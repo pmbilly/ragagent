@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
-import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
+import com.ragagent.common.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;

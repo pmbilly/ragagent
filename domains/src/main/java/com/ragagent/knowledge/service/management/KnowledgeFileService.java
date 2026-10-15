@@ -8,7 +8,7 @@ import com.ragagent.knowledge.repository.KnowledgeRepository;
 
 import com.ragagent.knowledge.repository.ChunkRepository;
 
-import com.ragagent.knowledge.support.KnowledgePaths;
+import com.ragagent.common.knowledge.support.KnowledgePaths;
 
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
@@ -19,7 +19,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
+import com.ragagent.common.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.platform.text.CleanInvalidUtf8;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;

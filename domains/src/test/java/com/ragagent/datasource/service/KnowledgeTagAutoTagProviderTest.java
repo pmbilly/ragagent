@@ -13,9 +13,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.knowledge.domain.KnowledgeTag;
-import com.ragagent.knowledge.repository.KnowledgeTagRepository;
-import com.ragagent.knowledge.service.management.KnowledgeBaseService;
-import com.ragagent.knowledge.service.management.KnowledgeTagService;
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
 /**
  * 自动标签生产实现（按名称查找或创建标签）：
@@ -23,17 +21,13 @@ import com.ragagent.knowledge.service.management.KnowledgeTagService;
  */
 class KnowledgeTagAutoTagProviderTest {
 
-    private KnowledgeBaseService kbService;
-    private KnowledgeTagRepository tagRepo;
-    private KnowledgeTagService tagService;
+    private KnowledgeCatalogPort catalog;
     private KnowledgeTagAutoTagProvider provider;
 
     @BeforeEach
     void setUp() {
-        kbService = mock(KnowledgeBaseService.class);
-        tagRepo = mock(KnowledgeTagRepository.class);
-        tagService = mock(KnowledgeTagService.class);
-        provider = new KnowledgeTagAutoTagProvider(kbService, tagRepo, tagService);
+        catalog = mock(KnowledgeCatalogPort.class);
+        provider = new KnowledgeTagAutoTagProvider(catalog);
     }
 
     @Test
@@ -47,7 +41,7 @@ class KnowledgeTagAutoTagProviderTest {
 
     @Test
     void missingKbThrowsNotFound() {
-        when(kbService.getAllTenantById("kb-1")).thenReturn(null);
+        when(catalog.getAllTenantById("kb-1")).thenReturn(null);
         assertThatThrownBy(() -> provider.findOrCreateTagId("kb-1", "tag"))
                 .isInstanceOf(BizException.class)
                 .hasMessageContaining("knowledge base not found");
@@ -58,13 +52,13 @@ class KnowledgeTagAutoTagProviderTest {
         KnowledgeBase kb = new KnowledgeBase();
         kb.setId("kb-1");
         kb.setTenantId(10002L);
-        when(kbService.getAllTenantById("kb-1")).thenReturn(kb);
+        when(catalog.getAllTenantById("kb-1")).thenReturn(kb);
         KnowledgeTag existing = new KnowledgeTag();
         existing.setId("tag-1");
-        when(tagRepo.getByName(10002L, "kb-1", "tag")).thenReturn(existing);
+        when(catalog.findKnowledgeTagByName(10002L, "kb-1", "tag")).thenReturn(existing);
 
         assertThat(provider.findOrCreateTagId("kb-1", " tag ")).isEqualTo("tag-1");
-        verify(tagService, never()).createTag(org.mockito.ArgumentMatchers.anyString(),
+        verify(catalog, never()).createKnowledgeTag(org.mockito.ArgumentMatchers.anyString(),
                 org.mockito.ArgumentMatchers.anyString(),
                 org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyInt());
     }
@@ -74,11 +68,11 @@ class KnowledgeTagAutoTagProviderTest {
         KnowledgeBase kb = new KnowledgeBase();
         kb.setId("kb-1");
         kb.setTenantId(10002L);
-        when(kbService.getAllTenantById("kb-1")).thenReturn(kb);
-        when(tagRepo.getByName(10002L, "kb-1", "tag")).thenReturn(null);
+        when(catalog.getAllTenantById("kb-1")).thenReturn(kb);
+        when(catalog.findKnowledgeTagByName(10002L, "kb-1", "tag")).thenReturn(null);
         KnowledgeTag created = new KnowledgeTag();
         created.setId("tag-new");
-        when(tagService.createTag("kb-1", "tag", null, 0)).thenReturn(created);
+        when(catalog.createKnowledgeTag("kb-1", "tag", null, 0)).thenReturn(created);
 
         assertThat(provider.findOrCreateTagId("kb-1", "tag")).isEqualTo("tag-new");
     }

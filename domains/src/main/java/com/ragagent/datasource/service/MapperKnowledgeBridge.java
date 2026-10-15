@@ -1,6 +1,6 @@
 package com.ragagent.datasource.service;
 
-import com.ragagent.knowledge.support.KnowledgePaths;
+import com.ragagent.common.knowledge.support.KnowledgePaths;
 
 import com.ragagent.common.knowledge.service.DuplicateKnowledgeException;
 
@@ -17,30 +17,23 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
-import com.ragagent.knowledge.storage.LocalStorageService;
+import com.ragagent.common.knowledge.task.KnowledgeProcessingQueue;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.platform.http.UrlBytesFetcher;
-import com.ragagent.knowledge.storage.TenantFileStorage;
+import com.ragagent.common.knowledge.support.KnowledgeHashes;
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
 /**
  * {@link KnowledgeBridge} 的生产实现：直接用 knowledge 模块的
- * {@link KnowledgeMapper} / {@link KnowledgeBaseMapper} / {@link LocalStorageService}
+ * {@code KnowledgeMapper} / {@code KnowledgeBaseMapper} / {@code LocalStorageService}
  * 与进程内处理队列。
  *
  * <h2>为什么不复用 {@code KnowledgeService}</h2>
@@ -78,27 +71,18 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final KnowledgeMapper knowledgeMapper;
-    private final KnowledgeBaseMapper kbMapper;
-    private final ChunkMapper chunkMapper;
     /** A3-3 尾批：租户感知文件存储（本地契约不变；云 provider 租户落对象存储）。 */
-    private final TenantFileStorage fileStorage;
+    private final KnowledgeCatalogPort knowledgeCatalog;
     private final KnowledgeProcessingQueue worker;
     /** SSRF 守卫：同步线程没有 controller 兜底，URL 抓取前必须自己校验。 */
     private final SsrfGuard ssrfGuard;
     private final boolean postgres;
 
-    public MapperKnowledgeBridge(KnowledgeMapper knowledgeMapper,
-                                 KnowledgeBaseMapper kbMapper,
-                                 ChunkMapper chunkMapper,
-                                 TenantFileStorage fileStorage,
+    public MapperKnowledgeBridge(KnowledgeCatalogPort knowledgeCatalog,
                                  KnowledgeProcessingQueue worker,
                                  SsrfGuard ssrfGuard,
                                  DataSource dataSource) {
-        this.knowledgeMapper = knowledgeMapper;
-        this.kbMapper = kbMapper;
-        this.chunkMapper = chunkMapper;
-        this.fileStorage = fileStorage;
+        this.knowledgeCatalog = knowledgeCatalog;
         this.worker = worker;
         this.ssrfGuard = ssrfGuard;
         this.postgres = DatabaseDialects.isPostgres(dataSource);
@@ -115,10 +99,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
         if (kbId == null || kbId.isEmpty()) {
             return null;
         }
-        return kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        return knowledgeCatalog.findKnowledgeBaseRow(kbId);
     }
 
     // ── 查询 ─────────────────────────────────────────────────────────────────
@@ -127,15 +108,8 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     public Knowledge findByDataSourceExternalId(long tenantId, String kbId, String dataSourceId,
                                                 String externalId) {
         if (postgres) {
-            List<Knowledge> rows = knowledgeMapper.selectList(
-                    new LambdaQueryWrapper<Knowledge>()
-                            .eq(Knowledge::getTenantId, tenantId)
-                            .eq(Knowledge::getKnowledgeBaseId, kbId)
-                            .apply("deleted_at IS NULL")
-                            .apply("metadata->>'datasourceId' = {0}", dataSourceId)
-                            .apply("metadata->>'externalId' = {0}", externalId)
-                            .last("LIMIT 1"));
-            return rows == null || rows.isEmpty() ? null : rows.get(0);
+            return knowledgeCatalog.findKnowledgeByExternalId(tenantId, kbId,
+                    dataSourceId, externalId);
         }
         for (Knowledge k : listLive(tenantId, kbId)) {
             Map<String, String> md = readMetadata(k);
@@ -153,14 +127,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
             return out;
         }
         if (postgres) {
-            List<Knowledge> rows = knowledgeMapper.selectList(
-                    new LambdaQueryWrapper<Knowledge>()
-                            .eq(Knowledge::getTenantId, tenantId)
-                            .eq(Knowledge::getKnowledgeBaseId, kbId)
-                            .apply("deleted_at IS NULL")
-                            .apply("metadata->>'" + key.replace("'", "''") + "' LIKE {0} ESCAPE '\\\\'",
-                                    escapeLike(prefix) + "%"));
-            return rows == null ? out : rows;
+            return knowledgeCatalog.listKnowledgeByMetadataPrefix(tenantId, kbId, key, prefix);
         }
         for (Knowledge k : listLive(tenantId, kbId)) {
             String value = readMetadata(k).get(key);
@@ -228,15 +195,10 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
                                     String rowTitle, String source, Map<String, String> metadata,
                                     String channel) {
         String fileType = fileTypeOf(fileName);
-        String hash = LocalStorageService.md5Hex(content);
+        String hash = KnowledgeHashes.md5Hex(content);
 
         // 重复检测：同库同哈希同类型即重复
-        Knowledge dup = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getKnowledgeBaseId, kb.getId())
-                .eq(Knowledge::getFileHash, hash)
-                .eq(Knowledge::getFileType, fileType)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge dup = knowledgeCatalog.findKnowledgeByHash(kb.getId(), hash, fileType);
         if (dup != null) {
             throw new DuplicateKnowledgeException(
                     dup, ErrorCode.KNOWLEDGE_DUPLICATE_FILE,
@@ -250,22 +212,16 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
         }
         k.setFileSize((long) content.length);
         k.setFileHash(hash);
-        k.setFilePath(fileStorage.save(tenantId, k.getId(), fileName, content));
+        k.setFilePath(knowledgeCatalog.saveKnowledgeFile(tenantId, k.getId(), fileName, content));
         k.setMetadata(metadataNode(metadata));
-        knowledgeMapper.insert(k);
+        knowledgeCatalog.insertKnowledge(k);
         worker.enqueue(k.getId());
         return k;
     }
 
     @Override
     public void attachMetadata(Knowledge knowledge, Map<String, String> metadata) {
-        LambdaUpdateWrapper<Knowledge> uw = new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledge.getId())
-                .eq(Knowledge::getTenantId, knowledge.getTenantId())
-                .set(Knowledge::getMetadata, metadataNode(metadata), "typeHandler="
-                        + PgJsonTypeHandler.class.getName())
-                .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC));
-        knowledgeMapper.update(null, uw);
+        knowledgeCatalog.updateKnowledgeMetadataRow(knowledge, metadata);
         knowledge.setMetadata(metadataNode(metadata));
     }
 
@@ -275,17 +231,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     @Override
     public void softDelete(long tenantId, String knowledgeId) {
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId).eq(Knowledge::getTenantId, tenantId)
-                .set(Knowledge::getDeletedAt, now));
-        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
-                .eq(Chunk::getKnowledgeId, knowledgeId).set(Chunk::getDeletedAt, now));
-        // A3-3 尾批：本地目录树恒清 + 若是 provider 引用则额外删对象（best-effort）
-        Knowledge row = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .eq(Knowledge::getTenantId, tenantId)
-                .last("LIMIT 1"));
-        fileStorage.delete(tenantId, knowledgeId, row == null ? null : row.getFilePath());
+        knowledgeCatalog.softDeleteKnowledgeFull(knowledgeId, tenantId, now);
     }
 
     @Override
@@ -301,9 +247,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     /** 物理删单条。 */
     @Override
     public void hardDelete(long tenantId, String knowledgeId) {
-        knowledgeMapper.delete(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .eq(Knowledge::getTenantId, tenantId));
+        knowledgeCatalog.hardDeleteKnowledge(knowledgeId, tenantId);
     }
 
     @Override
@@ -311,20 +255,14 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
         if (knowledgeIds == null || knowledgeIds.isEmpty()) {
             return;
         }
-        knowledgeMapper.delete(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getTenantId, tenantId)
-                .in(Knowledge::getId, knowledgeIds));
+        knowledgeCatalog.hardDeleteKnowledgeBatch(tenantId, knowledgeIds);
     }
 
     // ── 内部 ─────────────────────────────────────────────────────────────────
 
     /** 非 PG 路径的候选集：本租户 + 本知识库 + 未软删。 */
     private List<Knowledge> listLive(long tenantId, String kbId) {
-        List<Knowledge> rows = knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getTenantId, tenantId)
-                .eq(Knowledge::getKnowledgeBaseId, kbId)
-                .isNull(Knowledge::getDeletedAt));
-        return rows == null ? new ArrayList<>() : rows;
+        return knowledgeCatalog.listKnowledgeLive(tenantId, kbId);
     }
 
     /** 从 {@code metadata} 列读出字符串 map。 */
@@ -395,8 +333,4 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     }
 
     /** LIKE 转义：{@code \}、{@code %}、{@code _}。 */
-    static String escapeLike(String v) {
-        return v.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
-    }
-
 }

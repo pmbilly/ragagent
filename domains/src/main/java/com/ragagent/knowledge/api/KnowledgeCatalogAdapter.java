@@ -22,6 +22,19 @@ import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.domain.access.KnowledgeAccessGuard;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import com.ragagent.knowledge.service.management.KnowledgeTagService;
+import com.ragagent.knowledge.mapper.ChunkMapper;
+import com.ragagent.common.knowledge.domain.KnowledgeTag;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import java.util.Map;
+import java.util.ArrayList;
+import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
+import com.ragagent.knowledge.repository.KnowledgeTagRepository;
+import com.ragagent.platform.web.JsonMappers;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * {@link KnowledgeCatalogPort} 的知识域实现：读写逐字转发两个门面服务，
@@ -30,31 +43,43 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 @Component
 public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
 
+    private static final ObjectMapper METADATA_MAPPER = JsonMappers.lenient();
+
+
     private final KnowledgeService knowledgeService;
     private final KnowledgeBaseService knowledgeBaseService;
     private final KnowledgeAccessGuard accessGuard;
     private final KnowledgeBaseMapper knowledgeBaseMapper;
     private final KnowledgeMapper knowledgeMapper;
+    private final ChunkMapper chunkMapper;
+    private final KnowledgeTagService knowledgeTagService;
+    private final KnowledgeTagRepository knowledgeTagRepository;
+    private final TenantFileStorage tenantFileStorage;
     private final ChunkRepository chunkRepository;
     private final FaqEntryQueryService faqEntryQueryService;
-    private final TenantFileStorage tenantFileStorage;
 
     public KnowledgeCatalogAdapter(KnowledgeService knowledgeService,
                                    KnowledgeBaseService knowledgeBaseService,
                                    KnowledgeAccessGuard accessGuard,
                                    KnowledgeBaseMapper knowledgeBaseMapper,
                                    KnowledgeMapper knowledgeMapper,
+                                   ChunkMapper chunkMapper,
+                                   KnowledgeTagService knowledgeTagService,
+                                   KnowledgeTagRepository knowledgeTagRepository,
+                                   TenantFileStorage tenantFileStorage,
                                    ChunkRepository chunkRepository,
-                                   FaqEntryQueryService faqEntryQueryService,
-                                   TenantFileStorage tenantFileStorage) {
+                                   FaqEntryQueryService faqEntryQueryService) {
         this.knowledgeService = knowledgeService;
         this.knowledgeBaseService = knowledgeBaseService;
         this.accessGuard = accessGuard;
         this.knowledgeBaseMapper = knowledgeBaseMapper;
         this.knowledgeMapper = knowledgeMapper;
+        this.chunkMapper = chunkMapper;
+        this.knowledgeTagService = knowledgeTagService;
+        this.knowledgeTagRepository = knowledgeTagRepository;
+        this.tenantFileStorage = tenantFileStorage;
         this.chunkRepository = chunkRepository;
         this.faqEntryQueryService = faqEntryQueryService;
-        this.tenantFileStorage = tenantFileStorage;
     }
 
     @Override
@@ -194,4 +219,140 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
                 .isNull(Knowledge::getDeletedAt));
         return count != null && count > 0;
     }
+
+    // ── 摄取写面（SQL 与查询口径自 datasource 侧 verbatim 搬入） ──
+
+    @Override
+    public KnowledgeBase findKnowledgeBaseRow(String kbId) {
+        return knowledgeBaseMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
+                .eq(KnowledgeBase::getId, kbId)
+                .isNull(KnowledgeBase::getDeletedAt)
+                .last("LIMIT 1"));
+    }
+
+    @Override
+    public Knowledge findKnowledgeByExternalId(long tenantId, String kbId, String dataSourceId, String externalId) {
+        List<Knowledge> rows = knowledgeMapper.selectList(
+                new LambdaQueryWrapper<Knowledge>()
+                        .eq(Knowledge::getTenantId, tenantId)
+                        .eq(Knowledge::getKnowledgeBaseId, kbId)
+                        .apply("deleted_at IS NULL")
+                        .apply("metadata->>'datasourceId' = {0}", dataSourceId)
+                        .apply("metadata->>'externalId' = {0}", externalId)
+                        .last("LIMIT 1"));
+        return rows == null || rows.isEmpty() ? null : rows.get(0);
+    }
+
+    @Override
+    public List<Knowledge> listKnowledgeByMetadataPrefix(long tenantId, String kbId,
+            String metadataKey, String rawPrefix) {
+        List<Knowledge> rows = knowledgeMapper.selectList(
+                new LambdaQueryWrapper<Knowledge>()
+                        .eq(Knowledge::getTenantId, tenantId)
+                        .eq(Knowledge::getKnowledgeBaseId, kbId)
+                        .apply("deleted_at IS NULL")
+                        .apply("metadata->>'" + metadataKey.replace("'", "''") + "' LIKE {0} ESCAPE '\\\\'",
+                                escapeLike(rawPrefix) + "%"));
+        return rows == null ? new ArrayList<>() : rows;
+    }
+
+    @Override
+    public List<Knowledge> listKnowledgeLive(long tenantId, String kbId) {
+        List<Knowledge> rows = knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getTenantId, tenantId)
+                .eq(Knowledge::getKnowledgeBaseId, kbId)
+                .isNull(Knowledge::getDeletedAt));
+        return rows == null ? new ArrayList<>() : rows;
+    }
+
+    @Override
+    public Knowledge findKnowledgeByHash(String kbId, String fileHash, String fileType) {
+        return knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getKnowledgeBaseId, kbId)
+                .eq(Knowledge::getFileHash, fileHash)
+                .eq(Knowledge::getFileType, fileType)
+                .isNull(Knowledge::getDeletedAt)
+                .last("LIMIT 1"));
+    }
+
+    @Override
+    public void insertKnowledge(Knowledge knowledge) {
+        knowledgeMapper.insert(knowledge);
+    }
+
+    @Override
+    public String saveKnowledgeFile(long tenantId, String knowledgeId, String fileName, byte[] content) {
+        return tenantFileStorage.save(tenantId, knowledgeId, fileName, content);
+    }
+
+    @Override
+    public void deleteKnowledgeFile(long tenantId, String knowledgeId, String filePath) {
+        tenantFileStorage.delete(tenantId, knowledgeId, filePath);
+    }
+
+    @Override
+    public void updateKnowledgeMetadataRow(Knowledge knowledge, Map<String, String> metadata) {
+        LambdaUpdateWrapper<Knowledge> uw = new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledge.getId())
+                .eq(Knowledge::getTenantId, knowledge.getTenantId())
+                .set(Knowledge::getMetadata, metadataNode(metadata), "typeHandler="
+                        + PgJsonTypeHandler.class.getName())
+                .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC));
+        knowledgeMapper.update(null, uw);
+    }
+
+    @Override
+    public void softDeleteKnowledgeFull(String knowledgeId, long tenantId, OffsetDateTime now) {
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledgeId).eq(Knowledge::getTenantId, tenantId)
+                .set(Knowledge::getDeletedAt, now));
+        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
+                .eq(Chunk::getKnowledgeId, knowledgeId).set(Chunk::getDeletedAt, now));
+        Knowledge row = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledgeId)
+                .eq(Knowledge::getTenantId, tenantId)
+                .last("LIMIT 1"));
+        tenantFileStorage.delete(tenantId, knowledgeId, row == null ? null : row.getFilePath());
+    }
+
+    @Override
+    public void hardDeleteKnowledge(String knowledgeId, long tenantId) {
+        knowledgeMapper.delete(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledgeId)
+                .eq(Knowledge::getTenantId, tenantId));
+    }
+
+    @Override
+    public void hardDeleteKnowledgeBatch(long tenantId, List<String> knowledgeIds) {
+        knowledgeMapper.delete(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getTenantId, tenantId)
+                .in(Knowledge::getId, knowledgeIds));
+    }
+
+    @Override
+    public KnowledgeTag createKnowledgeTag(String kbId, String name, String color, int sortOrder) {
+        return knowledgeTagService.createTag(kbId, name, color, sortOrder);
+    }
+
+    @Override
+    public KnowledgeTag findKnowledgeTagByName(long tenantId, String kbId, String name) {
+        return knowledgeTagRepository.getByName(tenantId, kbId, name);
+    }
+
+    /** metadata map → JSON 节点（自 datasource 侧 verbatim 搬入）。 */
+    private static JsonNode metadataNode(Map<String, String> metadata) {
+        ObjectNode node = METADATA_MAPPER.createObjectNode();
+        if (metadata != null) {
+            for (Map.Entry<String, String> e : metadata.entrySet()) {
+                node.put(e.getKey(), e.getValue() == null ? "" : e.getValue());
+            }
+        }
+        return node;
+    }
+
+    /** SQL LIKE 转义（自 datasource 侧 verbatim 搬入）。 */
+    static String escapeLike(String v) {
+        return v.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
+    }
+
 }

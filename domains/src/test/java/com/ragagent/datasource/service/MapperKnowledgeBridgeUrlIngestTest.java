@@ -27,19 +27,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.storage.LocalStorageService;
-import com.ragagent.knowledge.storage.TenantFileStorage;
-import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
+import com.ragagent.common.knowledge.task.KnowledgeProcessingQueue;
 import com.sun.net.httpserver.HttpServer;
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
 /**
  * 数据源 URL 摄取（整改 K2 /）：下载在同步期完成、与文件行同形。
@@ -74,20 +69,18 @@ class MapperKnowledgeBridgeUrlIngestTest {
         int port = startServer("/doc.md", body);
         String url = "http://127.0.0.1:" + port + "/doc.md";
 
-        KnowledgeMapper knowledgeMapper = mock(KnowledgeMapper.class);
-        KnowledgeBaseMapper kbMapper = mock(KnowledgeBaseMapper.class);
-        when(kbMapper.selectOne(ArgumentMatchers.<Wrapper<KnowledgeBase>>any()))
+        KnowledgeCatalogPort catalog = mock(KnowledgeCatalogPort.class);
+        when(catalog.findKnowledgeBaseRow(anyString()))
                 .thenReturn(kb(42L, "kb-1"));
-        TenantFileStorage fileStorage = mock(TenantFileStorage.class);
-        when(fileStorage.save(anyLong(), anyString(), anyString(), any(byte[].class)))
+        when(catalog.saveKnowledgeFile(anyLong(), anyString(), anyString(), any(byte[].class)))
                 .thenReturn("kb-1/doc.md");
         KnowledgeProcessingQueue worker = mock(KnowledgeProcessingQueue.class);
 
-        Knowledge created = bridge(knowledgeMapper, kbMapper, fileStorage, worker)
+        Knowledge created = bridge(catalog, worker)
                 .createFromUrl(42L, "kb-1", url, null, "标题", List.of(), "ima");
 
         ArgumentCaptor<Knowledge> captor = ArgumentCaptor.forClass(Knowledge.class);
-        verify(knowledgeMapper).insert(captor.capture());
+        verify(catalog).insertKnowledge(captor.capture());
         Knowledge row = captor.getValue();
         assertThat(row.getFilePath()).as("URL 行必须与文件行同形（关键断言）").isEqualTo("kb-1/doc.md");
         assertThat(row.getFileHash()).isEqualTo(LocalStorageService.md5Hex(body));
@@ -106,41 +99,37 @@ class MapperKnowledgeBridgeUrlIngestTest {
     @DisplayName("SSRF：受限主机在抓取前被拒，不落行、不入队")
     void ssrfRestrictedHostRejectedBeforeInsert() throws Exception {
         SsrfGuard.installWhitelist("", "");
-        KnowledgeMapper knowledgeMapper = mock(KnowledgeMapper.class);
-        KnowledgeBaseMapper kbMapper = mock(KnowledgeBaseMapper.class);
-        when(kbMapper.selectOne(ArgumentMatchers.<Wrapper<KnowledgeBase>>any()))
+        KnowledgeCatalogPort catalog = mock(KnowledgeCatalogPort.class);
+        when(catalog.findKnowledgeBaseRow(anyString()))
                 .thenReturn(kb(42L, "kb-1"));
         KnowledgeProcessingQueue worker = mock(KnowledgeProcessingQueue.class);
 
-        MapperKnowledgeBridge bridge =
-                bridge(knowledgeMapper, kbMapper, mock(TenantFileStorage.class), worker);
+        MapperKnowledgeBridge bridge = bridge(catalog, worker);
 
         assertThatThrownBy(() -> bridge.createFromUrl(42L, "kb-1", "http://localhost/doc.md", null,
                 null, List.of(), "ima"))
                 .isInstanceOf(SsrfGuard.SsrfException.class);
 
-        verify(knowledgeMapper, never()).insert(any(Knowledge.class));
+        verify(catalog, never()).insertKnowledge(any(Knowledge.class));
         verifyNoInteractions(worker);
     }
 
     @Test
     @DisplayName("回归：createFromFile 行为不变（不写 source、metadata 落行）")
     void fileIngestUnchanged() throws Exception {
-        KnowledgeMapper knowledgeMapper = mock(KnowledgeMapper.class);
-        KnowledgeBaseMapper kbMapper = mock(KnowledgeBaseMapper.class);
-        when(kbMapper.selectOne(ArgumentMatchers.<Wrapper<KnowledgeBase>>any()))
+        KnowledgeCatalogPort catalog = mock(KnowledgeCatalogPort.class);
+        when(catalog.findKnowledgeBaseRow(anyString()))
                 .thenReturn(kb(42L, "kb-1"));
-        TenantFileStorage fileStorage = mock(TenantFileStorage.class);
-        when(fileStorage.save(anyLong(), anyString(), anyString(), any(byte[].class)))
+        when(catalog.saveKnowledgeFile(anyLong(), anyString(), anyString(), any(byte[].class)))
                 .thenReturn("kb-1/a.txt");
         KnowledgeProcessingQueue worker = mock(KnowledgeProcessingQueue.class);
 
-        bridge(knowledgeMapper, kbMapper, fileStorage, worker).createFromFile(42L, "kb-1",
+        bridge(catalog, worker).createFromFile(42L, "kb-1",
                 "abc".getBytes(StandardCharsets.UTF_8), "a.txt", Map.of("externalId", "e1"),
                 List.of(), "rss");
 
         ArgumentCaptor<Knowledge> captor = ArgumentCaptor.forClass(Knowledge.class);
-        verify(knowledgeMapper).insert(captor.capture());
+        verify(catalog).insertKnowledge(captor.capture());
         Knowledge row = captor.getValue();
         assertThat(row.getSource()).isEmpty();
         assertThat(row.getFileName()).isEqualTo("a.txt");
@@ -150,9 +139,7 @@ class MapperKnowledgeBridgeUrlIngestTest {
 
     // ── 夹具 ────────────────────────────────────────────────────────────────
 
-    private MapperKnowledgeBridge bridge(KnowledgeMapper knowledgeMapper,
-                                         KnowledgeBaseMapper kbMapper,
-                                         TenantFileStorage fileStorage,
+    private MapperKnowledgeBridge bridge(KnowledgeCatalogPort catalog,
                                          KnowledgeProcessingQueue worker) throws Exception {
         Connection connection = mock(Connection.class);
         DatabaseMetaData meta = mock(DatabaseMetaData.class);
@@ -160,8 +147,7 @@ class MapperKnowledgeBridgeUrlIngestTest {
         when(connection.getMetaData()).thenReturn(meta);
         DataSource dataSource = mock(DataSource.class);
         when(dataSource.getConnection()).thenReturn(connection);
-        return new MapperKnowledgeBridge(knowledgeMapper, kbMapper, mock(ChunkMapper.class),
-                fileStorage, worker, new SsrfGuard(), dataSource);
+        return new MapperKnowledgeBridge(catalog, worker, new SsrfGuard(), dataSource);
     }
 
     private int startServer(String path, byte[] body) throws IOException {

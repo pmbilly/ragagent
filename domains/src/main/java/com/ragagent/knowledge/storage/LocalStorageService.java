@@ -5,9 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Locale;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.common.storage.fileserve.FileTransport;
 import com.ragagent.common.storage.fileserve.StoragePathGuard;
@@ -18,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.ragagent.contract.error.AppError;
 import java.util.Comparator;
 import com.ragagent.platform.storage.config.UploadLimits;
+import com.ragagent.common.knowledge.support.KnowledgeHashes;
 
 /**
  * 本地存储引擎。
@@ -139,28 +137,19 @@ public class LocalStorageService {
     }
 
     /** 契约样例 为 32 位小写十六进制（md5） */
+    /** 内容 MD5（实现已下沉 L1 {@code KnowledgeHashes}，保留同名入口）。 */
     public static String md5Hex(byte[] content) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] digest = md.digest(content);
-            StringBuilder sb = new StringBuilder();
-            for (byte b : digest) {
-                sb.append(String.format(Locale.ROOT, "%02x", b));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
+        return KnowledgeHashes.md5Hex(content);
     }
 
-    /** 委托到 {@link UploadLimits}（纯规则搬 common 后本类保留同名入口，使用者零感知）。 */
-    public static long maxFileSizeBytes() {
-        return UploadLimits.maxFileSizeBytes();
-    }
-
-    /** 委托到 {@link UploadLimits}。 */
+    /** 上传大小上限（MB）：实现即 L1 {@code UploadLimits} 转发。 */
     public static long maxFileSizeMb() {
         return UploadLimits.maxFileSizeMb();
+    }
+
+    /** 上传大小上限（字节）：实现即 L1 {@code UploadLimits} 转发。 */
+    public static long maxFileSizeBytes() {
+        return UploadLimits.maxFileSizeBytes();
     }
 
     private static String sanitize(String fileName) {

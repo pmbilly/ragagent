@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.controller;
 
-import com.ragagent.knowledge.support.KnowledgePaths;
+import com.ragagent.common.knowledge.support.KnowledgePaths;
 import com.ragagent.knowledge.domain.KnowledgeSearchScope;
 
 import java.util.ArrayList;

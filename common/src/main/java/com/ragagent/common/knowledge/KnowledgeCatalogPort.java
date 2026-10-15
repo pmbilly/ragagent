@@ -1,6 +1,7 @@
 package com.ragagent.common.knowledge;
 
 import java.util.List;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -8,6 +9,7 @@ import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.ChunkPage;
 import com.ragagent.common.knowledge.domain.FaqEntryPage;
 import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.KnowledgeTag;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 
 /**
@@ -121,4 +123,48 @@ public interface KnowledgeCatalogPort {
 
     /** 该知识库下是否已有知识文件（未删除口径）。 */
     boolean hasFiles(String kbId);
+
+    // ── 摄取写面（数据源同步等；查询口径与域实现逐字一致） ──
+
+    /** 按 id 取知识库行（不看删除标记、LIMIT 1）。 */
+    KnowledgeBase findKnowledgeBaseRow(String kbId);
+
+    /** 按（租户 + 库 + 元数据 datasourceId/externalId）查行（PG 口径，LIMIT 1）；无 ⇒ null。 */
+    Knowledge findKnowledgeByExternalId(long tenantId, String kbId, String dataSourceId, String externalId);
+
+    /** 按元数据某键前缀查行（PG 口径；前缀转义在实现内做）。 */
+    List<Knowledge> listKnowledgeByMetadataPrefix(long tenantId, String kbId, String metadataKey, String rawPrefix);
+
+    /** 租户 + 库下的知识行（未删除口径，非 PG 回退路径用）。 */
+    List<Knowledge> listKnowledgeLive(long tenantId, String kbId);
+
+    /** 按（库 + 文件哈希 + 文件类型）查重（未删除口径）；无 ⇒ null。 */
+    Knowledge findKnowledgeByHash(String kbId, String fileHash, String fileType);
+
+    /** 落库新知识行。 */
+    void insertKnowledge(Knowledge knowledge);
+
+    /** 存知识文件（本地/云分流由域内门面决定），返回存储引用。 */
+    String saveKnowledgeFile(long tenantId, String knowledgeId, String fileName, byte[] content);
+
+    /** 删知识文件（best-effort 语义与域内门面一致）。 */
+    void deleteKnowledgeFile(long tenantId, String knowledgeId, String filePath);
+
+    /** 更新知识行的元数据（含 updatedAt）。 */
+    void updateKnowledgeMetadataRow(Knowledge knowledge, Map<String, String> metadata);
+
+    /** 软删知识 + 其 chunk（置 deletedAt）+ 清文件（best-effort）。 */
+    void softDeleteKnowledgeFull(String knowledgeId, long tenantId, java.time.OffsetDateTime now);
+
+    /** 硬删知识行（按 id + 租户）。 */
+    void hardDeleteKnowledge(String knowledgeId, long tenantId);
+
+    /** 硬删知识行（按租户 + id 集合）。 */
+    void hardDeleteKnowledgeBatch(long tenantId, List<String> knowledgeIds);
+
+    /** 建知识标签（校验与排序口径同域实现）。 */
+    KnowledgeTag createKnowledgeTag(String kbId, String name, String color, int sortOrder);
+
+    /** 按（租户 + 库 + 名）查标签；无 ⇒ null。 */
+    KnowledgeTag findKnowledgeTagByName(long tenantId, String kbId, String name);
 }

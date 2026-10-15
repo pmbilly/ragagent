@@ -10,7 +10,7 @@ import com.ragagent.knowledge.domain.KnowledgeSearchScope;
 
 import com.ragagent.knowledge.repository.ChunkRepository;
 
-import com.ragagent.knowledge.support.KnowledgePaths;
+import com.ragagent.common.knowledge.support.KnowledgePaths;
 
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
@@ -41,7 +41,7 @@ import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.knowledge.domain.KnowledgeTag;
-import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
+import com.ragagent.common.knowledge.task.KnowledgeProcessingQueue;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ragagent.knowledge.dto.doc.UpdateKnowledgeRequest;
@@ -722,7 +722,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
 
 
 
-    /** 入队端口外提为 {@link com.ragagent.knowledge.task.KnowledgeProcessingQueue}
+    /** 入队端口外提为 {@link com.ragagent.common.knowledge.task.KnowledgeProcessingQueue}
      *  （实现：KnowledgeProcessWorker）——原嵌套接口让全部提交方反向依赖门面类型，
      *  是 M2 解环的根之一，已删。 */
 }

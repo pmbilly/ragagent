@@ -55,6 +55,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantScopes;
 import com.ragagent.common.model.ModelCatalogPort;
 import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.common.knowledge.task.KnowledgeProcessingQueue;
 
 /**
  * 知识处理后台 worker：虚拟线程队列消费 knowledge 的解析主链路
