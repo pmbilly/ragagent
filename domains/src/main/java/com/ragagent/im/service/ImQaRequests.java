@@ -7,10 +7,10 @@ import com.ragagent.common.agent.AgentLookup;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
-import com.ragagent.common.session.domain.conversation.Session;
 import com.ragagent.common.session.qa.QaRequestPayload;
 import com.ragagent.common.session.domain.message.MessageAttachment;
 import com.ragagent.common.session.embed.MessageView;
+import com.ragagent.common.session.embed.SessionView;
 
 /**
  * QA 管线的共享底座：agent 模式判定、IM 请求构造（含 agent config 缺省补全）、
@@ -39,7 +39,7 @@ final class ImQaRequests {
     }
 
     /** 构造 QA 请求（含 agent config 缺省补全与 /stop 取消探针）。 */
-    QaRequestPayload buildIMQARequest(Session session, String query,
+    QaRequestPayload buildIMQARequest(SessionView session, String query,
             String assistantMessageId, String userMessageId, AgentLookup.AgentView agent,
             IncomingMessage.QuotedMessage quote, InflightEntry inflight) {
         QaRequestPayload req = new QaRequestPayload();

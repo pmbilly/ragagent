@@ -7,9 +7,9 @@ import com.ragagent.im.domain.ChannelSessionEntity;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.common.session.domain.conversation.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ragagent.common.session.embed.SessionView;
 
 /**
  * IM 消息的会话解析：user / thread 两种模式的映射查找与首建（含并发撞唯一约束时的
@@ -44,7 +44,7 @@ final class ImSessionResolver {
             return cs;
         }
         // 有文本就以 "" 起头（首条消息后按内容起标题）；否则用 IM 身份标题。
-        Session created = createImSession(tenantId,
+        SessionView created = createImSession(tenantId,
                 ImFormat.imInitialSessionTitle(msg, ImFormat::buildUserSessionTitle),
                 "Auto-created from " + msg.platform + " IM integration");
         ChannelSessionEntity fresh = newMapping(msg, tenantId, agentId, imChannelId, created.getId());
@@ -68,7 +68,7 @@ final class ImSessionResolver {
         if (cs != null) {
             return cs;
         }
-        Session created = createImSession(tenantId,
+        SessionView created = createImSession(tenantId,
                 ImFormat.imInitialSessionTitle(msg, ImFormat::buildThreadSessionTitle),
                 "Thread-based session from " + msg.platform + " IM");
         ChannelSessionEntity fresh = newMapping(msg, tenantId, agentId, imChannelId, created.getId());
@@ -78,8 +78,8 @@ final class ImSessionResolver {
     }
 
 
-    Session createImSession(long tenantId, String title, String description) {
-        Session s = new Session();
+    SessionView createImSession(long tenantId, String title, String description) {
+        SessionView s = new SessionView();
         s.setTenantId(tenantId);
         s.setTitle(title);
         s.setDescription(description);
@@ -106,7 +106,7 @@ final class ImSessionResolver {
     }
 
 
-    ChannelSessionEntity insertMapping(ChannelSessionEntity fresh, Session created) {
+    ChannelSessionEntity insertMapping(ChannelSessionEntity fresh, SessionView created) {
         try {
             service.channelSessions.insert(fresh, OffsetDateTime.now());
             log.info("[IM] Created new session mapping: session={}", created.getId());

@@ -15,7 +15,7 @@ import com.ragagent.common.session.domain.message.MessageAttachment;
 import com.ragagent.common.session.domain.message.MessageImage;
 import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.domain.message.MessageWithSession;
-import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.SessionRepository;
 import org.junit.jupiter.api.BeforeEach;

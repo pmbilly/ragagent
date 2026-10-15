@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.common.session.embed.SessionView;
 import com.ragagent.common.session.domain.message.MessageAttachment;
 
 /**
@@ -19,7 +19,7 @@ import com.ragagent.common.session.domain.message.MessageAttachment;
 public final class QaRequestPayload {
 
     /** 会话实体（已 L1）。 */
-    public Session session;
+    public SessionView session;
 
     public String query = "";
 

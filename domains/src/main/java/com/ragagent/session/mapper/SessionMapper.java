@@ -2,7 +2,7 @@ package com.ragagent.session.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
-import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.Session;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;

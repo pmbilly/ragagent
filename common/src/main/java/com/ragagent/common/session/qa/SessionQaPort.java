@@ -1,6 +1,6 @@
 package com.ragagent.common.session.qa;
 
-import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.common.session.embed.SessionView;
 import com.ragagent.common.session.embed.MessageView;
 import com.ragagent.platform.event.EventBus;
 
@@ -22,10 +22,10 @@ public interface SessionQaPort {
     void updateMessage(MessageView message);
 
     /** 按 id 取会话（不可见 / 不存在 ⇒ null，口径同域实现）。 */
-    Session getSession(String sessionId);
+    SessionView getSession(String sessionId);
 
     /** 建会话（口径同会话域 {@code SessionService#createSession}）。 */
-    Session createSession(Session session);
+    SessionView createSession(SessionView session);
 
     /** 删会话（口径同会话域 {@code SessionService#deleteSession}）。 */
     void deleteSession(String sessionId);

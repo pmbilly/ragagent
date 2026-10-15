@@ -45,11 +45,11 @@ import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
-import com.ragagent.common.session.domain.conversation.Session;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.common.storage.support.Resolver;
 import com.ragagent.common.session.qa.SessionQaPort;
+import com.ragagent.common.session.embed.SessionView;
 
 /**
  * IM 执行体核心。
@@ -302,7 +302,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
             return;
         }
 
-        Session session = sessionQaPort.getSession(channelSession.getSessionId());
+        SessionView session = sessionQaPort.getSession(channelSession.getSessionId());
         if (session == null) {
             // 会话被删：回收陈旧映射并重解析
             channelSessions.softDelete(channelSession.getId(), OffsetDateTime.now());
@@ -490,7 +490,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
             return queueReq;
         }
         final IncomingMessage msg;
-        final Session session;
+        final SessionView session;
         final AgentLookup.AgentView agent;
         final Adapter adapter;
         final ImChannelEntity channel;
@@ -501,7 +501,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
             this.queueReq = r;
         }
 
-        QaTask(IncomingMessage msg, Session session, AgentLookup.AgentView agent,
+        QaTask(IncomingMessage msg, SessionView session, AgentLookup.AgentView agent,
                 Adapter adapter, ImChannelEntity channel, String channelId, String userKey) {
 
             this.msg = msg;
@@ -527,7 +527,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
     void runFallbackNonStream(QaAttach attach, ImAttachmentPreparer.Prepared prepared) {
         qaRunner.runFallbackNonStream(attach, prepared);
     }
-    record QaAttach(IncomingMessage msg, Session session, AgentLookup.AgentView agent,
+    record QaAttach(IncomingMessage msg, SessionView session, AgentLookup.AgentView agent,
             Adapter adapter, ImChannelEntity channel, String channelId, String userKey,
             InflightEntry inflight) {
     }

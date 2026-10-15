@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 

@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.List;
 
 import com.ragagent.TestSchema;
-import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.common.session.domain.conversation.SessionLastRequestState;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.repository.SessionRepository;

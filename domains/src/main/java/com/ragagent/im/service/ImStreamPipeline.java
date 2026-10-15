@@ -16,7 +16,6 @@ import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.StreamSection;
 import com.ragagent.im.runtime.ThinkDisplay;
 import com.ragagent.im.runtime.ToolDisplay;
-import com.ragagent.common.session.domain.conversation.Session;
 import com.ragagent.platform.access.TenantContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +29,7 @@ import com.ragagent.contract.event.payload.AgentToolResultData;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.common.session.qa.QaRequestPayload;
 import com.ragagent.common.session.embed.MessageView;
+import com.ragagent.common.session.embed.SessionView;
 
 /**
  * IM 流式回复管线：事件订阅组、流缓冲袋、300ms 冲刷循环与 finalize/收尾落库。
@@ -65,7 +65,7 @@ final class ImStreamPipeline {
 
         subscribeStreamEvents(eventBus, buf, done, complete, useAgent);
 
-        Session session = attach.session();
+        SessionView session = attach.session();
         String requestId = UUID.randomUUID().toString();
         MessageView userMsg = service.qaRequests.createUserMessage(session.getId(), msg.content,
                 requestId, prepared.attachments());

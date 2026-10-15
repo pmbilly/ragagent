@@ -24,7 +24,7 @@ import com.ragagent.common.session.domain.message.MessageImage;
 import com.ragagent.common.session.domain.message.MessageArtifact;
 import com.ragagent.common.session.domain.message.MessageAttachment;
 import com.ragagent.session.domain.message.MessageNotFoundException;
-import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.MessageWithSession;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.session.SessionMessagePort;

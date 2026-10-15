@@ -80,7 +80,7 @@ import com.ragagent.common.session.domain.message.MessageArtifact;
 import com.ragagent.common.session.domain.message.MessageAttachment;
 import com.ragagent.common.session.domain.message.MessageExecutionContext;
 import com.ragagent.common.session.domain.message.MessageImage;
-import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.common.session.domain.conversation.SessionLastRequestState;
 import com.ragagent.session.domain.conversation.SessionListItem;
 import com.ragagent.common.session.domain.SuggestionAttribution;

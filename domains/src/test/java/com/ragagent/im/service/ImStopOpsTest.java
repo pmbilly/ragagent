@@ -17,7 +17,7 @@ import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.QaQueue;
-import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.common.session.embed.SessionView;
 
 /**
  * {@link ImStopOps} 的语义钉子：自 {@code ImTurnOrchestrator} 外提时逐字搬迁，
@@ -111,7 +111,7 @@ class ImStopOpsTest {
     void bindInflightWithoutRedisOnlyUpdatesEntry() {
         ImStopOps ops = singleInstance(emptyInflight());
         ImTurnOrchestrator.InflightEntry entry = new ImTurnOrchestrator.InflightEntry(null, () -> false);
-        Session session = new Session();
+        SessionView session = new SessionView();
         session.setId("sess-1");
         ImTurnOrchestrator.QaAttach attach = new ImTurnOrchestrator.QaAttach(null, session, null, null,
                 channel("ch1", "user"), "ch1", "ch1:u1:c1", entry);

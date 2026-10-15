@@ -105,7 +105,7 @@ public class Message {
     /**
      * 是否生成完毕。恒输出（线格式键是 {@code completed}，§1.24 不带 is 前缀）。
      *
-     * <p>字段名不带 {@code is} 前缀——理由见 {@link com.ragagent.common.session.domain.conversation.Session} 上同名字段的注释。</p>
+     * <p>字段名不带 {@code is} 前缀——理由见 {@link com.ragagent.session.domain.conversation.Session} 上同名字段的注释。</p>
      */
     @TableField("is_completed")
     private boolean completed;

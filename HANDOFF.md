@@ -268,7 +268,7 @@ contract  → JDK                                  （纯 JDK：公开 API / SPI
 | `Message` / `Chunk` / `Model` / `Session` | 3~6 | 2~4 | **非机械**：视图要覆盖大量字段（`Chunk` 24 访问器 vs 现有视图 6 字段）+ 跨域写面 + L1 组件（`BaseTool`/`ChunkPage`）⇒ 需设计 |
 | `KnowledgeBase` / `Knowledge` / `User` / `Tenant` | 4~10 | 0~3 | 最后（写面 16~48 处，多为管理面 ⇒ 用例归位） |
 
-**进度（2026-10-15）**：C2 实体 **14 → 9**（`KnowledgeTag`、`AuthToken`、`MessageSuggestionSet`、`Model`、`Message` 已归域；域侧 handler 12 → 10）；C4 待归位载荷 14、登记 8（platform 面 5 + 待去 Jackson 3）；R10 保持 **7 条边 / 52 类**（收窄未重建边 ✓）。
+**进度（2026-10-15）**：C2 实体 **14 → 8**（`KnowledgeTag`、`AuthToken`、`MessageSuggestionSet`、`Model`、`Message`、`Session` 已归域；域侧 handler 12 → 10）；C4 待归位载荷 14、登记 8（platform 面 5 + 待去 Jackson 3）；R10 保持 **7 条边 / 52 类**（收窄未重建边 ✓）。
 
 **次批三候选的实测阻断（已测，勿重复测量）**：`MessageSuggestionSet`＝**API 线格式**（`EmbedSessionPort` 返回 `ResponseEntity<…>` ⇒ 换视图即改 embed 公开面）· `StorageBackend`＝**实体跨域归属**（storage 与 knowledge **双方都有它的 mapper**）· `WikiPageIssue`＝**跨域写面**（`session/AgentToolWikiBackends` 12 读 + 56 setters）⇒ 三者均需**先决策**（线格式确认 / 归属裁定 / 用例归位）。**已解锁示范两支**：读面换视图（`KnowledgeTag`）· 写面走契约端口（`AuthToken`，同时清偿了 ②owner 的"写侧直用他域 mapper"）。
 
@@ -1451,6 +1451,15 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 C 批 1·第六子批：`Session` 收窄 + **无损互转**（实体 9 → 8）（2026-10-15）**
+- **关键设计决策＝"无损互转"而非"按 id 重载"**：im 侧会**新建（可能未落库的）会话**再塞进 QA 载荷 ⇒ 若适配器按 id 重载会拿到 null ✗。故 `SessionView` **镜像全部 13 字段与默认值**，`toEntity(view)` 回填后在域内继续走管线（**零语义丢失**）
+- **动作**：L1 新增 `common.session.embed.SessionView`（13 字段镜像 + `@JsonIgnore embedVisitorId`）· `SessionQaPort.getSession`/`createSession` → 视图 · **`QaRequestPayload.session` → `SessionView`**（容器映射改 `req.session = toEntity(payload.session)`）· 适配器加 `toView`/`toEntity`/`copyInto`（回填）· 实体回 `session/domain/conversation`（补 `SessionLastRequestState`/`SessionOwnerIds` 两个 L1 import）；其 **4 个静态助手只在域内被调用** ⇒ 随实体走 ✓
+- **⚠️ 两次红态（第一条是本轮最有价值的教训）**：
+  1. **R10 抓到 `im→session` 重现**（1 类 `ImTurnOrchestrator`）——根因不是用法，而是**残留的未使用 import**：我的代码段替换器因 FQN 里的 `.`（`…conversation.Session;`）**跳过了 import 行**，于是它把域实体 import 留了下来 ⇒ 守卫照样算依赖 ✗ ⇒ 删该 import 后 R10 **立即回绿**。**判据：搬迁后必须扫"未使用 import"（它照样构成依赖）——替换器要显式处理 import 行**
+  2. **javadoc 失效链接**（L1 `MessageAttachment` 里 `{@link com.ragagent.session.domain.conversation.Session}`）⇒ 改 `{@code}`（**该规律第 5 次**，已用"L1 侧批量修"脚本处理）
+- **读数**：**C2 实体 9 → 8**；C1 受控根 70 → **69 文件**；C4 待归位 14、**登记 platform 面 6 → 7**；**R10 保持 7 条边 / 52 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**；**金片测试 ✓**（embedchannel/session/im）+ **1349 金片签名一致** ✓；`spotlessCheck build` **1m46s**；**4991 / 失败 0 / 跳过 4**；dev ready + 冒烟：**`POST /api/v1/sessions` ⇒ 201 + 完整会话 JSON（含回填后的 id）** ✓✓——**端到端证明"视图 + 回填"链路可用**；sessions/models/KB/im-channels 200 ✓
+- **C 余量（8 个实体）**：`Chunk`/`Knowledge`/`KnowledgeBase`（宽字段 + 写面）· `StorageBackend`（**归属裁定**）· `WikiPage`/`WikiPageIssue`（**写面归位**）· `Tenant`/`User`（管理面）
 **🔶 C 批 1·第五子批：`Message` 收窄 + 消息线格式视图（实体 10 → 9）（2026-10-15）**
 - **判据先行（连续第三次靠金片护航）**：`EmbedContractTest` 对 `GET /embed/{c}/messages/{s}/load` 有 **4~5 条金片断言** ⇒ 动之前确认护栏在
 - **动作**：

@@ -15,7 +15,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
-import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.common.session.domain.conversation.SessionLastRequestState;
 import com.ragagent.session.domain.conversation.SessionListItem;
 import com.ragagent.session.domain.conversation.SessionListQuery;

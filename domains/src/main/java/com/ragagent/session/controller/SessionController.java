@@ -11,7 +11,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.session.domain.message.Message;
-import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionListQuery;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.common.session.domain.conversation.SessionOwnerIds;

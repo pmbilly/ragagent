@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.common.session.EmbedSessionOps;
 import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
-import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionListQuery;
 import com.ragagent.common.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.session.domain.conversation.SessionPage;

@@ -2,7 +2,7 @@ package com.ragagent.session.api;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.common.session.embed.MessageView;
 import com.ragagent.common.session.qa.QaRequestPayload;
@@ -13,6 +13,7 @@ import com.ragagent.session.service.QaSupport;
 import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SessionService;
+import com.ragagent.common.session.embed.SessionView;
 
 /**
  * {@link SessionQaPort} 的会话域实现：消息落库与会话读取逐字转发；
@@ -52,8 +53,10 @@ public class SessionQaAdapter implements SessionQaPort {
     }
 
     @Override
-    public Session createSession(Session session) {
-        return sessionService.createSession(session);
+    public SessionView createSession(SessionView session) {
+        Session saved = sessionService.createSession(toEntity(session));
+        copyInto(session, saved);
+        return toView(saved);
     }
 
     @Override
@@ -62,8 +65,8 @@ public class SessionQaAdapter implements SessionQaPort {
     }
 
     @Override
-    public Session getSession(String sessionId) {
-        return sessionService.getSession(sessionId);
+    public SessionView getSession(String sessionId) {
+        return toView(sessionService.getSession(sessionId));
     }
 
     @Override
@@ -79,7 +82,7 @@ public class SessionQaAdapter implements SessionQaPort {
     /** 载荷 → 运行容器：同名字段一一搬运（未列字段保持容器默认值）。 */
     private static QaSupport.QaRequest toContainer(QaRequestPayload payload) {
         QaSupport.QaRequest req = new QaSupport.QaRequest();
-        req.session = payload.session;
+        req.session = toEntity(payload.session);
         req.query = payload.query;
         req.assistantMessageId = payload.assistantMessageId;
         req.userMessageId = payload.userMessageId;
@@ -195,5 +198,71 @@ public class SessionQaAdapter implements SessionQaPort {
         v.setCreatedAt(fresh.getCreatedAt());
         v.setUpdatedAt(fresh.getUpdatedAt());
         v.setDeletedAt(fresh.getDeletedAt());
+    }
+
+    /** 实体 → 线格式视图（域内投影；null 透传）。 */
+    static SessionView toView(Session s) {
+        if (s == null) {
+            return null;
+        }
+        SessionView v = new SessionView();
+        v.setId(s.getId());
+        v.setTitle(s.getTitle());
+        v.setDescription(s.getDescription());
+        v.setTenantId(s.getTenantId());
+        v.setUserId(s.getUserId());
+        v.setEmbedVisitorId(s.getEmbedVisitorId());
+        v.setPinned(s.isPinned());
+        v.setPinnedAt(s.getPinnedAt());
+        v.setLastRequestState(s.getLastRequestState());
+        v.setCreatedAt(s.getCreatedAt());
+        v.setUpdatedAt(s.getUpdatedAt());
+        v.setDeletedAt(s.getDeletedAt());
+        v.setImPlatform(s.getImPlatform());
+        return v;
+    }
+
+    /** 视图 → 实体（无损：字段逐一搬运；null 透传）。QA 容器需要的是**完整会话**，
+     * 故载荷只携视图、在域内回填为实体（不做 id 重载，避免"未落库会话"丢失）。 */
+    static Session toEntity(SessionView v) {
+        if (v == null) {
+            return null;
+        }
+        Session e = new Session();
+        e.setId(v.getId());
+        e.setTitle(v.getTitle());
+        e.setDescription(v.getDescription());
+        e.setTenantId(v.getTenantId());
+        e.setUserId(v.getUserId());
+        e.setEmbedVisitorId(v.getEmbedVisitorId());
+        e.setPinned(v.isPinned());
+        e.setPinnedAt(v.getPinnedAt());
+        e.setLastRequestState(v.getLastRequestState());
+        e.setCreatedAt(v.getCreatedAt());
+        e.setUpdatedAt(v.getUpdatedAt());
+        e.setDeletedAt(v.getDeletedAt());
+        e.setImPlatform(v.getImPlatform());
+        return e;
+    }
+
+    /** 把落库后的实体字段回填到传入视图（恢复"同对象被填充"的旧语义；null 安全）。 */
+    static void copyInto(SessionView v, Session s) {
+        if (v == null || s == null) {
+            return;
+        }
+        SessionView fresh = toView(s);
+        v.setId(fresh.getId());
+        v.setTitle(fresh.getTitle());
+        v.setDescription(fresh.getDescription());
+        v.setTenantId(fresh.getTenantId());
+        v.setUserId(fresh.getUserId());
+        v.setEmbedVisitorId(fresh.getEmbedVisitorId());
+        v.setPinned(fresh.isPinned());
+        v.setPinnedAt(fresh.getPinnedAt());
+        v.setLastRequestState(fresh.getLastRequestState());
+        v.setCreatedAt(fresh.getCreatedAt());
+        v.setUpdatedAt(fresh.getUpdatedAt());
+        v.setDeletedAt(fresh.getDeletedAt());
+        v.setImPlatform(fresh.getImPlatform());
     }
 }
