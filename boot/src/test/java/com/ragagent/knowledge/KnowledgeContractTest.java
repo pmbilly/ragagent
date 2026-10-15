@@ -23,8 +23,6 @@ import com.ragagent.common.auth.domain.UserPreferences;
 import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
-import com.ragagent.common.storage.StorageBackend;
-import com.ragagent.knowledge.mapper.StorageBackendMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +70,6 @@ class KnowledgeContractTest {
     private TenantMapper tenantMapper;
     @Autowired
     private TenantMemberMapper memberMapper;
-    @Autowired
-    private StorageBackendMapper storageBackendMapper;
 
     @BeforeEach
     void seed() {
@@ -87,12 +83,11 @@ class KnowledgeContractTest {
         tenant.setDefaultStorageBackendId(STORAGE_BACKEND_ID);
         tenantMapper.insert(tenant);
 
-        StorageBackend backend = new StorageBackend();
-        backend.setId(STORAGE_BACKEND_ID);
-        backend.setTenantId(10002L);
-        backend.setName("local-default");
-        backend.setProvider("local");
-        storageBackendMapper.insert(backend);
+        // 单一持久面（本刀删除知识域重复 mapper）：种子改走测试自带的 jdbc。
+        // 只插旧 mapper 时代显式设置过的 4 列，其余列（config/status/...）由 schema 默认值填充
+        // ——与 MyBatis-Plus "跳过 null 字段" 的旧行为逐字一致。
+        jdbc.update("INSERT INTO storage_backends (id, tenant_id, name, provider) VALUES (?, ?, ?, ?)",
+                STORAGE_BACKEND_ID, 10002L, "local-default", "local");
 
         insertUser("11111111-2222-3333-4444-555555555501", "phase1test", "java-phase1@weknora.test");
         insertUser("11111111-2222-3333-4444-555555555504", "phase1viewer", "java-phase1-viewer@weknora.test");

@@ -30,7 +30,6 @@ import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.storage.StorageBackend;
 import com.ragagent.knowledge.domain.UserKbPin;
-import com.ragagent.knowledge.repository.KnowledgeStorageBackendRepository;
 import com.ragagent.knowledge.repository.UserKbPinRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +44,7 @@ import com.ragagent.common.knowledge.domain.KnowledgeBaseImageProcessingConfig;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.common.storage.StorageBackendPort;
 
 /**
  * （覆盖 CRUD + pin + move-targets + 计数回填；
@@ -62,7 +62,7 @@ public class KnowledgeBaseService
     private final KnowledgeRepository knowledgeRepository;
     private final ChunkRepository chunkRepository;
     private final UserKbPinRepository pinRepository;
-    private final KnowledgeStorageBackendRepository storageBackendRepository;
+    private final StorageBackendPort storageBackendPort;
     private final TenantConfigLookup tenantConfigLookup;
     private final UserNameLookup userNameLookup;
     private final String retrieveDriver;
@@ -73,7 +73,7 @@ public class KnowledgeBaseService
                                 KnowledgeRepository knowledgeRepository,
                                 ChunkRepository chunkRepository,
                                 UserKbPinRepository pinRepository,
-                                KnowledgeStorageBackendRepository storageBackendRepository,
+                                StorageBackendPort storageBackendPort,
                                 TenantConfigLookup tenantConfigLookup,
                                 UserNameLookup userNameLookup,
                                 RetrieveEngineRegistry retrieveEngineRegistry,
@@ -83,7 +83,7 @@ public class KnowledgeBaseService
         this.knowledgeRepository = knowledgeRepository;
         this.chunkRepository = chunkRepository;
         this.pinRepository = pinRepository;
-        this.storageBackendRepository = storageBackendRepository;
+        this.storageBackendPort = storageBackendPort;
         this.tenantConfigLookup = tenantConfigLookup;
         this.userNameLookup = userNameLookup;
         this.retrieveEngineRegistry = retrieveEngineRegistry;
@@ -263,14 +263,14 @@ public class KnowledgeBaseService
         }
         StorageBackend backend = null;
         if (!id.isEmpty()) {
-            backend = storageBackendRepository.findById(tenantId(), id);
+            backend = storageBackendPort.findById(tenantId(), id);
             if (backend == null) {
                 throw new BizException(AppError.badRequest("storage backend is unavailable"));
             }
         } else {
             String provider = kb.getStorageProvider();
             if (!provider.isEmpty()) {
-                backend = storageBackendRepository.findLegacyAliasByProvider(tenantId(), provider);
+                backend = storageBackendPort.findActiveLegacyAliasByProvider(tenantId(), provider);
             }
         }
         if (backend == null) {

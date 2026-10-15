@@ -1451,6 +1451,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 存储后端·单一持久面改造（为 `StorageBackend` 收窄铺路）（2026-10-15）**
+- **背景（实测发现）**：`storage_backends` 表原有**两个持久面**——storage 域 `StorageBackendRepository`（JdbcClient）+ **知识域自带 `StorageBackendMapper`（`@Mapper`）与其 `KnowledgeStorageBackendRepository`** ✗（同一张表两套访问；知识域注释还记录了"同名 Bean 冲突导致上下文起不来"的历史）
+- **动作**：① 契约端口 `StorageBackendPort` **+2 读方法**（`findById` · `findActiveLegacyAliasByProvider`）② storage 侧仓储新增 `findActiveLegacyAlias`（**SQL 从句网侧逐字搬入**）+ 适配器实现两方法 ③ `KnowledgeBaseService` 两处调用改走端口 ④ **删除知识域 `KnowledgeStorageBackendRepository` + `StorageBackendMapper`** ⇒ **该表现在只有一个域持有 mapper** ✓
+- **⚠️ 发现并登记一处语义分歧（本刀刻意不合并）**：storage 自用的 `findLegacyAlias` **不过滤 `deleted_at`**（其注释明示"刻意保留，别顺手修好"），而知识域原方法**过滤未删行**；本刀**逐字保留各自语义**（新方法以 `findActiveLegacyAliasByProvider` 命名显式区分），**合并须单独拍板**
+- **⚠️ 一次红态（我的测试种子改造踩到两个行为假设）**：把 `storageBackendMapper.insert(entity)` 换成手写 JDBC 后，`KnowledgeContractTest` 4 条失败——① `config` 列 **NOT NULL**（旧 MyBatis-Plus **跳过 null 字段** ⇒ 列走 schema 默认值）② `status` 必须为 **`active`**（KB 文件存取要求 `resolve storage provider` 成功）。修法：**只插旧代码显式设置过的 4 列**（id/tenant_id/name/provider），其余交 schema 默认值 ⇒ 4 条全绿 ✓。**判据：把 ORM 写入手写成 SQL 时，必须逐列核对"ORM 会跳过哪些列"——跳过＝走默认值，是与显式写 NULL 不同的行为**
+- **读数**：**R10 保持 7 条边 / 52 类**（端口在 L1 ⇒ 无新边）✓；14 守卫全绿；**净删 2 个文件**（知识域不再持有该表 mapper）
+- **验证**：`spotlessCheck build` **2m05s**；**4991 / 失败 0 / 跳过 4**；dev ready + 冒烟（knowledge-bases / **storage-backends** / sessions / models 200 ✓）
+- **意义**：`StorageBackend` 实体收窄（C 余量之一）**已具备前提**——唯一持久面在 storage 域，实体回域后跨域只剩端口读（+ system 的少量写面）
 **🔶 C 批 1·第六子批：`Session` 收窄 + **无损互转**（实体 9 → 8）（2026-10-15）**
 - **关键设计决策＝"无损互转"而非"按 id 重载"**：im 侧会**新建（可能未落库的）会话**再塞进 QA 载荷 ⇒ 若适配器按 id 重载会拿到 null ✗。故 `SessionView` **镜像全部 13 字段与默认值**，`toEntity(view)` 回填后在域内继续走管线（**零语义丢失**）
 - **动作**：L1 新增 `common.session.embed.SessionView`（13 字段镜像 + `@JsonIgnore embedVisitorId`）· `SessionQaPort.getSession`/`createSession` → 视图 · **`QaRequestPayload.session` → `SessionView`**（容器映射改 `req.session = toEntity(payload.session)`）· 适配器加 `toView`/`toEntity`/`copyInto`（回填）· 实体回 `session/domain/conversation`（补 `SessionLastRequestState`/`SessionOwnerIds` 两个 L1 import）；其 **4 个静态助手只在域内被调用** ⇒ 随实体走 ✓

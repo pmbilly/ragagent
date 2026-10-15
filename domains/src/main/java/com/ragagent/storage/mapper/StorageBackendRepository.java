@@ -89,6 +89,23 @@ public class StorageBackendRepository {
                 .orElse(null);
     }
 
+    /**
+     * provider 的 legacy 别名行，**过滤未软删**、按 {{@code LIMIT 1}} 取（自知识域仓储
+     * {{@code KnowledgeStorageBackendRepository#findLegacyAliasByProvider}} 原样搬入，
+     * 供契约端口 {{@code StorageBackendPort#findActiveLegacyAliasByProvider}} 使用）。
+     *
+     * <p>⚠️ 与上方 {{@code findLegacyAlias}} 刻意不同：那个不过滤 {{@code deleted_at}}。</p>
+     */
+    public StorageBackend findActiveLegacyAlias(long tenantId, String provider) {
+        return jdbc.sql("SELECT " + COLS + " FROM storage_backends "
+                        + "WHERE tenant_id = ? AND provider = ? AND legacy_alias = TRUE "
+                        + "AND deleted_at IS NULL LIMIT 1")
+                .params(tenantId, provider)
+                .query(new BackendMapper())
+                .optional()
+                .orElse(null);
+    }
+
     /** 列表：按 created_at 倒序 */
     public List<StorageBackend> list(long tenantId) {
         return jdbc.sql("SELECT " + COLS + " FROM storage_backends "

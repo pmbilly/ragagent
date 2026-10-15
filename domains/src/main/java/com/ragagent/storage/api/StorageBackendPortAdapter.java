@@ -41,4 +41,14 @@ public class StorageBackendPortAdapter implements StorageBackendPort {
     public List<StorageBackend> list(long tenantId) {
         return backendRepository.list(tenantId);
     }
+
+    @Override
+    public StorageBackend findById(long tenantId, String id) {
+        return backendRepository.getByID(tenantId, id).orElse(null);
+    }
+
+    @Override
+    public StorageBackend findActiveLegacyAliasByProvider(long tenantId, String provider) {
+        return backendRepository.findActiveLegacyAlias(tenantId, provider);
+    }
 }

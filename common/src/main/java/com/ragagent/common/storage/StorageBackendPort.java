@@ -18,4 +18,22 @@ public interface StorageBackendPort {
 
     /** 租户的存储后端清单（顺序与仓储一致）。 */
     List<StorageBackend> list(long tenantId);
+
+    // ── 行级读取面（供知识域等按 id / provider 解析 KB 绑定的后端） ──
+
+    /**
+     * 租户内 + 未软删，按 id 取后端；无 ⇒ null。
+     * （语义与 storage 域仓储 {@code getByID} 一致：{@code tenant_id = ? AND id = ? AND deleted_at IS NULL}。）
+     */
+    StorageBackend findById(long tenantId, String id);
+
+    /**
+     * 租户内按 provider 取**未软删**的 legacy alias 后端；按主键序取第一条；无 ⇒ null。
+     *
+     * <p>⚠️ <b>与 storage 域自用的 {@code findLegacyAlias} 刻意不同</b>：后者**不过滤
+     * {@code deleted_at}**（storage 侧注释明示"刻意保留，别顺手修好"）。本方法保留知识域
+     * 迁移前的语义（过滤未删行、无 ORDER BY 但有 LIMIT 1）；**两侧语义差异是既有事实，
+     * 未在本刀合并**（如需统一须单独拍板）。</p>
+     */
+    StorageBackend findActiveLegacyAliasByProvider(long tenantId, String provider);
 }
