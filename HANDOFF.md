@@ -1331,6 +1331,20 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 A③ 第三十三刀：`system→storage` 收官 ⇒ 存储族全清（2026-10-15，R10 边 27 → 26、类 186 → 184）**
+- **接缝**：`system→storage` 余 2 类（`SystemController` 的存储连通性检测 · `SystemInfoService` 的已启用存储提供商），这是**存储族最后一条边**
+- **L1 新增 1 件**：`common.storage.StorageBackendPort`（`test(backend)` 连通性探测 / `sanitizeConnectivity(msg)` 脱敏 / `list(tenantId)` 后端清单）+ 存储域 `api/StorageBackendPortAdapter`（探测与脱敏转发运行时探测服务、清单转发元数据仓储，语义逐字转发不缓冲）
+- **2 类改造**：`SystemController`（`StorageBackendService` → 端口；探测调用与脱敏调用换面）· `SystemInfoService`（`StorageBackendRepository` → 端口）⇒ **`system→storage` 整条边清零** ✓
+- **存储族收官读数**：`im→storage` / `knowledge→storage` / `session→storage` / `embedchannel→storage` / `system→storage` **五条边全部为零** ✓（㉗～本刀共 7 刀完成）
+- **A16 棘轮顺带收紧**：`SystemInfoService` 不再直接依赖 `storage.mapper` 边界层 ⇒ 守卫点名"过期条目"并按提示删除，存量 **70 → 69** ✓（真实结构改善）
+- **⚠️ 一处文档数字纠错（写入方法论）**：我按旧记忆（74）去改 A16 的"实测存量 N 类"注释，未命中（该注释在更早的刀已改为 70）⇒ **改棘轮计数注释前先读当前值，不要凭记忆推算**；本次已复核实际值并校准为 69
+- **验证**：**13 守卫全绿** ✓（A20：新端口恰一实现 ✓）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；定向 system/storage ✓；dev 重启 ready ✓（新适配器 bean + 两类新构造装配通过）+ 冒烟（`/api/v1/system/info`、`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 均 200 ✓）
+- **A③ 累计（三十三刀）**：边 **64 → 26（−38）**、类 **317 → 184（−133）**；三档 **① 18 条 / 98 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步（①档 18 条，按性质分组）**：
+  - **三大块**（须逐类枚举剩余跨域 import 再定刀）：`session→knowledge`(17) · `knowledge→model`(14) · `session→model`(12)
+  - **待拍板**：`mcp→agent`(9)（并入 agent-runtime 族＝零代码 或 工具 SPI 上提契约）
+  - **K 级**（实体线格式）：`datasource→knowledge`(8) · `embedchannel→knowledge`(2)
+  - **其余**：`session→memory`(7) · `im→session`(6) · `initialization→model`(4) · `initialization→knowledge`(4) · `session→websearch`(4) · `im→knowledge`(2) · `session→mcp`(2) · `session→wiki`(2) · `evaluation→{knowledge,model,session}`(各 1)
 **🔶 A③ 第三十二刀：`session→storage` 收官 ⇒ 消息文件代理走端口（2026-10-15，R10 边 28 → 27、类 187 → 186）**
 - **接缝**：`session→storage` 余最后 1 类 `MessageFileProxyController`（消息作用域资源代理）——**复用 ㉙ 的文件代理端口族**，不新造体系
 - **端口扩展**：`FileProxyPort` 增 `serveMessageFile(sessionId, messageId, MessageFactsLookup, req, res)`；新增 L1 载荷 `MessageFileFacts`（7 字段，自 `FileAccessResolver` 内嵌 record **搬为顶层**）+ 回调 `MessageFactsLookup`

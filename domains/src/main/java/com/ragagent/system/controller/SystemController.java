@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.common.storage.StorageBackend;
-import com.ragagent.storage.service.StorageBackendService;
+import com.ragagent.common.storage.StorageBackendPort;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
 import com.ragagent.platform.web.ApiResult;
 
@@ -61,7 +61,7 @@ public class SystemController {
     private final DocReaderAdminPort docReader;
     private final SsrfGuard ssrfGuard;
     private final DeploymentCapabilitiesHolder capabilitiesHolder;
-    private final StorageBackendService storageBackendService;
+    private final StorageBackendPort storageBackendPort;
     /** env 读取面（不读裸 System.getenv；含 DOCREADER_* 与存储 env 可用性探测）。 */
     private final Environment environment;
 
@@ -71,7 +71,7 @@ public class SystemController {
                             DocReaderAdminPort docReader,
                             SsrfGuard ssrfGuard,
                             DeploymentCapabilitiesHolder capabilitiesHolder,
-                            StorageBackendService storageBackendService,
+                            StorageBackendPort storageBackendPort,
                             Environment environment) {
         this.infoService = infoService;
         this.parserEngines = parserEngines;
@@ -79,7 +79,7 @@ public class SystemController {
         this.docReader = docReader;
         this.ssrfGuard = ssrfGuard;
         this.capabilitiesHolder = capabilitiesHolder;
-        this.storageBackendService = storageBackendService;
+        this.storageBackendPort = storageBackendPort;
         this.environment = environment;
     }
 
@@ -411,7 +411,7 @@ public class SystemController {
     }
 
     /**
-     * 真实连通性检测：复用 {@code StorageBackendService.test}（同一套 SDK 探测）。
+     * 真实连通性检测：复用存储后端端口的探测（同一套 SDK 探测）。
      * 失败文案按异常消息子串分派（403 / 404|NoSuchBucket|NotFound / AccessDenied）；
      * 各 SDK 错误串不完全一致 → 失败文案是已知差异
      * （golden 只覆盖缺配置 / SSRF / 禁用 provider 等确定性分支）。
@@ -432,7 +432,7 @@ public class SystemController {
         config.put("use_ssl", cfg.path("use_ssl").asBoolean(false));
         backend.setConfig(config);
         try {
-            storageBackendService.test(backend);
+            storageBackendPort.test(backend);
         } catch (RuntimeException e) {
             String msg = e.getMessage() == null ? "" : e.getMessage();
             if (msg.contains("403") || msg.contains("AccessDenied")) {
@@ -441,7 +441,7 @@ public class SystemController {
             if (msg.contains("404") || msg.contains("NoSuchBucket") || msg.contains("NotFound")) {
                 return checkResponse(false, "Bucket「" + bucketName + "」不存在，请检查名称和 Region");
             }
-            return checkResponse(false, StorageBackendService.sanitizeConnectivity(msg));
+            return checkResponse(false, storageBackendPort.sanitizeConnectivity(msg));
         }
         String message = "连接成功，Bucket「" + bucketName + "」已确认存在";
         if ("minio".equals(provider) && bucketName.isEmpty()) {

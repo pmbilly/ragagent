@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 import com.ragagent.common.storage.StorageBackend;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.platform.storage.config.StorageAllowList;
-import com.ragagent.storage.mapper.StorageBackendRepository;
+import com.ragagent.common.storage.StorageBackendPort;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
@@ -48,7 +48,7 @@ public class SystemInfoService {
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").withZone(ZoneOffset.UTC);
 
     private final StorageAllowList allowList;
-    private final StorageBackendRepository backendRepository;
+    private final StorageBackendPort storageBackendPort;
     private final DataSource dataSource;
     /** 构建期生成的 META-INF/build-info.properties；缺失（如纯 IDE 运行）时回退 "unknown"。 */
     private final ObjectProvider<BuildProperties> buildProperties;
@@ -72,14 +72,14 @@ public class SystemInfoService {
     private String javaVersionOverride;
 
     public SystemInfoService(StorageAllowList allowList,
-                             StorageBackendRepository backendRepository,
+                             StorageBackendPort storageBackendPort,
                              DataSource dataSource,
                              ObjectProvider<BuildProperties> buildProperties,
                              RetrieveGraphRepository graphRepository,
                              RetrievalDriverProperties driverProperties,
                              Environment environment) {
         this.allowList = allowList;
-        this.backendRepository = backendRepository;
+        this.storageBackendPort = storageBackendPort;
         this.dataSource = dataSource;
         this.buildProperties = buildProperties;
         this.driverProperties = driverProperties;
@@ -237,7 +237,7 @@ public class SystemInfoService {
             return result;
         }
         try {
-            for (StorageBackend backend : backendRepository.list(tenantId)) {
+            for (StorageBackend backend : storageBackendPort.list(tenantId)) {
                 if (backend == null || !"active".equals(backend.getStatus())) {
                     continue;
                 }

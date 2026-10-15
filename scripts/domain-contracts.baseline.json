@@ -284,10 +284,6 @@
       "SystemDtos",
       "SystemSettingService"
     ],
-    "system→storage": [
-      "SystemController",
-      "SystemInfoService"
-    ],
     "system→tenant": [
       "SystemAdminController",
       "SystemAdminUserService"
