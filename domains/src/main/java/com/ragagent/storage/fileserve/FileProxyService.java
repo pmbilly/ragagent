@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.platform.text.ContentTypeByFilename;
 import com.ragagent.common.storage.fileserve.FileProxyPort;
+import com.ragagent.common.storage.fileserve.MessageFactsLookup;
 import com.ragagent.common.storage.fileserve.FileServeHttp;
 import com.ragagent.common.storage.fileserve.FileTransport;
 import com.ragagent.common.storage.fileserve.StoragePaths;
@@ -360,6 +361,27 @@ public class FileProxyService implements FileProxyPort {
             return;
         }
         serveAuthorizedFile(response, request, file, "KB files");
+    }
+
+    /**
+     * 会话消息作用域 handler 体（自 {@code MessageFileProxyController.files} 原样搬入）：
+     * 解析 {@code file_path} → 消息授权匹配（事实由回调现取）→ 错误信封 → 直出。
+     */
+    @Override
+    public void serveMessageFile(String sessionId, String messageId, MessageFactsLookup messages,
+            HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String reference = requireFilePathQuery(request, response);
+        if (reference == null) {
+            return;
+        }
+        FileAccess file;
+        try {
+            file = accessResolver.resolveMessageFile(sessionId, messageId, reference, messages);
+        } catch (FileAccessException e) {
+            fileAccessError(response, e);
+            return;
+        }
+        serveAuthorizedFile(response, request, file, "message files");
     }
 
     public void serveAuthorizedFile(HttpServletResponse response, HttpServletRequest request,

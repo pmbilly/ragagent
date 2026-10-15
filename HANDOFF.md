@@ -1331,6 +1331,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 A③ 第三十二刀：`session→storage` 收官 ⇒ 消息文件代理走端口（2026-10-15，R10 边 28 → 27、类 187 → 186）**
+- **接缝**：`session→storage` 余最后 1 类 `MessageFileProxyController`（消息作用域资源代理）——**复用 ㉙ 的文件代理端口族**，不新造体系
+- **端口扩展**：`FileProxyPort` 增 `serveMessageFile(sessionId, messageId, MessageFactsLookup, req, res)`；新增 L1 载荷 `MessageFileFacts`（7 字段，自 `FileAccessResolver` 内嵌 record **搬为顶层**）+ 回调 `MessageFactsLookup`
+- **⚠️ 命名与 A20 的关系（写入方法论，非取巧）**：A20 的判定是"名字以 `Port` 结尾的 `common/contract` 接口必须有且仅有一个域侧实现"——**回调类型不是端口**（没有"实现 bean"、按 lambda 提供），故命名为 `MessageFactsLookup` / `MessageFileFacts`。反例警示：若叫 `MessageFactsPort`，会立刻被判"契约悬空"（㉘ 的 `FileUrlPort` 就是这个坑：当时它确实该有实现，只是实现是私有嵌套类）
+- **存储侧**：`FileProxyService.serveMessageFile`（handler 体自会话 controller **原样搬入**：`file_path` 校验 → `resolveMessageFile`（事实由回调现取、不缓存）→ 错误信封 → 直出）；`FileAccessResolver` 删内嵌 `MessageFileFacts`/`MessageFileLookup`、改用 L1 类型
+- **会话侧**：`MessageFileProxyController` → 薄委托（构造 3 → 2；只留 `factsOf(sessionId, messageId)` 事实映射与 HEAD 的 NoRoute）⇒ **`session→storage` 整条边清零** ✓
+- **读数**：边 **28 → 27**、类 **187 → 186**；①档 **19 条 / 100 类**；**存储族只剩 `system→storage`(2 类)**（`SystemController` / `SystemInfoService` 用后端服务 + 后端仓储，需后端端口）
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m59s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；定向 session/storage **242 条** ✓；dev 重启 ready ✓ + 冒烟**三形态逐字**（缺 `file_path` ⇒ 400 `{"error":"missing required parameter: file_path"}` ✓；消息不可见 ⇒ 404 空体（`plainStatus` 语义）✓；HEAD ⇒ 404 NoRoute 形 ✓）
+- **A③ 累计（三十二刀）**：边 **64 → 27（−37）**、类 **317 → 186（−131）**；三档 **① 19 条 / 100 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步**：①档余量按体量——`session→knowledge`(17) / `knowledge→model`(14) / `session→model`(12) 三大块（须逐类枚举剩余跨域 import 再定刀）；`mcp→agent`(9) **待拍板**（并入 agent-runtime 族 或 工具 SPI 上提契约）；`datasource→knowledge`(8) 与 `embedchannel→knowledge`(2) 属 **K 级**（实体线格式）；`session→memory`(7) / `im→session`(6) · `system→storage`(2) 收官在望
 **🔶 A③ 第三十一刀：`session→storage` 资源目录/全局文件服务面 ⇒ 5 → 1 类（2026-10-15，R10 类 191 → 187）**
 - **接缝**：`session→storage` 余 5 类分两面——本刀先做**资源目录 + 进程级文件服务**面（4 类：`AgentEngineAssembler` · `AgentWebPages` · `ArtifactCollectorWiring` · `SessionAgentQaService`），`MessageFileProxyController`（文件代理族，复用 ㉙ 的端口族+消息授权回调）留下刀
 - **L1 新增 2 端口**：`common.storage.ResourceCatalogPort`（`resolve` → 最小视图 `ResourceView(id, tenantId)` · `bind`）+ `common.storage.fileserve.GlobalFileServicePort`（进程级"本地基座 + 资源目录装饰"服务）

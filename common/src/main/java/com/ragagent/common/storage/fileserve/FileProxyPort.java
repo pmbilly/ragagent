@@ -15,6 +15,8 @@ import jakarta.servlet.http.HttpServletResponse;
  *   <li>{@link #serveKbFile} —— 知识库作用域：解析 {@code file_path}（缺参/非法 ⇒ 400）、
  *       按 KB 授权解析（不可达 ⇒ 404/403 信封）、命中后直出。KB 自身的访问闸门
  *       （{@code ChunkAccessGuard}）由调用方先过，本方法只吃它的产物（属主租户）。</li>
+ *   <li>{@link #serveMessageFile} —— 会话消息作用域：授权匹配用调用方给的
+ *       {@link MessageFactsLookup} 现取消息事实（存储侧不依赖会话实体）。</li>
  * </ul>
  *
  * <p>响应写出小件见 {@link FileServeHttp}（同层，供调用方在自家错误分支复用）。</p>
@@ -32,4 +34,12 @@ public interface FileProxyPort {
      */
     void serveKbFile(Long kbOwnerTenantId, String kbId,
                      HttpServletRequest request, HttpServletResponse response) throws IOException;
+
+    /**
+     * 会话消息作用域文件服务：解析 {@code file_path} → 用消息事实做授权匹配 → 直出。
+     *
+     * @param messages 消息事实回调（每次请求现取，实现内含会话可见性判定）
+     */
+    void serveMessageFile(String sessionId, String messageId, MessageFactsLookup messages,
+                          HttpServletRequest request, HttpServletResponse response) throws IOException;
 }

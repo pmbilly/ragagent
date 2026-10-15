@@ -1,8 +1,8 @@
 package com.ragagent.session.controller;
 
-import java.util.List;
-import com.ragagent.session.domain.message.Message;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,17 +10,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ragagent.storage.controller.FileProxyController;
-import com.ragagent.storage.fileserve.FileAccess;
-import com.ragagent.storage.fileserve.FileAccessException;
-import com.ragagent.storage.fileserve.FileAccessResolver;
-import com.ragagent.storage.fileserve.FileProxyService;
-import com.ragagent.storage.fileserve.FileAccessResolver.MessageFileLookup;
+import com.ragagent.common.storage.fileserve.FileProxyPort;
+import com.ragagent.common.storage.fileserve.FileServeHttp;
+import com.ragagent.common.storage.fileserve.MessageFileFacts;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.service.MessageService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.session.service.MessageService;
-import com.ragagent.platform.web.ApiResult;
 
 /**
  * 消息作用域的资源代理。
@@ -36,59 +34,48 @@ import com.ragagent.platform.web.ApiResult;
  *
  * <p><b>已知收紧</b>：跨租户消息文件的 shared-agent / org-shared KB 两条授予路径
  * 未实现——owner ≠ caller 恒 403，方向偏保守。</p>
+ *
+ * <p><b>跨域口径</b>：直出与授权匹配经 L1 端口 {@link FileProxyPort}（消息事实由本类的
+ * {@code lookup} 现取——存储侧不依赖会话实体）；响应小件经 {@link FileServeHttp}。</p>
  */
 @RestController
 @ApiResult
 public class MessageFileProxyController {
 
     private final MessageService messageService;
-    private final FileAccessResolver accessResolver;
-    private final FileProxyService proxy;
+    private final FileProxyPort fileProxy;
 
-    public MessageFileProxyController(MessageService messageService,
-            FileAccessResolver accessResolver, FileProxyService proxy) {
+    public MessageFileProxyController(MessageService messageService, FileProxyPort fileProxy) {
         this.messageService = messageService;
-        this.accessResolver = accessResolver;
-        this.proxy = proxy;
+        this.fileProxy = fileProxy;
     }
 
-    /** 只有 GET 注册了真实处理：HEAD 落 NoRoute 响应（见 FileProxyController 类注释）。 */
+    /** 只有 GET 注册了真实处理：HEAD 落 NoRoute 响应（见文件代理面的类注释）。 */
     @RequestMapping(value = "/api/v1/sessions/{id}/messages/{messageId}/files",
             method = RequestMethod.HEAD)
     public void filesHead(@PathVariable("id") String id,
-            @PathVariable("messageId") String messageId, jakarta.servlet.http.HttpServletResponse response)
+            @PathVariable("messageId") String messageId, HttpServletResponse response)
             throws IOException {
-        FileProxyController.writeGinNoRoute(response);
+        FileServeHttp.writeGinNoRoute(response);
     }
 
     @GetMapping("/api/v1/sessions/{id}/messages/{messageId}/files")
     public void files(@PathVariable("id") String id,
             @PathVariable("messageId") String messageId, HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-        String reference = FileProxyService.requireFilePathQuery(request, response);
-        if (reference == null) {
-            return;
-        }
-        MessageFileLookup lookup = (sid, mid) -> factsOf(messageService.getMessage(sid, mid));
-        FileAccess file;
-        try {
-            file = accessResolver.resolveMessageFile(id, messageId, reference, lookup);
-        } catch (FileAccessException e) {
-            FileProxyService.fileAccessError(response, e);
-            return;
-        }
-        proxy.serveAuthorizedFile(response, request, file, "message files");
+        fileProxy.serveMessageFile(id, messageId, this::factsOf, request, response);
     }
 
     /**
-     * 端口载荷映射：只取 storage 侧授权/匹配实际读取的字段
-     * （见 {@link FileAccessResolver.MessageFileFacts}）——避免 storage 依赖会话实体。
+     * 消息 → 授权事实：只取存储侧授权/匹配实际读取的字段
+     * （见 {@link MessageFileFacts}）——避免存储依赖会话实体。
      */
-    private static FileAccessResolver.MessageFileFacts factsOf(Message message) {
+    private MessageFileFacts factsOf(String sessionId, String messageId) {
+        Message message = messageService.getMessage(sessionId, messageId);
         if (message == null) {
             return null;
         }
-        List<String> artifactUrls = new java.util.ArrayList<>();
+        List<String> artifactUrls = new ArrayList<>();
         if (message.getArtifacts() != null) {
             for (var artifact : message.getArtifacts()) {
                 if (artifact != null) {
@@ -96,7 +83,7 @@ public class MessageFileProxyController {
                 }
             }
         }
-        List<Object> toolResults = new java.util.ArrayList<>();
+        List<Object> toolResults = new ArrayList<>();
         if (message.getAgentSteps() != null) {
             for (var step : message.getAgentSteps()) {
                 if (step == null || step.getToolCalls() == null) {
@@ -109,7 +96,7 @@ public class MessageFileProxyController {
                 }
             }
         }
-        return new FileAccessResolver.MessageFileFacts(message.getContent(), artifactUrls,
+        return new MessageFileFacts(message.getContent(), artifactUrls,
                 message.getKnowledgeReferences(), message.getImages(), toolResults,
                 message.getAgentTenantId(), message.getRole());
     }

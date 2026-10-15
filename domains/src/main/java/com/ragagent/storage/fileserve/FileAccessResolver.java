@@ -10,6 +10,8 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
 import com.ragagent.common.storage.fileserve.StoragePaths;
+import com.ragagent.common.storage.fileserve.MessageFactsLookup;
+import com.ragagent.common.storage.fileserve.MessageFileFacts;
 
 /**
  * KB / 消息两个 scoped 文件代理的授权判定（ResolveKBFile / ResolveMessageFile /
@@ -143,33 +145,19 @@ public class FileAccessResolver {
      * <p>不让 storage 依赖 session 的 {@code Message} 实体：会话侧只把需要的字段映射进来，
      * 授权与匹配逻辑也只看这几段。**别改成"整条消息序列化"**——那会让匹配范围变宽，等于越权。</p>
      */
-    public record MessageFileFacts(
-            String content,
-            List<String> artifactUrls,
-            List<?> knowledgeReferences,
-            List<?> images,
-            List<Object> toolResults,
-            long agentTenantId,
-            String role) {
-    }
-
-    /** 消息加载端口（实现应内含会话可见性判定）。 */
-    public interface MessageFileLookup {
-        MessageFileFacts getMessage(String sessionId, String messageId);
-    }
 
     /**
      * 用原始 caller 加载会话授权的消息；每次请求重查，不做缓存。
      */
     public FileAccess resolveMessageFile(String sessionId, String messageId, String reference,
-            MessageFileLookup messages) {
+            MessageFactsLookup messages) {
         Long callerTenant = TenantContext.currentTenantId();
         if (callerTenant == null || callerTenant == 0) {
             throw FileAccessException.unauthorized();
         }
         MessageFileFacts facts;
         try {
-            facts = messages.getMessage(sessionId, messageId);
+            facts = messages.lookup(sessionId, messageId);
         } catch (RuntimeException e) {
             // 消息加载的任何异常 → 404（无响应体）
             throw FileAccessException.notFound();

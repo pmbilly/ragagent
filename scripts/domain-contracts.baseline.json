@@ -222,9 +222,6 @@
       "SessionQaResolution",
       "TemporaryDocumentController"
     ],
-    "session→storage": [
-      "MessageFileProxyController"
-    ],
     "session→knowledge": [
       "AgentEngineAssembler",
       "AgentToolBackends",
