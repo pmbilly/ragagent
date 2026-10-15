@@ -22,7 +22,7 @@ import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.session.domain.message.MessageAttachment;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
-import com.ragagent.knowledge.storage.LocalStorageService;
+import com.ragagent.platform.storage.config.UploadLimits;
 
 /**
  * 会话附件服务。
@@ -234,8 +234,8 @@ public class TemporaryDocumentService {
         if (!supportsExtension(ext)) {
             throw new IllegalArgumentException("unsupported file type: " + ext);
         }
-        long maxSize = LocalStorageService.maxFileSizeBytes();
-        long maxMb = LocalStorageService.maxFileSizeMb();
+        long maxSize = UploadLimits.maxFileSizeBytes();
+        long maxMb = UploadLimits.maxFileSizeMb();
         if (fileSize <= 0 || fileSize > maxSize) {
             throw new IllegalArgumentException(
                     "file size must be between 1 byte and " + maxMb + "MB");

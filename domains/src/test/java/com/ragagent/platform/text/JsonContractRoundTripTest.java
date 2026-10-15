@@ -106,7 +106,7 @@ import com.ragagent.knowledge.dto.kb.DuplicateKnowledgeBaseResponse;
 import com.ragagent.knowledge.dto.kb.KBCloneProgress;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 import com.ragagent.knowledge.dto.doc.MoveKnowledgeResponse;
-import com.ragagent.knowledge.dto.faq.FaqEntry;
+import com.ragagent.common.knowledge.domain.FaqEntry;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsUpdate;
 import com.ragagent.knowledge.dto.faq.FaqExportEntry;

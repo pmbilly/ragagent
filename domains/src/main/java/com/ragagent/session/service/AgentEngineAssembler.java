@@ -3,9 +3,8 @@ package com.ragagent.session.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import com.ragagent.knowledge.dto.faq.FaqEntry;
-import com.ragagent.knowledge.dto.faq.FaqEntryPage;
-import com.ragagent.knowledge.service.faq.FaqEntryQueryService;
+import com.ragagent.common.knowledge.domain.FaqEntry;
+import com.ragagent.common.knowledge.domain.FaqEntryPage;
 import com.ragagent.agent.AgentConfig;
 import com.ragagent.agent.AgentEngine;
 import com.ragagent.common.agent.tool.ToolDefinitions;
@@ -60,7 +59,6 @@ final class AgentEngineAssembler {
     private final AgentToolBackends toolBackends;
     private final ArtifactCollectorWiring artifactCollectorWiring;
     private final KnowledgeCatalogPort knowledgeService;
-    private final FaqEntryQueryService faqService;
     private final McpToolRegistrationPort mcpTools;
     private final ResourceCatalogPort resourceCatalog;
     private final javax.sql.DataSource dataSource;
@@ -68,13 +66,12 @@ final class AgentEngineAssembler {
     /** 平台级技能目录（skills 表入库版）：装配期建 {@code DbSkillSource} 读 skills 表。 */
     private final SkillCatalogService skillCatalogService;
 
-    AgentEngineAssembler(MemoryRecallPort memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeCatalogPort knowledgeService, FaqEntryQueryService faqService, McpToolRegistrationPort mcpTools, ResourceCatalogPort resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, SkillCatalogService skillCatalogService) {
+    AgentEngineAssembler(MemoryRecallPort memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeCatalogPort knowledgeService, McpToolRegistrationPort mcpTools, ResourceCatalogPort resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, SkillCatalogService skillCatalogService) {
         this.memoryService = memoryService;
         this.knowledgeQa = knowledgeQa;
         this.toolBackends = toolBackends;
         this.artifactCollectorWiring = artifactCollectorWiring;
         this.knowledgeService = knowledgeService;
-        this.faqService = faqService;
         this.mcpTools = mcpTools;
         this.resourceCatalog = resourceCatalog;
         this.dataSource = dataSource;
@@ -276,7 +273,7 @@ final class AgentEngineAssembler {
             // FAQ 库：条目列表；否则/失败回落通用 knowledge 列表（completed 过滤，top 10）
             if ("faq".equals(kb.getType())) {
                 try {
-                    FaqEntryPage page = faqService.listEntries(kbId, 1, 10, null, 0, "", "", "", null);
+                    FaqEntryPage page = knowledgeService.listFaqEntries(kbId, 1, 10, null, 0, "", "", "", null);
                     docCount = page.total() > Integer.MAX_VALUE ? Integer.MAX_VALUE
                             : (int) page.total();
                     List<FaqEntry> entries = page.items();

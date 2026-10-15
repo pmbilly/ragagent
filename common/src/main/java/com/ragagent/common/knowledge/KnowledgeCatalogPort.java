@@ -5,6 +5,8 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.domain.ChunkPage;
+import com.ragagent.common.knowledge.domain.FaqEntryPage;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 
@@ -58,6 +60,36 @@ public interface KnowledgeCatalogPort {
      * 白名单校验）；软删行不可见，找不到 ⇒ 域内 not-found 运行时异常原样上抛。
      */
     Chunk getChunkByIdOnly(String id);
+
+    // ── chunk 批量读（工具/管线面，租户过滤口径与域仓储一致） ──
+
+    /** 按 id 批量取 chunk（租户内、软删不可见）。 */
+    List<Chunk> listChunksById(long tenantId, List<String> ids);
+
+    /** 按父 id 取子 chunk。 */
+    List<Chunk> listChunkByParentId(long tenantId, String parentId);
+
+    /** 按父 id 批量取子 chunk。 */
+    List<Chunk> listChunksByParentIDs(long tenantId, List<String> parentIds);
+
+    /** 按知识条目分页取 chunk（过滤参数与域仓储逐一同形）。 */
+    ChunkPage listPagedChunksByKnowledgeId(long tenantId, String knowledgeId, int offset,
+            int limit, List<String> chunkTypes, List<String> tagIds,
+            String keyword, String searchField, String sortOrder,
+            String knowledgeType, Boolean isEnabled);
+
+    // ── FAQ 目录读 ──
+
+    /** FAQ 条目分页（过滤参数与域服务逐一同形）。 */
+    FaqEntryPage listFaqEntries(String kbId, int page, int pageSize,
+            List<String> tagUuids, long legacyTagSeqId,
+            String keyword, String searchField,
+            String sortOrder, Boolean isEnabled);
+
+    // ── 知识文件读（本地/云分流与错误口径由域实现承担） ──
+
+    /** 读知识条目的存储文件（租户作用域；失败语义与域门面一致）。 */
+    byte[] readKnowledgeFile(long tenantId, String filePath);
 
     // ── 知识库 ──
 

@@ -8,11 +8,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.common.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.domain.ChunkPage;
+import com.ragagent.common.knowledge.domain.FaqEntryPage;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.service.faq.FaqEntryQueryService;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.knowledge.service.management.KnowledgeService;
+import com.ragagent.knowledge.storage.TenantFileStorage;
 
 /**
  * {@link KnowledgeCatalogPort} 的知识域实现：读写逐字转发两个门面服务，
@@ -24,13 +28,19 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     private final KnowledgeService knowledgeService;
     private final KnowledgeBaseService knowledgeBaseService;
     private final ChunkRepository chunkRepository;
+    private final FaqEntryQueryService faqEntryQueryService;
+    private final TenantFileStorage tenantFileStorage;
 
     public KnowledgeCatalogAdapter(KnowledgeService knowledgeService,
                                    KnowledgeBaseService knowledgeBaseService,
-                                   ChunkRepository chunkRepository) {
+                                   ChunkRepository chunkRepository,
+                                   FaqEntryQueryService faqEntryQueryService,
+                                   TenantFileStorage tenantFileStorage) {
         this.knowledgeService = knowledgeService;
         this.knowledgeBaseService = knowledgeBaseService;
         this.chunkRepository = chunkRepository;
+        this.faqEntryQueryService = faqEntryQueryService;
+        this.tenantFileStorage = tenantFileStorage;
     }
 
     @Override
@@ -81,6 +91,44 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     @Override
     public Chunk getChunkByIdOnly(String id) {
         return chunkRepository.getChunkByIdOnly(id);
+    }
+
+    @Override
+    public List<Chunk> listChunksById(long tenantId, List<String> ids) {
+        return chunkRepository.listChunksById(tenantId, ids);
+    }
+
+    @Override
+    public List<Chunk> listChunkByParentId(long tenantId, String parentId) {
+        return chunkRepository.listChunkByParentId(tenantId, parentId);
+    }
+
+    @Override
+    public List<Chunk> listChunksByParentIDs(long tenantId, List<String> parentIds) {
+        return chunkRepository.listChunksByParentIDs(tenantId, parentIds);
+    }
+
+    @Override
+    public ChunkPage listPagedChunksByKnowledgeId(long tenantId, String knowledgeId,
+            int offset, int limit, List<String> chunkTypes, List<String> tagIds,
+            String keyword, String searchField, String sortOrder,
+            String knowledgeType, Boolean isEnabled) {
+        return chunkRepository.listPagedChunksByKnowledgeId(tenantId, knowledgeId, offset,
+                limit, chunkTypes, tagIds, keyword, searchField, sortOrder,
+                knowledgeType, isEnabled);
+    }
+
+    @Override
+    public FaqEntryPage listFaqEntries(String kbId, int page, int pageSize,
+            List<String> tagUuids, long legacyTagSeqId,
+            String keyword, String searchField, String sortOrder, Boolean isEnabled) {
+        return faqEntryQueryService.listEntries(kbId, page, pageSize, tagUuids,
+                legacyTagSeqId, keyword, searchField, sortOrder, isEnabled);
+    }
+
+    @Override
+    public byte[] readKnowledgeFile(long tenantId, String filePath) {
+        return tenantFileStorage.read(tenantId, filePath);
     }
 
     @Override

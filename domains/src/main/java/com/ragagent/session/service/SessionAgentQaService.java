@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
-import com.ragagent.knowledge.service.faq.FaqEntryQueryService;
 import com.ragagent.agent.AgentEngine;
 import com.ragagent.agent.AgentEngineException;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
@@ -92,7 +91,6 @@ public class SessionAgentQaService {
             javax.sql.DataSource dataSource,
             ArtifactCollectorWiring artifactCollectorWiring,
             KnowledgeCatalogPort knowledgeService,
-            FaqEntryQueryService faqService,
             ConcurrencyGovernor concurrencyGovernor,
             org.springframework.beans.factory.ObjectProvider<OllamaService>
                     ollamaService,
@@ -116,7 +114,6 @@ public class SessionAgentQaService {
                         toolBackends,
                         artifactCollectorWiring,
                         knowledgeService,
-                        faqService,
                         mcpTools,
                         resourceCatalog,
                         dataSource,

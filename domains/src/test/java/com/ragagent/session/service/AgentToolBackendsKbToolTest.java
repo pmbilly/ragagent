@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.common.settings.ConversationProperties;
-import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.common.memory.MemorySearchHit;
 import com.ragagent.common.memory.MemorySearchHits;
@@ -28,7 +27,6 @@ import com.ragagent.session.domain.message.MessageSearchGroupItem;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.common.wiki.WikiPageOpsPort;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.chatpipeline.spi.WebSearchExecutor;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
@@ -50,7 +48,6 @@ class AgentToolBackendsKbToolTest {
         memorySearch = mock(MemorySearchPort.class);
         backends = new AgentToolBackends(
                 mock(KnowledgeCatalogPort.class),
-                mock(ChunkRepository.class),
                 mock(HybridSearchService.class),
                 mock(ConversationProperties.class),
                 messageService,
@@ -58,7 +55,6 @@ class AgentToolBackendsKbToolTest {
                 mock(WikiPageOpsPort.class),
                 mock(WebSearchExecutor.class),
                 mock(TenantService.class),
-                mock(TenantFileStorage.class),
                 mock(DataSource.class));
     }
 

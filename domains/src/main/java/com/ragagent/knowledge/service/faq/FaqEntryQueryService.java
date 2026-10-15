@@ -16,8 +16,8 @@ import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.knowledge.domain.KnowledgeTag;
-import com.ragagent.knowledge.dto.faq.FaqEntry;
-import com.ragagent.knowledge.dto.faq.FaqEntryPage;
+import com.ragagent.common.knowledge.domain.FaqEntry;
+import com.ragagent.common.knowledge.domain.FaqEntryPage;
 import com.ragagent.knowledge.dto.faq.FaqExportEntry;
 import com.ragagent.knowledge.repository.FaqChunkRepository;
 import com.ragagent.knowledge.repository.ChunkRepository;
@@ -32,6 +32,7 @@ import com.ragagent.knowledge.domain.access.FaqGuard;
 import com.ragagent.knowledge.dto.faq.FaqSearchRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.nio.charset.StandardCharsets;
+import com.ragagent.common.knowledge.domain.ChunkPage;
 
 /**
  * FAQ 条目查询面：分页列表、详情、导出（CSV/JSON）与混合检索。
@@ -97,7 +98,7 @@ public class FaqEntryQueryService {
                 }
                 tags = List.of(tag.getId());
             }
-            ChunkRepository.ChunkPage result = chunkRepository.listPagedChunksByKnowledgeId(
+            ChunkPage result = chunkRepository.listPagedChunksByKnowledgeId(
                     effectiveTenant, faqKnowledge.getId(), (page - 1) * pageSize, pageSize,
                     List.of("faq"), tags, keyword, searchField, sortOrder, "faq", isEnabled);
             total = result.total();

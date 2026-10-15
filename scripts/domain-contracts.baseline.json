@@ -152,14 +152,6 @@
       "SessionQaResolution",
       "TemporaryDocumentController"
     ],
-    "session→knowledge": [
-      "AgentEngineAssembler",
-      "AgentToolBackends",
-      "AgentToolKbBackends",
-      "QaWiring",
-      "SessionAgentQaService",
-      "TemporaryDocumentService"
-    ],
     "session→agenttools": [
       "AgentEngineAssembler",
       "AgentToolBackends",

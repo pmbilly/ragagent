@@ -8,6 +8,7 @@ import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import org.springframework.stereotype.Service;
+import com.ragagent.common.knowledge.domain.ChunkPage;
 
 /**
  * chunk 读取门面：控制器只与本类交互，不直接碰仓储。
@@ -38,7 +39,7 @@ public class ChunkReadService {
      */
     public ChunkPageView listPagedChunks(long tenantId, String knowledgeId, int offset, int limit,
                                         List<String> types) {
-        ChunkRepository.ChunkPage page = chunkRepository.listPagedChunksByKnowledgeId(
+        ChunkPage page = chunkRepository.listPagedChunksByKnowledgeId(
                 tenantId, knowledgeId, offset, limit, types, null, "", "", "", "", null);
         return new ChunkPageView(page.items(), page.total());
     }

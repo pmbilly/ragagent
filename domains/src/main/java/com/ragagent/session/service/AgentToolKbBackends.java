@@ -21,7 +21,6 @@ import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.repository.ChunkRepository;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
@@ -30,6 +29,7 @@ import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.common.knowledge.domain.ChunkPage;
 
 /**
  * {@code AgentToolBackends} 的**知识库检索簇**：知识库检索 / chunk 列举 /
@@ -46,7 +46,6 @@ final class AgentToolKbBackends {
     private static final List<String> TEXT_FAQ_TYPES = List.of(
             ChunkTypes.TEXT, ChunkTypes.FAQ);
     private final KnowledgeCatalogPort knowledgeCatalog;
-    private final ChunkRepository chunkRepository;
     private final HybridSearchService hybridSearchService;
     /** 检索阈值配置（与门面共用同一份租户配置对象）。 */
     private final ConversationProperties conversation;
@@ -54,12 +53,10 @@ final class AgentToolKbBackends {
     private final JdbcTemplate jdbc;
 
     AgentToolKbBackends(KnowledgeCatalogPort knowledgeCatalog,
-                        ChunkRepository chunkRepository,
                         HybridSearchService hybridSearchService,
                         ConversationProperties conversation,
                         JdbcTemplate jdbc) {
         this.knowledgeCatalog = knowledgeCatalog;
-        this.chunkRepository = chunkRepository;
         this.hybridSearchService = hybridSearchService;
         this.conversation = conversation;
         this.jdbc = jdbc;
@@ -146,7 +143,7 @@ final class AgentToolKbBackends {
         return new KnowledgeSearchTool.ChunkInfoBackend() {
             @Override
             public ChunkFacts faqChunkById(String chunkId) {
-                return ChunkProjectionAdapter.factsOf(chunkRepository.getChunkByIdOnly(chunkId));
+                return ChunkProjectionAdapter.factsOf(knowledgeCatalog.getChunkByIdOnly(chunkId));
             }
 
             @Override
@@ -177,7 +174,7 @@ final class AgentToolKbBackends {
                 return;
             }
             Map<String, String> infoMap = ImageInfoEnricher.collectImageInfoByChunkIds(
-                    (tid, pids) -> ChunkProjectionAdapter.factsAll(chunkRepository.listChunksByParentIDs(tid, pids)),
+                    (tid, pids) -> ChunkProjectionAdapter.factsAll(knowledgeCatalog.listChunksByParentIDs(tid, pids)),
                     tenantId, chunkIDs);
             if (infoMap == null || infoMap.isEmpty()) {
                 return;
@@ -435,12 +432,12 @@ final class AgentToolKbBackends {
     }
     /** 工具侧的 chunkById 回调（域内实体 → L1 载荷）。 */
     public java.util.function.Function<String, ChunkFacts> chunkById() {
-        return id -> ChunkProjectionAdapter.factsOf(chunkRepository.getChunkByIdOnly(id));
+        return id -> ChunkProjectionAdapter.factsOf(knowledgeCatalog.getChunkByIdOnly(id));
     }
     public DocChunkSupport.PagedChunks pagedChunks() {
         return (tenantId, knowledgeId, page, pageSize) -> {
             int offset = Math.max(page - 1, 0) * Math.max(pageSize, 0);
-            ChunkRepository.ChunkPage page1 = chunkRepository.listPagedChunksByKnowledgeId(
+            ChunkPage page1 = knowledgeCatalog.listPagedChunksByKnowledgeId(
                     tenantId, knowledgeId, offset, pageSize,
                     TEXT_FAQ_TYPES, null, "", "", "", "", Boolean.TRUE);
             return new DocChunkSupport.ChunkPage(ChunkProjectionAdapter.factsAll(page1.items()), page1.total());
@@ -448,13 +445,13 @@ final class AgentToolKbBackends {
     }
     /** text+faq + enabled 过滤的 count 段（{@code listPagedChunksByKnowledgeId}）。 */
     private long pagedChunkCount(long tenantId, String knowledgeId) {
-        return chunkRepository.listPagedChunksByKnowledgeId(
+        return knowledgeCatalog.listPagedChunksByKnowledgeId(
                 tenantId, knowledgeId, 0, 1, TEXT_FAQ_TYPES, null, "", "", "", "",
                 Boolean.TRUE).total();
     }
     public DocChunkSupport.ImageInfoCollector imageInfoCollector() {
         return (tenantId, chunkIds) -> ImageInfoEnricher.collectImageInfoByChunkIds(
-                (tid, pids) -> ChunkProjectionAdapter.factsAll(chunkRepository.listChunksByParentIDs(tid, pids)),
+                (tid, pids) -> ChunkProjectionAdapter.factsAll(knowledgeCatalog.listChunksByParentIDs(tid, pids)),
                 tenantId, chunkIds);
     }
     public QueryKnowledgeGraphTool.GraphSearch graphSearch() {

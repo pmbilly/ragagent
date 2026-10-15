@@ -45,10 +45,10 @@ import com.ragagent.session.domain.message.MessageSearchGroupItem;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.common.knowledge.domain.Chunk;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.common.knowledge.domain.ChunkPage;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.common.wiki.WikiPageOpsPort;
@@ -60,7 +60,6 @@ import com.ragagent.agenttools.knowledge.GetDocumentInfoTool;
 import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.WebSearchConfig;
-import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.chatpipeline.spi.WebSearchExecutor;
 import com.ragagent.common.knowledge.ChunkFacts;
 
@@ -81,7 +80,6 @@ public class AgentToolBackends {
 
 
     private final KnowledgeCatalogPort knowledgeCatalog;
-    private final ChunkRepository chunkRepository;
 
     /** 知识库检索簇：KB 检索/grep/图谱/chunk 列举等工具后端。 */
     private final AgentToolKbBackends kbBackends;
@@ -92,11 +90,9 @@ public class AgentToolBackends {
     private final MemorySearchPort memorySearch;
     private final WebSearchExecutor webSearchExecutor;
     private final TenantConfigLookup tenantService;
-    private final TenantFileStorage fileStorage;
     private final JdbcTemplate jdbc;
 
     public AgentToolBackends(KnowledgeCatalogPort knowledgeCatalog,
-                             ChunkRepository chunkRepository,
                              HybridSearchService hybridSearchService,
                              ConversationProperties conversation,
                              MessageService messageService,
@@ -104,17 +100,14 @@ public class AgentToolBackends {
                              WikiPageOpsPort wikiPageOps,
                              WebSearchExecutor webSearchExecutor,
                              TenantConfigLookup tenantService,
-                             TenantFileStorage fileStorage,
                              DataSource dataSource) {
         this.knowledgeCatalog = knowledgeCatalog;
-        this.chunkRepository = chunkRepository;
         this.messageService = messageService;
         this.memorySearch = memorySearch;
         this.webSearchExecutor = webSearchExecutor;
         this.tenantService = tenantService;
-        this.fileStorage = fileStorage;
         this.jdbc = new JdbcTemplate(dataSource);
-        this.kbBackends = new AgentToolKbBackends(knowledgeCatalog, chunkRepository,
+        this.kbBackends = new AgentToolKbBackends(knowledgeCatalog,
                 hybridSearchService, conversation, jdbc);
         this.wikiBackends = new AgentToolWikiBackends(wikiPageOps);
     }
@@ -204,7 +197,7 @@ public class AgentToolBackends {
         if (knowledge == null || knowledge.filePath() == null || knowledge.filePath().isEmpty()) {
             throw new IllegalArgumentException("knowledge file path is empty");
         }
-        byte[] content = fileStorage.read(knowledge.tenantId(), knowledge.filePath());
+        byte[] content = knowledgeCatalog.readKnowledgeFile(knowledge.tenantId(), knowledge.filePath());
         String path = knowledge.filePath();
         int dot = path.lastIndexOf('.');
         String ext = dot >= 0 ? path.substring(dot) : "";
@@ -454,7 +447,7 @@ public class AgentToolBackends {
             Knowledge k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
             long tenant = k == null || k.getTenantId() == null ? 0L : k.getTenantId();
             int offset = Math.max(page - 1, 0) * Math.max(pageSize, 0);
-            ChunkRepository.ChunkPage p = chunkRepository.listPagedChunksByKnowledgeId(
+            ChunkPage p = knowledgeCatalog.listPagedChunksByKnowledgeId(
                     tenant, knowledgeId, offset, pageSize, chunkTypes, null,
                     "", "", "", "", enabled);
             List<DataSchemaTool.ChunkView> out = new ArrayList<>();

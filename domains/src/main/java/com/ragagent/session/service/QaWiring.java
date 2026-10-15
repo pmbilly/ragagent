@@ -2,10 +2,8 @@ package com.ragagent.session.service;
 
 import com.ragagent.common.knowledge.support.KnowledgeProjectionAdapter;
 
-import com.ragagent.common.knowledge.support.ChunkProjectionAdapter;
 
 import com.ragagent.platform.web.JsonMappers;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,9 +39,7 @@ import com.ragagent.chatpipeline.plugin.PluginWikiBoost;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.common.settings.ConversationProperties;
-import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.repository.ChunkRepository;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.llm.LlmChatClient;
@@ -68,10 +64,9 @@ import com.ragagent.chatpipeline.plugin.PluginSearch;
 import com.ragagent.chatpipeline.plugin.PluginSearchEntity;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.tenant.WebSearchConfig;
-import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.knowledge.service.management.KnowledgeBaseLookupAdapter;
+import com.ragagent.common.knowledge.support.KnowledgeBaseViews;
 import com.ragagent.common.model.ModelCatalogPort;
 import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.modelruntime.application.ChatConfigs;
@@ -194,13 +189,13 @@ public class QaWiring {
                     throw new PipelinePorts.PipelinePortException(
                             "error code: 1003, error message: knowledge base not found");
                 }
-                return KnowledgeBaseLookupAdapter.view(kb);
+                return KnowledgeBaseViews.view(kb);
             }
 
             @Override
             public List<KnowledgeBaseView> getKnowledgeBasesByIdsUnscoped(List<String> ids) {
                 return ids.stream().map(kbService::getAllTenantById)
-                        .filter(kb -> kb != null).map(KnowledgeBaseLookupAdapter::view)
+                        .filter(kb -> kb != null).map(KnowledgeBaseViews::view)
                         .collect(java.util.stream.Collectors.toList());
             }
 
@@ -264,25 +259,7 @@ public class QaWiring {
         };
     }
 
-    /** {@link PipelinePorts.ChunkRepository} 的 chat_pipeline 子集。 */
-    @Bean
-    public PipelinePorts.ChunkRepository qaPipelineChunkRepository(ChunkRepository chunkRepository) {
-        return new PipelinePorts.ChunkRepository() {
-            @Override
-            public List<ChunkFacts> listChunksById(long tenantId, List<String> ids) {
-                return ChunkProjectionAdapter.factsAll(chunkRepository.listChunksById(tenantId, ids));
-            }
-
-            @Override
-            public List<ChunkFacts> listChunksByParentIds(long tenantId, List<String> parentIds) {
-                List<Chunk> out = new ArrayList<>();
-                for (String parentId : parentIds) {
-                    out.addAll(chunkRepository.listChunkByParentId(tenantId, parentId));
-                }
-                return ChunkProjectionAdapter.factsAll(out);
-            }
-        };
-    }
+    /** {@link PipelinePorts.ChunkRepository} 的实现在 knowledge 域适配器，此处只按类型注入。 */
 
     /** {@link PipelinePorts.KnowledgeRepository}（getKnowledgeBatch）。 */
     @Bean
@@ -303,7 +280,7 @@ public class QaWiring {
             @Override
             public List<KnowledgeBaseView> getKnowledgeBaseByIds(List<String> ids) {
                 return ids.stream().map(kbService::getAllTenantById)
-                        .filter(kb -> kb != null).map(KnowledgeBaseLookupAdapter::view)
+                        .filter(kb -> kb != null).map(KnowledgeBaseViews::view)
                         .collect(java.util.stream.Collectors.toList());
             }
         };

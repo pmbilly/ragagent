@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import javax.sql.DataSource;
+import com.ragagent.common.knowledge.domain.ChunkPage;
 
 /**
  * chunk 仓储（文档与 FAQ 的 chunk 行读写，方法式门面）。数据访问契约如下，
@@ -79,13 +80,6 @@ public class ChunkRepository implements ChunkSearchGateway {
         this.revisionMapper = revisionMapper;
         this.tx = tx;
         this.postgres = DatabaseDialects.isPostgres(dataSource);
-    }
-
-    /** 分页结果：行与总数一并返回（调用方一次拿到两份）。 */
-    public record ChunkPage(List<Chunk> items, long total) {
-        public ChunkPage {
-            items = items == null ? List.of() : items;
-        }
     }
 
     // ── 读 ──────────────────────────────────────────────────────────────────

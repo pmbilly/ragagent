@@ -24,6 +24,7 @@ import com.ragagent.knowledge.domain.ChunkNotFoundException;
 import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
 import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.mapper.ChunkRevisionMapper;
+import com.ragagent.common.knowledge.domain.ChunkPage;
 
 /**
  * chunk 仓储语义（H2）——覆盖 HTTP 面用到的全部仓储方法。
@@ -213,7 +214,7 @@ class ChunkRepositoryTest {
         chunk(TENANT, "k2", 5, "text", 2);      // 其他知识
         chunk(OTHER_TENANT, "k1", 6, "text", 2); // 跨租户
 
-        ChunkRepository.ChunkPage page = repo.listPagedChunksByKnowledgeId(
+        ChunkPage page = repo.listPagedChunksByKnowledgeId(
                 TENANT, "k1", 0, 10, List.of("text"), null, "", "", "", "doc", null);
         assertThat(page.total()).isEqualTo(3);
         assertThat(page.items()).extracting(Chunk::getId)
@@ -226,12 +227,12 @@ class ChunkRepositoryTest {
         chunk(TENANT, "k1", 1, "text", 2);
         chunk(TENANT, "k1", 2, "text", 2);
 
-        ChunkRepository.ChunkPage desc = repo.listPagedChunksByKnowledgeId(
+        ChunkPage desc = repo.listPagedChunksByKnowledgeId(
                 TENANT, "k1", 0, 2, List.of("text"), null, "", "", "desc", "doc", null);
         assertThat(desc.total()).isEqualTo(3);
         assertThat(desc.items()).extracting(Chunk::getChunkIndex).containsExactly(2, 1);
 
-        ChunkRepository.ChunkPage second = repo.listPagedChunksByKnowledgeId(
+        ChunkPage second = repo.listPagedChunksByKnowledgeId(
                 TENANT, "k1", 1, 1, List.of("text"), null, "", "", "asc", "doc", null);
         assertThat(second.total()).isEqualTo(3);
         assertThat(second.items()).extracting(Chunk::getChunkIndex).containsExactly(1);
@@ -242,14 +243,14 @@ class ChunkRepositoryTest {
         chunk(TENANT, "k1", 0, "text", 2, "the needle in the haystack");
         chunk(TENANT, "k1", 1, "text", 2, "nothing to see");
 
-        ChunkRepository.ChunkPage hit = repo.listPagedChunksByKnowledgeId(
+        ChunkPage hit = repo.listPagedChunksByKnowledgeId(
                 TENANT, "k1", 0, 10, List.of("text"), null, "needle", "", "", "doc", null);
         assertThat(hit.total()).isEqualTo(1);
         assertThat(hit.items()).extracting(Chunk::getContent)
                 .containsExactly("the needle in the haystack");
 
         // keyword 先 trim 首尾空白再匹配
-        ChunkRepository.ChunkPage trimmed = repo.listPagedChunksByKnowledgeId(
+        ChunkPage trimmed = repo.listPagedChunksByKnowledgeId(
                 TENANT, "k1", 0, 10, List.of("text"), null, "  needle\t", "", "", "doc", null);
         assertThat(trimmed.total()).isEqualTo(1);
     }
@@ -264,12 +265,12 @@ class ChunkRepositoryTest {
         disabled.setIsEnabled(false);
         chunkMapper.insert(disabled);
 
-        ChunkRepository.ChunkPage byTag = repo.listPagedChunksByKnowledgeId(
+        ChunkPage byTag = repo.listPagedChunksByKnowledgeId(
                 TENANT, "k1", 0, 10, List.of("text"), List.of("tag-1"), "", "", "", "doc", null);
         assertThat(byTag.total()).isEqualTo(1);
         assertThat(byTag.items()).extracting(Chunk::getId).containsExactly(tagged.getId());
 
-        ChunkRepository.ChunkPage off = repo.listPagedChunksByKnowledgeId(
+        ChunkPage off = repo.listPagedChunksByKnowledgeId(
                 TENANT, "k1", 0, 10, List.of("text"), null, "", "", "", "doc", false);
         assertThat(off.total()).isEqualTo(1);
         assertThat(off.items()).extracting(Chunk::getId).containsExactly(disabled.getId());
@@ -282,12 +283,12 @@ class ChunkRepositoryTest {
         Chunk mid = faq(TENANT, "k1", "2022-01-01T00:00:00Z");
         Chunk newest = faq(TENANT, "k1", "2023-01-01T00:00:00Z");
 
-        ChunkRepository.ChunkPage desc = repo.listPagedChunksByKnowledgeId(
+        ChunkPage desc = repo.listPagedChunksByKnowledgeId(
                 TENANT, "k1", 0, 10, List.of("faq"), null, "", "", "", "faq", null);
         assertThat(desc.items()).extracting(Chunk::getId)
                 .containsExactly(newest.getId(), mid.getId(), old.getId());
 
-        ChunkRepository.ChunkPage asc = repo.listPagedChunksByKnowledgeId(
+        ChunkPage asc = repo.listPagedChunksByKnowledgeId(
                 TENANT, "k1", 0, 10, List.of("faq"), null, "", "", "asc", "faq", null);
         assertThat(asc.items()).extracting(Chunk::getId)
                 .containsExactly(old.getId(), mid.getId(), newest.getId());
