@@ -147,6 +147,40 @@
 
 ## 12. 结构地图与包约定（v0.2.0 新建；对齐整改方案 §5/§6）
 
+### 12.0 终态模块口径（**判据，先于一切结构改动**；原文＝整改方案 §5.1/§5.2）
+
+```
+ragagent/
+├── contracts/          纯 JDK：公开 API / SPI / 不可变载荷
+├── platform/           框架、可靠执行与通用技术适配；不含业务状态机
+├── agent-engine/       ReAct 算法、工具调度、上下文预算
+├── retrieval-engine/   召回 / 融合 / 重排 / 上下文 / 索引与驱动
+├── model-runtime/      模型调用、provider、流生命周期
+├── domains/            业务域；跨域只经 contracts
+└── boot/               唯一组合根；不执行业务 SQL
+
+依赖方向（单向，禁止反向）：
+boot → domains, agent-engine, retrieval-engine, model-runtime, platform, contracts
+domains / 三个 runtime → platform, contracts
+platform → contracts
+contracts → JDK
+```
+
+**三条硬判据（与现状的差异必须按此收敛）**
+
+1. **`contracts` ＝ 纯 JDK + 不可变载荷**：持久化实体（`@TableName`/`@TableId`/TypeHandler/可变 setter）**不得**住在 L1；跨域载荷必须是 `contract.*` 的中立视图/事实（方案 §3-8「区分 persistence entity 与 domain」；§8.1 已列出 `ChunkView`/`KnowledgeView`/`KnowledgeBaseView`/`ModelFacts`/`PipelineMessageView`/`SearchHit` 等）
+2. **`platform` ＝ 框架/技术适配，不含业务状态机**：业务实体也不归它
+3. **业务域之间只经 `contracts`**；本域 `repository`/内部 port 不出域；`domain` 不引用 Spring/Mapper；仅 `controller`/`mapper`/`client`/`task`/`config` 等边界类可依赖 platform（§5.2 第 191 行）
+
+**分期（方案原文）**：**先建包边界与 ArchUnit 规则**（单进程分层单体），"确有必要时才逐域拆 Gradle 模块"；阶段 6 拆分顺序＝**先 `contracts`/`platform` → 再三个 runtime → 最后 `domains` 内部重排**（每步同步更新组件/属性/Mapper 扫描，不刷新 baseline 掩盖违例）。
+
+**⚠️ 本轮运动的定位与欠债登记（2026-10-15）**
+
+- A③「域间边清零」达成 **①档 0 条 / 0 类**（边 64 → 7、类 317 → 52），**目标（跨域只经契约）成立**；
+- 但**载体偏离本判据**：为清边把 **14 个持久化实体 + 12 个域侧 TypeHandler 上提到 `common`**（另有 2 个 `platform/persistence` 的既有基础设施 handler 属合法）；
+- ⇒ **立欠债：「实体 → 视图」收窄专项**（清单与分批路径见 `outputs/a3-entity-narrowing-plan-2026-10-15.md`）；**`common` 侧的门禁已上线**（§12.3 新增「契约层纯度」守卫：受控依赖根与持久化形状均冻结、只许减）；
+- ⇒ **新工作一律按本判据选载体**：窄读→`contract.*` 视图；宽字段/写面→**用例移入属主域**（不共享实体）；**不得再上提持久化实体**。
+
 ### 12.1 Gradle 模块与依赖方向（实测 build.gradle.kts）
 
 ```
@@ -181,6 +215,8 @@ common    → JDK（+ 工具链）            （平台与契约底座）
 | `check-exception-semantics.py` | 检索引擎 catch 不得清空边界条件 | 0 |
 | `check-contract-sync.py` | 契约金片键签名变化必须显式签字 | 1,349 金片 |
 | ArchUnit `ArchitectureRulesTest` 等 | A1 裸 env · A2 属性扫描 · A3 双装配 · A4 install 面 · A5 裸 NUL · A6 @Lazy · A7 裸 JDBC · A8 字符串 wrapper · A9 `.last` 拼接 · A10 分层倒挂 · A11/A11b Mapper 包约定 · A13 生命周期钩子 · A14 JsonProperty 卫生 · A15 序列化工厂 · **A16 边界层引用禁令（76 类）** · **A17 service 技术依赖禁令（61 类）** | 各基线只许减 |
+| `check-domain-contracts.py` | **R10 域间只经契约**（跨域边 / 类级棘轮；分档 ①②③，②③ 需登记理由） | `scripts/domain-contracts.baseline.json`（只许减） |
+| **`check-contracts-purity.py`（2026-10-15 新增）** | **C1 受控导入根 · C2 持久化形状（`@TableName` 实体 + 域侧 TypeHandler）· C3 `common/build.gradle.kts` 依赖清单**——判据＝§12.0（`contracts` 纯 JDK） | `scripts/contracts-purity.baseline.json`（只许减；现状 10 根 / 76 文件 · 实体 14 · handler 12 · 依赖 12） |
 
 ## 13. 落刀方法论（新 Agent 必读；全部是踩坑换来的）
 
