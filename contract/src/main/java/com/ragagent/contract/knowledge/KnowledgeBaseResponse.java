@@ -1,6 +1,5 @@
 package com.ragagent.contract.knowledge;
 
-import com.ragagent.contract.vectorstore.VectorStoreView;
 
 import java.time.OffsetDateTime;
 
