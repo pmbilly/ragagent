@@ -15,7 +15,7 @@ import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.memory.service.MemoryService;
+import com.ragagent.common.memory.MemoryRecallPort;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
 import com.ragagent.agent.skills.DbSkillSource;
@@ -55,7 +55,7 @@ final class AgentEngineAssembler {
     private static final org.slf4j.Logger log =
             org.slf4j.LoggerFactory.getLogger(AgentEngineAssembler.class);
 
-    private final MemoryService memoryService;
+    private final MemoryRecallPort memoryService;
     private final SessionKnowledgeQaService knowledgeQa;
     private final AgentToolBackends toolBackends;
     private final ArtifactCollectorWiring artifactCollectorWiring;
@@ -68,7 +68,7 @@ final class AgentEngineAssembler {
     /** 平台级技能目录（skills 表入库版）：装配期建 {@code DbSkillSource} 读 skills 表。 */
     private final SkillCatalogService skillCatalogService;
 
-    AgentEngineAssembler(MemoryService memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeCatalogPort knowledgeService, FaqEntryQueryService faqService, McpToolRegistrationPort mcpTools, ResourceCatalogPort resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, SkillCatalogService skillCatalogService) {
+    AgentEngineAssembler(MemoryRecallPort memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeCatalogPort knowledgeService, FaqEntryQueryService faqService, McpToolRegistrationPort mcpTools, ResourceCatalogPort resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, SkillCatalogService skillCatalogService) {
         this.memoryService = memoryService;
         this.knowledgeQa = knowledgeQa;
         this.toolBackends = toolBackends;

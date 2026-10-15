@@ -38,9 +38,9 @@ import com.ragagent.agenttools.wiki.WikiWritePageTool;
 import com.ragagent.agenttools.wiki.WikiSearchTool;
 import com.ragagent.agenttools.wiki.WikiReadSourceDocTool;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.memory.service.MemorySearchResult;
-import com.ragagent.memory.service.MemoryService;
+import com.ragagent.common.memory.MemorySearchHit;
+import com.ragagent.common.memory.MemorySearchHits;
+import com.ragagent.common.memory.MemorySearchPort;
 import com.ragagent.session.domain.message.MessageSearchGroupItem;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.common.settings.ConversationProperties;
@@ -89,7 +89,7 @@ public class AgentToolBackends {
     /** wiki 工具簇：WikiPages 端口实现与视图转换。 */
     private final AgentToolWikiBackends wikiBackends;
     private final MessageService messageService;
-    private final MemoryService memoryService;
+    private final MemorySearchPort memorySearch;
     private final WebSearchExecutor webSearchExecutor;
     private final TenantConfigLookup tenantService;
     private final TenantFileStorage fileStorage;
@@ -100,7 +100,7 @@ public class AgentToolBackends {
                              HybridSearchService hybridSearchService,
                              ConversationProperties conversation,
                              MessageService messageService,
-                             MemoryService memoryService,
+                             MemorySearchPort memorySearch,
                              WikiPageOpsPort wikiPageOps,
                              WebSearchExecutor webSearchExecutor,
                              TenantConfigLookup tenantService,
@@ -109,7 +109,7 @@ public class AgentToolBackends {
         this.knowledgeCatalog = knowledgeCatalog;
         this.chunkRepository = chunkRepository;
         this.messageService = messageService;
-        this.memoryService = memoryService;
+        this.memorySearch = memorySearch;
         this.webSearchExecutor = webSearchExecutor;
         this.tenantService = tenantService;
         this.fileStorage = fileStorage;
@@ -411,21 +411,21 @@ public class AgentToolBackends {
         };
     }
 
-    /** search_memory 取数：走 {@code memoryService.searchMemory}。 */
+    /** search_memory 取数：走 L1 查找端口（条目载荷经 memory 域适配器映射）。 */
     public SearchMemoryTool.MemorySearch memorySearch() {
         return (query, limit) -> {
-            MemorySearchResult r = memoryService.searchMemory(query, limit);
+            MemorySearchHits r = memorySearch.search(query, limit);
             if (r == null) {
                 return new SearchMemoryTool.MemorySearchResultView(false, List.of());
             }
             List<SearchMemoryTool.MemoryItemView> items = new ArrayList<>();
             if (r.items() != null) {
-                for (MemoryItem it : r.items()) {
-                    items.add(new SearchMemoryTool.MemoryItemView(nz(it.getKind()),
-                            nz(it.getTopic()), nz(it.getContent()),
-                            it.getValidFrom() == null
+                for (MemorySearchHit it : r.items()) {
+                    items.add(new SearchMemoryTool.MemoryItemView(nz(it.kind()),
+                            nz(it.topic()), nz(it.content()),
+                            it.validFrom() == null
                                     ? java.time.LocalDate.of(1, 1, 1)
-                                    : it.getValidFrom().toLocalDate()));
+                                    : it.validFrom().toLocalDate()));
                 }
             }
             return new SearchMemoryTool.MemorySearchResultView(r.available(), items);

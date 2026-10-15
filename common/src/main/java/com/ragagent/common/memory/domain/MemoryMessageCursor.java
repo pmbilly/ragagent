@@ -1,4 +1,4 @@
-package com.ragagent.memory.domain;
+package com.ragagent.common.memory.domain;
 
 import java.time.OffsetDateTime;
 
@@ -8,10 +8,9 @@ import com.ragagent.platform.web.ZeroTimeSerializer;
 /**
  * 抽取游标：用消息主键**打破时间戳平局**。
  *
- * <p>纯值对象，不落表。它出现在
- * {@link MemoryExtractionSession#getCursor()} 的嵌套 JSON 里，
- * 也作为 {@code failed_from_} / {@code failed_to_} 的 {@code embeddedPrefix} 展开成平列
- * （见 {@link MemoryExtractionSession} 的说明）。</p>
+ * <p>纯值对象，不落表。它出现在记忆抽取会话行 {@code getCursor()} 的嵌套 JSON 里
+ * （{@code MemoryExtractionSession}，留记忆域），也作为 {@code failed_from_} /
+ * {@code failed_to_} 的 {@code embeddedPrefix} 展开成平列。</p>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MemoryMessageCursor {

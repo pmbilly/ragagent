@@ -38,7 +38,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.memory.service.MemoryExtractionService;
+import com.ragagent.common.memory.MemoryExtractionPort;
 import com.ragagent.session.service.SteerRunCoordinator;
 import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.common.storage.support.FileUrlPort;
@@ -118,7 +118,7 @@ public class KnowledgeQaController {
     private final SseFrameWriter sseFrameWriter;
     private final FileUrlPort fileService;
     private final StorageBackendResolver storageBackendResolver;
-    private final MemoryExtractionService memoryExtraction;
+    private final MemoryExtractionPort memoryExtraction;
 
     public KnowledgeQaController(SessionService sessionService,
             MessageService messageService,
@@ -132,7 +132,7 @@ public class KnowledgeQaController {
             SseFrameWriter sseFrameWriter,
             org.springframework.beans.factory.ObjectProvider<FileUrlPort> fileService,
             org.springframework.beans.factory.ObjectProvider<StorageBackendResolver> storageBackendResolver,
-            org.springframework.beans.factory.ObjectProvider<MemoryExtractionService> memoryExtraction,
+            org.springframework.beans.factory.ObjectProvider<MemoryExtractionPort> memoryExtraction,
             org.springframework.beans.factory.ObjectProvider<TenantConfigLookup> tenantServiceProvider,
             FileResolverFactory fileResolverFactory) {
         this.sessionService = sessionService;

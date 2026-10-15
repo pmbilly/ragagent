@@ -20,8 +20,9 @@ import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.memory.service.MemorySearchResult;
-import com.ragagent.memory.service.MemoryService;
+import com.ragagent.common.memory.MemorySearchHit;
+import com.ragagent.common.memory.MemorySearchHits;
+import com.ragagent.common.memory.MemorySearchPort;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.domain.message.MessageSearchGroupItem;
 import com.ragagent.session.domain.message.MessageSearchResult;
@@ -41,19 +42,19 @@ class AgentToolBackendsKbToolTest {
 
     private AgentToolBackends backends;
     private MessageService messageService;
-    private MemoryService memoryService;
+    private MemorySearchPort memorySearch;
 
     @BeforeEach
     void setUp() {
         messageService = mock(MessageService.class);
-        memoryService = mock(MemoryService.class);
+        memorySearch = mock(MemorySearchPort.class);
         backends = new AgentToolBackends(
                 mock(KnowledgeCatalogPort.class),
                 mock(ChunkRepository.class),
                 mock(HybridSearchService.class),
                 mock(ConversationProperties.class),
                 messageService,
-                memoryService,
+                memorySearch,
                 mock(WikiPageOpsPort.class),
                 mock(WebSearchExecutor.class),
                 mock(TenantService.class),
@@ -123,8 +124,10 @@ class AgentToolBackendsKbToolTest {
         item.setTopic("主题");
         item.setContent("内容");
         item.setValidFrom(OffsetDateTime.parse("2026-08-01T00:00:00+08:00"));
-        when(memoryService.searchMemory(anyString(), anyInt()))
-                .thenReturn(new MemorySearchResult(true, List.of(item)));
+        when(memorySearch.search(anyString(), anyInt()))
+                .thenReturn(new MemorySearchHits(true, List.of(new MemorySearchHit(
+                        item.getKind(), item.getTopic(), item.getContent(),
+                        item.getValidFrom()))));
 
         var result = backends.memorySearch().search("内容", 5);
         assertThat(result.available()).isTrue();

@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.memory.service.MemoryExtractionService;
+import com.ragagent.common.memory.MemoryExtractionPort;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.suggestion.MessageSuggestionService;
@@ -39,7 +39,7 @@ class QaTurnFinalizerCommitGateTest {
 
     private final MessageService messageService = mock(MessageService.class);
     private final MessageSuggestionService suggestionService = mock(MessageSuggestionService.class);
-    private final MemoryExtractionService memoryExtraction = mock(MemoryExtractionService.class);
+    private final MemoryExtractionPort memoryExtraction = mock(MemoryExtractionPort.class);
     private final QaTurnFinalizer finalizer = new QaTurnFinalizer(mock(SessionService.class),
             messageService, suggestionService, mock(TemporaryDocumentService.class), memoryExtraction);
 

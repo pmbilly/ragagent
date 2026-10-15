@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.memory.service.MemoryExtractionService;
+import com.ragagent.common.memory.MemoryExtractionPort;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.suggestion.MessageSuggestionService;
 import com.ragagent.session.service.SessionService;
@@ -31,7 +31,7 @@ class QaTurnFinalizerTenantContextTest {
 
     private final QaTurnFinalizer finalizer = new QaTurnFinalizer(mock(SessionService.class),
             mock(MessageService.class), mock(MessageSuggestionService.class),
-            mock(TemporaryDocumentService.class), mock(MemoryExtractionService.class));
+            mock(TemporaryDocumentService.class), mock(MemoryExtractionPort.class));
 
     @AfterEach
     void clearContext() {

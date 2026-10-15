@@ -51,7 +51,6 @@ import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.domain.ChatConfig;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
-import com.ragagent.memory.service.MemoryService;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerConfig;
 import com.ragagent.rerank.RerankerFactory;
@@ -67,8 +66,6 @@ import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.chatpipeline.plugin.PluginDataAnalysis;
 import com.ragagent.chatpipeline.plugin.PluginSearch;
 import com.ragagent.chatpipeline.plugin.PluginSearchEntity;
-import com.ragagent.contract.memory.MemoryRecall;
-import com.ragagent.contract.memory.MemoryRetrievalContext;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.common.knowledge.ChunkFacts;
@@ -341,26 +338,7 @@ public class QaWiring {
         };
     }
 
-    /** {@link PipelinePorts.MemoryService}：签名与 {@link MemoryService} 已对齐，直接委托。 */
-    @Bean
-    public PipelinePorts.MemoryService qaPipelineMemoryService(MemoryService memoryService) {
-        return new PipelinePorts.MemoryService() {
-            @Override
-            public MemoryRecall recall(String query) {
-                return memoryService.recall(query);
-            }
-
-            @Override
-            public MemoryRetrievalContext retrievalContextFor() {
-                return memoryService.retrievalContextFor();
-            }
-
-            @Override
-            public Map<String, Integer> documentAffinity(List<String> knowledgeIds) {
-                return memoryService.documentAffinity(knowledgeIds);
-            }
-        };
-    }
+    /** {@link PipelinePorts.MemoryService} 的实现在 memory 域适配器，此处只按类型注入。 */
 
     /** {@link PipelinePorts.WebSearch} 的实现在 websearch 域适配器（管线/工具双面），此处只按类型注入。 */
 

@@ -20,7 +20,7 @@ import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.MemoryRecalledData;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.memory.service.MemoryService;
+import com.ragagent.common.memory.MemoryRecallPort;
 import com.ragagent.rerank.Reranker;
 
 import com.ragagent.session.support.PipelineViews;
@@ -61,7 +61,7 @@ public class SessionAgentQaService {
     static final int AGENT_HISTORY_FETCH_MIN = 20;
 
     private final ModelCatalogPort modelCatalog;
-    private final MemoryService memoryService;
+    private final MemoryRecallPort memoryService;
     private final SessionKnowledgeQaService knowledgeQa;
 
     /** 历史/消息装配簇。 */
@@ -85,7 +85,7 @@ public class SessionAgentQaService {
 
     public SessionAgentQaService(MessageService messageService,
             ModelCatalogPort modelCatalog,
-            MemoryService memoryService,
+            MemoryRecallPort memoryService,
             SessionKnowledgeQaService knowledgeQa,
             AgentToolBackends toolBackends,
             ResourceCatalogPort resourceCatalog,

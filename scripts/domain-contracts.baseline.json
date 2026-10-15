@@ -120,15 +120,6 @@
       "InitializationController",
       "ModelConnectivityTestService"
     ],
-    "session→memory": [
-      "AgentEngineAssembler",
-      "AgentToolBackends",
-      "KnowledgeQaController",
-      "MessageRepository",
-      "QaTurnFinalizer",
-      "QaWiring",
-      "SessionAgentQaService"
-    ],
     "session→agent": [
       "AgentEngineAssembler",
       "AgentHistoryAssembler",

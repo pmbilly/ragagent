@@ -14,7 +14,7 @@ import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.TemporaryDocumentService;
 import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.memory.service.MemoryExtractionService;
+import com.ragagent.common.memory.MemoryExtractionPort;
 import com.ragagent.session.domain.conversation.SessionLastRequestState;
 import com.ragagent.session.service.SessionLookupScope;
 
@@ -34,9 +34,9 @@ public final class QaTurnFinalizer {
     private final MessageService messageService;
     private final MessageSuggestionService suggestionService;
     private final TemporaryDocumentService temporaryDocuments;
-    private final MemoryExtractionService memoryExtraction;
+    private final MemoryExtractionPort memoryExtraction;
 
-    public QaTurnFinalizer(SessionService sessionService, MessageService messageService, MessageSuggestionService suggestionService, TemporaryDocumentService temporaryDocuments, MemoryExtractionService memoryExtraction) {
+    public QaTurnFinalizer(SessionService sessionService, MessageService messageService, MessageSuggestionService suggestionService, TemporaryDocumentService temporaryDocuments, MemoryExtractionPort memoryExtraction) {
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.suggestionService = suggestionService;
