@@ -1331,6 +1331,23 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 A③ 第三十八刀：批 1 尾判据（K 级立项）+ 批 2 首项 `evaluation→model` 清零（2026-10-15，R10 边 23 → 22、类 139 → 138）**
+- **批 1 尾巴 `initialization→model`(4 类)：判据核查后不改，立 K 级**（三条实证）：
+  1. `InitResponses.rawModel` 手工拼响应 Map，读 **16 个实体字段**（id/tenantId/name/displayName/type/source/description/parameters/default/builtin/managedBy/status/createdAt/updatedAt/deletedAt + parameters 明细），而 L1 视图 `ModelRowView` 只有 **7 个字段** ⇒ 换视图会**静默改前端契约** ✗
+  2. `InitializationConfigService` 是模型**写面**：`toModel(ModelDescriptor)` 造实体、`createModel`/`updateModel(existing)` 落库 ⇒ 超"换接口"范畴，需读写载荷设计
+  3. `InitializationController` 把同一个 `ModelService` 同时喂给"配置写入"与"连通性测试（内存造临时 Model 不落库）"⇒ 两处都依赖实体面
+  ⇒ **立项：K-模型管理读写面**（读写载荷 + 线格式对齐，需前端确认）；**不机械换视图**是本刀最有价值的判断（否则会静默改契约）
+- **批 2 首项（本刀落地）**：`evaluation→model` **清零** —— `EvaluationService` 的 3 处 `for (Model m : modelService.listModels())` 模式扫描（挑默认 embedding/KnowledgeQA/rerank/chat 模型）改为 **L1 端口 + 视图**（`modelType()`/`id()`）⇒ **1 类清 1 条边**（该边仅此一类）
+- **批 2 继续测量的负向结论（写入方法论）**：`session→memory` ★3 与 `im→knowledge` ★1 **都不属机械批**：
+  - `session→memory`：`KnowledgeQaController`/`QaTurnFinalizer` 用 `MemoryExtractionService.scheduleExtraction`（需"memory 抽取触发"端口）；`MessageRepository` 用 `memory.domain.MemoryMessageCursor`（**列名与 mapper 绑定**的载荷）⇒ 需载荷设计
+  - `im→knowledge`：`ImKnowledgeBridgeOps` 依赖 `DuplicateKnowledgeException`（域异常语义）⇒ 端口须表达"重复"分支
+  - `EvaluationService` 的 knowledge/session 面：**写面 + 造实体**（`new KnowledgeBase()` → `createKnowledgeBase`、`createFromPassageSync`、`deleteKnowledge`）⇒ K 级
+- **策略结论（供下一步排期）**：①档剩余边的**共同拦路石是"knowledge 域对外读写面"与"memory 抽取面"** ⇒ 与其逐类找机械点（收益已降到 1 类/刀），不如按域做**一次系统性收口**：
+  - **"knowledge 对外面端口化"**（读：lookup/gateway 部分已有；**写：create/delete/duplicate 载荷**）⇒ 一次可带动 `evaluation→knowledge`(1) · `im→knowledge`(2) · `initialization→knowledge`(4) · `session→knowledge`(17) · `datasource→knowledge`(8) = **5 条边 / 30+ 类**
+  - **"memory 抽取面端口化"** ⇒ 带动 `session→memory`(7)
+  - **K 级清单（需设计先行，不与机械批混）**：模型管理读写面（init 4 类）· knowledge 写面（上面 5 边）· memory 游标载荷 · `im→session`(6) · `embedchannel→session/knowledge` · `datasource→knowledge`(8)
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m59s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；定向 evaluation/model ✓；dev 重启 ready ✓ + 冒烟（models/knowledge-bases/sessions 200 ✓；`/api/v1/evaluation` 返**业务级 400 信封**"taskId: 不能为空" ✓ 路由与校验链路正常、非 500）
+- **A③ 累计（三十八刀）**：边 **64 → 22（−42）**、类 **317 → 138（−179）**；三档 **① 14 条 / 62 类 · ② 3 条 / 21 类 · ③ 5 条 / 55 类**
 **🔶 A③ 第三十七刀（批 1 后半）：`knowledge→model` + `session→model` 双清 ⇒ −14 类（2026-10-15，R10 边 25 → 23、类 153 → 139）**
 - **本半批动作**：
   - `ModelCatalogPort` **加 3 个按租户/可见性取行的方法**（语义各不同，逐一对应既有域语义）：`findModelOrEmpty`（捕获 `ModelNotFoundException` ⇒ 空，供"未找到即转 404"）/ `findModelVisible`（租户自有 或 内置）/ `findModelRow`（严格 id+租户、不看删除标记）——**第三种把 knowledge 里 `FaqIndexWriter` 的 MyBatis 直查（`LambdaQueryWrapper<Model>`）搬进域内适配器** ⇒ A17 存量 **61 → 60** ✓

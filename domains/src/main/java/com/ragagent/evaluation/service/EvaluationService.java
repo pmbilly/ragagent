@@ -31,8 +31,8 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
-import com.ragagent.model.domain.Model;
-import com.ragagent.model.service.ModelService;
+import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +95,7 @@ public class EvaluationService {
     @Value("${conversation.rerank-threshold:0.3}")
     private double rerankThreshold;
 
-    private final ModelService modelService;
+    private final ModelCatalogPort modelCatalog;
     private final KnowledgeBaseService knowledgeBaseService;
     private final DatasetService datasetService;
     private final KnowledgeService knowledgeService;
@@ -104,12 +104,12 @@ public class EvaluationService {
     /** 任务存储：taskID → detail。 */
     private final Map<String, EvaluationDetail> store = new ConcurrentHashMap<>();
 
-    public EvaluationService(ModelService modelService,
+    public EvaluationService(ModelCatalogPort modelCatalog,
                              KnowledgeBaseService knowledgeBaseService,
                              DatasetService datasetService,
                              KnowledgeService knowledgeService,
                              SessionKnowledgeQaService sessionKnowledgeQaService) {
-        this.modelService = modelService;
+        this.modelCatalog = modelCatalog;
         this.knowledgeBaseService = knowledgeBaseService;
         this.datasetService = datasetService;
         this.knowledgeService = knowledgeService;
@@ -128,15 +128,15 @@ public class EvaluationService {
             // 按模型表挑默认 embedding/KnowledgeQA（顺序扫描）
             String embeddingModelId = "";
             String llmModelId = "";
-            for (Model model : modelService.listModels()) {
+            for (ModelRowView model : modelCatalog.listModels()) {
                 if (model == null) {
                     continue;
                 }
-                if (MODEL_TYPE_EMBEDDING.equals(model.getType())) {
-                    embeddingModelId = model.getId();
+                if (MODEL_TYPE_EMBEDDING.equals(model.type())) {
+                    embeddingModelId = model.id();
                 }
-                if (MODEL_TYPE_KNOWLEDGE_QA.equals(model.getType())) {
-                    llmModelId = model.getId();
+                if (MODEL_TYPE_KNOWLEDGE_QA.equals(model.type())) {
+                    llmModelId = model.id();
                 }
             }
             if (embeddingModelId.isEmpty() || llmModelId.isEmpty()) {
@@ -169,18 +169,18 @@ public class EvaluationService {
 
         // rerank 缺省：模型表挑第一个 Rerank；无则跳过（记 WARN）
         if (rerankModelId.isEmpty()) {
-            for (Model model : modelService.listModels()) {
-                if (model != null && MODEL_TYPE_RERANK.equals(model.getType())) {
-                    rerankModelId = model.getId();
+            for (ModelRowView model : modelCatalog.listModels()) {
+                if (model != null && MODEL_TYPE_RERANK.equals(model.type())) {
+                    rerankModelId = model.id();
                     break;
                 }
             }
         }
         // chat 缺省：挑第一个 KnowledgeQA；无则失败
         if (chatModelId.isEmpty()) {
-            for (Model model : modelService.listModels()) {
-                if (model != null && MODEL_TYPE_KNOWLEDGE_QA.equals(model.getType())) {
-                    chatModelId = model.getId();
+            for (ModelRowView model : modelCatalog.listModels()) {
+                if (model != null && MODEL_TYPE_KNOWLEDGE_QA.equals(model.type())) {
+                    chatModelId = model.id();
                     break;
                 }
             }

@@ -114,9 +114,6 @@
     "evaluation→knowledge": [
       "EvaluationService"
     ],
-    "evaluation→model": [
-      "EvaluationService"
-    ],
     "evaluation→session": [
       "EvaluationService"
     ],
