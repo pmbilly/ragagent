@@ -130,6 +130,12 @@ PLATFORM_FACE = {
     "com/ragagent/common/storage/fileserve/ProviderFileStorePort.java":
         "provider 文件存储端口：**方法面含 `FileTransport`**，而后者带 jakarta.servlet 请求/响应类型 "
         "⇒ 零依赖契约装不下；随 `GlobalFileServicePort` 的未来路径一并处置",
+    "com/ragagent/common/wiki/WikiPageOpsPort.java":
+        "wiki 页读写端口：依赖 `wiki/domain/WikiIndexEntry`——**MyBatis 映射类型**（框架面）⇒ 零依赖契约装不下；"
+        "未来路径：把 `WikiIndexEntry` 的**映射面与展示面切开**（展示面纯 JDK 上提契约）后可入 contract.wiki",
+    "com/ragagent/common/session/qa/SessionQaPort.java":
+        "会话 QA 面端口：带 `platform.event.EventBus`（platform 类型）与平台面载荷 "
+        "`SessionView`/`MessageView`（见其登记）⇒ 零依赖契约装不下",
 "com/ragagent/common/storage/fileserve/FileProxyPort.java":
         "带 jakarta.servlet 请求/响应类型 ⇒ platform 面",
     "com/ragagent/common/session/embed/SessionView.java":
@@ -153,6 +159,15 @@ PENDING_DEJACKSON = {
 # 但其线格式依赖 Jackson 注解语义（零依赖 :contract 无法表达）——硬搬会导致
 # **抽象泄漏**（契约的字节隐式依赖 L1 类的注解）⇒ 诚实留 L1 并在此登记依据。
 # 与 ① 的区别：① 是"装了框架类型搬不动"，② 是"能装但语义装不下"。
+PENDING_DEJACKSON_EXTRA = {
+    "com/ragagent/common/session/qa/QaRequestPayload.java":
+        "对话入参载荷：含 `ObjectNode`（Jackson 树）且依赖 L1 值类型 `MessageAttachment` "
+        "⇒ 随 **session 域批次**（值类型回迁）一并去 Jackson 后入 contract.session",
+    "com/ragagent/common/session/PipelineMessageView.java":
+        "管线消息视图：依赖 L1 `retrieval/SearchResult` ⇒ 随 **检索域批次**（SearchResult 去 Jackson/归位）"
+        "一并处置后入契约",
+}
+
 JACKSON_SEMANTICS_REQUIRED = {
     "com/ragagent/common/auth/AdminUserView.java":
         "字段 preferences 是 L1 类型 `UserPreferences`，其 `@JsonInclude(NON_NULL)` **决定出面字节**"
@@ -165,7 +180,7 @@ JACKSON_SEMANTICS_REQUIRED = {
         "（契约接口不得引用 L1 类型）；随 AdminUserView 的未来路径一并入 contract.auth",
 }
 
-REGISTERED = {**PLATFORM_FACE, **PENDING_DEJACKSON, **JACKSON_SEMANTICS_REQUIRED}
+REGISTERED = {**PLATFORM_FACE, **PENDING_DEJACKSON, **PENDING_DEJACKSON_EXTRA, **JACKSON_SEMANTICS_REQUIRED}
 
 
 def scan_payloads() -> list[str]:
@@ -244,9 +259,10 @@ def main() -> int:
         if gone:
             shrinks.append(f"C2 {label} 减少 {len(gone)} 个（{gone[:3]}）")
     # C4
-    base_payloads = base.get("payloads", [])
-    if not base_payloads:
+    if "payloads" not in base:
         problems.append("C4 基线缺少 payloads 字段（旧基线）⇒ 确认后用 --write 重建")
+    # 空集是**正当终态**（全部载荷已入 contract 或按证据登记）⇒ 只按"键是否存在"判旧基线
+    base_payloads = base.get("payloads") or []
     new_payloads = sorted(set(cur["payloads"]) - set(base_payloads))
     if new_payloads:
         problems.append(f"C4 common 新增载荷型文件：{new_payloads[:4]}（共 {len(new_payloads)} 个）"

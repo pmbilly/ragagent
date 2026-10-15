@@ -97,13 +97,7 @@
   ]
  },
  "note": "契约层纯度基线（C1 受控导入根 / C2 持久化形状 / C3 build 依赖）——只许减；由 scripts/check-contracts-purity.py --write 生成。判据见 HANDOFF §12.0。",
- "payloads": [
-  "com/ragagent/common/knowledge/dto/KnowledgeBaseResponse.java",
-  "com/ragagent/common/session/PipelineMessageView.java",
-  "com/ragagent/common/session/qa/QaRequestPayload.java",
-  "com/ragagent/common/session/qa/SessionQaPort.java",
-  "com/ragagent/common/wiki/WikiPageOpsPort.java"
- ],
+ "payloads": [],
  "persistence": {
   "entities": [],
   "handlers": [

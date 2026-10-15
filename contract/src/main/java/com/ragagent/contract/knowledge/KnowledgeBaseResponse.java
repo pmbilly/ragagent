@@ -1,13 +1,9 @@
-package com.ragagent.common.knowledge.dto;
+package com.ragagent.contract.knowledge;
 
 import com.ragagent.contract.vectorstore.VectorStoreView;
 
 import java.time.OffsetDateTime;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
-import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.contract.knowledge.domain.AsrConfigView;
 import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
 import com.ragagent.contract.knowledge.domain.ImageProcessingConfigView;
@@ -56,33 +52,28 @@ public record KnowledgeBaseResponse(
         String storageBackendId,
         String storageProvider,
         IndexingStrategyView indexingStrategy,
-        JsonNode extractConfig,
-        JsonNode faqConfig,
-        JsonNode questionGenerationConfig,
-        JsonNode autoTagConfig,
-        JsonNode wikiConfig,
+        /** jsonb 原样（对象/数组/标量）。 */
+        Object extractConfig,
+        /** jsonb 原样（对象/数组/标量）。 */
+        Object faqConfig,
+        /** jsonb 原样（对象/数组/标量）。 */
+        Object questionGenerationConfig,
+        /** jsonb 原样（对象/数组/标量）。 */
+        Object autoTagConfig,
+        /** jsonb 原样（对象/数组/标量）。 */
+        Object wikiConfig,
         VectorStoreView vectorStore,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt) {
 
-    /** 知识库类型。库内取值只有这两种，非法值按 {@link #DOCUMENT} 处理。 */
+    /** 知识库类型。库内取值只有这两种，非法值按 {@link #document} 处理。 */
     public enum Type {
-        DOCUMENT("document"),
-        FAQ("faq");
-
-        private final String value;
-
-        Type(String value) {
-            this.value = value;
-        }
-
-        @JsonValue
-        public String value() {
-            return value;
-        }
+        /** 常量名即线格式值（原 {@code @JsonValue value()} 的零依赖等价：Jackson 枚举默认按 name 序列化）。 */
+        document,
+        faq;
 
         public static Type from(String raw) {
-            return FAQ.value.equals(raw) ? FAQ : DOCUMENT;
+            return faq.name().equals(raw) ? faq : document;
         }
     }
 
@@ -98,43 +89,23 @@ public record KnowledgeBaseResponse(
     public record VectorStoreView(String id, String name, Source source, String engineType, Status status) {
 
         /** 向量库来源（env / custom）。 */
+        /** 常量名即线格式值（同 {@code Type} 的去 Jackson 约定）。 */
         public enum Source {
-            ENV("env"),
-            USER("user"),
-            SHARED("shared");
-
-            private final String value;
-
-            Source(String value) {
-                this.value = value;
-            }
-
-            @JsonValue
-            public String value() {
-                return value;
-            }
+            env,
+            user,
+            shared
         }
 
         /** 向量库可用状态。 */
+        /** 常量名即线格式值（同 {@code Type} 的去 Jackson 约定）。 */
         public enum Status {
-            AVAILABLE("available"),
-            UNAVAILABLE("unavailable");
-
-            private final String value;
-
-            Status(String value) {
-                this.value = value;
-            }
-
-            @JsonValue
-            public String value() {
-                return value;
-            }
+            available,
+            unavailable
         }
 
         /** 本部署未配置任何向量库绑定（无绑定或回落环境默认）时的视图。 */
         public static VectorStoreView envDefault(String engineType) {
-            return new VectorStoreView(null, "System default", Source.ENV, engineType, Status.AVAILABLE);
+            return new VectorStoreView(null, "System default", Source.env, engineType, Status.available);
         }
     }
 
@@ -157,8 +128,8 @@ public record KnowledgeBaseResponse(
     private static VectorStoreView viewOf(KnowledgeBaseRowView kb, String retrieveDriver) {
         String engineType = engineTypeOf(retrieveDriver);
         return kb.hasVectorStore()
-                ? new VectorStoreView(kb.getVectorStoreId(), null, VectorStoreView.Source.USER,
-                        engineType, VectorStoreView.Status.AVAILABLE)
+                ? new VectorStoreView(kb.getVectorStoreId(), null, VectorStoreView.Source.user,
+                        engineType, VectorStoreView.Status.available)
                 : VectorStoreView.envDefault(engineType);
     }
 
@@ -202,11 +173,11 @@ public record KnowledgeBaseResponse(
                 emptyToNull(kb.getStorageBackendId()),
                 emptyToNull(kb.getStorageProvider()),
                 IndexingStrategyView.from(kb.getIndexingStrategy()),
-                JsonMappers.toJsonNode(kb.getExtractConfig()),
-                JsonMappers.toJsonNode(kb.getFaqConfig()),
-                JsonMappers.toJsonNode(kb.getQuestionGenerationConfig()),
-                JsonMappers.toJsonNode(kb.getAutoTagConfig()),
-                JsonMappers.toJsonNode(kb.getWikiConfig()),
+                kb.getExtractConfig(),
+                kb.getFaqConfig(),
+                kb.getQuestionGenerationConfig(),
+                kb.getAutoTagConfig(),
+                kb.getWikiConfig(),
                 storeView,
                 kb.getCreatedAt(),
                 kb.getUpdatedAt());

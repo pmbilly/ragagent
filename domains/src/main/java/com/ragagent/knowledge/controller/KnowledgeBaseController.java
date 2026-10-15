@@ -14,7 +14,7 @@ import com.ragagent.knowledge.dto.HybridSearchRequest;
 import com.ragagent.knowledge.dto.doc.RebuildIndexResponse;
 import com.ragagent.knowledge.dto.kb.UpdateKnowledgeBaseRequest;
 import com.ragagent.knowledge.dto.kb.CreateKnowledgeBaseRequest;
-import com.ragagent.common.knowledge.dto.KnowledgeBaseResponse;
+import com.ragagent.contract.knowledge.KnowledgeBaseResponse;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.retrieval.HybridSearchService;
 import jakarta.validation.Valid;

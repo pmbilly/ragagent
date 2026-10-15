@@ -19,7 +19,7 @@ import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseAsrConfig;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseVlmConfig;
-import com.ragagent.common.knowledge.dto.KnowledgeBaseResponse;
+import com.ragagent.contract.knowledge.KnowledgeBaseResponse;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.initialization.dto.InitResponses;
 import com.ragagent.contract.model.ModelCatalogPort;

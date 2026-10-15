@@ -1525,7 +1525,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 账 | 读数 | 状态 |
 |---|---|---|
-| `:contract` | **202 件** | ✅ 已独立（零依赖） |
+| `:contract` | **203 件** | ✅ 已独立（零依赖） |
 | `common/*` | **92 件**（125 → 97 → 92，E1/G1-b/G1-h/G1-c-1 共 −33） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
@@ -1783,6 +1783,19 @@ public interface AdminUserPort {
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 G1-c-2·`KnowledgeBaseResponse` 入契约（新技法：枚举"常量名即值"）+ 余 4 件按证据登记 ⇒ ⭐ C4 载荷型文件 = 0（2026-10-15）**
+- **对象（对账 §16.0-C 余 5 件）**：`KnowledgeBaseResponse` · `wiki/{WikiPageOpsPort,WikiIndex}` · `session/qa/{SessionQaPort,QaRequestPayload}` · `session/PipelineMessageView`
+- **结果分三类（先测后动）**：
+  1. **`KnowledgeBaseResponse` → `contract.knowledge`** ✓：去 Jackson 两条——① 5 个 `JsonNode` 组件 → `Object`（`from(...)` 去掉 `toJsonNode` 包裹，直接透传视图的纯 JDK 值）② **三个 `@JsonValue` 枚举**（`Type` / `VectorStoreView.Source` / `Status`）**改为"常量名即值"**（`DOCUMENT("document")` → `document`）⇒ **Jackson 枚举默认按 `name()` 序列化即得原小写值 ⇒ 字节等价** ✓（枚举常量全仓仅 3 处使用且都在文件内 ⇒ 零外部改动）
+  2. **`wiki/{WikiPageOpsPort,WikiIndex}` ⇒ 回退 + 登记**：实测 `WikiIndex` 依赖 **`WikiIndexEntry`（MyBatis 映射类型＝框架面）** ⇒ 零依赖契约装不下 ✗（未来路径：把 `WikiIndexEntry` 的**映射面与展示面切开**）
+  3. **`session/qa/SessionQaPort`** ⇒ 登记 platform 面（带 `platform.event.EventBus` + 平台面载荷）；**`QaRequestPayload` / `PipelineMessageView`** ⇒ 登记**待去 Jackson**（分别依赖 L1 `MessageAttachment` / `retrieval/SearchResult` ⇒ 随各自域批次处置）
+- **⭐ 里程碑**：**C4 载荷型文件 12 → 0** ✓✓ —— `common/*` 已**无未登记载荷**（全部入契约或按证据登记）；登记总册：platform 面 11 · Jackson 语义必要 2 · 待去 Jackson 2
+- **⭐ 新技法（可复用）**：**`@JsonValue` 的零依赖等价＝把枚举常量名改成与线格式值一致**（枚举默认按 name 序列化）——代价是"非常规命名"，收益是**零注解 + 字节等价**；若名/值差异大或使用点多 ⇒ 改走"登记留 L1"（本刀 `AdminUserView` 即取后者）
+- **⚠️ 两次摩擦（都已处置 + 判据）**：
+  1. **搬迁脚本目标文件名漏 `.java`** ⇒ `git mv` 生成无扩展名文件（javac 忽略 ⇒ "class WikiIndex does not exist"）⇒ **判据：搬迁脚本的目标路径必须以 `.java` 结尾**（与上一刀"目标包显式映射"同族：**别让路径/命名的隐式假设替代事实**）
+  2. **守卫零态缺陷**：载荷集归零后 `--write` 不写空 `payloads` 字段 ⇒ 守卫误报"旧基线" ✗ ⇒ 改为**按键存在性**判定（**空集是正当终态**）✓——这条正是"达到里程碑后工具必须能表达零"的实例
+- **读数**：`:contract` 197 → **203**（+6）；`common/*` 97 → **88**（−9）；**C4 载荷 12 → 0**；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**；**1349 金片签名一致**（枚举改名 + 去 Jackson 后**线格式逐字节不变** ✓）；`spotlessCheck build` **1m52s**；**4991 / 失败 0 / 跳过 4**；冒烟（KB 200 ✓ · init 404 业务信封 ✓ · sessions 200 ✓）
 **🔶 G1-c-1·KB 侧 5 件 `*ConfigView` 入契约 + 2 件 fileserve 端口按证据登记（C4 载荷 12 → 5）（2026-10-15）**
 - **对象（对账 §16.0-C 清单的前 7 件）**：`knowledge/dto/{Asr,Chunking,ImageProcessing,Indexing,Vlm}ConfigView` · `storage/fileserve/{GlobalFileServicePort,ProviderFileStorePort}`
 - **结果分两类（先测后动）**：
