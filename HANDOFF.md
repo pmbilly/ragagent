@@ -1331,6 +1331,25 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 A③ 第五十四刀：②owner 档·实体上提 + 读侧端口化 ⇒ `system→tenant` 清零、owner 21 → 2 类（2026-10-15，R10 边 8 → 7、类 71 → 52）**
+- **读数**：**`system→tenant` 整条边清零** ✓（边 **8 → 7**）；类 **71 → 52（−19）**；②owner **3 条 / 21 类 → 2 条 / 2 类**；累计 边 **64 → 7（−57）**、类 **317 → 52（−265）**
+- **第一步·实体上提 7 件**（登记条件认可的机械面，且是历次最高杠杆）：
+  - `tenant/repository/Tenant`（146 行）· `tenant/APIPrincipalConfigTypeHandler`（同族 TypeHandler）· `tenant/repository/TenantConfigRedaction` · `tenant/ParserEngineConfig` → **L1 `common.tenant.domain`**
+  - `auth/domain/{User, UserPreferences, AuthToken}` → **L1 `common.auth.domain`**
+  - ⇒ 一次清 **19 类**（`auth→tenant` 14 → 1、`system→auth` 5 → 1、`system→tenant` 2 → 1 且随后清零）
+  - **诚实记录**：`tenant/repository/TenantLookup` 的 javadoc 本就分析了"实体在 L1 ⇒ 返回实体的端口可并回 common"这条路（本次正是它认可形态）；其"只允许 L3 使用"的措辞已随实体上提而过期（**可选后续**：把 `TenantLookup` 并回 `common.tenant`）
+- **第二步·读侧端口化 3 处**（登记条件原文："条件：**读侧已走 L1 端口**…写/管理面集中在属主域"）：
+  1. `SystemController` → **复用既有 L1 `TenantConfigLookup`**（其 `storageView`/`parserEngineConfig` 与 auth 侧实现**语义逐字相同**，实现注释亦写明"与端口 javadoc 一致"）⇒ **零新增**
+  2. `SystemSettingService`（用户名展示的读）→ **新 L1 `common.auth.UserDirectoryPort.userById`** + `auth/api/UserDirectoryAdapter`（逐字转发 `UserMapper.selectById`）
+  3. `SystemAdminController`（默认配额全表维护）→ `TenantStorageQuotaPort` **+1 方法 `applyDefaultStorageQuota`**，实现走**具名 Mapper**（保留 `FullTableWriteGuard` 登记例外的口径，注释已写入端口 javadoc）
+- **⚠️ 三次红态（两条与上刀同型，说明是"换包"的系统性摩擦）**：
+  1. **R7 路径坑第二次**：hoist 脚本落点少带一段 ⇒ 7 文件落在 `common/domain/` 而包声明是 `common.{tenant,auth}.domain` ⇒ 按"**包名即路径**"通用脚本归位 ✓。**判据已固化：换包后先跑 R7，落点由包名推导而不是由源路径拼接**
+  2. **B169 冻结覆盖快照告警**（`ParserEngineConfig` 随换包**进入** `common/tenant` 冻结前缀）：核其键为**第三方/模型词汇**（`mineru_*` 8 键 · `chat_parser_engine_rules`，与既有登记同类）⇒ 按守卫指引 `--write` 重登记（快照 147 文件）；**守卫脚本自己写明"前缀冻结会在换包时静默失效 ⇒ 换包后务必回核 FROZEN_PREFIXES 并 --write"**
+  3. 脚本摩擦两处（端口方法被两个脚本各加一次 ⇒ 去重；行删除多删了类尾括号 ⇒ **新增习惯：删行后按 `{`/`}` 配平自检**）
+- **残留 2 类 = 真正的"需拍板"项**（两条边各 1 类，均为**管理/写面**，非读侧）：
+  1. `auth→tenant{TenantService}`：租户 CRUD 管理面（`TenantMapper` 13 处读写；§8.9 规划上属 auth）⇒ 清零需**搬管理面到 tenant 域**或**改公开 API 形状（实体→视图）**
+  2. `system→auth{SystemAdminUserService}`：用户/令牌管理面（`UserMapper` 6 处 + `AuthTokenMapper` 1 处 + auth 三个服务）⇒ §9.1「状态唯一写入者」张力 ⇒ 二选一：**改经 auth 的写端口**（auth 成为唯一写入者）或**承认它是 auth 管理面并搬迁**
+- **验证**：**13 守卫全绿** ✓（环 0、R9 = 8 组、R7 0 处不一致、R8 违规 0）；`spotlessCheck build` ✓ **2m10s** ✓；**4991 / 失败 0 / 跳过 4** ✓；定向 auth/tenant/system **111 条** ✓；dev 重启 ready ✓（新端口+适配器装配通过）+ 冒烟（`/api/v1/system/info` **200**（正是本刀改的 `TenantConfigLookup` 链路）· `/api/v1/tenants` **200** · `/api/v1/auth/me` **200** · `/api/v1/system/admin/settings` **403**（admin 角色校验，符合预期））
 **🔶 A③ 第五十三刀：`embedchannel→session` 收官 ⇒ **①档清零（0 条 / 0 类）**（2026-10-15，R10 边 9 → 8、类 72 → 71）**
 - **🎯 A③ 主线达标**：`① clearable` 从基线 **64 条边 / 317 类**（起始）降到 **0 条 / 0 类**；余下为 ②owner（3 条 / 21 类，登记允许）与 ③族内（5 条 / 50 类，冻结豁免）
 - **本刀对象**：①档最后一类 `EmbedChannelController`（含其协作者 `EmbedChannelDelegateOps` 的 7 处调用）——embed 委托层原先直持**会话域 4 个控制器**（`KnowledgeQaController` / `MessageController` / `SessionController` / `MessageSuggestionController`）

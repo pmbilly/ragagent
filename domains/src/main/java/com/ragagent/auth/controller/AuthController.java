@@ -13,11 +13,11 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantInvitation;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.auth.domain.User;
-import com.ragagent.auth.domain.UserPreferences;
+import com.ragagent.common.auth.domain.User;
+import com.ragagent.common.auth.domain.UserPreferences;
 import com.ragagent.auth.dto.AuthConfigResponse;
 import com.ragagent.auth.dto.AuthLoginResponse;
 import com.ragagent.auth.dto.ChangePasswordRequest;

@@ -16,8 +16,7 @@ import com.ragagent.contract.apikey.TenantAPIKeyResponse;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.auth.domain.User;
-import com.ragagent.tenant.mapper.TenantMapper;
+import com.ragagent.common.auth.domain.User;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -43,6 +42,7 @@ import com.ragagent.system.domain.SystemSetting;
 import com.ragagent.system.service.SystemSettingService;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.common.tenant.TenantStorageQuotaPort;
 
 /**
  * /api/v1/system/admin 组：用户管理 / 平台 API Key / 系统设置 / 运行时队列 / 配额批量应用。
@@ -67,18 +67,18 @@ public class SystemAdminController {
     private final SystemAdminUserService users;
     private final SystemSettingService settings;
     private final ApiKeyAdminPort apiKeyAdmin;
-    private final TenantMapper tenantMapper;
     private final AuditWritePort auditWriter;
+    private final TenantStorageQuotaPort tenantStorageQuotaPort;
 
     public SystemAdminController(SystemAdminUserService users,
                                  SystemSettingService settings,
                                  ApiKeyAdminPort apiKeyAdmin,
-                                 TenantMapper tenantMapper,
-                                 AuditWritePort auditWriter) {
+                                 AuditWritePort auditWriter,
+                                 TenantStorageQuotaPort tenantStorageQuotaPort) {
+        this.tenantStorageQuotaPort = tenantStorageQuotaPort;
         this.users = users;
         this.settings = settings;
         this.apiKeyAdmin = apiKeyAdmin;
-        this.tenantMapper = tenantMapper;
         this.auditWriter = auditWriter;
     }
 
@@ -491,7 +491,7 @@ public class SystemAdminController {
         }
         long quotaBytes = gb * 1024 * 1024 * 1024;
         // 全表写走具名 Mapper 方法（FullTableWriteGuard 登记例外），不再匿名 update(null, wrapper)
-        int affected = tenantMapper.applyDefaultStorageQuota(quotaBytes);
+        int affected = tenantStorageQuotaPort.applyDefaultStorageQuota(quotaBytes);
         var details = new LinkedHashMap<String, Object>();
         details.put("quotaBytes", quotaBytes);
         details.put("quotaGb", gb);

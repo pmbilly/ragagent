@@ -13,6 +13,16 @@ public interface TenantStorageQuotaPort {
     /** 配额视图；租户不存在返回 {@code null}（调用方按 0 兜底）。 */
     TenantQuotaView quotaView(long tenantId);
 
+    /**
+     * 把"默认存储配额"应用到未设置配额的租户（系统管理员维护面）。
+     *
+     * <p><b>实现约束</b>：域实现走具名 Mapper 方法（{@code TenantMapper#applyDefaultStorageQuota}，
+     * `FullTableWriteGuard` 的登记例外），不得改成匿名 {@code update(null, wrapper)}。</p>
+     *
+     * @return 受影响行数
+     */
+    int applyDefaultStorageQuota(long quotaBytes);
+
     /** {@code storage_used += delta}（负数钳 0）。 */
     void adjustUsed(long tenantId, long delta);
 

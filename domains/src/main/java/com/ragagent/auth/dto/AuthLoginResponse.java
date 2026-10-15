@@ -2,7 +2,7 @@ package com.ragagent.auth.dto;
 
 import java.util.List;
 
-import com.ragagent.auth.domain.User;
+import com.ragagent.common.auth.domain.User;
 
 /**
  * 登录 / 自动设置 / 切换空间的 HTTP 响应体。

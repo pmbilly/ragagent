@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.common.tenant.TenantStorageQuotaPort;
 import com.ragagent.tenant.mapper.TenantMapper;
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.domain.Tenant;
 
 /** {@link TenantStorageQuotaPort} 的租户域实现（配额读写都发生在租户表的属主域）。 */
 @Component
@@ -31,6 +31,11 @@ public class TenantStorageQuotaAdapter implements TenantStorageQuotaPort {
         long quota = t.getStorageQuota() == null ? 0L : t.getStorageQuota();
         long used = t.getStorageUsed() == null ? 0L : t.getStorageUsed();
         return new TenantQuotaView(tenantId, quota, used);
+    }
+
+    @Override
+    public int applyDefaultStorageQuota(long quotaBytes) {
+        return tenantMapper.applyDefaultStorageQuota(quotaBytes);
     }
 
     @Override

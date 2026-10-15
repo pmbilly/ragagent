@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.domain.Tenant;
 
 /**
  * 有效引擎解析：

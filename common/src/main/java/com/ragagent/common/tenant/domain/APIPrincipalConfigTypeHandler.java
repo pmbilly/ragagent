@@ -1,4 +1,4 @@
-package com.ragagent.tenant;
+package com.ragagent.common.tenant.domain;
 
 import com.ragagent.contract.tenant.APIPrincipalConfig;
 

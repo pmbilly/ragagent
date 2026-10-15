@@ -16,7 +16,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.platform.persistence.PageRequests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.tenant.repository.TenantLookup;
 import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.contract.storage.StorageBackendProvisioner;

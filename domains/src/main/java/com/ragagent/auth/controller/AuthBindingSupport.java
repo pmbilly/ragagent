@@ -3,8 +3,8 @@ package com.ragagent.auth.controller;
 import com.ragagent.platform.web.RequestFields;
 import java.util.List;
 
-import com.ragagent.tenant.repository.Tenant;
-import com.ragagent.auth.domain.User;
+import com.ragagent.common.tenant.domain.Tenant;
+import com.ragagent.common.auth.domain.User;
 import com.ragagent.auth.dto.AuthLoginResponse;
 import com.ragagent.auth.dto.TenantResponse;
 import com.ragagent.auth.dto.Membership;

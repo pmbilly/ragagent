@@ -1,4 +1,4 @@
-package com.ragagent.auth.domain;
+package com.ragagent.common.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

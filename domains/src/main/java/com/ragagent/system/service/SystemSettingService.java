@@ -15,8 +15,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.auth.domain.User;
-import com.ragagent.auth.mapper.UserMapper;
+import com.ragagent.common.auth.domain.User;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.common.settings.SystemSettingGateway;
@@ -28,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import com.ragagent.common.auth.UserDirectoryPort;
 
 /**
  * 系统设置服务。
@@ -57,23 +57,23 @@ public class SystemSettingService implements SystemSettingGateway {
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final SystemSettingMapper mapper;
-    private final UserMapper userMapper;
     private final AuditWritePort auditWriter;
     /** 白名单是进程级静态——注入任意实例即可（reloadWhitelist 改的是静态字段）。 */
     private final SsrfGuard ssrfGuard;
     /** 三层解析的 ENV 层（Spring Environment，不读裸 System.getenv；键名由调用方给）。 */
     private final Environment environment;
+    private final UserDirectoryPort userDirectoryPort;
     /** 配置兜底：未配置 → self_serve。 */
     @Value("${weknora.auth.registration-mode:}")
     private String configuredRegistrationMode;
 
     public SystemSettingService(SystemSettingMapper mapper,
-                                UserMapper userMapper,
                                 AuditWritePort auditWriter,
                                 SsrfGuard ssrfGuard,
-                                Environment environment) {
+                                Environment environment,
+                                UserDirectoryPort userDirectoryPort) {
+        this.userDirectoryPort = userDirectoryPort;
         this.mapper = mapper;
-        this.userMapper = userMapper;
         this.auditWriter = auditWriter;
         this.ssrfGuard = ssrfGuard;
         this.environment = environment;
@@ -493,7 +493,7 @@ public class SystemSettingService implements SystemSettingGateway {
             if (!nameById.get(id).isEmpty()) {
                 continue;
             }
-            User u = userMapper.selectById(id);
+            User u = userDirectoryPort.userById(id);
             if (u != null) {
                 if (!u.getUsername().trim().isEmpty()) {
                     nameById.put(id, u.getUsername());

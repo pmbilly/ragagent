@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import com.ragagent.auth.domain.User;
+import com.ragagent.common.auth.domain.User;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
 import com.ragagent.common.apikey.ApiKeyAuthPort;

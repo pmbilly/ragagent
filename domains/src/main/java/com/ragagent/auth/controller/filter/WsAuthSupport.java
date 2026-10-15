@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.auth.domain.User;
+import com.ragagent.common.auth.domain.User;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.ValidatedToken;

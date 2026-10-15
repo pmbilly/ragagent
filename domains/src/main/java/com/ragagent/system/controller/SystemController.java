@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -57,7 +57,7 @@ public class SystemController {
 
     private final SystemInfoService infoService;
     private final ParserEngineRegistry parserEngines;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantConfigLookup;
     private final DocReaderAdminPort docReader;
     private final SsrfGuard ssrfGuard;
     private final DeploymentCapabilitiesHolder capabilitiesHolder;
@@ -67,7 +67,7 @@ public class SystemController {
 
     public SystemController(SystemInfoService infoService,
                             ParserEngineRegistry parserEngines,
-                            TenantService tenantService,
+                            TenantConfigLookup tenantConfigLookup,
                             DocReaderAdminPort docReader,
                             SsrfGuard ssrfGuard,
                             DeploymentCapabilitiesHolder capabilitiesHolder,
@@ -75,7 +75,7 @@ public class SystemController {
                             Environment environment) {
         this.infoService = infoService;
         this.parserEngines = parserEngines;
-        this.tenantService = tenantService;
+        this.tenantConfigLookup = tenantConfigLookup;
         this.docReader = docReader;
         this.ssrfGuard = ssrfGuard;
         this.capabilitiesHolder = capabilitiesHolder;
@@ -509,13 +509,13 @@ public class SystemController {
 
     private TenantStorageView currentTenant() {
         long tid = currentTenantId();
-        return tid <= 0 ? null : tenantService.storageView(tid);
+        return tid <= 0 ? null : tenantConfigLookup.storageView(tid);
     }
 
     /** overrides 组装：租户 ParserEngineConfig → map。 */
     private Map<String, String> engineOverrides() {
         Map<String, String> overrides = new LinkedHashMap<>();
-        JsonNode parserCfg = tenantService.parserEngineConfig(currentTenantId());
+        JsonNode parserCfg = tenantConfigLookup.parserEngineConfig(currentTenantId());
         if (parserCfg != null) {
             overrides.putAll(overridesFromRaw(parserCfg));
         }

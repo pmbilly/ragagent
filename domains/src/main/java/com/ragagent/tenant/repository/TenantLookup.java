@@ -1,7 +1,8 @@
 package com.ragagent.tenant.repository;
+import com.ragagent.common.tenant.domain.Tenant;
 
 /**
- * 租户实体查询端口：按 id 取 {@link Tenant} 行。
+ * 租户实体查询端口：按 id 取 {@link com.ragagent.common.tenant.domain.Tenant} 行。
  *
  * <p><b>为什么不在 {@code common.tenant}</b>：本方法返回<b>实体</b>，而 {@code common} 是被 L2
  * （如 {@code retrieval}）依赖的契约层——若把返回实体的方法留在 common，则实体必须留在 common；

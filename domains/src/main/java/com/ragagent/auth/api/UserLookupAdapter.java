@@ -1,6 +1,6 @@
 package com.ragagent.auth.api;
 
-import com.ragagent.auth.domain.User;
+import com.ragagent.common.auth.domain.User;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.contract.auth.UserLookupPort;
 import java.util.Collection;

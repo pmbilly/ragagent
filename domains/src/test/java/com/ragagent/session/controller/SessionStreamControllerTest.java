@@ -40,7 +40,7 @@ import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.domain.Tenant;
 
 /**
  * {@code continue-stream} 端点的行为契约。

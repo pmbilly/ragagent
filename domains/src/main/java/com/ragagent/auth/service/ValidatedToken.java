@@ -1,6 +1,6 @@
 package com.ragagent.auth.service;
 
-import com.ragagent.auth.domain.User;
+import com.ragagent.common.auth.domain.User;
 
 /**
  * validateToken 的返回值。

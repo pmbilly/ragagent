@@ -6,7 +6,7 @@ import com.ragagent.auth.dto.AuthLoginResponse;
 import com.ragagent.auth.dto.TokenPairResponse;
 import com.ragagent.auth.dto.TenantResponse;
 import com.ragagent.auth.service.LoginResult;
-import com.ragagent.auth.domain.User;
+import com.ragagent.common.auth.domain.User;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.contract.error.AppError;

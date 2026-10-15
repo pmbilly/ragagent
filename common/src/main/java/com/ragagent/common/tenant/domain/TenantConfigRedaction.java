@@ -1,6 +1,5 @@
-package com.ragagent.tenant.repository;
+package com.ragagent.common.tenant.domain;
 
-import com.ragagent.tenant.ParserEngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 
 import com.ragagent.contract.tenant.WebSearchConfig;

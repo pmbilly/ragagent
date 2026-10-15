@@ -1,4 +1,4 @@
-package com.ragagent.auth.domain;
+package com.ragagent.common.auth.domain;
 
 import java.time.OffsetDateTime;
 

@@ -18,6 +18,7 @@
     "chatpipeline/plugin/PluginSearch.java": "chatpipeline/plugin",
     "chatpipeline/plugin/PluginSearchOps.java": "chatpipeline/plugin",
     "chatpipeline/plugin/PluginSearchParallel.java": "chatpipeline/plugin",
+    "common/tenant/domain/ParserEngineConfig.java": "common/tenant",
     "datasource/connector/feishu/core/DocxBlocks.java": "datasource/connector/feishu/core/DocxBlocks",
     "datasource/connector/feishu/core/FeishuApiTypes.java": "datasource/connector/feishu/core/FeishuApiTypes",
     "datasource/connector/feishu/core/FeishuClient.java": "datasource/connector/feishu/core/FeishuClient",
