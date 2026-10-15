@@ -1741,6 +1741,19 @@ public interface AdminUserPort {
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 G1-b 收口·去 Jackson 全账清零（12 件登记 → 9 件入契约 + 3 件有据留 L1）（2026-10-15）**
+- **⭐ 收口读数**：C4 **待去 Jackson 12 → 0** ✓✓；`common/*` **125 → 102**（G1-b 全程 −23）；`:contract` **179 → 191**（+12）；**C2 = 0 保持**；**R10 全程保持 6 条边 / 51 类 / ①档 0**
+- **9 件入 `:contract`（6 个子批）**：`StorageBackendView`+`StorageBackendPort`（→`contract.storage`）· `TenantRowView`（→`contract.tenant`）· `ChunkFacts`+`KnowledgeDocumentFacts`+`KnowledgeBaseView`（→`contract.knowledge`）· `ChunkRowView`+`ChunkPageView`（→`contract.knowledge`）· `KnowledgeRowView`+**`KnowledgeParseStatus`**（常量表随行）· `WikiPageView`（→`contract.wiki`）
+- **3 件按证据留 L1 并改登记类别**（新增第三类 **`JACKSON_SEMANTICS_REQUIRED`**，与 platform 面的区别：①＝"装了框架类型搬不动"，③＝"能装但**语义**装不下"）：
+  1. `AdminUserView`（+随行 `AdminUserPort`）：`preferences` 的 `@JsonInclude(NON_NULL)` **决定出面字节**、`@JsonIgnoreProperties(ignoreUnknown)` **决定入面容错** ⇒ 零依赖契约无法表达；硬搬（`Object preferences`）会让**契约线格式隐式依赖 L1 类注解＝抽象泄漏** ⇒ 诚实留 L1。未来路径：线格式改恒出 null（或客户端面改 Map 形状）
+  2. `KnowledgeBaseRowView`：5 个 JsonNode **可** Object 化，但 6 个 typed config 中 4 个是**实体 `@TableField` 字段类型**（＝持久化形状）且其 `fromJson/toJson` **直接调 `JsonMappers`（L1）** ⇒ 随 **G1-h** 整批处置
+- **⭐ 机制沉淀（可复用于任何"去 Jackson"）**：
+  1. `platform.web.JsonMappers` 增 `toJavaValue(JsonNode)` / `toJsonNode(Object)` / `toJavaList` / `toJsonList`（**null 保持 null**——否则域内 `== null` 默认值分支静默失效，见 G1-b-2 的 5 条金片红）
+  2. **Jackson 注解的零依赖等价表达**：`@JsonIgnore` → **非 getter 命名访问器**（`sourceContentValue()`；默认只序列化 getter 命名 ⇒ ser/deser 双向等价）；`@JsonInclude(NON_NULL)`/`@JsonSerialize` **无法等价** ⇒ 走"留 L1 + 登记"
+  3. 搬迁四步：转换 → 搬移 → **补同包引用者 import**（坑第 8 次，已脚本化）→ 消费侧 `toJsonNode` 还原（**按目标对象是实体还是视图分流**，G1-b-6 的方向性教训）
+  4. 跨模块 javadoc 链接（`{@link com.ragagent.<非 contract>}`）搬入时必须改 `{@code}`（坑第 9 次）
+- **验证（逐子批）**：**14 守卫全绿**（每批 `--write` 收紧）；**1349 金片签名一致**（含 `emb-pub-chunk-ok.json` 等**公开 API 金片** ⇒ 视图 JSON 与实体逐字节等价）；每批 `spotlessCheck build` **1m42s–2m24s** / **4991 / 失败 0 / 跳过 4**；dev 冒烟含 `/api/v1/tenants/all`（de-Jackson 视图出面）、`/api/v1/chunker/preview`（真实分块输出）、`/api/v1/system/storage-engine-check`（构造视图→端口 test）等新链路 ✓
+- **另修一处既有缺陷**：`StorageWriteFaceContractTest` 顺序依赖（依赖别的测试类建 H2 schema，被 Gradle 测试缓存掩盖）⇒ 加 `@BeforeEach` 自播种（兄弟类同款）✓
 **🔶 G1-b-6·`WikiPageView` 入 `contract.wiki`（先测后动纠正了登记描述）（2026-10-15）**
 - **登记原文说**"JsonNode pageMetadata + **6 个 `@JsonSerialize`** ⇒ 待去 Jackson" ⇒ **实测纠正**：那 6 个 `@JsonSerialize(EmptyListAsNullSerializer)`（空列表→null）**在实体 `WikiPage` 上，不在视图上** ✗ ⇒ 视图**本身零 Jackson 注解**，去 Jackson 只需处理 `pageMetadata` 一个字段 ✓✓
 - **先测后动三件（都支持可搬）**：① 视图**不作为响应体出面**（仅端口载荷；wiki 控制器返回域内 dto）② 消费点集中：wiki 域 3 文件（适配器/服务/支撑类）+ session `AgentToolWikiBackends`（经 L1 端口 ✓）+ L1 端口自身 ③ `pageMetadata` 全仓使用点 9 处
@@ -2725,7 +2738,7 @@ public interface AdminUserPort {
 
 | 目标模块 | 实际 | 差距 |
 |---|---|---|
-| `contracts` | `:contract` **191 件** ✅ 已独立（G1-b-6 后） | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
+| `contracts` | `:contract` **191 件** ✅ 已独立（G1-b 收口） | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
 | `platform` | `com.ragagent.platform.*` **139 件仍在 `:common`** | **未独立成模块**；包覆盖：方案 **23** vs 实际 **15** ⇒ 缺 `execution` · `outbox` · `parsing` · `storage.config` · `storage.provider` · `tracing.decorators` · `tracing.langfuse` · `transaction` · `web.error` · `web.health`；多 `redis` · `tracing` |
 | `agent-engine` · `retrieval-engine` · `model-runtime` | `:engine` **318 件 / 9 顶层包**（chatpipeline · embedding · llm · modelcontext · modelruntime · rerank · retrieval · tracing · webfetch） | 未拆分（**条件触发**项） |
 | `domains` | `:domains` **1343 件** | 域间边 **7 条**（①clearable **0** / ②owner 2 / ③族内 5）；域布局抽样见 C |
@@ -2740,7 +2753,7 @@ public interface AdminUserPort {
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
 | `:common` 受控依赖根 | 10 根 / 61 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
-| `:common` 规模 | **242 件** = `common/*` **102** + `platform/*` 139 + `event/*` 1（G1-b-6 后） | — |
+| `:common` 规模 | **242 件** = `common/*` **102** + `platform/*` 139 + `event/*` 1（G1-b 收口） | — |
 
 **C. 域布局抽样（以方案 §8.8.2 `knowledge/` 为范本）**
 

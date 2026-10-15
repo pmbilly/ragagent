@@ -140,17 +140,29 @@ PLATFORM_FACE = {
 #    `KnowledgeDocumentFacts`）⇒ :contract 零依赖装不下；与 B258 登记的"`AppError` 去 Jackson"
 #    **同一课题**（改造口径与风险见 HANDOFF §12.5）；改造完成即整批入 :contract。
 PENDING_DEJACKSON = {
-    "com/ragagent/common/auth/AdminUserView.java":
-        "管理面用户行视图（12 字段镜像，去 passwordHash）；**含 preferences（Jackson 类型）且直接出面**"
-        "⇒ 与端口同族登记（HANDOFF §12.6.4 硬约束 2）；去 Jackson 后可入 contract.auth",
-    "com/ragagent/common/auth/AdminUserPort.java":
-        "管理面端口（读/建/晋升/撤权/重置密码/密码策略）；与 AdminUserView 同族，随其去 Jackson 后入 contract.auth",
-    "com/ragagent/common/knowledge/KnowledgeBaseRowView.java":
-        "JsonNode × 5（extract/faq/questionGeneration/autoTag/wiki 配置）+ 6 个 typed config ⇒ 待去 Jackson；"
-        "KB API 与 init 线格式由 kb-*.json / init-*.json 金片钉住",
 }
 
-REGISTERED = {**PLATFORM_FACE, **PENDING_DEJACKSON}
+# ② Jackson 语义必要（G1-b 收口新增，2026-10-15）：**载荷本身不依赖框架类型**，
+# 但其线格式依赖 Jackson 注解语义（零依赖 :contract 无法表达）——硬搬会导致
+# **抽象泄漏**（契约的字节隐式依赖 L1 类的注解）⇒ 诚实留 L1 并在此登记依据。
+# 与 ① 的区别：① 是"装了框架类型搬不动"，② 是"能装但语义装不下"。
+JACKSON_SEMANTICS_REQUIRED = {
+    "com/ragagent/common/auth/AdminUserView.java":
+        "字段 preferences 是 L1 类型 `UserPreferences`，其 `@JsonInclude(NON_NULL)` **决定出面字节**"
+        "（null 字段省略：reg-prefs-*.json 等金片钉住）、`@JsonIgnoreProperties(ignoreUnknown=true)` "
+        "**决定入面容错**（客户端 PATCH 可带未知键）⇒ 零依赖契约装不下这两种语义；"
+        "若改 `Object preferences` 可硬搬，但契约线格式将隐式依赖 L1 类注解＝抽象泄漏 ⇒ 留 L1。"
+        "未来路径：线格式改恒出 null（或客户端面改 Map 形状）后可入 contract.auth",
+    "com/ragagent/common/auth/AdminUserPort.java":
+        "管理面端口（读/建/晋升/撤权/重置密码/密码策略），与 AdminUserView 同族：视图留 L1 ⇒ 端口随留"
+        "（契约接口不得引用 L1 类型）；随 AdminUserView 的未来路径一并入 contract.auth",
+    "com/ragagent/common/knowledge/KnowledgeBaseRowView.java":
+        "5 个 JsonNode 字段**可** Object 化，但 6 个 typed config 中 4 个在 common/knowledge/domain："
+        "① 是实体 `@TableField` 的**字段类型**（＝持久化形状）② 其 fromJson/toJson **直接调 JsonMappers（L1）**"
+        "⇒ 契约装不下。归位路径：随 **G1-h**（config 类型去 Jackson + JSON 逻辑下沉为域内 codec）整批入 contract.knowledge",
+}
+
+REGISTERED = {**PLATFORM_FACE, **PENDING_DEJACKSON, **JACKSON_SEMANTICS_REQUIRED}
 
 
 def scan_payloads() -> list[str]:
@@ -190,7 +202,7 @@ def write(cur: dict) -> None:
     print(f"✓ 基线已写入：受控导入根 {len(cur['imports'])} 个 / 共 {total} 文件，"
           f"实体 {len(cur['persistence']['entities'])}，域侧 handler {len(cur['persistence']['handlers'])}，"
           f"build 依赖 {len(cur['build_deps'])}，载荷型文件 {len(cur['payloads'])}"
-          f"（登记：platform 面 {len(PLATFORM_FACE)} · 待去 Jackson {len(PENDING_DEJACKSON)}）")
+          f"（登记：platform 面 {len(PLATFORM_FACE)} · 待去 Jackson {len(PENDING_DEJACKSON)} · Jackson 语义必要 {len(JACKSON_SEMANTICS_REQUIRED)}）")
 
 
 def main() -> int:
