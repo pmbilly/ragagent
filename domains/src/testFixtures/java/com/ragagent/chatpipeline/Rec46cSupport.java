@@ -44,7 +44,7 @@ import com.ragagent.session.support.PipelineViews;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.support.ContractJson;

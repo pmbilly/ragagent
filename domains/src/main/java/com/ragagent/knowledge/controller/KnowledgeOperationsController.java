@@ -10,7 +10,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.BatchDeleteRequest;
 import com.ragagent.knowledge.dto.tag.KnowledgeTagBatchRequest;
 import com.ragagent.knowledge.dto.doc.MoveKnowledgeRequest;

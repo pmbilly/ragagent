@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 
 /**
  * 覆盖 {@code KnowledgeBaseService.ensureDefaults}。

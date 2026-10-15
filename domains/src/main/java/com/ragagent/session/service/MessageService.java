@@ -27,9 +27,9 @@ import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 
 import com.ragagent.session.domain.message.ArtifactVersions;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * 消息服务。
@@ -446,7 +446,7 @@ public class MessageService {
         }
 
         try {
-            KnowledgeBase kb =
+            KnowledgeBaseRowView kb =
                     knowledgeCatalog.getKnowledgeBase(kbId);
             stats.setKnowledgeBaseName(kb.getName() == null ? "" : kb.getName());
             long count = kb.getKnowledgeCount();

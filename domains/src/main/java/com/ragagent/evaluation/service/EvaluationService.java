@@ -27,7 +27,6 @@ import com.ragagent.evaluation.dto.EvaluationDtos.PipelineParams;
 import com.ragagent.evaluation.dto.EvaluationDtos.SummaryConfigParams;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort;
@@ -39,6 +38,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.ragagent.evaluation.dto.EvaluationDtos;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * 评估服务（评估任务 + 结果；内存任务存储）。
@@ -145,7 +145,7 @@ public class EvaluationService {
             sourceEmbeddingModelId = embeddingModelId;
             sourceSummaryModelId = llmModelId;
         } else {
-            KnowledgeBase kb;
+            KnowledgeBaseRowView kb;
             try {
                 kb = knowledgeCatalog.getKnowledgeBase(knowledgeBaseId);
             } catch (BizException e) {
@@ -155,12 +155,12 @@ public class EvaluationService {
             sourceEmbeddingModelId = kb.getEmbeddingModelId();
             sourceSummaryModelId = kb.getSummaryModelId();
         }
-        KnowledgeBase created = new KnowledgeBase();
+        KnowledgeBaseRowView created = new KnowledgeBaseRowView();
         created.setName("evaluation");
         created.setDescription("evaluation");
         created.setEmbeddingModelId(sourceEmbeddingModelId);
         created.setSummaryModelId(sourceSummaryModelId);
-        KnowledgeBase newKb = knowledgeCatalog.createKnowledgeBase(created);
+        KnowledgeBaseRowView newKb = knowledgeCatalog.createKnowledgeBase(created);
 
         if (datasetId.isEmpty()) {
             datasetId = "default";

@@ -11,7 +11,7 @@ import java.time.ZoneOffset;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.DocumentParser;
 import org.springframework.stereotype.Service;
 

@@ -2,7 +2,7 @@ package com.ragagent.knowledge.domain.access;
 
 import java.util.List;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 
 /**
  * 访问守卫所需的**最小知识读取面**。

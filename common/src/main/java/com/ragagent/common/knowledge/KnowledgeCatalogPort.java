@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.knowledge.FaqEntryPageView;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.contract.knowledge.KnowledgeTagView;
 
 /**
@@ -15,7 +14,8 @@ import com.ragagent.contract.knowledge.KnowledgeTagView;
  *
  * <p><b>为什么是端口</b>：会话 / 评测 / IM / 数据源等域只做"按 id 取行、按租户列行、
  * 建/删"，而实现（含 409 重复冲突、租户可见性、内嵌状态机）在知识域。
- * 实体 {@link Knowledge} / {@link KnowledgeBase} 已上提 L1，端口直接搬运它们，无需视图。</p>
+ * 实体 {@code Knowledge}/{@code KnowledgeBase} 已**归位各域**（C 批）；跨域面只搬
+ * {@link KnowledgeBaseRowView} 等 L1 行视图（HANDOFF §12.0 判据 1）。</p>
  *
  * <p><b>失败语义</b>与知识域一致：id 空 / 不可见 / 状态异常 ⇒ 运行时异常原样上抛；
  * 建知识遇重复 ⇒ {@code DuplicateKnowledgeException}（409，details 带已存在文档 id）。</p>
@@ -94,16 +94,16 @@ public interface KnowledgeCatalogPort {
     // ── 知识库 ──
 
     /** 按 id 取知识库。 */
-    KnowledgeBase getKnowledgeBase(String id);
+    KnowledgeBaseRowView getKnowledgeBase(String id);
 
     /** 建知识库。 */
-    KnowledgeBase createKnowledgeBase(KnowledgeBase kb);
+    KnowledgeBaseRowView createKnowledgeBase(KnowledgeBaseRowView kb);
 
     /** 按创建者列知识库（null = 全部）。 */
-    List<KnowledgeBase> listKnowledgeBases(String creator);
+    List<KnowledgeBaseRowView> listKnowledgeBases(String creator);
 
     /** 按 id 取知识库（全租户口径，与域实现一致）。 */
-    KnowledgeBase getAllTenantById(String id);
+    KnowledgeBaseRowView getAllTenantById(String id);
 
     /** 删知识库。 */
     void deleteKnowledgeBase(String id);
@@ -111,13 +111,13 @@ public interface KnowledgeCatalogPort {
     // ── 访问闸门与配置面（初始化向导用） ──
 
     /** KB 访问闸门（不可达 ⇒ 抛运行时异常，语义同知识域闸门）。 */
-    KnowledgeBase requireKbAccess(String kbId);
+    KnowledgeBaseRowView requireKbAccess(String kbId);
 
     /** 检索驱动标识（配置面展示用）。 */
     String retrieveDriver();
 
     /** 按 id 更新知识库行（初始化向导的写面）。 */
-    void updateKnowledgeBase(KnowledgeBase kb);
+    void updateKnowledgeBase(KnowledgeBaseRowView kb);
 
     /** 该知识库下是否已有知识文件（未删除口径）。 */
     boolean hasFiles(String kbId);
@@ -125,7 +125,7 @@ public interface KnowledgeCatalogPort {
     // ── 摄取写面（数据源同步等；查询口径与域实现逐字一致） ──
 
     /** 按 id 取知识库行（不看删除标记、LIMIT 1）。 */
-    KnowledgeBase findKnowledgeBaseRow(String kbId);
+    KnowledgeBaseRowView findKnowledgeBaseRow(String kbId);
 
     /** 按（租户 + 库 + 元数据 datasourceId/externalId）查行（PG 口径，LIMIT 1）；无 ⇒ null。 */
     Knowledge findKnowledgeByExternalId(long tenantId, String kbId, String dataSourceId, String externalId);

@@ -30,12 +30,12 @@ import org.mockito.ArgumentCaptor;
 
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.sun.net.httpserver.HttpServer;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.knowledge.support.KnowledgePaths;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * 数据源 URL 摄取（整改 K2 /）：下载在同步期完成、与文件行同形。
@@ -163,8 +163,8 @@ class MapperKnowledgeBridgeUrlIngestTest {
         return server.getAddress().getPort();
     }
 
-    private static KnowledgeBase kb(long tenantId, String kbId) {
-        KnowledgeBase kb = new KnowledgeBase();
+    private static KnowledgeBaseRowView kb(long tenantId, String kbId) {
+        KnowledgeBaseRowView kb = new KnowledgeBaseRowView();
         kb.setId(kbId);
         kb.setTenantId(tenantId);
         kb.setEmbeddingModelId("em-1");

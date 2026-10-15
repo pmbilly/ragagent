@@ -1496,6 +1496,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **读数**：**R10 保持 7 条边 / 52 类**（端口在 L1 ⇒ 无新边）✓；14 守卫全绿；**净删 2 个文件**（知识域不再持有该表 mapper）
 - **验证**：`spotlessCheck build` **2m05s**；**4991 / 失败 0 / 跳过 4**；dev ready + 冒烟（knowledge-bases / **storage-backends** / sessions / models 200 ✓）
 - **意义**：`StorageBackend` 实体收窄（C 余量之一）**已具备前提**——唯一持久面在 storage 域，实体回域后跨域只剩端口读（+ system 的少量写面）
+**🔶 C 批 1·第十一子批：`KnowledgeBase` 收窄 + 视图/嵌套记录迁移（实体 4 → 3）（2026-10-15）**
+- **规模**：222 行 / **34 字段 / 70 访问器**（6 个 typed config + 5 个 `JsonNode`；含**派生访问器** `hasVectorStore()` · `getStorageProvider()` · `capabilities()`）——迄今最宽
+- **L1 耦合最重的一刀**：`KnowledgeCatalogPort`（**6 方法**）+ `KnowledgeBaseResponse`（**31 读**，KB API 线格式 DTO）+ `KnowledgeBaseViews`（13 读，lookup 投影）
+- **动作**：① 新建 `common.knowledge.KnowledgeBaseRowView`（34 字段镜像 + 派生访问器 + **嵌套 `Capabilities` 记录迁入视图**（实体改委托 ⇒ 单一实现）+ 补 `setStorageProvider`）② 端口 6 方法改视图 ③ **L1 两件改吃视图** ④ 域内新增单一映射器 `knowledge/support/KnowledgeBaseRowViews`（`rowView`/`rowViews`/`toEntity`/`copyInto`）⑤ 实体回 `knowledge/domain`（补 4 个 config import）⑥ 跨域改道：**datasource 6 文件 · init 1 文件（6 站点）· evaluation 1 · session 8 文件 · KB 控制器 8 处 `from(...)` 包一层映射** ⑦ 测试 3 件
+- **⚠️ 三条新判据/坑**：
+  1. **嵌套类型随实体迁出**：`KnowledgeBase.Capabilities`（实体嵌套 record）被 L1 的 `KnowledgeBaseResponse` 使用 ⇒ 必须**迁到视图**并让实体委托（否则 L1 引域类型 ✗）
+  2. **派生访问器与多行体漏采**：视图生成器只匹配"单行体访问器" ⇒ 漏 `getIndexingStrategy()`/`getStorageConfig()`（多行体）与 `hasVectorStore()`（前缀非 get/is）⇒ 补 3 件 + 去重 3 个重复 setter。**判据：镜像视图生成器须按"方法名候选（get/is/has）+ 大括号配平提取"，不能只靠单行正则**
+  3. 脚本 f-string 花括号坑**第二次**（javadoc 里的 `{@code}`）——M2 脚本化时应固化
+- **读数**：**C2 实体 4 → 3**；C1 受控根 65 → **64 文件**；C4 待归位 14、登记 platform 面 7 + **待去 Jackson 7 → 8**；**R10 保持 7 条边 / 52 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**（C2 = 3，基线已 `--write`）；**1349 金片签名一致** ✓（KB API `kb-*.json` + init `init-*.json` ⇒ **线格式逐字节不变**）；`spotlessCheck build` **2m**；**4991 / 失败 0 / 跳过 4**；定向 KB + init 金片测试 ✓；dev ready + 冒烟（**`GET /api/v1/knowledge-bases` ⇒ 200**——正是"端口→视图→`KnowledgeBaseResponse.from(view)`"这条新链路 · `/{id}` 404 信封 · `/api/v1/initialization/config/{kbId}` 404 信封 · sessions/datasource/types 200 ✓）
+- **C 余量（3 实体）**：`Knowledge`（跨域 31 文件；已有 `KnowledgeView` 可对齐）· `Tenant` / `User`（**管理面**，用例归位）
 **🔶 C 批 1·第十子批：`Chunk` 收窄 + JSON 等价行视图（实体 5 → 4）（2026-10-15）**
 - **规模**：`Chunk` = **30 字段 / 60 访问器**（3 个 `JsonNode`（relationChunks/indirectRelationChunks/metadata）+ 2 个 `@JsonIgnore`（sourceContent/contextHeader））——本仓最宽实体；跨域消费：embedchannel ×2、session ×2、chatpipeline（投影）
 - **⭐ 两条新判据（本刀最有价值处）**：
@@ -2539,10 +2550,10 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 项 | 现状 | 门禁 |
 |---|---|---|
-| `:common` 持久化实体 | **4**（`User` · `Knowledge` · `KnowledgeBase` · `Tenant`；`StorageBackend`/`WikiPageIssue`/`WikiPage`/`Chunk` 已归位） | C2（只许减） |
+| `:common` 持久化实体 | **3**（`User` · `Knowledge` · `Tenant`；`StorageBackend`/`WikiPageIssue`/`WikiPage`/`Chunk`/`KnowledgeBase` 已归位） | C2（只许减） |
 | `:common` 域侧 TypeHandler | **10** | C2 |
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
-| `:common` 受控依赖根 | 10 根 / 65 文件 | C1 |
+| `:common` 受控依赖根 | 10 根 / 64 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
 | `:common` 规模 | **265 件** = `common/*` **125** + `platform/*` 139 + `event/*` 1（D1 后） | — |
 

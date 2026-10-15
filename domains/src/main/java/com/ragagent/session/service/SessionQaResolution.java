@@ -8,10 +8,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.chatpipeline.ChatManage;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * 知识库/模型/租户解析协作者:mention 与 tag 范围收敛到 agent 授权面、chat 模型选择、
@@ -70,7 +70,7 @@ final class SessionQaResolution {
         return kbScope.resolveKnowledgeBasesFromAgent(agent, agentCfg, sessionTenantId);
     }
 
-    static boolean kbSatisfiesAgentRequirements(KnowledgeBase kb, ObjectNode agentCfg) {
+    static boolean kbSatisfiesAgentRequirements(KnowledgeBaseRowView kb, ObjectNode agentCfg) {
         return QaKbScope.kbSatisfiesAgentRequirements(kb, agentCfg);
     }
 
@@ -98,11 +98,11 @@ final class SessionQaResolution {
         return modelSelection.selectChatModelId(session, knowledgeBaseIds, knowledgeIds);
     }
 
-    public KnowledgeBase findKnowledgeBase(String kbId) {
+    public KnowledgeBaseRowView findKnowledgeBase(String kbId) {
         return modelSelection.findKnowledgeBase(kbId);
     }
 
-    KnowledgeBase findKb(String kbId) {
+    KnowledgeBaseRowView findKb(String kbId) {
         return modelSelection.findKb(kbId);
     }
 

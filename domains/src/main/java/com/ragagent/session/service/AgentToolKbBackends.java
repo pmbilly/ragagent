@@ -20,7 +20,6 @@ import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
@@ -30,6 +29,7 @@ import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.ChunkPageView;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * {@code AgentToolBackends} 的**知识库检索簇**：知识库检索 / chunk 列举 /
@@ -72,7 +72,7 @@ final class AgentToolKbBackends {
         return new KnowledgeSearchTool.KnowledgeSearchBackend() {
             @Override
             public KnowledgeSearchTool.KBView getKnowledgeBaseById(String kbId) {
-                KnowledgeBase kb = knowledgeCatalog.getAllTenantById(kbId);
+                KnowledgeBaseRowView kb = knowledgeCatalog.getAllTenantById(kbId);
                 if (kb == null) {
                     throw new RuntimeException("knowledge base not found");
                 }
@@ -87,7 +87,7 @@ final class AgentToolKbBackends {
                 }
                 for (String id : ids) {
                     try {
-                        KnowledgeBase kb = knowledgeCatalog.getAllTenantById(id);
+                        KnowledgeBaseRowView kb = knowledgeCatalog.getAllTenantById(id);
                         if (kb != null) {
                             out.add(toKbView(kb));
                         }
@@ -458,7 +458,7 @@ final class AgentToolKbBackends {
         return new QueryKnowledgeGraphTool.GraphSearch() {
             @Override
             public QueryKnowledgeGraphTool.KnowledgeBaseView getKnowledgeBaseByIdUnscoped(String kbId) {
-                KnowledgeBase kb = knowledgeCatalog.getAllTenantById(kbId);
+                KnowledgeBaseRowView kb = knowledgeCatalog.getAllTenantById(kbId);
                 if (kb == null) {
                     return null;
                 }
@@ -507,7 +507,7 @@ final class AgentToolKbBackends {
         }
         return new QueryKnowledgeGraphTool.ExtractConfigView(nodes, relations);
     }
-    private static KnowledgeSearchTool.KBView toKbView(KnowledgeBase kb) {
+    private static KnowledgeSearchTool.KBView toKbView(KnowledgeBaseRowView kb) {
         boolean vector = false;
         boolean keyword = false;
         if (kb.getIndexingStrategy() != null) {

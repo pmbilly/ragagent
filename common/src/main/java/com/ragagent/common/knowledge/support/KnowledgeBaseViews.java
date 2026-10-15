@@ -2,7 +2,7 @@ package com.ragagent.common.knowledge.support;
 
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * 知识库实体 → L1 视图的公用投影（自 knowledge 域适配器的静态助手原样搬入）：
@@ -15,7 +15,7 @@ public final class KnowledgeBaseViews {
     }
 
     /** 实体 → 视图；null 透传。 */
-    public static KnowledgeBaseView view(KnowledgeBase kb) {
+    public static KnowledgeBaseView view(KnowledgeBaseRowView kb) {
         if (kb == null) {
             return null;
         }

@@ -17,7 +17,6 @@ import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.dto.DataSourceResponse;
 import com.ragagent.datasource.service.DataSourceService;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +31,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * 数据源管理端点。
@@ -557,7 +557,7 @@ public class DataSourceController {
             // 会把"库不存在"与"库属于别人"压成同一个 404；本守卫要保持
             // 404（不存在）与 403（存在但属别人）两种应答——跨租户探测的形态不同。
             // 故走不带租户条件的 KnowledgeBridge.findKnowledgeBase。
-            KnowledgeBase kb = knowledge.findKnowledgeBase(kbId);
+            KnowledgeBaseRowView kb = knowledge.findKnowledgeBase(kbId);
             if (kb == null) {
                 return error(404, "knowledge base not found");
             }

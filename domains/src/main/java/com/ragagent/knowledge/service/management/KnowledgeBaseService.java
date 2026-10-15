@@ -27,7 +27,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.storage.StorageBackendView;
 import com.ragagent.knowledge.domain.UserKbPin;
 import com.ragagent.knowledge.repository.UserKbPinRepository;

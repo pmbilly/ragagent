@@ -29,7 +29,6 @@ import com.ragagent.agenttools.web.WebFetchTool;
 import com.ragagent.agenttools.web.WebSearchTool;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.common.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.contract.storage.ResourceCatalogPort;
@@ -40,6 +39,7 @@ import com.ragagent.agent.prompt.PinnedSkillInfo;
 import com.ragagent.agent.prompt.KnowledgeBaseInfo;
 import com.ragagent.chatpipeline.spi.McpToolingGateway;
 import com.ragagent.chatpipeline.spi.McpToolRegistrationPort;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * {@code SessionAgentQaService} 的**引擎/工具装配簇**（§14.9c 刀 3）：创建 agent 引擎（LLM/记忆/审批门/
@@ -251,7 +251,7 @@ final class AgentEngineAssembler {
         }
         List<KnowledgeBaseInfo> kbInfos = new ArrayList<>();
         for (String kbId : scopes.kbIds()) {
-            KnowledgeBase kb;
+            KnowledgeBaseRowView kb;
             try {
                 kb = knowledgeQa.findKnowledgeBase(kbId);
             } catch (RuntimeException e) {
@@ -325,7 +325,7 @@ final class AgentEngineAssembler {
         return kbInfos;
     }
     /** wiki / chunks（vector 或 keyword 开启）。 */
-    private static List<String> kbRetrievalCapabilities(KnowledgeBase kb) {
+    private static List<String> kbRetrievalCapabilities(KnowledgeBaseRowView kb) {
         List<String> caps = new ArrayList<>(2);
         if (kb.getIndexingStrategy() != null) {
             if (kb.getIndexingStrategy().isWikiEnabled()) {

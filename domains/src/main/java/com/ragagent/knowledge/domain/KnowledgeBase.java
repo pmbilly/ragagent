@@ -1,4 +1,4 @@
-package com.ragagent.common.knowledge.domain;
+package com.ragagent.knowledge.domain;
 
 import java.time.OffsetDateTime;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -10,6 +10,11 @@ import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageProviderConfig;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageConfig;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseAsrConfig;
+import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.common.knowledge.domain.KnowledgeBaseVlmConfig;
+import com.ragagent.common.knowledge.domain.KnowledgeBaseImageProcessingConfig;
+import com.ragagent.common.knowledge.domain.KnowledgeBaseChunkingConfig;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * knowledge_bases 表实体。
@@ -210,13 +215,10 @@ public class KnowledgeBase {
         return vectorStoreId != null && !vectorStoreId.isEmpty();
     }
 
-    public Capabilities capabilities() {
+    public KnowledgeBaseRowView.Capabilities capabilities() {
         KnowledgeBaseIndexingStrategy s = getIndexingStrategy();
-        return new Capabilities(s.isVectorEnabled(), s.isKeywordEnabled(), s.isWikiEnabled(),
+        return new KnowledgeBaseRowView.Capabilities(s.isVectorEnabled(), s.isKeywordEnabled(), s.isWikiEnabled(),
                 s.isGraphEnabled() && extractConfig != null && extractConfig.path("enabled").asBoolean(false),
                 "faq".equals(type));
     }
-
-    /** 知识库的检索能力开关快照：由各检索开关列派生，供响应直接输出（不落库）。 */
-    public record Capabilities(boolean vector, boolean keyword, boolean wiki, boolean graph, boolean faq) {}
 }

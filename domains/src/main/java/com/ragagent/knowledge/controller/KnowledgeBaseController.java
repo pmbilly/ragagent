@@ -8,7 +8,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.platform.web.NonNullBody;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.kb.CopyKnowledgeBaseRequest;
 import com.ragagent.knowledge.dto.HybridSearchRequest;
 import com.ragagent.knowledge.dto.doc.RebuildIndexResponse;
@@ -47,6 +47,7 @@ import com.ragagent.common.storage.support.Mode;
 import java.util.UUID;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.knowledge.support.KnowledgeBaseRowViews;
 
 /**
  * 知识库 CRUD 与检索入口：列表/详情/更新/删除、置顶、移动目标、混合检索
@@ -94,7 +95,7 @@ public class KnowledgeBaseController {
         KnowledgeBase kb = kbService.createKnowledgeBase(
                 request == null ? CreateKnowledgeBaseRequest.empty().toEntity() : request.toEntity());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(KnowledgeBaseResponse.from(kb, kbService.retrieveDriver()));
+                .body(KnowledgeBaseResponse.from(KnowledgeBaseRowViews.rowView(kb), kbService.retrieveDriver()));
     }
 
     /** 列表；KB 受限的 API Key 只看得到白名单内的库（数据面收口）。 */
@@ -108,14 +109,14 @@ public class KnowledgeBaseController {
             kbs = kbs.stream().filter(kb -> scope.allowsKnowledgeBase(kb.getId())).toList();
         }
         String driver = kbService.retrieveDriver();
-        return ResponseEntity.ok(kbs.stream().map(kb -> KnowledgeBaseResponse.from(kb, driver)).toList());
+        return ResponseEntity.ok(kbs.stream().map(kb -> KnowledgeBaseResponse.from(KnowledgeBaseRowViews.rowView(kb), driver)).toList());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<KnowledgeBaseResponse> getKnowledgeBase(@PathVariable("id") String id) {
         log.info("Start retrieving knowledge base, ID: {}", id);
         KnowledgeBase kb = kbService.getKnowledgeBase(id);
-        return ResponseEntity.ok(KnowledgeBaseResponse.from(kb, kbService.retrieveDriver()));
+        return ResponseEntity.ok(KnowledgeBaseResponse.from(KnowledgeBaseRowViews.rowView(kb), kbService.retrieveDriver()));
     }
 
     @PutMapping("/{id}")
@@ -129,7 +130,7 @@ public class KnowledgeBaseController {
             throw new BizException(AppError.badRequest("请求参数不合法").withDetails("name: 不能为空"));
         }
         existing = kbService.updateKnowledgeBase(existing, req.name(), req.description(), req.config());
-        return ResponseEntity.ok(KnowledgeBaseResponse.from(existing, kbService.retrieveDriver()));
+        return ResponseEntity.ok(KnowledgeBaseResponse.from(KnowledgeBaseRowViews.rowView(existing), kbService.retrieveDriver()));
     }
 
     /** 创建者本人或 Admin+，否则 403（不泄漏存在性）。 */
@@ -159,7 +160,7 @@ public class KnowledgeBaseController {
     public ResponseEntity<KnowledgeBaseResponse> togglePin(@PathVariable("id") String id) {
         log.info("Start toggling pin for knowledge base, ID: {}", id);
         KnowledgeBase kb = kbService.togglePin(id);
-        return ResponseEntity.ok(KnowledgeBaseResponse.from(kb, kbService.retrieveDriver()));
+        return ResponseEntity.ok(KnowledgeBaseResponse.from(KnowledgeBaseRowViews.rowView(kb), kbService.retrieveDriver()));
     }
 
     @GetMapping("/{id}/move-targets")
@@ -167,7 +168,7 @@ public class KnowledgeBaseController {
         log.info("Start listing move targets, ID: {}", id);
         List<KnowledgeBase> targets = kbService.listMoveTargets(id);
         String driver = kbService.retrieveDriver();
-        return ResponseEntity.ok(targets.stream().map(kb -> KnowledgeBaseResponse.from(kb, driver)).toList());
+        return ResponseEntity.ok(targets.stream().map(kb -> KnowledgeBaseResponse.from(KnowledgeBaseRowViews.rowView(kb), driver)).toList());
     }
 
     // ── hybrid-search / copy / duplicate / rebuild-index / copy progress ──
@@ -405,6 +406,6 @@ public class KnowledgeBaseController {
         KnowledgeBase targetKb = knowledgeService.duplicateKnowledgeBase(sourceId);
         return ResponseEntity.status(HttpStatus.CREATED).body(new DuplicateKnowledgeBaseResponse(
                 sourceId, targetKb.getId(),
-                KnowledgeBaseResponse.from(targetKb, kbService.retrieveDriver())));
+                KnowledgeBaseResponse.from(KnowledgeBaseRowViews.rowView(targetKb), kbService.retrieveDriver())));
     }
 }

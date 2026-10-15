@@ -18,7 +18,6 @@
    "com/ragagent/common/auth/domain/User.java",
    "com/ragagent/common/knowledge/KnowledgeCatalogPort.java",
    "com/ragagent/common/knowledge/domain/Knowledge.java",
-   "com/ragagent/common/knowledge/domain/KnowledgeBase.java",
    "com/ragagent/common/tenant/domain/Tenant.java",
    "com/ragagent/common/wiki/domain/WikiIndexEntry.java",
    "com/ragagent/platform/persistence/FullTableWriteGuard.java",
@@ -121,7 +120,6 @@
   "entities": [
    "com/ragagent/common/auth/domain/User.java",
    "com/ragagent/common/knowledge/domain/Knowledge.java",
-   "com/ragagent/common/knowledge/domain/KnowledgeBase.java",
    "com/ragagent/common/tenant/domain/Tenant.java"
   ],
   "handlers": [

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * 数据源同步往知识库里写东西时要用的那一小片能力（知识库服务 + 仓储
@@ -50,7 +50,7 @@ public interface KnowledgeBridge {
      * 需要区分 403（库存在但属于别人）与 404（库不存在），把两者都压成 404
      * 会让跨租户探测从"拒绝"变成"不存在"。</p>
      */
-    KnowledgeBase findKnowledgeBase(String kbId);
+    KnowledgeBaseRowView findKnowledgeBase(String kbId);
 
     /**
      * 按

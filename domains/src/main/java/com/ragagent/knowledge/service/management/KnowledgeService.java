@@ -39,7 +39,7 @@ import com.ragagent.common.knowledge.KnowledgeDocumentGateway;
 import com.ragagent.platform.security.InputSanitizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import org.springframework.stereotype.Service;

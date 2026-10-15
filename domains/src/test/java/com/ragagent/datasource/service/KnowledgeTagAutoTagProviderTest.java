@@ -11,9 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeTagView;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * 自动标签生产实现（按名称查找或创建标签）：
@@ -49,7 +49,7 @@ class KnowledgeTagAutoTagProviderTest {
 
     @Test
     void existingTagIsReusedWithoutCreate() {
-        KnowledgeBase kb = new KnowledgeBase();
+        KnowledgeBaseRowView kb = new KnowledgeBaseRowView();
         kb.setId("kb-1");
         kb.setTenantId(10002L);
         when(catalog.getAllTenantById("kb-1")).thenReturn(kb);
@@ -64,7 +64,7 @@ class KnowledgeTagAutoTagProviderTest {
 
     @Test
     void missingTagIsCreatedViaCreateTag() {
-        KnowledgeBase kb = new KnowledgeBase();
+        KnowledgeBaseRowView kb = new KnowledgeBaseRowView();
         kb.setId("kb-1");
         kb.setTenantId(10002L);
         when(catalog.getAllTenantById("kb-1")).thenReturn(kb);

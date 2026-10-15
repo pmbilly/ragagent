@@ -5,9 +5,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * {@code SessionQaResolution} 的**模型选择簇**：按请求/知识库/会话推导 chat 模型 id
@@ -89,7 +89,7 @@ final class QaModelSelection {
         }
         if (!kbIds.isEmpty()) {
             for (String kbId : kbIds) {
-                KnowledgeBase kb = findKb(kbId);
+                KnowledgeBaseRowView kb = findKb(kbId);
                 if (kb != null && kb.getSummaryModelId() != null && !kb.getSummaryModelId().isEmpty()) {
                     ModelRowView model = findModel(kb.getSummaryModelId());
                     if (model != null && "remote".equals(model.source())) {
@@ -98,7 +98,7 @@ final class QaModelSelection {
                     }
                 }
             }
-            KnowledgeBase kb = findKb(kbIds.get(0));
+            KnowledgeBaseRowView kb = findKb(kbIds.get(0));
             if (kb == null) {
                 throw new RuntimeException("failed to get knowledge base " + kbIds.get(0) + ": record not found");
             }
@@ -116,10 +116,10 @@ final class QaModelSelection {
         }
         throw new RuntimeException("no chat model ID available: no knowledge bases configured and no available models");
     }
-    public KnowledgeBase findKnowledgeBase(String kbId) {
+    public KnowledgeBaseRowView findKnowledgeBase(String kbId) {
         return findKb(kbId);
     }
-    KnowledgeBase findKb(String kbId) {
+    KnowledgeBaseRowView findKb(String kbId) {
         try {
             return service.knowledgeCatalog.getAllTenantById(kbId);
         } catch (RuntimeException e) {

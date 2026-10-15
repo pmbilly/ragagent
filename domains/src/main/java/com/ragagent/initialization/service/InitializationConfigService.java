@@ -19,13 +19,13 @@ import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseAsrConfig;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseVlmConfig;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.knowledge.dto.KnowledgeBaseResponse;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.initialization.dto.InitResponses;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.model.ModelView;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * initialization config/initialize 端点用例：KB 初始化配置读写、初始化装配与请求绑定。
@@ -51,7 +51,7 @@ public final class InitializationConfigService {
 
     public ResponseEntity<Object> getConfig(String kbId) {
         knowledgeCatalog.requireKbAccess(kbId);
-        KnowledgeBase kb = knowledgeCatalog.getAllTenantById(kbId);
+        KnowledgeBaseRowView kb = knowledgeCatalog.getAllTenantById(kbId);
         if (kb == null) {
             throw new BizException(AppError.notFound("知识库不存在"));
         }
@@ -78,7 +78,7 @@ public final class InitializationConfigService {
     public ResponseEntity<Object> initialize(String kbId,
             String rawBody) {
         InitializationRequests.InitializationRequest req = InitializationRequests.bindInitializationRequest(rawBody);
-        KnowledgeBase kb = kbForWrite(kbId);
+        KnowledgeBaseRowView kb = kbForWrite(kbId);
         validateConfigs(req);
 
         List<ModelView> processed = new ArrayList<>();
@@ -123,7 +123,7 @@ public final class InitializationConfigService {
         InitializationRequests.KBModelConfigRequest req = InitializationRequests.bindKBModelConfigRequest(rawBody);
         knowledgeCatalog.requireKbAccess(kbId);
         requireOwned(kbId);
-        KnowledgeBase kb = knowledgeCatalog.getAllTenantById(kbId);
+        KnowledgeBaseRowView kb = knowledgeCatalog.getAllTenantById(kbId);
         if (kb == null) {
             throw new BizException(AppError.notFound("知识库不存在"));
         }
@@ -293,10 +293,10 @@ public final class InitializationConfigService {
 
     // ══════════════ 守卫与校验 ══════════════
 
-    private KnowledgeBase kbForWrite(String kbId) {
+    private KnowledgeBaseRowView kbForWrite(String kbId) {
         knowledgeCatalog.requireKbAccess(kbId);
         requireOwned(kbId);
-        KnowledgeBase kb = knowledgeCatalog.getAllTenantById(kbId);
+        KnowledgeBaseRowView kb = knowledgeCatalog.getAllTenantById(kbId);
         if (kb == null) {
             throw new BizException(AppError.notFound("知识库不存在"));
         }
@@ -304,7 +304,7 @@ public final class InitializationConfigService {
     }
 
     private void requireOwned(String kbId) {
-        KnowledgeBase kb = knowledgeCatalog.getAllTenantById(kbId);
+        KnowledgeBaseRowView kb = knowledgeCatalog.getAllTenantById(kbId);
         if (kb == null) {
             throw new BizException(AppError.notFound("knowledge base not found"));
         }
@@ -415,7 +415,7 @@ public final class InitializationConfigService {
         return m;
     }
 
-    private String findExistingModelId(KnowledgeBase kb, String type) {
+    private String findExistingModelId(KnowledgeBaseRowView kb, String type) {
         return switch (type) {
             case "Embedding" -> ModelConnectivityTestService.orEmpty(kb.getEmbeddingModelId());
             case "KnowledgeQA" -> ModelConnectivityTestService.orEmpty(kb.getSummaryModelId());
@@ -424,7 +424,7 @@ public final class InitializationConfigService {
         };
     }
 
-    private void applyInitialization(KnowledgeBase kb, InitializationRequests.InitializationRequest req,
+    private void applyInitialization(KnowledgeBaseRowView kb, InitializationRequests.InitializationRequest req,
             List<ModelView> processed) {
         String embeddingId = "";
         String llmId = "";
@@ -486,13 +486,13 @@ public final class InitializationConfigService {
         }
     }
 
-    private void saveKb(KnowledgeBase kb) {
+    private void saveKb(KnowledgeBaseRowView kb) {
         knowledgeCatalog.updateKnowledgeBase(kb);
     }
 
     // ══════════════ GET config 响应（全 map 字母序）══════════════
 
-    private Map<String, Object> configResponse(List<ModelView> models, KnowledgeBase kb,
+    private Map<String, Object> configResponse(List<ModelView> models, KnowledgeBaseRowView kb,
             boolean hasFiles) {
         Map<String, Object> config = new TreeMap<>();
         config.put("hasFiles", hasFiles);

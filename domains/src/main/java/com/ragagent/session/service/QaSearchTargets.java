@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * {@code SessionQaResolution} 的**agent 覆盖簇**：把 custom agent 的配置
@@ -39,16 +39,16 @@ final class QaSearchTargets {
         List<String> kbIdsToFetch = new ArrayList<>(knowledgeBaseIds);
         kbIdsToFetch.addAll(tagIdsByKb.keySet());
         kbIdsToFetch = SessionKnowledgeQaService.uniqueNonEmptyStrings(kbIdsToFetch);
-        Map<String, KnowledgeBase> kbById = new LinkedHashMap<>();
+        Map<String, KnowledgeBaseRowView> kbById = new LinkedHashMap<>();
         if (!kbIdsToFetch.isEmpty()) {
-            List<KnowledgeBase> kbs = new ArrayList<>();
+            List<KnowledgeBaseRowView> kbs = new ArrayList<>();
             for (String id : kbIdsToFetch) {
-                KnowledgeBase kb = service.knowledgeCatalog.getAllTenantById(id);
+                KnowledgeBaseRowView kb = service.knowledgeCatalog.getAllTenantById(id);
                 if (kb != null) {
                     kbs.add(kb);
                 }
             }
-            for (KnowledgeBase kb : kbs) {
+            for (KnowledgeBaseRowView kb : kbs) {
                 if (kb != null) {
                     kbById.put(kb.getId(), kb);
                 }
@@ -66,7 +66,7 @@ final class QaSearchTargets {
             if (cached != null && cached != 0) {
                 return cached;
             }
-            KnowledgeBase kb = kbById.get(kbId);
+            KnowledgeBaseRowView kb = kbById.get(kbId);
             if (kb == null) {
                 kbTenantMap.put(kbId, tenantId);
                 return tenantId;
@@ -142,7 +142,7 @@ final class QaSearchTargets {
             if (kbTenant == 0) {
                 continue;
             }
-            KnowledgeBase kb = kbById.get(kbId);
+            KnowledgeBaseRowView kb = kbById.get(kbId);
             List<String> explicitKnowledgeIds = SessionKnowledgeQaService.uniqueNonEmptyStrings(
                     kbToKnowledgeIds.getOrDefault(kbId, new ArrayList<>()));
             boolean useDocumentTagResolution = kb == null || !"faq".equals(kb.getType());

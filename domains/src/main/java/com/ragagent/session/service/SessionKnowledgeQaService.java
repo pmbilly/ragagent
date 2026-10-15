@@ -29,7 +29,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.platform.event.EventBus;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.common.retrieval.SearchResult;
@@ -132,7 +132,7 @@ public class SessionKnowledgeQaService {
         return resolution.buildSearchTargets(tenantId, knowledgeBaseIds, knowledgeIds, tagScopes);
     }
 
-    public KnowledgeBase findKnowledgeBase(String kbId) {
+    public KnowledgeBaseRowView findKnowledgeBase(String kbId) {
         return resolution.findKnowledgeBase(kbId);
     }
 

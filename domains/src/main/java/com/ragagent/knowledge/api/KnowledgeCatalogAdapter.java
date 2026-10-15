@@ -10,7 +10,7 @@ import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.FaqEntryPageView;
 import com.ragagent.contract.knowledge.FaqEntryView;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.service.faq.FaqEntryQueryService;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
@@ -41,6 +41,8 @@ import com.ragagent.knowledge.support.ChunkRowViews;
 import com.ragagent.common.knowledge.ChunkPageView;
 import com.ragagent.common.knowledge.ChunkRowView;
 import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.knowledge.support.KnowledgeBaseRowViews;
 
 /**
  * {@link KnowledgeCatalogPort} 的知识域实现：读写逐字转发两个门面服务，
@@ -192,23 +194,25 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     }
 
     @Override
-    public KnowledgeBase getKnowledgeBase(String id) {
-        return knowledgeBaseService.getKnowledgeBase(id);
+    public KnowledgeBaseRowView getKnowledgeBase(String id) {
+        return KnowledgeBaseRowViews.rowView(knowledgeBaseService.getKnowledgeBase(id));
     }
 
     @Override
-    public KnowledgeBase createKnowledgeBase(KnowledgeBase kb) {
-        return knowledgeBaseService.createKnowledgeBase(kb);
+    public KnowledgeBaseRowView createKnowledgeBase(KnowledgeBaseRowView kb) {
+        KnowledgeBase saved = knowledgeBaseService.createKnowledgeBase(KnowledgeBaseRowViews.toEntity(kb));
+        KnowledgeBaseRowViews.copyInto(kb, saved);
+        return KnowledgeBaseRowViews.rowView(saved);
     }
 
     @Override
-    public List<KnowledgeBase> listKnowledgeBases(String creator) {
-        return knowledgeBaseService.listKnowledgeBases(creator);
+    public List<KnowledgeBaseRowView> listKnowledgeBases(String creator) {
+        return KnowledgeBaseRowViews.rowViews(knowledgeBaseService.listKnowledgeBases(creator));
     }
 
     @Override
-    public KnowledgeBase getAllTenantById(String id) {
-        return knowledgeBaseService.getAllTenantById(id);
+    public KnowledgeBaseRowView getAllTenantById(String id) {
+        return KnowledgeBaseRowViews.rowView(knowledgeBaseService.getAllTenantById(id));
     }
 
     @Override
@@ -217,8 +221,8 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     }
 
     @Override
-    public KnowledgeBase requireKbAccess(String kbId) {
-        return accessGuard.requireKbAccess(kbId);
+    public KnowledgeBaseRowView requireKbAccess(String kbId) {
+        return KnowledgeBaseRowViews.rowView(accessGuard.requireKbAccess(kbId));
     }
 
     @Override
@@ -227,8 +231,8 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     }
 
     @Override
-    public void updateKnowledgeBase(KnowledgeBase kb) {
-        knowledgeBaseMapper.updateById(kb);
+    public void updateKnowledgeBase(KnowledgeBaseRowView kb) {
+        knowledgeBaseMapper.updateById(KnowledgeBaseRowViews.toEntity(kb));
     }
 
     @Override
@@ -244,11 +248,11 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     // ── 摄取写面（SQL 与查询口径自 datasource 侧 verbatim 搬入） ──
 
     @Override
-    public KnowledgeBase findKnowledgeBaseRow(String kbId) {
-        return knowledgeBaseMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
+    public KnowledgeBaseRowView findKnowledgeBaseRow(String kbId) {
+        return KnowledgeBaseRowViews.rowView(knowledgeBaseMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
                 .eq(KnowledgeBase::getId, kbId)
                 .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+                .last("LIMIT 1")));
     }
 
     @Override

@@ -11,7 +11,7 @@ import java.util.List;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 import com.ragagent.knowledge.repository.ChunkRepository;

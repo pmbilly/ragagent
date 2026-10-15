@@ -13,7 +13,7 @@ import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import org.springframework.stereotype.Component;
 import com.ragagent.knowledge.support.TagViews;

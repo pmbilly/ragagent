@@ -20,10 +20,10 @@ import com.ragagent.datasource.domain.DataSourceException;
 import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.TaskInitiator;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * 数据源支撑件：配置的校验/解析/深比较、知识库归属校验、身份与"零值时间"等判据、
@@ -94,8 +94,8 @@ final class DataSourceSupport {
      * 找不到 → {@code knowledge base not found}；租户不符 → <b>同一个</b>错误
      * （不泄漏"这个 id 确实存在，只是不属于你"）。
      */
-    KnowledgeBase requireOwnedKnowledgeBase(String kbId, Long tenantId) {
-        KnowledgeBase kb = service.knowledge.findKnowledgeBase(kbId);
+    KnowledgeBaseRowView requireOwnedKnowledgeBase(String kbId, Long tenantId) {
+        KnowledgeBaseRowView kb = service.knowledge.findKnowledgeBase(kbId);
         if (kb == null) {
             throw new DataSourceException(DataSourceService.ERR_KNOWLEDGE_BASE_NOT_FOUND);
         }
@@ -127,7 +127,7 @@ final class DataSourceSupport {
     }
 
     /** KB 的多模态开关：缺失时等价于 false。 */
-    static boolean isMultimodalEnabled(KnowledgeBase kb) {
+    static boolean isMultimodalEnabled(KnowledgeBaseRowView kb) {
         try {
             java.lang.reflect.Method m = kb.getClass().getMethod("isMultimodalEnabled");
             Object v = m.invoke(kb);

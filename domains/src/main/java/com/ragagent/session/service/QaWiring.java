@@ -39,7 +39,6 @@ import com.ragagent.chatpipeline.plugin.PluginWikiBoost;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.common.settings.ConversationProperties;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.llm.LlmChatClient;
@@ -71,6 +70,7 @@ import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.modelruntime.application.ChatConfigs;
 import com.ragagent.rerank.RerankerConfigs;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * chat 管线 + QA 面装配（docs/known-issues/05-wave-4.md 的 11 seam 清单）。
@@ -183,7 +183,7 @@ public class QaWiring {
             public KnowledgeBaseView getKnowledgeBaseByIdUnscoped(String id) {
                 // 语义保持：仍走 getAllTenantById（含 ensureDefaults 的"索引策略零值 →
                 // vector+keyword 默认"回填），投影在回填**之后**取值。
-                KnowledgeBase kb = kbService.getAllTenantById(id);
+                KnowledgeBaseRowView kb = kbService.getAllTenantById(id);
                 if (kb == null) {
                     // 插件取 KB 元数据失败 → BizError(1003) → 管线 500 信封
                     throw new PipelinePorts.PipelinePortException(

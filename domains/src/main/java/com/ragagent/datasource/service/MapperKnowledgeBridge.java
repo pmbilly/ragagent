@@ -19,7 +19,6 @@ import javax.sql.DataSource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.error.AppError;
@@ -28,6 +27,7 @@ import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.http.UrlBytesFetcher;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * {@link KnowledgeBridge} 的生产实现：直接用 knowledge 模块的
@@ -94,9 +94,8 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
      * <b>没有</b>租户条件——租户归属由调用方比对。
      */
     @Override
-    public KnowledgeBase findKnowledgeBase(String kbId) {
+    public KnowledgeBaseRowView findKnowledgeBase(String kbId) {
         if (kbId == null || kbId.isEmpty()) {
-            return null;
         }
         return knowledgeCatalog.findKnowledgeBaseRow(kbId);
     }
@@ -149,7 +148,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     @Override
     public Knowledge createFromFile(long tenantId, String kbId, byte[] content, String fileName,
                                     Map<String, String> metadata, List<String> tagIds, String channel) {
-        KnowledgeBase kb = findKnowledgeBase(kbId);
+        KnowledgeBaseRowView kb = findKnowledgeBase(kbId);
         if (kb == null) {
             throw new BizException(
                     AppError.notFound("knowledge base not found"));
@@ -172,7 +171,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     @Override
     public Knowledge createFromUrl(long tenantId, String kbId, String url, String fileName,
                                    String title, List<String> tagIds, String channel) {
-        KnowledgeBase kb = findKnowledgeBase(kbId);
+        KnowledgeBaseRowView kb = findKnowledgeBase(kbId);
         if (kb == null) {
             throw new BizException(
                     AppError.notFound("knowledge base not found"));
@@ -190,7 +189,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
      *
      * @param source URL 型条目写原始 URL；文件型传 {@code null}（不写 source）
      */
-    private Knowledge insertFileRow(long tenantId, KnowledgeBase kb, byte[] content, String fileName,
+    private Knowledge insertFileRow(long tenantId, KnowledgeBaseRowView kb, byte[] content, String fileName,
                                     String rowTitle, String source, Map<String, String> metadata,
                                     String channel) {
         String fileType = fileTypeOf(fileName);
@@ -293,7 +292,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     /**
      * 构造一条新知识行（字段集与 {@code KnowledgeService.newKnowledge} 相同，但<b>显式传租户</b>）。
      */
-    private static Knowledge newKnowledge(long tenantId, KnowledgeBase kb, String title,
+    private static Knowledge newKnowledge(long tenantId, KnowledgeBaseRowView kb, String title,
                                           String fileType, String channel) {
         Knowledge k = new Knowledge();
         k.setId(UUID.randomUUID().toString());

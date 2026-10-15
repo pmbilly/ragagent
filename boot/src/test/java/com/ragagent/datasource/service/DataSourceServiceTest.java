@@ -39,7 +39,6 @@ import com.ragagent.datasource.domain.SyncResult;
 import com.ragagent.datasource.mapper.DataSourceRepository;
 import com.ragagent.datasource.mapper.SyncLogRepository;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +48,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import com.ragagent.datasource.DataSourceSyncEnqueueException;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * {@link DataSourceService} 的语义测试。
@@ -91,7 +91,7 @@ class DataSourceServiceTest {
 
     /** 可编程的知识库侧替身。 */
     private static final class FakeBridge implements KnowledgeBridge {
-        KnowledgeBase kb;
+        KnowledgeBaseRowView kb;
         final List<Knowledge> created = new ArrayList<>();
         final List<String> softDeleted = new ArrayList<>();
         final List<String> hardDeleted = new ArrayList<>();
@@ -107,7 +107,7 @@ class DataSourceServiceTest {
         RuntimeException lookupFailure;
 
         @Override
-        public KnowledgeBase findKnowledgeBase(String kbId) {
+        public KnowledgeBaseRowView findKnowledgeBase(String kbId) {
             return kb;
         }
 
@@ -305,8 +305,8 @@ class DataSourceServiceTest {
                 tenantService, auditWriter, (kbId, name) -> null);
     }
 
-    private KnowledgeBase newKnowledgeBase() {
-        KnowledgeBase kb = new KnowledgeBase();
+    private KnowledgeBaseRowView newKnowledgeBase() {
+        KnowledgeBaseRowView kb = new KnowledgeBaseRowView();
         kb.setId(KB_ID);
         kb.setTenantId(TENANT);
         kb.setName("ds-kb");

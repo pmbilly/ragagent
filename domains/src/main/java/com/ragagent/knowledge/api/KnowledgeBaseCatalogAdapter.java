@@ -1,11 +1,13 @@
 package com.ragagent.knowledge.api;
 
 import com.ragagent.contract.knowledge.KnowledgeBaseCatalogPort;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.knowledge.support.KnowledgeBaseRowViews;
 
 /**
  * {@link KnowledgeBaseCatalogPort} 的 knowledge 侧实现。
@@ -30,7 +32,7 @@ public class KnowledgeBaseCatalogAdapter implements KnowledgeBaseCatalogPort {
         List<KnowledgeBase> rows = knowledgeBaseService.listKnowledgeBases(creator);
         List<KbCapability> out = new ArrayList<>(rows.size());
         for (KnowledgeBase kb : rows) {
-            KnowledgeBase.Capabilities caps = kb.capabilities();
+            KnowledgeBaseRowView.Capabilities caps = KnowledgeBaseRowViews.rowView(kb).capabilities();
             out.add(new KbCapability(kb.getId(), caps.vector(), caps.keyword()));
         }
         return out;

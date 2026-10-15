@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Set;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * {@code SessionQaResolution} 的**KB 范围簇**：从 agent 配置推导可用知识库集合、
@@ -39,11 +39,11 @@ final class QaKbScope {
             case "all" -> {
                 // 能力过滤（DeriveKBFilterForAgent）：取 tool 能力面判定，非 wiki/rerank 工具
                 // 只要求 vector/keyword。
-                List<KnowledgeBase> allKbs = service.knowledgeCatalog.listKnowledgeBases(null);
+                List<KnowledgeBaseRowView> allKbs = service.knowledgeCatalog.listKnowledgeBases(null);
                 List<String> kbIds = new ArrayList<>();
                 Set<String> kbIdSet = new LinkedHashSet<>();
                 int ownSkipped = 0;
-                for (KnowledgeBase kb : allKbs) {
+                for (KnowledgeBaseRowView kb : allKbs) {
                     if (kbSatisfiesAgentRequirements(kb, agentCfg)) {
                         kbIds.add(kb.getId());
                         kbIdSet.add(kb.getId());
@@ -75,7 +75,7 @@ final class QaKbScope {
             }
         }
     }
-    static boolean kbSatisfiesAgentRequirements(KnowledgeBase kb, ObjectNode agentCfg) {
+    static boolean kbSatisfiesAgentRequirements(KnowledgeBaseRowView kb, ObjectNode agentCfg) {
         if (kb == null) {
             return false;
         }

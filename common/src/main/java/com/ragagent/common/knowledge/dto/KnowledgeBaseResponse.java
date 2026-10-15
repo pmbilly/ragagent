@@ -6,7 +6,7 @@ import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * 知识库的对外响应体（详情 / 列表项 / 初始化回执统一用这一个形态）。
@@ -40,7 +40,7 @@ public record KnowledgeBaseResponse(
         long chunkCount,
         long processingCount,
         long shareCount,
-        KnowledgeBase.Capabilities capabilities,
+        KnowledgeBaseRowView.Capabilities capabilities,
         ChunkingConfigView chunkingConfig,
         ImageProcessingConfigView imageProcessingConfig,
         String embeddingModelId,
@@ -137,7 +137,7 @@ public record KnowledgeBaseResponse(
      *
      * @param retrieveDriver 部署的检索引擎配置（{@code RETRIEVE_DRIVER}），用于推导引擎类型
      */
-    public static KnowledgeBaseResponse from(KnowledgeBase kb, String retrieveDriver) {
+    public static KnowledgeBaseResponse from(KnowledgeBaseRowView kb, String retrieveDriver) {
         return from(kb, viewOf(kb, retrieveDriver));
     }
 
@@ -148,7 +148,7 @@ public record KnowledgeBaseResponse(
      *   <li>无绑定 → 环境默认（{@code source=env}，引擎类型取 {@code RETRIEVE_DRIVER} 首段）。</li>
      * </ul>
      */
-    private static VectorStoreView viewOf(KnowledgeBase kb, String retrieveDriver) {
+    private static VectorStoreView viewOf(KnowledgeBaseRowView kb, String retrieveDriver) {
         String engineType = engineTypeOf(retrieveDriver);
         return kb.hasVectorStore()
                 ? new VectorStoreView(kb.getVectorStoreId(), null, VectorStoreView.Source.USER,
@@ -170,7 +170,7 @@ public record KnowledgeBaseResponse(
      *
      * @param storeView 向量库绑定视图；调用方决定其取值（环境默认 / 租户绑定 / 共享视图）
      */
-    public static KnowledgeBaseResponse from(KnowledgeBase kb, VectorStoreView storeView) {
+    public static KnowledgeBaseResponse from(KnowledgeBaseRowView kb, VectorStoreView storeView) {
         return new KnowledgeBaseResponse(
                 kb.getId(),
                 kb.getName(),

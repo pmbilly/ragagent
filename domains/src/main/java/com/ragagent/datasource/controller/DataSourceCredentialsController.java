@@ -15,7 +15,6 @@ import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.dto.DatasourceCredentialsResponse;
 import com.ragagent.datasource.service.DataSourceService;
 import com.ragagent.datasource.service.KnowledgeBridge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
+import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**
  * 数据源的凭据子资源（{@code PUT /datasource/:id/credentials} 与
@@ -146,7 +146,7 @@ public class DataSourceCredentialsController {
         if (ds == null) {
             throw new BizException(AppError.notFound("data source not found"));
         }
-        KnowledgeBase kb = null;
+        KnowledgeBaseRowView kb = null;
         try {
             kb = kbBridge.findKnowledgeBase(ds.getKnowledgeBaseId());
         } catch (RuntimeException ignored) {

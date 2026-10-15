@@ -23,7 +23,7 @@ import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
 
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
