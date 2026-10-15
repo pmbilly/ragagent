@@ -6,9 +6,9 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.agent.tool.BaseTool;
-import com.ragagent.agent.tool.ToolDefinitions;
-import com.ragagent.agent.tool.ToolRequest;
+import com.ragagent.common.agent.tool.BaseTool;
+import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.common.agent.tool.ToolRequest;
 
 /**
  * wiki_delete_page 工具。

@@ -13,11 +13,11 @@ import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.common.knowledge.ChunkFacts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.agent.tool.BaseTool;
+import com.ragagent.common.agent.tool.BaseTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.agent.tool.ToolDefinitions;
-import com.ragagent.agent.tool.ToolRequest;
+import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.common.agent.tool.ToolRequest;
 
 /**
  * knowledge_search 工具。

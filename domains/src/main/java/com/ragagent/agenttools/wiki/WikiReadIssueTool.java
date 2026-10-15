@@ -5,10 +5,10 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.agent.tool.BaseTool;
+import com.ragagent.common.agent.tool.BaseTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;
-import com.ragagent.agent.tool.ToolDefinitions;
-import com.ragagent.agent.tool.ToolRequest;
+import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.common.agent.tool.ToolRequest;
 
 /**
  * wiki_read_issue 工具。

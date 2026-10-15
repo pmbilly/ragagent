@@ -24,6 +24,12 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.agent.tool.spi.McpToolingGateway;
 import com.ragagent.agent.tool.spi.ToolRegistryPort;
+import com.ragagent.common.agent.tool.ToolOutput;
+import com.ragagent.common.agent.tool.McpCatalogGuardedTool;
+import com.ragagent.common.agent.tool.ToolExecContext;
+import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.common.agent.tool.AgentTool;
 
 /**
  * 工具注册表。

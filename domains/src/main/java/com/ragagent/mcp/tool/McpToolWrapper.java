@@ -22,10 +22,10 @@ import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.platform.web.ToolJson;
 import com.ragagent.contract.tool.Decision;
 import com.ragagent.contract.tool.PendingRequest;
-import com.ragagent.agent.tool.AgentTool;
-import com.ragagent.agent.tool.ToolRequest;
-import com.ragagent.agent.tool.ToolDefinitions;
-import com.ragagent.agent.tool.ToolExecContext;
+import com.ragagent.common.agent.tool.AgentTool;
+import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.common.agent.tool.ToolExecContext;
 
 /**
  * MCP 工具的动态包装。

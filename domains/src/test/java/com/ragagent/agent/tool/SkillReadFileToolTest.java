@@ -14,6 +14,7 @@ import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.skills.SkillSource;
 import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.common.agent.tool.ToolRequest;
 
 /**
  * {@code read_file}（技能资源）的行为契约。

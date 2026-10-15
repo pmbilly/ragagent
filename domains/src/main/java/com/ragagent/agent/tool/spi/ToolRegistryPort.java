@@ -3,8 +3,8 @@ package com.ragagent.agent.tool.spi;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.tool.AgentTool;
-import com.ragagent.agent.tool.ToolExecContext;
+import com.ragagent.common.agent.tool.AgentTool;
+import com.ragagent.common.agent.tool.ToolExecContext;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolResult;
 

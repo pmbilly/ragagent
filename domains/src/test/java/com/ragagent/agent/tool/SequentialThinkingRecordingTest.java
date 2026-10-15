@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agenttools.RecordingSupport;
 import com.ragagent.agenttools.GoRecording45A;
+import com.ragagent.common.agent.tool.ToolRequest;
 
 /**
  * SequentialThinkingTool 的录制状态机（case1..case9 + case11 共 10 步，

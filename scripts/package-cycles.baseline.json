@@ -12,11 +12,6 @@
       "com.ragagent.agent.skills.mapper"
     ],
     [
-      "com.ragagent.agent.tool",
-      "com.ragagent.agent.tool.runtime",
-      "com.ragagent.agent.tool.spi"
-    ],
-    [
       "com.ragagent.chatpipeline",
       "com.ragagent.chatpipeline.plugin",
       "com.ragagent.chatpipeline.support"

@@ -19,7 +19,7 @@ import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.contract.tool.ToolCancellation;
-import com.ragagent.agent.tool.ToolExecContext;
+import com.ragagent.common.agent.tool.ToolExecContext;
 
 /**
  * MCP OAuth 的会话挂载与重试。

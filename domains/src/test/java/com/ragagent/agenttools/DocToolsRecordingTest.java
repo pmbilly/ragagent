@@ -25,7 +25,7 @@ import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
 import com.ragagent.agenttools.wiki.WikiReadSourceDocTool;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.common.knowledge.ChunkFacts;
-import com.ragagent.agent.tool.ToolRequest;
+import com.ragagent.common.agent.tool.ToolRequest;
 
 /**
  * 4.5b 回放：wiki_read_source_doc / get_document_info / list_knowledge_chunks

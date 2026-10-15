@@ -23,7 +23,7 @@ import com.ragagent.contract.tool.Cancellation;
 import com.ragagent.mcp.oauth.OAuthReauthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpOAuthRequiredException;
-import com.ragagent.agent.tool.ToolDefinitions;
+import com.ragagent.common.agent.tool.ToolDefinitions;
 import com.ragagent.agent.tool.ToolRegistry;
 
 /**

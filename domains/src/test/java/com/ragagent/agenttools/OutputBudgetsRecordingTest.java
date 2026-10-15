@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolCancellation;
-import com.ragagent.agent.tool.ToolRequest;
+import com.ragagent.common.agent.tool.ToolRequest;
 import com.ragagent.agent.tool.OutputBudgets;
 
 /**

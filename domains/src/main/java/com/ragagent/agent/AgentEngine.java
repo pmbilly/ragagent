@@ -27,7 +27,7 @@ import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.llm.domain.ChatTool;
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.agent.skills.Manager;
-import com.ragagent.agent.tool.ToolDefinitions;
+import com.ragagent.common.agent.tool.ToolDefinitions;
 import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.platform.event.Event;

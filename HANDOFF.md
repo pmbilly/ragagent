@@ -1331,6 +1331,21 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 A③ 第三十四刀：`mcp→agent` 拍板（选"工具 SPI 上提"）+ 刀 1 ⇒ 9 → 5 类（2026-10-15，R10 类 184 → 170、R9 环组 9 → 8）**
+- **拍板记录（用户选择方案 A：工具 SPI 上提，不登记族内）**。判据（三条实测证据）：
+  1. R10 基线里 `agenttools→agent` 的 `why` **原文已写**"（**跨族**消费方 approval/im/mcp 的收入 ① 档）" ⇒ mcp 归①档是**有意为之**；登记进族＝推翻既有判断并打开"族可扩"口子
+  2. mcp 对 agent 的 25 处 import 里，22 处是 `agent.tool.*` 的 **6 个零内部依赖类型**（`AgentTool`/`BaseTool`/`ToolRequest`/`ToolDefinitions`/`ToolExecContext`/`McpCatalogGuardedTool` ≈ 350 行），2 处是**专为 MCP 声明的 SPI**（`agent.tool.spi.McpToolingGateway`/`ToolRegistryPort`），1 处 `agent.domain.ToolCallTarget`
+  3. 对照已登记的族内边 `agenttools→agent`（28 类 / 113 处 agent 面）⇒ mcp 耦合**更浅**，但性质是"跨族消费共享 SPI"⇒ 正解是**把共享面上提**（与主线"跨域只经契约"同向），而非扩族
+- **刀 1 内容（本刀）**：7 个类型上提 **L1 `common.agent.tool`**：6 个 SPI 类型 + **`ToolOutput`（连带发现）**——`ToolRequest.outputBudget()` 引用 `ToolOutput.DEFAULT_MAX_TOOL_OUTPUT`，而 `ToolOutput` 依赖仅 JDK ⇒ 一并上提（否则 L1 会反向依赖域内类）
+- **读数**：`mcp→agent` **9 → 5**（`McpDiscoverTool`/`McpOAuthPromptSupport`/`McpRegisteredTool`/`McpToolWrapper` 脱边）；连带 `agenttools→agent`（族内）28 → 18 类、`session→agent` 亦减 1（共享面上提的溢出收益）；**类总数 184 → 170（−14）**；**R9 包级环组 9 → 8** ✓（上提消解一个 SCC）
+- **⚠️ 一次命令短路陷阱（写入方法论）**：`grep ... && git mv ...` 链中，`grep` 无匹配退出码 1 ⇒ 后续 `git mv` **静默未执行**，而编译错误的表象（"找不到 ToolOutput"）会误导排查方向。**教训**：搬家类命令不要挂在可能失败的 `grep` 之后（用 `;` 或分步执行）
+- **验证**：**13 守卫全绿** ✓（R9 刷新至 8 组）；`spotlessCheck build` ✓ **2m00s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（mcp-services / sessions / knowledge-bases 均 200 ✓）
+- **刀 2 计划（已摸清，可直接开工）**：
+  1. 上提 `agent.tool.spi.ToolRegistryPort` + `McpToolingGateway` → L1 `common.agent.tool.spi`；上提 `agent.domain.ToolCallTarget`（40 行，依赖仅 `Map`/`JsonInclude`）→ L1 `common.agent.tool`
+  2. `MCP_CALL_ARGUMENTS_HINT` 常量从 `ToolRegistry` 移到 L1（建议 `ToolDefinitions`），`ToolRegistry` 内部与 `McpCatalog` 同改
+  3. mcp 侧 4 类 `ToolRegistry` → `ToolRegistryPort`：`McpCatalogPagination.installMcpCatalog`（`registerTool` ✓）、`McpExposure.registerMcpTools`（`getTool`+`catch ToolNotFoundException` ⇒ 端口 `get()` 的 **null 判定**）与 `mcpToolNamesByServiceId`（`listTools()` ⇒ 端口 `tools()`）、`McpCallTool`（`registry.port().tools()/executeInternal` ⇒ 直接持端口；`registry.isMcpPrepared()` ⇒ 改由 `McpToolingGateway.isPrepared()`）
+  4. 预期：`mcp→agent` **整条边清零**（边 26 → 25）
+- **A③ 累计（三十四刀）**：边 **64 → 26（−38）**、类 **317 → 170（−147）**；三档 **① 18 条 / 94 类 · ② 3 条 / 21 类 · ③ 5 条 / 55 类**
 **🔶 A③ 第三十三刀：`system→storage` 收官 ⇒ 存储族全清（2026-10-15，R10 边 27 → 26、类 186 → 184）**
 - **接缝**：`system→storage` 余 2 类（`SystemController` 的存储连通性检测 · `SystemInfoService` 的已启用存储提供商），这是**存储族最后一条边**
 - **L1 新增 1 件**：`common.storage.StorageBackendPort`（`test(backend)` 连通性探测 / `sanitizeConnectivity(msg)` 脱敏 / `list(tenantId)` 后端清单）+ 存储域 `api/StorageBackendPortAdapter`（探测与脱敏转发运行时探测服务、清单转发元数据仓储，语义逐字转发不缓冲）

@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.agent.domain.AgentToolCall;
-import com.ragagent.agent.tool.ToolDefinitions;
+import com.ragagent.common.agent.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolResult;
 
 /**

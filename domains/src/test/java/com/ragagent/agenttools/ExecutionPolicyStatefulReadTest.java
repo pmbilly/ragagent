@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.ragagent.agent.tool.ExecutionPolicy;
-import com.ragagent.agent.tool.ToolDefinitions;
+import com.ragagent.common.agent.tool.ToolDefinitions;
 
 /**
  * A4：并发白名单只许放**无会话状态**的读工具。

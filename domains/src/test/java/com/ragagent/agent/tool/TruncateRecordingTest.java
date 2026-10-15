@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agenttools.RecordingSupport;
 import com.ragagent.agenttools.GoRecording45A;
+import com.ragagent.common.agent.tool.ToolOutput;
 
 /**
  * ToolOutput.truncateToolOutput 的录制边界（15 条）。覆盖：上限内原样/恰等上限/零与负上限/

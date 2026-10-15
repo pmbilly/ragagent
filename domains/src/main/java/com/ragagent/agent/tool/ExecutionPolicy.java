@@ -1,4 +1,5 @@
 package com.ragagent.agent.tool;
+import com.ragagent.common.agent.tool.ToolDefinitions;
 
 /**
  * 并发执行白名单。

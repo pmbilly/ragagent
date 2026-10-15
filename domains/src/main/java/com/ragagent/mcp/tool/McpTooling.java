@@ -19,8 +19,8 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.mcp.domain.McpService;
-import com.ragagent.agent.tool.AgentTool;
-import com.ragagent.agent.tool.ToolDefinitions;
+import com.ragagent.common.agent.tool.AgentTool;
+import com.ragagent.common.agent.tool.ToolDefinitions;
 
 /**
  * MCP 工具编排（原 {@link com.ragagent.agent.tool.ToolRegistry} 的 MCP 目录方法与状态，逐行搬出）。

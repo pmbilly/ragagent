@@ -27,7 +27,7 @@ import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.mcp.protocol.McpServiceUrls;
 import com.ragagent.mcp.tool.McpToolWrapper;
-import com.ragagent.agent.tool.ToolRequest;
+import com.ragagent.common.agent.tool.ToolRequest;
 
 /**
  * MCP stub A/B：双端同打同一形态的 stub MCP server（JSON-RPC over streamable HTTP），

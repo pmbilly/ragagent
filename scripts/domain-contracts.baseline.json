@@ -57,9 +57,7 @@
       "SkillsCatalogController"
     ],
     "agenttools→agent": [
-      "DataAnalysisSessionBridge",
       "DataAnalysisTool",
-      "DataSchemaTool",
       "DatabaseQueryTool",
       "GetDocumentInfoTool",
       "GrepChunksTool",
@@ -67,23 +65,16 @@
       "KnowledgeSearchTool",
       "ListKnowledgeChunksTool",
       "QueryKnowledgeGraphTool",
-      "SearchConversationsTool",
-      "SearchMemoryTool",
-      "WebFetchTool",
-      "WebSearchTool",
       "WikiContentRewrite",
-      "WikiDeletePageTool",
       "WikiFlagIssueTool",
       "WikiPageRendering",
       "WikiReadIssueTool",
       "WikiReadPageTool",
       "WikiReadSourceDocTool",
-      "WikiRenamePageTool",
       "WikiReplaceTextTool",
       "WikiRouteResolver",
       "WikiScope",
       "WikiSearchTool",
-      "WikiUpdateIssueTool",
       "WikiWritePageTool"
     ],
     "auth→tenant": [
@@ -173,11 +164,7 @@
       "McpCallTool",
       "McpCatalog",
       "McpCatalogPagination",
-      "McpDiscoverTool",
       "McpExposure",
-      "McpOAuthPromptSupport",
-      "McpRegisteredTool",
-      "McpToolWrapper",
       "McpTooling"
     ],
     "session→memory": [
@@ -190,7 +177,6 @@
       "SessionAgentQaService"
     ],
     "session→agent": [
-      "AgentConfigAssembler",
       "AgentEngineAssembler",
       "AgentHistoryAssembler",
       "AgentStepListTypeHandler",
