@@ -15,7 +15,6 @@
  ],
  "imports": {
   "com.baomidou": [
-   "com/ragagent/common/auth/domain/AuthToken.java",
    "com/ragagent/common/auth/domain/User.java",
    "com/ragagent/common/knowledge/KnowledgeCatalogPort.java",
    "com/ragagent/common/knowledge/domain/Chunk.java",
@@ -130,7 +129,6 @@
  ],
  "persistence": {
   "entities": [
-   "com/ragagent/common/auth/domain/AuthToken.java",
    "com/ragagent/common/auth/domain/User.java",
    "com/ragagent/common/knowledge/domain/Chunk.java",
    "com/ragagent/common/knowledge/domain/Knowledge.java",

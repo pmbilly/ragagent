@@ -10,10 +10,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.common.auth.domain.AuthToken;
 import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.common.auth.domain.User;
-import com.ragagent.auth.mapper.AuthTokenMapper;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.auth.service.PasswordPolicy;
 import com.ragagent.auth.service.TenantMemberService;
@@ -27,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.contract.auth.AuthTokenAdminPort;
 
 /**
  * 系统管理员 P0 用户管理（注册 / 建管理员 / 重置密码 / 列管理员 / 撤管理员）。
@@ -58,7 +57,7 @@ public class SystemAdminUserService {
     static final String PASSWORD_SPECIAL_CHARS = "!@#$%^&*()_+-=[]{}|;:,.<>?";
 
     private final UserMapper userMapper;
-    private final AuthTokenMapper authTokenMapper;
+    private final AuthTokenAdminPort authTokenAdmin;
     private final TenantService tenantService;
     private final TenantMemberService memberService;
     private final AuditWritePort auditWriter;
@@ -66,13 +65,13 @@ public class SystemAdminUserService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public SystemAdminUserService(UserMapper userMapper,
-                                  AuthTokenMapper authTokenMapper,
+                                  AuthTokenAdminPort authTokenAdmin,
                                   TenantService tenantService,
                                   TenantMemberService memberService,
                                   AuditWritePort auditWriter,
                                   SystemSettingService settingService) {
         this.userMapper = userMapper;
-        this.authTokenMapper = authTokenMapper;
+        this.authTokenAdmin = authTokenAdmin;
         this.tenantService = tenantService;
         this.memberService = memberService;
         this.auditWriter = auditWriter;
@@ -196,9 +195,7 @@ public class SystemAdminUserService {
 
     private void revokeTokensByUserId(String userId) {
         try {
-            authTokenMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<AuthToken>()
-                    .eq(AuthToken::getUserId, userId)
-                    .set(AuthToken::isIsRevoked, true));
+            authTokenAdmin.revokeAllForUser(userId);
         } catch (RuntimeException e) {
             log.warn("Failed to revoke tokens for user {}: {}", userId, e.toString());
         }

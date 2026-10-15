@@ -268,7 +268,9 @@ contract  → JDK                                  （纯 JDK：公开 API / SPI
 | `Message` / `Chunk` / `Model` / `Session` | 3~6 | 2~4 | **非机械**：视图要覆盖大量字段（`Chunk` 24 访问器 vs 现有视图 6 字段）+ 跨域写面 + L1 组件（`BaseTool`/`ChunkPage`）⇒ 需设计 |
 | `KnowledgeBase` / `Knowledge` / `User` / `Tenant` | 4~10 | 0~3 | 最后（写面 16~48 处，多为管理面 ⇒ 用例归位） |
 
-**进度**：C2 实体 **14 → 13**（`KnowledgeTag` 已归域，2026-10-15）；R10 保持 **7 条边 / 52 类**（收窄未重建边 ✓）。
+**进度（2026-10-15）**：C2 实体 **14 → 12**（`KnowledgeTag`、`AuthToken` 已归域）；R10 保持 **7 条边 / 52 类**（收窄未重建边 ✓）。
+
+**次批三候选的实测阻断（已测，勿重复测量）**：`MessageSuggestionSet`＝**API 线格式**（`EmbedSessionPort` 返回 `ResponseEntity<…>` ⇒ 换视图即改 embed 公开面）· `StorageBackend`＝**实体跨域归属**（storage 与 knowledge **双方都有它的 mapper**）· `WikiPageIssue`＝**跨域写面**（`session/AgentToolWikiBackends` 12 读 + 56 setters）⇒ 三者均需**先决策**（线格式确认 / 归属裁定 / 用例归位）。**已解锁示范两支**：读面换视图（`KnowledgeTag`）· 写面走契约端口（`AuthToken`，同时清偿了 ②owner 的"写侧直用他域 mapper"）。
 
 | 实体 | 行数 | 跨域主源 | 已有 `contract.*` 视图可对齐 |
 |---|---|---|---|
@@ -1449,6 +1451,18 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 C 批 1·第二子批：`AuthToken` 收窄回归属域 + 契约面写端口（实体 13 → 12）（2026-10-15）**
+- **候选筛选（三候选都被实测证否）**：`MessageSuggestionSet` 卡在 **API 线格式**（`EmbedSessionPort` 返回 `ResponseEntity<MessageSuggestionSet>` ⇒ 换视图即改 embed 公开面响应）；`StorageBackend` 卡在**实体跨域归属**（`storage` 与 `knowledge` **双方都有它的 mapper**：`StorageBackendMapper`/`KnowledgeStorageBackendRepository`）；`WikiPageIssue` 卡在**跨域写面**（`session/AgentToolWikiBackends` 12 读 + **56 setters**）⇒ 这三者都需设计/线格式确认，**不属机械批**
+- **本刀对象＝`AuthToken`**（筛表里"跨域读 0 / L1 耦合 0"，唯一跨域消费是写面）⇒ **正好是 ②owner 登记中"写侧直用他域 mapper"的清偿实例**
+- **动作**：
+  1. **契约面新增写端口** `contract.auth.AuthTokenAdminPort.revokeAllForUser(String)`（§9.1 精神：令牌实体写入者唯一在 auth 域）
+  2. **auth 侧适配器** `auth/api/AuthTokenAdminAdapter`——把原来写在 system 侧的 `authTokenMapper.update(null, LambdaUpdateWrapper<AuthToken>()…)` **wrapper 逐字搬入属主域**
+  3. **实体 `AuthToken` 回 `auth/domain`**（域内 4 处 mapper/service 引用随 FQN 回退）
+  4. **system 侧改走端口**：`SystemAdminUserService` 去 `AuthTokenMapper` 字段/构造参/import，`revokeTokensByUserId` 改为 `authTokenAdmin.revokeAllForUser(...)`，**try/catch + warn 的既有语义逐字不变**
+- **判据补强（两支都有实证）**：**读面换视图**（`KnowledgeTag` 刀）+ **写面走契约端口**（本刀）⇒ §12.4 四步判据的两支均已实跑验证
+- **读数**：**C2 实体 13 → 12**；C1 受控根 76 → **74 文件**；**R10 保持 7 条边 / 52 类 / ①档 0** ✓（收窄未重建边）；`system→auth` 边**仍登记**（余 `UserMapper`/`TenantService`，属 ②owner 未清部分——但**写者已归位**）
+- **验证**：**14 守卫全绿** ✓（C2 = 12，基线已 `--write`）；`spotlessCheck build` ✓ **2m14s** ✓；**4991 / 失败 0 / 跳过 4** ✓；定向 auth/system **98 条** ✓；dev 重启 ready ✓ + 冒烟（**登录链路本身走 auth 令牌签发 ✓**；`/api/v1/auth/me` `/api/v1/system/info` `/api/v1/tenants` `/api/v1/knowledge-bases` 均 **200** ✓）
+- **余量（下一刀三选，均需先决策）**：`MessageSuggestionSet`（线格式确认）· `StorageBackend`（实体归属裁定：storage vs knowledge）· `WikiPageIssue`（写面归位：wiki 提供创建/更新端口）——或转 **G1-b 去 Jackson 专项**
 **🔶 G1-a 首批：`common` 载荷归位 `:contract` ⇒ 净搬 11 件（C4 31 → 22）（2026-10-15）**
 - **背景**：§12.5 准入 G1（`:common` 载荷型文件清零/登记）；分类已测——31 件分四组：**① 纯 JDK 13** · ② 仅 Jackson 3 · ③ 框架味 4 · ④ 引本仓其它包 11
 - **本批动作（落点规则＝保相对路径：`com.ragagent.common.<rest>` → `com.ragagent.contract.<rest>`）**：**净搬 11 件**入 `:contract`：

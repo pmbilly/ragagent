@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.common.auth.domain.AuthToken;
+import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.contract.tenant.TenantRole;

@@ -5,7 +5,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.common.auth.domain.AuthToken;
+import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.auth.dto.Membership;
 import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;

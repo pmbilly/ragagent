@@ -1,7 +1,7 @@
 package com.ragagent.auth.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.common.auth.domain.AuthToken;
+import com.ragagent.auth.domain.AuthToken;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

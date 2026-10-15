@@ -17,7 +17,7 @@ import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.common.auth.domain.AuthToken;
+import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.common.auth.domain.User;
 import com.ragagent.auth.mapper.AuthTokenMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
