@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.common.wiki.domain.WikiCategoryPaths;
+import com.ragagent.wiki.domain.WikiCategoryPaths;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiException;
 import com.ragagent.wiki.domain.folder.WikiFolder;

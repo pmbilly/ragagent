@@ -29,7 +29,7 @@ import com.ragagent.agenttools.web.WebFetchTool;
 import com.ragagent.agenttools.web.WebSearchTool;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
-import com.ragagent.common.session.domain.conversation.SessionOwnerIds;
+import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.agent.prompt.RecentDocInfo;
 import com.ragagent.agent.prompt.SelectedDocumentInfo;

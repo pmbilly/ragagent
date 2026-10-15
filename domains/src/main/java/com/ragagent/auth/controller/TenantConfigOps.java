@@ -10,7 +10,7 @@ import com.ragagent.contract.tenant.ChatHistoryConfig;
 import com.ragagent.common.tenant.domain.ParserEngineConfig;
 import com.ragagent.contract.tenant.RetrievalConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig;
-import com.ragagent.common.tenant.domain.TenantConfigRedaction;
+import com.ragagent.auth.domain.TenantConfigRedaction;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;

@@ -14,7 +14,7 @@ import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionListQuery;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
-import com.ragagent.common.session.domain.conversation.SessionOwnerIds;
+import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.session.domain.conversation.SessionPage;
 import com.ragagent.session.dto.ArtifactView;
 import com.ragagent.session.dto.BatchDeleteSessionsRequest;

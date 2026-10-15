@@ -23,7 +23,7 @@ import com.ragagent.contract.tenant.StorageEngineConfig.ObsEngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig.OssEngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig.S3EngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig.TosEngineConfig;
-import com.ragagent.common.tenant.domain.TenantConfigRedaction;
+import com.ragagent.auth.domain.TenantConfigRedaction;
 
 /**
  * 租户配置脱敏（{@link TenantConfigRedaction}）：密钥不得明文出响应面。

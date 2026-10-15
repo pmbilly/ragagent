@@ -20,7 +20,7 @@ import com.ragagent.contract.session.SessionLastRequestState;
 import com.ragagent.session.domain.conversation.SessionListItem;
 import com.ragagent.session.domain.conversation.SessionListQuery;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
-import com.ragagent.common.session.domain.conversation.SessionOwnerIds;
+import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.session.domain.conversation.SessionPage;
 import org.springframework.stereotype.Component;
 

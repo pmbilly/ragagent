@@ -2,7 +2,7 @@ package com.ragagent.wiki.domain.page;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.common.wiki.domain.WikiCategoryPaths;
+import com.ragagent.wiki.domain.WikiCategoryPaths;
 
 
 /**

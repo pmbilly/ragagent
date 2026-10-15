@@ -9,7 +9,7 @@ import com.ragagent.contract.session.EmbedSessionOps;
 import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionListQuery;
-import com.ragagent.common.session.domain.conversation.SessionOwnerIds;
+import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.session.domain.conversation.SessionPage;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.session.service.SessionService;

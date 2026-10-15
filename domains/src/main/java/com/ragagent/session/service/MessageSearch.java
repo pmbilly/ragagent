@@ -25,7 +25,7 @@ import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.domain.message.MessageSearchGroupItem;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.session.domain.message.MessageWithSession;
-import com.ragagent.common.session.domain.conversation.SessionOwnerIds;
+import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.session.repository.MessageRepository;
 
 

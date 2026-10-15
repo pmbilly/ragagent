@@ -6,7 +6,6 @@ import com.ragagent.wiki.domain.folder.WikiFolderNode;
 import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;
 import com.ragagent.wiki.domain.folder.WikiFolderNotFoundException;
 import com.ragagent.wiki.domain.graph.WikiGraph;
-import com.ragagent.common.wiki.domain.WikiCategoryPaths;
 import com.ragagent.contract.wiki.WikiIndex;
 import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.wiki.domain.page.WikiPageConflictException;

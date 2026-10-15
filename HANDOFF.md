@@ -1526,7 +1526,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 | 账 | 读数 | 状态 |
 |---|---|---|
 | `:contract` | **229 件** | ✅ 已独立（零依赖） |
-| `common/*` | **60 件**（125 → … → 66 → 64 → 60） | 收敛中 |
+| `common/*` | **57 件**（125 → … → 64 → 60 → 57） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
 | **C1 受控导入根** | 10 根 / **57 文件** | 冻结只许减 |
@@ -1792,6 +1792,42 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 §16.2 对账二轮·`common/*` 57 件逐类处置表 + 3 件顺手归位（2026-10-15）**
+
+### 一、权威读数（本轮末）
+| 指标 | 值 |
+|---|---|
+| `:contract` | **229 件** ✅ 零依赖 |
+| `common/*` | **57 件**（本轮 −3） |
+| `platform/*` / `event/*` / `:common` 总 | 135 / 1 / **193** |
+| C1 受控导入根 | 10 根 / **57 文件** |
+| **C2 持久化实体** | **0** ✅（C 收官保持） |
+| 域侧 TypeHandler | **0** ✅ |
+| C4 载荷型文件 | **0 残余**（登记：platform 面 8 · Jackson 语义必要 2 · 待去 Jackson 0）✅ |
+| R10 域间边 | **6 条边 / 51 类**（①clearable 0 / ②owner 1 / ③intra-family 5）✓ |
+| 测试 / 金片 | **4996 / 失败 0 / 跳过 4** · **1349 签名一致** |
+
+### 二、`common/*` 57 件逐类处置（本轮实测）
+| 桶 | 件数 | 处置与依据 |
+|---|---|---|
+| **⓪ package-info** | **13** | **文档件** ⇒ 无需迁移（保留包注释） |
+| **③ 框架味** | **7** | **正当留 L1**：端口面方法签名带框架类型（`{ApiKeyAuthPort, KnowledgeCatalogPort, StopSessionRequest, EmbedSessionPort, FileProxyPort, FileServeHttp, FileTransport}`——含 servlet / MyBatis / 平台件）⇒ 与"登记 platform 面 8 件"对应 |
+| **④ Jackson 味** | **14** | **逐件都有具名阻塞**（本轮复核）：<br>· **线格式字节绑定 5**：`SearchResult`（SSE references 字节序 + `@JsonInclude`）· `AgentStep` / `AgentToolCall` / `ToolCallTarget`（`@JsonInclude` 键省略）· `MemoryMessageCursor`（`ZeroTimeSerializer`）<br>· **`@JsonProperty` 面 2**：`ParserEngineConfig`（**27 个 snake 名**＝线格式）· `MessageExecutionContext`<br>· **platform 依赖 2**：`ConversationProperties`（`PromptSource`）· `SystemSettingRegistry`（`ToolJson`）<br>· **正当 L1 3**：`FaqChunkMetadataCodec`（映射面）· `TenantConfigLookup`（L1 端口）· `BaseTool`（实现基类）<br>· **被硬阻连带 1**：`MessageView`（被 `SearchResult` 阻）· **登记 1**：`UserPreferences` |
+| **⑤ 纯 JDK** | **21** | 三子类：<br>· **L1 端口/网关 9**（正当：`ChunkSearchGateway` · `KnowledgeBaseLookup` · `KnowledgeDocumentGateway` · `SessionQaPort` · `GlobalFileServicePort` · `ProviderFileStorePort` · `FileContentService` · `WritableFileContentService` · `AdminUserPort`(登记)）<br>· **共享工具 6**（正当，按 `Tokens`/`CodePoints` 先例：`Tokens` · `CodePoints` · `ParserEngineRules` · `StoragePaths` · `FileResolverFactory` · `StreamRewriter`）<br>· **域内支撑/适配 6**（`ChunkProjectionAdapter` · `KnowledgeProjectionAdapter`（跨 knowledge+session，需端口化）· `KnowledgeBaseViews`（仅 session 消费，**待核依赖**）· **`DuplicateKnowledgeException`（跨 datasource+knowledge+im ⇒ 契约候选 ✓）** · `PipelineMessageView`（被 `SearchResult` 阻）· `AdminUserView`(登记)） |
+| **⑥ slf4j 日志** | **2** | `Mode` / `Rewriter`：外部依赖实为 **slf4j（不计入受控根）** ⇒ 实为纯 JDK 支撑件 ✓（分类注记） |
+
+### 三、本轮顺手归位（对账同时动手）
+消费面纯单域的 3 件 → 各自域（**零新增域间边** ✓）：
+- `session/domain/conversation/SessionOwnerIds` → **`domains/session/domain/conversation`**（消费 session 8 处 ✓）
+- `wiki/domain/WikiCategoryPaths` → **`domains/wiki/domain`**（消费 wiki 7 处 ✓）
+- `tenant/domain/TenantConfigRedaction` → **`domains/auth/domain`**（消费 auth 1 处 ✓；**刻意放 auth 而非 tenant** ⇒ 避免在已登记的 ② 属主边上新增类 ✗）
+- 副产物：**清 2 个死包目录**（B124 当场抓到 ✓）、`TenantConfigRedaction` 补 `ParserEngineConfig` import（原同包兄弟 ✗——该坑**第 12 次**）
+
+### 四、剩余可执行项（明确、少）
+1. **`DuplicateKnowledgeException` → `:contract`**（跨 datasource/knowledge/im 的域间异常；纯 JDK ✓ 需核"契约是否宜含异常"）；
+2. **`KnowledgeBaseViews`**：仅 session 消费 ⇒ 核其自身依赖后或可迁（若依赖 L1 端口面则留 ✓）；
+3. **被线格式硬阻的 8 件**（`SearchResult` 及其连带 `MessageView` · `AgentStep`/`AgentToolCall`/`ToolCallTarget` · `ParserEngineConfig` · `MemoryMessageCursor` · `MessageExecutionContext`）⇒ **product 决策项**（改"键恒出"或改 Map 形状）；
+4. **housekeeping**：Redis 瞬态（本轮**第 3 次**复现，复跑即绿 ⇒ 建议给测试侧 Lettuce 加超时/重试）· 换锚基线 2 条陈旧条目。
 **🔶 G1-n·工具 API 整体入 `contract.tool`（`AgentTool` / `ToolRequest` / `ToolExecContext` / `ToolOutput`）（2026-10-15）**
 - **触发**：工具族刀序第 4 步（收尾）；前置①`JsonValues` 门面（G1-k）②被读取面迁移（G1-l）③platform 卡点清除（G1-m）均已完成
 - **四个阶段**：
