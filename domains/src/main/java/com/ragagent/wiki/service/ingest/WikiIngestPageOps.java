@@ -6,7 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.ragagent.common.wiki.domain.WikiConstants;
+import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.common.wiki.domain.WikiPage;
 import com.ragagent.wiki.service.page.WikiCrossLinker;
 import com.ragagent.wiki.service.page.WikiDeadLinks;

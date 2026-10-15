@@ -18,7 +18,7 @@ import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.common.auth.domain.User;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.common.settings.SystemSettingGateway;
+import com.ragagent.contract.settings.SystemSettingGateway;
 import com.ragagent.common.settings.SystemSettingRegistry;
 import com.ragagent.system.domain.SystemSetting;
 import com.ragagent.system.mapper.SystemSettingMapper;

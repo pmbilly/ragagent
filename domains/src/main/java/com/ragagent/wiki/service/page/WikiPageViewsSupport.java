@@ -3,7 +3,7 @@ package com.ragagent.wiki.service.page;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import com.ragagent.common.wiki.domain.WikiException;
+import com.ragagent.contract.wiki.WikiException;
 import com.ragagent.common.wiki.domain.WikiIndex;
 import com.ragagent.common.wiki.domain.WikiIndexEntry;
 import com.ragagent.common.wiki.domain.WikiPage;

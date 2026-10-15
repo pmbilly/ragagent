@@ -1,6 +1,6 @@
 package com.ragagent.wiki.service.page;
 
-import com.ragagent.common.wiki.domain.WikiException;
+import com.ragagent.contract.wiki.WikiException;
 
 /**
  * 回滚目标就是页面当前所在版本——这是调用方的失误（通常是历史列表过期），

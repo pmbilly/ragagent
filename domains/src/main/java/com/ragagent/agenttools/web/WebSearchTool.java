@@ -16,7 +16,7 @@ import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.retrieval.domain.WebSearchFilters;
 import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.common.agent.tool.BaseTool;
-import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.common.agent.tool.ToolOutput;
 import com.ragagent.common.agent.tool.ToolRequest;
 import com.ragagent.contract.tenant.WebSearchConfig;

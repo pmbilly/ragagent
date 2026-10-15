@@ -8,14 +8,14 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.ragagent.TestSchema;
-import com.ragagent.common.wiki.domain.WikiConstants;
+import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.wiki.domain.folder.WikiFolder;
 import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;
 import com.ragagent.wiki.domain.folder.WikiFolderNotFoundException;
 import com.ragagent.common.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageConflictException;
 import com.ragagent.wiki.domain.page.WikiPageListRequest;
-import com.ragagent.common.wiki.domain.WikiPageNotFoundException;
+import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.wiki.domain.page.WikiPageRevision;
 import com.ragagent.wiki.domain.page.WikiRevisionPruneRequest;
 import com.ragagent.wiki.mapper.WikiPageRevisionMapper;

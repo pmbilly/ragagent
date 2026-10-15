@@ -3,7 +3,7 @@ package com.ragagent.wiki.service.page;
 import java.util.function.Supplier;
 
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.wiki.domain.WikiConstants;
+import com.ragagent.contract.wiki.WikiConstants;
 
 /**
  * wiki 写入的「编辑来源」作用域。

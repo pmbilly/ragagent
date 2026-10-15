@@ -14,7 +14,7 @@ import com.ragagent.platform.web.ToolJson;
 import com.ragagent.wiki.domain.folder.WikiFolderConflictException;
 import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;
 import com.ragagent.wiki.domain.folder.WikiFolderNotFoundException;
-import com.ragagent.common.wiki.domain.WikiPageNotFoundException;
+import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

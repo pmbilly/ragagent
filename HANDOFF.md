@@ -1575,6 +1575,15 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 D1·契约料余量 9 件入 `:contract`（`:contract` 169 → 178；**全程零红态**）（2026-10-15）**
+- **搬入 9 件**（含新建 `contract.settings` 包）：`tool` 3（`McpCatalogGuardedTool` · `ToolDefinitions` · `McpApprovalOps`）· `session` 1（`EmbedSessionOps`）· `settings` 1（`SystemSettingGateway`）· `wiki` 4（`WikiLinkRepairResult` · `WikiConstants` · `WikiException` · `WikiPageNotFoundException`）
+- **按第三道判据筛掉的（不搬有据）**：`knowledge/chunker/*` **9 件**（§8.8.2 明列在 `knowledge/chunker` ＝**域内件**，属域归位轨）· `ToolOutput`（**截断逻辑＝实现件**，待 agent-engine 模块）· `WikiCategoryPaths`（算法件）· `dto/AsrConfigView`（**域内 dto**，属 G1-h 家族）
+- **落点判定（消费域核查的两个反直觉结论）**：① `WikiConstants`/`WikiException` 表面"只被 wiki 域用"，但**异常链与端口**把它们拉进契约面——`WikiPageNotFoundException extends WikiException`、`WikiPageOpsPort`(L1) 引 `WikiLinkRepairResult`+`WikiPageNotFoundException`；② `WikiPageNotFoundException` 被 **session `AgentToolWikiBackends` 捕获**（跨域 main）⇒ 必须契约面 ✓
+- **⭐ 本批首次全程零红态**：原因是**把三道判据与既有教训全部前置到脚本**——① 共居检查先跑 ② 消费域核查先做 ③ 脚本内置 `{@link com.ragagent.<非 contract>}` → `{@code}` 预处理（javadoc 跨模块链接第 6 次教训的机械化）④ 搬后立刻查死包目录。**⇒ 这就是 M2（搬迁脚本化）的实证价值：同一类工作从"3 次红态"降到"0 次"**
+- **读数**：`:contract` **178**（+9）· `common/*` 134 → **125** · `:common` 总 274 → **265**；**R10 保持 7 条边 / 52 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**（无死包目录）；**1349 金片签名一致**；`spotlessCheck build` **1m58s**；**4991 / 失败 0 / 跳过 4**；dev ready + 冒烟（KB / sessions / agents / system/info / embed-channels **全 200** ✓）
+- **`common/*` 125 件余量构成**：**8 实体 + 10 handler**（C 批）· 载荷 14 待归位 + 7 platform 面 + 3 待去 Jackson + G1-g/G1-h 家族（G1-b）· 算法/域内件（`chunker` 9 · `ToolOutput` · `WikiCategoryPaths` 等，域归位/模块阶段）· ~37 Jackson 味件 · `package-info`
+- **下一步（择一）**：**C 实体收窄**（8 实体，最大块；先 `StorageBackend`/`WikiPageIssue` 等窄读实体）或 **G1-b 去 Jackson**（把 3+2 件与 `AppError` 一起做，清 C4 待归位）
 **🔶 D0b·FAQ 两件回域 + 契约视图（`:contract` 169 → 169，误搬件 8 → 3）（2026-10-15）**
 - **对象**：`FaqEntry` · `FaqEntryPage`（方案 §8.8.2 明列在 `knowledge/dto.faq/`）
 - **动作**：
@@ -2481,7 +2490,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 目标模块 | 实际 | 差距 |
 |---|---|---|
-| `contracts` | `:contract` **169 件** ✅ 已独立 | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
+| `contracts` | `:contract` **178 件** ✅ 已独立 | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
 | `platform` | `com.ragagent.platform.*` **139 件仍在 `:common`** | **未独立成模块**；包覆盖：方案 **23** vs 实际 **15** ⇒ 缺 `execution` · `outbox` · `parsing` · `storage.config` · `storage.provider` · `tracing.decorators` · `tracing.langfuse` · `transaction` · `web.error` · `web.health`；多 `redis` · `tracing` |
 | `agent-engine` · `retrieval-engine` · `model-runtime` | `:engine` **318 件 / 9 顶层包**（chatpipeline · embedding · llm · modelcontext · modelruntime · rerank · retrieval · tracing · webfetch） | 未拆分（**条件触发**项） |
 | `domains` | `:domains` **1343 件** | 域间边 **7 条**（①clearable **0** / ②owner 2 / ③族内 5）；域布局抽样见 C |
@@ -2495,8 +2504,8 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 | `:common` 域侧 TypeHandler | **10** | C2 |
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
 | `:common` 受控依赖根 | 10 根 / 69 文件 | C1 |
-| `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
-| `:common` 规模 | **274 件** = `common/*` 134 + `platform/*` 139 + `event/*` 1 | — |
+| `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
+| `:common` 规模 | **265 件** = `common/*` **125** + `platform/*` 139 + `event/*` 1（D1 后） | — |
 
 **C. 域布局抽样（以方案 §8.8.2 `knowledge/` 为范本）**
 

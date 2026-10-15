@@ -32,7 +32,7 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.contract.audit.WikiActivityAudit;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.domain.page.WikiPageLite;
-import com.ragagent.common.wiki.domain.WikiConstants;
+import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.wiki.repository.TaskPendingOpsRepository;
 import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.contract.wiki.SlugUpdate;

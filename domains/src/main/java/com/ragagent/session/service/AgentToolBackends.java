@@ -53,7 +53,7 @@ import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.common.wiki.WikiPageOpsPort;
 import com.ragagent.common.agent.tool.AgentTool;
-import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.agenttools.datasource.AnalysisDuckDbJdbc;
 import com.ragagent.agenttools.datasource.DataAnalysisTool;
 import com.ragagent.agenttools.knowledge.GetDocumentInfoTool;

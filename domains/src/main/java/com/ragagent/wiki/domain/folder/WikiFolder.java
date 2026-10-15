@@ -39,7 +39,7 @@ public class WikiFolder {
 
     private String knowledgeBaseId = "";
 
-    /** 父文件夹 id；{@link com.ragagent.common.wiki.domain.WikiConstants#FOLDER_ROOT_ID}（""）= 根 */
+    /** 父文件夹 id；{@link com.ragagent.contract.wiki.WikiConstants#FOLDER_ROOT_ID}（""）= 根 */
     @TableField(value = "parent_id")
     private String parentId = "";
 

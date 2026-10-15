@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ragagent.common.wiki.domain.WikiCategoryPaths;
-import com.ragagent.common.wiki.domain.WikiConstants;
+import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.wiki.domain.folder.WikiFolder;
 import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;
 import com.ragagent.wiki.domain.folder.WikiFolderNotFoundException;

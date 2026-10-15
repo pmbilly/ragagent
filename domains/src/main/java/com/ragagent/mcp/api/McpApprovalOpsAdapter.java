@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.mcp.McpApprovalOps;
+import com.ragagent.contract.tool.McpApprovalOps;
 import com.ragagent.mcp.controller.AgentToolApprovalController;
 import com.ragagent.mcp.controller.McpOAuthController;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;

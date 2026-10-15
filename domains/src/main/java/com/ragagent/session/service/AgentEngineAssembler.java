@@ -7,7 +7,7 @@ import com.ragagent.contract.knowledge.FaqEntryView;
 import com.ragagent.contract.knowledge.FaqEntryPageView;
 import com.ragagent.agent.AgentConfig;
 import com.ragagent.agent.AgentEngine;
-import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.agenttools.wiki.WikiRouteResolver;
 import com.ragagent.agenttools.wiki.WikiScope;
 import com.ragagent.agent.tool.ToolRegistry;

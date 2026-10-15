@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.common.agent.tool.ToolRequest;
 import com.ragagent.common.agent.tool.BaseTool;
 

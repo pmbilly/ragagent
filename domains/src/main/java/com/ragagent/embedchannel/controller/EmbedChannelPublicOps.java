@@ -1,6 +1,6 @@
 package com.ragagent.embedchannel.controller;
 
-import com.ragagent.common.session.EmbedSessionOps;
+import com.ragagent.contract.session.EmbedSessionOps;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

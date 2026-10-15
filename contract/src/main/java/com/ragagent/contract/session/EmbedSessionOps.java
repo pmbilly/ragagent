@@ -1,4 +1,4 @@
-package com.ragagent.common.session;
+package com.ragagent.contract.session;
 
 import java.time.OffsetDateTime;
 import java.util.List;

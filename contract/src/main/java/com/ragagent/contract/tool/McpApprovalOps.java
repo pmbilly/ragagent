@@ -1,4 +1,4 @@
-package com.ragagent.common.mcp;
+package com.ragagent.contract.tool;
 
 import java.util.Map;
 

@@ -16,7 +16,7 @@ import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.common.agent.tool.AgentTool;
-import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.chatpipeline.spi.ToolRegistryPort;
 import com.ragagent.chatpipeline.spi.McpToolingGateway;
 

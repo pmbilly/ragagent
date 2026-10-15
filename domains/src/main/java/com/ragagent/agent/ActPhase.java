@@ -19,7 +19,7 @@ import com.ragagent.common.agent.domain.AgentStep;
 import com.ragagent.common.agent.domain.AgentToolCall;
 import com.ragagent.common.agent.tool.ToolCallTarget;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.agent.tool.runtime.JsonRepair;
 import com.ragagent.agent.tool.runtime.NormalizeToolCallId;
 import com.ragagent.common.agent.tool.ToolExecContext;

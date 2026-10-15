@@ -1,6 +1,6 @@
 package com.ragagent.wiki.domain.folder;
 
-import com.ragagent.common.wiki.domain.WikiException;
+import com.ragagent.contract.wiki.WikiException;
 
 public class WikiFolderNotFoundException extends WikiException {
 

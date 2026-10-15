@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ragagent.TestSchema;
-import com.ragagent.common.wiki.domain.WikiConstants;
-import com.ragagent.common.wiki.domain.WikiException;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.contract.wiki.WikiException;
 import com.ragagent.wiki.domain.issue.WikiLintIssue;
 import com.ragagent.wiki.domain.issue.WikiLintReport;
 import com.ragagent.common.wiki.domain.WikiPage;
-import com.ragagent.common.wiki.domain.WikiPageNotFoundException;
+import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.wiki.repository.WikiPageRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -8,8 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.ragagent.common.wiki.domain.WikiConstants;
-import com.ragagent.common.wiki.domain.WikiException;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.contract.wiki.WikiException;
 import com.ragagent.wiki.domain.graph.WikiGraph;
 import com.ragagent.common.wiki.domain.WikiPage;
 import org.junit.jupiter.api.Test;

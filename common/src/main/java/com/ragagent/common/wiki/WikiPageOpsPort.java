@@ -5,7 +5,8 @@ import java.util.List;
 import com.ragagent.common.wiki.domain.WikiIndex;
 import com.ragagent.common.wiki.domain.WikiPage;
 import com.ragagent.common.wiki.domain.WikiPageIssue;
-import com.ragagent.common.wiki.domain.WikiPageNotFoundException;
+import com.ragagent.contract.wiki.WikiPageNotFoundException;
+import com.ragagent.contract.wiki.WikiLinkRepairResult;
 
 /**
  * wiki 页读写端口（L1）：wiki 工具族消费的页面/issue/索引最小读写面。

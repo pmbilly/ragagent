@@ -53,7 +53,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.config.TenantProperties;
 import com.ragagent.common.settings.SystemSettingRegistry;
-import com.ragagent.common.settings.SystemSettingGateway;
+import com.ragagent.contract.settings.SystemSettingGateway;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;

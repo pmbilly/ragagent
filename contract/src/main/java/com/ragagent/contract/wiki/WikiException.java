@@ -1,4 +1,4 @@
-package com.ragagent.common.wiki.domain;
+package com.ragagent.contract.wiki;
 
 /**
  * wiki 领域异常基类。

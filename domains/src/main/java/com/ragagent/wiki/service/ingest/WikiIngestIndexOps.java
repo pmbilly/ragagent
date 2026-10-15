@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.common.wiki.domain.WikiConstants;
+import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.common.wiki.domain.WikiIndexEntry;
 import com.ragagent.common.wiki.domain.WikiPage;
 import com.ragagent.wiki.prompt.WikiPrompts;

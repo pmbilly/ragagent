@@ -12,11 +12,11 @@ import com.ragagent.common.wiki.domain.WikiIndexEntry;
 import com.ragagent.common.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageConflictException;
 import com.ragagent.wiki.domain.page.WikiPageLite;
-import com.ragagent.common.wiki.domain.WikiPageNotFoundException;
+import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.wiki.domain.page.WikiPageRevision;
 import com.ragagent.wiki.domain.page.WikiStats;
-import com.ragagent.common.wiki.domain.WikiConstants;
-import com.ragagent.common.wiki.domain.WikiException;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.contract.wiki.WikiException;
 import com.ragagent.common.wiki.domain.WikiStringListTypeHandler;
 
 import static org.assertj.core.api.Assertions.assertThat;

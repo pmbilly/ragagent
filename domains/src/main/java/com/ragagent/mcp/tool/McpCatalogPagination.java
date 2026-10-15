@@ -12,7 +12,7 @@ import com.ragagent.mcp.tool.McpCatalog.McpServerSummary;
 import com.ragagent.mcp.tool.McpCatalog.McpToolSummary;
 import com.ragagent.mcp.tool.McpCatalog.McpDiscoveryPage;
 import com.ragagent.mcp.domain.McpService;
-import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.chatpipeline.spi.ToolRegistryPort;
 import com.ragagent.chatpipeline.spi.McpToolingGateway;
 

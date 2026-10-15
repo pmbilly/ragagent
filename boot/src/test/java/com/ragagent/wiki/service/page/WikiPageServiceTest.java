@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.ragagent.TestSchema;
-import com.ragagent.common.wiki.domain.WikiConstants;
-import com.ragagent.common.wiki.domain.WikiException;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.contract.wiki.WikiException;
 import com.ragagent.wiki.domain.folder.WikiFolder;
 import com.ragagent.wiki.domain.folder.WikiFolderConflictException;
 import com.ragagent.wiki.domain.folder.WikiFolderNode;

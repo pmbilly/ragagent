@@ -13,7 +13,7 @@ import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.contract.audit.WikiActivityAudit;
 import com.ragagent.wiki.domain.WikiConfig;
-import com.ragagent.common.wiki.domain.WikiConstants;
+import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.common.wiki.domain.WikiPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

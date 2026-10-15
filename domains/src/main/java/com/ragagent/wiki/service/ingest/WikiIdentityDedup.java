@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.common.wiki.domain.WikiConstants;
+import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.common.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.service.page.SlugFuzzy;

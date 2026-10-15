@@ -25,9 +25,9 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.chatpipeline.spi.McpToolingGateway;
 import com.ragagent.chatpipeline.spi.ToolRegistryPort;
 import com.ragagent.common.agent.tool.ToolOutput;
-import com.ragagent.common.agent.tool.McpCatalogGuardedTool;
+import com.ragagent.contract.tool.McpCatalogGuardedTool;
 import com.ragagent.common.agent.tool.ToolExecContext;
-import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.common.agent.tool.ToolRequest;
 import com.ragagent.common.agent.tool.AgentTool;
 

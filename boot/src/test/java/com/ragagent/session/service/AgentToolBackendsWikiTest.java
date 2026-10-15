@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.List;
 
 import com.ragagent.TestSchema;
-import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.agenttools.wiki.IndexOverviewView;
 import com.ragagent.agenttools.wiki.WikiIndexOverview;
 import com.ragagent.agenttools.wiki.IssueView;
@@ -16,7 +16,7 @@ import com.ragagent.agenttools.wiki.WikiRouteResolver;
 import com.ragagent.agenttools.wiki.WikiContentRewrite;
 import com.ragagent.agenttools.wiki.WikiScope;
 import com.ragagent.common.wiki.domain.WikiPage;
-import com.ragagent.common.wiki.domain.WikiPageNotFoundException;
+import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.wiki.service.page.WikiPageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

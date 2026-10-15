@@ -3,7 +3,7 @@ package com.ragagent.wiki.service.page;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.wiki.domain.WikiConstants;
+import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.common.wiki.domain.WikiPage;
 
 /**
