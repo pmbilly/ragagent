@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.ragagent.TestSchema;
 import com.ragagent.session.domain.message.MessageSuggestionEvent;
-import com.ragagent.common.session.domain.message.MessageSuggestionSet;
+import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.session.domain.message.MessageSuggestionSetNotFoundException;
 import com.ragagent.common.session.domain.SuggestionItem;
 import com.ragagent.session.repository.MessageSuggestionRepository;

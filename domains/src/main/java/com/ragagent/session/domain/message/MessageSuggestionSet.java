@@ -1,7 +1,7 @@
-package com.ragagent.common.session.domain.message;
+package com.ragagent.session.domain.message;
 
 import com.ragagent.common.session.domain.SuggestionItem;
-import com.ragagent.common.session.domain.SuggestionItemListTypeHandler;
+import com.ragagent.session.domain.SuggestionItemListTypeHandler;
 
 import java.time.OffsetDateTime;
 import java.util.List;

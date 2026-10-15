@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.ragagent.common.session.domain.message.Message;
-import com.ragagent.common.session.domain.message.MessageSuggestionSet;
+import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.common.session.dto.StopSessionRequest;
 import com.ragagent.common.session.embed.EmbedSessionPort;
 import com.ragagent.platform.web.ApiResponse;
@@ -17,6 +17,7 @@ import com.ragagent.session.controller.MessageSuggestionController;
 import com.ragagent.session.controller.SessionController;
 
 import jakarta.servlet.http.HttpServletResponse;
+import com.ragagent.common.session.embed.MessageSuggestionView;
 
 /**
  * {@link EmbedSessionPort} 的会话域实现：逐参数转发到既有的四个端点方法
@@ -65,14 +66,51 @@ public class EmbedSessionAdapter implements EmbedSessionPort {
     }
 
     @Override
-    public ResponseEntity<MessageSuggestionSet> getSuggestions(String sessionId, String messageId) {
-        return suggestionController.get(sessionId, null, messageId);
+    public ResponseEntity<MessageSuggestionView> getSuggestions(String sessionId, String messageId) {
+        return toView(suggestionController.get(sessionId, null, messageId));
     }
 
     @Override
-    public ResponseEntity<MessageSuggestionSet> ensureSuggestions(String sessionId, String messageId,
+    public ResponseEntity<MessageSuggestionView> ensureSuggestions(String sessionId, String messageId,
             String rawBody) {
-        return suggestionController.ensure(sessionId, messageId, rawBody);
+        return toView(suggestionController.ensure(sessionId, messageId, rawBody));
+    }
+
+    /** 保状态码与响应头，仅把 body 换成线格式视图（404 等无 body 情形逐字保留）。 */
+    private static ResponseEntity<MessageSuggestionView> toView(
+            ResponseEntity<MessageSuggestionSet> resp) {
+        return ResponseEntity.status(resp.getStatusCode())
+                .headers(resp.getHeaders())
+                .body(toView(resp.getBody()));
+    }
+
+    /** 实体 → 线格式视图（域内投影：吃实体，字段逐字搬运；null 透传）。 */
+    static MessageSuggestionView toView(MessageSuggestionSet s) {
+        if (s == null) {
+            return null;
+        }
+        MessageSuggestionView v = new MessageSuggestionView();
+        v.setId(s.getId());
+        v.setTenantId(s.getTenantId());
+        v.setSessionId(s.getSessionId());
+        v.setAssistantMessageId(s.getAssistantMessageId());
+        v.setAgentId(s.getAgentId());
+        v.setPlacement(s.getPlacement());
+        v.setConfigHash(s.getConfigHash());
+        v.setLocale(s.getLocale());
+        v.setStatus(s.getStatus());
+        v.setAllowRegenerate(s.isAllowRegenerate());
+        v.setSuppressionReason(s.getSuppressionReason());
+        v.setQuestions(s.getQuestions());
+        v.setModelId(s.getModelId());
+        v.setPromptTokens(s.getPromptTokens());
+        v.setCompletionTokens(s.getCompletionTokens());
+        v.setLatencyMs(s.getLatencyMs());
+        v.setErrorCode(s.getErrorCode());
+        v.setGeneratedAt(s.getGeneratedAt());
+        v.setCreatedAt(s.getCreatedAt());
+        v.setUpdatedAt(s.getUpdatedAt());
+        return v;
     }
 
     @Override

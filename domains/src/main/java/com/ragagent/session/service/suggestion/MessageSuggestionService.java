@@ -25,7 +25,7 @@ import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.common.session.domain.message.MessageExecutionContext;
 import com.ragagent.session.domain.message.MessageSuggestionEvent;
-import com.ragagent.common.session.domain.message.MessageSuggestionSet;
+import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.common.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.common.session.domain.SuggestionItem;
 import com.ragagent.session.repository.MessageSuggestionRepository;

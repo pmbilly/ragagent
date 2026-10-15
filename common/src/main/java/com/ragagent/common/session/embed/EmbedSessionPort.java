@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 
 import com.ragagent.common.session.domain.message.Message;
-import com.ragagent.common.session.domain.message.MessageSuggestionSet;
 import com.ragagent.common.session.dto.StopSessionRequest;
 import com.ragagent.platform.web.ApiResponse;
 
@@ -44,10 +43,10 @@ public interface EmbedSessionPort {
     ApiResponse<Void> stopSession(String sessionId, StopSessionRequest body);
 
     /** 读取建议集。 */
-    ResponseEntity<MessageSuggestionSet> getSuggestions(String sessionId, String messageId);
+    ResponseEntity<MessageSuggestionView> getSuggestions(String sessionId, String messageId);
 
     /** 生成建议集（保证语义；生成中 ⇒ 202）。 */
-    ResponseEntity<MessageSuggestionSet> ensureSuggestions(String sessionId, String messageId,
+    ResponseEntity<MessageSuggestionView> ensureSuggestions(String sessionId, String messageId,
             String rawBody);
 
     /** 记录建议事件。 */

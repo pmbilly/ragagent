@@ -268,7 +268,7 @@ contract  → JDK                                  （纯 JDK：公开 API / SPI
 | `Message` / `Chunk` / `Model` / `Session` | 3~6 | 2~4 | **非机械**：视图要覆盖大量字段（`Chunk` 24 访问器 vs 现有视图 6 字段）+ 跨域写面 + L1 组件（`BaseTool`/`ChunkPage`）⇒ 需设计 |
 | `KnowledgeBase` / `Knowledge` / `User` / `Tenant` | 4~10 | 0~3 | 最后（写面 16~48 处，多为管理面 ⇒ 用例归位） |
 
-**进度（2026-10-15）**：C2 实体 **14 → 12**（`KnowledgeTag`、`AuthToken` 已归域）；R10 保持 **7 条边 / 52 类**（收窄未重建边 ✓）。
+**进度（2026-10-15）**：C2 实体 **14 → 11**（`KnowledgeTag`、`AuthToken`、`MessageSuggestionSet` 已归域；域侧 handler 12 → 11）；C4 待归位载荷 15、登记 8（platform 面 5 + 待去 Jackson 3）；R10 保持 **7 条边 / 52 类**（收窄未重建边 ✓）。
 
 **次批三候选的实测阻断（已测，勿重复测量）**：`MessageSuggestionSet`＝**API 线格式**（`EmbedSessionPort` 返回 `ResponseEntity<…>` ⇒ 换视图即改 embed 公开面）· `StorageBackend`＝**实体跨域归属**（storage 与 knowledge **双方都有它的 mapper**）· `WikiPageIssue`＝**跨域写面**（`session/AgentToolWikiBackends` 12 读 + 56 setters）⇒ 三者均需**先决策**（线格式确认 / 归属裁定 / 用例归位）。**已解锁示范两支**：读面换视图（`KnowledgeTag`）· 写面走契约端口（`AuthToken`，同时清偿了 ②owner 的"写侧直用他域 mapper"）。
 
@@ -1451,6 +1451,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 C 批 1·第三子批：`MessageSuggestionSet` 收窄 + **线格式等价视图**（实体 12 → 11）（2026-10-15）**
+- **对象**：`MessageSuggestionSet`（跨域主源 0——除 L1 端口外**全在会话域内**引用）⇒ 唯一障碍是 **embed 面端口 `EmbedSessionPort` 返回它**（线格式风险）
+- **⭐ 判据先行（本刀最关键的一步）**：动线格式类型**先核金片**——实测 `emb-pub-suggestions-get/off/get-none/ensure-badbody` **4 条金片** + 应用面 `MessageSuggestionContractTest` ⇒ **有护栏才动**
+- **动作**：
+  1. **L1 新增 `common.session.embed.MessageSuggestionView`**：字段**逐一对应实体参与 JSON 的 20 个字段**（`@JsonIgnore` 的 `agentTenantId`/`leaseUntil` **不迁**），`questions` **复用同一 `SuggestionItem`** ⇒ JSON 逐字节等价；本体是**可写数据持有者**（getters/setters，与 `contract.knowledge.ChunkView` 同款）
+  2. **投影留域内**：`EmbedSessionAdapter.toView(实体)` 做 20 字段搬运——**L1 不能依赖域**（第一版我把 `of(实体)` 写进视图，编译立刻报 `package ... does not exist` ⇒ 正解＝视图纯数据、投影在域侧）
+  3. **端口两方法改返回视图**；适配器 **保状态码与响应头、仅换 body**（404 无 body 情形逐字保留）
+  4. **实体 + 其 TypeHandler 回 `session/domain`**（持久化闭包一起走；搬后需补父类 `AbstractJsonListTypeHandler` 与载荷 import——跨包后不再同包）
+- **读数**：**C2 实体 12 → 11**、**域侧 handler 12 → 11**；C1 受控根 74 → **73 文件**；C4 待归位 15、**登记 platform 面 4 → 5**（视图随 `EmbedSessionPort` 同族登记，理由＝"embed 响应线格式形状，随端口迁 platform"）；**R10 保持 7 条边 / 52 类** ✓
+- **验证**：**金片契约测试 ✓**（`MessageSuggestionContractTest` + `EmbedContractTest`——**线格式逐字节未变**）；**`check-contract-sync`：1349 金片签名一致** ✓；**14 守卫全绿**；`spotlessCheck build` **2m12s**；**4991 / 失败 0 / 跳过 4**；定向 session/embedchannel **180 条**；dev ready + 冒烟（sessions/embed-channels/KB/models 200 ✓；`/api/v1/embed/.../suggestions` ⇒ 401 `{"error":"embed publish token is required"}` 渠道闸门信封 ✓）
+- **C 余量（下一步建议顺序）**：`Chunk`(跨域读 5/写面广) · `Knowledge`/`KnowledgeBase`(宽字段) · `Model`(宽字段+写面) · `Session`/`Message`(线格式) · `StorageBackend`（**需裁定归属**：storage 与 knowledge 都有它的 mapper）· `WikiPage`/`WikiPageIssue`（**需写面归位**：session 侧 56 setters）· `Tenant`/`User`（管理面，需用例归位）
 **🔶 C 批 1·第二子批：`AuthToken` 收窄回归属域 + 契约面写端口（实体 13 → 12）（2026-10-15）**
 - **候选筛选（三候选都被实测证否）**：`MessageSuggestionSet` 卡在 **API 线格式**（`EmbedSessionPort` 返回 `ResponseEntity<MessageSuggestionSet>` ⇒ 换视图即改 embed 公开面响应）；`StorageBackend` 卡在**实体跨域归属**（`storage` 与 `knowledge` **双方都有它的 mapper**：`StorageBackendMapper`/`KnowledgeStorageBackendRepository`）；`WikiPageIssue` 卡在**跨域写面**（`session/AgentToolWikiBackends` 12 读 + **56 setters**）⇒ 这三者都需设计/线格式确认，**不属机械批**
 - **本刀对象＝`AuthToken`**（筛表里"跨域读 0 / L1 耦合 0"，唯一跨域消费是写面）⇒ **正好是 ②owner 登记中"写侧直用他域 mapper"的清偿实例**
