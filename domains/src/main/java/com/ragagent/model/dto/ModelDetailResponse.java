@@ -2,7 +2,7 @@ package com.ragagent.model.dto;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
-import com.ragagent.model.domain.Model;
+import com.ragagent.common.model.Model;
 import com.ragagent.common.model.ModelParameters;
 
 /**

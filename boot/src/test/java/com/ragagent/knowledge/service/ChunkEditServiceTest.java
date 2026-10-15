@@ -20,7 +20,7 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.mapper.ChunkRevisionMapper;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.model.domain.Model;
+import com.ragagent.common.model.Model;
 import com.ragagent.model.mapper.ModelMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

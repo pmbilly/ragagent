@@ -27,10 +27,10 @@ import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.domain.access.KnowledgeAccessGuard;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
-import com.ragagent.model.domain.Model;
+import com.ragagent.common.model.Model;
 import com.ragagent.common.model.ModelParameters;
-import com.ragagent.model.service.ModelService;
 import com.ragagent.initialization.dto.InitResponses;
+import com.ragagent.common.model.ModelCatalogPort;
 
 /**
  * initialization config/initialize 端点用例：KB 初始化配置读写、初始化装配与请求绑定。
@@ -45,15 +45,15 @@ public final class InitializationConfigService {
     private final KnowledgeBaseService kbService;
     private final KnowledgeBaseMapper kbMapper;
     private final KnowledgeMapper knowledgeMapper;
-    private final ModelService modelService;
+    private final ModelCatalogPort modelCatalog;
     private final SsrfGuard ssrfGuard;
 
-    public InitializationConfigService(KnowledgeAccessGuard kbGuard, KnowledgeBaseService kbService, KnowledgeBaseMapper kbMapper, KnowledgeMapper knowledgeMapper, ModelService modelService, SsrfGuard ssrfGuard) {
+    public InitializationConfigService(KnowledgeAccessGuard kbGuard, KnowledgeBaseService kbService, KnowledgeBaseMapper kbMapper, KnowledgeMapper knowledgeMapper, ModelCatalogPort modelCatalog, SsrfGuard ssrfGuard) {
         this.kbGuard = kbGuard;
         this.kbService = kbService;
         this.kbMapper = kbMapper;
         this.knowledgeMapper = knowledgeMapper;
-        this.modelService = modelService;
+        this.modelCatalog = modelCatalog;
         this.ssrfGuard = ssrfGuard;
     }
 
@@ -72,7 +72,7 @@ public final class InitializationConfigService {
                 continue;
             }
             try {
-                Model m = modelService.getModelByID(id);
+                Model m = modelCatalog.getModelRow(id);
                 if (m != null) {
                     models.add(m);
                 }
@@ -98,7 +98,7 @@ public final class InitializationConfigService {
             Model existing = null;
             if (!existingId.isEmpty()) {
                 try {
-                    existing = modelService.getModelByID(existingId);
+                    existing = modelCatalog.getModelRow(existingId);
                 } catch (Exception ignored) {
                     existing = null;
                 }
@@ -108,10 +108,10 @@ public final class InitializationConfigService {
                 existing.setSource(model.getSource());
                 existing.setDescription(model.getDescription());
                 existing.setParameters(model.getParameters());
-                modelService.updateModel(existing);
+                modelCatalog.updateModel(existing);
                 processed.add(existing);
             } else {
-                modelService.createModel(model);
+                modelCatalog.createModel(model);
                 processed.add(model);
             }
         }
@@ -161,7 +161,7 @@ public final class InitializationConfigService {
         if (vlmReq != null && req.multimodalEnabled() && !vlmReq.path("modelId").asText("").isEmpty()) {
             String vlmModelId = vlmReq.path("modelId").asText("");
             try {
-                if (modelService.getModelByID(vlmModelId) != null) {
+                if (modelCatalog.findModel(vlmModelId) != null) {
                     vlm.setEnabled(vlmReq.path("enabled").asBoolean(false));
                     vlm.setModelId(vlmModelId);
                 }
@@ -178,7 +178,7 @@ public final class InitializationConfigService {
         if (asrReq != null && asrReq.path("enabled").asBoolean(false)
                 && !asrReq.path("modelId").asText("").isEmpty()) {
             try {
-                if (modelService.getModelByID(asrReq.path("modelId").asText()) != null) {
+                if (modelCatalog.findModel(asrReq.path("modelId").asText()) != null) {
                     asr.setEnabled(true);
                     asr.setModelId(asrReq.path("modelId").asText());
                     asr.setLanguage(asrReq.path("language").asText(""));
@@ -676,7 +676,7 @@ public final class InitializationConfigService {
             throw new BizException(AppError.badRequest(message));
         }
         try {
-            Model m = modelService.getModelByID(id);
+            Model m = modelCatalog.getModelRow(id);
             if (m != null) {
                 return;
             }

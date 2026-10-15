@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import com.ragagent.retrieval.vlm.VlmClient.VlmConfig;
 import com.ragagent.rerank.RerankerConfigs;
+import com.ragagent.embedding.EmbedderConfigs;
 
 /**
  * 「模型行 → 各能力运行时配置」的映射（原散在 5 个能力层配置类里的 {@code fromModel} 静态工厂）。
@@ -28,33 +29,14 @@ public final class ModelRuntimeConfigs {
     private ModelRuntimeConfigs() {
     }
 
-public static EmbedderConfig embedderConfig(ModelRowView m, String appId, String appSecret) {
-        EmbedderConfig c = new EmbedderConfig();
-        if (m == null) {
-            return c;
-        }
-        var p = m.parameters();
-        c.setSource(m.source() == null ? "" : m.source());
-        c.setBaseUrl(p == null ? "" : p.getBaseUrl());
-        c.setApiKey(p == null ? "" : p.getApiKey());
-        c.setModelId(m.id() == null ? "" : m.id());
-        c.setModelName(m.name() == null ? "" : m.name());
-        c.setDimensions(p == null ? 0 : p.getEmbeddingParameters().getDimension());
-        c.setSupportsDimensionOverride(p != null && p.getEmbeddingParameters().isSupportsDimensionOverride());
-        c.setTruncatePromptTokens(p == null ? 0 : p.getEmbeddingParameters().getTruncatePromptTokens());
-        c.setProvider(p == null ? "" : p.getProvider());
-        c.setMaxConcurrency(p == null ? 0 : p.getMaxConcurrency());
-        c.setExtraConfig(p == null ? null : p.getExtraConfig());
-        c.setCustomHeaders(p == null ? null : p.getCustomHeaders());
-        c.setAppId(appId);
-        c.setAppSecret(appSecret);
-        return c;
+    /**
+     * embedding 运行时配置：实现在 L2 {@code embedding.EmbedderConfigs}
+     * （本域只做委托——该映射只依赖 L1 载荷与 embedding 配置类型）。
+     */
+    public static EmbedderConfig embedderConfig(ModelRowView m, String appId, String appSecret) {
+        return EmbedderConfigs.embedderConfig(m, appId, appSecret);
     }
 
-    /**
-     * rerank 运行时配置：实现在 L2 {@code rerank.RerankerConfigs}
-     * （本域只做委托——该映射只依赖 L1 载荷与 rerank 配置类型，不需经模型域中转）。
-     */
     public static RerankerConfig rerankerConfig(ModelRowView m, String appId, String appSecret) {
         return RerankerConfigs.rerankerConfig(m, appId, appSecret);
     }

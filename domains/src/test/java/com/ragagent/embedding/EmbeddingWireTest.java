@@ -25,7 +25,7 @@ import com.ragagent.embedding.provider.OpenAiEmbedder;
 import com.ragagent.embedding.provider.VolcengineEmbedder;
 import com.ragagent.embedding.provider.ZhipuEmbedder;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
-import com.ragagent.model.domain.Model;
+import com.ragagent.common.model.Model;
 import com.ragagent.common.model.ModelParameters;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;

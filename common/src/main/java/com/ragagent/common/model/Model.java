@@ -1,4 +1,4 @@
-package com.ragagent.model.domain;
+package com.ragagent.common.model;
 
 import java.time.OffsetDateTime;
 
@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ragagent.common.model.ModelParameters;
+
 
 /**
  * models 表实体。

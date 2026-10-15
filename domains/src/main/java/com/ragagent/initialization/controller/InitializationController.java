@@ -27,9 +27,9 @@ import com.ragagent.knowledge.domain.access.KnowledgeAccessGuard;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
-import com.ragagent.model.service.ModelService;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.platform.web.ApiResult;
+import com.ragagent.common.model.ModelCatalogPort;
 
 /**
  * initialization 路由。系统级端点（ollama 管理、模型连通性测试、抽取）
@@ -59,15 +59,15 @@ public class InitializationController {
 
     public InitializationController(KnowledgeAccessGuard kbGuard, KnowledgeBaseService kbService,
             KnowledgeBaseMapper kbMapper, KnowledgeMapper knowledgeMapper,
-            ModelService modelService, SsrfGuard ssrfGuard,
+            ModelCatalogPort modelCatalog, SsrfGuard ssrfGuard,
             OllamaService ollamaService, OllamaDownloadTaskStore downloadTasks,
             AsrTranscriber asrTranscriber, ExtractPrompts extractPrompts,
             ConcurrencyGovernor concurrencyGovernor,
             DocReaderParsePort documentReader,
             CryptoService cryptoService) {
-        this.configService = new InitializationConfigService(kbGuard, kbService, kbMapper, knowledgeMapper, modelService, ssrfGuard);
+        this.configService = new InitializationConfigService(kbGuard, kbService, kbMapper, knowledgeMapper, modelCatalog, ssrfGuard);
         this.ollamaManage = new OllamaManageService(ollamaService, downloadTasks);
-        this.modelTest = new ModelConnectivityTestService(modelService, ssrfGuard, ollamaService, concurrencyGovernor, cryptoService, asrTranscriber, documentReader);
+        this.modelTest = new ModelConnectivityTestService(modelCatalog, ssrfGuard, ollamaService, concurrencyGovernor, cryptoService, asrTranscriber, documentReader);
         this.textTest = new TextExtractionTestService(extractPrompts, modelTest);
     }
 

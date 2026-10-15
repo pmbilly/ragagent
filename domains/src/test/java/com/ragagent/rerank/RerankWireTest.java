@@ -26,7 +26,7 @@ import com.ragagent.rerank.provider.OpenAiReranker;
 import com.ragagent.rerank.provider.VolcengineReranker;
 import com.ragagent.rerank.provider.ZhipuReranker;
 import com.ragagent.platform.web.ProviderJson;
-import com.ragagent.model.domain.Model;
+import com.ragagent.common.model.Model;
 import com.ragagent.common.model.ModelParameters;
 import com.ragagent.model.service.ModelRowViews;
 

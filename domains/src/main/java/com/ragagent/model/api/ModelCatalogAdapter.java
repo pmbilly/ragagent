@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.ragagent.common.model.ModelCatalogPort;
-import com.ragagent.model.domain.Model;
+import com.ragagent.common.model.Model;
 import com.ragagent.model.service.ModelRowViews;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.mapper.ModelMapper;
@@ -56,6 +56,26 @@ public class ModelCatalogAdapter implements ModelCatalogPort {
     @Override
     public ModelRowView findModelVisible(long tenantId, String modelId) {
         return ModelRowViews.of(modelService.getByIdVisible(tenantId, modelId));
+    }
+
+    @Override
+    public Model getModelRow(String id) {
+        return modelService.getModelByID(id);
+    }
+
+    @Override
+    public Model getModelRowVisible(long tenantId, String id) {
+        return modelService.getByIdVisible(tenantId, id);
+    }
+
+    @Override
+    public Model createModel(Model model) {
+        return modelService.createModel(model);
+    }
+
+    @Override
+    public Model updateModel(Model model) {
+        return modelService.updateModel(model);
     }
 
     @Override

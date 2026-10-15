@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
-import com.ragagent.model.domain.Model;
+import com.ragagent.common.model.Model;
 import com.ragagent.common.model.ModelParameters;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.model.service.ModelService;

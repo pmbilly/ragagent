@@ -10,7 +10,7 @@ import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.platform.web.RejectEmptyBody;
-import com.ragagent.model.domain.Model;
+import com.ragagent.common.model.Model;
 import com.ragagent.common.model.ModelParameters;
 import com.ragagent.model.dto.CreateModelRequest;
 import com.ragagent.model.dto.ModelProviderDTO;
