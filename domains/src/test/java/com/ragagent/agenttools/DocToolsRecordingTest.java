@@ -1,6 +1,6 @@
 package com.ragagent.agenttools;
 
-import com.ragagent.common.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

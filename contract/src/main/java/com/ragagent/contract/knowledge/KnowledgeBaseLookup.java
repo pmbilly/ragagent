@@ -1,7 +1,5 @@
-package com.ragagent.common.knowledge;
+package com.ragagent.contract.knowledge;
 
-import com.ragagent.contract.knowledge.KnowledgeView;
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
 
 
 /**
@@ -53,7 +51,7 @@ public interface KnowledgeBaseLookup {
     /**
      * 知识条目是否**仍存活**：存在且未软删（{@code deleted_at IS NULL}，{@code LIMIT 1}）。
      *
-     * <p>与 {@link #knowledgeGone(String)} 的区别：本方法<b>不</b>看解析状态
+     * <p>与 {@code #knowledgeGone(String)} 的区别：本方法<b>不</b>看解析状态
      * （健康检查只关心"还在不在"），且仓储缺位时无法判定按 {@code false}（与迁移前的
      * {@code WikiLintService.knowledgeExistsByIdOnly} 逐字一致）。</p>
      */

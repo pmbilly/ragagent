@@ -1792,6 +1792,21 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 清 `:common` 子批 A·8 件纯 JDK 跨域件入 `:contract`（`common/*` 46 → 38）（2026-10-16）**
+- **归类法（本刀先做）**：46 件逐件测「**真** Jackson 面（去注释/字符串）× 注解清点 × 框架 import × **引用者分域**」⇒ 一次性得出四路径名单（(a)→contract / (b)→platform / (c)→域内 / (d)→线格式待决策）
+- **入契约 8 件**：`ChunkSearchGateway` · `KnowledgeBaseLookup` · `KnowledgeDocumentGateway` · `CodePoints` · `Tokens` · `ChunkProjectionAdapter` · `KnowledgeProjectionAdapter` · **`MessageExecutionContext`**（末件去掉**冗余** `@JsonIgnoreProperties` ✓——其 jsonb 读取统一经 `JsonMappers.lenient()` ✓，承 G1-g 判据）
+- ⭐ **新增"反向依赖预检"关卡（本刀最有价值处）**：搬迁清单**动手前**先逐件核"是否引 platform / common"（契约在下层，二者皆不可 ✗）⇒ **当场拦下 4 件**：`KnowledgeBaseViews`（引 `common` 端口 ✗）· `FileContentService`（引 platform ✗）· `Mode`（引 platform ✗）· `MemoryMessageCursor`（引 platform ✗）
+  **判据：搬迁批必须先跑"目标层可见性/反向依赖"预检——把整类失败挡在改动之前**（本刀拦 4 件，避免 3 处编译错 + 1 处语义错）
+- ⚠️ **预检的盲区（已修）**：`WritableFileContentService` 依赖被拦的 `FileContentService` ✗、`StreamRewriter` 依赖被拦的 `Mode` ✗ ⇒ **成对回退** ✓
+  **判据补充：预检要按"依赖闭包"判，不能只看单件**；这两对即其**未来路径**（先把 `FileContentService`/`Mode` 的 platform 依赖摘掉，再连同伙伴一并处置 ✓）
+- **读数**：`:contract` 231 → **239**（+8）；`common/*` **46 → 38**（−8）；`platform` 144 ✓；C1 = 2 文件；**R10 保持 6 条边 / 51 类 / ①档 0** ✓；登记 platform 面 8 + Jackson 语义必要 2 ✓
+- **验证**：**14 守卫全绿** · **1349 金片签名一致** · gate **1m59s / 4996 / 失败 0 / 跳过 4** · 冒烟（sessions / knowledge-bases / system-info **200** ✓ · `GET /chunker/preview` ⇒ **405** ✓＝上轮 405 修复实况复核）
+- **剩余 38 件（下轮路径已定）**：
+  - **(b) → platform（3 件，零反向依赖）**：`FaqChunkMetadataCodec`(J=8) · `StoragePaths`(J=2) · `TenantConfigLookup`(J=8)
+  - **(a) 续（1 件）**：`KnowledgeBaseViews`（其伙伴 `KnowledgeBaseLookup` 本刀已入契约 ⇒ 现可迁 ✓）
+  - **被拦 3 件**：`FileContentService` · `Mode` · `MemoryMessageCursor` ⇒ 摘掉其 platform 依赖后入契约（含各自的成对伙伴 ✓）
+  - **(d) 线格式待决策（~12 件）**：`SearchResult` · `MessageView` · `AgentStep` · `AgentToolCall` · `ToolCallTarget` · `UserPreferences`（连带 `AdminUserPort`/`AdminUserView`）· `ParserEngineConfig` · `PipelineMessageView` · `SessionQaPort` · `Rewriter`
+  - **13 件 `package-info`**：随所在包解散而删除 ✓
 **🔶 清 `:common` 第一刀·11 件出账（8 → `:platform` · 1 → `:contract` · 1 → `platform.tool` · 1 回退登记）（2026-10-16）**
 - **缘起（用户提问"`:common` 不先清掉吗？"）**：**是** —— 方案 §5.1 目标树**没有 `common`**（`contracts` / `platform` / agent-engine / retrieval-engine / model-runtime / domains / boot）⇒ `:common` 是**过渡模块**，其清空＝"阶段 6 第 1 步（contracts/platform）"的**收尾**，**应先于三个 runtime** ✓
 - **先测两条决定性事实**：① **7 件框架味端口对业务域引用 = 0** ✓ ⇒ 入 platform 不破坏 §12.2 DAG（`platform → 业务域` 禁止）② **`ParserEngineRules` 真 Jackson 面 = 0**（G1-k 已纯化 ✓）⇒ 可直接入契约（先例：`contract.text.TextConv` ✓）

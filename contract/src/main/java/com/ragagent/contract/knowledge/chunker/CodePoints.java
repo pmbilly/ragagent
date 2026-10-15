@@ -1,9 +1,9 @@
-package com.ragagent.common.knowledge.chunker;
+package com.ragagent.contract.knowledge.chunker;
 
 /**
  * 码点（Unicode code point）工具。
  * Java 的 {@code char} 是 UTF-16 code unit，增补平面字符（如大部分 CJK 扩展、emoji）
- * 长度一律用 {@link #len(String)}（codePointCount），杜绝 char/char 长度错位。</p>
+ * 长度一律用 {@code #len(String)}（codePointCount），杜绝 char/char 长度错位。</p>
  */
 public final class CodePoints {
 

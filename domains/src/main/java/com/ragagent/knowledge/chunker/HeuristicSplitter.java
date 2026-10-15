@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.ragagent.common.knowledge.chunker.CodePoints;
+import com.ragagent.contract.knowledge.chunker.CodePoints;
 
 /**
  * Tier 2：启发式边界切分。

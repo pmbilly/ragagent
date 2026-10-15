@@ -22,7 +22,7 @@ import com.ragagent.contract.storage.support.ResourceModeException;
 import com.ragagent.common.storage.support.StreamRewriter;
 import static com.ragagent.session.service.QaSupport.KnowledgeTargets;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.common.session.domain.message.MessageExecutionContext;
+import com.ragagent.contract.session.MessageExecutionContext;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.common.storage.support.Mode;

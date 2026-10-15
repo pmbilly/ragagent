@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.common.knowledge.KnowledgeBaseLookup;
+import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;

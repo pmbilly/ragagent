@@ -78,7 +78,7 @@ import com.ragagent.contract.session.MentionedItem;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageArtifact;
 import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.common.session.domain.message.MessageExecutionContext;
+import com.ragagent.contract.session.MessageExecutionContext;
 import com.ragagent.contract.session.MessageImage;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.contract.session.SessionLastRequestState;

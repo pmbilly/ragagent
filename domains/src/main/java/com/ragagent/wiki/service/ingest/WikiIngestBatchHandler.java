@@ -11,7 +11,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.common.knowledge.KnowledgeBaseLookup;
+import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import com.ragagent.contract.knowledge.KnowledgeView;

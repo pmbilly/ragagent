@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.ragagent.common.knowledge.KnowledgeBaseLookup;
+import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.wiki.domain.WikiCategoryPaths;
 import com.ragagent.contract.wiki.WikiConstants;

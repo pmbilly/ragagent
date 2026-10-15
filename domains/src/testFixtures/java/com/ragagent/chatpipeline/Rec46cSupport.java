@@ -1,8 +1,8 @@
 package com.ragagent.chatpipeline;
 
-import com.ragagent.common.knowledge.support.KnowledgeProjectionAdapter;
+import com.ragagent.contract.knowledge.support.KnowledgeProjectionAdapter;
 
-import com.ragagent.common.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;

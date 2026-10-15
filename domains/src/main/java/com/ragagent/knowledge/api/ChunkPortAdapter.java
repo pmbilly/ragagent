@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.knowledge.support.ChunkRowViews;
@@ -18,8 +18,8 @@ import com.ragagent.knowledge.support.ChunkRowViews;
  * {@link ChunkPort} 的 knowledge 侧实现。
  *
  * <p>"实体 → L1 载荷"的公用投影已抽到
- * {@link com.ragagent.common.knowledge.support.ChunkProjectionAdapter#view}
- * /{@link com.ragagent.common.knowledge.support.ChunkProjectionAdapter#viewAll}
+ * {@link com.ragagent.contract.knowledge.support.ChunkProjectionAdapter#view}
+ * /{@link com.ragagent.contract.knowledge.support.ChunkProjectionAdapter#viewAll}
  * （原先作为静态助手挂在本类，令 `repository` 反向依赖 `service` ⇒ 现落环外 `support/`）。
  *
  * <p>四个方法的过滤条件/降级姿态与迁移前的 wiki 侧实现<b>逐字一致</b>：

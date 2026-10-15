@@ -20,7 +20,7 @@ import com.ragagent.common.agent.domain.AgentStep;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.session.domain.message.MessageExecutionContext;
+import com.ragagent.contract.session.MessageExecutionContext;
 import com.ragagent.contract.session.MessageArtifact;
 import com.ragagent.contract.session.MessageImage;
 import com.ragagent.contract.session.MessageAttachment;

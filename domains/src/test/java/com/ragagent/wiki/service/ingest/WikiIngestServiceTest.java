@@ -38,7 +38,7 @@ import com.ragagent.wiki.service.WikiLlmCallMetadata;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.wiki.service.page.WikiTextUtils;
-import com.ragagent.common.knowledge.KnowledgeBaseLookup;
+import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 
 /**
  * {@link WikiIngestService} 核心行为的测试（prompt 脱敏 / 消息布局缓存 /

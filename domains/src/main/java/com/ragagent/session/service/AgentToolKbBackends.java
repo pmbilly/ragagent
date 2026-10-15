@@ -1,6 +1,6 @@
 package com.ragagent.session.service;
 
-import com.ragagent.common.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
 
 import com.ragagent.retrieval.support.GrepChunkView;
 import java.util.ArrayList;

@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
-import com.ragagent.common.knowledge.chunker.CodePoints;
-import com.ragagent.common.knowledge.chunker.Tokens;
+import com.ragagent.contract.knowledge.chunker.CodePoints;
+import com.ragagent.contract.knowledge.chunker.Tokens;
 
 /**
  * 文档画像与策略选择。

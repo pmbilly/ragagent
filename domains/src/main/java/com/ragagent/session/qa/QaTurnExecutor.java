@@ -29,7 +29,7 @@ import com.ragagent.platform.stream.StreamManager;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.common.session.domain.message.MessageExecutionContext;
+import com.ragagent.contract.session.MessageExecutionContext;
 import com.ragagent.session.service.SessionLookupScope;
 import com.ragagent.session.service.SteerRunCoordinator;
 

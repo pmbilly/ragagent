@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.contract.knowledge.DocumentChunkingPort;
-import com.ragagent.common.knowledge.chunker.Tokens;
+import com.ragagent.contract.knowledge.chunker.Tokens;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.contract.knowledge.support.ParserEngineRules;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;

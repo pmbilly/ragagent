@@ -1,6 +1,6 @@
 package com.ragagent.auth.apikey.service;
 
-import com.ragagent.common.knowledge.KnowledgeBaseLookup;
+import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 
 import java.util.List;
 

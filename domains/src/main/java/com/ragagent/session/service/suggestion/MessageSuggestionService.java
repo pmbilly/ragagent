@@ -23,7 +23,7 @@ import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.session.domain.message.Message;
-import com.ragagent.common.session.domain.message.MessageExecutionContext;
+import com.ragagent.contract.session.MessageExecutionContext;
 import com.ragagent.session.domain.message.MessageSuggestionEvent;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.session.domain.conversation.SessionOwnerIds;

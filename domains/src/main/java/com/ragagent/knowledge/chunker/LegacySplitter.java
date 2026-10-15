@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.function.IntPredicate;
-import com.ragagent.common.knowledge.chunker.CodePoints;
+import com.ragagent.contract.knowledge.chunker.CodePoints;
 
 /**
  * Tier 3 legacy（递归字符）切分器。

@@ -1,11 +1,9 @@
-package com.ragagent.common.session.domain.message;
+package com.ragagent.contract.session;
 
-import com.ragagent.contract.session.SuggestionAttribution;
 
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * 单条消息级的**非机密**请求状态快照。
@@ -31,7 +29,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * <p><b>读路径必须宽容</b>（{@code ignoreUnknown=true}）：历史行里可能有已删键，
  * 且换锚前写的是下划线键——**旧键会被静默吞成空值**，存量行必须跑迁移。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageExecutionContext {
 
     private String agentConfigHash;

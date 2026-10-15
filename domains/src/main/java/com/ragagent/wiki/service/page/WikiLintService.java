@@ -9,7 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import com.ragagent.common.knowledge.KnowledgeBaseLookup;
+import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiException;

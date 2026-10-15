@@ -7,7 +7,7 @@ import com.ragagent.knowledge.domain.KnowledgeTenants;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
-import com.ragagent.common.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

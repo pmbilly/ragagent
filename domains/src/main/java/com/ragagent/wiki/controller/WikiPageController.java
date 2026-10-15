@@ -2,7 +2,7 @@ package com.ragagent.wiki.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.knowledge.KnowledgeBaseLookup;
+import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.audit.WikiActivityAudit;
 import com.ragagent.wiki.service.page.WikiLintService;
 import com.ragagent.wiki.service.page.WikiPageService;

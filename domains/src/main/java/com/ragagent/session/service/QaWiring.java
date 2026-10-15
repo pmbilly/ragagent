@@ -1,6 +1,6 @@
 package com.ragagent.session.service;
 
-import com.ragagent.common.knowledge.support.KnowledgeProjectionAdapter;
+import com.ragagent.contract.knowledge.support.KnowledgeProjectionAdapter;
 
 
 import com.ragagent.platform.web.JsonMappers;

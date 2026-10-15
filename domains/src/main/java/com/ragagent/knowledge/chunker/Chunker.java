@@ -2,8 +2,8 @@ package com.ragagent.knowledge.chunker;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.common.knowledge.chunker.CodePoints;
-import com.ragagent.common.knowledge.chunker.Tokens;
+import com.ragagent.contract.knowledge.chunker.CodePoints;
+import com.ragagent.contract.knowledge.chunker.Tokens;
 
 /**
  * 自适应分块入口。

@@ -21,7 +21,7 @@ import com.ragagent.knowledge.chunker.DocumentProfiler;
 import com.ragagent.knowledge.chunker.ParsedChunk;
 import com.ragagent.knowledge.chunker.SplitterConfig;
 import com.ragagent.knowledge.chunker.TextNormalizer;
-import com.ragagent.common.knowledge.chunker.Tokens;
+import com.ragagent.contract.knowledge.chunker.Tokens;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

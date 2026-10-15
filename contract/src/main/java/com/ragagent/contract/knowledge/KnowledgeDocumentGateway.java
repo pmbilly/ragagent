@@ -1,8 +1,7 @@
-package com.ragagent.common.knowledge;
+package com.ragagent.contract.knowledge;
 
 
 import java.util.List;
-import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 
 /**
  * 文档（knowledge 行）的**只读端口**（检索结果装配取文档元数据的最小接口）。

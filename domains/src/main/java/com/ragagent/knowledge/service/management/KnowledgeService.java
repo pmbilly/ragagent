@@ -15,7 +15,7 @@ import com.ragagent.knowledge.support.KnowledgePaths;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
 
-import com.ragagent.common.knowledge.support.KnowledgeProjectionAdapter;
+import com.ragagent.contract.knowledge.support.KnowledgeProjectionAdapter;
 
 import com.ragagent.knowledge.domain.access.KnowledgeReadPort;
 
@@ -35,7 +35,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.common.knowledge.KnowledgeDocumentGateway;
+import com.ragagent.contract.knowledge.KnowledgeDocumentGateway;
 import com.ragagent.platform.security.InputSanitizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
