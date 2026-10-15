@@ -16,7 +16,7 @@ import java.util.List;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
 import com.ragagent.knowledge.dto.faq.FaqSuccessEntry;
@@ -28,6 +28,7 @@ import com.ragagent.knowledge.storage.TenantFileStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FaqImportService 的批量导入簇：分批写入+进度回报、CSV 生成、结果落库与消息组装。
@@ -260,7 +261,7 @@ final class FaqBatchOps {
                 progress.failedEntriesUrl() == null || progress.failedEntriesUrl().isEmpty()
                         ? null : progress.failedEntriesUrl(),
                 "open", processingTime);
-        knowledge.setLastFaqImportResult(FaqChunkMetadata.JSON.valueToTree(result));
+        knowledge.setLastFaqImportResult(FaqChunkMetadataCodec.JSON.valueToTree(result));
         knowledge.setUpdatedAt(OffsetDateTime.now());
         knowledgeRepository.updateById(knowledge);
         log.info("Saved FAQ import result to database: knowledge_id={}, task={}, total={}, success={}, failed={}",

@@ -5,7 +5,7 @@ import com.ragagent.contract.text.TextConv;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
-import com.ragagent.common.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
 
 /**
  * 繁转简转换器 + FAQ 归一化纯函数的语料测试。期望值全部钉死在常量里

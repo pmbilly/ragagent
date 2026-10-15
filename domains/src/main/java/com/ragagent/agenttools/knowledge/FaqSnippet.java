@@ -6,8 +6,9 @@ import java.util.Set;
 import java.util.StringJoiner;
 
 import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.common.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FAQ 元数据在工具输出中的投影。
@@ -406,7 +407,7 @@ public final class FaqSnippet {
             if (node == null || node.isNull() || node.isMissingNode() || node.isEmpty()) {
                 return null;
             }
-            FaqChunkMetadata meta = FaqChunkMetadata.fromJson(node);
+            FaqChunkMetadata meta = FaqChunkMetadataCodec.fromJson(node);
             if (meta != null) {
                 meta.sanitize();
             }

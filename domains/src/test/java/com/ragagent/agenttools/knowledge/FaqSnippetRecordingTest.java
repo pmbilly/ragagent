@@ -10,9 +10,10 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.common.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.agenttools.GoRecording45A;
 import com.ragagent.agenttools.RecordingSupport;
+import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FaqSnippet 的录制语料（10 条）。XML 投影逐字节比对（含相似问截断的 omitted 标记）。
@@ -113,7 +114,7 @@ class FaqSnippetRecordingTest {
         meta.similarQuestions = List.of("怎么创建知识库？");
         meta.answers = List.of("在控制台点击新建知识库。");
         return new ChunkFacts("faq-chunk-1", "kb-doc-1", "", "Q: test\nSimilar Questions:\n- alt",
-                "faq", "", true, 0, 0, 0, 0, null, null, null, null, meta.toJsonNode(), null);
+                "faq", "", true, 0, 0, 0, 0, null, null, null, null, FaqChunkMetadataCodec.toJsonNode(meta), null);
     }
 
     private static String field(String name) {

@@ -3,10 +3,11 @@ package com.ragagent.knowledge.service.faq;
 import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FAQ 索引行组装。2026-09-22 走查批接线：此前的
@@ -27,7 +28,7 @@ final class FaqIndexRows {
         String indexMode = faqIndexMode(kb);
         String questionIndexMode = faqQuestionIndexMode(kb);
 
-        FaqChunkMetadata meta = FaqChunkMetadata.fromJson(chunk.getMetadata());
+        FaqChunkMetadata meta = FaqChunkMetadataCodec.fromJson(chunk.getMetadata());
         if (meta != null) {
             meta.sanitize();
         }

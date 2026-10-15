@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.faq.FaqFailedEntry;
@@ -37,6 +36,7 @@ import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsUpdate;
 import com.fasterxml.jackson.core.JacksonException;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FAQ 条目批量导入（upsert）与进度面：append/replace 两种模式的 dry-run 校验、
@@ -505,7 +505,7 @@ public class FaqImportService {
                 result.failedCount(), result.partialFailedCount(), result.skippedCount(),
                 result.mergedCount(), result.addedCount(), result.importMode(), result.importedAt(),
                 result.taskId(), result.failedEntriesUrl(), displayStatus, result.processingTime());
-        faqKnowledge.setLastFaqImportResult(FaqChunkMetadata.JSON.valueToTree(updated));
+        faqKnowledge.setLastFaqImportResult(FaqChunkMetadataCodec.JSON.valueToTree(updated));
         knowledgeRepository.updateById(faqKnowledge);
     }
     private void validateFAQImportTags(KnowledgeBase kb, List<FaqEntryPayload> entries) {
@@ -539,7 +539,7 @@ public class FaqImportService {
             return null;
         }
         try {
-            return FaqChunkMetadata.JSON.treeToValue(node, FaqImportResult.class);
+            return FaqChunkMetadataCodec.JSON.treeToValue(node, FaqImportResult.class);
         } catch (JacksonException e) {
             return null;
         }

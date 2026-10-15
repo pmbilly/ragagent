@@ -1,16 +1,10 @@
-package com.ragagent.common.knowledge;
+package com.ragagent.contract.knowledge;
 
-import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.contract.text.TextConv;
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -22,7 +16,7 @@ import java.util.Locale;
  *
  * <p>所有字段一律输出（空列表、0、空串照常输出，不再省略）。
  *
- * <p>{@link #sanitize()} / {@link #normalize()} 刻意不带 get/is 前缀，避免被 Jackson
+ * <p>{@code #sanitize()} / {@code #normalize()} 刻意不带 get/is 前缀，避免被 Jackson
  * 当作属性写进 jsonb（历史上在此两次踩到 {@code UnrecognizedPropertyException}）。
  */
 public class FaqChunkMetadata {
@@ -33,24 +27,6 @@ public class FaqChunkMetadata {
     /**
      * 本仓约定 第 6 条——历史行/新增字段不能让整行读不出来）。
      */
-    public static final ObjectMapper JSON =
-            JsonMappers.lenient();
-    /** 从 chunks.metadata 的 JsonNode 解析；null/空 → null。 */
-    public static FaqChunkMetadata fromJson(JsonNode node) {
-        if (node == null || node.isNull() || node.isMissingNode() || node.isEmpty()) {
-            return null;
-        }
-        try {
-            return JSON.treeToValue(node, FaqChunkMetadata.class);
-        } catch (JacksonException e) {
-            return null;
-        }
-    }
-
-    public ObjectNode toJsonNode() {
-        return JSON.valueToTree(this);
-    }
-
     public String standardQuestion = "";
 
     public List<String> similarQuestions;
@@ -257,7 +233,6 @@ public class FaqChunkMetadata {
     /**
      * 空白集与 Java 默认差 U+0085/U+00A0 两项；与 ChunkRepository.trimSpace 同一套表。
      */
-    @JsonIgnore
     public static String trimSpace(String s) {
         if (s == null) {
             return "";

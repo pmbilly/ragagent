@@ -3,10 +3,11 @@ package com.ragagent.knowledge.service.faq;
 import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.faq.FaqEntry;
 import org.springframework.stereotype.Component;
+import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FAQ 条目与 chunk 行之间的双向编解码：metadata JSON 的解析与写回（含 content_hash
@@ -21,7 +22,7 @@ public class FaqChunkCodec {
      * 语义处理，不抛错）。
      */
     public FaqChunkMetadata sanitizedFaqMetadata(Chunk chunk) {
-        FaqChunkMetadata meta = FaqChunkMetadata.fromJson(chunk.getMetadata());
+        FaqChunkMetadata meta = FaqChunkMetadataCodec.fromJson(chunk.getMetadata());
         if (meta != null) {
             meta.sanitize();
         }
@@ -42,7 +43,7 @@ public class FaqChunkCodec {
      */
     public void setFaqMetadata(Chunk chunk, FaqChunkMetadata meta) {
         meta.sanitize();
-        chunk.setMetadata(meta.toJsonNode());
+        chunk.setMetadata(FaqChunkMetadataCodec.toJsonNode(meta));
         chunk.setContentHash(FaqChunkMetadata.calculateContentHash(meta.normalize()));
     }
 

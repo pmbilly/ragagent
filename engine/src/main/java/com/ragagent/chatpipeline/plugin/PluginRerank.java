@@ -22,7 +22,7 @@ import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.common.knowledge.DocumentChunkMetadata;
+import com.ragagent.contract.knowledge.DocumentChunkMetadata;
 import com.ragagent.contract.knowledge.GeneratedQuestion;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.web.JsonMappers;

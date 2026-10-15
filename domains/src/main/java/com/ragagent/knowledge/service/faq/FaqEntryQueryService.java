@@ -12,7 +12,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
@@ -33,6 +33,7 @@ import com.ragagent.knowledge.dto.faq.FaqSearchRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.nio.charset.StandardCharsets;
 import com.ragagent.knowledge.domain.ChunkPage;
+import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FAQ 条目查询面：分页列表、详情、导出（CSV/JSON）与混合检索。
@@ -264,7 +265,7 @@ public class FaqEntryQueryService {
                     (chunk.getFlags() & 1) != 0));
         }
         try {
-            return FaqChunkMetadata.JSON.writeValueAsBytes(entries);
+            return FaqChunkMetadataCodec.JSON.writeValueAsBytes(entries);
         } catch (JsonProcessingException e) {
             throw new IllegalStateException(e);
         }

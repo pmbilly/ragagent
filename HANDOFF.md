@@ -1525,8 +1525,8 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 账 | 读数 | 状态 |
 |---|---|---|
-| `:contract` | **216 件** | ✅ 已独立（零依赖） |
-| `common/*` | **67 件**（125 → … → 77 → 72 → 67；G1-i 再 −5） | 收敛中 |
+| `:contract` | **218 件** | ✅ 已独立（零依赖） |
+| `common/*` | **66 件**（125 → … → 72 → 67 → 66；G1-j 净 −1＝迁出 2 件、新增 1 件 L1 codec） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
 | **C1 受控导入根** | 10 根 / **57 文件** | 冻结只许减 |
@@ -1792,6 +1792,18 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 G1-j·de-Jackson 批首刀：知识元数据 2 件形状入契约（JSON 侧留 L1 codec）+ 4 件登记（2026-10-15）**
+- **先测（8 件一次测清"`JsonNode` 用面 + 注解 + 消费规模 + platform import"）** ⇒ 结果比预期保守：**真正可迁只有 2 件**，其余 6 件各有硬阻塞
+- **实迁 2 件** → `contract.knowledge`：
+  1. **`DocumentChunkMetadata`**：本仓**零 `JsonNode`**（仅 2 个 `@JsonIgnore`）⇒ 而其中一个的注解**本来就冗余**（**带参方法不是 getter**——Jackson 只识别无参访问器）⇒ 直接去注解入契约 ✓
+  2. **`FaqChunkMetadata`（286 行）**：拆成"形状面 + 映射面"——① 形状（8 字段 + 22 个**纯 JDK** 工具方法）→ `contract.knowledge` ② **JSON 三成员**（`JSON` 常量 · `fromJson` · `toJsonNode`）→ 新建 **L1 `FaqChunkMetadataCodec`**（调用方 11 处：knowledge / agenttools / chatpipeline 均可达 L1 ✓；实例方法 `toJsonNode()` 改静态收参 ✓）
+- **登记 6 件（附依据）**：`AgentTool`/`BaseTool`/`ToolRequest`（**工具面 JsonNode 载重** + 消费量高：agenttools 37 / 22 ⇒ 需专门批次，含工具族改造）· `AgentLookup`（**接口 API 即带 `ObjectNode`/`ArrayNode`**；其自身 javadoc 已写明路径："待 JsonNode 载体 K 级重设计时再上提" ✓）· `ParserEngineRules`（**共享逻辑件而非载荷** ⇒ 按 `Tokens`/`CodePoints` 先例留 L1 ✓）· `SystemSettingRegistry`（引用 platform `ToolJson` + 内含 JSON 逻辑 ⇒ platform 面）
+- **⚠️ 两次脚本摩擦（判据）**：
+  1. **f-string 花括号坑第 3 次**（javadoc 里的 `{@link}` 未转义）⇒ **判据：生成的 Java 代码一律用非 f-string 拼接**（本刀重写为拼接版 ✓）
+  2. **"改了变量却重新读文件写回"** ⇒ 首轮改动丢失 ✗ ⇒ **判据：改写型脚本必须"先取内容、后写回同一变量"**；重跑时**按当前落点幂等处理**（本刀改为幂等版 ✓）
+- **读数**：`:contract` 216 → **218**（+2）；`common/*` 67 → **66**（迁出 2 + 新增 1 codec ⇒ 净 −1）；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**；**1349 金片签名一致**（`chunks.metadata`/FAQ 落库 JSON 未变 ✓）；`spotlessCheck build` **2m19s**；**4992 / 失败 0 / 跳过 4**；`scripts/fix-javadoc-links.py` 本刀补 **2 处** ✓；冒烟（sessions / KB / system-info **200** ✓ · **`POST /api/v1/chunker/preview` 200 真实分块输出** ✓）
+- **余量（本刀已把 8 件全部定性）**：工具面 3 件（需专门批次）· `AgentLookup`（K 级 JsonNode 载体设计）· `SystemSettingRegistry`（platform `ToolJson`）· `ParserEngineRules`（共享逻辑件 ⇒ 留 L1）⇒ **"去 Jackson 可迁件"至此清零**，余者均需**设计决策或专门批次**
 **🔶 G1-i·session 值类型 5 件入 `contract.session`（19 件余量一次测清注解面）（2026-10-15）**
 - **触发**：队列余件（承上一刀判据：**跨域消费不是阻塞**（L1→契约合法 ✓），**真正的阻塞只有 Jackson 注解语义**）
 - **一次测清 19 件余量的注解面** ⇒ 分类出"可迁（无载重注解）/ 必留（`@JsonInclude`·`@JsonProperty`·平台序列化器）"

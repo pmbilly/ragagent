@@ -14,7 +14,7 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.MatchTypes;
 import com.ragagent.chatpipeline.support.SearchSupport;
 import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.common.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
@@ -24,6 +24,7 @@ import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.retrieval.domain.ImageInfo;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
 
 /**
  * CHUNK_MERGE 阶段插件。
@@ -352,7 +353,7 @@ public final class PluginMerge implements Plugin {
             return null;
         }
         try {
-            return FaqChunkMetadata.fromJson(meta);
+            return FaqChunkMetadataCodec.fromJson(meta);
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("chunk_id", chunk.id());

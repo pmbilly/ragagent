@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import org.springframework.stereotype.Component;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.knowledge.mapper.ChunkMapper;
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import javax.sql.DataSource;
+import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FAQ 条目的 chunk 仓储面（FAQ 条目 = chunk_type=faq 的行）：按 seq_id/知识/KB 的
@@ -229,7 +230,7 @@ public class FaqChunkRepository {
         if (node == null || node.isNull() || node.isMissingNode() || node.isEmpty()) {
             return null;
         }
-        return FaqChunkMetadata.fromJson(node);
+        return FaqChunkMetadataCodec.fromJson(node);
     }
 
     /** 位运算表达式的方言切换：PG 用 | &~，H2 2.x 无位运算符 → BITOR/BITAND/BITNOT（语义等价）。 */

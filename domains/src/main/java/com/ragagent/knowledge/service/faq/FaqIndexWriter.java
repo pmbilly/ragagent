@@ -18,7 +18,7 @@ import com.ragagent.embedding.Embedder;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
-import com.ragagent.common.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.contract.tenant.TenantStorageQuotaPort;
 import com.ragagent.retrieval.engine.VectorStoreService;

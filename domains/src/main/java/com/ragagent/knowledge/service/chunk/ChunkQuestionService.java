@@ -21,7 +21,7 @@ import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.platform.prompt.PromptInstructions;
 import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.DocumentChunkMetadata;
+import com.ragagent.contract.knowledge.DocumentChunkMetadata;
 import com.ragagent.contract.knowledge.GeneratedQuestion;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
