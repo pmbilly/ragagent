@@ -208,6 +208,7 @@ contract  → JDK                                  （纯 JDK：公开 API / SPI
 | **G1** | `:common` 内**载荷型文件清零或全登记**（`*View`/`*Facts`/`*Payload`/`*Response`/`*Port`）——载荷应落 `:contract`、持久化实体回域。**进度 2026-10-15**：门禁口径（C4 载荷型）**待归位 14 件** + 登记 7 件（4 platform 面 + 3 待去 Jackson）；**契约料归位批 A/B 已完成**：`storage` 9 + `knowledge` 10 = **19 件入 `:contract`**（清单与两道搬前判据见下方「契约料盘点」） | 新增门禁 **C4**（`check-contracts-purity.py`，只许减）+ C1/C2 |
 | **G1-b（立项）** | **「去 Jackson」专项**：`ChunkFacts`/`KnowledgeBaseView`/`KnowledgeDocumentFacts` 的 `JsonNode` 字段（触达 7/1/2 处消费）+ B258 登记的 `AppError` ⇒ 改造口径二选一：**(a)** `JsonNode` → JDK `Map<String,Object>`（线格式基本等价，需金片复核 `NullNode`/空值语义）；**(b)** 载荷只带**消费者实际用度的键**（收窄成纯 JDK record，线格式**会变** ⇒ 需前端确认）。**改造完成即整批入 `:contract`** | C4 的 `PENDING_DEJACKSON` 登记 |
 | **G1-c（登记）** | 4 件**框架味**（`ApiKeyAuthPort` servlet · `KnowledgeCatalogPort` MyBatis-Plus Page · `EmbedSessionPort` servlet+ResponseEntity · `FileProxyPort` servlet）⇒ **永远进不了零依赖 `:contract`**，归未来 `platform` 模块 | C4 的 `PLATFORM_FACE` 登记 |
+| **G1-h（登记·D0b）** | `contract/knowledge/domain/{KnowledgeBaseAsrConfig, KnowledgeBaseStorageConfig, KnowledgeBaseStorageProviderConfig}`：**被 L1 实体 `KnowledgeBase` 的 `@TableField` 引用**（字段类型＝持久化形状；另有 `AsrConfigView`(L1) 与 `initialization` 各 1 处在用）⇒ **不能单独回域**，**随 `KnowledgeBase` 收窄批次一并回归 `knowledge/domain`**（方案 §8.8.2 原文落点） | 本表登记 |
 | **G1-g（登记·D0a）** | `contract/knowledge/service/DuplicateKnowledgeDetails`：与 **L1 异常** `common.knowledge.service.DuplicateKnowledgeException` 耦合（异常把 details 放进 `AppError.withDetails(...)`；异常被 datasource/im/chatpipeline 多域引用）⇒ **留 contract 有据**，随「异常面整体收窄」批次一并处理（方案 §8.9 把 details 列在 `knowledge/dto.kb/`，届时应连异常一起归位） | 本表登记 |
 | **G1-f（登记）** | `common/knowledge/DocumentChunkMetadata`（Jackson `@JsonIgnore`）· `common/knowledge/FaqChunkMetadata`（Jackson + **platform 的 `JsonMappers`**）⇒ 前者归「待去 Jackson」、后者归「platform 面 + 待去 Jackson」；二者均在方案 §8.1 的 `contract.knowledge/` 名单内（**未搬有据**） | 本表登记 |
 | **G1-e（登记）** | `common/retrieval/SearchResult`（**不带 C4 后缀**故未入 C4 计数，但实为载荷）：引 Jackson 注解 + `JsonNode` + **platform 的 `SortedMapSerializer`** ⇒ **既非纯 JDK 也非域内容** ⇒ 归 platform 面／待去 Jackson；**引用面 66 处**（影响面大，改造需单独批次）。`PipelineMessageView` 因此随它一起等 | 本表登记 |
@@ -1574,6 +1575,18 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 D0b·FAQ 两件回域 + 契约视图（`:contract` 169 → 169，误搬件 8 → 3）（2026-10-15）**
+- **对象**：`FaqEntry` · `FaqEntryPage`（方案 §8.8.2 明列在 `knowledge/dto.faq/`）
+- **动作**：
+  1. **契约新增两个视图**：`contract.knowledge.FaqEntryView`（**字段＝该端点实际消费用度 7 个**，非镜像 dto 全部字段）· `FaqEntryPageView`（items/page/pageSize/total 同形）
+  2. **端口改面**：`KnowledgeCatalogPort.listFaqEntries(...)` → 返回 `FaqEntryPageView`；适配器加**域内投影** `toFaqEntryView(域内 dto)`
+  3. **两件回域** → `knowledge/dto/faq/`（包 `com.ragagent.knowledge.dto.faq`）
+  4. **消费方**：知识域内 6 文件 import 回退；**session `AgentEngineAssembler`**（唯一跨域消费，经 L1 端口）两处局部类型换视图（**访问器名逐字一致 ⇒ 其余零改动**）
+- **读数**：`:contract` 169（−2 件 +2 视图）· `contract/knowledge` 23 件；**R10 保持 7 条边 / 52 类 / ①档 0** ✓（**未重建 session→knowledge 边**）
+- **登记（有据不搬）**：3 件 `KnowledgeBase*Config`（**被 L1 实体 `KnowledgeBase` 的 `@TableField` 引用**＝持久化形状 ⇒ 不能单独回域）⇒ 新增 **G1-h**，随 `KnowledgeBase` 收窄批次回归
+- **⚠️ 一次红态（javadoc 跨模块链接，第 6 次）**：我在 `FaqEntryView` javadoc 里写 `{@link …KnowledgeCatalogPort#listFaqEntries}`，但该端口在 **`common`** 且我写的 FQN 前缀是 `contract` ⇒ `:contract:javadoc` 红 ⇒ 改 `{@code com.ragagent.common.knowledge.KnowledgeCatalogPort#listFaqEntries}`。**教训：跨模块 javadoc 链接一律 `{@code}`，且 FQN 必须按实际模块写**（本条未机械化，仍在"靠记性"清单里）
+- **验证**：**14 守卫全绿**；全量闸门 **1m40s** / **4991 / 0 / 4**；**1349 金片签名一致**；定向 knowledge+session **267 条** ✓；dev ready + 冒烟（KB/sessions/models/datasource/types 200 ✓）
+- **D0 收口**：误搬件 8 → **3**（余 3 件＝实体耦合，已登记 G1-h）；**下一批**＝**D1**（`wiki` 4 件 · `agent/tool` 3 件 · `settings` 1 件 · `session` 1 件 + 互引 15 件同批）
 **🔶 D0a·`KnowledgeIngest` 端口落地 + 4 件内部件归位（`:contract` 172 → 169）（2026-10-15）**
 - **背景**：批 A/B 的第三道判据补上后，8 件误搬件立案；本批执行其中"有跨域调用点"的 4 件（另 4 件＝3 config + FaqEntry/FaqEntryPage 留 D0b）
 - **动作**：
@@ -2468,7 +2481,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 目标模块 | 实际 | 差距 |
 |---|---|---|
-| `contracts` | `:contract` **172 件** ✅ 已独立 | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
+| `contracts` | `:contract` **169 件** ✅ 已独立 | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
 | `platform` | `com.ragagent.platform.*` **139 件仍在 `:common`** | **未独立成模块**；包覆盖：方案 **23** vs 实际 **15** ⇒ 缺 `execution` · `outbox` · `parsing` · `storage.config` · `storage.provider` · `tracing.decorators` · `tracing.langfuse` · `transaction` · `web.error` · `web.health`；多 `redis` · `tracing` |
 | `agent-engine` · `retrieval-engine` · `model-runtime` | `:engine` **318 件 / 9 顶层包**（chatpipeline · embedding · llm · modelcontext · modelruntime · rerank · retrieval · tracing · webfetch） | 未拆分（**条件触发**项） |
 | `domains` | `:domains` **1343 件** | 域间边 **7 条**（①clearable **0** / ②owner 2 / ③族内 5）；域布局抽样见 C |
@@ -2482,7 +2495,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 | `:common` 域侧 TypeHandler | **10** | C2 |
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
 | `:common` 受控依赖根 | 10 根 / 69 文件 | C1 |
-| `:contract` **误搬件** | **8**（3 件 `KnowledgeBase*Config` + 5 件内部件）→ 见 §12.5 第三道判据 | **待加 C5/C6** |
+| `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
 | `:common` 规模 | **274 件** = `common/*` 134 + `platform/*` 139 + `event/*` 1 | — |
 
 **C. 域布局抽样（以方案 §8.8.2 `knowledge/` 为范本）**

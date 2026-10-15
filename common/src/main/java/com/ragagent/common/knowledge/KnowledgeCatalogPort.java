@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.ChunkPage;
-import com.ragagent.contract.knowledge.domain.FaqEntryPage;
+import com.ragagent.contract.knowledge.FaqEntryPageView;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.contract.knowledge.KnowledgeTagView;
@@ -83,7 +83,7 @@ public interface KnowledgeCatalogPort {
     // ── FAQ 目录读 ──
 
     /** FAQ 条目分页（过滤参数与域服务逐一同形）。 */
-    FaqEntryPage listFaqEntries(String kbId, int page, int pageSize,
+    FaqEntryPageView listFaqEntries(String kbId, int page, int pageSize,
             List<String> tagUuids, long legacyTagSeqId,
             String keyword, String searchField,
             String sortOrder, Boolean isEnabled);

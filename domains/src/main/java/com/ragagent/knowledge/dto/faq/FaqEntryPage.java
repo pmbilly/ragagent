@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge.domain;
+package com.ragagent.knowledge.dto.faq;
 
 import java.util.List;
 

@@ -3,8 +3,8 @@ package com.ragagent.session.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import com.ragagent.contract.knowledge.domain.FaqEntry;
-import com.ragagent.contract.knowledge.domain.FaqEntryPage;
+import com.ragagent.contract.knowledge.FaqEntryView;
+import com.ragagent.contract.knowledge.FaqEntryPageView;
 import com.ragagent.agent.AgentConfig;
 import com.ragagent.agent.AgentEngine;
 import com.ragagent.common.agent.tool.ToolDefinitions;
@@ -273,10 +273,10 @@ final class AgentEngineAssembler {
             // FAQ 库：条目列表；否则/失败回落通用 knowledge 列表（completed 过滤，top 10）
             if ("faq".equals(kb.getType())) {
                 try {
-                    FaqEntryPage page = knowledgeService.listFaqEntries(kbId, 1, 10, null, 0, "", "", "", null);
+                    FaqEntryPageView page = knowledgeService.listFaqEntries(kbId, 1, 10, null, 0, "", "", "", null);
                     docCount = page.total() > Integer.MAX_VALUE ? Integer.MAX_VALUE
                             : (int) page.total();
-                    List<FaqEntry> entries = page.items();
+                    List<FaqEntryView> entries = page.items();
                     if (entries != null) {
                         for (var entry : entries) {
                             if (recentDocs.size() >= 10) {

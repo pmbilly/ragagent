@@ -9,7 +9,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.ChunkPage;
-import com.ragagent.contract.knowledge.domain.FaqEntryPage;
+import com.ragagent.contract.knowledge.FaqEntryPageView;
+import com.ragagent.contract.knowledge.FaqEntryView;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
@@ -36,6 +37,8 @@ import com.ragagent.platform.web.JsonMappers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.knowledge.KnowledgeTagView;
+import com.ragagent.knowledge.dto.faq.FaqEntry;
+import com.ragagent.knowledge.dto.faq.FaqEntryPage;
 
 /**
  * {@link KnowledgeCatalogPort} 的知识域实现：读写逐字转发两个门面服务，
@@ -159,11 +162,26 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     }
 
     @Override
-    public FaqEntryPage listFaqEntries(String kbId, int page, int pageSize,
+    public FaqEntryPageView listFaqEntries(String kbId, int page, int pageSize,
             List<String> tagUuids, long legacyTagSeqId,
             String keyword, String searchField, String sortOrder, Boolean isEnabled) {
-        return faqEntryQueryService.listEntries(kbId, page, pageSize, tagUuids,
+        FaqEntryPage domain = faqEntryQueryService.listEntries(kbId, page, pageSize, tagUuids,
                 legacyTagSeqId, keyword, searchField, sortOrder, isEnabled);
+        if (domain == null) {
+            return null;
+        }
+        List<FaqEntryView> items = domain.items() == null ? null
+                : domain.items().stream().map(KnowledgeCatalogAdapter::toFaqEntryView).toList();
+        return new FaqEntryPageView(items, domain.page(), domain.pageSize(), domain.total());
+    }
+
+    /** 域内 FAQ 条目 dto → 契约视图（字段＝契约面实际用度；null 透传）。 */
+    static FaqEntryView toFaqEntryView(FaqEntry e) {
+        if (e == null) {
+            return null;
+        }
+        return new FaqEntryView(e.chunkId(), e.knowledgeBaseId(), e.knowledgeId(),
+                e.standardQuestion(), e.similarQuestions(), e.answers(), e.createdAt());
     }
 
     @Override
