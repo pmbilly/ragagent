@@ -1,6 +1,7 @@
 package com.ragagent.contract.knowledge;
 
-import java.util.Map;
+import com.ragagent.contract.json.JsonValues;
+
 
 /**
  * 契约面**纯 JDK** JSON 值读取助手（视图派生访问器用）。
@@ -22,21 +23,7 @@ public final class JsonValueSupport {
 
     /** 等价 {@code JsonNode#path(key).asBoolean(def)}（null 安全）。 */
     public static boolean boolAt(Object value, String key, boolean def) {
-        if (!(value instanceof Map<?, ?> map)) {
-            return def;
-        }
-        Object v = map.get(key);
-        if (v instanceof Boolean b) {
-            return b;
-        }
-        if (v instanceof String s) {
-            if ("true".equalsIgnoreCase(s)) {
-                return true;
-            }
-            if ("false".equalsIgnoreCase(s)) {
-                return false;
-            }
-        }
-        return def;
+        // 单一实现：契约侧通用读取门面（G1-k）
+        return JsonValues.boolAt(value, key, def);
     }
 }

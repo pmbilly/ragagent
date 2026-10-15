@@ -2,7 +2,6 @@ package com.ragagent.common.knowledge.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
@@ -14,9 +13,10 @@ class ParserEngineRulesTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private static JsonNode rules(String json) {
+    /** G1-k：resolve 已改纯 JDK 读面 ⇒ 夹具同步归一（顺带覆盖新读面）。 */
+    private static Object rules(String json) {
         try {
-            return MAPPER.readTree(json);
+            return com.ragagent.platform.web.JsonMappers.toJavaValue(MAPPER.readTree(json));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -40,7 +40,7 @@ class ParserEngineRulesTest {
 
     @Test
     void firstMatchingRuleWinsWithTrimmedEngine() {
-        JsonNode rules = rules("""
+        Object rules = rules("""
                 [{"file_types":[".PDF","docx"],"engine":" mineru "},
                  {"file_types":["pdf"],"engine":"paddleocr_vl"}]""");
         assertThat(ParserEngineRules.resolve(rules, "pdf")).isEqualTo("mineru");
@@ -50,7 +50,7 @@ class ParserEngineRulesTest {
 
     @Test
     void noHitFallsBackToDefaultEngine() {
-        JsonNode rules = rules("[{\"fileTypes\":[\"pdf\"],\"engine\":\"mineru\"}]");
+        Object rules = rules("[{\"fileTypes\":[\"pdf\"],\"engine\":\"mineru\"}]");
         assertThat(ParserEngineRules.resolve(rules, "ppt")).isEqualTo("markitdown");
         assertThat(ParserEngineRules.resolve(rules, "txt")).isEmpty();
     }

@@ -1,7 +1,7 @@
 package com.ragagent.common.knowledge.support;
 
 import java.util.Locale;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.json.JsonValues;
 
 /**
  * chat 解析引擎的规则解析。
@@ -26,21 +26,27 @@ public final class ParserEngineRules {
         return "ppt".equals(ft) || "pptx".equals(ft) ? "markitdown" : "";
     }
 
-    /** 规则数组形态（agent config 的 chat_parser_engine_rules）。 */
-    public static String resolve(JsonNode rules, String fileType) {
-        if (rules != null && rules.isArray()) {
+    /**
+     * 规则数组形态（agent config 的 chat_parser_engine_rules）。
+     *
+     * <p><b>G1-k</b>：入参由 {@code JsonNode} 改为**纯 JDK 值**（对象→Map、数组→List），
+     * 读面走契约侧 {@link JsonValues}（语义与 {@code JsonNode} 逐条对齐，见其类注释）；
+     * 调用方传 JsonNode 时先经 {@code JsonMappers#toJavaValue} 归一。</p>
+     */
+    public static String resolve(Object rules, String fileType) {
+        if (JsonValues.isArray(rules)) {
             String normalized = normalize(fileType);
-            for (JsonNode rule : rules) {
-                if (rule == null || !rule.isObject()) {
+            for (Object rule : JsonValues.elements(rules)) {
+                if (!JsonValues.isObject(rule)) {
                     continue;
                 }
-                String engine = trimSpace(rule.path("engine").asText(""));
-                JsonNode fileTypes = rule.get("file_types");
-                if (fileTypes == null || !fileTypes.isArray()) {
+                String engine = trimSpace(JsonValues.asText(JsonValues.get(rule, "engine"), ""));
+                Object fileTypes = JsonValues.get(rule, "file_types");
+                if (!JsonValues.isArray(fileTypes)) {
                     continue;
                 }
-                for (JsonNode candidate : fileTypes) {
-                    if (normalize(candidate.asText("")).equals(normalized)) {
+                for (Object candidate : JsonValues.elements(fileTypes)) {
+                    if (normalize(JsonValues.asText(candidate, "")).equals(normalized)) {
                         return engine;
                     }
                 }

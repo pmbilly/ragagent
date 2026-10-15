@@ -1525,7 +1525,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 账 | 读数 | 状态 |
 |---|---|---|
-| `:contract` | **218 件** | ✅ 已独立（零依赖） |
+| `:contract` | **219 件** | ✅ 已独立（零依赖） |
 | `common/*` | **66 件**（125 → … → 72 → 67 → 66；G1-j 净 −1＝迁出 2 件、新增 1 件 L1 codec） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
@@ -1534,7 +1534,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 | 域侧 handler | **0 件** ✅（TypeHandler 全部回域；最后一作 `WikiStringListTypeHandler` 随 wiki 收尾回域） | — |
 | build 依赖 | 12 | 冻结 |
 | **R10** | **6 条边 / 51 类**（①clearable **0** · ②owner 1〔`auth→tenant` 属主边〕· ③intra-family 5） | ✅ ①档达标 |
-| 测试 | **4992 / 失败 0 / 跳过 4**（+1＝405 回归测试）；金片 **1349 签名一致** | — |
+| 测试 | **4996 / 失败 0 / 跳过 4**；金片 **1349 签名一致** | — |
 
 **B. `common/*` 97 件处置表（6 组，全部有明确归属）**
 
@@ -1792,6 +1792,19 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 G1-k·契约侧纯 JDK JSON 读面 `JsonValues` + `ParserEngineRules` 试点（"被读取面"的整体解锁路径）（2026-10-15）**
+- **触发**：工具面批次 ⇒ 先做**"内容读取 vs 透传"审计** ⇒ **审计改变了策略**：
+  - 工具面三件（`AgentTool`/`BaseTool`/`ToolRequest`）的 `JsonNode` **全是被读取**（测试里就有 18 / 58 处内容读取 ✗）⇒ 硬改 `Object` 需 **60+ 处包裹** ✗ **不是好刀**
+  - ⇒ **正解＝先建契约侧纯 JDK JSON 读取门面**（K 级件），再逐面迁移 ✓
+- **交付 1｜`contract.json.JsonValues`**：纯 JDK 读面（`asText`/`asInt`/`asLong`/`asDouble`/`asBoolean` · `isNull`/`isObject`/`isArray`/`size` · `get`/`elements`/`fields` · `boolAt`），**语义与 `JsonNode` 读面逐条对齐并写进类注释**（缺键 → 默认值；`Number` → 值；`String` 宽松解析；`asBoolean` 忽略大小写）；`contract.knowledge.JsonValueSupport.boolAt` 改为**委托它**（单一实现）
+- **交付 2｜试点 `ParserEngineRules.resolve(Object, String)`**（3 个 JsonNode 参数中唯一读面 ✓：`isArray`/`isObject`/`path`/`get`/`asText` → `JsonValues`）+ **3 个调用点归一**（控制器 `JsonMappers.toJavaValue(...)` ✓ · 处理器 ✓ · **测试夹具改纯 JDK 值**（顺带覆盖新读面 ✓））
+- ⚠️ **一个编译期陷阱（判据）**：**`JsonNode` 就是 `Object`** ⇒ 未归一的调用点会**编译通过但运行期读不到数据** ✗✗（本刀靠人工核查 3 个调用点消除 ✓）
+  **判据：把参数类型放宽到 `Object` 时，必须逐个核查调用点是否已归一；并在门面注释里写明"传 `JsonNode` 不生效"**（已在 `JsonValues` 写明 ✓）
+- **交付 3｜门面单测 `JsonValuesTest`**（4 组：缺键/null · 标量读面 · 容器读面 · `boolAt` 对齐 ✓）
+- **读数**：`:contract` 218 → **219**（+1）；`common/*` **66**（试点保留 L1 但**已去 Jackson 依赖** ✓）；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**（含 **R8 内联 FQN 归零** ✓、**包级 SCC 基线未变** ✓）；**1349 金片签名一致**；`spotlessCheck build` **2m11s**；**4996 / 失败 0 / 跳过 4**（+4＝新门面单测）；冒烟（sessions / KB / system-info **200** ✓ · `POST /api/v1/chunker/preview` **200 真实输出** ✓）
+- **⭐ 工具面批次的正确刀序（已定，可照做）**：① `JsonValues` 门面 ✓（本刀）② 各"被读取面"逐面迁移（每面＝一次 `JsonValues` 化 + 调用点归一）③ 最后才是工具族本体（37 + 22 个消费点，届时借门面一次性改 ✓）
+- **小账（housekeeping）**：换锚守卫提示 2 条陈旧条目可清理（`common/knowledge/support/ParserEngineRules.java`——本刀已去 Jackson ✓；`tenant/ParserEngineConfig.java`）
 **🔶 G1-j·de-Jackson 批首刀：知识元数据 2 件形状入契约（JSON 侧留 L1 codec）+ 4 件登记（2026-10-15）**
 - **先测（8 件一次测清"`JsonNode` 用面 + 注解 + 消费规模 + platform import"）** ⇒ 结果比预期保守：**真正可迁只有 2 件**，其余 6 件各有硬阻塞
 - **实迁 2 件** → `contract.knowledge`：

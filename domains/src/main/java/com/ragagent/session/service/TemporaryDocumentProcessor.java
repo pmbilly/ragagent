@@ -29,6 +29,7 @@ import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.session.service.TemporaryDocumentService.CreateOptions;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * {@code TemporaryDocumentService} 的**解析 / 落盘管线子模块**（§14 步骤 2）：异步投递与重试、
@@ -204,7 +205,8 @@ final class TemporaryDocumentProcessor {
             if (cfg == null) {
                 return "";
             }
-            return ParserEngineRules.resolve(cfg.get("chatParserEngineRules"), ext);
+            return ParserEngineRules.resolve(
+                    JsonMappers.toJavaValue(cfg.get("chatParserEngineRules")), ext);
         } catch (RuntimeException e) {
             log.warn("failed to resolve tenant parser engine: {}", e.toString());
             return "";

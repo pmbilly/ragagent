@@ -30,6 +30,7 @@ import com.ragagent.common.knowledge.support.ParserEngineRules;
 import com.ragagent.session.service.AgentResolver;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 会话附件（临时文档）HTTP 层。
@@ -271,7 +272,7 @@ public class TemporaryDocumentController {
         }
         if (options.parserEngine().isEmpty() || "auto".equals(options.parserEngine())) {
             String engine = ParserEngineRules.resolve(
-                    cfg.get("chatParserEngineRules"), ext);
+                    JsonMappers.toJavaValue(cfg.get("chatParserEngineRules")), ext);
             if (!engine.isEmpty()) {
                 options = options.withParserEngine(engine);
             }
