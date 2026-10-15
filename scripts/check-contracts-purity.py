@@ -146,6 +146,9 @@ PENDING_DEJACKSON = {
         "JsonNode wikiConfig/extractConfig（1 处消费触达）⇒ 待去 Jackson",
     "com/ragagent/common/knowledge/KnowledgeDocumentFacts.java":
         "JsonNode metadata（2 处消费触达）⇒ 待去 Jackson",
+    "com/ragagent/common/storage/StorageBackendView.java":
+        "JsonNode config（存储配置 jsonb 原样透传）⇒ 待去 Jackson；"
+        "去 Jackson 后与 StorageBackendPort 整批入 contract.storage",
 }
 
 REGISTERED = {**PLATFORM_FACE, **PENDING_DEJACKSON}

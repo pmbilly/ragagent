@@ -13,7 +13,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import com.ragagent.common.storage.StorageBackend;
+import com.ragagent.common.storage.StorageBackendView;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.common.storage.StorageBackendPort;
@@ -237,7 +237,7 @@ public class SystemInfoService {
             return result;
         }
         try {
-            for (StorageBackend backend : storageBackendPort.list(tenantId)) {
+            for (StorageBackendView backend : storageBackendPort.list(tenantId)) {
                 if (backend == null || !"active".equals(backend.getStatus())) {
                     continue;
                 }

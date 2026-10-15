@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.storage.StorageBackend;
+import com.ragagent.storage.domain.StorageBackend;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;

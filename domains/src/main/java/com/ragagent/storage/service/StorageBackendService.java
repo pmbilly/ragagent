@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.common.storage.StorageBackend;
+import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.storage.dto.StorageConfig;
 import com.ragagent.storage.mapper.StorageBackendRepository;

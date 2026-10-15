@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.common.storage.StorageBackend;
+import com.ragagent.common.storage.StorageBackendView;
 import com.ragagent.common.storage.StorageBackendPort;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
 import com.ragagent.platform.web.ApiResult;
@@ -418,8 +418,8 @@ public class SystemController {
      */
     private ResponseEntity<SystemDtos.StorageCheckResponse> connectivityFallback(
             String provider, JsonNode cfg, String endpoint, String bucketName) {
-        StorageBackend backend =
-                new StorageBackend();
+        StorageBackendView backend =
+                new StorageBackendView();
         backend.setTenantId(currentTenantId());
         backend.setProvider(provider);
         ObjectNode config = MAPPER.createObjectNode();

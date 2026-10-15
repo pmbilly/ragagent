@@ -1496,6 +1496,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **读数**：**R10 保持 7 条边 / 52 类**（端口在 L1 ⇒ 无新边）✓；14 守卫全绿；**净删 2 个文件**（知识域不再持有该表 mapper）
 - **验证**：`spotlessCheck build` **2m05s**；**4991 / 失败 0 / 跳过 4**；dev ready + 冒烟（knowledge-bases / **storage-backends** / sessions / models 200 ✓）
 - **意义**：`StorageBackend` 实体收窄（C 余量之一）**已具备前提**——唯一持久面在 storage 域，实体回域后跨域只剩端口读（+ system 的少量写面）
+**🔶 C 批 1·第七子批：`StorageBackend` 收窄 + 行视图（实体 8 → 7）（2026-10-15）**
+- **前置解锁（本刀为何现在能做）**：`da22387b`（存储后端单一持久面）删掉了 knowledge 的重复 `StorageBackendMapper`/`KnowledgeStorageBackendRepository` ⇒ **归属收口（storage 是唯一持久面）**，此前"双方都有 mapper"的裁定障碍消失
+- **JSON 风险评估（先测后动）**：三处跨域消费**都不走实体 JSON**——`SystemInfoService.activeBackendProviders`（读 status/provider → 构建 `Map<String,Boolean>`）· `SystemController.connectivityFallback`（**构造**实体做探测 → 返回字符串信封）· `KnowledgeBaseService.applyAndValidateStorageBackend`（读 id/name/provider/tenantId）；而 `sb-*.json` 金片覆盖的是 **storage 域自己的 controller**（仍返回实体）⇒ **线格式逐字节不变** ✓
+- **动作**：① L1 新增 `common.storage.StorageBackendView`（11 字段，**访问器名与实体逐一相同** ⇒ 消费方改类型即等价）② 端口 4 方法改视图（`test` / `list` / `findById` / `findActiveLegacyAliasByProvider`）③ 适配器加 `toView`/`toEntity` 互转 ④ 实体回 `storage/domain` ⑤ 三处消费改视图（代码段替换，字符串安全）
+- **落点登记（有据不搬）**：视图 `config` 是 `JsonNode`（存储配置 jsonb 原样透传）⇒ `:contract` 零依赖装不下 ⇒ 留 L1 与端口同处，登记 **PENDING_DEJACKSON**（去 Jackson 后**与端口整批入 `contract.storage`**）
+- **读数**：**C2 实体 8 → 7**；C1 受控根 69 → **68 文件**；C4 待归位 14、登记 platform 面 7 + **待去 Jackson 3 → 4**；**R10 保持 7 条边 / 52 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**（C2 = 7，基线已 `--write`）；**1349 金片签名一致** ✓（线格式未变）；`spotlessCheck build` **1m55s**；**4991 / 失败 0 / 跳过 4**；定向 storage/system/knowledge **169 条** ✓；dev ready + 冒烟（storage-backends / system/info / KB / sessions **200** ✓；**`GET /system/storage-engine-status` ⇒ 200**（端口 `list` → 视图）· **`POST /system/storage-engine-check` ⇒ 200 `{"ok":true,"message":"本地存储无需检测"}`**（**构造视图 → 端口 `test` → 适配器 `toEntity`**）——**本刀两条新链路的端到端证据**）
+- **C 余量（7 实体）**：`Chunk` / `Knowledge` / `KnowledgeBase`（**宽字段**）· `WikiPage` / `WikiPageIssue`（**写面归位**：session 侧 56 setters）· `Tenant` / `User`（**管理面**，用例归位）
 **🔶 C 批 1·第六子批：`Session` 收窄 + **无损互转**（实体 9 → 8）（2026-10-15）**
 - **关键设计决策＝"无损互转"而非"按 id 重载"**：im 侧会**新建（可能未落库的）会话**再塞进 QA 载荷 ⇒ 若适配器按 id 重载会拿到 null ✗。故 `SessionView` **镜像全部 13 字段与默认值**，`toEntity(view)` 回填后在域内继续走管线（**零语义丢失**）
 - **动作**：L1 新增 `common.session.embed.SessionView`（13 字段镜像 + `@JsonIgnore embedVisitorId`）· `SessionQaPort.getSession`/`createSession` → 视图 · **`QaRequestPayload.session` → `SessionView`**（容器映射改 `req.session = toEntity(payload.session)`）· 适配器加 `toView`/`toEntity`/`copyInto`（回填）· 实体回 `session/domain/conversation`（补 `SessionLastRequestState`/`SessionOwnerIds` 两个 L1 import）；其 **4 个静态助手只在域内被调用** ⇒ 随实体走 ✓
@@ -2500,10 +2508,10 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 项 | 现状 | 门禁 |
 |---|---|---|
-| `:common` 持久化实体 | **8**（`User` · `Chunk` · `Knowledge` · `KnowledgeBase` · `StorageBackend` · `Tenant` · `WikiPage` · `WikiPageIssue`） | C2（只许减） |
+| `:common` 持久化实体 | **7**（`User` · `Chunk` · `Knowledge` · `KnowledgeBase` · `Tenant` · `WikiPage` · `WikiPageIssue`；`StorageBackend` 已归位） | C2（只许减） |
 | `:common` 域侧 TypeHandler | **10** | C2 |
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
-| `:common` 受控依赖根 | 10 根 / 69 文件 | C1 |
+| `:common` 受控依赖根 | 10 根 / 68 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
 | `:common` 规模 | **265 件** = `common/*` **125** + `platform/*` 139 + `event/*` 1（D1 后） | — |
 

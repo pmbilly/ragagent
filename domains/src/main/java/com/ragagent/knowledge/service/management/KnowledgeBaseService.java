@@ -28,7 +28,7 @@ import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.common.storage.StorageBackend;
+import com.ragagent.common.storage.StorageBackendView;
 import com.ragagent.knowledge.domain.UserKbPin;
 import com.ragagent.knowledge.repository.UserKbPinRepository;
 import org.slf4j.Logger;
@@ -261,7 +261,7 @@ public class KnowledgeBaseService
                 && !storageView.defaultStorageBackendId().trim().isEmpty()) {
             id = storageView.defaultStorageBackendId().trim();
         }
-        StorageBackend backend = null;
+        StorageBackendView backend = null;
         if (!id.isEmpty()) {
             backend = storageBackendPort.findById(tenantId(), id);
             if (backend == null) {

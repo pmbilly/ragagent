@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.storage.StorageBackend;
+import com.ragagent.common.storage.StorageBackendView;
+import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.common.storage.StorageBackendPort;
 import com.ragagent.storage.mapper.StorageBackendRepository;
 import com.ragagent.storage.service.StorageBackendService;
@@ -28,8 +29,8 @@ public class StorageBackendPortAdapter implements StorageBackendPort {
     }
 
     @Override
-    public void test(StorageBackend backend) {
-        backendService.test(backend);
+    public void test(StorageBackendView backend) {
+        backendService.test(toEntity(backend));
     }
 
     @Override
@@ -38,17 +39,57 @@ public class StorageBackendPortAdapter implements StorageBackendPort {
     }
 
     @Override
-    public List<StorageBackend> list(long tenantId) {
-        return backendRepository.list(tenantId);
+    public List<StorageBackendView> list(long tenantId) {
+        return backendRepository.list(tenantId).stream().map(StorageBackendPortAdapter::toView).toList();
     }
 
     @Override
-    public StorageBackend findById(long tenantId, String id) {
-        return backendRepository.getByID(tenantId, id).orElse(null);
+    public StorageBackendView findById(long tenantId, String id) {
+        return toView(backendRepository.getByID(tenantId, id).orElse(null));
     }
 
     @Override
-    public StorageBackend findActiveLegacyAliasByProvider(long tenantId, String provider) {
-        return backendRepository.findActiveLegacyAlias(tenantId, provider);
+    public StorageBackendView findActiveLegacyAliasByProvider(long tenantId, String provider) {
+        return toView(backendRepository.findActiveLegacyAlias(tenantId, provider));
+    }
+
+    /** 实体 → 行视图（逐字段搬运；null 透传）。 */
+    static StorageBackendView toView(StorageBackend b) {
+        if (b == null) {
+            return null;
+        }
+        StorageBackendView v = new StorageBackendView();
+        v.setId(b.getId());
+        v.setTenantId(b.getTenantId());
+        v.setName(b.getName());
+        v.setProvider(b.getProvider());
+        v.setConfig(b.getConfig());
+        v.setSource(b.getSource());
+        v.setStatus(b.getStatus());
+        v.setLegacyAlias(b.isLegacyAlias());
+        v.setCreatedAt(b.getCreatedAt());
+        v.setUpdatedAt(b.getUpdatedAt());
+        v.setDeletedAt(b.getDeletedAt());
+        return v;
+    }
+
+    /** 行视图 → 实体（写面/探测用；逐字段搬运；null 透传）。 */
+    static StorageBackend toEntity(StorageBackendView v) {
+        if (v == null) {
+            return null;
+        }
+        StorageBackend b = new StorageBackend();
+        b.setId(v.getId());
+        b.setTenantId(v.getTenantId());
+        b.setName(v.getName());
+        b.setProvider(v.getProvider());
+        b.setConfig(v.getConfig());
+        b.setSource(v.getSource());
+        b.setStatus(v.getStatus());
+        b.setLegacyAlias(v.isLegacyAlias());
+        b.setCreatedAt(v.getCreatedAt());
+        b.setUpdatedAt(v.getUpdatedAt());
+        b.setDeletedAt(v.getDeletedAt());
+        return b;
     }
 }
