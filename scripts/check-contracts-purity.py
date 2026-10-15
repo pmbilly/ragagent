@@ -148,9 +148,6 @@ PENDING_DEJACKSON = {
     "com/ragagent/common/knowledge/KnowledgeBaseRowView.java":
         "JsonNode × 5（extract/faq/questionGeneration/autoTag/wiki 配置）+ 6 个 typed config ⇒ 待去 Jackson；"
         "KB API 与 init 线格式由 kb-*.json / init-*.json 金片钉住",
-    "com/ragagent/common/wiki/WikiPageView.java":
-        "JsonNode pageMetadata（页元数据 jsonb）+ 6 个 @JsonSerialize 列表 ⇒ 待去 Jackson；"
-        "去 Jackson 后与 WikiPageOpsPort 的页面面整批入 contract.wiki",
 }
 
 REGISTERED = {**PLATFORM_FACE, **PENDING_DEJACKSON}

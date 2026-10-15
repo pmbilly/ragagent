@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * wiki 页面服务实现。
@@ -187,7 +188,7 @@ public class WikiPageServiceImpl implements WikiPageService {
         existing.setAliases(new ArrayList<>(page.getAliases()));
         existing.setSourceRefs(page.getSourceRefs());
         existing.setChunkRefs(page.getChunkRefs());
-        existing.setPageMetadata(page.getPageMetadata());
+        existing.setPageMetadata(JsonMappers.toJsonNode(page.getPageMetadata()));
         existing.setParentSlug(page.getParentSlug());
         existing.setFolderId(page.getFolderId());
         existing.setSortOrder(page.getSortOrder());
@@ -559,7 +560,7 @@ public class WikiPageServiceImpl implements WikiPageService {
         c.setChunkRefs(new ArrayList<>(p.getChunkRefs()));
         c.setInLinks(new ArrayList<>(p.getInLinks()));
         c.setOutLinks(new ArrayList<>(p.getOutLinks()));
-        c.setPageMetadata(p.getPageMetadata());
+        c.setPageMetadata(JsonMappers.toJsonNode(p.getPageMetadata()));
         c.setVersion(p.getVersion());
         c.setLastEditSource(p.getLastEditSource());
         c.setLastEditorId(p.getLastEditorId());

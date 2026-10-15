@@ -7,12 +7,13 @@ import org.springframework.stereotype.Component;
 import com.ragagent.contract.wiki.WikiLinkRepairResult;
 import com.ragagent.common.wiki.WikiPageOpsPort;
 import com.ragagent.common.wiki.domain.WikiIndex;
-import com.ragagent.common.wiki.WikiPageView;
+import com.ragagent.contract.wiki.WikiPageView;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.contract.wiki.WikiPageIssueView;
 import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.service.page.WikiEditContext;
 import com.ragagent.wiki.service.page.WikiPageService;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * {@link WikiPageOpsPort} 的 wiki 域实现：逐字转发 {@link WikiPageService}。
@@ -201,7 +202,7 @@ public class WikiPageOpsAdapter implements WikiPageOpsPort {
         v.setChunkRefs(e.getChunkRefs());
         v.setInLinks(e.getInLinks());
         v.setOutLinks(e.getOutLinks());
-        v.setPageMetadata(e.getPageMetadata());
+        v.setPageMetadata(JsonMappers.toJavaValue(e.getPageMetadata()));
         v.setVersion(e.getVersion());
         v.setLastEditSource(e.getLastEditSource());
         v.setLastEditorId(e.getLastEditorId());
@@ -237,7 +238,7 @@ public class WikiPageOpsAdapter implements WikiPageOpsPort {
         e.setChunkRefs(v.getChunkRefs());
         e.setInLinks(v.getInLinks());
         e.setOutLinks(v.getOutLinks());
-        e.setPageMetadata(v.getPageMetadata());
+        e.setPageMetadata(JsonMappers.toJsonNode(v.getPageMetadata()));
         e.setVersion(v.getVersion());
         e.setLastEditSource(v.getLastEditSource());
         e.setLastEditorId(v.getLastEditorId());

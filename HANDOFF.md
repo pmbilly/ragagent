@@ -1741,6 +1741,13 @@ public interface AdminUserPort {
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 G1-b-6·`WikiPageView` 入 `contract.wiki`（先测后动纠正了登记描述）（2026-10-15）**
+- **登记原文说**"JsonNode pageMetadata + **6 个 `@JsonSerialize`** ⇒ 待去 Jackson" ⇒ **实测纠正**：那 6 个 `@JsonSerialize(EmptyListAsNullSerializer)`（空列表→null）**在实体 `WikiPage` 上，不在视图上** ✗ ⇒ 视图**本身零 Jackson 注解**，去 Jackson 只需处理 `pageMetadata` 一个字段 ✓✓
+- **先测后动三件（都支持可搬）**：① 视图**不作为响应体出面**（仅端口载荷；wiki 控制器返回域内 dto）② 消费点集中：wiki 域 3 文件（适配器/服务/支撑类）+ session `AgentToolWikiBackends`（经 L1 端口 ✓）+ L1 端口自身 ③ `pageMetadata` 全仓使用点 9 处
+- **动作**：① `pageMetadata`：`JsonNode` → `Object` ② `git mv` → `contract.wiki` ③ **同包引用者补 import**（`WikiPageOpsPort` 等，脚本自动化）④ **方向性修补 5 处**（脚本首轮把"实体侧 setter"也包成 `toJavaValue` ✗ ⇒ 实体侧须 `toJsonNode`、视图↔视图**不得包裹**、session 侧需**局部还原**后判空）——**判据：双向映射的自动包裹必须按"目标对象是实体还是视图"分流，不能按 setter 名同型处理**
+- **读数**：`:contract` 190 → **191**；`common/*` 103 → **102**；**C4 待去 Jackson 5 → 4**；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**；**1349 金片签名一致** ✓（`wiki-*.json` 钉住页面线格式）；`spotlessCheck build` **2m24s**；**4991 / 失败 0 / 跳过 4**；五模块编译全绿
+- **G1-b 进度：9/12 件已入契约**（+ `KnowledgeParseStatus`/`StorageBackendPort` 两个随行件）；**余 3 件＝"Jackson 语义必要"**（下一刀按证据改登记类别收口）
 **🔶 G1-b-5·`KnowledgeRowView` + `KnowledgeParseStatus` 入 `contract.knowledge`（G1-b 进度 8/12）（2026-10-15）**
 - **对象**：`KnowledgeRowView`（30 字段 / **4 个 jsonb 字段**：`tags`＝`List<JsonNode>` + `metadata`/`customMetadata`/`lastFaqImportResult`）——docs API 载荷（`doc-*.json` 金片覆盖）
 - **动作**：① 4 字段 → 纯 JDK（`tags` → `List<Object>`；另 3 → `Object`）② **`JsonMappers` 新增列表助手** `toJavaList(List<JsonNode>)` / `toJsonList(List<Object>)`（逐元素转换，null 保持 null ✓）③ `git mv` → `contract.knowledge`（含同包引用者补 import 的自动化 pass）④ 域内映射器 4×2 处转换 ⑤ **消费侧还原 4 处**：`DataSourceSupport.readMetadataValue` · `MapperKnowledgeBridge.readMetadata` · `AgentToolKbBackends.metadataMap` · 测试断言（均 `JsonMappers.toJsonNode(...)`）
@@ -2718,7 +2725,7 @@ public interface AdminUserPort {
 
 | 目标模块 | 实际 | 差距 |
 |---|---|---|
-| `contracts` | `:contract` **190 件** ✅ 已独立（G1-b-5 后） | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
+| `contracts` | `:contract` **191 件** ✅ 已独立（G1-b-6 后） | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
 | `platform` | `com.ragagent.platform.*` **139 件仍在 `:common`** | **未独立成模块**；包覆盖：方案 **23** vs 实际 **15** ⇒ 缺 `execution` · `outbox` · `parsing` · `storage.config` · `storage.provider` · `tracing.decorators` · `tracing.langfuse` · `transaction` · `web.error` · `web.health`；多 `redis` · `tracing` |
 | `agent-engine` · `retrieval-engine` · `model-runtime` | `:engine` **318 件 / 9 顶层包**（chatpipeline · embedding · llm · modelcontext · modelruntime · rerank · retrieval · tracing · webfetch） | 未拆分（**条件触发**项） |
 | `domains` | `:domains` **1343 件** | 域间边 **7 条**（①clearable **0** / ②owner 2 / ③族内 5）；域布局抽样见 C |
@@ -2733,7 +2740,7 @@ public interface AdminUserPort {
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
 | `:common` 受控依赖根 | 10 根 / 61 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
-| `:common` 规模 | **243 件** = `common/*` **103** + `platform/*` 139 + `event/*` 1（G1-b-5 后） | — |
+| `:common` 规模 | **242 件** = `common/*` **102** + `platform/*` 139 + `event/*` 1（G1-b-6 后） | — |
 
 **C. 域布局抽样（以方案 §8.8.2 `knowledge/` 为范本）**
 

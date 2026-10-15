@@ -1,10 +1,9 @@
-package com.ragagent.common.wiki;
+package com.ragagent.contract.wiki;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * wiki 页**行视图**（L1）：{@code WikiPageOpsPort} 页面面（读 / 建 / 改 / 搜索）的载荷。
@@ -38,7 +37,8 @@ public class WikiPageView {
     private List<String> chunkRefs = new ArrayList<>();
     private List<String> inLinks = new ArrayList<>();
     private List<String> outLinks = new ArrayList<>();
-    private JsonNode pageMetadata;
+    /** 页元数据 jsonb 原样（对象/数组/标量；null 表示无）。 */
+    private Object pageMetadata;
     private int version;
     private String lastEditSource = "";
     private String lastEditorId = "";
@@ -66,7 +66,7 @@ public class WikiPageView {
     public List<String> getChunkRefs() { return chunkRefs; }
     public List<String> getInLinks() { return inLinks; }
     public List<String> getOutLinks() { return outLinks; }
-    public JsonNode getPageMetadata() { return pageMetadata; }
+    public Object getPageMetadata() { return pageMetadata; }
     public int getVersion() { return version; }
     public String getLastEditSource() { return lastEditSource; }
     public String getLastEditorId() { return lastEditorId; }
@@ -93,7 +93,7 @@ public class WikiPageView {
     public void setChunkRefs(List<String> v) { this.chunkRefs = v == null ? new ArrayList<>() : v; }
     public void setInLinks(List<String> v) { this.inLinks = v == null ? new ArrayList<>() : v; }
     public void setOutLinks(List<String> v) { this.outLinks = v == null ? new ArrayList<>() : v; }
-    public void setPageMetadata(JsonNode v) { this.pageMetadata = v; }
+    public void setPageMetadata(Object v) { this.pageMetadata = v; }
     public void setVersion(int v) { this.version = v; }
     public void setLastEditSource(String v) { this.lastEditSource = v == null ? "" : v; }
     public void setLastEditorId(String v) { this.lastEditorId = v == null ? "" : v; }

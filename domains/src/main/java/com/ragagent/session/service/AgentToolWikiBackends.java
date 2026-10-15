@@ -17,8 +17,9 @@ import com.ragagent.agenttools.wiki.IssueView;
 import com.ragagent.agenttools.wiki.PageView;
 import com.ragagent.agenttools.wiki.WikiPages;
 import com.ragagent.common.wiki.domain.WikiIndex;
-import com.ragagent.common.wiki.WikiPageView;
+import com.ragagent.contract.wiki.WikiPageView;
 import com.ragagent.contract.wiki.WikiPageIssueView;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * {@code AgentToolBackends} 的**wiki 工具簇**：WikiPages 工具端口的实现与
@@ -182,8 +183,8 @@ final class AgentToolWikiBackends {
         view.setChunkRefs(page.getChunkRefs());
         view.setInLinks(page.getInLinks());
         view.setOutLinks(page.getOutLinks());
-        view.setPageMetadata(page.getPageMetadata() == null
-                || page.getPageMetadata().isNull() ? "" : page.getPageMetadata().toString());
+        var meta = JsonMappers.toJsonNode(page.getPageMetadata());
+        view.setPageMetadata(meta == null || meta.isNull() ? "" : meta.toString());
         return view;
     }
     /** 工具侧页视图 → WikiPage 实体（service 就地补全 ID/Status/Version/OutLinks）。 */
