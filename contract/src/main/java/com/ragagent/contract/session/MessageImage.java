@@ -1,6 +1,5 @@
-package com.ragagent.common.session.domain.message;
+package com.ragagent.contract.session;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * 挂在消息上的图片。
@@ -11,7 +10,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * 所以 Java 实体上的这个列表字段**默认是空列表**，
  * 由类型处理器写成 {@code []}。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageImage {
 
     private String url = "";

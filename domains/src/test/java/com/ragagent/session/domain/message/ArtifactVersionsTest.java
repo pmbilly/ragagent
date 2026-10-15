@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import com.ragagent.common.session.domain.message.MessageArtifact;
+import com.ragagent.contract.session.MessageArtifact;
 
 /**
  * 产物版本澄清纯函数。

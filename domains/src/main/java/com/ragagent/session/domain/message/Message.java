@@ -4,7 +4,7 @@ import com.ragagent.session.domain.AgentStepListTypeHandler;
 import com.ragagent.contract.session.MentionedItem;
 import com.ragagent.session.domain.MentionedItemListTypeHandler;
 import com.ragagent.session.domain.SearchResultListTypeHandler;
-import com.ragagent.common.session.domain.UsedMemory;
+import com.ragagent.contract.session.UsedMemory;
 import com.ragagent.session.domain.UsedMemoryListTypeHandler;
 
 import java.time.OffsetDateTime;
@@ -21,9 +21,9 @@ import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.session.domain.message.MessageExecutionContext;
-import com.ragagent.common.session.domain.message.MessageArtifact;
-import com.ragagent.common.session.domain.message.MessageImage;
-import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.contract.session.MessageArtifact;
+import com.ragagent.contract.session.MessageImage;
+import com.ragagent.contract.session.MessageAttachment;
 
 /**
  * messages 表实体。

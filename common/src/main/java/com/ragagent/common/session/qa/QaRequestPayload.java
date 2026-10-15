@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.session.SessionView;
-import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.contract.session.MessageAttachment;
 
 /**
  * QA 请求载荷（L1）：IM 等装配面构造、会话面消费的最小字段集。

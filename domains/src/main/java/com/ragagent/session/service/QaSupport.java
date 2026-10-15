@@ -18,8 +18,8 @@ import com.ragagent.agent.SteerSink;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.common.session.domain.message.MessageAttachment;
-import com.ragagent.common.session.domain.SuggestionAttribution;
+import com.ragagent.contract.session.MessageAttachment;
+import com.ragagent.contract.session.SuggestionAttribution;
 
 /**
  * QA 请求上下文与共享辅助。

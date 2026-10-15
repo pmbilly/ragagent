@@ -8,11 +8,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.common.agent.domain.AgentStep;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.contract.session.MentionedItem;
-import com.ragagent.common.session.domain.UsedMemory;
-import com.ragagent.common.session.domain.message.MessageArtifact;
-import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.contract.session.UsedMemory;
+import com.ragagent.contract.session.MessageArtifact;
+import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.common.session.domain.message.MessageExecutionContext;
-import com.ragagent.common.session.domain.message.MessageImage;
+import com.ragagent.contract.session.MessageImage;
 import com.ragagent.contract.model.TokenUsage;
 
 /**

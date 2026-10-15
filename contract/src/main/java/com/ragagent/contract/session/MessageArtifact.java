@@ -1,8 +1,7 @@
-package com.ragagent.common.session.domain.message;
+package com.ragagent.contract.session;
 
 import java.time.OffsetDateTime;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * 某轮对话中 skill 脚本产出的文件。
@@ -15,7 +14,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * <p>关于 {@code url}：**序列化上它是输出的**（契约里有 {@code url} 键）；
  * "不要直接暴露给客户端"是意图层面的告诫（调用方不该拿它当可下载链接），不是序列化行为。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageArtifact {
 
     /** 存储 URL（{@code provider://path}）。 */

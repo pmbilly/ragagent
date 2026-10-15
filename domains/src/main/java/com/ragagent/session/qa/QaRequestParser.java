@@ -9,8 +9,8 @@ import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.session.domain.message.Message;
-import com.ragagent.common.session.domain.message.MessageAttachment;
-import com.ragagent.common.session.domain.SuggestionAttribution;
+import com.ragagent.contract.session.MessageAttachment;
+import com.ragagent.contract.session.SuggestionAttribution;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;
 import com.ragagent.session.service.AgentResolver;
@@ -238,7 +238,7 @@ public final class QaRequestParser {
                 }
                 MessageAttachment meta = new MessageAttachment();
                 meta.setId(doc.getId());
-                meta.setUrl(doc.getResourceRef());
+                meta.setUrlValue(doc.getResourceRef());
                 meta.setFileName(doc.getFileName());
                 meta.setFileType(doc.getFileType());
                 meta.setFileSize(doc.getFileSize());

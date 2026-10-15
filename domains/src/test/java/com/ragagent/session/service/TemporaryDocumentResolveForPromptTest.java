@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.auth.service.TenantService;

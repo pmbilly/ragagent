@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.ragagent.common.storage.fileserve.StoragePaths;
-import com.ragagent.common.session.domain.message.MessageArtifact;
+import com.ragagent.contract.session.MessageArtifact;
 
 /**
  * 产物版本澄清。

@@ -17,12 +17,12 @@ import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.contract.session.MentionedItem;
 import com.ragagent.session.domain.message.Message;
-import com.ragagent.common.session.domain.message.MessageArtifact;
-import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.contract.session.MessageArtifact;
+import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.common.session.domain.message.MessageExecutionContext;
-import com.ragagent.common.session.domain.message.MessageImage;
-import com.ragagent.common.session.domain.SuggestionAttribution;
-import com.ragagent.common.session.domain.UsedMemory;
+import com.ragagent.contract.session.MessageImage;
+import com.ragagent.contract.session.SuggestionAttribution;
+import com.ragagent.contract.session.UsedMemory;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -158,7 +158,7 @@ class MessageJsonContractTest {
 
         MessageAttachment att = new MessageAttachment();
         att.setId("a1");
-        att.setUrl("secret://internal-handle");
+        att.setUrlValue("secret://internal-handle");
         att.setFileName("f");
         att.setFileSize(10);
         m.setAttachments(new ArrayList<>(List.of(att)));

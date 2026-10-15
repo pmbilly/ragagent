@@ -1525,8 +1525,8 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 账 | 读数 | 状态 |
 |---|---|---|
-| `:contract` | **211 件** | ✅ 已独立（零依赖） |
-| `common/*` | **72 件**（125 → … → 78 → 77 → 72；G1-g 再 −5） | 收敛中 |
+| `:contract` | **216 件** | ✅ 已独立（零依赖） |
+| `common/*` | **67 件**（125 → … → 77 → 72 → 67；G1-i 再 −5） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
 | **C1 受控导入根** | 10 根 / **57 文件** | 冻结只许减 |
@@ -1792,6 +1792,19 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 G1-i·session 值类型 5 件入 `contract.session`（19 件余量一次测清注解面）（2026-10-15）**
+- **触发**：队列余件（承上一刀判据：**跨域消费不是阻塞**（L1→契约合法 ✓），**真正的阻塞只有 Jackson 注解语义**）
+- **一次测清 19 件余量的注解面** ⇒ 分类出"可迁（无载重注解）/ 必留（`@JsonInclude`·`@JsonProperty`·平台序列化器）"
+- **实迁 5 件** → `contract.session`：`SuggestionAttribution` · `UsedMemory` · `MessageArtifact` · `MessageImage` · `MessageAttachment`
+  - 其中 4 件：`@JsonIgnoreProperties(ignoreUnknown = true)` **冗余**（读取路径＝`AbstractJsonListTypeHandler` → `JsonMappers.lenient()`，已关 `FAIL_ON_UNKNOWN_PROPERTIES`）⇒ 去掉 ✓（承 G1-g 判据）
+  - **`MessageAttachment` 是个好例子**：`@JsonIgnore url` 的 javadoc 明写"**既不进 JSON 也不进数据库**……**一个注解覆盖两条路径（类型处理器也用 Jackson）**" ⇒ 用**非 getter 命名承接时必须 get+set 同改**（`urlValue()`/`setUrlValue()`），否则 setter 仍会让 jsonb 读回绑定它 ⇒ **判据：`@JsonIgnore` 若同时管"响应"与"落库"，改名须 get+set 同步**；调用点 4 处（域 2 + 契约测试 2）同步 ✓，`JsonContractRoundTripTest`（该行为的防线）保持通过 ✓
+  - `scripts/fix-javadoc-links.py` 已入流程（本刀 **0 处**需降级 ✓——上一刀的脚本化开始回本）
+- **登记（必留，附依据）**：`AgentStep`（`@JsonInclude`×3 + `ZeroTimeSerializer`）· `AgentToolCall`（`@JsonInclude`×4）· `ToolCallTarget`（`@JsonInclude`×1）· `ParserEngineConfig`（`@JsonInclude`×25 + `@JsonProperty`×27 ⇒ snake 线格式）· `MessageExecutionContext`（`@JsonProperty` + `@JsonInclude`）· `MemoryMessageCursor`（`ZeroTimeSerializer`）· `ConversationProperties`（引用 platform `PromptSource` ⇒ platform 面）
+- **读数**：`:contract` 211 → **216**（+5）；`common/*` 72 → **67**（−5）；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**；**1349 金片签名一致**；`spotlessCheck build` **1m58s**；**4992 / 失败 0 / 跳过 4**
+  - ⚠️ **一次基础设施瞬态（已判明）**：首轮 gate 中 engine `RedisLimiterTest.heartbeatExtendsLease` 抛 `RedisConnectionFailureException`（Redis 需密码，但容器在跑 ✓）+ domains 只跑 42 条 ⇒ **复跑全绿**（domains 2900 / engine 561 ✓）⇒ 判为**瞬态抖动**，非代码问题（登记待观察）
+- **冒烟**：sessions · **`GET /sessions/{id}`** · knowledge-bases · system-info **200** ✓
+- **余量（承本刀分类，路径已明）**：**可迁但需 de-Jackson**——`AgentTool`/`ToolRequest`/`AgentLookup`/`BaseTool`（JsonNode 面）· `DocumentChunkMetadata`/`FaqChunkMetadata`（`@JsonIgnore`→非 getter + JsonNode 工厂外移）· `ParserEngineRules` · `SystemSettingRegistry`；**必留**＝上列 7 件
 **🔶 G1-g·会话载荷契约化 5 件（解环）+ `SearchResult` 判定登记 + javadoc 链接脚本化（`common/*` 77 → 72）（2026-10-15）**
 - **触发**：队列第 1 项（检索能力面契约化）
 

@@ -19,7 +19,7 @@ import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
-import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.platform.storage.config.UploadLimits;

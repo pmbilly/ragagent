@@ -1,6 +1,5 @@
-package com.ragagent.common.session.domain;
+package com.ragagent.contract.session;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * 注入到某条回答里的长期记忆。
@@ -8,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * <p>三个键都恒输出——未用到的也要输出空串。持久化（而不是只走流式）
  * 是为了让重新打开会话时仍能解释"这个答案当时看到了什么"，并允许用户就地删除某一条。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class UsedMemory {
 
     private String id = "";

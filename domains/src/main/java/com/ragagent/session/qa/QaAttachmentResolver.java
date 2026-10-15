@@ -10,7 +10,7 @@ import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
 import com.ragagent.session.domain.message.Message;
-import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.QaSupport;

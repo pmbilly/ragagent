@@ -1,14 +1,12 @@
-package com.ragagent.common.session.domain.message;
+package com.ragagent.contract.session;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * 消息上的文件附件。
  *
  * <p><b>{@code url} 既不进 JSON 也不进数据库</b>：它是内部存储句柄
  * （{@code provider://path}），预览走会话级的附件端点，句柄本身一旦外泄就等于给出一个
- * 可跨会话下载的引用。Java 侧一个 {@link JsonIgnore} 覆盖两条路径（类型处理器也用 Jackson）。</p>
+ * 可跨会话下载的引用。Java 侧一个 `@JsonIgnore` 覆盖两条路径（类型处理器也用 Jackson）。</p>
  *
  * <p><b>字段名不带 {@code is} 前缀</b>（{@code truncated} 而非 {@code isTruncated}）——
  * 理由见 {@code com.ragagent.session.domain.conversation.Session} 上同名字段的注释：Jackson 会因字段与 getter 的隐式名不一致而多吐键。</p>
@@ -17,14 +15,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * {@code selectedChunks}/{@code totalChunks} 的 0 也照写，
  * 用 NON_DEFAULT。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageAttachment {
 
     /** 会话级上传的临时文档 ID。 */
     private String id;
 
     /** 内部存储句柄（{@code provider://path} / {@code resource://...}）。见类注释。 */
-    @JsonIgnore
     private String url;
 
     private String fileName = "";
@@ -61,11 +57,12 @@ public class MessageAttachment {
         this.id = v;
     }
 
-    public String getUrl() {
+    /** **非 getter 命名** ⇒ 等价原 {@code @JsonIgnore}（HTTP JSON 与 DB jsonb 两条路径都不出面）。 */
+    public String urlValue() {
         return url;
     }
 
-    public void setUrl(String v) {
+    public void setUrlValue(String v) {
         this.url = v;
     }
 

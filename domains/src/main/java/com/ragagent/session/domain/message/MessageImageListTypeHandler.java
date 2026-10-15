@@ -5,7 +5,7 @@ import com.ragagent.session.domain.AbstractJsonListTypeHandler;
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.ragagent.common.session.domain.message.MessageImage;
+import com.ragagent.contract.session.MessageImage;
 
 /**
  * {@code messages} 表上 {@code List<MessageImage>} 型 jsonb 列的处理器。

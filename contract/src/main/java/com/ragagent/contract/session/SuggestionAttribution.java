@@ -1,13 +1,11 @@
-package com.ragagent.common.session.domain;
+package com.ragagent.contract.session;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * 追问建议的归因。
  *
  * <p>挂在点击建议之后的那条用户消息上，让分析能区分"用户点了建议"与"用户自己打了同样的问题"。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class SuggestionAttribution {
 
     private String suggestionSetId = "";

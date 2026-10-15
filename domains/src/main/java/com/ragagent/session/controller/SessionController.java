@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.common.session.domain.message.MessageArtifact;
+import com.ragagent.contract.session.MessageArtifact;
 import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.platform.stream.StreamEvent;

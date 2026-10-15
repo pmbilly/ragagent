@@ -6,7 +6,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 
@@ -88,7 +88,7 @@ final class TemporaryDocumentPromptResolver {
                     query, perDocumentBudget);
             MessageAttachment att = new MessageAttachment();
             att.setId(document.getId());
-            att.setUrl(document.getResourceRef());
+            att.setUrlValue(document.getResourceRef());
             att.setFileName(document.getFileName());
             att.setFileType(document.getFileType());
             att.setFileSize(document.getFileSize());

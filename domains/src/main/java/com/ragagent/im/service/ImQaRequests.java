@@ -8,7 +8,7 @@ import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
 import com.ragagent.common.session.qa.QaRequestPayload;
-import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.common.session.embed.MessageView;
 import com.ragagent.contract.session.SessionView;
 

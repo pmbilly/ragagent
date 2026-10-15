@@ -20,10 +20,10 @@ import com.ragagent.chatpipeline.plugin.PluginError;
 import com.ragagent.chatpipeline.plugin.PluginQueryUnderstand;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.session.domain.message.Message;
-import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.llm.extract.PipelineConfig;
 import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.common.session.domain.message.MessageImage;
+import com.ragagent.contract.session.MessageImage;
 
 /**
  * 录制回放：query_understand 族 + load_history + history_messages
