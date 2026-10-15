@@ -1,4 +1,4 @@
-package com.ragagent.common.storage.support;
+package com.ragagent.contract.storage.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -10,9 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.contract.storage.support.StorageUrlContext;
-import com.ragagent.contract.storage.support.ResourceModeException;
-import com.ragagent.contract.storage.support.PublicModeForbiddenException;
 
 /**
  * {@link Mode} 的解析与合并。
@@ -48,7 +45,7 @@ class ModeTest {
     /** env 未设置（测试 JVM 的实际情况）→ 安全默认。 */
     @Test
     void defaultModeFallsBackToHandle() {
-        assertThat(Mode.defaultMode()).isEqualTo(Mode.HANDLE);
+        assertThat(Mode.defaultMode(null)).isEqualTo(Mode.HANDLE);
     }
 
     /**
@@ -59,7 +56,7 @@ class ModeTest {
     void forcedHandleModeWins() {
         for (String queryValue : List.of("", "public", "handle", "nonsense")) {
             StorageUrlContext.force();
-            assertThat(Mode.resolve(queryValue)).as("queryValue=%q", queryValue).isEqualTo(Mode.HANDLE);
+            assertThat(Mode.resolve(queryValue, null)).as("queryValue=%q", queryValue).isEqualTo(Mode.HANDLE);
         }
     }
 
@@ -68,25 +65,25 @@ class ModeTest {
     void rejectsPublicForKbRestrictedKey() {
         APIKeyScopeContext.set(new TenantAPIKeyScope(1L, "tenant", false, List.of("kb-1"), null));
 
-        assertThatThrownBy(() -> Mode.resolve("public"))
+        assertThatThrownBy(() -> Mode.resolve("public", null))
                 .isInstanceOf(PublicModeForbiddenException.class)
                 .hasMessage(Mode.PUBLIC_MODE_FORBIDDEN_MESSAGE);
 
         // 默认模式仍然可用：被禁的只是公网 URL
-        assertThat(Mode.resolve("handle")).isEqualTo(Mode.HANDLE);
+        assertThat(Mode.resolve("handle", null)).isEqualTo(Mode.HANDLE);
     }
 
     /** 全权 Key（无 KB 限制）不受影响。 */
     @Test
     void allowsPublicForUnrestrictedKey() {
         APIKeyScopeContext.set(new TenantAPIKeyScope(1L, "tenant", true, null, null));
-        assertThat(Mode.resolve("public")).isEqualTo(Mode.PUBLIC);
+        assertThat(Mode.resolve("public", null)).isEqualTo(Mode.PUBLIC);
     }
 
     /** 没有 API Key 主体（JWT 会话）→ 不受该限制。 */
     @Test
     void allowsPublicWithoutApiKeyPrincipal() {
-        assertThat(Mode.resolve("public")).isEqualTo(Mode.PUBLIC);
+        assertThat(Mode.resolve("public", null)).isEqualTo(Mode.PUBLIC);
     }
 
     /**
@@ -95,8 +92,8 @@ class ModeTest {
      */
     @Test
     void queryWinsOverDeployment() {
-        assertThat(Mode.resolve("handle")).isEqualTo(Mode.HANDLE);
-        assertThatThrownBy(() -> Mode.resolve("yes-please"))
+        assertThat(Mode.resolve("handle", null)).isEqualTo(Mode.HANDLE);
+        assertThatThrownBy(() -> Mode.resolve("yes-please", null))
                 .isInstanceOf(ResourceModeException.class)
                 .isNotInstanceOf(PublicModeForbiddenException.class);
     }

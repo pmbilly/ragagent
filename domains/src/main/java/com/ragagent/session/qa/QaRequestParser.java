@@ -25,12 +25,13 @@ import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.session.MessageExecutionContext;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.contract.storage.support.FileUrlPort;
-import com.ragagent.common.storage.support.Mode;
+import com.ragagent.contract.storage.support.Mode;
 import com.ragagent.contract.storage.support.PublicModeForbiddenException;
 import com.ragagent.common.storage.support.Rewriter;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
 import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
 import com.ragagent.common.storage.support.FileResolverFactory;
+import com.ragagent.platform.storage.support.ResourceUrlMode;
 
 /**
  * {@code KnowledgeQaController} 的**请求解析主体**：把 HTTP 请求（会话 id、
@@ -82,7 +83,7 @@ public final class QaRequestParser {
 
         // 先解析存储引用形态：SSE 起流后非法值不能再落 400
         try {
-            Mode mode = Mode.resolve(resourceUrls);
+            Mode mode = ResourceUrlMode.resolve(resourceUrls);
             Rewriter rw = Rewriter.forRequest(mode,
                     fileResolverFactory.create(readerTenant, fileService, storageBackendResolver));
             rc.resourceRewriter = new StreamRewriter(rw);

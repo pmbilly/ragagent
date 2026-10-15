@@ -1792,6 +1792,19 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 清 `:common` 子批 C·`Mode` 入契约（`common/*` 34 → 33；沉淀"零依赖边界"与"同包闭包"两条新判据）（2026-10-16）**
+- **目标**：`Mode`（资源 URL 模式 enum，跨域消费 session 6 / storage / mcp / knowledge ✓）
+- **两处 platform 耦合，两处解法都沉淀成判据**：
+  1. **env 读取**（`defaultMode()` 读 `StorageRuntimeEnv` ✗）⇒ **收参化**（`defaultMode(String rawEnv)` / `resolve(queryValue, rawEnv)`），"读 env + 坏值告警一次"上移到边界侧助手 **`platform.storage.support.ResourceUrlMode`** ✓
+  2. ⭐ **契约模块零依赖＝连 slf4j 也没有** ✗：`Mode` 的 `Logger` 直接编译失败（`package org.slf4j does not exist`）⇒ **日志一律上移边界**（含"坏值只告警一次"的 `WARNED_BAD_DEFAULTS`，语义保留 ✓）
+     **判据：契约面"纯 JDK"＝连 slf4j 也不可（契约 build 无任何依赖）；日志 / 告警 / env 读取都属边界职责**
+- ⚠️ **预检第 2 个盲区（"原同包"坑第 14 次——这次坑在预检自身）**：`StreamRewriter` 预检显示"无 common 引用" ✓，却在编译期报 `Rewriter` 缺符号 ✗ —— 它引用的是**同包裸名兄弟** ✗（`Rewriter` 属 (d) 阻塞）⇒ **回退 `StreamRewriter`** ✓
+  **判据：依赖闭包必须计入"同包裸名引用"（import 扫描看不见）；完整闭包＝import + 同包裸名 + 反射/字符串 FQN 三类**
+- ⚠️ **助手落点教训**：我先把 `ResourceUrlMode` 放 `domains/storage/support` ✗ ⇒ 4 个调用点立刻产生 **`knowledge→storage`** 与 **`session→storage`** 新边 ✗（R10 只许减）⇒ 改投 **`:platform`** ✓（它零域依赖：读 platform env + 返回契约枚举）⇒ R10 回基线 ✓
+  **判据：跨域共享的"边界助手"应放平台/契约层；放进任一域都会制造域间边——R10 守卫再次是唯一裁判**
+- **读数**：`:contract` 240 → **241**；`common/*` 34 → **33**；`platform` 147 → **148**；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿** · **1349 金片签名一致** · gate **1m43s / 4996 / 失败 0 / 跳过 4** · 冒烟（sessions / knowledge-bases / system-info **200** ✓）；`ModeTest`（8 处签名）随主体搬 `domains/src/test/java/com/ragagent/contract/storage/support/` 并同步 ✓
+- **剩余 33 件**：**(d) 线格式待决策 ~12 件** · **`FileContentService`/`WritableFileContentService`**（卡在 `FileTransport` 方法面 ⇒ 需"切出 servlet 面"）· **`MemoryMessageCursor`**（卡在 `ZeroTimeSerializer` ⇒ 需在域侧 codec 复现零时语义）· 13 件 `package-info`（随包解散删除 ✓）
 **🔶 清 `:common` 子批 B·3 件 → `:platform`、1 件 → `:contract`（`common/*` 38 → 34）（2026-10-16）**
 - **依赖闭包预检（上刀新关卡的第二次执行，四件全绿）**：
   - `FaqChunkMetadataCodec`：platform 引 `JsonMappers`；**无 common/域反引** ✓ ⇒ `platform.knowledge`

@@ -42,7 +42,7 @@ import com.ragagent.contract.memory.MemoryExtractionPort;
 import com.ragagent.session.service.SteerRunCoordinator;
 import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.contract.storage.support.FileUrlPort;
-import com.ragagent.common.storage.support.Mode;
+import com.ragagent.contract.storage.support.Mode;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
 import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.web.ApiResult;

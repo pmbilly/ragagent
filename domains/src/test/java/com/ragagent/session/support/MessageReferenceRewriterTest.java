@@ -17,7 +17,7 @@ import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageImage;
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.common.storage.support.Rewriter;
-import com.ragagent.common.storage.support.Mode;
+import com.ragagent.contract.storage.support.Mode;
 
 /**
  * 消息历史响应的存储引用重写（MessageReferenceRewriter）。

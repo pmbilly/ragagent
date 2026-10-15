@@ -27,7 +27,7 @@ import com.ragagent.session.service.SessionService;
 import com.ragagent.session.controller.sse.SseContract;
 import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.session.controller.sse.StreamEventEmitter;
-import com.ragagent.common.storage.support.Mode;
+import com.ragagent.contract.storage.support.Mode;
 import com.ragagent.contract.storage.support.PublicModeForbiddenException;
 import com.ragagent.contract.storage.support.ResourceModeException;
 import com.ragagent.common.storage.support.Rewriter;
@@ -41,6 +41,7 @@ import com.ragagent.platform.config.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.common.storage.support.FileResolverFactory;
+import com.ragagent.platform.storage.support.ResourceUrlMode;
 
 /**
  * 继续接收活跃流。
@@ -119,7 +120,7 @@ public class SessionStreamController {
      * （缺省时取部署默认）构造重写器。
      */
     Rewriter resolveResourceRewriter(String resourceUrls) {
-        Mode mode = Mode.resolve(resourceUrls);
+        Mode mode = ResourceUrlMode.resolve(resourceUrls);
         return Rewriter.forRequest(mode,
                 fileResolverFactory.create(currentTenant(), fileService, storageBackendResolver));
     }

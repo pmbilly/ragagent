@@ -14,7 +14,7 @@ import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.dto.SearchMessagesRequest;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.contract.storage.support.FileUrlPort;
-import com.ragagent.common.storage.support.Mode;
+import com.ragagent.contract.storage.support.Mode;
 import com.ragagent.contract.storage.support.PublicModeForbiddenException;
 import com.ragagent.contract.storage.support.ResourceModeException;
 import com.ragagent.session.support.MessageReferenceRewriter;
@@ -39,6 +39,7 @@ import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.common.storage.support.FileResolverFactory;
+import com.ragagent.platform.storage.support.ResourceUrlMode;
 
 /**
  * 消息 HTTP 层。
@@ -237,7 +238,7 @@ public class MessageController {
     private Rewriter resolveResourceRewriter(String resourceUrls) {
         Mode mode;
         try {
-            mode = Mode.resolve(resourceUrls);
+            mode = ResourceUrlMode.resolve(resourceUrls);
         } catch (PublicModeForbiddenException e) {
             log.warn("Rejected resource URL mode: {}", e.getMessage());
             throw BizException.forbidden(e.getMessage());

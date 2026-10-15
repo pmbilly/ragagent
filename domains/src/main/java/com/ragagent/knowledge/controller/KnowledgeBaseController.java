@@ -43,11 +43,11 @@ import com.ragagent.contract.storage.support.ResourceModeException;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
-import com.ragagent.common.storage.support.Mode;
 import java.util.UUID;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.knowledge.support.KnowledgeBaseRowViews;
+import com.ragagent.platform.storage.support.ResourceUrlMode;
 
 /**
  * 知识库 CRUD 与检索入口：列表/详情/更新/删除、置顶、移动目标、混合检索
@@ -203,7 +203,7 @@ public class KnowledgeBaseController {
         }
         // resource_urls：public 拒绝 → 403；其他坏值 → 400
         try {
-            Mode.resolve(resourceUrls);
+            ResourceUrlMode.resolve(resourceUrls);
         } catch (PublicModeForbiddenException e) {
             log.warn("Rejected resource URL mode: {}", e.getMessage());
             throw new BizException(AppError.forbidden(e.getMessage()));

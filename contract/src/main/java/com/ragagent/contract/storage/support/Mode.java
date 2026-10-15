@@ -1,16 +1,10 @@
-package com.ragagent.common.storage.support;
+package com.ragagent.contract.storage.support;
 
 import java.util.Locale;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.platform.storage.config.StorageRuntimeEnv;
-import com.ragagent.contract.storage.support.StorageUrlContext;
-import com.ragagent.contract.storage.support.ResourceModeException;
-import com.ragagent.contract.storage.support.PublicModeForbiddenException;
 
 /**
  * 存储文件在 API 响应里的引用方式。
@@ -50,8 +44,6 @@ public enum Mode {
     public static final String PUBLIC_MODE_FORBIDDEN_MESSAGE =
             "resource_urls=public is not available for a knowledge-base-restricted API key";
 
-    private static final Logger log = LoggerFactory.getLogger(Mode.class);
-
     private final String value;
 
     Mode(String value) {
@@ -64,7 +56,7 @@ public enum Mode {
 
     /**
      * 校验客户端或配置给出的模式。
-     * 空值落到 {@link #HANDLE}，让"未设置参数/配置"保持默认。
+     * 空值落到 {@code #HANDLE}，让"未设置参数/配置"保持默认。
      */
     public static Mode parse(String raw) {
         String normalized = raw == null ? "" : raw.trim().toLowerCase(Locale.ROOT);
@@ -78,19 +70,17 @@ public enum Mode {
     }
 
     /**
-     * 部署级默认模式。未设置或解析不了都落到
-     * {@link #HANDLE}——一个笔误应当降级到安全默认，而不是让每个请求都失败。
+     * 部署级默认模式（**收参**：env 由边界读取，本类保持零依赖）。未设置或解析不了都落到
+     * {@code #HANDLE}——一个笔误应当降级到安全默认，而不是让每个请求都失败。
      */
-    public static Mode defaultMode() {
-        String raw = StorageRuntimeEnv.resourceUrlMode();
+    public static Mode defaultMode(String raw) {
         if (raw == null || raw.isBlank()) {
             return HANDLE;
         }
         try {
             return parse(raw);
         } catch (ResourceModeException e) {
-            warnBadDefaultOnce(raw.trim());
-            return HANDLE;
+            return HANDLE;   // 笔误降级到安全默认；**告警由边界侧负责**（契约零依赖，无 logger）
         }
     }
 
@@ -105,11 +95,11 @@ public enum Mode {
      *       再给它匿名文件 URL 等于把它的范围从"chunk 文本"偷偷扩到"文件字节"。</li>
      * </ul>
      */
-    public static Mode resolve(String queryValue) {
+    public static Mode resolve(String queryValue, String rawEnvDefault) {
         if (StorageUrlContext.isHandleModeForced()) {
             return HANDLE;
         }
-        Mode mode = requestedMode(queryValue);
+        Mode mode = requestedMode(queryValue, rawEnvDefault);
         if (mode == PUBLIC) {
             TenantAPIKeyScope scope = APIKeyScopeContext.current();
             if (scope != null && scope.isKnowledgeBaseRestricted()) {
@@ -119,26 +109,11 @@ public enum Mode {
         return mode;
     }
 
-    private static Mode requestedMode(String queryValue) {
+    private static Mode requestedMode(String queryValue, String rawEnvDefault) {
         if (queryValue != null && !queryValue.trim().isEmpty()) {
             return parse(queryValue);
         }
-        return defaultMode();
+        return defaultMode(rawEnvDefault);
     }
 
-    /**
-     * 每个不同的坏值只告警一次。
-     *
-     * <p>值本身每次重读，所以运维改回正确值不需要重启；但如果再写一个新笔误，
-     * 仍会告警——这正是"按值去重"而不是"只告警一次"的原因。</p>
-     */
-    private static final java.util.Set<String> WARNED_BAD_DEFAULTS =
-            java.util.concurrent.ConcurrentHashMap.newKeySet();
-
-    private static void warnBadDefaultOnce(String raw) {
-        if (WARNED_BAD_DEFAULTS.add(raw)) {
-            log.warn("ignoring {}: invalid value \"{}\"; falling back to \"{}\"",
-                    ENV_VAR, raw, HANDLE.value);
-        }
-    }
 }
