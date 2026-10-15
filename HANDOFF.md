@@ -1525,12 +1525,12 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 账 | 读数 | 状态 |
 |---|---|---|
-| `:contract` | **197 件** | ✅ 已独立（零依赖） |
-| `common/*` | **97 件**（125 → 103 → 102 → 97，E1/G1-b/G1-h 三轮共 −28） | 收敛中 |
+| `:contract` | **202 件** | ✅ 已独立（零依赖） |
+| `common/*` | **92 件**（125 → 97 → 92，E1/G1-b/G1-h/G1-c-1 共 −33） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
 | **C1 受控导入根** | 10 根 / **61 文件** | 冻结只许减 |
-| **C4 载荷** | `common/*` 残余 **12 件** + 登记 **9 件**（platform 面 7 · Jackson 语义必要 2 · 待去 Jackson 0） | ✅ 待去 Jackson 全清 |
+| **C4 载荷** | `common/*` 残余 **5 件** + 登记 **11 件**（platform 面 9 · Jackson 语义必要 2 · 待去 Jackson 0） | ✅ 待去 Jackson 全清 |
 | 域侧 handler | 10 件（TypeHandler） | 登记 |
 | build 依赖 | 12 | 冻结 |
 | **R10** | **6 条边 / 51 类**（①clearable **0** · ②owner 1〔`auth→tenant` 属主边〕· ③intra-family 5） | ✅ ①档达标 |
@@ -1783,6 +1783,16 @@ public interface AdminUserPort {
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 G1-c-1·KB 侧 5 件 `*ConfigView` 入契约 + 2 件 fileserve 端口按证据登记（C4 载荷 12 → 5）（2026-10-15）**
+- **对象（对账 §16.0-C 清单的前 7 件）**：`knowledge/dto/{Asr,Chunking,ImageProcessing,Indexing,Vlm}ConfigView` · `storage/fileserve/{GlobalFileServicePort,ProviderFileStorePort}`
+- **结果分两类（先测后动）**：
+  1. **5 件 `*ConfigView` 成功入 `contract.knowledge.domain`** ✓——它们**已只依赖 contract**（引用 4 个 config 类型）⇒ 纯搬移，零去 Jackson
+  2. **2 件 fileserve 端口搬不动（实测依赖面）** ✗：`GlobalFileServicePort` 签名含 **L1 `WritableFileContentService`**、`ProviderFileStorePort` 方法面含 **`FileTransport`（带 `jakarta.servlet` 请求/响应）** ⇒ 零依赖契约装不下 ⇒ **回退原位 + 登记为 platform 面**（含未来路径：把纯 JDK 的 `FileContentService`/`WritableFileContentService` 上提契约、并把 `FileTransport` 的 servlet 面切出去后可入 `contract.storage`）
+- **⚠️ 一次脚本误映射（已修）**：我的搬迁脚本用"名字后缀"分流目标包（`*ConfigView` → knowledge）⇒ **`IndexingStrategyView` 不以 `ConfigView` 结尾**，被误写到 `contract.storage` ✗ ⇒ 编译立刻抓出（2 文件）⇒ 改为**按显式映射表**（源 → 目标包）逐件指定。**判据：搬迁脚本的目标包必须显式映射，禁止用命名模式推断**（与"删方法前编译验证"同属"别让模式推断替代事实"）
+- **读数**：`:contract` 197 → **202**（+5）；`common/*` 97 → **92**（−5）；**C4 载荷型 12 → 5**、登记 platform 面 7 → **9**；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**（基线已 `--write`）；**1349 金片签名一致**（`kb-*.json` 钉住 KB API 线格式 ⇒ 5 件 ConfigView 迁址不改字节 ✓）；`spotlessCheck build` **2m10s**；**4991 / 失败 0 / 跳过 4**
+- **冒烟**：KB **200** ✓（`KnowledgeBaseResponse` + 5 件 ConfigView 链路）· init **404 业务信封** ✓ · sessions / storage-backends **200** ✓
+- **G1-c 余量（对账 §16.0-C 剩 5 件）**：`knowledge/dto/KnowledgeBaseResponse`（先 de-Jackson：其组件若为 `JsonNode`）· `wiki/WikiPageOpsPort`（需先定 `wiki/domain/WikiIndex` 的归属）· `session/qa/{SessionQaPort,QaRequestPayload}` + `session/PipelineMessageView`
 **🔶 G1-h·4 个 KB config 类型去 Jackson + `KnowledgeBaseRowView` 入契约（Jackson 语义必要 3 → 2）（2026-10-15）**
 - **对象**：`KnowledgeBaseChunkingConfig` · `KnowledgeBaseImageProcessingConfig` · `KnowledgeBaseIndexingStrategy` · `KnowledgeBaseVlmConfig`（**实体 `@TableField` 字段类型**＝持久化形状）+ 依赖它们的 `KnowledgeBaseRowView`
 - **先测（两条决定性事实）**：① 4 个类型**字段全为纯 JDK** ✓ ⇒ 阻塞只有两处：静态 `from(JsonNode)` 工厂（用 `JsonMappers`）与 2 个 `@JsonIgnore` 派生访问器 ② 那 6 个 `@JsonSerialize` 与这些类型**无关**（在 `WikiPage`/`SourceConnector` 等别处）

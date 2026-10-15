@@ -123,7 +123,14 @@ PLATFORM_FACE = {
         "带 MyBatis-Plus Page ⇒ platform 面（分页属技术适配）",
     "com/ragagent/common/session/embed/EmbedSessionPort.java":
         "带 jakarta.servlet + Spring ResponseEntity ⇒ platform 面",
-    "com/ragagent/common/storage/fileserve/FileProxyPort.java":
+        "com/ragagent/common/storage/fileserve/GlobalFileServicePort.java":
+        "会话装配面的进程级文件服务端口：**签名含 L1 `WritableFileContentService`** ⇒ 契约装不下"
+        "（与该组件的 servlet 兄弟同族）；未来路径：把纯 JDK 的 `FileContentService`/"
+        "`WritableFileContentService` 上提契约、并把 `FileTransport` 的 servlet 面切出去后可入 contract.storage",
+    "com/ragagent/common/storage/fileserve/ProviderFileStorePort.java":
+        "provider 文件存储端口：**方法面含 `FileTransport`**，而后者带 jakarta.servlet 请求/响应类型 "
+        "⇒ 零依赖契约装不下；随 `GlobalFileServicePort` 的未来路径一并处置",
+"com/ragagent/common/storage/fileserve/FileProxyPort.java":
         "带 jakarta.servlet 请求/响应类型 ⇒ platform 面",
     "com/ragagent/common/session/embed/SessionView.java":
         "会话 QA 面载荷与装配面读写形状（platform 面端口载荷）；JSON 等价由 session-*.json / "

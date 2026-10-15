@@ -1,6 +1,5 @@
-package com.ragagent.common.knowledge.dto;
+package com.ragagent.contract.knowledge.domain;
 
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
 import java.util.List;
 
 /** 分块配置视图：分块尺寸/重叠、分隔符、解析器引擎规则、父子块与语言等。 */

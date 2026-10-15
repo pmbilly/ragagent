@@ -3,10 +3,10 @@ package com.ragagent.knowledge.dto.kb;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseVlmConfig;
-import com.ragagent.common.knowledge.dto.IndexingStrategyView;
-import com.ragagent.common.knowledge.dto.AsrConfigView;
-import com.ragagent.common.knowledge.dto.ImageProcessingConfigView;
-import com.ragagent.common.knowledge.dto.ChunkingConfigView;
+import com.ragagent.contract.knowledge.domain.IndexingStrategyView;
+import com.ragagent.contract.knowledge.domain.AsrConfigView;
+import com.ragagent.contract.knowledge.domain.ImageProcessingConfigView;
+import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
 
 public record CreateKnowledgeBaseRequest(
         String name,
