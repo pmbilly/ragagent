@@ -205,7 +205,11 @@ contract  → JDK                                  （纯 JDK：公开 API / SPI
 
 | # | 门槛 | 判定方式 |
 |---|---|---|
-| **G1** | `:common` 内**载荷型文件清零或全登记**（`*View`/`*Facts`/`*Payload`/`*Response`/`*Port`，实测 2026-10-15＝**32 件**）——载荷应落 `:contract`、持久化实体回域 | 新增门禁 **C4**（`check-contracts-purity.py`，只许减）+ C1/C2 |
+| **G1** | `:common` 内**载荷型文件清零或全登记**（`*View`/`*Facts`/`*Payload`/`*Response`/`*Port`）——载荷应落 `:contract`、持久化实体回域。**进度 2026-10-15**：起始 32 ⇒ **已入 `:contract` 10 件** · **已登记 7 件**（4 platform 面 + 3 待去 Jackson）· **待归位 15 件** | 新增门禁 **C4**（`check-contracts-purity.py`，只许减）+ C1/C2 |
+| **G1-b（立项）** | **「去 Jackson」专项**：`ChunkFacts`/`KnowledgeBaseView`/`KnowledgeDocumentFacts` 的 `JsonNode` 字段（触达 7/1/2 处消费）+ B258 登记的 `AppError` ⇒ 改造口径二选一：**(a)** `JsonNode` → JDK `Map<String,Object>`（线格式基本等价，需金片复核 `NullNode`/空值语义）；**(b)** 载荷只带**消费者实际用度的键**（收窄成纯 JDK record，线格式**会变** ⇒ 需前端确认）。**改造完成即整批入 `:contract`** | C4 的 `PENDING_DEJACKSON` 登记 |
+| **G1-c（登记）** | 4 件**框架味**（`ApiKeyAuthPort` servlet · `KnowledgeCatalogPort` MyBatis-Plus Page · `EmbedSessionPort` servlet+ResponseEntity · `FileProxyPort` servlet）⇒ **永远进不了零依赖 `:contract`**，归未来 `platform` 模块 | C4 的 `PLATFORM_FACE` 登记 |
+| **G1-e（登记）** | `common/retrieval/SearchResult`（**不带 C4 后缀**故未入 C4 计数，但实为载荷）：引 Jackson 注解 + `JsonNode` + **platform 的 `SortedMapSerializer`** ⇒ **既非纯 JDK 也非域内容** ⇒ 归 platform 面／待去 Jackson；**引用面 66 处**（影响面大，改造需单独批次）。`PipelineMessageView` 因此随它一起等 | 本表登记 |
+| **G1-d（随 C）** | 余 15 件中的实体相关项（7 个实体端口 + 3 个 `*ConfigView` + `KnowledgeBaseResponse` + `PipelineMessageView` 等）⇒ **随 C 的实体收窄逐批处理**（视图/端口改吃契约视图） | C4 基线（只许减） |
 | **G2** | `com.ragagent.platform.*` 与 `com.ragagent.common.*` **依赖单向无环** | R5/R6/R9（包级 SCC）已覆盖；拆前复跑 |
 | **G3** | **组件/属性/Mapper 扫描面清单同步**（方案阶段 6 验收原文：每步同步更新，**不刷新 baseline 掩盖违例**） | 拆某一模块时逐项核对 `@ConfigurationPropertiesScan`/`@ComponentScan`/`@MapperScan` |
 | **G4** | **"确有编译隔离收益"的证据**（方案触发条件） | 口径：该包簇的**改动频率 × 受影响模块数**、增量编译范围；给出量化对比后再动手 |

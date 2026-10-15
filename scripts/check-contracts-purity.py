@@ -25,6 +25,8 @@
      （`*View` / `*Facts` / `*Payload` / `*Response` / `*Port`）——终态应落 **`:contract`** 或回各域
      （HANDOFF §12.0/§12.5 G1）；新增 ⇒ 红，减少 ⇒ 提示 `--write` 收紧。
      （`:common` 已 `api(project(":contract"))`，端口/视图可落 `:contract` 并被 common 与各域共用。）
+     两个**已登记白名单**（不计入本项、各有理由）：`PLATFORM_FACE`（带 servlet/Spring/MyBatis ⇒ 归
+     未来 platform 模块）与 `PENDING_DEJACKSON`（载荷形状用 JsonNode ⇒ 待"去 Jackson"专项后入 :contract）。
 
 白名单（= 允许的根；改这里等于改判据，需同步 HANDOFF §12.0）：
   `java.` / `javax.` / `com.ragagent.` / `com.fasterxml.jackson`（序列化）/ `org.slf4j`（日志）
@@ -111,15 +113,47 @@ def scan_build_deps() -> list[str]:
 
 PAYLOAD_SUFFIXES = ("View", "Facts", "Payload", "Response", "Port")
 
+# ── 已登记白名单（两类，均为"有据的归属"，不计入 C4 的"待归位载荷"）──
+# ① platform 面：带框架类型（servlet / Spring / MyBatis），**永远进不了零依赖的 :contract**，
+#    归属未来的 `platform` 模块（§12.5 提取顺序里 platform 先于三 runtime）。
+PLATFORM_FACE = {
+    "com/ragagent/common/apikey/ApiKeyAuthPort.java":
+        "带 jakarta.servlet 请求/响应类型 ⇒ platform 面",
+    "com/ragagent/common/knowledge/KnowledgeCatalogPort.java":
+        "带 MyBatis-Plus Page ⇒ platform 面（分页属技术适配）",
+    "com/ragagent/common/session/embed/EmbedSessionPort.java":
+        "带 jakarta.servlet + Spring ResponseEntity ⇒ platform 面",
+    "com/ragagent/common/storage/fileserve/FileProxyPort.java":
+        "带 jakarta.servlet 请求/响应类型 ⇒ platform 面",
+}
+
+# ② 待"去 Jackson"专项：载荷形状本身用了 JsonNode（`ChunkFacts` / `KnowledgeBaseView` /
+#    `KnowledgeDocumentFacts`）⇒ :contract 零依赖装不下；与 B258 登记的"`AppError` 去 Jackson"
+#    **同一课题**（改造口径与风险见 HANDOFF §12.5）；改造完成即整批入 :contract。
+PENDING_DEJACKSON = {
+    "com/ragagent/common/knowledge/ChunkFacts.java":
+        "JsonNode relationChunks/metadata（7 处消费触达）⇒ 待去 Jackson",
+    "com/ragagent/common/knowledge/KnowledgeBaseView.java":
+        "JsonNode wikiConfig/extractConfig（1 处消费触达）⇒ 待去 Jackson",
+    "com/ragagent/common/knowledge/KnowledgeDocumentFacts.java":
+        "JsonNode metadata（2 处消费触达）⇒ 待去 Jackson",
+}
+
+REGISTERED = {**PLATFORM_FACE, **PENDING_DEJACKSON}
+
 
 def scan_payloads() -> list[str]:
-    """C4：`common`（非 platform）里的载荷型文件。"""
+    """C4：`common`（非 platform）里的载荷型文件，**扣除已登记白名单**（platform 面 / 待去 Jackson）。"""
     base = ROOT / "common" / "src" / "main" / "java"
     root = base / "com" / "ragagent" / "common"
     out = []
     for f in root.rglob("*.java"):
-        if f.name.endswith(tuple(s + ".java" for s in PAYLOAD_SUFFIXES)):
-            out.append(str(f.relative_to(base)))
+        if not f.name.endswith(tuple(s + ".java" for s in PAYLOAD_SUFFIXES)):
+            continue
+        rel = str(f.relative_to(base))
+        if rel in REGISTERED:
+            continue
+        out.append(rel)
     return sorted(out)
 
 
@@ -144,7 +178,8 @@ def write(cur: dict) -> None:
     total = sum(len(v) for v in cur["imports"].values())
     print(f"✓ 基线已写入：受控导入根 {len(cur['imports'])} 个 / 共 {total} 文件，"
           f"实体 {len(cur['persistence']['entities'])}，域侧 handler {len(cur['persistence']['handlers'])}，"
-          f"build 依赖 {len(cur['build_deps'])}，载荷型文件 {len(cur['payloads'])}")
+          f"build 依赖 {len(cur['build_deps'])}，载荷型文件 {len(cur['payloads'])}"
+          f"（登记：platform 面 {len(PLATFORM_FACE)} · 待去 Jackson {len(PENDING_DEJACKSON)}）")
 
 
 def main() -> int:
@@ -209,7 +244,8 @@ def main() -> int:
         return 1
     msg = (f"✓ 契约层纯度：受控导入根 {len(cur['imports'])} 个（{sum(len(v) for v in cur['imports'].values())} 文件）"
            f"· 实体 {len(cur['persistence']['entities'])} · 域侧 handler {len(cur['persistence']['handlers'])}"
-           f"· build 依赖 {len(cur['build_deps'])} · 载荷型文件 {len(cur['payloads'])}（全部冻结只许减）")
+           f"· build 依赖 {len(cur['build_deps'])} · 载荷型文件 {len(cur['payloads'])}（全部冻结只许减；"
+           f"另有 {len(PLATFORM_FACE)} 件 platform 面 + {len(PENDING_DEJACKSON)} 件待去 Jackson 已登记）")
     if shrinks:
         print(msg + f"；可收紧 {len(shrinks)} 处 —— 对账后跑 --write：")
         for s in shrinks[:8]:
