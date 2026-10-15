@@ -15,7 +15,6 @@ import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.common.session.domain.conversation.Session;
-import com.ragagent.session.service.QaSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +25,7 @@ import com.ragagent.im.service.ImTurnOrchestrator.QaTask;
 import com.ragagent.contract.event.payload.AgentCompleteData;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.payload.ErrorData;
+import com.ragagent.common.session.qa.QaRequestPayload;
 
 /**
  * IM QA 执行编排：队列 worker 的租户上下文绑定与在途登记、full-output / 流式 /
@@ -236,16 +236,16 @@ final class ImQaRunner {
                 TenantContext.PrincipalTypes.IM_USER, "system-" + imTenant), "viewer",
                 false, "system-" + imTenant, false);
         try {
-            QaSupport.QaRequest qaReq = service.qaRequests.buildIMQARequest(session, attach.msg().content,
+            QaRequestPayload qaReq = service.qaRequests.buildIMQARequest(session, attach.msg().content,
                     assistantMsg.getId(), userMsg.getId(), agent, attach.msg().quote, attach.inflight());
             ImAttachmentPreparer.applyTo(qaReq, prepared);
             // 同步执行（QA 服务内部为虚拟线程管线，事件经 eventBus 回流到上面的订阅）。
             Exception runErr;
             try {
                 if (agent != null && ImQaRequests.isAgentMode(agent.configJson())) {
-                    service.agentQaService.agentQA(qaReq, eventBus);
+                    service.sessionQaPort.agentQa(qaReq, eventBus);
                 } else {
-                    service.knowledgeQaService.knowledgeQA(qaReq, eventBus);
+                    service.sessionQaPort.knowledgeQa(qaReq, eventBus);
                 }
                 runErr = null;
             } catch (Exception e) {
@@ -286,7 +286,7 @@ final class ImQaRunner {
         assistantMsg.setContent(answer);
         assistantMsg.setCompleted(true);
         try {
-            service.messageService.updateMessage(assistantMsg);
+            service.sessionQaPort.updateMessage(assistantMsg);
         } catch (Exception e) {
             log.warn("[IM] Failed to update assistant message: {}", e.getMessage());
         }

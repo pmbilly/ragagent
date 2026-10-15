@@ -46,13 +46,10 @@ import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.common.session.domain.conversation.Session;
-import com.ragagent.session.service.MessageService;
-import com.ragagent.session.service.SessionAgentQaService;
-import com.ragagent.session.service.SessionKnowledgeQaService;
-import com.ragagent.session.service.SessionService;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.common.storage.support.Resolver;
+import com.ragagent.common.session.qa.SessionQaPort;
 
 /**
  * IM 执行体核心。
@@ -76,11 +73,8 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
 
     final ImChannelMapper channels;
     final ChannelSessionMapper channelSessions;
-    final SessionService sessionService;
-    final MessageService messageService;
+    final SessionQaPort sessionQaPort;
     final AgentLookup agentLookup;
-    final SessionKnowledgeQaService knowledgeQaService;
-    final SessionAgentQaService agentQaService;
     final Resolver storageResolver;
 
     // ── 调谐参数 ─────────────────────────────────────────────────────────
@@ -127,9 +121,8 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
     }
 
     public ImTurnOrchestrator(ImChannelMapper channels, ChannelSessionMapper channelSessions,
-            SessionService sessionService, MessageService messageService,
+            SessionQaPort sessionQaPort,
             AgentLookup agentLookup,
-            SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService,
             java.util.Optional<Resolver> storageResolver,
             ObjectProvider<StringRedisTemplate> redisTemplates,
             ObjectProvider<DocReaderParsePort> docReaders,
@@ -143,11 +136,8 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
             @Value("${im.rate-limit-max:10}") int rateLimitMax) {
         this.channels = channels;
         this.channelSessions = channelSessions;
-        this.sessionService = sessionService;
-        this.messageService = messageService;
+        this.sessionQaPort = sessionQaPort;
         this.agentLookup = agentLookup;
-        this.knowledgeQaService = knowledgeQaService;
-        this.agentQaService = agentQaService;
         this.storageResolver = storageResolver.orElse(null);
         this.streamPipeline = new ImStreamPipeline(this);
         this.outboundFormatter = new ImOutboundFormatter(this);
@@ -312,13 +302,13 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
             return;
         }
 
-        Session session = sessionService.getSession(channelSession.getSessionId());
+        Session session = sessionQaPort.getSession(channelSession.getSessionId());
         if (session == null) {
             // 会话被删：回收陈旧映射并重解析
             channelSessions.softDelete(channelSession.getId(), OffsetDateTime.now());
             channelSession = resolveSession(msg, tenantId, agentId, channelId,
                     channel.getSessionMode());
-            session = sessionService.getSession(channelSession.getSessionId());
+            session = sessionQaPort.getSession(channelSession.getSessionId());
             if (session == null) {
                 throw new IllegalStateException(
                         "get session (retry): " + channelSession.getSessionId());

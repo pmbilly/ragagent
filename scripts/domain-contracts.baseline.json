@@ -96,13 +96,6 @@
     "embedchannel→session": [
       "EmbedChannelController"
     ],
-    "im→session": [
-      "ImAttachmentPreparer",
-      "ImQaRequests",
-      "ImQaRunner",
-      "ImStreamPipeline",
-      "ImTurnOrchestrator"
-    ],
     "session→agentmanagement": [
       "AgentConfigAssembler",
       "AgentResolver",

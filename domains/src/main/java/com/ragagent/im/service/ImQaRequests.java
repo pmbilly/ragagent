@@ -9,7 +9,7 @@ import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
 import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.common.session.domain.conversation.Session;
-import com.ragagent.session.service.QaSupport;
+import com.ragagent.common.session.qa.QaRequestPayload;
 import com.ragagent.common.session.domain.message.MessageAttachment;
 
 /**
@@ -39,10 +39,10 @@ final class ImQaRequests {
     }
 
     /** 构造 QA 请求（含 agent config 缺省补全与 /stop 取消探针）。 */
-    QaSupport.QaRequest buildIMQARequest(Session session, String query,
+    QaRequestPayload buildIMQARequest(Session session, String query,
             String assistantMessageId, String userMessageId, AgentLookup.AgentView agent,
             IncomingMessage.QuotedMessage quote, InflightEntry inflight) {
-        QaSupport.QaRequest req = new QaSupport.QaRequest();
+        QaRequestPayload req = new QaRequestPayload();
         req.session = session;
         req.query = query;
         req.assistantMessageId = assistantMessageId;
@@ -78,7 +78,7 @@ final class ImQaRequests {
         if (attachments != null && !attachments.isEmpty()) {
             m.setAttachments(attachments);
         }
-        return service.messageService.createMessage(m);
+        return service.sessionQaPort.createMessage(m);
     }
 
     /** 助手消息落库。 */
@@ -88,6 +88,6 @@ final class ImQaRequests {
         m.setRole("assistant");
         m.setRequestId(requestId);
         m.setChannel("im");
-        return service.messageService.createMessage(m);
+        return service.sessionQaPort.createMessage(m);
     }
 }

@@ -83,7 +83,7 @@ final class ImSessionResolver {
         s.setTenantId(tenantId);
         s.setTitle(title);
         s.setDescription(description);
-        return service.sessionService.createSession(s);
+        return service.sessionQaPort.createSession(s);
     }
 
 
@@ -115,7 +115,7 @@ final class ImSessionResolver {
             log.error("[IM] channel session insert failed: {}", e.toString(), e);
             // 并发创建撞唯一约束：清掉孤儿会话，回落已存在映射。
             try {
-                service.sessionService.deleteSession(created.getId());
+                service.sessionQaPort.deleteSession(created.getId());
             } catch (Exception cleanup) {
                 log.warn("[IM] Failed to clean up orphaned session {}: {}",
                         created.getId(), cleanup.getMessage());

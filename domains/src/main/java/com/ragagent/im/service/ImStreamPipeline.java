@@ -18,7 +18,6 @@ import com.ragagent.im.runtime.ThinkDisplay;
 import com.ragagent.im.runtime.ToolDisplay;
 import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.common.session.domain.conversation.Session;
-import com.ragagent.session.service.QaSupport;
 import com.ragagent.platform.access.TenantContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +29,7 @@ import com.ragagent.contract.event.payload.AgentThoughtData;
 import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
 import com.ragagent.contract.event.payload.ErrorData;
+import com.ragagent.common.session.qa.QaRequestPayload;
 
 /**
  * IM 流式回复管线：事件订阅组、流缓冲袋、300ms 冲刷循环与 finalize/收尾落库。
@@ -80,15 +80,15 @@ final class ImStreamPipeline {
                 TenantContext.PrincipalTypes.IM_USER, "system-" + tenantId), "viewer",
                 false, "system-" + tenantId, false);
         try {
-            QaSupport.QaRequest qaReq = service.qaRequests.buildIMQARequest(session, msg.content,
+            QaRequestPayload qaReq = service.qaRequests.buildIMQARequest(session, msg.content,
                     assistantMsg.getId(), userMsg.getId(), agent, msg.quote, attach.inflight());
             ImAttachmentPreparer.applyTo(qaReq, prepared);
             Exception runErr;
             try {
                 if (useAgent) {
-                    service.agentQaService.agentQA(qaReq, eventBus);
+                    service.sessionQaPort.agentQa(qaReq, eventBus);
                 } else {
-                    service.knowledgeQaService.knowledgeQA(qaReq, eventBus);
+                    service.sessionQaPort.knowledgeQa(qaReq, eventBus);
                 }
                 runErr = null;
             } catch (Exception e) {
@@ -158,7 +158,7 @@ final class ImStreamPipeline {
         assistantMsg.setContent(answer);
         assistantMsg.setCompleted(true);
         try {
-            service.messageService.updateMessage(assistantMsg);
+            service.sessionQaPort.updateMessage(assistantMsg);
         } catch (Exception e) {
             log.warn("[IM] Failed to update assistant message: {}", e.getMessage());
         }

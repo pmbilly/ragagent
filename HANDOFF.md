@@ -1331,6 +1331,21 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 A③ 第五十二刀：批 4-④ 第二阶段·会话 QA 面端口化 ⇒ `im→session` 清零（2026-10-15，R10 边 10 → 9、类 77 → 72）**
+- **读数**：**`im→session` 整条边清零** ✓（边 **10 → 9**）；类 **77 → 72（−5）**；**①档仅剩 1 条 / 1 类**（`embedchannel→session` / `EmbedChannelController`）
+- **L1 新增 2 件**：`common.session.qa.QaRequestPayload`（**11 字段**：session / query / assistantMessageId / userMessageId / agentId / agentConfig / webSearchEnabled / quotedContext / cancellationProbe / attachments / imageUrls——**字段默认值刻意与运行容器一致**：attachments=`new ArrayList<>()`、imageUrls=null）· `common.session.qa.SessionQaPort`（**6 方法**：`createMessage` / `updateMessage`（void）· `getSession` / `createSession` / `deleteSession` · `knowledgeQa` / `agentQa`）
+- **会话侧适配器** `session/api/SessionQaAdapter`：消息与会话五个操作逐字转发；两条 QA 管线先做**载荷 → 容器逐字段搬运**（未列字段保持容器默认 ⇒ 与装配面原先"直建容器"的行为逐字等价），再分发
+- **im 侧 5 类迁移**：`ImQaRequests`（`buildIMQARequest` 产载荷；消息落库走端口）· `ImAttachmentPreparer.applyTo`（改吃载荷）· `ImQaRunner` / `ImStreamPipeline`（管线触发走端口；另两处 `updateMessage` 亦走端口）· `ImSessionResolver`（`createSession`/`deleteSession` 走端口）· **`ImTurnOrchestrator`（4 个会话服务 → 单端口，字段与构造各 −3）**
+- **⭐ 设计要点（本案的"载荷化"范式，可复用）**：容器 `QaSupport.QaRequest` 含 **family 类型字段**（`CustomAgentEntity`/`SteerSink`）与大量会话内部状态 ⇒ **不能上提**；而装配面只填 11 个字段 ⇒ 设计 = **L1 载荷（只含装配面字段）+ 域侧适配器（载荷→容器）**。这与 ㊿ 的"实体上提优先"互补：**实体能上提就上提，容器不能上提就载荷化**
+- **⚠️ 一次 R8 红态**：我在新载荷里写了内联全限定名（`java.util.List<com.ragagent.common.session.domain.message.MessageAttachment>`）⇒ R8 点名 ⇒ 改 import + 短名（**"新文件必过本域/全局约定测试"第 2 次应验**）
+- **验证**：**13 守卫全绿** ✓（环 0、R9 = 8 组、R8 违规 0）；`spotlessCheck build` ✓ **2m10s** ✓；**4991 / 失败 0 / 跳过 4** ✓；定向 im/session **324 条** ✓；dev 重启 ready ✓（新端口+适配器装配通过）+ 冒烟（im-channels / sessions / knowledge-bases / embed-channels 均 200 ✓）
+- **A③ 累计（五十二刀）**：边 **64 → 9（−55）**、类 **317 → 72（−245）**；三档 **① 1 条 / 1 类 · ② 3 条 / 21 类 · ③ 5 条 / 50 类**
+- **①档收官最后一类（`EmbedChannelController`）——设计要素已测清**：它把 4 个会话 controller 存为字段，实际 7 处调用发生在**同包** `EmbedChannelDelegateOps`（`ctrl.<controller>.<method>`）：
+  1. `knowledgeQaController.agentQA(sessionId, rawBody, resourceUrls, …)` · `knowledgeQa(sessionId, rawBody, resourceUrls, …)`（String 形态，非 QaRequest）
+  2. `messageController.loadMessages(sessionId, limit, beforeTime, …)` → `ResponseEntity<List<Message>>`
+  3. `sessionController.stopSession(sessionId, StopSessionRequest)` → `ApiResponse<Void>`（`StopSessionRequest` 已 L1 ✓）
+  4. `suggestionController.get/ensure/recordEvent(...)` → `ResponseEntity<MessageSuggestionSet>` / `ApiResponse<Void>`
+  ⇒ 设计建议：**端口面按"无响应壳"设计**（返回 `List<Message>` / `MessageSuggestionSet` / void），响应壳（`ResponseEntity`/`ApiResponse`）留在 embedchannel 侧自包；`MessageSuggestionSet` 需判定"上提 L1"或"端口返回 L1 视图"（先核其纯度与线格式）
 **🔶 A③ 第五十一刀：批 4-④ 第一阶段·会话实体面入 L1（22 件）⇒ ①档 8 → 6 类（2026-10-15，R10 类 84 → 77）**
 - **读数**：类 **84 → 77（−7）**；①档 **2 条 / 8 类 → 2 条 / 6 类**；`im→session` 6 → 5、`embedchannel→session` 2 → 1（两条边**未清零**——余下是设计面，见下）；`session→agent` 族内边 55 → 50（连带收窄）
 - **L1 上提 22 件**（`common.session.*` / `common.agent.domain`）：`Session` · `Message` · `MessageAttachment` · `MentionedItem` · `UsedMemory` · `SuggestionAttribution` · `SessionOwnerIds` · `SessionLastRequestState` · `AbstractJsonListTypeHandler` + **7 个 TypeHandler** · `MessageImage` · `MessageArtifact` · `MessageExecutionContext` · `StopSessionRequest` · `AgentStep` · `AgentToolCall`

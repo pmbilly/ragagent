@@ -18,7 +18,7 @@ import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.common.session.domain.message.MessageAttachment;
-import com.ragagent.session.service.QaSupport;
+import com.ragagent.common.session.qa.QaRequestPayload;
 
 /**
  * IM 文件/图片附件的下载与解析。
@@ -68,7 +68,7 @@ final class ImAttachmentPreparer {
     }
 
     /** 把解析产物挂到 QA 请求（附件元数据/正文 + vision 图片）。 */
-    static void applyTo(QaSupport.QaRequest qaReq, Prepared prepared) {
+    static void applyTo(QaRequestPayload qaReq, Prepared prepared) {
         if (qaReq == null || prepared == null) {
             return;
         }
