@@ -46,6 +46,7 @@ import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
 import com.ragagent.agent.prompt.PinnedSkillInfo;
 import com.ragagent.agent.prompt.KnowledgeBaseInfo;
 import com.ragagent.mcp.tool.McpTooling;
+import com.ragagent.chatpipeline.spi.McpToolingGateway;
 
 /**
  * {@code SessionAgentQaService} 的**引擎/工具装配簇**（§14.9c 刀 3）：创建 agent 引擎（LLM/记忆/审批门/
@@ -117,10 +118,11 @@ final class AgentEngineAssembler {
         }
         registerTools(toolRegistry, config, rerankModel, sessionId);
         // MCP 编排端口注入：引擎只持端口，MCP 目录逻辑（原 ToolRegistry 内）在 McpTooling
-        toolRegistry.setMcpTooling(new McpTooling(toolRegistry.port()));
+        McpTooling mcpTooling = new McpTooling(toolRegistry.port());
+        toolRegistry.setMcpTooling(mcpTooling);
         // registerMcpTools：按 agent 配置的
         // mcp_selection_mode 注册受限 MCP 目录（按需发现，不连上游、不广告完整 schema）
-        registerMcpTools(toolRegistry, config);
+        registerMcpTools(toolRegistry, config, mcpTooling);
 
         // 指令型技能（选项 B）：Manager 只做 SKILL.md 三级注入（元数据/正文/资源），
         // 模型凭指令用现有工具执行；shell/文件注入与沙箱镜像源已随沙箱退役。
@@ -228,7 +230,8 @@ final class AgentEngineAssembler {
      * ToolExecContext；OAuth 服务无快照时给出"先去授权"的方向。
      * 失败只记警告，不影响引擎创建。</p>
      */
-    private void registerMcpTools(ToolRegistry toolRegistry, QaAgentConfig config) {
+    private void registerMcpTools(ToolRegistry toolRegistry, QaAgentConfig config,
+            McpToolingGateway mcpTooling) {
         long tenantId = TenantContext.currentTenantId() == null ? 0L : TenantContext.currentTenantId();
         if (tenantId == 0) {
             // 租户缺失直接 return；补一条日志——否则该分支
@@ -273,7 +276,8 @@ final class AgentEngineAssembler {
 
         try {
             int registered = McpExposure.registerMcpTools(
-                    toolRegistry,
+                    toolRegistry.port(),
+                    mcpTooling,
                     enabled,
                     mcpClientManager,
                     toolApprovalGate,

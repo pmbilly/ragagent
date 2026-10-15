@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.common.agent.tool.ToolCallTarget;
 
 /**
  * agent 领域里的一次工具调用。

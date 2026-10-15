@@ -1,9 +1,9 @@
-package com.ragagent.agent.tool.spi;
+package com.ragagent.chatpipeline.spi;
 
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.domain.ToolCallTarget;
+import com.ragagent.common.agent.tool.ToolCallTarget;
 import com.ragagent.llm.domain.ChatMessage;
 
 /**

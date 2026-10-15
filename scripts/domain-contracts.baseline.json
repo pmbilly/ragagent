@@ -160,13 +160,6 @@
       "KnowledgeSummaryService",
       "KnowledgeTagService"
     ],
-    "mcp→agent": [
-      "McpCallTool",
-      "McpCatalog",
-      "McpCatalogPagination",
-      "McpExposure",
-      "McpTooling"
-    ],
     "session→memory": [
       "AgentEngineAssembler",
       "AgentToolBackends",

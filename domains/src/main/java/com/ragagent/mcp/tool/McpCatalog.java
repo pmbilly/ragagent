@@ -24,7 +24,6 @@ import com.ragagent.mcp.oauth.OAuthReauthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpOAuthRequiredException;
 import com.ragagent.common.agent.tool.ToolDefinitions;
-import com.ragagent.agent.tool.ToolRegistry;
 
 /**
  * MCP 目录：一个 Agent 引擎、一个授权主体独有。只有 server 快照可变；可执行的
@@ -635,7 +634,7 @@ public final class McpCatalog {
                 || arguments.isMissingNode()
                 || !arguments.isObject();
         if (bad) {
-            throw new IllegalArgumentException("toolRef and an arguments object are required." + ToolRegistry.MCP_CALL_ARGUMENTS_HINT);
+            throw new IllegalArgumentException("toolRef and an arguments object are required." + ToolDefinitions.MCP_CALL_ARGUMENTS_HINT);
         }
         return new DecodeResult(toolRef, arguments);
     }

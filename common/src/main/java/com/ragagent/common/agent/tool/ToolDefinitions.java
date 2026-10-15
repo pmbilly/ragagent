@@ -11,6 +11,16 @@ public final class ToolDefinitions {
     /** OpenAI API 对工具/函数名的最大长度。 */
     public static final int MAX_FUNCTION_NAME_LENGTH = 64;
 
+    /**
+     * MCP 调用参数提示（MCP 适配层也复用，故 public；**文本属契约，不得改字**）。
+     * <p>拼进校验失败信息。</p>
+     */
+    public static final String MCP_CALL_ARGUMENTS_HINT =
+            " Pass arguments as a JSON object, not a JSON-encoded string. "
+            + "For a tool with no parameters use {\"toolRef\":\"<describe reference>\",\"arguments\":{}}; "
+            + "otherwise match its inputSchema. If the definition is unavailable, use "
+            + "discover_mcp_tools(mode=\"describe\", serverId=..., toolName=...).";
+
     // ---- 工具名常量 ----
 
     /** 能力域 MCP 发现与调用；不是租户可选的内建工具。 */

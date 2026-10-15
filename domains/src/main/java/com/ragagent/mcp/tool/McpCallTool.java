@@ -7,10 +7,12 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.common.agent.tool.BaseTool;
-import com.ragagent.agent.tool.ToolRegistry;
+
 import com.ragagent.common.agent.tool.ToolRequest;
 import com.ragagent.common.agent.tool.AgentTool;
 import com.ragagent.platform.web.ToolJson;
+import com.ragagent.chatpipeline.spi.ToolRegistryPort;
+import com.ragagent.chatpipeline.spi.McpToolingGateway;
 
 /**
  * call_mcp_tool：解析目录引用并调用其 MCP 目标。Parameters 只广告完整定义已在
@@ -19,12 +21,15 @@ import com.ragagent.platform.web.ToolJson;
 public class McpCallTool extends BaseTool {
 
     private final McpCatalog catalog;
-    private final ToolRegistry registry;
+    private final ToolRegistryPort registry;
+    private final McpToolingGateway mcpTooling;
 
-    McpCallTool(String name, String description, String parameters, McpCatalog catalog, ToolRegistry registry) {
+    McpCallTool(String name, String description, String parameters, McpCatalog catalog,
+            ToolRegistryPort registry, McpToolingGateway mcpTooling) {
         super(name, description, parameters);
         this.catalog = catalog;
         this.registry = registry;
+        this.mcpTooling = mcpTooling;
     }
 
     /** 只广告已 describe 的 refs（mcpPrepared 时来自注册的引用）。 */
@@ -32,12 +37,12 @@ public class McpCallTool extends BaseTool {
     public JsonNode getParameters() {
         List<String> refs = new ArrayList<>();
         List<McpRegisteredTool> registered = new ArrayList<>();
-        for (AgentTool candidate : registry.port().tools()) {
+        for (AgentTool candidate : registry.tools()) {
             if (candidate instanceof McpRegisteredTool mcpTool) {
                 registered.add(mcpTool);
             }
         }
-        if (registry.isMcpPrepared()) {
+        if (mcpTooling != null && mcpTooling.isPrepared()) {
             for (McpRegisteredTool tool : registered) {
                 refs.add(tool.ref());
             }
@@ -62,7 +67,7 @@ public class McpCallTool extends BaseTool {
         if (resolved.error() != null) {
             return McpCatalog.mcpDiscoveryFailure(resolved.error(), "unavailable");
         }
-        return registry.port().executeInternal(request.cancellation(), request.execMeta(), resolved.tool(), resolved.argsNode());
+        return registry.executeInternal(request.cancellation(), request.execMeta(), resolved.tool(), resolved.argsNode());
     }
 
     record ResolveResult(McpToolWrapper tool, JsonNode argsNode, String error) {

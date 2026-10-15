@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.agent.domain.AgentToolCall;
-import com.ragagent.agent.domain.ToolCallTarget;
+import com.ragagent.common.agent.tool.ToolCallTarget;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.common.agent.tool.ToolDefinitions;
 import com.ragagent.agent.tool.runtime.JsonRepair;

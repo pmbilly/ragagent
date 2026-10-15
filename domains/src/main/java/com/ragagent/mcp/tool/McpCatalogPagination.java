@@ -12,12 +12,13 @@ import com.ragagent.mcp.tool.McpCatalog.McpServerSummary;
 import com.ragagent.mcp.tool.McpCatalog.McpToolSummary;
 import com.ragagent.mcp.tool.McpCatalog.McpDiscoveryPage;
 import com.ragagent.mcp.domain.McpService;
-import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.chatpipeline.spi.ToolRegistryPort;
+import com.ragagent.chatpipeline.spi.McpToolingGateway;
 
 /**
  * MCP 目录的分页与安装：游标分页（绑定查询与可见行）、快照浅拷贝、
- * 目录工具批量注册进 {@link ToolRegistry}。
+ * 目录工具批量注册进 {@link ToolRegistryPort}。
  */
 final class McpCatalogPagination {
 
@@ -169,7 +170,8 @@ final class McpCatalogPagination {
         return c;
     }
 
-    static void installMcpCatalog(ToolRegistry registry, McpCatalog c) {
+    static void installMcpCatalog(ToolRegistryPort registry, McpCatalog c,
+            McpToolingGateway mcpTooling) {
         // 有界的目录预览给模型路由提示，不暴露凭据、工具或 schema。全列表可经分页到达。
         List<String> ids = new ArrayList<>(c.servers.keySet());
         java.util.Collections.sort(ids);
@@ -207,6 +209,6 @@ final class McpCatalogPagination {
                         + "full inputSchema with describe before calling; listing does not enable execution. "
                         + "Pass the original tool arguments in arguments as a JSON object, never a JSON-encoded string. "
                         + "Discovery does not bypass approval or permissions.",
-                McpCatalog.MCP_CALL_SCHEMA, c, registry));
+                McpCatalog.MCP_CALL_SCHEMA, c, registry, mcpTooling));
     }
 }

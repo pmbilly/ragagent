@@ -19,11 +19,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.llm.domain.FunctionDef;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.agent.domain.ToolCallTarget;
+import com.ragagent.common.agent.tool.ToolCallTarget;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.agent.tool.spi.McpToolingGateway;
-import com.ragagent.agent.tool.spi.ToolRegistryPort;
+import com.ragagent.chatpipeline.spi.McpToolingGateway;
+import com.ragagent.chatpipeline.spi.ToolRegistryPort;
 import com.ragagent.common.agent.tool.ToolOutput;
 import com.ragagent.common.agent.tool.McpCatalogGuardedTool;
 import com.ragagent.common.agent.tool.ToolExecContext;
@@ -61,11 +61,6 @@ public class ToolRegistry {
     private int maxToolOutputSize;
 
     // ---- 校验失败的追加提示（文本属于各工具文件，registry 拼接点先就位）----
-    /** MCP 调用参数提示（MCP 适配层也复用，故 public；**文本属契约，不得改字**）。 */
-    public static final String MCP_CALL_ARGUMENTS_HINT = " Pass arguments as a JSON object, not a JSON-encoded string. "
-            + "For a tool with no parameters use {\"toolRef\":\"<describe reference>\",\"arguments\":{}}; "
-            + "otherwise match its inputSchema. If the definition is unavailable, use "
-            + "discover_mcp_tools(mode=\"describe\", serverId=..., toolName=...).";
     static final String WRITE_SANDBOX_MISSING_FIELD_HINT =
             "\nIf the previous call was truncated, retry with a complete JSON object: "
                     + "put `path` first (e.g. /workspace/output/script.py), then `content`. Split large files.";
@@ -232,7 +227,7 @@ public class ToolRegistry {
         if (!validationErrs.isEmpty()) {
             String errMsg = ParamValidator.formatValidationErrors(validationErrs);
             if (ToolDefinitions.TOOL_CALL_MCP_TOOL.equals(name)) {
-                errMsg += MCP_CALL_ARGUMENTS_HINT;
+                errMsg += ToolDefinitions.MCP_CALL_ARGUMENTS_HINT;
             }
             if (ToolDefinitions.TOOL_WRITE_SANDBOX_FILE.equals(name)) {
                 errMsg += WRITE_SANDBOX_MISSING_FIELD_HINT;

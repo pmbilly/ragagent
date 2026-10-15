@@ -1331,6 +1331,20 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 A③ 第三十五刀：`mcp→agent` 清零（刀 2）⇒ 工具注册表/编排 SPI 落 engine（2026-10-15，R10 边 26 → 25、类 170 → 165）**
+- **内容**：上提 `ToolRegistryPort`（注册表端口）+ `McpToolingGateway`（MCP 编排端口）+ `ToolCallTarget`（展示层调用目标载荷）；`MCP_CALL_ARGUMENTS_HINT` 常量从 `ToolRegistry` 移入 L1 `ToolDefinitions`（**多行拼接 + 注释写明"文本属契约，不得改字"⇒ 逐字搬移**，移动中曾漏续行、编译即报，已按原文补全）
+- **⚠️ 去向决策（本刀关键判断，两次预判拦截）**：
+  1. **`McpToolingGateway` 不能落 L1**：它依赖 engine 的 `llm.domain.ChatMessage`，而模块方向是 `domains → engine → common`（common 看不到 engine）⇒ 落 **engine `chatpipeline.spi`**
+  2. **`ToolRegistryPort` 随之落 engine（而非 L1）**：其 javadoc 自述"引擎侧接口"；更重要的是——若留 L1，**A20 会报"契约悬空"**（它的实现是 `ToolRegistry` 内**匿名内部类**，A20 只数顶层类）⇒ 这与 ㉘ 的 `FileUrlPort` 是同一坑的**第二次预判拦截**（这次在动手前就规避）
+  3. **`ToolCallTarget`（纯载荷：Map + JsonInclude）留 L1 `common.agent.tool`** ✓
+  4. 结论：二者同落 `com.ragagent.chatpipeline.spi`（engine 非域包 ⇒ R10 不计边、A20 不扫描）✓ 判据成立
+- **mcp 5 类改造**（全部改走端口）：`McpCallTool`（`registry.port().tools()` → `registry.tools()`；`registry.port().executeInternal` → `registry.executeInternal`；`registry.isMcpPrepared()` → **`mcpTooling != null && mcpTooling.isPrepared()`**，与原转发语义逐字等价）· `McpCatalog`（常量换 L1 来源）· `McpCatalogPagination`（`installMcpCatalog(port, catalog, tooling)`）· `McpExposure`（`registerMcpTools(port, tooling, …)`；"入口已注册"检查从 `getTool`+catch 改为**端口 `get()` 的 null 判定**；`mcpToolNamesByServiceId` 改遍历 `tools()` 并保留**末尾逐组排序** ⇒ 输出与原 `listTools()` 顺序口径一致）· `McpTooling`（import 换新家）
+- **装配透传**：`AgentEngineAssembler` 改为持有 `McpTooling` 实例并透传（`setMcpTooling(mcpTooling)` + `registerMcpTools(port, mcpTooling, …)`）
+- **读数**：**`mcp→agent` 整条边清零** ✓（边 **26 → 25**）；类 **170 → 165**（`McpCallTool`/`McpCatalog`/`McpCatalogPagination`/`McpExposure`/`McpTooling` 脱边）；①档 **17 条 / 89 类**；R9 包级环组稳在 8 ✓
+- **⚠️ javadoc 跨模块链接失效 2 处（新规律，已记）**：L1 的 `ToolCallTarget` 里 `{@link AgentToolCall}`（domains 的 `agent.domain`）与 engine 的 `ToolRegistryPort` 里 `{@link com.ragagent.agent.tool.ToolRegistry}`（domains）⇒ **模块方向决定 javadoc 可见性**：`common` 不能 link domains、`engine` 不能 link domains ⇒ 一律改 `{@code}`。**通用规则：类上提后，其 javadoc 里指向"新模块看不到的包"的 `{@link}` 必失效**
+- **验证**：**13 守卫全绿** ✓（A20 无悬空、环 0、R9 = 8 组）；`spotlessCheck build` ✓ **1m53s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；定向 mcp/agent/session/agenttools **632 条** ✓；dev 重启 ready ✓（新构造链路装配通过）+ 冒烟（`/api/v1/mcp-services`、`/api/v1/sessions`、`/api/v1/agents` 均 200 ✓）
+- **A③ 累计（三十五刀）**：边 **64 → 25（−39）**、类 **317 → 165（−152）**；三档 **① 17 条 / 89 类 · ② 3 条 / 21 类 · ③ 5 条 / 55 类**
+- **下一步（①档 17 条）**：`agenttools→agent` 族内边已随"工具 SPI 上提"自然缩小（55 类）；①档大块仍是 `session→knowledge`(17) / `knowledge→model`(14) / `session→model`(12)（须**逐类枚举**再定刀），`datasource→knowledge`(8) 与 `embedchannel→knowledge`(2) 属 **K 级**，其余小边多为半清边；**K 级立项待排期**：`im→session`(6) / `embedchannel→session`(1) / `datasource→knowledge`(8)
 **🔶 A③ 第三十四刀：`mcp→agent` 拍板（选"工具 SPI 上提"）+ 刀 1 ⇒ 9 → 5 类（2026-10-15，R10 类 184 → 170、R9 环组 9 → 8）**
 - **拍板记录（用户选择方案 A：工具 SPI 上提，不登记族内）**。判据（三条实测证据）：
   1. R10 基线里 `agenttools→agent` 的 `why` **原文已写**"（**跨族**消费方 approval/im/mcp 的收入 ① 档）" ⇒ mcp 归①档是**有意为之**；登记进族＝推翻既有判断并打开"族可扩"口子

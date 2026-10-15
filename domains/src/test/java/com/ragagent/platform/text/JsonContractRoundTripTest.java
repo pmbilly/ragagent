@@ -20,7 +20,7 @@ import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.agent.domain.AgentToolCall;
-import com.ragagent.agent.domain.ToolCallTarget;
+import com.ragagent.common.agent.tool.ToolCallTarget;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.apikey.TenantAPIKeyCreateResponse;
 import com.ragagent.datasource.domain.DataSource;

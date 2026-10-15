@@ -15,9 +15,10 @@ import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
-import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.common.agent.tool.AgentTool;
 import com.ragagent.common.agent.tool.ToolDefinitions;
+import com.ragagent.chatpipeline.spi.ToolRegistryPort;
+import com.ragagent.chatpipeline.spi.McpToolingGateway;
 
 /**
  * MCP 目录装载与注册入口（持久化元数据读写、目录加载、工具注册、
@@ -178,7 +179,8 @@ public final class McpExposure {
      * 拒绝部分安装或与调用方已注册工具的碰撞。返回装入的服务数。
      */
     public static int registerMcpTools(
-            ToolRegistry registry,
+            ToolRegistryPort registry,
+            McpToolingGateway mcpTooling,
             List<McpService> services,
             McpClientManager mcpManager,
             ToolApprovalGate gate,
@@ -225,30 +227,21 @@ public final class McpExposure {
             return 0;
         }
         for (String name : List.of(ToolDefinitions.TOOL_DISCOVER_MCP_TOOLS, ToolDefinitions.TOOL_CALL_MCP_TOOL)) {
-            try {
-                registry.getTool(name);
+            if (registry.get(name) != null) {
                 throw new IllegalStateException("MCP entry point already registered: " + name);
-            } catch (ToolRegistry.ToolNotFoundException expected) {
-                // 未注册 → 继续
             }
         }
-        McpCatalogPagination.installMcpCatalog(registry, catalog);
+        McpCatalogPagination.installMcpCatalog(registry, catalog, mcpTooling);
         return catalog.servers.size();
     }
 
     /** 已注册 MCP 工具名按服务 ID 分组（名字排序）。 */
-    public static Map<String, List<String>> mcpToolNamesByServiceId(ToolRegistry registry) {
+    public static Map<String, List<String>> mcpToolNamesByServiceId(ToolRegistryPort registry) {
         if (registry == null) {
             return null;
         }
         Map<String, List<String>> out = new HashMap<>();
-        for (String name : registry.listTools()) {
-            AgentTool tool;
-            try {
-                tool = registry.getTool(name);
-            } catch (ToolRegistry.ToolNotFoundException e) {
-                continue;
-            }
+        for (AgentTool tool : registry.tools()) {
             McpToolWrapper mcpTool = null;
             if (tool instanceof McpRegisteredTool direct) {
                 mcpTool = direct;
@@ -258,7 +251,7 @@ public final class McpExposure {
             if (mcpTool == null || mcpTool.service == null) {
                 continue;
             }
-            out.computeIfAbsent(mcpTool.service.getId(), k -> new ArrayList<>()).add(name);
+            out.computeIfAbsent(mcpTool.service.getId(), k -> new ArrayList<>()).add(tool.getName());
         }
         for (List<String> names : out.values()) {
             java.util.Collections.sort(names);
