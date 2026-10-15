@@ -2,7 +2,7 @@ package com.ragagent.session.dto;
 
 import java.time.OffsetDateTime;
 
-import com.ragagent.session.domain.message.MessageArtifact;
+import com.ragagent.common.session.domain.message.MessageArtifact;
 
 /**
  * 产物元数据的一行（会话/消息两个 artifacts 端点的元素）。
@@ -14,7 +14,7 @@ import com.ragagent.session.domain.message.MessageArtifact;
  * （§1.5 显式 null）。</p>
  *
  * <p>键名＝Java 字段名（camelCase）：消息面 {@code messages.artifacts} 里的
- * {@link MessageArtifact} 同一形状，前端抽屉消费的两处一致。</p>
+ * {@code MessageArtifact} 同一形状，前端抽屉消费的两处一致。</p>
  */
 public record ArtifactView(
         int index,

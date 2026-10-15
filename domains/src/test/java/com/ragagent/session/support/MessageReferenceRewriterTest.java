@@ -9,12 +9,12 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.agent.domain.AgentStep;
-import com.ragagent.agent.domain.AgentToolCall;
+import com.ragagent.common.agent.domain.AgentStep;
+import com.ragagent.common.agent.domain.AgentToolCall;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.message.MessageImage;
+import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.common.session.domain.message.MessageImage;
 import com.ragagent.common.storage.support.FileUrlPort;
 import com.ragagent.common.storage.support.Rewriter;
 import com.ragagent.common.storage.support.Mode;

@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ragagent.session.domain.MentionedItem;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.common.session.domain.MentionedItem;
+import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.common.session.domain.conversation.Session;
 import com.ragagent.session.dto.QaRequests.MentionedItemRequest;
 import com.ragagent.common.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.StreamEvent;
@@ -18,8 +18,8 @@ import com.ragagent.agent.SteerSink;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.session.domain.message.MessageAttachment;
-import com.ragagent.session.domain.SuggestionAttribution;
+import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.common.session.domain.SuggestionAttribution;
 
 /**
  * QA 请求上下文与共享辅助。

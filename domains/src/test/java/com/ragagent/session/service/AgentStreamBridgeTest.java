@@ -31,7 +31,7 @@ import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
 import com.ragagent.contract.event.payload.MemoryRecalledData;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.session.domain.message.Message;
+import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
 

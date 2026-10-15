@@ -12,7 +12,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.agent.domain.AgentStep;
+import com.ragagent.common.agent.domain.AgentStep;
 import com.ragagent.agent.tool.runtime.ToolResultPersist;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
@@ -38,7 +38,7 @@ import com.ragagent.contract.event.payload.UserMessageInjectedData;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.session.domain.message.Message;
+import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;

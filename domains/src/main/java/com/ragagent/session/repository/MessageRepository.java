@@ -19,12 +19,12 @@ import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.common.memory.domain.MemoryMessageCursor;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.message.MessageImage;
-import com.ragagent.session.domain.message.MessageArtifact;
-import com.ragagent.session.domain.message.MessageAttachment;
+import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.common.session.domain.message.MessageImage;
+import com.ragagent.common.session.domain.message.MessageArtifact;
+import com.ragagent.common.session.domain.message.MessageAttachment;
 import com.ragagent.session.domain.message.MessageNotFoundException;
-import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.common.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.MessageWithSession;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.session.SessionMessagePort;
@@ -56,14 +56,14 @@ public class MessageRepository implements SessionMessagePort {
     /** jsonb 列的类型处理器全限定名（3 参 set 的 mapping 串）。 */
     private static final String PG_JSON = "com.ragagent.platform.persistence.PgJsonTypeHandler";
     private static final String MENTIONED_ITEMS =
-            "com.ragagent.session.domain.MentionedItemListTypeHandler";
-    private static final String IMAGES = "com.ragagent.session.domain.message.MessageImageListTypeHandler";
+            "com.ragagent.common.session.domain.MentionedItemListTypeHandler";
+    private static final String IMAGES = "com.ragagent.common.session.domain.message.MessageImageListTypeHandler";
     private static final String ATTACHMENTS =
-            "com.ragagent.session.domain.message.MessageAttachmentListTypeHandler";
+            "com.ragagent.common.session.domain.message.MessageAttachmentListTypeHandler";
     private static final String ARTIFACTS =
-            "com.ragagent.session.domain.message.MessageArtifactListTypeHandler";
+            "com.ragagent.common.session.domain.message.MessageArtifactListTypeHandler";
     private static final String USED_MEMORIES =
-            "com.ragagent.session.domain.UsedMemoryListTypeHandler";
+            "com.ragagent.common.session.domain.UsedMemoryListTypeHandler";
 
     private final MessageMapper mapper;
     private final SessionMapper sessionMapper;

@@ -1,4 +1,4 @@
-package com.ragagent.agent.domain;
+package com.ragagent.common.agent.domain;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

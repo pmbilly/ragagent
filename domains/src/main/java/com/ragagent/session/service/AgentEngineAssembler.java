@@ -31,7 +31,7 @@ import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
-import com.ragagent.session.domain.conversation.SessionOwnerIds;
+import com.ragagent.common.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.common.storage.ResourceCatalogPort;
 import com.ragagent.agent.prompt.RecentDocInfo;
 import com.ragagent.agent.prompt.SelectedDocumentInfo;

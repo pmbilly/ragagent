@@ -12,21 +12,21 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.ragagent.agent.domain.AgentStep;
+import com.ragagent.common.agent.domain.AgentStep;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.session.domain.MentionedItem;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.message.MessageArtifact;
-import com.ragagent.session.domain.message.MessageAttachment;
-import com.ragagent.session.domain.message.MessageExecutionContext;
-import com.ragagent.session.domain.message.MessageImage;
-import com.ragagent.session.domain.SuggestionAttribution;
-import com.ragagent.session.domain.UsedMemory;
+import com.ragagent.common.session.domain.MentionedItem;
+import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.common.session.domain.message.MessageArtifact;
+import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.common.session.domain.message.MessageExecutionContext;
+import com.ragagent.common.session.domain.message.MessageImage;
+import com.ragagent.common.session.domain.SuggestionAttribution;
+import com.ragagent.common.session.domain.UsedMemory;
 import org.junit.jupiter.api.Test;
 
 /**
- * {@link Message} 响应体的 JSON 键序、键集与"不该泄漏的字段"（键名＝Java 字段名、
+ * {@code Message} 响应体的 JSON 键序、键集与"不该泄漏的字段"（键名＝Java 字段名、
  * 键序＝声明序、全部键恒输出）。
  *
  * <p>用 Jackson 的 {@code fieldNames()} 取**顶层**键序（而不是正则）：正则会把嵌套对象的键

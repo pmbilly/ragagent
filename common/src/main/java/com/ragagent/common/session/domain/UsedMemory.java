@@ -1,4 +1,4 @@
-package com.ragagent.session.domain;
+package com.ragagent.common.session.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

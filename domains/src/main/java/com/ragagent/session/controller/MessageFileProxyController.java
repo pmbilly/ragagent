@@ -14,7 +14,7 @@ import com.ragagent.common.storage.fileserve.FileProxyPort;
 import com.ragagent.common.storage.fileserve.FileServeHttp;
 import com.ragagent.common.storage.fileserve.MessageFileFacts;
 import com.ragagent.platform.web.ApiResult;
-import com.ragagent.session.domain.message.Message;
+import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.session.service.MessageService;
 
 import jakarta.servlet.http.HttpServletRequest;

@@ -1331,6 +1331,20 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 A③ 第五十一刀：批 4-④ 第一阶段·会话实体面入 L1（22 件）⇒ ①档 8 → 6 类（2026-10-15，R10 类 84 → 77）**
+- **读数**：类 **84 → 77（−7）**；①档 **2 条 / 8 类 → 2 条 / 6 类**；`im→session` 6 → 5、`embedchannel→session` 2 → 1（两条边**未清零**——余下是设计面，见下）；`session→agent` 族内边 55 → 50（连带收窄）
+- **L1 上提 22 件**（`common.session.*` / `common.agent.domain`）：`Session` · `Message` · `MessageAttachment` · `MentionedItem` · `UsedMemory` · `SuggestionAttribution` · `SessionOwnerIds` · `SessionLastRequestState` · `AbstractJsonListTypeHandler` + **7 个 TypeHandler** · `MessageImage` · `MessageArtifact` · `MessageExecutionContext` · `StopSessionRequest` · `AgentStep` · `AgentToolCall`
+- **⭐ 新工具：自动级联上提循环**（`/tmp/cascade_hoist.py` 模式，值得沉淀进方法论）：编译 → 取 `symbol: class X` → 若 `X.java` 在域内且**纯**（无非 L1 import）则自动上提+改 FQN → 重复。本次它一次跑出 9 件级联（`Message` 的同包裸名依赖链很深但全纯），把"逐件核纯度"的手工轮次压到 1 轮
+- **⚠️ 两次红态（都值得写进方法论）**：
+  1. **目的地少一层 `common/` 目录段**：我的搬运脚本把文件放到 `common/src/main/java/com/ragagent/session/...`（声明却是 `com.ragagent.common.session...`）⇒ 被 **R7（package 声明↔路径）** 抓出 **16 处不一致** ⇒ 归位到 `.../com/ragagent/common/session/...`。**判据：L1 落点是 `common/src/main/java/com/ragagent/common/<区>/...`；动完路径立即跑守卫（R7 专治此坑）**
+  2. **搬完出现"幽灵编译错"**：归位后 `:common:compileJava` 仍报一批 cannot find symbol ⇒ `--rerun-tasks` 后全绿（**Gradle 增量状态陈旧**）。**判据：路径批量变动后用 `--rerun-tasks` 证伪，再追真错误**
+- **javadoc 失效链接 11 文件（规律第 4 次应验，已自动化）**：新写了 `/tmp/fix_javadoc.py` ——L1 文件里 `{@link com.ragagent.<非L1域>.X}` 与域文件里 `{@link <已迁出类型>}` 一律改 `{@code}`（含 3 个测试文件的 javadoc）
+- **验证**：**13 守卫全绿** ✓（环 0、R9 = 8 组、**R7 = 0 处不一致**）；`spotlessCheck build` ✓ **1m52s** ✓；**4991 / 失败 0 / 跳过 4** ✓；定向 session/agent/im/embedchannel **485 条** ✓；dev 重启 ready ✓ + 冒烟（sessions / im-channels / knowledge-bases / models 均 200 ✓）
+- **A③ 累计（五十一刀）**：边 **64 → 10（−54）**、类 **317 → 77（−240）**；三档 **① 2 条 / 6 类 · ② 3 条 / 21 类 · ③ 5 条 / 50 类**
+- **批 4-④ 第二阶段（设计面，①档收官）——本刀已把设计要素测清**：
+  1. **`QaSupport.QaRequest` 载荷化**（im 4 类共用）：实测 im 侧**只用这一个嵌套类型**（不碰 `QaSupport` 其他成员）；它是 **public 字段容器**（~18 字段），依赖 `CustomAgentEntity`（agentmanagement）/`SteerSink`（agent）/`TagScope` —— 三者皆**族内**类型 ⇒ 不能整体上提 ⇒ 设计 = **L1 `QaRequestPayload`（只含 im 实际填充的字段）+ 会话侧适配器（payload → `QaSupport.QaRequest`）**
+  2. **会话服务端口**（`ImTurnOrchestrator`）：需为 `MessageService` / `SessionService` / `SessionAgentQaService` / `SessionKnowledgeQaService` 的 im 用面建端口（先按方法级枚举）
+  3. **会话控制器端口**（`EmbedChannelController`）：它包装 4 个会话 controller 端点 ⇒ 需"会话对外操作"端口（或复用 2 的服务端口 + `StopSessionRequest`（已 L1 ✓））
 **🔶 A③ 第五十刀：批 4-③ 摄取写面端口化 ⇒ `datasource→knowledge` 清零（2026-10-15，R10 边 11 → 10、类 86 → 84）**
 - **读数**：**`datasource→knowledge` 整条边清零** ✓（边 **11 → 10**）；类 **86 → 84（−2）**；**①档仅剩 2 条 / 8 类**（`im→session` 6 + `embedchannel→session` 2）
 - **L1 上提 2 件 + 1 新工具**：`KnowledgeProcessingQueue`（纯接口 14 行）· `KnowledgePaths`（纯静态路径件）· **`KnowledgeHashes.md5Hex`**（自 `LocalStorageService#md5Hex` 原样搬入，原入口保留同名委托）

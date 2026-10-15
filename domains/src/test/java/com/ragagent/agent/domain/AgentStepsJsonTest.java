@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.common.agent.tool.ToolCallTarget;
+import com.ragagent.common.agent.domain.AgentToolCall;
+import com.ragagent.common.agent.domain.AgentStep;
 
 /**
  * {@code agent_steps}（{@code AgentSteps} jsonb 载荷）的逐字节契约测试。

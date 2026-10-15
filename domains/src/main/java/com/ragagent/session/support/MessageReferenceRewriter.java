@@ -6,10 +6,10 @@ import java.util.List;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.ragagent.agent.domain.AgentStep;
-import com.ragagent.agent.domain.AgentToolCall;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.message.MessageImage;
+import com.ragagent.common.agent.domain.AgentStep;
+import com.ragagent.common.agent.domain.AgentToolCall;
+import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.common.session.domain.message.MessageImage;
 import com.ragagent.common.storage.support.Rewriter;
 
 /**

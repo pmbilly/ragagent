@@ -94,34 +94,14 @@
       "WsAuthSupport"
     ],
     "embedchannel→session": [
-      "EmbedChannelController",
-      "EmbedChannelDelegateOps"
+      "EmbedChannelController"
     ],
     "im→session": [
       "ImAttachmentPreparer",
       "ImQaRequests",
       "ImQaRunner",
-      "ImSessionResolver",
       "ImStreamPipeline",
       "ImTurnOrchestrator"
-    ],
-    "session→agent": [
-      "AgentEngineAssembler",
-      "AgentHistoryAssembler",
-      "AgentStepListTypeHandler",
-      "AgentStreamBridge",
-      "AgentToolBackends",
-      "AgentToolKbBackends",
-      "Message",
-      "MessageReferenceRewriter",
-      "MessageService",
-      "QaAgentConfig",
-      "QaSseOrchestrator",
-      "QaSupport",
-      "QaTurnSupport",
-      "SessionAgentQaService",
-      "SteerSinkBridge",
-      "VlmDescriberWiring"
     ],
     "session→agentmanagement": [
       "AgentConfigAssembler",
@@ -136,6 +116,19 @@
       "SessionKnowledgeQaService",
       "SessionQaResolution",
       "TemporaryDocumentController"
+    ],
+    "session→agent": [
+      "AgentEngineAssembler",
+      "AgentHistoryAssembler",
+      "AgentStreamBridge",
+      "AgentToolBackends",
+      "AgentToolKbBackends",
+      "MessageService",
+      "QaAgentConfig",
+      "QaSupport",
+      "SessionAgentQaService",
+      "SteerSinkBridge",
+      "VlmDescriberWiring"
     ],
     "session→agenttools": [
       "AgentEngineAssembler",

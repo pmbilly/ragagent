@@ -9,13 +9,13 @@ import java.util.Map;
 
 import com.ragagent.TestSchema;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.message.MessageArtifact;
-import com.ragagent.session.domain.message.MessageAttachment;
-import com.ragagent.session.domain.message.MessageImage;
+import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.common.session.domain.message.MessageArtifact;
+import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.common.session.domain.message.MessageImage;
 import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.domain.message.MessageWithSession;
-import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.common.session.domain.conversation.Session;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.SessionRepository;
 import org.junit.jupiter.api.BeforeEach;

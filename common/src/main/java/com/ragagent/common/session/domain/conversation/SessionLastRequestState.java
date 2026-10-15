@@ -1,6 +1,6 @@
-package com.ragagent.session.domain.conversation;
+package com.ragagent.common.session.domain.conversation;
 
-import com.ragagent.session.domain.MentionedItem;
+import com.ragagent.common.session.domain.MentionedItem;
 
 import java.util.List;
 

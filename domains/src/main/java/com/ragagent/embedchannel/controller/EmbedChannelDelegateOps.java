@@ -12,8 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.dto.StopSessionRequest;
+import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.common.session.dto.StopSessionRequest;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.contract.error.AppError;
 

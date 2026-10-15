@@ -1,4 +1,4 @@
-package com.ragagent.session.domain;
+package com.ragagent.common.session.domain;
 
 import com.ragagent.platform.web.JsonMappers;
 import java.sql.CallableStatement;

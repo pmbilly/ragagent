@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * 渲染给终端用户的一条**可归因**的追问建议。
  *
  * <p>所谓"可归因"：每条建议有稳定的 ID，点击后会把
- * {@link SuggestionAttribution} 挂到下一条用户消息上，分析才能区分
+ * {@code SuggestionAttribution} 挂到下一条用户消息上，分析才能区分
  * "用户点了建议"与"用户自己打了一模一样的问题"。</p>
  *
  * <p><b>与 LLM 解析面的边界</b>：模型回复里的建议**不经 Jackson**

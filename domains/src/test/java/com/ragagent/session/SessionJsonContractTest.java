@@ -12,15 +12,15 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.session.domain.conversation.SessionLastRequestState;
+import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.common.session.domain.conversation.SessionLastRequestState;
 import com.ragagent.session.domain.conversation.SessionListItem;
 import org.junit.jupiter.api.Test;
 
 /**
  * 会话响应体的 JSON **键序与键数**（键名＝Java 字段名、键序＝声明序）。
  *
- * <p>两者都是裸响应体：GET /sessions/{id} 直接返回 {@link Session}，
+ * <p>两者都是裸响应体：GET /sessions/{id} 直接返回 {@code Session}，
  * GET /sessions 的 {@code items} 数组元素是 {@link SessionListItem}。</p>
  *
  * <h2>为什么专门钉 SessionListItem 的键序</h2>
@@ -46,7 +46,7 @@ class SessionJsonContractTest {
     private static final OffsetDateTime TS =
             OffsetDateTime.of(2026, 9, 18, 10, 30, 0, 0, ZoneOffset.ofHours(8));
 
-    /** {@link SessionLastRequestState} 的十个键（声明序）——全部恒输出（§1.6）。 */
+    /** {@code SessionLastRequestState} 的十个键（声明序）——全部恒输出（§1.6）。 */
     private static final List<String> STATE_KEYS = List.of(
             "agentId", "agentEnabled", "modelId", "knowledgeBaseIds", "knowledgeIds", "tagIds",
             "mcpServiceIds", "skillNames", "mentionedItems", "webSearchEnabled");
@@ -60,7 +60,7 @@ class SessionJsonContractTest {
         return state;
     }
 
-    /** {@link Session} 的十二个键（声明序），{@code lastRequestState} 的内层键平铺在它后面。 */
+    /** {@code Session} 的十二个键（声明序），{@code lastRequestState} 的内层键平铺在它后面。 */
     private static List<String> sessionKeys() {
         List<String> keys = new ArrayList<>(List.of(
                 "id", "title", "description", "tenantId", "userId", "pinned", "pinnedAt",

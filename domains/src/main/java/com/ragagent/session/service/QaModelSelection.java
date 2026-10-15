@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.common.session.domain.conversation.Session;
 import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**

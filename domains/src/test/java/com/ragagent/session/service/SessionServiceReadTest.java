@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.common.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;

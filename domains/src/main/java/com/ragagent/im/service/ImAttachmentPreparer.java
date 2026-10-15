@@ -17,7 +17,7 @@ import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.session.domain.message.MessageAttachment;
+import com.ragagent.common.session.domain.message.MessageAttachment;
 import com.ragagent.session.service.QaSupport;
 
 /**

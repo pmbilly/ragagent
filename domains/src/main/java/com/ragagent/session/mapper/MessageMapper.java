@@ -4,16 +4,16 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
-import com.ragagent.session.domain.AgentStepListTypeHandler;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.message.MessageArtifact;
-import com.ragagent.session.domain.message.MessageArtifactListTypeHandler;
-import com.ragagent.session.domain.message.MessageAttachment;
-import com.ragagent.session.domain.message.MessageAttachmentListTypeHandler;
-import com.ragagent.session.domain.message.MessageImageListTypeHandler;
-import com.ragagent.session.domain.MentionedItemListTypeHandler;
-import com.ragagent.session.domain.SearchResultListTypeHandler;
-import com.ragagent.session.domain.UsedMemoryListTypeHandler;
+import com.ragagent.common.session.domain.AgentStepListTypeHandler;
+import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.common.session.domain.message.MessageArtifact;
+import com.ragagent.common.session.domain.message.MessageArtifactListTypeHandler;
+import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.common.session.domain.message.MessageAttachmentListTypeHandler;
+import com.ragagent.common.session.domain.message.MessageImageListTypeHandler;
+import com.ragagent.common.session.domain.MentionedItemListTypeHandler;
+import com.ragagent.common.session.domain.SearchResultListTypeHandler;
+import com.ragagent.common.session.domain.UsedMemoryListTypeHandler;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
@@ -78,7 +78,7 @@ public interface MessageMapper extends BaseMapper<Message> {
 
     /** 只写 {@code images} 列。 */
     @Update("UPDATE messages SET images = "
-            + "#{images, typeHandler=com.ragagent.session.domain.message.MessageImageListTypeHandler, "
+            + "#{images, typeHandler=com.ragagent.common.session.domain.message.MessageImageListTypeHandler, "
             + "jdbcType=OTHER} "
             + "WHERE id = #{messageId} AND session_id = #{sessionId}")
     int updateImages(@Param("sessionId") String sessionId,

@@ -18,8 +18,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.agent.domain.AgentStep;
-import com.ragagent.agent.domain.AgentToolCall;
+import com.ragagent.common.agent.domain.AgentStep;
+import com.ragagent.common.agent.domain.AgentToolCall;
 import com.ragagent.common.agent.tool.ToolCallTarget;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.apikey.TenantAPIKeyCreateResponse;
@@ -74,17 +74,17 @@ import com.ragagent.mcp.domain.McpStdioConfig;
 import com.ragagent.mcp.domain.McpTestResult;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.domain.McpToolApproval;
-import com.ragagent.session.domain.MentionedItem;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.message.MessageArtifact;
-import com.ragagent.session.domain.message.MessageAttachment;
-import com.ragagent.session.domain.message.MessageExecutionContext;
-import com.ragagent.session.domain.message.MessageImage;
-import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.session.domain.conversation.SessionLastRequestState;
+import com.ragagent.common.session.domain.MentionedItem;
+import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.common.session.domain.message.MessageArtifact;
+import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.common.session.domain.message.MessageExecutionContext;
+import com.ragagent.common.session.domain.message.MessageImage;
+import com.ragagent.common.session.domain.conversation.Session;
+import com.ragagent.common.session.domain.conversation.SessionLastRequestState;
 import com.ragagent.session.domain.conversation.SessionListItem;
-import com.ragagent.session.domain.SuggestionAttribution;
-import com.ragagent.session.domain.UsedMemory;
+import com.ragagent.common.session.domain.SuggestionAttribution;
+import com.ragagent.common.session.domain.UsedMemory;
 import com.ragagent.platform.stream.LiveRunPayload;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.wiki.domain.WikiConfig;
@@ -788,7 +788,7 @@ class JsonContractRoundTripTest {
      *   <li>{@code MessageAttachment.isTruncated} 与 {@code Message.isCompleted}/{@code isFallback}
      *       是「字段名不能带 is 前缀」的那类坑；</li>
      *   <li>{@code Message.executionContext} 同样不进响应，但它**要落库**——
-     *       所以子结构 {@link MessageExecutionContext} 必须能往返。</li>
+     *       所以子结构 {@code MessageExecutionContext} 必须能往返。</li>
      * </ol>
      * <p>时间字段留空：本工具用的是裸 ObjectMapper（未注册 JSR-310）。</p>
      */

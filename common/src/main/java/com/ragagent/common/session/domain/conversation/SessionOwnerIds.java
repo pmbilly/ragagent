@@ -1,4 +1,4 @@
-package com.ragagent.session.domain.conversation;
+package com.ragagent.common.session.domain.conversation;
 
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;

@@ -45,7 +45,7 @@ import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
-import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.common.session.domain.conversation.Session;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;

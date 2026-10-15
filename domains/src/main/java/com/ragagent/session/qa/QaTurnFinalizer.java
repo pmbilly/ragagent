@@ -3,7 +3,7 @@ package com.ragagent.session.qa;
 import java.time.OffsetDateTime;
 import java.util.List;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.session.domain.message.Message;
+import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.suggestion.MessageSuggestionService;
@@ -15,7 +15,7 @@ import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.TemporaryDocumentService;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.common.memory.MemoryExtractionPort;
-import com.ragagent.session.domain.conversation.SessionLastRequestState;
+import com.ragagent.common.session.domain.conversation.SessionLastRequestState;
 import com.ragagent.session.service.SessionLookupScope;
 
 /**

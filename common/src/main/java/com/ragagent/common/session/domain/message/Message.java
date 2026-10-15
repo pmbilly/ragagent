@@ -1,11 +1,11 @@
-package com.ragagent.session.domain.message;
+package com.ragagent.common.session.domain.message;
 
-import com.ragagent.session.domain.AgentStepListTypeHandler;
-import com.ragagent.session.domain.MentionedItem;
-import com.ragagent.session.domain.MentionedItemListTypeHandler;
-import com.ragagent.session.domain.SearchResultListTypeHandler;
-import com.ragagent.session.domain.UsedMemory;
-import com.ragagent.session.domain.UsedMemoryListTypeHandler;
+import com.ragagent.common.session.domain.AgentStepListTypeHandler;
+import com.ragagent.common.session.domain.MentionedItem;
+import com.ragagent.common.session.domain.MentionedItemListTypeHandler;
+import com.ragagent.common.session.domain.SearchResultListTypeHandler;
+import com.ragagent.common.session.domain.UsedMemory;
+import com.ragagent.common.session.domain.UsedMemoryListTypeHandler;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.agent.domain.AgentStep;
+import com.ragagent.common.agent.domain.AgentStep;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.common.retrieval.SearchResult;
@@ -98,7 +98,7 @@ public class Message {
     /**
      * 是否生成完毕。恒输出（线格式键是 {@code completed}，§1.24 不带 is 前缀）。
      *
-     * <p>字段名不带 {@code is} 前缀——理由见 {@link com.ragagent.session.domain.conversation.Session} 上同名字段的注释。</p>
+     * <p>字段名不带 {@code is} 前缀——理由见 {@link com.ragagent.common.session.domain.conversation.Session} 上同名字段的注释。</p>
      */
     @TableField("is_completed")
     private boolean completed;

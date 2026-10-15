@@ -10,11 +10,11 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.common.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionListQuery;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
-import com.ragagent.session.domain.conversation.SessionOwnerIds;
+import com.ragagent.common.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.session.domain.conversation.SessionPage;
 import com.ragagent.session.dto.ArtifactView;
 import com.ragagent.session.dto.BatchDeleteSessionsRequest;
@@ -23,7 +23,7 @@ import com.ragagent.session.dto.GenerateTitleRequest;
 import com.ragagent.session.dto.GenerateTitleResponse;
 import com.ragagent.session.dto.SessionListResponse;
 import com.ragagent.session.dto.SessionPinResponse;
-import com.ragagent.session.dto.StopSessionRequest;
+import com.ragagent.common.session.dto.StopSessionRequest;
 import com.ragagent.session.dto.UpdateSessionRequest;
 import com.ragagent.session.service.SessionService;
 import jakarta.validation.Valid;
@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.session.domain.message.MessageArtifact;
+import com.ragagent.common.session.domain.message.MessageArtifact;
 import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.platform.stream.StreamEvent;
@@ -53,7 +53,7 @@ import com.ragagent.platform.web.ApiResponse;
  *
  * <h2>响应形态（§2.1）</h2>
  * <ul>
- *   <li>创建 → <b>201</b> + 裸 {@link Session}；读取/更新 → 200 + 裸 {@link Session}；</li>
+ *   <li>创建 → <b>201</b> + 裸 {@code Session}；读取/更新 → 200 + 裸 {@code Session}；</li>
  *   <li>列表 → {@code {items,page,pageSize,total}}（{@link SessionListResponse}）；</li>
  *   <li>删除 / 批量删除 / 清空消息 → <b>200</b> + {@code ApiResponse} 外壳（§1.13；旧
  *       {@code {"message":…,"success":true}} 裸文案与空体 204 均退役，前端不再解析服务端文案）；</li>
@@ -110,7 +110,7 @@ public class SessionController {
 
     // ══════════════════════════ 创建 ══════════════════════════
 
-    /** 创建会话：<b>201</b> + 裸 {@link Session}。 */
+    /** 创建会话：<b>201</b> + 裸 {@code Session}。 */
     @PostMapping("/api/v1/sessions")
     public ResponseEntity<Session> createSession(@RequestBody @Valid CreateSessionRequest request) {
         // 请求体绑定校验（@Valid）先于租户校验

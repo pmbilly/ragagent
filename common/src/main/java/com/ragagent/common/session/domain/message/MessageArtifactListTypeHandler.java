@@ -1,6 +1,6 @@
-package com.ragagent.session.domain.message;
+package com.ragagent.common.session.domain.message;
 
-import com.ragagent.session.domain.AbstractJsonListTypeHandler;
+import com.ragagent.common.session.domain.AbstractJsonListTypeHandler;
 
 import java.util.List;
 

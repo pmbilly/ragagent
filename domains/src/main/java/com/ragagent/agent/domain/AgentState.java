@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.common.agent.domain.AgentStep;
 
 /**
  * agent 一次执行的运行时状态。
@@ -22,7 +23,7 @@ import com.ragagent.common.retrieval.SearchResult;
  *   <li>{@code turn_usage} 的 cache_status 走 TokenUsage 自己的输出规则。</li>
  * </ul>
  *
- * <p>与本包 {@link AgentStep} 的关系：{@link #roundSteps} 的元素就是 AgentStep
+ * <p>与本包 {@code AgentStep} 的关系：{@link #roundSteps} 的元素就是 AgentStep
  * （jsonb 列 {@code messages.agent_steps} 的元素同型）。</p>
  */
 public class AgentState {

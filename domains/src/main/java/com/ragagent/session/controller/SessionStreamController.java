@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.session.domain.message.Message;
+import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.service.MessageService;
