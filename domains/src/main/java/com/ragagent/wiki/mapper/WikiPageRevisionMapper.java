@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ragagent.wiki.domain.page.WikiPageRevision;
-import com.ragagent.wiki.domain.WikiStringListTypeHandler;
+import com.ragagent.common.wiki.domain.WikiStringListTypeHandler;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -70,7 +70,7 @@ public interface WikiPageRevisionMapper extends BaseMapper<WikiPageRevision> {
             + "#{rev.id}, #{rev.tenantId}, #{rev.knowledgeBaseId}, #{rev.pageId}, #{rev.slug}, "
             + "#{rev.version}, #{rev.title}, #{rev.pageType}, #{rev.status}, #{rev.content}, "
             + "#{rev.summary}, "
-            + "#{rev.aliases, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
+            + "#{rev.aliases, typeHandler=com.ragagent.common.wiki.domain.WikiStringListTypeHandler}, "
             + "#{rev.editSource}, #{rev.editorId}, #{rev.editedAt}, #{rev.createdAt}) "
             + "ON CONFLICT (page_id, version) DO NOTHING"
             + "</when>"
@@ -82,7 +82,7 @@ public interface WikiPageRevisionMapper extends BaseMapper<WikiPageRevision> {
             + "#{rev.id}, #{rev.tenantId}, #{rev.knowledgeBaseId}, #{rev.pageId}, #{rev.slug}, "
             + "#{rev.version}, #{rev.title}, #{rev.pageType}, #{rev.status}, #{rev.content}, "
             + "#{rev.summary}, "
-            + "#{rev.aliases, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
+            + "#{rev.aliases, typeHandler=com.ragagent.common.wiki.domain.WikiStringListTypeHandler}, "
             + "#{rev.editSource}, #{rev.editorId}, #{rev.editedAt}, #{rev.createdAt})"
             + "</otherwise>"
             + "</choose></script>")

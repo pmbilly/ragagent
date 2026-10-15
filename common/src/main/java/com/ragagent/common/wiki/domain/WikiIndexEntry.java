@@ -1,6 +1,5 @@
-package com.ragagent.wiki.domain.index;
+package com.ragagent.common.wiki.domain;
 
-import com.ragagent.wiki.domain.WikiStringListTypeHandler;
 
 import java.util.ArrayList;
 import java.util.List;

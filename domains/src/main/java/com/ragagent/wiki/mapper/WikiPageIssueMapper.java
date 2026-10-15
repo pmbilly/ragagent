@@ -3,8 +3,8 @@ package com.ragagent.wiki.mapper;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.wiki.domain.page.WikiPageIssue;
-import com.ragagent.wiki.domain.WikiStringListTypeHandler;
+import com.ragagent.common.wiki.domain.WikiPageIssue;
+import com.ragagent.common.wiki.domain.WikiStringListTypeHandler;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;

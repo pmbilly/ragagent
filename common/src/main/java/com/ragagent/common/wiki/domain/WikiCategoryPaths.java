@@ -1,6 +1,5 @@
-package com.ragagent.wiki.domain.index;
+package com.ragagent.common.wiki.domain;
 
-import com.ragagent.wiki.domain.WikiConstants;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

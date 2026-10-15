@@ -3,8 +3,8 @@ package com.ragagent.wiki.service.page;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.wiki.domain.WikiConstants;
-import com.ragagent.wiki.domain.page.WikiPage;
+import com.ragagent.common.wiki.domain.WikiConstants;
+import com.ragagent.common.wiki.domain.WikiPage;
 
 /**
  * 交叉链接注入的<b>可插拔端口</b>。

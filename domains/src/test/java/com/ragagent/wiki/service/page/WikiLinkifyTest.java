@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.wiki.service.page.WikiCrossLinker.LinkRef;
-import com.ragagent.wiki.domain.WikiConstants;
-import com.ragagent.wiki.domain.page.WikiPage;
+import com.ragagent.common.wiki.domain.WikiConstants;
+import com.ragagent.common.wiki.domain.WikiPage;
 
 /**
  * {@link WikiLinkify} 的表驱动测试。

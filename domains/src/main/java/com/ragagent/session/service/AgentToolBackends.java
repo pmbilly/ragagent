@@ -51,7 +51,7 @@ import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
-import com.ragagent.wiki.service.page.WikiPageService;
+import com.ragagent.common.wiki.WikiPageOpsPort;
 import com.ragagent.common.agent.tool.AgentTool;
 import com.ragagent.common.agent.tool.ToolDefinitions;
 import com.ragagent.agenttools.datasource.AnalysisDuckDbJdbc;
@@ -101,7 +101,7 @@ public class AgentToolBackends {
                              ConversationProperties conversation,
                              MessageService messageService,
                              MemoryService memoryService,
-                             WikiPageService wikiPageService,
+                             WikiPageOpsPort wikiPageOps,
                              WebSearchExecutor webSearchExecutor,
                              TenantConfigLookup tenantService,
                              TenantFileStorage fileStorage,
@@ -116,7 +116,7 @@ public class AgentToolBackends {
         this.jdbc = new JdbcTemplate(dataSource);
         this.kbBackends = new AgentToolKbBackends(knowledgeCatalog, chunkRepository,
                 hybridSearchService, conversation, jdbc);
-        this.wikiBackends = new AgentToolWikiBackends(wikiPageService);
+        this.wikiBackends = new AgentToolWikiBackends(wikiPageOps);
     }
 
     /**

@@ -8,12 +8,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.wiki.domain.index.WikiCategoryPaths;
-import com.ragagent.wiki.domain.WikiConstants;
+import com.ragagent.common.wiki.domain.WikiCategoryPaths;
+import com.ragagent.common.wiki.domain.WikiConstants;
 import com.ragagent.wiki.domain.folder.WikiFolder;
 import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;
 import com.ragagent.wiki.domain.folder.WikiFolderNotFoundException;
-import com.ragagent.wiki.domain.page.WikiPage;
+import com.ragagent.common.wiki.domain.WikiPage;
 import org.springframework.stereotype.Repository;
 
 /**

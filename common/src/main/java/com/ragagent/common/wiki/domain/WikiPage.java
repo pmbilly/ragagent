@@ -1,8 +1,5 @@
-package com.ragagent.wiki.domain.page;
+package com.ragagent.common.wiki.domain;
 
-import com.ragagent.wiki.domain.EmptyListAsNullSerializer;
-import com.ragagent.wiki.domain.WikiStringListTypeHandler;
-import com.ragagent.wiki.domain.index.WikiCategoryPaths;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

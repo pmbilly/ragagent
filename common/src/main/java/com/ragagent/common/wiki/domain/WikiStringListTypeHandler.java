@@ -1,4 +1,4 @@
-package com.ragagent.wiki.domain;
+package com.ragagent.common.wiki.domain;
 
 import com.ragagent.platform.web.JsonMappers;
 import java.sql.CallableStatement;

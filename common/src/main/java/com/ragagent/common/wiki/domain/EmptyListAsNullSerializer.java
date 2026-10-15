@@ -1,4 +1,4 @@
-package com.ragagent.wiki.domain;
+package com.ragagent.common.wiki.domain;
 
 import java.io.IOException;
 import java.util.List;

@@ -8,17 +8,17 @@ import com.ragagent.agenttools.wiki.IndexEntryView;
 import com.ragagent.agenttools.wiki.IndexGroupView;
 import com.ragagent.agenttools.wiki.RepairResult;
 import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.wiki.domain.index.WikiIndexEntry;
-import com.ragagent.wiki.domain.page.WikiPageNotFoundException;
+import com.ragagent.common.wiki.WikiLinkRepairResult;
+import com.ragagent.common.wiki.WikiPageOpsPort;
+import com.ragagent.common.wiki.domain.WikiIndexEntry;
+import com.ragagent.common.wiki.domain.WikiPageNotFoundException;
 import com.ragagent.agenttools.wiki.IndexOverviewView;
 import com.ragagent.agenttools.wiki.IssueView;
 import com.ragagent.agenttools.wiki.PageView;
 import com.ragagent.agenttools.wiki.WikiPages;
-import com.ragagent.wiki.domain.index.WikiIndex;
-import com.ragagent.wiki.domain.page.WikiPage;
-import com.ragagent.wiki.domain.page.WikiPageIssue;
-import com.ragagent.wiki.service.page.WikiEditContext;
-import com.ragagent.wiki.service.page.WikiPageService;
+import com.ragagent.common.wiki.domain.WikiIndex;
+import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.common.wiki.domain.WikiPageIssue;
 
 /**
  * {@code AgentToolBackends} 的**wiki 工具簇**：WikiPages 工具端口的实现与
@@ -26,26 +26,26 @@ import com.ragagent.wiki.service.page.WikiPageService;
  *
  * <p>为什么单独一类：这一簇只服务 wiki 类工具（读页、列版本、报问题、索引概览），
  * 与 KB 检索、web、datasource 各簇无交集；门面保留 {@code createWikiTool} 装配点与
- * {@code wikiPages()} 薄委托（契约测试直调面）。共享项：{@code wikiPageService}
+ * {@code wikiPages()} 薄委托（契约测试直调面）。共享项：{@code wikiPageOps}
  * 门面装配也在用 → 经构造参数传入。</p>
  */
 final class AgentToolWikiBackends {
 
-    private final WikiPageService wikiPageService;
+    private final WikiPageOpsPort wikiPageOps;
 
-    AgentToolWikiBackends(WikiPageService wikiPageService) {
-        this.wikiPageService = wikiPageService;
+    AgentToolWikiBackends(WikiPageOpsPort wikiPageOps) {
+        this.wikiPageOps = wikiPageOps;
     }
 
     /**
-     * 桥到 {@link WikiPageService} 的真实实现。
+     * 桥到 {@link WikiPageOpsPort} 的真实实现。
      *
      * <p>三处契约转换：</p>
      * <ol>
      *   <li>{@link WikiPageNotFoundException} 对接接缝约定「返回 null = 页不存在」：
      *       getPageBySlug 单独吞掉它、其余异常照抛（resolveUniqueWikiPage 会跳过
      *       null 但把异常当致命错误）。</li>
-     *   <li>编辑来源上下文对应 {@link WikiEditContext#callWith}（service 落库时读取）。</li>
+     *   <li>编辑来源 editSource 由端口实现经编辑上下文携带（service 落库时读取）。</li>
      *   <li>时间以 RFC3339 文本进视图；IssueView 以字符串承载，故在此格式化
      *       （读库得到 UTC location）。</li>
      * </ol>
@@ -56,7 +56,7 @@ final class AgentToolWikiBackends {
             @Override
             public PageView getPageBySlug(String kbId, String slug) {
                 try {
-                    return toPageView(wikiPageService.getPageBySlug(kbId, slug));
+                    return toPageView(wikiPageOps.getPageBySlug(kbId, slug));
                 } catch (WikiPageNotFoundException e) {
                     return null;
                 }
@@ -68,33 +68,29 @@ final class AgentToolWikiBackends {
                 // 工具经 PageView.copy() 会带来旧 ID，必须在接缝处清掉——
                 // 新建路径语义是"由 service 生成新 UUID"，否则与旧页撞主键。
                 entity.setId(null);
-                WikiPage created = WikiEditContext.callWith(editSource,
-                        () -> wikiPageService.createPage(entity));
-                return toPageView(created);
+                return toPageView(wikiPageOps.createPage(entity, editSource));
             }
 
             @Override
             public void updatePage(PageView page, String editSource) {
-                WikiEditContext.callWith(editSource,
-                        () -> wikiPageService.updatePage(toEntity(page)));
+                wikiPageOps.updatePage(toEntity(page), editSource);
             }
 
             @Override
             public void updateAutoLinkedContent(PageView page, String editSource) {
-                WikiEditContext.runWith(editSource,
-                        () -> wikiPageService.updateAutoLinkedContent(toEntity(page)));
+                wikiPageOps.updateAutoLinkedContent(toEntity(page), editSource);
             }
 
             @Override
             public void deletePage(String kbId, String slug, String editSource) {
-                WikiEditContext.runWith(editSource, () -> wikiPageService.deletePage(kbId, slug));
+                wikiPageOps.deletePage(kbId, slug, editSource);
             }
 
             @Override
             public RepairResult repairContentLinks(String kbId, String slug, String content) {
                 try {
-                    WikiPageService.RepairResult r =
-                            wikiPageService.repairContentLinks(kbId, slug, content);
+                    WikiLinkRepairResult r =
+                            wikiPageOps.repairContentLinks(kbId, slug, content);
                     return r == null ? null : new RepairResult(r.content(), r.changed());
                 } catch (RuntimeException e) {
                     // 修复失败永不阻塞写入
@@ -104,18 +100,18 @@ final class AgentToolWikiBackends {
 
             @Override
             public void injectCrossLinks(String kbId, List<String> slugs) {
-                wikiPageService.injectCrossLinks(kbId, slugs);
+                wikiPageOps.injectCrossLinks(kbId, slugs);
             }
 
             @Override
             public void rebuildIndexPage(String kbId) {
-                wikiPageService.rebuildIndexPage(kbId);
+                wikiPageOps.rebuildIndexPage(kbId);
             }
 
             @Override
             public List<IssueView> listIssues(String kbId, String slug, String status) {
                 List<IssueView> out = new ArrayList<>();
-                for (WikiPageIssue issue : wikiPageService.listIssues(kbId, slug, status)) {
+                for (WikiPageIssue issue : wikiPageOps.listIssues(kbId, slug, status)) {
                     if (issue != null) {
                         out.add(toIssueView(issue));
                     }
@@ -134,18 +130,18 @@ final class AgentToolWikiBackends {
                 entity.setSuspectedKnowledgeIds(issue.suspectedKnowledgeIds());
                 entity.setStatus(issue.status());
                 entity.setReportedBy(issue.reportedBy());
-                return toIssueView(wikiPageService.createIssue(entity));
+                return toIssueView(wikiPageOps.createIssue(entity));
             }
 
             @Override
             public void updateIssueStatus(String issueId, String status) {
-                wikiPageService.updateIssueStatus(issueId, status);
+                wikiPageOps.updateIssueStatus(issueId, status);
             }
 
             @Override
             public List<PageView> searchPages(String kbId, String query, int limit) {
                 List<PageView> out = new ArrayList<>();
-                for (WikiPage page : wikiPageService.searchPages(kbId, query, limit)) {
+                for (WikiPage page : wikiPageOps.searchPages(kbId, query, limit)) {
                     if (page != null) {
                         out.add(toPageView(page));
                     }
@@ -158,7 +154,7 @@ final class AgentToolWikiBackends {
                 try {
                     // 索引视图（无过滤、全量统计）
                     WikiIndex.Response resp =
-                            wikiPageService.getIndexView(kbId, null, topK, "");
+                            wikiPageOps.getIndexView(kbId, topK);
                     return toIndexOverviewView(resp);
                 } catch (RuntimeException e) {
                     // 获取失败或无 overview 时静默跳过

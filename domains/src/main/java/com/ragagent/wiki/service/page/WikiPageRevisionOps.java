@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.ragagent.wiki.domain.WikiConstants;
-import com.ragagent.wiki.domain.WikiException;
-import com.ragagent.wiki.domain.page.WikiPage;
-import com.ragagent.wiki.domain.page.WikiPageIssue;
+import com.ragagent.common.wiki.domain.WikiConstants;
+import com.ragagent.common.wiki.domain.WikiException;
+import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.common.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.domain.page.WikiPageRevision;
 import com.ragagent.wiki.domain.page.WikiPageRevisionListResponse;
 import com.ragagent.wiki.domain.page.WikiRevisionPruneRequest;

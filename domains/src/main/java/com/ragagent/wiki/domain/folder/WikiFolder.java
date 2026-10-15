@@ -14,7 +14,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
  * <p>wiki 浏览器里的一等目录节点。文件夹独立于页面存在——空文件夹会保留，
  * 用户可以先把骨架搭好、之后再往里归档页面。树是邻接表（parent_id，"" = 根）；
  * path 是物化的 "/" 连接名链，纯粹为了廉价展示/排序。页面的实际归属是
- * {@link com.ragagent.wiki.domain.page.WikiPage#getFolderId()}。</p>
+ * {@link com.ragagent.common.wiki.domain.WikiPage#getFolderId()}。</p>
  *
  * <p>落库行为约定：</p>
  * <ol>
@@ -39,7 +39,7 @@ public class WikiFolder {
 
     private String knowledgeBaseId = "";
 
-    /** 父文件夹 id；{@link com.ragagent.wiki.domain.WikiConstants#FOLDER_ROOT_ID}（""）= 根 */
+    /** 父文件夹 id；{@link com.ragagent.common.wiki.domain.WikiConstants#FOLDER_ROOT_ID}（""）= 根 */
     @TableField(value = "parent_id")
     private String parentId = "";
 

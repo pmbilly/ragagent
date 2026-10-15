@@ -177,10 +177,6 @@
       "AgentWebPages",
       "QaWiring"
     ],
-    "session→wiki": [
-      "AgentToolBackends",
-      "AgentToolWikiBackends"
-    ],
     "system→auth": [
       "SystemAdminController",
       "SystemAdminUserService",

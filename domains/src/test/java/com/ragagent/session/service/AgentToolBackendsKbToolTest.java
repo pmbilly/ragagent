@@ -25,7 +25,7 @@ import com.ragagent.memory.service.MemoryService;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.domain.message.MessageSearchGroupItem;
 import com.ragagent.session.domain.message.MessageSearchResult;
-import com.ragagent.wiki.service.page.WikiPageService;
+import com.ragagent.common.wiki.WikiPageOpsPort;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.chatpipeline.spi.WebSearchExecutor;
@@ -54,7 +54,7 @@ class AgentToolBackendsKbToolTest {
                 mock(ConversationProperties.class),
                 messageService,
                 memoryService,
-                mock(WikiPageService.class),
+                mock(WikiPageOpsPort.class),
                 mock(WebSearchExecutor.class),
                 mock(TenantService.class),
                 mock(TenantFileStorage.class),

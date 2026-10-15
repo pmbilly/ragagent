@@ -1,6 +1,5 @@
-package com.ragagent.wiki.domain.page;
+package com.ragagent.common.wiki.domain;
 
-import com.ragagent.wiki.domain.WikiException;
 
 public class WikiPageNotFoundException extends WikiException {
 

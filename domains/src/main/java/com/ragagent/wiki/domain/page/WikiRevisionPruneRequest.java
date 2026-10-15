@@ -11,7 +11,7 @@ import java.util.List;
  * @param keepFromVersion     低于该版本的快照被丢弃，<b>但仅当其编辑来源在
  *                            {@code prunableSources} 里</b>
  * @param prunableSources     可被软上限丢弃的编辑来源（见
- *                            {@link com.ragagent.wiki.domain.WikiConstants#PRUNABLE_EDIT_SOURCES}）
+ *                            {@link com.ragagent.common.wiki.domain.WikiConstants#PRUNABLE_EDIT_SOURCES}）
  * @param hardKeepFromVersion 低于该版本的快照<b>无条件</b>丢弃，无视作者
  */
 public record WikiRevisionPruneRequest(

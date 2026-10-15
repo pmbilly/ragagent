@@ -1,7 +1,5 @@
-package com.ragagent.wiki.domain.page;
+package com.ragagent.common.wiki.domain;
 
-import com.ragagent.wiki.domain.EmptyListAsNullSerializer;
-import com.ragagent.wiki.domain.WikiStringListTypeHandler;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.OffsetDateTime;
