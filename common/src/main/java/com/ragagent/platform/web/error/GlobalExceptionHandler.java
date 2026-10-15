@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResultSupport;
@@ -228,6 +229,19 @@ public class GlobalExceptionHandler {
         }
         String[] codes = err.getCodes();
         return codes != null && codes.length > 0 ? codes[codes.length - 1] : "参数";
+    }
+
+    /**
+     * 方法不允许（如 GET 打到仅 POST 的路由）。
+     *
+     * <p>不落 {@link #handleOther} 的 catch-all——那会回 <b>500</b> 并打 ERROR 日志，而语义上
+     * 这是客户端错误 ⇒ 405 + 通用段码（{@code errorCodeFor(405)}＝{@code METHOD_NOT_ALLOWED}），
+     * 与 {@link PlainErrorException} 的 405 同形；信封分派同样走 {@link #respond}。</p>
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Object> handleMethodNotSupported(
+            HttpRequestMethodNotSupportedException ex, HttpServletRequest req) {
+        return respond(new AppError(errorCodeFor(405), "Method Not Allowed", null, 405), req);
     }
 
     @ExceptionHandler(Exception.class)
