@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 

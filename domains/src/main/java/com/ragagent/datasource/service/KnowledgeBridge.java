@@ -3,8 +3,8 @@ package com.ragagent.datasource.service;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
 
 /**
  * 数据源同步往知识库里写东西时要用的那一小片能力（知识库服务 + 仓储

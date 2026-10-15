@@ -25,7 +25,7 @@ import com.ragagent.platform.event.Event;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.payload.AgentReferencesData;
-import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.event.EventIds;

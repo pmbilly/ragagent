@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.domain;
+package com.ragagent.common.knowledge.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.platform.web.JsonMappers;

@@ -15,7 +15,7 @@ import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.dto.DatasourceCredentialsResponse;
 import com.ragagent.datasource.service.DataSourceService;
 import com.ragagent.datasource.service.KnowledgeBridge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

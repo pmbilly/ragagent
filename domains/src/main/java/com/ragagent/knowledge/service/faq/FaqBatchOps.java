@@ -13,8 +13,8 @@ import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.KnowledgeTag;

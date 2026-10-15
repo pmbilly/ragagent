@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.api;
 
 import com.ragagent.contract.knowledge.KnowledgeBaseCatalogPort;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import java.util.ArrayList;
 import java.util.List;

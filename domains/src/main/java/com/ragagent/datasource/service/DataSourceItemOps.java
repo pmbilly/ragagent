@@ -13,7 +13,7 @@ import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.SubtreeChildIds;
 import com.ragagent.datasource.domain.SyncItemError;
 import com.ragagent.datasource.domain.SyncResult;
-import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.Knowledge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.knowledge.service.DuplicateKnowledgeException;

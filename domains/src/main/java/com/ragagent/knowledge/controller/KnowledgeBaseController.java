@@ -8,7 +8,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.platform.web.NonNullBody;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.kb.CopyKnowledgeBaseRequest;
 import com.ragagent.knowledge.dto.HybridSearchRequest;
 import com.ragagent.knowledge.dto.doc.RebuildIndexResponse;

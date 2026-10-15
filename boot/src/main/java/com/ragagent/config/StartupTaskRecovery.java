@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.KnowledgeSpanRepository;
 
 /**

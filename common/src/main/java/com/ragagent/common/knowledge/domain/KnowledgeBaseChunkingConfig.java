@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.domain;
+package com.ragagent.common.knowledge.domain;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.HybridSearchService;

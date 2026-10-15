@@ -14,6 +14,7 @@ import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.knowledge.dto.kb.ChunkingConfigView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import com.ragagent.common.knowledge.domain.KnowledgeBaseChunkingConfig;
 
 /**
  * K8 配置能力矩阵：**声明了的配置要么生效、要么被显式告知**，不许静默吞掉。

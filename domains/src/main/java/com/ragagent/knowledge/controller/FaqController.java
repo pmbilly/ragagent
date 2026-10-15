@@ -7,7 +7,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.NonNullBody;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.faq.AddSimilarQuestionsRequest;
 import com.ragagent.knowledge.dto.faq.FaqEntry;
 import com.ragagent.knowledge.dto.faq.FaqEntryPage;

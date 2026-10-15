@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.dto.kb;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.domain.KnowledgeBaseVlmConfig;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.KnowledgeBaseVlmConfig;
 
 public record CreateKnowledgeBaseRequest(
         String name,

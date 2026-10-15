@@ -20,7 +20,7 @@ import com.ragagent.datasource.domain.SyncCursor;
 import com.ragagent.datasource.domain.SyncItemError;
 import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.SyncResult;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.datasource.connector.rss.RssFetchState;

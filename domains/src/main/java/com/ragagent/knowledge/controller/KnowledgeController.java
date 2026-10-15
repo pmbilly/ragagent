@@ -11,7 +11,7 @@ import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.text.ContentTypeByFilename;
 import com.ragagent.platform.web.NonNullBody;
-import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.dto.doc.ClearContentsResponse;
 import com.ragagent.knowledge.dto.doc.CreateFromUrlRequest;
 import com.ragagent.knowledge.dto.doc.KnowledgeResponse;

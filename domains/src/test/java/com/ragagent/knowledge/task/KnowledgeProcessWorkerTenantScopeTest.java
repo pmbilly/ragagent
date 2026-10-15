@@ -15,7 +15,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.config.BatchEmbedProperties;
 import com.ragagent.knowledge.domain.span.SpanTracker;

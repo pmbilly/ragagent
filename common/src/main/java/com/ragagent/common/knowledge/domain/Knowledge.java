@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.domain;
+package com.ragagent.common.knowledge.domain;
 
 import java.time.OffsetDateTime;
 import java.util.List;

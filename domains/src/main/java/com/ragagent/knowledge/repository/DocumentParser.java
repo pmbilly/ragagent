@@ -2,7 +2,7 @@ package com.ragagent.knowledge.repository;
 
 import java.time.OffsetDateTime;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import org.springframework.stereotype.Component;
 

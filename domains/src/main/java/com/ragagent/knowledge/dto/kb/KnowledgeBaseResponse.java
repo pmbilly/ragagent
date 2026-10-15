@@ -6,7 +6,7 @@ import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
 
 /**
  * 知识库的对外响应体（详情 / 列表项 / 初始化回执统一用这一个形态）。

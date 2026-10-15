@@ -13,7 +13,7 @@ import com.ragagent.contract.tenant.ChatHistoryConfig;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.agent.tool.runtime.ThinkBlocks;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.HybridSearchService;
@@ -27,7 +27,7 @@ import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.session.domain.message.ArtifactVersions;
 

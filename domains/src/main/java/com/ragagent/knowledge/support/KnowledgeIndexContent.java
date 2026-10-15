@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.support;
 
-import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.Knowledge;
 
 /**
  * 索引文本 = 文档 title 前缀 + 内容（标题与疑问式查询的语义对齐）。

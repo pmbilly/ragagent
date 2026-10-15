@@ -17,7 +17,7 @@ import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.dto.DataSourceResponse;
 import com.ragagent.datasource.service.DataSourceService;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

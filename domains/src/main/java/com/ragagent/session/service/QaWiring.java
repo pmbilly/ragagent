@@ -42,7 +42,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.knowledge.service.management.KnowledgeService;

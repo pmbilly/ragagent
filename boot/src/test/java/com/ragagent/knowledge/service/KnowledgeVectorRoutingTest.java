@@ -15,10 +15,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.ragagent.TestSchema;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 
 /**

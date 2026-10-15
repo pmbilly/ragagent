@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.domain.access;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;

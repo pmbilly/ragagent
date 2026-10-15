@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.dto.kb;
 
-import com.ragagent.knowledge.domain.KnowledgeBaseVlmConfig;
+import com.ragagent.common.knowledge.domain.KnowledgeBaseVlmConfig;
 
 /** VLM（图像描述）配置视图——**不含** {@code apiKey}。 */
 public record VlmConfigView(

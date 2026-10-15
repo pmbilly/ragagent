@@ -94,12 +94,7 @@
       "WsAuthSupport"
     ],
     "datasource→knowledge": [
-      "DataSourceController",
-      "DataSourceCredentialsController",
       "DataSourceItemOps",
-      "DataSourceSupport",
-      "DataSourceSyncExecutor",
-      "KnowledgeBridge",
       "KnowledgeTagAutoTagProvider",
       "MapperKnowledgeBridge"
     ],
@@ -138,7 +133,6 @@
     "initialization→knowledge": [
       "InitializationConfigService",
       "InitializationController",
-      "InitializationRequests",
       "ModelConnectivityTestService"
     ],
     "session→memory": [
@@ -187,15 +181,9 @@
       "AgentToolBackends",
       "AgentToolKbBackends",
       "MessageService",
-      "QaKbScope",
-      "QaMentionTagScope",
-      "QaModelSelection",
-      "QaSearchTargets",
       "QaWiring",
       "SessionAgentQaService",
       "SessionKnowledgeQaService",
-      "SessionQaFallback",
-      "SessionQaResolution",
       "SessionService",
       "TemporaryDocumentController",
       "TemporaryDocumentProcessor",
