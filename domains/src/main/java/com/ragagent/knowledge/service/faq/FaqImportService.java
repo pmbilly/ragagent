@@ -21,7 +21,6 @@ import com.ragagent.knowledge.dto.faq.FaqFailedEntry;
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 import com.ragagent.knowledge.dto.faq.FaqImportResult;
 import com.ragagent.knowledge.dto.faq.FaqSuccessEntry;
-import com.ragagent.model.domain.Model;
 import com.ragagent.knowledge.repository.FaqChunkRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +36,7 @@ import com.ragagent.knowledge.dto.faq.FaqBatchUpsertPayload;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsUpdate;
 import com.fasterxml.jackson.core.JacksonException;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * FAQ 条目批量导入（upsert）与进度面：append/replace 两种模式的 dry-run 校验、
@@ -230,7 +230,7 @@ public class FaqImportService {
             progress = withMessage(progress,
                     "验证完成，开始导入 " + progress.validEntryIndices().size() + " 条有效数据...");
 
-            Model embeddingModel;
+            ModelRowView embeddingModel;
             try {
                 embeddingModel = faqIndexWriter.requireEmbeddingModel(kb);
             } catch (IllegalStateException e) {

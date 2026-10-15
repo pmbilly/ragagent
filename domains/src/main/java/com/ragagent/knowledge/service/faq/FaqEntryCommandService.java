@@ -27,7 +27,6 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.model.domain.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -43,6 +42,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * FAQ 条目命令面：创建、更新、相似问追加、批量字段/标签更新与删除，
@@ -128,7 +128,7 @@ public class FaqEntryCommandService {
             String indexMode = faqChunkCodec.faqIndexMode(kb);
 
             // GetEmbeddingModel：模型行缺失/ID 空 → plain 500（handler c.Error 的非 AppError 分支）
-            Model embeddingModel = faqIndexWriter.requireEmbeddingModel(kb);
+            ModelRowView embeddingModel = faqIndexWriter.requireEmbeddingModel(kb);
 
             boolean isEnabled = payload.enabled() == null || payload.enabled();
             int flags = payload.recommended() != null && !payload.recommended() ? 0 : 1;
@@ -254,7 +254,7 @@ public class FaqEntryCommandService {
         }
 
         // GetEmbeddingModel；无模型的 KB 在这里 plain 500（变更已持久化）
-        Model embeddingModel = faqIndexWriter.requireEmbeddingModel(kb);
+        ModelRowView embeddingModel = faqIndexWriter.requireEmbeddingModel(kb);
         // separate 模式相似问减少时先删多余 sourceID——Java 的
         // indexFAQChunks 全删该 chunk 行后重插（净效果等价）；索引失败原样返回
         faqIndexWriter.indexFAQChunks(kb, faqKnowledge, List.of(chunk), embeddingModel, false);
@@ -361,7 +361,7 @@ public class FaqEntryCommandService {
         if (faqKnowledge == null) {
             throw new IllegalStateException("failed to get knowledge: record not found");
         }
-        Model embeddingModel = faqIndexWriter.requireEmbeddingModel(kb);
+        ModelRowView embeddingModel = faqIndexWriter.requireEmbeddingModel(kb);
         // 相似问追加后全量重索引；失败原样返回
         faqIndexWriter.indexFAQChunks(kb, faqKnowledge, List.of(chunk), embeddingModel, false);
 

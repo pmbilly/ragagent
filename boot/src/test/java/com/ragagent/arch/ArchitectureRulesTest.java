@@ -798,7 +798,7 @@ class ArchitectureRulesTest {
      * （MyBatis / Redis / Servlet / Langfuse）的类。
      *
      * <p>登记理由（方案 §12.1 第 2 条）：service 只做用例与政策编排，技术实现归
-     * repository / client / task 等边界类。实测存量 <b>61 类</b>入基线
+     * repository / client / task 等边界类。实测存量 <b>60 类</b>入基线
      * （MyBatis / Redis / Langfuse 混合命中）——只许减、新增即红。</p>
      */
     private static final Set<String> SERVICE_TECH_BASELINE =
@@ -814,7 +814,6 @@ class ArchitectureRulesTest {
             "com.ragagent.im.service.ImTurnOrchestrator",
             "com.ragagent.initialization.service.InitializationConfigService",
             "com.ragagent.knowledge.service.chunk.ChunkExtractService",
-            "com.ragagent.knowledge.service.faq.FaqIndexWriter",
             "com.ragagent.knowledge.service.management.KnowledgeBaseLookupAdapter",
             "com.ragagent.knowledge.service.management.KnowledgeService",
             "com.ragagent.knowledge.service.enrichment.QuestionGenerationService",

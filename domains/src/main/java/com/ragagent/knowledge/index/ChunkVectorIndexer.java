@@ -21,10 +21,7 @@ import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.model.domain.Model;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
-import com.ragagent.model.service.ModelService;
-import com.ragagent.model.service.ModelService.ModelNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -37,6 +34,8 @@ import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.knowledge.support.KnowledgeIndexContent;
+import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * chunk 向量行的重建执行体（2026-09-22 走查批：把「路由在、执行体占位」的两处
@@ -59,7 +58,7 @@ public class ChunkVectorIndexer {
 
     private final KnowledgeBaseRepository kbRepository;
     private final KnowledgeRepository knowledgeRepository;
-    private final ModelService modelService;
+    private final ModelCatalogPort modelCatalog;
     private final EmbedderClient embedder;
     private final VectorStoreService vectorStore;
     private final KnowledgeVectorWrites vectorWrites;
@@ -69,7 +68,7 @@ public class ChunkVectorIndexer {
 
     public ChunkVectorIndexer(KnowledgeBaseRepository kbRepository,
                               KnowledgeRepository knowledgeRepository,
-                              ModelService modelService,
+                              ModelCatalogPort modelCatalog,
                               EmbedderClient embedder,
                               VectorStoreService vectorStore,
                               KnowledgeVectorWrites vectorWrites,
@@ -77,7 +76,7 @@ public class ChunkVectorIndexer {
                               BatchEmbedProperties batchEmbedProperties) {
         this.kbRepository = kbRepository;
         this.knowledgeRepository = knowledgeRepository;
-        this.modelService = modelService;
+        this.modelCatalog = modelCatalog;
         this.embedder = embedder;
         this.vectorStore = vectorStore;
         this.vectorWrites = vectorWrites;
@@ -117,17 +116,14 @@ public class ChunkVectorIndexer {
     }
 
     /** 模型解析（含既有错误映射）：空 ID → 1007 internal；模型缺失 → 404。 */
-    private Model resolveEmbeddingModel(KnowledgeBase kb) {
+    private ModelRowView resolveEmbeddingModel(KnowledgeBase kb) {
         // handler 包 1007 internal 原文；契约样例 kg-image-update/again/mismatch 钉住）
         String modelId = kb.getEmbeddingModelId() == null ? "" : kb.getEmbeddingModelId();
         if (modelId.isEmpty()) {
             throw new BizException(AppError.internal("model ID cannot be empty"));
         }
-        try {
-            return modelService.getModelByID(modelId);
-        } catch (ModelNotFoundException e) {
-            throw new BizException(AppError.notFound("Model not found"));
-        }
+        return modelCatalog.findModelOrEmpty(modelId)
+                .orElseThrow(() -> new BizException(AppError.notFound("Model not found")));
     }
 
     /**
@@ -158,11 +154,10 @@ public class ChunkVectorIndexer {
         if (modelId.isEmpty()) {
             throw new IllegalStateException("model ID cannot be empty");
         }
-        Model embeddingModel;
+        ModelRowView embeddingModel;
         try {
-            embeddingModel = modelService.getModelByID(modelId);
-        } catch (ModelNotFoundException e) {
-            throw new IllegalStateException("model not found");
+            embeddingModel = modelCatalog.findModelOrEmpty(modelId)
+                    .orElseThrow(() -> new IllegalStateException("model not found"));
         } catch (BizException e) {
             throw new IllegalStateException(e.appError().message());
         }
@@ -170,7 +165,7 @@ public class ChunkVectorIndexer {
     }
 
     /** 共享主体：ids 全删 → （enabled 且非 parent_text 的）chunk 行 + 问题行重建。 */
-    private void indexAndStore(KnowledgeBase kb, Model embeddingModel, List<Chunk> chunks) {
+    private void indexAndStore(KnowledgeBase kb, ModelRowView embeddingModel, List<Chunk> chunks) {
         // updateChunkVector 的 CreateRetrieveEngineForKB → DeleteByChunkIDList →
         // BatchIndex；未绑定保持 pg 直连，契约样例锁定行为不变）
         CompositeRetrieveEngine boundEngine =

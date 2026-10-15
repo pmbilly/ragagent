@@ -9,9 +9,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.model.domain.Model;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 知识库/模型/租户解析协作者:mention 与 tag 范围收敛到 agent 授权面、chat 模型选择、
@@ -90,7 +90,7 @@ final class SessionQaResolution {
         return modelSelection.resolveChatModelId(req, knowledgeBaseIds, knowledgeIds);
     }
 
-    Model findModel(String id) {
+    ModelRowView findModel(String id) {
         return modelSelection.findModel(id);
     }
 

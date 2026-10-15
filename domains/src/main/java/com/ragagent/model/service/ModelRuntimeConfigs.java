@@ -12,6 +12,7 @@ import com.ragagent.rerank.RerankerConfig;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import com.ragagent.retrieval.vlm.VlmClient.VlmConfig;
+import com.ragagent.rerank.RerankerConfigs;
 
 /**
  * 「模型行 → 各能力运行时配置」的映射（原散在 5 个能力层配置类里的 {@code fromModel} 静态工厂）。
@@ -50,23 +51,12 @@ public static EmbedderConfig embedderConfig(ModelRowView m, String appId, String
         return c;
     }
 
+    /**
+     * rerank 运行时配置：实现在 L2 {@code rerank.RerankerConfigs}
+     * （本域只做委托——该映射只依赖 L1 载荷与 rerank 配置类型，不需经模型域中转）。
+     */
     public static RerankerConfig rerankerConfig(ModelRowView m, String appId, String appSecret) {
-        if (m == null) {
-            return null;
-        }
-        RerankerConfig c = new RerankerConfig();
-        var p = m.parameters();
-        c.setModelId(m.id() == null ? "" : m.id());
-        c.setApiKey(p == null ? "" : p.getApiKey());
-        c.setBaseUrl(p == null ? "" : p.getBaseUrl());
-        c.setModelName(m.name() == null ? "" : m.name());
-        c.setSource(m.source() == null ? "" : m.source());
-        c.setProvider(p == null ? "" : p.getProvider());
-        c.setExtraConfig(p == null ? null : p.getExtraConfig());
-        c.setCustomHeaders(p == null ? null : p.getCustomHeaders());
-        c.setAppId(appId);
-        c.setAppSecret(appSecret);
-        return c;
+        return RerankerConfigs.rerankerConfig(m, appId, appSecret);
     }
 
     public static Config providerConfig(ModelRowView model) {

@@ -8,13 +8,10 @@ import com.ragagent.knowledge.config.BatchEmbedProperties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.model.domain.Model;
-import com.ragagent.model.mapper.ModelMapper;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import org.springframework.stereotype.Component;
 import com.ragagent.embedding.Embedder;
@@ -27,6 +24,8 @@ import com.ragagent.common.tenant.TenantStorageQuotaPort;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
+import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * FAQ 条目的落库与向量索引写路径：FAQ 容器 knowledge 的查找/惰性创建、嵌入模型
@@ -41,33 +40,33 @@ import com.ragagent.knowledge.index.ChunkVectorIndexer;
 public class FaqIndexWriter {
 
     private final KnowledgeRepository knowledgeRepository;
-    private final ModelMapper modelMapper;
     private final ChunkRepository chunkRepository;
     private final TenantStorageQuotaPort tenantStorage;
     private final KnowledgeVectorWrites vectorWrites;
     private final VectorStoreService vectorStore;
     private final EmbedderClient embedder;
     private final ModelRuntimePort modelRuntimeAssembler;
+    private final ModelCatalogPort modelCatalog;
     /** 批量向量化批大小（属性绑定）。 */
     private final BatchEmbedProperties batchEmbedProperties;
 
     public FaqIndexWriter(KnowledgeRepository knowledgeRepository,
-                          ModelMapper modelMapper,
                           ChunkRepository chunkRepository,
                           TenantStorageQuotaPort tenantStorage,
                           KnowledgeVectorWrites vectorWrites,
                           VectorStoreService vectorStore,
+                          ModelCatalogPort modelCatalog,
                           EmbedderClient embedder,
                           ModelRuntimePort modelRuntimeAssembler,
                           BatchEmbedProperties batchEmbedProperties) {
         this.knowledgeRepository = knowledgeRepository;
-        this.modelMapper = modelMapper;
         this.chunkRepository = chunkRepository;
         this.tenantStorage = tenantStorage;
         this.vectorWrites = vectorWrites;
         this.vectorStore = vectorStore;
         this.embedder = embedder;
         this.modelRuntimeAssembler = modelRuntimeAssembler;
+        this.modelCatalog = modelCatalog;
         this.batchEmbedProperties = batchEmbedProperties;
     }
 
@@ -121,12 +120,12 @@ public class FaqIndexWriter {
     /**
      * 嵌入模型门槛：KB 未配置或模型行缺失 → IllegalStateException（500 plain）。
      */
-    public Model requireEmbeddingModel(KnowledgeBase kb) {
+    public ModelRowView requireEmbeddingModel(KnowledgeBase kb) {
         String modelId = kb.getEmbeddingModelId() == null ? "" : kb.getEmbeddingModelId();
         if (modelId.isEmpty()) {
             throw new IllegalStateException("failed to get embedding model: model ID cannot be empty");
         }
-        Model model = findModelRow(tenantId(), modelId);
+        ModelRowView model = modelCatalog.findModelRow(tenantId(), modelId);
         if (model == null) {
             throw new IllegalStateException("failed to get embedding model: record not found");
         }
@@ -140,7 +139,7 @@ public class FaqIndexWriter {
      * VectorStoreService 分批路径。
      */
     public void indexFAQChunks(KnowledgeBase kb, Knowledge knowledge, List<Chunk> chunks,
-                               Model embeddingModel, boolean adjustStorage) {
+                               ModelRowView embeddingModel, boolean adjustStorage) {
         if (chunks == null || chunks.isEmpty()) {
             return;
         }
@@ -167,7 +166,7 @@ public class FaqIndexWriter {
         if (boundEngine != null) {
             try {
                 Embedder emb =
-                        modelRuntimeAssembler.getEmbeddingModel(embeddingModel.getId());
+                        modelRuntimeAssembler.getEmbeddingModel(embeddingModel.id());
                 boundEngine.deleteByChunkIdList(chunkIds, emb.getDimensions(), kb.getType());
                 boundEngine.batchIndex(emb, faqIndexInfos(kb, rows));
             } catch (RuntimeException e) {
@@ -222,7 +221,7 @@ public class FaqIndexWriter {
         if (chunks == null || chunks.isEmpty()) {
             return;
         }
-        Model embeddingModel = requireEmbeddingModel(kb);
+        ModelRowView embeddingModel = requireEmbeddingModel(kb);
         long tid = tenantId();
         List<VectorStoreService.IndexRow> rows = new ArrayList<>();
         List<String> chunkIds = new ArrayList<>();
@@ -236,7 +235,7 @@ public class FaqIndexWriter {
         if (boundEngine != null) {
             try {
                 Embedder emb =
-                        modelRuntimeAssembler.getEmbeddingModel(embeddingModel.getId());
+                        modelRuntimeAssembler.getEmbeddingModel(embeddingModel.id());
                 boundEngine.deleteByChunkIdList(chunkIds, emb.getDimensions(), kb.getType());
             } catch (RuntimeException e) {
                 throw e;
@@ -288,18 +287,12 @@ public class FaqIndexWriter {
     }
 
     /** 嵌入维度取模型参数 embedding_parameters.dimension，缺省 0。 */
-    private static int embeddingDimensions(Model model) {
-        if (model == null || model.getParameters() == null
-                || model.getParameters().getEmbeddingParameters() == null) {
+    private static int embeddingDimensions(ModelRowView model) {
+        if (model == null || model.parameters() == null
+                || model.parameters().getEmbeddingParameters() == null) {
             return 0;
         }
-        return model.getParameters().getEmbeddingParameters().getDimension();
+        return model.parameters().getEmbeddingParameters().getDimension();
     }
 
-    private Model findModelRow(long tenantId, String modelId) {
-        return modelMapper.selectOne(new LambdaQueryWrapper<Model>()
-                .eq(Model::getId, modelId)
-                .eq(Model::getTenantId, tenantId)
-                .last("LIMIT 1"));
-    }
 }

@@ -52,8 +52,6 @@ import com.ragagent.llm.domain.ChatConfig;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.memory.service.MemoryService;
-import com.ragagent.model.domain.Model;
-import com.ragagent.model.service.ModelService;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerConfig;
 import com.ragagent.rerank.RerankerFactory;
@@ -62,7 +60,6 @@ import com.ragagent.common.retrieval.SearchResult;
 import java.io.InputStream;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.websearch.service.WebSearchService;
-import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.tracing.decorators.LangfuseChatClient;
 import com.ragagent.tracing.decorators.LangfuseReranker;
@@ -80,7 +77,10 @@ import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.knowledge.service.management.KnowledgeBaseLookupAdapter;
-import com.ragagent.model.service.ModelRowViews;
+import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.modelruntime.application.ChatConfigs;
+import com.ragagent.rerank.RerankerConfigs;
 
 /**
  * chat 管线 + QA 面装配（docs/known-issues/05-wave-4.md 的 11 seam 清单）。
@@ -122,18 +122,18 @@ public class QaWiring {
     /** {@link PipelinePorts.ModelService}：getChatModel/getRerankModel 的运行时工厂。 */
     @Bean
     public PipelinePorts.ModelService qaPipelineModelService(
-            ModelService modelService,
+            ModelCatalogPort modelCatalog,
             ObjectProvider<OllamaService> ollamaService,
             ConcurrencyGovernor concurrencyGovernor) {
         return new PipelinePorts.ModelService() {
             @Override
             public LlmChatClient getChatModel(String modelId) {
-                Model model = modelService.getModelByID(modelId);
+                ModelRowView model = modelCatalog.findModel(modelId);
                 if (model == null) {
                     return null;
                 }
-                var p = model.getParameters();
-                ChatConfig config = ModelRuntimeConfigs.chatConfig(ModelRowViews.of(model),
+                var p = model.parameters();
+                ChatConfig config = ChatConfigs.chatConfig(model,
                         p == null ? null : p.getAppId(),
                         p == null ? null : p.getAppSecret());
                 // langfuse generation 装饰（未启用时原样返回）
@@ -143,12 +143,12 @@ public class QaWiring {
 
             @Override
             public Reranker getRerankModel(String modelId) {
-                Model model = modelService.getModelByID(modelId);
+                ModelRowView model = modelCatalog.findModel(modelId);
                 if (model == null) {
                     return null;
                 }
-                var p = model.getParameters();
-                RerankerConfig config = ModelRuntimeConfigs.rerankerConfig(ModelRowViews.of(model),
+                var p = model.parameters();
+                RerankerConfig config = RerankerConfigs.rerankerConfig(model,
                         p == null ? null : p.getAppId(),
                         p == null ? null : p.getAppSecret());
                 // langfuse generation 装饰（未启用时原样返回）

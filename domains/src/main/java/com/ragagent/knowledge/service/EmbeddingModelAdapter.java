@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.contract.knowledge.EmbeddingModelPort;
 import com.ragagent.knowledge.client.EmbedderClient;
-import com.ragagent.model.domain.Model;
-import com.ragagent.model.service.ModelService;
+import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * {@link EmbeddingModelPort} 的 knowledge 侧实现。
@@ -24,18 +24,18 @@ public class EmbeddingModelAdapter implements EmbeddingModelPort {
     /** model.parameters.type 里表示 embedding 模型的取值 */
     static final String MODEL_TYPE_EMBEDDING = "Embedding";
 
-    private final ModelService modelService;
+    private final ModelCatalogPort modelCatalog;
     private final EmbedderClient embedderClient;
 
-    public EmbeddingModelAdapter(ModelService modelService, EmbedderClient embedderClient) {
-        this.modelService = modelService;
+    public EmbeddingModelAdapter(ModelCatalogPort modelCatalog, EmbedderClient embedderClient) {
+        this.modelCatalog = modelCatalog;
         this.embedderClient = embedderClient;
     }
 
     @Override
     public Embedder embedderFor(String modelId) {
-        Model model = modelService.getModelByID(modelId);
-        String type = model.getType();
+        ModelRowView model = modelCatalog.findModel(modelId);
+        String type = model.type();
         if (!MODEL_TYPE_EMBEDDING.equals(type)) {
             // 类型闸门：非 embedding 模型直接报错，
             // 让调用方回落到"喂全部目录"的降级路径，而不是发一次注定失败的请求。

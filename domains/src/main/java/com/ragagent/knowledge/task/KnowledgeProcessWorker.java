@@ -16,8 +16,6 @@ import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.chunker.Chunker;
 import com.ragagent.knowledge.chunker.ParsedChunk;
 import com.ragagent.knowledge.chunker.SplitterConfig;
-import com.ragagent.model.domain.Model;
-import com.ragagent.model.service.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -55,6 +53,8 @@ import com.ragagent.contract.wiki.WikiFinalizePort;
 import com.ragagent.contract.wiki.WikiIngestPort;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantScopes;
+import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 知识处理后台 worker：虚拟线程队列消费 knowledge 的解析主链路
@@ -98,7 +98,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private final TenantFileStorage fileStorage;
     private final DocReaderClient docReader;
     private final VectorStoreService vectorStore;
-    private final ModelService modelService;
+    private final ModelCatalogPort modelCatalog;
     private final KnowledgeVectorWrites vectorWrites;
     /** K10b 收敛：索引执行的唯一实现（worker 不再自建分批/IndexRow/IndexInfo）。 */
     private final ChunkVectorIndexer chunkVectorIndexer;
@@ -126,7 +126,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                                   TenantFileStorage fileStorage,
                                   DocReaderClient docReader,
                                   VectorStoreService vectorStore,
-                                  ModelService modelService,
+                                  ModelCatalogPort modelCatalog,
                                   KnowledgeVectorWrites vectorWrites,
                                   ChunkVectorIndexer chunkVectorIndexer,
                                   ModelRuntimePort modelRuntimeAssembler,
@@ -148,7 +148,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         this.fileStorage = fileStorage;
         this.docReader = docReader;
         this.vectorStore = vectorStore;
-        this.modelService = modelService;
+        this.modelCatalog = modelCatalog;
         this.vectorWrites = vectorWrites;
         this.chunkVectorIndexer = chunkVectorIndexer;
         this.modelRuntimeAssembler = modelRuntimeAssembler;
@@ -497,7 +497,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         if (modelId == null || modelId.isEmpty()) {
             throw new IllegalStateException("embedding model is not configured");
         }
-        Model model = modelService.getByIdVisible(k.getTenantId(), modelId);
+        ModelRowView model = modelCatalog.findModelVisible(k.getTenantId(), modelId);
         if (model == null) {
             throw new IllegalStateException("embedding model not found: " + modelId);
         }

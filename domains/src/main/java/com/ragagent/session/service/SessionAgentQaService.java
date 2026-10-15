@@ -21,10 +21,8 @@ import com.ragagent.contract.event.payload.MemoryRecalledData;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.memory.service.MemoryService;
-import com.ragagent.model.service.ModelService;
 import com.ragagent.rerank.Reranker;
 
-import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.agent.budget.AgentBudgets;
 import com.ragagent.agent.skills.SkillCatalogService;
@@ -40,7 +38,9 @@ import com.ragagent.mcp.service.McpMetadataService;
 import com.ragagent.mcp.service.McpServiceManagement;
 import com.ragagent.rerank.RerankerFactory;
 import com.ragagent.common.storage.ResourceCatalogPort;
-import com.ragagent.model.service.ModelRowViews;
+import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.modelruntime.application.ChatConfigs;
+import com.ragagent.rerank.RerankerConfigs;
 
 /**
  * agent 问答 service 面。
@@ -63,7 +63,7 @@ public class SessionAgentQaService {
     static final int AGENT_HISTORY_FETCH_MULTIPLIER = 2;
     static final int AGENT_HISTORY_FETCH_MIN = 20;
 
-    private final ModelService modelService;
+    private final ModelCatalogPort modelCatalog;
     private final MemoryService memoryService;
     private final SessionKnowledgeQaService knowledgeQa;
 
@@ -84,7 +84,7 @@ public class SessionAgentQaService {
     private final AgentResolver agentResolver;
 
     public SessionAgentQaService(MessageService messageService,
-            ModelService modelService,
+            ModelCatalogPort modelCatalog,
             MemoryService memoryService,
             SessionKnowledgeQaService knowledgeQa,
             AgentToolBackends toolBackends,
@@ -106,7 +106,7 @@ public class SessionAgentQaService {
         this.concurrencyGovernor = concurrencyGovernor;
         this.agentResolver = agentResolver;
         this.ollamaService = ollamaService;
-        this.modelService = modelService;
+        this.modelCatalog = modelCatalog;
         this.memoryService = memoryService;
         this.knowledgeQa = knowledgeQa;
         this.historyAssembler = new AgentHistoryAssembler(messageService);
@@ -169,10 +169,10 @@ public class SessionAgentQaService {
             boolean supportsVision = false;
             int modelContextWindow = 0;
             try {
-                var info = modelService.getModelByID(effectiveModelId);
-                if (info != null && info.getParameters() != null) {
-                    supportsVision = info.getParameters().isSupportsVision();
-                    modelContextWindow = info.getParameters().getContextWindow();
+                var info = modelCatalog.findModel(effectiveModelId);
+                if (info != null && info.parameters() != null) {
+                    supportsVision = info.parameters().isSupportsVision();
+                    modelContextWindow = info.parameters().getContextWindow();
                 }
             } catch (RuntimeException e) {
                 // 获取失败 → 零值
@@ -321,12 +321,12 @@ public class SessionAgentQaService {
 
 
     private LlmChatClient chatModel(String modelId) {
-        var model = modelService.getModelByID(modelId);
+        var model = modelCatalog.findModel(modelId);
         if (model == null) {
             return null;
         }
-        var p = model.getParameters();
-        var config = ModelRuntimeConfigs.chatConfig(ModelRowViews.of(model),
+        var p = model.parameters();
+        var config = ChatConfigs.chatConfig(model,
                 p == null ? null : p.getAppId(), p == null ? null : p.getAppSecret());
         // ⚠️ 2026-09-23 修复：governor/ollama 曾传 null——并发闸门装配（95a49c4）后
         // ConcurrencyChatClient 必调 gateNamedN，agent 路径任何 LLM 调用都会 NPE。
@@ -336,9 +336,9 @@ public class SessionAgentQaService {
     }
 
     private Reranker rerankModel(String modelId) {
-        var model = modelService.getModelByID(modelId);
-        var p = model == null ? null : model.getParameters();
-        var config = ModelRuntimeConfigs.rerankerConfig(ModelRowViews.of(model),
+        var model = modelCatalog.findModel(modelId);
+        var p = model == null ? null : model.parameters();
+        var config = RerankerConfigs.rerankerConfig(model,
                 p == null ? null : p.getAppId(), p == null ? null : p.getAppSecret());
         // langfuse generation 装饰（未启用时原样返回）
         return LangfuseReranker.wrap(RerankerFactory.newReranker(config));

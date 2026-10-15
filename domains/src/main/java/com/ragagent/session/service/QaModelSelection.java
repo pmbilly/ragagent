@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Set;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.model.domain.Model;
 import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * {@code SessionQaResolution} 的**模型选择簇**：按请求/知识库/会话推导 chat 模型 id
@@ -39,16 +39,16 @@ final class QaModelSelection {
                         + req.agentRow.getId());
             }
             if (!configuredAgentModelId.isEmpty()) {
-                Model model = findModel(configuredAgentModelId);
-                if (model == null || !"KnowledgeQA".equals(model.getType())) {
+                ModelRowView model = findModel(configuredAgentModelId);
+                if (model == null || !"KnowledgeQA".equals(model.type())) {
                     throw new RuntimeException("configured chat model " + configuredAgentModelId
                             + " is unavailable for agent " + req.agentRow.getId());
                 }
             }
         }
         if (!summaryModelId.isEmpty()) {
-            Model model = findModel(summaryModelId);
-            if (model != null && "KnowledgeQA".equals(model.getType())) {
+            ModelRowView model = findModel(summaryModelId);
+            if (model != null && "KnowledgeQA".equals(model.type())) {
                 log.info("Using request's summary model override: {}", summaryModelId);
                 return summaryModelId;
             }
@@ -60,9 +60,9 @@ final class QaModelSelection {
         }
         return selectChatModelId(req.session, knowledgeBaseIds, knowledgeIds);
     }
-    Model findModel(String id) {
+    ModelRowView findModel(String id) {
         try {
-            return service.modelService.getModelByID(id);
+            return service.modelCatalog.findModel(id);
         } catch (RuntimeException e) {
             return null;
         }
@@ -91,8 +91,8 @@ final class QaModelSelection {
             for (String kbId : kbIds) {
                 KnowledgeBase kb = findKb(kbId);
                 if (kb != null && kb.getSummaryModelId() != null && !kb.getSummaryModelId().isEmpty()) {
-                    Model model = findModel(kb.getSummaryModelId());
-                    if (model != null && "remote".equals(model.getSource())) {
+                    ModelRowView model = findModel(kb.getSummaryModelId());
+                    if (model != null && "remote".equals(model.source())) {
                         log.info("Using Remote summary model from knowledge base");
                         return kb.getSummaryModelId();
                     }
@@ -107,11 +107,11 @@ final class QaModelSelection {
                 return kb.getSummaryModelId();
             }
         }
-        List<Model> models = service.modelService.listModels();
-        for (Model model : models) {
-            if (model != null && "KnowledgeQA".equals(model.getType())) {
-                log.info("Using first available KnowledgeQA model: {}", model.getId());
-                return model.getId();
+        List<ModelRowView> models = service.modelCatalog.listModels();
+        for (ModelRowView model : models) {
+            if (model != null && "KnowledgeQA".equals(model.type())) {
+                log.info("Using first available KnowledgeQA model: {}", model.id());
+                return model.id();
             }
         }
         throw new RuntimeException("no chat model ID available: no knowledge bases configured and no available models");

@@ -1331,6 +1331,19 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 A③ 第三十七刀（批 1 后半）：`knowledge→model` + `session→model` 双清 ⇒ −14 类（2026-10-15，R10 边 25 → 23、类 153 → 139）**
+- **本半批动作**：
+  - `ModelCatalogPort` **加 3 个按租户/可见性取行的方法**（语义各不同，逐一对应既有域语义）：`findModelOrEmpty`（捕获 `ModelNotFoundException` ⇒ 空，供"未找到即转 404"）/ `findModelVisible`（租户自有 或 内置）/ `findModelRow`（严格 id+租户、不看删除标记）——**第三种把 knowledge 里 `FaqIndexWriter` 的 MyBatis 直查（`LambdaQueryWrapper<Model>`）搬进域内适配器** ⇒ A17 存量 **61 → 60** ✓
+  - `EmbedderClient.configFrom(Model)` → `configFrom(ModelRowView)`（实体重载换成载荷，4 个调用方零改动）
+  - **knowledge 7 类**：`ChunkVectorIndexer`（`getModelByID`+catch ⇒ `findModelOrEmpty(...).orElseThrow(404)`）/ `KnowledgeProcessWorker`（`getByIdVisible` ⇒ `findModelVisible`）/ `FaqIndexWriter`（`ModelMapper`+`Model` ⇒ 端口+视图；私有直查方法删除）/ `FaqBatchOps` / `FaqEntryCommandService` / `FaqImportService`（类型换视图）/ `EmbeddingModelAdapter`（`getModelByID` ⇒ `findModel`）
+  - **session 5 类**：`QaModelSelection`（含 `service.modelCatalog` 字段改名）/ `SessionQaResolution` / `SessionKnowledgeQaService` / `SessionService` / `SessionAgentQaService` / `QAWiring`（含 `PipelinePorts.ModelService` 匿名实现内的 chat/rerank 映射改**L2 门面**）
+  - **新增 L2 `rerank.RerankerConfigs`**（与 ㉔ 的 `ChatConfigs` 同款）+ `ModelRuntimeConfigs.rerankerConfig` 改委托 ⇒ 会话侧造 reranker 配置不再经模型域
+- **语义等价关键点（已核）**：`ModelService.getModelByID` 对空 id / 缺失 / 异常状态**一律抛异常、从不返回 null** ⇒ 各消费方原有的 `if (model == null)` 是**死分支**，换端口后行为逐字不变 ✓；异常仍按"运行时异常原样上抛、由调用方降级"处理
+- **⚠️ 一次守卫红态（真实改善）**：A17 报 `knowledge.service.faq.FaqIndexWriter` **基线条目已不再违例**（去掉 MyBatis 直查）⇒ 按提示删条目、存量 **61 → 60**（**并先读当前计数注释再改**——㉝ 的教训已内化）
+- **读数**：**`knowledge→model` 与 `session→model` 两条边同时清零** ✓（边 **25 → 23**）；类 **153 → 139（−14）**；①档 **15 条 / 63 类**
+- **验证**：**13 守卫全绿** ✓（环 0、R9 = 8 组）；`spotlessCheck build` ✓ **1m51s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；定向 knowledge/session/model/initialization **323 条** ✓；dev 重启 ready ✓（全部新构造链路装配通过）+ 冒烟（models / knowledge-bases / sessions / agents 均 200 ✓）
+- **批 1 余尾（下一步，需一次判据先行）**：`initialization→model`(4 类) 未动 —— 其中 `InitResponses` / `InitializationConfigService` **疑涉线格式**（是否把模型实体直接序列化给前端）⇒ **先核 JSON 键签名/金片**后再决定：可换视图则换，属线格式则按 K 级立项（**不得机械换视图**，那会静默改前端契约）
+- **A③ 累计（三十七刀）**：边 **64 → 23（−41）**、类 **317 → 139（−178）**；三档 **① 15 条 / 63 类 · ② 3 条 / 21 类 · ③ 5 条 / 55 类**
 **🔶 A③ 第三十六刀（批量模式首刀·批 1 前半）：模型运行时装配端口化 ⇒ model 族三边共 −12 类（2026-10-15，R10 类 165 → 153）**
 - **策略转变（承"能否一次多处理几块"之问）**：先做**全 ①档一次盘点**（一次脚本覆盖 17 条边的逐类全部跨域 import + 用面性质）⇒ **A 组"可整条清零"为空**！结论：剩余 17 条边**没有一条能靠换接口整条清零**（每条的类都还牵扯他域或实体）⇒ 效率提升的正确姿势不是"多切边"，而是 **按承载面/域打包、逐类收敛**；本批选取 **model 族三边**（`knowledge→model` 14 · `session→model` 12 · `initialization→model` 4）——契约地基（㉔~㉖）现成
 - **内容（批内第一步：端口化，一次覆盖三条边）**：新增 **engine 端口 `com.ragagent.chatpipeline.spi.ModelRuntimePort`**（`getChatModel`/`getEmbeddingModel`/`getRerankModel`/`getVlmModel`/`vlmConfigFor`/`getAsrModel`/`validateVlmBaseUrl`，VLM/ASR 返回 **L1 载荷 `ModelRowView`** 而非模型实体）；`model/service/ModelRuntimeAssembler implements ModelRuntimePort`（VLM/ASR 视图化）；**全仓 35 个引用点统一换成端口类型**（Spring 按端口注入，同一 bean）

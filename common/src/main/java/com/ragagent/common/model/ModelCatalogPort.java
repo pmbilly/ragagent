@@ -27,6 +27,15 @@ public interface ModelCatalogPort {
      */
     ModelRowView findModel(String modelId);
 
+    /** 按 id 取模型行；**不存在 ⇒ 空**（供"未找到即降级 / 转 404"的调用方，免于捕获域内异常）。 */
+    java.util.Optional<ModelRowView> findModelOrEmpty(String modelId);
+
+    /** 租户可见模型行（租户自有 或 内置）；不可见 ⇒ null。 */
+    ModelRowView findModelVisible(long tenantId, String modelId);
+
+    /** 严格按（id + 租户）取行（不含内置回落、不看删除标记）；无 ⇒ null。 */
+    ModelRowView findModelRow(long tenantId, String modelId);
+
     /**
      * 模型行视图：挑模型（id/name/type）与造运行时配置（source/parameters）所需的最小字段集。
      *

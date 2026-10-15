@@ -26,9 +26,9 @@ import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
-import com.ragagent.model.service.ModelService;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
+import com.ragagent.common.model.ModelCatalogPort;
 
 /**
  * 回归：worker 管线必须在<b>知识行租户作用域</b>内执行。
@@ -55,7 +55,7 @@ class KnowledgeProcessWorkerTenantScopeTest {
             mock(TenantFileStorage.class),
             mock(DocReaderClient.class),
             mock(VectorStoreService.class),
-            mock(ModelService.class),
+            mock(ModelCatalogPort.class),
             mock(KnowledgeVectorWrites.class),
             mock(ChunkVectorIndexer.class),
             mock(ModelRuntimePort.class),

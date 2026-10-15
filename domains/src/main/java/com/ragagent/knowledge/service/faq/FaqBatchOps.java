@@ -24,10 +24,10 @@ import com.ragagent.knowledge.dto.faq.FaqFailedEntry;
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 import com.ragagent.knowledge.dto.faq.FaqImportResult;
 import com.ragagent.knowledge.service.faq.FaqImportService.ImportJob;
-import com.ragagent.model.domain.Model;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * FaqImportService 的批量导入簇：分批写入+进度回报、CSV 生成、结果落库与消息组装。
@@ -59,7 +59,7 @@ final class FaqBatchOps {
      * 的既有取舍同款。</p>
      */
     void executeImportBatches(ImportJob job, KnowledgeBase kb, Knowledge faqKnowledge,
-                                      Model embeddingModel, FaqImportProgress progress) {
+                                      ModelRowView embeddingModel, FaqImportProgress progress) {
         List<Integer> valid = progress.validEntryIndices();
         int totalEntries = progress.total();
         int skippedCount = progress.skippedCount();

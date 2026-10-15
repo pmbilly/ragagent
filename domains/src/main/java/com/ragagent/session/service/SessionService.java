@@ -25,7 +25,6 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
-import com.ragagent.model.service.ModelService;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.conversation.Session;
@@ -37,9 +36,10 @@ import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.model.domain.Model;
 import com.ragagent.session.domain.conversation.SessionLastRequestState;
 import com.ragagent.websearch.service.WebSearchTempKbStateService;
+import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 会话 service：读路径（{@link #getSession(String)} / {@link #getOwnedSession(String)} /
@@ -65,7 +65,7 @@ public class SessionService {
     private final MessageRepository messageRepository;
     private final MessageSuggestionRepository suggestionRepository;
     private final KnowledgeService knowledgeService;
-    private final ModelService modelService;
+    private final ModelCatalogPort modelCatalog;
     private final ModelRuntimePort modelRuntimeAssembler;
     private final ConversationProperties conversationProps;
     private final WebSearchTempKbStateService webSearchTempKbState;
@@ -74,7 +74,7 @@ public class SessionService {
                           MessageRepository messageRepository,
                           MessageSuggestionRepository suggestionRepository,
                           KnowledgeService knowledgeService,
-                          ModelService modelService,
+                          ModelCatalogPort modelCatalog,
                           ModelRuntimePort modelRuntimeAssembler,
                           ConversationProperties conversationProps,
                           WebSearchTempKbStateService webSearchTempKbState) {
@@ -82,7 +82,7 @@ public class SessionService {
         this.messageRepository = messageRepository;
         this.suggestionRepository = suggestionRepository;
         this.knowledgeService = knowledgeService;
-        this.modelService = modelService;
+        this.modelCatalog = modelCatalog;
         this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.conversationProps = conversationProps;
         this.webSearchTempKbState = webSearchTempKbState;
@@ -478,13 +478,13 @@ public class SessionService {
         }
 
         if (modelId == null || modelId.isEmpty()) {
-            List<Model> models = modelService.listModels();
-            for (Model model : models) {
+            List<ModelRowView> models = modelCatalog.listModels();
+            for (ModelRowView model : models) {
                 if (model == null) {
                     continue;
                 }
-                if ("KnowledgeQA".equals(model.getType())) {
-                    modelId = model.getId();
+                if ("KnowledgeQA".equals(model.type())) {
+                    modelId = model.id();
                     break;
                 }
             }

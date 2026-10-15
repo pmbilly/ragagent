@@ -32,8 +32,6 @@ import com.ragagent.platform.event.EventBus;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.knowledge.service.management.KnowledgeService;
-import com.ragagent.model.domain.Model;
-import com.ragagent.model.service.ModelService;
 import com.ragagent.common.retrieval.SearchResult;
 
 import static com.ragagent.session.service.QaSupport.TagScope;
@@ -45,6 +43,8 @@ import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.websearch.mapper.WebSearchProviderRepository;
+import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 知识问答 service 面（chat_pipeline 的调用方）。
@@ -64,7 +64,7 @@ public class SessionKnowledgeQaService {
 
     final EventManager eventManager;
     final ConversationProperties cfg;
-    final ModelService modelService;
+    final ModelCatalogPort modelCatalog;
     final KnowledgeService knowledgeService;
     final KnowledgeBaseService knowledgeBaseService;
     final PipelinePorts.ModelService pipelineModelService;
@@ -82,7 +82,7 @@ public class SessionKnowledgeQaService {
 
     public SessionKnowledgeQaService(EventManager eventManager,
             ConversationProperties cfg,
-            ModelService modelService,
+            ModelCatalogPort modelCatalog,
             KnowledgeService knowledgeService,
             KnowledgeBaseService knowledgeBaseService,
             PipelinePorts.ModelService pipelineModelService,
@@ -92,7 +92,7 @@ public class SessionKnowledgeQaService {
             AgentResolver agentResolver) {
         this.eventManager = eventManager;
         this.cfg = cfg;
-        this.modelService = modelService;
+        this.modelCatalog = modelCatalog;
         this.knowledgeService = knowledgeService;
         this.knowledgeBaseService = knowledgeBaseService;
         this.pipelineModelService = pipelineModelService;
@@ -213,9 +213,9 @@ public class SessionKnowledgeQaService {
         String vlmModelId = "";
         if (!chatModelId.isEmpty()) {
             try {
-                Model chatModelInfo = modelService.getModelByID(chatModelId);
+                ModelRowView chatModelInfo = modelCatalog.findModel(chatModelId);
                 if (chatModelInfo != null) {
-                    chatModelSupportsVision = chatModelInfo.getParameters() != null && chatModelInfo.getParameters().isSupportsVision();
+                    chatModelSupportsVision = chatModelInfo.parameters() != null && chatModelInfo.parameters().isSupportsVision();
                 }
             } catch (RuntimeException e) {
                 // 获取失败 → 保持 false
@@ -512,12 +512,12 @@ public class SessionKnowledgeQaService {
             chatManage.setRerankModelId(rc.rerankModelId());
         } else {
             try {
-                for (Model model : modelService.listModels()) {
+                for (ModelRowView model : modelCatalog.listModels()) {
                     if (model == null) {
                         continue;
                     }
-                    if ("Rerank".equals(model.getType())) {
-                        chatManage.setRerankModelId(model.getId());
+                    if ("Rerank".equals(model.type())) {
+                        chatManage.setRerankModelId(model.id());
                         break;
                     }
                 }

@@ -144,16 +144,6 @@
       "InitializationRequests",
       "ModelConnectivityTestService"
     ],
-    "knowledge→model": [
-      "ChunkVectorIndexer",
-      "EmbedderClient",
-      "EmbeddingModelAdapter",
-      "FaqBatchOps",
-      "FaqEntryCommandService",
-      "FaqImportService",
-      "FaqIndexWriter",
-      "KnowledgeProcessWorker"
-    ],
     "session→memory": [
       "AgentEngineAssembler",
       "AgentToolBackends",
@@ -213,14 +203,6 @@
       "TemporaryDocumentController",
       "TemporaryDocumentProcessor",
       "TemporaryDocumentService"
-    ],
-    "session→model": [
-      "QaModelSelection",
-      "QaWiring",
-      "SessionAgentQaService",
-      "SessionKnowledgeQaService",
-      "SessionQaResolution",
-      "SessionService"
     ],
     "session→websearch": [
       "AgentToolBackends",

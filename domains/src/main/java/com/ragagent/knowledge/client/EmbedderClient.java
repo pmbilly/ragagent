@@ -10,11 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.model.domain.Model;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import com.ragagent.platform.model.EmbeddingGateway;
 import com.ragagent.contract.model.ModelFacts;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 最小 OpenAI 兼容 embedding 客户端。
@@ -40,9 +40,9 @@ public class EmbedderClient implements EmbeddingGateway {
     /** base_url/api_key 来自模型参数 */
     public record EmbedConfig(String baseUrl, String apiKey, String modelName) {}
 
-    public static EmbedConfig configFrom(Model model) {
-        var p = model.getParameters();
-        return configFrom(new ModelFacts(model.getId(), model.getName(),
+    public static EmbedConfig configFrom(ModelRowView model) {
+        var p = model.parameters();
+        return configFrom(new ModelFacts(model.id(), model.name(),
                 p == null || p.getBaseUrl() == null ? "" : p.getBaseUrl(),
                 p == null || p.getApiKey() == null ? "" : p.getApiKey()));
     }
