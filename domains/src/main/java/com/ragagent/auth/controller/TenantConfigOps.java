@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.contract.tenant.ChatHistoryConfig;
 import com.ragagent.common.tenant.domain.ParserEngineConfig;
 import com.ragagent.contract.tenant.RetrievalConfig;
@@ -23,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.ragagent.platform.prompt.PromptTemplateCatalog;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.common.tenant.TenantRowView;
 
 /**
  * KV 配置分发协作者（自 {@link TenantCatalogController} 拆出）：6 个 DB-backed key 的
@@ -108,9 +108,9 @@ final class TenantConfigOps {
     }
 
     /** 上下文无租户 → 400 */
-    private Tenant requireContextTenant() {
+    private TenantRowView requireContextTenant() {
         Long tenantId = TenantContext.currentTenantId();
-        Tenant tenant = tenantId == null || tenantId == 0 ? null : service.tenantService.getTenantById(tenantId);
+        TenantRowView tenant = tenantId == null || tenantId == 0 ? null : service.tenantService.getTenantById(tenantId);
         if (tenant == null) {
             throw new BizException(AppError.badRequest("Workspace is empty"));
         }
@@ -147,7 +147,7 @@ final class TenantConfigOps {
     // ── web-search-config ──────────────────────────────────────────────────
 
     private WebSearchConfig getWebSearch() {
-        Tenant tenant = requireContextTenant();
+        TenantRowView tenant = requireContextTenant();
         return TenantConfigRedaction.webSearchForResponse(
                 parseConfig(tenant.getWebSearchConfig(), WebSearchConfig.class));
     }
@@ -157,7 +157,7 @@ final class TenantConfigOps {
         if (cfg == null) {
             cfg = new WebSearchConfig();
         }
-        Tenant tenant = requireContextTenant();
+        TenantRowView tenant = requireContextTenant();
         WebSearchConfig merged = TenantConfigRedaction.mergeWebSearch(
                 cfg, parseConfig(tenant.getWebSearchConfig(), WebSearchConfig.class));
         if (merged.getMaxResults() < 1 || merged.getMaxResults() > 50) {
@@ -175,7 +175,7 @@ final class TenantConfigOps {
     // ── parser-engine-config ───────────────────────────────────────────────
 
     private ParserEngineConfig getParserEngine() {
-        Tenant tenant = requireContextTenant();
+        TenantRowView tenant = requireContextTenant();
         ParserEngineConfig data = TenantConfigRedaction.parserEngineForResponse(
                 parseConfig(tenant.getParserEngineConfig(), ParserEngineConfig.class));
         return data == null ? new ParserEngineConfig() : data;
@@ -186,7 +186,7 @@ final class TenantConfigOps {
         if (cfg == null) {
             cfg = new ParserEngineConfig();
         }
-        Tenant tenant = requireContextTenant();
+        TenantRowView tenant = requireContextTenant();
         ParserEngineConfig merged = TenantConfigRedaction.mergeParserEngine(
                 cfg, parseConfig(tenant.getParserEngineConfig(), ParserEngineConfig.class));
         validateParserEngineOutboundUrls(merged);
@@ -230,7 +230,7 @@ final class TenantConfigOps {
     // ── storage-engine-config ──────────────────────────────────────────────
 
     private StorageEngineConfig getStorageEngine() {
-        Tenant tenant = requireContextTenant();
+        TenantRowView tenant = requireContextTenant();
         StorageEngineConfig data = TenantConfigRedaction.storageEngineForResponse(
                 parseConfig(tenant.getStorageEngineConfig(), StorageEngineConfig.class));
         return data == null ? new StorageEngineConfig() : data;
@@ -255,7 +255,7 @@ final class TenantConfigOps {
                     "Storage provider is not allowed by STORAGE_ALLOW_LIST"));
         }
         cfg.setDefaultProvider(provider);
-        Tenant tenant = requireContextTenant();
+        TenantRowView tenant = requireContextTenant();
         StorageEngineConfig merged = TenantConfigRedaction.mergeStorageEngine(
                 cfg, parseConfig(tenant.getStorageEngineConfig(), StorageEngineConfig.class));
         tenant.setStorageEngineConfig(TenantBindSupport.MAPPER.valueToTree(merged));
@@ -276,7 +276,7 @@ final class TenantConfigOps {
     // ── chat-history-config ────────────────────────────────────────────────
 
     private ChatHistoryConfig getChatHistory() {
-        Tenant tenant = requireContextTenant();
+        TenantRowView tenant = requireContextTenant();
         ChatHistoryConfig data = parseConfig(tenant.getChatHistoryConfig(), ChatHistoryConfig.class);
         return data == null ? new ChatHistoryConfig() : data;
     }
@@ -286,7 +286,7 @@ final class TenantConfigOps {
         if (req == null) {
             req = new ChatHistoryConfig();
         }
-        Tenant tenant = requireContextTenant();
+        TenantRowView tenant = requireContextTenant();
         ChatHistoryConfig existing = parseConfig(tenant.getChatHistoryConfig(), ChatHistoryConfig.class);
 
         // 重建对象（knowledgeBaseId 不受客户端控制），
@@ -325,7 +325,7 @@ final class TenantConfigOps {
     // ── retrieval-config ───────────────────────────────────────────────────
 
     private RetrievalConfig getRetrieval() {
-        Tenant tenant = requireContextTenant();
+        TenantRowView tenant = requireContextTenant();
         RetrievalConfig data = parseConfig(tenant.getRetrievalConfig(), RetrievalConfig.class);
         return data == null ? new RetrievalConfig() : data;
     }
@@ -351,7 +351,7 @@ final class TenantConfigOps {
         if (cfg.getRerankTopK() < 0 || cfg.getRerankTopK() > 200) {
             throw new BizException(AppError.badRequest("rerankTopK must be between 0 and 200"));
         }
-        Tenant tenant = requireContextTenant();
+        TenantRowView tenant = requireContextTenant();
         tenant.setRetrievalConfig(TenantBindSupport.MAPPER.valueToTree(cfg));
         try {
             service.tenantService.updateTenant(tenant);
@@ -364,7 +364,7 @@ final class TenantConfigOps {
     // ── memory-config（MemoryConfig 本体在 memory 模块） ────────────────────
 
     private MemoryConfig getMemory() {
-        Tenant tenant = requireContextTenant();
+        TenantRowView tenant = requireContextTenant();
         MemoryConfig data = parseConfig(tenant.getMemoryConfig(), MemoryConfig.class);
         if (data == null) {
             data = new MemoryConfig();
@@ -415,7 +415,7 @@ final class TenantConfigOps {
                             + " characters"));
         }
         cfg.normalize();
-        Tenant tenant = requireContextTenant();
+        TenantRowView tenant = requireContextTenant();
         tenant.setMemoryConfig(TenantBindSupport.MAPPER.valueToTree(cfg));
         try {
             service.tenantService.updateTenant(tenant);

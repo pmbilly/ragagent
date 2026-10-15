@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
-import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantInvitation;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.auth.domain.User;
@@ -70,6 +69,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.common.tenant.TenantRowView;
 
 /**
  * 认证端点（登录 / 注册 / 会话 / OIDC）。
@@ -256,7 +256,7 @@ public class AuthController {
             }
         }
         String[] tokens = generateTokensOr500(user, "auto-setup failed");
-        Tenant tenant = user.getTenantId() != null && user.getTenantId() > 0
+        TenantRowView tenant = user.getTenantId() != null && user.getTenantId() > 0
                 ? tenantService.getTenantById(user.getTenantId()) : null;
         List<Membership> memberships = List.of(new Membership(
                 user.getTenantId() == null ? 0L : user.getTenantId(),
@@ -278,7 +278,7 @@ public class AuthController {
         }
         TenantInvitation inv = lookupInvitationOr410(token);
 
-        Tenant tenant = null;
+        TenantRowView tenant = null;
         try {
             tenant = tenantService.getTenantById(inv.getTenantId());
         } catch (RuntimeException e) {
@@ -374,7 +374,7 @@ public class AuthController {
         }
 
         String[] tokens = generateTokensOr500(user, "token generation failed");
-        Tenant tenant = null;
+        TenantRowView tenant = null;
         try {
             tenant = tenantService.getTenantById(inv.getTenantId());
         } catch (RuntimeException ignored) {
@@ -429,7 +429,7 @@ public class AuthController {
         if (activeTenantId == 0) {
             activeTenantId = user.getTenantId() == null ? 0 : user.getTenantId();
         }
-        Tenant tenant = null;
+        TenantRowView tenant = null;
         if (activeTenantId > 0) {
             try {
                 tenant = tenantService.getTenantById(activeTenantId);
@@ -585,7 +585,7 @@ public class AuthController {
     }
 
     /** 租户名取不到时回落空串。 */
-    private static String tenantNameOrEmpty(Tenant t) {
+    private static String tenantNameOrEmpty(TenantRowView t) {
         return t == null || t.getName() == null ? "" : t.getName();
     }
 
@@ -653,7 +653,7 @@ public class AuthController {
     }
 
     AuthLoginResponse buildAuthLoginResponse(User user,
-            Tenant activeTenant, List<Membership> memberships, String token, String refreshToken) {
+            TenantRowView activeTenant, List<Membership> memberships, String token, String refreshToken) {
         return bindingSupport.buildAuthLoginResponse(user, activeTenant,
                 memberships, token, refreshToken);
     }

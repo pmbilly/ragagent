@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantInvitation;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.contract.tenant.TenantRole;
@@ -33,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.common.tenant.TenantRowView;
 
 /**
  * 邀请相关的 9 条路由：租户侧 GET/POST /tenants/{id}/invitations、
@@ -235,7 +235,7 @@ public class TenantInvitationController {
                 TenantMemberController.trimToEmpty(request.getParameter("include_terminal")));
         List<TenantInvitation> rows = invitationService.listByInvitee(caller, includeTerminal);
         Map<String, User> usersById = hydrateUsers(rows);
-        Map<Long, Tenant> tenantsById = hydrateTenants(rows);
+        Map<Long, TenantRowView> tenantsById = hydrateTenants(rows);
         List<TenantInvitationResponse> resp = new ArrayList<>(rows.size());
         for (TenantInvitation inv : rows) {
             resp.add(projectInvitation(inv, usersById, tenantsById));
@@ -313,7 +313,7 @@ public class TenantInvitationController {
 
         // 供前端切换空间展示
         String tenantName = "";
-        Tenant tenant = tenantService.getTenantById(member.getTenantId());
+        TenantRowView tenant = tenantService.getTenantById(member.getTenantId());
         if (tenant != null) {
             tenantName = tenant.getName();
         }
@@ -380,12 +380,12 @@ public class TenantInvitationController {
     /** inviter/invitee/tenant 字段尽力 hydrate，缺失降级为 id */
     static TenantInvitationResponse projectInvitation(TenantInvitation inv,
                                                       Map<String, User> usersById,
-                                                      Map<Long, Tenant> tenantsById) {
+                                                      Map<Long, TenantRowView> tenantsById) {
         User invitee = usersById == null ? null : usersById.get(inv.getInviteeUserId());
         User inviter = inv.getInvitedBy() == null || usersById == null
                 ? null
                 : usersById.get(inv.getInvitedBy());
-        Tenant tenant = tenantsById == null ? null : tenantsById.get(inv.getTenantId());
+        TenantRowView tenant = tenantsById == null ? null : tenantsById.get(inv.getTenantId());
         return new TenantInvitationResponse(
                 inv.getId(),
                 inv.getTenantId(),
@@ -414,7 +414,7 @@ public class TenantInvitationController {
      */
     private TenantInvitationResponse projectInvitationWithLink(TenantInvitation inv,
                                                                Map<String, User> usersById,
-                                                               Map<Long, Tenant> tenantsById) {
+                                                               Map<Long, TenantRowView> tenantsById) {
         TenantInvitationResponse base = projectInvitation(inv, usersById, tenantsById);
         String inviteUrl = "";
         if (TenantInvitationService.STATUS_PENDING.equals(inv.getStatus())
@@ -465,8 +465,8 @@ public class TenantInvitationController {
     }
 
     /** /me 视图跨空间，需要租户名 */
-    private Map<Long, Tenant> hydrateTenants(List<TenantInvitation> invs) {
-        Map<Long, Tenant> out = new HashMap<>();
+    private Map<Long, TenantRowView> hydrateTenants(List<TenantInvitation> invs) {
+        Map<Long, TenantRowView> out = new HashMap<>();
         if (invs == null || invs.isEmpty()) {
             return out;
         }

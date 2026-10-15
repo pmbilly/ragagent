@@ -1,4 +1,4 @@
-package com.ragagent.common.tenant.domain;
+package com.ragagent.tenant.domain;
 
 import com.ragagent.contract.tenant.APIPrincipalConfig;
 
@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ragagent.common.tenant.domain.APIPrincipalConfigTypeHandler;
 
 /**
  * tenants 表实体。

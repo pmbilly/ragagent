@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.contract.tenant.TenantStorageQuotaPort;
 import com.ragagent.tenant.mapper.TenantMapper;
-import com.ragagent.common.tenant.domain.Tenant;
+import com.ragagent.tenant.domain.Tenant;
 
 /** {@link TenantStorageQuotaPort} 的租户域实现（配额读写都发生在租户表的属主域）。 */
 @Component

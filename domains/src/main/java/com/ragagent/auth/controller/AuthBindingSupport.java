@@ -3,7 +3,6 @@ package com.ragagent.auth.controller;
 import com.ragagent.platform.web.RequestFields;
 import java.util.List;
 
-import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.AuthLoginResponse;
 import com.ragagent.auth.dto.TenantResponse;
@@ -11,6 +10,7 @@ import com.ragagent.auth.dto.Membership;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.common.tenant.TenantRowView;
 
 /**
  * AuthController 的绑定支持簇：登录响应组装、请求体宽松读（未知字段忽略）、
@@ -18,7 +18,7 @@ import com.ragagent.contract.tenant.TenantRole;
  */
 final class AuthBindingSupport {
 
-    AuthLoginResponse buildAuthLoginResponse(User user, Tenant activeTenant,
+    AuthLoginResponse buildAuthLoginResponse(User user, TenantRowView activeTenant,
                                              List<Membership> memberships,
                                              String token, String refreshToken) {
         TenantResponse tenantResp = null;

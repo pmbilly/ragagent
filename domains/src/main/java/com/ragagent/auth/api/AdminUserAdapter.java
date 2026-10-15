@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.common.auth.AdminUserPort;
 import com.ragagent.common.auth.AdminUserView;
-import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.auth.service.PasswordPolicy;
@@ -23,6 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.auth.AuthTokenAdminPort;
 import java.util.ArrayList;
+import com.ragagent.common.tenant.TenantRowView;
 
 /**
  * 系统管理员 P0 用户管理（注册 / 建管理员 / 重置密码 / 列管理员 / 撤管理员）。
@@ -273,9 +273,9 @@ public class AdminUserAdapter implements AdminUserPort {
         if (byUsernameEntity(username) != null) {
             throw new DuplicateIdentityException(AdminUserPort.ERR_USER_USERNAME_EXISTS);
         }
-        Tenant createdTenant = null;
+        TenantRowView createdTenant = null;
         if ("create_personal".equals(provisioning)) {
-            createdTenant = new Tenant();
+            createdTenant = new TenantRowView();
             createdTenant.setName(LogSanitizer.sanitize(username) + "'s Workspace");
             createdTenant.setDescription("Default workspace");
             createdTenant.setStatus("active");

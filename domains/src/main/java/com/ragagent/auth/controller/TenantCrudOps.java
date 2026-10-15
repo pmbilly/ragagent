@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.dto.TenantResponse;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
@@ -15,6 +14,7 @@ import com.ragagent.contract.tenant.TenantRole;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import com.ragagent.common.tenant.TenantRowView;
 
 /**
  * tenants CRUD 协作者（自 {@link TenantCatalogController} 拆出）：单空间列表、读取/更新/删除与
@@ -38,7 +38,7 @@ final class TenantCrudOps {
      */
     public Map<String, Object> listTenants() {
         Long tenantId = TenantContext.currentTenantId();
-        Tenant tenant = tenantId == null || tenantId == 0 ? null : service.tenantService.getTenantById(tenantId);
+        TenantRowView tenant = tenantId == null || tenantId == 0 ? null : service.tenantService.getTenantById(tenantId);
         if (tenant == null) {
             throw new BizException(AppError.unauthorized("Authentication required"));
         }
@@ -54,7 +54,7 @@ final class TenantCrudOps {
      * details "record not found"（仓储层错误不是 AppError）。
      */
     public TenantResponse getTenant(@PathVariable("id") String id) {
-        Tenant tenant = loadTenantOr500(Long.parseLong(id.trim()), "Failed to retrieve workspace");
+        TenantRowView tenant = loadTenantOr500(Long.parseLong(id.trim()), "Failed to retrieve workspace");
         return TenantResponse.from(tenant, contextRoleHasAdmin());
     }
 
@@ -66,7 +66,7 @@ final class TenantCrudOps {
     public TenantResponse updateTenant(@PathVariable("id") String id,
                                             @RequestBody(required = false) String rawBody) {
         UpdateTenantRequest req = bindUpdateTenantRequest(rawBody);
-        Tenant existing = loadTenantOr500(Long.parseLong(id.trim()), "Failed to load workspace");
+        TenantRowView existing = loadTenantOr500(Long.parseLong(id.trim()), "Failed to load workspace");
         // 注意：绑定（400 语义层）先于租户加载
 
         if (req.name != null) {
@@ -169,8 +169,8 @@ final class TenantCrudOps {
     }
 
     /** GET/PUT 共用：租户缺失 → 500 + details "record not found"（仓储错误原文透传）。 */
-    private Tenant loadTenantOr500(long id, String message) {
-        Tenant tenant = service.tenantService.getTenantById(id);
+    private TenantRowView loadTenantOr500(long id, String message) {
+        TenantRowView tenant = service.tenantService.getTenantById(id);
         if (tenant == null) {
             throw new BizException(AppError.internal(message).withDetails("record not found"));
         }

@@ -1,5 +1,5 @@
 /**
- * 租户域（由 {@code common.tenant} 搬出）：租户实体 {@link com.ragagent.common.tenant.domain.Tenant}、
+ * 租户域（由 {@code common.tenant} 搬出）：租户实体 {@link com.ragagent.tenant.domain.Tenant}、
  * {@code TenantMapper}、租户级配置 VO（{@code APIPrincipalConfig} / {@code ChatHistoryConfig} /
  * {@code ParserEngineConfig} / {@code RetrievalConfig} / {@code StorageEngineConfig}）、
  * {@code TenantConfigRedaction}（响应/更新面的密钥打码与合并）与 {@link com.ragagent.tenant.repository.TenantLookup}。

@@ -8,7 +8,6 @@ import java.util.UUID;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.auth.domain.AuthToken;
-import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.auth.domain.User;
@@ -25,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.ragagent.platform.security.UserNameLookup;
+import com.ragagent.common.tenant.TenantRowView;
 
 /**
  * 用户 service。
@@ -104,7 +104,7 @@ public class UserService implements UserNameLookup {
         }
 
         // resolvedTenantID == 0 是合法的 tenantless 身份，不算失败
-        Tenant tenant = null;
+        TenantRowView tenant = null;
         if (resolvedTenantId > 0) {
             tenant = tenantService.getTenantById(resolvedTenantId);
             if (tenant == null) {
@@ -238,7 +238,7 @@ public class UserService implements UserNameLookup {
      * 错误不传播：membership 查不到 → 空数组。
      * 仅 status=active 且 tenant 行存在（名字非空白）的行进入响应。
      */
-    public List<Membership> buildLoginMemberships(User user, Tenant activeTenant) {
+    public List<Membership> buildLoginMemberships(User user, TenantRowView activeTenant) {
         if (user == null) {
             return new ArrayList<>();
         }
@@ -256,7 +256,7 @@ public class UserService implements UserNameLookup {
             }
             needsLookup.add(m.getTenantId());
         }
-        java.util.Map<Long, Tenant> tenantById = tenantService.getTenantsByIds(needsLookup);
+        java.util.Map<Long, TenantRowView> tenantById = tenantService.getTenantsByIds(needsLookup);
 
         List<Membership> out = new ArrayList<>(rows.size());
         for (TenantMember m : rows) {
@@ -267,7 +267,7 @@ public class UserService implements UserNameLookup {
             if (activeTenant != null && m.getTenantId().equals(activeTenant.getId())) {
                 name = activeTenant.getName();
             } else {
-                Tenant t = tenantById.get(m.getTenantId());
+                TenantRowView t = tenantById.get(m.getTenantId());
                 if (t != null) {
                     name = t.getName();
                 }
@@ -474,9 +474,9 @@ public class UserService implements UserNameLookup {
             throw new RegistrationException("invalid tenant provisioning mode \"" + mode + "\"");
         }
 
-        Tenant createdTenant = null;
+        TenantRowView createdTenant = null;
         if (PROVISIONING_CREATE_PERSONAL.equals(mode)) {
-            Tenant tenant = new Tenant();
+            TenantRowView tenant = new TenantRowView();
             // 租户名再过一遍 sanitizeForLog（入口已对 username 消毒，此处幂等）
             tenant.setName(sanitizeForLog(username) + "'s Workspace");
             tenant.setDescription("Default workspace");

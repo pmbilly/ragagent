@@ -7,11 +7,11 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.auth.dto.Membership;
-import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.common.auth.domain.UserPreferences;
 import io.jsonwebtoken.Claims;
+import com.ragagent.common.tenant.TenantRowView;
 
 /**
  * 用户会话令牌操作（logout / refresh / switch-tenant，
@@ -130,7 +130,7 @@ final class UserSessionOps {
             }
         }
 
-        Tenant tenant = svc.tenantService.getTenantById(targetTenantId);
+        TenantRowView tenant = svc.tenantService.getTenantById(targetTenantId);
         if (tenant == null) {
             // "record not found" 包进 "load target workspace: " 前缀后抛出
             throw new UserService.SwitchTenantException("load target workspace: record not found");

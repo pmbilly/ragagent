@@ -40,7 +40,7 @@ import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.tenant.domain.Tenant;
+import com.ragagent.common.tenant.TenantRowView;
 
 /**
  * {@code continue-stream} 端点的行为契约。
@@ -79,7 +79,7 @@ class SessionStreamControllerTest {
                 // （与 A3-3 接线前传 null 的可见行为一致）
                 new TenantService(null, null, null) {
                     @Override
-                    public Tenant getTenantById(long id) {
+                    public TenantRowView getTenantById(long id) {
                         return null;
                     }
                 },

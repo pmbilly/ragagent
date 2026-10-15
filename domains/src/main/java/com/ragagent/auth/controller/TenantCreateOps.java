@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.contract.error.AppError;
@@ -20,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
+import com.ragagent.common.tenant.TenantRowView;
 
 /**
  * POST /tenants 创建租户协作者（自 {@link TenantCatalogController} 拆出）：自助/超管双路径、配额预检与
@@ -62,12 +62,12 @@ final class TenantCreateOps {
                     null, 403));
         }
 
-        Tenant tenantData;
+        TenantRowView tenantData;
         if (catalogManager) {
             // 超管/平台 Key：全字段兼容路径（整实体绑定）
-            tenantData = TenantBindSupport.bindBody(rawBody, Tenant.class, "Invalid request parameters");
+            tenantData = TenantBindSupport.bindBody(rawBody, TenantRowView.class, "Invalid request parameters");
             if (tenantData == null) {
-                tenantData = new Tenant(); // body "null" → 零值对象
+                tenantData = new TenantRowView(); // body "null" → 零值对象
             }
             tenantData.setId(null); // 主键恒由 DB 生成
         } else {
@@ -90,7 +90,7 @@ final class TenantCreateOps {
                     throw quotaExceeded();
                 }
             }
-            tenantData = new Tenant();
+            tenantData = new TenantRowView();
             tenantData.setName(TenantBindSupport.trimGo(req.name()));
             tenantData.setDescription(TenantBindSupport.trimGo(req.description()));
         }
@@ -107,7 +107,7 @@ final class TenantCreateOps {
             tenantData.setStorageQuota(gb * 1024 * 1024 * 1024);
         }
 
-        Tenant created;
+        TenantRowView created;
         try {
             created = service.tenantService.createTenant(tenantData);
         } catch (IllegalArgumentException e) {
@@ -188,7 +188,7 @@ final class TenantCreateOps {
     /**
      * tenant 序列化为 map 再加 api_key；map 序列化**各层键都按字母序**——递归深排序。
      */
-    private Object tenantWithApiKey(Tenant tenant, String token) {
+    private Object tenantWithApiKey(TenantRowView tenant, String token) {
         JsonNode node = service.springMapper.valueToTree(tenant);
         Object sorted = deepSortKeys(node);
         @SuppressWarnings("unchecked")

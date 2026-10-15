@@ -9,7 +9,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
-import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalConfigRequest;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalConfigResponse;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalTestTokenRequest;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.platform.web.ApiResult;
+import com.ragagent.common.tenant.TenantRowView;
 
 /**
  * api-principal 三条路由（Owner+）：
@@ -69,7 +69,7 @@ public class TenantAPIPrincipalController {
     @GetMapping("/api/v1/tenants/{id}/api-principal-config")
     public APIPrincipalConfigResponse getAPIPrincipalConfig(@PathVariable String id) {
         long tenantId = parseTenantId(id);
-        Tenant tenant = loadTenant(tenantId);
+        TenantRowView tenant = loadTenant(tenantId);
         return configForResponse(tenant.getApiPrincipalConfig());
     }
 
@@ -92,7 +92,7 @@ public class TenantAPIPrincipalController {
                 throw new BizException(AppError.validation("mode must be tenant, direct_header, or signed_token"));
         }
 
-        Tenant tenant = loadTenant(tenantId);
+        TenantRowView tenant = loadTenant(tenantId);
         APIPrincipalConfig existing = tenant.getApiPrincipalConfig();
         String existingSecret = existing == null ? "" : existing.hmacSecret;
         String hmacSecret = existingSecret;
@@ -115,7 +115,7 @@ public class TenantAPIPrincipalController {
         }
         tenant.setApiPrincipalConfig(cfg);
 
-        Tenant updated = tenantService.updateTenant(tenant);
+        TenantRowView updated = tenantService.updateTenant(tenant);
         return configForResponse(updated.getApiPrincipalConfig());
     }
 
@@ -129,7 +129,7 @@ public class TenantAPIPrincipalController {
         String externalUserId = req.externalUserId() == null ? "" : req.externalUserId().trim();
         validateExternalUserId(externalUserId);
 
-        Tenant tenant = loadTenant(tenantId);
+        TenantRowView tenant = loadTenant(tenantId);
         APIPrincipalConfig cfg = tenant.getApiPrincipalConfig();
         if (cfg == null || !APIPrincipalConfig.MODE_SIGNED_TOKEN.equals(cfg.mode)) {
             throw new BizException(AppError.validation("signed_token mode is required"));
@@ -216,8 +216,8 @@ public class TenantAPIPrincipalController {
         }
     }
 
-    private Tenant loadTenant(long tenantId) {
-        Tenant tenant = tenantService.getTenantById(tenantId);
+    private TenantRowView loadTenant(long tenantId) {
+        TenantRowView tenant = tenantService.getTenantById(tenantId);
         if (tenant == null) {
             // 租户不存在（底层 record not found）非业务错误 → 500 + 原文 details
             throw new BizException(AppError.internal("Failed to load workspace").withDetails("record not found"));

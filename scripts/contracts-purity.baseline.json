@@ -16,7 +16,6 @@
  "imports": {
   "com.baomidou": [
    "com/ragagent/common/knowledge/KnowledgeCatalogPort.java",
-   "com/ragagent/common/tenant/domain/Tenant.java",
    "com/ragagent/common/wiki/domain/WikiIndexEntry.java",
    "com/ragagent/platform/persistence/FullTableWriteGuard.java",
    "com/ragagent/platform/persistence/PageRequests.java",
@@ -114,9 +113,7 @@
   "com/ragagent/common/wiki/WikiPageOpsPort.java"
  ],
  "persistence": {
-  "entities": [
-   "com/ragagent/common/tenant/domain/Tenant.java"
-  ],
+  "entities": [],
   "handlers": [
    "com/ragagent/common/session/domain/AbstractJsonListTypeHandler.java",
    "com/ragagent/common/session/domain/AgentStepListTypeHandler.java",

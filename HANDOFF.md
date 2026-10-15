@@ -1585,6 +1585,14 @@ public interface AdminUserPort {
 
 **共同纪律**：① 每批先做"**等价物核查**"（复用 `UserDirectoryPort`/`UserLookupPort`，不新建重复端口——两者并存本身是历史欠账，本批登记）；② 实体常量若被跨域用 ⇒ 外提 L1 + 实体委托（`KnowledgeParseStatus` 先例）；③ 逐批跑 14 守卫 + 金片 + 全量闸门。
 
+**🔶 C 批 1·第十四子批：C-14a 落地——`Tenant` 收窄（**实体 1 → 0，C2 目标达成 / C 收官**）（2026-10-15）**
+- **设计依据＝R10 的登记文字本身**：`② auth→tenant` 是**域属主边**（§8.9 明写"租户/成员/RBAC 管理面在 auth；`tenant/` 只留持久层＝配置类 + `TenantMapper` + `repository`"），登记条件＝"读侧走 L1 端口（`TenantConfigLookup` ✓）、写/管理面集中在属主域"；**其清零路径之一正是"改公开 API 形状（实体→视图）"**（另一路径"搬管理面"与计划面清单相悖）⇒ 本刀即走此路
+- **⭐ 与 C-13a 的关键不同：本刀不需要新建端口**——该边**已登记且允许**，端口的价值是"不新增边"；只要让 **`TenantService` 成为该边上唯一承载类**、其余 auth 文件改视图 ⇒ **R10 定点不动（6 边 / 51 类，②owner 仍 `['TenantService']`）** ✓
+- **动作**：① 新建 `common.tenant.TenantRowView`（21 字段镜像：10 个 `JsonNode` + `APIPrincipalConfig`（同标 `@JsonIgnore`）；与 `TenantConfigLookup` 同包）② **`TenantLookup` 接口按其自身 javadoc 的预留路径改视图**（原话"后续可选：把本方法的返回收窄成视图（对齐 `ChunkView` 的做法）"⇒ 本刀兑现）③ `TenantService` **分层**：私有 `tenantRow(long)`（实体口径，域内与端口实现用）+ 公开 `getTenantById`/`tenantById`/`getTenantsByIds`/`listAllTenants`/`searchTenants`/`createTenant`/`updateTenant` 全部**视图口径**（边界 `toView`/`toEntity`/`copyInto`；`update`/`create` 保持**回填**语义）④ auth 侧 **14 文件**批量改道（`TenantResponse`(19 读 线格式) · `TenantConfigOps`(配置读写) · 3 个租户控制器 · `AdminUserAdapter` · `UserService` · `WsAuthSupport` …）⑤ 实体 `Tenant` 回 `tenant/domain`（55 处 FQN 回退；`APIPrincipalConfigTypeHandler` 留 L1）
+- **⭐ 读数（C 收官）**：**C2 实体 1 → 0** ✓✓ **`:common` 持久化实体全部归位**；C1 62 → **61 文件**；C4 待归位 13、登记 platform 面 7 + **待去 Jackson 11 → 12**；**R10 保持 6 条边 / 51 类 / ①档 0 / ②owner 1 类** ✓
+- **验证**：**14 守卫全绿**（**C2 = 0**，基线已 `--write`）；**1349 金片签名一致** ✓（线格式未变）；`spotlessCheck build` **2m**；**4991 / 失败 0 / 跳过 4**；dev ready + 冒烟（`auth/me` **200**（登录走租户解析链）· **`GET /api/v1/tenants` 200**（租户行经视图出面 ✓）· KB / sessions 200 ✓）
+- **C 收尾状态**：C2 实体 **0** ✓ · 域侧 handler 10（其宿主载荷待去 Jackson 后一并处理）· C4 待归位 13 + 登记 19（platform 7 + 待去 Jackson 12）· R10 **6 边**（①0 / ②1 属主边 / ③5 族内）
+- **后续（登记项）**：① **C-14b 租户用例归位**（`TenantService` + 3 个租户控制器迁 `domains/tenant`，auth 只留"注册建租户"一个调用点 ⇒ 可清零 ②owner 属主边）——结构性重构（动控制器/路由归属），独立立项 ② `common/*` 余量按 §16.2 走 **D1 批 C/D**（`wiki`/`agent/tool`/`settings`/`session` 契约料）与 **G1-b 去 Jackson**（12 件登记载荷）
 **🔶 C 批 1·第十三子批：C-13a 落地——`users` 单一持久面 + `system→auth` 边清偿 + `User` 实体回域（实体 2 → 1；R10 6 边 / 51 类）（2026-10-15）**
 - **按 §12.6.4 规格执行 8 步**：① `common.auth.AdminUserView`（12 字段镜像，去 `@JsonIgnore passwordHash`）+ ② `common.auth.AdminUserPort`（10 方法 + 嵌套 `AdminUserPage` / `CreateResult`）③ `auth/api/AdminUserAdapter`（**由 `SystemAdminUserService` 复制改造**：内部实体口径、仅在端口边界做 view↔entity 转换；`toView`/`toEntity`/`copyInto` 三助手）④ `SystemAdminUserService` 瘦身为**系统侧壳**（审计 + `isValidEmail` + 逐字转发）⑤ `SystemDtos`/控制器改视图 ⑥ **端口合并**（`SystemSettingService` 的 `UserDirectoryPort.userById` → `AdminUserPort.byId`；**删 `UserDirectoryPort` + `UserDirectoryAdapter`**）⑦ 实体 `User` 回 `auth/domain`（54 处 FQN 回退）⑧ 全量验证
 - **⭐ 本刀核心读数**：**`system→auth` 边清零 ⇒ R10 6 条边 / 51 类 · ②owner 2 → 1** ✓；**C2 实体 2 → 1**（仅剩 `Tenant`）；C1 63 → **62 文件**；C4 登记 platform 面 7 + **待去 Jackson 9 → 11**（新视图与端口登记）
@@ -2658,10 +2666,10 @@ public interface AdminUserPort {
 
 | 项 | 现状 | 门禁 |
 |---|---|---|
-| `:common` 持久化实体 | **1**（仅 `Tenant`；`StorageBackend`/`WikiPageIssue`/`WikiPage`/`Chunk`/`KnowledgeBase`/`Knowledge`/`User` 已归位） | C2（只许减） |
+| `:common` 持久化实体 | **0** ✅（C2 目标达成：14 → 0 全部归位；见下方 C 批 1 各子批） | C2（只许减） |
 | `:common` 域侧 TypeHandler | **10** | C2 |
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
-| `:common` 受控依赖根 | 10 根 / 62 文件 | C1 |
+| `:common` 受控依赖根 | 10 根 / 61 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
 | `:common` 规模 | **265 件** = `common/*` **125** + `platform/*` 139 + `event/*` 1（D1 后） | — |
 

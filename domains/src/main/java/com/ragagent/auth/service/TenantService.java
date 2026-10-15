@@ -16,7 +16,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.platform.persistence.PageRequests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.tenant.domain.Tenant;
+import com.ragagent.common.tenant.TenantRowView;
+import com.ragagent.tenant.domain.Tenant;
 import com.ragagent.tenant.repository.TenantLookup;
 import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.contract.storage.StorageBackendProvisioner;
@@ -55,8 +56,8 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         this.storageProvisioner = storageProvisioner;
     }
 
-    /** 按 id 查：不存在返回 null（调用方区分语义） */
-    public Tenant getTenantById(long id) {
+    /** 按 id 取**实体**（域内/端口实现用；不存在返回 null）。 */
+    Tenant tenantRow(long id) {
         Tenant t = tenantMapper.selectOne(new LambdaQueryWrapper<Tenant>()
                 .eq(Tenant::getId, id)
                 .isNull(Tenant::getDeletedAt)
@@ -68,39 +69,44 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         return t;
     }
 
+    /** 按 id 查（视图口径；不存在返回 null）——租户管理面消费用。 */
+    public TenantRowView getTenantById(long id) {
+        return toView(tenantRow(id));
+    }
+
     // ── TenantConfigLookup（检索/模型域的只读端口实现）────────────────────
 
     @Override
     public JsonNode retrieverEngines(long tenantId) {
-        Tenant t = getTenantById(tenantId);
+        Tenant t = tenantRow(tenantId);
         return t == null ? null : t.getRetrieverEngines();
     }
 
     @Override
     public JsonNode retrievalConfig(long tenantId) {
-        Tenant t = getTenantById(tenantId);
+        Tenant t = tenantRow(tenantId);
         return t == null ? null : t.getRetrievalConfig();
     }
 
     @Override
     public JsonNode memoryConfig(long tenantId) {
-        Tenant t = getTenantById(tenantId);
+        Tenant t = tenantRow(tenantId);
         return t == null ? null : t.getMemoryConfig();
     }
 
     @Override
-    public Tenant tenantById(long tenantId) {
+    public TenantRowView tenantById(long tenantId) {
         return getTenantById(tenantId);
     }
 
     @Override
     public boolean exists(long tenantId) {
-        return getTenantById(tenantId) != null;
+        return tenantRow(tenantId) != null;
     }
 
     @Override
     public APIPrincipalConfig apiPrincipalConfig(long tenantId) {
-        Tenant t = getTenantById(tenantId);
+        Tenant t = tenantRow(tenantId);
         return t == null ? null : t.getApiPrincipalConfig();
     }
 
@@ -121,13 +127,13 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
 
     /** 三段配置的统一取法：租户不存在或值为 null 时返回 null（与端口 javadoc 的语义一致）。 */
     private JsonNode configOf(long tenantId, java.util.function.Function<Tenant, JsonNode> getter) {
-        Tenant t = getTenantById(tenantId);
+        Tenant t = tenantRow(tenantId);
         return t == null ? null : getter.apply(t);
     }
 
     @Override
     public TenantStorageView storageView(long tenantId) {
-        Tenant t = getTenantById(tenantId);
+        Tenant t = tenantRow(tenantId);
         if (t == null) {
             return null;
         }
@@ -136,8 +142,8 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
     }
 
     /** 批量按 id 查（map 形态，供 memberships 组装） */
-    public Map<Long, Tenant> getTenantsByIds(Collection<Long> ids) {
-        Map<Long, Tenant> out = new HashMap<>();
+    public Map<Long, TenantRowView> getTenantsByIds(Collection<Long> ids) {
+        Map<Long, TenantRowView> out = new HashMap<>();
         if (ids == null || ids.isEmpty()) {
             return out;
         }
@@ -146,13 +152,13 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
                 .isNull(Tenant::getDeletedAt))) {
             normalizeRetrieverEngines(t);
             normalizeContextConfig(t);
-            out.put(t.getId(), t);
+            out.put(t.getId(), toView(t));
         }
         return out;
     }
 
     /** 全量列表，created_at DESC，软删除过滤 */
-    public List<Tenant> listAllTenants() {
+    public List<TenantRowView> listAllTenants() {
         List<Tenant> tenants = tenantMapper.selectList(new LambdaQueryWrapper<Tenant>()
                 .isNull(Tenant::getDeletedAt)
                 .orderByDesc(Tenant::getCreatedAt));
@@ -160,7 +166,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
             normalizeRetrieverEngines(t);
             normalizeContextConfig(t);
         }
-        return tenants;
+        return toViews(tenants);
     }
 
     /**
@@ -170,7 +176,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
      * LIKE 参数先过 {@code LikeEscapes.escape}（\ % _ 反斜杠转义，PG LIKE 默认 ESCAPE 就是反斜杠）。
      * 先 Count 再 Offset/Limit，恒 created_at DESC。
      */
-    public record TenantSearchPage(List<Tenant> tenants, long total) {}
+    public record TenantSearchPage(List<TenantRowView> tenants, long total) {}
 
     public TenantSearchPage searchTenants(String keyword, long tenantId, int page, int pageSize) {
         String kw = keyword == null ? "" : keyword;
@@ -198,7 +204,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
             normalizeRetrieverEngines(t);
             normalizeContextConfig(t);
         }
-        return new TenantSearchPage(tenants, total == null ? 0 : total);
+        return new TenantSearchPage(toViews(tenants), total == null ? 0 : total);
     }
 
     /** LIKE 转义：\ → \\、% → \%、_ → \_（顺序敏感，先转义反斜杠） */
@@ -209,12 +215,14 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
      * 对"从 DB 读出再写回"
      * 的用法等价（值未变的列重写同值）。
      */
-    public Tenant updateTenant(Tenant tenant) {
-        validateStorageBucketUniqueness(tenant);
+    public TenantRowView updateTenant(TenantRowView view) {
+        validateStorageBucketUniqueness(view);
         java.time.OffsetDateTime now = java.time.OffsetDateTime.now(java.time.ZoneOffset.UTC);
-        tenant.setUpdatedAt(now);
+        view.setUpdatedAt(now);
+        Tenant tenant = toEntity(view);
         tenantMapper.updateById(tenant);
-        return tenant;
+        copyInto(view, tenant);
+        return toView(tenant);
     }
 
     /**
@@ -223,7 +231,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
      * 了某族桶名（与库存旧值不同）且该桶名被别的租户占用时拒绝。
      * 旧租户行读取失败/不存在按"无旧值"处理（selectById 返回 null）。
      */
-    private void validateStorageBucketUniqueness(Tenant tenant) {
+    private void validateStorageBucketUniqueness(TenantRowView tenant) {
         JsonNode cfg = tenant.getStorageEngineConfig();
         if (cfg == null || cfg.isNull()) {
             return;
@@ -285,7 +293,8 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
      * validateStorageBucketUniqueness 对自助路径是 no-op（StorageEngineConfig 恒 null），
      * 超管全字段路径可能携带 → 在 insert 前跑。
      */
-    public Tenant createTenant(Tenant tenant) {
+    public TenantRowView createTenant(TenantRowView view) {
+        Tenant tenant = toEntity(view);
         if (tenant.getName() == null || tenant.getName().isEmpty()) {
             throw new IllegalArgumentException("workspace name cannot be empty");
         }
@@ -312,7 +321,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
         tenant.setCreatedAt(now);
         tenant.setUpdatedAt(now);
-        validateStorageBucketUniqueness(tenant);
+        validateStorageBucketUniqueness(view);
         tenantMapper.insert(tenant);
         try {
             createDefaultStorageBackend(tenant);
@@ -327,7 +336,8 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
             }
             throw e;
         }
-        return tenant;
+        copyInto(view, tenant);
+        return toView(tenant);
     }
 
     /**
@@ -415,5 +425,106 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
     private static String textOrEmpty(JsonNode cfg, String key) {
         JsonNode v = cfg == null ? null : cfg.get(key);
         return v != null && v.isTextual() ? v.asText("") : "";
+    }
+
+    /** 实体 → 视图（逐字段搬运；null 透传）。 */
+    public static TenantRowView toView(Tenant t) {
+        if (t == null) {
+            return null;
+        }
+        TenantRowView v = new TenantRowView();
+        v.setId(t.getId());
+        v.setName(t.getName());
+        v.setDescription(t.getDescription());
+        v.setStatus(t.getStatus());
+        v.setRetrieverEngines(t.getRetrieverEngines());
+        v.setBusiness(t.getBusiness());
+        v.setStorageQuota(t.getStorageQuota());
+        v.setStorageUsed(t.getStorageUsed());
+        v.setContextConfig(t.getContextConfig());
+        v.setWebSearchConfig(t.getWebSearchConfig());
+        v.setParserEngineConfig(t.getParserEngineConfig());
+        v.setCredentials(t.getCredentials());
+        v.setStorageEngineConfig(t.getStorageEngineConfig());
+        v.setDefaultStorageBackendId(t.getDefaultStorageBackendId());
+        v.setChatHistoryConfig(t.getChatHistoryConfig());
+        v.setRetrievalConfig(t.getRetrievalConfig());
+        v.setMemoryConfig(t.getMemoryConfig());
+        v.setApiPrincipalConfig(t.getApiPrincipalConfig());
+        v.setCreatedAt(t.getCreatedAt());
+        v.setUpdatedAt(t.getUpdatedAt());
+        v.setDeletedAt(t.getDeletedAt());
+        return v;
+    }
+
+    /** 批量（null 安全）。 */
+    public static List<TenantRowView> toViews(List<Tenant> rows) {
+        if (rows == null) {
+            return List.of();
+        }
+        List<TenantRowView> out = new java.util.ArrayList<>(rows.size());
+        for (Tenant t : rows) {
+            out.add(toView(t));
+        }
+        return out;
+    }
+
+    /** 视图 → 实体（写面用；经实体 setter；null 透传）。 */
+    public static Tenant toEntity(TenantRowView v) {
+        if (v == null) {
+            return null;
+        }
+        Tenant t = new Tenant();
+        t.setId(v.getId());
+        t.setName(v.getName());
+        t.setDescription(v.getDescription());
+        t.setStatus(v.getStatus());
+        t.setRetrieverEngines(v.getRetrieverEngines());
+        t.setBusiness(v.getBusiness());
+        t.setStorageQuota(v.getStorageQuota());
+        t.setStorageUsed(v.getStorageUsed());
+        t.setContextConfig(v.getContextConfig());
+        t.setWebSearchConfig(v.getWebSearchConfig());
+        t.setParserEngineConfig(v.getParserEngineConfig());
+        t.setCredentials(v.getCredentials());
+        t.setStorageEngineConfig(v.getStorageEngineConfig());
+        t.setDefaultStorageBackendId(v.getDefaultStorageBackendId());
+        t.setChatHistoryConfig(v.getChatHistoryConfig());
+        t.setRetrievalConfig(v.getRetrievalConfig());
+        t.setMemoryConfig(v.getMemoryConfig());
+        t.setApiPrincipalConfig(v.getApiPrincipalConfig());
+        t.setCreatedAt(v.getCreatedAt());
+        t.setUpdatedAt(v.getUpdatedAt());
+        t.setDeletedAt(v.getDeletedAt());
+        return t;
+    }
+
+    /** 落库后回填传入视图（保持"同对象被填充"的旧语义；null 安全）。 */
+    public static void copyInto(TenantRowView v, Tenant t) {
+        if (v == null || t == null) {
+            return;
+        }
+        TenantRowView fresh = toView(t);
+        v.setId(fresh.getId());
+        v.setName(fresh.getName());
+        v.setDescription(fresh.getDescription());
+        v.setStatus(fresh.getStatus());
+        v.setRetrieverEngines(fresh.getRetrieverEngines());
+        v.setBusiness(fresh.getBusiness());
+        v.setStorageQuota(fresh.getStorageQuota());
+        v.setStorageUsed(fresh.getStorageUsed());
+        v.setContextConfig(fresh.getContextConfig());
+        v.setWebSearchConfig(fresh.getWebSearchConfig());
+        v.setParserEngineConfig(fresh.getParserEngineConfig());
+        v.setCredentials(fresh.getCredentials());
+        v.setStorageEngineConfig(fresh.getStorageEngineConfig());
+        v.setDefaultStorageBackendId(fresh.getDefaultStorageBackendId());
+        v.setChatHistoryConfig(fresh.getChatHistoryConfig());
+        v.setRetrievalConfig(fresh.getRetrievalConfig());
+        v.setMemoryConfig(fresh.getMemoryConfig());
+        v.setApiPrincipalConfig(fresh.getApiPrincipalConfig());
+        v.setCreatedAt(fresh.getCreatedAt());
+        v.setUpdatedAt(fresh.getUpdatedAt());
+        v.setDeletedAt(fresh.getDeletedAt());
     }
 }

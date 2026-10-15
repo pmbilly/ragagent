@@ -2,9 +2,9 @@ package com.ragagent.auth.service;
 
 import java.util.List;
 
-import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.Membership;
+import com.ragagent.common.tenant.TenantRowView;
 
 /**
  * 登录结果（service 层形态）。
@@ -15,7 +15,7 @@ public record LoginResult(
         boolean success,
         String message,
         User user,
-        Tenant activeTenant,
+        TenantRowView activeTenant,
         List<Membership> memberships,
         String token,
         String refreshToken) {
@@ -24,7 +24,7 @@ public record LoginResult(
         return new LoginResult(false, message, null, null, null, null, null);
     }
 
-    public static LoginResult success(User user, Tenant activeTenant, List<Membership> memberships,
+    public static LoginResult success(User user, TenantRowView activeTenant, List<Membership> memberships,
                                       String token, String refreshToken) {
         return new LoginResult(true, "Login successful", user, activeTenant, memberships, token, refreshToken);
     }

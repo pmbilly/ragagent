@@ -1,7 +1,7 @@
 package com.ragagent.tenant.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.common.tenant.domain.Tenant;
+import com.ragagent.tenant.domain.Tenant;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;

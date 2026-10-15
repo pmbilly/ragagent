@@ -1,8 +1,8 @@
 package com.ragagent.tenant.repository;
-import com.ragagent.common.tenant.domain.Tenant;
+import com.ragagent.common.tenant.TenantRowView;
 
 /**
- * 租户实体查询端口：按 id 取 {@link com.ragagent.common.tenant.domain.Tenant} 行。
+ * 租户实体查询端口：按 id 取 {@code com.ragagent.tenant.domain.Tenant} 行。
  *
  * <p><b>为什么不在 {@code common.tenant}</b>：本方法返回<b>实体</b>，而 {@code common} 是被 L2
  * （如 {@code retrieval}）依赖的契约层——若把返回实体的方法留在 common，则实体必须留在 common；
@@ -13,10 +13,10 @@ import com.ragagent.common.tenant.domain.Tenant;
  *   <li>本端口（域侧）：返回实体，只允许 <b>L3 业务域</b>（storage / knowledge）使用。</li>
  * </ul>
  *
- * <p>后续可选：把本方法的返回收窄成视图（对齐 {@code common.knowledge.ChunkView} 的做法），
- * 届时可并回 common。</p>
+ * <p><b>已按预留路径收窄（2026-10-15，C-14a）</b>：返回类型改为 {@code common.tenant.TenantRowView}
+ * （对齐 {@code ChunkView} 的做法）——实体已归位本域，视图让消费方无需认识实体。</p>
  */
 public interface TenantLookup {
 
-    Tenant tenantById(long tenantId);
+    TenantRowView tenantById(long tenantId);
 }

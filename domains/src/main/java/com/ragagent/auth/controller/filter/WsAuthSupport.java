@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.auth.domain.User;
@@ -19,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import com.ragagent.common.tenant.TenantRowView;
 
 /**
  * JWT 认证装配支持（沙箱终端 WS 等非过滤器入口复用）。
@@ -112,7 +112,7 @@ public class WsAuthSupport {
             return false;
         }
 
-        Tenant tenant = target.tenant();
+        TenantRowView tenant = target.tenant();
         if (tenant == null) {
             tenant = tenantService.getTenantById(target.tenantId());
             if (tenant == null) {
@@ -170,7 +170,7 @@ public class WsAuthSupport {
                 writePlainError(response, 403, "Forbidden: insufficient permissions to access target workspace");
                 return null;
             }
-            Tenant targetTenant = tenantService.getTenantById(parsedTenantId);
+            TenantRowView targetTenant = tenantService.getTenantById(parsedTenantId);
             if (targetTenant == null) {
                 log.warn("Error getting target tenant by ID: tenantID={}", parsedTenantId);
                 writePlainError(response, 400, "Invalid target workspace ID");
@@ -260,7 +260,7 @@ public class WsAuthSupport {
         return TenantRole.ADMIN;
     }
 
-    private record TargetResolution(long tenantId, Tenant tenant, boolean crossTenantSwitch) {}
+    private record TargetResolution(long tenantId, TenantRowView tenant, boolean crossTenantSwitch) {}
 
     // ── 响应写入（契约逐字符锁定，golden 测试比对） ──────────────────────────
 
