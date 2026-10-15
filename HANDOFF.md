@@ -1526,7 +1526,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 | 账 | 读数 | 状态 |
 |---|---|---|
 | `:contract` | **206 件** | ✅ 已独立（零依赖） |
-| `common/*` | **78 件**（125 → … → 82 → 78；G1-e 再 −4） | 收敛中 |
+| `common/*` | **77 件**（125 → … → 82 → 78 → 77；G1-f 再 −1） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
 | **C1 受控导入根** | 10 根 / **57 文件** | 冻结只许减 |
@@ -1534,7 +1534,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 | 域侧 handler | **0 件** ✅（TypeHandler 全部回域；最后一作 `WikiStringListTypeHandler` 随 wiki 收尾回域） | — |
 | build 依赖 | 12 | 冻结 |
 | **R10** | **6 条边 / 51 类**（①clearable **0** · ②owner 1〔`auth→tenant` 属主边〕· ③intra-family 5） | ✅ ①档达标 |
-| 测试 | **4991 / 失败 0 / 跳过 4**；金片 **1349 签名一致** | — |
+| 测试 | **4992 / 失败 0 / 跳过 4**（+1＝405 回归测试）；金片 **1349 签名一致** | — |
 
 **B. `common/*` 97 件处置表（6 组，全部有明确归属）**
 
@@ -1792,6 +1792,33 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 G1-f·405 映射修复 + Jackson 味值类型按域回迁（1 件实迁 / 21 件转台账）+ §16.0 数字刷新（2026-10-15）**
+
+**① `HttpRequestMethodNotSupportedException ⇒ 405`（清账项，此前两次现身）**
+- **根因**：`GlobalExceptionHandler` 只按具体异常分派，`HttpRequestMethodNotSupportedException` 落 **catch-all `@ExceptionHandler(Exception.class)`** ⇒ 回 **500** 且打 ERROR 日志 ✗（而 `errorCodeFor(405)` **早已在案** ⇒ 只差"接住"）
+- **修法**：加专门 handler → `respond(new AppError(errorCodeFor(405), "Method Not Allowed", null, 405), req)`（复用既有信封分派：`@ApiResult` 路由走统一外壳、其余走历史形态 ✓）+ **回归测试**（`GlobalExceptionHandlerMethodNotAllowedTest`，断言 405 + code 1004 + 文案 ✓）
+- **实况验证**：`GET /api/v1/chunker/preview`（仅 POST 路由）⇒ **HTTP 405 + `{"error":{"code":1004,"message":"Method Not Allowed","details":null}}`** ✓✓（此前 500）
+
+**② Jackson 味 L1 值类型按域回迁：先测后动 ⇒ 1 件实迁 + 21 件转"精确阻塞台账"**
+- **测量（22 件逐件测消费域，去字符串）**：**仅 1 件消费全在本域** ⇒ 其余 **21 件全部跨域** ✗（被其它域或 L1 载荷引用）
+- **实迁（1 件）**：`wiki/domain/EmptyListAsNullSerializer` → **`domains/wiki/domain`**（引用者仅 `WikiPage`/`WikiPageIssue` 两个 wiki 实体 ⇒ 同包搬迁、**零 import churn** ✓）
+- **⭐ 21 件阻塞台账（按阻塞方分组，路径已写明——把"模糊队列项"变成"可执行的登记"）**：
+
+| 组 | 件数 | 阻塞方（消费域） | 归位路径 |
+|---|---|---|---|
+| **检索能力面** | 1（`SearchResult`） | **engine 28 · session 10 · L1 3 · knowledge 2 · agent/eval/websearch 各 1** | 属**检索域能力面** ⇒ 需**契约端口化**（retrieval 出 view/port），非"搬迁"能解 |
+| **agent 工具面** | 7（`AgentTool`/`BaseTool`/`ToolRequest`/`ToolCallTarget`/`AgentLookup`/`AgentStep`/`AgentToolCall`） | **mcp 4 · im 7 · session 2~7 · engine 1 · L1** | 族内边（③ 冻结）⇒ 需端口/L1 视图；`AgentStep`/`AgentToolCall` 还被 L1 引用 |
+| **知识元数据面** | 3（`DocumentChunkMetadata`/`FaqChunkMetadata`/`ParserEngineRules`） | **agenttools 3 · session 2 · engine 1** | 需**契约视图**（分块/FAQ 元数据面） |
+| **设置面** | 2（`ConversationProperties`/`SystemSettingRegistry`） | session 5 · knowledge 2 · auth 1 · system 1 | 需契约化（设置面载荷） |
+| **tenant 配置** | 1（`ParserEngineConfig`） | auth 1 | 随 **② 属主边**（`TenantRowView` 同族）⇒ 与 C-14b 同批 |
+| **memory 游标** | 1（`MemoryMessageCursor`） | session 1 | 需契约化 |
+| **session 值类型** | 9 | **L1 平台面载荷**（`MessageView`/`SessionView`/`MessageSuggestionView`，已登记）+ im 2 | 与 L1 平台面载荷**同生命周期**（登记）；待平台面载荷去 Jackson 后一并处置 |
+
+- **判据沉淀**：**"按域回迁"这一类队列项必须先逐件测消费域**——本次 22 件里只有 1 件真的"消费全在本域"；其余需**契约化/端口化**（≥1 设计刀/件）。**未测先搬会把 R10 打成红或制造新边** ✗
+
+**③ §16.0 数字刷新**：见上表（`:contract` 206 · `common/*` **77** · C1 **57 文件** · 实体 0 · **域侧 handler 0** · 载荷 0 + 登记 12 · R10 6 边/51 类 · 测试 **4992**/0/4）
+
+- **验证**：**14 守卫全绿**；**1349 金片签名一致**；`spotlessCheck build` **2m3s**；**4992 / 失败 0 / 跳过 4**；dev ready + 冒烟（**405 实况** ✓ · sessions/KB/system-info **200** ✓ · wiki 索引 **404 业务信封** ✓）
 **🔶 G1-e·wiki 收尾：`WikiIndexEntry` 去 MyBatis 注解 + `WikiIndex`/`WikiPageOpsPort` 入契约 + 最后一个 TypeHandler 回域（2026-10-15）**
 - **触发**：队列第 3 项（wiki 侧收尾）——一次清掉 `WikiPageOpsPort` 的 platform 面登记
 - **⭐ 决定性测量（本刀最有价值处）**：`WikiIndexEntry` 表面像"注定留 L1"（3 个 `@TableField` ✗），但实测 **mapper 早已有显式 `@Results(id = "wikiIndexEntryResult")`**，其中**已声明**全部列映射与 `category_path` 的 `WikiStringListTypeHandler` ⇒ 载荷上的注解**完全冗余** ✓✓
