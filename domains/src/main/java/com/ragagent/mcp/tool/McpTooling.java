@@ -12,7 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.agent.tool.ToolCallTarget;
+import com.ragagent.platform.agent.ToolCallTarget;
 import com.ragagent.chatpipeline.spi.McpToolingGateway;
 import com.ragagent.chatpipeline.spi.ToolRegistryPort;
 import com.ragagent.llm.domain.ChatMessage;

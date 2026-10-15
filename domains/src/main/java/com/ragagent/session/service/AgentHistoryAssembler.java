@@ -1,13 +1,13 @@
 package com.ragagent.session.service;
 
-import com.ragagent.common.agent.domain.AgentToolCall;
+import com.ragagent.platform.agent.AgentToolCall;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.common.agent.domain.AgentStep;
+import com.ragagent.platform.agent.AgentStep;
 
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.llm.domain.ChatMessage;

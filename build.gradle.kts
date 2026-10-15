@@ -38,7 +38,7 @@ dependencies {
     jacocoAggregation(project(":contract"))
     jacocoAggregation(project(":domains"))
     jacocoAggregation(project(":engine"))
-    jacocoAggregation(project(":common"))
+    jacocoAggregation(project(":platform"))
     jacocoAggregation(project(":boot"))
 }
 

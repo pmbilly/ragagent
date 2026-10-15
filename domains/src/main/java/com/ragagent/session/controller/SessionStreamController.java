@@ -40,7 +40,7 @@ import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.config.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResult;
-import com.ragagent.common.storage.support.FileResolverFactory;
+import com.ragagent.platform.storage.support.FileResolverFactory;
 import com.ragagent.platform.storage.support.ResourceUrlMode;
 
 /**

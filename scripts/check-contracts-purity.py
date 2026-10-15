@@ -117,27 +117,8 @@ PAYLOAD_SUFFIXES = ("View", "Facts", "Payload", "Response", "Port")
 # ① platform 面：带框架类型（servlet / Spring / MyBatis），**永远进不了零依赖的 :contract**，
 #    归属未来的 `platform` 模块（§12.5 提取顺序里 platform 先于三 runtime）。
 PLATFORM_FACE = {
-    "com/ragagent/common/apikey/ApiKeyAuthPort.java":
-        "带 jakarta.servlet 请求/响应类型 ⇒ platform 面",
-    "com/ragagent/common/knowledge/KnowledgeCatalogPort.java":
-        "带 MyBatis-Plus Page ⇒ platform 面（分页属技术适配）",
-    "com/ragagent/common/session/embed/EmbedSessionPort.java":
-        "带 jakarta.servlet + Spring ResponseEntity ⇒ platform 面",
-        "com/ragagent/common/storage/fileserve/GlobalFileServicePort.java":
-        "会话装配面的进程级文件服务端口：**签名含 L1 `WritableFileContentService`** ⇒ 契约装不下"
-        "（与该组件的 servlet 兄弟同族）；未来路径：把纯 JDK 的 `FileContentService`/"
-        "`WritableFileContentService` 上提契约、并把 `FileTransport` 的 servlet 面切出去后可入 contract.storage",
-    "com/ragagent/common/storage/fileserve/ProviderFileStorePort.java":
-        "provider 文件存储端口：**方法面含 `FileTransport`**，而后者带 jakarta.servlet 请求/响应类型 "
-        "⇒ 零依赖契约装不下；随 `GlobalFileServicePort` 的未来路径一并处置",
-    "com/ragagent/common/session/qa/SessionQaPort.java":
-        "会话 QA 面端口：带 `platform.event.EventBus`（platform 类型）与平台面载荷 "
-        "`SessionView`/`MessageView`（见其登记）⇒ 零依赖契约装不下",
 "com/ragagent/common/storage/fileserve/FileProxyPort.java":
         "带 jakarta.servlet 请求/响应类型 ⇒ platform 面",
-    "com/ragagent/common/session/embed/MessageView.java":
-        "embed 面 messages/load 响应形状 + 会话 QA 面消息载荷（platform 面端口载荷）；"
-        "JSON 逐字节等价由 emb-pub-messages-load*.json 金片钉住",
 }
 
 # ② 待"去 Jackson"专项：载荷形状本身用了 JsonNode（`ChunkFacts` / `KnowledgeBaseView` /
@@ -151,21 +132,9 @@ PENDING_DEJACKSON = {
 # **抽象泄漏**（契约的字节隐式依赖 L1 类的注解）⇒ 诚实留 L1 并在此登记依据。
 # 与 ① 的区别：① 是"装了框架类型搬不动"，② 是"能装但语义装不下"。
 PENDING_DEJACKSON_EXTRA = {
-    "com/ragagent/common/session/PipelineMessageView.java":
-        "管线消息视图：依赖 L1 `retrieval/SearchResult` ⇒ 随 **检索域批次**（SearchResult 去 Jackson/归位）"
-        "一并处置后入契约",
 }
 
 JACKSON_SEMANTICS_REQUIRED = {
-    "com/ragagent/common/auth/AdminUserView.java":
-        "字段 preferences 是 L1 类型 `UserPreferences`，其 `@JsonInclude(NON_NULL)` **决定出面字节**"
-        "（null 字段省略：reg-prefs-*.json 等金片钉住）、`@JsonIgnoreProperties(ignoreUnknown=true)` "
-        "**决定入面容错**（客户端 PATCH 可带未知键）⇒ 零依赖契约装不下这两种语义；"
-        "若改 `Object preferences` 可硬搬，但契约线格式将隐式依赖 L1 类注解＝抽象泄漏 ⇒ 留 L1。"
-        "未来路径：线格式改恒出 null（或客户端面改 Map 形状）后可入 contract.auth",
-    "com/ragagent/common/auth/AdminUserPort.java":
-        "管理面端口（读/建/晋升/撤权/重置密码/密码策略），与 AdminUserView 同族：视图留 L1 ⇒ 端口随留"
-        "（契约接口不得引用 L1 类型）；随 AdminUserView 的未来路径一并入 contract.auth",
 }
 
 REGISTERED = {**PLATFORM_FACE, **PENDING_DEJACKSON, **PENDING_DEJACKSON_EXTRA, **JACKSON_SEMANTICS_REQUIRED}

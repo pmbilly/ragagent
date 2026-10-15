@@ -30,7 +30,7 @@ import com.ragagent.contract.storage.support.PublicModeForbiddenException;
 import com.ragagent.platform.storage.support.Rewriter;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
 import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
-import com.ragagent.common.storage.support.FileResolverFactory;
+import com.ragagent.platform.storage.support.FileResolverFactory;
 import com.ragagent.platform.storage.support.ResourceUrlMode;
 
 /**

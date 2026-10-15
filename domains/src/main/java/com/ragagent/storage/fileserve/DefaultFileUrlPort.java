@@ -3,7 +3,7 @@ package com.ragagent.storage.fileserve;
 import java.io.IOException;
 
 import com.ragagent.contract.storage.support.FileUrlPort;
-import com.ragagent.common.storage.fileserve.FileContentService;
+import com.ragagent.platform.storage.fileserve.FileContentService;
 
 /**
  * {@link FileUrlPort} 的进程级默认实现：把 fileserve 读取面（{@link FileContentService}）

@@ -38,7 +38,7 @@ import com.ragagent.session.domain.ChatHistoryKbStats;
 import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.common.storage.support.FileResolverFactory;
+import com.ragagent.platform.storage.support.FileResolverFactory;
 import com.ragagent.platform.storage.support.ResourceUrlMode;
 
 /**

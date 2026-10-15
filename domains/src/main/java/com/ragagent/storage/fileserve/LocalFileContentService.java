@@ -9,8 +9,8 @@ import java.util.List;
 import com.ragagent.contract.storage.fileserve.StoragePathGuard;
 import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.common.storage.fileserve.WritableFileContentService;
-import com.ragagent.common.storage.fileserve.FileContentService;
+import com.ragagent.platform.storage.fileserve.WritableFileContentService;
+import com.ragagent.platform.storage.fileserve.FileContentService;
 
 /**
  * 本地盘文件服务（GetFile / GetFileURL / SaveBytes / DeleteFile）。

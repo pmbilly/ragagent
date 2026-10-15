@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.ragagent.contract.storage.ResourceCatalogPort;
-import com.ragagent.common.storage.fileserve.GlobalFileServicePort;
-import com.ragagent.common.storage.fileserve.WritableFileContentService;
+import com.ragagent.platform.storage.fileserve.GlobalFileServicePort;
+import com.ragagent.platform.storage.fileserve.WritableFileContentService;
 
 /**
  * AgentWebPages（agent 抓取页 web:// 快照）的生产装配。

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
-import com.ragagent.common.storage.fileserve.FileContentService;
+import com.ragagent.platform.storage.fileserve.FileContentService;
 
 /**
  * {@code com.ragagent.contract.storage.support.StorageBackendResolver} 的生产实现（A3-3 接线）。

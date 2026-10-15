@@ -10,7 +10,7 @@ import com.ragagent.contract.tenant.StorageEngineConfig.ObsEngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig.OssEngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig.CosEngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig.TosEngineConfig;
-import com.ragagent.common.tenant.domain.ParserEngineConfig;
+import com.ragagent.platform.tenant.ParserEngineConfig;
 
 /**
  * 租户配置密钥的打码与合并（响应面打码 / 更新面保留旧值）三族：

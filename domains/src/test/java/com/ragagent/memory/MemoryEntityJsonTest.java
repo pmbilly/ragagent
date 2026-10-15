@@ -19,7 +19,7 @@ import com.ragagent.memory.domain.MemoryExtractionSession;
 import com.ragagent.memory.domain.MemoryExtractionState;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryItemEmbedding;
-import com.ragagent.common.memory.domain.MemoryMessageCursor;
+import com.ragagent.platform.memory.MemoryMessageCursor;
 import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.domain.item.MemoryTombstone;
 import com.ragagent.memory.domain.MemoryTopicStat;

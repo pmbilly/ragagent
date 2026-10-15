@@ -2,7 +2,7 @@ package com.ragagent.storage.support;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.storage.support.FileResolverFactory;
+import com.ragagent.platform.storage.support.FileResolverFactory;
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.contract.storage.support.Resolver;
 import com.ragagent.contract.storage.support.StorageBackendResolver;

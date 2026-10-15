@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.common.storage.fileserve.FileContentService;
+import com.ragagent.platform.storage.fileserve.FileContentService;
 
 /**
  * 后端作用域包装（{@code GetFile / GetFileURL} 子集）：

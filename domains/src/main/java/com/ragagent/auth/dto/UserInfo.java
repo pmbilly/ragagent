@@ -3,7 +3,7 @@ package com.ragagent.auth.dto;
 import java.time.OffsetDateTime;
 
 import com.ragagent.auth.domain.User;
-import com.ragagent.common.auth.domain.UserPreferences;
+import com.ragagent.platform.auth.UserPreferences;
 
 /**
  * 用户信息投影。

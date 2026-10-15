@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.common.auth.domain.UserPreferences;
+import com.ragagent.platform.auth.UserPreferences;
 
 /**
  * users 表实体。

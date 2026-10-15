@@ -11,7 +11,7 @@ import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.auth.domain.User;
-import com.ragagent.common.auth.domain.UserPreferences;
+import com.ragagent.platform.auth.UserPreferences;
 import com.ragagent.auth.dto.LoginRequest;
 import com.ragagent.auth.dto.Membership;
 import com.ragagent.auth.mapper.AuthTokenMapper;

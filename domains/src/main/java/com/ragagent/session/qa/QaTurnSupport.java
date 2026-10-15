@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.agent.domain.AgentStep;
+import com.ragagent.platform.agent.AgentStep;
 import com.ragagent.session.domain.message.Message;
 
 /** QA 编排的共享小工具（阶段 5 从 {@code KnowledgeQaController} 的静态助手迁出）。 */

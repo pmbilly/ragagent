@@ -1792,6 +1792,17 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 清 `:common` 收口（D2+D3）·⭐ `:common` 完全解散 ⇒ 后端 5 模块（`common` 125 → **0**）（2026-10-16）**
+- **D2（12 件 → `:platform`）**：`MessageView` · `SessionQaPort` · `AgentStep` · `AgentToolCall` · `ToolCallTarget` · `UserPreferences` · `AdminUserView` · `AdminUserPort` · **`EmbedSessionPort`**（阻塞方 `MessageView` 同行 ⇒ 自动解锁 ✓）· `FileContentService` + `WritableFileContentService` · `MemoryMessageCursor`（阻塞方本就是 platform 件 ⇒ **无需切 servlet 面、无需复现零时语义** ✓）
+  - 三维闭包预检 **12 件全绿** ✓（import / 同包裸名 / 字符串 FQN 与注册名；外加 Spring 标注与随迁测试）；**FQN 引用更新 100 文件** ✓
+- **D3（收口）**：`GlobalFileServicePort` · `ProviderFileStorePort` · `FileResolverFactory` · `ParserEngineConfig` → `:platform` ✓ ⇒ 删 **14 件 `package-info`**（其包已无实现类 ✓）⇒ **删除 `:common` 模块** ✓
+  - 同步项：`settings.gradle.kts` 去 `include("common")` ✓ · 消费方 `boot`/`domains`/`engine` 的 `project(":common")` → `project(":platform")` ✓ · 根 `build.gradle.kts` ✓ · **`scripts/_source_roots.py` 的 `MODULE_DIRS` 与 `test-summary.py` 的 `MODULES` 去 common** ✓ · 9 条已不存在文件的陈旧登记摘除 ✓
+- ⚠️ **两条"换包"判据（都由守卫的既有约定指引，非我自创）**：
+  1. **`FROZEN_PREFIXES` 必须在换包时同步** ✗：`ParserEngineConfig` 从 `common/tenant` 迁走后，其 27 个 snake 键立刻被算成"**非冻结面新键**" ✗ ⇒ 按脚本自陈"**换包后务必回核 FROZEN_PREFIXES 并 --write**"办理 ✓（前缀 `common/tenant` → `platform/tenant`；**注意条目是单引号** ✗，我首轮只替换双引号未命中）
+  2. **残留"同包自引 import"** ✗（FQN 全局替换的副产物：`import com.ragagent.platform.storage.fileserve.WritableFileContentService;` 出现在**同包文件**里）⇒ `spotlessApply` 清除 ✓
+- **⭐ 收口读数**：`common/*` **29 → 0**（累计 **125 → 0**）；`:contract` **241**；`platform` 152 → **168**；**模块 6 → 5**（`contract` / `platform` / `domains` / `engine` / `boot`）；**R10 保持 6 条边 / 51 类 / ①档 0** ✓；C1/C2/C4 全零残余 ✓
+- **验证**：**14 守卫全绿** · **1349 金片签名一致** · gate **1m58s / 4996 / 失败 0 / 跳过 4**（**5 模块**，platform 测试 188 ✓）· 冒烟（sessions / knowledge-bases / tenants / system-info / storage-backends **200** ✓）
+- **与方案的对照**：目标树 §5.1 为 `contracts / platform / {agent,retrieval}-engine / model-runtime / domains / boot` ✓ —— 本轮已达 **contract(:contract) + platform + domains + engine + boot** ✓；**下一步＝阶段 6 续：三个 runtime 提取**（`:engine` → retrieval-engine / model-runtime / agent-engine；注意"agent 执行核心从 `domains/agent` 提成 agent-engine"会把 ③ 族内边变成跨模块依赖 ⇒ 建议 A③ ①档清零后再动 ✓）
 **🔶 清 `:common` 子批 D1·hub 先行：`SearchResult` + 2 件连带入 `:platform`（`common/*` 33 → 29）（2026-10-16）**
 - **决策依据（用户问"d 你的建议"后的定案）**：**(d) 簇不改线格式**（线格式是逐字节契约：1349 金片 + SSE 字节序 + 前端契约 ⇒ 改协议成本远高于收益 ✗），改按**落点法则**处置：
   > **形状是否需要 Jackson/框架语义 ⇒ 决定它进 `:contract` 还是 `:platform`**（契约＝纯 JDK，连 slf4j 都没有；**platform＝唯一"低于业务域且允许框架"的层**，且 `domains → platform` 是方案 §5.2 合法方向）

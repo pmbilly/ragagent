@@ -25,7 +25,7 @@ import com.ragagent.contract.storage.fileserve.MessageFactsLookup;
 import com.ragagent.platform.storage.fileserve.FileServeHttp;
 import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.common.storage.fileserve.FileContentService;
+import com.ragagent.platform.storage.fileserve.FileContentService;
 
 /**
  * 文件代理面共享处理器：

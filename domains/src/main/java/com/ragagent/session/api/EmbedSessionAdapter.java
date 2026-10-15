@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.platform.session.dto.StopSessionRequest;
-import com.ragagent.common.session.embed.EmbedSessionPort;
+import com.ragagent.platform.session.embed.EmbedSessionPort;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.session.controller.KnowledgeQaController;
 import com.ragagent.session.controller.MessageController;
@@ -18,7 +18,7 @@ import com.ragagent.session.controller.SessionController;
 
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.contract.session.MessageSuggestionView;
-import com.ragagent.common.session.embed.MessageView;
+import com.ragagent.platform.session.embed.MessageView;
 
 /**
  * {@link EmbedSessionPort} 的会话域实现：逐参数转发到既有的四个端点方法

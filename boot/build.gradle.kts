@@ -45,7 +45,7 @@ dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api")
     compileOnly("jakarta.validation:jakarta.validation-api")
     implementation(project(":engine"))
-    implementation(project(":common"))
+    implementation(project(":platform"))
     implementation(project(":contract"))
     testImplementation(testFixtures(project(":domains")))
     testImplementation(testFixtures(project(":platform")))   // EmbeddedRedis（共享测试基座）

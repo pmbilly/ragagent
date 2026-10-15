@@ -9,7 +9,7 @@ import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
 import com.ragagent.contract.session.QaRequestPayload;
 import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.common.session.embed.MessageView;
+import com.ragagent.platform.session.embed.MessageView;
 import com.ragagent.contract.session.SessionView;
 import com.ragagent.contract.json.JsonValues;
 

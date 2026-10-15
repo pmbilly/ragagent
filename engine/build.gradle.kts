@@ -43,7 +43,7 @@ dependencyManagement {
 
 dependencies {
     // 底座：engine 的公开面大量使用 common 词汇（端口/载荷/视图）⇒ api 暴露给 server。
-    api(project(":common"))
+    api(project(":platform"))
     api(project(":contract"))
 
     // 依 11 域的实际 import 面声明（实测 top：jackson 288 / slf4j 122 / spring-web 32 /

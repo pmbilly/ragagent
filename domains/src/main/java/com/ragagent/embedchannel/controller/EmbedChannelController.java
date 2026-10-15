@@ -36,8 +36,8 @@ import com.ragagent.platform.storage.fileserve.FileProxyPort;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.session.embed.EmbedSessionPort;
-import com.ragagent.common.session.embed.MessageView;
+import com.ragagent.platform.session.embed.EmbedSessionPort;
+import com.ragagent.platform.session.embed.MessageView;
 
 /**
  * embed 渠道 HTTP 层（管理面/公开面路由）。

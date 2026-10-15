@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.ragagent.agent.domain.AgentState;
-import com.ragagent.common.agent.domain.AgentStep;
+import com.ragagent.platform.agent.AgentStep;
 import com.ragagent.agent.tool.runtime.ThinkBlocks;
 import com.ragagent.contract.event.payload.AgentCompleteData;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;

@@ -6,8 +6,8 @@ import java.util.UUID;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.platform.persistence.PageRequests;
-import com.ragagent.common.auth.AdminUserPort;
-import com.ragagent.common.auth.AdminUserView;
+import com.ragagent.platform.auth.AdminUserPort;
+import com.ragagent.platform.auth.AdminUserView;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.auth.service.PasswordPolicy;

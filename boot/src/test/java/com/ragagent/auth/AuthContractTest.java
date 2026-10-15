@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import com.ragagent.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
-import com.ragagent.common.auth.domain.UserPreferences;
+import com.ragagent.platform.auth.UserPreferences;
 import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.TestSchema;

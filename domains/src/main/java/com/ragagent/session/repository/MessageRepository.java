@@ -18,7 +18,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.common.memory.domain.MemoryMessageCursor;
+import com.ragagent.platform.memory.MemoryMessageCursor;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageImage;
 import com.ragagent.contract.session.MessageArtifact;

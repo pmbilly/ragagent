@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.common.agent.domain.AgentStep;
-import com.ragagent.common.agent.domain.AgentToolCall;
+import com.ragagent.platform.agent.AgentStep;
+import com.ragagent.platform.agent.AgentToolCall;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.session.domain.message.Message;

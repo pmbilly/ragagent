@@ -7,7 +7,7 @@ import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.SeekableFileService;
 import com.ragagent.contract.storage.provider.SeekableSource;
 import com.ragagent.platform.storage.fileserve.FileTransport;
-import com.ragagent.common.storage.fileserve.WritableFileContentService;
+import com.ragagent.platform.storage.fileserve.WritableFileContentService;
 
 /**
  * 把 A3 的 {@link com.ragagent.storage.provider.FileService}（八个 provider 的真实实现）

@@ -18,7 +18,7 @@ import com.ragagent.memory.domain.MemoryExtractionFailure;
 import com.ragagent.memory.domain.MemoryExtractionLeaseLostException;
 import com.ragagent.memory.domain.MemoryExtractionSession;
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.common.memory.domain.MemoryMessageCursor;
+import com.ragagent.platform.memory.MemoryMessageCursor;
 import com.ragagent.memory.domain.MemoryPage;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;

@@ -1,6 +1,6 @@
 package com.ragagent.tenant.repository;
 
-import com.ragagent.common.tenant.domain.ParserEngineConfig;
+import com.ragagent.platform.tenant.ParserEngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -4,9 +4,9 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;
-import com.ragagent.common.session.embed.MessageView;
+import com.ragagent.platform.session.embed.MessageView;
 import com.ragagent.contract.session.QaRequestPayload;
-import com.ragagent.common.session.qa.SessionQaPort;
+import com.ragagent.platform.session.qa.SessionQaPort;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.QaSupport;

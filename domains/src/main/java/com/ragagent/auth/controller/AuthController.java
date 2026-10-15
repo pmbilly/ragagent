@@ -16,7 +16,7 @@ import jakarta.validation.Valid;
 import com.ragagent.auth.domain.TenantInvitation;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.auth.domain.User;
-import com.ragagent.common.auth.domain.UserPreferences;
+import com.ragagent.platform.auth.UserPreferences;
 import com.ragagent.auth.dto.AuthConfigResponse;
 import com.ragagent.auth.dto.AuthLoginResponse;
 import com.ragagent.auth.dto.ChangePasswordRequest;
