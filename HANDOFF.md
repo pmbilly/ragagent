@@ -208,6 +208,7 @@ contract  → JDK                                  （纯 JDK：公开 API / SPI
 | **G1** | `:common` 内**载荷型文件清零或全登记**（`*View`/`*Facts`/`*Payload`/`*Response`/`*Port`）——载荷应落 `:contract`、持久化实体回域。**进度 2026-10-15**：门禁口径（C4 载荷型）**待归位 14 件** + 登记 7 件（4 platform 面 + 3 待去 Jackson）；**契约料归位批 A/B 已完成**：`storage` 9 + `knowledge` 10 = **19 件入 `:contract`**（清单与两道搬前判据见下方「契约料盘点」） | 新增门禁 **C4**（`check-contracts-purity.py`，只许减）+ C1/C2 |
 | **G1-b（立项）** | **「去 Jackson」专项**：`ChunkFacts`/`KnowledgeBaseView`/`KnowledgeDocumentFacts` 的 `JsonNode` 字段（触达 7/1/2 处消费）+ B258 登记的 `AppError` ⇒ 改造口径二选一：**(a)** `JsonNode` → JDK `Map<String,Object>`（线格式基本等价，需金片复核 `NullNode`/空值语义）；**(b)** 载荷只带**消费者实际用度的键**（收窄成纯 JDK record，线格式**会变** ⇒ 需前端确认）。**改造完成即整批入 `:contract`** | C4 的 `PENDING_DEJACKSON` 登记 |
 | **G1-c（登记）** | 4 件**框架味**（`ApiKeyAuthPort` servlet · `KnowledgeCatalogPort` MyBatis-Plus Page · `EmbedSessionPort` servlet+ResponseEntity · `FileProxyPort` servlet）⇒ **永远进不了零依赖 `:contract`**，归未来 `platform` 模块 | C4 的 `PLATFORM_FACE` 登记 |
+| **G1-f（登记）** | `common/knowledge/DocumentChunkMetadata`（Jackson `@JsonIgnore`）· `common/knowledge/FaqChunkMetadata`（Jackson + **platform 的 `JsonMappers`**）⇒ 前者归「待去 Jackson」、后者归「platform 面 + 待去 Jackson」；二者均在方案 §8.1 的 `contract.knowledge/` 名单内（**未搬有据**） | 本表登记 |
 | **G1-e（登记）** | `common/retrieval/SearchResult`（**不带 C4 后缀**故未入 C4 计数，但实为载荷）：引 Jackson 注解 + `JsonNode` + **platform 的 `SortedMapSerializer`** ⇒ **既非纯 JDK 也非域内容** ⇒ 归 platform 面／待去 Jackson；**引用面 66 处**（影响面大，改造需单独批次）。`PipelineMessageView` 因此随它一起等 | 本表登记 |
 | **G1-d（随 C）** | 余 15 件中的实体相关项（7 个实体端口 + 3 个 `*ConfigView` + `KnowledgeBaseResponse` + `PipelineMessageView` 等）⇒ **随 C 的实体收窄逐批处理**（视图/端口改吃契约视图） | C4 基线（只许减） |
 | **G2** | `com.ragagent.platform.*` 与 `com.ragagent.common.*` **依赖单向无环** | R5/R6/R9（包级 SCC）已覆盖；拆前复跑 |
@@ -237,7 +238,14 @@ contract  → JDK                                  （纯 JDK：公开 API / SPI
 | （另）被 L1 内互引挡住 | 15 | 同批搬即可解 | — |
 | （另）被 `platform.*` 挡住 | 4 | `platform` 拆出后搬 | `ToolExecContext` · `SessionOwnerIds` · `SessionQaPort` · `StoragePaths` |
 
-⚠️ **搬前必做「同包裸名共居检查」**（本例已见高危：`FileContentService` 以**同包裸名**引 `FileTransport.OpenedFile`，而 `FileTransport` 带 servlet ⇒ **不可搬**）。口径：候选件的同包兄弟若被裸名引用且本身不可搬 ⇒ 该件不可搬。
+⚠️ **搬前三道判据（缺一不可；第三道是 2026-10-15 核对 §8.1 清单时补的）**：
+
+1. **同包裸名共居检查**（高危例：`FileContentService` 以同包裸名引 `FileTransport.OpenedFile`，后者带 servlet ⇒ 不可搬）——口径：候选件的同包兄弟若被裸名引用且本身不可搬 ⇒ 该件不可搬；
+2. **消费域核查**——只被本域使用的件，归宿是「回域」而非「进契约」；
+3. **§5.1 三测 + 持久化形状排除**（**批 A/B 的教训**）：① 它必须是**公开 API / SPI / 不可变载荷**之一——**内部工具类、队列接口、异常辅助不算**（批 A/B 误搬 5 件：`KnowledgeHashes` · `KnowledgePaths` · `KnowledgeTaskIdCodec` · `DuplicateKnowledgeDetails` · `KnowledgeProcessingQueue`，**已登记归位债**）；② 它不得是**某实体 `@TableField`/TypeHandler 的字段类型**（＝持久化形状组成部分；批 A/B 误搬 3 件：`KnowledgeBase{Asr,Storage,StorageProvider}Config`，**随 `KnowledgeBase` 收窄批次回域**）。
+   ⇒ 上述 8 件的跨域需求**应改用方案 §8.9 规划的端口**（`KnowledgeIngest` 等）表达，而不是把内部件搬进 contracts。
+
+**§8.1 清单核对（2026-10-15，`contract.knowledge/` 26 件 vs 方案 25 名）**：差异**四类**——① **合规新增**（4 个端口有跨模块消费 3~7 文件：`KnowledgeBaseCatalogPort`/`KnowledgeMaintenancePort`/`KnowledgeFinalizePort`/`KnowledgeSpanPort`）；② **未搬但有台账**（`ChunkFacts`/`KnowledgeBaseView`/`KnowledgeDocumentFacts` 待去 Jackson；`KnowledgeBaseLookup`/`KnowledgeDocumentGateway` 共居受阻；`DocumentChunkMetadata`/`FaqChunkMetadata` 见 G1-f）；③ **方案有名但尚未实现**（`KnowledgeIngest`/`KnowledgeIngestCommand`/`KnowledgeIngestResult`/`KnowledgeReader` ＝ §8.9 规划的目标形态）；④ **⚠️ 需纠偏**（批 A/B 误搬的 8 件：5 件内部件 + 3 件持久化字段类型，见上方第三道判据）。**注**：方案 §8.1 末尾规则原文＝"只公布跨模块确有消费者的 API/SPI；本域 repository/port 不得全部搬到 contracts"，故清单是**精选**而非穷尽。
 
 **归位批次建议与进展**：**批 A/B ✅ 已完成（19 件）**——`storage` 9（`StorageEnvLookup` · `MessageFactsLookup` · `StoragePathGuard` · `SeekableSource` · `PublicModeForbiddenException` · `Resolver` · `ResourceModeException` · `StorageBackendResolver` · `StorageUrlContext`）+ `knowledge` 10（`FaqEntry` · `FaqEntryPage` · `KnowledgeBase{Asr,Storage,StorageProvider}Config` · `DuplicateKnowledgeDetails` · `KnowledgeHashes` · `KnowledgePaths` · `KnowledgeTaskIdCodec` · `KnowledgeProcessingQueue`）；**搬前两道判据**：① 同包裸名共居检查（`storage/fileserve` 5 件因裸名引 `FileTransport`（servlet 味）被正确挡下）；② 消费域核查（19 件均有跨域消费，排除"只被本域用 ⇒ 应回域"）。**剩余**：批 C（`wiki/*` · `agent/tool` · `settings` · `session` 载荷件）→ 批 D（互引件同批搬）；`chunker/*` 9 件**算法件**不进契约（归宿 `retrieval-engine`）。每批：金片 + 全量闸门 + C1/C4 `--write` + 单独提交。
 
