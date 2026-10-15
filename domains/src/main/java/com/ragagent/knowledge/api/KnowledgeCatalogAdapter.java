@@ -17,6 +17,11 @@ import com.ragagent.knowledge.service.faq.FaqEntryQueryService;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
+import com.ragagent.knowledge.domain.access.KnowledgeAccessGuard;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 /**
  * {@link KnowledgeCatalogPort} 的知识域实现：读写逐字转发两个门面服务，
@@ -27,17 +32,26 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
 
     private final KnowledgeService knowledgeService;
     private final KnowledgeBaseService knowledgeBaseService;
+    private final KnowledgeAccessGuard accessGuard;
+    private final KnowledgeBaseMapper knowledgeBaseMapper;
+    private final KnowledgeMapper knowledgeMapper;
     private final ChunkRepository chunkRepository;
     private final FaqEntryQueryService faqEntryQueryService;
     private final TenantFileStorage tenantFileStorage;
 
     public KnowledgeCatalogAdapter(KnowledgeService knowledgeService,
                                    KnowledgeBaseService knowledgeBaseService,
+                                   KnowledgeAccessGuard accessGuard,
+                                   KnowledgeBaseMapper knowledgeBaseMapper,
+                                   KnowledgeMapper knowledgeMapper,
                                    ChunkRepository chunkRepository,
                                    FaqEntryQueryService faqEntryQueryService,
                                    TenantFileStorage tenantFileStorage) {
         this.knowledgeService = knowledgeService;
         this.knowledgeBaseService = knowledgeBaseService;
+        this.accessGuard = accessGuard;
+        this.knowledgeBaseMapper = knowledgeBaseMapper;
+        this.knowledgeMapper = knowledgeMapper;
         this.chunkRepository = chunkRepository;
         this.faqEntryQueryService = faqEntryQueryService;
         this.tenantFileStorage = tenantFileStorage;
@@ -154,5 +168,30 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     @Override
     public void deleteKnowledgeBase(String id) {
         knowledgeBaseService.deleteKnowledgeBase(id);
+    }
+
+    @Override
+    public KnowledgeBase requireKbAccess(String kbId) {
+        return accessGuard.requireKbAccess(kbId);
+    }
+
+    @Override
+    public String retrieveDriver() {
+        return knowledgeBaseService.retrieveDriver();
+    }
+
+    @Override
+    public void updateKnowledgeBase(KnowledgeBase kb) {
+        knowledgeBaseMapper.updateById(kb);
+    }
+
+    @Override
+    public boolean hasFiles(String kbId) {
+        Long tid = TenantContext.currentTenantId();
+        Long count = knowledgeMapper.selectCount(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getKnowledgeBaseId, kbId)
+                .eq(tid != null, Knowledge::getTenantId, tid)
+                .isNull(Knowledge::getDeletedAt));
+        return count != null && count > 0;
     }
 }

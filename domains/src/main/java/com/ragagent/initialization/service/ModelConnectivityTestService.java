@@ -33,7 +33,7 @@ import com.ragagent.embedding.Embedder;
 import com.ragagent.embedding.EmbedderConfig;
 import com.ragagent.embedding.EmbedderFactory;
 import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.knowledge.storage.LocalStorageService;
+import com.ragagent.platform.storage.config.UploadLimits;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
 import com.ragagent.common.model.ModelCatalogPort;
@@ -271,7 +271,7 @@ public final class ModelConnectivityTestService {
             }
             default -> throw new BizException(AppError.badRequest("无效的存储类型"));
         }
-        long maxSizeMB = LocalStorageService.maxFileSizeMb();
+        long maxSizeMB = UploadLimits.maxFileSizeMb();
         long maxSize = maxSizeMB * 1024 * 1024;
         if (image == null) {
             throw new BizException(AppError.badRequest("获取上传图片失败"));

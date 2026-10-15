@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.springframework.http.ResponseEntity;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -20,17 +19,13 @@ import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseAsrConfig;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseVlmConfig;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.dto.kb.KnowledgeBaseResponse;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.knowledge.domain.access.KnowledgeAccessGuard;
-import com.ragagent.knowledge.service.management.KnowledgeBaseService;
+import com.ragagent.common.knowledge.dto.KnowledgeBaseResponse;
 import com.ragagent.common.model.Model;
 import com.ragagent.common.model.ModelParameters;
 import com.ragagent.initialization.dto.InitResponses;
 import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
 /**
  * initialization config/initialize 端点用例：KB 初始化配置读写、初始化装配与请求绑定。
@@ -41,18 +36,13 @@ public final class InitializationConfigService {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final KnowledgeAccessGuard kbGuard;
-    private final KnowledgeBaseService kbService;
-    private final KnowledgeBaseMapper kbMapper;
-    private final KnowledgeMapper knowledgeMapper;
+    private final KnowledgeCatalogPort knowledgeCatalog;
     private final ModelCatalogPort modelCatalog;
     private final SsrfGuard ssrfGuard;
 
-    public InitializationConfigService(KnowledgeAccessGuard kbGuard, KnowledgeBaseService kbService, KnowledgeBaseMapper kbMapper, KnowledgeMapper knowledgeMapper, ModelCatalogPort modelCatalog, SsrfGuard ssrfGuard) {
-        this.kbGuard = kbGuard;
-        this.kbService = kbService;
-        this.kbMapper = kbMapper;
-        this.knowledgeMapper = knowledgeMapper;
+    public InitializationConfigService(KnowledgeCatalogPort knowledgeCatalog,
+            ModelCatalogPort modelCatalog, SsrfGuard ssrfGuard) {
+        this.knowledgeCatalog = knowledgeCatalog;
         this.modelCatalog = modelCatalog;
         this.ssrfGuard = ssrfGuard;
     }
@@ -60,8 +50,8 @@ public final class InitializationConfigService {
     // ══════════════ GET /initialization/config/:kbId ══════════════
 
     public ResponseEntity<Object> getConfig(String kbId) {
-        kbGuard.requireKbAccess(kbId);
-        KnowledgeBase kb = kbService.getAllTenantById(kbId);
+        knowledgeCatalog.requireKbAccess(kbId);
+        KnowledgeBase kb = knowledgeCatalog.getAllTenantById(kbId);
         if (kb == null) {
             throw new BizException(AppError.notFound("知识库不存在"));
         }
@@ -119,7 +109,7 @@ public final class InitializationConfigService {
         saveKb(kb);
 
         Map<String, Object> data = new TreeMap<>();
-        data.put("knowledgeBase", KnowledgeBaseResponse.from(kb, kbService.retrieveDriver()));
+        data.put("knowledgeBase", KnowledgeBaseResponse.from(kb, knowledgeCatalog.retrieveDriver()));
         // 自有契约：api_key 留在 parameters、无 credentials 键
         data.put("models", processed.stream().map(InitResponses::rawModel).toList());
         data.put("message", "知识库配置更新成功");
@@ -131,9 +121,9 @@ public final class InitializationConfigService {
     public ResponseEntity<Object> updateConfig(String kbId,
             String rawBody) {
         InitializationRequests.KBModelConfigRequest req = InitializationRequests.bindKBModelConfigRequest(rawBody);
-        kbGuard.requireKbAccess(kbId);
+        knowledgeCatalog.requireKbAccess(kbId);
         requireOwned(kbId);
-        KnowledgeBase kb = kbService.getAllTenantById(kbId);
+        KnowledgeBase kb = knowledgeCatalog.getAllTenantById(kbId);
         if (kb == null) {
             throw new BizException(AppError.notFound("知识库不存在"));
         }
@@ -304,9 +294,9 @@ public final class InitializationConfigService {
     // ══════════════ 守卫与校验 ══════════════
 
     private KnowledgeBase kbForWrite(String kbId) {
-        kbGuard.requireKbAccess(kbId);
+        knowledgeCatalog.requireKbAccess(kbId);
         requireOwned(kbId);
-        KnowledgeBase kb = kbService.getAllTenantById(kbId);
+        KnowledgeBase kb = knowledgeCatalog.getAllTenantById(kbId);
         if (kb == null) {
             throw new BizException(AppError.notFound("知识库不存在"));
         }
@@ -314,7 +304,7 @@ public final class InitializationConfigService {
     }
 
     private void requireOwned(String kbId) {
-        KnowledgeBase kb = kbService.getAllTenantById(kbId);
+        KnowledgeBase kb = knowledgeCatalog.getAllTenantById(kbId);
         if (kb == null) {
             throw new BizException(AppError.notFound("knowledge base not found"));
         }
@@ -497,7 +487,7 @@ public final class InitializationConfigService {
     }
 
     private void saveKb(KnowledgeBase kb) {
-        kbMapper.updateById(kb);
+        knowledgeCatalog.updateKnowledgeBase(kb);
     }
 
     // ══════════════ GET config 响应（全 map 字母序）══════════════
@@ -663,12 +653,7 @@ public final class InitializationConfigService {
     // ══════════════ 小工具 ══════════════
 
     private boolean hasFiles(String kbId) {
-        Long tid = TenantContext.currentTenantId();
-        Long count = knowledgeMapper.selectCount(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getKnowledgeBaseId, kbId)
-                .eq(tid != null, Knowledge::getTenantId, tid)
-                .isNull(Knowledge::getDeletedAt));
-        return count != null && count > 0;
+        return knowledgeCatalog.hasFiles(kbId);
     }
 
     private void requireModel(String id, String message) {

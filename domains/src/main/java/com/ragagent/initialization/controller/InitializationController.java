@@ -21,15 +21,12 @@ import com.ragagent.platform.security.CryptoService;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.knowledge.domain.access.KnowledgeAccessGuard;
-import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
 /**
  * initialization 路由。系统级端点（ollama 管理、模型连通性测试、抽取）
@@ -57,15 +54,14 @@ public class InitializationController {
     private final ModelConnectivityTestService modelTest;
     private final TextExtractionTestService textTest;
 
-    public InitializationController(KnowledgeAccessGuard kbGuard, KnowledgeBaseService kbService,
-            KnowledgeBaseMapper kbMapper, KnowledgeMapper knowledgeMapper,
+    public InitializationController(KnowledgeCatalogPort knowledgeCatalog,
             ModelCatalogPort modelCatalog, SsrfGuard ssrfGuard,
             OllamaService ollamaService, OllamaDownloadTaskStore downloadTasks,
             AsrTranscriber asrTranscriber, ExtractPrompts extractPrompts,
             ConcurrencyGovernor concurrencyGovernor,
             DocReaderParsePort documentReader,
             CryptoService cryptoService) {
-        this.configService = new InitializationConfigService(kbGuard, kbService, kbMapper, knowledgeMapper, modelCatalog, ssrfGuard);
+        this.configService = new InitializationConfigService(knowledgeCatalog, modelCatalog, ssrfGuard);
         this.ollamaManage = new OllamaManageService(ollamaService, downloadTasks);
         this.modelTest = new ModelConnectivityTestService(modelCatalog, ssrfGuard, ollamaService, concurrencyGovernor, cryptoService, asrTranscriber, documentReader);
         this.textTest = new TextExtractionTestService(extractPrompts, modelTest);

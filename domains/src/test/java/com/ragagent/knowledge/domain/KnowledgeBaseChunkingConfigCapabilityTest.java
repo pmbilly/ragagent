@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.knowledge.dto.kb.ChunkingConfigView;
+import com.ragagent.common.knowledge.dto.ChunkingConfigView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseChunkingConfig;

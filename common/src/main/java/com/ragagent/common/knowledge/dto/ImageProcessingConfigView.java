@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.dto.kb;
+package com.ragagent.common.knowledge.dto;
 
 import com.ragagent.common.knowledge.domain.KnowledgeBaseImageProcessingConfig;
 

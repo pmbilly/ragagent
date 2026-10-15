@@ -109,11 +109,6 @@
       "ImStreamPipeline",
       "ImTurnOrchestrator"
     ],
-    "initialization→knowledge": [
-      "InitializationConfigService",
-      "InitializationController",
-      "ModelConnectivityTestService"
-    ],
     "session→agent": [
       "AgentEngineAssembler",
       "AgentHistoryAssembler",

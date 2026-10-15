@@ -107,4 +107,18 @@ public interface KnowledgeCatalogPort {
 
     /** 删知识库。 */
     void deleteKnowledgeBase(String id);
+
+    // ── 访问闸门与配置面（初始化向导用） ──
+
+    /** KB 访问闸门（不可达 ⇒ 抛运行时异常，语义同知识域闸门）。 */
+    KnowledgeBase requireKbAccess(String kbId);
+
+    /** 检索驱动标识（配置面展示用）。 */
+    String retrieveDriver();
+
+    /** 按 id 更新知识库行（初始化向导的写面）。 */
+    void updateKnowledgeBase(KnowledgeBase kb);
+
+    /** 该知识库下是否已有知识文件（未删除口径）。 */
+    boolean hasFiles(String kbId);
 }
