@@ -7,8 +7,8 @@ import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;
 import com.ragagent.wiki.domain.folder.WikiFolderNotFoundException;
 import com.ragagent.wiki.domain.graph.WikiGraph;
 import com.ragagent.common.wiki.domain.WikiCategoryPaths;
-import com.ragagent.common.wiki.domain.WikiIndex;
-import com.ragagent.common.wiki.domain.WikiIndexEntry;
+import com.ragagent.contract.wiki.WikiIndex;
+import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.wiki.domain.page.WikiPageConflictException;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.contract.wiki.WikiPageNotFoundException;
@@ -16,7 +16,6 @@ import com.ragagent.wiki.domain.page.WikiPageRevision;
 import com.ragagent.wiki.domain.page.WikiStats;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiException;
-import com.ragagent.common.wiki.domain.WikiStringListTypeHandler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

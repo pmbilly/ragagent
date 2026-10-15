@@ -1,4 +1,4 @@
-package com.ragagent.common.wiki.domain;
+package com.ragagent.contract.wiki;
 
 import java.util.ArrayList;
 import java.util.List;

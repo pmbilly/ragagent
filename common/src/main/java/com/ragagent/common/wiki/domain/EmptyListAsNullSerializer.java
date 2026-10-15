@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  * 于是默认会序列化成 {@code []}；而出口契约要求空列表是 {@code null}，
  * 故在这一层把空列表映射回 {@code null}。</p>
  *
- * @see WikiStringListTypeHandler
+ * @see {@code WikiStringListTypeHandler}（已随实体回域 {@code domains/wiki/domain}）
  */
 public class EmptyListAsNullSerializer extends JsonSerializer<List<String>> {
 

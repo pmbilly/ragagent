@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.common.wiki.domain.EmptyListAsNullSerializer;
-import com.ragagent.common.wiki.domain.WikiStringListTypeHandler;
 import com.ragagent.common.wiki.domain.WikiCategoryPaths;
 
 /**

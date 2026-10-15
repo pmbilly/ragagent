@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.ragagent.contract.wiki.WikiLinkRepairResult;
-import com.ragagent.common.wiki.WikiPageOpsPort;
-import com.ragagent.common.wiki.domain.WikiIndex;
+import com.ragagent.contract.wiki.WikiPageOpsPort;
+import com.ragagent.contract.wiki.WikiIndex;
 import com.ragagent.contract.wiki.WikiPageView;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.contract.wiki.WikiPageIssueView;

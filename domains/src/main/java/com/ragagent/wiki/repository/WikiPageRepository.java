@@ -19,7 +19,7 @@ import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.wiki.domain.SourceRefNeedle;
 import com.ragagent.common.wiki.domain.WikiCategoryPaths;
 import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.common.wiki.domain.WikiIndexEntry;
+import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageConflictException;
 import com.ragagent.wiki.domain.WikiPageIssue;

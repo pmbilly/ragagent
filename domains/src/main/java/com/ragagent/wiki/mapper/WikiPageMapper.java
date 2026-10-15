@@ -6,10 +6,10 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.wiki.domain.SourceRefNeedle;
-import com.ragagent.common.wiki.domain.WikiIndexEntry;
+import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageLite;
-import com.ragagent.common.wiki.domain.WikiStringListTypeHandler;
+import com.ragagent.wiki.domain.WikiStringListTypeHandler;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
@@ -120,13 +120,13 @@ public interface WikiPageMapper extends BaseMapper<WikiPage> {
     @Update("UPDATE wiki_pages SET "
             + "title = #{page.title}, content = #{page.content}, summary = #{page.summary}, "
             + "page_type = #{page.pageType}, status = #{page.status}, "
-            + "aliases = #{page.aliases, typeHandler=com.ragagent.common.wiki.domain.WikiStringListTypeHandler}, "
-            + "out_links = #{page.outLinks, typeHandler=com.ragagent.common.wiki.domain.WikiStringListTypeHandler}, "
-            + "source_refs = #{page.sourceRefs, typeHandler=com.ragagent.common.wiki.domain.WikiStringListTypeHandler}, "
-            + "chunk_refs = #{page.chunkRefs, typeHandler=com.ragagent.common.wiki.domain.WikiStringListTypeHandler}, "
+            + "aliases = #{page.aliases, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
+            + "out_links = #{page.outLinks, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
+            + "source_refs = #{page.sourceRefs, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
+            + "chunk_refs = #{page.chunkRefs, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
             + "page_metadata = #{page.pageMetadata, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler}, "
             + "parent_slug = #{page.parentSlug}, folder_id = #{page.folderId}, "
-            + "category_path = #{page.categoryPath, typeHandler=com.ragagent.common.wiki.domain.WikiStringListTypeHandler}, "
+            + "category_path = #{page.categoryPath, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
             + "wiki_path = #{page.wikiPath}, depth = #{page.depth}, sort_order = #{page.sortOrder}, "
             + "last_edit_source = #{page.lastEditSource}, last_editor_id = #{page.lastEditorId}, "
             + "version = #{page.version}, updated_at = #{page.updatedAt} "
@@ -144,7 +144,7 @@ public interface WikiPageMapper extends BaseMapper<WikiPage> {
      */
     @Update("UPDATE wiki_pages SET "
             + "content = #{content}, "
-            + "out_links = #{outLinks, typeHandler=com.ragagent.common.wiki.domain.WikiStringListTypeHandler}, "
+            + "out_links = #{outLinks, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
             + "updated_at = #{updatedAt} "
             + "WHERE id = #{id} AND deleted_at IS NULL")
     int updateAutoLinkedContent(WikiPage page);
@@ -155,15 +155,15 @@ public interface WikiPageMapper extends BaseMapper<WikiPage> {
      * 其余（链接、来源引用、chunk 引用、page_metadata）都算记账。
      */
     @Update("UPDATE wiki_pages SET "
-            + "in_links = #{inLinks, typeHandler=com.ragagent.common.wiki.domain.WikiStringListTypeHandler}, "
-            + "out_links = #{outLinks, typeHandler=com.ragagent.common.wiki.domain.WikiStringListTypeHandler}, "
-            + "aliases = #{aliases, typeHandler=com.ragagent.common.wiki.domain.WikiStringListTypeHandler}, "
+            + "in_links = #{inLinks, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
+            + "out_links = #{outLinks, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
+            + "aliases = #{aliases, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
             + "status = #{status}, "
-            + "source_refs = #{sourceRefs, typeHandler=com.ragagent.common.wiki.domain.WikiStringListTypeHandler}, "
-            + "chunk_refs = #{chunkRefs, typeHandler=com.ragagent.common.wiki.domain.WikiStringListTypeHandler}, "
+            + "source_refs = #{sourceRefs, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
+            + "chunk_refs = #{chunkRefs, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
             + "page_metadata = #{pageMetadata, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler}, "
             + "parent_slug = #{parentSlug}, folder_id = #{folderId}, "
-            + "category_path = #{categoryPath, typeHandler=com.ragagent.common.wiki.domain.WikiStringListTypeHandler}, "
+            + "category_path = #{categoryPath, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
             + "wiki_path = #{wikiPath}, depth = #{depth}, sort_order = #{sortOrder}, "
             + "updated_at = #{updatedAt} "
             + "WHERE id = #{id} AND deleted_at IS NULL")

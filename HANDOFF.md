@@ -1525,13 +1525,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 账 | 读数 | 状态 |
 |---|---|---|
-| `:contract` | **203 件** | ✅ 已独立（零依赖） |
-| `common/*` | **82 件**（125 → … → 91 → 82；G1-d 再 −9） | 收敛中 |
+| `:contract` | **206 件** | ✅ 已独立（零依赖） |
+| `common/*` | **78 件**（125 → … → 82 → 78；G1-e 再 −4） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
-| **C1 受控导入根** | 10 根 / **59 文件** | 冻结只许减 |
-| **C4 载荷** | `common/*` 残余 **0 件** ✅ + 登记 **15 件**（platform 面 11 · Jackson 语义必要 2 · 待去 Jackson 2） | ✅ **载荷账清零** |
-| 域侧 handler | **1 件**（TypeHandler；其余 9 件已随实体回域 ✓） | 登记 |
+| **C1 受控导入根** | 10 根 / **57 文件** | 冻结只许减 |
+| **C4 载荷** | `common/*` 残余 **0 件** ✅ + 登记 **12 件**（platform 面 10 · Jackson 语义必要 2 · 待去 Jackson 0） | ✅ **载荷账清零** |
+| 域侧 handler | **0 件** ✅（TypeHandler 全部回域；最后一作 `WikiStringListTypeHandler` 随 wiki 收尾回域） | — |
 | build 依赖 | 12 | 冻结 |
 | **R10** | **6 条边 / 51 类**（①clearable **0** · ②owner 1〔`auth→tenant` 属主边〕· ③intra-family 5） | ✅ ①档达标 |
 | 测试 | **4991 / 失败 0 / 跳过 4**；金片 **1349 签名一致** | — |
@@ -1792,6 +1792,18 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 G1-e·wiki 收尾：`WikiIndexEntry` 去 MyBatis 注解 + `WikiIndex`/`WikiPageOpsPort` 入契约 + 最后一个 TypeHandler 回域（2026-10-15）**
+- **触发**：队列第 3 项（wiki 侧收尾）——一次清掉 `WikiPageOpsPort` 的 platform 面登记
+- **⭐ 决定性测量（本刀最有价值处）**：`WikiIndexEntry` 表面像"注定留 L1"（3 个 `@TableField` ✗），但实测 **mapper 早已有显式 `@Results(id = "wikiIndexEntryResult")`**，其中**已声明**全部列映射与 `category_path` 的 `WikiStringListTypeHandler` ⇒ 载荷上的注解**完全冗余** ✓✓
+  **判据沉淀：载荷上的框架注解（`@TableField` 等）必须与 mapper/仓储侧的显式声明核对——多数是防御性冗余；核对法＝读 mapper 的 `@Results`/`resultMap` 是否已覆盖同一列与处理器**
+- **动作**：① `WikiIndexEntry` 去 3 个 `@TableField` + MyBatis-Plus import ② `git mv`：`WikiIndexEntry` + `WikiIndex`（纯 JDK 行类型/容器 ✓）→ **`contract.wiki`** ③ `WikiPageOpsPort` → **`contract.wiki`**（其引用面 `WikiPageView`/`WikiPageIssueView`/`WikiLinkRepairResult`/`WikiPageNotFoundException` 全为契约件 ✓）④ `WikiStringListTypeHandler` → **`domains/wiki/domain`**（用户全在 wiki 域：实体 ×4 + mapper ×3 + 测试 ✓）⑤ 全仓引用更新（**19 文件**）+ 同包引用者补 import（1 文件）⑥ **摘除 `WikiPageOpsPort` 的 C4 platform 面登记**（登记 11 → 10 ✓）
+- **读数**：`:contract` 203 → **206**（+3）；`common/*` 82 → **78**（−4）；**C1 59 → 57 文件**；**域侧 handler 1 → 0** ✅（TypeHandler 全部回域）；**R10 保持 6 条边 / 51 类 / ①档 0** ✓（**无新增边**：session 经契约端口消费 ✓）
+- **验证**：**14 守卫全绿**（基线已 `--write`）；**1349 金片签名一致**（含 **`wiki-index.json`** ⇒ **索引线格式逐字节不变** ✓——该路由直接 `ResponseEntity.ok(WikiIndex.Response)` 序列化，是本刀最大风险点）；`spotlessCheck build` **1m48s**；**4991 / 失败 0 / 跳过 4**；冒烟（sessions / KB / system-info **200** ✓；`/api/v1/knowledgebase/{kbId}/wiki/{index,pages,graph}` ⇒ **404 `{"code":1003,"message":"knowledge base not found"}` 标准业务信封** ✓ 路由与守卫链正常）
+- **⚠️ 两处过程项（判据）**：
+  1. **javadoc 跨模块链接 2 处**（**此坑第 11 次**：L1 侧 `@see WikiStringListTypeHandler`、域侧 `{@link EmptyListAsNullSerializer}`）⇒ 两侧改 `{@code}` ✓（**建议：把"搬移/回域后扫 javadoc 链接"做成搬运脚本的第 3 步——现已是第 11 次，M2 脚本化应优先）**
+  2. **1 条脆弱测试**（`RedisMemoryExtractTaskQueueTest.runsTaskAndCompletes`，异步计数断言 expected 0 / actual 1）⇒ **单独复跑 5/0 通过** ⇒ 既有脆弱项（与本刀无关）⇒ 登记待观察
+- **`common/*` 78 件余量**：TypeHandler **0** ✅ · 框架味（含 platform 面登记 10）· Jackson 味域内值类型（含 2 件 Jackson 语义必要登记）· 纯 JDK 契约候选/域内件
+- **队列余项**：① **405 映射小刀**（`HttpRequestMethodNotSupportedException` 应然 405 却 500；已两次现身）② **Jackson 味域内值类型按域回迁**（解锁登记的 `QaRequestPayload`/`PipelineMessageView`）③ **§16.0 数字表刷新**（本轮已随本记录更新）
 **🔶 G1-c-2·`KnowledgeBaseResponse` 入契约（新技法：枚举"常量名即值"）+ 余 4 件按证据登记 ⇒ ⭐ C4 载荷型文件 = 0（2026-10-15）**
 - **对象（对账 §16.0-C 余 5 件）**：`KnowledgeBaseResponse` · `wiki/{WikiPageOpsPort,WikiIndex}` · `session/qa/{SessionQaPort,QaRequestPayload}` · `session/PipelineMessageView`
 - **结果分三类（先测后动）**：

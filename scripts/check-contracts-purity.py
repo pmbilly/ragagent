@@ -130,9 +130,6 @@ PLATFORM_FACE = {
     "com/ragagent/common/storage/fileserve/ProviderFileStorePort.java":
         "provider 文件存储端口：**方法面含 `FileTransport`**，而后者带 jakarta.servlet 请求/响应类型 "
         "⇒ 零依赖契约装不下；随 `GlobalFileServicePort` 的未来路径一并处置",
-    "com/ragagent/common/wiki/WikiPageOpsPort.java":
-        "wiki 页读写端口：依赖 `wiki/domain/WikiIndexEntry`——**MyBatis 映射类型**（框架面）⇒ 零依赖契约装不下；"
-        "未来路径：把 `WikiIndexEntry` 的**映射面与展示面切开**（展示面纯 JDK 上提契约）后可入 contract.wiki",
     "com/ragagent/common/session/qa/SessionQaPort.java":
         "会话 QA 面端口：带 `platform.event.EventBus`（platform 类型）与平台面载荷 "
         "`SessionView`/`MessageView`（见其登记）⇒ 零依赖契约装不下",

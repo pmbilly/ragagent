@@ -1,13 +1,17 @@
-package com.ragagent.common.wiki.domain;
+package com.ragagent.contract.wiki;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 
 /**
  * 结构化 wiki 索引响应里的一行。JSON 键为 snake（前端按此解析）。
+ *
+ * <p><b>去 Jackson/MyBatis 注解（wiki 收尾）</b>：列映射与 {@code category_path} 的
+ * {@code WikiStringListTypeHandler} **由 mapper 的 {@code @Results("wikiIndexEntryResult")}
+ * 显式声明**（见 {@code wiki/mapper/WikiPageMapper}）⇒ 本类型不再需要 {@code @TableField}，
+ * 因而可入零依赖的 {@code :contract}。</p>
  *
  * <p>只携带渲染一条可点击目录项所需的列——后端投影 {@code SELECT slug, title, summary}，
  * 这样 4 万页的知识库每次打开索引都不必为 TEXT 正文付出传输代价。</p>
@@ -20,13 +24,10 @@ public class WikiIndexEntry {
 
     private String summary = "";
 
-    @TableField(value = "parent_slug")
     private String parentSlug = "";
 
-    @TableField(value = "category_path", typeHandler = WikiStringListTypeHandler.class)
-        private List<String> categoryPath = new ArrayList<>();
+    private List<String> categoryPath = new ArrayList<>();
 
-    @TableField(value = "wiki_path")
     private String wikiPath = "";
 
     private int depth;

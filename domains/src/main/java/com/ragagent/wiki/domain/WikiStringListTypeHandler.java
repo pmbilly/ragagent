@@ -1,4 +1,4 @@
-package com.ragagent.common.wiki.domain;
+package com.ragagent.wiki.domain;
 
 import com.ragagent.platform.web.JsonMappers;
 import java.sql.CallableStatement;
@@ -29,7 +29,7 @@ import org.apache.ibatis.type.JdbcType;
  * 需要用 {@code COALESCE(in_links, '[]'::jsonb)}。仓储层已按此写法处理。</p>
  *
  * <p>读路径宽容：SQL NULL / 空串 / JSON {@code null} 一律回空列表；
- * 序列化时空列表再转回 {@code null}（见 {@link EmptyListAsNullSerializer}），
+ * 序列化时空列表再转回 {@code null}（见 {@code EmptyListAsNullSerializer}（L1 出口侧序列化器）），
  * 与写路径约定闭环。</p>
  */
 public class WikiStringListTypeHandler extends BaseTypeHandler<List<String>> {
