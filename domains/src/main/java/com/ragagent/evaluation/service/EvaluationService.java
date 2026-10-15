@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.ragagent.evaluation.dto.EvaluationDtos;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**

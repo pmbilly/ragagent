@@ -3,8 +3,9 @@ package com.ragagent.knowledge.support;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 知识库实体 → 行视图的**域内单一映射**（供端口适配器、KB 控制器与 L1 dto 调用点共用）。
@@ -96,11 +97,11 @@ public final class KnowledgeBaseRowViews {
         e.setStorageBackendId(v.getStorageBackendId());
         e.setStorageConfig(v.getStorageConfig());
         e.setVectorStoreId(v.getVectorStoreId());
-        e.setExtractConfig(v.getExtractConfig());
-        e.setFaqConfig(v.getFaqConfig());
-        e.setQuestionGenerationConfig(v.getQuestionGenerationConfig());
-        e.setAutoTagConfig(v.getAutoTagConfig());
-        e.setWikiConfig(v.getWikiConfig());
+        e.setExtractConfig(JsonMappers.toJsonNode(v.getExtractConfig()));
+        e.setFaqConfig(JsonMappers.toJsonNode(v.getFaqConfig()));
+        e.setQuestionGenerationConfig(JsonMappers.toJsonNode(v.getQuestionGenerationConfig()));
+        e.setAutoTagConfig(JsonMappers.toJsonNode(v.getAutoTagConfig()));
+        e.setWikiConfig(JsonMappers.toJsonNode(v.getWikiConfig()));
         e.setIndexingStrategy(v.getIndexingStrategy());
         e.setCreatedAt(v.getCreatedAt());
         e.setUpdatedAt(v.getUpdatedAt());

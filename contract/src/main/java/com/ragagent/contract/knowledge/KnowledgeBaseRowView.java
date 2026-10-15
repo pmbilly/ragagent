@@ -1,15 +1,14 @@
-package com.ragagent.common.knowledge;
+package com.ragagent.contract.knowledge;
 
 import java.time.OffsetDateTime;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageProviderConfig;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageConfig;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseAsrConfig;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseVlmConfig;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseImageProcessingConfig;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseChunkingConfig;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseVlmConfig;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseImageProcessingConfig;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
 
 /**
  * 知识库**行视图**（L1）：{@code KnowledgeCatalogPort} 知识库面（读 / 建 / 改 / 授权）+ KB API 线格式
@@ -44,11 +43,16 @@ public class KnowledgeBaseRowView {
     private String storageBackendId;
     private KnowledgeBaseStorageConfig storageConfig;
     private String vectorStoreId;
-    private JsonNode extractConfig;
-    private JsonNode faqConfig;
-    private JsonNode questionGenerationConfig;
-    private JsonNode autoTagConfig;
-    private JsonNode wikiConfig;
+    /** jsonb 原样（对象/数组/标量；null 表示无）。 */
+    private Object extractConfig;
+    /** jsonb 原样（对象/数组/标量；null 表示无）。 */
+    private Object faqConfig;
+    /** jsonb 原样（对象/数组/标量；null 表示无）。 */
+    private Object questionGenerationConfig;
+    /** jsonb 原样（对象/数组/标量；null 表示无）。 */
+    private Object autoTagConfig;
+    /** jsonb 原样（对象/数组/标量；null 表示无）。 */
+    private Object wikiConfig;
     private KnowledgeBaseIndexingStrategy indexingStrategy;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
@@ -84,16 +88,16 @@ public class KnowledgeBaseRowView {
     public void setStorageBackendId(String v) { storageBackendId = v; }
     public String getVectorStoreId() { return vectorStoreId; }
     public void setVectorStoreId(String v) { vectorStoreId = v; }
-    public JsonNode getExtractConfig() { return extractConfig; }
-    public void setExtractConfig(JsonNode v) { extractConfig = v; }
-    public JsonNode getFaqConfig() { return faqConfig; }
-    public void setFaqConfig(JsonNode v) { faqConfig = v; }
-    public JsonNode getQuestionGenerationConfig() { return questionGenerationConfig; }
-    public void setQuestionGenerationConfig(JsonNode v) { questionGenerationConfig = v; }
-    public JsonNode getAutoTagConfig() { return autoTagConfig; }
-    public void setAutoTagConfig(JsonNode v) { autoTagConfig = v; }
-    public JsonNode getWikiConfig() { return wikiConfig; }
-    public void setWikiConfig(JsonNode v) { wikiConfig = v; }
+    public Object getExtractConfig() { return extractConfig; }
+    public void setExtractConfig(Object v) { extractConfig = v; }
+    public Object getFaqConfig() { return faqConfig; }
+    public void setFaqConfig(Object v) { faqConfig = v; }
+    public Object getQuestionGenerationConfig() { return questionGenerationConfig; }
+    public void setQuestionGenerationConfig(Object v) { questionGenerationConfig = v; }
+    public Object getAutoTagConfig() { return autoTagConfig; }
+    public void setAutoTagConfig(Object v) { autoTagConfig = v; }
+    public Object getWikiConfig() { return wikiConfig; }
+    public void setWikiConfig(Object v) { wikiConfig = v; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(OffsetDateTime v) { createdAt = v; }
     public OffsetDateTime getUpdatedAt() { return updatedAt; }
@@ -120,7 +124,7 @@ public class KnowledgeBaseRowView {
     public Capabilities capabilities() {
         KnowledgeBaseIndexingStrategy s = getIndexingStrategy();
         return new Capabilities(s.isVectorEnabled(), s.isKeywordEnabled(), s.isWikiEnabled(),
-                s.isGraphEnabled() && extractConfig != null && extractConfig.path("enabled").asBoolean(false),
+                s.isGraphEnabled() && JsonValueSupport.boolAt(extractConfig, "enabled", false),
                 "faq".equals(type));
     }
 

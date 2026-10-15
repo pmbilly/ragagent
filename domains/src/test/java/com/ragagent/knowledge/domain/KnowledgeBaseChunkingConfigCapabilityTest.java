@@ -14,7 +14,8 @@ import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.common.knowledge.dto.ChunkingConfigView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseChunkingConfig;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
+import com.ragagent.knowledge.support.KnowledgeBaseConfigCodec;
 
 /**
  * K8 配置能力矩阵：**声明了的配置要么生效、要么被显式告知**，不许静默吞掉。
@@ -37,7 +38,7 @@ class KnowledgeBaseChunkingConfigCapabilityTest {
         JsonNode bad = read("{\"chunkSize\":\"not-a-number\"}");
 
         BizException e = assertThrows(BizException.class,
-                () -> KnowledgeBaseChunkingConfig.from(bad),
+                () -> KnowledgeBaseConfigCodec.chunkingFrom(bad),
                 "损坏的 chunkingConfig 静默回落成默认 512/80，会让摄取用错参数跑完而无人知情");
 
         assertTrue(e.getMessage() != null && e.getMessage().contains("chunkingConfig"),
@@ -47,9 +48,9 @@ class KnowledgeBaseChunkingConfigCapabilityTest {
     @Test
     @DisplayName("读取容错仍在：null / 空对象 / 未知键 → 默认值（只有损坏才报错）")
     void tolerantReadsStillTolerated() {
-        assertEquals(0, KnowledgeBaseChunkingConfig.from(null).getChunkSize(), "null → 默认");
-        assertEquals(0, KnowledgeBaseChunkingConfig.from(read("{}")).getChunkSize(), "空对象 → 默认");
-        assertEquals(500, KnowledgeBaseChunkingConfig.from(read("{\"chunkSize\":500,\"unknown\":1}"))
+        assertEquals(0, KnowledgeBaseConfigCodec.chunkingFrom(null).getChunkSize(), "null → 默认");
+        assertEquals(0, KnowledgeBaseConfigCodec.chunkingFrom(read("{}")).getChunkSize(), "空对象 → 默认");
+        assertEquals(500, KnowledgeBaseConfigCodec.chunkingFrom(read("{\"chunkSize\":500,\"unknown\":1}"))
                 .getChunkSize(), "未知键仍按 lenient 忽略");
     }
 

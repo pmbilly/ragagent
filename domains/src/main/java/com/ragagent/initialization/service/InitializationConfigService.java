@@ -18,14 +18,14 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseAsrConfig;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseVlmConfig;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseVlmConfig;
 import com.ragagent.common.knowledge.dto.KnowledgeBaseResponse;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.initialization.dto.InitResponses;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.model.ModelView;
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 
 /**
  * initialization config/initialize 端点用例：KB 初始化配置读写、初始化装配与请求绑定。
@@ -621,7 +621,7 @@ public final class InitializationConfigService {
             }
         }
 
-        JsonNode extract = kb.getExtractConfig();
+        JsonNode extract = JsonMappers.toJsonNode(kb.getExtractConfig());
         if (extract != null) {
             Map<String, Object> ne = new TreeMap<>();
             ne.put("enabled", extract.path("enabled").asBoolean(false));
@@ -638,7 +638,7 @@ public final class InitializationConfigService {
             config.put("nodeExtract", sortedBlock(Map.of("enabled", false)));
         }
 
-        JsonNode qg = kb.getQuestionGenerationConfig();
+        JsonNode qg = JsonMappers.toJsonNode(kb.getQuestionGenerationConfig());
         if (qg != null) {
             config.put("questionGeneration", sortedBlock(Map.of(
                     "enabled", qg.path("enabled").asBoolean(false),

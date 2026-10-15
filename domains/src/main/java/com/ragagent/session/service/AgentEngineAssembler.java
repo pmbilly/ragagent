@@ -38,7 +38,7 @@ import com.ragagent.agent.prompt.PinnedSkillInfo;
 import com.ragagent.agent.prompt.KnowledgeBaseInfo;
 import com.ragagent.chatpipeline.spi.McpToolingGateway;
 import com.ragagent.chatpipeline.spi.McpToolRegistrationPort;
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**

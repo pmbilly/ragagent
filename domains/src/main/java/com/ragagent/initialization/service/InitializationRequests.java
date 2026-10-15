@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseChunkingConfig;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
 
 /** initialization 端点的原始请求体绑定器（record + 手写绑定,契约换锚时一并 DTO 化）。 */
 public final class InitializationRequests {

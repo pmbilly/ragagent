@@ -1,10 +1,7 @@
-package com.ragagent.common.knowledge.domain;
+package com.ragagent.contract.knowledge.domain;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.web.JsonMappers;
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * 知识库分块配置（jsonb 列 {@code config} 的形状）：分块尺寸与重叠、分隔符、
@@ -63,25 +60,6 @@ public class KnowledgeBaseChunkingConfig {
         public void setXlsxFirstRowAsHeader(Boolean v) { xlsxFirstRowAsHeader = v; }
     }
 
-    /**
-     * 从 KB 配置 jsonb 读取。
-     *
-     * <p>容错边界（K8）：{@code null} / 缺省对象 → 默认值（"没配"是合法状态）；
-     * **形状损坏**（类型不匹配等）→ {@link BizException} 明确报错，不再回落默认——否则
-     * 配置坏了会悄悄按 512/80 跑完摄取，用户以为自己的尺寸生效了（静默成功）。</p>
-     */
-    public static KnowledgeBaseChunkingConfig from(JsonNode node) {
-        if (node == null || node.isNull()) {
-            return new KnowledgeBaseChunkingConfig();
-        }
-        KnowledgeBaseChunkingConfig parsed;
-        try {
-            parsed = JsonMappers.lenient().convertValue(node, KnowledgeBaseChunkingConfig.class);
-        } catch (IllegalArgumentException e) {
-            throw BizException.badRequest("chunkingConfig 解析失败：" + e.getMessage());
-        }
-        return parsed == null ? new KnowledgeBaseChunkingConfig() : parsed;
-    }
 
     /**
      * **主摄取未消费**的键（顺序固定；空 = 全部生效）。

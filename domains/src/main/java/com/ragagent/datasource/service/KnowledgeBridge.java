@@ -3,7 +3,7 @@ package com.ragagent.datasource.service;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**

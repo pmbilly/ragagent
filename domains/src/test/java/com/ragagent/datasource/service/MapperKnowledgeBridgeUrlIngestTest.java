@@ -34,7 +34,7 @@ import com.sun.net.httpserver.HttpServer;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.knowledge.support.KnowledgePaths;
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.contract.knowledge.KnowledgeParseStatus;
 import com.ragagent.platform.web.JsonMappers;

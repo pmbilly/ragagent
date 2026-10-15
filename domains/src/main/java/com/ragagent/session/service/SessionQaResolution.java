@@ -11,7 +11,7 @@ import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 
 /**
  * 知识库/模型/租户解析协作者:mention 与 tag 范围收敛到 agent 授权面、chat 模型选择、

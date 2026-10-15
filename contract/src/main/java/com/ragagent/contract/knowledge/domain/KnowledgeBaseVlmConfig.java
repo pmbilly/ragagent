@@ -1,6 +1,5 @@
-package com.ragagent.common.knowledge.domain;
+package com.ragagent.contract.knowledge.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * 知识库的 VLM（图像描述）配置：开关、模型、描述语言与自定义指令等。
@@ -35,10 +34,4 @@ public class KnowledgeBaseVlmConfig {
     public String getInterfaceType() { return interfaceType; }
     public void setInterfaceType(String v) { interfaceType = v == null ? "" : v; }
 
-    /** 新版本 {@code Enabled && ModelID != ""}，老版本 {@code ModelName && BaseURL}。
-     *  否则写入 jsonb 后回读触发 UnrecognizedPropertyException） */
-    @JsonIgnore
-    public boolean isMultimodalEnabled() {
-        return (enabled && !modelId.isEmpty()) || (!modelName.isEmpty() && !baseUrl.isEmpty());
-    }
 }

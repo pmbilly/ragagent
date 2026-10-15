@@ -23,7 +23,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
@@ -646,7 +646,7 @@ public class KnowledgeSummaryService {
      */
     private static boolean kbNeedsEmbedding(KnowledgeBase kb) {
         KnowledgeBaseIndexingStrategy strategy = kb.getIndexingStrategy();
-        if (strategy == null || strategy.isZero()) {
+        if (strategy == null || strategy.allIndexingDisabled()) {
             strategy = KnowledgeBaseIndexingStrategy.defaultStrategy();
         }
         return strategy.isVectorEnabled() || strategy.isKeywordEnabled();

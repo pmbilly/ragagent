@@ -22,7 +22,7 @@ import com.ragagent.datasource.domain.TaskInitiator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.platform.web.JsonMappers;
 

@@ -28,7 +28,7 @@ import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.ChunkPageView;
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.platform.web.JsonMappers;
 
@@ -464,7 +464,7 @@ final class AgentToolKbBackends {
                     return null;
                 }
                 return new QueryKnowledgeGraphTool.KnowledgeBaseView(kb.getId(),
-                        extractConfigView(kb.getExtractConfig()));
+                        extractConfigView(JsonMappers.toJsonNode(kb.getExtractConfig())));
             }
 
             @Override

@@ -9,7 +9,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 
 /**
  * {@code SessionQaResolution} 的**KB 范围簇**：从 agent 配置推导可用知识库集合、

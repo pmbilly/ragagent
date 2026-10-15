@@ -10,11 +10,11 @@ import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageProviderConfig;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageConfig;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseAsrConfig;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseVlmConfig;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseImageProcessingConfig;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseChunkingConfig;
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseVlmConfig;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseImageProcessingConfig;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 
 /**
  * knowledge_bases 表实体。

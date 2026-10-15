@@ -1,8 +1,5 @@
-package com.ragagent.common.knowledge.domain;
+package com.ragagent.contract.knowledge.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.platform.web.JsonMappers;
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * IndexingStrategy。
@@ -31,26 +28,14 @@ public class KnowledgeBaseIndexingStrategy {
     public boolean isGraphEnabled() { return graphEnabled; }
     public void setGraphEnabled(boolean v) { graphEnabled = v; }
 
-    /** 全 false（新建请求体未传 strategy 时的判定依据） */
-    @JsonIgnore
-    public boolean isZero() {
-        return !vectorEnabled && !keywordEnabled && !wikiEnabled && !graphEnabled;
-    }
 
     public boolean hasAnyIndexing() {
         return vectorEnabled || keywordEnabled || wikiEnabled || graphEnabled;
     }
 
-    /** 从 KB 配置 jsonb 读取（null/解析失败 → 默认值）。 */
-    public static KnowledgeBaseIndexingStrategy from(JsonNode node) {
-        if (node == null || node.isNull()) {
-            return KnowledgeBaseIndexingStrategy.defaultStrategy();
-        }
-        try {
-            KnowledgeBaseIndexingStrategy parsed = JsonMappers.lenient().convertValue(node, KnowledgeBaseIndexingStrategy.class);
-            return parsed == null ? KnowledgeBaseIndexingStrategy.defaultStrategy() : parsed;
-        } catch (IllegalArgumentException e) {
-            return KnowledgeBaseIndexingStrategy.defaultStrategy();
-        }
+    /** 全 false（新建请求体未传 strategy 时的判定依据）。**非 getter 命名** ⇒ 不参与序列化
+     * （等价于原 {@code @JsonIgnore isZero()}；Jackson 默认只识别 get/is 命名的访问器）。 */
+    public boolean allIndexingDisabled() {
+        return !vectorEnabled && !keywordEnabled && !wikiEnabled && !graphEnabled;
     }
 }

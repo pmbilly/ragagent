@@ -1741,6 +1741,20 @@ public interface AdminUserPort {
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 G1-h·4 个 KB config 类型去 Jackson + `KnowledgeBaseRowView` 入契约（Jackson 语义必要 3 → 2）（2026-10-15）**
+- **对象**：`KnowledgeBaseChunkingConfig` · `KnowledgeBaseImageProcessingConfig` · `KnowledgeBaseIndexingStrategy` · `KnowledgeBaseVlmConfig`（**实体 `@TableField` 字段类型**＝持久化形状）+ 依赖它们的 `KnowledgeBaseRowView`
+- **先测（两条决定性事实）**：① 4 个类型**字段全为纯 JDK** ✓ ⇒ 阻塞只有两处：静态 `from(JsonNode)` 工厂（用 `JsonMappers`）与 2 个 `@JsonIgnore` 派生访问器 ② 那 6 个 `@JsonSerialize` 与这些类型**无关**（在 `WikiPage`/`SourceConnector` 等别处）
+- **动作**：
+  1. **解析边界外移**：新建域内 `knowledge/support/KnowledgeBaseConfigCodec`（`chunkingFrom`/`imageProcessingFrom`/`indexingStrategyFrom`），工厂**逐字搬运**（含 chunking 的"形状损坏 → `BizException`"边界 ✓）
+  2. **`@JsonIgnore` 的零依赖等价**：`KnowledgeBaseIndexingStrategy.isZero()` → **非 getter 命名 `allIndexingDisabled()`**（3 处调用点改名）；`KnowledgeBaseVlmConfig.isMultimodalEnabled()` **无调用方** ⇒ 直接删除
+  3. **搬移**：4 类型 → `contract.knowledge.domain`（与另 3 件 config 会合）；`KnowledgeBaseRowView` 5 个 JsonNode → `Object` 并 → `contract.knowledge`；删 2 个死包目录（B124）
+  4. **⭐ 视图内内容读取的纯 JDK 等价**：`capabilities()` 原读 `extractConfig.path("enabled").asBoolean(false)` ⇒ 新增 **`contract.knowledge.JsonValueSupport.boolAt(Object, key, def)`**，**语义与 `JsonNode#path(key).asBoolean(def)` 逐条对齐**（非对象/缺键 → def；`Boolean` → 原值；`String "true"/"false"`（忽略大小写）→ 解析值；其余 → def）
+  5. **消费侧还原 13 处**（域内 mapper `toEntity` 方向 5 · init 2 · session 1 · L1 `KnowledgeBaseResponse` 5）+ 测试搬迁 1 件（L1 → domains，工厂改走 codec）
+- **⚠️ 一次误判（已固化判据）**：我用 `grep … | head -8` 判"`isZero()` 无调用方"⇒ **截断骗人**（真调用在输出之外）✗ ⇒ 删方法后**编译立刻抓出 3 处** ✓。**判据：删除方法前以"编译验证"为准，grep 只能作线索（必须 `-c` 或不去截断）**
+- **读数**：`:contract` 191 → **197**（+6）；`common/*` 102 → **97**（−5）；**C4 Jackson 语义必要 3 → 2**（仅余 `AdminUserView`/`AdminUserPort`，有据）；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**；**1349 金片签名一致**（`kb-*.json` / `init-*.json` 钉住 KB/init 线格式 ⇒ 视图与配置类型 JSON 逐字节不变 ✓）；`spotlessCheck build` **2m4s**；**4991 / 失败 0 / 跳过 4**（用例随测试搬迁重分布：domains 2894→2899、common 205→200，**总数不变** ✓）
+- **冒烟**：KB **200** ✓（`KnowledgeBaseRowView` → `KnowledgeBaseResponse` 链路）· init **404 业务信封** ✓ · sessions 200 ✓ · **`POST /api/v1/chunker/preview` ⇒ 200 真实分块输出** ✓（配置解析链）
+- **顺带登记（不在本刀范围）**：**GET 打到仅 `@PostMapping` 的路由返回 500 而非常规 405**（`HttpRequestMethodNotSupportedException` 的映射问题）⇒ 记入待办，属错误映射面的独立小刀
 **🔶 G1-b 收口·去 Jackson 全账清零（12 件登记 → 9 件入契约 + 3 件有据留 L1）（2026-10-15）**
 - **⭐ 收口读数**：C4 **待去 Jackson 12 → 0** ✓✓；`common/*` **125 → 102**（G1-b 全程 −23）；`:contract` **179 → 191**（+12）；**C2 = 0 保持**；**R10 全程保持 6 条边 / 51 类 / ①档 0**
 - **9 件入 `:contract`（6 个子批）**：`StorageBackendView`+`StorageBackendPort`（→`contract.storage`）· `TenantRowView`（→`contract.tenant`）· `ChunkFacts`+`KnowledgeDocumentFacts`+`KnowledgeBaseView`（→`contract.knowledge`）· `ChunkRowView`+`ChunkPageView`（→`contract.knowledge`）· `KnowledgeRowView`+**`KnowledgeParseStatus`**（常量表随行）· `WikiPageView`（→`contract.wiki`）
@@ -2738,7 +2752,7 @@ public interface AdminUserPort {
 
 | 目标模块 | 实际 | 差距 |
 |---|---|---|
-| `contracts` | `:contract` **191 件** ✅ 已独立（G1-b 收口） | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
+| `contracts` | `:contract` **197 件** ✅ 已独立（G1-h） | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
 | `platform` | `com.ragagent.platform.*` **139 件仍在 `:common`** | **未独立成模块**；包覆盖：方案 **23** vs 实际 **15** ⇒ 缺 `execution` · `outbox` · `parsing` · `storage.config` · `storage.provider` · `tracing.decorators` · `tracing.langfuse` · `transaction` · `web.error` · `web.health`；多 `redis` · `tracing` |
 | `agent-engine` · `retrieval-engine` · `model-runtime` | `:engine` **318 件 / 9 顶层包**（chatpipeline · embedding · llm · modelcontext · modelruntime · rerank · retrieval · tracing · webfetch） | 未拆分（**条件触发**项） |
 | `domains` | `:domains` **1343 件** | 域间边 **7 条**（①clearable **0** / ②owner 2 / ③族内 5）；域布局抽样见 C |
@@ -2753,7 +2767,7 @@ public interface AdminUserPort {
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
 | `:common` 受控依赖根 | 10 根 / 61 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
-| `:common` 规模 | **242 件** = `common/*` **102** + `platform/*` 139 + `event/*` 1（G1-b 收口） | — |
+| `:common` 规模 | **237 件** = `common/*` **97** + `platform/*` 139 + `event/*` 1（G1-h） | — |
 
 **C. 域布局抽样（以方案 §8.8.2 `knowledge/` 为范本）**
 

@@ -25,7 +25,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.contract.storage.StorageBackendView;
@@ -39,12 +39,11 @@ import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
 import com.ragagent.retrieval.engine.TenantStoreOwnership;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.retrieval.engine.RetrieveEngineFactories;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseChunkingConfig;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseImageProcessingConfig;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.storage.StorageBackendPort;
+import com.ragagent.knowledge.support.KnowledgeBaseConfigCodec;
 
 /**
  * （覆盖 CRUD + pin + move-targets + 计数回填；
@@ -191,7 +190,7 @@ public class KnowledgeBaseService
             kb.setAutoTagConfig(null);
         }
         // IndexingStrategy 零值 → 默认（vector+keyword）
-        if (kb.getIndexingStrategy().isZero()) {
+        if (kb.getIndexingStrategy().allIndexingDisabled()) {
             kb.setIndexingStrategy(KnowledgeBaseIndexingStrategy.defaultStrategy());
         }
         // legacy ExtractConfig.Enabled → GraphEnabled 同步
@@ -482,11 +481,11 @@ public class KnowledgeBaseService
      */
     private static void applyUpdateConfig(KnowledgeBase kb, JsonNode config) {
         if (config.hasNonNull("chunkingConfig")) {
-            kb.setChunkingConfig(KnowledgeBaseChunkingConfig.from(config.get("chunkingConfig")));
+            kb.setChunkingConfig(KnowledgeBaseConfigCodec.chunkingFrom(config.get("chunkingConfig")));
         }
         if (config.hasNonNull("imageProcessingConfig")) {
             kb.setImageProcessingConfig(
-                    KnowledgeBaseImageProcessingConfig.from(config.get("imageProcessingConfig")));
+                    KnowledgeBaseConfigCodec.imageProcessingFrom(config.get("imageProcessingConfig")));
         }
         if (config.hasNonNull("faqConfig")) {
             kb.setFaqConfig(config.get("faqConfig"));
@@ -500,7 +499,7 @@ public class KnowledgeBaseService
         // indexingStrategy：引用语义 null=不变；hasAnyIndexing 为 false → 400
         if (config.has("indexingStrategy") && config.get("indexingStrategy") != null
                 && config.get("indexingStrategy").isObject()) {
-            KnowledgeBaseIndexingStrategy strategy = KnowledgeBaseIndexingStrategy.from(config.get("indexingStrategy"));
+            KnowledgeBaseIndexingStrategy strategy = KnowledgeBaseConfigCodec.indexingStrategyFrom(config.get("indexingStrategy"));
             if (!strategy.hasAnyIndexing()) {
                 throw new BizException(AppError.badRequest("at least one indexing strategy must be enabled"));
             }

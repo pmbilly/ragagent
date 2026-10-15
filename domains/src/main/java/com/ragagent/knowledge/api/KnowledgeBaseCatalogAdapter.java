@@ -6,7 +6,7 @@ import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.knowledge.support.KnowledgeBaseRowViews;
 
 /**

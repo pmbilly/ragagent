@@ -26,7 +26,7 @@ import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.http.UrlBytesFetcher;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.contract.knowledge.KnowledgeParseStatus;
 

@@ -40,7 +40,7 @@ import com.ragagent.knowledge.support.ChunkRowViews;
 import com.ragagent.contract.knowledge.ChunkPageView;
 import com.ragagent.contract.knowledge.ChunkRowView;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.knowledge.support.KnowledgeBaseRowViews;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.knowledge.support.KnowledgeRowViews;

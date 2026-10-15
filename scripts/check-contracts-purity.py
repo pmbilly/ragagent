@@ -156,10 +156,6 @@ JACKSON_SEMANTICS_REQUIRED = {
     "com/ragagent/common/auth/AdminUserPort.java":
         "管理面端口（读/建/晋升/撤权/重置密码/密码策略），与 AdminUserView 同族：视图留 L1 ⇒ 端口随留"
         "（契约接口不得引用 L1 类型）；随 AdminUserView 的未来路径一并入 contract.auth",
-    "com/ragagent/common/knowledge/KnowledgeBaseRowView.java":
-        "5 个 JsonNode 字段**可** Object 化，但 6 个 typed config 中 4 个在 common/knowledge/domain："
-        "① 是实体 `@TableField` 的**字段类型**（＝持久化形状）② 其 fromJson/toJson **直接调 JsonMappers（L1）**"
-        "⇒ 契约装不下。归位路径：随 **G1-h**（config 类型去 Jackson + JSON 逻辑下沉为域内 codec）整批入 contract.knowledge",
 }
 
 REGISTERED = {**PLATFORM_FACE, **PENDING_DEJACKSON, **JACKSON_SEMANTICS_REQUIRED}

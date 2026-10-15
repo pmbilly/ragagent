@@ -1,4 +1,4 @@
-package com.ragagent.common.knowledge.domain;
+package com.ragagent.knowledge.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -18,6 +18,11 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageProviderConfig;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageConfig;
 import com.ragagent.contract.knowledge.domain.KnowledgeBaseAsrConfig;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseImageProcessingConfig;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseVlmConfig;
+import com.ragagent.knowledge.support.KnowledgeBaseConfigCodec;
 
 /**
  * 知识库配置 jsonb（{@code knowledge_bases.config} 列）的**序列化契约**。
@@ -86,7 +91,7 @@ class KnowledgeBaseConfigJsonContractTest {
                  "tableMetadataInstructions":"表头优先"}
                 """;
         JsonNode original = read(json);
-        KnowledgeBaseChunkingConfig parsed = KnowledgeBaseChunkingConfig.from(original);
+        KnowledgeBaseChunkingConfig parsed = KnowledgeBaseConfigCodec.chunkingFrom(original);
 
         assertEquals(500, parsed.getChunkSize());
         assertEquals(List.of("\n\n", "。"), parsed.getSeparators());
@@ -126,11 +131,11 @@ class KnowledgeBaseConfigJsonContractTest {
     @Test
     @DisplayName("读取容错：null / 空对象 / 未知键 → 默认值；旧 snake 键按政策不再映射")
     void fromIsTolerant() {
-        assertTrue(KnowledgeBaseChunkingConfig.from(null).getSeparators() == null, "null → 默认值");
-        assertEquals(0, KnowledgeBaseChunkingConfig.from(read("{}")).getChunkSize(), "空对象 → 默认值");
-        assertEquals(500, KnowledgeBaseChunkingConfig.from(read("{\"chunkSize\":500,\"unknownKey\":1}"))
+        assertTrue(KnowledgeBaseConfigCodec.chunkingFrom(null).getSeparators() == null, "null → 默认值");
+        assertEquals(0, KnowledgeBaseConfigCodec.chunkingFrom(read("{}")).getChunkSize(), "空对象 → 默认值");
+        assertEquals(500, KnowledgeBaseConfigCodec.chunkingFrom(read("{\"chunkSize\":500,\"unknownKey\":1}"))
                 .getChunkSize(), "未知键必须被忽略（lenient）");
-        assertEquals(0, KnowledgeBaseChunkingConfig.from(read("{\"chunk_size\":999}")).getChunkSize(),
+        assertEquals(0, KnowledgeBaseConfigCodec.chunkingFrom(read("{\"chunk_size\":999}")).getChunkSize(),
                 "旧 snake 键不再映射（无别名政策）——命中即为回归");
     }
 

@@ -45,7 +45,7 @@ import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.support.ContractJson;
 import com.ragagent.contract.knowledge.ChunkFacts;

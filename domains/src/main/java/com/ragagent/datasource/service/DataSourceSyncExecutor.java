@@ -23,7 +23,7 @@ import com.ragagent.datasource.domain.SyncResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.datasource.connector.rss.RssFetchState;
-import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 
 /**
  * 同步执行器：{@code datasource:sync} 任务的真正实现——一次性抓取与流式抓取两条路径、
