@@ -178,7 +178,7 @@ contracts → JDK
 
 - A③「域间边清零」达成 **①档 0 条 / 0 类**（边 64 → 7、类 317 → 52），**目标（跨域只经契约）成立**；
 - 但**载体偏离本判据**：为清边把 **14 个持久化实体 + 12 个域侧 TypeHandler 上提到 `common`**（另有 2 个 `platform/persistence` 的既有基础设施 handler 属合法）；
-- ⇒ **立欠债：「实体 → 视图」收窄专项**（清单与分批路径见 `outputs/a3-entity-narrowing-plan-2026-10-15.md`）；**`common` 侧的门禁已上线**（§12.3 新增「契约层纯度」守卫：受控依赖根与持久化形状均冻结、只许减）；
+- ⇒ **立欠债：「实体 → 视图」收窄专项**（清单与分批路径见 **§12.4**；本地工作稿 `outputs/a3-entity-narrowing-plan-2026-10-15.md`——⚠️ `outputs/` 被 gitignore，**以 §12.4 为准**）；**`common` 侧的门禁已上线**（§12.3 新增「契约层纯度」守卫：受控依赖根与持久化形状均冻结、只许减）；
 - ⇒ **新工作一律按本判据选载体**：窄读→`contract.*` 视图；宽字段/写面→**用例移入属主域**（不共享实体）；**不得再上提持久化实体**。
 
 ### 12.1 Gradle 模块与依赖方向（实测 build.gradle.kts）
@@ -217,6 +217,42 @@ common    → JDK（+ 工具链）            （平台与契约底座）
 | ArchUnit `ArchitectureRulesTest` 等 | A1 裸 env · A2 属性扫描 · A3 双装配 · A4 install 面 · A5 裸 NUL · A6 @Lazy · A7 裸 JDBC · A8 字符串 wrapper · A9 `.last` 拼接 · A10 分层倒挂 · A11/A11b Mapper 包约定 · A13 生命周期钩子 · A14 JsonProperty 卫生 · A15 序列化工厂 · **A16 边界层引用禁令（76 类）** · **A17 service 技术依赖禁令（61 类）** | 各基线只许减 |
 | `check-domain-contracts.py` | **R10 域间只经契约**（跨域边 / 类级棘轮；分档 ①②③，②③ 需登记理由） | `scripts/domain-contracts.baseline.json`（只许减） |
 | **`check-contracts-purity.py`（2026-10-15 新增）** | **C1 受控导入根 · C2 持久化形状（`@TableName` 实体 + 域侧 TypeHandler）· C3 `common/build.gradle.kts` 依赖清单**——判据＝§12.0（`contracts` 纯 JDK） | `scripts/contracts-purity.baseline.json`（只许减；现状 10 根 / 76 文件 · 实体 14 · handler 12 · 依赖 12） |
+
+### 12.4 「实体上提」欠债清单与收窄路径（2026-10-15 登记；**本表为受跟踪版本**）
+
+> 判据＝§12.0；门禁＝§12.3 的 `check-contracts-purity.py`（C1/C2/C3，只许减；通道已冻结）。
+
+**现状（实测 2026-10-15）**：`common` 有 **14 个 `@TableName` 持久化实体 + 12 个域侧 TypeHandler**；跨域主源消费 ≈**252 文件**（另测试 ≈77）。
+
+| 实体 | 行数 | 跨域主源 | 已有 `contract.*` 视图可对齐 |
+|---|---|---|---|
+| `Tenant` | 145 | 52 | `TenantStorageView`/`TenantQuotaView`（部分） |
+| `User` | 91 | 52 | 无 |
+| `Knowledge` | 139 | 31 | `KnowledgeView` |
+| `KnowledgeBase` | 219 | 27 | `KnowledgeBaseView` |
+| `Model` | 80 | 17 | `ModelFacts`·`ModelRowView` |
+| `Session` | 292 | 17 | `PipelineMessageView`（部分） |
+| `Chunk` | 139 | 16 | `ChunkView`（6 字段） |
+| `Message` | 394 | 13 | `PipelineMessageView` 族 |
+| `StorageBackend` | 56 | 8 | 无 |
+| `WikiPage` | 297 | 7 | 无 |
+| `WikiPageIssue` | 102 | 4 | 无 |
+| `KnowledgeTag` | 63 | 3 | 无 |
+| `MessageSuggestionSet` | 281 | 2 | 无 |
+| `AuthToken` | 48 | 1 | 无 |
+
+**四批路径**（每批独立提交、独立全绿）：
+
+| 批 | 范围 | 说明 |
+|---|---|---|
+| **1** | 有现成视图的 6 实体：`Chunk`(16) → `Knowledge`(31) → `KnowledgeBase`(27) → `Model`(17) → `Message`(13) → `Session`(17) | 机械为主；**视图字段不足时按 `ChunkView` javadoc 的家规"先改载荷"**（附加字段仅限内部载荷；若某视图进 API 线格式，以金片为准） |
+| **2** | 无视图且消费小的 6 实体：`AuthToken`(1) · `MessageSuggestionSet`(2) · `KnowledgeTag`(3) · `WikiPageIssue`(4) · `WikiPage`(7) · `StorageBackend`(8) | 先定窄视图（＝消费者实际用度），再同批 1 |
+| **3** | 管理面/宽字段（**设计级，先立项**）：`Model` 的 init 面（`InitResponses` 16 字段 + 写面）· `Tenant`(52) · `User`(52) | 判据：**用例移入属主域**，不造宽视图；两条 ②owner 边（`auth→tenant{TenantService}`、`system→auth{SystemAdminUserService}`）**保持登记不动**（§8.9 规划态） |
+| **4** | 收尾：12 个域侧 TypeHandler 随实体回域；C1/C2/C3 `--write` 收紧到"实体 0 / 域侧 handler 0" | 达标后阶段 6 第一步（`contracts`/`platform` 分离）具备前提 |
+
+**每批验收协议**：①`spotlessCheck build` 全绿 + **4991/0/4** 不变；②**14 守卫全绿**且 C1/C2/C3 只许减；③`check-contract-sync` 绿（**线格式不变 = 红线**）；④定向测试 + dev 重启 + 冒烟；⑤**R10 边数不增**（视图属 L1，消费者改视图后边应保持 0）；⑥单独提交，标注 `实体收窄·批N`。
+
+**首批就绪度（`Chunk`，已测）**：`ChunkView` 现 6 字段（`id`/`content`/`chunkType`/`chunkIndex`/`startAt`/`endAt`），而跨域消费者实际还用到 `knowledgeBaseId`/`tenantId`/`metadata`/`contentRevision`/`indexStatus`/`lastEditorId`/`contextHeader` ⇒ **执行前须先扩视图字段**（附加；`ChunkView` 当前消费方为 wiki ingest / agenttools 管道，非 API 线格式，以金片复核为准）。
 
 ## 13. 落刀方法论（新 Agent 必读；全部是踩坑换来的）
 
