@@ -44,8 +44,6 @@ public class CustomAgentService {
 
     private final CustomAgentMapper agentMapper;
     private final UserLookupPort userLookup;
-    /** KB 目录端口（债之一；原直连 knowledge.service.management.KnowledgeBaseService）。 */
-    private final KnowledgeBaseCatalogPort kbCatalog;
     private final BuiltinAgentRegistry registry;
     /**
      * IM 渠道清理。ObjectProvider 延迟解析：实现方（{@code ImTurnOrchestrator}）直接依赖本类
@@ -69,7 +67,6 @@ public class CustomAgentService {
                     AgentChannelCleaner> agentChannelCleanerProvider) {
         this.agentMapper = agentMapper;
         this.userLookup = userLookup;
-        this.kbCatalog = kbCatalog;
         this.registry = registry;
         this.agentChannelCleanerProvider = agentChannelCleanerProvider;
         this.suggestedQuestions = new AgentSuggestedQuestions(this, questionMapper, kbCatalog);

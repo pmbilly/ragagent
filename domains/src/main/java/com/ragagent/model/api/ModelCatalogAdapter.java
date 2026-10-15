@@ -10,7 +10,6 @@ import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelRowViews;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.mapper.ModelMapper;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelView;
 
 /**

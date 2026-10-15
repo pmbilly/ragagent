@@ -31,7 +31,6 @@ import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.KeywordsVectorHybridRetrieveEngineService;
-import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;
 import com.ragagent.retrieval.engine.RetrieveEngineException;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
@@ -58,7 +57,6 @@ class HybridSearchServiceStoreGroupTest {
     private ModelGateway modelGateway;
     private TenantService tenantService;
     private EmbeddingGateway embeddingGateway;
-    private PgVectorRetrieveRepository pgRepository;
     private RetrieveEngineRegistry registry;
     private TenantStoreOwnership ownership;
     private HybridSearchService service;
@@ -71,7 +69,6 @@ class HybridSearchServiceStoreGroupTest {
         modelGateway = mock(ModelGateway.class);
         tenantService = mock(TenantService.class);
         embeddingGateway = mock(EmbeddingGateway.class);
-        pgRepository = mock(PgVectorRetrieveRepository.class);
         registry = mock(RetrieveEngineRegistry.class);
         ownership = mock(TenantStoreOwnership.class);
         service = new HybridSearchService(kbGateway, documentGateway, chunkGateway, modelGateway,

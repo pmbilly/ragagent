@@ -5,7 +5,6 @@ import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
 import java.util.ArrayList;
-import com.ragagent.knowledge.config.BatchEmbedProperties;
 import java.util.concurrent.Executors;
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -85,9 +84,6 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     /** 任务观测的 span/根名。 */
     static final String TASK_TYPE_DOCUMENT_PROCESS = "document:process";
 
-    /** 批量向量化批大小（走属性绑定，取代 BATCH_EMBED_SIZE 的 env 直读）。 */
-    private final BatchEmbedProperties batchEmbedProperties;
-
     private final ExecutorService executor =
             Executors.newVirtualThreadPerTaskExecutor();
 
@@ -140,8 +136,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                                   ObjectProvider<
                                           ChunkExtractTaskQueue> chunkExtractQueue,
                                   ObjectProvider<
-                                          QuestionGenerationTaskQueue> questionGenerationQueue,
-                                  BatchEmbedProperties batchEmbedProperties) {
+                                          QuestionGenerationTaskQueue> questionGenerationQueue) {
         this.knowledgeRepository = knowledgeRepository;
         this.kbRepository = kbRepository;
         this.chunkRepository = chunkRepository;
@@ -159,7 +154,6 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         this.wikiKnowledgeFinalizer = wikiKnowledgeFinalizer;
         this.chunkExtractQueue = chunkExtractQueue;
         this.questionGenerationQueue = questionGenerationQueue;
-        this.batchEmbedProperties = batchEmbedProperties;
     }
 
     @Override

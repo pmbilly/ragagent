@@ -17,7 +17,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.client.DocReaderClient;
-import com.ragagent.knowledge.config.BatchEmbedProperties;
 import com.ragagent.knowledge.domain.span.SpanTracker;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
@@ -47,6 +46,7 @@ import com.ragagent.contract.model.ModelCatalogPort;
 class KnowledgeProcessWorkerTenantScopeTest {
 
     private final KnowledgeRepository knowledgeRepository = mock(KnowledgeRepository.class);
+    @SuppressWarnings("unchecked")
 
     private final KnowledgeProcessWorker worker = new KnowledgeProcessWorker(
             knowledgeRepository,
@@ -65,8 +65,7 @@ class KnowledgeProcessWorkerTenantScopeTest {
             mock(ObjectProvider.class),
             mock(ObjectProvider.class),
             mock(ObjectProvider.class),
-            mock(ObjectProvider.class),
-            mock(BatchEmbedProperties.class));
+            mock(ObjectProvider.class));
 
     @AfterEach
     void clearTenantContext() {

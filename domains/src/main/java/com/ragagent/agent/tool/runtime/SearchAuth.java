@@ -1,7 +1,5 @@
 package com.ragagent.agent.tool.runtime;
 
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.contract.knowledge.KnowledgeView;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

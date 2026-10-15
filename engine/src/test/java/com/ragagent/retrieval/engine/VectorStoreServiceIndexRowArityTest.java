@@ -54,6 +54,7 @@ class VectorStoreServiceIndexRowArityTest {
 
     @Test
     @DisplayName("K10b：rows 与 vectors 数量不符 ⇒ 抛，且一行 SQL 都不发")
+    @SuppressWarnings("unchecked")
     void arityMismatchThrowsBeforeWriting() {
         assertThatThrownBy(() -> service.saveIndexRows(
                 List.of(row("c1"), row("c2")), List.of(new float[] {1f, 2f})))
@@ -65,6 +66,7 @@ class VectorStoreServiceIndexRowArityTest {
 
     @Test
     @DisplayName("K10b：null 也按不符处理（不静默空写）")
+    @SuppressWarnings("unchecked")
     void nullListsThrow() {
         assertThatThrownBy(() -> service.saveIndexRows(null, List.of()))
                 .isInstanceOf(IllegalStateException.class)

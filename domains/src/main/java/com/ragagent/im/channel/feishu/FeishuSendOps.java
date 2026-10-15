@@ -1,6 +1,5 @@
 package com.ragagent.im.channel.feishu;
 
-import com.ragagent.platform.web.ApiResult;
 
 import java.net.URI;
 import java.net.http.HttpRequest;

@@ -29,6 +29,7 @@ class StartupTaskRecoverySplitTest {
 
     @Test
     @DisplayName("K6：知识面跳过（knowledge.redis-enabled=true）时，进程内同步队列的卡住行仍被复位")
+    @SuppressWarnings("unchecked")
     void criteriaArePerSurface() {
         StartupTaskRecovery recovery = new StartupTaskRecovery(jdbc,
                 mock(KnowledgeSpanRepository.class),
@@ -49,6 +50,7 @@ class StartupTaskRecoverySplitTest {
 
     @Test
     @DisplayName("K6：知识面未装配 Redis（false）时照常复位卡住的知识行")
+    @SuppressWarnings("unchecked")
     void knowledgeResetsWhenRedisSurfaceAbsent() {
         StartupTaskRecovery recovery = new StartupTaskRecovery(jdbc,
                 mock(KnowledgeSpanRepository.class), false, false);

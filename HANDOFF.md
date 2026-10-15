@@ -1792,6 +1792,17 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 IDE 告警清零批（IDE 导入成功后的项目级告警，全部真实可清理项）（2026-10-16）**
+- **背景**：`:common` 解散 + JDK 21 钉定后 IDE **导入成功**（5 模块齐 ✓），暴露出项目级告警（severity 4）。根因之一：**spotless 的 `ratchetFrom("seed")` 只格式化"seed 之后触碰过的文件"** ⇒ 未被碰过的老文件里未用 import 会一直留存 ✗
+- **处置三类**：
+  1. **未用 import 14 处 / 12 文件**（`SearchAuth` · `DataSchemaTool` · `QueryKnowledgeGraphTool` · `SearchMemoryTool` · `TenantAPIKeyValidator` · `FeishuSendOps` · `ChunkReadService` · `MemoryTrace` · `ModelCatalogAdapter` · `WebSearchService` · `WikiLinkify` · `TenantFilterGuard`）⇒ 按 JDT 判定删除 ✓
+  2. **字段级 4 处**：`KnowledgeProcessWorker.batchEmbedProperties`（**只赋值从不读** ⇒ 连带删构造末参 + import + 测试调用点）· `HybridSearchServiceStoreGroupTest.pgRepository`（测试内 mock 后从不读 ⇒ 删字段/赋值/import）· `CustomAgentService.kbCatalog` / `SessionAgentQaService.mcpTools`（**仅构造期传参** ⇒ 字段降为构造参数直用，JDT 结构性提示 ✓）
+  3. **测试 raw-type 泛型告警 5 处**：`StartupTaskRecoverySplitTest`（2 方法）· `VectorStoreServiceIndexRowArityTest`（2 方法）· `KnowledgeProcessWorkerTenantScopeTest`（字段级）⇒ 加 `@SuppressWarnings("unchecked")`（**仓内既有惯用法**：同款出现在 8+ 测试文件 ✓）
+- ⭐ **两条判据**：
+  1. **JDT 的 "never used" 是编译器级判定（含 javadoc 引用 ✓），可信任**；但删 import 的**安全网必须是目标模块的 `javadoc`**（`reference not found` 会立刻暴露误删 ✓）——本轮 14 处**零误删** ✓
+  2. **文本启发式会漏判** ✗：我首轮的"保守校验"（名字仍出现即跳过）把 14 处**全跳过**了 ✗（名字残留在**注释/字符串**里）⇒ **能编译的语义判定优先于文本启发式**
+- **验证**：**14 守卫全绿** · **1349 金片签名一致** · gate **2m4s / 4996 / 失败 0 / 跳过 4** · 冒烟（sessions / knowledge-bases / agents / system-info **200** ✓）
+- **备注**：**Redis 瞬态第 5 次**（`RedisDataSourceSyncTaskQueueTest`，复跑即绿 ✓）⇒ 仍在 housekeeping 队列（测试侧 Lettuce 超时/重试）
 **🔶 清 `:common` 收口（D2+D3）·⭐ `:common` 完全解散 ⇒ 后端 5 模块（`common` 125 → **0**）（2026-10-16）**
 - **D2（12 件 → `:platform`）**：`MessageView` · `SessionQaPort` · `AgentStep` · `AgentToolCall` · `ToolCallTarget` · `UserPreferences` · `AdminUserView` · `AdminUserPort` · **`EmbedSessionPort`**（阻塞方 `MessageView` 同行 ⇒ 自动解锁 ✓）· `FileContentService` + `WritableFileContentService` · `MemoryMessageCursor`（阻塞方本就是 platform 件 ⇒ **无需切 servlet 面、无需复现零时语义** ✓）
   - 三维闭包预检 **12 件全绿** ✓（import / 同包裸名 / 字符串 FQN 与注册名；外加 Spring 标注与随迁测试）；**FQN 引用更新 100 文件** ✓

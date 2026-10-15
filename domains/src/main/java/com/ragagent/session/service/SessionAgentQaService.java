@@ -72,8 +72,6 @@ public class SessionAgentQaService {
     /** 引擎/工具装配簇。 */
     private final AgentEngineAssembler engineAssembler;
 
-    /** MCP 按需目录注册端口（引擎侧 SPI，MCP 域实现）。 */
-    private final McpToolRegistrationPort mcpTools;
 
     /** 并发闸门（chat 工厂注入；null 会让 ConcurrencyChatClient NPE）。 */
     private final ConcurrencyGovernor concurrencyGovernor;
@@ -100,7 +98,6 @@ public class SessionAgentQaService {
             AgentResolver agentResolver) {
         this.concurrencyGovernor = concurrencyGovernor;
         this.agentResolver = agentResolver;
-        this.mcpTools = mcpTools;
         this.ollamaService = ollamaService;
         this.modelCatalog = modelCatalog;
         this.memoryService = memoryService;
