@@ -5,13 +5,13 @@
 > **`docs/handoff/archive/HANDOFF-v0.1.0-2026-10-13.md`**；历史细节仍可用 `git log --grep="(B###)"` 取回。
 > **外部引用注意**：§8 / §9 / §10 / §13 / §14 / §15.2 / §15.3 **编号与语义保持不动**（docs/ 与源码注释有 40+ 处按号引用）；
 > §11 压缩为指针；**§12 为新建**（原多处引用"§12 结构地图"长期悬空，此次补齐）；§0/§2/§4/§5/§7 重写；§15.1 换为 R 系列批次表。
-> 方案与计划：`outputs/java-remediation-plan-2026-10-13.md`（整改方案）· `outputs/java-remediation-implementation-plan-2026-10-13.md`（具体实施计划）。
+> 方案与计划：`docs/java-remediation-plan-2026-10-13.md`（整改方案）· `docs/java-remediation-implementation-plan-2026-10-13.md`（具体实施计划）。
 
 ## ⭐ 接手须知（v0.2.0 版，5 分钟）
 
 0. **本版是什么**：v0.1.0 的"脱 Go / 提可读性"各轴已收官（见 §7）；**v0.2.0 = 按整改方案做全面整改**（正确性修复 → 结构收敛 → 整体包结构整改），批次表见 §15.1。
-1. **开工顺序**：读 §7 现状 → §15.1 挑批次（按 ⬜ 顺序）→ §15.2 纪律 → 干活 → 回填 §15.1 状态 + §15.4 记录。
-2. **第一步永远先验基线**：`env -u SYSTEM_AES_KEY JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./gradlew spotlessCheck build`（期望 **4,908 用例 / 0 失败 / 跳过 4**）＋ 十一守卫（已接入 build）。
+1. **开工顺序**：读 **§16（方案对照与执行方案，2026-10-15 最新）** → §7 现状 → §15.1 挑批次 → §15.2 纪律 → 干活 → 回填 §15.1 状态 + §15.4 记录 + **§16.3 的「收口三问」**。
+2. **第一步永远先验基线**：`env -u SYSTEM_AES_KEY JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./gradlew spotlessCheck build`（期望 **4,991 用例 / 0 失败 / 跳过 4**）＋ **14 守卫**（已接入 build）。
 3. **行为不变是底线**：一切整改以测试套件为安全网；契约变更走显式签字（B221 守卫）。
 4. **两个拍板点**在 §15.1 标注（B238 K2 语义 / B247 K6 深度），到批前找用户定。
 5. **环境三件套**（起服/停服/端口）见 §8；⚠️ 跑完 build 必须重启后端（陈旧类全站 500）。
@@ -53,7 +53,7 @@
 2. **裁剪/大改期单工作流**：缝合点文件高度重叠时串行合入；其余按批并行。
 3. **先失败测试再改实现**（v0.2.0 新增）：每条正确性修复必须先有能红的测试/反例；守卫类改动必配红态探针（§15.2 第 6 条）。
 
-## 4. 关键测量数据（2026-10-13 实测）
+## 4. 关键测量数据（**2026-10-13 起点值**；最新复测见 §16.1）
 
 - 后端测试：**4,908 用例 / 0 失败 / 跳过 4**（B234 收尾实测；全量闸门口径）。
 - 结构规模：后端 **254 个生产包**；`:domains` **204 包 / 1,363 文件**（整改方案 §8.7 口径）；四 Gradle 模块 common/engine/domains/boot。
@@ -178,7 +178,7 @@ contracts → JDK
 
 - A③「域间边清零」达成 **①档 0 条 / 0 类**（边 64 → 7、类 317 → 52），**目标（跨域只经契约）成立**；
 - 但**载体偏离本判据**：为清边把 **14 个持久化实体 + 12 个域侧 TypeHandler 上提到 `common`**（另有 2 个 `platform/persistence` 的既有基础设施 handler 属合法）；
-- ⇒ **立欠债：「实体 → 视图」收窄专项**（清单与分批路径见 **§12.4**；本地工作稿 `outputs/a3-entity-narrowing-plan-2026-10-15.md`——⚠️ `outputs/` 被 gitignore，**以 §12.4 为准**）；**`common` 侧的门禁已上线**（§12.3 新增「契约层纯度」守卫：受控依赖根与持久化形状均冻结、只许减）；
+- ⇒ **立欠债：「实体 → 视图」收窄专项**（清单与分批路径见 **§12.4**；本地工作稿 `docs/a3-entity-narrowing-plan-2026-10-15.md`（**2026-10-15 已移入版本库**；§12.4 为受跟踪摘要））；**`common` 侧的门禁已上线**（§12.3 新增「契约层纯度」守卫：受控依赖根与持久化形状均冻结、只许减）；
 - ⇒ **新工作一律按本判据选载体**：窄读→`contract.*` 视图；宽字段/写面→**用例移入属主域**（不共享实体）；**不得再上提持久化实体**。
 
 ### 12.1 Gradle 模块与依赖方向（**实测 2026-10-15**：5 个模块）
@@ -191,8 +191,8 @@ common    → contract                             （api(project(":contract"))�
 contract  → JDK                                  （纯 JDK：公开 API / SPI / 不可变载荷）
 ```
 
-- `:contract` **已独立**（136 件，与整改方案 §8.1 的 `contracts/` 清单对齐：`contract.{agent,apikey,audit,auth,doc,knowledge,session,...}`）；**`:common` 已依赖 `:contract`** ⇒ 端口/视图可落 `:contract` 并被 `common`/域共同使用 ✓
-- **`:common` 尚未拆**：312 件 = `com.ragagent.common.*` **172** + `com.ragagent.platform.*` **139** + `com.ragagent.event.*` 1 ⇒ **`platform` 仍是包边界级（B259），未独立成模块**
+- `:contract` **已独立**（**172 件**，与整改方案 §8.1 的 `contracts/` 清单对齐：`contract.{agent,apikey,audit,auth,doc,knowledge,session,...}`；包覆盖对账见 §16.1）；**`:common` 已依赖 `:contract`** ⇒ 端口/视图可落 `:contract` 并被 `common`/域共同使用 ✓
+- **`:common` 尚未拆**：**274 件** = `com.ragagent.common.*` **134** + `com.ragagent.platform.*` **139** + `com.ragagent.event.*` 1 ⇒ **`platform` 仍是包边界级（B259），未独立成模块**（2026-10-15 复测）
 - `:engine` 的包根是 `com.ragagent.llm` / `retrieval` / `chatpipeline` 等（**无 `engine.` 中缀**）——模块边界靠 ArchUnit 与脚本规则强制，不靠包名前缀
 - v0.2.0 阶段 6 的 **B256~B267 十二批已 ✅，但完成口径是"包边界 + 规则"**（评审明确建议"本期只做包边界与规则，不新增 Gradle 模块；模块提取待包边界稳定后**单独立项**"）⇒ **模块提取的立项与准入见 §12.5**
 
@@ -656,7 +656,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 ## 15. 整改计划与纪律（v0.2.0）
 
 > 本版 §15 重写：v0.1.0 批次表（205 条）已归档（见 §11）；现行 = **R 系列批次表（§15.1）**，执行记录见 §15.4。
-> 方案与详细计划：`outputs/java-remediation-plan-2026-10-13.md` / `outputs/java-remediation-implementation-plan-2026-10-13.md`。
+> 方案与详细计划：`docs/java-remediation-plan-2026-10-13.md` / `docs/java-remediation-implementation-plan-2026-10-13.md`。
 
 ### 15.1 R 系列批次总表（B232~B267，共 36 批；状态 ✅ 完成 / ⬜ 待做；记录见 §15.4）
 
@@ -1567,7 +1567,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **计划更新（回答"`common` 何时完全拆成 contract/platform"）**：
   1. **§12.1 改实测版**：模块是 **5 个**（`:contract` 已独立 136 件、`:common` 312 件未拆）——旧图写 4 个模块属失真，已修；依赖方向 `domains/engine/boot → common → contract`（`common/build.gradle.kts:64` 的 `api(project(":contract"))`）
   2. **新增 §12.5「模块提取专项」**：承方案 §5.2（"**确有编译隔离收益时再逐域拆 Gradle 模块**"）与评审 P0-3（"模块提取待包边界稳定后**单独立项**"）⇒ **B256~B267 的完成口径＝"包边界 + 规则"**；**准入清单 G1~G4**：G1 `:common` 载荷型文件清零/登记（C4 棘轮）· G2 platform↔common 无环 · G3 组件/属性/Mapper 扫描面同步 · G4 编译隔离收益证据；**顺序**：platform（139 件，低风险）→ 三 runtime（engine 318 件）→ domains 重排；**纪律：准入未达标前不新增 Gradle 模块**；**与 C 的关系**：G1 的对象正是 C 收窄的内容 ⇒ **C 主体先做完**
-  3. 实施方案文档（`outputs/` 本地稿）同步加"**修订 3**"
+  3. 实施方案文档（`docs/java-remediation-implementation-plan-2026-10-13.md`）同步加"**修订 3**"
 - **载荷落点修正**：`KnowledgeTagView` 从 `common.knowledge` **移入 `:contract`**（`com.ragagent.contract.knowledge`，与 `ChunkView`/`KnowledgeView` 同处）——依据：`:common` 已依赖 `:contract` ⇒ 端口可返回契约类型；至此**"视图/事实/端口接口 → `:contract`；持久化实体 → 域"**口径落地
 - **新增 C4 门禁**（`check-contracts-purity.py`）：`common/**`（非 platform）的**载荷型文件**（`*View`/`*Facts`/`*Payload`/`*Response`/`*Port`）棘轮**只许减**，基线 **31 件**（移动前 32 ⇒ 本次修正本身即 −1）；红态探针有据（注入 `ProbeView.java` ⇒ 32 且判红 ✓）
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
@@ -2426,10 +2426,83 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 |---|---|
 | `HANDOFF.md`（本文） | v0.2.0 常读面：现状 / 批次表 / 纪律 / 环境 / 方法论 |
 | `docs/handoff/archive/HANDOFF-v0.1.0-2026-10-13.md` | v0.1.0 全文归档（历史追溯，勿作现行依据） |
-| `outputs/java-remediation-plan-2026-10-13.md` | 整改方案（设计产物，gitignored） |
-| `outputs/java-remediation-implementation-plan-2026-10-13.md` | 具体实施计划（含批次表原件与勘察证据） |
+| `docs/java-remediation-plan-2026-10-13.md` | 整改方案（**2026-10-15 由 `outputs/` 移入版本库**；§3 问题清单/§5 模块/§8 目标结构/§9 状态所有权/§12 规则的出处） |
+| `docs/java-remediation-implementation-plan-review-2026-10-13.md` | 实施方案评审（**P0-3「模块提取单独立项」的出处**） |
+| `docs/a3-entity-narrowing-plan-2026-10-15.md` | 实体上提欠债清单工作稿（受跟踪摘要＝§12.4） |
+| `docs/java-remediation-implementation-plan-2026-10-13.md` | 具体实施计划（含批次表原件与勘察证据） |
 | `docs/handoff/records/batch-records.md` | v0.1.0 早期逐批记录（~B110，历史） |
 | `docs/backend-package-map.md` · `docs/*-module-guide.md` | 包地图与 34 域模块手册 |
 | `docs/api-response-convention.md` | 统一响应外壳约定（权威） |
 
 批次详情取回：`git log --oneline | grep "B2xx"`；提交信息一律带 `(B###)` 与验证方式。
+
+
+---
+
+## 16. 方案对照与执行方案（2026-10-15 新建；**开工前必读**）
+
+> 起因：用户提问"有具体计划和目标为什么还跑偏"，复盘后确立——**指标先于判据会诱导跑偏；教训不转成脚本会按"第 N 次"复发**（本仓实测：已机械化的 6 类教训绝迹，未机械化的 6 类复发 3~5 次）。
+> 本节 = ① 仓库 vs 方案的**差距总表**（实测）② **执行方案**（批次表）③ **防跑偏机制**（M1~M6）。
+
+### 16.1 差距总表（实测 2026-10-15）
+
+**A. 模块结构（目标 §5.1 七模块 vs 实际五模块）**
+
+| 目标模块 | 实际 | 差距 |
+|---|---|---|
+| `contracts` | `:contract` **172 件** ✅ 已独立 | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
+| `platform` | `com.ragagent.platform.*` **139 件仍在 `:common`** | **未独立成模块**；包覆盖：方案 **23** vs 实际 **15** ⇒ 缺 `execution` · `outbox` · `parsing` · `storage.config` · `storage.provider` · `tracing.decorators` · `tracing.langfuse` · `transaction` · `web.error` · `web.health`；多 `redis` · `tracing` |
+| `agent-engine` · `retrieval-engine` · `model-runtime` | `:engine` **318 件 / 9 顶层包**（chatpipeline · embedding · llm · modelcontext · modelruntime · rerank · retrieval · tracing · webfetch） | 未拆分（**条件触发**项） |
+| `domains` | `:domains` **1343 件** | 域间边 **7 条**（①clearable **0** / ②owner 2 / ③族内 5）；域布局抽样见 C |
+| `boot` | **13 件** | ✅ 达标（唯一组合根、不执行业务 SQL） |
+
+**B. 载体纯度（§12.0 判据 vs 现状；门禁 C1~C4）**
+
+| 项 | 现状 | 门禁 |
+|---|---|---|
+| `:common` 持久化实体 | **8**（`User` · `Chunk` · `Knowledge` · `KnowledgeBase` · `StorageBackend` · `Tenant` · `WikiPage` · `WikiPageIssue`） | C2（只许减） |
+| `:common` 域侧 TypeHandler | **10** | C2 |
+| `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
+| `:common` 受控依赖根 | 10 根 / 69 文件 | C1 |
+| `:contract` **误搬件** | **8**（3 件 `KnowledgeBase*Config` + 5 件内部件）→ 见 §12.5 第三道判据 | **待加 C5/C6** |
+| `:common` 规模 | **274 件** = `common/*` 134 + `platform/*` 139 + `event/*` 1 | — |
+
+**C. 域布局抽样（以方案 §8.8.2 `knowledge/` 为范本）**
+
+| 方案条目 | 实际 | 差距 |
+|---|---|---|
+| `knowledge/chunker/`（14 件） | 仍在 `:common/knowledge/chunker` | ✗ **应回域** |
+| `knowledge/domain/{KnowledgeBaseAsrConfig, KnowledgeBaseStorageConfig, KnowledgeBaseStorageProviderConfig}` | 被误搬入 `:contract` | ✗ **应回域**（方案原文即依据） |
+| `knowledge/api/{KnowledgeIngestAdapter, KnowledgeReaderAdapter, KnowledgeSearchAdapter, RetrievalCatalogAdapter}` | 未实现（`KnowledgeIngest` 端口未落） | ✗ 未实现的目标形态 |
+
+**D. 差距四分类（决定"要不要还、什么时候还"）**
+
+- **A 类·结构性未做（条件触发，不算欠债）**：`:platform` 模块提取、三 runtime 拆分 —— 门槛＝§12.5 准入 G1~G4
+- **B 类·载体欠债（已登记，只许减）**：8 实体 + 10 handler + 14 载荷 + 3 待去 Jackson + **8 误搬件（本次新登记）**
+- **C 类·未实现目标形态**：`KnowledgeIngest*` / `KnowledgeReader` / `contract.execution` / `contract.settings` / `platform.execution` 等 §8.1/§8.2 规划件
+- **D 类·跟踪与文档（本次已修）**：方案与实施文档入版本库（`docs/`）+ 本节
+
+### 16.2 执行方案（批次表；每批独立提交 + §12.4 六条验收协议）
+
+| 序 | 批 | 内容 | 前置 | 读数目标 |
+|---|---|---|---|---|
+| 1 | **D0 纠偏** | 8 件误搬件归位：3 件 config 回 `knowledge/domain`（方案 §8.8.2 有据）+ 5 件内部件回域（`KnowledgeHashes` · `KnowledgePaths` · `KnowledgeTaskIdCodec` · `DuplicateKnowledgeDetails` · `KnowledgeProcessingQueue`） | **先落 `KnowledgeIngest` 端口**（否则重建 `datasource→knowledge` 边） | `:contract` 172 → 164 |
+| 2 | **D1 契约料余量** | `wiki` 4 件 · `agent/tool` 3 件 · `settings` 1 件 · `session` 1 件 · **互引 15 件同批** | §12.5 三道搬前判据 | `common/*` → ~120 |
+| 3 | **C 实体收窄** | 8 实体 + 10 handler；先窄读（`StorageBackend` · `WikiPageIssue`）→ 后宽字段（`KnowledgeBase` · `Knowledge` · `Chunk` · `User` · `Tenant` · `WikiPage`） | §12.6 载体选型决策表 | C2 → 0 |
+| 4 | **G1-b 去 Jackson** | `ChunkFacts` · `KnowledgeBaseView` · `KnowledgeDocumentFacts` · `DocumentChunkMetadata` · `FaqChunkMetadata` · `AppError` | 线格式确认（金片 + 前端） | C4 待归位 → 0 |
+| 5 | **platform 提取** | 139 件独立成 `:platform` Gradle 模块 | §12.5 准入 G1~G4 | 阶段 6 第一刀 |
+| 6 | **三 runtime** | `:engine` 318 件拆 `agent-engine` / `retrieval-engine` / `model-runtime` | 上一步 + G4 证据 | 阶段 6 第二刀 |
+| 7 | **domains 收尾** | 按 §8.9 逐域布局对账（`chunker` 回域等） | 上两步 | 阶段 6 收尾 |
+
+### 16.3 防跑偏机制（M1~M6；落地状态见表）
+
+| # | 机制 | 内容 | 状态 |
+|---|---|---|---|
+| **M1** | **收口三问（提交前必答）** | ① **载体**：本次引入/移动了哪些载体？逐个过 §5.1 三测了吗？② **等价物**：是否新建了与既有等价者？须写"为何不复用"；③ **固化**：本次教训是否已转成机械检查？未转的进"待固化队列" | ⬜ 待落地（本轮提出） |
+| **M2** | **搬迁整链脚本化** | `scripts/relocate.py`：三道判据预检（含同包共居扫描）→ FQN/import 自动修复 → **强制**跑 R7/B124/B169 → javadoc 跨模块链接扫描 | ⬜ |
+| **M3** | **门禁扩展三卡** | **C5 落点双向**（`common/**` 新增载荷型 ⇒ 红；`contract/**` 出现 `domain/` 包或 `@TableField`/`typeHandler`/`Mapper` ⇒ 红）；**C6 三测命名**（`contract/**` 内 `*Hashes`/`*Paths`/`*Codec`/`*Queue` 等内部件命名 ⇒ 警告 + 登记）；**C7 等价物核查**（新增 L1 端口/视图时列同名同签名候选） | ⬜ |
+| **M4** | **载体选型决策表（§12.6 待建）** | 跨域面**四选一**：`contract` 视图/SPI · 域写端口 · 用例归位 · platform 面；附**反例清单**（本次 8+3+2 件） | ⬜ |
+| **M5** | **批次就绪度卡** | 批次标签按结构判据表（读面视图覆盖 / 写面端口或归位 / L1 组件处理 / 阻塞项）；三格不齐 ⇒ 一律标"**设计批**"（防"设计题标成机械题"） | 部分（§12.4 难度筛表） |
+| **M6** | **负面清单 + 指标对账** | 三条禁令：**不上提持久化实体 · 不新增 Gradle 模块 · 不在 `contract` 放领域内部件**；每阶段做一次"指标下降是否伴随载体正确"对账（防 Goodhart） | ⬜ |
+
+**一句话根因**（供后续 Agent 判断优先级）：**指标（边数/文件数）一旦先于判据立起来，动作就会沿最省力路径走；教训不转成脚本，就会按"第 N 次"复发。** ⇒ 任何新指标上线时，**必须同时上线它的载体判据与门禁**（M3），否则宁可不立指标。

@@ -1093,8 +1093,8 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 ### 15.4 架构整改批次（R 系列，2026-10-13 立项）
 
-> 方案：`outputs/java-remediation-plan-2026-10-13.md`（架构审查 + 目标结构 + 阶段路线）；
-> 实施计划与勘察证据：`outputs/java-remediation-implementation-plan-2026-10-13.md`（批次表原件）。
+> 方案：`docs/java-remediation-plan-2026-10-13.md`（架构审查 + 目标结构 + 阶段路线）；
+> 实施计划与勘察证据：`docs/java-remediation-implementation-plan-2026-10-13.md`（批次表原件）。
 > 口径：先正确性（阶段 1~3）→ 结构收敛（阶段 4~5）→ 模块提取（阶段 6）；**每批独立提交独立全绿**；
 > 守卫/规则类改动必配红态探针；结构搬迁不夹带行为变更。两条硬规则基线（实测）：A16=81 类、A17=55 类，只许减。
 
@@ -1133,7 +1133,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **三个红态探针全验**：① 注入 `common/probe` 持久层引用 ⇒ 修前 R6 计数 **0**（漏检）、修后 `持久层 ['probe']`；② 注入子包环 `probe.a ⇄ probe.b` ⇒ R9 `14 组（基线 13）；✗ 新增` + rc=1（同时 R1/R1b 保持 0 ⇒ 证明看到了顶层域看不见的环）；③ 基线塞假 SCC ⇒ `已消除/变形（请 --write 刷新基线）` + rc=1。探针全删后复绿。
 - **Tarjan 抽取**：顶层域与完整包共用一份 `sccs_of()`（同政策一份实现）；包图**两趟收边**（先登记全部包再收边——探针开发期实测：单趟版把 13 组看成 9 组，漏了"目标包尚未读到"的边）。
 - **基线 diff 干净**：`package-cycles.baseline.json` 仅新增 `package_sccs`（+71 行），其余键零变化。**闸门**：十一守卫全绿 ✓ · `spotlessCheck build` ✓ **1m31s** ✓（脚本批，Java 零改动，未重启 dev）。
-- **同时登记**：R 系列批次表（本节）+ 实施计划 `outputs/java-remediation-implementation-plan-2026-10-13.md`（含勘察证据与两个拍板点）。
+- **同时登记**：R 系列批次表（本节）+ 实施计划 `docs/java-remediation-implementation-plan-2026-10-13.md`（含勘察证据与两个拍板点）。
 
 **✅ B233（2026-10-13，ArchUnit A16/A17 两条硬规则）**
 - **A16「边界层不得被用例层引用」**：`..service..` 不得直接依赖 `controller/mapper/task/client/channel`（同包依赖除外——同包是落点问题，归 Mapper 包约定等规则管）；**ArchUnit 语义实测基线 76 类**（import 口径 81 文件——ArchUnit 含签名/注解/泛型面；**以 ArchUnit 实测为准**）。
