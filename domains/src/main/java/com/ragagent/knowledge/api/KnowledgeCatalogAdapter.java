@@ -7,8 +7,10 @@ import org.springframework.stereotype.Component;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 
@@ -21,11 +23,14 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
 
     private final KnowledgeService knowledgeService;
     private final KnowledgeBaseService knowledgeBaseService;
+    private final ChunkRepository chunkRepository;
 
     public KnowledgeCatalogAdapter(KnowledgeService knowledgeService,
-                                   KnowledgeBaseService knowledgeBaseService) {
+                                   KnowledgeBaseService knowledgeBaseService,
+                                   ChunkRepository chunkRepository) {
         this.knowledgeService = knowledgeService;
         this.knowledgeBaseService = knowledgeBaseService;
+        this.chunkRepository = chunkRepository;
     }
 
     @Override
@@ -71,6 +76,11 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
             String displayName, JsonNode customMetadata, String channel) {
         return knowledgeService.createFromFile(kbId, fileContent, fileName, displayName,
                 customMetadata, channel);
+    }
+
+    @Override
+    public Chunk getChunkByIdOnly(String id) {
+        return chunkRepository.getChunkByIdOnly(id);
     }
 
     @Override

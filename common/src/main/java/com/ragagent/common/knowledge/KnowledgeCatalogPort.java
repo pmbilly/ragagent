@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 
@@ -49,6 +50,14 @@ public interface KnowledgeCatalogPort {
     /** 从文件内容建知识（IM 附件落库路径）；重复 ⇒ 409 异常。 */
     Knowledge createFromFile(String kbId, byte[] fileContent, String fileName,
             String displayName, JsonNode customMetadata, String channel);
+
+    // ── 分块（读，权限解析用） ──
+
+    /**
+     * 按 id 取分块。<b>无租户过滤</b>（调用方自行做权限裁决，如 embed 公开读取的
+     * 白名单校验）；软删行不可见，找不到 ⇒ 域内 not-found 运行时异常原样上抛。
+     */
+    Chunk getChunkByIdOnly(String id);
 
     // ── 知识库 ──
 

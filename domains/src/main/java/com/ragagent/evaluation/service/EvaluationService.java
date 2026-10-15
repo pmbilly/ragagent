@@ -33,7 +33,7 @@ import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.common.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.common.model.ModelCatalogPort;
 import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.session.service.SessionKnowledgeQaService;
+import com.ragagent.chatpipeline.spi.KnowledgeQaEventPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -98,7 +98,7 @@ public class EvaluationService {
     private final ModelCatalogPort modelCatalog;
     private final DatasetService datasetService;
     private final KnowledgeCatalogPort knowledgeCatalog;
-    private final SessionKnowledgeQaService sessionKnowledgeQaService;
+    private final KnowledgeQaEventPort knowledgeQaEvents;
 
     /** 任务存储：taskID → detail。 */
     private final Map<String, EvaluationDetail> store = new ConcurrentHashMap<>();
@@ -106,11 +106,11 @@ public class EvaluationService {
     public EvaluationService(ModelCatalogPort modelCatalog,
                              DatasetService datasetService,
                              KnowledgeCatalogPort knowledgeCatalog,
-                             SessionKnowledgeQaService sessionKnowledgeQaService) {
+                             KnowledgeQaEventPort knowledgeQaEvents) {
         this.modelCatalog = modelCatalog;
         this.datasetService = datasetService;
         this.knowledgeCatalog = knowledgeCatalog;
-        this.sessionKnowledgeQaService = sessionKnowledgeQaService;
+        this.knowledgeQaEvents = knowledgeQaEvents;
     }
 
     /**
@@ -320,7 +320,7 @@ public class EvaluationService {
                            MetricHook.HookMetric metricHook, AtomicInteger finished,
                            Object progressLock) {
         ChatManage chatManage = buildChatManage(detail.params, knowledgeBaseId, qaPair, tenantId);
-        sessionKnowledgeQaService.knowledgeQAByEvent(chatManage, PipelineBuilder.presets().get("rag"));
+        knowledgeQaEvents.knowledgeQAByEvent(chatManage, PipelineBuilder.presets().get("rag"));
 
         metricHook.recordInit(index);
         metricHook.recordQaPair(index, qaPair);

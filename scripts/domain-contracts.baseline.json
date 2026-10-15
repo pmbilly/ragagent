@@ -101,12 +101,6 @@
       "EmbedChannelController",
       "EmbedChannelDelegateOps"
     ],
-    "embedchannel→knowledge": [
-      "EmbedChannelService"
-    ],
-    "evaluation→session": [
-      "EvaluationService"
-    ],
     "im→session": [
       "ImAttachmentPreparer",
       "ImQaRequests",

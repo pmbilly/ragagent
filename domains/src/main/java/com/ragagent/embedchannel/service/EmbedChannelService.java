@@ -20,7 +20,7 @@ import com.ragagent.embedchannel.EmbedTokens;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.mapper.EmbedChannelMapper;
 import com.ragagent.common.knowledge.domain.Chunk;
-import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
 /**
  * embed 渠道 service（含 session token/签名段）。
@@ -53,19 +53,19 @@ public class EmbedChannelService {
 
     private final EmbedChannelMapper repo;
     private final AgentLookup agentLookup;
-    private final ChunkRepository chunkRepository;
+    private final KnowledgeCatalogPort knowledgeCatalog;
     private final EmbedTokenStore tokenStore;
     /** 部署形态（是否生产影响 embed 渠道来源白名单校验）。 */
     private final DeploymentProperties deploymentProperties;
 
     public EmbedChannelService(EmbedChannelMapper repo,
                                AgentLookup agentLookup,
-                               ChunkRepository chunkRepository,
+                               KnowledgeCatalogPort knowledgeCatalog,
                                EmbedTokenStore tokenStore,
                                DeploymentProperties deploymentProperties) {
         this.repo = repo;
         this.agentLookup = agentLookup;
-        this.chunkRepository = chunkRepository;
+        this.knowledgeCatalog = knowledgeCatalog;
         this.tokenStore = tokenStore;
         this.deploymentProperties = deploymentProperties;
     }
@@ -572,7 +572,7 @@ public class EmbedChannelService {
         }
         Chunk chunk;
         try {
-            chunk = chunkRepository.getChunkByIdOnly(cid);
+            chunk = knowledgeCatalog.getChunkByIdOnly(cid);
         } catch (RuntimeException e) {
             throw new ChunkNotFoundError();
         }
