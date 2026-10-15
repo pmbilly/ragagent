@@ -28,7 +28,7 @@ import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.common.storage.StorageBackendView;
+import com.ragagent.contract.storage.StorageBackendView;
 import com.ragagent.knowledge.domain.UserKbPin;
 import com.ragagent.knowledge.repository.UserKbPinRepository;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ import com.ragagent.common.knowledge.domain.KnowledgeBaseImageProcessingConfig;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.storage.StorageBackendPort;
+import com.ragagent.contract.storage.StorageBackendPort;
 
 /**
  * （覆盖 CRUD + pin + move-targets + 计数回填；

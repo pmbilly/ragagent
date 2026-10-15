@@ -36,4 +36,24 @@ public final class JsonMappers {
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .build();
     }
+
+    /**
+     * {@code JsonNode} → 纯 JDK 值（对象→{@code LinkedHashMap}、数组→{@code ArrayList}、
+     * 文本/数值/布尔/null→对应 JDK 类型）——供**去 Jackson 的契约载荷**在边界转换，
+     * 转换后由 Jackson 序列化的字节与直接序列化原 {@code JsonNode} **一致**（键序保留）。
+     */
+    public static Object toJavaValue(com.fasterxml.jackson.databind.JsonNode node) {
+        if (node == null || node.isNull()) {
+            return null;
+        }
+        return lenient().convertValue(node, Object.class);
+    }
+
+    /**
+     * 纯 JDK 值 → {@code JsonNode}（{@link #toJavaValue} 的逆；null ⇒ {@code NullNode}）。
+     * 供"载荷已去 Jackson、但域内仍需 JSON 树"的一侧还原。
+     */
+    public static com.fasterxml.jackson.databind.JsonNode toJsonNode(Object value) {
+        return lenient().valueToTree(value);
+    }
 }

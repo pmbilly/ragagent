@@ -1741,6 +1741,17 @@ public interface AdminUserPort {
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 G1-b-1·`StorageBackendView` 去 Jackson + 视图/端口整批入 `:contract`（C4 载荷 13 → 12）（2026-10-15）**
+- **G1-b（去 Jackson）的第一步：12 件登记载荷里最小、最干净的一件** —— 先测"内容读取 vs 透传"：`StorageBackendView.config` **0 处内容读取 / 20 处透传** ✓
+- **⭐ 机制（后续 11 件可复用）**：
+  1. **`platform.web.JsonMappers` 新增纯 JDK 双向助手**：`toJavaValue(JsonNode)`（对象→`LinkedHashMap`、数组→`ArrayList`、标量→包装类型；**键序保留 ⇒ 序列化字节与直接序列化 `JsonNode` 一致**）/ `toJsonNode(Object)`（逆，null-safe）
+  2. `StorageBackendView.config`：`JsonNode` → **`Object`**（jsonb 原样：对象/数组/标量 ⇒ 零依赖契约装得下，且任意形状都不会转型失败）
+  3. **视图与端口整批 `git mv` → `contract.storage`**（该包已存在）；全仓仅 **4 处**引用需更新
+  4. **边界转换只落在适配器**：`toView` = `JsonMappers.toJavaValue(entity.getConfig())`；`toEntity`（探测写面）= `JsonMappers.toJsonNode(view.getConfig())`；`SystemController` 的探测构造点**无需改动**（原 `ObjectNode` 可直接赋给 `Object`，且 `toJsonNode` 对节点幂等）
+- **⭐ 读数**：**C4 载荷型文件 13 → 12** ✓（`StorageBackendPort` 离开 `common/**`；基线已收紧 + 陈旧 PENDING_DEJACKSON 条目已删）；`common/*` 113 → **111**；`:contract` 180 → **182**；**R10 保持 6 条边 / 51 类 / ①档 0** ✓（契约件不产生域间边）
+- **⚠️ 顺带查清并修复一个既有缺陷（非本刀引入，已用 `git stash` 法证明）**：`StorageWriteFaceContractTest` 5/6 失败（H2 报 `Table "RESOURCES" not found (this database is empty)`）——根因＝**该测试类没有像兄弟类那样自播种 schema**（`TestSchema.createTables/resetData`），而是依赖"同一 JVM 内其它测试类先建表" ⇒ **顺序依赖的脆弱测试**（此前被 Gradle 测试缓存掩盖，本刀使输入失效后才暴露）。**修法：与兄弟类同款加 `@BeforeEach` 播种** ⇒ 该类 **6/0** ✓。**判据：测试结果依赖别的测试类 ⇒ 按缺陷修（自播种 schema 是本仓既有约定）**
+- **验证**：**14 守卫全绿**（C4 = 12）；**1349 金片签名一致** ✓；`spotlessCheck build` **1m42s**；**4991 / 失败 0 / 跳过 4**；dev ready + 冒烟（storage-backends / system-info / KB / sessions **200** ✓；**`GET /system/storage-engine-status` ⇒ 200**（端口 `list` → 契约视图）· **`POST /system/storage-engine-check` ⇒ 200 `{"ok":true,"message":"本地存储无需检测"}`**（构造视图（config 为纯 JDK 值）→ 端口 `test` → 适配器 `toJsonNode`）✓✓）
+- **G1-b 余量（11 件登记载荷）**：`ChunkRowView`/`ChunkPageView`（`emb-pub-chunk-ok.json` 金片护航）· `TenantRowView`（9 个 JsonNode **全零内容读取**）· `KnowledgeBaseRowView`/`KnowledgeRowView`/`KnowledgeBaseView`/`KnowledgeDocumentFacts`/`ChunkFacts`（少量内容读取：2/2/1/2/0）· `WikiPageView`（1）· `AdminUserView`+`AdminUserPort`（`preferences` 是 Jackson 注解**类型**，非 JsonNode ⇒ 需另策）
 **🔶 E1·知识分块簇归位域 + 分块能力契约化（`common/*` 125 → 113）（2026-10-15）**
 - **依据**：方案 §8.8.2 把分块实现明列在 `knowledge/chunker/` ⇒ 该簇归位域内；`Tokens`/`CodePoints` 是**跨域共享文本工具**（engine/agent/session/im/wiki）⇒ 留 L1
 - **先测后动的四项实测（其中两项推翻了先前判断）**：
@@ -2671,7 +2682,7 @@ public interface AdminUserPort {
 
 | 目标模块 | 实际 | 差距 |
 |---|---|---|
-| `contracts` | `:contract` **180 件** ✅ 已独立 | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
+| `contracts` | `:contract` **182 件** ✅ 已独立（G1-b-1 后） | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
 | `platform` | `com.ragagent.platform.*` **139 件仍在 `:common`** | **未独立成模块**；包覆盖：方案 **23** vs 实际 **15** ⇒ 缺 `execution` · `outbox` · `parsing` · `storage.config` · `storage.provider` · `tracing.decorators` · `tracing.langfuse` · `transaction` · `web.error` · `web.health`；多 `redis` · `tracing` |
 | `agent-engine` · `retrieval-engine` · `model-runtime` | `:engine` **318 件 / 9 顶层包**（chatpipeline · embedding · llm · modelcontext · modelruntime · rerank · retrieval · tracing · webfetch） | 未拆分（**条件触发**项） |
 | `domains` | `:domains` **1343 件** | 域间边 **7 条**（①clearable **0** / ②owner 2 / ③族内 5）；域布局抽样见 C |
@@ -2686,7 +2697,7 @@ public interface AdminUserPort {
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
 | `:common` 受控依赖根 | 10 根 / 61 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
-| `:common` 规模 | **253 件** = `common/*` **113** + `platform/*` 139 + `event/*` 1（E1 后） | — |
+| `:common` 规模 | **251 件** = `common/*` **111** + `platform/*` 139 + `event/*` 1（G1-b-1 后） | — |
 
 **C. 域布局抽样（以方案 §8.8.2 `knowledge/` 为范本）**
 

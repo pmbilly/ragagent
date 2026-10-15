@@ -1,4 +1,4 @@
-package com.ragagent.common.storage;
+package com.ragagent.contract.storage;
 
 import java.util.List;
 

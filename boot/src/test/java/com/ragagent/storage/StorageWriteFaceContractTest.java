@@ -7,11 +7,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.ragagent.TestSchema;
 import com.ragagent.storage.fileserve.LocalFileContentService;
 import com.ragagent.storage.fileserve.StorageFileResolver;
 import com.ragagent.common.storage.fileserve.WritableFileContentService;
@@ -35,6 +37,13 @@ class StorageWriteFaceContractTest {
     private ResourceCatalogService catalog;
     @Autowired
     private JdbcTemplate jdbc;
+
+    /** 与 <b>兄弟类</b>（{@code StorageBackendContractTest} 等）同款：本类自播种 schema。 */
+    @BeforeEach
+    void ensureSchema() {
+        TestSchema.createTables(jdbc);
+        TestSchema.resetData(jdbc);
+    }
 
     @Test
     void saveBytesRegistersAndRoundTrips(@org.junit.jupiter.api.io.TempDir Path tmp)

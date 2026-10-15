@@ -1,8 +1,6 @@
-package com.ragagent.common.storage;
+package com.ragagent.contract.storage;
 
 import java.time.OffsetDateTime;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * 存储后端**行视图**（L1）：{@code StorageBackendPort} 运维面（探测 / 清单 / 按 id 与 provider 读取）
@@ -12,9 +10,10 @@ import com.fasterxml.jackson.databind.JsonNode;
  * ——持久化实体归各域）；跨域方（system 的连通性检测与系统信息、knowledge 的 KB 存储后端解析）
  * 只应经本视图。</p>
  *
- * <p><b>落点说明（登记 HANDOFF §12.5）</b>：{@code config} 是 {@code JsonNode}（存储配置 jsonb 原样透传），
- * 而 `:contract` 零依赖装不下 Jackson ⇒ 暂留 L1（与端口同处），登记为**待去 Jackson**；
- * 去 Jackson 后本视图与端口可整批入 `contract.storage`。</p>
+ * <p><b>落点</b>：本视图与 {@link StorageBackendPort} 已**入 {@code :contract}**（G1-b 去 Jackson 后，
+ * 2026-10-15）：{@code config} 由 {@code JsonNode} 改为**纯 JDK 值**（对象→{@code Map}、数组→{@code List}、
+ * 标量→包装类型），边界转换见 {@code platform.web.JsonMappers#toJavaValue}/{@code #toJsonNode}；
+ * 序列化字节与直接序列化 {@code JsonNode} 一致（键序保留）。</p>
  *
  * <p>访问器名与实体逐一相同（含 {@code isLegacyAlias()}）⇒ 消费方改类型即等价。</p>
  */
@@ -24,7 +23,8 @@ public class StorageBackendView {
     private Long tenantId;
     private String name;
     private String provider;
-    private JsonNode config;
+    /** 存储配置 jsonb **原样透传**（对象/数组/标量；{@code null} 表示无配置）。 */
+    private Object config;
     private String source;
     private String status;
     private boolean legacyAlias;
@@ -64,11 +64,11 @@ public class StorageBackendView {
         provider = v;
     }
 
-    public JsonNode getConfig() {
+    public Object getConfig() {
         return config;
     }
 
-    public void setConfig(JsonNode v) {
+    public void setConfig(Object v) {
         config = v;
     }
 

@@ -13,10 +13,10 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import com.ragagent.common.storage.StorageBackendView;
+import com.ragagent.contract.storage.StorageBackendView;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.platform.storage.config.StorageAllowList;
-import com.ragagent.common.storage.StorageBackendPort;
+import com.ragagent.contract.storage.StorageBackendPort;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;

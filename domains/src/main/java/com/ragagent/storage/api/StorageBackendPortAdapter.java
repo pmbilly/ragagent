@@ -4,11 +4,12 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.storage.StorageBackendView;
+import com.ragagent.contract.storage.StorageBackendView;
 import com.ragagent.storage.domain.StorageBackend;
-import com.ragagent.common.storage.StorageBackendPort;
+import com.ragagent.contract.storage.StorageBackendPort;
 import com.ragagent.storage.mapper.StorageBackendRepository;
 import com.ragagent.storage.service.StorageBackendService;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * {@link StorageBackendPort} 的存储域实现：探测与脱敏转发运行时探测服务，清单转发元数据仓储。
@@ -63,7 +64,8 @@ public class StorageBackendPortAdapter implements StorageBackendPort {
         v.setTenantId(b.getTenantId());
         v.setName(b.getName());
         v.setProvider(b.getProvider());
-        v.setConfig(b.getConfig());
+        // config 去 Jackson：JsonNode → 纯 JDK 值（序列化字节一致，见 JsonMappers#toJavaValue）
+        v.setConfig(JsonMappers.toJavaValue(b.getConfig()));
         v.setSource(b.getSource());
         v.setStatus(b.getStatus());
         v.setLegacyAlias(b.isLegacyAlias());
@@ -83,7 +85,7 @@ public class StorageBackendPortAdapter implements StorageBackendPort {
         b.setTenantId(v.getTenantId());
         b.setName(v.getName());
         b.setProvider(v.getProvider());
-        b.setConfig(v.getConfig());
+        b.setConfig(JsonMappers.toJsonNode(v.getConfig()));
         b.setSource(v.getSource());
         b.setStatus(v.getStatus());
         b.setLegacyAlias(v.isLegacyAlias());
