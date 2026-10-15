@@ -23,7 +23,7 @@ import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.service.management.KnowledgeService;
-import com.ragagent.model.service.ModelRuntimeAssembler;
+import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
@@ -58,7 +58,7 @@ class MessageServiceChatHistoryIndexTest {
                 tenantService,
                 mock(KnowledgeBaseService.class),
                 mock(HybridSearchService.class),
-                mock(ModelRuntimeAssembler.class));
+                mock(ModelRuntimePort.class));
         TenantContext.set(TENANT, null, null, false, "u-1", false);
     }
 

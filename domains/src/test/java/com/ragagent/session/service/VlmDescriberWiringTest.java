@@ -20,9 +20,10 @@ import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.model.domain.Model;
 import com.ragagent.common.model.ModelParameters;
-import com.ragagent.model.service.ModelRuntimeAssembler;
+import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.retrieval.vlm.VlmClient;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 
 /**
  * VLM 描述器装配的验收：成功装配后逐张图片调用 predict；失败形态是
@@ -37,7 +38,7 @@ class VlmDescriberWiringTest {
 
     private final List<String> requestedUrls = new ArrayList<>();
 
-    private ModelRuntimeAssembler runtimeFactory() {
+    private ModelRuntimePort runtimeFactory() {
         // ollama provider 在 VLM 路径不触达；vlm 面不需要它
         return new ModelRuntimeAssembler(modelService, cryptoService,
                 null, governor, ssrfGuard);

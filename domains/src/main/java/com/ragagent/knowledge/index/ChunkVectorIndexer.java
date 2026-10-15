@@ -22,7 +22,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.model.domain.Model;
-import com.ragagent.model.service.ModelRuntimeAssembler;
+import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
 import org.slf4j.Logger;
@@ -63,7 +63,7 @@ public class ChunkVectorIndexer {
     private final EmbedderClient embedder;
     private final VectorStoreService vectorStore;
     private final KnowledgeVectorWrites vectorWrites;
-    private final ModelRuntimeAssembler modelRuntimeAssembler;
+    private final ModelRuntimePort modelRuntimeAssembler;
     /** 批量向量化批大小（属性绑定）。 */
     private final BatchEmbedProperties batchEmbedProperties;
 
@@ -73,7 +73,7 @@ public class ChunkVectorIndexer {
                               EmbedderClient embedder,
                               VectorStoreService vectorStore,
                               KnowledgeVectorWrites vectorWrites,
-                              ModelRuntimeAssembler modelRuntimeAssembler,
+                              ModelRuntimePort modelRuntimeAssembler,
                               BatchEmbedProperties batchEmbedProperties) {
         this.kbRepository = kbRepository;
         this.knowledgeRepository = knowledgeRepository;

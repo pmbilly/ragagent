@@ -25,12 +25,12 @@ import com.ragagent.knowledge.chunker.Tokens;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.knowledge.support.ParserEngineRules;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
-import com.ragagent.model.service.ModelRuntimeAssembler;
+import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.session.service.TemporaryDocumentService.CreateOptions;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.model.domain.Model;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * {@code TemporaryDocumentService} 的**解析 / 落盘管线子模块**（§14 步骤 2）：异步投递与重试、
@@ -56,14 +56,14 @@ final class TemporaryDocumentProcessor {
     private final TemporaryDocumentRepository repo;
     private final AttachmentFileStore fileStore;
     private final DocReaderParsePort docReader;
-    private final ModelRuntimeAssembler modelRuntimeAssembler;
+    private final ModelRuntimePort modelRuntimeAssembler;
     private final AsrTranscriber asrTranscriber;
     private final TenantConfigLookup tenantService;
 
     TemporaryDocumentProcessor(TemporaryDocumentRepository repo,
                                AttachmentFileStore fileStore,
                                DocReaderParsePort docReader,
-                               ModelRuntimeAssembler modelRuntimeAssembler,
+                               ModelRuntimePort modelRuntimeAssembler,
                                AsrTranscriber asrTranscriber,
                                TenantConfigLookup tenantService) {
         this.repo = repo;
@@ -218,16 +218,16 @@ final class TemporaryDocumentProcessor {
             throw new RuntimeException("audio transcription model is not configured");
         }
         return withResourceTenant(resourceTenantId, () -> {
-            Model model;
+            ModelRowView model;
             try {
                 model = modelRuntimeAssembler.getAsrModel(asrModelId);
             } catch (RuntimeException e) {
                 throw new RuntimeException("load ASR model: " + e.getMessage(), e);
             }
-            var p = model.getParameters();
+            var p = model.parameters();
             // language 不从模型来（恒空），customHeaders 透传
             var config = new AsrTranscriber.AsrConfig(p == null ? "" : p.getBaseUrl(),
-                    model.getName(), p == null ? "" : p.getApiKey(), model.getId(), "",
+                    model.name(), p == null ? "" : p.getApiKey(), model.id(), "",
                     p == null ? null : p.getCustomHeaders());
             try {
                 return asrTranscriber.transcribe(config, data, fileName).text();

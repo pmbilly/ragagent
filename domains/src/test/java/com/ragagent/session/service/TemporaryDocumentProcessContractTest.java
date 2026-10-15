@@ -23,11 +23,11 @@ import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.model.domain.Model;
 import com.ragagent.common.model.ModelParameters;
-import com.ragagent.model.service.ModelRuntimeAssembler;
+import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 附件解析链路的验收（资源租户、引擎回落与音频分支）：
@@ -42,7 +42,7 @@ class TemporaryDocumentProcessContractTest {
     private TemporaryDocumentRepository repo;
     private AttachmentFileStore fileStore;
     private DocReaderParsePort docReader;
-    private ModelRuntimeAssembler modelRuntimeAssembler;
+    private ModelRuntimePort modelRuntimeAssembler;
     private AsrTranscriber asrTranscriber;
     private TenantConfigLookup tenantService;
     private TemporaryDocumentService service;
@@ -52,7 +52,7 @@ class TemporaryDocumentProcessContractTest {
         repo = mock(TemporaryDocumentRepository.class);
         fileStore = mock(AttachmentFileStore.class);
         docReader = mock(DocReaderParsePort.class);
-        modelRuntimeAssembler = mock(ModelRuntimeAssembler.class);
+        modelRuntimeAssembler = mock(ModelRuntimePort.class);
         asrTranscriber = mock(AsrTranscriber.class);
         tenantService = mock(TenantConfigLookup.class);
         service = new TemporaryDocumentService(repo, fileStore, docReader,
@@ -79,13 +79,9 @@ class TemporaryDocumentProcessContractTest {
         return d;
     }
 
-    private static Model asrModel() {
-        Model m = new Model();
-        m.setId("asr-1");
-        m.setName("asr-test");
-        m.setSource("remote");
-        m.setParameters(new ModelParameters());
-        return m;
+    private static ModelRowView asrModel() {
+        return new ModelRowView("asr-1", "asr-test", "KnowledgeQA", "remote", "active", false,
+                new ModelParameters());
     }
 
     /** 租户的 chat 解析规则节点（pdf → engine）；自 A③ 起经 L1 端口读配置，不再取实体。 */

@@ -20,7 +20,7 @@ import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.kb.KBCloneProgress;
-import com.ragagent.model.service.ModelRuntimeAssembler;
+import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.engine.PgVectorEngineRepository;
 import org.springframework.stereotype.Service;
 import com.ragagent.embedding.Embedder;
@@ -52,7 +52,7 @@ public class KnowledgeCloneService {
     private final KnowledgeTaskProgressStore progressStore;
     private final KnowledgeVectorWrites vectorWrites;
     private final PgVectorEngineRepository pgVectorEngineRepository;
-    private final ModelRuntimeAssembler modelRuntimeAssembler;
+    private final ModelRuntimePort modelRuntimeAssembler;
     /** 后台任务执行器（统一命名与关停）。 */
     private final KnowledgeTaskExecutor taskExecutor;
 
@@ -64,7 +64,7 @@ public class KnowledgeCloneService {
             KnowledgeTaskProgressStore progressStore,
             KnowledgeVectorWrites vectorWrites,
             PgVectorEngineRepository pgVectorEngineRepository,
-            ModelRuntimeAssembler modelRuntimeAssembler) {
+            ModelRuntimePort modelRuntimeAssembler) {
 
         this.taskExecutor = taskExecutor;
         this.knowledgeRepository = knowledgeRepository;

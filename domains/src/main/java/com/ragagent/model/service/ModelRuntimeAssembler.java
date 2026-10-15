@@ -15,7 +15,6 @@ import com.ragagent.common.model.ModelParameters;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerFactory;
-import com.ragagent.retrieval.vlm.VlmClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -23,6 +22,9 @@ import org.springframework.stereotype.Component;
 import com.ragagent.tracing.decorators.LangfuseChatClient;
 import com.ragagent.tracing.decorators.LangfuseEmbedder;
 import com.ragagent.tracing.decorators.LangfuseReranker;
+import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.retrieval.vlm.VlmClient.VlmConfig;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 模型运行时工厂（chat / embedding / rerank / vlm / asr 五类运行时客户端的装配归口，
@@ -41,7 +43,7 @@ import com.ragagent.tracing.decorators.LangfuseReranker;
  * （BizException 的 getMessage 带 "error code: ..." 前缀，不能直接当对外文案用）。</p>
  */
 @Component
-public class ModelRuntimeAssembler {
+public class ModelRuntimeAssembler implements ModelRuntimePort {
 
     private static final Logger log = LoggerFactory.getLogger(ModelRuntimeAssembler.class);
 
@@ -109,9 +111,10 @@ public class ModelRuntimeAssembler {
     }
 
     /** repo 直取（无状态闸门）。调用方再 configFromModel + predict。 */
-    public Model getVlmModel(String modelId) {
-        Model model = getModelDirect(modelId);
-        log.info("Getting VLM model: {}, source: {}", model.getName(), model.getSource());
+    @Override
+    public ModelRowView getVlmModel(String modelId) {
+        ModelRowView model = ModelRowViews.of(getModelDirect(modelId));
+        log.info("Getting VLM model: {}, source: {}", model.name(), model.source());
         return model;
     }
 
@@ -122,8 +125,9 @@ public class ModelRuntimeAssembler {
      * <p>失败抛 {@link RuntimeException}，message 即对外错误文案——调用方
      * （模型调试端点、agent 引擎装配）直接写进 {@code data.error}。</p>
      */
-    public VlmClient.VlmConfig vlmConfigFor(Model model) {
-        VlmClient.VlmConfig config = ModelRuntimeConfigs.vlmConfig(ModelRowViews.of(model));
+    @Override
+    public VlmConfig vlmConfigFor(ModelRowView model) {
+        VlmConfig config = ModelRuntimeConfigs.vlmConfig(model);
         if (!config.isOllama()) {
             validateVlmBaseUrl(config.baseUrl());
         }
@@ -131,9 +135,10 @@ public class ModelRuntimeAssembler {
     }
 
     /** repo 直取（无状态闸门）。调用方再组 AsrConfig + transcribe。 */
-    public Model getAsrModel(String modelId) {
-        Model model = getModelDirect(modelId);
-        log.info("Getting ASR model: {}, source: {}", model.getName(), model.getSource());
+    @Override
+    public ModelRowView getAsrModel(String modelId) {
+        ModelRowView model = ModelRowViews.of(getModelDirect(modelId));
+        log.info("Getting ASR model: {}, source: {}", model.name(), model.source());
         return model;
     }
 

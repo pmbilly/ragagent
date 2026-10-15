@@ -18,7 +18,7 @@ import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.model.service.ModelRuntimeAssembler;
+import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
@@ -52,12 +52,12 @@ final class MessageSearch {
     /** 聊天历史 KB 的向量检索执行面。 */
     private final HybridSearchService hybridSearchService;
     /** rerankResults 的重排模型工厂。 */
-    private final ModelRuntimeAssembler modelRuntimeAssembler;
+    private final ModelRuntimePort modelRuntimeAssembler;
 
     MessageSearch(MessageRepository messageRepository,
                   TenantConfigLookup tenantService,
                   HybridSearchService hybridSearchService,
-                  ModelRuntimeAssembler modelRuntimeAssembler) {
+                  ModelRuntimePort modelRuntimeAssembler) {
         this.messageRepository = messageRepository;
         this.tenantService = tenantService;
         this.hybridSearchService = hybridSearchService;

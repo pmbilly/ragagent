@@ -15,7 +15,7 @@ import com.ragagent.agent.tool.runtime.ThinkBlocks;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.service.management.KnowledgeService;
-import com.ragagent.model.service.ModelRuntimeAssembler;
+import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.domain.ChatHistoryKbStats;
 import com.ragagent.session.domain.message.Message;
@@ -91,7 +91,7 @@ public class MessageService {
                           TenantConfigLookup tenantService,
                           KnowledgeBaseService knowledgeBaseService,
                           HybridSearchService hybridSearchService,
-                          ModelRuntimeAssembler modelRuntimeAssembler) {
+                          ModelRuntimePort modelRuntimeAssembler) {
         this.sessionRepository = sessionRepository;
         this.messageRepository = messageRepository;
         this.suggestionRepository = suggestionRepository;

@@ -32,7 +32,7 @@ import com.ragagent.common.model.ModelParameters;
 import com.ragagent.model.dto.ModelDebugAsrResponse;
 import com.ragagent.model.dto.ModelDebugChatResponse;
 import com.ragagent.model.dto.ModelDebugResult;
-import com.ragagent.model.service.ModelRuntimeAssembler;
+import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
 import com.ragagent.rerank.RankResult;
@@ -49,6 +49,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.model.service.ModelRowViews;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 模型调试端点（POST /api/v1/models/{id}/debug）。
@@ -77,11 +78,11 @@ public class ModelDebugController {
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final ModelService modelService;
-    private final ModelRuntimeAssembler runtimeFactory;
+    private final ModelRuntimePort runtimeFactory;
     private final AsrTranscriber asrTranscriber;
     private final VlmClient.Transport vlmTransport = new VlmHttpTransport();
 
-    public ModelDebugController(ModelService modelService, ModelRuntimeAssembler runtimeFactory,
+    public ModelDebugController(ModelService modelService, ModelRuntimePort runtimeFactory,
                                 AsrTranscriber asrTranscriber) {
         this.modelService = modelService;
         this.runtimeFactory = runtimeFactory;
@@ -322,7 +323,7 @@ public class ModelDebugController {
         if (fileBytes == null || fileBytes.length == 0) {
             throw new BizException(AppError.badRequest("image file is required"));
         }
-        Model vlmModel;
+        ModelRowView vlmModel;
         try {
             vlmModel = runtimeFactory.getVlmModel(model.getId());
         } catch (RuntimeException e) {

@@ -34,7 +34,7 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.model.service.ModelRuntimeAssembler;
+import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.contract.wiki.WikiFinalizePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -102,7 +102,7 @@ class ChunkExtractServiceTest {
         };
     }
 
-    private ModelRuntimeAssembler modelRuntimeAssembler;
+    private ModelRuntimePort modelRuntimeAssembler;
     private ChunkRepository chunkRepository;
     private KnowledgeRepository knowledgeRepository;
     private KnowledgeBaseRepository kbRepository;
@@ -115,7 +115,7 @@ class ChunkExtractServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        modelRuntimeAssembler = mock(ModelRuntimeAssembler.class);
+        modelRuntimeAssembler = mock(ModelRuntimePort.class);
         chunkRepository = mock(ChunkRepository.class);
         knowledgeRepository = mock(KnowledgeRepository.class);
         kbRepository = mock(KnowledgeBaseRepository.class);

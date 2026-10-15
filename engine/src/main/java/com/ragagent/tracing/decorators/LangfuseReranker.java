@@ -13,7 +13,7 @@ import com.ragagent.rerank.Reranker;
  * rerank 客户端的 langfuse 装饰器：
  * Rerank 发一条 generation；用量按 query + 各文档的「码点数/4 + 1」估算
  * （vendor 多按千文档计费，估算是给成本面板的比例信号）。由
- * {@code ModelRuntimeAssembler.getRerankModel} 装配。
+ * {@code ModelRuntimePort.getRerankModel} 装配。
  */
 public final class LangfuseReranker implements Reranker {
 

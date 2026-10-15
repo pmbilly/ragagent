@@ -28,7 +28,7 @@ import org.mockito.ArgumentCaptor;
 
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.model.service.ModelRuntimeAssembler;
+import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
@@ -58,7 +58,7 @@ class MessageServiceVectorSearchTest {
     private MessageRepository messageRepository;
     private TenantService tenantService;
     private HybridSearchService hybridSearchService;
-    private ModelRuntimeAssembler modelRuntimeAssembler;
+    private ModelRuntimePort modelRuntimeAssembler;
     private MessageService service;
 
     @BeforeEach
@@ -66,7 +66,7 @@ class MessageServiceVectorSearchTest {
         messageRepository = mock(MessageRepository.class);
         tenantService = mock(TenantService.class);
         hybridSearchService = mock(HybridSearchService.class);
-        modelRuntimeAssembler = mock(ModelRuntimeAssembler.class);
+        modelRuntimeAssembler = mock(ModelRuntimePort.class);
         service = new MessageService(
                 mock(SessionRepository.class),
                 messageRepository,

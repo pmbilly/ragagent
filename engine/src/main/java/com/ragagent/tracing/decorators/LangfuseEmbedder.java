@@ -12,7 +12,7 @@ import com.ragagent.embedding.Embedder;
  * embedding 客户端的 langfuse 装饰器：
  * Embed/BatchEmbed 各发一条 generation；用量按「码点数/4 + 1」估算
  * （provider 不返回 usage，Langfuse 成本报表需要非零 input tokens）。
- * 由 {@code ModelRuntimeAssembler.getEmbeddingModel} 装配。
+ * 由 {@code ModelRuntimePort.getEmbeddingModel} 装配。
  */
 public final class LangfuseEmbedder implements Embedder {
 

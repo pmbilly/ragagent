@@ -145,8 +145,6 @@
       "ModelConnectivityTestService"
     ],
     "knowledge→model": [
-      "ChunkExtractService",
-      "ChunkQuestionService",
       "ChunkVectorIndexer",
       "EmbedderClient",
       "EmbeddingModelAdapter",
@@ -154,11 +152,7 @@
       "FaqEntryCommandService",
       "FaqImportService",
       "FaqIndexWriter",
-      "KnowledgeCloneService",
-      "KnowledgeMoveService",
-      "KnowledgeProcessWorker",
-      "KnowledgeSummaryService",
-      "KnowledgeTagService"
+      "KnowledgeProcessWorker"
     ],
     "session→memory": [
       "AgentEngineAssembler",
@@ -221,18 +215,12 @@
       "TemporaryDocumentService"
     ],
     "session→model": [
-      "MessageSearch",
-      "MessageService",
-      "MessageSuggestionService",
       "QaModelSelection",
       "QaWiring",
       "SessionAgentQaService",
       "SessionKnowledgeQaService",
       "SessionQaResolution",
-      "SessionService",
-      "TemporaryDocumentProcessor",
-      "TemporaryDocumentService",
-      "VlmDescriberWiring"
+      "SessionService"
     ],
     "session→websearch": [
       "AgentToolBackends",

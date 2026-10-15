@@ -15,7 +15,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.mapper.ModelMapper;
-import com.ragagent.model.service.ModelRuntimeAssembler;
+import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import org.springframework.stereotype.Component;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
@@ -47,7 +47,7 @@ public class FaqIndexWriter {
     private final KnowledgeVectorWrites vectorWrites;
     private final VectorStoreService vectorStore;
     private final EmbedderClient embedder;
-    private final ModelRuntimeAssembler modelRuntimeAssembler;
+    private final ModelRuntimePort modelRuntimeAssembler;
     /** 批量向量化批大小（属性绑定）。 */
     private final BatchEmbedProperties batchEmbedProperties;
 
@@ -58,7 +58,7 @@ public class FaqIndexWriter {
                           KnowledgeVectorWrites vectorWrites,
                           VectorStoreService vectorStore,
                           EmbedderClient embedder,
-                          ModelRuntimeAssembler modelRuntimeAssembler,
+                          ModelRuntimePort modelRuntimeAssembler,
                           BatchEmbedProperties batchEmbedProperties) {
         this.knowledgeRepository = knowledgeRepository;
         this.modelMapper = modelMapper;

@@ -24,7 +24,7 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.model.service.ModelRuntimeAssembler;
+import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.session.domain.message.Message;
@@ -66,7 +66,7 @@ public class SessionService {
     private final MessageSuggestionRepository suggestionRepository;
     private final KnowledgeService knowledgeService;
     private final ModelService modelService;
-    private final ModelRuntimeAssembler modelRuntimeAssembler;
+    private final ModelRuntimePort modelRuntimeAssembler;
     private final ConversationProperties conversationProps;
     private final WebSearchTempKbStateService webSearchTempKbState;
 
@@ -75,7 +75,7 @@ public class SessionService {
                           MessageSuggestionRepository suggestionRepository,
                           KnowledgeService knowledgeService,
                           ModelService modelService,
-                          ModelRuntimeAssembler modelRuntimeAssembler,
+                          ModelRuntimePort modelRuntimeAssembler,
                           ConversationProperties conversationProps,
                           WebSearchTempKbStateService webSearchTempKbState) {
         this.sessionRepository = sessionRepository;
