@@ -4,7 +4,7 @@ import com.ragagent.knowledge.repository.KnowledgeRepository;
 
 import java.util.List;
 import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import org.springframework.stereotype.Service;

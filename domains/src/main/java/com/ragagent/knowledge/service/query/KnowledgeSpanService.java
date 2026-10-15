@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.service.query;
 
-import com.ragagent.knowledge.support.KnowledgeProjectionAdapter;
+import com.ragagent.common.knowledge.support.KnowledgeProjectionAdapter;
 
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;

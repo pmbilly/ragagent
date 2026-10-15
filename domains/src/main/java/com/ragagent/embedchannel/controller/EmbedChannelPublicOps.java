@@ -12,7 +12,7 @@ import com.ragagent.embedchannel.EmbedTokens;
 import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.service.EmbedChannelService;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.domain.Chunk;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;

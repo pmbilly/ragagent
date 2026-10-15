@@ -9,7 +9,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
+import com.ragagent.common.knowledge.support.KnowledgeTaskIdCodec;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.fasterxml.jackson.databind.ObjectMapper;

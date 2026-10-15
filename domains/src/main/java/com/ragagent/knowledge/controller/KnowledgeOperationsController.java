@@ -18,7 +18,7 @@ import com.ragagent.knowledge.dto.doc.MoveToFolderRequest;
 import com.ragagent.knowledge.dto.doc.RenameFolderRequest;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.knowledge.service.query.KnowledgeSearchService;
-import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
+import com.ragagent.common.knowledge.support.KnowledgeTaskIdCodec;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

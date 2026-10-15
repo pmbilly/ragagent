@@ -14,7 +14,7 @@ import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.agent.tool.runtime.ThinkBlocks;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.service.management.KnowledgeService;
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.domain.ChatHistoryKbStats;
@@ -28,7 +28,7 @@ import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.service.management.KnowledgeBaseService;
+
 import com.ragagent.session.domain.message.ArtifactVersions;
 
 /**
@@ -78,26 +78,23 @@ public class MessageService {
     private final SessionRepository sessionRepository;
     private final MessageRepository messageRepository;
     private final MessageSuggestionRepository suggestionRepository;
-    private final KnowledgeService knowledgeService;
+    private final KnowledgeCatalogPort knowledgeCatalog;
     private final TenantConfigLookup tenantService;
-    private final KnowledgeBaseService knowledgeBaseService;
     /** 聊天历史检索子模块（关键词/向量/混合 + RRF + 归属过滤 + 分组）。 */
     private final MessageSearch messageSearch;
 
     public MessageService(SessionRepository sessionRepository,
                           MessageRepository messageRepository,
                           MessageSuggestionRepository suggestionRepository,
-                          KnowledgeService knowledgeService,
+                          KnowledgeCatalogPort knowledgeCatalog,
                           TenantConfigLookup tenantService,
-                          KnowledgeBaseService knowledgeBaseService,
                           HybridSearchService hybridSearchService,
                           ModelRuntimePort modelRuntimeAssembler) {
         this.sessionRepository = sessionRepository;
         this.messageRepository = messageRepository;
         this.suggestionRepository = suggestionRepository;
-        this.knowledgeService = knowledgeService;
+        this.knowledgeCatalog = knowledgeCatalog;
         this.tenantService = tenantService;
-        this.knowledgeBaseService = knowledgeBaseService;
         this.messageSearch = new MessageSearch(messageRepository, tenantService,
                 hybridSearchService, modelRuntimeAssembler);
     }
@@ -236,7 +233,7 @@ public class MessageService {
         String knowledgeId = msg.getKnowledgeId();
         if (knowledgeId != null && !knowledgeId.isEmpty()) {
             try {
-                knowledgeService.deleteKnowledge(knowledgeId);
+                knowledgeCatalog.deleteKnowledge(knowledgeId);
             } catch (RuntimeException e) {
                 log.warn("Failed to delete chat history knowledge {}: {}", knowledgeId, e.toString());
             }
@@ -256,7 +253,7 @@ public class MessageService {
             List<String> knowledgeIds = messageRepository.getKnowledgeIdsBySessionId(sessionId);
             for (String knowledgeId : knowledgeIds) {
                 try {
-                    knowledgeService.deleteKnowledge(knowledgeId);
+                    knowledgeCatalog.deleteKnowledge(knowledgeId);
                 } catch (RuntimeException e) {
                     log.warn("Failed to delete chat history knowledge for session {}: {}",
                             sessionId, e.toString());
@@ -329,7 +326,7 @@ public class MessageService {
      * 未配置/未启用/缺 embedding 模型时
      * 静默跳过——尽力而为，失败只记日志。
      *
-     * <p><b>实现形态</b>：passage 走 {@link KnowledgeService#createFromPassageSync}，
+     * <p><b>实现形态</b>：passage 走 {@link KnowledgeCatalogPort#createFromPassageSync}，
      * 落库与索引语义同步完成，异步性由调用方的后台线程承接——HTTP 响应不受影响。</p>
      */
     public void indexMessageToKb(String userQuery, String assistantAnswer, String messageId,
@@ -359,7 +356,7 @@ public class MessageService {
 
         Knowledge knowledge;
         try {
-            knowledge = knowledgeService.createFromPassageSync(
+            knowledge = knowledgeCatalog.createFromPassageSync(
                     cfg.getKnowledgeBaseId(), List.of(passage), "");
         } catch (RuntimeException e) {
             log.warn("Failed to index message to chat history KB: {}", e.toString());
@@ -450,7 +447,7 @@ public class MessageService {
 
         try {
             KnowledgeBase kb =
-                    knowledgeBaseService.getKnowledgeBase(kbId);
+                    knowledgeCatalog.getKnowledgeBase(kbId);
             stats.setKnowledgeBaseName(kb.getName() == null ? "" : kb.getName());
             long count = kb.getKnowledgeCount();
             stats.setIndexedMessageCount(count);

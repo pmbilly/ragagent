@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.domain.Chunk;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;

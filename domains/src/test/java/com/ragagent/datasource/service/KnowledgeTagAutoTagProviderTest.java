@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.contract.error.BizException;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.domain.KnowledgeTag;
+import com.ragagent.common.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.knowledge.service.management.KnowledgeTagService;

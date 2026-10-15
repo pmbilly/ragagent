@@ -2,7 +2,7 @@ package com.ragagent.knowledge.service;
 
 import com.ragagent.knowledge.domain.KnowledgeTenants;
 
-import com.ragagent.knowledge.support.KnowledgeProjectionAdapter;
+import com.ragagent.common.knowledge.support.KnowledgeProjectionAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.domain.KnowledgeTag;
+import com.ragagent.common.knowledge.domain.KnowledgeTag;
 import org.springframework.stereotype.Component;
 
 /**

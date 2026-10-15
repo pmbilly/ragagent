@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.support;
+package com.ragagent.common.knowledge.support;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -10,7 +10,7 @@ import com.ragagent.platform.web.JsonMappers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeTag;
+import com.ragagent.common.knowledge.domain.KnowledgeTag;
 
 /**
  * knowledge 实体 → L1/线格式载荷的**域内公用投影**（由 {@code service.KnowledgeService}

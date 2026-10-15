@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import com.ragagent.contract.retrieval.ChunkTypes;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.contract.wiki.WikiImageMarkup;
 
 /**

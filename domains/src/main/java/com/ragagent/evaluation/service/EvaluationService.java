@@ -28,9 +28,9 @@ import com.ragagent.evaluation.dto.EvaluationDtos.SummaryConfigParams;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.service.management.KnowledgeBaseService;
-import com.ragagent.knowledge.service.management.KnowledgeService;
-import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
+
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.common.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.common.model.ModelCatalogPort;
 import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.session.service.SessionKnowledgeQaService;
@@ -45,7 +45,7 @@ import com.ragagent.evaluation.dto.EvaluationDtos;
  *
  * <h2>执行步</h2>
  * <p>后台虚拟线程跑完整流水线：取 dataset → passages 建进临时 KB（同步建索引，
- * {@link KnowledgeService#createFromPassageSync}）→ 逐 QA 对<b>并行</b>跑
+ * {@link KnowledgeCatalogPort#createFromPassageSync}）→ 逐 QA 对<b>并行</b>跑
  * KnowledgeQAByEvent（rag 管线）→ {@link MetricHook} 汇总 retrieval/generation
  * metrics → 清理临时知识与 KB。失败 → status=failed + err_msg=异常原文
  * （BizException 取 appError 原文）；全部成功 → status=success + metric 产出。</p>
@@ -96,23 +96,20 @@ public class EvaluationService {
     private double rerankThreshold;
 
     private final ModelCatalogPort modelCatalog;
-    private final KnowledgeBaseService knowledgeBaseService;
     private final DatasetService datasetService;
-    private final KnowledgeService knowledgeService;
+    private final KnowledgeCatalogPort knowledgeCatalog;
     private final SessionKnowledgeQaService sessionKnowledgeQaService;
 
     /** 任务存储：taskID → detail。 */
     private final Map<String, EvaluationDetail> store = new ConcurrentHashMap<>();
 
     public EvaluationService(ModelCatalogPort modelCatalog,
-                             KnowledgeBaseService knowledgeBaseService,
                              DatasetService datasetService,
-                             KnowledgeService knowledgeService,
+                             KnowledgeCatalogPort knowledgeCatalog,
                              SessionKnowledgeQaService sessionKnowledgeQaService) {
         this.modelCatalog = modelCatalog;
-        this.knowledgeBaseService = knowledgeBaseService;
         this.datasetService = datasetService;
-        this.knowledgeService = knowledgeService;
+        this.knowledgeCatalog = knowledgeCatalog;
         this.sessionKnowledgeQaService = sessionKnowledgeQaService;
     }
 
@@ -147,7 +144,7 @@ public class EvaluationService {
         } else {
             KnowledgeBase kb;
             try {
-                kb = knowledgeBaseService.getKnowledgeBase(knowledgeBaseId);
+                kb = knowledgeCatalog.getKnowledgeBase(knowledgeBaseId);
             } catch (BizException e) {
                 // 失败 → 500，消息为 not-found 原文
                 throw new IllegalStateException(kbNotFoundMessage(e));
@@ -160,7 +157,7 @@ public class EvaluationService {
         created.setDescription("evaluation");
         created.setEmbeddingModelId(sourceEmbeddingModelId);
         created.setSummaryModelId(sourceSummaryModelId);
-        KnowledgeBase newKb = knowledgeBaseService.createKnowledgeBase(created);
+        KnowledgeBase newKb = knowledgeCatalog.createKnowledgeBase(created);
 
         if (datasetId.isEmpty()) {
             datasetId = "default";
@@ -244,7 +241,7 @@ public class EvaluationService {
         // 2) 段落表（按 PID 铺平，空洞留 ""）
         List<String> passages = getPassageList(dataset);
         // 3) 建临时知识（同步建索引；此步失败即抛出——清理尚未注册，会残留临时 KB）
-        Knowledge knowledge = knowledgeService.createFromPassageSync(knowledgeBaseId, passages, "");
+        Knowledge knowledge = knowledgeCatalog.createFromPassageSync(knowledgeBaseId, passages, "");
 
         try {
             // 4) 并行评估（并发上限 = CPU 核数-1）
@@ -303,13 +300,13 @@ public class EvaluationService {
         } finally {
             // 6) 清理（deleteKnowledge + deleteKnowledgeBase）
             try {
-                knowledgeService.deleteKnowledge(knowledge.getId());
+                knowledgeCatalog.deleteKnowledge(knowledge.getId());
             } catch (RuntimeException e) {
                 log.error("Failed to delete knowledge: {}, knowledge ID: {}",
                         errorText(e), knowledge.getId());
             }
             try {
-                knowledgeBaseService.deleteKnowledgeBase(knowledgeBaseId);
+                knowledgeCatalog.deleteKnowledgeBase(knowledgeBaseId);
             } catch (RuntimeException e) {
                 log.error("Failed to delete knowledge base: {}, knowledge base ID: {}",
                         errorText(e), knowledgeBaseId);

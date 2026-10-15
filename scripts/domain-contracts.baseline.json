@@ -102,11 +102,7 @@
       "EmbedChannelDelegateOps"
     ],
     "embedchannel→knowledge": [
-      "EmbedChannelPublicOps",
       "EmbedChannelService"
-    ],
-    "evaluation→knowledge": [
-      "EvaluationService"
     ],
     "evaluation→session": [
       "EvaluationService"
@@ -171,22 +167,19 @@
       "SessionQaResolution",
       "TemporaryDocumentController"
     ],
-    "session→knowledge": [
-      "AgentEngineAssembler",
-      "AgentToolBackends",
-      "AgentToolKbBackends",
-      "MessageService",
-      "QaWiring",
-      "SessionAgentQaService",
-      "TemporaryDocumentController",
-      "TemporaryDocumentProcessor",
-      "TemporaryDocumentService"
-    ],
     "session→websearch": [
       "AgentToolBackends",
       "QaWiring",
       "SessionKnowledgeQaService",
       "SessionService"
+    ],
+    "session→knowledge": [
+      "AgentEngineAssembler",
+      "AgentToolBackends",
+      "AgentToolKbBackends",
+      "QaWiring",
+      "SessionAgentQaService",
+      "TemporaryDocumentService"
     ],
     "session→mcp": [
       "AgentEngineAssembler",

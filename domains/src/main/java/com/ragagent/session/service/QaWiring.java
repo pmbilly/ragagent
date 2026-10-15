@@ -1,8 +1,8 @@
 package com.ragagent.session.service;
 
-import com.ragagent.knowledge.support.KnowledgeProjectionAdapter;
+import com.ragagent.common.knowledge.support.KnowledgeProjectionAdapter;
 
-import com.ragagent.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.common.knowledge.support.ChunkProjectionAdapter;
 
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ import com.ragagent.chatpipeline.plugin.PluginWikiBoost;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.common.settings.ConversationProperties;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
 

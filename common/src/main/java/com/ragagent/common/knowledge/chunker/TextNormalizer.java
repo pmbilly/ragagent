@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.chunker;
+package com.ragagent.common.knowledge.chunker;
 
 /**
  * 文本规范化。

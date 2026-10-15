@@ -15,9 +15,9 @@ import java.util.List;
 
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
-import com.ragagent.knowledge.domain.KnowledgeTag;
+import com.ragagent.common.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
 import com.ragagent.knowledge.dto.faq.FaqSuccessEntry;
 import com.ragagent.knowledge.dto.faq.FaqFailedEntry;

@@ -1,6 +1,6 @@
 package com.ragagent.agenttools;
 
-import com.ragagent.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.common.knowledge.support.ChunkProjectionAdapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,7 +19,7 @@ import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoReader;
 import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoView;
 import com.ragagent.agent.tool.DocChunkSupport.PagedChunks;
 import com.ragagent.agent.tool.runtime.SearchAuth.TagView;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.agenttools.knowledge.GetDocumentInfoTool;
 import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
 import com.ragagent.agenttools.wiki.WikiReadSourceDocTool;

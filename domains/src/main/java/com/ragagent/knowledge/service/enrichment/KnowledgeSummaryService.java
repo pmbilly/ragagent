@@ -7,7 +7,7 @@ import com.ragagent.knowledge.domain.KnowledgeTenants;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
-import com.ragagent.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.common.knowledge.support.ChunkProjectionAdapter;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -22,7 +22,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.common.settings.ConversationProperties;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;

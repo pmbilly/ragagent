@@ -1,6 +1,7 @@
 package com.ragagent.knowledge.domain;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.domain.Chunk;
 
 
 /**

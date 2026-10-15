@@ -18,12 +18,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ragagent.common.tenant.TenantConfigLookup;
-import com.ragagent.knowledge.chunker.Chunker;
-import com.ragagent.knowledge.chunker.ParsedChunk;
-import com.ragagent.knowledge.chunker.SplitterConfig;
-import com.ragagent.knowledge.chunker.Tokens;
+import com.ragagent.common.knowledge.chunker.Chunker;
+import com.ragagent.common.knowledge.chunker.ParsedChunk;
+import com.ragagent.common.knowledge.chunker.SplitterConfig;
+import com.ragagent.common.knowledge.chunker.Tokens;
 import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.knowledge.support.ParserEngineRules;
+import com.ragagent.common.knowledge.support.ParserEngineRules;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.session.domain.document.TemporaryDocument;

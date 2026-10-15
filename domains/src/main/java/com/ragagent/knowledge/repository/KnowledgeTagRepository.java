@@ -2,7 +2,7 @@ package com.ragagent.knowledge.repository;
 
 import java.util.List;
 import java.util.UUID;
-import com.ragagent.knowledge.domain.KnowledgeTag;
+import com.ragagent.common.knowledge.domain.KnowledgeTag;
 import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 import java.time.OffsetDateTime;

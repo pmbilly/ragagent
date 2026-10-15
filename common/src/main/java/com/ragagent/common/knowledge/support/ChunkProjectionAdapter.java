@@ -1,11 +1,11 @@
-package com.ragagent.knowledge.support;
+package com.ragagent.common.knowledge.support;
 
 
 import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.domain.Chunk;
 
 /**
  * chunk 实体 → L1 载荷（{@link ChunkFacts} / {@link ChunkView}）的**域内公用投影**。

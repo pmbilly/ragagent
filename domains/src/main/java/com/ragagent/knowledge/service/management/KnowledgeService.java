@@ -15,7 +15,7 @@ import com.ragagent.knowledge.support.KnowledgePaths;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
 
-import com.ragagent.knowledge.support.KnowledgeProjectionAdapter;
+import com.ragagent.common.knowledge.support.KnowledgeProjectionAdapter;
 
 import com.ragagent.knowledge.domain.access.KnowledgeReadPort;
 
@@ -37,10 +37,10 @@ import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.knowledge.KnowledgeDocumentGateway;
 import com.ragagent.platform.security.InputSanitizer;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.domain.KnowledgeTag;
+import com.ragagent.common.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

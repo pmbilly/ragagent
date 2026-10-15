@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.dto.tag;
 
-import com.ragagent.knowledge.domain.KnowledgeTag;
+import com.ragagent.common.knowledge.domain.KnowledgeTag;
 import java.time.OffsetDateTime;
 
 /** 标签视图 + 文档数 / 分块数。 */

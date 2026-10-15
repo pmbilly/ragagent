@@ -119,6 +119,9 @@ FROZEN_PREFIXES = (
 
 # 基线：已逐条复核的例外（文件相对路径 → 允许的键集合）。新增即失败。
 BASELINE: dict[str, set[str]] = {
+    # 会话配置读取面（A③-㊶ 知识支持面上提 L1 时随类换锚）：`file_types` 是存量 DB 配置键
+    # （parser_engine_rules 的既有形态），改键会破坏存量数据——非新增契约。
+    'common/knowledge/support/ParserEngineRules.java': {'file_types'},
     # Langfuse span/trace 观测面（B135 复核改标：原写「agent_steps 落库列 + 历史回放」，实测站点是 toolSpanInput/toolSpanMeta 与 traceArgumentValue 构造 ⇒ 观测面，非 JSON 契约）
     'agent/ActPhase.java': {'args_redacted', 'argument_resolution', 'data_keys', 'image_count', 'mcp_service', 'mcp_tool', 'model_arg_keys', 'model_arguments', 'output_len', 'resolved_arg_keys', 'resolved_arguments', 'tool_index', 'unresolved_handle_count', 'unresolved_handles'},
     # 模板令牌（数据值，非 JSON 键）

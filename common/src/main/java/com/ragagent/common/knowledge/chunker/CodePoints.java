@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.chunker;
+package com.ragagent.common.knowledge.chunker;
 
 /**
  * 码点（Unicode code point）工具。

@@ -9,7 +9,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.platform.access.TracingContext;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.domain.Chunk;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
