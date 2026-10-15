@@ -14,7 +14,7 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.contract.wiki.SlugUpdate;

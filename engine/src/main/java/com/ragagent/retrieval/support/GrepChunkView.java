@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
 
 public final class GrepChunkView {
     public String id;

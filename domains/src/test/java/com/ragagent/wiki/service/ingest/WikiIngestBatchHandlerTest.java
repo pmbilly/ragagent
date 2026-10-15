@@ -24,7 +24,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.ObjectProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;

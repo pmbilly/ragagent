@@ -15,12 +15,14 @@ import com.ragagent.chatpipeline.support.SearchSupport;
 import com.ragagent.contract.graph.GraphData;
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.graph.NameSpace;
-import com.ragagent.common.knowledge.ChunkFacts;
-import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.contract.graph.GraphRelation;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.JsonMappers;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * ENTITY_SEARCH 阶段插件：
@@ -213,7 +215,7 @@ public final class PluginSearchEntity implements Plugin {
         r.setKnowledgeFilename(knowledge == null ? "" : knowledge.fileName());
         r.setKnowledgeSource(knowledge == null ? "" : knowledge.source());
         r.setKnowledgeChannel(knowledge == null ? "" : knowledge.channel());
-        r.setChunkMetadata(chunk.metadata());
+        r.setChunkMetadata(JsonMappers.toJsonNode(chunk.metadata()));
         r.setKnowledgeBaseId(knowledge == null ? "" : knowledge.knowledgeBaseId());
         return r;
     }
@@ -221,12 +223,11 @@ public final class PluginSearchEntity implements Plugin {
     /** knowledge 的 metadata jsonb 投影为全字符串 map（值统一字符串化）；空表无键、解析失败返回空 map。 */
     static Map<String, String> knowledgeMetadata(KnowledgeDocumentFacts knowledge) {
         Map<String, String> metadata = new LinkedHashMap<>();
-        if (knowledge == null || knowledge.metadata() == null
-                || !knowledge.metadata().isObject()
-                || knowledge.metadata().isEmpty()) {
+        JsonNode meta = JsonMappers.toJsonNode(knowledge == null ? null : knowledge.metadata());
+        if (meta == null || !meta.isObject() || meta.isEmpty()) {
             return metadata;
         }
-        var fields = knowledge.metadata().fields();
+        var fields = meta.fields();
         while (fields.hasNext()) {
             var e = fields.next();
             var v = e.getValue();

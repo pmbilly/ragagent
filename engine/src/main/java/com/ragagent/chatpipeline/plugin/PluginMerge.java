@@ -13,7 +13,7 @@ import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.MatchTypes;
 import com.ragagent.chatpipeline.support.SearchSupport;
-import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
@@ -23,6 +23,7 @@ import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.retrieval.domain.ImageInfo;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * CHUNK_MERGE 阶段插件。
@@ -342,7 +343,7 @@ public final class PluginMerge implements Plugin {
 
     /** FAQ 元数据解析（解析失败/无 FAQ 字段 → null）。 */
     private FaqChunkMetadata parseFaqMetadata(ChunkFacts chunk) {
-        JsonNode meta = chunk.metadata();
+        JsonNode meta = JsonMappers.toJsonNode(chunk.metadata());
         if (meta == null || meta.isNull() || !meta.isObject()) {
             return null;
         }

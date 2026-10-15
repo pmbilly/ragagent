@@ -60,7 +60,7 @@ import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.chatpipeline.spi.WebSearchExecutor;
-import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**

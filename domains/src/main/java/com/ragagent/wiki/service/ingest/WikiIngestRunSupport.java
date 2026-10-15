@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.contract.audit.WikiActivityAudit;

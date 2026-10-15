@@ -1741,6 +1741,13 @@ public interface AdminUserPort {
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 G1-b-3·`ChunkFacts` + `KnowledgeDocumentFacts` + `KnowledgeBaseView` 三件入 `contract.knowledge`（2026-10-15）**
+- **三件一并**（都是"检索/装配事实"类载荷）：`ChunkFacts`（record，17 组件含 2 个 JsonNode）· `KnowledgeDocumentFacts`（record，11 组件含 1）· `KnowledgeBaseView`（class，15 字段含 2）
+- **动作**：① 三件 `JsonNode` → `Object`（record 组件 / class 字段）② `git mv` → `contract.knowledge` ③ **补"原同包引用者"的 import**（`ChunkSearchGateway`/`KnowledgeDocumentGateway`/`KnowledgeBaseLookup` 三个 L1 文件——**该坑第 8 次**，本次同样由编译暴露后批量补齐）④ **消费侧还原**共 9 处（engine 5：`PluginExtractEntity`/`PluginMerge`/`PluginSearchEntity`(2)/`HybridFusionOps`/`HybridResultOps`(2)；domains 2：`FaqSnippet`/`WikiIngestBatchHandler`）——统一用 `JsonMappers.toJsonNode(...)`（**null 保持 null** ✓，与 G1-b-2 修好的语义一致；`PluginSearchEntity` 的多处读取改为一次局部还原）
+- **⚠️ 一次红态（javadoc 跨模块链接，第 9 次）**：`KnowledgeDocumentFacts` 的 javadoc `{@link com.ragagent.common.retrieval.SearchResult}` 在搬入 `:contract` 后失效 ⇒ 改 `{@code}` ✓（**建议把"搬入 contract 时自动扫 `{@link com.ragagent.<非 contract>}`→`{@code}`"纳入搬运脚本——M2 的下一项**）
+- **读数**：`:contract` 183 → **186**；`common/*` 110 → **107**；C1 = 61 文件；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**；**1349 金片签名一致** ✓；`spotlessCheck build` **1m45s**；**4991 / 失败 0 / 跳过 4**；五模块编译全绿
+- **G1-b 进度**：**已完成 5/12**（`StorageBackendView` · `TenantRowView` · `ChunkFacts` · `KnowledgeDocumentFacts` · `KnowledgeBaseView`）；**余 7 件**＝`ChunkRowView`+`ChunkPageView`（金片钉住 + 2 个 `@JsonIgnore` ⇒ 用"非 getter 命名"等价表达）· `KnowledgeRowView`（4 JsonNode）· `KnowledgeBaseRowView`（5 JsonNode + 4 个 L1 config 类型 ⇒ 需把 config 类型一并入 contract，实体可引契约 ✓ 顺带解 G1-h）· `WikiPageView`（1 JsonNode + 6 个 `@JsonSerialize` ⇒ 需等价替换）· `AdminUserView`+`AdminUserPort`（`UserPreferences` 是 Jackson 注解类型 ⇒ 去注解须证 JSON 等价）。**配方已固化**：转换（`Object`）→ 搬移 → 补同包 import → 消费侧 `toJsonNode` 还原 → 守卫/金片/闸门
 **🔶 G1-b-2·`TenantRowView` 去 Jackson 入 `contract.tenant`（C4 载荷 12 → 11）（2026-10-15）**
 - **对象**：`TenantRowView`（21 字段 / **9 个 jsonb `JsonNode`**）——消费面实测：**0 处内容读取**（纯透传：`TenantResponse` 与 3 个 auth 控制器）
 - **两处必须对症处理的设计点（先测后动）**：
@@ -2692,7 +2699,7 @@ public interface AdminUserPort {
 
 | 目标模块 | 实际 | 差距 |
 |---|---|---|
-| `contracts` | `:contract` **183 件** ✅ 已独立（G1-b-2 后） | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
+| `contracts` | `:contract` **186 件** ✅ 已独立（G1-b-3 后） | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
 | `platform` | `com.ragagent.platform.*` **139 件仍在 `:common`** | **未独立成模块**；包覆盖：方案 **23** vs 实际 **15** ⇒ 缺 `execution` · `outbox` · `parsing` · `storage.config` · `storage.provider` · `tracing.decorators` · `tracing.langfuse` · `transaction` · `web.error` · `web.health`；多 `redis` · `tracing` |
 | `agent-engine` · `retrieval-engine` · `model-runtime` | `:engine` **318 件 / 9 顶层包**（chatpipeline · embedding · llm · modelcontext · modelruntime · rerank · retrieval · tracing · webfetch） | 未拆分（**条件触发**项） |
 | `domains` | `:domains` **1343 件** | 域间边 **7 条**（①clearable **0** / ②owner 2 / ③族内 5）；域布局抽样见 C |
@@ -2707,7 +2714,7 @@ public interface AdminUserPort {
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
 | `:common` 受控依赖根 | 10 根 / 61 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
-| `:common` 规模 | **250 件** = `common/*` **110** + `platform/*` 139 + `event/*` 1（G1-b-2 后） | — |
+| `:common` 规模 | **247 件** = `common/*` **107** + `platform/*` 139 + `event/*` 1（G1-b-3 后） | — |
 
 **C. 域布局抽样（以方案 §8.8.2 `knowledge/` 为范本）**
 

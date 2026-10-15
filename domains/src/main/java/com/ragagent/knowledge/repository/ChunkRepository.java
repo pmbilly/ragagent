@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.platform.text.CleanInvalidUtf8;
-import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.ChunkSearchGateway;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;

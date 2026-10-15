@@ -1,6 +1,7 @@
 package com.ragagent.common.knowledge;
 
 import com.ragagent.contract.knowledge.KnowledgeView;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
 
 
 /**

@@ -15,9 +15,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.tenant.WebSearchConfig;
-import com.ragagent.common.knowledge.ChunkFacts;
-import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.rerank.Reranker;
 
 /**

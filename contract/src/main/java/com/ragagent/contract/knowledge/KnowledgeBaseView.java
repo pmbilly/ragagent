@@ -1,8 +1,7 @@
-package com.ragagent.common.knowledge;
+package com.ragagent.contract.knowledge;
 
 import java.time.OffsetDateTime;
 
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * 知识库只读视图（由 {@code KnowledgeBaseLookup} 内嵌类型提升为顶层类型，
@@ -22,10 +21,10 @@ public final class KnowledgeBaseView {
     private String summaryModelId;
     private String embeddingModelId;
     private boolean wikiEnabled;
-    private JsonNode wikiConfig;
+    private Object wikiConfig;
     private boolean vectorEnabled;
     private boolean keywordEnabled;
-    private JsonNode extractConfig;
+    private Object extractConfig;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 
@@ -102,11 +101,11 @@ public final class KnowledgeBaseView {
         this.wikiEnabled = wikiEnabled;
     }
 
-    public JsonNode getWikiConfig() {
+    public Object getWikiConfig() {
         return wikiConfig;
     }
 
-    public void setWikiConfig(JsonNode wikiConfig) {
+    public void setWikiConfig(Object wikiConfig) {
         this.wikiConfig = wikiConfig;
     }
 
@@ -129,11 +128,11 @@ public final class KnowledgeBaseView {
     }
 
     /** {@code extract_config} jsonb 原始载荷（解读留给消费方，视图不替它判定）。 */
-    public JsonNode getExtractConfig() {
+    public Object getExtractConfig() {
         return extractConfig;
     }
 
-    public void setExtractConfig(JsonNode extractConfig) {
+    public void setExtractConfig(Object extractConfig) {
         this.extractConfig = extractConfig;
     }
 

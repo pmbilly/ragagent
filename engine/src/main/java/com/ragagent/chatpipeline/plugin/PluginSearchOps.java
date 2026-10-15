@@ -15,7 +15,7 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.retrieval.domain.WebSearchResult;

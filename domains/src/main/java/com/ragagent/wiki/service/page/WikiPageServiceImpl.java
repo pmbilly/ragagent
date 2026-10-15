@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
-import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.common.wiki.domain.WikiCategoryPaths;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiException;

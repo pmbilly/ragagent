@@ -5,7 +5,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**

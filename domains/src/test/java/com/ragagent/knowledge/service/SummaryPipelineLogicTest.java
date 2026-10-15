@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.retrieval.domain.ImageInfo;

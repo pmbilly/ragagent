@@ -14,7 +14,7 @@ import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.MatchTypes;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.common.retrieval.SearchResult;

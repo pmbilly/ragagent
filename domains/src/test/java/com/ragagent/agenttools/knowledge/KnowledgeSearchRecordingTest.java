@@ -18,7 +18,7 @@ import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.KnowledgeSearchBack
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.RankResult;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.RerankerModel;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.SearchResultView;
-import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.common.agent.tool.ToolRequest;
 import com.ragagent.agenttools.GoRecording45B;

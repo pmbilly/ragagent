@@ -3,7 +3,7 @@ package com.ragagent.common.knowledge.support;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.common.knowledge.ChunkRowView;
 

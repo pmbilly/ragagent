@@ -1,6 +1,5 @@
-package com.ragagent.common.knowledge;
+package com.ragagent.contract.knowledge;
 
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * chunk 行的「检索事实」——检索编排（命中过滤、父块/相邻块/关系块扩召回、结果装配）
@@ -28,7 +27,7 @@ public record ChunkFacts(
         String parentChunkId,
         String preChunkId,
         String nextChunkId,
-        JsonNode relationChunks,
-        JsonNode metadata,
+        Object relationChunks,
+        Object metadata,
         String imageInfo) {
 }

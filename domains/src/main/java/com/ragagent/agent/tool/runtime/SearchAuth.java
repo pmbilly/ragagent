@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
-import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
 
 /**
  * scope 授权。

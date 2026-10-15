@@ -1,6 +1,6 @@
 package com.ragagent.agenttools.knowledge;
 
-import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
 
 import java.util.ArrayList;
 import java.util.HashSet;

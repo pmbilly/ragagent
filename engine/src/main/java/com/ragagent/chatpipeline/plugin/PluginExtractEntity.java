@@ -9,11 +9,13 @@ import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.contract.graph.GraphNode;
-import com.ragagent.common.knowledge.KnowledgeBaseView;
-import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.llm.extract.PipelineConfig;
 import com.ragagent.llm.LlmChatClient;
+import com.ragagent.platform.web.JsonMappers;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * QUERY_UNDERSTAND 附加插件：
@@ -133,7 +135,7 @@ public final class PluginExtractEntity implements Plugin {
 
     /** extract_config jsonb 的 enabled 开关（缺省关）。 */
     private static boolean extractEnabled(KnowledgeBaseView kb) {
-        var cfg = kb.getExtractConfig();
+        JsonNode cfg = JsonMappers.toJsonNode(kb.getExtractConfig());
         return cfg != null && !cfg.isNull()
                 && cfg.has("enabled") && cfg.path("enabled").asBoolean(false);
     }

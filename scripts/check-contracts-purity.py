@@ -140,12 +140,6 @@ PLATFORM_FACE = {
 #    `KnowledgeDocumentFacts`）⇒ :contract 零依赖装不下；与 B258 登记的"`AppError` 去 Jackson"
 #    **同一课题**（改造口径与风险见 HANDOFF §12.5）；改造完成即整批入 :contract。
 PENDING_DEJACKSON = {
-    "com/ragagent/common/knowledge/ChunkFacts.java":
-        "JsonNode relationChunks/metadata（7 处消费触达）⇒ 待去 Jackson",
-    "com/ragagent/common/knowledge/KnowledgeBaseView.java":
-        "JsonNode wikiConfig/extractConfig（1 处消费触达）⇒ 待去 Jackson",
-    "com/ragagent/common/knowledge/KnowledgeDocumentFacts.java":
-        "JsonNode metadata（2 处消费触达）⇒ 待去 Jackson",
     "com/ragagent/common/auth/AdminUserView.java":
         "管理面用户行视图（12 字段镜像，去 passwordHash）；**含 preferences（Jackson 类型）且直接出面**"
         "⇒ 与端口同族登记（HANDOFF §12.6.4 硬约束 2）；去 Jackson 后可入 contract.auth",

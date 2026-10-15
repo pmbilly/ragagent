@@ -11,10 +11,11 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.knowledge.ChunkFacts;
-import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * HybridSearch 的结果装配簇：命中 → SearchResult（chunk 元数据补全 + FAQ 问题回填）。
@@ -193,7 +194,7 @@ final class HybridResultOps {
         r.setMatchType(matchType);
         // metadata 装配：null → 空 map（序列化为 "{}"）；仅当所有值都是字符串才产出
         // map，出现非字符串值或结构不可解析 → null。
-        JsonNode meta = knowledge.metadata();
+        JsonNode meta = JsonMappers.toJsonNode(knowledge.metadata());
         if (meta == null || meta.isNull()) {
             r.setMetadata(new LinkedHashMap<>());
         } else if (meta.isObject()) {
@@ -225,7 +226,7 @@ final class HybridResultOps {
 
     static List<String> relatedChunkIds(ChunkFacts chunk, Set<String> processed) {
         List<String> related = new ArrayList<>();
-        JsonNode rel = chunk.relationChunks();
+        JsonNode rel = JsonMappers.toJsonNode(chunk.relationChunks());
         if (rel != null && rel.isArray()) {
             for (JsonNode n : rel) {
                 String id = n.asText("");

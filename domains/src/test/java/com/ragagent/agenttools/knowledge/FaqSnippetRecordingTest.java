@@ -9,7 +9,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.agenttools.GoRecording45A;
 import com.ragagent.agenttools.RecordingSupport;

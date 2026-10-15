@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
-import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import com.ragagent.contract.knowledge.KnowledgeView;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -190,10 +190,10 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
 
     /** 解析 KB 行的 wiki_config 列（jsonb）为 {@link WikiConfig} */
     static WikiConfig wikiConfigOf(KnowledgeBaseView kb) {
-        if (kb == null || kb.getWikiConfig() == null || kb.getWikiConfig().isNull()) {
+        JsonNode node = JsonMappers.toJsonNode(kb == null ? null : kb.getWikiConfig());
+        if (node == null || node.isNull()) {
             return null;
         }
-        JsonNode node = kb.getWikiConfig();
         return node.isTextual()
                 ? WikiConfig.fromJson(node.asText())
                 : WikiConfig.fromJson(node.toString());

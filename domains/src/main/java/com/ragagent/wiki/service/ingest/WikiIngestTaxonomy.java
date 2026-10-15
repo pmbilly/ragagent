@@ -10,7 +10,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.common.wiki.domain.WikiCategoryPaths;
 import com.ragagent.wiki.prompt.WikiPrompts;

@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.knowledge.KnowledgeDocumentGateway;
 import com.ragagent.platform.security.InputSanitizer;
 import com.ragagent.knowledge.domain.Chunk;

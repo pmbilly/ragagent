@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.domain.WikiConfig;

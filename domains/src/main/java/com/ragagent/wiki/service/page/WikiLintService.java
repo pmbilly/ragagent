@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
-import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiException;
 import com.ragagent.wiki.domain.issue.WikiLintIssue;

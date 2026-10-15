@@ -10,7 +10,7 @@ import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.support.ImageInfoCollector;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;

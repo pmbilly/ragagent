@@ -14,7 +14,7 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.KnowledgeBaseSearchFacts;
 import com.ragagent.contract.retrieval.SearchParams;
 
@@ -23,6 +23,7 @@ import com.ragagent.retrieval.HybridSearchService.StoreGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * HybridSearch 的融合与 FAQ 后处理簇：RRF 融合/按分去重、FAQ 迭代取回（只涨 TopK，
@@ -257,7 +258,7 @@ final class HybridFusionOps {
     List<String> faqNegativeQuestions(ChunkFacts chunk) {
         try {
             List<String> negatives = new ArrayList<>();
-            JsonNode node = chunk.metadata();
+            JsonNode node = JsonMappers.toJsonNode(chunk.metadata());
             if (node != null && node.has("negativeQuestions") && node.get("negativeQuestions").isArray()) {
                 for (JsonNode n : node.get("negativeQuestions")) {
                     negatives.add(n.asText(""));

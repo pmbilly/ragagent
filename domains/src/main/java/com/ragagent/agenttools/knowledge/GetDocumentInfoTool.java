@@ -15,7 +15,7 @@ import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoReader;
 import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoView;
 import com.ragagent.agent.tool.DocChunkSupport.PagedChunks;
 import com.ragagent.agenttools.knowledge.FaqSnippet.SimilarQuestionsDisplay;
-import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.common.agent.tool.BaseTool;
 import com.ragagent.agent.tool.DocChunkSupport;

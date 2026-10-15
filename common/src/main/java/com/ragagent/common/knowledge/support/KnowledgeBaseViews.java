@@ -1,7 +1,7 @@
 package com.ragagent.common.knowledge.support;
 
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
-import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 
 /**

@@ -2,6 +2,7 @@ package com.ragagent.common.knowledge;
 
 
 import java.util.List;
+import com.ragagent.contract.knowledge.ChunkFacts;
 
 /**
  * chunk 行的**只读端口**（检索编排批量取 chunk 事实的最小接口）。

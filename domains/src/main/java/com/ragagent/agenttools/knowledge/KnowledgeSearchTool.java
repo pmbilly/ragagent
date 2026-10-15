@@ -10,7 +10,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.ChunkFacts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.common.agent.tool.BaseTool;
