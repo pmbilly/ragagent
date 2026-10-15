@@ -1,18 +1,10 @@
-package com.ragagent.common.knowledge.service;
+package com.ragagent.contract.knowledge.service;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
-import com.ragagent.contract.knowledge.service.DuplicateKnowledgeDetails;
 
-/**
- * 重复知识冲突（由 {@code KnowledgeService} 的**嵌套类**提为**顶层类型**）。
- *
- * <p>它被 {@code datasource}/{@code im}/{@code chatpipeline} 等多个域以
- * {@code DuplicateKnowledgeException} 形式引用——嵌套在门面里会让这些域
- * 反向依赖 799 行的枢纽类；提为 {@code domain/} 顶层后按普通域异常引用。</p>
- */
 /**
  * 上传内容与库内已有文档重复（409）。
  *
@@ -20,6 +12,13 @@ import com.ragagent.contract.knowledge.service.DuplicateKnowledgeDetails;
  * （{@code {error:{code,message,details}, success:false}}），已存在文档的 ID 放
  * {@code details.existingKnowledgeId} 供前端跳转——取代历史上的特殊信封
  * （{@code {code,data,message,success}}）。</p>
+ *
+ * <p><b>为什么在 {@code :contract}</b>（§16.2 二轮裁定）：它被 {@code datasource} /
+ * {@code im} / {@code chatpipeline} / {@code knowledge} **多个域**抛出或捕获，且依赖面
+ * **全部是契约件**（{@code BizException} / {@code AppError} / {@code KnowledgeRowView} /
+ * {@code DuplicateKnowledgeDetails}）⇒ 符合契约既有的"跨域异常"先例
+ * （{@code WikiException} / {@code ResourceModeException} / {@code ToolApprovalException} 等）；
+ * 留在 L1 会让契约异常面与 L1 异常面分裂。</p>
  */
 public class DuplicateKnowledgeException extends BizException {
     private final KnowledgeRowView existing;

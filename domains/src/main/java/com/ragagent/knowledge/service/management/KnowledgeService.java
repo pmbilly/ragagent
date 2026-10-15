@@ -59,7 +59,7 @@ import com.ragagent.knowledge.service.KnowledgeAccessHelper;
 import com.ragagent.knowledge.service.enrichment.KnowledgeSummaryService;
 import com.ragagent.knowledge.service.query.KnowledgeSearchService;
 import com.ragagent.knowledge.service.query.KnowledgeSpanService;
-import com.ragagent.common.knowledge.service.DuplicateKnowledgeException;
+import com.ragagent.contract.knowledge.service.DuplicateKnowledgeException;
 import com.ragagent.knowledge.support.TagViews;
 import com.ragagent.knowledge.support.KnowledgeRowViews;
 

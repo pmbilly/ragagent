@@ -1525,8 +1525,8 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 账 | 读数 | 状态 |
 |---|---|---|
-| `:contract` | **229 件** | ✅ 已独立（零依赖） |
-| `common/*` | **57 件**（125 → … → 64 → 60 → 57） | 收敛中 |
+| `:contract` | **230 件** | ✅ 已独立（零依赖） |
+| `common/*` | **56 件**（125 → … → 60 → 57 → 56） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
 | **C1 受控导入根** | 10 根 / **57 文件** | 冻结只许减 |
@@ -1792,6 +1792,17 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 §16.2 收口·`DuplicateKnowledgeException` 入契约 + `KnowledgeBaseViews` 裁定留 L1（两条判据）（2026-10-15）**
+- **裁定 1｜跨域域异常 ⇒ 入契约**：`DuplicateKnowledgeException` → **`contract.knowledge.service`** ✓
+  - 依据三条：① 依赖面**全是契约件**（`BizException` / `AppError` / `KnowledgeRowView` / `DuplicateKnowledgeDetails` ✓）② 被 **4 个域**抛出/捕获（`datasource` / `im` / `chatpipeline` / `knowledge` ✓）③ **契约已有异常先例 7 个**（`BizException` · `WikiException` · `WikiPageNotFoundException` · `ResourceModeException` · `PublicModeForbiddenException` · `ToolApprovalException` · `EventBusException` ✓）
+  - **判据沉淀：跨域异常属契约**——判据＝"被 **≥2 个域**抛出/捕获"；留在 L1 会让"契约异常面"与"L1 异常面"分裂 ✗
+  - 副产物：顺手**合并它重复的两段相邻 javadoc** ✗（原文件有两段文档块 ⇒ 已合并且补写"为什么在 contract"的裁定依据 ✓）
+- **裁定 2｜`KnowledgeBaseViews` 留 L1**（不迁）✓
+  - 依据：它**依赖 L1 端口 `KnowledgeBaseLookup`** ✗ 且被 **session 域**消费 ✗ ⇒ 迁入 `domains/knowledge` 会在 **session→knowledge 之间新增域间边** ✗（R10 只许减 ✗）
+  - **判据沉淀：判"件该去哪"要看"消费域 × 依赖面"两面**——依赖 L1 端口 + 跨域消费 ⇒ **L1 是它唯一合法落点** ✓（"看起来属于知识域"不构成搬迁理由 ✗）
+- **读数**：`:contract` 229 → **230**（+1）；`common/*` 57 → **56**（−1）；清 1 个死包目录（`common/knowledge/service` 搬空 ✓）；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**；**1349 金片签名一致** ✓；`spotlessCheck build` **2m7s**；**4996 / 失败 0 / 跳过 4** ✓
+- **§16.2 剩余**：被线格式硬阻的 **8 件**（product 决策项 ✗）· housekeeping（Redis 瞬态测试侧 Lettuce 超时/重试 · 换锚基线 2 条陈旧条目）
 **🔶 §16.2 对账二轮·`common/*` 57 件逐类处置表 + 3 件顺手归位（2026-10-15）**
 
 ### 一、权威读数（本轮末）

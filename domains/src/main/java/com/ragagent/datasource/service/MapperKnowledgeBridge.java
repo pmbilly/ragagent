@@ -1,7 +1,7 @@
 package com.ragagent.datasource.service;
 
 
-import com.ragagent.common.knowledge.service.DuplicateKnowledgeException;
+import com.ragagent.contract.knowledge.service.DuplicateKnowledgeException;
 
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.web.JsonMappers;

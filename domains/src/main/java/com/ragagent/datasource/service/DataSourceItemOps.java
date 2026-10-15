@@ -15,7 +15,7 @@ import com.ragagent.datasource.domain.SyncItemError;
 import com.ragagent.datasource.domain.SyncResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.common.knowledge.service.DuplicateKnowledgeException;
+import com.ragagent.contract.knowledge.service.DuplicateKnowledgeException;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**
