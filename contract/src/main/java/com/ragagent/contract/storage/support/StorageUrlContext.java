@@ -1,4 +1,4 @@
-package com.ragagent.common.storage.support;
+package com.ragagent.contract.storage.support;
 
 /**
  * 把「本请求必须走 handle 模式」钉住的请求级标记。
@@ -7,7 +7,7 @@ package com.ragagent.common.storage.support;
  * 所以它必须继续走渠道作用域的 {@code /embed/…/files} 代理取图，
  * 而不是拿到一个可分享、免凭据的公网 URL。</p>
  *
- * <p><b>形态</b>：沿用与 {@link com.ragagent.platform.access.TenantContext}、
+ * <p><b>形态</b>：沿用与 {@code com.ragagent.platform.access.TenantContext}、
  * {@code APIKeyScopeContext} 一致的 ThreadLocal 方案——每请求一个线程，
  * <b>跨线程必须显式传值</b>。</p>
  *
@@ -22,7 +22,7 @@ public final class StorageUrlContext {
     private StorageUrlContext() {
     }
 
-    /** 把本请求钉在 {@link Mode#HANDLE}。 */
+    /** 把本请求钉在 {@code Mode}。 */
     public static void force() {
         FORCED_HANDLE.set(Boolean.TRUE);
     }

@@ -32,7 +32,7 @@ import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.storage.LocalStorageService;
-import com.ragagent.common.knowledge.task.KnowledgeProcessingQueue;
+import com.ragagent.contract.knowledge.task.KnowledgeProcessingQueue;
 import com.sun.net.httpserver.HttpServer;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 

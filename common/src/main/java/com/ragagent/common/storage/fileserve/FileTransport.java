@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ragagent.platform.text.ContentTypeByFilename;
-import com.ragagent.common.storage.provider.SeekableSource;
+import com.ragagent.contract.storage.provider.SeekableSource;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

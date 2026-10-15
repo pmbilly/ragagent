@@ -11,7 +11,7 @@ import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.storage.config.LocalStorageEnvProperties;
 import com.ragagent.storage.config.StorageProviderEnv;
 import com.ragagent.storage.config.ResourceUrlModeProperties;
-import com.ragagent.common.storage.StorageEnvLookup;
+import com.ragagent.contract.storage.StorageEnvLookup;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;

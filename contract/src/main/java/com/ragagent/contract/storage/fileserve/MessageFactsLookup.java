@@ -1,5 +1,4 @@
-package com.ragagent.common.storage.fileserve;
-import com.ragagent.contract.storage.fileserve.MessageFileFacts;
+package com.ragagent.contract.storage.fileserve;
 
 /**
  * 消息事实加载回调（L1）：调用方（会话域）按 session/message id 取事实；

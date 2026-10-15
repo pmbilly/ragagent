@@ -17,7 +17,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.common.knowledge.domain.KnowledgeBaseAsrConfig;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseAsrConfig;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseVlmConfig;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.knowledge.dto.KnowledgeBaseResponse;

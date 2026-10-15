@@ -1,4 +1,4 @@
-package com.ragagent.common.knowledge.service;
+package com.ragagent.contract.knowledge.service;
 
 
 /** 重复文档冲突载荷：命中的既有文档 ID（409 特殊信封）。 */

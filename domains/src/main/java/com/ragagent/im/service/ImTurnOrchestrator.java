@@ -47,7 +47,7 @@ import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.common.storage.support.Resolver;
+import com.ragagent.contract.storage.support.Resolver;
 import com.ragagent.common.session.qa.SessionQaPort;
 import com.ragagent.common.session.embed.SessionView;
 

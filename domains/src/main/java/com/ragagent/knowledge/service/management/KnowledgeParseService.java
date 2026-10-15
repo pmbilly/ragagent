@@ -8,7 +8,7 @@ import com.ragagent.knowledge.domain.span.SpanTracker;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import com.ragagent.common.knowledge.task.KnowledgeProcessingQueue;
+import com.ragagent.contract.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;

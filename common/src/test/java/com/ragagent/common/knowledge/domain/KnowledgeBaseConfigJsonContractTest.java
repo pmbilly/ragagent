@@ -15,6 +15,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.JsonMappers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageProviderConfig;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageConfig;
+import com.ragagent.contract.knowledge.domain.KnowledgeBaseAsrConfig;
 
 /**
  * 知识库配置 jsonb（{@code knowledge_bases.config} 列）的**序列化契约**。

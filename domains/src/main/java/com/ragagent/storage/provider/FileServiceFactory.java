@@ -8,7 +8,7 @@ import java.util.Set;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.common.storage.fileserve.StoragePaths;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.common.storage.StorageEnvLookup;
+import com.ragagent.contract.storage.StorageEnvLookup;
 
 /**
  * 按租户存储配置造 provider 专属 {@link FileService}。

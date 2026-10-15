@@ -20,7 +20,7 @@ import com.ragagent.storage.config.StorageProviderEnv;
 import com.ragagent.common.storage.StorageBackend;
 import com.ragagent.storage.mapper.StorageBackendRepository;
 import com.ragagent.storage.service.ResourceCatalogService;
-import com.ragagent.common.storage.StorageEnvLookup;
+import com.ragagent.contract.storage.StorageEnvLookup;
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.FileServiceFactory;
 import com.ragagent.contract.tenant.StorageEngineConfig;

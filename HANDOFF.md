@@ -205,7 +205,7 @@ contract  → JDK                                  （纯 JDK：公开 API / SPI
 
 | # | 门槛 | 判定方式 |
 |---|---|---|
-| **G1** | `:common` 内**载荷型文件清零或全登记**（`*View`/`*Facts`/`*Payload`/`*Response`/`*Port`）——载荷应落 `:contract`、持久化实体回域。**进度 2026-10-15**：起始 32 ⇒ **已入 `:contract` 10 件** · **已登记 7 件**（4 platform 面 + 3 待去 Jackson）· **待归位 15 件** | 新增门禁 **C4**（`check-contracts-purity.py`，只许减）+ C1/C2 |
+| **G1** | `:common` 内**载荷型文件清零或全登记**（`*View`/`*Facts`/`*Payload`/`*Response`/`*Port`）——载荷应落 `:contract`、持久化实体回域。**进度 2026-10-15**：门禁口径（C4 载荷型）**待归位 14 件** + 登记 7 件（4 platform 面 + 3 待去 Jackson）；**契约料归位批 A/B 已完成**：`storage` 9 + `knowledge` 10 = **19 件入 `:contract`**（清单与两道搬前判据见下方「契约料盘点」） | 新增门禁 **C4**（`check-contracts-purity.py`，只许减）+ C1/C2 |
 | **G1-b（立项）** | **「去 Jackson」专项**：`ChunkFacts`/`KnowledgeBaseView`/`KnowledgeDocumentFacts` 的 `JsonNode` 字段（触达 7/1/2 处消费）+ B258 登记的 `AppError` ⇒ 改造口径二选一：**(a)** `JsonNode` → JDK `Map<String,Object>`（线格式基本等价，需金片复核 `NullNode`/空值语义）；**(b)** 载荷只带**消费者实际用度的键**（收窄成纯 JDK record，线格式**会变** ⇒ 需前端确认）。**改造完成即整批入 `:contract`** | C4 的 `PENDING_DEJACKSON` 登记 |
 | **G1-c（登记）** | 4 件**框架味**（`ApiKeyAuthPort` servlet · `KnowledgeCatalogPort` MyBatis-Plus Page · `EmbedSessionPort` servlet+ResponseEntity · `FileProxyPort` servlet）⇒ **永远进不了零依赖 `:contract`**，归未来 `platform` 模块 | C4 的 `PLATFORM_FACE` 登记 |
 | **G1-e（登记）** | `common/retrieval/SearchResult`（**不带 C4 后缀**故未入 C4 计数，但实为载荷）：引 Jackson 注解 + `JsonNode` + **platform 的 `SortedMapSerializer`** ⇒ **既非纯 JDK 也非域内容** ⇒ 归 platform 面／待去 Jackson；**引用面 66 处**（影响面大，改造需单独批次）。`PipelineMessageView` 因此随它一起等 | 本表登记 |
@@ -213,6 +213,33 @@ contract  → JDK                                  （纯 JDK：公开 API / SPI
 | **G2** | `com.ragagent.platform.*` 与 `com.ragagent.common.*` **依赖单向无环** | R5/R6/R9（包级 SCC）已覆盖；拆前复跑 |
 | **G3** | **组件/属性/Mapper 扫描面清单同步**（方案阶段 6 验收原文：每步同步更新，**不刷新 baseline 掩盖违例**） | 拆某一模块时逐项核对 `@ConfigurationPropertiesScan`/`@ComponentScan`/`@MapperScan` |
 | **G4** | **"确有编译隔离收益"的证据**（方案触发条件） | 口径：该包簇的**改动频率 × 受影响模块数**、增量编译范围；给出量化对比后再动手 |
+
+**契约料盘点（2026-10-15 实测；G1 收口依据）**
+
+`:common` 293 件 = 裸 `common/*` **153** + `platform/*` **139** + `event/*` 1（`:contract` 现 **153** 件）。其中 `common/*` 153 件按**最终归属**分类：
+
+| 类别 | 件数 | 归属 | 状态 |
+|---|---|---|---|
+| 持久化实体（`@TableName`） | 8 | 回 `domains/<域>` | C2 冻结（只许减） |
+| 域侧 TypeHandler | 10 | 随实体回域 | C2 冻结 |
+| 框架味（servlet/MyBatis/Spring） | 8 | `platform` 面 | 4 件已登记（C4 `PLATFORM_FACE`） |
+| 待去 Jackson | 3 | 去 Jackson ⇒ 契约 | C4 `PENDING_DEJACKSON` |
+| **无框架依赖（契约料候选）** | **87** | 见下表 | **未盘点 ⇒ 本表** |
+| 其他（Jackson 味配置/载荷） | 约 37 | 逐类判 | 未盘点 |
+
+87 件按 §5.1 三测（**公开 API / SPI / 不可变载荷**）三分：
+
+| 形态 | 件数 | 归属 | 例 |
+|---|---|---|---|
+| 接口 / SPI | **17** | `:contract` ✓ | `ChunkSearchGateway` · `KnowledgeBaseLookup` · `KnowledgeDocumentGateway` · `McpApprovalOps` · `EmbedSessionOps` · `SystemSettingGateway` · `StorageBackendPort` · `FileContentService` · `GlobalFileServicePort` · `WritableFileContentService` · `MessageFactsLookup` · `SeekableSource` · `Resolver` · `StorageBackendResolver` · `KnowledgeProcessingQueue` · `McpCatalogGuardedTool` |
+| record/enum/异常/小配置 | **32** | `:contract` ✓ | `ChunkPage` · `FaqEntry` · `FaqEntryPage` · `KnowledgeBase{Asr,Storage,StorageProvider}Config` · `dto/*View` · `ToolDefinitions` · `ToolOutput` · `ChunkPatterns` · `CodePoints` · `TextNormalizer` · `KnowledgeHashes` · `KnowledgePaths` · `KnowledgeTaskIdCodec` · `StorageEnvLookup` · `StoragePathGuard` · `StorageUrlContext` · `WikiConstants` · `WikiIndex` · `WikiLinkRepairResult` · `WikiException` · `WikiPageNotFoundException` · `PublicModeForbiddenException` · `ResourceModeException` · `StreamRewriter` · `DuplicateKnowledgeDetails` · `MemoryMessageCursor` |
+| 纯 JDK **算法/实现件** | ~7 + 12×`package-info` | ❌ **不属 `contracts`** ⇒ `retrieval-engine` 或域 | `knowledge/chunker/{HeaderTracker,HeadingHierarchy,ParsedChunk,Tokens}` · `TenantConfigRedaction` · `WikiCategoryPaths` |
+| （另）被 L1 内互引挡住 | 15 | 同批搬即可解 | — |
+| （另）被 `platform.*` 挡住 | 4 | `platform` 拆出后搬 | `ToolExecContext` · `SessionOwnerIds` · `SessionQaPort` · `StoragePaths` |
+
+⚠️ **搬前必做「同包裸名共居检查」**（本例已见高危：`FileContentService` 以**同包裸名**引 `FileTransport.OpenedFile`，而 `FileTransport` 带 servlet ⇒ **不可搬**）。口径：候选件的同包兄弟若被裸名引用且本身不可搬 ⇒ 该件不可搬。
+
+**归位批次建议与进展**：**批 A/B ✅ 已完成（19 件）**——`storage` 9（`StorageEnvLookup` · `MessageFactsLookup` · `StoragePathGuard` · `SeekableSource` · `PublicModeForbiddenException` · `Resolver` · `ResourceModeException` · `StorageBackendResolver` · `StorageUrlContext`）+ `knowledge` 10（`FaqEntry` · `FaqEntryPage` · `KnowledgeBase{Asr,Storage,StorageProvider}Config` · `DuplicateKnowledgeDetails` · `KnowledgeHashes` · `KnowledgePaths` · `KnowledgeTaskIdCodec` · `KnowledgeProcessingQueue`）；**搬前两道判据**：① 同包裸名共居检查（`storage/fileserve` 5 件因裸名引 `FileTransport`（servlet 味）被正确挡下）；② 消费域核查（19 件均有跨域消费，排除"只被本域用 ⇒ 应回域"）。**剩余**：批 C（`wiki/*` · `agent/tool` · `settings` · `session` 载荷件）→ 批 D（互引件同批搬）；`chunker/*` 9 件**算法件**不进契约（归宿 `retrieval-engine`）。每批：金片 + 全量闸门 + C1/C4 `--write` + 单独提交。
 
 **提取顺序（方案 §5.2 / 阶段 6 原文）**：**先 `contracts`（✅ 已独立）→ 再 `platform`（139 件，低风险）→ 再三个 runtime（`engine` 318 件：agent-engine / retrieval-engine / model-runtime）→ 最后 `domains` 内部重排**；"一次只搬一个包簇 → 全绿 → 提交"。
 
@@ -1538,6 +1565,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 契约料归位·批 A/B：`storage` 9 件 + `knowledge` 10 件 → `:contract`（2026-10-15）**
+- **背景**：§12.5 新写入「**契约料盘点（87 件三分）**」——`common/*` 153 件的构成全量分类（8 实体 + 10 handler + 8 框架味 + 3 待去 Jackson + 87 无框架依赖 + ~37 Jackson 味），本批实施其中最干净的一批
+- **搬前两道判据（本批新增，写入 §12.5）**：① **同包裸名共居检查**（脚本口径：候选件的同包兄弟若被裸名引用且不可搬 ⇒ 该件不可搬）——`storage/fileserve` 5 件因裸名引 `FileTransport`（**servlet 味**）被**正确挡下**；② **消费域核查**——19 件全部有跨域消费（session/knowledge/im/embedchannel/initialization/datasource/evaluation），排除"只被本域用 ⇒ 该回域而非进契约"的误搬
+- **不进本批（有据）**：`knowledge/chunker/*` **9 件纯 JDK 算法件**（§5.1 三测＝公开 API/SPI/不可变载荷 ⇒ **不属 `contracts`**，归宿 `retrieval-engine`）；`knowledge/{ChunkSearchGateway,KnowledgeBaseLookup,KnowledgeDocumentGateway}` 等 8 件被同包共居挡住（留批 D）
+- **⚠️ 一次红态**：**B124 死包目录** 2 处（`common/knowledge/task`、`common/storage/provider` 搬空后成死包，git 不可见但守卫看得见）⇒ 删除（守卫自己点名 ✓）
+- **读数**：`:contract` 153 → **172 件**；裸 `common/*` 153 → **134 件**；**R10 保持 7 条边 / 52 类**（搬包不涉域间边 ✓）
+- **验证**：五模块编译全绿；`:contract:javadoc` 绿；**14 守卫全绿**（R7 = 0 处不一致）；**1349 金片签名一致**（线格式未变）；`spotlessCheck build` **2m05s**；**4991 / 失败 0 / 跳过 4**；dev ready + 冒烟（KB / storage-backends / datasource/types / sessions / models 全 200 ✓）
+- **下一步（批 C/D）**：`wiki/*`（`WikiConstants`/`WikiIndex`/`WikiException`/`WikiLinkRepairResult`）· `agent/tool`（`ToolDefinitions`/`ToolOutput`/`McpCatalogGuardedTool`）· `settings`（`SystemSettingGateway`）· `session`（`EmbedSessionOps`）· `storage/fileserve`（`MessageFactsLookup` 已搬，余 5 件需先解 `FileTransport` 的 servlet 味）；随后批 D 把 15 件**互引件同批**搬
 **🔶 C 批 1·第一子批：`KnowledgeTag` 实体收窄归域（实体 14 → 13；R10 保持 7 边 / 52 类）（2026-10-15）**
 - **背景**：①档已清零（A③-54），此后工作重心＝§12.0 判据下的**欠债收窄**（C；B 门禁 C1/C2/C3 已上线、A 清单已在 §12.4）
 - **本刀最重要的产出＝"收窄总判据"（写入 §12.4）**：**收窄实体会重建跨域边**，必须同批做四件事——①读面换 **L1 不可变视图** ②写面走 **L1 写端口**（或用例归位）③**L1 里以实体为参数的组件改吃视图或下沉回域**（投影器/端口签名/载荷）④实体才回域

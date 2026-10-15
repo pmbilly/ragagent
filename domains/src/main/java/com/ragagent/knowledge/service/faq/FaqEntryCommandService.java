@@ -21,7 +21,7 @@ import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
-import com.ragagent.common.knowledge.domain.FaqEntry;
+import com.ragagent.contract.knowledge.domain.FaqEntry;
 import com.ragagent.knowledge.repository.FaqChunkRepository;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.contract.audit.AuditAction;

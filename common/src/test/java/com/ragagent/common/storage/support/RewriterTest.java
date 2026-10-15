@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.contract.storage.support.FileUrlPort;
+import com.ragagent.contract.storage.support.Resolver;
 
 /**
  * {@link Rewriter} / {@link FileServiceResolver} 的对等测试。

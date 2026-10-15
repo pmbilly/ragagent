@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.ragagent.contract.storage.fileserve.MessageFactsLookup;
 
 /**
  * 文件代理路由的能力端口（L1）：把"按作用域直出文件"的两条既有 handler 体

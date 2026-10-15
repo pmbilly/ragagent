@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
+import com.ragagent.contract.storage.support.StorageUrlContext;
+import com.ragagent.contract.storage.support.ResourceModeException;
+import com.ragagent.contract.storage.support.PublicModeForbiddenException;
 
 /**
  * 存储文件在 API 响应里的引用方式。

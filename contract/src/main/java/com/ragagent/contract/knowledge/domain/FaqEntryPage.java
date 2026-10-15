@@ -1,4 +1,4 @@
-package com.ragagent.common.knowledge.domain;
+package com.ragagent.contract.knowledge.domain;
 
 import java.util.List;
 

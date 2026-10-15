@@ -43,7 +43,7 @@ import com.ragagent.session.service.SteerRunCoordinator;
 import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.common.storage.support.Mode;
-import com.ragagent.common.storage.support.StorageBackendResolver;
+import com.ragagent.contract.storage.support.StorageBackendResolver;
 import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.common.storage.support.FileResolverFactory;

@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ragagent.knowledge.task.FaqImportTaskStore;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
-import com.ragagent.common.knowledge.support.KnowledgeTaskIdCodec;
+import com.ragagent.contract.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.knowledge.domain.access.FaqGuard;

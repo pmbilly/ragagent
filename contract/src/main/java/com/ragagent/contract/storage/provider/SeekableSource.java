@@ -1,4 +1,4 @@
-package com.ragagent.common.storage.provider;
+package com.ragagent.contract.storage.provider;
 
 import java.io.IOException;
 import java.io.InputStream;

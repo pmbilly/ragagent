@@ -30,7 +30,7 @@ import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
-import com.ragagent.common.knowledge.support.KnowledgeTaskIdCodec;
+import com.ragagent.contract.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.chatpipeline.spi.KnowledgeQaEventPort;

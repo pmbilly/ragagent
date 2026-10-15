@@ -1,6 +1,6 @@
 package com.ragagent.datasource.service;
 
-import com.ragagent.common.knowledge.support.KnowledgePaths;
+import com.ragagent.contract.knowledge.support.KnowledgePaths;
 
 import com.ragagent.common.knowledge.service.DuplicateKnowledgeException;
 
@@ -21,14 +21,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.common.knowledge.task.KnowledgeProcessingQueue;
+import com.ragagent.contract.knowledge.task.KnowledgeProcessingQueue;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.http.UrlBytesFetcher;
-import com.ragagent.common.knowledge.support.KnowledgeHashes;
+import com.ragagent.contract.knowledge.support.KnowledgeHashes;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
 /**

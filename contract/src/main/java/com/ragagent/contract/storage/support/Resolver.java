@@ -1,8 +1,7 @@
-package com.ragagent.common.storage.support;
-import com.ragagent.contract.storage.support.FileUrlPort;
+package com.ragagent.contract.storage.support;
 
 /**
- * 把一个存储引用映射到拥有它的 {@link FileUrlPort}。
+ * 把一个存储引用映射到拥有它的 {@code FileUrlPort}。
  *
  * <p>引用自带 provider scheme 与可选的存储后端 id，所以<b>一条回答可以跨多个后端</b>。</p>
  */

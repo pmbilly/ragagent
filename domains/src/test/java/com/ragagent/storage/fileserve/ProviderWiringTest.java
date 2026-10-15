@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.SeekableFileService;
-import com.ragagent.common.storage.provider.SeekableSource;
+import com.ragagent.contract.storage.provider.SeekableSource;
 import com.ragagent.common.storage.fileserve.FileTransport;
 
 /**

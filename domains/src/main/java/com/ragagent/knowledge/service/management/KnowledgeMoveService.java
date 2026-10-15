@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.common.knowledge.task.KnowledgeProcessingQueue;
+import com.ragagent.contract.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;

@@ -8,7 +8,7 @@ import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 
 import com.ragagent.contract.knowledge.KnowledgeBaseFacts;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.common.storage.StorageEnvLookup;
+import com.ragagent.contract.storage.StorageEnvLookup;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.contract.knowledge.KnowledgeBaseGateway;
 import com.ragagent.contract.knowledge.KnowledgeBaseProvisioner;

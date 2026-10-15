@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsUpdate;
-import com.ragagent.common.knowledge.domain.FaqEntry;
+import com.ragagent.contract.knowledge.domain.FaqEntry;
 
 /**
  * FAQ 写路径的域守卫：知识库存在性/类型校验、租户越权判定、标签解析与作用域校验、

@@ -26,7 +26,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
-import com.ragagent.common.storage.provider.SeekableSource;
+import com.ragagent.contract.storage.provider.SeekableSource;
 
 /**
  * S3 协议族后端（<b>s3 / minio / obs / ks3</b>），一次实现覆盖四条 provider 路线：

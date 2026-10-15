@@ -4,6 +4,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.contract.knowledge.service.DuplicateKnowledgeDetails;
 
 /**
  * 重复知识冲突（由 {@code KnowledgeService} 的**嵌套类**提为**顶层类型**）。

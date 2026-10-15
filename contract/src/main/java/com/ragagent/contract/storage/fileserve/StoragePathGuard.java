@@ -1,4 +1,4 @@
-package com.ragagent.common.storage.fileserve;
+package com.ragagent.contract.storage.fileserve;
 
 import java.io.IOException;
 import java.nio.file.Path;

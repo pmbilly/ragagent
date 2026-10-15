@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.common.storage.fileserve.FileTransport;
-import com.ragagent.common.storage.fileserve.StoragePathGuard;
+import com.ragagent.contract.storage.fileserve.StoragePathGuard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import com.ragagent.contract.error.AppError;
 import java.util.Comparator;
 import com.ragagent.platform.storage.config.UploadLimits;
-import com.ragagent.common.knowledge.support.KnowledgeHashes;
+import com.ragagent.contract.knowledge.support.KnowledgeHashes;
 
 /**
  * 本地存储引擎。

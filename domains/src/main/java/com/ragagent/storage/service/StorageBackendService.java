@@ -18,7 +18,7 @@ import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.storage.dto.StorageConfig;
 import com.ragagent.storage.mapper.StorageBackendRepository;
 import org.springframework.stereotype.Service;
-import com.ragagent.common.storage.StorageEnvLookup;
+import com.ragagent.contract.storage.StorageEnvLookup;
 
 /**
  * 存储后端管理的 HTTP 面方法：Create / Update / Delete / SetDefault / Test + Validate 链。

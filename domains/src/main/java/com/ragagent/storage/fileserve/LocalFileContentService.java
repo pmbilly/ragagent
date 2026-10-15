@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.common.storage.fileserve.StoragePathGuard;
+import com.ragagent.contract.storage.fileserve.StoragePathGuard;
 import com.ragagent.common.storage.fileserve.FileTransport;
 import com.ragagent.common.storage.fileserve.StoragePaths;
 import com.ragagent.common.storage.fileserve.WritableFileContentService;

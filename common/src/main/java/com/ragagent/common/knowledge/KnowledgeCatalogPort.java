@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.ChunkPage;
-import com.ragagent.common.knowledge.domain.FaqEntryPage;
+import com.ragagent.contract.knowledge.domain.FaqEntryPage;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.contract.knowledge.KnowledgeTagView;
