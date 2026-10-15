@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.common.session.embed.MessageView;
-import com.ragagent.common.session.qa.QaRequestPayload;
+import com.ragagent.contract.session.QaRequestPayload;
 import com.ragagent.common.session.qa.SessionQaPort;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.session.service.MessageService;
@@ -14,6 +14,7 @@ import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.contract.session.SessionView;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * {@link SessionQaPort} 的会话域实现：消息落库与会话读取逐字转发；
@@ -87,7 +88,8 @@ public class SessionQaAdapter implements SessionQaPort {
         req.assistantMessageId = payload.assistantMessageId;
         req.userMessageId = payload.userMessageId;
         req.agentId = payload.agentId;
-        req.agentConfig = payload.agentConfig;
+        // 载荷侧纯 JDK 值 → 域容器 JsonNode（边界归一，G1-l）
+        req.agentConfig = JsonMappers.toObjectNode(payload.agentConfig);
         req.webSearchEnabled = payload.webSearchEnabled;
         req.quotedContext = payload.quotedContext;
         req.cancellationProbe = payload.cancellationProbe;

@@ -88,7 +88,7 @@ final class EmbedChannelPublicOps {
                 // 解析失败按"未指定"处理
             }
         }
-        com.fasterxml.jackson.databind.node.ArrayNode questions;
+        java.util.List<Object> questions;
         try {
             questions = ctrl.service.suggestedQuestions(ch, limitInt);
         } catch (RuntimeException e) {

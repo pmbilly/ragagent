@@ -3,6 +3,7 @@ package com.ragagent.common.session.qa;
 import com.ragagent.contract.session.SessionView;
 import com.ragagent.common.session.embed.MessageView;
 import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.session.QaRequestPayload;
 
 /**
  * 会话问答面端口（L1）：装配面（IM 等）触发会话 QA、读写会话与消息所需的窄面。

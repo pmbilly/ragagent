@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import com.ragagent.contract.agent.AgentChannelCleaner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.agent.AgentLookup;
+import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.platform.redis.RedisPubSub;
 import com.ragagent.platform.redis.SpringRedisPubSub;
 import com.ragagent.platform.access.TenantContext;

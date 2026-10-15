@@ -126,7 +126,7 @@ final class SessionQaResolution {
      * <p>⚠️ 前端/内置/IM 写的都是 {@code smart-reasoning}，判别取值不要改——
      * 写错会让 agent-chat 被误判进 RAG 快答分支。</p>
      */
-    static boolean isAgentMode(ObjectNode c) {
+    static boolean isAgentMode(JsonNode c) {
         return "smart-reasoning".equals(c.path("agentMode").asText(""));
     }
 

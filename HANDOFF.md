@@ -1525,8 +1525,8 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 账 | 读数 | 状态 |
 |---|---|---|
-| `:contract` | **219 件** | ✅ 已独立（零依赖） |
-| `common/*` | **66 件**（125 → … → 72 → 67 → 66；G1-j 净 −1＝迁出 2 件、新增 1 件 L1 codec） | 收敛中 |
+| `:contract` | **221 件** | ✅ 已独立（零依赖） |
+| `common/*` | **64 件**（125 → … → 67 → 66 → 64） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
 | **C1 受控导入根** | 10 根 / **57 文件** | 冻结只许减 |
@@ -1792,6 +1792,22 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 G1-l·`AgentLookup` 入 `contract.agent` + `QaRequestPayload` 入 `contract.session`（刀序第 2 步首个面）（2026-10-15）**
+- **触发**：G1-k 定下的刀序第 2 步（逐面迁移）——第一个面带 `ObjectNode`/`ArrayNode`
+- **交付 1｜`AgentLookup` 去 Jackson 并入 `contract.agent`**（其 javadoc 原写"待 `JsonNode` 载体 **K 级重设计**时再上提契约面"⇒ 门面就绪后**兑现** ✓）：`ObjectNode defaultedConfig(String)` → **`Object`**；`ArrayNode suggestedQuestions(...)` → **`List<Object>`**；适配器边界 `JsonMappers.toJavaValue/toJavaArray` 归一；消费方读面用 `contract.json.JsonValues` ✓
+- **交付 2｜`QaRequestPayload` 去 Jackson 并入 `contract.session`**（唯一 Jackson 面＝`ObjectNode agentConfig` → `Object` ✓；其余字段早已是契约件 ✓）⇒ **C4 摘登记**（待去 Jackson 保持 0 ✓）
+- **交付 3｜两个边界助手**：`JsonMappers.toJavaArray(JsonNode)`（数组 → `List<Object>`）· `toObjectNode(Object)`（纯 JDK → `ObjectNode`，**回填域容器**用）
+- **消费侧**：`ImQaRequests` 改用 **`JsonValues.boolAt`**（新门面首个真实用例 ✓）；`EmbedChannelService`/`EmbedChannelPublicOps` 的 `ArrayNode` → `List<Object>`（序列化等价，**`emb-pub-suggestions-get.json` 金片护航** ✓）；`SessionQaAdapter` 边界回填用 `toObjectNode` ✓
+- ⚠️ **两处实现要点（判据，都值得复用）**：
+  1. **G1-k 记录的"编译通过但读不到"陷阱当场现身** ✗：适配器 `defaultedConfig` 的 `return AgentConfigJson.ensureDefaults(obj);`（返回 `ObjectNode`，声明 `Object`）⇒ **编译无声、读面失效** ✗，由**测试**抓到（"原字段保留"期望有值却为空）⇒ 修法＝返回值处 `toJavaValue` 归一 ✓
+     **判据再确认：把参数/返回类型放宽到 `Object` 后，必须逐个返回值核查归一；编译器不作声，测试是唯一可靠探针**
+  2. **域容器改型引爆面广**：我先试图把域容器 `QaSupport.QaRequest.agentConfig` 由 `ObjectNode` 改成 `JsonNode`（想省一次 cast ✗）⇒ 触发 **8+ 处**连带错误 ✗ ⇒ **回退容器口径**，改为**只在装配/适配边界归一 + 回填** ✓
+     **判据：域容器口径不因"载荷侧去 Jackson"而改**
+  3. 另踩两次：R8 内联 FQN 与**行尾 CRLF**（我的替换写出 `databind.node.JsonNode` 这种**假 FQN** ✗）⇒ **判据：批量替换 FQN 用"短名 + import"，别生造 FQN**
+- **读数**：`:contract` 219 → **221**；`common/*` 66 → **64**；C4 登记 **platform 面 8 · Jackson 语义必要 2 · 待去 Jackson 0** ✓；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**；**1349 金片签名一致**（含 `emb-pub-suggestions-get.json` ⇒ **推荐问题线格式逐字节不变** ✓）；`spotlessCheck build` **1m56s**；**4996 / 失败 0 / 跳过 4**；冒烟（sessions / KB / system-info **200** ✓ · embed 推荐问题 ⇒ **401 渠道闸门信封** ✓）
+- ⚠️ **Redis 瞬态（第 2 次复现，登记）**：全量闸门首轮出现 `RedisLimiterTest` / `EmbedRateLimiterTest` 的 `RedisConnectionFailureException`，**复跑即绿** ⇒ 环境抖动（Redis 容器在跑但需密码）⇒ **建议独立小刀**：给测试侧 Lettuce 加连接超时/重试配置
+- **刀序进度**：① `JsonValues` 门面 ✓ ② 逐面迁移：**`AgentLookup` ✓（首个面）**；余面＝`SystemSettingRegistry`（platform `ToolJson`）· 知识/检索面 · **工具族本体**（37 + 22 点，借门面一次性改）
 **🔶 G1-k·契约侧纯 JDK JSON 读面 `JsonValues` + `ParserEngineRules` 试点（"被读取面"的整体解锁路径）（2026-10-15）**
 - **触发**：工具面批次 ⇒ 先做**"内容读取 vs 透传"审计** ⇒ **审计改变了策略**：
   - 工具面三件（`AgentTool`/`BaseTool`/`ToolRequest`）的 `JsonNode` **全是被读取**（测试里就有 18 / 58 处内容读取 ✗）⇒ 硬改 `Object` 需 **60+ 处包裹** ✗ **不是好刀**

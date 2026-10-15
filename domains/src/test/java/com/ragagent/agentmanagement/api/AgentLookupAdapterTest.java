@@ -1,6 +1,7 @@
 package com.ragagent.agentmanagement.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.ragagent.contract.json.JsonValues;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -67,8 +68,9 @@ class AgentLookupAdapterTest {
 
         var cfg = adapter.defaultedConfig("{\"agentMode\":\"quick-answer\"}");
         assertNotNull(cfg);
-        assertEquals("quick-answer", cfg.path("agentMode").asText(""), "原字段保留");
-        assertEquals(10, cfg.path("maxIterations").asInt(0), "缺省 maxIterations 已补");
-        assertTrue(cfg.has("questionSuggestions"), "缺省 questionSuggestions 已补");
+        // G1-l：返回值已改纯 JDK 值 ⇒ 断言走契约侧读面 JsonValues（语义与 JsonNode 读面逐条对齐）
+        assertEquals("quick-answer", JsonValues.asText(JsonValues.get(cfg, "agentMode"), ""), "原字段保留");
+        assertEquals(10, JsonValues.asInt(JsonValues.get(cfg, "maxIterations"), 0), "缺省 maxIterations 已补");
+        assertNotNull(JsonValues.get(cfg, "questionSuggestions"), "缺省 questionSuggestions 已补");
     }
 }

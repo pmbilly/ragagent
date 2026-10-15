@@ -83,4 +83,22 @@ public final class JsonMappers {
         }
         return out;
     }
+
+    /** 数组节点 → 纯 JDK 列表（逐元素 {@link #toJavaValue}；非数组/ null ⇒ 空列表）。 */
+    public static java.util.List<Object> toJavaArray(com.fasterxml.jackson.databind.JsonNode node) {
+        java.util.List<Object> out = new java.util.ArrayList<>();
+        if (node == null || !node.isArray()) {
+            return out;
+        }
+        for (com.fasterxml.jackson.databind.JsonNode n : node) {
+            out.add(toJavaValue(n));
+        }
+        return out;
+    }
+
+    /** 纯 JDK 值 → {@code ObjectNode}（对象 ⇒ 节点；非对象 / null ⇒ {@code null}）。 */
+    public static com.fasterxml.jackson.databind.node.ObjectNode toObjectNode(Object value) {
+        com.fasterxml.jackson.databind.JsonNode node = toJsonNode(value);
+        return node instanceof com.fasterxml.jackson.databind.node.ObjectNode obj ? obj : null;
+    }
 }

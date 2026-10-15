@@ -151,9 +151,6 @@ PENDING_DEJACKSON = {
 # **抽象泄漏**（契约的字节隐式依赖 L1 类的注解）⇒ 诚实留 L1 并在此登记依据。
 # 与 ① 的区别：① 是"装了框架类型搬不动"，② 是"能装但语义装不下"。
 PENDING_DEJACKSON_EXTRA = {
-    "com/ragagent/common/session/qa/QaRequestPayload.java":
-        "对话入参载荷：含 `ObjectNode`（Jackson 树）且依赖 L1 值类型 `MessageAttachment` "
-        "⇒ 随 **session 域批次**（值类型回迁）一并去 Jackson 后入 contract.session",
     "com/ragagent/common/session/PipelineMessageView.java":
         "管线消息视图：依赖 L1 `retrieval/SearchResult` ⇒ 随 **检索域批次**（SearchResult 去 Jackson/归位）"
         "一并处置后入契约",

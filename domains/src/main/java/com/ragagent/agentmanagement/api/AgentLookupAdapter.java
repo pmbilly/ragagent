@@ -7,14 +7,13 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
 import com.ragagent.agentmanagement.service.CustomAgentService;
 import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
-import com.ragagent.common.agent.AgentLookup;
+import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.platform.web.JsonMappers;
 
 /**
@@ -91,7 +90,7 @@ public class AgentLookupAdapter implements AgentLookup {
     }
 
     @Override
-    public ObjectNode defaultedConfig(String configJson) {
+    public Object defaultedConfig(String configJson) {
         if (configJson == null || configJson.isEmpty()) {
             return null;
         }
@@ -100,14 +99,15 @@ public class AgentLookupAdapter implements AgentLookup {
             if (!(node instanceof ObjectNode obj)) {
                 return null;
             }
-            return AgentConfigJson.ensureDefaults(obj);
+            // 边界归一：JsonNode → 纯 JDK 值（契约面口径，G1-l）
+            return JsonMappers.toJavaValue(AgentConfigJson.ensureDefaults(obj));
         } catch (RuntimeException | IOException e) {
             return null;
         }
     }
 
     @Override
-    public ArrayNode suggestedQuestions(String agentId, List<String> kbIds, int limit) {
-        return agentService.getSuggestedQuestions(agentId, kbIds, null, null, limit, null);
+    public java.util.List<Object> suggestedQuestions(String agentId, List<String> kbIds, int limit) {
+        return JsonMappers.toJavaArray(agentService.getSuggestedQuestions(agentId, kbIds, null, null, limit, null));
     }
 }

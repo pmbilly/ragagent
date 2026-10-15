@@ -11,7 +11,7 @@ import com.ragagent.im.runtime.Commands.CommandContext;
 import com.ragagent.im.runtime.Commands.CommandRegistry;
 import com.ragagent.im.runtime.Commands.CommandResult;
 import com.ragagent.im.runtime.Commands.ImCommand;
-import com.ragagent.common.agent.AgentLookup;
+import com.ragagent.contract.agent.AgentLookup;
 
 /**
  * 五个斜杠命令。注册序固定：help → info → search → stop → clear。

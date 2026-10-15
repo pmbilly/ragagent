@@ -18,7 +18,7 @@ import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.common.session.qa.QaRequestPayload;
+import com.ragagent.contract.session.QaRequestPayload;
 
 /**
  * IM 文件/图片附件的下载与解析。

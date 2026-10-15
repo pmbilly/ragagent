@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.ragagent.common.agent.AgentLookup;
+import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.platform.event.Event;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventType;
@@ -27,7 +27,7 @@ import com.ragagent.contract.event.payload.AgentThoughtData;
 import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
 import com.ragagent.contract.event.payload.ErrorData;
-import com.ragagent.common.session.qa.QaRequestPayload;
+import com.ragagent.contract.session.QaRequestPayload;
 import com.ragagent.common.session.embed.MessageView;
 import com.ragagent.contract.session.SessionView;
 

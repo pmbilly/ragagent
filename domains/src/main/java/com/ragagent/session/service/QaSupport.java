@@ -52,7 +52,7 @@ public final class QaSupport {
         public Session session;
         /** 已解析的 agent（id/config 树）；null = 未指定或未解析到 */
         public CustomAgentEntity agentRow;
-        /** agent 的 config 树（ensureDefaults 后的 ObjectNode） */
+        /** agent 的 config 树（ensureDefaults 后的 ObjectNode；装配面载荷为纯 JDK 值，边界经 JsonMappers 归一）。 */
         public com.fasterxml.jackson.databind.node.ObjectNode agentConfig;
         public Message assistantMessage;
         public List<String> knowledgeBaseIds = new ArrayList<>();

@@ -2,7 +2,7 @@ package com.ragagent.im.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.common.agent.AgentLookup;
+import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.im.domain.ChannelSessionEntity;
 
 /**

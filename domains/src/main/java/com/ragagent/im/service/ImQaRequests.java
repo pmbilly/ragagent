@@ -3,14 +3,15 @@ package com.ragagent.im.service;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.agent.AgentLookup;
+import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
-import com.ragagent.common.session.qa.QaRequestPayload;
+import com.ragagent.contract.session.QaRequestPayload;
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.common.session.embed.MessageView;
 import com.ragagent.contract.session.SessionView;
+import com.ragagent.contract.json.JsonValues;
 
 /**
  * QA 管线的共享底座：agent 模式判定、IM 请求构造（含 agent config 缺省补全）、
@@ -52,8 +53,7 @@ final class ImQaRequests {
         if (agent != null) {
             req.agentConfig = service.agentLookup.defaultedConfig(agent.configJson());
         }
-        req.webSearchEnabled = req.agentConfig != null
-                && req.agentConfig.path("webSearchEnabled").asBoolean(false);
+        req.webSearchEnabled = JsonValues.boolAt(req.agentConfig, "webSearchEnabled", false);
         req.quotedContext = ImFormat.formatQuotedContext(quote);
         if (inflight != null) {
             // IM /stop → 引擎取消：探针读队列层的取消标志（与 web 面 QaTurnExecutor 同契约，

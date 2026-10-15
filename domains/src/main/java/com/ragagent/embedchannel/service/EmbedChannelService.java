@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.agent.AgentLookup;
+import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.EmbedTokens;
@@ -614,7 +614,7 @@ public class EmbedChannelService {
     }
 
     /** 推荐问题：委托 agent.management 的同语义实现。 */
-    public ArrayNode suggestedQuestions(EmbedChannelEntity ch, int limit) {
+    public java.util.List<Object> suggestedQuestions(EmbedChannelEntity ch, int limit) {
         if (ch == null || !ch.isShowSuggestedQuestions()) {
             return null;
         }

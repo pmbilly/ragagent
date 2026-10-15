@@ -1,12 +1,9 @@
-package com.ragagent.common.session.qa;
+package com.ragagent.contract.session;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.session.SessionView;
-import com.ragagent.contract.session.MessageAttachment;
 
 /**
  * QA 请求载荷（L1）：IM 等装配面构造、会话面消费的最小字段集。
@@ -31,7 +28,7 @@ public final class QaRequestPayload {
     public String agentId = "";
 
     /** 归一化后的 agent 配置（缺省补全在装配面完成）。 */
-    public ObjectNode agentConfig;
+    public Object agentConfig;
 
     public boolean webSearchEnabled;
 
