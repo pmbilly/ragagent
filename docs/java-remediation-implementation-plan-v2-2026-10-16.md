@@ -39,18 +39,18 @@
 | 4 | `SearchResult`（`SortedMapSerializer` + `JsonNode`） | `platform.retrieval` | 去框架化 → `contract.retrieval`（方案 §8.1 原文落点；66 处消费，金片护航） | **P3** |
 | 5 | `MessageView` · `PipelineMessageView` | `platform.session.embed` / `platform.session` | 去框架化 → `contract.session`（金片 `emb-pub-messages-load*` 钉住，逐字节验证） | **P3** |
 | 6 | `MemoryMessageCursor`（`ZeroTimeSerializer`） | `platform.memory` | 去框架化 → `contract.memory`（零时序列化语义移至边界） | **P3** |
-| 7 | `UserPreferences` | `platform.auth` | 归域 → `auth/domain`（方案 §8.9 原文落点） | **P2** |
+| 7 | `UserPreferences` | `platform.auth` | 归域 → `auth/domain`（方案 §8.9 原文落点） | **P5** |
 | 8 | `LanguageProperties` · `RetrievalDriverProperties` · `TenantConfigLookup` · `TenantProperties` | `platform.config` | 去框架化 → `contract.wiki` / `contract.retrieval` / `contract.tenant`（均系方案 §8.1 原文落点） | **P4** |
 | 9 | `SessionQaPort` · `EmbedSessionPort`（servlet+ResponseEntity 签名） | `platform.session.{qa,embed}` | 签名中性化（`EventBusInterface` 已就位；servlet/ResponseEntity 归边界）→ `contract.session` | **P4** |
 | 10 | `AdminUserPort` · `AdminUserView` · `ApiKeyAuthPort` | `platform.{auth,apikey}` | 签名中性化 → `contract.auth` / `contract.apikey`（方案 §8.1 原文落点） | **P4** |
 | 11 | `KnowledgeCatalogPort` · `FaqChunkMetadataCodec` | `platform.knowledge` | 端口中性化（去 MyBatis-Plus `Page`）→ `contract.knowledge`；codec 归域 | **P4** |
 | 12 | `Settings` 2 件（`ConversationProperties`/`SystemSettingRegistry`） | `platform.settings` | 去 platform 依赖（`PromptSource`/`ToolJson`）→ `contract.settings` | **P4** |
-| 13 | `ParserEngineConfig` | `platform.tenant` | 回 `tenant` 域（方案 §8.9 原文落点）；跨域读取走 `TenantConfigLookup` 端口 | **P2** |
+| 13 | `ParserEngineConfig` | `platform.tenant` | 回 `tenant` 域（方案 §8.9 原文落点）；跨域读取走 `TenantConfigLookup` 端口 | **P5** |
 | 14 | `BaseTool` | `platform.tool` | 归 `agent-engine`（工具实现基类） | **R5**（随 agent） |
 | 15 | 文件服务面（`fileserve` 8 + `support` 4） | `platform.storage.*` | 逐件裁：端口中性化进 contract / servlet 技术件留 platform 边界 | **P5** |
 | — | 合理技术件（`UrlBytesFetcher`·`StreamManager`·`ContractJsonMixins*`·`LikeEscapes`·`JsonbRawStringTypeHandler`·`RedisPubSub`·`TenantContext/TenantScopes` 等） | 各面 | **保留**（技术适配定位相符） | — |
 
-**P2 执行设计（2026-10-16 勘察定稿）**——KB config 三层结构的实际读写面＝**7 个文件主战场**（不是"引用 KBRV 的 30 文件"全涟漪）：
+**P2 执行设计（2026-10-16 勘察定稿；✅ 已执行 `675b782b`）**——KB config 三层结构的实际读写面＝**7 个文件主战场**（不是"引用 KBRV 的 30 文件"全涟漪）：
 
 1. **新建 2 个 View** 补全 7 件对（`StorageConfigView`/`StorageProviderConfigView`，contract 纯 JDK record；字段＝消费者实际用度）；
 2. **KBRV 的 7 个配置字段**：Config → 对应 View；`KnowledgeBaseRowViews`（实体⇄载体映射）改走新建的域侧助手 `KnowledgeBaseConfigMaps`（View↔Config 双向映射，即原 `from/toDomain` 的接收者）；
