@@ -1,4 +1,4 @@
-package com.ragagent.agent.prompt;
+package com.ragagent.contract.agent;
 
 import java.util.List;
 

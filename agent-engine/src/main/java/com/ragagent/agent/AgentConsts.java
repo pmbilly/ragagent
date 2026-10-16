@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 
-import com.ragagent.agent.compaction.CompactionSettings;
+import com.ragagent.contract.agent.CompactionSettings;
 
 /**
  * agent 常量与判定。

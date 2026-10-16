@@ -1,5 +1,6 @@
 package com.ragagent.agent.compaction;
 
+import com.ragagent.contract.agent.CompactionSettings;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;

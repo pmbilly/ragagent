@@ -14,7 +14,7 @@ import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.support.PipelineViews;
-import com.ragagent.agent.tool.runtime.ToolResultPersist;
+import com.ragagent.contract.agent.ToolResultPersist;
 import com.ragagent.contract.model.chat.FunctionCall;
 
 /**

@@ -1,5 +1,6 @@
 package com.ragagent.agent.compaction;
 
+import com.ragagent.contract.agent.CompactionSettings;
 import static com.ragagent.agent.GoRecording.STR_E2E_LENGTH_STOP_SUMMARY;
 import static com.ragagent.agent.GoRecording.STR_E2E_REACT12_SUMMARY;
 import static com.ragagent.agent.GoRecording.STR_GROWN_PROMPT0;

@@ -83,9 +83,9 @@ class AgentEngineBoundaryTest {
  * 扫描面下限（低于此值说明路径漂移，守卫在空转）。
  *
  * <p> 改名后 `agent/tools` 迁出为平级 `agenttools/`（91 文件），引擎侧本面
- * 从 ≈150 降到 ≈60；阈值随之收紧到 55；R5a 切出 `:agent-engine` 时实测 80 件 ⇒ 收紧到 70。</p>
+ * 从 ≈150 降到 ≈60；阈值随之收紧到 55；R5a 切出 `:agent-engine` 时实测 80 件 ⇒ 收紧到 70；R5b-1 把 12 件纯形状上提 `contract.agent` 后实测 68 件 ⇒ 收到 60。</p>
  */
-    private static final int MIN_SCANNED_FILES = 70;
+    private static final int MIN_SCANNED_FILES = 60;
 
     @Test
     @DisplayName("B0：扫描面自检（防止路径漂移导致守卫静默空转）")

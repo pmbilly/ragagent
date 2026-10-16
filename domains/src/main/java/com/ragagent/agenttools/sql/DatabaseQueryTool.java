@@ -12,7 +12,7 @@ import com.ragagent.platform.web.ToolJson;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
-import com.ragagent.agent.tool.runtime.SearchAuth;
+import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;

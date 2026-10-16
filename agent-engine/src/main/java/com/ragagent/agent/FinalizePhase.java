@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.ragagent.agent.domain.AgentState;
 import com.ragagent.contract.agent.AgentStep;
-import com.ragagent.agent.tool.runtime.ThinkBlocks;
+import com.ragagent.contract.agent.ThinkBlocks;
 import com.ragagent.contract.event.payload.AgentCompleteData;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.Event;

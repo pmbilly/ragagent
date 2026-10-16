@@ -4,6 +4,7 @@ package com.ragagent.agent.tool.runtime;
 
 
 
+import com.ragagent.contract.agent.SearchAuth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -16,10 +17,10 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.tool.runtime.SearchAuth.ChunkView;
-import com.ragagent.agent.tool.runtime.SearchAuth.KnowledgeView;
-import com.ragagent.agent.tool.runtime.SearchAuth.ScopeAuthException;
-import com.ragagent.agent.tool.runtime.SearchAuth.TagView;
+import com.ragagent.contract.agent.SearchAuth.ChunkView;
+import com.ragagent.contract.agent.SearchAuth.KnowledgeView;
+import com.ragagent.contract.agent.SearchAuth.ScopeAuthException;
+import com.ragagent.contract.agent.SearchAuth.TagView;
 import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.agenttools.RecordingSupport;

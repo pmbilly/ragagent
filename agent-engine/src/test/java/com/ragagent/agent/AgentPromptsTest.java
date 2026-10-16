@@ -50,11 +50,11 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.platform.prompt.PromptConstants;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
 import com.ragagent.agent.prompt.GroundingPrompt;
-import com.ragagent.agent.prompt.RecentDocInfo;
-import com.ragagent.agent.prompt.PinnedSkillInstructions;
-import com.ragagent.agent.prompt.KnowledgeBaseInfo;
+import com.ragagent.contract.agent.RecentDocInfo;
+import com.ragagent.contract.agent.PinnedSkillInstructions;
+import com.ragagent.contract.agent.KnowledgeBaseInfo;
 import com.ragagent.agent.prompt.PlaceholderDefinition;
-import com.ragagent.agent.prompt.SystemPromptSection;
+import com.ragagent.contract.agent.SystemPromptSection;
 
 /**
  * 提示词合成的录制常量断言（时间参数化为固定日期 2026-09-20）。

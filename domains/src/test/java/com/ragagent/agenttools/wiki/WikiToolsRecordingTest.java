@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.agent.tool.runtime.SearchAuth.KnowledgeTagsFetcher;
-import com.ragagent.agent.tool.runtime.SearchAuth.TagView;
+import com.ragagent.contract.agent.SearchAuth.KnowledgeTagsFetcher;
+import com.ragagent.contract.agent.SearchAuth.TagView;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.agenttools.GoRecording45B;

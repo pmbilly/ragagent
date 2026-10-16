@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ragagent.contract.agent.AgentStep;
-import com.ragagent.agent.tool.runtime.ToolResultPersist;
+import com.ragagent.contract.agent.ToolResultPersist;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.contract.event.Event;

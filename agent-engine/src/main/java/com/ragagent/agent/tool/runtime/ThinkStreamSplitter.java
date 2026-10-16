@@ -3,7 +3,7 @@ package com.ragagent.agent.tool.runtime;
 /**
  * 流式 {@code <think>} 分离器。
  *
- * <p>{@link ThinkBlocks} 处理的是完整字符串；本类按 chunk 增量地把内联思维链与正文分流——
+ * <p>{@code contract.agent.ThinkBlocks} 处理的是完整字符串；本类按 chunk 增量地把内联思维链与正文分流——
  * 思考部分实时进 "thought" UI 区，正文进 "最终回答" 区，不等整个响应结束。跨 chunk 的标签
  * 边界（一个 chunk 尾部是 {@code <thi}、下个 chunk 开头是 {@code nk>}）靠缓冲"可能仍是标签
  * 前缀的尾部字节"解决；流结束时调 {@link #flush()} 排空缓冲。</p>

@@ -1,5 +1,6 @@
 package com.ragagent.agent.tool.runtime;
 
+import com.ragagent.contract.agent.ThinkBlocks;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;

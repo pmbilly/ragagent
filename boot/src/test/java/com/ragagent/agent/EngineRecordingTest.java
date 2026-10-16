@@ -16,15 +16,15 @@ import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.support.ContractJson;
-import com.ragagent.agent.compaction.CompactionSettings;
+import com.ragagent.contract.agent.CompactionSettings;
 import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.contract.model.chat.FunctionCall;
 import com.ragagent.agent.budget.TokenEstimator;
-import com.ragagent.agent.prompt.RecentDocInfo;
-import com.ragagent.agent.prompt.SelectedDocumentInfo;
-import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
-import com.ragagent.agent.prompt.PinnedSkillInfo;
-import com.ragagent.agent.prompt.KnowledgeBaseInfo;
+import com.ragagent.contract.agent.RecentDocInfo;
+import com.ragagent.contract.agent.SelectedDocumentInfo;
+import com.ragagent.contract.agent.PinnedMCPServiceInfo;
+import com.ragagent.contract.agent.PinnedSkillInfo;
+import com.ragagent.contract.agent.KnowledgeBaseInfo;
 
 /**
  * 引擎录制回放：Java 引擎用同一脚本驱动，事件序列 / AgentState 快照 /

@@ -19,7 +19,7 @@ import com.ragagent.agent.tool.DocChunkSupport;
 import com.ragagent.agenttools.knowledge.GrepChunksTool;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool;
-import com.ragagent.agent.tool.runtime.SearchAuth;
+import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.agenttools.knowledge.SearchConversationsTool;
 import com.ragagent.agenttools.knowledge.SearchMemoryTool;
 import com.ragagent.contract.retrieval.SearchTarget;

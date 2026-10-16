@@ -1,5 +1,6 @@
 package com.ragagent.agent.compaction;
 
+import com.ragagent.contract.agent.CompactionSettings;
 import java.util.ArrayList;
 import java.util.List;
 

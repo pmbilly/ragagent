@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.contract.tenant.ChatHistoryConfig;
 import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.agent.tool.runtime.ThinkBlocks;
+import com.ragagent.contract.agent.ThinkBlocks;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.model.ModelRuntime;

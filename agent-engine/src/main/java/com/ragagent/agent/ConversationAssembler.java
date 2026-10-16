@@ -12,13 +12,13 @@ import com.ragagent.agent.skills.Skill;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
-import com.ragagent.agent.prompt.RecentDocInfo;
-import com.ragagent.agent.prompt.SelectedDocumentInfo;
-import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
-import com.ragagent.agent.prompt.PinnedSkillInfo;
-import com.ragagent.agent.prompt.PinnedSkillInstructions;
-import com.ragagent.agent.prompt.KnowledgeBaseInfo;
-import com.ragagent.agent.prompt.SystemPromptSection;
+import com.ragagent.contract.agent.RecentDocInfo;
+import com.ragagent.contract.agent.SelectedDocumentInfo;
+import com.ragagent.contract.agent.PinnedMCPServiceInfo;
+import com.ragagent.contract.agent.PinnedSkillInfo;
+import com.ragagent.contract.agent.PinnedSkillInstructions;
+import com.ragagent.contract.agent.KnowledgeBaseInfo;
+import com.ragagent.contract.agent.SystemPromptSection;
 
 /**
  * 会话装配协作者（原 {@code PromptAssembly}）：把"这次要发给模型的消息"组装出来——

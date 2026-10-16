@@ -1,4 +1,4 @@
-package com.ragagent.agent.compaction;
+package com.ragagent.contract.agent;
 
 import java.util.regex.Pattern;
 

@@ -3,7 +3,7 @@ package com.ragagent.agent;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.agent.compaction.CompactionSettings;
+import com.ragagent.contract.agent.CompactionSettings;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.contract.model.TokenUsage;

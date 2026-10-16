@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.skills.SkillSource;
-import com.ragagent.agent.prompt.PinnedSkillInfo;
-import com.ragagent.agent.prompt.PinnedSkillInstructions;
+import com.ragagent.contract.agent.PinnedSkillInfo;
+import com.ragagent.contract.agent.PinnedSkillInstructions;
 
 /**
  * 装配层接线：@ 点名的技能正文被解析出来并随系统提示词注入；

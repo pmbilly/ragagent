@@ -1,6 +1,6 @@
 package com.ragagent.agent.tool;
 
-import com.ragagent.agent.tool.runtime.SearchAuth;
+import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -37,7 +37,7 @@ public final class DocChunkSupport {
     /**
      * 知识读取接缝（按 ID 取知识 / 取标签）。
      * 返回 null = empty result（记入失败文案）。
-     * 不继承 {@link SearchAuth.KnowledgeScopeReader}（record 无子类型关系），
+     * 不继承 {@code contract.agent.SearchAuth.KnowledgeScopeReader}（record 无子类型关系），
      * 传给 SearchAuth 时用 {@link #asScopeReader} 适配。
      */
     public interface KnowledgeInfoReader {

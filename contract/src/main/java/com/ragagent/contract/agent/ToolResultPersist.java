@@ -1,11 +1,9 @@
-package com.ragagent.agent.tool.runtime;
+package com.ragagent.contract.agent;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.contract.agent.AgentStep;
-import com.ragagent.contract.agent.AgentToolCall;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolResult;
 

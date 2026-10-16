@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.NullNode;
-import com.ragagent.agent.compaction.CompactionSettings;
+import com.ragagent.contract.agent.CompactionSettings;
 import com.ragagent.agent.compaction.Compactor;
 import com.ragagent.agent.domain.AgentState;
 import com.ragagent.contract.agent.AgentToolCall;
@@ -46,10 +46,10 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.agent.budget.AgentBudgets;
 import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
-import com.ragagent.agent.prompt.SelectedDocumentInfo;
-import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
-import com.ragagent.agent.prompt.PinnedSkillInfo;
-import com.ragagent.agent.prompt.KnowledgeBaseInfo;
+import com.ragagent.contract.agent.SelectedDocumentInfo;
+import com.ragagent.contract.agent.PinnedMCPServiceInfo;
+import com.ragagent.contract.agent.PinnedSkillInfo;
+import com.ragagent.contract.agent.KnowledgeBaseInfo;
 
 /**
  * ReAct agent 引擎。
