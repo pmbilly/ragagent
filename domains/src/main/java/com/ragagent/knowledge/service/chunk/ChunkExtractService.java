@@ -1,6 +1,7 @@
 package com.ragagent.knowledge.service.chunk;
 
 
+import com.ragagent.contract.retrieval.RetrievalObsRows;
 import com.ragagent.knowledge.domain.span.SpanTracker;
 
 import com.ragagent.knowledge.domain.ChunkExtractConsumer;
@@ -17,7 +18,6 @@ import com.ragagent.llm.extract.ExtractPrompts;
 import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.llm.extract.PipelineConfig;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
-import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.platform.prompt.PromptInstructions;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -206,7 +206,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
         }
         // 内容形态：让 trace 回答"这次 LLM 调用看到了什么"
         graphOut.put("chunk_chars", chunk.getContent().codePointCount(0, chunk.getContent().length()));
-        graphOut.put("chunk_preview", RetrievalObs.truncateRunes(chunk.getContent(), CHUNK_PREVIEW_RUNES));
+        graphOut.put("chunk_preview", RetrievalObsRows.truncateRunes(chunk.getContent(), CHUNK_PREVIEW_RUNES));
 
         KnowledgeBase kb = kbRepository.findByIdAny(chunk.getKnowledgeBaseId());
         if (kb == null) {

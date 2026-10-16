@@ -6,137 +6,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.RetrievalObsRows;
 
 /**
- * 检索观测的纯函数族：码点截断、命中预览、分数汇总、段落预览。
+ * 检索观测：**引擎内部形状**（{@code EngineTypes.*}）的汇总两法。
  *
- * <p>chat_pipeline 消费这四个纯函数（rerank / memory_recall / search 的 span 输入与
- * query_preview）。它们是纯本地计算、无 IO，放本包避免为纯函数动 langfuse seam。
- * 产出只进 span（Java 侧恒 no-op），行为契约由 rerank 的 span 输入测试钉住。</p>
+ * <p>R3b 拆类后本类只剩"引擎内部件"部分；纯函数族（截断/命中预览/分数汇总/段落预览/格式化）
+ * 已上提 {@link RetrievalObsRows}（契约面，业务域只认它）。</p>
+ *
+ * <p>产出只进 span（Java 侧恒 no-op），行为契约由 rerank 的 span 输入测试钉住。</p>
  */
 public final class RetrievalObs {
 
-    public static final int DEFAULT_HIT_PREVIEW_LIMIT = 25;
-
     private RetrievalObs() {}
-
-    /** 截到 maxRunes 个码点，截断时追加 "..."。 */
-    public static String truncateRunes(String s, int maxRunes) {
-        if (maxRunes <= 0) {
-            return "";
-        }
-        if (s == null) {
-            return "";
-        }
-        int len = s.codePointCount(0, s.length());
-        if (len <= maxRunes) {
-            return s;
-        }
-        return s.substring(0, s.offsetByCodePoints(0, maxRunes)) + "...";
-    }
-
-    /**
-     * 重排后的紧凑预览（分数降序，ID 决序；
-     * metadata 里的 base_score/model_score/faq_* 透出）。
-     */
-    public static Map<String, Object> summarizeSearchResults(List<SearchResult> results, int limit) {
-        int effective = limit <= 0 ? DEFAULT_HIT_PREVIEW_LIMIT : limit;
-        Map<String, Object> out = new LinkedHashMap<>();
-        int count = results == null ? 0 : results.size();
-        out.put("count", count);
-        out.put("top_hits", new ArrayList<Map<String, Object>>());
-        if (count == 0) {
-            return out;
-        }
-
-        List<SearchResult> sorted = new ArrayList<>(results);
-        sorted.sort((a, b) -> {
-            if (a.getScore() != b.getScore()) {
-                return Double.compare(b.getScore(), a.getScore());
-            }
-            return a.getId().compareTo(b.getId());
-        });
-
-        List<Map<String, Object>> hits = new ArrayList<>(Math.min(effective, sorted.size()));
-        for (int i = 0; i < sorted.size() && i < effective; i++) {
-            SearchResult sr = sorted.get(i);
-            Map<String, Object> item = new LinkedHashMap<>();
-            item.put("rank", i + 1);
-            item.put("chunk_id", sr.getId());
-            item.put("knowledge_id", sr.getKnowledgeId());
-            item.put("knowledge_title", sr.getKnowledgeTitle());
-            item.put("composite_score", formatScore4(sr.getScore()));
-            item.put("match_type", sr.getMatchType());
-            item.put("chunk_type", sr.getChunkType());
-            item.put("preview", truncateRunes(sr.getContent(), 160));
-            if (sr.getMetadata() != null) {
-                String base = sr.getMetadata().get("base_score");
-                if (base != null) {
-                    item.put("retrieval_score", base);
-                }
-                String model = sr.getMetadata().get("model_score");
-                if (model != null) {
-                    item.put("model_score", model);
-                }
-                String boosted = sr.getMetadata().get("faq_boosted");
-                if (boosted != null) {
-                    item.put("faq_boosted", boosted);
-                }
-                String orig = sr.getMetadata().get("faq_original_score");
-                if (orig != null) {
-                    item.put("faq_original_score", orig);
-                }
-            }
-            hits.add(item);
-        }
-        out.put("top_hits", hits);
-        if (sorted.size() > effective) {
-            out.put("truncated", sorted.size() - effective);
-        }
-        return out;
-    }
-
-    /** 分数汇总：超过 limit 时截前 limit 行。 */
-    public static List<Map<String, Object>> summarizeRankScores(List<Map<String, Object>> results, int limit) {
-        int effective = limit <= 0 ? DEFAULT_HIT_PREVIEW_LIMIT : limit;
-        if (results == null || results.size() <= effective) {
-            return results;
-        }
-        return new ArrayList<>(results.subList(0, effective));
-    }
-
-    /** 与候选对齐的段落预览行。 */
-    public static List<Map<String, Object>> summarizePassagePreviews(
-            List<SearchResult> candidates, List<String> passages, int limit) {
-        int effective = limit <= 0 ? DEFAULT_HIT_PREVIEW_LIMIT : limit;
-        int n = candidates == null ? 0 : candidates.size();
-        if (passages != null && passages.size() < n) {
-            n = passages.size();
-        }
-        if (effective < n) {
-            n = effective;
-        }
-        List<Map<String, Object>> out = new ArrayList<>(n);
-        for (int i = 0; i < n; i++) {
-            SearchResult sr = candidates.get(i);
-            Map<String, Object> row = new LinkedHashMap<>();
-            row.put("index", i);
-            row.put("chunk_id", sr.getId());
-            row.put("knowledge_id", sr.getKnowledgeId());
-            row.put("knowledge_title", sr.getKnowledgeTitle());
-            row.put("retrieval_score", formatScore4(sr.getScore()));
-            row.put("match_type", sr.getMatchType());
-            row.put("preview", truncateRunes(passages.get(i), 160));
-            out.add(row);
-        }
-        return out;
-    }
-
-    /** 四舍五入到 4 位小数（toFixed 语义）。 */
-    public static String formatScore4(double v) {
-        return String.format(java.util.Locale.ROOT, "%.4f", v);
-    }
 
     /**
      * 检索 span 的输出——
@@ -181,7 +63,7 @@ public final class RetrievalObs {
         out.put("keyword_hits", keywordHits);
         out.put("group_count", groupCount);
         out.put("by_retriever", byRetriever);
-        out.put("top_hits", summarizeIndexHits(all, DEFAULT_HIT_PREVIEW_LIMIT));
+        out.put("top_hits", summarizeIndexHits(all, RetrievalObsRows.DEFAULT_HIT_PREVIEW_LIMIT));
         return out;
     }
 
@@ -208,9 +90,9 @@ public final class RetrievalObs {
             row.put("chunk_id", hit.chunkId);
             row.put("knowledge_id", hit.knowledgeId);
             row.put("knowledge_base_id", hit.knowledgeBaseId);
-            row.put("score", formatScore4(hit.score));
+            row.put("score", RetrievalObsRows.formatScore4(hit.score));
             row.put("match_type", hit.matchType);
-            row.put("preview", truncateRunes(hit.content, 160));
+            row.put("preview", RetrievalObsRows.truncateRunes(hit.content, 160));
             out.add(row);
         }
         return out;

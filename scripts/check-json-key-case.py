@@ -189,6 +189,12 @@ BASELINE: dict[str, set[str]] = {
     # R3b 换锚：`ImageInfoMatchUtil` 由 retrieval/support 上提 platform.knowledge。`start_pos`/`end_pos`
     # 是**既有 wire 键**（图片在原文中的位置，随 chunk 元数据进出存量数据），换包换锚、键名不动。
     'platform/knowledge/ImageInfoMatchUtil.java': {'start_pos', 'end_pos'},
+    # R3b 拆类换锚：`RetrievalObs` 的纯函数族上提契约面成为 `RetrievalObsRows`。这些键是**观测 span 的
+    # 既有 wire 载荷**（langfuse/trace 面消费：命中预览、分数、FAQ 加成等），键名属于观测面契约、
+    # 改键会破坏存量 trace 断言 —— 换包换锚，键名不动（同 agent/ActPhase.java 的登记同族）。
+    'contract/retrieval/RetrievalObsRows.java': {'base_score', 'chunk_id', 'chunk_type', 'composite_score',
+        'faq_boosted', 'faq_original_score', 'knowledge_id', 'knowledge_title', 'match_type',
+        'model_score', 'retrieval_score', 'top_hits'},
     # SSE complete 事件的 data 键（B136 复核：与上条同属**冻结的线协议** §14.9l 前提判定 2；
     # 同上（SSE/消息载荷）
     'session/controller/SessionController.java': {'message_id', 'session_id'},

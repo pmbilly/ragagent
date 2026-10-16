@@ -1,5 +1,6 @@
 package com.ragagent.chatpipeline.plugin;
 
+import com.ragagent.contract.retrieval.RetrievalObsRows;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,7 +14,6 @@ import com.ragagent.chatpipeline.support.ReferencesSupport;
 import com.ragagent.platform.security.InputSanitizer;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.ChunkTypes;
-import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 
@@ -70,7 +70,7 @@ public final class PluginIntoChatMessage implements Plugin {
                         hasHighConfidenceFAQ = true;
                         Map<String, Object> f = new LinkedHashMap<>();
                         f.put("chunk_id", result.getId());
-                        f.put("score", RetrievalObs.formatScore4(result.getScore()));
+                        f.put("score", RetrievalObsRows.formatScore4(result.getScore()));
                         f.put("threshold", chatManage.getFaqDirectAnswerThreshold());
                         PipelineLog.info("IntoChatMessage", "high_confidence_faq", f);
                     }

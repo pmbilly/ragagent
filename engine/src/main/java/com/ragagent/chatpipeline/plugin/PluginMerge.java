@@ -1,5 +1,6 @@
 package com.ragagent.chatpipeline.plugin;
 
+import com.ragagent.contract.retrieval.RetrievalObsRows;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,7 +22,6 @@ import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
 import com.ragagent.contract.retrieval.SearchChunkMerge;
 import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.contract.retrieval.ChunkTypes;
-import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
@@ -442,7 +442,7 @@ public final class PluginMerge implements Plugin {
                 r.setMetadata(new LinkedHashMap<>());
             }
             r.getMetadata().put("history_similarity",
-                    trimTrailingZeros(RetrievalObs.formatScore4(sim)));
+                    trimTrailingZeros(RetrievalObsRows.formatScore4(sim)));
             filtered.add(r);
 
             Map<String, Object> f = new LinkedHashMap<>();

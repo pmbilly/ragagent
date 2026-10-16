@@ -1,5 +1,6 @@
 package com.ragagent.chatpipeline.support;
 
+import com.ragagent.contract.retrieval.RetrievalObsRows;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,7 +12,6 @@ import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.contract.retrieval.SearchChunkMerge;
 import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.retrieval.telemetry.RetrievalObs;
 
 /**
  * 检索的纯函数辅助：
@@ -158,7 +158,7 @@ public final class SearchSupport {
             Map<String, Object> fields = new LinkedHashMap<>();
             fields.put("index", i);
             fields.put("chunk_id", r.getId());
-            fields.put("score", RetrievalObs.formatScore4(r.getScore()));
+            fields.put("score", RetrievalObsRows.formatScore4(r.getScore()));
             fields.put("match_type", r.getMatchType());
             PipelineLog.info("Search", action, fields);
         }

@@ -2,6 +2,7 @@ package com.ragagent.chatpipeline.plugin;
 
 
 
+import com.ragagent.contract.retrieval.RetrievalObsRows;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,7 +18,6 @@ import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.MemoryRecalledData;
 import com.ragagent.contract.memory.MemoryItemView;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
-import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.contract.event.EventBusInterface;
 
 /**
@@ -51,7 +51,7 @@ public final class PluginMemoryRecall implements Plugin {
         Map<String, Object> in = new LinkedHashMap<>();
         in.put("sessionId", chatManage.getSessionId());
         in.put("query_len", chatManage.getQuery().length());
-        in.put("query_preview", RetrievalObs.truncateRunes(chatManage.getQuery(), 200));
+        in.put("query_preview", RetrievalObsRows.truncateRunes(chatManage.getQuery(), 200));
         PipelineLog.info("MemoryRecall", "input", in);
 
         var recall = memoryService.recall(chatManage.getQuery());
@@ -84,7 +84,7 @@ public final class PluginMemoryRecall implements Plugin {
         out.put("injected", true);
         out.put("prompt_runes", PipelineLog.runeLength(prompt));
         out.put("memory_ids", memoryIDs);
-        out.put("query_preview", RetrievalObs.truncateRunes(chatManage.getQuery(), 200));
+        out.put("query_preview", RetrievalObsRows.truncateRunes(chatManage.getQuery(), 200));
         PipelineLog.info("MemoryRecall", "output", out);
         return next.next();
     }
