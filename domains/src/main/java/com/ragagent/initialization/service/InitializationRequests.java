@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
+import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
 
 /** initialization 端点的原始请求体绑定器（record + 手写绑定,契约换锚时一并 DTO 化）。 */
 public final class InitializationRequests {
@@ -19,7 +19,7 @@ public final class InitializationRequests {
     }
     record KBModelConfigRequest(String llmModelId, String embeddingModelId,
             JsonNode vlmConfig, JsonNode asrConfig, int chunkSize, int chunkOverlap,
-            List<String> separators, List<KnowledgeBaseChunkingConfig.ParserEngineRule>
+            List<String> separators, List<ChunkingConfigView.ParserEngineRuleView>
             parserEngineRules, boolean enableParentChild, Integer parentChunkSize,
             Integer childChunkSize, String strategy, Integer tokenLimit, List<String> languages,
             String tableMetadataInstructions, boolean multimodalEnabled, String storageProvider,
@@ -53,15 +53,13 @@ public final class InitializationRequests {
         if (ds != null && ds.get("separators") != null && ds.get("separators").isArray()) {
             ds.get("separators").forEach(s -> seps.add(s.asText()));
         }
-        List<KnowledgeBaseChunkingConfig.ParserEngineRule> rules = new ArrayList<>();
+        List<ChunkingConfigView.ParserEngineRuleView> rules = new ArrayList<>();
         if (ds != null && ds.get("parserEngineRules") != null && ds.get("parserEngineRules").isArray()) {
             for (JsonNode r : ds.get("parserEngineRules")) {
-                KnowledgeBaseChunkingConfig.ParserEngineRule rule =
-                        new KnowledgeBaseChunkingConfig.ParserEngineRule();
-                rule.setFileTypes(toStringList(r.get("fileTypes")));
-                rule.setEngine(r.path("engine").asText(""));
-                rule.setXlsxFirstRowAsHeader(r.path("xlsxFirstRowAsHeader").asBoolean(false));
-                rules.add(rule);
+                rules.add(new ChunkingConfigView.ParserEngineRuleView(
+                        toStringList(r.get("fileTypes")),
+                        r.path("engine").asText(""),
+                        r.path("xlsxFirstRowAsHeader").asBoolean(false)));
             }
         }
         return new KBModelConfigRequest(

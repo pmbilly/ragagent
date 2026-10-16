@@ -2,17 +2,17 @@ package com.ragagent.knowledge.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseImageProcessingConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
+import com.ragagent.knowledge.domain.KnowledgeBaseImageProcessingConfig;
+import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.platform.web.JsonMappers;
 
 /**
  * KB 配置 jsonb → 契约配置类型的**解析边界**（承载原先挂在 4 个配置类型上的静态
  * {@code from(JsonNode)} 工厂，G1-h 去 Jackson 时外移）。
  *
- * <p><b>为什么外移</b>：配置类型已入 {@code :contract}（零依赖），而解析要 {@code JsonMappers}
- * （L1）⇒ 工厂必须留在能引 Jackson 的一侧；语义**逐字保留**（含
+ * <p><b>为什么独立</b>：配置类型归 {@code knowledge/domain}（零依赖形状），而解析要 {@code JsonMappers}
+ * （L1）⇒ 工厂留在能引 Jackson 的一侧；语义**逐字保留**（含
  * {@code KnowledgeBaseChunkingConfig} 的"形状损坏 → {@link BizException} 明确报错"边界）。</p>
  */
 public final class KnowledgeBaseConfigCodec {

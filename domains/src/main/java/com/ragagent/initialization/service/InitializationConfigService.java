@@ -17,8 +17,9 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseAsrConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseVlmConfig;
+import com.ragagent.contract.knowledge.domain.AsrConfigView;
+import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
+import com.ragagent.contract.knowledge.domain.VlmConfigView;
 import com.ragagent.contract.knowledge.KnowledgeBaseResponse;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.initialization.dto.InitResponses;
@@ -57,7 +58,7 @@ public final class InitializationConfigService {
         }
         List<ModelView> models = new ArrayList<>();
         for (String id : List.of(ModelConnectivityTestService.orEmpty(kb.getEmbeddingModelId()), ModelConnectivityTestService.orEmpty(kb.getSummaryModelId()),
-                ModelConnectivityTestService.orEmpty(kb.getVlmConfig().getModelId()))) {
+                ModelConnectivityTestService.orEmpty(kb.getVlmConfig().modelId()))) {
             if (id.isEmpty()) {
                 continue;
             }
@@ -144,79 +145,75 @@ public final class InitializationConfigService {
             kb.setEmbeddingModelId(req.embeddingModelId());
         }
 
-        // VLM / ASR 重置后再按请求回填
-        kb.setVlmConfig(new KnowledgeBaseVlmConfig());
-        KnowledgeBaseVlmConfig vlm = kb.getVlmConfig();
+        // VLM / ASR 重置后再按请求回填（收集为契约视图，末尾统一回写）
+        boolean vlmEnabled = false;
+        String vlmModelId = "";
         JsonNode vlmReq = req.vlmConfig();
         if (vlmReq != null && req.multimodalEnabled() && !vlmReq.path("modelId").asText("").isEmpty()) {
-            String vlmModelId = vlmReq.path("modelId").asText("");
+            String candidate = vlmReq.path("modelId").asText("");
             try {
-                if (modelCatalog.findModel(vlmModelId) != null) {
-                    vlm.setEnabled(vlmReq.path("enabled").asBoolean(false));
-                    vlm.setModelId(vlmModelId);
+                if (modelCatalog.findModel(candidate) != null) {
+                    vlmEnabled = vlmReq.path("enabled").asBoolean(false);
+                    vlmModelId = candidate;
                 }
             } catch (Exception ignored) {
                 // 查询失败 → 视为模型不存在，VLM 保持禁用
             }
         }
-        if (!vlm.isEnabled()) {
-            vlm.setModelId("");
+        if (!vlmEnabled) {
+            vlmModelId = "";
         }
-        kb.setAsrConfig(new KnowledgeBaseAsrConfig());
-        KnowledgeBaseAsrConfig asr = kb.getAsrConfig();
+        boolean asrEnabled = false;
+        String asrModelId = "";
+        String asrLanguage = "";
         JsonNode asrReq = req.asrConfig();
         if (asrReq != null && asrReq.path("enabled").asBoolean(false)
                 && !asrReq.path("modelId").asText("").isEmpty()) {
             try {
                 if (modelCatalog.findModel(asrReq.path("modelId").asText()) != null) {
-                    asr.setEnabled(true);
-                    asr.setModelId(asrReq.path("modelId").asText());
-                    asr.setLanguage(asrReq.path("language").asText(""));
+                    asrEnabled = true;
+                    asrModelId = asrReq.path("modelId").asText();
+                    asrLanguage = asrReq.path("language").asText("");
                 }
             } catch (Exception ignored) {
                 // 查询失败 → 忽略，ASR 保持未启用
             }
         }
+        kb.setAsrConfig(new AsrConfigView(asrEnabled, asrModelId, asrLanguage));
 
-        // 文档分块
-        var chunking = kb.getChunkingConfig();
-        if (req.chunkSize() > 0) {
-            chunking.setChunkSize(req.chunkSize());
-        }
-        if (req.chunkOverlap() >= 0) {
-            chunking.setChunkOverlap(req.chunkOverlap());
-        }
-        if (req.separators() != null && !req.separators().isEmpty()) {
-            chunking.setSeparators(req.separators());
-        }
-        chunking.setParserEngineRules(req.parserEngineRules());
-        chunking.setEnableParentChild(req.enableParentChild());
-        if (req.parentChunkSize() != null && req.parentChunkSize() > 0) {
-            chunking.setParentChunkSize(req.parentChunkSize());
-        }
-        if (req.childChunkSize() != null && req.childChunkSize() > 0) {
-            chunking.setChildChunkSize(req.childChunkSize());
-        }
-        if (req.strategy() != null) {
-            chunking.setStrategy(req.strategy());
-        }
-        if (req.tokenLimit() != null) {
-            chunking.setTokenLimit(req.tokenLimit());
-        }
-        if (req.languages() != null) {
-            chunking.setLanguages(req.languages());
-        }
-        if (req.tableMetadataInstructions() != null) {
-            chunking.setTableMetadataInstructions(req.tableMetadataInstructions().trim());
-        }
+        // 文档分块（未提供的键保持现值；未生效标注按最终值重算）
+        ChunkingConfigView curChunking = kb.getChunkingConfig();
+        int chunkSize = req.chunkSize() > 0 ? req.chunkSize() : curChunking.chunkSize();
+        int chunkOverlap = req.chunkOverlap() >= 0 ? req.chunkOverlap() : curChunking.chunkOverlap();
+        List<String> separators = req.separators() != null && !req.separators().isEmpty()
+                ? req.separators() : curChunking.separators();
+        List<ChunkingConfigView.ParserEngineRuleView> parserRules = req.parserEngineRules();
+        boolean enableParentChild = req.enableParentChild();
+        int parentChunkSize = req.parentChunkSize() != null && req.parentChunkSize() > 0
+                ? req.parentChunkSize() : curChunking.parentChunkSize();
+        int childChunkSize = req.childChunkSize() != null && req.childChunkSize() > 0
+                ? req.childChunkSize() : curChunking.childChunkSize();
+        String strategy = req.strategy() != null ? req.strategy() : curChunking.strategy();
+        int tokenLimit = req.tokenLimit() != null ? req.tokenLimit() : curChunking.tokenLimit();
+        List<String> languages = req.languages() != null ? req.languages() : curChunking.languages();
+        String tableMetadata = req.tableMetadataInstructions() != null
+                ? req.tableMetadataInstructions().trim() : curChunking.tableMetadataInstructions();
+        kb.setChunkingConfig(new ChunkingConfigView(chunkSize, chunkOverlap, separators, parserRules,
+                enableParentChild, parentChunkSize, childChunkSize, strategy, tokenLimit, languages,
+                tableMetadata, ChunkingConfigView.inactiveKeys(enableParentChild, parentChunkSize,
+                        childChunkSize, parserRules != null && !parserRules.isEmpty(), tableMetadata)));
 
         if (!req.multimodalEnabled()) {
-            vlm.setModelId("");
+            vlmModelId = "";
         }
+        String vlmDescLang = null;
+        String vlmCustomInstr = null;
         if (vlmReq != null) {
-            vlm.setDescriptionLanguage(vlmReq.path("descriptionLanguage").asText("").trim());
-            vlm.setCustomInstructions(vlmReq.path("customInstructions").asText("").trim());
+            vlmDescLang = vlmReq.path("descriptionLanguage").asText("").trim();
+            vlmCustomInstr = vlmReq.path("customInstructions").asText("").trim();
         }
+        kb.setVlmConfig(new VlmConfigView(vlmEnabled, vlmModelId, vlmDescLang, vlmCustomInstr,
+                "", "", ""));
 
         // 存储引擎：provider 兼容投影
         String provider = req.storageProvider() == null ? "" : req.storageProvider().trim().toLowerCase();
@@ -419,7 +416,7 @@ public final class InitializationConfigService {
         return switch (type) {
             case "Embedding" -> ModelConnectivityTestService.orEmpty(kb.getEmbeddingModelId());
             case "KnowledgeQA" -> ModelConnectivityTestService.orEmpty(kb.getSummaryModelId());
-            case "VLLM" -> ModelConnectivityTestService.orEmpty(kb.getVlmConfig().getModelId());
+            case "VLLM" -> ModelConnectivityTestService.orEmpty(kb.getVlmConfig().modelId());
             default -> "";
         };
     }
@@ -440,16 +437,19 @@ public final class InitializationConfigService {
         }
         kb.setSummaryModelId(llmId);
         kb.setEmbeddingModelId(embeddingId);
-        var chunking = kb.getChunkingConfig();
-        chunking.setChunkSize(req.chunkSize());
-        chunking.setChunkOverlap(req.chunkOverlap());
-        chunking.setSeparators(req.separators());
+        ChunkingConfigView prevChunking = kb.getChunkingConfig();
+        kb.setChunkingConfig(new ChunkingConfigView(req.chunkSize(), req.chunkOverlap(),
+                req.separators(), prevChunking.parserEngineRules(), prevChunking.enableParentChild(),
+                prevChunking.parentChunkSize(), prevChunking.childChunkSize(), prevChunking.strategy(),
+                prevChunking.tokenLimit(), prevChunking.languages(),
+                prevChunking.tableMetadataInstructions(),
+                ChunkingConfigView.inactiveKeys(prevChunking.enableParentChild(),
+                        prevChunking.parentChunkSize(), prevChunking.childChunkSize(),
+                        prevChunking.parserEngineRules() != null && !prevChunking.parserEngineRules().isEmpty(),
+                        prevChunking.tableMetadataInstructions())));
 
         if (req.multimodalEnabled()) {
-            KnowledgeBaseVlmConfig vlm = new KnowledgeBaseVlmConfig();
-            vlm.setEnabled(true);
-            vlm.setModelId(vlmId);
-            kb.setVlmConfig(vlm);
+            kb.setVlmConfig(new VlmConfigView(true, vlmId, null, null, "", "", ""));
             String storageType = req.multimodal() == null ? ""
                     : req.multimodal().path("storageType").asText("");
             // cos/minio 凭据落库段依赖部署环境（dev 无），只在段存在时触达
@@ -458,7 +458,7 @@ public final class InitializationConfigService {
                 kb.setStorageProvider(storageType);
             }
         } else {
-            kb.setVlmConfig(new KnowledgeBaseVlmConfig());
+            kb.setVlmConfig(new VlmConfigView(false, "", null, null, "", "", ""));
             kb.setStorageProvider("");
         }
 
@@ -544,9 +544,9 @@ public final class InitializationConfigService {
         }
 
         String storageProvider = kb.getStorageProvider();
-        boolean hasMultimodal = kb.getVlmConfig().isEnabled()
-                || !kb.getStorageConfig().getSecretId().isEmpty()
-                || !kb.getStorageConfig().getBucketName().isEmpty()
+        boolean hasMultimodal = kb.getVlmConfig().enabled()
+                || !kb.getStorageConfig().secretId().isEmpty()
+                || !kb.getStorageConfig().bucketName().isEmpty()
                 || (!storageProvider.isEmpty() && !"local".equals(storageProvider));
         Map<String, Object> mm = castMap(config.get("multimodal"));
         if (mm == null) {
@@ -556,8 +556,8 @@ public final class InitializationConfigService {
         } else {
             mm.put("enabled", hasMultimodal);
         }
-        String descLang = kb.getVlmConfig().getDescriptionLanguage();
-        String customInstr = kb.getVlmConfig().getCustomInstructions();
+        String descLang = kb.getVlmConfig().descriptionLanguage();
+        String customInstr = kb.getVlmConfig().customInstructions();
         if ((descLang != null && !descLang.isEmpty()) || (customInstr != null && !customInstr.isEmpty())) {
             if (descLang != null && !descLang.isEmpty()) {
                 mm.put("descriptionLanguage", descLang);
@@ -577,25 +577,25 @@ public final class InitializationConfigService {
 
         var c = kb.getChunkingConfig();
         Map<String, Object> ds = new TreeMap<>();
-        ds.put("chunkSize", c.getChunkSize());
-        ds.put("chunkOverlap", c.getChunkOverlap());
-        ds.put("separators", c.getSeparators());
-        if (c.getStrategy() != null && !c.getStrategy().isEmpty()) {
-            ds.put("strategy", c.getStrategy());
+        ds.put("chunkSize", c.chunkSize());
+        ds.put("chunkOverlap", c.chunkOverlap());
+        ds.put("separators", c.separators());
+        if (c.strategy() != null && !c.strategy().isEmpty()) {
+            ds.put("strategy", c.strategy());
         }
-        if (c.getTokenLimit() > 0) {
-            ds.put("tokenLimit", c.getTokenLimit());
+        if (c.tokenLimit() > 0) {
+            ds.put("tokenLimit", c.tokenLimit());
         }
-        if (c.getLanguages() != null && !c.getLanguages().isEmpty()) {
-            ds.put("languages", c.getLanguages());
+        if (c.languages() != null && !c.languages().isEmpty()) {
+            ds.put("languages", c.languages());
         }
-        if (c.getTableMetadataInstructions() != null && !c.getTableMetadataInstructions().isEmpty()) {
-            ds.put("tableMetadataInstructions", c.getTableMetadataInstructions());
+        if (c.tableMetadataInstructions() != null && !c.tableMetadataInstructions().isEmpty()) {
+            ds.put("tableMetadataInstructions", c.tableMetadataInstructions());
         }
         config.put("documentSplitting", ds);
 
         String effectiveProvider = kb.getStorageProvider();
-        if (!kb.getStorageConfig().getSecretId().isEmpty()
+        if (!kb.getStorageConfig().secretId().isEmpty()
                 || (!effectiveProvider.isEmpty() && !"local".equals(effectiveProvider))) {
             Map<String, Object> mm2 = castMap(config.get("multimodal"));
             if (mm2 == null) {
@@ -606,18 +606,18 @@ public final class InitializationConfigService {
             mm2.put("storageType", effectiveProvider);
             if ("cos".equals(effectiveProvider)) {
                 Map<String, Object> cos = new TreeMap<>();
-                cos.put("region", kb.getStorageConfig().getRegion());
-                cos.put("bucketName", kb.getStorageConfig().getBucketName());
-                cos.put("appId", kb.getStorageConfig().getAppId());
-                cos.put("pathPrefix", kb.getStorageConfig().getPathPrefix());
+                cos.put("region", kb.getStorageConfig().region());
+                cos.put("bucketName", kb.getStorageConfig().bucketName());
+                cos.put("appId", kb.getStorageConfig().appId());
+                cos.put("pathPrefix", kb.getStorageConfig().pathPrefix());
                 cos.put("credentials", Map.of(
-                        "secretId", !kb.getStorageConfig().getSecretId().isEmpty(),
-                        "secretKey", !kb.getStorageConfig().getSecretKey().isEmpty()));
+                        "secretId", !kb.getStorageConfig().secretId().isEmpty(),
+                        "secretKey", !kb.getStorageConfig().secretKey().isEmpty()));
                 mm2.put("cos", cos);
             } else if ("minio".equals(effectiveProvider)) {
                 mm2.put("minio", sortedBlock(Map.of(
-                        "bucketName", kb.getStorageConfig().getBucketName(),
-                        "pathPrefix", kb.getStorageConfig().getPathPrefix())));
+                        "bucketName", kb.getStorageConfig().bucketName(),
+                        "pathPrefix", kb.getStorageConfig().pathPrefix())));
             }
         }
 

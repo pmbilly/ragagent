@@ -2,7 +2,7 @@ package com.ragagent.knowledge.chunker;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
+import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 
 /**
  * 文本切分配置。

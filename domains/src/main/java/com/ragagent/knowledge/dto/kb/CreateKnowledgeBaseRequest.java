@@ -2,7 +2,8 @@ package com.ragagent.knowledge.dto.kb;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseVlmConfig;
+import com.ragagent.knowledge.support.KnowledgeBaseConfigMaps;
+import com.ragagent.knowledge.domain.KnowledgeBaseVlmConfig;
 import com.ragagent.contract.knowledge.domain.IndexingStrategyView;
 import com.ragagent.contract.knowledge.domain.AsrConfigView;
 import com.ragagent.contract.knowledge.domain.ImageProcessingConfigView;
@@ -67,11 +68,11 @@ public record CreateKnowledgeBaseRequest(
         if (type != null) kb.setType(type);
         if (embeddingModelId != null) kb.setEmbeddingModelId(embeddingModelId);
         if (summaryModelId != null) kb.setSummaryModelId(summaryModelId);
-        if (chunkingConfig != null) kb.setChunkingConfig(chunkingConfig.toDomain());
-        if (imageProcessingConfig != null) kb.setImageProcessingConfig(imageProcessingConfig.toDomain());
+        if (chunkingConfig != null) kb.setChunkingConfig(KnowledgeBaseConfigMaps.toDomain(chunkingConfig));
+        if (imageProcessingConfig != null) kb.setImageProcessingConfig(KnowledgeBaseConfigMaps.toDomain(imageProcessingConfig));
         if (vlmConfig != null) kb.setVlmConfig(vlmConfig.toDomain());
-        if (asrConfig != null) kb.setAsrConfig(asrConfig.toDomain());
-        if (indexingStrategy != null) kb.setIndexingStrategy(indexingStrategy.toDomain());
+        if (asrConfig != null) kb.setAsrConfig(KnowledgeBaseConfigMaps.toDomain(asrConfig));
+        if (indexingStrategy != null) kb.setIndexingStrategy(KnowledgeBaseConfigMaps.toDomain(indexingStrategy));
         kb.setExtractConfig(extractConfig);
         kb.setFaqConfig(faqConfig);
         kb.setQuestionGenerationConfig(questionGenerationConfig);

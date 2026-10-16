@@ -1,14 +1,15 @@
 package com.ragagent.contract.knowledge;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageProviderConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseAsrConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseVlmConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseIndexingStrategy;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseImageProcessingConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
+import com.ragagent.contract.knowledge.domain.AsrConfigView;
+import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
+import com.ragagent.contract.knowledge.domain.ImageProcessingConfigView;
+import com.ragagent.contract.knowledge.domain.IndexingStrategyView;
+import com.ragagent.contract.knowledge.domain.StorageConfigView;
+import com.ragagent.contract.knowledge.domain.StorageProviderConfigView;
+import com.ragagent.contract.knowledge.domain.VlmConfigView;
 
 /**
  * 知识库**行视图**（L1）：{@code KnowledgeCatalogPort} 知识库面（读 / 建 / 改 / 授权）+ KB API 线格式
@@ -21,8 +22,9 @@ import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
  * <p><b>口径</b>：镜像实体全部 **34 字段**，访问器体与实体**逐字一致**（含归一语义）；字段序与实体一致
  * ⇒ 序列化等价（KB API 由 {@code kb-*.json} / {@code init-*.json} 金片钉住）。</p>
  *
- * <p><b>落点登记（HANDOFF §12.5）</b>：含 5 个 {@code JsonNode} 配置字段 + 6 个 typed config ⇒
- * `:contract` 零依赖装不下 ⇒ 留 L1，登记**待去 Jackson**。</p>
+ * <p><b>配置形状（P2 归正）</b>：6 个 typed config 字段均为契约视图（纯 JDK）；领域形状
+ * （{@code KnowledgeBase*Config}）与视图的互转在 `knowledge.support.KnowledgeBaseConfigMaps`。
+ * 懒初始化 getter 的"null → 默认视图"与领域形状默认构造逐字对应。</p>
  */
 public class KnowledgeBaseRowView {
 
@@ -33,15 +35,15 @@ public class KnowledgeBaseRowView {
     private String description;
     private Long tenantId;
     private String creatorId;
-    private KnowledgeBaseChunkingConfig chunkingConfig;
-    private KnowledgeBaseImageProcessingConfig imageProcessingConfig;
+    private ChunkingConfigView chunkingConfig;
+    private ImageProcessingConfigView imageProcessingConfig;
     private String embeddingModelId;
     private String summaryModelId;
-    private KnowledgeBaseVlmConfig vlmConfig;
-    private KnowledgeBaseAsrConfig asrConfig;
-    private KnowledgeBaseStorageProviderConfig storageProviderConfig;
+    private VlmConfigView vlmConfig;
+    private AsrConfigView asrConfig;
+    private StorageProviderConfigView storageProviderConfig;
     private String storageBackendId;
-    private KnowledgeBaseStorageConfig storageConfig;
+    private StorageConfigView storageConfig;
     private String vectorStoreId;
     /** jsonb 原样（对象/数组/标量；null 表示无）。 */
     private Object extractConfig;
@@ -53,7 +55,7 @@ public class KnowledgeBaseRowView {
     private Object autoTagConfig;
     /** jsonb 原样（对象/数组/标量；null 表示无）。 */
     private Object wikiConfig;
-    private KnowledgeBaseIndexingStrategy indexingStrategy;
+    private IndexingStrategyView indexingStrategy;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
     private OffsetDateTime deletedAt;
@@ -82,8 +84,8 @@ public class KnowledgeBaseRowView {
     public void setEmbeddingModelId(String v) { embeddingModelId = v == null ? "" : v; }
     public String getSummaryModelId() { return summaryModelId; }
     public void setSummaryModelId(String v) { summaryModelId = v == null ? "" : v; }
-    public KnowledgeBaseStorageProviderConfig getStorageProviderConfig() { return storageProviderConfig; }
-    public void setStorageProviderConfig(KnowledgeBaseStorageProviderConfig v) { storageProviderConfig = v; }
+    public StorageProviderConfigView getStorageProviderConfig() { return storageProviderConfig; }
+    public void setStorageProviderConfig(StorageProviderConfigView v) { storageProviderConfig = v; }
     public String getStorageBackendId() { return storageBackendId; }
     public void setStorageBackendId(String v) { storageBackendId = v; }
     public String getVectorStoreId() { return vectorStoreId; }
@@ -122,20 +124,20 @@ public class KnowledgeBaseRowView {
     }
 
     public Capabilities capabilities() {
-        KnowledgeBaseIndexingStrategy s = getIndexingStrategy();
-        return new Capabilities(s.isVectorEnabled(), s.isKeywordEnabled(), s.isWikiEnabled(),
-                s.isGraphEnabled() && JsonValueSupport.boolAt(extractConfig, "enabled", false),
+        IndexingStrategyView s = getIndexingStrategy();
+        return new Capabilities(s.vectorEnabled(), s.keywordEnabled(), s.wikiEnabled(),
+                s.graphEnabled() && JsonValueSupport.boolAt(extractConfig, "enabled", false),
                 "faq".equals(type));
     }
 
     public String getStorageProvider() {
         if (storageProviderConfig != null) {
-            String p = storageProviderConfig.getProvider().toLowerCase().trim();
+            String p = storageProviderConfig.provider().toLowerCase().trim();
             if (!p.isEmpty() && !p.equals("__pending_env__")) {
                 return p;
             }
         }
-        return getStorageConfig().getProvider().toLowerCase().trim();
+        return getStorageConfig().provider().toLowerCase().trim();
     }
 
     public record Capabilities(boolean vector, boolean keyword, boolean wiki, boolean graph, boolean faq) {}
@@ -145,37 +147,40 @@ public class KnowledgeBaseRowView {
     public void setIsTemporary(boolean v) { isTemporary = v; }
 
 
-    public KnowledgeBaseChunkingConfig getChunkingConfig() {
-        if (chunkingConfig == null) chunkingConfig = new KnowledgeBaseChunkingConfig();
+    public ChunkingConfigView getChunkingConfig() {
+        if (chunkingConfig == null) {
+            chunkingConfig = new ChunkingConfigView(0, 0, null, null, false, 0, 0,
+                    null, 0, null, null, List.of());
+        }
         return chunkingConfig;
     }
 
-    public void setChunkingConfig(KnowledgeBaseChunkingConfig v) { chunkingConfig = v; }
+    public void setChunkingConfig(ChunkingConfigView v) { chunkingConfig = v; }
 
-    public KnowledgeBaseImageProcessingConfig getImageProcessingConfig() {
-        if (imageProcessingConfig == null) imageProcessingConfig = new KnowledgeBaseImageProcessingConfig();
+    public ImageProcessingConfigView getImageProcessingConfig() {
+        if (imageProcessingConfig == null) imageProcessingConfig = new ImageProcessingConfigView("");
         return imageProcessingConfig;
     }
 
-    public void setImageProcessingConfig(KnowledgeBaseImageProcessingConfig v) { imageProcessingConfig = v; }
+    public void setImageProcessingConfig(ImageProcessingConfigView v) { imageProcessingConfig = v; }
 
-    public KnowledgeBaseVlmConfig getVlmConfig() {
-        if (vlmConfig == null) vlmConfig = new KnowledgeBaseVlmConfig();
+    public VlmConfigView getVlmConfig() {
+        if (vlmConfig == null) vlmConfig = new VlmConfigView(false, "", null, null, "", "", "");
         return vlmConfig;
     }
 
-    public void setVlmConfig(KnowledgeBaseVlmConfig v) { vlmConfig = v; }
+    public void setVlmConfig(VlmConfigView v) { vlmConfig = v; }
 
-    public KnowledgeBaseAsrConfig getAsrConfig() {
-        if (asrConfig == null) asrConfig = new KnowledgeBaseAsrConfig();
+    public AsrConfigView getAsrConfig() {
+        if (asrConfig == null) asrConfig = new AsrConfigView(false, "", "");
         return asrConfig;
     }
 
-    public void setAsrConfig(KnowledgeBaseAsrConfig v) { asrConfig = v; }
+    public void setAsrConfig(AsrConfigView v) { asrConfig = v; }
 
-    public void setStorageConfig(KnowledgeBaseStorageConfig v) { storageConfig = v; }
+    public void setStorageConfig(StorageConfigView v) { storageConfig = v; }
 
-    public void setIndexingStrategy(KnowledgeBaseIndexingStrategy v) { indexingStrategy = v; }
+    public void setIndexingStrategy(IndexingStrategyView v) { indexingStrategy = v; }
 
     public boolean isIsPinned() { return isPinned; }
 
@@ -186,26 +191,24 @@ public class KnowledgeBaseRowView {
 
     public void setIsProcessing(boolean v) { isProcessing = v; }
 
-    public KnowledgeBaseStorageConfig getStorageConfig() {
-        if (storageConfig == null) storageConfig = new KnowledgeBaseStorageConfig();
+    public StorageConfigView getStorageConfig() {
+        if (storageConfig == null) {
+            storageConfig = new StorageConfigView("", "", "", "", "", "", "", null, false, false);
+        }
         return storageConfig;
     }
 
-    public KnowledgeBaseIndexingStrategy getIndexingStrategy() {
-        // NULL→Default 分支实际到不了）；IsZero→Default 只发生在 service 读路径的
-        // EnsureDefaults 调用点（KB list/get），chunk 等路径不做此默认。
-        // 历史近似（null→Default）与既有契约样例全兼容，仅补一处 carve-out：
-        // faq 且 faq_config 为 NULL → EnsureDefaults 提前 return，策略保持零值。
+    public IndexingStrategyView getIndexingStrategy() {
+        // 零值/缺省 → 默认（vector+keyword）；faq 且 faq_config 为 NULL → 保持零值
         if (indexingStrategy != null) {
             return indexingStrategy;
         }
         return "faq".equals(type) && faqConfig == null
-                ? new KnowledgeBaseIndexingStrategy() : KnowledgeBaseIndexingStrategy.defaultStrategy();
+                ? new IndexingStrategyView(false, false, false, false)
+                : new IndexingStrategyView(true, true, false, false);
     }
 
     public void setStorageProvider(String provider) {
-        KnowledgeBaseStorageProviderConfig c = new KnowledgeBaseStorageProviderConfig();
-        c.setProvider(provider);
-        this.storageProviderConfig = c;
+        this.storageProviderConfig = new StorageProviderConfigView(provider);
     }
 }

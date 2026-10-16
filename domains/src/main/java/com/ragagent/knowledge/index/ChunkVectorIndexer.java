@@ -17,7 +17,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.contract.knowledge.DocumentChunkMetadata;
 import com.ragagent.contract.knowledge.GeneratedQuestion;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;

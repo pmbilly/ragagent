@@ -11,10 +11,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
+import com.ragagent.knowledge.support.KnowledgeBaseConfigMaps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
 import com.ragagent.knowledge.support.KnowledgeBaseConfigCodec;
 
 /**
@@ -96,7 +95,7 @@ class KnowledgeBaseChunkingConfigCapabilityTest {
     @DisplayName("默认配置的标注为空数组（模块约定：字段一律显式输出）")
     void defaultConfigCarriesEmptyMark() {
         JsonNode view = MAPPER.valueToTree(
-                ChunkingConfigView.from(new KnowledgeBaseChunkingConfig()));
+                KnowledgeBaseConfigMaps.toView(new KnowledgeBaseChunkingConfig()));
 
         assertTrue(view.has("inactiveFeatures"),
                 "字段一律显式输出（知识库模块约定，勿用 @JsonInclude 省略）");
@@ -105,7 +104,7 @@ class KnowledgeBaseChunkingConfigCapabilityTest {
 
     /** 取视图里显式标注的未生效键（空 = 无该键）。 */
     private static List<String> inactiveFeaturesOf(KnowledgeBaseChunkingConfig cfg) {
-        JsonNode view = MAPPER.valueToTree(ChunkingConfigView.from(cfg));
+        JsonNode view = MAPPER.valueToTree(KnowledgeBaseConfigMaps.toView(cfg));
         JsonNode node = view.get("inactiveFeatures");
         List<String> keys = new ArrayList<>();
         if (node != null && node.isArray()) {

@@ -10,12 +10,4 @@ public record VlmConfigView(
         String modelName,
         String baseUrl,
         String interfaceType) {
-
-    public static VlmConfigView from(KnowledgeBaseVlmConfig c) {
-        if (c == null) {
-            return null;
-        }
-        return new VlmConfigView(c.isEnabled(), c.getModelId(), c.getDescriptionLanguage(),
-                c.getCustomInstructions(), c.getModelName(), c.getBaseUrl(), c.getInterfaceType());
-    }
 }

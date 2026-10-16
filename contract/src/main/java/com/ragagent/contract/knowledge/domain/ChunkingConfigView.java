@@ -1,5 +1,6 @@
 package com.ragagent.contract.knowledge.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** 分块配置视图：分块尺寸/重叠、分隔符、解析器引擎规则、父子块与语言等。 */
@@ -18,7 +19,7 @@ public record ChunkingConfigView(
         /**
          * 主摄取（worker）**未消费**的键（K8 能力矩阵；空 list = 全部生效）——"接受但未生效"的
          * 显式告知，不再让用户以为配置已生效。语义与来源见
-         * {@link KnowledgeBaseChunkingConfig#ingestionInactiveKeys()}。
+         * {@code KnowledgeBaseChunkingConfig#ingestionInactiveKeys()}（knowledge 域形状）。
          */
         List<String> inactiveFeatures) {
 
@@ -27,43 +28,26 @@ public record ChunkingConfigView(
                                        Boolean xlsxFirstRowAsHeader) {
     }
 
-    /** 请求侧反向映射（视图 → 领域）。 */
-    public KnowledgeBaseChunkingConfig toDomain() {
-        KnowledgeBaseChunkingConfig c = new KnowledgeBaseChunkingConfig();
-        c.setChunkSize(chunkSize);
-        c.setChunkOverlap(chunkOverlap);
-        c.setSeparators(separators);
-        if (parserEngineRules != null) {
-            c.setParserEngineRules(parserEngineRules.stream().map(r -> {
-                KnowledgeBaseChunkingConfig.ParserEngineRule rule = new KnowledgeBaseChunkingConfig.ParserEngineRule();
-                rule.setFileTypes(r.fileTypes());
-                rule.setEngine(r.engine());
-                rule.setXlsxFirstRowAsHeader(r.xlsxFirstRowAsHeader());
-                return rule;
-            }).toList());
+    /** 主摄取未消费的键（顺序固定；空 = 全部生效）；知识域形状 {@code ingestionInactiveKeys()} 委托本方法。 */
+    public static List<String> inactiveKeys(boolean enableParentChild, int parentChunkSize,
+                                            int childChunkSize, boolean hasParserEngineRules,
+                                            String tableMetadataInstructions) {
+        List<String> inactive = new ArrayList<>();
+        if (enableParentChild) {
+            inactive.add("enableParentChild");
+            if (parentChunkSize > 0) {
+                inactive.add("parentChunkSize");
+            }
+            if (childChunkSize > 0) {
+                inactive.add("childChunkSize");
+            }
         }
-        c.setEnableParentChild(enableParentChild);
-        c.setParentChunkSize(parentChunkSize);
-        c.setChildChunkSize(childChunkSize);
-        c.setStrategy(strategy);
-        c.setTokenLimit(tokenLimit);
-        c.setLanguages(languages);
-        c.setTableMetadataInstructions(tableMetadataInstructions);
-        return c;
-    }
-
-    public static ChunkingConfigView from(KnowledgeBaseChunkingConfig c) {
-        if (c == null) {
-            return null;
+        if (hasParserEngineRules) {
+            inactive.add("parserEngineRules");
         }
-        List<ParserEngineRuleView> rules = c.getParserEngineRules() == null ? null
-                : c.getParserEngineRules().stream()
-                        .map(r -> new ParserEngineRuleView(r.getFileTypes(), r.getEngine(),
-                                r.getXlsxFirstRowAsHeader()))
-                        .toList();
-        return new ChunkingConfigView(c.getChunkSize(), c.getChunkOverlap(), c.getSeparators(),
-                rules, c.isEnableParentChild(), c.getParentChunkSize(), c.getChildChunkSize(),
-                c.getStrategy(), c.getTokenLimit(), c.getLanguages(),
-                c.getTableMetadataInstructions(), c.ingestionInactiveKeys());
+        if (tableMetadataInstructions != null && !tableMetadataInstructions.isBlank()) {
+            inactive.add("tableMetadataInstructions");
+        }
+        return inactive;
     }
 }

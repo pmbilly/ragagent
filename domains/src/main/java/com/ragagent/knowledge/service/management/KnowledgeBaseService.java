@@ -25,7 +25,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.contract.storage.StorageBackendView;

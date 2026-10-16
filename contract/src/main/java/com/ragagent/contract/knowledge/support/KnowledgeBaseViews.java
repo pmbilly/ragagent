@@ -28,10 +28,10 @@ public final class KnowledgeBaseViews {
         v.setCreatorId(kb.getCreatorId());
         v.setSummaryModelId(kb.getSummaryModelId());
         v.setEmbeddingModelId(kb.getEmbeddingModelId());
-        v.setWikiEnabled(kb.getIndexingStrategy() != null && kb.getIndexingStrategy().isWikiEnabled());
+        v.setWikiEnabled(kb.getIndexingStrategy() != null && kb.getIndexingStrategy().wikiEnabled());
         v.setWikiConfig(kb.getWikiConfig());
-        v.setVectorEnabled(kb.getIndexingStrategy() != null && kb.getIndexingStrategy().isVectorEnabled());
-        v.setKeywordEnabled(kb.getIndexingStrategy() != null && kb.getIndexingStrategy().isKeywordEnabled());
+        v.setVectorEnabled(kb.getIndexingStrategy() != null && kb.getIndexingStrategy().vectorEnabled());
+        v.setKeywordEnabled(kb.getIndexingStrategy() != null && kb.getIndexingStrategy().keywordEnabled());
         v.setExtractConfig(kb.getExtractConfig());
         v.setCreatedAt(kb.getCreatedAt());
         v.setUpdatedAt(kb.getUpdatedAt());

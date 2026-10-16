@@ -15,13 +15,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.JsonMappers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageProviderConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseAsrConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseImageProcessingConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseIndexingStrategy;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseVlmConfig;
 import com.ragagent.knowledge.support.KnowledgeBaseConfigCodec;
 
 /**

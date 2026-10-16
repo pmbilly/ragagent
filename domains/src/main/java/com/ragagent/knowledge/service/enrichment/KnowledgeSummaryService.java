@@ -23,7 +23,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;

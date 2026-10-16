@@ -27,7 +27,7 @@ import com.ragagent.contract.graph.NameSpace;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.platform.access.TracingContext;
 import com.ragagent.embedding.Embedder;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
+import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;

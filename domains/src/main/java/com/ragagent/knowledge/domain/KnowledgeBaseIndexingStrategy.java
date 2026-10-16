@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge.domain;
+package com.ragagent.knowledge.domain;
 
 
 /**

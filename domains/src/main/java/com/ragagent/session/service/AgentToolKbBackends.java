@@ -512,8 +512,8 @@ final class AgentToolKbBackends {
         boolean vector = false;
         boolean keyword = false;
         if (kb.getIndexingStrategy() != null) {
-            vector = kb.getIndexingStrategy().isVectorEnabled();
-            keyword = kb.getIndexingStrategy().isKeywordEnabled();
+            vector = kb.getIndexingStrategy().vectorEnabled();
+            keyword = kb.getIndexingStrategy().keywordEnabled();
         }
         return new KnowledgeSearchTool.KBView(kb.getId(), AgentToolBackends.nz(kb.getType()), vector, keyword);
     }

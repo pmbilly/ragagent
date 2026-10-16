@@ -12,7 +12,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.ChunkMapper;

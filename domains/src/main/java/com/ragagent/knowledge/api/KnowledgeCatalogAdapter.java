@@ -233,7 +233,13 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
 
     @Override
     public void updateKnowledgeBase(KnowledgeBaseRowView kb) {
-        knowledgeBaseMapper.updateById(KnowledgeBaseRowViews.toEntity(kb));
+        KnowledgeBase entity = KnowledgeBaseRowViews.toEntity(kb);
+        // VLM 凭据只进不出（视图不含 apiKey）⇒ 写回前与库中现值合并，避免覆盖清空
+        KnowledgeBase current = knowledgeBaseMapper.selectById(entity.getId());
+        if (current != null && entity.getVlmConfig() != null && current.getVlmConfig() != null) {
+            entity.getVlmConfig().setApiKey(current.getVlmConfig().getApiKey());
+        }
+        knowledgeBaseMapper.updateById(entity);
     }
 
     @Override

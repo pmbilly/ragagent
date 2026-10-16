@@ -328,10 +328,10 @@ final class AgentEngineAssembler {
     private static List<String> kbRetrievalCapabilities(KnowledgeBaseRowView kb) {
         List<String> caps = new ArrayList<>(2);
         if (kb.getIndexingStrategy() != null) {
-            if (kb.getIndexingStrategy().isWikiEnabled()) {
+            if (kb.getIndexingStrategy().wikiEnabled()) {
                 caps.add("wiki");
             }
-            if (kb.getIndexingStrategy().isVectorEnabled() || kb.getIndexingStrategy().isKeywordEnabled()) {
+            if (kb.getIndexingStrategy().vectorEnabled() || kb.getIndexingStrategy().keywordEnabled()) {
                 caps.add("chunks");
             }
         }
@@ -413,10 +413,10 @@ final class AgentEngineAssembler {
                 try {
                     var kb = knowledgeQa.findKnowledgeBase(kbId);
                     if (kb != null && kb.getIndexingStrategy() != null) {
-                        if (kb.getIndexingStrategy().isVectorEnabled() || kb.getIndexingStrategy().isKeywordEnabled()) {
+                        if (kb.getIndexingStrategy().vectorEnabled() || kb.getIndexingStrategy().keywordEnabled()) {
                             hasVectorKb = true;
                         }
-                        if (kb.getIndexingStrategy().isWikiEnabled()) {
+                        if (kb.getIndexingStrategy().wikiEnabled()) {
                             detectedWikiKbIds.add(kb.getId());
                         }
                     }

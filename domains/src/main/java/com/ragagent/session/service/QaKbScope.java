@@ -80,7 +80,7 @@ final class QaKbScope {
             return false;
         }
         var st = kb.getIndexingStrategy();
-        return st.isVectorEnabled() || st.isKeywordEnabled() || st.isWikiEnabled();
+        return st.vectorEnabled() || st.keywordEnabled() || st.wikiEnabled();
     }
     public long resolveRetrievalTenantId(QaSupport.QaRequest req) {
         long retrievalTenantId = req.session.getTenantId();

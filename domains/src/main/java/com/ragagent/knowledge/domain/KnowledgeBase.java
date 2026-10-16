@@ -7,13 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageProviderConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseStorageConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseAsrConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseIndexingStrategy;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseVlmConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseImageProcessingConfig;
-import com.ragagent.contract.knowledge.domain.KnowledgeBaseChunkingConfig;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 
 /**

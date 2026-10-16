@@ -1,6 +1,6 @@
-package com.ragagent.contract.knowledge.domain;
+package com.ragagent.knowledge.domain;
 
-import java.util.ArrayList;
+import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
 import java.util.List;
 
 /**
@@ -74,22 +74,7 @@ public class KnowledgeBaseChunkingConfig {
      * <p><b>接进 worker 时请同步删掉对应项</b>——否则标注会撒谎。</p>
      */
     public List<String> ingestionInactiveKeys() {
-        List<String> inactive = new ArrayList<>();
-        if (enableParentChild) {
-            inactive.add("enableParentChild");
-            if (parentChunkSize > 0) {
-                inactive.add("parentChunkSize");
-            }
-            if (childChunkSize > 0) {
-                inactive.add("childChunkSize");
-            }
-        }
-        if (parserEngineRules != null && !parserEngineRules.isEmpty()) {
-            inactive.add("parserEngineRules");
-        }
-        if (tableMetadataInstructions != null && !tableMetadataInstructions.isBlank()) {
-            inactive.add("tableMetadataInstructions");
-        }
-        return inactive;
+        return ChunkingConfigView.inactiveKeys(enableParentChild, parentChunkSize, childChunkSize,
+                parserEngineRules != null && !parserEngineRules.isEmpty(), tableMetadataInstructions);
     }
 }
