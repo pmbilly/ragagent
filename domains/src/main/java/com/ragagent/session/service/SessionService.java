@@ -15,7 +15,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.contract.event.Event;
-import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.SessionTitleData;
@@ -589,7 +589,7 @@ public class SessionService {
      * emit {@code session_title} 事件（AgentStreamBridge 转发 SSE，前端据此更新标题）。
      */
     public void generateTitleAsync(Session session, String userQuery, String modelId,
-                                   EventBus bus) {
+                                   EventBusInterface bus) {
         final Long tenantId = TenantContext.currentTenantId();
         final String requestId = TenantContext.currentRequestId();
         final String userId = TenantContext.currentUserId();

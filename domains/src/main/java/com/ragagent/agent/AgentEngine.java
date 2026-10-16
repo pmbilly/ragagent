@@ -31,6 +31,7 @@ import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.contract.event.Event;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;
@@ -58,7 +59,7 @@ import com.ragagent.agent.prompt.KnowledgeBaseInfo;
  * 重建后经 {@code llmContext} 传入。引擎不维护自己的缓存、系统提示词存储或跨轮缓冲。</p>
  *
  * <h2>事件即 SSE 上游</h2>
- * <p>所有事件经 {@link EventBus} 发出；
+ * <p>所有事件经 {@link EventBusInterface} 发出；
  * emit 顺序就是将来的 SSE 帧序。</p>
  *
  * <h2>语义决策</h2>
@@ -107,7 +108,7 @@ public class AgentEngine {
     final AgentConfig config;
     final ToolRegistry toolRegistry;
     final LlmChatClient chatModel;
-    final EventBus eventBus;
+    final EventBusInterface eventBus;
     /** 绑定知识库详情（提示词用）；测试需要直改 → 包内可见。 */
     List<KnowledgeBaseInfo> knowledgeBasesInfo;
     /** 用户 @ 选中的文档。 */
@@ -167,7 +168,7 @@ public class AgentEngine {
     // ==================================================================
 
     public AgentEngine(AgentConfig config, LlmChatClient chatModel, ToolRegistry toolRegistry,
-            EventBus eventBus, List<KnowledgeBaseInfo> knowledgeBasesInfo,
+            EventBusInterface eventBus, List<KnowledgeBaseInfo> knowledgeBasesInfo,
             List<SelectedDocumentInfo> selectedDocs, String sessionId,
             String systemPromptTemplate) {
         if (eventBus == null) {
@@ -201,7 +202,7 @@ public class AgentEngine {
 
     /** 带技能管理器的构造变体。 */
     public static AgentEngine withSkills(AgentConfig config, LlmChatClient chatModel,
-            ToolRegistry toolRegistry, EventBus eventBus,
+            ToolRegistry toolRegistry, EventBusInterface eventBus,
             List<KnowledgeBaseInfo> knowledgeBasesInfo,
             List<SelectedDocumentInfo> selectedDocs, String sessionId,
             String systemPromptTemplate, Manager skillsManager) {
@@ -263,7 +264,7 @@ public class AgentEngine {
         return toolRegistry;
     }
 
-    EventBus getBusForTest() {
+    EventBusInterface getBusForTest() {
         return eventBus;
     }
 

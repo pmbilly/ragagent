@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.event.Event;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.AgentToolCallData;
@@ -74,7 +75,7 @@ public final class QaSseOrchestrator {
         streamCtx.assistantMessage = reqCtx.assistantMessage;
         streamCtx.tenantSnapshot = TenantContextSnapshot.capture();
 
-        EventBus eventBus = new EventBus();
+        EventBusInterface eventBus = new EventBus();
         streamCtx.eventBus = eventBus;
 
         // Mid-run steering：仅 agent 模式有引擎排空点
@@ -160,7 +161,7 @@ public final class QaSseOrchestrator {
                     reqCtx.sessionId, assistantMessageId, e.toString());
         }
     }
-    private void startStopWatcher(String sessionId, String assistantMessageId, EventBus eventBus) {
+    private void startStopWatcher(String sessionId, String assistantMessageId, EventBusInterface eventBus) {
         // A5：watcher 跑在自己的虚拟线程上（ThreadLocal 不跨线程，身份为空）——读流事件与
         // 会话范围判定都需要完整身份，因此在本线程 capture、watcher 里 replay 后清理。
         TenantContextSnapshot identity = TenantContextSnapshot.capture();
@@ -175,7 +176,7 @@ public final class QaSseOrchestrator {
     }
 
     /** stop watcher 主循环（独立虚拟线程；身份由 {@link #startStopWatcher} 显式传递）。 */
-    private void watchStopEvents(String sessionId, String assistantMessageId, EventBus eventBus) {
+    private void watchStopEvents(String sessionId, String assistantMessageId, EventBusInterface eventBus) {
         int offset = 0;
         long deadline = System.currentTimeMillis() + 2 * 60 * 60 * 1000L; // stopWatcherMaxDuration
         while (System.currentTimeMillis() < deadline) {
@@ -320,7 +321,7 @@ public final class QaSseOrchestrator {
     }
     private static final Set<String> QUICK_ANSWER_TIMELINE_TOOLS = Set.of(
             "query_understand", "knowledge_search", "attachment_parsing", "image_analysis");
-    public void registerQuickAnswerTimelineRecorder(EventBus bus, Message msg) {
+    public void registerQuickAnswerTimelineRecorder(EventBusInterface bus, Message msg) {
         if (bus == null || msg == null) {
             return;
         }

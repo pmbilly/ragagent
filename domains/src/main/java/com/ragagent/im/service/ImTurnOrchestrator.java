@@ -48,7 +48,7 @@ import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.contract.storage.support.Resolver;
-import com.ragagent.platform.session.qa.SessionQaPort;
+import com.ragagent.contract.session.SessionQaPort;
 import com.ragagent.contract.session.SessionView;
 
 /**

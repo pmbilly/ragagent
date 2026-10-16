@@ -13,7 +13,7 @@ import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.dto.QaRequests.MentionedItemRequest;
 import com.ragagent.platform.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.agent.SteerSink;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.model.ResponseType;
@@ -160,7 +160,7 @@ public final class QaSupport {
     // SSE 流上下文
     // ==================================================================
     public static final class SseStreamContext {
-        public EventBus eventBus;
+        public EventBusInterface eventBus;
         /** 虚拟线程上显式传租户的快照 */
         public TenantContextSnapshot tenantSnapshot;
         public volatile boolean cancelled;

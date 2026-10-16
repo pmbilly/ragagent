@@ -12,7 +12,7 @@ import com.ragagent.agenttools.wiki.WikiRouteResolver;
 import com.ragagent.agenttools.wiki.WikiScope;
 import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.contract.memory.MemoryRecallPort;
 import com.ragagent.rerank.Reranker;
@@ -80,8 +80,8 @@ final class AgentEngineAssembler {
     }
 
     AgentEngine createAgentEngine(QaAgentConfig config, LlmChatClient chatModel, Reranker rerankModel,
-            EventBus eventBus, String sessionId, String assistantMessageId) {
-        log.info("Creating agent engine with custom EventBus");
+            EventBusInterface eventBus, String sessionId, String assistantMessageId) {
+        log.info("Creating agent engine with custom EventBusInterface");
 
         // 1. Validate config（ValidateConfig）
         if (config.getMaxIterations() < 0) {

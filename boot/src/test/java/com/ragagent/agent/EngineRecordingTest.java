@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.agent.domain.AgentState;
 import com.ragagent.contract.agent.AgentToolCall;
-import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.platform.event.EventJson;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatResponse;
@@ -363,7 +363,7 @@ class EngineRecordingTest {
     void steerDrain() {
         Engine46bStubSupport.StubChat chat = new Engine46bStubSupport.StubChat(List.of());
         AgentEngine engine = Engine46bStubSupport.newEngine(chat);
-        EventBus bus = engine.getBusForTest();
+        EventBusInterface bus = engine.getBusForTest();
         Engine46bStubSupport.EventRecorder sink = new Engine46bStubSupport.EventRecorder().attach(bus);
 
         Engine46bStubSupport.FakeSteerSink fake = new Engine46bStubSupport.FakeSteerSink(
@@ -500,7 +500,7 @@ class EngineRecordingTest {
             c.setMaxCompletionTokens(1024);
         });
         AgentEngine engine = Engine46bStubSupport.newEngine(cfg, chat);
-        EventBus bus = engine.getBusForTest();
+        EventBusInterface bus = engine.getBusForTest();
         Engine46bStubSupport.EventRecorder sink = new Engine46bStubSupport.EventRecorder().attach(bus);
 
         List<ChatMessage> messages = new ArrayList<>();

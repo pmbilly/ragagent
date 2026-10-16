@@ -6,8 +6,8 @@ import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageView;
 import com.ragagent.contract.session.QaRequestPayload;
-import com.ragagent.platform.session.qa.SessionQaPort;
-import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.session.SessionQaPort;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.QaSupport;
 import com.ragagent.session.service.SessionAgentQaService;
@@ -71,12 +71,12 @@ public class SessionQaAdapter implements SessionQaPort {
     }
 
     @Override
-    public void knowledgeQa(QaRequestPayload payload, EventBus eventBus) {
+    public void knowledgeQa(QaRequestPayload payload, EventBusInterface eventBus) {
         knowledgeQaService.knowledgeQA(toContainer(payload), eventBus);
     }
 
     @Override
-    public void agentQa(QaRequestPayload payload, EventBus eventBus) {
+    public void agentQa(QaRequestPayload payload, EventBusInterface eventBus) {
         agentQaService.agentQA(toContainer(payload), eventBus);
     }
 

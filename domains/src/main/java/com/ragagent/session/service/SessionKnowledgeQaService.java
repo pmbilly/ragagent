@@ -28,7 +28,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.settings.ConversationProperties;
-import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 
 import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
@@ -172,7 +172,7 @@ public class SessionKnowledgeQaService {
     // KnowledgeQA 主流程
     // ==================================================================
 
-    public void knowledgeQA(QaSupport.QaRequest req, EventBus eventBus) {
+    public void knowledgeQA(QaSupport.QaRequest req, EventBusInterface eventBus) {
         agentResolver.resolveInto(req);
         String sessionId = req.session.getId();
         log.info("Knowledge base question answering parameters, session ID: {}, query: {}, webSearchEnabled: {}",
@@ -272,7 +272,7 @@ public class SessionKnowledgeQaService {
         chatManage.setRewriteQuery(req.query);
         chatManage.setImageDescription(req.imageDescription);
         chatManage.setQuotedContext(req.quotedContext);
-        chatManage.setEventBus(eventBus.asEventBusInterface());
+        chatManage.setEventBus(eventBus);
         chatManage.setMessageId(req.assistantMessageId);
         chatManage.setUserMessageId(req.userMessageId);
 

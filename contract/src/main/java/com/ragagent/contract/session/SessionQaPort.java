@@ -1,9 +1,6 @@
-package com.ragagent.platform.session.qa;
+package com.ragagent.contract.session;
 
-import com.ragagent.contract.session.SessionView;
-import com.ragagent.contract.session.MessageView;
-import com.ragagent.platform.event.EventBus;
-import com.ragagent.contract.session.QaRequestPayload;
+import com.ragagent.contract.event.EventBusInterface;
 
 /**
  * 会话问答面端口（L1）：装配面（IM 等）触发会话 QA、读写会话与消息所需的窄面。
@@ -32,8 +29,8 @@ public interface SessionQaPort {
     void deleteSession(String sessionId);
 
     /** 触发知识问答管线（内部按事件总线推送）。 */
-    void knowledgeQa(QaRequestPayload payload, EventBus eventBus);
+    void knowledgeQa(QaRequestPayload payload, EventBusInterface eventBus);
 
     /** 触发 agent 问答管线（内部按事件总线推送）。 */
-    void agentQa(QaRequestPayload payload, EventBus eventBus);
+    void agentQa(QaRequestPayload payload, EventBusInterface eventBus);
 }

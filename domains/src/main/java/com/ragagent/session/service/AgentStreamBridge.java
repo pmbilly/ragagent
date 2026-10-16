@@ -17,7 +17,7 @@ import com.ragagent.agent.tool.runtime.ToolResultPersist;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.contract.event.Event;
-import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.AgentCompleteData;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
@@ -46,7 +46,7 @@ import com.ragagent.platform.stream.StreamManager;
 /**
  * agent 事件订阅桥。
  *
- * <p>每个请求一条专属 EventBus（无 SessionID 过滤），事件按到达序 AppendEvent 进
+ * <p>每个请求一条专属 EventBusInterface（无 SessionID 过滤），事件按到达序 AppendEvent 进
  * StreamManager（不做累积——前端按 event id 累积）。</p>
  *
  * <h2>16 种事件订阅 + final_answer 分片重组（最高危）</h2>
@@ -75,7 +75,7 @@ public final class AgentStreamBridge {
 
     /** SSE 发射缝（各 handler 的"组装 + 试追加 + 日志"样板收拢处）。 */
     private final AgentStreamEmitter emitter;
-    private final EventBus eventBus;
+    private final EventBusInterface eventBus;
     // ---- State tracking ----
     private final List<SearchResult> knowledgeRefs = new ArrayList<>();
     private String finalAnswer = "";
@@ -119,7 +119,7 @@ public final class AgentStreamBridge {
     public AgentStreamBridge(
             String sessionId, String assistantMessageId, String requestId,
             OffsetDateTime receivedAt, Message assistantMessage,
-            StreamManager streamManager, EventBus eventBus) {
+            StreamManager streamManager, EventBusInterface eventBus) {
         this.sessionId = sessionId;
         this.assistantMessageId = assistantMessageId;
         this.requestId = requestId;

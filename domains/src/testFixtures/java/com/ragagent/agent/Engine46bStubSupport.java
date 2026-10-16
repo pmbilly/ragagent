@@ -10,7 +10,7 @@ import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.agent.tool.ToolRegistry;
-import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.platform.event.EventJson;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.llm.ChatStream;
@@ -89,7 +89,7 @@ final class Engine46bStubSupport {
 
         private final List<Rec> events = new ArrayList<>();
 
-        EventRecorder attach(EventBus bus) {
+        EventRecorder attach(EventBusInterface bus) {
             String[] types = {
                     EventType.EVENT_AGENT_THOUGHT,
                     EventType.EVENT_AGENT_FINAL_ANSWER,

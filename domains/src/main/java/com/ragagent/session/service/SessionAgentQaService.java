@@ -13,7 +13,7 @@ import com.ragagent.agent.AgentEngine;
 import com.ragagent.agent.AgentEngineException;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.contract.event.Event;
-import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.MemoryRecalledData;
@@ -122,7 +122,7 @@ public class SessionAgentQaService {
     // AgentQA
     // ==================================================================
 
-    public void agentQA(QaSupport.QaRequest req, EventBus eventBus) {
+    public void agentQA(QaSupport.QaRequest req, EventBusInterface eventBus) {
         agentResolver.resolveInto(req);
         String sessionId = req.session.getId();
         if (req.agentConfig == null) {
