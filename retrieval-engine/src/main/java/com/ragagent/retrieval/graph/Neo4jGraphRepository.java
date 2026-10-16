@@ -97,6 +97,7 @@ public class Neo4jGraphRepository implements RetrieveGraphRepository {
     }
 
     /** 驱动是否可用（供装配与自检用）。 */
+    @Override
     public boolean enabled() {
         return driver != null;
     }

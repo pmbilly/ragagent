@@ -44,7 +44,7 @@ import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
-import com.ragagent.retrieval.support.ChunkSearchUtil;
+import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
 
 /**

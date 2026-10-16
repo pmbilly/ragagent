@@ -1,4 +1,4 @@
-package com.ragagent.retrieval.support;
+package com.ragagent.platform.knowledge;
 
 
 import java.util.ArrayList;

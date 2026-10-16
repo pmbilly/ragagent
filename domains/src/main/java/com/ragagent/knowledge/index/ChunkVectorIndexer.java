@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.index;
 
+import com.ragagent.contract.retrieval.SourceTypes;
 import com.ragagent.contract.retrieval.IndexRow;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
@@ -29,11 +30,10 @@ import org.springframework.stereotype.Service;
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.contract.retrieval.IndexDocument;
 import com.ragagent.contract.retrieval.IndexEngine;
-import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.contract.retrieval.VectorIndexStore;
-import com.ragagent.retrieval.support.ChunkSearchUtil;
+import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.knowledge.support.KnowledgeIndexContent;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
@@ -300,7 +300,7 @@ public class ChunkVectorIndexer {
     private static IndexDocument indexInfo(
             KnowledgeBase kb, Knowledge knowledge, String sourceId, String chunkId,
             String content, boolean enabled) {
-        return new IndexDocument(sourceId, EngineTypes.SOURCE_TYPE_FILE, chunkId,
+        return new IndexDocument(sourceId, SourceTypes.FILE, chunkId,
                 knowledge.getId(), kb.getId(), kb.getType(), "", content, enabled);
     }
 

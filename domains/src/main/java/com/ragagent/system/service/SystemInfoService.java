@@ -23,7 +23,6 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Service;
-import com.ragagent.retrieval.graph.Neo4jGraphRepository;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 
 /**
@@ -180,8 +179,7 @@ public class SystemInfoService {
      * （NEO4J_ENABLE=true 且连上才是 Neo4j；配了但没连上属于启动失败，不会走到这里）。
      */
     public String graphDatabaseEngine() {
-        if (graphRepository instanceof Neo4jGraphRepository repo
-                && repo.enabled()) {
+        if (graphRepository.enabled()) {
             return "Neo4j";
         }
         return "Not Enabled";

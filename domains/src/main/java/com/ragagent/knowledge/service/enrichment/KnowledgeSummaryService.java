@@ -33,7 +33,7 @@ import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.retrieval.support.ImageInfoEnricher;
+import com.ragagent.platform.knowledge.ImageInfoEnricher;
 import com.ragagent.contract.retrieval.SearchChunkMerge;
 import com.ragagent.contract.wiki.WikiImageMarkup;
 import com.ragagent.contract.wiki.WikiLanguageSupport;

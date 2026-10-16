@@ -11,9 +11,9 @@ import com.ragagent.chatpipeline.support.ImageInfoCollector;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.retrieval.support.ImageInfoEnricher;
-import com.ragagent.retrieval.support.ChunkSearchUtil;
-import com.ragagent.retrieval.support.ImageInfoMatchUtil;
+import com.ragagent.platform.knowledge.ImageInfoEnricher;
+import com.ragagent.platform.knowledge.ChunkSearchUtil;
+import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
 
 /**
  * PluginMerge 的父块解析与短上下文扩展簇：resolveParentChunks（父子关联）、

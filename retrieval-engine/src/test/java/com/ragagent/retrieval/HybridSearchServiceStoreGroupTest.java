@@ -16,7 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.platform.model.EmbeddingGateway;
 import com.ragagent.contract.error.BizException;
@@ -55,7 +55,7 @@ class HybridSearchServiceStoreGroupTest {
     private KnowledgeDocumentGateway documentGateway;
     private ChunkSearchGateway chunkGateway;
     private ModelGateway modelGateway;
-    private TenantService tenantService;
+    private TenantConfigLookup tenantService;
     private EmbeddingGateway embeddingGateway;
     private RetrieveEngineRegistry registry;
     private TenantStoreOwnership ownership;
@@ -67,7 +67,7 @@ class HybridSearchServiceStoreGroupTest {
         documentGateway = mock(KnowledgeDocumentGateway.class);
         chunkGateway = mock(ChunkSearchGateway.class);
         modelGateway = mock(ModelGateway.class);
-        tenantService = mock(TenantService.class);
+        tenantService = mock(TenantConfigLookup.class);
         embeddingGateway = mock(EmbeddingGateway.class);
         registry = mock(RetrieveEngineRegistry.class);
         ownership = mock(TenantStoreOwnership.class);

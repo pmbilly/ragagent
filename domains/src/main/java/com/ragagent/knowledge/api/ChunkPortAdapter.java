@@ -11,7 +11,7 @@ import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.retrieval.support.ImageInfoEnricher;
+import com.ragagent.platform.knowledge.ImageInfoEnricher;
 import com.ragagent.knowledge.support.ChunkRowViews;
 
 /**

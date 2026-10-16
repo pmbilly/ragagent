@@ -186,6 +186,9 @@ BASELINE: dict[str, set[str]] = {
     # R3b 换锚：`WebResultConverter` 由 retrieval/support 上提契约面。写进检索结果 metadata 的
     # `published_at` 是既有 wire 键（第三方搜索响应时间，前端/API 消费）——换包换锚，键名不动。
     'contract/retrieval/WebResultConverter.java': {'published_at'},
+    # R3b 换锚：`ImageInfoMatchUtil` 由 retrieval/support 上提 platform.knowledge。`start_pos`/`end_pos`
+    # 是**既有 wire 键**（图片在原文中的位置，随 chunk 元数据进出存量数据），换包换锚、键名不动。
+    'platform/knowledge/ImageInfoMatchUtil.java': {'start_pos', 'end_pos'},
     # SSE complete 事件的 data 键（B136 复核：与上条同属**冻结的线协议** §14.9l 前提判定 2；
     # 同上（SSE/消息载荷）
     'session/controller/SessionController.java': {'message_id', 'session_id'},

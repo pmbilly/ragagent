@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
-import com.ragagent.retrieval.support.ChunkSearchUtil;
+import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import java.nio.charset.StandardCharsets;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
 import com.ragagent.knowledge.service.management.KnowledgeService;

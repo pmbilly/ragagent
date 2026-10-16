@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service.faq;
 
+import com.ragagent.contract.retrieval.SourceTypes;
 import com.ragagent.contract.retrieval.IndexDocument;
 import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.contract.retrieval.IndexRow;
@@ -18,7 +19,6 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.contract.model.ModelRuntime;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.model.Embedder;
-import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.contract.tenant.TenantStorageQuotaPort;
@@ -271,7 +271,7 @@ public class FaqIndexWriter {
         List<IndexDocument> items =
                 new ArrayList<>(rows.size());
         for (IndexRow row : rows) {
-            items.add(new IndexDocument(row.sourceId(), EngineTypes.SOURCE_TYPE_FILE,
+            items.add(new IndexDocument(row.sourceId(), SourceTypes.FILE,
                     row.chunkId(), row.knowledgeId(), row.knowledgeBaseId(), kb.getType(),
                     row.tagId(), row.content(), row.isEnabled()));
         }

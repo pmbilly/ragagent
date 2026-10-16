@@ -12,6 +12,14 @@ import java.util.List;
  * 流水线只用 {@link #searchNode}；写/删由抽取与清理链路调用。</p>
  */
 public interface RetrieveGraphRepository {
+    /**
+     * 仓储的真实驱动是否已建（缺省 false）——供健康/状态面读，避免调用方
+     * {@code instanceof} 具体实现。
+     */
+    default boolean enabled() {
+        return false;
+    }
+
     /** 把一批图写进仓库（driver 缺失 → 告警 + 静默返回）。 */
     void addGraph(NameSpace namespace, List<GraphData> graphs);
 
