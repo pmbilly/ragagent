@@ -3,9 +3,9 @@
   "growthSlack": 30,
   "exemptLine": 800,
   "limits": {
+    "agent-engine/src/main/java/com/ragagent/agent/ActPhase.java": 700,
+    "agent-engine/src/main/java/com/ragagent/agent/AgentEngine.java": 757,
     "boot/src/main/java/com/ragagent/config/WebConfig.java": 695,
-    "domains/src/main/java/com/ragagent/agent/ActPhase.java": 700,
-    "domains/src/main/java/com/ragagent/agent/AgentEngine.java": 757,
     "domains/src/main/java/com/ragagent/agenttools/knowledge/GrepChunksTool.java": 648,
     "domains/src/main/java/com/ragagent/agenttools/web/WebFetchTool.java": 692,
     "domains/src/main/java/com/ragagent/approval/Gate.java": 675,

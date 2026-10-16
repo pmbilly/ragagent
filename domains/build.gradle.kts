@@ -46,6 +46,10 @@ dependencyManagement {
 }
 
 dependencies {
+    // agent 引擎：**过渡边**——domains 内 55 个消费文件（agentmanagement/agenttools/session）
+    // 仍直引 agent 面；按 R5b/R5c 以 contract.agent 端口化逐点收窄。
+    implementation(project(":agent-engine"))
+
     // 模型运行时：R4b 后不再经 :engine 传递（engine 已解散）。**过渡边**——domains 尚余约 18 处
     // 对模型族实现面的 import（Ollama 管理面 / llm.extract 族 / modelcontext 工具 SPI 等），
     // 按 R2c-3d 清单逐项收（`modelcontext` 归 R5 后为合法终态边）。
@@ -55,6 +59,10 @@ dependencies {
     implementation(project(":platform"))
     implementation(project(":contract"))
     testImplementation(testFixtures(project(":platform")))
+    // 共享录制夹具（RecordingSupport/GoRecording45*/ContractJson）随 agent 树迁 agent-engine fixtures；
+    // fixtures 源集自身也要用（GoldenContract/Rec46cSupport 引用之）⇒ 两个源集都声明
+    testFixturesApi(testFixtures(project(":agent-engine")))
+    testImplementation(testFixtures(project(":agent-engine")))
     // 检索实现面：仅**测试**需要（错位测试 HybridResultOpsContextExpansionTest/
     // ArtifactReferenceRewriterTest 等 + 录制测试的检索桩）——主码对检索已只经契约
     testImplementation(project(":retrieval-engine"))    // EmbeddedRedis（B162 起在 :common）

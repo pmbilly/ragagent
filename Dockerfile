@@ -26,12 +26,14 @@ COPY contract/build.gradle.kts ./contract/
 COPY platform/build.gradle.kts ./platform/
 COPY model-runtime/build.gradle.kts ./model-runtime/
 COPY retrieval-engine/build.gradle.kts ./retrieval-engine/
+COPY agent-engine/build.gradle.kts ./agent-engine/
 COPY domains/build.gradle.kts ./domains/
 COPY boot/build.gradle.kts ./boot/
 COPY contract ./contract
 COPY platform ./platform
 COPY model-runtime ./model-runtime
 COPY retrieval-engine ./retrieval-engine
+COPY agent-engine ./agent-engine
 COPY domains ./domains
 COPY boot ./boot
 

@@ -23,7 +23,8 @@ import org.junit.jupiter.api.Test;
  *   <li><b>B0 扫描面自检</b>：扫描到的引擎侧源码文件数必须过阈值——防止路径漂移让守卫静默空转；</li>
  *   <li><b>B1 主规则</b>：{@code com.ragagent.agent} 引擎侧（{@code management/} 除外）只允许依赖
  *       <b>引擎底座</b>（L1 {@code :common} 的 {@code common}/{@code platform}（含旧 {@code event}/{@code stream}）
- *       + L2 {@code :engine} 的各能力包）与自身；其余顶层包一律视为<b>业务域</b>；</li>
+ *       + L2 能力包 {@code llm}/{@code modelcontext}/{@code retrieval}/{@code embedding}/{@code rerank}）与自身；
+ *       其余顶层包一律视为<b>业务域</b>（R5a 起 {@code agenttools} 也在此列——不再放行）；</li>
  *   <li><b>B2 例外登记 + 过期报红</b>：{@code management/}（唯一 HTTP 面，装配租户/空间/会话配置）
  *       按例外排除；一旦它不再依赖任何业务域，说明例外已无必要 ⇒ 本条转红，提示把管理面纳入 B1 扫描；</li>
  *   <li><b>B3 红态探针</b>：判定函数对业务域 import 必红、对底座 import 不误报（证明守卫真的能红）。</li>
@@ -42,7 +43,8 @@ class AgentEngineBoundaryTest {
     private static final Path REPO = Path.of("..").toAbsolutePath().normalize();
 
     /** 引擎侧源码根。 */
-    private static final Path ENGINE_ROOT = REPO.resolve("domains/src/main/java/com/ragagent/agent");
+    private static final Path ENGINE_ROOT =
+            REPO.resolve("agent-engine/src/main/java/com/ragagent/agent");   // R5a：已自 domains 切出为模块
 
     /** 按例外排除的管理面子树（其内部依赖由 B2 单独守）。 */
     private static final String MANAGEMENT_SEGMENT = "/agentmanagement/"; // 改名自 /management/
@@ -57,7 +59,9 @@ class AgentEngineBoundaryTest {
     private static final Set<String> ALLOWED_TOP_LEVEL = Set.of(
             // 工具适配包改名后与 agent 平级（原 agent.tools 因同属 agent.* 隐式通过）；
             // 真正的解耦（引擎不反向依赖工具实现）见/。
-            "agenttools",
+            // R5a（2026-10-16）：`agent` 已切出模块 `:agent-engine`、工具面早在 A 阶段迁出为
+            // `agenttools`（业务域）⇒ **本清单不再放行任何业务域**：`agenttools` 已移除（实测 0 引用，
+            // 属收紧）；`chatpipeline`/`webfetch` 随 R4b 归位（session/websearch 域）⇒ 一并摘除。
             "agent",        // 自身
             "common",       // L1（:common 主包）
             "platform",     // L1（:common 的平台面：B268 起 event/stream/tracing.langfuse 均在此）
@@ -69,9 +73,7 @@ class AgentEngineBoundaryTest {
             "retrieval",    // L2 能力
             "embedding",    // L2 能力
             "rerank",       // L2 能力
-            "chatpipeline", // L2 能力（快答链路）
-            "webfetch",     // L2 能力（抓取支撑）
-            "tracing");     // L1 core（:common）+ L2 装饰器（:engine）
+            "tracing");     // L1 core（:common）+ L2 装饰器（platform.tracing）
 
     /** {@code com.ragagent.<top>.} 形态的 import（含 static import）。 */
     private static final Pattern RAGAGENT_IMPORT =
@@ -81,9 +83,9 @@ class AgentEngineBoundaryTest {
  * 扫描面下限（低于此值说明路径漂移，守卫在空转）。
  *
  * <p> 改名后 `agent/tools` 迁出为平级 `agenttools/`（91 文件），引擎侧本面
- * 从 ≈150 降到 ≈60；阈值随之收紧到 55。</p>
+ * 从 ≈150 降到 ≈60；阈值随之收紧到 55；R5a 切出 `:agent-engine` 时实测 80 件 ⇒ 收紧到 70。</p>
  */
-    private static final int MIN_SCANNED_FILES = 55;
+    private static final int MIN_SCANNED_FILES = 70;
 
     @Test
     @DisplayName("B0：扫描面自检（防止路径漂移导致守卫静默空转）")
@@ -115,7 +117,7 @@ class AgentEngineBoundaryTest {
     @DisplayName("B2：management/ 例外仍必要（不再依赖业务域时应转红、把管理面纳入 B1）")
     void managementExceptionStillJustified() throws IOException {
         List<String> domainImports = new ArrayList<>();
-        Path management = ENGINE_ROOT.resolve("../agentmanagement").normalize(); // 已迁出 agent/ 子树
+        Path management = REPO.resolve("domains/src/main/java/com/ragagent/agentmanagement"); // 已迁出 agent/ 子树（现属 domains）
         if (Files.isDirectory(management)) {
             try (Stream<Path> walk = Files.walk(management)) {
                 for (Path file : walk.filter(p -> p.toString().endsWith(".java")).toList()) {

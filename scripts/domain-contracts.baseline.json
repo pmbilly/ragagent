@@ -27,16 +27,12 @@
       "note": "运行面族内：**豁免但冻结**（本档新增类仍判红）。族判据＝同一 runtime 的零件互调，不为拆而拆（B211 试切 `:channels` 回退的结论「紧耦合对内聚优先」）。跨族仍按 ① 档。",
       "families": {
         "agent-runtime": [
-          "agent",
           "agentmanagement",
           "agenttools",
           "session"
         ]
       },
       "edges": {
-        "agentmanagement→agent": "agent-runtime",
-        "agenttools→agent": "agent-runtime",
-        "session→agent": "agent-runtime",
         "session→agentmanagement": "agent-runtime",
         "session→agenttools": "agent-runtime"
       },
@@ -50,31 +46,6 @@
     }
   },
   "edges": {
-    "agentmanagement→agent": [
-      "SkillCatalogController",
-      "SkillsCatalogController"
-    ],
-    "agenttools→agent": [
-      "DataAnalysisTool",
-      "DatabaseQueryTool",
-      "GetDocumentInfoTool",
-      "GrepChunksTool",
-      "KnowledgeSearchOutputFormatter",
-      "KnowledgeSearchTool",
-      "ListKnowledgeChunksTool",
-      "QueryKnowledgeGraphTool",
-      "WikiContentRewrite",
-      "WikiFlagIssueTool",
-      "WikiPageRendering",
-      "WikiReadIssueTool",
-      "WikiReadPageTool",
-      "WikiReadSourceDocTool",
-      "WikiReplaceTextTool",
-      "WikiRouteResolver",
-      "WikiScope",
-      "WikiSearchTool",
-      "WikiWritePageTool"
-    ],
     "auth→tenant": [
       "TenantService"
     ],
@@ -91,19 +62,6 @@
       "SessionKnowledgeQaService",
       "SessionQaResolution",
       "TemporaryDocumentController"
-    ],
-    "session→agent": [
-      "AgentEngineAssembler",
-      "AgentHistoryAssembler",
-      "AgentStreamBridge",
-      "AgentToolBackends",
-      "AgentToolKbBackends",
-      "MessageService",
-      "QaAgentConfig",
-      "QaSupport",
-      "SessionAgentQaService",
-      "SteerSinkBridge",
-      "VlmDescriberWiring"
     ],
     "session→agenttools": [
       "AgentEngineAssembler",

@@ -35,6 +35,7 @@ dependencyManagement {
 }
 
 dependencies {
+    implementation(project(":agent-engine"))
     // 模型运行时：组合根自建模型装配/并发闸门（R4b 后不再经 :engine 传递）
     implementation(project(":model-runtime"))
 

@@ -39,6 +39,7 @@ dependencies {
     jacocoAggregation(project(":domains"))
     jacocoAggregation(project(":model-runtime"))
     jacocoAggregation(project(":retrieval-engine"))
+    jacocoAggregation(project(":agent-engine"))
     jacocoAggregation(project(":platform"))
     jacocoAggregation(project(":boot"))
 }

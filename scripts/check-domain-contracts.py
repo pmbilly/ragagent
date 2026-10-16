@@ -52,8 +52,10 @@ DOMAIN_SRC = os.path.join(ROOT, 'domains/src/main/java/com/ragagent')
 BASELINE = os.path.join(ROOT, 'scripts/domain-contracts.baseline.json')
 
 # 业务域清单（方案 §8.9）。新增域时同步这里——否则新域的跨域引用不会被本守卫看见。
+# R5a（2026-10-16）：`agent` 已切出为模块 `:agent-engine` ⇒ 不再计入域清单
+# （跨模块边由模块图治理，见 §8.1；R10 只管 domains 内部各域之间）。
 DOMAINS = [
-    'agent', 'agentmanagement', 'agenttools', 'approval', 'audit', 'auth', 'datasource',
+    'agentmanagement', 'agenttools', 'approval', 'audit', 'auth', 'datasource',
     'embedchannel', 'evaluation', 'favorite', 'im', 'initialization', 'knowledge', 'mcp',
     'memory', 'model', 'session', 'storage', 'system', 'tenant', 'vectorstore',
     'websearch', 'wiki',
