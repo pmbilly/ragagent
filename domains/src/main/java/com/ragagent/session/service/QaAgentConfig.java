@@ -3,17 +3,37 @@ package com.ragagent.session.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.agent.AgentConfig;
+import com.ragagent.contract.agent.AgentRunSpec;
 import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
 
 /**
  * 装配期 AgentConfig 扩展。
  *
- * <p>{@link AgentConfig} 只收引擎消费字段；本子类携带
+ * <p>{@code contract.agent.AgentRunSpec} 只收引擎消费字段；本子类携带
  * 装配路径的其余消费字段——引擎经父类 getter 读取，不受影响；
  * 本类只新增字段与存取器，零行为覆盖。</p>
  */
-public class QaAgentConfig extends AgentConfig {
+public class QaAgentConfig implements AgentRunSpec {
+
+    // ---- 引擎消费字段（R5c 起自持：原继承自 agent.AgentConfig 的字段；
+    // 契约面读接口 AgentRunSpec 把它们与域侧解耦，Jackson 注解留在此处供 JSON 绑定）----
+    private int maxIterations;
+    private List<String> allowedTools;
+    private double temperature;
+    private boolean webSearchEnabled;
+    private boolean multiTurnEnabled;
+    private Boolean thinking;
+    private Boolean citationEnabled;
+    private boolean retainRetrievalHistory;
+    private int llmCallTimeout;
+    private int maxCompletionTokens;
+    private int maxToolOutputChars;
+    private int maxContextTokens;
+    private int compactionKeepRecentTokens;
+    private boolean parallelToolCalls;
+    private boolean chatModelSupportsVision;
+    private String vlmModelId = "";
+
 
     private int webSearchMaxResults;
     private String webSearchProviderId = "";
@@ -70,4 +90,39 @@ public class QaAgentConfig extends AgentConfig {
     public void setPinnedSkillNames(List<String> v) { pinnedSkillNames = v; }
     public List<String> getPinnedMcpServiceIds() { return pinnedMcpServiceIds; }
     public void setPinnedMcpServiceIds(List<String> v) { pinnedMcpServiceIds = v; }
+
+    // ══════════════ 引擎消费字段的存取（R5c：原继承自 AgentConfig）══════════════
+
+    @Override public int getMaxIterations() { return maxIterations; }
+    public void setMaxIterations(int v) { maxIterations = v; }
+    @Override public List<String> getAllowedTools() { return allowedTools; }
+    public void setAllowedTools(List<String> v) { allowedTools = v; }
+    @Override public double getTemperature() { return temperature; }
+    public void setTemperature(double v) { temperature = v; }
+    @Override public boolean isWebSearchEnabled() { return webSearchEnabled; }
+    public void setWebSearchEnabled(boolean v) { webSearchEnabled = v; }
+    @Override public boolean isMultiTurnEnabled() { return multiTurnEnabled; }
+    public void setMultiTurnEnabled(boolean v) { multiTurnEnabled = v; }
+    @Override public Boolean getThinking() { return thinking; }
+    public void setThinking(Boolean v) { thinking = v; }
+    @Override public Boolean getCitationEnabled() { return citationEnabled; }
+    public void setCitationEnabled(Boolean v) { citationEnabled = v; }
+    @Override public boolean isRetainRetrievalHistory() { return retainRetrievalHistory; }
+    public void setRetainRetrievalHistory(boolean v) { retainRetrievalHistory = v; }
+    @Override public int getLlmCallTimeout() { return llmCallTimeout; }
+    public void setLlmCallTimeout(int v) { llmCallTimeout = v; }
+    @Override public int getMaxCompletionTokens() { return maxCompletionTokens; }
+    public void setMaxCompletionTokens(int v) { maxCompletionTokens = v; }
+    @Override public int getMaxToolOutputChars() { return maxToolOutputChars; }
+    public void setMaxToolOutputChars(int v) { maxToolOutputChars = v; }
+    @Override public int getMaxContextTokens() { return maxContextTokens; }
+    public void setMaxContextTokens(int v) { maxContextTokens = v; }
+    @Override public int getCompactionKeepRecentTokens() { return compactionKeepRecentTokens; }
+    public void setCompactionKeepRecentTokens(int v) { compactionKeepRecentTokens = v; }
+    @Override public boolean isParallelToolCalls() { return parallelToolCalls; }
+    public void setParallelToolCalls(boolean v) { parallelToolCalls = v; }
+    @Override public boolean isChatModelSupportsVision() { return chatModelSupportsVision; }
+    public void setChatModelSupportsVision(boolean v) { chatModelSupportsVision = v; }
+    @Override public String getVlmModelId() { return vlmModelId; }
+    public void setVlmModelId(String v) { vlmModelId = v == null ? "" : v; }
 }

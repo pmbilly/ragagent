@@ -1,11 +1,11 @@
 package com.ragagent.session.service;
 
+import com.ragagent.contract.agent.AgentRunSpec;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import com.ragagent.contract.knowledge.FaqEntryView;
 import com.ragagent.contract.knowledge.FaqEntryPageView;
-import com.ragagent.agent.AgentConfig;
 import com.ragagent.agent.AgentEngine;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.agenttools.wiki.WikiRouteResolver;
@@ -85,7 +85,7 @@ final class AgentEngineAssembler {
 
         // 1. Validate config（ValidateConfig）
         if (config.getMaxIterations() < 0) {
-            config.setMaxIterations(AgentConfig.UNLIMITED_MAX_ITERATIONS);
+            config.setMaxIterations(AgentRunSpec.UNLIMITED_MAX_ITERATIONS);
         } else if (config.getMaxIterations() == 0) {
             config.setMaxIterations(5);
         } else if (config.getMaxIterations() > SessionAgentQaService.MAX_ITERATIONS) {

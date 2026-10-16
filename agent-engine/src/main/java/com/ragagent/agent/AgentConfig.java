@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.ragagent.contract.agent.AgentRunSpec;
 
 /**
  * agent 运行时配置。
@@ -29,13 +30,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class AgentConfig {
+public class AgentConfig implements AgentRunSpec {
 
     /**
-     * ReAct 轮次上限。0 = 未设置（用默认）；负数 = 无上限（见
-     * {@link #unlimitedIterations()}）。
+     * ReAct 轮次上限。0 = 未设置（用默认）；负数 = 无上限。
+     *
+     * <p>哨兵常量已随读面上提 {@link AgentRunSpec#UNLIMITED_MAX_ITERATIONS}（此处保留转发，
+     * 便于既有引用与 JSON 绑定代码原样）。</p>
      */
-    public static final int UNLIMITED_MAX_ITERATIONS = -1;
+    public static final int UNLIMITED_MAX_ITERATIONS = AgentRunSpec.UNLIMITED_MAX_ITERATIONS;
 
     // ---- 引擎消费的持久化字段 ----
     private int maxIterations;
@@ -62,18 +65,20 @@ public class AgentConfig {
     @JsonIgnore
     private String vlmModelId = "";
 
-    /** ReAct 循环是否无轮次上限（派生判定，不持久化）。 */
+    /** ReAct 循环是否无轮次上限（派生判定，不持久化；实现见 {@link AgentRunSpec}）。 */
     @JsonIgnore
+    @Override
     public boolean unlimitedIterations() {
-        return maxIterations < 0;
+        return AgentRunSpec.super.unlimitedIterations();
     }
 
     /**
      * 引用输出开关；旧运行时配置没有该字段（null）时<b>默认开</b>。
      */
     @JsonIgnore
+    @Override
     public boolean citationsEnabled() {
-        return citationEnabled == null || citationEnabled;
+        return AgentRunSpec.super.citationsEnabled();
     }
 
     public int getMaxIterations() { return maxIterations; }

@@ -1,5 +1,6 @@
 package com.ragagent.agent;
 
+import com.ragagent.contract.agent.AgentRunSpec;
 import com.ragagent.contract.agent.SteerSink;
 import com.ragagent.contract.agent.ImageDescriberFunc;
 import com.ragagent.contract.model.chat.ToolCall;
@@ -107,7 +108,7 @@ public class AgentEngine {
 
     // ==================================================================
     // 引擎字段
-    final AgentConfig config;
+    final AgentRunSpec config;
     final ToolRegistry toolRegistry;
     final LlmChatClient chatModel;
     final EventBusInterface eventBus;
@@ -162,7 +163,7 @@ public class AgentEngine {
     // 构造
     // ==================================================================
 
-    public AgentEngine(AgentConfig config, LlmChatClient chatModel, ToolRegistry toolRegistry,
+    public AgentEngine(AgentRunSpec config, LlmChatClient chatModel, ToolRegistry toolRegistry,
             EventBusInterface eventBus, List<KnowledgeBaseInfo> knowledgeBasesInfo,
             List<SelectedDocumentInfo> selectedDocs, String sessionId,
             String systemPromptTemplate) {
