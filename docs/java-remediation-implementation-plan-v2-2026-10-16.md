@@ -31,6 +31,8 @@
 
 ### 1.2 platform 侧（业务形状 ~25 件 → 四类处置）
 
+> ✅ **P3 四刀已于 2026-10-16 完成**（`744fdcb2` / `2a9b3453` / `cac610c2` / `5ef29e07`）；本表 #3~#6 已落，余项见 P4/P5。
+
 | # | 类/簇 | 现状面 | 处置 | 批次 |
 |---|---|---|---|---|
 | 1 | `StopSessionRequest` | `platform.session.dto` | **归域** → `session/dto`（方案 §8.8.1 原文落点）；端口签名中性化 `stopSession(String, String)` | **P1** |
