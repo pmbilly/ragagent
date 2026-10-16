@@ -27,7 +27,7 @@ import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
-import com.ragagent.retrieval.engine.VectorStoreService;
+import com.ragagent.contract.retrieval.VectorIndexStore;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
@@ -71,7 +71,7 @@ public class KnowledgeTagService {
     private final ChunkRepository chunkRepo;
     private final AuditWritePort auditWriter;
     /** 向量索引回收。 */
-    private final VectorStoreService vectorStore;
+    private final VectorIndexStore vectorStore;
     /** 绑定 store 的向量写路由（绑定 KB 的索引清理走引擎口）。 */
     private final KnowledgeVectorWrites vectorWrites;
     /** 引擎路径删除需要的维度解析（照 deleteKnowledgeVectors 的取数口径）。 */
@@ -96,7 +96,7 @@ public class KnowledgeTagService {
                                KnowledgeTagRepository tagRepo,
                                ChunkRepository chunkRepo,
                                AuditWritePort auditWriter,
-                               VectorStoreService vectorStore,
+                               VectorIndexStore vectorStore,
                                KnowledgeVectorWrites vectorWrites,
                                ModelRuntime modelRuntimeAssembler,
                                KnowledgeBatchOpsService batchOpsService) {

@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.index;
 
+import com.ragagent.contract.retrieval.IndexRow;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
@@ -31,7 +32,7 @@ import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.knowledge.client.EmbedderClient;
-import com.ragagent.retrieval.engine.VectorStoreService;
+import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.knowledge.support.KnowledgeIndexContent;
 import com.ragagent.contract.model.ModelCatalogPort;
@@ -60,7 +61,7 @@ public class ChunkVectorIndexer {
     private final KnowledgeRepository knowledgeRepository;
     private final ModelCatalogPort modelCatalog;
     private final EmbedderClient embedder;
-    private final VectorStoreService vectorStore;
+    private final VectorIndexStore vectorStore;
     private final KnowledgeVectorWrites vectorWrites;
     private final ModelRuntime modelRuntimeAssembler;
     /** 批量向量化批大小（属性绑定）。 */
@@ -70,7 +71,7 @@ public class ChunkVectorIndexer {
                               KnowledgeRepository knowledgeRepository,
                               ModelCatalogPort modelCatalog,
                               EmbedderClient embedder,
-                              VectorStoreService vectorStore,
+                              VectorIndexStore vectorStore,
                               KnowledgeVectorWrites vectorWrites,
                               ModelRuntime modelRuntimeAssembler,
                               BatchEmbedProperties batchEmbedProperties) {
@@ -175,7 +176,7 @@ public class ChunkVectorIndexer {
             return;
         }
         EmbedderClient.EmbedConfig cfg = EmbedderClient.configFrom(embeddingModel);
-        List<VectorStoreService.IndexRow> rows = new ArrayList<>();
+        List<IndexRow> rows = new ArrayList<>();
         List<String> ids = new ArrayList<>();
         Map<String, Knowledge> knowledgeCache = new HashMap<>();
         for (Chunk chunk : chunks) {
@@ -196,7 +197,7 @@ public class ChunkVectorIndexer {
                 }
                 knowledgeCache.put(chunk.getKnowledgeId(), knowledge);
             }
-            rows.add(new VectorStoreService.IndexRow(chunk.getId(), chunk.getId(),
+            rows.add(new IndexRow(chunk.getId(), chunk.getId(),
                     chunk.getKnowledgeId(), chunk.getKnowledgeBaseId(),
                     KnowledgeIndexContent.build(knowledge, chunk.embeddingContent()),
                     chunk.isIsEnabled(), ""));
@@ -207,7 +208,7 @@ public class ChunkVectorIndexer {
                             || ChunkRepository.trimSpace(question.getQuestion()).isEmpty()) {
                         continue;
                     }
-                    rows.add(new VectorStoreService.IndexRow(
+                    rows.add(new IndexRow(
                             ChunkSearchUtil.generatedQuestionSourceId(chunk.getId(), question.getId()),
                             chunk.getId(), chunk.getKnowledgeId(), chunk.getKnowledgeBaseId(),
                             KnowledgeIndexContent.build(knowledge, question.getQuestion()), true, ""));
@@ -218,9 +219,9 @@ public class ChunkVectorIndexer {
         int embedBatch = embedBatchSize(batchEmbedProperties.embedSize());
         for (int from = 0; from < rows.size(); from += embedBatch) {
             int to = Math.min(from + embedBatch, rows.size());
-            List<VectorStoreService.IndexRow> batchRows = rows.subList(from, to);
+            List<IndexRow> batchRows = rows.subList(from, to);
             List<String> texts = new ArrayList<>(batchRows.size());
-            for (VectorStoreService.IndexRow row : batchRows) {
+            for (IndexRow row : batchRows) {
                 texts.add(row.content());
             }
             List<float[]> vectors;

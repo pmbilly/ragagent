@@ -40,7 +40,7 @@ import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.support.QuestionBatchPlanner;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
 import com.ragagent.knowledge.domain.span.SpanTracker;
-import com.ragagent.retrieval.engine.VectorStoreService;
+import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.knowledge.storage.TenantFileStorage;
@@ -93,7 +93,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     /** 租户感知文件存储（读 provider 引用；本地契约不变）。 */
     private final TenantFileStorage fileStorage;
     private final DocReaderClient docReader;
-    private final VectorStoreService vectorStore;
+    private final VectorIndexStore vectorStore;
     private final ModelCatalogPort modelCatalog;
     private final KnowledgeVectorWrites vectorWrites;
     /** K10b 收敛：索引执行的唯一实现（worker 不再自建分批/IndexRow/IndexInfo）。 */
@@ -121,7 +121,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                                   ChunkRepository chunkRepository,
                                   TenantFileStorage fileStorage,
                                   DocReaderClient docReader,
-                                  VectorStoreService vectorStore,
+                                  VectorIndexStore vectorStore,
                                   ModelCatalogPort modelCatalog,
                                   KnowledgeVectorWrites vectorWrites,
                                   ChunkVectorIndexer chunkVectorIndexer,

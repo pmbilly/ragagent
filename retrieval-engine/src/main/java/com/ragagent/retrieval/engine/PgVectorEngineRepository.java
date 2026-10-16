@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine;
 
+import com.ragagent.contract.retrieval.IndexRow;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -94,7 +95,7 @@ public class PgVectorEngineRepository
     public void batchSave(List<IndexInfo> indexInfoList, Map<String, Object> params) throws Exception {
         Map<String, float[]> embeddings = embeddingMap(params);
         Map<String, Boolean> chunkEnabled = chunkEnabledMap(params);
-        List<VectorStoreService.IndexRow> rows = new ArrayList<>(indexInfoList.size());
+        List<IndexRow> rows = new ArrayList<>(indexInfoList.size());
         List<float[]> vectors = new ArrayList<>(indexInfoList.size());
         for (IndexInfo info : indexInfoList) {
             float[] vector = embeddings.get(info.sourceId);
@@ -102,7 +103,7 @@ public class PgVectorEngineRepository
             if (chunkEnabled != null && chunkEnabled.containsKey(info.chunkId)) {
                 enabled = chunkEnabled.get(info.chunkId);
             }
-            rows.add(new VectorStoreService.IndexRow(info.sourceId, info.chunkId, info.knowledgeId,
+            rows.add(new IndexRow(info.sourceId, info.chunkId, info.knowledgeId,
                     info.knowledgeBaseId, info.content, enabled, info.tagId));
             vectors.add(vector == null ? new float[0] : vector);
         }

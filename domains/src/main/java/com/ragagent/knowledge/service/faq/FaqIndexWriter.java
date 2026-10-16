@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service.faq;
 
+import com.ragagent.contract.retrieval.IndexRow;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
@@ -21,7 +22,7 @@ import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.contract.tenant.TenantStorageQuotaPort;
-import com.ragagent.retrieval.engine.VectorStoreService;
+import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
 import com.ragagent.contract.model.ModelCatalogPort;
@@ -30,7 +31,7 @@ import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 /**
  * FAQ 条目的落库与向量索引写路径：FAQ 容器 knowledge 的查找/惰性创建、嵌入模型
  * 门槛、存储配额检查、索引写入与删除（绑定检索引擎的 KB 走引擎口，其余走内置
- * VectorStoreService）、删除时的配额回退。
+ * VectorIndexStore）、删除时的配额回退。
  *
  * <p>错误形态不变量：模型门槛与配额超限抛 {@link IllegalStateException}
  * （plain 500 形态，不进 BizException 信封）；配额累加在写入成功后进行，
@@ -43,7 +44,7 @@ public class FaqIndexWriter {
     private final ChunkRepository chunkRepository;
     private final TenantStorageQuotaPort tenantStorage;
     private final KnowledgeVectorWrites vectorWrites;
-    private final VectorStoreService vectorStore;
+    private final VectorIndexStore vectorStore;
     private final EmbedderClient embedder;
     private final ModelRuntime modelRuntimeAssembler;
     private final ModelCatalogPort modelCatalog;
@@ -54,7 +55,7 @@ public class FaqIndexWriter {
                           ChunkRepository chunkRepository,
                           TenantStorageQuotaPort tenantStorage,
                           KnowledgeVectorWrites vectorWrites,
-                          VectorStoreService vectorStore,
+                          VectorIndexStore vectorStore,
                           ModelCatalogPort modelCatalog,
                           EmbedderClient embedder,
                           ModelRuntime modelRuntimeAssembler,
@@ -136,7 +137,7 @@ public class FaqIndexWriter {
      * 批量索引 FAQ chunks：组装索引行 → （adjustStorage 时）配额预检 → 删旧行 →
      * 分批嵌入写库 → 配额累加 → 刷新 knowledge 的 processed_at。
      * 绑定检索引擎的 KB 走引擎口（嵌入与分批由引擎服务承担），否则走内置
-     * VectorStoreService 分批路径。
+     * VectorIndexStore 分批路径。
      */
     public void indexFAQChunks(KnowledgeBase kb, Knowledge knowledge, List<Chunk> chunks,
                                ModelRowView embeddingModel, boolean adjustStorage) {
@@ -144,7 +145,7 @@ public class FaqIndexWriter {
             return;
         }
         long tid = tenantId();
-        List<VectorStoreService.IndexRow> rows = new ArrayList<>();
+        List<IndexRow> rows = new ArrayList<>();
         List<String> chunkIds = new ArrayList<>();
         for (Chunk chunk : chunks) {
             rows.addAll(FaqIndexRows.build(kb, chunk));
@@ -153,7 +154,7 @@ public class FaqIndexWriter {
         int dimensions = embeddingDimensions(embeddingModel);
         long size = 0;
         if (adjustStorage) {
-            size = VectorStoreService.estimateStorageSize(rows, dimensions);
+            size = vectorStore.estimateStorageSize(rows, dimensions);
             TenantStorageQuotaPort.TenantQuotaView tenantInfo = tenantStorage.quotaView(tid);
             long quota = tenantInfo == null ? 0 : tenantInfo.quota();
             long used = tenantInfo == null ? 0 : tenantInfo.used();
@@ -190,9 +191,9 @@ public class FaqIndexWriter {
         int batchSize = ChunkVectorIndexer.embedBatchSize(batchEmbedProperties.embedSize());
         for (int from = 0; from < rows.size(); from += batchSize) {
             int to = Math.min(from + batchSize, rows.size());
-            List<VectorStoreService.IndexRow> batchRows = rows.subList(from, to);
+            List<IndexRow> batchRows = rows.subList(from, to);
             List<String> texts = new ArrayList<>(batchRows.size());
-            for (VectorStoreService.IndexRow row : batchRows) {
+            for (IndexRow row : batchRows) {
                 texts.add(row.content());
             }
             List<float[]> vectors;
@@ -223,13 +224,13 @@ public class FaqIndexWriter {
         }
         ModelRowView embeddingModel = requireEmbeddingModel(kb);
         long tid = tenantId();
-        List<VectorStoreService.IndexRow> rows = new ArrayList<>();
+        List<IndexRow> rows = new ArrayList<>();
         List<String> chunkIds = new ArrayList<>();
         for (Chunk chunk : chunks) {
             rows.addAll(FaqIndexRows.build(kb, chunk));
             chunkIds.add(chunk.getId());
         }
-        long size = VectorStoreService.estimateStorageSize(rows, embeddingDimensions(embeddingModel));
+        long size = vectorStore.estimateStorageSize(rows, embeddingDimensions(embeddingModel));
         CompositeRetrieveEngine boundEngine =
                 vectorWrites.boundEngine(kb, tid);
         if (boundEngine != null) {
@@ -266,10 +267,10 @@ public class FaqIndexWriter {
 
     /** 索引行 → 检索引擎的 IndexInfo（SourceType 固定 FILE）。 */
     private static List<IndexInfo> faqIndexInfos(
-            KnowledgeBase kb, List<VectorStoreService.IndexRow> rows) {
+            KnowledgeBase kb, List<IndexRow> rows) {
         List<IndexInfo> items =
                 new ArrayList<>(rows.size());
-        for (VectorStoreService.IndexRow row : rows) {
+        for (IndexRow row : rows) {
             IndexInfo item =
                     new IndexInfo();
             item.sourceId = row.sourceId();

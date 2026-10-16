@@ -1,11 +1,11 @@
 package com.ragagent.knowledge.service.faq;
 
+import com.ragagent.contract.retrieval.IndexRow;
 import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.retrieval.engine.VectorStoreService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
@@ -24,7 +24,7 @@ final class FaqIndexRows {
 
     private FaqIndexRows() {}
 
-    static List<VectorStoreService.IndexRow> build(KnowledgeBase kb, Chunk chunk) {
+    static List<IndexRow> build(KnowledgeBase kb, Chunk chunk) {
         String indexMode = faqIndexMode(kb);
         String questionIndexMode = faqQuestionIndexMode(kb);
 
@@ -42,13 +42,13 @@ final class FaqIndexRows {
         List<String> answers = meta.answers == null ? List.of() : meta.answers;
 
         if ("combined".equals(questionIndexMode)) {
-            return List.of(new VectorStoreService.IndexRow(chunk.getId(), chunk.getId(),
+            return List.of(new IndexRow(chunk.getId(), chunk.getId(),
                     chunk.getKnowledgeId(), chunk.getKnowledgeBaseId(),
                     buildFAQIndexContent(meta, indexMode), enabled, tagId));
         }
 
         // 分别索引模式：标准问 + 每个相似问各一行
-        List<VectorStoreService.IndexRow> rows = new ArrayList<>();
+        List<IndexRow> rows = new ArrayList<>();
         String standardContent = standardQuestion;
         if ("question_answer".equals(indexMode) && !answers.isEmpty()) {
             StringBuilder sb = new StringBuilder(standardQuestion);
@@ -57,7 +57,7 @@ final class FaqIndexRows {
             }
             standardContent = sb.toString();
         }
-        rows.add(new VectorStoreService.IndexRow(chunk.getId(), chunk.getId(),
+        rows.add(new IndexRow(chunk.getId(), chunk.getId(),
                 chunk.getKnowledgeId(), chunk.getKnowledgeBaseId(),
                 standardContent, enabled, tagId));
 
@@ -73,7 +73,7 @@ final class FaqIndexRows {
                 similarContent = sb.toString();
             }
             // sourceID = chunkID-{i}
-            rows.add(new VectorStoreService.IndexRow(chunk.getId() + "-" + i, chunk.getId(),
+            rows.add(new IndexRow(chunk.getId() + "-" + i, chunk.getId(),
                     chunk.getKnowledgeId(), chunk.getKnowledgeBaseId(),
                     similarContent, enabled, tagId));
         }

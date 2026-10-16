@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine;
 
+import com.ragagent.contract.retrieval.IndexRow;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -48,8 +49,8 @@ class VectorStoreServiceIndexRowArityTest {
         return jdbc;
     }
 
-    private static VectorStoreService.IndexRow row(String id) {
-        return new VectorStoreService.IndexRow(id, id, "kn", "kb", "text-" + id, true, "");
+    private static IndexRow row(String id) {
+        return new IndexRow(id, id, "kn", "kb", "text-" + id, true, "");
     }
 
     @Test

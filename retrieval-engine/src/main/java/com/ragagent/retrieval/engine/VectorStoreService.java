@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import com.ragagent.contract.retrieval.IndexRow;
+import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -23,21 +25,8 @@ import java.util.LinkedHashMap;
  * {@code chunkID-qID}（超 64 字节折叠 {@code chunkID-q<sha256 前 12 字节 hex>}，
  */
 @Service
-public class VectorStoreService {
+public class VectorStoreService implements VectorIndexStore {
 
-
-    /**
-     * source_type 恒 0（types.ChunkSourceType）；content 是调用方组装好的索引文本；
-     */
-    public record IndexRow(
-            String sourceId,
-            String chunkId,
-            String knowledgeId,
-            String knowledgeBaseId,
-            String content,
-            boolean isEnabled,
-            String tagId) {
-    }
 
     private final JdbcTemplate jdbc;
     private final boolean postgres;
@@ -181,10 +170,16 @@ public class VectorStoreService {
         }
     }
 
+    /** 端口面：实例方法转静态实现（静态版留给引擎内部调用）。 */
+    @Override
+    public long estimateStorageSize(List<IndexRow> rows, int dimension) {
+        return estimateStorageSizeStatic(rows, dimension);
+    }
+
     /**
      * content 字节 + dim×2（halfvec）+ 200 元数据开销 + 2×向量字节（HNSW 开销）。
      */
-    public static long estimateStorageSize(List<IndexRow> rows, int dimension) {
+    public static long estimateStorageSizeStatic(List<IndexRow> rows, int dimension) {
         long total = 0;
         for (IndexRow row : rows) {
             long contentSize = row.content() == null ? 0
