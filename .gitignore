@@ -20,6 +20,7 @@ frontend/package.json.md5
 .vscode/
 *.iml
 .claude/
+.codebuddy/
 .workbuddy/
 
 # OS
