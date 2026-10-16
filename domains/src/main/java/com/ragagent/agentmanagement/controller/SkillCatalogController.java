@@ -19,8 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.agent.skills.Skill;
-import com.ragagent.agent.skills.SkillCatalogService;
+import com.ragagent.contract.agent.SkillCatalogPort;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
@@ -40,7 +39,7 @@ import com.ragagent.platform.web.ApiResult;
  * 语义为「指令型技能入库」——技能 = SKILL.md（frontmatter + 正文），运行期注入提示词，
  * 无安装、无执行面（原 {@code POST /{id}/install} 不实现）。</p>
  *
- * <p>写入约束：frontmatter 由服务端组装并自校验（{@link Skill#parseSkillFile(String)}），
+ * <p>写入约束：frontmatter 由服务端组装并自校验（见 {@link SkillCatalogPort#create}——服务端自校验 frontmatter），
  * 调用方只提供 slug/name/description/正文。删除是软删；被**本空间**智能体引用时拒绝，
  * {@code force=true} 才强删（引用清单进 details 与审计）。</p>
  *
@@ -53,10 +52,10 @@ public class SkillCatalogController {
 
     private static final ObjectMapper AUDIT_MAPPER = JsonMappers.lenient();
 
-    private final SkillCatalogService catalog;
+    private final SkillCatalogPort catalog;
     private final AuditWritePort auditWriter;
 
-    public SkillCatalogController(SkillCatalogService catalog, AuditWritePort auditWriter) {
+    public SkillCatalogController(SkillCatalogPort catalog, AuditWritePort auditWriter) {
         this.catalog = catalog;
         this.auditWriter = auditWriter;
     }
@@ -83,7 +82,7 @@ public class SkillCatalogController {
             String createdBy,
             OffsetDateTime createdAt,
             OffsetDateTime updatedAt,
-            List<SkillCatalogService.SkillReference> referencedBy) {
+            List<SkillCatalogPort.SkillReference> referencedBy) {
     }
 
     /**
@@ -101,7 +100,7 @@ public class SkillCatalogController {
             String createdBy,
             OffsetDateTime createdAt,
             OffsetDateTime updatedAt,
-            List<SkillCatalogService.SkillReference> referencedBy) {
+            List<SkillCatalogPort.SkillReference> referencedBy) {
     }
 
     /** 技能文件条目（入库技能只有 SKILL.md）。 */
@@ -112,7 +111,7 @@ public class SkillCatalogController {
     public ResponseEntity<Map<String, Object>> listCatalog() {
         Long tenant = TenantContext.currentTenantId();
         List<SkillSummary> skills = new ArrayList<>();
-        for (SkillCatalogService.SkillRow row : catalog.listVisible(tenant)) {
+        for (SkillCatalogPort.SkillRow row : catalog.listVisible(tenant)) {
             skills.add(summary(row, catalog.listReferences(row.slug(), row.name(), tenant)));
         }
         return ResponseEntity.ok(Map.of("skills", skills));
@@ -124,14 +123,14 @@ public class SkillCatalogController {
             throw new BizException(AppError.badRequest("request body is required"));
         }
         Long tenant = requireTenant();
-        SkillCatalogService.SkillRow row;
+        SkillCatalogPort.SkillRow row;
         try {
             row = catalog.create(req.slug(), req.name(), req.description(), req.content(),
                     TenantContext.currentUserId(), tenant);
-        } catch (Skill.SkillValidationException e) {
+        } catch (SkillCatalogPort.SkillValidationException e) {
             throw new BizException(AppError.badRequest(e.getMessage()));
-        } catch (SkillCatalogService.DuplicateSlugException
-                | SkillCatalogService.SkillNameConflictException e) {
+        } catch (SkillCatalogPort.DuplicateSlugException
+                | SkillCatalogPort.SkillNameConflictException e) {
             throw new BizException(AppError.conflict(e.getMessage()));
         }
         audit(AuditAction.SKILL_CREATED, row, List.of());
@@ -142,7 +141,7 @@ public class SkillCatalogController {
     @GetMapping("/api/v1/skills/catalog/{id}")
     public ResponseEntity<SkillDetail> getCatalogItem(@PathVariable("id") String id) {
         Long tenant = TenantContext.currentTenantId();
-        SkillCatalogService.SkillRow row = requireRow(id, tenant);
+        SkillCatalogPort.SkillRow row = requireRow(id, tenant);
         return ResponseEntity.ok(new SkillDetail(
                 row.id(), row.slug(), row.name(), row.description(), skillBody(row),
                 row.version() == null ? 1 : row.version(), row.createdBy(),
@@ -159,23 +158,23 @@ public class SkillCatalogController {
             throw new BizException(AppError.badRequest("request body is required"));
         }
         Long tenant = TenantContext.currentTenantId();
-        SkillCatalogService.SkillRow current = requireRow(id, tenant);
-        SkillCatalogService.SkillRow updated;
+        SkillCatalogPort.SkillRow current = requireRow(id, tenant);
+        SkillCatalogPort.SkillRow updated;
         try {
             updated = catalog.update(current, req.name(), req.description(), req.content(), tenant);
-        } catch (Skill.SkillValidationException e) {
+        } catch (SkillCatalogPort.SkillValidationException e) {
             throw new BizException(AppError.badRequest(e.getMessage()));
-        } catch (SkillCatalogService.PlatformSkillReadOnlyException e) {
+        } catch (SkillCatalogPort.PlatformSkillReadOnlyException e) {
             throw new BizException(AppError.forbidden(e.getMessage()));
-        } catch (SkillCatalogService.SkillNameConflictException e) {
+        } catch (SkillCatalogPort.SkillNameConflictException e) {
             throw new BizException(AppError.conflict(e.getMessage()));
-        } catch (SkillCatalogService.RenameWhileReferencedException e) {
+        } catch (SkillCatalogPort.RenameWhileReferencedException e) {
             throw new BizException(AppError.conflict(
                     "skill is referenced by " + e.references().size()
                             + " agent(s); rename would make them lose the skill")
                     .withDetails(referenceDetails(e.references())));
         }
-        List<SkillCatalogService.SkillReference> refs =
+        List<SkillCatalogPort.SkillReference> refs =
                 catalog.listReferences(updated.slug(), updated.name(), tenant);
         audit(AuditAction.SKILL_UPDATED, updated, refs);
         return ResponseEntity.ok(summary(updated, refs));
@@ -186,12 +185,12 @@ public class SkillCatalogController {
             @PathVariable("id") String id,
             @RequestParam(value = "force", required = false) Boolean force) {
         Long tenant = TenantContext.currentTenantId();
-        SkillCatalogService.SkillRow row = requireRow(id, tenant);
+        SkillCatalogPort.SkillRow row = requireRow(id, tenant);
         if (row.platform()) {
             throw new BizException(AppError.forbidden(
                     "platform builtin skills are read-only for workspace admins"));
         }
-        List<SkillCatalogService.SkillReference> refs =
+        List<SkillCatalogPort.SkillReference> refs =
                 catalog.listReferences(row.slug(), row.name(), tenant);
         if (!refs.isEmpty() && !Boolean.TRUE.equals(force)) {
             throw new BizException(AppError.conflict(
@@ -208,22 +207,22 @@ public class SkillCatalogController {
     public ResponseEntity<Map<String, Object>> listCatalogFiles(@PathVariable("id") String id) {
         requireRow(id, TenantContext.currentTenantId());
         // 入库技能只有 SKILL.md（附随文件未支持）；保持裁剪前的数组形状。
-        return ResponseEntity.ok(Map.of("files", List.of(new SkillFileEntry(Skill.SKILL_FILE_NAME, Skill.SKILL_FILE_NAME))));
+        return ResponseEntity.ok(Map.of("files", List.of(new SkillFileEntry(SkillCatalogPort.SKILL_FILE_NAME, SkillCatalogPort.SKILL_FILE_NAME))));
     }
 
     @GetMapping("/api/v1/skills/catalog/{id}/files/content")
     public ResponseEntity<Map<String, Object>> getCatalogFile(
             @PathVariable("id") String id,
             @RequestParam(value = "path", required = false) String path) {
-        SkillCatalogService.SkillRow row = requireRow(id, TenantContext.currentTenantId());
+        SkillCatalogPort.SkillRow row = requireRow(id, TenantContext.currentTenantId());
         if (path != null && !path.isBlank()
-                && !path.equals(Skill.SKILL_FILE_NAME)
-                && !path.endsWith("/" + Skill.SKILL_FILE_NAME)) {
+                && !path.equals(SkillCatalogPort.SKILL_FILE_NAME)
+                && !path.endsWith("/" + SkillCatalogPort.SKILL_FILE_NAME)) {
             throw new BizException(AppError.notFound("file not found in skill: " + path));
         }
         return ResponseEntity.ok(Map.of(
-                "name", Skill.SKILL_FILE_NAME,
-                "path", Skill.SKILL_FILE_NAME,
+                "name", SkillCatalogPort.SKILL_FILE_NAME,
+                "path", SkillCatalogPort.SKILL_FILE_NAME,
                 "content", row.content()));
     }
 
@@ -237,8 +236,8 @@ public class SkillCatalogController {
     }
 
     /** 可见范围内的行（平台内置 + 当前空间）；他空间的 id 等同不存在 → 404。 */
-    private SkillCatalogService.SkillRow requireRow(String id, Long tenant) {
-        Optional<SkillCatalogService.SkillRow> row = catalog.findVisibleById(id, tenant);
+    private SkillCatalogPort.SkillRow requireRow(String id, Long tenant) {
+        Optional<SkillCatalogPort.SkillRow> row = catalog.findVisibleById(id, tenant);
         if (row.isEmpty()) {
             throw new BizException(AppError.notFound("skill not found"));
         }
@@ -246,26 +245,26 @@ public class SkillCatalogController {
     }
 
     /** 从落库的 SKILL.md 还原正文（与组装严格可逆：assembled body 与 instructions 都 strip）。 */
-    private static String skillBody(SkillCatalogService.SkillRow row) {
-        return Skill.parseSkillFile(row.content()).instructions;
+    private String skillBody(SkillCatalogPort.SkillRow row) {
+        return catalog.skillInstructions(row.content());
     }
 
-    private static SkillSummary summary(SkillCatalogService.SkillRow row, List<SkillCatalogService.SkillReference> refs) {
+    private static SkillSummary summary(SkillCatalogPort.SkillRow row, List<SkillCatalogPort.SkillReference> refs) {
         return new SkillSummary(row.id(), row.slug(), row.name(), row.description(),
                 row.version() == null ? 1 : row.version(), row.platform(),
                 row.createdBy(), row.createdAt(), row.updatedAt(), refs);
     }
 
-    private static String referenceDetails(List<SkillCatalogService.SkillReference> refs) {
+    private static String referenceDetails(List<SkillCatalogPort.SkillReference> refs) {
         List<String> parts = new ArrayList<>(refs.size());
-        for (SkillCatalogService.SkillReference ref : refs) {
+        for (SkillCatalogPort.SkillReference ref : refs) {
             parts.add(ref.agentName() + (ref.allMode() ? "(全部技能)" : ""));
         }
         return "引用它的智能体：" + String.join("、", parts);
     }
 
-    private void audit(String action, SkillCatalogService.SkillRow row,
-            List<SkillCatalogService.SkillReference> refs) {
+    private void audit(String action, SkillCatalogPort.SkillRow row,
+            List<SkillCatalogPort.SkillReference> refs) {
         ObjectNode details = AUDIT_MAPPER.createObjectNode();
         details.put("id", row.id());
         details.put("slug", row.slug());
@@ -275,7 +274,7 @@ public class SkillCatalogController {
         }
         if (!refs.isEmpty()) {
             List<String> names = new ArrayList<>(refs.size());
-            for (SkillCatalogService.SkillReference ref : refs) {
+            for (SkillCatalogPort.SkillReference ref : refs) {
                 names.add(ref.agentName());
             }
             details.put("referencedBy", String.join(",", names));

@@ -1,5 +1,6 @@
 package com.ragagent.agent.skills;
 
+import com.ragagent.contract.agent.SkillCatalogPort;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,7 +26,7 @@ class ManagerTest {
             public Skill loadSkillInstructions(String requested) {
                 Skill skill = new Skill();
                 if (!name.equals(requested)) {
-                    throw new Skill.SkillValidationException("skill not found: " + requested);
+                    throw new SkillCatalogPort.SkillValidationException("skill not found: " + requested);
                 }
                 skill.name = name;
                 skill.description = name + " 的说明";
@@ -36,15 +37,15 @@ class ManagerTest {
 
             @Override
             public Skill.SkillFile loadSkillFile(String requested, String relativePath) {
-                throw new Skill.SkillValidationException("file not found in skill: " + relativePath);
+                throw new SkillCatalogPort.SkillValidationException("file not found in skill: " + relativePath);
             }
 
             @Override
             public List<String> listSkillFiles(String requested) {
                 if (!name.equals(requested)) {
-                    throw new Skill.SkillValidationException("skill not found: " + requested);
+                    throw new SkillCatalogPort.SkillValidationException("skill not found: " + requested);
                 }
-                return List.of(Skill.SKILL_FILE_NAME);
+                return List.of(SkillCatalogPort.SKILL_FILE_NAME);
             }
 
             @Override
@@ -75,7 +76,7 @@ class ManagerTest {
         assertEquals(1, manager.getAllMetadata().size());
         assertEquals("a", manager.getAllMetadata().get(0).name());
         assertEquals("a 的正文", manager.loadSkill("a").instructions);
-        assertThrows(Skill.SkillValidationException.class, () -> manager.loadSkill("b"));
+        assertThrows(SkillCatalogPort.SkillValidationException.class, () -> manager.loadSkill("b"));
     }
 
     @Test
@@ -89,17 +90,17 @@ class ManagerTest {
 
             @Override
             public Skill loadSkillInstructions(String name) {
-                throw new Skill.SkillValidationException("not used");
+                throw new SkillCatalogPort.SkillValidationException("not used");
             }
 
             @Override
             public Skill.SkillFile loadSkillFile(String name, String relativePath) {
-                throw new Skill.SkillValidationException("not used");
+                throw new SkillCatalogPort.SkillValidationException("not used");
             }
 
             @Override
             public List<String> listSkillFiles(String name) {
-                throw new Skill.SkillValidationException("not used");
+                throw new SkillCatalogPort.SkillValidationException("not used");
             }
 
             @Override
@@ -115,7 +116,7 @@ class ManagerTest {
     @Test
     void unknownSkillReportsNotFound() {
         Manager manager = manager(List.of(fakeSource("a")), List.of());
-        Skill.SkillValidationException e = assertThrows(Skill.SkillValidationException.class,
+        SkillCatalogPort.SkillValidationException e = assertThrows(SkillCatalogPort.SkillValidationException.class,
                 () -> manager.loadSkill("missing"));
         assertTrue(e.getMessage().contains("not found"), e.getMessage());
     }
@@ -125,6 +126,6 @@ class ManagerTest {
         Manager manager = new Manager(new Manager.ManagerConfig(List.of(fakeSource("a")), List.of(), false));
         manager.initialize();
         assertNull(manager.getAllMetadata());
-        assertThrows(Skill.SkillValidationException.class, () -> manager.loadSkill("a"));
+        assertThrows(SkillCatalogPort.SkillValidationException.class, () -> manager.loadSkill("a"));
     }
 }

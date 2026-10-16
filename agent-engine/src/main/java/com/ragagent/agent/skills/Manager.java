@@ -1,5 +1,6 @@
 package com.ragagent.agent.skills;
 
+import com.ragagent.contract.agent.SkillCatalogPort;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -133,24 +134,24 @@ public final class Manager {
         for (SkillSource source : sources) {
             try {
                 return source.listSkillFiles(skillName);
-            } catch (Skill.SkillValidationException e) {
+            } catch (SkillCatalogPort.SkillValidationException e) {
                 // 该源没有这个 skill，换下一个
             }
         }
-        throw new Skill.SkillValidationException("skill not found: " + skillName);
+        throw new SkillCatalogPort.SkillValidationException("skill not found: " + skillName);
     }
 
     /** 第一个命中的数据源结果；全都不认时抛「找不到」。 */
     private <T> T fromSources(SourceCall<T> call) throws Exception {
-        Skill.SkillValidationException notFound = null;
+        SkillCatalogPort.SkillValidationException notFound = null;
         for (SkillSource source : sources) {
             try {
                 return call.apply(source);
-            } catch (Skill.SkillValidationException e) {
+            } catch (SkillCatalogPort.SkillValidationException e) {
                 notFound = e;
             }
         }
-        throw notFound != null ? notFound : new Skill.SkillValidationException("skill not found");
+        throw notFound != null ? notFound : new SkillCatalogPort.SkillValidationException("skill not found");
     }
 
     @FunctionalInterface
@@ -160,10 +161,10 @@ public final class Manager {
 
     private void requireUsable(String skillName) {
         if (!enabled) {
-            throw new Skill.SkillValidationException("skills are not enabled");
+            throw new SkillCatalogPort.SkillValidationException("skills are not enabled");
         }
         if (!isSkillAllowed(skillName)) {
-            throw new Skill.SkillValidationException("skill not allowed: " + skillName);
+            throw new SkillCatalogPort.SkillValidationException("skill not allowed: " + skillName);
         }
     }
 

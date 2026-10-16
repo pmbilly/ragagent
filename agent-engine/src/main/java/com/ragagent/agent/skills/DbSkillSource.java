@@ -1,5 +1,6 @@
 package com.ragagent.agent.skills;
 
+import com.ragagent.contract.agent.SkillCatalogPort;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,12 +28,12 @@ public final class DbSkillSource implements SkillSource {
     private record Entry(Skill skill, String rawContent, String slug) {
     }
 
-    public DbSkillSource(List<SkillCatalogService.SkillRow> rows) {
-        for (SkillCatalogService.SkillRow row : rows == null ? List.<SkillCatalogService.SkillRow>of() : rows) {
+    public DbSkillSource(List<SkillCatalogPort.SkillRow> rows) {
+        for (SkillCatalogPort.SkillRow row : rows == null ? List.<SkillCatalogPort.SkillRow>of() : rows) {
             try {
                 Skill skill = Skill.parseSkillFile(row.content());
                 skill.basePath = "db:" + row.slug();
-                skill.filePath = skill.basePath + "/" + Skill.SKILL_FILE_NAME;
+                skill.filePath = skill.basePath + "/" + SkillCatalogPort.SKILL_FILE_NAME;
                 byName.put(skill.name, new Entry(skill, row.content(), row.slug()));
             } catch (RuntimeException e) {
                 log.warn("[skills] skip unparsable skill row slug={}: {}", row.slug(), e.getMessage());
@@ -58,18 +59,18 @@ public final class DbSkillSource implements SkillSource {
     public Skill.SkillFile loadSkillFile(String name, String relativePath) {
         Entry e = require(name);
         if (relativePath == null || relativePath.isBlank()
-                || relativePath.equals(Skill.SKILL_FILE_NAME)
-                || relativePath.endsWith("/" + Skill.SKILL_FILE_NAME)) {
-            return new Skill.SkillFile(e.skill().name, Skill.SKILL_FILE_NAME, e.rawContent(), false);
+                || relativePath.equals(SkillCatalogPort.SKILL_FILE_NAME)
+                || relativePath.endsWith("/" + SkillCatalogPort.SKILL_FILE_NAME)) {
+            return new Skill.SkillFile(e.skill().name, SkillCatalogPort.SKILL_FILE_NAME, e.rawContent(), false);
         }
-        throw new Skill.SkillValidationException("file not found in skill: " + relativePath);
+        throw new SkillCatalogPort.SkillValidationException("file not found in skill: " + relativePath);
     }
 
     @Override
     public List<String> listSkillFiles(String name) {
         require(name);
         // 入库技能只有 SKILL.md 一个文件；附随文件（Level 3）暂未支持。
-        return List.of(Skill.SKILL_FILE_NAME);
+        return List.of(SkillCatalogPort.SKILL_FILE_NAME);
     }
 
     @Override
@@ -80,7 +81,7 @@ public final class DbSkillSource implements SkillSource {
     private Entry require(String name) {
         Entry e = name == null ? null : byName.get(name);
         if (e == null) {
-            throw new Skill.SkillValidationException("skill not found: " + name);
+            throw new SkillCatalogPort.SkillValidationException("skill not found: " + name);
         }
         return e;
     }

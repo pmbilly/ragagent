@@ -20,7 +20,7 @@ import com.ragagent.agent.prompt.AgentPromptTemplates;
 import com.ragagent.agent.skills.DbSkillSource;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
-import com.ragagent.agent.skills.SkillCatalogService;
+import com.ragagent.contract.agent.SkillCatalogPort;
 import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.agent.tool.SequentialThinkingTool;
 import com.ragagent.agent.tool.SkillReadFileTool;
@@ -64,9 +64,9 @@ final class AgentEngineAssembler {
     private final javax.sql.DataSource dataSource;
     private final VlmDescriberWiring vlmDescriberWiring;
     /** 平台级技能目录（skills 表入库版）：装配期建 {@code DbSkillSource} 读 skills 表。 */
-    private final SkillCatalogService skillCatalogService;
+    private final SkillCatalogPort skillCatalogService;
 
-    AgentEngineAssembler(MemoryRecallPort memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeCatalogPort knowledgeService, McpToolRegistrationPort mcpTools, ResourceCatalogPort resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, SkillCatalogService skillCatalogService) {
+    AgentEngineAssembler(MemoryRecallPort memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeCatalogPort knowledgeService, McpToolRegistrationPort mcpTools, ResourceCatalogPort resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, SkillCatalogPort skillCatalogService) {
         this.memoryService = memoryService;
         this.knowledgeQa = knowledgeQa;
         this.toolBackends = toolBackends;

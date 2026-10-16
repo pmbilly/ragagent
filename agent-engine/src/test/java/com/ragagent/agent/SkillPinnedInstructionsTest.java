@@ -1,5 +1,6 @@
 package com.ragagent.agent;
 
+import com.ragagent.contract.agent.SkillCatalogPort;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ class SkillPinnedInstructionsTest {
         @Override
         public Skill loadSkillInstructions(String name) {
             if (broken || !"kb-faq-curator".equals(name)) {
-                throw new Skill.SkillValidationException("skill not found: " + name);
+                throw new SkillCatalogPort.SkillValidationException("skill not found: " + name);
             }
             return Skill.parseSkillFile("""
                     ---
@@ -52,12 +53,12 @@ class SkillPinnedInstructionsTest {
 
         @Override
         public Skill.SkillFile loadSkillFile(String name, String relativePath) {
-            throw new Skill.SkillValidationException("file not found in skill: " + relativePath);
+            throw new SkillCatalogPort.SkillValidationException("file not found in skill: " + relativePath);
         }
 
         @Override
         public List<String> listSkillFiles(String name) {
-            return new ArrayList<>(List.of(Skill.SKILL_FILE_NAME));
+            return new ArrayList<>(List.of(SkillCatalogPort.SKILL_FILE_NAME));
         }
 
         @Override

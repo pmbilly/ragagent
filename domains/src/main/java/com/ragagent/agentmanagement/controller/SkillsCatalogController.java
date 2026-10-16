@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ragagent.agent.skills.SkillCatalogService;
+import com.ragagent.contract.agent.SkillCatalogPort;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResult;
 
@@ -30,9 +30,9 @@ import com.ragagent.platform.web.ApiResult;
 @ApiResult
 public class SkillsCatalogController {
 
-    private final SkillCatalogService catalog;
+    private final SkillCatalogPort catalog;
 
-    public SkillsCatalogController(SkillCatalogService catalog) {
+    public SkillsCatalogController(SkillCatalogPort catalog) {
         this.catalog = catalog;
     }
 
@@ -50,7 +50,7 @@ public class SkillsCatalogController {
     public ResponseEntity<Map<String, Object>> listSkills() {
         Map<String, Object> body = new TreeMap<>();
         List<SkillInfoResponse> response = new ArrayList<>();
-        for (SkillCatalogService.SkillRow row : catalog.listVisible(TenantContext.currentTenantId())) {
+        for (SkillCatalogPort.SkillRow row : catalog.listVisible(TenantContext.currentTenantId())) {
             response.add(new SkillInfoResponse(row.name(), row.description()));
         }
         body.put("skills", response);

@@ -1,5 +1,6 @@
 package com.ragagent.agent.skills;
 
+import com.ragagent.contract.agent.SkillCatalogPort.SkillValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -22,7 +23,6 @@ public final class Skill {
     /** Claude 规范的校验常量。 */
     public static final int MAX_NAME_LENGTH = 64;
     public static final int MAX_DESCRIPTION_LENGTH = 1024;
-    public static final String SKILL_FILE_NAME = "SKILL.md";
 
     /** skill 名不能包含的保留词。 */
     private static final String[] RESERVED_WORDS = {"anthropic", "claude"};
@@ -64,11 +64,6 @@ public final class Skill {
     public boolean frontmatterRepaired;
 
     /** 解析/校验失败；错误文案会逐字进入上层响应，措辞改动需谨慎。 */
-    public static final class SkillValidationException extends RuntimeException {
-        public SkillValidationException(String message) {
-            super(message);
-        }
-    }
 
     /** 校验 skill 元数据是否符合 Claude 规范。 */
     public void validate() {

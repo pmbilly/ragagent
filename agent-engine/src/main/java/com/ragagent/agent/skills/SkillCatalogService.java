@@ -1,5 +1,12 @@
 package com.ragagent.agent.skills;
 
+import com.ragagent.contract.agent.SkillCatalogPort;
+import com.ragagent.contract.agent.SkillCatalogPort.DuplicateSlugException;
+import com.ragagent.contract.agent.SkillCatalogPort.PlatformSkillReadOnlyException;
+import com.ragagent.contract.agent.SkillCatalogPort.RenameWhileReferencedException;
+import com.ragagent.contract.agent.SkillCatalogPort.SkillNameConflictException;
+import com.ragagent.contract.agent.SkillCatalogPort.SkillReference;
+import com.ragagent.contract.agent.SkillCatalogPort.SkillRow;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +38,7 @@ import com.ragagent.agent.skills.mapper.SkillMapper;
  * {@code slug} 只在同一命名空间内唯一（DB 部分唯一索引兜底）。</p>
  */
 @Service
-public class SkillCatalogService {
+public class SkillCatalogService implements SkillCatalogPort {
 
     private static final Logger log = LoggerFactory.getLogger(SkillCatalogService.class);
 
@@ -50,69 +57,19 @@ public class SkillCatalogService {
     }
 
     /** 目录/详情投影（不含 deletedAt；content 是完整 SKILL.md 原文）。 */
-    public record SkillRow(
-            String id,
-            Long tenantId,
-            String slug,
-            String name,
-            String description,
-            String content,
-            Integer version,
-            String createdBy,
-            OffsetDateTime createdAt,
-            OffsetDateTime updatedAt) {
-
-        /** 平台内置层：全员可见、只读。 */
-        public boolean platform() {
-            return tenantId == null;
-        }
-    }
 
     /** 引用了某技能的智能体（删除/改名保护的提示来源）。 */
-    public record SkillReference(String agentId, String agentName, boolean allMode) {
-    }
 
     /** slug 已被占用（API 层映射 409）。 */
-    public static final class DuplicateSlugException extends RuntimeException {
-        public DuplicateSlugException(String slug) {
-            super("skill slug already exists in this workspace: " + slug);
-        }
-    }
 
     /**
      * name 与可见范围内已有技能冲突（平台内置或本空间；API 层映射 409）。
      * name 是运行期身份，重名会让 {@code selectedSkills} 指向歧义。
      */
-    public static final class SkillNameConflictException extends RuntimeException {
-        public SkillNameConflictException(String name, boolean platformHit) {
-            super(platformHit
-                    ? "skill name is taken by a platform builtin: " + name
-                    : "skill name already exists in this workspace: " + name);
-        }
-    }
 
     /** 平台内置行只读（API 层映射 403）。 */
-    public static final class PlatformSkillReadOnlyException extends RuntimeException {
-        public PlatformSkillReadOnlyException() {
-            super("platform builtin skills are read-only for workspace admins");
-        }
-    }
 
     /** 改名被引用保护（API 层映射 409 + 引用清单）。 */
-    public static final class RenameWhileReferencedException extends RuntimeException {
-
-        private final transient List<SkillReference> references;
-
-        public RenameWhileReferencedException(List<SkillReference> references) {
-            super("skill is referenced by " + (references == null ? 0 : references.size())
-                    + " agent(s); rename would orphan them");
-            this.references = references == null ? List.of() : List.copyOf(references);
-        }
-
-        public List<SkillReference> references() {
-            return references;
-        }
-    }
 
     // ── 读 ────────────────────────────────────────────────────────────────
 
@@ -146,7 +103,7 @@ public class SkillCatalogService {
 
     /**
      * 新建技能（归属当前空间）。frontmatter 由本类组装后再自校验，
-     * 任何校验失败都抛 {@link Skill.SkillValidationException}（API 层映射 400）。
+     * 任何校验失败都抛 {@link SkillCatalogPort.SkillValidationException}（API 层映射 400）。
      */
     public SkillRow create(String slug, String name, String description, String body,
             String createdBy, Long tenantId) {
@@ -241,6 +198,11 @@ public class SkillCatalogService {
      * （实测为别的空间）——只按 {@code tenant_id = ?} 过滤会漏掉它，导致
      * 「改名/删除时提示不到真正会被影响的 agent」。</p>
      */
+    @Override
+    public String skillInstructions(String skillFileContent) {
+        return Skill.parseSkillFile(skillFileContent).instructions;
+    }
+
     public List<SkillReference> listReferences(String slug, String name, Long tenantId) {
         if (tenantId == null) {
             return List.of();
@@ -339,7 +301,7 @@ public class SkillCatalogService {
      */
     static void requireRuntimeIdentity(String requestedName, Skill parsed) {
         if (!parsed.name.equals(requestedName)) {
-            throw new Skill.SkillValidationException(
+            throw new SkillCatalogPort.SkillValidationException(
                     "name must be a runtime-legal skill name (letters/numbers/hyphens/underscores only); '"
                             + requestedName + "' would be normalized to '" + parsed.name + "'");
         }
@@ -353,7 +315,7 @@ public class SkillCatalogService {
     static String requireSlug(String slug) {
         String v = slug == null ? "" : slug.strip();
         if (!SLUG_PATTERN.matcher(v).matches()) {
-            throw new Skill.SkillValidationException(
+            throw new SkillCatalogPort.SkillValidationException(
                     "slug must match ^[a-z0-9]([a-z0-9-]{0,62}[a-z0-9])?$ (lowercase letters, digits, hyphens)");
         }
         return v;
@@ -362,10 +324,10 @@ public class SkillCatalogService {
     static String requireName(String name) {
         String v = name == null ? "" : name.strip();
         if (v.isEmpty()) {
-            throw new Skill.SkillValidationException("name: 不能为空");
+            throw new SkillCatalogPort.SkillValidationException("name: 不能为空");
         }
         if (v.length() > Skill.MAX_NAME_LENGTH) {
-            throw new Skill.SkillValidationException("name: 超过 " + Skill.MAX_NAME_LENGTH + " 字符上限");
+            throw new SkillCatalogPort.SkillValidationException("name: 超过 " + Skill.MAX_NAME_LENGTH + " 字符上限");
         }
         return v;
     }
@@ -374,10 +336,10 @@ public class SkillCatalogService {
         String v = description == null ? "" : description.strip();
         if (v.isEmpty()) {
             // 运行期 Skill.validate 也要求非空（描述会展示在技能选择器里）。
-            throw new Skill.SkillValidationException("description: 不能为空");
+            throw new SkillCatalogPort.SkillValidationException("description: 不能为空");
         }
         if (v.length() > Skill.MAX_DESCRIPTION_LENGTH) {
-            throw new Skill.SkillValidationException(
+            throw new SkillCatalogPort.SkillValidationException(
                     "description: 超过 " + Skill.MAX_DESCRIPTION_LENGTH + " 字符上限");
         }
         return v;
@@ -386,10 +348,10 @@ public class SkillCatalogService {
     static String requireBody(String body) {
         String v = body == null ? "" : body.strip();
         if (v.isEmpty()) {
-            throw new Skill.SkillValidationException("content: 不能为空（技能正文即注入给模型的指令）");
+            throw new SkillCatalogPort.SkillValidationException("content: 不能为空（技能正文即注入给模型的指令）");
         }
         if (v.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > MAX_CONTENT_BYTES) {
-            throw new Skill.SkillValidationException("content: 超过 " + MAX_CONTENT_BYTES + " 字节上限");
+            throw new SkillCatalogPort.SkillValidationException("content: 超过 " + MAX_CONTENT_BYTES + " 字节上限");
         }
         return v;
     }

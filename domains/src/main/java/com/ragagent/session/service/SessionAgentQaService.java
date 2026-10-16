@@ -24,7 +24,7 @@ import com.ragagent.contract.model.Reranker;
 
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.contract.agent.AgentBudgets;
-import com.ragagent.agent.skills.SkillCatalogService;
+import com.ragagent.contract.agent.SkillCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
 import com.ragagent.platform.tracing.decorators.LangfuseReranker;
@@ -85,7 +85,7 @@ public class SessionAgentQaService {
             ModelRuntime modelRuntime,
             McpToolRegistrationPort mcpTools,
             VlmDescriberWiring vlmDescriberWiring,
-            SkillCatalogService skillCatalogService,
+            SkillCatalogPort skillCatalogService,
             AgentResolver agentResolver) {
         this.agentResolver = agentResolver;
         this.modelRuntime = modelRuntime;

@@ -1,5 +1,6 @@
 package com.ragagent.agent.skills;
 
+import com.ragagent.contract.agent.SkillCatalogPort;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,7 +43,7 @@ class SkillCatalogServiceTest {
         String content = SkillCatalogService.assembleSkillFile("KB FAQ 整理", "kb-faq-curator", "说明", "正文");
         Skill parsed = Skill.parseSkillFile(content);
         assertEquals("kb-faq-curator", parsed.name); // 证明运行期确实改了名
-        Skill.SkillValidationException e = assertThrows(Skill.SkillValidationException.class,
+        SkillCatalogPort.SkillValidationException e = assertThrows(SkillCatalogPort.SkillValidationException.class,
                 () -> SkillCatalogService.requireRuntimeIdentity("KB FAQ 整理", parsed));
         assertTrue(e.getMessage().contains("normalized to"), e.getMessage());
     }
@@ -57,14 +58,14 @@ class SkillCatalogServiceTest {
 
     @Test
     void renameAllowedOnlyWhenUnreferenced() {
-        var ref = new SkillCatalogService.SkillReference("agent-1", "probe", true);
+        var ref = new SkillCatalogPort.SkillReference("agent-1", "probe", true);
         // 同名不算改名 → 即使有引用也放行（只改描述/正文）
         SkillCatalogService.requireRenameAllowed("a", "a", List.of(ref));
         // 无引用 → 可改名
         SkillCatalogService.requireRenameAllowed("a", "b", List.of());
         // 有引用 + 真改名 → 拒绝，且带上引用清单供 409 details 使用
-        SkillCatalogService.RenameWhileReferencedException e = assertThrows(
-                SkillCatalogService.RenameWhileReferencedException.class,
+        SkillCatalogPort.RenameWhileReferencedException e = assertThrows(
+                SkillCatalogPort.RenameWhileReferencedException.class,
                 () -> SkillCatalogService.requireRenameAllowed("a", "b", List.of(ref)));
         assertEquals(1, e.references().size());
         assertEquals("probe", e.references().get(0).agentName());
@@ -73,17 +74,17 @@ class SkillCatalogServiceTest {
 
     @Test
     void platformRowsAreReadOnlyAndTenantScoped() {
-        SkillCatalogService.SkillRow platform = row(null, "n");
-        SkillCatalogService.SkillRow tenantRow = row(7L, "n");
+        SkillCatalogPort.SkillRow platform = row(null, "n");
+        SkillCatalogPort.SkillRow tenantRow = row(7L, "n");
         // 平台内置行：租户管理员只读
-        assertThrows(SkillCatalogService.PlatformSkillReadOnlyException.class,
+        assertThrows(SkillCatalogPort.PlatformSkillReadOnlyException.class,
                 () -> SkillCatalogService.requireTenantWritable(platform, 7L));
         // 本空间行可写
         SkillCatalogService.requireTenantWritable(tenantRow, 7L);
         // 他空间行（读路径已过滤，这里是兜底）与无空间上下文都拒绝
-        assertThrows(SkillCatalogService.PlatformSkillReadOnlyException.class,
+        assertThrows(SkillCatalogPort.PlatformSkillReadOnlyException.class,
                 () -> SkillCatalogService.requireTenantWritable(tenantRow, 8L));
-        assertThrows(SkillCatalogService.PlatformSkillReadOnlyException.class,
+        assertThrows(SkillCatalogPort.PlatformSkillReadOnlyException.class,
                 () -> SkillCatalogService.requireTenantWritable(tenantRow, null));
     }
 
@@ -99,11 +100,11 @@ class SkillCatalogServiceTest {
         SkillCatalogService.requireNameFree("x", List.of());
         SkillCatalogService.requireNameFree("x", null);
 
-        var platformHit = assertThrows(SkillCatalogService.SkillNameConflictException.class,
+        var platformHit = assertThrows(SkillCatalogPort.SkillNameConflictException.class,
                 () -> SkillCatalogService.requireNameFree("x", List.of(row(null, "x"))));
         assertTrue(platformHit.getMessage().contains("platform builtin"), platformHit.getMessage());
 
-        var tenantHit = assertThrows(SkillCatalogService.SkillNameConflictException.class,
+        var tenantHit = assertThrows(SkillCatalogPort.SkillNameConflictException.class,
                 () -> SkillCatalogService.requireNameFree("x", List.of(row(7L, "x"))));
         assertTrue(tenantHit.getMessage().contains("workspace"), tenantHit.getMessage());
     }
@@ -111,28 +112,28 @@ class SkillCatalogServiceTest {
     @Test
     void slugMustBeFreeInSameNamespace() {
         SkillCatalogService.requireSlugFree("s", List.of());
-        assertThrows(SkillCatalogService.DuplicateSlugException.class,
+        assertThrows(SkillCatalogPort.DuplicateSlugException.class,
                 () -> SkillCatalogService.requireSlugFree("s", List.of(row(7L, "s"))));
     }
 
-    private static SkillCatalogService.SkillRow row(Long tenantId, String name) {
-        return new SkillCatalogService.SkillRow("id-" + name, tenantId, name, name, "说明", "内容", 1, "tester",
+    private static SkillCatalogPort.SkillRow row(Long tenantId, String name) {
+        return new SkillCatalogPort.SkillRow("id-" + name, tenantId, name, name, "说明", "内容", 1, "tester",
                 java.time.OffsetDateTime.now(), java.time.OffsetDateTime.now());
     }
 
     @Test
     void slugRules() {
         assertEquals("kb-faq", SkillCatalogService.requireSlug("kb-faq"));
-        assertThrows(Skill.SkillValidationException.class, () -> SkillCatalogService.requireSlug("KB_FAQ"));
-        assertThrows(Skill.SkillValidationException.class, () -> SkillCatalogService.requireSlug("-lead"));
-        assertThrows(Skill.SkillValidationException.class, () -> SkillCatalogService.requireSlug("trail-"));
-        assertThrows(Skill.SkillValidationException.class, () -> SkillCatalogService.requireSlug("a".repeat(65)));
+        assertThrows(SkillCatalogPort.SkillValidationException.class, () -> SkillCatalogService.requireSlug("KB_FAQ"));
+        assertThrows(SkillCatalogPort.SkillValidationException.class, () -> SkillCatalogService.requireSlug("-lead"));
+        assertThrows(SkillCatalogPort.SkillValidationException.class, () -> SkillCatalogService.requireSlug("trail-"));
+        assertThrows(SkillCatalogPort.SkillValidationException.class, () -> SkillCatalogService.requireSlug("a".repeat(65)));
     }
 
     @Test
     void descriptionAndBodyAreRequired() {
-        assertThrows(Skill.SkillValidationException.class, () -> SkillCatalogService.requireDescription("  "));
-        assertThrows(Skill.SkillValidationException.class, () -> SkillCatalogService.requireBody("  "));
-        assertThrows(Skill.SkillValidationException.class, () -> SkillCatalogService.requireName(" "));
+        assertThrows(SkillCatalogPort.SkillValidationException.class, () -> SkillCatalogService.requireDescription("  "));
+        assertThrows(SkillCatalogPort.SkillValidationException.class, () -> SkillCatalogService.requireBody("  "));
+        assertThrows(SkillCatalogPort.SkillValidationException.class, () -> SkillCatalogService.requireName(" "));
     }
 }

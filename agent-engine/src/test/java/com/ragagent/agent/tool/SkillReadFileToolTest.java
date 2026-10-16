@@ -1,5 +1,6 @@
 package com.ragagent.agent.tool;
 
+import com.ragagent.contract.agent.SkillCatalogPort;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ class SkillReadFileToolTest {
         @Override
         public Skill loadSkillInstructions(String skillName) {
             require(skillName);
-            return Skill.parseSkillFile(files.get(Skill.SKILL_FILE_NAME));
+            return Skill.parseSkillFile(files.get(SkillCatalogPort.SKILL_FILE_NAME));
         }
 
         @Override
@@ -56,7 +57,7 @@ class SkillReadFileToolTest {
             require(skillName);
             String content = files.get(relativePath);
             if (content == null) {
-                throw new Skill.SkillValidationException("file not found in skill: " + relativePath);
+                throw new SkillCatalogPort.SkillValidationException("file not found in skill: " + relativePath);
             }
             return new Skill.SkillFile(skillName, relativePath, content, false);
         }
@@ -75,14 +76,14 @@ class SkillReadFileToolTest {
 
         private void require(String skillName) {
             if (!name.equals(skillName)) {
-                throw new Skill.SkillValidationException("skill not found: " + skillName);
+                throw new SkillCatalogPort.SkillValidationException("skill not found: " + skillName);
             }
         }
     }
 
     private static Map<String, String> allowedFiles() {
         Map<String, String> files = new LinkedHashMap<>();
-        files.put(Skill.SKILL_FILE_NAME, """
+        files.put(SkillCatalogPort.SKILL_FILE_NAME, """
                 ---
                 name: 'allowed'
                 slug: 'allowed'

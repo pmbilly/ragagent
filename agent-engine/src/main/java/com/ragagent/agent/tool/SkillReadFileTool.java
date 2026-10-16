@@ -1,5 +1,6 @@
 package com.ragagent.agent.tool;
 
+import com.ragagent.contract.agent.SkillCatalogPort;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -102,10 +103,10 @@ public class SkillReadFileTool extends BaseTool {
 
         String content;
         try {
-            content = relative.equals(Skill.SKILL_FILE_NAME) || relative.endsWith("/" + Skill.SKILL_FILE_NAME)
+            content = relative.equals(SkillCatalogPort.SKILL_FILE_NAME) || relative.endsWith("/" + SkillCatalogPort.SKILL_FILE_NAME)
                     ? skills.loadSkill(skillName).instructions
                     : skills.readSkillFile(skillName, relative);
-        } catch (Skill.SkillValidationException e) {
+        } catch (SkillCatalogPort.SkillValidationException e) {
             return fail(e.getMessage() == null ? "failed to read " + path : e.getMessage());
         } catch (Exception e) {
             return fail("failed to read " + path + ": " + e.getMessage());
