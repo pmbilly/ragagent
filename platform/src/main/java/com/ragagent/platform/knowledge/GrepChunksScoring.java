@@ -1,4 +1,4 @@
-package com.ragagent.retrieval.support;
+package com.ragagent.platform.knowledge;
 
 import com.ragagent.contract.retrieval.SearchTextUtil;
 import java.util.ArrayList;
@@ -20,19 +20,19 @@ public final class GrepChunksScoring {
     private GrepChunksScoring() {
     }
 
-    public static List<GrepChunkView> deduplicateChunks(List<GrepChunkView> results) {
+    public static List<GrepChunkHit> deduplicateChunks(List<GrepChunkHit> results) {
         LinkedHashSet<String> seen = new LinkedHashSet<>();
         LinkedHashSet<String> contentSig = new LinkedHashSet<>();
-        List<GrepChunkView> uniqueResults = new ArrayList<>();
+        List<GrepChunkHit> uniqueResults = new ArrayList<>();
 
-        for (GrepChunkView r : results) {
+        for (GrepChunkHit r : results) {
             List<String> keys = new ArrayList<>();
-            keys.add(GrepChunkView.nz(r.id));
-            if (!GrepChunkView.nz(r.parentChunkId).isEmpty()) {
-                keys.add("parent:" + GrepChunkView.nz(r.parentChunkId));
+            keys.add(GrepChunkHit.nz(r.id));
+            if (!GrepChunkHit.nz(r.parentChunkId).isEmpty()) {
+                keys.add("parent:" + GrepChunkHit.nz(r.parentChunkId));
             }
-            if (!GrepChunkView.nz(r.knowledgeId).isEmpty()) {
-                keys.add("kb:" + GrepChunkView.nz(r.knowledgeId) + "#" + r.chunkIndex);
+            if (!GrepChunkHit.nz(r.knowledgeId).isEmpty()) {
+                keys.add("kb:" + GrepChunkHit.nz(r.knowledgeId) + "#" + r.chunkIndex);
             }
 
             boolean dup = false;
@@ -46,7 +46,7 @@ public final class GrepChunksScoring {
                 continue;
             }
 
-            String sig = buildContentSignature(GrepChunkView.nz(r.content));
+            String sig = buildContentSignature(GrepChunkHit.nz(r.content));
             if (!sig.isEmpty() && !contentSig.add(sig)) {
                 continue;
             }
@@ -56,9 +56,9 @@ public final class GrepChunksScoring {
         }
 
         LinkedHashSet<String> seenByID = new LinkedHashSet<>();
-        List<GrepChunkView> deduplicated = new ArrayList<>();
-        for (GrepChunkView r : uniqueResults) {
-            if (seenByID.add(GrepChunkView.nz(r.id))) {
+        List<GrepChunkHit> deduplicated = new ArrayList<>();
+        for (GrepChunkHit r : uniqueResults) {
+            if (seenByID.add(GrepChunkHit.nz(r.id))) {
                 deduplicated.add(r);
             }
         }
@@ -67,7 +67,7 @@ public final class GrepChunksScoring {
 
     /** 内容签名：小写+trim+折叠空白后 MD5 hex。 */
     public static String buildContentSignature(String content) {
-        String c = GrepChunkView.nz(content).toLowerCase(Locale.ROOT).trim();
+        String c = GrepChunkHit.nz(content).toLowerCase(Locale.ROOT).trim();
         if (c.isEmpty()) {
             return "";
         }
@@ -87,9 +87,9 @@ public final class GrepChunksScoring {
     }
 
     /** 命中评分：title 命中 +0.5 cap 1.0、patternCount 0 时置 1。 */
-    public static List<GrepChunkView> scoreChunks(List<GrepChunkView> results, List<Pattern> compiled) {
-        List<GrepChunkView> scored = new ArrayList<>(results.size());
-        for (GrepChunkView r : results) {
+    public static List<GrepChunkHit> scoreChunks(List<GrepChunkHit> results, List<Pattern> compiled) {
+        List<GrepChunkHit> scored = new ArrayList<>(results.size());
+        for (GrepChunkHit r : results) {
             double score;
             int patternCount;
             String content = r.content == null ? "" : r.content;
@@ -125,7 +125,7 @@ public final class GrepChunksScoring {
                     patternCount = matchCount;
                 }
             }
-            String title = GrepChunkView.nz(r.knowledgeTitle);
+            String title = GrepChunkHit.nz(r.knowledgeTitle);
             if (SearchTextUtil.regexMatchesAny(title, compiled)) {
                 r.titleMatch = true;
                 score = Math.min(score + 0.5, 1.0);
@@ -141,18 +141,18 @@ public final class GrepChunksScoring {
     }
 
     /** MMR 多样性重排：swap-remove，并列取先出现者（严格 &gt;）。 */
-    public static List<GrepChunkView> applyMMR(List<GrepChunkView> results, int k, double lambda) {
+    public static List<GrepChunkHit> applyMMR(List<GrepChunkHit> results, int k, double lambda) {
         if (k <= 0 || results.isEmpty()) {
             return List.of();
         }
 
-        List<GrepChunkView> selected = new ArrayList<>(k);
+        List<GrepChunkHit> selected = new ArrayList<>(k);
         List<Map<String, Boolean>> selectedTokenSets = new ArrayList<>(k);
 
-        List<GrepChunkView> candidates = new ArrayList<>(results);
+        List<GrepChunkHit> candidates = new ArrayList<>(results);
         List<Map<String, Boolean>> tokenSets = new ArrayList<>(candidates.size());
-        for (GrepChunkView r : candidates) {
-            tokenSets.add(tokenizeSimple(GrepChunkView.nz(r.content)));
+        for (GrepChunkHit r : candidates) {
+            tokenSets.add(tokenizeSimple(GrepChunkHit.nz(r.content)));
         }
 
         while (selected.size() < k && !candidates.isEmpty()) {
@@ -190,7 +190,7 @@ public final class GrepChunksScoring {
      * 一律走空白分词（英文/纯空白场景逐位一致）。
      */
     public static Map<String, Boolean> tokenizeSimple(String text) {
-        String t = GrepChunkView.nz(text).toLowerCase(Locale.ROOT).trim();
+        String t = GrepChunkHit.nz(text).toLowerCase(Locale.ROOT).trim();
         if (t.isEmpty()) {
             return Map.of();
         }

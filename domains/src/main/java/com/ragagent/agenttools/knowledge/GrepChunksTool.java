@@ -1,7 +1,7 @@
 package com.ragagent.agenttools.knowledge;
 
-import com.ragagent.retrieval.support.GrepChunkView;
-import com.ragagent.retrieval.support.GrepChunksScoring;
+import com.ragagent.platform.knowledge.GrepChunkHit;
+import com.ragagent.platform.knowledge.GrepChunksScoring;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -87,11 +87,11 @@ public class GrepChunksTool extends BaseTool {
      * scopeClause 的 OR 组合（knowledge_id IN / 标签 EXISTS / kb+tenant 对）、
      * 每个 query 的 {@code (content ~* ? OR knowledges.title ~* ?)}、
      * {@code ORDER BY chunks.created_at DESC LIMIT 500}、以及按 knowledge_id 的
-     * {@code COUNT(*)} 回填 {@link GrepChunkView#totalChunkCount}。
+     * {@code COUNT(*)} 回填 {@link GrepChunkHit#totalChunkCount}。
      * 无有效 scope 或 scope 子句为空时返回空表（两处 early return）。</p>
      */
     public interface GrepChunkSearch {
-        List<GrepChunkView> search(List<String> queries, List<String> fullKbIDs, List<String> knowledgeIDs,
+        List<GrepChunkHit> search(List<String> queries, List<String> fullKbIDs, List<String> knowledgeIDs,
                 List<SearchTarget> tagTargets, Map<String, Long> kbTenantMap);
     }
 
@@ -134,7 +134,7 @@ public class GrepChunksTool extends BaseTool {
             kbIDsForMeta = searchTargets.getAllKnowledgeBaseIds();
         }
 
-        List<GrepChunkView> results;
+        List<GrepChunkHit> results;
         try {
             results = chunkSearch.search(queries, scope.fullKBIDs, scope.knowledgeIDs,
                     scope.tagTargets, kbTenantMap);
@@ -145,16 +145,16 @@ public class GrepChunksTool extends BaseTool {
             results = List.of();
         }
 
-        List<GrepChunkView> deduplicated = GrepChunksScoring.deduplicateChunks(results);
-        List<GrepChunkView> scored = GrepChunksScoring.scoreChunks(deduplicated, compiled);
+        List<GrepChunkHit> deduplicated = GrepChunksScoring.deduplicateChunks(results);
+        List<GrepChunkHit> scored = GrepChunksScoring.scoreChunks(deduplicated, compiled);
 
-        List<GrepChunkView> finalResults = scored;
+        List<GrepChunkHit> finalResults = scored;
         if (scored.size() > 10) {
             int mmrK = scored.size();
             if (LIMIT > 0 && mmrK > LIMIT) {
                 mmrK = LIMIT;
             }
-            List<GrepChunkView> mmrResults = GrepChunksScoring.applyMMR(scored, mmrK, 0.7);
+            List<GrepChunkHit> mmrResults = GrepChunksScoring.applyMMR(scored, mmrK, 0.7);
             if (!mmrResults.isEmpty()) {
                 finalResults = mmrResults;
             }
@@ -294,7 +294,7 @@ public class GrepChunksTool extends BaseTool {
     }
 
     /** 按知识聚合（排序：TitleMatch &gt; DistinctPatterns &gt; TotalPatternHits &gt; ChunkHitCount &gt; Title，并列时序不定）。 */
-    static List<KnowledgeAggregation> aggregateByKnowledge(List<GrepChunkView> results,
+    static List<KnowledgeAggregation> aggregateByKnowledge(List<GrepChunkHit> results,
             List<String> queries, List<Pattern> compiled) {
         if (results.isEmpty()) {
             return null; // 空结果在 data 里序列化为 null（输出契约）
@@ -309,18 +309,18 @@ public class GrepChunksTool extends BaseTool {
         }
 
         Map<String, KnowledgeAggregation> aggregated = new LinkedHashMap<>();
-        for (GrepChunkView chunk : results) {
-            String knowledgeID = GrepChunkView.nz(chunk.knowledgeId);
+        for (GrepChunkHit chunk : results) {
+            String knowledgeID = GrepChunkHit.nz(chunk.knowledgeId);
             if (knowledgeID.isEmpty()) {
-                knowledgeID = "chunk-" + GrepChunkView.nz(chunk.id);
+                knowledgeID = "chunk-" + GrepChunkHit.nz(chunk.id);
             }
 
             KnowledgeAggregation entry = aggregated.get(knowledgeID);
             if (entry == null) {
                 entry = new KnowledgeAggregation();
                 entry.knowledgeID = knowledgeID;
-                entry.knowledgeBaseID = GrepChunkView.nz(chunk.knowledgeBaseId);
-                String title = GrepChunkView.nz(chunk.knowledgeTitle);
+                entry.knowledgeBaseID = GrepChunkHit.nz(chunk.knowledgeBaseId);
+                String title = GrepChunkHit.nz(chunk.knowledgeTitle);
                 if (title.trim().isEmpty()) {
                     title = "Untitled";
                 }
@@ -349,7 +349,7 @@ public class GrepChunksTool extends BaseTool {
                 }
             }
 
-            Map<String, Integer> occurrences = countRegexHits(GrepChunkView.nz(chunk.content), compiled, queryKeys);
+            Map<String, Integer> occurrences = countRegexHits(GrepChunkHit.nz(chunk.content), compiled, queryKeys);
             for (String q : queryKeys) {
                 int count = occurrences.getOrDefault(q, 0);
                 if (count == 0) {
@@ -390,18 +390,18 @@ public class GrepChunksTool extends BaseTool {
     }
 
     /** 构建结果列表（空串/0/false 的字段不写入 map——输出契约）。 */
-    static List<Map<String, Object>> buildGrepChunkResults(List<GrepChunkView> results,
+    static List<Map<String, Object>> buildGrepChunkResults(List<GrepChunkHit> results,
             List<Pattern> compiled) {
         if (results.isEmpty()) {
             return null; // 空结果在 data 里序列化为 null（输出契约）
         }
         List<Map<String, Object>> out = new ArrayList<>(results.size());
-        for (GrepChunkView r : results) {
+        for (GrepChunkHit r : results) {
             Map<String, Object> item = new LinkedHashMap<>();
-            String chunkType = GrepChunkView.nz(r.chunkType);
-            item.put("knowledgeId", GrepChunkView.nz(r.knowledgeId));
-            item.put("knowledgeBaseId", GrepChunkView.nz(r.knowledgeBaseId));
-            item.put("knowledgeTitle", GrepChunkView.nz(r.knowledgeTitle));
+            String chunkType = GrepChunkHit.nz(r.chunkType);
+            item.put("knowledgeId", GrepChunkHit.nz(r.knowledgeId));
+            item.put("knowledgeBaseId", GrepChunkHit.nz(r.knowledgeBaseId));
+            item.put("knowledgeTitle", GrepChunkHit.nz(r.knowledgeTitle));
             item.put("chunkType", chunkType);
             if (r.titleMatch) {
                 item.put("titleMatch", true);
@@ -412,8 +412,8 @@ public class GrepChunksTool extends BaseTool {
             }
             item.put("score", r.matchScore);
             if ("faq".equals(chunkType)) {
-                if (!GrepChunkView.nz(r.id).isEmpty()) {
-                    item.put("faqId", GrepChunkView.nz(r.id));
+                if (!GrepChunkHit.nz(r.id).isEmpty()) {
+                    item.put("faqId", GrepChunkHit.nz(r.id));
                 }
                 if (r.chunkIndex != 0) {
                     item.put("index", r.chunkIndex);
@@ -423,8 +423,8 @@ public class GrepChunksTool extends BaseTool {
                     item.put("faqQuestion", q);
                 }
             } else {
-                if (!GrepChunkView.nz(r.id).isEmpty()) {
-                    item.put("chunkId", GrepChunkView.nz(r.id));
+                if (!GrepChunkHit.nz(r.id).isEmpty()) {
+                    item.put("chunkId", GrepChunkHit.nz(r.id));
                 }
                 if (r.chunkIndex != 0) {
                     item.put("chunkIndex", r.chunkIndex);
@@ -482,7 +482,7 @@ public class GrepChunksTool extends BaseTool {
     }
 
     /** 命中摘要提取（FAQ 走 faqMatchSnippet，其他走 extractSnippetRegex）。 */
-    static String extractChunkMatchSnippet(GrepChunkView chunk, List<Pattern> compiled) {
+    static String extractChunkMatchSnippet(GrepChunkHit chunk, List<Pattern> compiled) {
         ChunkFacts c = chunk.toChunk();
         if ("faq".equals(c.chunkType())) {
             String s = FaqSnippet.faqMatchSnippet(c, compiled);
@@ -567,7 +567,7 @@ public class GrepChunksTool extends BaseTool {
     }
 
     /** XML 输出（seenChunks 会话级去重 → already_seen）。 */
-    String formatOutput(List<GrepChunkView> results, List<String> queries, List<Pattern> compiled) {
+    String formatOutput(List<GrepChunkHit> results, List<String> queries, List<Pattern> compiled) {
         StringBuilder b = new StringBuilder();
 
         b.append(String.format(Locale.ROOT, "<grepResults chunkCount=\"%d\">\n", results.size()));
@@ -580,7 +580,7 @@ public class GrepChunksTool extends BaseTool {
             return b.toString();
         }
 
-        for (GrepChunkView r : results) {
+        for (GrepChunkHit r : results) {
             Map<String, Integer> counts = countRegexHits(r.content == null ? "" : r.content, compiled, queries);
             String snippet = extractChunkMatchSnippet(r, compiled);
 
@@ -589,13 +589,13 @@ public class GrepChunksTool extends BaseTool {
             if (!faqQ.isEmpty()) {
                 extraAttr = String.format(Locale.ROOT, " faqQuestion=\"%s\"", FaqSnippet.xmlEscape(faqQ));
             }
-            boolean isFAQ = "faq".equals(GrepChunkView.nz(r.chunkType));
+            boolean isFAQ = "faq".equals(GrepChunkHit.nz(r.chunkType));
 
-            boolean seen = !seenChunks.add(GrepChunkView.nz(r.id));
+            boolean seen = !seenChunks.add(GrepChunkHit.nz(r.id));
 
-            String id = GrepChunkView.nz(r.id);
-            String knowledgeID = GrepChunkView.nz(r.knowledgeId);
-            String knowledgeTitle = GrepChunkView.nz(r.knowledgeTitle);
+            String id = GrepChunkHit.nz(r.id);
+            String knowledgeID = GrepChunkHit.nz(r.knowledgeId);
+            String knowledgeTitle = GrepChunkHit.nz(r.knowledgeTitle);
             if (isFAQ) {
                 if (seen) {
                     b.append(String.format(Locale.ROOT,

@@ -35,6 +35,9 @@ dependencyManagement {
 }
 
 dependencies {
+    // 检索引擎：组合根自建引擎注册表/工厂与审计 sink（R3c 后不再经 engine 传递）
+    implementation(project(":retrieval-engine"))
+
     implementation(project(":domains"))
     // 组合根本身用到的 API（:domains 的 compileOnly/implementation 不会传递到编译面）
     implementation("org.springframework.boot:spring-boot-starter-web")

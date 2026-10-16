@@ -1,9 +1,9 @@
-package com.ragagent.retrieval.support;
+package com.ragagent.platform.knowledge;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.knowledge.ChunkFacts;
 
-public final class GrepChunkView {
+public final class GrepChunkHit {
     public String id;
     public String content;
     public int chunkIndex;

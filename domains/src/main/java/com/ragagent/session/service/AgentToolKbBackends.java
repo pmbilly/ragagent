@@ -2,7 +2,7 @@ package com.ragagent.session.service;
 
 import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
 
-import com.ragagent.retrieval.support.GrepChunkView;
+import com.ragagent.platform.knowledge.GrepChunkHit;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -236,8 +236,8 @@ final class AgentToolKbBackends {
                     + "AND (" + scope + ") AND (" + String.join(" OR ", regexParts) + ") "
                     + "ORDER BY chunks.created_at DESC LIMIT 500";
 
-            List<GrepChunkView> results = jdbc.query(sql, (rs, i) -> {
-                GrepChunkView v = new GrepChunkView();
+            List<GrepChunkHit> results = jdbc.query(sql, (rs, i) -> {
+                GrepChunkHit v = new GrepChunkHit();
                 v.id = rs.getString("id");
                 v.content = rs.getString("content");
                 v.chunkIndex = rs.getInt("chunk_index");
@@ -307,9 +307,9 @@ final class AgentToolKbBackends {
         return String.join(" OR ", clauses);
     }
     /** count 回填：knowledge_id → 该 knowledge 的 enabled chunk 数。 */
-    private void backfillTotalChunkCounts(List<GrepChunkView> results) {
+    private void backfillTotalChunkCounts(List<GrepChunkHit> results) {
         Map<String, Boolean> seen = new LinkedHashMap<>();
-        for (GrepChunkView r : results) {
+        for (GrepChunkHit r : results) {
             if (r.knowledgeId != null && !r.knowledgeId.isEmpty()) {
                 seen.put(r.knowledgeId, Boolean.TRUE);
             }
@@ -327,7 +327,7 @@ final class AgentToolKbBackends {
                     rs -> {
                         counts.put(rs.getString("knowledge_id"), rs.getInt("cnt"));
                     }, ids.toArray());
-            for (GrepChunkView r : results) {
+            for (GrepChunkHit r : results) {
                 Integer c = counts.get(r.knowledgeId);
                 r.totalChunkCount = c == null ? 0 : c;
             }

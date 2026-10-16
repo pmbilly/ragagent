@@ -190,7 +190,7 @@ class ContractBoundaryRulesTest {
     /**
  * 检索面（`:engine` 的 `com.ragagent.retrieval..`）属运行时底座的一部分，
  * 只依赖 contracts / platform / common 与自身。反向依赖业务域或工具实现面，会让检索与业务
- * 编排再次互相缠绕—— 之前 `GrepChunksScoring` 借用工具侧 `FaqSnippet`、`GrepChunkView`
+ * 编排再次互相缠绕—— 之前 `GrepChunksScoring` 借用工具侧 `FaqSnippet`、`GrepChunkHit`
  * 藏在工具类里，就是这么缠起来的（前者已归位 {@code SearchTextUtil}）。
  */
     @Test

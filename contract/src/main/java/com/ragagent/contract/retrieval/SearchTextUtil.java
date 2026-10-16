@@ -249,7 +249,7 @@ public final class SearchTextUtil {
  * 正则命中判定（空文本/空表 false，null 模式跳过）。
  *
  * <p> 由 {@code agenttools.knowledge.FaqSnippet} 归位（原为工具侧私有助手，被
- * {@code GrepChunksScoring} 借用 ⇒ 工具实现面↔检索面互为依赖）。{@code FaqSnippet}
+ * {@code platform.knowledge.GrepChunksScoring} 借用 ⇒ 工具实现面↔检索面互为依赖）。{@code FaqSnippet}
  * 现委托到本方法，语义逐字保留。</p>
  */
     public static boolean regexMatchesAny(String text, List<java.util.regex.Pattern> compiled) {

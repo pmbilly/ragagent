@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.agenttools.knowledge.GrepChunksTool.GrepChunkSearch;
-import com.ragagent.retrieval.support.GrepChunkView;
+import com.ragagent.platform.knowledge.GrepChunkHit;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.agenttools.GoRecording45B;
@@ -158,7 +158,7 @@ class GrepChunksRecordingTest {
      */
     static final class JdbcGrepSearch implements GrepChunkSearch {
         @Override
-        public List<GrepChunkView> search(List<String> queries, List<String> fullKbIDs,
+        public List<GrepChunkHit> search(List<String> queries, List<String> fullKbIDs,
                 List<String> knowledgeIDs, List<SearchTarget> tagTargets, Map<String, Long> kbTenantMap) {
             if (fullKbIDs.isEmpty() && knowledgeIDs.isEmpty() && tagTargets.isEmpty()) {
                 return List.of();
@@ -220,7 +220,7 @@ class GrepChunksRecordingTest {
             sql.append(String.join(" OR ", regexConds)).append(")");
             sql.append(" ORDER BY chunks.created_at DESC LIMIT 500");
 
-            List<GrepChunkView> out = new ArrayList<>();
+            List<GrepChunkHit> out = new ArrayList<>();
             Map<String, Integer> countMap = new LinkedHashMap<>();
             try (PreparedStatement ps = db.prepareStatement(sql.toString())) {
                 int slot = 1;
@@ -236,7 +236,7 @@ class GrepChunksRecordingTest {
                 }
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        GrepChunkView v = new GrepChunkView();
+                        GrepChunkHit v = new GrepChunkHit();
                         v.id = rs.getString(1);
                         v.content = rs.getString(2);
                         v.chunkIndex = rs.getInt(3);
@@ -257,7 +257,7 @@ class GrepChunksRecordingTest {
 
             if (!out.isEmpty()) {
                 List<String> kids = new ArrayList<>();
-                for (GrepChunkView v : out) {
+                for (GrepChunkHit v : out) {
                     if (v.knowledgeId != null && !v.knowledgeId.isEmpty() && !kids.contains(v.knowledgeId)) {
                         kids.add(v.knowledgeId);
                     }
@@ -279,7 +279,7 @@ class GrepChunksRecordingTest {
                 } catch (java.sql.SQLException e) {
                     throw new RuntimeException(e);
                 }
-                for (GrepChunkView v : out) {
+                for (GrepChunkHit v : out) {
                     v.totalChunkCount = countMap.getOrDefault(v.knowledgeId == null ? "" : v.knowledgeId, 0);
                 }
             }

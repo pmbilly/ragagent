@@ -51,7 +51,10 @@ dependencies {
     implementation(project(":contract"))
     implementation(project(":engine"))
     testImplementation(testFixtures(project(":engine")))    // wire/ 录制夹具
-    testImplementation(testFixtures(project(":platform")))    // EmbeddedRedis（B162 起在 :common）
+    testImplementation(testFixtures(project(":platform")))
+    // 检索实现面：仅**测试**需要（错位测试 HybridResultOpsContextExpansionTest/
+    // ArtifactReferenceRewriterTest 等 + 录制测试的检索桩）——主码对检索已只经契约
+    testImplementation(project(":retrieval-engine"))    // EmbeddedRedis（B162 起在 :common）
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")

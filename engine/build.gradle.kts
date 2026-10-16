@@ -48,9 +48,6 @@ dependencies {
     // 模型运行时（R2 提取）：chatpipeline / webfetch 仍引用其类型（LlmTransport 归 platform 后
     // 出边已收窄）⇒ 过渡期 api 传递；R4b/R6 收口后改为逐消费点显式声明。
     api(project(":model-runtime"))
-    // 检索引擎（R3c 提取）：chatpipeline 的检索插件引用其类型，domains/boot 也经此传递可见
-    // ⇒ 过渡期 api 传递；R3d 端口化后收窄。
-    api(project(":retrieval-engine"))
 
     // 依 11 域的实际 import 面声明（实测 top：jackson 288 / slf4j 122 / spring-web 32 /
     // mybatis 30 / neo4j 11 / spring-http·stereotype 10 / OTLP proto 9 / spring-data-redis 7 /
