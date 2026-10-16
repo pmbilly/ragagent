@@ -1,4 +1,4 @@
-package com.ragagent.retrieval.vlm;
+package com.ragagent.modelruntime.adapter.provider.vlm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

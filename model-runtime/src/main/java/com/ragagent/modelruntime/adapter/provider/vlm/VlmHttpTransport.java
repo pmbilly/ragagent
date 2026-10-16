@@ -1,4 +1,4 @@
-package com.ragagent.retrieval.vlm;
+package com.ragagent.modelruntime.adapter.provider.vlm;
 
 import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.time.Duration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.modelruntime.adapter.provider.asr.OpenAiAsrTranscriber;
 import com.ragagent.platform.http.LlmTransport;
-import com.ragagent.retrieval.config.RetrievalEnvLookup;
+import com.ragagent.platform.config.AppEnvLookup;
 
 /**
  * {@link VlmClient.Transport} 的生产实现。
@@ -62,7 +62,7 @@ public class VlmHttpTransport implements VlmClient.Transport {
 
     /** 超时：env 正整数秒生效，否则 180s。 */
     static Duration timeout() {
-        String raw = RetrievalEnvLookup.get("VLM_HTTP_TIMEOUT_SECONDS");
+        String raw = AppEnvLookup.get("VLM_HTTP_TIMEOUT_SECONDS");
         if (raw != null && !raw.isBlank()) {
             try {
                 int secs = Integer.parseInt(raw.trim());

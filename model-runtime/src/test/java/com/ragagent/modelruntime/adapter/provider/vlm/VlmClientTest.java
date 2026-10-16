@@ -1,4 +1,4 @@
-package com.ragagent.retrieval.vlm;
+package com.ragagent.modelruntime.adapter.provider.vlm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.contract.model.VlmConfig;
-import com.ragagent.retrieval.vlm.VlmClient.VlmException;
+import com.ragagent.modelruntime.adapter.provider.vlm.VlmClient.VlmException;
 
 /**
  * VLM Predict 客户端：请求体形状（multipart、

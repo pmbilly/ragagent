@@ -10,6 +10,7 @@ import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.model.VlmConfig;
+import com.ragagent.contract.model.VlmPredictor;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapters;
@@ -24,6 +25,10 @@ import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
 import com.ragagent.platform.tracing.decorators.LangfuseEmbedder;
 import com.ragagent.platform.tracing.decorators.LangfuseReranker;
+import com.ragagent.llm.limiter.Release;
+import com.ragagent.modelruntime.adapter.provider.vlm.VlmClient;
+import com.ragagent.modelruntime.adapter.provider.vlm.VlmHttpTransport;
+import com.ragagent.platform.tracing.decorators.LangfuseVlm;
 import com.ragagent.rerank.RerankerFactory;
 
 import org.slf4j.Logger;
@@ -62,6 +67,9 @@ public class ModelRuntimeAssembler implements ModelRuntime {
     private final ObjectProvider<OllamaService> ollamaService;
     private final ConcurrencyGovernor concurrencyGovernor;
     private final SsrfGuard ssrfGuard;
+
+    /** VLM 出站通道（无状态，进程内复用）。 */
+    private final VlmClient.Transport vlmTransport = new VlmHttpTransport();
 
     public ModelRuntimeAssembler(ModelCatalogPort modelCatalog,
                                CryptoService cryptoService, ObjectProvider<OllamaService> ollamaService,
@@ -135,6 +143,36 @@ public class ModelRuntimeAssembler implements ModelRuntime {
             validateVlmBaseUrl(config.baseUrl());
         }
         return config;
+    }
+
+    /**
+     * VLM 预测器：配置（含 SSRF 校验）→ 观测装饰 → 命名并发闸门 → 真实 provider 往返。
+     *
+     * <p>装饰顺序与搬迁前一致：闸门在最外层（等待不计入 langfuse 计时）。</p>
+     *
+     * <p><b>已知差异（备案，随 R3a 从 VlmDescriberWiring 迁来）</b>：没有批级 60s 超时——
+     * Java 侧调用是阻塞的、没有协作取消通道，实际超时由 {@code VLM_HTTP_TIMEOUT_SECONDS}
+     * （缺省 180s）在 HTTP 层兜底。</p>
+     */
+    @Override
+    public VlmPredictor vlmPredictorFor(ModelRowView model) {
+        VlmConfig config = vlmConfigFor(model);
+        int limit = model.parameters() == null ? 0 : model.parameters().getMaxConcurrency();
+        String modelName = model.name() == null ? "" : model.name();
+        String modelId = model.id() == null ? "" : model.id();
+        LangfuseVlm.PredictFn predict = LangfuseVlm.wrap(
+                (images, prompt) -> VlmClient.predict(config, vlmTransport, images, prompt),
+                modelName, modelId);
+        return (imgBytes, prompt) -> {
+            try (Release release = concurrencyGovernor.gateNamedN(modelId, modelName, limit)) {
+                try {
+                    return predict.predict(new byte[][] {imgBytes}, prompt);
+                } catch (Exception e) {
+                    throw new RuntimeException(
+                            e.getMessage() == null ? e.toString() : e.getMessage(), e);
+                }
+            }
+        };
     }
 
     /** 直取（无状态闸门）。调用方再组 AsrConfig + transcribe。 */

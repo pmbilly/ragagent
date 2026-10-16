@@ -111,7 +111,8 @@ FROZEN_PREFIXES = (
     # 上游 API 载荷的适配器族（embedding/im/websearch/rerank/asr/vlm 的 provider 与客户端：
     # 键名由对方 API 定，冻结）
     'embedding/provider', 'im/', 'websearch/provider', 'rerank/', 'asr/', 'vlm/',
-    'retrieval/vlm', 'storage/provider',
+    'modelruntime/adapter/provider/vlm',  # R3a 换锚：VLM 客户端 retrieval/vlm → modelruntime/adapter/provider/vlm
+    'storage/provider',
     # 检索引擎适配器族（ES/OpenSearch/Milvus/Qdrant 的 DSL 字段）与检索观测面
     'retrieval/engine/', 'retrieval/telemetry/',
     # 2026-10-09 B134：`ReferencesSupport`（0 蛇键）与 `PipelineProgress`（5 键已换锚）摘除。

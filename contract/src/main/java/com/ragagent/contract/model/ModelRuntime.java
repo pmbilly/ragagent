@@ -32,6 +32,12 @@ public interface ModelRuntime {
      */
     VlmConfig vlmConfigFor(ModelRowView model);
 
+    /**
+     * VLM 预测器（按行视图装配：配置 + 非 ollama 的基址 SSRF 校验 + 观测装饰 + 命名并发闸门）。
+     * <p>装配失败抛 {@link RuntimeException}（message 即对外文案）；predict 失败同上。</p>
+     */
+    VlmPredictor vlmPredictorFor(ModelRowView model);
+
     /** ASR 模型行。 */
     ModelRowView getAsrModel(String modelId);
 

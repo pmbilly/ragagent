@@ -817,7 +817,6 @@ class ArchitectureRulesTest {
             "com.ragagent.session.service.QaWiring",
             "com.ragagent.session.service.SessionAgentQaService",
             "com.ragagent.session.service.SessionKnowledgeQaService",
-            "com.ragagent.session.service.VlmDescriberWiring",
             "com.ragagent.system.service.SystemSettingService",
             "com.ragagent.websearch.service.WebSearchTempKbStateService",
             "com.ragagent.wiki.service.ingest.RedisWikiDeletedTombstoneStore",

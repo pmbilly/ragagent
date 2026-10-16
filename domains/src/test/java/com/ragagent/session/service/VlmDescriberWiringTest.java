@@ -2,115 +2,82 @@ package com.ragagent.session.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.platform.security.CryptoService;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.llm.limiter.ConcurrencyGovernor;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.retrieval.vlm.VlmClient;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.modelruntime.application.ModelRuntimeAssembler;
+import com.ragagent.contract.model.VlmPredictor;
 
 /**
- * VLM 描述器装配的验收：成功装配后逐张图片调用 predict；失败形态是
- * warn 后回落（文案逐字钉住）。
+ * VLM 描述器装配的验收（R3a 后口径）：本类只剩"取行 → 转交预测器"，
+ * 故只断言委托与失败传播——装配链（配置/SSRF/观测/闸门）与 predict 的 HTTP 形状
+ * 分别由 {@code model-runtime} 的 {@code ModelRuntimeAssemblerVlmTest} / {@code VlmClientTest} 覆盖。
  */
 class VlmDescriberWiringTest {
 
-    private final ModelCatalogPort modelCatalog = mock(ModelCatalogPort.class);
-    private final CryptoService cryptoService = mock(CryptoService.class);
-    private final SsrfGuard ssrfGuard = mock(SsrfGuard.class);
-    private final ConcurrencyGovernor governor = new ConcurrencyGovernor();
+    private final ModelRuntime runtimeFactory = mock(ModelRuntime.class);
 
-    private final List<String> requestedUrls = new ArrayList<>();
-
-    private ModelRuntime runtimeFactory() {
-        // ollama provider 在 VLM 路径不触达；vlm 面不需要它
-        return new ModelRuntimeAssembler(modelCatalog, cryptoService,
-                null, governor, ssrfGuard);
+    private VlmDescriberWiring wiring() {
+        return new VlmDescriberWiring(runtimeFactory);
     }
 
-    private VlmDescriberWiring wiring(VlmClient.Transport transport) {
-        return new VlmDescriberWiring(runtimeFactory(), governor, transport);
-    }
-
-    private static ModelRowView vlmModel(String source, String provider, String baseUrl) {
+    private static ModelRowView vlmRow() {
         ModelParameters p = new ModelParameters();
-        p.setBaseUrl(baseUrl);
-        p.setProvider(provider);
-        return new ModelRowView("vlm-1", "vlm-test", "", source, "active", false, p);
+        p.setBaseUrl("https://vision.test/v1");
+        p.setExtraConfig(Map.of());
+        return new ModelRowView("vlm-1", "vlm-test", "", "remote", "active", false, p);
     }
 
     @Test
-    void predictsThroughTransportWithOpenAiShape() {
-        when(modelCatalog.findModelVisible(anyLong(), anyString()))
-                .thenReturn(vlmModel("remote", "", "https://vision.test/v1"));
-        VlmClient.Transport transport = (url, apiKey, body) -> {
-            requestedUrls.add(url);
-            return "{\"choices\":[{\"message\":{\"content\":\"a chart\"}}]}";
-        };
+    @DisplayName("逐张图片经预测器描述（委托不丢参）")
+    void describeDelegatesToPredictor() {
+        ModelRowView row = vlmRow();
+        when(runtimeFactory.getVlmModel("vlm-1")).thenReturn(row);
+        List<String> prompts = new ArrayList<>();
+        when(runtimeFactory.vlmPredictorFor(row)).thenReturn((image, prompt) -> {
+            prompts.add(prompt);
+            return "a chart";
+        });
 
-        var describer = wiring(transport).create("vlm-1");
+        var describer = wiring().create("vlm-1");
 
-        assertThat(describer.describe(new byte[] {1, 2, 3}, "describe this"))
-                .isEqualTo("a chart");
-        assertThat(requestedUrls).containsExactly("https://vision.test/v1/chat/completions");
+        assertThat(describer.describe(new byte[] {1, 2, 3}, "describe this")).isEqualTo("a chart");
+        assertThat(prompts).containsExactly("describe this");
+        verify(runtimeFactory).getVlmModel("vlm-1");
     }
 
     @Test
-    void modelMissingFailsWithGoText() {
-        when(modelCatalog.findModelVisible(anyLong(), anyString())).thenReturn(null);
+    @DisplayName("取模型失败：原样抛（调用方记警告后走无描述回落）")
+    void assemblyFailurePropagates() {
+        when(runtimeFactory.getVlmModel("vlm-missing"))
+                .thenThrow(new RuntimeException("model not found"));
 
-        assertThatThrownBy(() -> wiring((url, apiKey, body) -> "{}").create("vlm-missing"))
+        assertThatThrownBy(() -> wiring().create("vlm-missing"))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("model not found");
     }
 
     @Test
-    void ssrfFailurePropagatesWithGoPrefix() {
-        when(modelCatalog.findModelVisible(anyLong(), anyString()))
-                .thenReturn(vlmModel("remote", "", "https://vision.test/v1"));
-        doThrow(new RuntimeException("restricted hostname: localhost"))
-                .when(ssrfGuard).validateURLForSSRF(anyString());
-
-        assertThatThrownBy(() -> wiring((url, apiKey, body) -> "{}").create("vlm-1"))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("base URL SSRF check failed: restricted hostname: localhost");
-    }
-
-    @Test
-    void ollamaSkipsBaseUrlValidation() {
-        // 本机回环基址：非 ollama 界面会被 SSRF 拒绝；ollama 分支不校验（照 NewVLM）
-        when(modelCatalog.findModelVisible(anyLong(), anyString()))
-                .thenReturn(vlmModel("local", "", "http://127.0.0.1:11434"));
-
-        assertThat(wiring((url, apiKey, body) -> "{}").create("vlm-1")).isNotNull();
-        verify(ssrfGuard, never()).validateURLForSSRF(anyString());
-    }
-
-    @Test
+    @DisplayName("predict 失败：文案原样上抛")
     void predictFailureSurfacesGoMessage() {
-        when(modelCatalog.findModelVisible(anyLong(), anyString()))
-                .thenReturn(vlmModel("remote", "", "https://vision.test/v1"));
-        VlmClient.Transport transport = (url, apiKey, body) -> {
-            throw new RuntimeException("connection refused");
+        ModelRowView row = vlmRow();
+        when(runtimeFactory.getVlmModel("vlm-1")).thenReturn(row);
+        VlmPredictor failing = (image, prompt) -> {
+            throw new RuntimeException("OpenAI VLM request: connection refused");
         };
+        when(runtimeFactory.vlmPredictorFor(row)).thenReturn(failing);
 
-        var describer = wiring(transport).create("vlm-1");
+        var describer = wiring().create("vlm-1");
 
         assertThatThrownBy(() -> describer.describe(new byte[] {1}, "p"))
                 .isInstanceOf(RuntimeException.class)

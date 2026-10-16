@@ -1,4 +1,4 @@
-package com.ragagent.retrieval.vlm;
+package com.ragagent.modelruntime.adapter.provider.vlm;
 
 import com.ragagent.contract.model.VlmConfig;
 import com.ragagent.platform.web.JsonMappers;

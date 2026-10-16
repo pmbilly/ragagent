@@ -1,6 +1,5 @@
 package com.ragagent.model.controller;
 
-import com.ragagent.contract.model.VlmConfig;
 import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -29,12 +28,11 @@ import com.ragagent.model.dto.ModelDebugAsrResponse;
 import com.ragagent.model.dto.ModelDebugChatResponse;
 import com.ragagent.model.dto.ModelDebugResult;
 import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.model.VlmPredictor;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
 import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.Reranker;
-import com.ragagent.retrieval.vlm.VlmClient;
-import com.ragagent.retrieval.vlm.VlmHttpTransport;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -75,7 +73,6 @@ public class ModelDebugController {
     private final ModelService modelService;
     private final ModelRuntime runtimeFactory;
     private final AsrTranscriber asrTranscriber;
-    private final VlmClient.Transport vlmTransport = new VlmHttpTransport();
 
     public ModelDebugController(ModelService modelService, ModelRuntime runtimeFactory,
                                 AsrTranscriber asrTranscriber) {
@@ -324,21 +321,18 @@ public class ModelDebugController {
         } catch (RuntimeException e) {
             return writeResult(startedNanos, requestPreview, null, e.getMessage(), observations);
         }
-        // 凭证 + 构造期校验：model 级凭证优先、租户回落；
-        // ollama 不校验基址
-        // ——与 agent 侧 VLM 装配共用 vlmConfigFor 同一实现。
-        VlmConfig config;
+        // 装配（配置 + 构造期 SSRF 校验 + 观测装饰 + 并发闸门）整段走模型运行时端口
+        // ——与 agent 侧 VLM 装配共用同一条链。
+        VlmPredictor predictor;
         try {
-            config = runtimeFactory.vlmConfigFor(vlmModel);
+            predictor = runtimeFactory.vlmPredictorFor(vlmModel);
         } catch (RuntimeException e) {
             return writeResult(startedNanos, requestPreview, null, e.getMessage(), observations);
         }
         String result = null;
         String error = null;
         try {
-            result = VlmClient.predict(config, vlmTransport, new byte[][] {fileBytes}, input);
-        } catch (VlmClient.VlmException e) {
-            error = e.getMessage();
+            result = predictor.predict(fileBytes, input);
         } catch (RuntimeException e) {
             error = e.getMessage();
         }
