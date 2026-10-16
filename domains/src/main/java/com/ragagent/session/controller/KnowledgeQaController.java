@@ -35,7 +35,7 @@ import com.ragagent.session.controller.sse.StreamEventEmitter;
 import com.ragagent.platform.stream.StreamManager;
 
 import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.memory.MemoryExtractionPort;
@@ -44,7 +44,7 @@ import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.contract.storage.support.Mode;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
-import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
+import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.storage.support.FileResolverFactory;
 

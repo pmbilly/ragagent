@@ -76,7 +76,7 @@ final class QaWebSearchParams {
         Long tid = TenantContext.currentTenantId();
         if (tid != null) {
             try {
-                JsonNode webSearch = service.tenantService.webSearchConfig(tid);
+                JsonNode webSearch = JsonMappers.toJsonNode(service.tenantService.webSearchConfig(tid));
                 if (webSearch != null && !webSearch.isNull()) {
                     WebSearchConfig cfg = JSON.treeToValue(webSearch, WebSearchConfig.class);
                     int max = cfg.getMaxResults();   // 局部 cfg（本段解析出的 WebSearchConfig），非门面字段

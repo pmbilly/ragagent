@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
+import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.storage.config.StorageProviderEnv;
@@ -128,7 +128,7 @@ public class StorageFileResolver {
                     decorate(new BackendScopedFileService(b.getId(), inner.service())),
                     inner.provider(), null);
         }
-        JsonNode sec = hydrated.storageEngineConfig();
+        JsonNode sec = JsonMappers.toJsonNode(hydrated.storageEngineConfig());
         String provider0 = provider == null ? "" : provider.trim().toLowerCase(java.util.Locale.ROOT);
         if (provider0.isEmpty() && storageEngineDefaultProvider(sec).isEmpty()) {
             StorageBackend env = storageBackendFromEnvironment(hydrated.tenantId());
@@ -385,7 +385,7 @@ public class StorageFileResolver {
             return buildProviderRaw(backend.backend().getProvider(),
                     toStorageEngineConfig(backend.backend()), localBaseDir);
         }
-        JsonNode sec = hydrated.storageEngineConfig();
+        JsonNode sec = JsonMappers.toJsonNode(hydrated.storageEngineConfig());
         String p0 = provider == null ? "" : provider.trim().toLowerCase(java.util.Locale.ROOT);
         if (p0.isEmpty() && storageEngineDefaultProvider(sec).isEmpty()) {
             StorageBackend env = storageBackendFromEnvironment(hydrated.tenantId());

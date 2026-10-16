@@ -57,7 +57,7 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.tracing.decorators.LangfuseChatClient;
 import com.ragagent.tracing.decorators.LangfuseReranker;
 import com.ragagent.agenttools.datasource.DataAnalysisSessionFactoryAdapter;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.chatpipeline.plugin.PluginDataAnalysis;
 import com.ragagent.chatpipeline.plugin.PluginSearch;
 import com.ragagent.chatpipeline.plugin.PluginSearchEntity;
@@ -162,7 +162,7 @@ public class QaWiring {
                     return null;
                 }
                 try {
-                    JsonNode webSearch = tenantService.webSearchConfig(tid);
+                    JsonNode webSearch = JsonMappers.toJsonNode(tenantService.webSearchConfig(tid));
                     if (webSearch == null || webSearch.isNull()) {
                         return null;
                     }

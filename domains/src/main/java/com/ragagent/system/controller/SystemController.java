@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -515,7 +515,7 @@ public class SystemController {
     /** overrides 组装：租户 ParserEngineConfig → map。 */
     private Map<String, String> engineOverrides() {
         Map<String, String> overrides = new LinkedHashMap<>();
-        JsonNode parserCfg = tenantConfigLookup.parserEngineConfig(currentTenantId());
+        JsonNode parserCfg = JsonMappers.toJsonNode(tenantConfigLookup.parserEngineConfig(currentTenantId()));
         if (parserCfg != null) {
             overrides.putAll(overridesFromRaw(parserCfg));
         }
@@ -585,7 +585,7 @@ public class SystemController {
     private boolean isMinioConfigured(long tenantId) {
         TenantStorageView tenant = currentTenant();
         if (tenant != null && tenant.storageEngineConfig() != null) {
-            JsonNode minio = tenant.storageEngineConfig().get("minio");
+            JsonNode minio = JsonMappers.toJsonNode(tenant.storageEngineConfig()).get("minio");
             if (minio != null && !minio.isNull() && "remote".equals(minio.path("mode").asText(""))) {
                 return !minio.path("endpoint").asText("").isEmpty()
                         && !minio.path("access_key_id").asText("").isEmpty()
@@ -598,7 +598,7 @@ public class SystemController {
     private boolean hasAllNonEmpty(long tenantId, String provider, List<String> fields, boolean envFallback) {
         TenantStorageView tenant = currentTenant();
         if (tenant != null && tenant.storageEngineConfig() != null) {
-            JsonNode conf = tenant.storageEngineConfig().get(provider);
+            JsonNode conf = JsonMappers.toJsonNode(tenant.storageEngineConfig()).get(provider);
             if (conf != null && !conf.isNull()) {
                 for (String f : fields) {
                     if (conf.path(f).asText("").isEmpty()) {
@@ -653,7 +653,7 @@ public class SystemController {
     private boolean isS3Configured(long tenantId) {
         TenantStorageView tenant = currentTenant();
         if (tenant != null && tenant.storageEngineConfig() != null) {
-            JsonNode s3 = tenant.storageEngineConfig().get("s3");
+            JsonNode s3 = JsonMappers.toJsonNode(tenant.storageEngineConfig()).get("s3");
             if (s3 != null && !s3.isNull()) {
                 String accessKey = s3.path("access_key").asText("");
                 String secretKey = s3.path("secret_key").asText("");

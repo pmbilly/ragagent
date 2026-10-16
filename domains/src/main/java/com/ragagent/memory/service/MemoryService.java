@@ -11,7 +11,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.memory.MemoryContext;
 import com.ragagent.contract.memory.MemoryConfig;
@@ -284,7 +284,7 @@ public class MemoryService {
     MemoryConfig workspaceConfig(long tenantId) {
         JsonNode node;
         try {
-            node = tenantService.memoryConfig(tenantId);
+            node = JsonMappers.toJsonNode(tenantService.memoryConfig(tenantId));
         } catch (RuntimeException e) {
             log.warn("memory: load workspace config failed: {}", e.toString());
             return new MemoryConfig();

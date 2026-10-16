@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorRegistry;
 import com.ragagent.datasource.task.DataSourceSyncHandler;

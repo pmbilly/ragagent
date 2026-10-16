@@ -1,8 +1,6 @@
-package com.ragagent.platform.config;
+package com.ragagent.contract.tenant;
 
-import com.ragagent.contract.tenant.APIPrincipalConfig;
 
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * 租户配置的**只读端口**。
@@ -12,19 +10,22 @@ import com.fasterxml.jackson.databind.JsonNode;
  * 由 {@code auth.service.TenantService} 实现（它已有 {@code getTenantById}）——
  * 因此<b>没有新增 wiring</b>，Spring 照旧注入同一个 bean。</p>
  *
+ * <p><b>形状</b>：jsonb 值以 {@code Object}（不透明）持有，收取方按树 / Map 各自解释
+ * （树形收取经 {@code JsonMappers.toJsonNode}）。
+ *
  * <p>语义：租户不存在或该配置为空时返回 {@code null}（调用方各自兜底默认值）；
  * 读取异常由调用方按原有 try/catch 处理（与迁移前一致）。</p>
  */
 public interface TenantConfigLookup {
 
     /** 检索引擎配置（{@code tenants.retriever_engines}，形如 {@code {"engines":[…]}}）。 */
-    JsonNode retrieverEngines(long tenantId);
+    Object retrieverEngines(long tenantId);
 
     /** 检索参数配置（{@code tenants.retrieval_config}：rrf_k / rrf_vector_weight / rrf_keyword_weight）。 */
-    JsonNode retrievalConfig(long tenantId);
+    Object retrievalConfig(long tenantId);
 
     /** 记忆配置（{@code tenants.memory_config}：embeddingModelId / extractModelId 等）。 */
-    JsonNode memoryConfig(long tenantId);
+    Object memoryConfig(long tenantId);
 
     /** 租户是否存在（存在性探针；避免为此读整行/拉实体）。 */
     boolean exists(long tenantId);
@@ -37,13 +38,13 @@ public interface TenantConfigLookup {
     APIPrincipalConfig apiPrincipalConfig(long tenantId);
 
     /** 网络搜索配置（{@code tenants.web_search_config}；租户不存在或配置为空返回 {@code null}）。 */
-    JsonNode webSearchConfig(long tenantId);
+    Object webSearchConfig(long tenantId);
 
     /** 聊天历史配置（{@code tenants.chat_history_config}；租户不存在或配置为空返回 {@code null}）。 */
-    JsonNode chatHistoryConfig(long tenantId);
+    Object chatHistoryConfig(long tenantId);
 
     /** 解析引擎配置（{@code tenants.parser_engine_config}；租户不存在或配置为空返回 {@code null}）。 */
-    JsonNode parserEngineConfig(long tenantId);
+    Object parserEngineConfig(long tenantId);
 
     /**
      * 存储域只读视图（id + 默认后端 + 存储引擎配置）。租户不存在返回 {@code null}
@@ -52,6 +53,6 @@ public interface TenantConfigLookup {
     TenantStorageView storageView(long tenantId);
 
     /** 存储域只读视图（三字段，够解析 provider 链）。 */
-    record TenantStorageView(long tenantId, String defaultStorageBackendId, JsonNode storageEngineConfig) {
+    record TenantStorageView(long tenantId, String defaultStorageBackendId, Object storageEngineConfig) {
     }
 }

@@ -27,7 +27,7 @@ import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.platform.stream.StreamManager;
 import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.contract.session.MessageExecutionContext;
 import com.ragagent.session.service.SessionLookupScope;

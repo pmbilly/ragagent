@@ -19,7 +19,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.security.UserNameLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
@@ -207,9 +207,10 @@ public class KnowledgeBaseService
         }
         String provider = "";
         var storageView = tenantConfigLookup.storageView(tenantId());
-        if (storageView != null && storageView.storageEngineConfig() != null
-                && storageView.storageEngineConfig().path("defaultProvider").isTextual()) {
-            provider = storageView.storageEngineConfig().path("defaultProvider").asText().toLowerCase().trim();
+        JsonNode storageEngine = storageView == null ? null
+                : JsonMappers.toJsonNode(storageView.storageEngineConfig());
+        if (storageEngine != null && storageEngine.path("defaultProvider").isTextual()) {
+            provider = storageEngine.path("defaultProvider").asText().toLowerCase().trim();
         }
         if (provider.isEmpty() || !isStorageAllowed(provider)) {
             provider = firstAllowedStorage();

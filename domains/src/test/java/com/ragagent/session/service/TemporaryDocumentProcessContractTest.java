@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.contract.model.ModelParameters;

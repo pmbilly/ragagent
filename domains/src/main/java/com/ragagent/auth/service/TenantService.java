@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.contract.error.AppError;
@@ -77,19 +77,19 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
     // ── TenantConfigLookup（检索/模型域的只读端口实现）────────────────────
 
     @Override
-    public JsonNode retrieverEngines(long tenantId) {
+    public Object retrieverEngines(long tenantId) {
         Tenant t = tenantRow(tenantId);
         return t == null ? null : t.getRetrieverEngines();
     }
 
     @Override
-    public JsonNode retrievalConfig(long tenantId) {
+    public Object retrievalConfig(long tenantId) {
         Tenant t = tenantRow(tenantId);
         return t == null ? null : t.getRetrievalConfig();
     }
 
     @Override
-    public JsonNode memoryConfig(long tenantId) {
+    public Object memoryConfig(long tenantId) {
         Tenant t = tenantRow(tenantId);
         return t == null ? null : t.getMemoryConfig();
     }
@@ -111,17 +111,17 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
     }
 
     @Override
-    public JsonNode webSearchConfig(long tenantId) {
+    public Object webSearchConfig(long tenantId) {
         return configOf(tenantId, Tenant::getWebSearchConfig);
     }
 
     @Override
-    public JsonNode chatHistoryConfig(long tenantId) {
+    public Object chatHistoryConfig(long tenantId) {
         return configOf(tenantId, Tenant::getChatHistoryConfig);
     }
 
     @Override
-    public JsonNode parserEngineConfig(long tenantId) {
+    public Object parserEngineConfig(long tenantId) {
         return configOf(tenantId, Tenant::getParserEngineConfig);
     }
 

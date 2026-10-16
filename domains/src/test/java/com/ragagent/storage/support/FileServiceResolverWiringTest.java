@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
+import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.contract.storage.support.FileUrlPort;
 
 /**

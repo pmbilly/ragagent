@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
+import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.storage.provider.FileServiceFactory;
@@ -82,7 +82,7 @@ public class FileServiceResolver implements Resolver {
 
         String provider = parseProviderScheme(filePath);
         if (provider.isEmpty()) {
-            JsonNode config = tenant == null ? null : tenant.storageEngineConfig();
+            JsonNode config = JsonMappers.toJsonNode(tenant == null ? null : tenant.storageEngineConfig());
             if (config != null && config.isObject()) {
                 JsonNode defaultProvider = config.get("defaultProvider");
                 if (defaultProvider != null && defaultProvider.isTextual()) {
@@ -134,7 +134,7 @@ public class FileServiceResolver implements Resolver {
      */
     private FileUrlPort buildFileServiceForProvider(String provider, FileUrlPort defaultSvc) {
         try {
-            JsonNode sec = tenant == null ? null : tenant.storageEngineConfig();
+            JsonNode sec = JsonMappers.toJsonNode(tenant == null ? null : tenant.storageEngineConfig());
             StorageEngineConfig typed = sec == null ? new StorageEngineConfig()
                     : CONFIG_MAPPER.convertValue(sec, StorageEngineConfig.class);
             FileServiceFactory.Created created = FileServiceFactory.fromStorageConfig(

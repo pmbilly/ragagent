@@ -37,7 +37,7 @@ import com.ragagent.contract.wiki.WikiLanguageSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
@@ -562,7 +562,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
     private List<RetrieverEngineParams> tenantEngines(long tenantId) {
         JsonNode engines;
         try {
-            engines = tenantConfigLookup.retrieverEngines(tenantId);
+            engines = JsonMappers.toJsonNode(tenantConfigLookup.retrieverEngines(tenantId));
         } catch (RuntimeException e) {
             engines = null;
         }

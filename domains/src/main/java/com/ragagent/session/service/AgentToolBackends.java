@@ -57,7 +57,7 @@ import com.ragagent.agenttools.datasource.AnalysisDuckDbJdbc;
 import com.ragagent.agenttools.datasource.DataAnalysisTool;
 import com.ragagent.agenttools.knowledge.GetDocumentInfoTool;
 import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.chatpipeline.spi.WebSearchExecutor;
 import com.ragagent.contract.knowledge.ChunkFacts;
@@ -366,7 +366,7 @@ public class AgentToolBackends {
             return null;
         }
         try {
-            JsonNode webSearch = tenantService.webSearchConfig(tid);
+            JsonNode webSearch = JsonMappers.toJsonNode(tenantService.webSearchConfig(tid));
             if (webSearch == null || webSearch.isNull()) {
                 return null;
             }

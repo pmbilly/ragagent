@@ -9,8 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.contract.tenant.ChatHistoryConfig;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.agent.tool.runtime.ThinkBlocks;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
@@ -384,7 +385,7 @@ public class MessageService {
         if (tenantId == null) {
             return "no tenant in context";
         }
-        JsonNode node = tenantService.chatHistoryConfig(tenantId);
+        JsonNode node = JsonMappers.toJsonNode(tenantService.chatHistoryConfig(tenantId));
         if (node == null || node.isNull()) {
             return "chat history config not set";
         }
@@ -426,7 +427,7 @@ public class MessageService {
      */
     public ChatHistoryKbStats getChatHistoryKbStats() {
         long tenantId = requireTenantId();
-        JsonNode cfg = tenantService.chatHistoryConfig(tenantId);
+        JsonNode cfg = JsonMappers.toJsonNode(tenantService.chatHistoryConfig(tenantId));
 
         ChatHistoryKbStats stats = new ChatHistoryKbStats();
         if (cfg == null) {

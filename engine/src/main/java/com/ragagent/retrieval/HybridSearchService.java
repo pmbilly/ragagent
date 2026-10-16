@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.contract.error.AppError;
@@ -38,6 +38,7 @@ import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
 import com.ragagent.retrieval.engine.TenantStoreOwnership;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
@@ -689,7 +690,7 @@ public class HybridSearchService {
     JsonNode currentRetrieverEngines() {
         Long tid = TenantContext.currentTenantId();
         try {
-            return tid == null ? null : tenantConfigLookup.retrieverEngines(tid);
+            return JsonMappers.toJsonNode(tid == null ? null : tenantConfigLookup.retrieverEngines(tid));
         } catch (Exception e) {
             return null;
         }
@@ -698,7 +699,7 @@ public class HybridSearchService {
     private RetrievalConfigView currentRetrievalConfig() {
         try {
             Long tid = TenantContext.currentTenantId();
-            JsonNode node = tid == null ? null : tenantConfigLookup.retrievalConfig(tid);
+            JsonNode node = JsonMappers.toJsonNode(tid == null ? null : tenantConfigLookup.retrievalConfig(tid));
             if (node == null) {
                 return RetrievalConfigView.DEFAULTS;
             }

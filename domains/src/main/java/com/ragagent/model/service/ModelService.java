@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -336,7 +336,7 @@ public class ModelService implements ModelGateway  {
             }
         }
 
-        JsonNode memoryConfig = tenantConfigLookup.memoryConfig(tid);
+        JsonNode memoryConfig = JsonMappers.toJsonNode(tenantConfigLookup.memoryConfig(tid));
         if (memoryConfig != null) {
             // 两个记忆模型钉都要查：删任一会让空间指向不存在的模型
             if (modelId.equals(text(memoryConfig.get("embeddingModelId")))) {

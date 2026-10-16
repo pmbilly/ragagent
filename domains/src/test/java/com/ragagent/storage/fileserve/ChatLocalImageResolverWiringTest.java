@@ -19,7 +19,7 @@ import java.util.Base64;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
+import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;

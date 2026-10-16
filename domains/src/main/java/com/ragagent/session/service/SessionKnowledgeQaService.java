@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.EventManager;
 import com.ragagent.chatpipeline.PipelineBuilder;
@@ -38,7 +39,7 @@ import static com.ragagent.session.service.QaSupport.TagScope;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
@@ -478,7 +479,7 @@ public class SessionKnowledgeQaService {
         String userId = SessionService.sessionUserIDForLookup();
         RetrievalConfigView rc = new RetrievalConfigView(null);
         try {
-            JsonNode retrieval = tenantService.retrievalConfig(tenantId);
+            JsonNode retrieval = JsonMappers.toJsonNode(tenantService.retrievalConfig(tenantId));
             if (retrieval != null) {
                 rc = new RetrievalConfigView(retrieval);
             }

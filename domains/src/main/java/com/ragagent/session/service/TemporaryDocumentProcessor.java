@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.platform.config.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.knowledge.DocumentChunkingPort;
 import com.ragagent.contract.knowledge.chunker.Tokens;
 import com.ragagent.contract.doc.DocReaderParsePort;
@@ -201,7 +201,7 @@ final class TemporaryDocumentProcessor {
     /** 未显式指定 engine 时用资源租户的 chat 解析规则兜底。 */
     private String tenantParserEngine(long resourceTenantId, String ext) {
         try {
-            JsonNode cfg = tenantService.parserEngineConfig(resourceTenantId);
+            JsonNode cfg = JsonMappers.toJsonNode(tenantService.parserEngineConfig(resourceTenantId));
             if (cfg == null) {
                 return "";
             }
