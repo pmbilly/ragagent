@@ -30,7 +30,7 @@ import com.ragagent.contract.graph.GraphData;
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.graph.GraphRelation;
 import com.ragagent.llm.extract.EntityExtraction;
-import com.ragagent.llm.extract.PipelineConfig;
+import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.contract.model.StreamResponse;
 
 /**

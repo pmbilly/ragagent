@@ -1,4 +1,4 @@
-package com.ragagent.llm.extract;
+package com.ragagent.platform.prompt;
 
 import java.util.LinkedHashMap;
 import java.util.List;

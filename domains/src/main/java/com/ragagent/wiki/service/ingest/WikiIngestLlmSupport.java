@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.modelruntime.adapter.provider.chat.PromptCache;
+import com.ragagent.platform.prompt.PromptFingerprints;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
@@ -99,28 +99,28 @@ final class WikiIngestLlmSupport {
         opts.setTemperature(0.3);
         opts.setThinking(Boolean.FALSE);
         opts.setMaxTokens(WikiIngestConstants.LLM_MAX_TOKENS);
-        String prefixFingerprint = PromptCache.promptPrefixFingerprint(messages, opts);
+        String prefixFingerprint = PromptFingerprints.promptPrefixFingerprint(messages, opts);
         String warmupKey = "";
         Long tenantId = TenantContext.currentTenantId();
         boolean tenantScoped = tenantId != null;
         if (WikiPrompts.WIKI_PAGE_MODIFY_USER_PROMPT.equals(promptTpl)) {
             // 页面修改走"system 消息 + 共享源上下文"作为缓存前缀：
             // 同一源文档产出的所有页面共享它，页面元数据在它之后才分叉。
-            prefixFingerprint = PromptCache.fingerprintPromptPrefix(
+            prefixFingerprint = PromptFingerprints.fingerprintPromptPrefix(
                     messages.get(0).getContent(), fields.getOrDefault("SharedSourceContexts", ""));
             if (tenantScoped) {
-                warmupKey = PromptCache.buildPromptCacheKey(
+                warmupKey = PromptFingerprints.buildPromptCacheKey(
                         tenantId, chatModel.getModelId(), purpose, prefixFingerprint);
             }
         }
         // 把 LLM 记账元数据挂到执行线程上
         String effectivePrefixFingerprint = prefixFingerprint;
         final String resolvedWarmupKey = warmupKey;
-        String requestKey = PromptCache.buildPromptCacheKey(
+        String requestKey = PromptFingerprints.buildPromptCacheKey(
                 tenantScoped ? tenantId : 0L,
                 chatModel.getModelId(),
                 "wiki_exact_request",
-                PromptCache.fingerprintPromptPrefix(serializeRequest(messages, opts)));
+                PromptFingerprints.fingerprintPromptPrefix(serializeRequest(messages, opts)));
         java.util.concurrent.Callable<Object> execute = () -> {
             WikiLlmCallMetadata.set(purpose, effectivePrefixFingerprint);
             // 用长度为 1 的数组承载 release 句柄：lambda 里不能给局部变量重新赋值

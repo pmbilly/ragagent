@@ -60,7 +60,6 @@
     "im/service/ImTurnOrchestrator.java": "im/",
     "knowledge/service/chunk/ChunkExtractService.java": "knowledge/service/chunk/ChunkExtractService",
     "knowledge/task/KnowledgeProcessWorker.java": "knowledge/task/KnowledgeProcessWorker",
-    "llm/extract/ExtractPrompts.java": "llm/",
     "llm/ollama/OllamaChatResponse.java": "llm/",
     "llm/ollama/OllamaMessage.java": "llm/",
     "llm/ollama/OllamaService.java": "llm/",

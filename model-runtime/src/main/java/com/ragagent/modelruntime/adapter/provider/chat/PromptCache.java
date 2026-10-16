@@ -1,11 +1,6 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
 import com.ragagent.platform.web.JsonMappers;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HexFormat;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,6 +13,7 @@ import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.PromptCacheStatus;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.llm.provider.ProviderName;
+import com.ragagent.platform.prompt.PromptFingerprints;
 
 import org.springframework.http.HttpHeaders;
 
@@ -56,64 +52,21 @@ public final class PromptCache {
     // ------------------------------------------------------------------
 
     /**
-     * 短、不可逆的标识，用于日志与缓存路由。
-     * 逐段写入 UTF-8 字节，每段后跟一个 NUL 分隔符（防 "ab"+"c" 与 "a"+"bc" 撞车）。
+     * 短、不可逆的标识，用于日志与缓存路由（实现见 {@code platform.prompt.PromptFingerprints}，
+     * R2c-3d 拆出纯函数族后本类只做委托）。
      */
     public static String fingerprintPromptPrefix(String... parts) {
-        MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 unavailable", e);
-        }
-        if (parts != null) {
-            for (String part : parts) {
-                digest.update((part == null ? "" : part).getBytes(StandardCharsets.UTF_8));
-                digest.update((byte) 0);
-            }
-        }
-        return HexFormat.of().formatHex(digest.digest()).substring(0, 16);
+        return PromptFingerprints.fingerprintPromptPrefix(parts);
     }
 
-    /**
-     * 哈希普通 chat 与 agent 请求共有的稳定前缀——
-     * 开头的 system 消息 + 确定性 tool schema。动态的对话/用户消息不参与。
-     *
-     * <p>序列化契约：顶层键序固定 system, tools，空则省略；消息体经
-     * {@code valueToTree} 序列化，字段序由各 DTO 的 {@code @JsonPropertyOrder} 注解钉住
-     * （指纹对序列化字节敏感）。</p>
-     */
+    /** 哈希普通 chat 与 agent 请求共有的稳定前缀（委托 {@code PromptFingerprints}）。 */
     public static String promptPrefixFingerprint(List<ChatMessage> messages, ChatOptions opts) {
-        List<ChatMessage> system = new ArrayList<>();
-        if (messages != null) {
-            for (ChatMessage message : messages) {
-                if (!"system".equals(message.getRole())) {
-                    break;
-                }
-                system.add(message);
-            }
-        }
-        ObjectNode prefix = MAPPER.createObjectNode();
-        if (!system.isEmpty()) {
-            ArrayNode systemNode = prefix.putArray("system");
-            for (ChatMessage m : system) {
-                systemNode.add(MAPPER.valueToTree(m));
-            }
-        }
-        if (opts != null && opts.getTools() != null && !opts.getTools().isEmpty()) {
-            prefix.set("tools", MAPPER.valueToTree(opts.getTools()));
-        }
-        return fingerprintPromptPrefix(stringify(prefix));
+        return PromptFingerprints.promptPrefixFingerprint(messages, opts);
     }
 
-    /**
-     * 派生的、不透明的进程内协调 key。
-     * 租户与模型标识只参与哈希，不以明文驻留。
-     */
+    /** 派生的、不透明的进程内协调 key（委托 {@code PromptFingerprints}）。 */
     public static String buildPromptCacheKey(long tenantId, String modelId, String purpose, String prefixFingerprint) {
-        // tenantID 用无符号十进制表示，避免高位租户 ID 输出成负数
-        return "wk-" + fingerprintPromptPrefix(
-                Long.toUnsignedString(tenantId), modelId, purpose, prefixFingerprint);
+        return PromptFingerprints.buildPromptCacheKey(tenantId, modelId, purpose, prefixFingerprint);
     }
 
     // ------------------------------------------------------------------
@@ -535,12 +488,4 @@ public final class PromptCache {
         return node != null && node.isTextual() ? node.textValue() : "";
     }
 
-    private static String stringify(ObjectNode node) {
-        try {
-            return MAPPER.writeValueAsString(node);
-        } catch (Exception e) {
-            // ObjectNode 序列化不会失败；真失败时返回空串会让指纹退化，故直接抛出
-            throw new IllegalStateException("failed to serialize prompt prefix", e);
-        }
-    }
 }

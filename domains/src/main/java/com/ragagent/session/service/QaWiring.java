@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.session.service.rag.EventManager;
 import com.ragagent.contract.session.PipelineMessageImageView;
 import com.ragagent.contract.session.PipelineMessageView;
-import com.ragagent.llm.extract.PipelineConfig;
+import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.session.service.rag.plugin.PluginChatCompletion;
 import com.ragagent.session.service.rag.plugin.PluginChatCompletionStream;

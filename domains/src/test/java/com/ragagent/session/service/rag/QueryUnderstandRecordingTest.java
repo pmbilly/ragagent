@@ -21,7 +21,7 @@ import com.ragagent.session.service.rag.plugin.PluginQueryUnderstand;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.llm.extract.PipelineConfig;
+import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.session.MessageImage;
 

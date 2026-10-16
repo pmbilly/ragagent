@@ -1,4 +1,4 @@
-package com.ragagent.llm.extract;
+package com.ragagent.platform.prompt;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
 
-import com.ragagent.llm.extract.PipelineConfig.PromptTemplateStructured;
+import com.ragagent.platform.prompt.PipelineConfig.PromptTemplateStructured;
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.graph.GraphRelation;
 

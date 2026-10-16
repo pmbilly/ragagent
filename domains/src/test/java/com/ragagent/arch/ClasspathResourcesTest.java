@@ -67,7 +67,7 @@ class ClasspathResourcesTest {
         RESOURCES.put("agent/management/builtin_agents.yaml", "BuiltinAgentRegistry#load");
         RESOURCES.put("agent/management/agent_type_presets.yaml", "AgentTypePresets 构造器");
         // ── 其余按域 ──
-        RESOURCES.put("initialization/extract_config.yaml", "llm.extract.ExtractPrompts");
+        RESOURCES.put("initialization/extract_config.yaml", "platform.prompt.ExtractPrompts");
         RESOURCES.put("initialization/asr_test.wav", "initialization.AsrTestAudio（fail-fast，仍纳入）");
         RESOURCES.put("dataset/samples.json", "evaluation.DatasetService");
         RESOURCES.put("jieba/hmm_model.json", "retrieval…JiebaTokenizer");

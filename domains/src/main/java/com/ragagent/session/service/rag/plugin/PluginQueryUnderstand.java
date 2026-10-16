@@ -20,7 +20,7 @@ import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.contract.session.PipelineMessageImageView;
 import com.ragagent.contract.session.PipelineMessageView;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.llm.extract.PipelineConfig;
+import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.contract.model.chat.ChatResponse;
 

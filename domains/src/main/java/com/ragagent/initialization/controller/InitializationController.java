@@ -15,7 +15,7 @@ import com.ragagent.initialization.service.ModelConnectivityTestService;
 import com.ragagent.initialization.service.OllamaManageService;
 import com.ragagent.initialization.service.TextExtractionTestService;
 import com.ragagent.contract.model.AsrTranscriber;
-import com.ragagent.llm.extract.ExtractPrompts;
+import com.ragagent.platform.prompt.ExtractPrompts;
 import com.ragagent.initialization.service.OllamaDownloadTaskStore;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.contract.error.AppError;

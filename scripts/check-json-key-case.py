@@ -179,6 +179,11 @@ BASELINE: dict[str, set[str]] = {
     # WeKnora Cloud 第三方 API
     # Cypher 字段
     'retrieval/graph/Neo4jGraphRepository.java': {'knowledge_id', 'source_labels', 'target_labels'},
+    # R2c-3d 换锚：抽取提示词装载器由 `llm/extract` 迁 `platform.prompt`（纯提示词/配置面归技术面）。
+    # 下列键是 **`initialization/extract_config.yaml` 的存量配置键**（vendor 资源"复制即校验"，
+    # 键名由外部 yaml 决定、改键会破坏存量配置）——换包换锚，键名不动。
+    'platform/prompt/ExtractPrompts.java': {'extract_entity', 'extract_graph', 'fabri_text',
+        'with_no_tag', 'with_tag'},
     # ImageInfo 面（§15.3 冻结族）
     # websearch metadata 的 published_at（§15.3 ① 外部决定：键名由搜索服务给，非我们的 JSON 面）。
     # B147a 复核改标：原写「存量面」是错的——与 ReferencesSupport 同族，属外部词汇而非历史数据。

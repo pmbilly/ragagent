@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.graph.GraphRelation;
-import com.ragagent.llm.extract.PipelineConfig.PromptTemplateStructured;
+import com.ragagent.platform.prompt.PipelineConfig.PromptTemplateStructured;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
