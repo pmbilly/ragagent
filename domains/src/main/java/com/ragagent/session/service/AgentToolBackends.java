@@ -49,7 +49,7 @@ import com.ragagent.contract.knowledge.ChunkRowView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.ChunkPageView;
 import com.ragagent.contract.model.Reranker;
-import com.ragagent.retrieval.HybridSearchService;
+import com.ragagent.contract.retrieval.HybridSearchPort;
 import com.ragagent.contract.wiki.WikiPageOpsPort;
 import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.contract.tool.ToolDefinitions;
@@ -93,7 +93,7 @@ public class AgentToolBackends {
     private final JdbcTemplate jdbc;
 
     public AgentToolBackends(KnowledgeCatalogPort knowledgeCatalog,
-                             HybridSearchService hybridSearchService,
+                             HybridSearchPort hybridSearchService,
                              ConversationProperties conversation,
                              MessageService messageService,
                              MemorySearchPort memorySearch,

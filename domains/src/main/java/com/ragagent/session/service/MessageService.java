@@ -16,7 +16,7 @@ import com.ragagent.agent.tool.runtime.ThinkBlocks;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.retrieval.HybridSearchService;
+import com.ragagent.contract.retrieval.HybridSearchPort;
 import com.ragagent.session.domain.ChatHistoryKbStats;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageArtifact;
@@ -52,7 +52,7 @@ import com.ragagent.contract.knowledge.KnowledgeRowView;
  *       HTTP 响应不受影响。</li>
  *   <li><b>向量搜索</b>：
  *       租户配置了 ChatHistoryConfig 时走
- *       {@link HybridSearchService#hybridSearch}（vector-only：
+ *       {@link HybridSearchPort#hybridSearch}（vector-only：
  *       {@code DisableKeywordsMatch=true}，关键词仍在 messages 表上单独搜），
  *       KB 命中经 {@code knowledge_id} 映射回消息并按分排序；配置了 rerank 模型时
  *       先重排（取不到模型 / 调用失败 → 原样返回）。
@@ -89,7 +89,7 @@ public class MessageService {
                           MessageSuggestionRepository suggestionRepository,
                           KnowledgeCatalogPort knowledgeCatalog,
                           TenantConfigLookup tenantService,
-                          HybridSearchService hybridSearchService,
+                          HybridSearchPort hybridSearchService,
                           ModelRuntime modelRuntimeAssembler) {
         this.sessionRepository = sessionRepository;
         this.messageRepository = messageRepository;

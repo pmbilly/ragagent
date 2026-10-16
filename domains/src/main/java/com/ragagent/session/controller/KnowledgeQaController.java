@@ -264,7 +264,7 @@ public class KnowledgeQaController {
      * 读者租户实体（A3-3 接线）——供 Rewriter 解析"引用不带 provider scheme 时的租户默认
      * provider"。取不到租户实体时引用一律保留成 handle（降级形态）；
      * 现在按 TenantContext 的 id 取实体，与 {@code SystemController} /
-     * {@code HybridSearchService} 同一写法。
+     * {@code HybridSearchPort} 同一写法。
      */
     private TenantStorageView currentTenant() {
         Long tid = TenantContext.currentTenantId();

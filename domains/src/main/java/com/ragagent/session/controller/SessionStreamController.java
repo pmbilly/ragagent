@@ -141,7 +141,7 @@ public class SessionStreamController {
      * {@code storage_engine_config.default_provider}。
      *
      * <p><b>A3-3 接线</b>：{@code TenantContext} 只存 tenantId、不存租户实体，
-     * 故此处按 id 取实体（与 {@code SystemController} / {@code HybridSearchService} 同一写法）。
+     * 故此处按 id 取实体（与 {@code SystemController} / {@code HybridSearchPort} 同一写法）。
      * 取不到时返回 null（调用方按无租户降级）。</p>
      */
     private TenantStorageView currentTenant() {
