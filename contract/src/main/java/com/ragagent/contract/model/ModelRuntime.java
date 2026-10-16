@@ -55,4 +55,10 @@ public interface ModelRuntime {
 
     /** 按行视图取聊天配置（provider/基址/参数等；调试面读 thinking 控制等派生信息用）。 */
     ChatConfig chatConfigFor(ModelRowView model);
+
+    /**
+     * 解析该 chat 配置**实际生效**的思考控制（provider 能力 + {@code extra_config.thinking} 覆盖）。
+     * 返回实现侧策略名（如 {@code "none"} / {@code "enabled"}）；观测与调试面用。
+     */
+    String effectiveThinkingControl(ChatConfig config);
 }

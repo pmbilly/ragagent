@@ -18,16 +18,11 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.platform.storage.config.UploadLimits;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapters;
-import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingStrategies;
-import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingStrategy;
 import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.llm.provider.ProviderName;
-import com.ragagent.llm.provider.ProviderRegistry;
 import com.ragagent.model.domain.Model;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.model.dto.ModelDebugAsrResponse;
@@ -195,7 +190,7 @@ public class ModelDebugController {
 
         // 组 chat 配置 + thinking 观测
         ChatConfig chatConfig = runtimeFactory.chatConfigFor(ModelRowViews.of(model));
-        String thinkingControl = effectiveThinkingControl(chatConfig);
+        String thinkingControl = runtimeFactory.effectiveThinkingControl(chatConfig);
         observations.put("stream", true);
         observations.put("requestedThinking", opts.thinking != null && opts.thinking);
         observations.put("thinkingControl", thinkingControl);
@@ -578,22 +573,6 @@ public class ModelDebugController {
 
     // ── thinking 观测 ─────────────────────────────────────────────────────
 
-    static String effectiveThinkingControl(ChatConfig config) {
-        if (config == null) {
-            return "none";
-        }
-        ThinkingStrategy override = ThinkingStrategies.parseThinkingOverride(config.getExtraConfig());
-        if (override != null) {
-            return override.name();
-        }
-        // provider 为空串才探测回落；非空但未知名（fromValue=null）不回落
-        // ——resolve(null) 无命中 → BaseProvider
-        String pv = config.getProvider() == null ? "" : config.getProvider();
-        ProviderName name = pv.isEmpty()
-                ? ProviderRegistry.detectProvider(config.getBaseUrl())
-                : ProviderName.fromValue(pv);
-        return ProviderAdapters.resolve(name, config.getModelName()).thinking().name();
-    }
 
     // ── 小工具 ───────────────────────────────────────────────────────────
 

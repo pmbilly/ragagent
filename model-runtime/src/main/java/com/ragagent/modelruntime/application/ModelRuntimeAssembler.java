@@ -10,6 +10,11 @@ import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.model.VlmConfig;
+import com.ragagent.llm.provider.ProviderName;
+import com.ragagent.llm.provider.ProviderRegistry;
+import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapters;
+import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingStrategies;
+import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingStrategy;
 import com.ragagent.embedding.EmbedderFactory;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
@@ -154,6 +159,25 @@ public class ModelRuntimeAssembler implements ModelRuntime {
         } catch (RuntimeException e) {
             throw new RuntimeException("base URL SSRF check failed: " + e.getMessage());
         }
+    }
+
+    /** 解析生效的思考控制（provider 能力 + extra_config 覆盖）；观测/调试面用。 */
+    @Override
+    public String effectiveThinkingControl(ChatConfig config) {
+        if (config == null) {
+            return "none";
+        }
+        ThinkingStrategy override = ThinkingStrategies.parseThinkingOverride(config.getExtraConfig());
+        if (override != null) {
+            return override.name();
+        }
+        // provider 为空串才探测回落；非空但未知名（fromValue=null）不回落
+        // ——resolve(null) 无命中 → BaseProvider
+        String pv = config.getProvider() == null ? "" : config.getProvider();
+        ProviderName name = pv.isEmpty()
+                ? ProviderRegistry.detectProvider(config.getBaseUrl())
+                : ProviderName.fromValue(pv);
+        return ProviderAdapters.resolve(name, config.getModelName()).thinking().name();
     }
 
     // ── 按行视图的工厂面（不做取数、不挂观测装饰）──────────────────────────
