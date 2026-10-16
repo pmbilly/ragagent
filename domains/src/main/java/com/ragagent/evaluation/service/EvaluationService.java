@@ -13,10 +13,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.chatpipeline.ChatManage;
-import com.ragagent.chatpipeline.PipelineBuilder;
-import com.ragagent.chatpipeline.SummaryConfig;
+import com.ragagent.contract.pipeline.KnowledgeQaRunner;
+import com.ragagent.contract.pipeline.KnowledgeQaRunResult;
+import com.ragagent.contract.pipeline.KnowledgeQaRunRequest;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.evaluation.domain.QaPair;
@@ -30,7 +29,6 @@ import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.chatpipeline.spi.KnowledgeQaEventPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -99,7 +97,7 @@ public class EvaluationService {
     private final DatasetService datasetService;
     private final KnowledgeCatalogPort knowledgeCatalog;
     private final KnowledgeIngest knowledgeIngest;
-    private final KnowledgeQaEventPort knowledgeQaEvents;
+    private final KnowledgeQaRunner knowledgeQaRunner;
 
     /** 任务存储：taskID → detail。 */
     private final Map<String, EvaluationDetail> store = new ConcurrentHashMap<>();
@@ -108,12 +106,12 @@ public class EvaluationService {
                              DatasetService datasetService,
                              KnowledgeCatalogPort knowledgeCatalog,
                              KnowledgeIngest knowledgeIngest,
-                             KnowledgeQaEventPort knowledgeQaEvents) {
+                             KnowledgeQaRunner knowledgeQaRunner) {
         this.modelCatalog = modelCatalog;
         this.datasetService = datasetService;
         this.knowledgeCatalog = knowledgeCatalog;
         this.knowledgeIngest = knowledgeIngest;
-        this.knowledgeQaEvents = knowledgeQaEvents;
+        this.knowledgeQaRunner = knowledgeQaRunner;
     }
 
     /**
@@ -322,14 +320,15 @@ public class EvaluationService {
                            String knowledgeBaseId, long tenantId,
                            MetricHook.HookMetric metricHook, AtomicInteger finished,
                            Object progressLock) {
-        ChatManage chatManage = buildChatManage(detail.params, knowledgeBaseId, qaPair, tenantId);
-        knowledgeQaEvents.knowledgeQAByEvent(chatManage, PipelineBuilder.presets().get("rag"));
+        // R4b：管线运行时上下文与预设由会话域的 runner 构造（本域只认契约请求/产物）
+        KnowledgeQaRunResult run = knowledgeQaRunner.runRag(
+                toRunRequest(detail.params, knowledgeBaseId, qaPair, tenantId));
 
         metricHook.recordInit(index);
         metricHook.recordQaPair(index, qaPair);
-        metricHook.recordSearchResult(index, chatManage.getSearchResult());
-        metricHook.recordRerankResult(index, chatManage.getRerankResult());
-        metricHook.recordChatResponse(index, chatManage.getChatResponse());
+        metricHook.recordSearchResult(index, run.searchResults());
+        metricHook.recordRerankResult(index, run.rerankResults());
+        metricHook.recordChatResponse(index, run.chatResponse());
         metricHook.recordFinish(index);
 
         synchronized (progressLock) {
@@ -341,48 +340,23 @@ public class EvaluationService {
         }
     }
 
-    /**
-     * 从创建时的 params 快照构造运行时 ChatManage（JSON DTO 与运行时类型分离，故在此还原），
-     * 并逐 QA 对设置 query/rewriteQuery/
-     * knowledgeBaseIds/searchTargets（评估循环内的赋值）。
-     */
-    private static ChatManage buildChatManage(PipelineParams params, String knowledgeBaseId,
-                                              QaPair qaPair, long tenantId) {
-        ChatManage cm = new ChatManage();
-        cm.setMaxRounds(params.maxRounds);
-        cm.setVectorThreshold(params.vectorThreshold);
-        cm.setKeywordThreshold(params.keywordThreshold);
-        cm.setEmbeddingTopK(params.embeddingTopK);
-        cm.setRerankModelId(params.rerankModelId);
-        cm.setRerankTopK(params.rerankTopK);
-        cm.setRerankThreshold(params.rerankThreshold);
-        cm.setChatModelId(params.chatModelId);
-        cm.setSummaryConfig(toSummaryConfig(params.summaryConfig));
-        cm.setFallbackResponse(params.fallbackResponse);
-        cm.setRewritePromptSystem(params.rewritePromptSystem);
-        cm.setRewritePromptUser(params.rewritePromptUser);
-
-        cm.setQuery(qaPair.question());
-        cm.setRewriteQuery(qaPair.question());
-        cm.setKnowledgeBaseIds(new ArrayList<>(List.of(knowledgeBaseId)));
-        cm.setSearchTargets(new ArrayList<>(
-                List.of(SearchTarget.wholeKb(knowledgeBaseId, tenantId))));
-        return cm;
+    /** 从创建时的 params 快照构造**契约请求**（R4b：本域不再认识管线运行时类型）。 */
+    private static KnowledgeQaRunRequest toRunRequest(PipelineParams params, String knowledgeBaseId,
+                                                      QaPair qaPair, long tenantId) {
+        return new KnowledgeQaRunRequest(knowledgeBaseId, tenantId, qaPair.question(),
+                params.maxRounds, params.vectorThreshold, params.keywordThreshold,
+                params.embeddingTopK, params.rerankModelId, params.rerankTopK,
+                params.rerankThreshold, params.chatModelId, toSummarySpec(params.summaryConfig),
+                params.fallbackResponse, params.rewritePromptSystem, params.rewritePromptUser);
     }
 
     /** params 的 SummaryConfig 子集（其余字段为部署零值，DTO 未携带）。 */
-    private static SummaryConfig toSummaryConfig(SummaryConfigParams dto) {
-        SummaryConfig sc = new SummaryConfig();
+    private static KnowledgeQaRunRequest.SummarySpec toSummarySpec(SummaryConfigParams dto) {
         if (dto == null) {
-            return sc;
+            return new KnowledgeQaRunRequest.SummarySpec(0, null, null, null, 0, 0);
         }
-        sc.setRepeatPenalty(dto.repeatPenalty);
-        sc.setPrompt(dto.prompt);
-        sc.setContextTemplate(dto.contextTemplate);
-        sc.setNoMatchPrefix(dto.noMatchPrefix);
-        sc.setTemperature(dto.temperature);
-        sc.setMaxCompletionTokens(dto.maxCompletionTokens);
-        return sc;
+        return new KnowledgeQaRunRequest.SummarySpec(dto.repeatPenalty, dto.prompt,
+                dto.contextTemplate, dto.noMatchPrefix, dto.temperature, dto.maxCompletionTokens);
     }
 
     /** PIDs → passages 铺平（maxPID+1 长，空洞留 ""）。 */
