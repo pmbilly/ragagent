@@ -1,4 +1,4 @@
-package com.ragagent.agent.tool;
+package com.ragagent.platform.knowledge;
 
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.platform.web.JsonMappers;
@@ -23,13 +23,21 @@ import com.ragagent.contract.knowledge.ChunkFacts;
  *       其内部合并实现属基础设施侧。</li>
  * </ul>
  */
+/**
+ * 文档/分块视图组装工具（R5b-3：自 {@code agent-engine} 的 {@code agent.tool} 迁入——
+ * 它与 {@code ImageInfoMatchUtil}/{@code ChunkSearchUtil} 同族：**对契约形状做技术性组装**
+ * （markdown 片段、metadata 映射、图片信息解析），不含业务判定，故归 platform.knowledge）。
+ *
+ * <p>原嵌套 record {@code ImageInfoRow}/{@code KnowledgeInfoRow} 随之改名 *Row（platform 面
+ * 不得出现 View/Port/Request/Response/Payload/Facts 这类业务形状命名——C8 红旗口径）。</p>
+ */
 public final class DocChunkSupport {
 
     private DocChunkSupport() {
     }
 
     /** knowledge 文档富视图（跨模块被用字段）。 */
-    public record KnowledgeInfoView(String id, long tenantId, String knowledgeBaseId, String title,
+    public record KnowledgeInfoRow(String id, long tenantId, String knowledgeBaseId, String title,
             String description, String type, String source, String fileName, String fileType,
             long fileSize, String parseStatus, Map<String, Object> metadata) {
     }
@@ -41,7 +49,7 @@ public final class DocChunkSupport {
      * 传给 SearchAuth 时用 {@link #asScopeReader} 适配。
      */
     public interface KnowledgeInfoReader {
-        KnowledgeInfoView byIdOnly(String knowledgeId);
+        KnowledgeInfoRow byIdOnly(String knowledgeId);
 
         Map<String, List<SearchAuth.TagView>> fetchTags(List<String> knowledgeIds);
     }
@@ -51,7 +59,7 @@ public final class DocChunkSupport {
         return new SearchAuth.KnowledgeScopeReader() {
             @Override
             public SearchAuth.KnowledgeView byIdOnly(String knowledgeId) {
-                KnowledgeInfoView k = reader == null ? null : reader.byIdOnly(knowledgeId);
+                KnowledgeInfoRow k = reader == null ? null : reader.byIdOnly(knowledgeId);
                 if (k == null) {
                     return null;
                 }
@@ -82,7 +90,7 @@ public final class DocChunkSupport {
     // ==================== ImageInfo ====================
 
     /** 图片信息三字段：URL/Caption/OCRText。 */
-    public record ImageInfoView(String url, String caption, String ocrText) {
+    public record ImageInfoRow(String url, String caption, String ocrText) {
     }
 
     /** 独立 ObjectMapper（主源码不可依赖测试侧的 RecordingSupport）。 */
@@ -95,7 +103,7 @@ public final class DocChunkSupport {
     }
 
     /** 解析 ImageInfo JSON 数组：失败或空 → null。 */
-    public static List<ImageInfoView> parseImageInfoList(String imageInfoJson) {
+    public static List<ImageInfoRow> parseImageInfoList(String imageInfoJson) {
         if (imageInfoJson == null || imageInfoJson.isEmpty()) {
             return null;
         }
@@ -104,14 +112,14 @@ public final class DocChunkSupport {
             if (!node.isArray() || node.isEmpty()) {
                 return null;
             }
-            List<ImageInfoView> out = new ArrayList<>();
+            List<ImageInfoRow> out = new ArrayList<>();
             for (com.fasterxml.jackson.databind.JsonNode item : node) {
                 String url = item.path("url").asText("");
                 String originalUrl = item.path("originalUrl").asText("");
                 if (url.isEmpty()) {
                     url = originalUrl;
                 }
-                out.add(new ImageInfoView(url,
+                out.add(new ImageInfoRow(url,
                         item.path("caption").asText(""), item.path("ocrText").asText("")));
             }
             return out;
@@ -121,7 +129,7 @@ public final class DocChunkSupport {
     }
 
     /** caption/OCR 的 blockquote 组装；空 → ""。 */
-    public static String buildImageInfoMarkdownMetadata(ImageInfoView img) {
+    public static String buildImageInfoMarkdownMetadata(ImageInfoRow img) {
         if (img == null) {
             return "";
         }
@@ -144,7 +152,7 @@ public final class DocChunkSupport {
      * 图片 markdown 组装：URL 原样保留；alt = caption 按空白折叠，
      * 空 → "image"，反斜杠与方括号转义。
      */
-    public static String buildImageInfoMarkdownWithURL(String url, ImageInfoView img) {
+    public static String buildImageInfoMarkdownWithURL(String url, ImageInfoRow img) {
         if (img == null) {
             return "";
         }
@@ -196,10 +204,10 @@ public final class DocChunkSupport {
         String content = c.content() == null ? "" : c.content();
         String imageInfo = c.imageInfo();
         if (imageInfo != null && !imageInfo.isEmpty()) {
-            List<ImageInfoView> infos = parseImageInfoList(imageInfo);
+            List<ImageInfoRow> infos = parseImageInfoList(imageInfo);
             if (infos != null && !infos.isEmpty()) {
                 StringBuilder imgBuilder = new StringBuilder();
-                for (ImageInfoView img : infos) {
+                for (ImageInfoRow img : infos) {
                     String md = buildImageInfoMarkdownWithURL(img.url(), img);
                     if (!md.isEmpty()) {
                         imgBuilder.append('\n').append(md);

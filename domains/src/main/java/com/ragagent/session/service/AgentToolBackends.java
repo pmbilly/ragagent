@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.agenttools.datasource.DataSchemaTool;
 import com.ragagent.agenttools.sql.DatabaseQueryTool;
-import com.ragagent.agent.tool.DocChunkSupport;
+import com.ragagent.platform.knowledge.DocChunkSupport;
 import com.ragagent.agenttools.knowledge.GrepChunksTool;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool;

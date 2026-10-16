@@ -10,14 +10,14 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.agent.tool.DocChunkSupport.ChunkPage;
-import com.ragagent.agent.tool.DocChunkSupport.ImageInfoCollector;
-import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoReader;
-import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoView;
-import com.ragagent.agent.tool.DocChunkSupport.PagedChunks;
+import com.ragagent.platform.knowledge.DocChunkSupport.ChunkPage;
+import com.ragagent.platform.knowledge.DocChunkSupport.ImageInfoCollector;
+import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoReader;
+import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoRow;
+import com.ragagent.platform.knowledge.DocChunkSupport.PagedChunks;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.platform.tool.BaseTool;
-import com.ragagent.agent.tool.DocChunkSupport;
+import com.ragagent.platform.knowledge.DocChunkSupport;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
@@ -90,7 +90,7 @@ public class WikiReadSourceDocTool extends BaseTool {
         int startChunkIndex = args.path("startChunkIndex").asInt(0);
         int endChunkIndex = args.path("endChunkIndex").asInt(0);
 
-        KnowledgeInfoView knowledge;
+        KnowledgeInfoRow knowledge;
         if (searchTargets != null) {
             try {
                 SearchAuth.authorizeKnowledgeInSearchTargets(

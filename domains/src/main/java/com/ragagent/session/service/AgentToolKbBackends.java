@@ -10,7 +10,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.agent.tool.DocChunkSupport;
+import com.ragagent.platform.knowledge.DocChunkSupport;
 import com.ragagent.agenttools.knowledge.GrepChunksTool;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool;
@@ -399,12 +399,12 @@ final class AgentToolKbBackends {
     public DocChunkSupport.KnowledgeInfoReader knowledgeInfoReader() {
         return new DocChunkSupport.KnowledgeInfoReader() {
             @Override
-            public DocChunkSupport.KnowledgeInfoView byIdOnly(String knowledgeId) {
+            public DocChunkSupport.KnowledgeInfoRow byIdOnly(String knowledgeId) {
                 KnowledgeRowView k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
                 if (k == null) {
                     return null;
                 }
-                return new DocChunkSupport.KnowledgeInfoView(
+                return new DocChunkSupport.KnowledgeInfoRow(
                         k.getId(), k.getTenantId() == null ? 0L : k.getTenantId(),
                         AgentToolBackends.nz(k.getKnowledgeBaseId()), AgentToolBackends.nz(k.getTitle()), AgentToolBackends.nz(k.getDescription()),
                         AgentToolBackends.nz(k.getType()), AgentToolBackends.nz(k.getSource()), AgentToolBackends.nz(k.getFileName()), AgentToolBackends.nz(k.getFileType()),

@@ -10,15 +10,15 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.agent.tool.DocChunkSupport.ChunkPage;
-import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoReader;
-import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoView;
-import com.ragagent.agent.tool.DocChunkSupport.PagedChunks;
+import com.ragagent.platform.knowledge.DocChunkSupport.ChunkPage;
+import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoReader;
+import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoRow;
+import com.ragagent.platform.knowledge.DocChunkSupport.PagedChunks;
 import com.ragagent.agenttools.knowledge.FaqSnippet.SimilarQuestionsDisplay;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.platform.tool.BaseTool;
-import com.ragagent.agent.tool.DocChunkSupport;
+import com.ragagent.platform.knowledge.DocChunkSupport;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.ToolDefinitions;
@@ -98,7 +98,7 @@ public class GetDocumentInfoTool extends BaseTool {
     }
 
     private static final class DocInfo {
-        KnowledgeInfoView knowledge;
+        KnowledgeInfoRow knowledge;
         ChunkFacts chunk;
         FaqChunkMetadata faqMeta;
         int chunkCount;
@@ -144,7 +144,7 @@ public class GetDocumentInfoTool extends BaseTool {
 
         for (String knowledgeID : knowledgeIDs) {
             DocInfo info = new DocInfo();
-            KnowledgeInfoView knowledge;
+            KnowledgeInfoRow knowledge;
             try {
                 SearchAuth.authorizeKnowledgeInSearchTargets(searchTargets, knowledgeID,
                         DocChunkSupport.asScopeReader(knowledgeReader));
@@ -236,7 +236,7 @@ public class GetDocumentInfoTool extends BaseTool {
                 continue;
             }
 
-            KnowledgeInfoView k = doc.knowledge;
+            KnowledgeInfoRow k = doc.knowledge;
             output.append(String.format("  ID:           %s\n", k.id()));
             output.append(String.format("  Title:        %s\n", k.title()));
 

@@ -9,12 +9,12 @@ import java.util.Map;
 import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.agent.tool.DocChunkSupport.ImageInfoView;
+import com.ragagent.platform.knowledge.DocChunkSupport.ImageInfoRow;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.contract.knowledge.ChunkFacts;
 
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.ResultWithMeta;
-import com.ragagent.agent.tool.DocChunkSupport;
+import com.ragagent.platform.knowledge.DocChunkSupport;
 
 import static com.ragagent.agenttools.knowledge.KnowledgeSearchTool.nz;
 
@@ -206,8 +206,8 @@ final class KnowledgeSearchOutputFormatter {
                 ob.append(String.format(Locale.ROOT, "<content>%s</content>\n", nz(result.sr.content)));
 
                 if (!nz(result.sr.imageInfo).isEmpty()) {
-                    List<ImageInfoView> imageInfos = parseImageInfoList(result.sr.imageInfo);
-                    for (ImageInfoView img : imageInfos) {
+                    List<ImageInfoRow> imageInfos = parseImageInfoList(result.sr.imageInfo);
+                    for (ImageInfoRow img : imageInfos) {
                         String md = DocChunkSupport.buildImageInfoMarkdownWithURL(img.url(), img);
                         if (!md.isEmpty()) {
                             ob.append(md).append('\n');
@@ -240,7 +240,7 @@ final class KnowledgeSearchOutputFormatter {
 
             if (!nz(result.sr.imageInfo).isEmpty()) {
                 List<Map<String, String>> imageList = new ArrayList<>();
-                for (ImageInfoView img : parseImageInfoList(result.sr.imageInfo)) {
+                for (ImageInfoRow img : parseImageInfoList(result.sr.imageInfo)) {
                     Map<String, String> imgData = new LinkedHashMap<>();
                     if (!nz(img.url()).isEmpty()) {
                         imgData.put("url", img.url());
@@ -312,8 +312,8 @@ final class KnowledgeSearchOutputFormatter {
     }
 
     /** ImageInfo JSON 解析（url/caption/ocr_text 数组）。 */
-    static List<ImageInfoView> parseImageInfoList(String imageInfoJson) {
-        List<ImageInfoView> out = new ArrayList<>();
+    static List<ImageInfoRow> parseImageInfoList(String imageInfoJson) {
+        List<ImageInfoRow> out = new ArrayList<>();
         JsonNode arr;
         try {
             arr = KnowledgeSearchTool.RecordingSupportHolder.MAPPER.readTree(imageInfoJson);
@@ -324,7 +324,7 @@ final class KnowledgeSearchOutputFormatter {
             return out;
         }
         for (JsonNode img : arr) {
-            out.add(new ImageInfoView(img.path("url").asText(""),
+            out.add(new ImageInfoRow(img.path("url").asText(""),
                     img.path("caption").asText(""), img.path("ocrText").asText("")));
         }
         return out;

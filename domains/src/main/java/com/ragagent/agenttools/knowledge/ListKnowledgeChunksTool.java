@@ -8,15 +8,15 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.agent.tool.DocChunkSupport.ChunkPage;
-import com.ragagent.agent.tool.DocChunkSupport.ImageInfoCollector;
-import com.ragagent.agent.tool.DocChunkSupport.ImageInfoView;
-import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoReader;
-import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoView;
-import com.ragagent.agent.tool.DocChunkSupport.PagedChunks;
+import com.ragagent.platform.knowledge.DocChunkSupport.ChunkPage;
+import com.ragagent.platform.knowledge.DocChunkSupport.ImageInfoCollector;
+import com.ragagent.platform.knowledge.DocChunkSupport.ImageInfoRow;
+import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoReader;
+import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoRow;
+import com.ragagent.platform.knowledge.DocChunkSupport.PagedChunks;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.platform.tool.BaseTool;
-import com.ragagent.agent.tool.DocChunkSupport;
+import com.ragagent.platform.knowledge.DocChunkSupport;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.ToolDefinitions;
@@ -113,7 +113,7 @@ public class ListKnowledgeChunksTool extends BaseTool {
             return failure("one of faq_id, chunk_id, or knowledge_id is required");
         }
 
-        KnowledgeInfoView knowledge;
+        KnowledgeInfoRow knowledge;
         try {
             SearchAuth.authorizeKnowledgeInSearchTargets(searchTargets, knowledgeID,
                     DocChunkSupport.asScopeReader(knowledgeReader));
@@ -206,10 +206,10 @@ public class ListKnowledgeChunksTool extends BaseTool {
 
             String imageInfo = c.imageInfo();
             if (imageInfo != null && !imageInfo.isEmpty()) {
-                List<ImageInfoView> imageInfos = DocChunkSupport.parseImageInfoList(imageInfo);
+                List<ImageInfoRow> imageInfos = DocChunkSupport.parseImageInfoList(imageInfo);
                 if (imageInfos != null && !imageInfos.isEmpty()) {
                     List<Map<String, String>> imageList = new ArrayList<>();
-                    for (ImageInfoView img : imageInfos) {
+                    for (ImageInfoRow img : imageInfos) {
                         Map<String, String> imgData = new LinkedHashMap<>();
                         if (img.url() != null && !img.url().isEmpty()) {
                             imgData.put("url", img.url());
@@ -325,7 +325,7 @@ public class ListKnowledgeChunksTool extends BaseTool {
         if (knowledgeReader == null) {
             return "";
         }
-        KnowledgeInfoView knowledge;
+        KnowledgeInfoRow knowledge;
         try {
             knowledge = knowledgeReader.byIdOnly(knowledgeID);
         } catch (RuntimeException e) {
@@ -391,11 +391,11 @@ public class ListKnowledgeChunksTool extends BaseTool {
         if (imageInfo == null || imageInfo.isEmpty()) {
             return;
         }
-        List<ImageInfoView> imageInfos = DocChunkSupport.parseImageInfoList(imageInfo);
+        List<ImageInfoRow> imageInfos = DocChunkSupport.parseImageInfoList(imageInfo);
         if (imageInfos == null || imageInfos.isEmpty()) {
             return;
         }
-        for (ImageInfoView img : imageInfos) {
+        for (ImageInfoRow img : imageInfos) {
             String md = DocChunkSupport.buildImageInfoMarkdownWithURL(img.url(), img);
             if (!md.isEmpty()) {
                 b.append(md).append('\n');

@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.agent.tool.DocChunkSupport.ChunkPage;
-import com.ragagent.agent.tool.DocChunkSupport.ImageInfoCollector;
-import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoReader;
-import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoView;
-import com.ragagent.agent.tool.DocChunkSupport.PagedChunks;
+import com.ragagent.platform.knowledge.DocChunkSupport.ChunkPage;
+import com.ragagent.platform.knowledge.DocChunkSupport.ImageInfoCollector;
+import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoReader;
+import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoRow;
+import com.ragagent.platform.knowledge.DocChunkSupport.PagedChunks;
 import com.ragagent.contract.agent.SearchAuth.TagView;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.agenttools.knowledge.GetDocumentInfoTool;
@@ -43,11 +43,11 @@ class DocToolsRecordingTest {
     // ==================== Fakes ====================
 
     static final class FakeKnowledge implements KnowledgeInfoReader {
-        final Map<String, KnowledgeInfoView> byID = new LinkedHashMap<>();
+        final Map<String, KnowledgeInfoRow> byID = new LinkedHashMap<>();
         final Map<String, RuntimeException> byIDErr = new LinkedHashMap<>();
 
         @Override
-        public KnowledgeInfoView byIdOnly(String knowledgeId) {
+        public KnowledgeInfoRow byIdOnly(String knowledgeId) {
             RuntimeException err = byIDErr.get(knowledgeId);
             if (err != null) {
                 throw err;
@@ -146,15 +146,15 @@ class DocToolsRecordingTest {
         FakeKnowledge kn = new FakeKnowledge();
         Map<String, Object> md = new LinkedHashMap<>();
         md.put("作者", "张三");
-        kn.byID.put("d1", new KnowledgeInfoView("d1", 10002, "kb1", "源文档一", "",
+        kn.byID.put("d1", new KnowledgeInfoRow("d1", 10002, "kb1", "源文档一", "",
                 "file", "upload", "report.pdf", "pdf", 2048, "completed", md));
-        kn.byID.put("d2", new KnowledgeInfoView("d2", 10002, "kb1", "网页文档", "",
+        kn.byID.put("d2", new KnowledgeInfoRow("d2", 10002, "kb1", "网页文档", "",
                 "url", "https://example.com/a", "", "", 0, "processing", null));
-        kn.byID.put("ds1", new KnowledgeInfoView("ds1", 10002, "kb1", "小文件", "",
+        kn.byID.put("ds1", new KnowledgeInfoRow("ds1", 10002, "kb1", "小文件", "",
                 "file", "", "a.bin", "bin", 512, "pending", null));
-        kn.byID.put("ds2", new KnowledgeInfoView("ds2", 10002, "kb1", "无大小", "",
+        kn.byID.put("ds2", new KnowledgeInfoRow("ds2", 10002, "kb1", "无大小", "",
                 "file", "", "b.bin", "bin", 0, "failed", null));
-        kn.byID.put("ds3", new KnowledgeInfoView("ds3", 10002, "kb1", "三兆文件", "",
+        kn.byID.put("ds3", new KnowledgeInfoRow("ds3", 10002, "kb1", "三兆文件", "",
                 "file", "", "c.bin", "bin", 3 * 1024 * 1024, "success", null));
         kn.byIDErr.put("d9", new RuntimeException("db exploded"));
         return kn;
