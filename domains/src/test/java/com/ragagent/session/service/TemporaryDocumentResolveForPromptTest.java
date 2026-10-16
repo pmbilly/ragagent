@@ -22,6 +22,7 @@ import com.ragagent.contract.model.AsrTranscriber;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.knowledge.DocumentChunkingPort;
+import com.ragagent.platform.knowledge.ImageRefRewriter;
 
 /**
  * ResolveForPrompt + 图片落地（含 docreader 图片分支）的行为验收。
@@ -412,8 +413,8 @@ class TemporaryDocumentResolveForPromptTest {
         assertThat(TemporaryDocumentService.isImageFormat(".PNG")).isTrue();
         assertThat(TemporaryDocumentService.isImageFormat("webp")).isTrue();
         assertThat(TemporaryDocumentService.isImageFormat(".pdf")).isFalse();
-        assertThat(TemporaryDocumentProcessor.extFromMime("image/jpeg")).isEqualTo(".jpg");
-        assertThat(TemporaryDocumentProcessor.extFromMime("image/tiff")).isEmpty();
+        assertThat(ImageRefRewriter.extFromMime("image/jpeg")).isEqualTo(".jpg");
+        assertThat(ImageRefRewriter.extFromMime("image/tiff")).isEmpty();
     }
 
     @Test

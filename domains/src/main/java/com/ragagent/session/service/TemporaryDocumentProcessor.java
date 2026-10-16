@@ -29,6 +29,7 @@ import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.session.service.TemporaryDocumentService.CreateOptions;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.platform.knowledge.ImageRefRewriter;
 import com.ragagent.platform.web.JsonMappers;
 
 /**
@@ -78,9 +79,6 @@ final class TemporaryDocumentProcessor {
 
     private static final int CHUNK_SIZE = 1600;
     private static final int CHUNK_OVERLAP = 160;
-    /** 图标过滤阈值（最小边长 / 最小字节数）。 */
-    static final int MIN_IMAGE_DIMENSION = 64;
-    static final int MIN_IMAGE_BYTES = 512;
     /** 解析任务的单线程 executor（任务串行消费）。 */
     private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "temporary-document-worker");
@@ -160,7 +158,7 @@ final class TemporaryDocumentProcessor {
                 StoredImages stored = storeDocumentImages(tenantId, document, parsed.imageRefs(),
                         parsed.markdown());
                 content = stored.markdown();
-                metadata = new java.util.LinkedHashMap<>();
+                metadata = new LinkedHashMap<>();
                 metadata.put("parser", engine.isEmpty() ? "document_reader" : engine);
                 imageRefs = stored.imageRefsJson();
             }
@@ -269,107 +267,32 @@ final class TemporaryDocumentProcessor {
     /**
      * 处理 docreader 直出 {@code ImageRefs}：落盘 + 改写 markdown 引用。
      *
-     * <p><b>本批收敛</b>：只处理带内联字节的 ImageRef——这是聊天附件的唯一来源
-     * （docreader 的 ImageParser 对图片产 {@code ![](images/x.png)} + inline bytes，
-     * main.py 的 {@code _resolve_images} 恒填 {@code image_data} 不用 storage_key）；
-     * data URI / HTML data URI / bare base64 / 相对路径 HTML 四路（KB 文档解析场景的
-     * 边角）备案不实现。</p>
-     *
-     * <p><b>图标过滤</b>（两轴均 &lt; 64，或解不开且 &lt; 512 字节）只作用于非图片附件——
-     * gRPC 侧拿不到上游"原图"标记，以"来源文件本身是图片格式"等价判定。</p>
+     * <p>只处理带内联字节的引用（聊天附件的唯一来源：docreader 的 ImageParser 产
+     * {@code ![](images/x.png)} 并恒填 image_data）；data URI / HTML data URI /
+     * bare base64 / 相对路径 HTML 四路不在范围内。</p>
      */
     StoredImages storeDocumentImages(long tenantId, TemporaryDocument document,
             List<DocReaderParsePort.ImageRefView> refs, String markdown) {
         if (refs == null || refs.isEmpty()) {
             return new StoredImages(markdown, "[]");
         }
-        Map<String, DocReaderParsePort.ImageRefView> refMap = new LinkedHashMap<>();
+        List<ImageRefRewriter.RefRow> rows = new ArrayList<>(refs.size());
         for (DocReaderParsePort.ImageRefView ref : refs) {
-            if (ref.originalRef() != null && !ref.originalRef().isEmpty()) {
-                refMap.put(ref.originalRef(), ref);
-            }
+            rows.add(new ImageRefRewriter.RefRow(ref.originalRef(), ref.filename(),
+                    ref.mimeType(), ref.imageData()));
         }
-        boolean isOriginalDocument = TemporaryDocumentService.isImageFormat(document.getFileType());
-        Map<String, String> savedByFilename = new java.util.HashMap<>();
-        List<String> jsonItems = new ArrayList<>();
-
-        // 按 markdown 里出现的图片目标逐个处理，
-        // 命中 refMap 才落盘并改写引用；未被引用的 ref 不落盘。
-        java.util.regex.Pattern target = java.util.regex.Pattern.compile(
-                "(!\\[[^\\]]*\\]\\()\\s*(<[^>]*>|[^)]*?)\\s*(?:\"[^\"]*\"\\s*)?\\)");
-        java.util.regex.Matcher m = target.matcher(markdown);
-        StringBuilder out = new StringBuilder();
-        while (m.find()) {
-            String rawPath = m.group(2);
-            String path = rawPath.startsWith("<") && rawPath.endsWith(">")
-                    ? rawPath.substring(1, rawPath.length() - 1) : rawPath;
-            DocReaderParsePort.ImageRefView ref = refMap.get(path);
-            if (ref == null || ref.imageData() == null || ref.imageData().length == 0) {
-                continue; // 无内联字节 → 原样保留
-            }
-            byte[] bytes = ref.imageData();
-            if (!isOriginalDocument && isIconImage(bytes)) {
-                continue; // 图标/装饰元素过滤
-            }
-            String servingUrl = savedByFilename.get(ref.filename());
-            if (servingUrl == null) {
-                String ext = extFromMime(ref.mimeType());
-                if (ext.isEmpty()) {
-                    ext = TemporaryDocumentService.extOf(ref.filename());
-                }
-                if (ext.isEmpty()) {
-                    ext = ".png";
-                }
-                try {
-                    servingUrl = fileStore.saveBytes(bytes, tenantId,
-                            java.util.UUID.randomUUID() + ext);
-                } catch (RuntimeException e) {
-                    log.warn("failed to save image {}: {}", path, e.getMessage());
-                    continue; // 写失败只 WARN 继续
-                }
-                if (ref.filename() != null && !ref.filename().isEmpty()) {
-                    savedByFilename.put(ref.filename(), servingUrl);
-                }
-            }
-            jsonItems.add("{\"originalRef\":" + quote(path)
-                    + ",\"url\":" + quote(servingUrl)
-                    + ",\"mimeType\":" + quote(ref.mimeType() == null ? "" : ref.mimeType()) + "}");
-            // 只换路径本体：保留原目标的尾部（空白 / title / 右括号）
-            String tail = m.group(0).substring(m.end(2) - m.start());
-            m.appendReplacement(out,
-                    java.util.regex.Matcher.quoteReplacement(m.group(1) + servingUrl + tail));
+        // 来源文件本身是图片格式时保留原图（不做小图标过滤）
+        ImageRefRewriter.Result result = ImageRefRewriter.rewrite(markdown, rows,
+                !TemporaryDocumentService.isImageFormat(document.getFileType()),
+                (data, fileName) -> fileStore.saveBytes(data, tenantId, fileName));
+        List<String> jsonItems = new ArrayList<>(result.stored().size());
+        for (ImageRefRewriter.StoredRef stored : result.stored()) {
+            jsonItems.add("{\"originalRef\":" + quote(stored.originalRef())
+                    + ",\"url\":" + quote(stored.servingRef())
+                    + ",\"mimeType\":" + quote(stored.mimeType() == null ? "" : stored.mimeType())
+                    + "}");
         }
-        m.appendTail(out);
-        String updated = jsonItems.isEmpty() ? markdown : out.toString();
-        return new StoredImages(updated, "[" + String.join(",", jsonItems) + "]");
-    }
-    /** 解码尺寸两轴均 &lt; 64 视为图标；解码失败回退字节数 &lt; 512。 */
-    static boolean isIconImage(byte[] data) {
-        try {
-            java.awt.image.BufferedImage image = javax.imageio.ImageIO.read(
-                    new java.io.ByteArrayInputStream(data));
-            if (image == null) {
-                return data.length < MIN_IMAGE_BYTES;
-            }
-            return image.getWidth() < MIN_IMAGE_DIMENSION && image.getHeight() < MIN_IMAGE_DIMENSION;
-        } catch (Exception e) {
-            return data.length < MIN_IMAGE_BYTES;
-        }
-    }
-    /** MIME 类型 → 图片扩展名。 */
-    static String extFromMime(String mime) {
-        if (mime == null) {
-            return "";
-        }
-        return switch (mime) {
-            case "image/png" -> ".png";
-            case "image/jpeg" -> ".jpg";
-            case "image/gif" -> ".gif";
-            case "image/webp" -> ".webp";
-            case "image/bmp" -> ".bmp";
-            case "image/svg+xml" -> ".svg";
-            default -> "";
-        };
+        return new StoredImages(result.markdown(), "[" + String.join(",", jsonItems) + "]");
     }
     /** 替换非法 UTF-8 序列（REPLACE 语义）。 */
     static String cleanInvalidUtf8(String value) {
