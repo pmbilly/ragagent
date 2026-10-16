@@ -52,6 +52,7 @@ import com.ragagent.contract.event.payload.ToolApprovalResolvedData;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.event.payload.UserMessageInjectedData;
 import com.ragagent.contract.tenant.WebSearchConfig;
+import com.ragagent.contract.tenant.ParserEngineConfig;
 import com.ragagent.contract.auth.UserPreferences;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.PromptCacheStatus;
@@ -108,6 +109,7 @@ public final class ContractJsonModule extends SimpleModule {
         setMixInAnnotation(UserMessageInjectedData.class, ContractJsonMixinsEvent.UserMessageInjectedDataMixin.class);
         setMixInAnnotation(UserPreferences.class, ContractJsonMixinsAuth.UserPreferencesMixin.class);
         setMixInAnnotation(WebSearchConfig.class, ContractJsonMixinsCore.WebSearchConfigMixin.class);
+        setMixInAnnotation(ParserEngineConfig.class, ContractJsonMixinsCore.ParserEngineConfigMixin.class);
         setMixInAnnotation(APIPrincipalConfig.class, ContractJsonMixinsTenant.APIPrincipalConfigMixin.class);
         setMixInAnnotation(ChatHistoryConfig.class, ContractJsonMixinsTenant.ChatHistoryConfigMixin.class);
         setMixInAnnotation(RetrievalConfig.class, ContractJsonMixinsTenant.RetrievalConfigMixin.class);

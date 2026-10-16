@@ -91,7 +91,7 @@ FROZEN_PREFIXES = (
     # （前缀冻结在换包时静默失效——本文件开头已记过两次，这是第三次实战）
     'contract/model/ResponseType', 'contract/model/TokenUsage', 'contract/model/PromptCacheStatus',
     'contract/tool/ToolResult',
-    'llm/', 'modelruntime/', 'platform/tenant',
+    'llm/', 'modelruntime/', 'platform/tenant', 'contract/tenant/ParserEngineConfig',
     'contract/retrieval/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
     'memory/service/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
     'platform/tracing/langfuse', 'tracing/decorators', 'retrieval/engine/doris', 'retrieval/domain/ImageInfo',

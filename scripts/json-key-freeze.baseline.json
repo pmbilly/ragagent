@@ -105,7 +105,6 @@
     "modelruntime/adapter/provider/chat/anthropic/AnthropicToolChoice.java": "modelruntime/",
     "modelruntime/adapter/provider/chat/common/ProviderAdapters.java": "modelruntime/",
     "modelruntime/adapter/provider/chat/common/ThinkingStrategies.java": "modelruntime/",
-    "platform/tenant/ParserEngineConfig.java": "platform/tenant",
     "platform/tracing/langfuse/LangfuseHttpInterceptor.java": "platform/tracing/langfuse",
     "platform/tracing/langfuse/LangfuseTaskScope.java": "platform/tracing/langfuse",
     "platform/tracing/langfuse/LangfuseTokenUsage.java": "platform/tracing/langfuse",

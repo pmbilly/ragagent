@@ -1,6 +1,6 @@
 package com.ragagent.tenant.repository;
 
-import com.ragagent.platform.tenant.ParserEngineConfig;
+import com.ragagent.contract.tenant.ParserEngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -251,8 +251,8 @@ class TenantConfigRedactionTest {
         ParserEngineConfig existing = new ParserEngineConfig();
         existing.setMineruApiKey("old-mineru");
         existing.setPaddleOcrVlCloudToken("old-paddle");
-        List<com.fasterxml.jackson.databind.JsonNode> inheritedRules =
-                List.of(new com.fasterxml.jackson.databind.ObjectMapper().createObjectNode());
+        List<Object> inheritedRules =
+                List.of((Object) new com.fasterxml.jackson.databind.ObjectMapper().createObjectNode());
         existing.setChatParserEngineRules(inheritedRules);
 
         ParserEngineConfig incoming = new ParserEngineConfig();

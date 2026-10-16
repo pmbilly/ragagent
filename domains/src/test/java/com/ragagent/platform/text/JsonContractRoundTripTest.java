@@ -125,7 +125,7 @@ import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.evaluation.dto.EvaluationDtos;
 import com.ragagent.system.domain.SystemSetting;
 import com.ragagent.contract.tenant.ChatHistoryConfig;
-import com.ragagent.platform.tenant.ParserEngineConfig;
+import com.ragagent.contract.tenant.ParserEngineConfig;
 import com.ragagent.contract.tenant.RetrievalConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;

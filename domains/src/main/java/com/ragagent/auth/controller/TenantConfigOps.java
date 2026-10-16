@@ -7,7 +7,7 @@ import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.tenant.ChatHistoryConfig;
-import com.ragagent.platform.tenant.ParserEngineConfig;
+import com.ragagent.contract.tenant.ParserEngineConfig;
 import com.ragagent.contract.tenant.RetrievalConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.auth.domain.TenantConfigRedaction;
