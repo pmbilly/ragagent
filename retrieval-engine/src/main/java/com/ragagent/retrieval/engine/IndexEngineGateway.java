@@ -61,6 +61,12 @@ public class IndexEngineGateway implements IndexEngineResolver {
         return new PostgresAdapter(pgVectorEngineRepository);
     }
 
+    @Override
+    public void verifyBinding(long tenantId, String vectorStoreId) {
+        RetrieveEngineFactories.verifyBinding(retrieveEngineRegistry, storeOwnership,
+                tenantId, vectorStoreId);
+    }
+
     private static IndexEngine wrap(CompositeRetrieveEngine engine) {
         return engine == null ? null : new Adapter(engine);
     }

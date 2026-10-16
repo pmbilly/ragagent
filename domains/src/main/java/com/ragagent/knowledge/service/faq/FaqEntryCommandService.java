@@ -36,7 +36,7 @@ import com.ragagent.knowledge.domain.access.FaqGuard;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsUpdate;
-import com.ragagent.retrieval.engine.VectorStoreService;
+import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -62,7 +62,7 @@ public class FaqEntryCommandService {
     private final KnowledgeRepository knowledgeRepository;
     private final KnowledgeTagRepository tagRepository;
     private final FaqImportTaskStore taskStore;
-    private final VectorStoreService vectorStore;
+    private final VectorIndexStore vectorStore;
     private final KnowledgeVectorWrites vectorWrites;
     private final AuditWritePort auditWriter;
     private final FaqGuard faqGuard;
@@ -73,7 +73,7 @@ public class FaqEntryCommandService {
                                   KnowledgeRepository knowledgeRepository,
                                   KnowledgeTagRepository tagRepository,
                                   FaqImportTaskStore taskStore,
-                                  VectorStoreService vectorStore,
+                                  VectorIndexStore vectorStore,
                                   KnowledgeVectorWrites vectorWrites,
                                   AuditWritePort auditWriter,
                                   FaqGuard faqGuard,

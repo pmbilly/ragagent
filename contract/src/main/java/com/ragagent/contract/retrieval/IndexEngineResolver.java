@@ -32,4 +32,12 @@ public interface IndexEngineResolver {
      * 调用方在 KB 未绑 store 时用它保持既有直连路径。</p>
      */
     IndexEngine postgresDirect();
+
+    /**
+     * 校验"某向量店属于某租户"（不改任何状态，纯校验）。
+     *
+     * <p>归属校验是引擎知识（含跨租户 IDOR 纵深防御），收在实现侧一处；
+     * 失败抛 {@link RetrieveEngineException}（调用方按 kind 分类处理）。</p>
+     */
+    void verifyBinding(long tenantId, String vectorStoreId);
 }

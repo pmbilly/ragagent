@@ -34,11 +34,9 @@ import com.ragagent.knowledge.repository.UserKbPinRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import com.ragagent.contract.retrieval.IndexEngineResolver;
 import com.ragagent.contract.retrieval.RetrieveEngineException;
-import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
-import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.retrieval.engine.RetrieveEngineFactories;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -65,8 +63,7 @@ public class KnowledgeBaseService
     private final TenantConfigLookup tenantConfigLookup;
     private final UserNameLookup userNameLookup;
     private final String retrieveDriver;
-    private final RetrieveEngineRegistry retrieveEngineRegistry;
-    private final TenantStoreOwnership storeOwnership;
+    private final IndexEngineResolver indexEngineResolver;
 
     public KnowledgeBaseService(KnowledgeBaseRepository kbRepository,
                                 KnowledgeRepository knowledgeRepository,
@@ -75,8 +72,7 @@ public class KnowledgeBaseService
                                 StorageBackendPort storageBackendPort,
                                 TenantConfigLookup tenantConfigLookup,
                                 UserNameLookup userNameLookup,
-                                RetrieveEngineRegistry retrieveEngineRegistry,
-                                TenantStoreOwnership storeOwnership,
+                                IndexEngineResolver indexEngineResolver,
                                 RetrievalDriverProperties driverProperties) {
         this.kbRepository = kbRepository;
         this.knowledgeRepository = knowledgeRepository;
@@ -85,8 +81,7 @@ public class KnowledgeBaseService
         this.storageBackendPort = storageBackendPort;
         this.tenantConfigLookup = tenantConfigLookup;
         this.userNameLookup = userNameLookup;
-        this.retrieveEngineRegistry = retrieveEngineRegistry;
-        this.storeOwnership = storeOwnership;
+        this.indexEngineResolver = indexEngineResolver;
         String env = driverProperties.driver();
         this.retrieveDriver = env == null || env.isBlank() ? "postgres" : env;
     }
@@ -148,8 +143,7 @@ public class KnowledgeBaseService
                     "vector store not found", null, 400));
         }
         try {
-            RetrieveEngineFactories.verifyBinding(
-                    retrieveEngineRegistry, storeOwnership, tenantId, storeId);
+            indexEngineResolver.verifyBinding(tenantId, storeId);
         } catch (RuntimeException err) {
             if (err instanceof RetrieveEngineException re) {
                 switch (re.kind()) {
