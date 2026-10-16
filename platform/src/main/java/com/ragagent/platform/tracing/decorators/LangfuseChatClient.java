@@ -26,7 +26,7 @@ import com.ragagent.contract.model.chat.ChatTool;
 /**
  * chat 客户端的 langfuse 装饰器：
  * 每次 Chat/ChatStream 发一条 generation 观测（消息输入、模型参数、输出、用量）。
- * 由 {@code ModelRuntimePort.getChatModel} 在管理器启用时装配。
+ * 由 {@code ModelRuntime.getChatModel} 在管理器启用时装配。
  * 未启用时 {@link #wrap} 原样返回，零成本。
  *
  * <p><b>已知差异（备案）</b>：调用点未携带 call_purpose / prompt_prefix_fingerprint

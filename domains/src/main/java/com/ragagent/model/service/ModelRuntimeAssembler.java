@@ -22,8 +22,8 @@ import org.springframework.stereotype.Component;
 import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
 import com.ragagent.platform.tracing.decorators.LangfuseEmbedder;
 import com.ragagent.platform.tracing.decorators.LangfuseReranker;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
-import com.ragagent.retrieval.vlm.VlmClient.VlmConfig;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.model.VlmConfig;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
@@ -43,7 +43,7 @@ import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
  * （BizException 的 getMessage 带 "error code: ..." 前缀，不能直接当对外文案用）。</p>
  */
 @Component
-public class ModelRuntimeAssembler implements ModelRuntimePort {
+public class ModelRuntimeAssembler implements ModelRuntime {
 
     private static final Logger log = LoggerFactory.getLogger(ModelRuntimeAssembler.class);
 

@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
@@ -81,7 +81,7 @@ public class TemporaryDocumentService {
     public TemporaryDocumentService(TemporaryDocumentRepository repo,
                                     AttachmentFileStore fileStore,
                                     DocReaderParsePort docReader,
-                                    ModelRuntimePort modelRuntimeAssembler,
+                                    ModelRuntime modelRuntimeAssembler,
                                     AsrTranscriber asrTranscriber,
                                     TenantConfigLookup tenantService,
                                     DocumentChunkingPort documentChunking) {

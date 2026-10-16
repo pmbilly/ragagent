@@ -24,7 +24,7 @@ import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.contract.model.ModelParameters;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
@@ -43,7 +43,7 @@ class TemporaryDocumentProcessContractTest {
     private TemporaryDocumentRepository repo;
     private AttachmentFileStore fileStore;
     private DocReaderParsePort docReader;
-    private ModelRuntimePort modelRuntimeAssembler;
+    private ModelRuntime modelRuntimeAssembler;
     private AsrTranscriber asrTranscriber;
     private TenantConfigLookup tenantService;
     private TemporaryDocumentService service;
@@ -53,7 +53,7 @@ class TemporaryDocumentProcessContractTest {
         repo = mock(TemporaryDocumentRepository.class);
         fileStore = mock(AttachmentFileStore.class);
         docReader = mock(DocReaderParsePort.class);
-        modelRuntimeAssembler = mock(ModelRuntimePort.class);
+        modelRuntimeAssembler = mock(ModelRuntime.class);
         asrTranscriber = mock(AsrTranscriber.class);
         tenantService = mock(TenantConfigLookup.class);
         service = new TemporaryDocumentService(repo, fileStore, docReader,

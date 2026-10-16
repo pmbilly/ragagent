@@ -20,7 +20,7 @@ import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.model.domain.Model;
 import com.ragagent.contract.model.ModelParameters;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.retrieval.vlm.VlmClient;
 import com.ragagent.model.service.ModelRuntimeAssembler;
@@ -38,7 +38,7 @@ class VlmDescriberWiringTest {
 
     private final List<String> requestedUrls = new ArrayList<>();
 
-    private ModelRuntimePort runtimeFactory() {
+    private ModelRuntime runtimeFactory() {
         // ollama provider 在 VLM 路径不触达；vlm 面不需要它
         return new ModelRuntimeAssembler(modelService, cryptoService,
                 null, governor, ssrfGuard);

@@ -15,7 +15,7 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.retrieval.engine.PgVectorEngineRepository;
 import org.springframework.stereotype.Service;
 import com.ragagent.contract.graph.NameSpace;
@@ -41,7 +41,7 @@ public class KnowledgeMoveService {
     private final ChunkRepository chunkRepo;
     private final KnowledgeTagRepository tagRepository;
     private final TenantStorageQuotaPort tenantStorage;
-    private final ModelRuntimePort modelRuntimeAssembler;
+    private final ModelRuntime modelRuntimeAssembler;
     private final KnowledgeIngest knowledgeIngest;
     private final KnowledgeTaskProgressStore progressStore;
     private final KnowledgeVectorWrites vectorWrites;
@@ -56,7 +56,7 @@ public class KnowledgeMoveService {
             ChunkRepository chunkRepo,
             KnowledgeTagRepository tagRepository,
             TenantStorageQuotaPort tenantStorage,
-            ModelRuntimePort modelRuntimeAssembler,
+            ModelRuntime modelRuntimeAssembler,
             KnowledgeIngest knowledgeIngest,
             KnowledgeTaskProgressStore progressStore,
             KnowledgeVectorWrites vectorWrites,

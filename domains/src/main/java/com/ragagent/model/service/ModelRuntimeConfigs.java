@@ -11,7 +11,7 @@ import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.rerank.RerankerConfig;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import com.ragagent.retrieval.vlm.VlmClient.VlmConfig;
+import com.ragagent.contract.model.VlmConfig;
 import com.ragagent.rerank.RerankerConfigs;
 import com.ragagent.embedding.EmbedderConfigs;
 

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.model.VlmConfig;
 import com.ragagent.llm.ollama.OllamaService;
 import com.sun.net.httpserver.HttpServer;
 
@@ -60,8 +61,8 @@ class VlmOllamaTest {
         return "http://127.0.0.1:" + server.getAddress().getPort();
     }
 
-    private static VlmClient.VlmConfig ollamaConfig() {
-        return new VlmClient.VlmConfig("local", "", "llava", "", "m1", "ollama", "",
+    private static VlmConfig ollamaConfig() {
+        return new VlmConfig("local", "", "llava", "", "m1", "ollama", "",
                 Map.of());
     }
 

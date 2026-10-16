@@ -21,7 +21,7 @@ import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -62,7 +62,7 @@ public class ChunkVectorIndexer {
     private final EmbedderClient embedder;
     private final VectorStoreService vectorStore;
     private final KnowledgeVectorWrites vectorWrites;
-    private final ModelRuntimePort modelRuntimeAssembler;
+    private final ModelRuntime modelRuntimeAssembler;
     /** 批量向量化批大小（属性绑定）。 */
     private final BatchEmbedProperties batchEmbedProperties;
 
@@ -72,7 +72,7 @@ public class ChunkVectorIndexer {
                               EmbedderClient embedder,
                               VectorStoreService vectorStore,
                               KnowledgeVectorWrites vectorWrites,
-                              ModelRuntimePort modelRuntimeAssembler,
+                              ModelRuntime modelRuntimeAssembler,
                               BatchEmbedProperties batchEmbedProperties) {
         this.kbRepository = kbRepository;
         this.knowledgeRepository = knowledgeRepository;

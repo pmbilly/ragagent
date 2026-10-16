@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.retrieval.vlm.VlmClient.VlmConfig;
+import com.ragagent.contract.model.VlmConfig;
 import com.ragagent.retrieval.vlm.VlmClient.VlmException;
 
 /**

@@ -28,7 +28,7 @@ import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.platform.access.TracingContext;
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 
@@ -98,7 +98,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private final KnowledgeVectorWrites vectorWrites;
     /** K10b 收敛：索引执行的唯一实现（worker 不再自建分批/IndexRow/IndexInfo）。 */
     private final ChunkVectorIndexer chunkVectorIndexer;
-    private final ModelRuntimePort modelRuntimeAssembler;
+    private final ModelRuntime modelRuntimeAssembler;
     private final ApplicationEventPublisher eventPublisher;
     private final SpanTracker spanTracker;
     /** 图库仓储：重处理前清旧图谱。 */
@@ -125,7 +125,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                                   ModelCatalogPort modelCatalog,
                                   KnowledgeVectorWrites vectorWrites,
                                   ChunkVectorIndexer chunkVectorIndexer,
-                                  ModelRuntimePort modelRuntimeAssembler,
+                                  ModelRuntime modelRuntimeAssembler,
                                   ApplicationEventPublisher eventPublisher,
                                   SpanTracker spanTracker,
                                   RetrieveGraphRepository graphRepository,

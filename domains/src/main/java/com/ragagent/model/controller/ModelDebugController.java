@@ -1,5 +1,6 @@
 package com.ragagent.model.controller;
 
+import com.ragagent.contract.model.VlmConfig;
 import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.model.dto.ModelDebugAsrResponse;
 import com.ragagent.model.dto.ModelDebugChatResponse;
 import com.ragagent.model.dto.ModelDebugResult;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
 import com.ragagent.contract.model.RankResult;
@@ -78,11 +79,11 @@ public class ModelDebugController {
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final ModelService modelService;
-    private final ModelRuntimePort runtimeFactory;
+    private final ModelRuntime runtimeFactory;
     private final AsrTranscriber asrTranscriber;
     private final VlmClient.Transport vlmTransport = new VlmHttpTransport();
 
-    public ModelDebugController(ModelService modelService, ModelRuntimePort runtimeFactory,
+    public ModelDebugController(ModelService modelService, ModelRuntime runtimeFactory,
                                 AsrTranscriber asrTranscriber) {
         this.modelService = modelService;
         this.runtimeFactory = runtimeFactory;
@@ -332,7 +333,7 @@ public class ModelDebugController {
         // 凭证 + 构造期校验：model 级凭证优先、租户回落；
         // ollama 不校验基址
         // ——与 agent 侧 VLM 装配共用 vlmConfigFor 同一实现。
-        VlmClient.VlmConfig config;
+        VlmConfig config;
         try {
             config = runtimeFactory.vlmConfigFor(vlmModel);
         } catch (RuntimeException e) {

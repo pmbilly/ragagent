@@ -25,7 +25,7 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 
 import org.slf4j.Logger;
@@ -69,7 +69,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
 
     static final int CHUNK_PREVIEW_RUNES = 200;
 
-    private final ModelRuntimePort modelRuntimeAssembler;
+    private final ModelRuntime modelRuntimeAssembler;
     private final ChunkRepository chunkRepository;
     private final KnowledgeRepository knowledgeRepository;
     private final KnowledgeBaseRepository kbRepository;
@@ -80,7 +80,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
 
     /** 生产构造器（Spring 装配；模板来源用 vendored extract 配置）。 */
     @Autowired
-    public ChunkExtractService(ModelRuntimePort modelRuntimeAssembler,
+    public ChunkExtractService(ModelRuntime modelRuntimeAssembler,
                                ChunkRepository chunkRepository,
                                KnowledgeRepository knowledgeRepository,
                                KnowledgeBaseRepository kbRepository,
@@ -92,7 +92,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
     }
 
     /** 测试可注入模板来源。 */
-    ChunkExtractService(ModelRuntimePort modelRuntimeAssembler,
+    ChunkExtractService(ModelRuntime modelRuntimeAssembler,
                         ChunkRepository chunkRepository,
                         KnowledgeRepository knowledgeRepository,
                         KnowledgeBaseRepository kbRepository,

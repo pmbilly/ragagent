@@ -20,7 +20,7 @@ import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.knowledge.DocumentChunkingPort;
 
 /**
@@ -50,7 +50,7 @@ class TemporaryDocumentResolveForPromptTest {
         if (service == null) {
             fileStore = new AttachmentFileStore(tempDir.toString());
             service = new TemporaryDocumentService(repo, fileStore, docReader,
-                    mock(ModelRuntimePort.class),
+                    mock(ModelRuntime.class),
                     mock(AsrTranscriber.class),
                     mock(TenantService.class),
                     chunkingStub());
@@ -62,7 +62,7 @@ class TemporaryDocumentResolveForPromptTest {
     private TemporaryDocumentProcessor processor() {
         service(); // 确保 fileStore（真实落盘目录）已建
         return new TemporaryDocumentProcessor(repo, fileStore, docReader,
-                mock(ModelRuntimePort.class),
+                mock(ModelRuntime.class),
                 mock(AsrTranscriber.class),
                 mock(TenantService.class),
                 chunkingStub());

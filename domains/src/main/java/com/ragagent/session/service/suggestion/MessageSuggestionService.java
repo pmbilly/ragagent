@@ -21,7 +21,7 @@ import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageExecutionContext;
 import com.ragagent.session.domain.message.MessageSuggestionEvent;
@@ -58,7 +58,7 @@ import com.ragagent.platform.tracing.langfuse.Span;
  *       否则落 DefaultLanguage（WEKNORA_LANGUAGE env，缺省 zh-CN）。</li>
  * </ol>
  *
- * <p>generate 全量覆盖（generateWithModel 经 ModelRuntimePort
+ * <p>generate 全量覆盖（generateWithModel 经 ModelRuntime
  * + generateFromKnowledge 经 CustomAgentService.getKnowledgeSuggestedQuestions）。</p>
  */
 @Service
@@ -84,11 +84,11 @@ public class MessageSuggestionService {
 
     private final MessageSuggestionRepository suggestionRepository;
     private final MessageService messageService;
-    private final ModelRuntimePort modelRuntimeAssembler;
+    private final ModelRuntime modelRuntimeAssembler;
     private final CustomAgentService customAgentService;
 
     public MessageSuggestionService(MessageSuggestionRepository suggestionRepository,
-            MessageService messageService, ModelRuntimePort modelRuntimeAssembler,
+            MessageService messageService, ModelRuntime modelRuntimeAssembler,
             CustomAgentService customAgentService) {
         this.suggestionRepository = suggestionRepository;
         this.messageService = messageService;

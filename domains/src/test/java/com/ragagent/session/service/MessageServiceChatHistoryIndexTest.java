@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
@@ -56,7 +56,7 @@ class MessageServiceChatHistoryIndexTest {
                 knowledgeCatalog,
                 tenantService,
                 mock(HybridSearchService.class),
-                mock(ModelRuntimePort.class));
+                mock(ModelRuntime.class));
         TenantContext.set(TENANT, null, null, false, "u-1", false);
     }
 

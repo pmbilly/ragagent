@@ -1,9 +1,10 @@
 package com.ragagent.session.service;
 
+import com.ragagent.contract.model.VlmConfig;
 import com.ragagent.agent.AgentEngine;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.limiter.Release;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.retrieval.vlm.VlmClient;
 import com.ragagent.retrieval.vlm.VlmHttpTransport;
 import com.ragagent.platform.tracing.decorators.LangfuseVlm;
@@ -26,7 +27,7 @@ import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 @Component
 public class VlmDescriberWiring {
 
-    private final ModelRuntimePort runtimeFactory;
+    private final ModelRuntime runtimeFactory;
     private final ConcurrencyGovernor concurrencyGovernor;
     private final VlmClient.Transport transport;
 
@@ -35,13 +36,13 @@ public class VlmDescriberWiring {
      * 显式 {@code @Autowired}——类里还有一个测试用的包内构造，不标注时 Spring 挑错构造。
      */
     @org.springframework.beans.factory.annotation.Autowired
-    public VlmDescriberWiring(ModelRuntimePort runtimeFactory,
+    public VlmDescriberWiring(ModelRuntime runtimeFactory,
             ConcurrencyGovernor concurrencyGovernor) {
         this(runtimeFactory, concurrencyGovernor, new VlmHttpTransport());
     }
 
     /** 测试接缝：出站通道注入（生产缺省 {@link VlmHttpTransport}）。 */
-    VlmDescriberWiring(ModelRuntimePort runtimeFactory, ConcurrencyGovernor concurrencyGovernor,
+    VlmDescriberWiring(ModelRuntime runtimeFactory, ConcurrencyGovernor concurrencyGovernor,
             VlmClient.Transport transport) {
         this.runtimeFactory = runtimeFactory;
         this.concurrencyGovernor = concurrencyGovernor;
@@ -54,7 +55,7 @@ public class VlmDescriberWiring {
      */
     public AgentEngine.ImageDescriberFunc create(String vlmModelId) {
         ModelRowView model = runtimeFactory.getVlmModel(vlmModelId);
-        VlmClient.VlmConfig config = runtimeFactory.vlmConfigFor(model);
+        VlmConfig config = runtimeFactory.vlmConfigFor(model);
         int limit = model.parameters() == null ? 0 : model.parameters().getMaxConcurrency();
         String modelName = model.name() == null ? "" : model.name();
         String modelId = model.id() == null ? "" : model.id();

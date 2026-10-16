@@ -23,7 +23,7 @@ import com.ragagent.knowledge.repository.FaqChunkRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
@@ -75,7 +75,7 @@ public class KnowledgeTagService {
     /** 绑定 store 的向量写路由（绑定 KB 的索引清理走引擎口）。 */
     private final KnowledgeVectorWrites vectorWrites;
     /** 引擎路径删除需要的维度解析（照 deleteKnowledgeVectors 的取数口径）。 */
-    private final ModelRuntimePort modelRuntimeAssembler;
+    private final ModelRuntime modelRuntimeAssembler;
     /**
  * 标签下文档的批量删除：直接依赖**真正的实现者**{@code KnowledgeBatchOpsService}。
  *
@@ -98,7 +98,7 @@ public class KnowledgeTagService {
                                AuditWritePort auditWriter,
                                VectorStoreService vectorStore,
                                KnowledgeVectorWrites vectorWrites,
-                               ModelRuntimePort modelRuntimeAssembler,
+                               ModelRuntime modelRuntimeAssembler,
                                KnowledgeBatchOpsService batchOpsService) {
         this.faqChunkRepository = faqChunkRepository;
 

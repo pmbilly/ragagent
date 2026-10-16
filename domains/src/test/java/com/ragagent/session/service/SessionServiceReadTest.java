@@ -16,7 +16,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.platform.settings.ConversationProperties;
@@ -48,7 +48,7 @@ class SessionServiceReadTest {
                 org.mockito.Mockito.mock(MessageSuggestionRepository.class),
                 org.mockito.Mockito.mock(KnowledgeCatalogPort.class),
                 org.mockito.Mockito.mock(ModelCatalogPort.class),
-                org.mockito.Mockito.mock(ModelRuntimePort.class),
+                org.mockito.Mockito.mock(ModelRuntime.class),
                 org.mockito.Mockito.mock(ConversationProperties.class),
                 org.mockito.Mockito.mock(
                         WebSearchTempStatePort.class));

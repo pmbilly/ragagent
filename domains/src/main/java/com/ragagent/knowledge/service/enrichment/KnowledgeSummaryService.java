@@ -32,7 +32,7 @@ import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.contract.retrieval.SearchChunkMerge;
 import com.ragagent.contract.wiki.WikiImageMarkup;
@@ -58,7 +58,7 @@ public class KnowledgeSummaryService {
     private final KnowledgeRepository knowledgeRepository;
     private final KnowledgeBaseRepository kbRepository;
     private final ChunkRepository chunkRepo;
-    private final ModelRuntimePort modelRuntimeAssembler;
+    private final ModelRuntime modelRuntimeAssembler;
     private final ChunkVectorIndexer chunkVectorIndexer;
     private final ConversationProperties conversationProps;
     private final KnowledgeAccessHelper access;
@@ -70,7 +70,7 @@ public class KnowledgeSummaryService {
                             KnowledgeRepository knowledgeRepository,
                             KnowledgeBaseRepository kbRepository,
                             ChunkRepository chunkRepo,
-                            ModelRuntimePort modelRuntimeAssembler,
+                            ModelRuntime modelRuntimeAssembler,
                             ChunkVectorIndexer chunkVectorIndexer,
                             ConversationProperties conversationProps,
                             KnowledgeAccessHelper access) {

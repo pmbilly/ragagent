@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.vlm;
 
+import com.ragagent.contract.model.VlmConfig;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -27,34 +28,6 @@ public final class VlmClient {
 
     private static final int DEFAULT_MAX_TOKS = 5000;
     private static final double DEFAULT_TEMP = 0.1;
-
-    /** VLM 消费面配置。 */
-    public record VlmConfig(String source, String baseUrl, String modelName, String apiKey,
-            String modelId, String interfaceType, String provider,
-            Map<String, String> extra) {
-
-        public double temperature() {
-            String v = extra == null ? null : extra.get("temperature");
-            if (v != null) {
-                try {
-                    return Double.parseDouble(v);
-                } catch (NumberFormatException ignored) {
-                    // 解析失败保持缺省
-                }
-            }
-            return DEFAULT_TEMP;
-        }
-
-        public boolean isOllama() {
-            // ConfigFromModel：interfaceType 空时 source==local → ollama，否则 openai
-            String ifType = interfaceType == null || interfaceType.isEmpty()
-                    ? ("local".equals(source) ? "ollama" : "openai")
-                    : interfaceType;
-            return "ollama".equals(ifType);
-        }
-    }
-
-
 
     private VlmClient() {
     }

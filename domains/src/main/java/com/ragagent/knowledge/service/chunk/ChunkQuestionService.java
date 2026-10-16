@@ -32,7 +32,7 @@ import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
     private final ChunkRepository chunkRepository;
     private final KnowledgeBaseRepository kbRepository;
     private final ChunkVectorIndexer chunkVectorIndexer;
-    private final ModelRuntimePort modelRuntimeAssembler;
+    private final ModelRuntime modelRuntimeAssembler;
     private final RetrieveEngineRegistry retrieveEngineRegistry;
     private final TenantStoreOwnership storeOwnership;
     private final TenantConfigLookup tenantConfigLookup;
@@ -74,7 +74,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
     public ChunkQuestionService(ChunkRepository chunkRepository,
                                 KnowledgeBaseRepository kbRepository,
                                 ChunkVectorIndexer chunkVectorIndexer,
-                                ModelRuntimePort modelRuntimeAssembler,
+                                ModelRuntime modelRuntimeAssembler,
                                 RetrieveEngineRegistry retrieveEngineRegistry,
                                 TenantStoreOwnership storeOwnership,
                                 TenantConfigLookup tenantConfigLookup,
@@ -242,7 +242,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
             throw BizException.badRequest("failed to create retrieve engine: " + e.getMessage());
         }
         //     "model ID cannot be empty" / "model not found"，经
-        //     ModelRuntimePort.getEmbeddingModel 的 RuntimeException 原文冒出）
+        //     ModelRuntime.getEmbeddingModel 的 RuntimeException 原文冒出）
         Embedder embeddingModel;
         try {
             embeddingModel = modelRuntimeAssembler.getEmbeddingModel(
