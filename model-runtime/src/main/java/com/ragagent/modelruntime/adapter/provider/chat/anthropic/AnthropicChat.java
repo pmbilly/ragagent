@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 import com.ragagent.modelruntime.adapter.provider.chat.PromptCache;
 import com.ragagent.modelruntime.adapter.provider.chat.common.LlmTransport;
 import com.ragagent.modelruntime.adapter.provider.chat.common.SseReader;
-import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;
+import com.ragagent.platform.stream.QueuedChatStream;
 
 /**
  * Anthropic Messages API 客户端。

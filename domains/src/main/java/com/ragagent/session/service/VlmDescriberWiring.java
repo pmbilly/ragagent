@@ -6,7 +6,7 @@ import com.ragagent.llm.limiter.Release;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.vlm.VlmClient;
 import com.ragagent.retrieval.vlm.VlmHttpTransport;
-import com.ragagent.tracing.decorators.LangfuseVlm;
+import com.ragagent.platform.tracing.decorators.LangfuseVlm;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 

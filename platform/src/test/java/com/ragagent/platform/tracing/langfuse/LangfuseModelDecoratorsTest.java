@@ -1,9 +1,9 @@
 package com.ragagent.platform.tracing.langfuse;
 
-import com.ragagent.tracing.decorators.LangfuseVlm;
-import com.ragagent.tracing.decorators.LangfuseReranker;
-import com.ragagent.tracing.decorators.LangfuseEmbedder;
-import com.ragagent.tracing.decorators.LangfuseChatClient;
+import com.ragagent.platform.tracing.decorators.LangfuseVlm;
+import com.ragagent.platform.tracing.decorators.LangfuseReranker;
+import com.ragagent.platform.tracing.decorators.LangfuseEmbedder;
+import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.contract.model.ChatStream;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;
+import com.ragagent.platform.stream.QueuedChatStream;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;

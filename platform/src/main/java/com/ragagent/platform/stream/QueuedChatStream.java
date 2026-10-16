@@ -1,4 +1,4 @@
-package com.ragagent.modelruntime.adapter.provider.chat.common;
+package com.ragagent.platform.stream;
 
 import java.util.concurrent.LinkedBlockingQueue;
 

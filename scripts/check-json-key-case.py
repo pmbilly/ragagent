@@ -94,7 +94,10 @@ FROZEN_PREFIXES = (
     'llm/', 'modelruntime/', 'platform/tenant', 'contract/tenant/ParserEngineConfig',
     'contract/retrieval/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
     'memory/service/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
-    'platform/tracing/langfuse', 'tracing/decorators', 'retrieval/engine/doris', 'websearch/ImageInfo',
+    'platform/tracing/langfuse', 'platform/tracing/decorators', 'retrieval/engine/doris', 'websearch/ImageInfo',
+    # R4a 换锚：6 个 Langfuse 装饰器（tracing/decorators → platform/tracing/decorators）——包名带上了
+    # platform 前缀，模块相对路径随之变化（与上一行同族；三件流句柄迁 platform/stream 无蛇键，不入册）。
+    # 键名本体未变（Langfuse metadata 是第三方观测面）。
     # ⚠️ 前缀冻结会在**换包**时静默失效（B168 实测 ✗）：B162 把 llm/TokenUsage 搬进 common/llm、
     # B163 把 6 个 Langfuse 装饰器从 tracing/langfuse 换包到 tracing/decorators ⇒ 旧前缀不再命中，
     # 冻结悄悄失效、CI 才报"非冻结面出现新的 snake 键"。**换包时务必回来核这里** ✓。

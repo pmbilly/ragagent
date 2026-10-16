@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingEmitter;
-import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;
+import com.ragagent.platform.stream.QueuedChatStream;
 
 /**
  * 本地 Ollama 聊天客户端。

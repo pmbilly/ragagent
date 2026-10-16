@@ -1,4 +1,4 @@
-package com.ragagent.tracing.decorators;
+package com.ragagent.platform.tracing.decorators;
 
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.LangfuseEnvProperties;

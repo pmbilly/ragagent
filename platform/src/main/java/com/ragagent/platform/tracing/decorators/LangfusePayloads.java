@@ -1,4 +1,4 @@
-package com.ragagent.tracing.decorators;
+package com.ragagent.platform.tracing.decorators;
 
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.platform.tracing.langfuse.LangfuseTokenUsage;

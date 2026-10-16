@@ -1,4 +1,4 @@
-package com.ragagent.tracing.decorators;
+package com.ragagent.platform.tracing.decorators;
 
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.platform.tracing.langfuse.LangfuseTokenUsage;
@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.ragagent.contract.model.ChatStream;
-import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;
+import com.ragagent.platform.stream.QueuedChatStream;
 
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;

@@ -881,7 +881,7 @@ class ArchitectureRulesTest {
             "redis.clients.",
             "jakarta.servlet.",
             "com.ragagent.platform.tracing.langfuse.",
-            "com.ragagent.tracing.decorators.");
+            "com.ragagent.platform.tracing.decorators.");
 
     @Test
     @DisplayName("A16：service 不得直接依赖边界层（controller/mapper/task/client/channel）")

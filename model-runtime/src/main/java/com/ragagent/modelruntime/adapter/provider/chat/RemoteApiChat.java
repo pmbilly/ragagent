@@ -32,7 +32,7 @@ import com.ragagent.llm.provider.ProviderRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingStrategies;
-import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;
+import com.ragagent.platform.stream.QueuedChatStream;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapters;
 import com.ragagent.modelruntime.adapter.provider.chat.common.LlmTransport;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingStrategy;
