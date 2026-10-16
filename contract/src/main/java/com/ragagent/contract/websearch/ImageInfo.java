@@ -1,33 +1,24 @@
-package com.ragagent.retrieval.domain;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package com.ragagent.contract.websearch;
 
 /**
  * 图片富化信息。
  *
- * <p>检索/富化链路的共享域类型，落 {@code retrieval.domain}。JSON 键为
- * snake_case，六个键恒输出（不做空值省略）。会落 jsonb（image_info 列经各 TypeHandler
- * 透传），故注解只管序列化形状。</p>
+ * <p>检索/富化链路的共享形状（上提契约面）。JSON 键为 snake_case，六个键恒输出
+ * （不做空值省略）；会落 jsonb（image_info 列经各 TypeHandler 透传）——
+ * 线格式注解由 {@code platform.web.ContractJsonMixinsWebSearch} 的 mixin 承载（契约面纯 JDK）。</p>
  */
-
 public class ImageInfo {
 
-    @JsonProperty("url")
     private String url = "";
 
-    @JsonProperty("original_url")
     private String originalUrl = "";
 
-    @JsonProperty("start_pos")
     private int startPos;
 
-    @JsonProperty("end_pos")
     private int endPos;
 
-    @JsonProperty("caption")
     private String caption = "";
 
-    @JsonProperty("ocr_text")
     private String ocrText = "";
 
     public String getUrl() { return url == null ? "" : url; }

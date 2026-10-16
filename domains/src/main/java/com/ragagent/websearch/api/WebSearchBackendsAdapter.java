@@ -9,8 +9,8 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.spi.WebSearchExecutor;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.retrieval.domain.WebSearchRequest;
-import com.ragagent.retrieval.domain.WebSearchResult;
+import com.ragagent.contract.websearch.WebSearchRequest;
+import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.websearch.service.WebSearchService;
 
 /**

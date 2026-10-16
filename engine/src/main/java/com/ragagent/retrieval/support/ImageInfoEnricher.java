@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.retrieval.domain.ImageInfo;
+import com.ragagent.contract.websearch.ImageInfo;
 
 /**
  * 图片信息与正文的互相富化：解析 chunk 的 {@code image_info} JSON，合并为数组，

@@ -18,7 +18,7 @@ import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
-import com.ragagent.retrieval.domain.WebSearchResult;
+import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.retrieval.support.WebResultConverter;
 import com.ragagent.contract.tenant.WebSearchConfig;
 

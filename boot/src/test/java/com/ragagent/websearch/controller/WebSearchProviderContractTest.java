@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import com.ragagent.TestSchema;
-import com.ragagent.retrieval.domain.WebSearchResult;
+import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.websearch.provider.WebSearchProviderRegistry;
 import com.ragagent.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;

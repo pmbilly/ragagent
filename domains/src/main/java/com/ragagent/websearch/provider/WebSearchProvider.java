@@ -2,8 +2,8 @@ package com.ragagent.websearch.provider;
 
 import java.util.List;
 
-import com.ragagent.retrieval.domain.WebSearchFilters;
-import com.ragagent.retrieval.domain.WebSearchResult;
+import com.ragagent.contract.websearch.WebSearchFilters;
+import com.ragagent.contract.websearch.WebSearchResult;
 
 /**
  * 网络搜索 provider（含按 country/freshness 过滤的可选能力与空结果诊断的可选能力）。

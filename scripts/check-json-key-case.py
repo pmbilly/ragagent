@@ -94,7 +94,7 @@ FROZEN_PREFIXES = (
     'llm/', 'modelruntime/', 'platform/tenant', 'contract/tenant/ParserEngineConfig',
     'contract/retrieval/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
     'memory/service/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
-    'platform/tracing/langfuse', 'tracing/decorators', 'retrieval/engine/doris', 'retrieval/domain/ImageInfo',
+    'platform/tracing/langfuse', 'tracing/decorators', 'retrieval/engine/doris', 'websearch/ImageInfo',
     # ⚠️ 前缀冻结会在**换包**时静默失效（B168 实测 ✗）：B162 把 llm/TokenUsage 搬进 common/llm、
     # B163 把 6 个 Langfuse 装饰器从 tracing/langfuse 换包到 tracing/decorators ⇒ 旧前缀不再命中，
     # 冻结悄悄失效、CI 才报"非冻结面出现新的 snake 键"。**换包时务必回来核这里** ✓。

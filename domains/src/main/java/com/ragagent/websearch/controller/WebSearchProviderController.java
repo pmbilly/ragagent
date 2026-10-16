@@ -16,7 +16,7 @@ import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.retrieval.domain.WebSearchResult;
+import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
 import com.ragagent.websearch.dto.WebSearchProviderResponse;

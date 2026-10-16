@@ -22,7 +22,7 @@ import com.ragagent.contract.retrieval.SearchChunkMerge;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
-import com.ragagent.retrieval.domain.ImageInfo;
+import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 

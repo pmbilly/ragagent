@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.retrieval.SearchChunkMerge;
-import com.ragagent.retrieval.domain.ImageInfo;
+import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.retrieval.domain.WebSearchResult;
+import com.ragagent.contract.websearch.WebSearchResult;
 
 /**
  * searchutil 纯函数测试（chunkmerge / imageinfo_html /

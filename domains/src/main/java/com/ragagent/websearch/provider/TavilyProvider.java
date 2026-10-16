@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.retrieval.domain.WebSearchResult;
+import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
 import com.ragagent.platform.web.ProviderJson;
 

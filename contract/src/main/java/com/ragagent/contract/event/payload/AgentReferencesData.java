@@ -5,8 +5,7 @@ package com.ragagent.contract.event.payload;
  * 知识引用数据。
  *
  * <p>{@code references} 恒输出——null 输出 {@code "references":null}。
- * 为保持本包不依赖 retrieval 领域类型，元素以 Object 承载
- * （{@code retrieval.domain.SearchResult} 的列表）。</p>
+ * 元素以不透明 JSON 承载（运行时是 {@code contract.retrieval.SearchResult} 的列表）。</p>
  */
 
 public class AgentReferencesData {

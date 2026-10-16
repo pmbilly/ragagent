@@ -17,7 +17,7 @@ import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;
-import com.ragagent.retrieval.domain.ImageInfo;
+import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
 import com.ragagent.retrieval.support.SearchTextUtil;

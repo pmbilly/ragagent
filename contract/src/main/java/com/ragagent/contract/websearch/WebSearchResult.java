@@ -1,4 +1,4 @@
-package com.ragagent.retrieval.domain;
+package com.ragagent.contract.websearch;
 
 import java.time.OffsetDateTime;
 

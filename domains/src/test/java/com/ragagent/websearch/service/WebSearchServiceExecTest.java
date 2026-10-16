@@ -13,8 +13,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.retrieval.domain.WebSearchFilters;
-import com.ragagent.retrieval.domain.WebSearchResult;
+import com.ragagent.contract.websearch.WebSearchFilters;
+import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
 import com.ragagent.websearch.mapper.WebSearchProviderRepository;

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.retrieval.domain.ImageInfo;
+import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.platform.web.ProviderJson;
 
 /**

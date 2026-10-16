@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.retrieval.domain.WebSearchResult;
+import com.ragagent.contract.websearch.WebSearchResult;
 
 /**
  * 网络检索结果 → SearchResult 转换。
