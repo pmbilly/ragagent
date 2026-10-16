@@ -1,254 +1,261 @@
-# ragagent
+# RagAgent
 
-企业级 RAG + Agent 平台：知识库问答、Wiki 摄取、Agent 工具族、IM 渠道、MCP 接入。
-后端 **Java 21 / Spring Boot 3.3.5 / MyBatis-Plus**，前端 **Vue 3.5 + Vite 7**，单仓库前后端同构交付。
+**企业级 RAG + Agent 平台**：一套可自托管的后端服务与 Web 控制台 —— 文档摄取、知识库问答、Wiki 协作、Agent 工具编排、多渠道接入与 MCP 生态。
 
-> **项目背景**：本仓由 [Tencent/WeKnora](https://github.com/Tencent/WeKnora) 的 Go 后端移植而来，
-> 并已于 2026-09 从"逐文件复刻 Go"转为**Java 本位演进**（详见 [HANDOFF.md](HANDOFF.md) §0/§2）。
-> 当前目标不再是与 Go 仓字节级一致，而是**按 Java 生态的主流标准做可读性与架构收敛**。
-> **接手本仓请先读 [HANDOFF.md](HANDOFF.md)** —— 背景、已定决策、踩坑史与批次纪律都在那里。
+<p>
+  <img alt="JDK" src="https://img.shields.io/badge/JDK-21-orange">
+  <img alt="Spring Boot" src="https://img.shields.io/badge/Spring%20Boot-3.3-6DB33F">
+  <img alt="Vue" src="https://img.shields.io/badge/Vue-3.5-42B883">
+  <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-17%20%2B%20pgvector-4169E1">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-blue">
+</p>
 
 ---
 
-## 总体架构
+## 目录
 
-五个 Gradle 模块，**依赖单向、边界由编译期强制**——不是文档约定：往 `:engine` 里写一行业务域 import 就编译失败（ArchUnit + 包级棘轮双守）。
+- [功能特性](#功能特性)
+- [架构](#架构)
+- [技术栈](#技术栈)
+- [快速开始](#快速开始)
+- [配置项](#配置项)
+- [API 概览](#api-概览)
+- [目录结构](#目录结构)
+- [开发与测试](#开发与测试)
+- [许可与致谢](#许可与致谢)
+
+## 功能特性
+
+<details open>
+<summary><b>知识库与检索</b></summary>
+
+- **文档摄取管线**：多格式解析（独立 gRPC 文档解析服务）→ 分块 → 实体/关系抽取 → 向量化，全程可重试、可重处理
+- **混合检索**：向量召回 + 关键词召回，融合打分与可插拔**重排**；阈值、TopK、融合策略按知识库配置
+- **九种向量/检索引擎适配**：pgvector（默认，ParadeDB）、Elasticsearch、OpenSearch、Milvus、Qdrant、Weaviate、腾讯 VectorDB、Doris、SQLite —— 知识库之间可混用
+- **知识形态**：文件 / FAQ / 网页 / 知识图谱；Wiki 页面、文件夹树与链接图
+- **连接外部数据源**：飞书、GitLab、Notion、语雀、RSS、IMA 等连接器按计划同步
+
+</details>
+
+<details open>
+<summary><b>问答与 Agent</b></summary>
+
+- **流式问答（SSE）**：检索 → 重排 → 生成 → 引用装配的完整链路，全程事件流式推送
+- **Agent 执行循环**：ReAct 风格的思考/行动/观察循环，内置上下文压缩、Token 预算与用量统计
+- **工具族（35+）**：知识检索、Wiki 读写、文档与图片分析、SQL/数据表分析（DuckDB）、网页搜索与抓取、思维链、待办清单、技能读取……
+- **技能（Skills）**：以 `SKILL.md` 为载体的三级注入（元数据 / 正文 / 资源），支持平台内置层与租户自建
+- **会话能力**：多轮上下文、长期记忆召回、运行中转向（steer）与取消、消息附件与图片
+- **评测**：按 RAG 预设重放问答对，产出检索/重排/生成三段指标
+
+</details>
+
+<details open>
+<summary><b>集成与接入</b></summary>
+
+- **27 家 LLM 提供商**：OpenAI、Anthropic、Gemini、DeepSeek、通义千问（阿里云）、智谱、火山引擎、月之暗面、MiniMax、Ollama 本地部署……统一为同一套模型配置与调用面
+- **Embedding / 重排客户端族**：按模型能力自动装配，支持批处理与并发控制
+- **MCP（Model Context Protocol）**：接入外部 MCP 服务、按需发现工具、OAuth 授权，高危工具走人工审批闸门；另附独立交付的 MCP 参考服务
+- **IM 渠道（9 种）**：飞书、企业微信、钉钉、微信、Telegram、Slack、Mattermost、QQ 机器人、云之家 —— 平台验签回调 + 长连接
+- **网页搜索与抓取**：多家搜索提供商 + 受 SSRF 防护的抓取器
+
+</details>
+
+<details open>
+<summary><b>平台与治理</b></summary>
+
+- **多租户**：JWT 登录 + API Key 双通道，租户成员、邀请与角色权限（RBAC）
+- **审计**：三条独立游标流，只追加写入
+- **工具审批**：高危工具的人工闸门（申请 / 通过 / 拒绝）
+- **文件与存储**：本地 / 对象存储后端、文件代理与预签名访问
+- **可观测**：进程内事件总线 + SSE 流管理（内存 / Redis 双后端）、OTLP 追踪导出
+- **统一契约**：统一响应外壳与错误码约定；前端类型与后端字段由 CI 守卫对齐
+
+</details>
+
+## 架构
+
+七个 Gradle 模块，**依赖单向、边界在编译期强制**：越界依赖无法编译，模块之间只认契约。
 
 ```
-   :boot  ──►  :domains  ──►  :engine  ──►  :common  ──►  :contract
-  组合根         业务域         能力层        平台/共享内核    契约面（纯 JDK）
-  入口 + 装配    22 个业务包    8 个能力包    4 个平台包       18 个契约面
-  13 文件        1,448 文件     309 文件      158 文件         116 文件
-  1.8k 行        219k 行        50.8k 行      12.1k 行         7.3k 行
+:boot              ──►  全部模块（组合根）
+:domains           ──►  :platform  :contract  :model-runtime（模型上下文词汇）
+:agent-engine      ──►  :platform  :contract  :model-runtime（模型上下文词汇）
+:retrieval-engine  ──►  :platform  :contract
+:model-runtime     ──►  :platform  :contract
+:platform          ──►  :contract
+:contract          ──►  （无依赖：纯 JDK）
 ```
 
 | 模块 | 职责 | 依赖 |
 |---|---|---|
-| `:boot` | 组合根：入口类、全局装配（`config/` 的 `*WiringConfig`）、扫描、打包。**只出不进**（无任何模块反向依赖它） | → domains / engine / common / contract |
-| `:domains` | 业务域本体：HTTP 面（52 个 `*Controller`）+ 持久层（knowledge、agent、session、wiki、im、datasource…22 个包） | → engine / common / contract |
-| `:engine` | 能力层：检索引擎适配（8 家向量库）、LLM provider 族、chatpipeline 问答编排、embedding/rerank 客户端、modelcontext。**不得依赖业务域** | → common / contract |
-| `:common` | 平台/共享内核：跨域端口（L1）、横切基础设施（web/error/approval）、事件总线（`event/`）、SSE 流管理（`stream/`）、追踪（`tracing/`）、通用词汇 | → contract |
-| `:contract` | **契约面（方案 §5.1）**：纯 JDK 的公开 API / SPI / 不可变载荷（18 个面：agent / knowledge / session / model / retrieval / tenant / tool / wiki / …）。**构建文件无 dependencies 块** —— 一沾框架/其他模块即编译失败（把"契约面纯 JDK"从 ArchUnit R1 升格为编译期硬约束） | 无（纯 JDK） |
+| `:contract` | **契约面**：纯 JDK 的公开 API、SPI 与不可变载荷（agent / knowledge / session / model / retrieval / tool / pipeline / tenant / websearch / vectorstore …）。构建文件不声明任何依赖 —— 契约纯度由编译期保证 | 无 |
+| `:platform` | **技术底座**：Web 统一外壳与错误形态、SSRF 防护、事件总线、SSE 流管理、追踪装饰、提示词与配置装载、通用文本/知识工具 | contract |
+| `:model-runtime` | **模型运行时**：27 家 LLM provider 的传输与出站请求体拼装、Embedding / 重排客户端族、模型上下文协议（工具调用与思考块解析）、抽取、Ollama 本地模型管理 | platform · contract |
+| `:retrieval-engine` | **检索引擎**：九种向量/检索后端的适配与注册、混合检索融合、重排管线、索引写入与向量店连通性探测 | platform · contract |
+| `:agent-engine` | **Agent 引擎**：ReAct 执行循环与阶段（think/act/observe/finalize）、工具注册表与工具框架、技能目录与装载、上下文压缩、预算与转向 | platform · contract · model-runtime |
+| `:domains` | **业务域**：22 个业务包（知识库、会话、Wiki、Agent 管理、MCP、IM、数据源、认证、租户、审计、审批、评测、记忆、收藏、系统设置……），含 51 个 HTTP 控制器与持久层 | platform · contract · model-runtime |
+| `:boot` | **组合根**：应用入口、全局装配与跨模块 Bean 装配、扫描与打包。只出不进（无任何模块依赖它） | 全部 |
 
-**跨模块解耦靠端口下沉**：跨模块的公开 API / SPI / 载荷在 **`:contract`**（方案 §8.1）；L1 端口在 `:common`（如 `KnowledgeBaseGateway`、`SessionMessagePort`），由 `:domains` 提供实现（`KnowledgeBaseService`、`MessageRepository`）。依赖永远指向下层，无环；`scripts/check-package-cycles.py` 守着。
+**三条设计原则**
 
-> **包根共享，边界靠规则不靠前缀**：四个模块的 Java 包都挂在同一个 `com.ragagent` 根下——`:engine` 的包是
-> `com.ragagent.llm` / `com.ragagent.retrieval` / `com.ragagent.chatpipeline`…（**没有** `com.ragagent.engine.*` 这层）。
-> 因此"这段代码属于哪个模块"无法从包名看出来，模块边界由 ArchUnit 规则 + 包级棘轮脚本在**编译期/CI 强制**。
-> 阅读代码时以 `docs/backend-package-map.md` 的模块归属为准。
+1. **契约面纯 JDK**：跨模块的公开类型集中在 `:contract`，不允许出现任何框架或实现依赖 —— 它同时是前端契约、API 形状与可测试边界的唯一来源。
+2. **端口下沉，实现在下**：业务域通过契约端口消费能力模块（检索、模型、Agent），实现由装配层注入；跨模块协作不靠"互相 import"，靠端口与组合根。
+3. **服务端分层**：HTTP 面只编排、领域服务承载用例、仓储封装软删与方言差异；一类型一文件，每个包有 `package-info.java` 说明职责与依赖判据。
 
-**一次 RAG 问答的链路**（自上而下，全部单向）：
-
-```
-POST /api/v1/session/qa (session/*Controller)
-  → session/service 编排（QaSseOrchestrator SSE 流）
-    → :engine chatpipeline/ 23 个插件流水线（检索→重排→生成→引用装配）
-      ├─ retrieval/ HybridSearchService（pgvector/BM25 混合检索 + 融合）
-      ├─ llm/ provider 族（anthropic/openai/ollama… 出站请求体）
-      └─ 经 :common 端口回调 :domains（knowledge 权限过滤、session 落库、audit 记账）
-  → SSE 事件经 :common event/ 总线 + stream/ 管理器推给前端（键全 camel）
-```
-
-## 目录结构
+**一次问答的数据流**
 
 ```
-ragagent/
-├── boot/                 # :boot 组合根（入口 + 装配）
-├── domains/              # :domains 业务域（22 包，见下）
-├── engine/               # :engine 能力层（8 包）
-├── common/               # :common 平台/共享内核（4 包）
-├── contract/             # :contract 契约面（18 面，纯 JDK）
-├── frontend/             # Vue 3 前端（477 个源文件；api/ 类型手写，双守卫防契约漂移）
-├── scripts/              # 工程脚本：十二守卫（check-*.py）、起停服、契约重录、A/B
-├── migrations/           # Flyway 单份基线迁移 versioned/V1__baseline.sql
-├── docreader/            # 文档解析 gRPC proto（客户端 stub 在 :domains 构建期生成）
-├── mcp-server/           # MCP Python 参考服务（独立交付物，不参与 Java 构建）
-├── otlp-proto/           # OTLP 追踪 proto（tracing 用）
-├── docs/                 # 31 份模块手册 + 专项规范 + 踩坑档案
-├── gradle/libs.versions.toml  # 依赖版本唯一来源（模块 build 文件禁止写版本号）
-├── .github/workflows/    # CI：guards · backend · docker · frontend 四个 job
-├── docker-compose.yml    # 本地基础设施：ParadeDB(15432) + Redis(16379) + docreader(50051)
-├── Dockerfile            # 镜像（CI 有迁移路径自检）
-├── settings.gradle.kts   # 模块清单（5 个 include）
-└── HANDOFF.md            # 接手必读：已定决策、批次总表、逐包重构范式、踩坑史
+POST（SSE）                                     ← 前端 / 任意 HTTP 客户端
+  → :domains 会话域（鉴权 · 租户作用域 · 消息落库 · SSE 事件）
+    → :agent-engine 执行循环
+      ├─ :retrieval-engine  混合检索（向量 + 关键词）→ 重排
+      ├─ :model-runtime     LLM 调用（流式）· 工具调用解析 · 用量统计
+      └─ 内置/外部工具     知识检索 · Wiki · 数据查询 · 网页抓取 · MCP
+  → 事件经 :platform 事件总线与流管理器推送（统一外壳 · camelCase 键）
 ```
-
-> 树中省略生成物与本地态：`build/`、`.gradle/`、`.env`、`.DS_Store` 等；根构建脚本还有 `build.gradle.kts` / `gradle.properties` / `gradlew`。
-
-## 后端包结构
-
-### `:domains` — 22 个业务包
-
-| 包 | 一句话 | 包 | 一句话 |
-|---|---|---|---|
-| `knowledge` | KB 域：入库 → 分块/抽取/向量化 → 检索与 FAQ 供给 | `memory` | 记忆域：写入/检索/注入，recall 永不失败 |
-| `wiki` | Wiki 域：页面摄取管线 + 页面/文件夹/链接图 | `session` | 会话域：会话/消息 CRUD + SSE 问答流 |
-| `agent` | Agent 域：执行循环 + 工具族（36 个）+ 管理面 | `im` | IM 渠道域：飞书等渠道长连接 + 平台验签回调 |
-| `datasource` | 外部数据源连接器族（feishu/gitlab/notion/rss/yuque…） | `mcp` | MCP 接入：协议族 + OAuth + 工具审批桥 |
-| `websearch` | 网页搜索 provider 族与凭据管理 | `embedchannel` | 嵌入**渠道**域（HTTP 叶子；与 embedding 易混） |
-| `auth` | 认证域：登录/租户/成员/邀请 + apikey 子域 | `tenant` | 租户配置类型族（jsonb 列的类型化读写 + 脱敏） |
-| `system` | 系统设置 + SSRF 白名单 + admin 探测端点 | `settings` | 系统设置键注册表（键的类型化声明与网关） |
-| `model` | models 表 CRUD + 运行时配置值出口 | `vectorstore` | 向量库**配置面**（CRUD/探测；运行时在 `:engine`） |
-| `storage` | 存储后端配置 + 文件代理/URL 重写 | `initialization` | KB 配置第二路径 + 连通性测试 + Ollama 管理 |
-| `favorite` | 收藏域（全仓最小完整域） | `audit` | 审计域：三条游标流，只追加表 |
-| `approval` | 工具审批域（高危工具的人工闸门） | `evaluation` | 评测域：rag 预设重放 + 指标族（待排期可选项） |
-
-### `:engine` — 8 个能力包
-
-| 包 | 一句话 |
-|---|---|
-| `retrieval` | 检索引擎：HybridSearchService 混合检索融合 + `engine/` 九家向量库适配（pgvector、Elasticsearch 7/8、OpenSearch、Milvus、Qdrant、Weaviate、腾讯 VectoDB、Doris、SQLite） |
-| `llm` | LLM 传输与 provider 族 + chat/extract/asr 子域（出站请求体的唯一出口） |
-| `chatpipeline` | 问答编排管线：骨架 + `plugin/` 插件流水线 + `support/`（生产驱动方仅 session） |
-| `embedding` | embedding provider 客户端族（9 家） |
-| `rerank` | 重排 provider 客户端族（7 家） |
-| `modelcontext` | 模型输出协议（工具调用/引用/思考块的解析与装配） |
-| `tracing` | 检索链路 span（与 `:common` 的 Langfuse 追踪是两套，勿混） |
-| `webfetch` | 受 SSRF 守卫的网页抓取（工具面） |
-
-### `:common` — 4 个平台包
-
-| 包 | 一句话 |
-|---|---|
-| `common` | L1 平台本体：web（统一外壳/SSRF）、error（全局错误形态）、approval、各域端口与契约视图（被全部业务包依赖） |
-| `event` | 进程内事件总线 + `payload/` 事件载荷（SSE 线上契约面，键全 camel） |
-| `stream` | SSE 流基础设施：Redis/Memory 双后端 StreamManager |
-| `tracing` | Langfuse 追踪：伪装 langfuse-python 直写 OTLP 端点 |
-
-### 域内分层约定
-
-`controller/`（只放 `*Controller`）· `service/`（Spring 服务与用例）· `domain/`（实体）· `dto/`（请求响应）· `mapper/`（**只放 MyBatis-Plus 接口**）· `repository/`（仓储门面：软删/乐观锁/方言分支）· `support/`（无状态算法）。一类型一文件；每个子包有 `package-info.java` 说明职责与依赖判据。
-
-> 每个包的详细手册（结构、改哪里、坑、测试）见 [`docs/README.md`](docs/README.md) 索引；分包地图与分层判据见 [`docs/backend-package-map.md`](docs/backend-package-map.md)。
 
 ## 技术栈
 
 | 层 | 选型 |
 |---|---|
-| 运行时 | JDK 21（虚拟线程：管线并发、工具并行抓取） |
-| 框架 | Spring Boot 3.3.5（Web / Validation / AOP / Redis）、MyBatis-Plus 3.5.7 + 手写 JdbcClient |
-| 存储 | PostgreSQL 17（**ParadeDB** —— pgvector + BM25）、Redis 7（事件流 / 限流 / 跨实例协调） |
-| 文档解析 | docreader gRPC（proto 已本仓化，`:domains` 内生成客户端） |
-| 向量/检索引擎 | pgvector、Elasticsearch 7/8、OpenSearch、Milvus、Qdrant、Weaviate、腾讯 VectoDB、Doris、SQLite（九家，`retrieval/engine/` 一家一子包） |
-| 数据分析 | DuckDB JDBC（`data_analysis` 工具，独立会话，不依赖沙箱） |
-| 其他 | Flyway（**单份基线迁移**）、jjwt、OTLP 追踪导出、protobuf |
-| 前端 | Vue 3.5 + Vite 7（~480 个源文件） |
-| 测试 | JUnit 5 + AssertJ + MockMvc + H2（测试 schema `TestSchema`）+ 手写 HTTP 桩（stub LLM / Ollama / OAuth / Notion / 飞书…） |
+| 语言与框架 | JDK 21（虚拟线程用于管线并发与工具并行）· Spring Boot 3.3 |
+| 数据访问 | MyBatis-Plus + 手写 SQL/仓储门面 · Flyway 迁移（`migrations/versioned/`） |
+| 数据库 | PostgreSQL 17 + pgvector（默认以 ParadeDB 提供检索能力）· Redis 7（事件流、限流、跨实例协调） |
+| 检索引擎 | pgvector · Elasticsearch · OpenSearch · Milvus · Qdrant · Weaviate · 腾讯 VectorDB · Doris · SQLite |
+| 模型接入 | 27 家 LLM 提供商 · Embedding / 重排客户端族 · Ollama 本地模型 |
+| 文档解析 | 独立 gRPC 服务（proto 随仓库交付，构建期生成本地客户端） |
+| 其它 | 数据分析走 DuckDB JDBC · OTLP 追踪导出 · gRPC / protobuf |
+| 前端 | Vue 3.5 + Vite 7 + TypeScript + Pinia + Vue Router（国际化支持） |
+| 测试 | JUnit 5 + AssertJ + MockMvc + H2；手写 HTTP 桩覆盖 LLM / Ollama / OAuth / IM / 数据源 |
 
 ## 快速开始
 
-前置：JDK 21、Docker、Node 22+。
+**前置**：JDK 21、Docker、Node 22+。
 
 ```bash
-# 1) 基础设施：postgres(15432) + redis(16379) + docreader(50051)
+# 1) 基础设施：PostgreSQL(15432) + Redis(16379) + 文档解析服务(50051)
 docker compose up -d
 
-# 2) 配置：cp .env.example .env，按需改（.env 已 gitignore）
+# 2) 配置
+cp .env.example .env        # 按需修改数据库、Redis、密钥、存储目录
 
-# 3) 后端（本仓 dev 用 :8083，避免与旧仓 8082 冲突；端口取自 .env 的 SERVER_PORT）
-bash scripts/java-server-up.sh          # 或 ./gradlew :boot:bootRun
+# 3) 启动后端（默认 :8080，可用 SERVER_PORT 覆盖）
+./gradlew :boot:bootRun
 
-# 4) 前端（:5173）
-cd frontend && npm ci && npm run dev   # 代理默认指向本仓后端的 :8083（vite.config.ts 的 DEV_PROXY_TARGET 默认值）
+# 4) 启动前端（默认 :5173）
+cd frontend && npm ci && npm run dev
 ```
 
-本仓独立库不含种子数据 —— 首次使用先注册账号（注册者即该租户 owner）：
+首次使用先注册账号（**首位注册者成为该租户的 owner**）：
 
 ```bash
-curl -s -X POST http://localhost:8083/api/v1/auth/register -H 'Content-Type: application/json' \
+curl -s -X POST http://localhost:8080/api/v1/auth/register \
+  -H 'Content-Type: application/json' \
   -d '{"username":"demo","email":"demo@example.com","password":"Passw0rd!"}'
 ```
 
-**镜像部署**：
+**容器化部署**
 
 ```bash
 docker build -t ragagent-server .
 docker run --rm -p 8080:8080 --env-file .env ragagent-server
 ```
 
-> ⚠️ 镜像内 Flyway 迁移目录是 `/app/build/generated-migrations`（`application.yml` 用的是**相对工作目录**
-> 的 `filesystem:` 路径）。改 `WORKDIR` 或迁移路径时必须同步改 Dockerfile，否则全新容器启动即无 schema
-> —— 且**不会报错**，直到第一条查询才炸。CI 的 `docker` job 有一道自检守住这点。
+> 镜像内已包含 Flyway 迁移脚本，路径与镜像的 `WORKDIR` 绑定；调整工作目录或迁移位置时需同步 Dockerfile。
 
-## 配置
+## 配置项
 
-配置外置在 `boot/src/main/resources/application.yml`，全部走 `${ENV_VAR:default}`。没有 profile 分文件。
+配置集中在 `boot/src/main/resources/application.yml`，全部为 `${ENV_VAR:default}` 形式，无 profile 分文件。常用变量：
 
 | 变量 | 缺省 | 说明 |
 |---|---|---|
-| `SERVER_PORT` | 8080 | 服务端口（**本仓 dev 用 8083**） |
-| `DB_HOST` / `DB_PORT` | localhost / 15432 | ParadeDB |
-| `REDIS_HOST` / `REDIS_PORT` | localhost / 16379 | 事件流 / 限流 |
-| `DOCREADER_ADDR` | localhost:50051 | 文档解析 gRPC |
-| `LOCAL_STORAGE_BASE_DIR` | — | 本地存储根，**必须放持久目录，严禁 `/tmp`** |
-| `JWT_SECRET` / `SYSTEM_AES_KEY` | — | 密钥 |
-| `STREAM_MANAGER_TYPE` | memory | `redis` = 跨实例共享 |
-| `WIKI_REDIS_ENABLED` 等 | false | 各域 Redis 面开关（六处，独立） |
-| `WEKNORA_TENANT_FILTER_GUARD` | enforce | 租户过滤探测：`enforce` / `alert` / `off` |
+| `SERVER_PORT` | 8080 | 服务端口 |
+| `DB_HOST` / `DB_PORT` | localhost / 15432 | PostgreSQL（ParadeDB） |
+| `DB_USER` / `DB_PASSWORD` / `DB_NAME` | — | 数据库凭据与库名 |
+| `REDIS_HOST` / `REDIS_PORT` | localhost / 16379 | 事件流、限流与跨实例协调 |
+| `DOCREADER_ADDR` | localhost:50051 | 文档解析 gRPC 地址 |
+| `SYSTEM_AES_KEY` | — | 敏感配置（模型密钥等）的落库加密密钥 |
+| `LOCAL_STORAGE_BASE_DIR` | — | 本地存储根目录，**必须指向持久化目录**（放入系统临时目录会导致原始文件被清理且不可恢复） |
 
-完整清单见 [`.env.example`](.env.example)。代码内**禁止**裸 `System.getenv()`（架构硬门 A1 守着；统一走 `AppEnvLookup` 查找面）。
+完整清单见 [`.env.example`](.env.example)；全部可调开关（模型并发、流管理器后端、各域 Redis 开关等）见 `application.yml`。
 
-## 质量门禁
+## API 概览
 
-这是本仓的核心工程资产 —— 重构全程"行为不变"就靠它兜底。
+- **风格**：REST + JSON（键一律 camelCase），流式接口走 SSE
+- **认证**：`Authorization: Bearer <JWT>`；服务间/脚本可用 API Key
+- **响应外壳**：统一 `{ "code": …, "message": …, "data": … }`，错误码与可空字段显式声明
 
-| 门 | 位置 | 作用 |
-|---|---|---|
-| **契约测试** | `domains/src/testFixtures/resources/contracts/`（1,429 个金片）+ 49 个 `*ContractTest` | 逐字节钉死 HTTP 响应形状；改契约必须重录或改金片 |
-| **架构规则** | `boot/src/test/.../arch/ArchitectureRulesTest.java` + domains 侧 arch 测试（ArchUnit，A1–A15） | 禁裸 getenv、禁双装配、禁分层倒挂、Mapper 必须在 `..mapper..`、A14 逐字段 `@JsonProperty` 卫生、A15 禁自建 ObjectMapper… |
-| **十二守卫** | `bash scripts/run-guards.sh`（**已接入 `check`**，见下） | 包循环 / Go 锚点 / 契约键 / JSON 键大小写 / 事件面 / 文件规模棘轮 / 目录卫生 / 死成员 / 统一响应外壳 / 异常语义 / 契约同步 / **路径与包对应** |
-| **跳过棘轮** | `scripts/test-summary.py`（CI 每轮跑） | 跳过 = 这段覆盖没跑。未登记的跳过 ⇒ 报红；白名单里每条都写明"为什么可以跳" |
-| **覆盖率** | jacoco（**按需**：`-Pcoverage`） | **聚合口径（推荐）**`./gradlew testCodeCoverageReport -Pcoverage` → **行 67.8% / 分支 54.0%**；单模块 `:domains:jacocoTestReport -Pcoverage`。默认不插桩 —— 实测插桩让全量 +25%，本仓的 1.5 分钟闸门是刻意成果 |
-| **CI** | `.github/workflows/ci.yml` | 4 个 job：guards（十二守卫）· backend（真 ParadeDB + 真 Redis + 灌基线 SQL + 全量测试）· docker（镜像构建 + 迁移自检）· frontend |
+| 资源 | 前缀 |
+|---|---|
+| 认证与账号 | `/api/v1/auth` |
+| 知识库与文件 | `/api/v1/knowledge-bases` |
+| Wiki | `/api/v1/knowledgebase/{kbId}/wiki` |
+| 会话与消息 | `/api/v1/sessions` |
+| Agent 与技能 | `/api/v1/agent` |
+| 模型管理 | `/api/v1/models` |
+| MCP 服务 | `/api/v1/mcp-services` |
+| 向量库配置 | `/api/v1/vector-stores` |
+| 网页搜索提供商 | `/api/v1/web-search-providers` |
+| 存储后端 | `/api/v1/storage-backends` |
+| 系统设置与运维 | `/api/v1/system` |
+| 评测 | `/api/v1/evaluation` |
+| 文件代理 / 预签名 | `/api/v1/files/presigned` · `/r/{token}` |
 
-守卫大多是**棘轮**（ratchet）：登记基线后只许减不许增，例外须写明理由。新增违规当场变红。
+## 目录结构
 
-> 十二守卫已作为 Gradle 任务 `:guards` **接入 `check`**（B214）⇒ 本地 `./gradlew build` 与 CI 同一口径，
-> 不存在"本地绿、CI 红"。单独跑：`./gradlew guards`（迭代时 `./gradlew :domains:test --tests ...` 不会触发它）。
-> 需要 `python3` 在 PATH 上。CI 会跑两遍守卫（guards job + backend job），是刻意取舍：两边同口径优先。
-
-```bash
-export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
-
-./gradlew :domains:test --tests "com.ragagent.session.*"   # 定向（迭代用，10~30s）
-./gradlew build                                             # 全量闸门（spotless + 十二守卫 + 测试 + javadoc）
-./gradlew guards                                            # 只跑十二守卫（build 里已含）
-cd frontend && npx vue-tsc --build --force && npm test       # 前端
+```
+.
+├── contract/            # :contract  契约面（纯 JDK）
+├── platform/            # :platform  技术底座
+├── model-runtime/       # :model-runtime  模型运行时
+├── retrieval-engine/    # :retrieval-engine  检索引擎
+├── agent-engine/        # :agent-engine  Agent 引擎
+├── domains/             # :domains   业务域（22 包）
+├── boot/                # :boot      组合根与应用入口
+├── frontend/            # Vue 3 + Vite 控制台
+├── docreader/           # 文档解析 gRPC proto
+├── otlp-proto/          # OTLP 追踪 proto
+├── mcp-server/          # MCP 参考服务（独立交付物，不参与 Java 构建）
+├── migrations/          # Flyway 迁移脚本
+├── scripts/             # 工程脚本（起停、契约校验、架构守卫、A/B 对比）
+├── gradle/libs.versions.toml   # 依赖版本唯一来源
+├── docker-compose.yml   # 本地基础设施
+└── Dockerfile           # 服务镜像
 ```
 
-## 文档
+## 开发与测试
 
-| 文档 | 内容 |
-|---|---|
-| **[HANDOFF.md](HANDOFF.md)** | **接手必读**：背景与已定决策、踩坑史、逐包重构范式、批次总表与纪律 |
-| [`docs/README.md`](docs/README.md) | 31 份模块手册索引 + 新人阅读路径 |
-| [`docs/backend-package-map.md`](docs/backend-package-map.md) | 分包地图与分层约定 |
-| [`docs/api-response-convention.md`](docs/api-response-convention.md) | 统一响应外壳（`@ApiResult`）与错误形态 |
-| [`docs/knowledge-api-contract-v1.md`](docs/knowledge-api-contract-v1.md) | knowledge 域 API 契约（camelCase、可空显式 null） |
-| [`docs/persistence-architecture-rules.md`](docs/persistence-architecture-rules.md) | 持久层架构规则 |
-| [`docs/known-issues/`](docs/known-issues/) | 按批次分片的踩坑实录 |
-| [`docs/handoff/`](docs/handoff/) | 域级作战计划与批次执行记录 |
+```bash
+# 后端全量闸门：格式检查 + 架构守卫 + 单元/合约测试 + javadoc
+./gradlew build
 
-## 高频坑速查
+# 定向测试（迭代用）
+./gradlew :domains:test --tests "com.ragagent.session.*"
 
-<details>
-<summary>展开</summary>
+# 仅跑架构守卫（包循环、契约纯度、模块依赖矩阵、命名口径……只许减不许增的棘轮）
+bash scripts/run-guards.sh
 
-- **跑完 `./gradlew build` 必须重启后端**：构建会**就地重写** `bootRun` 正在用的 `build/classes` ⇒ 在线服务**全站 500 + NoClassDefFoundError**。看起来像业务炸了，其实是陈旧类 —— **重启即解，别去查代码**。
-- **前端"保存成功、重新打开却是空的"？先查代理指向**：`frontend/vite.config.ts` 的 `DEV_PROXY_TARGET` 默认值是**本仓后端的 :8083**（B222 修正）。此前它继承 Go 仓的 8080，而本仓后端在 8083 ⇒ 忘设 `VITE_DEV_PROXY_TARGET` 时**所有 `/api` 请求打到空端口**，浏览器侧只有 XHR 失败、**没有醒目提示**，症状就是"填了保存、重开为空"（数据根本没到后端）。
-- **停服用 `bash scripts/java-server-down.sh`**（`--stop` 兼容）⇒ 停完记得重启。**别再手敲通配符**：仓库里只有这一个 `*-down.sh`（B216 补的，此前文档引用的脚本并不存在，照文档停服会静默失败、端口一直被占）。起服脚本现在会在端口占用时**明确报错**，不再打到旧进程误报 "ready"。
-- **`LOCAL_STORAGE_BASE_DIR` 严禁 `/tmp`**：macOS 定期清理 ⇒ 入库文档原始文件丢失且**不可恢复**（列表正常、preview 全 500、无法重处理）。
-- **H2 绿 ≠ PG 绿**：jsonb 键序、NOT NULL、DDL 默认值只在真 PG 暴露 ⇒ 验收必须连真 PG（CI 的 backend job 就是干这个）。
-- **Redis 测试会跳过 —— 但有棘轮兜着**：`redis-server` 不在 PATH 时相关用例跳过（本地常见；CI 已装 ⇒ 真跑）。**跳过已升级为棘轮**：未登记的跳过会让 `scripts/test-summary.py` 报红，新增跳过必须去它的 `ALLOWED_SKIPS` 登记并写明理由（覆盖的消失是累积性的）。
-- **`*IT` 不在默认构建里**：Milvus / Weaviate 的驱动集成测试需要真实服务，走独立任务 `./gradlew :engine:integrationTest`（env 门控：`WEKNORA_MILVUS_IT=true` 等）。此前它们**连手动都跑不了**（`*IT` 不匹配 Gradle 默认收集模式）。
-- **改契约要同 PR 带前端**：前端 TS 类型是**手写**的（无 codegen），后端改字段前端照样编译通过。两道守卫兜着：`check-fe-contract-keys.py`（扫前端源码的 snake 键）+ **`check-contract-sync.py`（契约金片的键签名变了必须签字）**。
-  ⇒ 改了后端响应字段后：核对 `frontend/src/api/**` 是否需要同步 → 跑 `python3 scripts/check-contract-sync.py --write` 签字（它会先打印改了什么）。
-- **`Long != Long` 引用比较**：租户 id 超出 Long 缓存区，一律 `equals`。
-- **加依赖版本要进 catalog**：`gradle/libs.versions.toml` 是唯一来源（B214 起）。别在模块 build 文件里写 `group:artifact:version` —— 那正是本次收拢掉的形态。
-- **排查数据库先看后端启动日志的 jdbc URL**：同一实例下有旧仓的 `WeKnora` 库与本仓的 `ragagent` 库（`.env` 的 `DB_NAME`），查错库会得出"数据丢了"的假结论（B223 实测踩坑）。
+# 前端：类型检查 + 单测
+cd frontend && npm run type-check && npm test
+```
 
-</details>
+**质量保障**
 
----
+- **契约金片**：1,349 份逐字节钉死的 HTTP 响应样本 —— 改动响应形状必须显式重录，杜绝"接口悄悄变了"
+- **架构规则**：模块依赖矩阵、契约层纯度、禁止裸读环境变量、禁止双装配与分层倒挂等，均由 ArchUnit + 脚本守卫在 CI 强制
+- **测试**：约 5,000 条用例；Redis / 外部驱动等环境相关用例可跳过，但跳过项需登记理由（覆盖的消失是累积性的）
+- **集成测试**：Milvus / Weaviate 等驱动集成测试需真实服务，由环境变量门控、按需触发
+- **CI**：四个 job —— 架构守卫 · 后端（真实 PostgreSQL + Redis + 全量测试）· 镜像构建与迁移自检 · 前端
 
-*源自 Tencent/WeKnora（Apache-2.0）。本地参考仓只读对照，不参与构建与运行。*
+**参与贡献**
+
+1. 从 `main` 切出特性分支，保持提交粒度可回滚；
+2. 提交前本地跑通 `./gradlew build`（与 CI 同口径）与前端 `npm run type-check && npm test`；
+3. 涉及 HTTP 契约的改动，请同步前端类型并重录契约金片；
+4. 新增依赖请登记到 `gradle/libs.versions.toml`（版本唯一来源），不要写在模块构建文件里。
+
+## 许可与致谢
+
+本项目以 [MIT License](LICENSE) 发布。
+
+致谢：[Tencent/WeKnora](https://github.com/Tencent/WeKnora) —— 本项目的领域模型与接口设计参考了该项目（Apache-2.0）。
