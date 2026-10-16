@@ -12,15 +12,15 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.session.dto.StopSessionRequest;
-import com.ragagent.platform.session.embed.EmbedSessionPort;
-import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.contract.session.EmbedReply;
+import com.ragagent.contract.session.EmbedSessionPort;
+import com.ragagent.contract.session.SseSink;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.controller.KnowledgeQaController;
 import com.ragagent.session.controller.MessageController;
 import com.ragagent.session.controller.MessageSuggestionController;
 import com.ragagent.session.controller.SessionController;
 
-import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.contract.session.MessageSuggestionView;
 import com.ragagent.contract.session.MessageView;
 
@@ -51,27 +51,27 @@ public class EmbedSessionAdapter implements EmbedSessionPort {
 
     @Override
     public void knowledgeQa(String sessionId, String rawBody, String resourceUrls,
-            HttpServletResponse response) throws IOException {
-        knowledgeQaController.knowledgeQA(sessionId, rawBody, resourceUrls, response);
+            SseSink sink) throws IOException {
+        knowledgeQaController.runKnowledgeQA(sessionId, rawBody, resourceUrls, sink);
     }
 
     @Override
     public void agentQa(String sessionId, String rawBody, String resourceUrls,
-            HttpServletResponse response) throws IOException {
-        knowledgeQaController.agentQA(sessionId, rawBody, resourceUrls, response);
+            SseSink sink) throws IOException {
+        knowledgeQaController.runAgentQA(sessionId, rawBody, resourceUrls, sink);
     }
 
     @Override
-    public ResponseEntity<List<MessageView>> loadMessages(String sessionId, String limit,
+    public EmbedReply<List<MessageView>> loadMessages(String sessionId, String limit,
             String beforeTime, String resourceUrls) {
         ResponseEntity<List<Message>> resp = messageController.loadMessages(sessionId, limit, beforeTime, resourceUrls);
         List<MessageView> views = resp.getBody() == null ? null
                 : resp.getBody().stream().map(SessionQaAdapter::toView).toList();
-        return ResponseEntity.status(resp.getStatusCode()).headers(resp.getHeaders()).body(views);
+        return new EmbedReply<>(resp.getStatusCode().value(), views);
     }
 
     @Override
-    public ApiResponse<Void> stopSession(String sessionId, String rawBody) {
+    public void stopSession(String sessionId, String rawBody) {
         StopSessionRequest request = null;
         if (rawBody != null && !rawBody.isEmpty()) {
             try {
@@ -80,26 +80,24 @@ public class EmbedSessionAdapter implements EmbedSessionPort {
                 throw new BizException(AppError.badRequest("invalid request body"));
             }
         }
-        return sessionController.stopSession(sessionId, request);
+        sessionController.stopSession(sessionId, request);
     }
 
     @Override
-    public ResponseEntity<MessageSuggestionView> getSuggestions(String sessionId, String messageId) {
-        return toView(suggestionController.get(sessionId, null, messageId));
+    public EmbedReply<MessageSuggestionView> getSuggestions(String sessionId, String messageId) {
+        return toReply(suggestionController.get(sessionId, null, messageId));
     }
 
     @Override
-    public ResponseEntity<MessageSuggestionView> ensureSuggestions(String sessionId, String messageId,
+    public EmbedReply<MessageSuggestionView> ensureSuggestions(String sessionId, String messageId,
             String rawBody) {
-        return toView(suggestionController.ensure(sessionId, messageId, rawBody));
+        return toReply(suggestionController.ensure(sessionId, messageId, rawBody));
     }
 
-    /** 保状态码与响应头，仅把 body 换成线格式视图（404 等无 body 情形逐字保留）。 */
-    private static ResponseEntity<MessageSuggestionView> toView(
+    /** 保状态码，仅把 body 换成线格式视图（无 body 情形逐字保留）。 */
+    private static EmbedReply<MessageSuggestionView> toReply(
             ResponseEntity<MessageSuggestionSet> resp) {
-        return ResponseEntity.status(resp.getStatusCode())
-                .headers(resp.getHeaders())
-                .body(toView(resp.getBody()));
+        return new EmbedReply<>(resp.getStatusCode().value(), toView(resp.getBody()));
     }
 
     /** 实体 → 线格式视图（域内投影：吃实体，字段逐字搬运；null 透传）。 */
@@ -132,7 +130,7 @@ public class EmbedSessionAdapter implements EmbedSessionPort {
     }
 
     @Override
-    public ApiResponse<Void> recordSuggestionEvent(String sessionId, String rawBody) {
-        return suggestionController.recordEvent(sessionId, rawBody);
+    public void recordSuggestionEvent(String sessionId, String rawBody) {
+        suggestionController.recordEvent(sessionId, rawBody);
     }
 }

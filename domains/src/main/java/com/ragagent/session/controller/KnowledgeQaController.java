@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.session.SseSink;
+import com.ragagent.platform.web.ServletSseSink;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.session.qa.ParsedRequest;
 import com.ragagent.session.qa.QaRequestParser;
@@ -168,9 +170,15 @@ public class KnowledgeQaController {
             @RequestBody(required = false) String rawBody,
             @RequestParam(value = Mode.QUERY_PARAM, required = false) String resourceUrls,
             HttpServletResponse response) throws IOException {
+        runKnowledgeQA(rawSessionId, rawBody, resourceUrls, new ServletSseSink(response));
+    }
+
+    /** 非 HTTP 入口（embed 委托面）：写面收敛到 {@link SseSink}。 */
+    public void runKnowledgeQA(String rawSessionId, String rawBody, String resourceUrls,
+            SseSink sink) throws IOException {
         CreateKnowledgeQARequest request = QaRequestBinder.bindQaRequest(rawBody);
         ParsedRequest parsed = qaRequestParser.parseQARequest(rawSessionId, request, resourceUrls, "KnowledgeQA", agentResolverField, currentTenant());
-        executor.executeQA(parsed.reqCtx(), QaMode.NORMAL, !request.disableTitle, response);
+        executor.executeQA(parsed.reqCtx(), QaMode.NORMAL, !request.disableTitle, sink);
     }
 
     @PostMapping("/api/v1/agent-chat/{sessionId}")
@@ -178,6 +186,12 @@ public class KnowledgeQaController {
             @RequestBody(required = false) String rawBody,
             @RequestParam(value = Mode.QUERY_PARAM, required = false) String resourceUrls,
             HttpServletResponse response) throws IOException {
+        runAgentQA(rawSessionId, rawBody, resourceUrls, new ServletSseSink(response));
+    }
+
+    /** 非 HTTP 入口（embed 委托面）：写面收敛到 {@link SseSink}。 */
+    public void runAgentQA(String rawSessionId, String rawBody, String resourceUrls,
+            SseSink sink) throws IOException {
         CreateKnowledgeQARequest request = QaRequestBinder.bindQaRequest(rawBody);
         ParsedRequest parsed = qaRequestParser.parseQARequest(rawSessionId, request, resourceUrls, "AgentQA", agentResolverField, currentTenant());
         QaRequestContext reqCtx = parsed.reqCtx();
@@ -193,9 +207,9 @@ public class KnowledgeQaController {
         }
 
         if (agentModeEnabled) {
-            executor.executeQA(reqCtx, QaMode.AGENT, true, response);
+            executor.executeQA(reqCtx, QaMode.AGENT, true, sink);
         } else {
-            executor.executeQA(reqCtx, QaMode.NORMAL, !request.disableTitle, response);
+            executor.executeQA(reqCtx, QaMode.NORMAL, !request.disableTitle, sink);
         }
     }
 

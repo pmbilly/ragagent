@@ -31,7 +31,7 @@ import com.ragagent.platform.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
-import jakarta.servlet.http.HttpServletResponse;
+import com.ragagent.contract.session.SseSink;
 import com.ragagent.contract.agent.AgentToolCall;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.access.TenantContextSnapshot;
@@ -217,10 +217,10 @@ public final class QaSseOrchestrator {
             }
         }
     }
-    public void handleAgentEventsForSSE(HttpServletResponse response, String sessionId,
+    public void handleAgentEventsForSSE(SseSink sink, String sessionId,
             String assistantMessageId, String requestId, SseStreamContext streamCtx,
             boolean waitForTitle, StreamRewriter resourceRewriter) throws IOException {
-        SseContract.setSSEHeaders(response);
+        sink.applyHeaders();
         AtomicBoolean clientGone = new AtomicBoolean(false);
         StreamEventEmitter.ClientState client = clientGone::get;
 
@@ -258,7 +258,7 @@ public final class QaSseOrchestrator {
                         streamCtx.eventBus.emit(stopEvt);
                     }
                     try {
-                        emitter.flushHeldStreamContent(response, requestId, resourceRewriter, client);
+                        emitter.flushHeldStreamContent(sink, requestId, resourceRewriter, client);
                     } catch (IOException ignored) {
                         // 客户端已断开
                     }
@@ -268,7 +268,7 @@ public final class QaSseOrchestrator {
                     stopResp.setResponseType(ResponseType.STOP);
                     stopResp.setContent("Generation stopped by user");
                     stopResp.setDone(true);
-                    sseFrameWriter.write(response, stopResp);
+                    sseFrameWriter.write(sink, stopResp);
                     return;
                 }
                 if (evt.getType() == ResponseType.COMPLETE) {
@@ -278,7 +278,7 @@ public final class QaSseOrchestrator {
                     titleReceived = true;
                 }
                 try {
-                    emitter.emitStreamEvent(response, evt, requestId, resourceRewriter, client);
+                    emitter.emitStreamEvent(sink, evt, requestId, resourceRewriter, client);
                 } catch (IOException e) {
                     clientGone.set(true);
                     log.info("Connection closed during event sending, stopping");
@@ -301,7 +301,7 @@ public final class QaSseOrchestrator {
                         if (!titleBatch.events().isEmpty()) {
                             for (StreamEvent evt : titleBatch.events()) {
                                 try {
-                                    emitter.emitStreamEvent(response, evt, requestId, resourceRewriter, client);
+                                    emitter.emitStreamEvent(sink, evt, requestId, resourceRewriter, client);
                                 } catch (IOException e) {
                                     clientGone.set(true);
                                     return;
@@ -314,7 +314,7 @@ public final class QaSseOrchestrator {
                         }
                     }
                 }
-                SseContract.sendCompletionEvent(response, requestId);
+                SseContract.sendCompletionEvent(sink, requestId);
                 return;
             }
         }

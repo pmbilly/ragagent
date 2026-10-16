@@ -1,5 +1,6 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.platform.web.ServletSseSink;
 import com.ragagent.session.support.LogSanitizer;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -257,7 +258,7 @@ public class SessionStreamController {
 
         try {
             for (StreamEvent evt : events) {
-                emitter.emitStreamEvent(response, evt, requestId, resourceRewriter, client);
+                emitter.emitStreamEvent(new ServletSseSink(response), evt, requestId, resourceRewriter, client);
             }
         } catch (IOException e) {
             clientGone.set(true);
@@ -292,7 +293,7 @@ public class SessionStreamController {
                 // 读事件失败：把扣留缓冲里还剩的吐出去，然后收工
                 log.error("Failed to get new events: {}", e.toString());
                 try {
-                    emitter.flushHeldStreamContent(response, requestId, resourceRewriter, client);
+                    emitter.flushHeldStreamContent(new ServletSseSink(response), requestId, resourceRewriter, client);
                 } catch (IOException ignored) {
                     // 客户端已经走了——没有别人可发
                 }
@@ -305,7 +306,7 @@ public class SessionStreamController {
                     if (evt.getType() == ResponseType.COMPLETE) {
                         completedNow = true;
                     }
-                    emitter.emitStreamEvent(response, evt, requestId, resourceRewriter, client);
+                    emitter.emitStreamEvent(new ServletSseSink(response), evt, requestId, resourceRewriter, client);
                 }
             } catch (IOException e) {
                 clientGone.set(true);

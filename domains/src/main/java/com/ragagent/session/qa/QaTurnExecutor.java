@@ -1,6 +1,7 @@
 package com.ragagent.session.qa;
 
 
+import com.ragagent.contract.session.SseSink;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -26,7 +27,6 @@ import com.ragagent.session.service.QaSupport.SseStreamContext;
 import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.platform.stream.StreamManager;
-import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.contract.session.MessageExecutionContext;
@@ -68,15 +68,15 @@ public final class QaTurnExecutor {
     }
 
     public void executeQA(QaRequestContext reqCtx, QaMode mode, boolean generateTitle,
-            HttpServletResponse response) throws IOException {
-        executeQA(reqCtx, mode, generateTitle, response, null);
+            SseSink sink) throws IOException {
+        executeQA(reqCtx, mode, generateTitle, sink, null);
     }
     /**
      * @param asyncDone skipSSE 调用方（steer follow-up）的完成信号：异步 runner 收尾后
      *                  complete；HTTP 调用方传 null。
      */
     private void executeQA(QaRequestContext reqCtx, QaMode mode, boolean generateTitle,
-            HttpServletResponse response, CompletableFuture<Void> asyncDone) throws IOException {
+            SseSink sink, CompletableFuture<Void> asyncDone) throws IOException {
         String sessionId = reqCtx.sessionId;
 
         // 输入条状态（纯 UI memo）异步写：新虚拟线程没有 ThreadLocal——纪律 #1
@@ -273,12 +273,12 @@ public final class QaTurnExecutor {
 
         // 主线程阻塞推 SSE（skipSSE 的 follow-up 无 HTTP 响应体：不推流，
         // 由 executeQaInternal 的 asyncDone.join() 等异步段收尾）
-        if (response == null) {
+        if (sink == null) {
             return;
         }
         boolean shouldWaitForTitle = generateTitle && reqCtx.session.getTitle() != null
                 && reqCtx.session.getTitle().isEmpty();
-        sseOrchestrator.handleAgentEventsForSSE(response, sessionId, reqCtx.assistantMessage.getId(), reqCtx.requestId,
+        sseOrchestrator.handleAgentEventsForSSE(sink, sessionId, reqCtx.assistantMessage.getId(), reqCtx.requestId,
                 streamCtx, shouldWaitForTitle, reqCtx.resourceRewriter);
     }
     private void runFollowUp(QaRequestContext followUp) {
@@ -317,8 +317,8 @@ public final class QaTurnExecutor {
         }
     }
     private void executeQaInternal(QaRequestContext reqCtx, QaMode mode, boolean generateTitle,
-            HttpServletResponse response) throws IOException {
-        if (response == null) {
+            SseSink sink) throws IOException {
+        if (sink == null) {
             // skipSSE 路径：等待异步段完成后返回
             CompletableFuture<Void> asyncDone = new CompletableFuture<>();
             try {
@@ -331,7 +331,7 @@ public final class QaTurnExecutor {
             asyncDone.join();
             return;
         }
-        executeQA(reqCtx, mode, generateTitle, response, null);
+        executeQA(reqCtx, mode, generateTitle, sink, null);
     }
     private void persistTurnMessages(QaRequestContext reqCtx) {
         if (reqCtx.userMessageID.isEmpty()) {

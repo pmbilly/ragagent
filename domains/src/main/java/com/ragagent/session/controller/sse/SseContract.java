@@ -1,5 +1,7 @@
 package com.ragagent.session.controller.sse;
 
+import com.ragagent.contract.session.SseSink;
+import com.ragagent.platform.web.ServletSseSink;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
@@ -38,10 +40,7 @@ public final class SseContract {
      * 重复调用不应产生第二个同名头。</p>
      */
     public static void setSSEHeaders(HttpServletResponse response) {
-        response.setHeader("Content-Type", CONTENT_TYPE);
-        response.setHeader("Cache-Control", CACHE_CONTROL);
-        response.setHeader("Connection", CONNECTION);
-        response.setHeader("X-Accel-Buffering", X_ACCEL_BUFFERING);
+        new ServletSseSink(response).applyHeaders();
     }
 
     /**
@@ -58,6 +57,10 @@ public final class SseContract {
  * <p>保留这个具名方法而不是删掉调用点，让调用序列保持显式——
  * 将来完成信号的语义若有变化，这里有一个明确的落点。</p>
      */
+    public static void sendCompletionEvent(SseSink sink, String requestId) {
+        // Intentionally empty（与 response 版同语义：完成由 complete 事件标志）
+    }
+
     public static void sendCompletionEvent(HttpServletResponse response, String requestId) {
         // Intentionally empty - completion is signaled by the 'complete' event
         // which is already sent before this function is called

@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.session.EmbedReply;
+import com.ragagent.contract.session.MessageSuggestionView;
 import com.ragagent.contract.session.MessageView;
+import com.ragagent.platform.web.ServletSseSink;
 
 /**
  * embed 委托协作者（自 {@link EmbedChannelController} 拆出的
@@ -59,11 +62,11 @@ final class EmbedChannelDelegateOps {
         String patched = patchEmbedChatPayload(rawBody, ch, agentMode);
         if (agentMode && !"builtin-quick-answer".equals(ch.getAgentId())) {
             ctrl.sessionPort.agentQa(LogSanitizer.sanitize(sessionId), patched,
-                    resourceUrls, response);
+                    resourceUrls, new ServletSseSink(response));
             return;
         }
         ctrl.sessionPort.knowledgeQa(LogSanitizer.sanitize(sessionId), patched,
-                resourceUrls, response);
+                resourceUrls, new ServletSseSink(response));
     }
 
     /**
@@ -130,8 +133,9 @@ final class EmbedChannelDelegateOps {
                                                     @RequestParam(name = "before_time", required = false) String beforeTime,
                                                     @RequestParam(name = "resource_urls", required = false) String resourceUrls) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
-        return ctrl.sessionPort.loadMessages(LogSanitizer.sanitize(sessionId), limit, beforeTime,
-                resourceUrls);
+        EmbedReply<List<MessageView>> reply = ctrl.sessionPort.loadMessages(
+                LogSanitizer.sanitize(sessionId), limit, beforeTime, resourceUrls);
+        return ResponseEntity.status(reply.status()).body(reply.body());
     }
 
     /**
@@ -145,7 +149,8 @@ final class EmbedChannelDelegateOps {
                                   @RequestBody(required = false)
                                   String rawBody) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
-        return ctrl.sessionPort.stopSession(LogSanitizer.sanitize(sessionId), rawBody);
+        ctrl.sessionPort.stopSession(LogSanitizer.sanitize(sessionId), rawBody);
+        return ApiResponse.ok();
     }
 
     /** 建议读取：channel 级 suppressed 分支优先于委托。 */
@@ -157,8 +162,9 @@ final class EmbedChannelDelegateOps {
         if (suppressed != null) {
             return suppressed;
         }
-        return ctrl.sessionPort.getSuggestions(LogSanitizer.sanitize(sessionId),
-                LogSanitizer.sanitize(messageId));
+        EmbedReply<MessageSuggestionView> reply = ctrl.sessionPort.getSuggestions(
+                LogSanitizer.sanitize(sessionId), LogSanitizer.sanitize(messageId));
+        return ResponseEntity.status(reply.status()).body(reply.body());
     }
 
     /** 建议生成（ensure 语义）。 */
@@ -171,15 +177,17 @@ final class EmbedChannelDelegateOps {
         if (suppressed != null) {
             return suppressed;
         }
-        return ctrl.sessionPort.ensureSuggestions(LogSanitizer.sanitize(sessionId),
-                LogSanitizer.sanitize(messageId), rawBody);
+        EmbedReply<MessageSuggestionView> reply = ctrl.sessionPort.ensureSuggestions(
+                LogSanitizer.sanitize(sessionId), LogSanitizer.sanitize(messageId), rawBody);
+        return ResponseEntity.status(reply.status()).body(reply.body());
     }
 
     /** 建议事件上报：成功 204 无响应体。 */
     public ApiResponse<Void> suggestionEvents(@PathVariable("sessionId") String sessionId,
                                               @RequestBody(required = false) String rawBody) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
-        return ctrl.sessionPort.recordSuggestionEvent(LogSanitizer.sanitize(sessionId), rawBody);
+        ctrl.sessionPort.recordSuggestionEvent(LogSanitizer.sanitize(sessionId), rawBody);
+        return ApiResponse.ok();
     }
 
     /**

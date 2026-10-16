@@ -35,7 +35,7 @@ import com.ragagent.platform.storage.fileserve.FileProxyPort;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.platform.session.embed.EmbedSessionPort;
+import com.ragagent.contract.session.EmbedSessionPort;
 import com.ragagent.contract.session.MessageView;
 
 /**

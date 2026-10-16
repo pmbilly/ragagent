@@ -3,6 +3,8 @@ package com.ragagent.session.controller.sse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import com.ragagent.contract.session.SseSink;
+
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Component;
@@ -75,6 +77,12 @@ public class SseFrameWriter {
      * 由调用方按"写失败"处理（关流）。</p>
      */
     public void write(HttpServletResponse response, StreamResponse payload) throws IOException {
+        response.getOutputStream().write(frameOf(payload).getBytes(StandardCharsets.UTF_8));
+        response.getOutputStream().flush();
+    }
+
+    /** 组帧（序列化 + {@code event:}/{@code data:} 行）——写出口无关（servlet 直写与 SseSink 共用）。 */
+    public String frameOf(StreamResponse payload) throws IOException {
         String json;
         try {
             json = mapper.writeValueAsString(payload);
@@ -85,8 +93,11 @@ public class SseFrameWriter {
         StringBuilder frame = new StringBuilder(json.length() + 32);
         frame.append("event:").append(EVENT_NAME).append('\n');
         frame.append("data:").append(json).append('\n').append('\n');
+        return frame.toString();
+    }
 
-        response.getOutputStream().write(frame.toString().getBytes(StandardCharsets.UTF_8));
-        response.getOutputStream().flush();
+    /** 写一帧到 {@link SseSink}（embed/QA 会话流的出口）。 */
+    public void write(SseSink sink, StreamResponse payload) throws IOException {
+        sink.writeFrame(frameOf(payload));
     }
 }

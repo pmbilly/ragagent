@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.servlet.http.HttpServletResponse;
+import com.ragagent.contract.session.SseSink;
 
 import org.springframework.stereotype.Component;
 
@@ -116,7 +116,7 @@ public class StreamEventEmitter {
      * 因为客户端把完成标记当作消息结束。
      */
     public void emitStreamEvent(
-            HttpServletResponse out, StreamEvent evt, String requestId,
+            SseSink out, StreamEvent evt, String requestId,
             StreamRewriter rewriter, ClientState client) throws IOException {
         StreamResponse response = buildStreamResponseFor(evt, requestId, rewriter);
         if (TERMINAL_RESPONSE_TYPES.contains(evt.getType())) {
@@ -133,7 +133,7 @@ public class StreamEventEmitter {
      * 或者放弃事件存储。客户端已经走了就没人收了。</p>
      */
     public void flushHeldStreamContent(
-            HttpServletResponse out, String requestId, StreamRewriter rewriter,
+            SseSink out, String requestId, StreamRewriter rewriter,
             ClientState client) throws IOException {
         Map<String, StreamRewriter.Held> held = rewriter.flushAll();
         if (held == null || held.isEmpty() || client.isGone()) {
