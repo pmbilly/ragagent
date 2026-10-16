@@ -100,10 +100,10 @@
 > 计数口径：`<模块>/src/main/java/**/*.java`，**不含 package-info**（2026-10-16 R5a 后实测）。
 
 ```
-现状（R4b + R6 后）                          目标（方案 §5.1）
-contract      294 件（纯 JDK，零依赖块）  →  contracts/
-platform      155 件（技术适配 + 追踪装饰/流句柄/共享传输 + 抓取词汇）→ platform/
-model-runtime 134 件（llm 54 · modelruntime 39 · embedding 18 · rerank 12 ·
+现状（R5a 后）                              目标（方案 §5.1）
+contract      300 件（纯 JDK，零依赖块）  →  contracts/
+platform      158 件（技术适配 + 追踪装饰/流句柄/共享传输 + 提示词/配置）→ platform/
+model-runtime 132 件（llm · modelruntime · embedding · rerank ·
                  modelcontext 12 · vlm 2 · application 装配面）
                                         →  model-runtime（已成；余 R2c-3d 少量过渡边）
 retrieval-engine 80 件（engine 67 · support 7 · 根 5 · graph/artifact/config/telemetry）
@@ -113,11 +113,12 @@ agent-engine   80 件（tool 23 · compaction 12 · prompt 11 · skills 9 · bud
 domains      1253 件（knowledge 240 · session 165〔含 rag 43〕· wiki 158 · mcp 131 ·
                  datasource 127 · auth 88 · memory/im 各 80 · agenttools 58 · …）
                                         →  domains（R5b/R5c 端口化后消费面再收）
-boot           13 件                      →  boot
+boot           14 件                      →  boot
 
 依赖方向：boot → 全部；domains / 三个 runtime → platform, contract；platform → contract；contract → JDK
 （**`:engine` 已解散**：chatpipeline → `domains/session/service/rag`、webfetch/抓取面 → `domains/websearch/fetch`
- ⇒ 旧的 `api(:model-runtime)`/`api(:retrieval-engine)` 传递边随模块消失；domains/boot 显式声明两个 runtime
+ ⇒ 旧的 `api(:model-runtime)`/`api(:retrieval-engine)` 传递边随模块消失；domains/boot/boot 显式声明
+  各 runtime（含 R5a 的 `:agent-engine`，domains 那条是**过渡边**待 R5b/R5c 收窄）
  ——其中 domains→model-runtime 是**过渡边**，待 R2c-3d 余项收完）
 ```
 ### 8.2 域内分层（方案 §6）
