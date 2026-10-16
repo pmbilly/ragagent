@@ -1,5 +1,6 @@
 package com.ragagent.agent;
 
+import com.ragagent.llm.domain.ProviderMetadataMaps;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
@@ -15,8 +16,8 @@ import com.ragagent.agent.compaction.CompactionReason;
 import com.ragagent.agent.compaction.CompactionResult;
 import com.ragagent.agent.compaction.CompactionSettings;
 import com.ragagent.agent.compaction.NothingToCompactException;
-import com.ragagent.platform.agent.AgentStep;
-import com.ragagent.platform.agent.AgentToolCall;
+import com.ragagent.contract.agent.AgentStep;
+import com.ragagent.contract.agent.AgentToolCall;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.agent.tool.runtime.ThinkBlocks;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
@@ -364,7 +365,7 @@ final class ObservePhase {
                     ToolCall c = new ToolCall();
                     c.setId(tc.getId());
                     c.setType("function");
-                    c.setProviderMetadata(tc.getProviderMetadata());
+                    c.setProviderMetadata(ProviderMetadataMaps.toNodeMap(tc.getProviderMetadata()));
                     c.setFunction(new FunctionCall(tc.getName(),
                             argsJson(tc.getArgs())));
                     llmCalls.add(c);

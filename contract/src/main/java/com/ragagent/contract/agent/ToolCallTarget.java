@@ -1,8 +1,7 @@
-package com.ragagent.platform.agent;
+package com.ragagent.contract.agent;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * 解析后的实际调用目标。
@@ -19,7 +18,6 @@ public class ToolCallTarget {
 
     /** 键序递归恒排序（与既有 jsonb 记录逐字节一致）。恒输出：null → {@code null}。 */
 
-    @JsonInclude(JsonInclude.Include.ALWAYS)
     private Map<String, Object> args;
 
     private String serviceName = "";

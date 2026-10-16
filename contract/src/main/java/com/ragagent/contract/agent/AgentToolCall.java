@@ -1,10 +1,7 @@
-package com.ragagent.platform.agent;
+package com.ragagent.contract.agent;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
 
 /**
@@ -33,7 +30,6 @@ import com.ragagent.contract.tool.ToolResult;
 public class AgentToolCall {
 
     /** 解析后的实际目标。null 时省略。 */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private ToolCallTarget target;
 
     /** 来自 LLM 的 function call ID。 */
@@ -44,14 +40,12 @@ public class AgentToolCall {
 
     /** 工具参数。恒输出：null → {@code null}；键序递归恒排序（与既有 jsonb 记录逐字节一致）。 */
 
-    @JsonInclude(JsonInclude.Include.ALWAYS)
     private Map<String, Object> args;
 
     /** 执行结果（内含 Output）。**恒输出**：null → {@code null}。 */
     private ToolResult result;
 
     /** agent 对该结果的反思（启用时才有）。空时省略。 */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String reflection;
 
     /** 执行耗时（毫秒）。{@code 0} 恒输出。 */
@@ -59,10 +53,9 @@ public class AgentToolCall {
 
     /**
      * 厂商特有的工具调用状态，供回放。空时省略。
-     * **值原样内联**（不是字符串化），故 Java 用 {@link JsonNode}。
+     * **值原样内联**（不是字符串化）；契约面以 {@code Object}（不透明树形）持有。
      */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private Map<String, JsonNode> providerMetadata;
+    private Map<String, Object> providerMetadata;
 
     public ToolCallTarget getTarget() { return target; }
     public void setTarget(ToolCallTarget v) { target = v; }
@@ -87,8 +80,8 @@ public class AgentToolCall {
     public long getDuration() { return duration; }
     public void setDuration(long v) { duration = v; }
 
-    public Map<String, JsonNode> getProviderMetadata() { return providerMetadata; }
-    public void setProviderMetadata(Map<String, JsonNode> v) { providerMetadata = v; }
+    public Map<String, Object> getProviderMetadata() { return providerMetadata; }
+    public void setProviderMetadata(Map<String, Object> v) { providerMetadata = v; }
 
     /**
      * 有 target 时用 target 名做展示与追踪。
@@ -96,13 +89,11 @@ public class AgentToolCall {
      * <p>{@code @JsonIgnore}——这是派生值，不是持久化字段；不标会被 Jackson
      * 当属性写进 jsonb，回读抛 {@code UnrecognizedPropertyException}。</p>
      */
-    @JsonIgnore
     public String getExecutionName() {
         return target != null ? target.getName() : name;
     }
 
     /** 有 target 时用 target 的参数，**不改回放数据**。 */
-    @JsonIgnore
     public Map<String, Object> getExecutionArgs() {
         return target != null ? target.getArgs() : args;
     }

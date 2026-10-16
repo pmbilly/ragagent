@@ -1,5 +1,6 @@
 package com.ragagent.agent;
 
+import com.ragagent.llm.domain.ProviderMetadataMaps;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
@@ -15,9 +16,9 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.agent.AgentStep;
-import com.ragagent.platform.agent.AgentToolCall;
-import com.ragagent.platform.agent.ToolCallTarget;
+import com.ragagent.contract.agent.AgentStep;
+import com.ragagent.contract.agent.AgentToolCall;
+import com.ragagent.contract.agent.ToolCallTarget;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.agent.tool.runtime.JsonRepair;
@@ -190,7 +191,7 @@ final class ActPhase {
             Map<String, Object> rawArgs = new LinkedHashMap<>();
             rawArgs.put("_raw", tc.getFunction().getArguments());
             toolCall.setArgs(rawArgs);
-            toolCall.setProviderMetadata(tc.getProviderMetadata());
+            toolCall.setProviderMetadata(ProviderMetadataMaps.toObjectMap(tc.getProviderMetadata()));
             ToolResult r = new ToolResult();
             r.setSuccess(false);
             r.setError(TRUNCATED_ARGUMENTS_ERROR);
@@ -310,7 +311,7 @@ final class ActPhase {
                 Map<String, Object> rawArgs = new LinkedHashMap<>();
                 rawArgs.put("_raw", argsStr);
                 c.setArgs(rawArgs);
-                c.setProviderMetadata(tc.getProviderMetadata());
+                c.setProviderMetadata(ProviderMetadataMaps.toObjectMap(tc.getProviderMetadata()));
                 ToolResult r = new ToolResult();
                 r.setSuccess(false);
                 r.setError("Failed to parse tool arguments: " + argsError.getMessage()
@@ -331,7 +332,7 @@ final class ActPhase {
                 Map<String, Object> rawArgs = new LinkedHashMap<>();
                 rawArgs.put("_raw", argsStr);
                 c.setArgs(rawArgs);
-                c.setProviderMetadata(tc.getProviderMetadata());
+                c.setProviderMetadata(ProviderMetadataMaps.toObjectMap(tc.getProviderMetadata()));
                 ToolResult r = new ToolResult();
                 r.setSuccess(false);
                 r.setError(TRUNCATED_ARGUMENTS_ERROR);
@@ -361,7 +362,7 @@ final class ActPhase {
                 Map<String, Object> rawArgs = new LinkedHashMap<>();
                 rawArgs.put("_raw", tc.getFunction().getArguments());
                 c.setArgs(rawArgs);
-                c.setProviderMetadata(tc.getProviderMetadata());
+                c.setProviderMetadata(ProviderMetadataMaps.toObjectMap(tc.getProviderMetadata()));
                 ToolResult r = new ToolResult();
                 r.setSuccess(false);
                 r.setError("Failed to parse repaired tool arguments: " + e.getMessage());
@@ -460,7 +461,7 @@ final class ActPhase {
         toolCall.setArgs(args);
         toolCall.setResult(result);
         toolCall.setDuration(duration);
-        toolCall.setProviderMetadata(tc.getProviderMetadata());
+        toolCall.setProviderMetadata(ProviderMetadataMaps.toObjectMap(tc.getProviderMetadata()));
 
         if (execError != null) {
             // 错误文本要**带着 `error code: N, error message: ` 前缀**（BizException.wireText）。

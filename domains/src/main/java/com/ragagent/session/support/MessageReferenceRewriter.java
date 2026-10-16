@@ -6,8 +6,8 @@ import java.util.List;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.ragagent.platform.agent.AgentStep;
-import com.ragagent.platform.agent.AgentToolCall;
+import com.ragagent.contract.agent.AgentStep;
+import com.ragagent.contract.agent.AgentToolCall;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageImage;
 import com.ragagent.platform.storage.support.Rewriter;

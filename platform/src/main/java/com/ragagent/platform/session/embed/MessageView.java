@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.platform.agent.AgentStep;
+import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.session.MentionedItem;
 import com.ragagent.contract.session.UsedMemory;

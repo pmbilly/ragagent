@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.platform.agent.AgentStep;
-import com.ragagent.platform.agent.AgentToolCall;
+import com.ragagent.contract.agent.AgentStep;
+import com.ragagent.contract.agent.AgentToolCall;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.llm.domain.ChatMessage;
 

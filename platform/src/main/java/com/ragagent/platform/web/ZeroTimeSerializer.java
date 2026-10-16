@@ -6,6 +6,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
+import com.ragagent.contract.json.ZeroTimes;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -36,26 +37,25 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  */
 public class ZeroTimeSerializer extends JsonSerializer<OffsetDateTime> {
 
-    /** 零值时间的瞬时（year 1 元旦 UTC）。 */
-    public static final Instant ZERO_TIME_INSTANT = Instant.parse("0001-01-01T00:00:00Z");
+    /** 零值时间的瞬时（year 1 元旦 UTC）——实现上提至 {@link ZeroTimes}，此处保留别名。 */
+    public static final Instant ZERO_TIME_INSTANT = ZeroTimes.ZERO_INSTANT;
 
-    /** 零值的字面输出。 */
-    public static final String ZERO_TIME_LITERAL = "0001-01-01T00:00:00Z";
+    /** 零值的字面输出（别名，见 {@link ZeroTimes}）。 */
+    public static final String ZERO_TIME_LITERAL = ZeroTimes.ZERO_LITERAL;
 
     /**
-     * 零值时间的 Java 表示——供字段**默认值**使用。
+     * 零值时间的 Java 表示——供字段**默认值**使用（别名，语义见 {@link ZeroTimes}）。
      *
      * <p>⚠️ 这点很关键：Jackson 对 {@code null} 值调用的是 {@code nullSerializer}，
      * **不会**走 {@code @JsonSerialize(using=…)} 指定的序列化器。
      * 所以"字段为 null 时输出 year-1 字面量"这个想法是行不通的——
      * 必须让字段本身就持有零值时间（贴合"时间非空"的既定语义）。</p>
      */
-    public static final OffsetDateTime ZERO_DATE_TIME =
-            OffsetDateTime.ofInstant(ZERO_TIME_INSTANT, java.time.ZoneOffset.UTC);
+    public static final OffsetDateTime ZERO_DATE_TIME = ZeroTimes.ZERO_DATE_TIME;
 
-    /** 该值是否就是零值时间。 */
+    /** 该值是否就是零值时间（委托 {@link ZeroTimes#isZero}）。 */
     public static boolean isZeroValue(OffsetDateTime value) {
-        return value == null || ZERO_TIME_INSTANT.equals(value.toInstant());
+        return ZeroTimes.isZero(value);
     }
 
     @Override

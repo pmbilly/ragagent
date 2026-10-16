@@ -3,7 +3,7 @@ package com.ragagent.chatpipeline.spi;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.agent.ToolCallTarget;
+import com.ragagent.contract.agent.ToolCallTarget;
 import com.ragagent.llm.domain.ChatMessage;
 
 /**

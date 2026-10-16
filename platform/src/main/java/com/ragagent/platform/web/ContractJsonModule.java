@@ -17,6 +17,9 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.IOException;
 
+import com.ragagent.contract.agent.AgentStep;
+import com.ragagent.contract.agent.AgentToolCall;
+import com.ragagent.contract.agent.ToolCallTarget;
 import com.ragagent.contract.event.payload.AgentActionData;
 import com.ragagent.contract.event.payload.AgentCompleteData;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
@@ -71,6 +74,8 @@ public final class ContractJsonModule extends SimpleModule {
         setMixInAnnotation(AgentFinalAnswerData.class, ContractJsonMixinsEvent.AgentFinalAnswerDataMixin.class);
         setMixInAnnotation(AgentPlanData.class, ContractJsonMixinsEvent.AgentPlanDataMixin.class);
         setMixInAnnotation(AgentQueryData.class, ContractJsonMixinsEvent.AgentQueryDataMixin.class);
+        setMixInAnnotation(AgentStep.class, ContractJsonMixinsAgent.AgentStepMixin.class);
+        setMixInAnnotation(AgentToolCall.class, ContractJsonMixinsAgent.AgentToolCallMixin.class);
         setMixInAnnotation(AgentToolCallData.class, ContractJsonMixinsEvent.AgentToolCallDataMixin.class);
         setMixInAnnotation(AgentToolResultData.class, ContractJsonMixinsEvent.AgentToolResultDataMixin.class);
         setMixInAnnotation(AppError.class, ContractJsonMixinsCore.AppErrorMixin.class);
@@ -93,6 +98,7 @@ public final class ContractJsonModule extends SimpleModule {
         setMixInAnnotation(TokenUsage.class, ContractJsonMixinsCore.TokenUsageMixin.class);
         setMixInAnnotation(ToolApprovalRequiredData.class, ContractJsonMixinsEvent.ToolApprovalRequiredDataMixin.class);
         setMixInAnnotation(ToolApprovalResolvedData.class, ContractJsonMixinsEvent.ToolApprovalResolvedDataMixin.class);
+        setMixInAnnotation(ToolCallTarget.class, ContractJsonMixinsAgent.ToolCallTargetMixin.class);
         setMixInAnnotation(ToolResult.class, ContractJsonMixinsCore.ToolResultMixin.class);
         setMixInAnnotation(UserMessageInjectedData.class, ContractJsonMixinsEvent.UserMessageInjectedDataMixin.class);
         setMixInAnnotation(WebSearchConfig.class, ContractJsonMixinsCore.WebSearchConfigMixin.class);

@@ -5,7 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.platform.agent.AgentStep;
+import com.ragagent.contract.agent.AgentStep;
 
 /**
  * agent 一次执行的运行时状态。

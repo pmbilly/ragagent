@@ -1,16 +1,17 @@
 package com.ragagent.session.service;
 
-import com.ragagent.platform.agent.AgentToolCall;
+import com.ragagent.contract.agent.AgentToolCall;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.platform.agent.AgentStep;
+import com.ragagent.contract.agent.AgentStep;
 
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.llm.domain.ProviderMetadataMaps;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.support.PipelineViews;
@@ -198,7 +199,7 @@ final class AgentHistoryAssembler {
             c.setType("function");
             c.setFunction(new FunctionCall(
                     tc.getName(), toJsonString(tc.getArgs())));
-            c.setProviderMetadata(tc.getProviderMetadata());
+            c.setProviderMetadata(ProviderMetadataMaps.toNodeMap(tc.getProviderMetadata()));
             chatCalls.add(c);
         }
         assistantMsg.setToolCalls(chatCalls);

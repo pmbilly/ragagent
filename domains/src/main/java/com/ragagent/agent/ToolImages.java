@@ -2,7 +2,7 @@ package com.ragagent.agent;
 
 import java.util.List;
 
-import com.ragagent.platform.agent.AgentStep;
+import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.agent.compaction.ConversationSerializer;
 

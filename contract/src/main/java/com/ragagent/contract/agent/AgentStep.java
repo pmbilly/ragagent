@@ -1,12 +1,10 @@
-package com.ragagent.platform.agent;
+package com.ragagent.contract.agent;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.contract.json.ZeroTimes;
 
 /**
  * ReAct 循环的一轮。
@@ -21,13 +19,16 @@ import com.ragagent.platform.web.ZeroTimeSerializer;
  *       空时省略；</li>
  *   <li>{@code tool_calls} <b>恒输出</b>：null 输出 {@code "tool_calls":null}；</li>
  *   <li>{@code timestamp} 零值输出 {@code "0001-01-01T00:00:00Z"}
- *       （不是 {@code null}），由 {@link ZeroTimeSerializer} 序列化。</li>
+ *       （不是 {@code null}），零值字面量由 {@code ZeroTimes} 语义约定。</li>
  * </ul>
  *
  * <p>实测的完整形状（零值时）：</p>
  * <pre>
  *   [{"iteration":0,"thought":"","tool_calls":null,"timestamp":"0001-01-01T00:00:00Z"}]
  * </pre>
+ *
+ * <p>{@code @JsonInclude}/{@code @JsonIgnore} 线格式注解由
+ * {@code platform.web.ContractJsonMixinsAgent} 的 mixin 承载（契约面纯 JDK）。</p>
  */
 public class AgentStep {
 
@@ -41,14 +42,12 @@ public class AgentStep {
      * 本轮模型响应**之前**已消费的 steer 行，按投递顺序。
      * 与时间戳不同，这在回放时不歧义。空时省略。
      */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> userMessagesBefore;
 
     /**
      * 一个普通回答之后紧接着一次循环结束的 steer —— 用它保住那个回答。
      * 规范的最终答案仍然存在 {@code Message.content} 里。false 时省略。
      */
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean intermediateAnswer;
 
     /**
@@ -56,7 +55,6 @@ public class AgentStep {
      * 存在 AgentStep 上是为了跨轮回放能把它放回 assistant 消息——MiMo / DeepSeek V3.2+
      * 的思考模式要求如此，不认这个字段的厂商会忽略它。空时省略。
      */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String reasoningContent;
 
     /** 本轮 Act 阶段调用的工具。**恒输出**：null → {@code null}。 */
@@ -70,7 +68,7 @@ public class AgentStep {
      */
 
 
-    private OffsetDateTime timestamp = ZeroTimeSerializer.ZERO_DATE_TIME;
+    private OffsetDateTime timestamp = ZeroTimes.ZERO_DATE_TIME;
 
     public int getIteration() { return iteration; }
     public void setIteration(int v) { iteration = v; }
@@ -95,13 +93,13 @@ public class AgentStep {
     /**
      * ⚠️ 返回的是**值类型语义**：未设置时给的是零值时间（{@code 0001-01-01T00:00:00Z}），
      * <b>不是 {@code null}</b>。判"有没有时间"要用
-     * {@link ZeroTimeSerializer#isZeroValue(OffsetDateTime)}。
+     * {@code ZeroTimes#isZero(OffsetDateTime)}。
      */
     public OffsetDateTime getTimestamp() { return timestamp; }
 
     /** 传入 {@code null} 等价于置回零值时间（不是"清除"）。 */
     public void setTimestamp(OffsetDateTime v) {
-        timestamp = v == null ? ZeroTimeSerializer.ZERO_DATE_TIME : v;
+        timestamp = v == null ? ZeroTimes.ZERO_DATE_TIME : v;
     }
 
     /**
@@ -110,7 +108,6 @@ public class AgentStep {
      * <p>{@code @JsonIgnore}——不加的话 Jackson 会把这个 getter 当属性写进 jsonb，
      * 回读直接抛 {@code UnrecognizedPropertyException}（历史上复发率最高的坑）。</p>
      */
-    @JsonIgnore
     public List<String> getObservations() {
         List<String> observations = new ArrayList<>();
         if (toolCalls == null) {
