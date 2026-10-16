@@ -67,9 +67,9 @@
 | **R1** | 契约面先行：`contract.model.chat`（llm.domain 11 件）+ `contract.retrieval` 缺口 + `contract.agent` 6 件 + `contract.execution` 按需 | ✅ **收官**：R1a `ae0a17c0`（11 件 → `contract.model.chat`）· R1b-1 `b5a36912`（4 件 → `contract.websearch`）；余项 **R1b-2→R3 / R1c→R5 / R1d 不建**（判定见 §2.9） |
 | **R2** | `model-runtime` 提取（**实际 153 件** = llm 58 / modelruntime 46 / embedding 21 / rerank 15 / modelcontext 13；计划的"163 件"含 tracing 6 + webfetch 4——**按计划自身 R4/R3 行裁定：tracing 归 R4、webfetch 归 R3**）；公开面分层（契约类 vs 实现面） | 🔄 **R2a ✅ `925071a2`+`f0355a7f`** · **R2b ✅ `c160b749`**（模块切出） · **R2c-1a ✅ `c25d90e7`**（`ModelRuntimePort`→`contract.model.ModelRuntime`、`VlmConfig` 契约化） · **R2c-1b ✅ `76c30539`**（装配器+配置映射入 model-runtime、共享传输归位 platform.http、模块内环清零）；**R2c-2 ✅ `fda13bbe`**（六处自建客户端改走端口工厂面 `chatClientFor`/`embedderFor`/`rerankerFor`/`chatConfigFor`；domains 对模型族的 import 70 处/22 文件 → **40 处/17 文件**）；**R2c-3a/3b ✅ `2e914b31`**（ASR 端口化 + `QaWiring` 装配走端口；`AsrTranscriber` 实现抽成独立类并自持 `@Component`，摘掉 domains 的手工 @Bean）⇒ domains 对模型族的 import **40 处/17 文件 → 27 处/14 文件**；**R2c-3c ✅ `1377e4ab` + `f83e2976`**（thinking 判定收进端口 `effectiveThinkingControl`——provider 词汇 5 处退场，`ModelDebugController` 对模型族 import 清零；顺带清 `InitializationController` 死参数）⇒ domains 余 **22 处/13 文件**；**R2c-3d 待做**（余项多为设计项：① `VlmDescriberWiring` 的 VLM 并发闸门（`ConcurrencyGovernor`+`Release`）建议收进端口（`ModelRuntime` 给"按模型闸门"或整个 VLM 调用）② `OllamaManageService` 的 Ollama 能力（status/models/pull）需契约端口 ③ `llm.extract` 族 9 处与 R4b 一并裁定（`PipelineConfig` 随 chatpipeline 走，`ExtractPrompts`/`EntityExtraction` 归 knowledge 或入契约）④ `PromptCache`/`ImageResolver` 各 1 逐条裁定；⑤ `modelcontext` 4 处**不动**——R5 之后是 `agent-engine → model-runtime` 的合法终态边）**R2c-3d 部分 ✅ `bafd7030`**（图片解析桥接 `ChatLocalImageResolverWiring` 归位组合根 boot ⇒ domains 余 **20 处/12 文件**）。**R2c 实质收敛**：余下 20 处里 4 处是合法终态边（`modelcontext` → R5），12 处与 R3/R4b 天然耦合（`retrieval.vlm` 的 VLM 客户端 + `ConcurrencyGovernor`/`Release` 闸门 ⇒ 随 R3 的 VLM 面一并；`llm.extract` 族 9 处 ⇒ 随 R4b：`PipelineConfig` 随 chatpipeline 走、`ExtractPrompts`/`EntityExtraction` 归 knowledge 或入契约），只剩 2 项可独立做：`OllamaService`/`OllamaModelInfo` 4 处（需 Ollama 能力端口）与 `PromptCache` 1 处（纯函数拆分到 platform）。⇒ **收窄 engine 的 `api(:model-runtime)` 应排到 R3/R4b 之后**
 | **R3** | **retrieval-engine 模块提取**（实测 85 件 + 30 测试） | ✅ **收官**：**R3a** `a3d26936`（VLM 面归位 ⇒ retrieval 对模型族 = 0）· **R3b-1** `f9870dc6`（自足件上提）· **R3c** `8b0b3782`（`:retrieval-engine` 切出）· **R3b-3** `9b10c247`/`19d578d5`/`f322f5e2`/`6bb310d7`（向量店面 / 读面 / 写面+解析面 / fallback 变体）· **R3b-4** `a0b8f121`·**R3b-5** `195ed447`·**R3b-6** `8b1380a5`（工具面 / 落点裁定 / 观测面拆类）· **R3d-1..5** `3bf266fc`/`6ab7b52a`/`2e2fb0e1`/`616d3650`/`1c23a2f0`（补漏 / pg 直连句柄 / verifyBinding / 连通性面 / 工具面归位 + 依赖收窄）。**验收读数**：`retrieval` 对模型族 import = 0 · **`domains` 主码对 `com.ragagent.retrieval.*` import = 0** · `engine` 已摘 `:retrieval-engine` 依赖 · `boot` 显式声明 |
-| **R4** | 归位：`tracing`(6) → `platform.tracing.decorators`；`chatpipeline`(46) → `domains/session/service.rag` | 🔄 **R4a ✅ `fff4d3ba`**（tracing 六件 → `platform.tracing.decorators`；契约流句柄三件 → `platform.stream`；顺带换锚 ArchUnit A16 前缀）；R4b（chatpipeline 归位）待做 |
+| **R4** | 归位：`tracing`(6) → `platform.tracing.decorators`；`chatpipeline`(46) → `domains/session/service.rag`（实落 `session/service/rag`）；`webfetch`(4) → `websearch` 域 fetch 面 | ✅ **收官**：**R4a** `fff4d3ba`（tracing 六件 + 契约流句柄三件）、**R4b-1** `89df46b3`（管线 SPI 4 端口 → `contract.pipeline`）· **R4b-2a** `10faf9f7`（`PipelinePorts` 契约化）· **R4b-2b** `592309b8`（webfetch 归位 + 抓取面两端口）· **R4b-2c-1** `91ec80ae`（`KnowledgeQaRunner` 端口，解评估域阻塞）· **R4b-2c-2** `3ecf29af`（本体 43 件归位 `session/service/rag` + `:engine` 解散） |
 | **R5** | agent-engine 自 `domains/agent`（79 件）外提 + `contract.agent` 6 件（并入判定）+ 工具 SPI | ⬜（新情报：`AgentEngine` 直连 `platform.tracing.langfuse` 与 `platform.access/event` ⇒ platform 边比 engine 边重） |
-| **R6** | engine 解散收口（剩余包归位 + 收窄 `api` 传递 + 模块图终检） | ⬜（**前置**：R3/R4b 之后才能收窄 `engine` 的 `api(:model-runtime)`） |
+| **R6** | engine 解散收口（剩余包归位 + 收窄 `api` 传递 + 模块图终检） | ✅ **实做部分随 R4b-2c-2 完成** `3ecf29af`：`:engine` 整模块解散（settings/jacoco/守卫清单/Dockerfile/依赖全摘）⇒ 两条 `api` 传递边自动消失；**余**：模块图终检放到 R5 之后（agent-engine 落位后一次跑） |
 
 ## 6. 环境与运行
 
@@ -95,27 +95,28 @@
 
 ## 8. 结构地图与守卫总表
 
-### 8.1 现状模块（7）与目标（7）
+### 8.1 现状模块（6）与目标（7）
 
-> 计数口径：`<模块>/src/main/java/**/*.java`，**不含 package-info**（2026-10-16 R3c 后实测）。
+> 计数口径：`<模块>/src/main/java/**/*.java`，**不含 package-info**（2026-10-16 R4b/R6 后实测）。
 
 ```
-现状（R3c 后）                              目标（方案 §5.1）
-contract      271 件（纯 JDK，零依赖块）  →  contracts/
-platform      150 件（技术适配 + 追踪装饰/流句柄/共享传输）→ platform/
-model-runtime 134 件（llm 54 · modelruntime 39 · embedding 18 · rerank 12 · modelcontext 12 ·
-                 vlm 2 · application 装配面）
-                                        →  model-runtime（已成）
-retrieval-engine 85 件（R3c 切出：engine 67 · support 9 · 根 5 · graph 3 · artifact/config/telemetry）
-                                        →  retrieval-engine（已成；R3d 端口化收窄）
-engine         49 件（chatpipeline 45 · webfetch 4；二者将迁：chatpipeline→session（R4b）·
-                 webfetch 归属拍板（R3d））
-domains      1287 件
-boot           13 件                      →  agent-engine（R5 自 domains/agent 外提）
+现状（R4b + R6 后）                          目标（方案 §5.1）
+contract      294 件（纯 JDK，零依赖块）  →  contracts/
+platform      155 件（技术适配 + 追踪装饰/流句柄/共享传输 + 抓取词汇）→ platform/
+model-runtime 134 件（llm 54 · modelruntime 39 · embedding 18 · rerank 12 ·
+                 modelcontext 12 · vlm 2 · application 装配面）
+                                        →  model-runtime（已成；余 R2c-3d 少量过渡边）
+retrieval-engine 80 件（engine 67 · support 7 · 根 5 · graph/artifact/config/telemetry）
+                                        →  retrieval-engine（已成；R3 收官）
+domains      1334 件（knowledge 240 · session 165〔含 rag 43〕· wiki 158 · mcp 131 ·
+                 datasource 127 · auth 88 · memory/im/agent 各 80 · agenttools 58 · …）
+                                        →  domains + agent-engine（R5 自 domains/agent 80 件外提）
+boot           13 件                      →  boot
 
 依赖方向：boot → 全部；domains / 三个 runtime → platform, contract；platform → contract；contract → JDK
-（过渡期：engine 以 api 传递 :model-runtime 与 :retrieval-engine ⇒ R3d/R4b 端口化后收窄成逐点显式声明；
-  retrieval-engine 对模型族出边 = 0 ✓ 已达标）
+（**`:engine` 已解散**：chatpipeline → `domains/session/service/rag`、webfetch/抓取面 → `domains/websearch/fetch`
+ ⇒ 旧的 `api(:model-runtime)`/`api(:retrieval-engine)` 传递边随模块消失；domains/boot 显式声明两个 runtime
+ ——其中 domains→model-runtime 是**过渡边**，待 R2c-3d 余项收完）
 ```
 ### 8.2 域内分层（方案 §6）
 
@@ -206,6 +207,11 @@ boot           13 件                      →  agent-engine（R5 自 domains/ag
 | R2c-2 | 2026-10-16 | **六处"自建客户端"改走端口**：端口新增"按行视图的工厂面"四方法（不做取数、不挂观测装饰——取数口径本就因调用方而异，只统一"怎么造"）；改走：DefaultMemory/WikiModelResolver · McpUsageInstructionsOps/Controller · SessionAgentQaService（保留自身 wrap）· ModelConnectivityTestService（chat×2/embedding/rerank）· ModelDebugController。顺带清死码（域侧 appSecret 解密与 provider 分支——解密收进工厂面；对 lkeap/volcengine 现在会给 appId，属修正已注明） | 15 守卫绿 · :domains:javadoc 0 错 · 金片 1349 一致 · gate 2m21s / **4996 / 0 / 4** · 冒烟 200。（改写过程中曾误按截断读取覆盖两个 resolver 全文，已 git checkout 恢复后外科式改写） |
 | R2c-1b | 2026-10-16 | **组装权下沉**：`ModelRuntimeAssembler`+`ModelRuntimeConfigs` → `modelruntime.application`（依赖换成契约端口 `ModelCatalogPort`，闸门错误文案仍在装配器拆包）；`LlmTransport`+`Wiring` → `platform.http`（共享裸 HTTP 传输，非模型语义）⇒ **模块内环清零**（2 组→0、间接环 1→0），domains 的 7 个消费点不再 import model-runtime | 15 守卫绿 · 金片 1349 一致 · gate 2m12s / **4996 / 0 / 4**（platform 195→205、model-runtime 239→229）· 起服 200 |
 | R2c-1a | 2026-10-16 | 模型运行时端口契约化：`chatpipeline.spi.ModelRuntimePort` → `contract.model.ModelRuntime`（§8.1 目标名）；`VlmClient.VlmConfig` 抽为 `contract.model.VlmConfig`（纯记录 + 两个派生方法）；全仓类型名同步。**发现**：方案 §8.1 的 `ModelAccessResolver` 已被既有 `ModelCatalogPort` 覆盖，无需新建 | 15 守卫绿 · 金片 1349 一致 · gate 2m11s / 4996 / 0 / 4 · 冒烟 200 |
+| R4b-1 | 2026-10-16 | **管线 SPI 契约化**：`McpToolingGateway`/`McpToolRegistrationPort`/`ToolRegistryPort`/`WebSearchExecutor` `chatpipeline.spi` → `contract.pipeline`（四者的实现散在 mcp/knowledge/evaluation/agenttools 等域，消费方是管线本体 ⇒ 放实现包里会把整条管线拖成跨域依赖）；`KnowledgeQaEventPort` 未随迁（签名取内部件 `ChatManage`）。契约纯度：两处 `JsonNode` 参数改**不透明 JSON**（`Object`），实现侧还原。**A20 逮到真问题**：`ToolRegistryPort` 的实现原为 `ToolRegistry` 里的包内匿名类（守卫只认顶层类 ⇒ 报"契约悬空"）⇒ 抽成同包顶层 `ToolRegistryPortImpl` + 补包内访问器 | 15 守卫绿 · 金片 1349 一致 · gate 1m51s / **5000 / 0 / 4** · 冒烟 200 |
+| R4b-2a | 2026-10-16 | **管线端口束契约化**：`chatpipeline.PipelinePorts`（201 行，嵌套端口束 + 三对齐 record）→ `contract.pipeline`——session 之外的 4 个 api 适配器（knowledge/memory/websearch/datasource）只需这一束 ⇒ 契约化后不再依赖管线本体（本体归位的前置）；`DataAnalysisSession.execute(JsonNode)` → 不透明 JSON；顺带清 4 处"仅注释提及"的无效 import | 15 守卫绿 · 金片 1349 一致 · gate 2m14s / **5000 / 0 / 4** · 冒烟 200 |
+| R4b-2b | 2026-10-16 | **webfetch 归位 websearch 域 + 抓取面契约化**：`FetchException` → `contract.websearch`（可机读码是跨域失败词汇）；`Fetcher`/`AgentMarkdown`/`BrowserRenderer` + 测试 → `domains/websearch/fetch`；抓取面拆**两个单方法端口**（各恰一顶层实现，合 A20「唯一实现」）：`PipelinePageFetcher`（15s/100KB）/`ToolPageFetcher`（markdown/2MB/60s/浏览器兜底）；消费点 `PluginWebFetch`（QaWiring 注入）· `WebFetchTool`/`WebSearchTool`（AgentToolBackends 注入）⇒ **agenttools→websearch / session→websearch 两条新域间边均未产生**（R10 仍 6 条） | 15 守卫绿 · 金片 1349 一致 · gate 1m57s / **5000 / 0 / 4**（首轮 1 例 Redis 族失败，隔离 5/0 绿）· 冒烟 200 |
+| R4b-2c-1 | 2026-10-16 | **评估侧去管线本体依赖**（本体归位前置）：契约三件 `KnowledgeQaRunRequest`（评估路径实际赋值的字段子集 + 内嵌 `SummarySpec`）/ `KnowledgeQaRunResult`（检索/重排/生成三产物，均为契约形状）/`KnowledgeQaRunner`；会话域实现 `KnowledgeQaRunnerImpl`（顶层，A20 唯一实现）做 请求→`ChatManage` 还原→跑 rag 预设→回带产物；`EvaluationService` 的 `buildChatManage` 换成 `toRunRequest` ⇒ 对管线本体 import 清零 | 15 守卫绿 · 金片 1349 一致 · gate 2m13s / **5000 / 0 / 4** · 冒烟 200 |
+| R4b-2c-2 + R6 | 2026-10-16 | **管线本体归位 + `:engine` 解散**：chatpipeline 本体 43 件（`ChatManage`/`EventManager`/`PipelineBuilder`/`PipelineLog`/`PipelineProgress`/`SummaryConfig`/`spi.KnowledgeQaEventPort` + plugin 24 + support 7）→ `domains/session/service/rag`（包名整体换）；测试 9 + 夹具 2 随迁；`:engine` 模块解散（settings/jacoco/`_source_roots`/stray-dirs/test-summary/dev-stale-check/Dockerfile/依赖一并摘除）；补偿：domains/boot 显式声明 `:model-runtime`（domains 那条是过渡边）、engine 的 wire 录制夹具迁入 `domains/src/testFixtures/resources/wire`；**实物损失已修复**：`rm -rf engine` 连带删掉 `engine/src/main/resources/initialization/extract_config.yaml`（致 1249 例失败）⇒ 按"资源随读者走"恢复到 `model-runtime/src/main/resources/initialization/`；换锚：R9 包级 SCC 组名 · json-key 前缀/BASELINE · B93b EVENT_MAP_FILES · 大文件基线 · A17 两个管线插件 | 15 守卫绿（环 0 · R10 仍 6 条）· 金片 1349 一致 · gate 1m35s / **5000 / 0 / 4** · 冒烟 200 · **六模块** |
 | R4a | 2026-10-16 | **tracing 归位**：6 个 Langfuse 装饰器 → `platform.tracing.decorators` + 3 个契约流句柄（QueuedChatStream/SyncChatStream/StreamLifecycle）→ `platform.stream`（装饰器要建/转发流 ⇒ 句柄须在更低层）；错位测试随迁；engine 的 tracing 目录清空。**本批是 R2c 的解阻塞项**（装饰器已只依赖契约面）。顺带换锚 ArchUnit A16 禁用前缀（不改则 service 违规静默失明） | 15 守卫绿 · json-key 换锚（5 出 5 入）· 金片 1349 一致 · gate 2m4s / **4996 / 失败 0 / 跳过 4**（platform 188→195、engine 322→315）· 冒烟 200 |
 | R2b | 2026-10-16 | **`:model-runtime` 模块切出**：五包（llm/modelruntime/embedding/rerank/modelcontext）148 件主源码 + 19 件测试 `git mv`；模块清单四处同步（settings · `_source_roots.py`（守卫单一来源）· 根 jacoco 聚合 · stray-dirs/test-summary/dev-stale-check）；engine 过渡期 `api(:model-runtime)`；**Dockerfile 顺带校正**——原写已裁撤的 `common/` 且漏拷 contract/platform，`docker build` 必失败 | 15 守卫绿（R9 SCC 9 组不变 · 域间契约 6 条不变）· 大文件守卫按路径换锚 4 条（另回退 8 处无关数值刷新）· 金片 1349 一致 · gate 2m9s / **4996 / 失败 0 / 跳过 4**（model-runtime 实跑 239，engine 561→322 ⇒ 搬迁测试真跑）· 起服冒烟 200 |
 | R2a-2 | 2026-10-16 | 模型面端口与结果形状上提：`embedding.Embedder`（9）/`rerank.Reranker`（8）/`rerank.RankResult`（3）→ `contract.model`；**RankResult 拆分**——纯形状进契约面，parse/marshal 移实现侧新件 `rerank.RankResultCodec`；@JsonProperty 对位进 `ContractJsonMixinsModel`（含内嵌 DocumentInfo）；同包裸引用 7 处补 import | 15 守卫绿 · 金片 1349 一致 · json-key 换锚（离开 1 / 进入 2）· gate 1m55s / **4996 / 失败 0 / 跳过 4** · 冒烟 200 |
