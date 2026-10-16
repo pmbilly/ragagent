@@ -7,10 +7,10 @@ import com.ragagent.contract.tool.ToolResult;
 /**
  * agent 领域里的一次工具调用。
  *
- * <h2>⚠️ 与 {@code com.ragagent.llm.domain.ToolCall} 不是同一个类型</h2>
+ * <h2>⚠️ 与 {@code com.ragagent.contract.model.chat.ToolCall} 不是同一个类型</h2>
  * <p>本仓有<b>两个</b>同名类型，靠包区分：</p>
  * <ul>
- *   <li>{@code com.ragagent.llm.domain.ToolCall}：
+ *   <li>{@code com.ragagent.contract.model.chat.ToolCall}：
  *       **OpenAI 协议形状**（{@code id}/{@code type}/{@code function}），
  *       是发给 provider 的请求体。</li>
  *   <li>本类：**agent 领域形状**

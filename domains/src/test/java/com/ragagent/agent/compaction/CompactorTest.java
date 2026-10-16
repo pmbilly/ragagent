@@ -16,10 +16,10 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.llm.domain.CacheRetention;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.model.chat.CacheRetention;
 
 /**
  * 压缩器端到端的录制常量断言。

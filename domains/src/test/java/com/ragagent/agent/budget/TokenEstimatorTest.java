@@ -9,11 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatTool;
-import com.ragagent.llm.domain.MessageContentPart;
-import com.ragagent.llm.domain.ToolCall;
-import com.ragagent.llm.domain.FunctionCall;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatTool;
+import com.ragagent.contract.model.chat.MessageContentPart;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.chat.FunctionCall;
 
 /**
  * token 估算的录制常量断言（期望值由录制程序对旧分词器跑出真值后逐字节抄入）。

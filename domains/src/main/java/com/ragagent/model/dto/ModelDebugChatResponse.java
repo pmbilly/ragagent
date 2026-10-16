@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ToolCall;
 
 /**
  * models/{id}/debug 的 chat 分支 rawResponse（流式聚合结果）。

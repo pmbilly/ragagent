@@ -11,9 +11,9 @@ import java.util.function.BiPredicate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryConsolidationResult;
 import com.ragagent.memory.domain.item.MemoryItem;

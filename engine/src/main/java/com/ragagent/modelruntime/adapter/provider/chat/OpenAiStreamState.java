@@ -9,7 +9,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.llm.domain.ProviderMetadataMaps;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingEmitter;
 
 /**
@@ -90,6 +91,6 @@ final class OpenAiStreamState {
             entry.getFunction().setArguments("");
             toolCallMap.put(index, entry);
         }
-        entry.setProviderMetadata(metadata);
+        entry.setProviderMetadata(ProviderMetadataMaps.toObjectMap(metadata));
     }
 }

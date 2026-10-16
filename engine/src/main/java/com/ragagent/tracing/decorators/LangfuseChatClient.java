@@ -15,13 +15,13 @@ import com.ragagent.llm.ChatStream;
 import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;
 
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
-import com.ragagent.llm.domain.ToolCall;
-import com.ragagent.llm.domain.ChatTool;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.chat.ChatTool;
 
 /**
  * chat 客户端的 langfuse 装饰器：

@@ -14,15 +14,15 @@ import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.contract.session.PipelineMessageImageView;
 import com.ragagent.contract.session.PipelineMessageView;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.llm.extract.PipelineConfig;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.ChatResponse;
 
 /**
  * QUERY_UNDERSTAND 阶段插件：

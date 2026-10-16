@@ -1,11 +1,9 @@
-package com.ragagent.llm.domain;
-
+package com.ragagent.contract.model.chat;
 
 /**
  * 函数调用详情。
- * JSON 字段序 = 声明序。
+ * JSON 字段序 = 声明序；键名即字段名，不需要 mixin 承载。
  */
-
 public class FunctionCall {
 
     private String name = "";

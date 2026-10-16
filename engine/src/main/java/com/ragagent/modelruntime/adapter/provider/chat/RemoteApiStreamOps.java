@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ToolCall;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

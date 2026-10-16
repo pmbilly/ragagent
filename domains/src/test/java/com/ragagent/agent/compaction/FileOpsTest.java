@@ -12,9 +12,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ToolCall;
-import com.ragagent.llm.domain.FunctionCall;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.chat.FunctionCall;
 
 /**
  * fileops 的录制常量断言（场景 =

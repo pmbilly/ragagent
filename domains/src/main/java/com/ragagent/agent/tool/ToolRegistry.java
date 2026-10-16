@@ -17,11 +17,11 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.llm.domain.FunctionDef;
+import com.ragagent.contract.model.chat.FunctionDef;
 import com.ragagent.platform.web.ToolJson;
 import com.ragagent.contract.agent.ToolCallTarget;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.chatpipeline.spi.McpToolingGateway;
 import com.ragagent.chatpipeline.spi.ToolRegistryPort;
 import com.ragagent.contract.tool.ToolOutput;

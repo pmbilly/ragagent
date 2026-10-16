@@ -11,14 +11,14 @@ import com.ragagent.agent.domain.AgentState;
 import com.ragagent.contract.agent.AgentToolCall;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.platform.event.EventJson;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.support.ContractJson;
 import com.ragagent.agent.compaction.CompactionSettings;
-import com.ragagent.llm.domain.ChatTool;
-import com.ragagent.llm.domain.FunctionCall;
+import com.ragagent.contract.model.chat.ChatTool;
+import com.ragagent.contract.model.chat.FunctionCall;
 import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.agent.prompt.RecentDocInfo;
 import com.ragagent.agent.prompt.SelectedDocumentInfo;
@@ -264,7 +264,7 @@ class EngineRecordingTest {
             Engine46bStubSupport.EventRecorder sink = new Engine46bStubSupport.EventRecorder()
                     .attach(engine.getBusForTest());
 
-            com.ragagent.llm.domain.ToolCall tc = new com.ragagent.llm.domain.ToolCall();
+            com.ragagent.contract.model.chat.ToolCall tc = new com.ragagent.contract.model.chat.ToolCall();
             tc.setId(c.id());
             tc.getFunction().setName("knowledge_search");
             tc.getFunction().setArguments(c.args());
@@ -475,7 +475,7 @@ class EngineRecordingTest {
 
     private static ChatMessage assistantWithCall(String id, String toolName, String args) {
         ChatMessage m = new ChatMessage("assistant", "");
-        com.ragagent.llm.domain.ToolCall call = new com.ragagent.llm.domain.ToolCall();
+        com.ragagent.contract.model.chat.ToolCall call = new com.ragagent.contract.model.chat.ToolCall();
         call.setId(id);
         call.setType("function");
         call.setFunction(new FunctionCall(toolName, args));

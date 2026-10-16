@@ -1,19 +1,15 @@
-package com.ragagent.llm.domain;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+package com.ragagent.contract.model.chat;
 
 /**
  * 图片 URL 结构。
- * JSON 字段序 = 声明序：url 恒输出，detail 为空时省略。
+ * JSON 字段序 = 声明序：url 恒输出，detail 为空时省略——
+ * 线格式注解由 {@code platform.web.ContractJsonMixinsModelChat} 的 mixin 承载（契约面纯 JDK）。
  */
-@JsonPropertyOrder({"url", "detail"})
 public class ImageUrl {
 
     /** URL 或 base64 data URI */
     private String url = "";
     /** "auto" / "low" / "high" */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String detail;
 
     public ImageUrl() {

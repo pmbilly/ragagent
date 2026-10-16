@@ -10,12 +10,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.llm.domain.ChatTool;
-import com.ragagent.llm.domain.FunctionDef;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.model.chat.ChatTool;
+import com.ragagent.contract.model.chat.FunctionDef;
+import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.contract.retrieval.SearchResult;
 
 /**
@@ -429,8 +430,9 @@ public final class Registry {
             ChatTool copy = new ChatTool();
             copy.setType(tool.getType());
             FunctionDef original = tool.getFunction();
+            JsonNode parameters = JsonMappers.toJsonNode(original.getParameters());
             copy.setFunction(new FunctionDef(original.getName(), original.getDescription(),
-                    original.getParameters() == null ? null : original.getParameters().deepCopy()));
+                    parameters == null ? null : parameters.deepCopy()));
             encoded.add(copy);
         }
         // 先注册路由 enum，与工具描述顺序无关
@@ -440,7 +442,8 @@ public final class Registry {
             if (entry == null) {
                 continue;
             }
-            String parametersText = def.getParameters() == null ? null : ToolJson.write(def.getParameters());
+            JsonNode defParameters = JsonMappers.toJsonNode(def.getParameters());
+            String parametersText = defParameters == null ? null : ToolJson.write(defParameters);
             Map<String, String> schema = ToolPolicy.RawJson.scanTopLevelObject(parametersText);
             if (schema == null || !schema.containsKey("properties")) {
                 continue;

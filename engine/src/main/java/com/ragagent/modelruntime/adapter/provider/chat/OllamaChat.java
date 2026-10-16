@@ -14,15 +14,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.llm.domain.ChatConfig;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.llm.domain.FunctionCall;
+import com.ragagent.contract.model.chat.ChatConfig;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.model.chat.FunctionCall;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.llm.ollama.OllamaChatRequest;
 import com.ragagent.llm.ollama.OllamaMessage;
 import com.ragagent.llm.ollama.OllamaService;
@@ -31,7 +31,7 @@ import com.ragagent.llm.ollama.OllamaToolCall;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.llm.domain.ChatTool;
+import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingEmitter;
 import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;
 
@@ -278,7 +278,7 @@ public class OllamaChat implements LlmChatClient {
                 chatReq.setThink(opts.getThinking());
             }
             if (opts.getFormat() != null) {
-                chatReq.setFormat(opts.getFormat());
+                chatReq.setFormat(JsonMappers.toJsonNode(opts.getFormat()));
             }
             if (opts.getTools() != null && !opts.getTools().isEmpty()) {
                 chatReq.setTools(toolFrom(opts.getTools()));
@@ -330,7 +330,7 @@ public class OllamaChat implements LlmChatClient {
             OllamaTool.Function fn = new OllamaTool.Function(
                     function == null ? "" : function.getName(),
                     function == null ? null : function.getDescription(),
-                    function == null ? null : function.getParameters());
+                    function == null ? null : JsonMappers.toJsonNode(function.getParameters()));
             ollamaTools.add(new OllamaTool(tool.getType(), fn));
         }
         return ollamaTools;

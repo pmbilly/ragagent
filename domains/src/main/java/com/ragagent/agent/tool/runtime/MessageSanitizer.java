@@ -4,7 +4,7 @@ import com.ragagent.platform.text.HtmlText;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.contract.model.chat.ChatMessage;
 
 /**
  * LLM 兼容性消息清洗。

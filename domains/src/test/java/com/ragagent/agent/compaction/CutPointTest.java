@@ -8,9 +8,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.agent.budget.TokenEstimator;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ToolCall;
-import com.ragagent.llm.domain.FunctionCall;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.chat.FunctionCall;
 
 /**
  * 切点选择的录制常量断言。

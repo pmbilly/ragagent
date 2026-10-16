@@ -14,13 +14,14 @@ import static com.ragagent.modelcontext.GoRecording46A.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatTool;
-import com.ragagent.llm.domain.FunctionCall;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatTool;
+import com.ragagent.contract.model.chat.FunctionCall;
+import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.ChatResponse;
 
 /**
  * 4.6a modelcontext 包的录制回放（常量见 {@link GoRecording46A}——字节断言为准）。
@@ -660,8 +661,8 @@ class ModelContextRecordingTest {
                 sb.append(',');
             }
             ChatTool t = tools.get(i);
-            String params = t.getFunction().getParameters() == null ? "null"
-                    : ToolJson.write(t.getFunction().getParameters());
+            JsonNode parameters = JsonMappers.toJsonNode(t.getFunction().getParameters());
+            String params = parameters == null ? "null" : ToolJson.write(parameters);
             sb.append("{\"type\":\"").append(JsonBridge.jsonString(t.getType()))
                     .append("\",\"function\":{\"name\":\"").append(JsonBridge.jsonString(t.getFunction().getName()))
                     .append("\",\"description\":\"").append(JsonBridge.jsonString(t.getFunction().getDescription()))

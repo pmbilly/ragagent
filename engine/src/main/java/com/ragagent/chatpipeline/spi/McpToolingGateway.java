@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.agent.ToolCallTarget;
-import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.contract.model.chat.ChatMessage;
 
 /**
  * MCP 工具编排端口（引擎侧接口）。

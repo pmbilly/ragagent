@@ -1,7 +1,6 @@
 package com.ragagent.agent;
 
-import com.ragagent.llm.domain.ProviderMetadataMaps;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.time.Instant;
@@ -31,12 +30,12 @@ import com.ragagent.contract.event.payload.AgentToolResultData;
 import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.llm.domain.FunctionCall;
+import com.ragagent.contract.model.chat.FunctionCall;
 
 /**
  * ReAct「Act」段的协作者：工具调用编排——串行/并行执行、截断参数拒执、
@@ -191,7 +190,7 @@ final class ActPhase {
             Map<String, Object> rawArgs = new LinkedHashMap<>();
             rawArgs.put("_raw", tc.getFunction().getArguments());
             toolCall.setArgs(rawArgs);
-            toolCall.setProviderMetadata(ProviderMetadataMaps.toObjectMap(tc.getProviderMetadata()));
+            toolCall.setProviderMetadata(tc.getProviderMetadata());
             ToolResult r = new ToolResult();
             r.setSuccess(false);
             r.setError(TRUNCATED_ARGUMENTS_ERROR);
@@ -311,7 +310,7 @@ final class ActPhase {
                 Map<String, Object> rawArgs = new LinkedHashMap<>();
                 rawArgs.put("_raw", argsStr);
                 c.setArgs(rawArgs);
-                c.setProviderMetadata(ProviderMetadataMaps.toObjectMap(tc.getProviderMetadata()));
+                c.setProviderMetadata(tc.getProviderMetadata());
                 ToolResult r = new ToolResult();
                 r.setSuccess(false);
                 r.setError("Failed to parse tool arguments: " + argsError.getMessage()
@@ -332,7 +331,7 @@ final class ActPhase {
                 Map<String, Object> rawArgs = new LinkedHashMap<>();
                 rawArgs.put("_raw", argsStr);
                 c.setArgs(rawArgs);
-                c.setProviderMetadata(ProviderMetadataMaps.toObjectMap(tc.getProviderMetadata()));
+                c.setProviderMetadata(tc.getProviderMetadata());
                 ToolResult r = new ToolResult();
                 r.setSuccess(false);
                 r.setError(TRUNCATED_ARGUMENTS_ERROR);
@@ -362,7 +361,7 @@ final class ActPhase {
                 Map<String, Object> rawArgs = new LinkedHashMap<>();
                 rawArgs.put("_raw", tc.getFunction().getArguments());
                 c.setArgs(rawArgs);
-                c.setProviderMetadata(ProviderMetadataMaps.toObjectMap(tc.getProviderMetadata()));
+                c.setProviderMetadata(tc.getProviderMetadata());
                 ToolResult r = new ToolResult();
                 r.setSuccess(false);
                 r.setError("Failed to parse repaired tool arguments: " + e.getMessage());
@@ -461,7 +460,7 @@ final class ActPhase {
         toolCall.setArgs(args);
         toolCall.setResult(result);
         toolCall.setDuration(duration);
-        toolCall.setProviderMetadata(ProviderMetadataMaps.toObjectMap(tc.getProviderMetadata()));
+        toolCall.setProviderMetadata(tc.getProviderMetadata());
 
         if (execError != null) {
             // 错误文本要**带着 `error code: N, error message: ` 前缀**（BizException.wireText）。

@@ -19,9 +19,9 @@ import java.util.List;
 
 import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;

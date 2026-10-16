@@ -1,65 +1,42 @@
-package com.ragagent.llm.domain;
+package com.ragagent.contract.model.chat;
 
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 聊天消息。
  *
- * JSON 字段序 = 声明序；role/content 恒输出，其余为空时省略（NON_EMPTY）。
+ * <p>JSON 字段序 = 声明序；role/content 恒输出，其余为空时省略（NON_EMPTY）——
+ * 线格式注解由 {@code platform.web.ContractJsonMixinsModelChat} 的 mixin 承载（契约面纯 JDK）。</p>
  */
-@JsonPropertyOrder({
-        "role", "content", "multi_content", "name", "tool_call_id",
-        "tool_calls", "images", "reasoning_content"
-})
 public class ChatMessage {
 
     /** 引擎合成消息的标记。 */
     public static final String KIND_COMPACTION_SUMMARY = "compaction_summary";
 
     /** 角色：system / user / assistant / tool */
-    @JsonProperty("role")
     private String role = "";
-    @JsonProperty("content")
     private String content = "";
     /** 多内容消息（文本+图片混排） */
-    @JsonProperty("multi_content")
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<MessageContentPart> multiContent;
     /** 工具名（tool 角色用） */
-    @JsonProperty("name")
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String name;
     /** 工具调用 ID（tool 角色用） */
-    @JsonProperty("tool_call_id")
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String toolCallId;
     /** 工具调用列表（assistant 角色用） */
-    @JsonProperty("tool_calls")
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ToolCall> toolCalls;
     /** 图片 URL（仅当前 user 消息；转 OpenAI 时降级为 MultiContent） */
-    @JsonProperty("images")
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> images;
     /**
      * assistant 推理类模型上一轮输出的思考内容。部分供应商（MiMo、DeepSeek V3.2/V4
      * thinking 模式）要求多轮对话中把 assistant 的 reasoning_content 原样回传，
      * 否则以 400 拒绝；不要求的供应商会忽略未知字段，无副作用。
      */
-    @JsonProperty("reasoning_content")
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String reasoningContent;
     /**
-     * 引擎内部记账，**不上线**：某些端点会拒绝未知消息字段。
+     * 引擎内部记账，**不上线**（mixin 里 {@code @JsonIgnore}）：某些端点会拒绝未知消息字段。
      * 用于让压缩逻辑把自己的摘要与真实用户轮次区分开（否则摘要会被再次喂进摘要轮，
      * 退化成"摘要的摘要"）。
      */
-    @JsonIgnore
     private String kind;
 
     public ChatMessage() {
@@ -107,7 +84,7 @@ public class ChatMessage {
     public String getKind() { return kind; }
     public void setKind(String v) { kind = v; }
 
-    @JsonIgnore
+    /** 派生方法，**不上线**（mixin 里 {@code @JsonIgnore}）。 */
     public boolean isCompactionSummary() {
         return KIND_COMPACTION_SUMMARY.equals(kind);
     }

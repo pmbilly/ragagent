@@ -18,11 +18,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.llm.domain.CacheRetention;
-import com.ragagent.llm.domain.ChatConfig;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.CacheRetention;
+import com.ragagent.contract.model.chat.ChatConfig;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.PromptCacheStatus;
 import com.ragagent.llm.domain.StreamResponse;
 

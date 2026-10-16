@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.ragagent.llm.domain.FunctionCall;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.FunctionCall;
+import com.ragagent.contract.model.chat.ToolCall;
 
 /**
  * 流式 tool_use 的累积器。

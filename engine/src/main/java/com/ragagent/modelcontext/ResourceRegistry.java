@@ -8,9 +8,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ToolCall;
-import com.ragagent.llm.domain.MessageContentPart;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.chat.MessageContentPart;
 
 /**
  * model-context registry 的持久资源半边：为存储资源引用分配请求局部 res://NNNN 句柄，

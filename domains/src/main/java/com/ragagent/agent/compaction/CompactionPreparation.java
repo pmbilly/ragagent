@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ragagent.agent.budget.TokenEstimator;
-import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.contract.model.chat.ChatMessage;
 
 /**
  * 压缩准备与重建。

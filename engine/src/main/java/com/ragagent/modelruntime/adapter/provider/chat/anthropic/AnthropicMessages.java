@@ -6,11 +6,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.ChatTool;
-import com.ragagent.llm.domain.MessageContentPart;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatTool;
+import com.ragagent.contract.model.chat.MessageContentPart;
+import com.ragagent.contract.model.chat.ToolCall;
 
 /**
  * 把本模块的消息/工具转成 Anthropic Messages 的请求形态。
@@ -53,7 +53,7 @@ final class AnthropicMessages {
             req.addTool(new AnthropicTool(
                     function == null ? "" : function.getName(),
                     function == null ? "" : function.getDescription(),
-                    function == null ? null : function.getParameters()));
+                    function == null ? null : JsonMappers.toJsonNode(function.getParameters())));
         }
 
         AnthropicToolChoice choice = new AnthropicToolChoice("auto");

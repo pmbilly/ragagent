@@ -8,8 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.contract.retrieval.SearchResult;
 
 /**

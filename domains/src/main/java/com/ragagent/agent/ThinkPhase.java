@@ -19,10 +19,10 @@ import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.llm.ChatStream;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.llm.domain.ChatTool;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.agent.compaction.CompactionOverflow;
 import com.ragagent.agent.domain.AgentState;
@@ -33,7 +33,7 @@ import com.ragagent.modelcontext.StreamDecoder;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ToolCall;
 
 /**
  * ReAct「Think」段的协作者：LLM 流式调用与事件直播——流消费与停顿看门狗、

@@ -10,13 +10,12 @@ import java.util.Map;
 import com.ragagent.contract.agent.AgentStep;
 
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ProviderMetadataMaps;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.agent.tool.runtime.ToolResultPersist;
-import com.ragagent.llm.domain.FunctionCall;
+import com.ragagent.contract.model.chat.FunctionCall;
 
 /**
  * {@code SessionAgentQaService} 的**历史/消息装配簇**：把落库的 {@code Message}
@@ -199,7 +198,7 @@ final class AgentHistoryAssembler {
             c.setType("function");
             c.setFunction(new FunctionCall(
                     tc.getName(), toJsonString(tc.getArgs())));
-            c.setProviderMetadata(ProviderMetadataMaps.toNodeMap(tc.getProviderMetadata()));
+            c.setProviderMetadata(tc.getProviderMetadata());
             chatCalls.add(c);
         }
         assistantMsg.setToolCalls(chatCalls);

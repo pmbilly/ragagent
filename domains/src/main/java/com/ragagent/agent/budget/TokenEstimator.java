@@ -8,10 +8,10 @@ import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
 import com.knuddels.jtokkit.api.EncodingType;
 import com.knuddels.jtokkit.api.IntArrayList;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatTool;
-import com.ragagent.llm.domain.MessageContentPart;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatTool;
+import com.ragagent.contract.model.chat.MessageContentPart;
+import com.ragagent.contract.model.chat.ToolCall;
 
 /**
  * token 估算器。
@@ -136,8 +136,9 @@ public final class TokenEstimator {
         for (ChatTool tool : tools) {
             total += estimateString(tool.getFunction().getName());
             total += estimateString(tool.getFunction().getDescription());
-            // FunctionDef.parameters 是 JsonNode，序列化回紧凑 JSON 计数。
-            total += estimateString(ParametersJson.write(tool.getFunction().getParameters()));
+            // FunctionDef.parameters 持不透明 JSON，先归一回树再序列化成紧凑 JSON 计数。
+            total += estimateString(ParametersJson.write(
+                    JsonMappers.toJsonNode(tool.getFunction().getParameters())));
             total += PER_TOOL_DEF_OVERHEAD;
         }
         return total;

@@ -1,6 +1,6 @@
 package com.ragagent.agent;
 
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ToolCall;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -34,7 +34,7 @@ final class ToolBatchExecutor {
     }
 
     /** 单次工具调用的执行回调。 */
-    /** 输入是 LLM 侧的工具调用（{@code com.ragagent.llm.domain.ToolCall}），产出是 agent 域的结果。 */
+    /** 输入是 LLM 侧的工具调用（{@code com.ragagent.contract.model.chat.ToolCall}），产出是 agent 域的结果。 */
     interface CallRunner {
         /**
          * @param inWorker true = 运行在并发子线程（身份已 replay，按子线程上下文执行）；

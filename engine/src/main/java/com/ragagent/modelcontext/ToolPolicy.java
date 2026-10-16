@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ToolCall;
 
 /**
  * 内建工具字段句柄策略的完整 allowlist。字段名本身刻意不够：动态 MCP 工具可能用同名而语义无关，必须保持不透明。

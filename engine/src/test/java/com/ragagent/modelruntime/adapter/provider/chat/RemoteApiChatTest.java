@@ -21,18 +21,19 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.ContractJsonModule;
+import com.ragagent.platform.web.JsonMappers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.llm.domain.ChatConfig;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.llm.domain.ChatTool;
+import com.ragagent.contract.model.chat.ChatConfig;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ToolCall;
 import com.sun.net.httpserver.HttpServer;
 
 import org.junit.jupiter.api.AfterEach;
@@ -438,7 +439,7 @@ class RemoteApiChatTest {
 
         chat.applyCompletionToolCallMetadata(body, resp);
         assertEquals(1, resp.getToolCalls().size());
-        assertEquals("sig-from-gemini", resp.getToolCalls().get(0).getProviderMetadata()
+        assertEquals("sig-from-gemini", JsonMappers.toJsonNode(resp.getToolCalls().get(0).getProviderMetadata())
                 .get("google").path("thought_signature").asText());
     }
 
@@ -470,7 +471,7 @@ class RemoteApiChatTest {
         chat.applyStreamToolCallMetadata(chunk, state);
         List<ToolCall> toolCalls = state.buildOrderedToolCalls();
         assertEquals(1, toolCalls.size());
-        assertEquals("stream-sig-from-gemini", toolCalls.get(0).getProviderMetadata()
+        assertEquals("stream-sig-from-gemini", JsonMappers.toJsonNode(toolCalls.get(0).getProviderMetadata())
                 .get("google").path("thought_signature").asText());
     }
 

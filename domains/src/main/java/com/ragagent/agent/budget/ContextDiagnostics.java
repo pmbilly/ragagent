@@ -2,8 +2,8 @@ package com.ragagent.agent.budget;
 
 import java.util.List;
 
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatTool;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatTool;
 
 /**
  * 上下文记账的诊断。

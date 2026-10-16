@@ -10,7 +10,7 @@ import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.UserMessageInjectedData;
-import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.contract.model.chat.ChatMessage;
 
 /**
  * 引擎侧 steer（运行中注入）消费协作者：注入内容净化与轮首/收束前 drain。

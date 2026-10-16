@@ -17,8 +17,8 @@ import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.ResponseType;
 
 /**

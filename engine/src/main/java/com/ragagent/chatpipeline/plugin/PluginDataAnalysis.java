@@ -15,13 +15,13 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.MatchTypes;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.ChatResponse;
 
 /**
  * DATA_ANALYSIS 阶段插件：

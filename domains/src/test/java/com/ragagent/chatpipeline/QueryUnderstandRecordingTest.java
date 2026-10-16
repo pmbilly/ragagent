@@ -22,7 +22,7 @@ import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.llm.extract.PipelineConfig;
-import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.session.MessageImage;
 
 /**

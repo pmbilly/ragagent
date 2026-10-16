@@ -1,12 +1,9 @@
-package com.ragagent.llm.domain;
-
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.JsonNode;
+package com.ragagent.contract.model.chat;
 
 /**
- * 工具定义。JSON 字段序 = 声明序，两者均恒输出。
+ * 工具定义。JSON 字段序 = 声明序，两者均恒输出——
+ * 线格式注解由 {@code platform.web.ContractJsonMixinsModelChat} 的 mixin 承载（契约面纯 JDK）。
  */
-@JsonPropertyOrder({"type", "function"})
 public class ChatTool {
 
     /** 恒为 "function" */
@@ -16,7 +13,10 @@ public class ChatTool {
     public ChatTool() {
     }
 
-    public ChatTool(String name, String description, JsonNode parameters) {
+    /**
+     * @param parameters JSON Schema，持**不透明 JSON**（运行时是 {@code JsonNode} 或纯 JDK 值）
+     */
+    public ChatTool(String name, String description, Object parameters) {
         this.function = new FunctionDef(name, description, parameters);
     }
 

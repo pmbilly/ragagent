@@ -13,10 +13,11 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.llm.domain.ChatConfig;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ChatConfig;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.llm.domain.ProviderMetadataMaps;
 import com.ragagent.llm.provider.ProviderName;
 
 import org.junit.jupiter.api.Test;
@@ -218,7 +219,7 @@ class ProviderAdapterRegistryTest {
         call.getFunction().setArguments("{\"query\":\"MACS\"}");
         Map<String, JsonNode> metadata = new LinkedHashMap<>();
         metadata.put("google", MAPPER.readTree("{\"thought_signature\":\"gemini-signature\"}"));
-        call.setProviderMetadata(metadata);
+        call.setProviderMetadata(ProviderMetadataMaps.toObjectMap(metadata));
 
         ChatMessage assistant = new ChatMessage("assistant", "");
         assistant.setToolCalls(List.of(call));
@@ -240,7 +241,7 @@ class ProviderAdapterRegistryTest {
         call.getFunction().setArguments("{}");
         Map<String, JsonNode> metadata = new LinkedHashMap<>();
         metadata.put("google", MAPPER.readTree("{\"thought_signature\":\"sig\"}"));
-        call.setProviderMetadata(metadata);
+        call.setProviderMetadata(ProviderMetadataMaps.toObjectMap(metadata));
         ChatMessage assistant = new ChatMessage("assistant", "");
         assistant.setToolCalls(List.of(call));
 

@@ -43,7 +43,7 @@ import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.modelruntime.application.LlmChatClients;
-import com.ragagent.llm.domain.ChatConfig;
+import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.rerank.Reranker;

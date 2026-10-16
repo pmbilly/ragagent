@@ -13,11 +13,11 @@ import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.graph.GraphRelation;
 import com.ragagent.llm.extract.PipelineConfig.PromptTemplateStructured;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.ChatResponse;
 
 /**
  * 实体抽取的提示词生成与 LLM 输出解析。

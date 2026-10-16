@@ -7,8 +7,8 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.AgentToolNames;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ToolCall;
 
 /**
  * 沙箱文件操作在压缩中的存续。

@@ -7,13 +7,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.ChatTool;
-import com.ragagent.llm.domain.FunctionCall;
-import com.ragagent.llm.domain.FunctionDef;
-import com.ragagent.llm.domain.MessageContentPart;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatTool;
+import com.ragagent.contract.model.chat.FunctionCall;
+import com.ragagent.contract.model.chat.FunctionDef;
+import com.ragagent.contract.model.chat.MessageContentPart;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.llm.domain.ProviderMetadataMaps;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 出站组装协作者（自 {@link RemoteApiChat} 拆出）：
@@ -172,8 +174,10 @@ final class RemoteApiRequestOps {
                     fnNode.put("description", fn.getDescription());
                 }
                 fnNode.put("name", fn.getName());
-                // parameters 恒输出：null 时输出 JSON null（对齐 openai-go FunctionDefinition）
-                fnNode.set("parameters", fn.getParameters() == null ? NullNode.getInstance() : fn.getParameters());
+                // parameters 恒输出：null 时输出 JSON null（对齐 openai-go FunctionDefinition）；
+                // 契约面持不透明 JSON ⇒ 出站前经 JsonMappers 归一为树形
+                JsonNode parameters = JsonMappers.toJsonNode(fn.getParameters());
+                fnNode.set("parameters", parameters == null ? NullNode.getInstance() : parameters);
                 toolNode.put("type", tool.getType());
             }
         }
@@ -194,7 +198,7 @@ final class RemoteApiRequestOps {
             }
         }
 
-        JsonNode format = opts.getFormat();
+        JsonNode format = JsonMappers.toJsonNode(opts.getFormat());
         if (format != null && !format.isNull()) {
             body.putObject("response_format").put("type", "json_object");
             // 把 schema 提示拼到最后一条 message 的 content 尾部
@@ -296,7 +300,7 @@ final class RemoteApiRequestOps {
                         fn.put("arguments", fc.getArguments());
                     }
                 }
-                service.adapter().injectToolCallMetadata(call, tc.getProviderMetadata());
+                service.adapter().injectToolCallMetadata(call, ProviderMetadataMaps.toNodeMap(tc.getProviderMetadata()));
             }
         }
 

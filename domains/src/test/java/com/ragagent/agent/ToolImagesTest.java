@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.agent.AgentToolCall;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.contract.model.chat.ChatMessage;
 
 /**
  * 工具图片注入的录制常量断言：

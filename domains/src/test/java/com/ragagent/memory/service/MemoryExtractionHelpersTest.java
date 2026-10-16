@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryText;

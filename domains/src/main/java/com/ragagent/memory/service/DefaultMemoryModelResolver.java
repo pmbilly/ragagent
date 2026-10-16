@@ -10,7 +10,7 @@ import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.ModelFacts;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.llm.domain.ChatConfig;
+import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.modelruntime.application.ChatConfigs;

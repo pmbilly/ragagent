@@ -1,13 +1,11 @@
-package com.ragagent.llm.domain;
+package com.ragagent.contract.model.chat;
 
 import java.util.Map;
 
 /**
- * 聊天实例配置。
+ * 聊天模型连接配置（跨域词汇表：模型族与各业务域共用的"用哪个模型、怎么连"）。
  *
- * 构造入口统一走 {@code com.ragagent.model.service.ModelRuntimeConfigs}（已迁 :domains 侧，跨模块故用 {@code}）：
- * 生产路径（service 层按 DB 模型配置拉起实例）与测试路径（handler 层按前端表单
- * 临时拉起实例）必须走完全相同的字段映射，避免重复样板。
+ * <p>本类键名即字段名（无线格式注解），故不需要 mixin 承载。</p>
  */
 public class ChatConfig {
 
@@ -31,8 +29,6 @@ public class ChatConfig {
 
     public ChatConfig() {
     }
-
-
 
     public String getSource() { return source; }
     public void setSource(String v) { source = v; }

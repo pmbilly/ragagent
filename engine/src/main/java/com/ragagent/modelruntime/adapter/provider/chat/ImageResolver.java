@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
-import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.contract.model.chat.ChatMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

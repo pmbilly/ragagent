@@ -10,8 +10,8 @@ import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.ReferencesSupport;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
 
 /**
  * CHAT_COMPLETION 阶段插件：

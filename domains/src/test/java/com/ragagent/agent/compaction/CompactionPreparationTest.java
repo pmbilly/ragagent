@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.agent.budget.TokenEstimator;
-import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.contract.model.chat.ChatMessage;
 
 /**
  * 准备/重建的录制常量断言。

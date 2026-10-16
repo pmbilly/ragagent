@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.contract.model.chat.ChatMessage;
 
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;

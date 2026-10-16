@@ -2,7 +2,7 @@ package com.ragagent.agent.compaction;
 
 import java.util.List;
 
-import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.contract.model.chat.ChatMessage;
 
 /**
  * 一次压缩做了什么。

@@ -2,7 +2,7 @@ package com.ragagent.agent.compaction;
 
 import java.util.regex.Pattern;
 
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.ChatResponse;
 
 /**
  * 上下文溢出的识别。

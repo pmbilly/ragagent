@@ -1,7 +1,6 @@
 package com.ragagent.agent;
 
-import com.ragagent.llm.domain.ProviderMetadataMaps;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.time.Instant;
@@ -25,11 +24,11 @@ import com.ragagent.contract.event.payload.ContextCompactedData;
 import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.llm.domain.FunctionCall;
+import com.ragagent.contract.model.chat.FunctionCall;
 import com.ragagent.agent.budget.ContextDiagnostics;
 import com.ragagent.agent.budget.TokenEstimator;
 
@@ -365,7 +364,7 @@ final class ObservePhase {
                     ToolCall c = new ToolCall();
                     c.setId(tc.getId());
                     c.setType("function");
-                    c.setProviderMetadata(ProviderMetadataMaps.toNodeMap(tc.getProviderMetadata()));
+                    c.setProviderMetadata(tc.getProviderMetadata());
                     c.setFunction(new FunctionCall(tc.getName(),
                             argsJson(tc.getArgs())));
                     llmCalls.add(c);

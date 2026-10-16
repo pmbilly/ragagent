@@ -3,7 +3,7 @@ package com.ragagent.model.service;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.modelruntime.application.ChatConfigs;
 import com.ragagent.embedding.EmbedderConfig;
-import com.ragagent.llm.domain.ChatConfig;
+import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.llm.provider.Config;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;

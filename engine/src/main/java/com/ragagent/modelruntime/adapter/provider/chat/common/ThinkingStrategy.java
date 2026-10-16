@@ -1,7 +1,7 @@
 package com.ragagent.modelruntime.adapter.provider.chat.common;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.llm.domain.ChatOptions;
+import com.ragagent.contract.model.chat.ChatOptions;
 
 /**
  * 把 {@link ChatOptions#getThinking()} 转换成各厂商的 HTTP 字段。

@@ -2,7 +2,7 @@ package com.ragagent.modelruntime.application;
 
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelParameters;
-import com.ragagent.llm.domain.ChatConfig;
+import com.ragagent.contract.model.chat.ChatConfig;
 
 /**
  * 「模型行 → chat 运行时配置」的 L2 映射。

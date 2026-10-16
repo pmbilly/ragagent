@@ -11,11 +11,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ToolCall;
 
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.llm.domain.MessageContentPart;
+import com.ragagent.contract.model.chat.MessageContentPart;
 
 /**
  * source 句柄的<b>工具参数编解码</b>（自 {@code SourceRegistry} 的同名段外提）。

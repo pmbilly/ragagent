@@ -36,10 +36,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.agent.GoRecording;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.agenttools.RecordingSupport;
-import com.ragagent.llm.domain.FunctionCall;
+import com.ragagent.contract.model.chat.FunctionCall;
 
 /**
  * 摘要序列化的录制常量断言。

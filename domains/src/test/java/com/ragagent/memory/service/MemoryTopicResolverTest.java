@@ -10,9 +10,9 @@ import java.util.List;
 
 import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.repository.MemoryRepository;

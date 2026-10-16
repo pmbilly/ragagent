@@ -10,7 +10,7 @@ import com.ragagent.chatpipeline.PipelineCommon;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.prompt.PromptComposer;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
-import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.ChunkTypes;
