@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.chatpipeline.PipelinePorts;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.pipeline.WebSearchExecutor;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.platform.access.TenantContext;

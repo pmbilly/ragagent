@@ -8,7 +8,7 @@ import com.ragagent.chatpipeline.History;
 import com.ragagent.chatpipeline.PipelineCommon;
 import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelineLog;
-import com.ragagent.chatpipeline.PipelinePorts;
+import com.ragagent.contract.pipeline.PipelinePorts;
 
 /**
  * LOAD_HISTORY 阶段插件：

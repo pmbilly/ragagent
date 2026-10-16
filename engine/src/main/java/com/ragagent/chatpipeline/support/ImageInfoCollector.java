@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.chatpipeline.PipelinePorts;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.knowledge.ImageInfoEnricher;
 

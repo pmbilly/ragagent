@@ -36,7 +36,7 @@ import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.retrieval.SearchResult;
 
 import static com.ragagent.session.service.QaSupport.TagScope;
-import com.ragagent.chatpipeline.PipelinePorts;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.tenant.TenantConfigLookup;

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.chatpipeline.PipelinePorts;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRetrievalContext;
 import com.ragagent.memory.service.MemoryService;

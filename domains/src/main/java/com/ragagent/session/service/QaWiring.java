@@ -46,7 +46,7 @@ import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.contract.retrieval.SearchResult;
 import java.io.InputStream;
 import com.ragagent.session.support.PipelineViews;
-import com.ragagent.chatpipeline.PipelinePorts;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
 import com.ragagent.platform.tracing.decorators.LangfuseReranker;
 import com.ragagent.agenttools.datasource.DataAnalysisSessionFactoryAdapter;

@@ -1,5 +1,6 @@
 package com.ragagent.chatpipeline;
 
+import com.ragagent.contract.pipeline.PipelinePorts;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;

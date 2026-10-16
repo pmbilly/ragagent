@@ -1,4 +1,4 @@
-package com.ragagent.chatpipeline;
+package com.ragagent.contract.pipeline;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +11,6 @@ import com.ragagent.contract.session.PipelineMessageImageView;
 import com.ragagent.contract.session.PipelineMessageView;
 import com.ragagent.contract.websearch.WebSearchResult;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.tenant.WebSearchConfig;
@@ -44,6 +43,13 @@ import com.ragagent.contract.model.Reranker;
  * </ul>
  *
  * <p>错误通道：失败一律抛 {@link PipelinePortException}，成功走返回值。</p>
+ */
+/**
+ * 管线所需世界的**端口束**（R4b 契约化：原 {@code chatpipeline.PipelinePorts}）。
+ *
+ * <p>管线的消费方（session 的装配、以及 knowledge/memory/websearch/datasource 的 api 适配器）
+ * 只认这一束端口，不认管线本体；载荷一律用契约形状，{@code DataAnalysisSession.execute}
+ * 的 JSON 参数按契惯例为**不透明 JSON**（{@code Object}，实现侧按其 JSON 库解释）。</p>
  */
 public final class PipelinePorts {
 
@@ -181,7 +187,7 @@ public final class PipelinePorts {
     public interface DataAnalysisSession {
         TableSchema loadFromKnowledge(KnowledgeData knowledge);
 
-        ToolResult execute(JsonNode args);
+        ToolResult execute(Object args);
 
         void cleanup();
     }

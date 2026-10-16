@@ -1,5 +1,6 @@
 package com.ragagent.chatpipeline;
 
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.knowledge.support.KnowledgeProjectionAdapter;
 
 import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;

@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineLog;
-import com.ragagent.chatpipeline.PipelinePorts;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.access.TenantContextSnapshot;

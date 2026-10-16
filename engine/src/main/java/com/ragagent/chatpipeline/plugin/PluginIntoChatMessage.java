@@ -9,7 +9,7 @@ import java.util.Map;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelineLog;
-import com.ragagent.chatpipeline.PipelinePorts;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.ReferencesSupport;
 import com.ragagent.platform.security.InputSanitizer;
 import com.ragagent.contract.retrieval.SearchResult;

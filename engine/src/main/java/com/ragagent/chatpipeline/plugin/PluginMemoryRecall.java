@@ -11,7 +11,7 @@ import java.util.Map;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelineLog;
-import com.ragagent.chatpipeline.PipelinePorts;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.MemoryUsedMemories;
 import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventType;

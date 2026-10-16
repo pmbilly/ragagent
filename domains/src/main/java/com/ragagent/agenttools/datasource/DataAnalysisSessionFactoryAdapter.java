@@ -1,10 +1,11 @@
 package com.ragagent.agenttools.datasource;
 
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.chatpipeline.PipelinePorts;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.tool.ToolResult;
 
 /**
@@ -49,7 +50,9 @@ public final class DataAnalysisSessionFactoryAdapter implements PipelinePorts.Da
         }
 
         @Override
-        public ToolResult execute(JsonNode args) {
+        public ToolResult execute(Object argsArg) {
+            // 契约面用不透明 JSON：还原后再走桥（调用方恒传 JsonNode）
+            JsonNode args = argsArg instanceof JsonNode node ? node : JsonMappers.toJsonNode(argsArg);
             return DataAnalysisSessionBridge.execute(tool, args);
         }
 
