@@ -62,7 +62,7 @@
 | **P2** | KB config 形状三层拆分：7 件 Config 回 `knowledge/domain`；`KnowledgeBaseRowView` 载体改吃视图；View 的 from/toDomain 映射外移；`UserPreferences`→auth、`ParserEngineConfig`→tenant（余 2 件并入 P5） | ✅ 675b782b |
 | **P3** | 跨域形状去框架化（mixin 机制、金片护航）：`SearchResult`→contract.retrieval；`AgentStep/AgentToolCall/ToolCallTarget`→contract.agent；`MessageView`→contract.session；`MemoryMessageCursor`→contract.memory | ✅ 744fdcb2 / 2a9b3453 / cac610c2 / 5ef29e07 |
 | **P4** | 端口中性化进 contract：`AdminUserPort/AdminUserView/ApiKeyAuthPort` · `SessionQaPort` · `KnowledgeCatalogPort` · `TenantConfigLookup` · `EmbedSessionPort`（`SseSink`/`EmbedReply`）；config/settings 五件裁定留 platform（C8 豁免登记） | ✅ **6 刀全落**（163ddfcd/9db5b06d/d792a002/92c5eb70/151c7f25/4d7accdb）——**platform 业务形状清零** |
-| **P5** | platform 收尾：fileserve/support 逐件裁；目录与 package-info 清理；**C8 门禁上线**（业务形状零命中验收） | ⬜ |
+| **P5** | platform 收尾：fileserve/support 逐件裁；目录与 package-info 清理；**C8 门禁上线**（业务形状零命中验收） | ✅ e6f99afd / 1851b3ad / 1b020e97 |
 | **R1** | 契约面先行：`contract.model.chat`（llm.domain 11 件）+ `contract.retrieval` 缺口 + `contract.agent` 6 件 + `contract.execution` 按需 | ⬜ |
 | **R2** | `model-runtime` 提取（163 件：llm/modelruntime/embedding/rerank/modelcontext）；公开面分层（契约类 vs 实现面） | ⬜ |
 | **R3** | `retrieval-engine` 提取（96 件）；与 model 侧 8~9 处边接口化；`webfetch` 归属拍板 | ⬜ |
@@ -174,6 +174,7 @@ boot      13 件                        →     agent-engine（自 domains/agent
 | P3 | 2026-10-16 | 跨域形状去框架化四刀：`SearchResult`→contract.retrieval · `AgentStep` 族→contract.agent · `MessageView/PipelineMessageView`→contract.session · `MemoryMessageCursor`→contract.memory（mixin 承载注解；`ByteKeyOrder`/`ZeroTimes`/`ProviderMetadataMaps` 三共享物上提） | 四刀各自 14 守卫全绿 · 金片 1349 一致 · gate 2m21s~3m1s / **4996 / 失败 0 / 跳过 4**；platform 的 retrieval/agent/memory 三包消亡、session 收缩至 2 端口（P4 对象） |
 | P4 | 2026-10-16 | 端口中性化五刀：AdminUser 族→contract.auth · SessionQaPort+QA 链 EventBusInterface→contract.session · TenantConfigLookup→contract.tenant · KnowledgeCatalogPort（去 Page）→contract.knowledge · ApiKeyAuthPort 中性化→contract.apikey；config/settings 五件裁定留 platform | 五刀各自 14 守卫全绿 · 金片 1349 一致 · gate 1m56s~2m45s / **4996 / 失败 0 / 跳过 4**；platform 的 auth/apikey/retrieval/agent/memory 消亡、knowledge 仅余 codec、session 仅余 EmbedSessionPort（P4f） |
 | P4f | 2026-10-16 | `EmbedSessionPort` 中性化入契约：`SseSink`（帧出口）+ `EmbedReply`（status+body）；SSE 链全链换型（FrameWriter→Emitter→Orchestrator→Executor→Controller）+ 边界包装（DelegateOps/Adapter）；`platform.session` 包消亡 | 14 守卫全绿（R8 修复）· 金片 1349 一致 · gate 2m6s / **4996 / 失败 0 / 跳过 4** |
+| P5 | 2026-10-16 | platform 收尾三件：`ParserEngineConfig` 去框架化入 `contract.tenant`（27 注解 → Core mixin）· fileserve 逐件裁（4 端口 + `OpenedFile` 上提契约；HTTP 三件 + `StoragePaths` 留登记）· **C8 门禁上线**（业务形状棘轮，3 条登记） | 15 守卫全绿 · 金片 1349 一致 · gate 1m39s~2m23s / **4996 / 失败 0 / 跳过 4**；platform 只剩技术适配 + 3 条业务形状登记 |
 | —（杂项） | 2026-10-16 | 61 份过期文档清理（用户确认；活文档零引用已核）· `scripts/dev-env.sh` login 提取器适配统一响应壳（token 移入 data） | 冒烟 sessions / knowledge-bases 200 · token 265 字符 |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）

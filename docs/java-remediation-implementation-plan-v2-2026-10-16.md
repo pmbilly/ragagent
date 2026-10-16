@@ -41,7 +41,7 @@
 | 4 | `SearchResult`（`SortedMapSerializer` + `JsonNode`） | `platform.retrieval` | 去框架化 → `contract.retrieval`（方案 §8.1 原文落点；66 处消费，金片护航） | **P3** |
 | 5 | `MessageView` · `PipelineMessageView` | `platform.session.embed` / `platform.session` | 去框架化 → `contract.session`（金片 `emb-pub-messages-load*` 钉住，逐字节验证） | **P3** |
 | 6 | `MemoryMessageCursor`（`ZeroTimeSerializer`） | `platform.memory` | 去框架化 → `contract.memory`（零时序列化语义移至边界） | **P3** |
-| 7 | `UserPreferences` | `platform.auth` | 归域 → `auth/domain`（方案 §8.9 原文落点） | **P5** |
+| 7 | `UserPreferences` | `platform.auth` | 去框架化入 `contract.auth`（同批 AdminUser 族） | ✅ 163ddfcd |
 | 8 | `TenantConfigLookup` | `platform.config` | 去框架化（JsonNode→Object）→ `contract.tenant` | ✅ d792a002 |
 | 8b | `LanguageProperties` · `RetrievalDriverProperties` · `TenantProperties`（`@ConfigurationProperties`） | `platform.config` | **裁定留 platform（不搬）**：配置绑定＝框架面（判定标准二"技术适配"含框架绑定）；命名（`*Properties`）不在 C8 红灯清单——登记为豁免项 | — |
 | 9 | `SessionQaPort` | `platform.session.qa` | 签名中性化（`EventBus`→`EventBusInterface`，QA 链全链换型）→ `contract.session` | ✅ 9db5b06d |
@@ -50,9 +50,9 @@
 | 11 | `KnowledgeCatalogPort` | `platform.knowledge` | 端口中性化（去 MyBatis-Plus `Page`）→ `contract.knowledge` | ✅ 92c5eb70 |
 | 11b | `FaqChunkMetadataCodec` | `platform.knowledge` | **裁定留 platform（不搬）**：映射面（JSON 读写）＝技术适配；跨 knowledge/agenttools/chatpipeline 三域消费，归域会造边——登记豁免 | — |
 | 12 | `Settings` 2 件（`ConversationProperties`/`SystemSettingRegistry`） | `platform.settings` | **裁定留 platform（不搬）**：`ConversationProperties`＝配置绑定＋提示词装载（判定标准二"框架/提示词"双命中）；`SystemSettingRegistry`＝设置注册/解析基建（Jackson 面深、重写风险高）——登记豁免；命名（`*Properties`/`*Registry`）不在 C8 红灯清单 | — |
-| 13 | `ParserEngineConfig` | `platform.tenant` | 回 `tenant` 域（方案 §8.9 原文落点）；跨域读取走 `TenantConfigLookup` 端口 | **P5** |
+| 13 | `ParserEngineConfig` | `platform.tenant` | **改判**：去框架化（27 注解 → `ContractJsonMixinsCore` mixin）入 `contract.tenant`——与 WebSearch/Retrieval/StorageEngine 同族一致化（免 auth→tenant 域间边） | ✅ e6f99afd |
 | 14 | `BaseTool` | `platform.tool` | 归 `agent-engine`（工具实现基类） | **R5**（随 agent） |
-| 15 | 文件服务面（`fileserve` 8 + `support` 4） | `platform.storage.*` | 逐件裁：端口中性化进 contract / servlet 技术件留 platform 边界 | **P5** |
+| 15 | 文件服务面（`fileserve` 8 + `support` 4） | `platform.storage.*` | 逐件裁：4 端口 + `OpenedFile` 上提 `contract.storage.fileserve`；HTTP 三件（`FileTransport`/`FileServeHttp`/`FileProxyPort`）+ `StoragePaths` 留 platform（登记） | ✅ 1851b3ad |
 | — | 合理技术件（`UrlBytesFetcher`·`StreamManager`·`ContractJsonMixins*`·`LikeEscapes`·`JsonbRawStringTypeHandler`·`RedisPubSub`·`TenantContext/TenantScopes` 等） | 各面 | **保留**（技术适配定位相符） | — |
 
 **P2 执行设计（2026-10-16 勘察定稿；✅ 已执行 `675b782b`）**——KB config 三层结构的实际读写面＝**7 个文件主战场**（不是"引用 KBRV 的 30 文件"全涟漪）：
@@ -66,7 +66,7 @@
 ### 1.3 纠偏的完成判定（验收 = 两条标准逐条机器可查）
 
 - contract：`check-contracts-purity.py` C1/C2/C3 全零 + 每个类的跨域消费者可列举（脚本：引用面按模块统计 ≠ 仅自身模块）；
-- platform：**业务形状零命中**（新增门禁 C8：platform 内 `*View`/`*Port`/`*Request`/`*Response`/`*Payload`/`*Facts` 命名一律红灯，除非在登记例外表——例外必须写明"为何属于技术适配"）。
+- platform：**业务形状零命中**（新增门禁 C8：platform 内 `*View`/`*Port`/`*Request`/`*Response`/`*Payload`/`*Facts` 命名一律红灯，除非在登记例外表——例外必须写明"为何属于技术适配"）。 **✅ 2026-10-16 上线（`1b020e97`）**：`scripts/check-platform-shapes.py` + 3 条登记（ApiResponse/FileProxyPort/LiveRunPayload）；run-guards 15 守卫全绿。
 
 ---
 
