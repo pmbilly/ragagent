@@ -3,7 +3,7 @@ package com.ragagent.contract.knowledge;
 
 /**
  * 文档（knowledge 行）的「检索结果装配事实」——把检索命中拼成
- * {@code com.ragagent.platform.retrieval.SearchResult} 时需要的元数据。
+ * {@code com.ragagent.contract.retrieval.SearchResult} 时需要的元数据。
  *
  * <p>为什么不直接传 {@code knowledge.domain.Knowledge} 实体：检索引擎域不该依赖知识域的
  * 表实体（实体同时是 DB 行与 API 视图）。这里只保留结果装配实际写入的字段。</p>

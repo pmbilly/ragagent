@@ -13,7 +13,7 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 

@@ -17,7 +17,7 @@ import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.llm.LlmChatClient;

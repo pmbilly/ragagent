@@ -11,7 +11,7 @@ import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.ReferencesSupport;
 import com.ragagent.platform.security.InputSanitizer;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;

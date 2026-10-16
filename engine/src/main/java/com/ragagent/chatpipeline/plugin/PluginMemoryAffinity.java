@@ -7,7 +7,7 @@ import java.util.Map;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelinePorts;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 
 /**
  * CHUNK_RERANK 附加插件：

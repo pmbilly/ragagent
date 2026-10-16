@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.SuggestionItem;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 
 /**
  * 追问建议生成的纯函数面（parseGeneratedSuggestions / merge / rank /

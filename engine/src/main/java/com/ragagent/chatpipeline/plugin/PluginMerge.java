@@ -15,7 +15,7 @@ import com.ragagent.chatpipeline.support.MatchTypes;
 import com.ragagent.chatpipeline.support.SearchSupport;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
 import com.ragagent.contract.retrieval.SearchChunkMerge;

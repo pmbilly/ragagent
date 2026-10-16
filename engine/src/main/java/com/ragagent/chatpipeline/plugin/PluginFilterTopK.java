@@ -7,7 +7,7 @@ import java.util.Map;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelineLog;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 
 /**
  * FILTER_TOP_K 阶段插件：

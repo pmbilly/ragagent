@@ -1,13 +1,10 @@
-package com.ragagent.platform.retrieval;
+package com.ragagent.contract.retrieval;
 
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.web.SortedMapSerializer;
+import com.ragagent.contract.json.ByteKeyOrder;
 
 /**
  * 检索结果条目。
@@ -17,7 +14,9 @@ import com.ragagent.platform.web.SortedMapSerializer;
  * SSE 的 {@code references} 事件要按它的字段序逐字节输出。</p>
  *
  * <h2>字段序</h2>
- * <p>响应按 {@code @JsonPropertyOrder} 声明序输出，必须与下方字段声明一致。</p>
+ * <p>响应按字段声明序输出（Jackson 默认），必须与下方字段声明一致；
+ * {@code @JsonInclude}/{@code @JsonIgnore} 线格式注解由
+ * {@code platform.web.ContractJsonMixinsRetrieval} 的 mixin 承载（契约面纯 JDK）。</p>
  *
  * <h2>零值语义（逐字段）</h2>
  * <ul>
@@ -89,37 +88,31 @@ public class SearchResult {
     private String knowledgeChannel = "";
 
     /**
-     * chunk 级元数据（如生成的问题）。原样内联的 JSON 载荷，null 时整键省略。
+     * chunk 级元数据（如生成的问题）。原样内联的 JSON 载荷（不透明树形，以 {@code Object} 持有），
+     * null 时整键省略。
      *
      * <p>已知边界：{@code @JsonInclude(NON_NULL)} 只看 null，产出方若真写入空对象
      * {@code {}}，它仍会输出——实际语义里该字段要么是结构化 JSON 要么不设，
      * 这个角落不作特判。</p>
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private JsonNode chunkMetadata;
+    private Object chunkMetadata;
 
     /** 向量检索实际命中的文本（FAQ 场景是命中的问题）。空时整键省略。 */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String matchedContent;
 
     /** 知识条目描述。空时整键省略。 */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String knowledgeDescription;
 
     /** 用户自撰、可安全下发给模型的上下文。空时整键省略。 */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String knowledgeCustomMetadata;
 
     /** 所属知识库 ID。空时整键省略。 */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String knowledgeBaseId;
 
     /** 检索时 chunk 的编辑版本号。**仅内部**（不出响应），有对应的数据库列。 */
-    @JsonIgnore
     private int contentRevision;
 
     /** 合并管线是否改写过 {@code content}。**仅内部**（不出响应）。 */
-    @JsonIgnore
     private boolean contentRewritten;
 
     public String getId() { return id; }
@@ -163,7 +156,7 @@ public class SearchResult {
             metadata = null;
             return;
         }
-        TreeMap<String, String> sorted = new TreeMap<>(SortedMapSerializer.KEY_BYTE_ORDER);
+        TreeMap<String, String> sorted = new TreeMap<>(ByteKeyOrder.COMPARATOR);
         sorted.putAll(v);
         metadata = sorted;
     }
@@ -186,8 +179,8 @@ public class SearchResult {
     public String getKnowledgeChannel() { return knowledgeChannel; }
     public void setKnowledgeChannel(String v) { knowledgeChannel = v == null ? "" : v; }
 
-    public JsonNode getChunkMetadata() { return chunkMetadata; }
-    public void setChunkMetadata(JsonNode v) { chunkMetadata = v; }
+    public Object getChunkMetadata() { return chunkMetadata; }
+    public void setChunkMetadata(Object v) { chunkMetadata = v; }
 
     public String getMatchedContent() { return matchedContent; }
     public void setMatchedContent(String v) { matchedContent = v; }

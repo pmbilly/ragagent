@@ -38,6 +38,7 @@ import com.ragagent.contract.event.payload.QueryData;
 import com.ragagent.contract.event.payload.RerankData;
 import com.ragagent.contract.event.payload.RetrievalData;
 import com.ragagent.contract.retrieval.SearchParams;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.contract.event.payload.StopData;
 import com.ragagent.contract.model.TokenUsage;
@@ -86,6 +87,7 @@ public final class ContractJsonModule extends SimpleModule {
         setMixInAnnotation(RerankData.class, ContractJsonMixinsEvent.RerankDataMixin.class);
         setMixInAnnotation(RetrievalData.class, ContractJsonMixinsEvent.RetrievalDataMixin.class);
         setMixInAnnotation(SearchParams.class, ContractJsonMixinsCore.SearchParamsMixin.class);
+        setMixInAnnotation(SearchResult.class, ContractJsonMixinsRetrieval.SearchResultMixin.class);
         setMixInAnnotation(SlugUpdate.class, ContractJsonMixinsCore.SlugUpdateMixin.class);
         setMixInAnnotation(StopData.class, ContractJsonMixinsEvent.StopDataMixin.class);
         setMixInAnnotation(TokenUsage.class, ContractJsonMixinsCore.TokenUsageMixin.class);

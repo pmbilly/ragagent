@@ -17,7 +17,7 @@ import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.graph.NameSpace;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.graph.GraphRelation;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.platform.access.TenantContext;

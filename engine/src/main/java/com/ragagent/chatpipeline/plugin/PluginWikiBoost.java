@@ -7,7 +7,7 @@ import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.ChunkTypes;
 
 /**

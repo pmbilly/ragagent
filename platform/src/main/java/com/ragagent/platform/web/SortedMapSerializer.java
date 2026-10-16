@@ -1,7 +1,6 @@
 package com.ragagent.platform.web;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -9,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.ragagent.contract.json.ByteKeyOrder;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -44,20 +44,9 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public class SortedMapSerializer extends JsonSerializer<Map<String, Object>> {
 
     /**
-     * 字符串序：逐 UTF-8 字节比较，短者在前。
+     * 字符串序：逐 UTF-8 字节比较，短者在前（实现上提至 {@link ByteKeyOrder}，此处保留别名）。
      */
-    public static final Comparator<String> KEY_BYTE_ORDER = (a, b) -> {
-        byte[] x = a.getBytes(StandardCharsets.UTF_8);
-        byte[] y = b.getBytes(StandardCharsets.UTF_8);
-        int shared = Math.min(x.length, y.length);
-        for (int i = 0; i < shared; i++) {
-            int diff = (x[i] & 0xff) - (y[i] & 0xff);
-            if (diff != 0) {
-                return diff;
-            }
-        }
-        return x.length - y.length;
-    };
+    public static final Comparator<String> KEY_BYTE_ORDER = ByteKeyOrder.COMPARATOR;
 
     /**
      * 让「空 map 被 {@code @JsonInclude(NON_EMPTY)} 省略」继续生效。

@@ -17,7 +17,7 @@ import com.ragagent.contract.tenant.RetrievalConfig;
 import com.ragagent.platform.config.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.retrieval.SearchParams;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;

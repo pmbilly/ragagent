@@ -18,7 +18,7 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.domain.ImageInfo;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.contract.retrieval.SearchTarget;
@@ -619,7 +619,7 @@ public final class PluginRerank implements Plugin {
             }
         }
 
-        JsonNode metaNode = result.getChunkMetadata();
+        JsonNode metaNode = JsonMappers.toJsonNode(result.getChunkMetadata());
         if (metaNode != null && !metaNode.isNull()) {
             DocumentChunkMetadata docMeta = parseDocMeta(metaNode);
             if (docMeta == null) {

@@ -19,7 +19,7 @@ import com.ragagent.evaluation.metric.PrecisionMetric;
 import com.ragagent.evaluation.metric.RecallMetric;
 import com.ragagent.evaluation.metric.RougeMetric;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

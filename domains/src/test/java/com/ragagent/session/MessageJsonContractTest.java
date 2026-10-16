@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ragagent.platform.agent.AgentStep;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.session.MentionedItem;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageArtifact;

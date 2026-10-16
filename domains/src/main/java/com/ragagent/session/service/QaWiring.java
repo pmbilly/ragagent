@@ -50,7 +50,7 @@ import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerConfig;
 import com.ragagent.rerank.RerankerFactory;
 import com.ragagent.platform.prompt.PromptSource;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 import java.io.InputStream;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.chatpipeline.PipelinePorts;

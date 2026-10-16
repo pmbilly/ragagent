@@ -2,7 +2,7 @@ package com.ragagent.chatpipeline.support;
 
 /**
  * 匹配类型常量（int 枚举）。
- * {@code com.ragagent.platform.retrieval.SearchResult.matchType} 为 int，常量值即其取值。
+ * {@code com.ragagent.contract.retrieval.SearchResult.matchType} 为 int，常量值即其取值。
  */
 public final class MatchTypes {
 

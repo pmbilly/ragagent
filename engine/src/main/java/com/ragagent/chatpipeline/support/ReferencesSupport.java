@@ -12,7 +12,7 @@ import com.ragagent.platform.prompt.PromptComposer;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.modelcontext.Registry;
-import com.ragagent.platform.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.ChunkTypes;
 
 /**
