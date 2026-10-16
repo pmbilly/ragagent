@@ -53,6 +53,7 @@ class KnowledgeProcessWorkerTenantScopeTest {
             mock(KnowledgeBaseRepository.class),
             mock(ChunkRepository.class),
             mock(TenantFileStorage.class),
+            mock(ExtractedImageStore.class),
             mock(DocReaderClient.class),
             mock(VectorIndexStore.class),
             mock(ModelCatalogPort.class),

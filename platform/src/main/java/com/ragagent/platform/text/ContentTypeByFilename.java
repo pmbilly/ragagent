@@ -19,6 +19,18 @@ public final class ContentTypeByFilename {
         };
     }
 
+    /** 是否图片扩展名（带点/不带点均可）。 */
+    public static boolean isImageExt(String ext) {
+        String lower = ext == null ? "" : ext.toLowerCase(Locale.ROOT);
+        if (lower.startsWith(".")) {
+            lower = lower.substring(1);
+        }
+        return switch (lower) {
+            case "jpg", "jpeg", "png", "gif", "bmp", "tiff", "webp" -> true;
+            default -> false;
+        };
+    }
+
     /** 按扩展名取 Content-Type；活动浏览器内容扩展一律 octet-stream。 */
     public static String getByExt(String ext) {
         if (isActiveBrowserContentExt(ext)) {

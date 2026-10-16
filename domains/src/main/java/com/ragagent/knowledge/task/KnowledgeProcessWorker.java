@@ -92,6 +92,8 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private final ChunkRepository chunkRepository;
     /** 租户感知文件存储（读 provider 引用；本地契约不变）。 */
     private final TenantFileStorage fileStorage;
+    /** 解析抽取图片的落盘与绑定（落 exports 区 + 绑到本篇知识）。 */
+    private final ExtractedImageStore extractedImageStore;
     private final DocReaderClient docReader;
     private final VectorIndexStore vectorStore;
     private final ModelCatalogPort modelCatalog;
@@ -120,6 +122,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                                   KnowledgeBaseRepository kbRepository,
                                   ChunkRepository chunkRepository,
                                   TenantFileStorage fileStorage,
+                                  ExtractedImageStore extractedImageStore,
                                   DocReaderClient docReader,
                                   VectorIndexStore vectorStore,
                                   ModelCatalogPort modelCatalog,
@@ -141,6 +144,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         this.kbRepository = kbRepository;
         this.chunkRepository = chunkRepository;
         this.fileStorage = fileStorage;
+        this.extractedImageStore = extractedImageStore;
         this.docReader = docReader;
         this.vectorStore = vectorStore;
         this.modelCatalog = modelCatalog;
@@ -278,7 +282,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                     k.getTenantId() == null ? 0L : k.getTenantId(), k.getFilePath());
             DocReaderClient.ParseResult parsed = docReader.read(
                     content, k.getFileName(), k.getFileType(), k.getTitle(), null);
-            markdown = parsed.markdown();
+            markdown = extractedImageStore.storeAndRewrite(k, parsed.imageRefs(), parsed.markdown());
         } catch (RuntimeException e) {
             failStageSpan(docSpan, "DOCREADER_FAILED",
                     e.getMessage() == null ? e.toString() : e.getMessage(), e);
