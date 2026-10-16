@@ -22,7 +22,7 @@ import com.ragagent.contract.model.chat.ChatMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.modelruntime.adapter.provider.chat.common.LlmTransport;
+import com.ragagent.platform.http.LlmTransport;
 
 /**
  * 把"存储态的图片路径"转换成各 LLM API 能消费的形态。

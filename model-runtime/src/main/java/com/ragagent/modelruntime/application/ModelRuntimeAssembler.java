@@ -1,40 +1,44 @@
-package com.ragagent.model.service;
+package com.ragagent.modelruntime.application;
 
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.security.CryptoService;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.contract.model.Embedder;
-import com.ragagent.embedding.EmbedderFactory;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.modelruntime.application.LlmChatClients;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelParameters;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.model.Reranker;
+import com.ragagent.contract.model.VlmConfig;
+import com.ragagent.embedding.EmbedderFactory;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
-import com.ragagent.model.domain.Model;
-import com.ragagent.contract.model.ModelParameters;
-import com.ragagent.model.service.ModelService.ModelNotFoundException;
-import com.ragagent.contract.model.Reranker;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.CryptoService;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
+import com.ragagent.platform.tracing.decorators.LangfuseEmbedder;
+import com.ragagent.platform.tracing.decorators.LangfuseReranker;
 import com.ragagent.rerank.RerankerFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
-import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
-import com.ragagent.platform.tracing.decorators.LangfuseEmbedder;
-import com.ragagent.platform.tracing.decorators.LangfuseReranker;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.model.VlmConfig;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
- * 模型运行时工厂（chat / embedding / rerank / vlm / asr 五类运行时客户端的装配归口，
- * 服务于 models/{id}/debug 端点与 agent 引擎装配）。
+ * 模型运行时装配（{@link ModelRuntime} 的实现）：chat / embedding / rerank / vlm / asr 五类
+ * 运行时客户端的构造归口，服务 {@code models/{id}/debug} 端点与 agent 引擎装配。
+ *
+ * <p><b>为什么在 model-runtime</b>：构造要用的都是本模块的部件（{@code LlmChatClients} /
+ * {@code EmbedderFactory} / {@code RerankerFactory} / {@code OllamaService} / 限流器）；
+ * 只有"模型行"与"凭据解密"是外部能力——前者走契约端口 {@link ModelCatalogPort}、
+ * 后者走平台层 {@link CryptoService}。这样消费域只 import 契约面，不必看到本模块实现。</p>
  *
  * <p>两类取数口径（差别是契约，别统一）：</p>
  * <ul>
- *   <li><b>embedding / rerank</b> 走 {@code getModelGated}（带状态闸门：
+ *   <li><b>embedding / rerank</b> 走 {@code findModelOrEmpty}（带状态闸门：
  *       downloading → "model is currently downloading" 等）；</li>
- *   <li><b>chat / vlm / asr</b> 走 {@code getModelDirect} 直取（无状态闸门）。</li>
+ *   <li><b>chat / vlm / asr</b> 走 {@code findModelVisible} 直取（无状态闸门）。</li>
  * </ul>
  *
  * <p>错误形态：调用方（DebugModel）把异常消息写进 {@code data.error}（HTTP 200）。
@@ -47,73 +51,76 @@ public class ModelRuntimeAssembler implements ModelRuntime {
 
     private static final Logger log = LoggerFactory.getLogger(ModelRuntimeAssembler.class);
 
-    private final ModelService modelService;
+    private final ModelCatalogPort modelCatalog;
     private final CryptoService cryptoService;
     private final ObjectProvider<OllamaService> ollamaService;
     private final ConcurrencyGovernor concurrencyGovernor;
     private final SsrfGuard ssrfGuard;
 
-    public ModelRuntimeAssembler(ModelService modelService,
+    public ModelRuntimeAssembler(ModelCatalogPort modelCatalog,
                                CryptoService cryptoService, ObjectProvider<OllamaService> ollamaService,
                                ConcurrencyGovernor concurrencyGovernor, SsrfGuard ssrfGuard) {
-        this.modelService = modelService;
+        this.modelCatalog = modelCatalog;
         this.cryptoService = cryptoService;
         this.ollamaService = ollamaService;
         this.concurrencyGovernor = concurrencyGovernor;
         this.ssrfGuard = ssrfGuard;
     }
 
-    /** repo 直取（无状态闸门）→ chat 客户端装配。 */
+    /** 直取模型行（无状态闸门）→ chat 客户端装配。 */
+    @Override
     public LlmChatClient getChatModel(String modelId) {
-        Model model = getModelDirect(modelId);
-        log.info("Getting chat model: {}, source: {}", model.getName(), model.getSource());
-        String[] creds = modelCredentials(model.getParameters());
+        ModelRowView model = getModelDirect(modelId);
+        log.info("Getting chat model: {}, source: {}", model.name(), model.source());
+        String[] creds = modelCredentials(model.parameters());
         try {
             // langfuse generation 装饰（未启用时原样返回，零成本）
             return LangfuseChatClient.wrap(
-                    LlmChatClients.create(ModelRuntimeConfigs.chatConfig(ModelRowViews.of(model), creds[0], creds[1]),
+                    LlmChatClients.create(ModelRuntimeConfigs.chatConfig(model, creds[0], creds[1]),
                             ollamaService.getIfAvailable(), concurrencyGovernor));
         } catch (BizException e) {
             throw new RuntimeException(e.appError().message());
         }
     }
 
-    /** GetModelByID（状态闸门）→ embedder 工厂装配。 */
+    /** 带状态闸门取行 → embedder 工厂装配。 */
+    @Override
     public Embedder getEmbeddingModel(String modelId) {
-        Model model = getModelGated(modelId);
-        log.info("Getting embedding model: {}, source: {}", model.getName(), model.getSource());
-        String[] creds = modelCredentials(model.getParameters());
+        ModelRowView model = getModelGated(modelId);
+        log.info("Getting embedding model: {}, source: {}", model.name(), model.source());
+        String[] creds = modelCredentials(model.parameters());
         try {
             // pooler 只服务批量向量化；debug 只走单文本 embed，传 null
             // langfuse generation 装饰
             return LangfuseEmbedder.wrap(
                     EmbedderFactory.newEmbedder(
-                            ModelRuntimeConfigs.embedderConfig(ModelRowViews.of(model), creds[0], creds[1]),
+                            ModelRuntimeConfigs.embedderConfig(model, creds[0], creds[1]),
                             null, ollamaService.getIfAvailable(), concurrencyGovernor));
         } catch (BizException e) {
             throw new RuntimeException(e.appError().message());
         }
     }
 
-    /** GetModelByID（状态闸门）→ reranker 工厂装配。 */
+    /** 带状态闸门取行 → reranker 工厂装配。 */
+    @Override
     public Reranker getRerankModel(String modelId) {
-        Model model = getModelGated(modelId);
-        log.info("Getting rerank model: {}, source: {}", model.getName(), model.getSource());
-        String[] creds = modelCredentials(model.getParameters());
+        ModelRowView model = getModelGated(modelId);
+        log.info("Getting rerank model: {}, source: {}", model.name(), model.source());
+        String[] creds = modelCredentials(model.parameters());
         try {
             // langfuse generation 装饰
             return LangfuseReranker.wrap(
                     RerankerFactory.newReranker(
-                            ModelRuntimeConfigs.rerankerConfig(ModelRowViews.of(model), creds[0], creds[1])));
+                            ModelRuntimeConfigs.rerankerConfig(model, creds[0], creds[1])));
         } catch (BizException e) {
             throw new RuntimeException(e.appError().message());
         }
     }
 
-    /** repo 直取（无状态闸门）。调用方再 configFromModel + predict。 */
+    /** 直取（无状态闸门）。调用方再 configFromModel + predict。 */
     @Override
     public ModelRowView getVlmModel(String modelId) {
-        ModelRowView model = ModelRowViews.of(getModelDirect(modelId));
+        ModelRowView model = getModelDirect(modelId);
         log.info("Getting VLM model: {}, source: {}", model.name(), model.source());
         return model;
     }
@@ -134,10 +141,10 @@ public class ModelRuntimeAssembler implements ModelRuntime {
         return config;
     }
 
-    /** repo 直取（无状态闸门）。调用方再组 AsrConfig + transcribe。 */
+    /** 直取（无状态闸门）。调用方再组 AsrConfig + transcribe。 */
     @Override
     public ModelRowView getAsrModel(String modelId) {
-        ModelRowView model = ModelRowViews.of(getModelDirect(modelId));
+        ModelRowView model = getModelDirect(modelId);
         log.info("Getting ASR model: {}, source: {}", model.name(), model.source());
         return model;
     }
@@ -146,6 +153,7 @@ public class ModelRuntimeAssembler implements ModelRuntime {
      * 构造期校验（validateVLMBaseURL）：SSRF 失败文案
      * "base URL SSRF check failed: ..."。
      */
+    @Override
     public void validateVlmBaseUrl(String baseUrl) {
         if (baseUrl == null || baseUrl.isEmpty()) {
             return;
@@ -159,28 +167,32 @@ public class ModelRuntimeAssembler implements ModelRuntime {
 
     // ── 取数口径 ─────────────────────────────────────────────────────────
 
-    /** 按 ID 直取（tenant 可见性含 is_builtin；无状态闸门）。 */
-    private Model getModelDirect(String modelId) {
+    /** 租户可见模型行（含 is_builtin；无状态闸门）。 */
+    private ModelRowView getModelDirect(String modelId) {
         if (modelId == null || modelId.isEmpty()) {
             throw new RuntimeException("model ID cannot be empty");
         }
         long tid = TenantContext.currentTenantId() == null ? 0 : TenantContext.currentTenantId();
-        Model model = modelService.getByIdVisible(tid, modelId);
+        ModelRowView model = modelCatalog.findModelVisible(tid, modelId);
         if (model == null) {
             throw new RuntimeException("model not found");
         }
         return model;
     }
 
-    /** 带状态闸门取模型，错误文案拆包为对外原文。 */
-    private Model getModelGated(String modelId) {
+    /**
+     * 带状态闸门取行，错误文案拆包为对外原文。
+     *
+     * <p>{@code findModelOrEmpty} 只把"行不存在"收成空（别的失败照抛），
+     * 状态闸门的 BizException 因此原样冒出来，在此拆成对外文案。</p>
+     */
+    private ModelRowView getModelGated(String modelId) {
         if (modelId == null || modelId.isEmpty()) {
             throw new RuntimeException("model ID cannot be empty");
         }
         try {
-            return modelService.getModelByID(modelId);
-        } catch (ModelNotFoundException e) {
-            throw new RuntimeException("model not found");
+            return modelCatalog.findModelOrEmpty(modelId)
+                    .orElseThrow(() -> new RuntimeException("model not found"));
         } catch (BizException e) {
             throw new RuntimeException(e.appError().message());
         }

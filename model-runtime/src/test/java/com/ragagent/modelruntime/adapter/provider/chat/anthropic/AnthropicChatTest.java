@@ -31,7 +31,7 @@ import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import com.ragagent.modelruntime.adapter.provider.chat.common.LlmTransport;
+import com.ragagent.platform.http.LlmTransport;
 
 /**
  * Anthropic chat 语义测试（表内 7 条 + 端点拼接 2 条）。

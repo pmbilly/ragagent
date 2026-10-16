@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapter;
-import com.ragagent.modelruntime.adapter.provider.chat.common.LlmTransport;
+import com.ragagent.platform.http.LlmTransport;
 
 /**
  * HTTP 传输协作者（自 {@link RemoteApiChat} 拆出）：组请求头、发请求与非 200 错误文本。

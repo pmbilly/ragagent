@@ -812,7 +812,6 @@ class ArchitectureRulesTest {
             "com.ragagent.memory.service.MemoryTrace",
             "com.ragagent.memory.service.RedisMemoryExtractTaskQueue",
             "com.ragagent.model.service.BuiltinModelsReconciler",
-            "com.ragagent.model.service.ModelRuntimeAssembler",
             "com.ragagent.model.service.ModelService",
             "com.ragagent.session.service.suggestion.MessageSuggestionService",
             "com.ragagent.session.service.QaWiring",

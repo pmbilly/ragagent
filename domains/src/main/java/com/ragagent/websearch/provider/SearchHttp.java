@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.modelruntime.adapter.provider.chat.common.LlmTransport;
+import com.ragagent.platform.http.LlmTransport;
 
 /**
  * 出站搜索 HTTP 设施（代理 URL 校验 + 客户端装配）。

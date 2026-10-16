@@ -16,7 +16,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.model.service.ModelRuntimeConfigs;
+import com.ragagent.modelruntime.application.ModelRuntimeConfigs;
 import com.ragagent.model.service.ModelRowViews;
 import com.ragagent.model.domain.Model;
 

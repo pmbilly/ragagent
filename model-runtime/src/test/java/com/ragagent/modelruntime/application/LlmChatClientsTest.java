@@ -11,7 +11,7 @@ import com.ragagent.contract.model.chat.ChatConfig;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import com.ragagent.modelruntime.adapter.provider.chat.common.LlmTransport;
+import com.ragagent.platform.http.LlmTransport;
 import com.ragagent.modelruntime.adapter.provider.chat.anthropic.AnthropicChat;
 import com.ragagent.modelruntime.adapter.provider.chat.RemoteApiChat;
 

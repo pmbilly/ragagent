@@ -37,7 +37,7 @@ import com.ragagent.llm.provider.ProviderBaseURLs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.modelruntime.adapter.provider.chat.PromptCache;
-import com.ragagent.modelruntime.adapter.provider.chat.common.LlmTransport;
+import com.ragagent.platform.http.LlmTransport;
 import com.ragagent.modelruntime.adapter.provider.chat.common.SseReader;
 import com.ragagent.platform.stream.QueuedChatStream;
 

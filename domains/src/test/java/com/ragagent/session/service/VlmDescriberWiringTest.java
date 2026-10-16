@@ -18,12 +18,12 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
-import com.ragagent.model.domain.Model;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.model.service.ModelService;
 import com.ragagent.retrieval.vlm.VlmClient;
-import com.ragagent.model.service.ModelRuntimeAssembler;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.modelruntime.application.ModelRuntimeAssembler;
 
 /**
  * VLM 描述器装配的验收：成功装配后逐张图片调用 predict；失败形态是
@@ -31,7 +31,7 @@ import com.ragagent.model.service.ModelRuntimeAssembler;
  */
 class VlmDescriberWiringTest {
 
-    private final ModelService modelService = mock(ModelService.class);
+    private final ModelCatalogPort modelCatalog = mock(ModelCatalogPort.class);
     private final CryptoService cryptoService = mock(CryptoService.class);
     private final SsrfGuard ssrfGuard = mock(SsrfGuard.class);
     private final ConcurrencyGovernor governor = new ConcurrencyGovernor();
@@ -40,7 +40,7 @@ class VlmDescriberWiringTest {
 
     private ModelRuntime runtimeFactory() {
         // ollama provider 在 VLM 路径不触达；vlm 面不需要它
-        return new ModelRuntimeAssembler(modelService, cryptoService,
+        return new ModelRuntimeAssembler(modelCatalog, cryptoService,
                 null, governor, ssrfGuard);
     }
 
@@ -48,21 +48,16 @@ class VlmDescriberWiringTest {
         return new VlmDescriberWiring(runtimeFactory(), governor, transport);
     }
 
-    private static Model vlmModel(String source, String provider, String baseUrl) {
-        Model m = new Model();
-        m.setId("vlm-1");
-        m.setName("vlm-test");
-        m.setSource(source);
+    private static ModelRowView vlmModel(String source, String provider, String baseUrl) {
         ModelParameters p = new ModelParameters();
         p.setBaseUrl(baseUrl);
         p.setProvider(provider);
-        m.setParameters(p);
-        return m;
+        return new ModelRowView("vlm-1", "vlm-test", "", source, "active", false, p);
     }
 
     @Test
     void predictsThroughTransportWithOpenAiShape() {
-        when(modelService.getByIdVisible(anyLong(), anyString()))
+        when(modelCatalog.findModelVisible(anyLong(), anyString()))
                 .thenReturn(vlmModel("remote", "", "https://vision.test/v1"));
         VlmClient.Transport transport = (url, apiKey, body) -> {
             requestedUrls.add(url);
@@ -78,7 +73,7 @@ class VlmDescriberWiringTest {
 
     @Test
     void modelMissingFailsWithGoText() {
-        when(modelService.getByIdVisible(anyLong(), anyString())).thenReturn(null);
+        when(modelCatalog.findModelVisible(anyLong(), anyString())).thenReturn(null);
 
         assertThatThrownBy(() -> wiring((url, apiKey, body) -> "{}").create("vlm-missing"))
                 .isInstanceOf(RuntimeException.class)
@@ -87,7 +82,7 @@ class VlmDescriberWiringTest {
 
     @Test
     void ssrfFailurePropagatesWithGoPrefix() {
-        when(modelService.getByIdVisible(anyLong(), anyString()))
+        when(modelCatalog.findModelVisible(anyLong(), anyString()))
                 .thenReturn(vlmModel("remote", "", "https://vision.test/v1"));
         doThrow(new RuntimeException("restricted hostname: localhost"))
                 .when(ssrfGuard).validateURLForSSRF(anyString());
@@ -100,7 +95,7 @@ class VlmDescriberWiringTest {
     @Test
     void ollamaSkipsBaseUrlValidation() {
         // 本机回环基址：非 ollama 界面会被 SSRF 拒绝；ollama 分支不校验（照 NewVLM）
-        when(modelService.getByIdVisible(anyLong(), anyString()))
+        when(modelCatalog.findModelVisible(anyLong(), anyString()))
                 .thenReturn(vlmModel("local", "", "http://127.0.0.1:11434"));
 
         assertThat(wiring((url, apiKey, body) -> "{}").create("vlm-1")).isNotNull();
@@ -109,7 +104,7 @@ class VlmDescriberWiringTest {
 
     @Test
     void predictFailureSurfacesGoMessage() {
-        when(modelService.getByIdVisible(anyLong(), anyString()))
+        when(modelCatalog.findModelVisible(anyLong(), anyString()))
                 .thenReturn(vlmModel("remote", "", "https://vision.test/v1"));
         VlmClient.Transport transport = (url, apiKey, body) -> {
             throw new RuntimeException("connection refused");

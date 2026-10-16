@@ -1,4 +1,4 @@
-package com.ragagent.modelruntime.adapter.provider.chat.common;
+package com.ragagent.platform.http;
 
 import java.io.IOException;
 import com.ragagent.platform.config.AppEnvLookup;

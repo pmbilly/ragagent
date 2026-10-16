@@ -29,7 +29,7 @@ import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.contract.model.ModelParameters;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-import com.ragagent.model.service.ModelRuntimeConfigs;
+import com.ragagent.modelruntime.application.ModelRuntimeConfigs;
 import com.ragagent.llm.limiter.BackgroundTaskContext;
 import com.ragagent.llm.limiter.LocalLimiter;
 import com.ragagent.model.service.ModelRowViews;

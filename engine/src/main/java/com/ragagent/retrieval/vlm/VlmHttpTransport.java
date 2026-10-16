@@ -11,7 +11,7 @@ import java.time.Duration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
-import com.ragagent.modelruntime.adapter.provider.chat.common.LlmTransport;
+import com.ragagent.platform.http.LlmTransport;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 
 /**

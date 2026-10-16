@@ -19,7 +19,7 @@ import com.ragagent.contract.model.Reranker;
 import com.ragagent.platform.security.SsrfGuard;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-import com.ragagent.model.service.ModelRuntimeConfigs;
+import com.ragagent.modelruntime.application.ModelRuntimeConfigs;
 import com.ragagent.rerank.provider.AliyunReranker;
 import com.ragagent.rerank.provider.JinaReranker;
 import com.ragagent.rerank.provider.LkeapReranker;

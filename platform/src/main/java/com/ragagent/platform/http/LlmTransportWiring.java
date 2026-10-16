@@ -1,4 +1,4 @@
-package com.ragagent.modelruntime.adapter.provider.chat.common;
+package com.ragagent.platform.http;
 
 import com.ragagent.platform.security.SsrfGuard;
 
