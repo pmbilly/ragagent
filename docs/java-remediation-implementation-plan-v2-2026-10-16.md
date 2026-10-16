@@ -42,7 +42,8 @@
 | 5 | `MessageView` · `PipelineMessageView` | `platform.session.embed` / `platform.session` | 去框架化 → `contract.session`（金片 `emb-pub-messages-load*` 钉住，逐字节验证） | **P3** |
 | 6 | `MemoryMessageCursor`（`ZeroTimeSerializer`） | `platform.memory` | 去框架化 → `contract.memory`（零时序列化语义移至边界） | **P3** |
 | 7 | `UserPreferences` | `platform.auth` | 归域 → `auth/domain`（方案 §8.9 原文落点） | **P5** |
-| 8 | `LanguageProperties` · `RetrievalDriverProperties` · `TenantConfigLookup` · `TenantProperties` | `platform.config` | 去框架化 → `contract.wiki` / `contract.retrieval` / `contract.tenant`（均系方案 §8.1 原文落点） | **P4** |
+| 8 | `TenantConfigLookup` | `platform.config` | 去框架化（JsonNode→Object）→ `contract.tenant` | ✅ d792a002 |
+| 8b | `LanguageProperties` · `RetrievalDriverProperties` · `TenantProperties`（`@ConfigurationProperties`） | `platform.config` | **裁定留 platform（不搬）**：配置绑定＝框架面（判定标准二"技术适配"含框架绑定）；命名（`*Properties`）不在 C8 红灯清单——登记为豁免项 | — |
 | 9 | `SessionQaPort` · `EmbedSessionPort`（servlet+ResponseEntity 签名） | `platform.session.{qa,embed}` | 签名中性化（`EventBusInterface` 已就位；servlet/ResponseEntity 归边界）→ `contract.session` | **P4** |
 | 10 | `AdminUserPort` · `AdminUserView` · `ApiKeyAuthPort` | `platform.{auth,apikey}` | 签名中性化 → `contract.auth` / `contract.apikey`（方案 §8.1 原文落点） | **P4** |
 | 11 | `KnowledgeCatalogPort` · `FaqChunkMetadataCodec` | `platform.knowledge` | 端口中性化（去 MyBatis-Plus `Page`）→ `contract.knowledge`；codec 归域 | **P4** |
