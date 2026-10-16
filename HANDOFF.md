@@ -54,6 +54,8 @@
 
 ## 5. 执行方案（摘要；详情＝实施计划 v2）
 
+> **阶段路线（2026-10-16 用户拍板）**：**P1~P5（两模块纠偏）在 `v0.3.0` 全部完成** ⇒ **推送 `v0.3.0` + 合并 `main`** ⇒ 新建 **`v0.4.0`** 分支，R1~R6（三 runtime）在 v0.4.0 上继续。
+
 | 批 | 内容 | 状态 |
 |---|---|---|
 | **P1** | platform 域 DTO 归位示范：`StopSessionRequest` → `session/dto` + 端口中性签名 | 见 §12 |
@@ -68,7 +70,7 @@
 | **R5** | `agent-engine`：契约面 + 工具 SPI 先行 → 迁 `domains/agent` 核心（79 件） | ⬜ |
 | **R6** | engine 解散收口 + domains 逐域对账（§8.9 余项） | ⬜ |
 
-顺序：P1→…→P5→R1→…→R6（纠偏先行：承载面清净后再拆 runtime）。
+顺序：P1→…→P5 →（**推送 + 合 main + 开 `v0.4.0`**）→ R1→…→R6（纠偏先行：承载面清净后再拆 runtime）。
 
 ## 6. 环境与运行
 
@@ -168,6 +170,7 @@ boot      13 件                        →     agent-engine（自 domains/agent
 | 批 | 日期 | 内容 | 读数/验证 |
 |---|---|---|---|
 | P1 | 2026-10-16 | `StopSessionRequest` 归位 `domains/session/dto`（方案 §8.8.1 原文落点）+ `EmbedSessionPort.stopSession` 中性化（rawBody 透传、解析归会话域，口径对齐 `MessageSuggestionController.ensureSuggestions` 先例）；`platform.session.dto` 目录消亡 | 14 守卫绿 · 金片 1349 签名一致 · gate 2m16s / **4996 / 失败 0 / 跳过 4** · 端点覆盖 `EmbedContractTest` + `SessionG6ContractTest` 全绿 |
+| —（杂项） | 2026-10-16 | 61 份过期文档清理（用户确认；活文档零引用已核）· `scripts/dev-env.sh` login 提取器适配统一响应壳（token 移入 data） | 冒烟 sessions / knowledge-bases 200 · token 265 字符 |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

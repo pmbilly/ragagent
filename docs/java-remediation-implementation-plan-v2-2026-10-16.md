@@ -50,6 +50,14 @@
 | 15 | 文件服务面（`fileserve` 8 + `support` 4） | `platform.storage.*` | 逐件裁：端口中性化进 contract / servlet 技术件留 platform 边界 | **P5** |
 | — | 合理技术件（`UrlBytesFetcher`·`StreamManager`·`ContractJsonMixins*`·`LikeEscapes`·`JsonbRawStringTypeHandler`·`RedisPubSub`·`TenantContext/TenantScopes` 等） | 各面 | **保留**（技术适配定位相符） | — |
 
+**P2 执行设计（2026-10-16 勘察定稿）**——KB config 三层结构的实际读写面＝**7 个文件主战场**（不是"引用 KBRV 的 30 文件"全涟漪）：
+
+1. **新建 2 个 View** 补全 7 件对（`StorageConfigView`/`StorageProviderConfigView`，contract 纯 JDK record；字段＝消费者实际用度）；
+2. **KBRV 的 7 个配置字段**：Config → 对应 View；`KnowledgeBaseRowViews`（实体⇄载体映射）改走新建的域侧助手 `KnowledgeBaseConfigMaps`（View↔Config 双向映射，即原 `from/toDomain` 的接收者）；
+3. **消费点改造**（7 处）：`KnowledgeBaseResponse`（`from()` 调用→直传 View）· `CreateKnowledgeBaseRequest`（`toDomain()`→助手）· `InitializationConfigService`（3 段配置写读改为不可变 record 组装）· `KnowledgeProcessWorker`（`ingestionInactiveKeys` 消费面）· `KnowledgeCloneService` · `KnowledgeBaseViews`（契约 support 改读 View 访问器）· 相关测试；
+4. **7 个 Config 物理搬回** `domains/knowledge/domain`（与 `KnowledgeBase` 同包，实体侧 import 归零）+ 清 `contract.knowledge.domain` 的对应文件；
+5. **验收**：C2 该面无残留；`KnowledgeBaseConfigJsonContractTest` 等全绿；线格式零变化。
+
 ### 1.3 纠偏的完成判定（验收 = 两条标准逐条机器可查）
 
 - contract：`check-contracts-purity.py` C1/C2/C3 全零 + 每个类的跨域消费者可列举（脚本：引用面按模块统计 ≠ 仅自身模块）；
@@ -105,5 +113,7 @@ contract → JDK
 ## 4. 执行顺序
 
 **P1 → P2 → P3 → P4 → P5 → R1 → R2 → R3 → R4 → R5 → R6**（P 先行：纠偏把"承载面"清干净，runtime 拆分不再背负历史挂靠）。
+
+**阶段与分支路线（2026-10-16 用户拍板）**：P1~P5（两模块纠偏）全部完成于 **`v0.3.0`** ⇒ **推送 `v0.3.0` + 合并 `main`** ⇒ 新建 **`v0.4.0`** 分支，R1~R6（三 runtime）在 v0.4.0 上继续。
 
 > 缓行项（不阻塞）：`fileserve` 逐件裁（P5 内）；Phase 2「形状去框架化改协议」不独立立项——本轮 P3/P4 即其执行路径（mixin 机制、逐字节验证）。
