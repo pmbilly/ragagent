@@ -48,7 +48,7 @@
 | 10 | `AdminUserPort` · `AdminUserView` · `ApiKeyAuthPort` | `platform.{auth,apikey}` | 签名中性化 → `contract.auth` / `contract.apikey`（方案 §8.1 原文落点） | **P4** |
 | 11 | `KnowledgeCatalogPort` | `platform.knowledge` | 端口中性化（去 MyBatis-Plus `Page`）→ `contract.knowledge` | ✅ 92c5eb70 |
 | 11b | `FaqChunkMetadataCodec` | `platform.knowledge` | **裁定留 platform（不搬）**：映射面（JSON 读写）＝技术适配；跨 knowledge/agenttools/chatpipeline 三域消费，归域会造边——登记豁免 | — |
-| 12 | `Settings` 2 件（`ConversationProperties`/`SystemSettingRegistry`） | `platform.settings` | 去 platform 依赖（`PromptSource`/`ToolJson`）→ `contract.settings` | **P4** |
+| 12 | `Settings` 2 件（`ConversationProperties`/`SystemSettingRegistry`） | `platform.settings` | **裁定留 platform（不搬）**：`ConversationProperties`＝配置绑定＋提示词装载（判定标准二"框架/提示词"双命中）；`SystemSettingRegistry`＝设置注册/解析基建（Jackson 面深、重写风险高）——登记豁免；命名（`*Properties`/`*Registry`）不在 C8 红灯清单 | — |
 | 13 | `ParserEngineConfig` | `platform.tenant` | 回 `tenant` 域（方案 §8.9 原文落点）；跨域读取走 `TenantConfigLookup` 端口 | **P5** |
 | 14 | `BaseTool` | `platform.tool` | 归 `agent-engine`（工具实现基类） | **R5**（随 agent） |
 | 15 | 文件服务面（`fileserve` 8 + `support` 4） | `platform.storage.*` | 逐件裁：端口中性化进 contract / servlet 技术件留 platform 边界 | **P5** |
