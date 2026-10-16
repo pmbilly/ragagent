@@ -12,11 +12,6 @@
       "com.ragagent.agent.skills.mapper"
     ],
     [
-      "com.ragagent.chatpipeline",
-      "com.ragagent.chatpipeline.plugin",
-      "com.ragagent.chatpipeline.support"
-    ],
-    [
       "com.ragagent.contract.model",
       "com.ragagent.contract.model.chat",
       "com.ragagent.contract.retrieval"
@@ -44,6 +39,11 @@
       "com.ragagent.retrieval.engine.sqlite",
       "com.ragagent.retrieval.engine.tencentvectordb",
       "com.ragagent.retrieval.engine.weaviate"
+    ],
+    [
+      "com.ragagent.session.service.rag",
+      "com.ragagent.session.service.rag.plugin",
+      "com.ragagent.session.service.rag.support"
     ],
     [
       "com.ragagent.wiki.service.ingest",

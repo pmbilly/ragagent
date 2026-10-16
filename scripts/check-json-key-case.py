@@ -104,7 +104,7 @@ FROZEN_PREFIXES = (
     # A②-2a/2c：契约载荷的**线格式载体**（模块自 common/web 迁 platform/web，前缀同步换锚）——注解从契约类搬进 mixin 模块（§8.1 纯 JDK），
     # 键名仍是既有 API/jsonb 契约（snake 键是设计，不是漂移）。
     'platform/web/ContractJsonMixins',
-    'contract/wiki/ExtractedItem', 'chatpipeline/plugin', 'agent/AgentEngine',
+    'contract/wiki/ExtractedItem', 'session/service/rag/plugin', 'agent/AgentEngine',
     'agent/ReActIteration', 'retrieval/HybridSearchService', 'retrieval/vlm/VlmClient',
     'knowledge/service/chunk/ChunkExtractService', 'knowledge/task/KnowledgeProcessWorker',  # B263㉟ 换锚：ChunkExtractService 迁 service/chunk
     'memory/mapper', 'knowledge/domain/KnowledgeBase', 'mcp/domain/McpService',
@@ -143,9 +143,11 @@ BASELINE: dict[str, set[str]] = {
     # chat_parser_engine_rules 则是 agent 侧规则的透传保留（§14.9 表②）。
     'tenant/ParserEngineConfig.java': {'chat_parser_engine_rules', 'mineru_api_key', 'mineru_cloud_enable_formula', 'mineru_cloud_enable_ocr', 'mineru_cloud_enable_table', 'mineru_cloud_language', 'mineru_cloud_model', 'mineru_enable_formula', 'mineru_enable_ocr', 'mineru_enable_table', 'mineru_endpoint', 'mineru_language', 'mineru_model', 'mineru_parse_method', 'mineru_vlm_server_url', 'odl_hybrid', 'odl_hybrid_fallback', 'odl_hybrid_mode', 'odl_hybrid_url', 'odl_markdown_with_html', 'paddleocr_vl_cloud_model', 'paddleocr_vl_cloud_token', 'paddleocr_vl_cloud_use_chart_recognition', 'paddleocr_vl_cloud_use_seal_recognition', 'paddleocr_vl_endpoint', 'paddleocr_vl_use_chart_recognition', 'paddleocr_vl_use_seal_recognition'},
     # 内部预设名（presets() 仅内部查表）
-    'chatpipeline/PipelineBuilder.java': {'chat_history_stream', 'chat_stream', 'rag_stream'},
+        # R4b 换锚：`chatpipeline` 本体归位会话域（`session/service/rag`）——下列键都是**既有观测/录制
+    # wire 键**（管线 stage 记录与插件元数据，前端/录制夹具消费），键名不动、只换路径。
+'session/service/rag/PipelineBuilder.java': {'chat_history_stream', 'chat_stream', 'rag_stream'},
     # PipelineLog 观测面（日志字段，非契约）
-    'chatpipeline/support/SearchSupport.java': {'chunk_id', 'dropped_id', 'kept_id', 'match_type'},
+    'session/service/rag/support/SearchSupport.java': {'chunk_id', 'dropped_id', 'kept_id', 'match_type'},
     # langfuse 线上字段（第三方契约）
     'platform/access/TracingContext.java': {'lf_parent_obs_id', 'lf_session_id', 'lf_trace_id', 'lf_traceparent', 'lf_user_id'},
     # MDC 日志键（非 JSON）
@@ -236,7 +238,7 @@ BASELINE: dict[str, set[str]] = {
     # JWT claim 名（IdP 契约）
     'auth/service/UserSessionOps.java': {'user_id'},
     # websearch metadata（§15.3 ① 外部决定）
-    'chatpipeline/support/ReferencesSupport.java': {'published_at'},
+    'session/service/rag/support/ReferencesSupport.java': {'published_at'},
     # 提示词模板变量（数据值，非 JSON 键）
     'platform/prompt/PromptTemplateCatalog.java': {'has_knowledge_base', 'has_web_search'},
     # provider 配置字段（对方词汇）

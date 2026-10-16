@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.chatpipeline.ChatManage;
-import com.ragagent.chatpipeline.PipelineBuilder;
-import com.ragagent.chatpipeline.SummaryConfig;
-import com.ragagent.chatpipeline.spi.KnowledgeQaEventPort;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineBuilder;
+import com.ragagent.session.service.rag.SummaryConfig;
+import com.ragagent.session.service.rag.spi.KnowledgeQaEventPort;
 import com.ragagent.contract.pipeline.KnowledgeQaRunRequest;
 import com.ragagent.contract.pipeline.KnowledgeQaRunResult;
 import com.ragagent.contract.pipeline.KnowledgeQaRunner;

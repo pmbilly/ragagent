@@ -46,11 +46,14 @@ dependencyManagement {
 }
 
 dependencies {
+    // 模型运行时：R4b 后不再经 :engine 传递（engine 已解散）。**过渡边**——domains 尚余约 18 处
+    // 对模型族实现面的 import（Ollama 管理面 / llm.extract 族 / modelcontext 工具 SPI 等），
+    // 按 R2c-3d 清单逐项收（`modelcontext` 归 R5 后为合法终态边）。
+    implementation(project(":model-runtime"))
+
     // 共享内核（common + event）——B116 抽成独立模块后在此声明依赖（B117 定名 :common）
     implementation(project(":platform"))
     implementation(project(":contract"))
-    implementation(project(":engine"))
-    testImplementation(testFixtures(project(":engine")))    // wire/ 录制夹具
     testImplementation(testFixtures(project(":platform")))
     // 检索实现面：仅**测试**需要（错位测试 HybridResultOpsContextExpansionTest/
     // ArtifactReferenceRewriterTest 等 + 录制测试的检索桩）——主码对检索已只经契约

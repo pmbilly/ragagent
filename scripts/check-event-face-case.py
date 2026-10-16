@@ -119,7 +119,7 @@ EVENT_MAP_FILES = {
         'SSE 事件桥（手工 put；B93b 已 camel 38 处键位，B135b2 收尾 finalContent）',
     'session/controller/sse/StreamResponseBuilder.java':
         'SSE 响应构建 + Redis 回放的引用重建（读 SearchResult 形状）',
-    'chatpipeline/PipelineProgress.java':
+    'session/service/rag/PipelineProgress.java':
         '进度事件生产侧（B134 已 camel；棘轮自此覆盖）',
     'session/controller/SteerController.java':
         'steer 事件载荷生产侧（B135c 已 camel）',

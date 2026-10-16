@@ -35,6 +35,9 @@ dependencyManagement {
 }
 
 dependencies {
+    // 模型运行时：组合根自建模型装配/并发闸门（R4b 后不再经 :engine 传递）
+    implementation(project(":model-runtime"))
+
     // 检索引擎：组合根自建引擎注册表/工厂与审计 sink（R3c 后不再经 engine 传递）
     implementation(project(":retrieval-engine"))
 
@@ -47,7 +50,6 @@ dependencies {
     implementation(libs.mybatis.plus.starter)
     compileOnly("jakarta.servlet:jakarta.servlet-api")
     compileOnly("jakarta.validation:jakarta.validation-api")
-    implementation(project(":engine"))
     implementation(project(":platform"))
     implementation(project(":contract"))
     testImplementation(testFixtures(project(":domains")))

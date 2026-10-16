@@ -806,6 +806,10 @@ class ArchitectureRulesTest {
             "com.ragagent.im.service.ImTurnOrchestrator",
             "com.ragagent.knowledge.service.management.KnowledgeService",
             "com.ragagent.knowledge.service.chunk.ChunkExtractService",
+            // R4b：管线本体归位会话域后落在 service 包内——插件族依赖 langfuse 观测与具体技术
+            // （管线本体的必要依赖，随 chatpipeline → session.service.rag 迁移登记）
+            "com.ragagent.session.service.rag.plugin.PluginRerank",
+            "com.ragagent.session.service.rag.plugin.PluginSearchOps",
             "com.ragagent.knowledge.service.management.KnowledgeBaseLookupAdapter",
             "com.ragagent.knowledge.service.enrichment.QuestionGenerationService",
             "com.ragagent.memory.service.InProcessMemoryExtractTaskQueue",
@@ -969,7 +973,7 @@ class ArchitectureRulesTest {
     /** A18b 作用域：运行态与编排协作者所在包。 */
     private static boolean isRuntimePackage(String packageName) {
         return packageName.startsWith("com.ragagent.agent")
-                || packageName.startsWith("com.ragagent.chatpipeline")
+                || packageName.startsWith("com.ragagent.session.service.rag")
                 || packageName.startsWith("com.ragagent.session.controller");
     }
 

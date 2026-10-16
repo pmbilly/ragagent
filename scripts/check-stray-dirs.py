@@ -40,12 +40,10 @@ SOURCE_ROOTS = (
     "common/src/main/java",
     "common/src/test/java",
     "common/src/testFixtures/java",
-    "engine/src/main/java",
     "model-runtime/src/main/java",
     "model-runtime/src/test/java",
     "retrieval-engine/src/main/java",
     "retrieval-engine/src/test/java",
-    "engine/src/test/java",
     "engine/src/testFixtures/java",
     "boot/src/main/java",
     "boot/src/test/java",
@@ -72,7 +70,7 @@ def _ignored(path: pathlib.Path) -> bool:
 def check_stray_dirs() -> list[str]:
     problems = []
     scan = [(ROOT, ROOT_ALLOW)]
-    for mod in (ROOT / "domains", ROOT / "common", ROOT / "engine", ROOT / "model-runtime", ROOT / "retrieval-engine", ROOT / "boot", ROOT / "frontend", ROOT / "mcp-server",
+    for mod in (ROOT / "domains", ROOT / "common", ROOT / "model-runtime", ROOT / "retrieval-engine", ROOT / "boot", ROOT / "frontend", ROOT / "mcp-server",
                 ROOT / "docreader", ROOT / "otlp-proto", ROOT / "migrations", ROOT / "docs",
                 ROOT / "scripts"):
         if mod.is_dir():

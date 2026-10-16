@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.chatpipeline.ChatManage;
-import com.ragagent.chatpipeline.spi.KnowledgeQaEventPort;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.spi.KnowledgeQaEventPort;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 
 /**
