@@ -88,7 +88,7 @@
 
 | 批 | 内容 | 前置/验收 |
 |---|---|---|
-| **R1** | **契约面先行**：`contract.model.chat`（`llm.domain` 11 件上提）+ `contract.retrieval` 缺口（`SearchHit`/`IndexService`/`SearchPolicy` 等按检索引擎公开面成型）+ `contract.agent`（6 件）+ `contract.execution`（按需） | 每件过"跨域消费者"判据；不建空层 |
+| **R1** | **契约面先行**：✅ **已收官** —— R1a `ae0a17c0`（`llm.domain` 11 件 → `contract.model.chat`）· R1b-1 `b5a36912`（`retrieval.domain` 4 件 → `contract.websearch`）。**余项判定（2026-10-16 用户拍板）**：① `contract.retrieval` 缺口 ⇒ **并入 R3**（域侧直注的是 `CompositeRetrieveEngine`12/`HybridSearchService`10/`VectorStoreService`9/`PgVectorEngineRepository`4 等**实现类**，且索引面签名穿透 `Embedder`（模型族）与可变 setter `IndexInfo` ⇒ 须待 R2 模型面定型）；② `contract.agent` 6 件 ⇒ **并入 R5**（今日跨域消费者仅 boot 一个测试，六件全仓无对应物；R5 本要"先建契约面+工具 SPI"）；③ `contract.execution` ⇒ **判"不建"**（取消/元数据已在 `contract.tool.ToolCancellation`/`ToolExecContext`，引擎自身另有 `Supplier<String> cancellationSource` ⇒ 再建恐三套取消语义并存；agent 进度是事件流、无 sink 需求） | 原判据保留（每件过"跨域消费者"判据；不建空层）——三条判定正是该判据的应用 |
 | **R2** | **model-runtime 模块提取**（163 件）；公开面分层：契约类（纯 JDK）与实现面（允许框架）分开 | 复用 platform 提取判据（三维闭包预检 / 测试条数守恒 / 插件随配置块 / 扫描面核） |
 | **R3** | **retrieval-engine 模块提取**（96 件）；与 model 侧的 8~9 处边接口化（走 `contract.retrieval`/`EmbeddingModelPort`） | `webfetch` 归属拍板（方案原文=websearch 域 fetch 面；现登记"有意偏离"） |
 | **R4** | 归位：`tracing`(6) → `platform.tracing.decorators`；`chatpipeline`(49) → `domains/session/service.rag` | 每步全绿 + 扫描面同步 |
