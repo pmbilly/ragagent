@@ -1,4 +1,4 @@
-package com.ragagent.initialization.service;
+package com.ragagent.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,17 +7,16 @@ import com.ragagent.llm.extract.ExtractPrompts;
 import com.ragagent.llm.ollama.OllamaService;
 
 /**
- * agent.management 的进程级装配：
- * <ul>
- *   <li>{@link OllamaService} 单例 bean。
- *       注意 {@code isAvailable} 标志是跨请求共享状态——"已可用则跳过
- *       StartService" 的分支依赖这一点，不能每请求新建。</li>
- *       （见接缝类注释的线上行为说明）。</li>
- *   <li>{@link ExtractPrompts}——config.yaml extract 段的 vendor 装载。</li>
- * </ul>
+ * 模型运行时的两个进程级 bean（R2c-3d 组合根收拢）。
+ *
+ * <p>原先这两个 {@code @Bean} 挂在业务域（{@code initialization.service.InitializationWiring}）
+ * ——那是"跨模块组装权落在业务域"的典型；按计划"跨模块协作经 contract、由 boot 注入"归组合根。</p>
+ *
+ * <p>{@link OllamaService} 的 {@code isAvailable} 是**跨请求共享状态**——"已可用则跳过 StartService"
+ * 的分支依赖 bean 级单例，不能每请求新建。</p>
  */
 @Configuration
-public class InitializationWiring {
+public class ModelRuntimeBeansWiring {
 
     @Bean
     public OllamaService ollamaService() {
@@ -25,7 +24,6 @@ public class InitializationWiring {
         // OLLAMA_OPTIONAL=true 时可用性失败不报错。单例语义由 bean 层承担。
         return OllamaService.getOllamaService();
     }
-
 
     @Bean
     public ExtractPrompts extractPrompts() {

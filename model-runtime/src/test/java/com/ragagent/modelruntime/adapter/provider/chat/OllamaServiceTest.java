@@ -1,5 +1,6 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
+import com.ragagent.contract.model.OllamaModelInfo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.ragagent.llm.ollama.OllamaModelInfo;
 import com.ragagent.llm.ollama.OllamaService;
 
 import com.sun.net.httpserver.HttpExchange;

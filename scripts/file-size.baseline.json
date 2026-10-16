@@ -58,6 +58,7 @@
     "domains/src/main/java/com/ragagent/wiki/service/ingest/WikiIngestRunSupport.java": 655,
     "domains/src/main/java/com/ragagent/wiki/service/page/WikiLinkify.java": 641,
     "domains/src/main/java/com/ragagent/wiki/service/page/WikiPageServiceImpl.java": 730,
+    "model-runtime/src/main/java/com/ragagent/llm/ollama/OllamaService.java": 619,
     "model-runtime/src/main/java/com/ragagent/modelcontext/ModelOutput.java": 745,
     "model-runtime/src/main/java/com/ragagent/modelcontext/Registry.java": 645,
     "model-runtime/src/main/java/com/ragagent/modelcontext/ToolPolicy.java": 653,

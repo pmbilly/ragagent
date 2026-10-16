@@ -1,4 +1,4 @@
-package com.ragagent.llm.ollama;
+package com.ragagent.contract.model;
 
 import java.time.OffsetDateTime;
 

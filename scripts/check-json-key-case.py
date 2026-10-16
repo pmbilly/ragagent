@@ -125,7 +125,6 @@ FROZEN_PREFIXES = (
 BASELINE: dict[str, set[str]] = {
     # 会话配置读取面（A③-㊶ 知识支持面上提 L1 时随类换锚，旧路径条目已清）：`file_types` 是存量 DB
     # 配置键（parser_engine_rules 的既有形态），改键会破坏存量数据——非新增契约。
-    'common/knowledge/support/ParserEngineRules.java': {'file_types'},
     # Langfuse span/trace 观测面（B135 复核改标：原写「agent_steps 落库列 + 历史回放」，实测站点是 toolSpanInput/toolSpanMeta 与 traceArgumentValue 构造 ⇒ 观测面，非 JSON 契约）
     'agent/ActPhase.java': {'args_redacted', 'argument_resolution', 'data_keys', 'image_count', 'mcp_service', 'mcp_tool', 'model_arg_keys', 'model_arguments', 'output_len', 'resolved_arg_keys', 'resolved_arguments', 'tool_index', 'unresolved_handle_count', 'unresolved_handles'},
     # 模板令牌（数据值，非 JSON 键）
@@ -141,7 +140,6 @@ BASELINE: dict[str, set[str]] = {
     # （docreader/docreader.proto 里 config_overrides 是泛型 map，服务本体不在本仓）；
     # 租户 KV 复用同一词汇，改名须先加边界翻译层——属独立决策，故登记冻结。
     # chat_parser_engine_rules 则是 agent 侧规则的透传保留（§14.9 表②）。
-    'tenant/ParserEngineConfig.java': {'chat_parser_engine_rules', 'mineru_api_key', 'mineru_cloud_enable_formula', 'mineru_cloud_enable_ocr', 'mineru_cloud_enable_table', 'mineru_cloud_language', 'mineru_cloud_model', 'mineru_enable_formula', 'mineru_enable_ocr', 'mineru_enable_table', 'mineru_endpoint', 'mineru_language', 'mineru_model', 'mineru_parse_method', 'mineru_vlm_server_url', 'odl_hybrid', 'odl_hybrid_fallback', 'odl_hybrid_mode', 'odl_hybrid_url', 'odl_markdown_with_html', 'paddleocr_vl_cloud_model', 'paddleocr_vl_cloud_token', 'paddleocr_vl_cloud_use_chart_recognition', 'paddleocr_vl_cloud_use_seal_recognition', 'paddleocr_vl_endpoint', 'paddleocr_vl_use_chart_recognition', 'paddleocr_vl_use_seal_recognition'},
     # 内部预设名（presets() 仅内部查表）
         # R4b 换锚：`chatpipeline` 本体归位会话域（`session/service/rag`）——下列键都是**既有观测/录制
     # wire 键**（管线 stage 记录与插件元数据，前端/录制夹具消费），键名不动、只换路径。
@@ -182,7 +180,6 @@ BASELINE: dict[str, set[str]] = {
     # Cypher 字段
     'retrieval/graph/Neo4jGraphRepository.java': {'knowledge_id', 'source_labels', 'target_labels'},
     # ImageInfo 面（§15.3 冻结族）
-    'retrieval/support/ImageInfoMatchUtil.java': {'end_pos', 'start_pos'},
     # websearch metadata 的 published_at（§15.3 ① 外部决定：键名由搜索服务给，非我们的 JSON 面）。
     # B147a 复核改标：原写「存量面」是错的——与 ReferencesSupport 同族，属外部词汇而非历史数据。
     # R3b 换锚：`WebResultConverter` 由 retrieval/support 上提契约面。写进检索结果 metadata 的

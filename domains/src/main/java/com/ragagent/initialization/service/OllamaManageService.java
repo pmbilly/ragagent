@@ -18,8 +18,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.llm.ollama.OllamaService;
-import com.ragagent.llm.ollama.OllamaModelInfo;
+import com.ragagent.contract.model.OllamaAdminPort;
+import com.ragagent.contract.model.OllamaModelInfo;
 
 /**
  * ollama 管理端点用例：status/models/check/download/progress 与拉取任务机制。
@@ -30,10 +30,10 @@ public final class OllamaManageService {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final OllamaService ollamaService;
+    private final OllamaAdminPort ollamaService;
     private final OllamaDownloadTaskStore downloadTasks;
 
-    public OllamaManageService(OllamaService ollamaService, OllamaDownloadTaskStore downloadTasks) {
+    public OllamaManageService(OllamaAdminPort ollamaService, OllamaDownloadTaskStore downloadTasks) {
         this.ollamaService = ollamaService;
         this.downloadTasks = downloadTasks;
     }
@@ -224,12 +224,12 @@ public final class OllamaManageService {
             listener.onProgress(100.0, "模型已存在");
             return;
         }
-        ollamaService.pullWithProgress(modelName, progress -> {
+        ollamaService.pullModel(modelName, progress -> {
             double progressPercent = 0.0;
             String message = "下载中";
-            long total = progress.path("total").asLong(0);
-            long completed = progress.path("completed").asLong(0);
-            String status = progress.path("status").asText("");
+            long total = progress.total();
+            long completed = progress.completed();
+            String status = progress.status();
             if (total > 0 && completed > 0) {
                 progressPercent = (double) completed / (double) total * 100;
                 message = String.format(Locale.ROOT, "下载中: %.1f%% (%s)", progressPercent, status);

@@ -21,7 +21,7 @@ import com.ragagent.platform.security.CryptoService;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.llm.ollama.OllamaService;
+import com.ragagent.contract.model.OllamaAdminPort;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.contract.model.ModelCatalogPort;
@@ -56,7 +56,7 @@ public class InitializationController {
 
     public InitializationController(KnowledgeCatalogPort knowledgeCatalog,
             ModelCatalogPort modelCatalog, ModelRuntime modelRuntime, SsrfGuard ssrfGuard,
-            OllamaService ollamaService, OllamaDownloadTaskStore downloadTasks,
+            OllamaAdminPort ollamaService, OllamaDownloadTaskStore downloadTasks,
             AsrTranscriber asrTranscriber, ExtractPrompts extractPrompts,
             DocReaderParsePort documentReader,
             CryptoService cryptoService) {

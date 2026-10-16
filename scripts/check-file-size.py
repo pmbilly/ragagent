@@ -33,7 +33,13 @@
 而多红一次的代价只是一条 `--write`；若改成按文件名记，则不同包的同名文件会互相掩盖。
 `exempt.status`：`accepted` = 已论证接缝；`pending` = 欠债（待拆 / 待复核），
 守卫输出里标【待还债】，即后续批次的工作清单。
+2026-10-16（R2c-3d）：`model-runtime/llm/ollama/OllamaService.java` 619 行登记——
+  内聚论证：Ollama 的 HTTP 客户端一族（探活/启动/拉取进度/模型清单/删除/chat 流式）本就一体，
+  拆开只会把"共享的探活状态"（isAvailable 与 startService 的幂等分支）拆到两个类里；
+  本次增长 15 行全部是"契约端口桥接"（OllamaAdminPort 六方法与类型化进度重载）。
+  将来若继续增长，应先把 chat 流式一族拆出。
 """
+
 
 import json
 import pathlib

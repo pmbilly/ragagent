@@ -15,6 +15,11 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.ragagent.contract.model.OllamaAdminPort;
+import com.ragagent.contract.model.OllamaModelInfo;
+import com.ragagent.contract.model.OllamaProgressListener;
+import com.ragagent.contract.model.OllamaPullProgress;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -42,7 +47,7 @@ import org.slf4j.LoggerFactory;
  *
  * <p>线程安全：{@code isAvailable} / {@code isOptional} 受一把锁保护。</p>
  */
-public class OllamaService {
+public class OllamaService implements OllamaAdminPort {
 
     private static final Logger log = LoggerFactory.getLogger(OllamaService.class);
 
@@ -102,6 +107,7 @@ public class OllamaService {
      * {@code HEAD /} 探活。
      * 不可用时：optional 模式吞掉错误（只把 isAvailable 置 false），否则抛。
      */
+    @Override
     public void startService() {
         mu.lock();
         try {
@@ -130,6 +136,7 @@ public class OllamaService {
     }
 
     /** 服务是否可用。 */
+    @Override
     public boolean isAvailable() {
         mu.lock();
         try {
@@ -148,6 +155,7 @@ public class OllamaService {
      * 先探活；模型名不带 {@code ":"} 时按
      * {@code name:latest} 比对（Ollama 列表里的名字总是带 tag 的）。
      */
+    @Override
     public boolean isModelAvailable(String modelName) {
         startService();
         if (!isAvailable() && isOptional) {
@@ -212,6 +220,15 @@ public class OllamaService {
      *
      * <p>不先探活也不查模型是否已存在——前置检查由调用方负责。</p>
      */
+    /** 端口面：类型化进度（把原始 NDJSON 解析成记录后再回调）。 */
+    @Override
+    public void pullModel(String modelName, OllamaProgressListener listener) {
+        pullWithProgress(modelName, progress -> listener.onProgress(new OllamaPullProgress(
+                progress.path("completed").asLong(0),
+                progress.path("total").asLong(0),
+                progress.path("status").asText(""))));
+    }
+
     public void pullWithProgress(String modelName, ProgressCallback fn) {
         try {
             streamNdjson("/api/pull", Map.of("name", modelName), fn::onProgress);
@@ -253,6 +270,7 @@ public class OllamaService {
     // ------------------------------------------------------------------
 
     /** 不可用且 optional → "unavailable"。 */
+    @Override
     public String getVersion() {
         if (!isAvailable() && isOptional) {
             return "unavailable";
@@ -312,6 +330,7 @@ public class OllamaService {
     }
 
     /** 列出模型详情（含把原始列表打进日志）。 */
+    @Override
     public List<OllamaModelInfo> listModelsDetailed() {
         JsonNode listResp = getJson("/api/tags");
         if (listResp == null) {
