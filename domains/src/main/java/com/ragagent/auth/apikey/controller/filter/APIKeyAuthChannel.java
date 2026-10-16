@@ -16,8 +16,6 @@ import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
 import com.ragagent.contract.apikey.ApiKeyAuthPort;
-import com.ragagent.contract.apikey.ApiKeyAuthPort.AuthRequest;
-import com.ragagent.contract.apikey.ApiKeyAuthPort.AuthResult;
 import com.ragagent.contract.apikey.ApiKeyAuthPort.AuthResult.Passed;
 import com.ragagent.contract.apikey.ApiKeyAuthPort.AuthResult.Rejected;
 
@@ -38,17 +36,15 @@ import com.ragagent.contract.apikey.ApiKeyAuthPort.AuthResult.Rejected;
  * </ul>
  *
  * <h2>实现注意</h2>
- * <p>external-user 头名是**常量**（X-External-User-ID /
- * X-External-User-Token），刻意不读配置里的自定义头名。
+ * <p>external-user 的取值已在**边沿**解析完成（{@code AuthFilter} 读
+ * X-External-User-ID / X-External-User-Token，头名是常量、刻意不读配置里的自定义头名）；
+ * 本通道只消费解析后的值并做上限校验。
  * signed_token 校验为手写 HMAC-SHA256（jjwt 对 HS256 强制密钥 ≥ 256bit，
  * 而契约要求接受任意长度密钥，故手工实现）。</p>
  */
 @Component
 public class APIKeyAuthChannel implements ApiKeyAuthPort {
 
-    /** external-user 头名常量（刻意不读配置里的自定义头名）。 */
-    private static final String EXTERNAL_USER_ID_HEADER = "X-External-User-ID";
-    private static final String EXTERNAL_USER_TOKEN_HEADER = "X-External-User-Token";
     private static final int MAX_EXTERNAL_USER_ID_LEN = 128;
     private static final long MAX_EXTERNAL_USER_TOKEN_TTL_SECONDS = 24 * 3600L;
 

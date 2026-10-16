@@ -1,12 +1,6 @@
 package com.ragagent.agent.skills;
 
 import com.ragagent.contract.agent.SkillCatalogPort;
-import com.ragagent.contract.agent.SkillCatalogPort.DuplicateSlugException;
-import com.ragagent.contract.agent.SkillCatalogPort.PlatformSkillReadOnlyException;
-import com.ragagent.contract.agent.SkillCatalogPort.RenameWhileReferencedException;
-import com.ragagent.contract.agent.SkillCatalogPort.SkillNameConflictException;
-import com.ragagent.contract.agent.SkillCatalogPort.SkillReference;
-import com.ragagent.contract.agent.SkillCatalogPort.SkillRow;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;

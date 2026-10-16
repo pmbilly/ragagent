@@ -23,6 +23,11 @@ B154 补三件事（都由 IDE 告警顺出来的）：
        ——`AuditAction` 65 / `EventType` 38 / `LangfuseAttributes` 25 这类"声明但未引用"，
        实测全仓 934 处，做硬门只会变噪声；那种属人工复核。）
   D-d 自 import：import 的 FQN = 本文件 package + 本文件顶层类（或其后代）⇒ 必然冗余（零误报）
+  D-e 冗余嵌套 import：import 的是**本文件顶层类型的直接嵌套类型**（该顶层类型
+      implements/extends 了某个类型，其成员类型随继承进入作用域）⇒ 显式 import 多余
+      （javac/IDE 会报 "import is never used"，而 D-b 因"简单名在正文出现过"漏检——
+      它刻意保守以免误报 javadoc 引用，本规则补的就是这个盲区；只认顶层类型的直接嵌套层，
+      故零误报：内部类的 extends 不算、`X.Y.Z` 这种两层嵌套也不算）
 
 用法（仓库根目录）：python3 scripts/check-dead-members.py
 """
@@ -44,6 +49,32 @@ DEAD_TYPE = re.compile(r'^    private\s+(?:static\s+)?(?:final\s+)?'
                        r'(?:Logger|ObjectMapper)\s+(\w+)\s*[;=]')
 
 
+def _inherited_type_names(lines: list[str], top: str) -> set[str]:
+    """顶层类型 implements/extends 的**简单类型名**集合（含跨行子句）。
+
+    只取顶层类型自身（内部类的 extends 不算，否则会把它继承来的成员类型误判为可省）。
+    """
+    if not top:
+        return set()
+    start = next((i for i, l in enumerate(lines) if TOP_TYPE.match(l)), None)
+    if start is None:
+        return set()
+    clause = ''
+    for l in lines[start:]:
+        clause += ' ' + l
+        if '{' in l:
+            break
+    m = re.search(r'(?:implements|extends)([^{]*)', clause)
+    if not m:
+        return set()
+    names = set()
+    for part in m.group(1).split(','):
+        name = part.strip().split('<')[0].strip().split('.')[-1]
+        if re.fullmatch(r'[A-Z]\w*', name):
+            names.add(name)
+    return names
+
+
 def scan_file(p: pathlib.Path) -> list[str]:
     lines = p.read_text(encoding='utf-8').splitlines()
     problems = []
@@ -55,6 +86,7 @@ def scan_file(p: pathlib.Path) -> list[str]:
     pkg = next((m.group(1) for l in lines if (m := PKG.match(l))), '')
     top = next((m.group(1) for l in lines if (m := TOP_TYPE.match(l))), '')
     own = f'{pkg}.{top}' if pkg and top else ''
+    bases = _inherited_type_names(lines, top)
     for i, l in imports:
         m = IMPORT.match(l)
         if not m:
@@ -63,6 +95,11 @@ def scan_file(p: pathlib.Path) -> list[str]:
         simple = fq.split('.')[-1]
         if own and (fq == own or fq.startswith(own + '.')):
             problems.append(f'D-d 自 import（导入本文件的类型或其嵌套类）{fq};')
+            continue
+        parts = fq.split('.')
+        if len(parts) >= 3 and parts[-2] in bases:
+            problems.append(f'D-e 冗余嵌套 import（{parts[-2]} 已在 implements/extends 列表，'
+                            f'其成员类型随继承进入作用域）{fq};')
             continue
         if not any(re.search(r'(?<![\w.])' + re.escape(simple) + r'(?![\w])', x)
                    for j, x in enumerate(lines) if j != i and not x.startswith('import ')):
@@ -91,7 +128,7 @@ def main() -> int:
         for x in problems:
             print('   ' + x)
         return 1
-    print('✓ 守卫通过：无重复/未使用/自 import、无遗留的 private Logger/ObjectMapper 字段'
+    print('✓ 守卫通过：无重复/未使用/自/冗余嵌套 import、无遗留的 private Logger/ObjectMapper 字段'
           '（扫 main + test）。')
     return 0
 
