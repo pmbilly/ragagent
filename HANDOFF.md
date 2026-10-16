@@ -95,9 +95,9 @@
 
 ## 8. 结构地图与守卫总表
 
-### 8.1 现状模块（6）与目标（7）
+### 8.1 现状模块（7）与目标（7）
 
-> 计数口径：`<模块>/src/main/java/**/*.java`，**不含 package-info**（2026-10-16 R4b/R6 后实测）。
+> 计数口径：`<模块>/src/main/java/**/*.java`，**不含 package-info**（2026-10-16 R5a 后实测）。
 
 ```
 现状（R4b + R6 后）                          目标（方案 §5.1）
@@ -108,9 +108,11 @@ model-runtime 134 件（llm 54 · modelruntime 39 · embedding 18 · rerank 12 �
                                         →  model-runtime（已成；余 R2c-3d 少量过渡边）
 retrieval-engine 80 件（engine 67 · support 7 · 根 5 · graph/artifact/config/telemetry）
                                         →  retrieval-engine（已成；R3 收官）
-domains      1334 件（knowledge 240 · session 165〔含 rag 43〕· wiki 158 · mcp 131 ·
-                 datasource 127 · auth 88 · memory/im/agent 各 80 · agenttools 58 · …）
-                                        →  domains + agent-engine（R5 自 domains/agent 80 件外提）
+agent-engine   80 件（tool 23 · compaction 12 · prompt 11 · skills 9 · budget 4 · domain/根 21）
+                                        →  agent-engine（已成；R5b/R5c 以 `contract.agent` 收窄消费面）
+domains      1253 件（knowledge 240 · session 165〔含 rag 43〕· wiki 158 · mcp 131 ·
+                 datasource 127 · auth 88 · memory/im 各 80 · agenttools 58 · …）
+                                        →  domains（R5b/R5c 端口化后消费面再收）
 boot           13 件                      →  boot
 
 依赖方向：boot → 全部；domains / 三个 runtime → platform, contract；platform → contract；contract → JDK
@@ -212,6 +214,7 @@ boot           13 件                      →  boot
 | R4b-2b | 2026-10-16 | **webfetch 归位 websearch 域 + 抓取面契约化**：`FetchException` → `contract.websearch`（可机读码是跨域失败词汇）；`Fetcher`/`AgentMarkdown`/`BrowserRenderer` + 测试 → `domains/websearch/fetch`；抓取面拆**两个单方法端口**（各恰一顶层实现，合 A20「唯一实现」）：`PipelinePageFetcher`（15s/100KB）/`ToolPageFetcher`（markdown/2MB/60s/浏览器兜底）；消费点 `PluginWebFetch`（QaWiring 注入）· `WebFetchTool`/`WebSearchTool`（AgentToolBackends 注入）⇒ **agenttools→websearch / session→websearch 两条新域间边均未产生**（R10 仍 6 条） | 15 守卫绿 · 金片 1349 一致 · gate 1m57s / **5000 / 0 / 4**（首轮 1 例 Redis 族失败，隔离 5/0 绿）· 冒烟 200 |
 | R4b-2c-1 | 2026-10-16 | **评估侧去管线本体依赖**（本体归位前置）：契约三件 `KnowledgeQaRunRequest`（评估路径实际赋值的字段子集 + 内嵌 `SummarySpec`）/ `KnowledgeQaRunResult`（检索/重排/生成三产物，均为契约形状）/`KnowledgeQaRunner`；会话域实现 `KnowledgeQaRunnerImpl`（顶层，A20 唯一实现）做 请求→`ChatManage` 还原→跑 rag 预设→回带产物；`EvaluationService` 的 `buildChatManage` 换成 `toRunRequest` ⇒ 对管线本体 import 清零 | 15 守卫绿 · 金片 1349 一致 · gate 2m13s / **5000 / 0 / 4** · 冒烟 200 |
 | R4b-2c-2 + R6 | 2026-10-16 | **管线本体归位 + `:engine` 解散**：chatpipeline 本体 43 件（`ChatManage`/`EventManager`/`PipelineBuilder`/`PipelineLog`/`PipelineProgress`/`SummaryConfig`/`spi.KnowledgeQaEventPort` + plugin 24 + support 7）→ `domains/session/service/rag`（包名整体换）；测试 9 + 夹具 2 随迁；`:engine` 模块解散（settings/jacoco/`_source_roots`/stray-dirs/test-summary/dev-stale-check/Dockerfile/依赖一并摘除）；补偿：domains/boot 显式声明 `:model-runtime`（domains 那条是过渡边）、engine 的 wire 录制夹具迁入 `domains/src/testFixtures/resources/wire`；**实物损失已修复**：`rm -rf engine` 连带删掉 `engine/src/main/resources/initialization/extract_config.yaml`（致 1249 例失败）⇒ 按"资源随读者走"恢复到 `model-runtime/src/main/resources/initialization/`；换锚：R9 包级 SCC 组名 · json-key 前缀/BASELINE · B93b EVENT_MAP_FILES · 大文件基线 · A17 两个管线插件 | 15 守卫绿（环 0 · R10 仍 6 条）· 金片 1349 一致 · gate 1m35s / **5000 / 0 / 4** · 冒烟 200 · **六模块** |
+| R5a | 2026-10-16 | **切出 `:agent-engine`**：`com.ragagent.agent` 整树（main 80 / test 33）domains → agent-engine，包名不变；出边实测极干净（contract 139 / platform 51 / modelcontext 3，**零业务域**）⇒ 依赖按实测声明（contract/platform api + `:model-runtime`（modelcontext）+ Jackson/jtokkit/MyBatis-Plus），启用 `java-test-fixtures`；录制夹具 4 件随迁（只依赖 platform）⇒ domains 以 `testFixtures(:agent-engine)` 消费（同向不成环）；七处模块清单同步；domains 显式 `implementation(:agent-engine)`（**过渡边**，55 消费文件待 R5b/R5c）；**R10 域口径同步**（agent 摘出 DOMAINS + 族收敛）⇒ 6 条边 → **3 条**（owner 1 + 族内 2）；**既有边界守卫 `AgentEngineBoundaryTest` 随迁更新**（扫描根 → 新模块；白名单摘 `agenttools`（业务域、实测 0 引用 ⇒ 收紧）与已归位的 `chatpipeline`/`webfetch`；下限 55→70（实测 80）；管理面路径改仓库相对）；大文件基线纯换锚 | 15 守卫全绿 · 金片 1349 一致 · gate 2m / **5000 / 0 / 4** · 冒烟 200（**七模块**）|
 | R2c-3d-① | 2026-10-16 | **Ollama 管理面端口化**：契约面 `OllamaModelInfo`（record）上提 + 新 `OllamaPullProgress`/`OllamaProgressListener`/`OllamaAdminPort`（六方法=域侧真调用面）；端口方法名 `pullModel`（与实现侧内部 `pullWithProgress(String, ProgressCallback)` 区分——同名同元数下两个函数式接口会让 λ 歧义，实测踩到）；进度回调**不再吃原始 JsonNode**（域侧原先自己 `path("total")`）；**`InitializationWiring` 删除**——它挂在业务域的两个 @Bean（`OllamaService`/`ExtractPrompts`）都是模型运行时的件 ⇒ 迁 `boot/config/ModelRuntimeBeansWiring`；`OllamaService` 619 行（+15 行端口桥接）超 600 阈值 ⇒ 按守卫指引在 `check-file-size.py` 头写明**内聚论证**后登记；顺带清 3 条陈旧 json-key 登记 | 15 守卫绿 · 金片 1349 一致 · gate 2m4s / **5000 / 0 / 4** · 冒烟 200 |
 | R2c-3d-②③ | 2026-10-16 | **提示词/配置面归 platform.prompt**：`ExtractPrompts`（config.yaml 的 extract 段装载）与 `PipelineConfig`（管线配置）`llm/extract` → `platform.prompt`（消费方横跨 knowledge/initialization/session 三域，platform 是唯一都够得着又不该进契约的落点；`extract_config.yaml` 随读者迁）；`PromptCache` 的**纯函数族**（`fingerprintPromptPrefix`/`promptPrefixFingerprint`/`buildPromptCacheKey`）拆出为 `platform.prompt.PromptFingerprints`——整件迁不了（另一半方法吃 `llm.provider.ProviderName`），故拆纯函数、`PromptCache` 三方法改薄委托（内部零改动）、wiki 侧 5 处调用改走 platform；`ClasspathResourcesTest` 读者标签更新；json-key 换锚（提取器 5 键=存量 yaml 配置键）+ 冻结快照 | 15 守卫绿 · 金片 1349 一致 · gate 2m15s / **5000 / 0 / 4** · 冒烟 200 |
 | R2c-3d-④ | 2026-10-16 | **实体关系抽取端口化**（domains 对模型族过渡边清零）：契约面 `contract.graph.EntityExtractionResult`（只读 record，替代域侧直读实现内部类的可变字段）+ `contract.knowledge.EntityExtractionPort`（模板按**不透明配置载体**传入）；model-runtime 新 `EntityExtractionAdapter`（A20 唯一实现，内部形状不出模块、实现零改动）；三消费点改走端口（`ChunkExtractService` 两构造对齐 · `TextExtractionTestService` 的过滤改对列表就地过滤 · `PluginExtractEntity` + `QaWiring` 注册行）；`ChunkExtractServiceTest` 注入真实适配器（假模型驱动真解析，行为不变）；**R9 包级 SCC 再次变形**（契约词汇组加 contract.knowledge，已在守卫脚本头登记理由） | 15 守卫绿 · 金片 1349 一致 · gate 2m1s / **5000 / 0 / 4** · 冒烟 200 |
