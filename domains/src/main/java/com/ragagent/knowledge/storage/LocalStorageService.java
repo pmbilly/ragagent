@@ -1,12 +1,12 @@
 package com.ragagent.knowledge.storage;
 
+import com.ragagent.contract.storage.fileserve.OpenedFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.contract.storage.fileserve.StoragePathGuard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,10 +90,10 @@ public class LocalStorageService {
      * {@link #readChecked} 一致（{@code Failed to retrieve file} 信封，守护卫先行）。
      * {@code os.Open} 失败同口径（404），而不是读一半才炸。</p>
      */
-    public FileTransport.OpenedFile openChecked(String filePath) {
+    public OpenedFile openChecked(String filePath) {
         Path resolved = resolveUnderBase(filePath);
         try {
-            return FileTransport.OpenedFile.ofSeekable(resolved, Files.size(resolved));
+            return OpenedFile.ofSeekable(resolved, Files.size(resolved));
         } catch (IOException e) {
             throw new BizException(AppError.internal("Failed to retrieve file")
                     .withDetails("failed to open file: " + e.getMessage()));

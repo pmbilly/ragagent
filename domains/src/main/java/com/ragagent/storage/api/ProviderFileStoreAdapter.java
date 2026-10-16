@@ -1,5 +1,6 @@
 package com.ragagent.storage.api;
 
+import com.ragagent.contract.storage.fileserve.OpenedFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,8 +8,7 @@ import java.io.InputStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.platform.storage.fileserve.FileTransport;
-import com.ragagent.platform.storage.fileserve.ProviderFileStorePort;
+import com.ragagent.contract.storage.fileserve.ProviderFileStorePort;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.storage.fileserve.ProviderFileContentService;
 import com.ragagent.storage.fileserve.StorageFileResolver;
@@ -82,7 +82,7 @@ public class ProviderFileStoreAdapter implements ProviderFileStorePort {
         }
 
         @Override
-        public FileTransport.OpenedFile open(String filePath) throws IOException {
+        public OpenedFile open(String filePath) throws IOException {
             return contentService.getFile(filePath);
         }
 

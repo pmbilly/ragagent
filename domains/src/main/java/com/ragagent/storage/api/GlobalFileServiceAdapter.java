@@ -3,8 +3,8 @@ package com.ragagent.storage.api;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.platform.storage.fileserve.GlobalFileServicePort;
-import com.ragagent.platform.storage.fileserve.WritableFileContentService;
+import com.ragagent.contract.storage.fileserve.GlobalFileServicePort;
+import com.ragagent.contract.storage.fileserve.WritableFileContentService;
 import com.ragagent.storage.fileserve.StorageFileResolver;
 
 /**

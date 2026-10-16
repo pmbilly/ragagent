@@ -1,5 +1,6 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.contract.storage.fileserve.OpenedFile;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -46,7 +47,7 @@ class ProviderWiringTest {
         StubProvider stub = new StubProvider();
         ProviderFileContentService svc = new ProviderFileContentService(stub);
 
-        FileTransport.OpenedFile opened = svc.getFile("cos://b/r/k.png");
+        OpenedFile opened = svc.getFile("cos://b/r/k.png");
         assertEquals("cos://b/r/k.png", stub.lastPath);
         // 读面已是流形态——长度未知（0，SDK body 语义）、不整对象入堆
         assertNull(opened.bytes());
@@ -194,7 +195,7 @@ class ProviderWiringTest {
         byte[] payload = "0123456789".getBytes(StandardCharsets.UTF_8);
         ProviderFileContentService svc = new ProviderFileContentService(new SeekableStub(payload));
 
-        FileTransport.OpenedFile opened = svc.getFile("minio://b/k.bin");
+        OpenedFile opened = svc.getFile("minio://b/k.bin");
         assertNull(opened.bytes());
         assertNull(opened.stream());
         assertEquals(10, opened.size());

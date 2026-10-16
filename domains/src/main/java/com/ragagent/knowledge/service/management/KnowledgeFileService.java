@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service.management;
 
+import com.ragagent.contract.storage.fileserve.OpenedFile;
 import com.ragagent.knowledge.service.KnowledgeAccessHelper;
 
 import com.ragagent.knowledge.domain.KnowledgeTenants;
@@ -33,7 +34,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import com.ragagent.platform.storage.fileserve.FileTransport.OpenedFile;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import java.io.ByteArrayInputStream;

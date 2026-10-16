@@ -1,5 +1,6 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.contract.storage.fileserve.OpenedFile;
 import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 
 import com.ragagent.contract.tenant.TenantConfigLookup;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Component;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
-import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
 
 /**
@@ -138,7 +138,7 @@ public class ChatLocalImageResolverWiring implements InitializingBean, Disposabl
             }
 
             // 按物理路径打开文件并读全量字节
-            FileTransport.OpenedFile opened = resolution.service().getFile(physicalPath);
+            OpenedFile opened = resolution.service().getFile(physicalPath);
             // 三形态通吃（seekable / stream / bytes），此处读全量（多模态 base64 用）
             return opened.readAllBytes();
         } catch (RuntimeException | IOException e) {

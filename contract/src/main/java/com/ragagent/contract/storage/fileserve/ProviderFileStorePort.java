@@ -1,4 +1,4 @@
-package com.ragagent.platform.storage.fileserve;
+package com.ragagent.contract.storage.fileserve;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,7 +63,7 @@ public interface ProviderFileStorePort {
         InputStream getFile(String filePath);
 
         /** 打开为流式对象（可 seek / 顺序读）。 */
-        FileTransport.OpenedFile open(String filePath) throws IOException;
+        OpenedFile open(String filePath) throws IOException;
 
         /** 删除对象。 */
         void deleteFile(String filePath);

@@ -1,5 +1,6 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.contract.storage.fileserve.OpenedFile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -32,9 +33,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
-import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.platform.storage.fileserve.FileContentService;
+import com.ragagent.contract.storage.fileserve.FileContentService;
 
 /**
  * {@link ChatLocalImageResolverWiring} 的装配单测（mock 依赖）+ 两条集成式断言
@@ -89,7 +89,7 @@ class ChatLocalImageResolverWiringTest {
 
         FileContentService fileSvc = mock(FileContentService.class);
         when(fileSvc.getFile("local://kb-assets/img.png"))
-                .thenReturn(FileTransport.OpenedFile.ofBytes(PNG_BYTES));
+                .thenReturn(OpenedFile.ofBytes(PNG_BYTES));
         when(storageResolver.resolveFileService(eq(tenant), eq(""), eq("local"), anyString()))
                 .thenReturn(new StorageFileResolver.Resolution(fileSvc, "local", null));
 
@@ -164,7 +164,7 @@ class ChatLocalImageResolverWiringTest {
         when(tenantService.storageView(7L)).thenReturn(tenant);
 
         FileContentService fileSvc = mock(FileContentService.class);
-        when(fileSvc.getFile(url)).thenReturn(FileTransport.OpenedFile.ofSeekable(img, PNG_BYTES.length));
+        when(fileSvc.getFile(url)).thenReturn(OpenedFile.ofSeekable(img, PNG_BYTES.length));
         when(storageResolver.resolveFileService(eq(tenant), eq(""), eq("local"), anyString()))
                 .thenReturn(new StorageFileResolver.Resolution(fileSvc, "local", null));
 
@@ -184,7 +184,7 @@ class ChatLocalImageResolverWiringTest {
         when(tenantService.storageView(7L)).thenReturn(tenant);
 
         FileContentService fileSvc = mock(FileContentService.class);
-        when(fileSvc.getFile(url)).thenReturn(FileTransport.OpenedFile.ofBytes(PNG_BYTES));
+        when(fileSvc.getFile(url)).thenReturn(OpenedFile.ofBytes(PNG_BYTES));
         // scoped=true → providerPath 剥包装后仍是 local 前缀；backendID 被覆盖成 bk2
         when(storageResolver.resolveFileService(eq(tenant), eq("bk2"), eq("local"), anyString()))
                 .thenReturn(new StorageFileResolver.Resolution(fileSvc, "local", null));

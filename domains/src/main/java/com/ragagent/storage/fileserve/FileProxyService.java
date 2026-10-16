@@ -1,5 +1,6 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.contract.storage.fileserve.OpenedFile;
 import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.contract.error.BizException;
 
@@ -25,7 +26,7 @@ import com.ragagent.contract.storage.fileserve.MessageFactsLookup;
 import com.ragagent.platform.storage.fileserve.FileServeHttp;
 import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.platform.storage.fileserve.FileContentService;
+import com.ragagent.contract.storage.fileserve.FileContentService;
 
 /**
  * 文件代理面共享处理器：
@@ -156,7 +157,7 @@ public class FileProxyService implements FileProxyPort {
             plainStatus(response, HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        FileTransport.OpenedFile opened;
+        OpenedFile opened;
         try {
             opened = resolution.service().getFile(resolved);
         } catch (Exception e) {
@@ -219,7 +220,7 @@ public class FileProxyService implements FileProxyPort {
             plainStatus(response, HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        FileTransport.OpenedFile opened;
+        OpenedFile opened;
         try {
             opened = resolution.service().getFile(filePath);
         } catch (Exception e) {
@@ -316,7 +317,7 @@ public class FileProxyService implements FileProxyPort {
             plainStatus(response, HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        FileTransport.OpenedFile opened;
+        OpenedFile opened;
         try {
             opened = resolution.service().getFile(resource.getPhysicalPath());
         } catch (Exception e) {
@@ -407,7 +408,7 @@ public class FileProxyService implements FileProxyPort {
             plainStatus(response, HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        FileTransport.OpenedFile opened;
+        OpenedFile opened;
         try {
             opened = resolution.service().getFile(file.path());
         } catch (Exception e) {
@@ -435,7 +436,7 @@ public class FileProxyService implements FileProxyPort {
 
     /** 按派生参数直出已打开的存储对象。 */
     private static void streamStoredFile(HttpServletResponse response, HttpServletRequest request,
-            FileTransport.OpenedFile opened, String filename, String contentType, boolean inline,
+            OpenedFile opened, String filename, String contentType, boolean inline,
             String cacheControl) throws IOException {
         FileTransport.serve(response, request, opened,
                 new FileTransport.Options(filename, !inline, contentType, "", cacheControl, 0));

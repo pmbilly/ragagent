@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.platform.storage.fileserve.ProviderFileStorePort;
+import com.ragagent.contract.storage.fileserve.ProviderFileStorePort;
 import com.ragagent.storage.api.ProviderFileStoreAdapter;
 import com.ragagent.storage.fileserve.StorageFileResolver;
 import com.ragagent.contract.error.BizException;

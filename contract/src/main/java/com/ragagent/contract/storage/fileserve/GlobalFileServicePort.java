@@ -1,4 +1,4 @@
-package com.ragagent.platform.storage.fileserve;
+package com.ragagent.contract.storage.fileserve;
 
 /**
  * 进程级文件服务面（L1）：取"本地基座 + 资源目录装饰"的写读删服务。

@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.storage;
 
+import com.ragagent.contract.storage.fileserve.OpenedFile;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -7,8 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.ragagent.platform.storage.fileserve.FileTransport.OpenedFile;
-import com.ragagent.platform.storage.fileserve.ProviderFileStorePort;
+import com.ragagent.contract.storage.fileserve.ProviderFileStorePort;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.AppError;

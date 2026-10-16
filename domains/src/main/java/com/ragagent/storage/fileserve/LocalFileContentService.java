@@ -1,5 +1,6 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.contract.storage.fileserve.OpenedFile;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -7,10 +8,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.contract.storage.fileserve.StoragePathGuard;
-import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.platform.storage.fileserve.WritableFileContentService;
-import com.ragagent.platform.storage.fileserve.FileContentService;
+import com.ragagent.contract.storage.fileserve.WritableFileContentService;
+import com.ragagent.contract.storage.fileserve.FileContentService;
 
 /**
  * 本地盘文件服务（GetFile / GetFileURL / SaveBytes / DeleteFile）。
@@ -36,7 +36,7 @@ public class LocalFileContentService implements WritableFileContentService {
     // ── GetFile ─────────────────────────────────────────────────────────────
 
     @Override
-    public FileTransport.OpenedFile getFile(String filePath) throws IOException {
+    public OpenedFile getFile(String filePath) throws IOException {
         String candidate = normalizePathForBase(filePath == null ? "" : filePath);
         String resolved = safePathUnderBase(baseDir, candidate);
         Path p = Path.of(resolved);
@@ -44,7 +44,7 @@ public class LocalFileContentService implements WritableFileContentService {
             // 打开失败：文案只进日志，HTTP 形态是 404 无体。
             throw new IOException("failed to open file: open " + resolved + ": no such file or directory");
         }
-        return FileTransport.OpenedFile.ofSeekable(p, Files.size(p));
+        return OpenedFile.ofSeekable(p, Files.size(p));
     }
 
     // ── GetFileURL ──────────────────────────────────────────────────────────

@@ -1,5 +1,6 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.contract.storage.fileserve.OpenedFile;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -24,10 +25,9 @@ import com.ragagent.contract.storage.StorageEnvLookup;
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.FileServiceFactory;
 import com.ragagent.contract.tenant.StorageEngineConfig;
-import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.platform.storage.fileserve.WritableFileContentService;
-import com.ragagent.platform.storage.fileserve.FileContentService;
+import com.ragagent.contract.storage.fileserve.WritableFileContentService;
+import com.ragagent.contract.storage.fileserve.FileContentService;
 
 /**
  * 运行时存储解析器，三个职责：
@@ -618,7 +618,7 @@ public class StorageFileResolver {
             implements WritableFileContentService {
 
         @Override
-        public FileTransport.OpenedFile getFile(String filePath) throws IOException {
+        public OpenedFile getFile(String filePath) throws IOException {
             ResourceCatalogService.ResolvedPath resolved = catalog.resolvePath(filePath);
             if (resolved.error()) {
                 throw new IOException("resource not found");

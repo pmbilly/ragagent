@@ -1,10 +1,10 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.contract.storage.fileserve.OpenedFile;
 import java.io.IOException;
 import java.net.URI;
-import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.platform.storage.fileserve.FileContentService;
+import com.ragagent.contract.storage.fileserve.FileContentService;
 
 /**
  * 后端作用域包装（{@code GetFile / GetFileURL} 子集）：
@@ -46,7 +46,7 @@ public class BackendScopedFileService implements FileContentService {
     }
 
     @Override
-    public FileTransport.OpenedFile getFile(String filePath) throws IOException {
+    public OpenedFile getFile(String filePath) throws IOException {
         return inner.getFile(unwrap(filePath));
     }
 

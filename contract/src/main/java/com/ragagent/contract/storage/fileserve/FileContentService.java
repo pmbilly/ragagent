@@ -1,4 +1,4 @@
-package com.ragagent.platform.storage.fileserve;
+package com.ragagent.contract.storage.fileserve;
 
 import java.io.IOException;
 
@@ -17,7 +17,7 @@ public interface FileContentService {
     String LOCAL_SCHEME = "local://";
 
     /** 打开失败/不存在 → IOException（路由折成 404）。 */
-    FileTransport.OpenedFile getFile(String filePath) throws IOException;
+    OpenedFile getFile(String filePath) throws IOException;
 
     /** 解析为可访问的 URL（未配置外部访问时可能是 {@code local://} 路径形态）。 */
     String getFileURL(String filePath) throws IOException;
