@@ -46,9 +46,8 @@ dependencyManagement {
 }
 
 dependencies {
-    // agent 引擎：**过渡边**——domains 内 55 个消费文件（agentmanagement/agenttools/session）
-    // 仍直引 agent 面；按 R5b/R5c 以 contract.agent 端口化逐点收窄。
-    implementation(project(":agent-engine"))
+    // agent 引擎：**主码已零依赖**（R5c 收官：55 个消费文件全部改走 contract.agent）
+    // ⇒ 过渡边摘除；仅测试夹具面仍需（RecordingSupport/GoRecording45* 在 agent-engine fixtures）。
 
     // 模型运行时：R4b 后不再经 :engine 传递（engine 已解散）。**过渡边**——domains 尚余约 18 处
     // 对模型族实现面的 import（Ollama 管理面 / llm.extract 族 / modelcontext 工具 SPI 等），

@@ -954,7 +954,12 @@ class ArchitectureRulesTest {
             "com.ragagent.agent.ObservePhase",
             "com.ragagent.agent.ReActIteration",
             "com.ragagent.agent.SteerIntake",
-            "com.ragagent.agent.ThinkPhase");
+            "com.ragagent.agent.ThinkPhase",
+            // R5c（2026-10-16）登记：`AgentEngineHandleAdapter` 是**契约句柄的唯一适配器**——
+            // 它的职责正是在边界上把 AgentEngine 的宽面收窄成域侧需要的 4 个方法
+            // （setMemoryPrompt/setSteerSink/setCancellationSource/execute，且 execute 归 void）。
+            // 属"合法的单一回引点"：若把它算违例，等于禁止句柄模式本身。
+            "com.ragagent.agent.AgentEngineHandleAdapter");
 
     /**
      * A18b 棘轮基线：运行态包（agent / chatpipeline / session.controller）里仍带

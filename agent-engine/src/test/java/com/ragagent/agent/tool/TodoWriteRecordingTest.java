@@ -1,11 +1,12 @@
-package com.ragagent.agenttools;
+package com.ragagent.agent.tool;
 
+import com.ragagent.agenttools.RecordingSupport;
+import com.ragagent.agenttools.GoRecording45A;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.tool.TodoWriteTool;
 import com.ragagent.contract.tool.ToolRequest;
 
 /**

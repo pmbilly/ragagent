@@ -1,5 +1,7 @@
-package com.ragagent.agenttools;
+package com.ragagent.agent.tool;
 
+import com.ragagent.agenttools.RecordingSupport;
+import com.ragagent.agenttools.GoRecording45A;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
@@ -7,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.web.ToolJson;
 import com.ragagent.support.ContractJson;
-import com.ragagent.agent.tool.ParamCaster;
 
 /**
  * ParamCaster 的录制判定表（29 条）。

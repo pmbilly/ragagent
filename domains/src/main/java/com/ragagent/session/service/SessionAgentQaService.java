@@ -1,5 +1,7 @@
 package com.ragagent.session.service;
 
+import com.ragagent.contract.agent.AgentExecutionException;
+import com.ragagent.contract.agent.AgentEngineFactory;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,8 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
-import com.ragagent.agent.AgentEngine;
-import com.ragagent.agent.AgentEngineException;
+import com.ragagent.contract.agent.AgentEngineHandle;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.EventBusInterface;
@@ -24,11 +25,9 @@ import com.ragagent.contract.model.Reranker;
 
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.contract.agent.AgentBudgets;
-import com.ragagent.contract.agent.SkillCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
 import com.ragagent.platform.tracing.decorators.LangfuseReranker;
-import com.ragagent.contract.pipeline.McpToolRegistrationPort;
 import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelRuntime;
@@ -83,9 +82,8 @@ public class SessionAgentQaService {
             ArtifactCollectorWiring artifactCollectorWiring,
             KnowledgeCatalogPort knowledgeService,
             ModelRuntime modelRuntime,
-            McpToolRegistrationPort mcpTools,
+            AgentEngineFactory engineFactory,
             VlmDescriberWiring vlmDescriberWiring,
-            SkillCatalogPort skillCatalogService,
             AgentResolver agentResolver) {
         this.agentResolver = agentResolver;
         this.modelRuntime = modelRuntime;
@@ -101,11 +99,10 @@ public class SessionAgentQaService {
                         toolBackends,
                         artifactCollectorWiring,
                         knowledgeService,
-                        mcpTools,
+                        engineFactory,
                         resourceCatalog,
                         dataSource,
-                        vlmDescriberWiring,
-                        skillCatalogService);
+                        vlmDescriberWiring);
     }
 
     // ==================================================================
@@ -194,7 +191,7 @@ public class SessionAgentQaService {
             }
 
             // Create agent engine
-            AgentEngine engine = engineAssembler.createAgentEngine(agentConfig, summaryModel, rerankModel, eventBus,
+            AgentEngineHandle engine = engineAssembler.createAgentEngine(agentConfig, summaryModel, rerankModel, eventBus,
                     sessionId, req.assistantMessageId);
 
             // Memory recall
@@ -255,10 +252,11 @@ public class SessionAgentQaService {
             // 执行（失败 emit error 事件后返回）
             try {
                 engine.execute(sessionId, req.assistantMessageId, agentQuery, llmContext, agentImageUrls);
-            } catch (AgentEngineException e) {
+            } catch (AgentExecutionException e) {
                 // A18：引擎是失败上报的**唯一所有者**——error 事件已在抛出前发出（含 event id、
                 // stage=agent_execution），这里只留带栈日志；再补一份会让客户端看到两次报错。
                 // 带栈：只打 e.toString() 会让这类"回答为空"的事故无从定位。
+                // （R5c 契约化：原先捕获的是引擎实现类的异常，现为契约面类型，语义不变。）
                 log.error("Agent execution failed: {}", e.toString(), e);
             } catch (RuntimeException e) {
                 // 兜底：引擎入口自身（建 span / 组装 prompt / 建工具集）失败不在引擎的 catch 范围内，

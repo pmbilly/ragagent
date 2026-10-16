@@ -1,30 +1,24 @@
 package com.ragagent.session.service;
 
+import com.ragagent.contract.tool.AgentTool;
+import com.ragagent.contract.agent.ImageDescriberFunc;
+import com.ragagent.contract.agent.AgentEngineRequest;
+import com.ragagent.contract.agent.AgentEngineHandle;
+import com.ragagent.contract.agent.AgentEngineFactory;
 import com.ragagent.contract.agent.AgentRunSpec;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import com.ragagent.contract.knowledge.FaqEntryView;
 import com.ragagent.contract.knowledge.FaqEntryPageView;
-import com.ragagent.agent.AgentEngine;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.agenttools.wiki.WikiRouteResolver;
 import com.ragagent.agenttools.wiki.WikiScope;
-import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.memory.MemoryRecallPort;
 import com.ragagent.contract.model.Reranker;
-import com.ragagent.agent.prompt.AgentPromptTemplates;
-import com.ragagent.agent.skills.DbSkillSource;
-import com.ragagent.agent.skills.Manager;
-import com.ragagent.agent.skills.Skill;
-import com.ragagent.contract.agent.SkillCatalogPort;
-import com.ragagent.contract.tool.AgentTool;
-import com.ragagent.agent.tool.SequentialThinkingTool;
-import com.ragagent.agent.tool.SkillReadFileTool;
-import com.ragagent.agent.tool.TodoWriteTool;
 import com.ragagent.agenttools.web.WebFetchTool;
 import com.ragagent.agenttools.web.WebSearchTool;
 import com.ragagent.contract.retrieval.SearchTarget;
@@ -33,11 +27,7 @@ import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.contract.agent.RecentDocInfo;
 import com.ragagent.contract.agent.SelectedDocumentInfo;
-import com.ragagent.contract.agent.PinnedMCPServiceInfo;
-import com.ragagent.contract.agent.PinnedSkillInfo;
 import com.ragagent.contract.agent.KnowledgeBaseInfo;
-import com.ragagent.contract.pipeline.McpToolingGateway;
-import com.ragagent.contract.pipeline.McpToolRegistrationPort;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 
@@ -59,28 +49,24 @@ final class AgentEngineAssembler {
     private final AgentToolBackends toolBackends;
     private final ArtifactCollectorWiring artifactCollectorWiring;
     private final KnowledgeCatalogPort knowledgeService;
-    private final McpToolRegistrationPort mcpTools;
+    private final AgentEngineFactory engineFactory;
     private final ResourceCatalogPort resourceCatalog;
     private final javax.sql.DataSource dataSource;
     private final VlmDescriberWiring vlmDescriberWiring;
-    /** 平台级技能目录（skills 表入库版）：装配期建 {@code DbSkillSource} 读 skills 表。 */
-    private final SkillCatalogPort skillCatalogService;
-
-    AgentEngineAssembler(MemoryRecallPort memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeCatalogPort knowledgeService, McpToolRegistrationPort mcpTools, ResourceCatalogPort resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, SkillCatalogPort skillCatalogService) {
+    AgentEngineAssembler(MemoryRecallPort memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeCatalogPort knowledgeService, AgentEngineFactory engineFactory, ResourceCatalogPort resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring) {
         this.memoryService = memoryService;
         this.knowledgeQa = knowledgeQa;
         this.toolBackends = toolBackends;
         this.artifactCollectorWiring = artifactCollectorWiring;
         this.knowledgeService = knowledgeService;
-        this.mcpTools = mcpTools;
+        this.engineFactory = engineFactory;
         this.resourceCatalog = resourceCatalog;
         this.dataSource = dataSource;
         this.vlmDescriberWiring = vlmDescriberWiring;
-        this.skillCatalogService = skillCatalogService;
     }
 
-    AgentEngine createAgentEngine(QaAgentConfig config, LlmChatClient chatModel, Reranker rerankModel,
-            EventBusInterface eventBus, String sessionId, String assistantMessageId) {
+    AgentEngineHandle createAgentEngine(QaAgentConfig config, LlmChatClient chatModel,
+            Reranker rerankModel, EventBusInterface eventBus, String sessionId, String assistantMessageId) {
         log.info("Creating agent engine with custom EventBusInterface");
 
         // 1. Validate config（ValidateConfig）
@@ -96,45 +82,10 @@ final class AgentEngineAssembler {
             throw new RuntimeException("chat model is nil after initialization");
         }
 
-        // 2. Build tool registry
-        ToolRegistry toolRegistry = new ToolRegistry();
-        if (config.getMaxToolOutputChars() > 0) {
-            toolRegistry.setMaxToolOutputSize(config.getMaxToolOutputChars());
-        }
-        registerTools(toolRegistry, config, rerankModel, sessionId);
-        // MCP 编排端口注入：引擎只持端口，MCP 目录逻辑（原 ToolRegistry 内）在 McpTooling
-        McpToolingGateway mcpTooling = mcpTools.createTooling(toolRegistry.port());
-        toolRegistry.setMcpTooling(mcpTooling);
-        // registerMcpTools：按 agent 配置的
-        // mcp_selection_mode 注册受限 MCP 目录（按需发现，不连上游、不广告完整 schema）
-        registerMcpTools(toolRegistry, config, mcpTooling);
-
-        // 指令型技能（选项 B）：Manager 只做 SKILL.md 三级注入（元数据/正文/资源），
-        // 模型凭指令用现有工具执行；shell/文件注入与沙箱镜像源已随沙箱退役。
-        // 内容来自 skills 表——每轮装配新建 DbSkillSource（读一次表），
-        // 因此新建/删除技能对下一轮对话生效，无需缓存失效机制。
-        // 读的是「平台内置层 + 当前空间」，缺租户上下文时只读平台层（fail closed）。
-        Manager skillsManager = null;
-        if (config.isSkillsEnabled()) {
-            try {
-                DbSkillSource skillSource =
-                        new DbSkillSource(skillCatalogService
-                                .listVisible(TenantContext.currentTenantId()));
-                skillsManager = new Manager(
-                        new Manager.ManagerConfig(
-                                List.of(skillSource), config.getAllowedSkills(), true));
-                skillsManager.initialize();
-                log.info("Instructional skills enabled: {} skill(s) from DB catalog",
-                        skillsManager.getAllMetadata() == null ? 0 : skillsManager.getAllMetadata().size());
-            } catch (Exception e) {
-                // 降级：技能读取失败不阻断本轮对话（与宿主目录时代「目录打错字不 500」同口径），
-                // 但用 error 级留痕，避免静默。
-                skillsManager = null;
-                log.error("skills disabled for this run: {}", e.getMessage());
-            }
-        }
-        registerWebPageFiles(toolRegistry, config, sessionId, assistantMessageId);
-        toolRegistry.prepareMcpTools();
+        // 2. 外部工具（域侧构建；注册表/内置工具/MCP/技能装配由 agent-engine 的工厂完成）
+        ToolPlan plan = planTools(config);
+        List<AgentTool> tools = new ArrayList<>(buildTools(config, plan, rerankModel, sessionId));
+        wireWebPageFiles(tools, config, sessionId, assistantMessageId);
 
         // 3. Resolve KB / selected doc metadata（resolveKBAndDocInfos；失败回落 IDs-only）
         List<KnowledgeBaseInfo> kbInfos = getKnowledgeBaseInfos(config);
@@ -147,54 +98,11 @@ final class AgentEngineAssembler {
             systemPromptTemplate = config.getSystemPrompt();
         }
 
-        // 5. Create engine
-        AgentEngine engine = new AgentEngine(config, chatModel, toolRegistry, eventBus,
-                kbInfos, selectedDocs, sessionId, systemPromptTemplate);
-        // 启动时装载内置 yaml 模板——RAG/pure 两个 base
-        // 模板由此区分（塞空配置会让带 KB 的 agent 缺 RAG 开头段 ≈860 字符）。
-        engine.setAppConfig(new AgentPromptTemplates.TemplatesConfig(
-                AgentPromptTemplates.loadAgentSystemPromptTemplates()));
-        // pinned mentions（resolvePinnedMCPServiceInfos / resolvePinnedSkillInfos）
-        List<PinnedMCPServiceInfo> pinnedMcp = new ArrayList<>();
-        if (config.getPinnedMcpServiceIds() != null) {
-            for (String id : config.getPinnedMcpServiceIds()) {
-                if (id != null && !id.isEmpty()) {
-                    pinnedMcp.add(new PinnedMCPServiceInfo(false, id, id, "", new ArrayList<>()));
-                }
-            }
-        }
-        List<PinnedSkillInfo> pinnedSkills = new ArrayList<>();
-        if (config.getPinnedSkillNames() != null) {
-            // 描述取自已装配的技能元数据（此前给空串 → @ 引用处拿不到任何展示信息）
-            java.util.Map<String, String> descByName = new java.util.HashMap<>();
-            if (skillsManager != null && skillsManager.getAllMetadata() != null) {
-                for (Skill.SkillMetadata m : skillsManager.getAllMetadata()) {
-                    if (m != null && m.name() != null) {
-                        descByName.put(m.name(), m.description() == null ? "" : m.description());
-                    }
-                }
-            }
-            for (String name : config.getPinnedSkillNames()) {
-                if (name != null && !name.isEmpty()) {
-                    pinnedSkills.add(new PinnedSkillInfo(name, descByName.getOrDefault(name, "")));
-                }
-            }
-        }
-        engine.setPinnedMentions(pinnedMcp, pinnedSkills);
-
-        // 指令型技能注入（Level 1 元数据进系统提示词；Level 2/3 由引擎按需读取）
-        if (skillsManager != null) {
-            engine.setSkillsManager(skillsManager);
-            // Level 2/3 的按需读取通道：模型按提示词里的 skill://<name>/SKILL.md 调 read_file。
-            // 沙箱已退役，read_file 由本工具提供（不再等沙箱注册步骤）。
-            toolRegistry.registerTool(new SkillReadFileTool(skillsManager));
-        }
-
-        // 工具图片 VLM 描述器：取到 VLM 模型则
-        // setImageDescriber；失败只记警告继续——引擎随后对无描述能力走 "cannot view"。
+        // 5. 工具图片 VLM 描述器（取到 VLM 模型则注入；失败只记警告继续）
+        ImageDescriberFunc imageDescriber = null;
         if (!config.getVlmModelId().isEmpty()) {
             try {
-                engine.setImageDescriber(vlmDescriberWiring.create(config.getVlmModelId()));
+                imageDescriber = vlmDescriberWiring.create(config.getVlmModelId());
                 log.info("VLM image describer set for tool result analysis (model: {})",
                         config.getVlmModelId());
             } catch (RuntimeException e) {
@@ -203,31 +111,16 @@ final class AgentEngineAssembler {
             }
         }
 
-        return engine;
+        // 6. 交给 agent-engine 的工厂装配，返回契约句柄
+        AgentEngineRequest request = new AgentEngineRequest(config, sessionId, assistantMessageId,
+                kbInfos, selectedDocs, systemPromptTemplate, plan.allowedToolNames(), config.isSkillsEnabled(),
+                config.getAllowedSkills(), TenantContext.currentTenantId(), config.getMcpSelectionMode(),
+                config.getMcpServices(), config.getMcpAuthWaitTimeout(),
+                config.getPinnedMcpServiceIds(), config.getPinnedSkillNames(),
+                imageDescriber, tools);
+        return engineFactory.create(request, chatModel, eventBus);
     }
-    /**
-     * 从本租户的启用服务注册受限 MCP 目录（discover_mcp_tools / call_mcp_tool）：
-     * 注册编排在 MCP 域适配器内，这里只做 agent 配置侧的裁剪（模式归一化与空清单短路）
-     * 后委托端口。失败只记警告，不影响引擎创建。
-     */
-    private void registerMcpTools(ToolRegistry toolRegistry, QaAgentConfig config,
-            McpToolingGateway mcpTooling) {
-        String mcpMode = config.getMcpSelectionMode() == null || config.getMcpSelectionMode().isEmpty()
-                ? "all" : config.getMcpSelectionMode();
-        if ("none".equals(mcpMode)) {
-            log.info("MCP services disabled by agent config (mode: none)");
-            return;
-        }
-        List<String> selected = config.getMcpServices();
-        if ("selected".equals(mcpMode) && (selected == null || selected.isEmpty())) {
-            log.info("MCP services disabled by agent config (mode: selected, no services)");
-            return;
-        }
-        long tenantId = TenantContext.currentTenantId() == null ? 0L : TenantContext.currentTenantId();
-        mcpTools.registerOnDemandTools(tenantId, mcpMode, selected == null ? List.of() : selected,
-                toolRegistry.port(), mcpTooling, config.getMcpAuthWaitTimeout());
-    }
-    /** KnowledgeBases 优先，否则 SearchTargets 全集。 */
+
     private record KbScopes(List<String> kbIds, Map<String, Long> kbTenantMap) {
     }
     private static KbScopes knowledgeBaseScopesForPrompt(QaAgentConfig config) {
@@ -363,18 +256,25 @@ final class AgentEngineAssembler {
     private static String nz(String v) {
         return v == null ? "" : v;
     }
-    private void registerWebPageFiles(ToolRegistry registry, QaAgentConfig config,
+    private void wireWebPageFiles(List<AgentTool> tools, QaAgentConfig config,
             String sessionId, String assistantMessageId) {
         if (config == null || !config.isWebSearchEnabled()) {
             return;
         }
-        AgentTool raw = registry.getTool(ToolDefinitions.TOOL_WEB_FETCH);
-        if (!(raw instanceof WebFetchTool fetch)) {
+        WebFetchTool fetch = null;
+        WebSearchTool search = null;
+        for (AgentTool tool : tools) {
+            if (tool instanceof WebFetchTool f) {
+                fetch = f;
+            } else if (tool instanceof WebSearchTool s) {
+                search = s;
+            }
+        }
+        if (fetch == null) {
             return;
         }
         // web_search 是**另一次**工具查找，与 fetch 是两个实例
-        if (registry.getTool(ToolDefinitions.TOOL_WEB_SEARCH)
-                instanceof WebSearchTool search) {
+        if (search != null) {
             search.withPageReader(fetch);
         }
         // handler 已把会话存储钉到 owner 租户（租户取自 TenantContext）
@@ -391,9 +291,14 @@ final class AgentEngineAssembler {
                 sessionId, assistantMessageId);
         fetch.withPageSource(pages);
     }
+
+    /** 允许工具名 + wiki 装配上下文（KB/wiki/沙箱门控裁剪在此完成）。 */
+    private record ToolPlan(List<String> allowedToolNames, List<WikiScope> wikiScopes,
+                            List<String> wikiKbIds, WikiRouteResolver wikiRoutes) {
+    }
+
     /** 工具注册面；工具集与硬门控逐条保留。 */
-    private void registerTools(ToolRegistry registry, QaAgentConfig config, Reranker rerankModel,
-            String sessionId) {
+    private ToolPlan planTools(QaAgentConfig config) {
         List<String> allowedTools = new ArrayList<>(config.getAllowedTools().isEmpty()
                 ? ToolDefinitions.defaultAllowedTools()
                 : config.getAllowedTools());
@@ -506,16 +411,20 @@ final class AgentEngineAssembler {
 
         // Dedup 保序
         allowedTools = new ArrayList<>(new java.util.LinkedHashSet<>(allowedTools));
+        return new ToolPlan(allowedTools, wikiScopes, wikiKbIds, wikiRoutes);
+    }
 
-        // Register each allowed tool
+    /** 域侧外部工具（内置工具由 agent-engine 的工厂注册）。 */
+    private List<AgentTool> buildTools(QaAgentConfig config, ToolPlan plan, Reranker rerankModel,
+            String sessionId) {
+        List<AgentTool> out = new ArrayList<>();
         String toolOwnerId = SessionOwnerIds.currentSessionOwnerId();
-        for (String toolName : allowedTools) {
+        for (String toolName : plan.allowedToolNames()) {
             AgentTool toolToRegister = null;
             switch (toolName) {
-                case ToolDefinitions.TOOL_THINKING ->
-                        toolToRegister = new SequentialThinkingTool();
-                case ToolDefinitions.TOOL_TODO_WRITE ->
-                        toolToRegister = new TodoWriteTool();
+                // 思考/待办是**引擎内置工具**：由 agent-engine 的工厂按同一份允许清单注册
+                case ToolDefinitions.TOOL_THINKING, ToolDefinitions.TOOL_TODO_WRITE -> {
+                }
                 // 检索/会话/记忆/DB 族（2026-09-23 接线批）：seam → 真实服务经 AgentToolBackends
                 case ToolDefinitions.TOOL_KNOWLEDGE_SEARCH, ToolDefinitions.TOOL_GREP_CHUNKS,
                         ToolDefinitions.TOOL_LIST_KNOWLEDGE_CHUNKS,
@@ -533,7 +442,7 @@ final class AgentEngineAssembler {
                         ToolDefinitions.TOOL_WIKI_RENAME_PAGE, ToolDefinitions.TOOL_WIKI_DELETE_PAGE,
                         ToolDefinitions.TOOL_WIKI_READ_ISSUE, ToolDefinitions.TOOL_WIKI_UPDATE_ISSUE ->
                         toolToRegister = toolBackends.createWikiTool(toolName,
-                                config.getSearchTargets(), wikiScopes, wikiKbIds, wikiRoutes);
+                                config.getSearchTargets(), plan.wikiScopes(), plan.wikiKbIds(), plan.wikiRoutes());
                 // web 两件（2026-09-23 接线批）
                 case ToolDefinitions.TOOL_WEB_SEARCH, ToolDefinitions.TOOL_WEB_FETCH ->
                         toolToRegister = toolBackends.createWebTool(toolName,
@@ -551,11 +460,13 @@ final class AgentEngineAssembler {
                 if (!toolToRegister.getName().equals(toolName)) {
                     log.warn("Tool name mismatch: expected {}, got {}", toolName, toolToRegister.getName());
                 }
-                registry.registerTool(toolToRegister);
+                out.add(toolToRegister);
             }
         }
-        log.info("Registered {} tools", registry.listTools().size());
+        log.info("Assembled {} external tool(s)", out.size());
+        return out;
     }
+
     /** 过滤共享 agent 只读模式下不允许的写工具。 */
     private static List<String> filterSharedAgentWriteTools(List<String> allowed) {
         List<String> sourceWrites = List.of(

@@ -23,7 +23,7 @@ import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 
 /**
- * MCP 工具编排（原 {@link com.ragagent.agent.tool.ToolRegistry} 的 MCP 目录方法与状态，逐行搬出）。
+ * MCP 工具编排（原 {@code com.ragagent.agent.tool.ToolRegistry} 的 MCP 目录方法与状态，逐行搬出）。
  *
  * <p>存在意义：这些逻辑必须依赖 {@code com.ragagent.mcp.*} 与审批栈（业务域类型），
  * 留在引擎里会让 agent 无法独立成模块。抽到本类后，引擎只通过
