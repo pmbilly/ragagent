@@ -1,0 +1,8 @@
+{
+  "note": "C8（判定标准二）：platform 业务形状豁免登记——每条必须能回答「为何属技术适配」。只许减不许增；新增须先处置（搬 contract / 中性化 / 改名）或在此登记并写明理由。",
+  "allowed": {
+    "com/ragagent/platform/web/ApiResponse.java": "统一响应壳（全仓 HTTP 响应外壳）——HTTP 技术适配",
+    "com/ragagent/platform/storage/fileserve/FileProxyPort.java": "文件直出 HTTP 面（request/response 进出，与 FileServeHttp/FileTransport 配套）——HTTP 技术适配",
+    "com/ragagent/platform/stream/LiveRunPayload.java": "live-run 标记的 Redis 存储形态（仅 platform.stream 内部消费）——事件/流基建技术适配"
+  }
+}
