@@ -18,7 +18,7 @@ import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
+import com.ragagent.contract.model.AsrTranscriber;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.knowledge.DocumentChunkingPort;

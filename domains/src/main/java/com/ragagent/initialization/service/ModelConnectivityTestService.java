@@ -21,7 +21,7 @@ import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
+import com.ragagent.contract.model.AsrTranscriber;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.contract.doc.DocReaderParsePort;

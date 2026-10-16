@@ -22,7 +22,7 @@ import com.ragagent.contract.knowledge.DocumentChunkingPort;
 import com.ragagent.contract.knowledge.chunker.Tokens;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.contract.knowledge.support.ParserEngineRules;
-import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
+import com.ragagent.contract.model.AsrTranscriber;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;

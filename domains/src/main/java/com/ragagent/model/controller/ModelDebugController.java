@@ -12,7 +12,7 @@ import java.util.TreeMap;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.model.ChatStream;
-import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
+import com.ragagent.contract.model.AsrTranscriber;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.Embedder;

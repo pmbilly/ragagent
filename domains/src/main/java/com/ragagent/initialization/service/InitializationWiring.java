@@ -3,8 +3,6 @@ package com.ragagent.initialization.service;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.llm.extract.ExtractPrompts;
 import com.ragagent.llm.ollama.OllamaService;
 
@@ -14,7 +12,6 @@ import com.ragagent.llm.ollama.OllamaService;
  *   <li>{@link OllamaService} 单例 bean。
  *       注意 {@code isAvailable} 标志是跨请求共享状态——"已可用则跳过
  *       StartService" 的分支依赖这一点，不能每请求新建。</li>
- *   <li>{@link AsrTranscriber} 缺省实现——OpenAI 兼容 transcription 薄实现
  *       （见接缝类注释的线上行为说明）。</li>
  *   <li>{@link ExtractPrompts}——config.yaml extract 段的 vendor 装载。</li>
  * </ul>
@@ -29,10 +26,6 @@ public class InitializationWiring {
         return OllamaService.getOllamaService();
     }
 
-    @Bean
-    public AsrTranscriber asrTranscriber(SsrfGuard ssrfGuard) {
-        return new AsrTranscriber.OpenAiAsrTranscriber(ssrfGuard);
-    }
 
     @Bean
     public ExtractPrompts extractPrompts() {

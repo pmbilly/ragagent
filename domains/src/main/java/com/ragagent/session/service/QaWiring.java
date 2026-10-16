@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -42,13 +41,7 @@ import com.ragagent.platform.settings.ConversationProperties;
 
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.modelruntime.application.LlmChatClients;
-import com.ragagent.contract.model.chat.ChatConfig;
-import com.ragagent.llm.limiter.ConcurrencyGovernor;
-import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.contract.model.Reranker;
-import com.ragagent.rerank.RerankerConfig;
-import com.ragagent.rerank.RerankerFactory;
 import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.contract.retrieval.SearchResult;
 import java.io.InputStream;
@@ -67,9 +60,8 @@ import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.contract.knowledge.support.KnowledgeBaseViews;
 import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.modelruntime.application.ChatConfigs;
-import com.ragagent.rerank.RerankerConfigs;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 
 /**
@@ -113,8 +105,7 @@ public class QaWiring {
     @Bean
     public PipelinePorts.ModelService qaPipelineModelService(
             ModelCatalogPort modelCatalog,
-            ObjectProvider<OllamaService> ollamaService,
-            ConcurrencyGovernor concurrencyGovernor) {
+            ModelRuntime modelRuntime) {
         return new PipelinePorts.ModelService() {
             @Override
             public LlmChatClient getChatModel(String modelId) {
@@ -122,13 +113,9 @@ public class QaWiring {
                 if (model == null) {
                     return null;
                 }
-                var p = model.parameters();
-                ChatConfig config = ChatConfigs.chatConfig(model,
-                        p == null ? null : p.getAppId(),
-                        p == null ? null : p.getAppSecret());
+                // 取数口径留在此处（findModel 的状态闸门）；构造走 model-runtime 工厂面
                 // langfuse generation 装饰（未启用时原样返回）
-                return LangfuseChatClient.wrap(
-                        LlmChatClients.create(config, ollamaService.getIfAvailable(), concurrencyGovernor));
+                return LangfuseChatClient.wrap(modelRuntime.chatClientFor(model));
             }
 
             @Override
@@ -137,12 +124,8 @@ public class QaWiring {
                 if (model == null) {
                     return null;
                 }
-                var p = model.parameters();
-                RerankerConfig config = RerankerConfigs.rerankerConfig(model,
-                        p == null ? null : p.getAppId(),
-                        p == null ? null : p.getAppSecret());
                 // langfuse generation 装饰（未启用时原样返回）
-                return LangfuseReranker.wrap(RerankerFactory.newReranker(config));
+                return LangfuseReranker.wrap(modelRuntime.rerankerFor(model));
             }
         };
     }

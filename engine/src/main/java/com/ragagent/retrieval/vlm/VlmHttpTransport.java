@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
+import com.ragagent.modelruntime.adapter.provider.asr.OpenAiAsrTranscriber;
 import com.ragagent.platform.http.LlmTransport;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 
@@ -21,7 +21,7 @@ import com.ragagent.retrieval.config.RetrievalEnvLookup;
  *   <li>超时：{@code VLM_HTTP_TIMEOUT_SECONDS}（正整数秒）缺省 180s；</li>
  *   <li>鉴权：{@code Authorization: Bearer <apiKey>}；</li>
  *   <li>非 2xx 错误文案走 OpenAI 错误报文仿真
- *       （{@link AsrTranscriber.OpenAiAsrTranscriber#openAiErrorText}）——
+ *       （{@link OpenAiAsrTranscriber#openAiErrorText}）——
  *       与 ASR 共用同一套字节契约；</li>
  *   <li>网络层错误：{@code Post "<url>": <cause>} 形态。</li>
  * </ul>
@@ -55,7 +55,7 @@ public class VlmHttpTransport implements VlmClient.Transport {
         }
         if (resp.statusCode() != 200) {
             throw new RuntimeException(
-                    AsrTranscriber.OpenAiAsrTranscriber.openAiErrorText(resp.statusCode(), respBody));
+                    OpenAiAsrTranscriber.openAiErrorText(resp.statusCode(), respBody));
         }
         return new String(respBody, StandardCharsets.UTF_8);
     }
