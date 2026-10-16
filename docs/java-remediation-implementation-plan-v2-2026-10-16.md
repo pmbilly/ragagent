@@ -44,7 +44,8 @@
 | 7 | `UserPreferences` | `platform.auth` | 归域 → `auth/domain`（方案 §8.9 原文落点） | **P5** |
 | 8 | `TenantConfigLookup` | `platform.config` | 去框架化（JsonNode→Object）→ `contract.tenant` | ✅ d792a002 |
 | 8b | `LanguageProperties` · `RetrievalDriverProperties` · `TenantProperties`（`@ConfigurationProperties`） | `platform.config` | **裁定留 platform（不搬）**：配置绑定＝框架面（判定标准二"技术适配"含框架绑定）；命名（`*Properties`）不在 C8 红灯清单——登记为豁免项 | — |
-| 9 | `SessionQaPort` · `EmbedSessionPort`（servlet+ResponseEntity 签名） | `platform.session.{qa,embed}` | 签名中性化（`EventBusInterface` 已就位；servlet/ResponseEntity 归边界）→ `contract.session` | **P4** |
+| 9 | `SessionQaPort` | `platform.session.qa` | 签名中性化（`EventBus`→`EventBusInterface`，QA 链全链换型）→ `contract.session` | ✅ 9db5b06d |
+| 9b | `EmbedSessionPort`（servlet + ResponseEntity + SSE 签名） | `platform.session.embed` | 中性化（`SseSink` 抽象 + 中性结果 record）——**P4f，唯一剩余项** | P4f |
 | 10 | `AdminUserPort` · `AdminUserView` · `ApiKeyAuthPort` | `platform.{auth,apikey}` | 签名中性化 → `contract.auth` / `contract.apikey`（方案 §8.1 原文落点） | **P4** |
 | 11 | `KnowledgeCatalogPort` | `platform.knowledge` | 端口中性化（去 MyBatis-Plus `Page`）→ `contract.knowledge` | ✅ 92c5eb70 |
 | 11b | `FaqChunkMetadataCodec` | `platform.knowledge` | **裁定留 platform（不搬）**：映射面（JSON 读写）＝技术适配；跨 knowledge/agenttools/chatpipeline 三域消费，归域会造边——登记豁免 | — |
