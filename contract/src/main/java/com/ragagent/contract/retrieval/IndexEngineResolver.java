@@ -15,4 +15,12 @@ public interface IndexEngineResolver {
 
     /** 解析绑定引擎（{@code vectorStoreId} 非空；失败抛 {@link RetrieveEngineException}）。 */
     IndexEngine resolveFor(long tenantId, String vectorStoreId);
+
+    /**
+     * 解析绑定引擎，且**未绑定时回落租户有效引擎**（{@code fallback} 见 {@link TenantRetrievalDefault}）。
+     *
+     * <p>与上面那条的区别只在"店 id 为空/不可用时怎么办"：这条按租户配置的引擎表 + 部署驱动回落
+     * （原 domains 侧 {@code ChunkQuestionService} 的口径），那条直接失败。</p>
+     */
+    IndexEngine resolveFor(long tenantId, String vectorStoreId, TenantRetrievalDefault fallback);
 }

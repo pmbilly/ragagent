@@ -1,5 +1,8 @@
 package com.ragagent.knowledge.service.chunk;
 
+import com.ragagent.contract.retrieval.TenantRetrievalDefault;
+import com.ragagent.contract.retrieval.IndexEngineResolver;
+import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.knowledge.domain.ChunkQuestionPort;
 
 
@@ -39,12 +42,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.model.Embedder;
-import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
-import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
-import com.ragagent.retrieval.engine.RetrieverEngineParams;
-import com.ragagent.contract.retrieval.TenantStoreOwnership;
-import com.ragagent.retrieval.engine.EffectiveEngines;
-import com.ragagent.retrieval.engine.RetrieveEngineFactories;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
@@ -63,8 +60,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
     private final KnowledgeBaseRepository kbRepository;
     private final ChunkVectorIndexer chunkVectorIndexer;
     private final ModelRuntime modelRuntimeAssembler;
-    private final RetrieveEngineRegistry retrieveEngineRegistry;
-    private final TenantStoreOwnership storeOwnership;
+    private final IndexEngineResolver indexEngineResolver;
     private final TenantConfigLookup tenantConfigLookup;
     private final ConversationProperties conversationProps;
     private final ChunkAccessGuard guard;
@@ -75,8 +71,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
                                 KnowledgeBaseRepository kbRepository,
                                 ChunkVectorIndexer chunkVectorIndexer,
                                 ModelRuntime modelRuntimeAssembler,
-                                RetrieveEngineRegistry retrieveEngineRegistry,
-                                TenantStoreOwnership storeOwnership,
+                                IndexEngineResolver indexEngineResolver,
                                 TenantConfigLookup tenantConfigLookup,
                                 ConversationProperties conversationProps,
                                 ChunkAccessGuard guard,
@@ -85,8 +80,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
         this.kbRepository = kbRepository;
         this.chunkVectorIndexer = chunkVectorIndexer;
         this.modelRuntimeAssembler = modelRuntimeAssembler;
-        this.retrieveEngineRegistry = retrieveEngineRegistry;
-        this.storeOwnership = storeOwnership;
+        this.indexEngineResolver = indexEngineResolver;
         this.tenantConfigLookup = tenantConfigLookup;
         this.conversationProps = conversationProps;
         this.guard = guard;
@@ -233,11 +227,12 @@ public class ChunkQuestionService implements ChunkQuestionPort {
         String sourceId = ChunkSearchUtil.generatedQuestionSourceId(chunkId, questionId);
         //     无绑定回落租户有效引擎（RETRIEVE_DRIVER 驱动），绑定 store 走归属校验 +
         //     注册表解析。失败 → "failed to create retrieve engine: %w"（handler 包 400）。
-        CompositeRetrieveEngine engine;
+        IndexEngine engine;
         try {
-            engine = RetrieveEngineFactories.createForKb(
-                    retrieveEngineRegistry, storeOwnership, tenantId, kb.getVectorStoreId(),
-                    tenantEngines(tenantId));
+            // 绑定 store 走归属校验 + 注册表解析；无绑定回落租户有效引擎——解析收在
+            // retrieval-engine 的 IndexEngineGateway（本类只提供回落口径）。
+            engine = indexEngineResolver.resolveFor(tenantId, kb.getVectorStoreId(),
+                    tenantRetrievalDefault(tenantId));
         } catch (RuntimeException e) {
             throw BizException.badRequest("failed to create retrieve engine: " + e.getMessage());
         }
@@ -559,14 +554,14 @@ public class ChunkQuestionService implements ChunkQuestionPort {
     }
 
 
-    private List<RetrieverEngineParams> tenantEngines(long tenantId) {
-        JsonNode engines;
+    private TenantRetrievalDefault tenantRetrievalDefault(long tenantId) {
+        Object engines;
         try {
-            engines = JsonMappers.toJsonNode(tenantConfigLookup.retrieverEngines(tenantId));
+            engines = tenantConfigLookup.retrieverEngines(tenantId);
         } catch (RuntimeException e) {
             engines = null;
         }
-        return EffectiveEngines.of(engines, driverProperties.driver());
+        return new TenantRetrievalDefault(engines, driverProperties.driver());
     }
 
     /**

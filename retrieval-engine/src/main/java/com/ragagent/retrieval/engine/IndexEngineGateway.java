@@ -9,7 +9,9 @@ import com.ragagent.contract.model.Embedder;
 import com.ragagent.contract.retrieval.IndexDocument;
 import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.contract.retrieval.IndexEngineResolver;
+import com.ragagent.contract.retrieval.TenantRetrievalDefault;
 import com.ragagent.contract.retrieval.TenantStoreOwnership;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 索引引擎解析 + 适配（R3b 契约化）：把内部 {@link CompositeRetrieveEngine} 包成契约面
@@ -36,8 +38,20 @@ public class IndexEngineGateway implements IndexEngineResolver {
 
     @Override
     public IndexEngine resolveFor(long tenantId, String vectorStoreId) {
-        CompositeRetrieveEngine engine = RetrieveEngineFactories.createForKb(
-                retrieveEngineRegistry, storeOwnership, tenantId, vectorStoreId, null);
+        return wrap(RetrieveEngineFactories.createForKb(
+                retrieveEngineRegistry, storeOwnership, tenantId, vectorStoreId, null));
+    }
+
+    @Override
+    public IndexEngine resolveFor(long tenantId, String vectorStoreId, TenantRetrievalDefault fallback) {
+        List<RetrieverEngineParams> fallbackEngines = fallback == null ? null
+                : EffectiveEngines.of(JsonMappers.toJsonNode(fallback.retrieverEngines()),
+                        fallback.driver());
+        return wrap(RetrieveEngineFactories.createForKb(
+                retrieveEngineRegistry, storeOwnership, tenantId, vectorStoreId, fallbackEngines));
+    }
+
+    private static IndexEngine wrap(CompositeRetrieveEngine engine) {
         return engine == null ? null : new Adapter(engine);
     }
 
