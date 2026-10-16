@@ -258,4 +258,4 @@ cd frontend && npm run type-check && npm test
 
 本项目以 [MIT License](LICENSE) 发布。
 
-致谢：[Tencent/WeKnora](https://github.com/Tencent/WeKnora) —— 本项目的领域模型与接口设计参考了该项目（Apache-2.0）。
+致谢：[Tencent/WeKnora](https://github.com/Tencent/WeKnora) —— 本项目大量参考、复用了该项目。
