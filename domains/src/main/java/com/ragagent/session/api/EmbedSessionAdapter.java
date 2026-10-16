@@ -6,11 +6,15 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
-import com.ragagent.platform.session.dto.StopSessionRequest;
+import com.ragagent.session.dto.StopSessionRequest;
 import com.ragagent.platform.session.embed.EmbedSessionPort;
 import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.controller.KnowledgeQaController;
 import com.ragagent.session.controller.MessageController;
 import com.ragagent.session.controller.MessageSuggestionController;
@@ -27,6 +31,8 @@ import com.ragagent.platform.session.embed.MessageView;
  */
 @Component
 public class EmbedSessionAdapter implements EmbedSessionPort {
+
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final KnowledgeQaController knowledgeQaController;
     private final MessageController messageController;
@@ -65,8 +71,16 @@ public class EmbedSessionAdapter implements EmbedSessionPort {
     }
 
     @Override
-    public ApiResponse<Void> stopSession(String sessionId, StopSessionRequest body) {
-        return sessionController.stopSession(sessionId, body);
+    public ApiResponse<Void> stopSession(String sessionId, String rawBody) {
+        StopSessionRequest request = null;
+        if (rawBody != null && !rawBody.isEmpty()) {
+            try {
+                request = MAPPER.readValue(rawBody, StopSessionRequest.class);
+            } catch (Exception e) {
+                throw new BizException(AppError.badRequest("invalid request body"));
+            }
+        }
+        return sessionController.stopSession(sessionId, request);
     }
 
     @Override

@@ -167,7 +167,7 @@ boot      13 件                        →     agent-engine（自 domains/agent
 
 | 批 | 日期 | 内容 | 读数/验证 |
 |---|---|---|---|
-| P1 | 2026-10-16 | `StopSessionRequest` → `session/dto`（platform 业务形状归位首刀）+ `EmbedSessionPort.stopSession` 签名中性化 | 见下（完成后回填） |
+| P1 | 2026-10-16 | `StopSessionRequest` 归位 `domains/session/dto`（方案 §8.8.1 原文落点）+ `EmbedSessionPort.stopSession` 中性化（rawBody 透传、解析归会话域，口径对齐 `MessageSuggestionController.ensureSuggestions` 先例）；`platform.session.dto` 目录消亡 | 14 守卫绿 · 金片 1349 签名一致 · gate 2m16s / **4996 / 失败 0 / 跳过 4** · 端点覆盖 `EmbedContractTest` + `SessionG6ContractTest` 全绿 |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

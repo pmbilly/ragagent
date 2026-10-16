@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.contract.tenant.TenantRole;
 
-import com.ragagent.platform.session.dto.StopSessionRequest;
 import com.ragagent.platform.storage.fileserve.FileProxyPort;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
@@ -224,8 +223,8 @@ final FileProxyPort fileProxyService;
     @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/stop")
     public ApiResponse<Void> stop(@PathVariable("sessionId") String sessionId,
                                   @RequestBody(required = false)
-                                  StopSessionRequest body) {
-        return delegateOps.stop(sessionId, body);
+                                  String rawBody) {
+        return delegateOps.stop(sessionId, rawBody);
     }
 
     @GetMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/messages/{messageId}/suggestions")

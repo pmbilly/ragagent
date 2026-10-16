@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 
 
-import com.ragagent.platform.session.dto.StopSessionRequest;
 import com.ragagent.platform.web.ApiResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,8 +39,8 @@ public interface EmbedSessionPort {
     ResponseEntity<List<MessageView>> loadMessages(String sessionId, String limit,
             String beforeTime, String resourceUrls);
 
-    /** 停止助手消息生成。 */
-    ApiResponse<Void> stopSession(String sessionId, StopSessionRequest body);
+    /** 停止助手消息生成（收渠道边界透传的原始 body；解析归会话域侧，线格式与原生端点一致）。 */
+    ApiResponse<Void> stopSession(String sessionId, String rawBody);
 
     /** 读取建议集。 */
     ResponseEntity<MessageSuggestionView> getSuggestions(String sessionId, String messageId);

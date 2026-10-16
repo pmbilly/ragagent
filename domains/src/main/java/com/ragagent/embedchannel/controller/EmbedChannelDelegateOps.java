@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import com.ragagent.platform.session.dto.StopSessionRequest;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.platform.session.embed.MessageView;
@@ -139,13 +138,14 @@ final class EmbedChannelDelegateOps {
      * 委托 SessionController.stopSession。
      *
      * <p>请求体键名从 {@code message_id} 变成 {@code messageId}
-     * ——embed 的其余键仍是下划线。</p>
+     * ——embed 的其余键仍是下划线。body 以原始字符串透传，解析归会话域侧
+     * （线格式与原生端点一致）。</p>
      */
     public ApiResponse<Void> stop(@PathVariable("sessionId") String sessionId,
                                   @RequestBody(required = false)
-                                  StopSessionRequest body) {
+                                  String rawBody) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
-        return ctrl.sessionPort.stopSession(LogSanitizer.sanitize(sessionId), body);
+        return ctrl.sessionPort.stopSession(LogSanitizer.sanitize(sessionId), rawBody);
     }
 
     /** 建议读取：channel 级 suppressed 分支优先于委托。 */
