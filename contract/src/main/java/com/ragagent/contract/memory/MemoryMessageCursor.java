@@ -1,9 +1,8 @@
-package com.ragagent.platform.memory;
+package com.ragagent.contract.memory;
 
 import java.time.OffsetDateTime;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.contract.json.ZeroTimes;
 
 /**
  * 抽取游标：用消息主键**打破时间戳平局**。
@@ -11,11 +10,13 @@ import com.ragagent.platform.web.ZeroTimeSerializer;
  * <p>纯值对象，不落表。它出现在记忆抽取会话行 {@code getCursor()} 的嵌套 JSON 里
  * （{@code MemoryExtractionSession}，留记忆域），也作为 {@code failed_from_} /
  * {@code failed_to_} 的 {@code embeddedPrefix} 展开成平列。</p>
+ *
+ * <p>{@code @JsonIgnoreProperties(ignoreUnknown = true)} 线格式注解由
+ * {@code platform.web.ContractJsonMixinsMemory} 的 mixin 承载（契约面纯 JDK）。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class MemoryMessageCursor {
 
-    private OffsetDateTime at = ZeroTimeSerializer.ZERO_DATE_TIME;
+    private OffsetDateTime at = ZeroTimes.ZERO_DATE_TIME;
 
     private String id = "";
 
@@ -52,7 +53,7 @@ public class MemoryMessageCursor {
 
     public OffsetDateTime getAt() { return at; }
     public void setAt(OffsetDateTime v) {
-        at = v == null ? ZeroTimeSerializer.ZERO_DATE_TIME : v;
+        at = v == null ? ZeroTimes.ZERO_DATE_TIME : v;
     }
 
     public String getId() { return id; }

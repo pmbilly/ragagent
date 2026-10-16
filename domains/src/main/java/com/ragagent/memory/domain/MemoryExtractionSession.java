@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.platform.memory.MemoryMessageCursor;
+import com.ragagent.contract.memory.MemoryMessageCursor;
 
 /**
  * 每个会话的蒸馏进度——一行**有索引的小记录**，而不是塞进主体上那个不断长大的 JSON 文档。

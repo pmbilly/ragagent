@@ -37,6 +37,7 @@ import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.contract.event.payload.MCPOAuthRequiredData;
 import com.ragagent.contract.event.payload.MCPOAuthResolvedData;
 import com.ragagent.contract.event.payload.MergeData;
+import com.ragagent.contract.memory.MemoryMessageCursor;
 import com.ragagent.contract.session.MessageView;
 import com.ragagent.contract.event.payload.QueryData;
 import com.ragagent.contract.event.payload.RerankData;
@@ -89,6 +90,7 @@ public final class ContractJsonModule extends SimpleModule {
         setMixInAnnotation(MCPOAuthRequiredData.class, ContractJsonMixinsEvent.MCPOAuthRequiredDataMixin.class);
         setMixInAnnotation(MCPOAuthResolvedData.class, ContractJsonMixinsEvent.MCPOAuthResolvedDataMixin.class);
         setMixInAnnotation(MergeData.class, ContractJsonMixinsEvent.MergeDataMixin.class);
+        setMixInAnnotation(MemoryMessageCursor.class, ContractJsonMixinsMemory.MemoryMessageCursorMixin.class);
         setMixInAnnotation(MessageView.class, ContractJsonMixinsSession.MessageViewMixin.class);
         setMixInAnnotation(QueryData.class, ContractJsonMixinsEvent.QueryDataMixin.class);
         setMixInAnnotation(RerankData.class, ContractJsonMixinsEvent.RerankDataMixin.class);
