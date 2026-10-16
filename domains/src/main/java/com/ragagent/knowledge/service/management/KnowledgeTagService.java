@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service.management;
 
+import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -24,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
 import com.ragagent.contract.retrieval.VectorIndexStore;
@@ -344,7 +344,7 @@ public class KnowledgeTagService {
      */
     private void scheduleIndexDelete(KnowledgeBase kb, List<String> chunkIds) {
         List<String> ids = List.copyOf(chunkIds);
-        CompositeRetrieveEngine boundEngine = null;
+        IndexEngine boundEngine = null;
         int dim = 0;
         try {
             boundEngine = vectorWrites.boundEngine(kb, TenantContext.currentTenantId());
@@ -357,7 +357,7 @@ public class KnowledgeTagService {
             return;
         }
         if (boundEngine != null) {
-            final CompositeRetrieveEngine engine = boundEngine;
+            final IndexEngine engine = boundEngine;
             final int dimensions = dim;
             final String kbType = kb.getType();
             taskExecutor.submit("tag-index-delete", () -> {

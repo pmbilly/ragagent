@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service.faq;
 
+import com.ragagent.contract.retrieval.IndexDocument;
+import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.contract.retrieval.IndexRow;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
@@ -16,9 +18,7 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.contract.model.ModelRuntime;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.model.Embedder;
-import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.EngineTypes;
-import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.contract.tenant.TenantStorageQuotaPort;
@@ -162,7 +162,7 @@ public class FaqIndexWriter {
                 throw new IllegalStateException("Storage quota exceeded");
             }
         }
-        CompositeRetrieveEngine boundEngine =
+        IndexEngine boundEngine =
                 vectorWrites.boundEngine(kb, tid);
         if (boundEngine != null) {
             try {
@@ -231,7 +231,7 @@ public class FaqIndexWriter {
             chunkIds.add(chunk.getId());
         }
         long size = vectorStore.estimateStorageSize(rows, embeddingDimensions(embeddingModel));
-        CompositeRetrieveEngine boundEngine =
+        IndexEngine boundEngine =
                 vectorWrites.boundEngine(kb, tid);
         if (boundEngine != null) {
             try {
@@ -266,23 +266,14 @@ public class FaqIndexWriter {
     }
 
     /** 索引行 → 检索引擎的 IndexInfo（SourceType 固定 FILE）。 */
-    private static List<IndexInfo> faqIndexInfos(
+    private static List<IndexDocument> faqIndexInfos(
             KnowledgeBase kb, List<IndexRow> rows) {
-        List<IndexInfo> items =
+        List<IndexDocument> items =
                 new ArrayList<>(rows.size());
         for (IndexRow row : rows) {
-            IndexInfo item =
-                    new IndexInfo();
-            item.sourceId = row.sourceId();
-            item.sourceType = EngineTypes.SOURCE_TYPE_FILE;
-            item.chunkId = row.chunkId();
-            item.knowledgeId = row.knowledgeId();
-            item.knowledgeBaseId = row.knowledgeBaseId();
-            item.knowledgeType = kb.getType();
-            item.tagId = row.tagId() == null ? "" : row.tagId();
-            item.content = row.content();
-            item.isEnabled = row.isEnabled();
-            items.add(item);
+            items.add(new IndexDocument(row.sourceId(), EngineTypes.SOURCE_TYPE_FILE,
+                    row.chunkId(), row.knowledgeId(), row.knowledgeBaseId(), kb.getType(),
+                    row.tagId(), row.content(), row.isEnabled()));
         }
         return items;
     }

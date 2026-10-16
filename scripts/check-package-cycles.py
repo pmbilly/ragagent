@@ -45,6 +45,17 @@
     在 `contract.model`）同样要引用聊天形状 ⇒ 挪包只能把同一判定推到下一个批次，不解决结构问题。
   · 仍受棘轮：本组只许减不许增；若将来把 `TokenUsage`/`ResponseType` 一并归入 chat 面，
     本组应随之消除并刷新（已消除同样报红，不会悄悄过期）。
+
+2026-10-16（R3b-3）包级 SCC 9 组不变但**一组变形**：{contract.model, contract.model.chat}
+  → {contract.model, contract.model.chat, contract.retrieval}。
+  · 原因：R3a 起检索面契约化——`contract.retrieval.IndexEngine` 取 `contract.model.Embedder`
+    （写入需先向量化）；反向 `contract.model.StreamResponse` 早已持 `contract.retrieval.SearchResult`
+    （R2a-1 上提时即如此：SSE 帧要回传检索结果）。
+  · 性质：**契约词汇表内的固有形状互引**（检索载荷 ⇄ 模型能力载体），与既有的 model⇄model.chat
+    同族，不是跨族缠绕；三个包全是纯 JDK 词汇/端口，无框架依赖。
+  · 为什么不在本批消除：要拆只能把 `Embedder` 或 `SearchResult` 挪去对方包（都是错误落点），
+    或让 `StreamResponse` 放弃检索载荷（API 形状变化）。
+  · 仍受棘轮：本组只许减不许增。
 """
 import json
 import pathlib

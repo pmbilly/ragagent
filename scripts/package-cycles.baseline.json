@@ -18,7 +18,8 @@
     ],
     [
       "com.ragagent.contract.model",
-      "com.ragagent.contract.model.chat"
+      "com.ragagent.contract.model.chat",
+      "com.ragagent.contract.retrieval"
     ],
     [
       "com.ragagent.embedchannel",

@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service.faq;
 
+import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 
@@ -30,7 +31,6 @@ import com.ragagent.contract.audit.AuditWritePort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.knowledge.task.FaqImportTaskStore;
 import com.ragagent.knowledge.domain.access.FaqGuard;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
@@ -512,7 +512,7 @@ public class FaqEntryCommandService {
         // 检索引擎同步：失败 → 原样上抛（阻断；
         // 2026-09-22 走查批接线：此前为 WARN + no-op 占位。
         // 绑定 store 的 KB 走引擎口（deleteByChunkIdList + batchIndex）
-        CompositeRetrieveEngine boundEngine =
+        IndexEngine boundEngine =
                 (!enabledUpdates.isEmpty() || !tagUpdates.isEmpty())
                         ? vectorWrites.boundEngine(kb, tid) : null;
         if (boundEngine != null) {

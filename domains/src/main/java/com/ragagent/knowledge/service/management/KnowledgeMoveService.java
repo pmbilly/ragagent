@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service.management;
 
+import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
@@ -20,7 +21,6 @@ import com.ragagent.retrieval.engine.PgVectorEngineRepository;
 import org.springframework.stereotype.Service;
 import com.ragagent.contract.graph.NameSpace;
 import com.ragagent.contract.model.Embedder;
-import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.knowledge.task.KnowledgeTaskProgressStore;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
 import com.ragagent.contract.tenant.TenantStorageQuotaPort;
@@ -268,7 +268,7 @@ public class KnowledgeMoveService {
     private void deleteKnowledgeVectorRows(Knowledge row, KnowledgeBase kb, String embeddingModelId) {
         try {
             if (vectorWrites.boundEngine(kb, TenantContext.currentTenantId()) instanceof
-                    CompositeRetrieveEngine engine) {
+                    IndexEngine engine) {
                 Embedder emb =
                         modelRuntimeAssembler.getEmbeddingModel(embeddingModelId);
                 engine.deleteByKnowledgeIdList(List.of(row.getId()), emb.getDimensions(),
@@ -310,7 +310,7 @@ public class KnowledgeMoveService {
         }
         try {
             if (vectorWrites.boundEngine(sourceKb, TenantContext.currentTenantId()) instanceof
-                    CompositeRetrieveEngine engine) {
+                    IndexEngine engine) {
                 Embedder emb =
                         modelRuntimeAssembler.getEmbeddingModel(row.getEmbeddingModelId());
                 engine.moveKnowledgeIndices(sourceKbId, targetKbId, knowledgeId,

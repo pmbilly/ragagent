@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.platform.model.EmbeddingGateway;
@@ -25,7 +26,6 @@ import com.ragagent.contract.knowledge.KnowledgeBaseSearchGateway;
 import com.ragagent.contract.knowledge.KnowledgeDocumentGateway;
 import com.ragagent.contract.model.ModelFacts;
 import com.ragagent.platform.model.ModelGateway;
-import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;

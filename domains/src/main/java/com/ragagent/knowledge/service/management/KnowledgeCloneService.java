@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service.management;
 
+import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
@@ -24,7 +25,6 @@ import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.retrieval.engine.PgVectorEngineRepository;
 import org.springframework.stereotype.Service;
 import com.ragagent.contract.model.Embedder;
-import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.knowledge.task.KnowledgeTaskProgressStore;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -289,7 +289,7 @@ public class KnowledgeCloneService {
             return;
         }
         try {
-            CompositeRetrieveEngine engine =
+            IndexEngine engine =
                     vectorWrites.boundEngine(srcKb, TenantContext.currentTenantId());
             if (engine != null) {
                 Embedder emb =

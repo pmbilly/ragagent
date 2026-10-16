@@ -27,9 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ragagent.contract.model.Embedder;
-import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
+import com.ragagent.contract.retrieval.IndexDocument;
+import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.retrieval.engine.EngineTypes;
-import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.contract.retrieval.VectorIndexStore;
@@ -169,7 +169,7 @@ public class ChunkVectorIndexer {
     private void indexAndStore(KnowledgeBase kb, ModelRowView embeddingModel, List<Chunk> chunks) {
         // updateChunkVector 的 CreateRetrieveEngineForKB → DeleteByChunkIDList →
         // BatchIndex；未绑定保持 pg 直连，契约样例锁定行为不变）
-        CompositeRetrieveEngine boundEngine =
+        IndexEngine boundEngine =
                 vectorWrites.boundEngine(kb, TenantContext.currentTenantId());
         if (boundEngine != null) {
             indexAndStoreViaEngine(kb, boundEngine, chunks);
@@ -242,12 +242,12 @@ public class ChunkVectorIndexer {
      * KnowledgeType=kb.Type）；嵌入与分批/退避由 KV 引擎服务承担（40/10 分批 +
      */
     private void indexAndStoreViaEngine(KnowledgeBase kb,
-                                        CompositeRetrieveEngine engine,
+                                        IndexEngine engine,
                                         List<Chunk> chunks) {
         Embedder embedderRuntime =
                 modelRuntimeAssembler.getEmbeddingModel(kb.getEmbeddingModelId());
         List<String> ids = new ArrayList<>();
-        List<IndexInfo> items = new ArrayList<>();
+        List<IndexDocument> items = new ArrayList<>();
         Map<String, Knowledge> knowledgeCache = new HashMap<>();
         for (Chunk chunk : chunks) {
             if (chunk.getKnowledgeBaseId() == null
@@ -296,22 +296,12 @@ public class ChunkVectorIndexer {
         }
     }
 
-    /** 照 types.IndexInfo 的字段集（SourceType=ChunkSourceType=0；TagID 零值 ""）。 */
-    private static IndexInfo indexInfo(
+    /** 领域级索引载体（SourceType=ChunkSourceType=0；TagID 零值 ""）。 */
+    private static IndexDocument indexInfo(
             KnowledgeBase kb, Knowledge knowledge, String sourceId, String chunkId,
             String content, boolean enabled) {
-        IndexInfo item =
-                new IndexInfo();
-        item.sourceId = sourceId;
-        item.sourceType = EngineTypes.SOURCE_TYPE_FILE;
-        item.chunkId = chunkId;
-        item.knowledgeId = knowledge.getId();
-        item.knowledgeBaseId = kb.getId();
-        item.knowledgeType = kb.getType();
-        item.tagId = "";
-        item.content = content;
-        item.isEnabled = enabled;
-        return item;
+        return new IndexDocument(sourceId, EngineTypes.SOURCE_TYPE_FILE, chunkId,
+                knowledge.getId(), kb.getId(), kb.getType(), "", content, enabled);
     }
 
     /**

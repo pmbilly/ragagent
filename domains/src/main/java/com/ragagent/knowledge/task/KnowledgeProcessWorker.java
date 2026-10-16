@@ -29,7 +29,7 @@ import com.ragagent.platform.access.TracingContext;
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
+import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 
 import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
@@ -462,7 +462,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
      */
     private void deleteKnowledgeVectors(Knowledge k, KnowledgeBase kb,
                                         EmbedderClient.EmbedConfig embedConfig, String knowledgeId) {
-        CompositeRetrieveEngine boundEngine = vectorWrites.boundEngine(kb, k.getTenantId());
+        IndexEngine boundEngine = vectorWrites.boundEngine(kb, k.getTenantId());
         if (boundEngine != null) {
             try {
                 Embedder emb =
