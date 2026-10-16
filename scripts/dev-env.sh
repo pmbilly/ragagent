@@ -110,7 +110,7 @@ login() {
   curl -s -X POST "http://localhost:${2:-8080}/api/v1/auth/login" \
     -H 'Content-Type: application/json' \
     -d "{\"email\":\"${email}\",\"password\":\"${TEST_PASSWORD}\"}" \
-    | python3 -c 'import json,sys; print(json.load(sys.stdin)["token"])'
+    | python3 -c 'import json,sys; print(json.load(sys.stdin)["data"]["token"])'
 }
 
 # 等待服务就绪（轮询到非 000 即认为起来了）
