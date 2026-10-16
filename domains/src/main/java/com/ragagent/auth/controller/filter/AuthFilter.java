@@ -15,7 +15,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
-import com.ragagent.platform.apikey.ApiKeyAuthPort;
+import com.ragagent.contract.apikey.ApiKeyAuthPort;
+import org.springframework.http.MediaType;
 
 /**
  * 全局认证过滤器：三通道认证链。
@@ -155,8 +156,18 @@ public class AuthFilter extends OncePerRequestFilter {
         // 鉴权通过时由 channel 自行写入 principal/scope 上下文，不再往下走其它通道。
         String apiKey = request.getHeader("X-API-Key");
         if (apiKey != null && !apiKey.isEmpty()) {
-            if (apiKeyAuthChannel.authenticate(request, response)) {
+            ApiKeyAuthPort.AuthResult result = apiKeyAuthChannel.authenticate(
+                    new ApiKeyAuthPort.AuthRequest(apiKey,
+                            request.getHeader("X-Tenant-ID"),
+                            request.getHeader("X-External-User-ID"),
+                            request.getHeader("X-External-User-Token"),
+                            request.getRequestURI(), request.getMethod()));
+            if (result instanceof ApiKeyAuthPort.AuthResult.Passed) {
                 chain.doFilter(request, response);
+            } else {
+                ApiKeyAuthPort.AuthResult.Rejected rejected =
+                        (ApiKeyAuthPort.AuthResult.Rejected) result;
+                writeJson(response, rejected.status(), rejected.jsonBody());
             }
             return;
         }
@@ -230,4 +241,14 @@ public class AuthFilter extends OncePerRequestFilter {
     static void writeJson(HttpServletResponse response, String body) throws IOException {
         WsAuthSupport.writeJson(response, body);
     }
+
+    /** API-Key 契约结果的边界写出（与 Channel 原实现逐字一致）。 */
+    private static void writeJson(HttpServletResponse response, int status, String body)
+            throws IOException {
+        response.setStatus(status);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.getWriter().write(body);
+    }
+
 }

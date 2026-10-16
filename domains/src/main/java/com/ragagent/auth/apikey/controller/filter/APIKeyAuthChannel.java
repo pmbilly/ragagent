@@ -11,14 +11,15 @@ import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.access.TenantContext;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
-import com.ragagent.platform.apikey.ApiKeyAuthPort;
+import com.ragagent.contract.apikey.ApiKeyAuthPort;
+import com.ragagent.contract.apikey.ApiKeyAuthPort.AuthRequest;
+import com.ragagent.contract.apikey.ApiKeyAuthPort.AuthResult;
+import com.ragagent.contract.apikey.ApiKeyAuthPort.AuthResult.Passed;
+import com.ragagent.contract.apikey.ApiKeyAuthPort.AuthResult.Rejected;
 
 /**
  * X-API-Key 认证通道（认证链的第 3 条通道）。
@@ -71,58 +72,56 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
      * @return {@code true} = 认证通过（已写入上下文，调用方继续过滤链）；
      *         {@code false} = 已写出错误响应，调用方**不得**继续
      */
-    public boolean authenticate(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public AuthResult authenticate(AuthRequest request) {
         TenantAPIKey key;
         try {
-            key = apiKeyService.authenticate(request.getHeader("X-API-Key"));
+            key = apiKeyService.authenticate(request.apiKeyHeader());
         } catch (TenantAPIKeyNotFoundException e) {
             // 不存在 / 已撤销 / 已过期 → 同一个响应（刻意的信息隐藏）
-            writeJson(response, 401, "{\"error\":\"Unauthorized: invalid API key\"}");
-            return false;
+            return new Rejected(401, "{\"error\":\"Unauthorized: invalid API key\"}");
         }
 
         if (key.isPlatform()) {
-            String tenantHeader = trimToEmpty(request.getHeader("X-Tenant-ID"));
+            String tenantHeader = trimToEmpty(request.tenantIdHeader());
             if (tenantHeader.isEmpty()) {
-                if (!isPlatformTenantOptionalApi(request.getRequestURI(), request.getMethod())) {
+                if (!isPlatformTenantOptionalApi(request.requestUri(), request.method())) {
                     // JSON 键按字母序：code < error
-                    writeJson(response, 409, "{\"code\":\"TENANT_REQUIRED\","
+                    return new Rejected(409, "{\"code\":\"TENANT_REQUIRED\","
                             + "\"error\":\"Workspace required: platform API keys must send X-Tenant-ID\"}");
-                    return false;
                 }
                 attachPlatformKey(key);
             } else {
-                long targetTenantId = parseTenantHeader(tenantHeader, response);
+                long targetTenantId = parseTenantHeader(tenantHeader);
                 if (targetTenantId <= 0) {
-                    return false;
+                    return new Rejected(400, "{\"error\":\"Invalid X-Tenant-ID header\"}");
                 }
-                if (!attachTenantKey(request, response, targetTenantId, key)) {
-                    return false;
+                AuthResult attachResult = attachTenantKey(request, targetTenantId, key);
+                if (attachResult instanceof Rejected) {
+                    return attachResult;
                 }
             }
         } else {
             long tenantId = key.tenantIdValue();
             if (tenantId == 0L) {
-                writeJson(response, 401, "{\"error\":\"Unauthorized: invalid API key scope\"}");
-                return false;
+                return new Rejected(401, "{\"error\":\"Unauthorized: invalid API key scope\"}");
             }
-            String tenantHeader = trimToEmpty(request.getHeader("X-Tenant-ID"));
+            String tenantHeader = trimToEmpty(request.tenantIdHeader());
             if (!tenantHeader.isEmpty()) {
-                long requestedTenantId = parseTenantHeader(tenantHeader, response);
+                long requestedTenantId = parseTenantHeader(tenantHeader);
                 if (requestedTenantId <= 0) {
-                    return false;
+                    return new Rejected(400, "{\"error\":\"Invalid X-Tenant-ID header\"}");
                 }
                 if (requestedTenantId != tenantId) {
-                    writeJson(response, 403,
+                    return new Rejected(403,
                             "{\"error\":\"Forbidden: workspace API key cannot switch workspaces\"}");
-                    return false;
                 }
             }
-            if (!attachTenantKey(request, response, tenantId, key)) {
-                return false;
+            AuthResult attachResult = attachTenantKey(request, tenantId, key);
+            if (attachResult instanceof Rejected) {
+                return attachResult;
             }
         }
-        return true;
+        return new Passed();
     }
 
     /**
@@ -145,12 +144,11 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
      * @return false 表示已写响应（租户不存在）
      */
     /** 租户身份 + 首位用户（或合成用户）+ API 主体模式解析。 */
-    private boolean attachTenantKey(HttpServletRequest request, HttpServletResponse response,
-                                    long tenantId, TenantAPIKey key) throws IOException {
+    private AuthResult attachTenantKey(AuthRequest request,
+                                       long tenantId, TenantAPIKey key) {
         if (!tenantService.exists(tenantId)) {
             // 统一 401 invalid API key（不泄露"租户不存在"）
-            writeJson(response, 401, "{\"error\":\"Unauthorized: invalid API key\"}");
-            return false;
+            return new Rejected(401, "{\"error\":\"Unauthorized: invalid API key\"}");
         }
 
         // 租户首位用户（created_at 最早），查不到走合成用户兜底
@@ -170,9 +168,8 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
             ApiPrincipalResolutionOut resolution = resolveApiPrincipal(tenantId,
                     tenantService.apiPrincipalConfig(tenantId), request);
             if (resolution.error() != null) {
-                writeJson(response, 401,
+                return new Rejected(401,
                         "{\"error\":\"" + resolution.error() + "\"}");
-                return false;
             }
             principalType = resolution.principalType();
             principalId = resolution.principalId();
@@ -187,7 +184,7 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
                 role, false, userId, false);
         APIKeyScopeContext.set(new TenantAPIKeyScope(
                 key.getId(), key.getScopeType(), fullAccess, key.getKnowledgeBaseIds(), key.getCapabilities()));
-        return true;
+        return new Passed();
     }
 
     /** {@link #resolveApiPrincipal} 的返回（principal 或 401 文案）。 */
@@ -195,7 +192,7 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
             String error) {}
 
     private ApiPrincipalResolutionOut resolveApiPrincipal(long tenantId,
-            APIPrincipalConfig cfg, HttpServletRequest request) {
+            APIPrincipalConfig cfg, AuthRequest request) {
         // fallback = api_tenant/<tenantId>；cfg 缺失/mode 空/tenant 模式 → 回落
         if (cfg == null || cfg.mode == null || cfg.mode.isEmpty()
                 || APIPrincipalConfig.MODE_TENANT.equals(cfg.mode)) {
@@ -205,7 +202,7 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
             case APIPrincipalConfig.MODE_DIRECT_HEADER -> {
                 // 用常量头名 X-External-User-ID（刻意不读 cfg.directHeaderName）
                 String externalUserId = trimToEmpty(
-                        request.getHeader(EXTERNAL_USER_ID_HEADER));
+                        request.externalUserIdHeader());
                 if (externalUserId.isEmpty()) {
                     if (cfg.requireDirectHeader) {
                         return new ApiPrincipalResolutionOut(null, null,
@@ -221,7 +218,7 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
                         tenantId + ":" + externalUserId, null);
             }
             case APIPrincipalConfig.MODE_SIGNED_TOKEN -> {
-                String token = trimToEmpty(request.getHeader(EXTERNAL_USER_TOKEN_HEADER));
+                String token = trimToEmpty(request.externalUserTokenHeader());
                 String sub = verifyExternalUserJwt(token, tenantId,
                         cfg.hmacSecret == null ? "" : cfg.hmacSecret);
                 if (sub == null) {
@@ -363,16 +360,12 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
     }
 
     /** 解析 X-Tenant-ID：非数字或 ≤ 0 视为畸形，写出 400。 */
-    private static long parseTenantHeader(String header, HttpServletResponse response) throws IOException {
+    private static long parseTenantHeader(String header) {
         long parsed;
         try {
             parsed = Long.parseLong(header);
         } catch (NumberFormatException e) {
             parsed = 0L;
-        }
-        if (parsed <= 0L) {
-            writeJson(response, 400, "{\"error\":\"Invalid X-Tenant-ID header\"}");
-            return 0L;
         }
         return parsed;
     }
@@ -381,10 +374,4 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
         return value == null ? "" : value.trim();
     }
 
-    private static void writeJson(HttpServletResponse response, int status, String body) throws IOException {
-        response.setStatus(status);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.getWriter().write(body);
-    }
 }

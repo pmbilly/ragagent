@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import com.ragagent.contract.apikey.ApiKeyAuthPort;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
@@ -82,11 +85,7 @@ class APIKeyAuthChannelPrincipalTest {
         if (config != null) {
             when(tenantService.apiPrincipalConfig(TENANT)).thenReturn(config);
         }
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        boolean ok = channel.authenticate(request, response);
-        if (response.getStatus() != 200 && response.getStatus() != 0 && !ok) {
-            // 401 场景：调用方自行断言 body
-        }
+        toResponse(channel.authenticate(toRequest(request)));
     }
 
     /** tenant 模式（配置缺省）→ 回落 api_tenant/<tenantId> + 合成用户。 */
@@ -224,9 +223,7 @@ class APIKeyAuthChannelPrincipalTest {
         }
         when(tenantService.apiPrincipalConfig(TENANT)).thenReturn(config);
 
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        channel.authenticate(request, response);
-        return response;
+        return toResponse(channel.authenticate(toRequest(request)));
     }
 
     private static String hs256(String claimsJson) throws Exception {
@@ -240,4 +237,30 @@ class APIKeyAuthChannelPrincipalTest {
         return header + "." + payload + "."
                 + Base64.getUrlEncoder().withoutPadding().encodeToString(sig);
     }
+
+    /** servlet 请求 → 契约中性输入（与 AuthFilter 边界构造逐字一致）。 */
+    private static ApiKeyAuthPort.AuthRequest toRequest(MockHttpServletRequest request) {
+        return new ApiKeyAuthPort.AuthRequest(request.getHeader("X-API-Key"),
+                request.getHeader("X-Tenant-ID"),
+                request.getHeader("X-External-User-ID"),
+                request.getHeader("X-External-User-Token"),
+                request.getRequestURI(), request.getMethod());
+    }
+
+    /** 契约结果 → 响应（与 AuthFilter 边界写出逐字一致，供 status/body 断言）。 */
+    private static MockHttpServletResponse toResponse(ApiKeyAuthPort.AuthResult result) {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        if (result instanceof ApiKeyAuthPort.AuthResult.Rejected rejected) {
+            response.setStatus(rejected.status());
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            try {
+                response.getWriter().write(rejected.jsonBody());
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+        return response;
+    }
+
 }
