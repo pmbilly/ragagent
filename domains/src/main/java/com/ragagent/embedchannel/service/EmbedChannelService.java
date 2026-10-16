@@ -20,7 +20,7 @@ import com.ragagent.embedchannel.EmbedTokens;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.mapper.EmbedChannelMapper;
 import com.ragagent.contract.knowledge.ChunkRowView;
-import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 
 /**
  * embed 渠道 service（含 session token/签名段）。

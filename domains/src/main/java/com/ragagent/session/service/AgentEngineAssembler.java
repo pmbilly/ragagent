@@ -28,7 +28,7 @@ import com.ragagent.agent.tool.TodoWriteTool;
 import com.ragagent.agenttools.web.WebFetchTool;
 import com.ragagent.agenttools.web.WebSearchTool;
 import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.agent.prompt.RecentDocInfo;
@@ -299,9 +299,9 @@ final class AgentEngineAssembler {
                 try {
                     var page = knowledgeService.listKnowledge(kbId, 1, 10, null, "completed",
                             null, null, false);
-                    docCount = (int) Math.max(page.getTotal(), 0);
-                    if (page.getRecords() != null) {
-                        for (KnowledgeRowView k : page.getRecords()) {
+                    docCount = (int) Math.max(page.total(), 0);
+                    if (page.items() != null) {
+                        for (KnowledgeRowView k : page.items()) {
                             if (k == null || recentDocs.size() >= 10) {
                                 break;
                             }

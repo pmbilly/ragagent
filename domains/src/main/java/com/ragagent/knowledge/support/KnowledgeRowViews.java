@@ -3,6 +3,7 @@ package com.ragagent.knowledge.support;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ragagent.contract.knowledge.KnowledgePageView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -148,16 +149,12 @@ public final class KnowledgeRowViews {
         v.setKnowledgeBaseName(fresh.getKnowledgeBaseName());
     }
 
-    /** MyBatis-Plus 分页（实体页 → 视图页；null 透传）。 */
-    public static Page<KnowledgeRowView> pageView(
+    /** MyBatis-Plus 分页（实体页 → 契约分页视图；null 透传）。 */
+    public static KnowledgePageView pageView(
             Page<Knowledge> p) {
         if (p == null) {
             return null;
         }
-        Page<KnowledgeRowView> out =
-                new Page<>(
-                        p.getCurrent(), p.getSize(), p.getTotal());
-        out.setRecords(rowViews(p.getRecords()));
-        return out;
+        return new KnowledgePageView(rowViews(p.getRecords()), p.getTotal());
     }
 }

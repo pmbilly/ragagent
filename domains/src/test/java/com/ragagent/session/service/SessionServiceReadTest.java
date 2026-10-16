@@ -22,7 +22,7 @@ import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.contract.websearch.WebSearchTempStatePort;
 import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 
 /**
  * 会话读路径的可见性判定（{@code loadSessionForRead} /

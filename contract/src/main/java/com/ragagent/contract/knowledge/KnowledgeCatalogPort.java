@@ -1,16 +1,8 @@
-package com.ragagent.platform.knowledge;
+package com.ragagent.contract.knowledge;
 
 import java.util.List;
 import java.util.Map;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.knowledge.FaqEntryPageView;
-import com.ragagent.contract.knowledge.KnowledgeTagView;
-import com.ragagent.contract.knowledge.ChunkRowView;
-import com.ragagent.contract.knowledge.ChunkPageView;
-import com.ragagent.contract.knowledge.KnowledgeRowView;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 
 /**
  * 知识目录读写端口（L1）：知识条目与知识库两族的按 id/租户读取与增删。
@@ -40,7 +32,7 @@ public interface KnowledgeCatalogPort {
     KnowledgeRowView getKnowledgeInTenant(long tenantId, String id);
 
     /** 知识分页列表（关键字 / 解析状态 / 文件类型 / 目录过滤）。 */
-    Page<KnowledgeRowView> listKnowledge(String kbId, long page, long pageSize,
+    KnowledgePageView listKnowledge(String kbId, long page, long pageSize,
             String keyword, String parseStatus, String fileType,
             String folderPath, boolean folderPresent);
 
@@ -54,7 +46,7 @@ public interface KnowledgeCatalogPort {
 
     /** 从文件内容建知识（IM 附件落库路径）；重复 ⇒ 409 异常。 */
     KnowledgeRowView createFromFile(String kbId, byte[] fileContent, String fileName,
-            String displayName, JsonNode customMetadata, String channel);
+            String displayName, Object customMetadata, String channel);
 
     // ── 分块（读，权限解析用） ──
 

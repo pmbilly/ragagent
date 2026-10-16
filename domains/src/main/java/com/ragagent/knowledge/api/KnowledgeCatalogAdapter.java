@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ragagent.contract.knowledge.KnowledgePageView;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.FaqEntryPageView;
 import com.ragagent.contract.knowledge.FaqEntryView;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -112,7 +112,7 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     }
 
     @Override
-    public Page<KnowledgeRowView> listKnowledge(String kbId, long page, long pageSize,
+    public KnowledgePageView listKnowledge(String kbId, long page, long pageSize,
             String keyword, String parseStatus, String fileType,
             String folderPath, boolean folderPresent) {
         return KnowledgeRowViews.pageView(knowledgeService.listKnowledge(kbId, page, pageSize, keyword, parseStatus,
@@ -131,9 +131,9 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
 
     @Override
     public KnowledgeRowView createFromFile(String kbId, byte[] fileContent, String fileName,
-            String displayName, JsonNode customMetadata, String channel) {
+            String displayName, Object customMetadata, String channel) {
         return KnowledgeRowViews.rowView(knowledgeService.createFromFile(kbId, fileContent, fileName,
-                displayName, customMetadata, channel));
+                displayName, JsonMappers.toJsonNode(customMetadata), channel));
     }
 
     @Override

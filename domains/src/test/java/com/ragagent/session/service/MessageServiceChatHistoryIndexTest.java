@@ -26,7 +26,7 @@ import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**

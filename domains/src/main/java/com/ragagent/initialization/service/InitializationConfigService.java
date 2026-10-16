@@ -24,7 +24,7 @@ import com.ragagent.contract.knowledge.KnowledgeBaseResponse;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.initialization.dto.InitResponses;
 import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.model.ModelView;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 

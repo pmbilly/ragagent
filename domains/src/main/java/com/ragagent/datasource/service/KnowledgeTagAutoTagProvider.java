@@ -3,7 +3,7 @@ package com.ragagent.datasource.service;
 import com.ragagent.contract.error.BizException;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeTagView;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 

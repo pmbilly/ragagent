@@ -26,7 +26,7 @@ import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 
 /**
  * initialization 路由。系统级端点（ollama 管理、模型连通性测试、抽取）

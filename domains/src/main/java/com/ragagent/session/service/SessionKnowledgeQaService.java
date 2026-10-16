@@ -32,7 +32,7 @@ import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 
-import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.retrieval.SearchResult;
 
 import static com.ragagent.session.service.QaSupport.TagScope;

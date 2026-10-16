@@ -40,7 +40,7 @@ import com.ragagent.session.domain.message.MessageWithSession;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 
 /**
  * 消息搜索的**向量路径**。

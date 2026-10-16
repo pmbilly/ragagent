@@ -40,7 +40,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.platform.settings.ConversationProperties;
 
-import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.domain.ChatConfig;

@@ -20,7 +20,7 @@ import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.settings.ConversationProperties;
 
-import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;

@@ -46,7 +46,7 @@ import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.contract.knowledge.ChunkRowView;
 
-import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.ChunkPageView;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;

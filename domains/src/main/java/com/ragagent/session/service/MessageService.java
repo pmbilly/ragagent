@@ -14,7 +14,7 @@ import com.ragagent.contract.tenant.ChatHistoryConfig;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.agent.tool.runtime.ThinkBlocks;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.domain.ChatHistoryKbStats;
