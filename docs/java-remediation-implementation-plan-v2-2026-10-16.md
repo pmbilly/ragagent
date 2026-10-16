@@ -46,7 +46,8 @@
 | 8b | `LanguageProperties` · `RetrievalDriverProperties` · `TenantProperties`（`@ConfigurationProperties`） | `platform.config` | **裁定留 platform（不搬）**：配置绑定＝框架面（判定标准二"技术适配"含框架绑定）；命名（`*Properties`）不在 C8 红灯清单——登记为豁免项 | — |
 | 9 | `SessionQaPort` · `EmbedSessionPort`（servlet+ResponseEntity 签名） | `platform.session.{qa,embed}` | 签名中性化（`EventBusInterface` 已就位；servlet/ResponseEntity 归边界）→ `contract.session` | **P4** |
 | 10 | `AdminUserPort` · `AdminUserView` · `ApiKeyAuthPort` | `platform.{auth,apikey}` | 签名中性化 → `contract.auth` / `contract.apikey`（方案 §8.1 原文落点） | **P4** |
-| 11 | `KnowledgeCatalogPort` · `FaqChunkMetadataCodec` | `platform.knowledge` | 端口中性化（去 MyBatis-Plus `Page`）→ `contract.knowledge`；codec 归域 | **P4** |
+| 11 | `KnowledgeCatalogPort` | `platform.knowledge` | 端口中性化（去 MyBatis-Plus `Page`）→ `contract.knowledge` | ✅ 92c5eb70 |
+| 11b | `FaqChunkMetadataCodec` | `platform.knowledge` | **裁定留 platform（不搬）**：映射面（JSON 读写）＝技术适配；跨 knowledge/agenttools/chatpipeline 三域消费，归域会造边——登记豁免 | — |
 | 12 | `Settings` 2 件（`ConversationProperties`/`SystemSettingRegistry`） | `platform.settings` | 去 platform 依赖（`PromptSource`/`ToolJson`）→ `contract.settings` | **P4** |
 | 13 | `ParserEngineConfig` | `platform.tenant` | 回 `tenant` 域（方案 §8.9 原文落点）；跨域读取走 `TenantConfigLookup` 端口 | **P5** |
 | 14 | `BaseTool` | `platform.tool` | 归 `agent-engine`（工具实现基类） | **R5**（随 agent） |
