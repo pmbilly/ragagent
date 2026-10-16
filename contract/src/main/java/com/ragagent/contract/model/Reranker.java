@@ -1,4 +1,4 @@
-package com.ragagent.rerank;
+package com.ragagent.contract.model;
 
 import java.util.List;
 

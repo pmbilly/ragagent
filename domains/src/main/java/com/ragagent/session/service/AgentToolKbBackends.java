@@ -22,8 +22,8 @@ import com.ragagent.platform.settings.ConversationProperties;
 
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
-import com.ragagent.rerank.RankResult;
-import com.ragagent.rerank.Reranker;
+import com.ragagent.contract.model.RankResult;
+import com.ragagent.contract.model.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.knowledge.ChunkFacts;

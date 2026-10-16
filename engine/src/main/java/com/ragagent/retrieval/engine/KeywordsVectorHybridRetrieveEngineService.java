@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.embedding.Embedder;
+import com.ragagent.contract.model.Embedder;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
@@ -51,7 +51,7 @@ import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
  *   <li>并发用 Java 21 虚拟线程执行器 + {@code Semaphore}；
  *       首批失败即取消其余任务</li>
  *   <li>分批工具为本类内 {@code chunkSlice}（末批可短）</li>
- *   <li>嵌入口直接用全仓统一的 {@link com.ragagent.embedding.Embedder}
+ *   <li>嵌入口直接用全仓统一的 {@link com.ragagent.contract.model.Embedder}
  *       （不为检索引擎单独造薄口）</li>
  * </ul>
  */

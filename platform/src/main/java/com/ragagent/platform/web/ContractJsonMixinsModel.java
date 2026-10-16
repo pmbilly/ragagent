@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.contract.retrieval.SearchResult;
@@ -21,6 +23,27 @@ import com.ragagent.contract.retrieval.SearchResult;
 public final class ContractJsonMixinsModel {
 
     private ContractJsonMixinsModel() {
+    }
+
+    /** RankResult 的 mixin（注解逐条对位；index/document 是同名标注，relevance_score 是真改名）。 */
+    public abstract static class RankResultMixin {
+
+        @JsonProperty("index")
+        private int index;
+
+        @JsonProperty("document")
+        private RankResult.DocumentInfo document;
+
+        @JsonProperty("relevance_score")
+        private double relevanceScore;
+
+        /** 内嵌文档形状：恒输出 {@code {"text":"..."}}。 */
+        public abstract static class DocumentInfoMixin {
+
+            @JsonProperty("text")
+            private String text;
+
+        }
     }
 
     /** StreamResponse 的 mixin（注解逐条对位，行为与搬迁前一致）。 */

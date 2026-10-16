@@ -6,8 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.rerank.RankResult;
-import com.ragagent.rerank.Reranker;
+import com.ragagent.contract.model.RankResult;
+import com.ragagent.contract.model.Reranker;
 
 /**
  * rerank 客户端的 langfuse 装饰器：

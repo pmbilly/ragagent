@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.rerank.RankResult;
+import com.ragagent.contract.model.RankResult;
 
 /**
  * 模型观测的载荷/用量辅助（文本截断、预览、用量估算、usage 转换）。

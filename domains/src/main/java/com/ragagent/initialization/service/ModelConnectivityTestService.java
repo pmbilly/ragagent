@@ -28,7 +28,7 @@ import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.rerank.RerankerFactory;
-import com.ragagent.embedding.Embedder;
+import com.ragagent.contract.model.Embedder;
 import com.ragagent.embedding.EmbedderConfig;
 import com.ragagent.embedding.EmbedderFactory;
 import com.ragagent.contract.doc.DocReaderParsePort;

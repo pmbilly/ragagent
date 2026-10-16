@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.model.Embedder;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.embedding.provider.AliyunEmbedder;
 import com.ragagent.embedding.provider.AzureOpenAiEmbedder;

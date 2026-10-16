@@ -44,6 +44,7 @@ import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.contract.model.chat.FunctionDef;
 import com.ragagent.contract.model.chat.ImageUrl;
+import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.contract.model.chat.MessageContentPart;
@@ -104,6 +105,9 @@ public final class ContractJsonModule extends SimpleModule {
         setMixInAnnotation(ExtractedItem.class, ContractJsonMixinsCore.ExtractedItemMixin.class);
         setMixInAnnotation(FunctionDef.class, ContractJsonMixinsModelChat.FunctionDefMixin.class);
         setMixInAnnotation(ImageInfo.class, ContractJsonMixinsWebSearch.ImageInfoMixin.class);
+        setMixInAnnotation(RankResult.class, ContractJsonMixinsModel.RankResultMixin.class);
+        setMixInAnnotation(RankResult.DocumentInfo.class,
+                ContractJsonMixinsModel.RankResultMixin.DocumentInfoMixin.class);
         setMixInAnnotation(StreamResponse.class, ContractJsonMixinsModel.StreamResponseMixin.class);
         setMixInAnnotation(ImageUrl.class, ContractJsonMixinsModelChat.ImageUrlMixin.class);
         setMixInAnnotation(IndexConfig.class, ContractJsonMixinsCore.IndexConfigMixin.class);

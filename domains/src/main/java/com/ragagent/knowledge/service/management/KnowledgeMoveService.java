@@ -19,7 +19,7 @@ import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.engine.PgVectorEngineRepository;
 import org.springframework.stereotype.Service;
 import com.ragagent.contract.graph.NameSpace;
-import com.ragagent.embedding.Embedder;
+import com.ragagent.contract.model.Embedder;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.knowledge.task.KnowledgeTaskProgressStore;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;

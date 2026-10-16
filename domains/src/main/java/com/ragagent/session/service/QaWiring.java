@@ -46,7 +46,7 @@ import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
-import com.ragagent.rerank.Reranker;
+import com.ragagent.contract.model.Reranker;
 import com.ragagent.rerank.RerankerConfig;
 import com.ragagent.rerank.RerankerFactory;
 import com.ragagent.platform.prompt.PromptSource;

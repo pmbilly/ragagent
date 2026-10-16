@@ -20,7 +20,7 @@ import com.ragagent.contract.event.payload.MemoryRecalledData;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.memory.MemoryRecallPort;
-import com.ragagent.rerank.Reranker;
+import com.ragagent.contract.model.Reranker;
 
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.agent.budget.AgentBudgets;

@@ -2,6 +2,8 @@ package com.ragagent.embedding;
 
 import java.util.List;
 
+import com.ragagent.contract.model.Embedder;
+
 /**
  * 批量向量化的并发池化口。
  *

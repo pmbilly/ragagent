@@ -26,7 +26,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.graph.NameSpace;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.platform.access.TracingContext;
-import com.ragagent.embedding.Embedder;
+import com.ragagent.contract.model.Embedder;
 import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;

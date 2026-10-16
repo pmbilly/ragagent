@@ -14,6 +14,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.model.RankResult;
+import com.ragagent.contract.model.Reranker;
 import com.ragagent.platform.security.SsrfGuard;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -510,7 +512,7 @@ class RerankWireTest {
                         "{\"index\": 7, \"document\": {\"text\": \"This is a document\"}}",
                         "This is a document", 7, 0.0));
         for (Case c : cases) {
-            RankResult r = RankResult.parse(ProviderJson.parse(c.input()));
+            RankResult r = RankResultCodec.parse(ProviderJson.parse(c.input()));
             assertEquals(c.text(), r.getDocument().getText(), c.name());
             assertEquals(c.index(), r.getIndex(), c.name());
             assertEquals(c.score(), r.getRelevanceScore(), c.name());
@@ -521,7 +523,7 @@ class RerankWireTest {
     void rankResultAndDocumentInfoMarshal() {
         RankResult.DocumentInfo doc = new RankResult.DocumentInfo();
         doc.setText("Test document content");
-        assertEquals("{\"text\":\"Test document content\"}", doc.marshal());
+        assertEquals("{\"text\":\"Test document content\"}", RankResultCodec.marshalDocument(doc));
 
         RankResult r = new RankResult();
         r.setIndex(1);
@@ -529,8 +531,8 @@ class RerankWireTest {
         r.setRelevanceScore(0.95);
         // 录制 marshal 形状：{"index":1,"document":{"text":"Test document"},"relevance_score":0.95}
         assertEquals("{\"index\":1,\"document\":{\"text\":\"Test document\"},\"relevance_score\":0.95}",
-                r.marshal());
-        RankResult back = RankResult.parse(ProviderJson.parse(r.marshal()));
+                RankResultCodec.marshal(r));
+        RankResult back = RankResultCodec.parse(ProviderJson.parse(RankResultCodec.marshal(r)));
         assertEquals(1, back.getIndex());
         assertEquals("Test document", back.getDocument().getText());
         assertEquals(0.95, back.getRelevanceScore());

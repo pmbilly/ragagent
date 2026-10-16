@@ -18,7 +18,7 @@ import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.rerank.Reranker;
+import com.ragagent.contract.model.Reranker;
 
 /**
  * chat 管线消费面的窄 seam 接口集合，只收管线实际调用的方法子集。

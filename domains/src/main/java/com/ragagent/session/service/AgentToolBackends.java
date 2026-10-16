@@ -48,7 +48,7 @@ import com.ragagent.contract.knowledge.ChunkRowView;
 
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.ChunkPageView;
-import com.ragagent.rerank.Reranker;
+import com.ragagent.contract.model.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.contract.wiki.WikiPageOpsPort;
 import com.ragagent.contract.tool.AgentTool;

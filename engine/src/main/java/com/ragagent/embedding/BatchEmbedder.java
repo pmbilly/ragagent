@@ -1,6 +1,7 @@
 package com.ragagent.embedding;
 
 import java.util.ArrayList;
+import com.ragagent.contract.model.Embedder;
 import com.ragagent.platform.config.AppEnvLookup;
 import java.util.List;
 import java.util.concurrent.ExecutorService;

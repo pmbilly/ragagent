@@ -3,7 +3,7 @@ package com.ragagent.retrieval.engine;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.embedding.Embedder;
+import com.ragagent.contract.model.Embedder;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;

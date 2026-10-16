@@ -3,6 +3,7 @@ package com.ragagent.embedding;
 import java.util.Locale;
 import java.util.Map;
 
+import com.ragagent.contract.model.Embedder;
 import com.ragagent.embedding.provider.AliyunEmbedder;
 import com.ragagent.embedding.provider.AzureOpenAiEmbedder;
 import com.ragagent.embedding.provider.BaseEmbedder;

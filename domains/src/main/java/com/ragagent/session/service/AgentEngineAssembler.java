@@ -15,7 +15,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.memory.MemoryRecallPort;
-import com.ragagent.rerank.Reranker;
+import com.ragagent.contract.model.Reranker;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
 import com.ragagent.agent.skills.DbSkillSource;
 import com.ragagent.agent.skills.Manager;

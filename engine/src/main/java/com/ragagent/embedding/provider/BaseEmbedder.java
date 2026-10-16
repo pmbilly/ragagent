@@ -2,7 +2,7 @@ package com.ragagent.embedding.provider;
 
 import java.util.List;
 import java.util.Map;
-import com.ragagent.embedding.Embedder;
+import com.ragagent.contract.model.Embedder;
 import com.ragagent.embedding.EmbedderPooler;
 import com.ragagent.embedding.EmbeddingHttp;
 
