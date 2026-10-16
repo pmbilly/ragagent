@@ -45,6 +45,10 @@ dependencies {
     // 底座：engine 的公开面大量使用 common 词汇（端口/载荷/视图）⇒ api 暴露给 server。
     api(project(":platform"))
     api(project(":contract"))
+    // 模型运行时（R2 提取）：retrieval / chatpipeline / webfetch / tracing 仍引用其类型
+    // （LlmTransport 是共享 HTTP/SSRF 层）⇒ 过渡期 api 传递；R2c 组装权下沉后收窄为
+    // 逐消费点显式声明。
+    api(project(":model-runtime"))
 
     // 依 11 域的实际 import 面声明（实测 top：jackson 288 / slf4j 122 / spring-web 32 /
     // mybatis 30 / neo4j 11 / spring-http·stereotype 10 / OTLP proto 9 / spring-data-redis 7 /

@@ -35,7 +35,7 @@ START_EPOCH="$(date -j -f "%b %d %T %Y" "${START_RAW}" +%s 2>/dev/null \
 
 # 最新模块产物时刻
 NEWEST_JAR="$(ls -t domains/build/libs/*.jar engine/build/libs/*.jar \
-    common/build/libs/*.jar boot/build/libs/*.jar 2>/dev/null | head -1)"
+    model-runtime/build/libs/*.jar boot/build/libs/*.jar 2>/dev/null | head -1)"
 [ -z "${NEWEST_JAR}" ] && exit 0
 JAR_EPOCH="$(stat -f %m "${NEWEST_JAR}" 2>/dev/null || stat -c %Y "${NEWEST_JAR}" 2>/dev/null)"
 [ -z "${JAR_EPOCH}" ] && exit 0
