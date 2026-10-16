@@ -1,5 +1,6 @@
-package com.ragagent.storage.fileserve;
+package com.ragagent.config;
 
+import com.ragagent.storage.fileserve.StorageFileResolver;
 import com.ragagent.contract.storage.fileserve.OpenedFile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
