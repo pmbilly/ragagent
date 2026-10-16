@@ -47,7 +47,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import com.ragagent.modelruntime.application.ModelRuntimeConfigs;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.model.service.ModelRowViews;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
@@ -195,7 +194,7 @@ public class ModelDebugController {
         chatOpts.setThinking(opts.thinking);
 
         // 组 chat 配置 + thinking 观测
-        ChatConfig chatConfig = ModelRuntimeConfigs.chatConfig(ModelRowViews.of(model), "", "");
+        ChatConfig chatConfig = runtimeFactory.chatConfigFor(ModelRowViews.of(model));
         String thinkingControl = effectiveThinkingControl(chatConfig);
         observations.put("stream", true);
         observations.put("requestedThinking", opts.thinking != null && opts.thinking);

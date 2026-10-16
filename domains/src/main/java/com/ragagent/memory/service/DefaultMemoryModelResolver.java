@@ -2,7 +2,6 @@ package com.ragagent.memory.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 import com.ragagent.contract.model.ModelCatalogPort;
@@ -10,11 +9,7 @@ import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.ModelFacts;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatConfig;
-import com.ragagent.llm.limiter.ConcurrencyGovernor;
-import com.ragagent.llm.ollama.OllamaService;
-import com.ragagent.modelruntime.application.ChatConfigs;
-import com.ragagent.modelruntime.application.LlmChatClients;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.platform.model.EmbeddingGateway;
 
 /**
@@ -24,8 +19,9 @@ import com.ragagent.platform.model.EmbeddingGateway;
  * <p><b>目录读取走 L1 端口 {@link ModelCatalogPort}</b>（模型行视图 = id/name/type/status/参数），
  * 不再直接依赖模型域服务与实体。</p>
  *
- * <p><b>chat 配置走 L2 门面 {@link ChatConfigs}</b>（映射不依赖模型域）；
- * <b>embedding 走 L1 能力端口 {@link EmbeddingGateway}</b>（按模型事实嵌入），单条嵌入包一层。</p>
+ * <p><b>chat 客户端走契约端口 {@link ModelRuntime#chatClientFor}</b>（取数口径留在本类：
+ * {@code findModel} 的状态闸门；构造与并发闸门装饰收在 model-runtime 一处）；
+ * <b>embedding 走契约能力端口 {@link EmbeddingGateway}</b>（按模型事实嵌入），单条嵌入包一层。</p>
  */
 @Component
 public class DefaultMemoryModelResolver implements MemoryModelResolver {
@@ -34,28 +30,20 @@ public class DefaultMemoryModelResolver implements MemoryModelResolver {
     static final String MODEL_TYPE_EMBEDDING = "Embedding";
 
     private final ModelCatalogPort modelCatalog;
-    private final ObjectProvider<OllamaService> ollamaService;
-    private final ConcurrencyGovernor concurrencyGovernor;
+    private final ModelRuntime modelRuntime;
     private final EmbeddingGateway embeddingGateway;
 
     public DefaultMemoryModelResolver(ModelCatalogPort modelCatalog,
-                                      ObjectProvider<OllamaService> ollamaService,
-                                      ConcurrencyGovernor concurrencyGovernor,
+                                      ModelRuntime modelRuntime,
                                       EmbeddingGateway embeddingGateway) {
         this.modelCatalog = modelCatalog;
-        this.ollamaService = ollamaService;
-        this.concurrencyGovernor = concurrencyGovernor;
+        this.modelRuntime = modelRuntime;
         this.embeddingGateway = embeddingGateway;
     }
 
     @Override
     public LlmChatClient getChatModel(String modelId) {
-        ModelRowView model = modelCatalog.findModel(modelId);
-        ModelParameters p = model.parameters();
-        ChatConfig config = ChatConfigs.chatConfig(model,
-                p == null ? null : p.getAppId(),
-                p == null ? null : p.getAppSecret());
-        return LlmChatClients.create(config, ollamaService.getIfAvailable(), concurrencyGovernor);
+        return modelRuntime.chatClientFor(modelCatalog.findModel(modelId));
     }
 
     @Override

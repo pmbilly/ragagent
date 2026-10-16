@@ -1,17 +1,15 @@
 package com.ragagent.mcp.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.llm.limiter.ConcurrencyGovernor;
-import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpToolApproval;
@@ -75,8 +73,7 @@ public class McpServiceController {
     final McpToolApprovalService mcpToolApprovalService;
     final SsrfGuard ssrfGuard;
     final ModelCatalogPort modelCatalog;
-    final ConcurrencyGovernor concurrencyGovernor;
-    final Optional<OllamaService> ollamaService;
+    final ModelRuntime modelRuntime;
 
     /** 使用说明生成协作者。 */
     final McpUsageInstructionsOps usageOps;
@@ -89,15 +86,13 @@ public class McpServiceController {
                                 McpToolApprovalService mcpToolApprovalService,
                                 SsrfGuard ssrfGuard,
                                 ModelCatalogPort modelCatalog,
-                                ConcurrencyGovernor concurrencyGovernor,
-                                Optional<OllamaService> ollamaService) {
+                                ModelRuntime modelRuntime) {
         this.mcpServiceService = mcpServiceService;
         this.mcpMetadataService = mcpMetadataService;
         this.mcpToolApprovalService = mcpToolApprovalService;
         this.ssrfGuard = ssrfGuard;
         this.modelCatalog = modelCatalog;
-        this.concurrencyGovernor = concurrencyGovernor;
-        this.ollamaService = ollamaService;
+        this.modelRuntime = modelRuntime;
         this.usageOps = new McpUsageInstructionsOps(this);
         this.crudOps = new McpServiceCrudOps(this);
     }

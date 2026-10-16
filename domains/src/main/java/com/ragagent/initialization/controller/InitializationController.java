@@ -26,6 +26,7 @@ import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 
 /**
@@ -55,7 +56,7 @@ public class InitializationController {
     private final TextExtractionTestService textTest;
 
     public InitializationController(KnowledgeCatalogPort knowledgeCatalog,
-            ModelCatalogPort modelCatalog, SsrfGuard ssrfGuard,
+            ModelCatalogPort modelCatalog, ModelRuntime modelRuntime, SsrfGuard ssrfGuard,
             OllamaService ollamaService, OllamaDownloadTaskStore downloadTasks,
             AsrTranscriber asrTranscriber, ExtractPrompts extractPrompts,
             ConcurrencyGovernor concurrencyGovernor,
@@ -63,7 +64,7 @@ public class InitializationController {
             CryptoService cryptoService) {
         this.configService = new InitializationConfigService(knowledgeCatalog, modelCatalog, ssrfGuard);
         this.ollamaManage = new OllamaManageService(ollamaService, downloadTasks);
-        this.modelTest = new ModelConnectivityTestService(modelCatalog, ssrfGuard, ollamaService, concurrencyGovernor, cryptoService, asrTranscriber, documentReader);
+        this.modelTest = new ModelConnectivityTestService(modelCatalog, ssrfGuard, modelRuntime, asrTranscriber, documentReader);
         this.textTest = new TextExtractionTestService(extractPrompts, modelTest);
     }
 

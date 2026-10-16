@@ -26,17 +26,12 @@ import com.ragagent.session.support.PipelineViews;
 import com.ragagent.agent.budget.AgentBudgets;
 import com.ragagent.agent.skills.SkillCatalogService;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.modelruntime.application.LlmChatClients;
-import com.ragagent.llm.limiter.ConcurrencyGovernor;
-import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
 import com.ragagent.platform.tracing.decorators.LangfuseReranker;
 import com.ragagent.chatpipeline.spi.McpToolRegistrationPort;
-import com.ragagent.rerank.RerankerFactory;
 import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.modelruntime.application.ChatConfigs;
-import com.ragagent.rerank.RerankerConfigs;
+import com.ragagent.contract.model.ModelRuntime;
 
 /**
  * agent 问答 service 面。
@@ -73,10 +68,8 @@ public class SessionAgentQaService {
     private final AgentEngineAssembler engineAssembler;
 
 
-    /** 并发闸门（chat 工厂注入；null 会让 ConcurrencyChatClient NPE）。 */
-    private final ConcurrencyGovernor concurrencyGovernor;
-    private final org.springframework.beans.factory.ObjectProvider<OllamaService>
-            ollamaService;
+    /** 模型运行时（chat/rerank 客户端的构造归口）。 */
+    private final ModelRuntime modelRuntime;
     /** agent 解析（im 面请求只带 agentId：入口按需补 agentRow）。 */
     private final AgentResolver agentResolver;
 
@@ -89,16 +82,13 @@ public class SessionAgentQaService {
             javax.sql.DataSource dataSource,
             ArtifactCollectorWiring artifactCollectorWiring,
             KnowledgeCatalogPort knowledgeService,
-            ConcurrencyGovernor concurrencyGovernor,
-            org.springframework.beans.factory.ObjectProvider<OllamaService>
-                    ollamaService,
+            ModelRuntime modelRuntime,
             McpToolRegistrationPort mcpTools,
             VlmDescriberWiring vlmDescriberWiring,
             SkillCatalogService skillCatalogService,
             AgentResolver agentResolver) {
-        this.concurrencyGovernor = concurrencyGovernor;
         this.agentResolver = agentResolver;
-        this.ollamaService = ollamaService;
+        this.modelRuntime = modelRuntime;
         this.modelCatalog = modelCatalog;
         this.memoryService = memoryService;
         this.knowledgeQa = knowledgeQa;
@@ -314,23 +304,15 @@ public class SessionAgentQaService {
         if (model == null) {
             return null;
         }
-        var p = model.parameters();
-        var config = ChatConfigs.chatConfig(model,
-                p == null ? null : p.getAppId(), p == null ? null : p.getAppSecret());
-        // ⚠️ 2026-09-23 修复：governor/ollama 曾传 null——并发闸门装配（95a49c4）后
-        // ConcurrencyChatClient 必调 gateNamedN，agent 路径任何 LLM 调用都会 NPE。
+        // 取数口径留在此处（findModel 的状态闸门）；构造走 model-runtime 的工厂面
+        // （并发闸门装饰在那边装配，2026-09-23 的 NPE 教训随之固化）。
         // langfuse generation 装饰（未启用时原样返回）
-        return LangfuseChatClient.wrap(LlmChatClients.create(config,
-                ollamaService.getIfAvailable(), concurrencyGovernor));
+        return LangfuseChatClient.wrap(modelRuntime.chatClientFor(model));
     }
 
     private Reranker rerankModel(String modelId) {
-        var model = modelCatalog.findModel(modelId);
-        var p = model == null ? null : model.parameters();
-        var config = RerankerConfigs.rerankerConfig(model,
-                p == null ? null : p.getAppId(), p == null ? null : p.getAppSecret());
         // langfuse generation 装饰（未启用时原样返回）
-        return LangfuseReranker.wrap(RerankerFactory.newReranker(config));
+        return LangfuseReranker.wrap(modelRuntime.rerankerFor(modelCatalog.findModel(modelId)));
     }
 
     // ==================================================================

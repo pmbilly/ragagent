@@ -1,6 +1,7 @@
 package com.ragagent.contract.model;
 
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.chat.ChatConfig;
 
 /**
  * 模型运行时端口（契约面）：按模型 id 造出可直接调用的能力客户端。
@@ -36,4 +37,22 @@ public interface ModelRuntime {
 
     /** 构造期基址校验（SSRF）。空值直接返回。 */
     void validateVlmBaseUrl(String baseUrl);
+
+    // ── 按行视图的工厂面（取数口径留给调用方）─────────────────────────────
+    //
+    // 为什么另开一档：调用方对"怎么取行"的口径本就不同（状态闸门 findModel / 直取
+    // findModelVisible / 管理面 getModelRow），而"怎么造客户端"应当只有一处实现。
+    // 这一档不做取数、不挂观测装饰（要观测的调用方自己 wrap，见 platform.tracing.decorators）。
+
+    /** 按行视图造聊天客户端（密钥/基址/来源取自行参数；appSecret 在此解密）。 */
+    LlmChatClient chatClientFor(ModelRowView model);
+
+    /** 按行视图造嵌入客户端（不含批量池化——需要池化的内部路径自行包装）。 */
+    Embedder embedderFor(ModelRowView model);
+
+    /** 按行视图造重排客户端。 */
+    Reranker rerankerFor(ModelRowView model);
+
+    /** 按行视图取聊天配置（provider/基址/参数等；调试面读 thinking 控制等派生信息用）。 */
+    ChatConfig chatConfigFor(ModelRowView model);
 }

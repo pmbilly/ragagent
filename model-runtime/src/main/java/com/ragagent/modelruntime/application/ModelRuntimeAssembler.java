@@ -6,6 +6,7 @@ import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelParameters;
+import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.model.VlmConfig;
@@ -72,12 +73,9 @@ public class ModelRuntimeAssembler implements ModelRuntime {
     public LlmChatClient getChatModel(String modelId) {
         ModelRowView model = getModelDirect(modelId);
         log.info("Getting chat model: {}, source: {}", model.name(), model.source());
-        String[] creds = modelCredentials(model.parameters());
         try {
             // langfuse generation 装饰（未启用时原样返回，零成本）
-            return LangfuseChatClient.wrap(
-                    LlmChatClients.create(ModelRuntimeConfigs.chatConfig(model, creds[0], creds[1]),
-                            ollamaService.getIfAvailable(), concurrencyGovernor));
+            return LangfuseChatClient.wrap(chatClientFor(model));
         } catch (BizException e) {
             throw new RuntimeException(e.appError().message());
         }
@@ -88,14 +86,10 @@ public class ModelRuntimeAssembler implements ModelRuntime {
     public Embedder getEmbeddingModel(String modelId) {
         ModelRowView model = getModelGated(modelId);
         log.info("Getting embedding model: {}, source: {}", model.name(), model.source());
-        String[] creds = modelCredentials(model.parameters());
         try {
-            // pooler 只服务批量向量化；debug 只走单文本 embed，传 null
+            // pooler 只服务批量向量化；debug 只走单文本 embed，工厂面传 null
             // langfuse generation 装饰
-            return LangfuseEmbedder.wrap(
-                    EmbedderFactory.newEmbedder(
-                            ModelRuntimeConfigs.embedderConfig(model, creds[0], creds[1]),
-                            null, ollamaService.getIfAvailable(), concurrencyGovernor));
+            return LangfuseEmbedder.wrap(embedderFor(model));
         } catch (BizException e) {
             throw new RuntimeException(e.appError().message());
         }
@@ -106,12 +100,9 @@ public class ModelRuntimeAssembler implements ModelRuntime {
     public Reranker getRerankModel(String modelId) {
         ModelRowView model = getModelGated(modelId);
         log.info("Getting rerank model: {}, source: {}", model.name(), model.source());
-        String[] creds = modelCredentials(model.parameters());
         try {
             // langfuse generation 装饰
-            return LangfuseReranker.wrap(
-                    RerankerFactory.newReranker(
-                            ModelRuntimeConfigs.rerankerConfig(model, creds[0], creds[1])));
+            return LangfuseReranker.wrap(rerankerFor(model));
         } catch (BizException e) {
             throw new RuntimeException(e.appError().message());
         }
@@ -163,6 +154,38 @@ public class ModelRuntimeAssembler implements ModelRuntime {
         } catch (RuntimeException e) {
             throw new RuntimeException("base URL SSRF check failed: " + e.getMessage());
         }
+    }
+
+    // ── 按行视图的工厂面（不做取数、不挂观测装饰）──────────────────────────
+
+    /** 按行视图造聊天客户端：密钥/基址/来源取自行参数，appSecret 在此解密。 */
+    @Override
+    public LlmChatClient chatClientFor(ModelRowView model) {
+        String[] creds = modelCredentials(model.parameters());
+        return LlmChatClients.create(ModelRuntimeConfigs.chatConfig(model, creds[0], creds[1]),
+                ollamaService.getIfAvailable(), concurrencyGovernor);
+    }
+
+    /** 按行视图造嵌入客户端（池化留给需要它的内部路径）。 */
+    @Override
+    public Embedder embedderFor(ModelRowView model) {
+        String[] creds = modelCredentials(model.parameters());
+        return EmbedderFactory.newEmbedder(ModelRuntimeConfigs.embedderConfig(model, creds[0], creds[1]),
+                null, ollamaService.getIfAvailable(), concurrencyGovernor);
+    }
+
+    /** 按行视图造重排客户端。 */
+    @Override
+    public Reranker rerankerFor(ModelRowView model) {
+        String[] creds = modelCredentials(model.parameters());
+        return RerankerFactory.newReranker(ModelRuntimeConfigs.rerankerConfig(model, creds[0], creds[1]));
+    }
+
+    /** 按行视图取聊天配置。 */
+    @Override
+    public ChatConfig chatConfigFor(ModelRowView model) {
+        String[] creds = modelCredentials(model.parameters());
+        return ModelRuntimeConfigs.chatConfig(model, creds[0], creds[1]);
     }
 
     // ── 取数口径 ─────────────────────────────────────────────────────────

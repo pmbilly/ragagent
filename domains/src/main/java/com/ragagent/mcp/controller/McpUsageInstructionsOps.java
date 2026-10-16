@@ -18,8 +18,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.modelruntime.application.LlmChatClients;
-import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
@@ -33,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.ragagent.modelruntime.application.ChatConfigs;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 /**
@@ -288,12 +285,8 @@ final class McpUsageInstructionsOps {
         return selected;
     }
 
-    /** 由模型配置构造 LLM 客户端 */
+    /** 由模型行构造 LLM 客户端（构造收在 model-runtime，本类不 import 模型族实现） */
     private LlmChatClient chatClientFor(ModelRowView model) {
-        var p = model.parameters();
-        ChatConfig config = ChatConfigs.chatConfig(model,
-                p == null ? null : p.getAppId(),
-                p == null ? null : p.getAppSecret());
-        return LlmChatClients.create(config, ctrl.ollamaService.orElse(null), ctrl.concurrencyGovernor);
+        return ctrl.modelRuntime.chatClientFor(model);
     }
 }

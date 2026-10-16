@@ -15,30 +15,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.security.CryptoService;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.llm.limiter.ConcurrencyGovernor;
-import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.contract.model.ModelParameters;
-import com.ragagent.rerank.RerankerFactory;
 import com.ragagent.contract.model.Embedder;
-import com.ragagent.embedding.EmbedderConfig;
-import com.ragagent.embedding.EmbedderFactory;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.platform.storage.config.UploadLimits;
-import com.ragagent.llm.provider.ProviderName;
-import com.ragagent.llm.provider.ProviderRegistry;
 import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.modelruntime.application.ChatConfigs;
-import com.ragagent.embedding.EmbedderConfigs;
-import com.ragagent.rerank.RerankerConfigs;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.ModelViews;
 import com.ragagent.contract.model.ModelView;
 
@@ -53,18 +42,14 @@ public final class ModelConnectivityTestService {
 
     private final ModelCatalogPort modelCatalog;
     private final SsrfGuard ssrfGuard;
-    private final OllamaService ollamaService;
-    private final ConcurrencyGovernor concurrencyGovernor;
-    private final CryptoService cryptoService;
+    private final ModelRuntime modelRuntime;
     private final AsrTranscriber asrTranscriber;
     private final DocReaderParsePort documentReader;
 
-    public ModelConnectivityTestService(ModelCatalogPort modelCatalog, SsrfGuard ssrfGuard, OllamaService ollamaService, ConcurrencyGovernor concurrencyGovernor, CryptoService cryptoService, AsrTranscriber asrTranscriber, DocReaderParsePort documentReader) {
+    public ModelConnectivityTestService(ModelCatalogPort modelCatalog, SsrfGuard ssrfGuard, ModelRuntime modelRuntime, AsrTranscriber asrTranscriber, DocReaderParsePort documentReader) {
         this.modelCatalog = modelCatalog;
         this.ssrfGuard = ssrfGuard;
-        this.ollamaService = ollamaService;
-        this.concurrencyGovernor = concurrencyGovernor;
-        this.cryptoService = cryptoService;
+        this.modelRuntime = modelRuntime;
         this.asrTranscriber = asrTranscriber;
         this.documentReader = documentReader;
     }
@@ -82,8 +67,7 @@ public final class ModelConnectivityTestService {
         boolean available;
         String message;
         try {
-            LlmChatClient chat = LlmChatClients.create(
-                    ChatConfigs.chatConfig(ModelViews.rowView(model), "", ""), ollamaService, concurrencyGovernor);
+            LlmChatClient chat = modelRuntime.chatClientFor(ModelViews.rowView(model));
             ChatOptions opts = new ChatOptions();
             opts.setMaxTokens(1);
             opts.setThinking(Boolean.FALSE); // for dashscope.aliyuncs qwen3-32b
@@ -129,11 +113,10 @@ public final class ModelConnectivityTestService {
             }
         }
         ModelView model = buildTestModel(r, "Embedding", "remote");
-        EmbedderConfig config = EmbedderConfigs.embedderConfig(ModelViews.rowView(model), "", "");
         Embedder emb;
         try {
-            // pooler：单文本 embed 不触达批路径
-            emb = EmbedderFactory.newEmbedder(config, null, ollamaService, concurrencyGovernor);
+            // pooler：单文本 embed 不触达批路径（工厂面内部传 null）
+            emb = modelRuntime.embedderFor(ModelViews.rowView(model));
         } catch (RuntimeException e) {
             return embeddingResult(false, "创建Embedder失败: " + e.getMessage(), 0);
         }
@@ -154,18 +137,12 @@ public final class ModelConnectivityTestService {
         }
         requireSsrf("Base URL", req.baseUrl());
         ModelView model = buildTestModel(req, "Rerank", "remote");
-        String appID = "";
-        String appSecret = "";
-        String providerName = providerValue(model);
-        if ("lkeap".equals(providerName) || "volcengine".equals(providerName)) {
-            appID = "";
-            appSecret = decryptModelAppSecret(model.getParameters().getAppSecret());
-        }
         boolean available;
         String message;
         try {
-            var config = RerankerConfigs.rerankerConfig(ModelViews.rowView(model), appID, appSecret);
-            var reranker = RerankerFactory.newReranker(config);
+            // 凭据口径统一由工厂面决定（取 row 的 appId/appSecret，后者内部解密）——
+            // 原先此处按 provider 分支：只对 lkeap/volcengine 解 appSecret，且 appId 恒空。
+            var reranker = modelRuntime.rerankerFor(ModelViews.rowView(model));
             var results = reranker.rerank("ping", List.of("pong"));
             int count = results == null ? 0 : results.size();
             if (count > 0) {
@@ -492,35 +469,10 @@ public final class ModelConnectivityTestService {
         if (model == null) {
             throw new IllegalStateException("model not found");
         }
-        var p = model.getParameters();
-        String appID = p == null ? "" : orEmpty(p.getAppId());
-        String appSecret = p == null ? "" : decryptModelAppSecret(p.getAppSecret());
-        return LlmChatClients.create(ChatConfigs.chatConfig(ModelViews.rowView(model), appID, appSecret),
-                ollamaService, concurrencyGovernor);
+        return modelRuntime.chatClientFor(ModelViews.rowView(model));
     }
 
-    /** 宽容解密（失败原样返回）。 */
-    private String decryptModelAppSecret(String encrypted) {
-        if (encrypted == null || encrypted.isEmpty()) {
-            return encrypted;
-        }
-        try {
-            return cryptoService.decryptAESGCM(encrypted, cryptoService.getAESKey());
-        } catch (RuntimeException e) {
-            return encrypted;
-        }
-    }
 
-    private static String providerValue(ModelView model) {
-        var p = model.getParameters();
-        String value = p == null ? "" : orEmpty(p.getProvider());
-        var name = ProviderName.fromValue(value);
-        if (name == null) {
-            name = ProviderRegistry.detectProvider(
-                    p == null ? "" : orEmpty(p.getBaseUrl()));
-        }
-        return name == null ? "" : name.value();
-    }
 
     private void requireSsrf(String label, String url) {
         try {
