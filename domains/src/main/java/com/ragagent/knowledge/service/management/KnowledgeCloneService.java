@@ -22,7 +22,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.kb.KBCloneProgress;
 import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.retrieval.engine.PgVectorEngineRepository;
+import com.ragagent.contract.retrieval.IndexEngineResolver;
 import org.springframework.stereotype.Service;
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.knowledge.task.KnowledgeTaskProgressStore;
@@ -51,7 +51,7 @@ public class KnowledgeCloneService {
     private final KnowledgeBaseService knowledgeBaseService;
     private final KnowledgeTaskProgressStore progressStore;
     private final KnowledgeVectorWrites vectorWrites;
-    private final PgVectorEngineRepository pgVectorEngineRepository;
+    private final IndexEngineResolver indexEngineResolver;
     private final ModelRuntime modelRuntimeAssembler;
     /** 后台任务执行器（统一命名与关停）。 */
     private final KnowledgeTaskExecutor taskExecutor;
@@ -63,7 +63,7 @@ public class KnowledgeCloneService {
             KnowledgeBaseService knowledgeBaseService,
             KnowledgeTaskProgressStore progressStore,
             KnowledgeVectorWrites vectorWrites,
-            PgVectorEngineRepository pgVectorEngineRepository,
+            IndexEngineResolver indexEngineResolver,
             ModelRuntime modelRuntimeAssembler) {
 
         this.taskExecutor = taskExecutor;
@@ -73,7 +73,7 @@ public class KnowledgeCloneService {
         this.knowledgeBaseService = knowledgeBaseService;
         this.progressStore = progressStore;
         this.vectorWrites = vectorWrites;
-        this.pgVectorEngineRepository = pgVectorEngineRepository;
+        this.indexEngineResolver = indexEngineResolver;
         this.modelRuntimeAssembler = modelRuntimeAssembler;
     }
 
@@ -299,7 +299,7 @@ public class KnowledgeCloneService {
                         emb.getDimensions(), dst.getType());
                 return;
             }
-            pgVectorEngineRepository.copyIndices(src.getKnowledgeBaseId(),
+            indexEngineResolver.postgresDirect().copyIndices(src.getKnowledgeBaseId(),
                     Map.of(src.getId(), dstKnowledgeId), srcToDstChunkIds, dst.getId(), 0,
                     dst.getType());
         } catch (RuntimeException e) {

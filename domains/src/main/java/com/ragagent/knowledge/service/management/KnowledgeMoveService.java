@@ -17,7 +17,7 @@ import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.retrieval.engine.PgVectorEngineRepository;
+import com.ragagent.contract.retrieval.IndexEngineResolver;
 import org.springframework.stereotype.Service;
 import com.ragagent.contract.graph.NameSpace;
 import com.ragagent.contract.model.Embedder;
@@ -45,7 +45,7 @@ public class KnowledgeMoveService {
     private final KnowledgeIngest knowledgeIngest;
     private final KnowledgeTaskProgressStore progressStore;
     private final KnowledgeVectorWrites vectorWrites;
-    private final PgVectorEngineRepository pgVectorEngineRepository;
+    private final IndexEngineResolver indexEngineResolver;
     private final RetrieveGraphRepository graphRepository;
     /** 后台任务执行器（统一命名与关停）。 */
     private final KnowledgeTaskExecutor taskExecutor;
@@ -60,7 +60,7 @@ public class KnowledgeMoveService {
             KnowledgeIngest knowledgeIngest,
             KnowledgeTaskProgressStore progressStore,
             KnowledgeVectorWrites vectorWrites,
-            PgVectorEngineRepository pgVectorEngineRepository,
+            IndexEngineResolver indexEngineResolver,
             RetrieveGraphRepository graphRepository) {
 
         this.taskExecutor = taskExecutor;
@@ -73,7 +73,7 @@ public class KnowledgeMoveService {
         this.knowledgeIngest = knowledgeIngest;
         this.progressStore = progressStore;
         this.vectorWrites = vectorWrites;
-        this.pgVectorEngineRepository = pgVectorEngineRepository;
+        this.indexEngineResolver = indexEngineResolver;
         this.graphRepository = graphRepository;
     }
 
@@ -275,7 +275,7 @@ public class KnowledgeMoveService {
                         row.getType());
                 return;
             }
-            pgVectorEngineRepository.deleteByKnowledgeIdList(List.of(row.getId()), 0, row.getType());
+            indexEngineResolver.postgresDirect().deleteByKnowledgeIdList(List.of(row.getId()), 0, row.getType());
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
@@ -317,7 +317,7 @@ public class KnowledgeMoveService {
                         List.of(), emb.getDimensions(), sourceKb.getType());
                 return;
             }
-            pgVectorEngineRepository.moveKnowledgeIndices(sourceKbId, targetKbId, knowledgeId,
+            indexEngineResolver.postgresDirect().moveKnowledgeIndices(sourceKbId, targetKbId, knowledgeId,
                     List.of(), 0, sourceKb.getType());
         } catch (RuntimeException e) {
             throw e;

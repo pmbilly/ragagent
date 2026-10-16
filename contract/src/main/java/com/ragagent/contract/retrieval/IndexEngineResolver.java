@@ -23,4 +23,13 @@ public interface IndexEngineResolver {
      * （原 domains 侧 {@code ChunkQuestionService} 的口径），那条直接失败。</p>
      */
     IndexEngine resolveFor(long tenantId, String vectorStoreId, TenantRetrievalDefault fallback);
+
+    /**
+     * **内置 pg 引擎**的写面句柄（无绑定 store 的 KB 走本机 pg 时的直连路径）。
+     *
+     * <p>与 {@link #resolveFor} 的区别：那条按 KB 的 store 解析（含租户归属校验），
+     * 本条直接给"本进程内置 pg 引擎"（组合根装配的那个 bean，与迁移/克隆链上的 pg 引擎同源）；
+     * 调用方在 KB 未绑 store 时用它保持既有直连路径。</p>
+     */
+    IndexEngine postgresDirect();
 }

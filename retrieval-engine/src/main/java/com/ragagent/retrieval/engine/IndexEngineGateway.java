@@ -30,10 +30,15 @@ public class IndexEngineGateway implements IndexEngineResolver {
     private final RetrieveEngineRegistry retrieveEngineRegistry;
     private final TenantStoreOwnership storeOwnership;
 
+    /** 内置 pg 引擎 bean（组合根装配；直连句柄与迁移/克隆链同源）。 */
+    private final PgVectorEngineRepository pgVectorEngineRepository;
+
     public IndexEngineGateway(RetrieveEngineRegistry retrieveEngineRegistry,
-                              TenantStoreOwnership storeOwnership) {
+                              TenantStoreOwnership storeOwnership,
+                              PgVectorEngineRepository pgVectorEngineRepository) {
         this.retrieveEngineRegistry = retrieveEngineRegistry;
         this.storeOwnership = storeOwnership;
+        this.pgVectorEngineRepository = pgVectorEngineRepository;
     }
 
     @Override
@@ -49,6 +54,11 @@ public class IndexEngineGateway implements IndexEngineResolver {
                         fallback.driver());
         return wrap(RetrieveEngineFactories.createForKb(
                 retrieveEngineRegistry, storeOwnership, tenantId, vectorStoreId, fallbackEngines));
+    }
+
+    @Override
+    public IndexEngine postgresDirect() {
+        return new PostgresAdapter(pgVectorEngineRepository);
     }
 
     private static IndexEngine wrap(CompositeRetrieveEngine engine) {
@@ -141,6 +151,96 @@ public class IndexEngineGateway implements IndexEngineResolver {
         @Override
         public long estimateStorageSize(Embedder embedder, List<IndexDocument> documents) {
             return engine.estimateStorageSize(embedder, toIndexInfos(documents));
+        }
+    }
+
+    /** 内部形状映射（与主适配器同口径）。 */
+    private static EngineTypes.IndexInfo toIndexInfo(IndexDocument doc) {
+        EngineTypes.IndexInfo info = new EngineTypes.IndexInfo();
+        info.content = doc.content();
+        info.sourceId = doc.sourceId();
+        info.sourceType = doc.sourceType();
+        info.chunkId = doc.chunkId();
+        info.knowledgeId = doc.knowledgeId();
+        info.knowledgeBaseId = doc.knowledgeBaseId();
+        info.knowledgeType = doc.knowledgeType();
+        info.tagId = doc.tagId();
+        info.isEnabled = doc.enabled();
+        info.isRecommended = doc.recommended();
+        return info;
+    }
+
+    private static List<EngineTypes.IndexInfo> toIndexInfos(List<IndexDocument> docs) {
+        return docs == null ? List.of() : docs.stream().map(IndexEngineGateway::toIndexInfo).toList();
+    }
+
+    /** 内置 pg 引擎的写面适配（基于 `RetrieveEngineService` 接口，不依赖实现类细节）。 */
+    private static final class PostgresAdapter implements IndexEngine {
+
+        private final PgVectorEngineRepository service;
+
+        PostgresAdapter(PgVectorEngineRepository service) {
+            this.service = service;
+        }
+
+        @Override
+        public void index(Embedder embedder, IndexDocument document) throws Exception {
+            // 直连句柄无额外引擎参数（按 KB 解析的路径由 Composite 适配器承担）
+            service.save(toIndexInfo(document), java.util.Map.of());
+        }
+
+        @Override
+        public void batchIndex(Embedder embedder, List<IndexDocument> documents) throws Exception {
+            service.batchSave(toIndexInfos(documents), java.util.Map.of());
+        }
+
+        @Override
+        public void deleteByChunkIdList(List<String> chunkIds, int dimension, String knowledgeType)
+                throws Exception {
+            service.deleteByChunkIdList(chunkIds, dimension, knowledgeType);
+        }
+
+        @Override
+        public void deleteBySourceIdList(List<String> sourceIds, int dimension, String knowledgeType)
+                throws Exception {
+            service.deleteBySourceIdList(sourceIds, dimension, knowledgeType);
+        }
+
+        @Override
+        public void deleteByKnowledgeIdList(List<String> knowledgeIds, int dimension,
+                                            String knowledgeType) throws Exception {
+            service.deleteByKnowledgeIdList(knowledgeIds, dimension, knowledgeType);
+        }
+
+        @Override
+        public void copyIndices(String sourceKnowledgeBaseId, Map<String, String> sourceToTargetKbIdMap,
+                                Map<String, String> sourceToTargetChunkIdMap, String targetKnowledgeBaseId,
+                                int dimension, String knowledgeType) throws Exception {
+            service.copyIndices(sourceKnowledgeBaseId, sourceToTargetKbIdMap, sourceToTargetChunkIdMap,
+                    targetKnowledgeBaseId, dimension, knowledgeType);
+        }
+
+        @Override
+        public void moveKnowledgeIndices(String sourceKnowledgeBaseId, String targetKnowledgeBaseId,
+                                         String knowledgeId, List<String> chunkIds, int dimension,
+                                         String knowledgeType) throws Exception {
+            service.moveKnowledgeIndices(sourceKnowledgeBaseId, targetKnowledgeBaseId, knowledgeId,
+                    chunkIds, dimension, knowledgeType);
+        }
+
+        @Override
+        public void batchUpdateChunkEnabledStatus(Map<String, Boolean> chunkStatusMap) throws Exception {
+            service.batchUpdateChunkEnabledStatus(chunkStatusMap);
+        }
+
+        @Override
+        public void batchUpdateChunkTagID(Map<String, String> chunkTagMap) throws Exception {
+            service.batchUpdateChunkTagID(chunkTagMap);
+        }
+
+        @Override
+        public long estimateStorageSize(Embedder embedder, List<IndexDocument> documents) {
+            return service.estimateStorageSize(toIndexInfos(documents), java.util.Map.of());
         }
     }
 }

@@ -32,7 +32,7 @@ class IndexEngineGatewayTest {
         RetrieveEngineRegistry registry = mock(RetrieveEngineRegistry.class);
         RetrieveEngineService service = mock(RetrieveEngineService.class);
         when(registry.getOrLoadByStoreId(42L, "store-1")).thenReturn(service);
-        IndexEngineGateway gateway = new IndexEngineGateway(registry, ownership);
+        IndexEngineGateway gateway = new IndexEngineGateway(registry, ownership, null);
 
         AtomicReference<IndexEngine> resolved = new AtomicReference<>();
         AtomicReference<Throwable> failure = new AtomicReference<>();
@@ -54,7 +54,7 @@ class IndexEngineGatewayTest {
     @DisplayName("显式传错租户：跨租户仍被拒（纵深防御不放松）")
     void rejectsWrongTenant() {
         IndexEngineGateway gateway = new IndexEngineGateway(
-                mock(RetrieveEngineRegistry.class), (storeId, tenantId) -> tenantId == 42L);
+                mock(RetrieveEngineRegistry.class), (storeId, tenantId) -> tenantId == 42L, null);
 
         assertThatThrownBy(() -> gateway.resolveFor(7L, "store-1"))
                 .isInstanceOf(RetrieveEngineException.class);
