@@ -65,7 +65,7 @@
 | **P4** | 端口中性化进 contract：`AdminUserPort/AdminUserView/ApiKeyAuthPort` · `SessionQaPort` · `KnowledgeCatalogPort` · `TenantConfigLookup` · `EmbedSessionPort`（`SseSink`/`EmbedReply`）；config/settings 五件裁定留 platform（C8 豁免登记） | ✅ **6 刀全落**（163ddfcd/9db5b06d/d792a002/92c5eb70/151c7f25/4d7accdb）——**platform 业务形状清零** |
 | **P5** | platform 收尾：fileserve/support 逐件裁；目录与 package-info 清理；**C8 门禁上线**（业务形状零命中验收） | ✅ e6f99afd / 1851b3ad / 1b020e97 |
 | **R1** | 契约面先行：`contract.model.chat`（llm.domain 11 件）+ `contract.retrieval` 缺口 + `contract.agent` 6 件 + `contract.execution` 按需 | ✅ **收官**：R1a `ae0a17c0`（11 件 → `contract.model.chat`）· R1b-1 `b5a36912`（4 件 → `contract.websearch`）；余项 **R1b-2→R3 / R1c→R5 / R1d 不建**（判定见 §2.9） |
-| **R2** | `model-runtime` 提取（**实际 153 件** = llm 58 / modelruntime 46 / embedding 21 / rerank 15 / modelcontext 13；计划的"163 件"含 tracing 6 + webfetch 4——**按计划自身 R4/R3 行裁定：tracing 归 R4、webfetch 归 R3**）；公开面分层（契约类 vs 实现面） | 🔄 **R2a ✅ `925071a2` + `f0355a7f`**（六件跨域端口/形状 → `contract.model`）· **R2b ✅ `c160b749`**（`:model-runtime` 切出：148 件主源码 + 19 测试，测试守恒 4996）；R2c（组装权下沉：`ModelAccessResolver` + 组装入 boot）待做。**R2c 待决**：`domains` 仍有 ~85 处实现对模型族的 import（OllamaService 10 / ConcurrencyGovernor 9 / LlmChatClients·ChatConfigs 各 7 / AsrTranscriber 6 / 各工厂与 Configs），现经 engine 的 api 传递可见 ⇒ 须按 §8.1 `ModelAccessResolver`（domains 实现）+ 组装入组合根落地 |
+| **R2** | `model-runtime` 提取（**实际 153 件** = llm 58 / modelruntime 46 / embedding 21 / rerank 15 / modelcontext 13；计划的"163 件"含 tracing 6 + webfetch 4——**按计划自身 R4/R3 行裁定：tracing 归 R4、webfetch 归 R3**）；公开面分层（契约类 vs 实现面） | 🔄 **R2a ✅ `925071a2`+`f0355a7f`** · **R2b ✅ `c160b749`**（模块切出） · **R2c-1a ✅ `c25d90e7`**（`ModelRuntimePort`→`contract.model.ModelRuntime`、`VlmConfig` 契约化） · **R2c-1b ✅ `76c30539`**（装配器+配置映射入 model-runtime、共享传输归位 platform.http、模块内环清零）；R2c-2（把 domains 其余 ~6 处"自建客户端"改为走 `ModelRuntime` 端口 + 收窄 engine 的 api 传递）待做 |
 | **R3** | `retrieval-engine` 提取（96 件）；与 model 侧 8~9 处边接口化；`webfetch` 归属拍板 | ⬜ |
 | **R4** | 归位：`tracing`(6)→`platform.tracing.decorators`；`chatpipeline`(46)→`domains/session/service.rag` | 🔄 **R4a ✅ `fff4d3ba`**（tracing 六件 → `platform.tracing.decorators`；契约流句柄三件 → `platform.stream`；顺带换锚 ArchUnit A16 禁用前缀）；R4b（chatpipeline 归位）待做 |
 | **R5** | `agent-engine`：契约面 + 工具 SPI 先行 → 迁 `domains/agent` 核心（79 件） | ⬜ |
@@ -103,12 +103,12 @@
 
 ```
 现状（R2b 后）                              目标（方案 §5.1）
-contract      264 件（纯 JDK，零依赖块）  →  contracts/
-platform      148 件（技术适配；业务形状已归正；含 R4a 迁入的追踪装饰器 6 件 + 流句柄 3 件）→ platform/
+contract      266 件（纯 JDK，零依赖块）  →  contracts/
+platform      150 件（技术适配；业务形状已归正；含 R4a 追踪装饰器 6 + 流句柄 3、R2c 共享传输 2）→ platform/
 model-runtime 132 件（R2b 切出：llm 54 · modelruntime 39 · embedding 18 · rerank 12 ·
-                 modelcontext 12；R4a 迁出流句柄 3 件）
+                 modelcontext 12；R4a 迁出流句柄 3、R2c 迁入装配器与配置映射 2 / 迁出传输 2）
                                         →  model-runtime（已成）
-engine        140 件（retrieval 90 · chatpipeline 46 · webfetch 4；三者将迁：
+engine        139 件（retrieval 90 · chatpipeline 46 · webfetch 4；三者将迁：
                  retrieval→retrieval-engine（R3）· chatpipeline→session（R4b）· webfetch 归属拍板（R3））
 domains      1290 件
 boot           12 件                      →  agent-engine（R5 自 domains/agent 外提）
@@ -181,6 +181,8 @@ boot           12 件                      →  agent-engine（R5 自 domains/ag
 | P4f | 2026-10-16 | `EmbedSessionPort` 中性化入契约：`SseSink`（帧出口）+ `EmbedReply`（status+body）；SSE 链全链换型（FrameWriter→Emitter→Orchestrator→Executor→Controller）+ 边界包装（DelegateOps/Adapter）；`platform.session` 包消亡 | 14 守卫全绿（R8 修复）· 金片 1349 一致 · gate 2m6s / **4996 / 失败 0 / 跳过 4** |
 | P5 | 2026-10-16 | platform 收尾三件：`ParserEngineConfig` 去框架化入 `contract.tenant`（27 注解 → Core mixin）· fileserve 逐件裁（4 端口 + `OpenedFile` 上提契约；HTTP 三件 + `StoragePaths` 留登记）· **C8 门禁上线**（业务形状棘轮，3 条登记） | 15 守卫全绿 · 金片 1349 一致 · gate 1m39s~2m23s / **4996 / 失败 0 / 跳过 4**；platform 只剩技术适配 + 3 条业务形状登记 |
 | —（杂项） | 2026-10-16 | 61 份过期文档清理（用户确认；活文档零引用已核）· `scripts/dev-env.sh` login 提取器适配统一响应壳（token 移入 data） | 冒烟 sessions / knowledge-bases 200 · token 265 字符 |
+| R2c-1b | 2026-10-16 | **组装权下沉**：`ModelRuntimeAssembler`+`ModelRuntimeConfigs` → `modelruntime.application`（依赖换成契约端口 `ModelCatalogPort`，闸门错误文案仍在装配器拆包）；`LlmTransport`+`Wiring` → `platform.http`（共享裸 HTTP 传输，非模型语义）⇒ **模块内环清零**（2 组→0、间接环 1→0），domains 的 7 个消费点不再 import model-runtime | 15 守卫绿 · 金片 1349 一致 · gate 2m12s / **4996 / 0 / 4**（platform 195→205、model-runtime 239→229）· 起服 200 |
+| R2c-1a | 2026-10-16 | 模型运行时端口契约化：`chatpipeline.spi.ModelRuntimePort` → `contract.model.ModelRuntime`（§8.1 目标名）；`VlmClient.VlmConfig` 抽为 `contract.model.VlmConfig`（纯记录 + 两个派生方法）；全仓类型名同步。**发现**：方案 §8.1 的 `ModelAccessResolver` 已被既有 `ModelCatalogPort` 覆盖，无需新建 | 15 守卫绿 · 金片 1349 一致 · gate 2m11s / 4996 / 0 / 4 · 冒烟 200 |
 | R4a | 2026-10-16 | **tracing 归位**：6 个 Langfuse 装饰器 → `platform.tracing.decorators` + 3 个契约流句柄（QueuedChatStream/SyncChatStream/StreamLifecycle）→ `platform.stream`（装饰器要建/转发流 ⇒ 句柄须在更低层）；错位测试随迁；engine 的 tracing 目录清空。**本批是 R2c 的解阻塞项**（装饰器已只依赖契约面）。顺带换锚 ArchUnit A16 禁用前缀（不改则 service 违规静默失明） | 15 守卫绿 · json-key 换锚（5 出 5 入）· 金片 1349 一致 · gate 2m4s / **4996 / 失败 0 / 跳过 4**（platform 188→195、engine 322→315）· 冒烟 200 |
 | R2b | 2026-10-16 | **`:model-runtime` 模块切出**：五包（llm/modelruntime/embedding/rerank/modelcontext）148 件主源码 + 19 件测试 `git mv`；模块清单四处同步（settings · `_source_roots.py`（守卫单一来源）· 根 jacoco 聚合 · stray-dirs/test-summary/dev-stale-check）；engine 过渡期 `api(:model-runtime)`；**Dockerfile 顺带校正**——原写已裁撤的 `common/` 且漏拷 contract/platform，`docker build` 必失败 | 15 守卫绿（R9 SCC 9 组不变 · 域间契约 6 条不变）· 大文件守卫按路径换锚 4 条（另回退 8 处无关数值刷新）· 金片 1349 一致 · gate 2m9s / **4996 / 失败 0 / 跳过 4**（model-runtime 实跑 239，engine 561→322 ⇒ 搬迁测试真跑）· 起服冒烟 200 |
 | R2a-2 | 2026-10-16 | 模型面端口与结果形状上提：`embedding.Embedder`（9）/`rerank.Reranker`（8）/`rerank.RankResult`（3）→ `contract.model`；**RankResult 拆分**——纯形状进契约面，parse/marshal 移实现侧新件 `rerank.RankResultCodec`；@JsonProperty 对位进 `ContractJsonMixinsModel`（含内嵌 DocumentInfo）；同包裸引用 7 处补 import | 15 守卫绿 · 金片 1349 一致 · json-key 换锚（离开 1 / 进入 2）· gate 1m55s / **4996 / 失败 0 / 跳过 4** · 冒烟 200 |
