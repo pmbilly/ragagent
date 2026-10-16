@@ -16,7 +16,7 @@ import com.ragagent.chatpipeline.plugin.Plugin;
 import com.ragagent.chatpipeline.plugin.PluginError;
 import com.ragagent.chatpipeline.support.QueryTokenizer;
 import com.ragagent.contract.session.PipelineMessageImageView;
-import com.ragagent.platform.session.PipelineMessageView;
+import com.ragagent.contract.session.PipelineMessageView;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.EventHandler;

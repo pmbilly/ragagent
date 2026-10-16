@@ -1,7 +1,5 @@
-package com.ragagent.platform.session;
+package com.ragagent.contract.session;
 
-import com.ragagent.contract.session.PipelineMessageAttachmentView;
-import com.ragagent.contract.session.PipelineMessageImageView;
 
 import java.time.OffsetDateTime;
 import java.util.List;

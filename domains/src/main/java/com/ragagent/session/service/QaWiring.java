@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.chatpipeline.EventManager;
 import com.ragagent.contract.session.PipelineMessageImageView;
-import com.ragagent.platform.session.PipelineMessageView;
+import com.ragagent.contract.session.PipelineMessageView;
 import com.ragagent.llm.extract.PipelineConfig;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.chatpipeline.plugin.PluginChatCompletion;

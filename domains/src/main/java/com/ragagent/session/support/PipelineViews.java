@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.contract.session.PipelineMessageImageView;
-import com.ragagent.platform.session.PipelineMessageView;
+import com.ragagent.contract.session.PipelineMessageView;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageAttachment;

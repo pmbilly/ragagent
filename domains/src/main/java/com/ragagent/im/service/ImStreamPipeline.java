@@ -28,7 +28,7 @@ import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.contract.session.QaRequestPayload;
-import com.ragagent.platform.session.embed.MessageView;
+import com.ragagent.contract.session.MessageView;
 import com.ragagent.contract.session.SessionView;
 
 /**

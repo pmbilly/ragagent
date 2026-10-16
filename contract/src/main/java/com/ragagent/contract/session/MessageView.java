@@ -1,18 +1,11 @@
-package com.ragagent.platform.session.embed;
+package com.ragagent.contract.session;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.session.MentionedItem;
-import com.ragagent.contract.session.UsedMemory;
-import com.ragagent.contract.session.MessageArtifact;
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.contract.session.MessageExecutionContext;
-import com.ragagent.contract.session.MessageImage;
 import com.ragagent.contract.model.TokenUsage;
 
 /**
@@ -21,7 +14,8 @@ import com.ragagent.contract.model.TokenUsage;
  * <p><b>为什么有它</b>：实体 Message 属会话域内部（HANDOFF §12.0 判据 1），而
  * EmbedSessionPort#loadMessages 需把它作为响应体、SessionQaPort 需经它落库。
  * 本视图**逐一镜像实体的 26 个字段与默认值**，并在同样的三个字段上标 @JsonIgnore
- * （renderedContent / agentTenantId / executionContext）⇒ **JSON 逐字节等价**
+ * （renderedContent / agentTenantId / executionContext；注解由
+ * {@code platform.web.ContractJsonMixinsSession} 的 mixin 承载，契约面纯 JDK）⇒ **JSON 逐字节等价**
  * （由 emb-pub-messages-load*.json 金片钉住）。</p>
  *
  * <p><b>可写说明</b>：DTO——适配器填充、装配面构造；访问器名与实体一致（消费方零改动）。</p>
@@ -57,19 +51,16 @@ public class MessageView {
 
     private TokenUsage usage;
 
-    @JsonIgnore
     private String renderedContent = "";
 
     private String channel;
 
     private String agentId;
 
-    @JsonIgnore
     private long agentTenantId;
 
     private String modelId;
 
-    @JsonIgnore
     private MessageExecutionContext executionContext;
 
     private String knowledgeId;

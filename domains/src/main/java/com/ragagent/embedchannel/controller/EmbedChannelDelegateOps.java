@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.platform.session.embed.MessageView;
+import com.ragagent.contract.session.MessageView;
 
 /**
  * embed 委托协作者（自 {@link EmbedChannelController} 拆出的

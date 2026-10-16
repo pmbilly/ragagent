@@ -22,7 +22,7 @@ import com.ragagent.session.controller.SessionController;
 
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.contract.session.MessageSuggestionView;
-import com.ragagent.platform.session.embed.MessageView;
+import com.ragagent.contract.session.MessageView;
 
 /**
  * {@link EmbedSessionPort} 的会话域实现：逐参数转发到既有的四个端点方法

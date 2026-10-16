@@ -8,7 +8,7 @@ import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRetrievalContext;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.session.PipelineMessageImageView;
-import com.ragagent.platform.session.PipelineMessageView;
+import com.ragagent.contract.session.PipelineMessageView;
 import com.ragagent.retrieval.domain.WebSearchResult;
 
 import com.fasterxml.jackson.databind.JsonNode;
