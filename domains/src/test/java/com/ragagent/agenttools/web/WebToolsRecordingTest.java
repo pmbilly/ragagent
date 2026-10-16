@@ -26,6 +26,15 @@ import com.ragagent.platform.web.JsonMappers;
  */
 class WebToolsRecordingTest {
 
+    /** 抓取端口桩（R4b：WebFetchTool/WebSearchTool 经契约端口取网页）。 */
+    private static final com.ragagent.contract.websearch.ToolPageFetcher STUB_FETCHER =
+            new com.ragagent.contract.websearch.ToolPageFetcher() {
+                @Override
+                public String fetch(String url) {
+                    return "stub-content";
+                }
+            };
+
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     // ------------------------------------------------------------------
@@ -52,9 +61,9 @@ class WebToolsRecordingTest {
 
     @Test
     void schemasMatchGoRecording() throws Exception {
-        WebFetchTool fetch = new WebFetchTool();
+        WebFetchTool fetch = new WebFetchTool(STUB_FETCHER);
         WebSearchTool search = new WebSearchTool(
-                (tenantId, providerId, config, query) -> List.of(), 10, "p", () -> 10002L, null);
+                (tenantId, providerId, config, query) -> List.of(), 10, "p", () -> 10002L, null, STUB_FETCHER);
         // schema 的 JsonNode toString 与录制 RAW 常量逐字节一致（同序同形）
         assertThat(JsonMappers.toJsonNode(fetch.getParameters()).toString()).isEqualTo(GO_FETCH_SCHEMA);
         assertThat(JsonMappers.toJsonNode(search.getParameters()).toString()).isEqualTo(GO_SEARCH_SCHEMA);
@@ -70,14 +79,14 @@ class WebToolsRecordingTest {
     @Test
     void searchDescriptionInjectsMaxResults() {
         WebSearchTool def = new WebSearchTool(
-                (t, p, c, q) -> List.of(), 0, "p", () -> 1L, null);
+                (t, p, c, q) -> List.of(), 0, "p", () -> 1L, null, STUB_FETCHER);
         assertThat(def.getDescription()).contains("Returns up to 10 results");
         WebSearchTool narrowed = new WebSearchTool(
-                (t, p, c, q) -> List.of(), 3, "p", () -> 1L, null);
+                (t, p, c, q) -> List.of(), 3, "p", () -> 1L, null, STUB_FETCHER);
         assertThat(narrowed.getDescription()).contains("Returns up to 3 results");
         // clamp 到 20
         WebSearchTool clamped = new WebSearchTool(
-                (t, p, c, q) -> List.of(), 25, "p", () -> 1L, null);
+                (t, p, c, q) -> List.of(), 25, "p", () -> 1L, null, STUB_FETCHER);
         assertThat(clamped.getDescription()).contains("Returns up to 20 results");
         // 模板只有一个 %d，格式化后不再有未替换的动词
         assertThat(clamped.getDescription()).doesNotContain("%d");
@@ -88,7 +97,7 @@ class WebToolsRecordingTest {
     // ------------------------------------------------------------------
 
     private static WebFetchTool fetchTool(Function<String, String> fn) {
-        return new WebFetchTool(fn::apply);
+        return new WebFetchTool((WebFetchTool.PageFetcher) fn::apply);
     }
 
     @Test
@@ -281,7 +290,7 @@ class WebToolsRecordingTest {
     @Test
     void searchRejectsBadInputLikeGo() {
         WebSearchTool tool = new WebSearchTool(
-                (t, p, c, q) -> List.of(), 10, "p", () -> 10002L, null);
+                (t, p, c, q) -> List.of(), 10, "p", () -> 10002L, null, STUB_FETCHER);
         assertThat(tool.execute(ToolRequest.of(json("{}"))).getError())
                 .isEqualTo("query parameter is required");
         assertThat(tool.execute(ToolRequest.of(
@@ -298,7 +307,7 @@ class WebToolsRecordingTest {
                 .isEqualTo("freshness must be pd, pw, pm, py, or YYYY-MM-DDtoYYYY-MM-DD with start <= end");
         // 无租户
         WebSearchTool noTenant = new WebSearchTool(
-                (t, p, c, q) -> List.of(), 10, "p", () -> 0L, null);
+                (t, p, c, q) -> List.of(), 10, "p", () -> 0L, null, STUB_FETCHER);
         assertThat(noTenant.execute(ToolRequest.of(
                 json("{\"query\":\"q\"}"))).getError())
                 .isEqualTo("workspace ID not found in context");
@@ -312,7 +321,7 @@ class WebToolsRecordingTest {
                 row("Dirty", "ftp://bad.example/", "bad"),
                 row("T2", "https://e.com/two", "s2"));
         WebSearchTool tool = new WebSearchTool(
-                (t, p, c, q) -> backend, 10, "prov-1", () -> 10002L, null);
+                (t, p, c, q) -> backend, 10, "prov-1", () -> 10002L, null, STUB_FETCHER);
         ToolResult r = tool.execute(ToolRequest.of(json("{\"query\":\"  hello  \"}")));
         assertThat(r.isSuccess()).isTrue();
         assertThat(r.getOutput()).startsWith("=== Web Search Results ===\nQuery: hello\nFound 2 result(s)\n\n");
@@ -337,7 +346,7 @@ class WebToolsRecordingTest {
     @Test
     void searchEmptyResultsFormat() {
         WebSearchTool tool = new WebSearchTool(
-                (t, p, c, q) -> List.of(), 10, "p", () -> 10002L, null);
+                (t, p, c, q) -> List.of(), 10, "p", () -> 10002L, null, STUB_FETCHER);
         ToolResult r = tool.execute(ToolRequest.of(json("{\"query\":\"q\"}")));
         assertThat(r.isSuccess()).isTrue();
         assertThat(r.getOutput()).isEqualTo("No web search results found for query: q");
@@ -350,7 +359,7 @@ class WebToolsRecordingTest {
         WebSearchTool tool = new WebSearchTool(
                 (t, p, c, q) -> {
                     throw new IllegalStateException("no web search provider configured");
-                }, 10, "p", () -> 10002L, null);
+                }, 10, "p", () -> 10002L, null, STUB_FETCHER);
         ToolResult r = tool.execute(ToolRequest.of(json("{\"query\":\"q\"}")));
         assertThat(r.isSuccess()).isFalse();
         assertThat(r.getError()).isEqualTo("web search failed: no web search provider configured");
@@ -366,7 +375,7 @@ class WebToolsRecordingTest {
                         row("B", "https://e.com/b", "sb"),
                         row("C", "https://e.com/c", "sc"),
                         row("D", "https://e.com/d", "sd")),
-                10, "p", () -> 10002L, null);
+                10, "p", () -> 10002L, null, STUB_FETCHER);
         tool.withPageReader(fetchTool(url -> {
             fetchedUrls.add(url);
             return url.endsWith("/d") ? "" : "page body " + url;
@@ -397,7 +406,7 @@ class WebToolsRecordingTest {
         WebSearchResult withDate = row("T", "https://e.com/a", "s");
         withDate.setPublishedAt(java.time.OffsetDateTime.parse("2026-09-23T12:34:56.789+08:00"));
         WebSearchTool tool = new WebSearchTool(
-                (t, p, c, q) -> List.of(withDate), 10, "p", () -> 10002L, null);
+                (t, p, c, q) -> List.of(withDate), 10, "p", () -> 10002L, null, STUB_FETCHER);
         ToolResult r = tool.execute(ToolRequest.of(json("{\"query\":\"q\"}")));
         // RFC3339 秒精度 + 偏移
         assertThat(r.getOutput()).contains("Published: 2026-09-23T12:34:56+08:00\n");
@@ -409,7 +418,7 @@ class WebToolsRecordingTest {
                 (t, p, c, q) -> List.of(
                         row("A", "https://e.com/a", "sa"),
                         row("B", "https://e.com/b", "sb")),
-                10, "p", () -> 10002L, null);
+                10, "p", () -> 10002L, null, STUB_FETCHER);
         ToolResult r = tool.execute(ToolRequest.of(json("{\"query\":\"q\",\"count\":1}")));
         assertThat(r.getData().get("count")).isEqualTo(1);
     }

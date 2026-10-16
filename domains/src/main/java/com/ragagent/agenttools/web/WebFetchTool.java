@@ -15,13 +15,13 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.webfetch.FetchException;
+import com.ragagent.contract.websearch.FetchException;
+import com.ragagent.contract.websearch.ToolPageFetcher;
 import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolOutput;
 import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.webfetch.Fetcher;
 
 /**
  * web_fetch 工具。
@@ -34,7 +34,7 @@ import com.ragagent.webfetch.Fetcher;
  * <ul>
  *   <li>单飞合流：下载跑在虚拟线程上，等待方在锁外轮询 {@link PageFlight}
  *       （等待可被截止或取消打断，下载线程本身不受影响）。</li>
- *   <li>无取消下载：{@link Fetcher#fetch} 是无取消的阻塞调用，
+ *   <li>无取消下载：{@code websearch.fetch.Fetcher#fetch} 是无取消的阻塞调用，
  *       下载天然不受调用方 deadline 影响。</li>
  *   <li>批内 items 与 web_search 的 content=true 前 3 页：虚拟线程并行 + join。</li>
  * </ul>
@@ -128,9 +128,9 @@ public class WebFetchTool extends BaseTool {
     private final Map<String, WebPageSnapshot> pages = new LinkedHashMap<>();
     private final Map<String, PageFlight> inflight = new HashMap<>();
 
-    /** 生产 fetcher（markdown、2MB、60s、浏览器兜底）。 */
-    public WebFetchTool() {
-        this(Fetcher.newFetcher()::fetch);
+    /** 生产入口（收契约端口：markdown、2MB、60s、浏览器兜底由实现侧提供）。 */
+    public WebFetchTool(ToolPageFetcher fetcher) {
+        this((PageFetcher) fetcher::fetch);
     }
 
     /** 测试注入口。 */

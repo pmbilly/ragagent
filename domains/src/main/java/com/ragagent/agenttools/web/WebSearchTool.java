@@ -1,5 +1,6 @@
 package com.ragagent.agenttools.web;
 
+import com.ragagent.contract.websearch.ToolPageFetcher;
 import com.ragagent.platform.web.RequestFields;
 import com.ragagent.platform.web.ToolJson;
 import java.net.URI;
@@ -104,7 +105,8 @@ public class WebSearchTool extends BaseTool {
 
     public WebSearchTool(WebSearchBackend webSearchService, int maxResults, String providerId,
             LongSupplier tenantId,
-            WebSearchConfig tenantConfig) {
+            WebSearchConfig tenantConfig,
+            ToolPageFetcher toolPageFetcher) {
         super(ToolDefinitions.TOOL_WEB_SEARCH,
                 formatDescription(maxResults), SCHEMA_JSON);
         int effective = maxResults <= 0 ? DEFAULT_MAX_RESULTS : maxResults;
@@ -115,7 +117,7 @@ public class WebSearchTool extends BaseTool {
         this.tenantId = tenantId;
         this.tenantConfig = tenantConfig == null ? new WebSearchConfig() : tenantConfig;
         // 构造内嵌的页面抓取器（可用 withPageReader 共享 web_fetch 的实例）
-        this.pages = new WebFetchTool();
+        this.pages = new WebFetchTool(toolPageFetcher);
     }
 
     /** 描述注入：仅当归一后的 maxResults 注入（模板只有一个 %d）。 */

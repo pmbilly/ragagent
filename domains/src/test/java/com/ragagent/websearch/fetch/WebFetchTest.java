@@ -1,5 +1,6 @@
-package com.ragagent.webfetch;
+package com.ragagent.websearch.fetch;
 
+import com.ragagent.contract.websearch.FetchException;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.InetSocketAddress;

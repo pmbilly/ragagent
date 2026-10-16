@@ -1,5 +1,6 @@
-package com.ragagent.webfetch;
+package com.ragagent.websearch.fetch;
 
+import com.ragagent.contract.websearch.FetchException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;

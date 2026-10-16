@@ -1,4 +1,4 @@
-package com.ragagent.webfetch;
+package com.ragagent.websearch.fetch;
 
 /**
  * 无头浏览器渲染接缝。

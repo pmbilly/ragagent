@@ -38,6 +38,15 @@ import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
  */
 class AgentToolBackendsKbToolTest {
 
+    /** 抓取端口桩（R4b：WebFetchTool/WebSearchTool 经契约端口取网页）。 */
+    private static final com.ragagent.contract.websearch.ToolPageFetcher STUB_FETCHER =
+            new com.ragagent.contract.websearch.ToolPageFetcher() {
+                @Override
+                public String fetch(String url) {
+                    return "stub-content";
+                }
+            };
+
     private AgentToolBackends backends;
     private MessageService messageService;
     private MemorySearchPort memorySearch;
@@ -55,7 +64,8 @@ class AgentToolBackendsKbToolTest {
                 mock(WikiPageOpsPort.class),
                 mock(WebSearchExecutor.class),
                 mock(TenantService.class),
-                mock(DataSource.class));
+                mock(DataSource.class),
+                STUB_FETCHER);
     }
 
     @Test

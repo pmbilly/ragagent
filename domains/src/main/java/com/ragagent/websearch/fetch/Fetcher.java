@@ -1,5 +1,6 @@
-package com.ragagent.webfetch;
+package com.ragagent.websearch.fetch;
 
+import com.ragagent.contract.websearch.FetchException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;

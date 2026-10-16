@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.ragagent.contract.websearch.PipelinePageFetcher;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.webfetch.Fetcher;
 
 /**
  * WEB_FETCH 阶段插件：rerank 之后对 web 结果
@@ -19,6 +19,13 @@ import com.ragagent.webfetch.Fetcher;
  * 抓取走 webfetch 的 pipeline fetcher（15s/100KB + SSRF 守卫）。
  */
 public final class PluginWebFetch implements Plugin {
+
+    /** 抓取端口（管线语义由实现侧提供：15s/100KB）。 */
+    private final PipelinePageFetcher fetcher;
+
+    public PluginWebFetch(PipelinePageFetcher fetcher) {
+        this.fetcher = fetcher;
+    }
 
     @Override
     public String[] activationEvents() {
@@ -72,7 +79,7 @@ public final class PluginWebFetch implements Plugin {
                         return null;
                     }
                     try {
-                        contents[idx] = Fetcher.fetchUrlContent(fetchUrl);
+                        contents[idx] = fetcher.fetch(fetchUrl);
                     } catch (RuntimeException e) {
                         errors[idx] = e;
                     }

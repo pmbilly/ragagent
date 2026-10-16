@@ -1,4 +1,4 @@
-package com.ragagent.webfetch;
+package com.ragagent.contract.websearch;
 
 /**
  * 抓取失败的可机读错误。

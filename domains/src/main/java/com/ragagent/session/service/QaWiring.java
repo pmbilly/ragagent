@@ -1,5 +1,6 @@
 package com.ragagent.session.service;
 
+import com.ragagent.contract.websearch.PipelinePageFetcher;
 import com.ragagent.contract.knowledge.support.KnowledgeProjectionAdapter;
 
 
@@ -359,6 +360,7 @@ public class QaWiring {
             PipelinePorts.WebSearch webSearch,
             PipelinePorts.TenantService tenantService,
             RetrieveGraphRepository retrieveGraphRepository,
+            PipelinePageFetcher pipelinePageFetcher,
             PipelineConfig config) {
 
         EventManager mgr = new EventManager();
@@ -370,7 +372,7 @@ public class QaWiring {
         mgr.register(new PluginSearch(
                 knowledgeBaseService, webSearch, tenantService));
         mgr.register(new PluginRerank(modelService));
-        mgr.register(new PluginWebFetch());
+        mgr.register(new PluginWebFetch(pipelinePageFetcher));
         mgr.register(new PluginMerge(chunkRepository));
         mgr.register(new PluginDataAnalysis(modelService, knowledgeService,
                 new DataAnalysisSessionFactoryAdapter()));

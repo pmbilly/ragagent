@@ -699,7 +699,7 @@ class PipelineLifecycleRecordingTest {
      */
     @Test
     void webFetch() {
-        PluginWebFetch p = new PluginWebFetch();
+        PluginWebFetch p = new PluginWebFetch(com.ragagent.websearch.fetch.Fetcher::fetchUrlContent);
 
         // 1) disabled
         ChatManage cm = new ChatManage();

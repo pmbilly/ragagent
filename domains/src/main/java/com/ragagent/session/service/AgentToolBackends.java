@@ -1,5 +1,6 @@
 package com.ragagent.session.service;
 
+import com.ragagent.contract.websearch.ToolPageFetcher;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +80,8 @@ public class AgentToolBackends {
     static final ObjectMapper JSON = JsonMappers.lenient();
 
 
+    private final ToolPageFetcher toolPageFetcher;
+
     private final KnowledgeCatalogPort knowledgeCatalog;
 
     /** 知识库检索簇：KB 检索/grep/图谱/chunk 列举等工具后端。 */
@@ -100,11 +103,13 @@ public class AgentToolBackends {
                              WikiPageOpsPort wikiPageOps,
                              WebSearchExecutor webSearchExecutor,
                              TenantConfigLookup tenantService,
-                             DataSource dataSource) {
+                             DataSource dataSource,
+                             ToolPageFetcher toolPageFetcher) {
         this.knowledgeCatalog = knowledgeCatalog;
         this.messageService = messageService;
         this.memorySearch = memorySearch;
         this.webSearchExecutor = webSearchExecutor;
+        this.toolPageFetcher = toolPageFetcher;
         this.tenantService = tenantService;
         this.jdbc = new JdbcTemplate(dataSource);
         this.kbBackends = new AgentToolKbBackends(knowledgeCatalog,
@@ -334,8 +339,9 @@ public class AgentToolBackends {
         return switch (toolName) {
             case ToolDefinitions.TOOL_WEB_SEARCH -> new WebSearchTool(
                     webSearchBackend(), webSearchMaxResults, webSearchProviderId,
-                    currentTenantId(), loadTenantWebSearchConfig());
-            case ToolDefinitions.TOOL_WEB_FETCH -> new WebFetchTool();
+                    currentTenantId(), loadTenantWebSearchConfig(),
+                    toolPageFetcher);
+            case ToolDefinitions.TOOL_WEB_FETCH -> new WebFetchTool(toolPageFetcher);
             default -> null;
         };
     }
