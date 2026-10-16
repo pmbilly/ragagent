@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service.chunk;
 
+import com.ragagent.platform.prompt.ExtractPrompts;
+import com.ragagent.llm.extract.EntityExtractionAdapter;
 import com.ragagent.knowledge.domain.span.SpanTracker;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -133,7 +135,8 @@ class ChunkExtractServiceTest {
         when(chunkRepository.getChunkById(7L, "ck-1")).thenReturn(chunk);
 
         service = new ChunkExtractService(modelRuntimeAssembler, chunkRepository, knowledgeRepository,
-                kbRepository, spanTracker, graphRepo, finalizer);
+                kbRepository, spanTracker, graphRepo, finalizer, new ExtractPrompts(),
+                new EntityExtractionAdapter());
     }
 
     private KnowledgeBase kbWithExtractConfig(String json) throws Exception {

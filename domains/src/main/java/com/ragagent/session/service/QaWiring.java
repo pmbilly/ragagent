@@ -47,6 +47,7 @@ import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.contract.retrieval.SearchResult;
 import java.io.InputStream;
 import com.ragagent.session.support.PipelineViews;
+import com.ragagent.contract.knowledge.EntityExtractionPort;
 import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
 import com.ragagent.platform.tracing.decorators.LangfuseReranker;
@@ -361,6 +362,7 @@ public class QaWiring {
             PipelinePorts.TenantService tenantService,
             RetrieveGraphRepository retrieveGraphRepository,
             PipelinePageFetcher pipelinePageFetcher,
+            EntityExtractionPort entityExtraction,
             PipelineConfig config) {
 
         EventManager mgr = new EventManager();
@@ -384,7 +386,7 @@ public class QaWiring {
         mgr.register(new PluginLoadHistory(messageService));
         mgr.register(new PluginMemoryRecall(memoryService));
         mgr.register(new PluginExtractEntity(modelService, extractEntityTemplate,
-                knowledgeBaseRepository, knowledgeService, neo4jEnabled));
+                knowledgeBaseRepository, knowledgeService, neo4jEnabled, entityExtraction));
         mgr.register(new PluginSearchEntity(
                 retrieveGraphRepository, chunkRepository, knowledgeRepository));
         mgr.register(new PluginSearchParallel(mgr, knowledgeBaseService,

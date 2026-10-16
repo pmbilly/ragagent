@@ -12,6 +12,7 @@
       "com.ragagent.agent.skills.mapper"
     ],
     [
+      "com.ragagent.contract.knowledge",
       "com.ragagent.contract.model",
       "com.ragagent.contract.model.chat",
       "com.ragagent.contract.retrieval"

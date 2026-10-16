@@ -14,6 +14,7 @@ import com.ragagent.initialization.service.InitializationConfigService;
 import com.ragagent.initialization.service.ModelConnectivityTestService;
 import com.ragagent.initialization.service.OllamaManageService;
 import com.ragagent.initialization.service.TextExtractionTestService;
+import com.ragagent.contract.knowledge.EntityExtractionPort;
 import com.ragagent.contract.model.AsrTranscriber;
 import com.ragagent.platform.prompt.ExtractPrompts;
 import com.ragagent.initialization.service.OllamaDownloadTaskStore;
@@ -58,12 +59,13 @@ public class InitializationController {
             ModelCatalogPort modelCatalog, ModelRuntime modelRuntime, SsrfGuard ssrfGuard,
             OllamaAdminPort ollamaService, OllamaDownloadTaskStore downloadTasks,
             AsrTranscriber asrTranscriber, ExtractPrompts extractPrompts,
+            EntityExtractionPort entityExtraction,
             DocReaderParsePort documentReader,
             CryptoService cryptoService) {
         this.configService = new InitializationConfigService(knowledgeCatalog, modelCatalog, ssrfGuard);
         this.ollamaManage = new OllamaManageService(ollamaService, downloadTasks);
         this.modelTest = new ModelConnectivityTestService(modelCatalog, ssrfGuard, modelRuntime, asrTranscriber, documentReader);
-        this.textTest = new TextExtractionTestService(extractPrompts, modelTest);
+        this.textTest = new TextExtractionTestService(extractPrompts, modelTest, entityExtraction);
     }
 
     @GetMapping("/api/v1/initialization/config/{kbId}")

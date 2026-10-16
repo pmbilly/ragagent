@@ -5,13 +5,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ragagent.contract.graph.EntityExtractionResult;
+import com.ragagent.contract.knowledge.EntityExtractionPort;
 import com.ragagent.session.service.rag.ChatManage;
 import com.ragagent.session.service.rag.PipelineEventType;
 import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.platform.web.JsonMappers;
@@ -33,18 +34,21 @@ public final class PluginExtractEntity implements Plugin {
     private final PipelinePorts.KnowledgeBaseRepository knowledgeBaseRepo;
     private final PipelinePorts.KnowledgeService knowledgeService;
     private final boolean neo4jEnabled;
+    private final EntityExtractionPort entityExtraction;
 
     public PluginExtractEntity(PipelinePorts.ModelService modelService,
                                PipelineConfig.PromptTemplateStructured template,
                                PipelinePorts.KnowledgeBaseRepository knowledgeBaseRepo,
                                PipelinePorts.KnowledgeService knowledgeService,
-                               boolean neo4jEnabled) {
+                               boolean neo4jEnabled,
+                               EntityExtractionPort entityExtraction) {
         this.modelService = modelService;
         this.template = template;
         this.knowledgeBaseRepo = knowledgeBaseRepo;
         this.knowledgeService = knowledgeService;
         // 环境开关 NEO4J_ENABLE 在装配期解析传入
         this.neo4jEnabled = neo4jEnabled;
+        this.entityExtraction = entityExtraction;
     }
 
     @Override
@@ -118,15 +122,14 @@ public final class PluginExtractEntity implements Plugin {
         PipelineConfig.PromptTemplateStructured tpl = new PipelineConfig.PromptTemplateStructured();
         tpl.setDescription(template == null ? "" : template.getDescription());
         tpl.setExamples(template == null ? null : template.getExamples());
-        EntityExtraction.Extractor extractor = new EntityExtraction.Extractor(model, tpl);
-        EntityExtraction.EntityGraph graph;
+        EntityExtractionResult graph;
         try {
-            graph = extractor.extract(query);
+            graph = entityExtraction.extract(model, tpl, query);
         } catch (RuntimeException e) {
             return next.next();
         }
         List<String> nodes = new ArrayList<>();
-        for (GraphNode node : graph.node) {
+        for (GraphNode node : graph.nodes()) {
             nodes.add(node.getName());
         }
         chatManage.setEntity(nodes);

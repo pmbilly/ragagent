@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.prompt.ExtractPrompts;
-import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.platform.prompt.PromptInstructions;
@@ -33,10 +32,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.ragagent.contract.graph.EntityExtractionResult;
 import com.ragagent.contract.graph.GraphData;
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.graph.GraphRelation;
 import com.ragagent.contract.graph.NameSpace;
+import com.ragagent.contract.knowledge.EntityExtractionPort;
 import com.ragagent.contract.wiki.WikiFinalizePort;
 import com.ragagent.platform.access.TenantScopes;
 
@@ -77,6 +78,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
     private final RetrieveGraphRepository graphRepository;
     private final WikiFinalizePort finalizer;
     private final ExtractPrompts extractPrompts;
+    private final EntityExtractionPort entityExtraction;
 
     /** 生产构造器（Spring 装配；模板来源用 vendored extract 配置）。 */
     @Autowired
@@ -86,9 +88,10 @@ public class ChunkExtractService implements ChunkExtractConsumer {
                                KnowledgeBaseRepository kbRepository,
                                SpanTracker spanTracker,
                                RetrieveGraphRepository graphRepository,
-                               WikiFinalizePort finalizer) {
+                               WikiFinalizePort finalizer,
+            EntityExtractionPort entityExtraction) {
         this(modelRuntimeAssembler, chunkRepository, knowledgeRepository, kbRepository, spanTracker,
-                graphRepository, finalizer, new ExtractPrompts());
+                graphRepository, finalizer, new ExtractPrompts(), entityExtraction);
     }
 
     /** 测试可注入模板来源。 */
@@ -99,7 +102,8 @@ public class ChunkExtractService implements ChunkExtractConsumer {
                         SpanTracker spanTracker,
                         RetrieveGraphRepository graphRepository,
                         WikiFinalizePort finalizer,
-                        ExtractPrompts extractPrompts) {
+                        ExtractPrompts extractPrompts,
+                        EntityExtractionPort entityExtraction) {
         this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.chunkRepository = chunkRepository;
         this.knowledgeRepository = knowledgeRepository;
@@ -108,6 +112,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
         this.graphRepository = graphRepository;
         this.finalizer = finalizer;
         this.extractPrompts = extractPrompts;
+        this.entityExtraction = entityExtraction;
     }
 
     /** 队列入口：JSON 载荷 → 任务作用域→ 处理（默认按终态处理）。 */
@@ -227,10 +232,10 @@ public class ChunkExtractService implements ChunkExtractConsumer {
             throw new IllegalStateException("failed to get chat model: " + e.getMessage(), e);
         }
 
-        EntityExtraction.EntityGraph graph;
+        EntityExtractionResult graph;
         try {
-            graph = new EntityExtraction.Extractor(chatModel, buildTemplate(extractCfg))
-                    .extract(chunk.getContent());
+            graph = entityExtraction.extract(chatModel, buildTemplate(extractCfg),
+                    chunk.getContent());
         } catch (RuntimeException e) {
             throw new IllegalStateException("failed to extract entities: " + e.getMessage(), e);
         }
@@ -243,9 +248,9 @@ public class ChunkExtractService implements ChunkExtractConsumer {
             return null;
         }
 
-        List<GraphNode> nodes = graph.node == null ? new ArrayList<>() : graph.node;
-        List<GraphRelation> relations = graph.relation == null
-                ? new ArrayList<>() : graph.relation;
+        List<GraphNode> nodes = graph.nodes() == null ? new ArrayList<>() : graph.nodes();
+        List<GraphRelation> relations = graph.relations() == null
+                ? new ArrayList<>() : graph.relations();
         for (GraphNode node : nodes) {
             node.setChunks(List.of(again.getId()));
         }

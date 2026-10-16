@@ -1,6 +1,8 @@
 package com.ragagent.initialization.service;
 
 
+import com.ragagent.contract.graph.EntityExtractionResult;
+import com.ragagent.contract.knowledge.EntityExtractionPort;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +11,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.platform.prompt.ExtractPrompts;
 import com.ragagent.platform.prompt.PipelineConfig.PromptTemplateStructured;
 import com.ragagent.contract.error.AppError;
@@ -30,10 +31,14 @@ public final class TextExtractionTestService {
 
     private final ExtractPrompts extractPrompts;
     private final ModelConnectivityTestService modelTest;
+    private final EntityExtractionPort entityExtraction;
 
-    public TextExtractionTestService(ExtractPrompts extractPrompts, ModelConnectivityTestService modelTest) {
+    public TextExtractionTestService(ExtractPrompts extractPrompts,
+                                     ModelConnectivityTestService modelTest,
+                                     EntityExtractionPort entityExtraction) {
         this.extractPrompts = extractPrompts;
         this.modelTest = modelTest;
+        this.entityExtraction = entityExtraction;
     }
 
     // ══════════════ 抽取段 ══════════════
@@ -70,20 +75,20 @@ public final class TextExtractionTestService {
         template.setDescription(cfg.getDescription());
         template.setTags(tags);
         template.setExamples(cfg.getExamples());
-        EntityExtraction.Extractor extractor = new EntityExtraction.Extractor(chatModel, template);
-        EntityExtraction.EntityGraph graph;
+        EntityExtractionResult graph;
         try {
-            graph = extractor.extract(t);
+            graph = entityExtraction.extract(chatModel, template, t);
         } catch (RuntimeException e) {
             throw new BizException(AppError.internal("文本关系提取失败: " + e.getMessage()));
         }
-        removeUnknownRelation(graph, tags);
+        List<GraphRelation> relationList = new ArrayList<>(graph.relations());
+        removeUnknownRelation(relationList, tags);
         ObjectNode data = MAPPER.createObjectNode();
-        if (graph.node.isEmpty()) {
+        if (graph.nodes().isEmpty()) {
             data.putNull("nodes");
         } else {
             ArrayNode nodes = data.putArray("nodes");
-            for (var node : graph.node) {
+            for (var node : graph.nodes()) {
                 ObjectNode on = nodes.addObject();
                 if (!node.getName().isEmpty()) {
                     on.put("name", node.getName());
@@ -100,7 +105,7 @@ public final class TextExtractionTestService {
         }
         // relations 恒非 null（无关系时也给空数组）
         ArrayNode relations = data.putArray("relations");
-        for (var rel : graph.relation) {
+        for (var rel : relationList) {
             ObjectNode on = relations.addObject();
             if (!rel.node1().isEmpty()) {
                 on.put("node1", rel.node1());
@@ -182,16 +187,10 @@ public final class TextExtractionTestService {
             "Content", "Culture", "Person", "Event", "Time", "Location",
             "Work", "Author", "Relation", "Attribute");
 
-    /** 过滤不在请求 tags 内的关系。 */
-    private static void removeUnknownRelation(EntityExtraction.EntityGraph graph, List<String> tags) {
+    /** 过滤不在请求 tags 内的关系（就地过滤）。 */
+    private static void removeUnknownRelation(List<GraphRelation> relations, List<String> tags) {
         java.util.Set<String> known = new java.util.HashSet<>(tags);
-        List<GraphRelation> kept = new ArrayList<>();
-        for (var relation : graph.relation) {
-            if (known.contains(relation.type())) {
-                kept.add(relation);
-            }
-        }
-        graph.relation = kept;
+        relations.removeIf(relation -> !known.contains(relation.type()));
     }
 
 }

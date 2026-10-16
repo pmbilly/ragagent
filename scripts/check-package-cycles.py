@@ -56,6 +56,18 @@
   · 为什么不在本批消除：要拆只能把 `Embedder` 或 `SearchResult` 挪去对方包（都是错误落点），
     或让 `StreamResponse` 放弃检索载荷（API 形状变化）。
   · 仍受棘轮：本组只许减不许增。
+
+2026-10-16（R2c-3d）同一组再变形：{contract.model, contract.model.chat, contract.retrieval}
+  → **加 contract.knowledge**。
+  · 原因：新增 `contract.knowledge.EntityExtractionPort`（抽取能力端口）取
+    `contract.model.LlmChatClient`（模型句柄）与 `contract.graph.EntityExtractionResult`
+    （结果形状）；反向 `contract.model → contract.knowledge` 早已存在（模型面持有知识侧
+    形状，如知识库/知识行视图）。
+  · 性质：同上一处——**契约词汇表内的固有形状互引**（能力端口 ⇄ 载荷形状），
+    四个包全是纯 JDK 词汇/端口，无框架依赖。
+  · 为什么不在本批消除：要拆只能让"抽取端口"不引模型句柄（它必须以模型为入参），
+    或让模型面不持知识形状（API 形状变化）。
+  · 仍受棘轮：本组只许减不许增。
 """
 import json
 import pathlib
