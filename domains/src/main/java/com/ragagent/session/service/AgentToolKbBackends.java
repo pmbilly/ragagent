@@ -24,7 +24,7 @@ import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.Reranker;
-import com.ragagent.retrieval.HybridSearchService;
+import com.ragagent.contract.retrieval.HybridSearchPort;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.ChunkPageView;
@@ -47,14 +47,14 @@ final class AgentToolKbBackends {
     private static final List<String> TEXT_FAQ_TYPES = List.of(
             ChunkTypes.TEXT, ChunkTypes.FAQ);
     private final KnowledgeCatalogPort knowledgeCatalog;
-    private final HybridSearchService hybridSearchService;
+    private final HybridSearchPort hybridSearchService;
     /** 检索阈值配置（与门面共用同一份租户配置对象）。 */
     private final ConversationProperties conversation;
     /** 门面的 JdbcTemplate（grep/图谱/回填都走它）。 */
     private final JdbcTemplate jdbc;
 
     AgentToolKbBackends(KnowledgeCatalogPort knowledgeCatalog,
-                        HybridSearchService hybridSearchService,
+                        HybridSearchPort hybridSearchService,
                         ConversationProperties conversation,
                         JdbcTemplate jdbc) {
         this.knowledgeCatalog = knowledgeCatalog;

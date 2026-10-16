@@ -36,7 +36,7 @@ import com.ragagent.chatpipeline.plugin.PluginSearchParallel;
 import com.ragagent.chatpipeline.plugin.PluginWebFetch;
 import com.ragagent.chatpipeline.plugin.PluginWikiBoost;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.retrieval.HybridSearchService;
+import com.ragagent.contract.retrieval.HybridSearchPort;
 import com.ragagent.platform.settings.ConversationProperties;
 
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
@@ -74,7 +74,7 @@ import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
  * <h2>已知差异（备案）</h2>
  * <ul>
  *   <li><b>HybridSearch 执行面</b>：adapter 委托
- *       {@code HybridSearchService}（pgvector + ParadeDB BM25 + RRF 融合 +
+ *       {@code HybridSearchPort}（pgvector + ParadeDB BM25 + RRF 融合 +
  *       FAQ 迭代/负例过滤 + 富化装配）。
  *       外部向量店（ES/milvus/…）绑定仍按 2201 unavailable 同形拒绝（provider 批）。</li>
  *   <li><b>RetrieveGraphRepository（已接线）</b>：注入 {@code Neo4jGraphConfig} 提供的
@@ -160,7 +160,7 @@ public class QaWiring {
     /** {@link PipelinePorts.KnowledgeBaseService} 的 chat_pipeline 子集。 */
     @Bean
     public PipelinePorts.KnowledgeBaseService qaPipelineKnowledgeBaseService(
-            KnowledgeCatalogPort kbService, HybridSearchService hybridSearchService) {
+            KnowledgeCatalogPort kbService, HybridSearchPort hybridSearchService) {
         return new PipelinePorts.KnowledgeBaseService() {
             @Override
             public KnowledgeBaseView getKnowledgeBaseByIdUnscoped(String id) {

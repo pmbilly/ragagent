@@ -16,7 +16,7 @@ import com.ragagent.knowledge.dto.kb.UpdateKnowledgeBaseRequest;
 import com.ragagent.knowledge.dto.kb.CreateKnowledgeBaseRequest;
 import com.ragagent.contract.knowledge.KnowledgeBaseResponse;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
-import com.ragagent.retrieval.HybridSearchService;
+import com.ragagent.contract.retrieval.HybridSearchPort;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,12 +75,12 @@ public class KnowledgeBaseController {
     private final KnowledgeBaseService kbService;
     private final KnowledgeService knowledgeService;
     private final KnowledgeAccessGuard guard;
-    private final HybridSearchService hybridSearchService;
+    private final HybridSearchPort hybridSearchService;
 
     public KnowledgeBaseController(KnowledgeBaseService kbService,
                                    KnowledgeService knowledgeService,
                                    KnowledgeAccessGuard guard,
-                                   HybridSearchService hybridSearchService) {
+                                   HybridSearchPort hybridSearchService) {
         this.kbService = kbService;
         this.knowledgeService = knowledgeService;
         this.guard = guard;

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.contract.retrieval.HybridSearchPort;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.contract.error.AppError;
@@ -76,7 +77,7 @@ import com.ragagent.platform.tracing.langfuse.Span;
  * </ul>
  */
 @Service
-public class HybridSearchService {
+public class HybridSearchService implements HybridSearchPort {
 
     private static final Logger log = LoggerFactory.getLogger(HybridSearchService.class);
 
@@ -168,6 +169,7 @@ public class HybridSearchService {
 
     // ── 入口 ───────────────────────────────────────────────────────────────
 
+    @Override
     public List<SearchResult> hybridSearch(String id, SearchParams params) {
         if (params.getMatchCount() <= 0) {
             params.setMatchCount(DEFAULT_RETRIEVAL_TOP_K); // normalizedMatchCount
@@ -296,6 +298,7 @@ public class HybridSearchService {
     }
 
     /** 为查询文本现算一条嵌入向量（用 KB 绑定的嵌入模型）。 */
+    @Override
     public float[] getQueryEmbedding(String kbId, String queryText) {
         KnowledgeBaseSearchFacts kb = kbGateway.findSearchFacts(kbId);
         if (kb == null) {
@@ -327,6 +330,7 @@ public class HybridSearchService {
      * 跨租户的模型解析在<b>属主租户</b>上下文里做，同一个
      * 底层模型跨租户共享时键相同，多库分组才最优。解析失败回落 modelID。
      */
+    @Override
     public Map<String, String> resolveEmbeddingModelKeys(List<String> kbIds) {
         List<KnowledgeBaseSearchFacts> kbs = new ArrayList<>();
         for (String kbId : kbIds) {

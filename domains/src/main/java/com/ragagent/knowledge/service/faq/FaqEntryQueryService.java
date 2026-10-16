@@ -23,7 +23,7 @@ import com.ragagent.knowledge.repository.FaqChunkRepository;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.contract.retrieval.SearchParams;
-import com.ragagent.retrieval.HybridSearchService;
+import com.ragagent.contract.retrieval.HybridSearchPort;
 import com.ragagent.contract.retrieval.SearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,14 +47,14 @@ public class FaqEntryQueryService {
     private final ChunkRepository chunkRepository;
     private final FaqChunkRepository faqChunkRepository;
     private final KnowledgeTagRepository tagRepository;
-    private final HybridSearchService hybridSearchService;
+    private final HybridSearchPort hybridSearchService;
     private final FaqGuard faqGuard;
     private final FaqChunkCodec faqChunkCodec;
     private final FaqIndexWriter faqIndexWriter;
 
     public FaqEntryQueryService(ChunkRepository chunkRepository,
                                 KnowledgeTagRepository tagRepository,
-                                HybridSearchService hybridSearchService,
+                                HybridSearchPort hybridSearchService,
                                 FaqGuard faqGuard,
                                 FaqChunkCodec faqChunkCodec,
                                 FaqIndexWriter faqIndexWriter,

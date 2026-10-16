@@ -22,7 +22,7 @@ import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.Reranker;
-import com.ragagent.retrieval.HybridSearchService;
+import com.ragagent.contract.retrieval.HybridSearchPort;
 import com.ragagent.session.domain.message.MessageSearchGroupItem;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.session.domain.message.MessageWithSession;
@@ -51,13 +51,13 @@ final class MessageSearch {
     private final MessageRepository messageRepository;
     private final TenantConfigLookup tenantService;
     /** 聊天历史 KB 的向量检索执行面。 */
-    private final HybridSearchService hybridSearchService;
+    private final HybridSearchPort hybridSearchService;
     /** rerankResults 的重排模型工厂。 */
     private final ModelRuntime modelRuntimeAssembler;
 
     MessageSearch(MessageRepository messageRepository,
                   TenantConfigLookup tenantService,
-                  HybridSearchService hybridSearchService,
+                  HybridSearchPort hybridSearchService,
                   ModelRuntime modelRuntimeAssembler) {
         this.messageRepository = messageRepository;
         this.tenantService = tenantService;
