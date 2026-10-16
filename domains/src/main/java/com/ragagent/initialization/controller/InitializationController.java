@@ -21,7 +21,6 @@ import com.ragagent.platform.security.CryptoService;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.platform.web.ApiResult;
@@ -59,7 +58,6 @@ public class InitializationController {
             ModelCatalogPort modelCatalog, ModelRuntime modelRuntime, SsrfGuard ssrfGuard,
             OllamaService ollamaService, OllamaDownloadTaskStore downloadTasks,
             AsrTranscriber asrTranscriber, ExtractPrompts extractPrompts,
-            ConcurrencyGovernor concurrencyGovernor,
             DocReaderParsePort documentReader,
             CryptoService cryptoService) {
         this.configService = new InitializationConfigService(knowledgeCatalog, modelCatalog, ssrfGuard);
