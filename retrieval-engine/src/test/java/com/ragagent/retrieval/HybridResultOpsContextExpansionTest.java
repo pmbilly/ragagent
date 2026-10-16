@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.model.EmbeddingGateway;
 import com.ragagent.contract.knowledge.ChunkFacts;
@@ -63,7 +63,7 @@ class HybridResultOpsContextExpansionTest {
 
         HybridSearchService service = new HybridSearchService(
                 kbGateway, documentGateway, chunkGateway,
-                mock(ModelGateway.class), mock(TenantService.class), mock(EmbeddingGateway.class),
+                mock(ModelGateway.class), mock(TenantConfigLookup.class), mock(EmbeddingGateway.class),
                 mock(RetrieveEngineRegistry.class),
                 mock(TenantStoreOwnership.class), new RetrievalDriverProperties(null));
         ops = new HybridResultOps(service);

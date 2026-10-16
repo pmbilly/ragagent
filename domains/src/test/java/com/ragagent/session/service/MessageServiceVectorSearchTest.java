@@ -31,7 +31,8 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.Reranker;
-import com.ragagent.retrieval.HybridSearchService;
+import com.ragagent.contract.retrieval.HybridSearchPort;
+import com.ragagent.contract.retrieval.RetrieveEngineException;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.session.domain.message.Message;
@@ -45,7 +46,7 @@ import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 /**
  * 消息搜索的**向量路径**。
  *
- * <p>HybridSearchService 与仓储全部 mock——这组测试钉的是**管线语义**，
+ * <p>HybridSearchPort 与仓储全部 mock——这组测试钉的是**管线语义**，
  * 不是 SQL：未配置跳过、vector-only 参数映射、失败降级/上抛的分模式行为、
  * knowledge_id 关联回消息、SessionIDs 过滤、rerank 的阈值/topK/值拷贝语义。</p>
  */
@@ -56,7 +57,7 @@ class MessageServiceVectorSearchTest {
 
     private MessageRepository messageRepository;
     private TenantService tenantService;
-    private HybridSearchService hybridSearchService;
+    private HybridSearchPort hybridSearchService;
     private ModelRuntime modelRuntimeAssembler;
     private MessageService service;
 
@@ -64,7 +65,7 @@ class MessageServiceVectorSearchTest {
     void setUp() {
         messageRepository = mock(MessageRepository.class);
         tenantService = mock(TenantService.class);
-        hybridSearchService = mock(HybridSearchService.class);
+        hybridSearchService = mock(HybridSearchPort.class);
         modelRuntimeAssembler = mock(ModelRuntime.class);
         service = new MessageService(
                 mock(SessionRepository.class),
@@ -221,7 +222,8 @@ class MessageServiceVectorSearchTest {
     void vectorModePropagatesKbSearchFailure() {
         tenantWith(chatHistoryConfig(true, "emb-1", "kb-chat-1"), null);
         when(hybridSearchService.hybridSearch(eq("kb-chat-1"), any(SearchParams.class)))
-                .thenThrow(new HybridSearchService.RetrievalException("kb engine offline"));
+                .thenThrow(new RetrieveEngineException(RetrieveEngineException.Kind.VECTOR_STORE_UNAVAILABLE,
+                        "kb engine offline"));
 
         assertThatThrownBy(() -> service.searchMessages("q", "vector", 20, null))
                 .isInstanceOf(IllegalStateException.class)
@@ -235,7 +237,8 @@ class MessageServiceVectorSearchTest {
     void hybridModeFallsBackToKeywordOnlyWhenKbSearchFails() {
         tenantWith(chatHistoryConfig(true, "emb-1", "kb-chat-1"), null);
         when(hybridSearchService.hybridSearch(eq("kb-chat-1"), any(SearchParams.class)))
-                .thenThrow(new HybridSearchService.RetrievalException("kb engine offline"));
+                .thenThrow(new RetrieveEngineException(RetrieveEngineException.Kind.VECTOR_STORE_UNAVAILABLE,
+                        "kb engine offline"));
         when(messageRepository.searchMessagesByKeyword(TENANT, "u-1", "q", null, 60))
                 .thenReturn(List.of(
                         mws(message("m1", "s1", "r1", "user", "q body", null), "S1")));

@@ -62,9 +62,7 @@ dependencies {
     // fixtures 源集自身也要用（GoldenContract/Rec46cSupport 引用之）⇒ 两个源集都声明
     testFixturesApi(testFixtures(project(":agent-engine")))
     testImplementation(testFixtures(project(":agent-engine")))
-    // 检索实现面：仅**测试**需要（错位测试 HybridResultOpsContextExpansionTest/
-    // ArtifactReferenceRewriterTest 等 + 录制测试的检索桩）——主码对检索已只经契约
-    testImplementation(project(":retrieval-engine"))    // EmbeddedRedis（B162 起在 :common）
+    // 检索实现面：R6 起**已零依赖**（错位测试随迁 retrieval-engine；其余测试改为 mock 契约端口）    // EmbeddedRedis（B162 起在 :common）
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")

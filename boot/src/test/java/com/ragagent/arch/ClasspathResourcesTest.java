@@ -42,6 +42,8 @@ import org.junit.jupiter.api.Test;
  * 这里是<b>打包级</b>规则（资源是否真的躺在 classpath 上）。同为 {@code com.ragagent.arch}
  * 下的守卫。</p>
  */
+// R6：本测试核对"每个 classpath 资源真实存在"——需同时看见全部模块的资源，
+// 故归组合根（boot）测试树（原先在 domains，随 domains 摘掉检索测试依赖而失去可见性）。
 class ClasspathResourcesTest {
 
     /**

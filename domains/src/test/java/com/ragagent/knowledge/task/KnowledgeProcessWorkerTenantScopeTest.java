@@ -25,7 +25,7 @@ import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.retrieval.engine.VectorStoreService;
+import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.contract.model.ModelCatalogPort;
 
@@ -54,7 +54,7 @@ class KnowledgeProcessWorkerTenantScopeTest {
             mock(ChunkRepository.class),
             mock(TenantFileStorage.class),
             mock(DocReaderClient.class),
-            mock(VectorStoreService.class),
+            mock(VectorIndexStore.class),
             mock(ModelCatalogPort.class),
             mock(KnowledgeVectorWrites.class),
             mock(ChunkVectorIndexer.class),

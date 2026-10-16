@@ -20,6 +20,8 @@ import com.ragagent.tenant.domain.Tenant;
  * {@code RETRIEVE_DRIVER} 派生的默认（未设该环境变量即空集——本部署的实测行为，
  * 用对照 {@code defaults()} 的方式断言以免测试与运行环境耦合）。</p>
  */
+// R6：本测试断言"租户实体的检索引擎默认值"与"检索引擎的 defaults"一致——
+// 属**跨模块一致性**，归组合根（boot）测试树（only 这里同时看得见 domains 与 retrieval-engine）。
 class EffectiveEnginesTest {
 
     /** 驱动串由调用方注入（读点不读进程环境）——测试用固定值。 */
