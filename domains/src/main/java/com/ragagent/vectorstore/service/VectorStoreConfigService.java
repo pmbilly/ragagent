@@ -1,40 +1,22 @@
 package com.ragagent.vectorstore.service;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.Base64;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.contract.vectorstore.ConnectionConfig;
 import com.ragagent.vectorstore.domain.EnvVectorStores;
 import com.ragagent.contract.vectorstore.IndexConfig;
+import com.ragagent.contract.vectorstore.VectorStoreConnectivity;
 import com.ragagent.vectorstore.domain.VectorStore;
 import com.ragagent.vectorstore.domain.VectorStoreEngines;
 import com.ragagent.vectorstore.mapper.VectorStoreRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
-import com.ragagent.retrieval.engine.doris.DorisRetrieveRepository;
-import com.ragagent.retrieval.engine.milvus.MilvusRetrieveRepository;
-import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository;
-import com.ragagent.retrieval.engine.qdrant.QdrantRetrieveRepository;
-import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRestClient;
-import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepository;
 
 /**
  * 向量库配置服务（CRUD + 连通性探测 + 健康检查）。命名带 Config 以区别
@@ -44,24 +26,22 @@ import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepo
  * ValidateIndexConfig → OpenSearch HNSW → DB 去重 → env 去重 → TestConnection（失败=
  * "connection test failed: ..."）→ 落库 → 注册（进程内注册表当前 no-op）。</p>
  *
- * <p><b>TestConnection 的引擎覆盖（已知差异，记入报告）</b>：elasticsearch 走
- * 裸 HTTP GET（含 basic auth、不跟随重定向、版本解析）；milvus 为
- * TCP 拨号（version 恒 ""）；postgres 用 JDBC 探测；weaviate/opensearch 走 HTTP 探测；
- * qdrant/tencent/doris 以 TCP/JDBC 探测替代——
- * 连接被拒的**错误文案逐字一致**，成功路径的 version 探测弱化为 ""。</p>
+ * <p><b>TestConnection 的引擎覆盖</b>：探测体已拆到 retrieval-engine 的
+ * {@code VectorStoreConnectivityProbe}（各引擎的差异与"错误文案逐字一致"的约定随迁，
+ * 见那边的类说明）。本类只剩配置校验（必填 + 地址 SSRF）与对外错误包装。</p>
  */
 @Service
 public class VectorStoreConfigService {
 
-    private static final Logger log = LoggerFactory.getLogger(VectorStoreConfigService.class);
-    private static final ObjectMapper MAPPER = JsonMappers.lenient();
-    private static final Duration TEST_TIMEOUT = Duration.ofSeconds(10);
     private static final int MAX_SHARDS = 64;
     private static final int MAX_REPLICAS = 10;
     private static final Pattern INDEX_NAME_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_-]{0,127}$");
 
     private final VectorStoreRepository repo;
     private final SsrfGuard ssrfGuard;
+
+    /** 连通性探测面（R3d：探测体在 retrieval-engine，本类只做校验 + 委托 + 包装）。 */
+    private final VectorStoreConnectivity connectivity;
     private final JdbcTemplate jdbc;
     private final TransactionTemplate tx;
     /** 构造期派生一次的 env stores */
@@ -73,10 +53,12 @@ public class VectorStoreConfigService {
     private final List<VectorStore> envStores;
 
     public VectorStoreConfigService(VectorStoreRepository repo, SsrfGuard ssrfGuard,
+            VectorStoreConnectivity connectivity,
             JdbcTemplate jdbc, TransactionTemplate tx,
             RetrievalDriverProperties driverProperties, EnvVectorStores.EnvLookup envLookup) {
         this.repo = repo;
         this.ssrfGuard = ssrfGuard;
+        this.connectivity = connectivity;
         this.jdbc = jdbc;
         this.tx = tx;
         this.envLookup = envLookup;
@@ -208,219 +190,14 @@ public class VectorStoreConfigService {
     }
 
     /**
-     * 连通性测试：成功返回探测版本（可空），
-     * 失败抛 AppError（各分支均为 code 1000，
+     * 连通性测试：成功返回探测版本（可空），失败抛 AppError（各分支 code 1000，
      * handler 以**双前缀**形态输出——golden vs-test-byid-connrefused 钉住）。
+     *
+     * <p>R3d：探测体（9 个分支 + 各厂商驱动探针）已整块沉到 {@code retrieval-engine}，
+     * 经 {@link VectorStoreConnectivity} 端口调用；本方法保留为对外同名入口（行为与文案不变）。</p>
      */
     public String testConnection(String engineType, ConnectionConfig config) {
-        try {
-            return switch (engineType == null ? "" : engineType) {
-                case "elasticsearch" -> testElasticsearch(config);
-                case "postgres" -> testPostgres(config);
-                case "qdrant" -> testQdrant(config);
-                case "milvus" -> testMilvus(config);
-                case "tencent_vectordb" -> testTencentVectorDB(config);
-                case "weaviate" -> testWeaviate(config);
-                case "doris" -> testDoris(config);
-                case "opensearch" -> testOpenSearch(config);
-                case "sqlite" -> "";
-                default -> throw BizException.badRequest(
-                        "connection test not supported for engine type: " + engineType);
-            };
-        } catch (ConnectorFailure e) {
-            throw BizException.badRequest(e.getMessage());
-        }
-    }
-
-    /** 各探测器的失败载体（统一落 code 1000 AppError） */
-    private static class ConnectorFailure extends RuntimeException {
-        ConnectorFailure(String message) {
-            super(message);
-        }
-    }
-
-    // ── 各引擎探测（错误文案逐字固定，是契约） ──────────────────────────
-
-    private String testElasticsearch(ConnectionConfig config) {
-        HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER)
-                .connectTimeout(TEST_TIMEOUT).build();
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .timeout(TEST_TIMEOUT).GET();
-        try {
-            builder.uri(URI.create(config.addr));
-        } catch (RuntimeException e) {
-            throw new ConnectorFailure("failed to create elasticsearch request: invalid address");
-        }
-        if (config.username != null && !config.username.isEmpty()) {
-            String token = Base64.getEncoder().encodeToString(
-                    (config.username + ":" + (config.password == null ? "" : config.password))
-                            .getBytes(StandardCharsets.UTF_8));
-            builder.header("Authorization", "Basic " + token);
-        }
-        HttpResponse<String> resp;
-        try {
-            resp = client.send(builder.build(), HttpResponse.BodyHandlers.ofString());
-        } catch (IOException e) {
-            throw new ConnectorFailure("failed to connect to elasticsearch: connection refused or authentication failed");
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new ConnectorFailure("failed to connect to elasticsearch: connection refused or authentication failed");
-        }
-        if (resp.statusCode() != 200) {
-            throw new ConnectorFailure("failed to connect to elasticsearch: authentication failed or server error");
-        }
-        try {
-            JsonNode root = MAPPER.readTree(resp.body());
-            JsonNode number = root.path("version").path("number");
-            return number.isMissingNode() ? "" : number.asText("");
-        } catch (Exception e) {
-            return ""; // connected but version unparseable
-        }
-    }
-
-    private String testPostgres(ConnectionConfig config) {
-        if (config.useDefaultConnection) {
-            return ""; // 默认连接恒可达；无 handle 查版本
-        }
-        String addr = config.addr == null ? "" : config.addr;
-        String jdbcUrl = addr.startsWith("jdbc:")
-                ? addr
-                : "jdbc:postgresql://" + addr.replaceFirst("^postgres(ql)?://", "");
-        try (var conn = java.sql.DriverManager.getConnection(jdbcUrl,
-                config.username == null ? "" : config.username,
-                config.password == null ? "" : config.password)) {
-            var rs = conn.createStatement().executeQuery("SHOW server_version");
-            return rs.next() ? rs.getString(1) : "";
-        } catch (Exception e) {
-            throw new ConnectorFailure("failed to connect to postgres: connection refused or authentication failed");
-        }
-    }
-
-    /**
-     * qdrant 探测：走驱动的健康探针
-     * （gRPC HealthCheck → REST {@code GET /}），返回 {@code version}；失败折叠成通用文案。
-     */
-    private String testQdrant(ConnectionConfig config) {
-        int port = config.port == 0 ? 6334 : config.port;
-        try {
-            return QdrantRetrieveRepository.testConnection(
-                    config.host, port, config.apiKey, config.useTls, ssrfGuard);
-        } catch (RuntimeException e) {
-            log.warn("Qdrant connection test failed: {}", e.getMessage());
-            throw new ConnectorFailure(
-                    "failed to connect to qdrant: connection refused or authentication failed");
-        }
-    }
-
-    /**
-     * milvus 探测：<b>TCP 拨号</b>语义（不做 SDK 级验证），因此<b>版本恒空</b>。
-     * 本仓已有 REST v2 客户端 → 升级为 {@code collections/list} 探针
-     * （连通性 + 认证都验到，比 TCP 拨号更强），仍返回 ""（Milvus 无版本端点）。
-     */
-    private String testMilvus(ConnectionConfig config) {
-        try {
-            return MilvusRetrieveRepository.testConnection(
-                    config.addr, config.username, config.password, config.database, ssrfGuard);
-        } catch (RuntimeException e) {
-            log.warn("Milvus connection test failed: {}", e.getMessage());
-            throw new ConnectorFailure(
-                    "failed to connect to milvus: connection refused or server unreachable");
-        }
-    }
-
-    /**
-     * tencent_vectordb 探测：{@code ListDatabase}
-     * 探针——客户端构造失败（地址/用户名/密钥不合法）→ "connection refused or authentication
-     * failed"；调用失败 → "authentication failed or server error"。版本恒 ""。
-     */
-    private String testTencentVectorDB(ConnectionConfig config) {
-        try {
-            return TencentVectorDbRetrieveRepository
-                    .testConnection(config.addr, config.username, config.apiKey, ssrfGuard);
-        } catch (TencentVectorDbRestClient
-                .TencentVectorDbApiException e) {
-            log.warn("Tencent VectorDB list database failed: {}", e.getMessage());
-            throw new ConnectorFailure(
-                    "failed to connect to tencent vectordb: authentication failed or server error");
-        } catch (RuntimeException e) {
-            log.warn("Tencent VectorDB connection test failed: {}", e.getMessage());
-            throw new ConnectorFailure(
-                    "failed to connect to tencent vectordb: connection refused or authentication failed");
-        }
-    }
-
-    private String testWeaviate(ConnectionConfig config) {
-        String host = empty(config.host) ? "weaviate:8080" : config.host;
-        String scheme = empty(config.scheme) ? "http" : config.scheme;
-        HttpClient client = HttpClient.newBuilder().connectTimeout(TEST_TIMEOUT).build();
-        try {
-            HttpRequest req = HttpRequest.newBuilder(URI.create(scheme + "://" + host + "/v1/.well-known/ready"))
-                    .timeout(TEST_TIMEOUT).GET().build();
-            HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString());
-            if (resp.statusCode() != 200) {
-                throw new ConnectorFailure("failed to connect to weaviate: server not ready or authentication failed");
-            }
-        } catch (IOException e) {
-            throw new ConnectorFailure("failed to connect to weaviate: server not ready or authentication failed");
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new ConnectorFailure("failed to connect to weaviate: server not ready or authentication failed");
-        }
-        try {
-            HttpRequest meta = HttpRequest.newBuilder(URI.create(scheme + "://" + host + "/v1/meta"))
-                    .timeout(TEST_TIMEOUT).GET().build();
-            HttpResponse<String> resp = client.send(meta, HttpResponse.BodyHandlers.ofString());
-            if (resp.statusCode() == 200) {
-                JsonNode version = MAPPER.readTree(resp.body()).path("version");
-                return version.isMissingNode() ? "" : version.asText("");
-            }
-        } catch (Exception e) {
-            return ""; // connected but version unknown
-        }
-        return "";
-    }
-
-    /**
-     * doris 探测：走 MySQL 协议驱动
-     * 的完整探针——连接（Ping 语义）+ {@code SELECT @@version}（失败只 WARN，返回空版本）；
-     * 版本串剥 {@code "Doris-"} 前缀（{@code "5.7.99 Doris-4.1.0"} → {@code "4.1.0"}）。
-     * database 不强制：缺省用 information_schema。
-     */
-    private String testDoris(ConnectionConfig config) {
-        if (empty(config.addr)) {
-            throw new ConnectorFailure("failed to create doris connection: addr is required");
-        }
-        try {
-            return DorisRetrieveRepository.testConnection(
-                    config.addr, config.database, config.username, config.password);
-        } catch (java.sql.SQLException e) {
-            log.warn("Doris connection test failed: {}", e.getMessage());
-            throw new ConnectorFailure(
-                    "failed to connect to doris: connection refused or authentication failed");
-        }
-    }
-
-    /**
-     * opensearch 探测：走驱动的
-     * 连通性探针（版本 + 每节点 k-NN 插件，TestConnection→构造期探针复用）；失败折叠
-     * 成通用文案（不向 API 调用方暴露集群内部细节）。版本在探针内解析但不在此暴露
-     * （lazy index 首用再校验）→ 恒 ""。
-     */
-    private String testOpenSearch(ConnectionConfig config) {
-        String generic = "failed to connect to opensearch: check address, credentials, version (>= 2.4), "
-                + "and that the k-NN plugin is installed";
-        if (empty(config.addr)) {
-            throw new ConnectorFailure("failed to create opensearch connection: addr is required");
-        }
-        try {
-            OpenSearchRetrieveRepository.testConnection(
-                    config.addr, config.username, config.password, config.insecureSkipVerify,
-                    ssrfGuard);
-        } catch (RuntimeException e) {
-            log.warn("OpenSearch connection test failed: {}", e.getMessage());
-            throw new ConnectorFailure(generic);
-        }
-        return "";
+        return connectivity.probe(engineType, config);
     }
 
     // ── 校验（文案逐字对照） ────────────────────────────────────────────

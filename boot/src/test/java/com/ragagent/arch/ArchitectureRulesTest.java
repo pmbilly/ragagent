@@ -313,6 +313,8 @@ class ArchitectureRulesTest {
             Map.entry("com.ragagent.knowledge.repository.KnowledgeSpanRepository", "PG 专有 SQL（span 批量写）"),
             Map.entry("com.ragagent.knowledge.service.HousekeepingService", "PG 专有 SQL（超时清理）"),
             Map.entry("com.ragagent.tenant.api.TenantStorageQuotaAdapter", "PG 专有 SQL（存储用量；A③ 自 knowledge 收回租户域）"),
+            Map.entry("com.ragagent.retrieval.engine.VectorStoreConnectivityProbe",
+                    "连接探测（驱动级：postgres JDBC liveness；R3d 自 VectorStoreConfigService 随探测体迁入）"),
             Map.entry("com.ragagent.retrieval.engine.PgVectorEngineRepository", "非业务库引擎（pgvector 管理）"),
             Map.entry("com.ragagent.retrieval.engine.PgVectorRetrieveRepository", "非业务库引擎（pgvector 检索）"),
             Map.entry("com.ragagent.retrieval.engine.VectorStoreService", "非业务库引擎（pgvector 读写）"),
