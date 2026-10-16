@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * chat 三入口的契约测试（golden 回放）。

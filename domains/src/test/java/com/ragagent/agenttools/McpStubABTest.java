@@ -1,5 +1,6 @@
 package com.ragagent.agenttools;
 
+import com.ragagent.agent.fixtures.RecordingSupport;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;

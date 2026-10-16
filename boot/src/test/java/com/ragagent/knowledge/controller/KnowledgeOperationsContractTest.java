@@ -31,7 +31,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * knowledge 文档操作面契约测试（15+1 条路由）。golden：

@@ -31,7 +31,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * 会话 HTTP 层的契约测试（CRUD + 置顶 8 条端点）。

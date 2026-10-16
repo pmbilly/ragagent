@@ -27,7 +27,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * chunk 模块契约测试（10 条路由）。golden：record-chunk-golden.sh。

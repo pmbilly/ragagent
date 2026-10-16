@@ -28,7 +28,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * 系统管理端契约测试（/system 组 7 条 + /system/admin 组 16 条）。

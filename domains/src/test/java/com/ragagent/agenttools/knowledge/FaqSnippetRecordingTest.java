@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.agenttools.GoRecording45A;
-import com.ragagent.agenttools.RecordingSupport;
+import com.ragagent.agent.fixtures.GoRecording45A;
+import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
 /**

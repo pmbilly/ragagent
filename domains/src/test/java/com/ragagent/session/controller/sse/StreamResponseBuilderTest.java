@@ -16,7 +16,7 @@ import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.stream.StreamEvent;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * {@link StreamResponseBuilder} 的逐字节契约测试。

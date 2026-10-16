@@ -1,5 +1,6 @@
 package com.ragagent.agenttools;
 
+import com.ragagent.agent.fixtures.RecordingSupport;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**

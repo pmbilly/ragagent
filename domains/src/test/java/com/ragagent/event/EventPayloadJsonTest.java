@@ -38,7 +38,7 @@ import com.ragagent.contract.event.payload.StopData;
 import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
 import com.ragagent.contract.event.payload.ToolApprovalResolvedData;
 import com.ragagent.contract.event.payload.UserMessageInjectedData;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * 事件 payload 的 JSON 字节形状——<b>期望值全部是固定录制真值</b>，

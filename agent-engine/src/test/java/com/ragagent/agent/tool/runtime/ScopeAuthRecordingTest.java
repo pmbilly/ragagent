@@ -23,8 +23,8 @@ import com.ragagent.contract.agent.SearchAuth.ScopeAuthException;
 import com.ragagent.contract.agent.SearchAuth.TagView;
 import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
 import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.agenttools.RecordingSupport;
-import com.ragagent.agenttools.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.GoRecording45B;
 
 /**
  * SearchAuth/SearchTargets 的录制回放（26 条）。错误文案逐字比对；

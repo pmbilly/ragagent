@@ -37,7 +37,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.servlet.HandlerMapping;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * 长期记忆 HTTP 层的契约测试（16 个端点）。

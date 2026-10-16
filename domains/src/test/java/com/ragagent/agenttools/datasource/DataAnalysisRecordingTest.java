@@ -30,8 +30,8 @@ import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeLoader;
 import com.ragagent.agenttools.datasource.DataAnalysisTool.QueryResult;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.agenttools.GoRecording45B;
-import com.ragagent.agenttools.RecordingSupport;
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.platform.web.JsonMappers;
 
 /**

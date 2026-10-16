@@ -1,7 +1,7 @@
 package com.ragagent.agent.tool;
 
-import com.ragagent.agenttools.RecordingSupport;
-import com.ragagent.agenttools.GoRecording45A;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.GoRecording45A;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;

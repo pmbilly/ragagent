@@ -29,7 +29,7 @@ import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.SyncResult;
 import com.ragagent.datasource.domain.TaskInitiator;
 import org.junit.jupiter.api.Test;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * datasource 领域类型的**逐字节 JSON 契约**测试。

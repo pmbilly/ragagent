@@ -22,9 +22,9 @@ import com.ragagent.agenttools.knowledge.GrepChunksTool.GrepChunkSearch;
 import com.ragagent.platform.knowledge.GrepChunkHit;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.agenttools.GoRecording45B;
-import com.ragagent.agenttools.RecordingSupport;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * 4.5b 回放：grep_chunks 的录制回放。

@@ -25,7 +25,7 @@ import com.ragagent.memory.domain.item.MemoryTombstone;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import org.junit.jupiter.api.Test;
 import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * memory 实体 / jsonb 值的**逐字节 JSON 契约**测试。

@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.agenttools.GoRecording45B;
-import com.ragagent.agenttools.RecordingSupport;
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
 
 /**
  * SearchConversationsTool 的录制回放（7 条）。output 逐字比对；limit/owner 断言

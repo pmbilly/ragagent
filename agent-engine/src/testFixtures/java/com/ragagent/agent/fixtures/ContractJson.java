@@ -1,4 +1,4 @@
-package com.ragagent.support;
+package com.ragagent.agent.fixtures;
 
 import java.util.TreeMap;
 import java.util.Map;

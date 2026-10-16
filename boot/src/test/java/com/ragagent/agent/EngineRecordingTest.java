@@ -15,7 +15,7 @@ import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.contract.agent.CompactionSettings;
 import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.contract.model.chat.FunctionCall;
@@ -30,7 +30,7 @@ import com.ragagent.contract.agent.KnowledgeBaseInfo;
  * 引擎录制回放：Java 引擎用同一脚本驱动，事件序列 / AgentState 快照 /
  * stub 收到的消息与选项 / steer 注入路径与 {@link GoRecording46B} 的录制常量比对。
  *
- * <p>比对方式为「{@link com.ragagent.support.ContractJson#deep}
+ * <p>比对方式为「{@link com.ragagent.agent.fixtures.ContractJson#deep}
  * 语义比较」：键序 / HTML 转义形态 / 时间写法不再构成断言目标；
  * 录制文件保留为历史基准（禁止手改）。</p>
  *

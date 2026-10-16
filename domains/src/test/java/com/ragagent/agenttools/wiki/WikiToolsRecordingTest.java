@@ -16,8 +16,8 @@ import com.ragagent.contract.agent.SearchAuth.KnowledgeTagsFetcher;
 import com.ragagent.contract.agent.SearchAuth.TagView;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.agenttools.GoRecording45B;
-import com.ragagent.agenttools.RecordingSupport;
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
 
 /**
  * 4.5b 回放：wiki_read_page / wiki_search 的录制回放。

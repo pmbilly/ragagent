@@ -6,8 +6,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agenttools.RecordingSupport;
-import com.ragagent.agenttools.GoRecording45A;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.GoRecording45A;
 
 /**
  * ThinkBlocks.stripThinkBlocks 的录制语料（11 条）。多行块/多个块/仅块/周围空白/未闭合/

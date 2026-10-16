@@ -21,8 +21,8 @@ import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.SearchResultView;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.agenttools.GoRecording45B;
-import com.ragagent.agenttools.RecordingSupport;
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
 
 /**
  * 4.5b 回放：knowledge_search 的录制回放。

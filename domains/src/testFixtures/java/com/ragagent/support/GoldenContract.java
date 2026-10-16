@@ -1,5 +1,6 @@
 package com.ragagent.support;
 
+import com.ragagent.agent.fixtures.ContractJson;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.UnaryOperator;

@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.service.EmbedTokenStore;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * embed 契约测试：管理面（emb-mgmt-*）+ 公开面（emb-pub-*），golden 逐条

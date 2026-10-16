@@ -13,8 +13,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.agenttools.GoRecording45B;
-import com.ragagent.agenttools.RecordingSupport;
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
 
 /**
  * wiki 小件（wiki_support 行为 + write/replace/delete/rename/flag/read_issue/update_issue）

@@ -1,5 +1,7 @@
 package com.ragagent.agenttools;
 
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
 
 import static org.assertj.core.api.Assertions.assertThat;

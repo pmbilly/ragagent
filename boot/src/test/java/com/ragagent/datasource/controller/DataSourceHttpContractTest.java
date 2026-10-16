@@ -46,7 +46,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * 数据源 HTTP 层的契约测试（覆盖 17 个端点）。
@@ -662,7 +662,7 @@ class DataSourceHttpContractTest {
         MvcResult first = perform(delete("/api/v1/datasource/" + id + "/credentials/credentials")
                 .header("Authorization", bearer));
         assertEquals(200, first.getResponse().getStatus(), raw(first));   // 204 退役 ⇒ 200 + 外壳
-        assertEquals(com.ragagent.support.ContractJson.semantic(
+        assertEquals(com.ragagent.agent.fixtures.ContractJson.semantic(
                 new com.fasterxml.jackson.databind.ObjectMapper(),
                 "{\"code\":0,\"message\":\"ok\",\"data\":null}"), raw(first));
 
@@ -775,7 +775,7 @@ class DataSourceHttpContractTest {
         String id = createId();
         MvcResult r = perform(delete("/api/v1/datasource/" + id).header("Authorization", bearer));
         assertEquals(200, r.getResponse().getStatus(), raw(r));   // 204 退役 ⇒ 200 + 外壳
-            assertEquals(com.ragagent.support.ContractJson.semantic(
+            assertEquals(com.ragagent.agent.fixtures.ContractJson.semantic(
                     new com.fasterxml.jackson.databind.ObjectMapper(),
                     "{\"code\":0,\"message\":\"ok\",\"data\":null}"), raw(r));
 

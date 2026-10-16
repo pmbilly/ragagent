@@ -12,7 +12,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * SSE 帧的**逐字节**契约测试——这是整套 A/B 的落点，字节错了前面全白做。

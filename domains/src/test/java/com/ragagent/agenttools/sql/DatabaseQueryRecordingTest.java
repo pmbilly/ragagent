@@ -22,8 +22,8 @@ import com.ragagent.agenttools.sql.DatabaseQueryTool.QueryResult;
 import com.ragagent.agenttools.sql.DatabaseQueryTool.SqlQueryExecutor;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.agenttools.GoRecording45B;
-import com.ragagent.agenttools.RecordingSupport;
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.platform.web.JsonMappers;
 
 /**

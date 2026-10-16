@@ -20,7 +20,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import com.ragagent.support.ContractJson;
+import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * 契约测试：auth OIDC 4 端点（未配置 = disabled 分支全覆盖）。
@@ -158,8 +158,8 @@ class OidcContractTest {
         outer.put("code", 0);
         outer.put("message", "ok");
         outer.put("data", env);
-        assertEquals(com.ragagent.support.ContractJson.semantic(golden(goldenName)),
-                com.ragagent.support.ContractJson.semantic(MAPPER.writeValueAsString(outer)), goldenName);
+        assertEquals(com.ragagent.agent.fixtures.ContractJson.semantic(golden(goldenName)),
+                com.ragagent.agent.fixtures.ContractJson.semantic(MAPPER.writeValueAsString(outer)), goldenName);
     }
 
     private static final com.fasterxml.jackson.databind.ObjectMapper RAW_SEMANTIC_MAPPER =

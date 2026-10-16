@@ -39,6 +39,7 @@ run '契约同步（B221：金片键签名变了必须签字，防"后端改契�
 run '路径/包对应（B263㉖：源码目录必须与 package 声明一致，防"改包不搬目录"）' python3 scripts/check-package-dirs.py
 run '域间只经契约（R10/A③：跨域只经 contract 或装配层，棘轮只许减）' python3 scripts/check-domain-contracts.py
 run '契约层纯度（C1/C2/C3/C4：受控依赖根 · 持久化形状 · build 依赖 · 载荷落点，全部冻结只许减）' python3 scripts/check-contracts-purity.py
+run '模块图（R6：主码矩阵 · 主码无同包 · 测试边登记 · 夹具不占别模块包）' python3 scripts/check-module-graph.py
 run 'platform 业务形状（C8：只剩技术适配；红旗命名 View/Port/Request/Response/Payload/Facts 只许减不许增）' python3 scripts/check-platform-shapes.py
 
 echo

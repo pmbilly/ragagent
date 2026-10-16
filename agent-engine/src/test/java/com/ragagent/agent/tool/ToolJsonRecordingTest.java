@@ -6,15 +6,15 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.support.ContractJson;
-import com.ragagent.agenttools.RecordingSupport;
-import com.ragagent.agenttools.GoRecording45A;
+import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.GoRecording45A;
 
 /**
  * ToolJson 的录制语料（9 条：把 JSON 解析成树再重编码）。
  *
  * <p>HTML 转义形态不再构成断言目标（对比经
- * {@link com.ragagent.support.ContractJson#deep} 语义归一）；**键序**改由本类的
+ * {@link com.ragagent.agent.fixtures.ContractJson#deep} 语义归一）；**键序**改由本类的
  * {@code keysAreSortedAlphabetically} 单独钉住（它是 LLM 载荷的确定性前提）。</p>
  */
 class ToolJsonRecordingTest {

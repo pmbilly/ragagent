@@ -1,4 +1,4 @@
-package com.ragagent.agenttools;
+package com.ragagent.agent.fixtures;
 
 /**
  * 4.5b 录制常量（本文件由录制输出 rec.jsonl 生成——禁止手改；

@@ -1,5 +1,7 @@
 package com.ragagent.agenttools;
 
+import com.ragagent.agent.fixtures.GoRecording45A;
+import com.ragagent.agent.fixtures.RecordingSupport;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
