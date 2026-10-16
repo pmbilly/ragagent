@@ -3,8 +3,8 @@ package com.ragagent.modelruntime.adapter.provider.chat.common;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.llm.ChatStream;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.StreamResponse;
 
 /**
  * 无界队列承载的流句柄（{@code RemoteApiChat} 与 langfuse 转发层用）。

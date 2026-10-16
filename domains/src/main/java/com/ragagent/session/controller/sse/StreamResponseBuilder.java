@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.stream.StreamEvent;
 

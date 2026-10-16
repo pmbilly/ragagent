@@ -9,13 +9,13 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.llm.ChatStream;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.llm.limiter.BackgroundTaskContext;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.limiter.LocalLimiter;

@@ -9,7 +9,7 @@ import java.util.Set;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.knowledge.KnowledgeView;
 import com.ragagent.contract.knowledge.KnowledgeSpanPort;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

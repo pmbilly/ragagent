@@ -5,12 +5,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.ragagent.llm.ChatStream;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.limiter.Release;
 import org.slf4j.Logger;

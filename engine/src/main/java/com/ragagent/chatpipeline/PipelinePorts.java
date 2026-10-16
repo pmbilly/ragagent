@@ -3,7 +3,7 @@ package com.ragagent.chatpipeline;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRetrievalContext;
 import com.ragagent.contract.retrieval.SearchResult;

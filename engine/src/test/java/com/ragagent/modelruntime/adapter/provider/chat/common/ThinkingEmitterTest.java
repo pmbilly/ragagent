@@ -10,7 +10,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 
 import org.junit.jupiter.api.Test;
 

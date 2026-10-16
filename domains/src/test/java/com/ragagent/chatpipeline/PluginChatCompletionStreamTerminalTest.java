@@ -14,13 +14,13 @@ import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
-import com.ragagent.llm.ChatStream;
+import com.ragagent.contract.model.ChatStream;
 import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 
 /**
  * NORMAL 流的终态收口（整改 A1）。

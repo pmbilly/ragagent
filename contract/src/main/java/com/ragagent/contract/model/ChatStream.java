@@ -1,8 +1,6 @@
-package com.ragagent.llm;
+package com.ragagent.contract.model;
 
 import java.util.concurrent.BlockingQueue;
-
-import com.ragagent.llm.domain.StreamResponse;
 
 /**
  * 流式响应句柄（A3）：队列语义不变（{@code take}/{@code poll} 与既有消费者一致），

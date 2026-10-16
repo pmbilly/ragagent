@@ -13,7 +13,7 @@ import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.llm.extract.PipelineConfig;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.platform.web.JsonMappers;
 import com.fasterxml.jackson.databind.JsonNode;
 

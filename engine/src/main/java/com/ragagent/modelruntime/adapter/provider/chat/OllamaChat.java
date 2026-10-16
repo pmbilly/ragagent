@@ -8,19 +8,19 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.ragagent.llm.ChatStream;
+import com.ragagent.contract.model.ChatStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.chat.FunctionCall;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.llm.ollama.OllamaChatRequest;

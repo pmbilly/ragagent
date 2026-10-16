@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.knowledge.KnowledgeSpanPort;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.audit.WikiActivityAudit;
 import com.ragagent.wiki.domain.WikiConfig;
 import com.ragagent.contract.wiki.WikiConstants;

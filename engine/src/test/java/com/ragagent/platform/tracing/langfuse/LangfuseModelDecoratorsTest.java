@@ -16,14 +16,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import com.ragagent.embedding.Embedder;
-import com.ragagent.llm.ChatStream;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;

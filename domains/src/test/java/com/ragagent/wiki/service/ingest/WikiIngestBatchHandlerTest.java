@@ -28,7 +28,7 @@ import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.audit.WikiActivityAudit;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.domain.page.WikiPageLite;

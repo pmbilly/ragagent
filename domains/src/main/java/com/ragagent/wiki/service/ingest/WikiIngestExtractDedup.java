@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.prompt.WikiPrompts;

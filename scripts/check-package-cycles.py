@@ -34,6 +34,17 @@
     根目录只检查**最后读到的 1 个文件**；修复后全量重扫实测 0 命中 ⇒ 读数不变
     （纯漏检面修复；红态探针：注入 common/probe 持久层引用 ⇒ 修前计数 0、修后计数 1）。
   · R9 上线：包级 SCC 实测 13 组入基线（R1b 顶层域视角下全部不可见）。
+
+2026-10-16（R2a）包级 SCC 8 → 9 组（**新增 1 组**：{contract.model, contract.model.chat}）：
+  · 原因：契约面"模型运行时而"上提（R2a）——`contract.model` 收 `LlmChatClient`（聊天客户端端口）
+    与 `StreamResponse`（聊天流帧），前者签名取 `ChatMessage/ChatOptions/ChatResponse`、
+    后者含 `List<ToolCall>`；反向 `contract.model.chat.ChatResponse` 持 `contract.model.TokenUsage`。
+  · 性质：**父子包内聚**（同 skills/mapper、embedding/provider、rerank/provider 三组既有先例），
+    不是跨族缠绕；两包同属契约模型词汇表，互相引用是该词汇表的固有形状。
+  · 为什么不在本批消除：方案 §8.1 的目标面（`ModelRuntime`/`ModelCall`/`ModelChunk`/`ModelResponse`
+    在 `contract.model`）同样要引用聊天形状 ⇒ 挪包只能把同一判定推到下一个批次，不解决结构问题。
+  · 仍受棘轮：本组只许减不许增；若将来把 `TokenUsage`/`ResponseType` 一并归入 chat 面，
+    本组应随之消除并刷新（已消除同样报红，不会悄悄过期）。
 """
 import json
 import pathlib

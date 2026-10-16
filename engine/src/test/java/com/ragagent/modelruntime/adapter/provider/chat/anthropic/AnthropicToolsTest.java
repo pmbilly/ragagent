@@ -19,7 +19,7 @@ import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.contract.model.chat.FunctionCall;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.chat.ToolCall;
 
 import org.junit.jupiter.api.Test;

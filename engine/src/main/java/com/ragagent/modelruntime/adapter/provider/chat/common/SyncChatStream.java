@@ -3,8 +3,8 @@ package com.ragagent.modelruntime.adapter.provider.chat.common;
 import java.util.concurrent.SynchronousQueue;
 
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.llm.ChatStream;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.StreamResponse;
 
 /**
  * 无缓冲（{@code SynchronousQueue}）承载的流句柄：并发闸门装饰器用。

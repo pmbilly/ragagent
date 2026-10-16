@@ -13,14 +13,14 @@ import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.platform.event.EventJson;
 import com.ragagent.platform.event.EventType;
-import com.ragagent.llm.ChatStream;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.contract.model.chat.FunctionCall;
 

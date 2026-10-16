@@ -24,7 +24,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 

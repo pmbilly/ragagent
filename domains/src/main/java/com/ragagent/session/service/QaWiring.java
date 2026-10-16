@@ -41,7 +41,7 @@ import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.platform.settings.ConversationProperties;
 
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;

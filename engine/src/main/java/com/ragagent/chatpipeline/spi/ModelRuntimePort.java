@@ -2,7 +2,7 @@ package com.ragagent.chatpipeline.spi;
 
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.embedding.Embedder;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.vlm.VlmClient.VlmConfig;
 

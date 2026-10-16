@@ -31,7 +31,7 @@ import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.graph.GraphRelation;
 import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.llm.extract.PipelineConfig;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 
 /**
  * 录制回放：progress / into_chat / references / completion / stream / entity / web_fetch

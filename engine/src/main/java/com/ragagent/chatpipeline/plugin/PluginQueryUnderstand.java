@@ -13,7 +13,7 @@ import com.ragagent.chatpipeline.PipelineCommon;
 import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;

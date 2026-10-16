@@ -26,7 +26,7 @@ import com.ragagent.memory.repository.MemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 
 /**
  * 整仓回顾：把同一个主体近重复的记忆折成一条，并把搁置太久的任务降级。

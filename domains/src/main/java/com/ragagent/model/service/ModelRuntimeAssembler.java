@@ -6,7 +6,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.embedding.EmbedderFactory;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;

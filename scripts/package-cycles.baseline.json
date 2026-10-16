@@ -17,6 +17,10 @@
       "com.ragagent.chatpipeline.support"
     ],
     [
+      "com.ragagent.contract.model",
+      "com.ragagent.contract.model.chat"
+    ],
+    [
       "com.ragagent.embedchannel",
       "com.ragagent.embedchannel.controller.filter",
       "com.ragagent.embedchannel.service"

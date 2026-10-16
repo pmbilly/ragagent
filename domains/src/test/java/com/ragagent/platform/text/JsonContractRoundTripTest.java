@@ -53,7 +53,7 @@ import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.storage.dto.StorageConfig;

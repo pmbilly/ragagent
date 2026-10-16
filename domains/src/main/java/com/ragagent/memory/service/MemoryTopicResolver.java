@@ -20,7 +20,7 @@ import com.ragagent.memory.repository.MemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 
 /**
  * 把一次抽取产出的标签映射到这个人**已经有**的主体上。

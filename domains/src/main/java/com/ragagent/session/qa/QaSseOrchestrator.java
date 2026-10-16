@@ -36,7 +36,7 @@ import com.ragagent.contract.agent.AgentToolCall;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.contract.event.payload.StopData;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.platform.stream.LiveRunExistsException;
 

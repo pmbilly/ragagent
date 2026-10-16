@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.chatpipeline.plugin.PluginChatCompletionStream;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.llm.ChatStream;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 
 /**
  * A5：NORMAL 流消费线程必须显式继承请求身份。

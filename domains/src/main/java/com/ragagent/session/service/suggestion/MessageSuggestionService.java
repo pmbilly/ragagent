@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import com.ragagent.agentmanagement.service.AgentSuggestedQuestions;
 import com.ragagent.agentmanagement.service.CustomAgentService;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;

@@ -13,7 +13,7 @@ import com.ragagent.agenttools.wiki.WikiScope;
 import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.memory.MemoryRecallPort;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.agent.prompt.AgentPromptTemplates;

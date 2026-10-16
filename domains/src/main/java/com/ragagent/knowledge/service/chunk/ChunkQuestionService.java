@@ -28,7 +28,7 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.ChunkNotFoundException;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;

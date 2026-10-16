@@ -35,7 +35,7 @@ import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.FunctionDef;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.modelcontext.Registry;

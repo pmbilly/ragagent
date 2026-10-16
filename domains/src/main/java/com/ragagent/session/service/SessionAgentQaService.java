@@ -17,7 +17,7 @@ import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.MemoryRecalledData;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.memory.MemoryRecallPort;
 import com.ragagent.rerank.Reranker;

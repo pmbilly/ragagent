@@ -1,4 +1,4 @@
-package com.ragagent.llm;
+package com.ragagent.contract.model;
 
 import java.util.List;
 

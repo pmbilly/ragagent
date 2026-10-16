@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 
 /**
  * 把一个 {@link StreamResponse} 写成 gin 那条 SSE 帧——**逐字节**。

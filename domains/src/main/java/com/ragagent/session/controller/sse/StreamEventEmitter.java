@@ -10,7 +10,7 @@ import com.ragagent.contract.session.SseSink;
 import org.springframework.stereotype.Component;
 
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.platform.storage.support.Rewriter;
 import com.ragagent.platform.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.StreamEvent;

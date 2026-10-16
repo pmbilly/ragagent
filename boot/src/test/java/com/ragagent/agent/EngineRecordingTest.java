@@ -13,7 +13,7 @@ import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.platform.event.EventJson;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.support.ContractJson;
 import com.ragagent.agent.compaction.CompactionSettings;

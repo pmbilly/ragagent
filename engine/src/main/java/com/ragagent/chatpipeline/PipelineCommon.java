@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.chatpipeline.plugin.PluginError;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;

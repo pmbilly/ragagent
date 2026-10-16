@@ -21,7 +21,7 @@ import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.contract.model.chat.FunctionCall;
 import com.ragagent.contract.model.PromptCacheStatus;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.llm.ollama.OllamaChatRequest;
 import com.ragagent.llm.ollama.OllamaChatResponse;

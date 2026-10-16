@@ -1,23 +1,20 @@
-package com.ragagent.llm.domain;
+package com.ragagent.contract.model;
 
-import com.ragagent.contract.model.TokenUsage;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.model.ResponseType;
 
 /**
  * 流式响应。
  *
  * JSON 字段序 = 声明序。
- * id/response_type/content/done 恒输出；其余为空时省略（NON_EMPTY）。
+ * id/response_type/content/done 恒输出；其余为空时省略（NON_EMPTY）——
+ * 省略注解由 {@code platform.web.ContractJsonMixinsModel} 承载（契约面纯 JDK）。
  *
  * 线上契约：这是 SSE 事件体的核心结构，`response_type` 取值见 {@link ResponseType}。
  */
-
 public class StreamResponse {
 
     private String id = "";
@@ -31,26 +28,19 @@ public class StreamResponse {
      *
      * <p>为空时整键省略。</p>
      */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<SearchResult> knowledgeReferences;
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String sessionId;
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String assistantMessageId;
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ToolCall> toolCalls;
     /**
      * 附加数据（map，为空时省略）。
      *
-     * <p>键序由 {@link SortedMapSerializer} 递归按字母序归一——产出方（chat / agent 引擎）
+     * <p>键序由序列化侧递归按字母序归一——产出方（chat / agent 引擎）
      * 大多用 {@code LinkedHashMap} 按写入序；
      * 嵌套的 {@code arguments} 之类更是直接来自模型返回的 JSON，外层排不掉。</p>
      */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> data;
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private TokenUsage usage;
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String finishReason;
 
     /** 流在 provider 发出 finish_reason 之前中断（读错误/超时/停滞）时使用。 */

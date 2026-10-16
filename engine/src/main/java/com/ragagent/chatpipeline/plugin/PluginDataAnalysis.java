@@ -20,7 +20,7 @@ import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.contract.retrieval.ChunkTypes;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatResponse;
 
 /**

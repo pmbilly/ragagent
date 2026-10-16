@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.knowledge.ChunkPort;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.wiki.service.page.NewSlugFromCitation;

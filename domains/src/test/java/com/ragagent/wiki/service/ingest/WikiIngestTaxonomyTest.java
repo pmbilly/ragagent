@@ -20,7 +20,7 @@ import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.wiki.service.WikiModelResolver;
 import com.ragagent.wiki.service.page.WikiPageService;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 
 /**
  * {@link WikiIngestTaxonomy} 的测试，另含

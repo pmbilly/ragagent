@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.knowledge.ChunkPort;
-import com.ragagent.llm.LlmChatClient;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.wiki.domain.WikiExtractionGranularity;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import org.slf4j.Logger;

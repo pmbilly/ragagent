@@ -9,7 +9,7 @@ import java.util.concurrent.BlockingQueue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.model.chat.ToolCall;
 
