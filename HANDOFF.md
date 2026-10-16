@@ -66,7 +66,7 @@
 | **P5** | platform 收尾：fileserve/support 逐件裁；目录与 package-info 清理；**C8 门禁上线**（业务形状零命中验收） | ✅ e6f99afd / 1851b3ad / 1b020e97 |
 | **R1** | 契约面先行：`contract.model.chat`（llm.domain 11 件）+ `contract.retrieval` 缺口 + `contract.agent` 6 件 + `contract.execution` 按需 | ✅ **收官**：R1a `ae0a17c0`（11 件 → `contract.model.chat`）· R1b-1 `b5a36912`（4 件 → `contract.websearch`）；余项 **R1b-2→R3 / R1c→R5 / R1d 不建**（判定见 §2.9） |
 | **R2** | `model-runtime` 提取（**实际 153 件** = llm 58 / modelruntime 46 / embedding 21 / rerank 15 / modelcontext 13；计划的"163 件"含 tracing 6 + webfetch 4——**按计划自身 R4/R3 行裁定：tracing 归 R4、webfetch 归 R3**）；公开面分层（契约类 vs 实现面） | 🔄 **R2a ✅ `925071a2`+`f0355a7f`** · **R2b ✅ `c160b749`**（模块切出） · **R2c-1a ✅ `c25d90e7`**（`ModelRuntimePort`→`contract.model.ModelRuntime`、`VlmConfig` 契约化） · **R2c-1b ✅ `76c30539`**（装配器+配置映射入 model-runtime、共享传输归位 platform.http、模块内环清零）；**R2c-2 ✅ `fda13bbe`**（六处自建客户端改走端口工厂面 `chatClientFor`/`embedderFor`/`rerankerFor`/`chatConfigFor`；domains 对模型族的 import 70 处/22 文件 → **40 处/17 文件**）；**R2c-3a/3b ✅ `2e914b31`**（ASR 端口化 + `QaWiring` 装配走端口；`AsrTranscriber` 实现抽成独立类并自持 `@Component`，摘掉 domains 的手工 @Bean）⇒ domains 对模型族的 import **40 处/17 文件 → 27 处/14 文件**；**R2c-3c ✅ `1377e4ab` + `f83e2976`**（thinking 判定收进端口 `effectiveThinkingControl`——provider 词汇 5 处退场，`ModelDebugController` 对模型族 import 清零；顺带清 `InitializationController` 死参数）⇒ domains 余 **22 处/13 文件**；**R2c-3d 待做**（余项多为设计项：① `VlmDescriberWiring` 的 VLM 并发闸门（`ConcurrencyGovernor`+`Release`）建议收进端口（`ModelRuntime` 给"按模型闸门"或整个 VLM 调用）② `OllamaManageService` 的 Ollama 能力（status/models/pull）需契约端口 ③ `llm.extract` 族 9 处与 R4b 一并裁定（`PipelineConfig` 随 chatpipeline 走，`ExtractPrompts`/`EntityExtraction` 归 knowledge 或入契约）④ `PromptCache`/`ImageResolver` 各 1 逐条裁定；⑤ `modelcontext` 4 处**不动**——R5 之后是 `agent-engine → model-runtime` 的合法终态边）**R2c-3d 部分 ✅ `bafd7030`**（图片解析桥接 `ChatLocalImageResolverWiring` 归位组合根 boot ⇒ domains 余 **20 处/12 文件**）。**R2c 实质收敛**：余下 20 处里 4 处是合法终态边（`modelcontext` → R5），12 处与 R3/R4b 天然耦合（`retrieval.vlm` 的 VLM 客户端 + `ConcurrencyGovernor`/`Release` 闸门 ⇒ 随 R3 的 VLM 面一并；`llm.extract` 族 9 处 ⇒ 随 R4b：`PipelineConfig` 随 chatpipeline 走、`ExtractPrompts`/`EntityExtraction` 归 knowledge 或入契约），只剩 2 项可独立做：`OllamaService`/`OllamaModelInfo` 4 处（需 Ollama 能力端口）与 `PromptCache` 1 处（纯函数拆分到 platform）。⇒ **收窄 engine 的 `api(:model-runtime)` 应排到 R3/R4b 之后**
-| **R3** | **retrieval-engine 模块提取**（实测 91 件：engine 69 · support 8 · 根 5 · graph 4 · vlm 2 · artifact/config/telemetry 各 1；测试 32 件）；与 model 侧的边接口化（走 `contract.retrieval`/`EmbeddingModelPort`） | 🔄 **R3a ✅ `a3d26936`**（VLM 面归位 + 端口化 ⇒ **验收项：retrieval 对模型族 import = 0**）；R3b（契约面补检索端口/形状）/ R3c（模块切出）/ R3d（消费面与组装权）/ webfetch 归属拍板 待做 |
+| **R3** | **retrieval-engine 模块提取**（实测 91 件；测试 30）**按"先切后收"路线**（用户 2026-10-16 拍板择乙）：先切模块让 reshape 波被模块边界圈住，再端口化收窄 | 🔄 **R3a ✅ `a3d26936`**（VLM 面归位 ⇒ retrieval 对模型族边 = 0）· **R3b-1 ✅ `f9870dc6`**（三个自足件上提 `contract.retrieval`）· **R3c ✅ `8b0b3782`**（`:retrieval-engine` 切出，engine 315→16 条测试、新模块 292 条）；**R3b-2**（形状 reshape：93 构造点/143 赋值行/34 文件，含 `IndexInfo` 等可变→record）· **R3b-3**（impl 端口：CompositeRetrieveEngine/HybridSearchService/VectorStoreService/各 *RetrieveRepository）· **R3d**（消费面收窄 + webfetch 归属）待做 |
 | **R4** | 归位：`tracing`(6) → `platform.tracing.decorators`；`chatpipeline`(46) → `domains/session/service.rag` | 🔄 **R4a ✅ `fff4d3ba`**（tracing 六件 → `platform.tracing.decorators`；契约流句柄三件 → `platform.stream`；顺带换锚 ArchUnit A16 前缀）；R4b（chatpipeline 归位）待做 |
 | **R5** | agent-engine 自 `domains/agent`（79 件）外提 + `contract.agent` 6 件（并入判定）+ 工具 SPI | ⬜（新情报：`AgentEngine` 直连 `platform.tracing.langfuse` 与 `platform.access/event` ⇒ platform 边比 engine 边重） |
 | **R6** | engine 解散收口（剩余包归位 + 收窄 `api` 传递 + 模块图终检） | ⬜（**前置**：R3/R4b 之后才能收窄 `engine` 的 `api(:model-runtime)`） |
@@ -95,26 +95,28 @@
 
 ## 8. 结构地图与守卫总表
 
-### 8.1 现状模块（6）与目标（7）
+### 8.1 现状模块（7）与目标（7）
 
-> 计数口径：`<模块>/src/main/java/**/*.java`，**不含 package-info**（2026-10-16 R2b 后实测）。
+> 计数口径：`<模块>/src/main/java/**/*.java`，**不含 package-info**（2026-10-16 R3c 后实测）。
 
 ```
-现状（R2b 后）                              目标（方案 §5.1）
-contract      266 件（纯 JDK，零依赖块）  →  contracts/
-platform      150 件（技术适配；业务形状已归正；含 R4a 追踪装饰器 6 + 流句柄 3、R2c 共享传输 2）→ platform/
-model-runtime 132 件（R2b 切出：llm 54 · modelruntime 39 · embedding 18 · rerank 12 ·
-                 modelcontext 12；R4a 迁出流句柄 3、R2c 迁入装配器与配置映射 2 / 迁出传输 2）
+现状（R3c 后）                              目标（方案 §5.1）
+contract      271 件（纯 JDK，零依赖块）  →  contracts/
+platform      150 件（技术适配 + 追踪装饰/流句柄/共享传输）→ platform/
+model-runtime 134 件（llm 54 · modelruntime 39 · embedding 18 · rerank 12 · modelcontext 12 ·
+                 vlm 2 · application 装配面）
                                         →  model-runtime（已成）
-engine        139 件（retrieval 90 · chatpipeline 46 · webfetch 4；三者将迁：
-                 retrieval→retrieval-engine（R3）· chatpipeline→session（R4b）· webfetch 归属拍板（R3））
-domains      1290 件
-boot           12 件                      →  agent-engine（R5 自 domains/agent 外提）
+retrieval-engine 85 件（R3c 切出：engine 67 · support 9 · 根 5 · graph 3 · artifact/config/telemetry）
+                                        →  retrieval-engine（已成；R3d 端口化收窄）
+engine         49 件（chatpipeline 45 · webfetch 4；二者将迁：chatpipeline→session（R4b）·
+                 webfetch 归属拍板（R3d））
+domains      1287 件
+boot           13 件                      →  agent-engine（R5 自 domains/agent 外提）
 
 依赖方向：boot → 全部；domains / 三个 runtime → platform, contract；platform → contract；contract → JDK
-（R2b 过渡期：engine 以 api 传递 :model-runtime，domains 借之可见其类型 ⇒ R2c 组装权下沉后收窄）
+（过渡期：engine 以 api 传递 :model-runtime 与 :retrieval-engine ⇒ R3d/R4b 端口化后收窄成逐点显式声明；
+  retrieval-engine 对模型族出边 = 0 ✓ 已达标）
 ```
-
 ### 8.2 域内分层（方案 §6）
 
 `controller`（绑定/帧写出）· `service`（用例与政策）· `domain`（状态与不变量）· `mapper` · `repository` · `dto` · `client` · `task` · `api` · `support` · `config`（只装配）。
@@ -179,6 +181,7 @@ boot           12 件                      →  agent-engine（R5 自 domains/ag
 | P4f | 2026-10-16 | `EmbedSessionPort` 中性化入契约：`SseSink`（帧出口）+ `EmbedReply`（status+body）；SSE 链全链换型（FrameWriter→Emitter→Orchestrator→Executor→Controller）+ 边界包装（DelegateOps/Adapter）；`platform.session` 包消亡 | 14 守卫全绿（R8 修复）· 金片 1349 一致 · gate 2m6s / **4996 / 失败 0 / 跳过 4** |
 | P5 | 2026-10-16 | platform 收尾三件：`ParserEngineConfig` 去框架化入 `contract.tenant`（27 注解 → Core mixin）· fileserve 逐件裁（4 端口 + `OpenedFile` 上提契约；HTTP 三件 + `StoragePaths` 留登记）· **C8 门禁上线**（业务形状棘轮，3 条登记） | 15 守卫全绿 · 金片 1349 一致 · gate 1m39s~2m23s / **4996 / 失败 0 / 跳过 4**；platform 只剩技术适配 + 3 条业务形状登记 |
 | —（杂项） | 2026-10-16 | 61 份过期文档清理（用户确认；活文档零引用已核）· `scripts/dev-env.sh` login 提取器适配统一响应壳（token 移入 data） | 冒烟 sessions / knowledge-bases 200 · token 265 字符 |
+| R3c | 2026-10-16 | **`:retrieval-engine` 模块切出**：`com.ragagent.retrieval` 整树（main 91 / test 30）+ `jieba` 资源（hmm_model 1.1MB + 测试基线）engine → retrieval-engine，包名不变；依赖按实测 import 面（contract/platform api + Jackson/spring-context·jdbc·boot + neo4j/sqlite/Hikari implementation + mysql/postgres runtimeOnly）；**测试任务口径随迁**（integrationTest 显式入口 + test 排除 *IT——否则两台 env 门控 IT 混进 test：实测 +2 条/+2 跳过）；七处模块清单同步 + 异常语义守卫扫描根随迁（守卫自报"扫描根不存在"）+ 大文件基线 3 条换锚（ModelDebugController 出榜属收紧）。engine 过渡期 api 传递；**engine 的检索遗留依赖未删**（Gradle implementation 不传递，删前要逐个核 runtime 可达性，留 R6） | 15 守卫绿（环 0 · SCC 9 · 域间 6 条不变）· 金片 1349 一致 · gate 1m58s / **4997 / 0 / 4**（engine 315→16，新模块 292）· 冒烟 200 |
 | R3b-1 | 2026-10-16 | **检索契约面第一刀**：三个自足件上提 `contract.retrieval`——`RetrieveGraphRepository`（图库写/删/读端口，签名只取 contract.graph 的 NameSpace/GraphData）· `TenantStoreOwnership`（@FunctionalInterface）· `RetrieveEngineException`（哨兵异常族：Kind + 四哨兵 + 分类/重抛工具）；裸引用补 import 10 文件；javadoc 两处跨界 {@link} 改 {@code}。**未动**：`RetrieveEngineRegistry`/`RetrieveEngineService` 取 `EngineTypes.*`（可变形状，待 reshape）；工具面 7 件与 impl 端口待后续批 | 15 守卫绿（环 0）· javadoc 0 错 · 金片 1349 一致 · gate 2m32s / **4997 / 0 / 4** · 冒烟 200 |
 | R3a | 2026-10-16 | **VLM 面归位**：`VlmClient`+`VlmHttpTransport` retrieval/vlm → `modelruntime/adapter/provider/vlm`（两测试随迁；传输层 env 面换 `platform.config.AppEnvLookup`，否则 model-runtime → engine/retrieval 成环）；契约面新增 `VlmPredictor` + `ModelRuntime.vlmPredictorFor(ModelRowView)`，装配链（配置/SSRF/观测/命名闸门）整段收进 model-runtime；消费点 `VlmDescriberWiring`/`ModelDebugController` 改走端口；测试重分家（装配断言 → 新 `ModelRuntimeAssemblerVlmTest`，HTTP 形状 → 随迁的 `VlmClientTest`）。**A17 棘轮收紧**：`VlmDescriberWiring` 摘出 SERVICE_TECH_BASELINE（守卫报"基线条目已不再违例"） | 15 守卫绿 · 金片 1349 一致 · json-key 换锚 `--write`（1 出 1 入）· gate 1m46s / **4997 / 0 / 4** · 冒烟 200 · **retrieval 对模型族 import = 0**（R3 验收项达成）· domains 模型族 import 20 → 18 处 |
 | R2c-3d | 2026-10-16 | **图片解析桥接归位**：`ChatLocalImageResolverWiring`（domains 存储 ↔ model-runtime `ImageResolver` 静态钩子）+ 其单测 → `boot/config`（跨模块胶水按"由 boot 注入"归组合根）。**收敛判定**：余 20 处 = 4 合法（R5）+ 12 耦合 R3/R4b + 4 Ollama 端口 + 1 PromptCache 拆分的纯函数 | 15 守卫绿 · 金片 1349 一致 · gate 2m21s / **4996 / 0 / 4** · 起服 200 |
