@@ -22,7 +22,7 @@ import com.ragagent.chatpipeline.plugin.PluginSearchParallel;
 import com.ragagent.chatpipeline.support.SearchSupport;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.websearch.WebSearchResult;
-import com.ragagent.retrieval.support.SearchTextUtil;
+import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.contract.graph.GraphData;
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.retrieval.SearchTarget;

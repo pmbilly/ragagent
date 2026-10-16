@@ -21,7 +21,7 @@ import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.RetrieveEngineRepository;
-import com.ragagent.retrieval.support.SearchTextUtil;
+import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 

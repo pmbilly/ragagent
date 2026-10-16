@@ -1,4 +1,4 @@
-package com.ragagent.retrieval.support;
+package com.ragagent.contract.retrieval;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -8,7 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.websearch.WebSearchResult;
 
 /**

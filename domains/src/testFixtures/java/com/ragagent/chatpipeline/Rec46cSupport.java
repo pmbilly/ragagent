@@ -32,7 +32,7 @@ import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRetrievalContext;
 import com.ragagent.contract.model.RankResult;
-import com.ragagent.retrieval.support.SearchTextUtil;
+import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.session.domain.message.Message;

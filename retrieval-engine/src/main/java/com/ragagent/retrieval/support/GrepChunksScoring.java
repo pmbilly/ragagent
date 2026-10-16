@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.support;
 
+import com.ragagent.contract.retrieval.SearchTextUtil;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

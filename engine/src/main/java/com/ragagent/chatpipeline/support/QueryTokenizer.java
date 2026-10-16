@@ -2,7 +2,7 @@ package com.ragagent.chatpipeline.support;
 
 import java.util.List;
 
-import com.ragagent.retrieval.support.SearchTextUtil;
+import com.ragagent.contract.retrieval.SearchTextUtil;
 
 /**
  * 查询扩展的分词接缝。

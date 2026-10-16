@@ -1,4 +1,4 @@
-package com.ragagent.retrieval.support;
+package com.ragagent.contract.retrieval;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

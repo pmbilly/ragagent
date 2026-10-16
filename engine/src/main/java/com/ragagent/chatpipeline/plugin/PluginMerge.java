@@ -19,7 +19,7 @@ import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
 import com.ragagent.contract.retrieval.SearchChunkMerge;
-import com.ragagent.retrieval.support.SearchTextUtil;
+import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.contract.websearch.ImageInfo;

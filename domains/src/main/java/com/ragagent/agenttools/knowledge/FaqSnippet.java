@@ -1,6 +1,6 @@
 package com.ragagent.agenttools.knowledge;
 
-import com.ragagent.retrieval.support.SearchTextUtil;
+import com.ragagent.contract.retrieval.SearchTextUtil;
 import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;

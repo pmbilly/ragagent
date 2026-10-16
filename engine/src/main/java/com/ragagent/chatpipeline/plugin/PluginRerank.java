@@ -20,7 +20,7 @@ import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
-import com.ragagent.retrieval.support.SearchTextUtil;
+import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.knowledge.DocumentChunkMetadata;
 import com.ragagent.contract.knowledge.GeneratedQuestion;

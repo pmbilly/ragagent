@@ -13,7 +13,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.retrieval.support.SearchTextUtil;
+import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.SuggestionItem;
 import com.ragagent.session.service.suggestion.MessageSuggestionService.Evidence;

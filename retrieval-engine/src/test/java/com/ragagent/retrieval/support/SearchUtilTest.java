@@ -1,5 +1,7 @@
 package com.ragagent.retrieval.support;
 
+import com.ragagent.contract.retrieval.WebResultConverter;
+import com.ragagent.contract.retrieval.SearchTextUtil;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;

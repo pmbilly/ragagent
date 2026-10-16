@@ -183,7 +183,9 @@ BASELINE: dict[str, set[str]] = {
     'retrieval/support/ImageInfoMatchUtil.java': {'end_pos', 'start_pos'},
     # websearch metadata 的 published_at（§15.3 ① 外部决定：键名由搜索服务给，非我们的 JSON 面）。
     # B147a 复核改标：原写「存量面」是错的——与 ReferencesSupport 同族，属外部词汇而非历史数据。
-    'retrieval/support/WebResultConverter.java': {'published_at'},
+    # R3b 换锚：`WebResultConverter` 由 retrieval/support 上提契约面。写进检索结果 metadata 的
+    # `published_at` 是既有 wire 键（第三方搜索响应时间，前端/API 消费）——换包换锚，键名不动。
+    'contract/retrieval/WebResultConverter.java': {'published_at'},
     # SSE complete 事件的 data 键（B136 复核：与上条同属**冻结的线协议** §14.9l 前提判定 2；
     # 同上（SSE/消息载荷）
     'session/controller/SessionController.java': {'message_id', 'session_id'},
