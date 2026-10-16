@@ -11,7 +11,7 @@ import java.util.List;
  *
  * <p>共享一条进程内 DuckDB 内存连接（{@code jdbc:duckdb:}）：表名由
  * {@code tableName(knowledge)} 按知识 ID 命名空间（{@code k_<id>}），多会话/多回合
- * 复用同一连接；会话收尾由 {@link com.ragagent.agent.tool.Cleanable}
+ * 复用同一连接；会话收尾由 {@link com.ragagent.contract.agent.Cleanable}
  * （DataAnalysisTool.cleanup）按表 DROP。exec/query 在连接上串行——DuckDB 单连接
  * 不保证并发语句安全。</p>
  *

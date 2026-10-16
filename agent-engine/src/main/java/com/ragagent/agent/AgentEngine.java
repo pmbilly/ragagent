@@ -1,5 +1,7 @@
 package com.ragagent.agent;
 
+import com.ragagent.contract.agent.SteerSink;
+import com.ragagent.contract.agent.ImageDescriberFunc;
 import com.ragagent.contract.model.chat.ToolCall;
 import java.time.Duration;
 import java.time.Instant;
@@ -43,7 +45,7 @@ import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.agent.budget.AgentBudgets;
+import com.ragagent.contract.agent.AgentBudgets;
 import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
 import com.ragagent.contract.agent.SelectedDocumentInfo;
@@ -155,13 +157,6 @@ public class AgentEngine {
     final SteerIntake steer;
     final ReActIteration iteration;
     final ContextDebugEmitter contextDebug;
-
-    /** 图片描述函数。 */
-    @FunctionalInterface
-    public interface ImageDescriberFunc {
-        /** 描述一张图片；失败抛异常。 */
-        String describe(byte[] imgBytes, String prompt);
-    }
 
     // ==================================================================
     // 构造

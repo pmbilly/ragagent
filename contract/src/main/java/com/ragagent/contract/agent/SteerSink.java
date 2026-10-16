@@ -1,4 +1,4 @@
-package com.ragagent.agent;
+package com.ragagent.contract.agent;
 
 import java.util.List;
 import java.util.Map;

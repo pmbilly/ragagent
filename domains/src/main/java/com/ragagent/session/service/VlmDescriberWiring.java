@@ -1,9 +1,9 @@
 package com.ragagent.session.service;
 
+import com.ragagent.contract.agent.ImageDescriberFunc;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.VlmPredictor;
-import com.ragagent.agent.AgentEngine;
 
 import org.springframework.stereotype.Component;
 
@@ -27,7 +27,7 @@ public class VlmDescriberWiring {
     }
 
     /** 组装描述器；取模型/装配失败抛异常（调用方记警告后走无描述回落）。 */
-    public AgentEngine.ImageDescriberFunc create(String vlmModelId) {
+    public ImageDescriberFunc create(String vlmModelId) {
         ModelRowView model = runtimeFactory.getVlmModel(vlmModelId);
         VlmPredictor predictor = runtimeFactory.vlmPredictorFor(model);
         return (imgBytes, prompt) -> predictor.predict(imgBytes, prompt);

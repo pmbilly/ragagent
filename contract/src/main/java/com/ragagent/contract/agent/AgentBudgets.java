@@ -1,4 +1,4 @@
-package com.ragagent.agent.budget;
+package com.ragagent.contract.agent;
 
 /**
  * agent 轮次补全预算。

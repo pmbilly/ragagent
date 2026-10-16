@@ -23,7 +23,7 @@ import com.ragagent.contract.memory.MemoryRecallPort;
 import com.ragagent.contract.model.Reranker;
 
 import com.ragagent.session.support.PipelineViews;
-import com.ragagent.agent.budget.AgentBudgets;
+import com.ragagent.contract.agent.AgentBudgets;
 import com.ragagent.agent.skills.SkillCatalogService;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.platform.tracing.decorators.LangfuseChatClient;

@@ -3,7 +3,7 @@ package com.ragagent.agenttools.wiki;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import com.ragagent.agent.tool.OutputBudgets;
+import com.ragagent.contract.agent.OutputBudgets;
 import com.ragagent.contract.tool.ToolOutput;
 
 /** wiki 页面列表的预算内渲染（截断/省略记录）。 */

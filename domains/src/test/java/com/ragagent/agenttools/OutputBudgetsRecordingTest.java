@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.agent.tool.OutputBudgets;
+import com.ragagent.contract.agent.OutputBudgets;
 
 /**
  * OutputBudgets.splitBudgetFairly 的录制判定（10 组，max-min 公平分配）+

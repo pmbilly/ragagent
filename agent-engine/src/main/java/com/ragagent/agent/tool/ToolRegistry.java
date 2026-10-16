@@ -1,5 +1,6 @@
 package com.ragagent.agent.tool;
 
+import com.ragagent.contract.agent.Cleanable;
 import com.ragagent.contract.tool.ToolCancellation;
 
 

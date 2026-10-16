@@ -14,7 +14,7 @@ import com.ragagent.session.dto.QaRequests.MentionedItemRequest;
 import com.ragagent.platform.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.agent.SteerSink;
+import com.ragagent.contract.agent.SteerSink;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.platform.access.TenantContextSnapshot;

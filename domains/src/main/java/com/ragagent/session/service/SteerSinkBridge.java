@@ -9,7 +9,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.agent.SteerSink;
+import com.ragagent.contract.agent.SteerSink;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MentionedItem;
 import com.ragagent.platform.stream.StreamBatch;
