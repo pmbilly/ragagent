@@ -21,16 +21,18 @@ COPY gradle ./gradle
 COPY otlp-proto ./otlp-proto
 COPY docreader ./docreader
 COPY migrations ./migrations
-# 六个 Gradle 模块：先拷贝各自构建脚本（源码变动不使这一层失效），再拷贝源码
+# 七个 Gradle 模块：先拷贝各自构建脚本（源码变动不使这一层失效），再拷贝源码
 COPY contract/build.gradle.kts ./contract/
 COPY platform/build.gradle.kts ./platform/
 COPY model-runtime/build.gradle.kts ./model-runtime/
+COPY retrieval-engine/build.gradle.kts ./retrieval-engine/
 COPY engine/build.gradle.kts ./engine/
 COPY domains/build.gradle.kts ./domains/
 COPY boot/build.gradle.kts ./boot/
 COPY contract ./contract
 COPY platform ./platform
 COPY model-runtime ./model-runtime
+COPY retrieval-engine ./retrieval-engine
 COPY engine ./engine
 COPY domains ./domains
 COPY boot ./boot

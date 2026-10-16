@@ -42,7 +42,6 @@
     "domains/src/main/java/com/ragagent/memory/repository/MemoryIndexStore.java": 628,
     "domains/src/main/java/com/ragagent/memory/service/MemoryExtractionService.java": 733,
     "domains/src/main/java/com/ragagent/memory/service/MemoryService.java": 761,
-    "domains/src/main/java/com/ragagent/model/controller/ModelDebugController.java": 618,
     "domains/src/main/java/com/ragagent/session/controller/SessionController.java": 617,
     "domains/src/main/java/com/ragagent/session/service/AgentStreamBridge.java": 668,
     "domains/src/main/java/com/ragagent/session/service/SessionKnowledgeQaService.java": 757,
@@ -59,13 +58,13 @@
     "domains/src/main/java/com/ragagent/wiki/service/page/WikiPageServiceImpl.java": 729,
     "engine/src/main/java/com/ragagent/chatpipeline/plugin/PluginMerge.java": 661,
     "engine/src/main/java/com/ragagent/chatpipeline/plugin/PluginRerank.java": 683,
-    "engine/src/main/java/com/ragagent/retrieval/HybridSearchService.java": 758,
-    "engine/src/main/java/com/ragagent/retrieval/engine/milvus/MilvusRetrieveRepository.java": 610,
-    "engine/src/main/java/com/ragagent/retrieval/engine/tencentvectordb/TencentVectorDbRetrieveRepository.java": 651,
     "model-runtime/src/main/java/com/ragagent/modelcontext/ModelOutput.java": 745,
     "model-runtime/src/main/java/com/ragagent/modelcontext/Registry.java": 645,
     "model-runtime/src/main/java/com/ragagent/modelcontext/ToolPolicy.java": 653,
-    "model-runtime/src/main/java/com/ragagent/modelruntime/adapter/provider/chat/anthropic/AnthropicChat.java": 773
+    "model-runtime/src/main/java/com/ragagent/modelruntime/adapter/provider/chat/anthropic/AnthropicChat.java": 773,
+    "retrieval-engine/src/main/java/com/ragagent/retrieval/HybridSearchService.java": 759,
+    "retrieval-engine/src/main/java/com/ragagent/retrieval/engine/milvus/MilvusRetrieveRepository.java": 610,
+    "retrieval-engine/src/main/java/com/ragagent/retrieval/engine/tencentvectordb/TencentVectorDbRetrieveRepository.java": 651
   },
   "exempt": {}
 }

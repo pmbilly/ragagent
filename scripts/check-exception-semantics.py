@@ -8,7 +8,7 @@ ES/OpenSearch 而言是"匹配全库"——在 RAG 场景下，这意味着过�
 B217 修掉 Elasticsearch V7 的三处同款（向量路 / 关键词路 / 源索引批量读）后设此守卫，
 **零基线纯禁令**：engine 的检索引擎目录下，catch 块内不得新建空 JSON 节点。
 
-范围刻意的窄（只 `engine/src/main/java/com/ragagent/retrieval/engine/`）：
+范围刻意的窄（只 `retrieval-engine/src/main/java/com/ragagent/retrieval/engine/`（R3c 后模块更名，别让扫描根静默失效））：
 - 别处的 `catch → return createObjectNode()` 是"坏 jsonb 视为无数据"，属 §2-12 宽松读，
   不是本守卫的靶子；
 - 这里判的只有一件具体的事：**边界条件不得被降级**。
@@ -22,7 +22,7 @@ import pathlib
 import re
 import sys
 
-SCAN_ROOT = pathlib.Path('engine/src/main/java/com/ragagent/retrieval/engine')
+SCAN_ROOT = pathlib.Path('retrieval-engine/src/main/java/com/ragagent/retrieval/engine')
 CATCH_HEAD = re.compile(r'\bcatch\s*\([^)]*\)\s*\{')
 RESET_CALL = 'createObjectNode('
 

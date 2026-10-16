@@ -1,5 +1,5 @@
-// 能力层模块（L2）：llm / retrieval / embedding / rerank / chatpipeline / modelcontext /
-// webfetch / tracing —— 8 域（295 文件 / 50.1k 行，2026-10-10 实测）。
+// 能力层模块（L2）：chatpipeline / webfetch —— 2 域（R3c 后：retrieval 已切 :retrieval-engine、
+// llm/modelruntime/embedding/rerank/modelcontext 已切 :model-runtime、tracing 已归 platform）。
 // （`stream` 已下沉 `:common`；`tracing` 只留 `decorators` 侧；`model`/`vectorstore` 已回业务侧。）
 //
 // 存在意义（B161，M1 第二步，承 B116 的 :common）：把"能力层不得依赖业务域（L2 → L3 = 0）"
@@ -45,10 +45,12 @@ dependencies {
     // 底座：engine 的公开面大量使用 common 词汇（端口/载荷/视图）⇒ api 暴露给 server。
     api(project(":platform"))
     api(project(":contract"))
-    // 模型运行时（R2 提取）：retrieval / chatpipeline / webfetch / tracing 仍引用其类型
-    // （LlmTransport 是共享 HTTP/SSRF 层）⇒ 过渡期 api 传递；R2c 组装权下沉后收窄为
-    // 逐消费点显式声明。
+    // 模型运行时（R2 提取）：chatpipeline / webfetch 仍引用其类型（LlmTransport 归 platform 后
+    // 出边已收窄）⇒ 过渡期 api 传递；R4b/R6 收口后改为逐消费点显式声明。
     api(project(":model-runtime"))
+    // 检索引擎（R3c 提取）：chatpipeline 的检索插件引用其类型，domains/boot 也经此传递可见
+    // ⇒ 过渡期 api 传递；R3d 端口化后收窄。
+    api(project(":retrieval-engine"))
 
     // 依 11 域的实际 import 面声明（实测 top：jackson 288 / slf4j 122 / spring-web 32 /
     // mybatis 30 / neo4j 11 / spring-http·stereotype 10 / OTLP proto 9 / spring-data-redis 7 /
