@@ -116,7 +116,7 @@ import com.ragagent.knowledge.dto.faq.FaqImportResult;
 import com.ragagent.knowledge.dto.faq.FaqMergeDetail;
 import com.ragagent.knowledge.dto.faq.FaqSuccessEntry;
 import com.ragagent.auth.domain.User;
-import com.ragagent.platform.auth.UserPreferences;
+import com.ragagent.contract.auth.UserPreferences;
 import com.ragagent.auth.dto.InvitationLookupResponse;
 import com.ragagent.auth.dto.OidcAuthUrlResponse;
 import com.ragagent.auth.dto.OidcConfigResponse;

@@ -4,8 +4,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.platform.auth.UserPreferences;
-import com.ragagent.platform.auth.AdminUserView;
+import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.contract.auth.AdminUserView;
 
 /**
  * 系统管理端的响应 DTO 集（JSON 字段名即 Java 字段名，camelCase；可空字段显式 null）。

@@ -1,7 +1,5 @@
-package com.ragagent.platform.auth;
+package com.ragagent.contract.auth;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * users.preferences jsonb 列。
@@ -11,9 +9,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * （users 表该列 NOT NULL DEFAULT '{}'）。
  *
  * last_active_tenant_id 的特殊值：0 = 清除偏好的哨兵；N = 偏好空间 id。
+ *
+ * <p>线格式注解由 {@code platform.web.ContractJsonMixinsAuth} 的 mixin 承载（契约面纯 JDK）。</p>
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserPreferences {
 
     private Long lastActiveTenantId;

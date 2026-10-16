@@ -1,4 +1,4 @@
-package com.ragagent.platform.auth;
+package com.ragagent.contract.auth;
 
 import java.time.OffsetDateTime;
 
@@ -13,9 +13,9 @@ import java.time.OffsetDateTime;
  * <p><b>口径</b>：镜像实体除 {@code @JsonIgnore passwordHash} 外的全部字段，访问器名逐字一致
  * （含 {@code isIsActive()} / {@code isIsSystemAdmin()}）⇒ JSON 等价。</p>
  *
- * <p><b>落点（HANDOFF §12.6.4 硬约束 2）</b>：{@code preferences} 是带 Jackson 注解的
- * {@code UserPreferences} 且直接出面 ⇒ 本视图与端口**只能落 L1**（零依赖 :contract 装不下）；
- * 去 Jackson 后可整批入 {@code contract.auth}。</p>
+ * <p><b>落点（P4a 已清偿）</b>：{@code preferences}（{@code UserPreferences}）已随本批去
+ * Jackson（注解由 {@code platform.web.ContractJsonMixinsAuth} 承载）⇒ 本视图与端口已入
+ * {@code contract.auth}。</p>
  */
 public class AdminUserView {
 

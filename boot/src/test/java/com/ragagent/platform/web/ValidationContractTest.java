@@ -3,7 +3,7 @@ package com.ragagent.platform.web;
 
 import com.ragagent.TestSchema;
 import com.ragagent.auth.domain.User;
-import com.ragagent.platform.auth.UserPreferences;
+import com.ragagent.contract.auth.UserPreferences;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.tenant.domain.Tenant;

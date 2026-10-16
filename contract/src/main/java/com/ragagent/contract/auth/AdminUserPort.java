@@ -1,4 +1,4 @@
-package com.ragagent.platform.auth;
+package com.ragagent.contract.auth;
 
 import java.util.List;
 

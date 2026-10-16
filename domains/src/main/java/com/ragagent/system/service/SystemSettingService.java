@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import com.ragagent.platform.auth.AdminUserPort;
-import com.ragagent.platform.auth.AdminUserView;
+import com.ragagent.contract.auth.AdminUserPort;
+import com.ragagent.contract.auth.AdminUserView;
 
 /**
  * 系统设置服务。
