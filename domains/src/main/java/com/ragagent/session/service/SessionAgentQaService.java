@@ -28,7 +28,7 @@ import com.ragagent.agent.skills.SkillCatalogService;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
 import com.ragagent.platform.tracing.decorators.LangfuseReranker;
-import com.ragagent.chatpipeline.spi.McpToolRegistrationPort;
+import com.ragagent.contract.pipeline.McpToolRegistrationPort;
 import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelRuntime;

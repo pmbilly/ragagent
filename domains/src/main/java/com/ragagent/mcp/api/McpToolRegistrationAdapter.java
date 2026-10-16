@@ -7,9 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.chatpipeline.spi.McpToolRegistrationPort;
-import com.ragagent.chatpipeline.spi.McpToolingGateway;
-import com.ragagent.chatpipeline.spi.ToolRegistryPort;
+import com.ragagent.contract.pipeline.McpToolRegistrationPort;
+import com.ragagent.contract.pipeline.McpToolingGateway;
+import com.ragagent.contract.pipeline.ToolRegistryPort;
 import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.protocol.McpClientManager;

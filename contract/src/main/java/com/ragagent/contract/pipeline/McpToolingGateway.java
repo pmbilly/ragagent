@@ -1,8 +1,7 @@
-package com.ragagent.chatpipeline.spi;
+package com.ragagent.contract.pipeline;
 
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.agent.ToolCallTarget;
 import com.ragagent.contract.model.chat.ChatMessage;
 
@@ -15,6 +14,9 @@ import com.ragagent.contract.model.chat.ChatMessage;
  *
  * <p>方向：{@code agent} 定义 + 持有引用；MCP 适配层实现；装配期由 session 注入
  * （见 {@code AgentEngineAssembler}）。</p>
+ *
+ * <p>载荷按契约惯例用**不透明 JSON**（{@code Object}）：本接口不引 Jackson，
+ * 由实现侧按其 JSON 库解释。</p>
  */
 public interface McpToolingGateway {
 
@@ -36,7 +38,7 @@ public interface McpToolingGateway {
      *
      * @return null = 不是 MCP 代理调用 / 展示层不得提前鉴权
      */
-    ToolCallTarget callTarget(String name, JsonNode raw);
+    ToolCallTarget callTarget(String name, Object raw);
 
     /** 目录是否已 Prepare 过。 */
     boolean isPrepared();

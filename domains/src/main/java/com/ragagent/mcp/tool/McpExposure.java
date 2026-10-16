@@ -17,8 +17,8 @@ import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.chatpipeline.spi.ToolRegistryPort;
-import com.ragagent.chatpipeline.spi.McpToolingGateway;
+import com.ragagent.contract.pipeline.ToolRegistryPort;
+import com.ragagent.contract.pipeline.McpToolingGateway;
 
 /**
  * MCP 目录装载与注册入口（持久化元数据读写、目录加载、工具注册、

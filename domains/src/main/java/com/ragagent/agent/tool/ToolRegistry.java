@@ -22,8 +22,8 @@ import com.ragagent.platform.web.ToolJson;
 import com.ragagent.contract.agent.ToolCallTarget;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.chatpipeline.spi.McpToolingGateway;
-import com.ragagent.chatpipeline.spi.ToolRegistryPort;
+import com.ragagent.contract.pipeline.McpToolingGateway;
+import com.ragagent.contract.pipeline.ToolRegistryPort;
 import com.ragagent.contract.tool.ToolOutput;
 import com.ragagent.contract.tool.McpCatalogGuardedTool;
 import com.ragagent.contract.tool.ToolExecContext;
@@ -332,7 +332,7 @@ public class ToolRegistry {
 
     /**
      * 注册表端口：MCP 适配层注册/摘除工具与共享执行管线的唯一通道。
-     * 实现是包内匿名类，注册表的包内封装不被打开。
+     * 实现是包内顶层类（{@link ToolRegistryPortImpl}），注册表的包内封装不被打开。
      */
     public ToolRegistryPort port() {
         return registryPort;
@@ -401,53 +401,35 @@ public class ToolRegistry {
     }
 
 
-    /** 注册表端口的包内实现：外部只能看到这些动作，工具表本身仍是私有。 */
-    private final ToolRegistryPort registryPort = new ToolRegistryPort() {
-        @Override
-        public AgentTool get(String name) {
-            synchronized (ToolRegistry.this) {
-                return tools.get(name);
-            }
-        }
+    /** 注册表端口的包内实现（R4b：抽为同包顶层类，见 {@link ToolRegistryPortImpl}）。 */
+    private final ToolRegistryPort registryPort = new ToolRegistryPortImpl(this);
 
-        @Override
-        public List<AgentTool> tools() {
-            synchronized (ToolRegistry.this) {
-                return new ArrayList<>(tools.values());
-            }
-        }
+    // ── 端口实现用的包内访问器（锁口径与此前匿名实现逐字一致：实例锁）──────────
 
-        @Override
-        public void registerTool(AgentTool tool) {
-            ToolRegistry.this.registerTool(tool);
+    AgentTool toolOrNull(String name) {
+        synchronized (this) {
+            return tools.get(name);
         }
+    }
 
-        @Override
-        public void registerDeferredTool(AgentTool tool) {
-            ToolRegistry.this.registerDeferredTool(tool);
+    List<AgentTool> toolsSnapshot() {
+        synchronized (this) {
+            return new ArrayList<>(tools.values());
         }
+    }
 
-        @Override
-        public void remove(String name) {
-            synchronized (ToolRegistry.this) {
-                tools.remove(name);
-                deferred.remove(name);
-            }
+    void removeBoth(String name) {
+        synchronized (this) {
+            tools.remove(name);
+            deferred.remove(name);
         }
+    }
 
-        @Override
-        public void setDeferred(String name, boolean deferredFlag) {
-            synchronized (ToolRegistry.this) {
-                deferred.put(name, deferredFlag);
-            }
+    void putDeferred(String name, boolean deferredFlag) {
+        synchronized (this) {
+            deferred.put(name, deferredFlag);
         }
-
-        @Override
-        public ToolResult executeInternal(ToolCancellation cancellation, ToolExecContext meta,
-                AgentTool tool, JsonNode args) {
-            return ToolRegistry.this.executeInternal(cancellation, meta, tool, args);
-        }
-    };
+    }
 
     private static void logExecution(String stage, ToolExecContext meta, Map<String, String> fields) {
         logExecution(stage, meta, fields, "execute_failed".equals(stage) || "validation_failed".equals(stage));

@@ -11,8 +11,8 @@ import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.chatpipeline.spi.ToolRegistryPort;
-import com.ragagent.chatpipeline.spi.McpToolingGateway;
+import com.ragagent.contract.pipeline.ToolRegistryPort;
+import com.ragagent.contract.pipeline.McpToolingGateway;
 
 /**
  * call_mcp_tool：解析目录引用并调用其 MCP 目标。Parameters 只广告完整定义已在

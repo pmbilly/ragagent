@@ -36,8 +36,8 @@ import com.ragagent.agent.prompt.SelectedDocumentInfo;
 import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
 import com.ragagent.agent.prompt.PinnedSkillInfo;
 import com.ragagent.agent.prompt.KnowledgeBaseInfo;
-import com.ragagent.chatpipeline.spi.McpToolingGateway;
-import com.ragagent.chatpipeline.spi.McpToolRegistrationPort;
+import com.ragagent.contract.pipeline.McpToolingGateway;
+import com.ragagent.contract.pipeline.McpToolRegistrationPort;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 

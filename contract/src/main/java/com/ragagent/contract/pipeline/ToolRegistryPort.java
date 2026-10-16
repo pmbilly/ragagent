@@ -1,8 +1,7 @@
-package com.ragagent.chatpipeline.spi;
+package com.ragagent.contract.pipeline;
 
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.contract.tool.ToolExecContext;
 import com.ragagent.contract.tool.ToolCancellation;
@@ -14,6 +13,9 @@ import com.ragagent.contract.tool.ToolResult;
  * <p>语义与 {@code com.ragagent.agent.tool.ToolRegistry} 的注册原语逐条对齐（first-wins、deferred 标记随注册设定），
  * 以免搬运过程中改变行为。实现由注册表自己提供（{@code ToolRegistry.port()}，包内匿名实现），
  * 因此注册表的包内封装不被打开——外部只能看到这些动作。</p>
+ *
+ * <p>载荷按契约惯例用**不透明 JSON**（{@code Object}）：本接口不引 Jackson，
+ * 由实现侧按其 JSON 库解释。</p>
  */
 public interface ToolRegistryPort {
 
@@ -36,5 +38,5 @@ public interface ToolRegistryPort {
     void setDeferred(String name, boolean deferred);
 
     /** 目录解析后的共享执行管线入口。 */
-    ToolResult executeInternal(ToolCancellation cancellation, ToolExecContext meta, AgentTool tool, JsonNode args);
+    ToolResult executeInternal(ToolCancellation cancellation, ToolExecContext meta, AgentTool tool, Object args);
 }

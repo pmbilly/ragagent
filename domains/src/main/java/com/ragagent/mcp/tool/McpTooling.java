@@ -13,8 +13,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.agent.ToolCallTarget;
-import com.ragagent.chatpipeline.spi.McpToolingGateway;
-import com.ragagent.chatpipeline.spi.ToolRegistryPort;
+import com.ragagent.contract.pipeline.McpToolingGateway;
+import com.ragagent.contract.pipeline.ToolRegistryPort;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.platform.web.JsonMappers;
@@ -240,7 +240,9 @@ public final class McpTooling implements McpToolingGateway {
      * provider 元数据保持可回放。
      */
     @Override
-    public synchronized ToolCallTarget callTarget(String name, JsonNode raw) {
+    public synchronized ToolCallTarget callTarget(String name, Object rawArg) {
+        // 契约面用不透明 JSON：此处按其 JSON 库还原（调用方恒传 JsonNode，兼容其余形态）
+        JsonNode raw = rawArg instanceof JsonNode node ? node : JsonMappers.toJsonNode(rawArg);
         AgentTool registered = registry.get(name);
         if (registered == null) {
             return null;

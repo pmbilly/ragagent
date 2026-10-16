@@ -1,4 +1,4 @@
-package com.ragagent.chatpipeline.spi;
+package com.ragagent.contract.pipeline;
 
 import java.util.List;
 

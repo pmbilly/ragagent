@@ -27,7 +27,7 @@ import com.ragagent.session.domain.message.MessageSearchGroupItem;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.contract.wiki.WikiPageOpsPort;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.chatpipeline.spi.WebSearchExecutor;
+import com.ragagent.contract.pipeline.WebSearchExecutor;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 
 /**

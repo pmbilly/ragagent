@@ -59,7 +59,7 @@ import com.ragagent.agenttools.knowledge.GetDocumentInfoTool;
 import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.WebSearchConfig;
-import com.ragagent.chatpipeline.spi.WebSearchExecutor;
+import com.ragagent.contract.pipeline.WebSearchExecutor;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 
