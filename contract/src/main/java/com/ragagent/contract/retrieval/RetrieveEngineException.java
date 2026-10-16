@@ -1,4 +1,4 @@
-package com.ragagent.retrieval.engine;
+package com.ragagent.contract.retrieval;
 
 /**
  * 检索引擎解析的哨兵异常族——四个哨兵分类（租户信息缺失 / store 不可得 / 不可用 / 禁访），

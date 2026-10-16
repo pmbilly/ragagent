@@ -42,7 +42,7 @@ import com.ragagent.contract.model.Embedder;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
 import com.ragagent.retrieval.engine.RetrieverEngineParams;
-import com.ragagent.retrieval.engine.TenantStoreOwnership;
+import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import com.ragagent.retrieval.engine.EffectiveEngines;
 import com.ragagent.retrieval.engine.RetrieveEngineFactories;
 import com.ragagent.platform.web.JsonMappers;

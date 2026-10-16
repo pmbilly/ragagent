@@ -26,7 +26,7 @@ import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.retrieval.engine.VectorStoreService;
-import com.ragagent.retrieval.graph.RetrieveGraphRepository;
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.contract.model.ModelCatalogPort;
 
 /**

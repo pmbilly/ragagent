@@ -13,7 +13,7 @@ import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.SearchSupport;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.retrieval.graph.RetrieveGraphRepository;
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 
 /**
  * CHUNK_SEARCH_PARALLEL 阶段插件：

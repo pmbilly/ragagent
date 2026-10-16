@@ -38,7 +38,7 @@ import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.graph.GraphData;
 import com.ragagent.contract.graph.NameSpace;
-import com.ragagent.retrieval.graph.RetrieveGraphRepository;
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.contract.tenant.WebSearchConfig;

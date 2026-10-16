@@ -17,7 +17,7 @@ public interface StoreEngineFactory {
 
     /**
      * 建一条引擎服务。失败直接抛——注册表会把失败折成
-     * {@link RetrieveEngineException#VECTOR_STORE_UNAVAILABLE} 并进入重建冷却。
+     * {@code RetrieveEngineException#VECTOR_STORE_UNAVAILABLE} 并进入重建冷却。
      */
     RetrieveEngineService build(VectorStoreView store);
 

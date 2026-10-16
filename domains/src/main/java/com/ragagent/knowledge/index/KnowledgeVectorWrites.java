@@ -4,7 +4,7 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.RetrieveEngineFactories;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
-import com.ragagent.retrieval.engine.TenantStoreOwnership;
+import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,7 +32,7 @@ public class KnowledgeVectorWrites {
     /**
      * 绑定 store 的 KB → 复合引擎；未绑定 → {@code null}（调用方保持 pg 直连路径）。
      * 解析失败（跨租户 FORBIDDEN / 店不可用 UNAVAILABLE / 店未注册 NOT_FOUND）原样抛
-     * {@link com.ragagent.retrieval.engine.RetrieveEngineException}——调用方按各自的可重试策略处理。
+     * {@link com.ragagent.contract.retrieval.RetrieveEngineException}——调用方按各自的可重试策略处理。
      *
      * <p><b>租户必须由调用方显式给出</b>：原实现在此读 {@code TenantContext} 的 ThreadLocal，
      * 但处理队列的 executor 线程不携带上下文 ⇒ null 兜成 0，非零租户的绑定 store 被误判

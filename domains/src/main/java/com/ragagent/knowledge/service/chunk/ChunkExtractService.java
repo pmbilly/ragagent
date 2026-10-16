@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.llm.extract.ExtractPrompts;
 import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.llm.extract.PipelineConfig;
-import com.ragagent.retrieval.graph.RetrieveGraphRepository;
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.platform.prompt.PromptInstructions;
 import com.ragagent.knowledge.domain.Chunk;

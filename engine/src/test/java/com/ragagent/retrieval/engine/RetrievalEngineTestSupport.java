@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine;
 
+import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

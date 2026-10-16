@@ -1,14 +1,13 @@
-package com.ragagent.retrieval.graph;
+package com.ragagent.contract.retrieval;
 
 import com.ragagent.contract.graph.GraphData;
 import com.ragagent.contract.graph.NameSpace;
 import java.util.List;
 
-/** 图检索仓储端口（原为 chatpipeline.PipelinePorts 的嵌套接口；由本域实现，故下沉到实现方）。 */
 /**
  * 图库的写（AddGraph）/删（DelGraph）/读（SearchNode）端口。
  *
- * <p>由 {@code com.ragagent.retrieval.graph.Neo4jGraphRepository} 提供真实实现
+ * <p>由 {@code retrieval-engine} 的 {@code graph.Neo4jGraphRepository} 提供真实实现
  * （NEO4J_ENABLE=true 才建驱动；否则 driver 为 null，三个操作都告警并静默）。
  * 流水线只用 {@link #searchNode}；写/删由抽取与清理链路调用。</p>
  */

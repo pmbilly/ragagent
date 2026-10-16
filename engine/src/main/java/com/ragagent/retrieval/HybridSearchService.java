@@ -36,7 +36,7 @@ import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
-import com.ragagent.retrieval.engine.TenantStoreOwnership;
+import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.security.LogSanitizer;

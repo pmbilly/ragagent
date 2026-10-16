@@ -13,10 +13,10 @@ import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.EffectiveEngines;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
-import com.ragagent.retrieval.engine.RetrieveEngineException;
+import com.ragagent.contract.retrieval.RetrieveEngineException;
 import com.ragagent.retrieval.engine.RetrieveEngineFactories;
 import com.ragagent.retrieval.engine.RetrieverEngineParams;
-import com.ragagent.retrieval.engine.TenantStoreOwnership;
+import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

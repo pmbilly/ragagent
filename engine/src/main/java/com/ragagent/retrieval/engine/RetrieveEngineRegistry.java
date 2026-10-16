@@ -15,7 +15,7 @@ package com.ragagent.retrieval.engine;
  * 调用方必须走 {@link RetrieveEngineFactories} 的工厂函数（它包了归属校验，
  * 是对跨租户 IDOR 的纵深防御）。租户过滤是纵深防御而非归属校验的替代品。</p>
  *
- * <p>失败以 {@link RetrieveEngineException} 表达。</p>
+ * <p>失败以 {@code contract.retrieval.RetrieveEngineException} 表达。</p>
  */
 public interface RetrieveEngineRegistry {
 

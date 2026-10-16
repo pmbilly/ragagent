@@ -1,5 +1,7 @@
 package com.ragagent.retrieval.engine;
 
+import com.ragagent.contract.retrieval.RetrieveEngineException;
+import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import java.util.List;
 
 import org.slf4j.Logger;

@@ -20,7 +20,7 @@ import com.ragagent.chatpipeline.EventManager;
 import com.ragagent.contract.session.PipelineMessageImageView;
 import com.ragagent.contract.session.PipelineMessageView;
 import com.ragagent.llm.extract.PipelineConfig;
-import com.ragagent.retrieval.graph.RetrieveGraphRepository;
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.chatpipeline.plugin.PluginChatCompletion;
 import com.ragagent.chatpipeline.plugin.PluginChatCompletionStream;
 import com.ragagent.chatpipeline.plugin.PluginExtractEntity;

@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine;
 
+import com.ragagent.contract.retrieval.RetrieveEngineException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

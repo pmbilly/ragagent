@@ -24,7 +24,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Service;
 import com.ragagent.retrieval.graph.Neo4jGraphRepository;
-import com.ragagent.retrieval.graph.RetrieveGraphRepository;
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 
 /**
  * /system 组读端点的计算逻辑。

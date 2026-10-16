@@ -27,7 +27,7 @@ import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
-import com.ragagent.retrieval.engine.TenantStoreOwnership;
+import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

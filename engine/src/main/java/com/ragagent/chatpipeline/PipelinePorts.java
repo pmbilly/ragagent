@@ -38,7 +38,7 @@ import com.ragagent.contract.model.Reranker;
  *   <li>{@link MemoryService} → memory.service.MemoryService（recall/retrievalContextFor/
  *       documentAffinity 签名已对齐）。</li>
  *   <li>websearch 面 → 域侧适配器转成执行面配置（见 {@code session/QaWiring}）。</li>
- *   <li>{@link com.ragagent.retrieval.graph.RetrieveGraphRepository} → 图检索仓储（neo4j/图库面）。</li>
+ *   <li>{@link com.ragagent.contract.retrieval.RetrieveGraphRepository} → 图检索仓储（neo4j/图库面）。</li>
  *   <li>{@link TenantService} / {@link SessionService} / {@link WebSearchStateService} /
  *       {@link WebSearchProviderRepository}：占位接口——管线只判空、从不调用其方法。</li>
  * </ul>

@@ -31,11 +31,11 @@ import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.KeywordsVectorHybridRetrieveEngineService;
-import com.ragagent.retrieval.engine.RetrieveEngineException;
+import com.ragagent.contract.retrieval.RetrieveEngineException;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
 import com.ragagent.retrieval.engine.RetrieverEngineParams;
-import com.ragagent.retrieval.engine.TenantStoreOwnership;
+import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import com.ragagent.retrieval.engine.RetrieveEngineService;
 

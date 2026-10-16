@@ -24,7 +24,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.graph.NameSpace;
-import com.ragagent.retrieval.graph.RetrieveGraphRepository;
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.platform.access.TracingContext;
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;

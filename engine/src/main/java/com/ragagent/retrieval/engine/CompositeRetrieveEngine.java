@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine;
 
+import com.ragagent.contract.retrieval.RetrieveEngineException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

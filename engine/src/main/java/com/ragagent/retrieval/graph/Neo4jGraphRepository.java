@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.graph;
 
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

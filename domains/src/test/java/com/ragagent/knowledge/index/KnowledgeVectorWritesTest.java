@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
-import com.ragagent.retrieval.engine.RetrieveEngineException;
+import com.ragagent.contract.retrieval.RetrieveEngineException;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
 import com.ragagent.retrieval.engine.RetrieveEngineService;
-import com.ragagent.retrieval.engine.TenantStoreOwnership;
+import com.ragagent.contract.retrieval.TenantStoreOwnership;
 
 /**
  * 知识写链的向量店路由（整改 K1）：租户必须由调用方显式传入。

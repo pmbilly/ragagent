@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine;
 
+import com.ragagent.contract.retrieval.RetrieveEngineException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;

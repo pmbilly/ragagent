@@ -22,7 +22,7 @@ import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository;
 import com.ragagent.retrieval.engine.PgVectorEngineRepository;
 import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;
 import com.ragagent.retrieval.engine.RetrieveEngineService;
-import com.ragagent.retrieval.engine.TenantStoreOwnership;
+import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import com.ragagent.retrieval.engine.VectorStoreRepoOwnership;
 import com.ragagent.contract.vectorstore.VectorStoreLookup;
 import com.ragagent.retrieval.engine.doris.DorisRetrieveRepository;
