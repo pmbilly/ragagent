@@ -23,7 +23,7 @@
 ## 1. 仓库身份与分支
 
 - 远程 `origin` = `https://github.com/pmbilly/ragagent.git`（公开）；主分支 `main`（停 `ef89e4ab`，含 v0.2.0 结项 + 缺陷修复）。
-- 分支谱系：`v0.1.0`（归档）· `v0.2.0`（R 系列 36 批，已合并 main 并推送）· **`v0.3.0`（当前工作分支；起源自 `main`，含 A②/A③/A④、C 批1、G1-a~n、D0/D1/E1、platform 提取、:common 解散、IDE 告警清零等系列提交）**。
+- 分支谱系：`v0.1.0`（归档）· `v0.2.0`（R 系列 36 批，已合并 main 并推送）· `v0.3.0`（P1~P5 两模块纠偏）· `v0.4.0`（R1~R6 三 runtime，已合并 main）· **`v0.5.0`（当前工作分支；2026-10-18 自 `main` 切出，可读性专项 L1~L22）**。
 - 网络实录：本机↔github 的 https 不稳；用 `git -c http.version=HTTP/1.1 push …` + 重试。
 - 兼容边界：**系统未上线、无历史数据包袱、前端适配后端**（知识库模块三约束，全线适用）。
 
@@ -56,7 +56,42 @@
 - **跨域端口/视图面扩容 = 追认**（A③ 域间契约化的必然产物）；**platform 业务形状 = 归正**（去框架化进 contract / 中性化 / 归域 / 归 agent-engine，见实施计划 v2 §1.2）。
 - 验收工具：`check-contract-purity.py`（C1/C2/C3 全零）+ **C8**（platform 内 `*View/*Port/*Request/*Response/*Payload/*Facts` 命名红灯，例外须登记理由）。
 
-## 5. 执行方案（摘要；详情＝实施计划 v2）
+## 5. 执行方案
+
+### 5.0 当前阶段：v0.5.0「可读性专项」（2026-10-18 起）
+
+> 完整方案：`docs/internal/plans/readability-remediation-v0.5.0.md`。总目标：一条问答链路必读文件数 20 → ≤10；迁移叙事 769 → 0；控制器 catch 151 → 0；`package-info` 覆盖 48% → 100%。
+
+**边界**：不重写 RAG 管线 / `StreamManager` / `TenantContext`；不改 DB schema；不为架构形式拆模块；前端大文件单独立项。**允许**：删类改名、合并包、拆 `:knowledge`、一次清掉 Go 兼容语义。
+
+| 批 | 内容 | 状态 |
+|---|---|---|
+| **L1** | 迁移叙事清零（退役/旧/历史/备案/已知差异/Go，共 769 处） | 待做 |
+| **L2** | 行号与 Go 语法锚点（`L141-144`/`uuid.New()`/旧模块名 `common`）+ 构建脚本批次号 | 待做 |
+| **L3** | 修 7 处文档失真（README ×4 + 3 个类注释） | 待做 |
+| **L4** | 补 156 个 `package-info`（职责/依赖/从哪读起） | 待做 |
+| **L5** | 注释压缩：删 614 处分隔线，类头 ≤40 行，注释密度 ≤15% | 待做 |
+| **L6** | "未实现/暂缺"收敛到 `docs/known-gaps.md` | 待做 |
+| **L7** | 死代码删除（空包、未接线 port、`platform/session`、`platform/tool`） | 待做 |
+| **L8** | 日志降噪：warn 893 → ≤200 | 待做 |
+| **L9** | 删 151 处控制器 catch，统一交 `GlobalExceptionHandler`（保留 cause） | 待做 |
+| **L10** | 错误形态统一为 `{code,message,data}`（**行为变更**，金片重录） | 待做 |
+| **L11** | 异常语义守卫扩到 domains 全量 | 待做 |
+| **L12** | 数据访问定规：单表→Mapper，跨表/方言/事务→Repository；22 处 controller 下沉 | 待做 |
+| **L13** | 4 个核心实体 → `XxxView` record（**行为变更**） | 待做 |
+| **L14** | 事务三套模板收敛；多步写补声明或理由 | 待做 |
+| **L15** | `ChatManage` 127 方法 → `QaRequestConfig` + `QaPipelineState`；DTO 批量 record 化 | 待做 |
+| **L16** | `executeQA` 200 行 → 6 个具名步骤（≤50 行/方法） | 待做 |
+| **L17** | 插件表自动生成（事件→插件→读写字段→兜底）+ `--check` 守卫 | 待做 |
+| **L18** | 17 个插件类头三行契约 | 待做 |
+| **L19** | 拆 `:knowledge`（241 文件；切边 2 处；登记 7 个面） | 待做 |
+| **L20** | `modelcontext` 下沉 `contract`，剪 `domains`/`agent-engine` 两条依赖边 | 待做 |
+| **L21** | `platform/knowledge` 7 类、`platform/model` 2 类归位 | 待做 |
+| **L22** | 工具三处收敛：`BaseTool` → `agent-engine`，删 `platform/tool` | 待做 |
+
+**新增守卫**（各配红态探针）：`check-comment-narrative` / `check-doc-truth` / `check-controller-purity` / `check-pipeline-map` / `check-known-gaps`；另加 `scripts/readability-report.py` 输出 6 个指标。
+
+### 5.1 历史批次（v0.3.0 P1~P5 / v0.4.0 R1~R6，全部 ✅）
 
 > **阶段路线（续，2026-10-16）**：**R1~R6（三 runtime + 模块收口）在 `v0.4.0` 全部完成** ⇒ **推送 `v0.4.0` + 合并 `main`**。 **✅ 2026-10-16 已执行**：`v0.4.0` 推送（995696f9..e3dce136）→ `main` 快进合并并推送（`c07786fe` → 含本记录的 tip）。**R1~R6 收口读数**：七模块 → 六模块（`:engine` 解散）、末轮增出 `:agent-engine`（七模块新图，见 §8.1 终检）；domains 对全部运行时模块只剩契约 + `modelcontext` 终态边；**16 守卫全绿**（新增模块图守卫）· 测试 5000 / 0 / 4。
 
