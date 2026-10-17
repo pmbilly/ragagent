@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 技能目录端口（业务域 → agent 引擎；R5b-4 契约化）。
+ * 技能目录端口（业务域 → agent 引擎； 契约化）。
  *
  * <p>管理面（两个控制器）与会话装配原先直注 {@code agent.skills.SkillCatalogService} 实现类；
  * 本端口收域侧真调用的六个方法 + 两个形状 + 五个异常（原嵌在实现类与 {@code Skill} 内，

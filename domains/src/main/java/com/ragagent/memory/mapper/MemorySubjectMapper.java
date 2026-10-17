@@ -17,34 +17,34 @@ import org.apache.ibatis.annotations.Update;
 /**
  * {@code memory_subjects} 的基础仓储。
  *
- * <p>只有六条语句，但每一条都有必须显式写的理由（见约定 §3 与 §9）：</p>
+ * <p>只有六条语句，但每一条都有必须显式写的理由（见约定 与）：</p>
  * <ul>
- *   <li><b>两个 jsonb 列</b>（{@code extraction_state} / {@code pending_sessions}）在
- *       {@code @Update} 里也必须带 {@code typeHandler}：MyBatis-Plus 的
- *       {@code UpdateWrapper.set()} 不套实体上的 {@code @TableField(typeHandler=…)}，
- *       会退化成 Java 序列化（落库时报 {@code 0xACED} 魔数，§9）。所以这里**不用**
- *       给 wrapper 传无名参数，而是把 SQL 写在注解里、参数带类型处理器。</li>
- *   <li><b>{@code ON CONFLICT DO NOTHING} 的方言分叉</b>：H2 不支持该子句，
- *       所以与 {@code MessageSuggestionMapper} 同款处理——PG 一条、H2 一条
- *       （H2 那条用条件插入，语义相同、只是测试环境下的原子性弱一些）。</li>
- *   <li><b>{@code extract_scheduled_at} 必须能写 NULL</b>：调度时间为空时要写 SQL NULL。
- *       这里靠显式 {@code jdbcType} 让 H2 / PG 都接受 NULL。</li>
+ * <li><b>两个 jsonb 列</b>（{@code extraction_state} / {@code pending_sessions}）在
+ * {@code @Update} 里也必须带 {@code typeHandler}：MyBatis-Plus 的
+ * {@code UpdateWrapper.set()} 不套实体上的 {@code @TableField(typeHandler=…)}，
+ * 会退化成 Java 序列化（落库时报 {@code 0xACED} 魔数，）。所以这里**不用**
+ * 给 wrapper 传无名参数，而是把 SQL 写在注解里、参数带类型处理器。</li>
+ * <li><b>{@code ON CONFLICT DO NOTHING} 的方言分叉</b>：H2 不支持该子句，
+ * 所以与 {@code MessageSuggestionMapper} 同款处理——PG 一条、H2 一条
+ * （H2 那条用条件插入，语义相同、只是测试环境下的原子性弱一些）。</li>
+ * <li><b>{@code extract_scheduled_at} 必须能写 NULL</b>：调度时间为空时要写 SQL NULL。
+ * 这里靠显式 {@code jdbcType} 让 H2 / PG 都接受 NULL。</li>
  * </ul>
  */
 @Mapper
 public interface MemorySubjectMapper extends BaseMapper<MemorySubject> {
 
     /**
-     * 按 scope 取主体；未命中即"没有"，由仓储回 {@code null}。
-     *
-     * <p>⚠️ 自定义 {@code @Select} 的结果映射**不会**自动套实体上的
-     * {@code @TableField(typeHandler=…)}（约定 §9）——那两个 jsonb 列必须在方法上
-     * 再声明一次，否则 {@code extraction_state} / {@code pending_sessions} 会被
-     * 当成裸字符串塞进对象，读回来是 {@code null} 或直接抛异常。
-     * 这个坑只在"库里明明有值、读出来却是 null"时才暴露。</p>
-     *
-     * <p>其余列交给 MyBatis 的自动映射（{@code mapUnderscoreToCamelCase} 已开）。</p>
-     */
+ * 按 scope 取主体；未命中即"没有"，由仓储回 {@code null}。
+ *
+ * <p>⚠️ 自定义 {@code @Select} 的结果映射**不会**自动套实体上的
+ * {@code @TableField(typeHandler=…)}（约定）——那两个 jsonb 列必须在方法上
+ * 再声明一次，否则 {@code extraction_state} / {@code pending_sessions} 会被
+ * 当成裸字符串塞进对象，读回来是 {@code null} 或直接抛异常。
+ * 这个坑只在"库里明明有值、读出来却是 null"时才暴露。</p>
+ *
+ * <p>其余列交给 MyBatis 的自动映射（{@code mapUnderscoreToCamelCase} 已开）。</p>
+ */
     @Results({
             @Result(column = "extraction_state", property = "extractionState",
                     typeHandler = MemoryExtractionStateTypeHandler.class),
@@ -122,14 +122,14 @@ public interface MemorySubjectMapper extends BaseMapper<MemorySubject> {
                     @Param("now") OffsetDateTime now);
 
     /**
-     * 抽取状态的唯一写入口，更新四列。
-     *
-     * <p>其中两个是 jsonb，**必须**把类型处理器写在 SQL 里；
-     * 用 wrapper 的 {@code .set()} 会退化成 Java 序列化（§9 的 0xACED 坑）。</p>
-     *
-     * <p>{@code pending_sessions} 与 {@code extraction_state} 都**从不**为 NULL
-     * （落库的永远是完整 JSON），{@code extract_scheduled_at} 则可以是 NULL。</p>
-     */
+ * 抽取状态的唯一写入口，更新四列。
+ *
+ * <p>其中两个是 jsonb，**必须**把类型处理器写在 SQL 里；
+ * 用 wrapper 的 {@code .set()} 会退化成 Java 序列化（的 0xACED 坑）。</p>
+ *
+ * <p>{@code pending_sessions} 与 {@code extraction_state} 都**从不**为 NULL
+ * （落库的永远是完整 JSON），{@code extract_scheduled_at} 则可以是 NULL。</p>
+ */
     @Update("UPDATE memory_subjects SET "
             + "extraction_state = #{state, typeHandler=com.ragagent.memory.domain.MemoryExtractionStateTypeHandler, "
             + "jdbcType=OTHER}, "

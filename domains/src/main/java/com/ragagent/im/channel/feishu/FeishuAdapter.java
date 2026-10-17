@@ -212,19 +212,19 @@ public class FeishuAdapter implements AdapterInterfaces.Adapter,
         sendOps.sendReply(incoming, reply);
     }
 
-    /** 薄委托：F3/F4 消费（reply 优先、可回落）。 */
+    /** 薄委托：/ 消费（reply 优先、可回落）。 */
     void sendWithFallback(String accessToken, IncomingMessage incoming,
                           Map<String, Object> replyPayload, Map<String, Object> fallbackPayload,
                           String receiveIdType) throws Exception {
         sendOps.sendWithFallback(accessToken, incoming, replyPayload, fallbackPayload, receiveIdType);
     }
 
-    /** 薄委托：测试直调 + F3 消费。 */
+    /** 薄委托：测试直调 + 消费。 */
     static String[] resolveReceiveId(IncomingMessage incoming) {
         return FeishuSendOps.resolveReceiveId(incoming);
     }
 
-    /** 薄委托：测试直调 + F4 消费。 */
+    /** 薄委托：测试直调 + 消费。 */
     static boolean safePathParam(String value) {
         return FeishuSendOps.safePathParam(value);
     }

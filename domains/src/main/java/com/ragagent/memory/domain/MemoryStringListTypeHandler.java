@@ -21,24 +21,24 @@ import org.apache.ibatis.type.JdbcType;
  *
  * <h2>写路径</h2>
  * <pre>
- *   null / 空   → "[]"      ← null 与空列表**都**写 {@code []}，不是 SQL NULL
- *   ["a","b"]  → "[\"a\",\"b\"]"
+ * null / 空 → "[]" ← null 与空列表**都**写 {@code []}，不是 SQL NULL
+ * ["a","b"] → "[\"a\",\"b\"]"
  * </pre>
  * <p>所以这里空列表也写 {@code []}——与 wiki 那套「空列表写 SQL NULL」的处置**相反**，
- * 别套用（§9「jsonb 字符串数组列的 NULL 语义」）。</p>
+ * 别套用（「jsonb 字符串数组列的 NULL 语义」）。</p>
  *
  * <h2>读路径</h2>
  * <ul>
- *   <li>SQL NULL 或空字节 → 回 {@code null}；</li>
- *   <li>{@code []} → **非 null 的空列表**，即 Java 的空 {@link ArrayList}
- *       （{@code "[]"} 反序列化出来的是空列表，不是 null）。</li>
+ * <li>SQL NULL 或空字节 → 回 {@code null}；</li>
+ * <li>{@code []} → **非 null 的空列表**，即 Java 的空 {@link ArrayList}
+ * （{@code "[]"} 反序列化出来的是空列表，不是 null）。</li>
  * </ul>
  * <p>这条差异是真实可见的：{@code ensureSubject} 插入后立刻重读，返回给上层的
  * {@code pending_sessions} 因此是 {@code []} 而不是 {@code null}。</p>
  *
  * <h2>回读用的 ObjectMapper</h2>
  * <p>裸 mapper 即可（纯字符串数组，无需时间模块），但必须
- * {@code FAIL_ON_UNKNOWN_PROPERTIES=false}——读路径按约定 §9 要宽容。</p>
+ * {@code FAIL_ON_UNKNOWN_PROPERTIES=false}——读路径按约定 要宽容。</p>
  */
 public final class MemoryStringListTypeHandler extends BaseTypeHandler<List<String>> {
 
@@ -51,7 +51,7 @@ public final class MemoryStringListTypeHandler extends BaseTypeHandler<List<Stri
             throws SQLException {
         try {
             List<String> value = parameter == null ? List.of() : parameter;
-            // setObject(OTHER) 让 PG 的服务端按目标列类型 jsonb 强转（§9）；H2 落 VARCHAR。
+            // setObject(OTHER) 让 PG 的服务端按目标列类型 jsonb 强转；H2 落 VARCHAR。
             ps.setObject(i, MAPPER.writeValueAsString(value), java.sql.Types.OTHER);
         } catch (Exception e) {
             throw new SQLException("serialize memory string list failed", e);

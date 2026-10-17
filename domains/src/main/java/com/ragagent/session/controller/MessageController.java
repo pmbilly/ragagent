@@ -29,22 +29,22 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 消息 HTTP 层。
  *
- * <h2>响应形态（§2.1）</h2>
+ * <h2>响应形态</h2>
  * <ul>
- *   <li>load → 裸 {@code [Message]}；search → 裸 {@link MessageSearchResult}；
- *       stats → 裸 {@code ChatHistoryKbStats}；</li>
- *   <li>删除 → <b>200</b> + {@code ApiResponse} 外壳（§1.13；旧 {@code {"message":…,"success":true}}
- *       裸文案与空体 204 均退役）。</li>
+ * <li>load → 裸 {@code [Message]}；search → 裸 {@link MessageSearchResult}；
+ * stats → 裸 {@code ChatHistoryKbStats}；</li>
+ * <li>删除 → <b>200</b> + {@code ApiResponse} 外壳（旧 {@code {"message":…,"success":true}}
+ * 裸文案与空体 204 均退役）。</li>
  * </ul>
  *
  * <h2>错误门槛</h2>
  * <ul>
- *   <li>{@code resourceUrls} 非法：public 拒绝 → 403，其他坏值 → 400；</li>
- *   <li>{@code limit} 非整数**容错**回落 20（解析失败 → 默认值，不是 400）；</li>
- *   <li>{@code beforeTime} 解析失败 → 400（固定中文文案）；</li>
- *   <li>会话不可见 → 404 "session not found"；消息不存在 → 404 "record not found"
- *       （两个 404 文案**不同**）；</li>
- *   <li>搜索 {@code query} 缺失/为空 → 400 {@code query: 不能为空}（DTO 上的 {@code @NotBlank}）。</li>
+ * <li>{@code resourceUrls} 非法：public 拒绝 → 403，其他坏值 → 400；</li>
+ * <li>{@code limit} 非整数**容错**回落 20（解析失败 → 默认值，不是 400）；</li>
+ * <li>{@code beforeTime} 解析失败 → 400（固定中文文案）；</li>
+ * <li>会话不可见 → 404 "session not found"；消息不存在 → 404 "record not found"
+ * （两个 404 文案**不同**）；</li>
+ * <li>搜索 {@code query} 缺失/为空 → 400 {@code query: 不能为空}（DTO 上的 {@code @NotBlank}）。</li>
  * </ul>
  */
 @RestController

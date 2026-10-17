@@ -97,7 +97,7 @@ public class AgentLookupAdapter implements AgentLookup {
             if (!(node instanceof ObjectNode obj)) {
                 return null;
             }
-            // 边界归一：JsonNode → 纯 JDK 值（契约面口径，G1-l）
+            // 边界归一：JsonNode → 纯 JDK 值（契约面口径，）
             return JsonMappers.toJavaValue(AgentConfigJson.ensureDefaults(obj));
         } catch (RuntimeException | IOException e) {
             return null;

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * {@code TemporaryDocumentService} 的**提示词渲染子模块**（§14 步骤 2 拆分）：把 ready 的
+ * {@code TemporaryDocumentService} 的**提示词渲染子模块**（步骤 2 拆分）：把 ready 的
  * 临时附件按 token 预算选内容，产出提示词附件列表 + 给 vision 模型的图片 URL。
  *
  * <p>与门面同包、只持 {@code repo} 一个引用（同 {@code SessionQaResolution}/

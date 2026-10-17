@@ -29,7 +29,7 @@ public final class NotionPage {
     @JsonProperty("id")
     public String id;
 
-    /** {@code "page"} | {@code "database"} | {@code "data_source"}（2025-09-03+）。 */
+    /** {@code "page"} | {@code "database"} | {@code "data_source"}（+）。 */
     @JsonProperty("object")
     public String object;
 
@@ -63,9 +63,9 @@ public final class NotionPage {
     public JsonNode rawProperties;
 
     /**
-     * 数据源在工作区层级里的位置（仅 data_source 对象有，API 2025-09-03+）。
-     * 例如数据库放在某个页面里 → {@code {type:"page_id", page_id:"…"}}。
-     */
+ * 数据源在工作区层级里的位置（仅 data_source 对象有，API +）。
+ * 例如数据库放在某个页面里 → {@code {type:"page_id", page_id:"…"}}。
+ */
     @JsonProperty("database_parent")
     public NotionParent databaseParent;
 

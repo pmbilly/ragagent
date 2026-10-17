@@ -13,7 +13,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * RAG 预设运行端口实现（R4b）：把契约请求还原成管线运行时上下文，跑 rag 预设，回带产物。
+ * RAG 预设运行端口实现：把契约请求还原成管线运行时上下文，跑 rag 预设，回带产物。
  *
  * <p>迁移前这段逻辑在评估域（{@code EvaluationService#buildChatManage + knowledgeQAByEvent}）；
  * 契约化后评估域只构造请求、读产物，不再认识 {@code ChatManage}/{@code PipelineBuilder}。

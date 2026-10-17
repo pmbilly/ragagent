@@ -5,11 +5,11 @@ package com.ragagent.contract.knowledge;
  *
  * <p><b>为什么是端口</b>：内容指纹（幂等锚）、URL→文件名推导、任务号生成、处理队列投递，
  * 都是知识域的内部约定——四件实现（`KnowledgeHashes` · `KnowledgePaths` ·
- * `KnowledgeTaskIdCodec` · `KnowledgeProcessingQueue`）已于 2026-10-15 按方案 §8.9
+ * `KnowledgeTaskIdCodec` · `KnowledgeProcessingQueue`）已于 按方案
  * 归位回 `knowledge/{support,task}`；数据源与评估域只应表达"要幂等锚 / 要摄取"，
  * 不直连实现件。</p>
  *
- * <p><b>与方案 §8.9 的偏差（登记见 HANDOFF §12.5）</b>：方案规划的完整形态是
+ * <p><b>与方案 的偏差（登记见 HANDOFF）</b>：方案规划的完整形态是
  * `KnowledgeIngest` + `KnowledgeIngestCommand` + `KnowledgeIngestResult` + `service.ingest`
  * 用例（"知识来源验证 / 幂等 / 摄取"，**K 级设计项**）。本端口是其**能力面首版**：
  * 只收敛现有跨域调用点所需的四个能力，语义与域内实现**逐字一致**；

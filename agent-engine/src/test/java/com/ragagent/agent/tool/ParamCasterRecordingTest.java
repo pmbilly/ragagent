@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.fixtures.ContractJson;
-import com.ragagent.agent.fixtures.GoRecording45A;
 import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.ToolContractGoldenA;
 import com.ragagent.platform.web.ToolJson;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +50,7 @@ class ParamCasterRecordingTest {
     };
 
     @Test
-    void decisionTableMatchesGoRecording() throws Exception {
+    void decisionTableMatchesAgentPromptGolden() throws Exception {
         for (String name : CASES) {
             JsonNode r = RecordingSupport.rec(field(name));
             String args = r.get("args").asText();
@@ -71,7 +71,7 @@ class ParamCasterRecordingTest {
 
     private static String field(String name) {
         try {
-            return (String) GoRecording45A.class.getField(name).get(null);
+            return (String) ToolContractGoldenA.class.getField(name).get(null);
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }

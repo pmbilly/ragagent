@@ -3,7 +3,7 @@ package com.ragagent.contract.agent;
 import java.util.List;
 
 /**
- * agent 运行时配置的**读面**（R5c：原为 {@code agent.AgentConfig} 的字段读接口）。
+ * agent 运行时配置的**读面**（原为 {@code agent.AgentConfig} 的字段读接口）。
  *
  * <p>为什么是接口而不是 record：该配置在域侧是<b>从 agent 配置 jsonb 反序列化并逐项填充</b>的
  * （{@code QaAgentConfig} 带 Jackson 注解并继承/自持全部字段），而契约面零依赖、不能带 Jackson；

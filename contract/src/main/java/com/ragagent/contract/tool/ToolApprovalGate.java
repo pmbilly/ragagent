@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 工具审批闸门（§8.1 `contract.tool`）：工具调用前的审批判定、等待与解析。
+ * 工具审批闸门（`contract.tool`）：工具调用前的审批判定、等待与解析。
  *
  * <p><b>为什么是契约</b>：闸门实例此前以 approval 域的实现类 {@code Gate} 在各模块间传递
  * （session 装配直接注入 {@code Gate} 并把它送进 agent 引擎 ✗；mcp 侧以 {@code McpApproval} 这一
  * 域内接口承接 ✗）。本接口把"工具审批"提为契约面 SPI，实现唯一（{@code approval.Gate}），
  * 消费方（session 装配 / mcp 工具包装 / embed 渠道的审批解析）只依赖本接口。</p>
  *
- * <p><b>命名说明</b>：§8.1 在该面列的是 {@code ToolApproval}；本接口取更明确的名字
+ * <p><b>命名说明</b>： 在该面列的是 {@code ToolApproval}；本接口取更明确的名字
  * {@code ToolApprovalGate}（"审批闸门"，与实现的类名 {@code Gate} 对应），语义不变。</p>
  */
 public interface ToolApprovalGate {

@@ -96,14 +96,14 @@ public class McpMetadataException extends BizException {
     }
 
     /**
-     * 上游要求 OAuth 授权：文案必须**可操作**，区别于刷新的通用失败文案。
-     *
-     * <p>实案（2026-10-03 点检）：服务未授权时元数据刷新只回
-     * "Failed to refresh MCP tools. Check the connection and try again."，用户看不出
-     * 要先去授权；根因是刷新路径把 {@code McpOAuthRequiredException} 包成了
-     * {@code BizException.internal}，handler 落到 OTHER 默认分支。本工厂即该信号的
-     * 出口（{@code McpMetadataService.refreshFailure} 负责识别）。</p>
-     */
+ * 上游要求 OAuth 授权：文案必须**可操作**，区别于刷新的通用失败文案。
+ *
+ * <p>实案（点检）：服务未授权时元数据刷新只回
+ * "Failed to refresh MCP tools. Check the connection and try again."，用户看不出
+ * 要先去授权；根因是刷新路径把 {@code McpOAuthRequiredException} 包成了
+ * {@code BizException.internal}，handler 落到 OTHER 默认分支。本工厂即该信号的
+ * 出口（{@code McpMetadataService.refreshFailure} 负责识别）。</p>
+ */
     public static McpMetadataException oauthRequired(String detail) {
         return new McpMetadataException(Kind.OAUTH_REQUIRED,
                 AppError.badRequest("MCP server requires OAuth authorization; "

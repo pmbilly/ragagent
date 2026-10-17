@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * 向量店连通性探测（R3d 契约化搬迁）：引擎覆盖与文案逐字沿用原
+ * 向量店连通性探测（契约化搬迁）：引擎覆盖与文案逐字沿用原
  * {@code domains.vectorstore.service.VectorStoreConfigService#testConnection} 的实现。
  *
  * <p><b>TestConnection 的引擎覆盖（已知差异，原样保留）</b>：elasticsearch 走裸 HTTP GET

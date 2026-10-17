@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * 向量索引写面端口（业务域 → 向量店）。
  *
- * <p>R3b 契约化：业务域（知识索引/迁移/克隆/FAQ 等）原先直注 {@code retention-engine} 的
+ * <p> 契约化：业务域（知识索引/迁移/克隆/FAQ 等）原先直注 {@code retention-engine} 的
  * {@code VectorStoreService} 实现类；这里只收"域侧真调用"的那几个方法，实现留在
  * retrieval-engine（本面只依赖 {@link IndexRow} 这一领域级形状）。</p>
  */

@@ -13,17 +13,17 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * <p>这是本项目<b>自研</b>的实现，替代 mcp-go 依赖；协议语义逐条对照，其中：
  * <ul>
- *   <li><b>发现链</b>（{@code getServerMetadata}）：显式 {@code AuthServerMetadataURL} 优先；
- *       否则先拉 RFC 9728 protected-resource well-known，再按 RFC 8414 §3 的
- *       <b>路径插入</b>语义试 {@code /.well-known/oauth-authorization-server[/<path>]} 与
- *       OIDC 的两个变体，全失败才退到默认端点（{@code <authBase>/authorize|token|register}）；</li>
- *   <li><b>元数据 URL 校验</b>：授权服务器广告的每个 URL 字段都必须是 http/https 且带 host，
- *       防止 {@code javascript:}/{@code file:} 被反射进浏览器；</li>
- *   <li><b>RFC 7591 注册</b>：公共客户端用 {@code token_endpoint_auth_method=none}，
- *       已有 secret 时改用 {@code client_secret_post}；成功即就地改写 client_id/secret；</li>
- *   <li><b>CSRF</b>：{@link #setExpectedState} 是跨请求重建 handler 后仍能校验 state 的唯一手段
- *       ——服务端已在回调路径上做过一次性校验，这里是<b>刻意</b>保留的等价语义；</li>
- *   <li><b>GitHub 兼容</b>：HTTP 200 也可能带 {@code error} 字段，故先探 OAuthError 再解析 Token。</li>
+ * <li><b>发现链</b>（{@code getServerMetadata}）：显式 {@code AuthServerMetadataURL} 优先；
+ * 否则先拉 RFC 9728 protected-resource well-known，再按 RFC 8414 的
+ * <b>路径插入</b>语义试 {@code /.well-known/oauth-authorization-server[/<path>]} 与
+ * OIDC 的两个变体，全失败才退到默认端点（{@code <authBase>/authorize|token|register}）；</li>
+ * <li><b>元数据 URL 校验</b>：授权服务器广告的每个 URL 字段都必须是 http/https 且带 host，
+ * 防止 {@code javascript:}/{@code file:} 被反射进浏览器；</li>
+ * <li><b>RFC 7591 注册</b>：公共客户端用 {@code token_endpoint_auth_method=none}，
+ * 已有 secret 时改用 {@code client_secret_post}；成功即就地改写 client_id/secret；</li>
+ * <li><b>CSRF</b>：{@link #setExpectedState} 是跨请求重建 handler 后仍能校验 state 的唯一手段
+ * ——服务端已在回调路径上做过一次性校验，这里是<b>刻意</b>保留的等价语义；</li>
+ * <li><b>GitHub 兼容</b>：HTTP 200 也可能带 {@code error} 字段，故先探 OAuthError 再解析 Token。</li>
  * </ul>
  *
  * <p><b>出站实现</b>：统一走 {@link OAuthHttp}（基于 {@code McpHttp} 的
@@ -164,12 +164,12 @@ public class OAuthHandler {
     // ── 授权头 ─────────────────────────────────────────────────────────
 
     /**
-     * 取当前 token 拼 {@code "<type> <access>"}。
-     *
-     * <p>RFC 6749 §5.1 规定 token_type 大小写不敏感，{@code bearer} 归一成
-     * {@code Bearer} 以适配严格实现。token_type 为空时会拼出
-     * {@code " <token>"}（前导空格），刻意保留该形态，不做"修正"。</p>
-     */
+ * 取当前 token 拼 {@code "<type> <access>"}。
+ *
+ * <p>RFC 6749 规定 token_type 大小写不敏感，{@code bearer} 归一成
+ * {@code Bearer} 以适配严格实现。token_type 为空时会拼出
+ * {@code " <token>"}（前导空格），刻意保留该形态，不做"修正"。</p>
+ */
     public String getAuthorizationHeader(McpContext ctx) {
         OAuthToken token = getValidToken(ctx);
         String tokenType = token.tokenType();

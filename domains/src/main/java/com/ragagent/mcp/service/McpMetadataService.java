@@ -331,16 +331,16 @@ public class McpMetadataService {
     }
 
     /**
-     * 刷新期异常归一：**保留"上游要求 OAuth 授权"的信号**。
-     *
-     * <p>实案（2026-10-03 点检）：服务未授权时刷新只回通用文案
-     * "Failed to refresh MCP tools. Check the connection and try again."，
-     * 用户看不出需要先去授权。这里把 {@code McpOAuthRequiredException}
-     * （401 + RFC 9728 元数据广告，由 {@code DefaultMcpClient} 抛出）识别出来，
-     * 交给 handler 映射成可操作文案；其余异常维持原样（internal + 前缀）。</p>
-     *
-     * @param prefix 该步骤的日志/文案前缀（如 "could not refresh MCP directory: "）
-     */
+ * 刷新期异常归一：**保留"上游要求 OAuth 授权"的信号**。
+ *
+ * <p>实案（点检）：服务未授权时刷新只回通用文案
+ * "Failed to refresh MCP tools. Check the connection and try again."，
+ * 用户看不出需要先去授权。这里把 {@code McpOAuthRequiredException}
+ * （401 + RFC 9728 元数据广告，由 {@code DefaultMcpClient} 抛出）识别出来，
+ * 交给 handler 映射成可操作文案；其余异常维持原样（internal + 前缀）。</p>
+ *
+ * @param prefix 该步骤的日志/文案前缀（如 "could not refresh MCP directory: "）
+ */
     static BizException refreshFailure(String prefix, RuntimeException e) {
         Throwable cur = e;
         while (cur != null) {

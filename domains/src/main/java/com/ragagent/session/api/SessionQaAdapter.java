@@ -87,7 +87,7 @@ public class SessionQaAdapter implements SessionQaPort {
         req.assistantMessageId = payload.assistantMessageId;
         req.userMessageId = payload.userMessageId;
         req.agentId = payload.agentId;
-        // 载荷侧纯 JDK 值 → 域容器 JsonNode（边界归一，G1-l）
+        // 载荷侧纯 JDK 值 → 域容器 JsonNode（边界归一，）
         req.agentConfig = JsonMappers.toObjectNode(payload.agentConfig);
         req.webSearchEnabled = payload.webSearchEnabled;
         req.quotedContext = payload.quotedContext;

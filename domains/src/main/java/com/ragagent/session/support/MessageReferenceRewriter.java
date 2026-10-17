@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 消息历史响应的存储引用重写。
  *
- * <p>2026-09-30 从 {@link Rewriter} 搬来：这段代码操作的是**会话实体**（{@code Message}/
+ * <p> 从 {@link Rewriter} 搬来：这段代码操作的是**会话实体**（{@code Message}/
  * {@code MessageImage}/{@code AgentStep}），留在存储域会让 {@code storage} 反向依赖 {@code session}
  * （即 {@code session ⇄ storage} 环）。URL 重写内核仍在 {@link Rewriter}，本类只做"消息 → 字段级重写"的编排：
  * 因此依赖方向是"会话 → 存储"，单向。</p>

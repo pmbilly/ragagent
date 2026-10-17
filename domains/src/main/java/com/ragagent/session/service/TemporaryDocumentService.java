@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
  * auto/1600/160 → ApproxTokenCount → MarkReady）。
  *
  * <p>提示词渲染（ResolveForPrompt 的预算选块 + 图片 URL 选取）已拆至
- * {@link TemporaryDocumentPromptResolver}（§14 步骤 2），本类保留公开入口并薄委托。</p>
+ * {@link TemporaryDocumentPromptResolver}（步骤 2），本类保留公开入口并薄委托。</p>
  *
  * 已知差异：任务队列用进程内单线程 executor；
  * 扩展白名单为静态表（未接解析引擎的动态列表）；
@@ -63,10 +63,10 @@ public class TemporaryDocumentService {
     private final TemporaryDocumentRepository repo;
     private final AttachmentFileStore fileStore;
     /** 共享 agent 的解析依赖（ASR 模型）与租户级引擎规则回落。 */
-    /** 解析/落盘管线子模块（§14 步骤 2 第二刀）。 */
+    /** 解析/落盘管线子模块（步骤 2 第二刀）。 */
     private final TemporaryDocumentProcessor processor;
 
-    /** 提示词渲染子模块（§14 步骤 2：resolveForPrompt 的选块与图片 URL 选取）。 */
+    /** 提示词渲染子模块（步骤 2：resolveForPrompt 的选块与图片 URL 选取）。 */
     private final TemporaryDocumentPromptResolver promptResolver;
 
     /** 过期回收周期。 */
@@ -181,7 +181,7 @@ public class TemporaryDocumentService {
                     vlmModelId == null ? "" : vlmModelId, imageUnderstanding, ocrMaxPages);
         }
 
-        /** processing_options 序列化（零值省略；键名＝Java 字段名，§2 第 11 条）。 */
+        /** processing_options 序列化（零值省略；键名＝Java 字段名， 第 11 条）。 */
         String toJson() {
             Map<String, Object> m = new LinkedHashMap<>();
             if (resourceTenantId != 0) {

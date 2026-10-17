@@ -1,5 +1,5 @@
 /**
- * 会话实体面（由 {@code session.domain} 切出，对齐方案 §8.8.1）：
+ * 会话实体面（由 {@code session.domain} 切出，对齐方案）：
  * {@code Session} 及其列表/分页/状态（{@code SessionListItem} / {@code SessionListQuery} /
  * {@code SessionPage} / {@code SessionLastRequestState} / {@code SessionOwnerIds} /
  * {@code SessionNotFoundException}）与访客嵌入会话行（{@code EmbedVisitorSessionRow}）。

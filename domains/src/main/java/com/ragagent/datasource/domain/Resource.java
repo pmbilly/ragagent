@@ -15,13 +15,13 @@ import java.util.Map;
  *
  * <h2>JSON 形状（{@code DataSourceJsonTest} 逐字节钉住）</h2>
  * <pre>
- *   Resource{} →
- *   {"externalId":"","name":"","type":"","description":"","url":"",
- *    "modified_at":"0001-01-01T00:00:00Z"}
- *   Resource(全字段) →
- *   {"external_id":"e1","name":"n","type":"document","description":"d","url":"u",
- *    "modified_at":"2026-09-18T10:00:00+08:00","parent_id":"p1","has_children":true,
- *    "metadata":{"k":"v"}}
+ * Resource{} →
+ * {"externalId":"","name":"","type":"","description":"","url":"",
+ * "modified_at":"0001-01-01T00:00:00Z"}
+ * Resource(全字段) →
+ * {"external_id":"e1","name":"n","type":"document","description":"d","url":"u",
+ * "modified_at":"T10:00:00+08:00","parent_id":"p1","has_children":true,
+ * "metadata":{"k":"v"}}
  * </pre>
  * <p>要点：{@code modified_at} 恒输出，零值输出
  * {@code "0001-01-01T00:00:00Z"} 而不是 {@code null}（Jackson 对 null 值
@@ -30,11 +30,11 @@ import java.util.Map;
  *
  * <h2>持久化语义</h2>
  * <ol>
- *   <li><b>钩子/软删除/自动时间戳/唯一索引</b>：全无——本类型**不落表**，
- *       只在连接器与 handler 之间流动。</li>
- *   <li><b>关联预加载</b>：无。层级关系靠 {@code parent_id} 表达，
- *       {@code ListAvailableResources} 的 {@code parentID} 参数做惰性展开。</li>
- *   <li><b>默认排序</b>：无——顺序由各连接器决定，handler 原样透传。</li>
+ * <li><b>钩子/软删除/自动时间戳/唯一索引</b>：全无——本类型**不落表**，
+ * 只在连接器与 handler 之间流动。</li>
+ * <li><b>关联预加载</b>：无。层级关系靠 {@code parent_id} 表达，
+ * {@code ListAvailableResources} 的 {@code parentID} 参数做惰性展开。</li>
+ * <li><b>默认排序</b>：无——顺序由各连接器决定，handler 原样透传。</li>
  * </ol>
  */
 public class Resource {

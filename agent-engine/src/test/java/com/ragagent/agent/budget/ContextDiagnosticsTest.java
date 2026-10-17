@@ -1,7 +1,7 @@
 package com.ragagent.agent.budget;
 
-import static com.ragagent.agent.GoRecording.STR_BD0_STRING;
-import static com.ragagent.agent.GoRecording.STR_BD_STRING;
+import static com.ragagent.agent.AgentPromptGolden.STR_BD0_STRING;
+import static com.ragagent.agent.AgentPromptGolden.STR_BD_STRING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

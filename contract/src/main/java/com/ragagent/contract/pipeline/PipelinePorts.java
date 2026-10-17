@@ -43,7 +43,7 @@ import java.util.Map;
  * <p>错误通道：失败一律抛 {@link PipelinePortException}，成功走返回值。</p>
  */
 /**
- * 管线所需世界的**端口束**（R4b 契约化：原 {@code chatpipeline.PipelinePorts}）。
+ * 管线所需世界的**端口束**（契约化：原 {@code chatpipeline.PipelinePorts}）。
  *
  * <p>管线的消费方（session 的装配、以及 knowledge/memory/websearch/datasource 的 api 适配器）
  * 只认这一束端口，不认管线本体；载荷一律用契约形状，{@code DataAnalysisSession.execute}

@@ -2,7 +2,7 @@ package com.ragagent.contract.retrieval;
 
 /**
  * 索引源类型常量（原 {@code retrieval-engine} 的 {@code EngineTypes.SOURCE_TYPE_*}，
- * R3b 上提：业务域组装 {@link IndexDocument} 时要写这个字段）。
+ * 上提：业务域组装 {@link IndexDocument} 时要写这个字段）。
  *
  * <p>取值沿用既有 wire 语义（0 = 文件 chunk；1 = FAQ），不动。</p>
  */

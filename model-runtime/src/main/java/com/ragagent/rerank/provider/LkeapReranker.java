@@ -20,7 +20,7 @@ import javax.crypto.spec.SecretKeySpec;
  * 签名规范裸 HTTP 实现 SDK 的线格式：POST
  * {@code https://lkeap.tencentcloudapi.com}，请求体
  * {@code {"Docs":[...],"Model":...,"Query":...}}（SDK 线格式字段序），头
- * {@code X-TC-Action: RunRerank / X-TC-Version: 2024-05-22 / Authorization: TC3-HMAC-SHA256 ...}。</p>
+ * {@code X-TC-Action: RunRerank / X-TC-Version: / Authorization: TC3-HMAC-SHA256 ...}。</p>
  *
  * <p><b>批式语义</b>（有测试钉住）：空 documents 直接返回空；每请求最多
  * 60 条文档、Query+Docs 合计最多 2000 字符（码点计）；超限的单条文档报错；

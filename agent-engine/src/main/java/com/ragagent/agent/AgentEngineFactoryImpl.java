@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * agent 引擎工厂实现（R5c：装配权由域侧下沉到此）。
+ * agent 引擎工厂实现（装配权由域侧下沉到此）。
  *
  * <p>负责：工具注册表（含输出上限）、域侧传入的外部工具、内置工具（思考/待办/技能读取，
  * 按 {@code allowedToolNames} 门控）、MCP 编排端口与按需目录、技能目录装载

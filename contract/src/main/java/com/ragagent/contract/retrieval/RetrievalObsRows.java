@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * 检索观测行的纯函数族（契约面）：码点截断、命中预览、分数汇总、段落预览。
  *
- * <p>R3b 拆类：原 {@code retrieval-engine} 的 {@code telemetry.RetrievalObs} 把「纯计算结果行」
+ * <p> 拆类：原 {@code retrieval-engine} 的 {@code telemetry.RetrievalObs} 把「纯计算结果行」
  * 与「引擎内部形状（{@code EngineTypes.*}）的汇总」混在一个类里——业务域只需要前者
  * （如 chunk 预览），后者留实现模块（{@code RetrievalObs}）。拆开后域侧不再穿透实现模块，
  * 纯函数族也回到无依赖的契约面。</p>

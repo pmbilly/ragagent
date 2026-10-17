@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * {@link SseSink} 的 servlet 实现（HTTP 边界）：四个 SSE 头 + 输出流逐帧写入并 flush。
  *
- * <p>头设置逻辑原在 {@code session.controller.sse.SseContract#setSSEHeaders}，自 P4f 起以本类为
+ * <p>头设置逻辑原在 {@code session.controller.sse.SseContract#setSSEHeaders}，自 起以本类为
  * 单一实现（SseContract 保留同名薄壳委托，兼容既有 servlet 路径）。</p>
  */
 public final class ServletSseSink implements SseSink {

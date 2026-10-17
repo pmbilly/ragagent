@@ -250,10 +250,10 @@ public class SessionAgentQaService {
             try {
                 engine.execute(sessionId, req.assistantMessageId, agentQuery, llmContext, agentImageUrls);
             } catch (AgentExecutionException e) {
-                // A18：引擎是失败上报的**唯一所有者**——error 事件已在抛出前发出（含 event id、
+                //：引擎是失败上报的**唯一所有者**——error 事件已在抛出前发出（含 event id、
                 // stage=agent_execution），这里只留带栈日志；再补一份会让客户端看到两次报错。
                 // 带栈：只打 e.toString() 会让这类"回答为空"的事故无从定位。
-                // （R5c 契约化：原先捕获的是引擎实现类的异常，现为契约面类型，语义不变。）
+                // （契约化：原先捕获的是引擎实现类的异常，现为契约面类型，语义不变。）
                 log.error("Agent execution failed", e);
             } catch (RuntimeException e) {
                 // 兜底：引擎入口自身（建 span / 组装 prompt / 建工具集）失败不在引擎的 catch 范围内，
@@ -300,7 +300,7 @@ public class SessionAgentQaService {
             return null;
         }
         // 取数口径留在此处（findModel 的状态闸门）；构造走 model-runtime 的工厂面
-        // （并发闸门装饰在那边装配，2026-09-23 的 NPE 教训随之固化）。
+        // （并发闸门装饰在那边装配， 的 NPE 教训随之固化）。
         // langfuse generation 装饰（未启用时原样返回）
         return LangfuseChatClient.wrap(modelRuntime.chatClientFor(model));
     }

@@ -176,7 +176,7 @@ public class RbacInterceptor implements HandlerInterceptor {
         // 本拦截器注册在 ApiResultInterceptor（order=-100）**之后** ⇒ 打标已就位，直接读它即可；
         // 非迁移路由（无打标）保持历史纯字符串形态不变。
         // 反例（打标还没发生，形态注定不变）：AuthFilter 等 Filter 跑在 DispatcherServlet 之前，
-        // 见 docs/api-response-convention.md §4「已知例外」。
+        // 见 docs/api-response-convention.md 「已知例外」。
         if (ApiResultSupport.isActive(request)) {
             response.getWriter().write(forbiddenEnvelope(message));
             return false;

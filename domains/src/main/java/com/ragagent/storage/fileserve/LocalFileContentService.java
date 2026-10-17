@@ -105,7 +105,7 @@ public class LocalFileContentService implements WritableFileContentService {
         return sb.toString();
     }
 
-    // ── SaveBytes / DeleteFile（2026-09-24 存储写字节面批）──────────────────
+    // ── SaveBytes / DeleteFile（存储写字节面批）──────────────────
 
     /**
      * SafeFileName 校验 → baseDir/{tenantID}/exports/ → {@code <base>_<纳秒><ext>}

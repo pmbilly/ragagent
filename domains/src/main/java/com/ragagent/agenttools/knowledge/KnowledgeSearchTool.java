@@ -195,12 +195,12 @@ public class KnowledgeSearchTool extends BaseTool {
         float[] getQueryEmbedding(String kbId, String queryText);
 
         /**
-         * 混合检索；异常走 warn 跳过该路。
-         *
-         * <p>kbID 与 {@code params.knowledgeBaseIDs} 必须分开传（单 id 用于
-         * 主库/embedding 解析，列表用于跨库范围）——2026-09-23 接线时修正：此前 seam 只传
-         * params，定向（knowledge/tag）分支的 target KB id 会丢，适配器无从路由。</p>
-         */
+ * 混合检索；异常走 warn 跳过该路。
+ *
+ * <p>kbID 与 {@code params.knowledgeBaseIDs} 必须分开传（单 id 用于
+ * 主库/embedding 解析，列表用于跨库范围）—— 接线时修正：此前 seam 只传
+ * params，定向（knowledge/tag）分支的 target KB id 会丢，适配器无从路由。</p>
+ */
         List<SearchResultView> hybridSearch(String kbId, HybridParams params);
     }
 

@@ -59,11 +59,11 @@ public class Rewriter {
                     + "(?:local|minio|s3|cos|tos|oss|obs|ks3)://[^\\s)\\]>\"]+)");
 
     /**
-     * 只有 http(s) 是外部客户端能取的形态，
-     * 任何 provider scheme（{@code oss://}、{@code local://}…）都不是。
-     * <b>scheme 大小写不敏感</b>（RFC 3986 §3.1）——后端可能输出运维配置的
-     * 大写 scheme 主机（如 {@code OBS_PROXY_DOMAIN}）。
-     */
+ * 只有 http(s) 是外部客户端能取的形态，
+ * 任何 provider scheme（{@code oss://}、{@code local://}…）都不是。
+ * <b>scheme 大小写不敏感</b>（RFC 3986）——后端可能输出运维配置的
+ * 大写 scheme 主机（如 {@code OBS_PROXY_DOMAIN}）。
+ */
     public static boolean isHttpUrl(String s) {
         if (s == null) {
             return false;

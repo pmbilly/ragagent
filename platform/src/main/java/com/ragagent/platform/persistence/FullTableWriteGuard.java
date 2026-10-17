@@ -16,7 +16,7 @@ import org.apache.ibatis.mapping.SqlCommandType;
  * 而本仓 Mapper 注解里有大量 PG 方言 SQL（jsonb 运算符、向量操作符、{@code $n} 占位），
  * JSqlParser 未必都吃得下——误伤就是运行期炸合法写路径。这里改为 fail-open：解析得了的
  * 按规则拦，解析不了的放行。放行侧的安全性由架构规约兜底——复杂/方言 SQL 只允许住在
- * Mapper 注解或裸 JDBC 白名单 Repository（见 {@code ArchitectureRulesTest} R7），而
+ * Mapper 注解或裸 JDBC 白名单 Repository（见 {@code ArchitectureRulesTest}），而
  * wrapper 生成的 SQL 形态固定、必然可解析：防护恰好覆盖全表改删的主攻面。</p>
  *
  * <p>byId 族（updateById / deleteById）跳过：自带主键 WHERE，无需解析。</p>

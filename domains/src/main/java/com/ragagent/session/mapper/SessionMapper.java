@@ -16,7 +16,7 @@ import org.apache.ibatis.annotations.Update;
 /**
  * sessions 的 MyBatis-Plus 基础仓储。
  *
- * <p><b>为什么软删除是手写的 UPDATE 而不是 {@code @TableLogic}</b>：约定 §9 定下的做法——
+ * <p><b>为什么软删除是手写的 UPDATE 而不是 {@code @TableLogic}</b>：约定 定下的做法——
  * datetime 逻辑删除值在 MyBatis-Plus 各版本行为敏感，显式条件语义确定。所以：
  * 每条 SELECT 自带 {@code deleted_at IS NULL}，删除一律 {@code UPDATE ... SET deleted_at}。</p>
  *

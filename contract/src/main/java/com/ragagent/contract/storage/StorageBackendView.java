@@ -6,12 +6,12 @@ import java.time.OffsetDateTime;
  * 存储后端**行视图**（L1）：{@code StorageBackendPort} 运维面（探测 / 清单 / 按 id 与 provider 读取）
  * 的载荷。
  *
- * <p><b>为什么有它</b>：实体 {@code StorageBackend} 已归位 `storage/domain`（HANDOFF §12.0 判据 1
+ * <p><b>为什么有它</b>：实体 {@code StorageBackend} 已归位 `storage/domain`（HANDOFF 判据 1
  * ——持久化实体归各域）；跨域方（system 的连通性检测与系统信息、knowledge 的 KB 存储后端解析）
  * 只应经本视图。</p>
  *
- * <p><b>落点</b>：本视图与 {@link StorageBackendPort} 已**入 {@code :contract}**（G1-b 去 Jackson 后，
- * 2026-10-15）：{@code config} 由 {@code JsonNode} 改为**纯 JDK 值**（对象→{@code Map}、数组→{@code List}、
+ * <p><b>落点</b>：本视图与 {@link StorageBackendPort} 已**入 {@code :contract}**（去 Jackson 后，
+ *）：{@code config} 由 {@code JsonNode} 改为**纯 JDK 值**（对象→{@code Map}、数组→{@code List}、
  * 标量→包装类型），边界转换见 {@code platform.web.JsonMappers#toJavaValue}/{@code #toJsonNode}；
  * 序列化字节与直接序列化 {@code JsonNode} 一致（键序保留）。</p>
  *

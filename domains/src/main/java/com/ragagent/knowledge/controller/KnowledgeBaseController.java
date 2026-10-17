@@ -145,7 +145,7 @@ public class KnowledgeBaseController {
         }
     }
 
-    /** 删除知识库；成功返回 204（无响应体，见契约文档 §1.13）。 */
+    /** 删除知识库；成功返回 204（无响应体，见契约文档）。 */
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteKnowledgeBase(@PathVariable("id") String id) {
         log.info("Start deleting knowledge base, ID: {}", id);

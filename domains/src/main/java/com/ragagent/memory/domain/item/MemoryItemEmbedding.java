@@ -16,35 +16,35 @@ import java.time.OffsetDateTime;
  *
  * <h2>JSON 形态（键名＝Java 字段名）</h2>
  * <pre>
- *   MemoryItemEmbedding{} →
- *   {"itemId":"","tenantId":0,"subjectId":"","modelId":"","dims":0,
- *    "createdAt":"0001-01-01T00:00:00Z","updatedAt":"0001-01-01T00:00:00Z"}
+ * MemoryItemEmbedding{} →
+ * {"itemId":"","tenantId":0,"subjectId":"","modelId":"","dims":0,
+ * "createdAt":"0001-01-01T00:00:00Z","updatedAt":"0001-01-01T00:00:00Z"}
  * </pre>
  * <p>{@code sourceContent} / {@code sourceTopic} / {@code vector} 一个键都不出。</p>
  *
  * <h2>⚠️ 三个不出 JSON 的字段含义**不一样**</h2>
  * <ul>
- *   <li>{@code sourceContent} / {@code sourceTopic}：
- *       既不出响应也**不落库**，是纯粹的"输入快照"（防止慢的 embedding 调用
- *       覆盖更新的编辑），所以 Java 侧要 {@code @TableField(exist=false)}。</li>
- *   <li>{@code vector}：**不**出响应，
- *       但**要落库**（它是源真值）。Java 侧保留 {@code byte[]} 列。</li>
+ * <li>{@code sourceContent} / {@code sourceTopic}：
+ * 既不出响应也**不落库**，是纯粹的"输入快照"（防止慢的 embedding 调用
+ * 覆盖更新的编辑），所以 Java 侧要 {@code @TableField(exist=false)}。</li>
+ * <li>{@code vector}：**不**出响应，
+ * 但**要落库**（它是源真值）。Java 侧保留 {@code byte[]} 列。</li>
  * </ul>
  *
- * <h2>落库隐式行为清单（约定 §3）</h2>
+ * <h2>落库隐式行为清单（约定）</h2>
  * <ol>
- *   <li><b>自动时间戳</b>：{@code created_at}/{@code updated_at} 走字段名约定；
- *       {@code UpsertItemEmbedding} 还会显式写 {@code now}（并在 created 为零值时补上）。</li>
- *   <li><b>钩子</b>：无。</li>
- *   <li><b>软删除</b>：无。</li>
- *   <li><b>默认排序</b>：无——本表的读法只有"按 item_id 取"与"按 scope 扫"。</li>
- *   <li><b>主键</b>：{@code item_id}（**不是 id**），所以 upsert 按 item_id 冲突。
- *       Java 实体必须把 {@code itemId} 标成 {@code @TableId}。</li>
- *   <li><b>索引</b>：{@code idx_mem_emb_scope (tenant_id, subject_id)}；
- *       PG 上另有迁移 000095 条件创建的 {@code idx_mem_emb_search}
- *       {@code (tenant_id, subject_id, model_id, dims)} 与 pgvector 的 {@code embedding halfvec} 列。</li>
- *   <li><b>DEFAULT 列</b>：{@code model_id}（{@code default:''}）、{@code dims}（{@code default:0}）
- *       带字面量 default tag → 落库时仍显式写入。</li>
+ * <li><b>自动时间戳</b>：{@code created_at}/{@code updated_at} 走字段名约定；
+ * {@code UpsertItemEmbedding} 还会显式写 {@code now}（并在 created 为零值时补上）。</li>
+ * <li><b>钩子</b>：无。</li>
+ * <li><b>软删除</b>：无。</li>
+ * <li><b>默认排序</b>：无——本表的读法只有"按 item_id 取"与"按 scope 扫"。</li>
+ * <li><b>主键</b>：{@code item_id}（**不是 id**），所以 upsert 按 item_id 冲突。
+ * Java 实体必须把 {@code itemId} 标成 {@code @TableId}。</li>
+ * <li><b>索引</b>：{@code idx_mem_emb_scope (tenant_id, subject_id)}；
+ * PG 上另有迁移 000095 条件创建的 {@code idx_mem_emb_search}
+ * {@code (tenant_id, subject_id, model_id, dims)} 与 pgvector 的 {@code embedding halfvec} 列。</li>
+ * <li><b>DEFAULT 列</b>：{@code model_id}（{@code default:''}）、{@code dims}（{@code default:0}）
+ * 带字面量 default tag → 落库时仍显式写入。</li>
  * </ol>
  *
  * <p><b>{@code embedding} 列刻意不映射</b>：pgvector 的 {@code halfvec} 只在 PG 上存在，

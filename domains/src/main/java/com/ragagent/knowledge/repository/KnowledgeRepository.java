@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * knowledge 行级读写（由 {@code service.KnowledgeService} 的直连 mapper 抽出；对应方案
- * §8.8.2 的 {@code repository/KnowledgeRepository}）。
+ * 的 {@code repository/KnowledgeRepository}）。
  *
  * <p>契约（避免复活已断的环）：本层**只做数据访问**——不抛业务异常（重复冲突由 service 侧判定并
  * 抛 {@code DuplicateKnowledgeException}）、不依赖任何 service 类型；方向恒为 repository ← service。</p>
@@ -469,7 +469,7 @@ public class KnowledgeRepository {
     }
 
     /**
- * K4 CAS：只有仍由本次尝试占用的行（{@code processing}/{@code finalizing}）才许翻终态 completed
+ * CAS：只有仍由本次尝试占用的行（{@code processing}/{@code finalizing}）才许翻终态 completed
  * （顺带 enabled + processed_at + updated_at）；{@code resetSummaryStatus} 为真时额外写
  * {@code summary_status=none}（仅当 KB 配了 summary model）。返回影响行数（0 = 不归本次所有）。。
  */
@@ -487,7 +487,7 @@ public class KnowledgeRepository {
         return knowledgeMapper.update(null, uw);
     }
 
-    /** K4 CAS：只有仍 {@code processing} 的行才许翻 failed 并写 error_message。返回影响行数。。 */
+    /** CAS：只有仍 {@code processing} 的行才许翻 failed 并写 error_message。返回影响行数。。 */
     public int failIfProcessing(String id, String errorMessage, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)

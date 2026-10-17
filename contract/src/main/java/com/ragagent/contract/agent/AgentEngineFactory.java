@@ -4,7 +4,7 @@ import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.model.LlmChatClient;
 
 /**
- * agent 引擎工厂（R5c：装配权下沉到 agent-engine）。
+ * agent 引擎工厂（装配权下沉到 agent-engine）。
  *
  * <p><b>为什么把装配下沉</b>：原先域侧的 {@code AgentEngineAssembler} 负责建 ToolRegistry、
  * 注册内置工具（思考/待办/技能读取）、装载技能目录与提示词模板、构造引擎——这些都是

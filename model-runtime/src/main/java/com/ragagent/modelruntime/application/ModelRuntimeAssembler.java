@@ -145,14 +145,14 @@ public class ModelRuntimeAssembler implements ModelRuntime {
     }
 
     /**
-     * VLM 预测器：配置（含 SSRF 校验）→ 观测装饰 → 命名并发闸门 → 真实 provider 往返。
-     *
-     * <p>装饰顺序与搬迁前一致：闸门在最外层（等待不计入 langfuse 计时）。</p>
-     *
-     * <p><b>已知差异（备案，随 R3a 从 VlmDescriberWiring 迁来）</b>：没有批级 60s 超时——
-     * Java 侧调用是阻塞的、没有协作取消通道，实际超时由 {@code VLM_HTTP_TIMEOUT_SECONDS}
-     * （缺省 180s）在 HTTP 层兜底。</p>
-     */
+ * VLM 预测器：配置（含 SSRF 校验）→ 观测装饰 → 命名并发闸门 → 真实 provider 往返。
+ *
+ * <p>装饰顺序与搬迁前一致：闸门在最外层（等待不计入 langfuse 计时）。</p>
+ *
+ * <p><b>已知差异（备案，随 从 VlmDescriberWiring 迁来）</b>：没有批级 60s 超时——
+ * Java 侧调用是阻塞的、没有协作取消通道，实际超时由 {@code VLM_HTTP_TIMEOUT_SECONDS}
+ * （缺省 180s）在 HTTP 层兜底。</p>
+ */
     @Override
     public VlmPredictor vlmPredictorFor(ModelRowView model) {
         VlmConfig config = vlmConfigFor(model);

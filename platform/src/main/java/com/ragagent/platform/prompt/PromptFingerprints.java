@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * 提示词前缀指纹与缓存 key（纯函数族）。
  *
- * <p><b>R2c-3d 拆分</b>：原先这三个纯函数住在 {@code model-runtime} 的
+ * <p><b>拆分</b>：原先这三个纯函数住在 {@code model-runtime} 的
  * {@code adapter.provider.chat.PromptCache} 里，与 provider 相关的账目/策略方法同处一类——
  * 而它们只依赖契约形状与 Jackson（无 provider 词汇），业务域（wiki 摄取）需要它却只能穿透到
  * 模型运行时实现面。现按"纯函数归技术面"拆到这里；{@code PromptCache} 同名方法改为委托，

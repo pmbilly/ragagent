@@ -326,7 +326,7 @@ public class FaqEntryQueryService {
 
         boolean hasPriorityFilter = !firstPriorityTagUuids.isEmpty() || !secondPriorityTagUuids.isEmpty();
 
-        // HybridSearch 执行面（2026-09-23 走查批接线——原「随收口」备案，
+        // HybridSearch 执行面（走查批接线——原「随收口」备案，
         // FirstPriority 先结果后 SecondPriority 按 chunkID 去重合并；
         List<SearchResult> searchResults = searchFaqChunks(kbId, req.queryText(),
                 vectorThreshold, matchCount, req.onlyRecommended(),

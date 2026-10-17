@@ -58,7 +58,7 @@ public final class RecordingSupport {
     }
 
     public static JsonNode rec(String constant) {
-        return GoRecording45A.rec(constant);
+        return ToolContractGoldenA.rec(constant);
     }
 
     public static String text(JsonNode rec, String field) {

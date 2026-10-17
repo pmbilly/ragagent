@@ -1,5 +1,5 @@
 /**
- * 连接器契约面（方案 §8.9 的 {@code domain.connector/}）：连接器 SPI（{@code Connector} /
+ * 连接器契约面（方案 的 {@code domain.connector/}）：连接器 SPI（{@code Connector} /
  * {@code StreamingConnector}）、流式回调（{@code StreamHandler}）、目录与注册表
  * （{@code ConnectorCatalog} / {@code ConnectorRegistry} / {@code ConnectorMetadata}）、
  * HTTP 与异常（{@code ConnectorHttp} / {@code ConnectorHttpWiring} / {@code ConnectorException}）。

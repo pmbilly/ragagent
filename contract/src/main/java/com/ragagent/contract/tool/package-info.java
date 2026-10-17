@@ -1,5 +1,5 @@
 /**
- * 工具契约面（§8.1）：工具执行结果载荷与工具取消/能力词汇。
+ * 工具契约面：工具执行结果载荷与工具取消/能力词汇。
  *
  * <p>当前成员：{@link com.ragagent.contract.tool.ToolResult}（结果载荷）、
  * {@link com.ragagent.contract.tool.ToolCancellation}（取消探测，A③-⑨ 自 `agent.tool` 迁入）、

@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * 推荐问题集的**线格式视图**（embed 公开面响应形状）。
  *
- * <p><b>为什么有它</b>：实体 {@code MessageSuggestionSet} 属会话域内部（HANDOFF §12.0 判据 1），
+ * <p><b>为什么有它</b>：实体 {@code MessageSuggestionSet} 属会话域内部（HANDOFF 判据 1），
  * 而 embed 面端口 {@code EmbedSessionPort} 需要把该形状作为响应体返回。本视图字段**逐一对应
  * 实体参与 JSON 的字段**（实体的 {@code @JsonIgnore} 字段 {@code agentTenantId}/{@code leaseUntil} 不迁），
  * 且 {@code questions} 复用同一 {@link SuggestionItem} 类型 ⇒ **JSON 逐字节等价**

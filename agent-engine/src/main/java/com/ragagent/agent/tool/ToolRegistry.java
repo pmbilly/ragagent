@@ -397,7 +397,7 @@ public class ToolRegistry {
     }
 
 
-    /** 注册表端口的包内实现（R4b：抽为同包顶层类，见 {@link ToolRegistryPortImpl}）。 */
+    /** 注册表端口的包内实现（抽为同包顶层类，见 {@link ToolRegistryPortImpl}）。 */
     private final ToolRegistryPort registryPort = new ToolRegistryPortImpl(this);
 
     // ── 端口实现用的包内访问器（锁口径与此前匿名实现逐字一致：实例锁）──────────

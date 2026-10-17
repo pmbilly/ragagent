@@ -6,14 +6,14 @@ import java.time.OffsetDateTime;
 /**
  * 知识分块**行视图**（L1）：{@code KnowledgeCatalogPort} 分块面与 embed 公开分块响应（{@code /chunk}）的载荷。
  *
- * <p><b>为什么有它</b>：实体 {@code Chunk} 已归位 `knowledge/domain`（HANDOFF §12.0 判据 1）；
+ * <p><b>为什么有它</b>：实体 {@code Chunk} 已归位 `knowledge/domain`（HANDOFF 判据 1）；
  * 跨域方（embedchannel 的公开读、会话的 agent 工具面、chatpipeline 的投影）只应经本视图。</p>
  *
  * <p><b>⭐ JSON 等价口径（金片 {@code emb-pub-chunk-ok.json} 钉住）</b>：本视图＝实体**参与序列化的字段**
  * 之镜像（**跳过 2 个 {@code @JsonIgnore} 字段**：{@code sourceContent}/{@code contextHeader}），
  * 且**字段序与实体一致**；视图无 Jackson 注解需求 ⇒ 序列化形态**逐字节等价**。</p>
  *
- * <p><b>落点登记（HANDOFF §12.5）</b>：含 3 个 {@code JsonNode}（{@code relationChunks}/
+ * <p><b>落点登记（HANDOFF）</b>：含 3 个 {@code JsonNode}（{@code relationChunks}/
  * {@code indirectRelationChunks}/{@code metadata}）⇒ `:contract` 零依赖装不下 ⇒ 留 L1，
  * 登记**待去 Jackson**（去 Jackson 后与端口分块面整批入 `contract.knowledge`）。</p>
  */

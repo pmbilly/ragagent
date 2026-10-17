@@ -34,7 +34,7 @@ class TokenEstimatorTest {
     }
 
     @Test
-    void corpusMatchesGoRecording() {
+    void corpusMatchesAgentPromptGolden() {
         String[] corpus = {
             "",
             "hello world",
@@ -88,7 +88,7 @@ class TokenEstimatorTest {
     }
 
     @Test
-    void messageFixturesMatchGoRecording() {
+    void messageFixturesMatchAgentPromptGolden() {
         // m_empty = {}（全零值）
         assertThat(e.estimateMessage(new ChatMessage())).isEqualTo(3);
 
@@ -127,7 +127,7 @@ class TokenEstimatorTest {
     }
 
     @Test
-    void imageFixturesMatchGoRecording() {
+    void imageFixturesMatchAgentPromptGolden() {
         // m_images：图片计常量 1200，与 URL 长短无关
         ChatMessage withImages = msg("user", "what is this");
         withImages.setImages(List.of("https://x/a.png"));
@@ -155,7 +155,7 @@ class TokenEstimatorTest {
     }
 
     @Test
-    void conversationTailAndToolsMatchGoRecording() {
+    void conversationTailAndToolsMatchAgentPromptGolden() {
         // messages3
         List<ChatMessage> msgs = List.of(
                 msg("system", "You are a helpful assistant."),

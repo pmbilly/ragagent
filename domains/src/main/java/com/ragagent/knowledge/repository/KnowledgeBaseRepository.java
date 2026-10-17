@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * knowledge_base 行级读写（由 {@code service.KnowledgeBaseService} 的直连 kbMapper 抽出；
- * 对应方案 §8.8.2 的 {@code repository/KnowledgeBaseRepository}）。
+ * 对应方案 的 {@code repository/KnowledgeBaseRepository}）。
  *
  * <p>契约同 {@link KnowledgeRepository}：只做数据访问，不抛业务异常、不依赖 service，
  * 方向恒为 repository ← service。</p>

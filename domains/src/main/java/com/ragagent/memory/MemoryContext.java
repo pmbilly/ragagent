@@ -8,7 +8,7 @@ package com.ragagent.memory;
  *
  * <h2>为什么用 ThreadLocal 而不是参数</h2>
  * <p>与 {@code TenantContext} / {@code APIKeyScopeContext} / {@code StorageUrlContext}
- * 保持同一形状（约定 §5）。</p>
+ * 保持同一形状（约定）。</p>
  *
  * <h2>⚠️ 生命周期</h2>
  * <p>ThreadLocal 的值不会随作用域自动失效——设置方必须在请求结束的 finally 里

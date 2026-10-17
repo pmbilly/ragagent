@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 /**
  * {@code read_file}（技能资源）的行为契约。
  *
- * <p>断言锚在 45C 录像（{@code GoRecording45C} 的 {@code read_file/*}）上：
+ * <p>断言锚在 45C 录像（{@code ToolContractGoldenC} 的 {@code read_file/*}）上：
  * 输出三段式（{@code === File: … ===} / {@code size=…, returned=…} / 围栏内容）、
  * data 键集合、以及每条错误文案；本部署无沙箱，非 {@code skill://} 走
  * {@code exec_no_source} 文案。</p>

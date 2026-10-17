@@ -244,7 +244,7 @@ public class EvaluationService {
             AtomicInteger finished = new AtomicInteger();
             Object progressLock = new Object();
             long tenantId = detail.task.tenantId;
-            // 约定 §5：提交线程（已 replay）capture，工作线程 replay，finally clear
+            // 约定：提交线程（已 replay）capture，工作线程 replay，finally clear
             final TenantContextSnapshot qaSnap = TenantContextSnapshot.capture();
 
             ExecutorService executor = Executors.newFixedThreadPool(limit);
@@ -307,7 +307,7 @@ public class EvaluationService {
                            String knowledgeBaseId, long tenantId,
                            MetricHook.HookMetric metricHook, AtomicInteger finished,
                            Object progressLock) {
-        // R4b：管线运行时上下文与预设由会话域的 runner 构造（本域只认契约请求/产物）
+        //：管线运行时上下文与预设由会话域的 runner 构造（本域只认契约请求/产物）
         KnowledgeQaRunResult run = knowledgeQaRunner.runRag(
                 toRunRequest(detail.params, knowledgeBaseId, qaPair, tenantId));
 
@@ -327,7 +327,7 @@ public class EvaluationService {
         }
     }
 
-    /** 从创建时的 params 快照构造**契约请求**（R4b：本域不再认识管线运行时类型）。 */
+    /** 从创建时的 params 快照构造**契约请求**（本域不再认识管线运行时类型）。 */
     private static KnowledgeQaRunRequest toRunRequest(PipelineParams params, String knowledgeBaseId,
                                                       QaPair qaPair, long tenantId) {
         return new KnowledgeQaRunRequest(knowledgeBaseId, tenantId, qaPair.question(),

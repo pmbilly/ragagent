@@ -6,7 +6,7 @@ import java.time.OffsetDateTime;
 /**
  * 会话行**线格式视图**（会话 QA 面载荷与装配面读写形状）。
  *
- * <p><b>为什么有它</b>：实体 Session 属会话域内部（HANDOFF §12.0 判据 1），而
+ * <p><b>为什么有它</b>：实体 Session 属会话域内部（HANDOFF 判据 1），而
  * SessionQaPort 需经它读写会话、QaRequestPayload 需携带它触发 QA。本视图**逐一镜像实体的
  * 13 个字段与默认值**，并在同样字段上标 @JsonIgnore（embedVisitorId）⇒ **JSON 逐字节等价**
  * （由 session-*.json / emb-pub-sessions-*.json 金片钉住）；视图与实体**无损互转**

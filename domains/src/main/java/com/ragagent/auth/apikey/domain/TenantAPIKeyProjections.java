@@ -8,7 +8,7 @@ import com.ragagent.contract.apikey.TenantAPIKeyResponse;
  * 实体 → 响应投影。
  *
  * <p>响应记录 {@link TenantAPIKeyResponse} 已下沉 {@code :common}（纯载荷 ✓，见
- * {@code docs/phase4-module-boundaries-plan.md} §12），而映射需要实体 {@link TenantAPIKey}
+ * {@code docs/phase4-module-boundaries-plan.md}），而映射需要实体 {@link TenantAPIKey}
  * ⇒ 映射留在属主模块，避免 {@code :common → domains} 反向边 ✗。</p>
  *
  * <p>语义与原先的 {@code TenantAPIKeyResponse.from} <b>逐字一致</b>：null 入参返回零值投影

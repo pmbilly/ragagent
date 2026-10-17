@@ -1,46 +1,46 @@
 package com.ragagent.agent;
 
-import static com.ragagent.agent.GoRecording.STR_BOUNDARY_PROMPT;
-import static com.ragagent.agent.GoRecording.STR_DSUM0;
-import static com.ragagent.agent.GoRecording.STR_DSUM1;
-import static com.ragagent.agent.GoRecording.STR_DSUM2;
-import static com.ragagent.agent.GoRecording.STR_DSUM3;
-import static com.ragagent.agent.GoRecording.STR_DSUM4;
-import static com.ragagent.agent.GoRecording.STR_DSUM5;
-import static com.ragagent.agent.GoRecording.STR_DSUM6;
-import static com.ragagent.agent.GoRecording.STR_DSUM7;
-import static com.ragagent.agent.GoRecording.STR_DSUM8;
-import static com.ragagent.agent.GoRecording.STR_ESC0;
-import static com.ragagent.agent.GoRecording.STR_ESC1;
-import static com.ragagent.agent.GoRecording.STR_ESC2;
-import static com.ragagent.agent.GoRecording.STR_ESC3;
-import static com.ragagent.agent.GoRecording.STR_ESC4;
-import static com.ragagent.agent.GoRecording.STR_FSIZE0;
-import static com.ragagent.agent.GoRecording.STR_FSIZE1;
-import static com.ragagent.agent.GoRecording.STR_FSIZE10;
-import static com.ragagent.agent.GoRecording.STR_FSIZE2;
-import static com.ragagent.agent.GoRecording.STR_FSIZE3;
-import static com.ragagent.agent.GoRecording.STR_FSIZE4;
-import static com.ragagent.agent.GoRecording.STR_FSIZE5;
-import static com.ragagent.agent.GoRecording.STR_FSIZE6;
-import static com.ragagent.agent.GoRecording.STR_FSIZE7;
-import static com.ragagent.agent.GoRecording.STR_FSIZE8;
-import static com.ragagent.agent.GoRecording.STR_FSIZE9;
-import static com.ragagent.agent.GoRecording.STR_FULL_CUSTOM;
-import static com.ragagent.agent.GoRecording.STR_FULL_LEGACY;
-import static com.ragagent.agent.GoRecording.STR_GUID0;
-import static com.ragagent.agent.GoRecording.STR_KBLIST;
-import static com.ragagent.agent.GoRecording.STR_KBLIST_ALLNIL;
-import static com.ragagent.agent.GoRecording.STR_KBLIST_EMPTY;
-import static com.ragagent.agent.GoRecording.STR_KBLIST_INJECTION;
-import static com.ragagent.agent.GoRecording.STR_OUTPUT_PROMPT;
-import static com.ragagent.agent.GoRecording.STR_PHS_DISABLED;
-import static com.ragagent.agent.GoRecording.STR_PHS_FULL;
-import static com.ragagent.agent.GoRecording.STR_PHS_UNKNOWN_LEFT;
-import static com.ragagent.agent.GoRecording.STR_RUNTIME_CONTRACT;
-import static com.ragagent.agent.GoRecording.STR_SKILLS_META;
-import static com.ragagent.agent.GoRecording.STR_SKILLS_META_EMPTY;
-import static com.ragagent.agent.GoRecording.STR_STEER_GUIDANCE;
+import static com.ragagent.agent.AgentPromptGolden.STR_BOUNDARY_PROMPT;
+import static com.ragagent.agent.AgentPromptGolden.STR_DSUM0;
+import static com.ragagent.agent.AgentPromptGolden.STR_DSUM1;
+import static com.ragagent.agent.AgentPromptGolden.STR_DSUM2;
+import static com.ragagent.agent.AgentPromptGolden.STR_DSUM3;
+import static com.ragagent.agent.AgentPromptGolden.STR_DSUM4;
+import static com.ragagent.agent.AgentPromptGolden.STR_DSUM5;
+import static com.ragagent.agent.AgentPromptGolden.STR_DSUM6;
+import static com.ragagent.agent.AgentPromptGolden.STR_DSUM7;
+import static com.ragagent.agent.AgentPromptGolden.STR_DSUM8;
+import static com.ragagent.agent.AgentPromptGolden.STR_ESC0;
+import static com.ragagent.agent.AgentPromptGolden.STR_ESC1;
+import static com.ragagent.agent.AgentPromptGolden.STR_ESC2;
+import static com.ragagent.agent.AgentPromptGolden.STR_ESC3;
+import static com.ragagent.agent.AgentPromptGolden.STR_ESC4;
+import static com.ragagent.agent.AgentPromptGolden.STR_FSIZE0;
+import static com.ragagent.agent.AgentPromptGolden.STR_FSIZE1;
+import static com.ragagent.agent.AgentPromptGolden.STR_FSIZE10;
+import static com.ragagent.agent.AgentPromptGolden.STR_FSIZE2;
+import static com.ragagent.agent.AgentPromptGolden.STR_FSIZE3;
+import static com.ragagent.agent.AgentPromptGolden.STR_FSIZE4;
+import static com.ragagent.agent.AgentPromptGolden.STR_FSIZE5;
+import static com.ragagent.agent.AgentPromptGolden.STR_FSIZE6;
+import static com.ragagent.agent.AgentPromptGolden.STR_FSIZE7;
+import static com.ragagent.agent.AgentPromptGolden.STR_FSIZE8;
+import static com.ragagent.agent.AgentPromptGolden.STR_FSIZE9;
+import static com.ragagent.agent.AgentPromptGolden.STR_FULL_CUSTOM;
+import static com.ragagent.agent.AgentPromptGolden.STR_FULL_LEGACY;
+import static com.ragagent.agent.AgentPromptGolden.STR_GUID0;
+import static com.ragagent.agent.AgentPromptGolden.STR_KBLIST;
+import static com.ragagent.agent.AgentPromptGolden.STR_KBLIST_ALLNIL;
+import static com.ragagent.agent.AgentPromptGolden.STR_KBLIST_EMPTY;
+import static com.ragagent.agent.AgentPromptGolden.STR_KBLIST_INJECTION;
+import static com.ragagent.agent.AgentPromptGolden.STR_OUTPUT_PROMPT;
+import static com.ragagent.agent.AgentPromptGolden.STR_PHS_DISABLED;
+import static com.ragagent.agent.AgentPromptGolden.STR_PHS_FULL;
+import static com.ragagent.agent.AgentPromptGolden.STR_PHS_UNKNOWN_LEFT;
+import static com.ragagent.agent.AgentPromptGolden.STR_RUNTIME_CONTRACT;
+import static com.ragagent.agent.AgentPromptGolden.STR_SKILLS_META;
+import static com.ragagent.agent.AgentPromptGolden.STR_SKILLS_META_EMPTY;
+import static com.ragagent.agent.AgentPromptGolden.STR_STEER_GUIDANCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.agent.prompt.AgentPromptTemplates;
@@ -277,26 +277,26 @@ class AgentPromptsTest {
         for (int i = 0; i < sets.size(); i++) {
             assertThat(GroundingPrompt.formatGroundingGuidance(sets.get(i)))
                     .as("ground%d", i)
-                    .isEqualTo(GoRecordingGround.values()[i]);
+                    .isEqualTo(AgentPromptGoldenGround.values()[i]);
         }
         // 静态常量逐字节
         assertThat(AgentPrompts.STEER_GUIDANCE).isEqualTo(STR_STEER_GUIDANCE);
         assertThat(AgentPrompts.runtimePromptContract()).isEqualTo(STR_RUNTIME_CONTRACT);
         assertThat(PromptConstants.SOURCED_ANSWER_OUTPUT_PROMPT).isEqualTo(STR_OUTPUT_PROMPT);
         assertThat(PromptConstants.SOURCE_DATA_BOUNDARY_PROMPT).isEqualTo(STR_BOUNDARY_PROMPT);
-        assertThat(GoRecordingGround.values().length).isEqualTo(6);
+        assertThat(AgentPromptGoldenGround.values().length).isEqualTo(6);
     }
 
-    /** ground0..6 常量的引用别名（GoRecording 生成的常量名）。 */
-    private static final class GoRecordingGround {
+    /** ground0..6 常量的引用别名（AgentPromptGolden 生成的常量名）。 */
+    private static final class AgentPromptGoldenGround {
         static final String[] values() {
             return new String[] {
-                GoRecording.STR_GROUND0, GoRecording.STR_GROUND1, GoRecording.STR_GROUND2,
-                GoRecording.STR_GROUND3, GoRecording.STR_GROUND4, GoRecording.STR_GROUND5,
+                AgentPromptGolden.STR_GROUND0, AgentPromptGolden.STR_GROUND1, AgentPromptGolden.STR_GROUND2,
+                AgentPromptGolden.STR_GROUND3, AgentPromptGolden.STR_GROUND4, AgentPromptGolden.STR_GROUND5,
             };
         }
 
-        private GoRecordingGround() {
+        private AgentPromptGoldenGround() {
         }
     }
 

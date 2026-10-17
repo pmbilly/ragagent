@@ -178,13 +178,13 @@ final class ImChannelRuntimeOps {
     }
 
     /**
-     * 应用就绪后从库拉起全部 enabled 渠道（否则重启后渠道全部沉默）。失败只 WARN，不阻塞启动。
-     *
-     * <p><b>本类不是 Spring bean</b>（由门面 `new` 出来）⇒ 触发入口（{@code @EventListener} /
-     * {@code @PreDestroy}）**必须挂在门面** {@link ImTurnOrchestrator} 上，这里只保留实现。外提时
-     * 曾把注解一起搬进来 ⇒ 注解静默失效（渠道不再自动启动、停机不再清理），已修回并加
-     * ArchUnit A13 守卫这类问题。</p>
-     */
+ * 应用就绪后从库拉起全部 enabled 渠道（否则重启后渠道全部沉默）。失败只 WARN，不阻塞启动。
+ *
+ * <p><b>本类不是 Spring bean</b>（由门面 `new` 出来）⇒ 触发入口（{@code @EventListener} /
+ * {@code @PreDestroy}）**必须挂在门面** {@link ImTurnOrchestrator} 上，这里只保留实现。外提时
+ * 曾把注解一起搬进来 ⇒ 注解静默失效（渠道不再自动启动、停机不再清理），已修回并加
+ * ArchUnit 守卫这类问题。</p>
+ */
     public void startChannelsOnReady() {
         try {
             loadAndStartChannels();

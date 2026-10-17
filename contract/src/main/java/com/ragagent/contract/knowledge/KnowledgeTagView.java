@@ -5,10 +5,10 @@ package com.ragagent.contract.knowledge;
  * {@code KnowledgeCatalogPort} 的标签面读写都以此为口径。
  *
  * <p>落点在 `:contract`（与 {@code ChunkView}/{@code KnowledgeView} 同处）——**视图/事实/端口接口属契约面**；
- * 持久化实体回各域（HANDOFF §12.0 判据 1）。</p>
+ * 持久化实体回各域（HANDOFF 判据 1）。</p>
  *
  * <p><b>为什么不是实体</b>：终态 `contracts` ＝「纯 JDK：公开 API / SPI / 不可变载荷」
- * （方案 §5.1）；持久化实体 `@TableName` 属各域内部（HANDOFF §12.0 判据 1）。
+ * （方案）；持久化实体 `@TableName` 属各域内部（HANDOFF 判据 1）。
  * 字段取<b>消费者实际用度</b>——需要更多字段时先改本载荷，别把实体漏出去。</p>
  */
 public record KnowledgeTagView(

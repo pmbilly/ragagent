@@ -267,14 +267,14 @@ public final class GitLabClient {
     }
 
     /**
-     * 公司 GitLab 的 raw-file 路由只让
-     * ASCII 字母、数字、连字符、下划线保持字面。
-     *
-     * <p><b>其余一律逐字节 {@code %XX}，大写十六进制</b>——所以 {@code .} 也要转义
-     * （{@code a.md} → {@code a%2Emd}）。注意按 <b>UTF-8 字节</b>遍历：
-     * 中文会被拆成多个字节各自转义（{@code 中} → {@code %E4%B8%AD}），
-     * 这<b>不是</b>按码点编码，用 {@code char} 遍历会直接错。</p>
-     */
+ * 公司 GitLab 的 raw-file 路由只让
+ * ASCII 字母、数字、连字符、下划线保持字面。
+ *
+ * <p><b>其余一律逐字节 {@code %XX}，大写十六进制</b>——所以 {@code .} 也要转义
+ * （{@code a.md} → {@code a%2Emd}）。注意按 <b>UTF-8 字节</b>遍历：
+ * 中文会被拆成多个字节各自转义（{@code 中} → {@code %%B8%AD}），
+ * 这<b>不是</b>按码点编码，用 {@code char} 遍历会直接错。</p>
+ */
     public static String filePathEscape(String file) {
         char[] hex = "0123456789ABCDEF".toCharArray();
         byte[] bytes = (file == null ? "" : file).getBytes(java.nio.charset.StandardCharsets.UTF_8);

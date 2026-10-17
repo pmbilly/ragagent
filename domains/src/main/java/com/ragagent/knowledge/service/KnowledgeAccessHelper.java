@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  * <p>requireKb / findKb / getKnowledge / getKnowledgeBatch 等是全子服务共用的
  * 访问原语，原先经 {@code @Lazy} 回注门面复用——那是 knowledge 域循环依赖环的根。
  * 现在下沉为本类，子服务直接依赖这里，不再回注门面
- * （R6 禁 {@code @Lazy} 的配套拆法；数据访问契约与门面时代逐字一致）。</p>
+ * （禁 {@code @Lazy} 的配套拆法；数据访问契约与门面时代逐字一致）。</p>
  */
 @Component
 public class KnowledgeAccessHelper {

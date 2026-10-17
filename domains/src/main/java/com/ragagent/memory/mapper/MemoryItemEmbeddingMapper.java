@@ -26,7 +26,7 @@ import org.apache.ibatis.annotations.Update;
  * {@code @Select}/{@code @Update} 的裸 SQL，且只在 {@code vectorColumnReady()} 为真时调用。</p>
  *
  * <h2>⚠️ 两条裸 SQL 的结果映射要显式声明</h2>
- * <p>自定义 {@code @Select} 不会自动套实体上的 {@code @TableField(typeHandler=…)}（§9），
+ * <p>自定义 {@code @Select} 不会自动套实体上的 {@code @TableField(typeHandler=…)}，
  * 而 {@code vector} 是 {@code bytea} → 映射到 {@code byte[]} 没问题（JDBC 原生支持）。
  * 但为了让返回对象走同一套规则，这里仍显式写 {@code @Results}——
  * 列名与属性名的下划线映射在裸 {@code @Select} 上**同样不会自动发生**

@@ -4,7 +4,7 @@ package com.ragagent.contract.apikey;
  * X-API-Key 认证通道口（中性签名）。
  *
  * <p><b>动机（历史）</b>：{@code auth/filter/AuthFilter} 原先直接依赖
- * {@code auth.apikey.filter.APIKeyAuthChannel}；经本口反转后归零。P4 起端口入契约面：
+ * {@code auth.apikey.filter.APIKeyAuthChannel}；经本口反转后归零。 起端口入契约面：
  * 只读中性输入、只产中性结果——servlet 交互（读 header / 写响应）留在边界
  * （filter 提取 {@link AuthRequest}、按 {@link AuthResult.Rejected} 写响应）。</p>
  *

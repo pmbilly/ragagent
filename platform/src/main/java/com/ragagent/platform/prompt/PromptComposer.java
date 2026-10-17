@@ -11,7 +11,7 @@ import java.util.List;
  * {@code PipelineCommon}、{@code ReferencesSupport}、{@code SessionQaFallback}），
  * 改一处漏一处就出现口径漂移。</p>
  *
- * <p><b>字节即契约</b>：这里的拼接结果直接进模型输入，由实录（{@code GoRecording*}）逐字节钉住；
+ * <p><b>字节即契约</b>：这里的拼接结果直接进模型输入，由实录（{@code AgentPromptGolden*}）逐字节钉住；
  * 任何改动都会在实录上立刻变红，属显式契约变更。</p>
  */
 public final class PromptComposer {

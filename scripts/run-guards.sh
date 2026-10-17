@@ -45,6 +45,7 @@ run '架构索引（docs/architecture/packages.md 必须与 package-info 同步�
 run '租户作用域（跨线程身份必须走 TenantScope；禁止裸 capture/replay）' python3 scripts/check-tenant-scope.py
 run '日志异常（log 里禁止 Throwable.toString()/getMessage()）' python3 scripts/check-log-exceptions.py
 run '跨模块同名类（同一简单类名不得出现在多个模块主码）' python3 scripts/check-duplicate-classes.py
+run '迁移代号（主码注释禁止批次号/日期戳；旧夹具名不得回流）' python3 scripts/check-internal-codes.py
 
 echo
 # 汇总行**自计数**（B267 结项实测的漂移）：加第 12 个守卫时头注释/README/CI 都改了，唯独这里

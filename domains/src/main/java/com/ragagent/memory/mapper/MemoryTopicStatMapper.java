@@ -107,13 +107,13 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
                      @Param("normalizedKey") String normalizedKey, @Param("now") OffsetDateTime now);
 
     /**
-     * ⚠️ 自定义 {@code @Select} 的结果映射**不会**自动套实体上的
-     * {@code @TableField(typeHandler=…)}（约定 §9）——{@code aliases} 必须在方法上再声明一次，
-     * 否则读回来恒为 {@code null}（实体自带的 insert/updateById 路径不受影响，
-     * 所以这个坑只在"库里明明有值、读出来却是 null"时才暴露）。
-     *
-     * <p>其余列交给 MyBatis 的自动映射（{@code mapUnderscoreToCamelCase} 已开）。</p>
-     */
+ * ⚠️ 自定义 {@code @Select} 的结果映射**不会**自动套实体上的
+ * {@code @TableField(typeHandler=…)}（约定）——{@code aliases} 必须在方法上再声明一次，
+ * 否则读回来恒为 {@code null}（实体自带的 insert/updateById 路径不受影响，
+ * 所以这个坑只在"库里明明有值、读出来却是 null"时才暴露）。
+ *
+ * <p>其余列交给 MyBatis 的自动映射（{@code mapUnderscoreToCamelCase} 已开）。</p>
+ */
     @Results({
             @Result(column = "aliases", property = "aliases",
                     typeHandler = MemoryStringListTypeHandler.class),
@@ -130,13 +130,13 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
                     @Param("normalizedKey") String normalizedKey);
 
     /**
-     * ⚠️ 自定义 {@code @Select} 的结果映射**不会**自动套实体上的
-     * {@code @TableField(typeHandler=…)}（约定 §9）——{@code aliases} 必须在方法上再声明一次，
-     * 否则读回来恒为 {@code null}（实体自带的 insert/updateById 路径不受影响，
-     * 所以这个坑只在"库里明明有值、读出来却是 null"时才暴露）。
-     *
-     * <p>其余列交给 MyBatis 的自动映射（{@code mapUnderscoreToCamelCase} 已开）。</p>
-     */
+ * ⚠️ 自定义 {@code @Select} 的结果映射**不会**自动套实体上的
+ * {@code @TableField(typeHandler=…)}（约定）——{@code aliases} 必须在方法上再声明一次，
+ * 否则读回来恒为 {@code null}（实体自带的 insert/updateById 路径不受影响，
+ * 所以这个坑只在"库里明明有值、读出来却是 null"时才暴露）。
+ *
+ * <p>其余列交给 MyBatis 的自动映射（{@code mapUnderscoreToCamelCase} 已开）。</p>
+ */
     @Results({
             @Result(column = "aliases", property = "aliases",
                     typeHandler = MemoryStringListTypeHandler.class),
@@ -147,14 +147,14 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
                                      @Param("id") String id);
 
     /**
-     * ⚠️ 自定义 {@code @Select} 的结果映射**不会**自动套实体上的
-     * {@code @TableField(typeHandler=…)}（约定 §9）——{@code aliases} 必须在方法上再声明一次，
-     * 否则读回来恒为 {@code null}（实体自带的 insert/updateById 路径不受影响，
-     * 所以这个坑只在"库里明明有值、读出来却是 null"时才暴露）。
-     *
-     * <p>其余列交给 MyBatis 的自动映射（{@code mapUnderscoreToCamelCase} 已开）。</p>
-     * <p>最热主题：{@code hits DESC, last_seen_at DESC}。</p>
-     */
+ * ⚠️ 自定义 {@code @Select} 的结果映射**不会**自动套实体上的
+ * {@code @TableField(typeHandler=…)}（约定）——{@code aliases} 必须在方法上再声明一次，
+ * 否则读回来恒为 {@code null}（实体自带的 insert/updateById 路径不受影响，
+ * 所以这个坑只在"库里明明有值、读出来却是 null"时才暴露）。
+ *
+ * <p>其余列交给 MyBatis 的自动映射（{@code mapUnderscoreToCamelCase} 已开）。</p>
+ * <p>最热主题：{@code hits DESC, last_seen_at DESC}。</p>
+ */
     @Results({
             @Result(column = "aliases", property = "aliases",
                     typeHandler = MemoryStringListTypeHandler.class),
@@ -177,13 +177,13 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
      * 按"离阈值最近"排（= hits DESC）。
      */
     /**
-     * ⚠️ 自定义 {@code @Select} 的结果映射**不会**自动套实体上的
-     * {@code @TableField(typeHandler=…)}（约定 §9）——{@code aliases} 必须在方法上再声明一次，
-     * 否则读回来恒为 {@code null}（实体自带的 insert/updateById 路径不受影响，
-     * 所以这个坑只在"库里明明有值、读出来却是 null"时才暴露）。
-     *
-     * <p>其余列交给 MyBatis 的自动映射（{@code mapUnderscoreToCamelCase} 已开）。</p>
-     */
+ * ⚠️ 自定义 {@code @Select} 的结果映射**不会**自动套实体上的
+ * {@code @TableField(typeHandler=…)}（约定）——{@code aliases} 必须在方法上再声明一次，
+ * 否则读回来恒为 {@code null}（实体自带的 insert/updateById 路径不受影响，
+ * 所以这个坑只在"库里明明有值、读出来却是 null"时才暴露）。
+ *
+ * <p>其余列交给 MyBatis 的自动映射（{@code mapUnderscoreToCamelCase} 已开）。</p>
+ */
     @Results({
             @Result(column = "aliases", property = "aliases",
                     typeHandler = MemoryStringListTypeHandler.class),

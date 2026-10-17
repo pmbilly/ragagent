@@ -9,7 +9,7 @@ import com.ragagent.platform.web.JsonMappers;
 
 /**
  * KB 配置 jsonb → 契约配置类型的**解析边界**（承载原先挂在 4 个配置类型上的静态
- * {@code from(JsonNode)} 工厂，G1-h 去 Jackson 时外移）。
+ * {@code from(JsonNode)} 工厂， 去 Jackson 时外移）。
  *
  * <p><b>为什么独立</b>：配置类型归 {@code knowledge/domain}（零依赖形状），而解析要 {@code JsonMappers}
  * （L1）⇒ 工厂留在能引 Jackson 的一侧；语义**逐字保留**（含

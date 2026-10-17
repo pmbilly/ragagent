@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * 录制回放：progress / into_chat / references / completion / stream / entity / web_fetch
- * （期望值 = {@link GoRecording46C} 录制常量；web_fetch 打 127.0.0.1 本地 stub，无外网）。
+ * （期望值 = {@link ChatPipelineGolden} 录制常量；web_fetch 打 127.0.0.1 本地 stub，无外网）。
  */
 class PipelineLifecycleRecordingTest {
 
@@ -618,7 +618,7 @@ class PipelineLifecycleRecordingTest {
             String actual = json(rec);
             if (actual.contains("GO-JACKSON-DIFF")) {
                 // 备案：录制期错误文案与 Jackson 不同——掩去差异段后比较
-                String expected = GoRecording46C.constant("entity_parse", String.format("case%02d", i));
+                String expected = ChatPipelineGolden.constant("entity_parse", String.format("case%02d", i));
                 String expectedMasked = expected.replaceAll(
                         "failed to parse JSON content: [^\\x22]*", "failed to parse JSON content: ");
                 String actualMasked = actual.replaceAll(

@@ -1,10 +1,10 @@
 package com.ragagent.agent.compaction;
 
-import static com.ragagent.agent.GoRecording.STR_RESOLVE1_FORMAT;
-import static com.ragagent.agent.GoRecording.STR_RESOLVE2_FORMAT;
-import static com.ragagent.agent.GoRecording.STR_RESOLVE3_FORMAT;
-import static com.ragagent.agent.GoRecording.STR_RESOLVE4_FORMAT;
-import static com.ragagent.agent.GoRecording.STR_RESOLVE5_FORMAT;
+import static com.ragagent.agent.AgentPromptGolden.STR_RESOLVE1_FORMAT;
+import static com.ragagent.agent.AgentPromptGolden.STR_RESOLVE2_FORMAT;
+import static com.ragagent.agent.AgentPromptGolden.STR_RESOLVE3_FORMAT;
+import static com.ragagent.agent.AgentPromptGolden.STR_RESOLVE4_FORMAT;
+import static com.ragagent.agent.AgentPromptGolden.STR_RESOLVE5_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.contract.model.chat.ChatMessage;

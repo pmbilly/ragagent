@@ -15,7 +15,7 @@ import com.ragagent.platform.access.TracingContext;
  * （与业务键同级；{@code @JsonUnwrapped} 不支持 record 的 Creator 参数）；空值整键省略，
  * 未启用追踪时载荷字节与接线前一致。结构视图见 {@link #tracing()}。
  * 这五个键是 {@code lf_*} 平铺追踪载具的一部分（四个域的队列载荷同形），键名刻意保持
- * snake 并保留空值省略——前缀是防撞名的命名空间，见 HANDOFF §14.6 边界清单。</p>
+ * snake 并保留空值省略——前缀是防撞名的命名空间，见 HANDOFF 边界清单。</p>
  *
  * <p>载荷只在单 JVM 内的 {@link InProcessWikiIngestTaskQueue} 流动（死信留档除外），
  * 自有键名即 Java 字段名（camelCase），键序随声明序。</p>

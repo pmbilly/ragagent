@@ -6,8 +6,8 @@ package com.ragagent.agenttools.knowledge;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.fixtures.GoRecording45B;
 import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.ToolContractGoldenB;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.ExtractConfigView;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.GraphNodeView;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.GraphRelationView;
@@ -102,9 +102,9 @@ class WikiGraphRecordingTest {
 
     private static JsonNode rec(String name) {
         try {
-            String json = (String) GoRecording45B.class
+            String json = (String) ToolContractGoldenB.class
                     .getField("R_" + name.toUpperCase(java.util.Locale.ROOT)).get(null);
-            return GoRecording45B.rec(json);
+            return ToolContractGoldenB.rec(json);
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }

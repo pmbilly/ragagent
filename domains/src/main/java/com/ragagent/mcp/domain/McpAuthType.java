@@ -35,13 +35,13 @@ public enum McpAuthType {
     }
 
     /**
-     * 宽松读（Jackson 反序列化 / 落库行读取）：未知非空值 → {@code null}。
-     *
-     * <p><b>勿在写侧用它</b>——未知值静默变 null 会让"保存成功但策略丢失"
-     * （2026-10-03 点检实锤：前端发 {@code "apiKey"}、本枚举取值是 {@code "api_key"}，
-     * 遂把整条鉴权策略写成 null，凭据被当成 X-API-Key 发出、用户"配了不生效"）。
-     * 写侧请用 {@link #parseStrict(String)}。</p>
-     */
+ * 宽松读（Jackson 反序列化 / 落库行读取）：未知非空值 → {@code null}。
+ *
+ * <p><b>勿在写侧用它</b>——未知值静默变 null 会让"保存成功但策略丢失"
+ * （点检实锤：前端发 {@code "apiKey"}、本枚举取值是 {@code "api_key"}，
+ * 遂把整条鉴权策略写成 null，凭据被当成 X-API-Key 发出、用户"配了不生效"）。
+ * 写侧请用 {@link #parseStrict(String)}。</p>
+ */
     @JsonCreator
     public static McpAuthType fromValue(String v) {
         if (v == null || v.isEmpty()) {

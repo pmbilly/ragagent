@@ -8,11 +8,11 @@ import java.time.Duration;
 public final class McpProtocol {
 
     /**
-     * initialize 协商的协议版本（与 MCP 官方 SDK 的最新协议版本对齐）。
-     *
-     * <p><b>该值随官方 SDK 升级而上移，升级依赖时必须同步钉住</b>。
-     * 旧值 {@code 2024-11-05} 属于更早的 SDK 时代（差异见 known-issues/06）。</p>
-     */
+ * initialize 协商的协议版本（与 MCP 官方 SDK 的最新协议版本对齐）。
+ *
+ * <p><b>该值随官方 SDK 升级而上移，升级依赖时必须同步钉住</b>。
+ * 旧值 {@code } 属于更早的 SDK 时代（差异见 known-issues/06）。</p>
+ */
     public static final String PROTOCOL_VERSION = "2025-11-25";
 
     /**
@@ -57,7 +57,7 @@ public final class McpProtocol {
     /** SSE endpoint 事件的等待上限（默认 30s）。 */
     public static final Duration SSE_ENDPOINT_TIMEOUT = Duration.ofSeconds(30);
 
-    /** SSE `event:` 名——建流首帧给出 POST 地址（MCP 2024-11-05 HTTP+SSE 传输）。 */
+    /** SSE `event:` 名——建流首帧给出 POST 地址（MCP HTTP+SSE 传输）。 */
     public static final String SSE_EVENT_ENDPOINT = "endpoint";
 
     /** SSE `event:` 名——JSON-RPC 消息帧。 */

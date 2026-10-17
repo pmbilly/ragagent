@@ -32,12 +32,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@code SessionAgentQaService} 的**引擎/工具装配簇**（§14.9c 刀 3）：创建 agent 引擎（LLM/记忆/审批门/
+ * {@code SessionAgentQaService} 的**引擎/工具装配簇**（c 刀 3）：创建 agent 引擎（LLM/记忆/审批门/
  * 工件收集器接线），把 MCP 工具、知识库/文档信息、网页文件、内建工具注册进 {@code ToolRegistry}，
  * 以及知识库检索能力的探测与提示词段落拼装。
  *
  * <p>边界按调用点定：{@code chatModel}/{@code rerankModel}（{@code agentQA} 解析后作参数传入）与
- * {@code parseHostSkillDirs}（构造器在用）不随本簇走（§11.17 口径）。</p>
+ * {@code parseHostSkillDirs}（构造器在用）不随本簇走（口径）。</p>
  */
 final class AgentEngineAssembler {
 
@@ -424,7 +424,7 @@ final class AgentEngineAssembler {
                 // 思考/待办是**引擎内置工具**：由 agent-engine 的工厂按同一份允许清单注册
                 case ToolDefinitions.TOOL_THINKING, ToolDefinitions.TOOL_TODO_WRITE -> {
                 }
-                // 检索/会话/记忆/DB 族（2026-09-23 接线批）：seam → 真实服务经 AgentToolBackends
+                // 检索/会话/记忆/DB 族（接线批）：seam → 真实服务经 AgentToolBackends
                 case ToolDefinitions.TOOL_KNOWLEDGE_SEARCH, ToolDefinitions.TOOL_GREP_CHUNKS,
                         ToolDefinitions.TOOL_LIST_KNOWLEDGE_CHUNKS,
                         ToolDefinitions.TOOL_QUERY_KNOWLEDGE_GRAPH,
@@ -434,7 +434,7 @@ final class AgentEngineAssembler {
                         ToolDefinitions.TOOL_DATA_SCHEMA, ToolDefinitions.TOOL_DATA_ANALYSIS ->
                         toolToRegister = toolBackends.createTool(toolName,
                                 config.getSearchTargets(), rerankModel, toolOwnerId, sessionId);
-                // wiki 族 10 件（2026-09-23 接线批）
+                // wiki 族 10 件（接线批）
                 case ToolDefinitions.TOOL_WIKI_READ_PAGE, ToolDefinitions.TOOL_WIKI_SEARCH,
                         ToolDefinitions.TOOL_WIKI_READ_SOURCE_DOC, ToolDefinitions.TOOL_WIKI_FLAG_ISSUE,
                         ToolDefinitions.TOOL_WIKI_WRITE_PAGE, ToolDefinitions.TOOL_WIKI_REPLACE_TEXT,
@@ -442,7 +442,7 @@ final class AgentEngineAssembler {
                         ToolDefinitions.TOOL_WIKI_READ_ISSUE, ToolDefinitions.TOOL_WIKI_UPDATE_ISSUE ->
                         toolToRegister = toolBackends.createWikiTool(toolName,
                                 config.getSearchTargets(), plan.wikiScopes(), plan.wikiKbIds(), plan.wikiRoutes());
-                // web 两件（2026-09-23 接线批）
+                // web 两件（接线批）
                 case ToolDefinitions.TOOL_WEB_SEARCH, ToolDefinitions.TOOL_WEB_FETCH ->
                         toolToRegister = toolBackends.createWebTool(toolName,
                                 config.getWebSearchMaxResults(), config.getWebSearchProviderId());

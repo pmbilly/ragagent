@@ -27,7 +27,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * wiki 工具族接缝：{@link WikiPages}
  * 桥到真实 {@link WikiPageService}（H2 真库）的映射与契约转换。
  *
- * <p>工具自身的输出字节由 {@code GoRecording45A/B} 夹具钉住；本测试覆盖
+ * <p>工具自身的输出字节由 {@code ToolContractGoldenA/B} 夹具钉住；本测试覆盖
  * 此前从未被构造的那一层——桥。三处语义转换是回归高发点：
  * NotFound → null、editSource 经 {@code WikiEditContext}、
  * 时间 → RFC3339Nano 文本。</p>

@@ -58,7 +58,7 @@ class WebToolsRecordingTest {
                     + "\"required\":[\"items\"],\"additionalProperties\":false}";
 
     @Test
-    void schemasMatchGoRecording() throws Exception {
+    void schemasMatchAgentPromptGolden() throws Exception {
         WebFetchTool fetch = new WebFetchTool(STUB_FETCHER);
         WebSearchTool search = new WebSearchTool(
                 (tenantId, providerId, config, query) -> List.of(), 10, "p", () -> 10002L, null, STUB_FETCHER);

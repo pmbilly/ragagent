@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * 录制回放：event_manager / builder / plugin_error / chat_manage 组
- * （期望值 = {@link GoRecording46C} 的录制常量）。
+ * （期望值 = {@link ChatPipelineGolden} 的录制常量）。
  */
 class PipelineCoreRecordingTest {
 

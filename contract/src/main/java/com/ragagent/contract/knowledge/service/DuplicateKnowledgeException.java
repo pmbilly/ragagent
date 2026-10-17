@@ -13,7 +13,7 @@ import com.ragagent.contract.knowledge.KnowledgeRowView;
  * {@code details.existingKnowledgeId} 供前端跳转——取代历史上的特殊信封
  * （{@code {code,data,message,success}}）。</p>
  *
- * <p><b>为什么在 {@code :contract}</b>（§16.2 二轮裁定）：它被 {@code datasource} /
+ * <p><b>为什么在 {@code :contract}</b>（二轮裁定）：它被 {@code datasource} /
  * {@code im} / {@code chatpipeline} / {@code knowledge} **多个域**抛出或捕获，且依赖面
  * **全部是契约件**（{@code BizException} / {@code AppError} / {@code KnowledgeRowView} /
  * {@code DuplicateKnowledgeDetails}）⇒ 符合契约既有的"跨域异常"先例

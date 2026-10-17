@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@code TemporaryDocumentService} 的**解析 / 落盘管线子模块**（§14 步骤 2）：异步投递与重试、
+ * {@code TemporaryDocumentService} 的**解析 / 落盘管线子模块**（步骤 2）：异步投递与重试、
  * docreader → chunker（auto/1600/160）→ ApproxTokenCount → MarkReady、音频转写、
  * 文本与图片落盘（chunks jsonb / image_refs jsonb / markdown 内联图替换）。
  *
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * 与门面的 HTTP 面（create/get/list/delete/openFile）、生命周期（cleanup ticker）与
  * 提示词渲染子模块互不依赖。门面保留 {@code processNow} 薄委托（流程契约测试的驱动口）。</p>
  *
- * <p>共享项处置（§11.17 口径）：{@code MAPPER}/{@code readJsonArray}/{@code extOf}/
+ * <p>共享项处置（口径）：{@code MAPPER}/{@code readJsonArray}/{@code extOf}/
  * {@code isImageFormat} 门面也在用（删除/入 KB/附件提示词路径）→ 留门面，本类按类名引用；
  * {@code CreateOptions} 是门面的公开 record → 本类 import 其嵌套类型。</p>
  */

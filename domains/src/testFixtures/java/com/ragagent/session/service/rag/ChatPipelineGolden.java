@@ -9,11 +9,11 @@ import com.ragagent.platform.fixtures.GoldenResources;
  * <p>JSON 已外置到 {@code platform/src/testFixtures/resources/golden/chat-pipeline-46c.json}；
  * 掩码约定见原录制（UUID/日期/端口/durationMs）。</p>
  */
-public final class GoRecording46C {
+public final class ChatPipelineGolden {
 
     private static final String BUNDLE = "chat-pipeline-46c";
 
-    private GoRecording46C() {
+    private ChatPipelineGolden() {
     }
 
     /** 解析一条录制记录（传常量原文）。 */

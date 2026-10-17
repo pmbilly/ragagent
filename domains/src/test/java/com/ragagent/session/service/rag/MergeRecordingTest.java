@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * 录制回放：merge 五件（classify / sequential / group / parent / expand / faq / history）
- * （期望值 = {@link GoRecording46C} 录制常量）。
+ * （期望值 = {@link ChatPipelineGolden} 录制常量）。
  */
 class MergeRecordingTest {
 

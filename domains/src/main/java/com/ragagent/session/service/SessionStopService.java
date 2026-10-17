@@ -41,7 +41,7 @@ public class SessionStopService {
         this.streamManager = streamManager;
     }
 
-    /** 停止一轮运行中的会话消息；已结束的消息是幂等的成功（不回 message 文案，§1.17）。 */
+    /** 停止一轮运行中的会话消息；已结束的消息是幂等的成功（不回 message 文案，）。 */
     public void stopSession(String sessionId, StopSessionRequest request) {
         String sid = LogSanitizer.sanitize(sessionId);
         if (sid == null || sid.isEmpty()) {
@@ -79,7 +79,7 @@ public class SessionStopService {
             throw new BizException(AppError.ofHttpStatus(403, "Access denied"));
         }
         if (message.isCompleted()) {
-            // 已经结束的消息是幂等的成功（不回 message 文案，§1.17）
+            // 已经结束的消息是幂等的成功（不回 message 文案，）
             return;
         }
 

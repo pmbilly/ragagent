@@ -76,11 +76,11 @@ public class MemoryService {
     static final int RETRIEVAL_BACKGROUND_RUNE_BUDGET = 240;
 
     /**
-     * 读 {@code tenants.memory_config} 用的映射器。
-     *
-     * <p>必须容忍未知属性：那一列是历史 jsonb，配置里多一个键就让记忆整体失效
-     * 是这里最不该发生的事（§7.5 第 6 条）。</p>
-     */
+ * 读 {@code tenants.memory_config} 用的映射器。
+ *
+ * <p>必须容忍未知属性：那一列是历史 jsonb，配置里多一个键就让记忆整体失效
+ * 是这里最不该发生的事（第 6 条）。</p>
+ */
     static final ObjectMapper CONFIG_MAPPER = JsonMappers.lenient()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -399,12 +399,12 @@ public class MemoryService {
     }
 
     /**
-     * 记下使用情况，但不给请求的关键路径增加一次写。
-     *
-     * <p>它跑在异步线程上，HTTP handler 返回之后仍然活着。
-     * 注意它<b>只</b>用显式传进去的 scope，
-     * 不读 {@code TenantContext}——跨线程读 ThreadLocal 正是 §5 禁止的。</p>
-     */
+ * 记下使用情况，但不给请求的关键路径增加一次写。
+ *
+ * <p>它跑在异步线程上，HTTP handler 返回之后仍然活着。
+ * 注意它<b>只</b>用显式传进去的 scope，
+ * 不读 {@code TenantContext}——跨线程读 ThreadLocal 正是 禁止的。</p>
+ */
     void touchAsync(MemoryScope scope, List<MemoryItem> items) {
         if (items == null || items.isEmpty()) {
             return;

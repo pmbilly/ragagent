@@ -11,7 +11,7 @@ package com.ragagent.contract.session;
  * <p><b>字段名不带 {@code is} 前缀</b>（{@code truncated} 而非 {@code isTruncated}）——
  * 理由见 {@code com.ragagent.session.domain.conversation.Session} 上同名字段的注释：Jackson 会因字段与 getter 的隐式名不一致而多吐键。</p>
  *
- * <p>零值语义（§1.6 禁止条件键）：数值字段 {@code fileSize}/{@code lineCount}/{@code tokenCount}/
+ * <p>零值语义（禁止条件键）：数值字段 {@code fileSize}/{@code lineCount}/{@code tokenCount}/
  * {@code selectedChunks}/{@code totalChunks} 的 0 也照写，
  * 用 NON_DEFAULT。</p>
  */

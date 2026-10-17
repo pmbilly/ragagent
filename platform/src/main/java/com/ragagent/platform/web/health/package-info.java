@@ -1,4 +1,4 @@
 /**
- * 平台健康检查面（§8.2）。
+ * 平台健康检查面。
  */
 package com.ragagent.platform.web.health;

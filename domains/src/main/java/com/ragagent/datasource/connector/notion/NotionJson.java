@@ -17,18 +17,18 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
  *
  * <h2>三项关键配置</h2>
  * <ol>
- *   <li><b>未知字段不报错</b>：Notion 的响应字段极多，
- *       {@code FAIL_ON_UNKNOWN_PROPERTIES=false} 是必须的。</li>
- *   <li><b>时区不做上下文调整</b>：反序列化保留原偏移
- *       （{@code "…Z"} 就是 UTC，{@code "+08:00"} 就是 +08:00）。
- *       Jackson 的 {@code ADJUST_DATES_TO_CONTEXT_TIME_ZONE} 默认会把它们挪到
- *       {@code TimeZone.getDefault()}，必须关掉，否则 {@code last_edited_time}
- *       的偏移被改写、增量比对虽然仍按瞬时相等、但写回 cursor 的字面量会漂。</li>
- *   <li><b>时间按 ISO 字符串读写</b>（{@code WRITE_DATES_AS_TIMESTAMPS} 关闭）。</li>
+ * <li><b>未知字段不报错</b>：Notion 的响应字段极多，
+ * {@code FAIL_ON_UNKNOWN_PROPERTIES=false} 是必须的。</li>
+ * <li><b>时区不做上下文调整</b>：反序列化保留原偏移
+ * （{@code "…Z"} 就是 UTC，{@code "+08:00"} 就是 +08:00）。
+ * Jackson 的 {@code ADJUST_DATES_TO_CONTEXT_TIME_ZONE} 默认会把它们挪到
+ * {@code TimeZone.getDefault()}，必须关掉，否则 {@code last_edited_time}
+ * 的偏移被改写、增量比对虽然仍按瞬时相等、但写回 cursor 的字面量会漂。</li>
+ * <li><b>时间按 ISO 字符串读写</b>（{@code WRITE_DATES_AS_TIMESTAMPS} 关闭）。</li>
  * </ol>
  *
  * <p>{@link JavaTimeModule} 是必需的：Notion 的时间是
- * {@code "2026-01-15T10:00:00.000Z"} 形态的 RFC3339，{@code OffsetDateTime}
+ * {@code "T10:00:00.000Z"} 形态的 RFC3339，{@code OffsetDateTime}
  * 没有它直接抛 {@code InvalidDefinitionException}。</p>
  */
 final class NotionJson {

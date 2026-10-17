@@ -1,5 +1,5 @@
 /**
- * 内置智能体面（从 {@code agentmanagement.service} 切出，对齐方案 §8.8.3）：
+ * 内置智能体面（从 {@code agentmanagement.service} 切出，对齐方案）：
  * {@code BuiltinAgentRegistry}——内置智能体定义、类型与提示词的注册表。
  *
  * <p><b>切出依据</b>：它被用例层、控制器与其它域（{@code embedchannel} / {@code im} /

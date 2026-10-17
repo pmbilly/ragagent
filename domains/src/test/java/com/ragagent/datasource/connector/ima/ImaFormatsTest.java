@@ -56,7 +56,7 @@ class ImaFormatsTest {
             "kb1, '', Article,       ima_78014cc4ddb39728e9068a7b4158b057",
             "kb1, '', Photo,         ima_4fbb87e7c7c78ce28f9031010facf7b6",
     })
-    void logicalKeyMatchesGoRecordings(String kbId, String folderId, String title, String want) {
+    void logicalKeyMatchesAgentPromptGoldens(String kbId, String folderId, String title, String want) {
         assertThat(ImaFormats.logicalKey(kbId, folderId, title)).isEqualTo(want);
     }
 

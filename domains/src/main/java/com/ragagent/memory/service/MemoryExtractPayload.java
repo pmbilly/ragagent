@@ -36,13 +36,13 @@ public record MemoryExtractPayload(
         /** 结束触发那一轮的助手消息，用来界定抽取窗口，也是产出条目的来源。 */
         @JsonProperty("message_id") String messageId,
         /**
-         * {@code chat_model_id} 空串时**省略整个键**。
-         *
-         * <p>用 {@code NON_DEFAULT} 而不是 {@code NON_NULL}：字段在紧凑构造器里已经把
-         * null 归一成 {@code ""}，省略的是**空串**
-         * （§7.5 第 5 条）。{@code tenant_id} 是 0 时必须照常输出——
-         * 这也是注解只加在这两个分量上、不放类头的原因。</p>
-         */
+ * {@code chat_model_id} 空串时**省略整个键**。
+ *
+ * <p>用 {@code NON_DEFAULT} 而不是 {@code NON_NULL}：字段在紧凑构造器里已经把
+ * null 归一成 {@code ""}，省略的是**空串**
+ * （第 5 条）。{@code tenant_id} 是 0 时必须照常输出——
+ * 这也是注解只加在这两个分量上、不放类头的原因。</p>
+ */
         @JsonProperty("chat_model_id")
         @JsonInclude(JsonInclude.Include.NON_DEFAULT) String chatModelId,
         /** {@code language} 同样为空省略。 */

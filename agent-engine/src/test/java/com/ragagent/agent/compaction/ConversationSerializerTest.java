@@ -1,37 +1,37 @@
 package com.ragagent.agent.compaction;
 
-import static com.ragagent.agent.GoRecording.STR_ARGS0;
-import static com.ragagent.agent.GoRecording.STR_ARGS1;
-import static com.ragagent.agent.GoRecording.STR_ARGS10;
-import static com.ragagent.agent.GoRecording.STR_ARGS11;
-import static com.ragagent.agent.GoRecording.STR_ARGS12;
-import static com.ragagent.agent.GoRecording.STR_ARGS13;
-import static com.ragagent.agent.GoRecording.STR_ARGS14;
-import static com.ragagent.agent.GoRecording.STR_ARGS15;
-import static com.ragagent.agent.GoRecording.STR_ARGS2;
-import static com.ragagent.agent.GoRecording.STR_ARGS3;
-import static com.ragagent.agent.GoRecording.STR_ARGS4;
-import static com.ragagent.agent.GoRecording.STR_ARGS5;
-import static com.ragagent.agent.GoRecording.STR_ARGS6;
-import static com.ragagent.agent.GoRecording.STR_ARGS7;
-import static com.ragagent.agent.GoRecording.STR_ARGS8;
-import static com.ragagent.agent.GoRecording.STR_ARGS9;
-import static com.ragagent.agent.GoRecording.STR_CALLS2;
-import static com.ragagent.agent.GoRecording.STR_CALLS_BAD;
-import static com.ragagent.agent.GoRecording.STR_CONVERSATION;
-import static com.ragagent.agent.GoRecording.STR_CONVERSATION_EMPTY;
-import static com.ragagent.agent.GoRecording.STR_RAW_ARCHIVE;
-import static com.ragagent.agent.GoRecording.STR_RAW_ARCHIVE_EMPTY;
-import static com.ragagent.agent.GoRecording.STR_TRUNC_CJK;
-import static com.ragagent.agent.GoRecording.STR_TRUNC_EXACT;
-import static com.ragagent.agent.GoRecording.STR_TRUNC_MULTILINE;
-import static com.ragagent.agent.GoRecording.STR_TRUNC_NEWLINE_MARKER;
-import static com.ragagent.agent.GoRecording.STR_TRUNC_OVER;
-import static com.ragagent.agent.GoRecording.STR_TRUNC_SHORT;
-import static com.ragagent.agent.GoRecording.STR_TRUNC_TRIM;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS0;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS1;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS10;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS11;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS12;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS13;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS14;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS15;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS2;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS3;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS4;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS5;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS6;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS7;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS8;
+import static com.ragagent.agent.AgentPromptGolden.STR_ARGS9;
+import static com.ragagent.agent.AgentPromptGolden.STR_CALLS2;
+import static com.ragagent.agent.AgentPromptGolden.STR_CALLS_BAD;
+import static com.ragagent.agent.AgentPromptGolden.STR_CONVERSATION;
+import static com.ragagent.agent.AgentPromptGolden.STR_CONVERSATION_EMPTY;
+import static com.ragagent.agent.AgentPromptGolden.STR_RAW_ARCHIVE;
+import static com.ragagent.agent.AgentPromptGolden.STR_RAW_ARCHIVE_EMPTY;
+import static com.ragagent.agent.AgentPromptGolden.STR_TRUNC_CJK;
+import static com.ragagent.agent.AgentPromptGolden.STR_TRUNC_EXACT;
+import static com.ragagent.agent.AgentPromptGolden.STR_TRUNC_MULTILINE;
+import static com.ragagent.agent.AgentPromptGolden.STR_TRUNC_NEWLINE_MARKER;
+import static com.ragagent.agent.AgentPromptGolden.STR_TRUNC_OVER;
+import static com.ragagent.agent.AgentPromptGolden.STR_TRUNC_SHORT;
+import static com.ragagent.agent.AgentPromptGolden.STR_TRUNC_TRIM;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.agent.GoRecording;
+import com.ragagent.agent.AgentPromptGolden;
 import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.FunctionCall;
@@ -169,6 +169,6 @@ class ConversationSerializerTest {
         assertThat(ConversationSerializer.trimUnicodeWhitespace("")).isEmpty();
         assertThat(ConversationSerializer.trimUnicodeWhitespace(null)).isEmpty();
         // 该辅助被 AgentPrompts.formatDocSummary 复用，录制断言见 AgentPromptsTest
-        assertThat(GoRecording.STR_DSUM5).isEqualTo("spaced out text");
+        assertThat(AgentPromptGolden.STR_DSUM5).isEqualTo("spaced out text");
     }
 }

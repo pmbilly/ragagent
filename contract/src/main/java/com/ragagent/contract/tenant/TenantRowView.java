@@ -6,15 +6,15 @@ import java.time.OffsetDateTime;
 /**
  * 租户行**视图**（L1）：租户管理面与线格式（{@code auth.dto.TenantResponse}）的载荷。
  *
- * <p><b>为什么有它</b>：实体 {@code Tenant} 已归位 `tenant/domain`（HANDOFF §12.0 判据 1
- * ——持久化闭包与 `TenantMapper`/`TenantLookup` 同域）；auth 的租户管理面（§8.9 计划面：
+ * <p><b>为什么有它</b>：实体 {@code Tenant} 已归位 `tenant/domain`（HANDOFF 判据 1
+ * ——持久化闭包与 `TenantMapper`/`TenantLookup` 同域）；auth 的租户管理面（计划面：
  * 租户/成员/RBAC 管理在 auth）经本视图读写，以维持已登记的 {@code auth→tenant} 属主边
  * **只由 `TenantService` 一个类承载**（R10 登记条件：读侧走 L1 端口、写侧集中在属主域）。</p>
  *
  * <p><b>口径</b>：镜像实体全部 21 字段（10 个 jsonb {@code JsonNode} + {@code APIPrincipalConfig}），
  * 访问器名逐字一致；{@code apiPrincipalConfig} 与实体同标 {@code @JsonIgnore} ⇒ JSON 等价。</p>
  *
- * <p><b>落点（G1-b-2，2026-10-15）</b>：已**入 {@code :contract}**（{@code contract.tenant}）——
+ * <p><b>落点</b>：已**入 {@code :contract}**（{@code contract.tenant}）——
  * 9 个 jsonb 配置字段由 {@code JsonNode} 改为**纯 JDK 值**（对象→{@code Map}、数组→{@code List}、
  * 标量→包装类型），边界转换见 {@code platform.web.JsonMappers#toJavaValue}/{@code #toJsonNode}；
  * 序列化字节与直接序列化 {@code JsonNode} 一致（键序保留）。</p>

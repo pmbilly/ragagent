@@ -3,8 +3,8 @@ package com.ragagent.agenttools.knowledge;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.fixtures.GoRecording45A;
 import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.ToolContractGoldenA;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 class FaqSnippetRecordingTest {
 
     @Test
-    void metadataXmlMatchesGoRecording() {
+    void metadataXmlMatchesAgentPromptGolden() {
         JsonNode r = RecordingSupport.rec(field("R_FAQ_METADATA_XML"));
         FaqChunkMetadata meta = new FaqChunkMetadata();
         meta.standardQuestion = "如何创建知识库？";
@@ -31,7 +31,7 @@ class FaqSnippetRecordingTest {
     }
 
     @Test
-    void similarQuestionsXmlMatchesGoRecording() {
+    void similarQuestionsXmlMatchesAgentPromptGolden() {
         JsonNode r8 = RecordingSupport.rec(field("R_FAQ_SIMILAR_8"));
         List<String> qs = new ArrayList<>();
         for (int i = 1; i <= 8; i++) {
@@ -48,7 +48,7 @@ class FaqSnippetRecordingTest {
     }
 
     @Test
-    void entryXmlMatchesGoRecording() {
+    void entryXmlMatchesAgentPromptGolden() {
         JsonNode r = RecordingSupport.rec(field("R_FAQ_ENTRY_XML"));
         ChunkFacts chunk = faqChunk();
         StringBuilder b = new StringBuilder();
@@ -58,7 +58,7 @@ class FaqSnippetRecordingTest {
     }
 
     @Test
-    void matchSnippetsMatchGoRecording() {
+    void matchSnippetsMatchAgentPromptGolden() {
         FaqChunkMetadata meta = new FaqChunkMetadata();
         meta.standardQuestion = "如何创建知识库？";
         meta.similarQuestions = List.of("怎么创建知识库？");
@@ -74,7 +74,7 @@ class FaqSnippetRecordingTest {
     }
 
     @Test
-    void tokensMatchGoRecording() {
+    void tokensMatchAgentPromptGolden() {
         JsonNode r = RecordingSupport.rec(field("R_FAQ_TOKENS"));
         List<String> got = FaqSnippet.searchQueryTokens(
                 List.of("Hello, World! 你好 world", "a b", ""));
@@ -83,7 +83,7 @@ class FaqSnippetRecordingTest {
     }
 
     @Test
-    void truncateDisplayMatchesGoRecording() {
+    void truncateDisplayMatchesAgentPromptGolden() {
         JsonNode r3 = RecordingSupport.rec(field("R_FAQ_TRUNCATE_DISPLAY_3"));
         FaqSnippet.SimilarQuestionsDisplay d3 =
                 FaqSnippet.truncateSimilarQuestionsForDisplay(List.of("q1", "q2", "q3"));
@@ -97,7 +97,7 @@ class FaqSnippetRecordingTest {
     }
 
     @Test
-    void appendChunkDataMatchesGoRecording() {
+    void appendChunkDataMatchesAgentPromptGolden() {
         JsonNode r = RecordingSupport.rec(field("R_FAQ_APPEND_CHUNK_DATA"));
         Map<String, Object> data = new java.util.LinkedHashMap<>();
         data.put("content", "x");
@@ -117,7 +117,7 @@ class FaqSnippetRecordingTest {
 
     private static String field(String name) {
         try {
-            return (String) GoRecording45A.class.getField(name).get(null);
+            return (String) ToolContractGoldenA.class.getField(name).get(null);
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }

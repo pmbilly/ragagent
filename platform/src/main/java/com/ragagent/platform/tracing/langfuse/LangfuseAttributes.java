@@ -117,7 +117,7 @@ public final class LangfuseAttributes {
         return merged;
     }
 
-    /** ISO-8601 时间：UTC 毫秒精度（如 {@code 2026-01-02T15:04:05.000Z}）。 */
+    /** ISO-8601 时间：UTC 毫秒精度（如 {@code T15:04:05.000Z}）。 */
     public static String isoTime(long epochMillis) {
         return ISO_MILLIS.format(Instant.ofEpochMilli(epochMillis));
     }

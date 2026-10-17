@@ -46,25 +46,25 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 会话 HTTP 层。
  *
- * <h2>响应形态（§2.1）</h2>
+ * <h2>响应形态</h2>
  * <ul>
- *   <li>创建 → <b>201</b> + 裸 {@code Session}；读取/更新 → 200 + 裸 {@code Session}；</li>
- *   <li>列表 → {@code {items,page,pageSize,total}}（{@link SessionListResponse}）；</li>
- *   <li>删除 / 批量删除 / 清空消息 → <b>200</b> + {@code ApiResponse} 外壳（§1.13；旧
- *       {@code {"message":…,"success":true}} 裸文案与空体 204 均退役，前端不再解析服务端文案）；</li>
- *   <li>置顶 → 200 + {@code {"pinned":bool}}（{@link SessionPinResponse}）；</li>
- *   <li>产物列表 → 裸数组 {@code [ArtifactView]}；生成标题 → {@code {"title":"…"}}；</li>
- *   <li>停止生成 → 成功 <b>200</b> + {@code ApiResponse} 外壳，无业务数据（§1.17）。</li>
+ * <li>创建 → <b>201</b> + 裸 {@code Session}；读取/更新 → 200 + 裸 {@code Session}；</li>
+ * <li>列表 → {@code {items,page,pageSize,total}}（{@link SessionListResponse}）；</li>
+ * <li>删除 / 批量删除 / 清空消息 → <b>200</b> + {@code ApiResponse} 外壳（旧
+ * {@code {"message":…,"success":true}} 裸文案与空体 204 均退役，前端不再解析服务端文案）；</li>
+ * <li>置顶 → 200 + {@code {"pinned":bool}}（{@link SessionPinResponse}）；</li>
+ * <li>产物列表 → 裸数组 {@code [ArtifactView]}；生成标题 → {@code {"title":"…"}}；</li>
+ * <li>停止生成 → 成功 <b>200</b> + {@code ApiResponse} 外壳，无业务数据。</li>
  * </ul>
  *
  * <h2>错误门槛顺序</h2>
  * <ol>
- *   <li>路径参数 sanitize 后为空 → 400 {@code "invalid session id"}；</li>
- *   <li>请求体绑定失败 → 400，文案由全局处理器给（空体/字面量 null → {@code 请求体不能为空}；
- *       畸形 JSON → {@code 请求体格式不正确}；缺 {@code messages} → {@code messages: 不能为空}）；</li>
- *   <li>上下文无租户 → 401 {@code "Unauthorized"}；</li>
- *   <li>服务层 ErrSessionNotFound → 404 {@code "session not found"}（code 1003）；</li>
- *   <li>其余服务层错误 → 500 + 错误 message。</li>
+ * <li>路径参数 sanitize 后为空 → 400 {@code "invalid session id"}；</li>
+ * <li>请求体绑定失败 → 400，文案由全局处理器给（空体/字面量 null → {@code 请求体不能为空}；
+ * 畸形 JSON → {@code 请求体格式不正确}；缺 {@code messages} → {@code messages: 不能为空}）；</li>
+ * <li>上下文无租户 → 401 {@code "Unauthorized"}；</li>
+ * <li>服务层 ErrSessionNotFound → 404 {@code "session not found"}（code 1003）；</li>
+ * <li>其余服务层错误 → 500 + 错误 message。</li>
  * </ol>
  * <p>⚠️ {@code stop} 端点的错误仍是**纯字符串信封** {@code {"error":"…"}}，
  * 与组内其他端点的 AppError 信封不同。</p>
@@ -158,10 +158,10 @@ public class SessionController {
     }
 
     /**
-     * <p>查询参数是 camelCase（{@code page}/{@code pageSize}/{@code keyword}/{@code source}/
-     * {@code agentId}，§1.16）；分页门槛的文案是标准中文（见 {@link #bindPagination}）。
-     * 响应是 {@link SessionListResponse}（§2.1）。</p>
-     */
+ * <p>查询参数是 camelCase（{@code page}/{@code pageSize}/{@code keyword}/{@code source}/
+ * {@code agentId}，）；分页门槛的文案是标准中文（见 {@link #bindPagination}）。
+ * 响应是 {@link SessionListResponse}。</p>
+ */
     @GetMapping("/api/v1/sessions")
     public SessionListResponse getSessionsByTenant(
             @RequestParam(name = "page", required = false) String page,
@@ -270,7 +270,7 @@ public class SessionController {
 
     // ══════════════════════════ 删除 ══════════════════════════
 
-    /** 删除会话：同步删除 → <b>200</b> + {@code ApiResponse} 外壳（§1.13）。 */
+    /** 删除会话：同步删除 → <b>200</b> + {@code ApiResponse} 外壳。 */
     @DeleteMapping("/api/v1/sessions/{id}")
     public ApiResponse<Void> deleteSession(@PathVariable("id") String id) {
         String sessionId = LogSanitizer.sanitize(id);

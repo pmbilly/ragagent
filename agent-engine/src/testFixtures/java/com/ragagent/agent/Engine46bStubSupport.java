@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 
 /**
  * 引擎录制回放的替身与掩码工具（脚本化 chat / 计数工具 / steer sink 与掩码）。
- * 期望值全部是 {@link GoRecording46B} 的录制常量。
+ * 期望值全部是 {@link AgentExecutionGolden} 的录制常量。
  *
  * <p>掩码约定（探针在录制侧做了同款替换，两侧掩码后逐字节可比）：事件 id 的 uuid
  * 前缀 → {@code xxxxxxxx-}；duration/durationMs/totalDurationMs → 0；
@@ -414,6 +414,6 @@ final class Engine46bStubSupport {
     }
 
     static JsonNode rec(String constant) {
-        return GoRecording46B.rec(constant);
+        return AgentExecutionGolden.rec(constant);
     }
 }

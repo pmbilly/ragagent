@@ -7,13 +7,13 @@ import java.time.OffsetDateTime;
  * 用户行**视图**（L1）：{@code AdminUserPort} 管理面（读 / 建 / 晋升 / 撤权 / 重置密码）载荷，
  * 同时是系统管理面线格式（{@code SystemDtos.UserInfoResponse}）的形状。
  *
- * <p><b>为什么有它</b>：实体 {@code User} 已归位 `auth/domain`（HANDOFF §12.0 判据 1）；
+ * <p><b>为什么有它</b>：实体 {@code User} 已归位 `auth/domain`（HANDOFF 判据 1）；
  * 跨域方（system 的用户管理面）只应经本视图。</p>
  *
  * <p><b>口径</b>：镜像实体除 {@code @JsonIgnore passwordHash} 外的全部字段，访问器名逐字一致
  * （含 {@code isIsActive()} / {@code isIsSystemAdmin()}）⇒ JSON 等价。</p>
  *
- * <p><b>落点（P4a 已清偿）</b>：{@code preferences}（{@code UserPreferences}）已随本批去
+ * <p><b>落点（已清偿）</b>：{@code preferences}（{@code UserPreferences}）已随本批去
  * Jackson（注解由 {@code platform.web.ContractJsonMixinsAuth} 承载）⇒ 本视图与端口已入
  * {@code contract.auth}。</p>
  */

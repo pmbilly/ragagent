@@ -10,7 +10,7 @@ package com.ragagent.knowledge.domain;
  * 逐字对齐，**实现方无需改动方法体**。</p>
  *
  * <p><b>为什么在 {@code domain} 而非 {@code task}</b>：首版端口放在 {@code task}，两个 service 因
- * {@code implements} 立刻被 A16（service 不得依赖边界层 task）判为新增违例 ✗——端口必须落在**两侧都
+ * {@code implements} 立刻被 （service 不得依赖边界层 task）判为新增违例 ✗——端口必须落在**两侧都
  * 能合法依赖**的中立面，{@code domain} 正是（payload 类型本就在此）。</p>
  *
  * <p><b>为什么拆成两个端口</b>：首版用**一个**共享端口，两个 service 同时实现它 ⇒ Spring 按类型注入

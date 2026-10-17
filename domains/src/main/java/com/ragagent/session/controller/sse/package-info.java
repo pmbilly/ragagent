@@ -1,5 +1,5 @@
 /**
- * session 的 SSE 传输面（由 {@code session.sse} 迁入 {@code controller.sse}，对齐方案 §8.8.1）：
+ * session 的 SSE 传输面（由 {@code session.sse} 迁入 {@code controller.sse}，对齐方案）：
  * {@code SseContract}（帧契约）、{@code SseFrameWriter}（帧写出）、{@code StreamEventEmitter}
  * （事件 → SSE 帧）、{@code StreamResponseBuilder}（响应组装 + Redis 回放引用重建）。
  *

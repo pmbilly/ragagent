@@ -118,7 +118,7 @@ public class KnowledgeBaseService
         applyTenantDefaultStorageProvider(kb);
         applyAndValidateStorageBackend(kb);
         kb.normalizeVectorStoreId();
-        // 2026-09-25 接线批：vector_store_id 绑定校验
+        // 接线批：vector_store_id 绑定校验
         if (kb.hasVectorStore()) {
             validateVectorStoreBinding(tenantId(), kb.getVectorStoreId());
         }
@@ -388,20 +388,20 @@ public class KnowledgeBaseService
     }
 
     /**
-     * 全量（无分页）+ 计数/置顶/创建者名回填。
-     *
-     * <p><b>必须排除隐藏库</b>（{@code is_temporary = false}）：否则
-     * 「聊天历史」自动开通的 {@code __chat_history__} 会泄漏进列表与所有复用本方法的
-     * 消费面（IM {@code /kb}、建议问题范围、QA 范围）——2026-10-03 点检实锤。
-     * 隐藏库的正当访问路径是按配置里的 id 直查（MessageSearch），不依赖本列表。</p>
-     */
+ * 全量（无分页）+ 计数/置顶/创建者名回填。
+ *
+ * <p><b>必须排除隐藏库</b>（{@code is_temporary = false}）：否则
+ * 「聊天历史」自动开通的 {@code __chat_history__} 会泄漏进列表与所有复用本方法的
+ * 消费面（IM {@code /kb}、建议问题范围、QA 范围）—— 点检实锤。
+ * 隐藏库的正当访问路径是按配置里的 id 直查（MessageSearch），不依赖本列表。</p>
+ */
     public List<KnowledgeBase> listKnowledgeBases(String creator) {
         // Order("created_at DESC") 最新在前
         List<KnowledgeBase> all = kbRepository.listActiveByTenant(tenantId());
         String uid = TenantContext.currentUserId();
         List<KnowledgeBase> out = new ArrayList<>(all.size());
         for (KnowledgeBase kb : all) {
-            // 2026-09-25 线上抓回：缺这一步 ⇒ capabilities() 全假 ⇒ quick-answer 能力过滤
+            // 线上抓回：缺这一步 ⇒ capabilities() 全假 ⇒ quick-answer 能力过滤
             // 丢弃 KB ⇒ /agents/{id}/suggested-questions 无范围时返回空数组）
             ensureDefaults(kb);
             fillCounts(kb);

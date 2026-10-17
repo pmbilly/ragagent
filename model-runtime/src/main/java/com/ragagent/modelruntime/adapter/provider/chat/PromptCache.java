@@ -50,9 +50,9 @@ public final class PromptCache {
     // ------------------------------------------------------------------
 
     /**
-     * 短、不可逆的标识，用于日志与缓存路由（实现见 {@code platform.prompt.PromptFingerprints}，
-     * R2c-3d 拆出纯函数族后本类只做委托）。
-     */
+ * 短、不可逆的标识，用于日志与缓存路由（实现见 {@code platform.prompt.PromptFingerprints}，
+ * 拆出纯函数族后本类只做委托）。
+ */
     public static String fingerprintPromptPrefix(String... parts) {
         return PromptFingerprints.fingerprintPromptPrefix(parts);
     }

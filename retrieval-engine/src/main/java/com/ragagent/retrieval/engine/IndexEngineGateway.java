@@ -12,12 +12,12 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
- * 索引引擎解析 + 适配（R3b 契约化）：把内部 {@link CompositeRetrieveEngine} 包成契约面
+ * 索引引擎解析 + 适配（契约化）：把内部 {@link CompositeRetrieveEngine} 包成契约面
  * {@link IndexEngine}，并把业务域的 {@link IndexDocument} 映射回内部形状
  * {@link EngineTypes.IndexInfo}。
  *
  * <p><b>为什么需要适配层</b>：内部形状（含公有可变字段的 {@code EngineTypes.IndexInfo}）是各引擎适配器共用的
- * 实现细节，按 §2.1 载体红线不上提契约；域侧只认领域级载体，映射收在本层一处。</p>
+ * 实现细节，按 载体红线不上提契约；域侧只认领域级载体，映射收在本层一处。</p>
  *
  * <p>解析口径与迁出前的 domain 侧网关逐字一致：{@code createForKb(registry, ownership, tenantId,
  * storeId, fallbackEngineType=null)}（内含跨租户归属校验 + 失败分类）。</p>

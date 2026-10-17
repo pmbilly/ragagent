@@ -147,7 +147,7 @@ public class SessionService {
             if (!isAdmin) {
                 // 非管理员到此为止：连"存在但你看不到"都不该知道
                 // （诊断留痕：owner 推导错/上下文丢失时这里是唯一线索，见
-                //  2026-09-24 embed follow-up 的 SessionNotFound 排查）
+                // embed follow-up 的 SessionNotFound 排查）
                 log.info("[session-read-miss] tenant={}, owner={}, session={}, principalType={}, principalId={}",
                         tenantId, ownerId, LogSanitizer.sanitize(sessionId),
                         TenantContext.currentPrincipal() == null ? "" : TenantContext.currentPrincipal().type(),

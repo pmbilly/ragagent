@@ -408,17 +408,17 @@ public class AgentEngine {
     }
 
     /**
-     * 执行 agent：带会话历史与流式输出。
-     *
-     * @param imageURLs 多模态输入图片
-     * @throws AgentEngineException 失败时（**error 事件已在抛出前发出**，终态帧随后补；A18：
-     *     引擎是失败上报的唯一所有者——闸门内的非契约异常也统一收编成本类型，调用方
-     *     据类型判定"已上报"、不再补发第二份 error）
-     */
+ * 执行 agent：带会话历史与流式输出。
+ *
+ * @param imageURLs 多模态输入图片
+ * @throws AgentEngineException 失败时（**error 事件已在抛出前发出**，终态帧随后补；：
+ * 引擎是失败上报的唯一所有者——闸门内的非契约异常也统一收编成本类型，调用方
+ * 据类型判定"已上报"、不再补发第二份 error）
+ */
     public AgentState execute(String sessionId, String messageId, String query,
             List<ChatMessage> llmContext, List<String> imageURLs) {
         // null 列表按空集处理——调用方（如 skill 安装器的 installer run）可以合法传
-        // null，入口日志会直接取 size 而 NPE（2026-09-25 install E2E 抓回：
+        // null，入口日志会直接取 size 而 NPE（install E2E 抓回：
         // installer agent failed: Cannot invoke "java.util.List.size()" because
         // "llmContext" is null），这里归一为空列表。
         List<ChatMessage> context = llmContext == null ? List.of() : llmContext;
@@ -509,7 +509,7 @@ public class AgentEngine {
             if (completionEmitted.compareAndSet(false, true)) {
                 finalize.emitCompletionEvent(state, sessionId, messageId, startTime, e.getMessage());
             }
-            // A18：失败上报的**唯一所有者**在引擎侧——非契约异常统一收编为
+            //：失败上报的**唯一所有者**在引擎侧——非契约异常统一收编为
             // AgentEngineException（消息沿用既有 wireText 口径、保留 state 与 cause），
             // 调用方据此判定"已上报"、不再补发第二份 error。
             throw e instanceof AgentEngineException aee

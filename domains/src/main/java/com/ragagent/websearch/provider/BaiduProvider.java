@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  * {@code resource_type_filter:[{type:"web",top_k}]}。query 按「CJK/全角算 2」的
  * 宽度模型归一到 72 单位（超限截断）；maxResults 缺省 5、封顶 50；200 响应里的
  * {@code code != 0} 是 API 级错误；date 用正则解析变长格式
- * （"2025-4-24" / "2025-04-27 18:02" 等）。</p>
+ * （"2025-4-24" / " 18:02" 等）。</p>
  */
 public final class BaiduProvider implements WebSearchProvider {
 

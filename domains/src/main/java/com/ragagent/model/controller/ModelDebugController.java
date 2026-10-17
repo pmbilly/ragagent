@@ -571,7 +571,7 @@ public class ModelDebugController {
 
     // ── 小工具 ───────────────────────────────────────────────────────────
 
-    /** 日志脱敏：\n\r\t → 空格，其余 C0 控制符移除。 */
+    /** 日志脱敏：\n\r\t → 空格，其余 控制符移除。 */
     private static String sanitizeForLog(String input) {
         if (input == null || input.isEmpty()) {
             return "";

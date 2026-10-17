@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * 录制回放：query_understand 族 + load_history + history_messages
- * （期望值 = {@link GoRecording46C} 的录制常量；墙钟段以 DATE/WEEKDAY 掩码）。
+ * （期望值 = {@link ChatPipelineGolden} 的录制常量；墙钟段以 DATE/WEEKDAY 掩码）。
  */
 class QueryUnderstandRecordingTest {
 

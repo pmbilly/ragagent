@@ -3,7 +3,7 @@ package com.ragagent.contract.retrieval;
 /**
  * 索引引擎解析端口：把"租户 + 向量店 id"解析成一个可用的 {@link IndexEngine} 句柄。
  *
- * <p>R3b 契约化：业务域原先自己拿 {@code RetrieveEngineRegistry} + {@code RetrieveEngineFactories}
+ * <p> 契约化：业务域原先自己拿 {@code RetrieveEngineRegistry} + {@code RetrieveEngineFactories}
  * + {@code TenantStoreOwnership} 做绑定解析（含跨租户归属校验与失败分类）——那是**引擎知识**，
  * 沉到 retrieval-engine 一处实现。</p>
  *

@@ -64,7 +64,7 @@ final class HybridResultOps {
             chunkMap.put(c.id(), c);
         }
 
-        // 上下文扩展（K9）：父块 / 相邻块 / 关系块——**取回后必须输出**（此前只读不输出，
+        // 上下文扩展：父块 / 相邻块 / 关系块——**取回后必须输出**（此前只读不输出，
         // 请求里 skipContextEnrichment=false 也拿不到任何上下文块，那些读取全是白读）。
         // 扩展块登记到来源命中名下，装配时紧随其后。
         Map<String, List<String>> extrasBySource = new LinkedHashMap<>();

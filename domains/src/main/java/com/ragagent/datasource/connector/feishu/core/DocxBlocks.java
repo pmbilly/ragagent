@@ -675,14 +675,14 @@ public final class DocxBlocks {
     }
 
     /**
-     * 渲染一个多维表格单元格。
-     *
-     * <p>日期列带的是 Unix <b>毫秒</b>的 UTC 瞬时；用户看到的日历日期是"该瞬时在表格
-     * 时区下"的日期，所以要用 {@code loc} 渲染（用 UTC 会把日期挪一天，例如 GMT+8 的
-     * {@code "2024-04-01"} 会显示成 {@code "2024-03-31 16:00:00"}）。
-     * 只有日期的 formatter 输出 {@code yyyy-MM-dd}；带时间的 formatter 再加 {@code HH:mm}。
-     * 其它类型一律落到 {@link #bitableCellToString}。</p>
-     */
+ * 渲染一个多维表格单元格。
+ *
+ * <p>日期列带的是 Unix <b>毫秒</b>的 UTC 瞬时；用户看到的日历日期是"该瞬时在表格
+ * 时区下"的日期，所以要用 {@code loc} 渲染（用 UTC 会把日期挪一天，例如 GMT+8 的
+ * {@code ""} 会显示成 {@code " 16:00:00"}）。
+ * 只有日期的 formatter 输出 {@code yyyy-MM-dd}；带时间的 formatter 再加 {@code HH:mm}。
+ * 其它类型一律落到 {@link #bitableCellToString}。</p>
+ */
     public static String bitableFieldCell(Object v, BitableColumn col, ZoneId loc) {
         if (col != null && col.fieldType() == BITABLE_FIELD_TYPE_DATE_TIME && v instanceof Number n) {
             double ms = n.doubleValue();

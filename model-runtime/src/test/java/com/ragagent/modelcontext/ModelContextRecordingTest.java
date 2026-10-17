@@ -1,6 +1,6 @@
 package com.ragagent.modelcontext;
 
-import static com.ragagent.modelcontext.GoRecording46A.*;
+import static com.ragagent.modelcontext.ModelContextGolden.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,13 +21,13 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * 4.6a modelcontext 包的录制回放（常量见 {@link GoRecording46A}——字节断言为准）。
+ * 4.6a modelcontext 包的录制回放（常量见 {@link ModelContextGolden}——字节断言为准）。
  * model_output 组严格按录制时的 registry 复用顺序回放（句柄编号跨用例累积）。
  */
 class ModelContextRecordingTest {
 
     private static JsonNode rec(String constant) {
-        return GoRecording46A.rec(constant);
+        return ModelContextGolden.rec(constant);
     }
 
     private static String out(String constant) {

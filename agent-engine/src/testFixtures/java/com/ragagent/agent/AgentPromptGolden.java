@@ -9,11 +9,11 @@ import com.ragagent.platform.fixtures.GoldenResources;
  * <p>JSON 已外置到 {@code platform/src/testFixtures/resources/golden/agent-46.json}；
  * 字段名保持原 API，值由 {@link GoldenResources} 按 SHA-256 校验后加载。</p>
  */
-public final class GoRecording {
+public final class AgentPromptGolden {
 
     private static final String BUNDLE = "agent-46";
 
-    private GoRecording() {
+    private AgentPromptGolden() {
     }
 
     /** 解析一条录制记录。 */

@@ -55,7 +55,7 @@ import java.util.regex.Pattern;
 
 /**
  * 4.6c 录制回放的替身与掩码工具。
- * 期望值全部是 {@link GoRecording46C} 的录制常量；掩码后逐字节可比。
+ * 期望值全部是 {@link ChatPipelineGolden} 的录制常量；掩码后逐字节可比。
  *
  * <p>掩码约定（本类 {@link #mask}）：完整 uuid → MASKED-UUID；
  * 事件 id 的 8-hex 前缀 → xxxxxxxx-；"durationMs":N 连键带值删除；日期 → DATE；
@@ -91,17 +91,17 @@ final class Rec46cSupport {
         return EventJson.write(v);
     }
 
-    /** 解析 GoRecording46C 常量并断言相等（带上下文 diff）。 */
+    /** 解析 ChatPipelineGolden 常量并断言相等（带上下文 diff）。 */
     static void assertRec(String group, String key, String actual) {
-        String expected = GoRecording46C.constant(group, key);
+        String expected = ChatPipelineGolden.constant(group, key);
         org.assertj.core.api.Assertions.assertThat(ContractJson.deep(actual))
                 .as("recording %s/%s", group, key)
                 .isEqualTo(ContractJson.deep(expected));
     }
 
-    /** 常量查找（GoRecording46C 生成的常量名按组/键）。 */
+    /** 常量查找（ChatPipelineGolden 生成的常量名按组/键）。 */
     static String constant(String group, String key) {
-        return GoRecording46C.constant(group, key);
+        return ChatPipelineGolden.constant(group, key);
     }
 
     /** 断言"无错误"（无错误时 err 键不出现/整体为 null）。 */

@@ -61,7 +61,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * agent 引擎检索工具族的接缝适配（2026-09-23 接线批）。
+ * agent 引擎检索工具族的接缝适配（接线批）。
  *
  * <p>agent/tools 下的工具类走窄 seam（{@code KnowledgeSearchBackend} /
  * {@code GrepChunkSearch} / {@code GraphSearch} / {@code KnowledgeInfoReader} /

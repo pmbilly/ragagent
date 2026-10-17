@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Azure OpenAI。
  *
- * 唯一的 ExtraFields 使用者（api_version，default "2024-10-21"），其余 provider 的
+ * 唯一的 ExtraFields 使用者（api_version，default ""），其余 provider 的
  * ExtraFields 均未配置。
  */
 public class AzureOpenAIProvider implements Provider {

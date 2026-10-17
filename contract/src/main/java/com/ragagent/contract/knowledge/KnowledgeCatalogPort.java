@@ -10,7 +10,7 @@ import java.util.Map;
  * <p><b>为什么是端口</b>：会话 / 评测 / IM / 数据源等域只做"按 id 取行、按租户列行、
  * 建/删"，而实现（含 409 重复冲突、租户可见性、内嵌状态机）在知识域。
  * 实体 {@code KnowledgeRowView}/{@code KnowledgeBase} 已**归位各域**（C 批）；跨域面只搬
- * {@link KnowledgeBaseRowView} 等 L1 行视图（HANDOFF §12.0 判据 1）。</p>
+ * {@link KnowledgeBaseRowView} 等 L1 行视图（HANDOFF 判据 1）。</p>
  *
  * <p><b>失败语义</b>与知识域一致：id 空 / 不可见 / 状态异常 ⇒ 运行时异常原样上抛；
  * 建知识遇重复 ⇒ {@code DuplicateKnowledgeException}（409，details 带已存在文档 id）。</p>

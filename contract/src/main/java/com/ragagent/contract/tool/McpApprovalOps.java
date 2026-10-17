@@ -6,7 +6,7 @@ import java.util.Map;
  * MCP OAuth 授权与工具审批解析的操作面（L1）：embed 渠道把访客 UI 的动作转给这两个操作族。
  *
  * <p><b>为什么是端口</b>：embedchannel 此前直接注入 mcp 的 {@code McpOAuthController} 与
- * {@code AgentToolApprovalController}（**跨域直调他域 controller**，违反 §12.1 硬规则 1 ✗），
+ * {@code AgentToolApprovalController}（**跨域直调他域 controller**，违反 硬规则 1 ✗），
  * 还要把访客请求体解析成 mcp 的嵌套 DTO（{@code McpOAuthController.AuthorizeRequest} /
  * {@code ResolveToolApprovalRequest}）✗。本端口把这一族操作收回 mcp 实现
  * （{@code mcp/api/McpApprovalOpsAdapter}），调用方只传**原始 body 字符串**。</p>

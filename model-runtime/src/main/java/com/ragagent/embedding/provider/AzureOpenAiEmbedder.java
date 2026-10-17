@@ -13,7 +13,7 @@ import java.util.List;
  * Azure OpenAI embedding 客户端。
  *
  * <p>URL 公式：{@code {base}/openai/deployments/{model}/embeddings?api-version={v}}
- * （api_version 默认 2024-10-21，取 extra_config）；鉴权头是 {@code api-key}
+ * （api_version 默认，取 extra_config）；鉴权头是 {@code api-key}
  * （非 Bearer）。请求体无 truncate_prompt_tokens。</p>
  */
 public final class AzureOpenAiEmbedder extends BaseEmbedder {

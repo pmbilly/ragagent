@@ -18,39 +18,39 @@ import java.util.List;
  * 一个记忆空间：**一个工作区里的一个主体**。
  * scope 一律从请求上下文推导，绝不来自客户端传的 id。
  *
- * <h2>落库隐式行为清单（约定 §3）</h2>
+ * <h2>落库隐式行为清单（约定）</h2>
  * <ol>
- *   <li><b>自动时间戳</b>：{@code created_at}/{@code updated_at} 按字段名约定，
- *       INSERT 时**显式**写入当前时间，DB 的 {@code DEFAULT CURRENT_TIMESTAMP}
- *       实际上永远用不上。Java 侧在 {@code MemoryRepository.ensureSubject} 里显式赋值——
- *       <b>不</b>依赖 DDL 默认值。</li>
- *   <li><b>钩子</b>：无 BeforeCreate/AfterFind 之类的钩子（id 由仓储层显式生成）。</li>
- *   <li><b>关联预加载</b>：无（本表没有任何关联）。</li>
- *   <li><b>软删除</b>：无（本表没有 deleted_at 列，删除都是物理删）。</li>
- *   <li><b>默认排序</b>：无——读路径恒是"按 (tenant_id, subject_id) 取唯一一行"。</li>
- *   <li><b>唯一索引</b>：{@code idx_memory_subjects_scope (tenant_id, subject_id)}，
- *       模型与迁移**同时**声明——它是 {@code ensureSubject} 的 upsert
- *       （{@code ON CONFLICT ... DO NOTHING}）在任何库上都有约束可打的前提。
- *       Java 侧同样依赖这条约束。</li>
- *   <li><b>DEFAULT 列</b>：{@code enabled}（DDL {@code default:true}）、
- *       {@code item_count}（{@code default:0}）、{@code block_text}（迁移里的
- *       {@code DEFAULT ''}）。<b>带字面量 default tag 的字段落库时仍会显式写入</b>
- *       （列进 INSERT 列表），
- *       所以 Java 侧也一律显式赋值，不依赖 DDL 默认值。
- *       ⚠️ {@code extraction_state} / {@code pending_sessions} 是 jsonb，
- *       恒写入一段 JSON（**从不** NULL），故策略取 {@code ALWAYS}（§9 的 DEFAULT 列坑）。</li>
+ * <li><b>自动时间戳</b>：{@code created_at}/{@code updated_at} 按字段名约定，
+ * INSERT 时**显式**写入当前时间，DB 的 {@code DEFAULT CURRENT_TIMESTAMP}
+ * 实际上永远用不上。Java 侧在 {@code MemoryRepository.ensureSubject} 里显式赋值——
+ * <b>不</b>依赖 DDL 默认值。</li>
+ * <li><b>钩子</b>：无 BeforeCreate/AfterFind 之类的钩子（id 由仓储层显式生成）。</li>
+ * <li><b>关联预加载</b>：无（本表没有任何关联）。</li>
+ * <li><b>软删除</b>：无（本表没有 deleted_at 列，删除都是物理删）。</li>
+ * <li><b>默认排序</b>：无——读路径恒是"按 (tenant_id, subject_id) 取唯一一行"。</li>
+ * <li><b>唯一索引</b>：{@code idx_memory_subjects_scope (tenant_id, subject_id)}，
+ * 模型与迁移**同时**声明——它是 {@code ensureSubject} 的 upsert
+ * （{@code ON CONFLICT ... DO NOTHING}）在任何库上都有约束可打的前提。
+ * Java 侧同样依赖这条约束。</li>
+ * <li><b>DEFAULT 列</b>：{@code enabled}（DDL {@code default:true}）、
+ * {@code item_count}（{@code default:0}）、{@code block_text}（迁移里的
+ * {@code DEFAULT ''}）。<b>带字面量 default tag 的字段落库时仍会显式写入</b>
+ * （列进 INSERT 列表），
+ * 所以 Java 侧也一律显式赋值，不依赖 DDL 默认值。
+ * ⚠️ {@code extraction_state} / {@code pending_sessions} 是 jsonb，
+ * 恒写入一段 JSON（**从不** NULL），故策略取 {@code ALWAYS}（的 DEFAULT 列坑）。</li>
  * </ol>
  *
  * <h2>JSON 形态（键名＝Java 字段名，键序＝声明序）</h2>
  * <p>本类型**不是** HTTP 响应体（handler 只回 MemorySettings / MemoryItem / 各种 View），
  * 它的 JSON 面只出现在测试与 jsonb 列里。</p>
  * <ul>
- *   <li>{@code extractionState} 是 {@code @JsonIgnore} → 一个键都不出；</li>
- *   <li>{@code pendingSessions} 为 null 时输出 {@code null}
- *       （而**落库**时 null 写 {@code []}，两件事不冲突，见类型处理器）；</li>
- *   <li>三个可空时间戳字段输出 {@code null}；</li>
- *   <li>{@code createdAt}/{@code updatedAt} 是值类型，零值输出
- *       {@code "0001-01-01T00:00:00Z"}（见 {@code MemoryEntityJsonTest}）。</li>
+ * <li>{@code extractionState} 是 {@code @JsonIgnore} → 一个键都不出；</li>
+ * <li>{@code pendingSessions} 为 null 时输出 {@code null}
+ * （而**落库**时 null 写 {@code []}，两件事不冲突，见类型处理器）；</li>
+ * <li>三个可空时间戳字段输出 {@code null}；</li>
+ * <li>{@code createdAt}/{@code updatedAt} 是值类型，零值输出
+ * {@code "0001-01-01T00:00:00Z"}（见 {@code MemoryEntityJsonTest}）。</li>
  * </ul>
  */
 @TableName(value = "memory_subjects", autoResultMap = true)
@@ -194,15 +194,15 @@ public class MemorySubject {
     }
 
     /**
-     * 浅拷贝，供 {@code enqueuePendingSession} 取"更新前的快照"用。
-     *
-     * <p>Java 的对象是引用：不显式复制，之后对 {@code subject} 的字段赋值
-     * （清空 pending 队列、写 {@code extract_scheduled_at}）
-     * 就会把修改后的状态当成"更新前"返回给调用方。
-     * {@code pendingSessions} 也换成一个新的列表，理由同上。</p>
-     *
-     * <p>名字刻意不带 {@code get}/{@code is} 前缀（§7.5 第 2 条）。</p>
-     */
+ * 浅拷贝，供 {@code enqueuePendingSession} 取"更新前的快照"用。
+ *
+ * <p>Java 的对象是引用：不显式复制，之后对 {@code subject} 的字段赋值
+ * （清空 pending 队列、写 {@code extract_scheduled_at}）
+ * 就会把修改后的状态当成"更新前"返回给调用方。
+ * {@code pendingSessions} 也换成一个新的列表，理由同上。</p>
+ *
+ * <p>名字刻意不带 {@code get}/{@code is} 前缀（第 2 条）。</p>
+ */
     public MemorySubject copy() {
         MemorySubject out = new MemorySubject();
         out.id = id;

@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * 记忆管理器三类列表（条目 / 主题 / 文档亲和）共用的分页响应。
  *
- * <p>形态照 {@code docs/knowledge-api-contract-v1.md} §2.1 的约定：
+ * <p>形态照 {@code docs/knowledge-api-contract-v1.md} 的约定：
  * {@code {items, page, pageSize, total}}——旧信封
  * {@code {"data":[…],"success":true,"total":N}} 已退役。</p>
  *

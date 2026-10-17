@@ -351,11 +351,11 @@ public class KnowledgeController {
 
     /** 守卫链 + 搬移中拒绝（service 内）+ 异步删除语义。 */
     /**
-     * 删除文档：异步受理（索引清理在后台进行）→ 202 + {@code {taskId}}。
-     *
-     * <p>为何不是 204：删除尚未完成，前端需要 taskId 轮询进度；
-     * 同步完成的删除才用 204（见契约文档 §1.13）。</p>
-     */
+ * 删除文档：异步受理（索引清理在后台进行）→ 202 + {@code {taskId}}。
+ *
+ * <p>为何不是 204：删除尚未完成，前端需要 taskId 轮询进度；
+ * 同步完成的删除才用 204（见契约文档）。</p>
+ */
     @DeleteMapping("/knowledge/{id}")
     public ResponseEntity<TaskIdResponse> deleteKnowledge(@PathVariable("id") String id) {
         log.info("Start deleting knowledge, ID: {}", id);

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * {@link AgentEngineHandle} 的适配器（R5c）：把域侧的 4 个调用转发给 {@link AgentEngine}。
+ * {@link AgentEngineHandle} 的适配器：把域侧的 4 个调用转发给 {@link AgentEngine}。
  *
  * <p>为什么需要适配器而不是让 {@code AgentEngine} 直接实现端口：引擎的 {@code execute}
  * 返回 {@code AgentState}（引擎内部形状），而契约句柄声明为 void（域侧并不使用返回值）

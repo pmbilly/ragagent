@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * 引擎录制回放：Java 引擎用同一脚本驱动，事件序列 / AgentState 快照 /
- * stub 收到的消息与选项 / steer 注入路径与 {@link GoRecording46B} 的录制常量比对。
+ * stub 收到的消息与选项 / steer 注入路径与 {@link AgentExecutionGolden} 的录制常量比对。
  *
  * <p>比对方式为「{@link com.ragagent.agent.fixtures.ContractJson#deep}
  * 语义比较」：键序 / HTML 转义形态 / 时间写法不再构成断言目标；
@@ -40,7 +40,7 @@ class EngineRecordingTest {
     /**
      * 录制语义比较：两侧经 {@link ContractJson#deep} 归一后比较——
      * 键序 / HTML 转义形态 / 时间写法不再构成断言目标（与 ContractJson 的既定方针一致；
-     * GoRecording* 常量保留为历史基准，不再逐字节对齐）。
+     * golden 常量保留为历史基准，不再逐字节对齐）。
      */
     private static void assertRecording(String actual, String recording) {
         assertThat(ContractJson.deep(actual)).isEqualTo(ContractJson.deep(recording));
@@ -97,10 +97,10 @@ class EngineRecordingTest {
         AgentState state = engine.execute("sess-1", "msg-1", "what is weknora",
                 Engine46bStubSupport.emptyMessages());
 
-        assertRecording(sink.toJson(), GoRecording46B.R_EXECUTE_NATURAL_STOP_EVENTS);
-        assertRecording(stateJson(state), GoRecording46B.R_EXECUTE_NATURAL_STOP_STATE);
-        assertRecording(Engine46bStubSupport.chatShape(chat), GoRecording46B.R_EXECUTE_NATURAL_STOP_CHAT);
-        assertRecording(String.valueOf(tool.calls), GoRecording46B.R_EXECUTE_NATURAL_STOP_TOOL_CALLS);
+        assertRecording(sink.toJson(), AgentExecutionGolden.R_EXECUTE_NATURAL_STOP_EVENTS);
+        assertRecording(stateJson(state), AgentExecutionGolden.R_EXECUTE_NATURAL_STOP_STATE);
+        assertRecording(Engine46bStubSupport.chatShape(chat), AgentExecutionGolden.R_EXECUTE_NATURAL_STOP_CHAT);
+        assertRecording(String.valueOf(tool.calls), AgentExecutionGolden.R_EXECUTE_NATURAL_STOP_TOOL_CALLS);
     }
 
     // ------------------------------------------------------------------
@@ -119,9 +119,9 @@ class EngineRecordingTest {
 
         AgentState state = engine.execute("sess-1", "msg-1", "q", Engine46bStubSupport.emptyMessages());
 
-        assertRecording(sink.toJson(), GoRecording46B.R_EXECUTE_EMPTY_RETRY_EVENTS);
-        assertRecording(stateJson(state), GoRecording46B.R_EXECUTE_EMPTY_RETRY_STATE);
-        assertRecording(Engine46bStubSupport.chatShape(chat), GoRecording46B.R_EXECUTE_EMPTY_RETRY_CHAT);
+        assertRecording(sink.toJson(), AgentExecutionGolden.R_EXECUTE_EMPTY_RETRY_EVENTS);
+        assertRecording(stateJson(state), AgentExecutionGolden.R_EXECUTE_EMPTY_RETRY_STATE);
+        assertRecording(Engine46bStubSupport.chatShape(chat), AgentExecutionGolden.R_EXECUTE_EMPTY_RETRY_CHAT);
     }
 
     // ------------------------------------------------------------------
@@ -141,9 +141,9 @@ class EngineRecordingTest {
 
         AgentState state = engine.execute("sess-1", "msg-1", "q", Engine46bStubSupport.emptyMessages());
 
-        assertRecording(sink.toJson(), GoRecording46B.R_EXECUTE_STUCK_LOOP_EVENTS);
-        assertRecording(stateJson(state), GoRecording46B.R_EXECUTE_STUCK_LOOP_STATE);
-        assertRecording(String.valueOf(state.getCurrentRound()), GoRecording46B.R_EXECUTE_STUCK_LOOP_ROUNDS);
+        assertRecording(sink.toJson(), AgentExecutionGolden.R_EXECUTE_STUCK_LOOP_EVENTS);
+        assertRecording(stateJson(state), AgentExecutionGolden.R_EXECUTE_STUCK_LOOP_STATE);
+        assertRecording(String.valueOf(state.getCurrentRound()), AgentExecutionGolden.R_EXECUTE_STUCK_LOOP_ROUNDS);
     }
 
     // ------------------------------------------------------------------
@@ -190,10 +190,10 @@ class EngineRecordingTest {
 
         AgentState state = engine.execute("sess-1", "msg-1", "q", Engine46bStubSupport.emptyMessages());
 
-        assertRecording(sink.toJson(), GoRecording46B.R_EXECUTE_MAX_ITERATIONS_EVENTS);
-        assertRecording(stateJson(state), GoRecording46B.R_EXECUTE_MAX_ITERATIONS_STATE);
-        assertRecording(Engine46bStubSupport.chatShape(chat), GoRecording46B.R_EXECUTE_MAX_ITERATIONS_CHAT);
-        assertRecording(String.valueOf(tool.calls), GoRecording46B.R_EXECUTE_MAX_ITERATIONS_TOOL_EXEC_COUNT);
+        assertRecording(sink.toJson(), AgentExecutionGolden.R_EXECUTE_MAX_ITERATIONS_EVENTS);
+        assertRecording(stateJson(state), AgentExecutionGolden.R_EXECUTE_MAX_ITERATIONS_STATE);
+        assertRecording(Engine46bStubSupport.chatShape(chat), AgentExecutionGolden.R_EXECUTE_MAX_ITERATIONS_CHAT);
+        assertRecording(String.valueOf(tool.calls), AgentExecutionGolden.R_EXECUTE_MAX_ITERATIONS_TOOL_EXEC_COUNT);
     }
 
     private static StreamResponse withUsage(StreamResponse r, TokenUsage usage) {
@@ -218,8 +218,8 @@ class EngineRecordingTest {
 
         AgentState state = engine.execute("sess-1", "msg-1", "q", Engine46bStubSupport.emptyMessages());
 
-        assertRecording(sink.toJson(), GoRecording46B.R_EXECUTE_EMPTY_EXHAUSTED_EVENTS);
-        assertRecording(stateJson(state), GoRecording46B.R_EXECUTE_EMPTY_EXHAUSTED_STATE);
+        assertRecording(sink.toJson(), AgentExecutionGolden.R_EXECUTE_EMPTY_EXHAUSTED_EVENTS);
+        assertRecording(stateJson(state), AgentExecutionGolden.R_EXECUTE_EMPTY_EXHAUSTED_STATE);
     }
 
     // ------------------------------------------------------------------
@@ -236,8 +236,8 @@ class EngineRecordingTest {
 
         AgentState state = engine.execute("sess-1", "msg-1", "q", Engine46bStubSupport.emptyMessages());
 
-        assertRecording(sink.toJson(), GoRecording46B.R_EXECUTE_CONTENT_FILTER_EVENTS);
-        assertRecording(stateJson(state), GoRecording46B.R_EXECUTE_CONTENT_FILTER_STATE);
+        assertRecording(sink.toJson(), AgentExecutionGolden.R_EXECUTE_CONTENT_FILTER_EVENTS);
+        assertRecording(stateJson(state), AgentExecutionGolden.R_EXECUTE_CONTENT_FILTER_STATE);
     }
 
     // ------------------------------------------------------------------
@@ -293,7 +293,7 @@ class EngineRecordingTest {
 
     private static String constant(String name) {
         try {
-            return (String) GoRecording46B.class.getField(name).get(null);
+            return (String) AgentExecutionGolden.class.getField(name).get(null);
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }
@@ -325,8 +325,8 @@ class EngineRecordingTest {
 
         AgentState state = engine.execute("sess-1", "msg-1", "q", Engine46bStubSupport.emptyMessages());
 
-        assertRecording(sink.toJson(), GoRecording46B.R_EXECUTE_PARALLEL_TOOLS_EVENTS);
-        assertRecording(stateJson(state), GoRecording46B.R_EXECUTE_PARALLEL_TOOLS_STATE);
+        assertRecording(sink.toJson(), AgentExecutionGolden.R_EXECUTE_PARALLEL_TOOLS_EVENTS);
+        assertRecording(stateJson(state), AgentExecutionGolden.R_EXECUTE_PARALLEL_TOOLS_STATE);
     }
 
     // ------------------------------------------------------------------
@@ -349,8 +349,8 @@ class EngineRecordingTest {
 
         AgentState state = engine.execute("sess-1", "msg-1", "q", Engine46bStubSupport.emptyMessages());
 
-        assertRecording(sink.toJson(), GoRecording46B.R_EXECUTE_LENGTH_FINISH_EVENTS);
-        assertRecording(stateJson(state), GoRecording46B.R_EXECUTE_LENGTH_FINISH_STATE);
+        assertRecording(sink.toJson(), AgentExecutionGolden.R_EXECUTE_LENGTH_FINISH_EVENTS);
+        assertRecording(stateJson(state), AgentExecutionGolden.R_EXECUTE_LENGTH_FINISH_STATE);
     }
 
     // ------------------------------------------------------------------
@@ -377,15 +377,15 @@ class EngineRecordingTest {
         AgentEngine.MsgRef messagesRef = new AgentEngine.MsgRef(messages);
 
         int injected = engine.drainSteerMessages(state, messagesRef, "sess", "msg");
-        assertRecording(String.valueOf(injected), GoRecording46B.R_STEER_DRAIN_INJECTED);
-        assertRecording(messagesJson(messagesRef.items), GoRecording46B.R_STEER_DRAIN_MESSAGES);
-        assertRecording(mask(EventJson.write(state.getPendingSteerMessages())), GoRecording46B.R_STEER_DRAIN_PENDING);
-        assertRecording(mask(EventJson.write(fake.persisted)), GoRecording46B.R_STEER_DRAIN_PERSISTED);
-        assertRecording(sink.toJson(), GoRecording46B.R_STEER_DRAIN_EVENTS);
+        assertRecording(String.valueOf(injected), AgentExecutionGolden.R_STEER_DRAIN_INJECTED);
+        assertRecording(messagesJson(messagesRef.items), AgentExecutionGolden.R_STEER_DRAIN_MESSAGES);
+        assertRecording(mask(EventJson.write(state.getPendingSteerMessages())), AgentExecutionGolden.R_STEER_DRAIN_PENDING);
+        assertRecording(mask(EventJson.write(fake.persisted)), AgentExecutionGolden.R_STEER_DRAIN_PERSISTED);
+        assertRecording(sink.toJson(), AgentExecutionGolden.R_STEER_DRAIN_EVENTS);
 
         // 第二次 drain：队列消费完（consumed），无新增。
         int injected2 = engine.drainSteerMessages(state, messagesRef, "sess", "msg");
-        assertRecording(String.valueOf(injected2), GoRecording46B.R_STEER_DRAIN_INJECTED_SECOND);
+        assertRecording(String.valueOf(injected2), AgentExecutionGolden.R_STEER_DRAIN_INJECTED_SECOND);
 
         // 持久化失败：事件留在队列，不进消息。
         Engine46bStubSupport.FakeSteerSink failFake = new Engine46bStubSupport.FakeSteerSink(
@@ -393,8 +393,8 @@ class EngineRecordingTest {
         failFake.failPersist = true;
         engine.setSteerSink(failFake);
         int injected3 = engine.drainSteerMessages(state, messagesRef, "sess", "msg");
-        assertRecording(String.valueOf(injected3), GoRecording46B.R_STEER_DRAIN_INJECTED_FAILPERSIST);
-        assertRecording(mask(EventJson.write(state.getPendingSteerMessages())), GoRecording46B.R_STEER_DRAIN_PENDING_AFTER_FAIL);
+        assertRecording(String.valueOf(injected3), AgentExecutionGolden.R_STEER_DRAIN_INJECTED_FAILPERSIST);
+        assertRecording(mask(EventJson.write(state.getPendingSteerMessages())), AgentExecutionGolden.R_STEER_DRAIN_PENDING_AFTER_FAIL);
     }
 
     @Test
@@ -411,9 +411,9 @@ class EngineRecordingTest {
 
         AgentState state = engine.execute("sess-1", "msg-1", "q", Engine46bStubSupport.emptyMessages());
 
-        assertRecording(sink.toJson(), GoRecording46B.R_STEER_LOOP_END_INJECT_EVENTS);
-        assertRecording(stateJson(state), GoRecording46B.R_STEER_LOOP_END_INJECT_STATE);
-        assertRecording(Engine46bStubSupport.chatShape(chat), GoRecording46B.R_STEER_LOOP_END_INJECT_CHAT);
+        assertRecording(sink.toJson(), AgentExecutionGolden.R_STEER_LOOP_END_INJECT_EVENTS);
+        assertRecording(stateJson(state), AgentExecutionGolden.R_STEER_LOOP_END_INJECT_STATE);
+        assertRecording(Engine46bStubSupport.chatShape(chat), AgentExecutionGolden.R_STEER_LOOP_END_INJECT_CHAT);
     }
 
     // ------------------------------------------------------------------
@@ -437,12 +437,12 @@ class EngineRecordingTest {
                 List.of(new PinnedSkillInfo("writer", "writes")));
 
         String withAll = mask(EventJson.write(engine.renderUserTurnContent("sess-1", "什么是 WeKnora？")));
-        assertRecording(withAll, GoRecording46B.R_RENDER_USER_TURN_WITH_ALL);
+        assertRecording(withAll, AgentExecutionGolden.R_RENDER_USER_TURN_WITH_ALL);
 
         AgentEngine empty = Engine46bStubSupport.newEngine(
                 new Engine46bStubSupport.StubChat(List.of()));
         String emptyTurn = mask(EventJson.write(empty.renderUserTurnContent("s", "q")));
-        assertRecording(emptyTurn, GoRecording46B.R_RENDER_USER_TURN_EMPTY);
+        assertRecording(emptyTurn, AgentExecutionGolden.R_RENDER_USER_TURN_EMPTY);
     }
 
     // ------------------------------------------------------------------
@@ -462,9 +462,9 @@ class EngineRecordingTest {
                 toolMsg("c2", big));
         int full = est.estimateMessages(messages);
         ContextBudget.TrimOutcome trimmed = ContextBudget.trimToolResultsToBudget(messages, est, full / 3);
-        assertRecording(String.valueOf(trimmed.ok()), GoRecording46B.R_TRIM_TOOL_RESULTS_OK);
-        assertRecording(String.valueOf(full), GoRecording46B.R_TRIM_TOOL_RESULTS_FULL_TOKENS);
-        assertRecording(messagesJson(trimmed.messages()), GoRecording46B.R_TRIM_TOOL_RESULTS_TRIMMED);
+        assertRecording(String.valueOf(trimmed.ok()), AgentExecutionGolden.R_TRIM_TOOL_RESULTS_OK);
+        assertRecording(String.valueOf(full), AgentExecutionGolden.R_TRIM_TOOL_RESULTS_FULL_TOKENS);
+        assertRecording(messagesJson(trimmed.messages()), AgentExecutionGolden.R_TRIM_TOOL_RESULTS_TRIMMED);
     }
 
     private static ChatMessage assistantWithCall(String id) {
@@ -518,18 +518,18 @@ class EngineRecordingTest {
         engine.setUsageBaselineForTest(baseline, 3);
         AgentEngine.WindowOutcome outcome = engine.manageContextWindow(messages, 1, before);
 
-        assertRecording(String.valueOf(outcome.changed()), GoRecording46B.R_MANAGE_CONTEXT_WINDOW_CHANGED);
-        assertRecording(String.valueOf(before), GoRecording46B.R_MANAGE_CONTEXT_WINDOW_BEFORE_TOKENS);
-        assertRecording(String.valueOf(engine.tokenEstimatorForTest().estimateMessages(outcome.messages())), GoRecording46B.R_MANAGE_CONTEXT_WINDOW_AFTER_TOKENS);
-        assertRecording(messagesJson(outcome.messages()), GoRecording46B.R_MANAGE_CONTEXT_WINDOW_AFTER_MESSAGES);
-        assertRecording(sink.toJson(), GoRecording46B.R_MANAGE_CONTEXT_WINDOW_EVENTS);
-        assertRecording(settingsJson(engine.compactorSettingsForTest()), GoRecording46B.R_MANAGE_CONTEXT_WINDOW_SETTINGS);
+        assertRecording(String.valueOf(outcome.changed()), AgentExecutionGolden.R_MANAGE_CONTEXT_WINDOW_CHANGED);
+        assertRecording(String.valueOf(before), AgentExecutionGolden.R_MANAGE_CONTEXT_WINDOW_BEFORE_TOKENS);
+        assertRecording(String.valueOf(engine.tokenEstimatorForTest().estimateMessages(outcome.messages())), AgentExecutionGolden.R_MANAGE_CONTEXT_WINDOW_AFTER_TOKENS);
+        assertRecording(messagesJson(outcome.messages()), AgentExecutionGolden.R_MANAGE_CONTEXT_WINDOW_AFTER_MESSAGES);
+        assertRecording(sink.toJson(), AgentExecutionGolden.R_MANAGE_CONTEXT_WINDOW_EVENTS);
+        assertRecording(settingsJson(engine.compactorSettingsForTest()), AgentExecutionGolden.R_MANAGE_CONTEXT_WINDOW_SETTINGS);
 
         // 二次压缩：已耗尽标记生效，不再调摘要
         AgentEngine.WindowOutcome second = engine.manageContextWindow(outcome.messages(), 2,
                 engine.tokenEstimatorForTest().estimateMessages(outcome.messages()));
-        assertRecording(String.valueOf(second.changed()), GoRecording46B.R_MANAGE_CONTEXT_WINDOW_CHANGED_SECOND);
-        assertRecording(String.valueOf(chat.nonStreamCalls), GoRecording46B.R_MANAGE_CONTEXT_WINDOW_SUMMARIZER_CALLS);
+        assertRecording(String.valueOf(second.changed()), AgentExecutionGolden.R_MANAGE_CONTEXT_WINDOW_CHANGED_SECOND);
+        assertRecording(String.valueOf(chat.nonStreamCalls), AgentExecutionGolden.R_MANAGE_CONTEXT_WINDOW_SUMMARIZER_CALLS);
     }
 
     private static ChatResponse summaryResponse() {
@@ -574,10 +574,10 @@ class EngineRecordingTest {
         engine.setUsageBaselineForTest(usage, sent.size());
 
         int got = engine.estimateCurrentTokens(messages);
-        assertRecording(String.valueOf(got), GoRecording46B.R_ESTIMATE_CURRENT_TOKENS_BASELINE);
+        assertRecording(String.valueOf(got), AgentExecutionGolden.R_ESTIMATE_CURRENT_TOKENS_BASELINE);
 
         engine.setUsageBaselineForTest(new TokenUsage(), 0);
-        assertRecording(String.valueOf(engine.estimateCurrentTokens(messages)), GoRecording46B.R_ESTIMATE_CURRENT_TOKENS_NO_BASELINE);
+        assertRecording(String.valueOf(engine.estimateCurrentTokens(messages)), AgentExecutionGolden.R_ESTIMATE_CURRENT_TOKENS_NO_BASELINE);
     }
 
     // ------------------------------------------------------------------
@@ -597,8 +597,8 @@ class EngineRecordingTest {
             }
             sb.append(EventJson.write(tools.get(i)));
         }
-        assertRecording(mask(sb.append(']').toString()), GoRecording46B.R_BUILD_TOOLS_TOOLS);
-        assertRecording(mask(EventJson.write(AgentEngine.listToolNames(tools))), GoRecording46B.R_BUILD_TOOLS_NAMES);
+        assertRecording(mask(sb.append(']').toString()), AgentExecutionGolden.R_BUILD_TOOLS_TOOLS);
+        assertRecording(mask(EventJson.write(AgentEngine.listToolNames(tools))), AgentExecutionGolden.R_BUILD_TOOLS_NAMES);
     }
 
     // ------------------------------------------------------------------
@@ -621,8 +621,8 @@ class EngineRecordingTest {
         ChatResponse resp = engine.streamThinkingToEventBus(Engine46bStubSupport.emptyMessages(),
                 List.of(), 0, "sess-1");
 
-        assertRecording(sink.toJson(), GoRecording46B.R_STREAM_THINKING_ROUTING_EVENTS);
-        assertRecording(mask(EventJson.write(resp)), GoRecording46B.R_STREAM_THINKING_ROUTING_RESP);
+        assertRecording(sink.toJson(), AgentExecutionGolden.R_STREAM_THINKING_ROUTING_EVENTS);
+        assertRecording(mask(EventJson.write(resp)), AgentExecutionGolden.R_STREAM_THINKING_ROUTING_RESP);
     }
 
     // ------------------------------------------------------------------
@@ -645,9 +645,9 @@ class EngineRecordingTest {
             errorText = e.getMessage();
             state = e.getState();
         }
-        assertRecording(Engine46bStubSupport.jsonStr(errorText), GoRecording46B.R_EXECUTE_STREAM_ERROR_ERROR);
-        assertRecording(stateJson(state), GoRecording46B.R_EXECUTE_STREAM_ERROR_STATE);
-        assertRecording(sink.toJson(), GoRecording46B.R_EXECUTE_STREAM_ERROR_EVENTS);
+        assertRecording(Engine46bStubSupport.jsonStr(errorText), AgentExecutionGolden.R_EXECUTE_STREAM_ERROR_ERROR);
+        assertRecording(stateJson(state), AgentExecutionGolden.R_EXECUTE_STREAM_ERROR_STATE);
+        assertRecording(sink.toJson(), AgentExecutionGolden.R_EXECUTE_STREAM_ERROR_EVENTS);
     }
 
     @Test
@@ -674,11 +674,11 @@ class EngineRecordingTest {
             errorText = e.getMessage();
             state = e.getState();
         }
-        assertRecording(Engine46bStubSupport.jsonStr(errorText), GoRecording46B.R_EXECUTE_GRACEFUL_DEGRADATION_ERROR);
-        assertRecording(stateJson(state), GoRecording46B.R_EXECUTE_GRACEFUL_DEGRADATION_STATE);
-        assertRecording(sink.toJson(), GoRecording46B.R_EXECUTE_GRACEFUL_DEGRADATION_EVENTS);
-        assertRecording(Engine46bStubSupport.chatShape(chat), GoRecording46B.R_EXECUTE_GRACEFUL_DEGRADATION_CHAT);
-        assertRecording(String.valueOf(tool.calls), GoRecording46B.R_EXECUTE_GRACEFUL_DEGRADATION_TOOL_EXEC_COUNT);
+        assertRecording(Engine46bStubSupport.jsonStr(errorText), AgentExecutionGolden.R_EXECUTE_GRACEFUL_DEGRADATION_ERROR);
+        assertRecording(stateJson(state), AgentExecutionGolden.R_EXECUTE_GRACEFUL_DEGRADATION_STATE);
+        assertRecording(sink.toJson(), AgentExecutionGolden.R_EXECUTE_GRACEFUL_DEGRADATION_EVENTS);
+        assertRecording(Engine46bStubSupport.chatShape(chat), AgentExecutionGolden.R_EXECUTE_GRACEFUL_DEGRADATION_CHAT);
+        assertRecording(String.valueOf(tool.calls), AgentExecutionGolden.R_EXECUTE_GRACEFUL_DEGRADATION_TOOL_EXEC_COUNT);
     }
 
     // ------------------------------------------------------------------
@@ -692,11 +692,11 @@ class EngineRecordingTest {
                 AgentEngine.isNaturalStopFinishReason(" End_Turn "),
                 AgentEngine.isNaturalStopFinishReason("stop_sequence"),
                 AgentEngine.isNaturalStopFinishReason("toolCalls"),
-                AgentEngine.isNaturalStopFinishReason("")))), GoRecording46B.R_FINISH_REASON_CLASSES_NATURAL);
+                AgentEngine.isNaturalStopFinishReason("")))), AgentExecutionGolden.R_FINISH_REASON_CLASSES_NATURAL);
         assertRecording(mask(EventJson.write(List.of(
                 AgentEngine.isLengthFinishReason("length"),
                 AgentEngine.isLengthFinishReason("MAX_TOKENS"),
                 AgentEngine.isLengthFinishReason("max_output_tokens"),
-                AgentEngine.isLengthFinishReason("stop")))), GoRecording46B.R_FINISH_REASON_CLASSES_LENGTH);
+                AgentEngine.isLengthFinishReason("stop")))), AgentExecutionGolden.R_FINISH_REASON_CLASSES_LENGTH);
     }
 }

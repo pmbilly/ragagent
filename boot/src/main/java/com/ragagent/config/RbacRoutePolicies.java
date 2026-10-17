@@ -58,7 +58,7 @@ final class RbacRoutePolicies {
         rbac.addRule("POST", "/api/v1/knowledge-bases/*/hybrid-search", TenantRole.VIEWER, false);
         rbac.addRule("GET", "/api/v1/knowledge-bases/*/hybrid-search", TenantRole.VIEWER, false);
         rbac.addRule("POST", "/api/v1/knowledge-bases/*/duplicate", TenantRole.CONTRIBUTOR, false);
-        // 重建索引（2026-09-28 评审补端点）：索引策略变更后的全量重处理，与
+        // 重建索引（评审补端点）：索引策略变更后的全量重处理，与
         // duplicate 同档（KB 级重写面，Contributor+）
         rbac.addRule("POST", "/api/v1/knowledge-bases/*/rebuild-index", TenantRole.CONTRIBUTOR, false);
         // KB 图片代理：Viewer 下限（KB 访问判定在 KnowledgeBaseFileProxyController 内）

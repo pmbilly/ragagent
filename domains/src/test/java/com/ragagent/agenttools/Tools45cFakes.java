@@ -20,8 +20,8 @@ public final class Tools45cFakes {
         String name = "R_" + group.toUpperCase().replace('-', '_')
                 + "_" + id.toUpperCase().replace('-', '_');
         try {
-            String json = (String) GoRecording45C.class.getField(name).get(null);
-            return GoRecording45C.rec(json);
+            String json = (String) ToolContractGoldenC.class.getField(name).get(null);
+            return ToolContractGoldenC.rec(json);
         } catch (ReflectiveOperationException e) {
             throw new IllegalArgumentException("unknown recording constant: " + name, e);
         }

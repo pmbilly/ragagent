@@ -84,7 +84,7 @@ public final class ProviderAdapters {
 
     // ------------------------------------------------------------------
     // LKEAP：thinking 走 {"thinking":{"type":...}}，仅 DeepSeek V3.x
-    // R1 系列默认开启思维链、保持不动（落回 BaseProvider）。
+    // 系列默认开启思维链、保持不动（落回 BaseProvider）。
     // ------------------------------------------------------------------
 
     public static final class Lkeap implements ProviderAdapter {

@@ -5,7 +5,7 @@ package com.ragagent.contract.session;
  * 被 @ 提及的知识库 / 文件 / 标签 / MCP 工具 / skill。
  *
  * <p><b>八个键全部恒输出</b>：未使用的字段
- * 也要输出成空串，不能省略（§1.6 禁止条件键）。键名＝Java 字段名
+ * 也要输出成空串，不能省略（禁止条件键）。键名＝Java 字段名
  * （{@code kbType}/{@code kbId}/{@code kbName}/{@code serviceId}/{@code skillName}）。</p>
  *
  * <p>⚠️ 它**落两处 jsonb**（{@code messages.mentionedItems} 与

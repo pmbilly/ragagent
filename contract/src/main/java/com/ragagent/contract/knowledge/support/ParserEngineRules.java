@@ -27,12 +27,12 @@ public final class ParserEngineRules {
     }
 
     /**
-     * 规则数组形态（agent config 的 chat_parser_engine_rules）。
-     *
-     * <p><b>G1-k</b>：入参由 {@code JsonNode} 改为**纯 JDK 值**（对象→Map、数组→List），
-     * 读面走契约侧 {@link JsonValues}（语义与 {@code JsonNode} 逐条对齐，见其类注释）；
-     * 调用方传 JsonNode 时先经 {@code JsonMappers#toJavaValue} 归一。</p>
-     */
+ * 规则数组形态（agent config 的 chat_parser_engine_rules）。
+ *
+ * <p><b></b>：入参由 {@code JsonNode} 改为**纯 JDK 值**（对象→Map、数组→List），
+ * 读面走契约侧 {@link JsonValues}（语义与 {@code JsonNode} 逐条对齐，见其类注释）；
+ * 调用方传 JsonNode 时先经 {@code JsonMappers#toJavaValue} 归一。</p>
+ */
     public static String resolve(Object rules, String fileType) {
         if (JsonValues.isArray(rules)) {
             String normalized = normalize(fileType);

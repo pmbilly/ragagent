@@ -83,7 +83,7 @@ public class SystemAdminController {
         this.auditWriter = auditWriter;
     }
 
-    // ── P0：系统管理员升降级 ──────────────────────────────────────────────
+    // ──：系统管理员升降级 ──────────────────────────────────────────────
 
     /** promote 请求（userId 与 email 二选一，userId 优先）。 */
     public record PromoteRequest(String userId, String email) {
@@ -334,7 +334,7 @@ public class SystemAdminController {
         return new BizException(AppError.validation(message));
     }
 
-    // ── P1：系统设置 ──────────────────────────────────────────────────────
+    // ──：系统设置 ──────────────────────────────────────────────────────
 
     @GetMapping("/settings")
     public ResponseEntity<List<Object>> listSettings() {

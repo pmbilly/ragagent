@@ -8,7 +8,7 @@ package com.ragagent.memory.domain;
  * 这个区分是有意的：一次什么都没合并的回顾是常态，"什么都没发生"本身
  * 既不能告诉提问的人它有没有干活，也不能告诉他值不值得再点一次。</p>
  *
- * <p>六个字段全部恒输出（契约 §1.6「禁止条件键」）：{@code skipped} 未跳过时是
+ * <p>六个字段全部恒输出（契约 「禁止条件键」）：{@code skipped} 未跳过时是
  * {@code null}，空串就是空串——没有条件省略键。</p>
  */
 public class MemoryConsolidationResult {

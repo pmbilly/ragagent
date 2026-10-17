@@ -339,9 +339,9 @@ public class KnowledgeTagService {
     }
 
     /**
-     * 绑定外部 store 的 KB：向量行在外部店，走引擎口删除（2026-09-28 评审补接线）；
-     * 引擎与维度在请求线程上解析（TenantContext 只在这里有效），解析失败只 WARN
-     */
+ * 绑定外部 store 的 KB：向量行在外部店，走引擎口删除（评审补接线）；
+ * 引擎与维度在请求线程上解析（TenantContext 只在这里有效），解析失败只 WARN
+ */
     private void scheduleIndexDelete(KnowledgeBase kb, List<String> chunkIds) {
         List<String> ids = List.copyOf(chunkIds);
         IndexEngine boundEngine = null;

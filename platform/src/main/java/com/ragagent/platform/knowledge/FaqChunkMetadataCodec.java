@@ -10,7 +10,7 @@ import com.ragagent.platform.web.JsonMappers;
 /**
  * FaqChunkMetadata 的 JSON 侧（原挂在该类上的 JSON 常量与 fromJson/toJsonNode 两方法）。
  *
- * <p>形状类已入零依赖 contract（G1-j），而 JSON 读写要 Jackson ⇒ 属"映射面"，
+ * <p>形状类已入零依赖 contract，而 JSON 读写要 Jackson ⇒ 属"映射面"，
  * 按本仓定式（形状面入契约、映射面留 L1/域）留在 L1；调用方（knowledge / agenttools /
  * chatpipeline）均可达 L1。</p>
  */

@@ -3,8 +3,8 @@ package com.ragagent.agent.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.fixtures.GoRecording45A;
 import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.ToolContractGoldenA;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ class ParamValidatorRecordingTest {
     };
 
     @Test
-    void decisionTableMatchesGoRecording() {
+    void decisionTableMatchesAgentPromptGolden() {
         for (String name : CASES) {
             JsonNode r = RecordingSupport.rec(field(name));
             JsonNode argsNode = r.get("args").asText().isEmpty()
@@ -62,7 +62,7 @@ class ParamValidatorRecordingTest {
     }
 
     @Test
-    void formatValidationErrorsMatchesGoRecording() {
+    void formatValidationErrorsMatchesAgentPromptGolden() {
         JsonNode nil = RecordingSupport.rec(field("R_FMTVAL_NIL"));
         assertThat(ParamValidator.formatValidationErrors(List.of())).isEqualTo(nil.get("out").asText());
 
@@ -97,7 +97,7 @@ class ParamValidatorRecordingTest {
 
     private static String field(String name) {
         try {
-            return (String) GoRecording45A.class.getField(name).get(null);
+            return (String) ToolContractGoldenA.class.getField(name).get(null);
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }

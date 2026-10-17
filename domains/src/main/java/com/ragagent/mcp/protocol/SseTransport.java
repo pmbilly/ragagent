@@ -21,21 +21,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
- * 传统 HTTP+SSE 传输（MCP 2024-11-05 的 HTTP with SSE；对照 mcp-go
+ * 传统 HTTP+SSE 传输（MCP 的 HTTP with SSE；对照 mcp-go
  * {@code client/transport.SSE}）。
  *
  * <p>线上行为逐条对照 mcp-go：</p>
  * <ul>
- *   <li><b>建流</b>：GET 服务 URL，{@code Accept: text/event-stream} +
- *       {@code Cache-Control: no-cache}
- *       （{@code Connection: keep-alive} 是受限头无法设置，见 {@link #start} 的说明），
- *       自定义/鉴权头一并带上；</li>
- *   <li><b>endpoint 帧</b>：服务端首帧给出 POST 地址（可相对），相对基准是<b>建流的 URL</b>；
- *       且要求 host 与建流 URL 一致，否则丢弃（防被重定向到第三方）；</li>
- *   <li><b>endpoint 等待上限</b> 30s（mcp-go WithEndpointTimeout 默认值）；</li>
- *   <li><b>发请求</b>：POST 到 endpoint，{@code Content-Type: application/json}，
- *       响应体丢弃；真正的 JSON-RPC 响应从 SSE 流里按 id 匹配回来；</li>
- *   <li><b>断流</b>：读取线程结束/报错且未主动 close 时，回调 OnConnectionLost。</li>
+ * <li><b>建流</b>：GET 服务 URL，{@code Accept: text/event-stream} +
+ * {@code Cache-Control: no-cache}
+ * （{@code Connection: keep-alive} 是受限头无法设置，见 {@link #start} 的说明），
+ * 自定义/鉴权头一并带上；</li>
+ * <li><b>endpoint 帧</b>：服务端首帧给出 POST 地址（可相对），相对基准是<b>建流的 URL</b>；
+ * 且要求 host 与建流 URL 一致，否则丢弃（防被重定向到第三方）；</li>
+ * <li><b>endpoint 等待上限</b> 30s（mcp-go WithEndpointTimeout 默认值）；</li>
+ * <li><b>发请求</b>：POST 到 endpoint，{@code Content-Type: application/json}，
+ * 响应体丢弃；真正的 JSON-RPC 响应从 SSE 流里按 id 匹配回来；</li>
+ * <li><b>断流</b>：读取线程结束/报错且未主动 close 时，回调 OnConnectionLost。</li>
  * </ul>
  *
  * <p><b>刻意差异</b>：建流只施加连接超时，不施加整体超时——若给建流 GET 套上 30s

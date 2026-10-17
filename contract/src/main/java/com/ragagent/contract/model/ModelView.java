@@ -6,7 +6,7 @@ import java.time.OffsetDateTime;
  * 模型行**线格式视图**（契约面载荷）：管理/初始化面（`InitResponses` 等）与
  * {@link ModelCatalogPort} 的读写面都以此为口径。
  *
- * <p><b>为什么是它</b>：实体 {@code Model} 属 model 域内部（HANDOFF §12.0 判据 1）；
+ * <p><b>为什么是它</b>：实体 {@code Model} 属 model 域内部（HANDOFF 判据 1）；
  * 本视图**访问器名与实体逐一相同**（含 `isIsDefault()`/`isIsBuiltin()`）⇒ 消费方零改动、
  * 且 **JSON 逐字节等价**（由 `init-post-initialize.json` / `model-*.json` 金片钉住）。
  * 字段集＝实体参与 JSON 的全部字段（实体无 {@code @JsonIgnore}）。</p>

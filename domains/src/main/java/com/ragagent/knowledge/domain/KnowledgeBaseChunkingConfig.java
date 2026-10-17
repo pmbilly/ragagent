@@ -62,17 +62,17 @@ public class KnowledgeBaseChunkingConfig {
 
 
     /**
-     * **主摄取未消费**的键（顺序固定；空 = 全部生效）。
-     *
-     * <p>K8 能力矩阵：声明了的配置"要么生效、要么被显式告知"。已生效：{@code chunkSize} /
-     * {@code chunkOverlap} / {@code separators} / {@code strategy} / {@code tokenLimit} /
-     * {@code languages}（{@code KnowledgeProcessWorker.toSplitterConfig} → {@code Chunker}）。
-     * 未生效：{@code parserEngineRules}（worker 固定传 {@code parserEngine=null}）、
-     * 父子块（worker 只出 {@code text} 块；预览侧 {@code Chunker.splitParentChildWithDiagnostics}
-     * 已支持）、{@code tableMetadataInstructions}（全仓无消费点）。</p>
-     *
-     * <p><b>接进 worker 时请同步删掉对应项</b>——否则标注会撒谎。</p>
-     */
+ * **主摄取未消费**的键（顺序固定；空 = 全部生效）。
+ *
+ * <p> 能力矩阵：声明了的配置"要么生效、要么被显式告知"。已生效：{@code chunkSize} /
+ * {@code chunkOverlap} / {@code separators} / {@code strategy} / {@code tokenLimit} /
+ * {@code languages}（{@code KnowledgeProcessWorker.toSplitterConfig} → {@code Chunker}）。
+ * 未生效：{@code parserEngineRules}（worker 固定传 {@code parserEngine=null}）、
+ * 父子块（worker 只出 {@code text} 块；预览侧 {@code Chunker.splitParentChildWithDiagnostics}
+ * 已支持）、{@code tableMetadataInstructions}（全仓无消费点）。</p>
+ *
+ * <p><b>接进 worker 时请同步删掉对应项</b>——否则标注会撒谎。</p>
+ */
     public List<String> ingestionInactiveKeys() {
         return ChunkingConfigView.inactiveKeys(enableParentChild, parentChunkSize, childChunkSize,
                 parserEngineRules != null && !parserEngineRules.isEmpty(), tableMetadataInstructions);

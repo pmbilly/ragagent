@@ -56,11 +56,11 @@ final class HybridFusionOps {
     };
 
     /**
-     * 同分定序：分数相同再按 chunkId 升序。
-     *
-     * <p>RRF 分数大量并列（不同 store 的同一名次同权），若只按分排序，并列项的顺序就由
-     * 插入顺序决定 ⇒ 交换 store / KB 顺序结果会漂移（K9 验收：交换顺序结果稳定）。</p>
-     */
+ * 同分定序：分数相同再按 chunkId 升序。
+ *
+ * <p>RRF 分数大量并列（不同 store 的同一名次同权），若只按分排序，并列项的顺序就由
+ * 插入顺序决定 ⇒ 交换 store / KB 顺序结果会漂移（验收：交换顺序结果稳定）。</p>
+ */
     static final Comparator<EngineTypes.IndexWithScore> SCORE_THEN_ID =
             SCORE_DESC.thenComparing(h -> h.chunkId);
 
@@ -83,12 +83,12 @@ final class HybridFusionOps {
     }
 
     /**
-     * RRF 融合：vW/(k+vRank) + kW/(k+kRank)，rank 1-indexed，**每个 store 列表各自算名次**。
-     *
-     * <p>K9：rank 是"店内名次"——各 store 各自保序。此前调用方把同类型的多个 store 命中先
-     * {@code addAll} 成一个大列表，rank 退化成"拼接位置"，第二个 store 的本地第一名会被
-     * 系统性降级，且结果随 store 顺序漂移。</p>
-     */
+ * RRF 融合：vW/(k+vRank) + kW/(k+kRank)，rank 1-indexed，**每个 store 列表各自算名次**。
+ *
+ * <p>：rank 是"店内名次"——各 store 各自保序。此前调用方把同类型的多个 store 命中先
+ * {@code addAll} 成一个大列表，rank 退化成"拼接位置"，第二个 store 的本地第一名会被
+ * 系统性降级，且结果随 store 顺序漂移。</p>
+ */
     static List<EngineTypes.IndexWithScore> fuseWithRRF(
             List<List<EngineTypes.IndexWithScore>> vectorStores,
             List<List<EngineTypes.IndexWithScore>> keywordStores,

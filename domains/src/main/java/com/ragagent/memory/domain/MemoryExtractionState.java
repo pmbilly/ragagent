@@ -10,10 +10,10 @@ import java.time.OffsetDateTime;
  *
  * <h2>JSON 形态（键名＝Java 字段名，两个键都恒输出）</h2>
  * <pre>
- *   MemoryExtractionState{}                          → {"leaseId":"","leaseUntil":"0001-01-01T00:00:00Z"}
- *   MemoryExtractionState{LeaseID:"L", LeaseUntil:t} → {"leaseId":"L","leaseUntil":"…"}
+ * MemoryExtractionState{} → {"leaseId":"","leaseUntil":"0001-01-01T00:00:00Z"}
+ * MemoryExtractionState{LeaseID:"L", LeaseUntil:t} → {"leaseId":"L","leaseUntil":"…"}
  * </pre>
- * <p>按契约 §1.6「禁止条件键」，{@code leaseId} 空串照样写出 {@code ""}；
+ * <p>按契约 「禁止条件键」，{@code leaseId} 空串照样写出 {@code ""}；
  * {@code leaseUntil} 恒输出（零值时间也算"非空"，照样写出字面量）。</p>
  *
  * <h2>⚠️ 存量行要跑迁移：这里的读路径是宽松的</h2>

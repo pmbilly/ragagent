@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * 腾讯云知识引擎原子能力。
- * 支持 DeepSeek-R1, DeepSeek-V3 系列模型，具备思维链能力。
+ * 支持 DeepSeek-, DeepSeek-V3 系列模型，具备思维链能力。
  */
 public class LKEAPProvider implements Provider {
 
@@ -43,14 +43,14 @@ public class LKEAPProvider implements Provider {
     }
 
     /**
-     * DeepSeek R1 系列。
-     * R1 系列默认开启思维链。
-     */
+ * DeepSeek 系列。
+ * 系列默认开启思维链。
+ */
     public static boolean isLKEAPDeepSeekR1Model(String modelName) {
         return (modelName == null ? "" : modelName.toLowerCase(Locale.ROOT)).contains("deepseek-r1");
     }
 
-    /** R1 或 V3 即支持思维链 */
+    /** 或 V3 即支持思维链 */
     public static boolean isLKEAPThinkingModel(String modelName) {
         return isLKEAPDeepSeekR1Model(modelName) || isLKEAPDeepSeekV3Model(modelName);
     }

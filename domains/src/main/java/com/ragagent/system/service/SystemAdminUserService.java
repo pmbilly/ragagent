@@ -13,16 +13,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * 系统管理员 P0 用户管理的**系统侧壳**：审计写入 + 控制器委托面。
+ * 系统管理员 用户管理的**系统侧壳**：审计写入 + 控制器委托面。
  *
  * <p><b>本刀（C-13a）后</b>：用户/租户/成员的实际读写都归 auth 域（{@link AdminUserPort} 的实现
  * {@code auth/api/AdminUserAdapter}）——system 不再直引 {@code auth.mapper.UserMapper} /
- * {@code TenantService} / {@code TenantMemberService}（HANDOFF §12.6.4）。本类只负责：</p>
+ * {@code TenantService} / {@code TenantMemberService}（HANDOFF）。本类只负责：</p>
  * <ul>
- *   <li>{@link #emitAdminAudit}：租户 0 + target user 的 best-effort 审计（失败记 WARN）；</li>
- *   <li>{@link #systemAuditActorRole}：主体角色（平台 API-Key → {@code platform_api_key}）；</li>
- *   <li>{@link #isValidEmail}：binding 的 required,email 等价校验；</li>
- *   <li>其余方法**逐字转发**端口（语义、错误消息与幂等分支留在实现侧，本类不改写）。</li>
+ * <li>{@link #emitAdminAudit}：租户 0 + target user 的 best-effort 审计（失败记 WARN）；</li>
+ * <li>{@link #systemAuditActorRole}：主体角色（平台 API-Key → {@code platform_api_key}）；</li>
+ * <li>{@link #isValidEmail}：binding 的 required,email 等价校验；</li>
+ * <li>其余方法**逐字转发**端口（语义、错误消息与幂等分支留在实现侧，本类不改写）。</li>
  * </ul>
  */
 @Service

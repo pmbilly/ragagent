@@ -158,7 +158,7 @@ final class OAuthDiscovery {
             return;
         }
 
-        // RFC 9728 §3.3/§7.3：从 WWW-Authenticate 广告来的 PRM（不可信网络输入）必须自证——
+        // RFC 9728 /：从 WWW-Authenticate 广告来的 PRM（不可信网络输入）必须自证——
         // 声明的 resource 必须与被寻址的受保护资源一致；缺 resource 字段同样拒绝。
         if (explicitMetadataUrl) {
             if (protectedResource.resource().isEmpty()) {
@@ -279,9 +279,9 @@ final class OAuthDiscovery {
     // ── 静态工具 ─────────────────────────────────────────────────────────
 
     /**
-     * well-known 段<b>插在 authority 与 path 之间</b>
-     * （RFC 8414 §3 / RFC 9728 的路径插入语义），不是简单拼接。
-     */
+ * well-known 段<b>插在 authority 与 path 之间</b>
+ * （RFC 8414 / RFC 9728 的路径插入语义），不是简单拼接。
+ */
     static String buildWellKnownUrl(String baseUrl, String suffix) {
         URI parsed;
         try {

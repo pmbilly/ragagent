@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * <p><b>三档模式</b>（{@code weknora.persistence.tenant-filter-guard}，默认 enforce）：
  * {@code off} 关闭；{@code alert} 只告警（盘面用）；{@code enforce} 抛
  * {@link MybatisPlusException}——已完成逐表定性（72 条存量语句归入
- * {@link #ALLOWED_STATEMENTS}），默认档自 2026-10-05 起为 enforce；未登记的新增
+ * {@link #ALLOWED_STATEMENTS}），默认档自 起为 enforce；未登记的新增
  * 无租户谓词查询会在执行期直接红。</p>
  *
  * <p><b>v1 边界（刻意从窄，减少告警噪音）</b>：只查 SELECT 主 from-item 表（「读全表」型越权是主攻面），
@@ -46,12 +46,12 @@ public class TenantFilterGuard implements InnerInterceptor {
     public enum Mode { OFF, ALERT, ENFORCE }
 
     /**
-     * 查询时必须出现 {@code tenant_id} 谓词的表（2026-10-05 由 V1__baseline.sql +
-     * V5__skills_tenant.sql 推导；V5 已折叠 ⇒ **只看 V1__baseline.sql 即可**，且 skills 的
-     * {@code tenant_id} 已直接写在 CREATE 里）。判定脚本是「CREATE TABLE 块内含 tenant_id 列」。
-     * 已知误报面：按父键传递范围的查询（如 chunks 按 knowledge_id）也会命中告警——
-     * alert 档盘面后，属传递范围的表迁出本表、改在调用面注释范围语义。
-     */
+ * 查询时必须出现 {@code tenant_id} 谓词的表（由 V1__baseline.sql +
+ * V5__skills_tenant.sql 推导；V5 已折叠 ⇒ **只看 V1__baseline.sql 即可**，且 skills 的
+ * {@code tenant_id} 已直接写在 CREATE 里）。判定脚本是「CREATE TABLE 块内含 tenant_id 列」。
+ * 已知误报面：按父键传递范围的查询（如 chunks 按 knowledge_id）也会命中告警——
+ * alert 档盘面后，属传递范围的表迁出本表、改在调用面注释范围语义。
+ */
     public static final Set<String> TENANT_TABLES = Set.of(
             "audit_logs", "chunk_revisions", "chunks", "custom_agents", "data_sources",
             "embed_channels", "im_channel_sessions", "im_channels", "knowledge_bases",
@@ -73,17 +73,17 @@ public class TenantFilterGuard implements InnerInterceptor {
     }
 
     /**
-     * 语句级白名单（逐表定性，2026-10-05；首次盘面 72 条语句全部归类）。
-     * 增删条目必须注明族别。族别口径：
-     * <ul>
-     *   <li><b>认证面</b>——按 hash/bot 身份/邮箱定位，请求期不存在租户上下文；</li>
-     *   <li><b>调度面</b>——后台轮询全表（IM 渠道投递、数据源同步），天然跨租户；</li>
-     *   <li><b>跨空间身份关系面</b>——成员/邀请/收藏按 user 维度，天生跨空间；</li>
-     *   <li><b>按 id/父键传递</b>——UUID 取行 + 上层守卫（requireKb / getKnowledgeInTenant /
-     *       ChunkAccessGuard）校验归属；或按父键（kb_id / knowledge_id / item_id）传递范围；</li>
-     *   <li><b>内部任务队列</b>——(task_type, scope, scope_id) 三元组即租户边界。</li>
-     * </ul>
-     */
+ * 语句级白名单（逐表定性，；首次盘面 72 条语句全部归类）。
+ * 增删条目必须注明族别。族别口径：
+ * <ul>
+ * <li><b>认证面</b>——按 hash/bot 身份/邮箱定位，请求期不存在租户上下文；</li>
+ * <li><b>调度面</b>——后台轮询全表（IM 渠道投递、数据源同步），天然跨租户；</li>
+ * <li><b>跨空间身份关系面</b>——成员/邀请/收藏按 user 维度，天生跨空间；</li>
+ * <li><b>按 id/父键传递</b>——UUID 取行 + 上层守卫（requireKb / getKnowledgeInTenant /
+ * ChunkAccessGuard）校验归属；或按父键（kb_id / knowledge_id / item_id）传递范围；</li>
+ * <li><b>内部任务队列</b>——(task_type, scope, scope_id) 三元组即租户边界。</li>
+ * </ul>
+ */
     public static final Set<String> ALLOWED_STATEMENTS = Set.of(
             // ── 认证面 ──
             "com.ragagent.auth.apikey.mapper.TenantAPIKeyMapper.listByPlaceholderHash",

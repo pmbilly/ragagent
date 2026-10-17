@@ -30,10 +30,10 @@ public class MemoryMessageCursor {
     }
 
     /**
-     * 排序比较：先比 {@code at}，相等时用 {@code id} 打破平局。
-     *
-     * <p>方法名刻意不带 {@code is}/{@code get} 前缀——Jackson 不会把它当属性（§7.5 第 2 条）。</p>
-     */
+ * 排序比较：先比 {@code at}，相等时用 {@code id} 打破平局。
+ *
+ * <p>方法名刻意不带 {@code is}/{@code get} 前缀——Jackson 不会把它当属性（第 2 条）。</p>
+ */
     public boolean after(MemoryMessageCursor other) {
         if (other == null) {
             return true;
@@ -42,12 +42,12 @@ public class MemoryMessageCursor {
     }
 
     /**
-     * {@code at} 与给定时刻是否同一瞬间（按 instant 相等比较）。
-     *
-     * <p>名字**刻意**不用 {@code isXxx} 形式：那正是 §7.5 第 2 条的坑
-     * （Jackson 会把零参 {@code isXxx()} 当属性名 {@code xxx} 写出去）。
-     * 带参数的方法 Jackson 本来也不认，但少一个可疑形状少一分复发率。</p>
-     */
+ * {@code at} 与给定时刻是否同一瞬间（按 instant 相等比较）。
+ *
+ * <p>名字**刻意**不用 {@code isXxx} 形式：那正是 第 2 条的坑
+ * （Jackson 会把零参 {@code isXxx()} 当属性名 {@code xxx} 写出去）。
+ * 带参数的方法 Jackson 本来也不认，但少一个可疑形状少一分复发率。</p>
+ */
     public boolean atEquals(OffsetDateTime other) {
         return other != null && at.toInstant().equals(other.toInstant());
     }

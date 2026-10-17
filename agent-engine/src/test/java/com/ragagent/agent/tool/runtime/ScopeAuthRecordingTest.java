@@ -8,8 +8,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.fixtures.GoRecording45B;
 import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.ToolContractGoldenB;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.agent.SearchAuth.ChunkView;
 import com.ragagent.contract.agent.SearchAuth.KnowledgeView;
@@ -92,7 +92,7 @@ class ScopeAuthRecordingTest {
         final JsonNode result;
 
         Rec(String constant) {
-            JsonNode r = GoRecording45B.rec(field(constant));
+            JsonNode r = ToolContractGoldenB.rec(field(constant));
             this.id = r.get("id").asText();
             this.error = r.get("error").asText();
             this.result = r.get("result");
@@ -311,7 +311,7 @@ class ScopeAuthRecordingTest {
 
     private static String field(String name) {
         try {
-            return (String) GoRecording45B.class.getField(name).get(null);
+            return (String) ToolContractGoldenB.class.getField(name).get(null);
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }

@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * 混合检索读面端口（业务域 → 检索引擎）。
  *
- * <p>R3b 契约化：业务域（知识控制器/FAQ 查询/会话 QA/agent 工具）原先直注
+ * <p> 契约化：业务域（知识控制器/FAQ 查询/会话 QA/agent 工具）原先直注
  * {@code retrieval-engine} 的 {@code HybridSearchService} 实现类；本端口只收域侧真调用的
  * 三个方法，载体全部是契约面既有形状（{@link SearchParams}/{@link SearchResult}）。
  *

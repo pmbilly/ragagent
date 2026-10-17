@@ -16,12 +16,12 @@ import java.util.List;
  *
  * <p>本类不做任何资源查找或权限推断，边界归调用方。分派到两支：</p>
  * <ul>
- *   <li><b>可 seek</b>（本地盘路径）→ Accept-Ranges: bytes、Content-Length、
- *       Range→206/416、If-Match/If-None-Match 预判（零 modtime、无 ETag 形态）。</li>
- *   <li><b>仅流式</b>（{@link OpenedFile#ofStream} 的顺序读流 / 云对象）→
- *       Accept-Ranges: none，Content-Length 只认调用方的 {@code Options.size}，
- *       不缓冲整个对象来支持 seek（RFC 9110 §14.2）。云 provider 走这一支
- *       （{@code ProviderFileContentService}），本地盘仍走 seek 支路。</li>
+ * <li><b>可 seek</b>（本地盘路径）→ Accept-Ranges: bytes、Content-Length、
+ * Range→206/416、If-Match/If-None-Match 预判（零 modtime、无 ETag 形态）。</li>
+ * <li><b>仅流式</b>（{@link OpenedFile#ofStream} 的顺序读流 / 云对象）→
+ * Accept-Ranges: none，Content-Length 只认调用方的 {@code Options.size}，
+ * 不缓冲整个对象来支持 seek（RFC 9110）。云 provider 走这一支
+ * （{@code ProviderFileContentService}），本地盘仍走 seek 支路。</li>
  * </ul>
  *
  * <p><b>多段 Range（multipart/byteranges）的边界是随机的</b>：该分支按 RFC 结构
@@ -178,7 +178,7 @@ public final class FileTransport {
         if (ranges != null && ranges.size() == 1) {
             sendSize = ranges.get(0).length();
             code = HttpServletResponse.SC_PARTIAL_CONTENT;
-            // RFC 7233 §4.1：单段 206 必须带 Content-Range
+            // RFC 7233：单段 206 必须带 Content-Range
             response.setHeader("Content-Range", ranges.get(0).contentRange(size));
         } else if (ranges != null && ranges.size() > 1) {
             String boundary = randomBoundary();
@@ -265,7 +265,7 @@ public final class FileTransport {
             long rStart;
             long rLength;
             if (start.isEmpty()) {
-                // <suffix-length>：非负整数（RFC 7233 §2.1）
+                // <suffix-length>：非负整数（RFC 7233）
                 if (end.isEmpty() || end.charAt(0) == '-') {
                     return new ParseRange(null, "invalid range", false);
                 }
@@ -414,11 +414,11 @@ public final class FileTransport {
         b.append(attribute);
         boolean needEnc = needsEncoding(value);
         if (needEnc) {
-            b.append('*'); // RFC 2231 §4
+            b.append('*'); // RFC 2231
         }
         b.append('=');
         if (needEnc) {
-            // ⚠️ 必须按 UTF-8 **字节**逐个百分号化（数 → %E6%95%B0）；按 char 迭代
+            // ⚠️ 必须按 UTF-8 **字节**逐个百分号化（数 → %%95%B0）；按 char 迭代
             // 会把 BMP 字符的 16 位值直接切 hex。
             b.append("utf-8''");
             byte[] raw = value.getBytes(java.nio.charset.StandardCharsets.UTF_8);

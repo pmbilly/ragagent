@@ -3,8 +3,8 @@ package com.ragagent.agent.tool.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.fixtures.GoRecording45A;
 import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.ToolContractGoldenA;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -49,7 +49,7 @@ class JsonRepairRecordingTest {
     };
 
     @Test
-    void corpusMatchesGoRecording() {
+    void corpusMatchesAgentPromptGolden() {
         for (String name : CASES) {
             JsonNode r = RecordingSupport.rec(constant(name));
             String in = r.get("in").asText();
@@ -72,7 +72,7 @@ class JsonRepairRecordingTest {
 
     private static String constant(String name) {
         try {
-            var f = GoRecording45A.class.getField(name);
+            var f = ToolContractGoldenA.class.getField(name);
             return (String) f.get(null);
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);

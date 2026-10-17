@@ -4,7 +4,7 @@ package com.ragagent.contract.vectorstore;
 /**
  * 向量库索引配置（由 {@code vectorstore.domain} 下沉 L1）：
  * 公开字段的 JSON 值对象，{@code vectorstore} 域与 L2 {@code retrieval} 的引擎工厂/仓库共用；
- * 留在域内会让 L2 依赖业务域（R3）。
+ * 留在域内会让 L2 依赖业务域。
  *
  * <p>序列化形态：空字段整键省略；未知键容忍（jsonb 演进 + 其它引擎的键可能出现在历史行里——
  * 序列化形态不得因引擎不同而变化）。</p>

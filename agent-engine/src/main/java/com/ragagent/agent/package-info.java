@@ -33,7 +33,7 @@
  * 要把这条 seam 打开——约 38 处包内成员/嵌套类型需改 public，并牵动同包测试与其跨模块 split-package 取用
  * （{@code boot} 的 {@code EngineRecordingTest}、testFixtures 的 {@code Engine46bStubSupport}）；
  * 而包不构成编译边界、不产生强制力，收益仅限导航。
- * <b>2026-10-12 定案：不做 {@code loop/} 归位</b>，可读性由本节时序说明 + {@code AgentEngine} 类头「主循环地图」承担
- * （判据见 {@code docs/superpowers/plans/2026-10-12-prompt-unification-and-agent-package.md} F4 降级说明）。</p>
+ * <b>定案：不做 {@code loop/} 归位</b>，可读性由本节时序说明 + {@code AgentEngine} 类头「主循环地图」承担
+ * （判据见 {@code docs/superpowers/plans/-prompt-unification-and-agent-package.md} 降级说明）。</p>
  */
 package com.ragagent.agent;

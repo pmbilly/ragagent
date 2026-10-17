@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * 录制回放：rerank（清洗/段落/编排）+ wiki_boost + memory_recall/affinity + progress
- * （期望值 = {@link GoRecording46C} 录制常量）。
+ * （期望值 = {@link ChatPipelineGolden} 录制常量）。
  */
 class RerankRecordingTest {
 

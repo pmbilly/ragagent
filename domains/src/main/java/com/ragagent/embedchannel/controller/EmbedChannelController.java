@@ -50,17 +50,17 @@ import org.springframework.web.bind.annotation.RestController;
  * mcp-oauth authorize-url/status、mcp-oauth-resolutions(+cancel)、tool-approvals。
  * 委托面直接调用既有控制器方法，确保字节契约同源。</p>
  *
- * <p><b>W5d 收口（2026-09-21）</b>：{@code POST /embed/:cid/knowledge-chat/:sid} 与
+ * <p><b>收口</b>：{@code POST /embed/:cid/knowledge-chat/:sid} 与
  * {@code POST /embed/:cid/agent-chat/:sid}（patchEmbedChatPayload + 委托
  * KnowledgeQaController 的 KnowledgeQA/AgentQA）与 {@code GET /embed/:cid/files}
  * （委托 FileProxyService.serveTenantFiles，与 /files 同 handler 体）已落地。</p>
  *
  * <h2>响应形态</h2>
  * <ul>
- *   <li>管理面响应键<b>字母序</b>（TreeMap 构建）；create 是 201；</li>
- *   <li>公开面 envelope {@code {"data":…,"success":true}}；错误是纯字符串
- *       {@code {"error":"…"}}（webhook 中继/签名/白名单族）或 AppError 信封
- *       （suggestion/MCP 委托面沿用各自控制器的异常）。</li>
+ * <li>管理面响应键<b>字母序</b>（TreeMap 构建）；create 是 201；</li>
+ * <li>公开面 envelope {@code {"data":…,"success":true}}；错误是纯字符串
+ * {@code {"error":"…"}}（webhook 中继/签名/白名单族）或 AppError 信封
+ * （suggestion/MCP 委托面沿用各自控制器的异常）。</li>
  * </ul>
  */
 @RestController

@@ -3,8 +3,8 @@ package com.ragagent.agenttools;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.fixtures.GoRecording45A;
 import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.ToolContractGoldenA;
 import com.ragagent.contract.agent.OutputBudgets;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolRequest;
@@ -33,7 +33,7 @@ class OutputBudgetsRecordingTest {
     };
 
     @Test
-    void splitFairlyMatchesGoRecording() {
+    void splitFairlyMatchesAgentPromptGolden() {
         for (String name : CASES) {
             JsonNode r = RecordingSupport.rec(field(name));
             int total = r.get("total").asInt();
@@ -78,7 +78,7 @@ class OutputBudgetsRecordingTest {
 
     private static String field(String name) {
         try {
-            return (String) GoRecording45A.class.getField(name).get(null);
+            return (String) ToolContractGoldenA.class.getField(name).get(null);
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }

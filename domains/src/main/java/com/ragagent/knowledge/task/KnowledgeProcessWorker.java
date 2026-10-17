@@ -216,7 +216,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             }
             EmbedderClient.EmbedConfig embedConfig = resolveEmbedConfig(k, kb);
             preCleanKnowledge(k, kb, embedConfig, knowledgeId);
-            // K4：记下本次尝试的 chunk id——失败清场只删它们（见 cleanupFailedAttempt）。
+            //：记下本次尝试的 chunk id——失败清场只删它们（见 cleanupFailedAttempt）。
             List<String> attemptChunkIds = List.of();
             try {
                 String markdown = extractMarkdown(k, attempt, knowledgeId);
@@ -241,7 +241,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         }
     }
 
-    /** 失败清场（K4：按尝试划界——只删本次产出的 chunks；清单未知时退回知识粒度兜底；向量仍知识粒度）。 */
+    /** 失败清场（按尝试划界——只删本次产出的 chunks；清单未知时退回知识粒度兜底；向量仍知识粒度）。 */
     private void cleanupFailedAttempt(String knowledgeId, List<String> attemptChunkIds,
             Knowledge k, KnowledgeBase kb, EmbedderClient.EmbedConfig embedConfig) {
         if (attemptChunkIds.isEmpty()) {
@@ -295,7 +295,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     /** 分块并落库（KB 配置 0 值回退默认 512/80；行间 pre/next 双向链；阶段 span 记录写出量）。 */
     private List<Chunk> chunkAndPersist(Knowledge k, KnowledgeBase kb, String knowledgeId,
             String markdown, int attempt) {
-        // K8：未生效的配置键进 span（结构化可观测）——摄取侧不静默忽略。
+        //：未生效的配置键进 span（结构化可观测）——摄取侧不静默忽略。
         List<String> inactiveKeys = kb.getChunkingConfig() == null ? List.of()
                 : kb.getChunkingConfig().ingestionInactiveKeys();
         SpanTracker.SpanHandle chunkSpan = beginStageSpan(attempt, knowledgeId,
@@ -460,10 +460,10 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
      * 向量化判定 + 模型解析。
      */
     /**
-     * 知识删除/重处理的向量行清理——2026-09-25 写链改道：绑定 store 的 KB 走引擎口
-     * （经
-     * GetEmbeddingModel → DeleteByKnowledgeIDList）；未绑定保持 pg 直连（模型缺失时
-     */
+ * 知识删除/重处理的向量行清理—— 写链改道：绑定 store 的 KB 走引擎口
+ * （经
+ * GetEmbeddingModel → DeleteByKnowledgeIDList）；未绑定保持 pg 直连（模型缺失时
+ */
     private void deleteKnowledgeVectors(Knowledge k, KnowledgeBase kb,
                                         EmbedderClient.EmbedConfig embedConfig, String knowledgeId) {
         IndexEngine boundEngine = vectorWrites.boundEngine(kb, k.getTenantId());
@@ -708,7 +708,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                     KnowledgeProcessingSpan.STAGE_POST_PROCESS, null);
             // 索引完成即推进启用态（finalizing 前置）：
             // 索引完成 → summary_status=none（post-process fan-out 随后按需改 pending）。
-            // 条件化（2026-09-23 走查批）：仅当 KB 配了 summary model 时推进——Java 的
+            // 条件化（走查批）：仅当 KB 配了 summary model 时推进——Java 的
             // 进程内 worker 在契约测试里会真实处理：
             // 录制进程内；无条件推进会让异步副作用污染 HTTP 快照断言（kg-manual-draft
             // 等 3 例实测红）。无 summary model 的 KB 因此不做 none/failed 中间态
@@ -731,7 +731,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                         KnowledgeProcessingSpan.STATUS_DONE, null, "", "");
             }
         } else {
-            // K4 CAS：只有仍由本次处理占用的行（processing）才许翻 failed。
+            // CAS：只有仍由本次处理占用的行（processing）才许翻 failed。
             int failedRows = knowledgeRepository.failIfProcessing(knowledgeId, abbreviate(error),
                     OffsetDateTime.now(ZoneOffset.UTC));
             if (failedRows == 0) {

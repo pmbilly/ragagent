@@ -12,7 +12,7 @@ import java.util.List;
  * {@code GetSession} 回给前端、让聊天输入框恢复上次选的 agent / 模型 / KB 范围等。</p>
  *
  * <p>字段序 = 声明序、键名 = Java 字段名；<b>所有字段恒输出</b>
- * （§1.6：空集合写 {@code []}、未选模型写 {@code ""}，没有条件键）。</p>
+ * （空集合写 {@code []}、未选模型写 {@code ""}，没有条件键）。</p>
  *
  * <p><b>读路径必须宽容</b>：{@code ignoreUnknown=true}——历史行里可能有
  * 现在已删掉的键，不能让整行读不出来。</p>

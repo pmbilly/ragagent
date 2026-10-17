@@ -18,21 +18,21 @@ import org.springframework.stereotype.Component;
  *
  * <p>应用重启后把卡在处理态的任务复位为失败，让前端不再显示永远转圈的行：</p>
  * <ol>
- *   <li><b>知识解析</b>（仅未装配知识 Redis 面时）：parse_status ∈
- *       {pending, processing, finalizing, deleting} 的行 → failed +
- *       "Task interrupted due to application restart" + pending_subtasks_count=0。
- *       分布式实现另有「finalizing 且唯一未决子槽是持久化 wiki op」的 NOT-EXISTS 排除
- *       （分布式队列持久化、重启后能收尾）——单机形态下该理由不成立，
- *       故 Lite 路径一并复位（详见 {@link #listStuckKnowledgeIds(boolean)}）；复位
- *       成功后按行取消孤儿 span（LatestAttempt + CancelAllOpenSpans，errorCode=SERVER_RESTART）。</li>
- *   <li><b>摘要生成</b>（仅 Lite）：summary_status ∈ {pending, processing} → failed。</li>
- *   <li><b>数据源同步日志</b>（两种模式都跑）：status=running → failed +
- *       "Sync interrupted due to application restart" + finished_at=now；分布式模式
- *       加 30 分钟陈旧窗——持久化队列里可能还有
- *       未开 span 的积压任务，只有明显陈旧的才敢判死。</li>
+ * <li><b>知识解析</b>（仅未装配知识 Redis 面时）：parse_status ∈
+ * {pending, processing, finalizing, deleting} 的行 → failed +
+ * "Task interrupted due to application restart" + pending_subtasks_count=0。
+ * 分布式实现另有「finalizing 且唯一未决子槽是持久化 wiki op」的 NOT-EXISTS 排除
+ * （分布式队列持久化、重启后能收尾）——单机形态下该理由不成立，
+ * 故 Lite 路径一并复位（详见 {@link #listStuckKnowledgeIds(boolean)}）；复位
+ * 成功后按行取消孤儿 span（LatestAttempt + CancelAllOpenSpans，errorCode=SERVER_RESTART）。</li>
+ * <li><b>摘要生成</b>（仅 Lite）：summary_status ∈ {pending, processing} → failed。</li>
+ * <li><b>数据源同步日志</b>（两种模式都跑）：status=running → failed +
+ * "Sync interrupted due to application restart" + finished_at=now；分布式模式
+ * 加 30 分钟陈旧窗——持久化队列里可能还有
+ * 未开 span 的积压任务，只有明显陈旧的才敢判死。</li>
  * </ol>
  *
- * <p><b>知识/摘要行的跳过判据 = {@code knowledge.redis-enabled}</b>（K6：与
+ * <p><b>知识/摘要行的跳过判据 = {@code knowledge.redis-enabled}</b>（与
  * {@code KnowledgeRedisWiring} 同一开关）。旧实现用 {@code REDIS_ADDR} 非空判断：
  * 只把 Redis 用于 IM/embed 等其它面的部署会被误判成分布式，卡住的知识行**永不复位**
  * （前端永远转圈，HousekeepingService 只判 failed 不重投）。同理数据源同步日志按
@@ -88,12 +88,12 @@ public class StartupTaskRecovery {
     }
 
     /**
-     * 三种复位各自按**自己守护的任务基础设施**决定是否跳过（K6：口径必须与装配一致）。
-     *
-     * @param knowledgeDistributed 知识 Redis 面已装配（{@code knowledge.redis-enabled}）——
-     *                             此时另一副本可能仍在处理同一知识，启动钩子不敢判死
-     * @param syncDistributed      数据源同步队列已装配 Redis 版（{@code datasource.redis-enabled}）
-     */
+ * 三种复位各自按**自己守护的任务基础设施**决定是否跳过（口径必须与装配一致）。
+ *
+ * @param knowledgeDistributed 知识 Redis 面已装配（{@code knowledge.redis-enabled}）——
+ * 此时另一副本可能仍在处理同一知识，启动钩子不敢判死
+ * @param syncDistributed 数据源同步队列已装配 Redis 版（{@code datasource.redis-enabled}）
+ */
     void resetPendingTasks(boolean knowledgeDistributed, boolean syncDistributed) {
         try {
             resetStuckKnowledge(knowledgeDistributed);

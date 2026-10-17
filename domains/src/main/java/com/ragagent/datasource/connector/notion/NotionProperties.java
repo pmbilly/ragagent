@@ -175,14 +175,14 @@ final class NotionProperties {
     }
 
     /**
-     * 按**固定顺序**试探已知的叶子键。
-     *
-     * <p>顺序有语义：{@code name} 先于 {@code content} 先于 {@code plain_text}
-     * 先于 {@code start}/{@code end} 先于 {@code expression}，最后才按
-     * {@code type} 递归。{@code start} 命中后，只有 {@code end} **是非空字符串**
-     * 才拼 {@code "start ~ end"}（{@code end:""} 与 {@code end:null} 都只回 start
-     * ——实测 {@code {"start":"2026-01-15","end":""} → "2026-01-15"}）。</p>
-     */
+ * 按**固定顺序**试探已知的叶子键。
+ *
+ * <p>顺序有语义：{@code name} 先于 {@code content} 先于 {@code plain_text}
+ * 先于 {@code start}/{@code end} 先于 {@code expression}，最后才按
+ * {@code type} 递归。{@code start} 命中后，只有 {@code end} **是非空字符串**
+ * 才拼 {@code "start ~ end"}（{@code end:""} 与 {@code end:null} 都只回 start
+ * ——实测 {@code {"start":"","end":""} → ""}）。</p>
+ */
     static String extractLeafValue(JsonNode m) {
         if (m == null || !m.isObject()) {
             return "";

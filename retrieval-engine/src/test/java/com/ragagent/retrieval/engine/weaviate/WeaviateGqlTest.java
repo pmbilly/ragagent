@@ -59,7 +59,7 @@ class WeaviateGqlTest {
 
     @Test
     @DisplayName("向量查询：与 Go 实录逐字节一致（参数序 where→nearVector→limit、certainty 在前）")
-    void vectorQueryMatchesGoRecording() {
+    void vectorQueryMatchesAgentPromptGolden() {
         String actual = WeaviateGql.vectorQuery("Weknora_embeddings_3", baseWhere(), 10,
                 new float[] {0.5f, -0.25f, 1f}, 0.7f);
         assertThat(actual).isEqualTo(GO_QUERY_VECTOR);
@@ -67,7 +67,7 @@ class WeaviateGqlTest {
 
     @Test
     @DisplayName("关键词查询：与 Go 实录逐字节一致（bm25 的 %q 引号 + 逗号空格分隔）")
-    void bm25QueryMatchesGoRecording() {
+    void bm25QueryMatchesAgentPromptGolden() {
         String actual = WeaviateGql.bm25Query("Weknora_embeddings_3", baseWhere(), 10,
                 "知识库 \"检索\"", List.of("content"));
         assertThat(actual).isEqualTo(GO_QUERY_KEYWORDS);
@@ -83,7 +83,7 @@ class WeaviateGqlTest {
 
     @Test
     @DisplayName("move 列举：与 Go 实录逐字节一致（And + 两个 Equal + _additional{id}）")
-    void moveListQueryMatchesGoRecording() {
+    void moveListQueryMatchesAgentPromptGolden() {
         WeaviateGql.Where where = WeaviateGql.Where.and(List.of(
                 WeaviateGql.Where.equal("knowledge_base_id").valueString("srcKb"),
                 WeaviateGql.Where.equal("knowledge_id").valueString("k1")));

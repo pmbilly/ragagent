@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * <p>所有知识写链（删除 / FAQ / 克隆移动等）都经本网关路由——绑定外部 store 的 KB
  * 写进自己的店。历史路径直连 pg JDBC（{@code VectorIndexStore}），绑定店会写落错店。</p>
  *
- * <p><b>R3b 契约化</b>：绑定解析（registry + 工厂 + 归属校验 + 失败分类）是引擎知识，
+ * <p><b>契约化</b>：绑定解析（registry + 工厂 + 归属校验 + 失败分类）是引擎知识，
  * 已沉到 retrieval-engine 的 {@code IndexEngineGateway}；本类只剩域判定
  * （{@code hasVectorStore()}）与转交，不再 import 任何检索实现类。</p>
  */

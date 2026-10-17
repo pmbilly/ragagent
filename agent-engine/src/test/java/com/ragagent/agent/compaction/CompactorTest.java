@@ -1,12 +1,12 @@
 package com.ragagent.agent.compaction;
 
-import static com.ragagent.agent.GoRecording.STR_E2E_LENGTH_STOP_SUMMARY;
-import static com.ragagent.agent.GoRecording.STR_E2E_REACT12_SUMMARY;
-import static com.ragagent.agent.GoRecording.STR_GROWN_PROMPT0;
-import static com.ragagent.agent.GoRecording.STR_PROMPT_INITIAL;
-import static com.ragagent.agent.GoRecording.STR_PROMPT_UPDATE;
-import static com.ragagent.agent.GoRecording.STR_SUMMARIZATIONSYSTEMPROMPT;
-import static com.ragagent.agent.GoRecording.STR_SUMMARYFORMAT;
+import static com.ragagent.agent.AgentPromptGolden.STR_E2E_LENGTH_STOP_SUMMARY;
+import static com.ragagent.agent.AgentPromptGolden.STR_E2E_REACT12_SUMMARY;
+import static com.ragagent.agent.AgentPromptGolden.STR_GROWN_PROMPT0;
+import static com.ragagent.agent.AgentPromptGolden.STR_PROMPT_INITIAL;
+import static com.ragagent.agent.AgentPromptGolden.STR_PROMPT_UPDATE;
+import static com.ragagent.agent.AgentPromptGolden.STR_SUMMARIZATIONSYSTEMPROMPT;
+import static com.ragagent.agent.AgentPromptGolden.STR_SUMMARYFORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.agent.budget.TokenEstimator;

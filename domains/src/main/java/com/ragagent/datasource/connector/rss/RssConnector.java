@@ -442,7 +442,7 @@ public class RssConnector implements Connector {
 
         // 优先文章全文；失败就回落 feed 内容。
         // 抽取器不可用（UnavailableArticleExtractor 恒抛）时直接跳过文章页请求：
-        // 抓回的字节必被丢弃，每个条目白付一次外网请求（2026-09-28 评审修正）。
+        // 抓回的字节必被丢弃，每个条目白付一次外网请求（评审修正）。
         String contentHtml = feedContent;
         if (!RssUtil.trimUnicodeWhitespace(item.link()).isEmpty() && fullTextAvailable) {
             try {

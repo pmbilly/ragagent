@@ -8,11 +8,11 @@ import java.util.List;
 /**
  * wiki 页**行视图**（L1）：{@code WikiPageOpsPort} 页面面（读 / 建 / 改 / 搜索）的载荷。
  *
- * <p><b>为什么有它</b>：实体 {@code WikiPage} 已归位 `wiki/domain`（HANDOFF §12.0 判据 1）；
+ * <p><b>为什么有它</b>：实体 {@code WikiPage} 已归位 `wiki/domain`（HANDOFF 判据 1）；
  * 跨域方（会话域的 wiki 工具后端）只应经本视图读写——它对该实体用到 **42 个访问器**
  * （含 {@code pageMetadata}），故视图**镜像全 27 字段**、访问器体与实体**逐字一致**（含空值归一）。</p>
  *
- * <p><b>落点（登记 HANDOFF §12.5）</b>：{@code pageMetadata} 是 {@code JsonNode} ⇒ `:contract` 零依赖装不下
+ * <p><b>落点（登记 HANDOFF）</b>：{@code pageMetadata} 是 {@code JsonNode} ⇒ `:contract` 零依赖装不下
  * ⇒ 留 L1 与端口同处，登记为**待去 Jackson**（去 Jackson 后可与端口整批入 `contract.wiki`）。</p>
  */
 public class WikiPageView {

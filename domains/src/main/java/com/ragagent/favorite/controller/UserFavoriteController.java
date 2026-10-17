@@ -58,7 +58,7 @@ public class UserFavoriteController {
         this.service = service;
     }
 
- /** 列表 = 裸数组（§2.1）；?type= 缺失/非法 → 400（空串不命中白名单）。 */
+ /** 列表 = 裸数组；?type= 缺失/非法 → 400（空串不命中白名单）。 */
     @GetMapping("/api/v1/user/favorites")
     public ResponseEntity<List<UserResourceFavorite>> listFavorites(@RequestParam(required = false) String type) {
         String userId = favoriteUserId();

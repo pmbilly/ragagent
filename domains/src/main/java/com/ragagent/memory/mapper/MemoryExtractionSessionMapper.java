@@ -29,7 +29,7 @@ import org.apache.ibatis.annotations.Update;
  * <p>不是（H2 与 PG 都接受裸的 {@code pending} 作为列名），DDL 与迁移一致。</p>
  *
  * <p><b>裸 {@code @Select} 显式写 {@code @Results}</b>：MyBatis 的隐式驼峰映射
- * 由全局配置决定，项目里既有裸 SQL 的投影行都显式声明（§9）。</p>
+ * 由全局配置决定，项目里既有裸 SQL 的投影行都显式声明。</p>
  */
 @Mapper
 public interface MemoryExtractionSessionMapper extends BaseMapper<MemoryExtractionSession> {

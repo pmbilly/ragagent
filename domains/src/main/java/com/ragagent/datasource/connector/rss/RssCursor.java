@@ -21,11 +21,11 @@ import java.util.Map;
  *
  * <h2>序列化形状（{@code RssCursorJsonTest} 逐字节钉住）</h2>
  * <pre>
- *   {lastSyncTime: t}                     → {"lastSyncTime":"2006-01-02T15:04:05Z"}
- *   （feedItems/feedSignals 都是空 map）    → 同上（两个键被省略）
- *   {feedItems:{"f":{"g":"h:1"}}, ...}    → {"lastSyncTime":...,
- *                                            "feedItems":{"f":{"g":"h:1"}},
- *                                            "feedSignals":{...}}
+ * {lastSyncTime: t} → {"lastSyncTime":"T15:04:05Z"}
+ * （feedItems/feedSignals 都是空 map） → 同上（两个键被省略）
+ * {feedItems:{"f":{"g":"h:1"}}, ...} → {"lastSyncTime":...,
+ * "feedItems":{"f":{"g":"h:1"}},
+ * "feedSignals":{...}}
  * </pre>
  * <p>要点：{@code lastSyncTime} 恒输出（零值也输出字面量）；
  * 另两个键对 map 看 {@code size}，<b>空 map 整个键消失</b>，
@@ -33,8 +33,8 @@ import java.util.Map;
  *
  * <h2>落库行为清单</h2>
  * <ol>
- *   <li><b>钩子 / 软删除 / 自动时间戳 / 唯一索引 / 关联预加载 / 默认排序</b>：全无——
- *       本类型不落表，只是 jsonb 载荷里的一块。</li>
+ * <li><b>钩子 / 软删除 / 自动时间戳 / 唯一索引 / 关联预加载 / 默认排序</b>：全无——
+ * 本类型不落表，只是 jsonb 载荷里的一块。</li>
  * </ol>
  */
 

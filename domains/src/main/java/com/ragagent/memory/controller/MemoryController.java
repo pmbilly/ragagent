@@ -50,46 +50,46 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * <h2>响应形态</h2>
  * <p>成功响应不再包 {@code {"data":…,"success":true}} 信封；JSON 字段名＝Java 字段名
- * （camelCase，见 {@code docs/knowledge-api-contract-v1.md} §1.1）。逐类形态：</p>
+ * （camelCase，见 {@code docs/knowledge-api-contract-v1.md}）。逐类形态：</p>
  * <ul>
- *   <li>单资源（settings / 条目 / 整理结果）→ <b>裸对象</b>；</li>
- *   <li>列表（items / topics / documents）→ {@code {items, page, pageSize, total}}
- *       （{@link com.ragagent.memory.dto.MemoryListResponse}，§2.1 分页形态）；</li>
- *   <li>创建条目 → <b>201</b> + 裸条目（§1.15）；删除 / 拒绝 → <b>204</b>（§1.13）；</li>
- *   <li>Export 保持下载语义：{@code {items, total, truncated}} + {@code Content-Disposition}。</li>
+ * <li>单资源（settings / 条目 / 整理结果）→ <b>裸对象</b>；</li>
+ * <li>列表（items / topics / documents）→ {@code {items, page, pageSize, total}}
+ * （{@link com.ragagent.memory.dto.MemoryListResponse}， 分页形态）；</li>
+ * <li>创建条目 → <b>201</b> + 裸条目；删除 / 拒绝 → <b>204</b>；</li>
+ * <li>Export 保持下载语义：{@code {items, total, truncated}} + {@code Content-Disposition}。</li>
  * </ul>
- * <p>{@code Clear} 是同步删除，按 §1.13 返 204——{@code {"removed":N}} 计数随信封一并退役；
+ * <p>{@code Clear} 是同步删除，按 返 204——{@code {"removed":N}} 计数随信封一并退役；
  * 前端不再展示条数（如需恢复，须先改标准）。</p>
  *
- * <h2>请求形态：标准 DTO 绑定（§1.10 / §1.23）</h2>
+ * <h2>请求形态：标准 DTO 绑定（/）</h2>
  * <p>三个带体的端点用 {@code memory/dto} 里的 record 绑定 + {@code @Valid}，
  * 不再手写 {@code rawBody} 解析；错误由全局处理器统一给（都是 400 信封）：</p>
  * <pre>
- *   空体 / 字面量 null   → details "请求体不能为空"
- *   畸形 JSON            → details "请求体格式不正确"
- *   字段类型错           → details "&lt;字段&gt;: 类型不正确"
- *   缺 enabled / 显式 null → details "enabled: 不能为空"（DTO 上的 @NotNull）
- *   未知字段             → <b>忽略</b>（Spring Boot 的 mapper 关掉了 FAIL_ON_UNKNOWN——
- *                          多带一个字段不该让整条请求失败）
+ * 空体 / 字面量 null → details "请求体不能为空"
+ * 畸形 JSON → details "请求体格式不正确"
+ * 字段类型错 → details "&lt;字段&gt;: 类型不正确"
+ * 缺 enabled / 显式 null → details "enabled: 不能为空"（DTO 上的 @NotNull）
+ * 未知字段 → <b>忽略</b>（Spring Boot 的 mapper 关掉了 FAIL_ON_UNKNOWN——
+ * 多带一个字段不该让整条请求失败）
  * </pre>
  * <p>缺省语义：条目端点的 {@code kind}/{@code content}/{@code importance} 缺失或显式
  * {@code null} 都按零值（{@code orEmpty} / {@code orZero}），"内容是否为空"仍由服务层判。</p>
  *
  * <h2>错误形态：AppError 信封</h2>
  * <pre>
- *   NoScope          → 401 {"code":1001,…,"message":"no principal in request"}
- *   ItemNotFound     → 404 {"code":1003,…,"message":"memory not found"}
- *   MemoryConflict   → 409 err.Error()（domain 包，不是 service 包的那个）
- *   SensitiveContent → 400 err.Error()
- *   Disabled         → 400 "memory is disabled"
- *   其余（含 PreviouslyForgotten / EmptyContent）→ 500 + message(handler 传的) + details=err.Error()
+ * NoScope → 401 {"code":1001,…,"message":"no principal in request"}
+ * ItemNotFound → 404 {"code":1003,…,"message":"memory not found"}
+ * MemoryConflict → 409 err.Error()（domain 包，不是 service 包的那个）
+ * SensitiveContent → 400 err.Error()
+ * Disabled → 400 "memory is disabled"
+ * 其余（含 PreviouslyForgotten / EmptyContent）→ 500 + message(handler 传的) + details=err.Error()
  * </pre>
  * <p>{@code PreviouslyForgotten} 与 {@code EmptyContent} <b>刻意不在</b> switch 里——
- * 已实测钉住（2026-09-18）：</p>
+ * 已实测钉住：</p>
  * <pre>
- *   POST /memory/items {"content":"   "}
- *   → 500 {"error":{"code":1007,"details":"memory: empty content",
- *                   "message":"Failed to create memory"},"success":false}
+ * POST /memory/items {"content":" "}
+ * → 500 {"error":{"code":1007,"details":"memory: empty content",
+ * "message":"Failed to create memory"},"success":false}
  * </pre>
  *
  * <h2>分页</h2>
@@ -196,7 +196,7 @@ public class MemoryController {
                 || MemoryKinds.STATUS_PENDING.equals(status);
     }
 
-    /** 创建条目：<b>201</b> + 裸条目（§1.15）。 */
+    /** 创建条目：<b>201</b> + 裸条目。 */
     @PostMapping("/api/v1/memory/items")
     public ResponseEntity<MemoryItem> createItem(@RequestBody @Valid CreateMemoryItemRequest req) {
         MemoryItem item;
@@ -221,7 +221,7 @@ public class MemoryController {
         }
     }
 
-    /** 永久删除条目：<b>204</b>（§1.13）。 */
+    /** 永久删除条目：<b>204</b>。 */
     @DeleteMapping("/api/v1/memory/items/{id}")
     public ApiResponse<Void> deleteItem(@PathVariable("id") String id) {
         try {
@@ -258,14 +258,14 @@ public class MemoryController {
     }
 
     /**
-     * 一次性清空调用者记忆空间里的一切。
-     *
-     * <p>注意是 {@code DELETE /memory/items}（集合本身），
-     * 与 {@code DELETE /memory/items/{id}} 是两条不同的路由。</p>
-     *
-     * <p>同步完成，按 §1.13 返 <b>204</b>：{@code {"removed":N}}
-     * 计数随信封一并退役，不再下发（前端原样展示条数的 toast 一并去掉）。</p>
-     */
+ * 一次性清空调用者记忆空间里的一切。
+ *
+ * <p>注意是 {@code DELETE /memory/items}（集合本身），
+ * 与 {@code DELETE /memory/items/{id}} 是两条不同的路由。</p>
+ *
+ * <p>同步完成，按 返 <b>204</b>：{@code {"removed":N}}
+ * 计数随信封一并退役，不再下发（前端原样展示条数的 toast 一并去掉）。</p>
+ */
     @DeleteMapping("/api/v1/memory/items")
     public ApiResponse<Void> clear() {
         try {
@@ -294,11 +294,11 @@ public class MemoryController {
     }
 
     /**
-     * 提升一个话题为记忆条目。
-     *
-     * <p>它是"动作"而不是创建端点：动的是主题、产出的是那条新记忆，
-     * 故按 §2.1 的单资源形态返 200 + 裸条目（不套 §1.15 的 201）。</p>
-     */
+ * 提升一个话题为记忆条目。
+ *
+ * <p>它是"动作"而不是创建端点：动的是主题、产出的是那条新记忆，
+ * 故按 的单资源形态返 200 + 裸条目（不套 的 201）。</p>
+ */
     @PostMapping("/api/v1/memory/topics/{id}/promote")
     public MemoryItem promoteTopic(@PathVariable("id") String id) {
         try {
@@ -434,16 +434,16 @@ public class MemoryController {
     // ══════════════════════════ 工具方法 ══════════════════════════
 
     /**
-     * {@code {items, page, pageSize, total}}——三个列表端点的响应（§2.1 分页形态）。
-     *
-     * <p>{@code items} 直接透传 service 的 {@code Page.items()}：
-     * 空时是 {@code []} 而不是 {@code null}。</p>
-     *
-     * <p>{@code page} 由 offset/limit 换算（{@code offset / limit + 1}，整数除法），
-     * {@code pageSize} 就是容错后的 limit——请求侧仍只有 limit/offset 两个参数。</p>
-     *
-     * @param paging {@link #listPaging} 的返回值：{limit, offset}
-     */
+ * {@code {items, page, pageSize, total}}——三个列表端点的响应（分页形态）。
+ *
+ * <p>{@code items} 直接透传 service 的 {@code Page.items()}：
+ * 空时是 {@code []} 而不是 {@code null}。</p>
+ *
+ * <p>{@code page} 由 offset/limit 换算（{@code offset / limit + 1}，整数除法），
+ * {@code pageSize} 就是容错后的 limit——请求侧仍只有 limit/offset 两个参数。</p>
+ *
+ * @param paging {@link #listPaging} 的返回值：{limit, offset}
+ */
     private static <T> MemoryListResponse<T> pageBody(MemoryPage<T> page, int[] paging) {
         int limit = paging[0];
         int offset = paging[1];

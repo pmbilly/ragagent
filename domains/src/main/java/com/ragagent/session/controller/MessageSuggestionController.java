@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 追问建议 HTTP 层。
  *
- * <h2>响应形态（§2.1：裸对象，无 {"data","success"} 信封）</h2>
+ * <h2>响应形态（裸对象，无 {"data","success"} 信封）</h2>
  * <ul>
- *   <li>Ensure：裸 {@code MessageSuggestionSet}，集合进入 generating 态时是 <b>202</b>；</li>
- *   <li>Get：同上恒 200；</li>
- *   <li>RecordEvent：<b>200</b> + {@code ApiResponse} 外壳（无业务数据）。</li>
+ * <li>Ensure：裸 {@code MessageSuggestionSet}，集合进入 generating 态时是 <b>202</b>；</li>
+ * <li>Get：同上恒 200；</li>
+ * <li>RecordEvent：<b>200</b> + {@code ApiResponse} 外壳（无业务数据）。</li>
  * </ul>
  *
  * <p>用例本体（绑定、消毒、错误映射）在 {@link MessageSuggestionFacade} 的

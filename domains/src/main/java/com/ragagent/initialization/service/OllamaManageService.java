@@ -133,7 +133,7 @@ public final class OllamaManageService {
         }
         var existing = downloadTasks.findActiveByModel(modelName);
         if (existing != null) {
-            // 幂等：已有进行中的任务 → 裸任务对象原样返回（§2.1）
+            // 幂等：已有进行中的任务 → 裸任务对象原样返回
             ObjectNode data = MAPPER.createObjectNode();
             data.put("modelName", existing.modelName);
             data.putRawValue("progress", new com.fasterxml.jackson.databind.util.RawValue(Double.toString(existing.progress)));

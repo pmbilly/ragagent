@@ -16,39 +16,39 @@ import java.time.OffsetDateTime;
  * 逐字节期望见 {@code MemoryEntityJsonTest}。</p>
  *
  * <pre>
- *   MemoryItem{} →
- *   {"id":"","tenantId":0,"subjectId":"","kind":"","content":"","topic":"",
- *    "normalizedKey":"","importance":0,"origin":"","status":"","sourceSessionId":"",
- *    "sourceMessageId":"","validFrom":"0001-01-01T00:00:00Z","invalidAt":null,
- *    "expiresAt":null,"replacesId":"","supersededBy":"","lastUsedAt":null,"useCount":0,
- *    "createdAt":"0001-01-01T00:00:00Z","updatedAt":"0001-01-01T00:00:00Z"}
+ * MemoryItem{} →
+ * {"id":"","tenantId":0,"subjectId":"","kind":"","content":"","topic":"",
+ * "normalizedKey":"","importance":0,"origin":"","status":"","sourceSessionId":"",
+ * "sourceMessageId":"","validFrom":"0001-01-01T00:00:00Z","invalidAt":null,
+ * "expiresAt":null,"replacesId":"","supersededBy":"","lastUsedAt":null,"useCount":0,
+ * "createdAt":"0001-01-01T00:00:00Z","updatedAt":"0001-01-01T00:00:00Z"}
  * </pre>
  * <p>两个要点：{@code replacesId} 与 {@code supersededBy} **都恒输出**（未取代时是空串）——
- * 按契约 §1.6「禁止条件键」不做条件省略；{@code inferred} 一个键都不出。</p>
+ * 按契约 「禁止条件键」不做条件省略；{@code inferred} 一个键都不出。</p>
  *
- * <h2>落库隐式行为清单（约定 §3）</h2>
+ * <h2>落库隐式行为清单（约定）</h2>
  * <ol>
- *   <li><b>自动时间戳</b>：{@code created_at}/{@code updated_at} 按字段名约定，
- *       INSERT 时显式写入。{@code valid_from} **不是**自动时间戳（名字不匹配约定），
- *       它的 {@code DEFAULT CURRENT_TIMESTAMP} 只是 DDL 兜底——落库时每次都显式写它；
- *       {@code CreateItem} 还会在
- *       它为零值时补 {@code now}。Java 侧保持这两条。</li>
- *   <li><b>钩子</b>：无。id 由 {@code CreateItem} 在为空的生成。</li>
- *   <li><b>关联预加载</b>：无。</li>
- *   <li><b>软删除</b>：无——"忘记"就是**物理删**（{@code DeleteItem}）。</li>
- *   <li><b>默认排序</b>：仓库层显式写，共四种：
- *       {@code importance DESC, valid_from DESC}（活跃/常驻/存活列表）、
- *       {@code valid_from DESC, id DESC}（管理器分页，id 破平局是为了翻页确定）、
- *       {@code valid_from DESC}（按 key 查找、缺向量扫描）、
- *       {@code importance DESC, COALESCE(last_used_at, valid_from) DESC, valid_from DESC}
- *       （容量归档）。**没有**任何隐式排序。</li>
- *   <li><b>唯一索引/外键</b>：无唯一索引；{@code idx_memory_items_scope} /
- *       {@code idx_memory_items_key} / {@code idx_memory_replaces} 是普通索引。
- *       与 {@code memory_item_embeddings} 之间**没有**外键（删条目要手动删向量）。</li>
- *   <li><b>DEFAULT 列</b>：{@code topic} / {@code normalized_key} / {@code importance} /
- *       {@code origin} / {@code status} / {@code replaces_id} / {@code use_count}
- *       都带**字面量** {@code default:} tag → 落库时仍显式写入（列进 INSERT 列表）。
- *       Java 侧因此一律显式赋值，字段默认值对齐零值语义。</li>
+ * <li><b>自动时间戳</b>：{@code created_at}/{@code updated_at} 按字段名约定，
+ * INSERT 时显式写入。{@code valid_from} **不是**自动时间戳（名字不匹配约定），
+ * 它的 {@code DEFAULT CURRENT_TIMESTAMP} 只是 DDL 兜底——落库时每次都显式写它；
+ * {@code CreateItem} 还会在
+ * 它为零值时补 {@code now}。Java 侧保持这两条。</li>
+ * <li><b>钩子</b>：无。id 由 {@code CreateItem} 在为空的生成。</li>
+ * <li><b>关联预加载</b>：无。</li>
+ * <li><b>软删除</b>：无——"忘记"就是**物理删**（{@code DeleteItem}）。</li>
+ * <li><b>默认排序</b>：仓库层显式写，共四种：
+ * {@code importance DESC, valid_from DESC}（活跃/常驻/存活列表）、
+ * {@code valid_from DESC, id DESC}（管理器分页，id 破平局是为了翻页确定）、
+ * {@code valid_from DESC}（按 key 查找、缺向量扫描）、
+ * {@code importance DESC, COALESCE(last_used_at, valid_from) DESC, valid_from DESC}
+ * （容量归档）。**没有**任何隐式排序。</li>
+ * <li><b>唯一索引/外键</b>：无唯一索引；{@code idx_memory_items_scope} /
+ * {@code idx_memory_items_key} / {@code idx_memory_replaces} 是普通索引。
+ * 与 {@code memory_item_embeddings} 之间**没有**外键（删条目要手动删向量）。</li>
+ * <li><b>DEFAULT 列</b>：{@code topic} / {@code normalized_key} / {@code importance} /
+ * {@code origin} / {@code status} / {@code replaces_id} / {@code use_count}
+ * 都带**字面量** {@code default:} tag → 落库时仍显式写入（列进 INSERT 列表）。
+ * Java 侧因此一律显式赋值，字段默认值对齐零值语义。</li>
  * </ol>
  *
  * <h2>⚠️ {@code replacesId} 的"响应"与"落库"是两件事</h2>

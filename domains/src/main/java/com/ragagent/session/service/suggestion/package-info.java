@@ -1,5 +1,5 @@
 /**
- * 消息建议面（由 {@code session.service} 切出，对齐方案 §8.8.1 的 {@code service.suggestion/}）：
+ * 消息建议面（由 {@code session.service} 切出，对齐方案 的 {@code service.suggestion/}）：
  * {@code MessageSuggestionService}（建议生成的编排与落库）与
  * {@code MessageSuggestionPipeline}（候选收集、证据与排序管线）。
  *

@@ -37,11 +37,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * chunk 向量行的重建执行体（2026-09-22 走查批：把「路由在、执行体占位」的两处
+ * chunk 向量行的重建执行体（走查批：把「路由在、执行体占位」的两处
  * 索引缺口收敛到同一实现）：
  * <ul>
- *       （knowledge_process）：多 chunk 版（摘要 chunk 维护 / 问题重生成）；</li>
- *       （chunk）：单 chunk 版（chunk 编辑链路；disabled 块删旧不重建）。</li>
+ * （knowledge_process）：多 chunk 版（摘要 chunk 维护 / 问题重生成）；</li>
+ * （chunk）：单 chunk 版（chunk 编辑链路；disabled 块删旧不重建）。</li>
  * </ul>
  * <p><b>source_id 契约</b>：chunk 行 = chunkID（无前缀）；生成问题行 =
  * {@code generatedQuestionSourceId}（chunkID-qID；超 64 字节折叠
@@ -99,10 +99,10 @@ public class ChunkVectorIndexer {
     }
 
     /**
-     * 索引前校验（K7）：KB 可解析 + 模型非空且存在——**写库前**调用，失败在事务内抛
-     * （1007 "model ID cannot be empty" / 404 "Model not found" 文案与既有契约样例一致），
-     * 借此把真正的外部索引（删旧行 + batchIndex）安全后移到事务提交之后。
-     */
+ * 索引前校验：KB 可解析 + 模型非空且存在——**写库前**调用，失败在事务内抛
+ * （1007 "model ID cannot be empty" / 404 "Model not found" 文案与既有契约样例一致），
+ * 借此把真正的外部索引（删旧行 + batchIndex）安全后移到事务提交之后。
+ */
     public void assertIndexable(String kbId) {
         KnowledgeBase kb = findKbRow(kbId);
         if (kb == null) {
@@ -317,10 +317,10 @@ public class ChunkVectorIndexer {
     }
 
     /**
-     * <b>repo 层</b>判定——索引策略为 null 时返回 Default（NULL 列 → vector+keyword 开）；
-     * 显式全 false / 空 JSON 保持全 false（IsZero 不翻）。{@link #syncChunkIndex} 走这里
-     * （2026-09-22 走查批实证：套钩子会让全 false 策略的 KB 误走进真实出站，13 测试红）。
-     */
+ * <b>repo 层</b>判定——索引策略为 null 时返回 Default（NULL 列 → vector+keyword 开）；
+ * 显式全 false / 空 JSON 保持全 false（IsZero 不翻）。{@link #syncChunkIndex} 走这里
+ * （走查批实证：套钩子会让全 false 策略的 KB 误走进真实出站，13 测试红）。
+ */
     private static boolean needsEmbeddingRepoLayer(KnowledgeBase kb) {
         KnowledgeBaseIndexingStrategy strategy = kb.getIndexingStrategy();
         if (strategy == null) {

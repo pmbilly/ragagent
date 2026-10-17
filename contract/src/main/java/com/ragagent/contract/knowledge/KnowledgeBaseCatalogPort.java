@@ -7,7 +7,7 @@ import java.util.List;
  *
  * <p>实现留在 {@code knowledge} 侧（{@code api/KnowledgeBaseCatalogAdapter}）——它委托
  * {@code KnowledgeBaseService.listKnowledgeBases(creator)}（含 {@code ensureDefaults} 的能力默认值回填；
- * <b>2026-09-25 线上抓回</b>：缺这一步会让 {@code capabilities} 全假 ⇒ 建议问题范围为空数组），
+ * <b>线上抓回</b>：缺这一步会让 {@code capabilities} 全假 ⇒ 建议问题范围为空数组），
  * 再投影成本端口的记录。</p>
  *
  * <p><b>为什么要有它</b>：{@code agentmanagement} 属**适配面**，按 规则只允许依赖

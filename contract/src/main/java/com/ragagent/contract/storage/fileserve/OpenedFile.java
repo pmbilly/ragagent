@@ -9,12 +9,12 @@ import java.nio.file.Path;
 /**
  * 已打开的存储对象，三形态：
  * <ul>
- *   <li>{@code seekable}：本地盘路径，可 seek → 随机读（Range）支路；</li>
- *   <li>{@code stream}：只能顺序读的流（云对象）→ 流式支路，**不缓冲整个对象**；</li>
- *   <li>{@code bytes}：已在内存的字节 → 流式支路。</li>
+ * <li>{@code seekable}：本地盘路径，可 seek → 随机读（Range）支路；</li>
+ * <li>{@code stream}：只能顺序读的流（云对象）→ 流式支路，**不缓冲整个对象**；</li>
+ * <li>{@code bytes}：已在内存的字节 → 流式支路。</li>
  * </ul>
  *
- * <p>自 P5a 起上提契约（原 {@code platform.storage.fileserve.FileTransport} 的嵌套 record）；
+ * <p>自 起上提契约（原 {@code platform.storage.fileserve.FileTransport} 的嵌套 record）；
  * {@code FileTransport} 保留 HTTP 流式写出面并引用本类。</p>
  */
 public record OpenedFile(SeekableSource seekable, byte[] bytes, InputStream stream, long size) {

@@ -17,23 +17,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
- * HTTP Streamable 传输（MCP 2025-03-26 起的默认传输；对照 mcp-go
+ * HTTP Streamable 传输（MCP 起的默认传输；对照 mcp-go
  * {@code client/transport.StreamableHTTP}）。
  *
  * <p>线上行为逐条对照 mcp-go：</p>
  * <ul>
- *   <li>单端点 POST；{@code Content-Type: application/json}，
- *       {@code Accept: application/json, text/event-stream}；</li>
- *   <li>initialize 响应里的 {@code Mcp-Session-Id} 头被记下，<b>后续每个请求都要回传</b>
- *       （:571-578 / :630-634）；</li>
- *   <li>initialize 协商出的 protocolVersion 经 {@code Mcp-Protocol-Version} 头回传（:636-641）；</li>
- *   <li>只接受 200 / 202；202 = 通知已被受理，返回 null；</li>
- *   <li>401 → 解析 {@code WWW-Authenticate} 的 RFC 9728 {@code resource_metadata}，
- *       抛 {@link McpAuthorizationRequiredException}；</li>
- *   <li>404 且方法是 initialize → 服务端很可能只支持传统 SSE（legacy SSE server 信号）；</li>
- *   <li>响应 Content-Type 为 {@code text/event-stream} 时，从流里挑出<b>与本次请求 id 匹配</b>
- *       的那条 JSON-RPC 响应（其余是通知/其他请求，忽略）；</li>
- *   <li>close 时若持有 session，先发 DELETE 通知服务端会话结束（:211-230，5s 超时）。</li>
+ * <li>单端点 POST；{@code Content-Type: application/json}，
+ * {@code Accept: application/json, text/event-stream}；</li>
+ * <li>initialize 响应里的 {@code Mcp-Session-Id} 头被记下，<b>后续每个请求都要回传</b>
+ * （571-578 / :630-634）；</li>
+ * <li>initialize 协商出的 protocolVersion 经 {@code Mcp-Protocol-Version} 头回传（636-641）；</li>
+ * <li>只接受 200 / 202；202 = 通知已被受理，返回 null；</li>
+ * <li>401 → 解析 {@code WWW-Authenticate} 的 RFC 9728 {@code resource_metadata}，
+ * 抛 {@link McpAuthorizationRequiredException}；</li>
+ * <li>404 且方法是 initialize → 服务端很可能只支持传统 SSE（legacy SSE server 信号）；</li>
+ * <li>响应 Content-Type 为 {@code text/event-stream} 时，从流里挑出<b>与本次请求 id 匹配</b>
+ * 的那条 JSON-RPC 响应（其余是通知/其他请求，忽略）；</li>
+ * <li>close 时若持有 session，先发 DELETE 通知服务端会话结束（211-230，5s 超时）。</li>
  * </ul>
  */
 public final class StreamableHttpTransport implements McpTransport {

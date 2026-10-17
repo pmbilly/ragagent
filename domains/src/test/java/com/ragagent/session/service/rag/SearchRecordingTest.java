@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * 录制回放：查询扩展 / 去重 / 部分重叠 / filter_top_k / search / search_by_targets /
- * search_parallel（期望值 = {@link GoRecording46C} 录制常量）。
+ * search_parallel（期望值 = {@link ChatPipelineGolden} 录制常量）。
  *
  * <p>分词：jieba 是既有降级 seam；expansion 组语料按录制注入固定分词器
  * （输入段 → jieba 真值 token 表），其余包组不受影响。</p>

@@ -13,22 +13,22 @@ import java.util.regex.Pattern;
 /**
  * 记忆文本的清洗、脱敏、指纹与显式指令识别。
  *
- * <h2>三处刻意的口径（§9 记过的差异）</h2>
+ * <h2>三处刻意的口径（记过的差异）</h2>
  * <ol>
- *   <li><b>码点计数</b>：{@code MemoryContentMaxRunes} 是**码点**数，
- *       不是 {@code String.length()}（UTF-16 码元）。中文里后者会数对，
- *       但 emoji/增补平面就会算成两倍，所以统一走 {@link MemoryKeys#runeLength}。</li>
- *   <li><b>空白定义</b>：按 Unicode 的 White_Space 属性，等价于 Java 的
- *       {@code Character.isSpaceChar(c) || c ∈ {09,0A,0B,0C,0D,85}}。
- *       <b>不能</b>用 {@code Character.isWhitespace}：它把不换行空格
- *       （U+00A0/U+2007/U+202F）排除在外，语义不同。</li>
- *   <li><b>小写化与 locale 无关</b>：一律 {@code Locale.ROOT}。</li>
+ * <li><b>码点计数</b>：{@code MemoryContentMaxRunes} 是**码点**数，
+ * 不是 {@code String.length()}（UTF-16 码元）。中文里后者会数对，
+ * 但 emoji/增补平面就会算成两倍，所以统一走 {@link MemoryKeys#runeLength}。</li>
+ * <li><b>空白定义</b>：按 Unicode 的 White_Space 属性，等价于 Java 的
+ * {@code Character.isSpaceChar(c) || c ∈ {09,0A,0B,0C,0D,85}}。
+ * <b>不能</b>用 {@code Character.isWhitespace}：它把不换行空格
+ * （U+00A0/U+2007/U+202F）排除在外，语义不同。</li>
+ * <li><b>小写化与 locale 无关</b>：一律 {@code Locale.ROOT}。</li>
  * </ol>
  *
  * <h2>⚠️ 正则的注意点</h2>
  * <p>{@code \b} 当 ASCII 词边界（Java 默认 {@code \w} 是 {@code [A-Za-z0-9_]}），
  * 所以 {@code \b密码} **匹配不上**——CJK 那条规则刻意不写 {@code \b}，别顺手补。</p>
- * <p>{@code \s} 有一处已知差异（约定 §9）：Java 的 {@code \s} 含 {@code \x0B}（垂直制表符）。
+ * <p>{@code \s} 有一处已知差异（约定）：Java 的 {@code \s} 含 {@code \x0B}（垂直制表符）。
  * 出现概率可忽略，故保留差异、不改成显式字符类。</p>
  */
 public final class MemoryText {

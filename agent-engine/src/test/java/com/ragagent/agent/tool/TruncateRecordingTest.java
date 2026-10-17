@@ -3,8 +3,8 @@ package com.ragagent.agent.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.fixtures.GoRecording45A;
 import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.ToolContractGoldenA;
 import com.ragagent.contract.tool.ToolOutput;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +34,7 @@ class TruncateRecordingTest {
     };
 
     @Test
-    void boundariesMatchGoRecording() {
+    void boundariesMatchAgentPromptGolden() {
         for (String name : CASES) {
             JsonNode r = RecordingSupport.rec(field(name));
             String input = RecordingSupport.buildTruncInput(r);
@@ -62,7 +62,7 @@ class TruncateRecordingTest {
 
     private static String field(String name) {
         try {
-            return (String) GoRecording45A.class.getField(name).get(null);
+            return (String) ToolContractGoldenA.class.getField(name).get(null);
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }

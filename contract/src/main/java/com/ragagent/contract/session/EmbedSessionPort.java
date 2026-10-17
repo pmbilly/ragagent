@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * embed 渠道的**会话对外操作面**（契约面）：embed 委托层不再直接持有会话域控制器。
  *
- * <p><b>签名已中性化（P4f）</b>：两条 QA 通道经 {@link SseSink} 写帧（servlet 包装归边界）；
+ * <p><b>签名已中性化</b>：两条 QA 通道经 {@link SseSink} 写帧（servlet 包装归边界）；
  * 结果面用 {@link EmbedReply}（状态码 + 载荷——状态码是对外线格式的一部分，如 202 = 生成中）。
  * 失败语义与端点一致：参数/权限/可见性错误 ⇒ 各自既有的 {@code BizException} 信封原样上抛
  * （含 stop 端点的 400/401/403/404 纯字符串信封）。</p>

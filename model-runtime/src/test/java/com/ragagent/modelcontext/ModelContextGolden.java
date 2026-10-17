@@ -10,11 +10,11 @@ import com.ragagent.platform.fixtures.GoldenResources;
  * 常量名保持原 API（常量值由 {@link GoldenResources} 按 SHA-256 校验后加载），
  * 重生成需重跑 Go 录制程序。</p>
  */
-public final class GoRecording46A {
+public final class ModelContextGolden {
 
     private static final String BUNDLE = "modelcontext-46a";
 
-    private GoRecording46A() {
+    private ModelContextGolden() {
     }
 
     /** 解析一条录制记录。 */

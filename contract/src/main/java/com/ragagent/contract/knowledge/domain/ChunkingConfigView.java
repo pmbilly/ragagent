@@ -17,10 +17,10 @@ public record ChunkingConfigView(
         List<String> languages,
         String tableMetadataInstructions,
         /**
-         * 主摄取（worker）**未消费**的键（K8 能力矩阵；空 list = 全部生效）——"接受但未生效"的
-         * 显式告知，不再让用户以为配置已生效。语义与来源见
-         * {@code KnowledgeBaseChunkingConfig#ingestionInactiveKeys()}（knowledge 域形状）。
-         */
+ * 主摄取（worker）**未消费**的键（能力矩阵；空 list = 全部生效）——"接受但未生效"的
+ * 显式告知，不再让用户以为配置已生效。语义与来源见
+ * {@code KnowledgeBaseChunkingConfig#ingestionInactiveKeys()}（knowledge 域形状）。
+ */
         List<String> inactiveFeatures) {
 
     /** 按扩展名指定解析引擎的规则（如 xlsx 用哪个引擎、首行是否表头）。 */

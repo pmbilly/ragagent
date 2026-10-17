@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * wiki 问题行**视图**（契约面载荷）：{@code WikiPageOpsPort} 的问题面（列 / 登记 / 改状态）口径。
  *
- * <p><b>为什么有它</b>：实体 {@code WikiPageIssue} 已归位 `wiki/domain`（HANDOFF §12.0 判据 1）；
+ * <p><b>为什么有它</b>：实体 {@code WikiPageIssue} 已归位 `wiki/domain`（HANDOFF 判据 1）；
  * 跨域方（会话域的 wiki 工具后端）只应经本视图读写。</p>
  *
  * <p><b>落点</b>：字段全是 JDK 类型（无 Jackson 注解需求——本视图不直接出面给客户端，

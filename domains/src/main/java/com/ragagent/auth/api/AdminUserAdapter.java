@@ -24,16 +24,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * 系统管理员 P0 用户管理（注册 / 建管理员 / 重置密码 / 列管理员 / 撤管理员）。
+ * 系统管理员 用户管理（注册 / 建管理员 / 重置密码 / 列管理员 / 撤管理员）。
  *
  * <p>异常语义逐分支固定（错误消息是契约）：</p>
  * <ul>
- *   <li>promote：user_id/email 双空 → 400 "Either user_id or email is required"；
- *       查无 → 404 "User not found"；已是管理员 → 幂等 200（审计 idempotent=true）。</li>
- *   <li>revoke：自撤 → 400 "Cannot revoke your own system admin privileges"；
- *       最后一名 → 400 "Cannot revoke the last remaining system administrator"；
- *       查无 → 404；非管理员 → 幂等 200（changed=false）。</li>
- *   <li>create：身份重复且完全一致 → 200 幂等返回既有行；仅部分冲突 → 409。</li>
+ * <li>promote：user_id/email 双空 → 400 "Either user_id or email is required"；
+ * 查无 → 404 "User not found"；已是管理员 → 幂等 200（审计 idempotent=true）。</li>
+ * <li>revoke：自撤 → 400 "Cannot revoke your own system admin privileges"；
+ * 最后一名 → 400 "Cannot revoke the last remaining system administrator"；
+ * 查无 → 404；非管理员 → 幂等 200（changed=false）。</li>
+ * <li>create：身份重复且完全一致 → 200 幂等返回既有行；仅部分冲突 → 409。</li>
  * </ul>
  *
  * <p><b>已知差异（Lite）</b>：撤管理员无 SELECT ... FOR UPDATE 事务，

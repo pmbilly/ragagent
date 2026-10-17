@@ -100,7 +100,7 @@ public final class PipelineLog {
         return sb.append('"').toString();
     }
 
-    /** \n\r\t → 空格、其余 C0 控制符移除。 */
+    /** \n\r\t → 空格、其余 控制符移除。 */
     private static String sanitizeForLog(String input) {
         if (input == null || input.isEmpty()) {
             return "";

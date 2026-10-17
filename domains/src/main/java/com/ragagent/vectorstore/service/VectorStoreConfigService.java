@@ -39,7 +39,7 @@ public class VectorStoreConfigService {
     private final VectorStoreRepository repo;
     private final SsrfGuard ssrfGuard;
 
-    /** 连通性探测面（R3d：探测体在 retrieval-engine，本类只做校验 + 委托 + 包装）。 */
+    /** 连通性探测面（探测体在 retrieval-engine，本类只做校验 + 委托 + 包装）。 */
     private final VectorStoreConnectivity connectivity;
     private final JdbcTemplate jdbc;
     private final TransactionTemplate tx;
@@ -189,12 +189,12 @@ public class VectorStoreConfigService {
     }
 
     /**
-     * 连通性测试：成功返回探测版本（可空），失败抛 AppError（各分支 code 1000，
-     * handler 以**双前缀**形态输出——golden vs-test-byid-connrefused 钉住）。
-     *
-     * <p>R3d：探测体（9 个分支 + 各厂商驱动探针）已整块沉到 {@code retrieval-engine}，
-     * 经 {@link VectorStoreConnectivity} 端口调用；本方法保留为对外同名入口（行为与文案不变）。</p>
-     */
+ * 连通性测试：成功返回探测版本（可空），失败抛 AppError（各分支 code 1000，
+ * handler 以**双前缀**形态输出——golden vs-test-byid-connrefused 钉住）。
+ *
+ * <p>：探测体（9 个分支 + 各厂商驱动探针）已整块沉到 {@code retrieval-engine}，
+ * 经 {@link VectorStoreConnectivity} 端口调用；本方法保留为对外同名入口（行为与文案不变）。</p>
+ */
     public String testConnection(String engineType, ConnectionConfig config) {
         return connectivity.probe(engineType, config);
     }

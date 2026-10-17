@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.fixtures.ContractJson;
-import com.ragagent.agent.fixtures.GoRecording45A;
 import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.ToolContractGoldenA;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.tool.AgentTool;
@@ -120,7 +120,7 @@ class ToolRegistryRecordingTest {
     }
 
     @Test
-    void registrationAndDiscoveryMatchGoRecording() {
+    void registrationAndDiscoveryMatchAgentPromptGolden() {
         ToolRegistry reg = buildRegistry();
 
         JsonNode listTools = RecordingSupport.rec(field("R_REGISTRY_LIST_TOOLS"));
@@ -141,7 +141,7 @@ class ToolRegistryRecordingTest {
     }
 
     @Test
-    void executePipelineMatchesGoRecording() {
+    void executePipelineMatchesAgentPromptGolden() {
         ToolRegistry reg = buildRegistry();
 
         assertResult(reg, "denied", "R_REGISTRY_DENIED");
@@ -158,7 +158,7 @@ class ToolRegistryRecordingTest {
     }
 
     @Test
-    void validationPathMatchesGoRecording() {
+    void validationPathMatchesAgentPromptGolden() {
         ToolRegistry reg = new ToolRegistry();
         String typedSchema = "{\"type\":\"object\",\"properties\":{\"query\":{\"type\":\"string\",\"minLength\":1},"
                 + "\"limit\":{\"type\":\"integer\",\"minimum\":1}},\"required\":[\"query\"]}";
@@ -170,7 +170,7 @@ class ToolRegistryRecordingTest {
     }
 
     @Test
-    void hintAppendingMatchesGoRecording() {
+    void hintAppendingMatchesAgentPromptGolden() {
         ToolRegistry reg = new ToolRegistry();
         reg.registerTool(new MockTool(ToolDefinitions.TOOL_CALL_MCP_TOOL, "d",
                 "{\"type\":\"object\",\"properties\":{\"arguments\":{\"type\":\"object\"}},\"required\":[\"arguments\"]}"));
@@ -204,7 +204,7 @@ class ToolRegistryRecordingTest {
 
     private static String field(String name) {
         try {
-            return (String) GoRecording45A.class.getField(name).get(null);
+            return (String) ToolContractGoldenA.class.getField(name).get(null);
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }

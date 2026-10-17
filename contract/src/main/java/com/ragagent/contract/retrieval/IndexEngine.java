@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * 索引写面端口：一个**已绑定到某个 store** 的检索引擎句柄（业务域 → 检索引擎）。
  *
- * <p>R3b 契约化：业务域（知识索引/迁移/克隆/FAQ/worker 删除链）原先直注
+ * <p> 契约化：业务域（知识索引/迁移/克隆/FAQ/worker 删除链）原先直注
  * {@code retrieval-engine} 的 {@code CompositeRetrieveEngine} 实现类，且组装件是内部形状
  * {@code EngineTypes.IndexInfo}；本端口只收"域侧真调用"的方法，载体换成领域级
  * {@link IndexDocument}。句柄由 {@link IndexEngineResolver} 按租户 + store 解析

@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 
 /**
  * 文档解析的**行级读写**（由 {@code service.KnowledgeParseService} 抽出；对应方案
- * §8.8.2 的 {@code repository/DocumentParser}）。
+ * 的 {@code repository/DocumentParser}）。
  *
  * <p>解析触发/取消要读写 knowledge 行（未软删、租户内），原先这些 MyBatis 语句直接写在
- * service 里（A17"service 不得依赖具体技术"的登记债）。抽到本层后：service 侧只保留编排与
+ * service 里（"service 不得依赖具体技术"的登记债）。抽到本层后：service 侧只保留编排与
  * 状态机判定，**方向恒为 repository ← service**（本类不依赖任何 service）。</p>
  */
 @Component

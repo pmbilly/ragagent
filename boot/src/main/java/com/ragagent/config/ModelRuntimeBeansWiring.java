@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 模型运行时的两个进程级 bean（R2c-3d 组合根收拢）。
+ * 模型运行时的两个进程级 bean（组合根收拢）。
  *
  * <p>原先这两个 {@code @Bean} 挂在业务域（{@code initialization.service.InitializationWiring}）
  * ——那是"跨模块组装权落在业务域"的典型；按计划"跨模块协作经 contract、由 boot 注入"归组合根。</p>

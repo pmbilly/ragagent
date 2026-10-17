@@ -6,8 +6,8 @@ import java.util.List;
  * 用户**管理面**端口（L1）：系统管理员侧的用户读 / 建 / 晋升 / 撤权 / 重置密码 / 密码策略。
  *
  * <p><b>为什么是端口</b>：该逻辑的载体是 auth 域的 {@code UserMapper} / {@code TenantService} /
- * {@code TenantMemberService}（§9.1 状态唯一写入者）；system 域的控制器只应经本端口，
- * 不再直引 auth 内部件（HANDOFF §12.6.4 C-13a 清偿 {@code system→auth} 边）。</p>
+ * {@code TenantMemberService}（状态唯一写入者）；system 域的控制器只应经本端口，
+ * 不再直引 auth 内部件（HANDOFF C-13a 清偿 {@code system→auth} 边）。</p>
  *
  * <p><b>边界</b>：**设置读取不在本端口**（{@code complexPasswordEnabled}/{@code resolveDefaultTenantMode}
  * 属 system 侧壳）——本端口只收 {@code complexEnabled} 结果参数，避免与设置面成环。</p>

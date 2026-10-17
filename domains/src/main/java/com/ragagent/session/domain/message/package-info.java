@@ -1,5 +1,5 @@
 /**
- * 消息实体面（由 {@code session.domain} 切出，对齐方案 §8.8.1）：{@code Message} 与其
+ * 消息实体面（由 {@code session.domain} 切出，对齐方案）：{@code Message} 与其
  * 附件/图片/工件/搜索/建议集（{@code MessageArtifact} / {@code MessageSuggestionSet} …）+
  * artifact 版本化（{@code ArtifactVersions}）。
  *

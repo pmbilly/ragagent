@@ -44,12 +44,12 @@ public class SsrfGuard {
             "2379", "2380", "8500", "4001");
 
     /**
-     * 允许的 scheme。含 WebSocket 的两种形态：{@code wss}/{@code ws} 的风险与
-     * {@code https}/{@code http} 等价（分别为加密/明文），且 **IM 长连接只能走 wss**
-     * —— 此前只放行 http/https，导致飞书等平台的长连接 100% 建立失败
-     * （2026-10-11 实测：{@code SsrfException: invalid scheme: wss}，表现为
-     * "渠道配好了但发消息没回复"）。白名单仍只放宽主机/IP，不放松 scheme。
-     */
+ * 允许的 scheme。含 WebSocket 的两种形态：{@code wss}/{@code ws} 的风险与
+ * {@code https}/{@code http} 等价（分别为加密/明文），且 **IM 长连接只能走 wss**
+ * —— 此前只放行 http/https，导致飞书等平台的长连接 100% 建立失败
+ * （实测：{@code SsrfException: invalid scheme: wss}，表现为
+ * "渠道配好了但发消息没回复"）。白名单仍只放宽主机/IP，不放松 scheme。
+ */
     private static final Set<String> ALLOWED_SCHEMES = Set.of("http", "https", "ws", "wss");
 
     private static final List<Pattern> IP_LIKE_PATTERNS = List.of(
@@ -100,13 +100,13 @@ public class SsrfGuard {
     }
 
     /**
-     * 快照当前进程级白名单（测试用）：{@code reloadWhitelist} 改的是 static 字段，
-     * 测试里「new 一个新实例替换进 transport」并不还原它——同 JVM 的后续测试
-     * （storage 契约测试等）会看到上一个测试留下的白名单（known-issues W5a
-     * 「SsrfGuard 互踩」家族的根因）。测试模板：@BeforeEach 里
-     * {@code snapshot = SsrfGuard.snapshotWhitelist();}，@AfterEach 里
-     * {@code SsrfGuard.restoreWhitelist(snapshot);}。
-     */
+ * 快照当前进程级白名单（测试用）：{@code reloadWhitelist} 改的是 static 字段，
+ * 测试里「new 一个新实例替换进 transport」并不还原它——同 JVM 的后续测试
+ * （storage 契约测试等）会看到上一个测试留下的白名单（known-issues
+ * 「SsrfGuard 互踩」家族的根因）。测试模板：@BeforeEach 里
+ * {@code snapshot = SsrfGuard.snapshotWhitelist();}，@AfterEach 里
+ * {@code SsrfGuard.restoreWhitelist(snapshot);}。
+ */
     public static Whitelist snapshotWhitelist() {
         return whitelist;
     }

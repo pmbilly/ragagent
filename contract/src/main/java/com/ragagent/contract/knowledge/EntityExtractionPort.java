@@ -6,7 +6,7 @@ import com.ragagent.contract.model.LlmChatClient;
 /**
  * 实体关系抽取端口（业务域 → 模型运行时）。
  *
- * <p><b>R2c-3d 契约化</b>：知识抽取（chunk 后处理）、初始化域的抽取自测、会话管线的
+ * <p><b>契约化</b>：知识抽取（chunk 后处理）、初始化域的抽取自测、会话管线的
  * extract-entity 插件三处原先都直接 {@code new EntityExtraction.Extractor(...)} 并读其内部
  * 图形状。</p>
  *

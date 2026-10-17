@@ -118,9 +118,9 @@ public final class McpAuthHeaders {
     }
 
     /**
-     * 一条头值里可能有多个 challenge，每个都可能带 {@code resource_metadata}；
-     * 参数名按 RFC 9110 §11.2 大小写不敏感，值支持 quoted-string 与 token 两种形态。
-     */
+ * 一条头值里可能有多个 challenge，每个都可能带 {@code resource_metadata}；
+ * 参数名按 RFC 9110 大小写不敏感，值支持 quoted-string 与 token 两种形态。
+ */
     private static java.util.List<String> extractResourceMetadataUrls(String header) {
         java.util.List<String> out = new java.util.ArrayList<>();
         if (header == null || header.isEmpty()) {

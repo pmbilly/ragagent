@@ -15,17 +15,17 @@ import java.util.Map;
  * <h2>这是会落 jsonb 的线格式</h2>
  * <p>它写进 {@code data_sources.last_sync_cursor} 这一列：</p>
  * <pre>
- *   wiki   : {"lastSyncTime":"2026-09-18T10:00:00+08:00",
- *             "spaceNodeTimes":{"space1":{"nt1":"100"}}}
- *   drive  : {"lastSyncTime":"2026-09-18T10:00:00+08:00",
- *             "fileTimes":{"folder1":{"fdoc1":"100"}}}
+ * wiki : {"lastSyncTime":"T10:00:00+08:00",
+ * "spaceNodeTimes":{"space1":{"nt1":"100"}}}
+ * drive : {"lastSyncTime":"T10:00:00+08:00",
+ * "fileTimes":{"folder1":{"fdoc1":"100"}}}
  * </pre>
  * <p>{@code spaceNodeTimes} / {@code fileTimes} 为空省略：
  * <b>空/缺席时该键整个消失</b>；非空时才是嵌套对象。{@code lastSyncTime}
  * 恒输出（零值写成 year-1 字面量）。</p>
  *
  * <p><b>存量行为</b>：键名改名后，库里按旧键名存的游标读不出来 ⇒
- * 那次同步退化成<b>一次全量重扫</b>，不报错。这是 §15.3「落库 jsonb 存量键 ⬜ 可改造
+ * 那次同步退化成<b>一次全量重扫</b>，不报错。这是 「落库 jsonb 存量键 ⬜ 可改造
  * （开发库可清，不写迁移脚本）」接受的代价——原先"必须与既有数据逐字节兼容"的说法
  * 属已作废的"兼容历史数据"类，不再作为约束。</p>
  *

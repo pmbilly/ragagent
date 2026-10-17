@@ -5,7 +5,7 @@
  * 若干子服务共用；登记：搬入 {@code service.management} 会与"门面 → 摘要服务"
  * 组成 {@code enrichment ⇄ management} 环，故暂留本层）；</li>
  * <li><b>支撑</b>：{@code HousekeepingService}（定时清理）+ {@code EmbeddingModelAdapter}
- * （嵌入模型适配）——§8.8.2 目标树**本就留在本层**；{@code DuplicateKnowledgeException}
+ * （嵌入模型适配）—— 目标树**本就留在本层**；{@code DuplicateKnowledgeException}
  * 为本层业务异常（实测：放 {@code domain} 会新造环）。</li>
  * </ul>
  *

@@ -47,7 +47,7 @@ final class NotionFetchOps {
 
         // 数据库记录的内容在 properties 里而不是块里——交给 buildRecordItem，
         // 免得被当成"空页面"丢掉。记录父节点的 type 既可能是 database_id
-        // （老的 GetPage 响应）也可能是 data_source_id（Search 与 2025-09-03+）。
+        // （老的 GetPage 响应）也可能是 data_source_id（Search 与 +）。
         NotionParent parent = page.parent();
         if (NotionConstants.PARENT_TYPE_DATABASE_ID.equals(parent.type())
                 || NotionConstants.PARENT_TYPE_DATA_SOURCE_ID.equals(parent.type())) {

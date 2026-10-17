@@ -27,35 +27,35 @@ import org.slf4j.LoggerFactory;
  * {@code BM25Encoder}（v1.8.4）：
  *
  * <ul>
- *   <li><b>分词</b>：SDK 内置 jieba 系分词的 HMM 切分 + 停用词表——注意
- *       <b>{@code LoadDict("")} 实际什么都没加载</b>（非空 varargs 走错分支，词典恒为空 ⇒ 纯 HMM），
- *       实测结论见 {@link JiebaTokenizer} 类注释；本仓同款实现；</li>
- *   <li><b>哈希</b>：token → <b>murmur3 32 位</b>（x86_32 种子 0）
- *       → 无符号 int64 的十进制串；</li>
- *   <li><b>文档权重</b>：{@code tf/(K1*(1-B+B*(len/avgDocLen))+tf)}（B=0.75/K1=1.2）；</li>
- *   <li><b>查询权重</b>：{@code idf=ln((docCount+1)/(df+0.5))} 再按 Σidf 归一化；</li>
- *   <li><b>语料统计</b>：从 COS 下载的 {@code bm25_zh_default.json}（85 MB / 389 万词条：
- *       b/k1/doc_count/average_doc_length/token_freq），缓存于
- *       {@code /tmp/tencent/vectordatabase/data/}（SDK 缺省目录）。</li>
+ * <li><b>分词</b>：SDK 内置 jieba 系分词的 HMM 切分 + 停用词表——注意
+ * <b>{@code LoadDict("")} 实际什么都没加载</b>（非空 varargs 走错分支，词典恒为空 ⇒ 纯 HMM），
+ * 实测结论见 {@link JiebaTokenizer} 类注释；本仓同款实现；</li>
+ * <li><b>哈希</b>：token → <b>murmur3 32 位</b>（x86_32 种子 0）
+ * → 无符号 int64 的十进制串；</li>
+ * <li><b>文档权重</b>：{@code tf/(*(1-B+B*(len/avgDocLen))+tf)}（B=0.75/=1.2）；</li>
+ * <li><b>查询权重</b>：{@code idf=ln((docCount+1)/(df+0.5))} 再按 Σidf 归一化；</li>
+ * <li><b>语料统计</b>：从 COS 下载的 {@code bm25_zh_default.json}（85 MB / 389 万词条：
+ * b/k1/doc_count/average_doc_length/token_freq），缓存于
+ * {@code /tmp/tencent/vectordatabase/data/}（SDK 缺省目录）。</li>
  * </ul>
  *
  * <h2>实现差异</h2>
  * <ol>
- *   <li><b>分词接缝</b>：{@link JiebaTokenizer} 与 SDK 的
- *       实际行为（HMM 切分 + 小写化 + 停用词）逐 token 等价，基线
- *       {@code src/test/resources/jieba/jieba_baseline.json} + {@code JiebaTokenizerDiffTest}
- *       逐句守卫——写出的稀疏向量与 SDK 同源（前提：SDK 侧仍走默认构造）。</li>
- *   <li>统计表解析：不用整表 {@code map}（数百 MB 堆）；
- *       改用<b>流式解析 + 排序长整型数组</b>（约 47 MB）——查询结果一致，查找走二分。</li>
- *   <li>停用词：SDK 默认从 COS 下 {@code default_stopwords.txt}（1.1 KB）并启用；本仓同款
- *       （下载失败只 WARN 且不去停用词，不阻塞主链）。</li>
+ * <li><b>分词接缝</b>：{@link JiebaTokenizer} 与 SDK 的
+ * 实际行为（HMM 切分 + 小写化 + 停用词）逐 token 等价，基线
+ * {@code src/test/resources/jieba/jieba_baseline.json} + {@code JiebaTokenizerDiffTest}
+ * 逐句守卫——写出的稀疏向量与 SDK 同源（前提：SDK 侧仍走默认构造）。</li>
+ * <li>统计表解析：不用整表 {@code map}（数百 MB 堆）；
+ * 改用<b>流式解析 + 排序长整型数组</b>（约 47 MB）——查询结果一致，查找走二分。</li>
+ * <li>停用词：SDK 默认从 COS 下 {@code default_stopwords.txt}（1.1 KB）并启用；本仓同款
+ * （下载失败只 WARN 且不去停用词，不阻塞主链）。</li>
  * </ol>
  */
 public final class TencentVectorDbBm25 {
 
     private static final Logger log = LoggerFactory.getLogger(TencentVectorDbBm25.class);
 
-    /** BM25 权重缺省值（B=0.75 / K1=1.2，SDK 缺省）。 */
+    /** BM25 权重缺省值（B=0.75 / =1.2，SDK 缺省）。 */
     static final double DEFAULT_B = 0.75;
     static final double DEFAULT_K1 = 1.2;
 

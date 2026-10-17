@@ -117,10 +117,10 @@ public class ChunkExtractService implements ChunkExtractConsumer {
     }
 
     /**
-     * @param terminal 本次是否是该任务的**最后一次**尝试（队列侧按 {@code attempt > MAX_RETRY} 传入）。
-     *                 与 {@link com.ragagent.knowledge.service.enrichment.QuestionGenerationService QuestionGenerationService} 同款契约（K5）：失败且还会重试时**不**递减
-     *                 槽位——否则重试链/重复投递会把槽位扣穿、父知识在富化落库前就提前完成。
-     */
+ * @param terminal 本次是否是该任务的**最后一次**尝试（队列侧按 {@code attempt > MAX_RETRY} 传入）。
+ * 与 {@link com.ragagent.knowledge.service.enrichment.QuestionGenerationService QuestionGenerationService} 同款契约：失败且还会重试时**不**递减
+ * 槽位——否则重试链/重复投递会把槽位扣穿、父知识在富化落库前就提前完成。
+ */
     public void handleJson(String payloadJson, boolean terminal) {
         ExtractChunkPayload p = ExtractChunkPayload.fromJson(payloadJson);
         // 富化跑在队列虚拟线程上：没有 HTTP Filter 填 TenantContext，而模型解析按租户可见性
@@ -172,7 +172,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
             handleErr = e.getMessage() == null ? e.toString() : e.getMessage();
             throw e;
         } finally {
-            // 3) 终态释放槽位（K5：成功或最后一次尝试才递减——重试链只释放一次）
+            // 3) 终态释放槽位（成功或最后一次尝试才递减——重试链只释放一次）
             if (succeeded || terminal) {
                 drainSubtask(p.knowledgeId(), "graph_chunk[" + p.chunkIndex() + "]");
             }
@@ -202,7 +202,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
 
         Chunk chunk = chunkRepository.getChunkById(p.tenantId(), p.chunkId());
         if (chunk == null) {
-            // K5：失败必须抛出——返回字符串会被队列当成成功 ack（既不重试也不按终态释放槽位）
+            //：失败必须抛出——返回字符串会被队列当成成功 ack（既不重试也不按终态释放槽位）
             throw new IllegalStateException("failed to get chunk: " + p.chunkId());
         }
         // 内容形态：让 trace 回答"这次 LLM 调用看到了什么"

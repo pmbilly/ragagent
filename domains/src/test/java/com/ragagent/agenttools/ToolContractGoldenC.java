@@ -9,11 +9,11 @@ import com.ragagent.platform.fixtures.GoldenResources;
  * <p>JSON 已外置到 {@code platform/src/testFixtures/resources/golden/agenttools-45c.json}；
  * 字段名保持原 API，值由 {@link GoldenResources} 按 SHA-256 校验后加载。</p>
  */
-public final class GoRecording45C {
+public final class ToolContractGoldenC {
 
     private static final String BUNDLE = "agenttools-45c";
 
-    private GoRecording45C() {
+    private ToolContractGoldenC() {
     }
 
     /** 解析一条录制记录。 */

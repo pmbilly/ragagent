@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 消息行**线格式视图**（embed 公开面 messages/load 响应形状与会话 QA 面载荷）。
  *
- * <p><b>为什么有它</b>：实体 Message 属会话域内部（HANDOFF §12.0 判据 1），而
+ * <p><b>为什么有它</b>：实体 Message 属会话域内部（HANDOFF 判据 1），而
  * EmbedSessionPort#loadMessages 需把它作为响应体、SessionQaPort 需经它落库。
  * 本视图**逐一镜像实体的 26 个字段与默认值**，并在同样的三个字段上标 @JsonIgnore
  * （renderedContent / agentTenantId / executionContext；注解由

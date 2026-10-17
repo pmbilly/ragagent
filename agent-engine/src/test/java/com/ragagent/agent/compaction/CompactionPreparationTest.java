@@ -1,6 +1,6 @@
 package com.ragagent.agent.compaction;
 
-import static com.ragagent.agent.GoRecording.STR_SUMMARY_CONTENT;
+import static com.ragagent.agent.AgentPromptGolden.STR_SUMMARY_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.agent.budget.TokenEstimator;

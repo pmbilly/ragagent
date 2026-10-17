@@ -7,14 +7,14 @@ import java.util.List;
 /**
  * 知识行（文档）**行视图**（L1）：KnowledgeCatalogPort 知识行面（读 / 建 / 批 / 写）的载荷。
  *
- * <p><b>为什么有它</b>：实体 Knowledge 已归位 knowledge/domain（HANDOFF §12.0 判据 1）；
+ * <p><b>为什么有它</b>：实体 Knowledge 已归位 knowledge/domain（HANDOFF 判据 1）；
  * 跨域方（会话 10 文件、数据源 4 文件、初始化 / 评估 / wiki / config）与 L1 的
  * KnowledgeProjectionAdapter 只应经本视图。</p>
  *
  * <p><b>口径</b>：镜像实体全部 30 字段（含 3 个 JsonNode 与 2 个 @TableField(exist=false) 字段），
  * 访问器体与实体逐字一致；字段序与实体一致 ⇒ 序列化等价（doc-*.json 金片钉住）。</p>
  *
- * <p><b>落点登记（HANDOFF §12.5）</b>：含 3 个 JsonNode ⇒ :contract 零依赖装不下 ⇒ 留 L1，
+ * <p><b>落点登记（HANDOFF）</b>：含 3 个 JsonNode ⇒ :contract 零依赖装不下 ⇒ 留 L1，
  * 登记待去 Jackson（去 Jackson 后与端口知识行面整批入 contract.knowledge）。</p>
  */
 public class KnowledgeRowView {

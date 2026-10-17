@@ -15,7 +15,7 @@ import com.ragagent.platform.access.TenantContext;
  * <h2>失败表达</h2>
  * <p>失败用 {@link MemoryScopeExceptions.NoScope} 表达——读路径把异常当"没有记忆"，
  * API 路径把它转成 401（因为"没有主人的记忆管理器"是 bug，不是空状态）。</p>
- * <p>没有 context 参数：租户与主体走 {@link TenantContext}（约定 §5）。</p>
+ * <p>没有 context 参数：租户与主体走 {@link TenantContext}（约定）。</p>
  */
 public final class MemoryScopes {
 
@@ -46,15 +46,15 @@ public final class MemoryScopes {
     }
 
     /**
-     * {@code Type + ":" + ID} 形式的主体 id，两者都去空白后非空才算有效。
-     *
-     * <p>Java 侧没有独立的 Principal 领域类型（{@code TenantContext.Principal} 是 record），
-     * 所以 {@code Normalize}/{@code Valid}/{@code StorageID} 三个方法在这里合一。</p>
-     *
-     * <p>⚠️ 去空白按 Unicode White_Space 语义（含 U+00A0 / U+0085），**不是**
-     * {@link String#strip()}
-     * ——后者不含不换行空格（与 §9 记的那条 {@code \s} 差异同族）。</p>
-     */
+ * {@code Type + ":" + ID} 形式的主体 id，两者都去空白后非空才算有效。
+ *
+ * <p>Java 侧没有独立的 Principal 领域类型（{@code TenantContext.Principal} 是 record），
+ * 所以 {@code Normalize}/{@code Valid}/{@code StorageID} 三个方法在这里合一。</p>
+ *
+ * <p>⚠️ 去空白按 Unicode White_Space 语义（含 U+00A0 / U+0085），**不是**
+ * {@link String#strip()}
+ * ——后者不含不换行空格（与 记的那条 {@code \s} 差异同族）。</p>
+ */
     public static String storageId(TenantContext.Principal principal) {
         if (principal == null) {
             return "";

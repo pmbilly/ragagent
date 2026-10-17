@@ -325,7 +325,7 @@ final class WikiIngestRunSupport {
                 } catch (RuntimeException lockErr) {
                     // 锁协调层故障：安静停下，slug 记入未应用集合。
                     // 注意：reduce 自身的错误以前也曾被 throw 进这个 catch 一并吞掉，
-                    // 其 "reduce failed for slug" warn 从未执行（2026-09-24 修复）。
+                    // 其 "reduce failed for slug" warn 从未执行（修复）。
                     log.warn("wiki ingest: slug lock failed for slug {}", slug, lockErr);
                     collectUnapplied(reduceMu, unappliedSlugKIDs, updates);
                     return;

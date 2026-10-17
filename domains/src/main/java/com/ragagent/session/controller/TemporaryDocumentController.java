@@ -35,7 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * 会话附件（临时文档）HTTP 层。
  *
- * 响应形态（§2.1：裸对象，无 {"data","success"} 信封）：上传 202 裸 doc
+ * 响应形态（裸对象，无 {"data","success"} 信封）：上传 202 裸 doc
  * （status=uploaded，解析异步）；列表/详情 200 裸对象/裸数组（详情查不到
  * 404 "Attachment not found"）；预览是文件字节流（filetransport 语义）；
  * 删除 200 + {@code ApiResponse} 外壳（幂等）。表单字段名＝Java 参数名（camelCase）。

@@ -40,7 +40,7 @@ final class RssConfig {
 
     private static ObjectMapper buildMapper() {
         // 键名＝Java 字段名（feedUrls / authHeaders）——**不设命名策略**：
-        // §2 第 4 条禁 @JsonNaming/命名策略，且键名与字段名一致才不会被静默丢弃。
+        // 第 4 条禁 @JsonNaming/命名策略，且键名与字段名一致才不会被静默丢弃。
         ObjectMapper mapper = JsonMappers.lenient()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // 数字塞进 string 字段要报错，不能静默强转成 "12"。

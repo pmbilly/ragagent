@@ -221,7 +221,7 @@ public class McpServiceController {
                 case STORAGE_UNAVAILABLE -> new BizException(
                         AppError.serviceUnavailable("MCP metadata storage is unavailable"));
                 // 上游要求 OAuth 授权：文案在工厂里定（可操作），refresh/read 两条路径一致。
-                // 别让它落到 OTHER 的通用文案——那正是 2026-10-03 点检的问题。
+                // 别让它落到 OTHER 的通用文案——那正是 点检的问题。
                 case OAUTH_REQUIRED -> me;
                 case CONNECTION_CHANGED -> BizException.conflict(
                         "MCP connection changed during refresh; save the configuration and sync again");

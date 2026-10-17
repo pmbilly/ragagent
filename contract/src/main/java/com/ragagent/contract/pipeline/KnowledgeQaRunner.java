@@ -1,7 +1,7 @@
 package com.ragagent.contract.pipeline;
 
 /**
- * RAG 预设运行端口（R4b 契约化）：按请求跑一次完整 RAG 管线并回带全链路产物。
+ * RAG 预设运行端口（契约化）：按请求跑一次完整 RAG 管线并回带全链路产物。
  *
  * <p><b>为什么需要它</b>：原先评估域直接构造管线运行时上下文（{@code ChatManage}）并调用
  * `knowledgeQAByEvent`——那是管线内部形状 ⇒ 管线本体无法归位到会话域。抽出本端口后，

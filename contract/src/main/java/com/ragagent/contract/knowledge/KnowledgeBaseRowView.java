@@ -14,14 +14,14 @@ import java.util.List;
  * 知识库**行视图**（L1）：{@code KnowledgeCatalogPort} 知识库面（读 / 建 / 改 / 授权）+ KB API 线格式
  * （{@code KnowledgeBaseResponse.from}）的载荷。
  *
- * <p><b>为什么有它</b>：实体 {@code KnowledgeBase} 已归位 `knowledge/domain`（HANDOFF §12.0 判据 1）；
+ * <p><b>为什么有它</b>：实体 {@code KnowledgeBase} 已归位 `knowledge/domain`（HANDOFF 判据 1）；
  * 跨域方（数据源 7 处、初始化 1 处、评估 1 处、会话 7 处）与 L1 的 {@code KnowledgeBaseResponse}/
  * {@code KnowledgeBaseViews} 只应经本视图。</p>
  *
  * <p><b>口径</b>：镜像实体全部 **34 字段**，访问器体与实体**逐字一致**（含归一语义）；字段序与实体一致
  * ⇒ 序列化等价（KB API 由 {@code kb-*.json} / {@code init-*.json} 金片钉住）。</p>
  *
- * <p><b>配置形状（P2 归正）</b>：6 个 typed config 字段均为契约视图（纯 JDK）；领域形状
+ * <p><b>配置形状（归正）</b>：6 个 typed config 字段均为契约视图（纯 JDK）；领域形状
  * （{@code KnowledgeBase*Config}）与视图的互转在 `knowledge.support.KnowledgeBaseConfigMaps`。
  * 懒初始化 getter 的"null → 默认视图"与领域形状默认构造逐字对应。</p>
  */

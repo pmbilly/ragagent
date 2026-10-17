@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * <p><b>本类为何仍持有一个可选 mapper</b>：{@code ObjectProvider<KnowledgeMapper>} 是
  * **刻意的装配裁剪容忍**——某些装配/测试裁剪下知识表 mapper 不存在，此时保守返回（与迁移前一致）；
  * 而 {@code KnowledgeRepository} 是无条件 Bean、构造期就要求 mapper，换成它会让"缺 mapper"从
- * "保守返回"变成"上下文启动失败"。故保留该可选依赖（与 R6 禁 {@code @Lazy} 规避环无关），
+ * "保守返回"变成"上下文启动失败"。故保留该可选依赖（与 禁 {@code @Lazy} 规避环无关），
  * 其余行读取已改走 {@code KnowledgeBaseRepository}。</p>
  *
  * <p>过滤条件与迁移前的 wiki 侧直查<b>逐字一致</b>（软删过滤、{@code LIMIT 1}、

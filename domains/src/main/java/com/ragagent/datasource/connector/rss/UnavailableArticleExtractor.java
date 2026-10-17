@@ -4,7 +4,7 @@ package com.ragagent.datasource.connector.rss;
  * {@link ArticleExtractor} 的<b>降级默认实现</b>：永远失败。
  *
  * <p>它存在的理由是：让 {@code resolveItem} 在抽取层不可用时以 feed 内容定型——
- * 并且（2026-09-28 起）<b>连文章页请求一起跳过</b>（抓回的字节必被丢弃，省一次
+ * 并且（起）<b>连文章页请求一起跳过</b>（抓回的字节必被丢弃，省一次
  * 无效外网调用）。
  * 详细后果见 {@link ArticleExtractor} 的类注释。</p>
  *

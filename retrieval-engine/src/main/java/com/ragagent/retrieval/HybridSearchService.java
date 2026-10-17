@@ -262,7 +262,7 @@ public class HybridSearchService implements HybridSearchPort {
             return null;
         }
 
-        // 分类：按 **每个 store 的返回列表** 分组保序（K9：RRF 的 rank 是"店内名次"）——
+        // 分类：按 **每个 store 的返回列表** 分组保序（RRF 的 rank 是"店内名次"）——
         // 此前先 addAll 成一个大列表，rank 退化成拼接位置，第二个 store 的本地第一名被
         // 系统性降级，且结果随 groups 顺序漂移（交换 KB/store 顺序结果就变）。
         List<List<EngineTypes.IndexWithScore>> vectorStores = new ArrayList<>();

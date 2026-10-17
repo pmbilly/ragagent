@@ -24,7 +24,7 @@ import java.util.Map;
  * {@link Manager} 的读面已就绪，但工具侧一度缺位——模型看得到技能清单、却读不到正文，
  * 本工具即为此而设。</p>
  *
- * <p><b>契约以回归录像为准</b>（{@code GoRecording45C} 的 {@code read_file/*} 31 条记录）：
+ * <p><b>契约以回归录像为准</b>（{@code ToolContractGoldenC} 的 {@code read_file/*} 31 条记录）：
  * schema、描述、输出格式（{@code === File: … === / size=… / ```内容```}）、data 键集合
  * （{@code path/file_path/root/skill_name/size/returned_bytes/start_line/end_line/total_lines/truncated}）、
  * 以及错误文案（越界走 {@code canonical relative file path without traversal}、

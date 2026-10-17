@@ -18,20 +18,20 @@ import java.util.Map;
  *
  * <h2>JSON 形状（{@code DataSourceJsonTest} 逐字节钉住）</h2>
  * <pre>
- *   SyncCursor{} →
- *   {"lastSyncTime":"0001-01-01T00:00:00Z","connectorCursor":null,"lastSchemaHash":""}
- *   SyncCursor(全字段) →
- *   {"lastSyncTime":"2026-09-18T10:00:00+08:00",
- *    "connectorCursor":{"n":2,"page_token":"p"},"last_schema_hash":"h"}
+ * SyncCursor{} →
+ * {"lastSyncTime":"0001-01-01T00:00:00Z","connectorCursor":null,"lastSchemaHash":""}
+ * SyncCursor(全字段) →
+ * {"lastSyncTime":"T10:00:00+08:00",
+ * "connectorCursor":{"n":2,"page_token":"p"},"last_schema_hash":"h"}
  * </pre>
  * <p>{@code connectorCursor} {@code null} 时输出 {@code null}（恒输出）；
  * 且 map 键序按字母序排列（{@code n} 在 {@code page_token} 前）。</p>
  *
  * <h2>持久化语义</h2>
  * <ol>
- *   <li><b>钩子/软删除/自动时间戳/唯一索引/关联预加载</b>：全无——本类型不落表，
- *       只作为 {@code last_sync_cursor} 列的 JSON 载荷。</li>
- *   <li><b>默认排序</b>：无。</li>
+ * <li><b>钩子/软删除/自动时间戳/唯一索引/关联预加载</b>：全无——本类型不落表，
+ * 只作为 {@code last_sync_cursor} 列的 JSON 载荷。</li>
+ * <li><b>默认排序</b>：无。</li>
  * </ol>
  */
 public class SyncCursor {

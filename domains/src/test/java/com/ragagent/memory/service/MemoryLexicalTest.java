@@ -94,7 +94,7 @@ class MemoryLexicalTest {
     class Scoring {
 
         @Test
-        void scoresMatchTheGoRecording() {
+        void scoresMatchTheAgentPromptGolden() {
             List<MemoryLexical.ScoredItem> scored =
                     MemoryLexical.scoreItems("生产库 MySQL 迁移", corpus());
             // 实测：[{"id":"i1","score":0.6966666666666667}]
@@ -133,7 +133,7 @@ class MemoryLexicalTest {
     class Clustering {
 
         @Test
-        void jaccardMatchesTheGoRecording() {
+        void jaccardMatchesTheAgentPromptGolden() {
             List<String> a = MemoryLexical.tokenize("生产库用的是 MySQL");
             List<String> b = MemoryLexical.tokenize("生产库的 MySQL");
             // 实测：0.7142857142857143

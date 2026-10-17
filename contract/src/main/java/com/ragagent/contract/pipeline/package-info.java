@@ -1,5 +1,5 @@
 /**
- * 管线 SPI（R4b 契约化）：`chatpipeline` 消费、业务域实现的端口（MCP 工具网关/按需注册、
+ * 管线 SPI（契约化）：`chatpipeline` 消费、业务域实现的端口（MCP 工具网关/按需注册、
  * 工具注册表、网页检索执行器）。
  *
  * <p><b>为什么在契约面</b>：它们的实现散在 mcp / knowledge / evaluation / agenttools 等域，

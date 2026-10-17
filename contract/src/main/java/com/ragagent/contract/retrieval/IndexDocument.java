@@ -3,7 +3,7 @@ package com.ragagent.contract.retrieval;
 /**
  * 待索引条目（业务域 → 检索引擎的领域级形状）。
  *
- * <p>R3b 契约化：业务域（知识索引 / FAQ / 迁移克隆）原先直接组装 {@code retrieval-engine} 的
+ * <p> 契约化：业务域（知识索引 / FAQ / 迁移克隆）原先直接组装 {@code retrieval-engine} 的
  * 内部类 {@code EngineTypes.IndexInfo}（公有可变字段）——那件内部形状留在实现模块内，本记录
  * 只带"域侧真给"的字段；引擎适配器（{@code IndexEngineAdapter}）负责映射并补齐引擎侧
  * 生成字段（索引 id、推荐位等）。</p>

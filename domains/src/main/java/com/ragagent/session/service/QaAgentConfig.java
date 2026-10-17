@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class QaAgentConfig implements AgentRunSpec {
 
-    // ---- 引擎消费字段（R5c 起自持：原继承自 agent.AgentConfig 的字段；
+    // ---- 引擎消费字段（起自持：原继承自 agent.AgentConfig 的字段；
     // 契约面读接口 AgentRunSpec 把它们与域侧解耦，Jackson 注解留在此处供 JSON 绑定）----
     private int maxIterations;
     private List<String> allowedTools;
@@ -90,7 +90,7 @@ public class QaAgentConfig implements AgentRunSpec {
     public List<String> getPinnedMcpServiceIds() { return pinnedMcpServiceIds; }
     public void setPinnedMcpServiceIds(List<String> v) { pinnedMcpServiceIds = v; }
 
-    // ══════════════ 引擎消费字段的存取（R5c：原继承自 AgentConfig）══════════════
+    // ══════════════ 引擎消费字段的存取（原继承自 AgentConfig）══════════════
 
     @Override public int getMaxIterations() { return maxIterations; }
     public void setMaxIterations(int v) { maxIterations = v; }

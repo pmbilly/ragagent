@@ -474,18 +474,18 @@ public final class NotionClient {
     // ──────────────────────────────────────────────────────────────────────
 
     /**
-     * 分页拉取页面列表：POST 走请求体（{@code page_size=100} +
-     * 可选 {@code start_cursor}），GET 走查询串
-     * （{@code ?start_cursor=X&page_size=100}，**不做 URL 编码**——cursor 是 Notion 给回的原样串）。
-     *
-     * <p>请求形态：</p>
-     * <pre>
-     *   POST /v1/search  body={"page_size":100}
-     *   POST /v1/search  body={"page_size":100,"start_cursor":"CUR1"}
-     *   GET  /v1/blocks/gp/children
-     *   GET  /v1/blocks/gp/children?start_cursor=G2
-     * </pre>
-     */
+ * 分页拉取页面列表：POST 走请求体（{@code page_size=100} +
+ * 可选 {@code start_cursor}），GET 走查询串
+ * （{@code ?start_cursor=X&page_size=100}，**不做 URL 编码**——cursor 是 Notion 给回的原样串）。
+ *
+ * <p>请求形态：</p>
+ * <pre>
+ * POST /v1/search body={"page_size":100}
+ * POST /v1/search body={"page_size":100,"start_cursor":"CUR1"}
+ * GET /v1/blocks/gp/children
+ * GET /v1/blocks/gp/children?start_cursor=
+ * </pre>
+ */
     public List<NotionPage> paginatePages(String method, String path) {
         List<NotionPage> allPages = new ArrayList<>();
         String startCursor = "";

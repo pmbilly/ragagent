@@ -23,7 +23,7 @@ public final class JsonValueSupport {
 
     /** 等价 {@code JsonNode#path(key).asBoolean(def)}（null 安全）。 */
     public static boolean boolAt(Object value, String key, boolean def) {
-        // 单一实现：契约侧通用读取门面（G1-k）
+        // 单一实现：契约侧通用读取门面
         return JsonValues.boolAt(value, key, def);
     }
 }

@@ -68,7 +68,7 @@ class ArtifactReferenceRewriterTest {
     }
 
     @Test
-    void rewriteMatchesGoRecordings() {
+    void rewriteMatchesAgentPromptGoldens() {
         for (Case c : CASES) {
             List<Artifact> arts = c.key().equals("no_artifacts")
                     ? List.of()

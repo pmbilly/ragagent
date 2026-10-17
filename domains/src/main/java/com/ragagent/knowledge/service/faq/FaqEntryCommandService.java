@@ -509,7 +509,7 @@ public class FaqEntryCommandService {
         }
 
         // 检索引擎同步：失败 → 原样上抛（阻断；
-        // 2026-09-22 走查批接线：此前为 WARN + no-op 占位。
+        // 走查批接线：此前为 WARN + no-op 占位。
         // 绑定 store 的 KB 走引擎口（deleteByChunkIdList + batchIndex）
         IndexEngine boundEngine =
                 (!enabledUpdates.isEmpty() || !tagUpdates.isEmpty())

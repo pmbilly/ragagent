@@ -8,7 +8,7 @@ import java.util.List;
  *
  * <p><b>动机</b>：{@code :domains} 侧的 system/auth 控制器原先直接依赖
  * {@code auth.apikey.service.TenantAPIKeyService} ✗ —— 拆出 {@code :channels} 模块时该方向会成环 ✗
- * （见 {@code docs/phase4-module-boundaries-plan.md} §12）。</p>
+ * （见 {@code docs/phase4-module-boundaries-plan.md}）。</p>
  *
  * <p><b>形状</b>：只暴露窄面 + 已定形的 common 载荷（{@link TenantAPIKeyResponse} /
  * {@link TenantAPIKeyCreateResponse} ✓）；<b>脱敏在实现侧完成</b>（与原先控制器里的 {@code masked(...)}

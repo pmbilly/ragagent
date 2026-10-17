@@ -37,8 +37,8 @@ public class StorageBackendService {
     public static final String REDACTED = "***";
 
     /**
-     * 控制器读面：租户的全部存储后端（控制器不直连仓储，见包地图 P3）。
-     */
+ * 控制器读面：租户的全部存储后端（控制器不直连仓储，见包地图）。
+ */
     public java.util.List<StorageBackend> listBackends(long tenantId) {
         return repo.list(tenantId);
     }

@@ -14,26 +14,26 @@ import java.time.OffsetDateTime;
  *
  * <p><b>响应形态</b>：GET /sessions/{id}、POST /sessions、PUT /sessions/{id}
  * 都直接返回本对象（201/200 + 裸对象，无 {@code {data,success}} 信封）；JSON 键名＝Java 字段名
- * （camelCase）、键序＝字段声明序，所有字段恒输出（§1.6 禁止条件键：未置顶时
+ * （camelCase）、键序＝字段声明序，所有字段恒输出（禁止条件键：未置顶时
  * {@code pinnedAt:null}、无 IM 来源时 {@code imPlatform:""}）。</p>
  *
  * <h2>落库隐式行为清单</h2>
  * <ul>
- *   <li><b>钩子 BeforeCreate</b>（L141-144）：无条件 {@code s.ID = uuid.New().String()}——
- *       注意它**覆盖**调用方传入的 ID，不是"为空才生成"。<br>
- *       等效 Java：{@code SessionRepository.create} 无条件用新 UUID 覆盖。</li>
- *   <li><b>软删除</b>：deleted_at 列。**不用** {@code @TableLogic}，
- *       而是在每条查询里显式写 {@code deleted_at IS NULL}（datetime 逻辑删除值在 MP 各版本
- *       行为敏感，显式条件语义确定）。{@code Delete} 等效为 UPDATE deleted_at=now()。</li>
- *   <li><b>默认排序</b>：仓库层显式 {@code Order("updated_at DESC")}（L100/L129），
- *       列表另有 pin 优先的排序串（见 {@code SessionRepository.queryPaged}）。</li>
- *   <li><b>jsonb 列 {@code agent_config}</b>：存的是 {@code SessionLastRequestState}
- *       （复用这一列以避免新增迁移）。<b>注意
- *       {@code SessionRepository.update} 不写这一列</b>，只有
- *       {@code updateLastRequestState} 单独写——两条路径分开。</li>
- *   <li><b>未映射的遗留列</b>：迁移 000001 建的一批策略配置列（{@code knowledge_base_id} /
- *       {@code max_rounds} / {@code enable_rewrite} / … / {@code summary_parameters}）
- *       实体**不映射**、保持 DB 默认值——那批列上的 NOT NULL 由 DB 默认值兜住，别顺手补上。</li>
+ * <li><b>钩子 BeforeCreate</b>（L141-144）：无条件 {@code s.ID = uuid.New().String()}——
+ * 注意它**覆盖**调用方传入的 ID，不是"为空才生成"。<br>
+ * 等效 Java：{@code SessionRepository.create} 无条件用新 UUID 覆盖。</li>
+ * <li><b>软删除</b>：deleted_at 列。**不用** {@code @TableLogic}，
+ * 而是在每条查询里显式写 {@code deleted_at IS NULL}（datetime 逻辑删除值在 MP 各版本
+ * 行为敏感，显式条件语义确定）。{@code Delete} 等效为 UPDATE deleted_at=now()。</li>
+ * <li><b>默认排序</b>：仓库层显式 {@code Order("updated_at DESC")}（L100/L129），
+ * 列表另有 pin 优先的排序串（见 {@code SessionRepository.queryPaged}）。</li>
+ * <li><b>jsonb 列 {@code agent_config}</b>：存的是 {@code SessionLastRequestState}
+ * （复用这一列以避免新增迁移）。<b>注意
+ * {@code SessionRepository.update} 不写这一列</b>，只有
+ * {@code updateLastRequestState} 单独写——两条路径分开。</li>
+ * <li><b>未映射的遗留列</b>：迁移 000001 建的一批策略配置列（{@code knowledge_base_id} /
+ * {@code max_rounds} / {@code enable_rewrite} / … / {@code summary_parameters}）
+ * 实体**不映射**、保持 DB 默认值——那批列上的 NOT NULL 由 DB 默认值兜住，别顺手补上。</li>
  * </ul>
  */
 @TableName(value = "sessions", autoResultMap = true)
@@ -76,17 +76,17 @@ public class Session {
     private String embedVisitorId;
 
     /**
-     * <b>字段名不带 {@code is} 前缀是刻意的</b>，两个地方都依赖这一点：
-     * <ol>
-     *   <li>Jackson：字段 {@code isPinned} 的隐式属性名是 "isPinned"，而 getter
-     *       {@code isPinned()} 的隐式名是 "pinned"——两者对不上就会**各生成一个属性**，
-     *       JSON 里同时冒出两个键（真实踩过）。字段名与 getter 名在这里一致，只有
-     *       {@code pinned} 一个键（§1.24：布尔字段不带 {@code is} 前缀，读写一致）。</li>
-     *   <li>MyBatis-Plus 的 lambda：{@code Session::isPinned} 按 PropertyNamer 推成
-     *       "pinned"，要能对上实体字段名才找得到列映射。</li>
-     * </ol>
-     * 列名由 {@code @TableField("is_pinned")} 显式给出（**列名不变**，换锚只改 JSON 键名）。
-     */
+ * <b>字段名不带 {@code is} 前缀是刻意的</b>，两个地方都依赖这一点：
+ * <ol>
+ * <li>Jackson：字段 {@code isPinned} 的隐式属性名是 "isPinned"，而 getter
+ * {@code isPinned()} 的隐式名是 "pinned"——两者对不上就会**各生成一个属性**，
+ * JSON 里同时冒出两个键（真实踩过）。字段名与 getter 名在这里一致，只有
+ * {@code pinned} 一个键（布尔字段不带 {@code is} 前缀，读写一致）。</li>
+ * <li>MyBatis-Plus 的 lambda：{@code Session::isPinned} 按 PropertyNamer 推成
+ * "pinned"，要能对上实体字段名才找得到列映射。</li>
+ * </ol>
+ * 列名由 {@code @TableField("is_pinned")} 显式给出（**列名不变**，换锚只改 JSON 键名）。
+ */
     @TableField("is_pinned")
     private boolean pinned;
 

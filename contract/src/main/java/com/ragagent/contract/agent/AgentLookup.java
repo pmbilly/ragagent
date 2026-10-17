@@ -12,8 +12,8 @@ import java.util.List;
  * 本端口把读路径收回属主域实现（{@code agentmanagement/api/AgentLookupAdapter}），
  * 调用方只 import 本端口与 {@code AgentView}。</p>
  *
- * <p><b>归属说明</b>：方案 §8.1 的 {@code contract.agent/AgentCatalog} 目标形态是纯 JDK（typed records）；
- * **G1-l**：本面已去 Jackson 并**入 {@code :contract}**——{@code configJson} 串保持字符串、
+ * <p><b>归属说明</b>：方案 的 {@code contract.agent/AgentCatalog} 目标形态是纯 JDK（typed records）；
+ * 本面已去 Jackson 并**入 {@code :contract}**——{@code configJson} 串保持字符串、
  * 配置/推荐问题改为**纯 JDK 值**（对象→{@code Map}、数组→{@code List}），读面用
  * {@code contract.json.JsonValues}（零依赖；语义与 {@code JsonNode} 读面逐条对齐）。</p>
  */

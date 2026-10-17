@@ -3,8 +3,8 @@ package com.ragagent.agenttools.knowledge;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.fixtures.GoRecording45B;
 import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agent.fixtures.ToolContractGoldenB;
 import com.ragagent.contract.tool.ToolRequest;
 import java.time.LocalDate;
 import java.util.List;
@@ -26,7 +26,7 @@ class SearchMemoryRecordingTest {
     };
 
     @Test
-    void executionsMatchGoRecording() {
+    void executionsMatchAgentPromptGolden() {
         for (String name : CASES) {
             JsonNode r = RecordingSupport.rec(field(name));
             JsonNode args = RecordingSupport.readTree(r.get("args").asText());
@@ -97,7 +97,7 @@ class SearchMemoryRecordingTest {
 
     private static String field(String name) {
         try {
-            return (String) GoRecording45B.class.getField(name).get(null);
+            return (String) ToolContractGoldenB.class.getField(name).get(null);
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }

@@ -151,7 +151,7 @@ class McpStubABTest {
     }
 
     @Test
-    void javaSideRequestBodiesMatchGoRecording() throws Exception {
+    void javaSideRequestBodiesMatchAgentPromptGolden() throws Exception {
         McpService service = new McpService();
         service.setId("stub-svc");
         service.setName("Stub Service");

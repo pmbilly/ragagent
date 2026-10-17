@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * FAQ 索引行组装。2026-09-22 走查批接线：此前的
+ * FAQ 索引行组装。 走查批接线：此前的
  * 索引步是「embedding runtime is not available」占位。
  * <p><b>两种索引模式</b>（kb.faq_config）：</p>
  * <ul>
- *   <li>question_index_mode=combined（默认）：单行，content = 标准问 + 相似问 +
- *       （question_answer 模式时）答案；source_id = chunkID；</li>
- *   <li>question_index_mode=separate：标准问一行（source_id=chunkID）+ 每个相似问
- *       一行（source_id = {@code chunkID-<序号>}）。</li>
+ * <li>question_index_mode=combined（默认）：单行，content = 标准问 + 相似问 +
+ * （question_answer 模式时）答案；source_id = chunkID；</li>
+ * <li>question_index_mode=separate：标准问一行（source_id=chunkID）+ 每个相似问
+ * 一行（source_id = {@code chunkID-<序号>}）。</li>
  * </ul>
  */
 final class FaqIndexRows {
