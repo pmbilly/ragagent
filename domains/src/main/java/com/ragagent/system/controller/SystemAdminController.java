@@ -230,24 +230,27 @@ public class SystemAdminController {
         AdminUserPort.CreateResult result = users.adminCreateUser(
                 req.username(), req.email(), req.password(), passwordPresent,
                 users.resolveDefaultTenantMode());
-        if (result instanceof AdminUserPort.CreateResult.Idempotent idem) {
-            users.emitAdminAudit(AuditAction.SYSTEM_USER_CREATED, idem.user(), Map.of(
-                    "target_email", idem.user().getEmail(),
-                    "target_username", idem.user().getUsername(),
-                    "password_generated", false,
-                    "idempotent", true));
-            return ResponseEntity.ok(new SystemDtos.CreateUserResponse(
-                    SystemDtos.UserInfoResponse.from(idem.user()), null));
-        }
-        var created = (AdminUserPort.CreateResult.Created) result;
-        users.emitAdminAudit(AuditAction.SYSTEM_USER_CREATED, created.user(), Map.of(
-                "target_email", created.user().getEmail(),
-                "target_username", created.user().getUsername(),
-                "password_generated", !created.generatedPassword().isEmpty(),
-                "idempotent", false));
-        return ResponseEntity.status(HttpStatus.CREATED).body(new SystemDtos.CreateUserResponse(
-                SystemDtos.UserInfoResponse.from(created.user()),
-                created.generatedPassword().isEmpty() ? null : created.generatedPassword()));
+        return switch (result) {
+            case AdminUserPort.CreateResult.Idempotent idem -> {
+                users.emitAdminAudit(AuditAction.SYSTEM_USER_CREATED, idem.user(), Map.of(
+                        "target_email", idem.user().getEmail(),
+                        "target_username", idem.user().getUsername(),
+                        "password_generated", false,
+                        "idempotent", true));
+                yield ResponseEntity.ok(new SystemDtos.CreateUserResponse(
+                        SystemDtos.UserInfoResponse.from(idem.user()), null));
+            }
+            case AdminUserPort.CreateResult.Created created -> {
+                users.emitAdminAudit(AuditAction.SYSTEM_USER_CREATED, created.user(), Map.of(
+                        "target_email", created.user().getEmail(),
+                        "target_username", created.user().getUsername(),
+                        "password_generated", !created.generatedPassword().isEmpty(),
+                        "idempotent", false));
+                yield ResponseEntity.status(HttpStatus.CREATED).body(new SystemDtos.CreateUserResponse(
+                        SystemDtos.UserInfoResponse.from(created.user()),
+                        created.generatedPassword().isEmpty() ? null : created.generatedPassword()));
+            }
+        };
     }
 
     // ── 平台 API Key ──────────────────────────────────────────────────────

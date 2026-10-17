@@ -162,12 +162,10 @@ public class AuthFilter extends OncePerRequestFilter {
                             request.getHeader("X-External-User-ID"),
                             request.getHeader("X-External-User-Token"),
                             request.getRequestURI(), request.getMethod()));
-            if (result instanceof ApiKeyAuthPort.AuthResult.Passed) {
-                chain.doFilter(request, response);
-            } else {
-                ApiKeyAuthPort.AuthResult.Rejected rejected =
-                        (ApiKeyAuthPort.AuthResult.Rejected) result;
-                writeJson(response, rejected.status(), rejected.jsonBody());
+            switch (result) {
+                case ApiKeyAuthPort.AuthResult.Passed passed -> chain.doFilter(request, response);
+                case ApiKeyAuthPort.AuthResult.Rejected rejected ->
+                        writeJson(response, rejected.status(), rejected.jsonBody());
             }
             return;
         }
