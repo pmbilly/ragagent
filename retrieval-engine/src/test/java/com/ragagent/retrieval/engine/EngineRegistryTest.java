@@ -1,6 +1,5 @@
 package com.ragagent.retrieval.engine;
 
-import com.ragagent.contract.retrieval.RetrieveEngineException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,6 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.retrieval.RetrieveEngineException;
+import com.ragagent.contract.vectorstore.VectorStoreView;
+import com.ragagent.retrieval.engine.RetrievalEngineTestSupport.FakeEngineService;
+import com.ragagent.retrieval.engine.RetrievalEngineTestSupport.FakeStoreRepo;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -16,14 +19,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.retrieval.engine.RetrievalEngineTestSupport.FakeEngineService;
-import com.ragagent.retrieval.engine.RetrievalEngineTestSupport.FakeStoreRepo;
-import com.ragagent.contract.vectorstore.VectorStoreView;
 
 /**
  * 注册表：两张表、双表隔离、并发安全，

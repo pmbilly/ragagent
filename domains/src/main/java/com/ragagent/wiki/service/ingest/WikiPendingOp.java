@@ -1,9 +1,8 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * {@code task_pending_ops} 表里 {@code task_type="wiki:ingest"} 的一行操作。

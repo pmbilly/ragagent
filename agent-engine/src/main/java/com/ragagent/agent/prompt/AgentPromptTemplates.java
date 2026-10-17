@@ -1,11 +1,10 @@
 package com.ragagent.agent.prompt;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * agent 系统提示词模板的选取与装载。

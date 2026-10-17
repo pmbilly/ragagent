@@ -1,21 +1,11 @@
 package com.ragagent.datasource;
 
-import com.ragagent.platform.web.JsonMappers;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.common.JsonRoundTrip;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
@@ -28,8 +18,17 @@ import com.ragagent.datasource.domain.SyncItemError;
 import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.SyncResult;
 import com.ragagent.datasource.domain.TaskInitiator;
+import com.ragagent.platform.web.JsonMappers;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
-import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * datasource 领域类型的**逐字节 JSON 契约**测试。

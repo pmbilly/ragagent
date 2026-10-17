@@ -1,15 +1,14 @@
 package com.ragagent.datasource.domain;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializable;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.ragagent.platform.web.SortedMapSerializer;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializable;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.ragagent.platform.web.SortedMapSerializer;
 
 /**
  * {@link SortedMapSerializer} 的 datasource 版本：在"按键排序且递归"之上，**再把嵌套的

@@ -2,6 +2,18 @@ package com.ragagent.agenttools.datasource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agenttools.datasource.DataAnalysisTool.AnalysisDuckDb;
+import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeData;
+import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeFileMaterializer;
+import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeLoader;
+import com.ragagent.agenttools.datasource.DataAnalysisTool.QueryResult;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,23 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.agenttools.datasource.DataAnalysisTool.AnalysisDuckDb;
-import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeData;
-import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeFileMaterializer;
-import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeLoader;
-import com.ragagent.agenttools.datasource.DataAnalysisTool.QueryResult;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.agent.fixtures.GoRecording45B;
-import com.ragagent.agent.fixtures.RecordingSupport;
-import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 4.5b 回放：data_analysis 的录制回放。

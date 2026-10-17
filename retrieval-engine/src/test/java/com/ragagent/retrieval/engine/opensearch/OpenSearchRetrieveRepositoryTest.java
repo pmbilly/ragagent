@@ -3,6 +3,14 @@ package com.ragagent.retrieval.engine.opensearch;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.retrieval.engine.EngineTypes;
+import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -11,20 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
-import com.ragagent.retrieval.engine.EngineTypes;
 
 /**
  * OpenSearch k-NN 驱动：

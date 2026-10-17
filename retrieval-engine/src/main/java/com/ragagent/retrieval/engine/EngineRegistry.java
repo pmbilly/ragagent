@@ -1,6 +1,8 @@
 package com.ragagent.retrieval.engine;
 
 import com.ragagent.contract.retrieval.RetrieveEngineException;
+import com.ragagent.contract.vectorstore.VectorStoreLookup;
+import com.ragagent.contract.vectorstore.VectorStoreView;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -20,12 +22,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ragagent.contract.vectorstore.VectorStoreLookup;
-import com.ragagent.contract.vectorstore.VectorStoreView;
 
 /**
  * 检索引擎注册表——两张表 + 按需重建。

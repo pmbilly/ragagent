@@ -3,22 +3,20 @@ package com.ragagent.agent.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.fixtures.ContractJson;
-import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.agent.fixtures.GoRecording45A;
+import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.agent.fixtures.RecordingSupport;
-import com.ragagent.agent.fixtures.GoRecording45A;
+import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.contract.tool.AgentTool;
+import com.ragagent.contract.tool.ToolResult;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * ToolRegistry 的录制判定（17 条）。覆盖：first-wins 拒绝重名、ListTools/defs 按名排序且

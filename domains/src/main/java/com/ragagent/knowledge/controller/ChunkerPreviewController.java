@@ -1,5 +1,18 @@
 package com.ragagent.knowledge.controller;
 
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.error.ErrorCode;
+import com.ragagent.contract.knowledge.chunker.Tokens;
+import com.ragagent.knowledge.chunker.Chunker;
+import com.ragagent.knowledge.chunker.DocumentProfiler;
+import com.ragagent.knowledge.chunker.ParsedChunk;
+import com.ragagent.knowledge.chunker.SplitterConfig;
+import com.ragagent.knowledge.chunker.TextNormalizer;
+import com.ragagent.knowledge.dto.chunk.PreviewPayload;
+import com.ragagent.knowledge.dto.chunk.PreviewRequest;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.NonNullBody;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,23 +23,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.platform.web.NonNullBody;
-import com.ragagent.knowledge.dto.chunk.PreviewPayload;
-import com.ragagent.knowledge.dto.chunk.PreviewRequest;
-import com.ragagent.knowledge.chunker.Chunker;
-import com.ragagent.knowledge.chunker.DocumentProfiler;
-import com.ragagent.knowledge.chunker.ParsedChunk;
-import com.ragagent.knowledge.chunker.SplitterConfig;
-import com.ragagent.knowledge.chunker.TextNormalizer;
-import com.ragagent.contract.knowledge.chunker.Tokens;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResult;
 
 /**
  * chunker 只读预览端点（分块配置预览：文本进、分块结果出）。无状态：不落库、不生成 embedding、不打日志正文。

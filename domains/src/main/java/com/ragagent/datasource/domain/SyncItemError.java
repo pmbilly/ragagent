@@ -1,13 +1,12 @@
 package com.ragagent.datasource.domain;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import java.util.Map;
 
 /**
  * 一条面向用户的失败样本。

@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.chunker;
 
-import java.util.List;
 import com.ragagent.contract.knowledge.chunker.CodePoints;
+import java.util.List;
 
 /**
  * 层级输出校验。

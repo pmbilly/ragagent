@@ -1,15 +1,7 @@
 package com.ragagent.auth.controller;
 
-import com.ragagent.platform.web.JsonBodyErrors;
-import com.ragagent.platform.web.JsonMappers;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
-
-import javax.crypto.spec.SecretKeySpec;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tenant.APIPrincipalConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalConfigRequest;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalConfigResponse;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalTestTokenRequest;
@@ -17,16 +9,22 @@ import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalTestTokenResponse;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.tenant.APIPrincipalConfig;
+import com.ragagent.contract.tenant.TenantRowView;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.JsonBodyErrors;
+import com.ragagent.platform.web.JsonMappers;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
+import javax.crypto.spec.SecretKeySpec;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * api-principal 三条路由（Owner+）：

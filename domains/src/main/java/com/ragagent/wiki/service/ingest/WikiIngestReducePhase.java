@@ -1,5 +1,16 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.contract.knowledge.KnowledgeSpanPort;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.platform.text.CodePointOrder;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.prompt.WikiPrompts;
+import com.ragagent.wiki.service.page.WikiSlugHandles;
+import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -7,19 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import com.ragagent.contract.knowledge.KnowledgeSpanPort;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.prompt.WikiPrompts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
-import com.ragagent.wiki.service.page.WikiSlugHandles;
-import com.ragagent.wiki.service.page.WikiTextUtils;
-import com.ragagent.platform.text.CodePointOrder;
 
 /**
  * wiki 摄取 Reduce 阶段协作者:slug 更新按页归并写入(含 span 追踪与 chunk refs 合并)。

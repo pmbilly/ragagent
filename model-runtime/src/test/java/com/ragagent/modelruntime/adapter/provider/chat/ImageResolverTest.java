@@ -6,6 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.platform.http.LlmTransport;
+import com.ragagent.platform.security.SsrfGuard;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -13,15 +17,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
-
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.contract.model.chat.ChatMessage;
-
-import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import com.ragagent.platform.http.LlmTransport;
 
 /**
  * {@code ImageResolver} 各分支的测试（内部 URL 拒绝 / 重定向目标复检等）。

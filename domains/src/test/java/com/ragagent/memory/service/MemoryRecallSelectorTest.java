@@ -2,14 +2,13 @@ package com.ragagent.memory.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.domain.vector.MemoryVectorHit;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.memory.domain.vector.MemoryVectorHit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

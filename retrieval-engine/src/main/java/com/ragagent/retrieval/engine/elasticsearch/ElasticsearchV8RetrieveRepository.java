@@ -1,6 +1,17 @@
 package com.ragagent.retrieval.engine.elasticsearch;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.retrieval.engine.EngineTypes;
+import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
+import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
+import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -10,21 +21,8 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.retrieval.engine.EngineTypes;
-import com.ragagent.retrieval.engine.RetrieveEngineRepository;
-import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
-import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 
 /**
  * Elasticsearch v8 检索引擎仓库（文档结构与双向转换也在本类）。

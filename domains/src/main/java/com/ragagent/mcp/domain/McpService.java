@@ -1,13 +1,12 @@
 package com.ragagent.mcp.domain;
 
-import java.time.OffsetDateTime;
-import java.util.Map;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import java.time.OffsetDateTime;
+import java.util.Map;
 
 /**
  * MCP 服务配置实体。

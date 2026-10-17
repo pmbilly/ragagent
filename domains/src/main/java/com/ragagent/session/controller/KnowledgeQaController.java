@@ -1,28 +1,25 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.storage.support.Mode;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.ServletSseSink;
+import com.ragagent.session.dto.QaRequests.SearchKnowledgeRequest;
 import com.ragagent.session.qa.QaEntryRunner;
 import com.ragagent.session.qa.QaRequestBinder;
+import com.ragagent.session.service.QaSupport;
+import com.ragagent.session.service.SessionKnowledgeQaService;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.web.ServletSseSink;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.session.dto.QaRequests.SearchKnowledgeRequest;
-import com.ragagent.session.service.QaSupport;
-import com.ragagent.session.service.SessionKnowledgeQaService;
-
-import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.contract.storage.support.Mode;
-import com.ragagent.platform.web.ApiResult;
 
 
 /**

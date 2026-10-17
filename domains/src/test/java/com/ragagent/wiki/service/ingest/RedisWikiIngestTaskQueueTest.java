@@ -8,15 +8,14 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.time.Duration;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BooleanSupplier;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.stream.EmbeddedRedis;
 import com.ragagent.wiki.domain.TaskDeadLetter;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,5 +1,20 @@
 package com.ragagent.auth.apikey.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.auth.apikey.domain.TenantAPIKey;
+import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
+import com.ragagent.auth.apikey.domain.TenantAPIKeyRequest;
+import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
+import com.ragagent.auth.apikey.service.TenantAPIKeyService;
+import com.ragagent.auth.apikey.service.TenantAPIKeyValidator;
+import com.ragagent.contract.apikey.TenantAPIKeyCreateResponse;
+import com.ragagent.contract.apikey.TenantAPIKeyResponse;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.knowledge.KnowledgeBaseFacts;
+import com.ragagent.contract.knowledge.KnowledgeBaseGateway;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Instant;
@@ -7,19 +22,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.contract.apikey.TenantAPIKeyCreateResponse;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyRequest;
-import com.ragagent.contract.apikey.TenantAPIKeyResponse;
-import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
-import com.ragagent.auth.apikey.service.TenantAPIKeyService;
-import com.ragagent.auth.apikey.service.TenantAPIKeyValidator;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.KnowledgeBaseFacts;
-import com.ragagent.contract.knowledge.KnowledgeBaseGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +33,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
 
 /**
  * 租户 API Key 管理端点（列表 / 创建 / 更新 / 删除）。

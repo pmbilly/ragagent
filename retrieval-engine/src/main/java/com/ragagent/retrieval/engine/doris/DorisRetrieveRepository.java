@@ -1,5 +1,13 @@
 package com.ragagent.retrieval.engine.doris;
 
+import com.ragagent.contract.vectorstore.IndexConfig;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.retrieval.config.RetrievalEnvLookup;
+import com.ragagent.retrieval.engine.EngineTypes;
+import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
+import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -9,18 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.retrieval.engine.EngineTypes;
-import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
-import com.ragagent.retrieval.engine.RetrieveEngineRepository;
-import com.ragagent.contract.vectorstore.IndexConfig;
-import com.ragagent.retrieval.config.RetrievalEnvLookup;
 
 /**
  * Apache Doris 检索引擎仓储。

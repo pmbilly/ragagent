@@ -1,9 +1,8 @@
 package com.ragagent.auth.apikey.controller.filter;
 
+import com.ragagent.contract.apikey.APIKeyCapability;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.ragagent.contract.apikey.APIKeyCapability;
 
 /**
  * 单条路由的 API-Key 策略。

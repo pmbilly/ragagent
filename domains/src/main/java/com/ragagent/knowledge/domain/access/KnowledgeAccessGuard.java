@@ -1,11 +1,11 @@
 package com.ragagent.knowledge.domain.access;
 
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import org.springframework.stereotype.Component;
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
+import org.springframework.stereotype.Component;
 
 /**
  * knowledge 文档操作面路由（第二批）的守卫入口——语义与 {@link ChunkAccessGuard}

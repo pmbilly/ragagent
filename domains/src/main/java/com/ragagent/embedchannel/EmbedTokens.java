@@ -1,15 +1,13 @@
 package com.ragagent.embedchannel;
 
+import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
-import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 
 /**
  * embed 令牌族。

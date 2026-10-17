@@ -1,13 +1,12 @@
 package com.ragagent.platform.stream;
 
-import java.time.OffsetDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.TokenUsage;
+import java.time.OffsetDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 流中的单个事件。

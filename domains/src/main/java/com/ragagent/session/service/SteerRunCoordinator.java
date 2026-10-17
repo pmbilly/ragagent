@@ -1,17 +1,15 @@
 package com.ragagent.session.service;
 
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.session.domain.message.Message;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.stream.StreamManager;
 
 /**
  * steer 运行协调（引擎侧收尾：discardSteerBacklog / kickNextRunFromSteerBacklog /

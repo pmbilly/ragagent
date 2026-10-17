@@ -2,20 +2,19 @@ package com.ragagent.knowledge.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.websearch.ImageInfo;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.support.KnowledgeIndexContent;
+import com.ragagent.platform.knowledge.ChunkSearchUtil;
+import com.ragagent.platform.knowledge.ImageInfoEnricher;
+import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.contract.websearch.ImageInfo;
-import com.ragagent.platform.knowledge.ImageInfoEnricher;
 import org.junit.jupiter.api.Test;
-import com.ragagent.platform.knowledge.ChunkSearchUtil;
-import com.ragagent.knowledge.support.KnowledgeIndexContent;
-import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
 
 /**
  * 摘要管线与向量索引的确定性纯逻辑。

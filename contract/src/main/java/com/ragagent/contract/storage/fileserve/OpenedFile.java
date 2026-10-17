@@ -1,11 +1,10 @@
 package com.ragagent.contract.storage.fileserve;
 
+import com.ragagent.contract.storage.provider.SeekableSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import com.ragagent.contract.storage.provider.SeekableSource;
 
 /**
  * 已打开的存储对象，三形态：

@@ -1,27 +1,25 @@
 package com.ragagent.platform.tracing.decorators;
 
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.platform.tracing.langfuse.LangfuseTokenUsage;
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.model.chat.ChatTool;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.platform.stream.QueuedChatStream;
 import com.ragagent.platform.tracing.langfuse.Generation;
+import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.platform.tracing.langfuse.LangfuseTokenUsage;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
-import com.ragagent.contract.model.ChatStream;
-import com.ragagent.platform.stream.QueuedChatStream;
-
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.model.chat.ToolCall;
-import com.ragagent.contract.model.chat.ChatTool;
 
 /**
  * chat 客户端的 langfuse 装饰器：

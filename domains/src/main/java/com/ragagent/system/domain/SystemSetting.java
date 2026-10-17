@@ -1,15 +1,14 @@
 package com.ragagent.system.domain;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import com.ragagent.platform.web.ZeroTimeSerializer;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 /**
  * system_settings 表实体（迁移 000053）。

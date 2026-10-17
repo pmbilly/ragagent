@@ -1,11 +1,10 @@
 package com.ragagent.mcp.dto;
 
-import java.util.Map;
-
 import com.ragagent.mcp.domain.McpAdvancedConfig;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpStdioConfig;
+import java.util.Map;
 
 /**
  * 创建 MCP 服务的请求体。

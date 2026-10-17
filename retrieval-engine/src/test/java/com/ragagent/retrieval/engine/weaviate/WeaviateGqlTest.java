@@ -3,12 +3,10 @@ package com.ragagent.retrieval.engine.weaviate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Weaviate GraphQL 串的字节契约——<b>golden 期望串</b>：下面四条录自

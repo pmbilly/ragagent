@@ -3,7 +3,6 @@ package com.ragagent.mcp.protocol;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTransportType;
-
 import java.net.URI;
 import java.time.Duration;
 import java.util.Map;

@@ -9,14 +9,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.tool.ToolApprovalException;
-import com.ragagent.contract.tool.Decision;
-import com.ragagent.contract.tool.ToolApprovalGate;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.tool.Decision;
+import com.ragagent.contract.tool.ToolApprovalException;
+import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
+import com.ragagent.platform.access.TenantContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

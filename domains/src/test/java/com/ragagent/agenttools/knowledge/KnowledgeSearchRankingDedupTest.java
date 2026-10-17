@@ -2,13 +2,11 @@ package com.ragagent.agenttools.knowledge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.ResultWithMeta;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.SearchResultView;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * 去重语义：多键（id / parent / kb#index）+ 内容签名，且<b>同 ID 保留最高分</b>。

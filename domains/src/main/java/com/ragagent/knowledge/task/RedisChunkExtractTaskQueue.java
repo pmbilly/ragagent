@@ -1,10 +1,8 @@
 package com.ragagent.knowledge.task;
 
 import com.ragagent.knowledge.domain.ChunkExtractConsumer;
-
-import org.springframework.data.redis.core.StringRedisTemplate;
-
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
  * {@link ChunkExtractTaskQueue} 的 <b>Redis</b> 实现（跨实例共享任务表）。

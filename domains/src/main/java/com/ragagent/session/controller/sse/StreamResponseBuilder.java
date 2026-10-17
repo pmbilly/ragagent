@@ -1,14 +1,13 @@
 package com.ragagent.session.controller.sse;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.stream.StreamEvent;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 把流事件翻成 SSE 响应体。

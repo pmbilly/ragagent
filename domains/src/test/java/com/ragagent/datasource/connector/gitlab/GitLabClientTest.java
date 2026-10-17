@@ -3,16 +3,14 @@ package com.ragagent.datasource.connector.gitlab;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.datasource.domain.DataSourceConfig;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.DataSourceConfig;
 
 /**
  * {@link GitLabClient} 的语义测试（配置解析与流式部分在

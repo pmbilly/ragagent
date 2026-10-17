@@ -1,13 +1,12 @@
 package com.ragagent.embedchannel.domain;
 
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.platform.persistence.JsonbRawStringTypeHandler;
+import java.time.OffsetDateTime;
 
 /**
  * Web embed 渠道。

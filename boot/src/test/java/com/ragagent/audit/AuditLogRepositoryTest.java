@@ -2,20 +2,19 @@ package com.ragagent.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.TestSchema;
+import com.ragagent.audit.domain.AuditLog;
+import com.ragagent.audit.domain.AuditLogQuery;
+import com.ragagent.audit.mapper.AuditLogRepository;
+import com.ragagent.contract.audit.AuditAction;
+import com.ragagent.contract.audit.AuditOutcome;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.TestSchema;
-import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.audit.domain.AuditLogQuery;
-import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.audit.mapper.AuditLogRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

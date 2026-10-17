@@ -2,7 +2,6 @@ package com.ragagent.mcp.protocol;
 
 import com.ragagent.mcp.domain.McpResource;
 import com.ragagent.mcp.domain.McpTool;
-
 import java.util.List;
 import java.util.Map;
 

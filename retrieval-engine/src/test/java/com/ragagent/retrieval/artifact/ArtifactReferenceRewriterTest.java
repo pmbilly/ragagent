@@ -2,14 +2,12 @@ package com.ragagent.retrieval.artifact;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.ragagent.retrieval.artifact.ArtifactReferenceRewriter.Artifact;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.retrieval.artifact.ArtifactReferenceRewriter.Artifact;
 
 /**
  * 产物引用改写的字节契约：期望值逐条钉死，

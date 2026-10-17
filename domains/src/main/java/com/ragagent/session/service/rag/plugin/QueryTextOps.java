@@ -1,10 +1,10 @@
 package com.ragagent.session.service.rag.plugin;
 
+import com.ragagent.session.service.rag.support.QueryTokenizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import com.ragagent.session.service.rag.support.QueryTokenizer;
 
 /**
  * 查询关键词/分词静态工具（自 {@link PluginSearch} 拆出，全静态）：中英停用词、疑问词剥离、

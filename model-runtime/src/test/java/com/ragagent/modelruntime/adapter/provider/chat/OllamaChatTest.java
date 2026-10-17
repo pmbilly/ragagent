@@ -5,13 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.model.PromptCacheStatus;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.chat.CacheRetention;
 import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.contract.model.chat.ChatMessage;
@@ -19,17 +17,17 @@ import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.contract.model.chat.FunctionCall;
-import com.ragagent.contract.model.PromptCacheStatus;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.llm.ollama.OllamaChatRequest;
 import com.ragagent.llm.ollama.OllamaChatResponse;
+import com.ragagent.llm.ollama.OllamaMessage;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.llm.ollama.OllamaToolCall;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
-import com.ragagent.llm.ollama.OllamaMessage;
 
 /**
  * Ollama chat 路径的语义测试（按代码逐条建契约，覆盖最容易出错的几处）。

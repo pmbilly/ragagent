@@ -1,13 +1,12 @@
 package com.ragagent.datasource.connector.feishu.core;
 
+import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.datasource.domain.SyncCursor;
 
 /**
  * 飞书游标的线格式编解码（wiki 的 {@code spaceNodeTimes} /

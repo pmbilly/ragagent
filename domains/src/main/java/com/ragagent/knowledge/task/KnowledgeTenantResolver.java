@@ -1,10 +1,9 @@
 package com.ragagent.knowledge.task;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 解析「知识处理链要跑在哪个租户作用域」——worker 虚拟线程<b>没有</b> HTTP Filter 链填

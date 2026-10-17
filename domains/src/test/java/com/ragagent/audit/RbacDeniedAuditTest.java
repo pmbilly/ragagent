@@ -1,11 +1,5 @@
 package com.ragagent.audit;
 
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
-
-import com.ragagent.contract.audit.AuditOutcome;
-
-import com.ragagent.contract.audit.AuditAction;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -17,19 +11,21 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.mapper.AuditLogRepository;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.audit.service.RbacDeniedAuditorRegistrar;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
+import com.ragagent.contract.audit.AuditAction;
+import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.web.RbacInterceptor;
 import com.ragagent.platform.config.TenantProperties;
+import com.ragagent.platform.web.RbacInterceptor;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

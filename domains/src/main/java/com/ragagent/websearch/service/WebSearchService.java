@@ -1,24 +1,22 @@
 package com.ragagent.websearch.service;
 
 
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.WebResultConverter;
+import com.ragagent.contract.websearch.WebSearchFilters;
+import com.ragagent.contract.websearch.WebSearchResult;
+import com.ragagent.websearch.domain.WebSearchProviderEntity;
+import com.ragagent.websearch.domain.WebSearchProviderParams;
+import com.ragagent.websearch.mapper.WebSearchProviderRepository;
 import com.ragagent.websearch.provider.WebSearchProvider;
+import com.ragagent.websearch.provider.WebSearchProviderRegistry;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.springframework.stereotype.Service;
-
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.websearch.WebSearchFilters;
-import com.ragagent.contract.websearch.WebSearchResult;
-import com.ragagent.contract.retrieval.WebResultConverter;
-import com.ragagent.websearch.domain.WebSearchProviderEntity;
-import com.ragagent.websearch.domain.WebSearchProviderParams;
-import com.ragagent.websearch.mapper.WebSearchProviderRepository;
-import com.ragagent.websearch.provider.WebSearchProviderRegistry;
 
 /**
  * 网络搜索执行服务（搜索执行链：search / resolveProvider / 黑名单过滤 /

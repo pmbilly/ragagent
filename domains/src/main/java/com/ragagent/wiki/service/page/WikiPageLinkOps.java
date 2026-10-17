@@ -1,5 +1,7 @@
 package com.ragagent.wiki.service.page;
 
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.wiki.domain.WikiPage;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,10 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.wiki.domain.WikiPage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

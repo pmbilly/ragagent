@@ -2,15 +2,13 @@ package com.ragagent.agent.compaction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.contract.model.chat.FunctionCall;
+import com.ragagent.contract.model.chat.ToolCall;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * 切点选择的录制常量断言。

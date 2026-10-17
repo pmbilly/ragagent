@@ -1,34 +1,33 @@
 package com.ragagent.auth.controller;
 
-import com.ragagent.platform.web.JsonBodyErrors;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.RequestFields;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.TenantMemberResponse;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantRbacException;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.JsonBodyErrors;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.RequestFields;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 租户成员管理的 5 条路由：

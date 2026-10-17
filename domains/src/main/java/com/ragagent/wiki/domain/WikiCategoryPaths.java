@@ -1,12 +1,12 @@
 package com.ragagent.wiki.domain;
 
 
+import com.ragagent.contract.wiki.WikiConstants;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import com.ragagent.contract.wiki.WikiConstants;
 
 /**
  * Wiki 目录路径 / 候选类型的纯函数工具。

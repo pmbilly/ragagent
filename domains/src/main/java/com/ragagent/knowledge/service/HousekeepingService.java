@@ -1,8 +1,11 @@
 package com.ragagent.knowledge.service;
 
 
-import java.time.Duration;
 import com.ragagent.knowledge.config.HousekeepingProperties;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
+import jakarta.annotation.PreDestroy;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -18,11 +21,6 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-
-import com.ragagent.knowledge.domain.Knowledge;
-
-import jakarta.annotation.PreDestroy;
-import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
 
 /**
  * follow-up 落地）。

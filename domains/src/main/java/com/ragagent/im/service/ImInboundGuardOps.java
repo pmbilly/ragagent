@@ -1,16 +1,14 @@
 package com.ragagent.im.service;
 
+import com.ragagent.im.runtime.ImFormat;
+import com.ragagent.im.runtime.ImRedisKeys;
+import com.ragagent.im.runtime.ImRedisStore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ragagent.im.runtime.ImFormat;
-import com.ragagent.im.runtime.ImRedisKeys;
-import com.ragagent.im.runtime.ImRedisStore;
 
 /**
  * 消息入口的两道闸门：**去重**（同一 messageID 只处理一次）与**限流**（按渠道+用户+会话的滑动窗口配额）。

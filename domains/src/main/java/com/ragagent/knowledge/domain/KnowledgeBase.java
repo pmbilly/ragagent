@@ -1,13 +1,13 @@
 package com.ragagent.knowledge.domain;
 
-import java.time.OffsetDateTime;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import java.time.OffsetDateTime;
 
 /**
  * knowledge_bases 表实体。

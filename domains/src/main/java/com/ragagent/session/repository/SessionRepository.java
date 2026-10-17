@@ -1,27 +1,24 @@
 package com.ragagent.session.repository;
 
-import com.ragagent.platform.persistence.LikeEscapes;
-
-import com.ragagent.session.mapper.SessionMapper;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
-
-import javax.sql.DataSource;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.contract.session.SessionLastRequestState;
 import com.ragagent.platform.persistence.DatabaseDialects;
+import com.ragagent.platform.persistence.LikeEscapes;
 import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
 import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.contract.session.SessionLastRequestState;
 import com.ragagent.session.domain.conversation.SessionListItem;
 import com.ragagent.session.domain.conversation.SessionListQuery;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.session.domain.conversation.SessionPage;
+import com.ragagent.session.mapper.SessionMapper;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
+import javax.sql.DataSource;
 import org.springframework.stereotype.Component;
 
 /**

@@ -1,22 +1,20 @@
 package com.ragagent.agent.tool;
 
-import com.ragagent.contract.agent.SkillCatalogPort;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.skills.SkillSource;
-import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.contract.agent.SkillCatalogPort;
 import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.web.JsonMappers;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 /**
  * {@code read_file}（技能资源）的行为契约。

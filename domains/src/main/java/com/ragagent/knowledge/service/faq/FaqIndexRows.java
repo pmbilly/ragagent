@@ -1,13 +1,13 @@
 package com.ragagent.knowledge.service.faq;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.contract.retrieval.IndexRow;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FAQ 索引行组装。2026-09-22 走查批接线：此前的

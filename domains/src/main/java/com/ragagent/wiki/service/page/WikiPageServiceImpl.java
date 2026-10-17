@@ -1,41 +1,40 @@
 package com.ragagent.wiki.service.page;
 
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.wiki.domain.WikiCategoryPaths;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiException;
+import com.ragagent.contract.wiki.WikiIndex;
+import com.ragagent.contract.wiki.WikiIndexEntry;
+import com.ragagent.contract.wiki.WikiPageNotFoundException;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.domain.WikiCategoryPaths;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.domain.folder.WikiFolder;
 import com.ragagent.wiki.domain.folder.WikiFolderNode;
 import com.ragagent.wiki.domain.graph.WikiGraph;
-import com.ragagent.contract.wiki.WikiIndex;
-import com.ragagent.contract.wiki.WikiIndexEntry;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.domain.WikiPageIssue;
-import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.domain.page.WikiPageListRequest;
 import com.ragagent.wiki.domain.page.WikiPageListResponse;
-import com.ragagent.contract.wiki.WikiPageNotFoundException;
+import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.domain.page.WikiPageRevision;
 import com.ragagent.wiki.domain.page.WikiPageRevisionListResponse;
 import com.ragagent.wiki.domain.page.WikiStats;
 import com.ragagent.wiki.repository.WikiFolderRepository;
 import com.ragagent.wiki.repository.WikiPageRepository;
 import com.ragagent.wiki.service.WikiChunkCleaner;
-import com.ragagent.wiki.service.ingest.graph.WikiGraphCalculator;
 import com.ragagent.wiki.service.ingest.WikiPendingOpsCounter;
+import com.ragagent.wiki.service.ingest.graph.WikiGraphCalculator;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
-import com.ragagent.platform.web.JsonMappers;
 
 /**
  * wiki 页面服务实现。

@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine.doris;
 
+import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,8 +10,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Predicate;
-
-import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

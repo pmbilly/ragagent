@@ -1,14 +1,13 @@
 package com.ragagent.datasource.domain;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.time.OffsetDateTime;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ZeroTimeSerializer;
+import java.time.OffsetDateTime;
+import java.util.Map;
 
 /**
  * 增量同步的位置/状态。

@@ -1,13 +1,12 @@
 package com.ragagent.vectorstore.service;
 
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.vectorstore.ConnectionConfig;
 import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.contract.vectorstore.VectorStoreLookup;
 import com.ragagent.contract.vectorstore.VectorStoreView;
 import com.ragagent.vectorstore.domain.VectorStore;
 import com.ragagent.vectorstore.mapper.VectorStoreRepository;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link VectorStoreLookup} 的 vectorstore 侧实现。

@@ -1,12 +1,11 @@
 package com.ragagent.agent;
 
-import java.util.List;
-import java.util.function.Supplier;
-
 import com.ragagent.contract.agent.AgentEngineHandle;
 import com.ragagent.contract.agent.AgentExecutionException;
 import com.ragagent.contract.agent.SteerSink;
 import com.ragagent.contract.model.chat.ChatMessage;
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * {@link AgentEngineHandle} 的适配器（R5c）：把域侧的 4 个调用转发给 {@link AgentEngine}。

@@ -2,13 +2,12 @@ package com.ragagent.agent.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.web.ToolJson;
 import com.ragagent.agent.fixtures.ContractJson;
-import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agent.fixtures.GoRecording45A;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.platform.web.ToolJson;
+import org.junit.jupiter.api.Test;
 
 /**
  * ToolJson 的录制语料（9 条：把 JSON 解析成树再重编码）。

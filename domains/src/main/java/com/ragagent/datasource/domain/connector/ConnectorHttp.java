@@ -1,5 +1,6 @@
 package com.ragagent.datasource.domain.connector;
 
+import com.ragagent.platform.security.SsrfGuard;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -12,8 +13,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import com.ragagent.platform.security.SsrfGuard;
 
 /**
  * 连接器的出站 HTTP 底座（SSRF 防护、限次重定向、整体超时预算）。

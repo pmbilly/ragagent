@@ -14,34 +14,32 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.platform.access.TenantContext;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.retrieval.HybridSearchPort;
 import com.ragagent.contract.retrieval.RetrieveEngineException;
-import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchParams;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.session.domain.message.MessageWithSession;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * 消息搜索的**向量路径**。

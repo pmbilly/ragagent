@@ -5,24 +5,22 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.contract.doc.DocReaderParsePort;
+import com.ragagent.contract.knowledge.DocumentChunkingPort;
+import com.ragagent.contract.model.AsrTranscriber;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.session.MessageAttachment;
+import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
+import com.ragagent.platform.knowledge.ImageRefRewriter;
+import com.ragagent.session.domain.document.TemporaryDocument;
+import com.ragagent.session.repository.TemporaryDocumentRepository;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-
-import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.session.domain.document.TemporaryDocument;
-import com.ragagent.session.repository.TemporaryDocumentRepository;
-import com.ragagent.auth.service.TenantService;
-import com.ragagent.contract.model.AsrTranscriber;
-import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.knowledge.DocumentChunkingPort;
-import com.ragagent.platform.knowledge.ImageRefRewriter;
 
 /**
  * ResolveForPrompt + 图片落地（含 docreader 图片分支）的行为验收。

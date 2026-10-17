@@ -4,10 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.protocol.McpOAuthRequiredException;
+import org.junit.jupiter.api.Test;
 
 /**
  * 刷新失败归一：**"上游要求 OAuth 授权"的信号必须保留**。

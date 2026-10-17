@@ -1,13 +1,12 @@
 package com.ragagent.platform.knowledge;
 
 import com.ragagent.contract.agent.SearchAuth;
+import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.contract.knowledge.ChunkFacts;
 
 /**
  * wiki_read_source_doc / get_document_info / list_knowledge_chunks 三工具共享的

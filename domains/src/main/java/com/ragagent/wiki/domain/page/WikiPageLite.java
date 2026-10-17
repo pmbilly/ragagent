@@ -1,11 +1,9 @@
 package com.ragagent.wiki.domain.page;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.ragagent.wiki.domain.WikiStringListTypeHandler;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import com.baomidou.mybatisplus.annotation.TableField;
 
 /**
  * WikiPage 的瘦投影。

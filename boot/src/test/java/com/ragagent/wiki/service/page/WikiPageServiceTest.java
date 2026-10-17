@@ -3,27 +3,27 @@ package com.ragagent.wiki.service.page;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import com.ragagent.TestSchema;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiException;
-import com.ragagent.wiki.domain.folder.WikiFolder;
-import com.ragagent.wiki.domain.folder.WikiFolderConflictException;
-import com.ragagent.wiki.domain.folder.WikiFolderNode;
-import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;
 import com.ragagent.contract.wiki.WikiIndex;
 import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.WikiPageIssue;
-import com.ragagent.wiki.domain.page.WikiPageLite;
+import com.ragagent.wiki.domain.folder.WikiFolder;
+import com.ragagent.wiki.domain.folder.WikiFolderConflictException;
+import com.ragagent.wiki.domain.folder.WikiFolderNode;
+import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;
+import com.ragagent.wiki.domain.folder.WikiFolderNotFoundException;
 import com.ragagent.wiki.domain.page.WikiPageListRequest;
+import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.domain.page.WikiStats;
-import com.ragagent.wiki.repository.WikiPageRepository;
 import com.ragagent.wiki.repository.WikiFolderRepository;
+import com.ragagent.wiki.repository.WikiPageRepository;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,7 +31,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.wiki.domain.folder.WikiFolderNotFoundException;
 
 /**
  * Wiki 页面服务的测试。

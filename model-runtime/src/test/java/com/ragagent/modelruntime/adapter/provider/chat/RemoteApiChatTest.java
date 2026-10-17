@@ -7,6 +7,25 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.model.StreamResponse;
+import com.ragagent.contract.model.TokenUsage;
+import com.ragagent.contract.model.chat.ChatConfig;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.model.chat.ChatTool;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapters;
+import com.ragagent.platform.http.LlmTransport;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.web.ContractJsonModule;
+import com.ragagent.platform.web.JsonMappers;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -17,31 +36,10 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.web.ContractJsonModule;
-import com.ragagent.platform.web.JsonMappers;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.contract.model.chat.ChatConfig;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.chat.ChatTool;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.contract.model.chat.ToolCall;
-import com.sun.net.httpserver.HttpServer;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import com.ragagent.platform.http.LlmTransport;
-import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapters;
 
 /**
  * {@code RemoteApiChat} 出站/入站语义测试，外加针对 Java 单路径（裸 HTTP + SseReader）

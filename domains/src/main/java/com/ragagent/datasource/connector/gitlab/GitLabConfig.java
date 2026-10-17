@@ -1,12 +1,11 @@
 package com.ragagent.datasource.connector.gitlab;
 
+import com.ragagent.contract.text.Whitespace;
+import com.ragagent.datasource.domain.DataSourceConfig;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.DataSourceConfig;
-import com.ragagent.contract.text.Whitespace;
 
 /**
  * GitLab 数据源的 {@code settings} 形状与解析。

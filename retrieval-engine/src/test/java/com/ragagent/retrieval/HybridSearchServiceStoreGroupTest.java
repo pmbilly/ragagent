@@ -8,36 +8,34 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.contract.retrieval.SearchParams;
-import com.ragagent.platform.model.EmbeddingGateway;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.ChunkSearchGateway;
 import com.ragagent.contract.knowledge.KnowledgeBaseSearchFacts;
 import com.ragagent.contract.knowledge.KnowledgeBaseSearchGateway;
 import com.ragagent.contract.knowledge.KnowledgeDocumentGateway;
 import com.ragagent.contract.model.ModelFacts;
+import com.ragagent.contract.retrieval.RetrieveEngineException;
+import com.ragagent.contract.retrieval.SearchParams;
+import com.ragagent.contract.retrieval.TenantStoreOwnership;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.platform.config.RetrievalDriverProperties;
+import com.ragagent.platform.model.EmbeddingGateway;
 import com.ragagent.platform.model.ModelGateway;
+import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.KeywordsVectorHybridRetrieveEngineService;
-import com.ragagent.contract.retrieval.RetrieveEngineException;
-import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
-import com.ragagent.retrieval.engine.RetrieverEngineParams;
-import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import com.ragagent.retrieval.engine.RetrieveEngineService;
+import com.ragagent.retrieval.engine.RetrieverEngineParams;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * store-group 面钉子：工厂哨兵 → 2200/2201 的分类映射、多 KB 嵌入模型一致性闸门、

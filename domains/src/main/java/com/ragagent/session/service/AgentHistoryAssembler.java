@@ -1,21 +1,19 @@
 package com.ragagent.session.service;
 
+import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.agent.AgentToolCall;
+import com.ragagent.contract.agent.ToolResultPersist;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.FunctionCall;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.support.PipelineViews;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.contract.agent.AgentStep;
-
-import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ToolCall;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.support.PipelineViews;
-import com.ragagent.contract.agent.ToolResultPersist;
-import com.ragagent.contract.model.chat.FunctionCall;
 
 /**
  * {@code SessionAgentQaService} 的**历史/消息装配簇**：把落库的 {@code Message}

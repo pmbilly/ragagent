@@ -1,21 +1,19 @@
 package com.ragagent.session.service;
 
-import java.time.OffsetDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.springframework.stereotype.Service;
-
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ResponseType;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.contract.model.ResponseType;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.dto.StopSessionRequest;
+import java.time.OffsetDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.springframework.stereotype.Service;
 
 /**
  * 会话停止用例：校验（消息可见性 + 会话 owner 范围 + 租户匹配）后向流管理器写 stop 事件。

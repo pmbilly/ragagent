@@ -2,8 +2,11 @@ package com.ragagent.wiki.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.audit.WikiActivityAudit;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
 import com.ragagent.wiki.service.page.WikiLintService;
 import com.ragagent.wiki.service.page.WikiPageService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,9 +21,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.platform.web.ApiResponse;
 
 /**
  * Wiki 页面的 HTTP 层。

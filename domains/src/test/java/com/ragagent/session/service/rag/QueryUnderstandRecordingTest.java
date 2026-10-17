@@ -8,22 +8,20 @@ import static com.ragagent.session.service.rag.Rec46cSupport.mask;
 import static com.ragagent.session.service.rag.Rec46cSupport.message;
 import static com.ragagent.session.service.rag.Rec46cSupport.msgsJSON;
 
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.session.MessageAttachment;
+import com.ragagent.contract.session.MessageImage;
+import com.ragagent.contract.session.PipelineMessageAttachmentView;
+import com.ragagent.platform.prompt.PipelineConfig;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.service.rag.plugin.PluginError;
+import com.ragagent.session.service.rag.plugin.PluginQueryUnderstand;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.session.service.rag.plugin.PluginError;
-import com.ragagent.session.service.rag.plugin.PluginQueryUnderstand;
-import com.ragagent.contract.session.PipelineMessageAttachmentView;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.platform.prompt.PipelineConfig;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.session.MessageImage;
 
 /**
  * 录制回放：query_understand 族 + load_history + history_messages

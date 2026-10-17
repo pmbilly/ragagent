@@ -1,17 +1,15 @@
 package com.ragagent.websearch.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.knowledge.KnowledgeMaintenancePort;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-
-import com.ragagent.contract.knowledge.KnowledgeMaintenancePort;
 
 /**
  * web 搜索临时 KB 的 Redis 状态（Get/Save/Delete 三方法，键

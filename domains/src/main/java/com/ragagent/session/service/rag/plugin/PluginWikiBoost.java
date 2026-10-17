@@ -1,14 +1,13 @@
 package com.ragagent.session.service.rag.plugin;
 
-import java.util.List;
-
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.retrieval.ChunkTypes;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.session.service.rag.ChatManage;
 import com.ragagent.session.service.rag.PipelineEventType;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.retrieval.ChunkTypes;
+import java.util.List;
 
 /**
  * CHUNK_RERANK 附加插件：rerank 链之后的

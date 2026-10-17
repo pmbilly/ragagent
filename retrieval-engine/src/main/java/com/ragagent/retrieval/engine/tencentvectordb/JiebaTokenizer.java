@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine.tencentvectordb;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,11 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * 腾讯 VectorDB 稀疏向量的默认分词器——对齐腾讯 SDK（tcvdbtext）内置 jieba 分词的

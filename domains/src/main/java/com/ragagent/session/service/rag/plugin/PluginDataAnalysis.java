@@ -1,27 +1,26 @@
 package com.ragagent.session.service.rag.plugin;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.retrieval.ChunkTypes;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineEventType;
+import com.ragagent.session.service.rag.PipelineLog;
+import com.ragagent.session.service.rag.support.MatchTypes;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineEventType;
-import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.session.service.rag.support.MatchTypes;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.contract.retrieval.ChunkTypes;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatResponse;
 
 /**
  * DATA_ANALYSIS 阶段插件：

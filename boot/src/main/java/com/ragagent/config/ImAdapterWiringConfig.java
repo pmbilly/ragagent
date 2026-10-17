@@ -1,21 +1,20 @@
 package com.ragagent.config;
 
-import org.springframework.context.annotation.Configuration;
-
-import com.ragagent.im.runtime.ImTypes;
-import com.ragagent.im.service.ImTurnOrchestrator;
-import com.ragagent.im.channel.slack.SlackAdapterFactory;
-import com.ragagent.im.channel.telegram.TelegramAdapterFactory;
-import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.im.channel.dingtalk.DingtalkAdapterFactory;
 import com.ragagent.im.channel.feishu.FeishuAdapterFactory;
 import com.ragagent.im.channel.feishu.FeishuRegion;
 import com.ragagent.im.channel.mattermost.MattermostAdapterFactory;
 import com.ragagent.im.channel.qqbot.QqBotAdapterFactory;
+import com.ragagent.im.channel.slack.SlackAdapterFactory;
+import com.ragagent.im.channel.telegram.TelegramAdapterFactory;
 import com.ragagent.im.channel.wechat.WechatAdapterFactory;
 import com.ragagent.im.channel.wecom.WecomAdapterFactory;
 import com.ragagent.im.channel.yunzhijia.YunzhijiaAdapterFactory;
+import com.ragagent.im.runtime.ImTypes;
+import com.ragagent.im.service.ImTurnOrchestrator;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.stream.StreamManager;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * IM 适配器工厂的装配。

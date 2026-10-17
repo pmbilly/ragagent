@@ -1,17 +1,21 @@
 package com.ragagent.platform.web;
 
 
-import com.ragagent.TestSchema;
-import com.ragagent.auth.domain.User;
-import com.ragagent.contract.auth.UserPreferences;
-import com.ragagent.auth.mapper.TenantMemberMapper;
-import com.ragagent.auth.mapper.UserMapper;
-import com.ragagent.tenant.domain.Tenant;
-import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.tenant.mapper.TenantMapper;
-import com.ragagent.contract.error.ErrorCode;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.TestSchema;
+import com.ragagent.auth.domain.TenantMember;
+import com.ragagent.auth.domain.User;
+import com.ragagent.auth.mapper.TenantMemberMapper;
+import com.ragagent.auth.mapper.UserMapper;
+import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.contract.error.ErrorCode;
+import com.ragagent.tenant.domain.Tenant;
+import com.ragagent.tenant.mapper.TenantMapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -33,10 +37,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 /**
  * 全局参数校验异常的 400 契约：信封形态 {@code {success:false, error:{code:1000,

@@ -1,5 +1,11 @@
 package com.ragagent.datasource.connector.feishu.core;
 
+import com.ragagent.datasource.domain.DataSourceConfig;
+import com.ragagent.datasource.domain.FetchedItem;
+import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.StreamHandler;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -7,16 +13,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ragagent.datasource.domain.connector.Connector;
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.connector.StreamHandler;
-import com.ragagent.datasource.domain.DataSourceConfig;
-import com.ragagent.datasource.domain.FetchedItem;
-import com.ragagent.datasource.domain.SyncCursor;
 
 /**
  * wiki 与云盘<b>共用</b>的泛型流式同步引擎。

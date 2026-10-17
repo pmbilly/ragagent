@@ -1,12 +1,11 @@
 package com.ragagent.modelcontext;
 
-import com.ragagent.platform.web.ContractJsonModule;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.platform.web.ContractJsonModule;
 
 /**
  * modelcontext 包内的 JSON 语义小工具：解析容错与 double 归一。

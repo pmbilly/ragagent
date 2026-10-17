@@ -1,8 +1,8 @@
 package com.ragagent.retrieval.engine;
 
+import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import java.util.List;
 import java.util.Map;
-import com.ragagent.retrieval.config.RetrievalEnvLookup;
 
 /**
  * 检索引擎共享类型（IndexInfo/MatchType/RetrieveParams/IndexWithScore/RetrieveResult）。

@@ -1,14 +1,13 @@
 package com.ragagent.datasource.connector.ima;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.time.OffsetDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ZeroTimeSerializer;
+import java.time.OffsetDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * IMA 连接器的游标载荷。它装进

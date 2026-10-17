@@ -6,13 +6,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.List;
-import java.util.Map;
-
 import com.ragagent.auth.apikey.domain.TenantAPIKeyRequest;
 import com.ragagent.auth.apikey.service.TenantAPIKeyValidator;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**

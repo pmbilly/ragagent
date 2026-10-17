@@ -1,12 +1,11 @@
 package com.ragagent.retrieval.engine.doris;
 
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 
 /**
  * Doris 驱动的常量与纯函数族——字段常量 / 列序 / whereBuilder / embedding 字面量与解析 /

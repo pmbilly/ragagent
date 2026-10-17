@@ -1,29 +1,27 @@
 package com.ragagent.session.service;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.time.OffsetDateTime;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.doc.DocReaderParsePort;
+import com.ragagent.contract.knowledge.DocumentChunkingPort;
+import com.ragagent.contract.model.AsrTranscriber;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.session.MessageAttachment;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.config.AppEnvLookup;
+import com.ragagent.platform.storage.config.UploadLimits;
+import com.ragagent.platform.text.ContentTypeByFilename;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.domain.document.TemporaryDocument;
+import com.ragagent.session.repository.TemporaryDocumentRepository;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.ragagent.platform.text.ContentTypeByFilename;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.model.AsrTranscriber;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.session.domain.document.TemporaryDocument;
-import com.ragagent.session.repository.TemporaryDocumentRepository;
-import com.ragagent.platform.storage.config.UploadLimits;
-import com.ragagent.contract.knowledge.DocumentChunkingPort;
 
 /**
  * 会话附件服务。

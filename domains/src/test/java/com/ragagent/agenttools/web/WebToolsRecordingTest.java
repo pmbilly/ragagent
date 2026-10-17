@@ -2,21 +2,19 @@ package com.ragagent.agenttools.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.tool.ToolCancellation;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.contract.websearch.WebSearchResult;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
-
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.contract.websearch.WebSearchResult;
-import com.ragagent.contract.tool.ToolCancellation;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.platform.web.JsonMappers;
 
 /**
  * web_search / web_fetch 工具钉。

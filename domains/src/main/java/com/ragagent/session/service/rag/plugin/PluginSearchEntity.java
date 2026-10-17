@@ -1,28 +1,27 @@
 package com.ragagent.session.service.rag.plugin;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.graph.GraphData;
+import com.ragagent.contract.graph.GraphNode;
+import com.ragagent.contract.graph.GraphRelation;
+import com.ragagent.contract.graph.NameSpace;
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineEventType;
+import com.ragagent.session.service.rag.PipelineLog;
+import com.ragagent.session.service.rag.support.ImageInfoCollector;
+import com.ragagent.session.service.rag.support.MatchTypes;
+import com.ragagent.session.service.rag.support.SearchSupport;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineEventType;
-import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.session.service.rag.support.ImageInfoCollector;
-import com.ragagent.session.service.rag.support.MatchTypes;
-import com.ragagent.session.service.rag.support.SearchSupport;
-import com.ragagent.contract.graph.GraphData;
-import com.ragagent.contract.graph.GraphNode;
-import com.ragagent.contract.graph.NameSpace;
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.graph.GraphRelation;
-import com.ragagent.contract.retrieval.RetrieveGraphRepository;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.web.JsonMappers;
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * ENTITY_SEARCH 阶段插件：

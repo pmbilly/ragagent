@@ -1,5 +1,20 @@
 package com.ragagent.memory.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.memory.domain.MemoryConsolidationResult;
+import com.ragagent.memory.domain.MemoryText;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.memory.domain.scope.MemorySubject;
+import com.ragagent.memory.domain.vector.MemoryVectors;
+import com.ragagent.memory.repository.MemoryRepository;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -8,25 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.memory.MemoryConfig;
-import com.ragagent.memory.domain.MemoryConsolidationResult;
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.memory.domain.scope.MemoryScope;
-import com.ragagent.memory.domain.scope.MemorySubject;
-import com.ragagent.memory.domain.MemoryText;
-import com.ragagent.memory.domain.vector.MemoryVectors;
-import com.ragagent.memory.repository.MemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import com.ragagent.contract.model.LlmChatClient;
 
 /**
  * 整仓回顾：把同一个主体近重复的记忆折成一条，并把搁置太久的任务降级。

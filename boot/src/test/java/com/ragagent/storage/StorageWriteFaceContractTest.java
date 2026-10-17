@@ -3,21 +3,19 @@ package com.ragagent.storage;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.TestSchema;
+import com.ragagent.contract.storage.fileserve.WritableFileContentService;
+import com.ragagent.storage.fileserve.LocalFileContentService;
+import com.ragagent.storage.fileserve.StorageFileResolver;
+import com.ragagent.storage.service.ResourceCatalogService;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import com.ragagent.TestSchema;
-import com.ragagent.storage.fileserve.LocalFileContentService;
-import com.ragagent.storage.fileserve.StorageFileResolver;
-import com.ragagent.contract.storage.fileserve.WritableFileContentService;
-import com.ragagent.storage.service.ResourceCatalogService;
 
 /**
  * 存储写字节面（SaveBytes/DeleteFile +

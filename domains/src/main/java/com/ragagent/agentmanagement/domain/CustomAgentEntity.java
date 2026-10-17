@@ -1,11 +1,10 @@
 package com.ragagent.agentmanagement.domain;
 
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ragagent.platform.persistence.JsonbRawStringTypeHandler;
+import java.time.OffsetDateTime;
 
 /**
  * custom_agents 行实体。

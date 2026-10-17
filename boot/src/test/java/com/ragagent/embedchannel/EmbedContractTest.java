@@ -3,13 +3,15 @@ package com.ragagent.embedchannel;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.TestSchema;
+import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.embedchannel.domain.EmbedChannelEntity;
+import com.ragagent.embedchannel.service.EmbedTokenStore;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.ragagent.TestSchema;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +26,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import com.ragagent.embedchannel.domain.EmbedChannelEntity;
-import com.ragagent.embedchannel.service.EmbedTokenStore;
-import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * embed 契约测试：管理面（emb-mgmt-*）+ 公开面（emb-pub-*），golden 逐条

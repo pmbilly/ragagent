@@ -1,17 +1,16 @@
 package com.ragagent.auth.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ragagent.auth.domain.AuthToken;
+import com.ragagent.auth.domain.TenantMember;
+import com.ragagent.auth.domain.User;
+import com.ragagent.auth.dto.Membership;
+import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.contract.tenant.TenantRowView;
+import io.jsonwebtoken.Claims;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.auth.domain.AuthToken;
-import com.ragagent.auth.dto.Membership;
-import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.auth.domain.User;
-import com.ragagent.contract.auth.UserPreferences;
-import io.jsonwebtoken.Claims;
-import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * 用户会话令牌操作（logout / refresh / switch-tenant，

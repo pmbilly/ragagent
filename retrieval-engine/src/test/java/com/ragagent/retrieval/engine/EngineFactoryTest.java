@@ -4,24 +4,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.vectorstore.ConnectionConfig;
+import com.ragagent.contract.vectorstore.IndexConfig;
+import com.ragagent.contract.vectorstore.VectorStoreView;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.retrieval.engine.EngineFactory.EngineNotSupportedException;
+import com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.retrieval.engine.EngineFactory.EngineNotSupportedException;
-import com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository;
-import com.ragagent.contract.vectorstore.ConnectionConfig;
-import com.ragagent.contract.vectorstore.IndexConfig;
-import com.ragagent.contract.vectorstore.VectorStoreView;
-import com.sun.net.httpserver.HttpServer;
 
 /**
  * 引擎工厂：按 store 建引擎的 ES v7/v8 分支（版本前缀判定、索引配置取值、Basic Auth、驱动自举）与

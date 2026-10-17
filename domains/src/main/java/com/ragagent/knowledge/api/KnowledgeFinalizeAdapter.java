@@ -1,14 +1,11 @@
 package com.ragagent.knowledge.api;
 
+import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
-
 import java.time.OffsetDateTime;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
 
 /**
  * {@link KnowledgeFinalizePort} 的 knowledge 侧实现。

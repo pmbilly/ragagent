@@ -1,16 +1,14 @@
 package com.ragagent.memory.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.ModelFacts;
-import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.platform.model.EmbeddingGateway;
+import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link MemoryModelResolver} 的默认实现：按模型 id 取运行时的聊天 / 嵌入模型实例

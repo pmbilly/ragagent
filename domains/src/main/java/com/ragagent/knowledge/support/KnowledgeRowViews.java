@@ -1,13 +1,12 @@
 package com.ragagent.knowledge.support;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ragagent.contract.knowledge.KnowledgePageView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.knowledge.domain.Knowledge;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ragagent.platform.web.JsonMappers;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 知识行实体 → 行视图的**域内单一映射**（供端口适配器、投影器调用点共用）。

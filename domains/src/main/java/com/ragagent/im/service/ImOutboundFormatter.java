@@ -6,9 +6,9 @@ import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.im.runtime.ThinkDisplay;
+import com.ragagent.platform.storage.support.Rewriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.platform.storage.support.Rewriter;
 
 /**
  * IM 出站内容整形与发送：XML/引用标签清洗、存储链接重写、最终答案兜底、

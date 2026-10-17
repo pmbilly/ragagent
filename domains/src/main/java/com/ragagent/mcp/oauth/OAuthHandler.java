@@ -1,14 +1,12 @@
 package com.ragagent.mcp.oauth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.ragagent.mcp.protocol.McpContext;
 
 /**
  * OAuth2 授权码流程客户端：发现 → 动态客户端注册 → 授权跳转 → code 交换 → 刷新。

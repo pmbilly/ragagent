@@ -5,9 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.BizException;
@@ -15,6 +12,8 @@ import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.domain.McpToolApproval;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**

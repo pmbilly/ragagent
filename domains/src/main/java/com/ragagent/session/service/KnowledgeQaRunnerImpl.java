@@ -1,18 +1,16 @@
 package com.ragagent.session.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineBuilder;
-import com.ragagent.session.service.rag.SummaryConfig;
-import com.ragagent.session.service.rag.spi.KnowledgeQaEventPort;
 import com.ragagent.contract.pipeline.KnowledgeQaRunRequest;
 import com.ragagent.contract.pipeline.KnowledgeQaRunResult;
 import com.ragagent.contract.pipeline.KnowledgeQaRunner;
 import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineBuilder;
+import com.ragagent.session.service.rag.SummaryConfig;
+import com.ragagent.session.service.rag.spi.KnowledgeQaEventPort;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * RAG 预设运行端口实现（R4b）：把契约请求还原成管线运行时上下文，跑 rag 预设，回带产物。

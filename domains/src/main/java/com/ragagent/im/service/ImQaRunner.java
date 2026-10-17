@@ -1,32 +1,30 @@
 package com.ragagent.im.service;
 
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-
 import com.ragagent.contract.agent.AgentLookup;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.event.EventBusFactory;
 import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.platform.event.EventType;
+import com.ragagent.contract.event.payload.AgentCompleteData;
+import com.ragagent.contract.event.payload.AgentFinalAnswerData;
+import com.ragagent.contract.event.payload.ErrorData;
+import com.ragagent.contract.session.MessageView;
+import com.ragagent.contract.session.QaRequestPayload;
+import com.ragagent.contract.session.SessionView;
 import com.ragagent.im.runtime.AdapterInterfaces.FullOutputProgressSender;
 import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.im.runtime.ReplyMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
 import com.ragagent.im.service.ImTurnOrchestrator.QaAttach;
 import com.ragagent.im.service.ImTurnOrchestrator.QaOutcome;
 import com.ragagent.im.service.ImTurnOrchestrator.QaTask;
-import com.ragagent.contract.event.payload.AgentCompleteData;
-import com.ragagent.contract.event.payload.AgentFinalAnswerData;
-import com.ragagent.contract.event.payload.ErrorData;
-import com.ragagent.contract.session.QaRequestPayload;
-import com.ragagent.contract.session.MessageView;
-import com.ragagent.contract.session.SessionView;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.event.EventType;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * IM QA 执行编排：队列 worker 的租户上下文绑定与在途登记、full-output / 流式 /

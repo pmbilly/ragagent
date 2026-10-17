@@ -1,12 +1,11 @@
 package com.ragagent.retrieval.telemetry;
 
+import com.ragagent.contract.retrieval.RetrievalObsRows;
 import com.ragagent.retrieval.engine.EngineTypes;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.contract.retrieval.RetrievalObsRows;
 
 /**
  * 检索观测：**引擎内部形状**（{@code EngineTypes.*}）的汇总两法。

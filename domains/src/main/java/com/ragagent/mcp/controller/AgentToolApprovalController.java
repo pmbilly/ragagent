@@ -2,13 +2,13 @@ package com.ragagent.mcp.controller;
 
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
 import com.ragagent.mcp.service.AgentToolApprovalService;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
 
 /**
  * 处理待审批的 MCP 工具调用。

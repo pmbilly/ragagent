@@ -1,20 +1,18 @@
 package com.ragagent.auth.service;
 
-import java.nio.charset.StandardCharsets;
 import com.ragagent.auth.config.JwtProperties;
+import com.ragagent.auth.domain.User;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.SignatureException;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Date;
-
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
-import com.ragagent.auth.domain.User;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.SignatureException;
 import org.springframework.stereotype.Component;
 
 /**

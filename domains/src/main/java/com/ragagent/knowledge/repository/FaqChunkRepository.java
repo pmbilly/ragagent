@@ -1,23 +1,23 @@
 package com.ragagent.knowledge.repository;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ragagent.platform.persistence.PageRequests;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import org.springframework.stereotype.Component;
-import com.ragagent.platform.persistence.DatabaseDialects;
-import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.mapper.ChunkMapper;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.platform.persistence.DatabaseDialects;
+import com.ragagent.platform.persistence.PageRequests;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.sql.DataSource;
-import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
+import org.springframework.stereotype.Component;
 
 /**
  * FAQ 条目的 chunk 仓储面（FAQ 条目 = chunk_type=faq 的行）：按 seq_id/知识/KB 的

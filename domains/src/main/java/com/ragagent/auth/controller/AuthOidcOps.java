@@ -1,21 +1,19 @@
 package com.ragagent.auth.controller;
 
+import com.ragagent.auth.dto.OidcAuthUrlResponse;
+import com.ragagent.auth.dto.OidcConfigResponse;
+import com.ragagent.auth.service.OidcService;
+import com.ragagent.auth.service.OidcStateCodec;
+import com.ragagent.auth.service.UserService;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ragagent.auth.service.OidcService;
-import com.ragagent.auth.service.UserService;
-import com.ragagent.auth.service.OidcStateCodec;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.auth.dto.OidcAuthUrlResponse;
-import com.ragagent.auth.dto.OidcConfigResponse;
-import com.ragagent.contract.error.BizException;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * AuthController 的 OIDC 簇：/oidc/config|url|start|callback 四端点执行体与

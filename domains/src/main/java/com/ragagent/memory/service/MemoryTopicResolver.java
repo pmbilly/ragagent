@@ -1,26 +1,25 @@
 package com.ragagent.memory.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.memory.MemoryKeys;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.memory.domain.MemoryText;
+import com.ragagent.memory.domain.MemoryTopicStat;
+import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.memory.repository.MemoryRepository;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.memory.MemoryKeys;
-import com.ragagent.memory.domain.scope.MemoryScope;
-import com.ragagent.memory.domain.MemoryText;
-import com.ragagent.memory.domain.MemoryTopicStat;
-import com.ragagent.memory.repository.MemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import com.ragagent.contract.model.LlmChatClient;
 
 /**
  * 把一次抽取产出的标签映射到这个人**已经有**的主体上。

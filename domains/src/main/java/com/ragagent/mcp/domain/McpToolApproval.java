@@ -1,10 +1,9 @@
 package com.ragagent.mcp.domain;
 
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.time.OffsetDateTime;
 
 /**
  * 逐工具的审批/启用策略。

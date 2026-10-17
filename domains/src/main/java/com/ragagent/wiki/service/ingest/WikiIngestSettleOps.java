@@ -1,11 +1,10 @@
 package com.ragagent.wiki.service.ingest;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ragagent.wiki.domain.TaskDeadLetter;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import com.ragagent.wiki.service.WikiKnowledgeFinalizer;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

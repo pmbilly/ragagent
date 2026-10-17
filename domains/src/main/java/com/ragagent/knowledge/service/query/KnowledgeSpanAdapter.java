@@ -1,14 +1,11 @@
 package com.ragagent.knowledge.service.query;
 
-import com.ragagent.knowledge.domain.span.SpanTracker;
-
-import java.util.Map;
-
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
+import com.ragagent.knowledge.domain.span.SpanTracker;
+import java.util.Map;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link KnowledgeSpanPort} 的 knowledge 侧实现。

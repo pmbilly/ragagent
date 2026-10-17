@@ -3,9 +3,8 @@ package com.ragagent.platform.settings;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
 
 /** 类型名与 400 文案的钉子（消息原文会透给前端）。 */
 class SystemSettingRegistryTest {

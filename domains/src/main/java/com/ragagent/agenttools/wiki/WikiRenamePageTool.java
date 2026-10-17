@@ -1,14 +1,13 @@
 package com.ragagent.agenttools.wiki;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.platform.web.JsonMappers;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * wiki_rename_page 工具。

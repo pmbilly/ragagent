@@ -1,10 +1,10 @@
 package com.ragagent.platform.prompt;
 
+import com.ragagent.contract.graph.GraphNode;
+import com.ragagent.contract.graph.GraphRelation;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import com.ragagent.contract.graph.GraphNode;
-import com.ragagent.contract.graph.GraphRelation;
 
 /**
  * 管线消费的配置切片：对话改写与意图系统提示词、实体抽取模板。

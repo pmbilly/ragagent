@@ -1,13 +1,12 @@
 package com.ragagent.retrieval.engine.doris;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

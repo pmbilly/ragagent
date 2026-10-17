@@ -1,14 +1,14 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.wiki.service.page.NewSlugFromCitation;
+import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.wiki.service.page.NewSlugFromCitation;
-import com.ragagent.wiki.service.page.WikiTextUtils;
 
 /**
  * trace 视图用的"内容预览"渲染。

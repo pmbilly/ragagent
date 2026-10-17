@@ -2,6 +2,7 @@ package com.ragagent.datasource.connector.rss;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.datasource.domain.SyncCursor;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -10,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.ragagent.datasource.domain.SyncCursor;
 import org.junit.jupiter.api.Test;
 
 /**

@@ -4,17 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.storage.fileserve.StoragePathGuard;
+import com.ragagent.knowledge.storage.LocalStorageService;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-
-import com.ragagent.contract.error.BizException;
-import com.ragagent.knowledge.storage.LocalStorageService;
-import com.ragagent.contract.storage.fileserve.StoragePathGuard;
 
 /**
  * ③ local 双实现去重的语义验证（W5γ5.1）：单一份实现在 {@link StoragePathGuard}，

@@ -1,10 +1,9 @@
 package com.ragagent.wiki.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.ChunkView;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**

@@ -2,14 +2,12 @@ package com.ragagent.session.service.suggestion;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.session.SuggestionItem;
+import com.ragagent.session.domain.message.Message;
 import java.util.List;
 import java.util.Set;
-
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.contract.session.SuggestionItem;
-import com.ragagent.contract.retrieval.SearchResult;
 
 /**
  * 追问建议生成的纯函数面（parseGeneratedSuggestions / merge / rank /

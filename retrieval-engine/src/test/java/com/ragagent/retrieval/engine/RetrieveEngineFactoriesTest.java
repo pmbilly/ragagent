@@ -1,6 +1,5 @@
 package com.ragagent.retrieval.engine;
 
-import com.ragagent.contract.retrieval.RetrieveEngineException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -8,19 +7,18 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.retrieval.RetrieveEngineException;
+import com.ragagent.retrieval.engine.RetrievalEngineTestSupport.FakeEngineService;
+import com.ragagent.retrieval.engine.RetrievalEngineTestSupport.FakeOwnership;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.retrieval.engine.RetrievalEngineTestSupport.FakeEngineService;
-import com.ragagent.retrieval.engine.RetrievalEngineTestSupport.FakeOwnership;
 
 /**
  * 工厂函数：{@code createForKb} / {@code createFromPayload} /

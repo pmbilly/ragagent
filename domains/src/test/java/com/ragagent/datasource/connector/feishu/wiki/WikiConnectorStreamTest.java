@@ -3,24 +3,6 @@ package com.ragagent.datasource.connector.feishu.wiki;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.connector.StreamHandler;
 import com.ragagent.datasource.connector.feishu.core.FeishuCursorCodec;
 import com.ragagent.datasource.connector.feishu.core.FeishuRegion;
 import com.ragagent.datasource.connector.feishu.core.FeishuSupport;
@@ -30,6 +12,22 @@ import com.ragagent.datasource.connector.feishu.core.SyncEngine;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.StreamHandler;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * wiki 流式同步的核心不变式（Tencent/WeKnora#2136）：<b>抓取失败不推进游标</b>、

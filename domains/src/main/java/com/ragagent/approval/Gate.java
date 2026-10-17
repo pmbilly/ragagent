@@ -1,27 +1,22 @@
 package com.ragagent.approval;
 
-import com.ragagent.contract.tool.ApprovalEvent;
-
-import com.ragagent.contract.tool.OAuthPendingRequest;
-
-import com.ragagent.contract.tool.Decision;
 import com.ragagent.contract.event.payload.MCPOAuthRequiredData;
 import com.ragagent.contract.event.payload.MCPOAuthResolvedData;
 import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
 import com.ragagent.contract.event.payload.ToolApprovalResolvedData;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.tool.ApprovalEvent;
+import com.ragagent.contract.tool.Cancellation;
+import com.ragagent.contract.tool.Decision;
+import com.ragagent.contract.tool.OAuthPendingRequest;
+import com.ragagent.contract.tool.PendingRequest;
 import com.ragagent.contract.tool.ToolApprovalException;
 import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.contract.tool.ToolEnabledChecks;
 import com.ragagent.contract.tool.ToolPolicyChecker;
-
-import com.ragagent.contract.tool.PendingRequest;
-
-import com.ragagent.contract.tool.Cancellation;
-
-import com.ragagent.platform.redis.RedisPubSub;
-
-import java.time.Duration;
 import com.ragagent.platform.config.AppEnvLookup;
+import com.ragagent.platform.redis.RedisPubSub;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -32,8 +27,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.ragagent.contract.model.ResponseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

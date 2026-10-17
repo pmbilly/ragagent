@@ -1,15 +1,15 @@
 package com.ragagent.modelruntime.adapter.provider.vlm;
 
 import com.ragagent.contract.model.VlmConfig;
+import com.ragagent.llm.ollama.OllamaChatRequest;
+import com.ragagent.llm.ollama.OllamaMessage;
+import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import com.ragagent.llm.ollama.OllamaChatRequest;
-import com.ragagent.llm.ollama.OllamaMessage;
-import com.ragagent.llm.ollama.OllamaService;
 
 /**
  * VLM（视觉语言模型）Predict 客户端。

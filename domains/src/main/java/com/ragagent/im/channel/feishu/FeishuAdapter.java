@@ -1,26 +1,24 @@
 package com.ragagent.im.channel.feishu;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.im.runtime.AdapterInterfaces;
+import com.ragagent.im.runtime.CallbackExchange;
+import com.ragagent.im.runtime.IncomingMessage;
+import com.ragagent.im.runtime.ReplyMessage;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.JsonMappers;
-import java.nio.charset.StandardCharsets;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
-
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.im.runtime.AdapterInterfaces;
-import com.ragagent.im.runtime.CallbackExchange;
-import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.runtime.ReplyMessage;
 
 /**
  * 飞书 / Lark 适配器。

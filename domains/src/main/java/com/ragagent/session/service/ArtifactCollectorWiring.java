@@ -1,14 +1,12 @@
 package com.ragagent.session.service;
 
-import java.io.IOException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.contract.storage.fileserve.GlobalFileServicePort;
 import com.ragagent.contract.storage.fileserve.WritableFileContentService;
+import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * AgentWebPages（agent 抓取页 web:// 快照）的生产装配。

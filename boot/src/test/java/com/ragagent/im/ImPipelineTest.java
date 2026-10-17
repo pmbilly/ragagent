@@ -4,12 +4,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.TestSchema;
+import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
+import com.ragagent.im.runtime.CallbackExchange;
+import com.ragagent.im.runtime.IncomingMessage;
+import com.ragagent.im.runtime.ReplyMessage;
+import com.ragagent.im.service.ImTurnOrchestrator;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +24,6 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
-import com.ragagent.TestSchema;
-import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
-import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.runtime.ReplyMessage;
-import com.ragagent.im.service.ImTurnOrchestrator;
-import com.ragagent.im.runtime.CallbackExchange;
 
 /**
  * W5γ2：IM 管线端到端（回调 → ACK → 去重/命令/会话解析 → QA → 回复送达）。

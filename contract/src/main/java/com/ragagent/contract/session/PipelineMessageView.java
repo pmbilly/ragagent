@@ -1,10 +1,9 @@
 package com.ragagent.contract.session;
 
 
+import com.ragagent.contract.retrieval.SearchResult;
 import java.time.OffsetDateTime;
 import java.util.List;
-
-import com.ragagent.contract.retrieval.SearchResult;
 
 /**
  * 会话消息的「聊天管线视图」——chat 管线在端口往返与历史装载时真正读取的字段。

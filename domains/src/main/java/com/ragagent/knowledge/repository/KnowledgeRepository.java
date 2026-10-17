@@ -1,29 +1,21 @@
 package com.ragagent.knowledge.repository;
 
-import com.ragagent.platform.persistence.LikeEscapes;
-
-import java.util.Set;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.List;
-import com.ragagent.knowledge.domain.KnowledgeSearchScope;
-import com.ragagent.platform.persistence.PageRequests;
-
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-
-import java.time.ZoneOffset;
-
-import java.time.OffsetDateTime;
-
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeSearchScope;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.platform.persistence.LikeEscapes;
+import com.ragagent.platform.persistence.PageRequests;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /**

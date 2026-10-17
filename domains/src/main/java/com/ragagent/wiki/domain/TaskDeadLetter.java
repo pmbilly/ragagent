@@ -1,13 +1,12 @@
 package com.ragagent.wiki.domain;
 
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import java.time.OffsetDateTime;
 
 /**
  * {@code task_dead_letters} 表实体（表结构以迁移 000041 第 2 段为准）。

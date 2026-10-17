@@ -3,21 +3,19 @@ package com.ragagent.retrieval.engine.doris;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.retrieval.engine.EngineTypes;
+import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
+import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.retrieval.engine.EngineTypes;
-import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
-import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 
 /**
  * Doris 仓储：

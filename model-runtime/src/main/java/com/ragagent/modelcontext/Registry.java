@@ -1,23 +1,22 @@
 package com.ragagent.modelcontext;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.ToolJson;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.contract.model.chat.FunctionDef;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.ToolJson;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * 请求局部模型句柄的唯一边界。

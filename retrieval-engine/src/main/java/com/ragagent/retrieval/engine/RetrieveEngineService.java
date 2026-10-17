@@ -1,12 +1,11 @@
 package com.ragagent.retrieval.engine;
 
-import java.util.List;
-import java.util.Map;
-
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 检索引擎服务端口——"引擎服务"层。

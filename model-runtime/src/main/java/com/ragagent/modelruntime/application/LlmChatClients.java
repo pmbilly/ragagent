@@ -8,9 +8,9 @@ import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
+import com.ragagent.modelruntime.adapter.provider.chat.OllamaChat;
 import com.ragagent.modelruntime.adapter.provider.chat.RemoteApiChat;
 import com.ragagent.modelruntime.adapter.provider.chat.anthropic.AnthropicChat;
-import com.ragagent.modelruntime.adapter.provider.chat.OllamaChat;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ConcurrencyChatClient;
 
 /**

@@ -2,19 +2,27 @@ package com.ragagent.session.service;
 
 
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import static com.ragagent.session.service.QaSupport.TagScope;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.event.EventBusInterface;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.contract.websearch.WebSearchProviderPort;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
+import com.ragagent.platform.settings.ConversationProperties;
+import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.service.rag.ChatManage;
 import com.ragagent.session.service.rag.EventManager;
@@ -23,29 +31,18 @@ import com.ragagent.session.service.rag.PipelineEventType;
 import com.ragagent.session.service.rag.PipelineLog;
 import com.ragagent.session.service.rag.PipelineProgress;
 import com.ragagent.session.service.rag.PipelineProgress.StageProgress;
-import com.ragagent.session.service.rag.plugin.PluginError;
 import com.ragagent.session.service.rag.SummaryConfig;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
-import com.ragagent.platform.settings.ConversationProperties;
-import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
-
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.retrieval.SearchResult;
-
-import static com.ragagent.session.service.QaSupport.TagScope;
-import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.session.service.rag.plugin.PluginError;
 import com.ragagent.session.support.PipelineViews;
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
-import com.ragagent.platform.tracing.langfuse.Span;
-import com.ragagent.contract.websearch.WebSearchProviderPort;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
  * 知识问答 service 面（chat_pipeline 的调用方）。

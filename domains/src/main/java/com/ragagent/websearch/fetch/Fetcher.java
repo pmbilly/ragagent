@@ -1,6 +1,9 @@
 package com.ragagent.websearch.fetch;
 
 import com.ragagent.contract.websearch.FetchException;
+import com.ragagent.platform.http.LlmTransport;
+import com.ragagent.platform.security.IpClass;
+import com.ragagent.platform.security.SsrfGuard;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
@@ -13,10 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.ragagent.platform.http.LlmTransport;
-import com.ragagent.platform.security.IpClass;
-import com.ragagent.platform.security.SsrfGuard;
 
 /**
  * 公网页面抓取器。

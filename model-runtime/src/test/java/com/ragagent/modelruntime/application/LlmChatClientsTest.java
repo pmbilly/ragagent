@@ -5,15 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatConfig;
+import com.ragagent.modelruntime.adapter.provider.chat.RemoteApiChat;
+import com.ragagent.modelruntime.adapter.provider.chat.anthropic.AnthropicChat;
+import com.ragagent.platform.http.LlmTransport;
+import com.ragagent.platform.security.SsrfGuard;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import com.ragagent.platform.http.LlmTransport;
-import com.ragagent.modelruntime.adapter.provider.chat.anthropic.AnthropicChat;
-import com.ragagent.modelruntime.adapter.provider.chat.RemoteApiChat;
 
 /**
  * 聊天实例工厂（{@code LlmChatClients#create} / {@code newRemoteChat}）的分发契约。

@@ -1,26 +1,29 @@
 package com.ragagent.auth.controller;
 
-import com.ragagent.platform.web.RequestFields;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.auth.domain.TenantInvitation;
 import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.TenantInvitationResponse;
 import com.ragagent.auth.service.TenantInvitationService;
 import com.ragagent.auth.service.TenantRbacException;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.error.ErrorCode;
+import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRowView;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.RequestFields;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,10 +32,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * 邀请相关的 9 条路由：租户侧 GET/POST /tenants/{id}/invitations、

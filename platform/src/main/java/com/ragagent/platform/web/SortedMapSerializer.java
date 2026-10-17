@@ -1,5 +1,9 @@
 package com.ragagent.platform.web;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.ragagent.contract.json.ByteKeyOrder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,11 +11,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import com.ragagent.contract.json.ByteKeyOrder;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
  * 让 {@code Map} 的输出键序确定且稳定：<b>按键排序，且递归到嵌套的 map 与数组</b>。

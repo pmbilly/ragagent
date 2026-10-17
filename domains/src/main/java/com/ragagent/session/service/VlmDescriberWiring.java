@@ -4,7 +4,6 @@ import com.ragagent.contract.agent.ImageDescriberFunc;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.VlmPredictor;
-
 import org.springframework.stereotype.Component;
 
 /**

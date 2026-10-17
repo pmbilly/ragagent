@@ -1,13 +1,5 @@
 package com.ragagent.platform.web;
 
-import com.ragagent.contract.tenant.StorageEngineConfig;
-
-import com.ragagent.contract.tenant.RetrievalConfig;
-
-import com.ragagent.contract.tenant.ChatHistoryConfig;
-
-import com.ragagent.contract.tenant.APIPrincipalConfig;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -15,11 +7,11 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import java.io.IOException;
-
 import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.agent.AgentToolCall;
 import com.ragagent.contract.agent.ToolCallTarget;
+import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.event.payload.AgentActionData;
 import com.ragagent.contract.event.payload.AgentCompleteData;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
@@ -27,46 +19,49 @@ import com.ragagent.contract.event.payload.AgentPlanData;
 import com.ragagent.contract.event.payload.AgentQueryData;
 import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
-import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.event.payload.ChatData;
-import com.ragagent.contract.vectorstore.ConnectionConfig;
 import com.ragagent.contract.event.payload.ContextCompactedData;
 import com.ragagent.contract.event.payload.ErrorData;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.contract.event.payload.MCPOAuthRequiredData;
 import com.ragagent.contract.event.payload.MCPOAuthResolvedData;
 import com.ragagent.contract.event.payload.MergeData;
+import com.ragagent.contract.event.payload.QueryData;
+import com.ragagent.contract.event.payload.RerankData;
+import com.ragagent.contract.event.payload.RetrievalData;
+import com.ragagent.contract.event.payload.StopData;
+import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
+import com.ragagent.contract.event.payload.ToolApprovalResolvedData;
+import com.ragagent.contract.event.payload.UserMessageInjectedData;
 import com.ragagent.contract.memory.MemoryMessageCursor;
+import com.ragagent.contract.model.PromptCacheStatus;
+import com.ragagent.contract.model.RankResult;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.model.StreamResponse;
+import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.contract.model.chat.FunctionDef;
 import com.ragagent.contract.model.chat.ImageUrl;
-import com.ragagent.contract.model.RankResult;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.contract.model.chat.MessageContentPart;
 import com.ragagent.contract.model.chat.ToolCall;
-import com.ragagent.contract.session.MessageView;
-import com.ragagent.contract.event.payload.QueryData;
-import com.ragagent.contract.event.payload.RerankData;
-import com.ragagent.contract.event.payload.RetrievalData;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.contract.event.payload.StopData;
-import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
-import com.ragagent.contract.event.payload.ToolApprovalResolvedData;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.contract.event.payload.UserMessageInjectedData;
-import com.ragagent.contract.tenant.WebSearchConfig;
+import com.ragagent.contract.session.MessageView;
+import com.ragagent.contract.tenant.APIPrincipalConfig;
+import com.ragagent.contract.tenant.ChatHistoryConfig;
 import com.ragagent.contract.tenant.ParserEngineConfig;
-import com.ragagent.contract.auth.UserPreferences;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.PromptCacheStatus;
+import com.ragagent.contract.tenant.RetrievalConfig;
+import com.ragagent.contract.tenant.StorageEngineConfig;
+import com.ragagent.contract.tenant.WebSearchConfig;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.contract.vectorstore.ConnectionConfig;
+import com.ragagent.contract.vectorstore.IndexConfig;
+import com.ragagent.contract.websearch.ImageInfo;
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.SlugUpdate;
+import java.io.IOException;
 
 /**
  * 契约载荷的 Jackson 装配：把线格式（键名/省略策略/枚举字面量）从契约类里剥离到 mixin 与

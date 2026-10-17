@@ -6,19 +6,17 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.contract.websearch.WebSearchFilters;
 import com.ragagent.contract.websearch.WebSearchResult;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
 import com.ragagent.websearch.mapper.WebSearchProviderRepository;
 import com.ragagent.websearch.provider.WebSearchProviderRegistry;
+import java.util.List;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * WebSearchService 执行链（Search/resolveProvider/

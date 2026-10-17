@@ -3,10 +3,9 @@ package com.ragagent.mcp.controller;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.service.McpMetadataException;
+import org.junit.jupiter.api.Test;
 
 /**
  * 目录快照异常 → HTTP 文案的映射。

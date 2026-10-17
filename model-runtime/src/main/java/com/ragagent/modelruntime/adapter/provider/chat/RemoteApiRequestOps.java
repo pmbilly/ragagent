@@ -1,8 +1,5 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.NullNode;
@@ -16,6 +13,8 @@ import com.ragagent.contract.model.chat.MessageContentPart;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.llm.domain.ProviderMetadataMaps;
 import com.ragagent.platform.web.JsonMappers;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 出站组装协作者（自 {@link RemoteApiChat} 拆出）：

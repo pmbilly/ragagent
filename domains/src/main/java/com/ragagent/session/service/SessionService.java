@@ -1,45 +1,43 @@
 package com.ragagent.session.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import com.ragagent.platform.prompt.AgentPromptPlaceholders;
-import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.platform.event.EventIds;
-import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.SessionTitleData;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.session.SessionLastRequestState;
+import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.contract.websearch.WebSearchTempStatePort;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
-import com.ragagent.session.domain.message.Message;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.event.EventIds;
+import com.ragagent.platform.event.EventType;
+import com.ragagent.platform.prompt.AgentPromptPlaceholders;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionListQuery;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.session.domain.conversation.SessionPage;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.contract.session.SessionLastRequestState;
-import com.ragagent.contract.websearch.WebSearchTempStatePort;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
  * 会话 service：读路径（{@link #getSession(String)} / {@link #getOwnedSession(String)} /

@@ -1,36 +1,33 @@
 package com.ragagent.session.service;
 
-import com.ragagent.contract.agent.AgentExecutionException;
-import com.ragagent.contract.agent.AgentEngineFactory;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
-import com.ragagent.contract.session.PipelineUsedMemoryView;
-import com.ragagent.contract.agent.AgentEngineHandle;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
+import com.ragagent.contract.agent.AgentBudgets;
+import com.ragagent.contract.agent.AgentEngineFactory;
+import com.ragagent.contract.agent.AgentEngineHandle;
+import com.ragagent.contract.agent.AgentExecutionException;
 import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.event.payload.ErrorData;
-import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.MemoryRecalledData;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.memory.MemoryRecallPort;
-import com.ragagent.contract.model.Reranker;
-
-import com.ragagent.session.support.PipelineViews;
-import com.ragagent.contract.agent.AgentBudgets;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
-import com.ragagent.platform.tracing.decorators.LangfuseReranker;
-import com.ragagent.contract.storage.ResourceCatalogPort;
+import com.ragagent.contract.memory.MemoryRecallPort;
+import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.model.Reranker;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.session.PipelineUsedMemoryView;
+import com.ragagent.contract.storage.ResourceCatalogPort;
+import com.ragagent.platform.event.EventType;
+import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
+import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
+import com.ragagent.platform.tracing.decorators.LangfuseReranker;
+import com.ragagent.session.support.PipelineViews;
+import java.util.ArrayList;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
  * agent 问答 service 面。

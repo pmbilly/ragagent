@@ -1,13 +1,12 @@
 package com.ragagent.mcp.tool;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.tool.BaseTool;
-import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.platform.web.JsonMappers;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * discover_mcp_tools：暴露授权目录与精确工具定义。描述与来源摘要伴随 direct 工具

@@ -2,7 +2,6 @@ package com.ragagent.embedchannel;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ErrorReportValve;

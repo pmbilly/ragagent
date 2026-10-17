@@ -1,13 +1,12 @@
 package com.ragagent.agent.skills;
 
-import com.ragagent.contract.agent.SkillCatalogPort;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.agent.SkillCatalogPort;
 import java.time.OffsetDateTime;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 /** 入库技能源：从 skills 表行（组装好的 SKILL.md）发现/加载技能；坏行跳过不致命。 */

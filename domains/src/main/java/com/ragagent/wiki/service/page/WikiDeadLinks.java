@@ -1,13 +1,13 @@
 package com.ragagent.wiki.service.page;
 
+import com.ragagent.contract.text.Whitespace;
+import com.ragagent.wiki.service.ingest.WikiBatchContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.ragagent.wiki.service.ingest.WikiBatchContext;
-import com.ragagent.contract.text.Whitespace;
 
 /**
  * 死链重写。

@@ -1,10 +1,9 @@
 package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Anthropic Messages 请求体。

@@ -1,24 +1,22 @@
 package com.ragagent.session.qa;
 
 
-import com.ragagent.contract.session.SseSink;
-import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.event.Event;
-import com.ragagent.platform.event.EventType;
+import com.ragagent.contract.event.payload.AgentCompleteData;
+import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.payload.AgentThoughtData;
 import com.ragagent.contract.event.payload.ErrorData;
-import com.ragagent.contract.event.payload.AgentFinalAnswerData;
-import com.ragagent.contract.event.payload.AgentCompleteData;
-import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageAttachment;
+import com.ragagent.contract.session.MessageExecutionContext;
 import com.ragagent.contract.session.MessageImage;
+import com.ragagent.contract.session.SseSink;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.event.EventType;
+import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.QaSupport;
 import com.ragagent.session.service.QaSupport.QaMode;
@@ -26,13 +24,15 @@ import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.QaSupport.SseStreamContext;
 import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
-import com.ragagent.platform.stream.StreamManager;
-import org.springframework.stereotype.Component;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.contract.session.MessageExecutionContext;
 import com.ragagent.session.service.SessionLookupScope;
 import com.ragagent.session.service.SteerRunCoordinator;
+import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import org.springframework.stereotype.Component;
 
 /**
  * {@code KnowledgeQaController} 的**执行/落库簇**：一整轮 QA 的编排（模式分派、

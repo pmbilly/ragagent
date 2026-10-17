@@ -1,8 +1,5 @@
 package com.ragagent.agent.budget;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.util.List;
-
 import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
@@ -12,6 +9,8 @@ import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.contract.model.chat.MessageContentPart;
 import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.platform.web.JsonMappers;
+import java.util.List;
 
 /**
  * token 估算器。

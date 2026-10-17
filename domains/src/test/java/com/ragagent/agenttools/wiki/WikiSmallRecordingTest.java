@@ -2,19 +2,17 @@ package com.ragagent.agenttools.wiki;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.contract.agent.SearchAuth;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.contract.agent.SearchAuth;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.agent.fixtures.GoRecording45B;
-import com.ragagent.agent.fixtures.RecordingSupport;
 
 /**
  * wiki 小件（wiki_support 行为 + write/replace/delete/rename/flag/read_issue/update_issue）

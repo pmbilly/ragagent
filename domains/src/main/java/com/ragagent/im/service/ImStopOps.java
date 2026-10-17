@@ -1,14 +1,5 @@
 package com.ragagent.im.service;
 
-import java.time.OffsetDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.im.domain.ChannelSessionEntity;
 import com.ragagent.im.domain.ImChannelEntity;
@@ -20,6 +11,13 @@ import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.stream.StreamStopWatcher;
+import java.time.OffsetDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 跨实例 /stop 全链路：本地出队/在途取消、stop 事件写入 StreamManager、标记兜底、

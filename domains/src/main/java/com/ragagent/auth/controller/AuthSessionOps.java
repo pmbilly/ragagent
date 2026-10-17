@@ -1,19 +1,19 @@
 package com.ragagent.auth.controller;
 
 
-import com.ragagent.platform.web.JsonBodyErrors;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ragagent.auth.dto.AuthLoginResponse;
-import com.ragagent.auth.dto.TokenPairResponse;
-import com.ragagent.auth.dto.TenantResponse;
-import com.ragagent.auth.service.LoginResult;
 import com.ragagent.auth.domain.User;
+import com.ragagent.auth.dto.AuthLoginResponse;
+import com.ragagent.auth.dto.TenantResponse;
+import com.ragagent.auth.dto.TokenPairResponse;
+import com.ragagent.auth.service.LoginResult;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.web.ToolJson;
+import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.RequestFields;
+import com.ragagent.platform.web.ToolJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

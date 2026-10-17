@@ -1,5 +1,10 @@
 package com.ragagent.memory.service;
 
+import com.ragagent.contract.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.memory.domain.vector.MemoryVectorHit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,12 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.ragagent.contract.memory.MemoryConfig;
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.memory.domain.scope.MemoryScope;
-import com.ragagent.memory.domain.vector.MemoryVectorHit;
 import org.springframework.stereotype.Component;
 
 /**

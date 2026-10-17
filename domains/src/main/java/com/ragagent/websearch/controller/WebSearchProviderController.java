@@ -1,45 +1,44 @@
 package com.ragagent.websearch.controller;
 
-import com.ragagent.platform.web.JsonBodyErrors;
-import com.ragagent.websearch.provider.WebSearchProvider;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.RequestFields;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.contract.websearch.WebSearchResult;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.JsonBodyErrors;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.RequestFields;
 import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
 import com.ragagent.websearch.dto.WebSearchProviderResponse;
 import com.ragagent.websearch.dto.WebSearchProviderTypes;
 import com.ragagent.websearch.provider.EmptyTestResults;
+import com.ragagent.websearch.provider.WebSearchProvider;
 import com.ragagent.websearch.provider.WebSearchProviderRegistry;
 import com.ragagent.websearch.service.WebSearchProviderService;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
 
 /**
  * web 搜索 provider 管理面（10 条路由；角色门：读 Viewer+ / 写 Admin+）。

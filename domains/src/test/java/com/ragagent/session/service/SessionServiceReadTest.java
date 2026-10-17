@@ -8,21 +8,20 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.websearch.WebSearchTempStatePort;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.settings.ConversationProperties;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.SessionNotFoundException;
+import com.ragagent.session.repository.MessageRepository;
+import com.ragagent.session.repository.MessageSuggestionRepository;
+import com.ragagent.session.repository.SessionRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.session.domain.conversation.SessionNotFoundException;
-import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.session.repository.MessageRepository;
-import com.ragagent.session.repository.MessageSuggestionRepository;
-import com.ragagent.platform.settings.ConversationProperties;
-import com.ragagent.contract.websearch.WebSearchTempStatePort;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 
 /**
  * 会话读路径的可见性判定（{@code loadSessionForRead} /

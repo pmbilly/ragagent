@@ -1,25 +1,25 @@
 package com.ragagent.initialization.service;
 
-import com.ragagent.platform.web.JsonBodyErrors;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.RequestFields;
-import java.time.OffsetDateTime;
-import com.ragagent.platform.config.AppEnvLookup;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.web.ToolJson;
 import com.ragagent.contract.model.OllamaAdminPort;
 import com.ragagent.contract.model.OllamaModelInfo;
+import com.ragagent.platform.config.AppEnvLookup;
+import com.ragagent.platform.web.JsonBodyErrors;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.RequestFields;
+import com.ragagent.platform.web.ToolJson;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
 
 /**
  * ollama 管理端点用例：status/models/check/download/progress 与拉取任务机制。

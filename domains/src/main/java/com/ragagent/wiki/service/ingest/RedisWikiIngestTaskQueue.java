@@ -1,6 +1,8 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -8,15 +10,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
-import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 
 /**
  * {@link WikiIngestTaskQueue} 的 <b>Redis</b> 实现：跨实例共享的任务表。

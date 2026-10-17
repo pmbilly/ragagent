@@ -1,10 +1,9 @@
 package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.List;
 
 /**
  * Anthropic 非流式响应。

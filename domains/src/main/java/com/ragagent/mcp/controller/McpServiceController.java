@@ -1,16 +1,11 @@
 package com.ragagent.mcp.controller;
 
-import com.ragagent.platform.web.JsonBodyErrors;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpToolApproval;
@@ -21,7 +16,13 @@ import com.ragagent.mcp.service.McpMetadataException;
 import com.ragagent.mcp.service.McpMetadataService;
 import com.ragagent.mcp.service.McpServiceManagement;
 import com.ragagent.mcp.service.McpToolApprovalService;
-import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.JsonBodyErrors;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +34,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
 
 /**
  * MCP 服务 HTTP 层。

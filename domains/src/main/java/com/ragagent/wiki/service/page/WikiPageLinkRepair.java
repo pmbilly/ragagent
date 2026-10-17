@@ -1,12 +1,12 @@
 package com.ragagent.wiki.service.page;
 
+import com.ragagent.wiki.domain.page.WikiPageLite;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.ragagent.wiki.domain.page.WikiPageLite;
 
 /**
  * wiki 链接修复协作者:正文内链死链检测与重写(RE2 语义见 WikiTextUtils)。

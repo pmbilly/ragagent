@@ -1,11 +1,10 @@
 package com.ragagent.contract.pipeline;
 
-import java.util.List;
-
 import com.ragagent.contract.tool.AgentTool;
-import com.ragagent.contract.tool.ToolExecContext;
 import com.ragagent.contract.tool.ToolCancellation;
+import com.ragagent.contract.tool.ToolExecContext;
 import com.ragagent.contract.tool.ToolResult;
+import java.util.List;
 
 /**
  * 工具注册表端口（引擎侧接口）：MCP 适配层注册/摘除工具、共享执行管线的唯一通道。

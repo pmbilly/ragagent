@@ -1,21 +1,20 @@
 package com.ragagent.knowledge.service.query;
 
-import com.ragagent.contract.knowledge.support.KnowledgeProjectionAdapter;
-
-import com.ragagent.platform.web.JsonMappers;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.contract.knowledge.support.KnowledgeProjectionAdapter;
 import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.repository.KnowledgeSpanRepository;
-import org.springframework.stereotype.Service;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
+import com.ragagent.knowledge.repository.KnowledgeSpanRepository;
+import com.ragagent.platform.web.JsonMappers;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.springframework.stereotype.Service;
 
 /**
  * 知识处理 spans 合成树。静态 canonical 时间线复用门面公开常量

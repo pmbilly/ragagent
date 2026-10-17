@@ -1,26 +1,23 @@
 package com.ragagent.embedchannel.controller.filter;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
-import org.springframework.http.MediaType;
-import org.springframework.web.filter.OncePerRequestFilter;
-
+import com.ragagent.contract.storage.support.StorageUrlContext;
 import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.platform.access.TenantContext;
+import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.EmbedRateLimiter;
 import com.ragagent.embedchannel.EmbedTokens;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.service.EmbedChannelService;
-
+import com.ragagent.platform.access.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.contract.storage.support.StorageUrlContext;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import org.springframework.http.MediaType;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * embed 公开面的认证过滤器（publish token 门）。

@@ -4,27 +4,25 @@ package com.ragagent.agent.tool.runtime;
 
 
 
-import com.ragagent.contract.agent.SearchAuth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.contract.agent.SearchAuth;
+import com.ragagent.contract.agent.SearchAuth.ChunkView;
+import com.ragagent.contract.agent.SearchAuth.KnowledgeView;
+import com.ragagent.contract.agent.SearchAuth.ScopeAuthException;
+import com.ragagent.contract.agent.SearchAuth.TagView;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.agent.SearchAuth.ChunkView;
-import com.ragagent.contract.agent.SearchAuth.KnowledgeView;
-import com.ragagent.contract.agent.SearchAuth.ScopeAuthException;
-import com.ragagent.contract.agent.SearchAuth.TagView;
-import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.agent.fixtures.RecordingSupport;
-import com.ragagent.agent.fixtures.GoRecording45B;
 
 /**
  * SearchAuth/SearchTargets 的录制回放（26 条）。错误文案逐字比对；

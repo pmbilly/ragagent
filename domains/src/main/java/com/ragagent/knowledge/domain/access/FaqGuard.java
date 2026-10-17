@@ -1,26 +1,26 @@
 package com.ragagent.knowledge.domain.access;
 
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeTag;
+import com.ragagent.knowledge.dto.faq.FaqEntry;
+import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
+import com.ragagent.knowledge.dto.faq.FaqEntryFieldsUpdate;
+import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
+import com.ragagent.knowledge.repository.FaqChunkRepository;
+import com.ragagent.knowledge.repository.KnowledgeTagRepository;
+import com.ragagent.platform.access.TenantContext;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.domain.KnowledgeTag;
-import com.ragagent.knowledge.repository.FaqChunkRepository;
-import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import org.springframework.stereotype.Component;
-import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
-import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
-import com.ragagent.knowledge.dto.faq.FaqEntryFieldsUpdate;
-import com.ragagent.knowledge.dto.faq.FaqEntry;
 
 /**
  * FAQ 写路径的域守卫：知识库存在性/类型校验、租户越权判定、标签解析与作用域校验、

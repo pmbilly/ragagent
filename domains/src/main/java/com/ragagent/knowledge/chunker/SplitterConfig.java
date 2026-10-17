@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.chunker;
 
+import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 
 /**
  * 文本切分配置。

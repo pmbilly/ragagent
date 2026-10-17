@@ -10,20 +10,19 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.session.domain.document.TemporaryDocument;
+import com.ragagent.session.service.AgentResolver;
+import com.ragagent.session.service.SessionService;
+import com.ragagent.session.service.TemporaryDocumentService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
-
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.session.domain.document.TemporaryDocument;
-import com.ragagent.session.service.AgentResolver;
-import com.ragagent.session.service.SessionService;
-import com.ragagent.session.service.TemporaryDocumentService;
 
 /**
  * 附件上传入口的 agent 语义验收：

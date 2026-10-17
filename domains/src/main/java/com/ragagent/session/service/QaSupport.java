@@ -1,25 +1,24 @@
 package com.ragagent.session.service;
 
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.contract.agent.SteerSink;
+import com.ragagent.contract.event.EventBusInterface;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.session.MentionedItem;
+import com.ragagent.contract.session.MessageAttachment;
+import com.ragagent.contract.session.SuggestionAttribution;
+import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.storage.support.StreamRewriter;
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.dto.QaRequests.MentionedItemRequest;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.ragagent.contract.session.MentionedItem;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.session.dto.QaRequests.MentionedItemRequest;
-import com.ragagent.platform.storage.support.StreamRewriter;
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.contract.agent.SteerSink;
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.contract.session.SuggestionAttribution;
 
 /**
  * QA 请求上下文与共享辅助。

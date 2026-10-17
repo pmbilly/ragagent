@@ -1,8 +1,7 @@
 package com.ragagent.datasource.task;
 
-import java.time.Duration;
-
 import com.ragagent.datasource.domain.DataSourceSyncPayload;
+import java.time.Duration;
 
 /**
  * 同步任务的投递端口（调度器触发同步时的那一次入队调用）。

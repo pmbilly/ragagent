@@ -1,8 +1,8 @@
 package com.ragagent.mcp.oauth;
 
-import com.ragagent.mcp.repository.McpOAuthRepository;
 import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.ragagent.mcp.protocol.McpOAuthSupport;
+import com.ragagent.mcp.repository.McpOAuthRepository;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

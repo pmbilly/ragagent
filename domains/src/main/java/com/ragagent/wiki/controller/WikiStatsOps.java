@@ -1,21 +1,5 @@
 package com.ragagent.wiki.controller;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.ragagent.wiki.domain.graph.WikiGraph;
-import com.ragagent.contract.wiki.WikiIndex;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.domain.page.WikiStats;
-import com.ragagent.wiki.service.page.WikiPageService;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
-
 import static com.ragagent.wiki.controller.WikiRequestSupport.atoi;
 import static com.ragagent.wiki.controller.WikiRequestSupport.atoiOrNull;
 import static com.ragagent.wiki.controller.WikiRequestSupport.errText;
@@ -23,6 +7,20 @@ import static com.ragagent.wiki.controller.WikiRequestSupport.internal;
 import static com.ragagent.wiki.controller.WikiRequestSupport.q;
 import static com.ragagent.wiki.controller.WikiRequestSupport.query;
 import static com.ragagent.wiki.controller.WikiRequestSupport.trimSpace;
+
+import com.ragagent.contract.wiki.WikiIndex;
+import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.graph.WikiGraph;
+import com.ragagent.wiki.domain.page.WikiStats;
+import com.ragagent.wiki.service.page.WikiPageService;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 /**
  * 索引/图谱/统计/检索端点的执行体。图谱查询参数边界（上限与静默夹紧）随簇在此声明。

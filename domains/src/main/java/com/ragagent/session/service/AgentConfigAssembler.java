@@ -1,5 +1,10 @@
 package com.ragagent.session.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.agentmanagement.service.config.AgentConfigJson;
+import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
+import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.InputStream;
@@ -7,12 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.agentmanagement.service.config.AgentConfigJson;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
 
 /**
  * {@code SessionAgentQaService} 的**配置装配簇**：从请求 + 知识库/文档信息构造

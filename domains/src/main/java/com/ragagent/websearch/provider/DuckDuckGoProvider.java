@@ -1,18 +1,17 @@
 package com.ragagent.websearch.provider;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.websearch.WebSearchResult;
+import com.ragagent.platform.web.ProviderJson;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.websearch.WebSearchResult;
-import com.ragagent.platform.web.ProviderJson;
 
 /**
  * DuckDuckGo 搜索 provider。

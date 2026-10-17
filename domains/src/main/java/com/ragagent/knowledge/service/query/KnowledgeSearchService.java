@@ -1,16 +1,16 @@
 package com.ragagent.knowledge.service.query;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeSearchScope;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import org.springframework.stereotype.Service;
 import com.ragagent.platform.access.TenantContext;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Service;
 
 /**
  * 知识检索。

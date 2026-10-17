@@ -2,13 +2,12 @@ package com.ragagent.memory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
-import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.contract.memory.MemoryKeys;
-import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryRender;
 import com.ragagent.memory.domain.MemoryText;
+import com.ragagent.memory.domain.item.MemoryItem;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**

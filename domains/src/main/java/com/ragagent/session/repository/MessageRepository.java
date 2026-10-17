@@ -1,7 +1,21 @@
 package com.ragagent.session.repository;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.ragagent.contract.memory.MemoryMessageCursor;
+import com.ragagent.contract.session.MessageArtifact;
+import com.ragagent.contract.session.MessageAttachment;
+import com.ragagent.contract.session.MessageImage;
+import com.ragagent.contract.session.SessionMessagePort;
+import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.persistence.LikeEscapes;
-
+import com.ragagent.platform.persistence.PageRequests;
+import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.domain.message.MessageNotFoundException;
+import com.ragagent.session.domain.message.MessageWithSession;
 import com.ragagent.session.mapper.MessageMapper;
 import com.ragagent.session.mapper.SessionMapper;
 import java.time.OffsetDateTime;
@@ -11,23 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.ragagent.platform.persistence.DatabaseDialects;
-import com.ragagent.platform.persistence.PageRequests;
-import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.contract.memory.MemoryMessageCursor;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.contract.session.MessageImage;
-import com.ragagent.contract.session.MessageArtifact;
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.session.domain.message.MessageNotFoundException;
-import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.session.domain.message.MessageWithSession;
 import org.springframework.stereotype.Component;
-import com.ragagent.contract.session.SessionMessagePort;
 
 /**
  * 消息仓储。

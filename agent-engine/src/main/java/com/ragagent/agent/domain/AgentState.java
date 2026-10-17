@@ -1,11 +1,10 @@
 package com.ragagent.agent.domain;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.agent.AgentStep;
+import java.util.List;
 
 /**
  * agent 一次执行的运行时状态。

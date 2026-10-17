@@ -1,34 +1,27 @@
 package com.ragagent.knowledge.service.enrichment;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.wiki.WikiFinalizePort;
+import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkQuestionPort;
-
-import com.ragagent.knowledge.domain.span.SpanTracker;
-
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.knowledge.domain.QuestionGenerationConsumer;
-
+import com.ragagent.knowledge.domain.span.SpanTracker;
+import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
-
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.access.TenantScopes;
+import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.repository.ChunkRepository;
-
-import com.ragagent.knowledge.domain.QuestionBatchPayload;
-import com.ragagent.contract.wiki.WikiFinalizePort;
-import com.ragagent.platform.access.TenantScopes;
 
 /**
  * 问题生成**批** worker。

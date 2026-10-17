@@ -1,5 +1,13 @@
 package com.ragagent.im.channel.telegram;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.im.runtime.AdapterInterfaces;
+import com.ragagent.im.runtime.CallbackExchange;
+import com.ragagent.im.runtime.ImTypes;
+import com.ragagent.im.runtime.IncomingMessage;
+import com.ragagent.im.runtime.ReplyMessage;
+import com.ragagent.im.runtime.ThinkDisplay;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.net.URI;
@@ -12,18 +20,8 @@ import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.im.runtime.AdapterInterfaces;
-import com.ragagent.im.runtime.CallbackExchange;
-import com.ragagent.im.runtime.ImTypes;
-import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.runtime.ReplyMessage;
-import com.ragagent.im.runtime.ThinkDisplay;
 
 /**
  * Telegram Bot 适配器。

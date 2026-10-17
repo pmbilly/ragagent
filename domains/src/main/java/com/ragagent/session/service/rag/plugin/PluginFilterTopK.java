@@ -1,13 +1,12 @@
 package com.ragagent.session.service.rag.plugin;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.session.service.rag.ChatManage;
 import com.ragagent.session.service.rag.PipelineEventType;
 import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.retrieval.SearchResult;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * FILTER_TOP_K 阶段插件：

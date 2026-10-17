@@ -1,18 +1,15 @@
 package com.ragagent.memory.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryConflictException;
 import com.ragagent.memory.domain.MemoryConsolidationResult;
 import com.ragagent.memory.domain.MemoryDocView;
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryPage;
-import com.ragagent.memory.domain.scope.MemorySettings;
 import com.ragagent.memory.domain.MemoryTopicView;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.domain.scope.MemorySettings;
 import com.ragagent.memory.dto.CreateMemoryItemRequest;
 import com.ragagent.memory.dto.MemoryExportResponse;
 import com.ragagent.memory.dto.MemoryListResponse;
@@ -21,7 +18,11 @@ import com.ragagent.memory.dto.UpdateMemorySettingsRequest;
 import com.ragagent.memory.service.MemoryConsolidationService;
 import com.ragagent.memory.service.MemoryScopeExceptions;
 import com.ragagent.memory.service.MemoryService;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
 import jakarta.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -35,8 +36,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 长期记忆的 HTTP 层。

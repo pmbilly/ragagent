@@ -1,8 +1,7 @@
 package com.ragagent.mcp.service;
 
-import java.util.List;
-
 import com.ragagent.mcp.domain.McpToolApproval;
+import java.util.List;
 
 /**
  * 逐工具策略的**整表读取口**。

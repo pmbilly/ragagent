@@ -6,21 +6,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import com.ragagent.TestSchema;
+import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.auth.domain.TenantMember;
+import com.ragagent.auth.domain.User;
+import com.ragagent.auth.mapper.TenantMemberMapper;
+import com.ragagent.auth.mapper.UserMapper;
+import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.tenant.domain.Tenant;
+import com.ragagent.tenant.mapper.TenantMapper;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.ragagent.TestSchema;
-import com.ragagent.tenant.domain.Tenant;
-import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.auth.domain.User;
-import com.ragagent.contract.auth.UserPreferences;
-import com.ragagent.tenant.mapper.TenantMapper;
-import com.ragagent.auth.mapper.TenantMemberMapper;
-import com.ragagent.auth.mapper.UserMapper;
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.stream.StreamManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * steer 的契约测试。

@@ -1,20 +1,19 @@
 package com.ragagent.mcp.oauth;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.List;
-
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpOAuthClient;
+import com.ragagent.mcp.domain.McpOAuthToken;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.mcp.protocol.McpServiceUrls;
-import com.ragagent.mcp.domain.McpOAuthToken;
+import com.ragagent.platform.access.TenantContext;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
 
 /**
  * MCP OAuth2 授权码流程编排：发现 → 动态客户端注册 → 授权跳转 → 回调 code 交换。

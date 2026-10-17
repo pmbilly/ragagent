@@ -1,12 +1,11 @@
 package com.ragagent.session.domain.conversation;
 
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.contract.session.SessionLastRequestState;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import java.time.OffsetDateTime;
 
 /**
  * 列表里的一行会话 = 会话字段 + IM 来源字段。

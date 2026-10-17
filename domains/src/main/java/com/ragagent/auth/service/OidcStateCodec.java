@@ -1,18 +1,16 @@
 package com.ragagent.auth.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.auth.config.JwtProperties;
 import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
-import com.ragagent.auth.config.JwtProperties;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 
 /**

@@ -1,42 +1,40 @@
 package com.ragagent.knowledge.service.faq;
 
-import com.ragagent.knowledge.repository.KnowledgeTagRepository;
-
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.access.FaqGuard;
+import com.ragagent.knowledge.dto.faq.FaqBatchUpsertPayload;
+import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
+import com.ragagent.knowledge.dto.faq.FaqEntryFieldsUpdate;
+import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
+import com.ragagent.knowledge.dto.faq.FaqFailedEntry;
+import com.ragagent.knowledge.dto.faq.FaqImportProgress;
+import com.ragagent.knowledge.dto.faq.FaqImportResult;
+import com.ragagent.knowledge.dto.faq.FaqSuccessEntry;
+import com.ragagent.knowledge.repository.FaqChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
-
+import com.ragagent.knowledge.repository.KnowledgeTagRepository;
+import com.ragagent.knowledge.storage.LocalStorageService;
+import com.ragagent.knowledge.storage.TenantFileStorage;
+import com.ragagent.knowledge.task.FaqImportTaskStore;
+import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
+import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.dto.faq.FaqFailedEntry;
-import com.ragagent.knowledge.dto.faq.FaqImportProgress;
-import com.ragagent.knowledge.dto.faq.FaqImportResult;
-import com.ragagent.knowledge.dto.faq.FaqSuccessEntry;
-import com.ragagent.knowledge.repository.FaqChunkRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.knowledge.task.FaqImportTaskStore;
-import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
-import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
-import com.ragagent.knowledge.storage.LocalStorageService;
-import com.ragagent.knowledge.storage.TenantFileStorage;
-import com.ragagent.knowledge.domain.access.FaqGuard;
-import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
-import com.ragagent.knowledge.dto.faq.FaqBatchUpsertPayload;
-import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
-import com.ragagent.knowledge.dto.faq.FaqEntryFieldsUpdate;
-import com.fasterxml.jackson.core.JacksonException;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FAQ 条目批量导入（upsert）与进度面：append/replace 两种模式的 dry-run 校验、

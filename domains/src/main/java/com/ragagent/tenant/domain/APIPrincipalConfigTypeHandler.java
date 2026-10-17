@@ -1,16 +1,14 @@
 package com.ragagent.tenant.domain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
-
+import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.web.JsonMappers;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.security.CryptoService;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;

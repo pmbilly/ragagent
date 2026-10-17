@@ -1,13 +1,12 @@
 package com.ragagent.knowledge.support;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ragagent.contract.knowledge.ChunkPageView;
 import com.ragagent.contract.knowledge.ChunkRowView;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkPage;
 import com.ragagent.platform.web.JsonMappers;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 分块实体 → 行视图的**域内单一映射**（供知识域的三个端口适配器与仓储共用）。

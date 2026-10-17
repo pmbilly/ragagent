@@ -1,10 +1,9 @@
 package com.ragagent.contract.agent;
 
+import com.ragagent.contract.json.ZeroTimes;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.ragagent.contract.json.ZeroTimes;
 
 /**
  * ReAct 循环的一轮。

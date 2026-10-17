@@ -1,14 +1,14 @@
 package com.ragagent.contract.knowledge;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 import com.ragagent.contract.text.TextConv;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * FAQ 条目在 {@code chunks.metadata}（jsonb）中的结构——**落库 JSON 即契约**，

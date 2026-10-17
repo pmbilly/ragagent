@@ -2,14 +2,13 @@ package com.ragagent.wiki.service.ingest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.wiki.service.WikiLlmRetryPolicy;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import com.ragagent.wiki.service.WikiLlmRetryPolicy;
 
 /**
  * LLM 瞬时错误判定的测试。

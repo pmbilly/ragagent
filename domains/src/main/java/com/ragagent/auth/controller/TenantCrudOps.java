@@ -1,21 +1,19 @@
 package com.ragagent.auth.controller;
 
-import com.ragagent.platform.web.JsonBodyErrors;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ragagent.auth.dto.TenantResponse;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRowView;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.JsonBodyErrors;
+import com.ragagent.platform.web.ToolJson;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.auth.dto.TenantResponse;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.web.ToolJson;
-import com.ragagent.contract.tenant.TenantRole;
-
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * tenants CRUD 协作者（自 {@link TenantCatalogController} 拆出）：单空间列表、读取/更新/删除与

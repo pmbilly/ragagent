@@ -1,9 +1,8 @@
 package com.ragagent.modelruntime.adapter.provider.chat.common;
 
-import java.util.concurrent.BlockingQueue;
-
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * "先思考、后回答"的交接器。

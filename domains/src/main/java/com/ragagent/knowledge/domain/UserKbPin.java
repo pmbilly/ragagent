@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.domain;
 
-import java.time.OffsetDateTime;
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.time.OffsetDateTime;
 
 /**
  * user_kb_pins：per-(user,knowledge base) 置顶。

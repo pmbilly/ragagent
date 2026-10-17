@@ -1,16 +1,16 @@
 package com.ragagent.session.controller;
 
 
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.session.domain.message.MessageSuggestionSet;
+import com.ragagent.session.service.suggestion.MessageSuggestionFacade;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.session.domain.message.MessageSuggestionSet;
-import com.ragagent.session.service.suggestion.MessageSuggestionFacade;
 
 /**
  * 追问建议 HTTP 层。

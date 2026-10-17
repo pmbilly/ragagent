@@ -1,5 +1,11 @@
 package com.ragagent.retrieval.engine.sqlite;
 
+import com.ragagent.retrieval.config.RetrievalEnvLookup;
+import com.ragagent.retrieval.engine.EngineTypes;
+import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
+import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,17 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sqlite.Function;
-
-import com.ragagent.retrieval.engine.EngineTypes;
-import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
-import com.ragagent.retrieval.engine.RetrieveEngineRepository;
-import com.ragagent.retrieval.config.RetrievalEnvLookup;
 
 /**
  * SQLite 检索引擎仓储。

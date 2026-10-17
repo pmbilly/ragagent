@@ -8,12 +8,11 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.platform.stream.EmbeddedRedis;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.stream.EmbeddedRedis;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

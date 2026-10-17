@@ -2,9 +2,8 @@ package com.ragagent.initialization.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.contract.error.BizException;
+import org.junit.jupiter.api.Test;
 
 /** bindJsonObject 的请求体形态 400 文案钉子（原先 0 金片覆盖）。 */
 class OllamaBindJsonObjectTest {

@@ -1,8 +1,7 @@
 package com.ragagent.websearch.fetch;
 
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.websearch.ToolPageFetcher;
+import org.springframework.stereotype.Component;
 
 /** 工具抓取（markdown/2MB/60s/浏览器兜底）——{@link ToolPageFetcher} 的唯一实现。 */
 @Component

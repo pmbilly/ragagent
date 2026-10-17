@@ -1,16 +1,12 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
-
-import com.ragagent.contract.tenant.TenantConfigLookup;
-
-import java.io.IOException;
-
-import org.springframework.stereotype.Component;
-
+import com.ragagent.contract.storage.fileserve.FileContentService;
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
-import com.ragagent.contract.storage.fileserve.FileContentService;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
+import java.io.IOException;
+import org.springframework.stereotype.Component;
 
 /**
  * {@code com.ragagent.contract.storage.support.StorageBackendResolver} 的生产实现（A3-3 接线）。

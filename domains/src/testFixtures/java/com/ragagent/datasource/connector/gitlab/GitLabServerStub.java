@@ -1,5 +1,9 @@
 package com.ragagent.datasource.connector.gitlab;
 
+import com.ragagent.datasource.domain.connector.ConnectorHttp;
+import com.ragagent.platform.security.SsrfGuard;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -7,11 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
-
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.datasource.domain.connector.ConnectorHttp;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
 
 /**
  * GitLab API 的最小桩服务。

@@ -4,10 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.im.runtime.ImFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.im.runtime.ImFormat;
 
 /**
  * {@link ImInboundGuardOps} 的语义钉子：自 {@code ImTurnOrchestrator} 外提时逐字搬迁，

@@ -1,10 +1,6 @@
 package com.ragagent.wiki.domain;
 
 
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -13,6 +9,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * wiki_pages 表实体。JSON 键为 snake（前端按此解析）。

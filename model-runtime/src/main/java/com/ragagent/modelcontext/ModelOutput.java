@@ -1,15 +1,14 @@
 package com.ragagent.modelcontext;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.ragagent.contract.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.ragagent.contract.tool.ToolResult;
 
 /**
  * 给 LLM 的紧凑、以 source 为中心的工具结果渲染。规范的 ToolResult.Output 保持不动，供 UI/日志/存储。

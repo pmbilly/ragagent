@@ -1,17 +1,16 @@
 package com.ragagent.session.service.rag.support;
 
 import com.ragagent.contract.retrieval.RetrievalObsRows;
+import com.ragagent.contract.retrieval.SearchChunkMerge;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchTextUtil;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.History;
+import com.ragagent.session.service.rag.PipelineLog;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.History;
-import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.retrieval.SearchChunkMerge;
-import com.ragagent.contract.retrieval.SearchTextUtil;
-import com.ragagent.contract.retrieval.SearchResult;
 
 /**
  * 检索的纯函数辅助：

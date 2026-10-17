@@ -2,15 +2,13 @@ package com.ragagent.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.agent.AgentToolCall;
-import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.tool.ToolResult;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * 工具图片注入的录制常量断言：

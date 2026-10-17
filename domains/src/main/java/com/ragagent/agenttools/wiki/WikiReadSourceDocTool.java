@@ -1,5 +1,20 @@
 package com.ragagent.agenttools.wiki;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.agent.SearchAuth;
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.knowledge.DocChunkSupport;
+import com.ragagent.platform.knowledge.DocChunkSupport.ChunkPage;
+import com.ragagent.platform.knowledge.DocChunkSupport.ImageInfoCollector;
+import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoReader;
+import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoRow;
+import com.ragagent.platform.knowledge.DocChunkSupport.PagedChunks;
+import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -7,22 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.knowledge.DocChunkSupport.ChunkPage;
-import com.ragagent.platform.knowledge.DocChunkSupport.ImageInfoCollector;
-import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoReader;
-import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoRow;
-import com.ragagent.platform.knowledge.DocChunkSupport.PagedChunks;
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.platform.tool.BaseTool;
-import com.ragagent.platform.knowledge.DocChunkSupport;
-import com.ragagent.contract.agent.SearchAuth;
-import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.platform.web.JsonMappers;
 
 /**
  * wiki_read_source_doc 工具。

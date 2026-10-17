@@ -1,28 +1,27 @@
 package com.ragagent.auth.api;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.platform.persistence.PageRequests;
-import com.ragagent.contract.auth.AdminUserPort;
-import com.ragagent.contract.auth.AdminUserView;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.auth.service.PasswordPolicy;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
+import com.ragagent.contract.auth.AdminUserPort;
+import com.ragagent.contract.auth.AdminUserView;
+import com.ragagent.contract.auth.AuthTokenAdminPort;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.tenant.TenantRowView;
+import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.platform.security.LogSanitizer;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-import com.ragagent.contract.auth.AuthTokenAdminPort;
-import java.util.ArrayList;
-import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * 系统管理员 P0 用户管理（注册 / 建管理员 / 重置密码 / 列管理员 / 撤管理员）。

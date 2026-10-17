@@ -1,15 +1,13 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.wiki.domain.TaskPendingOp;
+import com.ragagent.wiki.service.ingest.WikiIngestService.PendingBatch;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.wiki.domain.TaskPendingOp;
 import org.slf4j.Logger;
-
-import com.ragagent.wiki.service.ingest.WikiIngestService.PendingBatch;
 import org.slf4j.LoggerFactory;
 
 /**

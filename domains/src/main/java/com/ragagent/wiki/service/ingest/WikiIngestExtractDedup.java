@@ -1,6 +1,14 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.domain.page.WikiPageLite;
+import com.ragagent.wiki.prompt.WikiPrompts;
+import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -8,16 +16,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.wiki.domain.page.WikiPageLite;
-import com.ragagent.wiki.prompt.WikiPrompts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.wiki.service.page.WikiTextUtils;
 
 /**
  * 抽取项去重协作者:候选组渲染、LLM 去重仲裁与投影稳定化。

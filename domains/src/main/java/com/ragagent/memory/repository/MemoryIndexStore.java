@@ -1,5 +1,21 @@
 package com.ragagent.memory.repository;
 
+import com.ragagent.contract.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryKeys;
+import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryMessageCursor;
+import com.ragagent.memory.domain.MemoryDocAffinity;
+import com.ragagent.memory.domain.MemoryExtractionBatch;
+import com.ragagent.memory.domain.MemoryExtractionFailure;
+import com.ragagent.memory.domain.MemoryExtractionLeaseLostException;
+import com.ragagent.memory.domain.MemoryExtractionSession;
+import com.ragagent.memory.domain.MemoryPage;
+import com.ragagent.memory.domain.MemoryTopicStat;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.memory.domain.scope.MemorySubject;
+import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -7,23 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import com.ragagent.contract.memory.MemoryConfig;
-import com.ragagent.contract.memory.MemoryKeys;
-import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.memory.domain.MemoryDocAffinity;
-import com.ragagent.memory.domain.MemoryExtractionBatch;
-import com.ragagent.memory.domain.MemoryExtractionFailure;
-import com.ragagent.memory.domain.MemoryExtractionLeaseLostException;
-import com.ragagent.memory.domain.MemoryExtractionSession;
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.contract.memory.MemoryMessageCursor;
-import com.ragagent.memory.domain.MemoryPage;
-import com.ragagent.memory.domain.scope.MemoryScope;
-import com.ragagent.memory.domain.scope.MemorySubject;
-import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
-import com.ragagent.memory.domain.MemoryTopicStat;
 
 /**
  * 记忆索引侧读写：**话题统计、文档亲和、抽取进度**，以及本类与仓储共用的内部工具

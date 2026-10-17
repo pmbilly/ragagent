@@ -3,15 +3,13 @@ package com.ragagent.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.contract.event.Event;
+import com.ragagent.contract.event.payload.AgentCompleteData;
+import com.ragagent.platform.event.EventType;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.contract.event.Event;
-import com.ragagent.platform.event.EventType;
-import com.ragagent.contract.event.payload.AgentCompleteData;
 
 /**
  * AGENT 失败收束的终态契约（整改 A1-AGENT）。

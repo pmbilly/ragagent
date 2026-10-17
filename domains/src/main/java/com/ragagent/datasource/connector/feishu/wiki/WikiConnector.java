@@ -1,21 +1,7 @@
 package com.ragagent.datasource.connector.feishu.wiki;
 
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.connector.StreamHandler;
-import com.ragagent.datasource.domain.connector.StreamingConnector;
 import com.ragagent.datasource.connector.feishu.core.DocxFetcher;
+import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.PartialWikiNodeListException;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiNode;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiNodeListFailure;
@@ -30,7 +16,19 @@ import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncCursor;
-import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.StreamHandler;
+import com.ragagent.datasource.domain.connector.StreamingConnector;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 飞书 wiki 连接器。

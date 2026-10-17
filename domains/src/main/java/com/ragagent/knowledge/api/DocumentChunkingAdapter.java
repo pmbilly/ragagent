@@ -1,12 +1,11 @@
 package com.ragagent.knowledge.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ragagent.contract.knowledge.DocumentChunkingPort;
 import com.ragagent.knowledge.chunker.Chunker;
 import com.ragagent.knowledge.chunker.ParsedChunk;
 import com.ragagent.knowledge.chunker.SplitterConfig;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**

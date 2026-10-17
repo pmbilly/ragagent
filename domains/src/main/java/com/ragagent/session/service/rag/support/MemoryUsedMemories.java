@@ -1,11 +1,10 @@
 package com.ragagent.session.service.rag.support;
 
+import com.ragagent.contract.memory.MemoryItemView;
+import com.ragagent.contract.session.PipelineUsedMemoryView;
+import com.ragagent.platform.text.ListMerges;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.ragagent.contract.session.PipelineUsedMemoryView;
-import com.ragagent.contract.memory.MemoryItemView;
-import com.ragagent.platform.text.ListMerges;
 
 /**
  * {@code memory_items} → 客户端可见形态的投影（条目投影 + 已展示记忆合并）。

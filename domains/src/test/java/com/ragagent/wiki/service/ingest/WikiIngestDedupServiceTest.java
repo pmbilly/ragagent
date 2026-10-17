@@ -6,6 +6,12 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.page.WikiPageLite;
+import com.ragagent.wiki.service.page.WikiPageService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -14,17 +20,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.domain.page.WikiPageLite;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.wiki.service.page.WikiPageService;
 
 /**
  * {@link WikiIngestDedupService} 的测试。

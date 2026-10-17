@@ -1,20 +1,19 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.wiki.domain.page.WikiPageLite;
+import com.ragagent.wiki.service.page.WikiPageService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.wiki.domain.page.WikiPageLite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.wiki.service.page.WikiPageService;
 
 /**
  * 实体/概念去重与身份收敛。

@@ -1,13 +1,13 @@
 package com.ragagent.knowledge.api;
 
 import com.ragagent.contract.knowledge.KnowledgeBaseCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
+import com.ragagent.knowledge.support.KnowledgeBaseRowViews;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
-import com.ragagent.knowledge.support.KnowledgeBaseRowViews;
 
 /**
  * {@link KnowledgeBaseCatalogPort} 的 knowledge 侧实现。

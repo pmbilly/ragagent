@@ -1,29 +1,33 @@
 package com.ragagent.knowledge.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.dto.faq.AddSimilarQuestionsRequest;
-import com.ragagent.knowledge.dto.faq.FaqEntry;
-import com.ragagent.knowledge.dto.faq.FaqEntryPage;
-import com.ragagent.knowledge.dto.faq.FaqDeleteRequest;
-import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
-import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
-import com.ragagent.knowledge.dto.faq.FaqEntryTagBatchRequest;
+import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.knowledge.dto.doc.UpdateLastImportDisplayStatusRequest;
+import com.ragagent.knowledge.dto.faq.AddSimilarQuestionsRequest;
 import com.ragagent.knowledge.dto.faq.FaqBatchUpsertPayload;
+import com.ragagent.knowledge.dto.faq.FaqDeleteRequest;
+import com.ragagent.knowledge.dto.faq.FaqEntry;
+import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
+import com.ragagent.knowledge.dto.faq.FaqEntryPage;
+import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
+import com.ragagent.knowledge.dto.faq.FaqEntryTagBatchRequest;
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
-import com.ragagent.knowledge.dto.faq.FaqTaskStartResponse;
 import com.ragagent.knowledge.dto.faq.FaqSearchRequest;
+import com.ragagent.knowledge.dto.faq.FaqTaskStartResponse;
 import com.ragagent.knowledge.service.faq.FaqEntryCommandService;
 import com.ragagent.knowledge.service.faq.FaqEntryQueryService;
 import com.ragagent.knowledge.service.faq.FaqImportService;
+import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.NonNullBody;
 import jakarta.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,10 +38,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
-import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
 
 /**
  * FAQ 模块 HTTP 面：条目查询/命令/导入三服务的薄绑定层。读路由经

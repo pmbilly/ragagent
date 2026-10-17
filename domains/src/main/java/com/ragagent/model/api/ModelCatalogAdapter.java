@@ -1,16 +1,14 @@
 package com.ragagent.model.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelView;
 import com.ragagent.model.domain.Model;
+import com.ragagent.model.mapper.ModelMapper;
 import com.ragagent.model.service.ModelRowViews;
 import com.ragagent.model.service.ModelService;
-import com.ragagent.model.mapper.ModelMapper;
-import com.ragagent.contract.model.ModelView;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link ModelCatalogPort} 的 model 侧实现：行读取与视图成形都发生在属主域。

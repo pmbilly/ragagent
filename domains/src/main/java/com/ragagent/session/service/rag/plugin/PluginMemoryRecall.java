@@ -2,23 +2,22 @@ package com.ragagent.session.service.rag.plugin;
 
 
 
+import com.ragagent.contract.event.Event;
+import com.ragagent.contract.event.EventBusInterface;
+import com.ragagent.contract.event.payload.MemoryRecalledData;
+import com.ragagent.contract.memory.MemoryItemView;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.RetrievalObsRows;
+import com.ragagent.contract.session.PipelineUsedMemoryView;
+import com.ragagent.platform.event.EventType;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineEventType;
+import com.ragagent.session.service.rag.PipelineLog;
+import com.ragagent.session.service.rag.support.MemoryUsedMemories;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineEventType;
-import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.session.service.rag.support.MemoryUsedMemories;
-import com.ragagent.contract.event.Event;
-import com.ragagent.platform.event.EventType;
-import com.ragagent.contract.event.payload.MemoryRecalledData;
-import com.ragagent.contract.memory.MemoryItemView;
-import com.ragagent.contract.session.PipelineUsedMemoryView;
-import com.ragagent.contract.event.EventBusInterface;
 
 /**
  * MEMORY_RECALL 阶段插件：

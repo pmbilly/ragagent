@@ -1,31 +1,31 @@
 package com.ragagent.initialization.service;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.util.ArrayList;
-import com.ragagent.platform.config.AppEnvLookup;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
-import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.web.error.GuardForbiddenException;
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.contract.knowledge.KnowledgeBaseResponse;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.domain.AsrConfigView;
 import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
 import com.ragagent.contract.knowledge.domain.VlmConfigView;
-import com.ragagent.contract.knowledge.KnowledgeBaseResponse;
-import com.ragagent.contract.model.ModelParameters;
-import com.ragagent.initialization.dto.InitResponses;
 import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.ModelView;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.initialization.dto.InitResponses;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.config.AppEnvLookup;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.error.GuardForbiddenException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * initialization config/initialize 端点用例：KB 初始化配置读写、初始化装配与请求绑定。

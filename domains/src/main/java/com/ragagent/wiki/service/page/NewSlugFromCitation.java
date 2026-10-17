@@ -1,9 +1,8 @@
 package com.ragagent.wiki.service.page;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 
 /**
  * {@code WikiChunkCitationPrompt} 的 {@code "new_slugs"} 数组里的一项。

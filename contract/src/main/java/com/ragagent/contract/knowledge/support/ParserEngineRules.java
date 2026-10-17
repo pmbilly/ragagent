@@ -1,7 +1,7 @@
 package com.ragagent.contract.knowledge.support;
 
-import java.util.Locale;
 import com.ragagent.contract.json.JsonValues;
+import java.util.Locale;
 
 /**
  * chat 解析引擎的规则解析。

@@ -1,50 +1,46 @@
 package com.ragagent.knowledge.service.enrichment;
 
-import com.ragagent.knowledge.service.KnowledgeAccessHelper;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.retrieval.SearchChunkMerge;
+import com.ragagent.contract.wiki.WikiImageMarkup;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.KnowledgeTenants;
-
+import com.ragagent.knowledge.index.ChunkVectorIndexer;
+import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
-
-import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
-
+import com.ragagent.knowledge.service.KnowledgeAccessHelper;
+import com.ragagent.knowledge.support.ChunkRowViews;
+import com.ragagent.knowledge.task.KnowledgeProcessedEvent;
+import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.knowledge.ImageInfoEnricher;
+import com.ragagent.platform.prompt.AgentPromptPlaceholders;
+import com.ragagent.platform.settings.ConversationProperties;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.prompt.AgentPromptPlaceholders;
-import com.ragagent.platform.settings.ConversationProperties;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.task.KnowledgeProcessedEvent;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.platform.knowledge.ImageInfoEnricher;
-import com.ragagent.contract.retrieval.SearchChunkMerge;
-import com.ragagent.contract.wiki.WikiImageMarkup;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
-import java.util.Collections;
-import com.ragagent.knowledge.index.ChunkVectorIndexer;
-import com.ragagent.knowledge.support.ChunkRowViews;
 
 /**
  * 知识摘要生成管线：同步重生（含 fallback/重试状态机）与异步刷新入队；

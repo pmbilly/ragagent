@@ -2,22 +2,21 @@ package com.ragagent.mcp.oauth;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.lang.reflect.Method;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpAuthType;
 import com.ragagent.mcp.domain.McpOAuthToken;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.protocol.McpContext;
+import com.ragagent.platform.access.TenantContext;
+import java.lang.reflect.Method;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import org.junit.jupiter.api.Test;
 
 /**

@@ -1,25 +1,28 @@
 package com.ragagent.system.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.contract.doc.DocReaderAdminPort;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.storage.StorageBackendPort;
+import com.ragagent.contract.storage.StorageBackendView;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.system.dto.SystemDtos;
+import com.ragagent.system.service.DeploymentCapabilitiesHolder;
+import com.ragagent.system.service.ParserEngineRegistry;
+import com.ragagent.system.service.SystemInfoService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.contract.doc.DocReaderAdminPort;
-import com.ragagent.system.dto.SystemDtos;
-import com.ragagent.system.service.ParserEngineRegistry;
-import com.ragagent.system.service.SystemInfoService;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,10 +30,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.contract.storage.StorageBackendView;
-import com.ragagent.contract.storage.StorageBackendPort;
-import com.ragagent.system.service.DeploymentCapabilitiesHolder;
-import com.ragagent.platform.web.ApiResult;
 
 /**
  * /api/v1/system 组：读端（capabilities/info/parser-engines/storage-engine-status）Viewer+；

@@ -2,10 +2,9 @@ package com.ragagent.memory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.memory.domain.vector.MemoryVectors;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-import com.ragagent.memory.domain.vector.MemoryVectors;
 import org.junit.jupiter.api.Test;
 
 /**

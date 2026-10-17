@@ -1,11 +1,10 @@
 package com.ragagent.datasource.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ragagent.datasource.domain.SyncLog;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import java.time.OffsetDateTime;
 import java.util.List;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
-import com.ragagent.datasource.domain.SyncLog;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

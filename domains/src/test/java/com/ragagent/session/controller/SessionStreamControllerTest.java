@@ -1,7 +1,6 @@
 package com.ragagent.session.controller;
 
 
-import com.ragagent.session.support.LogSanitizer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -10,37 +9,36 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.tenant.TenantRowView;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.stream.StreamBatch;
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.platform.web.ContractJsonModule;
+import com.ragagent.session.controller.sse.SseFrameWriter;
+import com.ragagent.session.controller.sse.StreamEventEmitter;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.SessionNotFoundException;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.domain.message.MessageNotFoundException;
+import com.ragagent.session.service.MessageService;
+import com.ragagent.session.service.SessionService;
+import com.ragagent.session.support.LogSanitizer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import com.ragagent.contract.apikey.APIKeyScopeContext;
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.message.MessageNotFoundException;
-import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.session.domain.conversation.SessionNotFoundException;
-import com.ragagent.session.service.MessageService;
-import com.ragagent.session.controller.sse.SseFrameWriter;
-import com.ragagent.session.controller.sse.StreamEventEmitter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.web.ContractJsonModule;
-import com.ragagent.session.service.SessionService;
-import com.ragagent.platform.stream.StreamBatch;
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.stream.StreamManager;
-import com.ragagent.auth.service.TenantService;
-import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * {@code continue-stream} 端点的行为契约。

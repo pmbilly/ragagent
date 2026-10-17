@@ -1,16 +1,15 @@
 package com.ragagent.knowledge.chunker;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+
 import com.ragagent.contract.knowledge.chunker.CodePoints;
 import com.ragagent.contract.knowledge.chunker.Tokens;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * chunker 单元测试，不依赖 Spring 上下文。

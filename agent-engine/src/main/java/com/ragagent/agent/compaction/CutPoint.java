@@ -1,10 +1,9 @@
 package com.ragagent.agent.compaction;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.contract.model.chat.ChatMessage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 切点选择。

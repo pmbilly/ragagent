@@ -1,18 +1,16 @@
 package com.ragagent.embedchannel.controller;
 
+import com.ragagent.contract.knowledge.ChunkRowView;
 import com.ragagent.contract.session.EmbedSessionOps;
-
+import com.ragagent.embedchannel.EmbedError;
+import com.ragagent.embedchannel.EmbedTokens;
+import com.ragagent.embedchannel.domain.EmbedChannelEntity;
+import com.ragagent.embedchannel.service.EmbedChannelService;
+import com.ragagent.platform.security.LogSanitizer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.embedchannel.EmbedTokens;
-import com.ragagent.embedchannel.EmbedError;
-import com.ragagent.embedchannel.domain.EmbedChannelEntity;
-import com.ragagent.embedchannel.service.EmbedChannelService;
-import com.ragagent.contract.knowledge.ChunkRowView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;

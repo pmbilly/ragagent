@@ -1,5 +1,8 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.platform.http.LlmTransport;
+import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,13 +19,8 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
-
-import com.ragagent.platform.storage.config.StorageRuntimeEnv;
-import com.ragagent.contract.model.chat.ChatMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.platform.http.LlmTransport;
 
 /**
  * 把"存储态的图片路径"转换成各 LLM API 能消费的形态。

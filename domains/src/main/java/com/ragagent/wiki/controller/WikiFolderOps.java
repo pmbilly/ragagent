@@ -1,31 +1,29 @@
 package com.ragagent.wiki.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.wiki.domain.folder.WikiFolder;
-import com.ragagent.wiki.domain.folder.WikiFolderCreateRequest;
-import com.ragagent.wiki.domain.folder.WikiFolderListResponse;
-import com.ragagent.wiki.domain.folder.WikiFolderNode;
-import com.ragagent.wiki.domain.folder.WikiFolderUpdateRequest;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.domain.page.WikiPageMoveRequest;
-import com.ragagent.wiki.service.page.WikiPageService;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
-
 import static com.ragagent.wiki.controller.WikiRequestSupport.currentTenantId;
 import static com.ragagent.wiki.controller.WikiRequestSupport.errText;
 import static com.ragagent.wiki.controller.WikiRequestSupport.internal;
 import static com.ragagent.wiki.controller.WikiRequestSupport.requiredFieldErrors;
 import static com.ragagent.wiki.controller.WikiRequestSupport.sanitize;
 import static com.ragagent.wiki.controller.WikiRequestSupport.trimSpace;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.folder.WikiFolder;
+import com.ragagent.wiki.domain.folder.WikiFolderCreateRequest;
+import com.ragagent.wiki.domain.folder.WikiFolderListResponse;
+import com.ragagent.wiki.domain.folder.WikiFolderNode;
+import com.ragagent.wiki.domain.folder.WikiFolderUpdateRequest;
+import com.ragagent.wiki.domain.page.WikiPageMoveRequest;
+import com.ragagent.wiki.service.page.WikiPageService;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 /**
  * 文件夹资源端点的执行体：目录列表/新建/改名移动/删除，以及 move-page

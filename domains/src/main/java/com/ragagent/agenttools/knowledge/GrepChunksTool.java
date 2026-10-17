@@ -1,7 +1,16 @@
 package com.ragagent.agenttools.knowledge;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.agent.SearchAuth;
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.knowledge.GrepChunkHit;
 import com.ragagent.platform.knowledge.GrepChunksScoring;
+import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -10,16 +19,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.platform.tool.BaseTool;
-import com.ragagent.contract.agent.SearchAuth;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.platform.web.JsonMappers;
 
 /**
  * grep_chunks 工具。

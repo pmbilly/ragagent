@@ -1,5 +1,9 @@
 package com.ragagent.wiki.service.ingest.graph;
 
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.contract.wiki.WikiException;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.graph.WikiGraph;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -8,11 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.contract.wiki.WikiException;
-import com.ragagent.wiki.domain.graph.WikiGraph;
-import com.ragagent.wiki.domain.WikiPage;
 
 /**
  * 图谱子集计算。

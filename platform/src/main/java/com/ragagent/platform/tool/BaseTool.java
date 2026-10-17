@@ -2,8 +2,8 @@ package com.ragagent.platform.tool;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.contract.tool.AgentTool;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 工具基类。

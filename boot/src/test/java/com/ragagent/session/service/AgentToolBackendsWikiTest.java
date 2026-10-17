@@ -3,21 +3,20 @@ package com.ragagent.session.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.List;
-
 import com.ragagent.TestSchema;
-import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.agenttools.wiki.IndexOverviewView;
-import com.ragagent.agenttools.wiki.WikiIndexOverview;
 import com.ragagent.agenttools.wiki.IssueView;
 import com.ragagent.agenttools.wiki.PageView;
+import com.ragagent.agenttools.wiki.WikiContentRewrite;
+import com.ragagent.agenttools.wiki.WikiIndexOverview;
 import com.ragagent.agenttools.wiki.WikiPages;
 import com.ragagent.agenttools.wiki.WikiRouteResolver;
-import com.ragagent.agenttools.wiki.WikiContentRewrite;
 import com.ragagent.agenttools.wiki.WikiScope;
-import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.wiki.WikiPageNotFoundException;
+import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.service.page.WikiPageService;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

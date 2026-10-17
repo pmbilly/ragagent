@@ -7,18 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.error.BizException;
+import com.ragagent.model.domain.Model;
+import com.ragagent.model.service.ModelRowViews;
+import com.ragagent.modelruntime.application.ModelRuntimeConfigs;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import com.ragagent.contract.error.BizException;
-import com.ragagent.modelruntime.application.ModelRuntimeConfigs;
-import com.ragagent.model.service.ModelRowViews;
-import com.ragagent.model.domain.Model;
 
 /**
  * 厂商注册表 / URL 探测 / 按类型列出 / 厂商校验的单元测试。

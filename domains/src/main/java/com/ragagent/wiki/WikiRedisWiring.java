@@ -1,14 +1,6 @@
 package com.ragagent.wiki;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.data.redis.core.StringRedisTemplate;
-
+import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import com.ragagent.wiki.service.ingest.RedisWikiDeletedTombstoneStore;
 import com.ragagent.wiki.service.ingest.RedisWikiFinalizeLock;
 import com.ragagent.wiki.service.ingest.RedisWikiIdentityClaimStore;
@@ -23,7 +15,14 @@ import com.ragagent.wiki.service.ingest.WikiIngestTaskHandler;
 import com.ragagent.wiki.service.ingest.WikiIngestTaskQueue;
 import com.ragagent.wiki.service.page.RedisWikiSlugLock;
 import com.ragagent.wiki.service.page.WikiSlugLock;
-import com.ragagent.wiki.repository.TaskDeadLetterRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
  * wiki 域的 Redis 面装配（多实例部署）。

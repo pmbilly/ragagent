@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.task;
 
+import jakarta.annotation.PreDestroy;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Component;
 
 /**

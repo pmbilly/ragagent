@@ -1,12 +1,6 @@
 package com.ragagent.system.controller;
 
 
-import com.ragagent.platform.web.JsonMappers;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.apikey.APIKeyScopeType;
@@ -18,16 +12,26 @@ import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.contract.auth.AdminUserPort;
 import com.ragagent.contract.auth.AdminUserView;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.tenant.TenantStorageQuotaPort;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.platform.web.RejectEmptyBody;
+import com.ragagent.system.domain.SystemSetting;
 import com.ragagent.system.dto.SystemDtos;
 import com.ragagent.system.service.SystemAdminUserService;
+import com.ragagent.system.service.SystemSettingService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,11 +43,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.system.domain.SystemSetting;
-import com.ragagent.system.service.SystemSettingService;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.contract.tenant.TenantStorageQuotaPort;
 
 /**
  * /api/v1/system/admin 组：用户管理 / 平台 API Key / 系统设置 / 运行时队列 / 配额批量应用。

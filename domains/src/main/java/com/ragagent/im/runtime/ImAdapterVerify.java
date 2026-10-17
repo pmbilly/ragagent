@@ -2,7 +2,6 @@ package com.ragagent.im.runtime;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 

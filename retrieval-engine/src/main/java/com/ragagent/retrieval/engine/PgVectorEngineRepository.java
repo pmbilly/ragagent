@@ -1,24 +1,21 @@
 package com.ragagent.retrieval.engine;
 
 import com.ragagent.contract.retrieval.IndexRow;
+import com.ragagent.contract.retrieval.SearchParams;
+import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
+import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import javax.sql.DataSource;
-
-import com.ragagent.contract.retrieval.SearchParams;
-import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
-import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 
 /**
  * postgres 引擎仓库的引擎口适配器——让 postgres 以引擎身份进入注册表

@@ -1,18 +1,17 @@
 package com.ragagent.retrieval.engine;
 
+import com.ragagent.contract.model.Embedder;
 import com.ragagent.contract.retrieval.TenantStoreOwnership;
+import com.ragagent.contract.vectorstore.VectorStoreLookup;
+import com.ragagent.contract.vectorstore.VectorStoreView;
+import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import com.ragagent.contract.model.Embedder;
-import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
-import com.ragagent.contract.vectorstore.VectorStoreLookup;
-import com.ragagent.contract.vectorstore.VectorStoreView;
 
 /**
  * 检索引擎测试共用的假件：假引擎服务、假租户归属、假 store 仓库。

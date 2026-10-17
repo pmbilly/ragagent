@@ -1,10 +1,8 @@
 package com.ragagent.knowledge.task;
 
-import com.ragagent.knowledge.domain.QuestionGenerationConsumer;
-
-import org.springframework.data.redis.core.StringRedisTemplate;
-
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
+import com.ragagent.knowledge.domain.QuestionGenerationConsumer;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
  * {@link QuestionGenerationTaskQueue} 的 <b>Redis</b> 实现（跨实例共享任务表）。

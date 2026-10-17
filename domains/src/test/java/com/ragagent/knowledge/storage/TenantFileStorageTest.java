@@ -1,7 +1,5 @@
 package com.ragagent.knowledge.storage;
 
-import com.ragagent.contract.tenant.TenantConfigLookup;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,22 +7,21 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.storage.fileserve.ProviderFileStorePort;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.storage.api.ProviderFileStoreAdapter;
+import com.ragagent.storage.fileserve.StorageFileResolver;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
-import com.ragagent.auth.service.TenantService;
-import com.ragagent.contract.storage.fileserve.ProviderFileStorePort;
-import com.ragagent.storage.api.ProviderFileStoreAdapter;
-import com.ragagent.storage.fileserve.StorageFileResolver;
-import com.ragagent.contract.error.BizException;
 
 /**
  * A3-3 尾批：租户感知文件存储门面（{@link TenantFileStorage}）与写面 provider 解析。

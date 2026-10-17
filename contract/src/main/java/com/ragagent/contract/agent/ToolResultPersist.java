@@ -1,11 +1,10 @@
 package com.ragagent.contract.agent;
 
+import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolResult;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.contract.tool.ToolResult;
 
 /**
  * 工具结果的客户端/存储投影。

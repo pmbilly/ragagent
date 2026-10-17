@@ -1,8 +1,8 @@
 package com.ragagent.agenttools.wiki;
 
+import com.ragagent.contract.agent.SearchAuth;
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.contract.agent.SearchAuth;
 
 /** wiki 链接突变：入站内容重写、失败回滚、错误聚合。 */
     public interface WikiContentRewrite {

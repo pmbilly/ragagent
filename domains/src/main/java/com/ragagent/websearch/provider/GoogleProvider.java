@@ -1,15 +1,14 @@
 package com.ragagent.websearch.provider;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.websearch.WebSearchResult;
+import com.ragagent.platform.web.ProviderJson;
+import com.ragagent.websearch.domain.WebSearchProviderParams;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.websearch.WebSearchResult;
-import com.ragagent.websearch.domain.WebSearchProviderParams;
-import com.ragagent.platform.web.ProviderJson;
 
 /**
  * Google CSE 搜索 provider。

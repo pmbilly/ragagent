@@ -5,18 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.im.runtime.ImTypes;
+import com.ragagent.im.runtime.IncomingMessage;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.im.runtime.ImTypes;
-import com.ragagent.im.runtime.IncomingMessage;
 
 /**
  * 飞书/Lark 长连接：接入点协议与 ClientConfig 覆盖、数据帧分发与

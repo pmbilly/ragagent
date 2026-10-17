@@ -9,6 +9,23 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.wiki.domain.TaskPendingOp;
+import com.ragagent.wiki.prompt.WikiPrompts;
+import com.ragagent.wiki.repository.TaskPendingOpsRepository;
+import com.ragagent.wiki.service.WikiLlmCallMetadata;
+import com.ragagent.wiki.service.page.WikiPageService;
+import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,29 +33,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.model.ChatStream;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.wiki.domain.TaskPendingOp;
-import com.ragagent.wiki.repository.TaskPendingOpsRepository;
-import com.ragagent.wiki.prompt.WikiPrompts;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
-import com.ragagent.wiki.service.WikiLlmCallMetadata;
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.wiki.service.page.WikiPageService;
-import com.ragagent.wiki.service.page.WikiTextUtils;
-import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 
 /**
  * {@link WikiIngestService} 核心行为的测试（prompt 脱敏 / 消息布局缓存 /

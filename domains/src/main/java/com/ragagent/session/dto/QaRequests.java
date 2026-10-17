@@ -1,10 +1,9 @@
 package com.ragagent.session.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * QA 请求面 DTO（三个入口共用：{@code /knowledge-chat}、{@code /agent-chat}、

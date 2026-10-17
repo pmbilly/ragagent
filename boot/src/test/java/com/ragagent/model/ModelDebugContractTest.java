@@ -5,6 +5,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.TestSchema;
+import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.auth.domain.TenantMember;
+import com.ragagent.auth.domain.User;
+import com.ragagent.auth.mapper.TenantMemberMapper;
+import com.ragagent.auth.mapper.UserMapper;
+import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.tenant.domain.Tenant;
+import com.ragagent.tenant.mapper.TenantMapper;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -14,20 +28,6 @@ import java.time.ZoneOffset;
 import java.util.Base64;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.TestSchema;
-import com.ragagent.tenant.domain.Tenant;
-import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.auth.domain.User;
-import com.ragagent.contract.auth.UserPreferences;
-import com.ragagent.tenant.mapper.TenantMapper;
-import com.ragagent.auth.mapper.TenantMemberMapper;
-import com.ragagent.auth.mapper.UserMapper;
-import com.ragagent.platform.security.SsrfGuard;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -43,7 +43,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * 模型调试契约测试：POST /api/v1/models/{id}/debug，对照 golden 逐字节比对。

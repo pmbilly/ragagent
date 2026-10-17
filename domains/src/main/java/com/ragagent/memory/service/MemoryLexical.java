@@ -1,5 +1,7 @@
 package com.ragagent.memory.service;
 
+import com.ragagent.contract.memory.MemoryKeys;
+import com.ragagent.memory.domain.item.MemoryItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,9 +10,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.contract.memory.MemoryKeys;
 
 /**
  * 情境召回的字面排序。

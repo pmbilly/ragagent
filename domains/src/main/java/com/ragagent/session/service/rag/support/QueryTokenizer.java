@@ -1,8 +1,7 @@
 package com.ragagent.session.service.rag.support;
 
-import java.util.List;
-
 import com.ragagent.contract.retrieval.SearchTextUtil;
+import java.util.List;
 
 /**
  * 查询扩展的分词接缝。

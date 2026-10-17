@@ -1,23 +1,23 @@
 package com.ragagent.initialization.service;
 
 
-import com.ragagent.contract.graph.EntityExtractionResult;
-import com.ragagent.contract.knowledge.EntityExtractionPort;
-import com.ragagent.platform.web.JsonMappers;
-import java.util.ArrayList;
-import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.platform.prompt.ExtractPrompts;
-import com.ragagent.platform.prompt.PipelineConfig.PromptTemplateStructured;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.graph.EntityExtractionResult;
+import com.ragagent.contract.graph.GraphRelation;
+import com.ragagent.contract.knowledge.EntityExtractionPort;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.graph.GraphRelation;
+import com.ragagent.platform.prompt.ExtractPrompts;
+import com.ragagent.platform.prompt.PipelineConfig.PromptTemplateStructured;
+import com.ragagent.platform.web.JsonMappers;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 文本抽取测试端点用例（text-relation/fabri-tag/fabri-text）。

@@ -2,26 +2,31 @@ package com.ragagent.knowledge.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.TestSchema;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
-import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.mapper.ChunkRevisionMapper;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.service.chunk.ChunkEditService;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.mapper.ModelMapper;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.SsrfGuard;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,10 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.contract.model.ModelParameters;
-import com.ragagent.knowledge.service.chunk.ChunkEditService;
 
 /**
  * chunk 编辑链路语义（H2）：乐观锁冲突（409 面）、校验的 500 面文案、source_content

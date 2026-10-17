@@ -1,14 +1,13 @@
 package com.ragagent.agent.skills;
 
-import com.ragagent.contract.agent.SkillCatalogPort;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.agent.SkillCatalogPort;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 /** 技能管理器：多源聚合、allowedSkills 过滤、同名先到先得、禁用/未命中语义。 */

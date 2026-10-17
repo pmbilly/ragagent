@@ -1,20 +1,19 @@
 package com.ragagent.session.api;
 
-import org.springframework.stereotype.Component;
-
-import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.session.domain.message.Message;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.session.MessageView;
 import com.ragagent.contract.session.QaRequestPayload;
 import com.ragagent.contract.session.SessionQaPort;
-import com.ragagent.contract.event.EventBusInterface;
+import com.ragagent.contract.session.SessionView;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.QaSupport;
 import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SessionService;
-import com.ragagent.contract.session.SessionView;
-import com.ragagent.platform.web.JsonMappers;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link SessionQaPort} 的会话域实现：消息落库与会话读取逐字转发；

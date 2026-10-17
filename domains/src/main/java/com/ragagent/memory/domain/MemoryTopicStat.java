@@ -1,17 +1,16 @@
 package com.ragagent.memory.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.contract.memory.MemoryKeys;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.platform.web.ZeroTimeSerializer;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 一个话题被这个人问过多少次。

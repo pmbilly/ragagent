@@ -1,16 +1,14 @@
 package com.ragagent.agent.compaction;
 
-import com.ragagent.contract.agent.CompactionSettings;
 import static com.ragagent.agent.GoRecording.STR_SUMMARY_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.agent.budget.TokenEstimator;
+import com.ragagent.contract.agent.CompactionSettings;
+import com.ragagent.contract.model.chat.ChatMessage;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.agent.budget.TokenEstimator;
-import com.ragagent.contract.model.chat.ChatMessage;
 
 /**
  * 准备/重建的录制常量断言。

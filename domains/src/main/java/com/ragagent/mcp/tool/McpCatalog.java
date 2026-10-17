@@ -1,6 +1,18 @@
 package com.ragagent.mcp.tool;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.tool.Cancellation;
+import com.ragagent.contract.tool.ToolApprovalGate;
+import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolEnabledChecker;
+import com.ragagent.contract.tool.ToolEnabledChecks;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.mcp.domain.McpService;
+import com.ragagent.mcp.oauth.OAuthReauthorizationRequiredException;
+import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
+import com.ragagent.mcp.protocol.McpOAuthRequiredException;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.ToolJson;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -11,19 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolEnabledChecker;
-import com.ragagent.contract.tool.ToolApprovalGate;
-import com.ragagent.contract.tool.ToolEnabledChecks;
-import com.ragagent.platform.web.ToolJson;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.mcp.domain.McpService;
-import com.ragagent.contract.tool.Cancellation;
-import com.ragagent.mcp.oauth.OAuthReauthorizationRequiredException;
-import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
-import com.ragagent.mcp.protocol.McpOAuthRequiredException;
-import com.ragagent.contract.tool.ToolDefinitions;
 
 /**
  * MCP 目录：一个 Agent 引擎、一个授权主体独有。只有 server 快照可变；可执行的

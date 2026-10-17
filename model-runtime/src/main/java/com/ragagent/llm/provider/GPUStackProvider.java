@@ -1,9 +1,8 @@
 package com.ragagent.llm.provider;
 
+import com.ragagent.contract.error.BizException;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.contract.error.BizException;
 
 /**
  * GPUStack。

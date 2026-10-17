@@ -1,11 +1,10 @@
 package com.ragagent.mcp.domain;
 
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.time.OffsetDateTime;
 
 /**
  * MCP 服务的 OAuth 客户端凭据。

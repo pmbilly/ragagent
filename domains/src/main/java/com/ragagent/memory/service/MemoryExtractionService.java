@@ -1,6 +1,27 @@
 package com.ragagent.memory.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryKeys;
+import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryMessageCursor;
+import com.ragagent.contract.session.SessionMessagePort;
+import com.ragagent.memory.domain.MemoryConflictException;
+import com.ragagent.memory.domain.MemoryExtractionBatch;
+import com.ragagent.memory.domain.MemoryExtractionFailure;
+import com.ragagent.memory.domain.MemoryExtractionSession;
+import com.ragagent.memory.domain.MemoryText;
+import com.ragagent.memory.domain.MemoryTopicStat;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryTombstone;
+import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.memory.domain.scope.MemorySubject;
+import com.ragagent.memory.repository.MemoryRepository;
+import com.ragagent.platform.access.TenantScopes;
+import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,32 +30,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.contract.memory.MemoryConfig;
-import com.ragagent.memory.domain.MemoryExtractionBatch;
-import com.ragagent.memory.domain.MemoryExtractionFailure;
-import com.ragagent.memory.domain.MemoryExtractionSession;
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.contract.memory.MemoryMessageCursor;
-import com.ragagent.memory.domain.scope.MemoryScope;
-import com.ragagent.memory.domain.scope.MemorySubject;
-import com.ragagent.memory.domain.MemoryText;
-import com.ragagent.memory.domain.item.MemoryTombstone;
-import com.ragagent.memory.domain.MemoryTopicStat;
-import com.ragagent.memory.repository.MemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
-import com.ragagent.contract.session.SessionMessagePort;
-import com.ragagent.contract.memory.MemoryKeys;
-import com.ragagent.memory.domain.MemoryConflictException;
-import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
-import com.ragagent.platform.access.TenantScopes;
 
 /**
  * 后台蒸馏：把一段对话变成记忆。

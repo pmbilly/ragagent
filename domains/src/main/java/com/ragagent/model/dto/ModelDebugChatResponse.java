@@ -1,11 +1,10 @@
 package com.ragagent.model.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.model.chat.ToolCall;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * models/{id}/debug 的 chat 分支 rawResponse（流式聚合结果）。

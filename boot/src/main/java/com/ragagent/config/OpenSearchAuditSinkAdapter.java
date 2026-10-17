@@ -1,18 +1,16 @@
 package com.ragagent.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.ragagent.audit.domain.AuditLog;
+import com.ragagent.audit.service.AuditLogService;
+import com.ragagent.contract.audit.AuditAction;
+import com.ragagent.contract.audit.AuditOutcome;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.audit.service.AuditLogService;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository;
 
 /**
  * OpenSearch 驱动审计事件的适配器——driver 自有 AuditSink 接口，依赖箭头单向；

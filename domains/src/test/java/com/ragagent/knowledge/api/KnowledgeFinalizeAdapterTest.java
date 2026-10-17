@@ -8,15 +8,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-
-import org.apache.ibatis.builder.MapperBuilderAssistant;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
@@ -24,6 +15,13 @@ import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import org.apache.ibatis.builder.MapperBuilderAssistant;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * {@link KnowledgeFinalizeAdapter} 的行为测试（由 wiki 侧

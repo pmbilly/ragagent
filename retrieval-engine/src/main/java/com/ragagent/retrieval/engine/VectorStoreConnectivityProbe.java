@@ -1,14 +1,5 @@
 package com.ragagent.retrieval.engine;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.Base64;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.BizException;
@@ -22,6 +13,14 @@ import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository;
 import com.ragagent.retrieval.engine.qdrant.QdrantRetrieveRepository;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRestClient;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepository;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

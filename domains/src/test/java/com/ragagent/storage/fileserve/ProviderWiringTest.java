@@ -1,6 +1,5 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.contract.storage.fileserve.OpenedFile;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -8,26 +7,25 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.contract.storage.fileserve.OpenedFile;
+import com.ragagent.contract.storage.provider.SeekableSource;
+import com.ragagent.contract.tenant.StorageEngineConfig;
+import com.ragagent.platform.security.CryptoService;
+import com.ragagent.platform.storage.fileserve.FileTransport;
+import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.storage.provider.FileService;
+import com.ragagent.storage.provider.SeekableFileService;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.security.CryptoService;
-import com.ragagent.contract.tenant.StorageEngineConfig;
-import com.ragagent.storage.domain.StorageBackend;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.storage.provider.FileService;
-import com.ragagent.storage.provider.SeekableFileService;
-import com.ragagent.contract.storage.provider.SeekableSource;
-import com.ragagent.platform.storage.fileserve.FileTransport;
 
 /**
  * 接线测试：provider 服务 → fileserve 读取面（适配器）、云 provider 分支经工厂落地、

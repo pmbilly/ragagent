@@ -43,18 +43,17 @@ import static com.ragagent.agent.GoRecording.STR_SKILLS_META_EMPTY;
 import static com.ragagent.agent.GoRecording.STR_STEER_GUIDANCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import com.ragagent.platform.prompt.PromptConstants;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
 import com.ragagent.agent.prompt.GroundingPrompt;
-import com.ragagent.contract.agent.RecentDocInfo;
-import com.ragagent.contract.agent.PinnedSkillInstructions;
-import com.ragagent.contract.agent.KnowledgeBaseInfo;
 import com.ragagent.agent.prompt.PlaceholderDefinition;
+import com.ragagent.contract.agent.KnowledgeBaseInfo;
+import com.ragagent.contract.agent.PinnedSkillInstructions;
+import com.ragagent.contract.agent.RecentDocInfo;
 import com.ragagent.contract.agent.SystemPromptSection;
+import com.ragagent.platform.prompt.PromptConstants;
+import java.time.LocalDate;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * 提示词合成的录制常量断言（时间参数化为固定日期 2026-09-20）。

@@ -1,12 +1,11 @@
 package com.ragagent.mcp.oauth;
 
+import com.ragagent.mcp.protocol.McpContext;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import com.ragagent.mcp.protocol.McpContext;
 
 /**
  * OAuth 协议交换协作者（自 {@link OAuthHandler} 拆出）：token 刷新与落库、RFC 7591 动态注册、

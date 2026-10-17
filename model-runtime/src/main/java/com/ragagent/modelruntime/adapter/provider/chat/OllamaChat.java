@@ -1,5 +1,27 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.model.StreamResponse;
+import com.ragagent.contract.model.TokenUsage;
+import com.ragagent.contract.model.chat.ChatConfig;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.model.chat.ChatTool;
+import com.ragagent.contract.model.chat.FunctionCall;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.llm.ollama.OllamaChatRequest;
+import com.ragagent.llm.ollama.OllamaMessage;
+import com.ragagent.llm.ollama.OllamaService;
+import com.ragagent.llm.ollama.OllamaTool;
+import com.ragagent.llm.ollama.OllamaToolCall;
+import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingEmitter;
+import com.ragagent.platform.stream.QueuedChatStream;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -7,33 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
-
-import com.ragagent.contract.model.ChatStream;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatConfig;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.chat.FunctionCall;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.contract.model.chat.ToolCall;
-import com.ragagent.llm.ollama.OllamaChatRequest;
-import com.ragagent.llm.ollama.OllamaMessage;
-import com.ragagent.llm.ollama.OllamaService;
-import com.ragagent.llm.ollama.OllamaTool;
-import com.ragagent.llm.ollama.OllamaToolCall;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.contract.model.chat.ChatTool;
-import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingEmitter;
-import com.ragagent.platform.stream.QueuedChatStream;
 
 /**
  * 本地 Ollama 聊天客户端。

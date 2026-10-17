@@ -1,6 +1,12 @@
 package com.ragagent.knowledge.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelFacts;
+import com.ragagent.platform.model.EmbeddingGateway;
 import com.ragagent.platform.web.JsonMappers;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -8,13 +14,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
-import java.io.IOException;
-import com.ragagent.platform.model.EmbeddingGateway;
-import com.ragagent.contract.model.ModelFacts;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 最小 OpenAI 兼容 embedding 客户端。

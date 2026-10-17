@@ -1,23 +1,19 @@
 package com.ragagent.config;
 
 import com.ragagent.contract.storage.fileserve.OpenedFile;
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
-
 import com.ragagent.contract.tenant.TenantConfigLookup;
-
+import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
+import com.ragagent.platform.storage.fileserve.StoragePaths;
+import com.ragagent.storage.domain.StoredResource;
+import com.ragagent.storage.fileserve.StorageFileResolver;
+import com.ragagent.storage.service.ResourceCatalogService;
 import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
-
-import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
-import com.ragagent.storage.domain.StoredResource;
-import com.ragagent.storage.fileserve.StorageFileResolver;
-import com.ragagent.storage.service.ResourceCatalogService;
-import com.ragagent.platform.storage.fileserve.StoragePaths;
 
 /**
  * 把 {@link ImageResolver} 的 {@code LocalImageResolver} 全局钩子接到存储模块。

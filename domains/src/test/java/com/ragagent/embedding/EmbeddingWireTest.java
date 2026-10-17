@@ -2,21 +2,9 @@ package com.ragagent.embedding;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.InputStream;
-import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.model.Embedder;
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.embedding.provider.AliyunEmbedder;
 import com.ragagent.embedding.provider.AzureOpenAiEmbedder;
 import com.ragagent.embedding.provider.GeminiEmbedder;
@@ -25,15 +13,25 @@ import com.ragagent.embedding.provider.NvidiaEmbedder;
 import com.ragagent.embedding.provider.OpenAiEmbedder;
 import com.ragagent.embedding.provider.VolcengineEmbedder;
 import com.ragagent.embedding.provider.ZhipuEmbedder;
+import com.ragagent.llm.limiter.BackgroundTaskContext;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
-import com.ragagent.contract.model.ModelParameters;
+import com.ragagent.llm.limiter.LocalLimiter;
+import com.ragagent.model.domain.Model;
+import com.ragagent.model.service.ModelRowViews;
+import com.ragagent.modelruntime.application.ModelRuntimeConfigs;
+import com.ragagent.platform.security.SsrfGuard;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-import com.ragagent.modelruntime.application.ModelRuntimeConfigs;
-import com.ragagent.llm.limiter.BackgroundTaskContext;
-import com.ragagent.llm.limiter.LocalLimiter;
-import com.ragagent.model.service.ModelRowViews;
-import com.ragagent.model.domain.Model;
+import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * embedding 客户端的 stub server A/B：请求体/路径/头部与录制

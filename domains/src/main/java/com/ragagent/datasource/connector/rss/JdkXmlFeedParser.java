@@ -1,5 +1,6 @@
 package com.ragagent.datasource.connector.rss;
 
+import com.ragagent.platform.text.HtmlEntities;
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
@@ -13,16 +14,13 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import com.ragagent.platform.text.HtmlEntities;
 
 /**
  * {@link FeedParser} 的默认实现：<b>只用 JDK 自带的 DOM 解析器</b>，实现 gofeed 的

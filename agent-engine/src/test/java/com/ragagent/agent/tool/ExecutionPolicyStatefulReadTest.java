@@ -2,9 +2,9 @@ package com.ragagent.agent.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.contract.tool.ToolDefinitions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import com.ragagent.contract.tool.ToolDefinitions;
 
 /**
  * A4：并发白名单只许放**无会话状态**的读工具。

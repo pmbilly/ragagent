@@ -1,18 +1,16 @@
 package com.ragagent.storage.api;
 
 import com.ragagent.contract.storage.fileserve.OpenedFile;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.storage.fileserve.ProviderFileStorePort;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.storage.fileserve.ProviderFileContentService;
 import com.ragagent.storage.fileserve.StorageFileResolver;
 import com.ragagent.storage.provider.FileService;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link ProviderFileStorePort} 的存储域实现：把租户配置解析成 provider 服务，并暴露写/读/删操作。

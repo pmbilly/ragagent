@@ -1,13 +1,12 @@
 package com.ragagent.im.channel.feishu;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
+import com.ragagent.platform.web.JsonMappers;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 长连接事件帧 → 统一消息。

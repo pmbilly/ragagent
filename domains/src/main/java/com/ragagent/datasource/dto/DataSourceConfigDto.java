@@ -1,10 +1,9 @@
 package com.ragagent.datasource.dto;
 
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ragagent.datasource.domain.DataSourceMapSerializer;
+import java.util.List;
+import java.util.Map;
 
 /**
  * {@link com.ragagent.datasource.domain.DataSourceConfig} 去掉 Credentials 之后的响应形状。

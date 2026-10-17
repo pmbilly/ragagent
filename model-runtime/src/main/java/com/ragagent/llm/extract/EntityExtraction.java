@@ -1,23 +1,22 @@
 package com.ragagent.llm.extract;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.graph.GraphNode;
+import com.ragagent.contract.graph.GraphRelation;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.platform.prompt.PipelineConfig.PromptTemplateStructured;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.ToolJson;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.graph.GraphNode;
-import com.ragagent.contract.graph.GraphRelation;
-import com.ragagent.platform.prompt.PipelineConfig.PromptTemplateStructured;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.ToolJson;
-import com.ragagent.contract.model.chat.ChatResponse;
 
 /**
  * 实体抽取的提示词生成与 LLM 输出解析。

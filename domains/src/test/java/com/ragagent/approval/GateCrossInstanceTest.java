@@ -1,24 +1,20 @@
 package com.ragagent.approval;
 
-import com.ragagent.contract.tool.PendingRequest;
-
-import com.ragagent.contract.tool.Cancellation;
-import com.ragagent.contract.tool.ToolApprovalException;
-
-import com.ragagent.contract.tool.Decision;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.Duration;
-import java.util.concurrent.atomic.AtomicReference;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
 import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.tool.Cancellation;
+import com.ragagent.contract.tool.Decision;
+import com.ragagent.contract.tool.PendingRequest;
+import com.ragagent.contract.tool.ToolApprovalException;
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;

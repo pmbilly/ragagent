@@ -1,10 +1,9 @@
 package com.ragagent.websearch.mapper;
 
+import com.ragagent.websearch.domain.WebSearchParamsTypeHandler;
+import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import java.time.OffsetDateTime;
 import java.util.List;
-
-import com.ragagent.websearch.domain.WebSearchProviderEntity;
-import com.ragagent.websearch.domain.WebSearchParamsTypeHandler;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

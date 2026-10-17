@@ -1,6 +1,21 @@
 package com.ragagent.wiki.repository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.contract.wiki.WikiIndexEntry;
+import com.ragagent.contract.wiki.WikiPageNotFoundException;
+import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.domain.SourceRefNeedle;
+import com.ragagent.wiki.domain.WikiCategoryPaths;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPageIssue;
+import com.ragagent.wiki.domain.WikiSourceRefs;
+import com.ragagent.wiki.domain.page.WikiPageConflictException;
+import com.ragagent.wiki.domain.page.WikiPageListRequest;
+import com.ragagent.wiki.domain.page.WikiPageLite;
+import com.ragagent.wiki.domain.page.WikiPageRevision;
+import com.ragagent.wiki.domain.page.WikiRevisionPruneRequest;
 import com.ragagent.wiki.mapper.WikiPageIssueMapper;
 import com.ragagent.wiki.mapper.WikiPageMapper;
 import com.ragagent.wiki.mapper.WikiPageRevisionMapper;
@@ -11,24 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.sql.DataSource;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.persistence.DatabaseDialects;
-import com.ragagent.wiki.domain.SourceRefNeedle;
-import com.ragagent.wiki.domain.WikiCategoryPaths;
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.contract.wiki.WikiIndexEntry;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.domain.page.WikiPageConflictException;
-import com.ragagent.wiki.domain.WikiPageIssue;
-import com.ragagent.wiki.domain.page.WikiPageLite;
-import com.ragagent.wiki.domain.page.WikiPageListRequest;
-import com.ragagent.contract.wiki.WikiPageNotFoundException;
-import com.ragagent.wiki.domain.page.WikiPageRevision;
-import com.ragagent.wiki.domain.page.WikiRevisionPruneRequest;
-import com.ragagent.wiki.domain.WikiSourceRefs;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

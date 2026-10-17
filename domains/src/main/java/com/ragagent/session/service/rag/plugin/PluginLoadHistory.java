@@ -1,14 +1,14 @@
 package com.ragagent.session.service.rag.plugin;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.session.service.rag.ChatManage;
 import com.ragagent.session.service.rag.History;
 import com.ragagent.session.service.rag.PipelineCommon;
 import com.ragagent.session.service.rag.PipelineEventType;
 import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.pipeline.PipelinePorts;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * LOAD_HISTORY 阶段插件：

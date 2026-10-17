@@ -1,15 +1,14 @@
 package com.ragagent.mcp.oauth;
 
+import com.ragagent.mcp.domain.McpOAuthClient;
+import com.ragagent.mcp.domain.McpOAuthToken;
+import com.ragagent.mcp.domain.McpPrincipal;
+import com.ragagent.platform.access.TenantContext;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.mcp.domain.McpOAuthClient;
-import com.ragagent.mcp.domain.McpOAuthToken;
-import com.ragagent.mcp.domain.McpPrincipal;
 
 /**
  * 内存版 OAuth 仓储。

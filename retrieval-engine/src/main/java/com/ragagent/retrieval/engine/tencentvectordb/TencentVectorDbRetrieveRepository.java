@@ -1,21 +1,11 @@
 package com.ragagent.retrieval.engine.tencentvectordb;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
@@ -25,8 +15,16 @@ import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbBm25.SparseVecItem;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRestClient.Json;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRestClient.TencentVectorDbApiException;
-import com.ragagent.contract.vectorstore.IndexConfig;
-import com.ragagent.retrieval.config.RetrievalEnvLookup;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 腾讯 VectorDB 检索引擎仓储。

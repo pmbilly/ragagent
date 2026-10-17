@@ -1,8 +1,7 @@
 package com.ragagent.auth.dto;
 
-import java.time.OffsetDateTime;
-
 import com.ragagent.contract.tenant.TenantRowView;
+import java.time.OffsetDateTime;
 
 /**
  * Tenant 的 API 投影。

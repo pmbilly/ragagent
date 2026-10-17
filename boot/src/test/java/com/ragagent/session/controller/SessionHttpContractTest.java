@@ -7,21 +7,21 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.ragagent.TestSchema;
+import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicy;
-import com.ragagent.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
-import com.ragagent.contract.auth.UserPreferences;
-import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
+import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.tenant.domain.Tenant;
+import com.ragagent.tenant.mapper.TenantMapper;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * 会话 HTTP 层的契约测试（CRUD + 置顶 8 条端点）。

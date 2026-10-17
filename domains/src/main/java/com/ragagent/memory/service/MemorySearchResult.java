@@ -1,8 +1,7 @@
 package com.ragagent.memory.service;
 
-import java.util.List;
-
 import com.ragagent.memory.domain.item.MemoryItem;
+import java.util.List;
 
 /**
  * 一次按需查找记忆库的返回。

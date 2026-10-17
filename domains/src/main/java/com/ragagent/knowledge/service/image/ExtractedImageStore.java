@@ -1,15 +1,5 @@
 package com.ragagent.knowledge.service.image;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -18,6 +8,14 @@ import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.platform.knowledge.ImageRefRewriter;
 import com.ragagent.platform.text.ContentTypeByFilename;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * 解析抽取图片的落点：写租户存储后端的 {@code exports} 区并登记资源、绑定属主，

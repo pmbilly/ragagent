@@ -6,21 +6,20 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.mcp.domain.McpPrincipal;
+import com.ragagent.mcp.protocol.McpContext;
+import com.ragagent.mcp.protocol.McpServiceUrls;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.SsrfGuard;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.mcp.protocol.McpContext;
-import com.ragagent.mcp.protocol.McpServiceUrls;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.mcp.domain.McpPrincipal;
 
 /**
  * OAuth handler 的协议行为测试。

@@ -1,16 +1,15 @@
 package com.ragagent.datasource.domain;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ragagent.platform.security.CryptoService;
+import com.ragagent.platform.web.JsonMappers;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 未加密的数据源配置。

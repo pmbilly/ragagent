@@ -1,10 +1,9 @@
 package com.ragagent.datasource.service;
 
-import java.util.List;
-import java.util.Map;
-
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 数据源同步往知识库里写东西时要用的那一小片能力（知识库服务 + 仓储

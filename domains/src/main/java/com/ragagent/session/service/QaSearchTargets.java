@@ -1,13 +1,13 @@
 package com.ragagent.session.service;
 
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
-import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**
  * {@code SessionQaResolution} 的**agent 覆盖簇**：把 custom agent 的配置

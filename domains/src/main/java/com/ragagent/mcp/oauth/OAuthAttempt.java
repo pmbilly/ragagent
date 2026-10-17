@@ -1,7 +1,6 @@
 package com.ragagent.mcp.oauth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import com.ragagent.platform.access.TenantContext;
 
 /**

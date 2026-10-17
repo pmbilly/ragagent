@@ -1,19 +1,17 @@
 package com.ragagent.wiki.api;
 
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
-import com.ragagent.contract.wiki.WikiLinkRepairResult;
-import com.ragagent.contract.wiki.WikiPageOpsPort;
 import com.ragagent.contract.wiki.WikiIndex;
-import com.ragagent.contract.wiki.WikiPageView;
-import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.contract.wiki.WikiLinkRepairResult;
 import com.ragagent.contract.wiki.WikiPageIssueView;
+import com.ragagent.contract.wiki.WikiPageOpsPort;
+import com.ragagent.contract.wiki.WikiPageView;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.service.page.WikiEditContext;
 import com.ragagent.wiki.service.page.WikiPageService;
-import com.ragagent.platform.web.JsonMappers;
+import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link WikiPageOpsPort} 的 wiki 域实现：逐字转发 {@link WikiPageService}。

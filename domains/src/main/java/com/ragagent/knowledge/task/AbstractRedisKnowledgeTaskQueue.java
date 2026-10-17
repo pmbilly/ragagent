@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.task;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.platform.task.RedisTaskQueueCore;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -7,13 +9,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
-
-import com.ragagent.platform.task.RedisTaskQueueCore;
 
 /**
  * knowledge 两个 Redis 任务队列（分块抽取 / 问题生成）的共享骨架。

@@ -1,11 +1,10 @@
 package com.ragagent.config;
 
+import com.ragagent.platform.config.AppEnvLookup;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
-
-import com.ragagent.platform.config.AppEnvLookup;
 
 /**
  * 启动最早点安装 {@link AppEnvLookup}。

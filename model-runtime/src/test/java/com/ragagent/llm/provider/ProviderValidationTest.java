@@ -5,9 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.contract.error.BizException;
+import org.junit.jupiter.api.Test;
 
 /**
  * 各厂商的 ValidateConfig / Info 校验测试。

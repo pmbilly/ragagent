@@ -1,22 +1,21 @@
 package com.ragagent.mcp.service;
 
-import com.ragagent.platform.web.JsonBodyErrors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.tool.Decision;
 import com.ragagent.contract.tool.ToolApprovalException;
 import com.ragagent.contract.tool.ToolApprovalGate;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.JsonBodyErrors;
+import com.ragagent.platform.web.JsonMappers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 待审批 MCP 工具调用的决议用例：鉴权闸门前置 + 决议解析 + gate 调用与错误映射。

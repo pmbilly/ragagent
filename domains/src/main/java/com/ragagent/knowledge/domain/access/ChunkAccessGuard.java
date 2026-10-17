@@ -1,22 +1,21 @@
 package com.ragagent.knowledge.domain.access;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.ChunkNotFoundException;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
-
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.error.GuardForbiddenException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.web.error.GuardForbiddenException;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.domain.ChunkNotFoundException;
-import com.ragagent.knowledge.repository.ChunkRepository;
 import org.springframework.stereotype.Component;
 
 /**

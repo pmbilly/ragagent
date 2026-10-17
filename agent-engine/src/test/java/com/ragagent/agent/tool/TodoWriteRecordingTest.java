@@ -1,13 +1,12 @@
 package com.ragagent.agent.tool;
 
-import com.ragagent.agent.fixtures.RecordingSupport;
-import com.ragagent.agent.fixtures.GoRecording45A;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agent.fixtures.GoRecording45A;
+import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.contract.tool.ToolRequest;
+import org.junit.jupiter.api.Test;
 
 /**
  * TodoWriteTool 的录制语料（5 条有效用例；bad_json 一条不录——录制侧

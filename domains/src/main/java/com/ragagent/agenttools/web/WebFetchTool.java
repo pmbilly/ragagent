@@ -1,5 +1,15 @@
 package com.ragagent.agenttools.web;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.tool.ToolCancellation;
+import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolOutput;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.contract.websearch.FetchException;
+import com.ragagent.contract.websearch.ToolPageFetcher;
+import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
 import java.net.URI;
@@ -11,17 +21,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.contract.websearch.FetchException;
-import com.ragagent.contract.websearch.ToolPageFetcher;
-import com.ragagent.platform.tool.BaseTool;
-import com.ragagent.contract.tool.ToolCancellation;
-import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.contract.tool.ToolOutput;
-import com.ragagent.contract.tool.ToolRequest;
 
 /**
  * web_fetch 工具。

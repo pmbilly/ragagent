@@ -1,19 +1,17 @@
 package com.ragagent.agent.skills;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ragagent.agent.skills.mapper.SkillMapper;
 import com.ragagent.contract.agent.SkillCatalogPort;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.agent.skills.mapper.SkillMapper;
 
 /**
  * 技能目录（技能已入库；**租户级 + 平台内置层**）。

@@ -1,19 +1,17 @@
 package com.ragagent.rerank.provider;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.model.RankResult;
+import com.ragagent.contract.model.Reranker;
+import com.ragagent.platform.web.ProviderJson;
+import com.ragagent.rerank.RerankHttp;
+import com.ragagent.rerank.RerankerConfig;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.web.ProviderJson;
-import com.ragagent.contract.model.RankResult;
-import com.ragagent.rerank.RerankHttp;
-import com.ragagent.contract.model.Reranker;
-import com.ragagent.rerank.RerankerConfig;
 
 /**
  * 腾讯云 LKEAP rerank 客户端。

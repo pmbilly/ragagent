@@ -1,8 +1,8 @@
 package com.ragagent.platform.tracing.decorators;
 
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
-import com.ragagent.platform.tracing.langfuse.LangfuseEnvProperties;
 import com.ragagent.platform.tracing.langfuse.LangfuseConfig;
+import com.ragagent.platform.tracing.langfuse.LangfuseEnvProperties;
+import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;

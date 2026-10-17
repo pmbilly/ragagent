@@ -2,6 +2,15 @@ package com.ragagent.agenttools.knowledge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agenttools.knowledge.GrepChunksTool.GrepChunkSearch;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.knowledge.GrepChunkHit;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,19 +21,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.agenttools.knowledge.GrepChunksTool.GrepChunkSearch;
-import com.ragagent.platform.knowledge.GrepChunkHit;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.agent.fixtures.GoRecording45B;
-import com.ragagent.agent.fixtures.RecordingSupport;
-import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * 4.5b 回放：grep_chunks 的录制回放。

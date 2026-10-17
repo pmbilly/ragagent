@@ -1,27 +1,24 @@
 package com.ragagent.modelcontext;
 
+import static com.ragagent.modelcontext.GoRecording46A.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.model.chat.ChatTool;
+import com.ragagent.contract.model.chat.FunctionCall;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.ToolJson;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-
-import static com.ragagent.modelcontext.GoRecording46A.*;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.ToolJson;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatTool;
-import com.ragagent.contract.model.chat.FunctionCall;
-import com.ragagent.contract.model.chat.ToolCall;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.model.chat.ChatResponse;
 
 /**
  * 4.6a modelcontext 包的录制回放（常量见 {@link GoRecording46A}——字节断言为准）。

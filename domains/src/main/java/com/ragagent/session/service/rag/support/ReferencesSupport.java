@@ -1,19 +1,18 @@
 package com.ragagent.session.service.rag.support;
 
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.retrieval.ChunkTypes;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.modelcontext.Registry;
+import com.ragagent.platform.knowledge.ImageInfoEnricher;
+import com.ragagent.platform.prompt.PromptComposer;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineCommon;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineCommon;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.prompt.PromptComposer;
-import com.ragagent.platform.knowledge.ImageInfoEnricher;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.modelcontext.Registry;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.retrieval.ChunkTypes;
 
 /**
  * 模型上下文装配：把检索结果里的位置 ID 换成请求内 model 句柄。

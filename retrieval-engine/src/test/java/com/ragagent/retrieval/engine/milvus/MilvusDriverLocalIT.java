@@ -2,6 +2,11 @@ package com.ragagent.retrieval.engine.milvus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.contract.vectorstore.IndexConfig;
+import com.ragagent.retrieval.engine.EngineTypes;
+import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -13,19 +18,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-
-import com.ragagent.retrieval.engine.EngineTypes;
-import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
-import com.ragagent.contract.vectorstore.IndexConfig;
 
 /**
  * Milvus 驱动对<b>真实服务端</b>的端到端验证（env 门控，默认跳过）：起 compose 口径的

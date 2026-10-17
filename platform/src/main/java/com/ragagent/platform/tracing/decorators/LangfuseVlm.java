@@ -1,7 +1,7 @@
 package com.ragagent.platform.tracing.decorators;
 
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Generation;
+import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

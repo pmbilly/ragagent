@@ -1,8 +1,8 @@
 package com.ragagent.auth.apikey.domain;
 
-import com.ragagent.contract.apikey.TenantAPIKeyResponse;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.apikey.APIKeyScopeType;
+import com.ragagent.contract.apikey.TenantAPIKeyResponse;
 
 /**
  * 实体 → 响应投影。

@@ -1,18 +1,19 @@
 package com.ragagent.auth.controller;
 
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.apikey.ApiKeyAdminPort;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.config.TenantProperties;
+import com.ragagent.contract.apikey.ApiKeyAdminPort;
 import com.ragagent.contract.knowledge.KnowledgeBaseProvisioner;
-import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.contract.settings.SystemSettingGateway;
+import com.ragagent.contract.tenant.TenantRowView;
+import com.ragagent.platform.config.TenantProperties;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.storage.config.StorageAllowList;
+import com.ragagent.platform.web.ApiResult;
+import java.util.List;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,8 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * 跨空间租户目录 + KV 配置分发器（五条路由）：

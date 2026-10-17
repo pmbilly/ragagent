@@ -1,5 +1,6 @@
 package com.ragagent.mcp.oauth;
 
+import com.ragagent.mcp.protocol.McpContext;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -7,8 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-
-import com.ragagent.mcp.protocol.McpContext;
 
 /**
  * OAuth 元数据发现协作者（自 {@link OAuthHandler} 拆出）：发现状态组（一次性缓存 + 错误 + base/resource URL）

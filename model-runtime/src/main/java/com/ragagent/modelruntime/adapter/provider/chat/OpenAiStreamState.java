@@ -1,17 +1,16 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.model.TokenUsage;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.llm.domain.ProviderMetadataMaps;
+import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingEmitter;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.contract.model.chat.ToolCall;
-import com.ragagent.llm.domain.ProviderMetadataMaps;
-import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingEmitter;
 
 /**
  * OpenAI 兼容流式处理状态。

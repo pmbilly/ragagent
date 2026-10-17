@@ -2,11 +2,10 @@ package com.ragagent.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.Duration;
-
-import org.junit.jupiter.api.Test;
-import com.ragagent.platform.event.EventIds;
 import com.ragagent.contract.agent.AgentBudgets;
+import com.ragagent.platform.event.EventIds;
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
 
 /**
  * 常量与预算族纯逻辑的录制断言（{@code AgentConsts}）。

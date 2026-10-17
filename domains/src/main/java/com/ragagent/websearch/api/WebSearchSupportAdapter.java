@@ -1,11 +1,10 @@
 package com.ragagent.websearch.api;
 
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.websearch.WebSearchProviderPort;
 import com.ragagent.contract.websearch.WebSearchTempStatePort;
 import com.ragagent.websearch.mapper.WebSearchProviderRepository;
 import com.ragagent.websearch.service.WebSearchTempKbStateService;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link WebSearchProviderPort} / {@link WebSearchTempStatePort} 的 websearch 域实现：

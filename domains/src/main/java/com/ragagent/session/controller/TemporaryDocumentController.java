@@ -1,16 +1,22 @@
 package com.ragagent.session.controller;
 
-import java.util.List;
-import java.util.Map;
-
-import com.ragagent.platform.access.TenantContext;
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.knowledge.support.ParserEngineRules;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.text.ContentTypeByFilename;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.domain.document.TemporaryDocument;
+import com.ragagent.session.service.AgentResolver;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.TemporaryDocumentService;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -24,13 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.platform.text.ContentTypeByFilename;
-import com.ragagent.contract.knowledge.support.ParserEngineRules;
-import com.ragagent.session.service.AgentResolver;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 会话附件（临时文档）HTTP 层。

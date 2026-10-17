@@ -1,25 +1,22 @@
 package com.ragagent.im.controller;
 
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
 import com.ragagent.im.runtime.CallbackExchange;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.service.ImChannelService;
 import com.ragagent.im.service.ImTurnOrchestrator;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * IM 平台回调面（路由 GET/POST /api/v1/im/callback/{channelId}）。

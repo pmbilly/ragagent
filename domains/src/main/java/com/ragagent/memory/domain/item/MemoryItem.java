@@ -1,12 +1,11 @@
 package com.ragagent.memory.domain.item;
 
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.platform.web.ZeroTimeSerializer;
+import java.time.OffsetDateTime;
 
 /**
  * 一条被记住的陈述。

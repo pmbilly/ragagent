@@ -1,9 +1,5 @@
 package com.ragagent.knowledge.service.chunk;
 
-import com.ragagent.platform.prompt.ExtractPrompts;
-import com.ragagent.llm.extract.EntityExtractionAdapter;
-import com.ragagent.knowledge.domain.span.SpanTracker;
-
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -19,32 +15,34 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.retrieval.RetrieveGraphRepository;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
-import com.ragagent.knowledge.repository.KnowledgeRepository;
-import com.ragagent.contract.model.ChatStream;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.wiki.WikiFinalizePort;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import com.ragagent.contract.graph.GraphData;
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.graph.NameSpace;
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
+import com.ragagent.contract.wiki.WikiFinalizePort;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.ExtractChunkPayload;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.span.SpanTracker;
+import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.llm.extract.EntityExtractionAdapter;
+import com.ragagent.platform.prompt.ExtractPrompts;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * 分块图抽取服务测试（{@code ChunkExtractService.handle} 的四条出口：

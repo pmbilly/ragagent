@@ -1,9 +1,8 @@
 package com.ragagent.memory.service;
 
-import java.util.List;
-
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import java.util.List;
 
 /**
  * memory 管线按模型 ID 取运行时模型实例的端口。

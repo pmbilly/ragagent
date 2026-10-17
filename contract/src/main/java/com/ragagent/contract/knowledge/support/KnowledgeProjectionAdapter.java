@@ -1,12 +1,12 @@
 package com.ragagent.contract.knowledge.support;
 
+import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**
  * knowledge 实体 → L1/线格式载荷的**域内公用投影**（由 {@code service.KnowledgeService}

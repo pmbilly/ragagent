@@ -1,19 +1,16 @@
 package com.ragagent.session.controller.sse;
 
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.model.StreamResponse;
+import com.ragagent.contract.session.SseSink;
+import com.ragagent.platform.storage.support.Rewriter;
+import com.ragagent.platform.storage.support.StreamRewriter;
+import com.ragagent.platform.stream.StreamEvent;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-
-import com.ragagent.contract.session.SseSink;
-
 import org.springframework.stereotype.Component;
-
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.platform.storage.support.Rewriter;
-import com.ragagent.platform.storage.support.StreamRewriter;
-import com.ragagent.platform.stream.StreamEvent;
 
 /**
  * 把流事件重写后发到 SSE 线缆上。

@@ -1,11 +1,10 @@
 package com.ragagent.mcp.dto;
 
+import com.ragagent.mcp.domain.McpAuthConfig;
+import com.ragagent.mcp.domain.McpAuthType;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.mcp.domain.McpAuthConfig;
-import com.ragagent.mcp.domain.McpAuthType;
 
 /**
  * MCP 鉴权配置的响应形态。

@@ -1,5 +1,13 @@
 package com.ragagent.datasource.connector.rss;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.CoercionAction;
+import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
+import com.fasterxml.jackson.databind.type.LogicalType;
+import com.ragagent.datasource.domain.DataSourceConfig;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -7,15 +15,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.cfg.CoercionAction;
-import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
-import com.fasterxml.jackson.databind.type.LogicalType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.DataSourceConfig;
 
 /**
  * RSS 连接器的私有配置（解析 + feed 地址/请求头的存储形状）。

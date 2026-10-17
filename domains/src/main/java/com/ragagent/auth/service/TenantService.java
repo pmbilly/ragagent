@@ -1,35 +1,32 @@
 package com.ragagent.auth.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.auth.domain.TenantMember;
+import com.ragagent.auth.mapper.TenantMemberMapper;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.storage.StorageBackendProvisioner;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
-
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.persistence.LikeEscapes;
-
+import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.tenant.domain.Tenant;
+import com.ragagent.tenant.mapper.TenantMapper;
+import com.ragagent.tenant.repository.TenantLookup;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.platform.persistence.PageRequests;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.tenant.TenantRowView;
-import com.ragagent.tenant.domain.Tenant;
-import com.ragagent.tenant.repository.TenantLookup;
-import com.ragagent.tenant.mapper.TenantMapper;
-import com.ragagent.contract.storage.StorageBackendProvisioner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.auth.mapper.TenantMemberMapper;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
 
 /**
  * 租户 service。

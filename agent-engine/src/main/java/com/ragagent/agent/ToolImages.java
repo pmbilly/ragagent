@@ -1,10 +1,9 @@
 package com.ragagent.agent;
 
-import java.util.List;
-
+import com.ragagent.agent.compaction.ConversationSerializer;
 import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.agent.compaction.ConversationSerializer;
+import java.util.List;
 
 /**
  * 工具回传图片的注入。

@@ -1,22 +1,23 @@
 package com.ragagent.storage.controller;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.storage.config.StorageAllowList;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
+import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.storage.dto.StorageBackendResponse;
+import com.ragagent.storage.dto.StorageConfig;
+import com.ragagent.storage.service.StorageBackendService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.storage.domain.StorageBackend;
-import com.ragagent.platform.storage.config.StorageAllowList;
-import com.ragagent.storage.dto.StorageBackendResponse;
-import com.ragagent.storage.dto.StorageConfig;
-import com.ragagent.storage.service.StorageBackendService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,8 +28,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 存储后端管理面：9 条路由；读 Viewer+ / 写与测试 Admin+。

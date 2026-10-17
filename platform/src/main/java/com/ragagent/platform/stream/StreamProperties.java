@@ -1,7 +1,6 @@
 package com.ragagent.platform.stream;
 
 import java.time.Duration;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**

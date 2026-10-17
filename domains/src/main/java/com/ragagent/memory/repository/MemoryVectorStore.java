@@ -1,27 +1,25 @@
 package com.ragagent.memory.repository;
 
-import com.ragagent.memory.mapper.VectorHitRow;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryItemEmbedding;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.vector.MemoryVectorHit;
 import com.ragagent.memory.domain.vector.MemoryVectorQuery;
+import com.ragagent.memory.domain.vector.MemoryVectors;
+import com.ragagent.memory.mapper.VectorHitRow;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
-import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.memory.domain.vector.MemoryVectors;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 记忆**向量面**（item_embeddings 表 + pgvector 列）：写入/删除嵌入、按向量检索、

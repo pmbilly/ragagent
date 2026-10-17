@@ -1,8 +1,8 @@
 package com.ragagent.im.runtime;
 
+import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.Map;
-import com.ragagent.im.domain.ImChannelEntity;
 
 /**
  * 渠道凭据/模式小助手。

@@ -1,9 +1,9 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 
 /**
  * 单篇文档的摄取结果，供批次的收尾阶段使用。

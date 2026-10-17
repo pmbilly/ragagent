@@ -3,11 +3,12 @@ package com.ragagent.agentmanagement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.TestSchema;
+import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.agentmanagement.service.CustomAgentService;
+import com.ragagent.platform.access.TenantContext;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.ragagent.TestSchema;
-import com.ragagent.agentmanagement.service.CustomAgentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * agents 契约测试：agents CRUD 家族（8 条路由）+ initialization 三条

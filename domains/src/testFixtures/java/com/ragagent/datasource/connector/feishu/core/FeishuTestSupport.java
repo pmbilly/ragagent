@@ -1,18 +1,17 @@
 package com.ragagent.datasource.connector.feishu.core;
 
+import com.ragagent.datasource.domain.DataSourceConfig;
+import com.ragagent.datasource.domain.DataSourceConstants;
+import com.ragagent.datasource.domain.FetchedItem;
+import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.datasource.domain.connector.ConnectorHttp;
+import com.ragagent.datasource.domain.connector.StreamHandler;
+import com.ragagent.platform.security.SsrfGuard;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.datasource.domain.connector.ConnectorHttp;
-import com.ragagent.datasource.domain.connector.StreamHandler;
-import com.ragagent.datasource.domain.DataSourceConfig;
-import com.ragagent.datasource.domain.FetchedItem;
-import com.ragagent.datasource.domain.SyncCursor;
-import com.ragagent.datasource.domain.DataSourceConstants;
 
 /**
  * 飞书测试的公共夹具：SSRF 白名单放行 loopback、配置构造、记录型 StreamHandler、

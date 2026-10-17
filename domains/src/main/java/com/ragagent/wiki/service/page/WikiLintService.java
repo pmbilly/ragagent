@@ -1,5 +1,13 @@
 package com.ragagent.wiki.service.page;
 
+import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.contract.wiki.WikiException;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.issue.WikiLintIssue;
+import com.ragagent.wiki.domain.issue.WikiLintReport;
+import com.ragagent.wiki.domain.page.WikiStats;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,15 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.contract.wiki.WikiException;
-import com.ragagent.wiki.domain.issue.WikiLintIssue;
-import com.ragagent.wiki.domain.issue.WikiLintReport;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.domain.page.WikiStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

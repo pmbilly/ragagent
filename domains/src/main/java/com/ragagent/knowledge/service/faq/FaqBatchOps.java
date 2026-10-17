@@ -1,34 +1,32 @@
 package com.ragagent.knowledge.service.faq;
 
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeTag;
+import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
+import com.ragagent.knowledge.dto.faq.FaqFailedEntry;
+import com.ragagent.knowledge.dto.faq.FaqImportProgress;
+import com.ragagent.knowledge.dto.faq.FaqImportResult;
+import com.ragagent.knowledge.dto.faq.FaqSuccessEntry;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
-
+import com.ragagent.knowledge.service.faq.FaqImportService.ImportJob;
+import com.ragagent.knowledge.storage.TenantFileStorage;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.knowledge.domain.KnowledgeTag;
-import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
-import com.ragagent.knowledge.dto.faq.FaqSuccessEntry;
-import com.ragagent.knowledge.dto.faq.FaqFailedEntry;
-import com.ragagent.knowledge.dto.faq.FaqImportProgress;
-import com.ragagent.knowledge.dto.faq.FaqImportResult;
-import com.ragagent.knowledge.service.faq.FaqImportService.ImportJob;
-import com.ragagent.knowledge.storage.TenantFileStorage;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FaqImportService 的批量导入簇：分批写入+进度回报、CSV 生成、结果落库与消息组装。

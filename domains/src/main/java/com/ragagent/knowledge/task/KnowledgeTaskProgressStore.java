@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.task;
 
-import com.ragagent.knowledge.dto.kb.KBCloneProgress;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
+import com.ragagent.knowledge.dto.kb.KBCloneProgress;
 
 /**
  * move / clone 任务的进度端口（轮询端点读取）。

@@ -1,17 +1,13 @@
 package com.ragagent.session.controller.sse;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
-import com.ragagent.contract.session.SseSink;
-
-import jakarta.servlet.http.HttpServletResponse;
-
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.model.StreamResponse;
+import com.ragagent.contract.session.SseSink;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import org.springframework.stereotype.Component;
 
 /**
  * 把一个 {@link StreamResponse} 写成 gin 那条 SSE 帧——**逐字节**。

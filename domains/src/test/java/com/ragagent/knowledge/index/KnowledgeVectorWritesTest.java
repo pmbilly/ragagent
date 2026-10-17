@@ -6,12 +6,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.contract.retrieval.IndexEngineResolver;
 import com.ragagent.knowledge.domain.KnowledgeBase;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * 知识写链的向量店路由网关（R3b 后口径）：本类只剩**域判定 + 转交**——

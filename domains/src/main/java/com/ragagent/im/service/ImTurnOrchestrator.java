@@ -1,37 +1,19 @@
 package com.ragagent.im.service;
 
 
-import com.ragagent.platform.web.JsonMappers;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import jakarta.annotation.PreDestroy;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-
-import com.ragagent.contract.agent.AgentChannelCleaner;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.agent.AgentChannelCleaner;
 import com.ragagent.contract.agent.AgentLookup;
-import com.ragagent.platform.redis.RedisPubSub;
-import com.ragagent.platform.redis.SpringRedisPubSub;
-import com.ragagent.platform.access.TenantContext;
+import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.contract.event.EventBusFactory;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.session.SessionQaPort;
+import com.ragagent.contract.session.SessionView;
+import com.ragagent.contract.storage.support.Resolver;
 import com.ragagent.im.domain.ChannelSessionEntity;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.mapper.ChannelSessionMapper;
 import com.ragagent.im.mapper.ImChannelMapper;
-import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
 import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;
 import com.ragagent.im.runtime.Commands;
@@ -41,16 +23,30 @@ import com.ragagent.im.runtime.Commands.CommandResult;
 import com.ragagent.im.runtime.ImCommandSet;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.ImRedisStore;
+import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.im.runtime.ReplyMessage;
-import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.contract.storage.support.Resolver;
-import com.ragagent.contract.session.SessionQaPort;
-import com.ragagent.contract.session.SessionView;
+import com.ragagent.platform.redis.RedisPubSub;
+import com.ragagent.platform.redis.SpringRedisPubSub;
+import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.platform.web.JsonMappers;
+import jakarta.annotation.PreDestroy;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
 
 /**
  * IM 执行体核心。

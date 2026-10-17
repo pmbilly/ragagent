@@ -8,21 +8,21 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
+import com.ragagent.TestSchema;
+import com.ragagent.auth.domain.TenantMember;
+import com.ragagent.auth.domain.User;
+import com.ragagent.auth.mapper.TenantMemberMapper;
+import com.ragagent.auth.mapper.UserMapper;
+import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.contract.websearch.WebSearchResult;
+import com.ragagent.tenant.domain.Tenant;
+import com.ragagent.tenant.mapper.TenantMapper;
+import com.ragagent.websearch.provider.WebSearchProvider;
+import com.ragagent.websearch.provider.WebSearchProviderRegistry;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import com.ragagent.TestSchema;
-import com.ragagent.contract.websearch.WebSearchResult;
-import com.ragagent.websearch.provider.WebSearchProviderRegistry;
-import com.ragagent.tenant.domain.Tenant;
-import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.auth.domain.User;
-import com.ragagent.contract.auth.UserPreferences;
-import com.ragagent.tenant.mapper.TenantMapper;
-import com.ragagent.auth.mapper.TenantMemberMapper;
-import com.ragagent.auth.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import com.ragagent.websearch.provider.WebSearchProvider;
 
 /**
  * web-search-providers 11 条 + 旧版 /web-search/providers 的契约测试。

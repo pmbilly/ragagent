@@ -1,8 +1,7 @@
 package com.ragagent.contract.agent;
 
-import java.util.Map;
-
 import com.ragagent.contract.tool.ToolResult;
+import java.util.Map;
 
 /**
  * agent 领域里的一次工具调用。

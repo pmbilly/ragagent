@@ -1,5 +1,17 @@
 package com.ragagent.agent;
 
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.ragagent.agent.domain.AgentState;
+import com.ragagent.contract.agent.AgentStep;
+import com.ragagent.contract.agent.ThinkBlocks;
+import com.ragagent.contract.event.Event;
+import com.ragagent.contract.event.payload.AgentCompleteData;
+import com.ragagent.contract.event.payload.AgentFinalAnswerData;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.platform.event.EventIds;
+import com.ragagent.platform.event.EventType;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -8,18 +20,6 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.ragagent.agent.domain.AgentState;
-import com.ragagent.contract.agent.AgentStep;
-import com.ragagent.contract.agent.ThinkBlocks;
-import com.ragagent.contract.event.payload.AgentCompleteData;
-import com.ragagent.contract.event.payload.AgentFinalAnswerData;
-import com.ragagent.contract.event.Event;
-import com.ragagent.platform.event.EventIds;
-import com.ragagent.platform.event.EventType;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.ResponseType;
 
 /**
  * ReAct「Finalize」段的协作者：最终答案合成与完成事件——从既有工具结果兜底合成答案、\n * 迭代上限兜底、complete 事件发射、答案流收束。

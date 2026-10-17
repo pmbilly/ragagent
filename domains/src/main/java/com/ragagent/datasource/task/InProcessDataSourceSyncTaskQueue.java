@@ -1,9 +1,10 @@
 package com.ragagent.datasource.task;
 
 import com.ragagent.datasource.DataSourceSyncEnqueueException;
+import com.ragagent.datasource.domain.DataSourceSyncPayload;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorException;
-
+import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,14 +16,10 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
-
-import com.ragagent.datasource.domain.DataSourceSyncPayload;
-import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 
 /**
  * {@link DataSourceSyncTaskQueue} 的<b>进程内</b>实现：基于虚拟线程的队列

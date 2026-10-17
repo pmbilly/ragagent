@@ -1,23 +1,21 @@
 package com.ragagent.contract.pipeline;
 
-import java.util.List;
-import java.util.Map;
-
-import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRetrievalContext;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.Reranker;
+import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.session.PipelineMessageImageView;
 import com.ragagent.contract.session.PipelineMessageView;
-import com.ragagent.contract.websearch.WebSearchResult;
-
-import com.ragagent.contract.retrieval.SearchParams;
-import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.tenant.WebSearchConfig;
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.contract.model.Reranker;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.contract.websearch.WebSearchResult;
+import java.util.List;
+import java.util.Map;
 
 /**
  * chat 管线消费面的窄 seam 接口集合，只收管线实际调用的方法子集。

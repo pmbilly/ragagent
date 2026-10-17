@@ -1,23 +1,22 @@
 package com.ragagent.agent.domain;
 
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.web.JsonMappers;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.agent.AgentStep;
+import com.ragagent.contract.agent.AgentToolCall;
+import com.ragagent.contract.agent.ToolCallTarget;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.contract.agent.ToolCallTarget;
-import com.ragagent.contract.agent.AgentToolCall;
-import com.ragagent.contract.agent.AgentStep;
 
 /**
  * {@code agent_steps}（{@code AgentSteps} jsonb 载荷）的逐字节契约测试。

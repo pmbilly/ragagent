@@ -1,28 +1,27 @@
 package com.ragagent.knowledge.service.chunk;
 
+import com.ragagent.contract.error.BizException;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.ChunkRevision;
+import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
+import com.ragagent.knowledge.index.ChunkVectorIndexer;
+import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
-
+import com.ragagent.knowledge.service.management.KnowledgeService;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.knowledge.ChunkSearchUtil;
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.ChunkRevision;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
-import com.ragagent.platform.knowledge.ChunkSearchUtil;
-import java.nio.charset.StandardCharsets;
-import com.ragagent.knowledge.index.ChunkVectorIndexer;
-import com.ragagent.knowledge.service.management.KnowledgeService;
 
 /**
  * chunk 版本化编辑面：乐观锁更新的编辑/回滚/修订历史、软删除、图片子块联动与父内容重建，

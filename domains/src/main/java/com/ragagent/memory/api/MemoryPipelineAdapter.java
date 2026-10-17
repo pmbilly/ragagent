@@ -1,14 +1,12 @@
 package com.ragagent.memory.api;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.stereotype.Component;
-
-import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRetrievalContext;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.memory.service.MemoryService;
+import java.util.List;
+import java.util.Map;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link PipelinePorts.MemoryService}（管线面）的 memory 域实现：

@@ -1,10 +1,23 @@
 package com.ragagent.agent.tool;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.agent.Cleanable;
+import com.ragagent.contract.agent.ToolCallTarget;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.FunctionDef;
+import com.ragagent.contract.pipeline.McpToolingGateway;
+import com.ragagent.contract.pipeline.ToolRegistryPort;
+import com.ragagent.contract.tool.AgentTool;
+import com.ragagent.contract.tool.McpCatalogGuardedTool;
 import com.ragagent.contract.tool.ToolCancellation;
-
-
-
+import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolExecContext;
+import com.ragagent.contract.tool.ToolOutput;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.ToolJson;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,26 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.contract.model.chat.FunctionDef;
-import com.ragagent.platform.web.ToolJson;
-import com.ragagent.contract.agent.ToolCallTarget;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.pipeline.McpToolingGateway;
-import com.ragagent.contract.pipeline.ToolRegistryPort;
-import com.ragagent.contract.tool.ToolOutput;
-import com.ragagent.contract.tool.McpCatalogGuardedTool;
-import com.ragagent.contract.tool.ToolExecContext;
-import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.contract.tool.AgentTool;
-import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 工具注册表。

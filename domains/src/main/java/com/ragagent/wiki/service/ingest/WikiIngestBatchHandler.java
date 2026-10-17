@@ -1,37 +1,36 @@
 package com.ragagent.wiki.service.ingest;
 
 
-import com.ragagent.platform.web.JsonMappers;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.audit.WikiActivityAudit;
 import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import com.ragagent.contract.knowledge.KnowledgeView;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.audit.WikiActivityAudit;
-import com.ragagent.wiki.domain.WikiConfig;
+import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.platform.access.TenantScopes;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.domain.WikiConfig;
 import com.ragagent.wiki.domain.WikiExtractionGranularity;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.repository.TaskPendingOpsRepository;
+import com.ragagent.wiki.service.WikiModelResolver;
+import com.ragagent.wiki.service.page.WikiPageService;
+import com.ragagent.wiki.service.page.WikiTextUtils;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.wiki.service.WikiModelResolver;
-import com.ragagent.wiki.service.page.WikiPageService;
-import com.ragagent.wiki.service.page.WikiTextUtils;
-import com.ragagent.platform.access.TenantScopes;
 
 /**
  * wiki 生成管线的批次执行体：Map（逐文档抽取/摘要/引用）→ Reduce（逐 slug 落页）→

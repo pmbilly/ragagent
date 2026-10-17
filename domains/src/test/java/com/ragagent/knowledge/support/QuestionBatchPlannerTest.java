@@ -2,15 +2,13 @@ package com.ragagent.knowledge.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.contract.retrieval.ChunkTypes;
-import com.ragagent.platform.access.TracingContext;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
+import com.ragagent.platform.access.TracingContext;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * 导入后问题生成的**选块与分批**契约（{@code QuestionBatchPlanner}

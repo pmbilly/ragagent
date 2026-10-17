@@ -1,8 +1,7 @@
 package com.ragagent.mcp.protocol;
 
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.mcp.domain.McpService;
-
+import com.ragagent.platform.access.TenantContext;
 import java.util.Map;
 
 /**

@@ -1,19 +1,18 @@
 package com.ragagent.session.service.rag.plugin;
 
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.retrieval.ChunkTypes;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.platform.knowledge.ChunkSearchUtil;
+import com.ragagent.platform.knowledge.ImageInfoEnricher;
+import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineLog;
+import com.ragagent.session.service.rag.support.ImageInfoCollector;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.session.service.rag.support.ImageInfoCollector;
-import com.ragagent.contract.retrieval.ChunkTypes;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.platform.knowledge.ImageInfoEnricher;
-import com.ragagent.platform.knowledge.ChunkSearchUtil;
-import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
 
 /**
  * PluginMerge 的父块解析与短上下文扩展簇：resolveParentChunks（父子关联）、

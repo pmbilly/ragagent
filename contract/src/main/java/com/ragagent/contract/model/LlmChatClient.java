@@ -1,10 +1,9 @@
 package com.ragagent.contract.model;
 
-import java.util.List;
-
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
+import java.util.List;
 
 /**
  * 聊天客户端。

@@ -1,12 +1,11 @@
 package com.ragagent.model.domain;
 
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ragagent.contract.model.ModelParameters;
+import java.time.OffsetDateTime;
 
 
 /**

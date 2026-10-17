@@ -1,11 +1,10 @@
 package com.ragagent.mcp.mapper;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.mcp.domain.McpAuthConfigTypeHandler;
 import com.ragagent.mcp.domain.McpService;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;

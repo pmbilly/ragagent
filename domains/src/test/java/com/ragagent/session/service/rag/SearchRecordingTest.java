@@ -6,28 +6,26 @@ import static com.ragagent.session.service.rag.Rec46cSupport.json;
 import static com.ragagent.session.service.rag.Rec46cSupport.resultIDs;
 import static com.ragagent.session.service.rag.Rec46cSupport.searchResultsShape;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
+import com.ragagent.contract.graph.GraphData;
+import com.ragagent.contract.graph.GraphNode;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTextUtil;
+import com.ragagent.contract.websearch.WebSearchResult;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.session.service.rag.plugin.PluginError;
 import com.ragagent.session.service.rag.plugin.PluginFilterTopK;
 import com.ragagent.session.service.rag.plugin.PluginSearch;
 import com.ragagent.session.service.rag.plugin.PluginSearchParallel;
 import com.ragagent.session.service.rag.support.SearchSupport;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.websearch.WebSearchResult;
-import com.ragagent.contract.retrieval.SearchTextUtil;
-import com.ragagent.contract.graph.GraphData;
-import com.ragagent.contract.graph.GraphNode;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.Knowledge;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * 录制回放：查询扩展 / 去重 / 部分重叠 / filter_top_k / search / search_by_targets /

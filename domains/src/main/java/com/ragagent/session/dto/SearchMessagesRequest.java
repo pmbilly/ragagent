@@ -1,8 +1,7 @@
 package com.ragagent.session.dto;
 
-import java.util.List;
-
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 
 /**
  * {@code POST /api/v1/messages/search} 的请求体。

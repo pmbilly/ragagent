@@ -1,11 +1,10 @@
 package com.ragagent.session.domain.message;
 
-import java.util.List;
-import java.util.HashSet;
-import java.util.Set;
-
-import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.contract.session.MessageArtifact;
+import com.ragagent.platform.storage.fileserve.StoragePaths;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 产物版本澄清。

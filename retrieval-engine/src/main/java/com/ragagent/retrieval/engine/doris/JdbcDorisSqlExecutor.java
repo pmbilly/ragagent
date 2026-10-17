@@ -1,5 +1,8 @@
 package com.ragagent.retrieval.engine.doris;
 
+import com.ragagent.platform.security.SsrfGuard;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,10 +10,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.ragagent.platform.security.SsrfGuard;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * {@link DorisSqlExecutor} 的 JDBC 实现：MySQL 协议（mysql-connector-j）+ Hikari

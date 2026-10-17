@@ -1,10 +1,9 @@
 package com.ragagent.datasource.connector.notion;
 
-import java.time.OffsetDateTime;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.time.OffsetDateTime;
 
 /**
  * Notion 的 page / database / data_source 三种对象共用的形状。

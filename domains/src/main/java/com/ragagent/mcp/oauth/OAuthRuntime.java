@@ -1,18 +1,17 @@
 package com.ragagent.mcp.oauth;
 
+import com.ragagent.mcp.domain.McpOAuthToken;
+import com.ragagent.mcp.domain.McpPrincipal;
+import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
+import com.ragagent.mcp.protocol.McpContext;
+import com.ragagent.mcp.protocol.McpOAuthRuntime;
+import com.ragagent.platform.access.TenantContext;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.mcp.domain.McpOAuthToken;
-import com.ragagent.mcp.domain.McpPrincipal;
-import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
-import com.ragagent.mcp.protocol.McpContext;
-import com.ragagent.mcp.protocol.McpOAuthRuntime;
 
 /**
  * 运行期 token 生命周期。

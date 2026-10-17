@@ -7,28 +7,25 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.List;
-
-import javax.sql.DataSource;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.platform.settings.ConversationProperties;
-import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.memory.MemorySearchHit;
 import com.ragagent.contract.memory.MemorySearchHits;
 import com.ragagent.contract.memory.MemorySearchPort;
+import com.ragagent.contract.pipeline.WebSearchExecutor;
 import com.ragagent.contract.retrieval.HybridSearchPort;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.wiki.WikiPageOpsPort;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.session.domain.message.MessageSearchGroupItem;
 import com.ragagent.session.domain.message.MessageSearchResult;
-import com.ragagent.contract.wiki.WikiPageOpsPort;
-import com.ragagent.auth.service.TenantService;
-import com.ragagent.contract.pipeline.WebSearchExecutor;
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.util.List;
+import javax.sql.DataSource;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * 工具接线钉（2026-09-23 接线批：工作包 1 KB 五件 + 工作包 2a 会话/记忆/DB 三件）。

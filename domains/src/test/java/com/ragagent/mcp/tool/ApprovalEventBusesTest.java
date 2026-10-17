@@ -1,21 +1,20 @@
 package com.ragagent.mcp.tool;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
+import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.tool.ApprovalEvent;
 import com.ragagent.contract.tool.ApprovalEventBus;
-import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventType;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import org.junit.jupiter.api.Test;
 
 /**
  * {@link ApprovalEventBuses} 的总线桥：闸门事件（data 已是 {@code contract.event.payload}

@@ -1,10 +1,9 @@
 package com.ragagent.datasource.connector.rss;
 
-import java.util.List;
-
-import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import java.util.List;
 
 /**
  * 部分 feed 成功、部分失败。

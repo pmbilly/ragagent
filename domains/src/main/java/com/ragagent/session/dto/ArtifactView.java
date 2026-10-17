@@ -1,8 +1,7 @@
 package com.ragagent.session.dto;
 
-import java.time.OffsetDateTime;
-
 import com.ragagent.contract.session.MessageArtifact;
+import java.time.OffsetDateTime;
 
 /**
  * 产物元数据的一行（会话/消息两个 artifacts 端点的元素）。

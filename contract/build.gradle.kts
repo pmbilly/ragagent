@@ -25,6 +25,8 @@ spotless {
     java {
         ratchetFrom("seed")
         targetExclude("build/**")
+        // import 口径（2026-10 全仓重排同款）：\# 前缀=static 块置顶，空串=其余单块 ASCII 序
+        importOrder("\\#", "")
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()

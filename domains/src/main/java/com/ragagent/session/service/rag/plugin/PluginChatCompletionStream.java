@@ -1,33 +1,32 @@
 package com.ragagent.session.service.rag.plugin;
 
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineCommon;
-import com.ragagent.session.service.rag.PipelineEventType;
-import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.session.service.rag.support.ReferencesSupport;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.platform.event.EventType;
-import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.payload.AgentThoughtData;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.contract.model.ChatStream;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.modelcontext.StreamDecoder;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.modelcontext.Registry;
+import com.ragagent.modelcontext.StreamDecoder;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.event.EventType;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineCommon;
+import com.ragagent.session.service.rag.PipelineEventType;
+import com.ragagent.session.service.rag.PipelineLog;
+import com.ragagent.session.service.rag.support.ReferencesSupport;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * CHAT_COMPLETION_STREAM 阶段插件：

@@ -1,51 +1,48 @@
 package com.ragagent.knowledge.service.chunk;
 
-import com.ragagent.contract.retrieval.TenantRetrievalDefault;
-import com.ragagent.contract.retrieval.IndexEngineResolver;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.knowledge.DocumentChunkMetadata;
+import com.ragagent.contract.knowledge.GeneratedQuestion;
+import com.ragagent.contract.model.Embedder;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.retrieval.IndexEngine;
+import com.ragagent.contract.retrieval.IndexEngineResolver;
+import com.ragagent.contract.retrieval.TenantRetrievalDefault;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.ChunkNotFoundException;
 import com.ragagent.knowledge.domain.ChunkQuestionPort;
-
-
+import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
+import com.ragagent.knowledge.index.ChunkVectorIndexer;
+import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
-
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.config.RetrievalDriverProperties;
+import com.ragagent.platform.knowledge.ChunkSearchUtil;
+import com.ragagent.platform.prompt.AgentPromptPlaceholders;
+import com.ragagent.platform.prompt.PromptInstructions;
+import com.ragagent.platform.settings.ConversationProperties;
+import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.prompt.AgentPromptPlaceholders;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.config.RetrievalDriverProperties;
-import com.ragagent.platform.prompt.PromptInstructions;
-import com.ragagent.platform.settings.ConversationProperties;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.contract.knowledge.DocumentChunkMetadata;
-import com.ragagent.contract.knowledge.GeneratedQuestion;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.domain.ChunkNotFoundException;
-import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.contract.model.Embedder;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
-import com.ragagent.platform.knowledge.ChunkSearchUtil;
-import com.ragagent.knowledge.index.ChunkVectorIndexer;
 
 /**
  * chunk 生成问题面：生成问题的 upsert/删除/重生（LLM 生成 + 邻块上下文拼装 + metadata 落库）。

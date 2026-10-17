@@ -1,8 +1,7 @@
 package com.ragagent.audit.dto;
 
-import java.util.List;
-
 import com.ragagent.audit.domain.AuditLog;
+import java.util.List;
 
 /**
  * 审计列表的响应（游标分页形态：{@code {"items":[...],"nextCursor":N}}）。

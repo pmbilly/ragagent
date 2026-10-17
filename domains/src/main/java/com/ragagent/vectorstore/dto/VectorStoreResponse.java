@@ -1,10 +1,9 @@
 package com.ragagent.vectorstore.dto;
 
-import java.time.OffsetDateTime;
-
 import com.ragagent.contract.vectorstore.ConnectionConfig;
 import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.vectorstore.domain.VectorStore;
+import java.time.OffsetDateTime;
 
 /**
  * 向量库的响应形态（内嵌 VectorStore + source/readonly）。键名即 Java 字段名

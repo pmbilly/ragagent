@@ -1,8 +1,7 @@
 package com.ragagent.wiki.service.ingest;
 
-import java.util.concurrent.Callable;
-
 import com.ragagent.platform.access.TenantContext;
+import java.util.concurrent.Callable;
 
 /**
  * 脱钩的收尾清理作用域。

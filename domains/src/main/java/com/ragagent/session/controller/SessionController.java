@@ -1,18 +1,19 @@
 package com.ragagent.session.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.session.MessageArtifact;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.session.domain.message.Message;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionListQuery;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.session.domain.conversation.SessionPage;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.dto.ArtifactView;
 import com.ragagent.session.dto.BatchDeleteSessionsRequest;
 import com.ragagent.session.dto.CreateSessionRequest;
@@ -22,9 +23,12 @@ import com.ragagent.session.dto.SessionListResponse;
 import com.ragagent.session.dto.SessionPinResponse;
 import com.ragagent.session.dto.StopSessionRequest;
 import com.ragagent.session.dto.UpdateSessionRequest;
+import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.SessionStopService;
 import jakarta.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -37,11 +41,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.contract.session.MessageArtifact;
-import com.ragagent.session.domain.message.MessageNotFoundException;
-import com.ragagent.session.service.MessageService;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 会话 HTTP 层。

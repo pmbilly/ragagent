@@ -1,5 +1,6 @@
 package com.ragagent.datasource.connector.yuque;
 
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
@@ -7,8 +8,6 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
-
-import com.ragagent.platform.web.ZeroTimeSerializer;
 
 /**
  * 语雀连接器的**纯函数**（文档 URL 拼接、内容更新时间解析、

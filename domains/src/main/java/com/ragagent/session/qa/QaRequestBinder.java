@@ -1,14 +1,14 @@
 package com.ragagent.session.qa;
 
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
-import java.util.ArrayList;
-import java.util.List;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.session.dto.QaRequests.AttachmentUpload;
 import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;
 import com.ragagent.session.dto.QaRequests.SearchKnowledgeRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@code KnowledgeQaController} 的**静态解析助手簇**：请求体绑定

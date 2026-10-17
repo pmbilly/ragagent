@@ -1,5 +1,9 @@
 package com.ragagent.platform.storage.support;
 
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.storage.support.FileUrlPort;
+import com.ragagent.contract.storage.support.Mode;
+import com.ragagent.contract.storage.support.Resolver;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -7,14 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.storage.support.FileUrlPort;
-import com.ragagent.contract.storage.support.Resolver;
-import com.ragagent.contract.storage.support.Mode;
 
 /**
  * 把内部存储引用替换成客户端可直接加载的 HTTP URL。

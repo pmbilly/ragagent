@@ -3,18 +3,17 @@ package com.ragagent.wiki.service.page;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ragagent.TestSchema;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiException;
+import com.ragagent.contract.wiki.WikiPageNotFoundException;
+import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.issue.WikiLintIssue;
 import com.ragagent.wiki.domain.issue.WikiLintReport;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.wiki.repository.WikiPageRepository;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

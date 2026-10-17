@@ -1,16 +1,27 @@
 package com.ragagent.agentmanagement.controller;
 
-import com.ragagent.platform.web.JsonBodyErrors;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.agentmanagement.dto.AgentResponses;
+import com.ragagent.agentmanagement.service.AgentSuggestedQuestions.TagScope;
+import com.ragagent.agentmanagement.service.CustomAgentService;
+import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
+import com.ragagent.agentmanagement.service.config.AgentPlaceholders;
+import com.ragagent.agentmanagement.service.config.AgentTypePresets;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,20 +31,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.agentmanagement.dto.AgentResponses;
-import com.ragagent.agentmanagement.service.config.AgentPlaceholders;
-import com.ragagent.agentmanagement.service.config.AgentTypePresets;
-import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
-import com.ragagent.agentmanagement.service.CustomAgentService;
-import com.ragagent.agentmanagement.service.AgentSuggestedQuestions.TagScope;
-import com.ragagent.contract.apikey.APIKeyScopeContext;
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
 
 /**
  * agents CRUD 家族路由。

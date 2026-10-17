@@ -1,12 +1,12 @@
 package com.ragagent.storage.domain;
 
-import java.time.OffsetDateTime;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import java.time.OffsetDateTime;
 
 /**
  * storage_backends（迁移 000068）：具体对象存储实例。

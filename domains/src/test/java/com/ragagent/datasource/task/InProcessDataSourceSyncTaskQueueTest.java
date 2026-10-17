@@ -1,9 +1,9 @@
 package com.ragagent.datasource.task;
 
-import com.ragagent.datasource.domain.connector.ConnectorException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.datasource.domain.DataSourceSyncPayload;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
@@ -11,8 +11,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
-
-import com.ragagent.datasource.domain.DataSourceSyncPayload;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;

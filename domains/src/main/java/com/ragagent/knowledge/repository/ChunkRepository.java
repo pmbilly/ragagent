@@ -1,31 +1,29 @@
 package com.ragagent.knowledge.repository;
 
-import com.ragagent.contract.retrieval.ChunkTypes;
-
-import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
-
-import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ragagent.platform.persistence.PageRequests;
-import com.ragagent.platform.text.CleanInvalidUtf8;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.ChunkSearchGateway;
+import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.ChunkRevision;
-import org.springframework.stereotype.Component;
-import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.knowledge.domain.ChunkNotFoundException;
+import com.ragagent.knowledge.domain.ChunkPage;
+import com.ragagent.knowledge.domain.ChunkRevision;
 import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
 import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.mapper.ChunkRevisionMapper;
+import com.ragagent.knowledge.support.ChunkRowViews;
+import com.ragagent.platform.persistence.DatabaseDialects;
+import com.ragagent.platform.persistence.PageRequests;
+import com.ragagent.platform.text.CleanInvalidUtf8;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.sql.DataSource;
-import com.ragagent.knowledge.domain.ChunkPage;
-import com.ragagent.knowledge.support.ChunkRowViews;
+import org.springframework.stereotype.Component;
 
 /**
  * chunk 仓储（文档与 FAQ 的 chunk 行读写，方法式门面）。数据访问契约如下，

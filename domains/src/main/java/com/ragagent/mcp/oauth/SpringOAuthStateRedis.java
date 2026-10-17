@@ -3,7 +3,6 @@ package com.ragagent.mcp.oauth;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map;
-
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;

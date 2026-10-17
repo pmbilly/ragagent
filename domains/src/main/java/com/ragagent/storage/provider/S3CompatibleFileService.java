@@ -1,15 +1,14 @@
 package com.ragagent.storage.provider;
 
+import com.ragagent.contract.storage.provider.SeekableSource;
+import com.ragagent.platform.security.SsrfGuard;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
 import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ragagent.platform.security.SsrfGuard;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.checksums.RequestChecksumCalculation;
@@ -26,7 +25,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
-import com.ragagent.contract.storage.provider.SeekableSource;
 
 /**
  * S3 协议族后端（<b>s3 / minio / obs / ks3</b>），一次实现覆盖四条 provider 路线：

@@ -1,12 +1,12 @@
 package com.ragagent.knowledge.chunker;
 
+import com.ragagent.contract.knowledge.chunker.CodePoints;
+import com.ragagent.contract.knowledge.chunker.Tokens;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
-import com.ragagent.contract.knowledge.chunker.CodePoints;
-import com.ragagent.contract.knowledge.chunker.Tokens;
 
 /**
  * 文档画像与策略选择。

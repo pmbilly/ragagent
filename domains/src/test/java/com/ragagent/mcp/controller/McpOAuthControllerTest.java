@@ -15,28 +15,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
-import java.util.Map;
-
-import com.ragagent.contract.tool.ToolApprovalException;
-import com.ragagent.contract.tool.Decision;
-import com.ragagent.contract.tool.ToolApprovalGate;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.web.error.GlobalExceptionHandler;
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.contract.tool.Decision;
+import com.ragagent.contract.tool.ToolApprovalException;
+import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpAuthType;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.mapper.McpServiceMapper;
-import com.ragagent.mcp.oauth.OAuthManager;
-import com.ragagent.mcp.oauth.OAuthStateStore;
 import com.ragagent.mcp.oauth.FakeOAuthRepository;
+import com.ragagent.mcp.oauth.OAuthManager;
 import com.ragagent.mcp.oauth.OAuthServerStub;
+import com.ragagent.mcp.oauth.OAuthStateStore;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpServiceUrls;
 import com.ragagent.mcp.service.McpServiceManagement;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.web.error.GlobalExceptionHandler;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

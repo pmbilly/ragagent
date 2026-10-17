@@ -1,19 +1,18 @@
 package com.ragagent.memory;
 
-import com.ragagent.platform.web.JsonMappers;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryConsolidationResult;
 import com.ragagent.memory.domain.MemoryDocView;
-import com.ragagent.memory.domain.scope.MemorySettings;
 import com.ragagent.memory.domain.MemoryTopicView;
+import com.ragagent.memory.domain.scope.MemorySettings;
+import com.ragagent.platform.web.JsonMappers;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**

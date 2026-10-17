@@ -2,18 +2,16 @@ package com.ragagent.knowledge.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.TestSchema;
+import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
 import java.time.Duration;
 import java.util.UUID;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import com.ragagent.TestSchema;
-import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
 
 /**
  * 知识管家清扫（{@code HousekeepingService}）的 H2 钉子：

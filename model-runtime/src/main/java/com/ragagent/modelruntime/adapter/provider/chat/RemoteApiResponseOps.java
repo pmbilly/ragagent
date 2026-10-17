@@ -1,13 +1,12 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.llm.domain.ProviderMetadataMaps;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 响应解析协作者（自 {@link RemoteApiChat} 拆出）：choices[0] 解析、<think> 标签剥离与厂商工具调用元数据回填。

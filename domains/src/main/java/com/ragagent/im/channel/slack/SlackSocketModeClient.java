@@ -1,5 +1,9 @@
 package com.ragagent.im.channel.slack;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.im.runtime.IncomingMessage;
+import com.ragagent.im.runtime.SlackAdapterCore;
 import com.ragagent.platform.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -11,14 +15,8 @@ import java.time.Duration;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.runtime.SlackAdapterCore;
 
 /**
  * Slack Socket Mode 长连接。

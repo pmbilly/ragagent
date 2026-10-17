@@ -1,48 +1,45 @@
 package com.ragagent.knowledge.service.management;
 
-import com.ragagent.knowledge.repository.ChunkRepository;
-
-import com.ragagent.knowledge.repository.KnowledgeRepository;
-
-import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.knowledge.KnowledgeBaseFacts;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.contract.storage.StorageEnvLookup;
-import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.contract.knowledge.KnowledgeBaseGateway;
 import com.ragagent.contract.knowledge.KnowledgeBaseProvisioner;
 import com.ragagent.contract.knowledge.KnowledgeBaseSearchFacts;
 import com.ragagent.contract.knowledge.KnowledgeBaseSearchGateway;
+import com.ragagent.contract.retrieval.IndexEngineResolver;
+import com.ragagent.contract.retrieval.RetrieveEngineException;
+import com.ragagent.contract.storage.StorageBackendPort;
+import com.ragagent.contract.storage.StorageBackendView;
+import com.ragagent.contract.storage.StorageEnvLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.knowledge.domain.UserKbPin;
+import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.knowledge.repository.UserKbPinRepository;
+import com.ragagent.knowledge.service.image.ExtractedImageStore;
+import com.ragagent.knowledge.support.KnowledgeBaseConfigCodec;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.config.RetrievalDriverProperties;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.security.UserNameLookup;
+import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.platform.security.UserNameLookup;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.service.image.ExtractedImageStore;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.contract.storage.StorageBackendView;
-import com.ragagent.knowledge.domain.UserKbPin;
-import com.ragagent.knowledge.repository.UserKbPinRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.contract.retrieval.IndexEngineResolver;
-import com.ragagent.contract.retrieval.RetrieveEngineException;
-import com.ragagent.platform.security.LogSanitizer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.storage.StorageBackendPort;
-import com.ragagent.knowledge.support.KnowledgeBaseConfigCodec;
 
 /**
  * （覆盖 CRUD + pin + move-targets + 计数回填；

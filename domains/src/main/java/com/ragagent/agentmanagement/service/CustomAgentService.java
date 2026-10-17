@@ -1,19 +1,5 @@
 package com.ragagent.agentmanagement.service;
 
-import com.ragagent.agentmanagement.service.config.AgentConfigJson;
-
-import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
-
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -21,14 +7,24 @@ import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.dto.CustomAgentResult;
 import com.ragagent.agentmanagement.mapper.AgentQuestionMapper;
 import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.platform.web.error.GuardForbiddenException;
+import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
+import com.ragagent.agentmanagement.service.config.AgentConfigJson;
+import com.ragagent.contract.agent.AgentChannelCleaner;
+import com.ragagent.contract.auth.UserLookupPort;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.KnowledgeBaseCatalogPort;
-import com.ragagent.contract.auth.UserLookupPort;
-import com.ragagent.contract.agent.AgentChannelCleaner;
+import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.error.GuardForbiddenException;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import org.springframework.stereotype.Service;
 
 /**
  * agents CRUD 家族 service。

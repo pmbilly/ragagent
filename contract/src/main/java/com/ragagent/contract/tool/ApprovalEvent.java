@@ -1,10 +1,9 @@
 package com.ragagent.contract.tool;
 
+import com.ragagent.contract.model.ResponseType;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import com.ragagent.contract.model.ResponseType;
 
 /**
  * 事件包络。

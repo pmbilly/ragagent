@@ -10,13 +10,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.context.ApplicationEventPublisher;
-
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
@@ -34,6 +27,11 @@ import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.service.image.ExtractedImageStore;
 import com.ragagent.knowledge.storage.TenantFileStorage;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * 回流守卫：解析出的图片必须经 {@link ExtractedImageStore} 改写后再进分块正文。

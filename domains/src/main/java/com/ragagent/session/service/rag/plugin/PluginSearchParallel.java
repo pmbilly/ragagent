@@ -1,19 +1,18 @@
 package com.ragagent.session.service.rag.plugin;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.session.service.rag.ChatManage;
 import com.ragagent.session.service.rag.EventManager;
 import com.ragagent.session.service.rag.PipelineCommon;
 import com.ragagent.session.service.rag.PipelineEventType;
 import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.session.service.rag.support.SearchSupport;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.retrieval.RetrieveGraphRepository;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * CHUNK_SEARCH_PARALLEL 阶段插件：

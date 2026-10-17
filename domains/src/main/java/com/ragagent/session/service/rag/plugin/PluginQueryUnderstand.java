@@ -1,28 +1,27 @@
 package com.ragagent.session.service.rag.plugin;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.session.PipelineMessageImageView;
+import com.ragagent.contract.session.PipelineMessageView;
+import com.ragagent.platform.prompt.AgentPromptPlaceholders;
+import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
+import com.ragagent.platform.prompt.PipelineConfig;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.service.rag.ChatManage;
 import com.ragagent.session.service.rag.History;
 import com.ragagent.session.service.rag.PipelineCommon;
 import com.ragagent.session.service.rag.PipelineEventType;
 import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
-import com.ragagent.contract.session.PipelineMessageImageView;
-import com.ragagent.contract.session.PipelineMessageView;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.prompt.PipelineConfig;
-import com.ragagent.platform.prompt.AgentPromptPlaceholders;
-import com.ragagent.contract.model.chat.ChatResponse;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * QUERY_UNDERSTAND 阶段插件：

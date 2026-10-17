@@ -1,13 +1,13 @@
 package com.ragagent.knowledge.service.faq;
 
-import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
+import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.faq.FaqEntry;
-import org.springframework.stereotype.Component;
 import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
+import java.util.Map;
+import org.springframework.stereotype.Component;
 
 /**
  * FAQ 条目与 chunk 行之间的双向编解码：metadata JSON 的解析与写回（含 content_hash

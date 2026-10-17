@@ -1,15 +1,13 @@
 package com.ragagent.im.mapper;
 
+import com.ragagent.im.domain.ChannelSessionEntity;
 import java.time.OffsetDateTime;
 import java.util.List;
-
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-
-import com.ragagent.im.domain.ChannelSessionEntity;
 
 /**
  * IM 渠道会话映射的 SQL 面（会话解析查询 + /clear 的软删）。

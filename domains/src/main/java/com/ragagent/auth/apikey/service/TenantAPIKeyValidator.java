@@ -1,12 +1,11 @@
 package com.ragagent.auth.apikey.service;
 
 
-import java.util.List;
-
-import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.auth.apikey.domain.TenantAPIKeyRequest;
+import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import java.util.List;
 
 /**
  * API Key 请求校验。

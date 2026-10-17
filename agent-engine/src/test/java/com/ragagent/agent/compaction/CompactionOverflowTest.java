@@ -1,11 +1,10 @@
 package com.ragagent.agent.compaction;
 
-import com.ragagent.contract.agent.CompactionOverflow;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Test;
-
+import com.ragagent.contract.agent.CompactionOverflow;
 import com.ragagent.contract.model.chat.ChatResponse;
+import org.junit.jupiter.api.Test;
 
 /**
  * 溢出识别的录制常量断言（语料 = 真实供应商错误 +

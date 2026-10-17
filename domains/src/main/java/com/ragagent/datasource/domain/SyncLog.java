@@ -1,14 +1,13 @@
 package com.ragagent.datasource.domain;
 
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import com.ragagent.platform.web.ZeroTimeSerializer;
+import java.time.OffsetDateTime;
 
 /**
  * 一次同步任务的执行记录（表 {@code sync_logs}）。

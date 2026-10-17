@@ -1,30 +1,32 @@
 package com.ragagent.knowledge.controller;
 
-import java.util.List;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.platform.web.RejectEmptyBody;
-import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.contract.knowledge.GeneratedQuestion;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.dto.chunk.ChunkPageResponse;
-import com.ragagent.knowledge.dto.chunk.ChunkRevisionResponse;
-import com.ragagent.knowledge.dto.chunk.ChunkUpdateResponse;
-import com.ragagent.knowledge.dto.faq.DeleteGeneratedQuestionRequest;
-import com.ragagent.knowledge.dto.chunk.RevertChunkRequest;
-import com.ragagent.knowledge.dto.faq.GeneratedQuestionResponse;
-import com.ragagent.knowledge.dto.chunk.UpdateChunkRequest;
-import com.ragagent.knowledge.dto.chunk.ChunkResponse;
-import com.ragagent.knowledge.dto.faq.UpsertGeneratedQuestionRequest;
+import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkNotFoundException;
 import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
+import com.ragagent.knowledge.dto.chunk.ChunkPageResponse;
+import com.ragagent.knowledge.dto.chunk.ChunkResponse;
+import com.ragagent.knowledge.dto.chunk.ChunkRevisionResponse;
+import com.ragagent.knowledge.dto.chunk.ChunkUpdateResponse;
+import com.ragagent.knowledge.dto.chunk.RevertChunkRequest;
+import com.ragagent.knowledge.dto.chunk.UpdateChunkRequest;
+import com.ragagent.knowledge.dto.faq.DeleteGeneratedQuestionRequest;
+import com.ragagent.knowledge.dto.faq.GeneratedQuestionResponse;
+import com.ragagent.knowledge.dto.faq.UpsertGeneratedQuestionRequest;
 import com.ragagent.knowledge.service.chunk.ChunkEditService;
-import com.ragagent.knowledge.service.chunk.ChunkReadService;
 import com.ragagent.knowledge.service.chunk.ChunkQuestionService;
+import com.ragagent.knowledge.service.chunk.ChunkReadService;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.RejectEmptyBody;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -36,8 +38,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
 
 /**
  * chunk 路由：编辑/生成问题两服务与仓储读面的 HTTP 绑定层。

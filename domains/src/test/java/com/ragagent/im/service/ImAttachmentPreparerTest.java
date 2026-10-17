@@ -8,17 +8,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.nio.charset.StandardCharsets;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.ObjectProvider;
-
+import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.im.runtime.AdapterInterfaces;
 import com.ragagent.im.runtime.CallbackExchange;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ReplyMessage;
-import com.ragagent.contract.doc.DocReaderParsePort;
+import java.nio.charset.StandardCharsets;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * IM 附件解析：

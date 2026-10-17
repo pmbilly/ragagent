@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.engine;
 
-import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.contract.vectorstore.VectorStoreView;
+import com.ragagent.platform.security.SsrfGuard;
 
 /**
  * 从 {@code VectorStore} 配置建引擎的函数口。

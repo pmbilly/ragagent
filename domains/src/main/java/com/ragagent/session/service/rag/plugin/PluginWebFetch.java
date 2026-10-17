@@ -1,17 +1,16 @@
 package com.ragagent.session.service.rag.plugin;
 
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.websearch.PipelinePageFetcher;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineEventType;
+import com.ragagent.session.service.rag.PipelineLog;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import com.ragagent.contract.websearch.PipelinePageFetcher;
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineEventType;
-import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.retrieval.SearchResult;
 
 /**
  * WEB_FETCH 阶段插件：rerank 之后对 web 结果

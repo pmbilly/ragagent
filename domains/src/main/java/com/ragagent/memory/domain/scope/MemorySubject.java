@@ -1,20 +1,18 @@
 package com.ragagent.memory.domain.scope;
 
-import com.ragagent.memory.domain.MemoryExtractionState;
-import com.ragagent.memory.domain.MemoryExtractionStateTypeHandler;
-import com.ragagent.memory.domain.MemoryStringListTypeHandler;
-
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ragagent.memory.domain.MemoryExtractionState;
+import com.ragagent.memory.domain.MemoryExtractionStateTypeHandler;
+import com.ragagent.memory.domain.MemoryStringListTypeHandler;
 import com.ragagent.platform.web.ZeroTimeSerializer;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 一个记忆空间：**一个工作区里的一个主体**。

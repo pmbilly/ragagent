@@ -2,26 +2,24 @@ package com.ragagent.websearch.provider;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.websearch.WebSearchFilters;
+import com.ragagent.contract.websearch.WebSearchResult;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.websearch.domain.WebSearchProviderParams;
+import com.ragagent.websearch.service.WebSearchService;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.websearch.WebSearchFilters;
-import com.ragagent.contract.websearch.WebSearchResult;
-import com.ragagent.websearch.domain.WebSearchProviderParams;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
-import com.ragagent.websearch.service.WebSearchService;
 
 /**
  * web_search 执行面的 stub server A/B：请求体/URL 与录制（wire/ws_*.json）

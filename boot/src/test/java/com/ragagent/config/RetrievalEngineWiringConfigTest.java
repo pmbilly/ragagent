@@ -6,22 +6,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.util.List;
-
-import javax.sql.DataSource;
-
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
-import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.retrieval.engine.EngineRegistry;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.PgVectorEngineRepository;
 import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;
 import com.ragagent.retrieval.engine.RetrieverEngineParams;
+import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.util.List;
+import javax.sql.DataSource;
+import org.junit.jupiter.api.Test;
 
 /**
  * 检索引擎装配的钉子：

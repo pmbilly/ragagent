@@ -1,23 +1,22 @@
 package com.ragagent.session.service.suggestion;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.util.ArrayList;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchTextUtil;
+import com.ragagent.contract.session.SuggestionItem;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.service.suggestion.MessageSuggestionService.Evidence;
+import com.ragagent.session.service.suggestion.MessageSuggestionService.GenerationContext;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.retrieval.SearchTextUtil;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.contract.session.SuggestionItem;
-import com.ragagent.session.service.suggestion.MessageSuggestionService.Evidence;
-import com.ragagent.session.service.suggestion.MessageSuggestionService.GenerationContext;
 
 /**
  * {@code MessageSuggestionService} 的**无状态管道子模块**：生成输入的上下文装配

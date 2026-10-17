@@ -1,5 +1,17 @@
 package com.ragagent.im.channel.dingtalk;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.im.runtime.AdapterInterfaces;
+import com.ragagent.im.runtime.CallbackExchange;
+import com.ragagent.im.runtime.ImAdapterVerify;
+import com.ragagent.im.runtime.ImTypes;
+import com.ragagent.im.runtime.IncomingMessage;
+import com.ragagent.im.runtime.ReplyMessage;
+import com.ragagent.im.runtime.ThinkDisplay;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -16,22 +28,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.im.runtime.AdapterInterfaces;
-import com.ragagent.im.runtime.CallbackExchange;
-import com.ragagent.im.runtime.ImAdapterVerify;
-import com.ragagent.im.runtime.ImTypes;
-import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.runtime.ReplyMessage;
-import com.ragagent.im.runtime.ThinkDisplay;
 
 /**
  * 钉钉适配器。

@@ -1,12 +1,5 @@
 package com.ragagent.mcp.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.pipeline.McpToolRegistrationPort;
 import com.ragagent.contract.pipeline.McpToolingGateway;
 import com.ragagent.contract.pipeline.ToolRegistryPort;
@@ -17,6 +10,11 @@ import com.ragagent.mcp.service.McpMetadataService;
 import com.ragagent.mcp.service.McpServiceManagement;
 import com.ragagent.mcp.tool.McpExposure;
 import com.ragagent.mcp.tool.McpTooling;
+import java.util.ArrayList;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link McpToolRegistrationPort} 的 MCP 域实现：注册编排（列表 → 启用过滤 →

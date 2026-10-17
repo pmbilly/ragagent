@@ -1,15 +1,14 @@
 package com.ragagent.datasource.connector.rss;
 
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorHttp;
+import com.ragagent.platform.security.SsrfGuard;
 import java.net.URI;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.connector.ConnectorHttp;
 
 /**
  * RSS 连接器的出站 HTTP 客户端。

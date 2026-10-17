@@ -2,22 +2,20 @@ package com.ragagent.datasource.connector.gitlab;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.datasource.domain.DataSourceConfig;
+import com.ragagent.datasource.domain.FetchedItem;
+import com.ragagent.datasource.domain.Resource;
+import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.StreamHandler;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.datasource.domain.connector.Connector;
-import com.ragagent.datasource.domain.connector.StreamHandler;
-import com.ragagent.datasource.domain.DataSourceConfig;
-import com.ragagent.datasource.domain.FetchedItem;
-import com.ragagent.datasource.domain.Resource;
-import com.ragagent.datasource.domain.SyncCursor;
 
 /**
  * 连接器主体：{@code fetchStream} / {@code fetchIncremental} / {@code fetchAll} /

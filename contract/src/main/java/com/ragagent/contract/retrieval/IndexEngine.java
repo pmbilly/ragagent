@@ -1,9 +1,8 @@
 package com.ragagent.contract.retrieval;
 
+import com.ragagent.contract.model.Embedder;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.contract.model.Embedder;
 
 /**
  * 索引写面端口：一个**已绑定到某个 store** 的检索引擎句柄（业务域 → 检索引擎）。

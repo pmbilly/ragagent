@@ -5,11 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -19,10 +14,13 @@ import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.llm.domain.ProviderMetadataMaps;
 import com.ragagent.llm.provider.ProviderName;
-
-import org.junit.jupiter.api.Test;
 import com.ragagent.modelruntime.adapter.provider.chat.common.BaseProvider;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapters;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 
 /**

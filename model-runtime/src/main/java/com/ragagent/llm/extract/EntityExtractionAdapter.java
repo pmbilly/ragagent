@@ -1,14 +1,12 @@
 package com.ragagent.llm.extract;
 
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.graph.EntityExtractionResult;
 import com.ragagent.contract.knowledge.EntityExtractionPort;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.platform.prompt.PipelineConfig.PromptTemplateStructured;
 import com.ragagent.platform.web.JsonMappers;
+import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * 实体关系抽取端口的适配器（R2c-3d）：把契约面的不透明模板还原成平台模板类型，

@@ -1,13 +1,12 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.wiki.domain.WikiExtractionGranularity;
+import com.ragagent.wiki.domain.page.WikiPageLite;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import com.ragagent.wiki.domain.WikiExtractionGranularity;
-import com.ragagent.wiki.domain.page.WikiPageLite;
 
 /**
  * Map 与 Reduce 阶段共享的数据。

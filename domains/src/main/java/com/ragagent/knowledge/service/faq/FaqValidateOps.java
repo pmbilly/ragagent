@@ -1,17 +1,16 @@
 package com.ragagent.knowledge.service.faq;
 
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
+import com.ragagent.knowledge.dto.faq.FaqFailedEntry;
+import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
-import com.ragagent.knowledge.dto.faq.FaqFailedEntry;
-import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

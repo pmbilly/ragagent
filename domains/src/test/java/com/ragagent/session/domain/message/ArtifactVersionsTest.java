@@ -2,10 +2,9 @@ package com.ragagent.session.domain.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
 import com.ragagent.contract.session.MessageArtifact;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * 产物版本澄清纯函数。

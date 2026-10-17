@@ -1,9 +1,8 @@
 package com.ragagent.approval;
 
-import com.ragagent.contract.tool.Decision;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.tool.Decision;
 
 /**
  * 跨实例广播的 Resolve 报文。

@@ -1,24 +1,21 @@
 package com.ragagent.session.qa;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
+import com.ragagent.contract.memory.MemoryExtractionPort;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.session.service.MessageService;
+import com.ragagent.session.service.SessionService;
+import com.ragagent.session.service.TemporaryDocumentService;
+import com.ragagent.session.service.suggestion.MessageSuggestionService;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.contract.memory.MemoryExtractionPort;
-import com.ragagent.session.service.MessageService;
-import com.ragagent.session.service.suggestion.MessageSuggestionService;
-import com.ragagent.session.service.SessionService;
-import com.ragagent.session.service.TemporaryDocumentService;
-
-import static org.mockito.Mockito.mock;
 
 /**
  * A5：{@code runWithTenant} 在**新线程（身份为空）**上必须能用调用方快照补齐身份。

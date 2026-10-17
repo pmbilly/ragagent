@@ -1,8 +1,7 @@
 package com.ragagent.websearch.domain;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.Map;
 
 /**
  * web 搜索 provider 的 parameters 载荷。

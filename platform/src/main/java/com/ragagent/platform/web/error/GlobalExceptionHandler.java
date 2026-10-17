@@ -1,26 +1,22 @@
 package com.ragagent.platform.web.error;
 
-import com.ragagent.contract.error.BizException;
-
 import com.ragagent.contract.error.AppError;
-
+import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResultSupport;
+import com.ragagent.platform.web.PageParams;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResultSupport;
-import com.ragagent.platform.web.PageParams;
-
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * 统一错误形态（迁移期**两形态并存**，按路由分派）：

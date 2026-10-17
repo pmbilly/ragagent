@@ -1,10 +1,8 @@
 package com.ragagent.knowledge.support;
 
-import java.util.List;
-
-import java.util.ArrayList;
-
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * knowledge 的**文件名/下载名规则**（由 {@code service.KnowledgeService} 抽出，

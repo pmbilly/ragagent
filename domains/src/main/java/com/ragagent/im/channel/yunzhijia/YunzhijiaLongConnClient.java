@@ -1,5 +1,9 @@
 package com.ragagent.im.channel.yunzhijia;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.platform.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -15,14 +19,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.im.runtime.IncomingMessage;
 
 /**
  * 云之家长连接（websocket）客户端。

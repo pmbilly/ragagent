@@ -1,5 +1,15 @@
 package com.ragagent.evaluation.controller;
 
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.evaluation.dto.EvaluationDtos.EvaluationDetail;
+import com.ragagent.evaluation.dto.EvaluationRequest;
+import com.ragagent.evaluation.service.EvaluationService;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.RejectEmptyBody;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -7,18 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.platform.web.RejectEmptyBody;
-import com.ragagent.evaluation.dto.EvaluationDtos.EvaluationDetail;
-import com.ragagent.evaluation.dto.EvaluationRequest;
-import com.ragagent.evaluation.service.EvaluationService;
-
-import jakarta.validation.Valid;
-import com.ragagent.platform.web.ApiResult;
 
 /**
  * 评估端点（POST = Admin：驱动 LLM+检索、跨 KB 读；GET = Viewer 读同租户任务）。

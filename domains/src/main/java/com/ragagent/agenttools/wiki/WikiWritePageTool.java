@@ -1,17 +1,16 @@
 package com.ragagent.agenttools.wiki;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.agent.SearchAuth.KnowledgeScopeReader;
 import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
-import com.ragagent.platform.tool.BaseTool;
-import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.platform.web.JsonMappers;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * wiki_write_page 工具。

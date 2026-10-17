@@ -1,11 +1,11 @@
 package com.ragagent.session.service.rag;
 
+import com.ragagent.session.service.rag.plugin.Plugin;
+import com.ragagent.session.service.rag.plugin.PluginError;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.ragagent.session.service.rag.plugin.Plugin;
-import com.ragagent.session.service.rag.plugin.PluginError;
 
 /**
  * 插件注册表与事件分发器。

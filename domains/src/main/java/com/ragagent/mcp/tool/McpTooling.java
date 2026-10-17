@@ -1,5 +1,16 @@
 package com.ragagent.mcp.tool;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.agent.ToolCallTarget;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.pipeline.McpToolingGateway;
+import com.ragagent.contract.pipeline.ToolRegistryPort;
+import com.ragagent.contract.tool.AgentTool;
+import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.mcp.domain.McpService;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -9,18 +20,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.agent.ToolCallTarget;
-import com.ragagent.contract.pipeline.McpToolingGateway;
-import com.ragagent.contract.pipeline.ToolRegistryPort;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ToolCall;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.mcp.domain.McpService;
-import com.ragagent.contract.tool.AgentTool;
-import com.ragagent.contract.tool.ToolDefinitions;
 
 /**
  * MCP 工具编排（原 {@code com.ragagent.agent.tool.ToolRegistry} 的 MCP 目录方法与状态，逐行搬出）。

@@ -1,11 +1,10 @@
 package com.ragagent.auth.api;
 
-import org.springframework.stereotype.Component;
-
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.auth.mapper.AuthTokenMapper;
 import com.ragagent.contract.auth.AuthTokenAdminPort;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link AuthTokenAdminPort} 的 auth 域实现：批量置 {@code isRevoked=true}，

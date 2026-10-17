@@ -1,10 +1,5 @@
 package com.ragagent.session.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.session.EmbedSessionOps;
 import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
 import com.ragagent.session.domain.conversation.Session;
@@ -13,6 +8,9 @@ import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.session.domain.conversation.SessionPage;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.session.service.SessionService;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link EmbedSessionOps} 的会话域实现：owner 串规则、描述标记与查询口径都留在会话域内。

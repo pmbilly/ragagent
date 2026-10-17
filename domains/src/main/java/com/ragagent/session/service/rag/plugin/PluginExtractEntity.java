@@ -1,22 +1,21 @@
 package com.ragagent.session.service.rag.plugin;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.graph.EntityExtractionResult;
+import com.ragagent.contract.graph.GraphNode;
+import com.ragagent.contract.knowledge.EntityExtractionPort;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.platform.prompt.PipelineConfig;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineEventType;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.contract.graph.EntityExtractionResult;
-import com.ragagent.contract.knowledge.EntityExtractionPort;
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineEventType;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.contract.graph.GraphNode;
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.platform.prompt.PipelineConfig;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.platform.web.JsonMappers;
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * QUERY_UNDERSTAND 附加插件：

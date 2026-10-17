@@ -1,13 +1,12 @@
 package com.ragagent.datasource.connector.feishu.wiki;
 
+import com.ragagent.datasource.connector.feishu.core.DocxBlocks;
+import com.ragagent.datasource.connector.feishu.core.DocxFetcher;
+import com.ragagent.datasource.connector.feishu.core.FeishuTestServer;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.datasource.connector.feishu.core.DocxBlocks;
-import com.ragagent.datasource.connector.feishu.core.DocxFetcher;
-import com.ragagent.datasource.connector.feishu.core.FeishuTestServer;
 
 /**
  * wiki 连接器测试的飞书 API 桩夹具（层级节点、块 JSON、导出任务等路由）。

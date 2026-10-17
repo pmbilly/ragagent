@@ -2,21 +2,20 @@ package com.ragagent.session.controller.sse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.web.ContractJsonModule;
+import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.web.ContractJsonModule;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
-import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * {@link StreamResponseBuilder} 的逐字节契约测试。

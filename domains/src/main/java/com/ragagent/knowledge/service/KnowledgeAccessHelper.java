@@ -1,22 +1,19 @@
 package com.ragagent.knowledge.service;
 
-import com.ragagent.knowledge.domain.KnowledgeTenants;
-
-
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeTag;
+import com.ragagent.knowledge.domain.KnowledgeTenants;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.domain.KnowledgeTag;
-import org.springframework.stereotype.Component;
 import com.ragagent.knowledge.support.TagViews;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * 知识域访问面收敛点（M2 解环：原 KnowledgeService 门面 helper 下沉）。

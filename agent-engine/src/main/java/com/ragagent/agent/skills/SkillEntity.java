@@ -1,10 +1,9 @@
 package com.ragagent.agent.skills;
 
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.time.OffsetDateTime;
 
 /**
  * 技能行（指令型技能入库；**租户级 + 平台内置层**）。

@@ -14,19 +14,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.contract.memory.MemoryExtractionPort;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.service.MessageService;
-import com.ragagent.session.service.suggestion.MessageSuggestionService;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.TemporaryDocumentService;
+import com.ragagent.session.service.suggestion.MessageSuggestionService;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * A2：全轮一次性提交门（完成收尾幂等 + 更新失败短路）。

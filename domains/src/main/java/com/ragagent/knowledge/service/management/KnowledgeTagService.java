@@ -1,36 +1,36 @@
 package com.ragagent.knowledge.service.management;
 
-import com.ragagent.contract.retrieval.IndexEngine;
-import com.ragagent.platform.web.JsonMappers;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.platform.access.TenantContext;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.retrieval.IndexEngine;
+import com.ragagent.contract.retrieval.VectorIndexStore;
+import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
-import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.dto.tag.KnowledgeTagWithStats;
 import com.ragagent.knowledge.dto.tag.TagPageResult;
+import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.repository.FaqChunkRepository;
+import com.ragagent.knowledge.repository.KnowledgeTagRepository;
+import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.JsonMappers;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
-import com.ragagent.contract.retrieval.VectorIndexStore;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 
 /**
  * <h2>路由链与 Java 落地</h2>

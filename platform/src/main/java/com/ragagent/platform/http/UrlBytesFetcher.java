@@ -1,15 +1,14 @@
 package com.ragagent.platform.http;
 
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.platform.storage.config.UploadLimits;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.function.Consumer;
-
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.storage.config.UploadLimits;
 
 /**
  * URL → 字节的**统一抓取**：知识库 URL 导入与数据源同步共用一份口径。

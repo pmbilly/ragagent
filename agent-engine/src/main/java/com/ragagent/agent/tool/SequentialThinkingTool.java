@@ -1,18 +1,17 @@
 package com.ragagent.agent.tool;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.tool.BaseTool;
 
 /**
  * thinking / 顺序思维工具。

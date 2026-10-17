@@ -1,7 +1,20 @@
 package com.ragagent.session.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
+import com.ragagent.contract.doc.DocReaderParsePort;
+import com.ragagent.contract.knowledge.DocumentChunkingPort;
+import com.ragagent.contract.knowledge.chunker.Tokens;
+import com.ragagent.contract.knowledge.support.ParserEngineRules;
+import com.ragagent.contract.model.AsrTranscriber;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.knowledge.ImageRefRewriter;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.domain.document.TemporaryDocument;
+import com.ragagent.session.repository.TemporaryDocumentRepository;
+import com.ragagent.session.service.TemporaryDocumentService.CreateOptions;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
@@ -13,24 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.contract.knowledge.DocumentChunkingPort;
-import com.ragagent.contract.knowledge.chunker.Tokens;
-import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.contract.knowledge.support.ParserEngineRules;
-import com.ragagent.contract.model.AsrTranscriber;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.session.domain.document.TemporaryDocument;
-import com.ragagent.session.repository.TemporaryDocumentRepository;
-import com.ragagent.session.service.TemporaryDocumentService.CreateOptions;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.platform.knowledge.ImageRefRewriter;
-import com.ragagent.platform.web.JsonMappers;
 
 /**
  * {@code TemporaryDocumentService} 的**解析 / 落盘管线子模块**（§14 步骤 2）：异步投递与重试、

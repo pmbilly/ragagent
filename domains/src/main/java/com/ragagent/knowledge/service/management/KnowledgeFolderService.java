@@ -1,37 +1,34 @@
 package com.ragagent.knowledge.service.management;
 
-import com.ragagent.knowledge.service.KnowledgeAccessHelper;
-
-import com.ragagent.knowledge.domain.KnowledgeTenants;
-
-import com.ragagent.knowledge.support.KnowledgePaths;
-
-import com.ragagent.platform.web.JsonMappers;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.InputSanitizer;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeTenants;
+import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
-import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.ragagent.knowledge.service.KnowledgeAccessHelper;
+import com.ragagent.knowledge.support.KnowledgePaths;
+import com.ragagent.platform.security.InputSanitizer;
+import com.ragagent.platform.web.JsonMappers;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 知识文件夹树与文件夹移动 / 重命名：树的增删改查、移动/重命名的路径重写与冲突校验。

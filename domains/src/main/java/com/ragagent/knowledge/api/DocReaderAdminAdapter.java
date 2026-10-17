@@ -1,14 +1,12 @@
 package com.ragagent.knowledge.api;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.doc.DocReaderAdminPort;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.config.DocReaderProperties;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link DocReaderAdminPort} 的 knowledge 侧实现：把管理面四件事转发给

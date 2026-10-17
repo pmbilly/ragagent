@@ -1,20 +1,20 @@
 package com.ragagent.retrieval.engine;
 
 
+import com.ragagent.contract.vectorstore.ConnectionConfig;
+import com.ragagent.contract.vectorstore.EnvStoreIds;
+import com.ragagent.contract.vectorstore.IndexConfig;
+import com.ragagent.contract.vectorstore.VectorStoreView;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.retrieval.engine.doris.DorisRetrieveRepository;
 import com.ragagent.retrieval.engine.elasticsearch.ElasticsearchV7RetrieveRepository;
 import com.ragagent.retrieval.engine.elasticsearch.ElasticsearchV8RetrieveRepository;
-import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository;
 import com.ragagent.retrieval.engine.milvus.MilvusRetrieveRepository;
+import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository;
 import com.ragagent.retrieval.engine.qdrant.QdrantRetrieveRepository;
 import com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepository;
 import com.ragagent.retrieval.engine.weaviate.WeaviateRetrieveRepository;
-import com.ragagent.contract.vectorstore.ConnectionConfig;
-import com.ragagent.contract.vectorstore.IndexConfig;
-import com.ragagent.contract.vectorstore.EnvStoreIds;
-import com.ragagent.contract.vectorstore.VectorStoreView;
 
 /**
  * 检索引擎工厂——从 {@link com.ragagent.contract.vectorstore.VectorStoreView} 配置按引擎类型构建检索引擎服务，

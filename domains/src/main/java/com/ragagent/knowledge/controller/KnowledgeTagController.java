@@ -1,19 +1,21 @@
 package com.ragagent.knowledge.controller;
 
-import java.util.List;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.knowledge.domain.KnowledgeTag;
+import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.knowledge.dto.tag.CreateTagRequest;
 import com.ragagent.knowledge.dto.tag.DeleteTagRequest;
 import com.ragagent.knowledge.dto.tag.KnowledgeTagResponse;
 import com.ragagent.knowledge.dto.tag.TagPageResult;
 import com.ragagent.knowledge.dto.tag.UpdateTagRequest;
-import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.knowledge.service.management.KnowledgeTagService;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.NonNullBody;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,8 +26,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
 
 /**
  * KB 标签 CRUD 面：列表（分页/关键字）、创建、更新、删除（含排除条目）。

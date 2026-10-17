@@ -5,29 +5,26 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.auth.apikey.domain.TenantAPIKey;
+import com.ragagent.auth.apikey.service.TenantAPIKeyService;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.auth.service.UserService;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.contract.apikey.ApiKeyAuthPort;
+import com.ragagent.contract.tenant.APIPrincipalConfig;
+import com.ragagent.platform.access.TenantContext;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
-
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import com.ragagent.contract.apikey.ApiKeyAuthPort;
-import com.ragagent.contract.apikey.APIKeyScopeContext;
-import com.ragagent.auth.apikey.service.TenantAPIKeyService;
-import com.ragagent.contract.tenant.APIPrincipalConfig;
-import com.ragagent.auth.service.TenantService;
-import com.ragagent.auth.service.UserService;
-import com.ragagent.platform.access.TenantContext;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import com.ragagent.auth.apikey.domain.TenantAPIKey;
 
 /**
  * API 主体解析：tenant/direct_header/signed_token 三模式、

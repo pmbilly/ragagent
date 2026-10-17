@@ -1,18 +1,16 @@
 package com.ragagent.im.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.agent.AgentLookup;
+import com.ragagent.im.domain.ImChannelEntity;
+import com.ragagent.im.mapper.ImChannelMapper;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.im.domain.ImChannelEntity;
-import com.ragagent.im.mapper.ImChannelMapper;
-import com.ragagent.contract.agent.AgentLookup;
 
 /**
  * IM 渠道 service（CRUD + 渠道行钩子：兜底、session_mode 校验、bot_identity 计算）。

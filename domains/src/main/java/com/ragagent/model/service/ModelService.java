@@ -1,5 +1,20 @@
 package com.ragagent.model.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ModelFacts;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.model.domain.Model;
+import com.ragagent.model.mapper.ModelMapper;
+import com.ragagent.model.mapper.ModelUsageMapper;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.model.ModelGateway;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -7,25 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.model.domain.Model;
-import com.ragagent.model.mapper.ModelMapper;
-import com.ragagent.model.mapper.ModelUsageMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.contract.model.ModelFacts;
-import com.ragagent.platform.model.ModelGateway;
 
 /**
  * 模型配置服务（配置 CRUD + credentials 子资源 + 删除守卫；运行时工厂见 ModelRuntime）。

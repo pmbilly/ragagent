@@ -1,8 +1,14 @@
 package com.ragagent.llm.ollama;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.model.OllamaAdminPort;
+import com.ragagent.contract.model.OllamaModelInfo;
+import com.ragagent.contract.model.OllamaProgressListener;
+import com.ragagent.contract.model.OllamaPullProgress;
+import com.ragagent.platform.config.AppEnvLookup;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.BufferedReader;
-import com.ragagent.platform.config.AppEnvLookup;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,17 +21,8 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.ragagent.contract.model.OllamaAdminPort;
-import com.ragagent.contract.model.OllamaModelInfo;
-import com.ragagent.contract.model.OllamaProgressListener;
-import com.ragagent.contract.model.OllamaPullProgress;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

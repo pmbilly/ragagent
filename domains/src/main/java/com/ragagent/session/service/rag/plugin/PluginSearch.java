@@ -1,22 +1,21 @@
 package com.ragagent.session.service.rag.plugin;
 
 
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineEventType;
+import com.ragagent.session.service.rag.PipelineLog;
+import com.ragagent.session.service.rag.support.SearchSupport;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineEventType;
-import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.session.service.rag.support.SearchSupport;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.contract.retrieval.SearchResult;
 
 /**
  * CHUNK_SEARCH 阶段插件（含查询扩展与检索执行协作者）。

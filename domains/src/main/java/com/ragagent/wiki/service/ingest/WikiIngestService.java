@@ -1,32 +1,31 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.WikiIngestPort;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.domain.TaskPendingOp;
+import com.ragagent.wiki.repository.TaskDeadLetterRepository;
+import com.ragagent.wiki.repository.TaskPendingOpsRepository;
+import com.ragagent.wiki.service.WikiImageEnricher;
+import com.ragagent.wiki.service.WikiKnowledgeFinalizer;
+import com.ragagent.wiki.service.page.WikiCrossLinker;
+import com.ragagent.wiki.service.page.WikiPageService;
+import com.ragagent.wiki.service.page.WikiSlugLock;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.wiki.domain.TaskPendingOp;
-import com.ragagent.wiki.repository.TaskDeadLetterRepository;
-import com.ragagent.wiki.repository.TaskPendingOpsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
-import com.ragagent.contract.wiki.WikiIngestPort;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.wiki.service.WikiImageEnricher;
-import com.ragagent.wiki.service.WikiKnowledgeFinalizer;
-import com.ragagent.wiki.service.page.WikiCrossLinker;
-import com.ragagent.wiki.service.page.WikiPageService;
-import com.ragagent.wiki.service.page.WikiSlugLock;
 
 /**
  * wiki 生成管线的主入口。

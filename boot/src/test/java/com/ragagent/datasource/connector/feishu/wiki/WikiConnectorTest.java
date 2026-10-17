@@ -3,23 +3,12 @@ package com.ragagent.datasource.connector.feishu.wiki;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.time.OffsetDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.slf4j.LoggerFactory;
-
-import com.ragagent.datasource.domain.connector.ConnectorException;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes;
+import com.ragagent.datasource.connector.feishu.core.FeishuClient;
+import com.ragagent.datasource.connector.feishu.core.FeishuConfig;
+import com.ragagent.datasource.connector.feishu.core.FeishuCursorCodec;
 import com.ragagent.datasource.connector.feishu.core.FeishuRegion;
 import com.ragagent.datasource.connector.feishu.core.FeishuSupport;
 import com.ragagent.datasource.connector.feishu.core.FeishuTestServer;
@@ -29,15 +18,23 @@ import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncCursor;
-
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
-import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.datasource.domain.connector.Connector;
-import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes;
-import com.ragagent.datasource.connector.feishu.core.FeishuClient;
-import com.ragagent.datasource.connector.feishu.core.FeishuConfig;
-import com.ragagent.datasource.connector.feishu.core.FeishuCursorCodec;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.platform.web.ZeroTimeSerializer;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.OffsetDateTime;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 
 /**
  * wiki 连接器的语义测试。

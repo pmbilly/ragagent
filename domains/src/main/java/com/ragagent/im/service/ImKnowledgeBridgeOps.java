@@ -1,17 +1,15 @@
 package com.ragagent.im.service;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
-
-import com.ragagent.platform.access.TenantContext;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.service.DuplicateKnowledgeException;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCommandSet;
 import com.ragagent.im.runtime.ImFormat;
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.knowledge.service.DuplicateKnowledgeException;
+import com.ragagent.platform.access.TenantContext;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * IM 与知识库域的全部接面：命令面的 KB 清单/检索读取，以及附件异步入库。

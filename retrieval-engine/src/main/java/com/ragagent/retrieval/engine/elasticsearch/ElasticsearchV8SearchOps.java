@@ -1,8 +1,5 @@
 package com.ragagent.retrieval.engine.elasticsearch;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -10,9 +7,10 @@ import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
-
 import com.ragagent.retrieval.engine.elasticsearch.ElasticsearchV8RetrieveRepository.HttpResult;
 import com.ragagent.retrieval.engine.elasticsearch.ElasticsearchV8RetrieveRepository.VectorEmbedding;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Elasticsearch v8 引擎的检索簇：基础条件（bool must/must_not，恒排除 is_enabled=false）、

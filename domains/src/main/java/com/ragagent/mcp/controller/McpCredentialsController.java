@@ -1,12 +1,14 @@
 package com.ragagent.mcp.controller;
 
 
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.dto.McpCredentialsResponse;
 import com.ragagent.mcp.service.McpServiceManagement;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +18,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
 
 /**
  * MCP 服务凭据子资源。把凭据写入从主资源更新里拆出来带来三点收益：

@@ -1,30 +1,29 @@
 package com.ragagent.session.service.rag.plugin;
 
-import com.ragagent.contract.retrieval.RetrievalObsRows;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.retrieval.ChunkTypes;
+import com.ragagent.contract.retrieval.RetrievalObsRows;
+import com.ragagent.contract.retrieval.SearchChunkMerge;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchTextUtil;
+import com.ragagent.contract.websearch.ImageInfo;
+import com.ragagent.platform.knowledge.ChunkSearchUtil;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.service.rag.ChatManage;
 import com.ragagent.session.service.rag.PipelineCommon;
 import com.ragagent.session.service.rag.PipelineEventType;
 import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.session.service.rag.support.MatchTypes;
 import com.ragagent.session.service.rag.support.SearchSupport;
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.platform.knowledge.ChunkSearchUtil;
-import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
-import com.ragagent.contract.retrieval.SearchChunkMerge;
-import com.ragagent.contract.retrieval.SearchTextUtil;
-import com.ragagent.contract.retrieval.ChunkTypes;
-import com.ragagent.contract.websearch.ImageInfo;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * CHUNK_MERGE 阶段插件。

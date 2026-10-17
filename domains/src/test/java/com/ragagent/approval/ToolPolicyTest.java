@@ -1,21 +1,19 @@
 package com.ragagent.approval;
 
-import com.ragagent.contract.tool.Cancellation;
-import com.ragagent.contract.tool.ToolApprovalException;
-import com.ragagent.contract.tool.ToolEnabledChecks;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.ragagent.contract.tool.Cancellation;
+import com.ragagent.contract.tool.ToolApprovalException;
+import com.ragagent.contract.tool.ToolEnabledChecks;
+import com.ragagent.mcp.service.Adapter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-import com.ragagent.mcp.service.Adapter;
 
 /**
  * 工具批量策略判定（{@code Gate} 与 {@code ToolEnabledChecks} 的 enabledTools）。

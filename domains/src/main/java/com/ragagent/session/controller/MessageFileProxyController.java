@@ -1,24 +1,21 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.contract.storage.fileserve.MessageFileFacts;
+import com.ragagent.platform.storage.fileserve.FileProxyPort;
+import com.ragagent.platform.storage.fileserve.FileServeHttp;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.service.MessageService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.ragagent.platform.storage.fileserve.FileProxyPort;
-import com.ragagent.platform.storage.fileserve.FileServeHttp;
-import com.ragagent.contract.storage.fileserve.MessageFileFacts;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.service.MessageService;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 消息作用域的资源代理。

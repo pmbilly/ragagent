@@ -1,28 +1,13 @@
 package com.ragagent.session.service;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.agent.ToolResultPersist;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.AgentCompleteData;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
-import com.ragagent.contract.event.payload.AgentReflectionData;
 import com.ragagent.contract.event.payload.AgentReferencesData;
+import com.ragagent.contract.event.payload.AgentReflectionData;
 import com.ragagent.contract.event.payload.AgentThoughtData;
 import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
@@ -38,10 +23,23 @@ import com.ragagent.contract.event.payload.UserMessageInjectedData;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.support.PipelineViews;
+import com.ragagent.contract.session.PipelineUsedMemoryView;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.support.PipelineViews;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * agent 事件订阅桥。

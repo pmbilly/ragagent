@@ -3,11 +3,10 @@ package com.ragagent.session.qa;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.contract.error.BizException;
 import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;
 import com.ragagent.session.dto.QaRequests.SearchKnowledgeRequest;
+import org.junit.jupiter.api.Test;
 
 /**
  * QA 请求面绑定契约：键名＝Java 字段名（camelCase），旧 snake 键静默失效；

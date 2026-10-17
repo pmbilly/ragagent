@@ -1,21 +1,12 @@
 package com.ragagent.mcp.controller;
 
-import com.ragagent.platform.web.JsonBodyErrors;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.web.ToolJson;
 import com.ragagent.mcp.domain.McpAdvancedConfig;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpAuthType;
-import com.ragagent.mcp.domain.McpResource;
 import com.ragagent.mcp.domain.McpMetadataSummary;
+import com.ragagent.mcp.domain.McpResource;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpStdioConfig;
 import com.ragagent.mcp.domain.McpTestResult;
@@ -23,13 +14,20 @@ import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.dto.McpServiceCreateRequest;
 import com.ragagent.mcp.dto.McpServiceResponse;
 import com.ragagent.mcp.protocol.McpServiceUrls;
-
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.JsonBodyErrors;
+import com.ragagent.platform.web.ToolJson;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.ragagent.platform.web.ApiResponse;
 
 /**
  * MCP 服务 CRUD 协作者（自 {@link McpServiceController} 拆出）：创建/列表/详情/更新/删除、

@@ -1,11 +1,10 @@
 package com.ragagent.agent;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ragagent.contract.agent.AgentRunSpec;
+import java.util.List;
 
 /**
  * agent 运行时配置。

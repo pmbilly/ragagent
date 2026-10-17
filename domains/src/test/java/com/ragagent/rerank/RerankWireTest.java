@@ -2,24 +2,15 @@ package com.ragagent.rerank;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.InputStream;
-import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.Map;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.Reranker;
-import com.ragagent.platform.security.SsrfGuard;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
+import com.ragagent.model.domain.Model;
+import com.ragagent.model.service.ModelRowViews;
 import com.ragagent.modelruntime.application.ModelRuntimeConfigs;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.web.ProviderJson;
 import com.ragagent.rerank.provider.AliyunReranker;
 import com.ragagent.rerank.provider.JinaReranker;
 import com.ragagent.rerank.provider.LkeapReranker;
@@ -27,10 +18,17 @@ import com.ragagent.rerank.provider.NvidiaReranker;
 import com.ragagent.rerank.provider.OpenAiReranker;
 import com.ragagent.rerank.provider.VolcengineReranker;
 import com.ragagent.rerank.provider.ZhipuReranker;
-import com.ragagent.platform.web.ProviderJson;
-import com.ragagent.contract.model.ModelParameters;
-import com.ragagent.model.service.ModelRowViews;
-import com.ragagent.model.domain.Model;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
+import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * rerank 客户端的 stub server A/B：请求体与录制（wire/*.json）逐字节比对 +

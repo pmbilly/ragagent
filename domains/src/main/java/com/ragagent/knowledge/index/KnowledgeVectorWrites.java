@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.index;
 
-import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.contract.retrieval.IndexEngineResolver;
+import com.ragagent.knowledge.domain.KnowledgeBase;
 import org.springframework.stereotype.Component;
 
 /**

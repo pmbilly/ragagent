@@ -2,24 +2,22 @@ package com.ragagent.knowledge.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.TestSchema;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
+import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.knowledge.service.management.KnowledgeService;
+import com.ragagent.platform.access.TenantContext;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import com.ragagent.TestSchema;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.service.management.KnowledgeService;
 
 /**
  * 写链改道的 H2 钉子：move 的 reuse_vectors 模式把 embeddings 行

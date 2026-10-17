@@ -1,11 +1,9 @@
 package com.ragagent.platform.web;
 
+import com.ragagent.contract.session.SseSink;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
-import com.ragagent.contract.session.SseSink;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * {@link SseSink} 的 servlet 实现（HTTP 边界）：四个 SSE 头 + 输出流逐帧写入并 flush。

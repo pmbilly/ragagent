@@ -1,9 +1,8 @@
 package com.ragagent.session.dto;
 
-import java.util.List;
-
 import com.ragagent.session.domain.message.Message;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * {@code POST /api/v1/sessions/{sessionId}/generate_title} 的请求体。

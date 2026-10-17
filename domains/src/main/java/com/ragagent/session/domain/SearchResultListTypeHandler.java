@@ -1,9 +1,8 @@
 package com.ragagent.session.domain;
 
-import java.util.List;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.ragagent.contract.retrieval.SearchResult;
+import java.util.List;
 
 /**
  * {@code messages} 表上 {@code knowledge_references} 列的处理器。

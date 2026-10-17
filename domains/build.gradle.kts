@@ -14,6 +14,8 @@ spotless {
         // 与 common/engine/boot 同规格：**生成代码不格式化**。此前本模块（当时叫 :server）没有这行，
         // 改名后 ratchet 把 build/generated/source/proto 下的 protoc 产物也当成"触碰过"⇒ spotless 红（B167 实测）。
         targetExclude("build/**")
+        // import 口径（2026-10 全仓重排同款）：\# 前缀=static 块置顶，空串=其余单块 ASCII 序
+        importOrder("\\#", "")
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()

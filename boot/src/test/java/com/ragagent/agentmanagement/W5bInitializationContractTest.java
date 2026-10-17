@@ -5,13 +5,14 @@ package com.ragagent.agentmanagement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.TestSchema;
+import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.initialization.service.OllamaDownloadTaskStore;
+import com.ragagent.platform.security.SsrfGuard;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import com.ragagent.TestSchema;
-import com.ragagent.platform.security.SsrfGuard;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -28,8 +29,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import com.ragagent.initialization.service.OllamaDownloadTaskStore;
-import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * 契约测试：initialization 系统级 14 条（ollama 管理 6 + 模型测试 5 +

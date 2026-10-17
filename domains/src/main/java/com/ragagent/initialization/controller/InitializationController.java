@@ -1,6 +1,24 @@
 package com.ragagent.initialization.controller;
 
 
+import com.ragagent.contract.doc.DocReaderParsePort;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.knowledge.EntityExtractionPort;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.model.AsrTranscriber;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.model.OllamaAdminPort;
+import com.ragagent.initialization.service.InitializationConfigService;
+import com.ragagent.initialization.service.ModelConnectivityTestService;
+import com.ragagent.initialization.service.OllamaDownloadTaskStore;
+import com.ragagent.initialization.service.OllamaManageService;
+import com.ragagent.initialization.service.TextExtractionTestService;
+import com.ragagent.platform.prompt.ExtractPrompts;
+import com.ragagent.platform.security.CryptoService;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.web.ApiResult;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,25 +27,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.ragagent.initialization.service.InitializationConfigService;
-import com.ragagent.initialization.service.ModelConnectivityTestService;
-import com.ragagent.initialization.service.OllamaManageService;
-import com.ragagent.initialization.service.TextExtractionTestService;
-import com.ragagent.contract.knowledge.EntityExtractionPort;
-import com.ragagent.contract.model.AsrTranscriber;
-import com.ragagent.platform.prompt.ExtractPrompts;
-import com.ragagent.initialization.service.OllamaDownloadTaskStore;
-import com.ragagent.platform.security.CryptoService;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.contract.model.OllamaAdminPort;
-import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 
 /**
  * initialization 路由。系统级端点（ollama 管理、模型连通性测试、抽取）

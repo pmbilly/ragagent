@@ -3,23 +3,22 @@ package com.ragagent.datasource.connector.ima;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.ragagent.datasource.domain.connector.Connector;
-import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.connector.ima.FakeIma.FakeFile;
 import com.ragagent.datasource.connector.ima.FakeIma.FakeFolder;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.platform.web.ZeroTimeSerializer;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import com.ragagent.platform.web.ZeroTimeSerializer;
 
 /**
  * IMA 连接器的语义测试。

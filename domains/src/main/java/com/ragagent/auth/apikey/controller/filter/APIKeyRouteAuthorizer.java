@@ -1,13 +1,12 @@
 package com.ragagent.auth.apikey.controller.filter;
 
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
-
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
 
 /**
  * 逐路由 API-Key 策略注册表 + 授权判定。

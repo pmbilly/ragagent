@@ -1,27 +1,25 @@
 package com.ragagent.retrieval;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.knowledge.KnowledgeBaseSearchFacts;
+import com.ragagent.contract.retrieval.RetrieveEngineException;
 import com.ragagent.contract.retrieval.SearchParams;
+import com.ragagent.contract.retrieval.TenantStoreOwnership;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.retrieval.HybridSearchService.StoreGroup;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.EffectiveEngines;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
-import com.ragagent.contract.retrieval.RetrieveEngineException;
 import com.ragagent.retrieval.engine.RetrieveEngineFactories;
 import com.ragagent.retrieval.engine.RetrieverEngineParams;
-import com.ragagent.contract.retrieval.TenantStoreOwnership;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ragagent.retrieval.HybridSearchService.StoreGroup;
-import com.ragagent.platform.security.LogSanitizer;
 
 /**
  * HybridSearch 的 store-group 解析簇：KB 按 (vectorStoreId, 属主租户) 分桶、逐组经工厂

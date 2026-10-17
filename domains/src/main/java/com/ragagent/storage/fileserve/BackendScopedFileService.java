@@ -1,10 +1,10 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.contract.storage.fileserve.FileContentService;
 import com.ragagent.contract.storage.fileserve.OpenedFile;
+import com.ragagent.platform.storage.fileserve.StoragePaths;
 import java.io.IOException;
 import java.net.URI;
-import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.contract.storage.fileserve.FileContentService;
 
 /**
  * 后端作用域包装（{@code GetFile / GetFileURL} 子集）：

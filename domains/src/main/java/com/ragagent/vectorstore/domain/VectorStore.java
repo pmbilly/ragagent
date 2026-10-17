@@ -1,15 +1,14 @@
 package com.ragagent.vectorstore.domain;
 
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ragagent.contract.vectorstore.ConnectionConfig;
-import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.vectorstore.ConnectionConfig;
+import com.ragagent.contract.vectorstore.IndexConfig;
+import java.time.OffsetDateTime;
 
 /**
  * vector_stores 表实体（迁移 000032）。

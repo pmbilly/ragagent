@@ -1,14 +1,13 @@
 package com.ragagent.im.channel.wechat;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.function.BiConsumer;
-
-import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCredentials;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.service.ImTurnOrchestrator;
+import com.ragagent.platform.security.SsrfGuard;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * 微信（个人号）iLink 机器人渠道工厂。

@@ -5,11 +5,11 @@ package com.ragagent.auth.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.TestSchema;
+import com.ragagent.agent.fixtures.ContractJson;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.function.UnaryOperator;
-
-import com.ragagent.TestSchema;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * 契约测试（56 条 w5a-* golden 逐条掩码比对；golden 来源：

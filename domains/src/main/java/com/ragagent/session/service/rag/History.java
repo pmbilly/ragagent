@@ -1,10 +1,9 @@
 package com.ragagent.session.service.rag;
 
+import com.ragagent.contract.retrieval.SearchResult;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.ragagent.contract.retrieval.SearchResult;
 
 /**
  * 一轮问答历史。

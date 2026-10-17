@@ -1,6 +1,18 @@
 package com.ragagent.datasource.connector.gitlab;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.ragagent.contract.text.Whitespace;
+import com.ragagent.datasource.domain.DataSourceConfig;
+import com.ragagent.datasource.domain.DataSourceConstants;
+import com.ragagent.datasource.domain.FetchedItem;
+import com.ragagent.datasource.domain.Resource;
+import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.StreamHandler;
+import com.ragagent.datasource.domain.connector.StreamingConnector;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -10,19 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.connector.StreamHandler;
-import com.ragagent.datasource.domain.connector.StreamingConnector;
-import com.ragagent.datasource.domain.DataSourceConfig;
-import com.ragagent.datasource.domain.DataSourceConstants;
-import com.ragagent.datasource.domain.FetchedItem;
-import com.ragagent.datasource.domain.Resource;
-import com.ragagent.datasource.domain.SyncCursor;
-import com.ragagent.contract.text.Whitespace;
 
 /**
  * GitLab 数据源连接器。

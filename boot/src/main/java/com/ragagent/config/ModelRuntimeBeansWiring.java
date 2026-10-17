@@ -1,10 +1,9 @@
 package com.ragagent.config;
 
+import com.ragagent.llm.ollama.OllamaService;
+import com.ragagent.platform.prompt.ExtractPrompts;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.ragagent.platform.prompt.ExtractPrompts;
-import com.ragagent.llm.ollama.OllamaService;
 
 /**
  * 模型运行时的两个进程级 bean（R2c-3d 组合根收拢）。

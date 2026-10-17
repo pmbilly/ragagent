@@ -1,29 +1,27 @@
 package com.ragagent.auth.controller;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.auth.domain.TenantConfigRedaction;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.tenant.ChatHistoryConfig;
 import com.ragagent.contract.tenant.ParserEngineConfig;
 import com.ragagent.contract.tenant.RetrievalConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig;
-import com.ragagent.auth.domain.TenantConfigRedaction;
-import com.ragagent.contract.tenant.WebSearchConfig;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.tenant.TenantRole;
-
+import com.ragagent.contract.tenant.TenantRowView;
+import com.ragagent.contract.tenant.WebSearchConfig;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.prompt.PromptTemplateCatalog;
+import com.ragagent.platform.web.JsonMappers;
+import java.util.List;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.ragagent.platform.prompt.PromptTemplateCatalog;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
-import com.ragagent.contract.tenant.TenantRowView;
-import com.ragagent.platform.web.JsonMappers;
 
 /**
  * KV 配置分发协作者（自 {@link TenantCatalogController} 拆出）：6 个 DB-backed key 的

@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.dto.faq;
 
-import java.util.List;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 
 public record FaqSearchRequest(
         @NotBlank(message = "queryText: 不能为空")

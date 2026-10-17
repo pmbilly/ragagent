@@ -6,17 +6,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.VlmPredictor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * VLM 描述器装配的验收（R3a 后口径）：本类只剩"取行 → 转交预测器"，

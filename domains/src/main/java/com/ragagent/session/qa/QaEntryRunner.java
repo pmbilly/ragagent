@@ -1,10 +1,5 @@
 package com.ragagent.session.qa;
 
-import java.io.IOException;
-
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.session.SseSink;
 import com.ragagent.contract.tenant.TenantConfigLookup;
@@ -15,6 +10,9 @@ import com.ragagent.session.service.AgentResolver;
 import com.ragagent.session.service.QaSupport.QaMode;
 import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.SessionKnowledgeQaService;
+import java.io.IOException;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.stereotype.Component;
 
 /**
  * QA 三入口中两个 SSE 入口（knowledge-chat / agent-chat）的**非 HTTP 入口**：

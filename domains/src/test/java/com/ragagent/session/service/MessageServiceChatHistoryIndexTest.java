@@ -11,23 +11,21 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.platform.access.TenantContext;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.HybridSearchPort;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.knowledge.KnowledgeRowView;
+import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * 聊天历史 KB 索引的验收：

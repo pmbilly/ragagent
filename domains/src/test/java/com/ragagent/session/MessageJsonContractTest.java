@@ -4,11 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -16,13 +11,17 @@ import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.session.MentionedItem;
-import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageArtifact;
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.contract.session.MessageExecutionContext;
 import com.ragagent.contract.session.MessageImage;
 import com.ragagent.contract.session.SuggestionAttribution;
 import com.ragagent.contract.session.UsedMemory;
+import com.ragagent.session.domain.message.Message;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**

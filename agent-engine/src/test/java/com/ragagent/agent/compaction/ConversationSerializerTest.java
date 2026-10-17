@@ -31,15 +31,13 @@ import static com.ragagent.agent.GoRecording.STR_TRUNC_SHORT;
 import static com.ragagent.agent.GoRecording.STR_TRUNC_TRIM;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.agent.GoRecording;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.FunctionCall;
+import com.ragagent.contract.model.chat.ToolCall;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * 摘要序列化的录制常量断言。

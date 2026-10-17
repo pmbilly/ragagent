@@ -1,13 +1,5 @@
 package com.ragagent.storage.provider;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Date;
-import java.util.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -18,6 +10,12 @@ import com.qcloud.cos.model.GeneratePresignedUrlRequest;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.region.Region;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Date;
+import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 腾讯云 COS 后端。

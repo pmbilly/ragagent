@@ -1,19 +1,16 @@
 package com.ragagent.storage.mapper;
 
+import com.ragagent.storage.domain.StoredResource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import javax.sql.DataSource;
-
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
-
-import com.ragagent.storage.domain.StoredResource;
 
 /**
  * 资源注册表仓储。

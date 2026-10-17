@@ -1,6 +1,17 @@
 package com.ragagent.agenttools.web;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.tenant.WebSearchConfig;
+import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolOutput;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.websearch.ToolPageFetcher;
+import com.ragagent.contract.websearch.WebSearchFilters;
+import com.ragagent.contract.websearch.WebSearchRequest;
+import com.ragagent.contract.websearch.WebSearchResult;
+import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import com.ragagent.platform.web.ToolJson;
 import java.net.URI;
@@ -11,18 +22,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.LongSupplier;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.contract.websearch.WebSearchFilters;
-import com.ragagent.contract.websearch.WebSearchResult;
-import com.ragagent.platform.tool.BaseTool;
-import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.contract.tool.ToolOutput;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.contract.tenant.WebSearchConfig;
-import com.ragagent.contract.websearch.WebSearchRequest;
-import com.ragagent.platform.web.JsonMappers;
 
 /**
  * web_search 工具。

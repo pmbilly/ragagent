@@ -1,22 +1,27 @@
 package com.ragagent.datasource.controller;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import com.ragagent.datasource.domain.DataSource;
+import com.ragagent.datasource.domain.Resource;
+import com.ragagent.datasource.domain.SyncLog;
+import com.ragagent.datasource.domain.connector.ConnectorCatalog;
+import com.ragagent.datasource.domain.connector.ConnectorMetadata;
+import com.ragagent.datasource.dto.DataSourceResponse;
+import com.ragagent.datasource.service.DataSourceService;
+import com.ragagent.datasource.service.KnowledgeBridge;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.datasource.domain.connector.ConnectorCatalog;
-import com.ragagent.datasource.domain.connector.ConnectorMetadata;
-import com.ragagent.datasource.domain.DataSource;
-import com.ragagent.datasource.domain.Resource;
-import com.ragagent.datasource.domain.SyncLog;
-import com.ragagent.datasource.dto.DataSourceResponse;
-import com.ragagent.datasource.service.DataSourceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,12 +31,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.datasource.service.KnowledgeBridge;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 
 /**
  * 数据源管理端点。

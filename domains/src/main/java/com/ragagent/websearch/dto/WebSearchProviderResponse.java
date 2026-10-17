@@ -1,11 +1,10 @@
 package com.ragagent.websearch.dto;
 
+import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.websearch.domain.WebSearchProviderEntity;
 
 /**
  * provider 响应 DTO。api_key **按构造摘除**；

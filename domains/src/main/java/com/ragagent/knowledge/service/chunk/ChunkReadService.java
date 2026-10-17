@@ -1,14 +1,13 @@
 package com.ragagent.knowledge.service.chunk;
 
-import com.ragagent.knowledge.repository.KnowledgeRepository;
-
-import java.util.List;
-import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.ChunkPage;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.platform.security.LogSanitizer;
+import java.util.List;
 import org.springframework.stereotype.Service;
-import com.ragagent.knowledge.domain.ChunkPage;
 
 /**
  * chunk 读取门面：控制器只与本类交互，不直接碰仓储。

@@ -3,29 +3,28 @@ package com.ragagent.wiki.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import com.ragagent.TestSchema;
 import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.contract.wiki.WikiPageNotFoundException;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.domain.folder.WikiFolder;
 import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;
 import com.ragagent.wiki.domain.folder.WikiFolderNotFoundException;
-import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageConflictException;
 import com.ragagent.wiki.domain.page.WikiPageListRequest;
-import com.ragagent.contract.wiki.WikiPageNotFoundException;
+import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.domain.page.WikiPageRevision;
 import com.ragagent.wiki.domain.page.WikiRevisionPruneRequest;
 import com.ragagent.wiki.mapper.WikiPageRevisionMapper;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.wiki.domain.WikiPageIssue;
-import com.ragagent.wiki.domain.page.WikiPageLite;
 
 /**
  * Wiki 页面仓储测试（H2 内存库，见 {@code src/test/resources/application.yml}），

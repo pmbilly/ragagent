@@ -1,7 +1,9 @@
 package com.ragagent.platform.tracing.langfuse;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.ragagent.platform.web.ContractJsonModule;
-
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.Instant;
@@ -11,10 +13,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 
 /**
  * Langfuse / OpenTelemetry 语义约定属性键与序列化辅助。

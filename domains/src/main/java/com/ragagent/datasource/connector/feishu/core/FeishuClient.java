@@ -1,5 +1,16 @@
 package com.ragagent.datasource.connector.feishu.core;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DocRawContentResponse;
+import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFile;
+import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFolderMetaResponse;
+import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.ExportTaskCreateResponse;
+import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.ExportTaskStatusResponse;
+import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiNode;
+import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiSpace;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorHttp;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.time.Instant;
@@ -8,21 +19,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.datasource.domain.connector.Connector;
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.connector.ConnectorHttp;
-import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DocRawContentResponse;
-import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFile;
-import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFolderMetaResponse;
-import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.ExportTaskCreateResponse;
-import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.ExportTaskStatusResponse;
-import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiNode;
-import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiSpace;
 
 /**
  * 飞书 Open Platform API 客户端。

@@ -1,14 +1,12 @@
 package com.ragagent.agentmanagement.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import java.util.List;
-
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 
 /**
  * custom_agents CRUD。

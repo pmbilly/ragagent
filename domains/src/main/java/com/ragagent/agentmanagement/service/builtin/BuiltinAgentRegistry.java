@@ -1,21 +1,18 @@
 package com.ragagent.agentmanagement.service.builtin;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
-
+import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.InputStream;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * 内建 agent 注册表（config/builtin_agents.yaml + {@code PromptSource} 提示词模板的启动装载）。

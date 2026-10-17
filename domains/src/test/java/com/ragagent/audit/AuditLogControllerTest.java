@@ -9,20 +9,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.ragagent.audit.controller.AuditLogController;
+import com.ragagent.audit.domain.AuditLog;
+import com.ragagent.audit.domain.AuditLogQuery;
+import com.ragagent.audit.service.AuditLogService;
+import com.ragagent.contract.audit.AuditAction;
+import com.ragagent.contract.audit.AuditOutcome;
+import com.ragagent.contract.knowledge.KnowledgeBaseFacts;
+import com.ragagent.contract.knowledge.KnowledgeBaseGateway;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.error.GlobalExceptionHandler;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-
-import com.ragagent.audit.controller.AuditLogController;
-import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.audit.domain.AuditLogQuery;
-import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.audit.service.AuditLogService;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.web.error.GlobalExceptionHandler;
-import com.ragagent.contract.knowledge.KnowledgeBaseFacts;
-import com.ragagent.contract.knowledge.KnowledgeBaseGateway;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;

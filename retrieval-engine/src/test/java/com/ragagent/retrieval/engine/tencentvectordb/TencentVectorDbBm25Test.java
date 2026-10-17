@@ -3,15 +3,13 @@ package com.ragagent.retrieval.engine.tencentvectordb;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
+import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbBm25.SparseVecItem;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbBm25.SparseVecItem;
 
 /**
  * 腾讯 BM25 编码器对照 <b>Go SDK v1.8.4 的实测输出</b>（基准生成命令：在 WeKnora 仓跑

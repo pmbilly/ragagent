@@ -2,18 +2,16 @@ package com.ragagent.agenttools.knowledge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agent.fixtures.GoRecording45A;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.agent.fixtures.GoRecording45A;
-import com.ragagent.agent.fixtures.RecordingSupport;
-import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FaqSnippet 的录制语料（10 条）。XML 投影逐字节比对（含相似问截断的 omitted 标记）。

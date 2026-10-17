@@ -1,14 +1,13 @@
 package com.ragagent.knowledge.mapper;
 
+import com.ragagent.knowledge.domain.KnowledgeTag;
 import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-
-import com.ragagent.knowledge.domain.KnowledgeTag;
-import org.apache.ibatis.annotations.Param;
 
 /**
  * knowledge_tags + knowledge_tag_relations 访问。

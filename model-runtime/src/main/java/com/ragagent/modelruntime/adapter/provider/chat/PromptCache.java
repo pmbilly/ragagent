@@ -1,20 +1,18 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.contract.model.PromptCacheStatus;
+import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.model.chat.CacheRetention;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.PromptCacheStatus;
-import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.platform.prompt.PromptFingerprints;
-
+import com.ragagent.platform.web.JsonMappers;
+import java.util.List;
 import org.springframework.http.HttpHeaders;
 
 /**

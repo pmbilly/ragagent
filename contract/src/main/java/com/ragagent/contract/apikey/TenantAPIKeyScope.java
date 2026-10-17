@@ -1,12 +1,11 @@
 package com.ragagent.contract.apikey;
 
 
+import com.ragagent.contract.error.BizException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.ragagent.contract.error.BizException;
 
 /**
  * 请求上下文里的 API Key 授权投影。

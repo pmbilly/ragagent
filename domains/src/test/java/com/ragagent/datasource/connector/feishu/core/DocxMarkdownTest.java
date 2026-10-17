@@ -2,18 +2,16 @@ package com.ragagent.datasource.connector.feishu.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.datasource.connector.feishu.core.DocxBlocks.BlockFileRef;
 import com.ragagent.datasource.connector.feishu.core.DocxBlocks.BlockText;
 import com.ragagent.datasource.connector.feishu.core.DocxBlocks.BlockTokenRef;
 import com.ragagent.datasource.connector.feishu.core.DocxBlocks.DocxBlock;
 import com.ragagent.datasource.connector.feishu.core.DocxMarkdown.MarkdownResult;
 import com.ragagent.datasource.connector.feishu.core.DocxMarkdown.PendingAttachment;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * {@code blocksToMarkdown} 的逐字节输出契约。

@@ -1,13 +1,12 @@
 package com.ragagent.datasource.domain.connector;
 
+import com.ragagent.datasource.domain.DataSourceConstants;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.ragagent.datasource.domain.DataSourceConstants;
 
 /**
  * 可用连接器的元数据目录。

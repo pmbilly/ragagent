@@ -1,22 +1,26 @@
 package com.ragagent.config;
 
 
-import com.ragagent.platform.web.ContractJsonModule;
-
-import com.ragagent.platform.tracing.langfuse.LangfuseHttpInterceptor;
-
-import com.ragagent.platform.web.ApiResultInterceptor;
-
+import com.ragagent.auth.apikey.controller.filter.APIKeyAuthChannel;
+import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
+import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
+import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
+import com.ragagent.auth.apikey.controller.filter.APIKeyScopeCleanupFilter;
+import com.ragagent.auth.apikey.controller.filter.AllowFileServeAPIKeyInterceptor;
 import com.ragagent.auth.apikey.controller.filter.DenyAPIKeyPrincipalInterceptor;
-
-import com.ragagent.platform.web.RequestIdFilter;
-
-import com.ragagent.platform.config.TenantProperties;
-import java.util.List;
-
+import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.auth.controller.filter.AuthFilter;
+import com.ragagent.auth.controller.filter.WsAuthSupport;
 import com.ragagent.auth.service.UserService;
+import com.ragagent.platform.config.DeploymentProperties;
+import com.ragagent.platform.config.TenantProperties;
+import com.ragagent.platform.tracing.langfuse.LangfuseHttpInterceptor;
+import com.ragagent.platform.web.ApiResultInterceptor;
+import com.ragagent.platform.web.ContractJsonModule;
 import com.ragagent.platform.web.RbacInterceptor;
+import com.ragagent.platform.web.RequestIdFilter;
+import com.ragagent.system.service.DeploymentCapabilitiesHolder;
+import java.util.List;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,16 +31,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import com.ragagent.auth.apikey.controller.filter.APIKeyAuthChannel;
-import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
-import com.ragagent.auth.apikey.controller.filter.APIKeyScopeCleanupFilter;
-import com.ragagent.auth.apikey.controller.filter.AllowFileServeAPIKeyInterceptor;
-import com.ragagent.auth.apikey.service.TenantAPIKeyService;
-import com.ragagent.auth.controller.filter.WsAuthSupport;
-import com.ragagent.platform.config.DeploymentProperties;
-import com.ragagent.system.service.DeploymentCapabilitiesHolder;
 
 /**
  * 全局装配顺序：CORS → RequestID → Auth（认证走 servlet filter）。

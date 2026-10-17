@@ -1,24 +1,23 @@
 package com.ragagent.mcp.tool;
 
+import com.ragagent.contract.pipeline.McpToolingGateway;
+import com.ragagent.contract.pipeline.ToolRegistryPort;
+import com.ragagent.contract.tool.AgentTool;
+import com.ragagent.contract.tool.ToolApprovalGate;
+import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.mcp.domain.McpMetadata;
+import com.ragagent.mcp.domain.McpService;
+import com.ragagent.mcp.domain.McpTool;
+import com.ragagent.mcp.protocol.McpClient;
+import com.ragagent.mcp.protocol.McpClientManager;
+import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.mcp.domain.McpService;
-import com.ragagent.mcp.domain.McpTool;
-import com.ragagent.contract.tool.ToolApprovalGate;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.mcp.domain.McpMetadata;
-import com.ragagent.mcp.protocol.McpClient;
-import com.ragagent.mcp.protocol.McpClientManager;
-import com.ragagent.mcp.protocol.McpContext;
-import com.ragagent.contract.tool.AgentTool;
-import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.contract.pipeline.ToolRegistryPort;
-import com.ragagent.contract.pipeline.McpToolingGateway;
 
 /**
  * MCP 目录装载与注册入口（持久化元数据读写、目录加载、工具注册、

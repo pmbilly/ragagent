@@ -1,5 +1,22 @@
 package com.ragagent.session.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.model.RankResult;
+import com.ragagent.contract.model.Reranker;
+import com.ragagent.contract.retrieval.HybridSearchPort;
+import com.ragagent.contract.retrieval.SearchParams;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.tenant.ChatHistoryConfig;
+import com.ragagent.contract.tenant.RetrievalConfig;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.domain.conversation.SessionOwnerIds;
+import com.ragagent.session.domain.message.MessageSearchGroupItem;
+import com.ragagent.session.domain.message.MessageSearchResult;
+import com.ragagent.session.domain.message.MessageWithSession;
+import com.ragagent.session.repository.MessageRepository;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,27 +24,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.contract.tenant.ChatHistoryConfig;
-import com.ragagent.contract.tenant.RetrievalConfig;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.retrieval.SearchParams;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.model.RankResult;
-import com.ragagent.contract.model.Reranker;
-import com.ragagent.contract.retrieval.HybridSearchPort;
-import com.ragagent.session.domain.message.MessageSearchGroupItem;
-import com.ragagent.session.domain.message.MessageSearchResult;
-import com.ragagent.session.domain.message.MessageWithSession;
-import com.ragagent.session.domain.conversation.SessionOwnerIds;
-import com.ragagent.session.repository.MessageRepository;
 
 
 /**

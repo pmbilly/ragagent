@@ -1,10 +1,10 @@
 package com.ragagent.embedding.provider;
 
-import java.util.List;
-import java.util.Map;
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.embedding.EmbedderPooler;
 import com.ragagent.embedding.EmbeddingHttp;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 各 HTTP embedder 的公共骨架：

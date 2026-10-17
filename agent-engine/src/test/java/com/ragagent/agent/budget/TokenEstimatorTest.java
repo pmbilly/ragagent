@@ -2,18 +2,16 @@ package com.ragagent.agent.budget;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatTool;
+import com.ragagent.contract.model.chat.FunctionCall;
 import com.ragagent.contract.model.chat.MessageContentPart;
 import com.ragagent.contract.model.chat.ToolCall;
-import com.ragagent.contract.model.chat.FunctionCall;
+import java.util.List;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * token 估算的录制常量断言（期望值由录制程序对旧分词器跑出真值后逐字节抄入）。

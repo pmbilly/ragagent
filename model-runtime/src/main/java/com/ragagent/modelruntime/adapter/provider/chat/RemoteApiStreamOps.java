@@ -1,21 +1,19 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.model.StreamResponse;
+import com.ragagent.contract.model.TokenUsage;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.modelruntime.adapter.provider.chat.common.SseReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.contract.model.chat.ToolCall;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.modelruntime.adapter.provider.chat.common.SseReader;
 
 /**
  * 流式解析协作者（自 {@link RemoteApiChat} 拆出）：

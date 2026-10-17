@@ -1,5 +1,7 @@
 package com.ragagent.embedding;
 
+import com.ragagent.platform.http.LlmTransport;
+import com.ragagent.platform.security.SsrfGuard;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -7,9 +9,6 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map;
-
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.http.LlmTransport;
 
 /**
  * embedding 包共享的 SSRF 安全 HTTP 设施。

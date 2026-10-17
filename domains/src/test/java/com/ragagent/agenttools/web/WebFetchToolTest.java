@@ -2,9 +2,8 @@ package com.ragagent.agenttools.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
 
 /** items 参数错误的文案钉子（LLM 可见）。 */
 class WebFetchToolTest {

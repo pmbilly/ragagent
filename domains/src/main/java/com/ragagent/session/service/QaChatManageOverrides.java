@@ -1,13 +1,13 @@
 package com.ragagent.session.service;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.agentmanagement.service.config.AgentConfigJson;
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.agentmanagement.service.config.AgentConfigJson;
+import com.ragagent.platform.prompt.PromptSource;
+import com.ragagent.session.service.rag.ChatManage;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * {@code SessionQaResolution} 的**agent 覆盖簇**：把 custom agent 的配置

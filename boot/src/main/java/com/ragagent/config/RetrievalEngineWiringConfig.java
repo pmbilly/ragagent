@@ -2,35 +2,33 @@ package com.ragagent.config;
 
 
 
+import com.ragagent.contract.retrieval.TenantStoreOwnership;
+import com.ragagent.contract.vectorstore.VectorStoreLookup;
+import com.ragagent.platform.config.RetrievalDriverProperties;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.retrieval.config.RetrievalEnvLookup;
+import com.ragagent.retrieval.engine.EngineFactory;
+import com.ragagent.retrieval.engine.EngineRegistry;
+import com.ragagent.retrieval.engine.EngineTypes;
+import com.ragagent.retrieval.engine.KeywordsVectorHybridRetrieveEngineService;
+import com.ragagent.retrieval.engine.PgVectorEngineRepository;
+import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;
+import com.ragagent.retrieval.engine.RetrieveEngineService;
+import com.ragagent.retrieval.engine.VectorStoreRepoOwnership;
+import com.ragagent.retrieval.engine.VectorStoreService;
+import com.ragagent.retrieval.engine.doris.DorisRetrieveRepository;
+import com.ragagent.retrieval.engine.milvus.MilvusRetrieveRepository;
+import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository;
+import com.ragagent.retrieval.engine.qdrant.QdrantRetrieveRepository;
+import com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository;
+import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepository;
+import com.ragagent.retrieval.engine.weaviate.WeaviateRetrieveRepository;
 import javax.sql.DataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-
-import com.ragagent.platform.config.RetrievalDriverProperties;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.retrieval.engine.VectorStoreService;
-import com.ragagent.retrieval.engine.EngineFactory;
-import com.ragagent.retrieval.config.RetrievalEnvLookup;
-import com.ragagent.retrieval.engine.EngineRegistry;
-import com.ragagent.retrieval.engine.EngineTypes;
-import com.ragagent.retrieval.engine.KeywordsVectorHybridRetrieveEngineService;
-import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository;
-import com.ragagent.retrieval.engine.PgVectorEngineRepository;
-import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;
-import com.ragagent.retrieval.engine.RetrieveEngineService;
-import com.ragagent.contract.retrieval.TenantStoreOwnership;
-import com.ragagent.retrieval.engine.VectorStoreRepoOwnership;
-import com.ragagent.contract.vectorstore.VectorStoreLookup;
-import com.ragagent.retrieval.engine.doris.DorisRetrieveRepository;
-import com.ragagent.retrieval.engine.milvus.MilvusRetrieveRepository;
-import com.ragagent.retrieval.engine.qdrant.QdrantRetrieveRepository;
-import com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository;
-import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepository;
-import com.ragagent.retrieval.engine.weaviate.WeaviateRetrieveRepository;
 
 /**
  * 检索引擎层的生产装配。

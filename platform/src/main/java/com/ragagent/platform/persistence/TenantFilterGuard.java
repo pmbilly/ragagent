@@ -2,6 +2,7 @@ package com.ragagent.platform.persistence;
 
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
+import java.util.Set;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
@@ -11,8 +12,6 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Set;
 
 /**
  * 租户过滤缺失<b>探测</b>（租户过滤单点化评估的 Step 2，fail-loud 路线）。

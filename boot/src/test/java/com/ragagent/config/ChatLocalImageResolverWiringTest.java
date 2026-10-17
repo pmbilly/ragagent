@@ -1,7 +1,5 @@
 package com.ragagent.config;
 
-import com.ragagent.storage.fileserve.StorageFileResolver;
-import com.ragagent.contract.storage.fileserve.OpenedFile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -14,28 +12,28 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.contract.storage.fileserve.FileContentService;
+import com.ragagent.contract.storage.fileserve.OpenedFile;
+import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
+import com.ragagent.platform.storage.fileserve.StoragePaths;
+import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.storage.domain.StoredResource;
+import com.ragagent.storage.fileserve.StorageFileResolver;
+import com.ragagent.storage.mapper.ResourceRepository;
+import com.ragagent.storage.mapper.StorageBackendRepository;
+import com.ragagent.storage.service.ResourceCatalogService;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Optional;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
-import com.ragagent.auth.service.TenantService;
-import com.ragagent.storage.domain.StorageBackend;
-import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
-import com.ragagent.storage.domain.StoredResource;
-import com.ragagent.storage.mapper.ResourceRepository;
-import com.ragagent.storage.mapper.StorageBackendRepository;
-import com.ragagent.storage.service.ResourceCatalogService;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
-import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.contract.storage.fileserve.FileContentService;
 
 /**
  * {@link ChatLocalImageResolverWiring} 的装配单测（mock 依赖）+ 两条集成式断言

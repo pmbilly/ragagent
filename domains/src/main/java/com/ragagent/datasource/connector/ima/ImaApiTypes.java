@@ -1,11 +1,10 @@
 package com.ragagent.datasource.connector.ima;
 
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.List;
+import java.util.Map;
 
 /**
  * IMA OpenAPI 的请求/响应形状。

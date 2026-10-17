@@ -1,15 +1,13 @@
 package com.ragagent.storage.api;
 
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
-import com.ragagent.contract.storage.StorageBackendView;
-import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.contract.storage.StorageBackendPort;
+import com.ragagent.contract.storage.StorageBackendView;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.mapper.StorageBackendRepository;
 import com.ragagent.storage.service.StorageBackendService;
-import com.ragagent.platform.web.JsonMappers;
+import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link StorageBackendPort} 的存储域实现：探测与脱敏转发运行时探测服务，清单转发元数据仓储。

@@ -1,5 +1,6 @@
 package com.ragagent.rerank;
 
+import com.ragagent.platform.http.LlmTransport;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -7,8 +8,6 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map;
-
-import com.ragagent.platform.http.LlmTransport;
 
 /**
  * rerank 包共享的 SSRF 安全 HTTP 设施。

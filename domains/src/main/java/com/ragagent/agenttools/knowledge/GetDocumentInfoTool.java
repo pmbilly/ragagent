@@ -1,5 +1,21 @@
 package com.ragagent.agenttools.knowledge;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agenttools.knowledge.FaqSnippet.SimilarQuestionsDisplay;
+import com.ragagent.contract.agent.SearchAuth;
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.knowledge.DocChunkSupport;
+import com.ragagent.platform.knowledge.DocChunkSupport.ChunkPage;
+import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoReader;
+import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoRow;
+import com.ragagent.platform.knowledge.DocChunkSupport.PagedChunks;
+import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -7,23 +23,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.knowledge.DocChunkSupport.ChunkPage;
-import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoReader;
-import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoRow;
-import com.ragagent.platform.knowledge.DocChunkSupport.PagedChunks;
-import com.ragagent.agenttools.knowledge.FaqSnippet.SimilarQuestionsDisplay;
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.platform.tool.BaseTool;
-import com.ragagent.platform.knowledge.DocChunkSupport;
-import com.ragagent.contract.agent.SearchAuth;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.platform.web.JsonMappers;
 
 /**
  * get_document_info 工具。

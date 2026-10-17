@@ -1,7 +1,7 @@
 package com.ragagent.wiki.service.page;
 
-import java.util.List;
 import com.ragagent.contract.text.Whitespace;
+import java.util.List;
 
 /**
  * wiki ingest 的纯文本工具：slug 化、截断、预览、XML 转义、SUMMARY 行解析与

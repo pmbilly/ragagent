@@ -1,11 +1,11 @@
 package com.ragagent.websearch.controller;
 
 
+import com.ragagent.platform.web.ApiResult;
 import com.ragagent.websearch.dto.WebSearchProviderTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResult;
 
 /**
  * GET /api/v1/web-search/providers 的处理器（本控制器唯一路由）。

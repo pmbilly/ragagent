@@ -1,11 +1,10 @@
 package com.ragagent.knowledge.support;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.platform.web.JsonMappers;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 知识库实体 → 行视图的**域内单一映射**（供端口适配器、KB 控制器与 L1 dto 调用点共用）。

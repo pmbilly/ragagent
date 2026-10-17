@@ -1,12 +1,11 @@
 package com.ragagent.auth.apikey.controller.filter;
 
-import java.io.IOException;
-
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**

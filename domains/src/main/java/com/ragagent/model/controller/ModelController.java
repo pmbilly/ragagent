@@ -1,26 +1,26 @@
 package com.ragagent.model.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.platform.web.NonNullBody;
-import com.ragagent.platform.web.RejectEmptyBody;
-import com.ragagent.model.domain.Model;
 import com.ragagent.contract.model.ModelParameters;
+import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.model.domain.Model;
 import com.ragagent.model.dto.CreateModelRequest;
-import com.ragagent.model.dto.ModelProviderDto;
 import com.ragagent.model.dto.ModelDetailResponse;
+import com.ragagent.model.dto.ModelProviderDto;
 import com.ragagent.model.dto.UpdateModelRequest;
+import com.ragagent.model.service.ModelProviderCatalog;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
-import com.ragagent.model.service.ModelProviderCatalog;
-
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.NonNullBody;
+import com.ragagent.platform.web.RejectEmptyBody;
 import jakarta.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -34,8 +34,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 模型配置端点（CRUD + providers；写操作 = Admin+，读 = Viewer+）。

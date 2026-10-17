@@ -3,17 +3,15 @@ package com.ragagent.platform.storage.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.storage.support.FileUrlPort;
+import com.ragagent.contract.storage.support.Resolver;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.storage.support.FileUrlPort;
-import com.ragagent.contract.storage.support.Resolver;
 
 /**
  * {@link Rewriter} / {@link FileServiceResolver} 的对等测试。

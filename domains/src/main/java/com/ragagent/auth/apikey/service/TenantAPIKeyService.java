@@ -1,5 +1,10 @@
 package com.ragagent.auth.apikey.service;
 
+import com.ragagent.auth.apikey.domain.TenantAPIKey;
+import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
+import com.ragagent.auth.apikey.mapper.TenantAPIKeyRepository;
+import com.ragagent.contract.apikey.APIKeyCapability;
+import com.ragagent.contract.apikey.APIKeyScopeType;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -14,12 +19,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.ragagent.contract.apikey.APIKeyCapability;
-import com.ragagent.contract.apikey.APIKeyScopeType;
-import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
-import com.ragagent.auth.apikey.mapper.TenantAPIKeyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

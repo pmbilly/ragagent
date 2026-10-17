@@ -1,12 +1,11 @@
 package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
+import com.ragagent.contract.model.chat.FunctionCall;
+import com.ragagent.contract.model.chat.ToolCall;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import com.ragagent.contract.model.chat.FunctionCall;
-import com.ragagent.contract.model.chat.ToolCall;
 
 /**
  * 流式 tool_use 的累积器。

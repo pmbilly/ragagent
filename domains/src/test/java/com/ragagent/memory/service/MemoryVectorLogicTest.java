@@ -2,15 +2,14 @@ package com.ragagent.memory.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.contract.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.repository.MemoryRepository;
 import java.time.OffsetDateTime;
 import java.util.List;
-
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.contract.memory.MemoryKinds;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import com.ragagent.contract.memory.MemoryConfig;
-import com.ragagent.memory.repository.MemoryRepository;
 
 /**
  * {@link MemoryVectorService} 的纯函数部分

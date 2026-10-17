@@ -3,7 +3,6 @@ package com.ragagent.platform.knowledge;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
-
 import org.junit.jupiter.api.Test;
 
 /**

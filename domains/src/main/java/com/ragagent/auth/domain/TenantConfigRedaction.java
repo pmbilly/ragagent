@@ -1,16 +1,15 @@
 package com.ragagent.auth.domain;
 
+import com.ragagent.contract.tenant.ParserEngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig;
-
-import com.ragagent.contract.tenant.WebSearchConfig;
+import com.ragagent.contract.tenant.StorageEngineConfig.CosEngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig.Ks3EngineConfig;
-import com.ragagent.contract.tenant.StorageEngineConfig.S3EngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig.MinioEngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig.ObsEngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig.OssEngineConfig;
-import com.ragagent.contract.tenant.StorageEngineConfig.CosEngineConfig;
+import com.ragagent.contract.tenant.StorageEngineConfig.S3EngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig.TosEngineConfig;
-import com.ragagent.contract.tenant.ParserEngineConfig;
+import com.ragagent.contract.tenant.WebSearchConfig;
 
 /**
  * 租户配置密钥的打码与合并（响应面打码 / 更新面保留旧值）三族：

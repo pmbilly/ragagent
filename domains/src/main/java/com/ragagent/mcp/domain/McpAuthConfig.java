@@ -1,9 +1,8 @@
 package com.ragagent.mcp.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * MCP 服务鉴权配置。

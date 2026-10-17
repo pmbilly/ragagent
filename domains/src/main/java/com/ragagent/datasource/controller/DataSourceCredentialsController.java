@@ -1,21 +1,23 @@
 package com.ragagent.datasource.controller;
 
-import com.ragagent.platform.web.JsonBodyErrors;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.RequestFields;
-import java.util.Map;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.dto.DatasourceCredentialsResponse;
 import com.ragagent.datasource.service.DataSourceService;
 import com.ragagent.datasource.service.KnowledgeBridge;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.JsonBodyErrors;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.RequestFields;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +26,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 
 /**
  * 数据源的凭据子资源（{@code PUT /datasource/:id/credentials} 与

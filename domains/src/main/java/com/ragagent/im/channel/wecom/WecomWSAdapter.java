@@ -1,14 +1,13 @@
 package com.ragagent.im.channel.wecom;
 
-import java.net.http.HttpClient;
-import java.time.Duration;
-
-import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.im.runtime.AdapterInterfaces;
 import com.ragagent.im.runtime.CallbackExchange;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ReplyMessage;
+import com.ragagent.platform.security.SsrfGuard;
+import java.net.http.HttpClient;
+import java.time.Duration;
 
 /**
  * 企业微信长连接（智能机器人）适配器。

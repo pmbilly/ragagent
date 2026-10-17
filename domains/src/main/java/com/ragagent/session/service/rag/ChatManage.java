@@ -1,18 +1,17 @@
 package com.ragagent.session.service.rag;
 
+import com.ragagent.contract.event.EventBusInterface;
+import com.ragagent.contract.graph.GraphData;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.session.PipelineMessageAttachmentView;
+import com.ragagent.contract.session.PipelineUsedMemoryView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.session.PipelineMessageAttachmentView;
-import com.ragagent.contract.session.PipelineUsedMemoryView;
-import com.ragagent.contract.graph.GraphData;
 
 /**
  * 一次 chat 管线执行的全部配置、状态与运行时句柄，按请求段、状态段、运行时段三部分组织。

@@ -4,17 +4,15 @@ import static com.ragagent.session.service.rag.Rec46cSupport.assertRec;
 import static com.ragagent.session.service.rag.Rec46cSupport.errOf;
 import static com.ragagent.session.service.rag.Rec46cSupport.json;
 
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.session.PipelineMessageAttachmentView;
+import com.ragagent.contract.session.PipelineUsedMemoryView;
+import com.ragagent.session.service.rag.plugin.PluginError;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.session.service.rag.plugin.PluginError;
-import com.ragagent.contract.session.PipelineMessageAttachmentView;
-import com.ragagent.contract.session.PipelineUsedMemoryView;
-import com.ragagent.contract.retrieval.SearchTarget;
 
 /**
  * 录制回放：event_manager / builder / plugin_error / chat_manage 组

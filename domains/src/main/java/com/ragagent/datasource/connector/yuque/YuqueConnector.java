@@ -1,18 +1,5 @@
 package com.ragagent.datasource.connector.yuque;
 
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.ragagent.datasource.domain.connector.Connector;
-import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2Doc;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2DocDetail;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2Group;
@@ -23,6 +10,18 @@ import com.ragagent.datasource.domain.DataSourceConstants;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

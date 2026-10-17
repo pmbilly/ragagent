@@ -1,11 +1,10 @@
 package com.ragagent.datasource.connector.feishu.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * 飞书连接器配置与导出格式常量。

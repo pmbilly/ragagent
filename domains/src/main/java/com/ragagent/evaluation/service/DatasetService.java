@@ -1,5 +1,8 @@
 package com.ragagent.evaluation.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.evaluation.domain.QaPair;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -7,10 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.evaluation.domain.QaPair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

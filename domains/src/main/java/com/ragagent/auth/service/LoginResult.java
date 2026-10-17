@@ -1,10 +1,9 @@
 package com.ragagent.auth.service;
 
-import java.util.List;
-
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.Membership;
 import com.ragagent.contract.tenant.TenantRowView;
+import java.util.List;
 
 /**
  * 登录结果（service 层形态）。

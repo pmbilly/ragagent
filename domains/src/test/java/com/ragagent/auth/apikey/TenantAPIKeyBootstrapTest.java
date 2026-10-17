@@ -2,11 +2,10 @@ package com.ragagent.auth.apikey;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-import java.util.Map;
-
 import com.ragagent.auth.apikey.controller.filter.APIKeyAuthChannel;
 import com.ragagent.auth.apikey.service.TenantAPIKeyBootstrap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**

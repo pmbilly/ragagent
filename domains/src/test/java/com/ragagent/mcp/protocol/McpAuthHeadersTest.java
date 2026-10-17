@@ -6,12 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.mcp.domain.McpAuthConfig;
+import com.ragagent.mcp.domain.McpAuthType;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.mcp.domain.McpAuthConfig;
-import com.ragagent.mcp.domain.McpAuthType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

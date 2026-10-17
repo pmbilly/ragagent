@@ -1,17 +1,15 @@
 package com.ragagent.im.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ragagent.im.domain.ImChannelEntity;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.im.domain.ImChannelEntity;
 
 /**
  * im_channels 仓储（列集见 migrations 000021/000023/000024/000028）。

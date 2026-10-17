@@ -3,6 +3,11 @@ package com.ragagent.modelruntime.adapter.provider.vlm;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.model.VlmConfig;
+import com.ragagent.llm.ollama.OllamaService;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -10,16 +15,9 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.model.VlmConfig;
-import com.ragagent.llm.ollama.OllamaService;
-import com.sun.net.httpserver.HttpServer;
 
 /**
  * Ollama 界面的 VLM：

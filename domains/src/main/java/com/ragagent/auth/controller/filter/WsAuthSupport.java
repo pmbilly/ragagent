@@ -1,24 +1,23 @@
 package com.ragagent.auth.controller.filter;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
 import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.ValidatedToken;
+import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.config.TenantProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * JWT 认证装配支持（沙箱终端 WS 等非过滤器入口复用）。

@@ -13,34 +13,32 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.audit.WikiActivityAudit;
+import com.ragagent.contract.knowledge.ChunkPort;
+import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeSpanPort;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.wiki.domain.TaskPendingOp;
+import com.ragagent.wiki.domain.WikiConfig;
+import com.ragagent.wiki.domain.WikiExtractionGranularity;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.page.WikiPageLite;
+import com.ragagent.wiki.repository.TaskPendingOpsRepository;
+import com.ragagent.wiki.service.WikiModelResolver;
+import com.ragagent.wiki.service.page.WikiPageService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.ObjectProvider;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.contract.knowledge.KnowledgeSpanPort;
-import com.ragagent.contract.knowledge.ChunkPort;
-import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.audit.WikiActivityAudit;
-import com.ragagent.wiki.domain.TaskPendingOp;
-import com.ragagent.wiki.domain.page.WikiPageLite;
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.wiki.repository.TaskPendingOpsRepository;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.wiki.service.WikiModelResolver;
-import com.ragagent.wiki.service.page.WikiPageService;
-import com.ragagent.wiki.domain.WikiConfig;
-import com.ragagent.wiki.domain.WikiExtractionGranularity;
-import com.ragagent.wiki.domain.WikiPage;
 
 /**
  * {@link WikiIngestBatchHandler} 的行为测试，外加批次主干里几个可独立验证的纯函数

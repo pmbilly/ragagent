@@ -1,12 +1,11 @@
 package com.ragagent.datasource.connector.notion;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * 属性抽取的四个纯函数（{@code extractTitle} / {@code joinPlainText} /

@@ -1,32 +1,27 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.contract.storage.fileserve.OpenedFile;
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.contract.error.BizException;
-
-import com.ragagent.contract.tenant.TenantConfigLookup;
-
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.storage.domain.StoredResource;
-import com.ragagent.storage.service.ResourceCatalogService;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.platform.text.ContentTypeByFilename;
-import com.ragagent.platform.storage.fileserve.FileProxyPort;
+import com.ragagent.contract.storage.fileserve.FileContentService;
 import com.ragagent.contract.storage.fileserve.MessageFactsLookup;
+import com.ragagent.contract.storage.fileserve.OpenedFile;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.storage.fileserve.FileProxyPort;
 import com.ragagent.platform.storage.fileserve.FileServeHttp;
 import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.contract.storage.fileserve.FileContentService;
+import com.ragagent.platform.text.ContentTypeByFilename;
+import com.ragagent.storage.domain.StoredResource;
+import com.ragagent.storage.service.ResourceCatalogService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
  * 文件代理面共享处理器：

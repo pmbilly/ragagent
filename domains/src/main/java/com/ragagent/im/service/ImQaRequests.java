@@ -1,17 +1,16 @@
 package com.ragagent.im.service;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.agent.AgentLookup;
-import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.runtime.ImFormat;
-import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
-import com.ragagent.contract.session.QaRequestPayload;
+import com.ragagent.contract.json.JsonValues;
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.contract.session.MessageView;
+import com.ragagent.contract.session.QaRequestPayload;
 import com.ragagent.contract.session.SessionView;
-import com.ragagent.contract.json.JsonValues;
+import com.ragagent.im.runtime.ImFormat;
+import com.ragagent.im.runtime.IncomingMessage;
+import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
+import java.util.List;
 
 /**
  * QA 管线的共享底座：agent 模式判定、IM 请求构造（含 agent config 缺省补全）、

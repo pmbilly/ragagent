@@ -2,22 +2,21 @@ package com.ragagent.auth.apikey;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
-import com.ragagent.contract.apikey.APIKeyCapability;
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicy;
 import com.ragagent.auth.apikey.controller.filter.AllowFileServeAPIKeyInterceptor;
 import com.ragagent.auth.apikey.controller.filter.DenyAPIKeyPrincipalInterceptor;
+import com.ragagent.contract.apikey.APIKeyCapability;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
-import com.ragagent.contract.apikey.APIKeyScopeContext;
 
 /**
  * API-Key 门禁的行为测试。

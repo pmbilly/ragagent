@@ -3,15 +3,14 @@ package com.ragagent.session;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-
 import com.ragagent.TestSchema;
+import com.ragagent.contract.session.SuggestionItem;
 import com.ragagent.session.domain.message.MessageSuggestionEvent;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.session.domain.message.MessageSuggestionSetNotFoundException;
-import com.ragagent.contract.session.SuggestionItem;
 import com.ragagent.session.repository.MessageSuggestionRepository;
+import java.time.OffsetDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

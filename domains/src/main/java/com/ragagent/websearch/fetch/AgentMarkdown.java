@@ -1,14 +1,14 @@
 package com.ragagent.websearch.fetch;
 
 import com.ragagent.contract.websearch.FetchException;
+import com.ragagent.platform.text.HtmlToMarkdown;
+import com.ragagent.platform.text.JdkHtmlToMarkdown;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.ragagent.platform.text.HtmlToMarkdown;
-import com.ragagent.platform.text.JdkHtmlToMarkdown;
 
 /**
  * agent 用 HTML → Markdown 抽取。

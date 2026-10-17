@@ -10,11 +10,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Map;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelParameters;
@@ -23,6 +18,9 @@ import com.ragagent.contract.model.VlmPredictor;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.security.SsrfGuard;
+import java.util.Map;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * {@link ModelRuntime#vlmPredictorFor} 的装配语义（原 domains 侧 VlmDescriberWiringTest 的

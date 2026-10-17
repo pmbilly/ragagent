@@ -1,16 +1,13 @@
 package com.ragagent.mcp.tool;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.contract.tool.ApprovalCancellations;
+import com.ragagent.contract.tool.Decision;
+import com.ragagent.contract.tool.PendingRequest;
 import com.ragagent.contract.tool.ToolApprovalGate;
+import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolExecContext;
+import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
@@ -19,13 +16,15 @@ import com.ragagent.mcp.protocol.ContentItem;
 import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.contract.tool.Decision;
-import com.ragagent.contract.tool.PendingRequest;
-import com.ragagent.contract.tool.AgentTool;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.contract.tool.ToolExecContext;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * MCP 工具的动态包装。

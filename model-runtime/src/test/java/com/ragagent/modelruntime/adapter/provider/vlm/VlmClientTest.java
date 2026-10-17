@@ -4,16 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.model.VlmConfig;
+import com.ragagent.modelruntime.adapter.provider.vlm.VlmClient.VlmException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.contract.model.VlmConfig;
-import com.ragagent.modelruntime.adapter.provider.vlm.VlmClient.VlmException;
 
 /**
  * VLM Predict 客户端：请求体形状（multipart、

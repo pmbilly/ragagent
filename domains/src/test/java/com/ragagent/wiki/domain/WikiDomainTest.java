@@ -1,31 +1,29 @@
 package com.ragagent.wiki.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.contract.wiki.WikiException;
+import com.ragagent.contract.wiki.WikiIndex;
+import com.ragagent.contract.wiki.WikiIndexEntry;
+import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.wiki.domain.folder.WikiFolder;
 import com.ragagent.wiki.domain.folder.WikiFolderConflictException;
 import com.ragagent.wiki.domain.folder.WikiFolderNode;
 import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;
 import com.ragagent.wiki.domain.folder.WikiFolderNotFoundException;
 import com.ragagent.wiki.domain.graph.WikiGraph;
-import com.ragagent.contract.wiki.WikiIndex;
-import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.wiki.domain.page.WikiPageConflictException;
 import com.ragagent.wiki.domain.page.WikiPageLite;
-import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.wiki.domain.page.WikiPageRevision;
 import com.ragagent.wiki.domain.page.WikiStats;
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.contract.wiki.WikiException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.Test;
 
 /**

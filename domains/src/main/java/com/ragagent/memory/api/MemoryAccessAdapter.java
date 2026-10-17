@@ -1,18 +1,16 @@
 package com.ragagent.memory.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.memory.MemoryExtractionPort;
+import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRecallPort;
 import com.ragagent.contract.memory.MemorySearchHit;
 import com.ragagent.contract.memory.MemorySearchHits;
 import com.ragagent.contract.memory.MemorySearchPort;
-import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.memory.service.MemoryExtractionService;
 import com.ragagent.memory.service.MemoryService;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * 记忆三个 L1 端口的 memory 域实现：逐字转发域内服务，不新增缓冲、不改失败口径。

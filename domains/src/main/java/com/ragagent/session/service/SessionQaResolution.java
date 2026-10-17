@@ -1,17 +1,17 @@
 package com.ragagent.session.service;
 
-import com.ragagent.platform.prompt.PromptSource;
-import com.ragagent.platform.web.JsonMappers;
-import java.io.InputStream;
-import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.platform.prompt.PromptSource;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.service.rag.ChatManage;
+import java.io.InputStream;
+import java.util.List;
 
 /**
  * 知识库/模型/租户解析协作者:mention 与 tag 范围收敛到 agent 授权面、chat 模型选择、

@@ -1,16 +1,13 @@
 package com.ragagent.approval;
 
+import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.tool.ApprovalEvent;
-
 import com.ragagent.contract.tool.ApprovalEventBus;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-
-import com.ragagent.contract.model.ResponseType;
 
 /**
  * 测试用事件总线（额外记录已 emit 的事件供断言）。

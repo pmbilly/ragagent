@@ -1,9 +1,8 @@
 package com.ragagent.contract.pipeline;
 
-import java.util.List;
-
 import com.ragagent.contract.websearch.WebSearchRequest;
 import com.ragagent.contract.websearch.WebSearchResult;
+import java.util.List;
 
 /**
  * 联网搜索执行端口（引擎侧接口）：按 provider + 工具面请求执行一次 web 搜索。

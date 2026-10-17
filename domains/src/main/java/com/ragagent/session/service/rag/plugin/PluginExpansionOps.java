@@ -1,5 +1,11 @@
 package com.ragagent.session.service.rag.plugin;
 
+import com.ragagent.contract.retrieval.SearchParams;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineLog;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -9,13 +15,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
-
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.retrieval.SearchParams;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.platform.access.TenantContextSnapshot;
 
 /**
  * 查询扩展协作者（自 {@link PluginSearch} 拆出）：

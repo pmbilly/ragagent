@@ -1,19 +1,18 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.contract.text.Whitespace;
+import com.ragagent.contract.wiki.WikiIngestPort;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
+import com.ragagent.wiki.domain.TaskPendingOp;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.ragagent.contract.wiki.WikiIngestPort;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
-import com.ragagent.wiki.domain.TaskPendingOp;
-import com.ragagent.contract.text.Whitespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
 
 /**
  * wiki 摄取的写面：待办 op 持久化（task_pending_ops）、ingest/retract 投递、

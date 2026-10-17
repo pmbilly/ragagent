@@ -3,10 +3,9 @@ package com.ragagent.evaluation.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import com.ragagent.platform.prompt.PromptTemplates;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.platform.prompt.PromptTemplates;
 
 /**
  * 评估生效值的来源守门：四个值必须真从模板取到（模板改名/文件缺失会静默退化为空串，

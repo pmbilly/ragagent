@@ -1,8 +1,7 @@
 package com.ragagent.knowledge.service.management;
 
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.knowledge.KnowledgeMaintenancePort;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link KnowledgeMaintenancePort} 的 knowledge 侧实现：把"删知识条目 / 删知识库"

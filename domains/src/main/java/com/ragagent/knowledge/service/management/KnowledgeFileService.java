@@ -1,46 +1,41 @@
 package com.ragagent.knowledge.service.management;
 
-import com.ragagent.contract.storage.fileserve.OpenedFile;
-import com.ragagent.knowledge.service.KnowledgeAccessHelper;
-
-import com.ragagent.knowledge.domain.KnowledgeTenants;
-
-import com.ragagent.knowledge.repository.KnowledgeRepository;
-
-import com.ragagent.knowledge.repository.ChunkRepository;
-
-import com.ragagent.knowledge.support.KnowledgePaths;
-
-import com.ragagent.platform.web.JsonMappers;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.knowledge.KnowledgeIngest;
-import com.ragagent.platform.text.CleanInvalidUtf8;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.InputSanitizer;
+import com.ragagent.contract.knowledge.KnowledgeIngest;
+import com.ragagent.contract.storage.fileserve.OpenedFile;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeTenants;
+import com.ragagent.knowledge.index.ChunkVectorIndexer;
+import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.knowledge.service.KnowledgeAccessHelper;
+import com.ragagent.knowledge.storage.LocalStorageService;
+import com.ragagent.knowledge.storage.TenantFileStorage;
+import com.ragagent.knowledge.support.KnowledgePaths;
+import com.ragagent.platform.security.InputSanitizer;
+import com.ragagent.platform.text.CleanInvalidUtf8;
+import com.ragagent.platform.web.JsonMappers;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import com.ragagent.knowledge.storage.LocalStorageService;
-import com.ragagent.knowledge.storage.TenantFileStorage;
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import com.ragagent.knowledge.index.ChunkVectorIndexer;
 
 /**
  * 知识文件/行写面：manual 知识更新（全列写语义）、文件下载流、图片信息更新与

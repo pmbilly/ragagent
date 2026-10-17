@@ -1,10 +1,9 @@
 package com.ragagent.initialization.dto;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.ModelView;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * initialization POST 响应里的 models 序列化（自有契约,键 = camelCase）：

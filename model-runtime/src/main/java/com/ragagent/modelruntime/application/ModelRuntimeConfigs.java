@@ -1,18 +1,18 @@
 package com.ragagent.modelruntime.application;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.embedding.EmbedderConfig;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.VlmConfig;
 import com.ragagent.contract.model.chat.ChatConfig;
+import com.ragagent.embedding.EmbedderConfig;
+import com.ragagent.embedding.EmbedderConfigs;
 import com.ragagent.llm.provider.Config;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.rerank.RerankerConfig;
+import com.ragagent.rerank.RerankerConfigs;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import com.ragagent.contract.model.VlmConfig;
-import com.ragagent.rerank.RerankerConfigs;
-import com.ragagent.embedding.EmbedderConfigs;
 
 /**
  * 「模型行 → 各能力运行时配置」的映射（原散在 5 个能力层配置类里的 {@code fromModel} 静态工厂）。

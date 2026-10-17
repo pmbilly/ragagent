@@ -1,8 +1,5 @@
 package com.ragagent.platform.web;
 
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,6 +10,8 @@ import com.ragagent.contract.model.chat.FunctionCall;
 import com.ragagent.contract.model.chat.ImageUrl;
 import com.ragagent.contract.model.chat.MessageContentPart;
 import com.ragagent.contract.model.chat.ToolCall;
+import java.util.List;
+import java.util.Map;
 
 
 /**

@@ -1,5 +1,14 @@
 package com.ragagent.im.channel.wecom;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.im.runtime.AdapterInterfaces;
+import com.ragagent.im.runtime.CallbackExchange;
+import com.ragagent.im.runtime.FeishuWecomCrypt;
+import com.ragagent.im.runtime.ImTypes;
+import com.ragagent.im.runtime.IncomingMessage;
+import com.ragagent.im.runtime.ReplyMessage;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -11,25 +20,13 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.im.runtime.AdapterInterfaces;
-import com.ragagent.im.runtime.CallbackExchange;
-import com.ragagent.im.runtime.FeishuWecomCrypt;
-import com.ragagent.im.runtime.ImTypes;
-import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.runtime.ReplyMessage;
 
 /**
  * 企业微信自建应用 webhook 适配器。

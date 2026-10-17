@@ -1,25 +1,24 @@
 package com.ragagent.mcp.tool;
 
-import java.time.Duration;
-import java.time.Instant;
-
+import com.ragagent.contract.event.Event;
+import com.ragagent.contract.event.EventBusInterface;
+import com.ragagent.contract.event.payload.MCPOAuthRequiredData;
 import com.ragagent.contract.tool.Cancellation;
 import com.ragagent.contract.tool.Decision;
 import com.ragagent.contract.tool.OAuthPendingRequest;
-import com.ragagent.contract.event.Event;
-import com.ragagent.platform.event.EventType;
-import com.ragagent.contract.event.payload.MCPOAuthRequiredData;
+import com.ragagent.contract.tool.ToolCancellation;
+import com.ragagent.contract.tool.ToolExecContext;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.oauth.OAuthReauthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
-import com.ragagent.mcp.protocol.McpOAuthRequiredException;
-import com.ragagent.platform.web.ToolJson;
 import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
-import com.ragagent.contract.tool.ToolCancellation;
-import com.ragagent.contract.tool.ToolExecContext;
-import com.ragagent.contract.event.EventBusInterface;
+import com.ragagent.mcp.protocol.McpOAuthRequiredException;
+import com.ragagent.platform.event.EventType;
+import com.ragagent.platform.web.ToolJson;
+import java.time.Duration;
+import java.time.Instant;
 
 /**
  * MCP OAuth 的会话挂载与重试。

@@ -7,25 +7,23 @@ import static com.ragagent.session.service.rag.Rec46cSupport.resultIDs;
 import static com.ragagent.session.service.rag.Rec46cSupport.scores;
 import static com.ragagent.session.service.rag.Rec46cSupport.searchResultsShape;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
+import com.ragagent.contract.memory.MemoryItemView;
+import com.ragagent.contract.memory.MemoryRecall;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.session.service.rag.plugin.PluginError;
 import com.ragagent.session.service.rag.plugin.PluginMemoryAffinity;
 import com.ragagent.session.service.rag.plugin.PluginMemoryRecall;
 import com.ragagent.session.service.rag.plugin.PluginRerank;
 import com.ragagent.session.service.rag.plugin.PluginWikiBoost;
 import com.ragagent.session.service.rag.support.ReferencesSupport;
-import com.ragagent.contract.memory.MemoryItemView;
-import com.ragagent.contract.memory.MemoryRecall;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.retrieval.SearchTarget;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * 录制回放：rerank（清洗/段落/编排）+ wiki_boost + memory_recall/affinity + progress

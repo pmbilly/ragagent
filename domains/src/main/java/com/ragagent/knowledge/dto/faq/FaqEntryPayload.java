@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.dto.faq;
 
-import java.util.List;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 
 /** FAQ 条目载荷（落库与跨任务传递共用）。 */
 public record FaqEntryPayload(

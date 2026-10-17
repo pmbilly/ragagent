@@ -2,7 +2,6 @@ package com.ragagent.mcp.protocol;
 
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpAuthType;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 

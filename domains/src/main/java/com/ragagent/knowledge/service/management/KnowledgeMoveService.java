@@ -1,32 +1,31 @@
 package com.ragagent.knowledge.service.management;
 
+import com.ragagent.contract.graph.NameSpace;
+import com.ragagent.contract.knowledge.KnowledgeIngest;
+import com.ragagent.contract.model.Embedder;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.IndexEngine;
+import com.ragagent.contract.retrieval.IndexEngineResolver;
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
+import com.ragagent.contract.tenant.TenantStorageQuotaPort;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
+import com.ragagent.knowledge.index.KnowledgeVectorWrites;
+import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
-
+import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
+import com.ragagent.knowledge.task.KnowledgeTaskProgressStore;
+import com.ragagent.platform.access.TenantContext;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.contract.knowledge.KnowledgeIngest;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.contract.retrieval.RetrieveGraphRepository;
-import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
-import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.retrieval.IndexEngineResolver;
-import org.springframework.stereotype.Service;
-import com.ragagent.contract.graph.NameSpace;
-import com.ragagent.contract.model.Embedder;
-import com.ragagent.knowledge.task.KnowledgeTaskProgressStore;
-import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
-import com.ragagent.contract.tenant.TenantStorageQuotaPort;
-import java.time.Instant;
 import java.util.Objects;
-import com.ragagent.knowledge.index.KnowledgeVectorWrites;
+import org.springframework.stereotype.Service;
 
 /**
  * 知识库 Move（跨库搬移）worker 面。HTTP 契约 = 立即返回 + 进度查询；

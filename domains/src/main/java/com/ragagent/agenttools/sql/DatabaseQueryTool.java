@@ -1,22 +1,21 @@
 package com.ragagent.agenttools.sql;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
+import com.ragagent.contract.agent.SearchAuth;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.ToolJson;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.LongSupplier;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.web.ToolJson;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
-import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
-import com.ragagent.contract.agent.SearchAuth;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.platform.web.JsonMappers;
 
 /**
  * database_query 工具。

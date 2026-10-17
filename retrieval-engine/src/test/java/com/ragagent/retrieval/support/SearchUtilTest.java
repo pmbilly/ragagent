@@ -1,24 +1,22 @@
 package com.ragagent.retrieval.support;
 
-import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
-import com.ragagent.platform.knowledge.ImageInfoEnricher;
-import com.ragagent.platform.knowledge.ChunkSearchUtil;
-import com.ragagent.contract.retrieval.WebResultConverter;
-import com.ragagent.contract.retrieval.SearchTextUtil;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.ragagent.contract.knowledge.ChunkView;
+import com.ragagent.contract.retrieval.SearchChunkMerge;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchTextUtil;
+import com.ragagent.contract.retrieval.WebResultConverter;
+import com.ragagent.contract.websearch.ImageInfo;
+import com.ragagent.contract.websearch.WebSearchResult;
+import com.ragagent.platform.knowledge.ChunkSearchUtil;
+import com.ragagent.platform.knowledge.ImageInfoEnricher;
+import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.contract.retrieval.SearchChunkMerge;
-import com.ragagent.contract.websearch.ImageInfo;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.websearch.WebSearchResult;
 
 /**
  * searchutil 纯函数测试（chunkmerge / imageinfo_html /

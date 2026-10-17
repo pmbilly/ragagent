@@ -1,38 +1,37 @@
 package com.ragagent.knowledge.service.management;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.Embedder;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.IndexEngine;
+import com.ragagent.contract.retrieval.IndexEngineResolver;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.knowledge.dto.kb.KBCloneProgress;
+import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
-
+import com.ragagent.knowledge.service.image.ExtractedImageStore;
+import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
+import com.ragagent.knowledge.task.KnowledgeTaskProgressStore;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.dto.kb.KBCloneProgress;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.retrieval.IndexEngineResolver;
-import org.springframework.stereotype.Service;
-import com.ragagent.contract.model.Embedder;
-import com.ragagent.knowledge.task.KnowledgeTaskProgressStore;
-import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.Instant;
-import java.util.HashSet;
 import java.util.Set;
-import com.ragagent.knowledge.index.KnowledgeVectorWrites;
-import com.ragagent.knowledge.service.image.ExtractedImageStore;
+import java.util.UUID;
+import org.springframework.stereotype.Service;
 
 /**
  * KB clone（copy 路由 worker 面）+ Duplicate（同步 settings-only）+ 跨库兼容性校验。

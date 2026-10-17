@@ -1,20 +1,18 @@
 package com.ragagent.rerank.provider;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.ragagent.contract.model.RankResult;
+import com.ragagent.contract.model.Reranker;
+import com.ragagent.platform.web.ProviderJson;
+import com.ragagent.rerank.RerankHttp;
+import com.ragagent.rerank.RerankerConfig;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.ragagent.platform.web.ProviderJson;
-import com.ragagent.contract.model.RankResult;
-import com.ragagent.rerank.RerankHttp;
-import com.ragagent.contract.model.Reranker;
-import com.ragagent.rerank.RerankerConfig;
 
 /**
  * 火山引擎（托管知识服务）rerank 客户端。

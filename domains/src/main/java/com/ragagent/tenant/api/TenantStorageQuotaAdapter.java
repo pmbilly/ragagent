@@ -1,14 +1,12 @@
 package com.ragagent.tenant.api;
 
+import com.ragagent.contract.tenant.TenantStorageQuotaPort;
+import com.ragagent.tenant.domain.Tenant;
+import com.ragagent.tenant.mapper.TenantMapper;
 import java.sql.Timestamp;
 import java.time.Instant;
-
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-
-import com.ragagent.contract.tenant.TenantStorageQuotaPort;
-import com.ragagent.tenant.mapper.TenantMapper;
-import com.ragagent.tenant.domain.Tenant;
 
 /** {@link TenantStorageQuotaPort} 的租户域实现（配额读写都发生在租户表的属主域）。 */
 @Component

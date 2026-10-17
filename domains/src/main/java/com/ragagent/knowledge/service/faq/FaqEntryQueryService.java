@@ -1,39 +1,38 @@
 package com.ragagent.knowledge.service.faq;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.retrieval.HybridSearchPort;
+import com.ragagent.contract.retrieval.SearchParams;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.ChunkPage;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeTag;
+import com.ragagent.knowledge.domain.access.FaqGuard;
+import com.ragagent.knowledge.dto.faq.FaqEntry;
+import com.ragagent.knowledge.dto.faq.FaqEntryPage;
+import com.ragagent.knowledge.dto.faq.FaqExportEntry;
+import com.ragagent.knowledge.dto.faq.FaqSearchRequest;
+import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.FaqChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
-
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.platform.security.LogSanitizer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.domain.KnowledgeTag;
-import com.ragagent.knowledge.dto.faq.FaqEntry;
-import com.ragagent.knowledge.dto.faq.FaqEntryPage;
-import com.ragagent.knowledge.dto.faq.FaqExportEntry;
-import com.ragagent.knowledge.repository.FaqChunkRepository;
-import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.contract.retrieval.SearchParams;
-import com.ragagent.contract.retrieval.HybridSearchPort;
-import com.ragagent.contract.retrieval.SearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.knowledge.domain.access.FaqGuard;
-import com.ragagent.knowledge.dto.faq.FaqSearchRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import java.nio.charset.StandardCharsets;
-import com.ragagent.knowledge.domain.ChunkPage;
-import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FAQ 条目查询面：分页列表、详情、导出（CSV/JSON）与混合检索。

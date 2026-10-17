@@ -1,20 +1,17 @@
 package com.ragagent.approval;
 
-import com.ragagent.platform.redis.RedisPubSub;
-
-import com.ragagent.contract.tool.PendingRequest;
-
-import com.ragagent.contract.tool.Cancellation;
-import com.ragagent.contract.tool.ToolApprovalException;
-
-import com.ragagent.contract.tool.Decision;
-
-import com.ragagent.platform.redis.SpringRedisPubSub;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.tool.Cancellation;
+import com.ragagent.contract.tool.Decision;
+import com.ragagent.contract.tool.PendingRequest;
+import com.ragagent.contract.tool.ToolApprovalException;
+import com.ragagent.platform.redis.RedisPubSub;
+import com.ragagent.platform.redis.SpringRedisPubSub;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -25,12 +22,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-
-import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
-import com.ragagent.contract.model.ResponseType;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;

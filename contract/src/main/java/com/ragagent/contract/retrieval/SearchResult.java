@@ -1,10 +1,9 @@
 package com.ragagent.contract.retrieval;
 
+import com.ragagent.contract.json.ByteKeyOrder;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import com.ragagent.contract.json.ByteKeyOrder;
 
 /**
  * 检索结果条目。

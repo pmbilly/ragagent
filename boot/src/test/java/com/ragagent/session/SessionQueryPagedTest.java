@@ -2,14 +2,13 @@ package com.ragagent.session;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
 import com.ragagent.TestSchema;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionListItem;
 import com.ragagent.session.domain.conversation.SessionListQuery;
 import com.ragagent.session.domain.conversation.SessionPage;
 import com.ragagent.session.repository.SessionRepository;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

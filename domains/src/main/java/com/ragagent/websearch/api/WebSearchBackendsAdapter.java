@@ -1,17 +1,15 @@
 package com.ragagent.websearch.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.pipeline.WebSearchExecutor;
 import com.ragagent.contract.tenant.WebSearchConfig;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.websearch.WebSearchRequest;
 import com.ragagent.contract.websearch.WebSearchResult;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.websearch.service.WebSearchService;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * 联网搜索两个对外执行面的 websearch 域实现（同源双面）：

@@ -1,8 +1,7 @@
 package com.ragagent.session.dto;
 
-import java.util.List;
-
 import com.ragagent.session.domain.conversation.SessionListItem;
+import java.util.List;
 
 /**
  * {@code GET /api/v1/sessions} 的分页响应（§2.1 的标准形状）。

@@ -1,5 +1,18 @@
 package com.ragagent.memory.service;
 
+import com.ragagent.contract.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryKeys;
+import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.memory.domain.MemoryText;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryItemEmbedding;
+import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.memory.domain.vector.MemoryVectorHit;
+import com.ragagent.memory.domain.vector.MemoryVectorQuery;
+import com.ragagent.memory.domain.vector.MemoryVectors;
+import com.ragagent.memory.repository.MemoryRepository;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.access.TenantScopes;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,23 +28,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import com.ragagent.contract.memory.MemoryConfig;
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.memory.domain.item.MemoryItemEmbedding;
-import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.contract.memory.MemoryKeys;
-import com.ragagent.memory.domain.scope.MemoryScope;
-import com.ragagent.memory.domain.MemoryText;
-import com.ragagent.memory.domain.vector.MemoryVectorHit;
-import com.ragagent.memory.domain.vector.MemoryVectorQuery;
-import com.ragagent.memory.domain.vector.MemoryVectors;
-import com.ragagent.memory.repository.MemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.access.TenantScopes;
 
 /**
  * 向量侧的全部动作。

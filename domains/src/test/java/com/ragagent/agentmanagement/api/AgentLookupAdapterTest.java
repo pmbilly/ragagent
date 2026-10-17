@@ -1,7 +1,6 @@
 package com.ragagent.agentmanagement.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import com.ragagent.contract.json.JsonValues;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -9,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
+import com.ragagent.contract.json.JsonValues;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * {@link AgentLookupAdapter} 的语义钉子（A③-⑰ im→agentmanagement 清零时新增的面）：

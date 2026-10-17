@@ -2,15 +2,14 @@ package com.ragagent.arch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.tngtech.archunit.core.domain.JavaClass;
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
-import com.tngtech.archunit.core.domain.JavaClass;
-import com.tngtech.archunit.core.importer.ClassFileImporter;
-import com.tngtech.archunit.core.importer.ImportOption;
-import com.tngtech.archunit.core.domain.JavaClasses;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

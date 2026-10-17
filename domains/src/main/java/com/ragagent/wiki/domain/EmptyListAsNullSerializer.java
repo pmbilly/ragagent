@@ -1,11 +1,10 @@
 package com.ragagent.wiki.domain;
 
-import java.io.IOException;
-import java.util.List;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * 把空/ null 的字符串列表序列化成 JSON 字面量 {@code null}（不是 {@code []}）。

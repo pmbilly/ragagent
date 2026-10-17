@@ -1,16 +1,14 @@
 package com.ragagent.tenant.domain;
 
-import com.ragagent.contract.tenant.APIPrincipalConfig;
-
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.tenant.APIPrincipalConfig;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import java.time.OffsetDateTime;
 
 /**
  * tenants 表实体。

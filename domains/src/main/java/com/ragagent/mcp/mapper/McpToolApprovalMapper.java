@@ -1,9 +1,8 @@
 package com.ragagent.mcp.mapper;
 
+import com.ragagent.mcp.domain.McpToolApproval;
 import java.time.OffsetDateTime;
 import java.util.List;
-
-import com.ragagent.mcp.domain.McpToolApproval;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

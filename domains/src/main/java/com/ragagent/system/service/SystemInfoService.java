@@ -1,5 +1,10 @@
 package com.ragagent.system.service;
 
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
+import com.ragagent.contract.storage.StorageBackendPort;
+import com.ragagent.contract.storage.StorageBackendView;
+import com.ragagent.platform.config.RetrievalDriverProperties;
+import com.ragagent.platform.storage.config.StorageAllowList;
 import java.sql.Connection;
 import java.time.Duration;
 import java.time.Instant;
@@ -10,20 +15,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.sql.DataSource;
-
-import com.ragagent.contract.storage.StorageBackendView;
-import com.ragagent.platform.config.RetrievalDriverProperties;
-import com.ragagent.platform.storage.config.StorageAllowList;
-import com.ragagent.contract.storage.StorageBackendPort;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Service;
-import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 
 /**
  * /system 组读端点的计算逻辑。

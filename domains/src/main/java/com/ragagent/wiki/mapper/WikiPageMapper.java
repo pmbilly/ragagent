@@ -1,15 +1,15 @@
 package com.ragagent.wiki.mapper;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.wiki.domain.SourceRefNeedle;
-import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.domain.WikiStringListTypeHandler;
+import com.ragagent.wiki.domain.page.WikiPageListRequest;
+import com.ragagent.wiki.domain.page.WikiPageLite;
+import java.time.OffsetDateTime;
+import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
@@ -17,7 +17,6 @@ import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import com.ragagent.wiki.domain.page.WikiPageListRequest;
 
 /**
  * wiki_pages 仓储语句（{@link com.ragagent.wiki.repository.WikiPageRepository} 的配套 SQL）。

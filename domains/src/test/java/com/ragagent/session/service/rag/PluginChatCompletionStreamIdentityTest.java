@@ -2,25 +2,23 @@ package com.ragagent.session.service.rag;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.model.StreamResponse;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.stream.QueuedChatStream;
+import com.ragagent.session.service.rag.plugin.PluginChatCompletionStream;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.session.service.rag.plugin.PluginChatCompletionStream;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.ChatStream;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.platform.stream.QueuedChatStream;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.StreamResponse;
 
 /**
  * A5：NORMAL 流消费线程必须显式继承请求身份。

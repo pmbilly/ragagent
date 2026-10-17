@@ -1,36 +1,33 @@
 package com.ragagent.session.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.contract.tenant.ChatHistoryConfig;
-import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.agent.ThinkBlocks;
-import com.ragagent.platform.access.TenantContext;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.HybridSearchPort;
-import com.ragagent.session.domain.ChatHistoryKbStats;
-import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageArtifact;
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.contract.session.MessageImage;
+import com.ragagent.contract.tenant.ChatHistoryConfig;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.domain.ChatHistoryKbStats;
+import com.ragagent.session.domain.message.ArtifactVersions;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
-
-import com.ragagent.session.domain.message.ArtifactVersions;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
-import com.ragagent.contract.knowledge.KnowledgeRowView;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
  * 消息服务。

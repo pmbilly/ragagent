@@ -1,13 +1,12 @@
 package com.ragagent.im.domain;
 
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.platform.persistence.JsonbRawStringTypeHandler;
+import java.time.OffsetDateTime;
 
 /**
  * IM 渠道会话：平台 (user×chat[×thread]) 组合 ↔ WeKnora 会话的映射。

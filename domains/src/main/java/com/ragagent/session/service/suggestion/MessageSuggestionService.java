@@ -1,41 +1,38 @@
 package com.ragagent.session.service.suggestion;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agentmanagement.service.AgentSuggestedQuestions;
+import com.ragagent.agentmanagement.service.CustomAgentService;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.session.MessageExecutionContext;
+import com.ragagent.contract.session.SuggestionItem;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
+import com.ragagent.platform.tracing.langfuse.Span;
+import com.ragagent.session.domain.conversation.SessionOwnerIds;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.domain.message.MessageSuggestionEvent;
+import com.ragagent.session.domain.message.MessageSuggestionSet;
+import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.service.MessageService;
-
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import com.ragagent.agentmanagement.service.AgentSuggestedQuestions;
-import com.ragagent.agentmanagement.service.CustomAgentService;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.contract.session.MessageExecutionContext;
-import com.ragagent.session.domain.message.MessageSuggestionEvent;
-import com.ragagent.session.domain.message.MessageSuggestionSet;
-import com.ragagent.session.domain.conversation.SessionOwnerIds;
-import com.ragagent.contract.session.SuggestionItem;
-import com.ragagent.session.repository.MessageSuggestionRepository;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
-import com.ragagent.contract.apikey.APIKeyScopeContext;
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
-import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
-import com.ragagent.platform.tracing.langfuse.Span;
 
 /**
  * 追问建议服务。

@@ -1,5 +1,9 @@
 package com.ragagent.retrieval.graph;
 
+import com.ragagent.contract.graph.GraphData;
+import com.ragagent.contract.graph.GraphNode;
+import com.ragagent.contract.graph.GraphRelation;
+import com.ragagent.contract.graph.NameSpace;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.neo4j.driver.AccessMode;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Record;
@@ -19,10 +22,6 @@ import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Relationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.contract.graph.GraphData;
-import com.ragagent.contract.graph.GraphNode;
-import com.ragagent.contract.graph.GraphRelation;
-import com.ragagent.contract.graph.NameSpace;
 
 /**
  * Neo4j 图仓储：实体/关系图谱的写（AddGraph）/删（DelGraph）/读（SearchNode）。

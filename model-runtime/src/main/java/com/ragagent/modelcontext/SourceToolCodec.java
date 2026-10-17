@@ -1,21 +1,19 @@
 package com.ragagent.modelcontext;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.MessageContentPart;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.platform.web.ToolJson;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ToolCall;
-
-import com.ragagent.platform.web.ToolJson;
-import com.ragagent.contract.model.chat.MessageContentPart;
 
 /**
  * source 句柄的<b>工具参数编解码</b>（自 {@code SourceRegistry} 的同名段外提）。

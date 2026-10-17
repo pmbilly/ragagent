@@ -6,21 +6,19 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.wiki.service.WikiModelResolver;
+import com.ragagent.wiki.service.page.WikiPageService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.wiki.service.WikiModelResolver;
-import com.ragagent.wiki.service.page.WikiPageService;
-import com.ragagent.contract.model.LlmChatClient;
 
 /**
  * {@link WikiIngestTaxonomy} 的测试，另含

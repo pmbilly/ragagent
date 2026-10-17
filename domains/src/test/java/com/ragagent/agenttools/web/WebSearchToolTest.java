@@ -2,9 +2,8 @@ package com.ragagent.agenttools.web;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
 
 /** 入参类型错误的文案钉子（LLM 可见）。 */
 class WebSearchToolTest {

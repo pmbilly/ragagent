@@ -1,11 +1,10 @@
 package com.ragagent.datasource.domain;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.platform.web.JsonMappers;
+import java.util.List;
 
 /**
  * 一次同步的成果汇总。

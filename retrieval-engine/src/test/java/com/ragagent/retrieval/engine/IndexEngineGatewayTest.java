@@ -5,15 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.contract.retrieval.RetrieveEngineException;
 import com.ragagent.contract.retrieval.TenantStoreOwnership;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * 索引引擎解析（R3b 契约化）：断言随行为从 domains 的 {@code KnowledgeVectorWritesTest} 迁来——

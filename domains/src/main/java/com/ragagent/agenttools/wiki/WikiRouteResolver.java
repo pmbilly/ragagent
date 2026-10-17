@@ -1,11 +1,11 @@
 package com.ragagent.agenttools.wiki;
 
+import com.ragagent.contract.agent.SearchAuth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import com.ragagent.contract.agent.SearchAuth;
 
 /** wiki 路由解析：页面唯一解析、创建目标 KB 决策、source ref 解析、issue 解析。 */
     public final class WikiRouteResolver {

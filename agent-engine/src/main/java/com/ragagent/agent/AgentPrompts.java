@@ -1,21 +1,20 @@
 package com.ragagent.agent;
 
+import com.ragagent.agent.compaction.ConversationSerializer;
+import com.ragagent.agent.prompt.AgentPromptTemplates;
+import com.ragagent.agent.prompt.GroundingPrompt;
+import com.ragagent.agent.prompt.PlaceholderDefinition;
+import com.ragagent.contract.agent.KnowledgeBaseInfo;
+import com.ragagent.contract.agent.PinnedSkillInstructions;
+import com.ragagent.contract.agent.SystemPromptSection;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.prompt.PromptComposer;
+import com.ragagent.platform.prompt.PromptConstants;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import com.ragagent.agent.compaction.ConversationSerializer;
-import com.ragagent.platform.prompt.PromptConstants;
-import com.ragagent.agent.prompt.AgentPromptTemplates;
-import com.ragagent.agent.prompt.GroundingPrompt;
-import com.ragagent.contract.agent.KnowledgeBaseInfo;
-import com.ragagent.contract.agent.PinnedSkillInstructions;
-import com.ragagent.agent.prompt.PlaceholderDefinition;
-import com.ragagent.contract.agent.SystemPromptSection;
 
 /**
  * agent 系统提示词合成。

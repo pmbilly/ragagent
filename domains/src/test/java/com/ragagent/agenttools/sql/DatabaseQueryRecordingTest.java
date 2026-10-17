@@ -2,6 +2,15 @@ package com.ragagent.agenttools.sql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agenttools.sql.DatabaseQueryTool.QueryResult;
+import com.ragagent.agenttools.sql.DatabaseQueryTool.SqlQueryExecutor;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.web.JsonMappers;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,19 +21,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.agenttools.sql.DatabaseQueryTool.QueryResult;
-import com.ragagent.agenttools.sql.DatabaseQueryTool.SqlQueryExecutor;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.agent.fixtures.GoRecording45B;
-import com.ragagent.agent.fixtures.RecordingSupport;
-import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 4.5b 回放：database_query 的录制回放。

@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine.sqlite;
 
+import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

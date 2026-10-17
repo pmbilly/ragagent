@@ -1,9 +1,5 @@
 package com.ragagent.datasource.task;
 
-import com.ragagent.datasource.DataSourceSyncEnqueueException;
-
-import com.ragagent.datasource.domain.connector.ConnectorException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -13,6 +9,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.TestSchema;
+import com.ragagent.datasource.DataSourceSyncEnqueueException;
+import com.ragagent.datasource.domain.DataSource;
+import com.ragagent.datasource.domain.DataSourceConstants;
+import com.ragagent.datasource.domain.DataSourceSyncPayload;
+import com.ragagent.datasource.domain.SyncLog;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.mapper.DataSourceRepository;
+import com.ragagent.datasource.mapper.SyncLogRepository;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -21,14 +26,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
-
-import com.ragagent.TestSchema;
-import com.ragagent.datasource.domain.DataSource;
-import com.ragagent.datasource.domain.DataSourceConstants;
-import com.ragagent.datasource.domain.DataSourceSyncPayload;
-import com.ragagent.datasource.domain.SyncLog;
-import com.ragagent.datasource.mapper.DataSourceRepository;
-import com.ragagent.datasource.mapper.SyncLogRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

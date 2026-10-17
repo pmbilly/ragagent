@@ -1,20 +1,19 @@
 package com.ragagent.agent.tool;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agent.skills.Manager;
+import com.ragagent.agent.skills.Skill;
 import com.ragagent.contract.agent.SkillCatalogPort;
+import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.skills.Manager;
-import com.ragagent.agent.skills.Skill;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.tool.BaseTool;
 
 /**
  * {@code read_file}：技能资源读取（无沙箱部署下技能是唯一可读的"文件源"）。

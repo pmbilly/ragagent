@@ -1,16 +1,15 @@
 package com.ragagent.memory.service;
 
+import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import java.time.Duration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
-import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 
 /**
  * {@link MemoryExtractTaskQueue} 的<b>进程内</b>实现：虚拟线程队列

@@ -1,5 +1,6 @@
 package com.ragagent.im.channel.wecom;
 
+import com.ragagent.platform.security.SsrfGuard;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.http.HttpClient;
@@ -12,12 +13,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-
-import com.ragagent.platform.security.SsrfGuard;
 
 /**
  * 企业微信两个模式的公共件（webhook 与长连接共用）：端点校验、下载、

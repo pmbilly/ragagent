@@ -1,14 +1,11 @@
 package com.ragagent.session.service;
 
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
-
-import javax.sql.DataSource;
-
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import com.ragagent.agenttools.web.WebFetchTool;
 import com.ragagent.contract.storage.ResourceCatalogPort;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+import javax.sql.DataSource;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * agent 抓取页的完整快照存取。

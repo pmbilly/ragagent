@@ -3,15 +3,13 @@ package com.ragagent.retrieval.engine.doris;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.contract.vectorstore.IndexConfig;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.contract.vectorstore.IndexConfig;
 
 /**
  * Doris 驱动纯函数族：

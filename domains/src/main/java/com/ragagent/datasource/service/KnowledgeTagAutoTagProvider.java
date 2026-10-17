@@ -1,11 +1,11 @@
 package com.ragagent.datasource.service;
 
-import com.ragagent.contract.error.BizException;
-import org.springframework.stereotype.Component;
 import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeTagView;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import org.springframework.stereotype.Component;
 
 /**
  * 自动标签的生产实现：同名标签存在 → 直接用；否则走 {@code KnowledgeTagService#createTag}

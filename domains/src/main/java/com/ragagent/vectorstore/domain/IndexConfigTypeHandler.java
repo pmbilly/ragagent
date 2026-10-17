@@ -1,15 +1,14 @@
 package com.ragagent.vectorstore.domain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.platform.web.JsonMappers;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
-import com.ragagent.contract.vectorstore.IndexConfig;
 
 /**
  * vector_stores.index_config jsonb 列的 TypeHandler（无加密，仅 JSON 往返；未知键容忍）。

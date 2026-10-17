@@ -2,13 +2,12 @@ package com.ragagent.knowledge.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.TestSchema;
+import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.TestSchema;
-import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

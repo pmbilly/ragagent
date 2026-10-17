@@ -1,15 +1,14 @@
 package com.ragagent.mcp.dto;
 
-import java.time.OffsetDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.ragagent.mcp.domain.McpAdvancedConfig;
 import com.ragagent.mcp.domain.McpConfigFingerprint;
 import com.ragagent.mcp.domain.McpMetadataSummary;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpStdioConfig;
+import java.time.OffsetDateTime;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * MCP 服务的主资源响应。

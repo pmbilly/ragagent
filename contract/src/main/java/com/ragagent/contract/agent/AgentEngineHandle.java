@@ -1,9 +1,8 @@
 package com.ragagent.contract.agent;
 
+import com.ragagent.contract.model.chat.ChatMessage;
 import java.util.List;
 import java.util.function.Supplier;
-
-import com.ragagent.contract.model.chat.ChatMessage;
 
 /**
  * agent 引擎句柄（R5c：业务域对运行中引擎的用法面）。

@@ -1,7 +1,8 @@
 package com.ragagent.platform.http;
 
-import java.io.IOException;
 import com.ragagent.platform.config.AppEnvLookup;
+import com.ragagent.platform.security.SsrfGuard;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.ProxySelector;
 import java.net.URI;
@@ -13,8 +14,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-
-import com.ragagent.platform.security.SsrfGuard;
 
 /**
  * LLM 裸 HTTP 调用的共享传输层。

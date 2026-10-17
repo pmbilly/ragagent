@@ -1,14 +1,13 @@
 package com.ragagent.auth.apikey.domain;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.contract.apikey.APIKeyScopeType;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 /**
  * tenant_api_keys 表实体。

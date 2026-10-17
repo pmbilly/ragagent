@@ -1,5 +1,23 @@
 package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.model.StreamResponse;
+import com.ragagent.contract.model.TokenUsage;
+import com.ragagent.contract.model.chat.CacheRetention;
+import com.ragagent.contract.model.chat.ChatConfig;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.model.chat.FunctionCall;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.llm.provider.ProviderBaseURLs;
+import com.ragagent.modelruntime.adapter.provider.chat.PromptCache;
+import com.ragagent.modelruntime.adapter.provider.chat.common.SseReader;
+import com.ragagent.platform.http.LlmTransport;
+import com.ragagent.platform.stream.QueuedChatStream;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -17,29 +35,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-
-import com.ragagent.contract.model.ChatStream;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.CacheRetention;
-import com.ragagent.contract.model.chat.ChatConfig;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.chat.FunctionCall;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.contract.model.chat.ToolCall;
-import com.ragagent.llm.provider.ProviderBaseURLs;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.modelruntime.adapter.provider.chat.PromptCache;
-import com.ragagent.platform.http.LlmTransport;
-import com.ragagent.modelruntime.adapter.provider.chat.common.SseReader;
-import com.ragagent.platform.stream.QueuedChatStream;
 
 /**
  * Anthropic Messages API 客户端。

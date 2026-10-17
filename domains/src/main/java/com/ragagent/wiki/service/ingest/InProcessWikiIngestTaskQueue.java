@@ -1,17 +1,16 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
-import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 
 /**
  * {@link WikiIngestTaskQueue} 的<b>进程内</b>实现：虚拟线程队列

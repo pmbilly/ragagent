@@ -3,16 +3,15 @@ package com.ragagent.memory;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-
 import com.ragagent.TestSchema;
+import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryConflictException;
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
 import com.ragagent.memory.repository.MemoryRepository;
+import java.time.OffsetDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,13 +2,11 @@ package com.ragagent.agent.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agent.fixtures.GoRecording45A;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * ParamValidator 的录制判定表（15 条 validateParams + 3 条

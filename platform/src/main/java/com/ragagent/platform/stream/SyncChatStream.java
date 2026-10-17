@@ -1,10 +1,9 @@
 package com.ragagent.platform.stream;
 
-import java.util.concurrent.SynchronousQueue;
-
-import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
+import java.util.concurrent.SynchronousQueue;
 
 /**
  * 无缓冲（{@code SynchronousQueue}）承载的流句柄：并发闸门装饰器用。

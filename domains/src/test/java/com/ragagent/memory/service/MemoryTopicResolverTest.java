@@ -5,17 +5,16 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.contract.model.ChatStream;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.repository.MemoryRepository;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

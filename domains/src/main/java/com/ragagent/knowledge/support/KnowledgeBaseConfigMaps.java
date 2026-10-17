@@ -1,7 +1,5 @@
 package com.ragagent.knowledge.support;
 
-import java.util.List;
-
 import com.ragagent.contract.knowledge.domain.AsrConfigView;
 import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
 import com.ragagent.contract.knowledge.domain.ImageProcessingConfigView;
@@ -16,6 +14,7 @@ import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.KnowledgeBaseStorageConfig;
 import com.ragagent.knowledge.domain.KnowledgeBaseStorageProviderConfig;
 import com.ragagent.knowledge.domain.KnowledgeBaseVlmConfig;
+import java.util.List;
 
 /**
  * 知识库配置形状的双向映射（领域形状 ⇄ 契约视图）——域内单一实现。

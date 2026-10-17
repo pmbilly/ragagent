@@ -1,15 +1,13 @@
 package com.ragagent.session.service;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@code AgentStreamBridge} 的 SSE 发射缝：组装 {@link StreamEvent}（时间戳取当前时刻）并追加到

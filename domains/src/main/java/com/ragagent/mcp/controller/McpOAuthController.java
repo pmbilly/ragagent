@@ -1,15 +1,16 @@
 package com.ragagent.mcp.controller;
 
-import java.net.URI;
-import java.util.Map;
-
-import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.mcp.oauth.OAuthCallbackException;
 import com.ragagent.mcp.oauth.OAuthManager;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.service.McpOAuthFlowService;
 import com.ragagent.mcp.service.McpOAuthFlowService.AuthorizeRequest;
 import com.ragagent.mcp.service.McpOAuthFlowService.ResolveRequest;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import java.net.URI;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -23,8 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
 
 /**
  * 每用户维度的 MCP OAuth2 授权码流程 HTTP 层。

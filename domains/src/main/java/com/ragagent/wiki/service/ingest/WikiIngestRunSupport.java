@@ -1,5 +1,15 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.contract.audit.WikiActivityAudit;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeSpanPort;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.wiki.domain.WikiConfig;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -8,18 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.contract.knowledge.KnowledgeSpanPort;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.audit.WikiActivityAudit;
-import com.ragagent.wiki.domain.WikiConfig;
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.wiki.domain.WikiPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
-import com.ragagent.wiki.service.page.WikiTextUtils;
 
 /**
  * wiki 批次摄取的运行管道协作者:processWikiFinalize 的执行体、ingest 的

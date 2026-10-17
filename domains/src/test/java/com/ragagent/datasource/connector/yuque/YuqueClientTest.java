@@ -1,9 +1,20 @@
 package com.ragagent.datasource.connector.yuque;
 
-import com.ragagent.platform.web.JsonMappers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import com.ragagent.datasource.connector.yuque.YuqueApiTypes.FlexibleStatus;
+import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2Doc;
+import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2Repo;
+import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2User;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.platform.web.JsonMappers;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -14,18 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.connector.yuque.YuqueApiTypes.FlexibleStatus;
-import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2Doc;
-import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2Repo;
-import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2User;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

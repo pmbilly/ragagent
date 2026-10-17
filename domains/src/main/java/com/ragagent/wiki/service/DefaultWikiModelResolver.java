@@ -1,11 +1,10 @@
 package com.ragagent.wiki.service;
 
-import org.springframework.stereotype.Component;
-
-import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.knowledge.EmbeddingModelPort;
 import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelRuntime;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link WikiModelResolver} 的默认实现：用 Java 侧已有的部件拼出 chat / embedding 模型。

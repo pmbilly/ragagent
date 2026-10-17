@@ -1,36 +1,34 @@
 package com.ragagent.im.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.EventBusFactory;
 import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.platform.event.EventType;
-import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;
-import com.ragagent.im.runtime.ImFormat;
-import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.runtime.StreamSection;
-import com.ragagent.im.runtime.ThinkDisplay;
-import com.ragagent.im.runtime.ToolDisplay;
-import com.ragagent.platform.access.TenantContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.ragagent.im.service.ImTurnOrchestrator.QaAttach;
 import com.ragagent.contract.event.payload.AgentCompleteData;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.payload.AgentThoughtData;
 import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
 import com.ragagent.contract.event.payload.ErrorData;
-import com.ragagent.contract.session.QaRequestPayload;
 import com.ragagent.contract.session.MessageView;
+import com.ragagent.contract.session.QaRequestPayload;
 import com.ragagent.contract.session.SessionView;
+import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;
+import com.ragagent.im.runtime.ImFormat;
+import com.ragagent.im.runtime.IncomingMessage;
+import com.ragagent.im.runtime.StreamSection;
+import com.ragagent.im.runtime.ThinkDisplay;
+import com.ragagent.im.runtime.ToolDisplay;
+import com.ragagent.im.service.ImTurnOrchestrator.QaAttach;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.event.EventType;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * IM 流式回复管线：事件订阅组、流缓冲袋、300ms 冲刷循环与 finalize/收尾落库。

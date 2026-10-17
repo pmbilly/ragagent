@@ -1,10 +1,11 @@
 package com.ragagent.memory.mapper;
 
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ragagent.memory.domain.MemoryExtractionState;
+import com.ragagent.memory.domain.MemoryExtractionStateTypeHandler;
+import com.ragagent.memory.domain.MemoryStringListTypeHandler;
 import com.ragagent.memory.domain.scope.MemorySubject;
+import java.time.OffsetDateTime;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -12,8 +13,6 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import com.ragagent.memory.domain.MemoryExtractionStateTypeHandler;
-import com.ragagent.memory.domain.MemoryStringListTypeHandler;
 
 /**
  * {@code memory_subjects} 的基础仓储。

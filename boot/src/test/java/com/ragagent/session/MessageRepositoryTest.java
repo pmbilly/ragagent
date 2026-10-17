@@ -3,21 +3,20 @@ package com.ragagent.session;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.ragagent.TestSchema;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageArtifact;
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.contract.session.MessageImage;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.domain.message.MessageWithSession;
-import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.SessionRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

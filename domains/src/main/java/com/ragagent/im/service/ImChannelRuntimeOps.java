@@ -1,7 +1,14 @@
 package com.ragagent.im.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
+import com.ragagent.im.domain.ImChannelEntity;
+import com.ragagent.im.mapper.ImChannelMapper;
+import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
+import com.ragagent.im.runtime.ImRedisKeys;
+import com.ragagent.im.runtime.ImRedisStore;
+import com.ragagent.im.runtime.IncomingMessage;
+import com.ragagent.im.runtime.QaQueue;
+import com.ragagent.platform.redis.RedisPubSub;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -10,18 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ragagent.platform.redis.RedisPubSub;
-import com.ragagent.im.domain.ImChannelEntity;
-import com.ragagent.im.mapper.ImChannelMapper;
-import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
-import com.ragagent.im.runtime.ImRedisKeys;
-import com.ragagent.im.runtime.ImRedisStore;
-import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.runtime.QaQueue;
 
 /**
  * 渠道运行时：adapter 工厂注册表、渠道生命周期（起停 / 重载 / 按库重建 / 配置广播），

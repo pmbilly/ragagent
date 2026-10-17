@@ -1,18 +1,16 @@
 package com.ragagent.session.repository;
 
-import com.ragagent.session.mapper.MessageSuggestionMapper;
-import java.time.Duration;
-import java.time.OffsetDateTime;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.session.domain.message.MessageSuggestionEvent;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.session.domain.message.MessageSuggestionSetNotFoundException;
+import com.ragagent.session.mapper.MessageSuggestionMapper;
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.util.List;
+import javax.sql.DataSource;
 import org.springframework.stereotype.Component;
 
 /**

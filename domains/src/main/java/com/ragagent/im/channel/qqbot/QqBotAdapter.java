@@ -1,9 +1,5 @@
 package com.ragagent.im.channel.qqbot;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.im.runtime.AdapterInterfaces;
@@ -12,6 +8,9 @@ import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.im.runtime.ThinkDisplay;
+import com.ragagent.platform.web.JsonMappers;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * QQ 机器人适配器。

@@ -2,11 +2,10 @@ package com.ragagent.retrieval;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ragagent.retrieval.HybridSearchService.RetrievalConfigView;
 import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

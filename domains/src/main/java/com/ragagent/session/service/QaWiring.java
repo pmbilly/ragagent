@@ -1,29 +1,42 @@
 package com.ragagent.session.service;
 
-import com.ragagent.contract.websearch.PipelinePageFetcher;
-import com.ragagent.contract.knowledge.support.KnowledgeProjectionAdapter;
-
-
-import com.ragagent.platform.web.JsonMappers;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.session.service.rag.EventManager;
+import com.ragagent.agenttools.datasource.DataAnalysisSessionFactoryAdapter;
+import com.ragagent.contract.knowledge.EntityExtractionPort;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.contract.knowledge.support.KnowledgeBaseViews;
+import com.ragagent.contract.knowledge.support.KnowledgeProjectionAdapter;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.model.Reranker;
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.retrieval.HybridSearchPort;
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
+import com.ragagent.contract.retrieval.SearchParams;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.session.PipelineMessageImageView;
 import com.ragagent.contract.session.PipelineMessageView;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.contract.tenant.WebSearchConfig;
+import com.ragagent.contract.websearch.PipelinePageFetcher;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.prompt.PipelineConfig;
-import com.ragagent.contract.retrieval.RetrieveGraphRepository;
+import com.ragagent.platform.prompt.PromptSource;
+import com.ragagent.platform.settings.ConversationProperties;
+import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
+import com.ragagent.platform.tracing.decorators.LangfuseReranker;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.service.rag.EventManager;
 import com.ragagent.session.service.rag.plugin.PluginChatCompletion;
 import com.ragagent.session.service.rag.plugin.PluginChatCompletionStream;
+import com.ragagent.session.service.rag.plugin.PluginDataAnalysis;
 import com.ragagent.session.service.rag.plugin.PluginExtractEntity;
 import com.ragagent.session.service.rag.plugin.PluginFilterTopK;
 import com.ragagent.session.service.rag.plugin.PluginIntoChatMessage;
@@ -33,38 +46,20 @@ import com.ragagent.session.service.rag.plugin.PluginMemoryRecall;
 import com.ragagent.session.service.rag.plugin.PluginMerge;
 import com.ragagent.session.service.rag.plugin.PluginQueryUnderstand;
 import com.ragagent.session.service.rag.plugin.PluginRerank;
+import com.ragagent.session.service.rag.plugin.PluginSearch;
+import com.ragagent.session.service.rag.plugin.PluginSearchEntity;
 import com.ragagent.session.service.rag.plugin.PluginSearchParallel;
 import com.ragagent.session.service.rag.plugin.PluginWebFetch;
 import com.ragagent.session.service.rag.plugin.PluginWikiBoost;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.retrieval.HybridSearchPort;
-import com.ragagent.platform.settings.ConversationProperties;
-
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.Reranker;
-import com.ragagent.platform.prompt.PromptSource;
-import com.ragagent.contract.retrieval.SearchResult;
-import java.io.InputStream;
 import com.ragagent.session.support.PipelineViews;
-import com.ragagent.contract.knowledge.EntityExtractionPort;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
-import com.ragagent.platform.tracing.decorators.LangfuseReranker;
-import com.ragagent.agenttools.datasource.DataAnalysisSessionFactoryAdapter;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.session.service.rag.plugin.PluginDataAnalysis;
-import com.ragagent.session.service.rag.plugin.PluginSearch;
-import com.ragagent.session.service.rag.plugin.PluginSearchEntity;
-import com.ragagent.contract.retrieval.SearchParams;
-import com.ragagent.contract.tenant.WebSearchConfig;
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.contract.knowledge.support.KnowledgeBaseViews;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import java.io.InputStream;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * chat 管线 + QA 面装配（docs/known-issues/05-wave-4.md 的 11 seam 清单）。

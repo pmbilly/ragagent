@@ -1,12 +1,5 @@
 package com.ragagent.datasource.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.ragagent.datasource.domain.connector.Connector;
-import com.ragagent.datasource.domain.connector.ConnectorRegistry;
-import com.ragagent.datasource.task.DataSourceSyncTaskQueue;
-import com.ragagent.datasource.task.Scheduler;
 import com.ragagent.datasource.connector.feishu.core.FeishuRegion;
 import com.ragagent.datasource.connector.feishu.drive.DriveConnector;
 import com.ragagent.datasource.connector.feishu.wiki.WikiConnector;
@@ -15,8 +8,14 @@ import com.ragagent.datasource.connector.ima.ImaConnector;
 import com.ragagent.datasource.connector.notion.NotionConnector;
 import com.ragagent.datasource.connector.rss.RssConnector;
 import com.ragagent.datasource.connector.yuque.YuqueConnector;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorRegistry;
 import com.ragagent.datasource.mapper.DataSourceRepository;
 import com.ragagent.datasource.mapper.SyncLogRepository;
+import com.ragagent.datasource.task.DataSourceSyncTaskQueue;
+import com.ragagent.datasource.task.Scheduler;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;

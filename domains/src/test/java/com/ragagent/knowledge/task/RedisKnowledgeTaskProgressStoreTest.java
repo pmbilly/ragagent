@@ -3,8 +3,8 @@ package com.ragagent.knowledge.task;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-import com.ragagent.knowledge.dto.kb.KBCloneProgress;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
+import com.ragagent.knowledge.dto.kb.KBCloneProgress;
 import com.ragagent.platform.stream.EmbeddedRedis;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

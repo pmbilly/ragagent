@@ -6,13 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import com.ragagent.platform.tracing.langfuse.LangfuseManager.GenerationOptions;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager.SpanOptions;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager.TraceOptions;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,14 +1,13 @@
 package com.ragagent.agent.compaction;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.AgentToolNames;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.platform.web.JsonMappers;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 沙箱文件操作在压缩中的存续。

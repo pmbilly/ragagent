@@ -1,17 +1,15 @@
 package com.ragagent.wiki.controller;
 
-import java.util.List;
-
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.web.error.GuardForbiddenException;
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import org.springframework.http.HttpStatus;
-
+import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
+import java.util.List;
+import org.springframework.http.HttpStatus;
 
 /**
  * WikiPageController 的 KB 访问与所有权守卫：API-Key 数据面白名单、租户判定、

@@ -3,15 +3,14 @@ package com.ragagent.auth.apikey;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.List;
-
+import com.ragagent.auth.apikey.domain.APIKeyStringListTypeHandler;
+import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.APIKeyScopeType;
-import com.ragagent.auth.apikey.domain.APIKeyStringListTypeHandler;
-import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.BizException;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 

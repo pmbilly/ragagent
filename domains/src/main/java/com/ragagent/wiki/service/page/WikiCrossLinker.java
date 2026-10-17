@@ -1,10 +1,9 @@
 package com.ragagent.wiki.service.page;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.wiki.domain.WikiPage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 交叉链接注入的<b>可插拔端口</b>。

@@ -1,15 +1,14 @@
 package com.ragagent.platform.web;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import com.ragagent.contract.text.Whitespace;
 import com.ragagent.platform.text.HtmlConversionException;
 import com.ragagent.platform.text.HtmlEntities;
 import com.ragagent.platform.text.HtmlToMarkdown;
 import com.ragagent.platform.text.JdkHtmlToMarkdown;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import org.junit.jupiter.api.Test;
-import com.ragagent.contract.text.Whitespace;
 
 /**
  * {@link JdkHtmlToMarkdown} 的**语料级**对等测试。

@@ -1,15 +1,14 @@
 package com.ragagent.platform.knowledge;
 
 
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.websearch.ImageInfo;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.websearch.ImageInfo;
 
 /**
  * 图片信息与正文的互相富化：解析 chunk 的 {@code image_info} JSON，合并为数组，

@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.dto.chunk;
 
-import java.time.OffsetDateTime;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.knowledge.domain.Chunk;
+import java.time.OffsetDateTime;
 
 /**
  * 分块（Chunk）对外视图。

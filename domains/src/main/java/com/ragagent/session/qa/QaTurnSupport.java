@@ -1,12 +1,11 @@
 package com.ragagent.session.qa;
 
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.session.domain.message.Message;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /** QA 编排的共享小工具（阶段 5 从 {@code KnowledgeQaController} 的静态助手迁出）。 */
 public final class QaTurnSupport {

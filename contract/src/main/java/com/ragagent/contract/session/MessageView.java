@@ -1,12 +1,11 @@
 package com.ragagent.contract.session;
 
+import com.ragagent.contract.agent.AgentStep;
+import com.ragagent.contract.model.TokenUsage;
+import com.ragagent.contract.retrieval.SearchResult;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.ragagent.contract.agent.AgentStep;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.model.TokenUsage;
 
 /**
  * 消息行**线格式视图**（embed 公开面 messages/load 响应形状与会话 QA 面载荷）。

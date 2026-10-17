@@ -1,23 +1,22 @@
 package com.ragagent.embedchannel.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.session.EmbedReply;
+import com.ragagent.contract.session.MessageSuggestionView;
+import com.ragagent.contract.session.MessageView;
+import com.ragagent.embedchannel.domain.EmbedChannelEntity;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ServletSseSink;
+import com.ragagent.platform.web.error.PlainErrorException;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.web.error.PlainErrorException;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.session.EmbedReply;
-import com.ragagent.contract.session.MessageSuggestionView;
-import com.ragagent.contract.session.MessageView;
-import com.ragagent.platform.web.ServletSseSink;
 
 /**
  * embed 委托协作者（自 {@link EmbedChannelController} 拆出的

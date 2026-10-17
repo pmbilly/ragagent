@@ -1,28 +1,27 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.text.Whitespace;
+import com.ragagent.contract.wiki.SlugUpdate;
+import com.ragagent.platform.text.CodePointOrder;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.domain.WikiCategoryPaths;
+import com.ragagent.wiki.prompt.WikiPrompts;
+import com.ragagent.wiki.service.WikiModelResolver;
+import com.ragagent.wiki.service.page.WikiPageService;
+import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.wiki.domain.WikiCategoryPaths;
-import com.ragagent.wiki.prompt.WikiPrompts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.wiki.service.WikiModelResolver;
-import com.ragagent.wiki.service.page.WikiPageService;
-import com.ragagent.wiki.service.page.WikiTextUtils;
-import com.ragagent.contract.text.Whitespace;
-import com.ragagent.platform.text.CodePointOrder;
 
 /**
  * 批次目录规划与 embedding 选夹。

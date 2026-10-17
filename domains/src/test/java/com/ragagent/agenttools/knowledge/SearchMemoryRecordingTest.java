@@ -2,15 +2,13 @@ package com.ragagent.agenttools.knowledge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.agent.fixtures.GoRecording45B;
 import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.contract.tool.ToolRequest;
+import java.time.LocalDate;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * SearchMemoryTool 的录制回放（6 条：hits/limit_clamp/limit_zero/disabled/empty/blank_query）。

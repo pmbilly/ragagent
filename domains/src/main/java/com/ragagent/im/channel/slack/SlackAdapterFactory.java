@@ -1,15 +1,13 @@
 package com.ragagent.im.channel.slack;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.function.BiConsumer;
-
-import org.springframework.stereotype.Component;
-
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCredentials;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.service.ImTurnOrchestrator;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import org.springframework.stereotype.Component;
 
 /**
  * Slack 渠道工厂。

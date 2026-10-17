@@ -1,14 +1,13 @@
 package com.ragagent.agent.tool;
 
-import com.ragagent.agent.fixtures.RecordingSupport;
-import com.ragagent.agent.fixtures.GoRecording45A;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.web.ToolJson;
 import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.agent.fixtures.GoRecording45A;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.platform.web.ToolJson;
+import org.junit.jupiter.api.Test;
 
 /**
  * ParamCaster 的录制判定表（29 条）。

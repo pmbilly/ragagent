@@ -2,22 +2,21 @@ package com.ragagent.platform.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.RecordComponent;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
+import com.ragagent.contract.vectorstore.ConnectionConfig;
+import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.memory.domain.MemoryExtractionState;
-import com.ragagent.contract.model.ModelParameters;
-import com.ragagent.contract.vectorstore.ConnectionConfig;
-import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
 import com.ragagent.wiki.domain.WikiConfig;
+import java.lang.reflect.Field;
+import java.lang.reflect.RecordComponent;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

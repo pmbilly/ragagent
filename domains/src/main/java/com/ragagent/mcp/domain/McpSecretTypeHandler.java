@@ -1,11 +1,10 @@
 package com.ragagent.mcp.domain;
 
+import com.ragagent.platform.security.CryptoService;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import com.ragagent.platform.security.CryptoService;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.slf4j.Logger;

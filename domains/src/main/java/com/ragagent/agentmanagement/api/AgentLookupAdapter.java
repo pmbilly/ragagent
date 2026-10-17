@@ -1,10 +1,5 @@
 package com.ragagent.agentmanagement.api;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -15,6 +10,9 @@ import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.platform.web.JsonMappers;
+import java.io.IOException;
+import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link AgentLookup} 的 agentmanagement 侧实现：读路径（行查询 / 视图成形 / 推荐问题）都发生在属主域。

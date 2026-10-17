@@ -1,8 +1,7 @@
 package com.ragagent.session.service.rag.spi;
 
-import java.util.List;
-
 import com.ragagent.session.service.rag.ChatManage;
+import java.util.List;
 
 /**
  * 知识库问答事件触发端口（引擎侧接口）：由事件清单驱动一轮知识库问答。

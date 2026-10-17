@@ -1,24 +1,22 @@
 package com.ragagent.datasource.connector.rss;
 
+import com.ragagent.datasource.domain.DataSourceConfig;
+import com.ragagent.datasource.domain.DataSourceConstants;
+import com.ragagent.datasource.domain.FetchedItem;
+import com.ragagent.datasource.domain.Resource;
+import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.platform.text.HtmlToMarkdown;
+import com.ragagent.platform.text.JdkHtmlToMarkdown;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ragagent.datasource.domain.connector.Connector;
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.DataSourceConfig;
-import com.ragagent.datasource.domain.DataSourceConstants;
-import com.ragagent.datasource.domain.FetchedItem;
-import com.ragagent.datasource.domain.Resource;
-import com.ragagent.datasource.domain.SyncCursor;
-import com.ragagent.platform.text.HtmlToMarkdown;
-import com.ragagent.platform.text.JdkHtmlToMarkdown;
 
 /**
  * RSS / Atom 数据源连接器。

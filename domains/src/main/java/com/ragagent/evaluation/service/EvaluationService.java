@@ -1,5 +1,24 @@
 package com.ragagent.evaluation.service;
 
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeIngest;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.pipeline.KnowledgeQaRunRequest;
+import com.ragagent.contract.pipeline.KnowledgeQaRunResult;
+import com.ragagent.contract.pipeline.KnowledgeQaRunner;
+import com.ragagent.evaluation.domain.QaPair;
+import com.ragagent.evaluation.dto.EvaluationDtos;
+import com.ragagent.evaluation.dto.EvaluationDtos.EvaluationDetail;
+import com.ragagent.evaluation.dto.EvaluationDtos.EvaluationTask;
+import com.ragagent.evaluation.dto.EvaluationDtos.MetricResult;
+import com.ragagent.evaluation.dto.EvaluationDtos.PipelineParams;
+import com.ragagent.evaluation.dto.EvaluationDtos.SummaryConfigParams;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.access.TenantContextSnapshot;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -12,31 +31,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import com.ragagent.contract.pipeline.KnowledgeQaRunner;
-import com.ragagent.contract.pipeline.KnowledgeQaRunResult;
-import com.ragagent.contract.pipeline.KnowledgeQaRunRequest;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.evaluation.domain.QaPair;
-import com.ragagent.evaluation.dto.EvaluationDtos.EvaluationDetail;
-import com.ragagent.evaluation.dto.EvaluationDtos.EvaluationTask;
-import com.ragagent.evaluation.dto.EvaluationDtos.MetricResult;
-import com.ragagent.evaluation.dto.EvaluationDtos.PipelineParams;
-import com.ragagent.evaluation.dto.EvaluationDtos.SummaryConfigParams;
-import com.ragagent.platform.access.TenantContextSnapshot;
-
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.ragagent.evaluation.dto.EvaluationDtos;
-import com.ragagent.contract.knowledge.KnowledgeIngest;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
-import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**
  * 评估服务（评估任务 + 结果；内存任务存储）。

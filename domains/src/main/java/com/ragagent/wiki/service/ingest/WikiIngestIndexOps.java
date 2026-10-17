@@ -1,17 +1,17 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.text.Whitespace;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.contract.wiki.WikiIndexEntry;
+import com.ragagent.platform.text.CodePointOrder;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.prompt.WikiPrompts;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.contract.wiki.WikiIndexEntry;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.prompt.WikiPrompts;
-import com.ragagent.contract.text.Whitespace;
-import com.ragagent.platform.text.CodePointOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

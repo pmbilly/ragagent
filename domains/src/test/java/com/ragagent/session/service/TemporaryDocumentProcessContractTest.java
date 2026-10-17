@@ -9,26 +9,24 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.contract.doc.DocReaderParsePort;
+import com.ragagent.contract.knowledge.DocumentChunkingPort;
+import com.ragagent.contract.model.AsrTranscriber;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelParameters;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.session.domain.document.TemporaryDocument;
+import com.ragagent.session.repository.TemporaryDocumentRepository;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import com.ragagent.contract.model.AsrTranscriber;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.contract.model.ModelParameters;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.session.domain.document.TemporaryDocument;
-import com.ragagent.session.repository.TemporaryDocumentRepository;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.contract.knowledge.DocumentChunkingPort;
 
 /**
  * 附件解析链路的验收（资源租户、引擎回落与音频分支）：

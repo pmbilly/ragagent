@@ -1,18 +1,16 @@
 package com.ragagent.knowledge.api;
 
+import com.ragagent.contract.knowledge.ChunkPort;
+import com.ragagent.contract.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.support.ChunkRowViews;
+import com.ragagent.platform.knowledge.ImageInfoEnricher;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.stereotype.Component;
-
-import com.ragagent.contract.knowledge.ChunkPort;
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
-import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.platform.knowledge.ImageInfoEnricher;
-import com.ragagent.knowledge.support.ChunkRowViews;
 
 /**
  * {@link ChunkPort} 的 knowledge 侧实现。

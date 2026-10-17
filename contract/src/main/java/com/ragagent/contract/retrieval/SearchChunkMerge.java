@@ -1,9 +1,9 @@
 package com.ragagent.contract.retrieval;
 
+import com.ragagent.contract.knowledge.ChunkView;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import com.ragagent.contract.knowledge.ChunkView;
 
 
 

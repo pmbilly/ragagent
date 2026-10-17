@@ -1,19 +1,18 @@
 package com.ragagent.vectorstore.service;
 
-import java.util.List;
-import java.util.regex.Pattern;
-
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.contract.vectorstore.ConnectionConfig;
-import com.ragagent.vectorstore.domain.EnvVectorStores;
 import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.contract.vectorstore.VectorStoreConnectivity;
+import com.ragagent.platform.config.RetrievalDriverProperties;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.vectorstore.domain.EnvVectorStores;
 import com.ragagent.vectorstore.domain.VectorStore;
 import com.ragagent.vectorstore.domain.VectorStoreEngines;
 import com.ragagent.vectorstore.mapper.VectorStoreRepository;
-import com.ragagent.platform.config.RetrievalDriverProperties;
+import java.util.List;
+import java.util.regex.Pattern;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;

@@ -1,33 +1,32 @@
 package com.ragagent.session.service.rag.plugin;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.knowledge.DocumentChunkMetadata;
+import com.ragagent.contract.knowledge.GeneratedQuestion;
+import com.ragagent.contract.model.RankResult;
+import com.ragagent.contract.model.Reranker;
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.retrieval.RetrievalObsRows;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTextUtil;
+import com.ragagent.contract.websearch.ImageInfo;
+import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
+import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineCommon;
+import com.ragagent.session.service.rag.PipelineEventType;
+import com.ragagent.session.service.rag.PipelineLog;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.function.BiFunction;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineCommon;
-import com.ragagent.session.service.rag.PipelineEventType;
-import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.contract.model.RankResult;
-import com.ragagent.contract.model.Reranker;
-import com.ragagent.contract.websearch.ImageInfo;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
-import com.ragagent.contract.retrieval.SearchTextUtil;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.knowledge.DocumentChunkMetadata;
-import com.ragagent.contract.knowledge.GeneratedQuestion;
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.contract.retrieval.ChunkTypes;
+import java.util.regex.Pattern;
 
 /**
  * CHUNK_RERANK 阶段插件。

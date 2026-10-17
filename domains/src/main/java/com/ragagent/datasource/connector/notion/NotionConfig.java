@@ -1,9 +1,8 @@
 package com.ragagent.datasource.connector.notion;
 
-import java.util.Map;
-
-import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.DataSourceConfig;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import java.util.Map;
 
 /**
  * Notion 连接器自己的配置。

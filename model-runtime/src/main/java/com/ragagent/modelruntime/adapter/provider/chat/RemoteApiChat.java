@@ -1,5 +1,27 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.StreamResponse;
+import com.ragagent.contract.model.TokenUsage;
+import com.ragagent.contract.model.chat.CacheRetention;
+import com.ragagent.contract.model.chat.ChatConfig;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.llm.provider.ProviderBaseURLs;
+import com.ragagent.llm.provider.ProviderName;
+import com.ragagent.llm.provider.ProviderRegistry;
+import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapter;
+import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapters;
+import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingStrategies;
+import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingStrategy;
+import com.ragagent.platform.http.LlmTransport;
+import com.ragagent.platform.stream.QueuedChatStream;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,32 +33,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.regex.Pattern;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.model.ChatStream;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.CacheRetention;
-import com.ragagent.contract.model.chat.ChatConfig;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.llm.provider.ProviderBaseURLs;
-import com.ragagent.llm.provider.ProviderName;
-import com.ragagent.llm.provider.ProviderRegistry;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingStrategies;
-import com.ragagent.platform.stream.QueuedChatStream;
-import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapters;
-import com.ragagent.platform.http.LlmTransport;
-import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingStrategy;
-import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapter;
 
 /**
  * OpenAI 兼容 API 的聊天客户端。

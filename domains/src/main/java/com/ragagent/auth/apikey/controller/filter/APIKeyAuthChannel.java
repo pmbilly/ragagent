@@ -1,23 +1,22 @@
 package com.ragagent.auth.apikey.controller.filter;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
-import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
-import com.ragagent.auth.service.TenantService;
-import com.ragagent.platform.access.TenantContext;
-import org.springframework.stereotype.Component;
 import com.ragagent.auth.domain.User;
+import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.contract.tenant.APIPrincipalConfig;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.ApiKeyAuthPort;
 import com.ragagent.contract.apikey.ApiKeyAuthPort.AuthResult.Passed;
 import com.ragagent.contract.apikey.ApiKeyAuthPort.AuthResult.Rejected;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
+import com.ragagent.contract.tenant.APIPrincipalConfig;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.JsonMappers;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import org.springframework.stereotype.Component;
 
 /**
  * X-API-Key 认证通道（认证链的第 3 条通道）。

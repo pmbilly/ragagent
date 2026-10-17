@@ -1,13 +1,12 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.contract.knowledge.EmbeddingModelPort;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.knowledge.client.EmbedderClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import com.ragagent.contract.knowledge.EmbeddingModelPort;
-import com.ragagent.knowledge.client.EmbedderClient;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * {@link EmbeddingModelPort} 的 knowledge 侧实现。

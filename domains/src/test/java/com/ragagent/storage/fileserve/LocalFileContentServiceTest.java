@@ -1,18 +1,17 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.contract.storage.fileserve.OpenedFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.storage.fileserve.OpenedFile;
+import com.ragagent.platform.storage.fileserve.StoragePaths;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import com.ragagent.platform.storage.fileserve.StoragePaths;
 
 /**
  * {@link LocalFileContentService} 的路径规范化与守卫（safe-path 边界 +

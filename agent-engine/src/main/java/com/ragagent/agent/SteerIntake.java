@@ -1,16 +1,16 @@
 package com.ragagent.agent;
 
+import com.ragagent.agent.domain.AgentState;
+import com.ragagent.contract.event.Event;
+import com.ragagent.contract.event.payload.UserMessageInjectedData;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.platform.event.EventIds;
+import com.ragagent.platform.event.EventType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.agent.domain.AgentState;
-import com.ragagent.contract.event.Event;
-import com.ragagent.platform.event.EventIds;
-import com.ragagent.platform.event.EventType;
-import com.ragagent.contract.event.payload.UserMessageInjectedData;
-import com.ragagent.contract.model.chat.ChatMessage;
 
 /**
  * 引擎侧 steer（运行中注入）消费协作者：注入内容净化与轮首/收束前 drain。

@@ -1,7 +1,7 @@
 package com.ragagent.mcp.protocol;
 
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.mcp.domain.McpService;
+import com.ragagent.platform.access.TenantContext;
 
 /**
  * 构造 MCP 客户端所需的配置。

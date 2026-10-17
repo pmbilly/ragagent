@@ -1,7 +1,6 @@
 package com.ragagent.approval;
 
 import com.ragagent.contract.tool.Cancellation;
-
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;

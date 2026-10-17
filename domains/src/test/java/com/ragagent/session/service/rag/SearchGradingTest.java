@@ -7,18 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
-import com.ragagent.session.service.rag.plugin.PluginError;
-import com.ragagent.session.service.rag.plugin.PluginSearch;
-import com.ragagent.session.service.rag.plugin.PluginSearchParallel;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.session.service.rag.plugin.PluginError;
+import com.ragagent.session.service.rag.plugin.PluginSearch;
+import com.ragagent.session.service.rag.plugin.PluginSearchParallel;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * 回归：KB 检索的 <b>"硬错 vs 降级" 分级</b>。

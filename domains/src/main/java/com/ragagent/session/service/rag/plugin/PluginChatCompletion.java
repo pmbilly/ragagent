@@ -1,17 +1,16 @@
 package com.ragagent.session.service.rag.plugin;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.session.service.rag.ChatManage;
 import com.ragagent.session.service.rag.PipelineCommon;
 import com.ragagent.session.service.rag.PipelineEventType;
 import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.session.service.rag.support.ReferencesSupport;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * CHAT_COMPLETION 阶段插件：

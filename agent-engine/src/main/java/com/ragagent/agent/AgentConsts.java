@@ -1,10 +1,9 @@
 package com.ragagent.agent;
 
+import com.ragagent.contract.agent.CompactionSettings;
 import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
-
-import com.ragagent.contract.agent.CompactionSettings;
 
 /**
  * agent 常量与判定。

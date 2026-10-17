@@ -1,14 +1,13 @@
 package com.ragagent.session.service;
 
+import com.ragagent.contract.session.MessageAttachment;
+import com.ragagent.session.domain.document.TemporaryDocument;
+import com.ragagent.session.repository.TemporaryDocumentRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.session.domain.document.TemporaryDocument;
-import com.ragagent.session.repository.TemporaryDocumentRepository;
 
 /**
  * {@code TemporaryDocumentService} 的**提示词渲染子模块**（§14 步骤 2 拆分）：把 ready 的

@@ -1,12 +1,11 @@
 package com.ragagent.agent.fixtures;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.ContractJsonModule;
 import com.ragagent.platform.web.ToolJson;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /** 4.5a 录制测试的共享小工具。 */
 public final class RecordingSupport {

@@ -2,20 +2,18 @@ package com.ragagent.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import java.util.List;
-
-import org.mockito.ArgumentCaptor;
-import org.springframework.jdbc.core.JdbcTemplate;
+import static org.mockito.Mockito.when;
 
 import com.ragagent.knowledge.repository.KnowledgeSpanRepository;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * K6：三种启动复位**各按自己守护的任务基础设施**判据（不再用 {@code REDIS_ADDR} 统一代理）。

@@ -2,11 +2,10 @@ package com.ragagent.agent.tool.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agent.fixtures.GoRecording45A;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import org.junit.jupiter.api.Test;
 
 /**
  * NormalizeToolCallId 的录制判定（9 条）。确定性生成（空 id → 同一 tool+index 同值）、

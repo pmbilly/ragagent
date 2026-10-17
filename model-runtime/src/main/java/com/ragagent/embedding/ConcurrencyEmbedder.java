@@ -1,11 +1,9 @@
 package com.ragagent.embedding;
 
-import java.util.List;
-
 import com.ragagent.contract.model.Embedder;
-
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.limiter.Release;
+import java.util.List;
 
 /**
  * 后台并发治理装饰器。

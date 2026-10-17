@@ -1,10 +1,9 @@
 package com.ragagent.llm.ollama;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 
 /**
  * Ollama 聊天消息（对齐 ollama v0.23.2 API）。

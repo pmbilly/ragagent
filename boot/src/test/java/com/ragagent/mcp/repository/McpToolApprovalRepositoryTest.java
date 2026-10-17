@@ -4,18 +4,17 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
 import com.ragagent.TestSchema;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.mcp.domain.McpToolApproval;
 import com.ragagent.mcp.domain.McpToolPolicyPatch;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.mcp.domain.McpToolApproval;
 
 /**
  * MCP 工具审批仓储语义。

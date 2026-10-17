@@ -1,23 +1,22 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.platform.web.JsonMappers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.memory.domain.MemoryText;
+import com.ragagent.memory.domain.MemoryTopicStat;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryTombstone;
+import com.ragagent.platform.web.JsonMappers;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.memory.domain.MemoryText;
-import com.ragagent.memory.domain.item.MemoryTombstone;
-import com.ragagent.memory.domain.MemoryTopicStat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

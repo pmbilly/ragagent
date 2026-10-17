@@ -1,12 +1,10 @@
 package com.ragagent.knowledge.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.knowledge.client.DocReaderClient;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link DocReaderParsePort} 的 knowledge 侧实现：把解析请求转发给

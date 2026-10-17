@@ -1,5 +1,12 @@
 package com.ragagent.im.service;
 
+import com.ragagent.contract.doc.DocReaderParsePort;
+import com.ragagent.contract.session.MessageAttachment;
+import com.ragagent.contract.session.QaRequestPayload;
+import com.ragagent.im.runtime.AdapterInterfaces;
+import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
+import com.ragagent.im.runtime.ImTypes;
+import com.ragagent.im.runtime.IncomingMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,18 +14,9 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
-
-import com.ragagent.im.runtime.AdapterInterfaces;
-import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
-import com.ragagent.im.runtime.ImTypes;
-import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.contract.session.QaRequestPayload;
 
 /**
  * IM 文件/图片附件的下载与解析。

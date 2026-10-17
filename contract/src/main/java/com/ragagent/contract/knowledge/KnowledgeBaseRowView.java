@@ -1,8 +1,5 @@
 package com.ragagent.contract.knowledge;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-
 import com.ragagent.contract.knowledge.domain.AsrConfigView;
 import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
 import com.ragagent.contract.knowledge.domain.ImageProcessingConfigView;
@@ -10,6 +7,8 @@ import com.ragagent.contract.knowledge.domain.IndexingStrategyView;
 import com.ragagent.contract.knowledge.domain.StorageConfigView;
 import com.ragagent.contract.knowledge.domain.StorageProviderConfigView;
 import com.ragagent.contract.knowledge.domain.VlmConfigView;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 /**
  * 知识库**行视图**（L1）：{@code KnowledgeCatalogPort} 知识库面（读 / 建 / 改 / 授权）+ KB API 线格式

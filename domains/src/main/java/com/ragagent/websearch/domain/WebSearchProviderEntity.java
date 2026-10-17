@@ -1,11 +1,10 @@
 package com.ragagent.websearch.domain;
 
-import java.time.OffsetDateTime;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.time.OffsetDateTime;
 
 /**
  * web_search_providers 表实体（迁移 000030 引入）。

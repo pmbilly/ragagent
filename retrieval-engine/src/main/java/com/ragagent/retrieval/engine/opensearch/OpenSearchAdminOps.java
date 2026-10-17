@@ -1,22 +1,20 @@
 package com.ragagent.retrieval.engine.opensearch;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository.DimInit;
+import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository.InternalCfg;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository.DimInit;
-import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository.InternalCfg;
 
 /**
  * OpenSearch 引擎的惰性初始化/建索引/探针/别名簇：逐维 once（transient 可重置）、

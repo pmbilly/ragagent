@@ -3,6 +3,13 @@ package com.ragagent.datasource.connector.notion;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.datasource.domain.DataSourceConfig;
+import com.ragagent.datasource.domain.DataSourceConstants;
+import com.ragagent.datasource.domain.FetchedItem;
+import com.ragagent.datasource.domain.Resource;
+import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -11,18 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.datasource.domain.connector.Connector;
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.DataSourceConfig;
-import com.ragagent.datasource.domain.DataSourceConstants;
-import com.ragagent.datasource.domain.FetchedItem;
-import com.ragagent.datasource.domain.Resource;
-import com.ragagent.datasource.domain.SyncCursor;
 
 /**
  * {@code NotionConnector} 的对等测试。

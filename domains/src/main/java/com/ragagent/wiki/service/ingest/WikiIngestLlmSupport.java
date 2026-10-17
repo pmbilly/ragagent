@@ -1,30 +1,30 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.text.Whitespace;
+import com.ragagent.contract.wiki.WikiImageMarkup;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.prompt.PromptFingerprints;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.prompt.WikiPromptTemplate;
+import com.ragagent.wiki.prompt.WikiPrompts;
+import com.ragagent.wiki.service.WikiLlmCallMetadata;
+import com.ragagent.wiki.service.WikiLlmRetryPolicy;
+import com.ragagent.wiki.service.WikiPromptInstructions;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.platform.prompt.PromptFingerprints;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.wiki.prompt.WikiPromptTemplate;
-import com.ragagent.wiki.prompt.WikiPrompts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.contract.wiki.WikiImageMarkup;
-import com.ragagent.wiki.service.WikiLlmCallMetadata;
-import com.ragagent.wiki.service.WikiLlmRetryPolicy;
-import com.ragagent.wiki.service.WikiPromptInstructions;
-import com.ragagent.contract.text.Whitespace;
 
 /**
  * 摄取用 LLM 调用协作者:模板化生成、请求序列化与提示词预热。

@@ -7,18 +7,17 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BooleanSupplier;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.knowledge.service.chunk.ChunkExtractService;
 import com.ragagent.knowledge.service.enrichment.QuestionGenerationService;
 import com.ragagent.platform.stream.EmbeddedRedis;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BooleanSupplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

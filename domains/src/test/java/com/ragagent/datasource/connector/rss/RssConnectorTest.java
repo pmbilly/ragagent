@@ -3,6 +3,17 @@ package com.ragagent.datasource.connector.rss;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.datasource.domain.DataSourceConfig;
+import com.ragagent.datasource.domain.FetchedItem;
+import com.ragagent.datasource.domain.Resource;
+import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorHttp;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.text.JdkHtmlToMarkdown;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -13,21 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.datasource.domain.connector.Connector;
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.connector.ConnectorHttp;
-import com.ragagent.datasource.domain.DataSourceConfig;
-import com.ragagent.datasource.domain.FetchedItem;
-import com.ragagent.datasource.domain.Resource;
-import com.ragagent.datasource.domain.SyncCursor;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import com.ragagent.platform.text.JdkHtmlToMarkdown;
 
 /**
  * {@link RssConnector} 的端到端对等测试（stub server，**不碰真实网络**）。

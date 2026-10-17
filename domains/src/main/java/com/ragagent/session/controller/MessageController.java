@@ -1,17 +1,19 @@
 package com.ragagent.session.controller;
 
-import java.util.List;
-
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.session.domain.ChatHistoryKbStats;
+import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.domain.message.MessageSearchResult;
-import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.dto.SearchMessagesRequest;
 import com.ragagent.session.service.MessageHistoryService;
 import com.ragagent.session.service.MessageService;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +24,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.session.domain.ChatHistoryKbStats;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 消息 HTTP 层。

@@ -2,14 +2,12 @@ package com.ragagent.im.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import jakarta.annotation.PreDestroy;
 import java.lang.reflect.Method;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-
-import jakarta.annotation.PreDestroy;
 
 /**
  * 生命周期接线契约：IM 运行时的两个触发点**必须挂在门面**（{@link ImTurnOrchestrator}，它是 Spring bean）上，

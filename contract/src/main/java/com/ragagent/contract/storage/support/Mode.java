@@ -1,10 +1,8 @@
 package com.ragagent.contract.storage.support;
 
-import java.util.Locale;
-
-
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
+import java.util.Locale;
 
 /**
  * 存储文件在 API 响应里的引用方式。

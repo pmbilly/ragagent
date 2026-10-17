@@ -3,24 +3,10 @@ package com.ragagent.datasource.connector.feishu.drive;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.connector.feishu.core.DocxFetcher;
+import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFile;
+import com.ragagent.datasource.connector.feishu.core.FeishuClient;
 import com.ragagent.datasource.connector.feishu.core.FeishuCursorCodec;
 import com.ragagent.datasource.connector.feishu.core.FeishuRegion;
 import com.ragagent.datasource.connector.feishu.core.FeishuSupport;
@@ -31,9 +17,21 @@ import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.connector.ConnectorHttp;
-import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes;
-import com.ragagent.datasource.connector.feishu.core.FeishuClient;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * 云盘连接器的对等测试（含 {@code listDriveFilesForResource} 的 {@code 1061002}

@@ -1,17 +1,16 @@
 package com.ragagent.audit.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.audit.domain.AuditLog;
+import com.ragagent.contract.audit.AuditAction;
+import com.ragagent.contract.audit.AuditOutcome;
+import com.ragagent.contract.audit.WikiActivityAudit;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.audit.WikiActivityAudit;
 import org.springframework.stereotype.Component;
 
 /**

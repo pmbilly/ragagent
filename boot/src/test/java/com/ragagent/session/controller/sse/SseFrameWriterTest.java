@@ -2,17 +2,15 @@ package com.ragagent.session.controller.sse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.model.StreamResponse;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * SSE 帧的**逐字节**契约测试——这是整套 A/B 的落点，字节错了前面全白做。

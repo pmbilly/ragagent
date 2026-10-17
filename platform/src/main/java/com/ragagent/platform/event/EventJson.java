@@ -1,9 +1,5 @@
 package com.ragagent.platform.event;
 
-import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -12,6 +8,9 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ragagent.platform.web.ContractJsonModule;
 import com.ragagent.platform.web.ZeroTimeSerializer;
+import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.util.Map;
 
 /**
  * 事件 payload 进出 JSON 的唯一 ObjectMapper，集中定义三条序列化行为。

@@ -5,13 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.event.Event;
+import com.ragagent.contract.event.EventBusException;
+import com.ragagent.contract.event.EventHandler;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.EventHandler;
-import com.ragagent.contract.event.EventBusException;
 
 /**
  * 中间件行为断言（执行序与文案由固定录制钉住）。

@@ -1,14 +1,6 @@
 package com.ragagent.memory.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.memory.MemoryKinds;
@@ -16,10 +8,17 @@ import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.memory.domain.scope.MemoryScope;
-import com.ragagent.memory.domain.item.MemoryTombstone;
 import com.ragagent.memory.domain.MemoryTopicStat;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryTombstone;
+import com.ragagent.memory.domain.scope.MemoryScope;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

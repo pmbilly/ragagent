@@ -1,7 +1,8 @@
 package com.ragagent.knowledge.domain.span;
 
+import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
-
+import com.ragagent.knowledge.repository.KnowledgeSpanRepository;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.OffsetDateTime;
@@ -14,8 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
-import com.ragagent.knowledge.repository.KnowledgeSpanRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

@@ -1,13 +1,12 @@
 package com.ragagent.storage.fileserve;
 
 import com.ragagent.contract.storage.fileserve.OpenedFile;
-import java.io.IOException;
-import java.io.InputStream;
-
+import com.ragagent.contract.storage.fileserve.WritableFileContentService;
+import com.ragagent.contract.storage.provider.SeekableSource;
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.SeekableFileService;
-import com.ragagent.contract.storage.provider.SeekableSource;
-import com.ragagent.contract.storage.fileserve.WritableFileContentService;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * 把 A3 的 {@link com.ragagent.storage.provider.FileService}（八个 provider 的真实实现）

@@ -2,9 +2,8 @@ package com.ragagent.wiki.controller;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
 
 /** 请求体绑定的 400 文案钉子（非对象 body / EOF）。 */
 class WikiRequestSupportTest {

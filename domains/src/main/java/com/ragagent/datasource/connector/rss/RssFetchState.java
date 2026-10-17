@@ -1,9 +1,8 @@
 package com.ragagent.datasource.connector.rss;
 
-import java.util.List;
-
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.SyncCursor;
+import java.util.List;
 
 /**
  * <b>"异常与结果同时有效"</b>的载体——本模块最重要的一条设计决定。

@@ -1,10 +1,10 @@
 package com.ragagent.knowledge.support;
 
+import com.ragagent.contract.retrieval.ChunkTypes;
+import com.ragagent.knowledge.domain.Chunk;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import com.ragagent.contract.retrieval.ChunkTypes;
-import com.ragagent.knowledge.domain.Chunk;
 
 /**
  * 问题生成的**选块与分批**。

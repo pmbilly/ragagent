@@ -1,20 +1,18 @@
 package com.ragagent.agenttools.knowledge;
 
-import com.ragagent.platform.knowledge.GrepChunksScoring;
+import static com.ragagent.agenttools.knowledge.KnowledgeSearchTool.nz;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.RankResult;
+import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.ResultWithMeta;
+import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.SearchResultView;
+import com.ragagent.platform.knowledge.GrepChunksScoring;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.fasterxml.jackson.databind.JsonNode;
-
-import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.RankResult;
-import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.ResultWithMeta;
-import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.SearchResultView;
-
-import static com.ragagent.agenttools.knowledge.KnowledgeSearchTool.nz;
 
 
 final class KnowledgeSearchRanking {

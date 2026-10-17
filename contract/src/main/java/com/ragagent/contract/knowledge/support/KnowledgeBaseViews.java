@@ -1,8 +1,8 @@
 package com.ragagent.contract.knowledge.support;
 
 import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
 
 /**
  * 知识库实体 → L1 视图的公用投影（自 knowledge 域适配器的静态助手原样搬入）：

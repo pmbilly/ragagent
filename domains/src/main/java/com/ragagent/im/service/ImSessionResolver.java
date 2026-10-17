@@ -1,15 +1,14 @@
 package com.ragagent.im.service;
 
-import java.time.OffsetDateTime;
-import java.util.UUID;
-
+import com.ragagent.contract.session.SessionView;
 import com.ragagent.im.domain.ChannelSessionEntity;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
+import java.time.OffsetDateTime;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.contract.session.SessionView;
 
 /**
  * IM 消息的会话解析：user / thread 两种模式的映射查找与首建（含并发撞唯一约束时的

@@ -1,5 +1,8 @@
 package com.ragagent.storage.service;
 
+import com.ragagent.platform.storage.fileserve.StoragePaths;
+import com.ragagent.storage.domain.StoredResource;
+import com.ragagent.storage.mapper.ResourceRepository;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -8,15 +11,9 @@ import java.time.ZoneOffset;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
 import org.springframework.stereotype.Service;
-
-import com.ragagent.storage.domain.StoredResource;
-import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.storage.mapper.ResourceRepository;
 
 /**
  * 资源注册表领域服务：resource:// 手柄的解析/授权与注册/绑定/软删。

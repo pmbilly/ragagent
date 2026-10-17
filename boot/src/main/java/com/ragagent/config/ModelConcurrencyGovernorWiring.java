@@ -1,19 +1,17 @@
 package com.ragagent.config;
 
+import com.ragagent.llm.limiter.ConcurrencyGovernor;
+import com.ragagent.llm.limiter.LocalLimiter;
+import com.ragagent.llm.limiter.ModelConcurrencyLimiter;
+import com.ragagent.llm.limiter.RedisLimiter;
+import com.ragagent.system.service.SystemSettingService;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
-
-import com.ragagent.llm.limiter.ConcurrencyGovernor;
-import com.ragagent.llm.limiter.LocalLimiter;
-import com.ragagent.llm.limiter.ModelConcurrencyLimiter;
-import com.ragagent.llm.limiter.RedisLimiter;
-import com.ragagent.system.service.SystemSettingService;
-
-import jakarta.annotation.PostConstruct;
 
 /**
  * 后台并发闸门的启动装配：limit = model.max_concurrency（DB → {@code WEKNORA_MODEL_MAX_CONCURRENCY}

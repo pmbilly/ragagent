@@ -1,28 +1,29 @@
 package com.ragagent.session.controller;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.session.MentionedItem;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.stream.LiveRun;
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
+import com.ragagent.session.domain.conversation.SessionNotFoundException;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.service.MessageService;
+import com.ragagent.session.service.SessionService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.contract.session.MentionedItem;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.conversation.SessionNotFoundException;
-import com.ragagent.session.service.MessageService;
-import com.ragagent.session.service.SessionService;
-import com.ragagent.platform.stream.LiveRun;
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.stream.StreamManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +33,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.platform.web.ApiResult;
 
 /**
  * 运行中轮次的中途消息（steer）HTTP 层。

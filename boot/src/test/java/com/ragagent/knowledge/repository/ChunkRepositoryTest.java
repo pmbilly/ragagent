@@ -5,26 +5,25 @@ package com.ragagent.knowledge.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.TestSchema;
 import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.ChunkNotFoundException;
+import com.ragagent.knowledge.domain.ChunkPage;
 import com.ragagent.knowledge.domain.ChunkRevision;
+import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
+import com.ragagent.knowledge.mapper.ChunkMapper;
+import com.ragagent.knowledge.mapper.ChunkRevisionMapper;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.knowledge.domain.ChunkNotFoundException;
-import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
-import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.mapper.ChunkRevisionMapper;
-import com.ragagent.knowledge.domain.ChunkPage;
 
 /**
  * chunk 仓储语义（H2）——覆盖 HTTP 面用到的全部仓储方法。

@@ -1,15 +1,5 @@
 package com.ragagent.mcp.service;
 
-import com.ragagent.platform.web.JsonBodyErrors;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.stereotype.Service;
-
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.tool.Decision;
@@ -21,6 +11,14 @@ import com.ragagent.mcp.oauth.OAuthAuthorizationStatus;
 import com.ragagent.mcp.oauth.OAuthManager;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.web.JsonBodyErrors;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.stereotype.Service;
 
 /**
  * MCP OAuth 流程的用例层：发起授权、授权状态查询、会话内 OAuth 决议与取消。

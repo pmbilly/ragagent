@@ -1,9 +1,8 @@
 package com.ragagent.auth.dto;
 
-import java.time.OffsetDateTime;
-
 import com.ragagent.auth.domain.User;
 import com.ragagent.contract.auth.UserPreferences;
+import java.time.OffsetDateTime;
 
 /**
  * 用户信息投影。

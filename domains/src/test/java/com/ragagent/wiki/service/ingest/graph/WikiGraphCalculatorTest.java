@@ -3,15 +3,14 @@ package com.ragagent.wiki.service.ingest.graph;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.contract.wiki.WikiException;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.graph.WikiGraph;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.contract.wiki.WikiException;
-import com.ragagent.wiki.domain.graph.WikiGraph;
-import com.ragagent.wiki.domain.WikiPage;
 import org.junit.jupiter.api.Test;
 
 /**

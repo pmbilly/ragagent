@@ -1,5 +1,21 @@
 package com.ragagent.mcp.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.mcp.domain.McpMetadata;
+import com.ragagent.mcp.domain.McpService;
+import com.ragagent.mcp.domain.McpTool;
+import com.ragagent.mcp.domain.McpToolApproval;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.util.LinkedHashMap;
@@ -10,29 +26,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.mcp.domain.McpMetadata;
-import com.ragagent.mcp.domain.McpService;
-import com.ragagent.mcp.domain.McpTool;
-import com.ragagent.mcp.domain.McpToolApproval;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 /**
  * 使用说明生成协作者（自 {@link McpServiceController} 拆出）：白名单式输入装配、
  * 60 秒限时 LLM 调用与模型选择。

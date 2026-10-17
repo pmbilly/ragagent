@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.model.ResponseType;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +16,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import com.ragagent.contract.model.ResponseType;
 import org.junit.jupiter.api.Test;
 
 /**

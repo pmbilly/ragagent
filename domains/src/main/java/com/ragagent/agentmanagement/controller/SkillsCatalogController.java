@@ -1,17 +1,15 @@
 package com.ragagent.agentmanagement.controller;
 
+import com.ragagent.contract.agent.SkillCatalogPort;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.ApiResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.ragagent.contract.agent.SkillCatalogPort;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.web.ApiResult;
 
 /**
  * 指令型技能选择器的数据源（智能体编辑器 → 技能区）。

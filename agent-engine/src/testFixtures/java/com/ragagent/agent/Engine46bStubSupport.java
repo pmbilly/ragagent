@@ -1,29 +1,28 @@
 package com.ragagent.agent;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.contract.agent.SteerSink;
+import com.ragagent.contract.event.EventBusInterface;
+import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.model.StreamResponse;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.model.chat.FunctionCall;
+import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.event.EventJson;
+import com.ragagent.platform.event.EventType;
+import com.ragagent.platform.stream.QueuedChatStream;
+import com.ragagent.platform.tool.BaseTool;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.agent.tool.ToolRegistry;
-import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.platform.event.EventJson;
-import com.ragagent.platform.event.EventType;
-import com.ragagent.contract.model.ChatStream;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.platform.stream.QueuedChatStream;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.model.chat.ToolCall;
-import com.ragagent.contract.model.chat.FunctionCall;
 
 /**
  * 引擎录制回放的替身与掩码工具（脚本化 chat / 计数工具 / steer sink 与掩码）。

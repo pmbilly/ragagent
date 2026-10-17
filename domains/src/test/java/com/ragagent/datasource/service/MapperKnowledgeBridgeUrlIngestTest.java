@@ -11,6 +11,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeIngest;
+import com.ragagent.contract.knowledge.KnowledgeParseStatus;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
+import com.ragagent.knowledge.storage.LocalStorageService;
+import com.ragagent.knowledge.support.KnowledgePaths;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.web.JsonMappers;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -19,25 +29,12 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.util.List;
 import java.util.Map;
-
 import javax.sql.DataSource;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.knowledge.storage.LocalStorageService;
-import com.sun.net.httpserver.HttpServer;
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.knowledge.KnowledgeIngest;
-import com.ragagent.knowledge.support.KnowledgePaths;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
-import com.ragagent.contract.knowledge.KnowledgeRowView;
-import com.ragagent.contract.knowledge.KnowledgeParseStatus;
-import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 数据源 URL 摄取（整改 K2 /）：下载在同步期完成、与文件行同形。

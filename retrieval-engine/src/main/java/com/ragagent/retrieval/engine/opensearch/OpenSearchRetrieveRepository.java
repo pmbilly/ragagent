@@ -2,7 +2,15 @@ package com.ragagent.retrieval.engine.opensearch;
 
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.vectorstore.IndexConfig;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.retrieval.engine.EngineTypes;
+import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
+import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -15,18 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.retrieval.engine.EngineTypes;
-import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
-import com.ragagent.retrieval.engine.RetrieveEngineRepository;
-import com.ragagent.contract.vectorstore.IndexConfig;
 
 /**
  * OpenSearch k-NN 检索引擎仓库。HTTP 自持（java.net.http），与 ES v7/v8 驱动同一姿态。

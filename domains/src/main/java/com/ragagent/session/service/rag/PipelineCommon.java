@@ -1,6 +1,19 @@
 package com.ragagent.session.service.rag;
 
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.session.PipelineMessageAttachmentView;
+import com.ragagent.contract.session.PipelineMessageImageView;
+import com.ragagent.contract.session.PipelineMessageView;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.prompt.AgentPromptPlaceholders;
+import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
+import com.ragagent.platform.prompt.PromptComposer;
+import com.ragagent.session.service.rag.plugin.PluginError;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -10,20 +23,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.function.BiFunction;
-
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.session.service.rag.plugin.PluginError;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
-import com.ragagent.contract.session.PipelineMessageAttachmentView;
-import com.ragagent.contract.session.PipelineMessageImageView;
-import com.ragagent.contract.session.PipelineMessageView;
-import com.ragagent.platform.prompt.PromptComposer;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.prompt.AgentPromptPlaceholders;
-import com.ragagent.platform.access.TenantContextSnapshot;
 
 /**
  * 管线共享工具。

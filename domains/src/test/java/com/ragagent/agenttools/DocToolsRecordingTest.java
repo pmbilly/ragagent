@@ -1,34 +1,31 @@
 package com.ragagent.agenttools;
 
-import com.ragagent.agent.fixtures.GoRecording45B;
-import com.ragagent.agent.fixtures.RecordingSupport;
-import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.agenttools.knowledge.GetDocumentInfoTool;
+import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
+import com.ragagent.agenttools.wiki.WikiReadSourceDocTool;
+import com.ragagent.contract.agent.SearchAuth.TagView;
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.support.ChunkRowViews;
 import com.ragagent.platform.knowledge.DocChunkSupport.ChunkPage;
 import com.ragagent.platform.knowledge.DocChunkSupport.ImageInfoCollector;
 import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoReader;
 import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoRow;
 import com.ragagent.platform.knowledge.DocChunkSupport.PagedChunks;
-import com.ragagent.contract.agent.SearchAuth.TagView;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.agenttools.knowledge.GetDocumentInfoTool;
-import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
-import com.ragagent.agenttools.wiki.WikiReadSourceDocTool;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.knowledge.support.ChunkRowViews;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 /**
  * 4.5b 回放：wiki_read_source_doc / get_document_info / list_knowledge_chunks

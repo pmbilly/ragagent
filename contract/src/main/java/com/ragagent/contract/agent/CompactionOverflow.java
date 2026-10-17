@@ -1,8 +1,7 @@
 package com.ragagent.contract.agent;
 
-import java.util.regex.Pattern;
-
 import com.ragagent.contract.model.chat.ChatResponse;
+import java.util.regex.Pattern;
 
 /**
  * 上下文溢出的识别。

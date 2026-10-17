@@ -1,5 +1,8 @@
 package com.ragagent.memory.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.platform.task.RedisTaskQueueCore;
+import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.util.concurrent.ExecutorService;
@@ -8,15 +11,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.redis.core.StringRedisTemplate;
-
-import com.ragagent.platform.task.RedisTaskQueueCore;
-import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 
 /**
  * {@link MemoryExtractTaskQueue} 的 <b>Redis</b> 实现（跨实例共享任务表）。

@@ -4,14 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import com.ragagent.TestSchema;
+import com.ragagent.knowledge.storage.LocalStorageService;
+import com.ragagent.support.GoldenContract;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
-import com.ragagent.TestSchema;
-import com.ragagent.knowledge.storage.LocalStorageService;
-import com.ragagent.support.GoldenContract;
 
 /**
  * embed QA 委托 / 文件代理（w5d-emb-*）的契约测试。golden 来源：dev server

@@ -1,17 +1,16 @@
 package com.ragagent.knowledge.task;
 
 import com.ragagent.knowledge.domain.ChunkExtractConsumer;
-
+import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import com.ragagent.knowledge.domain.ExtractChunkPayload;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 进程内分块抽取队列。

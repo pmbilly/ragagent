@@ -8,21 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.contract.event.Event;
-import com.ragagent.platform.event.EventBus;
-import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.AgentCompleteData;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.payload.AgentReferencesData;
@@ -30,10 +16,22 @@ import com.ragagent.contract.event.payload.AgentThoughtData;
 import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
 import com.ragagent.contract.event.payload.MemoryRecalledData;
+import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.session.domain.message.Message;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.session.PipelineUsedMemoryView;
+import com.ragagent.platform.event.EventBus;
+import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.session.domain.message.Message;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * {@code AgentStreamBridge} 的 SSE 载荷契约。

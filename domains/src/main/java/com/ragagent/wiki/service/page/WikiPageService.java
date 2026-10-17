@@ -1,21 +1,20 @@
 package com.ragagent.wiki.service.page;
 
-import java.util.List;
-import java.util.Map;
-
-import com.ragagent.wiki.domain.folder.WikiFolder;
-import com.ragagent.wiki.domain.folder.WikiFolderNode;
-import com.ragagent.wiki.domain.graph.WikiGraph;
 import com.ragagent.contract.wiki.WikiIndex;
 import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.WikiPageIssue;
-import com.ragagent.wiki.domain.page.WikiPageLite;
+import com.ragagent.wiki.domain.folder.WikiFolder;
+import com.ragagent.wiki.domain.folder.WikiFolderNode;
+import com.ragagent.wiki.domain.graph.WikiGraph;
 import com.ragagent.wiki.domain.page.WikiPageListRequest;
 import com.ragagent.wiki.domain.page.WikiPageListResponse;
+import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.domain.page.WikiPageRevision;
 import com.ragagent.wiki.domain.page.WikiPageRevisionListResponse;
 import com.ragagent.wiki.domain.page.WikiStats;
+import java.util.List;
+import java.util.Map;
 
 /**
  * wiki 页面服务接口。

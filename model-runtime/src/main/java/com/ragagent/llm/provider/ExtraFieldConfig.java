@@ -1,9 +1,8 @@
 package com.ragagent.llm.provider;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 
 /**
  * 服务商额外字段元数据，JSON 键逐字段固定：

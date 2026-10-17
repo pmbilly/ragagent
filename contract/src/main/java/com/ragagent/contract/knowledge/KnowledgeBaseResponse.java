@@ -1,13 +1,12 @@
 package com.ragagent.contract.knowledge;
 
 
-import java.time.OffsetDateTime;
-
 import com.ragagent.contract.knowledge.domain.AsrConfigView;
 import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
 import com.ragagent.contract.knowledge.domain.ImageProcessingConfigView;
 import com.ragagent.contract.knowledge.domain.IndexingStrategyView;
 import com.ragagent.contract.knowledge.domain.VlmConfigView;
+import java.time.OffsetDateTime;
 
 /**
  * 知识库的对外响应体（详情 / 列表项 / 初始化回执统一用这一个形态）。

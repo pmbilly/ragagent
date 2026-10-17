@@ -1,17 +1,15 @@
 package com.ragagent.session.domain.message;
 
-import com.ragagent.contract.session.SuggestionItem;
-import com.ragagent.session.domain.SuggestionItemListTypeHandler;
-
-import java.time.OffsetDateTime;
-import java.util.List;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.ragagent.contract.session.SuggestionItem;
+import com.ragagent.session.domain.SuggestionItemListTypeHandler;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 /**
  * 一条助手消息 + 一套生效 agent 配置的**生成/缓存记录**。

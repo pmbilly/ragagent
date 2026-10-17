@@ -1,5 +1,6 @@
 package com.ragagent.mcp.oauth;
 
+import com.ragagent.mcp.protocol.McpHttp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -7,8 +8,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-
-import com.ragagent.mcp.protocol.McpHttp;
 
 /**
  * OAuth 流程的出站 HTTP（统一 30s 超时）。

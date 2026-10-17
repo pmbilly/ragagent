@@ -1,7 +1,5 @@
 package com.ragagent.agent.tool;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.pipeline.ToolRegistryPort;
 import com.ragagent.contract.tool.AgentTool;
@@ -9,6 +7,7 @@ import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolExecContext;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.web.JsonMappers;
+import java.util.List;
 
 /**
  * 注册表端口的**包内实现**：外部（mcp 装配层等）只能看到这些动作，工具表本身仍是私有。

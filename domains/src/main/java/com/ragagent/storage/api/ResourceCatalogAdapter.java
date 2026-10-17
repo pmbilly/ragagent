@@ -1,12 +1,10 @@
 package com.ragagent.storage.api;
 
-import java.util.Optional;
-
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
+import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link ResourceCatalogPort} 的存储域实现：把目录服务的解析与绑定映射成最小视图。

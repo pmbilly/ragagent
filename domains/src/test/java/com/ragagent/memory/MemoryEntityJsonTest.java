@@ -1,8 +1,22 @@
 package com.ragagent.memory;
 
-import com.ragagent.platform.web.JsonMappers;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.common.JsonRoundTrip;
+import com.ragagent.contract.memory.MemoryMessageCursor;
+import com.ragagent.memory.domain.MemoryDocAffinity;
+import com.ragagent.memory.domain.MemoryExtractionSession;
+import com.ragagent.memory.domain.MemoryExtractionState;
+import com.ragagent.memory.domain.MemoryTopicStat;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryItemEmbedding;
+import com.ragagent.memory.domain.item.MemoryTombstone;
+import com.ragagent.memory.domain.scope.MemorySubject;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -10,22 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.JsonRoundTrip;
-import com.ragagent.memory.domain.MemoryDocAffinity;
-import com.ragagent.memory.domain.MemoryExtractionSession;
-import com.ragagent.memory.domain.MemoryExtractionState;
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.memory.domain.item.MemoryItemEmbedding;
-import com.ragagent.contract.memory.MemoryMessageCursor;
-import com.ragagent.memory.domain.scope.MemorySubject;
-import com.ragagent.memory.domain.item.MemoryTombstone;
-import com.ragagent.memory.domain.MemoryTopicStat;
 import org.junit.jupiter.api.Test;
-import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * memory 实体 / jsonb 值的**逐字节 JSON 契约**测试。

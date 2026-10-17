@@ -1,18 +1,18 @@
 package com.ragagent.retrieval.engine;
 
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
 import com.ragagent.contract.retrieval.IndexRow;
 import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
 
 /**
  * postgres 检索引擎的 embeddings 索引写面（写/删/更新），与读侧

@@ -1,25 +1,23 @@
 package com.ragagent.auth.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
-
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ragagent.contract.apikey.APIKeyScopeContext;
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.tenant.TenantRole;
-
+import com.ragagent.contract.tenant.TenantRowView;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * POST /tenants 创建租户协作者（自 {@link TenantCatalogController} 拆出）：自助/超管双路径、配额预检与

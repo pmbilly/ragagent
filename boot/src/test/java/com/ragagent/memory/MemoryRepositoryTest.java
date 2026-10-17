@@ -3,30 +3,29 @@ package com.ragagent.memory;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.time.OffsetDateTime;
-import java.util.List;
-
 import com.ragagent.TestSchema;
-import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.memory.domain.MemoryDocAffinity;
-import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.memory.domain.MemoryDocAffinity;
 import com.ragagent.memory.domain.MemoryPage;
+import com.ragagent.memory.domain.MemoryText;
+import com.ragagent.memory.domain.MemoryTopicStat;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryTombstone;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
-import com.ragagent.memory.domain.MemoryText;
-import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.repository.MemoryRepository;
+import com.ragagent.platform.web.ZeroTimeSerializer;
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.memory.domain.item.MemoryTombstone;
 
 /**
  * 记忆仓储在 H2 上的语义。

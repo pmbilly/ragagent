@@ -8,30 +8,28 @@ import static com.ragagent.session.service.rag.Rec46cSupport.json;
 import static com.ragagent.session.service.rag.Rec46cSupport.mask;
 import static com.ragagent.session.service.rag.Rec46cSupport.msgsJSON;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
+import com.ragagent.contract.graph.GraphData;
+import com.ragagent.contract.graph.GraphNode;
+import com.ragagent.contract.graph.GraphRelation;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.model.StreamResponse;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.session.PipelineMessageAttachmentView;
+import com.ragagent.llm.extract.EntityExtraction;
+import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.session.service.rag.plugin.PluginChatCompletion;
 import com.ragagent.session.service.rag.plugin.PluginChatCompletionStream;
 import com.ragagent.session.service.rag.plugin.PluginError;
 import com.ragagent.session.service.rag.plugin.PluginIntoChatMessage;
 import com.ragagent.session.service.rag.plugin.PluginWebFetch;
 import com.ragagent.session.service.rag.support.ReferencesSupport;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.session.PipelineMessageAttachmentView;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.graph.GraphData;
-import com.ragagent.contract.graph.GraphNode;
-import com.ragagent.contract.graph.GraphRelation;
-import com.ragagent.llm.extract.EntityExtraction;
-import com.ragagent.platform.prompt.PipelineConfig;
-import com.ragagent.contract.model.StreamResponse;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * 录制回放：progress / into_chat / references / completion / stream / entity / web_fetch

@@ -1,8 +1,8 @@
 package com.ragagent.agenttools.wiki;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.databind.JsonNode;
 
 /** wiki 工具共享文本处理：JSON 字段解析、截断、按查询摘要、码点切片。 */
 public final class WikiTexts {

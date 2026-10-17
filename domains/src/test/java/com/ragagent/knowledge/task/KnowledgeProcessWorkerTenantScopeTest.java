@@ -6,29 +6,27 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.context.ApplicationEventPublisher;
-
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
+import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.knowledge.client.DocReaderClient;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.span.SpanTracker;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
-import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.knowledge.service.image.ExtractedImageStore;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.retrieval.VectorIndexStore;
-import com.ragagent.contract.retrieval.RetrieveGraphRepository;
-import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.knowledge.storage.TenantFileStorage;
+import com.ragagent.platform.access.TenantContext;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * 回归：worker 管线必须在<b>知识行租户作用域</b>内执行。

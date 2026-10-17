@@ -1,13 +1,12 @@
 package com.ragagent.wiki.service;
 
+import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
+import com.ragagent.contract.wiki.WikiFinalizePort;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-
-import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import com.ragagent.contract.wiki.WikiFinalizePort;
 
 /**
  * {@link WikiKnowledgeFinalizer} 的默认实现：把文档从 {@code finalizing} 推向

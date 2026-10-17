@@ -1,12 +1,11 @@
 package com.ragagent.mcp.oauth;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.mcp.domain.McpOAuthToken;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.protocol.McpContext;
+import com.ragagent.platform.access.TenantContext;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 /**
  * 由 {@link OAuthRepository} 支撑的 token 存储，作用域钉死在一个

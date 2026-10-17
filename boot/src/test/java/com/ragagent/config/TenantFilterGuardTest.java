@@ -1,11 +1,16 @@
 package com.ragagent.config;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
+import com.ragagent.platform.persistence.FullTableWriteGuard;
 import com.ragagent.platform.persistence.TenantFilterGuard;
+import java.util.Collections;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
@@ -14,12 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collections;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import com.ragagent.platform.persistence.FullTableWriteGuard;
 
 /**
  * {@link TenantFilterGuard} 行为测试：探针 SQL 直接打拦截器。

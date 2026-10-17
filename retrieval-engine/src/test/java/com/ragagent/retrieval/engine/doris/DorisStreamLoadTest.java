@@ -3,6 +3,10 @@ package com.ragagent.retrieval.engine.doris;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.retrieval.engine.doris.DorisRetrieveRepositoryTest.FakeRowSpec;
+import com.ragagent.retrieval.engine.doris.DorisRetrieveRepositoryTest.FakeSql;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -12,16 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.retrieval.engine.doris.DorisRetrieveRepositoryTest.FakeRowSpec;
-import com.ragagent.retrieval.engine.doris.DorisRetrieveRepositoryTest.FakeSql;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
 
 /**
  * Doris Stream Load 面（legacy 模式的 partial update）：

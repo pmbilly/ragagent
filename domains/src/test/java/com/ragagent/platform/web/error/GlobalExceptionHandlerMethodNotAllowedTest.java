@@ -2,12 +2,11 @@ package com.ragagent.platform.web.error;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.contract.error.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
-
-import com.ragagent.contract.error.ErrorCode;
 
 /**
  * 方法不允许 → 405（而非 catch-all 的 500）。

@@ -1,20 +1,20 @@
 package com.ragagent.knowledge.domain.access;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.access.TenantContext;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
-import org.springframework.stereotype.Component;
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.platform.access.TenantContext;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import org.springframework.stereotype.Component;
 
 /**
  * 知识文档路由共用的守卫与解析面（两个控制器共享）：

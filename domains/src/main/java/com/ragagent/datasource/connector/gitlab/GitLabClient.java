@@ -1,5 +1,11 @@
 package com.ragagent.datasource.connector.gitlab;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.text.Whitespace;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorHttp;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.time.Duration;
@@ -7,13 +13,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.connector.ConnectorHttp;
-import com.ragagent.contract.text.Whitespace;
 
 /**
  * GitLab REST 客户端。

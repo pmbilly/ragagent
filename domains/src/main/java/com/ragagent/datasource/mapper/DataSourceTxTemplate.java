@@ -1,7 +1,6 @@
 package com.ragagent.datasource.mapper;
 
 import java.util.function.Supplier;
-
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,17 +1,9 @@
 package com.ragagent.event;
 
-import com.ragagent.platform.event.EventJson;
-import com.ragagent.platform.event.EventType;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.Test;
+import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.contract.event.payload.AgentActionData;
 import com.ragagent.contract.event.payload.AgentCompleteData;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
@@ -38,7 +30,13 @@ import com.ragagent.contract.event.payload.StopData;
 import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
 import com.ragagent.contract.event.payload.ToolApprovalResolvedData;
 import com.ragagent.contract.event.payload.UserMessageInjectedData;
-import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.platform.event.EventJson;
+import com.ragagent.platform.event.EventType;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 /**
  * 事件 payload 的 JSON 字节形状——<b>期望值全部是固定录制真值</b>，

@@ -6,20 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.contract.model.PromptCacheStatus;
+import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.model.chat.CacheRetention;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatTool;
-import com.ragagent.contract.model.PromptCacheStatus;
-import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.llm.provider.ProviderName;
-
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 

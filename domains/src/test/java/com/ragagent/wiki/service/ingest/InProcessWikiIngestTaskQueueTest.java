@@ -3,20 +3,18 @@ package com.ragagent.wiki.service.ingest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.wiki.domain.TaskDeadLetter;
+import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import java.time.Duration;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.ObjectProvider;
-
-import com.ragagent.wiki.domain.TaskDeadLetter;
-import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 
 /**
  * 进程内虚拟线程任务队列的语义测试。

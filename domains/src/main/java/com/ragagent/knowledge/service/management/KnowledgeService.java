@@ -1,31 +1,6 @@
 package com.ragagent.knowledge.service.management;
 
 
-import com.ragagent.knowledge.domain.KnowledgeTenants;
-
-import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
-
-import com.ragagent.knowledge.repository.KnowledgeTagRepository;
-import com.ragagent.knowledge.domain.KnowledgeSearchScope;
-
-import com.ragagent.knowledge.repository.ChunkRepository;
-
-import com.ragagent.knowledge.support.KnowledgePaths;
-
-import com.ragagent.knowledge.repository.KnowledgeRepository;
-
-
-import com.ragagent.contract.knowledge.support.KnowledgeProjectionAdapter;
-
-import com.ragagent.knowledge.domain.access.KnowledgeReadPort;
-
-import com.ragagent.platform.web.JsonMappers;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,33 +11,49 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.contract.knowledge.KnowledgeDocumentGateway;
-import com.ragagent.platform.security.InputSanitizer;
+import com.ragagent.contract.knowledge.KnowledgeIngest;
+import com.ragagent.contract.knowledge.service.DuplicateKnowledgeException;
+import com.ragagent.contract.knowledge.support.KnowledgeProjectionAdapter;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
+import com.ragagent.knowledge.domain.KnowledgeSearchScope;
 import com.ragagent.knowledge.domain.KnowledgeTag;
-import com.ragagent.contract.knowledge.KnowledgeIngest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.ragagent.knowledge.domain.KnowledgeTenants;
+import com.ragagent.knowledge.domain.access.KnowledgeReadPort;
+import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 import com.ragagent.knowledge.dto.doc.UpdateKnowledgeRequest;
 import com.ragagent.knowledge.dto.kb.KBCloneProgress;
-import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
-import com.ragagent.knowledge.storage.LocalStorageService;
-import com.ragagent.knowledge.storage.TenantFileStorage;
-import com.ragagent.platform.http.UrlBytesFetcher;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.TreeSet;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
+import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.service.KnowledgeAccessHelper;
 import com.ragagent.knowledge.service.enrichment.KnowledgeSummaryService;
+import com.ragagent.knowledge.service.image.ExtractedImageStore;
 import com.ragagent.knowledge.service.query.KnowledgeSearchService;
 import com.ragagent.knowledge.service.query.KnowledgeSpanService;
-import com.ragagent.knowledge.service.image.ExtractedImageStore;
-import com.ragagent.contract.knowledge.service.DuplicateKnowledgeException;
-import com.ragagent.knowledge.support.TagViews;
+import com.ragagent.knowledge.storage.LocalStorageService;
+import com.ragagent.knowledge.storage.TenantFileStorage;
+import com.ragagent.knowledge.support.KnowledgePaths;
 import com.ragagent.knowledge.support.KnowledgeRowViews;
+import com.ragagent.knowledge.support.TagViews;
+import com.ragagent.platform.http.UrlBytesFetcher;
+import com.ragagent.platform.security.InputSanitizer;
+import com.ragagent.platform.web.JsonMappers;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * （覆盖 file/url/manual 创建、分页列表、get/update/delete、folders；

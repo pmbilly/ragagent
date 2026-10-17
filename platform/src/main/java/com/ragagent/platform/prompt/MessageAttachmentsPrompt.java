@@ -1,9 +1,8 @@
 package com.ragagent.platform.prompt;
 
+import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.platform.text.HtmlText;
 import java.util.List;
-
-import com.ragagent.contract.session.PipelineMessageAttachmentView;
 
 /**
  * 附件列表 → LLM 提示词段。

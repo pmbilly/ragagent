@@ -2,18 +2,16 @@ package com.ragagent.datasource.connector.feishu.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.datasource.connector.feishu.core.DocxBlocks.DocxBlock;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorHttp;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.datasource.domain.connector.ConnectorHttp;
-import com.ragagent.datasource.connector.feishu.core.DocxBlocks.DocxBlock;
-import com.ragagent.datasource.domain.connector.ConnectorException;
 
 /**
  * docx blocks / sheets-v2 / bitable-v1 的读取、分页、截断与防御性 break。

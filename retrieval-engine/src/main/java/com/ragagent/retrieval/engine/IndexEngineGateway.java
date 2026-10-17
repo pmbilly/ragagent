@@ -1,10 +1,5 @@
 package com.ragagent.retrieval.engine;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.contract.retrieval.IndexDocument;
 import com.ragagent.contract.retrieval.IndexEngine;
@@ -12,6 +7,9 @@ import com.ragagent.contract.retrieval.IndexEngineResolver;
 import com.ragagent.contract.retrieval.TenantRetrievalDefault;
 import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import com.ragagent.platform.web.JsonMappers;
+import java.util.List;
+import java.util.Map;
+import org.springframework.stereotype.Component;
 
 /**
  * 索引引擎解析 + 适配（R3b 契约化）：把内部 {@link CompositeRetrieveEngine} 包成契约面

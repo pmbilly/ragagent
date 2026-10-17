@@ -1,15 +1,15 @@
 package com.ragagent.initialization.service;
 
-import com.ragagent.platform.web.JsonBodyErrors;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.RequestFields;
-import java.util.ArrayList;
-import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
+import com.ragagent.platform.web.JsonBodyErrors;
+import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.RequestFields;
+import java.util.ArrayList;
+import java.util.List;
 
 /** initialization 端点的原始请求体绑定器（record + 手写绑定,契约换锚时一并 DTO 化）。 */
 public final class InitializationRequests {

@@ -1,10 +1,9 @@
 package com.ragagent.wiki.mapper;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.wiki.domain.page.WikiPageRevision;
 import com.ragagent.wiki.domain.WikiStringListTypeHandler;
+import com.ragagent.wiki.domain.page.WikiPageRevision;
+import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

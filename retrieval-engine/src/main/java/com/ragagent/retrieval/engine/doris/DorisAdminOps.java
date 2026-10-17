@@ -3,9 +3,8 @@ package com.ragagent.retrieval.engine.doris;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Locale;
 import java.util.List;
-
+import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

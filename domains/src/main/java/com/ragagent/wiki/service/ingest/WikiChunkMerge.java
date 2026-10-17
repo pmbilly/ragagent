@@ -1,10 +1,9 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.contract.knowledge.ChunkView;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import com.ragagent.contract.knowledge.ChunkView;
 
 /**
  * 按位置 + 文本匹配重建文档正文。

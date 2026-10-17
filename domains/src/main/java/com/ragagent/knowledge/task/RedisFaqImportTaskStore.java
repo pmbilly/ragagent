@@ -1,17 +1,15 @@
 package com.ragagent.knowledge.task;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.knowledge.dto.faq.FaqImportProgress;
+import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
-
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 
 /**
  * {@link FaqImportTaskStore} 的 <b>Redis</b> 实现（跨实例共享的进度与锁）。

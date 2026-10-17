@@ -1,27 +1,25 @@
 package com.ragagent.wiki.controller;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.wiki.domain.issue.WikiLintReport;
-import com.ragagent.wiki.domain.WikiPageIssue;
-import com.ragagent.wiki.service.page.WikiLintService;
-import com.ragagent.wiki.service.page.WikiPageService;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
-
 import static com.ragagent.wiki.controller.WikiRequestSupport.errText;
 import static com.ragagent.wiki.controller.WikiRequestSupport.internal;
 import static com.ragagent.wiki.controller.WikiRequestSupport.message;
 import static com.ragagent.wiki.controller.WikiRequestSupport.q;
 import static com.ragagent.wiki.controller.WikiRequestSupport.requiredFieldErrors;
 import static com.ragagent.wiki.controller.WikiRequestSupport.sanitize;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
+import com.ragagent.wiki.domain.WikiPageIssue;
+import com.ragagent.wiki.domain.issue.WikiLintReport;
+import com.ragagent.wiki.service.page.WikiLintService;
+import com.ragagent.wiki.service.page.WikiPageService;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 /**
  * 检索维护面与问题面的端点执行体：重建链接、体检、自动修复、问题列表与状态流转。

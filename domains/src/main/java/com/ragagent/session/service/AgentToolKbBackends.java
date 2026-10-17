@@ -1,36 +1,33 @@
 package com.ragagent.session.service;
 
-import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
-
-import com.ragagent.platform.knowledge.GrepChunkHit;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.platform.knowledge.DocChunkSupport;
 import com.ragagent.agenttools.knowledge.GrepChunksTool;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool;
 import com.ragagent.contract.agent.SearchAuth;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.retrieval.SearchParams;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.platform.settings.ConversationProperties;
-
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.platform.knowledge.ImageInfoEnricher;
-import com.ragagent.contract.model.RankResult;
-import com.ragagent.contract.model.Reranker;
-import com.ragagent.contract.retrieval.HybridSearchPort;
-import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.ChunkPageView;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.contract.model.RankResult;
+import com.ragagent.contract.model.Reranker;
+import com.ragagent.contract.retrieval.ChunkTypes;
+import com.ragagent.contract.retrieval.HybridSearchPort;
+import com.ragagent.contract.retrieval.SearchParams;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.platform.knowledge.DocChunkSupport;
+import com.ragagent.platform.knowledge.GrepChunkHit;
+import com.ragagent.platform.knowledge.ImageInfoEnricher;
+import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.platform.web.JsonMappers;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * {@code AgentToolBackends} 的**知识库检索簇**：知识库检索 / chunk 列举 /

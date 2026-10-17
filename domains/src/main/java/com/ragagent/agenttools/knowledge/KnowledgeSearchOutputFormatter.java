@@ -1,5 +1,14 @@
 package com.ragagent.agenttools.knowledge;
 
+import static com.ragagent.agenttools.knowledge.KnowledgeSearchTool.nz;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.ResultWithMeta;
+import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.platform.knowledge.DocChunkSupport;
+import com.ragagent.platform.knowledge.DocChunkSupport.ImageInfoRow;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -7,16 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.knowledge.DocChunkSupport.ImageInfoRow;
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.contract.knowledge.ChunkFacts;
-
-import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.ResultWithMeta;
-import com.ragagent.platform.knowledge.DocChunkSupport;
-
-import static com.ragagent.agenttools.knowledge.KnowledgeSearchTool.nz;
 
 
 final class KnowledgeSearchOutputFormatter {

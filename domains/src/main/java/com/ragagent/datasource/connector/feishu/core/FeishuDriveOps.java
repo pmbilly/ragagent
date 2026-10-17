@@ -1,17 +1,16 @@
 package com.ragagent.datasource.connector.feishu.core;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFile;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFileListFailure;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFileListResponse;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFolderMetaResponse;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveShortcutInfo;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.PartialDriveFileListException;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

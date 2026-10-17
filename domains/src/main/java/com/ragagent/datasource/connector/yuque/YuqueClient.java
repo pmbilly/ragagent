@@ -1,19 +1,7 @@
 package com.ragagent.datasource.connector.yuque;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.datasource.domain.connector.Connector;
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.connector.ConnectorHttp;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.ApiErrorBody;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2Doc;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2DocDetail;
@@ -25,6 +13,17 @@ import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2Repo;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2RepoListResponse;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2User;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2UserResponse;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorHttp;
+import com.ragagent.platform.web.JsonMappers;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

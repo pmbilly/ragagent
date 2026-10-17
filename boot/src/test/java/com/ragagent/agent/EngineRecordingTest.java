@@ -2,29 +2,27 @@ package com.ragagent.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
-import com.ragagent.agent.domain.AgentState;
-import com.ragagent.contract.agent.AgentToolCall;
-import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.platform.event.EventJson;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.agent.fixtures.ContractJson;
-import com.ragagent.contract.agent.CompactionSettings;
-import com.ragagent.contract.model.chat.ChatTool;
-import com.ragagent.contract.model.chat.FunctionCall;
 import com.ragagent.agent.budget.TokenEstimator;
-import com.ragagent.contract.agent.RecentDocInfo;
-import com.ragagent.contract.agent.SelectedDocumentInfo;
+import com.ragagent.agent.domain.AgentState;
+import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.contract.agent.AgentToolCall;
+import com.ragagent.contract.agent.CompactionSettings;
+import com.ragagent.contract.agent.KnowledgeBaseInfo;
 import com.ragagent.contract.agent.PinnedMCPServiceInfo;
 import com.ragagent.contract.agent.PinnedSkillInfo;
-import com.ragagent.contract.agent.KnowledgeBaseInfo;
+import com.ragagent.contract.agent.RecentDocInfo;
+import com.ragagent.contract.agent.SelectedDocumentInfo;
+import com.ragagent.contract.event.EventBusInterface;
+import com.ragagent.contract.model.StreamResponse;
+import com.ragagent.contract.model.TokenUsage;
+import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.model.chat.ChatTool;
+import com.ragagent.contract.model.chat.FunctionCall;
+import com.ragagent.platform.event.EventJson;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * 引擎录制回放：Java 引擎用同一脚本驱动，事件序列 / AgentState 快照 /

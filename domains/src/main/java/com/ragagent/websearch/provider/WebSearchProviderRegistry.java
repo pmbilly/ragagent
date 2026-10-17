@@ -1,11 +1,9 @@
 package com.ragagent.websearch.provider;
 
-import java.util.LinkedHashMap;
-
-import org.springframework.stereotype.Component;
-import java.util.Map;
-
 import com.ragagent.websearch.domain.WebSearchProviderParams;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.springframework.stereotype.Component;
 
 /**
  * provider 类型注册表。

@@ -1,17 +1,15 @@
 package com.ragagent.im.channel.qqbot;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.function.BiConsumer;
-
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.stereotype.Component;
-
-import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCredentials;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.service.ImTurnOrchestrator;
+import com.ragagent.platform.security.SsrfGuard;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.stereotype.Component;
 
 /**
  * QQ 机器人渠道工厂。

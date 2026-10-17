@@ -7,6 +7,25 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.TestObjectProviders;
+import com.ragagent.TestSchema;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.mcp.domain.McpAuthConfig;
+import com.ragagent.mcp.domain.McpAuthType;
+import com.ragagent.mcp.domain.McpConfigFingerprint;
+import com.ragagent.mcp.domain.McpMetadata;
+import com.ragagent.mcp.domain.McpMetadataSummary;
+import com.ragagent.mcp.domain.McpPrincipal;
+import com.ragagent.mcp.domain.McpService;
+import com.ragagent.mcp.domain.McpTool;
+import com.ragagent.mcp.mapper.McpServiceMapper;
+import com.ragagent.mcp.repository.McpMetadataRepository;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.SsrfGuard;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -15,34 +34,13 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
-
 import java.util.UUID;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.TestObjectProviders;
-import com.ragagent.TestSchema;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.mcp.domain.McpAuthConfig;
-import com.ragagent.mcp.domain.McpAuthType;
-import com.ragagent.mcp.domain.McpConfigFingerprint;
-import com.ragagent.mcp.domain.McpMetadata;
-import com.ragagent.mcp.domain.McpPrincipal;
-import com.ragagent.mcp.domain.McpService;
-import com.ragagent.mcp.domain.McpTool;
-import com.ragagent.mcp.repository.McpMetadataRepository;
-import com.ragagent.mcp.mapper.McpServiceMapper;
-import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.mcp.domain.McpMetadataSummary;
 
 /**
  * MCP 元数据刷新的服务层契约。

@@ -5,12 +5,11 @@ package com.ragagent.embedchannel.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;
+import org.junit.jupiter.api.Test;
 
 /**
  * embed 访客请求改写器的键对齐契约（§14.9l S4）。

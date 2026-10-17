@@ -1,16 +1,15 @@
 package com.ragagent.datasource.connector.ima;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.util.Locale;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.connector.ConnectorHttp;
-import com.ragagent.datasource.domain.DataSourceConfig;
+import com.ragagent.platform.web.JsonMappers;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * IMA 专属配置。

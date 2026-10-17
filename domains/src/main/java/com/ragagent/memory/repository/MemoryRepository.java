@@ -1,5 +1,20 @@
 package com.ragagent.memory.repository;
 
+import com.ragagent.contract.memory.MemoryMessageCursor;
+import com.ragagent.memory.domain.MemoryDocAffinity;
+import com.ragagent.memory.domain.MemoryExtractionBatch;
+import com.ragagent.memory.domain.MemoryExtractionFailure;
+import com.ragagent.memory.domain.MemoryExtractionSession;
+import com.ragagent.memory.domain.MemoryExtractionState;
+import com.ragagent.memory.domain.MemoryPage;
+import com.ragagent.memory.domain.MemoryTopicStat;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryItemEmbedding;
+import com.ragagent.memory.domain.item.MemoryTombstone;
+import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.memory.domain.scope.MemorySubject;
+import com.ragagent.memory.domain.vector.MemoryVectorHit;
+import com.ragagent.memory.domain.vector.MemoryVectorQuery;
 import com.ragagent.memory.mapper.MemoryDocAffinityMapper;
 import com.ragagent.memory.mapper.MemoryExtractionSessionMapper;
 import com.ragagent.memory.mapper.MemoryItemEmbeddingMapper;
@@ -7,31 +22,14 @@ import com.ragagent.memory.mapper.MemoryItemMapper;
 import com.ragagent.memory.mapper.MemorySubjectMapper;
 import com.ragagent.memory.mapper.MemoryTombstoneMapper;
 import com.ragagent.memory.mapper.MemoryTopicStatMapper;
+import com.ragagent.platform.persistence.DatabaseDialects;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 import javax.sql.DataSource;
-
-import com.ragagent.platform.persistence.DatabaseDialects;
-import com.ragagent.memory.domain.MemoryDocAffinity;
-import com.ragagent.memory.domain.MemoryExtractionBatch;
-import com.ragagent.memory.domain.MemoryExtractionFailure;
-import com.ragagent.memory.domain.MemoryExtractionSession;
-import com.ragagent.memory.domain.MemoryExtractionState;
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.memory.domain.item.MemoryItemEmbedding;
-import com.ragagent.contract.memory.MemoryMessageCursor;
-import com.ragagent.memory.domain.MemoryPage;
-import com.ragagent.memory.domain.scope.MemoryScope;
-import com.ragagent.memory.domain.scope.MemorySubject;
-import com.ragagent.memory.domain.item.MemoryTombstone;
-import com.ragagent.memory.domain.MemoryTopicStat;
-import com.ragagent.memory.domain.vector.MemoryVectorHit;
-import com.ragagent.memory.domain.vector.MemoryVectorQuery;
 import org.springframework.stereotype.Component;
 
 /**

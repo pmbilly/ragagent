@@ -2,13 +2,11 @@ package com.ragagent.modelcontext;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.tool.ToolResult;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.contract.tool.ToolResult;
 
 /**
  * 空结果的输出契约与模型面渲染：

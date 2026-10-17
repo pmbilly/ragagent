@@ -1,5 +1,7 @@
 package com.ragagent.mcp.tool;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.JsonMappers;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -7,9 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * MCP 工具入参的完整 schema 校验——自带一个 Draft 2020-12 校验器，见下"为什么手写"。

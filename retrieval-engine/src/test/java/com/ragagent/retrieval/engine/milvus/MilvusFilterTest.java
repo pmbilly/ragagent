@@ -3,13 +3,11 @@ package com.ragagent.retrieval.engine.milvus;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.contract.vectorstore.IndexConfig;
+import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
-import com.ragagent.contract.vectorstore.IndexConfig;
 
 /**
  * Milvus 纯函数面——过滤器表达式（算子/括号/转义形态，

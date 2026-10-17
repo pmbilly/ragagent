@@ -1,13 +1,12 @@
 package com.ragagent.session.service.rag.plugin;
 
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineEventType;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineEventType;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.contract.retrieval.SearchResult;
 
 /**
  * CHUNK_RERANK 附加插件：

@@ -1,7 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
 import java.util.Collections;
-
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 

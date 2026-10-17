@@ -1,19 +1,18 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.contract.text.Whitespace;
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.platform.text.CodePointOrder;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.page.WikiPageLite;
+import com.ragagent.wiki.service.page.SlugFuzzy;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.domain.page.WikiPageLite;
-import com.ragagent.wiki.service.page.SlugFuzzy;
-import com.ragagent.contract.text.Whitespace;
-import com.ragagent.platform.text.CodePointOrder;
 
 /**
  * 实体/概念去重的纯算法：候选页预筛与配对打分，身份标题归一、精确同名解析与身份合并。

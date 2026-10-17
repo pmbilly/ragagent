@@ -1,26 +1,25 @@
 package com.ragagent.session.service.rag.plugin;
 
 
+import com.ragagent.contract.knowledge.KnowledgeBaseView;
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.retrieval.SearchParams;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.WebResultConverter;
+import com.ragagent.contract.tenant.WebSearchConfig;
+import com.ragagent.contract.websearch.WebSearchResult;
+import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.platform.tracing.langfuse.Span;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineLog;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.contract.retrieval.SearchParams;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
-import com.ragagent.platform.tracing.langfuse.Span;
-import com.ragagent.contract.websearch.WebSearchResult;
-import com.ragagent.contract.retrieval.WebResultConverter;
-import com.ragagent.contract.tenant.WebSearchConfig;
 
 /**
  * 检索执行协作者（自 {@link PluginSearch} 拆出）：

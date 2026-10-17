@@ -1,16 +1,15 @@
 package com.ragagent.session.support;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.ragagent.contract.session.MessageAttachment;
+import com.ragagent.contract.session.MessageImage;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.contract.session.PipelineMessageImageView;
 import com.ragagent.contract.session.PipelineMessageView;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.contract.session.MessageImage;
 import com.ragagent.contract.session.UsedMemory;
+import com.ragagent.session.domain.message.Message;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 会话实体 ↔ 聊天管线载荷（{@code common.session.Pipeline*}）的映射。

@@ -1,15 +1,13 @@
 package com.ragagent.wiki.service.page;
 
 
+import com.ragagent.contract.text.Whitespace;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.springframework.stereotype.Component;
-
-import com.ragagent.contract.text.Whitespace;
 
 /**
  * {@code [[slug]]} 交叉链接自动注入（{@link WikiCrossLinker} 的默认实现）。

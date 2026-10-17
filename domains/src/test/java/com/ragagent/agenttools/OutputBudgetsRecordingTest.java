@@ -1,18 +1,16 @@
 package com.ragagent.agenttools;
 
-import com.ragagent.agent.fixtures.GoRecording45A;
-import com.ragagent.agent.fixtures.RecordingSupport;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agent.fixtures.GoRecording45A;
+import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.contract.agent.OutputBudgets;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.contract.agent.OutputBudgets;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * OutputBudgets.splitBudgetFairly 的录制判定（10 组，max-min 公平分配）+

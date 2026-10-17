@@ -1,12 +1,12 @@
 package com.ragagent.knowledge.support;
 
+import com.ragagent.contract.retrieval.ChunkTypes;
+import com.ragagent.contract.wiki.WikiImageMarkup;
+import com.ragagent.knowledge.domain.Chunk;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import com.ragagent.contract.retrieval.ChunkTypes;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.contract.wiki.WikiImageMarkup;
 
 /**
  * 图抽取的分块筛选。

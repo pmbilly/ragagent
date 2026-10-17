@@ -1,24 +1,24 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.contract.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.KnowledgeSpanPort;
+import com.ragagent.contract.knowledge.KnowledgeView;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.WikiImageMarkup;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.wiki.prompt.WikiPrompts;
+import com.ragagent.wiki.service.page.NewSlugFromCitation;
+import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.contract.knowledge.KnowledgeView;
-import com.ragagent.contract.knowledge.KnowledgeSpanPort;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.wiki.prompt.WikiPrompts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.contract.wiki.WikiImageMarkup;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
-import com.ragagent.wiki.service.page.NewSlugFromCitation;
-import com.ragagent.wiki.service.page.WikiTextUtils;
 
 /**
  * wiki 摄取 Map 阶段协作者:单文档 → 页面草图的 LLM 映射与文档标题解析。

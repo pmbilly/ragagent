@@ -1,11 +1,10 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.wiki.domain.page.WikiPageLite;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.ragagent.wiki.domain.page.WikiPageLite;
-import com.ragagent.contract.wiki.ExtractedItem;
 
 /**
  * 实体/概念去重与身份收敛的<b>可插拔端口</b>。

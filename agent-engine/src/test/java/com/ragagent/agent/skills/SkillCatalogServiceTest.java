@@ -1,12 +1,11 @@
 package com.ragagent.agent.skills;
 
-import com.ragagent.contract.agent.SkillCatalogPort;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.agent.SkillCatalogPort;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 /**

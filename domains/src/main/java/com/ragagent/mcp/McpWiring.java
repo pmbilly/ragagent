@@ -1,12 +1,12 @@
 package com.ragagent.mcp;
 
-import com.ragagent.mcp.service.Adapter;
 import com.ragagent.contract.tool.Cancellation;
 import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.contract.tool.ToolApprovalGateFactory;
 import com.ragagent.contract.tool.ToolPolicyChecker;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpOAuthSupport;
+import com.ragagent.mcp.service.Adapter;
 import com.ragagent.mcp.service.McpToolApprovalService;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;

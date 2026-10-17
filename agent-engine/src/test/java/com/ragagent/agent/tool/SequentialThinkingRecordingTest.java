@@ -2,12 +2,11 @@ package com.ragagent.agent.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agent.fixtures.GoRecording45A;
+import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.contract.tool.ToolRequest;
+import org.junit.jupiter.api.Test;
 
 /**
  * SequentialThinkingTool 的录制状态机（case1..case9 + case11 共 10 步，

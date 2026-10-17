@@ -1,16 +1,15 @@
 package com.ragagent.session;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.ragagent.agent.fixtures.ContractJson;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * chat 三入口的契约测试（golden 回放）。

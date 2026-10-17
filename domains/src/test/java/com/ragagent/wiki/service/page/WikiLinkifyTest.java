@@ -2,15 +2,13 @@ package com.ragagent.wiki.service.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.service.page.WikiCrossLinker.LinkRef;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.wiki.service.page.WikiCrossLinker.LinkRef;
-import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.wiki.domain.WikiPage;
 
 /**
  * {@link WikiLinkify} 的表驱动测试。

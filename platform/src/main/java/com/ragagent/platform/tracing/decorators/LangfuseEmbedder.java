@@ -1,12 +1,11 @@
 package com.ragagent.platform.tracing.decorators;
 
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.contract.model.Embedder;
 import com.ragagent.platform.tracing.langfuse.Generation;
+import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.contract.model.Embedder;
 
 /**
  * embedding 客户端的 langfuse 装饰器：

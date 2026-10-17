@@ -1,10 +1,9 @@
 package com.ragagent.datasource.connector.feishu.core;
 
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 
 /**
  * 飞书 Open Platform 的响应/请求形状。

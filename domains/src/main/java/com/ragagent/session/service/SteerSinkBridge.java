@@ -1,21 +1,19 @@
 package com.ragagent.session.service;
 
+import com.ragagent.contract.agent.SteerSink;
+import com.ragagent.contract.session.MentionedItem;
+import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.stream.StreamBatch;
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.session.domain.message.Message;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ragagent.contract.agent.SteerSink;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.contract.session.MentionedItem;
-import com.ragagent.platform.stream.StreamBatch;
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.stream.StreamManager;
-import com.ragagent.platform.access.TenantContextSnapshot;
 
 /**
  * steer 的 handler 侧后半段：每轮 QA 在建立 SSE 流时构造一个实例，

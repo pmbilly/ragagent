@@ -2,16 +2,14 @@ package com.ragagent.storage.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.contract.storage.support.Mode;
-import com.ragagent.platform.storage.support.Rewriter;
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
+import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.platform.storage.support.Rewriter;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import org.junit.jupiter.api.Test;
 
 /**
  * {@code Rewriter.forRequest} 与存储域解析器（{@link FileServiceResolver}）的接线用例。

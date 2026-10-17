@@ -1,7 +1,6 @@
 package com.ragagent.wiki.domain.issue;
 
 import com.ragagent.wiki.domain.page.WikiStats;
-
 import java.util.List;
 
 

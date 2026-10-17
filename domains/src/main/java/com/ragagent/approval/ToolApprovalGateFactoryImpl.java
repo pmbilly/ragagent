@@ -1,12 +1,11 @@
 package com.ragagent.approval;
 
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.contract.tool.ToolApprovalGateFactory;
 import com.ragagent.contract.tool.ToolPolicyChecker;
 import com.ragagent.platform.redis.RedisPubSub;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.stereotype.Component;
 
 /**
  * 审批闸门的装配面实现：把"策略查询源 + 超时秒"装成 {@link ToolApprovalGate}。

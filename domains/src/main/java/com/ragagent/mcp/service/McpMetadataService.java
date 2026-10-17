@@ -1,7 +1,24 @@
 package com.ragagent.mcp.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.mcp.domain.McpConfigFingerprint;
+import com.ragagent.mcp.domain.McpMetadata;
+import com.ragagent.mcp.domain.McpMetadataSummary;
+import com.ragagent.mcp.domain.McpPrincipal;
+import com.ragagent.mcp.domain.McpService;
+import com.ragagent.mcp.domain.McpTool;
+import com.ragagent.mcp.mapper.McpServiceMapper;
+import com.ragagent.mcp.protocol.InitializeResult;
+import com.ragagent.mcp.protocol.McpClient;
+import com.ragagent.mcp.protocol.McpClientConfig;
+import com.ragagent.mcp.protocol.McpClientFactory;
+import com.ragagent.mcp.protocol.McpContext;
+import com.ragagent.mcp.protocol.McpOAuthRequiredException;
+import com.ragagent.mcp.protocol.McpOAuthSupport;
+import com.ragagent.mcp.repository.McpMetadataRepository;
+import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.JsonMappers;
-import org.springframework.beans.factory.ObjectProvider;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -14,28 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.mcp.domain.McpConfigFingerprint;
-import com.ragagent.mcp.domain.McpMetadata;
-import com.ragagent.mcp.domain.McpMetadataSummary;
-import com.ragagent.mcp.domain.McpPrincipal;
-import com.ragagent.mcp.domain.McpService;
-import com.ragagent.mcp.domain.McpTool;
-import com.ragagent.mcp.repository.McpMetadataRepository;
-import com.ragagent.mcp.mapper.McpServiceMapper;
-import com.ragagent.mcp.protocol.InitializeResult;
-import com.ragagent.mcp.protocol.McpClient;
-import com.ragagent.mcp.protocol.McpClientConfig;
-import com.ragagent.mcp.protocol.McpClientFactory;
-import com.ragagent.mcp.protocol.McpContext;
-import com.ragagent.mcp.protocol.McpOAuthRequiredException;
-import com.ragagent.mcp.protocol.McpOAuthSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
-import com.ragagent.platform.security.LogSanitizer;
 
 /**
  * MCP 目录快照应用层（依赖方向单向：{@link McpServiceManagement} → 本类）。

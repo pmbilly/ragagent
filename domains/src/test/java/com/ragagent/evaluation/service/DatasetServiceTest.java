@@ -3,9 +3,8 @@ package com.ragagent.evaluation.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
-
 import com.ragagent.evaluation.domain.QaPair;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**

@@ -3,14 +3,14 @@ package com.ragagent.auth;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.TestSchema;
+import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.auth.service.OidcStateCodec;
+import jakarta.servlet.http.Cookie;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.TestSchema;
-import com.ragagent.auth.service.OidcStateCodec;
-import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import com.ragagent.agent.fixtures.ContractJson;
 
 /**
  * 契约测试：auth OIDC 4 端点（未配置 = disabled 分支全覆盖）。

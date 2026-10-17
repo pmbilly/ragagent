@@ -1,10 +1,7 @@
 package com.ragagent.mcp.api;
 
-import java.util.Map;
-
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.tool.McpApprovalOps;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
 import com.ragagent.mcp.service.AgentToolApprovalService;
@@ -12,7 +9,8 @@ import com.ragagent.mcp.service.McpOAuthFlowService;
 import com.ragagent.mcp.service.McpOAuthFlowService.AuthorizeRequest;
 import com.ragagent.mcp.service.McpOAuthFlowService.ResolveRequest;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.contract.error.BizException;
+import java.util.Map;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link McpApprovalOps} 的 mcp 侧实现：把 embed 渠道传来的原始 body 解析成既有 DTO，再调用例层。

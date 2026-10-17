@@ -8,15 +8,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.contract.knowledge.KnowledgeMaintenancePort;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-
-import com.ragagent.contract.knowledge.KnowledgeMaintenancePort;
 
 /**
  * web 搜索临时 KB 状态服务。

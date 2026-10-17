@@ -5,18 +5,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
+import com.ragagent.audit.domain.AuditLog;
+import com.ragagent.audit.mapper.AuditLogRepository;
+import com.ragagent.audit.service.AuditLogService;
+import com.ragagent.audit.service.WikiActivityAuditRecorder;
+import com.ragagent.contract.audit.AuditAction;
+import com.ragagent.contract.audit.AuditOutcome;
+import com.ragagent.platform.access.TenantContext;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.audit.mapper.AuditLogRepository;
-import com.ragagent.audit.service.AuditLogService;
-import com.ragagent.audit.service.WikiActivityAuditRecorder;
-import com.ragagent.platform.access.TenantContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 

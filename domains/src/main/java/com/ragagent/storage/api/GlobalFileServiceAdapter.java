@@ -1,11 +1,10 @@
 package com.ragagent.storage.api;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.storage.fileserve.GlobalFileServicePort;
 import com.ragagent.contract.storage.fileserve.WritableFileContentService;
 import com.ragagent.storage.fileserve.StorageFileResolver;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link GlobalFileServicePort} 的存储域实现：委托 {@link StorageFileResolver#globalFileService(String)}，

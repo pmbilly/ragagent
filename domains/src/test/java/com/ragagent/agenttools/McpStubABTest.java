@@ -1,6 +1,22 @@
 package com.ragagent.agenttools;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.mcp.domain.McpService;
+import com.ragagent.mcp.domain.McpTool;
+import com.ragagent.mcp.protocol.McpClient;
+import com.ragagent.mcp.protocol.McpClientManager;
+import com.ragagent.mcp.protocol.McpContext;
+import com.ragagent.mcp.protocol.McpServiceUrls;
+import com.ragagent.mcp.tool.McpToolWrapper;
+import com.ragagent.platform.security.SsrfGuard;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -9,26 +25,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.mcp.domain.McpService;
-import com.ragagent.mcp.protocol.McpClient;
-import com.ragagent.mcp.protocol.McpClientManager;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import com.ragagent.mcp.domain.McpTool;
-import com.ragagent.mcp.protocol.McpContext;
-import com.ragagent.mcp.protocol.McpServiceUrls;
-import com.ragagent.mcp.tool.McpToolWrapper;
-import com.ragagent.contract.tool.ToolRequest;
 
 /**
  * MCP stub A/B：双端同打同一形态的 stub MCP server（JSON-RPC over streamable HTTP），

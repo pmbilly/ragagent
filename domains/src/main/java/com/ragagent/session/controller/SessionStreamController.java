@@ -1,14 +1,38 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.storage.support.FileUrlPort;
+import com.ragagent.contract.storage.support.Mode;
+import com.ragagent.contract.storage.support.PublicModeForbiddenException;
+import com.ragagent.contract.storage.support.ResourceModeException;
+import com.ragagent.contract.storage.support.StorageBackendResolver;
+import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.storage.support.FileResolverFactory;
+import com.ragagent.platform.storage.support.ResourceUrlMode;
+import com.ragagent.platform.storage.support.Rewriter;
+import com.ragagent.platform.storage.support.StreamRewriter;
+import com.ragagent.platform.stream.StreamBatch;
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.ServletSseSink;
+import com.ragagent.session.controller.sse.SseContract;
+import com.ragagent.session.controller.sse.SseFrameWriter;
+import com.ragagent.session.controller.sse.StreamEventEmitter;
+import com.ragagent.session.domain.conversation.SessionNotFoundException;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.domain.message.MessageNotFoundException;
+import com.ragagent.session.service.MessageService;
+import com.ragagent.session.service.SessionService;
 import com.ragagent.session.support.LogSanitizer;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -16,33 +40,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.message.MessageNotFoundException;
-import com.ragagent.session.domain.conversation.SessionNotFoundException;
-import com.ragagent.session.service.MessageService;
-import com.ragagent.session.service.SessionService;
-import com.ragagent.session.controller.sse.SseContract;
-import com.ragagent.session.controller.sse.SseFrameWriter;
-import com.ragagent.session.controller.sse.StreamEventEmitter;
-import com.ragagent.contract.storage.support.Mode;
-import com.ragagent.contract.storage.support.PublicModeForbiddenException;
-import com.ragagent.contract.storage.support.ResourceModeException;
-import com.ragagent.platform.storage.support.Rewriter;
-import com.ragagent.contract.storage.support.StorageBackendResolver;
-import com.ragagent.contract.storage.support.FileUrlPort;
-import com.ragagent.platform.storage.support.StreamRewriter;
-import com.ragagent.platform.stream.StreamBatch;
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.stream.StreamManager;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.storage.support.FileResolverFactory;
-import com.ragagent.platform.storage.support.ResourceUrlMode;
 
 /**
  * 继续接收活跃流。

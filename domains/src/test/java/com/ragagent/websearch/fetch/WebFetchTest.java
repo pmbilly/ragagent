@@ -1,17 +1,15 @@
 package com.ragagent.websearch.fetch;
 
-import com.ragagent.contract.websearch.FetchException;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.ragagent.contract.websearch.FetchException;
+import com.ragagent.platform.security.SsrfGuard;
+import com.sun.net.httpserver.HttpServer;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.platform.security.SsrfGuard;
-import com.sun.net.httpserver.HttpServer;
 
 /**
  * web_fetch 的 stub server 测试（chromedp / readability / html-to-markdown 是接缝，

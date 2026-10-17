@@ -1,13 +1,12 @@
 package com.ragagent.knowledge.dto.doc;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.EnableStatus;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.ParseStatus;
 import com.ragagent.knowledge.domain.SummaryStatus;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 
 /**

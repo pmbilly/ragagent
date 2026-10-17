@@ -4,7 +4,6 @@ package com.ragagent.platform.security;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.InetAddress;
-
 import org.junit.jupiter.api.Test;
 
 /**

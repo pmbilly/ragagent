@@ -1,17 +1,16 @@
 package com.ragagent.mcp.oauth;
 
-import java.net.URI;
-import java.time.Duration;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Consumer;
-
 import com.ragagent.mcp.protocol.JsonRpcRequest;
 import com.ragagent.mcp.protocol.JsonRpcResponse;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.mcp.protocol.McpTransport;
 import com.ragagent.mcp.protocol.SseTransport;
 import com.ragagent.mcp.protocol.StreamableHttpTransport;
+import java.net.URI;
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 带 OAuth 的 MCP 传输：在既有 SSE / HTTP-Streamable 传输之上按请求注入

@@ -1,21 +1,20 @@
 package com.ragagent.retrieval;
 
-import com.ragagent.retrieval.engine.EngineTypes;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.retrieval.engine.EngineTypes;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * HybridSearch 的结果装配簇：命中 → SearchResult（chunk 元数据补全 + FAQ 问题回填）。

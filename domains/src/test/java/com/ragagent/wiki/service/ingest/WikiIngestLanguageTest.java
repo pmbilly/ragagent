@@ -2,22 +2,20 @@ package com.ragagent.wiki.service.ingest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.text.Whitespace;
+import com.ragagent.contract.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.wiki.domain.TaskPendingOp;
+import com.ragagent.wiki.prompt.WikiPromptTemplate;
+import com.ragagent.wiki.prompt.WikiPrompts;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.wiki.domain.TaskPendingOp;
-import com.ragagent.wiki.prompt.WikiPromptTemplate;
-import com.ragagent.wiki.prompt.WikiPrompts;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
-import com.ragagent.contract.text.Whitespace;
 
 /**
  * 语言持久化与 prompt 渲染的测试。

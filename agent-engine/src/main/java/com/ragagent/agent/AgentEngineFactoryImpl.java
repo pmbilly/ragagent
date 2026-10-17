@@ -1,12 +1,5 @@
 package com.ragagent.agent;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import com.ragagent.agent.prompt.AgentPromptTemplates;
 import com.ragagent.agent.skills.DbSkillSource;
 import com.ragagent.agent.skills.Manager;
@@ -24,9 +17,14 @@ import com.ragagent.contract.agent.SkillCatalogPort;
 import com.ragagent.contract.event.EventBusFactory;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.pipeline.McpToolingGateway;
 import com.ragagent.contract.pipeline.McpToolRegistrationPort;
+import com.ragagent.contract.pipeline.McpToolingGateway;
 import com.ragagent.contract.tool.ToolDefinitions;
+import java.util.ArrayList;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * agent 引擎工厂实现（R5c：装配权由域侧下沉到此）。

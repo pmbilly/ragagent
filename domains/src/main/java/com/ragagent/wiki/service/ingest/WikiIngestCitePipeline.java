@@ -1,6 +1,18 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.knowledge.ChunkPort;
+import com.ragagent.contract.knowledge.ChunkView;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.domain.WikiExtractionGranularity;
+import com.ragagent.wiki.prompt.WikiPrompts;
+import com.ragagent.wiki.service.page.NewSlugFromCitation;
+import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -8,22 +20,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.contract.knowledge.ChunkPort;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.wiki.domain.WikiExtractionGranularity;
-import com.ragagent.wiki.prompt.WikiPrompts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.wiki.service.page.NewSlugFromCitation;
-import com.ragagent.wiki.service.page.WikiTextUtils;
 
 /**
  * 分块引用管线的纯算法与并发编排。

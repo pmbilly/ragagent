@@ -2,12 +2,10 @@ package com.ragagent.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.agent.domain.AgentState;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.agent.domain.AgentState;
 
 /**
  * 回归锚点：{@code llmContext} 传 null 必须当空历史处理——安装器的 installer run 正是这样调的，旧实现在入口日志

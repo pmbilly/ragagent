@@ -10,19 +10,17 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.contract.storage.ResourceCatalogPort;
-import com.ragagent.platform.knowledge.ImageRefRewriter;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.storage.TenantFileStorage;
+import com.ragagent.platform.knowledge.ImageRefRewriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * 抽取图片：落 exports 区（按租户存储后端）→ 登记资源 → 绑定知识 → 正文改写成 provider 引用；

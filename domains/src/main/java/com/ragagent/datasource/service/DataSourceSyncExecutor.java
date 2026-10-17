@@ -1,15 +1,7 @@
 package com.ragagent.datasource.service;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import com.ragagent.datasource.domain.connector.Connector;
-import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.datasource.domain.connector.StreamHandler;
-import com.ragagent.datasource.domain.connector.StreamingConnector;
+import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
+import com.ragagent.datasource.connector.rss.RssFetchState;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.DataSourceConstants;
@@ -20,10 +12,17 @@ import com.ragagent.datasource.domain.SyncCursor;
 import com.ragagent.datasource.domain.SyncItemError;
 import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.SyncResult;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.StreamHandler;
+import com.ragagent.datasource.domain.connector.StreamingConnector;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.datasource.connector.rss.RssFetchState;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 
 /**
  * 同步执行器：{@code datasource:sync} 任务的真正实现——一次性抓取与流式抓取两条路径、

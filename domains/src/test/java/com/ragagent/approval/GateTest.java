@@ -1,18 +1,5 @@
 package com.ragagent.approval;
 
-import com.ragagent.contract.tool.OAuthPendingRequest;
-
-import com.ragagent.contract.tool.ApprovalEventBus;
-
-import com.ragagent.contract.tool.PendingRequest;
-
-import com.ragagent.contract.tool.Cancellation;
-import com.ragagent.contract.tool.ToolApprovalException;
-
-import com.ragagent.contract.tool.ApprovalEvent;
-
-import com.ragagent.contract.tool.Decision;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -20,21 +7,27 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.event.payload.MCPOAuthRequiredData;
 import com.ragagent.contract.event.payload.MCPOAuthResolvedData;
 import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
 import com.ragagent.contract.event.payload.ToolApprovalResolvedData;
 import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.tool.ApprovalEvent;
+import com.ragagent.contract.tool.ApprovalEventBus;
+import com.ragagent.contract.tool.Cancellation;
+import com.ragagent.contract.tool.Decision;
+import com.ragagent.contract.tool.OAuthPendingRequest;
+import com.ragagent.contract.tool.PendingRequest;
+import com.ragagent.contract.tool.ToolApprovalException;
+import com.ragagent.mcp.service.Adapter;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-import com.ragagent.mcp.service.Adapter;
 
 /**
  * {@code Gate} 的逐用例覆盖（请求-等待 / Resolve / IsEnabled / OAuth 等待族）。

@@ -12,34 +12,33 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import java.time.Duration;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.ragagent.contract.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryMessageCursor;
 import com.ragagent.contract.model.ChatStream;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.memory.MemoryConfig;
+import com.ragagent.contract.session.SessionMessagePort;
+import com.ragagent.memory.domain.MemoryConflictException;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
 import com.ragagent.memory.domain.MemoryExtractionSession;
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.contract.memory.MemoryMessageCursor;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.repository.MemoryRepository;
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.ObjectProvider;
-import com.ragagent.contract.session.SessionMessagePort;
-import com.ragagent.memory.domain.MemoryConflictException;
 
 /**
  * 蒸馏编排的对等测试（{@code handle} /

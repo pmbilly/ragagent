@@ -2,19 +2,18 @@ package com.ragagent.session;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.ragagent.contract.session.SessionLastRequestState;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.SessionListItem;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.contract.session.SessionLastRequestState;
-import com.ragagent.session.domain.conversation.SessionListItem;
 import org.junit.jupiter.api.Test;
 
 /**

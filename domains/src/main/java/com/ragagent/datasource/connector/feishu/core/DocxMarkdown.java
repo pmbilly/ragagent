@@ -1,5 +1,7 @@
 package com.ragagent.datasource.connector.feishu.core;
 
+import com.ragagent.datasource.connector.feishu.core.DocxBlocks.BlockText;
+import com.ragagent.datasource.connector.feishu.core.DocxBlocks.DocxBlock;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,9 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.ragagent.datasource.connector.feishu.core.DocxBlocks.BlockText;
-import com.ragagent.datasource.connector.feishu.core.DocxBlocks.DocxBlock;
 
 /**
  * docx 块 → Markdown 渲染器。

@@ -1,29 +1,27 @@
 package com.ragagent.session.domain.message;
 
-import com.ragagent.session.domain.AgentStepListTypeHandler;
-import com.ragagent.contract.session.MentionedItem;
-import com.ragagent.session.domain.MentionedItemListTypeHandler;
-import com.ragagent.session.domain.SearchResultListTypeHandler;
-import com.ragagent.contract.session.UsedMemory;
-import com.ragagent.session.domain.UsedMemoryListTypeHandler;
-
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.contract.agent.AgentStep;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.session.MessageExecutionContext;
+import com.ragagent.contract.session.MentionedItem;
 import com.ragagent.contract.session.MessageArtifact;
-import com.ragagent.contract.session.MessageImage;
 import com.ragagent.contract.session.MessageAttachment;
+import com.ragagent.contract.session.MessageExecutionContext;
+import com.ragagent.contract.session.MessageImage;
+import com.ragagent.contract.session.UsedMemory;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import com.ragagent.session.domain.AgentStepListTypeHandler;
+import com.ragagent.session.domain.MentionedItemListTypeHandler;
+import com.ragagent.session.domain.SearchResultListTypeHandler;
+import com.ragagent.session.domain.UsedMemoryListTypeHandler;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * messages 表实体。

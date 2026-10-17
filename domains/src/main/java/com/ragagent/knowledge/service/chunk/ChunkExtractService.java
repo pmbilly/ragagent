@@ -1,45 +1,41 @@
 package com.ragagent.knowledge.service.chunk;
 
 
-import com.ragagent.contract.retrieval.RetrievalObsRows;
-import com.ragagent.knowledge.domain.span.SpanTracker;
-
-import com.ragagent.knowledge.domain.ChunkExtractConsumer;
-
-import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
-import com.ragagent.knowledge.repository.KnowledgeRepository;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.prompt.ExtractPrompts;
-import com.ragagent.platform.prompt.PipelineConfig;
-import com.ragagent.contract.retrieval.RetrieveGraphRepository;
-import com.ragagent.platform.prompt.PromptInstructions;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
-import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import com.ragagent.knowledge.domain.ExtractChunkPayload;
-import org.springframework.beans.factory.annotation.Autowired;
 import com.ragagent.contract.graph.EntityExtractionResult;
 import com.ragagent.contract.graph.GraphData;
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.graph.GraphRelation;
 import com.ragagent.contract.graph.NameSpace;
 import com.ragagent.contract.knowledge.EntityExtractionPort;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.retrieval.RetrievalObsRows;
+import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.contract.wiki.WikiFinalizePort;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.ChunkExtractConsumer;
+import com.ragagent.knowledge.domain.ExtractChunkPayload;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
+import com.ragagent.knowledge.domain.span.SpanTracker;
+import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.platform.access.TenantScopes;
+import com.ragagent.platform.prompt.ExtractPrompts;
+import com.ragagent.platform.prompt.PipelineConfig;
+import com.ragagent.platform.prompt.PromptInstructions;
+import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 分块图抽取任务：

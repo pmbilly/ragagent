@@ -1,11 +1,10 @@
 package com.ragagent.datasource.domain.connector;
 
-import java.util.List;
-
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncCursor;
+import java.util.List;
 
 /**
  * 所有外部数据源连接器必须实现的接口。

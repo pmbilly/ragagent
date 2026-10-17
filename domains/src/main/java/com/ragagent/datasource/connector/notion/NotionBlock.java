@@ -1,8 +1,5 @@
 package com.ragagent.datasource.connector.notion;
 
-import java.io.IOException;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
@@ -10,6 +7,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Notion 的一个内容块。

@@ -1,13 +1,13 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.access.TracingContext;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.platform.access.TracingContext;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 一次蒸馏任务的全部输入。

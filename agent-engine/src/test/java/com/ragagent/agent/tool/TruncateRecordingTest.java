@@ -2,12 +2,11 @@ package com.ragagent.agent.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agent.fixtures.GoRecording45A;
+import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.contract.tool.ToolOutput;
+import org.junit.jupiter.api.Test;
 
 /**
  * ToolOutput.truncateToolOutput 的录制边界（15 条）。覆盖：上限内原样/恰等上限/零与负上限/

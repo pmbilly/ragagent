@@ -1,21 +1,20 @@
 package com.ragagent.session.service.rag.plugin;
 
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.retrieval.RetrievalObsRows;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.platform.prompt.AgentPromptPlaceholders;
+import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
+import com.ragagent.platform.security.InputSanitizer;
+import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineEventType;
+import com.ragagent.session.service.rag.PipelineLog;
+import com.ragagent.session.service.rag.support.ReferencesSupport;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineEventType;
-import com.ragagent.session.service.rag.PipelineLog;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.session.service.rag.support.ReferencesSupport;
-import com.ragagent.platform.security.InputSanitizer;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.retrieval.ChunkTypes;
-import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
-import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 
 /**
  * INTO_CHAT_MESSAGE 阶段插件：

@@ -1,9 +1,5 @@
 package com.ragagent.datasource.connector.feishu.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.PartialWikiNodeListException;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiNode;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiNodeInfoResponse;
@@ -11,6 +7,9 @@ import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiNodeList
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiNodeListResponse;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiSpace;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiSpaceListResponse;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

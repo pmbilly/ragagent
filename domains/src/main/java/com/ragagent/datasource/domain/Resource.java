@@ -1,10 +1,9 @@
 package com.ragagent.datasource.domain;
 
-import java.time.OffsetDateTime;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ragagent.platform.web.ZeroTimeSerializer;
+import java.time.OffsetDateTime;
+import java.util.Map;
 
 /**
  * 外部系统里一个可同步的资源（文档 / 文件夹 / 空间）。

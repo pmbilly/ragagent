@@ -5,14 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import com.ragagent.contract.graph.GraphData;
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.graph.GraphRelation;
 import com.ragagent.contract.graph.NameSpace;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * 图仓储的离线契约测试（标签推导与 Cypher 文本）：

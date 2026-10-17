@@ -1,30 +1,29 @@
 package com.ragagent.auth.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ragagent.auth.domain.AuthToken;
+import com.ragagent.auth.domain.TenantMember;
+import com.ragagent.auth.domain.User;
+import com.ragagent.auth.dto.LoginRequest;
+import com.ragagent.auth.dto.Membership;
+import com.ragagent.auth.mapper.AuthTokenMapper;
+import com.ragagent.auth.mapper.UserMapper;
+import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.contract.settings.SystemSettingGateway;
+import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRowView;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.UserNameLookup;
+import io.jsonwebtoken.Claims;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.auth.domain.AuthToken;
-import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.auth.domain.User;
-import com.ragagent.contract.auth.UserPreferences;
-import com.ragagent.auth.dto.LoginRequest;
-import com.ragagent.auth.dto.Membership;
-import com.ragagent.auth.mapper.AuthTokenMapper;
-import com.ragagent.auth.mapper.UserMapper;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.settings.SystemSettingGateway;
-import io.jsonwebtoken.Claims;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.ragagent.platform.security.UserNameLookup;
-import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * 用户 service。

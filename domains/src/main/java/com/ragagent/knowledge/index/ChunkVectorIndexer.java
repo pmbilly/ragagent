@@ -1,42 +1,40 @@
 package com.ragagent.knowledge.index;
 
-import com.ragagent.contract.retrieval.SourceTypes;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.error.AppError;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.knowledge.DocumentChunkMetadata;
+import com.ragagent.contract.knowledge.GeneratedQuestion;
+import com.ragagent.contract.model.Embedder;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.retrieval.IndexDocument;
+import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.contract.retrieval.IndexRow;
-import com.ragagent.knowledge.repository.KnowledgeRepository;
-
-import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
-
-import java.util.ArrayList;
+import com.ragagent.contract.retrieval.SourceTypes;
+import com.ragagent.contract.retrieval.VectorIndexStore;
+import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.knowledge.config.BatchEmbedProperties;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.knowledge.support.KnowledgeIndexContent;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.knowledge.ChunkSearchUtil;
+import com.ragagent.platform.web.JsonMappers;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.contract.knowledge.DocumentChunkMetadata;
-import com.ragagent.contract.knowledge.GeneratedQuestion;
-import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.contract.model.ModelRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.contract.model.Embedder;
-import com.ragagent.contract.retrieval.IndexDocument;
-import com.ragagent.contract.retrieval.IndexEngine;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.knowledge.client.EmbedderClient;
-import com.ragagent.contract.retrieval.VectorIndexStore;
-import com.ragagent.platform.knowledge.ChunkSearchUtil;
-import com.ragagent.knowledge.support.KnowledgeIndexContent;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * chunk 向量行的重建执行体（2026-09-22 走查批：把「路由在、执行体占位」的两处

@@ -1,20 +1,18 @@
 package com.ragagent.knowledge.controller;
 
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
+import com.ragagent.platform.storage.fileserve.FileProxyPort;
+import com.ragagent.platform.storage.fileserve.FileServeHttp;
+import com.ragagent.platform.web.ApiResult;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
-import com.ragagent.platform.storage.fileserve.FileProxyPort;
-import com.ragagent.platform.storage.fileserve.FileServeHttp;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.platform.web.ApiResult;
 
 /**
  * newKBScopedFileServeHandlerWithResources + access.ResolveKBFile）。

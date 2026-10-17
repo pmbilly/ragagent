@@ -1,6 +1,5 @@
 package com.ragagent.agent.compaction;
 
-import com.ragagent.contract.agent.CompactionSettings;
 import static com.ragagent.agent.GoRecording.STR_E2E_LENGTH_STOP_SUMMARY;
 import static com.ragagent.agent.GoRecording.STR_E2E_REACT12_SUMMARY;
 import static com.ragagent.agent.GoRecording.STR_GROWN_PROMPT0;
@@ -10,17 +9,16 @@ import static com.ragagent.agent.GoRecording.STR_SUMMARIZATIONSYSTEMPROMPT;
 import static com.ragagent.agent.GoRecording.STR_SUMMARYFORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import com.ragagent.agent.budget.TokenEstimator;
+import com.ragagent.contract.agent.CompactionSettings;
 import com.ragagent.contract.model.ChatStream;
 import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.chat.CacheRetention;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.chat.CacheRetention;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * 压缩器端到端的录制常量断言。

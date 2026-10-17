@@ -5,15 +5,9 @@ package com.ragagent.agenttools.knowledge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.agent.fixtures.GoRecording45B;
+import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.ExtractConfigView;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.GraphNodeView;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.GraphRelationView;
@@ -24,8 +18,12 @@ import com.ragagent.contract.agent.SearchAuth.KnowledgeTagsFetcher;
 import com.ragagent.contract.agent.SearchAuth.TagView;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.agent.fixtures.GoRecording45B;
-import com.ragagent.agent.fixtures.RecordingSupport;
+import com.ragagent.contract.tool.ToolResult;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 /**
  * 4.5b 回放：query_knowledge_graph 的录制回放。

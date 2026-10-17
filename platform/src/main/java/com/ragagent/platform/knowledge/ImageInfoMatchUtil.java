@@ -1,15 +1,14 @@
 package com.ragagent.platform.knowledge;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.ProviderJson;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.websearch.ImageInfo;
-import com.ragagent.platform.web.ProviderJson;
 
 /**
  * 检索窗口与 image_info 的互相裁剪（{@code ImageURLsInContent / ImageURLsFromInfo} 已在

@@ -2,12 +2,10 @@ package com.ragagent.llm.provider;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.ragagent.model.dto.ModelProviderDto;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.model.dto.ModelProviderDto;
 
 /**
  * 目录一致性哨兵：把本包（运行时元数据）与

@@ -1,8 +1,7 @@
 package com.ragagent.contract.agent;
 
-import java.util.List;
-
 import com.ragagent.contract.tool.AgentTool;
+import java.util.List;
 
 /**
  * 创建 agent 引擎所需的全部输入（R5c：由域侧准备、agent-engine 侧消费）。

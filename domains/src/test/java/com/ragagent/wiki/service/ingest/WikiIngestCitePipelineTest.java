@@ -6,20 +6,18 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.contract.knowledge.ChunkPort;
+import com.ragagent.contract.knowledge.ChunkView;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.wiki.prompt.WikiPrompts;
+import com.ragagent.wiki.service.page.NewSlugFromCitation;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.contract.knowledge.ChunkPort;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.wiki.prompt.WikiPrompts;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.wiki.service.page.NewSlugFromCitation;
 
 /**
  * {@link WikiIngestCitePipeline} 的测试：覆盖 {@code mergeCitationsIntoItems} 与

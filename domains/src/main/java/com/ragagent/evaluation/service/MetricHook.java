@@ -1,12 +1,7 @@
 package com.ragagent.evaluation.service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.ObjDoubleConsumer;
-import java.util.function.ToDoubleFunction;
-
+import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.evaluation.domain.QaPair;
 import com.ragagent.evaluation.dto.EvaluationDtos.MetricResult;
 import com.ragagent.evaluation.metric.BleuMetric;
@@ -18,8 +13,12 @@ import com.ragagent.evaluation.metric.NdcgMetric;
 import com.ragagent.evaluation.metric.PrecisionMetric;
 import com.ragagent.evaluation.metric.RecallMetric;
 import com.ragagent.evaluation.metric.RougeMetric;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.retrieval.SearchResult;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.ObjDoubleConsumer;
+import java.util.function.ToDoubleFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

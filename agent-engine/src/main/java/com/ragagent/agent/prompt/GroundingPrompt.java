@@ -1,9 +1,8 @@
 package com.ragagent.agent.prompt;
 
+import com.ragagent.agent.AgentToolNames;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.ragagent.agent.AgentToolNames;
 
 /**
  * 内容接地（grounding）指引。

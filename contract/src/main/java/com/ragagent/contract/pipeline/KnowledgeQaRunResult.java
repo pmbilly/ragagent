@@ -1,9 +1,8 @@
 package com.ragagent.contract.pipeline;
 
-import java.util.List;
-
 import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.retrieval.SearchResult;
+import java.util.List;
 
 /**
  * RAG 预设跑完后的全链路产物（评估度量用）：检索命中 · 重排命中 · 生成响应。

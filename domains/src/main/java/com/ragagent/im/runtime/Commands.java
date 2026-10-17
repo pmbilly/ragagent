@@ -1,9 +1,9 @@
 package com.ragagent.im.runtime;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.im.domain.ChannelSessionEntity;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * IM 斜杠命令基建。命令声明意图（Action 枚举），副作用由 Service 执行——

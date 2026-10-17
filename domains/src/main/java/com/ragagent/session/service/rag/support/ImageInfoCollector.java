@@ -1,13 +1,12 @@
 package com.ragagent.session.service.rag.support;
 
+import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.platform.knowledge.ImageInfoEnricher;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.platform.knowledge.ImageInfoEnricher;
 
 /**
  * 按命中 chunk 批量聚合子块 image_info（search_entity/merge 消费）。

@@ -1,12 +1,11 @@
 package com.ragagent.knowledge.api;
 
-import org.springframework.stereotype.Component;
-
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.knowledge.support.KnowledgeHashes;
 import com.ragagent.knowledge.support.KnowledgePaths;
 import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link KnowledgeIngest} 的知识域实现：逐字转发域内四件（哈希 / 路径 / 任务号 / 队列），

@@ -1,31 +1,29 @@
 package com.ragagent.session.service;
 
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeParseException;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.stereotype.Service;
-
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.storage.support.FileUrlPort;
+import com.ragagent.contract.storage.support.Mode;
+import com.ragagent.contract.storage.support.PublicModeForbiddenException;
+import com.ragagent.contract.storage.support.ResourceModeException;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.storage.support.FileResolverFactory;
-import com.ragagent.contract.storage.support.FileUrlPort;
-import com.ragagent.contract.storage.support.Mode;
 import com.ragagent.platform.storage.support.ResourceUrlMode;
 import com.ragagent.platform.storage.support.Rewriter;
-import com.ragagent.contract.storage.support.PublicModeForbiddenException;
-import com.ragagent.contract.storage.support.ResourceModeException;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.support.MessageReferenceRewriter;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.stereotype.Service;
 
 /**
  * 消息历史读取用例：limit/beforeTime 解析、资源 URL 模式解析与字段级引用重写。
