@@ -36,6 +36,8 @@ dependencies {
 
     testFixturesApi(project(":contract"))
     testFixturesApi(project(":platform"))
+    // 录制金片加载器在 platform testFixtures（JSON 外置 + SHA-256 校验）
+    testFixturesApi(testFixtures(project(":platform")))
 
     testImplementation(testFixtures(project(":platform")))   // EmbeddedRedis 等平台测试基座
     testImplementation("org.springframework.boot:spring-boot-starter-test")

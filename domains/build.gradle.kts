@@ -29,6 +29,8 @@ dependencies {
     // fixtures 源集自身也要用（GoldenContract/Rec46cSupport 引用之）⇒ 两个源集都声明
     testFixturesApi(testFixtures(project(":agent-engine")))
     testImplementation(testFixtures(project(":agent-engine")))
+    // 录制金片加载器在 platform testFixtures（GoRecording46C 的常量经它加载）
+    testFixturesImplementation(testFixtures(project(":platform")))
     // 检索实现面：R6 起**已零依赖**（错位测试随迁 retrieval-engine；其余测试改为 mock 契约端口）    // EmbeddedRedis（B162 起在 :common）
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-web")
