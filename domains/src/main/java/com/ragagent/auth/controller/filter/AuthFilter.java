@@ -101,9 +101,9 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 通道 1.1：API 文档（仅 GET）。默认关闭时 springdoc 不注册端点，
+        // 通道 1.1：API 文档（Scalar + OpenAPI JSON，仅 GET）。默认关闭时
         // 这里会落到 DispatcherServlet 的 404；生产不会暴露。
-        if ("GET".equals(request.getMethod()) && isSpringdocPath(request.getRequestURI())) {
+        if ("GET".equals(request.getMethod()) && isApiDocsPath(request.getRequestURI())) {
             chain.doFilter(request, response);
             return;
         }
@@ -188,11 +188,11 @@ public class AuthFilter extends OncePerRequestFilter {
         return methods != null && methods.contains(method);
     }
 
-    /** springdoc 路径（仅 GET 放行；是否真的启用由 springdoc.enabled 决定）。 */
-    static boolean isSpringdocPath(String path) {
+    /** API 文档路径（Scalar 页面 + OpenAPI JSON；仅 GET 放行，是否启用由 springdoc 决定）。 */
+    static boolean isApiDocsPath(String path) {
         return path != null
-                && (path.equals("/swagger-ui.html")
-                || path.startsWith("/swagger-ui/")
+                && (path.equals("/scalar")
+                || path.equals("/scalar/")
                 || path.equals("/v3/api-docs")
                 || path.startsWith("/v3/api-docs/"));
     }

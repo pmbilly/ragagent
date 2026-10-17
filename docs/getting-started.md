@@ -145,7 +145,7 @@ cd frontend && npm run type-check && npm test
 | `bash scripts/run-guards.sh` | 23 条架构/契约守卫 |
 | `python3 scripts/test-summary.py` | 测试条数、失败与跳过清单 |
 | `python3 scripts/gen-arch-index.py` | 重新生成 `docs/architecture/packages.md` |
-| `SPRINGDOC_ENABLED=true ./gradlew :boot:bootRun` | 本地打开 Swagger UI（`:8083/swagger-ui.html`） |
+| `SPRINGDOC_ENABLED=true ./gradlew :boot:bootRun` | 本地打开 Scalar API 文档（`:8083/scalar`） |
 
 ---
 

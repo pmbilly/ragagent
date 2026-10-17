@@ -71,16 +71,21 @@ for _ in $(seq 1 90); do
 done
 
 health="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/health" 2>/dev/null || true)"
-swagger="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/v3/api-docs" 2>/dev/null || true)"
+api_docs="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/v3/api-docs" 2>/dev/null || true)"
+scalar="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/scalar" 2>/dev/null || true)"
 
 if [[ "$health" != "200" ]]; then
     echo "✗ /health 期望 200，实际 $health；日志尾部：" >&2
     tail -80 "$LOG" >&2 || true
     exit 1
 fi
-if [[ "$swagger" != "404" ]]; then
-    echo "✗ /v3/api-docs 默认应 404（Swagger 关闭），实际 $swagger" >&2
+if [[ "$api_docs" != "404" ]]; then
+    echo "✗ /v3/api-docs 默认应 404（API 文档关闭），实际 $api_docs" >&2
+    exit 1
+fi
+if [[ "$scalar" != "404" ]]; then
+    echo "✗ /scalar 默认应 404（Scalar 关闭），实际 $scalar" >&2
     exit 1
 fi
 
-echo "✓ smoke passed: /health=200, /v3/api-docs=404（Swagger 默认关闭）"
+echo "✓ smoke passed: /health=200, /v3/api-docs=404, /scalar=404（文档默认关闭）"

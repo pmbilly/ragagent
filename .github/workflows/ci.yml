@@ -81,7 +81,7 @@ jobs:
         # `tee` 落盘 + pipefail 保退出码 ⇒ 失败时下面的注解步能把关键行变成注解（公开 API 可读 ✓）
         run: set -o pipefail; ./gradlew build 2>&1 | tee /tmp/build.log
 
-      - name: 启动冒烟（真实 jar：/health 200 + Swagger 默认 404）
+      - name: 启动冒烟（真实 jar：/health 200 + Scalar/API 文档默认 404）
         run: bash scripts/ci-smoke.sh
 
       # B175：构建失败也自证 —— 日志要鉴权才看得到 ✗，这里把关键行（What went wrong / OOM / worker 崩 …）

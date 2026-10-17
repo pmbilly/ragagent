@@ -27,8 +27,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation(libs.mybatis.plus.starter)
-    // API 文档（dev-only，默认关闭；见 application.yml 的 springdoc.*）
-    implementation(libs.springdoc.openapi.starter.webmvc.ui)
+    // OpenAPI JSON（dev-only，默认关闭；UI 由 boot 的 /scalar 页面承载）
+    implementation(libs.springdoc.openapi.starter.webmvc.api)
     compileOnly("jakarta.servlet:jakarta.servlet-api")
     compileOnly("jakarta.validation:jakarta.validation-api")
     implementation(project(":platform"))

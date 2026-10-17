@@ -198,7 +198,7 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 | `JWT_SECRET` | 随机生成 | JWT 签名密钥；不设会重启掉登录，生产必须固定 |
 | `RETRIEVE_DRIVER` | 空 | 检索引擎列表；**为空 = 检索关闭**，dev 填 `postgres` |
 | `LOCAL_STORAGE_BASE_DIR` | `${user.home}/ragagent-data/files` | 本地存储根目录，必须持久化；勿放 `/tmp` |
-| `SPRINGDOC_ENABLED` | false | 本地 Swagger UI / OpenAPI 开关 |
+| `SPRINGDOC_ENABLED` | false | 本地 Scalar API 文档 / OpenAPI 开关 |
 
 完整清单见 [`.env.example`](.env.example)；全部可调开关（模型并发、流管理器后端、各域 Redis 开关等）见 `application.yml`。
 
@@ -207,7 +207,7 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 - **风格**：REST + JSON（键一律 camelCase），流式接口走 SSE
 - **认证**：`Authorization: Bearer <JWT>`；服务间/脚本可用 API Key
 - **响应外壳**：统一 `{ "code": …, "message": …, "data": … }`，错误码与可空字段显式声明
-- **API 文档**：默认关闭；本地 `SPRINGDOC_ENABLED=true ./gradlew :boot:bootRun` 后访问 `http://localhost:8083/swagger-ui.html`（生产保持 false）
+- **API 文档**：默认关闭；本地 `SPRINGDOC_ENABLED=true ./gradlew :boot:bootRun` 后访问 `http://localhost:8083/scalar`（Scalar UI，生产保持 false）
 
 | 资源 | 前缀 |
 |---|---|

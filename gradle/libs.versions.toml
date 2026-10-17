@@ -59,7 +59,7 @@ qcloud-cos = { module = "com.qcloud:cos_api", version.ref = "qcloud-cos" }
 volcengine-tos = { module = "com.volcengine:ve-tos-java-sdk", version.ref = "volcengine-tos" }
 duckdb-jdbc = { module = "org.duckdb:duckdb_jdbc", version.ref = "duckdb" }
 jtokkit = { module = "com.knuddels:jtokkit", version.ref = "jtokkit" }
-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
+springdoc-openapi-starter-webmvc-api = { module = "org.springdoc:springdoc-openapi-starter-webmvc-api", version.ref = "springdoc" }
 swagger-annotations-jakarta = { module = "io.swagger.core.v3:swagger-annotations-jakarta", version.ref = "swagger-annotations" }
 
 [plugins]
