@@ -16,6 +16,8 @@
 
 查表：[`architecture/packages.md`](architecture/packages.md) —— 166 份 `package-info` 的包索引（由脚本生成，勿手改）。
 
+先看模块：[`architecture/module-package-map.md`](architecture/module-package-map.md) —— 7 个模块的包根、22 个业务域的包/控制器数量（由脚本生成，勿手改）。
+
 > 代码注释里的「HANDOFF §x」指 [`internal/HANDOFF.md`](internal/HANDOFF.md)。
 
 ## 维护者路径
