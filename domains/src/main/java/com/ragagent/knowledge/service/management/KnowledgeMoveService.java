@@ -183,7 +183,7 @@ public class KnowledgeMoveService {
     }
 
     /**
-     * {@code enqueueMovedKnowledge} L1430-1510）：搬走后按目标 KB 的配置重新解析——
+     * 与 {@code enqueueMovedKnowledge} 同源：搬走后按目标 KB 的配置重新解析——
      * "向量不跟着走，到目标店重建"。
      * <ol>
      *   <li><b>源侧资源清理</b>（{@link #cleanupKnowledgeResourcesForReparse}）——向量行、

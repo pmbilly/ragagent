@@ -531,8 +531,8 @@ public class KnowledgeSummaryService {
      * post-process 的摘要 fan-out。
      * <p>调用方 {@link com.ragagent.knowledge.task.KnowledgeProcessWorker} 在索引完成后调用（知识行此时已落
      * {@code summary_status=none}）。
-     * 本方法完成三件事：cancelled/deleting → 跳过（L1148-1156）；无 summary model
-     * → 落 failed 不抛（L1133-1138）；否则 pending 落库 + 异步生成（重试/吞错语义
+     * 本方法完成三件事：cancelled/deleting → 跳过；无 summary model
+     * → 落 failed 不抛；否则 pending 落库 + 异步生成（重试/吞错语义
      * 同 {@link #spawnSummaryRefreshWorker}）。租户取知识行，不依赖调用线程的
      * TenantContext（worker 线程无上下文）。</p>
      */
@@ -633,7 +633,7 @@ public class KnowledgeSummaryService {
 
     /**
      * KB.NeedsEmbeddingModel 的服务层读法（
-     * L2302 的 kb 来自 {@code kbService.GetKnowledgeBaseByID} → {@code EnsureDefaults()}：
+     * kb 来自 {@code kbService.GetKnowledgeBaseByID} → {@code EnsureDefaults()}：
      * IsZero（4 字段全 false）→ Default），即 vector||keyword。
      * 服务层（kbService，含 EnsureDefaults 钩子）与 repo 层（kbRepository，仅 Scan：
      * NULL→Default、全 false 保持）。本方法对应服务层；{@link ChunkVectorIndexer}

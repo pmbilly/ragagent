@@ -18,7 +18,7 @@ public class KnowledgeProcessingSpan {
     public static final String KIND_SUB_SPAN = "subspan";
     public static final String KIND_GENERATION = "generation";
 
-    // ── span status（L29-36） ───────────────────────────────────────────
+    // ── span status ────────────────────────────────────────────────────
     public static final String STATUS_PENDING = "pending";
     public static final String STATUS_RUNNING = "running";
     public static final String STATUS_DONE = "done";
@@ -26,7 +26,7 @@ public class KnowledgeProcessingSpan {
     public static final String STATUS_SKIPPED = "skipped";
     public static final String STATUS_CANCELLED = "cancelled";
 
-    // ── stage 名（L42-48） ──────────────────────────────────────────────
+    // ── stage 名 ───────────────────────────────────────────────────────
     public static final String STAGE_DOC_READER = "docreader";
     public static final String STAGE_CHUNKING = "chunking";
     public static final String STAGE_EMBEDDING = "embedding";

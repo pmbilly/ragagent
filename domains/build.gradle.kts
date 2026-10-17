@@ -1,6 +1,6 @@
 plugins {
     java
-    `java-test-fixtures`   // 共享测试基建（TestSchema/契约夹具/桩服务器：B164 起）
+    `java-test-fixtures`   // 共享测试基建（TestSchema/契约夹具/桩服务器）
     id("com.google.protobuf")
     id("ragagent.java-conventions")
     id("ragagent.test-conventions")
@@ -13,15 +13,15 @@ configurations {
 }
 
 dependencies {
-    // agent 引擎：**主码已零依赖**（R5c 收官：55 个消费文件全部改走 contract.agent）
+    // agent 引擎：**主码已零依赖**（55 个消费文件全部改走 contract.agent）
     // ⇒ 过渡边摘除；仅测试夹具面仍需（RecordingSupport/GoRecording45* 在 agent-engine fixtures）。
 
-    // 模型运行时：R4b 后不再经 :engine 传递（engine 已解散）。**过渡边**——domains 尚余约 18 处
+    // 模型运行时：不再经 :engine 传递（engine 已解散）。**过渡边**——domains 尚余约 18 处
     // 对模型族实现面的 import（Ollama 管理面 / llm.extract 族 / modelcontext 工具 SPI 等），
-    // 按 R2c-3d 清单逐项收（`modelcontext` 归 R5 后为合法终态边）。
+    // 按清单逐项收（`modelcontext` 为合法终态边）。
     implementation(project(":model-runtime"))
 
-    // 共享内核（common + event）——B116 抽成独立模块后在此声明依赖（B117 定名 :common）
+    // 共享内核（platform + event）
     implementation(project(":platform"))
     implementation(project(":contract"))
     testImplementation(testFixtures(project(":platform")))
@@ -31,7 +31,8 @@ dependencies {
     testImplementation(testFixtures(project(":agent-engine")))
     // 录制金片加载器在 platform testFixtures（GoRecording46C 的常量经它加载）
     testFixturesImplementation(testFixtures(project(":platform")))
-    // 检索实现面：R6 起**已零依赖**（错位测试随迁 retrieval-engine；其余测试改为 mock 契约端口）    // EmbeddedRedis（B162 起在 :common）
+    // 检索实现面：**已零依赖**（错位测试随迁 retrieval-engine；其余测试改为 mock 契约端口）
+    // EmbeddedRedis
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -111,7 +112,7 @@ protobuf {
 }
 sourceSets["main"].proto {
     srcDir("../docreader")
-    // OTLP proto 已随 tracing 迁往 :engine（B161）——别在两个模块各生成一份同名类。
+    // OTLP proto 由 platform 生成——别在两个模块各生成一份同名类。
 }
 
 // Flyway 命名 V<version>__<desc>.sql；迁移已基线化（V1__baseline.sql，历史增量不再参与构建），
@@ -128,19 +129,19 @@ tasks.named("processResources") { dependsOn(syncMigrations) }
 // 与 spring-boot 的 bootBuildInfo 输出相撞 ⇒ Gradle 校验报错）。testFixtures 不需要 proto ⇒ 关掉相关任务。
 tasks.matching { it.name.contains("TestProto") || it.name.contains("TestFixturesProto") }.configureEach { enabled = false }
 
-// java-test-fixtures 默认**不继承** implementation（B164 实测：夹具编译看不到 jackson/engine/common）
+// java-test-fixtures 默认**不继承** implementation（实测：夹具编译看不到 jackson/platform）
 // ⇒ 让夹具与主源码同一套依赖。
 configurations.named("testFixturesImplementation") { extendsFrom(configurations.getByName("implementation")) }
 configurations.named("testFixturesRuntimeOnly") { extendsFrom(configurations.getByName("runtimeOnly")) }
 
 tasks.withType<Test> {
-    // 并行分叉（2026-10-09 B142）：此前是**单 fork 串行**跑完 4,792 条 ⇒ 10 核机器上测试期间 9 核闲着，
+    // 并行分叉：此前是**单 fork 串行**跑完 4,792 条 ⇒ 10 核机器上测试期间 9 核闲着，
     // 而套件是 I/O 型长尾（Top 20 类占 55%，全是 HTTP 契约往返与嵌入式 Redis）⇒ 分叉收益直接。
-    // 实测：全量测试 214s → 见 §15.1.1 B142 记录（连跑三遍验稳定性）。
+    // 实测：全量测试 214s（连跑三遍验稳定性）。
     // 注意：契约类会各起桩服务器/嵌入式 Redis，若将来出现端口或夹具冲突，先降 fork 数再查桩。
-    // 分叉数**按核数自适应**（B175）：CI runner 只有 4 核 ✗，而 4 fork × maxHeapSize 2g = 8g
+    // 分叉数**按核数自适应**：CI runner 只有 4 核 ✗，而 4 fork × maxHeapSize 2g = 8g
     // ⇒ 与 daemon / PG 容器抢内存 ⇒ worker 崩（表现为"任务失败但零失败用例" ✗，日志还要鉴权才看得到 ✗）。
-    // 规则：每核 2 个 fork 上限，且不超过原来的 4（本地 10 核 ⇒ 仍是 4，与 B142 的调参一致 ✓）。
+    // 规则：每核 2 个 fork 上限，且不超过原来的 4（本地 10 核 ⇒ 仍是 4，与调参一致 ✓）。
     maxParallelForks = maxOf(1, minOf(4, Runtime.getRuntime().availableProcessors() / 2))
     // 测试 JVM 堆：单 fork 时代 5g（多个 @SpringBootTest 上下文各自驻留整份上下文）；
     // 分 4 叉后每个 JVM 驻留的上下文≈1/4 ⇒ 2g 起步（fork 数变了就重新看堆，别照搬旧值）。
@@ -153,9 +154,9 @@ tasks.withType<Test> {
     // 契约夹具重录开关：-Dcontract.refresh=true 时把掩码后的实际响应写回
     // src/test/resources/contracts（平时是断言）；-D 只作用于 daemon JVM，需显式转发。
     systemProperty("contract.refresh", System.getProperty("contract.refresh") ?: "false")
-    // 钉死测试 JVM 时区（B173）：本仓是 Go 移植，**线格式断言里的时间戳就是 +08:00**
+    // 钉死测试 JVM 时区：线格式断言里的时间戳就是 +08:00
     // （如 AgentStepsJsonTest 期望 "2026-09-18T10:00:00+08:00"），而 CI runner 是 **UTC** ✗
-    // ⇒ 不钉死就是"本机必绿、CI 必红"（2026-10-10 CI 实测 2 条；本机 TZ=UTC 精确复现 ✓）。
+    // ⇒ 不钉死就是"本机必绿、CI 必红"（CI 实测 2 条；本机 TZ=UTC 精确复现 ✓）。
     // 产品部署在 +08:00，故以此为测试基准；其他模块暂未见到时区敏感断言，先只钉这里。
     systemProperty("user.timezone", "Asia/Shanghai")
 }

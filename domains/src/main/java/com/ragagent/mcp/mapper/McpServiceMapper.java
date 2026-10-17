@@ -21,7 +21,7 @@ import org.apache.ibatis.annotations.Update;
  *   <li><b>软删除</b>：**每个查询显式写出** {@code deleted_at IS NULL}（不用 @TableLogic）</li>
  *   <li><b>内置服务可见性</b>：{@code tenant_id = ? OR is_builtin = true} 的括号必须保留，
  *       否则 ListEnabled 的 AND enabled 会把内置行漏掉</li>
- *   <li><b>排序</b>：List/ListEnabled 显式 {@code ORDER BY created_at DESC}（repository L51/L66）</li>
+ *   <li><b>排序</b>：List/ListEnabled 显式 {@code ORDER BY created_at DESC}（见 repository 的 List/ListEnabled）</li>
  *   <li><b>Update 的部分列语义</b>：未提供的字段不动——见 {@link #updatePartial}</li>
  *   <li>jsonb 列（headers/auth_config/advanced_config/stdio_config/env_vars）走 TypeHandler</li>
  * </ul>

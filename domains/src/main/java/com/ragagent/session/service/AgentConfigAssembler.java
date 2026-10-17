@@ -273,7 +273,7 @@ final class AgentConfigAssembler {
         }
         return result;
     }
-    /** agentRequiresRerankModel（org 包 AgentShareService L368 同源；agent/tools 的判定）。 */
+    /** agentRequiresRerankModel（与 agent 共享服务同源；agent/tools 的判定）。 */
     static boolean agentRequiresRerankModel(ObjectNode c) {
         List<String> allowed = new ArrayList<>();
         JsonNode arr = c.get("allowedTools");

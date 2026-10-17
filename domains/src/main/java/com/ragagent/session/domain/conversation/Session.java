@@ -19,13 +19,12 @@ import java.time.OffsetDateTime;
  *
  * <h2>落库隐式行为清单</h2>
  * <ul>
- * <li><b>钩子 BeforeCreate</b>（L141-144）：无条件 {@code s.ID = uuid.New().String()}——
- * 注意它**覆盖**调用方传入的 ID，不是"为空才生成"。<br>
- * 等效 Java：{@code SessionRepository.create} 无条件用新 UUID 覆盖。</li>
+ * <li><b>新建即生成 ID</b>：{@code SessionRepository.create} 无条件用新 UUID 覆盖
+ * 调用方传入的 ID（不是"为空才生成"）。</li>
  * <li><b>软删除</b>：deleted_at 列。**不用** {@code @TableLogic}，
  * 而是在每条查询里显式写 {@code deleted_at IS NULL}（datetime 逻辑删除值在 MP 各版本
  * 行为敏感，显式条件语义确定）。{@code Delete} 等效为 UPDATE deleted_at=now()。</li>
- * <li><b>默认排序</b>：仓库层显式 {@code Order("updated_at DESC")}（L100/L129），
+ * <li><b>默认排序</b>：仓库层按 {@code updated_at DESC} 排序，
  * 列表另有 pin 优先的排序串（见 {@code SessionRepository.queryPaged}）。</li>
  * <li><b>jsonb 列 {@code agent_config}</b>：存的是 {@code SessionLastRequestState}
  * （复用这一列以避免新增迁移）。<b>注意

@@ -286,7 +286,7 @@ public class KnowledgeBaseService
      * 跨域命令端口的实现（{@link KnowledgeBaseProvisioner}）：建聊天历史隐藏 KB。
      *
      * <p>归属调整：实体构造原先发生在聊天历史配置端点（auth），现收回本域；
-     * 字段与描述逐字保持原样，出处标注 L1696-1716 一并保留。</p>
+     * 字段与描述逐字保持原样。</p>
      */
     @Override
     public String provisionChatHistoryKnowledgeBase(String embeddingModelId) {
@@ -396,7 +396,7 @@ public class KnowledgeBaseService
  * 隐藏库的正当访问路径是按配置里的 id 直查（MessageSearch），不依赖本列表。</p>
  */
     public List<KnowledgeBase> listKnowledgeBases(String creator) {
-        // Order("created_at DESC") 最新在前
+        // 按 created_at DESC 排序，最新在前
         List<KnowledgeBase> all = kbRepository.listActiveByTenant(tenantId());
         String uid = TenantContext.currentUserId();
         List<KnowledgeBase> out = new ArrayList<>(all.size());

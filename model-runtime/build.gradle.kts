@@ -1,13 +1,13 @@
-// 模型运行时模块（R2 提取，2026-10-16）：llm / modelruntime / embedding / rerank / modelcontext。
+// 模型运行时模块：llm / modelruntime / embedding / rerank / modelcontext。
 //
 // 依赖方向：model-runtime → platform → contract。对 engine 其余包（retrieval / chatpipeline /
 // webfetch / tracing）的出边实测 0（llm 与 modelcontext 全零）⇒ 可独立成模块。
 //
-// 跨模块消费走契约面：R2a 已把 LlmChatClient / ChatStream / StreamResponse（SSE 帧）/
+// 跨模块消费走契约面：已把 LlmChatClient / ChatStream / StreamResponse（SSE 帧）/
 // Embedder / Reranker / RankResult 上提 `contract.model`。
 //
 // 过渡说明：engine（retrieval / chatpipeline / webfetch / tracing）与 domains 现阶段经
-// `api` 传递可见本模块类型——待 R2c 组装权下沉（`ModelAccessResolver` + 组装入组合根）后收窄。
+// `api` 传递可见本模块类型——待组装权下沉（`ModelAccessResolver` + 组装入组合根）后收窄。
 plugins {
     `java-library`
     id("ragagent.java-conventions")

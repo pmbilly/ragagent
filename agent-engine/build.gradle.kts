@@ -1,4 +1,4 @@
-// agent 引擎模块（R5a 切出，2026-10-16）：`com.ragagent.agent`（80 件主源码 + 33 件测试 + 3 件夹具）。
+// agent 引擎模块：`com.ragagent.agent`（80 件主源码 + 33 件测试 + 3 件夹具）。
 //
 // 依赖方向：agent-engine → platform → contract（**对其它域出边 = 0**：实测只 import
 // contract 139 / platform 51 / modelcontext 3 —— 后者是 agent-engine → model-runtime 的
@@ -9,7 +9,7 @@
 //
 // 过渡说明：domains 现有 55 个消费文件（agentmanagement/agenttools/session）仍直引本模块
 // ⇒ domains 显式声明 `implementation(project(":agent-engine"))`（**过渡边**），
-// 后续按 `contract.agent` 端口化逐点收窄（R5b/R5c）。
+// 后续按 `contract.agent` 端口化逐点收窄。
 plugins {
     `java-library`
     `java-test-fixtures`   // 共享测试基建（GoRecording*/契约夹具：随 agent 树自 domains 迁来）

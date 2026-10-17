@@ -352,7 +352,7 @@ public class FaqEntryQueryService {
                 hasPriorityFilter, firstPriorityTagUuids, secondPriorityTagUuids,
                 chunkScores, chunkMatchTypes, chunkMatchedContents);
 
-        // 批量补 TagName（L1214-1250）：entry.TagID(seq) → tag 名
+        // 批量补 TagName：entry.TagID(seq) → tag 名
         if (!entries.isEmpty()) {
             List<Long> tagSeqIds = new ArrayList<>();
             for (FaqEntry entry : entries) {
@@ -490,7 +490,7 @@ public class FaqEntryQueryService {
         if (entries.size() > matchCount) {
             entries = new ArrayList<>(entries.subList(0, matchCount));
         }
-        // 批量补 TagName（L1214-1250；检索未接线时 entries 恒空，骨架保留）
+        // 批量补 TagName（检索未接线时 entries 恒空，骨架保留）
         return entries;
     }
 

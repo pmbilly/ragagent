@@ -147,7 +147,7 @@ public final class QaTurnExecutor {
             });
             final boolean[] completionHandled = {false};
             // 事件在桥接虚拟线程触发，TenantContext 是 ThreadLocal——注册时捕获
-            // session 租户，触发时 replay（与 L976 stop 处理器同款纪律 #1）。
+            // session 租户，触发时 replay（与 stop 处理器同款纪律 #1）。
             final long normalSessionTenantId = reqCtx.session.getTenantId();
             streamCtx.eventBus.on(EventType.EVENT_AGENT_FINAL_ANSWER, evt -> {
                 if (!(evt.getData() instanceof AgentFinalAnswerData data)) {

@@ -1,13 +1,13 @@
-// 检索引擎模块（R3c 切出，2026-10-16）：`com.ragagent.retrieval`（91 件主源码 + 30 件测试）。
+// 检索引擎模块：`com.ragagent.retrieval`（91 件主源码 + 30 件测试）。
 //
-// 依赖方向：retrieval-engine → platform → contract（**对模型族出边 = 0**：R3a 已把
-// VLM 客户端归位 model-runtime，索引面用的 `Embedder` 早在 R2 就上了契约面）。
+// 依赖方向：retrieval-engine → platform → contract（**对模型族出边 = 0**：已把
+// VLM 客户端归位 model-runtime，索引面用的 `Embedder` 已在契约面）。
 //
 // 技术栈按实测 import 面声明：Jackson（databind/core/annotations）· Neo4j driver ·
 // Spring（context/jdbc/boot 配置绑定）· HikariCP · sqlite-jdbc；不含 MyBatis / Redis / servlet。
 //
 // 过渡说明：engine（chatpipeline/webfetch 还在）与 domains/boot 现阶段经 engine 的 `api` 传递可见
-// 本模块类型——R3d 端口化后再收窄成逐消费点显式声明。
+// 本模块类型——端口化后再收窄成逐消费点显式声明。
 plugins {
     `java-library`
     id("ragagent.java-conventions")
@@ -41,7 +41,7 @@ dependencies {
 
 
 
-// ── 集成测试任务（随 R3c 从 :engine 原样搬来）───────────────────────────────
+// ── 集成测试任务（从 :engine 原样搬来）──────────────────────────────────────-
 // `*IT` 不匹配 Gradle 默认收集模式 ⇒ 必须给显式入口，且**不接 check**（要真实外部服务，env 门控）：
 //   WEKNORA_MILVUS_IT=true ./gradlew :retrieval-engine:integrationTest
 // 未设 env 时 JUnit 的 @EnabledIfEnvironmentVariable 把类标为 disabled ⇒ 任务绿、零联网。

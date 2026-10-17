@@ -516,7 +516,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
     }
 
     /**
-     *  的行解析段（L2186-2201）：
+     * 逐行解析：
      * 逐行 trim → 裁前缀符号（{@code "0123456789.-*) "}）→ trim → 非空且 &gt;5 字节
      */
     static List<String> parseGeneratedQuestions(String content, int questionCount) {

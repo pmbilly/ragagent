@@ -8,6 +8,7 @@
 判据（硬零）：
   C1 主码 `src/main` 的注释里不得出现代号/裸日期戳；ISO-8601 时间示例（`2026-09-18T10:00:00Z`）保留。
   C2 任意 `src/test` / `src/testFixtures` 不得再出现 `GoRecording`。
+  C3 构建脚本（`*.kts`，排除 build 产物）的注释同样不得出现代号。
 
 红态探针：临时在主码注释写 `// B999`，本脚本必须非零退出；跑完删除探针。
 """
@@ -32,6 +33,13 @@ def sources(module: str, kind: str):
     return (ROOT / module / "src" / kind / "java").rglob("*.java")
 
 
+def kts_files():
+    for p in ROOT.rglob("*.kts"):
+        if "build" in p.parts:
+            continue
+        yield p
+
+
 def main() -> int:
     problems: list[str] = []
 
@@ -48,6 +56,12 @@ def main() -> int:
             for path in sources(module, kind):
                 if LEGACY_NAME in path.read_text(encoding="utf-8"):
                     problems.append(f"C2 {path.relative_to(ROOT)}: 旧夹具名 {LEGACY_NAME} 回流")
+
+    for path in kts_files():
+        text = path.read_text(encoding="utf-8")
+        found = sorted({m.group(0) for c in COMMENT_RE.findall(text) for m in CODE_RE.finditer(c)})
+        if found:
+            problems.append(f"C3 {path.relative_to(ROOT)}: {', '.join(found)}")
 
     if problems:
         print("✗ 迁移代号守卫失败：")

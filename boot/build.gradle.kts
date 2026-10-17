@@ -1,10 +1,10 @@
-// 组合根模块（:boot）：入口 + 全局装配 + 扫描 + 打包（B165 / P3b-2）。
+// 组合根模块（:boot）：入口 + 全局装配 + 扫描 + 打包。
 //
 // 为什么独立：`config/` 与 `RagAgentApplication` 是**只出不进**的组合根（守卫 R-rule：依赖 config 的包 0 个），
 // 集成测试（@SpringBootTest）也必须住在这里 —— 它们隐式依赖 `@SpringBootConfiguration`（包级向上搜索），
 // 而 `:domains` 看不到 `:boot`（方向是 boot → domains）。
 //
-// 依赖方向：boot → domains（原 :server，B167 更名）→ engine → common（一路向下，无环）。
+// 依赖方向：boot → 各模块（一路向下，无环）。
 plugins {
     java
     id("org.springframework.boot")
@@ -14,10 +14,10 @@ plugins {
 
 dependencies {
     implementation(project(":agent-engine"))
-    // 模型运行时：组合根自建模型装配/并发闸门（R4b 后不再经 :engine 传递）
+    // 模型运行时：组合根自建模型装配/并发闸门（不经 :engine 传递）
     implementation(project(":model-runtime"))
 
-    // 检索引擎：组合根自建引擎注册表/工厂与审计 sink（R3c 后不再经 engine 传递）
+    // 检索引擎：组合根自建引擎注册表/工厂与审计 sink（不经 engine 传递）
     implementation(project(":retrieval-engine"))
 
     implementation(project(":domains"))
@@ -43,7 +43,7 @@ dependencies {
     // 集成测试走内存库（与 :domains 同口径）。⚠️ testRuntimeOnly **不可传递** ⇒ 必须显式声明，
     // 否则测试会落到 application.yml 里的真 PG URL 上，TestSchema 的 H2 专有 DDL 直接 bad SQL grammar。
     testRuntimeOnly("com.h2database:h2")
-    testImplementation(libs.archunit)   // 架构规则（随 B165 迁入）
+    testImplementation(libs.archunit)   // 架构规则
     testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("jakarta.validation:jakarta.validation-api")
 }
@@ -77,7 +77,7 @@ tasks.named("processResources") { dependsOn(syncMigrations) }
 
 tasks.withType<Test> {
     // 契约夹具按「模块相对 + server/ 兜底」两候选读 **文件路径**（18 处调用点 + GoldenContract 内置）；
-    // 集成测试从 :server 迁到 :boot 后，工作目录变成 boot/ ⇒ 两个候选都落空（B165 实测 97 处失败）。
+    // 集成测试从 :server 迁到 :boot 后，工作目录变成 boot/ ⇒ 两个候选都落空（实测 97 处失败）。
     // 统一把工作目录设为**仓库根**，两候选中的第二个（domains/src/testFixtures/resources/contracts/…）即可命中。
     workingDir = rootDir
     maxHeapSize = "2g"
