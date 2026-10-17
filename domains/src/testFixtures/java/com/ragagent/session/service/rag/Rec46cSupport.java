@@ -112,8 +112,8 @@ final class Rec46cSupport {
         }
         m.put("description", err.description);
         m.put("error_type", err.errorType);
-        if (err.err != null) {
-            m.put("err", err.err.getMessage());
+        if (err.cause() != null) {
+            m.put("err", err.cause().getMessage());
         }
         return m;
     }

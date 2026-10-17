@@ -42,7 +42,7 @@ final class HandleStore<M> {
         }
     }
 
-    private final ReentrantReadWriteLock mu = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final String prefix;
     private final int width;
     private int next;
@@ -75,7 +75,7 @@ final class HandleStore<M> {
         if (key == null || key.isEmpty()) {
             return "";
         }
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             String existing = handleByKey.get(key);
             if (existing != null) {
@@ -96,7 +96,7 @@ final class HandleStore<M> {
             entryByHandle.put(handle, new Entry<>(value, meta, compileWordBounded(handle)));
             return handle;
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
@@ -112,36 +112,36 @@ final class HandleStore<M> {
         if (key == null) {
             return null;
         }
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             return handleByKey.get(key);
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 
     /** 句柄是否存在。 */
     boolean has(String handle) {
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             return entryByHandle.containsKey(handle);
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 
     int size() {
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             return entryByHandle.size();
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 
     /** 已知句柄 → (持久值, 元数据)。 */
     M resolve(String handle, StringBuilder valueOut) {
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             Entry<M> entry = entryByHandle.get(handle);
             if (entry == null) {
@@ -153,24 +153,24 @@ final class HandleStore<M> {
             }
             return entry.meta;
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 
     /** 句柄 → 持久值（忽略元数据）。 */
     String resolveValue(String handle) {
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             Entry<M> entry = entryByHandle.get(handle);
             return entry == null ? null : entry.value;
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 
     /** 值/句柄快照，顺序由调用方负责。 */
     List<Pair<M>> pairs() {
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             List<Pair<M>> out = new ArrayList<>(entryByHandle.size());
             for (Map.Entry<String, Entry<M>> e : entryByHandle.entrySet()) {
@@ -178,7 +178,7 @@ final class HandleStore<M> {
             }
             return out;
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 

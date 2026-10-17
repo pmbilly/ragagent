@@ -46,7 +46,7 @@ public class EventBus implements EventBusInterface {
 
     private static final Logger log = LoggerFactory.getLogger(EventBus.class);
 
-    private final ReentrantReadWriteLock mu = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final Map<String, List<EventHandler>> handlers = new java.util.HashMap<>();
     private final boolean asyncMode;
 
@@ -64,21 +64,21 @@ public class EventBus implements EventBusInterface {
      * 注册 handler；同一事件类型可注册多个，按注册顺序执行。
      */
     public void on(String eventType, EventHandler handler) {
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             handlers.computeIfAbsent(eventType, k -> new ArrayList<>()).add(handler);
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
     /** 移除该事件类型的全部 handler。 */
     public void off(String eventType) {
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             handlers.remove(eventType);
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
@@ -95,12 +95,12 @@ public class EventBus implements EventBusInterface {
             copy.setId(Event.newUuid());
         }
 
-        mu.readLock().lock();
+        lock.readLock().lock();
         List<EventHandler> list;
         try {
             list = handlers.get(copy.getType());
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
         if (list == null || list.isEmpty()) {
             return; // 无订阅者：静默成功
@@ -147,12 +147,12 @@ public class EventBus implements EventBusInterface {
             copy.setId(Event.newUuid());
         }
 
-        mu.readLock().lock();
+        lock.readLock().lock();
         List<EventHandler> list;
         try {
             list = handlers.get(copy.getType());
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
         if (list == null || list.isEmpty()) {
             return;
@@ -208,33 +208,33 @@ public class EventBus implements EventBusInterface {
 
     /** 是否存在该事件类型的订阅。 */
     public boolean hasHandlers(String eventType) {
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             List<EventHandler> list = handlers.get(eventType);
             return list != null && !list.isEmpty();
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 
     /** 该事件类型的 handler 数。 */
     public int getHandlerCount(String eventType) {
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             List<EventHandler> list = handlers.get(eventType);
             return list == null ? 0 : list.size();
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 
     /** 清空全部 handler。 */
     public void clear() {
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             handlers.clear();
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 

@@ -11,13 +11,13 @@ import java.util.Set;
 /**
  * wiki 链接修复协作者:正文内链死链检测与重写(RE2 语义见 WikiTextUtils)。
  *
- * <p>持有 {@link WikiPageServiceImpl} 回引以访问仓储与工具;本类不得独立实例化。</p>
+ * <p>持有 {@link DefaultWikiPageService} 回引以访问仓储与工具;本类不得独立实例化。</p>
  */
 final class WikiPageLinkRepair {
 
-    private final WikiPageServiceImpl service;
+    private final DefaultWikiPageService service;
 
-    WikiPageLinkRepair(WikiPageServiceImpl service) {
+    WikiPageLinkRepair(DefaultWikiPageService service) {
         this.service = service;
     }
 

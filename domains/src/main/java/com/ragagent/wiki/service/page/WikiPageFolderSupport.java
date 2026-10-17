@@ -24,15 +24,15 @@ import org.slf4j.LoggerFactory;
 /**
  * wiki 文件夹树协作者:文件夹 CRUD、路径 find-or-create、页面归位与空链修剪。
  *
- * <p>持有 {@link WikiPageServiceImpl} 回引以访问仓储与工具;本类不得独立实例化。</p>
+ * <p>持有 {@link DefaultWikiPageService} 回引以访问仓储与工具;本类不得独立实例化。</p>
  */
 final class WikiPageFolderSupport {
 
     private static final Logger log = LoggerFactory.getLogger(WikiPageFolderSupport.class);
 
-    private final WikiPageServiceImpl service;
+    private final DefaultWikiPageService service;
 
-    WikiPageFolderSupport(WikiPageServiceImpl service) {
+    WikiPageFolderSupport(DefaultWikiPageService service) {
         this.service = service;
     }
 
@@ -57,8 +57,8 @@ final class WikiPageFolderSupport {
         if (!types.isEmpty()) {
             allDirect = service.folderRepo.countPagesByFolder(kbId, null);
         }
-        Map<String, Long> recScoped = WikiPageServiceImpl.recursiveFolderCounts(all, scopedDirect);
-        Map<String, Long> recAll = WikiPageServiceImpl.recursiveFolderCounts(all, allDirect);
+        Map<String, Long> recScoped = DefaultWikiPageService.recursiveFolderCounts(all, scopedDirect);
+        Map<String, Long> recAll = DefaultWikiPageService.recursiveFolderCounts(all, allDirect);
         boolean showEmptyFolders = types.size() > 1;
         // 一个文件夹属于本视图，当且仅当它（递归地）含有请求类型的页面，
         // 或者——只在合并视图里——它是一个任何类型页面都没有的完全空容器。
@@ -90,7 +90,7 @@ final class WikiPageFolderSupport {
 
     /** 创建文件夹（校验名字、解析父路径、防同级重名）。 */
     public WikiFolder createFolder(String kbId, Long tenantID, String parentID, String name) {
-        String folderName = WikiPageServiceImpl.validateFolderName(name);
+        String folderName = DefaultWikiPageService.validateFolderName(name);
         String parentPath = "";
         int depth = 1;
         if (!WikiConstants.FOLDER_ROOT_ID.equals(parentID)) {
@@ -179,7 +179,7 @@ final class WikiPageFolderSupport {
         page.setFolderId(folderID == null ? "" : folderID.trim());
         applyFolderToPage(page);
         page.setUpdatedAt(OffsetDateTime.now());
-        WikiPageServiceImpl.normalizeWikiHierarchy(page);
+        DefaultWikiPageService.normalizeWikiHierarchy(page);
         service.repo.updateMeta(page);
         return page;
     }
@@ -194,7 +194,7 @@ final class WikiPageFolderSupport {
         WikiFolder folder = service.folderRepo.getFolderByID(kbId, id);
         String name = folder.getName();
         if (newName != null && !newName.trim().isEmpty()) {
-            name = WikiPageServiceImpl.validateFolderName(newName);
+            name = DefaultWikiPageService.validateFolderName(newName);
         }
         String targetParent = folder.getParentId();
         if (moveParent) {
@@ -271,7 +271,7 @@ final class WikiPageFolderSupport {
         for (WikiPage page : pages) {
             applyFolderToPage(page);
             page.setUpdatedAt(OffsetDateTime.now());
-            WikiPageServiceImpl.normalizeWikiHierarchy(page);
+            DefaultWikiPageService.normalizeWikiHierarchy(page);
             try {
                 service.repo.updateMeta(page);
             } catch (RuntimeException e) {

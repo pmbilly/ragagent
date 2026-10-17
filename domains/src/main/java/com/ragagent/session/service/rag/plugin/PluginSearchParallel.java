@@ -107,7 +107,7 @@ public final class PluginSearchParallel implements Plugin {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("task", e.getKey());
             f.put("err", e.getValue() == null ? null
-                    : (e.getValue().err == null ? e.getValue().errorType : e.getValue().err.getMessage()));
+                    : (e.getValue().cause() == null ? e.getValue().errorType : e.getValue().cause().getMessage()));
             PipelineLog.warn("SearchParallel", "task_error", f);
         }
 

@@ -300,11 +300,11 @@ final class ToolPolicy {
     // ---- JSON 字符串值遍历（rewriteJSONStringValues / walkJSONStringValues）----
 
     static String rewriteJSONStringValues(String raw, java.util.function.BinaryOperator<String> rewrite) {
-        JsonNode value = JsonValues.parse(raw);
+        JsonNode value = ModelJsonValues.parse(raw);
         if (value == null) {
             return raw;
         }
-        value = JsonValues.numbersAsDouble(value);
+        value = ModelJsonValues.numbersAsDouble(value);
         value = walkJSONValue("", value, rewrite);
         return ToolJson.write(value);
     }
@@ -331,7 +331,7 @@ final class ToolPolicy {
 
     /** 仅供收集（不改写）的遍历；解析失败静默。 */
     static void walkJSONStringValues(String raw, java.util.function.BinaryOperator<String> rewrite) {
-        JsonNode value = JsonValues.parse(raw);
+        JsonNode value = ModelJsonValues.parse(raw);
         if (value == null) {
             return;
         }
@@ -351,12 +351,12 @@ final class ToolPolicy {
             }
             String rewritten = RawJson.rewriteRawObject(call.getFunction().getArguments(), "items", rawValue -> {
                 // rawValue 是 JSON 字符串字面量；解码出内层字符串
-                JsonNode inner = JsonValues.parse(rawValue);
+                JsonNode inner = ModelJsonValues.parse(rawValue);
                 if (inner == null || !inner.isTextual()) {
                     return null;
                 }
                 String wrapped = inner.asText();
-                JsonNode items = JsonValues.parse(wrapped);
+                JsonNode items = ModelJsonValues.parse(wrapped);
                 if (items == null || !items.isArray() || items.isEmpty()) {
                     return null;
                 }
@@ -380,12 +380,12 @@ final class ToolPolicy {
                 continue;
             }
             String rewritten = RawJson.rewriteRawObject(call.getFunction().getArguments(), "arguments", rawValue -> {
-                JsonNode inner = JsonValues.parse(rawValue);
+                JsonNode inner = ModelJsonValues.parse(rawValue);
                 if (inner == null || !inner.isTextual()) {
                     return null;
                 }
                 String wrapped = inner.asText();
-                JsonNode object = JsonValues.parse(wrapped);
+                JsonNode object = ModelJsonValues.parse(wrapped);
                 if (object == null || !object.isObject() || object.isEmpty()) {
                     return null;
                 }
@@ -501,7 +501,7 @@ final class ToolPolicy {
                     return null;
                 }
                 String keyLiteral = raw.substring(keyStart, pos[0]);
-                JsonNode keyNode = JsonValues.parse(keyLiteral);
+                JsonNode keyNode = ModelJsonValues.parse(keyLiteral);
                 if (keyNode == null || !keyNode.isTextual()) {
                     return null;
                 }

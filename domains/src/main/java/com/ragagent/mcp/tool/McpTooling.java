@@ -156,11 +156,11 @@ public final class McpTooling implements McpToolingGateway {
         Collections.sort(ids);
         for (String id : ids) {
             McpCatalog.McpCatalogServer entry = c.servers.get(id);
-            entry.mu.lock();
+            entry.lock.lock();
             McpService service = entry.service;
             List<McpToolWrapper> cached = entry.tools;
             String status = entry.status;
-            entry.mu.unlock();
+            entry.lock.unlock();
             if (!"ready".equals(status)) {
                 continue;
             }

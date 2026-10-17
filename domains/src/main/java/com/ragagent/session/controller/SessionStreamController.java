@@ -10,6 +10,7 @@ import com.ragagent.contract.storage.support.StorageBackendResolver;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.storage.support.FileResolverFactory;
 import com.ragagent.platform.storage.support.ResourceUrlMode;
 import com.ragagent.platform.storage.support.Rewriter;
@@ -27,7 +28,6 @@ import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionService;
-import com.ragagent.session.support.LogSanitizer;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -162,11 +162,11 @@ public class SessionStreamController {
             HttpServletResponse response) throws IOException {
 
         // 日志消毒：去掉换行/制表/控制字符，防日志注入。
-        String sessionId = LogSanitizer.sanitizeForLog(rawSessionId);
+        String sessionId = LogSanitizer.sanitize(rawSessionId);
         if (sessionId.isEmpty()) {
             throw BizException.badRequest("invalid session id");
         }
-        String messageId = LogSanitizer.sanitizeForLog(rawMessageId);
+        String messageId = LogSanitizer.sanitize(rawMessageId);
         if (messageId.isEmpty()) {
             throw BizException.badRequest("Missing message ID");
         }

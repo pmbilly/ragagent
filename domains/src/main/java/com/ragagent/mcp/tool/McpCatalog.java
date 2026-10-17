@@ -161,24 +161,24 @@ public final class McpCatalog {
     /** 一台授权服务的快照槽。 */
     static final class McpCatalogServer {
         final ReentrantLock loadLock = new ReentrantLock();
-        final ReentrantLock mu = new ReentrantLock();
+        final ReentrantLock lock = new ReentrantLock();
         McpService service;
         List<McpToolWrapper> tools = new ArrayList<>();
         String status = "not_loaded";
 
         void store(McpService service, List<McpToolWrapper> tools, String status) {
-            mu.lock();
+            lock.lock();
             try {
                 this.service = service;
                 this.tools = tools;
                 this.status = status;
             } finally {
-                mu.unlock();
+                lock.unlock();
             }
         }
 
         McpServerSummary summary(String id) {
-            mu.lock();
+            lock.lock();
             try {
                 String instructions = "";
                 if (!tools.isEmpty()) {
@@ -197,7 +197,7 @@ public final class McpCatalog {
                 s.usageInstructions = service == null ? "" : McpCatalog.shortMcpDescription(service.effectiveUsageInstructions());
                 return s;
             } finally {
-                mu.unlock();
+                lock.unlock();
             }
         }
     }
@@ -334,14 +334,14 @@ public final class McpCatalog {
         if (entry == null) {
             return "";
         }
-        entry.mu.lock();
+        entry.lock.lock();
         try {
             if (entry.service == null) {
                 return "";
             }
             return entry.service.getName();
         } finally {
-            entry.mu.unlock();
+            entry.lock.unlock();
         }
     }
 
@@ -383,11 +383,11 @@ public final class McpCatalog {
         }
         entry.loadLock.lock();
         try {
-            entry.mu.lock();
+            entry.lock.lock();
             McpService service = entry.service;
             List<McpToolWrapper> loaded = entry.tools;
             String status = entry.status;
-            entry.mu.unlock();
+            entry.lock.unlock();
             boolean reload = live || !"ready".equals(status);
             if (lookup != null) {
                 McpService current;
@@ -644,7 +644,7 @@ public final class McpCatalog {
     /** 已缓存定义中按 ref 精确读取。 */
     McpToolWrapper cachedTool(String ref) {
         for (McpCatalogServer entry : servers.values()) {
-            entry.mu.lock();
+            entry.lock.lock();
             McpToolWrapper found = null;
             try {
                 if (entry.tools != null) {
@@ -656,7 +656,7 @@ public final class McpCatalog {
                     }
                 }
             } finally {
-                entry.mu.unlock();
+                entry.lock.unlock();
             }
             if (found != null) {
                 return found;

@@ -79,9 +79,9 @@ class SearchGradingTest {
                 });
         assertNotSame(PluginError.SEARCH_NOTHING, err, "硬错不得被降级成 search_nothing");
         assertEquals("search_failed", err.errorType);
-        assertNotNull(err.err, "原始错误须带出（SSE 文案来源）");
-        assertTrue(err.err.getMessage().contains("error code: 2200"),
-                "文案应保留 AppError 前缀，实际：" + err.err.getMessage());
+        assertNotNull(err.cause(), "原始错误须带出（SSE 文案来源）");
+        assertTrue(err.cause().getMessage().contains("error code: 2200"),
+                "文案应保留 AppError 前缀，实际：" + err.cause().getMessage());
         assertFalse(next[0], "检索硬错时不得推进后续管线");
 
         // ② 并行阶段：0 结果 + chunk 硬错 ⇒ 上抛该硬错（不降级）

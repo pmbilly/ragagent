@@ -648,7 +648,7 @@ class ArchitectureRulesTest {
      *   <li>{@code GitLabConnector} —— 落库 jsonb 字节必须与既有 cursor 一致；</li>
      *   <li>{@code NotionJson} —— {@code ADJUST_DATES_TO_CONTEXT_TIME_ZONE=false}
      *       （收编会让写回 cursor 的偏移字面量漂移）；</li>
-     *   <li>{@code JsonValues} —— {@code FAIL_ON_TRAILING_TOKENS=true}（LLM 输出的严格解析）。</li>
+     *   <li>{@code ModelJsonValues} —— {@code FAIL_ON_TRAILING_TOKENS=true}（LLM 输出的严格解析）。</li>
      * </ul>
      * <p>全仓自建 mapper 已从 168 处收到 7 处：裸 {@code new ObjectMapper()}
      * 没注册 JSR-310、又开着严格模式，与 §2-12「宽松读统一策略」正好相反。</p>
@@ -660,7 +660,7 @@ class ArchitectureRulesTest {
             "com.ragagent.platform.event.EventJson",
             "com.ragagent.datasource.connector.gitlab.GitLabConnector",
             "com.ragagent.datasource.connector.notion.NotionJson",
-            "com.ragagent.modelcontext.JsonValues");
+            "com.ragagent.modelcontext.ModelJsonValues");
 
     @Test
     @DisplayName("A15：JSON mapper 必须来自 JsonMappers 工厂（不得自建 ObjectMapper / JsonMapper.builder）")

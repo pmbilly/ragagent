@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * {@link WikiChunkCleaner} 的生产实现：wiki 页面删除时同步删除其镜像 chunk
  * （id = {@code "wp-" + pageId}，谓词 tenant_id + id）。
  *
- * <p>此前该端口没有实现 bean，{@code WikiPageServiceImpl.deletePage} 恒走"跳过"
+ * <p>此前该端口没有实现 bean，{@code DefaultWikiPageService.deletePage} 恒走"跳过"
  * 分支——被删页面的镜像 chunk 永久残留，可能被检索命中为幽灵来源。
  * chunk 清理失败只记 WARN，不让页面删除失败。</p>
  */

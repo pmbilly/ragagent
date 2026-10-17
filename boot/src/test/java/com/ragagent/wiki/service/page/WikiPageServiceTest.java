@@ -176,7 +176,7 @@ class WikiPageServiceTest {
         page.setCategoryPath(new ArrayList<>(
                 List.of("概念/爱护花草", " 实体/标牌 ", "摘要", "生态/平台", "多余层级")));
 
-        WikiPageServiceImpl.normalizeWikiHierarchy(page);
+        DefaultWikiPageService.normalizeWikiHierarchy(page);
 
         assertThat(page.getCategoryPath()).containsExactly("爱护花草", "标牌", "生态");
         assertThat(page.getDepth()).isEqualTo(3);
@@ -193,7 +193,7 @@ class WikiPageServiceTest {
         page.setFolderId("folder-concepts");
         page.setCategoryPath(new ArrayList<>(List.of("概念", " 概念 ", "Concepts", "")));
 
-        WikiPageServiceImpl.normalizeWikiHierarchy(page);
+        DefaultWikiPageService.normalizeWikiHierarchy(page);
 
         assertThat(page.getCategoryPath()).containsExactly("概念", "概念", "Concepts");
         assertThat(page.getDepth()).isEqualTo(3);
@@ -208,7 +208,7 @@ class WikiPageServiceTest {
         entry.setTitle("爱护花草标牌");
         entry.setCategoryPath(new ArrayList<>(List.of("实体/标牌", "概念", "生态/行为倡导")));
 
-        WikiPageServiceImpl.normalizeWikiIndexEntryHierarchy(entry, WikiConstants.PAGE_TYPE_ENTITY);
+        DefaultWikiPageService.normalizeWikiIndexEntryHierarchy(entry, WikiConstants.PAGE_TYPE_ENTITY);
 
         assertThat(entry.getCategoryPath()).containsExactly("标牌", "生态", "行为倡导");
         assertThat(entry.getWikiPath()).isEqualTo("entity/标牌/生态/行为倡导/爱护花草标牌");
@@ -220,17 +220,17 @@ class WikiPageServiceTest {
     @Test
     void containsString() {
         List<String> slice = List.of("a", "b", "c");
-        assertThat(WikiPageServiceImpl.containsString(slice, "b")).isTrue();
-        assertThat(WikiPageServiceImpl.containsString(slice, "d")).isFalse();
-        assertThat(WikiPageServiceImpl.containsString(null, "a")).isFalse();
+        assertThat(DefaultWikiPageService.containsString(slice, "b")).isTrue();
+        assertThat(DefaultWikiPageService.containsString(slice, "d")).isFalse();
+        assertThat(DefaultWikiPageService.containsString(null, "a")).isFalse();
     }
 
     /** 移除<b>所有</b>匹配项 */
     @Test
     void removeString() {
         List<String> slice = List.of("a", "b", "c", "b");
-        assertThat(WikiPageServiceImpl.removeString(slice, "b")).containsExactly("a", "c");
-        assertThat(WikiPageServiceImpl.removeString(slice, "z")).hasSize(4);
+        assertThat(DefaultWikiPageService.removeString(slice, "b")).containsExactly("a", "c");
+        assertThat(DefaultWikiPageService.removeString(slice, "z")).hasSize(4);
     }
 
     // ──────────────────────── PruneEmptyFolderChains ────────────────────────
@@ -589,7 +589,7 @@ class WikiPageServiceTest {
         assertThat(index.getStatus()).isEqualTo(WikiConstants.STATUS_PUBLISHED);
         assertThat(index.getVersion()).isEqualTo(1);
         assertThat(index.getTenantId()).isEqualTo(1L);
-        assertThat(index.getContent()).isEqualTo(WikiPageServiceImpl.DEFAULT_INDEX_CONTENT);
+        assertThat(index.getContent()).isEqualTo(DefaultWikiPageService.DEFAULT_INDEX_CONTENT);
         // 再取一次返回同一行，不再新建
         assertThat(svc.getIndex("kb-idx").getId()).isEqualTo(index.getId());
     }
@@ -638,9 +638,9 @@ class WikiPageServiceTest {
         insertKb(kbId, 1L, true);
         WikiIndex.Response view = svc.getIndexView(kbId, List.of(), 50, "");
         assertThat(view.getGroups()).extracting(WikiIndex.Group::getType)
-                .containsExactlyElementsOf(WikiPageServiceImpl.WIKI_INDEX_CONTENT_PAGE_TYPES);
+                .containsExactlyElementsOf(DefaultWikiPageService.WIKI_INDEX_CONTENT_PAGE_TYPES);
         // intro 回落到索引页正文（建默认页时正文非空）
-        assertThat(view.getIntro()).isEqualTo(WikiPageServiceImpl.DEFAULT_INDEX_CONTENT);
+        assertThat(view.getIntro()).isEqualTo(DefaultWikiPageService.DEFAULT_INDEX_CONTENT);
         assertThat(view.getVersion()).isEqualTo(1);
     }
 

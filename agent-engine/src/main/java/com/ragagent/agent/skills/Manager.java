@@ -32,7 +32,7 @@ public final class Manager {
     private final List<String> allowedSkills;
     private final boolean enabled;
 
-    private final ReentrantReadWriteLock mu = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private List<Skill.SkillMetadata> metadataCache = new ArrayList<>();
 
     /** Manager 的配置。 */
@@ -77,11 +77,11 @@ public final class Manager {
         if (!allowedSkills.isEmpty()) {
             metadata = filterAllowedSkills(metadata);
         }
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             metadataCache = metadata;
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
@@ -104,11 +104,11 @@ public final class Manager {
         if (!enabled) {
             return null;
         }
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             return new ArrayList<>(metadataCache);
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 

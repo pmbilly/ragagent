@@ -57,7 +57,7 @@ public class OllamaService implements OllamaAdminPort {
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 只保护 isAvailable 的读写。 */
-    private final ReentrantLock mu = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
 
     private final HttpClient client;
     private final String baseUrl;
@@ -106,7 +106,7 @@ public class OllamaService implements OllamaAdminPort {
      */
     @Override
     public void startService() {
-        mu.lock();
+        lock.lock();
         try {
             try {
                 HttpResponse<InputStream> resp = send(HttpRequest.newBuilder(uri("/"))
@@ -128,18 +128,18 @@ public class OllamaService implements OllamaAdminPort {
                 throw new IllegalStateException("ollama service unavailable: " + e.getMessage(), e);
             }
         } finally {
-            mu.unlock();
+            lock.unlock();
         }
     }
 
     /** 服务是否可用。 */
     @Override
     public boolean isAvailable() {
-        mu.lock();
+        lock.lock();
         try {
             return isAvailable;
         } finally {
-            mu.unlock();
+            lock.unlock();
         }
     }
 

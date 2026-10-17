@@ -19,15 +19,15 @@ import org.slf4j.LoggerFactory;
  * wiki 链接维护协作者：出链解析、入链增删、全量重建与交叉链接注入，以及 wiki 链接文本工具
  * （slug 归一、行内 chunk 引句柄剥离）。
  *
- * <p>持有 {@link WikiPageServiceImpl} 回引以访问仓储与工具;本类不得独立实例化。</p>
+ * <p>持有 {@link DefaultWikiPageService} 回引以访问仓储与工具;本类不得独立实例化。</p>
  */
 final class WikiPageLinkOps {
 
     private static final Logger log = LoggerFactory.getLogger(WikiPageLinkOps.class);
 
-    private final WikiPageServiceImpl service;
+    private final DefaultWikiPageService service;
 
-    WikiPageLinkOps(WikiPageServiceImpl service) {
+    WikiPageLinkOps(DefaultWikiPageService service) {
         this.service = service;
     }
 
@@ -146,7 +146,7 @@ final class WikiPageLinkOps {
             } catch (RuntimeException e) {
                 continue;
             }
-            List<String> newInLinks = WikiPageServiceImpl.removeString(targetPage.getInLinks(), sourceSlug);
+            List<String> newInLinks = DefaultWikiPageService.removeString(targetPage.getInLinks(), sourceSlug);
             if (newInLinks.size() != targetPage.getInLinks().size()) {
                 targetPage.setInLinks(newInLinks);
                 targetPage.setUpdatedAt(OffsetDateTime.now());

@@ -17,6 +17,7 @@ import com.ragagent.contract.storage.support.ResourceModeException;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
 import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.storage.support.FileResolverFactory;
 import com.ragagent.platform.storage.support.ResourceUrlMode;
 import com.ragagent.platform.storage.support.Rewriter;
@@ -31,7 +32,6 @@ import com.ragagent.session.service.QaSupport;
 import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.TemporaryDocumentService;
-import com.ragagent.session.support.LogSanitizer;
 import java.util.List;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
@@ -76,7 +76,7 @@ public final class QaRequestParser {
             TenantStorageView readerTenant) {
         QaRequestContext rc = new QaRequestContext();
 
-        String sessionId = LogSanitizer.sanitizeForLog(rawSessionId);
+        String sessionId = LogSanitizer.sanitize(rawSessionId);
         if (sessionId.isEmpty()) {
             throw BizException.badRequest("invalid session id");
         }
@@ -228,7 +228,7 @@ public final class QaRequestParser {
                 }
                 if (doc == null) {
                     throw BizException.badRequest(
-                            "attachment " + LogSanitizer.sanitizeForLog(id)
+                            "attachment " + LogSanitizer.sanitize(id)
                                     + " was not found in this session");
                 }
                 if (rc.agentConfig != null) {

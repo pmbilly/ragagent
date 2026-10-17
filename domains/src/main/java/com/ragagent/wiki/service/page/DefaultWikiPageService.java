@@ -60,9 +60,9 @@ import org.springframework.stereotype.Service;
  * {@link com.ragagent.platform.access.TenantContext} 承担，service 签名不带额外的来源参数。</p>
  */
 @Service
-public class WikiPageServiceImpl implements WikiPageService {
+public class DefaultWikiPageService implements WikiPageService {
 
-    static final Logger log = LoggerFactory.getLogger(WikiPageServiceImpl.class);
+    static final Logger log = LoggerFactory.getLogger(DefaultWikiPageService.class);
 
 
 
@@ -97,7 +97,7 @@ public class WikiPageServiceImpl implements WikiPageService {
     final WikiPageLinkRepair linkRepair;
     final WikiPageViewsSupport views;
 
-    public WikiPageServiceImpl(WikiPageRepository repo,
+    public DefaultWikiPageService(WikiPageRepository repo,
                                WikiFolderRepository folderRepo,
                                KnowledgeBaseLookup kbLookup,
                                ObjectProvider<WikiChunkCleaner> chunkCleaner,

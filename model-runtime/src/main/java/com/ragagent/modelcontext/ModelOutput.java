@@ -77,7 +77,7 @@ final class ModelOutput {
 
     /** 从 JSON 工具结果里显式标记的键下登记持久 ID。 */
     static void registerStructuredReferences(SourceRegistry r, String raw) {
-        JsonNode value = JsonValues.parse(raw);
+        JsonNode value = ModelJsonValues.parse(raw);
         if (value == null) {
             return;
         }
@@ -632,7 +632,7 @@ final class ModelOutput {
         if (value instanceof JsonNode n) {
             return n;
         }
-        return JsonValues.MAPPER.valueToTree(value);
+        return ModelJsonValues.MAPPER.valueToTree(value);
     }
 
     /**

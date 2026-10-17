@@ -133,7 +133,7 @@ public final class Registry {
             addAll(unresolved, ToolPolicy.unresolvedPrivateToolHandles(this, call.getFunction().getName(), resolved));
             addAll(unresolved, decodedMCP.unresolved());
             call.setUnresolvedHandles(uniqueSorted(unresolved));
-            boolean changed = !JsonValues.jsonEquivalent(call.getModelArguments(), resolved);
+            boolean changed = !ModelJsonValues.jsonEquivalent(call.getModelArguments(), resolved);
             if (changed && !call.getUnresolvedHandles().isEmpty()) {
                 call.setArgumentResolution(ARGUMENT_RESOLUTION_PARTIALLY_RESOLVED);
             } else if (!call.getUnresolvedHandles().isEmpty()) {
@@ -319,7 +319,7 @@ public final class Registry {
     /** 顶层对象的单字段改写；其余值原字节保留。 */
     static String rewriteMCPField(String raw, String key, java.util.function.UnaryOperator<String> rewrite) {
         String result = ToolPolicy.RawJson.rewriteRawObject(raw, key, rawValue -> {
-            JsonNode value = JsonValues.parse(rawValue);
+            JsonNode value = ModelJsonValues.parse(rawValue);
             if (value == null || !value.isTextual()) {
                 return null;
             }
@@ -464,7 +464,7 @@ public final class Registry {
             }
             // 替换 enum 后逐层按键序重组
             Map<String, String> fieldRewritten = new java.util.LinkedHashMap<>(field);
-            fieldRewritten.put("enum", ToolJson.write(JsonValues.MAPPER.valueToTree(ids)));
+            fieldRewritten.put("enum", ToolJson.write(ModelJsonValues.MAPPER.valueToTree(ids)));
             Map<String, String> propertiesRewritten = new java.util.LinkedHashMap<>(properties);
             propertiesRewritten.put(entry.key(), ToolPolicy.RawJson.marshalObject(fieldRewritten));
             Map<String, String> schemaRewritten = new java.util.LinkedHashMap<>(schema);
@@ -472,7 +472,7 @@ public final class Registry {
             String marshaled = ToolPolicy.RawJson.marshalObject(schemaRewritten);
             // FunctionDef.parameters 是 JsonNode：把编出文本保序解析回树，
             // 后续序列化保持同样的键序与数字形态
-            def.setParameters(JsonValues.parse(marshaled));
+            def.setParameters(ModelJsonValues.parse(marshaled));
         }
         for (ChatTool tool : encoded) {
             FunctionDef def = tool.getFunction();
@@ -498,7 +498,7 @@ public final class Registry {
 
     /** 解码一个 JSON 字符串数组的原始文本；任何元素非字符串返回 null。 */
     static List<String> decodeStringArray(String raw) {
-        JsonNode node = JsonValues.parse(raw);
+        JsonNode node = ModelJsonValues.parse(raw);
         if (node == null || !node.isArray()) {
             return null;
         }
@@ -540,7 +540,7 @@ public final class Registry {
         }
         // 只在用于找链接的草稿副本里解 JSON 字符串转义；外部正文与持久 ToolResult 不动
         String scanned = SourceRegistry.replaceAllFunc(MCP_JSON_STRING, output, token -> {
-            JsonNode value = JsonValues.parse(token);
+            JsonNode value = ModelJsonValues.parse(token);
             if (value != null && value.isTextual()) {
                 return "\"" + value.asText() + "\"";
             }
@@ -551,7 +551,7 @@ public final class Registry {
         java.util.regex.Matcher m = MCP_URL.matcher(scanned);
         while (m.find()) {
             String match = m.group();
-            String rawURL = HtmlEntities.unescape(match);
+            String rawURL = HtmlCodec.unescape(match);
             rawURL = trimRight(rawURL, ".,;!?");
             // 剥 Markdown/prose 收尾定界符，保留平衡的 URL 括号（如 /wiki/Function_(mathematics)）
             for (String[] pair : new String[][] {{"(", ")"}, {"[", "]"}, {"{", "}"}}) {

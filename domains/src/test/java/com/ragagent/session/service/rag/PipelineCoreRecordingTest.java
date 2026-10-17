@@ -79,7 +79,7 @@ class PipelineCoreRecordingTest {
         shape.put("clone", pp != PluginError.SEARCH_NOTHING);
         shape.put("err_type", pp.errorType);
         shape.put("desc", pp.description);
-        shape.put("err", pp.err.getMessage());
+        shape.put("err", pp.cause().getMessage());
         assertRec("plugin_error", "with_error", json(shape));
     }
 

@@ -402,7 +402,7 @@ public class SessionKnowledgeQaService {
             // 阶段 span 收尾（输出时长；SEARCH_NOTHING 不算错误）
             if (stageSpan != null) {
                 String stageErr = err != null && err != PluginError.SEARCH_NOTHING
-                        ? (err.err != null ? err.err.getMessage() : err.description) : null;
+                        ? (err.cause() != null ? err.cause().getMessage() : err.description) : null;
                 stageSpan.finish(java.util.Map.of("durationMs", stageDuration), null, stageErr);
             }
 
@@ -428,7 +428,7 @@ public class SessionKnowledgeQaService {
                 f.put("error_type", err.errorType);
                 f.put("description", err.description);
                 PipelineLog.error("Pipeline", "stage_failed", f);
-                throw err.err != null ? new RuntimeException(err.err) : new RuntimeException(err.description);
+                throw err.cause() != null ? new RuntimeException(err.cause()) : new RuntimeException(err.description);
             }
 
             PipelineLog.info("Pipeline", "stage_complete", Map.of(
@@ -543,7 +543,7 @@ public class SessionKnowledgeQaService {
 
             // SEARCH_NOTHING 不算错误；其余带底层错误消息收尾
             String stageErr = err != null && err != PluginError.SEARCH_NOTHING
-                    ? (err.err != null ? err.err.getMessage() : err.description) : null;
+                    ? (err.cause() != null ? err.cause().getMessage() : err.description) : null;
             stageSpan.finish(null, null, stageErr);
 
             if (err == PluginError.SEARCH_NOTHING) {
@@ -552,9 +552,9 @@ public class SessionKnowledgeQaService {
             }
             if (err != null) {
                 log.error("Event triggering failed, event: {}, error type: {}, description: {}, error: {}",
-                        event, err.errorType, err.description, err.err);
+                        event, err.errorType, err.description, err.cause());
                 // 管线错误 → 500 内部错误，文案取底层错误消息
-                String msg = err.err != null ? err.err.getMessage() : err.description;
+                String msg = err.cause() != null ? err.cause().getMessage() : err.description;
                 throw BizException.internal(msg);
             }
             log.info("Event {} triggered successfully", event);

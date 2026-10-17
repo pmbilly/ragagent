@@ -503,12 +503,12 @@ class WebSearchProviderExecTest {
                 + "{\"title\":\"Result 1\",\"link\":\"https://example.com/1\",\"content\":\"Summary 1\",\"publish_date\":\"2026-07-16\"},"
                 + "{\"title\":\"Result 2\",\"link\":\"https://example.com/2\",\"content\":\"Summary 2\"}]}");
         try {
-            ZhipuProvider p = new ZhipuProvider(params("test-key"));
+            ZhipuWebSearchProvider p = new ZhipuWebSearchProvider(params("test-key"));
             p.searchEngine = "search_pro";
             p.contentSize = "high";
             p.baseUrl = stub.url();
-            String query = "智".repeat(ZhipuProvider.MAX_QUERY_RUNES + 1);
-            List<WebSearchResult> results = p.search(query, ZhipuProvider.MAX_RESULTS + 1, true);
+            String query = "智".repeat(ZhipuWebSearchProvider.MAX_QUERY_RUNES + 1);
+            List<WebSearchResult> results = p.search(query, ZhipuWebSearchProvider.MAX_RESULTS + 1, true);
             assertEquals(wireBody("ws_zhipu"), stub.requests.get(0).body());
             assertEquals(2, results.size());
             assertEquals("Summary 1", results.get(0).getSnippet());
@@ -523,34 +523,34 @@ class WebSearchProviderExecTest {
     @Test
     void zhipuValidationTableAndDateParses() {
         RuntimeException noKey = assertThrows(RuntimeException.class,
-                () -> ZhipuProvider.validateParameters(params("  ")));
+                () -> ZhipuWebSearchProvider.validateParameters(params("  ")));
         assertTrue(noKey.getMessage().contains("API key is required for Zhipu provider"));
 
         WebSearchProviderParams badEngine = params("key");
         badEngine.setExtraConfig(Map.of("search_engine", "unknown"));
         RuntimeException engine = assertThrows(RuntimeException.class,
-                () -> ZhipuProvider.validateParameters(badEngine));
+                () -> ZhipuWebSearchProvider.validateParameters(badEngine));
         assertTrue(engine.getMessage().contains("invalid Zhipu search engine: unknown"));
 
         WebSearchProviderParams badSize = params("key");
         badSize.setExtraConfig(Map.of("content_size", "large"));
         RuntimeException size = assertThrows(RuntimeException.class,
-                () -> ZhipuProvider.validateParameters(badSize));
+                () -> ZhipuWebSearchProvider.validateParameters(badSize));
         assertTrue(size.getMessage().contains("invalid Zhipu content size: large"));
 
         String[] okDates = {"2026-07-16", "2026-07-16 12:30", "2026-07-16 12:30:45",
                 "2026-07-16T12:30:45Z"};
         for (String d : okDates) {
-            assertNotNull(ZhipuProvider.parseZhipuDate(d), d);
+            assertNotNull(ZhipuWebSearchProvider.parseZhipuDate(d), d);
         }
-        assertNull(ZhipuProvider.parseZhipuDate("not-a-date"));
+        assertNull(ZhipuWebSearchProvider.parseZhipuDate("not-a-date"));
     }
 
     @Test
     void zhipuHttpErrorAndApiError() {
         Stub rateLimited = new Stub(429, "{\"error\":{\"code\":\"1302\",\"message\":\"rate limited\"}}");
         try {
-            ZhipuProvider p = new ZhipuProvider(params("test-key"));
+            ZhipuWebSearchProvider p = new ZhipuWebSearchProvider(params("test-key"));
             p.baseUrl = rateLimited.url();
             RuntimeException err = assertThrows(RuntimeException.class,
                     () -> p.search("test", 1, false));
@@ -561,7 +561,7 @@ class WebSearchProviderExecTest {
         }
         Stub apiError = new Stub("{\"error\":{\"code\":\"999\",\"message\":\"boom\"}}");
         try {
-            ZhipuProvider p = new ZhipuProvider(params("test-key"));
+            ZhipuWebSearchProvider p = new ZhipuWebSearchProvider(params("test-key"));
             p.baseUrl = apiError.url();
             RuntimeException err = assertThrows(RuntimeException.class,
                     () -> p.search("test", 1, false));

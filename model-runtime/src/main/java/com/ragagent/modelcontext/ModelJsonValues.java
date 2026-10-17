@@ -11,14 +11,14 @@ import com.ragagent.platform.web.ContractJsonModule;
  * modelcontext 包内的 JSON 语义小工具：解析容错与 double 归一。
  * 编码统一走 agent.tools 的 ToolJson（map 键排序 + HTML 转义 + 64 位浮点）。
  */
-final class JsonValues {
+final class ModelJsonValues {
 
     static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_TRAILING_TOKENS, true)
             // 上下文预算读写的载荷含契约类（TokenUsage 等）：线格式在 mixin 模块里
             .registerModule(new ContractJsonModule());
 
-    private JsonValues() {
+    private ModelJsonValues() {
     }
 
     /** 解析失败返回 null。 */

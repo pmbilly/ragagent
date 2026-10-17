@@ -74,7 +74,7 @@ public class EngineRegistry implements RetrieveEngineRegistry {
     private final Map<String, RetrieveEngineService> byStoreId = new LinkedHashMap<>();
     private final Map<String, Long> storeGen = new HashMap<>();
     private final Map<String, Instant> failedUntil = new HashMap<>();
-    private final ReadWriteLock mu = new ReentrantReadWriteLock();
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     /** 两者任一为空即"不能重建"（按需加载退化为普通查表）。 */
     private final VectorStoreLookup storeLookup;
@@ -114,7 +114,7 @@ public class EngineRegistry implements RetrieveEngineRegistry {
 
     @Override
     public void register(RetrieveEngineService service) {
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             if (byEngineType.containsKey(service.engineType())) {
                 throw new RetrieveEngineException(
@@ -123,13 +123,13 @@ public class EngineRegistry implements RetrieveEngineRegistry {
             }
             byEngineType.put(service.engineType(), service);
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
     @Override
     public RetrieveEngineService getRetrieveEngineService(String engineType) {
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             RetrieveEngineService svc = byEngineType.get(engineType);
             if (svc == null) {
@@ -139,17 +139,17 @@ public class EngineRegistry implements RetrieveEngineRegistry {
             }
             return svc;
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 
     @Override
     public List<RetrieveEngineService> getAllRetrieveEngineServices() {
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             return new ArrayList<>(byEngineType.values());
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 
@@ -157,14 +157,14 @@ public class EngineRegistry implements RetrieveEngineRegistry {
 
     @Override
     public void registerWithStoreId(String storeId, RetrieveEngineService service) {
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             byStoreId.put(storeId, service);
             // 与注销一样计数：先前启动的按需构建不得覆盖此处发布的条目——否则这里装上的
             // 引擎会被"孤儿化"（连接开着、无人持有）。
             bumpGenerationLocked(storeId);
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
@@ -180,24 +180,24 @@ public class EngineRegistry implements RetrieveEngineRegistry {
     }
 
     private RetrieveEngineService lookupByStoreIdOrNull(String storeId) {
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             return byStoreId.get(storeId);
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 
     @Override
     public void unregisterByStoreId(String storeId) {
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             byStoreId.remove(storeId);
             bumpGenerationLocked(storeId);
             // 让运维删掉 store 后立刻能重试，而不是干等上一份配置留下的冷却。
             failedUntil.remove(storeId);
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
@@ -316,12 +316,12 @@ public class EngineRegistry implements RetrieveEngineRegistry {
 
     /** 读取 store 的当前代数。 */
     private long storeGeneration(String storeId) {
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             Long gen = storeGen.get(storeId);
             return gen == null ? 0L : gen;
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 
@@ -330,7 +330,7 @@ public class EngineRegistry implements RetrieveEngineRegistry {
      * 返回是否发布。
      */
     private boolean registerIfGenUnchanged(String storeId, long gen, RetrieveEngineService svc) {
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             long current = storeGen.get(storeId) == null ? 0L : storeGen.get(storeId);
             if (current != gen) {
@@ -340,7 +340,7 @@ public class EngineRegistry implements RetrieveEngineRegistry {
             failedUntil.remove(storeId);
             return true;
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
@@ -351,22 +351,22 @@ public class EngineRegistry implements RetrieveEngineRegistry {
 
     /** 是否仍在建失败的冷却期内。 */
     private boolean inFailureCooldown(String storeId) {
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             Instant until = failedUntil.get(storeId);
             return until != null && Instant.now().isBefore(until);
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 
     /** 为建失败的 store 起冷却。 */
     private void markBuildFailed(String storeId) {
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             failedUntil.put(storeId, Instant.now().plus(rebuildCooldown));
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 

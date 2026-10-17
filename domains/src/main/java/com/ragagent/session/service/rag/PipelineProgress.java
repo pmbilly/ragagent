@@ -140,8 +140,8 @@ public final class PipelineProgress {
         }
         boolean success = stageErr == null;
         String output = success ? "已完成问题理解" : "";
-        String errMsg = !success && stageErr != null && stageErr.err != null
-                ? stageErr.err.getMessage() : "";
+        String errMsg = !success && stageErr != null && stageErr.cause() != null
+                ? stageErr.cause().getMessage() : "";
 
         long durationMs = clock.millis() - startMillis;
         AgentToolResultData data = new AgentToolResultData();
@@ -196,8 +196,8 @@ public final class PipelineProgress {
             }
         }
 
-        String errMsg = !success && stageErr != null && stageErr.err != null
-                ? stageErr.err.getMessage() : "";
+        String errMsg = !success && stageErr != null && stageErr.cause() != null
+                ? stageErr.cause().getMessage() : "";
 
         Map<String, Object> structured = new LinkedHashMap<>();
         structured.put("count", count);

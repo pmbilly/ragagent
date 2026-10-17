@@ -18,15 +18,15 @@ import org.slf4j.LoggerFactory;
 /**
  * wiki 页面修订历史与页面问题协作者：快照构造、历史剪枝与查询、回滚，以及问题单的增查改。
  *
- * <p>持有 {@link WikiPageServiceImpl} 回引以访问仓储与工具;本类不得独立实例化。</p>
+ * <p>持有 {@link DefaultWikiPageService} 回引以访问仓储与工具;本类不得独立实例化。</p>
  */
 final class WikiPageRevisionOps {
 
     private static final Logger log = LoggerFactory.getLogger(WikiPageRevisionOps.class);
 
-    private final WikiPageServiceImpl service;
+    private final DefaultWikiPageService service;
 
-    WikiPageRevisionOps(WikiPageServiceImpl service) {
+    WikiPageRevisionOps(DefaultWikiPageService service) {
         this.service = service;
     }
 
@@ -120,7 +120,7 @@ final class WikiPageRevisionOps {
         }
         WikiPageRevision rev = service.repo.getRevision(kbId, page.getId(), version);
 
-        WikiPage target = WikiPageServiceImpl.copyPage(page);
+        WikiPage target = DefaultWikiPageService.copyPage(page);
         target.setTitle(rev.getTitle());
         target.setContent(rev.getContent());
         target.setSummary(rev.getSummary());

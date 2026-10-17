@@ -48,7 +48,7 @@ class WikiPageRevisionServiceTest {
         assertThat(created.getLastEditSource()).isEqualTo(WikiConstants.EDIT_SOURCE_USER);
 
         // 第一次真编辑：v1 必须被快照，v2 成为当前版本
-        WikiPage edit = WikiPageServiceImpl.copyPage(created);
+        WikiPage edit = DefaultWikiPageService.copyPage(created);
         edit.setContent("v2 body");
         WikiPage updated = WikiEditContext.callWith(WikiConstants.EDIT_SOURCE_AGENT,
                 () -> svc.updatePage(edit));
@@ -70,7 +70,7 @@ class WikiPageRevisionServiceTest {
         assertThat(rev.getContent()).isEqualTo("v1 body");
 
         // 纯记账写入（内容完全相同）不得产生快照
-        WikiPage same = WikiPageServiceImpl.copyPage(updated);
+        WikiPage same = DefaultWikiPageService.copyPage(updated);
         svc.updatePage(same);
         WikiPageRevisionListResponse resp2 = svc.listRevisions(kb, "concept/rag", 50, 0);
         assertThat(resp2.getTotal()).isEqualTo(1);
@@ -88,14 +88,14 @@ class WikiPageRevisionServiceTest {
         seed.setSummary("to be cleared");
         WikiPage created = svc.createPage(seed);
 
-        WikiPage edit = WikiPageServiceImpl.copyPage(created);
+        WikiPage edit = DefaultWikiPageService.copyPage(created);
         edit.setSummary("");
         WikiPage updated = svc.updatePage(edit);
         assertThat(updated.getVersion()).isEqualTo(2);
         assertThat(updated.getSummary()).isEmpty();
 
         // 字段完全一致时再次更新必须被当作 no-op（不涨版本）
-        WikiPage again = WikiPageServiceImpl.copyPage(updated);
+        WikiPage again = DefaultWikiPageService.copyPage(updated);
         WikiPage roundTripped = svc.updatePage(again);
         assertThat(roundTripped.getVersion()).isEqualTo(2);
         assertThat(roundTripped.getSummary()).isEmpty();
@@ -113,7 +113,7 @@ class WikiPageRevisionServiceTest {
                 newPage(kb, "entity/acme", "Acme", "original body"));
         assertThat(created.getTitle()).isEqualTo("Acme");
 
-        WikiPage edit = WikiPageServiceImpl.copyPage(created);
+        WikiPage edit = DefaultWikiPageService.copyPage(created);
         edit.setContent("rewritten body");
         edit.setTitle("Acme Corp");
         svc.updatePage(edit);
@@ -154,7 +154,7 @@ class WikiPageRevisionServiceTest {
 
         int total = WikiConstants.MAX_REVISIONS_PER_PAGE + 5;
         for (int i = 2; i <= total + 1; i++) {
-            WikiPage edit = WikiPageServiceImpl.copyPage(page);
+            WikiPage edit = DefaultWikiPageService.copyPage(page);
             edit.setContent("v" + i);
             page = svc.updatePage(edit);
         }
@@ -183,13 +183,13 @@ class WikiPageRevisionServiceTest {
                         newPage(kb, "concept/hub", "Hub", "handwritten v1")));
 
         // 再一次人工编辑，然后是一长串管道重写
-        WikiPage edit = WikiPageServiceImpl.copyPage(page);
+        WikiPage edit = DefaultWikiPageService.copyPage(page);
         edit.setContent("handwritten v2");
         page = WikiEditContext.callWith(WikiConstants.EDIT_SOURCE_USER,
                 () -> svc.updatePage(edit));
 
         for (int i = 0; i < WikiConstants.MAX_REVISIONS_PER_PAGE + 10; i++) {
-            WikiPage next = WikiPageServiceImpl.copyPage(page);
+            WikiPage next = DefaultWikiPageService.copyPage(page);
             next.setContent("pipeline rewrite " + i);
             page = svc.updatePage(next);
         }
@@ -213,7 +213,7 @@ class WikiPageRevisionServiceTest {
     void deletePageDropsRevisionHistory() {
         final String kb = "kb-del-rev";
         WikiPage page = svc.createPage(newPage(kb, "concept/doomed", "Doomed", "v1"));
-        WikiPage edit = WikiPageServiceImpl.copyPage(page);
+        WikiPage edit = DefaultWikiPageService.copyPage(page);
         edit.setContent("v2");
         page = svc.updatePage(edit);
 

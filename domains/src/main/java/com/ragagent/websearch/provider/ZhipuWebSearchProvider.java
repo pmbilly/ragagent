@@ -20,7 +20,7 @@ import java.util.Set;
  * 非 200 走 {@code Zhipu API returned status %d (%s): %s}；200 但 error 字段非空
  * 走 {@code Zhipu API error (%s): %s}。响应 2MB 上限。</p>
  */
-public final class ZhipuProvider implements WebSearchProvider {
+public final class ZhipuWebSearchProvider implements WebSearchProvider {
 
     static final String DEFAULT_URL = "https://open.bigmodel.cn/api/paas/v4/web_search";
     static final Duration TIMEOUT = Duration.ofSeconds(15);
@@ -40,7 +40,7 @@ public final class ZhipuProvider implements WebSearchProvider {
     String searchEngine;
     String contentSize;
 
-    public ZhipuProvider(WebSearchProviderParams params) {
+    public ZhipuWebSearchProvider(WebSearchProviderParams params) {
         validateParameters(params);
         this.apiKey = params.getApiKey().trim();
         String[] options = zhipuOptions(params.getExtraConfig());

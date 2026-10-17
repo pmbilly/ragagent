@@ -34,7 +34,7 @@ public class WebSearchProviderRegistry {
         factories.put("searxng", SearxngProvider::new);
         factories.put("keenable", KeenableProvider::new);
         factories.put("metaso", MetasoProvider::new);
-        factories.put("zhipu", ZhipuProvider::new);
+        factories.put("zhipu", ZhipuWebSearchProvider::new);
         factories.put("exa", ExaProvider::new);
         factories.put("bocha", BochaProvider::new);
     }

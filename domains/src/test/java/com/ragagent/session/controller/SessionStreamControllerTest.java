@@ -17,6 +17,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
@@ -29,7 +30,6 @@ import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionService;
-import com.ragagent.session.support.LogSanitizer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -270,16 +270,16 @@ class SessionStreamControllerTest {
 
     // ── 辅助函数 ────────────────────────────────────────────────────────────
 
-    /** {@code sanitizeForLog}：换行/制表归一成空格，其余控制字符丢弃。 */
+    /** {@code sanitize}：换行/制表归一成空格，其余控制字符丢弃。 */
     @Test
-    void sanitizeForLogMatchesGo() {
-        assertThat(LogSanitizer.sanitizeForLog("a\nb")).isEqualTo("a b");
-        assertThat(LogSanitizer.sanitizeForLog("a\r\nb")).isEqualTo("a  b");
-        assertThat(LogSanitizer.sanitizeForLog("a\tb")).isEqualTo("a b");
-        assertThat(LogSanitizer.sanitizeForLog("ab")).isEqualTo("ab");
-        assertThat(LogSanitizer.sanitizeForLog("正常 id")).isEqualTo("正常 id");
-        assertThat(LogSanitizer.sanitizeForLog(null)).isEmpty();
-        assertThat(LogSanitizer.sanitizeForLog("")).isEmpty();
+    void sanitizeMatchesGo() {
+        assertThat(LogSanitizer.sanitize("a\nb")).isEqualTo("a b");
+        assertThat(LogSanitizer.sanitize("a\r\nb")).isEqualTo("a  b");
+        assertThat(LogSanitizer.sanitize("a\tb")).isEqualTo("a b");
+        assertThat(LogSanitizer.sanitize("ab")).isEqualTo("ab");
+        assertThat(LogSanitizer.sanitize("正常 id")).isEqualTo("正常 id");
+        assertThat(LogSanitizer.sanitize(null)).isEmpty();
+        assertThat(LogSanitizer.sanitize("")).isEmpty();
     }
 
     /** 手写信封的字节：对象体键按字母序，所以 {@code error} 在前。 */

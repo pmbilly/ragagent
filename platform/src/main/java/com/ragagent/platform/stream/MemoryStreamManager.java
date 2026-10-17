@@ -47,7 +47,7 @@ public class MemoryStreamManager implements StreamManager {
     private final Map<String, Map<String, StreamData>> streams = new ConcurrentHashMap<>();
     /** sessionId -> 当前生成中的一轮 */
     private final Map<String, LiveRunMarker> liveRuns = new HashMap<>();
-    private final ReentrantReadWriteLock mu = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     /** 流的过期阈值（与 Redis 后端的键 TTL 同源）。 */
     private final Duration ttl;
@@ -73,22 +73,22 @@ public class MemoryStreamManager implements StreamManager {
     // ── 内部取用 ────────────────────────────────────────────────────────────
 
     private StreamData getOrCreateStream(String sessionId, String messageId) {
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             Map<String, StreamData> sessionMap = streams.computeIfAbsent(sessionId, k -> new ConcurrentHashMap<>());
             return sessionMap.computeIfAbsent(messageId, k -> new StreamData());
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
     private StreamData getStream(String sessionId, String messageId) {
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             Map<String, StreamData> sessionMap = streams.get(sessionId);
             return sessionMap == null ? null : sessionMap.get(messageId);
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 
@@ -114,7 +114,7 @@ public class MemoryStreamManager implements StreamManager {
     /** 全扫：删除 {@code lastUpdated} 超过 ttl 的流（清空后的会话条目一并移除）。 */
     private void sweepExpired() {
         OffsetDateTime cutoff = OffsetDateTime.now().minus(ttl);
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             var it = streams.entrySet().iterator();
             while (it.hasNext()) {
@@ -125,7 +125,7 @@ public class MemoryStreamManager implements StreamManager {
                 }
             }
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
@@ -277,7 +277,7 @@ public class MemoryStreamManager implements StreamManager {
 
     @Override
     public void setLiveRun(String sessionId, String assistantMessageId, String requestId) {
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             LiveRunMarker existing = liveRuns.get(sessionId);
             if (existing != null && !existing.assistantMessageId().equals(assistantMessageId)) {
@@ -285,41 +285,41 @@ public class MemoryStreamManager implements StreamManager {
             }
             liveRuns.put(sessionId, new LiveRunMarker(assistantMessageId, requestId));
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
     @Override
     public void claimLiveRun(String sessionId, String assistantMessageId, String requestId) {
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             liveRuns.put(sessionId, new LiveRunMarker(assistantMessageId, requestId));
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
     @Override
     public LiveRun getLiveRun(String sessionId) {
-        mu.readLock().lock();
+        lock.readLock().lock();
         try {
             LiveRunMarker marker = liveRuns.get(sessionId);
             return marker == null ? LiveRun.NONE : new LiveRun(marker.assistantMessageId(), marker.requestId());
         } finally {
-            mu.readLock().unlock();
+            lock.readLock().unlock();
         }
     }
 
     @Override
     public void clearLiveRun(String sessionId, String assistantMessageId) {
-        mu.writeLock().lock();
+        lock.writeLock().lock();
         try {
             LiveRunMarker marker = liveRuns.get(sessionId);
             if (marker != null && marker.assistantMessageId().equals(assistantMessageId)) {
                 liveRuns.remove(sessionId);
             }
         } finally {
-            mu.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 }

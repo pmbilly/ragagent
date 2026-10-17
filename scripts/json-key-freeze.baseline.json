@@ -142,6 +142,6 @@
     "websearch/provider/OllamaProvider.java": "websearch/provider",
     "websearch/provider/SearxngProvider.java": "websearch/provider",
     "websearch/provider/TavilyProvider.java": "websearch/provider",
-    "websearch/provider/ZhipuProvider.java": "websearch/provider"
+    "websearch/provider/ZhipuWebSearchProvider.java": "websearch/provider"
   }
 }

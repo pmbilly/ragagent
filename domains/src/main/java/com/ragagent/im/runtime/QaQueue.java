@@ -100,8 +100,8 @@ public final class QaQueue {
             long totalProcessed, long totalRejected, long totalTimeout) {
     }
 
-    private final ReentrantLock mu = new ReentrantLock();
-    private final Condition notEmpty = mu.newCondition();
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition notEmpty = lock.newCondition();
     private final List<QaRequest> queue = new ArrayList<>();
     private final int maxSize;
     private final int maxPerUser;
@@ -160,12 +160,12 @@ public final class QaQueue {
 
     /** 通知所有 worker 在排空后退出。 */
     public void stop() {
-        mu.lock();
+        lock.lock();
         try {
             closed = true;
             notEmpty.signalAll();
         } finally {
-            mu.unlock();
+            lock.unlock();
         }
     }
 
@@ -185,7 +185,7 @@ public final class QaQueue {
                         "global per-user queue limit reached (" + count + "/" + maxPerUser + ")");
             }
         }
-        mu.lock();
+        lock.lock();
         try {
             if (closed) {
                 redisDecrUser(req.userKey);
@@ -213,13 +213,13 @@ public final class QaQueue {
             notEmpty.signal();
             return queue.size() - 1;
         } finally {
-            mu.unlock();
+            lock.unlock();
         }
     }
 
     /** 按 userKey 取消并移除排队请求；有命中返回 true。 */
     public boolean remove(String userKey) {
-        mu.lock();
+        lock.lock();
         try {
             for (int i = 0; i < queue.size(); i++) {
                 QaRequest req = queue.get(i);
@@ -233,17 +233,17 @@ public final class QaQueue {
             }
             return false;
         } finally {
-            mu.unlock();
+            lock.unlock();
         }
     }
 
     public QueueMetrics metrics() {
-        mu.lock();
+        lock.lock();
         int depth;
         try {
             depth = queue.size();
         } finally {
-            mu.unlock();
+            lock.unlock();
         }
         return new QueueMetrics(depth, activeWorkers.get(), totalEnqueued.get(),
                 totalProcessed.get(), totalRejected.get(), totalTimeout.get());
@@ -353,7 +353,7 @@ public final class QaQueue {
     }
 
     private QaRequest dequeue() {
-        mu.lock();
+        lock.lock();
         try {
             while (queue.isEmpty() && !closed) {
                 notEmpty.awaitUninterruptibly();
@@ -365,7 +365,7 @@ public final class QaQueue {
             decrementPerUser(req.userKey);
             return req;
         } finally {
-            mu.unlock();
+            lock.unlock();
         }
     }
 

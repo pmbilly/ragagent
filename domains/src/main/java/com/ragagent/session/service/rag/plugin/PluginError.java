@@ -15,7 +15,7 @@ package com.ragagent.session.service.rag.plugin;
 public final class PluginError {
 
     /** 底层错误（可为 null）。 */
-    public final Throwable err;
+    private final Throwable err;
     /** 人类可读描述。 */
     public final String description;
     /** 错误类型标识。 */
@@ -47,6 +47,11 @@ public final class PluginError {
             new PluginError(null, "Failed to call model", "model_call_failed");
     public static final PluginError GET_HISTORY =
             new PluginError(null, "Failed to get conversation history", "get_history_failed");
+
+    /** 底层错误（可为 null）；对外只读，避免 Go 式公开字段。 */
+    public Throwable cause() {
+        return err;
+    }
 
     /** 附错误并返回<b>新实例</b>（单例不被改写）。 */
     public PluginError withError(Throwable cause) {

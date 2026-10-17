@@ -18,15 +18,15 @@ import org.slf4j.LoggerFactory;
 /**
  * wiki 视图协作者:分页列表、索引视图与统计聚合。
  *
- * <p>持有 {@link WikiPageServiceImpl} 回引以访问仓储与工具;本类不得独立实例化。</p>
+ * <p>持有 {@link DefaultWikiPageService} 回引以访问仓储与工具;本类不得独立实例化。</p>
  */
 final class WikiPageViewsSupport {
 
     private static final Logger log = LoggerFactory.getLogger(WikiPageViewsSupport.class);
 
-    private final WikiPageServiceImpl service;
+    private final DefaultWikiPageService service;
 
-    WikiPageViewsSupport(WikiPageServiceImpl service) {
+    WikiPageViewsSupport(DefaultWikiPageService service) {
         this.service = service;
     }
 
@@ -36,7 +36,7 @@ final class WikiPageViewsSupport {
         List<WikiPage> pages = result.pages();
         for (WikiPage page : pages) {
             WikiPageLinkOps.stripWikiPageInlineChunkCitations(page);
-            WikiPageServiceImpl.normalizeWikiHierarchy(page);
+            DefaultWikiPageService.normalizeWikiHierarchy(page);
         }
         int pageSize = req.getPageSize();
         if (pageSize < 1) {
@@ -98,7 +98,7 @@ final class WikiPageViewsSupport {
         // 这样将来新增的页面类型一被 LLM 创建就能出现在索引里，无需改 handler。
         List<String> selected = pageTypes;
         if (selected == null || selected.isEmpty()) {
-            selected = new ArrayList<>(WikiPageServiceImpl.WIKI_INDEX_CONTENT_PAGE_TYPES);
+            selected = new ArrayList<>(DefaultWikiPageService.WIKI_INDEX_CONTENT_PAGE_TYPES);
         }
         List<WikiIndex.Group> groups = new ArrayList<>(selected.size());
         for (String pt : selected) {
@@ -110,7 +110,7 @@ final class WikiPageViewsSupport {
             }
             List<WikiIndexEntry> entries = listed.entries();
             for (WikiIndexEntry entry : entries) {
-                WikiPageServiceImpl.normalizeWikiIndexEntryHierarchy(entry, pt);
+                DefaultWikiPageService.normalizeWikiIndexEntryHierarchy(entry, pt);
             }
             String next = "";
             // 只有返回了完整一页<b>且</b> offset+limit 之后还有行时才给 cursor。

@@ -323,7 +323,7 @@ final class SourceToolCodec {
         if (value == null) {
             return raw;
         }
-        value = JsonValues.numbersAsDouble(value);
+        value = ModelJsonValues.numbersAsDouble(value);
         value = walkJSON("", value, encode, allowed);
         return ToolJson.write(value);
     }

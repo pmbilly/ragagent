@@ -87,7 +87,7 @@ public class Scheduler {
     private final TaskScheduler cron;
     private final boolean ownsCron;
 
-    private final ReentrantLock mu = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
     /** dataSourceID → 已注册的 cron 任务。 */
     private final Map<String, ScheduledFuture<?>> entries = new LinkedHashMap<>();
 
@@ -162,14 +162,14 @@ public class Scheduler {
      * 调用方若需要"等到跑完"应自行等待线程池（Spring 关闭时天然如此）。</p>
      */
     public void stop() {
-        mu.lock();
+        lock.lock();
         try {
             for (Map.Entry<String, ScheduledFuture<?>> entry : new ArrayList<>(entries.entrySet())) {
                 entry.getValue().cancel(false);
             }
             entries.clear();
         } finally {
-            mu.unlock();
+            lock.unlock();
         }
         if (ownsCron && cron instanceof ThreadPoolTaskScheduler pool) {
             pool.shutdown();
@@ -187,7 +187,7 @@ public class Scheduler {
      * 它的定时任务真的停掉"的实现点。</p>
      */
     public void addOrUpdate(DataSource ds) {
-        mu.lock();
+        lock.lock();
         try {
             ScheduledFuture<?> existing = entries.remove(ds.getId());
             if (existing != null) {
@@ -199,30 +199,30 @@ public class Scheduler {
             }
             addEntryLocked(ds);
         } finally {
-            mu.unlock();
+            lock.unlock();
         }
     }
 
     /** 移除某数据源的 cron 任务。 */
     public void remove(String dataSourceId) {
-        mu.lock();
+        lock.lock();
         try {
             ScheduledFuture<?> existing = entries.remove(dataSourceId);
             if (existing != null) {
                 existing.cancel(false);
             }
         } finally {
-            mu.unlock();
+            lock.unlock();
         }
     }
 
     /** 当前已注册的 cron 任务数（供测试/监控用）。 */
     public int entryCount() {
-        mu.lock();
+        lock.lock();
         try {
             return entries.size();
         } finally {
-            mu.unlock();
+            lock.unlock();
         }
     }
 
@@ -231,11 +231,11 @@ public class Scheduler {
     // ------------------------------------------------------------------
 
     private void addEntry(DataSource ds) {
-        mu.lock();
+        lock.lock();
         try {
             addEntryLocked(ds);
         } finally {
-            mu.unlock();
+            lock.unlock();
         }
     }
 

@@ -13,9 +13,9 @@ import com.ragagent.platform.text.HtmlText;
  * 出现的是五个基本实体与数字引用；这里覆盖它们加常用命名实体，更冷僻的
  * HTML5 命名实体按原样保留（已知差异）。</p>
  */
-final class HtmlEntities {
+final class HtmlCodec {
 
-    private HtmlEntities() {
+    private HtmlCodec() {
     }
 
     static String escape(String s) {
