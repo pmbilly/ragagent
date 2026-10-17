@@ -6,7 +6,6 @@ import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -92,7 +91,7 @@ final class WikiKbAccessGuard {
         String uid = TenantContext.currentUserId();
         boolean admin = TenantRole.fromString(role).hasPermission(TenantRole.ADMIN);
         if (!admin && (kb.getCreatorId().isEmpty() || !kb.getCreatorId().equals(uid))) {
-            throw GuardForbiddenException.mustOwnResourceOrHaveRole();
+            throw BizException.forbidden("must own the resource or have the required role");
         }
     }
 }

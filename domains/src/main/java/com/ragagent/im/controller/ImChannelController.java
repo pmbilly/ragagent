@@ -11,7 +11,6 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
-import com.ragagent.platform.web.error.PlainErrorException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -276,14 +275,13 @@ public class ImChannelController {
     @PostMapping("/api/v1/wechat/qrcode")
     public ResponseEntity<Map<String, Object>> wechatQrcode() {
         if (wechatQRCodeService == null) {
-            throw new PlainErrorException(500,
-                    "failed to generate QR code: wechat iLink integration is not wired");
+            throw BizException.internal("failed to generate QR code: wechat iLink integration is not wired");
         }
         WechatQRCodeService.QRCodeResult result;
         try {
             result = wechatQRCodeService.getLoginQRCode();
         } catch (Exception e) {
-            throw new PlainErrorException(500, "failed to generate QR code: " + errText(e));
+            throw BizException.internal("failed to generate QR code: " + errText(e));
         }
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("qrcode", result.qrcode());
@@ -448,20 +446,18 @@ public class ImChannelController {
         try {
             return MAPPER.readValue(rawBody, CreateRequest.class);
         } catch (Exception e) {
-            throw new PlainErrorException(400,
-                    (e.getMessage() == null ? "" : e.getMessage()));
+            throw BizException.badRequest((e.getMessage() == null ? "" : e.getMessage()));
         }
     }
 
     private static UpdateRequest bindUpdate(String rawBody) {
         if (rawBody == null || rawBody.isEmpty()) {
-            throw new PlainErrorException(400, JsonBodyErrors.EMPTY_BODY);
+            throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
         }
         try {
             return MAPPER.readValue(rawBody, UpdateRequest.class);
         } catch (Exception e) {
-            throw new PlainErrorException(400,
-                    (e.getMessage() == null ? "" : e.getMessage()));
+            throw BizException.badRequest((e.getMessage() == null ? "" : e.getMessage()));
         }
     }
 }

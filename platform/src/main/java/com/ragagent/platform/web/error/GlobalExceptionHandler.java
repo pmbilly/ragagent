@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
- * 统一错误形态（**两形态并存**，按路由分派）：
- * - 命中 {@code @ApiResult} 控制器 → {@code {"code": N, "message": "...", "data": details}}
- * - 其余控制器 → 历史形态 {@code {"error": {code, message, details}}}
+ * 统一错误形态：{@code {"code": N, "message": "...", "data": details}}。
+ * 未标注 {@code @ApiResult} 的存量控制器由 {@code ApiResultSupport} 分派为
+ * {@code {"error": {code, message, details}}}——清单只许减（见 check-api-envelope）。
  *
  * <p>分派依据是 {@link ApiResultSupport#isActive} 读的请求属性（由 {@code ApiResultInterceptor}
  * 在门禁之前打标）。有一种形态**无论哪种控制器都保持原样**：未映射路径的 404
@@ -35,47 +35,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BizException.class)
     public ResponseEntity<Object> handleBiz(BizException ex, HttpServletRequest req) {
         return respond(ex.appError(), req);
-    }
-
-    /**
-     * 路由守卫式 403：纯字符串形态 {@code {"error":"Forbidden: ..."}}。
-     *
-     * <p>与 {@link BizException} 的 403 **形态不同**：后者是 AppError 信封。两种形态并存，
-     * 按拒绝发生在中间件还是 handler 区分——控制器里做的所有权判定属于前者，
-     * 详见 {@link GuardForbiddenException} 的类注释。</p>
-     */
-    @ExceptionHandler(GuardForbiddenException.class)
-    public ResponseEntity<Object> handleGuardForbidden(GuardForbiddenException ex,
-            HttpServletRequest req) {
-        String msg = ex.getMessage() == null ? "" : ex.getMessage();
-        if (ApiResultSupport.isActive(req)) {
-            return ResponseEntity.status(403)
-                    .body(ApiResponse.fail(ErrorCode.FORBIDDEN.value(), "Forbidden: " + msg));
-        }
-        String escaped = msg.replace("\\", "\\\\").replace("\"", "\\\"");
-        return ResponseEntity.status(403)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("{\"error\":\"Forbidden: " + escaped + "\"}");
-    }
-
-    /**
-     * handler 直写的纯字符串错误形态（{@code {"error": msg}}），
-     * 状态码随异常携带——system admin 组的 promote/revoke/reset-password 等大量使用。
-     * 与 {@link #handleGuardForbidden(GuardForbiddenException, HttpServletRequest)} 同族（那边恒 403 且
-     * 消息带 "Forbidden: " 前缀），这边按消息原文原样输出。
-     */
-    @ExceptionHandler(PlainErrorException.class)
-    public ResponseEntity<Object> handlePlainError(PlainErrorException ex,
-            HttpServletRequest req) {
-        String msg = ex.getMessage() == null ? "" : ex.getMessage();
-        if (ApiResultSupport.isActive(req)) {
-            return ResponseEntity.status(ex.status())
-                    .body(ApiResponse.fail(errorCodeFor(ex.status()), msg));
-        }
-        String escaped = msg.replace("\\", "\\\\").replace("\"", "\\\"");
-        return ResponseEntity.status(ex.status())
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("{\"error\":\"" + escaped + "\"}");
     }
 
     /**
@@ -237,13 +196,13 @@ public class GlobalExceptionHandler {
      * 方法不允许（如 GET 打到仅 POST 的路由）。
      *
      * <p>不落 {@link #handleOther} 的 catch-all——那会回 <b>500</b> 并打 ERROR 日志，而语义上
-     * 这是客户端错误 ⇒ 405 + 通用段码（{@code errorCodeFor(405)}＝{@code METHOD_NOT_ALLOWED}），
-     * 与 {@link PlainErrorException} 的 405 同形；信封分派同样走 {@link #respond}。</p>
+     * 这是客户端错误 ⇒ 405 + 通用段码 {@code METHOD_NOT_ALLOWED}，
+     * 信封分派同样走 {@link #respond}。</p>
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<Object> handleMethodNotSupported(
             HttpRequestMethodNotSupportedException ex, HttpServletRequest req) {
-        return respond(new AppError(errorCodeFor(405), "Method Not Allowed", null, 405), req);
+        return respond(new AppError(ErrorCode.METHOD_NOT_ALLOWED.value(), "Method Not Allowed", null, 405), req);
     }
 
     @ExceptionHandler(Exception.class)
@@ -264,20 +223,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(e.httpCode()).body(body);
     }
 
-    /** 只有 HTTP 状态、没有业务码的错误（PlainErrorException）→ 通用段码表。 */
-    private static int errorCodeFor(int httpStatus) {
-        return switch (httpStatus) {
-            case 400 -> ErrorCode.BAD_REQUEST.value();
-            case 401 -> ErrorCode.UNAUTHORIZED.value();
-            case 403 -> ErrorCode.FORBIDDEN.value();
-            case 404 -> ErrorCode.NOT_FOUND.value();
-            case 405 -> ErrorCode.METHOD_NOT_ALLOWED.value();
-            case 409 -> ErrorCode.CONFLICT.value();
-            case 429 -> ErrorCode.TOO_MANY_REQUESTS.value();
-            case 503 -> ErrorCode.SERVICE_UNAVAILABLE.value();
-            default -> ErrorCode.INTERNAL_SERVER.value();
-        };
-    }
 
     /**
      * 错误体 = {@code {"error":{"code","message","details"}}}（键序按契约标准声明序；

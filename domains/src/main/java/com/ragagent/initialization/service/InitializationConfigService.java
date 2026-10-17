@@ -18,7 +18,6 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.config.AppEnvLookup;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.error.GuardForbiddenException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -308,7 +307,7 @@ public final class InitializationConfigService {
         String uid = TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId();
         String creator = kb.getCreatorId() == null ? "" : kb.getCreatorId();
         if (!admin && (creator.isEmpty() || !creator.equals(uid))) {
-            throw GuardForbiddenException.mustOwnResourceOrHaveRole();
+            throw BizException.forbidden("must own the resource or have the required role");
         }
     }
 

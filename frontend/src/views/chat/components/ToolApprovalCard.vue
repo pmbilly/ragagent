@@ -236,7 +236,7 @@ const submit = async (decision: 'approve' | 'reject') => {
       }))
     MessagePlugin.success(t('agentStream.toolApproval.submitted'))
   } catch (e: any) {
-    const msg = e?.response?.data?.error?.message || e?.message || t('agentStream.toolApproval.submitFailed')
+    const msg = e?.response?.data?.message || e?.message || t('agentStream.toolApproval.submitFailed')
     MessagePlugin.error(msg)
   } finally {
     submitting.value = false

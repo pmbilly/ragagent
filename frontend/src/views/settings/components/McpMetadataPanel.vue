@@ -106,7 +106,7 @@ function setSnapshot(saved: MCPMetadata | null) {
 }
 
 function errorText(e: any) {
-  return e?.response?.data?.error?.message || e?.message || t('mcpMetadata.failed')
+  return e?.response?.data?.message || e?.message || t('mcpMetadata.failed')
 }
 
 function formatTime(value: string) {

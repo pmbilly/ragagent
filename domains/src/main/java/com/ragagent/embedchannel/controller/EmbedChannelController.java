@@ -19,7 +19,6 @@ import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.error.PlainErrorException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -301,28 +300,28 @@ void ensureSession(String sessionId) {
         EmbedChannelEntity ch = channel(request0());
         long tenantId = ch.getTenantId() == null ? 0 : ch.getTenantId();
         if (sessionId == null || sessionId.isEmpty()) {
-            throw new PlainErrorException(400, "session_id is required");
+            throw BizException.badRequest("session_id is required");
         }
         EmbedSessionOps.OwnershipView sess = embedSessionOps.ownership(tenantId, sessionId);
         if (sess == null) {
-            throw new PlainErrorException(404, "session not found");
+            throw BizException.notFound("session not found");
         }
         String marker = EmbedChannelService.embedSessionDescription(ch.getId());
         if (sess.tenantId() == null || sess.tenantId().longValue() != tenantId
                 || !marker.equals(sess.description())) {
-            throw new PlainErrorException(403, "session not allowed for this embed channel");
+            throw BizException.forbidden("session not allowed for this embed channel");
         }
         if (sess.userId() == null || sess.userId().trim().isEmpty()) {
             embedSessionOps.attachOwner(tenantId, ch.getId(), sessionId);
         }
         String sig = trim(request0().getHeader("X-Embed-Session"));
         if (!EmbedTokens.verifyHandle(ch, sessionId, sig)) {
-            throw new PlainErrorException(403, "session signature invalid");
+            throw BizException.forbidden("session signature invalid");
         }
         // X-Embed-Visitor：合法时挂到上下文
         String visitor = trim(request0().getHeader("X-Embed-Visitor"));
         if (!visitor.isEmpty() && !validVisitor(visitor)) {
-            throw new PlainErrorException(400, "invalid embed visitor id");
+            throw BizException.badRequest("invalid embed visitor id");
         }
         TenantContext.set(tenantId,
                 new TenantContext.Principal(TenantContext.PrincipalTypes.EMBED_SESSION,
@@ -437,12 +436,12 @@ void ensureSession(String sessionId) {
     }
 
     /** 管理面错误的分派（纯字符串错误信封）。 */
-    static PlainErrorException writeMgmtError(EmbedError e) {
+    static BizException writeMgmtError(EmbedError e) {
         return switch (e.kind) {
-            case CHANNEL_NOT_FOUND -> new PlainErrorException(404, "embed channel not found");
-            case BAD_REQUEST_TEXT -> new PlainErrorException(400, e.getMessage());
-            case CHANNEL_DISABLED -> new PlainErrorException(403, "embed channel is disabled");
-            default -> new PlainErrorException(500, "operation failed");
+            case CHANNEL_NOT_FOUND -> BizException.notFound("embed channel not found");
+            case BAD_REQUEST_TEXT -> BizException.badRequest(e.getMessage());
+            case CHANNEL_DISABLED -> BizException.forbidden("embed channel is disabled");
+            default -> BizException.internal("operation failed");
         };
     }
 
@@ -473,13 +472,12 @@ void ensureSession(String sessionId) {
      */
     static EmbedChannelRequest bind(String rawBody) {
         if (rawBody == null || rawBody.isEmpty()) {
-            throw new PlainErrorException(400, JsonBodyErrors.EMPTY_BODY);
+            throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
         }
         try {
             return MAPPER.readValue(rawBody, EmbedChannelRequest.class);
         } catch (Exception e) {
-            throw new PlainErrorException(400,
-                    (e.getMessage() == null ? "" : e.getMessage()));
+            throw BizException.badRequest((e.getMessage() == null ? "" : e.getMessage()));
         }
     }
 

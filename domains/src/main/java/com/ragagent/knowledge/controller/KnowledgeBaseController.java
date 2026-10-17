@@ -30,7 +30,6 @@ import com.ragagent.platform.storage.support.ResourceUrlMode;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.NonNullBody;
-import com.ragagent.platform.web.error.GuardForbiddenException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
@@ -141,7 +140,7 @@ public class KnowledgeBaseController {
         String uid = TenantContext.currentUserId();
         boolean admin = TenantRole.fromString(role).hasPermission(TenantRole.ADMIN);
         if (!admin && (kb.getCreatorId().isEmpty() || !kb.getCreatorId().equals(uid))) {
-            throw GuardForbiddenException.mustOwnResourceOrHaveRole();
+            throw BizException.forbidden("must own the resource or have the required role");
         }
     }
 

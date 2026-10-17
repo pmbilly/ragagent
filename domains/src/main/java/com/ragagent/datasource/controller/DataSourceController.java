@@ -468,7 +468,7 @@ public class DataSourceController {
      * 再校验它所属的知识库归属。
      *
      * <p>⚠️ 两步的异常边界<b>必须分开</b>：知识库那一层会抛
-     * {@code GuardForbiddenException}（API-Key 白名单拒绝），把它一起 catch 成 404
+     * {@code BizException}（API-Key 白名单拒绝），把它一起 catch 成 404
      * 会把 403 变成 404——这是"一个 id 能不能用来探测存在性"的实质区别。</p>
      */
     private Owned ownDataSource(long tenantId, String id) {

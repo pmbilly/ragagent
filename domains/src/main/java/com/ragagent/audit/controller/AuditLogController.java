@@ -11,7 +11,6 @@ import com.ragagent.contract.knowledge.KnowledgeBaseGateway;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.error.GuardForbiddenException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -140,7 +139,7 @@ public class AuditLogController {
         String creatorId = kb.creatorId() == null ? "" : kb.creatorId();
         if (!creatorId.equals(actorId) && !role.hasPermission(TenantRole.ADMIN)) {
             // 守卫形态拒绝：不是 AppError 信封（见方法注释第 3 条）。
-            throw GuardForbiddenException.mustOwnResourceOrHaveRole();
+            throw BizException.forbidden("must own the resource or have the required role");
         }
 
         long[] cursor = parseAuditCursor(afterId, limit);

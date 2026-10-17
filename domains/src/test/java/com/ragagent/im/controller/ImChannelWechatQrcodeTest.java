@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.error.BizException;
 import com.ragagent.im.channel.wechat.WechatQRCodeService;
 import com.ragagent.im.channel.wechat.WechatQRCodeService.LoginResult;
 import com.ragagent.im.channel.wechat.WechatQRCodeService.QRCodeResult;
-import com.ragagent.platform.web.error.PlainErrorException;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,15 +69,15 @@ class ImChannelWechatQrcodeTest {
                 json(ok));
 
         stub.failQr = true;
-        PlainErrorException e = assertThrows(PlainErrorException.class, controller::wechatQrcode);
-        assertEquals(500, e.status());
-        assertEquals("failed to generate QR code: boom", e.getMessage());
+        BizException e = assertThrows(BizException.class, controller::wechatQrcode);
+        assertEquals(500, e.appError().httpCode());
+        assertEquals("failed to generate QR code: boom", e.appError().message());
 
         // bean 缺位 → 保留接缝文案
         ImChannelController bare = new ImChannelController(null);
-        PlainErrorException seam = assertThrows(PlainErrorException.class, bare::wechatQrcode);
-        assertEquals(500, seam.status());
-        assertTrue(seam.getMessage().startsWith("failed to generate QR code: "));
+        BizException seam = assertThrows(BizException.class, bare::wechatQrcode);
+        assertEquals(500, seam.appError().httpCode());
+        assertTrue(seam.appError().message().startsWith("failed to generate QR code: "));
     }
 
     @Test

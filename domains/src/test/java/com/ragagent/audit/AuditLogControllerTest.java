@@ -278,7 +278,7 @@ class AuditLogControllerTest {
         mvc.perform(get("/api/v1/knowledge-bases/kb-1/activity"))
                 .andExpect(status().isForbidden())
                 .andExpect(content().string(
-                        "{\"error\":\"Forbidden: must own the resource or have the required role\"}"));
+                        "{\"error\":{\"code\":1002,\"message\":\"must own the resource or have the required role\",\"details\":null}}"));
     }
 
     /** Admin（非创建者）可以读——admin 角色满足权限判定。 */

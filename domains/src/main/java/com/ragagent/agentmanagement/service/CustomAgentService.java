@@ -13,7 +13,6 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.KnowledgeBaseCatalogPort;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.web.error.GuardForbiddenException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -91,7 +90,7 @@ public class CustomAgentService {
             String creator = row.getCreatedBy() == null ? "" : row.getCreatedBy();
             String uid = TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId();
             if (creator.isEmpty() || !creator.equals(uid)) {
-                throw GuardForbiddenException.mustOwnResourceOrHaveRole();
+                throw BizException.forbidden("must own the resource or have the required role");
             }
         }
     }

@@ -11,7 +11,6 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.web.error.GuardForbiddenException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -151,7 +150,7 @@ public class ChunkAccessGuard {
         String uid = TenantContext.currentUserId();
         boolean admin = TenantRole.fromString(role).hasPermission(TenantRole.ADMIN);
         if (!admin && (kb.getCreatorId().isEmpty() || !kb.getCreatorId().equals(uid))) {
-            throw GuardForbiddenException.mustOwnResourceOrHaveRole();
+            throw BizException.forbidden("must own the resource or have the required role");
         }
     }
 

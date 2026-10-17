@@ -161,7 +161,7 @@ const skip = async () => {
       await cancelMCPOAuth(props.pendingId)
     }
   } catch (e: any) {
-    const msg = e?.response?.data?.error?.message || e?.message || t('agentStream.mcpOAuth.skipFailed')
+    const msg = e?.response?.data?.message || e?.message || t('agentStream.mcpOAuth.skipFailed')
     MessagePlugin.error(msg)
   } finally {
     canceling.value = false
@@ -238,7 +238,7 @@ const authorize = async () => {
           }
           MessagePlugin.success(t('agentStream.mcpOAuth.authorizedToast'))
         } catch (e: any) {
-          const msg = e?.response?.data?.error?.message || e?.message || t('agentStream.mcpOAuth.resumeFailed')
+          const msg = e?.response?.data?.message || e?.message || t('agentStream.mcpOAuth.resumeFailed')
           MessagePlugin.error(msg)
         }
         authorizing.value = false
@@ -248,7 +248,7 @@ const authorize = async () => {
       }
     }, 1500)
   } catch (e: any) {
-    const msg = e?.response?.data?.error?.message || e?.message || t('agentStream.mcpOAuth.startFailed')
+    const msg = e?.response?.data?.message || e?.message || t('agentStream.mcpOAuth.startFailed')
     MessagePlugin.error(msg)
     authorizing.value = false
   }

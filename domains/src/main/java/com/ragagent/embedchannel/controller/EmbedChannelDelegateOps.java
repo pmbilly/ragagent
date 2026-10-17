@@ -9,7 +9,6 @@ import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ServletSseSink;
-import com.ragagent.platform.web.error.PlainErrorException;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
@@ -86,13 +85,13 @@ final class EmbedChannelDelegateOps {
             try {
                 node = EmbedChannelController.MAPPER.readTree(rawBody);
             } catch (Exception e) {
-                throw new PlainErrorException(400, "invalid json");
+                throw BizException.badRequest("invalid json");
             }
             // JSON null 视同空体；数组/标量 → "invalid json"
             if (node == null || node.isNull()) {
                 payload = EmbedChannelController.MAPPER.createObjectNode();
             } else if (!node.isObject()) {
-                throw new PlainErrorException(400, "invalid json");
+                throw BizException.badRequest("invalid json");
             } else {
                 payload = (tools.jackson.databind.node.ObjectNode) node;
             }
@@ -113,7 +112,7 @@ final class EmbedChannelDelegateOps {
         try {
             return EmbedChannelController.MAPPER.writeValueAsString(payload);
         } catch (Exception e) {
-            throw new PlainErrorException(500, "failed to prepare request");
+            throw BizException.internal("failed to prepare request");
         }
     }
 
