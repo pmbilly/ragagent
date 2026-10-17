@@ -71,9 +71,9 @@
 | **L3** | 修 7 处文档失真（README ×4 + 3 个类注释） | ✅ `check-doc-truth` 上线 |
 | **L4** | 补 156 个 `package-info`（职责/依赖/从哪读起） | ✅ 覆盖率 100%（322 包） |
 | **L5** | 注释装饰清理：491 行纯装饰分隔线删除、216 行统一格式 | ✅ `check-comment-decor` 硬零 |
-| **L6** | "未实现/暂缺"收敛到 `docs/known-gaps.md` | 待做 |
-| **L7** | 死代码删除（空包、未接线 port、`platform/session`、`platform/tool`） | 待做 |
-| **L8** | 日志降噪：warn 893 → ≤200 | 待做 |
+| **L6** | "未实现/暂缺"收敛到 `docs/known-gaps.md` | ✅ 18 项 + 9 处指针 |
+| **L7** | 死代码删除（空包、`@Deprecated`、`platform/session`；`platform/tool` 归 L22） | ✅ `@Deprecated` 归零 |
+| **L8** | 日志分级：404/跳过 → debug、配置缺失 → info（不设总数门） | ✅ 116 处降级（893→777） |
 | **L9** | 删 151 处控制器 catch，统一交 `GlobalExceptionHandler`（保留 cause） | 待做 |
 | **L10** | 错误形态统一为 `{code,message,data}`（**行为变更**，金片重录） | 待做 |
 | **L11** | 异常语义守卫扩到 domains 全量 | 待做 |
@@ -308,6 +308,8 @@ boot           14 件                      →  boot
 
 | L3+L4 | 2026-10-18 | **文档失真修正 + package-info 补齐**：README 统一外壳补「基础设施端点除外」、删除 `frontend/pnpm-workspace.yaml`（npm 残留）；`Session` 的「裸对象」改为 `ApiResultAdvice` 包壳、`SessionKnowledgeQaService` 删「hybridSearch 空实现」、`RagAgentApplication` 的 `common/*` 改 `platform` 配置包。**生成 156 个 package-info**（职责＝包内主要类型、依赖＝跨模块 import、入口＝Controller/Service/Repository），覆盖率 48%→100%（322 包）；`packages.md` 与 `module-package-map.md` 重生成；新增 `check-doc-truth.py`（D1 模块数/D2 控制器数/D3 package-info 覆盖），**第 25 条守卫**。 | **25 守卫** · **5022 / 0 / 4** · build 2m10s |
 | L5 | 2026-10-18 | **注释装饰清理**：删 491 行纯装饰分隔线（`// ═══`/`// ===`/`// ---`），216 行带文字分隔线统一为 `// ── 段名 ──`；新增 `check-comment-decor.py`（**第 26 条守卫**，红态探针已验）。**不设注释密度硬指标**——密度会奖励删信息，本仓注释承载契约与线程纪律（实测 18.6%，最大类头 63 行，分布健康）。 | **26 守卫** · **5022 / 0 / 4** · build 3m04s |
+
+| L6~L8 | 2026-10-18 | **缺口登记 + 死代码 + 日志分级**：新增 `docs/known-gaps.md`（18 项，状态/影响/替代/涉及类）；9 处类注释加指针、6 处误报改措辞；新增 `check-known-gaps.py`（第 27 条）。删 `@Deprecated getDocumentRawContent` + 2 个未用 record + 空包 `platform/session`，全仓 `@Deprecated` 归零。日志：116 处 warn 降级（95 debug / 21 info），warn 893→777；新增 `check-log-level.py`（第 28 条，warn 不得用于 404/跳过）。 | **28 守卫** · **5022 / 0 / 4** · build 2m48s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
