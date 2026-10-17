@@ -61,7 +61,7 @@ sequenceDiagram
 | 管线阶段枚举化 + 完整性测试 | 高（编译期可查、IDE 可跳） | 低（行为不变） | 已做（O8） |
 | 去掉插件内部的隐藏 `new`（显式注入/工厂） | 中（依赖可见） | 低 | 已做（O8；`PluginSearchParallel` 构造注入） |
 | `TenantScope` 替代 30 处手工 capture | 高（防隐 bug） | 中 | 已做（O9） |
-| `ChatManage` 40 个 setter 收成 5–6 个 apply 方法 | 中（可读性） | 低 | 做（O14） |
+| `ChatManage` 40 个 setter 收成 5–6 个 apply 方法 | 中（可读性） | 低 | 已做（O14；`ChatManageFactory`） |
 | 合并 QaEntryRunner / QaTurnExecutor / QaSseOrchestrator / QaTurnFinalizer | 低（只减类数） | 高（生命周期耦合、测试缝消失） | 不做 |
 | 把 100ms 轮询改成推送 | 中（延迟） | 高（帧序/金片/多实例） | 先测量，不现在做 |
 | 把链路压到 5–8 个类 | 负（god class） | 高 | 不做 |

@@ -191,12 +191,7 @@ public class SessionKnowledgeQaService {
         String chatModelId = resolution.resolveChatModelId(req, kb.kbIds, kb.knowledgeIds);
 
         // Initialize ChatManage defaults from config.yaml
-        SummaryConfig summaryConfig = new SummaryConfig();
-        summaryConfig.setPrompt(cfg.getSummaryPrompt());
-        summaryConfig.setContextTemplate(cfg.getSummaryContextTemplate());
-        summaryConfig.setTemperature(cfg.getSummaryTemperature());
-        summaryConfig.setNoMatchPrefix(cfg.getSummaryNoMatchPrefix());
-        summaryConfig.setMaxCompletionTokens(cfg.getSummaryMaxCompletionTokens());
+        SummaryConfig summaryConfig = ChatManageFactory.summaryConfig(cfg);
         String fallbackStrategy = cfg.getFallbackStrategy();
         if (fallbackStrategy == null || fallbackStrategy.isEmpty()) {
             fallbackStrategy = "fixed";
@@ -234,45 +229,12 @@ public class SessionKnowledgeQaService {
         log.info("Creating chat manage object, knowledge base IDs: {}, knowledge IDs: {}, chat model ID: {}, search targets: {}",
                 kb.kbIds, kb.knowledgeIds, chatModelId, searchTargets.size());
 
-        ChatManage chatManage = new ChatManage();
-        chatManage.setQuery(req.query);
-        chatManage.setSessionId(sessionId);
-        chatManage.setUserId(SessionService.sessionUserIDForLookup());
-        chatManage.setMaxRounds(cfg.getMaxRounds());
-        chatManage.setKnowledgeBaseIds(kb.kbIds);
-        chatManage.setKnowledgeIds(kb.knowledgeIds);
-        chatManage.setSearchTargets(SearchTargetView.toPipeline(searchTargets));
-        chatManage.setVectorThreshold(cfg.getVectorThreshold());
-        chatManage.setKeywordThreshold(cfg.getKeywordThreshold());
-        chatManage.setEmbeddingTopK(cfg.getEmbeddingTopK());
-        chatManage.setRerankTopK(cfg.getRerankTopK());
-        chatManage.setRerankThreshold(cfg.getRerankThreshold());
-        chatManage.setChatModelId(chatModelId);
-        chatManage.setSummaryConfig(summaryConfig);
-        chatManage.setFallbackStrategy(fallbackStrategy);
-        chatManage.setFallbackResponse(cfg.getFallbackResponse());
-        chatManage.setFallbackPrompt(cfg.getFallbackPrompt());
-        chatManage.setEnableRewrite(cfg.isEnableRewrite());
-        chatManage.setEnableQueryExpansion(cfg.isEnableQueryExpansion());
-        chatManage.setRewritePromptSystem(cfg.getRewritePromptSystem());
-        chatManage.setRewritePromptUser(cfg.getRewritePromptUser());
-        chatManage.setWebSearchEnabled(req.webSearchEnabled);
-        chatManage.setWebSearchProviderId(webSearchParams.resolveWebSearchProviderId(req, retrievalTenantId));
-        chatManage.setWebSearchMaxResults(webSearchParams.resolveWebSearchMaxResults(req));
-        chatManage.setWebFetchEnabled(webSearchParams.resolveWebFetchEnabled(req));
-        chatManage.setWebFetchTopN(webSearchParams.resolveWebFetchTopN(req));
-        chatManage.setTenantId(retrievalTenantId);
-        chatManage.setImages(req.imageUrls);
-        chatManage.setVlmModelId(vlmModelId);
-        chatManage.setChatModelSupportsVision(chatModelSupportsVision);
-        chatManage.setAttachments(PipelineViews.ofAttachments(req.attachments));
-        chatManage.setLanguage(currentLanguage());
-        chatManage.setRewriteQuery(req.query);
-        chatManage.setImageDescription(req.imageDescription);
-        chatManage.setQuotedContext(req.quotedContext);
-        chatManage.setEventBus(eventBus);
-        chatManage.setMessageId(req.assistantMessageId);
-        chatManage.setUserMessageId(req.userMessageId);
+        ChatManage chatManage = ChatManageFactory.create(req, sessionId, retrievalTenantId, eventBus);
+        ChatManageFactory.applyRetrieval(chatManage, kb, searchTargets, cfg);
+        ChatManageFactory.applyModel(chatManage, chatModelId, summaryConfig,
+                chatModelSupportsVision, vlmModelId);
+        ChatManageFactory.applyGeneration(chatManage, cfg, fallbackStrategy);
+        ChatManageFactory.applyWeb(chatManage, req, retrievalTenantId, webSearchParams);
 
         // Apply custom agent overrides
         resolution.applyAgentOverridesToChatManage(req, chatManage);
