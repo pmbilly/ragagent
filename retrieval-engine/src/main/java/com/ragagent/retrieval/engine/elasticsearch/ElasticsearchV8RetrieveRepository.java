@@ -223,7 +223,7 @@ public class ElasticsearchV8RetrieveRepository
             JsonNode root = MAPPER.readTree(resp.body());
             JsonNode indexNode = root.path(index);
             if (indexNode.isMissingNode()) {
-                log.warn("[Elasticsearch] Index {} not found in mapping response, defaulting to"
+                log.debug("[Elasticsearch] Index {} not found in mapping response, defaulting to"
                         + " .keyword suffix", index);
                 useKeywordSuffix = true;
                 return;

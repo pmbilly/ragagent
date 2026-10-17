@@ -19,7 +19,7 @@ import java.util.List;
  *   <li>把 {@code <image>/<imageOcr>/<imageCaption>} 块内联进正文。</li>
  * </ol>
  *
- * <p><b>未接线时的退化行为</b>：{@code wikiService} 在 enrich 服务缺席时返回
+ * <p><b>端口缺席时的退化行为</b>：{@code wikiService} 在 enrich 服务缺席时返回
  * {@link #identity}（第 1 步的结果）。这与"无需富化"的两种既有情形一致：
  * 没有文本 chunk、或合并后图片信息为空——两种情形同样返回纯文本重建结果。
  * 也就是说：<b>退化路径就是空图片信息路径</b>，不是新引入的行为。</p>

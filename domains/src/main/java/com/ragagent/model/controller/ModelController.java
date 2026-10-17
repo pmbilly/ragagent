@@ -108,7 +108,7 @@ public class ModelController {
         try {
             model = modelService.getModelByID(id);
         } catch (ModelNotFoundException e) {
-            log.warn("Model not found, ID: {}", id);
+            log.debug("Model not found, ID: {}", id);
             throw new BizException(AppError.notFound("Model not found"));
         }
         return ResponseEntity.ok(ModelDetailResponse.from(model, canViewIntegrationSecrets(), canManageBuiltin(model)));
@@ -145,7 +145,7 @@ public class ModelController {
         try {
             model = modelService.getModelByID(id);
         } catch (ModelNotFoundException e) {
-            log.warn("Model not found, ID: {}", id);
+            log.debug("Model not found, ID: {}", id);
             throw new BizException(AppError.notFound("Model not found"));
         }
 
@@ -174,10 +174,10 @@ public class ModelController {
         ModelParameters newParams = req.parameters() != null
                 ? req.parameters().toDomain() : new ModelParameters();
         if (!isBlank(newParams.getApiKey()) && !newParams.getApiKey().equals(storedApiKey)) {
-            log.warn("deprecated: apiKey in PUT /models/{} body is ignored; use PUT /credentials instead", id);
+            log.debug("deprecated: apiKey in PUT /models/{} body is ignored; use PUT /credentials instead", id);
         }
         if (!isBlank(newParams.getAppSecret()) && !newParams.getAppSecret().equals(storedAppSecret)) {
-            log.warn("deprecated: appSecret in PUT /models/{} body is ignored; use PUT /credentials instead", id);
+            log.debug("deprecated: appSecret in PUT /models/{} body is ignored; use PUT /credentials instead", id);
         }
         newParams.setApiKey(storedApiKey);
         newParams.setAppSecret(storedAppSecret);
@@ -211,7 +211,7 @@ public class ModelController {
         try {
             modelService.deleteModel(id);
         } catch (ModelNotFoundException e) {
-            log.warn("Model not found, ID: {}", id);
+            log.debug("Model not found, ID: {}", id);
             throw new BizException(AppError.notFound("Model not found"));
         }
         log.info("Model deleted successfully, ID: {}", id);

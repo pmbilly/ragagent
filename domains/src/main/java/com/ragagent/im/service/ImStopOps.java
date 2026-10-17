@@ -105,7 +105,7 @@ final class ImStopOps {
     private void writeStopEvent(String sessionId, String messageId) {
         StreamManager sm = streamManager.get();
         if (sm == null) {
-            log.warn("[IM] StreamManager not wired; stop event skipped: session={} message={}",
+            log.debug("[IM] StreamManager not wired; stop event skipped: session={} message={}",
                     sessionId, messageId);
             return;
         }

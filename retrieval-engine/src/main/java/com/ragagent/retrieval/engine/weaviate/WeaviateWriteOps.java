@@ -55,7 +55,7 @@ final class WeaviateWriteOps {
     void batchSave(List<IndexInfo> embeddingList, Map<String, Object> params)
             throws Exception {
         if (embeddingList == null || embeddingList.isEmpty()) {
-            log.warn("[Weaviate] Empty list provided to BatchSave, skipping");
+            log.debug("[Weaviate] Empty list provided to BatchSave, skipping");
             return;
         }
         log.info("[Weaviate] Batch saving {} indices", embeddingList.size());
@@ -63,7 +63,7 @@ final class WeaviateWriteOps {
         for (IndexInfo info : embeddingList) {
             WeaviateVectorEmbedding row = WeaviateRetrieveRepository.toEmbedding(info, params);
             if (row.embedding == null || row.embedding.length == 0) {
-                log.warn("[Weaviate] Skipping empty embedding for chunk ID: {}", info.chunkId);
+                log.debug("[Weaviate] Skipping empty embedding for chunk ID: {}", info.chunkId);
                 continue;
             }
             byDimension.computeIfAbsent(row.embedding.length, k -> new ArrayList<>()).add(row);
@@ -193,7 +193,7 @@ final class WeaviateWriteOps {
     void batchUpdateChunkEnabledStatus(Map<String, Boolean> chunkStatusMap)
             throws Exception {
         if (chunkStatusMap == null || chunkStatusMap.isEmpty()) {
-            log.warn("[Weaviate] Empty chunk status map provided, skipping");
+            log.debug("[Weaviate] Empty chunk status map provided, skipping");
             return;
         }
         log.info("[Weaviate] Batch updating chunk enabled status, count: {}",
@@ -218,7 +218,7 @@ final class WeaviateWriteOps {
 
     void batchUpdateChunkTagID(Map<String, String> chunkTagMap) throws Exception {
         if (chunkTagMap == null || chunkTagMap.isEmpty()) {
-            log.warn("[Weaviate] Empty chunk tag map provided, skipping");
+            log.debug("[Weaviate] Empty chunk tag map provided, skipping");
             return;
         }
         log.info("[Weaviate] Batch updating chunk tag ID, count: {}", chunkTagMap.size());
@@ -270,7 +270,7 @@ final class WeaviateWriteOps {
                 JsonNode additional = item.path("_additional");
                 JsonNode vectors = additional.path("vectors").path(WeaviateRetrieveRepository.FIELD_EMBEDDING);
                 if (!vectors.isArray() || vectors.isEmpty()) {
-                    log.warn("[Weaviate] No vectors found for source point with chunk {}, skipping",
+                    log.debug("[Weaviate] No vectors found for source point with chunk {}, skipping",
                             item.path(WeaviateRetrieveRepository.FIELD_CHUNK_ID).asString(""));
                     continue;
                 }

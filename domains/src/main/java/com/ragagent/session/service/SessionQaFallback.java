@@ -70,7 +70,7 @@ final class SessionQaFallback {
         String promptContent = renderFallbackPrompt(chatManage);
         EventBusInterface eventBus = chatManage.getEventBus();
         if (eventBus == null) {
-            log.warn("EventBus not available for streaming fallback, falling back to fixed response");
+            log.info("EventBus not available for streaming fallback, falling back to fixed response");
             handleFixedFallback(chatManage);
             return;
         }

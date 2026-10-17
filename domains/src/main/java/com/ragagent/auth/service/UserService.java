@@ -78,7 +78,7 @@ public class UserService implements UserNameLookup {
     public LoginResult login(LoginRequest req) {
         User user = getUserByEmail(req.email());
         if (user == null) {
-            log.warn("User not found for email");
+            log.warn("Login failed: no account for email");
             return LoginResult.failure("Invalid email or password");
         }
         if (!user.isIsActive()) {

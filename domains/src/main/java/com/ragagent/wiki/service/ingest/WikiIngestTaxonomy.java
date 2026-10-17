@@ -235,7 +235,7 @@ public class WikiIngestTaxonomy {
         try {
             embedder = modelResolver.getEmbeddingModel(embeddingModelId);
         } catch (Exception e) {
-            log.warn("wiki ingest: taxonomy plan embed model unavailable, feeding all folders", e);
+            log.info("wiki ingest: taxonomy plan embed model unavailable, feeding all folders", e);
             return capFolders(pool, WikiBatchConstants.TAXONOMY_PROMPT_MAX_PATHS);
         }
 

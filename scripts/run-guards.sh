@@ -45,6 +45,8 @@ run '架构索引（docs/architecture/packages.md 必须与 package-info 同步�
 run '文档事实（README 的模块数/控制器数/package-info 覆盖率必须与代码一致）' python3 scripts/check-doc-truth.py
 run '租户作用域（跨线程身份必须走 TenantScope；禁止裸 capture/replay）' python3 scripts/check-tenant-scope.py
 run '日志异常（log 里禁止 Throwable.toString()/getMessage()）' python3 scripts/check-log-exceptions.py
+run '已知缺口（类注释声明缺口必须指向 docs/known-gaps.md）' python3 scripts/check-known-gaps.py
+run '日志级别（warn 不用于 404 / 跳过语义）' python3 scripts/check-log-level.py
 run '跨模块同名类（同一简单类名不得出现在多个模块主码）' python3 scripts/check-duplicate-classes.py
 run '迁移代号（主码注释禁止批次号/日期戳；旧夹具名不得回流）' python3 scripts/check-internal-codes.py
 run '迁移叙事棘轮（v0.5.0 L1：注释只讲现在，不写迁移史）' python3 scripts/check-comment-narrative.py

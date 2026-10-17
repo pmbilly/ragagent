@@ -47,7 +47,7 @@ final class ContextDebugEmitter {
         if (predicted > 0 && compare > 0) {
             double ratio = (double) predicted / (double) compare;
             if (ratio > 1.5 || ratio < 0.67) {
-                log.warn("[Agent][Round-{}][ctx] usage baseline and direct estimate disagree by {}x (predicted={}, estimated={}) — one of them is missing content the other counts",
+                log.info("[Agent][Round-{}][ctx] usage baseline and direct estimate disagree by {}x (predicted={}, estimated={}) — one of them is missing content the other counts",
                         round, String.format(java.util.Locale.ROOT, "%.1f", ratio), predicted, compare);
             }
         }

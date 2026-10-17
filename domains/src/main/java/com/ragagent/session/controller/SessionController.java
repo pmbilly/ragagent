@@ -149,7 +149,7 @@ public class SessionController {
         try {
             session = sessionService.getSession(sessionId);
         } catch (SessionNotFoundException e) {
-            log.warn("Session not found, ID: {}", sessionId);
+            log.debug("Session not found, ID: {}", sessionId);
             throw BizException.notFound(e.getMessage());
         } catch (RuntimeException e) {
             throw toInternal(e);
@@ -248,7 +248,7 @@ public class SessionController {
         try {
             sessionService.updateSession(session);
         } catch (SessionNotFoundException e) {
-            log.warn("Session not found, ID: {}", sessionId);
+            log.debug("Session not found, ID: {}", sessionId);
             throw BizException.notFound(e.getMessage());
         } catch (RuntimeException e) {
             throw toInternal(e);
@@ -280,7 +280,7 @@ public class SessionController {
         try {
             sessionService.deleteSession(sessionId);
         } catch (SessionNotFoundException e) {
-            log.warn("Session not found, ID: {}", sessionId);
+            log.debug("Session not found, ID: {}", sessionId);
             throw BizException.notFound(e.getMessage());
         } catch (RuntimeException e) {
             throw toInternal(e);
@@ -344,7 +344,7 @@ public class SessionController {
         try {
             messageService.clearSessionMessages(sessionId);
         } catch (SessionNotFoundException e) {
-            log.warn("Session not found, ID: {}", sessionId);
+            log.debug("Session not found, ID: {}", sessionId);
             throw BizException.notFound(e.getMessage());
         } catch (RuntimeException e) {
             throw toInternal(e);
@@ -524,7 +524,7 @@ public class SessionController {
         try {
             session = sessionService.getOwnedSession(sessionId);
         } catch (SessionNotFoundException e) {
-            log.warn("Session not found, ID: {}", sessionId);
+            log.debug("Session not found, ID: {}", sessionId);
             throw BizException.notFound(e.getMessage());
         } catch (RuntimeException e) {
             throw toInternal(e);

@@ -107,7 +107,7 @@ final class McpServiceCrudOps {
         try {
             service = ctrl.mcpServiceService.getMCPServiceByID(tenantId, McpServiceController.sanitize(id));
         } catch (RuntimeException e) {
-            log.warn("MCP service not found, service_id={}", McpServiceController.sanitize(id));
+            log.debug("MCP service not found, service_id={}", McpServiceController.sanitize(id));
             throw BizException.notFound("MCP service not found");
         }
         return McpServiceController.ok(mcpServiceResponses(tenantId, List.of(service)).get(0));
@@ -210,11 +210,11 @@ final class McpServiceCrudOps {
             // 这样改超时/启用之类的无关配置不可能误伤已存的凭据。
             // 客户端仍在发就记一条告警，便于发现陈旧的调用方。
             if (authConfig.has("api_key")) {
-                log.warn("deprecated: api_key in PUT /mcp-services/{} body is ignored; "
+                log.debug("deprecated: api_key in PUT /mcp-services/{} body is ignored; "
                         + "use PUT /credentials instead", serviceId);
             }
             if (authConfig.has("token")) {
-                log.warn("deprecated: token in PUT /mcp-services/{} body is ignored; "
+                log.debug("deprecated: token in PUT /mcp-services/{} body is ignored; "
                         + "use PUT /credentials instead", serviceId);
             }
             // CustomHeaders 是结构性配置（不是秘密）：null 保持既有，非 null 整体替换

@@ -99,10 +99,10 @@ public class MessageController {
         try {
             messageService.deleteMessage(sid, mid);
         } catch (SessionNotFoundException e) {
-            log.warn("Session not found, ID: {}", sid);
+            log.debug("Session not found, ID: {}", sid);
             throw BizException.notFound(e.getMessage());
         } catch (MessageNotFoundException e) {
-            log.warn("Message not found, session ID: {}, message ID: {}", sid, mid);
+            log.debug("Message not found, session ID: {}, message ID: {}", sid, mid);
             throw BizException.notFound(RECORD_NOT_FOUND);
         } catch (RuntimeException e) {
             throw toInternal(e);

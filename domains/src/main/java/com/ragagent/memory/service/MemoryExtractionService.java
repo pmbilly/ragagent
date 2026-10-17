@@ -159,7 +159,7 @@ public class MemoryExtractionService {
             return;
         }
         if (queueProvider.getIfAvailable() == null) {
-            log.warn("memory: no task enqueuer configured, skipping extraction");
+            log.debug("memory: no task enqueuer configured, skipping extraction");
             return;
         }
         MemoryScope scope = state.scope();
@@ -351,7 +351,7 @@ public class MemoryExtractionService {
                                 processed++;
                                 break;
                             }
-                            log.warn("memory: skipping invalid segment; failure recorded for session {}",
+                            log.debug("memory: skipping invalid segment; failure recorded for session {}",
                                     session.getSessionId());
                         }
                     }

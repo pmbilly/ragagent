@@ -18,7 +18,7 @@ import java.util.Set;
  *
  * <p>已覆盖 <b>local + S3 协议族</b>（s3/minio/obs/ks3——obs 与 ks3 走 S3 兼容路线）
  * 与 <b>oss/cos/tos</b>（各家官方 SDK）。
- * 未实现的 provider 抛明确异常，不静默退化到本地盘。</p>
+ * 不支持的 provider 抛明确异常，不静默退化到本地盘。</p>
  */
 public final class FileServiceFactory {
 

@@ -37,7 +37,7 @@ import tools.jackson.databind.ObjectMapper;
  *       <b>NDJSON</b>（换行分隔的 JSON）而不是 SSE，请求头 {@code Accept: application/x-ndjson}。</li>
  *   <li>心跳是 {@code HEAD /}。</li>
  *   <li>基址指向 ollama.com 时官方客户端会签 Authorization 头；本模块只服务
- *       私部署路径（与 WeKnora 一致），不实现该分支。</li>
+ *       私部署路径，不实现该分支（见 {@code docs/known-gaps.md} 第 14 节）。</li>
  *   <li>{@code Embeddings} / {@code Generate} 的强类型请求体属于 embedding / rerank
  *       模块，故在这里以原始 JSON 形态提供，避免两处各定一套 DTO。</li>
  * </ul>
@@ -117,7 +117,7 @@ public class OllamaService implements OllamaAdminPort {
                 }
                 isAvailable = true;
             } catch (Exception e) {
-                log.warn("ollama service unavailable", e);
+                log.info("ollama service unavailable", e);
                 isAvailable = false;
                 if (isOptional) {
                     log.info("ollama service set as optional, will continue running the application");
@@ -179,7 +179,7 @@ public class OllamaService implements OllamaAdminPort {
     public void pullModel(String modelName) {
         startService();
         if (!isAvailable() && isOptional) {
-            log.warn("Ollama service unavailable, unable to pull model {}", modelName);
+            log.info("Ollama service unavailable, unable to pull model {}", modelName);
             return;
         }
         if (isModelAvailable(modelName)) {
@@ -242,7 +242,7 @@ public class OllamaService implements OllamaAdminPort {
      */
     public void ensureModelAvailable(String modelName) {
         if (!isAvailable() && isOptional) {
-            log.warn("Ollama service unavailable, skipping ensuring model {} availability", modelName);
+            log.debug("Ollama service unavailable, skipping ensuring model {} availability", modelName);
             return;
         }
         boolean available;

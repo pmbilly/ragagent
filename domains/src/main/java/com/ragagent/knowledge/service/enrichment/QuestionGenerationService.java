@@ -131,7 +131,7 @@ public class QuestionGenerationService implements QuestionGenerationConsumer {
 
         Knowledge k = knowledgeRepository.findByIdAny(p.knowledgeId());
         if (k == null) {
-            log.warn("question generation: knowledge {} not found (old in-flight task?)", p.knowledgeId());
+            log.debug("question generation: knowledge {} not found (old in-flight task?)", p.knowledgeId());
             return 0;
         }
         // 取消/删除短路：批式扇出让每个批都白拿一次检查，
@@ -144,7 +144,7 @@ public class QuestionGenerationService implements QuestionGenerationConsumer {
 
         KnowledgeBase kb = kbRepository.findByIdAny(p.knowledgeBaseId());
         if (kb == null) {
-            log.warn("question generation: knowledge base {} not found", p.knowledgeBaseId());
+            log.debug("question generation: knowledge base {} not found", p.knowledgeBaseId());
             return 0;
         }
 

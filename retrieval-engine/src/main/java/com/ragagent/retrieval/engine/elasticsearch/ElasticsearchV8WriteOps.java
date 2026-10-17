@@ -49,7 +49,7 @@ final class ElasticsearchV8WriteOps {
     void batchSave(List<IndexInfo> embeddingList, Map<String, Object> additionalParams)
             throws Exception {
         if (embeddingList == null || embeddingList.isEmpty()) {
-            log.warn("[Elasticsearch] Empty list provided to BatchSave, skipping");
+            log.debug("[Elasticsearch] Empty list provided to BatchSave, skipping");
             return;
         }
         StringBuilder ndjson = new StringBuilder();
@@ -136,7 +136,7 @@ final class ElasticsearchV8WriteOps {
 
     void deleteByTerms(String field, List<String> ids) throws Exception {
         if (ids == null || ids.isEmpty()) {
-            log.warn("[Elasticsearch] Empty {} list provided for deletion, skipping", field);
+            log.debug("[Elasticsearch] Empty {} list provided for deletion, skipping", field);
             return;
         }
         ObjectNode query = ElasticsearchV8RetrieveRepository.termsQuery(service.idField(field), ids);
@@ -156,7 +156,7 @@ final class ElasticsearchV8WriteOps {
                             String targetKnowledgeBaseId, int dimension, String knowledgeType)
             throws Exception {
         if (sourceToTargetChunkIdMap == null || sourceToTargetChunkIdMap.isEmpty()) {
-            log.warn("[Elasticsearch] Empty mapping, skipping copy");
+            log.debug("[Elasticsearch] Empty mapping, skipping copy");
             return;
         }
         RetrieveParams params = new RetrieveParams();
@@ -194,13 +194,13 @@ final class ElasticsearchV8WriteOps {
                 VectorEmbedding sourceDoc = ElasticsearchV8RetrieveRepository.parseSource(hit.path("_source"));
                 String targetChunkId = sourceToTargetChunkIdMap.get(sourceDoc.chunkId);
                 if (targetChunkId == null) {
-                    log.warn("[Elasticsearch] Source chunk {} not found in target mapping,"
+                    log.debug("[Elasticsearch] Source chunk {} not found in target mapping,"
                             + " skipping", sourceDoc.chunkId);
                     continue;
                 }
                 String targetKnowledgeId = sourceToTargetKbIdMap.get(sourceDoc.knowledgeId);
                 if (targetKnowledgeId == null) {
-                    log.warn("[Elasticsearch] Source knowledge {} not found in target mapping,"
+                    log.debug("[Elasticsearch] Source knowledge {} not found in target mapping,"
                             + " skipping", sourceDoc.knowledgeId);
                     continue;
                 }
@@ -250,7 +250,7 @@ final class ElasticsearchV8WriteOps {
     /** 按值分两组 update_by_query。 */
     void batchUpdateChunkEnabledStatus(Map<String, Boolean> chunkStatusMap) throws Exception {
         if (chunkStatusMap == null || chunkStatusMap.isEmpty()) {
-            log.warn("[Elasticsearch] Chunk status map is empty, skipping update");
+            log.debug("[Elasticsearch] Chunk status map is empty, skipping update");
             return;
         }
         List<String> enabled = new ArrayList<>();
@@ -273,7 +273,7 @@ final class ElasticsearchV8WriteOps {
     /** 按 tagID 分组逐组 update_by_query。 */
     void batchUpdateChunkTagID(Map<String, String> chunkTagMap) throws Exception {
         if (chunkTagMap == null || chunkTagMap.isEmpty()) {
-            log.warn("[Elasticsearch] Chunk tag map is empty, skipping update");
+            log.debug("[Elasticsearch] Chunk tag map is empty, skipping update");
             return;
         }
         Map<String, List<String>> groups = new LinkedHashMap<>();

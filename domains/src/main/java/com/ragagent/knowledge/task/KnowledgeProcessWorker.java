@@ -594,7 +594,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                                       List<Chunk> graphChunks, int attempt) {
         ChunkExtractTaskQueue queue = chunkExtractQueue.getIfAvailable();
         if (queue == null) {
-            log.warn("[KnowledgePostProcess] chunk extract queue unavailable, releasing {} slot(s) for {}",
+            log.info("[KnowledgePostProcess] chunk extract queue unavailable, releasing {} slot(s) for {}",
                     graphChunks.size(), knowledgeId);
             releaseSlots(knowledgeId, graphChunks.size());
             return;
@@ -625,7 +625,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         List<QuestionBatchPlanner.Batch> batches = QuestionBatchPlanner.planBatches(questionChunks);
         QuestionGenerationTaskQueue queue = questionGenerationQueue.getIfAvailable();
         if (queue == null) {
-            log.warn("[KnowledgePostProcess] question generation queue unavailable, releasing {} slot(s) for {}",
+            log.info("[KnowledgePostProcess] question generation queue unavailable, releasing {} slot(s) for {}",
                     batches.size(), knowledgeId);
             releaseSlots(knowledgeId, batches.size());
             return;
@@ -661,7 +661,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private void enqueueWikiIngest(String knowledgeId, Knowledge k) {
         WikiIngestPort service = wikiIngestService.getIfAvailable();
         if (service == null) {
-            log.warn("[KnowledgePostProcess] Wiki ingest service unavailable, releasing slot for {}",
+            log.info("[KnowledgePostProcess] Wiki ingest service unavailable, releasing slot for {}",
                     knowledgeId);
             releaseWikiSlot(knowledgeId);
             return;

@@ -327,11 +327,11 @@ public class MemoryTopicResolver {
         try {
             chatModel = modelResolver.getChatModel(modelId);
         } catch (RuntimeException e) {
-            log.warn("memory: topic adjudication model unavailable", e);
+            log.info("memory: topic adjudication model unavailable", e);
             return;
         }
         if (chatModel == null) {
-            log.warn("memory: topic adjudication model unavailable");
+            log.info("memory: topic adjudication model unavailable");
             return;
         }
 

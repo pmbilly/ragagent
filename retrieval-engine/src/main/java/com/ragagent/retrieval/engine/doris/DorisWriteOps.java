@@ -45,7 +45,7 @@ final class DorisWriteOps {
         for (IndexInfo info : indexInfoList) {
             DorisVectorEmbedding emb = DorisRetrieveRepository.toEmbedding(info, params, compatMode);
             if (emb.embedding == null || emb.embedding.length == 0) {
-                log.warn("[Doris] Skipping empty embedding for chunk {}", info.chunkId);
+                log.debug("[Doris] Skipping empty embedding for chunk {}", info.chunkId);
                 continue;
             }
             try {

@@ -84,7 +84,7 @@ public class MessageHistoryService {
             try {
                 messages = messageService.getRecentMessages(sid, limitInt);
             } catch (SessionNotFoundException e) {
-                log.warn("Session not found, ID: {}", sid);
+                log.debug("Session not found, ID: {}", sid);
                 throw BizException.notFound(e.getMessage());
             } catch (RuntimeException e) {
                 throw toInternal(e);
@@ -94,7 +94,7 @@ public class MessageHistoryService {
             try {
                 messages = messageService.getMessagesBeforeTime(sid, before, limitInt);
             } catch (SessionNotFoundException e) {
-                log.warn("Session not found, ID: {}", sid);
+                log.debug("Session not found, ID: {}", sid);
                 throw BizException.notFound(e.getMessage());
             } catch (RuntimeException e) {
                 throw toInternal(e);

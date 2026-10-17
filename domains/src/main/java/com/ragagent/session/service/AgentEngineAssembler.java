@@ -244,7 +244,7 @@ final class AgentEngineAssembler {
                 k = null;
             }
             if (k == null) {
-                log.warn("Selected knowledge {} not found", kid);
+                log.debug("Selected knowledge {} not found", kid);
                 continue;
             }
             selectedDocs.add(new SelectedDocumentInfo(nz(k.getId()),

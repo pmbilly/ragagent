@@ -1,6 +1,5 @@
 package com.ragagent.datasource.connector.feishu.core;
 
-import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DocRawContentResponse;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFile;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFolderMetaResponse;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.ExportTaskCreateResponse;
@@ -215,23 +214,6 @@ public class FeishuClient implements DocxMarkdown.SheetReader {
     // 通用请求（JSON API）
 
     // wiki：空间 / 节点
-
-    /**
-     * 已废弃路径，仅为兼容保留。
-     *
-     * @deprecated 优先用 {@link #exportAndDownload}，它保留格式。
-     */
-    @Deprecated
-    public String getDocumentRawContent(String documentId) {
-        String path = "/open-apis/docx/v1/documents/" + documentId + "/raw_content";
-        DocRawContentResponse resp = doRequest("GET", path, null, DocRawContentResponse.class);
-        if (resp == null || resp.code() != 0) {
-            int code = resp == null ? -1 : resp.code();
-            String msg = resp == null ? "" : resp.msg();
-            throw new ConnectorException("get document raw content error: code=" + code + " msg=" + msg);
-        }
-        return resp.data() == null || resp.data().content() == null ? "" : resp.data().content();
-    }
 
     // 导出任务 API
     //   1. POST /drive/v1/export_tasks            → 建任务，拿 ticket

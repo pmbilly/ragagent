@@ -595,7 +595,7 @@ public class StorageFileResolver {
         }
         String globalStorageType = StoragePaths.globalStorageType();
         if (provider != null && provider.equals(globalStorageType) && globalFileService != null) {
-            log.warn("[Router] {} tenant storage config missing or invalid, fallback to global file "
+            log.info("[Router] {} tenant storage config missing or invalid, fallback to global file "
                     + "service: tenant_id={} provider={} err={}", logTag, tenant.tenantId(), provider,
                     resolution.error());
             return new Resolution(new DecoratedFileService(globalFileService, catalog), globalStorageType, null);

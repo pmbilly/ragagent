@@ -67,7 +67,7 @@ import tools.jackson.databind.ObjectMapper;
  *       DIMENSION_MISMATCH；三种删除走 _delete_by_query terms + refresh=true、
  *       cap 1000；缺 embedding 的文档/批路由到 keywords 索引</li>
  *   <li><b>复制</b>：批 500 分页扫源（from/size，受 max_result_window 10000 界——
- *       超大批量需 scroll 异步路径，未实现）+ 三态 SourceID 改写 + embedding 按
+ *       超大批量需 scroll 异步路径，未实现，见 {@code docs/known-gaps.md} 第 13 节）+ 三态 SourceID 改写 + embedding 按
  *       <b>目标 SourceID</b> 键回填 + BatchSave 逐页落</li>
  *   <li><b>迁移</b>：_update_by_query 于 {@code <base>_*}（跨维）改写
  *       knowledge_base_id 并清 tag_id，painless 脚本 + params 绑定（防注入）、

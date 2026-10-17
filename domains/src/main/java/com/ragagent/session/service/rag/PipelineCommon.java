@@ -29,7 +29,7 @@ import java.util.function.BiFunction;
  *
  * <h2>已知取舍</h2>
  * <ul>
- *   <li>提示词缓存指纹元数据未接线：{@link LlmChatClient} 无 ctx 形参、无消费点，非行为面。</li>
+ *   <li>提示词缓存指纹元数据未接线（见 {@code docs/known-gaps.md} 第 10 节）：{@link LlmChatClient} 无 ctx 形参、无消费点，非行为面。</li>
  *   <li>虚拟线程 + TenantContext：runParallel/parallelMap 的任务里若要读租户，
  *       由调用方先 {@code TenantContextSnapshot.capture()} 再在任务里 replay。
  *       管线内部对 service 的调用一律显式传 tenantId/chatManage 值，不依赖 ThreadLocal。</li>

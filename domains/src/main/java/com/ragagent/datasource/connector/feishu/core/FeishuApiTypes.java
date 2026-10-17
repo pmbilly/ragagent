@@ -315,19 +315,6 @@ public final class FeishuApiTypes {
 
     // 文档原始内容（已废弃路径）
 
-    /** 已废弃的 raw_content 路径的 {@code data} 段。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public record DocRawContentData(@JsonProperty("content") String content) {
-    }
-
-    /** 已废弃的 {@code .../documents/:id/raw_content} 的响应。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public record DocRawContentResponse(
-            @JsonProperty("code") int code,
-            @JsonProperty("msg") String msg,
-            @JsonProperty("data") DocRawContentData data) {
-    }
-
     // 导出任务 API
 
     /** 导出任务的 ticket。 */

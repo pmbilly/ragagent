@@ -51,7 +51,7 @@ final class DataSourceItemOps {
                 return; // 关闭了删除同步：既不计也不删
             }
             if (item.getExternalId() == null || item.getExternalId().isEmpty()) {
-                log.warn("[datasource] skipping deletion for item \"{}\": empty external_id",
+                log.debug("[datasource] skipping deletion for item \"{}\": empty external_id",
                         item.getTitle());
                 result.setSkipped(result.getSkipped() + 1);
                 return;

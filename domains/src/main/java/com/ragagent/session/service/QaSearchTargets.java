@@ -147,7 +147,7 @@ final class QaSearchTargets {
                     kbToKnowledgeIds.getOrDefault(kbId, new ArrayList<>()));
             boolean useDocumentTagResolution = kb == null || !"faq".equals(kb.getType());
             if (kb == null) {
-                log.warn("Knowledge base metadata missing for tag scope, kb_id={}, using document tag resolution", kbId);
+                log.info("Knowledge base metadata missing for tag scope, kb_id={}, using document tag resolution", kbId);
             }
             if (useDocumentTagResolution) {
                 List<String> tagKnowledgeIds;

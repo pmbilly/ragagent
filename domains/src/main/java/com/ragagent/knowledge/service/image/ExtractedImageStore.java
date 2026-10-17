@@ -50,7 +50,7 @@ public class ExtractedImageStore {
         }
         long tenantId = k.getTenantId() == null ? 0L : k.getTenantId();
         if (tenantId == 0) {
-            log.warn("skip storing extracted images: knowledge {} has no tenant", k.getId());
+            log.debug("skip storing extracted images: knowledge {} has no tenant", k.getId());
             return markdown;
         }
         // 来源文件本身是图片格式时保留原图（不做小图标过滤）

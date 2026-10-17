@@ -285,7 +285,7 @@ final class ImChannelRuntimeOps {
                     try {
                         event = ImTurnOrchestrator.JSON.readTree(payload);
                     } catch (Exception e) {
-                        log.warn("[IM] Ignore invalid channel config event", e);
+                        log.debug("[IM] Ignore invalid channel config event", e);
                         continue;
                     }
                     String channelId = event.path("channel_id").asString("");

@@ -54,7 +54,7 @@ public class OpenSearchAuditSinkAdapter implements OpenSearchRetrieveRepository.
         }
         Long tid = TenantContext.currentTenantId();
         if (tid == null) {
-            log.warn("[audit] {}: no tenant in context, skipping audit (target={})", action,
+            log.debug("[audit] {}: no tenant in context, skipping audit (target={})", action,
                     target);
             return;
         }

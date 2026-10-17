@@ -151,7 +151,7 @@ final class OpenSearchWriteOps {
                             Map<String, String> sourceToTargetChunkIdMap, String targetKnowledgeBaseId,
                             int dimension, String knowledgeType) throws Exception {
         if (sourceToTargetChunkIdMap == null || sourceToTargetChunkIdMap.isEmpty()) {
-            log.warn("[OpenSearch] CopyIndices: empty chunk mapping, skipping");
+            log.debug("[OpenSearch] CopyIndices: empty chunk mapping, skipping");
             return;
         }
         if (dimension <= 0) {
@@ -175,14 +175,14 @@ final class OpenSearchWriteOps {
                 String chunkId = str(d.get("chunk_id"));
                 String targetChunkId = sourceToTargetChunkIdMap.get(chunkId);
                 if (targetChunkId == null) {
-                    log.warn("[OpenSearch] CopyIndices: source chunk {} not mapped, skipping",
+                    log.debug("[OpenSearch] CopyIndices: source chunk {} not mapped, skipping",
                             chunkId);
                     continue;
                 }
                 String knowledgeId = str(d.get("knowledge_id"));
                 String targetKnowledgeId = sourceToTargetKbIdMap.get(knowledgeId);
                 if (targetKnowledgeId == null) {
-                    log.warn("[OpenSearch] CopyIndices: source knowledge {} not mapped, skipping",
+                    log.debug("[OpenSearch] CopyIndices: source knowledge {} not mapped, skipping",
                             knowledgeId);
                     continue;
                 }

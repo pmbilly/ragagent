@@ -239,7 +239,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
         Chunk again = chunkRepository.getChunkById(p.tenantId(), p.chunkId());
         if (again == null) {
             // 抽取期间分块消失（新 attempt 清理）→ 不当失败，记 skipped 即返回
-            log.warn("graph ignore chunk {}: chunk disappeared", p.chunkId());
+            log.debug("graph ignore chunk {}: chunk disappeared", p.chunkId());
             graphOut.put("skipped", "chunk_disappeared");
             return null;
         }

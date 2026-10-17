@@ -61,7 +61,7 @@ public final class TenantFileServiceResolver {
         String globalType = globalStorageType();
         String requested = provider == null ? "" : provider.trim().toLowerCase();
         if (requested.equals(globalType) && globalFileService != null) {
-            log.warn("[Router] {} tenant storage config missing or invalid, fallback to global "
+            log.info("[Router] {} tenant storage config missing or invalid, fallback to global "
                     + "file service: tenant_id={} provider={}", logTag, tenantId, provider);
             return new Fallback(globalFileService, globalType, true);
         }

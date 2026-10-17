@@ -163,7 +163,7 @@ public final class DocxFetcher {
             keep.add(childId); // 文档里还在 → 绝不能当成过期清扫掉
             String ext = FeishuSupport.fileExt(a.name()).toLowerCase(Locale.ROOT);
             if (ext.isEmpty()) {
-                log.warn("[Feishu] doc {}: skipping attachment with no usable filename (token={} name=\"{}\")",
+                log.debug("[Feishu] doc {}: skipping attachment with no usable filename (token={} name=\"{}\")",
                         in.objToken, a.fileToken(), a.name());
                 continue;
             }
@@ -234,7 +234,7 @@ public final class DocxFetcher {
             }
             FeishuSupport.ImageExt sniffed = FeishuSupport.supportedImageExt(data);
             if (!sniffed.ok()) {
-                log.warn("[Feishu] doc {}: skipping image (token={}) of unsupported type \"{}\"",
+                log.debug("[Feishu] doc {}: skipping image (token={}) of unsupported type \"{}\"",
                         in.objToken, img.token(), sniffed.contentType());
                 continue;
             }

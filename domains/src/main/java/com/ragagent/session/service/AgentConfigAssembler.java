@@ -173,7 +173,7 @@ final class AgentConfigAssembler {
             return;
         }
         if ("none".equals(skillsMode) || skillsMode.isEmpty()) {
-            log.warn("Ignoring @skill mention: agent skills selection is disabled (mode={})", skillsMode);
+            log.debug("Ignoring @skill mention: agent skills selection is disabled (mode={})", skillsMode);
             return;
         }
         if (!ac.isSkillsEnabled()) {
@@ -191,13 +191,13 @@ final class AgentConfigAssembler {
             return;
         }
         if ("none".equals(ac.getMcpSelectionMode())) {
-            log.warn("Ignoring @MCP mention: agent MCP selection is disabled (mode=none)");
+            log.debug("Ignoring @MCP mention: agent MCP selection is disabled (mode=none)");
             return;
         }
         List<String> mentioned = dedupPreservingOrder(requested);
         var scope = resolvePerRequestMcpScope(mentioned, agentPresetMcps, ac.getMcpSelectionMode(), isSharedAgent);
         if (scope.effective().isEmpty()) {
-            log.warn("Ignoring @MCP scope outside agent preset: requested={} agent={} shared={}",
+            log.debug("Ignoring @MCP scope outside agent preset: requested={} agent={} shared={}",
                     requested, agentPresetMcps, isSharedAgent);
             return;
         }

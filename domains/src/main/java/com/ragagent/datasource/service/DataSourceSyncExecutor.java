@@ -272,7 +272,7 @@ final class DataSourceSyncExecutor {
         try {
             ds = service.getDataSource(payload.dataSourceId());
         } catch (RuntimeException e) {
-            log.warn("[datasource] data source not found (likely deleted), cancelling sync: ds={}", payload.dataSourceId(), e);
+            log.debug("[datasource] data source not found (likely deleted), cancelling sync: ds={}", payload.dataSourceId(), e);
             SyncLog syncLog = null;
             try {
                 syncLog = service.syncLogRepo.findById(payload.syncLogId());
@@ -298,7 +298,7 @@ final class DataSourceSyncExecutor {
 
         KnowledgeBaseRowView kb = service.knowledge.findKnowledgeBase(ds.getKnowledgeBaseId());
         if (kb == null) {
-            log.warn("[datasource] knowledge base not found (likely deleted), cancelling sync: "
+            log.debug("[datasource] knowledge base not found (likely deleted), cancelling sync: "
                     + "kb={} ds={}", ds.getKnowledgeBaseId(), payload.dataSourceId());
             syncLog.setStatus(DataSourceConstants.SYNC_LOG_STATUS_CANCELED);
             syncLog.setFinishedAt(OffsetDateTime.now(ZoneOffset.UTC));

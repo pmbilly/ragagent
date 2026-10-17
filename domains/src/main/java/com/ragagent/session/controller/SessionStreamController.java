@@ -189,7 +189,7 @@ public class SessionStreamController {
         try {
             sessionService.getSession(sessionId);
         } catch (SessionNotFoundException e) {
-            log.warn("Session not found, ID: {}", sessionId);
+            log.debug("Session not found, ID: {}", sessionId);
             throw BizException.notFound(e.getMessage());
         } catch (RuntimeException e) {
             throw BizException.internal(e.getMessage());
@@ -203,10 +203,10 @@ public class SessionStreamController {
         try {
             message = messageService.getMessage(sessionId, messageId);
         } catch (SessionNotFoundException e) {
-            log.warn("Session not found, ID: {}", sessionId);
+            log.debug("Session not found, ID: {}", sessionId);
             throw BizException.notFound(e.getMessage());
         } catch (MessageNotFoundException e) {
-            log.warn("Message not found, session ID: {}, message ID: {}", sessionId, messageId);
+            log.debug("Message not found, session ID: {}, message ID: {}", sessionId, messageId);
             throw BizException.notFound(RECORD_NOT_FOUND);
         } catch (RuntimeException e) {
             throw BizException.internal(e.getMessage());
@@ -214,7 +214,7 @@ public class SessionStreamController {
 
         if (message == null) {
             // 防御分支：仓储查不到时抛异常，正常不可达；保留作兜底落点。
-            log.warn("Incomplete message not found, session ID: {}, message ID: {}", sessionId, messageId);
+            log.debug("Incomplete message not found, session ID: {}, message ID: {}", sessionId, messageId);
             writeJsonError(response, 404, "Incomplete message not found");
             return;
         }

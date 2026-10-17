@@ -475,11 +475,11 @@ public class MemoryConsolidationService {
         try {
             chatModel = modelResolver.getChatModel(modelId);
         } catch (RuntimeException e) {
-            log.warn("memory: consolidation model unavailable", e);
+            log.info("memory: consolidation model unavailable", e);
             return new ConsolidationCall("", true);
         }
         if (chatModel == null) {
-            log.warn("memory: consolidation model unavailable");
+            log.info("memory: consolidation model unavailable");
             return new ConsolidationCall("", true);
         }
 

@@ -113,7 +113,7 @@ public class TenantFileStorage {
         try {
             ProviderFileStorePort.Resolution resolved = providerStore.resolve(tenantId, provider);
             if (!resolved.ok()) {
-                log.warn("delete export skipped: provider={} err={}", provider, resolved.error());
+                log.debug("delete export skipped: provider={} err={}", provider, resolved.error());
                 return;
             }
             resolved.ops().deleteFile(filePath);
@@ -200,7 +200,7 @@ public class TenantFileStorage {
         try {
             ProviderFileStorePort.Resolution resolved = providerStore.resolve(tenantId, provider);
             if (!resolved.ok()) {
-                log.warn("delete provider object skipped: provider={} err={}",
+                log.debug("delete provider object skipped: provider={} err={}",
                         provider, resolved.error());
                 return;
             }

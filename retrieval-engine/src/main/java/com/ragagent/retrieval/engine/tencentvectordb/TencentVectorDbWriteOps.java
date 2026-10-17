@@ -44,7 +44,7 @@ final class TencentVectorDbWriteOps {
         for (IndexInfo info : indexInfoList) {
             Document doc = TencentVectorDbRetrieveRepository.toDocument(info, params);
             if (doc.vector.length == 0) {
-                log.warn("[TencentVectorDB] skip empty embedding for chunk_id={}", info.chunkId);
+                log.debug("[TencentVectorDB] skip empty embedding for chunk_id={}", info.chunkId);
                 continue;
             }
             byDimension.computeIfAbsent(doc.vector.length, k -> new ArrayList<>()).add(doc);

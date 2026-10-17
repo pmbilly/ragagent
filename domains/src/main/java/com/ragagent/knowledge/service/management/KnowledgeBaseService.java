@@ -157,7 +157,7 @@ public class KnowledgeBaseService
                                 "vector store not found", null, 400));
                     case VECTOR_STORE_NOT_FOUND:
                     case VECTOR_STORE_UNAVAILABLE:
-                        log.warn("[kb.create] vector store currently unavailable: tenant_id={} "
+                        log.info("[kb.create] vector store currently unavailable: tenant_id={} "
                                 + "store_id={}", tenantId, sanitized);
                         throw new BizException(new AppError(
                                 ErrorCode.VECTOR_STORE_UNAVAILABLE.value(),

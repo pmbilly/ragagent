@@ -185,13 +185,13 @@ public class PgVectorEngineRepository
             for (CopyRow row : source) {
                 String targetChunkId = sourceToTargetChunkIdMap.get(row.chunkId);
                 if (targetChunkId == null) {
-                    log.warn("[Postgres] Source chunk {} not found in target chunk mapping, skipping",
+                    log.debug("[Postgres] Source chunk {} not found in target chunk mapping, skipping",
                             row.chunkId);
                     continue;
                 }
                 String targetKnowledgeId = sourceToTargetKbIdMap.get(row.knowledgeId);
                 if (targetKnowledgeId == null) {
-                    log.warn("[Postgres] Source knowledge {} not found in target knowledge mapping, skipping",
+                    log.debug("[Postgres] Source knowledge {} not found in target knowledge mapping, skipping",
                             row.knowledgeId);
                     continue;
                 }

@@ -35,7 +35,7 @@ public final class DbSkillSource implements SkillSource {
                 skill.filePath = skill.basePath + "/" + SkillCatalogPort.SKILL_FILE_NAME;
                 byName.put(skill.name, new Entry(skill, row.content(), row.slug()));
             } catch (RuntimeException e) {
-                log.warn("[skills] skip unparsable skill row slug={}", row.slug(), e);
+                log.debug("[skills] skip unparsable skill row slug={}", row.slug(), e);
             }
         }
     }

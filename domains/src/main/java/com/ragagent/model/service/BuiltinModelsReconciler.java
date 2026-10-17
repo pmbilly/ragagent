@@ -78,7 +78,7 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
             Map<String, Object> e = entries.get(i);
             String id = str(e.get("id"));
             if (id.isEmpty() || id.length() > 64) {
-                log.warn("[builtin-models] WARN: entry {} has empty/oversized id; skipping", i);
+                log.debug("[builtin-models] WARN: entry {} has empty/oversized id; skipping", i);
                 continue;
             }
             String type = str(e.get("type"));

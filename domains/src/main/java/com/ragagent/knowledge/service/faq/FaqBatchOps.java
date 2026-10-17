@@ -243,7 +243,7 @@ final class FaqBatchOps {
     void saveImportResultToDatabase(ImportJob job, FaqImportProgress progress, int originalTotalEntries) {
         Knowledge knowledge = knowledgeRepository.findById(job.tenantId(), job.knowledgeId());
         if (knowledge == null) {
-            log.warn("FAQ import task {}: knowledge not found for result save", job.taskId());
+            log.debug("FAQ import task {}: knowledge not found for result save", job.taskId());
             return;
         }
         int skippedCount = originalTotalEntries - progress.successCount()

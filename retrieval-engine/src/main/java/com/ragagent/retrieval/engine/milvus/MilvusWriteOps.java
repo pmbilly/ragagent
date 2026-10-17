@@ -56,7 +56,7 @@ final class MilvusWriteOps {
     void batchSave(List<IndexInfo> embeddingList, Map<String, Object> params)
             throws Exception {
         if (embeddingList == null || embeddingList.isEmpty()) {
-            log.warn("[Milvus] Empty list provided to BatchSave, skipping");
+            log.debug("[Milvus] Empty list provided to BatchSave, skipping");
             return;
         }
         log.info("[Milvus] Batch saving {} indices", embeddingList.size());
@@ -64,7 +64,7 @@ final class MilvusWriteOps {
         for (IndexInfo info : embeddingList) {
             MilvusVectorEmbedding row = MilvusRetrieveRepository.toEmbedding(info, params);
             if (row.embedding == null || row.embedding.length == 0) {
-                log.warn("[Milvus] Skipping empty embedding for chunk ID: {}", info.chunkId);
+                log.debug("[Milvus] Skipping empty embedding for chunk ID: {}", info.chunkId);
                 continue;
             }
             byDimension.computeIfAbsent(row.embedding.length, k -> new ArrayList<>()).add(row);
@@ -144,7 +144,7 @@ final class MilvusWriteOps {
     void batchUpdateChunkEnabledStatus(Map<String, Boolean> chunkStatusMap)
             throws Exception {
         if (chunkStatusMap == null || chunkStatusMap.isEmpty()) {
-            log.warn("[Milvus] Empty chunk status map provided, skipping");
+            log.debug("[Milvus] Empty chunk status map provided, skipping");
             return;
         }
         log.info("[Milvus] Batch updating chunk enabled status, count: {}", chunkStatusMap.size());
@@ -203,7 +203,7 @@ final class MilvusWriteOps {
 
     void batchUpdateChunkTagID(Map<String, String> chunkTagMap) throws Exception {
         if (chunkTagMap == null || chunkTagMap.isEmpty()) {
-            log.warn("[Milvus] Empty chunk tag map provided, skipping");
+            log.debug("[Milvus] Empty chunk tag map provided, skipping");
             return;
         }
         log.info("[Milvus] Batch updating chunk tag ID, count: {}", chunkTagMap.size());
@@ -273,7 +273,7 @@ final class MilvusWriteOps {
                 + " {}, count: {}, dimension: {}", sourceKnowledgeBaseId, targetKnowledgeBaseId,
                 sourceToTargetChunkIdMap == null ? 0 : sourceToTargetChunkIdMap.size(), dimension);
         if (sourceToTargetChunkIdMap == null || sourceToTargetChunkIdMap.isEmpty()) {
-            log.warn("[Milvus] Empty mapping, skipping copy");
+            log.debug("[Milvus] Empty mapping, skipping copy");
             return;
         }
         String collection = service.collectionName(dimension);
@@ -300,14 +300,14 @@ final class MilvusWriteOps {
                 MilvusVectorEmbedding source = MilvusRetrieveRepository.fromNode(node);
                 String targetChunkId = sourceToTargetChunkIdMap.get(source.chunkId);
                 if (targetChunkId == null) {
-                    log.warn("[Milvus] Source chunk {} not found in target mapping, skipping",
+                    log.debug("[Milvus] Source chunk {} not found in target mapping, skipping",
                             source.chunkId);
                     continue;
                 }
                 String targetKnowledgeId = sourceToTargetKbIdMap == null ? null
                         : sourceToTargetKbIdMap.get(source.knowledgeId);
                 if (targetKnowledgeId == null) {
-                    log.warn("[Milvus] Source knowledge {} not found in target mapping, skipping",
+                    log.debug("[Milvus] Source knowledge {} not found in target mapping, skipping",
                             source.knowledgeId);
                     continue;
                 }

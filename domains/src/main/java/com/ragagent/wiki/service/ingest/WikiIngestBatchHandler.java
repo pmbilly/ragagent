@@ -385,7 +385,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
 
         WikiIngestTaskQueue queue = taskQueueProvider.getIfAvailable();
         if (queue == null) {
-            log.warn("wiki ingest: follow-up enqueue skipped (task queue not wired)");
+            log.debug("wiki ingest: follow-up enqueue skipped (task queue not wired)");
             return false;
         }
         try {

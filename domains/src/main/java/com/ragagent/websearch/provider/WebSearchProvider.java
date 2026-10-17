@@ -8,7 +8,7 @@ import java.util.List;
  * 网络搜索 provider（含按 country/freshness 过滤的可选能力与空结果诊断的可选能力）。
  *
  * <p>三种能力面合并成一个接口 + default 方法：default 抛异常 =
- * 「未实现过滤能力」的运行期语义。</p>
+ * 「不支持过滤能力」的运行期语义。</p>
  */
 public interface WebSearchProvider {
 

@@ -168,7 +168,7 @@ final class WikiIngestFinalizePhase {
         if (synthesisModelId.isEmpty()) {
             // 没有模型可用于重建索引；仍跑纯文本遍历，然后排空。
             // 缺模型是配置缺口，不是瞬时错误。
-            log.warn("wiki finalize: no synthesis model for KB {}, skipping index rebuild", kbId);
+            log.debug("wiki finalize: no synthesis model for KB {}, skipping index rebuild", kbId);
         }
 
         WikiBatchContext batchCtx = handler.newWikiBatchContext(kbId, wikiConfig);

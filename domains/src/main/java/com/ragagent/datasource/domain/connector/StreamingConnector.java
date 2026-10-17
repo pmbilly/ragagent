@@ -8,7 +8,7 @@ import com.ragagent.datasource.domain.SyncCursor;
  *
  * <p>实现它的连接器让 service 层把「抓取→灌入→检查点」交错起来：大型同步
  * 因此是增量落库的、超时后能续跑，而不是把所有条目攒在内存里、重试时
- * 全部进度归零。不实现它的连接器<b>原样</b>回落到
+ * 全部进度归零。没有实现该接口的连接器<b>原样</b>回落到
  * {@link Connector#fetchAll} / {@link Connector#fetchIncremental}。</p>
  *
  * <p>service 层判定走 {@code connector instanceof StreamingConnector}。</p>

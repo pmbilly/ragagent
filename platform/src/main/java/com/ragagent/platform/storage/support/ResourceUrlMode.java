@@ -46,7 +46,7 @@ public final class ResourceUrlMode {
             Mode.parse(raw);
         } catch (RuntimeException e) {
             if (WARNED_BAD_DEFAULTS.add(raw.trim())) {
-                log.warn("ignoring {}: invalid value \"{}\"; falling back to \"{}\"",
+                log.debug("ignoring {}: invalid value \"{}\"; falling back to \"{}\"",
                         Mode.ENV_VAR, raw.trim(), Mode.HANDLE.value());
             }
         }

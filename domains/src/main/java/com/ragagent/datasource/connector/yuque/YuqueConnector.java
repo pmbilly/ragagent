@@ -188,7 +188,7 @@ public class YuqueConnector implements Connector {
                         teamRepos = cli.listGroupRepos(g.getLogin());
                     } catch (ConnectorException e) {
                         // 跳过这个团队但继续其它团队（例如受限团队的 403）。
-                        log.warn("[Yuque] skip group {}", g.getLogin(), e);
+                        log.debug("[Yuque] skip group {}", g.getLogin(), e);
                         continue;
                     }
                     if (teamRepos == null) {
@@ -374,7 +374,7 @@ public class YuqueConnector implements Connector {
                 if (!detail.getFormat().isEmpty()
                         && !"markdown".equals(detail.getFormat())
                         && !"lake".equals(detail.getFormat())) {
-                    log.warn("[Yuque] skip doc {} (\"{}\"): unsupported format \"{}\"",
+                    log.debug("[Yuque] skip doc {} (\"{}\"): unsupported format \"{}\"",
                             d.getId(), d.getTitle(), detail.getFormat());
                     Map<String, String> metadata = new LinkedHashMap<>();
                     metadata.put("channel", "yuque");

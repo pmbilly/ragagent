@@ -58,7 +58,7 @@ final class QdrantWriteOps {
     void batchSave(List<IndexInfo> embeddingList, Map<String, Object> params)
             throws Exception {
         if (embeddingList == null || embeddingList.isEmpty()) {
-            log.warn("[Qdrant] Empty list provided to BatchSave, skipping");
+            log.debug("[Qdrant] Empty list provided to BatchSave, skipping");
             return;
         }
         log.info("[Qdrant] Batch saving {} indices", embeddingList.size());
@@ -66,7 +66,7 @@ final class QdrantWriteOps {
         for (IndexInfo info : embeddingList) {
             QdrantVectorEmbedding row = QdrantRetrieveRepository.toEmbedding(info, params);
             if (row.embedding == null || row.embedding.length == 0) {
-                log.warn("[Qdrant] Skipping empty embedding for chunk ID: {}", info.chunkId);
+                log.debug("[Qdrant] Skipping empty embedding for chunk ID: {}", info.chunkId);
                 continue;
             }
             int dimension = row.embedding.length;
@@ -154,7 +154,7 @@ final class QdrantWriteOps {
 
     void deleteByField(String field, List<String> ids, int dimension, String subject) {
         if (ids == null || ids.isEmpty()) {
-            log.warn("[Qdrant] Empty {} list provided for deletion, skipping", subject);
+            log.debug("[Qdrant] Empty {} list provided for deletion, skipping", subject);
             return;
         }
         String collection = service.collectionName(dimension);
@@ -176,7 +176,7 @@ final class QdrantWriteOps {
     void batchUpdateChunkEnabledStatus(Map<String, Boolean> chunkStatusMap)
             throws Exception {
         if (chunkStatusMap == null || chunkStatusMap.isEmpty()) {
-            log.warn("[Qdrant] Empty chunk status map provided, skipping");
+            log.debug("[Qdrant] Empty chunk status map provided, skipping");
             return;
         }
         log.info("[Qdrant] Batch updating chunk enabled status, count: {}", chunkStatusMap.size());
@@ -217,7 +217,7 @@ final class QdrantWriteOps {
     /** 批量改标签：按 tagID 分组 → 每集合逐组 SetPayload。 */
     void batchUpdateChunkTagID(Map<String, String> chunkTagMap) throws Exception {
         if (chunkTagMap == null || chunkTagMap.isEmpty()) {
-            log.warn("[Qdrant] Empty chunk tag map provided, skipping");
+            log.debug("[Qdrant] Empty chunk tag map provided, skipping");
             return;
         }
         log.info("[Qdrant] Batch updating chunk tag ID, count: {}", chunkTagMap.size());
@@ -280,7 +280,7 @@ final class QdrantWriteOps {
                 targetKnowledgeBaseId,
                 sourceToTargetChunkIdMap == null ? 0 : sourceToTargetChunkIdMap.size(), dimension);
         if (sourceToTargetChunkIdMap == null || sourceToTargetChunkIdMap.isEmpty()) {
-            log.warn("[Qdrant] Empty mapping, skipping copy");
+            log.debug("[Qdrant] Empty mapping, skipping copy");
             return;
         }
         String collection = service.collectionName(dimension);
@@ -318,14 +318,14 @@ final class QdrantWriteOps {
                 String sourceKnowledgeId = payload.path(QdrantRetrieveRepository.FIELD_KNOWLEDGE_ID).asString("");
                 String originalSourceId = payload.path(QdrantRetrieveRepository.FIELD_SOURCE_ID).asString("");
                 if (!sourceToTargetChunkIdMap.containsKey(sourceChunkId)) {
-                    log.warn("[Qdrant] Source chunk {} not found in target mapping, skipping",
+                    log.debug("[Qdrant] Source chunk {} not found in target mapping, skipping",
                             sourceChunkId);
                     continue;
                 }
                 String targetChunkId = sourceToTargetChunkIdMap.get(sourceChunkId);
                 if (sourceToTargetKbIdMap == null
                         || !sourceToTargetKbIdMap.containsKey(sourceKnowledgeId)) {
-                    log.warn("[Qdrant] Source knowledge {} not found in target mapping, skipping",
+                    log.debug("[Qdrant] Source knowledge {} not found in target mapping, skipping",
                             sourceKnowledgeId);
                     continue;
                 }
@@ -336,7 +336,7 @@ final class QdrantWriteOps {
                         || payload.path(QdrantRetrieveRepository.FIELD_IS_ENABLED).asBoolean(true);
                 JsonNode vectorNode = point.get("vector");
                 if (vectorNode == null || !vectorNode.isArray() || vectorNode.isEmpty()) {
-                    log.warn("[Qdrant] No vectors found for source point with chunk {}, skipping",
+                    log.debug("[Qdrant] No vectors found for source point with chunk {}, skipping",
                             sourceChunkId);
                     continue;
                 }

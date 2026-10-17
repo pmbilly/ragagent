@@ -22,7 +22,7 @@ import org.springframework.beans.factory.ObjectProvider;
  * {@link #knowledgeSearcher()} 目前是**返回空列表的桩**，而 {@code KnowledgeCatalogPort}
  * 明明已注入——{@link ImCommandSet.InfoCommand}/{@code SearchCommand} 会读到它们，
  * 因此生产上 {@code /info} 与 {@code /search} 的 KB/检索面**恒为空**。这是功能缺口
- * （疑似未接线），不是重构问题，待另行专项核查；搬到一个类里正是为了让这处显眼。</p>
+ * （疑似未接线，见 {@code docs/known-gaps.md} 第 17 节），不是重构问题；搬到一个类里正是为了让这处显眼。</p>
  */
 final class ImKnowledgeBridgeOps {
 

@@ -139,7 +139,7 @@ public class MemoryVectorService {
             Thread.currentThread().interrupt();
             return null;
         } catch (ExecutionException e) {
-            log.warn("memory: embedding model {} unavailable", modelId, e);
+            log.info("memory: embedding model {} unavailable", modelId, e);
             return null;
         }
     }

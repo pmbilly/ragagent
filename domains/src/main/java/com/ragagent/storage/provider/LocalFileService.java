@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  *
  * <h2>GetFileURL</h2>
  * <p>配了 {@code externalURL}（{@code APP_EXTERNAL_URL}）时走预签名 URL；
- * 未注入 {@link UrlSigner}（预签名未接线）时记警告并返回 {@code local://} 路径。</p>
+ * 未注入 {@link UrlSigner} 时记警告并返回 {@code local://} 路径。</p>
  */
 public class LocalFileService implements FileService {
 
@@ -35,7 +35,7 @@ public class LocalFileService implements FileService {
     /** {@code local://} 前缀。 */
     public static final String LOCAL_SCHEME = "local://";
 
-    /** 预签名接缝：未注入 = 未接线，返回 provider 路径。 */
+    /** 预签名接缝：未注入实现时返回 provider 路径。 */
     public interface UrlSigner {
         String sign(String baseUrl, String filePath, long tenantId, long ttlSeconds);
     }
