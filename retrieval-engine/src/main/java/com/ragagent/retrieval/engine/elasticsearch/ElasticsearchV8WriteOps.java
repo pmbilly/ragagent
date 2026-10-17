@@ -1,8 +1,5 @@
 package com.ragagent.retrieval.engine.elasticsearch;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.elasticsearch.ElasticsearchV8RetrieveRepository.HttpResult;
@@ -14,6 +11,9 @@ import java.util.Map;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Elasticsearch v8 引擎的写入/删除/批量更新/拷贝簇：单条 _doc 与 bulk NDJSON（部分失败视为失败）、
@@ -75,7 +75,7 @@ final class ElasticsearchV8WriteOps {
      * 静默丢数据且无日志。部分失败视为批量失败（与 OpenSearch 语义一致）。
      */
     void inspectBulkResponse(String body) throws Exception {
-        com.fasterxml.jackson.databind.JsonNode root;
+        tools.jackson.databind.JsonNode root;
         try {
             root = ElasticsearchV8RetrieveRepository.MAPPER.readTree(body);
         } catch (Exception e) {
@@ -89,24 +89,24 @@ final class ElasticsearchV8WriteOps {
         }
         int total = 0;
         List<String> msgs = new ArrayList<>();
-        for (com.fasterxml.jackson.databind.JsonNode item : root.path("items")) {
-            var it = item.fields();
+        for (tools.jackson.databind.JsonNode item : root.path("items")) {
+            var it = item.properties().iterator();
             if (!it.hasNext()) {
                 continue;
             }
             String opName = it.next().getKey();
-            com.fasterxml.jackson.databind.JsonNode op = item.path(opName);
-            com.fasterxml.jackson.databind.JsonNode err = op.path("error");
+            tools.jackson.databind.JsonNode op = item.path(opName);
+            tools.jackson.databind.JsonNode err = op.path("error");
             if (err.isMissingNode() || err.isNull()) {
                 continue;
             }
             total++;
             log.debug("[Elasticsearch] bulk item err: op={} id={} type={} reason={}",
-                    opName, op.path("_id").asText(""), err.path("type").asText(""),
-                    err.path("reason").asText(""));
+                    opName, op.path("_id").asString(""), err.path("type").asString(""),
+                    err.path("reason").asString(""));
             if (msgs.size() < 5) {
-                msgs.add("[" + opName + " " + op.path("_id").asText("") + "] "
-                        + err.path("type").asText(""));
+                msgs.add("[" + opName + " " + op.path("_id").asString("") + "] "
+                        + err.path("type").asString(""));
             }
         }
         if (total == 0) {

@@ -1,6 +1,5 @@
 package com.ragagent.knowledge.service.faq;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
@@ -33,6 +32,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.JacksonException;
 
 /**
  * FAQ 条目查询面：分页列表、详情、导出（CSV/JSON）与混合检索。
@@ -265,7 +265,7 @@ public class FaqEntryQueryService {
         }
         try {
             return FaqChunkMetadataCodec.JSON.writeValueAsBytes(entries);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException(e);
         }
     }

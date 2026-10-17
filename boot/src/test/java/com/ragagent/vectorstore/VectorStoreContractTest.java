@@ -124,8 +124,8 @@ class VectorStoreContractTest {
                             .contentType("application/json")
                             .content("{\"email\":\"" + email + "\",\"password\":\"Passw0rd!\"}"))
                     .andReturn();
-            return new com.fasterxml.jackson.databind.ObjectMapper()
-                    .readTree(result.getResponse().getContentAsString()).path("data").get("token").asText();
+            return new tools.jackson.databind.ObjectMapper()
+                    .readTree(result.getResponse().getContentAsString()).path("data").get("token").asString();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

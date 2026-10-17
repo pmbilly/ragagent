@@ -1,20 +1,18 @@
 package com.ragagent.platform.stream;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ragagent.platform.web.ContractJsonModule;
-import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 /**
  * 流事件进出 Redis 用的 ObjectMapper（**不是** HTTP 响应那个）。
@@ -35,13 +33,11 @@ public final class StreamJson {
     private static final ObjectMapper MAPPER = build();
 
     private static ObjectMapper build() {
-        ObjectMapper mapper = JsonMapper.builder()
-                .addModule(new JavaTimeModule())
+        ObjectMapper mapper = JsonMapper.builder().disable(tools.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
                 .addModule(new ContractJsonModule())
                 .addModule(offsetDateTimeModule())
                 .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .build();
         return mapper;
     }
@@ -56,7 +52,7 @@ public final class StreamJson {
     public static String write(Object value) {
         try {
             return MAPPER.writeValueAsString(value);
-        } catch (IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new StreamStoreException("failed to marshal event: " + e.getMessage(), e);
         }
     }
@@ -71,7 +67,7 @@ public final class StreamJson {
     public static String writeString(String value) {
         try {
             return MAPPER.writeValueAsString(value);
-        } catch (IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new StreamStoreException("failed to marshal assistant message id: " + e.getMessage(), e);
         }
     }
@@ -80,17 +76,16 @@ public final class StreamJson {
     public static <T> T read(String raw, Class<T> type) {
         try {
             return MAPPER.readValue(raw, type);
-        } catch (IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new StreamStoreException(String.valueOf(e.getMessage()), e);
         }
     }
 
     /** 与 {@code config.JacksonConfig} 同一套 OffsetDateTime 输出规则（本地时区 + RFC3339Nano）。 */
-    private static Module offsetDateTimeModule() {
-        return new SimpleModule().addSerializer(OffsetDateTime.class, new JsonSerializer<OffsetDateTime>() {
+    private static JacksonModule offsetDateTimeModule() {
+        return new SimpleModule().addSerializer(OffsetDateTime.class, new ValueSerializer<OffsetDateTime>() {
             @Override
-            public void serialize(OffsetDateTime value, JsonGenerator gen, SerializerProvider serializers)
-                    throws IOException {
+            public void serialize(OffsetDateTime value, JsonGenerator gen, SerializationContext serializers) {
                 OffsetDateTime local = value.atZoneSameInstant(ZoneId.systemDefault()).toOffsetDateTime();
                 gen.writeString(local.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
             }

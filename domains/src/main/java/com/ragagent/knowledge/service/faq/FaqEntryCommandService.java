@@ -1,7 +1,5 @@
 package com.ragagent.knowledge.service.faq;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
@@ -42,6 +40,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * FAQ 条目命令面：创建、更新、相似问追加、批量字段/标签更新与删除，
@@ -53,7 +53,7 @@ public class FaqEntryCommandService {
 
     private static final Logger log = LoggerFactory.getLogger(FaqEntryCommandService.class);
 
-    /** 审计 details 的节点构造走统一策略（此前在循环内每次 {@code JsonMapper.builder().build()}）。 */
+    /** 审计 details 的节点构造走统一策略（JsonMappers.lenient）。 */
     private static final ObjectMapper JSON = JsonMappers.lenient();
 
     private final ChunkRepository chunkRepository;

@@ -1,8 +1,5 @@
 package com.ragagent.initialization.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -26,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * initialization config/initialize 端点用例：KB 初始化配置读写、初始化装配与请求绑定。
@@ -148,8 +148,8 @@ public final class InitializationConfigService {
         boolean vlmEnabled = false;
         String vlmModelId = "";
         JsonNode vlmReq = req.vlmConfig();
-        if (vlmReq != null && req.multimodalEnabled() && !vlmReq.path("modelId").asText("").isEmpty()) {
-            String candidate = vlmReq.path("modelId").asText("");
+        if (vlmReq != null && req.multimodalEnabled() && !vlmReq.path("modelId").asString("").isEmpty()) {
+            String candidate = vlmReq.path("modelId").asString("");
             try {
                 if (modelCatalog.findModel(candidate) != null) {
                     vlmEnabled = vlmReq.path("enabled").asBoolean(false);
@@ -167,12 +167,12 @@ public final class InitializationConfigService {
         String asrLanguage = "";
         JsonNode asrReq = req.asrConfig();
         if (asrReq != null && asrReq.path("enabled").asBoolean(false)
-                && !asrReq.path("modelId").asText("").isEmpty()) {
+                && !asrReq.path("modelId").asString("").isEmpty()) {
             try {
-                if (modelCatalog.findModel(asrReq.path("modelId").asText()) != null) {
+                if (modelCatalog.findModel(asrReq.path("modelId").asString()) != null) {
                     asrEnabled = true;
-                    asrModelId = asrReq.path("modelId").asText();
-                    asrLanguage = asrReq.path("language").asText("");
+                    asrModelId = asrReq.path("modelId").asString();
+                    asrLanguage = asrReq.path("language").asString("");
                 }
             } catch (Exception ignored) {
                 // 查询失败 → 忽略，ASR 保持未启用
@@ -208,8 +208,8 @@ public final class InitializationConfigService {
         String vlmDescLang = null;
         String vlmCustomInstr = null;
         if (vlmReq != null) {
-            vlmDescLang = vlmReq.path("descriptionLanguage").asText("").trim();
-            vlmCustomInstr = vlmReq.path("customInstructions").asText("").trim();
+            vlmDescLang = vlmReq.path("descriptionLanguage").asString("").trim();
+            vlmCustomInstr = vlmReq.path("customInstructions").asString("").trim();
         }
         kb.setVlmConfig(new VlmConfigView(vlmEnabled, vlmModelId, vlmDescLang, vlmCustomInstr,
                 "", "", ""));
@@ -273,10 +273,8 @@ public final class InitializationConfigService {
             return null;
         }
         Map<String, String> out = new TreeMap<>();
-        var fields = n.fields();
-        while (fields.hasNext()) {
-            var e = fields.next();
-            out.put(e.getKey(), e.getValue().isNull() ? null : e.getValue().asText(""));
+        for (var e : n.properties()) {
+            out.put(e.getKey(), e.getValue().isNull() ? null : e.getValue().asString(""));
         }
         return out;
     }
@@ -320,7 +318,7 @@ public final class InitializationConfigService {
         urls.add(new String[] {"Embedding BaseURL", req.embBaseUrl()});
         urls.add(new String[] {"Rerank BaseURL", req.rerankBaseUrl()});
         if (req.multimodal() != null && req.multimodal().get("vlm") != null) {
-            urls.add(new String[] {"VLM BaseURL", req.multimodal().path("vlm").path("baseUrl").asText("")});
+            urls.add(new String[] {"VLM BaseURL", req.multimodal().path("vlm").path("baseUrl").asString("")});
         }
         for (String[] u : urls) {
             if (!u[1].isEmpty()) {
@@ -337,9 +335,9 @@ public final class InitializationConfigService {
             if (vlm == null) {
                 throw new BizException(AppError.badRequest("启用多模态时需要配置VLM信息"));
             }
-            String modelName = vlm.path("modelName").asText("");
-            String baseUrl = vlm.path("baseUrl").asText("");
-            if ("ollama".equals(vlm.path("interfaceType").asText(""))) {
+            String modelName = vlm.path("modelName").asString("");
+            String baseUrl = vlm.path("baseUrl").asString("");
+            if ("ollama".equals(vlm.path("interfaceType").asString(""))) {
                 String ollama = AppEnvLookup.get("OLLAMA_BASE_URL");
                 baseUrl = (ollama == null ? "" : ollama) + "/v1";
             }
@@ -381,9 +379,9 @@ public final class InitializationConfigService {
         }
         if (req.multimodalEnabled() && req.multimodal() != null && req.multimodal().get("vlm") != null) {
             JsonNode vlm = req.multimodal().get("vlm");
-            list.add(new ModelDescriptor("VLLM", vlm.path("modelName").asText(""), "remote",
-                    "VLM Model", vlm.path("baseUrl").asText(""), vlm.path("apiKey").asText(""),
-                    0, vlm.path("interfaceType").asText("")));
+            list.add(new ModelDescriptor("VLLM", vlm.path("modelName").asString(""), "remote",
+                    "VLM Model", vlm.path("baseUrl").asString(""), vlm.path("apiKey").asString(""),
+                    0, vlm.path("interfaceType").asString("")));
         }
         return list;
     }
@@ -450,7 +448,7 @@ public final class InitializationConfigService {
         if (req.multimodalEnabled()) {
             kb.setVlmConfig(new VlmConfigView(true, vlmId, null, null, "", "", ""));
             String storageType = req.multimodal() == null ? ""
-                    : req.multimodal().path("storageType").asText("");
+                    : req.multimodal().path("storageType").asString("");
             // cos/minio 凭据落库段依赖部署环境（dev 无），只在段存在时触达
             if (("cos".equals(storageType) || "minio".equals(storageType))
                     && req.multimodal().get(storageType) != null) {
@@ -469,7 +467,7 @@ public final class InitializationConfigService {
             for (Object n : req.nodeExtractNodes()) {
                 JsonNode node = MAPPER.valueToTree(n);
                 ObjectNode copy = nodes.addObject();
-                copy.put("name", node.path("name").asText(""));
+                copy.put("name", node.path("name").asString(""));
                 copy.set("attributes", node.get("attributes") == null
                         ? MAPPER.createArrayNode() : node.get("attributes").deepCopy());
             }
@@ -477,9 +475,9 @@ public final class InitializationConfigService {
             for (Object r : req.nodeExtractRelations()) {
                 JsonNode rel = MAPPER.valueToTree(r);
                 ObjectNode copy = relations.addObject();
-                copy.put("node1", rel.path("node1").asText(""));
-                copy.put("node2", rel.path("node2").asText(""));
-                copy.put("type", rel.path("type").asText(""));
+                copy.put("node1", rel.path("node1").asString(""));
+                copy.put("node2", rel.path("node2").asString(""));
+                copy.put("type", rel.path("type").asString(""));
             }
             kb.setExtractConfig(extract);
         }
@@ -624,11 +622,11 @@ public final class InitializationConfigService {
         if (extract != null) {
             Map<String, Object> ne = new TreeMap<>();
             ne.put("enabled", extract.path("enabled").asBoolean(false));
-            ne.put("text", extract.path("text").asText(""));
+            ne.put("text", extract.path("text").asString(""));
             ne.put("tags", extract.get("tags"));
             ne.put("nodes", extract.get("nodes"));
             ne.put("relations", extract.get("relations"));
-            String ci = extract.path("customInstructions").asText("");
+            String ci = extract.path("customInstructions").asString("");
             if (!ci.isEmpty()) {
                 ne.put("customInstructions", ci);
             }
@@ -642,7 +640,7 @@ public final class InitializationConfigService {
             config.put("questionGeneration", sortedBlock(Map.of(
                     "enabled", qg.path("enabled").asBoolean(false),
                     "questionCount", qg.path("questionCount").asInt(0),
-                    "customInstructions", qg.path("customInstructions").asText(""))));
+                    "customInstructions", qg.path("customInstructions").asString(""))));
         } else {
             config.put("questionGeneration", sortedBlock(Map.of("enabled", false)));
         }

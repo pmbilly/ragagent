@@ -1,7 +1,5 @@
 package com.ragagent.retrieval.engine;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.vectorstore.ConnectionConfig;
 import com.ragagent.contract.vectorstore.VectorStoreConnectivity;
@@ -24,6 +22,8 @@ import java.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 向量店连通性探测（契约化搬迁）：引擎覆盖与文案逐字沿用原
@@ -114,7 +114,7 @@ public class VectorStoreConnectivityProbe implements VectorStoreConnectivity {
         try {
             JsonNode root = MAPPER.readTree(resp.body());
             JsonNode number = root.path("version").path("number");
-            return number.isMissingNode() ? "" : number.asText("");
+            return number.isMissingNode() ? "" : number.asString("");
         } catch (Exception e) {
             return ""; // connected but version unparseable
         }
@@ -213,7 +213,7 @@ public class VectorStoreConnectivityProbe implements VectorStoreConnectivity {
             HttpResponse<String> resp = client.send(meta, HttpResponse.BodyHandlers.ofString());
             if (resp.statusCode() == 200) {
                 JsonNode version = MAPPER.readTree(resp.body()).path("version");
-                return version.isMissingNode() ? "" : version.asText("");
+                return version.isMissingNode() ? "" : version.asString("");
             }
         } catch (Exception e) {
             return ""; // connected but version unknown

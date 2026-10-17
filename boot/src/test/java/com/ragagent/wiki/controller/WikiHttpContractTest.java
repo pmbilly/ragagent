@@ -61,7 +61,7 @@ class WikiHttpContractTest {
     /** 统一外壳下钻：返回 data 的紧凑 JSON（序保持 ✓）；非外壳原样返回。 */
     private static String payload(String body) {
         try {
-            var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(body);
+            var root = new tools.jackson.databind.ObjectMapper().readTree(body);
             if (root.isObject() && root.has("code") && root.has("data")) {
                 return root.get("data").toString();
             }

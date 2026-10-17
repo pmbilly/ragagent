@@ -1,20 +1,16 @@
 package com.ragagent.datasource.connector.rss;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.cfg.CoercionAction;
-import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
-import com.fasterxml.jackson.databind.type.LogicalType;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.ContractJsonModule;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * RSS 连接器的私有配置（解析 + feed 地址/请求头的存储形状）。
@@ -39,16 +35,22 @@ final class RssConfig {
     private static final ObjectMapper MAPPER = buildMapper();
 
     private static ObjectMapper buildMapper() {
-        // 键名＝Java 字段名（feedUrls / authHeaders）——**不设命名策略**：
-        // 第 4 条禁 @JsonNaming/命名策略，且键名与字段名一致才不会被静默丢弃。
-        ObjectMapper mapper = JsonMappers.lenient()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        // 数字塞进 string 字段要报错，不能静默强转成 "12"。
-        mapper.coercionConfigFor(LogicalType.Textual)
-                .setCoercion(CoercionInputShape.Integer, CoercionAction.Fail)
-                .setCoercion(CoercionInputShape.Float, CoercionAction.Fail)
-                .setCoercion(CoercionInputShape.Boolean, CoercionAction.Fail);
-        return mapper;
+        // 键名＝Java 字段名（feedUrls / authHeaders）——不设命名策略。
+        // 数字/布尔不得静默强转成字符串（Jackson 3 用 withCoercionConfig 表达）。
+        return tools.jackson.databind.json.JsonMapper.builder()
+                .disable(tools.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+                .disable(tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .disable(tools.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+                .disable(tools.jackson.databind.cfg.DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .addModule(new ContractJsonModule())
+                .withCoercionConfig(tools.jackson.databind.type.LogicalType.Textual, c -> c
+                        .setCoercion(tools.jackson.databind.cfg.CoercionInputShape.Integer,
+                                tools.jackson.databind.cfg.CoercionAction.Fail)
+                        .setCoercion(tools.jackson.databind.cfg.CoercionInputShape.Float,
+                                tools.jackson.databind.cfg.CoercionAction.Fail)
+                        .setCoercion(tools.jackson.databind.cfg.CoercionInputShape.Boolean,
+                                tools.jackson.databind.cfg.CoercionAction.Fail))
+                .build();
     }
 
     /** {@code feedUrls}：换行或逗号分隔的 feed 地址列表。 */

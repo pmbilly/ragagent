@@ -1,7 +1,6 @@
 package com.ragagent.auth.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
@@ -18,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
+import tools.jackson.databind.JsonNode;
 
 /**
  * POST /tenants 创建租户协作者（自 {@link TenantCatalogController} 拆出）：自助/超管双路径、配额预检与
@@ -201,7 +201,7 @@ final class TenantCreateOps {
         }
         if (node.isObject()) {
             TreeMap<String, Object> out = new TreeMap<>();
-            node.fields().forEachRemaining(e -> out.put(e.getKey(), deepSortKeys(e.getValue())));
+            node.properties().forEach(e -> out.put(e.getKey(), deepSortKeys(e.getValue())));
             return out;
         }
         if (node.isArray()) {

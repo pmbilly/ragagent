@@ -6,10 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.model.PromptCacheStatus;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.model.chat.CacheRetention;
@@ -20,6 +16,10 @@ import com.ragagent.llm.provider.ProviderName;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * {@code PromptCache} 的契约测试（键截断 / 请求体改写 / 头注入 / 指纹与缓存账目）。
@@ -73,7 +73,7 @@ class PromptCacheTest {
         boolean rewritten = PromptCache.applyPromptCacheToJSONBody(body, policy, "sess-abc", CacheRetention.SHORT);
 
         assertTrue(rewritten, "forceRaw 必须为真（Go 里 rewritten ⟺ forceRaw）");
-        assertEquals("sess-abc", body.get("prompt_cache_key").asText());
+        assertEquals("sess-abc", body.get("prompt_cache_key").asString());
         assertFalse(body.has("prompt_cache_retention"));
     }
 
@@ -84,7 +84,7 @@ class PromptCacheTest {
         boolean rewritten = PromptCache.applyPromptCacheToJSONBody(body, policy, "sess-abc", CacheRetention.LONG);
 
         assertTrue(rewritten);
-        assertEquals("24h", body.get("prompt_cache_retention").asText());
+        assertEquals("24h", body.get("prompt_cache_retention").asString());
     }
 
     @Test
@@ -95,7 +95,7 @@ class PromptCacheTest {
 
         assertFalse(rewritten);
         // body 一字未动
-        assertEquals("gpt-4o", body.get("model").asText());
+        assertEquals("gpt-4o", body.get("model").asString());
         assertEquals(1, body.size());
         assertFalse(body.has("prompt_cache_key"));
     }
@@ -119,15 +119,15 @@ class PromptCacheTest {
 
         JsonNode sys = body.get("messages").get(0);
         JsonNode sysParts = sys.get("content");
-        assertEquals("ephemeral", sysParts.get(0).get("cache_control").get("type").asText());
-        assertEquals("stable system", sysParts.get(0).get("text").asText());
+        assertEquals("ephemeral", sysParts.get(0).get("cache_control").get("type").asString());
+        assertEquals("stable system", sysParts.get(0).get("text").asString());
 
         JsonNode user = body.get("messages").get(1);
         JsonNode userParts = user.get("content");
-        assertEquals("ephemeral", userParts.get(0).get("cache_control").get("type").asText());
+        assertEquals("ephemeral", userParts.get(0).get("cache_control").get("type").asString());
 
         JsonNode lastTool = body.get("tools").get(body.get("tools").size() - 1);
-        assertEquals("ephemeral", lastTool.get("cache_control").get("type").asText());
+        assertEquals("ephemeral", lastTool.get("cache_control").get("type").asString());
     }
 
     /** LONG 保留期时，cache_control 带上 1h TTL。 */
@@ -139,8 +139,8 @@ class PromptCacheTest {
         PromptCache.applyPromptCacheToJSONBody(body, policy, "", CacheRetention.LONG);
 
         JsonNode part = body.get("messages").get(0).get("content").get(0);
-        assertEquals("ephemeral", part.get("cache_control").get("type").asText());
-        assertEquals("1h", part.get("cache_control").get("ttl").asText());
+        assertEquals("ephemeral", part.get("cache_control").get("type").asString());
+        assertEquals("1h", part.get("cache_control").get("ttl").asString());
     }
 
     /** 数组形态的 content：断点落在最后一个 text/tool_result part 上（不是第一个）。 */
@@ -159,7 +159,7 @@ class PromptCacheTest {
         assertFalse(body.get("messages").get(0).get("content").get(0).has("cache_control"));
         assertFalse(body.get("messages").get(0).get("content").get(1).has("cache_control"));
         assertEquals("ephemeral",
-                body.get("messages").get(0).get("content").get(2).get("cache_control").get("type").asText());
+                body.get("messages").get(0).get("content").get(2).get("cache_control").get("type").asString());
     }
 
     @Test
@@ -215,7 +215,7 @@ class PromptCacheTest {
         ObjectNode body = body("gpt-4o");
         PromptCache.Policy policy = PromptCache.promptCachePolicyFor(ProviderName.OPENAI, "");
         assertTrue(PromptCache.applyPromptCacheToJSONBody(body, policy, sessionId, PromptCache.resolveCacheRetention(opts)));
-        assertEquals("sess-live", body.get("prompt_cache_key").asText());
+        assertEquals("sess-live", body.get("prompt_cache_key").asString());
     }
 
     /** opts.promptCacheKey 优先于上下文 session ID，且两者都过 64 截断。 */

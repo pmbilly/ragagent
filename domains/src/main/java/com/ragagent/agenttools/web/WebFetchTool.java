@@ -1,7 +1,5 @@
 package com.ragagent.agenttools.web;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolOutput;
@@ -21,6 +19,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * web_fetch 工具。
@@ -212,12 +212,12 @@ public class WebFetchTool extends BaseTool {
             return new ParsedItems(List.of(), null);
         }
         // Some models double-encode the items array as a JSON string; unwrap and retry.
-        if (itemsNode.isTextual()) {
+        if (itemsNode.isString()) {
             try {
                 JsonNode reparsed;
                 try {
-                    reparsed = MAPPER.readTree(itemsNode.asText());
-                } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+                    reparsed = MAPPER.readTree(itemsNode.asString());
+                } catch (tools.jackson.core.JacksonException e) {
                     reparsed = null;
                 }
                 if (reparsed.isArray() && !reparsed.isEmpty()) {
@@ -246,7 +246,7 @@ public class WebFetchTool extends BaseTool {
         JsonNode url = element.path("url");
         JsonNode offset = element.path("offset");
         JsonNode limit = element.path("limit");
-        if (!url.isTextual()) {
+        if (!url.isString()) {
             return null;
         }
         if (!(offset.isMissingNode() || offset.isNull() || offset.isIntegralNumber())) {
@@ -255,7 +255,7 @@ public class WebFetchTool extends BaseTool {
         if (!(limit.isMissingNode() || limit.isNull() || limit.isIntegralNumber())) {
             return null;
         }
-        return new WebFetchItem(url.asText(), offset.asInt(0), limit.asInt(0));
+        return new WebFetchItem(url.asString(), offset.asInt(0), limit.asInt(0));
     }
 
     /** items 参数的类型错误文案（LLM 可见）。 */

@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.im.channel.wechat.WechatQRCodeService;
 import com.ragagent.im.channel.wechat.WechatQRCodeService.LoginResult;
 import com.ragagent.im.channel.wechat.WechatQRCodeService.QRCodeResult;
@@ -13,6 +12,7 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 微信扫码两个端点的响应面：成功体是裸对象（键名即字段名，camelCase）；

@@ -1,6 +1,5 @@
 package com.ragagent.agenttools.wiki;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
@@ -8,6 +7,7 @@ import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
+import tools.jackson.databind.JsonNode;
 
 /**
  * wiki_rename_page 工具。
@@ -51,14 +51,14 @@ public class WikiRenamePageTool extends BaseTool {
         if (kbIds == null || kbIds.isEmpty()) {
             return failure("No knowledge bases available for editing");
         }
-        if (args.path("newSlug").asText("").isEmpty()) {
+        if (args.path("newSlug").asString("").isEmpty()) {
             return failure("new_slug is required");
         }
         String slug;
         String newSlug;
         try {
-            slug = WikiSlugs.normalizeAndValidateWikiSlug(args.path("slug").asText(""));
-            newSlug = WikiSlugs.normalizeAndValidateWikiSlug(args.path("newSlug").asText(""));
+            slug = WikiSlugs.normalizeAndValidateWikiSlug(args.path("slug").asString(""));
+            newSlug = WikiSlugs.normalizeAndValidateWikiSlug(args.path("newSlug").asString(""));
         } catch (IllegalArgumentException e) {
             return failure(e.getMessage());
         }

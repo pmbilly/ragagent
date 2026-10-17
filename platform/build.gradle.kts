@@ -29,10 +29,8 @@ dependencies {
     api(project(":contract"))
     // 依 common/event 的实际 import 面声明（实测：jackson / spring / mybatis-plus / slf4j /
     // jakarta 六类，无云 SDK、无 jjwt、无 jdbc 驱动）—— 不用 starter 以免把自动配置漏进库。
-    api("com.fasterxml.jackson.core:jackson-databind")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    // Boot 4 过渡期：GlobalExceptionHandler 需要识别 tools.jackson 的 MismatchedInputException
-    compileOnly("tools.jackson.core:jackson-databind")
+    api("tools.jackson.core:jackson-databind")
+    // MyBatis-Plus 3.5.17 的 JacksonTypeHandler 仍只接受 Jackson 2 ObjectMapper
     api("org.springframework:spring-context")
     api("org.springframework:spring-web")
     api("org.springframework:spring-webmvc")

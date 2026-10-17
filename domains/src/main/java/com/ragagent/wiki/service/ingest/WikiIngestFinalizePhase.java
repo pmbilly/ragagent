@@ -1,8 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
@@ -17,6 +15,8 @@ import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * wiki 批次摄取的 Finalize 阶段协作者:终稿落库与批次收尾(从 RunSupport 分解)。

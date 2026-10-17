@@ -2,8 +2,6 @@ package com.ragagent.platform.text;
 
 import static com.ragagent.fixtures.JsonRoundTrip.assertRoundTrips;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
@@ -124,6 +122,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * 契约实体的 JSON 往返体检——覆盖所有**会落 jsonb 或直接作响应体**的类型。
@@ -137,8 +137,9 @@ import org.junit.jupiter.api.Test;
 class JsonContractRoundTripTest {
 
     // 裸 mapper + 契约 Json 模块：等价于搬迁前的"注解直接在类上"（§8.1 去框架化后注解在 mixin 里）
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .registerModule(new com.ragagent.platform.web.ContractJsonModule());
+    private static final ObjectMapper MAPPER = tools.jackson.databind.json.JsonMapper.builder().disable(tools.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .addModule(new com.ragagent.platform.web.ContractJsonModule())
+            .build();
 
     // ── MCP（auth_config / headers 等 jsonb 列 + 直接作响应体） ──────────────
 

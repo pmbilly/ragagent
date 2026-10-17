@@ -1,11 +1,11 @@
 package com.ragagent.modelcontext;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.DoubleNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.platform.web.ContractJsonModule;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.DoubleNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * modelcontext 包内的 JSON 语义小工具：解析容错与 double 归一。
@@ -13,10 +13,11 @@ import com.ragagent.platform.web.ContractJsonModule;
  */
 final class ModelJsonValues {
 
-    static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_TRAILING_TOKENS, true)
+    static final ObjectMapper MAPPER = tools.jackson.databind.json.JsonMapper.builder().disable(tools.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .enable(tools.jackson.databind.DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
             // 上下文预算读写的载荷含契约类（TokenUsage 等）：线格式在 mixin 模块里
-            .registerModule(new ContractJsonModule());
+            .addModule(new ContractJsonModule())
+            .build();
 
     private ModelJsonValues() {
     }
@@ -42,9 +43,7 @@ final class ModelJsonValues {
         if (node.isObject()) {
             ObjectNode obj = (ObjectNode) node;
             ObjectNode out = MAPPER.createObjectNode();
-            var fields = obj.fields();
-            while (fields.hasNext()) {
-                var e = fields.next();
+            for (var e : obj.properties()) {
                 out.set(e.getKey(), numbersAsDouble(e.getValue()));
             }
             return out;
@@ -81,9 +80,7 @@ final class ModelJsonValues {
             if (a.size() != b.size()) {
                 return false;
             }
-            var fields = a.fields();
-            while (fields.hasNext()) {
-                var e = fields.next();
+            for (var e : a.properties()) {
                 JsonNode bv = b.get(e.getKey());
                 if (bv == null || !deepEquals(e.getValue(), bv)) {
                     return false;
@@ -105,8 +102,8 @@ final class ModelJsonValues {
         if (a.isNumber() && b.isNumber()) {
             return a.doubleValue() == b.doubleValue();
         }
-        if (a.isTextual() && b.isTextual()) {
-            return a.asText().equals(b.asText());
+        if (a.isString() && b.isString()) {
+            return a.asString().equals(b.asString());
         }
         return a.equals(b);
     }

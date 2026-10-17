@@ -3,9 +3,6 @@ package com.ragagent.knowledge.service.management;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
@@ -54,6 +51,9 @@ import java.util.TreeSet;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * （覆盖 file/url/manual 创建、分页列表、get/update/delete、folders；
@@ -458,7 +458,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
                 k.setTitle(req.title());
             }
             if (req.description() != null) {
-                k.setDescription(req.description().isNull() ? "" : req.description().asText());
+                k.setDescription(req.description().isNull() ? "" : req.description().asString());
                 // description 显式更新联动 summary_status
                 k.setSummaryStatus(k.getDescription().isEmpty() ? "none" : "completed");
             }

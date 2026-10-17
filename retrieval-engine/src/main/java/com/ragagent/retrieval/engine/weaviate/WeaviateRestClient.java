@@ -1,9 +1,5 @@
 package com.ragagent.retrieval.engine.weaviate;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
@@ -13,6 +9,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Weaviate REST 传输层——统一自持 REST（端点与报文形状逐条对照
@@ -115,7 +115,7 @@ public final class WeaviateRestClient {
                 builder.method(method, HttpRequest.BodyPublishers.ofString(
                         Json.mapper().writeValueAsString(body), StandardCharsets.UTF_8));
             }
-        } catch (IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new IllegalStateException("marshal weaviate request body: " + e.getMessage(), e);
         }
         HttpResponse<byte[]> resp;
@@ -139,7 +139,7 @@ public final class WeaviateRestClient {
         }
         try {
             return Json.mapper().readTree(raw);
-        } catch (IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new IllegalStateException("decode weaviate response for " + path + ": "
                     + e.getMessage() + " (raw=" + raw + ")", e);
         }
@@ -241,6 +241,6 @@ public final class WeaviateRestClient {
         if (meta == null) {
             return "";
         }
-        return meta.path("version").asText("");
+        return meta.path("version").asString("");
     }
 }

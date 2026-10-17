@@ -1,6 +1,5 @@
 package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.model.ChatStream;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ResponseType;
@@ -37,6 +36,7 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Anthropic Messages API 客户端。
@@ -152,7 +152,7 @@ public class AnthropicChat implements LlmChatClient {
         AnthropicResponse chatResp;
         try {
             chatResp = MAPPER.readValue(body, AnthropicResponse.class);
-        } catch (IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new IllegalStateException("decode response: " + e.getMessage(), e);
         }
         if (status < 200 || status >= 300) {
@@ -709,7 +709,7 @@ public class AnthropicChat implements LlmChatClient {
     static byte[] serialize(AnthropicRequest request) {
         try {
             return MAPPER.writeValueAsBytes(request);
-        } catch (IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new IllegalStateException("marshal request: " + e.getMessage(), e);
         }
     }
@@ -718,7 +718,7 @@ public class AnthropicChat implements LlmChatClient {
         try {
             AnthropicStreamEvent parsed = MAPPER.readValue(event.data(), AnthropicStreamEvent.class);
             return parsed == null ? new AnthropicStreamEvent() : parsed;
-        } catch (IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new IllegalStateException("decode SSE response: " + e.getMessage(), e);
         }
     }

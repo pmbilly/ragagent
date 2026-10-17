@@ -1,6 +1,5 @@
 package com.ragagent.session.service.rag.plugin;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.contract.pipeline.PipelinePorts;
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import tools.jackson.databind.JsonNode;
 
 /**
  * CHUNK_MERGE 阶段插件。

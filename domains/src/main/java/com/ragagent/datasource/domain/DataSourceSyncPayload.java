@@ -2,10 +2,9 @@ package com.ragagent.datasource.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.access.TracingContext;
 import com.ragagent.platform.web.JsonMappers;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 一次数据源同步任务的载荷。
@@ -69,8 +68,7 @@ public record DataSourceSyncPayload(
         @JsonInclude(value = JsonInclude.Include.CUSTOM,
                 valueFilter = TracingContext.EmptyOmitFilter.class) TracingContext tracing) {
 
-    private static final ObjectMapper MAPPER = JsonMappers.lenient()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 紧凑构造器：字符串归一成空串，让 NON_EMPTY 对 null 与 "" 表现一致。 */
     public DataSourceSyncPayload {

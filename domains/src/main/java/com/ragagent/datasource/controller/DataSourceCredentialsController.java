@@ -1,8 +1,5 @@
 package com.ragagent.datasource.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
@@ -27,6 +24,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 数据源的凭据子资源（{@code PUT /datasource/:id/credentials} 与
@@ -52,8 +51,7 @@ public class DataSourceCredentialsController {
 
     private static final Logger log = LoggerFactory.getLogger(DataSourceCredentialsController.class);
 
-    private static final ObjectMapper MAPPER = JsonMappers.lenient()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
 
     private final DataSourceService service;
@@ -177,7 +175,7 @@ public class DataSourceCredentialsController {
         }
         try {
             return MAPPER.readValue(rawBody, PutRequest.class);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new BizException(AppError.badRequest(e.getMessage()));
         }
     }

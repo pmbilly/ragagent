@@ -1,7 +1,5 @@
 package com.ragagent.wiki.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
@@ -18,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * WikiPageController 的静态解析与绑定助手：查询参数清洗、宽松整数解析、
@@ -266,8 +266,8 @@ final class WikiRequestSupport {
         if (v == null || v.isNull() || v.isMissingNode()) {
             return true;
         }
-        if (v.isTextual()) {
-            return v.asText().isEmpty();
+        if (v.isString()) {
+            return v.asString().isEmpty();
         }
         if (v.isNumber()) {
             return v.asDouble() == 0d;

@@ -1,6 +1,5 @@
 package com.ragagent.wiki.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.audit.WikiActivityAudit;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Wiki 页面的 HTTP 层。

@@ -1,9 +1,6 @@
 package com.ragagent.auth.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.contract.error.AppError;
@@ -27,6 +24,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * 租户 service。
@@ -276,8 +276,8 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
                 continue;
             }
             JsonNode bucket = node.get("bucketName");
-            if (bucket != null && bucket.isTextual() && !bucket.asText().isEmpty()) {
-                out.put(provider, bucket.asText());
+            if (bucket != null && bucket.isString() && !bucket.asString().isEmpty()) {
+                out.put(provider, bucket.asString());
             }
         }
         return out;
@@ -419,7 +419,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
 
     private static String textOrEmpty(JsonNode cfg, String key) {
         JsonNode v = cfg == null ? null : cfg.get(key);
-        return v != null && v.isTextual() ? v.asText("") : "";
+        return v != null && v.isString() ? v.asString("") : "";
     }
 
     /** 实体 → 视图（逐字段搬运；null 透传）。 */

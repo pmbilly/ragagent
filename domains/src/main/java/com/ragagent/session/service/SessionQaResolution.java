@@ -1,8 +1,5 @@
 package com.ragagent.session.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
@@ -12,6 +9,9 @@ import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.service.rag.ChatManage;
 import java.io.InputStream;
 import java.util.List;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * 知识库/模型/租户解析协作者:mention 与 tag 范围收敛到 agent 授权面、chat 模型选择、
@@ -127,7 +127,7 @@ final class SessionQaResolution {
      * 写错会让 agent-chat 被误判进 RAG 快答分支。</p>
      */
     static boolean isAgentMode(JsonNode c) {
-        return "smart-reasoning".equals(c.path("agentMode").asText(""));
+        return "smart-reasoning".equals(c.path("agentMode").asString(""));
     }
 
     static String templateContentByIdAndFile(String id, String file) {
@@ -142,8 +142,8 @@ final class SessionQaResolution {
                 return null;
             }
             for (JsonNode t : list) {
-                if (id.equals(t.path("id").asText(""))) {
-                    return t.path("content").asText("");
+                if (id.equals(t.path("id").asString(""))) {
+                    return t.path("content").asString("");
                 }
             }
             return null;

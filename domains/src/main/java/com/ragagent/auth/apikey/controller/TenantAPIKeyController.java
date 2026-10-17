@@ -1,6 +1,5 @@
 package com.ragagent.auth.apikey.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
 import com.ragagent.auth.apikey.domain.TenantAPIKeyRequest;
@@ -34,6 +33,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 租户 API Key 管理端点（列表 / 创建 / 更新 / 删除）。

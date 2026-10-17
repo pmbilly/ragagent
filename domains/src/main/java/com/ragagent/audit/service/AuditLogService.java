@@ -1,8 +1,6 @@
 package com.ragagent.audit.service;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.domain.AuditLogQuery;
 import com.ragagent.audit.mapper.AuditLogRepository;
@@ -17,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * 审计日志服务。

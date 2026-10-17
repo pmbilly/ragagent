@@ -1,9 +1,5 @@
 package com.ragagent.modelcontext;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.platform.web.ToolJson;
 import java.util.ArrayList;
@@ -12,6 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 
 /**
  * 内建工具字段句柄策略的完整 allowlist。字段名本身刻意不够：动态 MCP 工具可能用同名而语义无关，必须保持不透明。
@@ -310,8 +310,8 @@ final class ToolPolicy {
     }
 
     private static JsonNode walkJSONValue(String key, JsonNode value, java.util.function.BinaryOperator<String> rewrite) {
-        if (value.isTextual()) {
-            return TextNode.valueOf(rewrite.apply(key, value.asText()));
+        if (value.isString()) {
+            return StringNode.valueOf(rewrite.apply(key, value.asString()));
         }
         if (value.isArray()) {
             ArrayNode array = (ArrayNode) value;
@@ -321,7 +321,7 @@ final class ToolPolicy {
         } else if (value.isObject()) {
             ObjectNode obj = (ObjectNode) value;
             List<Map.Entry<String, JsonNode>> entries = new ArrayList<>();
-            obj.fields().forEachRemaining(entries::add);
+            obj.properties().forEach(entries::add);
             for (Map.Entry<String, JsonNode> e : entries) {
                 obj.set(e.getKey(), walkJSONValue(e.getKey(), e.getValue(), rewrite));
             }
@@ -352,10 +352,10 @@ final class ToolPolicy {
             String rewritten = RawJson.rewriteRawObject(call.getFunction().getArguments(), "items", rawValue -> {
                 // rawValue 是 JSON 字符串字面量；解码出内层字符串
                 JsonNode inner = ModelJsonValues.parse(rawValue);
-                if (inner == null || !inner.isTextual()) {
+                if (inner == null || !inner.isString()) {
                     return null;
                 }
-                String wrapped = inner.asText();
+                String wrapped = inner.asString();
                 JsonNode items = ModelJsonValues.parse(wrapped);
                 if (items == null || !items.isArray() || items.isEmpty()) {
                     return null;
@@ -381,10 +381,10 @@ final class ToolPolicy {
             }
             String rewritten = RawJson.rewriteRawObject(call.getFunction().getArguments(), "arguments", rawValue -> {
                 JsonNode inner = ModelJsonValues.parse(rawValue);
-                if (inner == null || !inner.isTextual()) {
+                if (inner == null || !inner.isString()) {
                     return null;
                 }
-                String wrapped = inner.asText();
+                String wrapped = inner.asString();
                 JsonNode object = ModelJsonValues.parse(wrapped);
                 if (object == null || !object.isObject() || object.isEmpty()) {
                     return null;
@@ -443,7 +443,7 @@ final class ToolPolicy {
                     sb.append(',');
                 }
                 first = false;
-                sb.append(ToolJson.write(TextNode.valueOf(key)));
+                sb.append(ToolJson.write(StringNode.valueOf(key)));
                 sb.append(':');
                 sb.append(key.equals(childKey) ? replacement : object.get(key));
             }
@@ -463,7 +463,7 @@ final class ToolPolicy {
                     sb.append(',');
                 }
                 first = false;
-                sb.append(ToolJson.write(TextNode.valueOf(key)));
+                sb.append(ToolJson.write(StringNode.valueOf(key)));
                 sb.append(':');
                 sb.append(object.get(key));
             }
@@ -502,10 +502,10 @@ final class ToolPolicy {
                 }
                 String keyLiteral = raw.substring(keyStart, pos[0]);
                 JsonNode keyNode = ModelJsonValues.parse(keyLiteral);
-                if (keyNode == null || !keyNode.isTextual()) {
+                if (keyNode == null || !keyNode.isString()) {
                     return null;
                 }
-                String key = keyNode.asText();
+                String key = keyNode.asString();
                 skipWs(raw, pos);
                 if (pos[0] >= raw.length() || raw.charAt(pos[0]) != ':') {
                     return null;

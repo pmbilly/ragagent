@@ -1,6 +1,5 @@
 package com.ragagent.wiki.service.ingest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.domain.TaskDeadLetter;
@@ -10,6 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * wiki 任务的<b>执行与归档公共逻辑</b>（{@link InProcessWikiIngestTaskQueue} 与

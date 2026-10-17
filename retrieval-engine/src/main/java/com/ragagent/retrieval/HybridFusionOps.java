@@ -1,6 +1,5 @@
 package com.ragagent.retrieval;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.KnowledgeBaseSearchFacts;
@@ -20,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
 
 /**
  * HybridSearch 的融合与 FAQ 后处理簇：RRF 融合/按分去重、FAQ 迭代取回（只涨 TopK，
@@ -256,7 +256,7 @@ final class HybridFusionOps {
             JsonNode node = JsonMappers.toJsonNode(chunk.metadata());
             if (node != null && node.has("negativeQuestions") && node.get("negativeQuestions").isArray()) {
                 for (JsonNode n : node.get("negativeQuestions")) {
-                    negatives.add(n.asText(""));
+                    negatives.add(n.asString(""));
                 }
             }
             return negatives;

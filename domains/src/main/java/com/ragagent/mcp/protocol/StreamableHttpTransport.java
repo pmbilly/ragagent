@@ -1,7 +1,5 @@
 package com.ragagent.mcp.protocol;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * HTTP Streamable 传输（MCP 起的默认传输；对照 mcp-go
@@ -152,7 +152,7 @@ public final class StreamableHttpTransport implements McpTransport {
     @Override
     public void sendNotification(String method, Object params, McpContext ctx) {
         ctx.throwIfCancelled();
-        com.fasterxml.jackson.databind.node.ObjectNode node = MAPPER.createObjectNode();
+        tools.jackson.databind.node.ObjectNode node = MAPPER.createObjectNode();
         node.put("jsonrpc", JsonRpcRequest.JSONRPC_VERSION);
         node.put("method", method);
         if (params != null) {

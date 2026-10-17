@@ -1,7 +1,5 @@
 package com.ragagent.wiki.service.ingest;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.text.Whitespace;
@@ -22,6 +20,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 批次目录规划与 embedding 选夹。
@@ -420,7 +420,7 @@ public class WikiIngestTaxonomy {
             }
             JsonNode slugNode = a.get("slug");
             String slug = slugNode == null || slugNode.isNull()
-                    ? "" : Whitespace.trimSpace(slugNode.asText(""));
+                    ? "" : Whitespace.trimSpace(slugNode.asString(""));
             if (slug.isEmpty()) {
                 continue;
             }
@@ -432,7 +432,7 @@ public class WikiIngestTaxonomy {
                         path.add("");
                         continue;
                     }
-                    path.add(seg.isTextual() ? seg.textValue() : seg.asText(""));
+                    path.add(seg.isString() ? seg.textValue() : seg.asString(""));
                 }
             }
             out.put(slug, path);

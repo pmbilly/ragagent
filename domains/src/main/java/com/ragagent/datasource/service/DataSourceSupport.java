@@ -1,6 +1,5 @@
 package com.ragagent.datasource.service;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
@@ -23,6 +22,7 @@ import java.util.Objects;
 import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * 数据源支撑件：配置的校验/解析/深比较、知识库归属校验、身份与"零值时间"等判据、
@@ -115,7 +115,7 @@ final class DataSourceSupport {
         return Objects.equals(configTree(a), configTree(b));
     }
 
-    static com.fasterxml.jackson.databind.JsonNode configTree(DataSourceConfig cfg) {
+    static tools.jackson.databind.JsonNode configTree(DataSourceConfig cfg) {
         ObjectNode node = DataSourceService.MAPPER.createObjectNode();
         node.put("type", cfg.getType());
         node.set("credentials", DataSourceService.MAPPER.valueToTree(cfg.getCredentials()));
@@ -167,12 +167,12 @@ final class DataSourceSupport {
     }
 
     static String readMetadataValue(KnowledgeRowView k, String key) {
-        com.fasterxml.jackson.databind.JsonNode md = JsonMappers.toJsonNode(k.getMetadata());
+        tools.jackson.databind.JsonNode md = JsonMappers.toJsonNode(k.getMetadata());
         if (md == null || !md.isObject()) {
             return null;
         }
-        com.fasterxml.jackson.databind.JsonNode v = md.get(key);
-        return v == null || v.isNull() ? null : v.asText();
+        tools.jackson.databind.JsonNode v = md.get(key);
+        return v == null || v.isNull() ? null : v.asString();
     }
 
     void bestEffortUpdate(DataSource ds) {
@@ -260,7 +260,7 @@ final class DataSourceSupport {
             }
         }
 
-        com.fasterxml.jackson.databind.JsonNode detailsNode =
+        tools.jackson.databind.JsonNode detailsNode =
                 activityDetails.isEmpty() ? null : DataSourceService.MAPPER.valueToTree(activityDetails);
 
         String actorId = nullToEmpty(TenantContext.currentUserId());

@@ -1,7 +1,5 @@
 package com.ragagent.mcp.tool;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.agent.ToolCallTarget;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ToolCall;
@@ -20,6 +18,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * MCP 工具编排（原 {@code com.ragagent.agent.tool.ToolRegistry} 的 MCP 目录方法与状态，逐行搬出）。
@@ -218,7 +218,7 @@ public final class McpTooling implements McpToolingGateway {
                 if (ToolDefinitions.TOOL_CALL_MCP_TOOL.equals(name)) {
                     try {
                         JsonNode args = PLAIN_READER.readTree(call.getFunction().getArguments());
-                        String ref = args.path("toolRef").asText("");
+                        String ref = args.path("toolRef").asString("");
                         if (!ref.isEmpty()) {
                             c.historyRefs.put(ref, Boolean.TRUE);
                         }

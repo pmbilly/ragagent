@@ -1,6 +1,5 @@
 package com.ragagent.storage.fileserve;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.storage.StorageEnvLookup;
 import com.ragagent.contract.storage.fileserve.FileContentService;
 import com.ragagent.contract.storage.fileserve.OpenedFile;
@@ -26,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 运行时存储解析器，三个职责：
@@ -195,10 +195,10 @@ public class StorageFileResolver {
             return "";
         }
         JsonNode dp = sec.get("defaultProvider");
-        if (dp == null || !dp.isTextual()) {
+        if (dp == null || !dp.isString()) {
             return "";
         }
-        return dp.asText().trim().toLowerCase(java.util.Locale.ROOT);
+        return dp.asString().trim().toLowerCase(java.util.Locale.ROOT);
     }
 
     // ── 配置 → FileService 工厂 ─────────────────────────────────────────────
@@ -429,14 +429,14 @@ public class StorageFileResolver {
         }
     }
 
-    private static final com.fasterxml.jackson.databind.ObjectMapper CONFIG_MAPPER =
+    private static final tools.jackson.databind.ObjectMapper CONFIG_MAPPER =
             JsonMappers.lenient();
     private static String textOrNull(JsonNode n) {
-        return n == null || n.isNull() ? null : n.asText();
+        return n == null || n.isNull() ? null : n.asString();
     }
 
     private static String textOr(JsonNode n, String def) {
-        return n == null || n.isNull() ? def : n.asText();
+        return n == null || n.isNull() ? def : n.asString();
     }
 
     /**
@@ -467,7 +467,7 @@ public class StorageFileResolver {
      * <p>测试可注入 crypto：{@code getAESKey()} 读 32 字节 env，单测用子类固定密钥。</p>
      */
     static JsonNode toStorageEngineConfig(StorageBackend b, CryptoService crypto) {
-        var cfg = new com.fasterxml.jackson.databind.node.ObjectNode(
+        var cfg = new tools.jackson.databind.node.ObjectNode(
                 JsonMappers.lenient().getNodeFactory());
         cfg.put("defaultProvider", b.getProvider());
         JsonNode c = b.getConfig();
@@ -504,8 +504,8 @@ public class StorageFileResolver {
      * 「无凭据」（403/匿名），且行校验恰好「两边都空 ⇒ 通过」不报错。护栏见
      * {@code ProviderWiringTest#backendRowCredentialsBindToProviderSection}。</p>
      */
-    private static void renameConfigKeys(com.fasterxml.jackson.databind.JsonNode providerConfig, String provider) {
-        if (!(providerConfig instanceof com.fasterxml.jackson.databind.node.ObjectNode obj)) {
+    private static void renameConfigKeys(tools.jackson.databind.JsonNode providerConfig, String provider) {
+        if (!(providerConfig instanceof tools.jackson.databind.node.ObjectNode obj)) {
             return;
         }
         String p = provider == null ? "" : provider.trim().toLowerCase(java.util.Locale.ROOT);
@@ -520,7 +520,7 @@ public class StorageFileResolver {
     }
 
     /** 改键：目标键已存在时保留现状（行里显式给的引擎面键优先）。 */
-    private static void moveKey(com.fasterxml.jackson.databind.node.ObjectNode obj, String from, String to) {
+    private static void moveKey(tools.jackson.databind.node.ObjectNode obj, String from, String to) {
         var v = obj.remove(from);
         if (v != null && !obj.has(to)) {
             obj.set(to, v);
@@ -528,14 +528,14 @@ public class StorageFileResolver {
     }
 
     /** 解密两族凭据命名（只有带 {@code enc:v1:} 前缀的才是密文，其余原样——照存储层语义）。 */
-    private static void decryptCredentials(com.fasterxml.jackson.databind.JsonNode providerConfig,
+    private static void decryptCredentials(tools.jackson.databind.JsonNode providerConfig,
             CryptoService crypto) {
         for (String field : new String[]{
                 "accessKeyId", "secretAccessKey", "secretId", "secretKey", "accessKey"}) {
-            com.fasterxml.jackson.databind.JsonNode value = providerConfig.get(field);
-            if (value != null && value.isTextual()) {
-                ((com.fasterxml.jackson.databind.node.ObjectNode) providerConfig)
-                        .put(field, crypto.decryptStoredSecret(value.asText()));
+            tools.jackson.databind.JsonNode value = providerConfig.get(field);
+            if (value != null && value.isString()) {
+                ((tools.jackson.databind.node.ObjectNode) providerConfig)
+                        .put(field, crypto.decryptStoredSecret(value.asString()));
             }
         }
     }
@@ -545,7 +545,7 @@ public class StorageFileResolver {
             return "";
         }
         JsonNode v = node.get(field);
-        return v == null || v.isNull() ? "" : v.asText();
+        return v == null || v.isNull() ? "" : v.asString();
     }
 
     /**

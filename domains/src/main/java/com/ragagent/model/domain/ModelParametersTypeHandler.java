@@ -1,7 +1,6 @@
 package com.ragagent.model.domain;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.web.JsonMappers;
@@ -12,6 +11,7 @@ import java.sql.SQLException;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * ModelParameters 的 jsonb TypeHandler：

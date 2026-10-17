@@ -224,8 +224,8 @@ class W5cFileProxyContractTest {
                             .contentType("application/json")
                             .content("{\"email\":\"" + email + "\",\"password\":\"Passw0rd!\"}"))
                     .andReturn();
-            return new com.fasterxml.jackson.databind.ObjectMapper()
-                    .readTree(result.getResponse().getContentAsString()).path("data").get("token").asText();
+            return new tools.jackson.databind.ObjectMapper()
+                    .readTree(result.getResponse().getContentAsString()).path("data").get("token").asString();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -341,8 +341,8 @@ class W5cFileProxyContractTest {
                             .header("Authorization", owner)
                             .contentType("application/json").content(body))
                     .andReturn();
-            return new com.fasterxml.jackson.databind.ObjectMapper()
-                    .readTree(r.getResponse().getContentAsString()).path("data").path("token").asText();
+            return new tools.jackson.databind.ObjectMapper()
+                    .readTree(r.getResponse().getContentAsString()).path("data").path("token").asString();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

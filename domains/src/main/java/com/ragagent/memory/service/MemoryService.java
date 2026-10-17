@@ -1,8 +1,5 @@
 package com.ragagent.memory.service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.contract.memory.MemoryKinds;
@@ -36,6 +33,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 跨会话长期记忆的写入、召回与记忆管理器。
@@ -81,8 +80,7 @@ public class MemoryService {
  * <p>必须容忍未知属性：那一列是历史 jsonb，配置里多一个键就让记忆整体失效
  * 是这里最不该发生的事（第 6 条）。</p>
  */
-    static final ObjectMapper CONFIG_MAPPER = JsonMappers.lenient()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    static final ObjectMapper CONFIG_MAPPER = JsonMappers.lenient();
 
     final MemoryRepository repo;
     final TenantConfigLookup tenantService;

@@ -1,8 +1,5 @@
 package com.ragagent.mcp.oauth;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.platform.config.AppEnvLookup;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
@@ -13,6 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * 进行中的 OAuth state 存储。
@@ -219,7 +219,7 @@ public class OAuthStateStore {
             return node;
         }
         ObjectNode migrated = MAPPER.createObjectNode();
-        obj.fields().forEachRemaining(f -> migrated.set(
+        obj.properties().forEach(f -> migrated.set(
                 LEGACY_KEY_RENAMES.getOrDefault(f.getKey(), f.getKey()), f.getValue()));
         return migrated;
     }

@@ -2,7 +2,6 @@ package com.ragagent.agenttools.knowledge;
 
 import static com.ragagent.agenttools.knowledge.KnowledgeSearchTool.nz;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.ResultWithMeta;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import tools.jackson.databind.JsonNode;
 
 
 final class KnowledgeSearchOutputFormatter {
@@ -316,15 +316,15 @@ final class KnowledgeSearchOutputFormatter {
         JsonNode arr;
         try {
             arr = KnowledgeSearchTool.RecordingSupportHolder.MAPPER.readTree(imageInfoJson);
-        } catch (java.io.IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             return out;
         }
         if (arr == null || !arr.isArray()) {
             return out;
         }
         for (JsonNode img : arr) {
-            out.add(new ImageInfoRow(img.path("url").asText(""),
-                    img.path("caption").asText(""), img.path("ocrText").asText("")));
+            out.add(new ImageInfoRow(img.path("url").asString(""),
+                    img.path("caption").asString(""), img.path("ocrText").asString("")));
         }
         return out;
     }

@@ -2,11 +2,11 @@ package com.ragagent.agent.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agent.fixtures.ToolContractGoldenA;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
 
 /**
  * ParamValidator 的录制判定表（15 条 validateParams + 3 条
@@ -38,25 +38,25 @@ class ParamValidatorRecordingTest {
     void decisionTableMatchesAgentPromptGolden() {
         for (String name : CASES) {
             JsonNode r = RecordingSupport.rec(field(name));
-            JsonNode argsNode = r.get("args").asText().isEmpty()
+            JsonNode argsNode = r.get("args").asString().isEmpty()
                     ? null
-                    : RecordingSupport.readTree(r.get("args").asText());
-            String schema = schemaFor(r.get("id").asText());
-            JsonNode wantErrs = RecordingSupport.readTree(r.get("errs").asText());
+                    : RecordingSupport.readTree(r.get("args").asString());
+            String schema = schemaFor(r.get("id").asString());
+            JsonNode wantErrs = RecordingSupport.readTree(r.get("errs").asString());
 
             List<ParamValidator.ValidationError> got = ParamValidator.validateParams(
                     argsNode, RecordingSupport.readTree(schema));
             assertThat(got.size())
-                    .as("validateParams %s count", r.get("id").asText())
+                    .as("validateParams %s count", r.get("id").asString())
                     .isEqualTo(wantErrs.size());
             for (int i = 0; i < wantErrs.size(); i++) {
                 JsonNode want = wantErrs.get(i);
                 assertThat(got.get(i).param())
-                        .as("validateParams %s [%d].param", r.get("id").asText(), i)
-                        .isEqualTo(want.get("Param").asText());
+                        .as("validateParams %s [%d].param", r.get("id").asString(), i)
+                        .isEqualTo(want.get("Param").asString());
                 assertThat(RecordingSupport.normalizeNumberText(got.get(i).message()))
-                        .as("validateParams %s [%d].message", r.get("id").asText(), i)
-                        .isEqualTo(RecordingSupport.normalizeNumberText(want.get("Message").asText()));
+                        .as("validateParams %s [%d].message", r.get("id").asString(), i)
+                        .isEqualTo(RecordingSupport.normalizeNumberText(want.get("Message").asString()));
             }
         }
     }
@@ -64,18 +64,18 @@ class ParamValidatorRecordingTest {
     @Test
     void formatValidationErrorsMatchesAgentPromptGolden() {
         JsonNode nil = RecordingSupport.rec(field("R_FMTVAL_NIL"));
-        assertThat(ParamValidator.formatValidationErrors(List.of())).isEqualTo(nil.get("out").asText());
+        assertThat(ParamValidator.formatValidationErrors(List.of())).isEqualTo(nil.get("out").asString());
 
         JsonNode single = RecordingSupport.rec(field("R_FMTVAL_SINGLE"));
         assertThat(ParamValidator.formatValidationErrors(List.of(
                 new ParamValidator.ValidationError("q", "required parameter 'q' is missing"))))
-                .isEqualTo(single.get("out").asText());
+                .isEqualTo(single.get("out").asString());
 
         JsonNode multi = RecordingSupport.rec(field("R_FMTVAL_MULTI"));
         assertThat(ParamValidator.formatValidationErrors(List.of(
                 new ParamValidator.ValidationError("a", "error a"),
                 new ParamValidator.ValidationError("b", "error b"))))
-                .isEqualTo(multi.get("out").asText());
+                .isEqualTo(multi.get("out").asString());
     }
 
     /** 与探针里的 valSchema 逐字一致（含 tags minItems 扩展）。 */

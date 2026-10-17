@@ -1,6 +1,5 @@
 package com.ragagent.agenttools.knowledge;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.retrieval.SearchTarget;
@@ -21,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import tools.jackson.databind.JsonNode;
 
 /**
  * list_knowledge_chunks 工具。
@@ -99,15 +99,15 @@ public class ListKnowledgeChunksTool extends BaseTool {
     public ToolResult execute(ToolRequest request) {
         JsonNode args = JsonMappers.toJsonNode(request.args());
 
-        String chunkID = args.path("faqId").asText("").trim();
+        String chunkID = args.path("faqId").asString("").trim();
         if (chunkID.isEmpty()) {
-            chunkID = args.path("chunkId").asText("").trim();
+            chunkID = args.path("chunkId").asString("").trim();
         }
         if (!chunkID.isEmpty()) {
             return executeByChunkID(chunkID);
         }
 
-        String knowledgeID = args.path("knowledgeId").asText("").trim();
+        String knowledgeID = args.path("knowledgeId").asString("").trim();
         if (knowledgeID.isEmpty()) {
             return failure("one of faq_id, chunk_id, or knowledge_id is required");
         }

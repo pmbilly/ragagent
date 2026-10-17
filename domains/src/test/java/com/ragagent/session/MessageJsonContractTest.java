@@ -4,9 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.retrieval.SearchResult;
@@ -23,6 +20,8 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * {@code Message} 响应体的 JSON 键序、键集与"不该泄漏的字段"（键名＝Java 字段名、
@@ -198,7 +197,7 @@ class MessageJsonContractTest {
 
     private static String json(Object value) {
         try {
-            ObjectMapper mapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
+            ObjectMapper mapper = JsonMapper.builder().disable(tools.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY).build();
             return mapper.writeValueAsString(value);
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -207,9 +206,9 @@ class MessageJsonContractTest {
 
     private static List<String> fieldNames(String json) {
         try {
-            ObjectMapper mapper = JsonMapper.builder().build();
+            ObjectMapper mapper = JsonMapper.builder().disable(tools.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY).build();
             List<String> out = new ArrayList<>();
-            mapper.readTree(json).fieldNames().forEachRemaining(out::add);
+            mapper.readTree(json).propertyNames().forEach(out::add);
             return out;
         } catch (Exception e) {
             throw new IllegalStateException(e);

@@ -2,7 +2,6 @@ package com.ragagent.wiki.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.TestSchema;
 import com.ragagent.wiki.domain.TaskDeadLetter;
 import com.ragagent.wiki.domain.TaskPendingOp;
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * {@code task_pending_ops} / {@code task_dead_letters} 的仓储测试。

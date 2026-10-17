@@ -1,13 +1,12 @@
 package com.ragagent.datasource.connector.ima;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * IMA 连接器的游标载荷。它装进
@@ -42,8 +41,7 @@ import java.util.Map;
 public class ImaCursor {
 
     /** 容忍未知属性（游标是历史数据的容器）。 */
-    private static final ObjectMapper MAPPER = JsonMappers.lenient()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 上次同步时间（零值也输出字面量）。 */
     private OffsetDateTime lastSyncTime = ZeroTimeSerializer.ZERO_DATE_TIME;

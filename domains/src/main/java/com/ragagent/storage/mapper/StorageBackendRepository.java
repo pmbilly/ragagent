@@ -1,6 +1,5 @@
 package com.ragagent.storage.mapper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.storage.domain.StorageBackend;
@@ -13,6 +12,7 @@ import javax.sql.DataSource;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * storage_backends 行仓储。

@@ -1,6 +1,5 @@
 package com.ragagent.agenttools.wiki;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agenttools.knowledge.FaqSnippet;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.agent.SearchAuth.KnowledgeScopeReader;
@@ -11,6 +10,7 @@ import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.List;
+import tools.jackson.databind.JsonNode;
 
 /**
  * wiki_replace_text 工具。
@@ -75,13 +75,13 @@ public class WikiReplaceTextTool extends BaseTool {
         if (kbIds == null || kbIds.isEmpty()) {
             return failure("No knowledge bases available for editing");
         }
-        String oldText = args.path("oldText").asText("");
+        String oldText = args.path("oldText").asString("");
         if (oldText.isEmpty()) {
             return failure("old_text is required");
         }
         String slug;
         try {
-            slug = WikiSlugs.normalizeAndValidateWikiSlug(args.path("slug").asText(""));
+            slug = WikiSlugs.normalizeAndValidateWikiSlug(args.path("slug").asString(""));
         } catch (IllegalArgumentException e) {
             return failure(e.getMessage());
         }
@@ -100,7 +100,7 @@ public class WikiReplaceTextTool extends BaseTool {
             return failure("old_text not found in the current page content. Ensure you copy it exactly as it appears.");
         }
 
-        String newText = args.path("newText").asText("");
+        String newText = args.path("newText").asString("");
         existingPage.setContent(existingPage.content().replace(oldText, newText));
 
         if (args.has("sourceRefs")) {

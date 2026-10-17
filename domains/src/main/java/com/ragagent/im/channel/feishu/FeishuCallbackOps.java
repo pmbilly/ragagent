@@ -1,6 +1,5 @@
 package com.ragagent.im.channel.feishu;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.im.runtime.AdapterInterfaces;
 import com.ragagent.im.runtime.CallbackExchange;
 import com.ragagent.im.runtime.FeishuWecomCrypt;
@@ -12,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 飞书回调验签/解析协作者：加密体先解密、只认
@@ -37,7 +37,7 @@ final class FeishuCallbackOps {
         byte[] raw;
         try {
             JsonNode encrypted = FeishuAdapter.readTree(body);
-            String encrypt = encrypted.path("encrypt").asText("");
+            String encrypt = encrypted.path("encrypt").asString("");
             if (!encrypt.isEmpty()) {
                 raw = decrypt(encrypt);
             } else {
@@ -51,7 +51,7 @@ final class FeishuCallbackOps {
             JsonNode event = FeishuAdapter.readTree(raw);
             JsonNode header = event.path("header");
             if (header.isMissingNode() || header.isNull()
-                    || !service.verificationToken.equals(header.path("token").asText(""))) {
+                    || !service.verificationToken.equals(header.path("token").asString(""))) {
                 return new AdapterInterfaces.VerifyException("invalid verification token");
             }
         } catch (Exception e) {
@@ -67,7 +67,7 @@ final class FeishuCallbackOps {
         JsonNode parsed;
         try {
             JsonNode maybeEncrypted = FeishuAdapter.readTree(body);
-            String encrypt = maybeEncrypted.path("encrypt").asText("");
+            String encrypt = maybeEncrypted.path("encrypt").asString("");
             if (!encrypt.isEmpty()) {
                 parsed = FeishuAdapter.readTree(decrypt(encrypt));
             } else {
@@ -81,8 +81,8 @@ final class FeishuCallbackOps {
             log.error("[{}] Failed to decrypt", service.region.label(), e);
             return false;
         }
-        if (parsed.has("challenge") && parsed.get("challenge").isTextual()) {
-            exchange.json(200, Map.of("challenge", parsed.get("challenge").asText()));
+        if (parsed.has("challenge") && parsed.get("challenge").isString()) {
+            exchange.json(200, Map.of("challenge", parsed.get("challenge").asString()));
             return true;
         }
         return false;
@@ -91,12 +91,12 @@ final class FeishuCallbackOps {
     public IncomingMessage parseCallback(CallbackExchange exchange) throws Exception {
         byte[] body = exchange.body();
         JsonNode maybeEncrypted = FeishuAdapter.readTree(body);
-        String encrypt = maybeEncrypted.path("encrypt").asText("");
+        String encrypt = maybeEncrypted.path("encrypt").asString("");
         JsonNode eventBody = encrypt.isEmpty() ? maybeEncrypted
                 : FeishuAdapter.readTree(decrypt(encrypt));
 
         JsonNode header = eventBody.path("header");
-        String eventType = header.path("event_type").asText("");
+        String eventType = header.path("event_type").asString("");
         if (!"im.message.receive_v1".equals(eventType)) {
             if (!header.isMissingNode()) {
                 log.info("[{}] Ignoring event type: {}", service.region.label(), eventType);
@@ -108,23 +108,23 @@ final class FeishuCallbackOps {
             return null;
         }
 
-        String messageId = message.path("message_id").asText("");
-        String threadId = message.path("root_id").asText("");
+        String messageId = message.path("message_id").asString("");
+        String threadId = message.path("root_id").asString("");
         if (threadId.isEmpty()) {
             threadId = messageId;
         }
-        boolean isGroup = "group".equals(message.path("chat_type").asText(""));
+        boolean isGroup = "group".equals(message.path("chat_type").asString(""));
         String chatType = isGroup ? ImTypes.CHAT_TYPE_GROUP : ImTypes.CHAT_TYPE_DIRECT;
-        String chatId = isGroup ? message.path("chat_id").asText("") : "";
+        String chatId = isGroup ? message.path("chat_id").asString("") : "";
         String openId = eventBody.path("event").path("sender").path("sender_id")
-                .path("open_id").asText("");
+                .path("open_id").asString("");
 
-        String messageType = message.path("message_type").asText("");
-        String rawContent = message.path("content").asText("");
+        String messageType = message.path("message_type").asString("");
+        String rawContent = message.path("content").asString("");
         return switch (messageType) {
             case "text" -> {
                 JsonNode text = FeishuAdapter.MAPPER.readTree(rawContent.isEmpty() ? "{}" : rawContent);
-                String content = text.path("text").asText("");
+                String content = text.path("text").asString("");
                 if (isGroup) {
                     content = stripBotMention(content);
                 }
@@ -133,19 +133,19 @@ final class FeishuCallbackOps {
             }
             case "file" -> {
                 JsonNode file = FeishuAdapter.MAPPER.readTree(rawContent.isEmpty() ? "{}" : rawContent);
-                String fileKey = file.path("file_key").asText("");
+                String fileKey = file.path("file_key").asString("");
                 if (fileKey.isEmpty()) {
                     yield null;
                 }
                 IncomingMessage msg = baseMessage(openId, chatId, chatType, messageId, threadId);
                 msg.messageType = ImTypes.MESSAGE_TYPE_FILE;
                 msg.fileKey = fileKey;
-                msg.fileName = file.path("file_name").asText("");
+                msg.fileName = file.path("file_name").asString("");
                 yield msg;
             }
             case "image" -> {
                 JsonNode image = FeishuAdapter.MAPPER.readTree(rawContent.isEmpty() ? "{}" : rawContent);
-                String imageKey = image.path("image_key").asText("");
+                String imageKey = image.path("image_key").asString("");
                 if (imageKey.isEmpty()) {
                     yield null;
                 }
@@ -158,16 +158,16 @@ final class FeishuCallbackOps {
             case "post" -> {
                 JsonNode post = FeishuAdapter.MAPPER.readTree(rawContent.isEmpty() ? "{}" : rawContent);
                 List<String> parts = new ArrayList<>();
-                String title = post.path("title").asText("");
+                String title = post.path("title").asString("");
                 if (!title.isEmpty()) {
                     parts.add(title);
                 }
                 for (JsonNode line : post.path("content")) {
                     StringBuilder lineText = new StringBuilder();
                     for (JsonNode element : line) {
-                        String tag = element.path("tag").asText("");
+                        String tag = element.path("tag").asString("");
                         if ("text".equals(tag) || "a".equals(tag)) {
-                            lineText.append(element.path("text").asText(""));
+                            lineText.append(element.path("text").asString(""));
                         }
                     }
                     String trimmed = lineText.toString().trim();

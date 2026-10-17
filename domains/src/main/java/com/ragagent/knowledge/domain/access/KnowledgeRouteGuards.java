@@ -1,7 +1,5 @@
 package com.ragagent.knowledge.domain.access;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -15,6 +13,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 知识文档路由共用的守卫与解析面（两个控制器共享）：
@@ -94,8 +94,8 @@ public class KnowledgeRouteGuards {
         JsonNode metadata = k.getMetadata();
         if (metadata != null && metadata.has("_knowledge_transfer")) {
             JsonNode state = metadata.get("_knowledge_transfer");
-            if ("move".equals(state.path("operation").asText(""))
-                    && "moving".equals(state.path("phase").asText(""))) {
+            if ("move".equals(state.path("operation").asString(""))
+                    && "moving".equals(state.path("phase").asString(""))) {
                 throw new BizException(AppError.conflict(
                         "knowledge has an unfinished move; retry the move first"));
             }

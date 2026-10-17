@@ -1,6 +1,5 @@
 package com.ragagent.datasource.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.datasource.DataSourceSyncEnqueueException;
 import com.ragagent.datasource.domain.DataSourceSyncPayload;
 import com.ragagent.platform.task.RedisTaskQueueCore;
@@ -21,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * {@link DataSourceSyncTaskQueue} 的 <b>Redis</b> 实现：跨实例共享任务表 +

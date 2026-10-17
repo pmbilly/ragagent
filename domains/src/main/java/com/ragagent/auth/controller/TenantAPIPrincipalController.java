@@ -1,7 +1,5 @@
 package com.ragagent.auth.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalConfigRequest;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalConfigResponse;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalTestTokenRequest;
@@ -26,6 +24,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * api-principal 三条路由（Owner+）：

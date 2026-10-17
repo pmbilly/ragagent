@@ -227,9 +227,9 @@ class FaqContractTest {
                             .contentType("application/json")
                             .content("{\"email\":\"" + email + "\",\"password\":\"Passw0rd!\"}"))
                     .andReturn();
-            com.fasterxml.jackson.databind.JsonNode node = new com.fasterxml.jackson.databind.ObjectMapper()
+            tools.jackson.databind.JsonNode node = new tools.jackson.databind.ObjectMapper()
                     .readTree(result.getResponse().getContentAsString());
-            return node.path("data").get("token").asText();
+            return node.path("data").get("token").asString();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

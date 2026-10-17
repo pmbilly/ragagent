@@ -1,6 +1,5 @@
 package com.ragagent.websearch.provider;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.web.ProviderJson;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
@@ -11,6 +10,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 自托管 SearXNG provider。
@@ -82,7 +82,7 @@ public final class SearxngProvider implements WebSearchProvider {
         for (JsonNode e : data.path("unresponsive_engines")) {
             List<String> tuple = new ArrayList<>();
             for (JsonNode x : e) {
-                tuple.add(x.asText(""));
+                tuple.add(x.asString(""));
             }
             lastUnresponsive.add(tuple);
         }
@@ -91,17 +91,17 @@ public final class SearxngProvider implements WebSearchProvider {
             if (results.size() >= maxResults) {
                 break;
             }
-            String urlValue = r.path("url").asText("");
-            String title = r.path("title").asText("");
+            String urlValue = r.path("url").asString("");
+            String title = r.path("title").asString("");
             if (urlValue.isEmpty() || title.isEmpty()) {
                 continue;
             }
             WebSearchResult item = new WebSearchResult();
             item.setTitle(title);
             item.setUrl(urlValue);
-            item.setSnippet(r.path("content").asText(""));
+            item.setSnippet(r.path("content").asString(""));
             item.setSource("searxng");
-            String publishedDate = r.path("publishedDate").asText("");
+            String publishedDate = r.path("publishedDate").asString("");
             if (includeDate && !publishedDate.isEmpty()) {
                 OffsetDateTime t = parseSearxngDate(publishedDate);
                 if (t != null) {

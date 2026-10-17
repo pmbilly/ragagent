@@ -1,7 +1,5 @@
 package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatTool;
@@ -10,6 +8,8 @@ import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 把本模块的消息/工具转成 Anthropic Messages 的请求形态。

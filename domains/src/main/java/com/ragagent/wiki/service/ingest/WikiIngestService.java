@@ -1,6 +1,5 @@
 package com.ragagent.wiki.service.ingest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.model.LlmChatClient;
@@ -26,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * wiki 生成管线的主入口。

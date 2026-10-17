@@ -75,7 +75,7 @@ final class AuthSessionOps {
         if (rawBody == null || rawBody.isBlank()) {
             throw service.invalidParams("Invalid refresh token request", JsonBodyErrors.EMPTY_BODY);
         }
-        com.fasterxml.jackson.databind.JsonNode root;
+        tools.jackson.databind.JsonNode root;
         try {
             root = AuthController.MAPPER.readTree(rawBody);
         } catch (Exception e) {
@@ -90,9 +90,9 @@ final class AuthSessionOps {
             throw service.invalidParams("Invalid refresh token request",
                     ToolJson.expectedObjectMessage(root));
         }
-        com.fasterxml.jackson.databind.JsonNode node = root.get("refreshToken");
-        if (node == null || node.isNull() || node.isTextual()) {
-            req.refreshToken = node == null || node.isNull() ? null : node.asText();
+        tools.jackson.databind.JsonNode node = root.get("refreshToken");
+        if (node == null || node.isNull() || node.isString()) {
+            req.refreshToken = node == null || node.isNull() ? null : node.asString();
             return req;
         }
         throw service.invalidParams("Invalid refresh token request",
@@ -104,10 +104,10 @@ final class AuthSessionOps {
             return "";
         }
         try {
-            com.fasterxml.jackson.databind.JsonNode root = AuthController.MAPPER.readTree(rawBody);
-            com.fasterxml.jackson.databind.JsonNode node = root == null ? null : root.get("refresh_token");
-            if (node != null && node.isTextual()) {
-                return node.asText();
+            tools.jackson.databind.JsonNode root = AuthController.MAPPER.readTree(rawBody);
+            tools.jackson.databind.JsonNode node = root == null ? null : root.get("refresh_token");
+            if (node != null && node.isString()) {
+                return node.asString();
             }
         } catch (Exception ignored) {
             // 语法错误已在 bindSwitchTenantRequest 报过
@@ -152,7 +152,7 @@ final class AuthSessionOps {
         if (rawBody == null || rawBody.isBlank()) {
             throw service.invalidParams("Invalid workspace switch request", JsonBodyErrors.EMPTY_BODY);
         }
-        com.fasterxml.jackson.databind.JsonNode root;
+        tools.jackson.databind.JsonNode root;
         try {
             root = AuthController.MAPPER.readTree(rawBody);
         } catch (Exception e) {
@@ -168,7 +168,7 @@ final class AuthSessionOps {
             throw service.invalidParams("Invalid workspace switch request",
                     ToolJson.expectedObjectMessage(root));
         }
-        com.fasterxml.jackson.databind.JsonNode idNode = root.get("tenantId");
+        tools.jackson.databind.JsonNode idNode = root.get("tenantId");
         if (idNode == null || idNode.isNull()) {
             throw service.invalidParams("Invalid workspace switch request",
                     service.bindingError("TenantID", "required"));

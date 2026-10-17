@@ -2,11 +2,11 @@ package com.ragagent.agent.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agent.fixtures.ToolContractGoldenA;
 import com.ragagent.contract.tool.ToolRequest;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
 
 /**
  * TodoWriteTool 的录制语料（5 条有效用例；bad_json 一条不录——录制侧
@@ -28,21 +28,21 @@ class TodoWriteRecordingTest {
     void executionsMatchAgentPromptGolden() {
         for (String name : CASES) {
             JsonNode r = RecordingSupport.rec(field(name));
-            JsonNode args = RecordingSupport.readTree(r.get("args").asText());
+            JsonNode args = RecordingSupport.readTree(r.get("args").asString());
             var result = new TodoWriteTool().execute(ToolRequest.of(args));
 
             assertThat(result.isSuccess())
-                    .as("todo %s success", r.get("id").asText())
+                    .as("todo %s success", r.get("id").asString())
                     .isEqualTo(r.get("success").asBoolean());
             assertThat(result.getOutput())
-                    .as("todo %s output", r.get("id").asText())
-                    .isEqualTo(r.get("output").asText());
-            String wantData = r.get("data").asText();
+                    .as("todo %s output", r.get("id").asString())
+                    .isEqualTo(r.get("output").asString());
+            String wantData = r.get("data").asString();
             if ("null".equals(wantData)) {
-                assertThat(result.getData()).as("todo %s data", r.get("id").asText()).isNull();
+                assertThat(result.getData()).as("todo %s data", r.get("id").asString()).isNull();
             } else {
                 assertThat(RecordingSupport.canonicalJson(RecordingSupport.PLAIN.valueToTree(result.getData())))
-                        .as("todo %s data", r.get("id").asText())
+                        .as("todo %s data", r.get("id").asString())
                         .isEqualTo(RecordingSupport.canonicalJson(RecordingSupport.readTree(wantData)));
             }
         }

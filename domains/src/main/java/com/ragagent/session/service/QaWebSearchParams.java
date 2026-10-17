@@ -1,12 +1,12 @@
 package com.ragagent.session.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * WebSearch / WebFetch 的**有效参数解析**：provider 选择、开关、fetch topN 与结果条数上限。
@@ -33,7 +33,7 @@ final class QaWebSearchParams {
 
     String resolveWebSearchProviderId(QaSupport.QaRequest req, long tenantId) {
         if (req.agentConfig != null) {
-            String providerId = req.agentConfig.path("webSearchProviderId").asText("");
+            String providerId = req.agentConfig.path("webSearchProviderId").asString("");
             if (!providerId.isEmpty()) {
                 return providerId;
             }
@@ -82,7 +82,7 @@ final class QaWebSearchParams {
                         return max;
                     }
                 }
-            } catch (RuntimeException | com.fasterxml.jackson.core.JsonProcessingException e) {
+            } catch (tools.jackson.core.JacksonException e) {
                 log.warn("resolveWebSearchMaxResults tenant config parse failed", e);
             }
         }

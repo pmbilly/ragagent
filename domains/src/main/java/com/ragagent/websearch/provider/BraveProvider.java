@@ -1,6 +1,5 @@
 package com.ragagent.websearch.provider;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.websearch.WebSearchFilters;
 import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.web.ProviderJson;
@@ -12,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Brave 搜索 provider。
@@ -100,14 +100,14 @@ public final class BraveProvider implements WebSearchProvider {
         }
         List<WebSearchResult> results = new ArrayList<>();
         for (JsonNode row : response.path("web").path("results")) {
-            String age = row.path("age").asText("");
+            String age = row.path("age").asString("");
             if (age.isEmpty()) {
-                age = row.path("page_age").asText("");
+                age = row.path("page_age").asString("");
             }
             WebSearchResult result = new WebSearchResult();
-            result.setTitle(row.path("title").asText(""));
-            result.setUrl(row.path("url").asText(""));
-            result.setSnippet(row.path("description").asText(""));
+            result.setTitle(row.path("title").asString(""));
+            result.setUrl(row.path("url").asString(""));
+            result.setSnippet(row.path("description").asString(""));
             result.setSource(name());
             result.setAge(age);
             results.add(result);

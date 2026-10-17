@@ -1,7 +1,5 @@
 package com.ragagent.auth.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.auth.config.JwtProperties;
 import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
@@ -12,6 +10,8 @@ import java.util.Base64;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * OIDC state 编解码。
@@ -112,8 +112,8 @@ public class OidcStateCodec {
         } catch (Exception e) {
             throw new StateException("unmarshal oidc state: " + e.getMessage());
         }
-        String nonce = node.path("nonce").isTextual() ? node.path("nonce").asText() : "";
-        String redirectUri = node.path("redirect_uri").isTextual() ? node.path("redirect_uri").asText() : "";
+        String nonce = node.path("nonce").isString() ? node.path("nonce").asString() : "";
+        String redirectUri = node.path("redirect_uri").isString() ? node.path("redirect_uri").asString() : "";
         long iat = node.path("iat").isIntegralNumber() ? node.path("iat").asLong() : 0;
         if (UserService.trimUnicodeWhitespace(redirectUri).isEmpty()) {
             throw new StateException("state.redirect_uri is required");

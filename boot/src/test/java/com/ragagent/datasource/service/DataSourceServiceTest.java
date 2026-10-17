@@ -188,9 +188,9 @@ class DataSourceServiceTest {
             return k;
         }
 
-        private static com.fasterxml.jackson.databind.JsonNode toNode(Map<String, String> m) {
-            com.fasterxml.jackson.databind.node.ObjectNode n =
-                    new com.fasterxml.jackson.databind.ObjectMapper().createObjectNode();
+        private static tools.jackson.databind.JsonNode toNode(Map<String, String> m) {
+            tools.jackson.databind.node.ObjectNode n =
+                    new tools.jackson.databind.ObjectMapper().createObjectNode();
             if (m != null) {
                 m.forEach(n::put);
             }
@@ -483,8 +483,8 @@ class DataSourceServiceTest {
         DataSource req = new DataSource();
         req.setId(ds.getId());
         req.setType(DataSourceConstants.CONNECTOR_TYPE_RSS);
-        com.fasterxml.jackson.databind.node.ObjectNode incoming =
-                new com.fasterxml.jackson.databind.ObjectMapper().createObjectNode();
+        tools.jackson.databind.node.ObjectNode incoming =
+                new tools.jackson.databind.ObjectMapper().createObjectNode();
         incoming.put("type", DataSourceConstants.CONNECTOR_TYPE_RSS);
         incoming.putObject("credentials").put("feedUrls", "https://attacker.test/feed.xml");
         req.setConfig(incoming);

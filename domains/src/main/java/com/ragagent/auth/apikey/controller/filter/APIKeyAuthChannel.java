@@ -14,7 +14,6 @@ import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.springframework.stereotype.Component;
 
@@ -47,7 +46,7 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
     private static final int MAX_EXTERNAL_USER_ID_LEN = 128;
     private static final long MAX_EXTERNAL_USER_TOKEN_TTL_SECONDS = 24 * 3600L;
 
-    private static final com.fasterxml.jackson.databind.ObjectMapper JSON_MAPPER =
+    private static final tools.jackson.databind.ObjectMapper JSON_MAPPER =
             JsonMappers.lenient();
     private final TenantAPIKeyService apiKeyService;
     private final TenantService tenantService;
@@ -266,9 +265,9 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
             return null;
         }
         try {
-            com.fasterxml.jackson.databind.JsonNode header = JSON_MAPPER.readTree(
+            tools.jackson.databind.JsonNode header = JSON_MAPPER.readTree(
                     java.util.Base64.getUrlDecoder().decode(parts[0]));
-            if (!"HS256".equals(header.path("alg").asText(""))) {
+            if (!"HS256".equals(header.path("alg").asString(""))) {
                 return null;
             }
             javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
@@ -281,16 +280,16 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
             if (!java.security.MessageDigest.isEqual(expected, provided)) {
                 return null;
             }
-            com.fasterxml.jackson.databind.JsonNode claims = JSON_MAPPER.readTree(
+            tools.jackson.databind.JsonNode claims = JSON_MAPPER.readTree(
                     java.util.Base64.getUrlDecoder().decode(parts[1]));
             // aud 含 "weknora"（字符串或数组）
-            com.fasterxml.jackson.databind.JsonNode aud = claims.get("aud");
+            tools.jackson.databind.JsonNode aud = claims.get("aud");
             boolean audOk = false;
-            if (aud != null && aud.isTextual()) {
-                audOk = "weknora".equals(aud.asText());
+            if (aud != null && aud.isString()) {
+                audOk = "weknora".equals(aud.asString());
             } else if (aud != null && aud.isArray()) {
-                for (com.fasterxml.jackson.databind.JsonNode a : aud) {
-                    if ("weknora".equals(a.asText())) {
+                for (tools.jackson.databind.JsonNode a : aud) {
+                    if ("weknora".equals(a.asString())) {
                         audOk = true;
                         break;
                     }
@@ -299,7 +298,7 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
             if (!audOk) {
                 return null;
             }
-            com.fasterxml.jackson.databind.JsonNode exp = claims.get("exp");
+            tools.jackson.databind.JsonNode exp = claims.get("exp");
             if (exp == null || !exp.canConvertToLong()) {
                 return null; // WithExpirationRequired
             }
@@ -311,19 +310,19 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
             if (expAt - now > MAX_EXTERNAL_USER_TOKEN_TTL_SECONDS) {
                 return null; // token lifetime exceeds 24h
             }
-            com.fasterxml.jackson.databind.JsonNode nbf = claims.get("nbf");
+            tools.jackson.databind.JsonNode nbf = claims.get("nbf");
             if (nbf != null && nbf.canConvertToLong() && now < nbf.asLong()) {
                 return null;
             }
-            com.fasterxml.jackson.databind.JsonNode tenantClaim = claims.get("tenant_id");
+            tools.jackson.databind.JsonNode tenantClaim = claims.get("tenant_id");
             long gotTenant = tenantClaim != null && tenantClaim.canConvertToLong()
                     && tenantClaim.asLong() > 0 ? tenantClaim.asLong() : 0;
             if (gotTenant != tenantId) {
                 return null;
             }
-            String sub = claims.path("sub").asText("").trim();
+            String sub = claims.path("sub").asString("").trim();
             return sub.isEmpty() ? null : sub;
-        } catch (RuntimeException | java.security.GeneralSecurityException | IOException e) {
+        } catch (RuntimeException | java.security.GeneralSecurityException e) {
             return null;
         }
     }

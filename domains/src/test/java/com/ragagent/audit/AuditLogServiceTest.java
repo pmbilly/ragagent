@@ -178,10 +178,10 @@ class AuditLogServiceTest {
         assertThat(row.getRequestPath()).isEqualTo("/api/v1/tenants/7");
         assertThat(row.getRequestMethod()).isEqualTo("PUT");
         assertThat(row.getActorRole()).isEqualTo("viewer");
-        assertThat(row.getDetails().get("requiredRole").asText()).isEqualTo("admin");
+        assertThat(row.getDetails().get("requiredRole").asString()).isEqualTo("admin");
         // rawPath 与 request_path 相同时**不写**（去重同一资源）
         assertThat(row.getDetails().has("rawPath")).isFalse();
-        assertThat(row.getDetails().fieldNames()).toIterable().containsExactly("requiredRole");
+        assertThat(row.getDetails().propertyNames()).containsExactly("requiredRole");
     }
 
     /**
@@ -246,11 +246,11 @@ class AuditLogServiceTest {
         AuditLog row = f.created().get(0);
         assertThat(row.getRequestPath()).isEqualTo("/api/v1/tenants/{id}/audit-log");
         assertThat(row.getRequestMethod()).isEqualTo("GET");
-        assertThat(row.getDetails().get("rawPath").asText())
+        assertThat(row.getDetails().get("rawPath").asString())
                 .isEqualTo("/api/v1/tenants/10002/audit-log");
-        assertThat(row.getDetails().get("requiredRole").asText()).isEqualTo("admin");
+        assertThat(row.getDetails().get("requiredRole").asString()).isEqualTo("admin");
         // 键序按字母序：rawPath 在 requiredRole 之前
-        assertThat(row.getDetails().fieldNames()).toIterable()
+        assertThat(row.getDetails().propertyNames())
                 .containsExactly("rawPath", "requiredRole");
     }
 
@@ -262,7 +262,7 @@ class AuditLogServiceTest {
         f.svc().logDenied(10002L, "u-owner", "user", "system_admin",
                 "/api/v1/system/admin/audit-log", "GET");
 
-        assertThat(f.created().get(0).getDetails().get("requiredRole").asText())
+        assertThat(f.created().get(0).getDetails().get("requiredRole").asString())
                 .isEqualTo("system_admin");
     }
 

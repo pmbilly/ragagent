@@ -1,9 +1,6 @@
 package com.ragagent.system.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
@@ -27,6 +24,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.StringNode;
 
 /**
  * 系统设置服务。
@@ -104,9 +104,9 @@ public class SystemSettingService implements SystemSettingGateway {
             if (raw != null && raw.isNumber()) {
                 return raw.asLong();
             }
-            if (raw != null && raw.isTextual()) {
+            if (raw != null && raw.isString()) {
                 try {
-                    return Long.parseLong(raw.asText());
+                    return Long.parseLong(raw.asString());
                 } catch (NumberFormatException ignored) {
                     // fall through to env/default
                 }
@@ -127,8 +127,8 @@ public class SystemSettingService implements SystemSettingGateway {
 
     public String getString(String key, String envName, String def) {
         Resolved r = resolveRaw(key);
-        if (r.fromDB() && r.raw() != null && r.raw().isTextual()) {
-            return r.raw().asText();
+        if (r.fromDB() && r.raw() != null && r.raw().isString()) {
+            return r.raw().asString();
         }
         if (envName != null && !envName.isEmpty()) {
             String v = environment.getProperty(envName);
@@ -162,7 +162,7 @@ public class SystemSettingService implements SystemSettingGateway {
         Resolved r = resolveRaw(key);
         if (r.fromDB() && r.raw() != null && r.raw().isArray()) {
             List<String> out = new ArrayList<>();
-            r.raw().forEach(n -> out.add(n.asText()));
+            r.raw().forEach(n -> out.add(n.asString()));
             return out;
         }
         if (envName != null && !envName.isEmpty()) {
@@ -265,7 +265,7 @@ public class SystemSettingService implements SystemSettingGateway {
                             + e.getMessage());
         }
         if (!spec.enumOptions().isEmpty() && "string".equals(spec.type())) {
-            String str = rawValue.isTextual() ? rawValue.asText() : null;
+            String str = rawValue.isString() ? rawValue.asString() : null;
             if (str == null || !spec.enumOptions().contains(str)) {
                 throw new IllegalArgumentException("invalid value for \"" + key + "\": \""
                         + (str == null ? "" : str) + "\" not in " + formatBracketedList(spec.enumOptions()));
@@ -369,10 +369,10 @@ public class SystemSettingService implements SystemSettingGateway {
             if (raw != null && !raw.trim().isEmpty()) {
                 try {
                     return switch (spec.type()) {
-                        case "int" -> SystemSettingRegistry.encodeForType("int", new TextNode(raw.trim()));
-                        case "string" -> SystemSettingRegistry.encodeForType("string", new TextNode(raw));
-                        case "bool" -> SystemSettingRegistry.encodeForType("bool", new TextNode(raw));
-                        case "string_list" -> SystemSettingRegistry.encodeForType("string_list", new TextNode(raw));
+                        case "int" -> SystemSettingRegistry.encodeForType("int", new StringNode(raw.trim()));
+                        case "string" -> SystemSettingRegistry.encodeForType("string", new StringNode(raw));
+                        case "bool" -> SystemSettingRegistry.encodeForType("bool", new StringNode(raw));
+                        case "string_list" -> SystemSettingRegistry.encodeForType("string_list", new StringNode(raw));
                         default -> null;
                     };
                 } catch (IllegalArgumentException ignored) {
@@ -531,15 +531,15 @@ public class SystemSettingService implements SystemSettingGateway {
                         throw new IllegalArgumentException("expected integer value");
                     }
                     n = (long) d;
-                } else if (rawValue.isTextual()) {
-                    n = Long.parseLong(rawValue.asText());
+                } else if (rawValue.isString()) {
+                    n = Long.parseLong(rawValue.asString());
                 } else {
                     throw new IllegalArgumentException(
                             "expected integer, got " + SystemSettingRegistry.jsonTypeLabel(rawValue));
                 }
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(
-                        "expected integer, got \"" + rawValue.asText() + "\"");
+                        "expected integer, got \"" + rawValue.asString() + "\"");
             }
             if (n < 1) {
                 throw new IllegalArgumentException("concurrency must be at least 1");

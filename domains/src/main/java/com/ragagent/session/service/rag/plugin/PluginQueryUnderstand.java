@@ -1,7 +1,5 @@
 package com.ragagent.session.service.rag.plugin;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
@@ -22,6 +20,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * QUERY_UNDERSTAND 阶段插件：
@@ -478,8 +478,8 @@ public final class PluginQueryUnderstand implements Plugin {
             if (raw == null || raw.isMissingNode() || raw.isNull()) {
                 continue;
             }
-            if (raw.isTextual()) {
-                return raw.asText();
+            if (raw.isString()) {
+                return raw.asString();
             }
         }
         return "";

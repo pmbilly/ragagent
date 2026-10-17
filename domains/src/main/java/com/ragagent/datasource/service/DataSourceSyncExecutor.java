@@ -96,7 +96,7 @@ final class DataSourceSyncExecutor {
             throw fetchErr;
         }
 
-        com.fasterxml.jackson.databind.JsonNode resultJson = result.toJSON();
+        tools.jackson.databind.JsonNode resultJson = result.toJSON();
         String allFailed = DataSourceSyncResultOps.allFetchedItemsFailedError(result);
         if (allFailed != null) {
             log.error("[datasource] streaming sync failed while processing fetched items: {}", allFailed);
@@ -438,7 +438,7 @@ final class DataSourceSyncExecutor {
             }
         }
 
-        com.fasterxml.jackson.databind.JsonNode resultJson = result.toJSON();
+        tools.jackson.databind.JsonNode resultJson = result.toJSON();
         String allFailed = DataSourceSyncResultOps.allFetchedItemsFailedError(result);
         if (allFailed != null) {
             log.error("[datasource] data source sync failed while processing fetched items: {}", allFailed);

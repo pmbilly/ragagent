@@ -18,8 +18,8 @@ public final class ImCredentials {
             return Map.of();
         }
         try {
-            com.fasterxml.jackson.databind.ObjectMapper mapper = JsonMappers.lenient();
-            return mapper.readValue(data, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {
+            tools.jackson.databind.ObjectMapper mapper = JsonMappers.lenient();
+            return mapper.readValue(data, new tools.jackson.core.type.TypeReference<Map<String, Object>>() {
             });
         } catch (Exception e) {
             throw new IllegalArgumentException(e.getMessage(), e);

@@ -1,6 +1,5 @@
 package com.ragagent.wiki.service.ingest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import java.time.Duration;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * {@link WikiIngestTaskQueue} 的 <b>Redis</b> 实现：跨实例共享的任务表。

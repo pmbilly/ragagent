@@ -1,6 +1,5 @@
 package com.ragagent.session.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.agent.ThinkBlocks;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
@@ -28,6 +27,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 消息服务。
@@ -388,10 +388,10 @@ public class MessageService {
         if (!node.path("enabled").asBoolean(false)) {
             return "chat history indexing disabled";
         }
-        if (node.path("embeddingModelId").asText("").isEmpty()) {
+        if (node.path("embeddingModelId").asString("").isEmpty()) {
             return "enabled but no embedding model selected";
         }
-        if (node.path("knowledgeBaseId").asText("").isEmpty()) {
+        if (node.path("knowledgeBaseId").asString("").isEmpty()) {
             return "enabled but chat history knowledge base not created yet";
         }
         return "chat history config incomplete";
@@ -434,8 +434,8 @@ public class MessageService {
         }
 
         stats.setEnabled(true);
-        stats.setEmbeddingModelId(cfg.path("embeddingModelId").asText(""));
-        stats.setKnowledgeBaseId(cfg.path("knowledgeBaseId").asText(""));
+        stats.setEmbeddingModelId(cfg.path("embeddingModelId").asString(""));
+        stats.setKnowledgeBaseId(cfg.path("knowledgeBaseId").asString(""));
 
         String kbId = stats.getKnowledgeBaseId();
         if (kbId.isEmpty()) {

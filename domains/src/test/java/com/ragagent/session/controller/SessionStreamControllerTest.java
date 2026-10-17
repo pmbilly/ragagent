@@ -9,7 +9,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
@@ -21,7 +20,7 @@ import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
-import com.ragagent.platform.web.ContractJsonModule;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.session.controller.sse.StreamEventEmitter;
 import com.ragagent.session.domain.conversation.Session;
@@ -39,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.mock.web.MockHttpServletResponse;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * {@code continue-stream} 端点的行为契约。
@@ -62,7 +62,7 @@ class SessionStreamControllerTest {
     /** 控制器测试用的普通 mapper（帧字节形态由 {@code SseFrameWriterTest} 覆盖）。 */
     private static ObjectMapper streamMapper() {
         // 契约载荷（ResponseType 等）的线格式由 mixin 模块承载（B268-A②）
-        return new ObjectMapper().registerModule(new ContractJsonModule());
+        return JsonMappers.lenient();
     }
 
     @BeforeEach

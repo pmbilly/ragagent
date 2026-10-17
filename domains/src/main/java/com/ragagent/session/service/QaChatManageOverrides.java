@@ -1,13 +1,13 @@
 package com.ragagent.session.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.session.service.rag.ChatManage;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * {@code SessionQaResolution} 的**agent 覆盖簇**：把 custom agent 的配置
@@ -67,33 +67,33 @@ final class QaChatManageOverrides {
             cm.setRerankTopK(rerankTopK);
         }
         cm.setRerankThreshold(c.path("rerankThreshold").asDouble(0));
-        String rerankModelId = c.path("rerankModelId").asText("");
+        String rerankModelId = c.path("rerankModelId").asString("");
         if (!rerankModelId.isEmpty()) {
             cm.setRerankModelId(rerankModelId);
         }
         cm.setEnableRewrite(c.path("enableRewrite").asBoolean(false));
         cm.setEnableQueryExpansion(c.path("enableQueryExpansion").asBoolean(false));
-        String rwSys = c.path("rewritePromptSystem").asText("");
+        String rwSys = c.path("rewritePromptSystem").asString("");
         if (!rwSys.isEmpty()) {
             cm.setRewritePromptSystem(rwSys);
         }
-        String rwUser = c.path("rewritePromptUser").asText("");
+        String rwUser = c.path("rewritePromptUser").asString("");
         if (!rwUser.isEmpty()) {
             cm.setRewritePromptUser(rwUser);
         }
-        String quModel = c.path("queryUnderstandModelId").asText("");
+        String quModel = c.path("queryUnderstandModelId").asString("");
         if (!quModel.isEmpty()) {
             cm.setQueryUnderstandModelId(quModel);
         }
-        String fallbackStrategy = c.path("fallbackStrategy").asText("");
+        String fallbackStrategy = c.path("fallbackStrategy").asString("");
         if (!fallbackStrategy.isEmpty()) {
             cm.setFallbackStrategy(fallbackStrategy);
         }
-        String fallbackResponse = c.path("fallbackResponse").asText("");
+        String fallbackResponse = c.path("fallbackResponse").asString("");
         if (!fallbackResponse.isEmpty()) {
             cm.setFallbackResponse(fallbackResponse);
         }
-        String fallbackPrompt = c.path("fallbackPrompt").asText("");
+        String fallbackPrompt = c.path("fallbackPrompt").asString("");
         if (!fallbackPrompt.isEmpty()) {
             cm.setFallbackPrompt(fallbackPrompt);
         }
@@ -117,7 +117,7 @@ final class QaChatManageOverrides {
         JsonNode intentPrompts = c.get("intentPrompts");
         if (intentPrompts != null && intentPrompts.isObject() && intentPrompts.size() > 0) {
             Map<String, String> overrides = new LinkedHashMap<>();
-            intentPrompts.fields().forEachRemaining(e -> overrides.put(e.getKey(), e.getValue().asText("")));
+            intentPrompts.properties().forEach(e -> overrides.put(e.getKey(), e.getValue().asString("")));
             cm.setIntentPromptOverrides(overrides);
         }
     }
@@ -126,10 +126,10 @@ final class QaChatManageOverrides {
         if (c == null) {
             return new SessionQaResolution.Prompts("", "");
         }
-        String system = c.path("systemPrompt").asText("");
-        String context = c.path("contextTemplate").asText("");
+        String system = c.path("systemPrompt").asString("");
+        String context = c.path("contextTemplate").asString("");
         boolean agentMode = SessionKnowledgeQaService.isAgentMode(c);
-        String systemId = c.path("systemPromptId").asText("");
+        String systemId = c.path("systemPromptId").asString("");
         if (system.isEmpty() && !systemId.isEmpty()) {
             String content = SessionQaResolution.templateContentByIdAndFile(systemId,
                     agentMode ? PromptSource.AGENT_SYSTEM_PROMPT : PromptSource.SYSTEM_PROMPT);
@@ -137,7 +137,7 @@ final class QaChatManageOverrides {
                 system = content;
             }
         }
-        String contextId = c.path("contextTemplateId").asText("");
+        String contextId = c.path("contextTemplateId").asString("");
         if (context.isEmpty() && !contextId.isEmpty()) {
             String content = SessionQaResolution.templateContentByIdAndFile(contextId, PromptSource.CONTEXT_TEMPLATE);
             if (content != null) {

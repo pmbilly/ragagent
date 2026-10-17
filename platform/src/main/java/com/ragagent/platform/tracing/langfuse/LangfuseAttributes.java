@@ -1,10 +1,6 @@
 package com.ragagent.platform.tracing.langfuse;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.ragagent.platform.web.ContractJsonModule;
-import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -13,6 +9,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Langfuse / OpenTelemetry 语义约定属性键与序列化辅助。
@@ -73,7 +72,7 @@ public final class LangfuseAttributes {
 
     private static ObjectMapper buildJson() {
         // 浮点走 Jackson 默认（上报面，形态无契约意义）
-        return JsonMapper.builder()
+        return JsonMapper.builder().disable(tools.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
                 .addModule(new ContractJsonModule())
                 .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
                 .build();
@@ -90,7 +89,7 @@ public final class LangfuseAttributes {
         String json;
         try {
             json = JSON.writeValueAsString(v);
-        } catch (IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             return null;
         }
         if (json.isEmpty() || "null".equals(json)) {

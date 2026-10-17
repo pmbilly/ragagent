@@ -1,8 +1,5 @@
 package com.ragagent.im.channel.wecom;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.platform.security.SsrfGuard;
@@ -22,6 +19,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * 企业微信智能机器人长连接。
@@ -203,7 +203,7 @@ public class WecomLongConnClient {
         int errCode = resp.path("errcode").asInt(0);
         if (errCode != 0) {
             throw new IllegalStateException("auth failed: code=" + errCode + " msg="
-                    + resp.path("errmsg").asText(""));
+                    + resp.path("errmsg").asString(""));
         }
     }
 
@@ -232,7 +232,7 @@ public class WecomLongConnClient {
             log.warn("[WeCom] Failed to unmarshal frame", e);
             return;
         }
-        String cmd = frame.path("cmd").asText("");
+        String cmd = frame.path("cmd").asString("");
         if (CMD_MSG_CALLBACK.equals(cmd) || CMD_EVENT_CALLBACK.equals(cmd)) {
             // 回调处理与连接生命周期解耦（重连不影响在飞消息）
             Thread worker = new Thread(() -> handleCallback(frame),
@@ -262,9 +262,9 @@ public class WecomLongConnClient {
      */
     IncomingMessage parseCallbackBody(JsonNode frame) {
         JsonNode msg = frame.path("body");
-        String msgType = msg.path("msgtype").asText("");
+        String msgType = msg.path("msgtype").asString("");
         if ("event".equals(msgType)) {
-            String eventType = msg.path("event").path("eventtype").asText("");
+            String eventType = msg.path("event").path("eventtype").asString("");
             if ("disconnected_event".equals(eventType)) {
                 log.warn("[WeCom] Server sent disconnected_event, closing connection to trigger"
                         + " reconnect");
@@ -278,24 +278,24 @@ public class WecomLongConnClient {
             return null;
         }
 
-        String reqId = frame.path("headers").path("req_id").asText("");
-        String chatTypeRaw = msg.path("chattype").asText("");
+        String reqId = frame.path("headers").path("req_id").asString("");
+        String chatTypeRaw = msg.path("chattype").asString("");
         boolean isGroup = "group".equals(chatTypeRaw);
         String chatType = isGroup ? ImTypes.CHAT_TYPE_GROUP : ImTypes.CHAT_TYPE_DIRECT;
-        String chatId = isGroup ? msg.path("chatid").asText("") : "";
-        String userId = msg.path("from").path("userid").asText("");
-        String msgId = msg.path("msgid").asText("");
+        String chatId = isGroup ? msg.path("chatid").asString("") : "";
+        String userId = msg.path("from").path("userid").asString("");
+        String msgId = msg.path("msgid").asString("");
 
         IncomingMessage incoming = switch (msgType) {
             case "text" -> {
-                String content = msg.path("text").path("content").asText("");
+                String content = msg.path("text").path("content").asString("");
                 if (isGroup) {
                     content = stripAtMention(content);
                 }
                 yield textMessage(userId, chatId, chatType, msgId, content, reqId, null);
             }
             case "voice" -> {
-                String content = msg.path("voice").path("content").asText("");
+                String content = msg.path("voice").path("content").asString("");
                 if (content.isEmpty()) {
                     log.info("[WeCom] Ignoring voice message with empty content");
                     yield null;
@@ -303,22 +303,22 @@ public class WecomLongConnClient {
                 yield textMessage(userId, chatId, chatType, msgId, content, reqId, null);
             }
             case "image" -> {
-                String url = msg.path("image").path("url").asText("");
+                String url = msg.path("image").path("url").asString("");
                 if (url.isEmpty()) {
                     log.info("[WeCom] Ignoring image message with empty URL");
                     yield null;
                 }
                 yield fileMessage(ImTypes.MESSAGE_TYPE_IMAGE, userId, chatId, chatType, msgId,
-                        url, msgId + ".png", msg.path("image").path("aeskey").asText(""), reqId);
+                        url, msgId + ".png", msg.path("image").path("aeskey").asString(""), reqId);
             }
             case "file" -> {
-                String url = msg.path("file").path("url").asText("");
+                String url = msg.path("file").path("url").asString("");
                 if (url.isEmpty()) {
                     log.info("[WeCom] Ignoring file message with empty URL");
                     yield null;
                 }
                 yield fileMessage(ImTypes.MESSAGE_TYPE_FILE, userId, chatId, chatType, msgId,
-                        url, msgId, msg.path("file").path("aeskey").asText(""), reqId);
+                        url, msgId, msg.path("file").path("aeskey").asString(""), reqId);
             }
             case "mixed" -> convertMixedMessage(msg, chatId, chatType, reqId);
             default -> {
@@ -331,7 +331,7 @@ public class WecomLongConnClient {
         }
         JsonNode quote = msg.path("quote");
         if (!quote.isMissingNode() && !quote.isNull()) {
-            incoming.quote = buildQuotedMessage(quote, msg.path("aibotid").asText(""));
+            incoming.quote = buildQuotedMessage(quote, msg.path("aibotid").asString(""));
         }
         return incoming;
     }
@@ -378,9 +378,9 @@ public class WecomLongConnClient {
         String firstImageUrl = "";
         String firstImageAesKey = "";
         for (JsonNode item : msg.path("mixed").path("msg_item")) {
-            String itemType = item.path("msgtype").asText("");
+            String itemType = item.path("msgtype").asString("");
             if ("text".equals(itemType)) {
-                String text = item.path("text").path("content").asText("").trim();
+                String text = item.path("text").path("content").asString("").trim();
                 if (isGroup) {
                     text = stripAtMention(text);
                 }
@@ -388,15 +388,15 @@ public class WecomLongConnClient {
                     textParts.add(text);
                 }
             } else if ("image".equals(itemType) && firstImageUrl.isEmpty()) {
-                String url = item.path("image").path("url").asText("");
+                String url = item.path("image").path("url").asString("");
                 if (!url.isEmpty()) {
                     firstImageUrl = url;
-                    firstImageAesKey = item.path("image").path("aeskey").asText("");
+                    firstImageAesKey = item.path("image").path("aeskey").asString("");
                 }
             }
         }
-        String userId = msg.path("from").path("userid").asText("");
-        String msgId = msg.path("msgid").asText("");
+        String userId = msg.path("from").path("userid").asString("");
+        String msgId = msg.path("msgid").asString("");
         if (!textParts.isEmpty()) {
             return textMessage(userId, chatId, chatType, msgId, String.join("\n", textParts),
                     reqId, null);
@@ -415,15 +415,15 @@ public class WecomLongConnClient {
         if (quote == null || quote.isMissingNode() || quote.isNull()) {
             return null;
         }
-        String msgType = quote.path("msgtype").asText("");
+        String msgType = quote.path("msgtype").asString("");
         String content = switch (msgType) {
-            case "text" -> quote.path("text").path("content").asText("");
-            case "voice" -> quote.path("voice").path("content").asText("");
+            case "text" -> quote.path("text").path("content").asString("");
+            case "voice" -> quote.path("voice").path("content").asString("");
             case "mixed" -> {
                 List<String> parts = new java.util.ArrayList<>();
                 for (JsonNode item : quote.path("mixed").path("msg_item")) {
-                    if ("text".equals(item.path("msgtype").asText(""))) {
-                        String text = item.path("text").path("content").asText("");
+                    if ("text".equals(item.path("msgtype").asString(""))) {
+                        String text = item.path("text").path("content").asString("");
                         if (!text.isEmpty()) {
                             parts.add(text);
                         }
@@ -433,13 +433,13 @@ public class WecomLongConnClient {
             }
             default -> "";
         };
-        String fromUserId = quote.path("from").path("userid").asText("");
-        String quoteAiBotId = quote.path("aibotid").asText("");
+        String fromUserId = quote.path("from").path("userid").asString("");
+        String quoteAiBotId = quote.path("aibotid").asString("");
         boolean isBot = (!fromUserId.isEmpty() && !aiBotId.isEmpty() && fromUserId.equals(aiBotId))
                 || (!quoteAiBotId.isEmpty() && quoteAiBotId.equals(aiBotId));
 
         IncomingMessage.QuotedMessage result = new IncomingMessage.QuotedMessage();
-        result.messageId = quote.path("msgid").asText("");
+        result.messageId = quote.path("msgid").asString("");
         result.content = content;
         result.senderId = fromUserId;
         result.isBotMessage = isBot;

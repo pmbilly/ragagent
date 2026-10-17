@@ -1,13 +1,13 @@
 package com.ragagent.session.controller.sse;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.session.SseSink;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 把一个 {@link StreamResponse} 写成 gin 那条 SSE 帧——**逐字节**。
@@ -82,7 +82,7 @@ public class SseFrameWriter {
         String json;
         try {
             json = mapper.writeValueAsString(payload);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IOException("failed to marshal stream response: " + e.getMessage(), e);
         }
 

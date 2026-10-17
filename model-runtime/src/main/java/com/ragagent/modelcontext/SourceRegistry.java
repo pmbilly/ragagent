@@ -1,7 +1,6 @@
 package com.ragagent.modelcontext;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.contract.retrieval.SearchResult;
@@ -10,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import tools.jackson.databind.JsonNode;
 
 /**
  * model-context registry 的 source-reference 半边：chunk/document/knowledge base/web page 的

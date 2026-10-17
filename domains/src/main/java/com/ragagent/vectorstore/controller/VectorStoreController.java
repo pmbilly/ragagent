@@ -1,8 +1,6 @@
 package com.ragagent.vectorstore.controller;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.vectorstore.ConnectionConfig;
@@ -34,6 +32,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 向量库管理端（8 条路由；读 Viewer+ / 写与测试 Admin+）。
@@ -267,7 +267,7 @@ public class VectorStoreController {
 
     private static String textOrNull(JsonNode body, String field) {
         JsonNode n = body.get(field);
-        return n == null || n.isNull() ? null : n.asText();
+        return n == null || n.isNull() ? null : n.asString();
     }
 
     private static JsonNode parseOrValidator(String rawBody) {

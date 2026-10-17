@@ -132,9 +132,9 @@ class WebSearchProviderContractTest {
                             .contentType("application/json")
                             .content("{\"email\":\"" + email + "\",\"password\":\"Passw0rd!\"}"))
                     .andReturn();
-            com.fasterxml.jackson.databind.JsonNode node = new com.fasterxml.jackson.databind.ObjectMapper()
+            tools.jackson.databind.JsonNode node = new tools.jackson.databind.ObjectMapper()
                     .readTree(result.getResponse().getContentAsString());
-            return node.path("data").get("token").asText();
+            return node.path("data").get("token").asString();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -199,9 +199,9 @@ class WebSearchProviderContractTest {
         MvcResult result = perform("POST", API + "/web-search-providers", owner, body);
         assertEquals(201, result.getResponse().getStatus(),
                 () -> "seed create failed: " + result.getResponse().getErrorMessage());
-        com.fasterxml.jackson.databind.JsonNode node = new com.fasterxml.jackson.databind.ObjectMapper()
+        tools.jackson.databind.JsonNode node = new tools.jackson.databind.ObjectMapper()
                 .readTree(result.getResponse().getContentAsString());
-        return node.path("data").get("id").asText();   // 统一外壳下钻
+        return node.path("data").get("id").asString();   // 统一外壳下钻
     }
 
     // ── 1) 静态元数据 ──────────────────────────────────────────────────

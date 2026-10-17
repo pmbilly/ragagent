@@ -1,9 +1,5 @@
 package com.ragagent.embedchannel.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.contract.knowledge.ChunkRowView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
@@ -19,6 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * embed 渠道 service（含 session token/签名段）。
@@ -603,7 +603,7 @@ public class EmbedChannelService {
         if (agent == null) {
             return false;
         }
-        String mode = parseConfig(agent).path("kbSelectionMode").asText("");
+        String mode = parseConfig(agent).path("kbSelectionMode").asString("");
         return switch (mode) {
             case "none" -> false;
             case "selected" -> false;
@@ -655,14 +655,14 @@ public class EmbedChannelService {
             return List.of();
         }
         JsonNode cfg = parseConfig(agent);
-        if (!"selected".equals(cfg.path("kbSelectionMode").asText(""))) {
+        if (!"selected".equals(cfg.path("kbSelectionMode").asString(""))) {
             return List.of();
         }
         List<String> ids = new ArrayList<>();
         JsonNode kbs = cfg.get("knowledgeBases");
         if (kbs != null && kbs.isArray()) {
             for (JsonNode k : kbs) {
-                ids.add(k.asText(""));
+                ids.add(k.asString(""));
             }
         }
         return ids;
@@ -694,7 +694,7 @@ public class EmbedChannelService {
             }
             List<String> origins = new ArrayList<>();
             for (JsonNode n : node) {
-                origins.add(n.asText(""));
+                origins.add(n.asString(""));
             }
             return origins;
         } catch (Exception e) {

@@ -1,6 +1,5 @@
 package com.ragagent.agenttools.knowledge;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
@@ -11,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import tools.jackson.databind.JsonNode;
 
 /**
  * search_conversations 工具。
@@ -96,7 +96,7 @@ public class SearchConversationsTool extends BaseTool {
     @Override
     public ToolResult execute(ToolRequest request) {
         JsonNode args = JsonMappers.toJsonNode(request.args());
-        String query = args.path("query").asText("").trim();
+        String query = args.path("query").asString("").trim();
         if (query.isEmpty()) {
             return failure("query is required");
         }

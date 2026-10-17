@@ -1,6 +1,5 @@
 package com.ragagent.websearch.provider;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.web.ProviderJson;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
@@ -10,6 +9,7 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Bing 搜索 provider。
@@ -65,12 +65,12 @@ public final class BingProvider implements WebSearchProvider {
         List<WebSearchResult> results = new ArrayList<>();
         for (JsonNode item : respData.path("webPages").path("value")) {
             WebSearchResult result = new WebSearchResult();
-            result.setTitle(item.path("name").asText(""));
-            result.setUrl(item.path("url").asText(""));
-            result.setSnippet(item.path("snippet").asText(""));
+            result.setTitle(item.path("name").asString(""));
+            result.setUrl(item.path("url").asString(""));
+            result.setSnippet(item.path("snippet").asString(""));
             result.setSource("bing");
             // dateLastCrawled 恒承载（零值也是值）；解析失败置 null，不外显
-            OffsetDateTime crawled = parseRfc3339(item.path("dateLastCrawled").asText(""));
+            OffsetDateTime crawled = parseRfc3339(item.path("dateLastCrawled").asString(""));
             result.setPublishedAt(crawled);
             results.add(result);
         }

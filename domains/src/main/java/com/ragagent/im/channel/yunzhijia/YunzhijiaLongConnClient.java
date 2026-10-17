@@ -1,8 +1,5 @@
 package com.ragagent.im.channel.yunzhijia;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.platform.web.JsonMappers;
 import java.net.URI;
@@ -21,6 +18,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * 云之家长连接（websocket）客户端。
@@ -336,7 +336,7 @@ public class YunzhijiaLongConnClient {
         List<String> required = new ArrayList<>(List.of("robotId", "robotName", "operatorOpenid",
                 "operatorName", "msgId", "content"));
         for (String key : required) {
-            if (!data.has(key) || !data.get(key).isTextual()) {
+            if (!data.has(key) || !data.get(key).isString()) {
                 return null;
             }
         }
@@ -352,7 +352,7 @@ public class YunzhijiaLongConnClient {
 
     /** 非字符串或缺失 → 空串。 */
     static String rawString(JsonNode node) {
-        return node != null && node.isTextual() ? node.asText("") : "";
+        return node != null && node.isString() ? node.asString("") : "";
     }
 
     /** 供测试投递一帧（替代 WS 收包，照 wecom/dingtalk 长连接的测试粒度）。 */

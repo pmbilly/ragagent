@@ -1,9 +1,5 @@
 package com.ragagent.modelcontext;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.MessageContentPart;
 import com.ragagent.contract.model.chat.ToolCall;
@@ -14,6 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 
 /**
  * source 句柄的<b>工具参数编解码</b>（自 {@code SourceRegistry} 的同名段外提）。
@@ -66,11 +66,11 @@ final class SourceToolCodec {
     }
 
     private void collectUnresolvedToolHandles(String key, JsonNode value, Set<String> seen, java.util.function.Predicate<String> allowed) {
-        if (value.isTextual()) {
+        if (value.isString()) {
             if (!ToolPolicy.hasSourceKeySpace(key) || !allowed.test(key)) {
                 return;
             }
-            String handle = value.asText().strip();
+            String handle = value.asString().strip();
             if (SourceRegistry.SHORT_SOURCE_HANDLE.matcher(handle).matches() && durableForHandle(handle).isEmpty()) {
                 seen.add(handle);
             }
@@ -79,9 +79,7 @@ final class SourceToolCodec {
                 collectUnresolvedToolHandles(key, item, seen, allowed);
             }
         } else if (value.isObject()) {
-            var fields = value.fields();
-            while (fields.hasNext()) {
-                var e = fields.next();
+            for (var e : value.properties()) {
                 collectUnresolvedToolHandles(e.getKey(), e.getValue(), seen, allowed);
             }
         }
@@ -250,18 +248,16 @@ final class SourceToolCodec {
     }
 
     private void registerToolArgumentValue(String key, JsonNode value, java.util.function.Predicate<String> allowed) {
-        if (value.isTextual()) {
+        if (value.isString()) {
             if (allowed.test(key)) {
-                registerSourceIDByKey(key, value.asText(), false);
+                registerSourceIDByKey(key, value.asString(), false);
             }
         } else if (value.isArray()) {
             for (JsonNode item : value) {
                 registerToolArgumentValue(key, item, allowed);
             }
         } else if (value.isObject()) {
-            var fields = value.fields();
-            while (fields.hasNext()) {
-                var e = fields.next();
+            for (var e : value.properties()) {
                 registerToolArgumentValue(e.getKey(), e.getValue(), allowed);
             }
         }
@@ -329,15 +325,15 @@ final class SourceToolCodec {
     }
 
     private JsonNode walkJSON(String key, JsonNode value, boolean encode, java.util.function.Predicate<String> allowed) {
-        if (value.isTextual()) {
-            String typed = value.asText();
+        if (value.isString()) {
+            String typed = value.asString();
             if (!allowed.test(key)) {
                 return value;
             }
             if (encode) {
                 // 编码按精确真实标识（UUID/URL）匹配，不与 prose 冲突，保持 key 无关
                 String handle = handleForDurable(typed);
-                return handle.isEmpty() ? value : TextNode.valueOf(handle);
+                return handle.isEmpty() ? value : StringNode.valueOf(handle);
             }
             // 解码只针对 ID 键，且值是 handle 形状时才替换
             if (!ToolPolicy.hasSourceKeySpace(key)) {
@@ -347,7 +343,7 @@ final class SourceToolCodec {
                 return value;
             }
             String real = durableForHandle(typed);
-            return real.isEmpty() ? value : TextNode.valueOf(real);
+            return real.isEmpty() ? value : StringNode.valueOf(real);
         }
         if (value.isArray()) {
             ArrayNode array = (ArrayNode) value;
@@ -356,9 +352,9 @@ final class SourceToolCodec {
             }
         } else if (value.isObject()) {
             ObjectNode obj = (ObjectNode) value;
-            var fields = obj.fields();
+            var fields = obj.properties();
             List<Map.Entry<String, JsonNode>> entries = new ArrayList<>();
-            fields.forEachRemaining(entries::add);
+            fields.forEach(entries::add);
             for (Map.Entry<String, JsonNode> e : entries) {
                 obj.set(e.getKey(), walkJSON(e.getKey(), e.getValue(), encode, allowed));
             }

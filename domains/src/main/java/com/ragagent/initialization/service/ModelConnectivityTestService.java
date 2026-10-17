@@ -1,8 +1,5 @@
 package com.ragagent.initialization.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -29,6 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * 模型连通性测试端点用例（remote/embedding/rerank/asr/multimodal）与测试模型装配、SSRF 校验、密钥解密机制。
@@ -283,7 +283,7 @@ public final class ModelConnectivityTestService {
                 JsonNode sepNode = MAPPER.readTree(separatorsRaw);
                 if (sepNode.isArray()) {
                     List<String> parsed = new ArrayList<>();
-                    sepNode.forEach(s -> parsed.add(s.asText()));
+                    sepNode.forEach(s -> parsed.add(s.asString()));
                     separators = parsed;
                 } else {
                     separators = List.of("\n\n", "\n", "。", "！", "？", ";", "；");
@@ -504,7 +504,7 @@ public final class ModelConnectivityTestService {
 
     static String text(JsonNode n, String field) {
         JsonNode v = n.get(field);
-        return v == null || v.isNull() ? "" : v.asText("");
+        return v == null || v.isNull() ? "" : v.asString("");
     }
 
     static String orEmpty(String s) {

@@ -1,7 +1,5 @@
 package com.ragagent.websearch.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.knowledge.KnowledgeMaintenancePort;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.List;
@@ -10,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * web 搜索临时 KB 的 Redis 状态（Get/Save/Delete 三方法，键
@@ -64,9 +64,9 @@ public class WebSearchTempKbStateService {
     /** 旧 blob 的键名 → 新键名（仅部署窗口用；窗口过后连同本方法删除）。 */
     static String migrateLegacyKeys(String json) {
         try {
-            com.fasterxml.jackson.databind.JsonNode root = MAPPER.readTree(json);
-            if (root instanceof com.fasterxml.jackson.databind.node.ObjectNode obj) {
-                var moved = new java.util.LinkedHashMap<String, com.fasterxml.jackson.databind.JsonNode>();
+            tools.jackson.databind.JsonNode root = MAPPER.readTree(json);
+            if (root instanceof tools.jackson.databind.node.ObjectNode obj) {
+                var moved = new java.util.LinkedHashMap<String, tools.jackson.databind.JsonNode>();
                 for (String[] pair : new String[][]{{"kbID", "kbId"}, {"knowledgeIDs", "knowledgeIds"},
                         {"seenURLs", "seenUrls"}}) {
                     var v = obj.remove(pair[0]);
@@ -97,7 +97,7 @@ public class WebSearchTempKbStateService {
                             state.seenUrls() == null ? Map.of() : state.seenUrls());
                 }
             }
-        } catch (RuntimeException | JsonProcessingException e) {
+        } catch (JacksonException e) {
             // 读取或反序列化失败都返回空三元组
         }
         return new TempKbState("", List.of(), Map.of());
@@ -111,7 +111,7 @@ public class WebSearchTempKbStateService {
             byte[] json = MAPPER.writeValueAsBytes(
                     new TempKbState(tempKbId, knowledgeIds, seenUrls));
             redis.opsForValue().set(stateKey, new String(json, java.nio.charset.StandardCharsets.UTF_8));
-        } catch (RuntimeException | JsonProcessingException e) {
+        } catch (JacksonException e) {
             // 序列化失败静默丢弃
         }
     }
@@ -136,7 +136,7 @@ public class WebSearchTempKbStateService {
         TempKbState state;
         try {
             state = MAPPER.readValue(raw, TempKbState.class);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             // Invalid state, just delete the key
             redis.delete(stateKey);
             return;

@@ -3,11 +3,10 @@ package com.ragagent.memory.service;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.platform.access.TracingContext;
 import com.ragagent.platform.web.JsonMappers;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 一次蒸馏任务的全部输入。
@@ -56,8 +55,7 @@ public record MemoryExtractPayload(
         @JsonInclude(value = JsonInclude.Include.CUSTOM,
                 valueFilter = TracingContext.EmptyOmitFilter.class) TracingContext tracing) {
 
-    private static final ObjectMapper MAPPER = JsonMappers.lenient()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     public MemoryExtractPayload {
         subjectId = subjectId == null ? "" : subjectId;

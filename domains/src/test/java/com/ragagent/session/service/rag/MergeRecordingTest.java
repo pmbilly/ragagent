@@ -4,7 +4,6 @@ import static com.ragagent.session.service.rag.Rec46cSupport.assertRec;
 import static com.ragagent.session.service.rag.Rec46cSupport.json;
 import static com.ragagent.session.service.rag.Rec46cSupport.searchResultsShape;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.contract.retrieval.SearchChunkMerge;
 import com.ragagent.contract.retrieval.SearchResult;
@@ -18,6 +17,7 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 录制回放：merge 五件（classify / sequential / group / parent / expand / faq / history）

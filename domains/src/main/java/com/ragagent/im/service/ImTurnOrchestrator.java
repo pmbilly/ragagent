@@ -1,7 +1,6 @@
 package com.ragagent.im.service;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.agent.AgentChannelCleaner;
 import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.contract.doc.DocReaderParsePort;
@@ -48,6 +47,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * IM 执行体核心。

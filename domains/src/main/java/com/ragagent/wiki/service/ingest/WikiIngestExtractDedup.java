@@ -1,7 +1,5 @@
 package com.ragagent.wiki.service.ingest;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.contract.wiki.WikiConstants;
@@ -18,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 抽取项去重协作者:候选组渲染、LLM 去重仲裁与投影稳定化。
@@ -243,7 +243,7 @@ final class WikiIngestExtractDedup {
                     continue;
                 }
                 JsonNode target = merges.get(item.getSlug());
-                if (target == null || !target.isTextual()) {
+                if (target == null || !target.isString()) {
                     continue;
                 }
                 String existingSlug = target.textValue();

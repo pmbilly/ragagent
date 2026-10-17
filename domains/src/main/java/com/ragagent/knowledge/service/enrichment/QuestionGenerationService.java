@@ -1,6 +1,5 @@
 package com.ragagent.knowledge.service.enrichment;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.wiki.WikiFinalizePort;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkQuestionPort;
@@ -22,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 问题生成**批** worker。
@@ -150,7 +150,7 @@ public class QuestionGenerationService implements QuestionGenerationConsumer {
 
         int questionCount = clampQuestionCount(p.questionCount());
         JsonNode qg = kb.getQuestionGenerationConfig();
-        String customInstructions = qg == null ? "" : qg.path("customInstructions").asText("");
+        String customInstructions = qg == null ? "" : qg.path("customInstructions").asString("");
 
         List<Chunk> batch = new ArrayList<>(batchIds.size());
         for (String id : batchIds) {

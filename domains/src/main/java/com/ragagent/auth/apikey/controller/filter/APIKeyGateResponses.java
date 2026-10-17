@@ -1,6 +1,5 @@
 package com.ragagent.auth.apikey.controller.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.JsonMappers;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -8,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.http.MediaType;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * API-Key 门禁的拒绝响应。

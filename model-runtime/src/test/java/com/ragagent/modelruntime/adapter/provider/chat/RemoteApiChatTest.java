@@ -7,9 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
@@ -23,7 +20,6 @@ import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapters;
 import com.ragagent.platform.http.LlmTransport;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.web.ContractJsonModule;
 import com.ragagent.platform.web.JsonMappers;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
@@ -40,6 +36,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * {@code RemoteApiChat} 出站/入站语义测试，外加针对 Java 单路径（裸 HTTP + SseReader）
@@ -50,8 +49,7 @@ import org.junit.jupiter.api.Test;
 class RemoteApiChatTest {
 
     // TokenUsage 的线格式（snake 键 + NON_DEFAULT 省略）自 B268-A② 起由契约 mixin 模块承载
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .registerModule(new ContractJsonModule());
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 无 provider、无 baseURL 的默认实例。 */
     private static RemoteApiChat newTestRemoteChat() {
@@ -100,7 +98,7 @@ class RemoteApiChatTest {
         assertNotNull(enabledBody.get("parallel_tool_calls"));
         assertTrue(enabledBody.get("parallel_tool_calls").asBoolean());
         assertEquals(1, enabledBody.get("tools").size());
-        assertEquals("mcp_weather_getforecast", enabledBody.get("tools").get(0).path("function").path("name").asText());
+        assertEquals("mcp_weather_getforecast", enabledBody.get("tools").get(0).path("function").path("name").asString());
 
         ChatOptions disabled = new ChatOptions();
         disabled.setTemperature(0.7);
@@ -141,14 +139,14 @@ class RemoteApiChatTest {
         JsonNode tools = node.get("tools");
         assertEquals(2, tools.size());
         assertEquals("mcp_hazardous_chemicals_gethazardouschemicals",
-                tools.get(0).path("function").path("name").asText());
+                tools.get(0).path("function").path("name").asString());
         assertEquals("mcp_hazardous_chemicals_gethazardouschemicalbybizid",
-                tools.get(1).path("function").path("name").asText());
+                tools.get(1).path("function").path("name").asString());
         assertTrue(node.get("parallel_tool_calls").asBoolean());
         assertTrue(node.get("stream").asBoolean());
 
         for (JsonNode tool : tools) {
-            String name = tool.path("function").path("name").asText();
+            String name = tool.path("function").path("name").asString();
             assertFalse(name.contains("ed606721"), "tool name must use service name, not UUID");
             assertTrue(name.matches("^[a-zA-Z0-9_-]+$"), "tool name must match OpenAI pattern");
             assertTrue(name.length() <= 64, "tool name must be <= 64 chars");
@@ -234,14 +232,14 @@ class RemoteApiChatTest {
 
         ChatOptions auto = new ChatOptions();
         auto.setToolChoice("auto");
-        assertEquals("auto", body(chat, messages, auto, false).path("tool_choice").asText());
+        assertEquals("auto", body(chat, messages, auto, false).path("tool_choice").asString());
 
         ChatOptions specific = new ChatOptions();
         specific.setToolChoice("mcp_svc_tool");
         JsonNode choice = body(chat, messages, specific, false).get("tool_choice");
         assertNotNull(choice);
-        assertEquals("function", choice.path("type").asText());
-        assertEquals("mcp_svc_tool", choice.path("function").path("name").asText());
+        assertEquals("function", choice.path("type").asString());
+        assertEquals("mcp_svc_tool", choice.path("function").path("name").asString());
     }
 
     // ------------------------------------------------------------------
@@ -281,7 +279,7 @@ class RemoteApiChatTest {
         JsonNode node = chat.buildChatCompletionRequest(List.of(user1, assistant), new ChatOptions(), false);
         assertNull(node.get("messages").get(0).get("reasoning_content"));
         assertEquals("let me think about this carefully",
-                node.get("messages").get(1).path("reasoning_content").asText());
+                node.get("messages").get(1).path("reasoning_content").asString());
     }
 
     /** 补测：ConvertMessages 的 Images → MultiContent 展开（仅 user 角色，detail=auto，content 收尾）。 */
@@ -296,19 +294,19 @@ class RemoteApiChatTest {
         JsonNode content = messages.get(0).get("content");
         assertTrue(content.isArray(), "images 应降级为 multi-content 数组");
         assertEquals(2, content.size());
-        assertEquals("image_url", content.get(0).path("type").asText());
-        assertEquals("data:image/png;base64,AAAA", content.get(0).path("image_url").path("url").asText());
-        assertEquals("auto", content.get(0).path("image_url").path("detail").asText());
-        assertEquals("text", content.get(1).path("type").asText());
-        assertEquals("描述这张图", content.get(1).path("text").asText());
+        assertEquals("image_url", content.get(0).path("type").asString());
+        assertEquals("data:image/png;base64,AAAA", content.get(0).path("image_url").path("url").asString());
+        assertEquals("auto", content.get(0).path("image_url").path("detail").asString());
+        assertEquals("text", content.get(1).path("type").asString());
+        assertEquals("描述这张图", content.get(1).path("text").asString());
 
         // assistant 带 images 时不展开（仅 user 消息展开 images）
         ChatMessage assistant = new ChatMessage("assistant", "ok");
         assistant.setImages(List.of("data:image/png;base64,AAAA"));
         JsonNode assistantMsg = chat.buildChatCompletionRequest(List.of(assistant), new ChatOptions(), false)
                 .get("messages").get(0);
-        assertTrue(assistantMsg.get("content").isTextual());
-        assertEquals("ok", assistantMsg.get("content").asText());
+        assertTrue(assistantMsg.get("content").isString());
+        assertEquals("ok", assistantMsg.get("content").asString());
     }
 
     /** 补测：tool 角色消息带上 tool_call_id / name，assistant 的 tool_calls 原样回传。 */
@@ -328,12 +326,12 @@ class RemoteApiChatTest {
                 new ChatOptions(), false).get("messages");
         assertNull(messages.get(0).get("content"), "go-openai 的 content 带 omitempty，空串不上线");
         JsonNode toolCall = messages.get(0).path("tool_calls").get(0);
-        assertEquals("call_1", toolCall.path("id").asText());
-        assertEquals("function", toolCall.path("type").asText());
-        assertEquals("wiki_search", toolCall.path("function").path("name").asText());
-        assertEquals("{\"query\":\"MACS\"}", toolCall.path("function").path("arguments").asText());
-        assertEquals("call_1", messages.get(1).path("tool_call_id").asText());
-        assertEquals("wiki_search", messages.get(1).path("name").asText());
+        assertEquals("call_1", toolCall.path("id").asString());
+        assertEquals("function", toolCall.path("type").asString());
+        assertEquals("wiki_search", toolCall.path("function").path("name").asString());
+        assertEquals("{\"query\":\"MACS\"}", toolCall.path("function").path("arguments").asString());
+        assertEquals("call_1", messages.get(1).path("tool_call_id").asString());
+        assertEquals("wiki_search", messages.get(1).path("name").asString());
     }
 
     /** 补测：tools 的 parameters 无『为空省略』——null 时上线 null（对照 go-openai 的字段 tag）。 */
@@ -392,7 +390,7 @@ class RemoteApiChatTest {
 
     @Test
     void mapPathKeysStayAlphabetical() throws Exception {
-        com.fasterxml.jackson.databind.JsonNode body = MAPPER.readTree(
+        tools.jackson.databind.JsonNode body = MAPPER.readTree(
                 "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}],"
                         + "\"stream\":true}");
         String json = RemoteApiChat.byteOrderSorted(body).toString();
@@ -438,7 +436,7 @@ class RemoteApiChatTest {
         chat.applyCompletionToolCallMetadata(body, resp);
         assertEquals(1, resp.getToolCalls().size());
         assertEquals("sig-from-gemini", JsonMappers.toJsonNode(resp.getToolCalls().get(0).getProviderMetadata())
-                .get("google").path("thought_signature").asText());
+                .get("google").path("thought_signature").asString());
     }
 
     // ------------------------------------------------------------------
@@ -470,7 +468,7 @@ class RemoteApiChatTest {
         List<ToolCall> toolCalls = state.buildOrderedToolCalls();
         assertEquals(1, toolCalls.size());
         assertEquals("stream-sig-from-gemini", JsonMappers.toJsonNode(toolCalls.get(0).getProviderMetadata())
-                .get("google").path("thought_signature").asText());
+                .get("google").path("thought_signature").asString());
     }
 
     // ------------------------------------------------------------------
@@ -667,8 +665,8 @@ class RemoteApiChatTest {
         assertEquals("wiki_search", resp.getToolCalls().get(0).getFunction().getName());
 
         JsonNode sent = MAPPER.readTree(requestBody.get());
-        assertEquals("test-model", sent.path("model").asText());
-        assertEquals("hi", sent.path("messages").get(0).path("content").asText());
+        assertEquals("test-model", sent.path("model").asString());
+        assertEquals("hi", sent.path("messages").get(0).path("content").asString());
         assertEquals(64, sent.path("max_tokens").asInt(), "generic provider 用 max_tokens");
         assertNull(sent.get("max_completion_tokens"));
         assertNull(sent.get("stream"), "非流式不带 stream");
@@ -884,7 +882,7 @@ class RemoteApiChatTest {
 
         RemoteApiChat chat = new RemoteApiChat(config);
         JsonNode sent = chat.buildChatCompletionRequest(userMessage("hi"), new ChatOptions(), false);
-        assertEquals("upstream-model", sent.path("model").asText());
+        assertEquals("upstream-model", sent.path("model").asString());
     }
 
     /** 收干队列（生产者结束后 poll 到 null 为止）——断言逐块顺序需要拿到全部元素。 */

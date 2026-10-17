@@ -2,7 +2,6 @@ package com.ragagent.rerank;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.Reranker;
@@ -29,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
 
 /**
  * rerank 客户端的 stub server A/B：请求体与录制（wire/*.json）逐字节比对 +
@@ -111,14 +111,14 @@ class RerankWireTest {
     static JsonNode wire(String name) {
         try (InputStream in = RerankWireTest.class.getResourceAsStream("/wire/" + name + ".json")) {
             assertNotNull(in, "wire recording missing: " + name);
-            return new com.fasterxml.jackson.databind.ObjectMapper().readTree(in);
+            return new tools.jackson.databind.ObjectMapper().readTree(in);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     static String wireBody(String name) {
-        return wire(name).path("body").asText();
+        return wire(name).path("body").asString();
     }
 
     static RerankerConfig config(String baseUrl) {

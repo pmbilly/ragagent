@@ -1,13 +1,11 @@
 package com.ragagent.agent.tool;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
-import java.util.Iterator;
-import java.util.Map;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * 参数类型矫正。
@@ -48,9 +46,7 @@ public final class ParamCaster {
         ObjectNode argsMap = ((ObjectNode) args).deepCopy();
         boolean changed = false;
 
-        Iterator<Map.Entry<String, JsonNode>> it = argsMap.fields();
-        while (it.hasNext()) {
-            Map.Entry<String, JsonNode> entry = it.next();
+        for (var entry : argsMap.properties()) {
             String key = entry.getKey();
             JsonNode propDef = properties.get(key);
             if (propDef == null) {
@@ -60,7 +56,7 @@ public final class ParamCaster {
                 continue;
             }
             JsonNode typeNode = propDef.get("type");
-            String targetType = typeNode != null && typeNode.isTextual() ? typeNode.textValue() : "";
+            String targetType = typeNode != null && typeNode.isString() ? typeNode.textValue() : "";
             if (targetType.isEmpty()) {
                 continue;
             }
@@ -90,7 +86,7 @@ public final class ParamCaster {
     static JsonNode castValue(JsonNode val, String targetType) {
         switch (targetType) {
             case "array": {
-                if (val.isTextual()) {
+                if (val.isString()) {
                     String s = val.textValue();
                     // 先试 JSON 解析（处理 "[{...}]" → 数组）
                     try {
@@ -109,7 +105,7 @@ public final class ParamCaster {
                 break;
             }
             case "boolean": {
-                if (val.isTextual()) {
+                if (val.isString()) {
                     String lower = val.textValue().toLowerCase();
                     switch (lower) {
                         case "true", "1", "yes":
@@ -133,7 +129,7 @@ public final class ParamCaster {
                 break;
             }
             case "integer": {
-                if (val.isTextual()) {
+                if (val.isString()) {
                     try {
                         long i = Long.parseLong(val.textValue());
                         return F.numberNode(i);
@@ -151,7 +147,7 @@ public final class ParamCaster {
                 break;
             }
             case "number": {
-                if (val.isTextual()) {
+                if (val.isString()) {
                     try {
                         double f = Double.parseDouble(val.textValue());
                         if (!Double.isNaN(f) && !Double.isInfinite(f)) {
@@ -194,7 +190,7 @@ public final class ParamCaster {
     }
 
     private static final class ObjectMapperHolder {
-        private static final com.fasterxml.jackson.databind.ObjectMapper MAPPER =
+        private static final tools.jackson.databind.ObjectMapper MAPPER =
                 JsonMappers.lenient();
     }
 }

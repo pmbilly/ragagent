@@ -128,8 +128,8 @@ class StorageBackendContractTest {
                             .contentType("application/json")
                             .content("{\"email\":\"" + email + "\",\"password\":\"Passw0rd!\"}"))
                     .andReturn();
-            return new com.fasterxml.jackson.databind.ObjectMapper()
-                    .readTree(result.getResponse().getContentAsString()).path("data").get("token").asText();
+            return new tools.jackson.databind.ObjectMapper()
+                    .readTree(result.getResponse().getContentAsString()).path("data").get("token").asString();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -202,8 +202,8 @@ class StorageBackendContractTest {
         String diag = bodyStr;
         assertEquals(201, result.getResponse().getStatus(),
                 () -> "seed create failed: " + diag);
-        return new com.fasterxml.jackson.databind.ObjectMapper()
-                .readTree(result.getResponse().getContentAsString()).path("data").get("id").asText();   // 外壳下钻
+        return new tools.jackson.databind.ObjectMapper()
+                .readTree(result.getResponse().getContentAsString()).path("data").get("id").asString();   // 外壳下钻
     }
 
     private String latestId(String name) {

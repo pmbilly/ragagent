@@ -2,14 +2,13 @@ package com.ragagent.datasource.connector.ima;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.connector.ConnectorHttp;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.Locale;
 import java.util.Map;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * IMA 专属配置。
@@ -36,8 +35,7 @@ public class ImaConfig {
      *
      * <p>凭据 map 里的键只多不少，解析必须容忍未知属性。</p>
      */
-    private static final ObjectMapper MAPPER = JsonMappers.lenient()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** {@code ima-openapi-clientid} 头的取值来源。 */
     private String clientId = "";

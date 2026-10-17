@@ -8,7 +8,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.datasource.domain.DataSourceSyncPayload;
 import com.ragagent.datasource.domain.TaskInitiator;
 import com.ragagent.platform.stream.EmbeddedRedis;
@@ -20,6 +19,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * {@link RedisDataSourceSyncTaskQueue} 的真 Redis 语义：执行与 TaskID 释放、

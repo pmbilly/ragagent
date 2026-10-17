@@ -1,7 +1,5 @@
 package com.ragagent.session.service.rag.plugin;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
@@ -21,6 +19,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * DATA_ANALYSIS 阶段插件：
@@ -143,7 +143,7 @@ public final class PluginDataAnalysis implements Plugin {
             try {
                 JsonNode args = JSON.readTree(response.getContent());
                 toolResult = tool.execute(args);
-            } catch (RuntimeException | com.fasterxml.jackson.core.JsonProcessingException e) {
+            } catch (tools.jackson.core.JacksonException e) {
                 Map<String, Object> f = new LinkedHashMap<>();
                 f.put("error", e.getMessage());
                 PipelineLog.error("DataAnalysis", "execute_sql", f);

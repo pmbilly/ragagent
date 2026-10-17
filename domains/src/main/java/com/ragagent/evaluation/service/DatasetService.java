@@ -1,18 +1,17 @@
 package com.ragagent.evaluation.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.evaluation.domain.QaPair;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 评估数据集服务。
@@ -128,10 +127,8 @@ public class DatasetService {
     private static Map<Long, String> readTextMap(JsonNode node) {
         Map<Long, String> out = new TreeMap<>();
         if (node != null) {
-            Iterator<Map.Entry<String, JsonNode>> it = node.fields();
-            while (it.hasNext()) {
-                Map.Entry<String, JsonNode> e = it.next();
-                out.put(Long.parseLong(e.getKey()), e.getValue().asText());
+            for (var e : node.properties()) {
+                out.put(Long.parseLong(e.getKey()), e.getValue().asString());
             }
         }
         return out;
@@ -140,9 +137,7 @@ public class DatasetService {
     private static Map<Long, List<Long>> readRelsMap(JsonNode node) {
         Map<Long, List<Long>> out = new TreeMap<>();
         if (node != null) {
-            Iterator<Map.Entry<String, JsonNode>> it = node.fields();
-            while (it.hasNext()) {
-                Map.Entry<String, JsonNode> e = it.next();
+            for (var e : node.properties()) {
                 List<Long> pids = new ArrayList<>();
                 for (JsonNode pid : e.getValue()) {
                     pids.add(pid.asLong());
@@ -156,9 +151,7 @@ public class DatasetService {
     private static Map<Long, Long> readQasMap(JsonNode node) {
         Map<Long, Long> out = new TreeMap<>();
         if (node != null) {
-            Iterator<Map.Entry<String, JsonNode>> it = node.fields();
-            while (it.hasNext()) {
-                Map.Entry<String, JsonNode> e = it.next();
+            for (var e : node.properties()) {
                 out.put(Long.parseLong(e.getKey()), e.getValue().asLong());
             }
         }

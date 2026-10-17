@@ -1,5 +1,8 @@
 # Spring Boot 4 升级评估（2026-10-17）
 
+> 2026-10-17 **v0.4.2 Jackson 3 全量迁移已通过**：4867/0，23 守卫全绿；
+> 主码已无 `com.fasterxml.jackson.databind/core` import。
+>
 > 2026-10-17 **v0.4.1 空跑已通过**：Boot 4.1.1 + Jackson 2 兼容桥（已去掉 spring-boot-jackson2 自动配置），4867/0；
 > 后续仍需独立迁移 Jackson 3（见文末）。
 

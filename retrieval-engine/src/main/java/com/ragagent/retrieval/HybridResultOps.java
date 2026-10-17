@@ -1,6 +1,5 @@
 package com.ragagent.retrieval;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.contract.retrieval.SearchResult;
@@ -15,6 +14,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import tools.jackson.databind.JsonNode;
 
 /**
  * HybridSearch 的结果装配簇：命中 → SearchResult（chunk 元数据补全 + FAQ 问题回填）。
@@ -199,13 +199,12 @@ final class HybridResultOps {
         } else if (meta.isObject()) {
             Map<String, String> m = new LinkedHashMap<>();
             boolean allStrings = true;
-            for (var it = meta.fields(); it.hasNext(); ) {
-                var e = it.next();
-                if (e.getValue() == null || !e.getValue().isTextual()) {
+            for (var e : meta.properties()) {
+                if (e.getValue() == null || !e.getValue().isString()) {
                     allStrings = false;
                     break;
                 }
-                m.put(e.getKey(), e.getValue().asText());
+                m.put(e.getKey(), e.getValue().asString());
             }
             r.setMetadata(allStrings ? m : null);
         } else {
@@ -228,7 +227,7 @@ final class HybridResultOps {
         JsonNode rel = JsonMappers.toJsonNode(chunk.relationChunks());
         if (rel != null && rel.isArray()) {
             for (JsonNode n : rel) {
-                String id = n.asText("");
+                String id = n.asString("");
                 if (!id.isEmpty() && !processed.contains(id)) {
                     related.add(id);
                     processed.add(id);

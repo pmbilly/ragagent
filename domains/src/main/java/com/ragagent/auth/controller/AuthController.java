@@ -1,6 +1,5 @@
 package com.ragagent.auth.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.auth.domain.TenantInvitation;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.AuthConfigResponse;
@@ -70,6 +69,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 认证端点（登录 / 注册 / 会话 / OIDC）。

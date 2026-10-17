@@ -7,8 +7,6 @@ import static com.ragagent.wiki.controller.WikiRequestSupport.q;
 import static com.ragagent.wiki.controller.WikiRequestSupport.requiredFieldErrors;
 import static com.ragagent.wiki.controller.WikiRequestSupport.sanitize;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
 import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.domain.issue.WikiLintReport;
@@ -20,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 检索维护面与问题面的端点执行体：重建链接、体检、自动修复、问题列表与状态流转。
@@ -121,7 +121,7 @@ final class WikiMaintenanceOps {
             throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
                     "Invalid request body: " + bindingErrors);
         }
-        String status = node.path("status").asText();
+        String status = node.path("status").asString();
 
         if (!"pending".equals(status) && !"ignored".equals(status) && !"resolved".equals(status)) {
             throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),

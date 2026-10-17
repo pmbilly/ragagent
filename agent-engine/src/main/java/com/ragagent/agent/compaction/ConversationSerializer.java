@@ -1,7 +1,5 @@
 package com.ragagent.agent.compaction;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.platform.web.JsonMappers;
@@ -9,6 +7,8 @@ import com.ragagent.platform.web.ToolJson;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 摘要用对话序列化。
@@ -125,7 +125,7 @@ public final class ConversationSerializer {
     /** 按 UTF-8 字节序排键，保证同一参数渲染结果恒定（String.compareTo 是 UTF-16 序，不等于字节序）。 */
     private static List<String> sortedKeys(JsonNode obj) {
         List<String> keys = new ArrayList<>();
-        obj.fieldNames().forEachRemaining(keys::add);
+        obj.propertyNames().forEach(keys::add);
         keys.sort(ConversationSerializer::compareUtf8);
         return keys;
     }

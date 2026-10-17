@@ -1,11 +1,10 @@
 package com.ragagent.datasource.connector.notion;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 属性抽取的四个纯函数（{@code extractTitle} / {@code joinPlainText} /
@@ -59,14 +58,13 @@ final class NotionProperties {
         }
         JsonNode props = page.rawProperties;
         if (props != null && props.isObject()) {
-            Iterator<Map.Entry<String, JsonNode>> fields = props.fields();
-            while (fields.hasNext()) {
-                JsonNode propRaw = fields.next().getValue();
+            for (Map.Entry<String, JsonNode> field : props.properties()) {
+                JsonNode propRaw = field.getValue();
                 if (propRaw == null || !propRaw.isObject()) {
                     continue;
                 }
                 JsonNode typeNode = propRaw.get("type");
-                if (typeNode == null || !typeNode.isTextual()
+                if (typeNode == null || !typeNode.isString()
                         || !"title".equals(typeNode.textValue())) {
                     continue;
                 }
@@ -96,7 +94,7 @@ final class NotionProperties {
                 continue;
             }
             JsonNode pt = segment.get("plain_text");
-            if (pt != null && pt.isTextual()) {
+            if (pt != null && pt.isString()) {
                 sb.append(pt.textValue());
             }
         }
@@ -123,7 +121,7 @@ final class NotionProperties {
         }
         String typeName = "";
         JsonNode typeNode = value.get("type");
-        if (typeNode != null && typeNode.isTextual()) {
+        if (typeNode != null && typeNode.isString()) {
             typeName = typeNode.textValue();
         }
         if (typeName.isEmpty()) {
@@ -148,7 +146,7 @@ final class NotionProperties {
         if (v == null || v.isNull() || v.isMissingNode()) {
             return "";
         }
-        if (v.isTextual()) {
+        if (v.isString()) {
             return v.textValue();
         }
         if (v.isNumber()) {
@@ -188,31 +186,31 @@ final class NotionProperties {
             return "";
         }
         JsonNode name = m.get("name");
-        if (name != null && name.isTextual()) {
+        if (name != null && name.isString()) {
             return name.textValue();
         }
         JsonNode content = m.get("content");
-        if (content != null && content.isTextual()) {
+        if (content != null && content.isString()) {
             return content.textValue();
         }
         JsonNode plainText = m.get("plain_text");
-        if (plainText != null && plainText.isTextual()) {
+        if (plainText != null && plainText.isString()) {
             return plainText.textValue();
         }
         JsonNode start = m.get("start");
-        if (start != null && start.isTextual()) {
+        if (start != null && start.isString()) {
             JsonNode end = m.get("end");
-            if (end != null && end.isTextual() && !end.textValue().isEmpty()) {
+            if (end != null && end.isString() && !end.textValue().isEmpty()) {
                 return start.textValue() + " ~ " + end.textValue();
             }
             return start.textValue();
         }
         JsonNode expression = m.get("expression");
-        if (expression != null && expression.isTextual()) {
+        if (expression != null && expression.isString()) {
             return expression.textValue();
         }
         JsonNode typeNode = m.get("type");
-        if (typeNode != null && typeNode.isTextual()) {
+        if (typeNode != null && typeNode.isString()) {
             JsonNode inner = m.get(typeNode.textValue());
             if (inner != null) {
                 return extractValue(inner);
@@ -245,14 +243,12 @@ final class NotionProperties {
             return null;
         }
         List<String> propNames = new ArrayList<>();
-        Iterator<Map.Entry<String, JsonNode>> fields = props.fields();
-        while (fields.hasNext()) {
-            Map.Entry<String, JsonNode> entry = fields.next();
+        for (var entry : props.properties()) {
             JsonNode propRaw = entry.getValue();
             String type = "";
             if (propRaw != null && propRaw.isObject()) {
                 JsonNode typeNode = propRaw.get("type");
-                if (typeNode != null && typeNode.isTextual()) {
+                if (typeNode != null && typeNode.isString()) {
                     type = typeNode.textValue();
                 }
             }

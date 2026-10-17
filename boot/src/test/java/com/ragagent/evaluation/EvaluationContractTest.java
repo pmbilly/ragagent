@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.TestSchema;
 import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.auth.domain.TenantMember;
@@ -28,6 +26,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 评估契约测试（POST/GET /api/v1/evaluation）。
@@ -235,7 +235,7 @@ class EvaluationContractTest {
         }
         assertEquals(3, task.path("status").asInt(), raw(r));
         // 失败点在 ChunkVectorIndexer.updateChunkVector（KB 无 embedding 模型）
-        assertEquals("model ID cannot be empty", task.path("errMsg").asText());
+        assertEquals("model ID cannot be empty", task.path("errMsg").asString());
         JsonNode createdNode = MAPPER.readTree(raw(created));
         // 统一外壳下先下钻 data
         if (createdNode.isObject() && createdNode.has("code") && createdNode.has("data")) { createdNode = createdNode.get("data"); }
@@ -263,8 +263,8 @@ class EvaluationContractTest {
         return builder.contentType("application/json").content(body);
     }
 
-    private static final com.fasterxml.jackson.databind.ObjectMapper RAW_SEMANTIC_MAPPER =
-            new com.fasterxml.jackson.databind.ObjectMapper();
+    private static final tools.jackson.databind.ObjectMapper RAW_SEMANTIC_MAPPER =
+            new tools.jackson.databind.ObjectMapper();
 
     private static String raw(MvcResult r) throws Exception {
         // PR4 语义比较：与 golden 同侧归一（非 JSON 文本原样）
@@ -272,8 +272,8 @@ class EvaluationContractTest {
                 r.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
     }
 
-    private static final com.fasterxml.jackson.databind.ObjectMapper GOLDEN_SEMANTIC_MAPPER =
-            new com.fasterxml.jackson.databind.ObjectMapper();
+    private static final tools.jackson.databind.ObjectMapper GOLDEN_SEMANTIC_MAPPER =
+            new tools.jackson.databind.ObjectMapper();
 
     private static String golden(String name) throws Exception {
         // PR4 语义比较：键序/HTML 转义归一后返回（非 JSON 文本原样），断言侧不变

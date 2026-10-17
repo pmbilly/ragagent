@@ -130,7 +130,7 @@ class AgentContractTest {
             assertTrue(result.row().getConfig() != null
                             && result.row().getConfig().contains("\"smart-reasoning\""),
                     "虚拟内建行的 config 字符串必须落上（运行时消费面重新 parse row.getConfig()）");
-            assertEquals("smart-reasoning", result.config().path("agentMode").asText());
+            assertEquals("smart-reasoning", result.config().path("agentMode").asString());
         } finally {
             TenantContext.clear();
         }
@@ -415,8 +415,8 @@ class AgentContractTest {
     }
 
     private static String jsonPath(MvcResult r, String path) throws Exception {
-        com.fasterxml.jackson.databind.JsonNode node =
-                new com.fasterxml.jackson.databind.ObjectMapper().readTree(raw(r));
+        tools.jackson.databind.JsonNode node =
+                new tools.jackson.databind.ObjectMapper().readTree(raw(r));
         for (String seg : path.split("\\.")) {
             if (node.isArray() && seg.matches("\\d+")) {
                 node = node.get(Integer.parseInt(seg));
@@ -424,11 +424,11 @@ class AgentContractTest {
                 node = node.get(seg);
             }
         }
-        return node.asText();
+        return node.asString();
     }
 
-    private static final com.fasterxml.jackson.databind.ObjectMapper RAW_SEMANTIC_MAPPER =
-            new com.fasterxml.jackson.databind.ObjectMapper();
+    private static final tools.jackson.databind.ObjectMapper RAW_SEMANTIC_MAPPER =
+            new tools.jackson.databind.ObjectMapper();
 
     private static String raw(MvcResult r) throws Exception {
         // PR4 语义比较：与 golden 同侧归一（非 JSON 文本原样）
@@ -436,8 +436,8 @@ class AgentContractTest {
                 r.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
     }
 
-    private static final com.fasterxml.jackson.databind.ObjectMapper GOLDEN_SEMANTIC_MAPPER =
-            new com.fasterxml.jackson.databind.ObjectMapper();
+    private static final tools.jackson.databind.ObjectMapper GOLDEN_SEMANTIC_MAPPER =
+            new tools.jackson.databind.ObjectMapper();
 
     private static String golden(String name) throws Exception {
         // PR4 语义比较：键序/HTML 转义归一后返回（非 JSON 文本原样），断言侧不变

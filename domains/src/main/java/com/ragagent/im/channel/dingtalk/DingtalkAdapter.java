@@ -1,9 +1,5 @@
 package com.ragagent.im.channel.dingtalk;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.im.runtime.AdapterInterfaces;
 import com.ragagent.im.runtime.CallbackExchange;
 import com.ragagent.im.runtime.ImAdapterVerify;
@@ -30,6 +26,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * 钉钉适配器。
@@ -190,28 +190,28 @@ public class DingtalkAdapter implements AdapterInterfaces.Adapter,
 
     /** 四段链：richText → file/picture → audio → text。 */
     static IncomingMessage parseCallbackMessage(JsonNode msg) {
-        String conversationType = msg.path("conversationType").asText("");
+        String conversationType = msg.path("conversationType").asString("");
         boolean isGroup = CONV_TYPE_GROUP.equals(conversationType);
         String chatType = isGroup ? ImTypes.CHAT_TYPE_GROUP : ImTypes.CHAT_TYPE_DIRECT;
-        String chatId = isGroup ? msg.path("conversationId").asText("") : "";
+        String chatId = isGroup ? msg.path("conversationId").asString("") : "";
 
-        String userId = msg.path("senderStaffId").asText("");
+        String userId = msg.path("senderStaffId").asString("");
         if (userId.isEmpty()) {
-            userId = msg.path("senderId").asText("");
+            userId = msg.path("senderId").asString("");
         }
-        String msgType = msg.path("msgtype").asText("");
-        String msgId = msg.path("msgId").asText("");
-        String robotCode = msg.path("robotCode").asText("");
+        String msgType = msg.path("msgtype").asString("");
+        String msgId = msg.path("msgId").asString("");
+        String robotCode = msg.path("robotCode").asString("");
         JsonNode content = msg.path("content");
 
         IncomingMessage incoming = new IncomingMessage();
         incoming.platform = ImTypes.PLATFORM_DINGTALK;
         incoming.userId = userId;
-        incoming.userName = msg.path("senderNick").asText("");
+        incoming.userName = msg.path("senderNick").asString("");
         incoming.chatId = chatId;
         incoming.chatType = chatType;
         incoming.messageId = msgId;
-        incoming.extra.put("session_webhook", msg.path("sessionWebhook").asText(""));
+        incoming.extra.put("session_webhook", msg.path("sessionWebhook").asString(""));
         incoming.extra.put("raw_msgtype", msgType);
 
         RichText rich = parseRichTextContent(msgType, content);
@@ -234,7 +234,7 @@ public class DingtalkAdapter implements AdapterInterfaces.Adapter,
             return incoming;
         }
         incoming.messageType = ImTypes.MESSAGE_TYPE_TEXT;
-        incoming.content = msg.path("text").path("content").asText("").trim();
+        incoming.content = msg.path("text").path("content").asString("").trim();
         return incoming;
     }
 
@@ -259,7 +259,7 @@ public class DingtalkAdapter implements AdapterInterfaces.Adapter,
         List<String> textParts = new ArrayList<>();
         RichText result = new RichText();
         for (JsonNode item : richText) {
-            String text = item.path("text").asText("").trim();
+            String text = item.path("text").asString("").trim();
             if (!text.isEmpty()) {
                 textParts.add(text);
             }
@@ -278,11 +278,11 @@ public class DingtalkAdapter implements AdapterInterfaces.Adapter,
 
     /** type=picture 才认；原图码优先回落预览码。 */
     static String pictureDownloadCode(JsonNode item) {
-        if (!item.path("type").asText("").trim().equalsIgnoreCase("picture")) {
+        if (!item.path("type").asString("").trim().equalsIgnoreCase("picture")) {
             return "";
         }
-        String code = item.path("downloadCode").asText("");
-        return code.isEmpty() ? item.path("pictureDownloadCode").asText("") : code;
+        String code = item.path("downloadCode").asString("");
+        return code.isEmpty() ? item.path("pictureDownloadCode").asString("") : code;
     }
 
     /** msgtype=audio 且 recognition 非空。 */
@@ -293,7 +293,7 @@ public class DingtalkAdapter implements AdapterInterfaces.Adapter,
         if (content == null || content.isMissingNode() || content.isNull()) {
             return null;
         }
-        String text = content.path("recognition").asText("").trim();
+        String text = content.path("recognition").asString("").trim();
         return text.isEmpty() ? null : text;
     }
 
@@ -311,14 +311,14 @@ public class DingtalkAdapter implements AdapterInterfaces.Adapter,
                 return null;
             }
         }
-        String downloadCode = content == null ? "" : content.path("downloadCode").asText("");
+        String downloadCode = content == null ? "" : content.path("downloadCode").asString("");
         if (downloadCode.isEmpty()) {
-            downloadCode = content == null ? "" : content.path("pictureDownloadCode").asText("");
+            downloadCode = content == null ? "" : content.path("pictureDownloadCode").asString("");
         }
         if (downloadCode.isEmpty()) {
             return null;
         }
-        String fileName = content == null ? "" : content.path("fileName").asText("");
+        String fileName = content == null ? "" : content.path("fileName").asString("");
         if (ImTypes.MESSAGE_TYPE_IMAGE.equals(messageType)) {
             fileName = "";
         }
@@ -386,7 +386,7 @@ public class DingtalkAdapter implements AdapterInterfaces.Adapter,
         byte[] respBody = dingtalkApi("POST", "/v1.0/robot/messageFiles/download", body);
 
         JsonNode parsed = MAPPER.readTree(respBody);
-        String downloadUrl = parsed.path("downloadUrl").asText("");
+        String downloadUrl = parsed.path("downloadUrl").asString("");
         if (downloadUrl.isEmpty()) {
             throw new IllegalStateException("download response has no downloadUrl: "
                     + new String(respBody, StandardCharsets.UTF_8));
@@ -544,7 +544,7 @@ public class DingtalkAdapter implements AdapterInterfaces.Adapter,
                     StandardCharsets.UTF_8));
         }
         JsonNode result = MAPPER.readTree(response.body());
-        String accessToken = result.path("accessToken").asText("");
+        String accessToken = result.path("accessToken").asString("");
         if (accessToken.isEmpty()) {
             throw new IllegalStateException("empty access token from dingtalk");
         }

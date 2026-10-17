@@ -60,7 +60,7 @@ class WikiContractTest {
     /** 统一外壳下钻：返回 data 的紧凑 JSON（序保持 ✓）；非外壳原样返回。 */
     private static String payload(String body) {
         try {
-            var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(body);
+            var root = new tools.jackson.databind.ObjectMapper().readTree(body);
             if (root.isObject() && root.has("code") && root.has("data")) {
                 return root.get("data").toString();
             }
@@ -335,8 +335,8 @@ class WikiContractTest {
         return m.group(1);
     }
 
-    private static final com.fasterxml.jackson.databind.ObjectMapper GOLDEN_SEMANTIC_MAPPER =
-            new com.fasterxml.jackson.databind.ObjectMapper();
+    private static final tools.jackson.databind.ObjectMapper GOLDEN_SEMANTIC_MAPPER =
+            new tools.jackson.databind.ObjectMapper();
 
     /** {@code -Dcontract.refresh=true} 时把掩码后的实际响应写回夹具。 */
     private static final boolean REFRESH_FIXTURES = Boolean.getBoolean("contract.refresh");

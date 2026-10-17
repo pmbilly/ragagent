@@ -1,7 +1,5 @@
 package com.ragagent.datasource.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -32,6 +30,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 数据源管理端点。
@@ -67,8 +66,7 @@ public class DataSourceController {
      * （默认忽略未知字段）。Jackson 的裸配置默认会<b>失败</b>
      * ——前端多带一个字段就整条 400 是这里最不该发生的事。</p>
      */
-    private static final ObjectMapper MAPPER = JsonMappers.lenient()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 列表分页的最大页大小。 */
     static final int MAX_LIST_PAGE_SIZE = 100;

@@ -1,7 +1,5 @@
 package com.ragagent.llm.ollama;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.model.OllamaAdminPort;
 import com.ragagent.contract.model.OllamaModelInfo;
 import com.ragagent.contract.model.OllamaProgressListener;
@@ -25,6 +23,8 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Ollama 服务管理。
@@ -223,7 +223,7 @@ public class OllamaService implements OllamaAdminPort {
         pullWithProgress(modelName, progress -> listener.onProgress(new OllamaPullProgress(
                 progress.path("completed").asLong(0),
                 progress.path("total").asLong(0),
-                progress.path("status").asText(""))));
+                progress.path("status").asString(""))));
     }
 
     public void pullWithProgress(String modelName, ProgressCallback fn) {
@@ -436,7 +436,7 @@ public class OllamaService implements OllamaAdminPort {
         }
         try {
             return MAPPER.readTree(respBody);
-        } catch (IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
     }
@@ -454,7 +454,7 @@ public class OllamaService implements OllamaAdminPort {
         }
         try {
             return MAPPER.readTree(respBody);
-        } catch (IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
     }
@@ -486,7 +486,7 @@ public class OllamaService implements OllamaAdminPort {
                 JsonNode node;
                 try {
                     node = MAPPER.readTree(line);
-                } catch (IOException e) {
+                } catch (tools.jackson.core.JacksonException e) {
                     // 解析不了就按错误处理（状态码 >=400 时带状态）
                     throw statusError(resp.statusCode(), line, e);
                 }
@@ -524,7 +524,7 @@ public class OllamaService implements OllamaAdminPort {
             JsonNode node = MAPPER.readTree(body);
             String error = node == null ? null : textOrNull(node.get("error"));
             message = error == null ? "" : error;
-        } catch (IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             message = new String(body, StandardCharsets.UTF_8);
         }
         throw statusError(statusCode, message, null);
@@ -597,13 +597,13 @@ public class OllamaService implements OllamaAdminPort {
     private static byte[] serialize(Object body) {
         try {
             return MAPPER.writeValueAsBytes(body);
-        } catch (IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
     }
 
     private static String textOrNull(JsonNode node) {
-        return node == null || node.isNull() ? null : node.asText();
+        return node == null || node.isNull() ? null : node.asString();
     }
 
     private static String trimTrailingSlashes(String value) {

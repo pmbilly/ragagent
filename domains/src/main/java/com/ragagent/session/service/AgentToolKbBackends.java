@@ -1,6 +1,5 @@
 package com.ragagent.session.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agenttools.knowledge.GrepChunksTool;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool;
@@ -28,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.jdbc.core.JdbcTemplate;
+import tools.jackson.databind.JsonNode;
 
 /**
  * {@code AgentToolBackends} 的**知识库检索簇**：知识库检索 / chunk 列举 /
@@ -388,7 +388,7 @@ final class AgentToolKbBackends {
         }
         try {
             return AgentToolBackends.JSON.convertValue(node,
-                    new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+                    new tools.jackson.core.type.TypeReference<Map<String, Object>>() {});
         } catch (RuntimeException e) {
             return null;
         }
@@ -493,14 +493,14 @@ final class AgentToolKbBackends {
         JsonNode n = cfg.path("nodes");
         if (n.isArray()) {
             for (JsonNode item : n) {
-                nodes.add(new QueryKnowledgeGraphTool.GraphNodeView(item.path("name").asText("")));
+                nodes.add(new QueryKnowledgeGraphTool.GraphNodeView(item.path("name").asString("")));
             }
         }
         List<QueryKnowledgeGraphTool.GraphRelationView> relations = new ArrayList<>();
         JsonNode r = cfg.path("relations");
         if (r.isArray()) {
             for (JsonNode item : r) {
-                relations.add(new QueryKnowledgeGraphTool.GraphRelationView(item.path("type").asText("")));
+                relations.add(new QueryKnowledgeGraphTool.GraphRelationView(item.path("type").asString("")));
             }
         }
         return new QueryKnowledgeGraphTool.ExtractConfigView(nodes, relations);

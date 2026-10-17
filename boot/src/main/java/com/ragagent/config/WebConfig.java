@@ -16,7 +16,7 @@ import com.ragagent.platform.config.DeploymentProperties;
 import com.ragagent.platform.config.TenantProperties;
 import com.ragagent.platform.tracing.langfuse.LangfuseHttpInterceptor;
 import com.ragagent.platform.web.ApiResultInterceptor;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.web.ContractJsonModule;
 import com.ragagent.platform.web.RbacInterceptor;
 import com.ragagent.platform.web.RequestIdFilter;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
@@ -41,27 +41,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     /**
-     * 过渡期 Jackson 2 ObjectMapper：业务代码仍直接使用 Jackson 2。
-     *
-     * <p>不再引 `spring-boot-jackson2` 自动配置，改由 {@link JsonMappers#lenient()}
-     * 显式提供（含契约 mixin / JavaTime / 宽松读策略）。Jackson 3 迁移完成后删除。</p>
+     * Spring MVC 的 Jackson 3 装配：契约 mixin + 保持既有线格式的宽松读/声明顺序。
      */
     @Bean
-    public com.fasterxml.jackson.databind.ObjectMapper jackson2ObjectMapper() {
-        return JsonMappers.lenient();
-    }
-
-    /** 过渡桥：让 Jackson 3 原样输出 Jackson 2 JsonNode（见模块类注释）。 */
-    @Bean
     public org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
-            jackson2JsonNodeCustomizer() {
+            jacksonCustomizer() {
         return builder -> builder
                 .disable(tools.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
                 .disable(tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                // Jackson 3 默认按字母排序；保留 Jackson 2 的声明顺序（金片按字节锁）
+                // 保留既有声明顺序（金片按字节锁）
                 .disable(tools.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
-                .addModule(new Jackson2JsonNodeModule())
-                .addModule(new ContractJackson3Module());
+                .addModule(new ContractJsonModule());
     }
 
     private final TenantProperties tenantProperties;

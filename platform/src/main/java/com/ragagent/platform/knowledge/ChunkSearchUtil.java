@@ -1,11 +1,11 @@
 package com.ragagent.platform.knowledge;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * chunk 内容与图片 URL 的纯逻辑辅助：Markdown/HTML 图片链接扫描、内容拼接与包含判断、
@@ -97,11 +97,11 @@ public final class ChunkSearchUtil {
             return urls; // 结构不匹配返回空 map
         }
         for (JsonNode info : arr) {
-            String url = info.path("url").asText("");
+            String url = info.path("url").asString("");
             if (!url.isEmpty()) {
                 urls.add(url);
             }
-            String original = info.path("originalUrl").asText("");
+            String original = info.path("originalUrl").asString("");
             if (!original.isEmpty()) {
                 urls.add(original);
             }

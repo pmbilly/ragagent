@@ -1,8 +1,5 @@
 package com.ragagent.agentmanagement.api;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
 import com.ragagent.agentmanagement.service.CustomAgentService;
@@ -10,9 +7,11 @@ import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.platform.web.JsonMappers;
-import java.io.IOException;
 import java.util.List;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * {@link AgentLookup} 的 agentmanagement 侧实现：读路径（行查询 / 视图成形 / 推荐问题）都发生在属主域。
@@ -99,7 +98,7 @@ public class AgentLookupAdapter implements AgentLookup {
             }
             // 边界归一：JsonNode → 纯 JDK 值（契约面口径，）
             return JsonMappers.toJavaValue(AgentConfigJson.ensureDefaults(obj));
-        } catch (RuntimeException | IOException e) {
+        } catch (RuntimeException e) {
             return null;
         }
     }

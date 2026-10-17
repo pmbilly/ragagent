@@ -2,7 +2,6 @@ package com.ragagent.session.service;
 
 
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
@@ -10,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * {@code SessionQaResolution} 的**mention/tag 收敛簇**：把请求里 @ 提及的知识库/知识范围与

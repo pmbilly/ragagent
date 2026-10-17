@@ -1,12 +1,11 @@
 package com.ragagent.agent.fixtures;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * 契约测试的 JSON 语义比较器。
@@ -101,7 +100,7 @@ public final class ContractJson {
     private static JsonNode canonical(JsonNode node, ObjectMapper mapper) {
         if (node.isObject()) {
             Map<String, JsonNode> sorted = new TreeMap<>();
-            node.fields().forEachRemaining(e -> sorted.put(e.getKey(), canonical(e.getValue(), mapper)));
+            node.properties().forEach(e -> sorted.put(e.getKey(), canonical(e.getValue(), mapper)));
             ObjectNode out = mapper.createObjectNode();
             sorted.forEach(out::set);
             return out;
@@ -118,8 +117,8 @@ public final class ContractJson {
             }
             return node;
         }
-        if (node.isTextual()) {
-            String raw = node.asText();
+        if (node.isString()) {
+            String raw = node.asString();
             JsonNode nested = tryNested(mapper, raw);
             if (nested != null) {
                 try {
@@ -175,9 +174,7 @@ public final class ContractJson {
         }
         if (node.isObject()) {
             Map<String, JsonNode> sorted = new TreeMap<>();
-            Iterator<Map.Entry<String, JsonNode>> it = node.fields();
-            while (it.hasNext()) {
-                Map.Entry<String, JsonNode> e = it.next();
+            for (var e : node.properties()) {
                 sorted.put(e.getKey(), normalize(e.getValue()));
             }
             ObjectNode out = new ObjectMapper().createObjectNode();

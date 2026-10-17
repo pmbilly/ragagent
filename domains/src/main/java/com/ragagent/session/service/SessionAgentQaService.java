@@ -126,7 +126,7 @@ public class SessionAgentQaService {
 
         {
             // VLM runtime field
-            String vlm = req.agentConfig.path("vlmModelId").asText("");
+            String vlm = req.agentConfig.path("vlmModelId").asString("");
             if (!vlm.isEmpty()) {
                 agentConfig.setVlmModelId(vlm);
             }
@@ -162,7 +162,7 @@ public class SessionAgentQaService {
             // Rerank model only when knowledge_search can run
             Reranker rerankModel = null;
             if (AgentConfigAssembler.agentRequiresRerankModel(req.agentConfig)) {
-                String rerankModelId = req.agentConfig.path("rerankModelId").asText("");
+                String rerankModelId = req.agentConfig.path("rerankModelId").asString("");
                 if (rerankModelId.isEmpty()) {
                     throw new RuntimeException("rerank model is not configured: please set rerank_model_id on the agent");
                 }

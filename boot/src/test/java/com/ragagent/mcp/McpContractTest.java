@@ -339,8 +339,8 @@ class McpContractTest {
         return m.group(1);
     }
 
-    private static final com.fasterxml.jackson.databind.ObjectMapper GOLDEN_SEMANTIC_MAPPER =
-            new com.fasterxml.jackson.databind.ObjectMapper();
+    private static final tools.jackson.databind.ObjectMapper GOLDEN_SEMANTIC_MAPPER =
+            new tools.jackson.databind.ObjectMapper();
 
 
     /**

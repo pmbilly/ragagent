@@ -1,7 +1,6 @@
 package com.ragagent.agenttools.knowledge;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
 import com.ragagent.contract.tool.ToolDefinitions;
@@ -15,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import tools.jackson.databind.JsonNode;
 
 /**
  * query_knowledge_graph 工具。
@@ -143,8 +143,8 @@ public class QueryKnowledgeGraphTool extends BaseTool {
         JsonNode kbNode = args.get("knowledgeBaseIds");
         if (kbNode != null && kbNode.isArray()) {
             for (JsonNode item : kbNode) {
-                if (item.isTextual()) {
-                    knowledgeBaseIDs.add(item.asText());
+                if (item.isString()) {
+                    knowledgeBaseIDs.add(item.asString());
                 }
             }
         }
@@ -162,7 +162,7 @@ public class QueryKnowledgeGraphTool extends BaseTool {
             }
         }
 
-        String query = args.path("query").asText("");
+        String query = args.path("query").asString("");
         if (query.isEmpty()) {
             return failure("query is required");
         }

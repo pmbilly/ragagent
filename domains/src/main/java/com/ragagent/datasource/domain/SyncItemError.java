@@ -1,12 +1,12 @@
 package com.ragagent.datasource.domain;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import java.util.Map;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 /**
  * 一条面向用户的失败样本。
@@ -100,33 +100,32 @@ public class SyncItemError {
         }
 
         @Override
-        public SyncItemError deserialize(JsonParser p, DeserializationContext ctxt)
-                throws java.io.IOException {
+        public SyncItemError deserialize(JsonParser p, DeserializationContext ctxt) {
             SyncItemError out = new SyncItemError();
             JsonNode node = p.readValueAsTree();
             if (node == null || node.isNull()) {
                 return out;
             }
-            if (node.isTextual()) {
-                out.message = node.asText();
+            if (node.isString()) {
+                out.message = node.asString();
                 return out;
             }
             if (!node.isObject()) {
                 return out;
             }
             if (node.hasNonNull("title")) {
-                out.title = node.get("title").asText();
+                out.title = node.get("title").asString();
             }
             if (node.hasNonNull("code")) {
-                out.code = node.get("code").asText();
+                out.code = node.get("code").asString();
             }
             if (node.hasNonNull("message")) {
-                out.message = node.get("message").asText();
+                out.message = node.get("message").asString();
             }
             JsonNode params = node.get("params");
             if (params != null && params.isObject()) {
                 Map<String, String> map = new java.util.LinkedHashMap<>();
-                params.fields().forEachRemaining(e -> map.put(e.getKey(), e.getValue().asText()));
+                params.properties().forEach(e -> map.put(e.getKey(), e.getValue().asString()));
                 out.params = map;
             }
             return out;

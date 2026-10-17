@@ -1,7 +1,5 @@
 package com.ragagent.mcp.tool;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.JsonMappers;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -9,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * MCP 工具入参的完整 schema 校验——自带一个 Draft 2020-12 校验器，见下"为什么手写"。
@@ -137,7 +137,7 @@ public final class McpInputSchemaValidator {
             return null;
         }
         JsonNode ref = node.get("$ref");
-        if (ref != null && ref.isTextual() && !ref.textValue().startsWith("#")) {
+        if (ref != null && ref.isString() && !ref.textValue().startsWith("#")) {
             return EXTERNAL_REF_MESSAGE;
         }
         return null;
@@ -164,12 +164,12 @@ public final class McpInputSchemaValidator {
         JsonNode typeNode = schema.get("type");
         if (typeNode != null) {
             boolean ok;
-            if (typeNode.isTextual()) {
+            if (typeNode.isString()) {
                 ok = typeMatches(value, typeNode.textValue());
             } else if (typeNode.isArray()) {
                 ok = false;
                 for (JsonNode t : typeNode) {
-                    if (t.isTextual() && typeMatches(value, t.textValue())) {
+                    if (t.isString() && typeMatches(value, t.textValue())) {
                         ok = true;
                         break;
                     }
@@ -215,7 +215,7 @@ public final class McpInputSchemaValidator {
         }
 
         // 字符串长度按 code point 计（如 "中文" 过 minLength 2）
-        if (value.isTextual()) {
+        if (value.isString()) {
             JsonNode minLength = schema.get("minLength");
             if (minLength != null && minLength.isNumber()
                     && value.textValue().codePointCount(0, value.textValue().length()) < minLength.intValue()) {
@@ -259,7 +259,7 @@ public final class McpInputSchemaValidator {
             if (required != null && required.isArray()) {
                 List<String> missing = new ArrayList<>();
                 for (JsonNode r : required) {
-                    if (r.isTextual() && !value.has(r.textValue())) {
+                    if (r.isString() && !value.has(r.textValue())) {
                         missing.add(r.textValue());
                     }
                 }
@@ -337,7 +337,7 @@ public final class McpInputSchemaValidator {
 
         // 本地 $ref（#/$defs/... 等 JSON Pointer）
         JsonNode ref = schema.get("$ref");
-        if (ref != null && ref.isTextual()) {
+        if (ref != null && ref.isString()) {
             String pointer = ref.textValue();
             if (!pointer.startsWith("#")) {
                 return EXTERNAL_REF_MESSAGE;
@@ -385,7 +385,7 @@ public final class McpInputSchemaValidator {
 
     private Iterable<Map.Entry<String, JsonNode>> propertiesObjects(JsonNode obj) {
         List<Map.Entry<String, JsonNode>> out = new ArrayList<>();
-        obj.fields().forEachRemaining(out::add);
+        obj.properties().forEach(out::add);
         return out;
     }
 
@@ -416,7 +416,7 @@ public final class McpInputSchemaValidator {
 
     private static boolean typeMatches(JsonNode value, String type) {
         return switch (type) {
-            case "string" -> value.isTextual();
+            case "string" -> value.isString();
             case "number" -> value.isNumber();
             case "integer" -> value.isNumber() && value.isIntegralNumber();
             case "boolean" -> value.isBoolean();

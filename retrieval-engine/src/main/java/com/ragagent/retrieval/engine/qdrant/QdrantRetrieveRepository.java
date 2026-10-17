@@ -1,8 +1,5 @@
 package com.ragagent.retrieval.engine.qdrant;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.platform.security.SsrfGuard;
@@ -22,6 +19,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Qdrant 检索引擎仓储。
@@ -344,7 +344,7 @@ public class QdrantRetrieveRepository
         JsonNode collections = result == null ? null : result.get("collections");
         if (collections != null) {
             for (JsonNode node : collections) {
-                names.add(node.path("name").asText(""));
+                names.add(node.path("name").asString(""));
             }
         }
         return names;
@@ -536,7 +536,7 @@ public class QdrantRetrieveRepository
             if (probe.status() / 100 != 2) {
                 throw new IllegalStateException("qdrant health check HTTP " + probe.status());
             }
-            return QdrantRestClient.mapper().readTree(probe.body()).path("version").asText("");
+            return QdrantRestClient.mapper().readTree(probe.body()).path("version").asString("");
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

@@ -1,11 +1,11 @@
 package com.ragagent.im.runtime;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Slack 适配器的确定性核心：
@@ -29,11 +29,11 @@ public final class SlackAdapterCore {
     public static boolean handleURLVerification(CallbackExchange exchange) {
         try {
             JsonNode body = JSON.readTree(exchange.body());
-            if (body == null || !body.path("type").asText("").equals("url_verification")) {
+            if (body == null || !body.path("type").asString("").equals("url_verification")) {
                 return false;
             }
             Map<String, Object> resp = new LinkedHashMap<>();
-            resp.put("challenge", body.path("challenge").asText(""));
+            resp.put("challenge", body.path("challenge").asString(""));
             exchange.json(200, resp);
             return true;
         } catch (Exception e) {
@@ -48,41 +48,41 @@ public final class SlackAdapterCore {
      */
     public static IncomingMessage parseCallback(byte[] bodyBytes) throws Exception {
         JsonNode root = JSON.readTree(bodyBytes);
-        String eventType = root.path("type").asText("");
+        String eventType = root.path("type").asString("");
         if (!eventType.equals("event_callback")) {
             return null;
         }
         JsonNode event = root.path("event");
-        String innerType = event.path("type").asText("");
+        String innerType = event.path("type").asString("");
 
         switch (innerType) {
             case "app_mention": {
-                String threadTs = event.path("thread_ts").asText("");
+                String threadTs = event.path("thread_ts").asString("");
                 if (threadTs.isEmpty()) {
-                    threadTs = event.path("ts").asText("");
+                    threadTs = event.path("ts").asString("");
                 }
-                return parseIncomingMessage(event.path("user").asText(""),
-                        event.path("channel").asText(""), event.path("text").asText(""),
+                return parseIncomingMessage(event.path("user").asString(""),
+                        event.path("channel").asString(""), event.path("text").asString(""),
                         threadTs, ImTypes.CHAT_TYPE_GROUP);
             }
             case "message": {
                 // bot 消息与系统 subType 不回环处理（file_share 除外）
-                String botId = event.path("bot_id").asText("");
-                String subType = event.path("subtype").asText("");
+                String botId = event.path("bot_id").asString("");
+                String subType = event.path("subtype").asString("");
                 if (!botId.isEmpty() || (!subType.isEmpty() && !subType.equals("file_share"))) {
                     return null;
                 }
-                String channelType = event.path("channel_type").asText("");
+                String channelType = event.path("channel_type").asString("");
                 String chatType = channelType.equals("channel") || channelType.equals("group")
                         ? ImTypes.CHAT_TYPE_GROUP
                         : ImTypes.CHAT_TYPE_DIRECT;
-                String threadTs = event.path("thread_ts").asText("");
+                String threadTs = event.path("thread_ts").asString("");
                 if (threadTs.isEmpty()) {
-                    threadTs = event.path("ts").asText("");
+                    threadTs = event.path("ts").asString("");
                 }
                 // threadTs 同时作 MessageID 与 ThreadID。
-                return parseIncomingMessage(event.path("user").asText(""),
-                        event.path("channel").asText(""), event.path("text").asText(""),
+                return parseIncomingMessage(event.path("user").asString(""),
+                        event.path("channel").asString(""), event.path("text").asString(""),
                         threadTs, chatType);
             }
             default:
@@ -131,11 +131,9 @@ public final class SlackAdapterCore {
         try {
             JsonNode node = JSON.readTree(bodyBytes);
             if (node != null && node.isObject()) {
-                var fields = node.fields();
-                while (fields.hasNext()) {
-                    var e = fields.next();
+                for (var e : node.properties()) {
                     JsonNode v = e.getValue();
-                    out.put(e.getKey(), v.isValueNode() ? v.asText("") : v.toString());
+                    out.put(e.getKey(), v.isValueNode() ? v.asString("") : v.toString());
                 }
             }
         } catch (Exception ignored) {

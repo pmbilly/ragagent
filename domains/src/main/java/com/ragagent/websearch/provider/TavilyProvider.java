@@ -1,6 +1,5 @@
 package com.ragagent.websearch.provider;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.web.ProviderJson;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
@@ -8,6 +7,7 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Tavily 搜索 provider。
@@ -63,11 +63,11 @@ public final class TavilyProvider implements WebSearchProvider {
         List<WebSearchResult> results = new ArrayList<>();
         for (JsonNode item : respData.path("results")) {
             WebSearchResult result = new WebSearchResult();
-            result.setTitle(item.path("title").asText(""));
-            result.setUrl(item.path("url").asText(""));
-            result.setSnippet(item.path("content").asText(""));
+            result.setTitle(item.path("title").asString(""));
+            result.setUrl(item.path("url").asString(""));
+            result.setSnippet(item.path("content").asString(""));
             result.setSource("tavily");
-            String publishedDate = item.path("published_date").asText("");
+            String publishedDate = item.path("published_date").asString("");
             if (includeDate && !publishedDate.isEmpty()) {
                 OffsetDateTime t = BingProvider.parseRfc3339(publishedDate);
                 if (t != null) {

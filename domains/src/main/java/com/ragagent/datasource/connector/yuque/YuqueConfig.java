@@ -2,13 +2,12 @@ package com.ragagent.datasource.connector.yuque;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.connector.ConnectorHttp;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.Map;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 语雀专属配置。
@@ -33,8 +32,7 @@ public class YuqueConfig {
     /**
      * 忽略未知属性（credentials 里的键只多不少，{@code baseUrl} 这类字段可选）。
      */
-    private static final ObjectMapper MAPPER = JsonMappers.lenient()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 语雀设置页里的个人令牌，随 {@code X-Auth-Token} 头发送。 */
     private String apiToken = "";

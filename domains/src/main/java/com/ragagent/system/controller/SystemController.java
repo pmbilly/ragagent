@@ -1,8 +1,5 @@
 package com.ragagent.system.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.doc.DocReaderAdminPort;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -31,6 +28,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * /api/v1/system 组：读端（capabilities/info/parser-engines/storage-engine-status）Viewer+；
@@ -152,7 +152,7 @@ public class SystemController {
     public ResponseEntity<SystemDtos.ParserEnginesResponse> reconnectDocReader(
             @RequestBody(required = false) String rawBody) {
         JsonNode body = parseBody(rawBody);
-        String addr = body == null || !body.has("addr") ? null : body.path("addr").asText(null);
+        String addr = body == null || !body.has("addr") ? null : body.path("addr").asString(null);
         if (addr == null) {
             throw new BizException(AppError.badRequest("请提供 addr 参数"));
         }
@@ -238,7 +238,7 @@ public class SystemController {
         if (body == null) {
             throw new BizException(AppError.badRequest("请求参数不合法").withDetails("请求体格式不正确"));
         }
-        String provider = body.path("provider").asText("");
+        String provider = body.path("provider").asString("");
         if (!infoService.allowList().isAllowed(provider)) {
             throw new BizException(AppError.forbidden("该存储引擎已被禁用"));
         }
@@ -267,15 +267,15 @@ public class SystemController {
         if (cfg == null || cfg.isNull()) {
             return checkResponse(false, "未提供 MinIO 配置");
         }
-        String bucketName = cfg.path("bucket_name").asText("");
+        String bucketName = cfg.path("bucket_name").asString("");
         if (!bucketName.isEmpty() && !FIELD_PATTERN.matcher(bucketName).matches()) {
             return checkResponse(false, "Bucket 名称格式不正确，仅允许字母、数字、点、连字符");
         }
         // mode != "remote" → env 兜底（任一缺失即拒绝）
-        String endpoint = cfg.path("endpoint").asText("");
-        String accessKey = cfg.path("access_key_id").asText("");
-        String secretKey = cfg.path("secret_access_key").asText("");
-        if (!"remote".equals(cfg.path("mode").asText(""))) {
+        String endpoint = cfg.path("endpoint").asString("");
+        String accessKey = cfg.path("access_key_id").asString("");
+        String secretKey = cfg.path("secret_access_key").asString("");
+        if (!"remote".equals(cfg.path("mode").asString(""))) {
             endpoint = orEnv(endpoint, "MINIO_ENDPOINT");
             accessKey = orEnv(accessKey, "MINIO_ACCESS_KEY_ID");
             secretKey = orEnv(secretKey, "MINIO_SECRET_ACCESS_KEY");
@@ -283,7 +283,7 @@ public class SystemController {
         if (endpoint.isEmpty() || accessKey.isEmpty() || secretKey.isEmpty()) {
             return checkResponse(false, "Endpoint、Access Key、Secret Key 不能为空");
         }
-        if ("remote".equals(cfg.path("mode").asText(""))) {
+        if ("remote".equals(cfg.path("mode").asString(""))) {
             String blocked = blockedStorageEndpoint(endpoint);
             if (blocked != null) {
                 return checkResponse(false, blocked);
@@ -296,10 +296,10 @@ public class SystemController {
         if (cfg == null || cfg.isNull()) {
             return checkResponse(false, "未提供 COS 配置");
         }
-        String secretId = cfg.path("secret_id").asText("");
-        String secretKey = cfg.path("secret_key").asText("");
-        String region = cfg.path("region").asText("");
-        String bucketName = cfg.path("bucket_name").asText("");
+        String secretId = cfg.path("secret_id").asString("");
+        String secretKey = cfg.path("secret_key").asString("");
+        String region = cfg.path("region").asString("");
+        String bucketName = cfg.path("bucket_name").asString("");
         if (secretId.isEmpty() || secretKey.isEmpty() || region.isEmpty() || bucketName.isEmpty()) {
             return checkResponse(false, "Secret ID、Secret Key、Region、Bucket 名称不能为空");
         }
@@ -316,17 +316,17 @@ public class SystemController {
         if (cfg == null || cfg.isNull()) {
             return checkResponse(false, "未提供 S3 配置");
         }
-        String region = cfg.path("region").asText("");
-        String bucketName = cfg.path("bucket_name").asText("");
-        String accessKey = cfg.path("access_key").asText("");
-        String secretKey = cfg.path("secret_key").asText("");
+        String region = cfg.path("region").asString("");
+        String bucketName = cfg.path("bucket_name").asString("");
+        String accessKey = cfg.path("access_key").asString("");
+        String secretKey = cfg.path("secret_key").asString("");
         if (region.isEmpty() || bucketName.isEmpty()) {
             return checkResponse(false, "Region、Bucket 名称不能为空");
         }
         if (accessKey.isEmpty() != secretKey.isEmpty()) {
             return checkResponse(false, "Access Key 与 Secret Key 必须同时填写或同时留空（使用 AWS 默认凭证链）");
         }
-        String endpoint = cfg.path("endpoint").asText("");
+        String endpoint = cfg.path("endpoint").asString("");
         if (!endpoint.isEmpty()) {
             String blocked = blockedStorageEndpoint(endpoint);
             if (blocked != null) {
@@ -340,10 +340,10 @@ public class SystemController {
         if (cfg == null || cfg.isNull()) {
             return checkResponse(false, "未提供 OSS 配置");
         }
-        String endpoint = cfg.path("endpoint").asText("");
-        String accessKey = cfg.path("access_key").asText("");
-        String secretKey = cfg.path("secret_key").asText("");
-        String bucketName = cfg.path("bucket_name").asText("");
+        String endpoint = cfg.path("endpoint").asString("");
+        String accessKey = cfg.path("access_key").asString("");
+        String secretKey = cfg.path("secret_key").asString("");
+        String bucketName = cfg.path("bucket_name").asString("");
         if (endpoint.isEmpty() || accessKey.isEmpty() || secretKey.isEmpty() || bucketName.isEmpty()) {
             return checkResponse(false, "Endpoint、Access Key、Secret Key、Bucket Name 不能为空");
         }
@@ -352,7 +352,7 @@ public class SystemController {
         if (blocked != null) {
             return checkResponse(false, blocked);
         }
-        String region = cfg.path("region").asText("");
+        String region = cfg.path("region").asString("");
         if (!FIELD_PATTERN.matcher(region).matches()) {
             return checkResponse(false, "Region 格式不正确，仅允许字母、数字、点、连字符");
         }
@@ -366,11 +366,11 @@ public class SystemController {
         if (cfg == null || cfg.isNull()) {
             return checkResponse(false, "未提供 OBS 配置");
         }
-        String endpoint = cfg.path("endpoint").asText("");
-        String region = cfg.path("region").asText("");
-        String accessKey = cfg.path("access_key").asText("");
-        String secretKey = cfg.path("secret_key").asText("");
-        String bucketName = cfg.path("bucket_name").asText("");
+        String endpoint = cfg.path("endpoint").asString("");
+        String region = cfg.path("region").asString("");
+        String accessKey = cfg.path("access_key").asString("");
+        String secretKey = cfg.path("secret_key").asString("");
+        String bucketName = cfg.path("bucket_name").asString("");
         if (endpoint.isEmpty() || region.isEmpty() || accessKey.isEmpty() || secretKey.isEmpty()
                 || bucketName.isEmpty()) {
             return checkResponse(false, "Endpoint、Region、Access Key、Secret Key、Bucket 名称不能为空");
@@ -395,11 +395,11 @@ public class SystemController {
         if (cfg == null || cfg.isNull()) {
             return checkResponse(false, "未提供 " + label + " 配置");
         }
-        String endpoint = cfg.path(endpointField).asText("");
-        String region = cfg.path("region").asText("");
-        String accessKey = cfg.path("access_key").asText("");
-        String secretKey = cfg.path("secret_key").asText("");
-        String bucketName = cfg.path("bucket_name").asText("");
+        String endpoint = cfg.path(endpointField).asString("");
+        String region = cfg.path("region").asString("");
+        String accessKey = cfg.path("access_key").asString("");
+        String secretKey = cfg.path("secret_key").asString("");
+        String bucketName = cfg.path("bucket_name").asString("");
         if (endpoint.isEmpty() || region.isEmpty() || accessKey.isEmpty() || secretKey.isEmpty()
                 || bucketName.isEmpty()) {
             return checkResponse(false, String.join("、", requiredFields) + "不能为空");
@@ -426,7 +426,7 @@ public class SystemController {
         ObjectNode config = MAPPER.createObjectNode();
         config.put("mode", "remote");
         config.put("endpoint", endpoint);
-        config.put("region", cfg.path("region").asText(""));
+        config.put("region", cfg.path("region").asString(""));
         config.put("access_key_id", accessKeyOf(provider, cfg));
         config.put("secret_access_key", secretKeyOf(provider, cfg));
         config.put("bucket_name", bucketName);
@@ -453,14 +453,14 @@ public class SystemController {
 
     private static String accessKeyOf(String provider, JsonNode cfg) {
         return "minio".equals(provider)
-                ? cfg.path("access_key_id").asText("")
-                : cfg.path("access_key").asText("");
+                ? cfg.path("access_key_id").asString("")
+                : cfg.path("access_key").asString("");
     }
 
     private static String secretKeyOf(String provider, JsonNode cfg) {
         return "minio".equals(provider)
-                ? cfg.path("secret_access_key").asText("")
-                : cfg.path("secret_key").asText("");
+                ? cfg.path("secret_access_key").asString("")
+                : cfg.path("secret_key").asString("");
     }
 
     private static String authFailedMessage(String provider) {
@@ -536,7 +536,7 @@ public class SystemController {
         putBool(overrides, node, "mineru_enable_formula");
         putBool(overrides, node, "mineru_enable_table");
         // mineru_parse_method：显式值归一；否则 legacy enable_ocr 推导
-        String method = node.path("mineru_parse_method").asText("").trim().toLowerCase();
+        String method = node.path("mineru_parse_method").asString("").trim().toLowerCase();
         JsonNode legacyOcr = node.get("mineru_enable_ocr");
         String resolved = switch (method) {
             case "auto" -> "auto";
@@ -544,7 +544,7 @@ public class SystemController {
             case "txt" -> "txt";
             default -> legacyOcr != null && legacyOcr.isBoolean() && !legacyOcr.asBoolean() ? "txt" : "auto";
         };
-        if (!node.path("mineru_parse_method").asText("").isEmpty() || (legacyOcr != null && legacyOcr.isBoolean())) {
+        if (!node.path("mineru_parse_method").asString("").isEmpty() || (legacyOcr != null && legacyOcr.isBoolean())) {
             overrides.put("mineru_parse_method", resolved);
         }
         putBool(overrides, node, "mineru_enable_ocr");
@@ -570,7 +570,7 @@ public class SystemController {
     }
 
     private static void putString(Map<String, String> m, JsonNode node, String field) {
-        String v = node.path(field).asText("");
+        String v = node.path(field).asString("");
         if (!v.isEmpty()) {
             m.put(field, v);
         }
@@ -587,10 +587,10 @@ public class SystemController {
         TenantStorageView tenant = currentTenant();
         if (tenant != null && tenant.storageEngineConfig() != null) {
             JsonNode minio = JsonMappers.toJsonNode(tenant.storageEngineConfig()).get("minio");
-            if (minio != null && !minio.isNull() && "remote".equals(minio.path("mode").asText(""))) {
-                return !minio.path("endpoint").asText("").isEmpty()
-                        && !minio.path("access_key_id").asText("").isEmpty()
-                        && !minio.path("secret_access_key").asText("").isEmpty();
+            if (minio != null && !minio.isNull() && "remote".equals(minio.path("mode").asString(""))) {
+                return !minio.path("endpoint").asString("").isEmpty()
+                        && !minio.path("access_key_id").asString("").isEmpty()
+                        && !minio.path("secret_access_key").asString("").isEmpty();
             }
         }
         return infoService.isMinioEnvAvailable();
@@ -602,7 +602,7 @@ public class SystemController {
             JsonNode conf = JsonMappers.toJsonNode(tenant.storageEngineConfig()).get(provider);
             if (conf != null && !conf.isNull()) {
                 for (String f : fields) {
-                    if (conf.path(f).asText("").isEmpty()) {
+                    if (conf.path(f).asString("").isEmpty()) {
                         return false;
                     }
                 }
@@ -656,10 +656,10 @@ public class SystemController {
         if (tenant != null && tenant.storageEngineConfig() != null) {
             JsonNode s3 = JsonMappers.toJsonNode(tenant.storageEngineConfig()).get("s3");
             if (s3 != null && !s3.isNull()) {
-                String accessKey = s3.path("access_key").asText("");
-                String secretKey = s3.path("secret_key").asText("");
-                return !s3.path("region").asText("").isEmpty()
-                        && !s3.path("bucket_name").asText("").isEmpty()
+                String accessKey = s3.path("access_key").asString("");
+                String secretKey = s3.path("secret_key").asString("");
+                return !s3.path("region").asString("").isEmpty()
+                        && !s3.path("bucket_name").asString("").isEmpty()
                         && (accessKey.isEmpty()) == (secretKey.isEmpty());
             }
         }

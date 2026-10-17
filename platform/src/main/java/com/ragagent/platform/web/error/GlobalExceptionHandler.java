@@ -158,9 +158,9 @@ public class GlobalExceptionHandler {
         Throwable cause = ex.getCause();
         if (ex.getMessage() != null && ex.getMessage().contains("Required request body")) {
             details = "请求体不能为空";
-        } else if (cause instanceof com.fasterxml.jackson.databind.exc.MismatchedInputException mie
+        } else if (cause instanceof tools.jackson.databind.exc.MismatchedInputException mie
                 && !mie.getPath().isEmpty()) {
-            String field = mie.getPath().get(mie.getPath().size() - 1).getFieldName();
+            String field = mie.getPath().get(mie.getPath().size() - 1).getPropertyName();
             if (field != null) {
                 details = field + ": 类型不正确";
             }

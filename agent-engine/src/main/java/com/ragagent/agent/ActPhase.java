@@ -1,8 +1,5 @@
 package com.ragagent.agent;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.tool.runtime.JsonRepair;
 import com.ragagent.agent.tool.runtime.NormalizeToolCallId;
 import com.ragagent.contract.agent.AgentStep;
@@ -37,6 +34,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * ReAct「Act」段的协作者：工具调用编排——串行/并行执行、截断参数拒执、
@@ -441,7 +441,7 @@ final class ActPhase {
                         : tc.getFunction().getArguments());
                 result = engine.toolRegistry.executeTool(engine::pollCancellation, toolExecCtx,
                         tc.getFunction().getName(), raw);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 execError = new AgentEngineException(e.getMessage());
             } catch (RuntimeException e) {
                 execError = e;

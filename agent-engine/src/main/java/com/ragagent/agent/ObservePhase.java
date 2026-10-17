@@ -1,6 +1,5 @@
 package com.ragagent.agent;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.budget.ContextDiagnostics;
 import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.agent.compaction.CompactionReason;
@@ -31,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * ReAct「Observe」段的协作者：上下文窗口管理与响应分析——上下文预算估算与

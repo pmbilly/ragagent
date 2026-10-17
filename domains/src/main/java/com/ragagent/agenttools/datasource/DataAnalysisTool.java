@@ -1,6 +1,5 @@
 package com.ragagent.agenttools.datasource;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
 import com.ragagent.agenttools.sql.SqlGuard;
 import com.ragagent.contract.agent.Cleanable;
@@ -24,6 +23,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import tools.jackson.databind.JsonNode;
 
 /**
  * data_analysis 工具。
@@ -295,8 +295,8 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
     @Override
     public ToolResult execute(ToolRequest request) {
         JsonNode args = JsonMappers.toJsonNode(request.args());
-        String knowledgeID = args == null ? "" : args.path("knowledgeId").asText("");
-        String sql = args == null ? "" : args.path("sql").asText("");
+        String knowledgeID = args == null ? "" : args.path("knowledgeId").asString("");
+        String sql = args == null ? "" : args.path("sql").asString("");
 
         if (scopeEnforced) {
             try {

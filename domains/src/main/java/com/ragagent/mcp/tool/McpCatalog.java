@@ -1,6 +1,5 @@
 package com.ragagent.mcp.tool;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.Cancellation;
 import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.contract.tool.ToolDefinitions;
@@ -23,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import tools.jackson.databind.JsonNode;
 
 /**
  * MCP 目录：一个 Agent 引擎、一个授权主体独有。只有 server 快照可变；可执行的
@@ -587,7 +587,7 @@ public final class McpCatalog {
      * 不能用 {@link ToolJson}.write（它按 map 语义排序键，struct 契约会乱序）。
      * （不做 HTML 转义。）
      */
-    static final com.fasterxml.jackson.databind.ObjectMapper STRUCT_JSON =
+    static final tools.jackson.databind.ObjectMapper STRUCT_JSON =
             JsonMappers.lenient();
 
     /** 结果 JSON（插入序键序；序列化失败走 error 页）。 */
@@ -613,9 +613,9 @@ public final class McpCatalog {
             return raw;
         }
         try {
-            com.fasterxml.jackson.databind.ObjectMapper plain = JsonMappers.lenient();
+            tools.jackson.databind.ObjectMapper plain = JsonMappers.lenient();
             JsonNode schema = plain.readTree(raw);
-            ((com.fasterxml.jackson.databind.node.ObjectNode) schema.path("properties").path(key))
+            ((tools.jackson.databind.node.ObjectNode) schema.path("properties").path(key))
                     .set("enum", plain.valueToTree(values));
             return ToolJson.write(schema);
         } catch (Exception e) {
@@ -625,7 +625,7 @@ public final class McpCatalog {
 
     /** ref 解码；失败 message 以 mcpCallArgumentsHint 结尾。 */
     static DecodeResult decodeMcpCall(JsonNode raw) {
-        String toolRef = raw.path("toolRef").asText("");
+        String toolRef = raw.path("toolRef").asString("");
         JsonNode arguments = raw.get("arguments");
         boolean bad = toolRef.isEmpty()
                 || arguments == null

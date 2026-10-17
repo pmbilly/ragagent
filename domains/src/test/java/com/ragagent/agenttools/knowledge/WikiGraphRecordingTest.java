@@ -5,7 +5,6 @@ package com.ragagent.agenttools.knowledge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agent.fixtures.ToolContractGoldenB;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.ExtractConfigView;
@@ -24,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 4.5b 回放：query_knowledge_graph 的录制回放。
@@ -113,15 +113,15 @@ class WikiGraphRecordingTest {
     private static ToolRequest req(String argsJson) {
         try {
             return ToolRequest.of(RecordingSupport.PLAIN.readTree(argsJson));
-        } catch (java.io.IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new IllegalStateException(e);
         }
     }
 
     private static void assertToolResult(String label, ToolResult result, JsonNode r) {
         assertThat(result.isSuccess()).as("%s success", label).isEqualTo(r.get("success").asBoolean());
-        assertThat(result.getOutput()).as("%s output", label).isEqualTo(r.get("output").asText());
-        String wantError = r.hasNonNull("error") ? r.get("error").asText() : "";
+        assertThat(result.getOutput()).as("%s output", label).isEqualTo(r.get("output").asString());
+        String wantError = r.hasNonNull("error") ? r.get("error").asString() : "";
         if (!wantError.isEmpty()) {
             assertThat(result.getError()).as("%s error", label).isEqualTo(wantError);
         }

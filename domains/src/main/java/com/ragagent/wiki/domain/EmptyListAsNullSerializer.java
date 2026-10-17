@@ -1,10 +1,9 @@
 package com.ragagent.wiki.domain;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import java.io.IOException;
 import java.util.List;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * 把空/ null 的字符串列表序列化成 JSON 字面量 {@code null}（不是 {@code []}）。
@@ -16,11 +15,10 @@ import java.util.List;
  *
  * @see {@code WikiStringListTypeHandler}（已随实体回域 {@code domains/wiki/domain}）
  */
-public class EmptyListAsNullSerializer extends JsonSerializer<List<String>> {
+public class EmptyListAsNullSerializer extends ValueSerializer<List<String>> {
 
     @Override
-    public void serialize(List<String> value, JsonGenerator gen, SerializerProvider serializers)
-            throws IOException {
+    public void serialize(List<String> value, JsonGenerator gen, SerializationContext serializers) {
         if (value == null || value.isEmpty()) {
             gen.writeNull();
             return;

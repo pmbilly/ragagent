@@ -2,7 +2,6 @@ package com.ragagent.wiki.service.ingest;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.model.LlmChatClient;
@@ -23,6 +22,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 分块引用管线的纯算法与并发编排。

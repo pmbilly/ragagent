@@ -2,20 +2,20 @@ package com.ragagent.session.controller.sse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.web.ContractJsonModule;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * {@link StreamResponseBuilder} 的逐字节契约测试。
@@ -34,8 +34,7 @@ class StreamResponseBuilderTest {
 
     /** 与线上一致：默认 mapper（本类型不含时间字段，无需 JacksonConfig 的 OffsetDateTime 覆盖）。 */
     // 契约载荷（ToolResult/ResponseType 等）的线格式由 mixin 模块承载（B268-A②）
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .registerModule(new ContractJsonModule());
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private static String write(StreamResponse response) throws Exception {
         return MAPPER.writeValueAsString(response);
@@ -66,13 +65,13 @@ class StreamResponseBuilderTest {
         // 重建结果**自身**（不是 data 直通）必须真的带上这些字段——
         // 若读者按错的键形状读，这里会全空（B135b1 修复的正是这个静默缺陷）
         JsonNode rebuilt = MAPPER.readTree(json).path("knowledgeReferences").path(0);
-        assertThat(rebuilt.path("knowledgeId").asText()).isEqualTo("kb-1");
+        assertThat(rebuilt.path("knowledgeId").asString()).isEqualTo("kb-1");
         assertThat(rebuilt.path("chunkIndex").asInt()).isEqualTo(3);
-        assertThat(rebuilt.path("knowledgeTitle").asText()).isEqualTo("t");
+        assertThat(rebuilt.path("knowledgeTitle").asString()).isEqualTo("t");
         assertThat(rebuilt.path("startAt").asInt()).isEqualTo(10);
         assertThat(rebuilt.path("endAt").asInt()).isEqualTo(20);
-        assertThat(rebuilt.path("knowledgeFilename").asText()).isEqualTo("a.md");
-        assertThat(rebuilt.path("knowledgeSource").asText()).isEqualTo("file");
+        assertThat(rebuilt.path("knowledgeFilename").asString()).isEqualTo("a.md");
+        assertThat(rebuilt.path("knowledgeSource").asString()).isEqualTo("file");
         assertThat(json).contains("\"data\":{\"references\":[");
         assertThat(json).contains("\"chunkIndex\":3");
         assertThat(json).contains("\"extra_unknown_key\":\"ignored\"");

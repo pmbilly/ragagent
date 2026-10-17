@@ -7,9 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.storage.fileserve.OpenedFile;
 import com.ragagent.contract.storage.provider.SeekableSource;
 import com.ragagent.contract.tenant.StorageEngineConfig;
@@ -26,6 +23,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * 接线测试：provider 服务 → fileserve 读取面（适配器）、云 provider 分支经工厂落地、
@@ -113,10 +114,10 @@ class ProviderWiringTest {
         row.setConfig(config);
 
         JsonNode engine = StorageFileResolver.toStorageEngineConfig(row, crypto);
-        assertEquals("minio", engine.path("defaultProvider").asText());
-        assertEquals("localhost:9100", engine.path("minio").path("endpoint").asText());
-        assertEquals("AK-minio", engine.path("minio").path("accessKeyId").asText());
-        assertEquals("SK-minio", engine.path("minio").path("secretAccessKey").asText());
+        assertEquals("minio", engine.path("defaultProvider").asString());
+        assertEquals("localhost:9100", engine.path("minio").path("endpoint").asString());
+        assertEquals("AK-minio", engine.path("minio").path("accessKeyId").asString());
+        assertEquals("SK-minio", engine.path("minio").path("secretAccessKey").asString());
 
         // 无 enc:v1: 前缀 → 原样（照存储层"带前缀才解密"的语义）；且 s3 段的凭据键是
         // accessKey/secretKey（不是 minio 的 accessKeyId/secretAccessKey）
@@ -127,8 +128,8 @@ class ProviderWiringTest {
         plainRow.setProvider("s3");
         plainRow.setConfig(plain);
         JsonNode plainEngine = StorageFileResolver.toStorageEngineConfig(plainRow, crypto);
-        assertEquals("plain-ak", plainEngine.path("s3").path("accessKey").asText());
-        assertEquals("plain-sk", plainEngine.path("s3").path("secretKey").asText());
+        assertEquals("plain-ak", plainEngine.path("s3").path("accessKey").asString());
+        assertEquals("plain-sk", plainEngine.path("s3").path("secretKey").asString());
     }
 
     @Test
@@ -142,8 +143,7 @@ class ProviderWiringTest {
         };
         ObjectMapper mapper = new ObjectMapper();
         // 转换器与生产同配置：未知键不报错（正是"静默丢弃"能发生的原因）
-        ObjectMapper engineMapper = new ObjectMapper().configure(
-                com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ObjectMapper engineMapper = JsonMapper.builder().disable(tools.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY).disable(tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).build();
 
         // minio：accessKeyId / secretAccessKey
         assertRowCredentialsBind(mapper, engineMapper, crypto, "minio", "AK-minio", "SK-minio");
@@ -171,7 +171,7 @@ class ProviderWiringTest {
 
         switch (provider) {
             case "minio" -> {
-                assertEquals(accessKey, engine.path("minio").path("accessKeyId").asText(),
+                assertEquals(accessKey, engine.path("minio").path("accessKeyId").asString(),
                         "minio 引擎面凭据键应为 accessKeyId");
                 assertEquals(accessKey, typed.getMinio().getAccessKeyId(), "minio 凭据应绑定");
                 assertEquals(secretKey, typed.getMinio().getSecretAccessKey(), "minio 密钥应绑定");

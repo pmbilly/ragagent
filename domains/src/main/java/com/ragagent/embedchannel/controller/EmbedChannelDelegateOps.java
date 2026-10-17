@@ -1,6 +1,5 @@
 package com.ragagent.embedchannel.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.session.EmbedReply;
@@ -17,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import tools.jackson.databind.JsonNode;
 
 /**
  * embed 委托协作者（自 {@link EmbedChannelController} 拆出的
@@ -78,7 +78,7 @@ final class EmbedChannelDelegateOps {
      */
     static String patchEmbedChatPayload(String rawBody, EmbedChannelEntity ch,
             boolean agentMode) {
-        com.fasterxml.jackson.databind.node.ObjectNode payload;
+        tools.jackson.databind.node.ObjectNode payload;
         if (rawBody == null || rawBody.isEmpty()) {
             payload = EmbedChannelController.MAPPER.createObjectNode();
         } else {
@@ -94,7 +94,7 @@ final class EmbedChannelDelegateOps {
             } else if (!node.isObject()) {
                 throw new PlainErrorException(400, "invalid json");
             } else {
-                payload = (com.fasterxml.jackson.databind.node.ObjectNode) node;
+                payload = (tools.jackson.databind.node.ObjectNode) node;
             }
         }
         payload.put("agentId", ch.getAgentId());

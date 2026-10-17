@@ -1,7 +1,5 @@
 package com.ragagent.mcp.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.tool.Decision;
 import com.ragagent.contract.tool.ToolApprovalException;
@@ -16,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 待审批 MCP 工具调用的决议用例：鉴权闸门前置 + 决议解析 + gate 调用与错误映射。

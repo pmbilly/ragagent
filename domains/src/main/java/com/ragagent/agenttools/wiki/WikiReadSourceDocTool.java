@@ -1,6 +1,5 @@
 package com.ragagent.agenttools.wiki;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.retrieval.SearchTarget;
@@ -22,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import tools.jackson.databind.JsonNode;
 
 /**
  * wiki_read_source_doc 工具。
@@ -81,11 +81,11 @@ public class WikiReadSourceDocTool extends BaseTool {
     public ToolResult execute(ToolRequest request) {
         JsonNode args = JsonMappers.toJsonNode(request.args());
 
-        String knowledgeID = args.path("knowledgeId").asText("").trim();
+        String knowledgeID = args.path("knowledgeId").asString("").trim();
         if (knowledgeID.isEmpty()) {
             return failure("knowledge_id is required");
         }
-        String query = args.path("query").asText("");
+        String query = args.path("query").asString("");
         int startChunkIndex = args.path("startChunkIndex").asInt(0);
         int endChunkIndex = args.path("endChunkIndex").asInt(0);
 

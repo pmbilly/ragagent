@@ -1,6 +1,5 @@
 package com.ragagent.retrieval.engine.weaviate;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
@@ -9,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Weaviate 引擎的检索簇：vector（GraphQL nearVector，certainty=threshold）与 keywords
@@ -142,7 +142,7 @@ final class WeaviateSearchOps {
         List<IndexWithScore> results = new ArrayList<>();
         for (JsonNode item : items) {
             JsonNode additional = item.path("_additional");
-            String pointId = additional.path("id").asText("");
+            String pointId = additional.path("id").asString("");
             double score = 0.0;
             String additionalName = matchType == EngineTypes.MATCH_EMBEDDING
                     ? "certainty" : "score";
@@ -152,9 +152,9 @@ final class WeaviateSearchOps {
                     score = 1.0;
                 } else if (raw.isNumber()) {
                     score = raw.asDouble();
-                } else if (raw.isTextual()) {
+                } else if (raw.isString()) {
                     try {
-                        score = Double.parseDouble(raw.asText());
+                        score = Double.parseDouble(raw.asString());
                     } catch (NumberFormatException ignored) {
                         // 保持 0.0（解析不了就不给分）
                     }
@@ -162,13 +162,13 @@ final class WeaviateSearchOps {
             }
             IndexWithScore out = new IndexWithScore();
             out.id = pointId;
-            out.sourceId = item.path(WeaviateRetrieveRepository.FIELD_SOURCE_ID).asText("");
+            out.sourceId = item.path(WeaviateRetrieveRepository.FIELD_SOURCE_ID).asString("");
             out.sourceType = item.path(WeaviateRetrieveRepository.FIELD_SOURCE_TYPE).asInt(0);
-            out.chunkId = item.path(WeaviateRetrieveRepository.FIELD_CHUNK_ID).asText("");
-            out.knowledgeId = item.path(WeaviateRetrieveRepository.FIELD_KNOWLEDGE_ID).asText("");
-            out.knowledgeBaseId = item.path(WeaviateRetrieveRepository.FIELD_KNOWLEDGE_BASE_ID).asText("");
-            out.tagId = item.path(WeaviateRetrieveRepository.FIELD_TAG_ID).asText("");
-            out.content = item.path(WeaviateRetrieveRepository.FIELD_CONTENT).asText("");
+            out.chunkId = item.path(WeaviateRetrieveRepository.FIELD_CHUNK_ID).asString("");
+            out.knowledgeId = item.path(WeaviateRetrieveRepository.FIELD_KNOWLEDGE_ID).asString("");
+            out.knowledgeBaseId = item.path(WeaviateRetrieveRepository.FIELD_KNOWLEDGE_BASE_ID).asString("");
+            out.tagId = item.path(WeaviateRetrieveRepository.FIELD_TAG_ID).asString("");
+            out.content = item.path(WeaviateRetrieveRepository.FIELD_CONTENT).asString("");
             out.score = score;
             out.matchType = matchType;
             results.add(out);

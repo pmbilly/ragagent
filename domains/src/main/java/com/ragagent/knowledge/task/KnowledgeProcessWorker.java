@@ -1,6 +1,5 @@
 package com.ragagent.knowledge.task;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.graph.NameSpace;
 import com.ragagent.contract.model.Embedder;
@@ -53,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 知识处理后台 worker：虚拟线程队列消费 knowledge 的解析主链路
@@ -266,7 +266,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private String extractMarkdown(Knowledge k, int attempt, String knowledgeId) throws Exception {
         if ("manual".equals(k.getType())) {
             return k.getMetadata() != null && k.getMetadata().hasNonNull("content")
-                    ? k.getMetadata().get("content").asText() : "";
+                    ? k.getMetadata().get("content").asString() : "";
         }
         SpanTracker.SpanHandle docSpan = beginStageSpan(attempt, knowledgeId,
                 KnowledgeProcessingSpan.STAGE_DOC_READER,
@@ -534,7 +534,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         }
         JsonNode wikiConfig = kb.getWikiConfig();
         if (wikiConfig != null && wikiConfig.isObject()
-                && !wikiConfig.path("synthesisModelId").asText("").isEmpty()) {
+                && !wikiConfig.path("synthesisModelId").asString("").isEmpty()) {
             return true;
         }
         return hasSummaryModel(kb);
