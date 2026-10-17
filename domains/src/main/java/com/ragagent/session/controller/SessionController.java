@@ -1,10 +1,7 @@
 package com.ragagent.session.controller;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
@@ -26,6 +23,7 @@ import com.ragagent.session.dto.SessionPinResponse;
 import com.ragagent.session.dto.StopSessionRequest;
 import com.ragagent.session.dto.UpdateSessionRequest;
 import com.ragagent.session.service.SessionService;
+import com.ragagent.session.service.SessionStopService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,12 +37,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.session.MessageArtifact;
 import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.service.MessageService;
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.ApiResponse;
 
@@ -86,14 +81,14 @@ public class SessionController {
 
     private final SessionService sessionService;
     private final MessageService messageService;
-    private final StreamManager streamManager;
+    private final SessionStopService sessionStopService;
 
     public SessionController(SessionService sessionService,
                              MessageService messageService,
-                             StreamManager streamManager) {
+                             SessionStopService sessionStopService) {
         this.sessionService = sessionService;
         this.messageService = messageService;
-        this.streamManager = streamManager;
+        this.sessionStopService = sessionStopService;
     }
 
     /**
@@ -554,64 +549,8 @@ public class SessionController {
     public ApiResponse<Void> stopSession(
             @PathVariable("sessionId") String sessionId,
             @RequestBody(required = false) StopSessionRequest request) {
-        String sid = LogSanitizer.sanitize(sessionId);
-        if (sid == null || sid.isEmpty()) {
-            throw new BizException(AppError.ofHttpStatus(400, "Session ID is required"));   // 返回位不可用 ⇒ 就地展开
-        }
-        if (request == null || isBlankStr(request.messageId())) {
-            throw new BizException(AppError.ofHttpStatus(400, "message_id is required"));   // 返回位不可用 ⇒ 就地展开
-        }
-        String assistantMessageId = LogSanitizer.sanitize(request.messageId());
-
-        Long tenantId = TenantContext.currentTenantId();
-        if (tenantId == null) {
-            throw new BizException(AppError.ofHttpStatus(401, "Unauthorized"));   // 返回位不可用 ⇒ 就地展开
-        }
-
-        // 消息可见性走 GetMessage（读路径），会话走严格 owner 范围（写路径）
-        Message message;
-        try {
-            message = messageService.getMessage(sid, assistantMessageId);
-        } catch (RuntimeException e) {
-            throw new BizException(AppError.ofHttpStatus(404, "Message not found"));   // 返回位不可用 ⇒ 就地展开
-        }
-        if (message.getSessionId() == null || !message.getSessionId().equals(sid)) {
-            throw new BizException(AppError.ofHttpStatus(403, "Message does not belong to this session"));   // 返回位不可用 ⇒ 就地展开
-        }
-        Session session;
-        try {
-            session = sessionService.getOwnedSession(sid);
-        } catch (RuntimeException e) {
-            throw new BizException(AppError.ofHttpStatus(404, "Session not found"));   // 返回位不可用 ⇒ 就地展开
-        }
-        if (session.getTenantId() == null || session.getTenantId().longValue() != tenantId) {
-            // ⚠️ Long 比较必须拆箱/equals（租户 id 超出 Integer 缓存区间时
-            // 引用比较恒不等 → 会误判 "Access denied"）
-            throw new BizException(AppError.ofHttpStatus(403, "Access denied"));   // 返回位不可用 ⇒ 就地展开
-        }
-        if (message.isCompleted()) {
-            // 已经结束的消息是幂等的成功（不回 message 文案，§1.17）
+        // 校验与 stop 事件写入在 SessionStopService（HTTP 与 embed 委托面共用）
+        sessionStopService.stopSession(sessionId, request);
         return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
-        }
-
-        StreamEvent stopEvent = new StreamEvent(
-                "stop-" + System.nanoTime(), ResponseType.STOP,
-                "", true);
-        stopEvent.setTimestamp(OffsetDateTime.now());
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("session_id", sid);
-        data.put("message_id", assistantMessageId);
-        data.put("reason", "user_requested");
-        stopEvent.setData(data);
-        try {
-            streamManager.appendEvent(sid, assistantMessageId, stopEvent);
-        } catch (RuntimeException e) {
-            throw new BizException(AppError.ofHttpStatus(500, "Failed to write stop event"));   // 返回位不可用 ⇒ 就地展开
-        }
-        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
-    }
-
-    private static boolean isBlankStr(String v) {
-        return v == null || v.trim().isEmpty();
     }
 }

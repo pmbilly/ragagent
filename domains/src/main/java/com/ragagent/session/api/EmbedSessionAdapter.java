@@ -3,7 +3,6 @@ package com.ragagent.session.api;
 import java.io.IOException;
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,18 +15,21 @@ import com.ragagent.contract.session.EmbedReply;
 import com.ragagent.contract.session.EmbedSessionPort;
 import com.ragagent.contract.session.SseSink;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.session.controller.MessageController;
-import com.ragagent.session.controller.MessageSuggestionController;
-import com.ragagent.session.controller.SessionController;
 import com.ragagent.session.qa.QaEntryRunner;
+import com.ragagent.session.service.MessageHistoryService;
+import com.ragagent.session.service.SessionStopService;
+import com.ragagent.session.service.suggestion.MessageSuggestionFacade;
 
 import com.ragagent.contract.session.MessageSuggestionView;
 import com.ragagent.contract.session.MessageView;
 
 /**
- * {@link EmbedSessionPort} 的会话域实现：逐参数转发到既有的四个端点方法
- * （与 embed 委托层原先的调用**逐字一致**——包括建议读取的 {@code idFallback=null}
- * 与 {@code beforeTime}/{@code limit} 的原始字符串形态），不新增校验、不改错误口径。
+ * {@link EmbedSessionPort} 的会话域实现：逐参数转发到与 HTTP 面**同一套用例层**
+ * （QA 入口 {@link QaEntryRunner}、消息历史 {@link MessageHistoryService}、
+ * 停止 {@link SessionStopService}、追问建议 {@link MessageSuggestionFacade}
+ * 的双面门面），不新增校验、不改错误口径——两个面语义恒一致。
+ *
+ * <p>原先逐参数回调控制器公共方法（api → controller 方向倒挂），本类改为经用例层。</p>
  */
 @Component
 public class EmbedSessionAdapter implements EmbedSessionPort {
@@ -35,18 +37,18 @@ public class EmbedSessionAdapter implements EmbedSessionPort {
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final QaEntryRunner qaEntryRunner;
-    private final MessageController messageController;
-    private final SessionController sessionController;
-    private final MessageSuggestionController suggestionController;
+    private final MessageHistoryService messageHistory;
+    private final SessionStopService sessionStop;
+    private final MessageSuggestionFacade suggestionFacade;
 
     public EmbedSessionAdapter(QaEntryRunner qaEntryRunner,
-                               MessageController messageController,
-                               SessionController sessionController,
-                               MessageSuggestionController suggestionController) {
+                               MessageHistoryService messageHistory,
+                               SessionStopService sessionStop,
+                               MessageSuggestionFacade suggestionFacade) {
         this.qaEntryRunner = qaEntryRunner;
-        this.messageController = messageController;
-        this.sessionController = sessionController;
-        this.suggestionController = suggestionController;
+        this.messageHistory = messageHistory;
+        this.sessionStop = sessionStop;
+        this.suggestionFacade = suggestionFacade;
     }
 
     @Override
@@ -64,10 +66,11 @@ public class EmbedSessionAdapter implements EmbedSessionPort {
     @Override
     public EmbedReply<List<MessageView>> loadMessages(String sessionId, String limit,
             String beforeTime, String resourceUrls) {
-        ResponseEntity<List<Message>> resp = messageController.loadMessages(sessionId, limit, beforeTime, resourceUrls);
-        List<MessageView> views = resp.getBody() == null ? null
-                : resp.getBody().stream().map(SessionQaAdapter::toView).toList();
-        return new EmbedReply<>(resp.getStatusCode().value(), views);
+        List<Message> messages = messageHistory.loadMessages(sessionId, limit, beforeTime, resourceUrls);
+        List<MessageView> views = messages == null ? null
+                : messages.stream().map(SessionQaAdapter::toView).toList();
+        // 成功路径恒 200（错误在用例层以 BizException 抛出，不走到这里）
+        return new EmbedReply<>(200, views);
     }
 
     @Override
@@ -80,24 +83,25 @@ public class EmbedSessionAdapter implements EmbedSessionPort {
                 throw new BizException(AppError.badRequest("invalid request body"));
             }
         }
-        sessionController.stopSession(sessionId, request);
+        sessionStop.stopSession(sessionId, request);
     }
 
     @Override
     public EmbedReply<MessageSuggestionView> getSuggestions(String sessionId, String messageId) {
-        return toReply(suggestionController.get(sessionId, null, messageId));
+        MessageSuggestionSet set = suggestionFacade.getFollowUpsSanitized(sessionId, messageId);
+        return new EmbedReply<>(MessageSuggestionFacade.statusFor(set), toView(set));
     }
 
     @Override
     public EmbedReply<MessageSuggestionView> ensureSuggestions(String sessionId, String messageId,
             String rawBody) {
-        return toReply(suggestionController.ensure(sessionId, messageId, rawBody));
+        MessageSuggestionSet set = suggestionFacade.ensureFollowUpsBody(sessionId, messageId, rawBody);
+        return new EmbedReply<>(MessageSuggestionFacade.statusFor(set), toView(set));
     }
 
-    /** 保状态码，仅把 body 换成线格式视图（无 body 情形逐字保留）。 */
-    private static EmbedReply<MessageSuggestionView> toReply(
-            ResponseEntity<MessageSuggestionSet> resp) {
-        return new EmbedReply<>(resp.getStatusCode().value(), toView(resp.getBody()));
+    @Override
+    public void recordSuggestionEvent(String sessionId, String rawBody) {
+        suggestionFacade.recordEventBody(sessionId, rawBody);
     }
 
     /** 实体 → 线格式视图（域内投影：吃实体，字段逐字搬运；null 透传）。 */
@@ -127,10 +131,5 @@ public class EmbedSessionAdapter implements EmbedSessionPort {
         v.setCreatedAt(s.getCreatedAt());
         v.setUpdatedAt(s.getUpdatedAt());
         return v;
-    }
-
-    @Override
-    public void recordSuggestionEvent(String sessionId, String rawBody) {
-        suggestionController.recordEvent(sessionId, rawBody);
     }
 }
