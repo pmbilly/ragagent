@@ -16,10 +16,10 @@ import com.ragagent.contract.session.EmbedReply;
 import com.ragagent.contract.session.EmbedSessionPort;
 import com.ragagent.contract.session.SseSink;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.session.controller.KnowledgeQaController;
 import com.ragagent.session.controller.MessageController;
 import com.ragagent.session.controller.MessageSuggestionController;
 import com.ragagent.session.controller.SessionController;
+import com.ragagent.session.qa.QaEntryRunner;
 
 import com.ragagent.contract.session.MessageSuggestionView;
 import com.ragagent.contract.session.MessageView;
@@ -34,16 +34,16 @@ public class EmbedSessionAdapter implements EmbedSessionPort {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final KnowledgeQaController knowledgeQaController;
+    private final QaEntryRunner qaEntryRunner;
     private final MessageController messageController;
     private final SessionController sessionController;
     private final MessageSuggestionController suggestionController;
 
-    public EmbedSessionAdapter(KnowledgeQaController knowledgeQaController,
+    public EmbedSessionAdapter(QaEntryRunner qaEntryRunner,
                                MessageController messageController,
                                SessionController sessionController,
                                MessageSuggestionController suggestionController) {
-        this.knowledgeQaController = knowledgeQaController;
+        this.qaEntryRunner = qaEntryRunner;
         this.messageController = messageController;
         this.sessionController = sessionController;
         this.suggestionController = suggestionController;
@@ -52,13 +52,13 @@ public class EmbedSessionAdapter implements EmbedSessionPort {
     @Override
     public void knowledgeQa(String sessionId, String rawBody, String resourceUrls,
             SseSink sink) throws IOException {
-        knowledgeQaController.runKnowledgeQA(sessionId, rawBody, resourceUrls, sink);
+        qaEntryRunner.runKnowledgeQA(sessionId, rawBody, resourceUrls, sink);
     }
 
     @Override
     public void agentQa(String sessionId, String rawBody, String resourceUrls,
             SseSink sink) throws IOException {
-        knowledgeQaController.runAgentQA(sessionId, rawBody, resourceUrls, sink);
+        qaEntryRunner.runAgentQA(sessionId, rawBody, resourceUrls, sink);
     }
 
     @Override

@@ -25,6 +25,7 @@ import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.QaSupport.SseStreamContext;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.SteerSinkBridge;
+import org.springframework.stereotype.Component;
 import com.ragagent.session.controller.sse.SseContract;
 import com.ragagent.session.controller.sse.StreamEventEmitter;
 import com.ragagent.platform.storage.support.StreamRewriter;
@@ -49,6 +50,7 @@ import com.ragagent.platform.stream.LiveRunExistsException;
  * {@link QaTurnFinalizer}，本类**持有它**转发（不回调控制器）；{@code ensureQuickAnswerStep}
  * 是 static 且执行簇也在用 → 留控制器，按类名引用。</p>
  */
+@Component
 public final class QaSseOrchestrator {
 
     private static final org.slf4j.Logger log =

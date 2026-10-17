@@ -119,9 +119,10 @@ class McpOAuthControllerTest {
         if (clientManager != null) {
             beans.registerSingleton("mcpClientManager", clientManager);
         }
-        McpOAuthController controller = new McpOAuthController(manager, svc,
+        McpOAuthController controller = new McpOAuthController(manager,
                 beans.getBeanProvider(McpClientManager.class),
-                beans.getBeanProvider(ToolApprovalGate.class));
+                new com.ragagent.mcp.service.McpOAuthFlowService(manager, svc,
+                        beans.getBeanProvider(ToolApprovalGate.class)));
         return MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();

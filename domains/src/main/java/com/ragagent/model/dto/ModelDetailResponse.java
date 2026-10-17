@@ -20,7 +20,7 @@ public record ModelDetailResponse(
         String type,
         String source,
         String description,
-        ModelParametersDTO parameters,
+        ModelParametersDto parameters,
         boolean isDefault,
         boolean isBuiltin,
         String status,
@@ -41,9 +41,9 @@ public record ModelDetailResponse(
         Integer maxOutputTokens = p.getMaxOutputTokens() == 0 ? null : p.getMaxOutputTokens();
         Integer maxConcurrency = p.getMaxConcurrency() == 0 ? null : p.getMaxConcurrency();
         String appId = p.getAppId().isEmpty() ? null : p.getAppId();
-        ModelParametersDTO params = new ModelParametersDTO(
+        ModelParametersDto params = new ModelParametersDto(
                 p.getBaseUrl(), p.getInterfaceType(),
-                new ModelParametersDTO.EmbeddingParametersDTO(
+                new ModelParametersDto.EmbeddingParametersDTO(
                         p.getEmbeddingParameters().getDimension(),
                         p.getEmbeddingParameters().getTruncatePromptTokens(),
                         p.getEmbeddingParameters().isSupportsDimensionOverride()),

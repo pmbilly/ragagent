@@ -70,69 +70,69 @@ public class InitializationController {
 
     @GetMapping("/api/v1/initialization/config/{kbId}")
     public ResponseEntity<Object> getConfig(@PathVariable("kbId") String kbId) {
-        return configService.getConfig(kbId);
+        return ResponseEntity.ok(configService.getConfig(kbId));
     }
 
     @PostMapping("/api/v1/initialization/initialize/{kbId}")
     public ResponseEntity<Object> initialize(@PathVariable("kbId") String kbId,
             @RequestBody(required = false) String rawBody) {
-        return configService.initialize(kbId, rawBody);
+        return ResponseEntity.ok(configService.initialize(kbId, rawBody));
     }
 
     @PutMapping("/api/v1/initialization/config/{kbId}")
     public ResponseEntity<Object> updateConfig(@PathVariable("kbId") String kbId,
             @RequestBody(required = false) String rawBody) {
-        return configService.updateConfig(kbId, rawBody);
+        return ResponseEntity.ok(configService.updateConfig(kbId, rawBody));
     }
 
     @GetMapping("/api/v1/initialization/ollama/status")
     public ResponseEntity<Object> ollamaStatus() {
-        return ollamaManage.ollamaStatus();
+        return ResponseEntity.ok(ollamaManage.ollamaStatus());
     }
 
     @GetMapping("/api/v1/initialization/ollama/models")
     public ResponseEntity<Object> ollamaModels() {
-        return ollamaManage.ollamaModels();
+        return ResponseEntity.ok(ollamaManage.ollamaModels());
     }
 
     @PostMapping("/api/v1/initialization/ollama/models/check")
     public ResponseEntity<Object> ollamaModelsCheck(@RequestBody(required = false) String rawBody) {
-        return ollamaManage.ollamaModelsCheck(rawBody);
+        return ResponseEntity.ok(ollamaManage.ollamaModelsCheck(rawBody));
     }
 
     @PostMapping("/api/v1/initialization/ollama/models/download")
     public ResponseEntity<Object> ollamaModelDownload(@RequestBody(required = false) String rawBody) {
-        return ollamaManage.ollamaModelDownload(rawBody);
+        return ResponseEntity.ok(ollamaManage.ollamaModelDownload(rawBody));
     }
 
     @GetMapping("/api/v1/initialization/ollama/download/progress/{taskId}")
     public ResponseEntity<Object> downloadProgress(@PathVariable("taskId") String taskId) {
-        return ollamaManage.downloadProgress(taskId);
+        return ResponseEntity.ok(ollamaManage.downloadProgress(taskId));
     }
 
     @GetMapping("/api/v1/initialization/ollama/download/tasks")
     public ResponseEntity<Object> downloadTasksList() {
-        return ollamaManage.downloadTasksList();
+        return ResponseEntity.ok(ollamaManage.downloadTasksList());
     }
 
     @PostMapping("/api/v1/initialization/remote/check")
     public ResponseEntity<Object> remoteCheck(@RequestBody(required = false) String rawBody) {
-        return modelTest.remoteCheck(rawBody);
+        return ResponseEntity.ok(modelTest.remoteCheck(rawBody));
     }
 
     @PostMapping("/api/v1/initialization/embedding/test")
     public ResponseEntity<Object> embeddingTest(@RequestBody(required = false) String rawBody) {
-        return modelTest.embeddingTest(rawBody);
+        return ResponseEntity.ok(modelTest.embeddingTest(rawBody));
     }
 
     @PostMapping("/api/v1/initialization/rerank/check")
     public ResponseEntity<Object> rerankCheck(@RequestBody(required = false) String rawBody) {
-        return modelTest.rerankCheck(rawBody);
+        return ResponseEntity.ok(modelTest.rerankCheck(rawBody));
     }
 
     @PostMapping("/api/v1/initialization/asr/check")
     public ResponseEntity<Object> asrCheck(@RequestBody(required = false) String rawBody) {
-        return modelTest.asrCheck(rawBody);
+        return ResponseEntity.ok(modelTest.asrCheck(rawBody));
     }
 
     @PostMapping("/api/v1/initialization/multimodal/test")
@@ -151,22 +151,22 @@ public class InitializationController {
             @RequestParam(value = "chunkOverlap", required = false) String chunkOverlapRaw,
             @RequestParam(value = "separators", required = false) String separatorsRaw,
             @RequestParam(value = "image", required = false) org.springframework.web.multipart.MultipartFile image) {
-        return modelTest.multimodalTest(vlmModel, vlmBaseUrl, vlmInterfaceType, storageType, cosSecretId, cosSecretKey, cosRegion, cosBucketName, cosAppId, minioBucketName, chunkSizeRaw, chunkOverlapRaw, separatorsRaw, image);
+        return ResponseEntity.ok(modelTest.multimodalTest(vlmModel, vlmBaseUrl, vlmInterfaceType, storageType, cosSecretId, cosSecretKey, cosRegion, cosBucketName, cosAppId, minioBucketName, chunkSizeRaw, chunkOverlapRaw, separatorsRaw, image));
     }
 
     @PostMapping("/api/v1/initialization/extract/text-relation")
     public ResponseEntity<Object> extractTextRelations(@RequestBody(required = false) String rawBody) {
-        return textTest.extractTextRelations(rawBody);
+        return ResponseEntity.ok(textTest.extractTextRelations(rawBody));
     }
 
     @PostMapping("/api/v1/initialization/extract/fabri-tag")
     public ResponseEntity<Object> fabriTag() {
-        return textTest.fabriTag();
+        return ResponseEntity.ok(textTest.fabriTag());
     }
 
     @PostMapping("/api/v1/initialization/extract/fabri-text")
     public ResponseEntity<Object> fabriText(@RequestBody(required = false) String rawBody) {
-        return textTest.fabriText(rawBody);
+        return ResponseEntity.ok(textTest.fabriText(rawBody));
     }
 
     // ══════════════ multipart 解析失败兜底（controller 侧） ══════════════

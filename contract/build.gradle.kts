@@ -31,4 +31,11 @@ spotless {
     }
 }
 
+// 编译期静态分析最小面：契约层最稳定，全量 lint + 警告即错误先行
+//（其余模块按棘轮节奏跟进）。-serial 排除：异常类的 serialVersionUID 告警
+// 在本仓契约面全是噪音（异常不做跨进程序列化）。-parameters 等公共 flags 在根 build 注入。
+tasks.named<JavaCompile>("compileJava") {
+    options.compilerArgs.addAll(listOf("-Xlint:all,-serial", "-Werror"))
+}
+
 // 刻意留空：契约面零依赖（R1 由 ArchUnit 守，这里由"没有依赖可声明"再兜一层）。

@@ -10,7 +10,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
-import org.springframework.http.ResponseEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -41,7 +40,7 @@ public final class OllamaManageService {
     // ══════════════ ollama 管理段 ══════════════
 
     /** GET /initialization/ollama/status——StartService 失败仍是 200 + available:false。 */
-    public ResponseEntity<Object> ollamaStatus() {
+    public Object ollamaStatus() {
         // 展示用基址的缺省是 host.docker.internal（与 OllamaService 的
         // localhost:11434 连接缺省刻意不同）
         String envUrl = AppEnvLookup.get("OLLAMA_BASE_URL");
@@ -54,7 +53,7 @@ public final class OllamaManageService {
             data.put("available", false);
             data.put("baseUrl", baseURL);
             data.put("error", e.getMessage());
-            return ModelConnectivityTestService.ok(data);
+            return data;
         }
         String version;
         try {
@@ -65,11 +64,11 @@ public final class OllamaManageService {
         data.put("available", ollamaService.isAvailable());
         data.put("baseUrl", baseURL);
         data.put("version", version);
-        return ModelConnectivityTestService.ok(data);
+        return data;
     }
 
     /** GET /initialization/ollama/models——ListModelsDetailed（name/size/digest/modified_at）。 */
-    public ResponseEntity<Object> ollamaModels() {
+    public Object ollamaModels() {
         ensureOllamaStarted();
         List<OllamaModelInfo> models;
         try {
@@ -88,11 +87,11 @@ public final class OllamaManageService {
             // （与 startTime 的本地时区路径刻意不同）
             n.put("modifiedAt", ModelConnectivityTestService.timeAsIs(m.modifiedAt()));
         }
-        return ModelConnectivityTestService.ok(data);
+        return data;
     }
 
     /** POST /initialization/ollama/models/check——逐模型可用性（map 按名字母序）。 */
-    public ResponseEntity<Object> ollamaModelsCheck(String rawBody) {
+    public Object ollamaModelsCheck(String rawBody) {
         List<String> models = bindOllamaModelsCheck(rawBody);
         ensureOllamaStarted();
         Map<String, Boolean> sorted = new TreeMap<>();
@@ -110,11 +109,11 @@ public final class OllamaManageService {
         for (Map.Entry<String, Boolean> e : sorted.entrySet()) {
             statusMap.put(e.getKey(), e.getValue().booleanValue());
         }
-        return ModelConnectivityTestService.ok(data);
+        return data;
     }
 
     /** POST /initialization/ollama/models/download——建任务 + 虚拟线程异步拉取。 */
-    public ResponseEntity<Object> ollamaModelDownload(String rawBody) {
+    public Object ollamaModelDownload(String rawBody) {
         String modelName = bindDownloadRequest(rawBody);
         ensureOllamaStarted();
         boolean available;
@@ -129,7 +128,7 @@ public final class OllamaManageService {
             data.putRawValue("progress", new com.fasterxml.jackson.databind.util.RawValue(Double.toString(100.0)));
             data.put("status", "completed");
             data.put("message", "模型已存在");
-            return ResponseEntity.ok(data);
+            return data;
         }
         var existing = downloadTasks.findActiveByModel(modelName);
         if (existing != null) {
@@ -139,7 +138,7 @@ public final class OllamaManageService {
             data.putRawValue("progress", new com.fasterxml.jackson.databind.util.RawValue(Double.toString(existing.progress)));
             data.put("status", existing.status);
             data.put("taskId", existing.id);
-            return ResponseEntity.ok(data);
+            return data;
         }
         String taskId = UUID.randomUUID().toString();
         downloadTasks.create(taskId, modelName, OffsetDateTime.now());
@@ -150,11 +149,11 @@ public final class OllamaManageService {
         data.put("status", "pending");
         data.put("taskId", taskId);
         data.put("message", "模型下载任务已创建");
-        return ResponseEntity.ok(data);
+        return data;
     }
 
     /** GET /initialization/ollama/download/progress/:taskId——DownloadTask 按 struct 序输出。 */
-    public ResponseEntity<Object> downloadProgress(String taskId) {
+    public Object downloadProgress(String taskId) {
         if (taskId == null || taskId.isEmpty()) {
             throw new BizException(AppError.badRequest("任务ID不能为空"));
         }
@@ -162,16 +161,16 @@ public final class OllamaManageService {
         if (task == null) {
             throw new BizException(AppError.notFound("下载任务不存在"));
         }
-        return ModelConnectivityTestService.ok(taskNode(task));
+        return taskNode(task);
     }
 
     /** GET /initialization/ollama/download/tasks——全量任务列表（map 序随机）。 */
-    public ResponseEntity<Object> downloadTasksList() {
+    public Object downloadTasksList() {
         ArrayNode arr = MAPPER.createArrayNode();
         for (var task : downloadTasks.list()) {
             arr.add(taskNode(task));
         }
-        return ModelConnectivityTestService.ok(arr);
+        return arr;
     }
 
     private void ensureOllamaStarted() {

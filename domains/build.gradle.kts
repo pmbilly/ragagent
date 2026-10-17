@@ -112,10 +112,6 @@ dependencies {
     // tiktoken BPE 编码器（cl100k_base；纯 BPE、纯 Java、零传递依赖）
     implementation(libs.jtokkit)
 
-    // 工具
-    compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
-
     // 测试
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test")

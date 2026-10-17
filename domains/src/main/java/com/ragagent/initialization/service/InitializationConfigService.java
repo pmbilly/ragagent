@@ -6,7 +6,6 @@ import com.ragagent.platform.config.AppEnvLookup;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.springframework.http.ResponseEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -50,7 +49,7 @@ public final class InitializationConfigService {
 
     // ══════════════ GET /initialization/config/:kbId ══════════════
 
-    public ResponseEntity<Object> getConfig(String kbId) {
+    public Map<String, Object> getConfig(String kbId) {
         knowledgeCatalog.requireKbAccess(kbId);
         KnowledgeBaseRowView kb = knowledgeCatalog.getAllTenantById(kbId);
         if (kb == null) {
@@ -71,12 +70,12 @@ public final class InitializationConfigService {
                 // 单个模型查询失败 → 跳过，继续处理其余模型
             }
         }
-        return ResponseEntity.ok(configResponse(models, kb, hasFiles(kbId)));
+        return configResponse(models, kb, hasFiles(kbId));
     }
 
     // ══════════════ POST /initialization/initialize/:kbId ══════════════
 
-    public ResponseEntity<Object> initialize(String kbId,
+    public Map<String, Object> initialize(String kbId,
             String rawBody) {
         InitializationRequests.InitializationRequest req = InitializationRequests.bindInitializationRequest(rawBody);
         KnowledgeBaseRowView kb = kbForWrite(kbId);
@@ -114,12 +113,12 @@ public final class InitializationConfigService {
         // 自有契约：api_key 留在 parameters、无 credentials 键
         data.put("models", processed.stream().map(InitResponses::rawModel).toList());
         data.put("message", "知识库配置更新成功");
-        return ResponseEntity.ok(data);
+        return data;
     }
 
     // ══════════════ PUT /initialization/config/:kbId ══════════════
 
-    public ResponseEntity<Object> updateConfig(String kbId,
+    public Map<String, Object> updateConfig(String kbId,
             String rawBody) {
         InitializationRequests.KBModelConfigRequest req = InitializationRequests.bindKBModelConfigRequest(rawBody);
         knowledgeCatalog.requireKbAccess(kbId);
@@ -264,7 +263,7 @@ public final class InitializationConfigService {
         kb.setQuestionGenerationConfig(qg);
 
         saveKb(kb);
-        return ResponseEntity.ok(java.util.Collections.singletonMap("message", "配置更新成功"));
+        return java.util.Collections.singletonMap("message", "配置更新成功");
     }
 
     /** RFC-3339 纳秒精度 + 服务器本地时区（同 ZeroTimeSerializer 逻辑）。 */

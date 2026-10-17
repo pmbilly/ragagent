@@ -90,3 +90,9 @@ tasks.withType<Test> {
     jvmArgs("-XX:+EnableDynamicAgentLoading")
     maxHeapSize = "1g"
 }
+
+// 编译期静态分析最小面（与 :contract 同款；见该模块注释）。-serial 排除同因：
+// 异常类 serialVersionUID 告警在本模块同为噪音。
+tasks.named<JavaCompile>("compileJava") {
+    options.compilerArgs.addAll(listOf("-Xlint:all,-serial", "-Werror"))
+}

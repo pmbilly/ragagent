@@ -2,53 +2,53 @@ package com.ragagent.mcp.api;
 
 import java.util.Map;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.tool.McpApprovalOps;
-import com.ragagent.mcp.controller.AgentToolApprovalController;
-import com.ragagent.mcp.controller.McpOAuthController;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
+import com.ragagent.mcp.service.AgentToolApprovalService;
+import com.ragagent.mcp.service.McpOAuthFlowService;
+import com.ragagent.mcp.service.McpOAuthFlowService.AuthorizeRequest;
+import com.ragagent.mcp.service.McpOAuthFlowService.ResolveRequest;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.contract.error.BizException;
 
 /**
- * {@link McpApprovalOps} 的 mcp 侧实现：把 embed 渠道传来的原始 body 解析成既有 DTO，再调既有 controller。
+ * {@link McpApprovalOps} 的 mcp 侧实现：把 embed 渠道传来的原始 body 解析成既有 DTO，再调用例层。
  *
  * <p><b>零行为变化</b>：请求体解析（含解析失败的 {@code BizException.badRequest} 语义）由 embedchannel
- * 移到本类，其余（租户/主体校验、闸门调用、错误映射）仍走原 controller 路径 ✗⇒ 不新开旁路；
- * 返回值与 controller 的响应体一致（恒 200 + body）。</p>
+ * 移到本类，其余（租户/主体校验、闸门调用、错误映射）走用例层（原先在 controller，方向倒挂已解）；
+ * 返回值与 HTTP 响应体一致（恒 200 + body）。</p>
  */
 @Component
 public class McpApprovalOpsAdapter implements McpApprovalOps {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final McpOAuthController oauth;
-    private final AgentToolApprovalController toolApproval;
+    private final McpOAuthFlowService oauth;
+    private final AgentToolApprovalService toolApproval;
 
-    public McpApprovalOpsAdapter(McpOAuthController oauth, AgentToolApprovalController toolApproval) {
+    public McpApprovalOpsAdapter(McpOAuthFlowService oauth, AgentToolApprovalService toolApproval) {
         this.oauth = oauth;
         this.toolApproval = toolApproval;
     }
 
     @Override
     public Map<String, Object> authorizeUrl(String serviceId, String rawBodyJson) {
-        McpOAuthController.AuthorizeRequest req =
-                parse(rawBodyJson, McpOAuthController.AuthorizeRequest.class);
-        return oauth.authorizeUrl(serviceId, req).getBody();
+        AuthorizeRequest req =
+                parse(rawBodyJson, AuthorizeRequest.class);
+        return oauth.authorizeUrl(serviceId, req);
     }
 
     @Override
     public Object authorizationStatus(String serviceId, String attemptId) {
-        ResponseEntity<?> res = oauth.status(serviceId, attemptId);
-        return res == null ? null : res.getBody();
+        return oauth.status(serviceId, attemptId);
     }
 
     @Override
     public void resolveAuthorization(String pendingId, String rawBodyJson) {
-        oauth.resolveMcpOAuth(pendingId, parse(rawBodyJson, McpOAuthController.ResolveRequest.class));
+        oauth.resolveMcpOAuth(pendingId, parse(rawBodyJson, ResolveRequest.class));
     }
 
     @Override

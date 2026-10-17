@@ -31,12 +31,8 @@ import com.ragagent.agentmanagement.service.CustomAgentService;
 import com.ragagent.agentmanagement.service.AgentSuggestedQuestions.TagScope;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.web.error.GuardForbiddenException;
-import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
 
 /**
  * agents CRUD 家族路由。
@@ -58,15 +54,12 @@ public class AgentController {
     private final CustomAgentService service;
     private final AgentPlaceholders placeholders;
     private final AgentTypePresets typePresets;
-    private final CustomAgentMapper agentMapper;
 
     public AgentController(CustomAgentService service, AgentPlaceholders placeholders,
-            AgentTypePresets typePresets,
-            CustomAgentMapper agentMapper) {
+            AgentTypePresets typePresets) {
         this.service = service;
         this.placeholders = placeholders;
         this.typePresets = typePresets;
-        this.agentMapper = agentMapper;
     }
 
     // ── 请求体（仅 name 必填）──
@@ -127,7 +120,7 @@ public class AgentController {
             @RequestBody(required = false) String rawBody, HttpServletRequest req) {
         requireNonEmpty(id);
         AgentRequest parsed = bindAgentRequest(rawBody, false);
-        checkAgentOwnership(id, req);
+        service.requireOwnedOrAdmin(id);
         ObjectNode cfg = configNode(parsed);
         authorizeKnowledgeScope(cfg);
         String locale = BuiltinAgentRegistry.localeFromRequest(req.getHeader("Accept-Language"));
@@ -140,7 +133,7 @@ public class AgentController {
     @DeleteMapping("/api/v1/agents/{id}")
     public ApiResponse<Void> delete(@PathVariable("id") String id, HttpServletRequest req) {
         requireNonEmpty(id);
-        checkAgentOwnership(id, req);
+        service.requireOwnedOrAdmin(id);
         service.deleteAgent(id);
         // 成功也带文案：由外壳的 message 承担（200 + {code:0,message:"Agent deleted successfully",data:null}）
         return ApiResponse.ok(null, "Agent deleted successfully");
@@ -279,25 +272,7 @@ public class AgentController {
     }
 
 
-    /** 归属校验：行存在且非 Admin+ 且非创建者 → 403。 */
-    private void checkAgentOwnership(String id, HttpServletRequest req) {
-        String role = TenantContext.currentRole();
-        boolean admin = TenantRole.fromString(role == null ? "" : role)
-                .hasPermission(TenantRole.ADMIN);
-        if (admin) {
-            return;
-        }
-        // 行存在性：查询交给 mapper（软删过滤）。行不存在时放行，由 handler 出 404。
-        Long tenant = TenantContext.currentTenantId();
-        var row = agentMapper.getByIDAndTenant(id, tenant == null ? 0 : tenant);
-        if (row != null) {
-            String creator = row.getCreatedBy() == null ? "" : row.getCreatedBy();
-            String uid = TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId();
-            if (creator.isEmpty() || !creator.equals(uid)) {
-                throw GuardForbiddenException.mustOwnResourceOrHaveRole();
-            }
-        }
-    }
+    /** 归属校验在 service（{@link CustomAgentService#requireOwnedOrAdmin}）。 */
 
     private static List<String> strings(ObjectNode cfg, String field) {
         List<String> out = new ArrayList<>();

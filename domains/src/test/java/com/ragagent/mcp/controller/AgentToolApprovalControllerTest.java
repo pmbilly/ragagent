@@ -9,7 +9,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.tool.ToolApprovalException;
@@ -40,7 +39,7 @@ class AgentToolApprovalControllerTest {
     @BeforeEach
     void setUp() {
         gate = mock(ToolApprovalGate.class);
-        controller = new AgentToolApprovalController(Optional.of(gate));
+        controller = new AgentToolApprovalController(new com.ragagent.mcp.service.AgentToolApprovalService(gate));
         // 处理器从租户上下文取 tenant/principal/角色，先种好上下文
         TenantContext.set(7L, TenantContext.webUserPrincipal("user-1"), "admin", false, "user-1", false);
     }
@@ -171,7 +170,7 @@ class AgentToolApprovalControllerTest {
 
     @Test
     void gateNotConfiguredReturns500() {
-        AgentToolApprovalController unconfigured = new AgentToolApprovalController(Optional.empty());
+        AgentToolApprovalController unconfigured = new AgentToolApprovalController(new com.ragagent.mcp.service.AgentToolApprovalService((com.ragagent.contract.tool.ToolApprovalGate) null));
 
         BizException e = assertThrows(BizException.class, () -> unconfigured.resolveToolApproval("p1",
                 new ResolveToolApprovalRequest("approve", null, "")));

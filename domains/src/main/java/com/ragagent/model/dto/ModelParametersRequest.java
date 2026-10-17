@@ -7,7 +7,7 @@ import com.ragagent.contract.model.ModelParameters;
 /**
  * 模型参数请求体（创建/更新共用；JSON 字段名即 Java 字段名）。
  *
- * <p>与响应投影 {@link ModelParametersDTO} 的差别：含 {@code apiKey}/{@code appSecret}
+ * <p>与响应投影 {@link ModelParametersDto} 的差别：含 {@code apiKey}/{@code appSecret}
  * 两个密钥字段——创建时可携带；更新时经 PUT 正文携带的密钥会被忽略（WARN），
  * 凭证只走 {@code /models/{id}/credentials} 子资源。</p>
  */
@@ -15,7 +15,7 @@ public record ModelParametersRequest(
         String baseUrl,
         String apiKey,
         String interfaceType,
-        ModelParametersDTO.EmbeddingParametersDTO embeddingParameters,
+        ModelParametersDto.EmbeddingParametersDTO embeddingParameters,
         String parameterSize,
         String provider,
         Map<String, String> extraConfig,

@@ -6,7 +6,6 @@ import com.ragagent.contract.knowledge.EntityExtractionPort;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.http.ResponseEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -44,7 +43,7 @@ public final class TextExtractionTestService {
     // ══════════════ 抽取段 ══════════════
 
     /** POST /initialization/extract/text-relation——LLM 驱动的实体关系抽取。 */
-    public ResponseEntity<Object> extractTextRelations(String rawBody) {
+    public Object extractTextRelations(String rawBody) {
         JsonNode n;
         try {
             n = OllamaManageService.bindJsonObject(rawBody);
@@ -117,21 +116,21 @@ public final class TextExtractionTestService {
                 on.put("type", rel.type());
             }
         }
-        return ModelConnectivityTestService.ok(data);
+        return data;
     }
 
     /** POST /initialization/extract/fabri-tag——随机标签组（无 LLM 调用）。 */
-    public ResponseEntity<Object> fabriTag() {
+    public Object fabriTag() {
         List<String> tagRandom = randomSelect(TAG_OPTIONS,
                 java.util.concurrent.ThreadLocalRandom.current().nextInt(TAG_OPTIONS.size() - 1) + 1);
         ObjectNode data = MAPPER.createObjectNode();
         ArrayNode tags = data.putArray("tags");
         tagRandom.forEach(tags::add);
-        return ModelConnectivityTestService.ok(data);
+        return data;
     }
 
     /** POST /initialization/extract/fabri-text——按标签生成示例文本（LLM 驱动）。 */
-    public ResponseEntity<Object> fabriText(String rawBody) {
+    public Object fabriText(String rawBody) {
         JsonNode n;
         try {
             n = OllamaManageService.bindJsonObject(rawBody);
@@ -166,7 +165,7 @@ public final class TextExtractionTestService {
         }
         ObjectNode data = MAPPER.createObjectNode();
         data.put("text", result);
-        return ModelConnectivityTestService.ok(data);
+        return data;
     }
 
     /** 洗牌后取前 n（n 钳到上限）。 */

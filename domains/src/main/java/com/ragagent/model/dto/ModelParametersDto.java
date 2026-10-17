@@ -8,7 +8,7 @@ import java.util.Map;
  * <p>可空字段显式输出 null（未设置的 contextWindow/maxOutputTokens/maxConcurrency/appId、
  * 无额外配置时的 extraConfig/customHeaders）。</p>
  */
-public record ModelParametersDTO(
+public record ModelParametersDto(
         String baseUrl,
         String interfaceType,
         EmbeddingParametersDTO embeddingParameters,
@@ -23,15 +23,15 @@ public record ModelParametersDTO(
         String appId) {
 
     /** 非 Admin+：剥离 baseUrl/extraConfig/customHeaders */
-    ModelParametersDTO withSecretsStripped() {
-        return new ModelParametersDTO("", interfaceType, embeddingParameters,
+    ModelParametersDto withSecretsStripped() {
+        return new ModelParametersDto("", interfaceType, embeddingParameters,
                 parameterSize, provider, null, null, supportsVision,
                 contextWindow, maxOutputTokens, maxConcurrency, appId);
     }
 
     /** 内置模型对非系统管理员：额外剥离 appId 并清空 baseUrl */
-    ModelParametersDTO withBuiltinStripped() {
-        return new ModelParametersDTO("", interfaceType, embeddingParameters,
+    ModelParametersDto withBuiltinStripped() {
+        return new ModelParametersDto("", interfaceType, embeddingParameters,
                 parameterSize, provider, null, null, supportsVision,
                 contextWindow, maxOutputTokens, maxConcurrency, null);
     }

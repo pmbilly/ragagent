@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.stereotype.Component;
 import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.AgentToolCallData;
@@ -22,6 +23,7 @@ import com.ragagent.session.service.TemporaryDocumentService;
  * {@code KnowledgeQaController} 的**附件解析簇**：临时文档/内联图片的解析与
  * 等待、解析结果的持久化；SSE 侧只负责经它拿结果。
  */
+@Component
 public final class QaAttachmentResolver {
 
     private static final org.slf4j.Logger log =

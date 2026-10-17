@@ -24,8 +24,10 @@ public class MemoryMessageCursor {
     }
 
     public MemoryMessageCursor(OffsetDateTime at, String id) {
-        setAt(at);
-        setId(id);
+        // 直接字段归一赋值（不经 setter）：setter 非 final 可被子类覆写，
+        // 构造器里调用会让 this 在子类构造完成前逃逸（-Xlint:this-escape）
+        this.at = at == null ? ZeroTimes.ZERO_DATE_TIME : at;
+        this.id = id == null ? "" : id;
     }
 
     /**

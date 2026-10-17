@@ -27,6 +27,7 @@ import com.ragagent.session.service.QaSupport.SseStreamContext;
 import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.platform.stream.StreamManager;
+import org.springframework.stereotype.Component;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.contract.session.MessageExecutionContext;
@@ -40,6 +41,7 @@ import com.ragagent.session.service.SteerRunCoordinator;
  * <p>共享项处理：{@code turnFinalizer}/{@code sseOrchestrator}/{@code attachmentResolver}
  * 均为已建协作者，直接持有转发；{@code appendQuickAnswerReasoning} 是 static → 留控制器按类名引用。</p>
  */
+@Component
 public final class QaTurnExecutor {
 
     private static final org.slf4j.Logger log =
@@ -55,7 +57,8 @@ public final class QaTurnExecutor {
     private final QaAttachmentResolver attachmentResolver;
     private final TenantConfigLookup tenantService;
 
-    public QaTurnExecutor(MessageService messageService, StreamManager streamManager, SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService, SteerRunCoordinator steerCoordinator, QaSseOrchestrator sseOrchestrator, QaTurnFinalizer turnFinalizer, QaAttachmentResolver attachmentResolver, TenantConfigLookup tenantService) {
+    public QaTurnExecutor(MessageService messageService, StreamManager streamManager, SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService, SteerRunCoordinator steerCoordinator, QaSseOrchestrator sseOrchestrator, QaTurnFinalizer turnFinalizer, QaAttachmentResolver attachmentResolver,
+            org.springframework.beans.factory.ObjectProvider<TenantConfigLookup> tenantServiceProvider) {
         this.messageService = messageService;
         this.streamManager = streamManager;
         this.knowledgeQaService = knowledgeQaService;
@@ -64,7 +67,8 @@ public final class QaTurnExecutor {
         this.sseOrchestrator = sseOrchestrator;
         this.turnFinalizer = turnFinalizer;
         this.attachmentResolver = attachmentResolver;
-        this.tenantService = tenantService;
+        // 租户服务可选（缺 bean 时降级，与控制器原先的手工装配语义一致）
+        this.tenantService = tenantServiceProvider.getIfAvailable();
     }
 
     public void executeQA(QaRequestContext reqCtx, QaMode mode, boolean generateTitle,

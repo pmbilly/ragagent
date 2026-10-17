@@ -13,7 +13,7 @@ import com.ragagent.platform.web.RejectEmptyBody;
 import com.ragagent.model.domain.Model;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.model.dto.CreateModelRequest;
-import com.ragagent.model.dto.ModelProviderDTO;
+import com.ragagent.model.dto.ModelProviderDto;
 import com.ragagent.model.dto.ModelDetailResponse;
 import com.ragagent.model.dto.UpdateModelRequest;
 import com.ragagent.model.service.ModelService;
@@ -220,10 +220,10 @@ public class ModelController {
 
     /** 模型提供方列表（Viewer+）；{@code modelType} 支持的取值由 ModelProviderCatalog 映射。 */
     @GetMapping("/providers")
-    public ResponseEntity<List<ModelProviderDTO>> listModelProviders(
+    public ResponseEntity<List<ModelProviderDto>> listModelProviders(
             @RequestParam(name = "modelType", required = false) String modelType) {
         log.info("Listing model providers for type: {}", modelType);
-        List<ModelProviderDTO> providers;
+        List<ModelProviderDto> providers;
         if (modelType != null && !modelType.isEmpty()) {
             providers = providerRegistry.listByModelType(ModelProviderCatalog.queryToBackend(modelType));
         } else {

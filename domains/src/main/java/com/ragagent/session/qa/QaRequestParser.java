@@ -32,16 +32,19 @@ import com.ragagent.contract.storage.support.StorageBackendResolver;
 import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.storage.support.FileResolverFactory;
 import com.ragagent.platform.storage.support.ResourceUrlMode;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.stereotype.Component;
 
 /**
  * {@code KnowledgeQaController} 的**请求解析主体**：把 HTTP 请求（会话 id、
  * agentId、资源、模式）解析成 {@code ParsedRequest}（{@code QaRequestContext} + 具名请求体）。
  *
- * <p>参数化而非注入：{@code agentResolver} 由调用方传入（控制器里是
- * {@code @Autowired} 字段，普通协作者不能快照）；读者租户 {@code readerTenant} 同理由调用方算好传入
- * （控制器侧的 {@code currentTenant()} 依赖 {@code tenantServiceField}）。共享静态助手
+ * <p>参数化而非注入：{@code agentResolver} 由调用方传入（{@link QaEntryRunner} 构造注入后
+ * 逐调用快照）；读者租户 {@code readerTenant} 同理由调用方算好传入
+ * （{@code QaEntryRunner} 侧的 {@code currentTenant()} 依赖 {@code tenantService}）。共享静态助手
  * {@code KnowledgeQaController.stringListOf} 与嵌套类型 {@code ParsedRequest} 按包内可见引用。</p>
  */
+@Component
 public final class QaRequestParser {
 
     private static final org.slf4j.Logger log =
@@ -54,12 +57,15 @@ public final class QaRequestParser {
     private final FileResolverFactory fileResolverFactory;
 
     public QaRequestParser(SessionService sessionService, TemporaryDocumentService temporaryDocuments,
-            FileUrlPort fileService, StorageBackendResolver storageBackendResolver,
+            ObjectProvider<FileUrlPort> fileServiceProvider,
+            ObjectProvider<StorageBackendResolver> storageBackendResolverProvider,
             FileResolverFactory fileResolverFactory) {
         this.sessionService = sessionService;
         this.temporaryDocuments = temporaryDocuments;
-        this.fileService = fileService;
-        this.storageBackendResolver = storageBackendResolver;
+        // 两个端口按 ObjectProvider 取（缺 bean 时 Rewriter 按未装配分支降级，
+        // 与控制器原先的手工装配语义一致）
+        this.fileService = fileServiceProvider.getIfAvailable();
+        this.storageBackendResolver = storageBackendResolverProvider.getIfAvailable();
         this.fileResolverFactory = fileResolverFactory;
     }
 

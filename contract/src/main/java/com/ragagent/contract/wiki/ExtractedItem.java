@@ -37,7 +37,8 @@ public class ExtractedItem {
                          String description, String details) {
         this.name = name == null ? "" : name;
         this.slug = slug == null ? "" : slug;
-        setAliases(aliases);
+        // 直接字段归一赋值（不经 setter）：避免 this 在子类构造完成前逃逸（-Xlint:this-escape）
+        this.aliases = aliases == null ? new ArrayList<>() : aliases;
         this.description = description == null ? "" : description;
         this.details = details == null ? "" : details;
     }

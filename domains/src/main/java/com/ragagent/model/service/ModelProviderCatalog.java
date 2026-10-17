@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.ragagent.model.dto.ModelProviderDTO;
+import com.ragagent.model.dto.ModelProviderDto;
 import org.springframework.stereotype.Component;
 
 /**
@@ -180,21 +180,21 @@ public class ModelProviderCatalog {
     // @formatter:on
 
     /** 全量（注册表顺序）。 */
-    public List<ModelProviderDTO> list() {
+    public List<ModelProviderDto> list() {
         return ENTRIES.stream().map(ModelProviderCatalog::toDTO).toList();
     }
 
     /** 按后端类型过滤，保持注册表顺序。 */
-    public List<ModelProviderDTO> listByModelType(String backendType) {
+    public List<ModelProviderDto> listByModelType(String backendType) {
         return ENTRIES.stream()
                 .filter(e -> e.backendTypes().contains(backendType))
                 .map(ModelProviderCatalog::toDTO)
                 .toList();
     }
 
-    private static ModelProviderDTO toDTO(ProviderEntry e) {
+    private static ModelProviderDto toDTO(ProviderEntry e) {
         // defaultUrls 为 map：TreeMap 保证 JSON key 字母序（输出稳定字节）
-        return new ModelProviderDTO(e.value(), e.label(), e.description(),
+        return new ModelProviderDto(e.value(), e.label(), e.description(),
                 new TreeMap<>(e.defaultUrls()), e.modelTypes());
     }
 }

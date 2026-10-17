@@ -8,7 +8,7 @@ import java.util.Map;
  * 是否必须鉴权、额外字段配置。
  *
  * 字段序 = 声明序。HTTP 目录响应由
- * com.ragagent.model.service.ModelProviderCatalog + ModelProviderDTO 承载，
+ * com.ragagent.model.service.ModelProviderCatalog + ModelProviderDto 承载，
  * 本 record 供运行时路由/校验使用。
  */
 public record ProviderInfo(

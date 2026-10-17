@@ -1,7 +1,7 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.session.qa.QaEntryRunner;
 import com.ragagent.session.qa.QaRequestBinder;
-import com.ragagent.session.qa.QaAttachmentResolver;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,42 +13,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.session.SseSink;
 import com.ragagent.platform.web.ServletSseSink;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.session.qa.ParsedRequest;
-import com.ragagent.session.qa.QaRequestParser;
-import com.ragagent.session.qa.QaSseOrchestrator;
-import com.ragagent.session.qa.QaTurnExecutor;
-import com.ragagent.session.qa.QaTurnFinalizer;
-import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;
 import com.ragagent.session.dto.QaRequests.SearchKnowledgeRequest;
-import com.ragagent.session.service.AgentResolver;
-import com.ragagent.session.service.MessageService;
-import com.ragagent.session.service.suggestion.MessageSuggestionService;
 import com.ragagent.session.service.QaSupport;
-import com.ragagent.session.service.QaSupport.QaMode;
-import com.ragagent.session.service.QaSupport.QaRequestContext;
-import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
-import com.ragagent.session.service.SessionService;
-import com.ragagent.session.service.TemporaryDocumentService;
-import com.ragagent.session.controller.sse.StreamEventEmitter;
-import com.ragagent.platform.stream.StreamManager;
 
 import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.contract.memory.MemoryExtractionPort;
-import com.ragagent.session.service.SteerRunCoordinator;
-import com.ragagent.session.controller.sse.SseFrameWriter;
-import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.contract.storage.support.Mode;
-import com.ragagent.contract.storage.support.StorageBackendResolver;
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.storage.support.FileResolverFactory;
 
 
 /**
@@ -90,78 +64,17 @@ import com.ragagent.platform.storage.support.FileResolverFactory;
 public class KnowledgeQaController {
 
 
-    private final SessionService sessionService;
-
-    /** 执行/落库簇。 */
-    private final QaTurnExecutor executor;
-
-    /** 租户服务（A3-3 接线；原 @Autowired 字段，改构造注入保持可选语义）。 */
-    private final TenantConfigLookup tenantService;
-
-    /** 附件解析簇。 */
-    private final QaAttachmentResolver attachmentResolver;
-
-    /** SSE 编排簇。 */
-    private final QaSseOrchestrator sseOrchestrator;
-
-    /** 收尾簇。 */
-    private final QaTurnFinalizer turnFinalizer;
-
-    /** 请求解析主体。 */
-    private final QaRequestParser qaRequestParser;
-    private final MessageService messageService;
-    private final StreamManager streamManager;
+    /** 检索面（knowledge-search）。 */
     private final SessionKnowledgeQaService knowledgeQaService;
-    private final SessionAgentQaService agentQaService;
-    private final MessageSuggestionService suggestionService;
-    private final TemporaryDocumentService temporaryDocuments;
-    private final SteerRunCoordinator steerCoordinator;
-    private final StreamEventEmitter emitter;
-    private final SseFrameWriter sseFrameWriter;
-    private final FileUrlPort fileService;
-    private final StorageBackendResolver storageBackendResolver;
-    private final MemoryExtractionPort memoryExtraction;
 
-    public KnowledgeQaController(SessionService sessionService,
-            MessageService messageService,
-            StreamManager streamManager,
-            SessionKnowledgeQaService knowledgeQaService,
-            SessionAgentQaService agentQaService,
-            MessageSuggestionService suggestionService,
-            TemporaryDocumentService temporaryDocuments,
-            SteerRunCoordinator steerCoordinator,
-            StreamEventEmitter emitter,
-            SseFrameWriter sseFrameWriter,
-            org.springframework.beans.factory.ObjectProvider<FileUrlPort> fileService,
-            org.springframework.beans.factory.ObjectProvider<StorageBackendResolver> storageBackendResolver,
-            org.springframework.beans.factory.ObjectProvider<MemoryExtractionPort> memoryExtraction,
-            org.springframework.beans.factory.ObjectProvider<TenantConfigLookup> tenantServiceProvider,
-            FileResolverFactory fileResolverFactory) {
-        this.sessionService = sessionService;
-        this.messageService = messageService;
-        this.streamManager = streamManager;
+    /** SSE 双入口（HTTP 与 embed 面共用；绑定→解析→执行收敛在 {@link QaEntryRunner}）。 */
+    private final QaEntryRunner qaEntryRunner;
+
+    public KnowledgeQaController(SessionKnowledgeQaService knowledgeQaService,
+            QaEntryRunner qaEntryRunner) {
         this.knowledgeQaService = knowledgeQaService;
-        this.agentQaService = agentQaService;
-        this.suggestionService = suggestionService;
-        this.temporaryDocuments = temporaryDocuments;
-        this.steerCoordinator = steerCoordinator;
-        this.emitter = emitter;
-        this.sseFrameWriter = sseFrameWriter;
-        // 两个端口按 ObjectProvider 取（A3-3 起 StorageBackendResolver 有生产实现）；
-        // 缺 bean 时 Rewriter 按未装配分支降级（handle 模式同形）
-        this.fileService = fileService.getIfAvailable();
-        this.storageBackendResolver = storageBackendResolver.getIfAvailable();
-        this.memoryExtraction = memoryExtraction.getIfAvailable();
-            this.qaRequestParser = new QaRequestParser(sessionService, temporaryDocuments,
-                    this.fileService, this.storageBackendResolver, fileResolverFactory);
-        this.turnFinalizer = new QaTurnFinalizer(this.sessionService, this.messageService, this.suggestionService, this.temporaryDocuments, this.memoryExtraction);
-        this.sseOrchestrator = new QaSseOrchestrator(this.streamManager, this.emitter, this.sessionService, this.messageService, this.sseFrameWriter, this.turnFinalizer);
-        this.attachmentResolver = new QaAttachmentResolver(this.messageService, this.temporaryDocuments, this.turnFinalizer);
-        this.tenantService = tenantServiceProvider.getIfAvailable();
-        this.executor = new QaTurnExecutor(this.messageService, this.streamManager, this.knowledgeQaService,
-                this.agentQaService, this.steerCoordinator, this.sseOrchestrator, this.turnFinalizer,
-                this.attachmentResolver, this.tenantService);
-}
+        this.qaEntryRunner = qaEntryRunner;
+    }
 
     // ── 端点 ──────────────────────────────────────────────────────────────────
 
@@ -170,15 +83,7 @@ public class KnowledgeQaController {
             @RequestBody(required = false) String rawBody,
             @RequestParam(value = Mode.QUERY_PARAM, required = false) String resourceUrls,
             HttpServletResponse response) throws IOException {
-        runKnowledgeQA(rawSessionId, rawBody, resourceUrls, new ServletSseSink(response));
-    }
-
-    /** 非 HTTP 入口（embed 委托面）：写面收敛到 {@link SseSink}。 */
-    public void runKnowledgeQA(String rawSessionId, String rawBody, String resourceUrls,
-            SseSink sink) throws IOException {
-        CreateKnowledgeQARequest request = QaRequestBinder.bindQaRequest(rawBody);
-        ParsedRequest parsed = qaRequestParser.parseQARequest(rawSessionId, request, resourceUrls, "KnowledgeQA", agentResolverField, currentTenant());
-        executor.executeQA(parsed.reqCtx(), QaMode.NORMAL, !request.disableTitle, sink);
+        qaEntryRunner.runKnowledgeQA(rawSessionId, rawBody, resourceUrls, new ServletSseSink(response));
     }
 
     @PostMapping("/api/v1/agent-chat/{sessionId}")
@@ -186,31 +91,7 @@ public class KnowledgeQaController {
             @RequestBody(required = false) String rawBody,
             @RequestParam(value = Mode.QUERY_PARAM, required = false) String resourceUrls,
             HttpServletResponse response) throws IOException {
-        runAgentQA(rawSessionId, rawBody, resourceUrls, new ServletSseSink(response));
-    }
-
-    /** 非 HTTP 入口（embed 委托面）：写面收敛到 {@link SseSink}。 */
-    public void runAgentQA(String rawSessionId, String rawBody, String resourceUrls,
-            SseSink sink) throws IOException {
-        CreateKnowledgeQARequest request = QaRequestBinder.bindQaRequest(rawBody);
-        ParsedRequest parsed = qaRequestParser.parseQARequest(rawSessionId, request, resourceUrls, "AgentQA", agentResolverField, currentTenant());
-        QaRequestContext reqCtx = parsed.reqCtx();
-
-        // agent 模式判定：customAgent.agent_mode > request.agent_enabled
-        boolean agentModeEnabled = request.agentEnabled;
-        if (reqCtx.agentConfig != null) {
-            agentModeEnabled = SessionKnowledgeQaService.isAgentMode(reqCtx.agentConfig);
-        }
-
-        if (agentModeEnabled && reqCtx.agentConfig == null) {
-            throw BizException.badRequest("agent_id is required when agent mode is enabled");
-        }
-
-        if (agentModeEnabled) {
-            executor.executeQA(reqCtx, QaMode.AGENT, true, sink);
-        } else {
-            executor.executeQA(reqCtx, QaMode.NORMAL, !request.disableTitle, sink);
-        }
+        qaEntryRunner.runAgentQA(rawSessionId, rawBody, resourceUrls, new ServletSseSink(response));
     }
 
     @PostMapping("/api/v1/knowledge-search")
@@ -254,30 +135,6 @@ public class KnowledgeQaController {
     }
 
     // ── 请求体绑定（绑定错误文案逐字对齐） ───────────────────────────────
-
-
-    /** 共享/自有 agent 解析（与附件上传入口共用同一组件）。 */
-    @org.springframework.beans.factory.annotation.Autowired
-    private AgentResolver agentResolverField;
-
-    /**
-     * 读者租户实体（A3-3 接线）——供 Rewriter 解析"引用不带 provider scheme 时的租户默认
-     * provider"。取不到租户实体时引用一律保留成 handle（降级形态）；
-     * 现在按 TenantContext 的 id 取实体，与 {@code SystemController} /
-     * {@code HybridSearchPort} 同一写法。
-     */
-    private TenantStorageView currentTenant() {
-        Long tid = TenantContext.currentTenantId();
-        try {
-            return tid == null || tid <= 0 || tenantService == null
-                    ? null : tenantService.storageView(tid);
-        } catch (RuntimeException e) {
-            return null;
-        }
-    }
-
-    // ── executeQA ─────────────────────────────────────────────────────────────
-
 
     // 曾有的 errorEventText（剥 BizException 取 appError().message()）已删除：
     // 其前提被线上 A/B 推翻（W5γ5.12），现统一走 BizException.wireText，理由见上面的调用点注释。

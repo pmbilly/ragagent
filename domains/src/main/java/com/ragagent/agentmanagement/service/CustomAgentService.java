@@ -22,6 +22,8 @@ import com.ragagent.agentmanagement.dto.CustomAgentResult;
 import com.ragagent.agentmanagement.mapper.AgentQuestionMapper;
 import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.KnowledgeBaseCatalogPort;
@@ -75,6 +77,27 @@ public class CustomAgentService {
     static long tenantId() {
         Long tid = TenantContext.currentTenantId();
         return tid == null ? 0 : tid;
+    }
+
+    /**
+     * 归属校验（写路由共用）：行存在且非 Admin+ 且非创建者 → 403；
+     * 行不存在时放行，由后续 handler 出 404。
+     */
+    public void requireOwnedOrAdmin(String id) {
+        String role = TenantContext.currentRole();
+        boolean admin = TenantRole.fromString(role == null ? "" : role)
+                .hasPermission(TenantRole.ADMIN);
+        if (admin) {
+            return;
+        }
+        CustomAgentEntity row = agentMapper.getByIDAndTenant(id, tenantId());
+        if (row != null) {
+            String creator = row.getCreatedBy() == null ? "" : row.getCreatedBy();
+            String uid = TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId();
+            if (creator.isEmpty() || !creator.equals(uid)) {
+                throw GuardForbiddenException.mustOwnResourceOrHaveRole();
+            }
+        }
     }
 
     // ═══════════════════ 查询 ═══════════════════

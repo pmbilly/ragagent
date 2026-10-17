@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.model.dto.ModelProviderDTO;
+import com.ragagent.model.dto.ModelProviderDto;
 
 /**
  * 目录一致性哨兵：把本包（运行时元数据）与
@@ -31,7 +31,7 @@ class ProviderCatalogParityTest {
         assertEquals(catalog.size(), runtime.size(), "厂商数量必须一致");
         for (int i = 0; i < runtime.size(); i++) {
             ProviderInfo info = runtime.get(i);
-            ModelProviderDTO dto = catalog.get(i);
+            ModelProviderDto dto = catalog.get(i);
 
             assertEquals(dto.value(), info.name().value(), "第 " + i + " 个厂商的标识不一致");
             assertEquals(dto.label(), info.displayName(), info.name() + " 的 DisplayName 不一致");

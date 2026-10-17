@@ -17,6 +17,8 @@ import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.contract.memory.MemoryExtractionPort;
 import com.ragagent.contract.session.SessionLastRequestState;
 import com.ragagent.session.service.SessionLookupScope;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * {@code KnowledgeQaController} 的**收尾簇**：轮次状态落库、待处理附件判定、
@@ -25,6 +27,7 @@ import com.ragagent.session.service.SessionLookupScope;
  * <p>{@code runWithTenant} 与 {@code completeAssistantMessage} 集中在本类，
  * SSE 编排协作者持有本类即可转发这两件事，不必回调控制器。</p>
  */
+@Component
 public final class QaTurnFinalizer {
 
     private static final org.slf4j.Logger log =
@@ -36,6 +39,14 @@ public final class QaTurnFinalizer {
     private final TemporaryDocumentService temporaryDocuments;
     private final MemoryExtractionPort memoryExtraction;
 
+    @Autowired   // 多构造器（含测试接缝）⇒ 显式指定装配用的这一个
+    public QaTurnFinalizer(SessionService sessionService, MessageService messageService, MessageSuggestionService suggestionService, TemporaryDocumentService temporaryDocuments,
+            org.springframework.beans.factory.ObjectProvider<MemoryExtractionPort> memoryExtractionProvider) {
+        this(sessionService, messageService, suggestionService, temporaryDocuments,
+                memoryExtractionProvider.getIfAvailable());
+    }
+
+    /** 测试接缝：直接给端口实例（不经 Spring 装配）。 */
     public QaTurnFinalizer(SessionService sessionService, MessageService messageService, MessageSuggestionService suggestionService, TemporaryDocumentService temporaryDocuments, MemoryExtractionPort memoryExtraction) {
         this.sessionService = sessionService;
         this.messageService = messageService;

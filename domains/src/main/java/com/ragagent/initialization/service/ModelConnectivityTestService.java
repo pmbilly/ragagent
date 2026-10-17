@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import org.springframework.http.ResponseEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -57,7 +56,7 @@ public final class ModelConnectivityTestService {
     // ══════════════ 模型连通性测试段 ══════════════
 
     /** POST /initialization/remote/check——chat 模块最小化连通性调用。 */
-    public ResponseEntity<Object> remoteCheck(String rawBody) {
+    public Object remoteCheck(String rawBody) {
         ModelTestRequest req = fillSecretsFromStoredModel(bindModelTestRequest(rawBody));
         if (req.modelName().isEmpty() || req.baseUrl().isEmpty()) {
             throw new BizException(AppError.badRequest("模型名称和Base URL不能为空"));
@@ -92,7 +91,7 @@ public final class ModelConnectivityTestService {
     }
 
     /** POST /initialization/embedding/test——embed 一次 "hello" 并回报维度。 */
-    public ResponseEntity<Object> embeddingTest(String rawBody) {
+    public Object embeddingTest(String rawBody) {
         ModelTestRequest r = fillSecretsFromStoredModel(bindModelTestRequest(rawBody));
         String source = r.source();
         if (source.isEmpty()) {
@@ -109,7 +108,7 @@ public final class ModelConnectivityTestService {
                 data.put("available", false);
                 data.put("dimension", 0);
                 data.put("message", "阿里云多模态 Embedding 模型暂不支持，请使用纯文本 Embedding 模型（如 text-embedding-v4）");
-                return ok(data);
+                return data;
             }
         }
         ModelView model = buildTestModel(r, "Embedding", "remote");
@@ -130,7 +129,7 @@ public final class ModelConnectivityTestService {
     }
 
     /** POST /initialization/rerank/check——rerank 一次 ["ping"]/["pong"]。 */
-    public ResponseEntity<Object> rerankCheck(String rawBody) {
+    public Object rerankCheck(String rawBody) {
         ModelTestRequest req = fillSecretsFromStoredModel(bindModelTestRequest(rawBody));
         if (req.modelName().isEmpty() || req.baseUrl().isEmpty()) {
             throw new BizException(AppError.badRequest("模型名称和Base URL不能为空"));
@@ -160,7 +159,7 @@ public final class ModelConnectivityTestService {
     }
 
     /** POST /initialization/asr/check——发一段静默 WAV 验证 transcription 端点。 */
-    public ResponseEntity<Object> asrCheck(String rawBody) {
+    public Object asrCheck(String rawBody) {
         ModelTestRequest req = fillSecretsFromStoredModel(bindModelTestRequest(rawBody));
         if (req.modelName().isEmpty() || req.baseUrl().isEmpty()) {
             throw new BizException(AppError.badRequest("模型名称和Base URL不能为空"));
@@ -183,7 +182,7 @@ public final class ModelConnectivityTestService {
             ObjectNode data = MAPPER.createObjectNode();
             data.put("available", false);
             data.put("message", "创建ASR实例失败: " + e.getMessage());
-            return ok(data);
+            return data;
         } catch (AsrTranscriber.AsrTranscribeException e) {
             String errMsg = e.getMessage() == null ? "" : e.getMessage();
             if (errMsg.contains("401") || errMsg.contains("Unauthorized") || errMsg.contains("authentication")) {
@@ -209,7 +208,7 @@ public final class ModelConnectivityTestService {
     }
 
     /** POST /initialization/multimodal/test——multipart 上传图片，走 DocReader 解析。 */
-    public ResponseEntity<Object> multimodalTest(
+    public Object multimodalTest(
             String vlmModel,
             String vlmBaseUrl,
             String vlmInterfaceType,
@@ -322,7 +321,7 @@ public final class ModelConnectivityTestService {
             data.put("processingTime", processingTime);
             data.put("success", true);
         }
-        return ok(data);
+        return data;
     }
 
     /** 多模态测试的 DocReader 调用：ReadRequest(FileContent/FileName/FileType)。 */
@@ -482,23 +481,19 @@ public final class ModelConnectivityTestService {
         }
     }
 
-    static ResponseEntity<Object> okAvailability(boolean available, String message) {
+    static ObjectNode okAvailability(boolean available, String message) {
         ObjectNode data = MAPPER.createObjectNode();
         data.put("available", available);
         data.put("message", message);
-        return ok(data);
+        return data;
     }
 
-    static ResponseEntity<Object> embeddingResult(boolean available, String message, int dimension) {
+    static ObjectNode embeddingResult(boolean available, String message, int dimension) {
         ObjectNode data = MAPPER.createObjectNode();
         data.put("available", available);
         data.put("dimension", dimension);
         data.put("message", message);
-        return ok(data);
-    }
-
-    static ResponseEntity<Object> ok(Object data) {
-        return ResponseEntity.ok(data);
+        return data;
     }
 
     /** 时间保持原 offset 输出（JSON 反序列化来的时间不改时区）。 */
