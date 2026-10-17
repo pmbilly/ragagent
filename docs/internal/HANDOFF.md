@@ -77,10 +77,10 @@
 | **L9** | 删纯转发的控制器 catch（12 处），统一交 `GlobalExceptionHandler` | ✅ 其余带业务语义或金片钉住，保留 |
 | **L10** | 错误形态统一为 `{code,message,data}`（**行为变更**） | ✅ 删 2 个异常类 + RawJsonError；金片 8 条 |
 | **L11** | 异常语义守卫扩到 domains 全量 | 待做 |
-| **L12** | 数据访问定规：单表→Mapper，跨表/方言/事务→Repository；22 处 controller 下沉 | 待做 |
-| **L13** | 4 个核心实体 → `XxxView` record（**行为变更**） | 待做 |
-| **L14** | 事务三套模板收敛；多步写补声明或理由 | 待做 |
-| **L15** | `ChatManage` 127 方法 → `QaRequestConfig` + `QaPipelineState`；DTO 批量 record 化 | 待做 |
+| **L12** | 数据访问定规 + controller 纯度守卫 | ✅ controller 直连 Mapper 实为 0（原 22 是 ObjectMapper 误报） |
+| **L13** | 4 个核心实体 → `XxxView` record | ⏸ 评估后不做：收益（架构纯粹性）小于成本（157 金片 + 序列化细节）与可读性损失（多一层跳转） |
+| **L14** | 事务模板收敛 + 队列 worker 补事务边界说明 | ✅ 2 类合并为 `platform.persistence.TxTemplate` |
+| **L15** | `ChatManage` 拆分 | ⏸ 评估后不做：127 方法 = 60 字段 × 2，是 JavaBean 固有成本；拆分只把复杂度搬到两个类，插件链需持两个引用 |
 | **L16** | `executeQA` 200 行 → 6 个具名步骤（≤50 行/方法） | 待做 |
 | **L17** | 插件表自动生成（事件→插件→读写字段→兜底）+ `--check` 守卫 | 待做 |
 | **L18** | 17 个插件类头三行契约 | 待做 |
@@ -316,6 +316,9 @@ boot           14 件                      →  boot
 | L10b | 2026-10-18 | **删除 Wiki 的 RawJsonError 转译补丁**：43 处 `new RawJsonError(...)` → `BizException` 工厂 / `AppError.ofHttpStatus`；删嵌套异常类与 `@ExceptionHandler`；`WikiRequestSupport` 三个返回类型改 `BizException`；测试断言 3 处。**补 `docs/api-response-convention.md`**（此前被 5 处代码引用但文件不存在）与 baseline 两条例外理由。 | **28 守卫** · **5022 / 0 / 4** · build 1m53s |
 
 | L11 | 2026-10-18 | **错误响应语法糖清理 + 守卫评估**：`DataSourceController` 35 处 `return error(400, msg)` 改 `throw BizException.*`（原写法像"返回错误"实为抛异常），删私有 `error()`。守卫评估结论：规则二已覆盖 domains 全量；规则一（catch 内清空过滤）扩面会误报 4 处（坏 JSON 宽松读），**不扩**。 | **28 守卫** · **5022 / 0 / 4** · build 1m52s |
+
+| L12 | 2026-10-18 | **控制器纯度守卫 + 数据访问定规**：`check-controller-purity.py`（第 29 条；controller 禁直连 Mapper 硬零 + `catch (RuntimeException)` 棘轮 139 只许减，红态探针已验）；`mechanisms.md` §9 记录 Mapper（76）/Repository（28）的选择规则。**实测 controller 直连 Mapper 为 0**（此前统计的 22 处是 `ObjectMapper` 误报）。 | **29 守卫** · **5022 / 0 / 4** |
+| L14 | 2026-10-18 | **事务模板收敛**：`DataSourceTxTemplate` / `ChunkTxTemplate` 合并为 `platform.persistence.TxTemplate`（Runnable + Supplier 两法），两个 Repository 改注入，删两人类；`MemoryTxTemplate` 保留（`FOR UPDATE` 行锁语义不同）；`KnowledgeProcessWorker` 补「为什么整链不包大事务」的边界说明。 | **29 守卫** · **5022 / 0 / 4** · build 2m18s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
