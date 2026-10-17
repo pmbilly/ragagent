@@ -315,6 +315,8 @@ boot           14 件                      →  boot
 | L10a | 2026-10-18 | **删除两个纯字符串异常**：`PlainErrorException`（22 处）→ `BizException` 工厂、`GuardForbiddenException`（7 处）→ `BizException.forbidden`；删两个类 + `GlobalExceptionHandler` 两个 handler（-40 行）；金片 8 条（`Forbidden:` 前缀去掉）、测试断言 1 条、前端 4 处 `data.error.message`→`data.message`。 | **28 守卫** · **5022 / 0 / 4** · build 1m58s · 前端 type-check 0 |
 | L10b | 2026-10-18 | **删除 Wiki 的 RawJsonError 转译补丁**：43 处 `new RawJsonError(...)` → `BizException` 工厂 / `AppError.ofHttpStatus`；删嵌套异常类与 `@ExceptionHandler`；`WikiRequestSupport` 三个返回类型改 `BizException`；测试断言 3 处。**补 `docs/api-response-convention.md`**（此前被 5 处代码引用但文件不存在）与 baseline 两条例外理由。 | **28 守卫** · **5022 / 0 / 4** · build 1m53s |
 
+| L11 | 2026-10-18 | **错误响应语法糖清理 + 守卫评估**：`DataSourceController` 35 处 `return error(400, msg)` 改 `throw BizException.*`（原写法像"返回错误"实为抛异常），删私有 `error()`。守卫评估结论：规则二已覆盖 domains 全量；规则一（catch 内清空过滤）扩面会误报 4 处（坏 JSON 宽松读），**不扩**。 | **28 守卫** · **5022 / 0 / 4** · build 1m52s |
+
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
 ## 13. 文档地图与归档
