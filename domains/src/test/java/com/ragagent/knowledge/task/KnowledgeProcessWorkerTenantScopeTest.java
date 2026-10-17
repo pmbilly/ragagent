@@ -24,6 +24,7 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.storage.TenantFileStorage;
+import com.ragagent.knowledge.service.image.ExtractedImageStore;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;

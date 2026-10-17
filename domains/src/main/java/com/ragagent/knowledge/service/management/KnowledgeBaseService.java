@@ -27,6 +27,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.service.image.ExtractedImageStore;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.contract.storage.StorageBackendView;
 import com.ragagent.knowledge.domain.UserKbPin;
@@ -64,6 +65,8 @@ public class KnowledgeBaseService
     private final UserNameLookup userNameLookup;
     private final String retrieveDriver;
     private final IndexEngineResolver indexEngineResolver;
+    /** 抽取图片回收（删库时逐篇清理）。 */
+    private final ExtractedImageStore extractedImageStore;
 
     public KnowledgeBaseService(KnowledgeBaseRepository kbRepository,
                                 KnowledgeRepository knowledgeRepository,
@@ -73,7 +76,8 @@ public class KnowledgeBaseService
                                 TenantConfigLookup tenantConfigLookup,
                                 UserNameLookup userNameLookup,
                                 IndexEngineResolver indexEngineResolver,
-                                RetrievalDriverProperties driverProperties) {
+                                RetrievalDriverProperties driverProperties,
+                                ExtractedImageStore extractedImageStore) {
         this.kbRepository = kbRepository;
         this.knowledgeRepository = knowledgeRepository;
         this.chunkRepository = chunkRepository;
@@ -82,6 +86,7 @@ public class KnowledgeBaseService
         this.tenantConfigLookup = tenantConfigLookup;
         this.userNameLookup = userNameLookup;
         this.indexEngineResolver = indexEngineResolver;
+        this.extractedImageStore = extractedImageStore;
         String env = driverProperties.driver();
         this.retrieveDriver = env == null || env.isBlank() ? "postgres" : env;
     }
@@ -517,7 +522,11 @@ public class KnowledgeBaseService
         if (kb == null) {
             throw new BizException(AppError.notFound("knowledge base not found"));
         }
+        long tenant = tenantId();
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+        for (Knowledge k : knowledgeRepository.listByTenantAndKb(tenant, id)) {
+            extractedImageStore.releaseFor(tenant, k.getId());
+        }
         kbRepository.softDelete(id, now);
         knowledgeRepository.softDeleteByKnowledgeBaseId(id, now);
         chunkRepository.softDeleteByKnowledgeBaseId(id, now);

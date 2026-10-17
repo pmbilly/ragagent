@@ -366,6 +366,15 @@ public class ResourceCatalogService {
         repo.createBinding(resource.getId(), resource.getTenantId(), ownerType, ownerId, rel);
     }
 
+    /** 按物理路径软删资源行（未注册/已删 → 静默忽略）。 */
+    public void markDeletedByLocation(long tenantId, String physicalPath) {
+        if (tenantId == 0 || physicalPath == null || physicalPath.isEmpty()) {
+            return;
+        }
+        repo.getByTenantLocation(tenantId, locationHash(physicalPath))
+                .ifPresent(resource -> repo.markDeleted(resource.getId()));
+    }
+
     /** 解析后软删资源行。 */
     public void markDeleted(String reference) {
         StoredResource resource = resolve(reference).orElse(null);

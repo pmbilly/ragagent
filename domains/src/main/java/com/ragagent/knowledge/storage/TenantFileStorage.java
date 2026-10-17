@@ -86,6 +86,44 @@ public class TenantFileStorage {
         return new Exported(null, false);
     }
 
+    /**
+     * 保存导出字节到租户存储后端的 {@code exports} 区，返回正文可用的引用：
+     * 云 → provider 引用（{@code minio://…} 等）；本地 → {@code local://{tenant}/exports/…}。
+     *
+     * <p>抽取图片走这条：知识库文件代理只放行 exports 命名空间，且引用形态与聊天链一致。</p>
+     */
+    public String saveExportBytes(long tenantId, String fileName, byte[] data) {
+        ProviderFileStorePort.Resolution resolved = providerStore.resolve(tenantId, null);
+        if (resolved.ok()) {
+            String ref = resolved.ops().saveBytes(data, tenantId, fileName, false);
+            log.info("exported bytes on provider {}: ref={}", resolved.provider(), ref);
+            return ref;
+        }
+        if (resolved.error() != null) {
+            throw new IllegalStateException("resolve storage provider failed: " + resolved.error());
+        }
+        return local.saveExport(tenantId, fileName, data);
+    }
+
+    /** 删除一个导出字节引用（本地删文件、云删对象）；失败只告警。 */
+    public void deleteExportBytes(long tenantId, String filePath) {
+        String provider = StoragePaths.parseProviderScheme(filePath);
+        if (provider.isEmpty() || isLocalScheme(provider)) {
+            local.deleteExport(filePath);
+            return;
+        }
+        try {
+            ProviderFileStorePort.Resolution resolved = providerStore.resolve(tenantId, provider);
+            if (!resolved.ok()) {
+                log.warn("delete export skipped: provider={} err={}", provider, resolved.error());
+                return;
+            }
+            resolved.ops().deleteFile(filePath);
+        } catch (RuntimeException e) {
+            log.warn("delete export failed: path={} err={}", filePath, e.toString());
+        }
+    }
+
     // ── 读 ──────────────────────────────────────────────────────────────────
 
     /**

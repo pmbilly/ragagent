@@ -59,6 +59,7 @@ import com.ragagent.knowledge.service.KnowledgeAccessHelper;
 import com.ragagent.knowledge.service.enrichment.KnowledgeSummaryService;
 import com.ragagent.knowledge.service.query.KnowledgeSearchService;
 import com.ragagent.knowledge.service.query.KnowledgeSpanService;
+import com.ragagent.knowledge.service.image.ExtractedImageStore;
 import com.ragagent.contract.knowledge.service.DuplicateKnowledgeException;
 import com.ragagent.knowledge.support.TagViews;
 import com.ragagent.knowledge.support.KnowledgeRowViews;
@@ -110,6 +111,8 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     private final KnowledgeFileService knowledgeFileService;
     private final KnowledgeParseService knowledgeParseService;
     private final KnowledgeBatchOpsService batchOpsService;
+    /** 抽取图片的落点/回收（删除文档时一并清理）。 */
+    private final ExtractedImageStore extractedImageStore;
 
     public KnowledgeService(                            KnowledgeRepository knowledgeRepository,
                             ChunkRepository chunkRepository,
@@ -126,7 +129,8 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
                             KnowledgeSummaryService knowledgeSummaryService,
                             KnowledgeFileService knowledgeFileService,
                             KnowledgeParseService knowledgeParseService,
-                            KnowledgeBatchOpsService batchOpsService) {
+                            KnowledgeBatchOpsService batchOpsService,
+                            ExtractedImageStore extractedImageStore) {
         this.knowledgeRepository = knowledgeRepository;
         this.chunkRepository = chunkRepository;
         this.tagRepository = tagRepository;
@@ -143,6 +147,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         this.knowledgeFileService = knowledgeFileService;
         this.knowledgeParseService = knowledgeParseService;
         this.batchOpsService = batchOpsService;
+        this.extractedImageStore = extractedImageStore;
     }
 
     /**
@@ -482,6 +487,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         knowledgeRepository.softDelete(k.getId(), now);
         chunkRepository.softDeleteByKnowledgeId(k.getId(), now);
         fileStorage.delete(tenantId(), k.getId(), k.getFilePath());
+        extractedImageStore.releaseFor(k.getTenantId() == null ? tenantId() : k.getTenantId(), k.getId());
         return UUID.randomUUID().toString();
     }
 

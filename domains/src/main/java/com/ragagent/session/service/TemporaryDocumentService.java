@@ -6,9 +6,9 @@ import com.ragagent.platform.config.AppEnvLookup;
 import java.time.ZoneId;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import com.ragagent.platform.text.ContentTypeByFilename;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,9 +59,7 @@ public class TemporaryDocumentService {
     public static final int MAX_ATTACHMENTS_PER_MESSAGE = 5;
 
 
-    /** 图片扩展名（无点形态）。 */
-    private static final Set<String> IMAGE_EXTENSIONS =
-            Set.of("jpg", "jpeg", "png", "gif", "bmp", "tiff", "webp");
+
 
 
     private final TemporaryDocumentRepository repo;
@@ -378,16 +376,9 @@ public class TemporaryDocumentService {
 
 
 
-    /** 文件类型是否图片格式（无点/带点均可）。 */
+    /** 文件类型是否图片格式（无点/带点均可；判定与知识链同一处）。 */
     static boolean isImageFormat(String fileType) {
-        if (fileType == null) {
-            return false;
-        }
-        String t = fileType.toLowerCase(Locale.ROOT);
-        if (t.startsWith(".")) {
-            t = t.substring(1);
-        }
-        return IMAGE_EXTENSIONS.contains(t);
+        return ContentTypeByFilename.isImageExt(fileType);
     }
 
     // ══ ResolveForPrompt ══

@@ -34,6 +34,23 @@ public class ResourceCatalogAdapter implements ResourceCatalogPort {
         catalog.bind(reference, ownerType, ownerId, relation);
     }
 
+    @Override
+    public String register(long tenantId, String physicalPath, ResourceMeta meta) {
+        return catalog.register(tenantId, physicalPath,
+                new ResourceCatalogService.ResourceRegistration(
+                        meta == null ? null : meta.kind(),
+                        meta == null ? null : meta.mimeType(),
+                        meta == null ? null : meta.originalName(),
+                        meta == null ? 0 : meta.size(),
+                        meta == null ? null : meta.contentHash(),
+                        meta != null && meta.temporary()));
+    }
+
+    @Override
+    public void markDeletedByLocation(long tenantId, String physicalPath) {
+        catalog.markDeletedByLocation(tenantId, physicalPath);
+    }
+
     private static ResourceView toView(StoredResource resource) {
         return new ResourceView(resource.getId(), resource.getTenantId());
     }

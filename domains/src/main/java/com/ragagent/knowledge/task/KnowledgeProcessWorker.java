@@ -44,6 +44,8 @@ import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.knowledge.storage.TenantFileStorage;
+import com.ragagent.knowledge.service.image.ExtractedImageStore;
+import com.ragagent.platform.knowledge.ImageRefRewriter;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -73,9 +75,7 @@ import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
  * finalizing（pending_subtasks_count 由子任务持有）再入队 ingest，
  * 由 DefaultWikiKnowledgeFinalizer 递减并晋升 completed。</li>
  * </ol>
- *
- * <p>规模： 把仓储访问外提后本类已降到 800 行以下（超 600 行仍在大文件棘轮基线内，
- * 只许减不许增）。</p> */
+ */
 @Service
 public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
 
@@ -192,7 +192,6 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         }
     }
 
-
     private void processInner(String knowledgeId,
                               LangfuseTaskScope scope) {
         // CAS pending → processing：被抢/已取消则静默退出
@@ -257,9 +256,10 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         deleteKnowledgeVectors(k, kb, embedConfig, knowledgeId);
     }
 
-    /** 预清理：删旧 chunks 行（无条件）+ 该知识全部向量行（仅向量化启用且模型可用）+ 旧图谱（失败仅告警）。 */
+    /** 预清理：回收旧抽取图片 + 删旧 chunks 行（无条件）+ 向量行（仅启用且模型可用）+ 旧图谱（失败仅告警）。 */
     private void preCleanKnowledge(Knowledge k, KnowledgeBase kb,
             EmbedderClient.EmbedConfig embedConfig, String knowledgeId) {
+        extractedImageStore.releaseFor(k.getTenantId() == null ? 0L : k.getTenantId(), knowledgeId);
         chunkRepository.deleteByKnowledgeId(knowledgeId);
         deleteKnowledgeVectors(k, kb, embedConfig, knowledgeId);
         deleteGraphData(k.getKnowledgeBaseId(), knowledgeId);
@@ -282,7 +282,10 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                     k.getTenantId() == null ? 0L : k.getTenantId(), k.getFilePath());
             DocReaderClient.ParseResult parsed = docReader.read(
                     content, k.getFileName(), k.getFileType(), k.getTitle(), null);
-            markdown = extractedImageStore.storeAndRewrite(k, parsed.imageRefs(), parsed.markdown());
+            List<ImageRefRewriter.RefRow> rows = parsed.imageRefs() == null ? List.of()
+                    : parsed.imageRefs().stream().map(r -> new ImageRefRewriter.RefRow(
+                            r.originalRef(), r.filename(), r.mimeType(), r.imageData())).toList();
+            markdown = extractedImageStore.storeAndRewrite(k, rows, parsed.markdown());
         } catch (RuntimeException e) {
             failStageSpan(docSpan, "DOCREADER_FAILED",
                     e.getMessage() == null ? e.toString() : e.getMessage(), e);

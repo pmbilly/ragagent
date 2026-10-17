@@ -99,6 +99,10 @@ public final class ImageRefRewriter {
                     log.warn("failed to store image {}: {}", path, e.getMessage());
                     continue; // 落盘失败只告警
                 }
+                if (servingRef == null || servingRef.isEmpty()) {
+                    log.warn("storage returned no reference for image {}", path);
+                    continue; // 空落盘结果按失败处理，避免把 "null" 写进正文
+                }
                 if (ref.filename() != null && !ref.filename().isEmpty()) {
                     savedByFilename.put(ref.filename(), servingRef);
                 }

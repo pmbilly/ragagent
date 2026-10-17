@@ -54,6 +54,40 @@ public class LocalStorageService {
         }
     }
 
+    /**
+     * 保存到租户 {@code exports} 区（知识库文件代理唯一放行的命名空间），
+     * 返回 {@code local://{tenantId}/exports/{唯一名}}。
+     */
+    public String saveExport(long tenantId, String fileName, byte[] content) {
+        String safeName = sanitize(fileName);
+        int dot = safeName.lastIndexOf('.');
+        String ext = dot < 0 ? "" : safeName.substring(dot);
+        String baseName = dot < 0 ? safeName : safeName.substring(0, dot);
+        String unique = baseName + "_" + System.nanoTime() + ext;
+        try {
+            Path dir = baseDir.resolve(String.valueOf(tenantId)).resolve("exports");
+            Files.createDirectories(dir);
+            Files.write(dir.resolve(unique), content);
+            return "local://" + tenantId + "/exports/" + unique;
+        } catch (IOException e) {
+            throw new IllegalStateException("failed to create directory or write file: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 删除 {@code local://} 导出文件（逃逸守卫同读面）；不存在视为成功。
+     */
+    public void deleteExport(String localPath) {
+        if (localPath == null || !localPath.startsWith("local://")) {
+            return;
+        }
+        try {
+            Files.deleteIfExists(resolveUnderBase(localPath));
+        } catch (IOException e) {
+            log.warn("delete export {} failed: {}", localPath, e.toString());
+        }
+    }
+
     /** 按 resource:// 路径读回字节 */
     public byte[] read(String resourcePath) {
         if (resourcePath == null || !resourcePath.startsWith("resource://")) {

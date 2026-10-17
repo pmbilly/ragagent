@@ -32,6 +32,7 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
+import com.ragagent.knowledge.service.image.ExtractedImageStore;
 
 /**
  * KB clone（copy 路由 worker 面）+ Duplicate（同步 settings-only）+ 跨库兼容性校验。
@@ -52,6 +53,8 @@ public class KnowledgeCloneService {
     private final KnowledgeTaskProgressStore progressStore;
     private final KnowledgeVectorWrites vectorWrites;
     private final IndexEngineResolver indexEngineResolver;
+    /** 抽取图片搬运：克隆时把图片复制到新文档并改写正文引用。 */
+    private final ExtractedImageStore extractedImageStore;
     private final ModelRuntime modelRuntimeAssembler;
     /** 后台任务执行器（统一命名与关停）。 */
     private final KnowledgeTaskExecutor taskExecutor;
@@ -64,6 +67,7 @@ public class KnowledgeCloneService {
             KnowledgeTaskProgressStore progressStore,
             KnowledgeVectorWrites vectorWrites,
             IndexEngineResolver indexEngineResolver,
+            ExtractedImageStore extractedImageStore,
             ModelRuntime modelRuntimeAssembler) {
 
         this.taskExecutor = taskExecutor;
@@ -74,6 +78,7 @@ public class KnowledgeCloneService {
         this.progressStore = progressStore;
         this.vectorWrites = vectorWrites;
         this.indexEngineResolver = indexEngineResolver;
+        this.extractedImageStore = extractedImageStore;
         this.modelRuntimeAssembler = modelRuntimeAssembler;
     }
 
@@ -257,7 +262,9 @@ public class KnowledgeCloneService {
             nc.setTenantId(dst.getTenantId());
             nc.setKnowledgeId(newId);
             nc.setKnowledgeBaseId(dst.getId());
-            nc.setContent(c.getContent());
+            // 抽取图片随行复制到新文档并改写引用（原引用绑定的是源文档，跨库取图会 403）
+            nc.setContent(extractedImageStore.copyImagesTo(src.getTenantId(), c.getContent(),
+                    dst.getTenantId(), newId));
             nc.setChunkIndex(c.getChunkIndex());
             nc.setIsEnabled(c.isIsEnabled());
             nc.setChunkType(c.getChunkType());

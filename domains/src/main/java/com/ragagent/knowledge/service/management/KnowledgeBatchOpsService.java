@@ -16,6 +16,7 @@ import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ragagent.knowledge.service.KnowledgeAccessHelper;
+import com.ragagent.knowledge.service.image.ExtractedImageStore;
 
 /**
  * 批量面：批量删除 / 批量重解析 / 重建索引 / 清空 KB 内容。
@@ -31,17 +32,20 @@ public class KnowledgeBatchOpsService {
     private final KnowledgeIngest knowledgeIngest;
     private final KnowledgeFileService knowledgeFileService;
     private final KnowledgeAccessHelper access;
+    private final ExtractedImageStore extractedImageStore;
 
     public KnowledgeBatchOpsService(KnowledgeRepository knowledgeRepository,
                                     ChunkRepository chunkRepository,
                                     KnowledgeIngest knowledgeIngest,
                                     KnowledgeFileService knowledgeFileService,
-                                    KnowledgeAccessHelper access) {
+                                    KnowledgeAccessHelper access,
+                                    ExtractedImageStore extractedImageStore) {
         this.knowledgeRepository = knowledgeRepository;
         this.chunkRepository = chunkRepository;
         this.knowledgeIngest = knowledgeIngest;
         this.knowledgeFileService = knowledgeFileService;
         this.access = access;
+        this.extractedImageStore = extractedImageStore;
     }
 
     // ── 批量删除 / 批量重解析 / 清空（任务队列 → 同步尽力而为，响应契约一致） ──
@@ -53,7 +57,9 @@ public class KnowledgeBatchOpsService {
     @Transactional
     public String batchDeleteKnowledge(String kbId, List<String> ids) {
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+        long tenantId = KnowledgeTenants.tenantId();
         for (String id : ids) {
+            extractedImageStore.releaseFor(tenantId, id);
             knowledgeRepository.softDeleteIfActive(id, now);
             chunkRepository.softDeleteByKnowledgeId(id, now);
         }
