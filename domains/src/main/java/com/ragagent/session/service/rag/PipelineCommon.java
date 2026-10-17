@@ -8,8 +8,8 @@ import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.contract.session.PipelineMessageImageView;
 import com.ragagent.contract.session.PipelineMessageView;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.prompt.PromptComposer;
@@ -231,20 +231,15 @@ public final class PipelineCommon {
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             List<java.util.concurrent.Future<?>> futures = new ArrayList<>(tasks.length);
             for (ParallelTask task : tasks) {
-                futures.add(executor.submit(() -> {
-                    tenantSnap.replay();
-                    try {
-                        PluginError err = task.run().get();
-                        if (err != null) {
-                            synchronized (errs) {
-                                errs.put(task.name(), err);
-                            }
+                futures.add(executor.submit(TenantScope.callable(tenantSnap, () -> {
+                    PluginError err = task.run().get();
+                    if (err != null) {
+                        synchronized (errs) {
+                            errs.put(task.name(), err);
                         }
-                        return null;
-                    } finally {
-                        TenantContext.clear();
                     }
-                }));
+                    return null;
+                })));
             }
             for (java.util.concurrent.Future<?> f : futures) {
                 try {
@@ -281,20 +276,15 @@ public final class PipelineCommon {
             for (int i = 0; i < n; i++) {
                 final int idx = i;
                 final T item = items.get(i);
-                futures.add(executor.submit(() -> {
-                    tenantSnap.replay();
+                futures.add(executor.submit(TenantScope.callable(tenantSnap, () -> {
+                    sem.acquireUninterruptibly();
                     try {
-                        sem.acquireUninterruptibly();
-                        try {
-                            results.set(idx, fn.apply(idx, item));
-                        } finally {
-                            sem.release();
-                        }
-                        return null;
+                        results.set(idx, fn.apply(idx, item));
                     } finally {
-                        TenantContext.clear();
+                        sem.release();
                     }
-                }));
+                    return null;
+                })));
             }
             for (java.util.concurrent.Future<?> f : futures) {
                 try {

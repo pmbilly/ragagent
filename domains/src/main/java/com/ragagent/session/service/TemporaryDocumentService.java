@@ -105,8 +105,7 @@ public class TemporaryDocumentService {
                 try {
                     delete(document.getTenantId(), document.getSessionId(), document.getId());
                 } catch (RuntimeException e) {
-                    log.warn("cleanup temporary document failed: document_id={} err={}",
-                            document.getId(), e.getMessage());
+                    log.warn("cleanup temporary document failed: document_id={}", document.getId(), e);
                 }
             }
             if (documents.size() < 100) {
@@ -132,7 +131,7 @@ public class TemporaryDocumentService {
                 try {
                     cleanupExpired();
                 } catch (RuntimeException e) {
-                    log.warn("[TemporaryDocument] cleanup failed: {}", e.getMessage());
+                    log.warn("[TemporaryDocument] cleanup failed", e);
                 }
             }
         });

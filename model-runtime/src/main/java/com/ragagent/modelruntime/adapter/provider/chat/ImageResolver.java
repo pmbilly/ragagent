@@ -160,7 +160,7 @@ public final class ImageResolver {
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }
-            log.debug("[image-resolve] failed to fetch remote image {}: {}", imageUrl, e.toString());
+            log.debug("[image-resolve] failed to fetch remote image {}", imageUrl, e);
             return null;
         }
     }
@@ -208,13 +208,13 @@ public final class ImageResolver {
             localPath = Paths.get(baseDir + File.separator
                     + relPath.replace('/', File.separatorChar)).normalize();
         } catch (InvalidPathException e) {
-            log.warn("[image-resolve] invalid local storage path {}: {}", storagePath, e.toString());
+            log.warn("[image-resolve] invalid local storage path {}", storagePath, e);
             return null;
         }
         try {
             return Files.readAllBytes(localPath);
         } catch (IOException e) {
-            log.warn("[image-resolve] failed to read local file {}: {}", localPath, e.toString());
+            log.warn("[image-resolve] failed to read local file {}", localPath, e);
             return null;
         }
     }

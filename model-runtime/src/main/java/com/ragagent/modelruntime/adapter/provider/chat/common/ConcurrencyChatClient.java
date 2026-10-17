@@ -155,7 +155,7 @@ public class ConcurrencyChatClient implements LlmChatClient {
             } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
             } catch (RuntimeException e) {
-                log.warn("stream forwarding failed for model {}: {}", delegate.getModelId(), e.toString());
+                log.warn("stream forwarding failed for model {}", delegate.getModelId(), e);
             } finally {
                 if (!released) {
                     release.close();

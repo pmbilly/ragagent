@@ -131,7 +131,7 @@ final class AuthSessionOps {
         try {
             result = service.userService.switchTenant(user, tenantId, currentRefreshToken);
         } catch (UserService.SwitchTenantException e) {
-            log.warn("SwitchTenant failed user={} target={}: {}", user.getId(), tenantId, e.getMessage());
+            log.warn("SwitchTenant failed user={} target={}", user.getId(), tenantId, e);
             throw new BizException(AppError.forbidden("workspace switch failed").withDetails(e.getMessage()));
         }
         return ResponseEntity.ok(new AuthLoginResponse(result.user(), activeTenantResponse(result),

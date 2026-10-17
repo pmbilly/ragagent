@@ -225,7 +225,7 @@ public class OllamaChat implements LlmChatClient {
                     }
                 });
             } catch (RuntimeException e) {
-                log.error("流式聊天请求失败: {}", e.toString());
+                log.error("流式聊天请求失败", e);
                 put(streamQueue, StreamResponse.of(ResponseType.ERROR, e.getMessage(), true));
             }
         }));

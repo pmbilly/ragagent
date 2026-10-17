@@ -61,7 +61,7 @@ public class ArtifactCollectorWiring {
                 try {
                     globalStorage().deleteFile(reference);
                 } catch (IOException e) {
-                    log.warn("[AgentWebPages] delete saved page failed: {} err={}", reference, e.getMessage());
+                    log.warn("[AgentWebPages] delete saved page failed: {}", reference, e);
                 }
             }
         };

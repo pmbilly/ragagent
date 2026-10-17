@@ -29,7 +29,7 @@ final class StreamLifecycle {
             hook.run();
         } catch (RuntimeException e) {
             // 关流钩子（关连接 / 中断转发 / 收观测）失败不能让调用方的取消路径炸掉。
-            log.warn("chat stream close hook failed: {}", e.toString(), e);
+            log.warn("chat stream close hook failed", e);
         }
         return true;
     }

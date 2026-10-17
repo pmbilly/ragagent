@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 十二守卫的**单一入口**（B168；B183 加「统一响应外壳」；B263㉖ 加「路径/包对应」）——CI 的 guards job 与本地都跑这一份，口径不可能漂移。
+# 守卫的**单一入口**——CI 的 guards job 与本地都跑这一份，口径不可能漂移。
 #
 # 为什么要有它：B168 实测漏检一次真失败 ✗——本地手敲 `python3 scripts/check-json-key-case.py`
 # 少了 CI 的 `--strict`（该守卫默认只**报告**并退出 0，加了 --strict 才是闸门）⇒ 本地全绿、
@@ -38,9 +38,12 @@ run '异常语义（B217：检索引擎层不得在 catch 里清空条件——�
 run '契约同步（B221：金片键签名变了必须签字，防"后端改契约前端不知情"）' python3 scripts/check-contract-sync.py
 run '路径/包对应（B263㉖：源码目录必须与 package 声明一致，防"改包不搬目录"）' python3 scripts/check-package-dirs.py
 run '域间只经契约（R10/A③：跨域只经 contract 或装配层，棘轮只许减）' python3 scripts/check-domain-contracts.py
-run '契约层纯度（C1/C2/C3/C4：受控依赖根 · 持久化形状 · build 依赖 · 载荷落点，全部冻结只许减）' python3 scripts/check-contracts-purity.py
+run '契约层纯度（C1/C2/C3：contract 只允许纯 JDK；导入根 · 构建依赖 · 框架形状）' python3 scripts/check-contract-purity.py
 run '模块图（R6：主码矩阵 · 主码无同包 · 测试边登记 · 夹具不占别模块包）' python3 scripts/check-module-graph.py
 run 'platform 业务形状（C8：只剩技术适配；红旗命名 View/Port/Request/Response/Payload/Facts 只许减不许增）' python3 scripts/check-platform-shapes.py
+run '架构索引（docs/architecture/packages.md 必须与 package-info 同步）' python3 scripts/gen-arch-index.py --check
+run '租户作用域（跨线程身份必须走 TenantScope；禁止裸 capture/replay）' python3 scripts/check-tenant-scope.py
+run '日志异常（log 里禁止 Throwable.toString()/getMessage()）' python3 scripts/check-log-exceptions.py
 
 echo
 # 汇总行**自计数**（B267 结项实测的漂移）：加第 12 个守卫时头注释/README/CI 都改了，唯独这里

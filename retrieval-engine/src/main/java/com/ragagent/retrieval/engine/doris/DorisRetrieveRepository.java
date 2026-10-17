@@ -392,7 +392,7 @@ public class DorisRetrieveRepository
                     version = rs.getString(1) == null ? "" : rs.getString(1);
                 }
             } catch (SQLException e) {
-                log.warn("[Doris] Doris version detection failed: {}", e.getMessage());
+                log.warn("[Doris] Doris version detection failed", e);
                 return "";
             }
             return stripDorisVersionPrefix(version);

@@ -304,7 +304,7 @@ public class SteerController {
             try {
                 streamManager.clearLiveRun(sessionId, assistantId);
             } catch (RuntimeException e) {
-                log.warn("stale live run cleanup failed for session {}: {}", sessionId, e.toString());
+                log.warn("stale live run cleanup failed for session {}", sessionId, e);
             }
             return "";
         }

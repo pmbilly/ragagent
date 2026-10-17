@@ -207,7 +207,7 @@ public class WikiIngestCitePipeline {
             CombinedExtraction result = MAPPER.readValue(raw, CombinedExtraction.class);
             return result == null ? new CombinedExtraction() : result;
         } catch (Exception e) {
-            log.warn("wiki ingest: failed to parse {} JSON: {}\nRaw: {}", what, e.getMessage(), raw);
+            log.warn("wiki ingest: failed to parse {} JSON\nRaw: {}", what, raw, e);
             throw new IllegalStateException("parse " + what + " JSON: " + e.getMessage(), e);
         }
     }
@@ -455,7 +455,7 @@ public class WikiIngestCitePipeline {
                                     "Language", lang == null ? "" : lang));
                 } catch (RuntimeException e) {
                     // 失败只记日志并返回 —— 不中断兄弟批次
-                    log.warn("wiki ingest: citation batch {} failed: {}", batchIdx, e.getMessage());
+                    log.warn("wiki ingest: citation batch {} failed", batchIdx, e);
                     return;
                 }
 
@@ -464,8 +464,7 @@ public class WikiIngestCitePipeline {
                 try {
                     parsed = MAPPER.readValue(raw, CitationBatchResult.class);
                 } catch (Exception jerr) {
-                    log.warn("wiki ingest: citation batch {} parse failed: {}\nRaw: {}",
-                            batchIdx, jerr.getMessage(), raw);
+                    log.warn("wiki ingest: citation batch {} parse failed\nRaw: {}", batchIdx, raw, jerr);
                     return;
                 }
                 if (parsed == null) {
@@ -593,7 +592,7 @@ public class WikiIngestCitePipeline {
             try {
                 chunks = chunkPort.chunksByIds(tenantId, ids);
             } catch (Exception e) {
-                log.warn("wiki ingest: failed to resolve cited chunks: {}", e.getMessage());
+                log.warn("wiki ingest: failed to resolve cited chunks", e);
                 continue;
             }
             for (ChunkView c : chunks) {

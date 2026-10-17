@@ -33,12 +33,12 @@ public final class PluginMemoryRecall implements Plugin {
     }
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.MEMORY_RECALL};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.MEMORY_RECALL};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         if (memoryService == null) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("sessionId", chatManage.getSessionId());

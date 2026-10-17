@@ -26,6 +26,11 @@ weknora:
   storage:
     local-base-dir: ./build/test-files   # 测试期本地文件落点（KB 文档上传）
 
+# 能力报告会探测真实存储目录；测试不跑，避免在 CI/home 下建目录。
+ragagent:
+  capability-report:
+    enabled: false
+
 logging:
   level:
     com.ragagent: WARN

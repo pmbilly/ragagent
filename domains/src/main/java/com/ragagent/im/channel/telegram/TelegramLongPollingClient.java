@@ -74,7 +74,7 @@ public class TelegramLongPollingClient {
                 if (!running) {
                     return;
                 }
-                log.error("[Telegram] getUpdates error: {}", e.toString());
+                log.error("[Telegram] getUpdates error", e);
                 if (!sleep(BACKOFF_MS)) {
                     return;
                 }
@@ -92,7 +92,7 @@ public class TelegramLongPollingClient {
                 try {
                     handler.accept(msg, channelId);
                 } catch (Exception e) {
-                    log.error("[Telegram] Handle message error: {}", e.toString());
+                    log.error("[Telegram] Handle message error", e);
                 }
             }
         }

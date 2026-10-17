@@ -52,8 +52,7 @@ public final class TenantFileServiceResolver {
             }
         } catch (RuntimeException e) {
             created = null;
-            log.debug("[Router] {} tenant resolution failed: tenant_id={} provider={} err={}",
-                    logTag, tenantId, provider, e.toString());
+            log.debug("[Router] {} tenant resolution failed: tenant_id={} provider={}", logTag, tenantId, provider, e);
         }
         if (created != null && created.service() != null) {
             return new Fallback(created.service(), created.provider(), true);

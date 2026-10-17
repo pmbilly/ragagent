@@ -7,6 +7,7 @@ import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -70,10 +71,7 @@ final class ToolBatchExecutor {
             List<Thread> threads = new ArrayList<>(batchSize);
             for (int k = batchStart; k < i; k++) {
                 final int idx = k;
-                Thread t = Thread.ofVirtual().unstarted(() -> {
-                    if (tenant != null) {
-                        tenant.replay();
-                    }
+                Runnable work = () -> {
                     boolean acquired = false;
                     try {
                         permits.acquire();
@@ -87,7 +85,7 @@ final class ToolBatchExecutor {
                     } catch (Throwable fatal) {
                         // 外围（modelContext 解码/langfuse span/eventBus emit）抛错会让线程死亡、
                         // results[idx] 保持 null，收集循环直接 NPE 炸掉整轮。兜底落失败结果。
-                        log.warn("[Agent][Round-{}] tool call crashed: {}", round, fatal.toString());
+                        log.warn("[Agent][Round-{}] tool call crashed", round, fatal);
                         results[idx] = crashed(calls.get(idx), BizException.wireText(fatal));
                     } finally {
                         // acquire 被中断时并没有持票——此时 release 会让许可数虚增，
@@ -95,7 +93,17 @@ final class ToolBatchExecutor {
                         if (acquired) {
                             permits.release();
                         }
-                        TenantContext.clear();
+                    }
+                };
+                Thread t = Thread.ofVirtual().unstarted(() -> {
+                    if (tenant != null) {
+                        TenantScope.run(tenant, work);
+                    } else {
+                        try {
+                            work.run();
+                        } finally {
+                            TenantContext.clear();
+                        }
                     }
                 });
                 threads.add(t);

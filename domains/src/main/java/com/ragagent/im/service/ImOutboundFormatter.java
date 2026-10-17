@@ -60,7 +60,7 @@ final class ImOutboundFormatter {
         try {
             adapter.sendReply(msg, reply);
         } catch (Exception e) {
-            log.warn("[IM] Send reply failed: {}", e.getMessage());
+            log.warn("[IM] Send reply failed", e);
         }
     }
 }

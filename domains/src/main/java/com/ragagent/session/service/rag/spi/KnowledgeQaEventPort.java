@@ -1,6 +1,7 @@
 package com.ragagent.session.service.rag.spi;
 
 import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineEventType;
 import java.util.List;
 
 /**
@@ -17,5 +18,5 @@ import java.util.List;
 public interface KnowledgeQaEventPort {
 
     /** 按事件清单发起一轮知识库问答（行为与日志同会话域实现）。 */
-    void knowledgeQAByEvent(ChatManage chatManage, List<String> eventList);
+    void knowledgeQAByEvent(ChatManage chatManage, List<PipelineEventType> eventList);
 }

@@ -41,7 +41,7 @@ final class WikiIngestSettleOps {
             // 而不是直接读 domain 行——域行里没有 knowledgeId/isIngest 这些语义字段
             batch = service.queueOps.peekPendingList(kbId, WikiIngestConstants.MAX_DOCS_PER_BATCH);
         } catch (RuntimeException e) {
-            log.warn("wiki ingest: list pending ops for abandoned batch {} failed: {}", kbId, e.getMessage());
+            log.warn("wiki ingest: list pending ops for abandoned batch {} failed", kbId, e);
             return;
         }
         java.util.Set<String> seen = new java.util.LinkedHashSet<>();
@@ -117,8 +117,7 @@ final class WikiIngestSettleOps {
             try {
                 count = service.pendingRepo.incrFailCount(op.getDbId());
             } catch (Exception e) {
-                log.warn("wiki ingest: failed to increment fail count for {} (id={}): {}",
-                        op.getKnowledgeId(), op.getDbId(), e.getMessage());
+                log.warn("wiki ingest: failed to increment fail count for {} (id={})", op.getKnowledgeId(), op.getDbId(), e);
                 settleErrors.add(new IllegalStateException(
                         "increment fail count id=" + op.getDbId() + ": " + e.getMessage(), e));
                 // 拿不到新计数就无法判断该不该丢弃。保守处理：把行留在原处，
@@ -133,8 +132,7 @@ final class WikiIngestSettleOps {
                 try {
                     service.pendingRepo.releaseByIds(List.of(op.getDbId()));
                 } catch (Exception e) {
-                    log.warn("wiki ingest: failed to release claim for retry id={}: {}",
-                            op.getDbId(), e.getMessage());
+                    log.warn("wiki ingest: failed to release claim for retry id={}", op.getDbId(), e);
                     settleErrors.add(new IllegalStateException(
                             "release retry claim id=" + op.getDbId() + ": " + e.getMessage(), e));
                 }
@@ -167,8 +165,7 @@ final class WikiIngestSettleOps {
                     dl.setFailCount(count);
                     deadLetters.insert(dl);
                 } catch (Exception e) {
-                    log.warn("wiki ingest: failed to archive op {} to dead letters: {}",
-                            op.getKnowledgeId(), e.getMessage());
+                    log.warn("wiki ingest: failed to archive op {} to dead letters", op.getKnowledgeId(), e);
                     settleErrors.add(new IllegalStateException(
                             "archive dead letter id=" + op.getDbId() + ": " + e.getMessage(), e));
                 }
@@ -176,8 +173,7 @@ final class WikiIngestSettleOps {
             try {
                 service.pendingRepo.deleteByIds(List.of(op.getDbId()));
             } catch (Exception e) {
-                log.warn("wiki ingest: failed to drop dead-lettered row id={}: {}",
-                        op.getDbId(), e.getMessage());
+                log.warn("wiki ingest: failed to drop dead-lettered row id={}", op.getDbId(), e);
                 settleErrors.add(new IllegalStateException(
                         "drop dead-lettered row id=" + op.getDbId() + ": " + e.getMessage(), e));
             }

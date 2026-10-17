@@ -67,7 +67,7 @@ public class DataSourceWiring {
         if (!errors.isEmpty()) {
             RuntimeException first = errors.get(0);
             for (RuntimeException e : errors) {
-                log.error("[datasource] connector registration failed: {}", e.getMessage());
+                log.error("[datasource] connector registration failed", e);
             }
             throw first;
         }
@@ -109,7 +109,7 @@ public class DataSourceWiring {
                 try {
                     dataSourceScheduler.start();
                 } catch (RuntimeException e) {
-                    log.warn("[Container] data source scheduler start failed: {}", e.getMessage());
+                    log.warn("[Container] data source scheduler start failed", e);
                 }
                 running = true;
             }

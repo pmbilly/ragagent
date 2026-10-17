@@ -114,7 +114,7 @@ final class WikiIngestFinalizePhase {
             try {
                 row = MAPPER.treeToValue(rawPayload, WikiFinalizeRow.class);
             } catch (Exception e) {
-                log.warn("wiki finalize: unmarshal row id={} failed: {}", r.getId(), e.getMessage());
+                log.warn("wiki finalize: unmarshal row id={} failed", r.getId(), e);
                 continue;
             }
             if (row == null) {
@@ -180,7 +180,7 @@ final class WikiIngestFinalizePhase {
             try {
                 chatModel = handler.modelResolver.getChatModel(synthesisModelId);
             } catch (RuntimeException e) {
-                log.warn("wiki finalize: get chat model failed: {}", e.getMessage());
+                log.warn("wiki finalize: get chat model failed", e);
             }
             if (chatModel != null) {
                 try {
@@ -188,7 +188,7 @@ final class WikiIngestFinalizePhase {
                             batchCtx.getContentInstructions());
                     indexRebuilt = true;
                 } catch (Exception e) {
-                    log.warn("wiki finalize: rebuild index failed: {}", e.getMessage());
+                    log.warn("wiki finalize: rebuild index failed", e);
                 }
             }
         }
@@ -210,8 +210,7 @@ final class WikiIngestFinalizePhase {
                 pending = handler.pendingRepo.pendingCount(WikiIngestConstants.TASK_TYPE,
                         WikiIngestConstants.TASK_SCOPE, kbId);
             } catch (Exception e) {
-                log.warn("wiki finalize: cannot verify ingest drain before folder prune: {}",
-                        e.getMessage());
+                log.warn("wiki finalize: cannot verify ingest drain before folder prune", e);
             }
             if (pending == null || pending > 0) {
                 pruneDeferred = true;
@@ -221,7 +220,7 @@ final class WikiIngestFinalizePhase {
                             kbId, WikiIngestService.uniqueWikiFolderIDs(folderPruneIDs));
                     deletedFolders = deleted == null ? 0 : deleted.size();
                 } catch (Exception pruneErr) {
-                    log.warn("wiki finalize: prune empty folders failed: {}", pruneErr.getMessage());
+                    log.warn("wiki finalize: prune empty folders failed", pruneErr);
                     pruneDeferred = true;
                 }
             }

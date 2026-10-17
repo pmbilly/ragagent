@@ -320,8 +320,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
             finalizer.finalizeWikiSubtask(knowledgeId);
         } catch (RuntimeException e) {
             // best-effort：递减失败不破坏任务语义（行由 housekeeping sweep 兜底）
-            log.warn("finalize subtask decrement failed source={} knowledge={} err={}",
-                    source, knowledgeId, e.toString());
+            log.warn("finalize subtask decrement failed source={} knowledge={}", source, knowledgeId, e);
         }
     }
 

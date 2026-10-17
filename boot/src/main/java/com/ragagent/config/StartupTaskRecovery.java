@@ -98,18 +98,17 @@ public class StartupTaskRecovery {
         try {
             resetStuckKnowledge(knowledgeDistributed);
         } catch (RuntimeException e) {
-            log.warn("resetPendingTasks: reset stuck knowledge failed: {}", e.getMessage());
+            log.warn("resetPendingTasks: reset stuck knowledge failed", e);
         }
         try {
             resetStuckSummary(knowledgeDistributed);
         } catch (RuntimeException e) {
-            log.warn("resetPendingTasks: reset pending summary tasks failed: {}", e.getMessage());
+            log.warn("resetPendingTasks: reset pending summary tasks failed", e);
         }
         try {
             resetStuckSyncLogs(syncDistributed);
         } catch (RuntimeException e) {
-            log.warn("resetPendingTasks: reset pending data source sync tasks failed: {}",
-                    e.getMessage());
+            log.warn("resetPendingTasks: reset pending data source sync tasks failed", e);
         }
     }
 

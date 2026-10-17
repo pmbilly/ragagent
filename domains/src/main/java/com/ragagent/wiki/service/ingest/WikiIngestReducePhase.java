@@ -433,8 +433,7 @@ final class WikiIngestReducePhase {
                         changed = true;
                     }
                 } catch (RuntimeException genErr) {
-                    log.warn("wiki ingest: update/retract failed for slug {}: {}",
-                            slug, genErr.getMessage());
+                    log.warn("wiki ingest: update/retract failed for slug {}", slug, genErr);
                     // 标记新增失败，让批次能净化该文档摘要页里陈旧的 [[slug]] 引用，并把缺失
                     // 的页面排除出 finalize 处理。纯 retract 的失败不会毒化任何东西
                     // （页面保持原样），因此不标记。

@@ -120,7 +120,7 @@ final class DorisSearchOps {
                 all.addAll(service.sql.query(stmt, args,
                         row -> scanRetrieveRow(row, EngineTypes.MATCH_KEYWORDS, false)));
             } catch (SQLException e) {
-                log.warn("[Doris] Keyword retrieve in {} failed: {}", table, e.getMessage());
+                log.warn("[Doris] Keyword retrieve in {} failed", table, e);
             }
         }
         int topK = Math.max(0, params.topK);

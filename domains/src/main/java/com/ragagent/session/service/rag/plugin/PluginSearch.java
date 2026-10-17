@@ -4,8 +4,8 @@ package com.ragagent.session.service.rag.plugin;
 import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import com.ragagent.session.service.rag.ChatManage;
 import com.ragagent.session.service.rag.PipelineEventType;
 import com.ragagent.session.service.rag.PipelineLog;
@@ -56,12 +56,12 @@ public final class PluginSearch implements Plugin {
     }
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.CHUNK_SEARCH};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.CHUNK_SEARCH};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         boolean hasKBTargets = SearchTarget.SearchTargets.hasKnowledgeRetrievalScope(
                 new SearchTarget.SearchTargets(chatManage.getSearchTargets()),
                 chatManage.getKnowledgeBaseIds(), chatManage.getKnowledgeIds());
@@ -86,7 +86,7 @@ public final class PluginSearch implements Plugin {
         java.util.concurrent.atomic.AtomicReference<Throwable> kbErrHolder =
                 new java.util.concurrent.atomic.AtomicReference<>();
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            var f1 = executor.submit(withTenant(tenantSnap, () -> {
+            var f1 =         executor.submit(TenantScope.callable(tenantSnap, () -> {
                 try {
                     List<SearchResult> kbResults = searchByTargets(chatManage);
                     if (kbResults != null && !kbResults.isEmpty()) {
@@ -100,7 +100,7 @@ public final class PluginSearch implements Plugin {
                     return null;
                 }
             }));
-            var f2 = executor.submit(withTenant(tenantSnap, () -> {
+            var f2 = executor.submit(TenantScope.callable(tenantSnap, () -> {
                 List<SearchResult> webResults = searchWebIfEnabled(chatManage);
                 if (webResults != null && !webResults.isEmpty()) {
                     synchronized (lock) {
@@ -178,24 +178,6 @@ public final class PluginSearch implements Plugin {
         } catch (Exception e) {
             throw new IllegalStateException("search task failed", e);
         }
-    }
-
-    // ------------------------------------------------------------------
-
-    /**
-     * 跨虚拟线程显式传 TenantContext：提交线程 capture，工作线程 replay，
-     * finally clear（虚拟线程由 JVM 池化复用载体，不清理会污染下一个任务）。
-     */
-    static java.util.concurrent.Callable<Object> withTenant(
-            TenantContextSnapshot snap, java.util.concurrent.Callable<Object> body) {
-        return () -> {
-            snap.replay();
-            try {
-                return body.call();
-            } finally {
-                TenantContext.clear();
-            }
-        };
     }
 
     /** 薄委托：见 {@link PluginSearchOps#searchByTargets}。 */

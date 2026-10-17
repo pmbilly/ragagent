@@ -38,7 +38,7 @@ final class KnowledgeTenantResolver {
             Knowledge k = knowledgeRepository.findByIdAny(knowledgeId);
             return k == null ? null : k.getTenantId();
         } catch (RuntimeException e) {
-            log.warn("tenant scope fallback failed kid={}: {}", knowledgeId, e.toString());
+            log.warn("tenant scope fallback failed kid={}", knowledgeId, e);
             return null;
         }
     }

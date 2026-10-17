@@ -127,7 +127,7 @@ public class WebSearchProviderController {
         try {
             service.create(providerEntity);
         } catch (RuntimeException e) {
-            log.warn("Failed to create web search provider: {}", e.getMessage());
+            log.warn("Failed to create web search provider", e);
             throw BizException.internal(e.getMessage());
         }
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -190,7 +190,7 @@ public class WebSearchProviderController {
         try {
             service.update(updated);
         } catch (RuntimeException e) {
-            log.warn("Failed to update web search provider {}: {}", id, e.getMessage());
+            log.warn("Failed to update web search provider {}", id, e);
             throw BizException.internal(e.getMessage());
         }
         // Re-fetch to get the full stored state
@@ -208,7 +208,7 @@ public class WebSearchProviderController {
         try {
             service.delete(tenantId, id);
         } catch (RuntimeException e) {
-            log.warn("Failed to delete web search provider {}: {}", id, e.getMessage());
+            log.warn("Failed to delete web search provider {}", id, e);
             throw BizException.internal(e.getMessage());
         }
         return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
@@ -238,14 +238,14 @@ public class WebSearchProviderController {
         try {
             provider = registry.createProvider(providerType, params);
         } catch (RuntimeException e) {
-            log.warn("[WebSearch][Test] failed to create provider: {}", e.getMessage());
+            log.warn("[WebSearch][Test] failed to create provider", e);
             throw new TestFailure("failed to create provider: " + messageOf(e));
         }
         List<WebSearchResult> results;
         try {
             results = provider.search("test", 1, false);
         } catch (RuntimeException e) {
-            log.warn("[WebSearch][Test] search failed: {}", e.getMessage());
+            log.warn("[WebSearch][Test] search failed", e);
             throw new TestFailure(messageOf(e));
         }
         if (results == null || results.isEmpty()) {

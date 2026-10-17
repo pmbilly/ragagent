@@ -63,7 +63,7 @@ final class AgentStreamEmitter {
         try {
             streamManager.appendEvent(sessionId, assistantMessageId, event);
         } catch (RuntimeException e) {
-            log.error("{}: {}", failureLog, e.toString());
+            log.error("{}", failureLog, e);
         }
     }
 
@@ -72,7 +72,7 @@ final class AgentStreamEmitter {
         try {
             streamManager.appendEvent(sessionId, assistantMessageId, event);
         } catch (RuntimeException e) {
-            log.warn("{}: {}", failureLog, e.toString());
+            log.warn("{}", failureLog, e);
         }
     }
 
@@ -86,7 +86,7 @@ final class AgentStreamEmitter {
                 streamManager.appendEvent(sessionId, assistantMessageId, event);
             }
         } catch (RuntimeException e) {
-            log.error("{}: {}", failureLog, e.toString());
+            log.error("{}", failureLog, e);
         }
     }
 }

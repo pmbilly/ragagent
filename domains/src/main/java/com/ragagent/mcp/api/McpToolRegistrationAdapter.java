@@ -68,7 +68,7 @@ public class McpToolRegistrationAdapter implements McpToolRegistrationPort {
                 services = mcpServiceService.listMCPServices(tenantId);
             }
         } catch (RuntimeException e) {
-            log.warn("Failed to list MCP services: {}", e.toString());
+            log.warn("Failed to list MCP services", e);
             return;
         }
 
@@ -101,7 +101,7 @@ public class McpToolRegistrationAdapter implements McpToolRegistrationPort {
                     toolApprovalGate::requestOAuthAndWait);
             log.info("Registered {} MCP service(s) for on-demand discovery", registered);
         } catch (Exception e) {
-            log.warn("Failed to register MCP directory: {}", e.toString());
+            log.warn("Failed to register MCP directory", e);
         }
     }
 }

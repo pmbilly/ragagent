@@ -29,12 +29,12 @@ public class StorageUrlWiringConfig {
      *
      * <p>本地根目录与 {@link FileProxyService} 用同一个属性链
      * （{@code weknora.storage.local-base-dir} → {@code LOCAL_STORAGE_BASE_DIR} →
-     * {@code /data/files}），避免两处对"根在哪"有分歧。</p>
+     * {@code ${user.home}/ragagent-data/files}），避免两处对"根在哪"有分歧。</p>
      */
     @Bean
     public FileUrlPort storageUrlDefaultFileService(
             StorageFileResolver resolver,
-            @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}")
+            @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:${user.home}/ragagent-data/files}}")
                     String localBaseDir) {
         return new DefaultFileUrlPort(resolver.globalFileService(localBaseDir));
     }

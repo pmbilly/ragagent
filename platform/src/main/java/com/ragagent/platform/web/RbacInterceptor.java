@@ -161,8 +161,7 @@ public class RbacInterceptor implements HandlerInterceptor {
                     request.getMethod(),
                     request.getRequestURI());
         } catch (RuntimeException e) {
-            log.warn("[rbac] denied-audit write failed (ignored): path={} err={}",
-                    request.getRequestURI(), e.getMessage());
+            log.warn("[rbac] denied-audit write failed (ignored): path={}", request.getRequestURI(), e);
         }
         response.setStatus(403);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

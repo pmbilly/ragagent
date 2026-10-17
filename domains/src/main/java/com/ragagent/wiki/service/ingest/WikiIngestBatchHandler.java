@@ -237,7 +237,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
                         pages = fetched;
                     }
                 } catch (Exception e) {
-                    log.warn("wiki ingest: ListBySlugs({} slugs) failed: {}", need.size(), e.getMessage());
+                    log.warn("wiki ingest: ListBySlugs({} slugs) failed", need.size(), e);
                 }
                 synchronized (fetchMu) {
                     for (String slug : need) {
@@ -288,8 +288,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
                         contents = fetched;
                     }
                 } catch (Exception e) {
-                    log.warn("wiki ingest: ListSummariesByKnowledgeIDs({} kids) failed: {}",
-                            need.size(), e.getMessage());
+                    log.warn("wiki ingest: ListSummariesByKnowledgeIDs({} kids) failed", need.size(), e);
                 }
                 synchronized (fetchMu) {
                     for (String kid : need) {
@@ -406,7 +405,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
                     Duration.ofMinutes(60), // 任务超时：60 分钟
                     ""));
         } catch (Exception e) {
-            log.warn("wiki ingest: follow-up enqueue failed: {}", e.getMessage());
+            log.warn("wiki ingest: follow-up enqueue failed", e);
             return false;
         }
         return true;

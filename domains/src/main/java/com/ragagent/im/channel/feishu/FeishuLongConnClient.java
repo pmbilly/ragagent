@@ -143,7 +143,7 @@ public class FeishuLongConnClient {
                 connect();
                 connected = true;
             } catch (Exception e) {
-                log.warn("[{}] long connection failed: {}", region.label(), e.toString());
+                log.warn("[{}] long connection failed", region.label(), e);
             }
             if (stopped.get()) {
                 return;
@@ -165,8 +165,7 @@ public class FeishuLongConnClient {
                     connected = true;
                     break;
                 } catch (Exception e) {
-                    log.warn("[{}] reconnect attempt {} failed: {}", region.label(), attempt,
-                            e.toString());
+                    log.warn("[{}] reconnect attempt {} failed", region.label(), attempt, e);
                 }
                 Thread.sleep(Math.max(reconnectIntervalSeconds, 1) * 1000L);
             }
@@ -228,7 +227,7 @@ public class FeishuLongConnClient {
                         socket.sendBinary(ByteBuffer.wrap(ping.encode()), true)
                                 .get(10, TimeUnit.SECONDS);
                     } catch (Exception e) {
-                        log.warn("[{}] ping failed: {}", region.label(), e.toString());
+                        log.warn("[{}] ping failed", region.label(), e);
                         return;
                     }
                 }
@@ -260,7 +259,7 @@ public class FeishuLongConnClient {
             try {
                 socket.abort();
             } catch (RuntimeException e) {
-                log.debug("[{}] abort failed: {}", region.label(), e.toString());
+                log.debug("[{}] abort failed", region.label(), e);
             }
             ws = null;
         }
@@ -359,7 +358,7 @@ public class FeishuLongConnClient {
         try {
             frame = LarkFrame.decode(raw);
         } catch (RuntimeException e) {
-            log.warn("[{}] decode frame failed: {}", region.label(), e.toString());
+            log.warn("[{}] decode frame failed", region.label(), e);
             return;
         }
         switch (frame.method) {
@@ -382,7 +381,7 @@ public class FeishuLongConnClient {
         try {
             configure(MAPPER.readTree(frame.payload));
         } catch (Exception e) {
-            log.warn("[{}] unmarshal client config failed: {}", region.label(), e.toString());
+            log.warn("[{}] unmarshal client config failed", region.label(), e);
         }
     }
 
@@ -414,7 +413,7 @@ public class FeishuLongConnClient {
                 msgHandler.accept(message, channelId);
             }
         } catch (Exception e) {
-            log.error("[{}] handle event failed: {}", region.label(), e.toString());
+            log.error("[{}] handle event failed", region.label(), e);
             code = 500;
         }
         long elapsed = System.currentTimeMillis() - start;
@@ -471,7 +470,7 @@ public class FeishuLongConnClient {
         try {
             socket.sendBinary(ByteBuffer.wrap(frame), true).get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
-            log.warn("[{}] ack send failed: {}", region.label(), e.toString());
+            log.warn("[{}] ack send failed", region.label(), e);
         }
     }
 
@@ -524,7 +523,7 @@ public class FeishuLongConnClient {
 
         @Override
         public void onError(WebSocket socket, Throwable error) {
-            log.warn("[{}] long connection error: {}", region.label(), error.toString());
+            log.warn("[{}] long connection error", region.label(), error);
             closed.countDown();
         }
     }

@@ -342,8 +342,7 @@ public final class TencentVectorDbBm25 {
             }
             return new HashSet<>(Files.readAllLines(file, StandardCharsets.UTF_8));
         } catch (IOException e) {
-            log.warn("[TencentVectorDB] stopwords unavailable ({}), continuing without them",
-                    e.getMessage());
+            log.warn("[TencentVectorDB] stopwords unavailable (), continuing without them", e);
             return Set.of();
         }
     }

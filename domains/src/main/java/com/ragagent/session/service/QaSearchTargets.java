@@ -99,7 +99,7 @@ final class QaSearchTargets {
             try {
                 knowledgeList = service.knowledgeCatalog.getKnowledgeBatchWithSharedAccess(tenantId, knowledgeIds);
             } catch (RuntimeException e) {
-                log.warn("Failed to get knowledge batch for search targets: {}", e.toString());
+                log.warn("Failed to get knowledge batch for search targets", e);
                 return targets; // Return what we have, don't fail
             }
             for (KnowledgeRowView k : knowledgeList) {

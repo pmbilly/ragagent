@@ -199,7 +199,7 @@ public class TemporaryDocumentController {
             if (message.contains("not found")) {
                 throw BizException.notFound("Attachment not found");
             }
-            log.error("Failed to retrieve attachment: {}", e.toString());
+            log.error("Failed to retrieve attachment", e);
             throw BizException.internal("Failed to retrieve attachment");
         }
         // filetransport.Serve 语义：头用 servlet setHeader 原样写——

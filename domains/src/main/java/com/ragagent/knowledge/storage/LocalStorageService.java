@@ -31,7 +31,7 @@ public class LocalStorageService {
     private final Path baseDir;
 
     public LocalStorageService(
-            @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}") String baseDir) {
+            @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:${user.home}/ragagent-data/files}}") String baseDir) {
         this.baseDir = Path.of(baseDir);
     }
 
@@ -84,7 +84,7 @@ public class LocalStorageService {
         try {
             Files.deleteIfExists(resolveUnderBase(localPath));
         } catch (IOException e) {
-            log.warn("delete export {} failed: {}", localPath, e.toString());
+            log.warn("delete export {} failed", localPath, e);
         }
     }
 
@@ -162,11 +162,11 @@ public class LocalStorageService {
                 try {
                     Files.delete(p);
                 } catch (IOException e) {
-                    log.warn("delete {} failed: {}", p, e.toString());
+                    log.warn("delete {} failed", p, e);
                 }
             });
         } catch (IOException e) {
-            log.warn("delete tree {} failed: {}", dir, e.toString());
+            log.warn("delete tree {} failed", dir, e);
         }
     }
 

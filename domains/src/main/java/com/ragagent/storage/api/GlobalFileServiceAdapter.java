@@ -19,7 +19,7 @@ public class GlobalFileServiceAdapter implements GlobalFileServicePort {
     private volatile WritableFileContentService cached;
 
     public GlobalFileServiceAdapter(StorageFileResolver resolver,
-                                    @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}")
+                                    @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:${user.home}/ragagent-data/files}}")
                                             String localBaseDir) {
         this.resolver = resolver;
         this.localBaseDir = localBaseDir;

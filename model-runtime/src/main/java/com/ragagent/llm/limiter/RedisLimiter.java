@@ -116,8 +116,7 @@ public class RedisLimiter implements ModelConcurrencyLimiter, RuntimeInspectable
                             Long.toString(ttlMillis));
                 } catch (RuntimeException e) {
                     // Fail open：限流器故障绝不允许阻断模型流量
-                    log.warn("[ModelLimiter] acquire failed for key={}, failing open: {}",
-                            key, e.toString());
+                    log.warn("[ModelLimiter] acquire failed for key={}, failing open", key, e);
                     return Release.NOOP;
                 }
                 if (res != null && res == 1L) {
@@ -151,7 +150,7 @@ public class RedisLimiter implements ModelConcurrencyLimiter, RuntimeInspectable
                 template.expire(zkey, Duration.ofMillis(ttlMillis * 2));
             } catch (RuntimeException e) {
                 // best-effort：刷新失败只让租约提前被回收，上限本身容忍
-                log.debug("[ModelLimiter] lease refresh failed for {}: {}", zkey, e.toString());
+                log.debug("[ModelLimiter] lease refresh failed for {}", zkey, e);
             }
         }, ttlMillis / 3, ttlMillis / 3, TimeUnit.MILLISECONDS);
 
@@ -163,7 +162,7 @@ public class RedisLimiter implements ModelConcurrencyLimiter, RuntimeInspectable
                     template.opsForZSet().remove(zkey, token);
                 } catch (RuntimeException e) {
                     // 释放失败只让槽位等到租约过期，不阻断调用方
-                    log.debug("[ModelLimiter] release failed for {}: {}", zkey, e.toString());
+                    log.debug("[ModelLimiter] release failed for {}", zkey, e);
                 }
             }
         };
@@ -182,7 +181,7 @@ public class RedisLimiter implements ModelConcurrencyLimiter, RuntimeInspectable
                 active = template.opsForZSet().count(KEY_PREFIX + modelId,
                         (double) (now + 1), Double.POSITIVE_INFINITY);
             } catch (RuntimeException e) {
-                log.warn("[ModelLimiter] runtime stats failed for {}: {}", modelId, e.toString());
+                log.warn("[ModelLimiter] runtime stats failed for {}", modelId, e);
                 continue;
             }
             stats.add(new RuntimeStat(modelId, t.name.get(),

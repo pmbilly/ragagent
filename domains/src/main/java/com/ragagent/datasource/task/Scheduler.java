@@ -146,8 +146,7 @@ public class Scheduler {
             try {
                 addEntry(ds);
             } catch (RuntimeException e) {
-                log.warn("[Scheduler] failed to register cron for ds={} schedule=\"{}\": {}",
-                        ds.getId(), ds.getSyncSchedule(), e.getMessage());
+                log.warn("[Scheduler] failed to register cron for ds={} schedule=\"{}\"", ds.getId(), ds.getSyncSchedule(), e);
             }
         }
 
@@ -309,7 +308,7 @@ public class Scheduler {
         try {
             syncLogRepo.create(syncLog);
         } catch (RuntimeException e) {
-            log.error("[Scheduler] failed to create sync log for ds={}: {}", dataSourceId, e.getMessage());
+            log.error("[Scheduler] failed to create sync log for ds={}", dataSourceId, e);
             return;
         }
 
@@ -324,7 +323,7 @@ public class Scheduler {
         try {
             outcome = taskQueue.enqueue(payload, taskId, MAX_RETRY, TASK_TIMEOUT);
         } catch (RuntimeException e) {
-            log.error("[Scheduler] failed to enqueue sync task for ds={}: {}", dataSourceId, e.getMessage());
+            log.error("[Scheduler] failed to enqueue sync task for ds={}", dataSourceId, e);
             syncLog.setStatus(DataSourceConstants.SYNC_LOG_STATUS_FAILED);
             syncLog.setFinishedAt(OffsetDateTime.now(ZoneOffset.UTC));
             syncLog.setErrorMessage("enqueue failed: " + e.getMessage());

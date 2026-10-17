@@ -146,7 +146,7 @@ public final class RedisTaskQueueCore {
             template.execute(RENEW, List.of(procKey),
                     member, Long.toString(System.currentTimeMillis() + leaseMillis));
         } catch (RuntimeException e) {
-            log.debug("task queue: lease renew failed: {}", e.toString());
+            log.debug("task queue: lease renew failed", e);
         }
     }
 
@@ -155,7 +155,7 @@ public final class RedisTaskQueueCore {
         try {
             template.execute(COMPLETE, List.of(procKey), member);
         } catch (RuntimeException e) {
-            log.warn("task queue: complete failed: {}", e.toString());
+            log.warn("task queue: complete failed", e);
         }
     }
 
@@ -167,7 +167,7 @@ public final class RedisTaskQueueCore {
             return ok != null && ok == 1L;
         } catch (RuntimeException e) {
             // 重排失败：proc 中的成员等租约回收重跑（重试计数偏差一次，可接受）
-            log.warn("task queue: requeue failed: {}", e.toString());
+            log.warn("task queue: requeue failed", e);
             return false;
         }
     }
@@ -186,7 +186,7 @@ public final class RedisTaskQueueCore {
                         sink.accept(member);
                     }
                 } catch (Throwable t) {
-                    log.warn("task queue: dispatch loop error: {}", t.toString());
+                    log.warn("task queue: dispatch loop error", t);
                 }
                 try {
                     Thread.sleep(dispatchIntervalMillis);

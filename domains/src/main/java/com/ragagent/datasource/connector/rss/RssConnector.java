@@ -195,7 +195,7 @@ public class RssConnector implements Connector {
             try {
                 data = client.fetchFeed(feedUrl);
             } catch (ConnectorException e) {
-                log.warn("[RSS] list: fetch {} failed: {}", feedUrl, e.getMessage());
+                log.warn("[RSS] list: fetch {} failed", feedUrl, e);
                 res.setDescription("fetch failed: " + e.getMessage());
                 out.add(res);
                 continue;
@@ -204,7 +204,7 @@ public class RssConnector implements Connector {
             try {
                 feed = feedParser.parse(data);
             } catch (FeedParseException e) {
-                log.warn("[RSS] list: parse {} failed: {}", feedUrl, e.getMessage());
+                log.warn("[RSS] list: parse {} failed", feedUrl, e);
                 res.setDescription("parse failed: " + e.getMessage());
                 out.add(res);
                 continue;
@@ -324,7 +324,7 @@ public class RssConnector implements Connector {
             try {
                 data = client.fetchFeed(feedUrl);
             } catch (ConnectorException e) {
-                log.warn("[RSS] sync: fetch {} failed: {}", feedUrl, e.getMessage());
+                log.warn("[RSS] sync: fetch {} failed", feedUrl, e);
                 feedErrors.add(feedUrl + ": " + e.getMessage());
                 RssUtil.copyFeedCursor(newCursor, prev, feedUrl);
                 continue;
@@ -333,7 +333,7 @@ public class RssConnector implements Connector {
             try {
                 feed = feedParser.parse(data);
             } catch (FeedParseException e) {
-                log.warn("[RSS] sync: parse {} failed: {}", feedUrl, e.getMessage());
+                log.warn("[RSS] sync: parse {} failed", feedUrl, e);
                 feedErrors.add(feedUrl + ": " + e.getMessage());
                 RssUtil.copyFeedCursor(newCursor, prev, feedUrl);
                 continue;
@@ -453,8 +453,7 @@ public class RssConnector implements Connector {
                     title = article.title();
                 }
             } catch (RuntimeException e) {
-                log.warn("[RSS] full-text fetch failed for {} (using feed content): {}",
-                        item.link(), e.getMessage());
+                log.warn("[RSS] full-text fetch failed for {} (using feed content)", item.link(), e);
             }
         }
 
@@ -529,7 +528,7 @@ public class RssConnector implements Connector {
         try {
             return RssCursor.fromMap(cursor.getConnectorCursor());
         } catch (RuntimeException e) {
-            log.warn("[RSS] unmarshal connector cursor: {}", e.getMessage());
+            log.warn("[RSS] unmarshal connector cursor", e);
             return null;
         }
     }

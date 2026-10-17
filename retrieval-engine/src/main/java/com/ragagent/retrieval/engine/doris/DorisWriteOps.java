@@ -180,7 +180,7 @@ final class DorisWriteOps {
         try {
             service.sql.execute(stmt, new ArrayList<>(ids));
         } catch (SQLException e) {
-            log.error("[Doris] Delete by {} failed: {}", field, e.getMessage());
+            log.error("[Doris] Delete by {} failed", field, e);
             throw new IllegalStateException("delete by " + field + ": " + DorisRetrieveRepository.message(e), e);
         }
         log.info("[Doris] Deleted {} rows from {} by {}", ids.size(), table, field);

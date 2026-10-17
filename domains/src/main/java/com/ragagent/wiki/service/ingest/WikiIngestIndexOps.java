@@ -108,7 +108,7 @@ final class WikiIngestIndexOps {
         try {
             slugs = service.wikiService.listSlugsBySourceRef(kbId, knowledgeId);
         } catch (Exception e) {
-            log.warn("wiki ingest: ListSlugsBySourceRef({}) failed: {}", knowledgeId, e.getMessage());
+            log.warn("wiki ingest: ListSlugsBySourceRef({}) failed", knowledgeId, e);
             return null;
         }
         if (slugs == null || slugs.isEmpty()) {
@@ -259,7 +259,7 @@ final class WikiIngestIndexOps {
                 try {
                     service.wikiService.updatePageMeta(page);
                 } catch (Exception e) {
-                    log.warn("wiki ingest: failed to publish page {}: {}", slug, e.getMessage());
+                    log.warn("wiki ingest: failed to publish page {}", slug, e);
                 }
             }
         }

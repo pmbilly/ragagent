@@ -80,7 +80,7 @@ abstract class AbstractRedisKnowledgeTaskQueue {
         try {
             queued = MAPPER.readValue(member, QueueMember.class);
         } catch (Exception e) {
-            log.warn("{} task: dropping corrupt member: {}", taskName(), e.toString());
+            log.warn("{} task: dropping corrupt member", taskName(), e);
             core.complete(member);
             return;
         }
@@ -104,14 +104,12 @@ abstract class AbstractRedisKnowledgeTaskQueue {
             return;
         }
         if (queued.attempt() > MAX_RETRY) {
-            log.warn("{} task gave up after {} attempts: {}",
-                    taskName(), queued.attempt(), failure.toString());
+            log.warn("{} task gave up after {} attempts", taskName(), queued.attempt(), failure);
             core.complete(member);
             return;
         }
         long delaySeconds = retryDelaySeconds(queued.attempt());
-        log.warn("{} task failed (attempt {}/{}), retrying in {}s: {}",
-                taskName(), queued.attempt(), MAX_RETRY + 1, delaySeconds, failure.toString());
+        log.warn("{} task failed (attempt {}/{}), retrying in {}s", taskName(), queued.attempt(), MAX_RETRY + 1, delaySeconds, failure);
         core.requeue(member, toJson(new QueueMember(queued.body(), queued.attempt() + 1)),
                 System.currentTimeMillis() + RedisTaskQueueCore.secondsToMillis(delaySeconds));
     }

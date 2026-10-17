@@ -12,8 +12,8 @@ import com.ragagent.contract.session.MessageExecutionContext;
 import com.ragagent.contract.session.MessageImage;
 import com.ragagent.contract.session.SseSink;
 import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.session.domain.message.Message;
@@ -88,17 +88,15 @@ public final class QaTurnExecutor {
         // updateSessionLastRequestState 按 (tenant, owner) 过滤后静默 0 行。
         final TenantContextSnapshot memoTenant =
                 TenantContextSnapshot.capture();
-        Thread.ofVirtual().start(() -> {
-            memoTenant.replay();
+        Thread.ofVirtual().start(() -> TenantScope.run(memoTenant, () -> {
             // 派生线程同样按会话属主租户查
             SessionLookupScope.mark();
             try {
                 turnFinalizer.persistLastRequestState(reqCtx, mode);
             } finally {
-                TenantContext.clear();
                 SessionLookupScope.clear();
             }
-        });
+        }));
 
         if (mode == QaMode.AGENT) {
             try {
@@ -125,7 +123,7 @@ public final class QaTurnExecutor {
             try {
                 streamManager.appendSteerEvents(sessionId, reqCtx.assistantMessage.getId(), reqCtx.steerCarryOver);
             } catch (RuntimeException e) {
-                log.warn("steer carry-over append failed for session {}: {}", sessionId, e.toString());
+                log.warn("steer carry-over append failed for session {}", sessionId, e);
             }
         }
 
@@ -198,12 +196,10 @@ public final class QaTurnExecutor {
                     reqCtx.effectiveTenantId);
         }
         Thread.Builder.OfVirtual runner = Thread.ofVirtual();
-        runner.start(() -> {
+        runner.start(() -> TenantScope.run(requestTenant, () -> {
             try {
-                requestTenant.replay();
                 // 本线程上的会话/消息查询按会话属主
                 // 租户范围——共享 agent 场景下当前主体不是属主，带 user 范围会查不到。
-                // 线程收尾处清理（见下方 finally 的 TenantContext.clear() 旁）。
                 SessionLookupScope.mark();
                 attachmentResolver.resolveTemporaryAttachments(streamCtx, reqCtx);
                 QaSupport.QaRequest qaReq = reqCtx.buildQaRequest();
@@ -216,7 +212,7 @@ public final class QaTurnExecutor {
                     agentQaService.agentQA(qaReq, streamCtx.eventBus);
                 }
             } catch (RuntimeException serviceErr) {
-                log.error("QA service failed for session {}: {}", sessionId, serviceErr.toString());
+                log.error("QA service failed for session {}", sessionId, serviceErr);
                 Event errEvt = new Event();
                 errEvt.setType(EventType.EVENT_ERROR);
                 errEvt.setSessionId(sessionId);
@@ -238,8 +234,8 @@ public final class QaTurnExecutor {
                     Message am = streamCtx.assistantMessage;
                     // agent 收尾：steer 交接 + 完成 + 清除 live 标记
                     //
-                    // 顺序纪律：收尾必须在**本线程上下文仍完整**时进行，clear 放到最后。
-                    // 旧实现先 clear 再 runWithTenant，prev 已空、只剩 tenantId——
+                    // 顺序纪律：收尾必须在**本线程上下文仍完整**时进行；TenantScope 的恢复
+                    // 在它之后。旧实现先 clear 再 runWithTenant，prev 已空、只剩 tenantId——
                     // completeAssistantMessage 的异步索引/follow-up 快照因此丢了
                     // principal/userId，owner 推导成 ""，embed（owner=embed_session:…）
                     // 与平台（owner=<userId>）会话双双 SessionNotFound。
@@ -261,19 +257,18 @@ public final class QaTurnExecutor {
                         try {
                             streamManager.clearLiveRun(sessionId, am.getId());
                         } catch (RuntimeException e) {
-                            log.warn("live run cleanup failed for session {}: {}", sessionId, e.toString());
+                            log.warn("live run cleanup failed for session {}", sessionId, e);
                         }
                         log.info("Agent QA service completed for session: {}", sessionId);
                     });
                 }
-                // 收尾（含身份相关的库写）完成后再清线程上下文
-                TenantContext.clear();
+                // 收尾（含身份相关的库写）完成后再清会话范围标记；租户上下文由 TenantScope 恢复
                 SessionLookupScope.clear();
                 if (asyncDone != null) {
                     asyncDone.complete(null);
                 }
             }
-        });
+        }));
 
         // 主线程阻塞推 SSE（skipSSE 的 follow-up 无 HTTP 响应体：不推流，
         // 由 executeQaInternal 的 asyncDone.join() 等异步段收尾）
@@ -293,7 +288,7 @@ public final class QaTurnExecutor {
             } catch (Throwable e) {
                 // follow-up 失败必须自救：claimNextSteerFollowUp 已落 user/assistant 两行并
                 // 抢占 live-run，异常路径若不清理会把这个会话的 agent 模式持续 409 锁死。
-                log.error("steer follow-up run failed: {}", e.toString(), e);
+                log.error("steer follow-up run failed", e);
                 recoverFailedFollowUp(followUp);
             }
         });
@@ -308,7 +303,7 @@ public final class QaTurnExecutor {
                         followUp.assistantMessage, followUp.query, followUp.userMessageID, sessionTenant));
             }
         } catch (RuntimeException e) {
-            log.warn("follow-up completion recovery failed: {}", e.toString());
+            log.warn("follow-up completion recovery failed", e);
         }
         try {
             String amId = followUp.assistantMessage == null ? "" : followUp.assistantMessage.getId();
@@ -316,8 +311,7 @@ public final class QaTurnExecutor {
                 streamManager.clearLiveRun(followUp.sessionId, amId);
             }
         } catch (RuntimeException e) {
-            log.warn("follow-up live-run cleanup failed for session {}: {}",
-                    followUp.sessionId, e.toString());
+            log.warn("follow-up live-run cleanup failed for session {}", followUp.sessionId, e);
         }
     }
     private void executeQaInternal(QaRequestContext reqCtx, QaMode mode, boolean generateTitle,
@@ -394,7 +388,7 @@ public final class QaTurnExecutor {
                 messageService.deleteMessage(sessionId, reqCtx.userMessageID);
                 reqCtx.userMessageID = "";
             } catch (RuntimeException e) {
-                log.warn("turn rollback failed for user message {}: {}", reqCtx.userMessageID, e.toString());
+                log.warn("turn rollback failed for user message {}", reqCtx.userMessageID, e);
             }
         }
         if (assistant && reqCtx.assistantMessage != null && !reqCtx.assistantMessage.getId().isEmpty()) {
@@ -402,8 +396,7 @@ public final class QaTurnExecutor {
                 messageService.deleteMessage(sessionId, reqCtx.assistantMessage.getId());
                 reqCtx.assistantMessage.setId("");
             } catch (RuntimeException e) {
-                log.warn("turn rollback failed for assistant message {}: {}",
-                        reqCtx.assistantMessage.getId(), e.toString());
+                log.warn("turn rollback failed for assistant message {}", reqCtx.assistantMessage.getId(), e);
             }
         }
     }

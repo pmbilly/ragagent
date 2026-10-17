@@ -14,8 +14,8 @@ import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.modelcontext.Registry;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
@@ -78,7 +78,7 @@ final class SessionQaFallback {
         try {
             chatModel = service.pipelineModelService.getChatModel(chatManage.getChatModelId());
         } catch (RuntimeException e) {
-            log.error("Failed to get chat model for fallback: {}, falling back to fixed response", e.toString());
+            log.error("Failed to get chat model for fallback, falling back to fixed response", e);
             handleFixedFallback(chatManage);
             return;
         }
@@ -91,7 +91,7 @@ final class SessionQaFallback {
         try {
             responseQueue = chatModel.chatStream(prepared.messages(), opt);
         } catch (RuntimeException e) {
-            log.error("Failed to start streaming fallback response: {}, falling back to fixed response", e.toString());
+            log.error("Failed to start streaming fallback response, falling back to fixed response", e);
             handleFixedFallback(chatManage);
             return;
         }
@@ -103,14 +103,8 @@ final class SessionQaFallback {
         // 纪律 #1（A5）：消费线程跑在独立虚拟线程上——本线程 capture、消费线程 replay/clear，
         // 否则索引/追问的 owner 推导成 ""（SessionNotFound）。
         TenantContextSnapshot identity = TenantContextSnapshot.capture();
-        Thread.ofVirtual().start(() -> {
-            identity.replay();
-            try {
-                consumeFallbackStream(chatManage, responseQueue, prepared.registry());
-            } finally {
-                TenantContext.clear();
-            }
-        });
+        Thread.ofVirtual().start(() -> TenantScope.run(identity,
+                () -> consumeFallbackStream(chatManage, responseQueue, prepared.registry())));
     }
 
     record FallbackPrepared(List<ChatMessage> messages, Registry registry) {}
@@ -203,7 +197,7 @@ final class SessionQaFallback {
             try {
                 knowledges = service.knowledgeCatalog.listKnowledge(kbId, 1, 10000, null, null, null, null, false).items();
             } catch (RuntimeException e) {
-                log.warn("buildKBDocumentListing: failed to list knowledge for KB {}: {}", kbId, e.toString());
+                log.warn("buildKBDocumentListing: failed to list knowledge for KB {}", kbId, e);
                 continue;
             }
             for (KnowledgeRowView k : knowledges) {
@@ -289,7 +283,7 @@ final class SessionQaFallback {
                 try {
                     eventBus.emit(evt);
                 } catch (RuntimeException e) {
-                    log.error("Failed to emit fallback answer chunk event: {}", e.toString());
+                    log.error("Failed to emit fallback answer chunk event", e);
                 }
                 if (response.isDone()) {
                     ChatResponse cr = new ChatResponse();
@@ -324,7 +318,7 @@ final class SessionQaFallback {
         try {
             chatManage.getEventBus().emit(evt);
         } catch (RuntimeException e) {
-            log.error("Failed to emit references event: {}", e.toString());
+            log.error("Failed to emit references event", e);
         }
     }
 
@@ -348,7 +342,7 @@ final class SessionQaFallback {
             eventBus.emit(evt);
             log.info("Fallback answer event emitted successfully");
         } catch (RuntimeException e) {
-            log.error("Failed to emit fallback answer event: {}", e.toString());
+            log.error("Failed to emit fallback answer event", e);
         }
     }
 }

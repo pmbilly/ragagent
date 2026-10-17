@@ -70,7 +70,7 @@ final class DataSourceSyncExecutor {
         try {
             startCursor = streamStartCursor(ds, forceFull, attempt);
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to parse sync cursor: {}", e.getMessage());
+            log.error("[datasource] failed to parse sync cursor", e);
             service.resultOps.updateSyncRunResult(ds, syncLog, new SyncResult(), null,
                     DataSourceConstants.SYNC_LOG_STATUS_FAILED,
                     "Invalid cursor: " + e.getMessage(), wasPaused, activityTask);
@@ -89,7 +89,7 @@ final class DataSourceSyncExecutor {
         }
 
         if (fetchErr != null) {
-            log.error("[datasource] streaming fetch failed: {}", fetchErr.getMessage());
+            log.error("[datasource] streaming fetch failed", fetchErr);
             service.resultOps.updateSyncRunResult(ds, syncLog, result, result.toJSON(),
                     DataSourceConstants.SYNC_LOG_STATUS_FAILED,
                     "Fetch failed: " + fetchErr.getMessage(), wasPaused, activityTask);
@@ -242,8 +242,7 @@ final class DataSourceSyncExecutor {
             try {
                 svc.syncLogRepo.updateResult(syncLog);
             } catch (RuntimeException e) {
-                log.warn("[datasource] failed to persist sync log progress at checkpoint: {}",
-                        e.getMessage());
+                log.warn("[datasource] failed to persist sync log progress at checkpoint", e);
             }
         }
     }
@@ -273,8 +272,7 @@ final class DataSourceSyncExecutor {
         try {
             ds = service.getDataSource(payload.dataSourceId());
         } catch (RuntimeException e) {
-            log.warn("[datasource] data source not found (likely deleted), cancelling sync: "
-                    + "ds={} err={}", payload.dataSourceId(), e.getMessage());
+            log.warn("[datasource] data source not found (likely deleted), cancelling sync: ds={}", payload.dataSourceId(), e);
             SyncLog syncLog = null;
             try {
                 syncLog = service.syncLogRepo.findById(payload.syncLogId());
@@ -294,7 +292,7 @@ final class DataSourceSyncExecutor {
         try {
             syncLog = service.syncLogRepo.findById(payload.syncLogId());
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to get sync log: {}", e.getMessage());
+            log.error("[datasource] failed to get sync log", e);
             return;
         }
 
@@ -395,11 +393,10 @@ final class DataSourceSyncExecutor {
                 try {
                     service.dsRepo.updateSyncState(ds);
                 } catch (RuntimeException uerr) {
-                    log.warn("[datasource] failed to persist sync cursor after fetch error: {}",
-                            uerr.getMessage());
+                    log.warn("[datasource] failed to persist sync cursor after fetch error", uerr);
                 }
             }
-            log.error("[datasource] fetch operation failed: {}", fetchErr.getMessage());
+            log.error("[datasource] fetch operation failed", fetchErr);
             syncLog.setStatus(DataSourceConstants.SYNC_LOG_STATUS_FAILED);
             syncLog.setFinishedAt(OffsetDateTime.now(ZoneOffset.UTC));
             syncLog.setErrorMessage("Fetch failed: " + fetchErr.getMessage());

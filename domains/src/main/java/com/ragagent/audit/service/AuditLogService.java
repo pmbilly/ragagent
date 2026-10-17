@@ -117,8 +117,7 @@ public class AuditLogService {
         try {
             log(entry);
         } catch (RuntimeException e) {
-            log.warn("audit log dropped (best-effort): action={} err={}",
-                    entry == null ? null : entry.getAction(), e.getMessage());
+            log.warn("audit log dropped (best-effort): action={}", entry == null ? null : entry.getAction(), e);
         }
     }
 
@@ -166,8 +165,7 @@ public class AuditLogService {
                     tenantId, actor, AuditAction.ACCESS_DENIED, path, since) > 0;
         } catch (RuntimeException e) {
             // 探测失败不阻断：继续照写。
-            log.warn("audit dedup probe failed, writing anyway: tenant={} path={} err={}",
-                    tenantId, path, e.getMessage());
+            log.warn("audit dedup probe failed, writing anyway: tenant={} path={}", tenantId, path, e);
         }
         if (alreadyRecorded) {
             return;

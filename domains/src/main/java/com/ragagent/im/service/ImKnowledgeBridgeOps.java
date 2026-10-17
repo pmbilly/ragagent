@@ -108,7 +108,7 @@ final class ImKnowledgeBridgeOps {
         } catch (DuplicateKnowledgeException e) {
             log.info("[IM] File already exists in knowledge base: {}", raw.fileName());
         } catch (RuntimeException e) {
-            log.error("[IM] Failed to create knowledge from file: {}", e.getMessage());
+            log.error("[IM] Failed to create knowledge from file", e);
         }
     }
 }

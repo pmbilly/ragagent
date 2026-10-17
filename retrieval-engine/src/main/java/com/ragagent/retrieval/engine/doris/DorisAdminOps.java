@@ -70,14 +70,14 @@ final class DorisAdminOps {
         try {
             existing = detectExistingCompatMode();
         } catch (RuntimeException e) {
-            log.error("[Doris] {}", e.getMessage());
+            log.error("[Doris]", e);
             return new CompatResolution(null, e);
         }
         if (existing.found()) {
             if (requested != DorisCompatMode.AUTO && requested != existing.mode()) {
                 RuntimeException err = new IllegalStateException(mismatchMessage(requested,
                         existing.mode(), existing.exampleTable()));
-                log.error("[Doris] {}", err.getMessage());
+                log.error("[Doris]", err);
                 return new CompatResolution(null, err);
             }
             log.warn("[Doris] Using compat mode {} from existing embedding tables ({}). {} is "
@@ -107,7 +107,7 @@ final class DorisAdminOps {
                                 + "your Doris build. " + DorisCompatMode.ENV_KEY
                                 + " is not interchangeable after " + service.tableBaseName
                                 + "_* tables are created");
-                log.error("[Doris] {}", err.getMessage());
+                log.error("[Doris]", err);
                 return new CompatResolution(null, err);
             }
             log.warn("[Doris] Auto-selected compat mode {} for new embedding tables. {} is not "
@@ -226,7 +226,7 @@ final class DorisAdminOps {
         try {
             exists = tableExists(tableName);
         } catch (RuntimeException e) {
-            log.error("[Doris] Failed to check table existence: {}", e.getMessage());
+            log.error("[Doris] Failed to check table existence", e);
             throw new IllegalStateException("check table existence: " + e.getMessage(), e);
         }
         if (!exists) {
@@ -235,7 +235,7 @@ final class DorisAdminOps {
             try {
                 createTable(tableName, dimension, compatMode);
             } catch (RuntimeException e) {
-                log.error("[Doris] Failed to create table: {}", e.getMessage());
+                log.error("[Doris] Failed to create table", e);
                 throw new IllegalStateException("create table: " + e.getMessage(), e);
             }
             String tableForPoll = tableName;
@@ -244,9 +244,7 @@ final class DorisAdminOps {
                     waitAnnReady(tableForPoll);
                     log.info("[Doris] ANN index for {} ready", tableForPoll);
                 } catch (RuntimeException e) {
-                    log.warn("[Doris] ANN index for {} not ready within {}: {} "
-                                    + "(queries may fall back to brute force temporarily)",
-                            tableForPoll, DorisRetrieveRepository.ANN_READY_TIMEOUT_MS, e.getMessage());
+                    log.warn("[Doris] ANN index for {} not ready within {} (queries may fall back to brute force temporarily)", tableForPoll, DorisRetrieveRepository.ANN_READY_TIMEOUT_MS, e);
                 }
             });
         }

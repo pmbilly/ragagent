@@ -15,6 +15,7 @@ import com.ragagent.contract.session.SuggestionItem;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
 import com.ragagent.platform.tracing.langfuse.Span;
@@ -210,8 +211,7 @@ public class MessageSuggestionService {
             set.setLeaseUntil(null);
             set.setGeneratedAt(OffsetDateTime.now());
             suggestionRepository.save(set);
-            log.error("Suggestion generation failed (session {}, message {}, set {}): {}",
-                    sessionId, assistantMessageId, set.getId(), generateErr.toString());
+            log.error("Suggestion generation failed (session {}, message {}, set {})", sessionId, assistantMessageId, set.getId(), generateErr);
             return set;
         }
         long latency = System.currentTimeMillis() - startedAt;
@@ -422,12 +422,7 @@ public class MessageSuggestionService {
         if (agentTenantId == 0 || (prev.tenantId() != null && prev.tenantId() == agentTenantId)) {
             return body.get();
         }
-        try {
-            prev.withTenantId(agentTenantId).replay();
-            return body.get();
-        } finally {
-            prev.replay();
-        }
+        return TenantScope.supply(prev.withTenantId(agentTenantId), body);
     }
 
     private String buildSuggestionSystemPrompt(int count, String language, String categories) {

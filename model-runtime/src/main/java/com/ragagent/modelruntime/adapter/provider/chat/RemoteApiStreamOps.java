@@ -57,8 +57,7 @@ final class RemoteApiStreamOps {
                     }
                     event = next.get();
                 } catch (IOException e) {
-                    log.error("Stream read error: {} (tool_calls_assembled={})",
-                            e.getMessage(), state.toolCallMap.size());
+                    log.error("Stream read error (tool_calls_assembled={})", state.toolCallMap.size(), e);
                     StreamResponse error = StreamResponse.of(ResponseType.ERROR, e.getMessage(), true);
                     error.setToolCalls(state.buildOrderedToolCalls());
                     error.setUsage(state.usage);
@@ -81,7 +80,7 @@ final class RemoteApiStreamOps {
                 try {
                     chunk = RemoteApiChat.MAPPER.readTree(data);
                 } catch (IOException e) {
-                    log.error("Failed to parse stream response: {}", e.getMessage());
+                    log.error("Failed to parse stream response", e);
                     continue;
                 }
 
@@ -109,7 +108,7 @@ final class RemoteApiStreamOps {
             Thread.currentThread().interrupt();
             log.debug("[LLM Stream] interrupted, closing stream for model={}", service.modelName);
         } catch (IOException e) {
-            log.debug("[LLM Stream] failed to close stream body for model={}: {}", service.modelName, e.getMessage());
+            log.debug("[LLM Stream] failed to close stream body for model={}", service.modelName, e);
         }
     }
 

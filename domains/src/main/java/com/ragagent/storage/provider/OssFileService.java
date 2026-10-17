@@ -255,7 +255,7 @@ public class OssFileService implements FileService {
             client.abortMultipartUpload(
                     new AbortMultipartUploadRequest(bucketName, objectName, uploadId));
         } catch (RuntimeException e) {
-            log.warn("failed to abort OSS multipart upload {}: {}", objectName, e.getMessage());
+            log.warn("failed to abort OSS multipart upload {}", objectName, e);
         }
     }
 

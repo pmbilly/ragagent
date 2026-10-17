@@ -111,10 +111,10 @@ public class MessageHistoryService {
         try {
             mode = ResourceUrlMode.resolve(resourceUrls);
         } catch (PublicModeForbiddenException e) {
-            log.warn("Rejected resource URL mode: {}", e.getMessage());
+            log.warn("Rejected resource URL mode", e);
             throw BizException.forbidden(e.getMessage());
         } catch (ResourceModeException e) {
-            log.warn("Rejected resource URL mode: {}", e.getMessage());
+            log.warn("Rejected resource URL mode", e);
             throw BizException.badRequest(e.getMessage());
         }
         return Rewriter.forRequest(mode,

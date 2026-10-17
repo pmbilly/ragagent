@@ -132,7 +132,7 @@ final class WikiPageLinkOps {
                 try {
                     service.repo.updateMeta(targetPage);
                 } catch (RuntimeException e) {
-                    log.warn("wiki: failed to update in_links for {}: {}", targetSlug, e.toString());
+                    log.warn("wiki: failed to update in_links for {}", targetSlug, e);
                 }
             }
         }
@@ -153,7 +153,7 @@ final class WikiPageLinkOps {
                 try {
                     service.repo.updateMeta(targetPage);
                 } catch (RuntimeException e) {
-                    log.warn("wiki: failed to update in_links for {}: {}", targetSlug, e.toString());
+                    log.warn("wiki: failed to update in_links for {}", targetSlug, e);
                 }
             }
         }
@@ -189,7 +189,7 @@ final class WikiPageLinkOps {
             try {
                 service.repo.updateMeta(p);
             } catch (RuntimeException e) {
-                log.warn("wiki: failed to update links for page {}: {}", p.getSlug(), e.toString());
+                log.warn("wiki: failed to update links for page {}", p.getSlug(), e);
             }
         }
     }
@@ -233,7 +233,7 @@ final class WikiPageLinkOps {
             try {
                 service.updateAutoLinkedContent(p);
             } catch (RuntimeException e) {
-                log.warn("wiki: cross-link injection failed for {}: {}", p.getSlug(), e.toString());
+                log.warn("wiki: cross-link injection failed for {}", p.getSlug(), e);
                 continue;
             }
             updated++;

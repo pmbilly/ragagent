@@ -165,7 +165,7 @@ final class WikiIngestExtractDedup {
                                 List.of(WikiConstants.PAGE_TYPE_ENTITY, WikiConstants.PAGE_TYPE_CONCEPT),
                                 WikiDedupSupport.DEDUP_CANDIDATE_TOP_K);
                     } catch (Exception e) {
-                        log.warn("wiki ingest: dedup FindSimilarPages({}) failed: {}", q, e.getMessage());
+                        log.warn("wiki ingest: dedup FindSimilarPages({}) failed", q, e);
                         continue;
                     }
                     for (WikiPageLite p : pages) {
@@ -221,7 +221,7 @@ final class WikiIngestExtractDedup {
             dedupeJson = service.llm.generateWithTemplate(chatModel, WikiPrompts.WIKI_DEDUPLICATION_PROMPT,
                     Map.of("Candidates", candBuf.toString()));
         } catch (Exception e) {
-            log.warn("wiki ingest: deduplication LLM call failed: {}", e.getMessage());
+            log.warn("wiki ingest: deduplication LLM call failed", e);
             return stabilize(dedup, kbId, entities, concepts, mergeTargets, exactTargets, batchCtx);
         }
         dedupeJson = WikiTextUtils.cleanLLMJSON(dedupeJson);
@@ -229,7 +229,7 @@ final class WikiIngestExtractDedup {
         try {
             parsed = MAPPER.readTree(dedupeJson);
         } catch (Exception e) {
-            log.warn("wiki ingest: failed to parse dedup JSON: {}\nRaw: {}", e.getMessage(), dedupeJson);
+            log.warn("wiki ingest: failed to parse dedup JSON\nRaw: {}", dedupeJson, e);
             return stabilize(dedup, kbId, entities, concepts, mergeTargets, exactTargets, batchCtx);
         }
         JsonNode merges = parsed == null ? null : parsed.get("merges");

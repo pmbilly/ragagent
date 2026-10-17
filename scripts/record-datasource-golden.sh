@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 录 datasource 模块的 golden（对照 docs/HANDOFF.md §4 的标准流程）。
+# 录 datasource 模块的 golden（对照 docs/internal/HANDOFF.md §4 的标准流程）。
 #
 # 前提：
 #   1) Go server 起在 :8080，且带 SSRF_WHITELIST=127.0.0.1,::1,localhost

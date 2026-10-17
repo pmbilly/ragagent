@@ -139,8 +139,7 @@ final class MessageSearch {
             } catch (RuntimeException e) {
                 // 两种模式都先记 WARN，vector 模式再上抛（500）、
                 // hybrid 模式吞掉降级 keyword-only
-                log.warn("Vector search via KB failed, falling back to keyword-only: {}",
-                        e.toString());
+                log.warn("Vector search via KB failed, falling back to keyword-only", e);
                 if (MessageService.MODE_VECTOR.equals(mode)) {
                     throw e;
                 }
@@ -317,8 +316,7 @@ final class MessageSearch {
         try {
             reranker = modelRuntimeAssembler.getRerankModel(rc.getRerankModelId());
         } catch (RuntimeException e) {
-            log.warn("Failed to get rerank model {}, skipping rerank: {}",
-                    rc.getRerankModelId(), e.toString());
+            log.warn("Failed to get rerank model {}, skipping rerank", rc.getRerankModelId(), e);
             return results;
         }
 
@@ -331,7 +329,7 @@ final class MessageSearch {
         try {
             rankResults = reranker.rerank(query, documents);
         } catch (RuntimeException e) {
-            log.warn("Rerank call failed, skipping: {}", e.toString());
+            log.warn("Rerank call failed, skipping", e);
             return results;
         }
 
@@ -526,7 +524,7 @@ final class MessageSearch {
                 out.add(new SearchItem(p, 0, ""));
             }
         } catch (RuntimeException e) {
-            log.warn("Failed to fetch partner messages: {}", e.toString());
+            log.warn("Failed to fetch partner messages", e);
             return items;
         }
         return out;

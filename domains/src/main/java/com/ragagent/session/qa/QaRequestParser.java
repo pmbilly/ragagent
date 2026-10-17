@@ -95,10 +95,10 @@ public final class QaRequestParser {
                     fileResolverFactory.create(readerTenant, fileService, storageBackendResolver));
             rc.resourceRewriter = new StreamRewriter(rw);
         } catch (PublicModeForbiddenException e) {
-            log.warn("Rejected resource URL mode: {}", e.getMessage());
+            log.warn("Rejected resource URL mode", e);
             throw BizException.forbidden(e.getMessage());
         } catch (ResourceModeException e) {
-            log.warn("Rejected resource URL mode: {}", e.getMessage());
+            log.warn("Rejected resource URL mode", e);
             throw BizException.badRequest(e.getMessage());
         }
 

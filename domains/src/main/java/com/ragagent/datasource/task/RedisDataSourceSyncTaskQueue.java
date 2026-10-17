@@ -143,7 +143,7 @@ public class RedisDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue {
         try {
             queued = MAPPER.readValue(member, QueueMember.class);
         } catch (Exception e) {
-            log.warn("[DataSourceSyncQueue] dropping corrupt task member: {}", e.toString());
+            log.warn("[DataSourceSyncQueue] dropping corrupt task member", e);
             core.complete(member);
             return;
         }
@@ -196,7 +196,7 @@ public class RedisDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue {
             payload = DataSourceSyncPayload.fromJson(queued.body());
         } catch (RuntimeException e) {
             // 载荷坏掉是确定性的失败：重试多少次都一样，直接放弃
-            log.error("[DataSourceSyncQueue] undecodable payload: {}", e.getMessage());
+            log.error("[DataSourceSyncQueue] undecodable payload", e);
             return Attempt.SUCCESS;
         }
 
@@ -240,8 +240,7 @@ public class RedisDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue {
             log.error("[DataSourceSyncQueue] task timed out after {}ms", queued.timeoutMillis());
             return Attempt.FAILED;
         } catch (ExecutionException e) {
-            log.error("[DataSourceSyncQueue] task failed: {}",
-                    e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
+            log.error("[DataSourceSyncQueue] task failed", e);
             return Attempt.FAILED;
         } catch (InterruptedException e) {
             future.cancel(true);
@@ -255,7 +254,7 @@ public class RedisDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue {
             template.delete(ID_PREFIX + taskId);
         } catch (RuntimeException e) {
             // 删不掉就等 TTL 兜底
-            log.warn("[DataSourceSyncQueue] release taskId failed: {}", e.toString());
+            log.warn("[DataSourceSyncQueue] release taskId failed", e);
         }
     }
 

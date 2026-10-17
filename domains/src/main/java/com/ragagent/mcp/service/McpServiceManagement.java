@@ -407,14 +407,14 @@ public class McpServiceManagement {
             try {
                 tools = client.listTools(testCtx);
             } catch (RuntimeException e) {
-                log.warn("Failed to list tools: {}", e.getMessage());
+                log.warn("Failed to list tools", e);
                 tools = List.of();
             }
             List<McpResource> resources;
             try {
                 resources = client.listResources(testCtx);
             } catch (RuntimeException e) {
-                log.warn("Failed to list resources: {}", e.getMessage());
+                log.warn("Failed to list resources", e);
                 resources = List.of();
             }
 

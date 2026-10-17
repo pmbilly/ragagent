@@ -47,8 +47,7 @@ final class SteerIntake {
         try {
             events = engine.steerSink.pollSteer(sessionId, messageID, 0);
         } catch (RuntimeException e) {
-            log.warn("[Agent] Steer poll failed at round {}: {}", state.getCurrentRound() + 1,
-                    e.getMessage());
+            log.warn("[Agent] Steer poll failed at round {}", state.getCurrentRound() + 1, e);
             return 0;
         }
         if (events == null || events.isEmpty()) {

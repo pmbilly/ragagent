@@ -1,10 +1,7 @@
 package com.ragagent.session.service.rag.plugin;
 
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.EventManager;
 import com.ragagent.session.service.rag.PipelineCommon;
 import com.ragagent.session.service.rag.PipelineEventType;
 import com.ragagent.session.service.rag.PipelineLog;
@@ -16,8 +13,12 @@ import java.util.Map;
 
 /**
  * CHUNK_SEARCH_PARALLEL 阶段插件：
- * 并发跑 chunk 检索（内部 PluginSearch 的克隆）与实体检索（内部 PluginSearchEntity
- * 的克隆），两路结果合并去重。
+ * 并发跑 chunk 检索（复用 {@link PluginSearch}）与实体检索（复用
+ * {@link PluginSearchEntity}），两路结果合并去重。
+ *
+ * <p>两个内部插件由装配层显式传入、不注册到 manager——依赖写在构造器上，
+ * 而不是藏在类体里。两者都是无状态服务引用，可与 CHUNK_SEARCH / ENTITY_SEARCH
+ * 的注册实例共用。</p>
  *
  * <p>Deep-copy：并发任务各自持有 {@code cloneChatManage()} 的副本（检索结果清空）
  * 避免并发读写共享列表。SEARCH_NOTHING 会被吞掉（两个检索任务把它归为无结果）；
@@ -29,25 +30,18 @@ public final class PluginSearchParallel implements Plugin {
     private final PluginSearch searchPlugin;
     private final PluginSearchEntity searchEntityPlugin;
 
-    public PluginSearchParallel(EventManager eventManager,
-                                PipelinePorts.KnowledgeBaseService knowledgeBaseService,
-                                PipelinePorts.WebSearch webSearchService,
-                                PipelinePorts.TenantService tenantService,
-                                RetrieveGraphRepository graphRepository,
-                                PipelinePorts.ChunkRepository chunkRepository,
-                                PipelinePorts.KnowledgeRepository knowledgeRepository) {
-        // 内部插件不注册到 manager
-        this.searchPlugin = new PluginSearch(knowledgeBaseService, webSearchService, tenantService);
-        this.searchEntityPlugin = new PluginSearchEntity(graphRepository, chunkRepository, knowledgeRepository);
+    public PluginSearchParallel(PluginSearch searchPlugin, PluginSearchEntity searchEntityPlugin) {
+        this.searchPlugin = searchPlugin;
+        this.searchEntityPlugin = searchEntityPlugin;
     }
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.CHUNK_SEARCH_PARALLEL};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.CHUNK_SEARCH_PARALLEL};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         if (!chatManage.needsRetrieval()) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("sessionId", chatManage.getSessionId());

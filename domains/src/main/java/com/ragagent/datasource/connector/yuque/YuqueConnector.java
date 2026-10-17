@@ -178,7 +178,7 @@ public class YuqueConnector implements Connector {
             } catch (ConnectorException e) {
                 // 用户没加入任何团队（团队）时语雀返回 404 而不是空列表。
                 // 把它当成"没有团队"继续——个人仓库上面已经抓到了。
-                log.warn("[Yuque] list user groups failed (treating as empty): {}", e.getMessage());
+                log.warn("[Yuque] list user groups failed (treating as empty)", e);
                 groups = null;
             }
             if (groups != null) {
@@ -188,7 +188,7 @@ public class YuqueConnector implements Connector {
                         teamRepos = cli.listGroupRepos(g.getLogin());
                     } catch (ConnectorException e) {
                         // 跳过这个团队但继续其它团队（例如受限团队的 403）。
-                        log.warn("[Yuque] skip group {}: {}", g.getLogin(), e.getMessage());
+                        log.warn("[Yuque] skip group {}", g.getLogin(), e);
                         continue;
                     }
                     if (teamRepos == null) {

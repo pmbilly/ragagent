@@ -95,7 +95,7 @@ public class WikiIngestTaxonomy {
                     pool = paths;
                 }
             } catch (Exception e) {
-                log.warn("wiki ingest: list category paths for plan failed: {}", e.getMessage());
+                log.warn("wiki ingest: list category paths for plan failed", e);
             }
         }
 
@@ -131,8 +131,7 @@ public class WikiIngestTaxonomy {
                                 "Items", itemsBlock.toString(),
                                 "Language", lang == null ? "" : lang));
             } catch (RuntimeException e) {
-                log.warn("wiki ingest: taxonomy plan call failed ({} items): {}",
-                        chunk.size(), e.getMessage());
+                log.warn("wiki ingest: taxonomy plan call failed ({} items)", chunk.size(), e);
                 continue;
             }
 
@@ -181,7 +180,7 @@ public class WikiIngestTaxonomy {
                     fid = resolved == null ? "" : resolved.folderId();
                     pathCache.put(key, fid);
                 } catch (Exception err) {
-                    log.warn("wiki ingest: resolve folder {} failed: {}", key, err.getMessage());
+                    log.warn("wiki ingest: resolve folder {} failed", key, err);
                     // 负缓存：避免为每个 slug 反复重试同一条坏路径
                     pathCache.put(key, "");
                     continue;
@@ -240,8 +239,7 @@ public class WikiIngestTaxonomy {
         try {
             embedder = modelResolver.getEmbeddingModel(embeddingModelId);
         } catch (Exception e) {
-            log.warn("wiki ingest: taxonomy plan embed model unavailable, feeding all folders: {}",
-                    e.getMessage());
+            log.warn("wiki ingest: taxonomy plan embed model unavailable, feeding all folders", e);
             return capFolders(pool, WikiBatchConstants.TAXONOMY_PROMPT_MAX_PATHS);
         }
 
@@ -258,16 +256,14 @@ public class WikiIngestTaxonomy {
         try {
             folderVecs = embedder.batchEmbed(folderTexts);
         } catch (Exception e) {
-            log.warn("wiki ingest: taxonomy plan folder embed failed, feeding all folders: {}",
-                    e.getMessage());
+            log.warn("wiki ingest: taxonomy plan folder embed failed, feeding all folders", e);
             return capFolders(pool, WikiBatchConstants.TAXONOMY_PROMPT_MAX_PATHS);
         }
         List<float[]> itemVecs;
         try {
             itemVecs = embedder.batchEmbed(itemTexts);
         } catch (Exception e) {
-            log.warn("wiki ingest: taxonomy plan item embed failed, feeding all folders: {}",
-                    e.getMessage());
+            log.warn("wiki ingest: taxonomy plan item embed failed, feeding all folders", e);
             return capFolders(pool, WikiBatchConstants.TAXONOMY_PROMPT_MAX_PATHS);
         }
         if (folderVecs == null || itemVecs == null) {

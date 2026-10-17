@@ -32,14 +32,14 @@ final class ContextDebugEmitter {
 
         int messagesEst = b.getTotal() - b.getToolSchemas();
         log.debug("[Agent][Round-{}][ctx] predicted={} (baseline_usage={} + delta) | messages={} tool_schemas={} request={} | threshold={} window={} keep_recent={}",
-                round, predicted, AgentEngine.contextTokensFromUsage(engine.lastUsage), messagesEst, b.getToolSchemas(),
+                round, predicted, ContextBudget.contextTokensFromUsage(engine.lastUsage), messagesEst, b.getToolSchemas(),
                 b.getTotal(), settings.threshold(), settings.maxContextTokens(),
                 settings.keepRecentTokens());
         log.debug("[Agent][Round-{}][ctx] breakdown: {}", round, b);
 
         // 压缩的预估是 messages-only（或 usage+delta）口径；独立校验用同一口径：
         // 有 usage 基线时 provider 已把工具计费，对比全请求；没有就只对比消息。
-        int baseline = AgentEngine.contextTokensFromUsage(engine.lastUsage);
+        int baseline = ContextBudget.contextTokensFromUsage(engine.lastUsage);
         int compare = messagesEst;
         if (baseline > 0) {
             compare = b.getTotal();

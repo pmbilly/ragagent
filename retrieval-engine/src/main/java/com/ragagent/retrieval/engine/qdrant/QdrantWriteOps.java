@@ -36,7 +36,7 @@ final class QdrantWriteOps {
         if (row.embedding == null || row.embedding.length == 0) {
             IllegalStateException e = new IllegalStateException(
                     "empty embedding vector for chunk ID: " + indexInfo.chunkId);
-            log.error("[Qdrant] {}", e.getMessage());
+            log.error("[Qdrant]", e);
             throw e;
         }
         int dimension = row.embedding.length;
@@ -47,7 +47,7 @@ final class QdrantWriteOps {
             service.client.request("PUT", "/collections/" + collection + "/points",
                     upsertBody(List.of(pointBody(pointId, row))));
         } catch (RuntimeException e) {
-            log.error("[Qdrant] Failed to save index: {}", e.getMessage());
+            log.error("[Qdrant] Failed to save index", e);
             throw new IllegalStateException("failed to save index for chunk ID "
                     + indexInfo.chunkId + ": " + e.getMessage(), e);
         }
@@ -164,7 +164,7 @@ final class QdrantWriteOps {
             // Delete 不带 wait（异步默认）。
             service.client.request("POST", "/collections/" + collection + "/points/delete", body);
         } catch (RuntimeException e) {
-            log.error("[Qdrant] Failed to delete by {}: {}", subject, e.getMessage());
+            log.error("[Qdrant] Failed to delete by {}", subject, e);
             throw new IllegalStateException(
                     "failed to delete by " + subject + ": " + e.getMessage(), e);
         }
@@ -199,8 +199,7 @@ final class QdrantWriteOps {
                     setPayload(collection, QdrantRetrieveRepository.FIELD_IS_ENABLED, true,
                             QdrantRetrieveRepository.matchAny(QdrantRetrieveRepository.FIELD_CHUNK_ID, enabledChunkIds));
                 } catch (RuntimeException e) {
-                    log.warn("[Qdrant] Failed to update enabled chunks in {}: {}",
-                            collection, e.getMessage());
+                    log.warn("[Qdrant] Failed to update enabled chunks in {}", collection, e);
                 }
             }
             if (!disabledChunkIds.isEmpty()) {
@@ -208,8 +207,7 @@ final class QdrantWriteOps {
                     setPayload(collection, QdrantRetrieveRepository.FIELD_IS_ENABLED, false,
                             QdrantRetrieveRepository.matchAny(QdrantRetrieveRepository.FIELD_CHUNK_ID, disabledChunkIds));
                 } catch (RuntimeException e) {
-                    log.warn("[Qdrant] Failed to update disabled chunks in {}: {}",
-                            collection, e.getMessage());
+                    log.warn("[Qdrant] Failed to update disabled chunks in {}", collection, e);
                 }
             }
         }
@@ -238,8 +236,7 @@ final class QdrantWriteOps {
                     setPayload(collection, QdrantRetrieveRepository.FIELD_TAG_ID, group.getKey(),
                             QdrantRetrieveRepository.matchAny(QdrantRetrieveRepository.FIELD_CHUNK_ID, group.getValue()));
                 } catch (RuntimeException e) {
-                    log.warn("[Qdrant] Failed to update chunks with tag_id {} in {}: {}",
-                            group.getKey(), collection, e.getMessage());
+                    log.warn("[Qdrant] Failed to update chunks with tag_id {} in {}", group.getKey(), collection, e);
                 }
             }
         }
@@ -251,7 +248,7 @@ final class QdrantWriteOps {
         try {
             return service.listCollections();
         } catch (RuntimeException e) {
-            log.error("[Qdrant] Failed to list collections: {}", e.getMessage());
+            log.error("[Qdrant] Failed to list collections", e);
             throw new IllegalStateException("failed to list collections: " + e.getMessage(), e);
         }
     }
@@ -305,7 +302,7 @@ final class QdrantWriteOps {
                 scroll = service.client.request("POST", "/collections/" + collection + "/points/scroll",
                         body);
             } catch (RuntimeException e) {
-                log.error("[Qdrant] Failed to query source points: {}", e.getMessage());
+                log.error("[Qdrant] Failed to query source points", e);
                 throw new IllegalStateException(e.getMessage(), e);
             }
             JsonNode points = scroll == null ? null : scroll.get("points");
@@ -363,7 +360,7 @@ final class QdrantWriteOps {
                     service.client.request("PUT", "/collections/" + collection + "/points",
                             upsertBody(targetPoints));
                 } catch (RuntimeException e) {
-                    log.error("[Qdrant] Failed to batch upsert target points: {}", e.getMessage());
+                    log.error("[Qdrant] Failed to batch upsert target points", e);
                     throw new IllegalStateException(
                             "failed to batch upsert target points during copy: "
                                     + e.getMessage(), e);

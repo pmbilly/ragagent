@@ -133,34 +133,53 @@ POST（SSE）                                     ← 前端 / 任意 HTTP 客�
 **前置**：JDK 21、Docker、Node 22+。
 
 ```bash
-# 1) 基础设施：PostgreSQL(15432) + Redis(16379) + 文档解析服务(50051)
+# 1) 配置：dev 端口 8083、检索驱动 postgres、固定 JWT 密钥都在这里
+cp .env.example .env
+
+# 2) 基础设施：PostgreSQL(15432) + Redis(16379) + 文档解析服务(50051)
 docker compose up -d
 
-# 2) 配置
-cp .env.example .env        # 按需修改数据库、Redis、密钥、存储目录
-
-# 3) 启动后端（默认 :8080，可用 SERVER_PORT 覆盖）
+# 3) 启动后端（:8083；bootRun 会读取仓库根的 .env）
 ./gradlew :boot:bootRun
 
-# 4) 启动前端（默认 :5173）
+# 4) 启动前端（:5173，/api 代理到 8083）
 cd frontend && npm ci && npm run dev
 ```
+
+起服前可以先体检，缺什么会直接给修复命令：
+
+```bash
+bash scripts/doctor.sh
+```
+
+也可以一条命令起基础设施 + 后端（日志落在 `/tmp/ragagent-java-server.log`）：
+
+```bash
+bash scripts/dev-up.sh              # 加 --with-frontend 连同前端一起起
+```
+
+起服日志会打印一行 `[capabilities]`（检索 / JWT 密钥来源 / 存储目录 / Redis / 流管理器）；检索关闭或 JWT 随机生成会另起 WARN。
+
+完整的文档索引（新人路径 / 维护者路径）见 [`docs/README.md`](docs/README.md)。
 
 首次使用先注册账号（**首位注册者成为该租户的 owner**）：
 
 ```bash
-curl -s -X POST http://localhost:8080/api/v1/auth/register \
+curl -s -X POST http://localhost:8083/api/v1/auth/register \
   -H 'Content-Type: application/json' \
   -d '{"username":"demo","email":"demo@example.com","password":"Passw0rd!"}'
 ```
 
-**容器化部署**
+**容器化部署**（镜像内默认 :8080，与 dev 的 :8083 无关）
 
 ```bash
 docker build -t ragagent-server .
 docker run --rm -p 8080:8080 --env-file .env ragagent-server
 ```
 
+> 容器内的 `localhost` 指向容器自身：`.env` 里的 `DB_HOST=localhost` 只适用于 host-run。
+> 容器部署需要把 `DB_HOST`/`REDIS_HOST` 指向容器可达的地址，并为
+> `LOCAL_STORAGE_BASE_DIR`（镜像默认 `/app/data/files`）挂持久卷。
 > 镜像内已包含 Flyway 迁移脚本，路径与镜像的 `WORKDIR` 绑定；调整工作目录或迁移位置时需同步 Dockerfile。
 
 ## 配置项
@@ -169,13 +188,16 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 
 | 变量 | 缺省 | 说明 |
 |---|---|---|
-| `SERVER_PORT` | 8080 | 服务端口 |
+| `SERVER_PORT` | 8080 | 服务端口（dev `.env` 用 8083） |
 | `DB_HOST` / `DB_PORT` | localhost / 15432 | PostgreSQL（ParadeDB） |
 | `DB_USER` / `DB_PASSWORD` / `DB_NAME` | — | 数据库凭据与库名 |
 | `REDIS_HOST` / `REDIS_PORT` | localhost / 16379 | 事件流、限流与跨实例协调 |
+| `REDIS_PASSWORD` | — | 仅当 Redis 开启 requirepass 时设置 |
 | `DOCREADER_ADDR` | localhost:50051 | 文档解析 gRPC 地址 |
-| `SYSTEM_AES_KEY` | — | 敏感配置（模型密钥等）的落库加密密钥 |
-| `LOCAL_STORAGE_BASE_DIR` | — | 本地存储根目录，**必须指向持久化目录**（放入系统临时目录会导致原始文件被清理且不可恢复） |
+| `SYSTEM_AES_KEY` | — | 敏感配置（模型密钥等）的落库加密密钥，必填 |
+| `JWT_SECRET` | 随机生成 | JWT 签名密钥；不设会重启掉登录，生产必须固定 |
+| `RETRIEVE_DRIVER` | 空 | 检索引擎列表；**为空 = 检索关闭**，dev 填 `postgres` |
+| `LOCAL_STORAGE_BASE_DIR` | `${user.home}/ragagent-data/files` | 本地存储根目录，必须持久化；勿放 `/tmp` |
 
 完整清单见 [`.env.example`](.env.example)；全部可调开关（模型并发、流管理器后端、各域 Redis 开关等）见 `application.yml`。
 

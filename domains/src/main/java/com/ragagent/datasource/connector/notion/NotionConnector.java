@@ -395,7 +395,7 @@ public final class NotionConnector implements Connector {
         try {
             allPages = client.searchPages();
         } catch (ConnectorException e) {
-            log.warn("[Notion] failed to search pages for discovery: {}", e.getMessage());
+            log.warn("[Notion] failed to search pages for discovery", e);
             return new DiscoverResult(new ArrayList<>(), new LinkedHashMap<>());
         }
 
@@ -502,7 +502,7 @@ public final class NotionConnector implements Connector {
         try {
             visible = listResources(config, "");
         } catch (ConnectorException e) {
-            log.warn("[Notion] failed to list visible resources for exclusion: {}", e.getMessage());
+            log.warn("[Notion] failed to list visible resources for exclusion", e);
             return new LinkedHashMap<>();
         }
         List<String> ids = new ArrayList<>(visible.size());
@@ -536,8 +536,7 @@ public final class NotionConnector implements Connector {
                     try {
                         resolved = client.resolveBlock(block.id());
                     } catch (ConnectorException e) {
-                        log.warn("[Notion] failed to resolve file_upload in block {}: {}",
-                                block.id(), e.getMessage());
+                        log.warn("[Notion] failed to resolve file_upload in block {}", block.id(), e);
                         continue;
                     }
                     block.rawContent = resolved.rawContent;

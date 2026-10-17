@@ -66,14 +66,14 @@ final class WikiIngestEnqueueOps {
         try {
             op = newWikiIngestPendingOp(tenantId, kbId, knowledgeId);
         } catch (Exception e) {
-            log.warn("wiki ingest: failed to marshal pending op for {}: {}", knowledgeId, e.getMessage());
+            log.warn("wiki ingest: failed to marshal pending op for {}", knowledgeId, e);
             return new WikiIngestPort.EnqueueResult(false, e);
         }
         boolean accepted;
         try {
             accepted = enqueueWikiPendingOp(op);
         } catch (Exception e) {
-            log.warn("wiki ingest: failed to enqueue pending op for {}: {}", knowledgeId, e.getMessage());
+            log.warn("wiki ingest: failed to enqueue pending op for {}", knowledgeId, e);
             return new WikiIngestPort.EnqueueResult(false, e);
         }
         if (!accepted) {
@@ -202,7 +202,7 @@ final class WikiIngestEnqueueOps {
         try {
             return enqueueWikiPendingOp(op);
         } catch (Exception e) {
-            log.warn("wiki finalize: enqueue {} row failed: {}", op.getOp(), e.getMessage());
+            log.warn("wiki finalize: enqueue {} row failed", op.getOp(), e);
             return false;
         }
     }

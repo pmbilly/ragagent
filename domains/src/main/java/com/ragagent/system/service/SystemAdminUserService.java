@@ -137,7 +137,7 @@ public class SystemAdminUserService {
                     AuditOutcome.SUCCESS,
                     detailsNode.toString()));
         } catch (RuntimeException e) {
-            log.warn("system admin audit write failed (ignored): {}", e.toString());
+            log.warn("system admin audit write failed (ignored)", e);
         }
     }
 

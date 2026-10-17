@@ -83,7 +83,7 @@ final class QaWebSearchParams {
                     }
                 }
             } catch (RuntimeException | com.fasterxml.jackson.core.JsonProcessingException e) {
-                log.warn("resolveWebSearchMaxResults tenant config parse failed: {}", e.getMessage());
+                log.warn("resolveWebSearchMaxResults tenant config parse failed", e);
             }
         }
         return 10; // types.DefaultWebSearchMaxResults

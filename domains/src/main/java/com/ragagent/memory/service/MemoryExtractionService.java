@@ -173,7 +173,7 @@ public class MemoryExtractionService {
         try {
             subject = repo.ensureSubject(scope);
         } catch (RuntimeException e) {
-            log.warn("memory: ensure subject for extraction failed: {}", e.toString());
+            log.warn("memory: ensure subject for extraction failed", e);
             return;
         }
         if (!subject.isEnabled()) {
@@ -186,7 +186,7 @@ public class MemoryExtractionService {
             enqueued = repo.enqueuePendingSession(scope, sessionId,
                     cfg.extractMinInterval().plus(delay).plus(EXTRACT_IN_FLIGHT_GRACE));
         } catch (RuntimeException e) {
-            log.warn("memory: record pending session failed: {}", e.toString());
+            log.warn("memory: record pending session failed", e);
             return;
         }
         if (!enqueued.shouldSend()) {
@@ -230,7 +230,7 @@ public class MemoryExtractionService {
         try {
             queue.enqueue(payload, delay);
         } catch (RuntimeException e) {
-            log.warn("memory: enqueue extraction failed: {}", e.toString());
+            log.warn("memory: enqueue extraction failed", e);
             releaseSlot(scope);
             throw e;
         }
@@ -242,7 +242,7 @@ public class MemoryExtractionService {
         try {
             repo.releaseExtractionSlot(scope, "");
         } catch (RuntimeException e) {
-            log.warn("memory: release extraction slot failed: {}", e.toString());
+            log.warn("memory: release extraction slot failed", e);
         }
     }
 
@@ -386,7 +386,7 @@ public class MemoryExtractionService {
             try {
                 repo.releaseExtractionSlot(scope, leaseId);
             } catch (RuntimeException e) {
-                log.warn("memory: release worker lease failed: {}", e.toString());
+                log.warn("memory: release worker lease failed", e);
             }
         }
     }

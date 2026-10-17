@@ -72,7 +72,7 @@ final class ImQaRunner {
             try {
                 prepared = service.attachmentPreparer.prepare(msg, attach.adapter());
             } catch (Exception e) {
-                log.warn("[IM] attachment preparation failed: {}", e.getMessage());
+                log.warn("[IM] attachment preparation failed", e);
                 service.sendReplyQuiet(attach.adapter(), msg,
                         new ReplyMessage("❌ 无法读取此附件，请重试或改用文字描述。", false, true));
                 return;
@@ -87,7 +87,7 @@ final class ImQaRunner {
                     try {
                         handleMessageFullOutput(msg, attach, prepared, progress);
                     } catch (Exception e) {
-                        log.error("[IM] Full-output QA failed: {}", e.getMessage(), e);
+                        log.error("[IM] Full-output QA failed", e);
                     }
                     return;
                 }
@@ -95,7 +95,7 @@ final class ImQaRunner {
                 try {
                     service.streamPipeline.handleMessageStream(msg, attach, prepared, streamer);
                 } catch (Exception e) {
-                    log.error("[IM] Stream QA failed: {}", e.getMessage(), e);
+                    log.error("[IM] Stream QA failed", e);
                 }
                 return;
             }
@@ -128,7 +128,7 @@ final class ImQaRunner {
         try {
             streamId = streamer.startStream(msg);
         } catch (Exception e) {
-            log.warn("[IM] StartStream failed for full output, falling back: {}", e.getMessage());
+            log.warn("[IM] StartStream failed for full output, falling back", e);
             runFallbackNonStream(attach, prepared);
             return;
         }
@@ -144,12 +144,12 @@ final class ImQaRunner {
             streamer.finalizeStream(msg, streamId, finalContent);
         } catch (Exception e) {
             finalizeErr = e;
-            log.warn("[IM] FinalizeStream failed for full output: {}", e.getMessage());
+            log.warn("[IM] FinalizeStream failed for full output", e);
         }
         try {
             streamer.endStream(msg, streamId);
         } catch (Exception e) {
-            log.warn("[IM] EndStream failed for full output: {}", e.getMessage());
+            log.warn("[IM] EndStream failed for full output", e);
         }
         if (finalizeErr != null) {
             service.sendReplyQuiet(attach.adapter(), msg, new ReplyMessage(finalContent, false, true));
@@ -289,7 +289,7 @@ final class ImQaRunner {
         try {
             service.sessionQaPort.updateMessage(assistantMsg);
         } catch (Exception e) {
-            log.warn("[IM] Failed to update assistant message: {}", e.getMessage());
+            log.warn("[IM] Failed to update assistant message", e);
         }
         return new QaOutcome(answer, null);
     }

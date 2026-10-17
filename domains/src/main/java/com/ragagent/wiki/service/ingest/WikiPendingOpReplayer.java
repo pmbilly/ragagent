@@ -51,7 +51,7 @@ public class WikiPendingOpReplayer {
         try {
             kbIds = pendingRepo.distinctIngestScopeIds(WikiIngestConstants.TASK_TYPE);
         } catch (RuntimeException e) {
-            log.warn("wiki orphan replay: list pending scopes failed: {}", e.getMessage());
+            log.warn("wiki orphan replay: list pending scopes failed", e);
             return;
         }
         if (kbIds == null || kbIds.isEmpty()) {
@@ -66,7 +66,7 @@ public class WikiPendingOpReplayer {
                 ingestService.enqueueWikiIngestTrigger(tenantOf(kbId), kbId);
                 replayed++;
             } catch (RuntimeException e) {
-                log.warn("wiki orphan replay: enqueue for KB {} failed: {}", kbId, e.getMessage());
+                log.warn("wiki orphan replay: enqueue for KB {} failed", kbId, e);
             }
         }
         log.info("wiki orphan replay: re-triggered {} KB(s) holding pending ingest ops", replayed);
@@ -81,7 +81,7 @@ public class WikiPendingOpReplayer {
                 return rows.get(0).getTenantId();
             }
         } catch (RuntimeException e) {
-            log.debug("wiki orphan replay: tenant lookup failed for KB {}: {}", kbId, e.getMessage());
+            log.debug("wiki orphan replay: tenant lookup failed for KB {}", kbId, e);
         }
         return 0L;
     }

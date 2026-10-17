@@ -27,12 +27,12 @@ public final class PluginWebFetch implements Plugin {
     }
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.WEB_FETCH};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.WEB_FETCH};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         if (!chatManage.isWebFetchEnabled() || !chatManage.isWebSearchEnabled()) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("reason", "disabled");

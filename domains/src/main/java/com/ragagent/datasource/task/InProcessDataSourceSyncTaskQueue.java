@@ -139,7 +139,7 @@ public class InProcessDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue
             payload = DataSourceSyncPayload.fromJson(body);
         } catch (RuntimeException e) {
             // 载荷坏掉是确定性的失败：重试多少次都一样，直接放弃
-            log.error("[DataSourceSyncQueue] undecodable payload: {}", e.getMessage());
+            log.error("[DataSourceSyncQueue] undecodable payload", e);
             return true;
         }
 
@@ -182,8 +182,7 @@ public class InProcessDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue
             log.error("[DataSourceSyncQueue] task timed out after {}ms", timeoutMillis);
             return false;
         } catch (ExecutionException e) {
-            log.error("[DataSourceSyncQueue] task failed: {}",
-                    e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
+            log.error("[DataSourceSyncQueue] task failed", e);
             return false;
         } catch (InterruptedException e) {
             future.cancel(true);

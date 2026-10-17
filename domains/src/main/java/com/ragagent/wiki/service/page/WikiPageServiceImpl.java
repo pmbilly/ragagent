@@ -434,7 +434,7 @@ public class WikiPageServiceImpl implements WikiPageService {
             cleaner.deleteWikiPageChunk(page.getTenantId(),
                     WikiChunkCleaner.chunkIdFor(page.getId()));
         } catch (RuntimeException e) {
-            log.warn("wiki: failed to delete chunk for page {}: {}", page.getSlug(), e.toString());
+            log.warn("wiki: failed to delete chunk for page {}", page.getSlug(), e);
         }
     }
 

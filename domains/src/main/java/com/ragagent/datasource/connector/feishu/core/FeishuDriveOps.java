@@ -135,8 +135,7 @@ final class FeishuDriveOps {
             RuntimeException wrapped = new ConnectorException(
                     "list children of " + folderToken + ": " + e.getMessage(), e);
             failures.add(new DriveFileListFailure(folderToken, wrapped));
-            log.warn("[FeishuDrive] partial drive file listing failure: folder={} err={}",
-                    folderToken, e.getMessage());
+            log.warn("[FeishuDrive] partial drive file listing failure: folder={}", folderToken, e);
             return;
         }
 

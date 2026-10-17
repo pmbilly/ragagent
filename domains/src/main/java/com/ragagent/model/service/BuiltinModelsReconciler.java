@@ -57,7 +57,7 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
             }
             reconcile(path);
         } catch (Exception e) {
-            log.warn("[builtin-models] reconcile failed: {}; continuing", e.toString());
+            log.warn("[builtin-models] reconcile failed; continuing", e);
         }
     }
 

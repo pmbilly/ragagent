@@ -40,8 +40,7 @@ public final class StreamStopWatcher {
                     batch = streamManager.getEvents(sessionId, messageId, offset);
                 } catch (RuntimeException e) {
                     // 瞬态读错误：跳过本轮
-                    log.warn("stop watcher poll failed: session={} message={}: {}",
-                            sessionId, messageId, e.getMessage());
+                    log.warn("stop watcher poll failed: session={} message={}", sessionId, messageId, e);
                     if (!sleepQuietly()) {
                         return;
                     }

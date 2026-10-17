@@ -96,7 +96,7 @@ public class YunzhijiaLongConnClient {
                 Thread.currentThread().interrupt();
                 return;
             } catch (Exception e) {
-                log.warn("[Yunzhijia] WebSocket error: {}", e.toString());
+                log.warn("[Yunzhijia] WebSocket error", e);
             }
             if (closed.get()) {
                 return;
@@ -174,7 +174,7 @@ public class YunzhijiaLongConnClient {
                     frame = parseWebSocketFrame(raw);
                 } catch (RuntimeException e) {
                     invalidFrames++;
-                    log.warn("[Yunzhijia] Invalid WebSocket frame: {}", e.getMessage());
+                    log.warn("[Yunzhijia] Invalid WebSocket frame", e);
                     if (invalidFrames >= MAX_INVALID_FRAMES) {
                         throw new IllegalStateException("too many invalid websocket frames");
                     }
@@ -197,7 +197,7 @@ public class YunzhijiaLongConnClient {
                         msgHandler.accept(incoming, channelId);
                     }
                 } catch (Exception e) {
-                    log.error("[Yunzhijia] Handle WebSocket message failed: {}", e.toString());
+                    log.error("[Yunzhijia] Handle WebSocket message failed", e);
                 }
             }
         } finally {
@@ -223,7 +223,7 @@ public class YunzhijiaLongConnClient {
                     socket.sendPing(ByteBuffer.wrap(new byte[0]))
                             .get(5, TimeUnit.SECONDS);
                 } catch (Exception e) {
-                    log.warn("[Yunzhijia] WebSocket heartbeat failed: {}", e.toString());
+                    log.warn("[Yunzhijia] WebSocket heartbeat failed", e);
                     socket.abort();
                     return;
                 }
@@ -247,7 +247,7 @@ public class YunzhijiaLongConnClient {
             try {
                 socket.abort();
             } catch (RuntimeException e) {
-                log.debug("[Yunzhijia] abort failed: {}", e.toString());
+                log.debug("[Yunzhijia] abort failed", e);
             }
             ws = null;
         }
@@ -387,7 +387,7 @@ public class YunzhijiaLongConnClient {
 
         @Override
         public void onError(WebSocket socket, Throwable error) {
-            log.warn("[Yunzhijia] WebSocket error: {}", error.toString());
+            log.warn("[Yunzhijia] WebSocket error", error);
             inbox.offer(CLOSED_SENTINEL);
         }
     }

@@ -206,7 +206,7 @@ final class MemoryVectorStore {
             try {
                 writeVectorColumn(row.getItemId(), row.getVector());
             } catch (RuntimeException e) {
-                log.warn("memory: sync vector column failed for {}: {}", row.getItemId(), e.getMessage());
+                log.warn("memory: sync vector column failed for {}", row.getItemId(), e);
                 continue;
             }
             moved++;
@@ -319,7 +319,7 @@ final class MemoryVectorStore {
                     return true;
                 }
             } catch (SQLException e) {
-                log.warn("memory: failed to probe column {}.{}: {}", table, column, e.getMessage());
+                log.warn("memory: failed to probe column {}.{}", table, column, e);
             }
         }
         return false;

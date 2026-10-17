@@ -47,12 +47,12 @@ public final class PluginSearchEntity implements Plugin {
     }
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.ENTITY_SEARCH};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.ENTITY_SEARCH};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         List<String> entity = chatManage.getEntity();
         if (entity == null || entity.isEmpty()) {
             PipelineLog.info("search_entity", "no_entity", new LinkedHashMap<>());

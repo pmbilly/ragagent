@@ -196,11 +196,10 @@ final class HybridFusionOps {
                         .collect(java.util.stream.Collectors.toList());
             } catch (BizException e) {
                 // 类型化失败（组超时/绑定失效）如实上抛——不静默截断。
-                log.warn("Iterative retrieval surfaced typed failure at iteration {}: {}",
-                        i + 1, e.getMessage());
+                log.warn("Iterative retrieval surfaced typed failure at iteration {}", i + 1, e);
                 throw e;
             } catch (RuntimeException e) {
-                log.warn("Iterative retrieval failed at iteration {}: {}", i + 1, e.getMessage());
+                log.warn("Iterative retrieval failed at iteration {}", i + 1, e);
                 break;
             }
             if (iterationResults.isEmpty()) {
@@ -221,7 +220,7 @@ final class HybridFusionOps {
                         chunkDataCache.put(c.id(), c);
                     }
                 } catch (Exception e) {
-                    log.warn("Failed to fetch chunks at iteration {}: {}", i + 1, e.getMessage());
+                    log.warn("Failed to fetch chunks at iteration {}", i + 1, e);
                 }
             }
             for (EngineTypes.IndexWithScore result : iterationResults) {
@@ -300,7 +299,7 @@ final class HybridFusionOps {
                 cache.put(c.id(), c);
             }
         } catch (Exception e) {
-            log.warn("Failed to fetch chunks for negative question filtering: {}", e.getMessage());
+            log.warn("Failed to fetch chunks for negative question filtering", e);
             return chunks;
         }
         List<EngineTypes.IndexWithScore> result = new ArrayList<>();

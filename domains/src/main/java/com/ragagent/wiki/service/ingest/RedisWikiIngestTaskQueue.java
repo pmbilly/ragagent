@@ -221,14 +221,14 @@ public class RedisWikiIngestTaskQueue implements WikiIngestTaskQueue {
                         queued = fromJson(m);
                     } catch (RuntimeException e) {
                         // 损坏成员：丢弃（留在 proc 会永远回收重试）
-                        log.warn("wiki task queue: dropping corrupt task member: {}", e.toString());
+                        log.warn("wiki task queue: dropping corrupt task member", e);
                         completeMember(m, "");
                         continue;
                     }
                     worker.execute(() -> run(queued, m));
                 }
             } catch (Throwable t) {
-                log.warn("wiki task queue: dispatch loop error: {}", t.toString());
+                log.warn("wiki task queue: dispatch loop error", t);
             }
             try {
                 Thread.sleep(DISPATCH_INTERVAL_MILLIS);
@@ -321,7 +321,7 @@ public class RedisWikiIngestTaskQueue implements WikiIngestTaskQueue {
             }
         } catch (RuntimeException e) {
             // 重排失败：proc 中的成员等租约过期被回收重跑（重试计数偏差一次，可接受）
-            log.warn("wiki task queue: requeue failed: {}", e.toString());
+            log.warn("wiki task queue: requeue failed", e);
         }
     }
 
@@ -331,7 +331,7 @@ public class RedisWikiIngestTaskQueue implements WikiIngestTaskQueue {
                     member, Long.toString(System.currentTimeMillis() + LEASE_MILLIS));
         } catch (RuntimeException e) {
             // best-effort：漏续期只让任务被提前回收重投（至少一次语义容忍）
-            log.debug("wiki task queue: lease renew failed: {}", e.toString());
+            log.debug("wiki task queue: lease renew failed", e);
         }
     }
 
@@ -341,7 +341,7 @@ public class RedisWikiIngestTaskQueue implements WikiIngestTaskQueue {
         } catch (RuntimeException e) {
             // 清理失败：proc 成员等租约过期回收后重跑一次（DB 行级认领兜住重复）；
             // TaskID 键靠 TTL 释放
-            log.warn("wiki task queue: complete failed: {}", e.toString());
+            log.warn("wiki task queue: complete failed", e);
         }
     }
 

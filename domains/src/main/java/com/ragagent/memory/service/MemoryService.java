@@ -285,7 +285,7 @@ public class MemoryService {
         try {
             node = JsonMappers.toJsonNode(tenantService.memoryConfig(tenantId));
         } catch (RuntimeException e) {
-            log.warn("memory: load workspace config failed: {}", e.toString());
+            log.warn("memory: load workspace config failed", e);
             return new MemoryConfig();
         }
         if (node == null || node.isNull()) {
@@ -295,7 +295,7 @@ public class MemoryService {
         try {
             cfg = CONFIG_MAPPER.treeToValue(node, MemoryConfig.class);
         } catch (Exception e) {
-            log.warn("memory: unparsable workspace memory config: {}", e.toString());
+            log.warn("memory: unparsable workspace memory config", e);
             return new MemoryConfig();
         }
         if (cfg == null) {
@@ -331,7 +331,7 @@ public class MemoryService {
         try {
             subject = repo.getSubject(scope);
         } catch (RuntimeException e) {
-            log.warn("memory: load subject failed: {}", e.toString());
+            log.warn("memory: load subject failed", e);
             return new ScopeState(scope, cfg, false);
         }
         // 主体行在第一次写入时创建。它不存在意味着这个人还什么都没存，
@@ -422,7 +422,7 @@ public class MemoryService {
             try {
                 repo.touchUsed(scope, ids);
             } catch (RuntimeException e) {
-                log.warn("memory: touch used failed: {}", e.toString());
+                log.warn("memory: touch used failed", e);
             }
         });
     }
@@ -623,7 +623,7 @@ public class MemoryService {
         try {
             count = repo.countActive(scope);
         } catch (RuntimeException e) {
-            log.warn("memory: count active failed: {}", e.toString());
+            log.warn("memory: count active failed", e);
             return;
         }
         if (count <= maxItems) {
@@ -633,7 +633,7 @@ public class MemoryService {
         try {
             archived = repo.archiveLowestRanked(scope, maxItems);
         } catch (RuntimeException e) {
-            log.warn("memory: archive overflow failed: {}", e.toString());
+            log.warn("memory: archive overflow failed", e);
             return;
         }
         log.info("memory: archived {} items over the {} cap", archived, maxItems);
@@ -648,21 +648,21 @@ public class MemoryService {
         try {
             items = repo.listActiveResident(scope, 60);
         } catch (RuntimeException e) {
-            log.warn("memory: rebuild block load failed: {}", e.toString());
+            log.warn("memory: rebuild block load failed", e);
             return;
         }
         long count;
         try {
             count = repo.countActive(scope);
         } catch (RuntimeException e) {
-            log.warn("memory: rebuild block count failed: {}", e.toString());
+            log.warn("memory: rebuild block count failed", e);
             return;
         }
         String block = MemoryRender.renderMemoryBlock(items);
         try {
             repo.updateSubjectBlock(scope, block, (int) count);
         } catch (RuntimeException e) {
-            log.warn("memory: rebuild block store failed: {}", e.toString());
+            log.warn("memory: rebuild block store failed", e);
         }
     }
 
@@ -714,7 +714,7 @@ public class MemoryService {
         try {
             models = modelResolver.listModels();
         } catch (RuntimeException e) {
-            log.warn("memory: list models for extraction fallback failed: {}", e.toString());
+            log.warn("memory: list models for extraction fallback failed", e);
             return "";
         }
         if (models == null) {

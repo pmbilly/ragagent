@@ -110,7 +110,7 @@ public class AgentEngineFactoryImpl implements AgentEngineFactory {
             } catch (Exception e) {
                 // 降级：技能读取失败不阻断本轮对话（与宿主目录时代「目录打错字不 500」同口径）
                 skillsManager = null;
-                log.error("skills disabled for this run: {}", e.getMessage());
+                log.error("skills disabled for this run", e);
             }
         }
         toolRegistry.prepareMcpTools();

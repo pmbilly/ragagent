@@ -51,7 +51,7 @@ final class WeaviateSearchOps {
         try {
             exists = service.client.classExists(collection);
         } catch (RuntimeException e) {
-            log.error("[Weaviate] Failed to check collection existence: {}", e.getMessage());
+            log.error("[Weaviate] Failed to check collection existence", e);
             throw new IllegalStateException("failed to check collection: " + e.getMessage(), e);
         }
         if (!exists) {
@@ -66,7 +66,7 @@ final class WeaviateSearchOps {
         try {
             result = service.client.graphql(query);
         } catch (RuntimeException e) {
-            log.error("[Weaviate] Vector search failed: {}", e.getMessage());
+            log.error("[Weaviate] Vector search failed", e);
             throw new IllegalStateException("failed to search: " + e.getMessage(), e);
         }
         JsonNode items = WeaviateRetrieveRepository.extractItems(result, collection);
@@ -105,7 +105,7 @@ final class WeaviateSearchOps {
             try {
                 result = service.client.graphql(gql);
             } catch (RuntimeException e) {
-                log.error("[Weaviate] keywords search failed: {}", e.getMessage());
+                log.error("[Weaviate] keywords search failed", e);
                 throw new IllegalStateException("failed to search: " + e.getMessage(), e);
             }
             JsonNode items = WeaviateRetrieveRepository.extractItems(result, collection);

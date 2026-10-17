@@ -175,7 +175,7 @@ public class ParserEngineRegistry {
             }
             return mapped;
         } catch (RuntimeException e) {
-            log.warn("Failed to fetch remote engines from docreader: {}", e.toString());
+            log.warn("Failed to fetch remote engines from docreader", e);
             return null;
         }
     }

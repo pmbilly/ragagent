@@ -213,7 +213,7 @@ public class WeaviateRetrieveRepository
         try {
             exists = client.classExists(name);
         } catch (RuntimeException e) {
-            log.error("[Weaviate] Failed to check collection existence: {}", e.getMessage());
+            log.error("[Weaviate] Failed to check collection existence", e);
             throw new IllegalStateException(
                     "failed to check collection existence: " + e.getMessage(), e);
         }
@@ -222,7 +222,7 @@ public class WeaviateRetrieveRepository
             try {
                 client.createClass(classBodyWithClusterOptions(name, dimension));
             } catch (RuntimeException e) {
-                log.error("[Weaviate] Failed to create collection: {}", e.getMessage());
+                log.error("[Weaviate] Failed to create collection", e);
                 throw new IllegalStateException(
                         "failed to create collection: " + e.getMessage(), e);
             }
@@ -307,7 +307,7 @@ public class WeaviateRetrieveRepository
         try {
             return listCollections();
         } catch (RuntimeException e) {
-            log.error("[Weaviate] Failed to list collections: {}", e.getMessage());
+            log.error("[Weaviate] Failed to list collections", e);
             throw new IllegalStateException("failed to list collections: " + e.getMessage(), e);
         }
     }

@@ -119,7 +119,7 @@ public class OllamaService implements OllamaAdminPort {
                 }
                 isAvailable = true;
             } catch (Exception e) {
-                log.warn("ollama service unavailable: {}", e.toString());
+                log.warn("ollama service unavailable", e);
                 isAvailable = false;
                 if (isOptional) {
                     log.info("ollama service set as optional, will continue running the application");
@@ -346,7 +346,7 @@ public class OllamaService implements OllamaAdminPort {
                     try {
                         modifiedAt = OffsetDateTime.parse(modifiedAtRaw);
                     } catch (RuntimeException e) {
-                        log.debug("unparsable model modified_at {}: {}", modifiedAtRaw, e.toString());
+                        log.debug("unparsable model modified_at {}", modifiedAtRaw, e);
                     }
                 }
                 models.add(new OllamaModelInfo(name, model.path("size").asLong(0),

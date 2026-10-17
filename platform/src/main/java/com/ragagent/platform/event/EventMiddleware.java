@@ -37,7 +37,7 @@ public interface EventMiddleware {
             try {
                 next.handle(event);
             } catch (Exception e) {
-                log.error("Event handler error: type={}, error={}", event.getType(), e.toString());
+                log.error("Event handler error: type={}", event.getType(), e);
                 throw e;
             }
             log.debug("Event handled successfully: type={}", event.getType());
@@ -73,7 +73,7 @@ public interface EventMiddleware {
                 next.handle(event);
             } catch (Throwable t) {
                 // 记日志并抛 PanicError
-                log.error("Event handler panic: type={}, panic={}", event.getType(), t.toString());
+                log.error("Event handler panic: type={}", event.getType(), t);
                 throw new PanicError(t);
             }
         };

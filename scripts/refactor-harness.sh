@@ -53,7 +53,7 @@ PYEOF
 # ── ⑤ 文档 + 提交（两关都过才提交） ─────────────────────────────────────
 if [ "$(cat /tmp/tests_ok)" = "ok" ] && [ -f /tmp/faith_ok ]; then
   # [填这里]：§11 总览表加一行 + §14.3 计数刷新（实测值）
-  git add -A server/src HANDOFF.md && git commit -q -F /tmp/msg.txt && git push 2>&1 | tail -2
+  git add -A server/src docs/internal/HANDOFF.md && git commit -q -F /tmp/msg.txt && git push 2>&1 | tail -2
   git --no-pager log --oneline -1
 else
   echo "[测试或忠实性未过，不提交]"

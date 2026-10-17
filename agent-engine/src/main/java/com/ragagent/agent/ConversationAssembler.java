@@ -91,7 +91,7 @@ final class ConversationAssembler {
                 Skill skill = manager.loadSkill(item.name());
                 out.add(new PinnedSkillInstructions(item.name(), skill.instructions));
             } catch (Exception e) {
-                log.warn("[Agent][Prompt] pinned skill \"{}\" not injected: {}", item.name(), e.getMessage());
+                log.warn("[Agent][Prompt] pinned skill \"{}\" not injected", item.name(), e);
             }
         }
         return out;

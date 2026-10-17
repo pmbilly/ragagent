@@ -75,7 +75,7 @@ public class ModelController {
             try {
                 ssrfGuard.validateURLForSSRF(parameters.getBaseUrl());
             } catch (SsrfGuard.SsrfException e) {
-                log.warn("SSRF validation failed for model BaseURL: {}", e.getMessage());
+                log.warn("SSRF validation failed for model BaseURL", e);
                 throw new BizException(AppError.badRequest(
                         ssrfGuard.formatSSRFError("Base URL", parameters.getBaseUrl(), e)));
             }
@@ -160,7 +160,7 @@ public class ModelController {
             try {
                 ssrfGuard.validateURLForSSRF(req.parameters().baseUrl());
             } catch (SsrfGuard.SsrfException e) {
-                log.warn("SSRF validation failed for model BaseURL: {}", e.getMessage());
+                log.warn("SSRF validation failed for model BaseURL", e);
                 throw new BizException(AppError.badRequest(
                         ssrfGuard.formatSSRFError("Base URL", req.parameters().baseUrl(), e)));
             }

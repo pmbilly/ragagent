@@ -243,7 +243,7 @@ public class MilvusRetrieveRepository
         try {
             has = client.hasCollection(name);
         } catch (RuntimeException e) {
-            log.error("[Milvus] Failed to check collection existence: {}", e.getMessage());
+            log.error("[Milvus] Failed to check collection existence", e);
             throw new IllegalStateException(
                     "failed to check collection existence: " + e.getMessage(), e);
         }
@@ -252,7 +252,7 @@ public class MilvusRetrieveRepository
             try {
                 client.createCollection(collectionBody(name, dimension));
             } catch (RuntimeException e) {
-                log.error("[Milvus] Failed to create collection: {}", e.getMessage());
+                log.error("[Milvus] Failed to create collection", e);
                 throw new IllegalStateException(
                         "failed to create collection: " + e.getMessage(), e);
             }
@@ -261,7 +261,7 @@ public class MilvusRetrieveRepository
         try {
             client.loadCollection(name, replicaNumber);
         } catch (RuntimeException e) {
-            log.error("[Milvus] Failed to load collection: {}", e.getMessage());
+            log.error("[Milvus] Failed to load collection", e);
             throw new IllegalStateException("failed to load collection: " + e.getMessage(), e);
         }
         initializedCollections.put(dimension, true);
@@ -390,7 +390,7 @@ public class MilvusRetrieveRepository
         try {
             return client.listCollections();
         } catch (RuntimeException e) {
-            log.error("[Milvus] Failed to list collections: {}", e.getMessage());
+            log.error("[Milvus] Failed to list collections", e);
             throw new IllegalStateException("failed to list collections: " + e.getMessage(), e);
         }
     }

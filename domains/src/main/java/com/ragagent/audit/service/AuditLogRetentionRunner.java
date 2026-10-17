@@ -158,8 +158,7 @@ public class AuditLogRetentionRunner {
         try {
             deleted = svc.purge(retentionDays);
         } catch (RuntimeException e) {
-            log.warn("[audit-retention] sweep failed: retention_days={} err={}",
-                    retentionDays, e.getMessage());
+            log.warn("[audit-retention] sweep failed: retention_days={}", retentionDays, e);
             return;
         }
         if (deleted > 0) {

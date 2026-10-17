@@ -79,8 +79,7 @@ final class ThinkPhase {
         try {
             stream = engine.chatModel.chatStream(encoded, opts);
         } catch (RuntimeException e) {
-            log.error("[Agent][Stream] Failed to start LLM stream: {}",
-                    e.getMessage() == null ? e.toString() : e.getMessage());
+            log.error("[Agent][Stream] Failed to start LLM stream", e);
             throw new AgentEngineException(e.getMessage() == null ? e.toString() : e.getMessage());
         }
 
@@ -484,8 +483,7 @@ final class ThinkPhase {
         if (error != null && !engine.overflowRecovered
                 && CompactionOverflow.isOverflowError(error.getMessage() == null ? "" : error.getMessage())) {
             engine.overflowRecovered = true;
-            log.warn("[Agent][Round-{}] Provider rejected the request as too large; compacting and retrying once: {}",
-                    round, error.getMessage());
+            log.warn("[Agent][Round-{}] Provider rejected the request as too large; compacting and retrying once", round, error);
             // 引擎的副本保持未清洗。清洗会并掉连续同角色消息，而摘要是条 user 消息、
             // 可能紧贴真用户消息——并掉会把活对话折进摘要信封，下次压缩读不出来。
             List<ChatMessage> compacted = engine.observe.forceCompaction(messages, round);
@@ -505,8 +503,7 @@ final class ThinkPhase {
             // 瞬态错误（超时/限流/服务器错误）最多重试 MAX_LLM_RETRIES 次。
             for (int retry = 1; retry <= AgentConsts.MAX_LLM_RETRIES; retry++) {
                 long retryDelayMs = retry * 1000L;
-                log.warn("[Agent][Round-{}] LLM transient error (attempt {}/{}), retrying in {}ms: {}",
-                        round, retry, AgentConsts.MAX_LLM_RETRIES, retryDelayMs, error.getMessage());
+                log.warn("[Agent][Round-{}] LLM transient error (attempt {}/{}), retrying in {}ms", round, retry, AgentConsts.MAX_LLM_RETRIES, retryDelayMs, error);
                 try {
                     Thread.sleep(retryDelayMs);
                 } catch (InterruptedException ie) {
@@ -526,9 +523,8 @@ final class ThinkPhase {
             }
         }
         if (error != null) {
-            log.error("[Agent][Round-{}] LLM call failed: {}", round, error.getMessage());
-            log.info("[PIPELINE] stage=Agent action=think_failed iteration={} error=\"{}\"",
-                    iteration, error.getMessage());
+            log.error("[Agent][Round-{}] LLM call failed", round, error);
+            log.info("[PIPELINE] stage=Agent action=think_failed iteration={} error=\"\"", iteration, error);
 
             // 优雅降级：有历史工具结果时从它们合成最终答案，而不是全丢。
             int totalTC = AgentEngine.countTotalToolCalls(state.getRoundSteps());
@@ -540,7 +536,7 @@ final class ThinkPhase {
                 try {
                     engine.finalize.streamFinalAnswerToEventBus(query, state, sessionId, messages);
                 } catch (RuntimeException synthErr) {
-                    log.error("[Agent] Final answer synthesis also failed: {}", synthErr.getMessage());
+                    log.error("[Agent] Final answer synthesis also failed", synthErr);
                     throw new AgentEngineException("LLM call failed: " + error.getMessage()
                             + " (synthesis also failed: " + synthErr.getMessage() + ")");
                 }

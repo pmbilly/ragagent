@@ -67,7 +67,7 @@ final class McpServiceCrudOps {
         try {
             McpServiceUrls.validateServiceOutboundUrls(service);
         } catch (RuntimeException e) {
-            log.warn("SSRF validation failed for MCP service configuration: {}", e.getMessage());
+            log.warn("SSRF validation failed for MCP service configuration", e);
             throw BizException.badRequest(e.getMessage());
         }
 
@@ -270,7 +270,7 @@ final class McpServiceCrudOps {
         try {
             McpServiceUrls.validateServiceOutboundUrls(service);
         } catch (RuntimeException e) {
-            log.warn("SSRF validation failed for MCP service update: {}", e.getMessage());
+            log.warn("SSRF validation failed for MCP service update", e);
             throw BizException.badRequest(e.getMessage());
         }
 
@@ -384,7 +384,7 @@ final class McpServiceCrudOps {
         try {
             ctrl.ssrfGuard.validateURLForSSRF(url);
         } catch (SsrfGuard.SsrfException e) {
-            log.warn("SSRF validation failed for MCP service URL: {}", e.getMessage());
+            log.warn("SSRF validation failed for MCP service URL", e);
             throw BizException.badRequest(ctrl.ssrfGuard.formatSSRFError("MCP service URL", url, e));
         }
     }

@@ -241,7 +241,7 @@ public class KnowledgeSummaryService {
             try {
                 knowledgeRepository.updateSummaryColumns(knowledge);
             } catch (RuntimeException e) {
-                log.warn("Failed to mark summary refresh pending for retry: {}", e.toString());
+                log.warn("Failed to mark summary refresh pending for retry", e);
             }
             return generationErr;
         }
@@ -619,8 +619,7 @@ public class KnowledgeSummaryService {
                         if (e == ERR_INSUFFICIENT_SUMMARY_CONTENT) {
                             return;
                         }
-                        log.warn("Summary refresh failed for knowledge {} (attempt {}/{}): {}",
-                                knowledgeId, attempt + 1, SUMMARY_MAX_RETRY + 1, e.getMessage());
+                        log.warn("Summary refresh failed for knowledge {} (attempt {}/{})", knowledgeId, attempt + 1, SUMMARY_MAX_RETRY + 1, e);
                         if (!willRetry) {
                             return;
                         }

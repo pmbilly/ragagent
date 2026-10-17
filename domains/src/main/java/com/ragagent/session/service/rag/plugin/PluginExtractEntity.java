@@ -51,12 +51,12 @@ public final class PluginExtractEntity implements Plugin {
     }
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.QUERY_UNDERSTAND};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.QUERY_UNDERSTAND};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         if (!neo4jEnabled) {
             return next.next();
         }

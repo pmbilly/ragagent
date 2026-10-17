@@ -147,7 +147,7 @@ public class AuthFilter extends OncePerRequestFilter {
                 return;
             } catch (TokenValidationException e) {
                 // bearer 校验失败继续尝试 API key，不立即拒绝
-                log.warn("[auth] bearer token rejected: {}", e.getMessage());
+                log.warn("[auth] bearer token rejected", e);
             }
         }
 

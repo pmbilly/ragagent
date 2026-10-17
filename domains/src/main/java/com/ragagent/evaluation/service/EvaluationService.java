@@ -17,8 +17,8 @@ import com.ragagent.evaluation.dto.EvaluationDtos.EvaluationTask;
 import com.ragagent.evaluation.dto.EvaluationDtos.MetricResult;
 import com.ragagent.evaluation.dto.EvaluationDtos.PipelineParams;
 import com.ragagent.evaluation.dto.EvaluationDtos.SummaryConfigParams;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -201,29 +201,24 @@ public class EvaluationService {
         final String evalKbId = newKb.getId();
         // 提交线程（HTTP 线程）capture，后台虚拟线程 replay，finally clear
         final TenantContextSnapshot tenantSnap = TenantContextSnapshot.capture();
-        Thread.ofVirtual().name("evaluation-" + task.id).start(() -> {
-            tenantSnap.replay();
-            try {
-                EvaluationDetail stored = store.get(task.id);
-                if (stored == null) {
-                    return;
-                }
-                stored.task.status = EvaluationDtos.STATUS_RUNNING;
-                log.info("Background evaluation started for task ID: {}", task.id);
-                try {
-                    evalDataset(stored, evalKbId);
-                } catch (RuntimeException e) {
-                    stored.task.status = EvaluationDtos.STATUS_FAILED;
-                    stored.task.errMsg = errorText(e);
-                    log.error("Evaluation task failed: {}, task ID: {}", stored.task.errMsg, task.id);
-                    return;
-                }
-                log.info("Evaluation task completed successfully, task ID: {}", task.id);
-                stored.task.status = EvaluationDtos.STATUS_SUCCESS;
-            } finally {
-                TenantContext.clear();
+        Thread.ofVirtual().name("evaluation-" + task.id).start(() -> TenantScope.run(tenantSnap, () -> {
+            EvaluationDetail stored = store.get(task.id);
+            if (stored == null) {
+                return;
             }
-        });
+            stored.task.status = EvaluationDtos.STATUS_RUNNING;
+            log.info("Background evaluation started for task ID: {}", task.id);
+            try {
+                evalDataset(stored, evalKbId);
+            } catch (RuntimeException e) {
+                stored.task.status = EvaluationDtos.STATUS_FAILED;
+                stored.task.errMsg = errorText(e);
+                log.error("Evaluation task failed: {}, task ID: {}", stored.task.errMsg, task.id);
+                return;
+            }
+            log.info("Evaluation task completed successfully, task ID: {}", task.id);
+            stored.task.status = EvaluationDtos.STATUS_SUCCESS;
+        }));
         // 返回创建时刻的快照（见类注释「任务状态竞争的确定性化」）
         return snapshotOf(detail);
     }
@@ -258,15 +253,9 @@ public class EvaluationService {
                 for (int i = 0; i < dataset.size(); i++) {
                     final int index = i;
                     final QaPair qaPair = dataset.get(i);
-                    futures.add(executor.submit(() -> {
-                        qaSnap.replay();
-                        try {
-                            runQaPair(index, qaPair, detail, knowledgeBaseId, tenantId,
-                                    metricHook, finished, progressLock);
-                        } finally {
-                            TenantContext.clear();
-                        }
-                    }));
+                    futures.add(executor.submit(() -> TenantScope.run(qaSnap,
+                            () -> runQaPair(index, qaPair, detail, knowledgeBaseId, tenantId,
+                                    metricHook, finished, progressLock))));
                 }
                 RuntimeException firstError = null;
                 for (Future<?> f : futures) {

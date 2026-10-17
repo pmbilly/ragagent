@@ -61,14 +61,14 @@ public class StorageBackendService {
     private final SsrfGuard ssrfGuard;
     private final StorageConfigCodec codec;
     private final org.springframework.transaction.support.TransactionTemplate tx;
-    /** 本地存储根（{@code LOCAL_STORAGE_BASE_DIR}，缺省 /data/files）；测试经 weknora.storage.local-base-dir 指向 build 目录 */
+    /** 本地存储根（{@code LOCAL_STORAGE_BASE_DIR}，缺省 ${user.home}/ragagent-data/files）；测试经 weknora.storage.local-base-dir 指向 build 目录。 */
     private final String localStorageBaseDir;
 
     public StorageBackendService(StorageBackendRepository repo, StorageAllowList allowList,
             SsrfGuard ssrfGuard, StorageConfigCodec codec,
             org.springframework.transaction.support.TransactionTemplate tx,
             @org.springframework.beans.factory.annotation.Value(
-                    "${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}") String localStorageBaseDir) {
+                    "${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:${user.home}/ragagent-data/files}}") String localStorageBaseDir) {
         this.repo = repo;
         this.allowList = allowList;
         this.ssrfGuard = ssrfGuard;

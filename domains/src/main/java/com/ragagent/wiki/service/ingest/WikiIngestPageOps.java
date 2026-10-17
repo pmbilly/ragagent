@@ -75,8 +75,7 @@ public final class WikiIngestPageOps {
             try {
                 service.wikiService.updateAutoLinkedContent(page);
             } catch (Exception e) {
-                log.warn("wiki ingest: failed to sanitize dead links in summary {}: {}",
-                        summarySlug, e.getMessage());
+                log.warn("wiki ingest: failed to sanitize dead links in summary {}", summarySlug, e);
                 continue;
             }
             log.info("wiki ingest: sanitized dead [[slug]] refs in summary {}", summarySlug);
@@ -119,8 +118,7 @@ public final class WikiIngestPageOps {
             try {
                 liveMap = service.wikiService.existsSlugs(kbId, new ArrayList<>(page.getOutLinks()));
             } catch (Exception e) {
-                log.warn("wiki: ExistsSlugs failed during dead-link cleanup for {}: {}",
-                        slug, e.getMessage());
+                log.warn("wiki: ExistsSlugs failed during dead-link cleanup for {}", slug, e);
                 continue;
             }
             Set<String> deadSlugs = new LinkedHashSet<>();
@@ -153,7 +151,7 @@ public final class WikiIngestPageOps {
             try {
                 service.wikiService.updateAutoLinkedContent(page);
             } catch (Exception e) {
-                log.warn("wiki: failed to clean dead links in page {}: {}", page.getSlug(), e.getMessage());
+                log.warn("wiki: failed to clean dead links in page {}", page.getSlug(), e);
                 continue;
             }
             cleaned++;
@@ -234,8 +232,7 @@ public final class WikiIngestPageOps {
             try {
                 service.wikiService.updateAutoLinkedContent(page);
             } catch (Exception e) {
-                log.warn("wiki ingest: cross-link injection failed for {}: {}",
-                        page.getSlug(), e.getMessage());
+                log.warn("wiki ingest: cross-link injection failed for {}", page.getSlug(), e);
                 continue;
             }
             updated++;

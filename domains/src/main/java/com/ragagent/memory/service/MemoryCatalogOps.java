@@ -89,7 +89,7 @@ final class MemoryCatalogOps {
         try {
             service.repo.markTopicPromoted(state.scope(), stat.getNormalizedKey());
         } catch (RuntimeException e) {
-            log.warn("memory: mark topic promoted failed: {}", e.toString());
+            log.warn("memory: mark topic promoted failed", e);
         }
         return created;
     }
@@ -145,7 +145,7 @@ final class MemoryCatalogOps {
         try {
             rows = service.repo.topDocAffinity(scope, 200);
         } catch (RuntimeException e) {
-            log.warn("memory: load familiar documents failed: {}", e.toString());
+            log.warn("memory: load familiar documents failed", e);
             return null;
         }
         if (rows == null) {
@@ -182,7 +182,7 @@ final class MemoryCatalogOps {
             try {
                 forgotten = service.repo.hasTombstone(scope, fingerprint);
             } catch (RuntimeException e) {
-                log.warn("memory: check forgotten topic failed: {}", e.toString());
+                log.warn("memory: check forgotten topic failed", e);
                 continue;
             }
             if (forgotten) {
@@ -217,7 +217,7 @@ final class MemoryCatalogOps {
             try {
                 service.repo.addTombstone(scope, stat.getTopic(), fingerprint, "");
             } catch (RuntimeException e) {
-                log.warn("memory: record topic tombstone failed: {}", e.toString());
+                log.warn("memory: record topic tombstone failed", e);
             }
         }
     }
@@ -294,7 +294,7 @@ final class MemoryCatalogOps {
             service.repo.addTombstone(scope, existing.getTopic(),
                     MemoryText.fingerprint(existing.getContent()), existing.getSourceMessageId());
         } catch (RuntimeException e) {
-            log.warn("memory: record tombstone failed: {}", e.toString());
+            log.warn("memory: record tombstone failed", e);
         }
         service.repo.deleteItem(scope, id);
     service.rebuildBlock(scope);
@@ -335,7 +335,7 @@ final class MemoryCatalogOps {
             try {
                 page = service.repo.listItems(scope, status, budget, 0);
             } catch (RuntimeException e) {
-                log.warn("memory: list {} items during clear failed: {}", status, e.toString());
+                log.warn("memory: list {} items during clear failed", status, e);
                 continue;
             }
             for (MemoryItem item : page.items()) {
@@ -346,7 +346,7 @@ final class MemoryCatalogOps {
                     service.repo.addTombstone(scope, item.getTopic(), MemoryText.fingerprint(item.getContent()),
                             item.getSourceMessageId());
                 } catch (RuntimeException e) {
-                    log.warn("memory: record tombstone during clear failed: {}", e.toString());
+                    log.warn("memory: record tombstone during clear failed", e);
                 }
                 budget--;
             }
@@ -421,7 +421,7 @@ final class MemoryCatalogOps {
         try {
             renamed = service.repo.renameTopic(scope, currentKey, newKey, newLabel);
         } catch (RuntimeException e) {
-            log.warn("memory: rename topic {} failed: {}", stat.getTopic(), e.toString());
+            log.warn("memory: rename topic {} failed", stat.getTopic(), e);
             return new String[]{stat.getTopic(), currentKey};
         }
         if (!renamed) {
@@ -443,7 +443,7 @@ final class MemoryCatalogOps {
         try {
             items = service.repo.listActiveByKinds(scope, List.of(MemoryKinds.KIND_INTEREST), 100);
         } catch (RuntimeException e) {
-            log.warn("memory: load interests for rename failed: {}", e.toString());
+            log.warn("memory: load interests for rename failed", e);
             return;
         }
         if (items == null) {
@@ -457,14 +457,14 @@ final class MemoryCatalogOps {
                 service.repo.updateItemContent(scope, item.getId(), newLabel,
                         MemoryKeys.itemKey(newLabel, newLabel), item.getImportance());
             } catch (RuntimeException e) {
-                log.warn("memory: rename interest item failed: {}", e.toString());
+                log.warn("memory: rename interest item failed", e);
                 continue;
             }
             // 向量里还拼着旧标签，所以语义召回会继续匹配一个这个主体已经不再用的名字。
             try {
                 service.repo.deleteItemEmbedding(scope, item.getId());
             } catch (RuntimeException e) {
-                log.warn("memory: drop renamed interest embedding failed: {}", e.toString());
+                log.warn("memory: drop renamed interest embedding failed", e);
             }
     service.rebuildBlock(scope);
             return;
@@ -495,7 +495,7 @@ final class MemoryCatalogOps {
         try {
             items = service.repo.listActiveByKinds(scope, List.of(MemoryKinds.KIND_INTEREST), 100);
         } catch (RuntimeException e) {
-            log.warn("memory: load interests for re-embedding failed: {}", e.toString());
+            log.warn("memory: load interests for re-embedding failed", e);
             return;
         }
         if (items == null) {
@@ -508,7 +508,7 @@ final class MemoryCatalogOps {
             try {
                 service.repo.deleteItemEmbedding(scope, item.getId());
             } catch (RuntimeException e) {
-                log.warn("memory: drop interest embedding failed: {}", e.toString());
+                log.warn("memory: drop interest embedding failed", e);
             }
             return;
         }

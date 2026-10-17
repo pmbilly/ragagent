@@ -361,7 +361,7 @@ public class KnowledgeFileService {
         try {
             effect.run();
         } catch (RuntimeException e) {
-            log.error("[K7] post-commit external index failed: {}", e.toString(), e);
+            log.error("[K7] post-commit external index failed", e);
         }
     }
 }

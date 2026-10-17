@@ -175,8 +175,7 @@ final class TenantCreateOps {
                 String token = service.apiKeyAdmin.createDefaultTenantKey(created.getId());
                 data = tenantWithApiKey(created, token);
             } catch (RuntimeException e) {
-                log.warn("[tenant] auto-create default API key failed for tenant {}: {}",
-                        created.getId(), e.toString());
+                log.warn("[tenant] auto-create default API key failed for tenant {}", created.getId(), e);
             }
         }
 

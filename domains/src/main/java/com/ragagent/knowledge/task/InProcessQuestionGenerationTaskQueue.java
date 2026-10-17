@@ -56,12 +56,11 @@ public class InProcessQuestionGenerationTaskQueue implements QuestionGenerationT
             service.handleJson(body, attempt > MAX_RETRY);
         } catch (RuntimeException e) {
             if (attempt > MAX_RETRY) {
-                log.warn("question generation task gave up after {} attempts: {}", attempt, e.toString());
+                log.warn("question generation task gave up after {} attempts", attempt, e);
                 return;
             }
             long delaySeconds = retryDelaySeconds(attempt);
-            log.warn("question generation task failed (attempt {}/{}), retrying in {}s: {}",
-                    attempt, MAX_RETRY + 1, delaySeconds, e.toString());
+            log.warn("question generation task failed (attempt {}/{}), retrying in {}s", attempt, MAX_RETRY + 1, delaySeconds, e);
             try {
                 scheduler.schedule(() -> worker.execute(() -> run(body, attempt + 1)),
                         delaySeconds, TimeUnit.SECONDS);

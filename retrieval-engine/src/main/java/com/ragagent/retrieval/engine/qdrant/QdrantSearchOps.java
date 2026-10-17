@@ -54,7 +54,7 @@ final class QdrantSearchOps {
         try {
             existing = service.client.request("GET", "/collections/" + collection, null, true);
         } catch (RuntimeException e) {
-            log.error("[Qdrant] Failed to check collection existence: {}", e.getMessage());
+            log.error("[Qdrant] Failed to check collection existence", e);
             throw new IllegalStateException("failed to check collection: " + e.getMessage(), e);
         }
         if (existing == null) {
@@ -74,7 +74,7 @@ final class QdrantSearchOps {
         try {
             result = service.client.request("POST", "/collections/" + collection + "/points/search", body);
         } catch (RuntimeException e) {
-            log.error("[Qdrant] Vector search failed: {}", e.getMessage());
+            log.error("[Qdrant] Vector search failed", e);
             throw new IllegalStateException(collection + ": " + e.getMessage(), e);
         }
         List<IndexWithScore> results = new ArrayList<>();
@@ -105,7 +105,7 @@ final class QdrantSearchOps {
         try {
             collections = service.listCollections();
         } catch (RuntimeException e) {
-            log.error("[Qdrant] Failed to list collections: {}", e.getMessage());
+            log.error("[Qdrant] Failed to list collections", e);
             throw new IllegalStateException("failed to list collections: " + e.getMessage(), e);
         }
         List<IndexWithScore> allResults = new ArrayList<>();
@@ -133,7 +133,7 @@ final class QdrantSearchOps {
                 scroll = service.client.request("POST",
                         "/collections/" + collection + "/points/scroll", body);
             } catch (RuntimeException e) {
-                log.warn("[Qdrant] Keywords search failed in {}: {}", collection, e.getMessage());
+                log.warn("[Qdrant] Keywords search failed in {}", collection, e);
                 continue;
             }
             JsonNode points = scroll == null ? null : scroll.get("points");

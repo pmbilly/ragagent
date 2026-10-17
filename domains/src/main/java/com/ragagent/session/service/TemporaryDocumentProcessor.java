@@ -101,8 +101,7 @@ final class TemporaryDocumentProcessor {
                 process(tenantId, documentId);
                 return;
             } catch (RuntimeException e) {
-                log.warn("temporary document parse attempt {} failed: document={} {}",
-                        attempt + 1, documentId, e.toString());
+                log.warn("temporary document parse attempt {} failed: document={}", attempt + 1, documentId, e);
             }
         }
     }
@@ -203,7 +202,7 @@ final class TemporaryDocumentProcessor {
             return ParserEngineRules.resolve(
                     JsonMappers.toJavaValue(cfg.get("chatParserEngineRules")), ext);
         } catch (RuntimeException e) {
-            log.warn("failed to resolve tenant parser engine: {}", e.toString());
+            log.warn("failed to resolve tenant parser engine", e);
             return "";
         }
     }

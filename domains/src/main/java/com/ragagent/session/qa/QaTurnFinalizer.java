@@ -2,8 +2,8 @@ package com.ragagent.session.qa;
 
 import com.ragagent.contract.memory.MemoryExtractionPort;
 import com.ragagent.contract.session.SessionLastRequestState;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.service.MessageService;
@@ -83,17 +83,13 @@ public final class QaTurnFinalizer {
                 TenantContextSnapshot.capture();
         TenantContextSnapshot identity =
                 prev.hasIdentity() || fallback == null ? prev : fallback;
-        try {
-            if (tenantId != null) {
-                identity.withTenantId(tenantId).replay();
-            } else if (identity != prev) {
-                // 新线程 + 未指定执行租户：至少把身份装回来，否则 owner/权限判定失真
-                identity.replay();
-            }
+        if (tenantId != null) {
+            TenantScope.run(identity.withTenantId(tenantId), body);
+        } else if (identity != prev) {
+            // 新线程 + 未指定执行租户：至少把身份装回来，否则 owner/权限判定失真
+            TenantScope.run(identity, body);
+        } else {
             body.run();
-        } finally {
-            // 调用方无上下文时 prev 全空，恢复等价于 clear（新线程场景行为不变）
-            prev.replay();
         }
     }
     public boolean hasPendingAttachments(long tenantId, String sessionId, List<String> ids) {
@@ -130,7 +126,7 @@ public final class QaTurnFinalizer {
             state.setWebSearchEnabled(reqCtx.webSearchEnabled);
             sessionService.updateSessionLastRequestState(reqCtx.sessionId, state);
         } catch (RuntimeException e) {
-            log.warn("persist last_request_state failed for session {}: {}", reqCtx.sessionId, e.toString());
+            log.warn("persist last_request_state failed for session {}", reqCtx.sessionId, e);
         }
     }
     /**
@@ -150,7 +146,7 @@ public final class QaTurnFinalizer {
         try {
             won = messageService.completeMessageOnce(assistantMessage);
         } catch (RuntimeException e) {
-            log.warn("complete assistant message update failed: {}", e.toString());
+            log.warn("complete assistant message update failed", e);
             return;
         }
         if (!won) {
@@ -162,7 +158,7 @@ public final class QaTurnFinalizer {
             try {
                 messageService.updateMessage(assistantMessage);
             } catch (RuntimeException e) {
-                log.warn("complete assistant message re-persist failed: {}", e.toString());
+                log.warn("complete assistant message re-persist failed", e);
             }
             return;
         }
@@ -175,31 +171,27 @@ public final class QaTurnFinalizer {
         // 平台（owner=<userId>）会话的索引与 follow-up 全部 SessionNotFoundException。
         final TenantContextSnapshot asyncTenant =
                 TenantContextSnapshot.capture();
-        Thread.ofVirtual().start(() -> {
-            asyncTenant.replay();
+        Thread.ofVirtual().start(() -> TenantScope.run(asyncTenant, () -> {
             SessionLookupScope.mark();
             try {
                 messageService.indexMessageToKb(userQuery, content, amId, sessionId);
             } catch (RuntimeException e) {
-                log.warn("index message to KB failed for message {}: {}", amId, e.toString());
+                log.warn("index message to KB failed for message {}", amId, e);
             } finally {
-                TenantContext.clear();
                 SessionLookupScope.clear();
             }
-        });
+        }));
         if (userQuery != null && !userQuery.isEmpty() && suggestionService != null) {
-            Thread.ofVirtual().start(() -> {
-                asyncTenant.replay();
+            Thread.ofVirtual().start(() -> TenantScope.run(asyncTenant, () -> {
                 SessionLookupScope.mark();
                 try {
                     suggestionService.ensureFollowUps(sessionId, amId, false);
                 } catch (RuntimeException e) {
-                    log.warn("follow-up suggestion generation failed for message {}: {}", amId, e.toString());
+                    log.warn("follow-up suggestion generation failed for message {}", amId, e);
                 } finally {
-                    TenantContext.clear();
                     SessionLookupScope.clear();
                 }
-            });
+            }));
         }
         // 记忆自动蒸馏调度：enabledScope 读当前
         // 租户上下文（调用方已 runWithTenant），model_id 沿 assistant 行取。
@@ -208,7 +200,7 @@ public final class QaTurnFinalizer {
                 memoryExtraction.scheduleExtraction(sessionId, amId,
                         assistantMessage.getModelId() == null ? "" : assistantMessage.getModelId());
             } catch (RuntimeException e) {
-                log.warn("memory extraction scheduling failed for session {}: {}", sessionId, e.toString());
+                log.warn("memory extraction scheduling failed for session {}", sessionId, e);
             }
         }
     }

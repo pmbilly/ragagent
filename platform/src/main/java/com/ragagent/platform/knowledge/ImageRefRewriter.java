@@ -94,7 +94,7 @@ public final class ImageRefRewriter {
                 try {
                     servingRef = saver.save(ref.data(), imageFileName(ref));
                 } catch (RuntimeException e) {
-                    log.warn("failed to store image {}: {}", path, e.getMessage());
+                    log.warn("failed to store image {}", path, e);
                     continue; // 落盘失败只告警
                 }
                 if (servingRef == null || servingRef.isEmpty()) {

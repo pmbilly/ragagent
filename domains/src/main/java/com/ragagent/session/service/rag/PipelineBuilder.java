@@ -10,22 +10,22 @@ import java.util.Map;
  */
 public final class PipelineBuilder {
 
-    private List<String> stages = new ArrayList<>();
+    private final List<PipelineEventType> stages = new ArrayList<>();
 
     public static PipelineBuilder builder() {
         return new PipelineBuilder();
     }
 
     /** 无条件追加。 */
-    public PipelineBuilder add(String... stages) {
-        for (String s : stages) {
-            this.stages.add(s);
+    public PipelineBuilder add(PipelineEventType... stages) {
+        for (PipelineEventType stage : stages) {
+            this.stages.add(stage);
         }
         return this;
     }
 
     /** 条件追加。 */
-    public PipelineBuilder addIf(boolean cond, String... stages) {
+    public PipelineBuilder addIf(boolean cond, PipelineEventType... stages) {
         if (cond) {
             return add(stages);
         }
@@ -33,13 +33,13 @@ public final class PipelineBuilder {
     }
 
     /** 输出最终事件列表（builder 不复用）。 */
-    public List<String> build() {
+    public List<PipelineEventType> build() {
         return new ArrayList<>(stages);
     }
 
     /** 预设管线。 */
-    public static Map<String, List<String>> presets() {
-        Map<String, List<String>> p = new LinkedHashMap<>();
+    public static Map<String, List<PipelineEventType>> presets() {
+        Map<String, List<PipelineEventType>> p = new LinkedHashMap<>();
         p.put("chat", List.of(PipelineEventType.CHAT_COMPLETION));
         p.put("chat_stream", List.of(PipelineEventType.CHAT_COMPLETION_STREAM));
         p.put("chat_history_stream",

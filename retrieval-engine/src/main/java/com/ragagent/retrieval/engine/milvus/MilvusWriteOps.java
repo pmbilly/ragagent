@@ -34,7 +34,7 @@ final class MilvusWriteOps {
         if (row.embedding == null || row.embedding.length == 0) {
             IllegalStateException e = new IllegalStateException(
                     "empty embedding vector for chunk ID: " + indexInfo.chunkId);
-            log.error("[Milvus] {}", e.getMessage());
+            log.error("[Milvus]", e);
             throw e;
         }
         int dimension = row.embedding.length;
@@ -45,7 +45,7 @@ final class MilvusWriteOps {
         try {
             service.client.upsert(service.collectionName(dimension), rows);
         } catch (RuntimeException e) {
-            log.error("[Milvus] Failed to save index: {}", e.getMessage());
+            log.error("[Milvus] Failed to save index", e);
             throw new IllegalStateException(e.getMessage() == null ? e.toString()
                     : e.getMessage(), e);
         }
@@ -86,8 +86,7 @@ final class MilvusWriteOps {
             try {
                 service.client.upsert(collection, rows);
             } catch (RuntimeException e) {
-                log.error("[Milvus] Failed to execute batch operation for dimension {}: {}",
-                        dimension, e.getMessage());
+                log.error("[Milvus] Failed to execute batch operation for dimension {}", dimension, e);
                 throw new IllegalStateException("failed to batch save (dimension " + dimension
                         + "): " + e.getMessage(), e);
             }
@@ -134,7 +133,7 @@ final class MilvusWriteOps {
         try {
             service.client.delete(collection, MilvusRetrieveRepository.inFilter(field, ids));
         } catch (RuntimeException e) {
-            log.error("[Milvus] {}: {}", errorPrefix, e.getMessage());
+            log.error("[Milvus] {}", errorPrefix, e);
             throw new IllegalStateException(errorPrefix + ": " + e.getMessage(), e);
         }
         log.info("[Milvus] Successfully deleted documents by {}", field);
@@ -224,8 +223,7 @@ final class MilvusWriteOps {
                     rows = searchByFilter(collection,
                             MilvusFilter.Condition.in(MilvusRetrieveRepository.FIELD_CHUNK_ID, group.getValue()));
                 } catch (RuntimeException e) {
-                    log.warn("[Milvus] Failed to search chunks in {}: {}", collection,
-                            e.getMessage());
+                    log.warn("[Milvus] Failed to search chunks in {}", collection, e);
                     continue;
                 }
                 if (rows.isEmpty()) {
@@ -239,8 +237,7 @@ final class MilvusWriteOps {
                 try {
                     service.client.upsert(collection, data);
                 } catch (RuntimeException e) {
-                    log.warn("[Milvus] Failed to update chunks in {}: {}", collection,
-                            e.getMessage());
+                    log.warn("[Milvus] Failed to update chunks in {}", collection, e);
                 }
             }
         }
@@ -291,7 +288,7 @@ final class MilvusWriteOps {
                 page = service.client.query(collection, MilvusFilter.expr(filter), List.of("*"),
                         MilvusRetrieveRepository.COPY_PAGE_SIZE, offset);
             } catch (RuntimeException e) {
-                log.error("[Milvus] Failed to query source points: {}", e.getMessage());
+                log.error("[Milvus] Failed to query source points", e);
                 throw new IllegalStateException(e.getMessage(), e);
             }
             int pageSize = page == null || !page.isArray() ? 0 : page.size();
@@ -331,7 +328,7 @@ final class MilvusWriteOps {
                 try {
                     service.client.upsert(collection, targets);
                 } catch (RuntimeException e) {
-                    log.error("[Milvus] Failed to batch upsert target points: {}", e.getMessage());
+                    log.error("[Milvus] Failed to batch upsert target points", e);
                     throw new IllegalStateException(e.getMessage(), e);
                 }
                 totalCopied += targets.size();

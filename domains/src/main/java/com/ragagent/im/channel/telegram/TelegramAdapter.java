@@ -321,7 +321,7 @@ public class TelegramAdapter implements AdapterInterfaces.Adapter,
             editMessage(state.chatId, state.msgId, fullContent, "");
         } catch (Exception e) {
             // 更新失败只告警，不抛（流式期间的一次编辑失败不该中断回答）
-            log.warn("[Telegram] Failed to update stream content: {}", e.toString());
+            log.warn("[Telegram] Failed to update stream content", e);
         }
     }
 
@@ -335,11 +335,11 @@ public class TelegramAdapter implements AdapterInterfaces.Adapter,
         try {
             editMessage(state.chatId, state.msgId, finalContent, "Markdown");
         } catch (Exception e) {
-            log.warn("[Telegram] Markdown finalize failed, retrying plain: {}", e.toString());
+            log.warn("[Telegram] Markdown finalize failed, retrying plain", e);
             try {
                 editMessage(state.chatId, state.msgId, finalContent, "");
             } catch (Exception retryErr) {
-                log.warn("[Telegram] Failed to finalize stream: {}", retryErr.toString());
+                log.warn("[Telegram] Failed to finalize stream", retryErr);
             }
         }
     }

@@ -126,13 +126,11 @@ public class InProcessMemoryExtractTaskQueue implements MemoryExtractTaskQueue {
             }
         } catch (Exception e) {
             if (attempt > MAX_RETRY) {
-                log.warn("memory: extraction task gave up after {} attempts: {}",
-                        attempt, e.toString());
+                log.warn("memory: extraction task gave up after {} attempts", attempt, e);
                 return;
             }
             long delaySeconds = retryDelaySeconds(attempt);
-            log.warn("memory: extraction task failed (attempt {}/{}), retrying in {}s: {}",
-                    attempt, MAX_RETRY + 1, delaySeconds, e.toString());
+            log.warn("memory: extraction task failed (attempt {}/{}), retrying in {}s", attempt, MAX_RETRY + 1, delaySeconds, e);
             try {
                 scheduler.schedule(() -> worker.execute(() -> run(body, attempt + 1)),
                         delaySeconds, TimeUnit.SECONDS);

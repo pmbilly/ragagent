@@ -99,7 +99,7 @@ final class FeishuCardStreamOps {
         try {
             cardkitSetStreaming(accessToken, streamId, false, summary, seq);
         } catch (Exception e) {
-            log.warn("[{}] Failed to disable streaming_mode: {}", service.region.label(), e.toString());
+            log.warn("[{}] Failed to disable streaming_mode", service.region.label(), e);
         }
         log.info("[{}] Streaming ended: card_id={}", service.region.label(), streamId);
     }

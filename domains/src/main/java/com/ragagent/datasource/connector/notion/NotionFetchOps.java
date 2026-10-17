@@ -56,8 +56,7 @@ final class NotionFetchOps {
                 NotionDatabaseInfo dbInfo = connector.getDatabaseOrDataSourceInfo(client, parent.parentId());
                 dbTitle = dbInfo.page.title == null ? "" : dbInfo.page.title;
             } catch (ConnectorException e) {
-                log.debug("[Notion] failed to resolve parent db title for record {}: {}",
-                        page.id(), e.getMessage());
+                log.debug("[Notion] failed to resolve parent db title for record {}", page.id(), e);
             }
             List<String> propNames = NotionProperties.extractPropertySchema(page);
             FetchedItem item = buildRecordItem(client, page, propNames, dbTitle);
@@ -71,7 +70,7 @@ final class NotionFetchOps {
         try {
             blocks = client.getBlockChildrenAll(page.id());
         } catch (ConnectorException e) {
-            log.warn("[Notion] failed to get blocks for page {}: {}", page.id(), e.getMessage());
+            log.warn("[Notion] failed to get blocks for page {}", page.id(), e);
             return items;
         }
 
@@ -112,8 +111,7 @@ final class NotionFetchOps {
             try {
                 data = client.downloadFile(attachment.url);
             } catch (ConnectorException e) {
-                log.warn("[Notion] failed to download attachment {}: {}",
-                        attachment.fileName, e.getMessage());
+                log.warn("[Notion] failed to download attachment {}", attachment.fileName, e);
                 continue;
             }
             FetchedItem item = new FetchedItem();
@@ -137,8 +135,7 @@ final class NotionFetchOps {
                     try {
                         childPage = client.getPage(block.id());
                     } catch (ConnectorException e) {
-                        log.warn("[Notion] failed to get child page {}: {}",
-                                block.id(), e.getMessage());
+                        log.warn("[Notion] failed to get child page {}", block.id(), e);
                         continue;
                     }
                     items.addAll(fetchPage(client, childPage, visited));
@@ -283,7 +280,7 @@ final class NotionFetchOps {
         try {
             dbInfo = connector.getDatabaseOrDataSourceInfo(client, id);
         } catch (ConnectorException e) {
-            log.warn("[Notion] failed to get database/data_source info {}: {}", id, e.getMessage());
+            log.warn("[Notion] failed to get database/data_source info {}", id, e);
             throw e;
         }
 
@@ -295,7 +292,7 @@ final class NotionFetchOps {
         try {
             records = client.queryDatabaseAll(queryId);
         } catch (ConnectorException e) {
-            log.warn("[Notion] failed to query database {}: {}", id, e.getMessage());
+            log.warn("[Notion] failed to query database {}", id, e);
             throw e;
         }
         log.info("[Notion] database {} ({}): {} records",
@@ -342,8 +339,7 @@ final class NotionFetchOps {
         try {
             blocks = client.getBlockChildrenAll(record.id());
         } catch (ConnectorException e) {
-            log.warn("[Notion] failed to get blocks for record {}: {}",
-                    record.id(), e.getMessage());
+            log.warn("[Notion] failed to get blocks for record {}", record.id(), e);
         }
         if (blocks != null && !blocks.isEmpty()) {
             NotionConnector.resolveFileUploads(client, blocks);

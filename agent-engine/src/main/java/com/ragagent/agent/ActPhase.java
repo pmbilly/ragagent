@@ -22,6 +22,7 @@ import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
@@ -265,15 +266,10 @@ final class ActPhase {
             return runToolCallInner(tc, i, iteration, round, sessionId, assistantMessageID);
         }
         // 借用快照执行：并发执行的子线程传 null（子线程自行 replay/clear），
-        // 突变屏障分支在**主线程**以非 null 快照调用——必须保存-恢复而非 clear，
+        // 突变屏障分支在**主线程**以非 null 快照调用——TenantScope 保存-恢复，
         // 否则引擎线程的租户/身份会被清掉，后续轮次的模型/KB 解析全部失败。
-        TenantContextSnapshot prev = TenantContextSnapshot.capture();
-        tenant.replay();
-        try {
-            return runToolCallInner(tc, i, iteration, round, sessionId, assistantMessageID);
-        } finally {
-            prev.replay();
-        }
+        return TenantScope.supply(tenant,
+                () -> runToolCallInner(tc, i, iteration, round, sessionId, assistantMessageID));
     }
 
     private AgentToolCall runToolCallInner(ToolCall tc, int i, int iteration,
@@ -303,7 +299,7 @@ final class ActPhase {
                 // fall through：解析仍失败
             }
             if (!repairOk) {
-                log.error("{} Failed to parse arguments (repair failed): {}", toolTag, argsError.getMessage());
+                log.error("{} Failed to parse arguments (repair failed)", toolTag, argsError);
                 AgentToolCall c = new AgentToolCall();
                 c.setId(tc.getId());
                 c.setName(tc.getFunction().getName());

@@ -207,7 +207,7 @@ public class AnthropicChat implements LlmChatClient {
             try {
                 streamBody.close();
             } catch (IOException e) {
-                log.debug("[anthropic-stream] close body failed: {}", e.toString());
+                log.debug("[anthropic-stream] close body failed", e);
             }
         });
         String model = modelName;
@@ -215,7 +215,7 @@ public class AnthropicChat implements LlmChatClient {
             try (streamBody) {
                 processAnthropicStream(streamBody, model, streamQueue);
             } catch (IOException e) {
-                log.warn("[anthropic-stream] close failed: {}", e.toString());
+                log.warn("[anthropic-stream] close failed", e);
             }
         });
         return streamQueue;
@@ -673,7 +673,7 @@ public class AnthropicChat implements LlmChatClient {
             try {
                 builder.setHeader(name, entry.getValue());
             } catch (IllegalArgumentException e) {
-                log.debug("[anthropic] custom header {} rejected by JDK http client: {}", name, e.toString());
+                log.debug("[anthropic] custom header {} rejected by JDK http client", name, e);
             }
         }
     }

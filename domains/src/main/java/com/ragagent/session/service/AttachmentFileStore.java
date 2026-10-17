@@ -25,7 +25,7 @@ public class AttachmentFileStore {
     private final Path baseDir;
 
     public AttachmentFileStore(
-            @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}")
+            @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:${user.home}/ragagent-data/files}}")
             String baseDir) {
         // toAbsolutePath().normalize()：测试配置是相对路径 ./build/test-files，
         // 而 resolve().normalize() 后是绝对形态——不规范化会被 startsWith 误判穿越
@@ -70,7 +70,7 @@ public class AttachmentFileStore {
                 Files.delete(resolved);
             }
         } catch (IOException e) {
-            log.warn("Failed to delete attachment file {}: {}", ref, e.toString());
+            log.warn("Failed to delete attachment file {}", ref, e);
         }
     }
 

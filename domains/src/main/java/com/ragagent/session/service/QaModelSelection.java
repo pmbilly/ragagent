@@ -84,7 +84,7 @@ final class QaModelSelection {
                 log.info("Derived {} knowledge base IDs from {} knowledge IDs for model selection",
                         kbIds.size(), knowledgeIds.size());
             } catch (RuntimeException e) {
-                log.warn("Failed to get knowledge batch for model selection: {}", e.toString());
+                log.warn("Failed to get knowledge batch for model selection", e);
             }
         }
         if (!kbIds.isEmpty()) {

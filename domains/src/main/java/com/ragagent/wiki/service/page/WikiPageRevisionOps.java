@@ -74,7 +74,7 @@ final class WikiPageRevisionOps {
         try {
             service.repo.pruneRevisions(req);
         } catch (RuntimeException e) {
-            log.warn("prune wiki page revisions for {} failed: {}", pageId, e.toString());
+            log.warn("prune wiki page revisions for {} failed", pageId, e);
         }
     }
 
@@ -157,7 +157,7 @@ final class WikiPageRevisionOps {
         try {
             service.repo.deleteRevisionsByPage(page.getId());
         } catch (RuntimeException e) {
-            log.warn("delete wiki page revisions for {} failed: {}", page.getId(), e.toString());
+            log.warn("delete wiki page revisions for {} failed", page.getId(), e);
         }
     }
 }

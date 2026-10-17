@@ -52,12 +52,12 @@ public final class PluginDataAnalysis implements Plugin {
     }
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.DATA_ANALYSIS};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.DATA_ANALYSIS};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         if (!chatManage.needsRetrieval()) {
             return next.next();
         }

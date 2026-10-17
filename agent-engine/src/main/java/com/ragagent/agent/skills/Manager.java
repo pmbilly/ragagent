@@ -71,7 +71,7 @@ public final class Manager {
                 }
             } catch (Exception e) {
                 // 单源失败不阻断其他源（与宿主目录时代“目录打错字不 500”同口径）
-                log.warn("[skills] source discovery failed: {}", e.getMessage());
+                log.warn("[skills] source discovery failed", e);
             }
         }
         if (!allowedSkills.isEmpty()) {

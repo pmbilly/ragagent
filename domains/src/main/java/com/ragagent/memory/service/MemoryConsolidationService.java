@@ -166,7 +166,7 @@ public class MemoryConsolidationService {
         try {
             subject = repo.getSubject(scope);
         } catch (RuntimeException e) {
-            log.warn("memory: load subject for consolidation failed: {}", e.toString());
+            log.warn("memory: load subject for consolidation failed", e);
             return result;
         }
         if (subject == null) {
@@ -189,7 +189,7 @@ public class MemoryConsolidationService {
             try {
                 repo.markForcedConsolidated(scope);
             } catch (RuntimeException e) {
-                log.warn("memory: mark forced consolidation failed: {}", e.toString());
+                log.warn("memory: mark forced consolidation failed", e);
             }
         }
 
@@ -201,7 +201,7 @@ public class MemoryConsolidationService {
                 log.info("memory: archived {} expired memories for {}", archived, scope.subjectId());
             }
         } catch (RuntimeException e) {
-            log.warn("memory: expire overdue failed: {}", e.toString());
+            log.warn("memory: expire overdue failed", e);
         }
 
         // 整个仓库，不是一页。以前用一个固定的 200 封顶，意味着两条都旧的重复
@@ -214,7 +214,7 @@ public class MemoryConsolidationService {
         try {
             items = repo.listItems(scope, MemoryKinds.STATUS_ACTIVE, cfg.effectiveMaxItems(), 0).items();
         } catch (RuntimeException e) {
-            log.warn("memory: consolidation list failed: {}", e.toString());
+            log.warn("memory: consolidation list failed", e);
             return result;
         }
         if (items == null) {
@@ -245,13 +245,13 @@ public class MemoryConsolidationService {
                         moved, scope.subjectId());
             }
         } catch (RuntimeException e) {
-            log.warn("memory: sync vector column failed: {}", e.toString());
+            log.warn("memory: sync vector column failed", e);
         }
 
         try {
             repo.markConsolidated(scope);
         } catch (RuntimeException e) {
-            log.warn("memory: mark consolidated failed: {}", e.toString());
+            log.warn("memory: mark consolidated failed", e);
         }
         if (result.getMerged() > 0 || result.getDemoted() > 0 || result.getExpired() > 0) {
             memoryService.rebuildBlock(scope);
@@ -292,7 +292,7 @@ public class MemoryConsolidationService {
                 repo.updateItemContent(scope, item.getId(), item.getContent(),
                         item.getNormalizedKey(), 1);
             } catch (RuntimeException e) {
-                log.warn("memory: demote stale task failed: {}", e.toString());
+                log.warn("memory: demote stale task failed", e);
                 continue;
             }
             demoted++;
@@ -354,7 +354,7 @@ public class MemoryConsolidationService {
                 incoming.setSourceMessageId(primary.getSourceMessageId());
                 replacement = memoryService.write(scope, cfg, incoming);
             } catch (RuntimeException e) {
-                log.warn("memory: consolidation write failed: {}", e.toString());
+                log.warn("memory: consolidation write failed", e);
             }
             if (replacement == null) {
                 continue;
@@ -368,7 +368,7 @@ public class MemoryConsolidationService {
                 try {
                     repo.supersedeItem(scope, item.getId(), replacement.getId());
                 } catch (RuntimeException e) {
-                    log.warn("memory: supersede during consolidation failed: {}", e.toString());
+                    log.warn("memory: supersede during consolidation failed", e);
                 }
             }
             merged++;
@@ -475,7 +475,7 @@ public class MemoryConsolidationService {
         try {
             chatModel = modelResolver.getChatModel(modelId);
         } catch (RuntimeException e) {
-            log.warn("memory: consolidation model unavailable: {}", e.toString());
+            log.warn("memory: consolidation model unavailable", e);
             return new ConsolidationCall("", true);
         }
         if (chatModel == null) {
@@ -503,7 +503,7 @@ public class MemoryConsolidationService {
                     options);
         } catch (RuntimeException e) {
             // 含 RunExpiredException：预算耗尽也落进同一条 warn 分支。
-            log.warn("memory: consolidation call failed: {}", e.toString());
+            log.warn("memory: consolidation call failed", e);
             return new ConsolidationCall("", true);
         }
         if (response == null) {

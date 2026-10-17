@@ -69,7 +69,7 @@ final class MemoryRecallOps {
         } catch (RuntimeException e) {
             subject = null;
             String reason = "subject_load_failed";
-            log.warn("memory: load subject for recall failed: {}", e.toString());
+            log.warn("memory: load subject for recall failed", e);
             finishSubjectLoadFailure(recallSpan, reason, scope);
             return MemoryRecall.EMPTY;
         }
@@ -82,7 +82,7 @@ final class MemoryRecallOps {
         try {
             residentItems = service.repo.listActiveResident(scope, 60);
         } catch (RuntimeException e) {
-            log.warn("memory: load resident items failed: {}", e.toString());
+            log.warn("memory: load resident items failed", e);
             residentItems = null;
         }
         MemoryRecallSelector.Split split = MemoryRecallSelector.splitResidentInterests(residentItems);
@@ -112,7 +112,7 @@ final class MemoryRecallOps {
                     List.of(MemoryKinds.KIND_FACT, MemoryKinds.KIND_TASK),
                     MemoryRecallSelector.lexicalPoolSize(cfg));
         } catch (RuntimeException e) {
-            log.warn("memory: load situational items failed: {}", e.toString());
+            log.warn("memory: load situational items failed", e);
             situational = null;
         }
         // 常驻条目已经在块里了；再匹配一次会把它们印两遍。

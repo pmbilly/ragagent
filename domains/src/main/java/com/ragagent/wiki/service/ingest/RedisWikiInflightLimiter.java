@@ -96,8 +96,7 @@ public class RedisWikiInflightLimiter implements WikiInflightLimiter {
                     token,
                     Long.toString(WikiIngestConstants.INFLIGHT_TTL.toMillis()));
         } catch (RuntimeException e) {
-            log.warn("wiki inflight: reserve failed for KB {}: {} (running uncapped)",
-                    kbId, e.toString());
+            log.warn("wiki inflight: reserve failed for KB {} (running uncapped)", kbId, e);
             return Reservation.allow();
         }
         if (res == null || res != 1L) {
@@ -120,7 +119,7 @@ public class RedisWikiInflightLimiter implements WikiInflightLimiter {
             template.opsForZSet().remove(WikiIngestConstants.INFLIGHT_PREFIX + kbId, token);
         } catch (RuntimeException e) {
             // 释放失败只让槽位等到租约过期，不需要让调用方感知
-            log.warn("wiki inflight: release failed for KB {}: {}", kbId, e.toString());
+            log.warn("wiki inflight: release failed for KB {}", kbId, e);
         }
     }
 
@@ -137,8 +136,7 @@ public class RedisWikiInflightLimiter implements WikiInflightLimiter {
                     template.opsForZSet().add(key, token, expiry);
                     template.expire(key, WikiIngestConstants.INFLIGHT_TTL);
                 } catch (RuntimeException e) {
-                    log.warn("wiki inflight: renew failed for KB {}: {}",
-                            entry.getKey(), e.toString());
+                    log.warn("wiki inflight: renew failed for KB {}", entry.getKey(), e);
                 }
             }
         }

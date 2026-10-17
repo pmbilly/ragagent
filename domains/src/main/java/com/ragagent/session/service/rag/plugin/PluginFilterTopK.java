@@ -17,12 +17,12 @@ import java.util.Map;
 public final class PluginFilterTopK implements Plugin {
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.FILTER_TOP_K};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.FILTER_TOP_K};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         if (!chatManage.needsRetrieval()) {
             return next.next();
         }

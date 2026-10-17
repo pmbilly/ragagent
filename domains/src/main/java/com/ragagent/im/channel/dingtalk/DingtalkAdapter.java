@@ -657,8 +657,7 @@ public class DingtalkAdapter implements AdapterInterfaces.Adapter,
             try {
                 state.outTrackId = createAndDeliverCard(incoming);
             } catch (Exception e) {
-                log.warn("[DingTalk] Failed to create AI card, falling back to sessionWebhook: {}",
-                        e.toString());
+                log.warn("[DingTalk] Failed to create AI card, falling back to sessionWebhook", e);
             }
         }
         STREAMS.put(streamId, state);
@@ -692,7 +691,7 @@ public class DingtalkAdapter implements AdapterInterfaces.Adapter,
         try {
             streamingUpdateCard(state.outTrackId, fullContent, false);
         } catch (Exception e) {
-            log.warn("[DingTalk] Failed to update card stream: {}", e.toString());
+            log.warn("[DingTalk] Failed to update card stream", e);
         }
     }
 
@@ -713,7 +712,7 @@ public class DingtalkAdapter implements AdapterInterfaces.Adapter,
             try {
                 streamingUpdateCard(outTrackId, finalContent == null ? "" : finalContent, false);
             } catch (Exception e) {
-                log.warn("[DingTalk] Failed to finalize card stream: {}", e.toString());
+                log.warn("[DingTalk] Failed to finalize card stream", e);
             }
         }
     }
@@ -743,7 +742,7 @@ public class DingtalkAdapter implements AdapterInterfaces.Adapter,
                 replyViaOpenApi(incoming, fullContent);
             }
         } catch (Exception e) {
-            log.warn("[DingTalk] Failed to end stream: {}", e.toString());
+            log.warn("[DingTalk] Failed to end stream", e);
         }
         log.info("[DingTalk] Streaming ended: stream_id={}", streamId);
     }

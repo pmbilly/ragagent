@@ -127,8 +127,7 @@ final class TencentVectorDbSearchOps {
                 res = service.client.fullTextSearch(service.databaseName, collection, search);
             } catch (RuntimeException e) {
                 failed++;
-                log.warn("[TencentVectorDB] keyword search failed in {}: {}", collection,
-                        e.getMessage());
+                log.warn("[TencentVectorDB] keyword search failed in {}", collection, e);
                 continue;
             }
             results.addAll(parseHits(res, EngineTypes.MATCH_KEYWORDS));

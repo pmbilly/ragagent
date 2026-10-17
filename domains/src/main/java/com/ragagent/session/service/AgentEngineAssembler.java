@@ -106,8 +106,7 @@ final class AgentEngineAssembler {
                 log.info("VLM image describer set for tool result analysis (model: {})",
                         config.getVlmModelId());
             } catch (RuntimeException e) {
-                log.warn("Failed to load VLM model {} for tool image fallback: {}",
-                        config.getVlmModelId(), e.toString());
+                log.warn("Failed to load VLM model {} for tool image fallback", config.getVlmModelId(), e);
             }
         }
 
@@ -184,7 +183,7 @@ final class AgentEngineAssembler {
                         }
                     }
                 } catch (RuntimeException e) {
-                    log.warn("Failed to list FAQ entries for {}: {}", kbId, e.getMessage());
+                    log.warn("Failed to list FAQ entries for {}", kbId, e);
                 }
             }
             // 非 FAQ 或 FAQ 列表为空/失败 → 回落通用 knowledge 列表
@@ -208,7 +207,7 @@ final class AgentEngineAssembler {
                         }
                     }
                 } catch (RuntimeException e) {
-                    log.warn("Failed to list knowledge for {}: {}", kbId, e.getMessage());
+                    log.warn("Failed to list knowledge for {}", kbId, e);
                 }
             }
             String kbType = kb.getType() == null || kb.getType().isEmpty() ? "document" : kb.getType();

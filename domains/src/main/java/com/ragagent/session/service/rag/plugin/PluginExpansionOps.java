@@ -4,6 +4,7 @@ import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import com.ragagent.session.service.rag.ChatManage;
 import com.ragagent.session.service.rag.PipelineLog;
 import java.util.ArrayList;
@@ -80,7 +81,7 @@ final class PluginExpansionOps {
             for (Object[] job : jobs) {
                 String q = (String) job[0];
                 SearchTarget t = (SearchTarget) job[1];
-                futures.add(executor.submit(PluginSearch.withTenant(expansionSnap, () -> {
+                futures.add(executor.submit(TenantScope.callable(expansionSnap, () -> {
                     sem.acquireUninterruptibly();
                     try {
                         double[] th = t.recallThresholds(chatManage.getVectorThreshold(), expKwTh);

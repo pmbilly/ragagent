@@ -180,7 +180,7 @@ public class SlackAdapter implements AdapterInterfaces.Adapter,
             updateMessage(state.channel, state.ts, fullContent);
         } catch (Exception e) {
             // 更新失败只告警（流式期间的一次编辑失败不该中断回答）
-            log.warn("[Slack] Failed to update stream content: {}", e.toString());
+            log.warn("[Slack] Failed to update stream content", e);
         }
     }
 
@@ -199,7 +199,7 @@ public class SlackAdapter implements AdapterInterfaces.Adapter,
         try {
             updateMessage(state.channel, state.ts, state.content);
         } catch (Exception e) {
-            log.warn("[Slack] Failed to end stream: {}", e.toString());
+            log.warn("[Slack] Failed to end stream", e);
         }
         log.info("[Slack] Streaming ended: stream_id={}", streamId);
     }

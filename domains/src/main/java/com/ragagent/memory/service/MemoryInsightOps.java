@@ -62,7 +62,7 @@ final class MemoryInsightOps {
             items = service.repo.listActiveByKinds(scope,
                     List.of(MemoryKinds.KIND_PROFILE, MemoryKinds.KIND_INTEREST), 30);
         } catch (RuntimeException e) {
-            log.warn("memory: load retrieval context failed: {}", e.toString());
+            log.warn("memory: load retrieval context failed", e);
             Map<String, Object> error = new LinkedHashMap<>();
             error.put("outcome", "error");
             error.put("error", e.toString());
@@ -119,7 +119,7 @@ final class MemoryInsightOps {
         try {
             rows = service.repo.topDocAffinity(scope, 5);
         } catch (RuntimeException e) {
-            log.warn("memory: load document affinity failed: {}", e.toString());
+            log.warn("memory: load document affinity failed", e);
             return null;
         }
         if (rows == null) {
@@ -149,7 +149,7 @@ final class MemoryInsightOps {
         try {
             return service.repo.docAffinity(state.scope(), knowledgeIds);
         } catch (RuntimeException e) {
-            log.warn("memory: read document affinity failed: {}", e.toString());
+            log.warn("memory: read document affinity failed", e);
             return null;
         }
     }
@@ -171,13 +171,13 @@ final class MemoryInsightOps {
         try {
             service.repo.ensureSubject(state.scope());
         } catch (RuntimeException e) {
-            log.warn("memory: ensure subject for affinity failed: {}", e.toString());
+            log.warn("memory: ensure subject for affinity failed", e);
             return;
         }
         try {
             service.repo.bumpDocAffinity(state.scope(), refs);
         } catch (RuntimeException e) {
-            log.warn("memory: record answer sources failed: {}", e.toString());
+            log.warn("memory: record answer sources failed", e);
         }
     }
 
@@ -212,7 +212,7 @@ final class MemoryInsightOps {
         try {
             service.repo.ensureSubject(scope);
         } catch (RuntimeException e) {
-            log.warn("memory: ensure subject for topics failed: {}", e.toString());
+            log.warn("memory: ensure subject for topics failed", e);
             return null;
         }
 
@@ -253,7 +253,7 @@ final class MemoryInsightOps {
             try {
                 stat = service.repo.bumpTopic(scope, canonicalTopic, key, resolution.surface());
             } catch (RuntimeException e) {
-                log.warn("memory: count topic {} failed: {}", canonicalTopic, e.toString());
+                log.warn("memory: count topic {} failed", canonicalTopic, e);
                 continue;
             }
             if (stat == null) {
@@ -296,12 +296,12 @@ final class MemoryInsightOps {
             } catch (MemoryScopeExceptions.SensitiveContent e) {
                 // 同上：不算失败。
             } catch (RuntimeException e) {
-                log.warn("memory: promote interest failed: {}", e.toString());
+                log.warn("memory: promote interest failed", e);
             }
             try {
                 service.repo.markTopicPromoted(scope, key);
             } catch (RuntimeException e) {
-                log.warn("memory: mark topic promoted failed: {}", e.toString());
+                log.warn("memory: mark topic promoted failed", e);
             }
             promoted.add(canonicalTopic);
         }
@@ -368,7 +368,7 @@ final class MemoryInsightOps {
             candidates = service.repo.listActiveByKinds(scope, MemoryKinds.ALL,
                     MemoryRecallSelector.lexicalPoolSize(cfg));
         } catch (RuntimeException e) {
-            log.warn("memory: load search candidates failed: {}", e.toString());
+            log.warn("memory: load search candidates failed", e);
             Map<String, Object> error = new LinkedHashMap<>();
             error.put("outcome", "error");
             error.put("error", e.toString());

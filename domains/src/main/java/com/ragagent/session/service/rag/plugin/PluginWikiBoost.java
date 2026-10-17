@@ -24,12 +24,12 @@ public final class PluginWikiBoost implements Plugin {
     }
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.CHUNK_RERANK};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.CHUNK_RERANK};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         PluginError err = next.next();
         if (err != null) {
             return err;

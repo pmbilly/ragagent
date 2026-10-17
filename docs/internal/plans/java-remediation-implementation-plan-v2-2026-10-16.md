@@ -65,7 +65,7 @@
 
 ### 1.3 纠偏的完成判定（验收 = 两条标准逐条机器可查）
 
-- contract：`check-contracts-purity.py` C1/C2/C3 全零 + 每个类的跨域消费者可列举（脚本：引用面按模块统计 ≠ 仅自身模块）；
+- contract：`check-contract-purity.py` C1/C2/C3 全零 + 每个类的跨域消费者可列举（脚本：引用面按模块统计 ≠ 仅自身模块）；
 - platform：**业务形状零命中**（新增门禁 C8：platform 内 `*View`/`*Port`/`*Request`/`*Response`/`*Payload`/`*Facts` 命名一律红灯，除非在登记例外表——例外必须写明"为何属于技术适配"）。 **✅ 2026-10-16 上线（`1b020e97`）**：`scripts/check-platform-shapes.py` + 3 条登记（ApiResponse/FileProxyPort/LiveRunPayload）；run-guards 15 守卫全绿。
 
 ---

@@ -156,7 +156,7 @@ public class WebSearchTempKbStateService {
             try {
                 knowledgeMaintenance.deleteKnowledge(kid);
             } catch (RuntimeException e) {
-                log.warn("Failed to delete temp knowledge {}: {}", kid, e.toString());
+                log.warn("Failed to delete temp knowledge {}", kid, e);
             }
         }
 
@@ -164,14 +164,14 @@ public class WebSearchTempKbStateService {
         try {
             knowledgeMaintenance.deleteKnowledgeBase(kbId);
         } catch (RuntimeException e) {
-            log.warn("Failed to delete temp knowledge base {}: {}", kbId, e.toString());
+            log.warn("Failed to delete temp knowledge base {}", kbId, e);
         }
 
         // Delete the Redis key（唯一上抛点）
         try {
             redis.delete(stateKey);
         } catch (RuntimeException e) {
-            log.warn("Failed to delete Redis key {}: {}", stateKey, e.toString());
+            log.warn("Failed to delete Redis key {}", stateKey, e);
             throw new IllegalStateException("failed to delete Redis key: " + e.getMessage(), e);
         }
 

@@ -188,8 +188,7 @@ public class DataSourceService implements DataSourceSyncHandler {
             try {
                 scheduler.addOrUpdate(ds);
             } catch (RuntimeException e) {
-                log.warn("[datasource] failed to register cron for ds={}: {}",
-                        ds.getId(), e.getMessage());
+                log.warn("[datasource] failed to register cron for ds={}", ds.getId(), e);
             }
         }
 
@@ -219,7 +218,7 @@ public class DataSourceService implements DataSourceSyncHandler {
         try {
             dataSources = dsRepo.findByKnowledgeBase(kbId);
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to list data sources: {}", e.getMessage());
+            log.error("[datasource] failed to list data sources", e);
             throw e;
         }
         for (DataSource ds : dataSources) {
@@ -309,14 +308,14 @@ public class DataSourceService implements DataSourceSyncHandler {
         try {
             dsRepo.update(ds);
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to update data source: {}", e.getMessage());
+            log.error("[datasource] failed to update data source", e);
             throw e;
         }
 
         try {
             scheduler.addOrUpdate(ds);
         } catch (RuntimeException e) {
-            log.warn("[datasource] failed to update cron for ds={}: {}", ds.getId(), e.getMessage());
+            log.warn("[datasource] failed to update cron for ds={}", ds.getId(), e);
         }
 
         log.info("[datasource] data source updated: id={}", ds.getId());
@@ -407,7 +406,7 @@ public class DataSourceService implements DataSourceSyncHandler {
         try {
             dsRepo.delete(id);
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to delete data source: {}", e.getMessage());
+            log.error("[datasource] failed to delete data source", e);
             throw e;
         }
 
@@ -416,7 +415,7 @@ public class DataSourceService implements DataSourceSyncHandler {
         try {
             syncLogRepo.cancelPendingByDataSource(id);
         } catch (RuntimeException e) {
-            log.warn("[datasource] failed to cancel pending sync logs for ds={}: {}", id, e.getMessage());
+            log.warn("[datasource] failed to cancel pending sync logs for ds={}", id, e);
         }
 
         log.info("[datasource] data source deleted: id={}", id);
@@ -475,7 +474,7 @@ public class DataSourceService implements DataSourceSyncHandler {
         try {
             resources = connector.listResources(config, parentId);
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to list resources: {}", e.getMessage());
+            log.error("[datasource] failed to list resources", e);
             throw e;
         }
         return resources;
@@ -499,7 +498,7 @@ public class DataSourceService implements DataSourceSyncHandler {
         try {
             ancestors = connector.resolveResourceAncestors(config, resourceIds);
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to resolve resource ancestors: {}", e.getMessage());
+            log.error("[datasource] failed to resolve resource ancestors", e);
             throw e;
         }
         return ancestors;
@@ -539,7 +538,7 @@ public class DataSourceService implements DataSourceSyncHandler {
         try {
             syncLogRepo.create(syncLog);
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to create sync log: {}", e.getMessage());
+            log.error("[datasource] failed to create sync log", e);
             throw e;
         }
 
@@ -556,7 +555,7 @@ public class DataSourceService implements DataSourceSyncHandler {
             // 如需区分请先对齐 DataSourceSyncTaskQueue.Outcome 的文档语义
             taskQueue.enqueue(payload, taskId, Scheduler.MAX_RETRY, Scheduler.TASK_TIMEOUT);
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to enqueue sync task: {}", e.getMessage());
+            log.error("[datasource] failed to enqueue sync task", e);
             syncLog.setStatus(DataSourceConstants.SYNC_LOG_STATUS_FAILED);
             syncLog.setFinishedAt(OffsetDateTime.now(ZoneOffset.UTC));
             syncLog.setErrorMessage(e.getMessage());
@@ -593,7 +592,7 @@ public class DataSourceService implements DataSourceSyncHandler {
         try {
             dsRepo.update(ds);
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to pause data source: {}", e.getMessage());
+            log.error("[datasource] failed to pause data source", e);
             throw e;
         }
         scheduler.remove(id);
@@ -611,13 +610,13 @@ public class DataSourceService implements DataSourceSyncHandler {
         try {
             dsRepo.update(ds);
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to resume data source: {}", e.getMessage());
+            log.error("[datasource] failed to resume data source", e);
             throw e;
         }
         try {
             scheduler.addOrUpdate(ds);
         } catch (RuntimeException e) {
-            log.warn("[datasource] failed to re-register cron for ds={}: {}", ds.getId(), e.getMessage());
+            log.warn("[datasource] failed to re-register cron for ds={}", ds.getId(), e);
         }
         log.info("[datasource] data source resumed: id={}", id);
         support.recordKbActivity(ds.getTenantId(), ds.getKnowledgeBaseId(),
@@ -631,7 +630,7 @@ public class DataSourceService implements DataSourceSyncHandler {
         try {
             return syncLogRepo.findByDataSource(dsId, limit, offset);
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to get sync logs: {}", e.getMessage());
+            log.error("[datasource] failed to get sync logs", e);
             throw e;
         }
     }

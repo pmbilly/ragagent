@@ -360,11 +360,11 @@ final class Rec46cSupport {
     /** 对照 zzPlugin：记录调用序。 */
     static final class TestPlugin implements Plugin {
         private final String name;
-        private final String[] events;
+        private final PipelineEventType[] events;
         private final PluginError fail;
         private final List<String> calls;
 
-        TestPlugin(String name, String[] events, PluginError fail, List<String> calls) {
+        TestPlugin(String name, PipelineEventType[] events, PluginError fail, List<String> calls) {
             this.name = name;
             this.events = events;
             this.fail = fail;
@@ -372,7 +372,7 @@ final class Rec46cSupport {
         }
 
         @Override
-        public PluginError onEvent(String eventType, ChatManage chatManage, Chain next) {
+        public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Chain next) {
             calls.add(name + ">in");
             if (fail != null) {
                 return fail;
@@ -383,7 +383,7 @@ final class Rec46cSupport {
         }
 
         @Override
-        public String[] activationEvents() {
+        public PipelineEventType[] activationEvents() {
             return events;
         }
     }

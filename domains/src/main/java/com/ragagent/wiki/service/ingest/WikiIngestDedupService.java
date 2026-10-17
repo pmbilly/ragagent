@@ -126,8 +126,7 @@ public class WikiIngestDedupService implements WikiDedupSupport {
                     usedSharedStore = true;
                 }
             } catch (RuntimeException e) {
-                log.warn("wiki ingest: identity claim failed for {}: {} (using batch-local claim)",
-                        proposedSlug, e.getMessage());
+                log.warn("wiki ingest: identity claim failed for {} (using batch-local claim)", proposedSlug, e);
             }
         }
 
@@ -317,8 +316,7 @@ public class WikiIngestDedupService implements WikiDedupSupport {
             try {
                 pages = wikiService.findPagesByNormalizedTitles(kbId, pageType, miss);
             } catch (Exception e) {
-                log.warn("wiki ingest: exact identity lookup failed for {} ({} titles): {}",
-                        pageType, miss.size(), e.getMessage());
+                log.warn("wiki ingest: exact identity lookup failed for {} ({} titles)", pageType, miss.size(), e);
                 pages = null;
             }
             if (pages != null) {

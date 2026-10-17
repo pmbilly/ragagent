@@ -354,7 +354,7 @@ public final class McpClientManager {
                 try {
                     entry.getValue().disconnect();
                 } catch (RuntimeException e) {
-                    log.error("Failed to disconnect MCP client {}: {}", entry.getKey(), e.toString());
+                    log.error("Failed to disconnect MCP client {}", entry.getKey(), e);
                 }
                 clients.remove(entry.getKey());
                 log.info("MCP client closed: {}", entry.getKey());
@@ -376,7 +376,7 @@ public final class McpClientManager {
                 try {
                     entry.getValue().disconnect();
                 } catch (RuntimeException e) {
-                    log.error("Failed to disconnect MCP client {}: {}", entry.getKey(), e.toString());
+                    log.error("Failed to disconnect MCP client {}", entry.getKey(), e);
                 }
             }
             clients.clear();

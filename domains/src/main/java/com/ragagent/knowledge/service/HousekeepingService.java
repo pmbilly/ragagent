@@ -178,7 +178,7 @@ public class HousekeepingService {
             try {
                 runSweep();
             } catch (RuntimeException e) {
-                log.warn("[Housekeeping] sweep failed: {}", e.getMessage());
+                log.warn("[Housekeeping] sweep failed", e);
             }
         }
     }
@@ -230,7 +230,7 @@ public class HousekeepingService {
                         rows, threshold);
             }
         } catch (RuntimeException e) {
-            log.warn("[Housekeeping] knowledge sweep update failed: {}", e.getMessage());
+            log.warn("[Housekeeping] knowledge sweep update failed", e);
         }
     }
 
@@ -245,7 +245,7 @@ public class HousekeepingService {
                     Knowledge.PARSE_PENDING, Knowledge.PARSE_PROCESSING,
                     Knowledge.PARSE_FINALIZING, cutoff);
         } catch (RuntimeException e) {
-            log.warn("[Housekeeping] knowledge candidate query failed: {}", e.getMessage());
+            log.warn("[Housekeeping] knowledge candidate query failed", e);
             return List.of();
         }
     }
@@ -272,8 +272,7 @@ public class HousekeepingService {
                             + "WHERE knowledge_id IN (" + placeholders + ") AND updated_at > ?",
                     String.class, args));
         } catch (RuntimeException e) {
-            log.warn("[Housekeeping] span heartbeat query failed: {} "
-                    + "(will fail safe and recover all candidates)", e.getMessage());
+            log.warn("[Housekeeping] span heartbeat query failed (will fail safe and recover all candidates)", e);
             return candidates;
         }
         List<String> out = new ArrayList<>(candidates.size());
@@ -309,8 +308,7 @@ public class HousekeepingService {
                             + placeholders + ")",
                     String.class, args.toArray()));
         } catch (RuntimeException e) {
-            log.warn("[Housekeeping] durable queue probe failed: {} (deferring {} candidate(s))",
-                    e.getMessage(), candidates.size());
+            log.warn("[Housekeeping] durable queue probe failed (deferring {} candidate(s))", candidates.size(), e);
             skippedHolder[0] = candidates.size();
             return List.of();
         }
@@ -330,8 +328,7 @@ public class HousekeepingService {
             try {
                 queued = inspector.hasQueuedTasksForKnowledge(id);
             } catch (RuntimeException e) {
-                log.warn("[Housekeeping] queue probe failed for {}: {} "
-                        + "(will fail safe and treat as stuck)", id, e.getMessage());
+                log.warn("[Housekeeping] queue probe failed for {} (will fail safe and treat as stuck)", id, e);
                 out.add(id);
                 continue;
             }
@@ -354,7 +351,7 @@ public class HousekeepingService {
                             + "WHERE summary_status = ? AND updated_at < ? AND deleted_at IS NULL",
                     SUMMARY_STATUS_FAILED, SUMMARY_STATUS_PROCESSING, summaryCutoff);
         } catch (RuntimeException e) {
-            log.warn("[Housekeeping] summary sweep failed: {}", e.getMessage());
+            log.warn("[Housekeeping] summary sweep failed", e);
             return;
         }
         if (rows > 0) {

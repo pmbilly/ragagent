@@ -36,8 +36,7 @@ public class KnowledgeFinalizeAdapter implements KnowledgeFinalizePort {
             int rows = knowledgeRepository.decrementPendingSubtasks(knowledgeId, now);
             decremented = rows > 0;
         } catch (RuntimeException e) {
-            log.warn("finalize subtask decrement failed source=wiki knowledge={} err={}",
-                    knowledgeId, e.getMessage());
+            log.warn("finalize subtask decrement failed source=wiki knowledge={}", knowledgeId, e);
             return new Result(false, false);
         }
 
@@ -47,8 +46,7 @@ public class KnowledgeFinalizeAdapter implements KnowledgeFinalizePort {
             int rows = knowledgeRepository.promoteFinalizingToCompleted(knowledgeId, now);
             promoted = rows > 0;
         } catch (RuntimeException e) {
-            log.warn("finalize subtask promote failed source=wiki knowledge={} err={}",
-                    knowledgeId, e.getMessage());
+            log.warn("finalize subtask promote failed source=wiki knowledge={}", knowledgeId, e);
             return new Result(decremented, false);
         }
         return new Result(decremented, promoted);

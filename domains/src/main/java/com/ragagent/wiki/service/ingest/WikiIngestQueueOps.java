@@ -86,8 +86,7 @@ final class WikiIngestQueueOps {
                         op = new WikiPendingOp();
                     }
                 } catch (Exception e) {
-                    log.warn("wiki ingest: failed to unmarshal pending op id={}: {}",
-                            r.getId(), e.getMessage());
+                    log.warn("wiki ingest: failed to unmarshal pending op id={}", r.getId(), e);
                     continue;
                 }
             } else {
@@ -134,7 +133,7 @@ final class WikiIngestQueueOps {
         try {
             service.pendingRepo.deleteByIds(ids);
         } catch (RuntimeException e) {
-            log.warn("wiki ingest: failed to trim {} pending rows: {}", ids.size(), e.getMessage());
+            log.warn("wiki ingest: failed to trim {} pending rows", ids.size(), e);
             throw e;
         }
     }

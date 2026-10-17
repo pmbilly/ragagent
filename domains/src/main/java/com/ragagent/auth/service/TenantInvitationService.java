@@ -358,8 +358,7 @@ public class TenantInvitationService {
             }
             markStatusIfPending(inv.getId(), STATUS_ACCEPTED);
         } catch (RuntimeException e) {
-            log.warn("failed to reconcile pending invitation for tenant {} user {}: {}",
-                    tenantId, inviteeUserId, e.getMessage());
+            log.warn("failed to reconcile pending invitation for tenant {} user {}", tenantId, inviteeUserId, e);
         }
     }
 
@@ -424,8 +423,7 @@ public class TenantInvitationService {
         try {
             markPendingAcceptedIfExists(tenantId, inviteeUserId);
         } catch (RuntimeException e) {
-            log.warn("failed to reconcile pending invitation for tenant {} user {}: {}",
-                    tenantId, inviteeUserId, e.getMessage());
+            log.warn("failed to reconcile pending invitation for tenant {} user {}", tenantId, inviteeUserId, e);
         }
     }
 
@@ -439,7 +437,7 @@ public class TenantInvitationService {
             }
         } catch (RuntimeException e) {
             // 计数只服务于管理端展示；失败不撤销已获得的成员资格
-            log.warn("share-link {} accepted_count bump failed (membership still created): {}", id, e.getMessage());
+            log.warn("share-link {} accepted_count bump failed (membership still created)", id, e);
         }
     }
 
@@ -491,7 +489,7 @@ public class TenantInvitationService {
                     return existing;
                 }
             }
-            log.error("invitation {} accepted but tenant_members insert failed: {}", inv.getId(), e.getMessage());
+            log.error("invitation {} accepted but tenant_members insert failed", inv.getId(), e);
             throw e;
         }
     }
@@ -511,7 +509,7 @@ public class TenantInvitationService {
                     .set(TenantInvitation::getRespondedAt, now)
                     .set(TenantInvitation::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
         } catch (RuntimeException e) {
-            log.warn("tenant_invitation lazy sweep failed: {}", e.getMessage());
+            log.warn("tenant_invitation lazy sweep failed", e);
         }
     }
 

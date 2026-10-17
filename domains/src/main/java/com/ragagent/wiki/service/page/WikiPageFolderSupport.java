@@ -275,8 +275,7 @@ final class WikiPageFolderSupport {
             try {
                 service.repo.updateMeta(page);
             } catch (RuntimeException e) {
-                log.warn("wiki: recompute folder path for page {} failed: {}", page.getSlug(),
-                        e.toString());
+                log.warn("wiki: recompute folder path for page {} failed", page.getSlug(), e);
             }
         }
     }

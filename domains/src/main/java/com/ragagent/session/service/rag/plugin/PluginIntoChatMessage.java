@@ -41,12 +41,12 @@ public final class PluginIntoChatMessage implements Plugin {
     }
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.INTO_CHAT_MESSAGE};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.INTO_CHAT_MESSAGE};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         Map<String, Object> in = new LinkedHashMap<>();
         in.put("sessionId", chatManage.getSessionId());
         in.put("merge_result_cnt", chatManage.getMergeResult() == null ? 0 : chatManage.getMergeResult().size());

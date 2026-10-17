@@ -48,12 +48,12 @@ public final class PluginMerge implements Plugin {
     }
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.CHUNK_MERGE};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.CHUNK_MERGE};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         if (!chatManage.needsRetrieval()) {
             return next.next();
         }

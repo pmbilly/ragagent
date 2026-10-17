@@ -109,7 +109,7 @@ public class ChunkEditService {
                     try {
                         rebuildParentContent(chunk);
                     } catch (RuntimeException e) {
-                        log.warn("Failed to rebuild parent chunk while retrying edit: {}", e.getMessage());
+                        log.warn("Failed to rebuild parent chunk while retrying edit", e);
                         return chunk;
                     }
                 }
@@ -171,7 +171,7 @@ public class ChunkEditService {
             try {
                 rebuildParentContent(chunk);
             } catch (RuntimeException e) {
-                log.warn("Failed to rebuild parent chunk after edit: {}", e.getMessage());
+                log.warn("Failed to rebuild parent chunk after edit", e);
                 chunk.setIndexStatus("failed");
                 updateChunkIgnoreError(chunk);
                 return chunk;
@@ -181,7 +181,7 @@ public class ChunkEditService {
             try {
                 syncEditedChunkImages(chunk);
             } catch (RuntimeException e) {
-                log.warn("Failed to synchronize image children after chunk edit: {}", e.getMessage());
+                log.warn("Failed to synchronize image children after chunk edit", e);
                 chunk.setIndexStatus("failed");
                 updateChunkIgnoreError(chunk);
                 return chunk;
@@ -193,8 +193,7 @@ public class ChunkEditService {
                 try {
                     enqueueSummaryRefresh(knowledge);
                 } catch (RuntimeException e) {
-                    log.warn("Chunk saved but summary refresh enqueue failed for {}: {}",
-                            knowledge.getId(), e.getMessage());
+                    log.warn("Chunk saved but summary refresh enqueue failed for {}", knowledge.getId(), e);
                 }
             }
         }
@@ -203,7 +202,7 @@ public class ChunkEditService {
         } catch (RuntimeException e) {
             chunk.setIndexStatus("failed");
             updateChunkIgnoreError(chunk);
-            log.error("Chunk {} saved but reindex failed: {}", chunk.getId(), e.getMessage());
+            log.error("Chunk {} saved but reindex failed", chunk.getId(), e);
             return chunk;
         }
         chunk.setIndexStatus("ready");
@@ -411,7 +410,7 @@ public class ChunkEditService {
         try {
             chunkRepository.updateChunk(chunk);
         } catch (RuntimeException e) {
-            log.debug("ignored chunk update failure for {}: {}", chunk.getId(), e.getMessage());
+            log.debug("ignored chunk update failure for {}", chunk.getId(), e);
         }
     }
 

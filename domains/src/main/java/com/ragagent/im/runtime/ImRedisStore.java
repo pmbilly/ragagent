@@ -104,7 +104,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
             return count;
         } catch (DataAccessException e) {
             // 故障：跳过全局检查，回落到本地限额
-            log.warn("[IM] Redis INCR failed for {}: {}", key, e.getMessage());
+            log.warn("[IM] Redis INCR failed for {}", key, e);
             return null;
         }
     }
@@ -114,7 +114,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
         try {
             template.opsForValue().decrement(key);
         } catch (DataAccessException e) {
-            log.warn("[IM] Redis DECR failed for {}: {}", key, e.getMessage());
+            log.warn("[IM] Redis DECR failed for {}", key, e);
         }
     }
 
@@ -126,7 +126,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
             return result == null || result == 1L;
         } catch (DataAccessException e) {
             // 故障：跳过全局限制，避免阻塞 worker
-            log.warn("[IM] Redis global gate failed (proceeding without limit): {}", e.getMessage());
+            log.warn("[IM] Redis global gate failed (proceeding without limit)", e);
             return true;
         }
     }
@@ -144,7 +144,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
             template.opsForValue().set(ImRedisKeys.STOP_PREFIX + userKey, "1",
                     Duration.ofSeconds(ttlSeconds));
         } catch (DataAccessException e) {
-            log.warn("[IM] Redis SET stop marker failed for {}: {}", userKey, e.getMessage());
+            log.warn("[IM] Redis SET stop marker failed for {}", userKey, e);
         }
     }
 
@@ -153,7 +153,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
         try {
             return Boolean.TRUE.equals(template.delete(ImRedisKeys.STOP_PREFIX + userKey));
         } catch (DataAccessException e) {
-            log.warn("[IM] Redis DEL stop marker failed for {}: {}", userKey, e.getMessage());
+            log.warn("[IM] Redis DEL stop marker failed for {}", userKey, e);
             return false;
         }
     }
@@ -164,7 +164,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
             template.opsForValue().set(ImRedisKeys.INFLIGHT_PREFIX + userKey,
                     sessionId + ":" + messageId, Duration.ofSeconds(ttlSeconds));
         } catch (DataAccessException e) {
-            log.warn("[IM] Redis SET inflight failed for {}: {}", userKey, e.getMessage());
+            log.warn("[IM] Redis SET inflight failed for {}", userKey, e);
         }
     }
 
@@ -173,7 +173,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
         try {
             template.delete(ImRedisKeys.INFLIGHT_PREFIX + userKey);
         } catch (DataAccessException e) {
-            log.warn("[IM] Redis DEL inflight failed for {}: {}", userKey, e.getMessage());
+            log.warn("[IM] Redis DEL inflight failed for {}", userKey, e);
         }
     }
 
@@ -183,7 +183,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
         try {
             val = template.opsForValue().get(ImRedisKeys.INFLIGHT_PREFIX + userKey);
         } catch (DataAccessException e) {
-            log.warn("[IM] Redis GET inflight failed for {}: {}", userKey, e.getMessage());
+            log.warn("[IM] Redis GET inflight failed for {}", userKey, e);
             return null;
         }
         if (val == null) {
@@ -207,7 +207,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
             return Boolean.TRUE.equals(template.opsForValue()
                     .setIfAbsent(key, value, Duration.ofSeconds(ttlSeconds)));
         } catch (DataAccessException e) {
-            log.warn("[IM] Redis SETNX failed for {}: {}", key, e.getMessage());
+            log.warn("[IM] Redis SETNX failed for {}", key, e);
             return null;
         }
     }
@@ -229,7 +229,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
                     String.valueOf(maxRequests), member);
             return result == null || result == 1L;
         } catch (DataAccessException e) {
-            log.warn("[IM] Redis rate limit failed for {}: {}", key, e.getMessage());
+            log.warn("[IM] Redis rate limit failed for {}", key, e);
             return null;
         }
     }
@@ -246,7 +246,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
                     .setIfAbsent(key, instanceId, Duration.ofSeconds(ttlSeconds));
             return Boolean.TRUE.equals(ok);
         } catch (DataAccessException e) {
-            log.warn("[IM] Redis leader acquire failed for {}: {}", key, e.getMessage());
+            log.warn("[IM] Redis leader acquire failed for {}", key, e);
             return false;
         }
     }
@@ -258,7 +258,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
                     instanceId, String.valueOf(ttlSeconds * 1000L));
             return result != null && result == 1L;
         } catch (DataAccessException e) {
-            log.warn("[IM] Redis leader renew failed for {}: {}", key, e.getMessage());
+            log.warn("[IM] Redis leader renew failed for {}", key, e);
             return false;
         }
     }
@@ -268,7 +268,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
         try {
             template.execute(RELEASE_LEADER, List.of(key), instanceId);
         } catch (DataAccessException e) {
-            log.warn("[IM] Redis leader release failed for {}: {}", key, e.getMessage());
+            log.warn("[IM] Redis leader release failed for {}", key, e);
         }
     }
 }

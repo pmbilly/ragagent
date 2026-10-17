@@ -109,7 +109,7 @@ public class RedisFaqImportTaskStore implements FaqImportTaskStore {
                     Duration.ofSeconds(PROGRESS_TTL_SECONDS));
         } catch (RuntimeException e) {
             // 进度是体验数据：写失败不得打断导入流程
-            log.warn("[FaqImportRedis] save progress failed for {}: {}", p.taskId(), e.toString());
+            log.warn("[FaqImportRedis] save progress failed for {}", p.taskId(), e);
         }
     }
 
@@ -134,7 +134,7 @@ public class RedisFaqImportTaskStore implements FaqImportTaskStore {
             template.execute(CLEAR_RUNNING, List.of(RUNNING_PREFIX + kbId), taskId, instanceId);
         } catch (RuntimeException e) {
             // 释放失败靠 TTL 兜底（2 小时自愈）
-            log.warn("[FaqImportRedis] clear running info failed for {}: {}", kbId, e.toString());
+            log.warn("[FaqImportRedis] clear running info failed for {}", kbId, e);
         }
     }
 
@@ -153,7 +153,7 @@ public class RedisFaqImportTaskStore implements FaqImportTaskStore {
             template.delete(GUARD_PREFIX + key);
         } catch (RuntimeException e) {
             // 释放失败靠 TTL 兜底（30 秒自愈）
-            log.warn("[FaqImportRedis] release create guard failed: {}", e.toString());
+            log.warn("[FaqImportRedis] release create guard failed", e);
         }
     }
 

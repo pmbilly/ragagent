@@ -40,7 +40,7 @@ public final class ImSupervisor {
                 if (cancelled.getAsBoolean()) {
                     return;
                 }
-                log.warn("[IM] {} connect failed: {}, retrying in {}", name, e.getMessage(), delay);
+                log.warn("[IM] {} connect failed, retrying in {}", name, delay, e);
                 if (sleepInterruptibly(delay, cancelled)) {
                     return;
                 }

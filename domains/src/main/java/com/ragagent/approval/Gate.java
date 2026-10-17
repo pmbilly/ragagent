@@ -152,10 +152,10 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
             return checker.isRequired(ctx, tenantId, serviceId, toolName);
         } catch (RuntimeException e) {
             if (failClose) {
-                log.warn("mcp tool approval check failed (fail-close: requiring approval): {}", e.toString());
+                log.warn("mcp tool approval check failed (fail-close: requiring approval)", e);
                 return true;
             }
-            log.warn("mcp tool approval check failed (fail-open: skip gate): {}", e.toString());
+            log.warn("mcp tool approval check failed (fail-open: skip gate)", e);
             return false;
         }
     }
@@ -462,7 +462,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
                 }
             } catch (RuntimeException e) {
                 if (!closed.get()) {
-                    log.warn("mcp approval pubsub subscribe: {}", e.toString());
+                    log.warn("mcp approval pubsub subscribe", e);
                 }
             } finally {
                 if (sub != null) {
@@ -505,14 +505,14 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
                     redis.publish(m.replyChannel(), ApprovalJson.write(
                             ResolveAck.of(m.pendingId(), status, instanceId, m.requestNonce())));
                 } catch (RuntimeException e) {
-                    log.warn("mcp approval pubsub reply: {}", e.toString());
+                    log.warn("mcp approval pubsub reply", e);
                 }
             }
         }
 
         // 投递成功或本副本没有该 pending 都保持安静，其他错误才告警
         if (err != null && err.kind() != ToolApprovalException.Kind.PENDING_NOT_FOUND) {
-            log.warn("mcp approval pubsub deliver: {}", err.toString());
+            log.warn("mcp approval pubsub deliver", err);
         }
     }
 
@@ -545,7 +545,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
                     Map.of("assistantMessageId", req.assistantMessageId()),
                     req.requestId()));
         } catch (RuntimeException e) {
-            log.warn("emit tool approval resolved failed (pending_id={}): {}", pendingId, e.toString());
+            log.warn("emit tool approval resolved failed (pending_id={})", pendingId, e);
         }
     }
 
@@ -561,7 +561,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
                     Map.of("assistantMessageId", req.assistantMessageId()),
                     req.requestId()));
         } catch (RuntimeException e) {
-            log.warn("emit mcp oauth resolved failed (pending_id={}): {}", pendingId, e.toString());
+            log.warn("emit mcp oauth resolved failed (pending_id={})", pendingId, e);
         }
     }
 

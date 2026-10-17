@@ -28,12 +28,12 @@ public final class PluginChatCompletion implements Plugin {
     }
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.CHAT_COMPLETION};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.CHAT_COMPLETION};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         Map<String, Object> in = new LinkedHashMap<>();
         in.put("sessionId", chatManage.getSessionId());
         in.put("user_question", chatManage.getUserContent());

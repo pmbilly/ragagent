@@ -352,8 +352,7 @@ public class KnowledgeTagService {
                 dim = modelRuntimeAssembler.getEmbeddingModel(kb.getEmbeddingModelId()).getDimensions();
             }
         } catch (Exception e) {
-            log.warn("[tag] bound engine resolve failed, external index rows not deleted (kb={}, chunks={}): {}",
-                    kb.getId(), ids.size(), e.toString());
+            log.warn("[tag] bound engine resolve failed, external index rows not deleted (kb={}, chunks={})", kb.getId(), ids.size(), e);
             return;
         }
         if (boundEngine != null) {
@@ -365,8 +364,7 @@ public class KnowledgeTagService {
                     engine.deleteByChunkIdList(ids, dimensions, kbType);
                     log.info("[tag] deleted index rows for {} chunks (kb={}, engine)", ids.size(), kb.getId());
                 } catch (Exception e) {
-                    log.warn("[tag] index delete failed (kb={}, chunks={}): {}",
-                            kb.getId(), ids.size(), e.toString());
+                    log.warn("[tag] index delete failed (kb={}, chunks={})", kb.getId(), ids.size(), e);
                 }
             });
             return;
@@ -379,8 +377,7 @@ public class KnowledgeTagService {
                 }
                 log.info("[tag] deleted index rows for {} chunks (kb={})", ids.size(), kb.getId());
             } catch (RuntimeException e) {
-                log.warn("[tag] index delete failed (kb={}, chunks={}): {}",
-                        kb.getId(), ids.size(), e.toString());
+                log.warn("[tag] index delete failed (kb={}, chunks={})", kb.getId(), ids.size(), e);
             }
         });
     }
@@ -400,8 +397,7 @@ public class KnowledgeTagService {
                 batchOpsService.batchDeleteKnowledge(kb.getId(), knowledgeIds);
                 log.info("[tag] deleted {} knowledge under tag {}", knowledgeIds.size(), tag.getId());
             } catch (RuntimeException e) {
-                log.warn("[tag] knowledge list delete failed (kb={}, tag={}, count={}): {}",
-                        kb.getId(), tag.getId(), knowledgeIds.size(), e.toString());
+                log.warn("[tag] knowledge list delete failed (kb={}, tag={}, count={})", kb.getId(), tag.getId(), knowledgeIds.size(), e);
             }
         });
     }

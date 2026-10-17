@@ -51,7 +51,7 @@ final class ImStreamPipeline {
         try {
             streamId = streamer.startStream(msg);
         } catch (Exception e) {
-            log.warn("[IM] StartStream failed, falling back to non-streaming: {}", e.getMessage());
+            log.warn("[IM] StartStream failed, falling back to non-streaming", e);
             service.runFallbackNonStream(attach, prepared);
             return;
         }
@@ -96,7 +96,7 @@ final class ImStreamPipeline {
                 runErr = e;
             }
             if (runErr != null) {
-                log.error("[IM] QA stream execution error: {}", runErr.getMessage(), runErr);
+                log.error("[IM] QA stream execution error", runErr);
                 buf.qaErr = new RuntimeException("QA execution error: " + runErr.getMessage(), runErr);
                 done.countDown();
                 complete.countDown();
@@ -146,12 +146,12 @@ final class ImStreamPipeline {
         try {
             streamer.finalizeStream(msg, streamId, finalDisplay);
         } catch (Exception e) {
-            log.warn("[IM] FinalizeStream failed: {}", e.getMessage());
+            log.warn("[IM] FinalizeStream failed", e);
         }
         try {
             streamer.endStream(msg, streamId);
         } catch (Exception e) {
-            log.warn("[IM] EndStream failed: {}", e.getMessage());
+            log.warn("[IM] EndStream failed", e);
         }
         if (answer.isEmpty()) {
             answer = ImFormat.IM_NO_ANSWER_FALLBACK;
@@ -161,7 +161,7 @@ final class ImStreamPipeline {
         try {
             service.sessionQaPort.updateMessage(assistantMsg);
         } catch (Exception e) {
-            log.warn("[IM] Failed to update assistant message: {}", e.getMessage());
+            log.warn("[IM] Failed to update assistant message", e);
         }
         log.info("[IM] Stream reply sent: platform={} user={} answer_len={}",
                 msg.platform, msg.userId, answer.length());
@@ -418,7 +418,7 @@ final class ImStreamPipeline {
         try {
             streamer.updateStreamContent(msg, streamId, display);
         } catch (Exception e) {
-            log.warn("[IM] UpdateStreamContent failed: {}", e.getMessage());
+            log.warn("[IM] UpdateStreamContent failed", e);
         }
     }
 }

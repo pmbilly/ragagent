@@ -177,7 +177,7 @@ final class McpUsageInstructionsOps {
                     USAGE_INSTRUCTIONS_TIMEOUT.toSeconds());
             return null;
         } catch (ExecutionException e) {
-            log.warn("usage instruction generation failed: {}", e.toString());
+            log.warn("usage instruction generation failed", e);
             return null;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

@@ -17,6 +17,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.session.service.rag.plugin.PluginError;
 import com.ragagent.session.service.rag.plugin.PluginFilterTopK;
 import com.ragagent.session.service.rag.plugin.PluginSearch;
+import com.ragagent.session.service.rag.plugin.PluginSearchEntity;
 import com.ragagent.session.service.rag.plugin.PluginSearchParallel;
 import com.ragagent.session.service.rag.support.SearchSupport;
 import java.util.ArrayList;
@@ -518,9 +519,9 @@ class SearchRecordingTest {
         Rec46cSupport.StubChunkRepo chunkRepo = new Rec46cSupport.StubChunkRepo();
         chunkRepo.chunks.put("ent-1", chunk("ent-1", "实体扩展内容一", 3));
         chunkRepo.chunks.put("ent-2", chunk("ent-2", "实体扩展内容二", 4));
-        EventManager mgr = new EventManager();
-        PluginSearchParallel p = new PluginSearchParallel(mgr, kbSvc,
-                null, new Rec46cSupport.StubTenantService(), graph, chunkRepo, knowledgeRepo);
+        PluginSearchParallel p = new PluginSearchParallel(
+                new PluginSearch(kbSvc, null, new Rec46cSupport.StubTenantService()),
+                new PluginSearchEntity(graph, chunkRepo, knowledgeRepo));
         ChatManage cm = new ChatManage();
         cm.setSessionId("sp1");
         cm.setQuery("实体查询");
@@ -541,9 +542,9 @@ class SearchRecordingTest {
         assertRec("search_parallel", "both", json(s1));
 
         // chunk only
-        EventManager mgr2 = new EventManager();
-        PluginSearchParallel p2 = new PluginSearchParallel(mgr2, kbSvc,
-                null, null, graph, chunkRepo, knowledgeRepo);
+        PluginSearchParallel p2 = new PluginSearchParallel(
+                new PluginSearch(kbSvc, null, null),
+                new PluginSearchEntity(graph, chunkRepo, knowledgeRepo));
         ChatManage cm2 = new ChatManage();
         cm2.setSessionId("sp2");
         cm2.setQuery("普通");
@@ -574,10 +575,10 @@ class SearchRecordingTest {
         // empty → search_nothing
         Rec46cSupport.StubKBService emptyKB = new Rec46cSupport.StubKBService();
         emptyKB.kbs.put("kb-9", Rec46cSupport.kb("kb-9", "document", true, true, false));
-        EventManager mgr4 = new EventManager();
-        PluginSearchParallel p4 = new PluginSearchParallel(mgr4, emptyKB,
-                null, null, new Rec46cSupport.StubGraphRepo(), new Rec46cSupport.StubChunkRepo(),
-                new Rec46cSupport.StubKnowledgeRepo());
+        PluginSearchParallel p4 = new PluginSearchParallel(
+                new PluginSearch(emptyKB, null, null),
+                new PluginSearchEntity(new Rec46cSupport.StubGraphRepo(),
+                        new Rec46cSupport.StubChunkRepo(), new Rec46cSupport.StubKnowledgeRepo()));
         ChatManage cm4 = new ChatManage();
         cm4.setSessionId("sp4");
         cm4.setQuery("空");

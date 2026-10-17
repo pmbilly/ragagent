@@ -121,8 +121,7 @@ public class McpOAuthController {
                 frontendRedirect = FALLBACK_REDIRECT;
             }
             // 失败路径不回收连接（旧的传输可能仍然是好的）
-            log.error("MCP OAuth callback failed: {} (service_id={})", e.getMessage(),
-                    LogSanitizer.sanitize(serviceId));
+            log.error("MCP OAuth callback failed (service_id={})", LogSanitizer.sanitize(serviceId), e);
             return redirect(frontendRedirect + "#mcp_oauth_error=" + urlQueryEscape("authorization_failed"));
         }
         if (frontendRedirect.isEmpty()) {

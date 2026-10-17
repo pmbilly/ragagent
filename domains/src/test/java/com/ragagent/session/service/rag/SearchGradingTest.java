@@ -13,6 +13,7 @@ import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.session.service.rag.plugin.PluginError;
 import com.ragagent.session.service.rag.plugin.PluginSearch;
+import com.ragagent.session.service.rag.plugin.PluginSearchEntity;
 import com.ragagent.session.service.rag.plugin.PluginSearchParallel;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,10 +57,10 @@ class SearchGradingTest {
     }
 
     private static PluginSearchParallel parallel(Rec46cSupport.StubKBService kbSvc) {
-        return new PluginSearchParallel(new EventManager(), kbSvc,
-                null, null,
-                new Rec46cSupport.StubGraphRepo(), new Rec46cSupport.StubChunkRepo(),
-                new Rec46cSupport.StubKnowledgeRepo());
+        return new PluginSearchParallel(
+                new PluginSearch(kbSvc, null, null),
+                new PluginSearchEntity(new Rec46cSupport.StubGraphRepo(),
+                        new Rec46cSupport.StubChunkRepo(), new Rec46cSupport.StubKnowledgeRepo()));
     }
 
     @Test

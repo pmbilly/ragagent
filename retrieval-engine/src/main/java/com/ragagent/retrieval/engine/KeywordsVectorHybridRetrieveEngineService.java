@@ -170,8 +170,7 @@ public class KeywordsVectorHybridRetrieveEngineService
                 return embeddings;
             } catch (Exception e) {
                 lastError = e;
-                log.error("BatchEmbedWithPool attempt {}/{} failed: {}", attempt + 1,
-                        EMBED_RETRY_ATTEMPTS, e.toString());
+                log.error("BatchEmbedWithPool attempt {}/{} failed", attempt + 1, EMBED_RETRY_ATTEMPTS, e);
                 if (attempt + 1 < EMBED_RETRY_ATTEMPTS) {
                     Thread.sleep(delay);
                     delay *= 2;

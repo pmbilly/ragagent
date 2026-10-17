@@ -118,7 +118,7 @@ final class AuthOidcOps {
         try {
             return service.oidcService.getAuthorizationUrl(redirectUri);
         } catch (OidcService.OidcException e) {
-            log.error("Failed to generate OIDC authorization URL: {}", e.getMessage());
+            log.error("Failed to generate OIDC authorization URL", e);
             throw new BizException(AppError.forbidden("OIDC authorization unavailable")
                     .withDetails(e.getMessage()));
         }

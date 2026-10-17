@@ -156,9 +156,7 @@ final class WikiIngestLlmSupport {
                         break;
                     }
                     Duration backoff = WikiIngestConstants.llmBackoff(attempt);
-                    log.warn("wiki ingest: LLM call failed (attempt {}/{}), retrying in {}s: {}",
-                            attempt, WikiIngestConstants.LLM_MAX_ATTEMPTS,
-                            backoff.toSeconds(), callErr.getMessage());
+                    log.warn("wiki ingest: LLM call failed (attempt {}/{}), retrying in {}s", attempt, WikiIngestConstants.LLM_MAX_ATTEMPTS, backoff.toSeconds(), callErr);
                     try {
                         Thread.sleep(backoff.toMillis());
                     } catch (InterruptedException ie) {

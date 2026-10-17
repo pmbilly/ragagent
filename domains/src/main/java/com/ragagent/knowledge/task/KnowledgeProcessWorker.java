@@ -203,7 +203,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             attempt = spanTracker.openAttempt(knowledgeId,
                     LangfuseTracing.currentTraceId()).attempt();
         } catch (RuntimeException e) {
-            log.warn("[SpanTracker] openAttempt failed kid={}: {}", knowledgeId, e.toString());
+            log.warn("[SpanTracker] openAttempt failed kid={}", knowledgeId, e);
         }
         try {
             Knowledge k = knowledgeRepository.findByIdAny(knowledgeId);
@@ -236,7 +236,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             String message = e.getMessage() == null ? e.toString() : e.getMessage();
             // 处理体抛错 → span/根记 outcome=error（scope.finish 幂等，随后的 close 不会覆盖）
             scope.finish("error", message);
-            log.warn("process knowledge {} failed: {}", knowledgeId, e.toString());
+            log.warn("process knowledge {} failed", knowledgeId, e);
             failOrComplete(knowledgeId, attempt, message);
         }
     }
@@ -452,7 +452,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             graphRepository.delGraph(List.of(new NameSpace(
                     knowledgeBaseId, knowledgeId)));
         } catch (RuntimeException e) {
-            log.warn("Failed to delete existing graph data (may not exist): {}", e.toString());
+            log.warn("Failed to delete existing graph data (may not exist)", e);
         }
     }
 
@@ -556,8 +556,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             // 语义与原直调一致（异常照旧从这里冒出）。
             eventPublisher.publishEvent(new KnowledgeProcessedEvent(knowledgeId));
         } catch (RuntimeException e) {
-            log.warn("Post-process summary fan-out failed for knowledge {}: {}",
-                    knowledgeId, e.toString());
+            log.warn("Post-process summary fan-out failed for knowledge {}", knowledgeId, e);
         }
     }
 
@@ -609,8 +608,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                         kb.getSummaryModelId() == null ? "" : kb.getSummaryModelId(),
                         knowledgeId, attempt, index, tracing));
             } catch (RuntimeException e) {
-                log.error("[KnowledgePostProcess] Failed to create chunk extract task for {}: {}",
-                        chunk.getId(), e.toString());
+                log.error("[KnowledgePostProcess] Failed to create chunk extract task for {}", chunk.getId(), e);
                 releaseSlots(knowledgeId, 1);
             }
             index++;
@@ -642,8 +640,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                         questionCount, "", attempt, batch.chunkIds(), batch.index(),
                         batch.prevChunkId(), batch.nextChunkId(), tracing));
             } catch (RuntimeException e) {
-                log.error("[KnowledgePostProcess] Failed to enqueue question batch {} for {}: {}",
-                        batch.index(), knowledgeId, e.toString());
+                log.error("[KnowledgePostProcess] Failed to enqueue question batch {} for {}", batch.index(), knowledgeId, e);
                 releaseSlots(knowledgeId, 1);
             }
         }
@@ -675,17 +672,14 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             if (result.accepted()) {
                 log.info("[KnowledgePostProcess] Enqueued wiki ingest task for {}", knowledgeId);
                 if (result.error() != null) {
-                    log.warn("[KnowledgePostProcess] Wiki trigger enqueue failed for {}: {}",
-                            knowledgeId, result.error().toString());
+                    log.warn("[KnowledgePostProcess] Wiki trigger enqueue failed for {}", knowledgeId, result.error());
                 }
             } else {
-                log.warn("[KnowledgePostProcess] Wiki pending op not accepted for {}: {}",
-                        knowledgeId, result.error() == null ? "" : result.error().toString());
+                log.warn("[KnowledgePostProcess] Wiki pending op not accepted for {}", knowledgeId, result.error());
                 releaseWikiSlot(knowledgeId);
             }
         } catch (RuntimeException e) {
-            log.warn("[KnowledgePostProcess] Wiki ingest enqueue failed for {}: {}",
-                    knowledgeId, e.toString());
+            log.warn("[KnowledgePostProcess] Wiki ingest enqueue failed for {}", knowledgeId, e);
             releaseWikiSlot(knowledgeId);
         }
     }
@@ -703,8 +697,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         try {
             finalizer.finalizeWikiSubtask(knowledgeId);
         } catch (RuntimeException e) {
-            log.warn("[KnowledgePostProcess] Release wiki slot failed for {}: {}",
-                    knowledgeId, e.toString());
+            log.warn("[KnowledgePostProcess] Release wiki slot failed for {}", knowledgeId, e);
         }
     }
 

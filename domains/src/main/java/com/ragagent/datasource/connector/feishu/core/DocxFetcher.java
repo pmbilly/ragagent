@@ -121,8 +121,7 @@ public final class DocxFetcher {
         try {
             blocks = client.listDocumentBlocks(in.objToken);
         } catch (RuntimeException e) {
-            log.warn("[Feishu] blocks API failed for {} ({}), falling back to export: {}",
-                    in.title, in.objToken, e.getMessage());
+            log.warn("[Feishu] blocks API failed for {} ({}), falling back to export", in.title, in.objToken, e);
             return List.of(exportDocxFallback(client, in));
         }
 
@@ -175,8 +174,7 @@ public final class DocxFetcher {
             try {
                 data = client.downloadMediaFile(a.fileToken());
             } catch (RuntimeException derr) {
-                log.warn("[Feishu] doc {}: attachment \"{}\" (token={}) download failed: {}",
-                        in.objToken, a.name(), a.fileToken(), derr.getMessage());
+                log.warn("[Feishu] doc {}: attachment \"{}\" (token={}) download failed", in.objToken, a.name(), a.fileToken(), derr);
                 FetchedItem errItem = new FetchedItem();
                 errItem.setExternalId(childId);
                 errItem.setTitle(a.name());
@@ -222,8 +220,7 @@ public final class DocxFetcher {
             try {
                 data = client.downloadMediaFile(img.token());
             } catch (RuntimeException derr) {
-                log.warn("[Feishu] doc {}: image (token={}) download failed: {}",
-                        in.objToken, img.token(), derr.getMessage());
+                log.warn("[Feishu] doc {}: image (token={}) download failed", in.objToken, img.token(), derr);
                 FetchedItem errItem = new FetchedItem();
                 errItem.setExternalId(childId);
                 errItem.setTitle(in.title + "（内嵌图片）");

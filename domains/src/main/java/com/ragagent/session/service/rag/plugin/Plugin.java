@@ -1,5 +1,7 @@
 package com.ragagent.session.service.rag.plugin;
+
 import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineEventType;
 
 /**
  * chat 管线插件接口。
@@ -10,10 +12,10 @@ import com.ragagent.session.service.rag.ChatManage;
 public interface Plugin {
 
     /** 处理事件。返回 null = 无错误。 */
-    PluginError onEvent(String eventType, ChatManage chatManage, Chain next);
+    PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Chain next);
 
     /** 本插件响应的事件类型列表。 */
-    String[] activationEvents();
+    PipelineEventType[] activationEvents();
 
     /** 插件链的下一环。 */
     @FunctionalInterface

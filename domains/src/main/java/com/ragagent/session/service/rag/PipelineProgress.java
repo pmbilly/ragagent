@@ -59,29 +59,30 @@ public final class PipelineProgress {
     }
 
     /** 是否属于共用检索进度窗口的阶段。 */
-    public static boolean isConsolidatedRetrievalStage(String stage, ChatManage chatManage) {
+    public static boolean isConsolidatedRetrievalStage(PipelineEventType stage, ChatManage chatManage) {
         if (chatManage == null) {
             return false;
         }
         switch (stage) {
-            case PipelineEventType.CHUNK_SEARCH_PARALLEL:
-            case PipelineEventType.CHUNK_RERANK:
-            case PipelineEventType.CHUNK_MERGE:
-            case PipelineEventType.FILTER_TOP_K:
+            case CHUNK_SEARCH_PARALLEL:
+            case CHUNK_RERANK:
+            case CHUNK_MERGE:
+            case FILTER_TOP_K:
                 return chatManage.needsRetrieval();
-            case PipelineEventType.WEB_FETCH:
+            case WEB_FETCH:
                 return chatManage.isWebSearchEnabled();
-            case PipelineEventType.DATA_ANALYSIS:
+            case DATA_ANALYSIS:
                 return chatManage.isDataAnalysisEnabled() && chatManage.needsRetrieval();
             default:
                 return false;
         }
     }
 
-    /** 最后一个共用检索进度窗口的阶段（无命中返回 ""）。 */
-    public static String lastConsolidatedRetrievalStage(List<String> eventList, ChatManage chatManage) {
-        String last = "";
-        for (String stage : eventList) {
+    /** 最后一个共用检索进度窗口的阶段（无命中返回 null）。 */
+    public static PipelineEventType lastConsolidatedRetrievalStage(List<PipelineEventType> eventList,
+                                                                   ChatManage chatManage) {
+        PipelineEventType last = null;
+        for (PipelineEventType stage : eventList) {
             if (isConsolidatedRetrievalStage(stage, chatManage)) {
                 last = stage;
             }
@@ -90,9 +91,10 @@ public final class PipelineProgress {
     }
 
     /** 检索进度窗口是否该关闭（ErrSearchNothing 引用比较在此生效）。 */
-    public static boolean shouldCloseRetrievalProgress(String stage, String lastRetrievalStage,
+    public static boolean shouldCloseRetrievalProgress(PipelineEventType stage,
+                                                       PipelineEventType lastRetrievalStage,
                                                        PluginError stageErr) {
-        return stage.equals(lastRetrievalStage) || stageErr != null;
+        return stage == lastRetrievalStage || stageErr != null;
     }
 
     /** 发单个 pending knowledge_search tool_call。 */

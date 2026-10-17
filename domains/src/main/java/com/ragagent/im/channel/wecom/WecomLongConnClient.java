@@ -136,7 +136,7 @@ public class WecomLongConnClient {
                 if (closed) {
                     return;
                 }
-                log.warn("[WeCom] Connection lost ({}), reconnecting...", e.toString());
+                log.warn("[WeCom] Connection lost (), reconnecting...", e);
             }
             if (closed) {
                 return;
@@ -217,8 +217,7 @@ public class WecomLongConnClient {
                 String reqId = CMD_PING + "_" + System.nanoTime();
                 ws.sendText(buildFrame(CMD_PING, reqId, null), true).join();
             } catch (RuntimeException e) {
-                log.warn("[WeCom] Heartbeat failed: {}, closing connection to trigger reconnect",
-                        e.toString());
+                log.warn("[WeCom] Heartbeat failed, closing connection to trigger reconnect", e);
                 closeConnIf(ws);
                 return;
             }
@@ -230,7 +229,7 @@ public class WecomLongConnClient {
         try {
             frame = MAPPER.readTree(raw);
         } catch (Exception e) {
-            log.warn("[WeCom] Failed to unmarshal frame: {}", e.toString());
+            log.warn("[WeCom] Failed to unmarshal frame", e);
             return;
         }
         String cmd = frame.path("cmd").asText("");
@@ -253,7 +252,7 @@ public class WecomLongConnClient {
         try {
             handler.accept(incoming, channelId);
         } catch (Exception e) {
-            log.error("[WeCom] Handle message error: {}", e.toString());
+            log.error("[WeCom] Handle message error", e);
         }
     }
 
@@ -645,7 +644,7 @@ public class WecomLongConnClient {
 
         @Override
         public void onError(WebSocket ws, Throwable error) {
-            log.warn("[WeCom] WebSocket error: {}", error.toString());
+            log.warn("[WeCom] WebSocket error", error);
             inbox.offer(CLOSED_SENTINEL);
         }
     }

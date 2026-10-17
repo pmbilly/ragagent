@@ -140,7 +140,7 @@ public class ChatLocalImageResolverWiring implements InitializingBean, Disposabl
             return opened.readAllBytes();
         } catch (RuntimeException | IOException e) {
             // 任何异常 → 返回 null，调用侧回落 LOCAL_STORAGE_BASE_DIR 兜底
-            log.debug("[image-resolve] application resolver failed for {}: {}", storageUrl, e.toString());
+            log.debug("[image-resolve] application resolver failed for {}", storageUrl, e);
             return null;
         }
     }

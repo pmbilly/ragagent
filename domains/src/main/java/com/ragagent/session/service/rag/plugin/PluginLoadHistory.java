@@ -23,12 +23,12 @@ public final class PluginLoadHistory implements Plugin {
     }
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.LOAD_HISTORY};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.LOAD_HISTORY};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         if (chatManage.getMaxRounds() <= 0) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("sessionId", chatManage.getSessionId());

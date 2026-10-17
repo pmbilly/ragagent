@@ -310,7 +310,7 @@ public final class QaQueue {
             try {
                 handler.accept(req);
             } catch (RuntimeException e) {
-                log.error("[IM] QA handler panicked: {}", e.getMessage(), e);
+                log.error("[IM] QA handler panicked", e);
             } finally {
                 activeWorkers.decrementAndGet();
                 releaseGlobalGate();

@@ -80,12 +80,12 @@ class PipelineLifecycleRecordingTest {
                 PipelineProgress.isConsolidatedRetrievalStage(PipelineEventType.DATA_ANALYSIS, cmDA),
                 PipelineProgress.isConsolidatedRetrievalStage(PipelineEventType.CHUNK_SEARCH_PARALLEL, cmIntent))));
 
-        String last = PipelineProgress.lastConsolidatedRetrievalStage(List.of(
+        PipelineEventType last = PipelineProgress.lastConsolidatedRetrievalStage(List.of(
                 PipelineEventType.LOAD_HISTORY, PipelineEventType.QUERY_UNDERSTAND,
                 PipelineEventType.CHUNK_SEARCH_PARALLEL, PipelineEventType.CHUNK_RERANK,
                 PipelineEventType.CHUNK_MERGE, PipelineEventType.FILTER_TOP_K,
                 PipelineEventType.INTO_CHAT_MESSAGE, PipelineEventType.CHAT_COMPLETION_STREAM), cm);
-        assertRec("progress", "last_stage", json(last));
+        assertRec("progress", "last_stage", json(last == null ? null : last.key()));
 
         assertRec("progress", "should_close", json(List.of(
                 PipelineProgress.shouldCloseRetrievalProgress(PipelineEventType.FILTER_TOP_K, PipelineEventType.FILTER_TOP_K, null),

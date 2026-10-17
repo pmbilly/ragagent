@@ -1,12 +1,15 @@
 # ragagent 交接文档（v0.3.0 · 载体纠偏 + 三 runtime 版）
 
-> **版本谱系**：v0.1.0 归档 `docs/handoff/archive/HANDOFF-v0.1.0-2026-10-13.md`；**v0.2.0 全文归档 `docs/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`**（含 B232~B267 全部逐批记录、v0.2.0 结构规范与 C/G1/D/E 系列过程记录）。
+> **内部迁移作战文档（非新人入口）**：新人请从仓库根 `README.md` → `docs/README.md` 开始。
+> 本文件记录重构/迁移的过程与决策，路径与读数随批次变化，不是当前架构说明。
+
+> **版本谱系**：v0.1.0 归档 `docs/internal/handoff/archive/HANDOFF-v0.1.0-2026-10-13.md`；**v0.2.0 全文归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`**（含 B232~B267 全部逐批记录、v0.2.0 结构规范与 C/G1/D/E 系列过程记录）。
 > 本版 2026-10-16 生效：**只留活信息**；历史一概在归档，追溯用 `git log --grep`。
-> 工作分支：`v0.3.0`。
+> 工作分支：`v0.4.0`。
 
 ## ⭐ 接手须知（5 分钟）
 
-1. **开工顺序**：读 §4 两条判定标准（2026-10-16 拍板）→ §5 执行方案（详情＝`docs/java-remediation-implementation-plan-v2-2026-10-16.md`）→ §9 方法论 → §10 纪律 → 干活 → 回填 §12。
+1. **开工顺序**：读 §4 两条判定标准（2026-10-16 拍板）→ §5 执行方案（详情＝`docs/internal/plans/java-remediation-implementation-plan-v2-2026-10-16.md`）→ §9 方法论 → §10 纪律 → 干活 → 回填 §12。
 2. **基线核对**：先跑 §6 的全量闸门，确认 `BUILD SUCCESSFUL` + 各模块测试条数（**numbers 守恒**；只信汇总数字，`boot`/`platform` 条数缺失＝静默少跑）。
 3. **待办与读数都会过期**：宣称"未完成/待办"或据此动手前先实测（`git log` / 守卫 / 脚本输出）；**以守卫为准**。
 4. **提交**：批次号 `(P#)`/`(R#)`，写明验证方式；**推送等用户发话**（历史纪律，一字不改）。
@@ -14,7 +17,7 @@
 ## 0. 总目标与当前阶段
 
 - **终态（方案 §5.1）**：7 个 Gradle 模块 —— contract / platform / agent-engine / retrieval-engine / model-runtime / domains / boot；单进程分层单体；跨模块只经 contract。
-- **现状（2026-10-16）**：**5 模块** —— `:contract`（241 件）· `:platform`（168 件）· `:domains` · `:engine`（318 件）· `:boot`。`:common` 已完全解散（125→0）。
+- **现状（2026-10-17）**：**7 模块** —— `:contract` · `:platform` · `:model-runtime` · `:retrieval-engine` · `:agent-engine` · `:domains` · `:boot`。`:common` 与 `:engine` 均已解散。
 - **当前阶段（v0.3.0）**：**载体纠偏（P1~P5）+ 三 runtime（R1~R6）** ⇒ 计划见 §5。
 
 ## 1. 仓库身份与分支
@@ -51,7 +54,7 @@
 口径：
 - 判定标准是**原则**，优先于方案 §8.1/§8.2 的枚举清单（方案原文："只公布跨模块确有消费者的 API/SPI"；"不为 DDD 完整编造空层"）。
 - **跨域端口/视图面扩容 = 追认**（A③ 域间契约化的必然产物）；**platform 业务形状 = 归正**（去框架化进 contract / 中性化 / 归域 / 归 agent-engine，见实施计划 v2 §1.2）。
-- 验收工具：`check-contracts-purity.py`（C1/C2/C3 全零）+ 新增 **C8**（platform 内 `*View/*Port/*Request/*Response/*Payload/*Facts` 命名红灯，例外须登记理由）。
+- 验收工具：`check-contract-purity.py`（C1/C2/C3 全零）+ **C8**（platform 内 `*View/*Port/*Request/*Response/*Payload/*Facts` 命名红灯，例外须登记理由）。
 
 ## 5. 执行方案（摘要；详情＝实施计划 v2）
 
@@ -128,13 +131,13 @@ boot           14 件                      →  boot
 `controller`（绑定/帧写出）· `service`（用例与政策）· `domain`（状态与不变量）· `mapper` · `repository` · `dto` · `client` · `task` · `api` · `support` · `config`（只装配）。
 禁止：`service` 引边界层/具体技术（A16/A17）· `domain` 引 Spring/Mapper · `repository` 回引 service · `controller` 跑编排 · `mapper` 放仓储门面（A11b）。
 
-### 8.3 守卫与规则总表（**14 守卫 + ArchUnit**；新增规则前先查这里）
+### 8.3 守卫与规则总表（**全部守卫 + ArchUnit**；新增规则前先查这里）
 
 | 守卫 | 语义 | 基线 |
 |---|---|---|
 | `check-package-cycles.py` | 环/分层/域依赖/SCC（R1~R9） | `package-cycles.baseline.json`（只许减；SCC 12 组） |
 | `check-domain-contracts.py` | **R10 域间只经契约**（分档①②③） | `domain-contracts.baseline.json`（**6 条边 / 51 类**；①0/②2/③5） |
-| `check-contracts-purity.py` | C1 受控导入根 · C2 持久化形状 · C3 依赖清单（+C4 载荷型） | `contracts-purity.baseline.json`（只许减；全零） |
+| `check-contract-purity.py` | C1 导入根（纯 JDK）· C2 构建依赖 · C3 框架形状 | 硬零，无基线 |
 | `check-contract-sync.py` | 金片键签名变化必须签字 | 1,349 金片 |
 | `check-json-key-case.py --strict` | 换锚棘轮 + 冻结覆盖快照 | 冻结面登记 |
 | `check-event-face-case.py` | 事件面/路由面命名口径 | — |
@@ -146,6 +149,11 @@ boot           14 件                      →  boot
 | `check-api-envelope.py` | 统一响应外壳 | 只许减 |
 | `check-exception-semantics.py` | 检索引擎 catch 不得清空边界条件 | 0 |
 | `check-package-dirs.py` | 包声明 ↔ 目录一致（含 testFixtures） | 0 |
+| `check-module-graph.py` | 主码依赖矩阵 · 同包 · 测试边登记 · 夹具包 | 登记表 |
+| `check-platform-shapes.py` | platform 业务形状红旗 | `platform-shapes.baseline.json` |
+| `gen-arch-index.py --check` | `package-info` 与 `docs/architecture/packages.md` 同步 | 硬零 |
+| `check-tenant-scope.py` | 跨线程身份必须走 `TenantScope`；禁止裸 capture/replay | 硬零 |
+| `check-log-exceptions.py` | log 里禁止 `Throwable.toString()` / `.getMessage()` | 硬零 |
 | ArchUnit `ArchitectureRulesTest` | A1~A20（含 A16/A17 边界禁令、A18 状态所有权、A19 分层、A20 装配契约） | 各基线只许减 |
 
 ## 9. 落刀方法论（精要；**全量判据见归档 v0.2.0 §13/§14**）
@@ -237,7 +245,7 @@ boot           14 件                      →  boot
 | R1b-1 | 2026-10-16 | 契约面先行第二件：`retrieval.domain` 整包 4 件（WebSearchResult/Filters/Request/ImageInfo）→ `contract.websearch`（§8.1 目标落点）；ImageInfo 注解对位进 `ContractJsonMixinsWebSearch`；修 `AgentReferencesData` 陈旧 javadoc | 15 守卫绿 · 金片 1349 一致 · json-key 换锚 `--write`（离开 1 / 进入 1）· gate 1m57s / **4996 / 失败 0 / 跳过 4** · 冒烟 200；首轮闸门 `ImRedisStoreTest` 单例失败 → 隔离重跑 7/0 绿（已知 Redis 瞬态族） |
 | R1a | 2026-10-16 | 契约面先行第一件：`llm.domain` 11 件聊天形状 `git mv` → `contract.model.chat`（ChatMessage/ChatOptions/ChatResponse/ChatTool/FunctionCall/FunctionDef/ImageUrl/MessageContentPart/ToolCall/CacheRetention/ChatConfig）+ Jackson 注解逐条对位进 `platform.web.ContractJsonMixinsModelChat`（ContractJsonModule 注册）+ 4 处不透明 JSON 字段改 `Object`（format/parameters/providerMetadata）· **逐件过跨域消费者判据**（ImageUrl 为 MessageContentPart 公开形状件随迁；StreamResponse/ProviderMetadataMaps 留 R2 公开面分层） | 15 守卫全绿（金片 1349 一致 · R10 无新增边 · C8 无新增）· json-key 换锚 `--write`（离开 5 / 进入 1，均换包）· gate 2m15s / **4996 / 失败 0 / 跳过 4** · 定向 engine 456 + domains 266 · 冒烟 sessions/knowledge-bases/models 200（后端已重启） |
 
-（历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
+（历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
 ## 13. 文档地图与归档
 
@@ -248,6 +256,6 @@ boot           14 件                      →  boot
 | `docs/java-remediation-implementation-plan-v2-2026-10-16.md` | **v0.3.0 执行计划（P/R 批次全部细节与验收）** |
 | `docs/java-remediation-implementation-plan-2026-10-13.md` | v1 历史（36 批已完成；已标注归档） |
 | `docs/java-remediation-implementation-plan-review-2026-10-13.md` | v1 实施评审（P0-3 模块提取立项出处） |
-| `docs/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md` | v0.2.0 全文（结构规范/方法论全量/逐批记录） |
-| `docs/handoff/archive/HANDOFF-v0.1.0-2026-10-13.md` | v0.1.0 全文（远古追溯） |
-| `docs/handoff/records/batch-records.md` | v0.1.0 早期逐批记录（~B110） |
+| `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md` | v0.2.0 全文（结构规范/方法论全量/逐批记录） |
+| `docs/internal/handoff/archive/HANDOFF-v0.1.0-2026-10-13.md` | v0.1.0 全文（远古追溯） |
+| `docs/internal/handoff/records/batch-records.md` | v0.1.0 早期逐批记录（~B110） |

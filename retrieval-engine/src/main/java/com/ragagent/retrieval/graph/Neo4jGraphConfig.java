@@ -62,8 +62,7 @@ public class Neo4jGraphConfig {
                 return driver;
             } catch (RuntimeException e) {
                 last = e;
-                log.warn("Failed to verify Neo4j authentication (attempt {}/{}): {}",
-                        attempt, MAX_RETRIES, e.toString());
+                log.warn("Failed to verify Neo4j authentication (attempt {}/{})", attempt, MAX_RETRIES, e);
                 if (driver != null) {
                     try {
                         driver.close();

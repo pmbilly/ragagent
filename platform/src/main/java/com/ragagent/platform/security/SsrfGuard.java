@@ -309,7 +309,7 @@ public class SsrfGuard {
                     prefixLens.add(prefix);
                     continue;
                 } catch (Exception e) {
-                    log.warn("[ssrf-whitelist] dropping invalid CIDR entry \"{}\": {}", entry, e.toString());
+                    log.warn("[ssrf-whitelist] dropping invalid CIDR entry \"{}\"", entry, e);
                     continue;
                 }
             }

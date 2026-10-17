@@ -114,8 +114,7 @@ public class LocalFileService implements FileService {
             return Files.newInputStream(resolved);
         } catch (IOException e) {
             // baseDir/resolved 都记上：写入方与读取方 LOCAL_STORAGE_BASE_DIR 不一致时一眼可见
-            log.error("Failed to open file: baseDir={} resolvedPath={} err={}",
-                    baseDir, resolved, e.toString());
+            log.error("Failed to open file: baseDir={} resolvedPath={}", baseDir, resolved, e);
             throw new IllegalStateException("failed to open file: " + e.getMessage(), e);
         }
     }

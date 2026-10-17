@@ -247,7 +247,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
             engine.deleteBySourceIdList(List.of(sourceId), embeddingModel.getDimensions(),
                     kb.getType());
         } catch (Exception e) {
-            log.warn("Failed to delete vector index for question (may not exist): {}", e.getMessage());
+            log.warn("Failed to delete vector index for question (may not exist)", e);
         }
 
         // 6. 从 metadata 移除
@@ -372,7 +372,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
             questions = generateQuestionsWithContext(chatModel, chunk.getContent(), prevContent, nextContent,
                     knowledge.getTitle(), questionCount, customInstructions);
         } catch (RuntimeException e) {
-            log.warn("Failed to generate questions for chunk {}: {}", chunk.getId(), e.toString());
+            log.warn("Failed to generate questions for chunk {}", chunk.getId(), e);
             return 0;
         }
         if (questions.isEmpty()) {

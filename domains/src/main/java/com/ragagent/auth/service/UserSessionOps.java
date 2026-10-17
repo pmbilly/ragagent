@@ -164,8 +164,7 @@ final class UserSessionOps {
                     svc.authTokenMapper.updateById(record);
                 }
             } catch (RuntimeException e) {
-                UserService.log.warn("Failed to revoke previous refresh token during tenant switch: {}",
-                        e.getMessage());
+                UserService.log.warn("Failed to revoke previous refresh token during tenant switch", e);
             }
         }
 

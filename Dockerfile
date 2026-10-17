@@ -66,6 +66,9 @@ COPY --from=builder /app.jar app.jar
 # （Flyway 静默落到空的 classpath 位置，不报错、直到第一条查询才炸）。
 COPY --from=builder /build/migrations/versioned ./build/generated-migrations/
 
+# 本地文件持久目录（非 root 可写）；生产用 -v 挂到这里
+RUN mkdir -p /app/data/files && chown -R ragagent:ragagent /app/data
+
 USER ragagent
 
 # 环境变量：DB_*/REDIS_*/SYSTEM_AES_KEY/DOCREADER_ADDR/STREAM_MANAGER_TYPE/
@@ -75,7 +78,8 @@ ENV DB_HOST=localhost \
     DB_NAME=WeKnora \
     REDIS_HOST=localhost \
     REDIS_PORT=6379 \
-    DOCREADER_ADDR=localhost:50051
+    DOCREADER_ADDR=localhost:50051 \
+    LOCAL_STORAGE_BASE_DIR=/app/data/files
 
 EXPOSE 8080
 # 健康检查打 /health（与 k8s 探针、docker healthcheck 同端点）。

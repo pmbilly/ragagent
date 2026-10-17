@@ -98,7 +98,7 @@ public class RedisMemoryExtractTaskQueue implements MemoryExtractTaskQueue {
         try {
             queued = MAPPER.readValue(member, QueueMember.class);
         } catch (Exception e) {
-            log.warn("memory: dropping corrupt task member: {}", e.toString());
+            log.warn("memory: dropping corrupt task member", e);
             core.complete(member);
             return;
         }
@@ -146,14 +146,12 @@ public class RedisMemoryExtractTaskQueue implements MemoryExtractTaskQueue {
             return;
         }
         if (queued.attempt() > MAX_RETRY) {
-            log.warn("memory: extraction task gave up after {} attempts: {}",
-                    queued.attempt(), failure.toString());
+            log.warn("memory: extraction task gave up after {} attempts", queued.attempt(), failure);
             core.complete(member);
             return;
         }
         long delaySeconds = retryDelaySeconds(queued.attempt());
-        log.warn("memory: extraction task failed (attempt {}/{}), retrying in {}s: {}",
-                queued.attempt(), MAX_RETRY + 1, delaySeconds, failure.toString());
+        log.warn("memory: extraction task failed (attempt {}/{}), retrying in {}s", queued.attempt(), MAX_RETRY + 1, delaySeconds, failure);
         core.requeue(member, toJson(new QueueMember(queued.body(), queued.attempt() + 1)),
                 System.currentTimeMillis() + RedisTaskQueueCore.secondsToMillis(delaySeconds));
     }

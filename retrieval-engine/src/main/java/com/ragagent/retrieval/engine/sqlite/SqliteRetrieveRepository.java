@@ -229,7 +229,7 @@ public class SqliteRetrieveRepository
                         + TABLE_EMBEDDINGS + "(" + column + ")");
             }
         } catch (SQLException e) {
-            log.error("[SQLite] Failed to auto-migrate {}: {}", TABLE_EMBEDDINGS, e.getMessage());
+            log.error("[SQLite] Failed to auto-migrate {}", TABLE_EMBEDDINGS, e);
             throw new IllegalStateException("sqlite migrate failed: " + e.getMessage(), e);
         }
         initFts();
@@ -290,7 +290,7 @@ public class SqliteRetrieveRepository
                 }
             }
         } catch (SQLException e) {
-            log.warn("[SQLite] Failed to create FTS5 table: {}", e.getMessage());
+            log.warn("[SQLite] Failed to create FTS5 table", e);
         }
     }
 
@@ -305,7 +305,7 @@ public class SqliteRetrieveRepository
                 dims.add(rs.getInt(1));
             }
         } catch (SQLException e) {
-            log.warn("[SQLite] Failed to scan existing dimensions: {}", e.getMessage());
+            log.warn("[SQLite] Failed to scan existing dimensions", e);
             return;
         }
         for (int dim : dims) {
@@ -321,8 +321,7 @@ public class SqliteRetrieveRepository
         try (Connection conn = open()) {
             ensureVecTable(conn, dim);
         } catch (SQLException e) {
-            log.error("[SQLite] Failed to open connection for vec table dim {}: {}", dim,
-                    e.getMessage());
+            log.error("[SQLite] Failed to open connection for vec table dim {}", dim, e);
         }
     }
 
@@ -344,7 +343,7 @@ public class SqliteRetrieveRepository
                 vecTables.put(dim, true);
                 return;
             }
-            log.error("[SQLite] Failed to create vec table for dim {}: {}", dim, e.getMessage());
+            log.error("[SQLite] Failed to create vec table for dim {}", dim, e);
             throw e;
         }
     }

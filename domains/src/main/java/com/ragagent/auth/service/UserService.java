@@ -98,7 +98,7 @@ public class UserService implements UserNameLookup {
             accessToken = tokens[0];
             refreshToken = tokens[1];
         } catch (RuntimeException e) {
-            log.error("Failed to generate tokens: {}", e.toString());
+            log.error("Failed to generate tokens", e);
             return LoginResult.failure("Login failed");
         }
 
@@ -355,8 +355,7 @@ public class UserService implements UserNameLookup {
                     .eq(User::getId, user.getId())
                     .set(User::getTenantId, null));
         } catch (RuntimeException e) {
-            log.warn("clearStaleHomeTenant: failed to persist cleared home for user {} (was tenant {}): {}",
-                    user.getId(), staleHome, e.toString());
+            log.warn("clearStaleHomeTenant: failed to persist cleared home for user {} (was tenant {})", user.getId(), staleHome, e);
         }
     }
 
@@ -385,8 +384,7 @@ public class UserService implements UserNameLookup {
             try {
                 userMapper.updateById(user);
             } catch (RuntimeException e) {
-                log.warn("resolveLoginTenantID: failed to persist tenant {} for tenantless user {}: {}",
-                        tid, user.getId(), e.toString());
+                log.warn("resolveLoginTenantID: failed to persist tenant {} for tenantless user {}", tid, user.getId(), e);
                 user.setTenantId(0L);
             }
             return tid;
@@ -402,8 +400,7 @@ public class UserService implements UserNameLookup {
         try {
             userMapper.updateById(user);
         } catch (RuntimeException e) {
-            log.warn("clearLastActiveTenantPreference: failed to persist cleared preference for user {}: {}",
-                    user.getId(), e.toString());
+            log.warn("clearLastActiveTenantPreference: failed to persist cleared preference for user {}", user.getId(), e);
         }
     }
 
@@ -432,7 +429,7 @@ public class UserService implements UserNameLookup {
             authTokenMapper.insert(record);
         } catch (RuntimeException e) {
             // 落库失败不使登录失败
-            log.warn("Failed to persist {} (user={}): {}", tokenType, userId, e.toString());
+            log.warn("Failed to persist {} (user={})", tokenType, userId, e);
         }
     }
 
@@ -483,7 +480,7 @@ public class UserService implements UserNameLookup {
             try {
                 createdTenant = tenantService.createTenant(tenant);
             } catch (RuntimeException e) {
-                log.error("Failed to create workspace: {}", e.toString());
+                log.error("Failed to create workspace", e);
                 throw new RegistrationException("failed to create workspace");
             }
         }
@@ -511,13 +508,12 @@ public class UserService implements UserNameLookup {
                 userMapper.insert(user);
             }
         } catch (RuntimeException e) {
-            log.error("Failed to create user: {}", e.toString());
+            log.error("Failed to create user", e);
             if (createdTenant != null) {
                 try {
                     tenantService.deleteTenant(createdTenant.getId());
                 } catch (RuntimeException rollbackErr) {
-                    log.error("Failed to roll back tenant {} after user creation failure: {}",
-                            createdTenant.getId(), rollbackErr.toString());
+                    log.error("Failed to roll back tenant {} after user creation failure", createdTenant.getId(), rollbackErr);
                 }
             }
             throw new RegistrationException("failed to create user");
@@ -528,8 +524,7 @@ public class UserService implements UserNameLookup {
             try {
                 memberService.addMember(user.getId(), createdTenant.getId(), TenantRole.OWNER.value(), null);
             } catch (RuntimeException e) {
-                log.error("Failed to create owner membership for user {} tenant {}: {}",
-                        user.getId(), createdTenant.getId(), e.toString());
+                log.error("Failed to create owner membership for user {} tenant {}", user.getId(), createdTenant.getId(), e);
                 try {
                     userMapper.deleteById(user.getId());
                 } catch (RuntimeException ignored) {

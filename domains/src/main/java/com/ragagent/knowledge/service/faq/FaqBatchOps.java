@@ -222,7 +222,7 @@ final class FaqBatchOps {
             Files.write(target, csv);
             return "local://" + tenantId + "/exports/" + unique;
         } catch (IOException e) {
-            log.warn("FAQ import task {}: failed to generate failed entries CSV: {}", taskId, e.getMessage());
+            log.warn("FAQ import task {}: failed to generate failed entries CSV", taskId, e);
             return null;
         }
     }

@@ -36,7 +36,7 @@ final class WeaviateWriteOps {
         if (row.embedding == null || row.embedding.length == 0) {
             IllegalStateException e = new IllegalStateException(
                     "empty embedding vector for chunk ID: " + indexInfo.chunkId);
-            log.error("[Weaviate] {}", e.getMessage());
+            log.error("[Weaviate]", e);
             throw e;
         }
         int dimension = row.embedding.length;
@@ -45,7 +45,7 @@ final class WeaviateWriteOps {
         try {
             service.client.createObject(object);
         } catch (RuntimeException e) {
-            log.error("[Weaviate] Failed to save index: {}", e.getMessage());
+            log.error("[Weaviate] Failed to save index", e);
             throw new IllegalStateException(e.getMessage() == null
                     ? e.toString() : e.getMessage(), e);
         }
@@ -85,8 +85,7 @@ final class WeaviateWriteOps {
                 JsonNode response = service.client.batchCreate(objects);
                 logObjectErrors(response, "BatchSave");
             } catch (RuntimeException e) {
-                log.error("[Weaviate] Failed to execute batch operation for dimension {}: {}",
-                        dimension, e.getMessage());
+                log.error("[Weaviate] Failed to execute batch operation for dimension {}", dimension, e);
                 throw new IllegalStateException(
                         "failed to batch save (dimension " + dimension + "): " + e.getMessage(), e);
             }
@@ -183,7 +182,7 @@ final class WeaviateWriteOps {
         try {
             service.client.batchDelete(collection, where.json(), "minimal");
         } catch (RuntimeException e) {
-            log.error("[Weaviate] {}: {}", errorPrefix, e.getMessage());
+            log.error("[Weaviate] {}", errorPrefix, e);
             throw new IllegalStateException(errorPrefix + ": " + e.getMessage(), e);
         }
         log.info("[Weaviate] Successfully deleted documents by {}", subject);
@@ -210,9 +209,7 @@ final class WeaviateWriteOps {
                 try {
                     service.client.mergeUpdate(collection, entry.getKey(), properties);
                 } catch (RuntimeException e) {
-                    log.error("[Weaviate] Failed to update chunk {} status in {}: {}",
-                            Boolean.TRUE.equals(entry.getValue()) ? "enabled" : "disabled",
-                            collection, e.getMessage());
+                    log.error("[Weaviate] Failed to update chunk {} status in {}", Boolean.TRUE.equals(entry.getValue()) ? "enabled" : "disabled", collection, e);
                 }
             }
         }
@@ -236,8 +233,7 @@ final class WeaviateWriteOps {
                 try {
                     service.client.mergeUpdate(collection, entry.getKey(), properties);
                 } catch (RuntimeException e) {
-                    log.warn("[Weaviate] Failed to update chunk {} tag ID in {}: {}",
-                            entry.getKey(), collection, e.getMessage());
+                    log.warn("[Weaviate] Failed to update chunk {} tag ID in {}", entry.getKey(), collection, e);
                 }
             }
         }

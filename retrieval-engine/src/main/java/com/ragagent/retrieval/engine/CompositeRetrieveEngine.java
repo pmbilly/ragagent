@@ -168,8 +168,7 @@ public class CompositeRetrieveEngine {
             try {
                 info.engine.index(embedder, indexInfo, info.retrieverTypes);
             } catch (Exception e) {
-                log.error("Repository {} failed to save: {}", info.engine.engineType(),
-                        e.toString());
+                log.error("Repository {} failed to save", info.engine.engineType(), e);
                 throw e;
             }
         }));
@@ -182,8 +181,7 @@ public class CompositeRetrieveEngine {
             try {
                 info.engine.batchIndex(embedder, deduped, info.retrieverTypes);
             } catch (Exception e) {
-                log.error("Repository {} failed to batch save: {}", info.engine.engineType(),
-                        e.toString());
+                log.error("Repository {} failed to batch save", info.engine.engineType(), e);
                 throw e;
             }
         }));
@@ -196,8 +194,7 @@ public class CompositeRetrieveEngine {
             try {
                 info.engine.deleteByChunkIdList(chunkIdList, dimension, knowledgeType);
             } catch (Exception e) {
-                log.error("Repository {} failed to delete chunk ID list: {}",
-                        info.engine.engineType(), e.toString());
+                log.error("Repository {} failed to delete chunk ID list", info.engine.engineType(), e);
                 throw e;
             }
         }));
@@ -210,8 +207,7 @@ public class CompositeRetrieveEngine {
             try {
                 info.engine.deleteBySourceIdList(sourceIdList, dimension, knowledgeType);
             } catch (Exception e) {
-                log.error("Repository {} failed to delete source ID list: {}",
-                        info.engine.engineType(), e.toString());
+                log.error("Repository {} failed to delete source ID list", info.engine.engineType(), e);
                 throw e;
             }
         }));
@@ -224,8 +220,7 @@ public class CompositeRetrieveEngine {
             try {
                 info.engine.deleteByKnowledgeIdList(knowledgeIdList, dimension, knowledgeType);
             } catch (Exception e) {
-                log.error("Repository {} failed to delete knowledge ID list: {}",
-                        info.engine.engineType(), e.toString());
+                log.error("Repository {} failed to delete knowledge ID list", info.engine.engineType(), e);
                 throw e;
             }
         }));
@@ -242,8 +237,7 @@ public class CompositeRetrieveEngine {
                 info.engine.copyIndices(sourceKnowledgeBaseId, sourceToTargetKbIdMap,
                         sourceToTargetChunkIdMap, targetKnowledgeBaseId, dimension, knowledgeType);
             } catch (Exception e) {
-                log.error("Repository {} failed to copy indices: {}", info.engine.engineType(),
-                        e.toString());
+                log.error("Repository {} failed to copy indices", info.engine.engineType(), e);
                 throw e;
             }
         }));
@@ -275,7 +269,7 @@ public class CompositeRetrieveEngine {
         }, errors);
         Throwable first = firstError(errors);
         if (first != null) {
-            log.error("EstimateStorageSize failed: {}", first.toString());
+            log.error("EstimateStorageSize failed", first);
         }
         return sum.get();
     }

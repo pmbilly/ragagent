@@ -106,7 +106,7 @@ public class ElasticsearchV7RetrieveRepository
         try {
             createIndexIfNotExists();
         } catch (Exception e) {
-            log.error("[ElasticsearchV7] Failed to create index: {}", e.toString());
+            log.error("[ElasticsearchV7] Failed to create index", e);
         }
         detectFieldTypes();
         this.searchOps = new ElasticsearchV7SearchOps(this);
@@ -197,8 +197,7 @@ public class ElasticsearchV7RetrieveRepository
                         + " .keyword suffix", chunkIdProp.path("type").asText());
             }
         } catch (Exception e) {
-            log.warn("[ElasticsearchV7] Failed to get index mapping, defaulting to .keyword"
-                    + " suffix: {}", e.toString());
+            log.warn("[ElasticsearchV7] Failed to get index mapping, defaulting to .keyword suffix", e);
             useKeywordSuffix = true;
         }
     }

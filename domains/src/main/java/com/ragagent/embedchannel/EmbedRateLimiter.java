@@ -139,8 +139,7 @@ public class EmbedRateLimiter {
             }
             return result == 1L;
         } catch (RuntimeException e) {
-            log.warn("embed rate limit: Redis failed for {}: {} (falling back to local)",
-                    windowKey, e.toString());
+            log.warn("embed rate limit: Redis failed for {} (falling back to local)", windowKey, e);
             return null;
         }
     }

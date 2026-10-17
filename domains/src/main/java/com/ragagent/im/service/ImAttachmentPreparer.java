@@ -158,7 +158,7 @@ final class ImAttachmentPreparer {
             DocReaderParsePort.ParsedDocumentView result = client.parse(content, fileName, ext, fileName, "");
             return result == null ? null : result.markdown();
         } catch (Exception e) {
-            log.warn("[IM] {}: {}", warnPrefix, e.getMessage());
+            log.warn("[IM] {}", warnPrefix, e);
             return null;
         }
     }

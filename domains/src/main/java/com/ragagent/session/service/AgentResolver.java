@@ -45,8 +45,7 @@ public class AgentResolver {
                 customAgent = result == null ? null : result.row();
                 effectiveTenantId = currentTenant;
             } catch (RuntimeException e) {
-                log.warn("Failed to get custom agent, agent ID: {}, error: {}, using default config",
-                        agentId, e.toString());
+                log.warn("Failed to get custom agent, agent ID: {}, error, using default config", agentId, e);
             }
         }
         return new ResolvedAgent(customAgent, effectiveTenantId, false);

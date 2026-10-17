@@ -5,6 +5,7 @@ import com.ragagent.contract.event.EventBusException;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.event.EventHandler;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -111,21 +112,16 @@ public class EventBus implements EventBusInterface {
             // Async mode: fire and forget
             TenantContextSnapshot ctx = TenantContextSnapshot.capture();
             for (EventHandler handler : snapshot) {
-                Thread.ofVirtual().start(() -> {
-                    TenantContextSnapshot saved = TenantContextSnapshot.capture();
-                    ctx.replay();
-                try {
-                    handler.handle(copy);
-                } catch (Exception e) {
-                    // 异步模式下处理失败（Exception）被静默丢弃
-                } catch (Throwable t) {
-                    // panic 路径：记日志，不外泄
-                    log.error("event handler panic recovered (type={}): {}", copy.getType(),
-                            t.toString(), t);
-                } finally {
-                    saved.replay(); // 恢复工作线程原有上下文（虚拟线程复用场景）
-                }
-                });
+                Thread.ofVirtual().start(() -> TenantScope.run(ctx, () -> {
+                    try {
+                        handler.handle(copy);
+                    } catch (Exception e) {
+                        // 异步模式下处理失败（Exception）被静默丢弃
+                    } catch (Throwable t) {
+                        // panic 路径：记日志，不外泄
+                        log.error("event handler panic recovered (type={})", copy.getType(), t);
+                    }
+                }));
             }
             return;
         }
@@ -171,16 +167,17 @@ public class EventBus implements EventBusInterface {
 
         for (EventHandler handler : snapshot) {
             Thread.ofVirtual().start(() -> {
-                TenantContextSnapshot saved = TenantContextSnapshot.capture();
-                ctx.replay();
                 try {
-                    handler.handle(copy);
-                } catch (Exception e) {
-                    failures.add(new Failure(e, false));
-                } catch (Throwable t) {
-                    failures.add(new Failure(t, true));
+                    TenantScope.run(ctx, () -> {
+                        try {
+                            handler.handle(copy);
+                        } catch (Exception e) {
+                            failures.add(new Failure(e, false));
+                        } catch (Throwable t) {
+                            failures.add(new Failure(t, true));
+                        }
+                    });
                 } finally {
-                    saved.replay();
                     done.countDown();
                 }
             });

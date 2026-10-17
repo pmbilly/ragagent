@@ -1,21 +1,13 @@
 #!/usr/bin/env bash
-# 被 go-server-up.sh / java-server-up.sh source 的公共环境。
+# java-server-up.sh / go-server-up.sh / token.sh 共用的 dev 环境。
 #
-# ─────────────────────────────────────────────────────────────────────────────
-# 这里固化的每一条都是**踩过的坑**，不要再手工重来：
-#
-# 1. WeKnora/.env 是**容器内**地址（DB_HOST=postgres / REDIS_ADDR=redis:6379 /
-#    DOCREADER_ADDR=docreader:50051）。host-run 必须逐项覆盖为 localhost + 映射端口，
-#    否则启动直接崩（"连接Redis失败: lookup redis: no such host"）。
-#    也**不要**图省事整份 `source .env` —— 它会覆盖掉刚设好的 localhost 地址。
-#    只取需要的那几个 key（下面用 `env_value` 函数）。
-# 2. **SYSTEM_AES_KEY 两侧必须相同**：不同 key 下跨语言读对方写的密文会静默置空
-#    （宽容解密 → credentials.configured=false），看起来像 bug，其实是密码学预期行为。
-#    e2e 验证加密互操作时必须用同一把 key。
-# 3. Go server 需要先用 `go build` 出二进制；仓库里的 `make run` 会走容器路径。
-# 4. 需要访问被 SSRF 白名单拦住的 MCP/LLM 域名时，设 SSRF_WHITELIST_EXTRA
+# 约定：
+# 1. 只按 key 读取本仓 .env（`env_value`），不整份 source——避免把容器内地址
+#    或其它 shell 变量带进来。
+# 2. host-run 一律用 localhost + compose 映射端口（15432 / 16379 / 50051）。
+# 3. SYSTEM_AES_KEY 更换后旧密文不可解；跨语言 e2e 两侧必须用同一把 key。
+# 4. 访问被 SSRF 白名单拦住的 MCP/LLM 域名时设 SSRF_WHITELIST_EXTRA
 #    （逗号分隔，支持 *.example.com 通配）。
-# ─────────────────────────────────────────────────────────────────────────────
 
 set -euo pipefail
 
@@ -28,20 +20,8 @@ if [ -z "${JAVA_HOME:-}" ] && [ -d /opt/homebrew/opt/openjdk@21 ]; then
 fi
 
 RAGAGENT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-# 密钥/连接值优先读本仓自己的 .env（自 Go 仓下线后成为唯一来源）；
-# 本仓没有时回落 WeKnora 仓的 .env（历史开发机兼容，已废弃路径）。
-# 注意是**按 key** 回落：本仓 .env 存在但缺某个 key（如 RETRIEVE_DRIVER）时，
-# 仍可从 WeKnora 仓 .env 补——否则整文件抢占会让缺键静默为空（走查踩坑：
-# Java 缺 RETRIEVE_DRIVER → 默认检索引擎为空 → 检索恒空）。
-WEKNORA_ROOT_FALLBACK="$(cd "${RAGAGENT_ROOT}/../WeKnora" 2>/dev/null && pwd || true)"
-if [ -f "${RAGAGENT_ROOT}/.env" ]; then
-  WEKNORA_ENV="${RAGAGENT_ROOT}/.env"
-  WEKNORA_ENV_FALLBACK="${WEKNORA_ROOT_FALLBACK:+$WEKNORA_ROOT_FALLBACK/.env}"
-else
-  WEKNORA_ROOT="${WEKNORA_ROOT:-$WEKNORA_ROOT_FALLBACK}"
-  WEKNORA_ENV="${WEKNORA_ROOT}/.env"
-  WEKNORA_ENV_FALLBACK=""
-fi
+# 只读本仓 .env；缺失时各 key 为空，由 scripts/doctor.sh 提示。
+ENV_FILE="${RAGAGENT_ROOT}/.env"
 
 # dev 环境的宿主机端口（docker-compose 映射）
 export DB_HOST="${DB_HOST:-localhost}"
@@ -49,18 +29,14 @@ export DB_PORT="${DB_PORT:-15432}"
 export REDIS_HOST="${REDIS_HOST:-localhost}"
 export REDIS_PORT="${REDIS_PORT:-16379}"
 export DOCREADER_ADDR="${DOCREADER_ADDR:-localhost:50051}"
-export JAVA_PORT="${JAVA_PORT:-}"   # B181：留空 ⇒ 末尾统一解析（显式 env > .env 的 SERVER_PORT > 8082）
+export JAVA_PORT="${JAVA_PORT:-}"   # 留空 ⇒ 末尾统一解析（显式 env > .env 的 SERVER_PORT > 8083）
 export GO_PORT="${GO_PORT:-8080}"
 
-# 从 .env 取单个 key（不要 source 整个文件，见坑 1）
+# 从 .env 取单个 key（不要 source 整个文件：容器内地址会覆盖 localhost）
 env_value() {
   local key="$1" val=""
-  if [ -f "${WEKNORA_ENV}" ]; then
-    val=$(grep -m1 "^${key}=" "${WEKNORA_ENV}" | cut -d= -f2- || true)
-  fi
-  # 按 key 回落到 WeKnora 仓 .env（主文件缺键时）
-  if [ -z "$val" ] && [ -n "${WEKNORA_ENV_FALLBACK:-}" ] && [ -f "${WEKNORA_ENV_FALLBACK}" ]; then
-    val=$(grep -m1 "^${key}=" "${WEKNORA_ENV_FALLBACK}" | cut -d= -f2- || true)
+  if [ -f "${ENV_FILE}" ]; then
+    val=$(grep -m1 "^${key}=" "${ENV_FILE}" | cut -d= -f2- | tr -d '\r' || true)
   fi
   echo "$val"
 }
@@ -75,15 +51,15 @@ export DB_DRIVER="${DB_DRIVER:-$(env_value DB_DRIVER)}"
 export DB_USER="${DB_USER:-$(env_value DB_USER)}"
 export DB_PASSWORD="${DB_PASSWORD:-$(env_value DB_PASSWORD)}"
 export DB_NAME="${DB_NAME:-$(env_value DB_NAME)}"
-# 检索引擎兜底（走查踩坑：Go 从 .env 拿到 RETRIEVE_DRIVER=postgres，Java 缺了它
-# 会让「租户 engines 空 → 默认引擎」兜底落空，检索恒空「No retrievable indexing
-# pipelines」）。与 Go 同源取 .env，未配置则不导出（保持 Go 的"未配置"语义）。
+# 检索引擎：未配置 = 检索关闭（问答拿不到知识库上下文，且不会报错）。
 export RETRIEVE_DRIVER="${RETRIEVE_DRIVER:-$(env_value RETRIEVE_DRIVER)}"
 
-# Java 侧自有配置（与 Go 无关）
+# Java 侧自有配置
+export JWT_SECRET="${JWT_SECRET:-$(env_value JWT_SECRET)}"
 export JWT_SECRET="${JWT_SECRET:-java-e2e-jwt-secret-key-0123456789abcdef}"
-# 严禁默认 /tmp：macOS 定期清 /tmp 会丢已入库文档的原始文件（preview 500、不可恢复，实测踩坑 2026-09-28）
+# 严禁 /tmp：macOS 定期清理会丢已入库文档的原始文件。
 export LOCAL_STORAGE_BASE_DIR="${LOCAL_STORAGE_BASE_DIR:-$(env_value LOCAL_STORAGE_BASE_DIR)}"
+export LOCAL_STORAGE_BASE_DIR="${LOCAL_STORAGE_BASE_DIR:-${HOME}/ragagent-data/files}"
 
 # Langfuse 可观测（B228 自建栈起）。**不注入 = 静默 disabled**：启动日志只有一行
 # "[Langfuse] disabled (no LANGFUSE_PUBLIC_KEY/SECRET_KEY)"，之后所有链路都无记录
@@ -107,7 +83,7 @@ export TEST_PASSWORD="${TEST_PASSWORD:-Passw0rd!}"
 # 登录并回显 token（供录制脚本使用）
 login() {
   local email="${1:-${TEST_EMAIL}}"
-  curl -s -X POST "http://localhost:${2:-8080}/api/v1/auth/login" \
+  curl -s -X POST "http://localhost:${2:-8083}/api/v1/auth/login" \
     -H 'Content-Type: application/json' \
     -d "{\"email\":\"${email}\",\"password\":\"${TEST_PASSWORD}\"}" \
     | python3 -c 'import json,sys; print(json.load(sys.stdin)["data"]["token"])'
@@ -129,12 +105,8 @@ wait_for_port() {
   return 1
 }
 
-# ── 端口优先级（B181 实测修正）──────────────────────────────────────────────
-# 此前 `export JAVA_PORT="${JAVA_PORT:-8082}"` 只认显式环境变量 ⇒ **把 .env 里故意的
-# SERVER_PORT=8083 覆盖成 8082** ✗（表现：服务起在 8082，而前端代理按 §8 指向 8083 ⇒ 白屏）。
-# 改为：显式 env > .env 的 SERVER_PORT > 8082。放在文件末尾 ⇒ 必定生效（最后一次赋值胜出）。
+# ── 端口优先级：显式 env > .env 的 SERVER_PORT > 8083 ──────────────────────
+# 放在文件末尾 ⇒ 必定生效（最后一次赋值胜出）。
 _java_port_from_env="$(env_value SERVER_PORT || true)"
-if [ -n "${_java_port_from_env}" ]; then
-  export JAVA_PORT="${JAVA_PORT:-${_java_port_from_env:-8082}}"
-fi
+export JAVA_PORT="${JAVA_PORT:-${_java_port_from_env:-8083}}"
 unset _java_port_from_env

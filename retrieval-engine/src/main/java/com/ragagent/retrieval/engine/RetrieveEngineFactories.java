@@ -130,8 +130,7 @@ public final class RetrieveEngineFactories {
             }
             // 基础设施故障：原始错误只进日志，不泄漏内部细节。store 本身可能好着，
             // 所以这是"可重试"而不是"不存在"。
-            log.error("[retriever.factory] ownership lookup failed tenant_id={} store_id={}: {}",
-                    tenantId, storeId, e.toString());
+            log.error("[retriever.factory] ownership lookup failed tenant_id={} store_id={}", tenantId, storeId, e);
             throw RetrieveEngineException.VECTOR_STORE_UNAVAILABLE;
         }
         if (!owned) {
@@ -148,8 +147,7 @@ public final class RetrieveEngineFactories {
             if (RetrieveEngineException.isCancellation(e)) {
                 throw e;
             }
-            log.error("[retriever.factory] store engine could not be resolved tenant_id={} "
-                    + "store_id={}: {}", tenantId, storeId, e.toString());
+            log.error("[retriever.factory] store engine could not be resolved tenant_id={} store_id={}", tenantId, storeId, e);
             throw classifyLookupError(e);
         }
         return CompositeRetrieveEngine.ofSingle(svc);

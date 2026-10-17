@@ -118,7 +118,7 @@ public class TenantFileStorage {
             }
             resolved.ops().deleteFile(filePath);
         } catch (RuntimeException e) {
-            log.warn("delete export failed: path={} err={}", filePath, e.toString());
+            log.warn("delete export failed: path={}", filePath, e);
         }
     }
 
@@ -207,7 +207,7 @@ public class TenantFileStorage {
             resolved.ops().deleteFile(filePath);
             log.info("deleted provider object: provider={} path={}", provider, filePath);
         } catch (RuntimeException e) {
-            log.warn("delete provider object failed: path={} err={}", filePath, e.toString());
+            log.warn("delete provider object failed: path={}", filePath, e);
         }
     }
 

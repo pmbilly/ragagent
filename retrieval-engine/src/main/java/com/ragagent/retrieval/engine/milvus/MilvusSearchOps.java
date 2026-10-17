@@ -53,7 +53,7 @@ final class MilvusSearchOps {
         try {
             has = service.client.hasCollection(collection);
         } catch (RuntimeException e) {
-            log.error("[Milvus] Failed to check collection existence: {}", e.getMessage());
+            log.error("[Milvus] Failed to check collection existence", e);
             throw new IllegalStateException("failed to check collection: " + e.getMessage(), e);
         }
         if (!has) {
@@ -64,7 +64,7 @@ final class MilvusSearchOps {
         try {
             filter = MilvusRetrieveRepository.baseFilter(params);
         } catch (RuntimeException e) {
-            log.error("[Milvus] Failed to build base filter: {}", e.getMessage());
+            log.error("[Milvus] Failed to build base filter", e);
             throw new IllegalStateException("failed to build filter: " + e.getMessage(), e);
         }
         ArrayNode data = Json.array();
@@ -77,7 +77,7 @@ final class MilvusSearchOps {
             hits = service.client.search(collection, data, MilvusRetrieveRepository.FIELD_EMBEDDING, filter, params.topK,
                     List.of("*"), params.threshold > 0 ? params.threshold : null);
         } catch (RuntimeException e) {
-            log.error("[Milvus] Vector search failed: {}", e.getMessage());
+            log.error("[Milvus] Vector search failed", e);
             throw new IllegalStateException("failed to search: " + e.getMessage(), e);
         }
         List<IndexWithScore> results = parseSearchHits(hits, EngineTypes.MATCH_EMBEDDING, false);
@@ -107,7 +107,7 @@ final class MilvusSearchOps {
             try {
                 filter = MilvusRetrieveRepository.baseFilter(params);
             } catch (RuntimeException e) {
-                log.error("[Milvus] Failed to build base filter: {}", e.getMessage());
+                log.error("[Milvus] Failed to build base filter", e);
                 continue;
             }
             ArrayNode data = Json.array();
@@ -117,7 +117,7 @@ final class MilvusSearchOps {
                 hits = service.client.search(collection, data, MilvusRetrieveRepository.FIELD_CONTENT_SPARSE, filter, params.topK,
                         List.of("*"), null);
             } catch (RuntimeException e) {
-                log.error("[Milvus] Keywords search failed: {}", e.getMessage());
+                log.error("[Milvus] Keywords search failed", e);
                 continue;
             }
             allResults.addAll(parseSearchHits(hits, EngineTypes.MATCH_KEYWORDS, true));

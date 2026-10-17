@@ -351,11 +351,11 @@ public final class StoragePaths {
 
     // ── 部署环境 ────────────────────────────────────────────────────────────
 
-    /** 启动期快照，缺省 /data/files。 */
+    /** 启动期快照；未配置时落到用户目录（容器需显式设 LOCAL_STORAGE_BASE_DIR）。 */
     public static String localStorageBaseDir() {
         String baseDir = StorageRuntimeEnv.localStorageBaseDir();
         if (baseDir == null || baseDir.trim().isEmpty()) {
-            return "/data/files";
+            return Path.of(System.getProperty("user.home", "."), "ragagent-data", "files").toString();
         }
         return baseDir.trim();
     }

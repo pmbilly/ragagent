@@ -179,7 +179,7 @@ public class Neo4jGraphRepository implements RetrieveGraphRepository {
             });
         } catch (RuntimeException e) {
             // failed to add graph → 记日志并上抛（由调用方决定是否吞）
-            log.error("failed to add graph: {}", e.toString());
+            log.error("failed to add graph", e);
             throw e;
         }
     }
@@ -208,7 +208,7 @@ public class Neo4jGraphRepository implements RetrieveGraphRepository {
                 return null;
             });
         } catch (RuntimeException e) {
-            log.error("failed to delete graph: {}", e.toString());
+            log.error("failed to delete graph", e);
             throw e;
         }
     }
@@ -250,7 +250,7 @@ public class Neo4jGraphRepository implements RetrieveGraphRepository {
             }
             return new GraphData(outNodes, outRelations);
         } catch (RuntimeException e) {
-            log.error("search node failed: {}", e.toString());
+            log.error("search node failed", e);
             throw e;
         }
     }

@@ -179,7 +179,7 @@ public class SessionAgentQaService {
                 try {
                     llmContext = historyAssembler.loadAgentHistory(sessionId, historyTurns);
                 } catch (RuntimeException e) {
-                    log.warn("Failed to load agent history from DB: {}, continuing without history", e.toString());
+                    log.warn("Failed to load agent history from DB, continuing without history", e);
                     llmContext = new ArrayList<>();
                 }
                 log.info("Loaded {} history messages from DB (turns={})", llmContext.size(), historyTurns);
@@ -211,7 +211,7 @@ public class SessionAgentQaService {
                     try {
                         eventBus.emit(evt);
                     } catch (RuntimeException e) {
-                        log.warn("Failed to emit memory recalled event: {}", e.toString());
+                        log.warn("Failed to emit memory recalled event", e);
                     }
                     log.info("Injected {} long-term memories into agent context", used.size());
                 }
@@ -254,11 +254,11 @@ public class SessionAgentQaService {
                 // stage=agent_execution），这里只留带栈日志；再补一份会让客户端看到两次报错。
                 // 带栈：只打 e.toString() 会让这类"回答为空"的事故无从定位。
                 // （R5c 契约化：原先捕获的是引擎实现类的异常，现为契约面类型，语义不变。）
-                log.error("Agent execution failed: {}", e.toString(), e);
+                log.error("Agent execution failed", e);
             } catch (RuntimeException e) {
                 // 兜底：引擎入口自身（建 span / 组装 prompt / 建工具集）失败不在引擎的 catch 范围内，
                 // 这类异常没有对应 error 事件，仍需本层补发（避免静默失败）。
-                log.error("Agent execution failed before engine error channel: {}", e.toString(), e);
+                log.error("Agent execution failed before engine error channel", e);
                 Event evt = new Event();
                 evt.setType(EventType.EVENT_ERROR);
                 evt.setSessionId(sessionId);

@@ -205,10 +205,10 @@ public class KnowledgeBaseController {
         try {
             ResourceUrlMode.resolve(resourceUrls);
         } catch (PublicModeForbiddenException e) {
-            log.warn("Rejected resource URL mode: {}", e.getMessage());
+            log.warn("Rejected resource URL mode", e);
             throw new BizException(AppError.forbidden(e.getMessage()));
         } catch (ResourceModeException e) {
-            log.warn("Rejected resource URL mode: {}", e.getMessage());
+            log.warn("Rejected resource URL mode", e);
             throw new BizException(AppError.badRequest(e.getMessage()));
         }
         // 多库 scope：knowledge_base_ids 优先，缺省单库；API-Key 白名单 + 租户归属校验

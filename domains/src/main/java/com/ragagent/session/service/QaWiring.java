@@ -331,7 +331,7 @@ public class QaWiring {
                 }
             }
         } catch (Exception e) {
-            log.warn("load intent prompts failed: {}", e.toString());
+            log.warn("load intent prompts failed", e);
         }
         return out;
     }
@@ -366,8 +366,9 @@ public class QaWiring {
         var extractEntityTemplate = new PipelineConfig.PromptTemplateStructured();
 
         // 插件注册顺序即执行链顺序
-        mgr.register(new PluginSearch(
-                knowledgeBaseService, webSearch, tenantService));
+        PluginSearch searchPlugin = new PluginSearch(
+                knowledgeBaseService, webSearch, tenantService);
+        mgr.register(searchPlugin);
         mgr.register(new PluginRerank(modelService));
         mgr.register(new PluginWebFetch(pipelinePageFetcher));
         mgr.register(new PluginMerge(chunkRepository));
@@ -382,12 +383,10 @@ public class QaWiring {
         mgr.register(new PluginMemoryRecall(memoryService));
         mgr.register(new PluginExtractEntity(modelService, extractEntityTemplate,
                 knowledgeBaseRepository, knowledgeService, neo4jEnabled, entityExtraction));
-        mgr.register(new PluginSearchEntity(
-                retrieveGraphRepository, chunkRepository, knowledgeRepository));
-        mgr.register(new PluginSearchParallel(mgr, knowledgeBaseService,
-                webSearch, tenantService,
-                retrieveGraphRepository,
-                chunkRepository, knowledgeRepository));
+        PluginSearchEntity searchEntityPlugin = new PluginSearchEntity(
+                retrieveGraphRepository, chunkRepository, knowledgeRepository);
+        mgr.register(searchEntityPlugin);
+        mgr.register(new PluginSearchParallel(searchPlugin, searchEntityPlugin));
         mgr.register(new PluginWikiBoost(knowledgeBaseService));
         mgr.register(new PluginMemoryAffinity(memoryService));
         return mgr;

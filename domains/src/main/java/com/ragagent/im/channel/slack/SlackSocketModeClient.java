@@ -89,7 +89,7 @@ public class SlackSocketModeClient {
                 if (!running) {
                     return;
                 }
-                log.error("[Slack] Connection failed. Retrying later... ({})", e.toString());
+                log.error("[Slack] Connection failed. Retrying later... ()", e);
             }
             if (!running) {
                 return;
@@ -140,7 +140,7 @@ public class SlackSocketModeClient {
                 handler.accept(msg, channelId);
             }
         } catch (Exception e) {
-            log.error("[Slack] Handle message error: {}", e.toString());
+            log.error("[Slack] Handle message error", e);
         }
     }
 
@@ -172,7 +172,7 @@ public class SlackSocketModeClient {
 
         @Override
         public void onError(WebSocket ws, Throwable error) {
-            log.warn("[Slack] WebSocket error: {}", error.toString());
+            log.warn("[Slack] WebSocket error", error);
             closed.countDown();
         }
     }

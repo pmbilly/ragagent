@@ -13,7 +13,7 @@ import java.util.Set;
  * 按租户存储配置造 provider 专属 {@link FileService}。
  *
  * <p>provider 为空时回落到配置里的 {@code default_provider}；根目录缺省链：
- * 入参 → {@code LOCAL_STORAGE_BASE_DIR} → {@code /data/files}；local 再叠加
+ * 入参 → {@code LOCAL_STORAGE_BASE_DIR} → {@code ${user.home}/ragagent-data/files}；local 再叠加
  * {@code sec.local.path_prefix}（{@code SafeJoinUnderBase} 语义：越界就忽略前缀）。</p>
  *
  * <p>已覆盖 <b>local + S3 协议族</b>（s3/minio/obs/ks3——obs 与 ks3 走 S3 兼容路线）
@@ -22,7 +22,7 @@ import java.util.Set;
  */
 public final class FileServiceFactory {
 
-    // 本地存储根与 LOCAL_STORAGE_BASE_DIR 缺省（/data/files）统一由
+    // 本地存储根与 LOCAL_STORAGE_BASE_DIR 的缺省统一由
     // StoragePaths.localStorageBaseDir() 提供（同一个 env 只有一条读取路径）。
     /** 本地后端的预签名基址来源（外部 URL env）。 */
     public static final String ENV_EXTERNAL_URL = "APP_EXTERNAL_URL";

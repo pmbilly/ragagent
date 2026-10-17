@@ -205,7 +205,7 @@ public class AdminUserAdapter implements AdminUserPort {
         try {
             authTokenAdmin.revokeAllForUser(userId);
         } catch (RuntimeException e) {
-            log.warn("Failed to revoke tokens for user {}: {}", userId, e.toString());
+            log.warn("Failed to revoke tokens for user {}", userId, e);
         }
     }
 
@@ -298,8 +298,7 @@ public class AdminUserAdapter implements AdminUserPort {
                 try {
                     tenantService.deleteTenant(createdTenant.getId());
                 } catch (RuntimeException rollbackErr) {
-                    log.warn("Failed to roll back tenant {} after user creation failure: {}",
-                            createdTenant.getId(), rollbackErr.toString());
+                    log.warn("Failed to roll back tenant {} after user creation failure", createdTenant.getId(), rollbackErr);
                 }
             }
             throw new IllegalStateException("failed to create user");
@@ -308,8 +307,7 @@ public class AdminUserAdapter implements AdminUserPort {
             try {
                 memberService.addMember(user.getId(), createdTenant.getId(), "owner", "");
             } catch (RuntimeException e) {
-                log.warn("Failed to create owner membership for user {} tenant {}: {}",
-                        user.getId(), createdTenant.getId(), e.toString());
+                log.warn("Failed to create owner membership for user {} tenant {}", user.getId(), createdTenant.getId(), e);
                 userMapper.deleteById(user.getId());
                 tenantService.deleteTenant(createdTenant.getId());
                 throw new IllegalStateException("failed to finalise workspace ownership");

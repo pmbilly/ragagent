@@ -170,8 +170,7 @@ public class KnowledgeBaseService
             if (RetrieveEngineException.isCancellation(err)) {
                 throw err;
             }
-            log.error("[kb.create] binding verification failed: tenant_id={} store_id={} err={}",
-                    tenantId, sanitized, err.toString());
+            log.error("[kb.create] binding verification failed: tenant_id={} store_id={}", tenantId, sanitized, err);
             throw new BizException(AppError.internal("failed to verify vector store binding"));
         }
     }

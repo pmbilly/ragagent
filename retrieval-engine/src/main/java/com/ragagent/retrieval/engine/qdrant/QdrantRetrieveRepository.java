@@ -226,7 +226,7 @@ public class QdrantRetrieveRepository
         try {
             existing = client.request("GET", "/collections/" + name, null, true);
         } catch (RuntimeException e) {
-            log.error("[Qdrant] Failed to check collection existence: {}", e.getMessage());
+            log.error("[Qdrant] Failed to check collection existence", e);
             throw new IllegalStateException(
                     "failed to check collection existence: " + e.getMessage(), e);
         }
@@ -245,7 +245,7 @@ public class QdrantRetrieveRepository
             try {
                 client.request("PUT", "/collections/" + name, body);
             } catch (RuntimeException e) {
-                log.error("[Qdrant] Failed to create collection: {}", e.getMessage());
+                log.error("[Qdrant] Failed to create collection", e);
                 throw new IllegalStateException(
                         "failed to create collection: " + e.getMessage(), e);
             }
@@ -273,7 +273,7 @@ public class QdrantRetrieveRepository
         try {
             client.request("PUT", "/collections/" + collection + "/index?wait=true", body);
         } catch (RuntimeException e) {
-            log.warn("[Qdrant] Failed to create index for field {}: {}", field, e.getMessage());
+            log.warn("[Qdrant] Failed to create index for field {}", field, e);
         }
     }
 

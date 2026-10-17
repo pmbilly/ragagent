@@ -345,8 +345,7 @@ public class TenantMemberService {
                 }
             }
         } catch (RuntimeException e) {
-            log.warn("RemoveMember cleanup: failed to clear stale tenant pointers for user {} tenant {}: {}",
-                    userId, tenantId, e.toString());
+            log.warn("RemoveMember cleanup: failed to clear stale tenant pointers for user {} tenant {}", userId, tenantId, e);
         }
         try {
             authTokenMapper.update(null, new LambdaUpdateWrapper<AuthToken>()
@@ -354,7 +353,7 @@ public class TenantMemberService {
                     .eq(AuthToken::isIsRevoked, false)
                     .set(AuthToken::isIsRevoked, true));
         } catch (RuntimeException e) {
-            log.warn("RemoveMember cleanup: failed to revoke tokens for user {}: {}", userId, e.toString());
+            log.warn("RemoveMember cleanup: failed to revoke tokens for user {}", userId, e);
         }
     }
 

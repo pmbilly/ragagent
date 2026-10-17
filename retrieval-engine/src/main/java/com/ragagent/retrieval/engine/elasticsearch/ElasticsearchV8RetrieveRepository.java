@@ -146,7 +146,7 @@ public class ElasticsearchV8RetrieveRepository
         try {
             createIndexIfNotExists();
         } catch (Exception e) {
-            log.error("[Elasticsearch] Failed to create index: {}", e.toString());
+            log.error("[Elasticsearch] Failed to create index", e);
         }
         detectFieldTypes();
         this.searchOps = new ElasticsearchV8SearchOps(this);
@@ -245,8 +245,7 @@ public class ElasticsearchV8RetrieveRepository
             log.info("[Elasticsearch] No mapping detected for chunk_id (empty index?),"
                     + " defaulting to .keyword suffix");
         } catch (Exception e) {
-            log.warn("[Elasticsearch] Failed to get index mapping, defaulting to .keyword"
-                    + " suffix: {}", e.toString());
+            log.warn("[Elasticsearch] Failed to get index mapping, defaulting to .keyword suffix", e);
             useKeywordSuffix = true;
         }
     }

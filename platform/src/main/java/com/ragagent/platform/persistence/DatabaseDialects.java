@@ -35,7 +35,7 @@ public final class DatabaseDialects {
             return product != null && product.toLowerCase(Locale.ROOT).contains("postgres");
         } catch (SQLException e) {
             // 失败按非 PG 分支走是既有语义；这里集中告警一次，替代此前各副本散落的日志
-            log.warn("database product detection failed, assuming non-postgres: {}", e.getMessage());
+            log.warn("database product detection failed, assuming non-postgres", e);
             return false;
         }
     }

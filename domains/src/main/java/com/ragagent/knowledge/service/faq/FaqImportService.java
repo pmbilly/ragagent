@@ -176,7 +176,7 @@ public class FaqImportService {
             processImportInner(job);
         } catch (RuntimeException e) {
             // panic → 任务失败（直落终态，无重试）
-            log.error("FAQ import task {} crashed: {}", job.taskId(), e.getMessage(), e);
+            log.error("FAQ import task {} crashed", job.taskId(), e);
         }
     }
 
@@ -187,7 +187,7 @@ public class FaqImportService {
             try {
                 kb = faqGuard.validateFAQKnowledgeBase(job.kbId());
             } catch (BizException e) {
-                log.warn("FAQ import task {} aborted: KB invalid: {}", job.taskId(), e.getMessage());
+                log.warn("FAQ import task {} aborted: KB invalid", job.taskId(), e);
                 return;
             }
             Knowledge knowledge = knowledgeRepository.findById(job.tenantId(), job.knowledgeId());

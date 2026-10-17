@@ -14,8 +14,8 @@ import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.modelcontext.StreamDecoder;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.session.service.rag.ChatManage;
 import com.ragagent.session.service.rag.PipelineCommon;
@@ -57,12 +57,12 @@ public final class PluginChatCompletionStream implements Plugin {
     }
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.CHAT_COMPLETION_STREAM};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.CHAT_COMPLETION_STREAM};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         Map<String, Object> in = new LinkedHashMap<>();
         in.put("sessionId", chatManage.getSessionId());
         in.put("user_question", chatManage.getUserContent());
@@ -135,14 +135,8 @@ public final class PluginChatCompletionStream implements Plugin {
         final ChatStream queue = responseQueue;
         final Registry modelContext = assembly.registry();
         final TenantContextSnapshot identity = TenantContextSnapshot.capture();
-        Thread.ofVirtual().start(() -> {
-            identity.replay();
-            try {
-                consumeStream(cm, eventBus, modelContext, queue);
-            } finally {
-                TenantContext.clear();
-            }
-        });
+        Thread.ofVirtual().start(() -> TenantScope.run(identity,
+                () -> consumeStream(cm, eventBus, modelContext, queue)));
 
         return next.next();
     }

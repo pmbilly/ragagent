@@ -92,14 +92,11 @@ final class DataSourceItemOps {
             if ("true".equals(embeddedImage)) {
                 // 从文档里抽出来做 OCR 的图片是"尽力而为"的增强，不是文档本身：
                 // 知识库灌不进去（没配 VLM/对象存储）时跳过即可，别让整次同步失败。
-                log.info("[datasource] skipping embedded image \"{}\" (external_id={}), "
-                                + "not ingested: {}", item.getTitle(), item.getExternalId(),
-                        err.getMessage());
+                log.info("[datasource] skipping embedded image \"{}\" (external_id={}), not ingested", item.getTitle(), item.getExternalId(), err);
                 result.setSkipped(result.getSkipped() + 1);
                 return;
             }
-            log.warn("[datasource] failed to ingest item \"{}\" (external_id={}): {}",
-                    item.getTitle(), item.getExternalId(), err.getMessage());
+            log.warn("[datasource] failed to ingest item \"{}\" (external_id={})", item.getTitle(), item.getExternalId(), err);
             result.setFailed(result.getFailed() + 1);
             SyncItemError e = new SyncItemError();
             e.setTitle(item.getTitle());
@@ -122,9 +119,7 @@ final class DataSourceItemOps {
             existing = service.knowledge.findByDataSourceExternalId(
                     ds.getTenantId(), ds.getKnowledgeBaseId(), ds.getId(), item.getExternalId());
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to find deleted knowledge for external_id={} "
-                            + "(ds={}, kb={}): {}", item.getExternalId(), ds.getId(),
-                    ds.getKnowledgeBaseId(), e.getMessage());
+            log.error("[datasource] failed to find deleted knowledge for external_id={} (ds={}, kb={})", item.getExternalId(), ds.getId(), ds.getKnowledgeBaseId(), e);
             result.setFailed(result.getFailed() + 1);
             result.setDeletionFailed(result.getDeletionFailed() + 1);
             SyncItemError err = new SyncItemError();
@@ -144,8 +139,7 @@ final class DataSourceItemOps {
         } catch (RuntimeException deleteErr) {
             result.setFailed(result.getFailed() + 1);
             result.setDeletionFailed(result.getDeletionFailed() + 1);
-            log.error("[datasource] failed to delete knowledge {} for external_id={} (ds={}): {}",
-                    existing.getId(), item.getExternalId(), ds.getId(), deleteErr.getMessage());
+            log.error("[datasource] failed to delete knowledge {} for external_id={} (ds={})", existing.getId(), item.getExternalId(), ds.getId(), deleteErr);
             DataSourceSyncResultOps.recordSyncError(result, DataSourceSyncResultOps.deletionFailedError(item));
             return;
         }
@@ -154,8 +148,7 @@ final class DataSourceItemOps {
         } catch (RuntimeException herr) {
             result.setFailed(result.getFailed() + 1);
             result.setDeletionFailed(result.getDeletionFailed() + 1);
-            log.error("[datasource] failed to hard-delete knowledge {} for external_id={} (ds={}): {}",
-                    existing.getId(), item.getExternalId(), ds.getId(), herr.getMessage());
+            log.error("[datasource] failed to hard-delete knowledge {} for external_id={} (ds={})", existing.getId(), item.getExternalId(), ds.getId(), herr);
             DataSourceSyncResultOps.recordSyncError(result, DataSourceSyncResultOps.deletionFailedError(item));
             return;
         }
@@ -204,8 +197,7 @@ final class DataSourceItemOps {
                 existing = service.knowledge.findByDataSourceExternalId(
                         ds.getTenantId(), ds.getKnowledgeBaseId(), ds.getId(), item.getExternalId());
             } catch (RuntimeException e) {
-                log.warn("[datasource] failed to check existing knowledge for external_id={}: {}",
-                        item.getExternalId(), e.getMessage());
+                log.warn("[datasource] failed to check existing knowledge for external_id={}", item.getExternalId(), e);
                 existing = null; // 非致命：继续新建（可能产生重复）
             }
             if (existing != null) {
@@ -216,13 +208,11 @@ final class DataSourceItemOps {
                     try {
                         service.knowledge.hardDelete(ds.getTenantId(), existing.getId());
                     } catch (RuntimeException herr) {
-                        log.warn("[datasource] failed to hard-delete replaced knowledge {}: {}",
-                                existing.getId(), herr.getMessage());
+                        log.warn("[datasource] failed to hard-delete replaced knowledge {}", existing.getId(), herr);
                     }
                     isUpdate = true;
                 } catch (RuntimeException e) {
-                    log.warn("[datasource] failed to delete existing knowledge {}: {}",
-                            existing.getId(), e.getMessage());
+                    log.warn("[datasource] failed to delete existing knowledge {}", existing.getId(), e);
                 }
             }
         }
@@ -297,8 +287,7 @@ final class DataSourceItemOps {
             children = service.knowledge.findByMetadataKeyPrefix(ds.getTenantId(), ds.getKnowledgeBaseId(),
                     "externalId", SubtreeChildIds.subtreeChildPrefix(item.getExternalId()));
         } catch (RuntimeException e) {
-            log.warn("[datasource] failed to list subtree of externalId={}: {}",
-                    item.getExternalId(), e.getMessage());
+            log.warn("[datasource] failed to list subtree of externalId={}", item.getExternalId(), e);
             return;
         }
         if (children == null || children.isEmpty()) {
@@ -323,15 +312,13 @@ final class DataSourceItemOps {
         try {
             service.knowledge.softDeleteList(ds.getTenantId(), ids);
         } catch (RuntimeException derr) {
-            log.warn("[datasource] failed to delete {} stale sub-item(s) of external_id={}: {}",
-                    ids.size(), item.getExternalId(), derr.getMessage());
+            log.warn("[datasource] failed to delete {} stale sub-item(s) of external_id={}", ids.size(), item.getExternalId(), derr);
             return;
         }
         try {
             service.knowledge.hardDeleteList(ds.getTenantId(), ids);
         } catch (RuntimeException herr) {
-            log.warn("[datasource] failed to hard-delete {} stale sub-item(s) of external_id={}: {}",
-                    ids.size(), item.getExternalId(), herr.getMessage());
+            log.warn("[datasource] failed to hard-delete {} stale sub-item(s) of external_id={}", ids.size(), item.getExternalId(), herr);
         }
     }
 }

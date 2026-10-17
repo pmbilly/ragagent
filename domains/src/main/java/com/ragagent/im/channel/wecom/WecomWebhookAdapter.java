@@ -160,7 +160,7 @@ public class WecomWebhookAdapter implements AdapterInterfaces.Adapter,
         try {
             exchange.plain(200, "text/plain; charset=utf-8", decryptToString(echoStr));
         } catch (RuntimeException e) {
-            log.error("[WeCom] Failed to decrypt echostr: {}", e.toString());
+            log.error("[WeCom] Failed to decrypt echostr", e);
             exchange.plain(400, "text/plain; charset=utf-8", "decrypt failed");
         }
         return true;
@@ -261,8 +261,7 @@ public class WecomWebhookAdapter implements AdapterInterfaces.Adapter,
                 sendToAppChat(accessToken, incoming.chatId, reply);
                 return;
             } catch (RuntimeException e) {
-                log.debug("[WeCom] appchat/send failed for chat={}, falling back to touser: {}",
-                        incoming.chatId, e.toString());
+                log.debug("[WeCom] appchat/send failed for chat={}, falling back to touser", incoming.chatId, e);
             }
         }
         sendToUser(accessToken, incoming.userId, reply);

@@ -70,7 +70,7 @@ public class RedisWikiSlugLock implements WikiSlugLock {
                 ok = template.opsForValue().setIfAbsent(key, token, ttl);
             } catch (RuntimeException e) {
                 // SetNX 报错 → fail-open，不加锁直接跑
-                log.warn("wiki slug lock: SetNX failed for {}: {} (running unlocked)", slug, e.toString());
+                log.warn("wiki slug lock: SetNX failed for {} (running unlocked)", slug, e);
                 return true;
             }
             if (Boolean.TRUE.equals(ok)) {
@@ -103,7 +103,7 @@ public class RedisWikiSlugLock implements WikiSlugLock {
             template.execute(UNLOCK_SCRIPT, keys, token);
         } catch (RuntimeException e) {
             // 释放失败只会让锁自然过期（最多 TTL），不需要让调用方感知
-            log.warn("wiki slug lock: release failed for {}: {}", slug, e.toString());
+            log.warn("wiki slug lock: release failed for {}", slug, e);
         }
     }
 

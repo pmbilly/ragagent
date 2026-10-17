@@ -120,7 +120,7 @@ final class ImStopOps {
         try {
             sm.appendEvent(sessionId, messageId, stopEvent);
         } catch (RuntimeException e) {
-            log.warn("[IM] Failed to write stop event to StreamManager: {}", e.getMessage());
+            log.warn("[IM] Failed to write stop event to StreamManager", e);
         }
     }
 

@@ -62,12 +62,12 @@ public final class PluginQueryUnderstand implements Plugin {
     }
 
     @Override
-    public String[] activationEvents() {
-        return new String[] {PipelineEventType.QUERY_UNDERSTAND};
+    public PipelineEventType[] activationEvents() {
+        return new PipelineEventType[] {PipelineEventType.QUERY_UNDERSTAND};
     }
 
     @Override
-    public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         chatManage.setRewriteQuery(chatManage.getQuery());
 
         boolean hasImages = chatManage.getImages() != null && !chatManage.getImages().isEmpty();

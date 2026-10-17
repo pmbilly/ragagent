@@ -172,7 +172,7 @@ final class WikiPageViewsSupport {
                 pendingTasks = pending.pendingCount(WikiPendingOpsCounter.TASK_TYPE_WIKI_INGEST,
                         WikiPendingOpsCounter.SCOPE_KNOWLEDGE_BASE, kbId);
             } catch (RuntimeException e) {
-                log.warn("wiki stats: pending count for KB {} failed: {}", kbId, e.toString());
+                log.warn("wiki stats: pending count for KB {} failed", kbId, e);
             }
         }
         WikiActiveFlag flag = service.activeFlag.getIfAvailable();
@@ -182,14 +182,14 @@ final class WikiPageViewsSupport {
             try {
                 isActive = flag.isActive(kbId);
             } catch (RuntimeException e) {
-                log.warn("wiki stats: active flag for KB {} failed: {}", kbId, e.toString());
+                log.warn("wiki stats: active flag for KB {} failed", kbId, e);
             }
         }
         long pendingIssues = 0;
         try {
             pendingIssues = service.listIssues(kbId, "", "pending").size();
         } catch (RuntimeException e) {
-            log.warn("wiki stats: list pending issues for KB {} failed: {}", kbId, e.toString());
+            log.warn("wiki stats: list pending issues for KB {} failed", kbId, e);
         }
         WikiStats stats = new WikiStats();
         stats.setTotalPages(total);

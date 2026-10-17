@@ -3,6 +3,7 @@ package com.ragagent.session.service;
 import com.ragagent.contract.agent.SteerSink;
 import com.ragagent.contract.session.MentionedItem;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
@@ -60,14 +61,7 @@ public final class SteerSinkBridge implements SteerSink {
         // 该线程已有租户/身份上下文）——必须保存-恢复，不能 clear，否则引擎后续
         // 轮次的模型/KB/工具解析全部丢租户（knowledge_search 检索恒空即此因）。
         // 调用方无上下文时 prev 全空，恢复等价于 clear（跨线程借用场景行为不变）。
-        TenantContextSnapshot prev =
-                TenantContextSnapshot.capture();
-        tenant.replay();
-        try {
-            return pollSteerInner(messageId, lastOffset);
-        } finally {
-            prev.replay();
-        }
+        return TenantScope.supply(tenant, () -> pollSteerInner(messageId, lastOffset));
     }
 
     private List<Map<String, Object>> pollSteerInner(String messageId, int lastOffset) {
@@ -167,14 +161,8 @@ public final class SteerSinkBridge implements SteerSink {
     public String persistSteerMessage(String sid, String messageId, String steerId,
             String content, Object mentionedItems, String channel) {
         // 同 pollSteer：保存-恢复调用方上下文（引擎线程调用时不得清空租户）。
-        TenantContextSnapshot prev =
-                TenantContextSnapshot.capture();
-        tenant.replay();
-        try {
-            return persistSteerInner(messageId, steerId, content, mentionedItems, channel);
-        } finally {
-            prev.replay();
-        }
+        return TenantScope.supply(tenant,
+                () -> persistSteerInner(messageId, steerId, content, mentionedItems, channel));
     }
 
     private String persistSteerInner(String messageId, String steerId,
@@ -204,7 +192,7 @@ public final class SteerSinkBridge implements SteerSink {
         try {
             created = messageService.createMessage(msg);
         } catch (RuntimeException e) {
-            log.error("steer persist failed session={} steer={}: {}", sessionId, steerId, e.toString());
+            log.error("steer persist failed session={} steer={}", sessionId, steerId, e);
             unmarkInjected(steerId);
             return "";
         }
@@ -215,8 +203,7 @@ public final class SteerSinkBridge implements SteerSink {
         try {
             updated = streamManager.updateSteerEventData(sessionId, messageId, steerId, patch);
         } catch (RuntimeException e) {
-            log.warn("steer consume flag failed for session {} steer {}: {}",
-                    sessionId, steerId, e.toString());
+            log.warn("steer consume flag failed for session {} steer {}", sessionId, steerId, e);
             updated = true; // 标记失败只记日志，不回滚
         }
         if (!updated) {
@@ -225,8 +212,7 @@ public final class SteerSinkBridge implements SteerSink {
             try {
                 messageService.deleteMessage(sessionId, created.getId());
             } catch (RuntimeException e) {
-                log.warn("steer persist rollback failed for session {} message {}: {}",
-                        sessionId, created.getId(), e.toString());
+                log.warn("steer persist rollback failed for session {} message {}", sessionId, created.getId(), e);
             }
             unmarkInjected(steerId);
             String again = persistedUserMessageId(sessionId, messageId, steerId);

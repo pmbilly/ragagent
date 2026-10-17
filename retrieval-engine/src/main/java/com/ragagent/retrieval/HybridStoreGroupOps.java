@@ -90,9 +90,7 @@ final class HybridStoreGroupOps {
      */
     static BizException classifyFactoryError(RuntimeException err, long tenantId,
                                                      String storeId) {
-        log.warn("resolve store engine failed: tenant_id={} store_id={} reason={} err={}",
-                tenantId, LogSanitizer.sanitize(storeId),
-                "resolve store engine", err.toString());
+        log.warn("resolve store engine failed: tenant_id={} store_id={} reason={}", tenantId, LogSanitizer.sanitize(storeId), "resolve store engine", err);
         if (err instanceof RetrieveEngineException e) {
             switch (e.kind()) {
                 case VECTOR_STORE_FORBIDDEN:

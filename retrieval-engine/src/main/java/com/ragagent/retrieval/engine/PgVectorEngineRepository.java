@@ -63,7 +63,7 @@ public class PgVectorEngineRepository
         try (var conn = dataSource.getConnection()) {
             pg = conn.getMetaData().getDatabaseProductName().toLowerCase().contains("postgres");
         } catch (Exception e) {
-            log.warn("detect database product failed, assume non-postgres: {}", e.toString());
+            log.warn("detect database product failed, assume non-postgres", e);
         }
         this.postgres = pg;
     }

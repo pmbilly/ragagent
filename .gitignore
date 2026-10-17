@@ -29,6 +29,7 @@ frontend/package.json.md5
 # 本地环境
 .env
 *.local
+/data/
 
 # 测试产物
 server/src/test/resources/contracts/tmp/

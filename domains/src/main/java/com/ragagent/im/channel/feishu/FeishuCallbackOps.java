@@ -78,7 +78,7 @@ final class FeishuCallbackOps {
                     exchange.body(), StandardCharsets.UTF_8).contains("\"encrypt\"")) {
                 return false;
             }
-            log.error("[{}] Failed to decrypt: {}", service.region.label(), e.toString());
+            log.error("[{}] Failed to decrypt", service.region.label(), e);
             return false;
         }
         if (parsed.has("challenge") && parsed.get("challenge").isTextual()) {

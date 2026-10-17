@@ -2,6 +2,7 @@ package com.ragagent.session.api;
 
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.rag.ChatManage;
+import com.ragagent.session.service.rag.PipelineEventType;
 import com.ragagent.session.service.rag.spi.KnowledgeQaEventPort;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ public class KnowledgeQaEventAdapter implements KnowledgeQaEventPort {
     }
 
     @Override
-    public void knowledgeQAByEvent(ChatManage chatManage, List<String> eventList) {
+    public void knowledgeQAByEvent(ChatManage chatManage, List<PipelineEventType> eventList) {
         knowledgeQaService.knowledgeQAByEvent(chatManage, eventList);
     }
 }

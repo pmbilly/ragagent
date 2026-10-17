@@ -196,8 +196,7 @@ final class FeishuWikiTreeOps {
                 RuntimeException wrapped = new ConnectorException(
                         "list children of " + node.getNodeToken() + ": " + e.getMessage(), e);
                 failures.add(new WikiNodeListFailure(node, wrapped));
-                log.warn("[Feishu] partial wiki node listing failure: space={} node={} err={}",
-                        spaceId, node.getNodeToken(), e.getMessage());
+                log.warn("[Feishu] partial wiki node listing failure: space={} node={}", spaceId, node.getNodeToken(), e);
                 continue;
             }
             walkWikiNodes(client, spaceId, children, allNodes, failures);
@@ -216,8 +215,7 @@ final class FeishuWikiTreeOps {
         } catch (RuntimeException e) {
             RuntimeException wrapped = new ConnectorException(
                     "list children of " + root.getNodeToken() + ": " + e.getMessage(), e);
-            log.warn("[Feishu] partial wiki node listing failure: space={} node={} err={}",
-                    spaceId, root.getNodeToken(), e.getMessage());
+            log.warn("[Feishu] partial wiki node listing failure: space={} node={}", spaceId, root.getNodeToken(), e);
             throw new PartialWikiNodeListException(List.of(), List.of(new WikiNodeListFailure(root, wrapped)));
         }
 

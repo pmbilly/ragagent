@@ -114,3 +114,23 @@ tasks.withType<Test> {
     environment("DOCREADER_ADDR", "")
     systemProperty("contract.refresh", System.getProperty("contract.refresh") ?: "false")
 }
+
+// dev 起服把仓库根的 .env 逐项注入进程环境（脚本路径用 scripts/dev-env.sh，同一口径）。
+// 只挂在 bootRun：测试、容器与 jar 启动都不读，避免误用开发库。
+tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
+    val envFile = rootProject.file(".env")
+    if (envFile.isFile) {
+        envFile.readLines()
+            .map { it.trim().removePrefix("export ").trim() }
+            .filter { it.isNotEmpty() && !it.startsWith("#") && it.contains("=") }
+            .forEach { line ->
+                val key = line.substringBefore("=").trim()
+                val value = line.substringAfter("=").trim()
+                    .removeSurrounding("\"").removeSurrounding("'")
+                // 与 dev-env.sh 一致：显式环境变量优先于 .env
+                if (key.isNotEmpty() && System.getenv(key) == null) {
+                    environment(key, value)
+                }
+            }
+    }
+}

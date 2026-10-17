@@ -34,7 +34,7 @@ public class RedisWikiDeletedTombstoneStore implements WikiDeletedTombstoneStore
                     template.hasKey(WikiIngestConstants.deletedTombstoneKey(kbId, knowledgeId)));
         } catch (RuntimeException e) {
             // 方向安全：当作未命中，回落 DB 查询
-            log.warn("wiki tombstones: exists check failed: {} (falling back to DB)", e.toString());
+            log.warn("wiki tombstones: exists check failed (falling back to DB)", e);
             return false;
         }
     }
@@ -46,7 +46,7 @@ public class RedisWikiDeletedTombstoneStore implements WikiDeletedTombstoneStore
                     "1", WikiIngestConstants.DELETED_TTL);
         } catch (RuntimeException e) {
             // 墓碑没写上只是少一次快路径，正确性靠 DB 回落
-            log.warn("wiki tombstones: mark deleted failed: {}", e.toString());
+            log.warn("wiki tombstones: mark deleted failed", e);
         }
     }
 
@@ -55,7 +55,7 @@ public class RedisWikiDeletedTombstoneStore implements WikiDeletedTombstoneStore
         try {
             template.delete(WikiIngestConstants.deletedTombstoneKey(kbId, knowledgeId));
         } catch (RuntimeException e) {
-            log.warn("wiki tombstones: clear failed: {}", e.toString());
+            log.warn("wiki tombstones: clear failed", e);
         }
     }
 }

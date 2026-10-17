@@ -116,7 +116,7 @@ final class MemoryTranscriptOps {
         try {
             before = service.sessionMessages.listBeforeTime(sessionId, lines.get(0).at, MemoryExtractionService.EXTRACT_CONTEXT_LINES * 4);
         } catch (RuntimeException e) {
-            log.warn("memory: load prior context failed: {}", e.toString());
+            log.warn("memory: load prior context failed", e);
             return null;
         }
         List<MemoryExtractionService.TranscriptLine> previous = new ArrayList<>();

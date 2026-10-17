@@ -106,8 +106,7 @@ public class ImCallbackController {
         // 平台验签
         Exception verifyErr = adapter.verifyCallback(exchange);
         if (verifyErr != null) {
-            log.error("[IM] Callback verification failed for channel {}: {}",
-                    channelId, verifyErr.getMessage());
+            log.error("[IM] Callback verification failed for channel {}", channelId, verifyErr);
             writeJson(response, 403, "verification failed");
             return;
         }
@@ -117,7 +116,7 @@ public class ImCallbackController {
         try {
             msg = adapter.parseCallback(exchange);
         } catch (Exception e) {
-            log.error("[IM] Parse callback failed for channel {}: {}", channelId, e.getMessage());
+            log.error("[IM] Parse callback failed for channel {}", channelId, e);
             writeJson(response, 400, "parse failed");
             return;
         }
@@ -140,7 +139,7 @@ public class ImCallbackController {
             try {
                 imTurnOrchestrator.handleMessage(msg, channelId);
             } catch (Exception e) {
-                log.error("[IM] Handle message error for channel {}: {}", channelId, e.getMessage(), e);
+                log.error("[IM] Handle message error for channel {}", channelId, e);
             }
         });
     }

@@ -29,7 +29,7 @@ public class ProviderFileStoreAdapter implements ProviderFileStorePort {
 
     public ProviderFileStoreAdapter(StorageFileResolver resolver,
                                     TenantConfigLookup tenantConfigLookup,
-                                    @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}")
+                                    @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:${user.home}/ragagent-data/files}}")
                                             String localBaseDir) {
         this.resolver = resolver;
         this.tenantConfigLookup = tenantConfigLookup;

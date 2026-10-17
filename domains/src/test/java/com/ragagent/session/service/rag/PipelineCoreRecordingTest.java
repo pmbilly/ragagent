@@ -27,11 +27,11 @@ class PipelineCoreRecordingTest {
         List<String> calls = new ArrayList<>();
         EventManager mgr = new EventManager();
         var p1 = new Rec46cSupport.TestPlugin("p1",
-                new String[] {PipelineEventType.CHUNK_SEARCH}, null, calls);
+                new PipelineEventType[] {PipelineEventType.CHUNK_SEARCH}, null, calls);
         var p2 = new Rec46cSupport.TestPlugin("p2",
-                new String[] {PipelineEventType.CHUNK_SEARCH}, null, calls);
+                new PipelineEventType[] {PipelineEventType.CHUNK_SEARCH}, null, calls);
         var p3 = new Rec46cSupport.TestPlugin("p3",
-                new String[] {PipelineEventType.CHUNK_SEARCH},
+                new PipelineEventType[] {PipelineEventType.CHUNK_SEARCH},
                 new PluginError(null, "boom", "boom"), calls);
         mgr.register(p1);
         mgr.register(p2);
@@ -52,19 +52,23 @@ class PipelineCoreRecordingTest {
 
     @Test
     void builder() {
-        List<String> p = PipelineBuilder.builder()
+        List<PipelineEventType> p = PipelineBuilder.builder()
                 .add(PipelineEventType.LOAD_HISTORY)
                 .addIf(false, PipelineEventType.QUERY_UNDERSTAND)
                 .addIf(true, PipelineEventType.CHAT_COMPLETION_STREAM)
                 .build();
-        assertRec("builder", "add_if", json(p));
+        assertRec("builder", "add_if", json(keys(p)));
 
-        List<String> empty = PipelineBuilder.builder().build();
-        assertRec("builder", "empty", json(empty));
+        List<PipelineEventType> empty = PipelineBuilder.builder().build();
+        assertRec("builder", "empty", json(keys(empty)));
 
-        assertRec("builder", "rag_stream", json(PipelineBuilder.presets().get("rag_stream")));
-        assertRec("builder", "rag", json(PipelineBuilder.presets().get("rag")));
-        assertRec("builder", "chat_stream", json(PipelineBuilder.presets().get("chat_stream")));
+        assertRec("builder", "rag_stream", json(keys(PipelineBuilder.presets().get("rag_stream"))));
+        assertRec("builder", "rag", json(keys(PipelineBuilder.presets().get("rag"))));
+        assertRec("builder", "chat_stream", json(keys(PipelineBuilder.presets().get("chat_stream"))));
+    }
+
+    private static List<String> keys(List<PipelineEventType> stages) {
+        return stages.stream().map(PipelineEventType::key).toList();
     }
 
     @Test

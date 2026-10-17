@@ -168,7 +168,7 @@ public class MessageService {
         try {
             previous = messageRepository.getSessionArtifacts(sessionId);
         } catch (RuntimeException e) {
-            log.warn("Read artifact versions failed: {}", e.toString());
+            log.warn("Read artifact versions failed", e);
             return messages;
         }
         if (previous == null) {
@@ -225,7 +225,7 @@ public class MessageService {
         try {
             suggestionRepository.deleteByMessageId(tenantId, sessionId, messageId);
         } catch (RuntimeException e) {
-            log.warn("Failed to delete suggestions for message {}: {}", messageId, e.toString());
+            log.warn("Failed to delete suggestions for message {}", messageId, e);
         }
 
         String knowledgeId = msg.getKnowledgeId();
@@ -233,7 +233,7 @@ public class MessageService {
             try {
                 knowledgeCatalog.deleteKnowledge(knowledgeId);
             } catch (RuntimeException e) {
-                log.warn("Failed to delete chat history knowledge {}: {}", knowledgeId, e.toString());
+                log.warn("Failed to delete chat history knowledge {}", knowledgeId, e);
             }
         }
     }
@@ -253,12 +253,11 @@ public class MessageService {
                 try {
                     knowledgeCatalog.deleteKnowledge(knowledgeId);
                 } catch (RuntimeException e) {
-                    log.warn("Failed to delete chat history knowledge for session {}: {}",
-                            sessionId, e.toString());
+                    log.warn("Failed to delete chat history knowledge for session {}", sessionId, e);
                 }
             }
         } catch (RuntimeException e) {
-            log.warn("Failed to get knowledge IDs for session {}: {}", sessionId, e.toString());
+            log.warn("Failed to get knowledge IDs for session {}", sessionId, e);
         }
 
         messageRepository.deleteBySessionId(sessionId);
@@ -266,7 +265,7 @@ public class MessageService {
         try {
             suggestionRepository.deleteBySessionId(tenantId, sessionId);
         } catch (RuntimeException e) {
-            log.warn("Failed to delete suggestions for session {}: {}", sessionId, e.toString());
+            log.warn("Failed to delete suggestions for session {}", sessionId, e);
         }
     }
 
@@ -357,14 +356,14 @@ public class MessageService {
             knowledge = knowledgeCatalog.createFromPassageSync(
                     cfg.getKnowledgeBaseId(), List.of(passage), "");
         } catch (RuntimeException e) {
-            log.warn("Failed to index message to chat history KB: {}", e.toString());
+            log.warn("Failed to index message to chat history KB", e);
             return;
         }
 
         try {
             messageRepository.updateKnowledgeId(messageId, knowledge.getId());
         } catch (RuntimeException e) {
-            log.warn("Failed to update message knowledge_id: {}", e.toString());
+            log.warn("Failed to update message knowledge_id", e);
             return;
         }
 
@@ -451,7 +450,7 @@ public class MessageService {
             stats.setIndexedMessageCount(count);
             stats.setHasIndexedMessages(count > 0);
         } catch (RuntimeException e) {
-            log.warn("Failed to load chat history KB {}: {}", kbId, e.toString());
+            log.warn("Failed to load chat history KB {}", kbId, e);
         }
         return stats;
     }

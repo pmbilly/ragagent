@@ -125,8 +125,7 @@ final class ImChannelRuntimeOps {
             // 工厂失败（凭据不全 / 出站校验不过 / 平台未实现该模式）时渠道起不来，
             // 适配器不入运行态——回调路径因此走 "adapter not active"
             // （503 "channel not available"），而不是把异常冒成 500。
-            log.warn("[IM] Channel start failed: id={} platform={} mode={} err={}",
-                    channel.getId(), channel.getPlatform(), channel.getMode(), e.toString());
+            log.warn("[IM] Channel start failed: id={} platform={} mode={}", channel.getId(), channel.getPlatform(), channel.getMode(), e);
             if (leaderHeld) {
                 releaseLeader(channel.getId()); // 启动失败回滚选主
             }
@@ -190,7 +189,7 @@ final class ImChannelRuntimeOps {
         try {
             loadAndStartChannels();
         } catch (RuntimeException e) {
-            log.warn("[IM] Failed to load channels from database: {}", e.getMessage());
+            log.warn("[IM] Failed to load channels from database", e);
         }
     }
 
@@ -204,13 +203,13 @@ final class ImChannelRuntimeOps {
         try {
             qaQueue.stop();
         } catch (RuntimeException e) {
-            log.warn("[IM] qa queue stop failed: {}", e.getMessage());
+            log.warn("[IM] qa queue stop failed", e);
         }
         for (String id : new java.util.ArrayList<>(channelStates.keySet())) {
             try {
                 stopChannel(id);
             } catch (RuntimeException e) {
-                log.warn("[IM] channel {} stop failed: {}", id, e.getMessage());
+                log.warn("[IM] channel {} stop failed", id, e);
             }
         }
         for (Thread t : leaderRetryThreads.values()) {
@@ -263,7 +262,7 @@ final class ImChannelRuntimeOps {
             pubSub.publish(ImRedisKeys.CHANNEL_CONFIG_CHANNEL, ImTurnOrchestrator.JSON.writeValueAsString(event));
         } catch (Exception e) {
             // DB 是权威；事件只是加速（发布失败只 WARN）
-            log.warn("[IM] Publish channel config event failed for {}: {}", channelId, e.getMessage());
+            log.warn("[IM] Publish channel config event failed for {}", channelId, e);
         }
     }
 
@@ -286,7 +285,7 @@ final class ImChannelRuntimeOps {
                     try {
                         event = ImTurnOrchestrator.JSON.readTree(payload);
                     } catch (Exception e) {
-                        log.warn("[IM] Ignore invalid channel config event: {}", e.getMessage());
+                        log.warn("[IM] Ignore invalid channel config event", e);
                         continue;
                     }
                     String channelId = event.path("channel_id").asText("");
@@ -297,7 +296,7 @@ final class ImChannelRuntimeOps {
                     reloadChannelFromDb(channelId);
                 }
             } catch (RuntimeException e) {
-                log.warn("[IM] Channel config subscriber stopped: {}", e.getMessage());
+                log.warn("[IM] Channel config subscriber stopped", e);
             } finally {
                 if (sub != null) {
                     sub.close();

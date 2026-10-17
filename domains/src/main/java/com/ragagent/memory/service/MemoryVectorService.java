@@ -139,7 +139,7 @@ public class MemoryVectorService {
             Thread.currentThread().interrupt();
             return null;
         } catch (ExecutionException e) {
-            log.warn("memory: embedding model {} unavailable: {}", modelId, e.getCause().toString());
+            log.warn("memory: embedding model {} unavailable", modelId, e);
             return null;
         }
     }
@@ -166,7 +166,7 @@ public class MemoryVectorService {
         try {
             repo.upsertItemEmbedding(scope, newEmbedding(item, modelId, vector));
         } catch (RuntimeException e) {
-            log.warn("memory: store embedding failed: {}", e.toString());
+            log.warn("memory: store embedding failed", e);
         }
     }
 
@@ -240,7 +240,7 @@ public class MemoryVectorService {
             }
             return stat.getAliases();
         } catch (RuntimeException e) {
-            log.warn("memory: load topic aliases failed: {}", e.toString());
+            log.warn("memory: load topic aliases failed", e);
             return null;
         }
     }
@@ -276,7 +276,7 @@ public class MemoryVectorService {
             hits = repo.searchItemsByVector(scope, new MemoryVectorQuery(
                     modelId, queryVector, kinds, MIN_COSINE, limit));
         } catch (RuntimeException e) {
-            log.warn("memory: vector search failed: {}", e.toString());
+            log.warn("memory: vector search failed", e);
             return new VectorSearchOutcome(null, "vector_search_failed");
         }
         if (hits == null || hits.isEmpty()) {
@@ -335,7 +335,7 @@ public class MemoryVectorService {
         try {
             return repo.itemEmbeddings(scope, ids, modelId);
         } catch (RuntimeException e) {
-            log.warn("memory: load embeddings for consolidation failed: {}", e.toString());
+            log.warn("memory: load embeddings for consolidation failed", e);
             return null;
         }
     }
@@ -353,7 +353,7 @@ public class MemoryVectorService {
         try {
             items = repo.itemsMissingEmbeddings(scope, modelId, BACKFILL_PER_RUN);
         } catch (RuntimeException e) {
-            log.warn("memory: find items missing embeddings failed: {}", e.toString());
+            log.warn("memory: find items missing embeddings failed", e);
             return 0;
         }
         if (items == null) {
@@ -373,7 +373,7 @@ public class MemoryVectorService {
             try {
                 repo.upsertItemEmbedding(scope, newEmbedding(item, modelId, vector));
             } catch (RuntimeException e) {
-                log.warn("memory: backfill embedding failed: {}", e.toString());
+                log.warn("memory: backfill embedding failed", e);
                 continue;
             }
             filled++;

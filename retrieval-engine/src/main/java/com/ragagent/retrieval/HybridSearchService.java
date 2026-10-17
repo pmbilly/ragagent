@@ -16,6 +16,7 @@ import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.platform.model.EmbeddingGateway;
 import com.ragagent.platform.model.ModelGateway;
@@ -361,20 +362,18 @@ public class HybridSearchService implements HybridSearchPort {
     /** 单个 (modelID, tenantId) 的身份键解析（属主租户上下文；失败回落 modelID）。 */
     private String resolveModelIdentity(ModelRef ref) {
         TenantContextSnapshot prev = TenantContextSnapshot.capture();
-        try {
-            if (ref.tenantId() != null) {
-                prev.withTenantId(ref.tenantId()).replay();
+        TenantContextSnapshot target = ref.tenantId() != null ? prev.withTenantId(ref.tenantId()) : prev;
+        return TenantScope.supply(target, () -> {
+            try {
+                ModelFacts model = modelGateway.findFacts(ref.modelId());
+                String baseUrl = model == null ? "" : model.baseUrl();
+                return model == null ? ref.modelId() : model.name() + "|" + baseUrl;
+            } catch (Exception e) {
+                log.warn("ResolveEmbeddingModelKeys: cannot resolve model {} for tenant {}",
+                        ref.modelId(), ref.tenantId(), e);
+                return ref.modelId();
             }
-            ModelFacts model = modelGateway.findFacts(ref.modelId());
-            String baseUrl = model == null ? "" : model.baseUrl();
-            return model == null ? ref.modelId() : model.name() + "|" + baseUrl;
-        } catch (Exception e) {
-            log.warn("ResolveEmbeddingModelKeys: cannot resolve model {} for tenant {}: {}",
-                    ref.modelId(), ref.tenantId(), e.toString());
-            return ref.modelId();
-        } finally {
-            prev.replay();
-        }
+        });
     }
 
     /**
@@ -562,9 +561,7 @@ public class HybridSearchService implements HybridSearchPort {
                 failure = failure == null
                         ? new RuntimeException("store group retrieve: interrupted") : failure;
             } catch (Exception e) {
-                log.warn("multi-store retrieve failed: tenant_id={} kb_count={} store_kind={} err={}",
-                        grp.ownerTenantId, grp.kbIds.size(), storeKindLabel(grp.storeId),
-                        e.toString());
+                log.warn("multi-store retrieve failed: tenant_id={} kb_count={} store_kind={}", grp.ownerTenantId, grp.kbIds.size(), storeKindLabel(grp.storeId), e);
                 failure = failure == null
                         ? new RuntimeException("store group retrieve: " + e.getMessage(), e) : failure;
             }

@@ -88,7 +88,7 @@ final class ElasticsearchV7WriteOps {
         try {
             bulkResponse = ElasticsearchV7RetrieveRepository.MAPPER.readTree(resp.body());
         } catch (Exception e) {
-            log.warn("[ElasticsearchV7] Could not parse bulk response: {}", e.toString());
+            log.warn("[ElasticsearchV7] Could not parse bulk response", e);
             return;
         }
         if (bulkResponse != null && bulkResponse.path("errors").asBoolean(false)) {
@@ -163,7 +163,7 @@ final class ElasticsearchV7WriteOps {
                 log.info("[ElasticsearchV7] Successfully deleted documents by {}", field);
             }
         } catch (Exception e) {
-            log.warn("[ElasticsearchV7] Could not parse delete response: {}", e.toString());
+            log.warn("[ElasticsearchV7] Could not parse delete response", e);
         }
     }
 

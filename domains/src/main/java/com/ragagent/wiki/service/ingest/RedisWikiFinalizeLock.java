@@ -79,7 +79,7 @@ public class RedisWikiFinalizeLock implements WikiFinalizeLock {
             acquired = template.opsForValue().setIfAbsent(key, "1", ttl);
         } catch (RuntimeException e) {
             // fail CLOSED：无锁放行会让两个 finalize 批次排空同一批待办、重复重建索引页
-            log.warn("wiki finalize: SetNX failed for KB {}: {} (retrying)", kbId, e.toString());
+            log.warn("wiki finalize: SetNX failed for KB {} (retrying)", kbId, e);
             return AcquireResult.FAILED;
         }
         if (!Boolean.TRUE.equals(acquired)) {
@@ -91,7 +91,7 @@ public class RedisWikiFinalizeLock implements WikiFinalizeLock {
             try {
                 template.expire(key, ttl);
             } catch (RuntimeException e) {
-                log.warn("wiki finalize: lock renew failed for KB {}: {}", kbId, e.toString());
+                log.warn("wiki finalize: lock renew failed for KB {}", kbId, e);
             }
         }, renew.toMillis(), renew.toMillis(), TimeUnit.MILLISECONDS);
         renewals.put(kbId, task);
@@ -113,7 +113,7 @@ public class RedisWikiFinalizeLock implements WikiFinalizeLock {
         try {
             template.delete(WikiFinalizeLock.lockKey(kbId));
         } catch (RuntimeException e) {
-            log.warn("wiki finalize: lock release failed for KB {}: {}", kbId, e.toString());
+            log.warn("wiki finalize: lock release failed for KB {}", kbId, e);
         }
     }
 

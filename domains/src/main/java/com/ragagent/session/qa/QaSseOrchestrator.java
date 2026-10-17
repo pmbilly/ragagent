@@ -13,8 +13,8 @@ import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.session.SseSink;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.LiveRunExistsException;
@@ -94,7 +94,7 @@ public final class QaSseOrchestrator {
             try {
                 streamManager.setLiveRun(reqCtx.sessionId, reqCtx.assistantMessage.getId(), reqCtx.requestId);
             } catch (RuntimeException e) {
-                log.error("SetLiveRun failed for session {}: {}", reqCtx.sessionId, e.toString());
+                log.error("SetLiveRun failed for session {}", reqCtx.sessionId, e);
                 streamCtx.liveRunFailed = true;
                 streamCtx.liveRunErr = e.getMessage();
                 streamCtx.liveRunExists = e instanceof LiveRunExistsException;
@@ -163,22 +163,15 @@ public final class QaSseOrchestrator {
         try {
             streamManager.appendEvent(reqCtx.sessionId, assistantMessageId, evt);
         } catch (RuntimeException e) {
-            log.error("write agent query event failed session={} message={}: {}",
-                    reqCtx.sessionId, assistantMessageId, e.toString());
+            log.error("write agent query event failed session={} message={}", reqCtx.sessionId, assistantMessageId, e);
         }
     }
     private void startStopWatcher(String sessionId, String assistantMessageId, EventBusInterface eventBus) {
         // A5：watcher 跑在自己的虚拟线程上（ThreadLocal 不跨线程，身份为空）——读流事件与
         // 会话范围判定都需要完整身份，因此在本线程 capture、watcher 里 replay 后清理。
         TenantContextSnapshot identity = TenantContextSnapshot.capture();
-        Thread.ofVirtual().start(() -> {
-            identity.replay();
-            try {
-                watchStopEvents(sessionId, assistantMessageId, eventBus);
-            } finally {
-                TenantContext.clear();
-            }
-        });
+        Thread.ofVirtual().start(() -> TenantScope.run(identity,
+                () -> watchStopEvents(sessionId, assistantMessageId, eventBus)));
     }
 
     /** stop watcher 主循环（独立虚拟线程；身份由 {@link #startStopWatcher} 显式传递）。 */
@@ -244,7 +237,7 @@ public final class QaSseOrchestrator {
             try {
                 batch = streamManager.getEvents(sessionId, assistantMessageId, lastOffset);
             } catch (RuntimeException e) {
-                log.warn("Failed to get events from stream: {}", e.toString());
+                log.warn("Failed to get events from stream", e);
                 continue;
             }
             boolean streamCompleted = false;

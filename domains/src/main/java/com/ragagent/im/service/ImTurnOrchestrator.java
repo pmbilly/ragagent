@@ -29,6 +29,7 @@ import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.redis.RedisPubSub;
 import com.ragagent.platform.redis.SpringRedisPubSub;
 import com.ragagent.platform.stream.StreamManager;
@@ -215,12 +216,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
     public void handleMessage(IncomingMessage msg, String channelId) {
         TenantContextSnapshot previous =
                 TenantContextSnapshot.capture();
-        try {
-            runHandleMessage(msg, channelId);
-        } finally {
-            TenantContext.clear();
-            previous.replay();
-        }
+        TenantScope.run(previous, () -> runHandleMessage(msg, channelId));
     }
 
     private void runHandleMessage(IncomingMessage msg, String channelId) {
@@ -321,7 +317,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
         try {
             qaQueue.enqueue(req);
         } catch (QaQueue.RejectedException e) {
-            log.warn("[IM] Queue rejected: user={} reason={}", msg.userId, e.getMessage());
+            log.warn("[IM] Queue rejected: user={} reason=", msg.userId, e);
             sendReplyQuiet(adapter, msg,
                     new ReplyMessage("当前排队较多，请稍后再试。", false, true));
         }
@@ -374,7 +370,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
         try {
             result = cmd.execute(cmdCtx, args);
         } catch (Exception e) {
-            log.error("[IM] Command /{} error: {}", cmd.name(), e.getMessage(), e);
+            log.error("[IM] Command /{} error", cmd.name(), e);
             sendReplyQuiet(adapter, msg,
                     new ReplyMessage("抱歉，执行指令时出现了异常，请稍后再试。", false, true));
             return;
@@ -393,8 +389,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
                 sendStreamReply(msg, streamer, result.content);
                 sent = true;
             } catch (Exception e) {
-                log.warn("[IM] Stream reply for command /{} failed, falling back: {}",
-                        cmd.name(), e.getMessage());
+                log.warn("[IM] Stream reply for command /{} failed, falling back", cmd.name(), e);
             }
         }
         if (!sent) {

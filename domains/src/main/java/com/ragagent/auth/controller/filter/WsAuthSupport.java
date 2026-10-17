@@ -245,7 +245,7 @@ public class WsAuthSupport {
                         user.getId(), targetTenantId);
                 return TenantRole.OWNER;
             } catch (RuntimeException e) {
-                log.warn("Failed to auto-promote user {} in tenant {}: {}", user.getId(), targetTenantId, e.toString());
+                log.warn("Failed to auto-promote user {} in tenant {}", user.getId(), targetTenantId, e);
             }
         }
 

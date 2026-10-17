@@ -181,7 +181,7 @@ public class TenantAPIKeyService {
             try {
                 repo.updateLastUsed(keyId, OffsetDateTime.now(ZoneOffset.UTC));
             } catch (RuntimeException e) {
-                log.warn("failed to update tenant api key last_used_at (id={}): {}", keyId, e.toString());
+                log.warn("failed to update tenant api key last_used_at (id={})", keyId, e);
                 lastUsedTouch.remove(keyId);
             }
         });
@@ -226,7 +226,7 @@ public class TenantAPIKeyService {
                 log.info("[bootstrap] backfilled {} legacy tenant api key hash(es)", n);
             }
         } catch (RuntimeException e) {
-            log.warn("[bootstrap] tenant api key hash backfill failed: {}", e.toString());
+            log.warn("[bootstrap] tenant api key hash backfill failed", e);
         }
     }
 

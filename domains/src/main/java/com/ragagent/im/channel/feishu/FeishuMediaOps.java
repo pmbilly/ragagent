@@ -47,8 +47,7 @@ final class FeishuMediaOps {
             try {
                 imageKey = imageKeyForUrl(accessToken, rawUrl);
             } catch (Exception e) {
-                log.warn("[{}] image upload failed, degrading to link: url={} err={}",
-                        service.region.label(), rawUrl, e.toString());
+                log.warn("[{}] image upload failed, degrading to link: url={}", service.region.label(), rawUrl, e);
             }
             String replacement;
             if (imageKey == null || imageKey.isEmpty()) {

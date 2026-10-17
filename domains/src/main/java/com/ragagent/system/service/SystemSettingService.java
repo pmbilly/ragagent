@@ -423,7 +423,7 @@ public class SystemSettingService implements SystemSettingGateway {
             try {
                 dispatchSideEffects(key);
             } catch (RuntimeException e) {
-                log.warn("startup {} apply failed, env-only fallback: {}", key, e.toString());
+                log.warn("startup {} apply failed, env-only fallback", key, e);
             }
         }
     }
@@ -465,7 +465,7 @@ public class SystemSettingService implements SystemSettingGateway {
                     AuditOutcome.SUCCESS,
                     details == null ? null : details.toString()));
         } catch (RuntimeException e) {
-            log.warn("[system_settings] audit write failed (ignored): {}", e.toString());
+            log.warn("[system_settings] audit write failed (ignored)", e);
         }
     }
 

@@ -176,10 +176,10 @@ public class SessionStreamController {
         try {
             resourceRewriter = resolveStreamRewriter(resourceUrls);
         } catch (PublicModeForbiddenException e) {
-            log.warn("Rejected resource URL mode: {}", e.getMessage());
+            log.warn("Rejected resource URL mode", e);
             throw BizException.forbidden(e.getMessage());
         } catch (ResourceModeException e) {
-            log.warn("Rejected resource URL mode: {}", e.getMessage());
+            log.warn("Rejected resource URL mode", e);
             throw BizException.badRequest(e.getMessage());
         }
 
@@ -288,7 +288,7 @@ public class SessionStreamController {
                 next = streamManager.getEvents(sessionId, messageId, currentOffset);
             } catch (RuntimeException e) {
                 // 读事件失败：把扣留缓冲里还剩的吐出去，然后收工
-                log.error("Failed to get new events: {}", e.toString());
+                log.error("Failed to get new events", e);
                 try {
                     emitter.flushHeldStreamContent(new ServletSseSink(response), requestId, resourceRewriter, client);
                 } catch (IOException ignored) {

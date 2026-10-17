@@ -192,8 +192,7 @@ public class ImaConnector implements Connector {
             try {
                 batch = cli.getKnowledgeBase(ids.subList(i, end));
             } catch (ConnectorException e) {
-                log.warn("[IMA] get_knowledge_base batch failed (skipping enrichment): {}",
-                        e.getMessage());
+                log.warn("[IMA] get_knowledge_base batch failed (skipping enrichment)", e);
                 continue;
             }
             details.putAll(batch);
@@ -492,8 +491,7 @@ public class ImaConnector implements Connector {
         try {
             info = cli.getMediaInfo(f.getMediaId());
         } catch (ConnectorException e) {
-            log.warn("[IMA] get_media_info({}) failed, will retry next sync: {}",
-                    f.getMediaId(), e.getMessage());
+            log.warn("[IMA] get_media_info({}) failed, will retry next sync", f.getMediaId(), e);
             return new FetchOne(null, FetchOutcome.FAILED);
         }
 
@@ -537,8 +535,7 @@ public class ImaConnector implements Connector {
         try {
             download = cli.downloadUrl(info.getUrlInfo());
         } catch (ConnectorException e) {
-            log.warn("[IMA] download media {} (title=\"{}\") failed, will retry next sync: {}",
-                    f.getMediaId(), f.getTitle(), e.getMessage());
+            log.warn("[IMA] download media {} (title=\"{}\") failed, will retry next sync", f.getMediaId(), f.getTitle(), e);
             return new FetchOne(null, FetchOutcome.FAILED);
         }
 
@@ -593,8 +590,7 @@ public class ImaConnector implements Connector {
         try {
             content = cli.getNoteContent(noteId);
         } catch (ConnectorException e) {
-            log.warn("[IMA] get_doc_content(note {}, title=\"{}\") failed, will retry next sync: {}",
-                    noteId, f.getTitle(), e.getMessage());
+            log.warn("[IMA] get_doc_content(note {}, title=\"{}\") failed, will retry next sync", noteId, f.getTitle(), e);
             return new FetchOne(null, FetchOutcome.FAILED);
         }
         if (ImaFormats.isGoBlank(content)) {

@@ -154,7 +154,7 @@ public class Rewriter {
         try {
             httpUrl = fileService.getFileURL(ref);
         } catch (RuntimeException e) {
-            log.warn("[{}] storage URL rewrite failed: src={} err={}", logPrefix, ref, e.toString());
+            log.warn("[{}] storage URL rewrite failed: src={}", logPrefix, ref, e);
             return ref;
         }
         // 非 http(s) 的结果客户端取不到——这同时覆盖"没改动"的空操作，

@@ -48,8 +48,7 @@ public class RedisKnowledgeTaskProgressStore implements KnowledgeTaskProgressSto
             template.opsForValue().setIfAbsent(MOVE_PREFIX + progress.taskId(),
                     toJson(progress), Duration.ofSeconds(TTL_SECONDS));
         } catch (RuntimeException e) {
-            log.warn("[KnowledgeProgressRedis] save move initial failed for {}: {}",
-                    progress.taskId(), e.toString());
+            log.warn("[KnowledgeProgressRedis] save move initial failed for {}", progress.taskId(), e);
         }
     }
 
@@ -60,8 +59,7 @@ public class RedisKnowledgeTaskProgressStore implements KnowledgeTaskProgressSto
                     toJson(progress), Duration.ofSeconds(TTL_SECONDS));
         } catch (RuntimeException e) {
             // 进度写失败不得打断 move 流程
-            log.warn("[KnowledgeProgressRedis] save move failed for {}: {}",
-                    progress.taskId(), e.toString());
+            log.warn("[KnowledgeProgressRedis] save move failed for {}", progress.taskId(), e);
         }
     }
 
@@ -78,8 +76,7 @@ public class RedisKnowledgeTaskProgressStore implements KnowledgeTaskProgressSto
             template.opsForValue().setIfAbsent(CLONE_PREFIX + progress.taskId(),
                     toJson(progress), Duration.ofSeconds(TTL_SECONDS));
         } catch (RuntimeException e) {
-            log.warn("[KnowledgeProgressRedis] save clone initial failed for {}: {}",
-                    progress.taskId(), e.toString());
+            log.warn("[KnowledgeProgressRedis] save clone initial failed for {}", progress.taskId(), e);
         }
     }
 
@@ -89,8 +86,7 @@ public class RedisKnowledgeTaskProgressStore implements KnowledgeTaskProgressSto
             template.opsForValue().set(CLONE_PREFIX + progress.taskId(),
                     toJson(progress), Duration.ofSeconds(TTL_SECONDS));
         } catch (RuntimeException e) {
-            log.warn("[KnowledgeProgressRedis] save clone failed for {}: {}",
-                    progress.taskId(), e.toString());
+            log.warn("[KnowledgeProgressRedis] save clone failed for {}", progress.taskId(), e);
         }
     }
 

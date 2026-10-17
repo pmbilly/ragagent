@@ -117,8 +117,7 @@ public class WechatLongPollClient {
                 }
                 attempts++;
                 long delay = pollReconnectDelayMs(attempts);
-                log.warn("[WeChat] Poll error ({}), retrying in {}ms (attempt {})",
-                        e.toString(), delay, attempts);
+                log.warn("[WeChat] Poll error, retrying in {}ms (attempt {})", delay, attempts, e);
                 try {
                     Thread.sleep(delay);
                 } catch (InterruptedException ie) {
@@ -187,7 +186,7 @@ public class WechatLongPollClient {
                         msgHandler.accept(incoming, channelId);
                     }
                 } catch (Exception e) {
-                    log.error("[WeChat] Handle message error: {}", e.toString());
+                    log.error("[WeChat] Handle message error", e);
                 }
             });
         }

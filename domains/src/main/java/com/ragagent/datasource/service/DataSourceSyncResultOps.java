@@ -57,7 +57,7 @@ final class DataSourceSyncResultOps {
         try {
             service.syncLogRepo.updateResult(syncLog);
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to update sync log: {}", e.getMessage());
+            log.error("[datasource] failed to update sync log", e);
         }
 
         if (DataSourceConstants.SYNC_LOG_STATUS_FAILED.equals(status)) {
@@ -74,7 +74,7 @@ final class DataSourceSyncResultOps {
         try {
             service.dsRepo.updateSyncState(ds);
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to update data source: {}", e.getMessage());
+            log.error("[datasource] failed to update data source", e);
         }
 
         String action = AuditAction.DATASOURCE_SYNC_COMPLETED;

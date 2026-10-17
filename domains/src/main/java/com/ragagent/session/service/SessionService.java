@@ -209,8 +209,7 @@ public class SessionService {
             try {
                 session.setImPlatform(sessionRepository.getImPlatform(tenantId, session.getId()));
             } catch (RuntimeException e) {
-                log.warn("Failed to resolve IM platform for session {}: {}",
-                        session.getId(), e.toString());
+                log.warn("Failed to resolve IM platform for session {}", session.getId(), e);
             }
         }
         return session;
@@ -370,7 +369,7 @@ public class SessionService {
             try {
                 suggestionRepository.deleteBySessionId(tenantId, id);
             } catch (RuntimeException e) {
-                log.warn("Failed to delete suggestions for session {}: {}", id, e.toString());
+                log.warn("Failed to delete suggestions for session {}", id, e);
             }
         }
     }
@@ -387,7 +386,7 @@ public class SessionService {
         try {
             sessions = sessionRepository.getByTenantId(tenantId, userId);
         } catch (RuntimeException e) {
-            log.warn("Failed to list sessions for cleanup: {}", e.toString());
+            log.warn("Failed to list sessions for cleanup", e);
             sessions = null;
         }
         if (sessions != null) {
@@ -403,8 +402,7 @@ public class SessionService {
                 try {
                     suggestionRepository.deleteBySessionId(tenantId, session.getId());
                 } catch (RuntimeException e) {
-                    log.warn("Failed to delete suggestions for session {}: {}",
-                            session.getId(), e.toString());
+                    log.warn("Failed to delete suggestions for session {}", session.getId(), e);
                 }
             }
         }
@@ -425,17 +423,16 @@ public class SessionService {
                 try {
                     knowledgeService.deleteKnowledge(knowledgeId);
                 } catch (RuntimeException e) {
-                    log.warn("Failed to delete chat history knowledge for session {}: {}",
-                            sessionId, e.toString());
+                    log.warn("Failed to delete chat history knowledge for session {}", sessionId, e);
                 }
             }
         } catch (RuntimeException e) {
-            log.warn("Failed to get knowledge IDs for session {}: {}", sessionId, e.toString());
+            log.warn("Failed to get knowledge IDs for session {}", sessionId, e);
         }
         try {
             webSearchTempState.deleteTempKbState(sessionId);
         } catch (RuntimeException e) {
-            log.warn("Failed to cleanup temporary KB for session {}: {}", sessionId, e.toString());
+            log.warn("Failed to cleanup temporary KB for session {}", sessionId, e);
         }
     }
 
@@ -608,8 +605,7 @@ public class SessionService {
                 try {
                     title = generateTitle(session, List.of(userMessage), modelId);
                 } catch (RuntimeException e) {
-                    log.error("Failed to generate title for session {}: {}",
-                            session.getId(), e.getMessage());
+                    log.error("Failed to generate title for session {}", session.getId(), e);
                     return;
                 }
                 if (bus != null) {
@@ -618,8 +614,7 @@ public class SessionService {
                                 EventType.EVENT_SESSION_TITLE, session.getId(),
                                 new SessionTitleData(session.getId(), title), null, requestId));
                     } catch (RuntimeException e) {
-                        log.error("Failed to emit title update event, session {}: {}",
-                                session.getId(), e.getMessage());
+                        log.error("Failed to emit title update event, session {}", session.getId(), e);
                     }
                 }
             } finally {

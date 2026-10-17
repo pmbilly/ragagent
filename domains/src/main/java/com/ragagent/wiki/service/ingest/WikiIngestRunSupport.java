@@ -171,8 +171,7 @@ final class WikiIngestRunSupport {
                         log.warn("wiki ingest: released {} claimed rows on abnormal exit for KB {} "
                                 + "(re-claimable immediately)", peekedIds.size(), kbId);
                     } catch (Exception e) {
-                        log.warn("wiki ingest: failed to release {} claims on abnormal exit for KB {}: {}",
-                                peekedIds.size(), kbId, e.getMessage());
+                        log.warn("wiki ingest: failed to release {} claims on abnormal exit for KB {}", peekedIds.size(), kbId, e);
                     }
                 }
             }
@@ -241,8 +240,7 @@ final class WikiIngestRunSupport {
                             rateLimited.set(true);
                         }
                     }
-                    log.warn("wiki ingest: failed to map knowledge {}: {}",
-                            op.getKnowledgeId(), failure.getMessage());
+                    log.warn("wiki ingest: failed to map knowledge {}", op.getKnowledgeId(), failure);
                     return; // 不让整个批次失败
                 }
 
@@ -328,7 +326,7 @@ final class WikiIngestRunSupport {
                     // 锁协调层故障：安静停下，slug 记入未应用集合。
                     // 注意：reduce 自身的错误以前也曾被 throw 进这个 catch 一并吞掉，
                     // 其 "reduce failed for slug" warn 从未执行（2026-09-24 修复）。
-                    log.warn("wiki ingest: slug lock failed for slug {}: {}", slug, lockErr.getMessage());
+                    log.warn("wiki ingest: slug lock failed for slug {}", slug, lockErr);
                     collectUnapplied(reduceMu, unappliedSlugKIDs, updates);
                     return;
                 }
@@ -344,7 +342,7 @@ final class WikiIngestRunSupport {
                 }
                 WikiIngestBatchHandler.ReduceOutcome r = outcome[0].value();
                 if (r.error() != null) {
-                    log.warn("wiki ingest: reduce failed for slug {}: {}", slug, r.error().getMessage());
+                    log.warn("wiki ingest: reduce failed for slug {}", slug, r.error());
                     collectUnapplied(reduceMu, unappliedSlugKIDs, updates);
                     if (WikiBatchSupport.isLikelyRateLimitError(r.error())) {
                         synchronized (reduceMu) {
@@ -393,7 +391,7 @@ final class WikiIngestRunSupport {
             try (WikiCleanupScope scope = handler.ingestService.cleanupScope()) {
                 scope.run(() -> audit.wikiContentChanged(payload.tenantId(), kbId, wikiActivityActions));
             } catch (Exception e) {
-                log.warn("wiki ingest: record content activity failed: {}", e.getMessage());
+                log.warn("wiki ingest: record content activity failed", e);
             }
         }
 
@@ -599,8 +597,7 @@ final class WikiIngestRunSupport {
                 livePages = handler.wikiService.listPagesBySourceRef(
                         payload.knowledgeBaseId(), op.getKnowledgeId());
             } catch (Exception e) {
-                log.warn("wiki ingest: retract lookup failed for {}: {}",
-                        op.getKnowledgeId(), e.getMessage());
+                log.warn("wiki ingest: retract lookup failed for {}", op.getKnowledgeId(), e);
             }
             if (livePages != null) {
                 for (WikiPage p : livePages) {

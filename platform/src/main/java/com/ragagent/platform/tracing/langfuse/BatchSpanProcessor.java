@@ -142,7 +142,7 @@ final class BatchSpanProcessor {
         try {
             flush();
         } catch (RuntimeException e) {
-            log.debug("[Langfuse] flush failed: {}", e.getMessage());
+            log.debug("[Langfuse] flush failed", e);
         }
     }
 
@@ -154,9 +154,9 @@ final class BatchSpanProcessor {
             sink.export(batch);
         } catch (Exception e) {
             if (cfg.debug()) {
-                log.warn("[Langfuse] export {} spans failed: {}", batch.size(), e.getMessage());
+                log.warn("[Langfuse] export {} spans failed", batch.size(), e);
             } else {
-                log.debug("[Langfuse] export {} spans failed: {}", batch.size(), e.getMessage());
+                log.debug("[Langfuse] export {} spans failed", batch.size(), e);
             }
         }
     }

@@ -461,7 +461,7 @@ class EngineRecordingTest {
                 assistantWithCall("c2"),
                 toolMsg("c2", big));
         int full = est.estimateMessages(messages);
-        AgentEngine.TrimOutcome trimmed = AgentEngine.trimToolResultsToBudget(messages, est, full / 3);
+        ContextBudget.TrimOutcome trimmed = ContextBudget.trimToolResultsToBudget(messages, est, full / 3);
         assertRecording(String.valueOf(trimmed.ok()), GoRecording46B.R_TRIM_TOOL_RESULTS_OK);
         assertRecording(String.valueOf(full), GoRecording46B.R_TRIM_TOOL_RESULTS_FULL_TOKENS);
         assertRecording(messagesJson(trimmed.messages()), GoRecording46B.R_TRIM_TOOL_RESULTS_TRIMMED);

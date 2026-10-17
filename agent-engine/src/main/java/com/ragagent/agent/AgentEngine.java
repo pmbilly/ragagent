@@ -41,7 +41,6 @@ import com.ragagent.platform.tracing.langfuse.Span;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -341,7 +340,7 @@ public class AgentEngine {
     // token 预算与迭代上限
 
     int estimateCurrentTokens(List<ChatMessage> messages) {
-        int baseline = contextTokensFromUsage(lastUsage);
+        int baseline = ContextBudget.contextTokensFromUsage(lastUsage);
         if (baseline > 0 && lastSentMsgCount > 0 && lastSentMsgCount <= messages.size()) {
             return baseline + tokenEstimator
                     .estimateMessages(messages.subList(deltaStart(messages), messages.size()));
@@ -356,17 +355,6 @@ public class AgentEngine {
             start++;
         }
         return start;
-    }
-
-    /** usage 报告还原为它描述的上下文大小（缓存计数不加回）。 */
-    static int contextTokensFromUsage(TokenUsage usage) {
-        if (usage == null) {
-            return 0;
-        }
-        if (usage.getTotalTokens() > 0) {
-            return usage.getTotalTokens();
-        }
-        return usage.getPromptTokens() + usage.getCompletionTokens();
     }
 
     /** 是否还允许一个 ReAct 轮次；负 MaxIterations = 无上限。 */
@@ -511,7 +499,7 @@ public class AgentEngine {
             executeLoop(state, query, new MsgRef(messages), tools, sessionId, messageId,
                     completionEmitted, startTime);
         } catch (RuntimeException e) {
-            log.error("[Agent] Execution failed: {}", e.getMessage());
+            log.error("[Agent] Execution failed", e);
             // 顺序契约：终态帧（agentComplete）是 SSE 的退出条件——必须先发错误事件，
             // 否则错误帧落在流关闭之后（客户端只看到"成功收尾"）。
             eventBus.emit(new Event(EventIds.generateEventID("error"), EventType.EVENT_ERROR,
@@ -661,64 +649,7 @@ public class AgentEngine {
     }
 
     // ==================================================================
-    // 响应分析保留面（TrimOutcome 族 + finish reason 判定，供测试与 ReAct 迭代共用）
-    record TrimOutcome(List<ChatMessage> messages, boolean ok) {
-    }
-
-    /**
-     * 返回下一次模型调用的消息副本。
-     * 绝不改 SSE/诊断/持久化共用的 ToolResult 对象；assistant 工具调用消息不动，
-     * 保住 provider 要求的 call/result 配对。每个工具结果都是候选——压缩后保留窗口
-     * 全部是"近期"的，需要裁的那个大结果在头在尾都可能。
-     */
-    static TrimOutcome trimToolResultsToBudget(List<ChatMessage> messages,
-            TokenEstimator estimator, int budget) {
-        if (estimator == null || budget <= 0 || messages.isEmpty()) {
-            return new TrimOutcome(messages, false);
-        }
-
-        List<Integer> toolIndexes = new ArrayList<>();
-        int total = 0;
-        for (int i = 0; i < messages.size(); i++) {
-            if ("tool".equals(messages.get(i).getRole())) {
-                toolIndexes.add(i);
-                total += estimator.estimateMessage(messages.get(i));
-            }
-        }
-        if (total <= budget || toolIndexes.isEmpty()) {
-            return new TrimOutcome(messages, false);
-        }
-
-        List<ChatMessage> out = new ArrayList<>(messages);
-        Map<Integer, Integer> baseCosts = new HashMap<>();
-        int remaining = budget;
-        for (int idx : toolIndexes) {
-            ChatMessage copy = ObservePhase.shallowCopy(out.get(idx));
-            copy.setContent(ObservePhase.compactedToolResultMarker(messages.get(idx).getContent()));
-            out.set(idx, copy);
-            int cost = estimator.estimateMessage(out.get(idx));
-            baseCosts.put(idx, cost);
-            remaining -= cost;
-        }
-        if (remaining < 0) {
-            remaining = 0;
-        }
-
-        // 剩余预算从最新往最旧花；装不下完整版的拿到装得下的最大头尾预览。
-        for (int i = toolIndexes.size() - 1; i >= 0; i--) {
-            int idx = toolIndexes.get(i);
-            int fullCost = estimator.estimateMessage(messages.get(idx));
-            int extra = fullCost - baseCosts.get(idx);
-            if (extra <= remaining) {
-                out.set(idx, messages.get(idx));
-                remaining -= extra;
-                continue;
-            }
-            out.set(idx, ObservePhase.compactToolMessage(messages.get(idx), baseCosts.get(idx) + remaining, estimator));
-            remaining = 0;
-        }
-        return new TrimOutcome(out, true);
-    }
+    // finish reason 判定（供测试与 ReAct 迭代共用）
 
     /** 自然停 finish reason。 */
     static boolean isNaturalStopFinishReason(String reason) {

@@ -104,7 +104,7 @@ public class QqBotGatewayClient {
                 }
                 attempt++;
                 long delay = reconnectDelayMs(attempt);
-                log.warn("[QQBot] connection lost: {}, reconnecting in {}ms", e.toString(), delay);
+                log.warn("[QQBot] connection lost, reconnecting in {}ms", delay, e);
                 if (!sleep(delay)) {
                     return;
                 }
@@ -147,7 +147,7 @@ public class QqBotGatewayClient {
                         handler.accept(msg, channelId);
                     }
                 } catch (Exception e) {
-                    log.warn("[QQBot] parse event failed: {}", e.toString());
+                    log.warn("[QQBot] parse event failed", e);
                 }
                 return;
             case OP_RECONNECT:

@@ -190,8 +190,7 @@ public class YunzhijiaAdapter implements AdapterInterfaces.Adapter,
         try {
             param = parseMessageParam(msg.msgParam);
         } catch (Exception e) {
-            log.warn("[Yunzhijia] Failed to parse msgParam: msgId={} err={}", msg.msgId,
-                    e.toString());
+            log.warn("[Yunzhijia] Failed to parse msgParam: msgId={}", msg.msgId, e);
         }
         if (param != null) {
             log.info("[Yunzhijia] Thread callback: msg_id={} reply_msg_id={} reply_root_msg_id={}",

@@ -117,8 +117,7 @@ public final class QaAttachmentResolver {
         }
         if (resolveErr != null || resolved == null) {
             if (resolveErr != null) {
-                log.warn("temporary attachment resolution failed for session {}: {}",
-                        sessionId, resolveErr.getMessage());
+                log.warn("temporary attachment resolution failed for session {}", sessionId, resolveErr);
             }
             return;
         }
@@ -166,8 +165,7 @@ public final class QaAttachmentResolver {
         try {
             msg = messageService.getMessage(reqCtx.sessionId, reqCtx.userMessageID);
         } catch (RuntimeException e) {
-            log.warn("persist attachment content: load user message {} failed: {}",
-                    reqCtx.userMessageID, e.getMessage());
+            log.warn("persist attachment content: load user message {} failed", reqCtx.userMessageID, e);
             return;
         }
         if (msg == null) {
@@ -202,8 +200,7 @@ public final class QaAttachmentResolver {
         try {
             messageService.updateMessage(msg);
         } catch (RuntimeException e) {
-            log.warn("persist attachment content: update user message {} failed: {}",
-                    reqCtx.userMessageID, e.getMessage());
+            log.warn("persist attachment content: update user message {} failed", reqCtx.userMessageID, e);
         }
     }
     public void waitForAttachments(long tenantId, String sessionId, List<String> ids, long timeoutMs) {

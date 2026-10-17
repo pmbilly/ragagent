@@ -112,7 +112,7 @@ final class ObservePhase {
             engine.compactionExhaustedAt = messages.size();
             return new CompactionOutcome(messages, false);
         } catch (RuntimeException e) {
-            log.warn("[Agent][Round-{}] Compaction failed: {}", round, e.getMessage());
+            log.warn("[Agent][Round-{}] Compaction failed", round, e);
             engine.compactionExhaustedAt = messages.size();
             return new CompactionOutcome(messages, false);
         }
@@ -178,7 +178,7 @@ final class ObservePhase {
     /** 用预览替换工具输出直到装进窗口的一部分（最后的兜底）。 */
     private AgentEngine.WindowOutcome trimToolResults(List<ChatMessage> messages, int round,
             CompactionSettings settings) {
-        AgentEngine.TrimOutcome trimmed = AgentEngine.trimToolResultsToBudget(messages, engine.tokenEstimator,
+        ContextBudget.TrimOutcome trimmed = ContextBudget.trimToolResultsToBudget(messages, engine.tokenEstimator,
                 toolResultBudget(settings.maxContextTokens()));
         if (!trimmed.ok()) {
             return new AgentEngine.WindowOutcome(messages, false);
@@ -406,13 +406,13 @@ final class ObservePhase {
                         try {
                             bytes = ActPhase.decodeDataURIBytes(uri);
                         } catch (Exception e) {
-                            log.warn("[Agent] Failed to decode tool result image: {}", e.getMessage());
+                            log.warn("[Agent] Failed to decode tool result image", e);
                             continue;
                         }
                         try {
                             raw.add(engine.imageDescriber.describe(bytes, ActPhase.TOOL_IMAGE_ANALYSIS_PROMPT));
                         } catch (Exception e) {
-                            log.warn("[Agent] VLM analysis failed for tool result image: {}", e.getMessage());
+                            log.warn("[Agent] VLM analysis failed for tool result image", e);
                         }
                     }
                     return raw;

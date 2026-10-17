@@ -111,13 +111,12 @@ final class ImSessionResolver {
             log.info("[IM] Created new session mapping: session={}", created.getId());
             return fresh;
         } catch (RuntimeException e) {
-            log.error("[IM] channel session insert failed: {}", e.toString(), e);
+            log.error("[IM] channel session insert failed", e);
             // 并发创建撞唯一约束：清掉孤儿会话，回落已存在映射。
             try {
                 service.sessionQaPort.deleteSession(created.getId());
             } catch (Exception cleanup) {
-                log.warn("[IM] Failed to clean up orphaned session {}: {}",
-                        created.getId(), cleanup.getMessage());
+                log.warn("[IM] Failed to clean up orphaned session {}", created.getId(), cleanup);
             }
             ChannelSessionEntity existing = service.channelSessions.findUserSession(fresh.getPlatform(),
                     fresh.getUserId(), fresh.getChatId(), fresh.getTenantId(), fresh.getAgentId());

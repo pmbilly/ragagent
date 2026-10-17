@@ -367,7 +367,7 @@ public class FaqEntryQueryService {
                         tagNameMap.put(tag.getSeqId(), tag.getName());
                     }
                 } catch (RuntimeException e) {
-                    log.warn("Failed to batch query tags: {}", e.toString());
+                    log.warn("Failed to batch query tags", e);
                 }
                 if (!tagNameMap.isEmpty()) {
                     List<FaqEntry> filled = new ArrayList<>(entries.size());

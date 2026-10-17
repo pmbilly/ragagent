@@ -162,7 +162,7 @@ public class SpanTracker {
         try {
             knowledgeRepository.touchUpdatedAt(knowledgeId, OffsetDateTime.now(ZoneOffset.UTC));
         } catch (RuntimeException e) {
-            log.warn("[SpanTracker] heartbeat update failed kid={}: {}", knowledgeId, e.toString());
+            log.warn("[SpanTracker] heartbeat update failed kid={}", knowledgeId, e);
         }
     }
 
@@ -195,7 +195,7 @@ public class SpanTracker {
         try {
             repo.upsert(row);
         } catch (RuntimeException e) {
-            log.warn("[SpanTracker] OpenAttempt failed kid={}: {}", knowledgeId, e.toString());
+            log.warn("[SpanTracker] OpenAttempt failed kid={}", knowledgeId, e);
             throw e;
         }
         recordStart(rootId, now);
@@ -227,7 +227,7 @@ public class SpanTracker {
         try {
             return repo.latestAttempt(knowledgeId);
         } catch (RuntimeException e) {
-            log.warn("[SpanTracker] LatestAttempt failed kid={}: {}", knowledgeId, e.toString());
+            log.warn("[SpanTracker] LatestAttempt failed kid={}", knowledgeId, e);
             return 0;
         }
     }
@@ -245,8 +245,7 @@ public class SpanTracker {
         try {
             rows = repo.listByAttempt(knowledgeId, attempt);
         } catch (RuntimeException e) {
-            log.warn("[SpanTracker] BeginStage list failed kid={} attempt={}: {}",
-                    knowledgeId, attempt, e.toString());
+            log.warn("[SpanTracker] BeginStage list failed kid={} attempt={}", knowledgeId, attempt, e);
             return null;
         }
         String rootId = "";
@@ -339,8 +338,7 @@ public class SpanTracker {
             repo.cancelOpenSpansByName(parent.knowledgeId, parent.attempt, fitted,
                     "TASK_SUPERSEDED", "superseded by a new run of the same subtask");
         } catch (RuntimeException e) {
-            log.warn("[SpanTracker] supersede {} before BeginSubSpan failed: {}",
-                    fitted, e.toString());
+            log.warn("[SpanTracker] supersede {} before BeginSubSpan failed", fitted, e);
         }
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
         String id = newSpanId();
@@ -440,7 +438,7 @@ public class SpanTracker {
         try {
             repo.cancelDescendants(span.knowledgeId, span.attempt, span.spanId, reason);
         } catch (RuntimeException e) {
-            log.warn("[SpanTracker] cancel descendants failed span={}: {}", span.spanId, e.toString());
+            log.warn("[SpanTracker] cancel descendants failed span={}", span.spanId, e);
         }
         if (KnowledgeProcessingSpan.KIND_STAGE.equals(span.kind)) {
             cascadeDependentStages(span, reason);
@@ -479,8 +477,7 @@ public class SpanTracker {
         try {
             rows = repo.listByAttempt(knowledgeId, attempt);
         } catch (RuntimeException e) {
-            log.warn("[SpanTracker] LookupStage list failed kid={} attempt={}: {}",
-                    knowledgeId, attempt, e.toString());
+            log.warn("[SpanTracker] LookupStage list failed kid={} attempt={}", knowledgeId, attempt, e);
             return null;
         }
         for (KnowledgeProcessingSpan r : rows) {
@@ -504,8 +501,7 @@ public class SpanTracker {
         try {
             rows = repo.listByAttempt(knowledgeId, attempt);
         } catch (RuntimeException e) {
-            log.warn("[SpanTracker] LookupSpanByName list failed kid={} attempt={}: {}",
-                    knowledgeId, attempt, e.toString());
+            log.warn("[SpanTracker] LookupSpanByName list failed kid={} attempt={}", knowledgeId, attempt, e);
             return null;
         }
         for (KnowledgeProcessingSpan r : rows) {
@@ -556,8 +552,7 @@ public class SpanTracker {
             try {
                 repo.cancelDescendants(row.getKnowledgeId(), row.getAttempt(), row.getSpanId(), reason);
             } catch (RuntimeException e) {
-                log.warn("[SpanTracker] cascade descendants of dependent {}: {}",
-                        row.getName(), e.toString());
+                log.warn("[SpanTracker] cascade descendants of dependent {}", row.getName(), e);
             }
         }
     }
@@ -579,8 +574,7 @@ public class SpanTracker {
         try {
             rows = repo.listByAttempt(knowledgeId, attempt);
         } catch (RuntimeException e) {
-            log.warn("[SpanTracker] FinalizeAttempt list failed kid={} attempt={}: {}",
-                    knowledgeId, attempt, e.toString());
+            log.warn("[SpanTracker] FinalizeAttempt list failed kid={} attempt={}", knowledgeId, attempt, e);
             return;
         }
         KnowledgeProcessingSpan root = null;
@@ -652,8 +646,7 @@ public class SpanTracker {
                         n, knowledgeId, attempt);
             }
         } catch (RuntimeException e) {
-            log.warn("[SpanTracker] AbortAttempt sweep failed kid={} attempt={}: {}",
-                    knowledgeId, attempt, e.toString());
+            log.warn("[SpanTracker] AbortAttempt sweep failed kid={} attempt={}", knowledgeId, attempt, e);
         }
         finalizeAttempt(knowledgeId, attempt, KnowledgeProcessingSpan.STATUS_CANCELLED,
                 null, errorCode, errorMessage);
@@ -690,7 +683,7 @@ public class SpanTracker {
             repo.upsert(row);
             return true;
         } catch (RuntimeException e) {
-            log.warn("[SpanTracker] {} failed a={} b={}: {}", op, a, b, e.toString());
+            log.warn("[SpanTracker] {} failed a={} b={}", op, a, b, e);
             return false;
         }
     }

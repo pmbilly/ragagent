@@ -517,8 +517,7 @@ public class KnowledgeSearchTool extends BaseTool {
                     try {
                         queryEmbedding = backend.getQueryEmbedding(targets.get(0).knowledgeBaseId(), q);
                     } catch (RuntimeException e) {
-                        log.warn("[Tool][KnowledgeSearch] Failed to pre-compute embedding for model {}: {}",
-                                modelKey, e.toString());
+                        log.warn("[Tool][KnowledgeSearch] Failed to pre-compute embedding for model {}", modelKey, e);
                         queryEmbedding = null; // warn 后置空
                     }
                 }
@@ -548,8 +547,7 @@ public class KnowledgeSearchTool extends BaseTool {
                             }
                         }
                     } catch (RuntimeException e) {
-                        log.warn("[Tool][KnowledgeSearch] Combined search failed for KBs {}: {}",
-                                fullKBIDs, e.toString());
+                        log.warn("[Tool][KnowledgeSearch] Combined search failed for KBs {}", fullKBIDs, e);
                     }
                 }
 
@@ -568,8 +566,7 @@ public class KnowledgeSearchTool extends BaseTool {
                             }
                         }
                     } catch (RuntimeException e) {
-                        log.warn("[Tool][KnowledgeSearch] Failed to search KB {}: {}",
-                                st.knowledgeBaseId(), e.toString());
+                        log.warn("[Tool][KnowledgeSearch] Failed to search KB {}", st.knowledgeBaseId(), e);
                     }
                 }
             }

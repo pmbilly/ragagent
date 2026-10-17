@@ -128,8 +128,7 @@ final class WikiIngestMapPhase {
             extractedConcepts = candidates.concepts();
             slugItems = candidates.slugItems();
         } catch (RuntimeException e) {
-            log.warn("wiki ingest: pass 0 failed for {} ({}) — falling back to legacy extractor",
-                    knowledgeID, e.getMessage());
+            log.warn("wiki ingest: pass 0 failed for {} () — falling back to legacy extractor", knowledgeID, e);
             pass0Failed = true;
             try {
                 WikiIngestCitePipeline.CandidateSlugs fallback =
@@ -139,8 +138,7 @@ final class WikiIngestMapPhase {
                 extractedConcepts = fallback.concepts();
                 slugItems = fallback.slugItems();
             } catch (RuntimeException e2) {
-                log.warn("wiki ingest: legacy fallback also failed for {}: {}",
-                        knowledgeID, e2.getMessage());
+                log.warn("wiki ingest: legacy fallback also failed for {}", knowledgeID, e2);
                 handler.spans.failSpan(extractSpan, "EXTRACT_FAILED", e2.getMessage(), e2);
                 handler.spans.failSpan(wikiSpan, "EXTRACT_FAILED", e2.getMessage(), e2);
                 throw e2;
@@ -311,8 +309,7 @@ final class WikiIngestMapPhase {
             // requeueFailedOps 随后把它追加回待办列表，让下一批次重试。
             // generateWithTemplate 内部的退避重试已经在我们放弃之前耗尽了 LLM 自己的瞬时
             // 错误预算。
-            log.error("wiki ingest: generate summary failed for {}, will requeue: {}",
-                    knowledgeID, summaryErr.getMessage());
+            log.error("wiki ingest: generate summary failed for {}, will requeue", knowledgeID, summaryErr);
             handler.spans.failSpan(wikiSpan, "SUMMARY_FAILED", summaryErr.getMessage(), summaryErr);
             throw new IllegalStateException("generate summary: " + summaryErr.getMessage(), summaryErr);
         }

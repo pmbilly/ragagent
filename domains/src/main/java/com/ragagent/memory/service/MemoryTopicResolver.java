@@ -142,7 +142,7 @@ public class MemoryTopicResolver {
         try {
             existing = repo.topTopics(scope, TOPIC_CANDIDATE_LIMIT);
         } catch (RuntimeException e) {
-            log.warn("memory: load existing topics failed: {}", e.toString());
+            log.warn("memory: load existing topics failed", e);
             existing = null;
         }
         if (existing == null) {
@@ -329,7 +329,7 @@ public class MemoryTopicResolver {
         try {
             chatModel = modelResolver.getChatModel(modelId);
         } catch (RuntimeException e) {
-            log.warn("memory: topic adjudication model unavailable: {}", e.toString());
+            log.warn("memory: topic adjudication model unavailable", e);
             return;
         }
         if (chatModel == null) {
@@ -361,10 +361,10 @@ public class MemoryTopicResolver {
                     List.of(ChatMessage.system(TOPIC_ADJUDICATION_PROMPT), ChatMessage.user(b.toString())),
                     options);
         } catch (MemoryRunBudget.RunExpiredException e) {
-            log.warn("memory: topic adjudication failed: {}", e.toString());
+            log.warn("memory: topic adjudication failed", e);
             return;
         } catch (RuntimeException e) {
-            log.warn("memory: topic adjudication failed: {}", e.toString());
+            log.warn("memory: topic adjudication failed", e);
             return;
         }
         if (response == null) {
@@ -394,7 +394,7 @@ public class MemoryTopicResolver {
                 }
             }
         } catch (Exception e) {
-            log.warn("memory: unparsable topic adjudication: {}", e.toString());
+            log.warn("memory: unparsable topic adjudication", e);
             return;
         }
 

@@ -145,7 +145,7 @@ public class MattermostAdapter implements AdapterInterfaces.Adapter,
                 try {
                     actualRoot = client.getPostRootId(payload.postId());
                 } catch (Exception e) {
-                    log.debug("[Mattermost] get post failed: {}", e.toString());
+                    log.debug("[Mattermost] get post failed", e);
                 }
                 threadRoot = actualRoot.isEmpty() ? payload.postId() : actualRoot;
             }
@@ -331,7 +331,7 @@ public class MattermostAdapter implements AdapterInterfaces.Adapter,
         try {
             client.patchPostMessage(state.postId, fullContent);
         } catch (Exception e) {
-            log.warn("[Mattermost] Patch post failed: {}", e.toString());
+            log.warn("[Mattermost] Patch post failed", e);
         }
     }
 
@@ -354,7 +354,7 @@ public class MattermostAdapter implements AdapterInterfaces.Adapter,
         try {
             client.patchPostMessage(state.postId, full);
         } catch (Exception e) {
-            log.warn("[Mattermost] EndStream patch failed: {}", e.toString());
+            log.warn("[Mattermost] EndStream patch failed", e);
         }
         log.info("[Mattermost] Streaming ended: post_id={}", state.postId);
     }

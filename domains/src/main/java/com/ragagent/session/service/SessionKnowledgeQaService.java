@@ -282,7 +282,7 @@ public class SessionKnowledgeQaService {
         boolean needsRag = hasKb || req.webSearchEnabled;
         boolean hasHistory = chatManage.getMaxRounds() > 0;
 
-        List<String> pipeline;
+        List<PipelineEventType> pipeline;
         if (!needsRag) {
             // Pure chat — no retrieval needed.
             String userContent = req.query;
@@ -344,35 +344,35 @@ public class SessionKnowledgeQaService {
     // KnowledgeQAByEvent
     // ==================================================================
 
-    public void knowledgeQAByEvent(ChatManage chatManage, List<String> eventList) {
+    public void knowledgeQAByEvent(ChatManage chatManage, List<PipelineEventType> eventList) {
         log.info("Start processing knowledge base question answering through events");
         log.info("Knowledge base question answering parameters, session ID: {}, query: {}",
                 chatManage.getSessionId(), chatManage.getQuery());
 
-        List<String> methods = new ArrayList<>(eventList);
-        log.info("Trigger event list: {}", methods);
+        List<PipelineEventType> methods = new ArrayList<>(eventList);
+        log.info("Trigger event list: {}", methods.stream().map(PipelineEventType::key).toList());
 
         long pipelineStart = System.currentTimeMillis();
-        String lastRetrievalStage = PipelineProgress.lastConsolidatedRetrievalStage(eventList, chatManage);
+        PipelineEventType lastRetrievalStage = PipelineProgress.lastConsolidatedRetrievalStage(eventList, chatManage);
         StageProgress retrievalProgress = null;
         long retrievalStart = 0;
         StageProgress understandProgress = null;
         long understandStart = 0;
-        for (String eventType : eventList) {
+        for (PipelineEventType eventType : eventList) {
             long stageStart = System.currentTimeMillis();
             // 阶段 span 包住本阶段；CHAT_COMPLETION_STREAM 跳过——
             // 该阶段的 chat.completion.stream generation 已覆盖完整时长，再套一层
             // 会产出"视觉上超出父节点"的子观测
             Span stageSpan = null;
-            if (!PipelineEventType.CHAT_COMPLETION_STREAM.equals(eventType)) {
+            if (eventType != PipelineEventType.CHAT_COMPLETION_STREAM) {
                 stageSpan = LangfuseManager.get().startSpan(
                         new LangfuseManager.SpanOptions(
-                                "pipeline." + eventType, null,
-                                java.util.Map.of("event_type", eventType,
+                                "pipeline." + eventType.key(), null,
+                                java.util.Map.of("event_type", eventType.key(),
                                         "session_id", chatManage.getSessionId() == null
                                                 ? "" : chatManage.getSessionId())));
             }
-            if (PipelineEventType.QUERY_UNDERSTAND.equals(eventType)
+            if (eventType == PipelineEventType.QUERY_UNDERSTAND
                     && PipelineProgress.shouldEmitQueryUnderstandProgress(chatManage)) {
                 understandStart = stageStart;
                 understandProgress = PipelineProgress.beginQueryUnderstandProgress(chatManage);
@@ -382,11 +382,11 @@ public class SessionKnowledgeQaService {
                 retrievalProgress = PipelineProgress.beginRetrievalProgress(chatManage);
             }
             // Emit references before answer streaming（complete 关流前必达）
-            if (PipelineEventType.CHAT_COMPLETION_STREAM.equals(eventType)) {
+            if (eventType == PipelineEventType.CHAT_COMPLETION_STREAM) {
                 SessionQaFallback.emitKnowledgeReferencesEvent(chatManage);
             }
             PluginError err = eventManager.trigger(eventType, chatManage);
-            if (understandProgress != null && PipelineEventType.QUERY_UNDERSTAND.equals(eventType)) {
+            if (understandProgress != null && eventType == PipelineEventType.QUERY_UNDERSTAND) {
                 PipelineProgress.endQueryUnderstandProgress(chatManage, understandProgress,
                         understandStart, err);
                 understandProgress = null;
@@ -409,7 +409,7 @@ public class SessionKnowledgeQaService {
             // 用户停止：先于"检索无结果"判定
             if (cancelled()) {
                 PipelineLog.warn("Pipeline", "stage_cancelled", Map.of(
-                        "event", eventType, "duration_ms", stageDuration, "reason", "context canceled"));
+                        "event", eventType.key(), "duration_ms", stageDuration, "reason", "context canceled"));
                 throw new RuntimeException("context canceled");
             }
 
@@ -517,27 +517,27 @@ public class SessionKnowledgeQaService {
                     }
                 }
             } catch (RuntimeException e) {
-                log.error("Failed to get models: {}", e.toString());
+                log.error("Failed to get models", e);
                 throw e;
             }
         }
 
-        List<String> searchEvents = List.of(
+        List<PipelineEventType> searchEvents = List.of(
                 PipelineEventType.CHUNK_SEARCH,
                 PipelineEventType.CHUNK_RERANK,
                 PipelineEventType.CHUNK_MERGE,
                 PipelineEventType.FILTER_TOP_K);
 
-        log.info("Trigger search event list: {}", searchEvents);
+        log.info("Trigger search event list: {}", searchEvents.stream().map(PipelineEventType::key).toList());
 
-        for (String event : searchEvents) {
-            log.info("Starting to trigger search event: {}", event);
+        for (PipelineEventType event : searchEvents) {
+            log.info("Starting to trigger search event: {}", event.key());
             // search_knowledge 流的阶段 span（恒开，含 SEARCH_NOTHING）
             Span stageSpan =
                     LangfuseManager.get().startSpan(
                             new LangfuseManager.SpanOptions(
-                                    "pipeline." + event, null,
-                                    java.util.Map.of("event_type", event,
+                                    "pipeline." + event.key(), null,
+                                    java.util.Map.of("event_type", event.key(),
                                             "flow", "search_knowledge")));
             PluginError err = eventManager.trigger(event, chatManage);
 

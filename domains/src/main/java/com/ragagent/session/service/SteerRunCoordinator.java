@@ -39,7 +39,7 @@ public class SteerRunCoordinator {
         try {
             all = streamManager.getSteerEvents(sessionId, assistantMessageId, 0).events();
         } catch (RuntimeException e) {
-            log.warn("steer backlog read failed for session {}: {}", sessionId, e.toString());
+            log.warn("steer backlog read failed for session {}", sessionId, e);
             return;
         }
         List<StreamEvent> backlog = QaSupport.selectSteerBacklog(all, injected);
@@ -55,7 +55,7 @@ public class SteerRunCoordinator {
                 backlog.addAll(late);
             }
         } catch (RuntimeException e) {
-            log.warn("steer discard sweep failed for session {}: {}", sessionId, e.toString());
+            log.warn("steer discard sweep failed for session {}", sessionId, e);
         }
         log.info("Discarded {} queued steer message(s) after stop, session={}", backlog.size(), sessionId);
     }
@@ -82,7 +82,7 @@ public class SteerRunCoordinator {
         try {
             all = streamManager.getSteerEvents(prevReqCtx.sessionId, prevMessageId, 0).events();
         } catch (RuntimeException e) {
-            log.warn("steer backlog read failed for session {}: {}", prevReqCtx.sessionId, e.toString());
+            log.warn("steer backlog read failed for session {}", prevReqCtx.sessionId, e);
             return null;
         }
         Set<String> injected = prevStreamCtx.steerSink != null
@@ -147,7 +147,7 @@ public class SteerRunCoordinator {
             Message createdAssistant = messageService.createMessage(followUp.assistantMessage);
             followUp.assistantMessage = createdAssistant;
         } catch (RuntimeException e) {
-            log.error("follow-up persist failed for session {}: {}", prevReqCtx.sessionId, e.toString());
+            log.error("follow-up persist failed for session {}", prevReqCtx.sessionId, e);
             rollback(followUp);
             return null;
         }
@@ -158,7 +158,7 @@ public class SteerRunCoordinator {
         try {
             streamManager.claimLiveRun(followUp.sessionId, followUp.assistantMessage.getId(), followUp.requestId);
         } catch (RuntimeException e) {
-            log.error("follow-up ClaimLiveRun failed for session {}: {}", followUp.sessionId, e.toString());
+            log.error("follow-up ClaimLiveRun failed for session {}", followUp.sessionId, e);
             rollback(followUp);
             return null;
         }
@@ -175,7 +175,7 @@ public class SteerRunCoordinator {
                 followUp.steerCarryOver.addAll(late);
             }
         } catch (RuntimeException e) {
-            log.warn("steer late-handoff read failed for session {}: {}", prevReqCtx.sessionId, e.toString());
+            log.warn("steer late-handoff read failed for session {}", prevReqCtx.sessionId, e);
         }
 
         if (!followUp.steerCarryOver.isEmpty()) {
@@ -184,7 +184,7 @@ public class SteerRunCoordinator {
                         followUp.assistantMessage.getId(), followUp.steerCarryOver);
                 followUp.steerCarryOver = null;
             } catch (RuntimeException e) {
-                log.warn("steer carry-over append failed for session {}: {}", followUp.sessionId, e.toString());
+                log.warn("steer carry-over append failed for session {}", followUp.sessionId, e);
             }
         }
         return followUp;
@@ -196,7 +196,7 @@ public class SteerRunCoordinator {
                 streamManager.updateSteerEventData(sessionId, assistantId, evt.getId(),
                         java.util.Map.of(QaSupport.STEER_DATA_CONSUMED, true));
             } catch (RuntimeException e) {
-                log.warn("steer consume flag failed for session {} steer {}: {}", sessionId, evt.getId(), e.toString());
+                log.warn("steer consume flag failed for session {} steer {}", sessionId, evt.getId(), e);
             }
         }
     }
@@ -210,7 +210,7 @@ public class SteerRunCoordinator {
                 messageService.deleteMessage(followUp.sessionId, followUp.assistantMessage.getId());
             }
         } catch (RuntimeException e) {
-            log.warn("follow-up rollback failed: {}", e.toString());
+            log.warn("follow-up rollback failed", e);
         }
     }
 

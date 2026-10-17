@@ -31,7 +31,7 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:16379}
-      # dev Redis 开了 requirepass（.env 的 REDIS_PASSWORD）；未设时留空
+      # 本仓 dev Redis 无密码；仅当服务端开启 requirepass 时设置 REDIS_PASSWORD
       password: ${REDIS_PASSWORD:}
       # 可选的 Redis ACL 用户名与库号
       username: ${REDIS_USERNAME:}
@@ -117,6 +117,12 @@ conversation:
   fallback-strategy: model
   enable-rewrite: true
   enable-query-expansion: true
+
+# 起服能力报告：检索 / JWT 密钥来源 / 存储目录 / Redis / 流管理器一行摘要；
+# 存储不可写时直接失败（避免上传时才炸）。
+ragagent:
+  capability-report:
+    enabled: ${CAPABILITY_REPORT_ENABLED:true}
 
 logging:
   level:

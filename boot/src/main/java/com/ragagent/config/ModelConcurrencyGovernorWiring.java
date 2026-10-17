@@ -60,8 +60,7 @@ public class ModelConcurrencyGovernorWiring {
         } catch (RuntimeException e) {
             // 设置面不可用时按缺省装配（尽力而为），
             // 闸门失效退化为"未装配"形态（全部放行），不得阻断应用启动。
-            log.warn("[ModelLimiter] resolve model.max_concurrency failed, "
-                    + "governor left unwired (all calls pass): {}", e.toString());
+            log.warn("[ModelLimiter] resolve model.max_concurrency failed, governor left unwired (all calls pass)", e);
             return;
         }
 

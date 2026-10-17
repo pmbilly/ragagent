@@ -328,8 +328,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
             try {
                 tenantMapper.deleteById(tenant.getId());
             } catch (RuntimeException rollbackErr) {
-                log.warn("createTenant rollback: failed to delete tenant {}: {}",
-                        tenant.getId(), rollbackErr.toString());
+                log.warn("createTenant rollback: failed to delete tenant {}", tenant.getId(), rollbackErr);
             }
             throw e;
         }
@@ -354,8 +353,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
             try {
                 storageProvisioner.deleteForTenant(tenant.getId(), backendId);
             } catch (RuntimeException cleanupErr) {
-                log.warn("createDefaultStorageBackend cleanup: failed to delete backend {}: {}",
-                        backendId, cleanupErr.toString());
+                log.warn("createDefaultStorageBackend cleanup: failed to delete backend {}", backendId, cleanupErr);
             }
             throw e;
         }

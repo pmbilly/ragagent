@@ -275,8 +275,7 @@ public class EngineRegistry implements RetrieveEngineRegistry {
             } catch (RuntimeException e) {
                 // store 很可能存在，只是元数据库答不上来。这里说"not found"会让异步 worker
                 // 因为一次短暂故障丢掉任务。
-                log.error("[retriever.registry] loading store {} for rebuild failed: {}",
-                        storeId, e.toString());
+                log.error("[retriever.registry] loading store {} for rebuild failed", storeId, e);
                 throw RetrieveEngineException.VECTOR_STORE_UNAVAILABLE;
             }
             if (store == null) {
@@ -287,8 +286,7 @@ public class EngineRegistry implements RetrieveEngineRegistry {
                 svc = factory.build(store);
             } catch (RuntimeException e) {
                 // 原因止于这条日志：它带着后端端点，不能回流给调用方。
-                log.error("[retriever.registry] rebuilding engine for store {} failed, "
-                        + "retrying no sooner than {}: {}", storeId, rebuildCooldown, e.toString());
+                log.error("[retriever.registry] rebuilding engine for store {} failed, retrying no sooner than {}", storeId, rebuildCooldown, e);
                 markBuildFailed(storeId);
                 throw RetrieveEngineException.VECTOR_STORE_UNAVAILABLE;
             }
@@ -309,8 +307,7 @@ public class EngineRegistry implements RetrieveEngineRegistry {
             if (surprise instanceof RetrieveEngineException sentinel) {
                 throw sentinel;
             }
-            log.error("[retriever.registry] engine build failed unexpectedly for store {}: {}",
-                    storeId, surprise.toString());
+            log.error("[retriever.registry] engine build failed unexpectedly for store {}", storeId, surprise);
             throw RetrieveEngineException.VECTOR_STORE_UNAVAILABLE;
         }
     }

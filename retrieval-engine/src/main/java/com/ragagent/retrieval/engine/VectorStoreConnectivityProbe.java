@@ -148,7 +148,7 @@ public class VectorStoreConnectivityProbe implements VectorStoreConnectivity {
             return QdrantRetrieveRepository.testConnection(
                     config.host, port, config.apiKey, config.useTls, ssrfGuard);
         } catch (RuntimeException e) {
-            log.warn("Qdrant connection test failed: {}", e.getMessage());
+            log.warn("Qdrant connection test failed", e);
             throw new ConnectorFailure(
                     "failed to connect to qdrant: connection refused or authentication failed");
         }
@@ -163,7 +163,7 @@ public class VectorStoreConnectivityProbe implements VectorStoreConnectivity {
             return MilvusRetrieveRepository.testConnection(
                     config.addr, config.username, config.password, config.database, ssrfGuard);
         } catch (RuntimeException e) {
-            log.warn("Milvus connection test failed: {}", e.getMessage());
+            log.warn("Milvus connection test failed", e);
             throw new ConnectorFailure(
                     "failed to connect to milvus: connection refused or server unreachable");
         }
@@ -180,11 +180,11 @@ public class VectorStoreConnectivityProbe implements VectorStoreConnectivity {
                     .testConnection(config.addr, config.username, config.apiKey, ssrfGuard);
         } catch (TencentVectorDbRestClient
                 .TencentVectorDbApiException e) {
-            log.warn("Tencent VectorDB list database failed: {}", e.getMessage());
+            log.warn("Tencent VectorDB list database failed", e);
             throw new ConnectorFailure(
                     "failed to connect to tencent vectordb: authentication failed or server error");
         } catch (RuntimeException e) {
-            log.warn("Tencent VectorDB connection test failed: {}", e.getMessage());
+            log.warn("Tencent VectorDB connection test failed", e);
             throw new ConnectorFailure(
                     "failed to connect to tencent vectordb: connection refused or authentication failed");
         }
@@ -235,7 +235,7 @@ public class VectorStoreConnectivityProbe implements VectorStoreConnectivity {
             return DorisRetrieveRepository.testConnection(
                     config.addr, config.database, config.username, config.password);
         } catch (java.sql.SQLException e) {
-            log.warn("Doris connection test failed: {}", e.getMessage());
+            log.warn("Doris connection test failed", e);
             throw new ConnectorFailure(
                     "failed to connect to doris: connection refused or authentication failed");
         }
@@ -258,7 +258,7 @@ public class VectorStoreConnectivityProbe implements VectorStoreConnectivity {
                     config.addr, config.username, config.password, config.insecureSkipVerify,
                     ssrfGuard);
         } catch (RuntimeException e) {
-            log.warn("OpenSearch connection test failed: {}", e.getMessage());
+            log.warn("OpenSearch connection test failed", e);
             throw new ConnectorFailure(generic);
         }
         return "";

@@ -162,7 +162,7 @@ public class RetrievalEngineWiringConfig {
             register(registry, new KeywordsVectorHybridRetrieveEngineService(repo,
                     EngineTypes.ENGINE_OPENSEARCH), label);
         } catch (RuntimeException e) {
-            log.error("Create {} repository failed: {}", label, e.getMessage());
+            log.error("Create {} repository failed", label, e);
         }
     }
 
@@ -208,7 +208,7 @@ public class RetrievalEngineWiringConfig {
             register(registry, new KeywordsVectorHybridRetrieveEngineService(repo,
                     EngineTypes.ENGINE_DORIS), label);
         } catch (RuntimeException e) {
-            log.error("Create {} client failed: {}", label, e.toString());
+            log.error("Create {} client failed", label, e);
         }
     }
 
@@ -246,7 +246,7 @@ public class RetrievalEngineWiringConfig {
             register(registry, new KeywordsVectorHybridRetrieveEngineService(repo,
                     EngineTypes.ENGINE_QDRANT), label);
         } catch (RuntimeException e) {
-            log.error("Create {} client failed: {}", label, e.toString());
+            log.error("Create {} client failed", label, e);
         }
     }
 
@@ -278,7 +278,7 @@ public class RetrievalEngineWiringConfig {
             register(registry, new KeywordsVectorHybridRetrieveEngineService(repo,
                     EngineTypes.ENGINE_WEAVIATE), label);
         } catch (RuntimeException e) {
-            log.error("Create {} client failed: {}", label, e.toString());
+            log.error("Create {} client failed", label, e);
         }
     }
 
@@ -301,7 +301,7 @@ public class RetrievalEngineWiringConfig {
             register(registry, new KeywordsVectorHybridRetrieveEngineService(repo,
                     EngineTypes.ENGINE_MILVUS), label);
         } catch (RuntimeException e) {
-            log.error("Create {} client failed: {}", label, e.toString());
+            log.error("Create {} client failed", label, e);
         }
     }
 
@@ -328,7 +328,7 @@ public class RetrievalEngineWiringConfig {
             register(registry, new KeywordsVectorHybridRetrieveEngineService(repo,
                     EngineTypes.ENGINE_TENCENT_VECTORDB), label);
         } catch (RuntimeException e) {
-            log.error("Create {} client failed: {}", label, e.toString());
+            log.error("Create {} client failed", label, e);
         }
     }
 
@@ -346,7 +346,7 @@ public class RetrievalEngineWiringConfig {
             register(registry, new KeywordsVectorHybridRetrieveEngineService(repo,
                     EngineTypes.ENGINE_SQLITE), "sqlite");
         } catch (RuntimeException e) {
-            log.error("Register sqlite retrieve engine failed: {}", e.toString());
+            log.error("Register sqlite retrieve engine failed", e);
         }
     }
 
@@ -360,7 +360,7 @@ public class RetrievalEngineWiringConfig {
         try {
             registry.register(service);
         } catch (RuntimeException e) {
-            log.error("Register {} retrieve engine failed: {}", label, e.getMessage());
+            log.error("Register {} retrieve engine failed", label, e);
             return;
         }
         log.info("Register {} retrieve engine success", label);
@@ -389,7 +389,7 @@ public class RetrievalEngineWiringConfig {
                             EngineTypes.ENGINE_ELASTICSEARCH);
             register(registry, engine, label);
         } catch (RuntimeException e) {
-            log.error("Create {} client failed: {}", label, e.toString());
+            log.error("Create {} client failed", label, e);
         }
     }
 

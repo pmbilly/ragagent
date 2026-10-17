@@ -33,8 +33,7 @@ public class DefaultWikiChunkCleaner implements WikiChunkCleaner {
             chunkPort.deleteChunk(tenantId, chunkId);
         } catch (RuntimeException e) {
             // 清理失败仅记 WARN：不阻断页面删除流程
-            log.warn("wiki: failed to delete chunk {} for tenant {}: {}",
-                    chunkId, tenantId, e.toString());
+            log.warn("wiki: failed to delete chunk {} for tenant {}", chunkId, tenantId, e);
         }
     }
 }

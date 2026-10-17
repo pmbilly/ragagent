@@ -389,7 +389,7 @@ public class RemoteApiChat implements LlmChatClient {
         try {
             body.close();
         } catch (IOException e) {
-            log.debug("[LLM Stream] close body failed for model={}: {}", modelName, e.toString());
+            log.debug("[LLM Stream] close body failed for model={}", modelName, e);
         }
     }
 

@@ -127,8 +127,8 @@ final class FinalizePhase {
         try {
             streamFinalAnswerToEventBus(query, state, sessionId, messages);
         } catch (RuntimeException e) {
-            log.error("Failed to synthesize final answer: {}", e.getMessage());
-            log.error("[PIPELINE] stage=Agent action=final_answer_failed error=\"{}\"", e.getMessage());
+            log.error("Failed to synthesize final answer", e);
+            log.error("[PIPELINE] stage=Agent action=final_answer_failed error=\"\"", e);
             state.setFinalAnswer("Sorry, I was unable to generate a complete answer.");
         }
         state.setComplete(true);

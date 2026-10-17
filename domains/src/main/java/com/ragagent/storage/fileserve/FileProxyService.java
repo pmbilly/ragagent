@@ -62,7 +62,7 @@ public class FileProxyService implements FileProxyPort {
             ResourceCatalogService catalog,
             FileAccessResolver accessResolver,
             @org.springframework.beans.factory.annotation.Value(
-                    "${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}")
+                    "${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:${user.home}/ragagent-data/files}}")
             String localBaseDir) {
         this.tenantConfigLookup = tenantConfigLookup;
         this.resolver = resolver;
@@ -156,8 +156,7 @@ public class FileProxyService implements FileProxyPort {
         try {
             opened = resolution.service().getFile(resolved);
         } catch (Exception e) {
-            log.warn("[Router] /files get file failed: tenant_id={} provider={} path=\"{}\" err={}",
-                    ctxTenantId, resolution.resolvedProvider(), resolved, e.toString());
+            log.warn("[Router] /files get file failed: tenant_id={} provider={} path=\"{}\"", ctxTenantId, resolution.resolvedProvider(), resolved, e);
             plainStatus(response, HttpServletResponse.SC_NOT_FOUND);
             return;
         }

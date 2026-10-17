@@ -6,7 +6,7 @@ import com.ragagent.contract.storage.support.Resolver;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
-import com.ragagent.platform.storage.config.StorageRuntimeEnv;
+import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.platform.storage.support.Rewriter;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.storage.provider.FileService;
@@ -45,15 +45,11 @@ public class FileServiceResolver implements Resolver {
             {"local", "minio", "cos", "tos", "s3", "oss", "ks3", "obs", "dummy"};
 
     /**
-     * 本地存储的磁盘根——启动期快照
-     * （{@code LOCAL_STORAGE_BASE_DIR}），缺省 {@code /data/files}。
+     * 本地存储的磁盘根——启动期快照（{@code LOCAL_STORAGE_BASE_DIR}），
+     * 缺省见 {@link StoragePaths#localStorageBaseDir()}。
      */
     public static String localStorageBaseDir() {
-        String baseDir = StorageRuntimeEnv.localStorageBaseDir();
-        if (baseDir == null || baseDir.isBlank()) {
-            return "/data/files";
-        }
-        return baseDir.trim();
+        return StoragePaths.localStorageBaseDir();
     }
 
     private final TenantStorageView tenant;
@@ -106,8 +102,7 @@ public class FileServiceResolver implements Resolver {
                     return resolved.fileService();
                 }
             } catch (RuntimeException e) {
-                log.warn("resolve storage backend failed: backend_id={} provider={} err={}",
-                        backendId, provider, e.toString());
+                log.warn("resolve storage backend failed: backend_id={} provider={}", backendId, provider, e);
             }
         }
         FileUrlPort service = buildFileServiceForProvider(provider, defaultSvc);
@@ -141,8 +136,7 @@ public class FileServiceResolver implements Resolver {
                 return new ProviderUrlFileService(created.service());
             }
         } catch (RuntimeException e) {
-            log.warn("build file service for provider failed: provider={} err={}",
-                    provider, e.toString());
+            log.warn("build file service for provider failed: provider={}", provider, e);
         }
         return defaultSvc;
     }

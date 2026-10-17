@@ -104,8 +104,7 @@ final class OpenSearchAdminOps {
                     service.send("DELETE", "/" + realIndex, null, "application/json", OpenSearchRetrieveRepository.SEARCH_BODY_CAP);
                     log.info("[OpenSearch] cleaned up orphan {} after aliasPut failure", realIndex);
                 } catch (Exception delErr) {
-                    log.warn("[OpenSearch] orphan cleanup failed for {}: {}"
-                            + " (operator must DELETE manually)", realIndex, delErr.getMessage());
+                    log.warn("[OpenSearch] orphan cleanup failed for {} (operator must DELETE manually)", realIndex, delErr);
                 }
             }
             throw new OpenSearchDriverException(e.kind(),

@@ -10,6 +10,7 @@ import com.ragagent.contract.retrieval.WebResultConverter;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.session.service.rag.ChatManage;
@@ -99,7 +100,7 @@ final class PluginSearchOps {
             for (Map.Entry<String, List<SearchTarget>> entry : groups.entrySet()) {
                 String modelKey = entry.getKey();
                 List<SearchTarget> targets = entry.getValue();
-                futures.add(executor.submit(PluginSearch.withTenant(groupSnap, () -> {
+                futures.add(executor.submit(TenantScope.callable(groupSnap, () -> {
                     searchModelGroup(modelKey, targets, chatManage, queryText, kbMap,
                             results, firstErr, errOnce, lock);
                     return null;

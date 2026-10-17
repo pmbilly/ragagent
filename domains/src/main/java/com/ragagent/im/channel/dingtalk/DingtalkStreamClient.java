@@ -138,7 +138,7 @@ public class DingtalkStreamClient {
                 Thread.currentThread().interrupt();
                 return;
             } catch (Exception e) {
-                log.warn("[DingTalk] Stream connect failed: {}", e.toString());
+                log.warn("[DingTalk] Stream connect failed", e);
             }
             if (stopped.get()) {
                 return;
@@ -183,7 +183,7 @@ public class DingtalkStreamClient {
                         socket.sendPing(ByteBuffer.wrap(new byte[0]))
                                 .get(PING_WAIT_MS, TimeUnit.MILLISECONDS);
                     } catch (Exception e) {
-                        log.warn("[DingTalk] ping timeout, closing connection: {}", e.toString());
+                        log.warn("[DingTalk] ping timeout, closing connection", e);
                         socket.abort();
                         return;
                     }
@@ -209,7 +209,7 @@ public class DingtalkStreamClient {
                 try {
                     dispatch(frame);
                 } catch (Exception e) {
-                    log.warn("[DingTalk] Stream frame handling error: {}", e.toString());
+                    log.warn("[DingTalk] Stream frame handling error", e);
                 }
             }
         } finally {
@@ -229,7 +229,7 @@ public class DingtalkStreamClient {
             try {
                 socket.abort();
             } catch (RuntimeException e) {
-                log.debug("[DingTalk] abort failed: {}", e.toString());
+                log.debug("[DingTalk] abort failed", e);
             }
         }
         workers.shutdownNow();
@@ -274,7 +274,7 @@ public class DingtalkStreamClient {
         try {
             handleBotFrame(frame);
         } catch (Exception e) {
-            log.error("[DingTalk] bot frame failed: {}", e.toString());
+            log.error("[DingTalk] bot frame failed", e);
         }
     }
 
@@ -401,7 +401,7 @@ public class DingtalkStreamClient {
         try {
             socket.sendText(json, true).get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
-            log.warn("[DingTalk] ack send failed: {}", e.toString());
+            log.warn("[DingTalk] ack send failed", e);
         }
     }
 
@@ -468,7 +468,7 @@ public class DingtalkStreamClient {
 
         @Override
         public void onError(WebSocket socket, Throwable error) {
-            log.warn("[DingTalk] Stream error: {}", error.toString());
+            log.warn("[DingTalk] Stream error", error);
             inbox.offer(CLOSED_SENTINEL);
         }
     }

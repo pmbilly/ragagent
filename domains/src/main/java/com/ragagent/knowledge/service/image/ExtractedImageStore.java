@@ -94,7 +94,7 @@ public class ExtractedImageStore {
                             mimeTypeOf(fileName));
                     copies.put(ref, copied);
                 } catch (RuntimeException e) {
-                    log.warn("copy extracted image {} failed: {}", ref, e.getMessage());
+                    log.warn("copy extracted image {} failed", ref, e);
                     continue;
                 }
             }
@@ -113,8 +113,7 @@ public class ExtractedImageStore {
             contents = chunkRepository.listActiveByKnowledgeId(tenantId, knowledgeId)
                     .stream().map(Chunk::getContent).toList();
         } catch (RuntimeException e) {
-            log.warn("load chunks for image release failed: knowledge={} err={}",
-                    knowledgeId, e.getMessage());
+            log.warn("load chunks for image release failed: knowledge={}", knowledgeId, e);
             return;
         }
         releaseExtractedImages(tenantId, contents);
@@ -137,7 +136,7 @@ public class ExtractedImageStore {
                 fileStorage.deleteExportBytes(tenantId, ref);
                 resourceCatalog.markDeletedByLocation(tenantId, ref);
             } catch (RuntimeException e) {
-                log.warn("release extracted image {} failed: {}", ref, e.getMessage());
+                log.warn("release extracted image {} failed", ref, e);
             }
         }
     }

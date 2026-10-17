@@ -122,7 +122,7 @@ public class TenantAPIKeyController {
                     tenantId, null, req.name(), req.fullAccess(),
                     req.knowledgeBaseIds(), req.capabilities(), expiresAt));
         } catch (RuntimeException e) {
-            log.warn("[apikey] create failed for tenant={}: {}", tenantId, e.toString());
+            log.warn("[apikey] create failed for tenant={}", tenantId, e);
             throw new BizException(AppError.internal("Failed to create API key").withDetails(e.getMessage()));
         }
 

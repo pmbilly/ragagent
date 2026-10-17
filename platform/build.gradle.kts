@@ -1,7 +1,7 @@
 // 平台层（stage 6 提取，2026-10-16）：框架、可靠执行与通用技术适配；**不含业务状态机**。
 //
 // 依赖方向（方案 §5.2）：platform → contracts（+ 框架库）；**platform 不得依赖业务域**（§12.2 DAG 规则，
-// 提取后由 Gradle 编译边强制 —— 此前 0 处违规，见 HANDOFF §12.5 准入 G2/G4）。
+// 提取后由 Gradle 编译边强制 —— 此前 0 处违规，见 docs/internal/HANDOFF.md §12.5 准入 G2/G4）。
 //
 // 来源：common/src/main/java/com/ragagent/platform/**（135 件）+ 平台侧测试（22 件）+
 // testFixtures（EmbeddedRedis：L1 与上层测试共用）；**包名不变** ⇒ 组件/属性/Mapper 扫描面零改动（G3）。

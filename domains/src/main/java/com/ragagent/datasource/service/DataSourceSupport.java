@@ -55,8 +55,7 @@ final class DataSourceSupport {
                         ds.getName(), tagId);
             }
         } catch (RuntimeException e) {
-            log.warn("[datasource] failed to find/create auto-tag \"{}\": {} "
-                    + "(proceeding without tag)", ds.getName(), e.getMessage());
+            log.warn("[datasource] failed to find/create auto-tag \"{}\" (proceeding without tag)", ds.getName(), e);
         }
         return autoTagIds;
     }

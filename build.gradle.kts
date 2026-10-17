@@ -52,14 +52,14 @@ dependencies {
 // （B111~B118 期间人工修过 ≥5 次）。交给 javadoc 自己的解析器判定，零维护成本；
 // HTML 风格（</p>、heading 顺序）与 @param 完整性刻意**不**纳入——噪声大、价值低。
 
-// ── 十一守卫（B214 接入；B217 加异常语义；B221 加契约同步）───────────────────
-// 单一入口 scripts/run-guards.sh（B168 起）：包环 / Go 锚点 / 前端契约键 / JSON 键大小写
-// （--strict）/ 事件面 / 文件规模棘轮 / 目录卫生 / 死成员 / 统一响应外壳。
+// ── 守卫（单一入口 scripts/run-guards.sh，本地与 CI 同口径）─────────────────
+// 包环 / Go 锚点 / 前端契约键 / JSON 键大小写（--strict）/ 事件面 / 文件规模棘轮 /
+// 目录卫生 / 死成员 / 统一响应外壳 / 契约纯度 / 模块图 / platform 形状 / 架构索引。
 // 注册在本块**之前**：下面的 subprojects{} 里 check 要 dependsOn 它，而 tasks.named()
 // 是立即解析的（找不到即抛异常）。
 val guards = tasks.register<Exec>("guards") {
     group = "verification"
-    description = "十一守卫（脚本入口与 CI guards job 同一份）"
+    description = "守卫（脚本入口与 CI guards job 同一份）"
     workingDir = rootDir
     commandLine("bash", "scripts/run-guards.sh")
     // 默认 false：守卫失败即构建失败 —— 这正是接入的目的，别改成 ignoreExitValue。
@@ -70,11 +70,11 @@ subprojects {
     // ⚠️ 注意 guards 任务必须注册在本块**之前**（见下方 register），因为
     // rootProject.tasks.named("guards") 是立即解析的，找不到就抛。
     plugins.withId("java") {
-        // 十一守卫（B214 接进 check）：`scripts/run-guards.sh` 是本地与 CI 的**同一份**入口，
+        // 守卫接进 check：`scripts/run-guards.sh` 是本地与 CI 的**同一份**入口，
         // 此前它只挂在 CI 的 guards job ⇒ 本地 `./gradlew build` 绿 ≠ CI 绿
         // （B168 实测漏检过一次真失败：本地手敲守卫漏了 check-json-key-case 的 --strict）。
         // 代价：CI 会跑两遍守卫（guards job + 本 job 的 build）—— 刻意的，两边同口径
-        // 比省一次扫描值。需要 python3 在 PATH 上（九条守卫都是 Python）。
+        // 比省一次扫描值。需要 python3 在 PATH 上（守卫都是 Python）。
         tasks.named("check") { dependsOn(rootProject.tasks.named("guards")) }
         // `-parameters`：MyBatis 无 @Param 的参数绑定、Spring MVC/Jackson 的**参数名反射**都依赖它。
         // 该标志原由 org.springframework.boot 插件自动附加；B165 把 boot 插件从 :server 移到 :boot 后

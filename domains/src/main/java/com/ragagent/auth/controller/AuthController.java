@@ -281,7 +281,7 @@ public class AuthController {
         try {
             tenant = tenantService.getTenantById(inv.getTenantId());
         } catch (RuntimeException e) {
-            log.warn("invitations/lookup: tenant {} lookup failed: {}", inv.getTenantId(), e.toString());
+            log.warn("invitations/lookup: tenant {} lookup failed", inv.getTenantId(), e);
         }
         InvitationLookupResponse resp = new InvitationLookupResponse(
                 inv.getTenantId(),
@@ -356,12 +356,11 @@ public class AuthController {
         } catch (RuntimeException e) {
             // 竞态：lookup 与 accept 之间链接被撤。保留新号但还原成 tenantless；
             // 修复也失败则删掉半个身份。
-            log.error("register-by-invite: accept failed for user {}: {}", user.getId(), e.toString());
+            log.error("register-by-invite: accept failed for user {}", user.getId(), e);
             try {
                 userService.restoreTenantless(user);
             } catch (RuntimeException rollbackErr) {
-                log.error("register-by-invite: failed to restore tenantless user {}: {}",
-                        user.getId(), rollbackErr.toString());
+                log.error("register-by-invite: failed to restore tenantless user {}", user.getId(), rollbackErr);
                 try {
                     userService.deleteUser(user.getId());
                 } catch (RuntimeException ignored) {
@@ -434,8 +433,7 @@ public class AuthController {
                 tenant = tenantService.getTenantById(activeTenantId);
             } catch (RuntimeException e) {
                 // 租户信息取不到不让请求失败
-                log.warn("Failed to get tenant info for user {}, tenant ID {}: {}",
-                        user.getEmail(), activeTenantId, e.toString());
+                log.warn("Failed to get tenant info for user {}, tenant ID {}", user.getEmail(), activeTenantId, e);
             }
         }
         UserInfo userInfo = UserInfo.from(user, user.isCanAccessAllTenants());
