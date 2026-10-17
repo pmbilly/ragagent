@@ -28,7 +28,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
  * </ol>
  *
  * <p>{@link JavaTimeModule} 是必需的：Notion 的时间是
- * {@code "T10:00:00.000Z"} 形态的 RFC3339，{@code OffsetDateTime}
+ * {@code "2026-01-15T10:00:00.000Z"} 形态的 RFC3339，{@code OffsetDateTime}
  * 没有它直接抛 {@code InvalidDefinitionException}。</p>
  */
 final class NotionJson {

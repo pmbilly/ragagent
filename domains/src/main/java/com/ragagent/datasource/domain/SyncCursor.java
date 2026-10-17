@@ -21,7 +21,7 @@ import java.util.Map;
  * SyncCursor{} →
  * {"lastSyncTime":"0001-01-01T00:00:00Z","connectorCursor":null,"lastSchemaHash":""}
  * SyncCursor(全字段) →
- * {"lastSyncTime":"T10:00:00+08:00",
+ *   {"lastSyncTime":"2026-09-18T10:00:00+08:00",
  * "connectorCursor":{"n":2,"page_token":"p"},"last_schema_hash":"h"}
  * </pre>
  * <p>{@code connectorCursor} {@code null} 时输出 {@code null}（恒输出）；

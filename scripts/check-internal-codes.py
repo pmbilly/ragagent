@@ -6,7 +6,7 @@
 `GoRecording*` 是旧夹具名，已行为化改名，禁止回流。
 
 判据（硬零）：
-  C1 主码 `src/main` 的注释里不得出现代号/日期戳；
+  C1 主码 `src/main` 的注释里不得出现代号/裸日期戳；ISO-8601 时间示例（`2026-09-18T10:00:00Z`）保留。
   C2 任意 `src/test` / `src/testFixtures` 不得再出现 `GoRecording`。
 
 红态探针：临时在主码注释写 `// B999`，本脚本必须非零退出；跑完删除探针。
@@ -22,7 +22,7 @@ COMMENT_RE = re.compile(r"//[^\n]*|/\*.*?\*/", re.S)
 CODE_RE = re.compile(
     r"\b(?:B\d{2,3}|K\d{1,2}|A\d{2}|R\d[a-z]?|W\d[a-zγ]?|P\d[a-z]?|O\d{1,2}|G\d|D\d|E\d|F\d|C\d)"
     r"(?:[-–][A-Za-z0-9②③④⑤]+)*\b"
-    r"|20\d{2}-\d{2}-\d{2}"
+    r"|20\d{2}-\d{2}-\d{2}(?!T\d)"
     r"|§\d+(?:\.\d+)*"
 )
 LEGACY_NAME = "GoRecording"

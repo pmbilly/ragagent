@@ -20,7 +20,7 @@ import java.util.Map;
  * "modified_at":"0001-01-01T00:00:00Z"}
  * Resource(全字段) →
  * {"external_id":"e1","name":"n","type":"document","description":"d","url":"u",
- * "modified_at":"T10:00:00+08:00","parent_id":"p1","has_children":true,
+ *    "modified_at":"2026-09-18T10:00:00+08:00","parent_id":"p1","has_children":true,
  * "metadata":{"k":"v"}}
  * </pre>
  * <p>要点：{@code modified_at} 恒输出，零值输出

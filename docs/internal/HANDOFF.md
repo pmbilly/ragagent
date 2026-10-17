@@ -155,7 +155,7 @@ boot           14 件                      →  boot
 | `check-tenant-scope.py` | 跨线程身份必须走 `TenantScope`；禁止裸 capture/replay | 硬零 |
 | `check-log-exceptions.py` | log 里禁止 `Throwable.toString()` / `.getMessage()` | 硬零 |
 | `check-duplicate-classes.py` | 同一简单类名不得出现在多个模块主码 | 硬零 |
-| `check-internal-codes.py` | 主码注释禁止批次号/日期戳；旧夹具名不得回流 | 硬零 |
+| `check-internal-codes.py` | 主码注释禁止批次号/裸日期戳（ISO-8601 时间示例保留）；旧夹具名不得回流 | 硬零 |
 | ArchUnit `ArchitectureRulesTest` | A1~A20（含 A16/A17 边界禁令、A18 状态所有权、A19 分层、A20 装配契约） | 各基线只许减 |
 
 ## 9. 落刀方法论（精要；**全量判据见归档 v0.2.0 §13/§14**）

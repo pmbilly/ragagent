@@ -15,9 +15,9 @@ import java.util.Map;
  * <h2>这是会落 jsonb 的线格式</h2>
  * <p>它写进 {@code data_sources.last_sync_cursor} 这一列：</p>
  * <pre>
- * wiki : {"lastSyncTime":"T10:00:00+08:00",
+ *   wiki   : {"lastSyncTime":"2026-09-18T10:00:00+08:00",
  * "spaceNodeTimes":{"space1":{"nt1":"100"}}}
- * drive : {"lastSyncTime":"T10:00:00+08:00",
+ *   drive  : {"lastSyncTime":"2026-09-18T10:00:00+08:00",
  * "fileTimes":{"folder1":{"fdoc1":"100"}}}
  * </pre>
  * <p>{@code spaceNodeTimes} / {@code fileTimes} 为空省略：

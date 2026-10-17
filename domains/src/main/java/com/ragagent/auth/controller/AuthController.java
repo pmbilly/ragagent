@@ -289,7 +289,7 @@ public class AuthController {
                 inv.getTenantId(),
                 tenant != null ? tenant.getName() : null,
                 inv.getRole(),
-                // 对照 .UTC().Format("T15:04:05Z07:00")：UTC、无小数秒、Z 结尾
+                // 对照 .UTC().Format("2006-01-02T15:04:05Z07:00")：UTC、无小数秒、Z 结尾
                 DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
                         .format(inv.getExpiresAt().withOffsetSameInstant(ZoneOffset.UTC)));
         return ResponseEntity.ok(resp);
