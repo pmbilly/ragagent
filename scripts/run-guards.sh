@@ -42,6 +42,7 @@ run '契约层纯度（C1/C2/C3：contract 只允许纯 JDK；导入根 · 构�
 run '模块图（R6：主码矩阵 · 主码无同包 · 测试边登记 · 测试无错位 · 夹具不占别模块包）' python3 scripts/check-module-graph.py
 run 'platform 业务形状（C8：只剩技术适配；红旗命名 View/Port/Request/Response/Payload/Facts 只许减不许增）' python3 scripts/check-platform-shapes.py
 run '架构索引（docs/architecture/packages.md 必须与 package-info 同步）' python3 scripts/gen-arch-index.py --check
+run '文档事实（README 的模块数/控制器数/package-info 覆盖率必须与代码一致）' python3 scripts/check-doc-truth.py
 run '租户作用域（跨线程身份必须走 TenantScope；禁止裸 capture/replay）' python3 scripts/check-tenant-scope.py
 run '日志异常（log 里禁止 Throwable.toString()/getMessage()）' python3 scripts/check-log-exceptions.py
 run '跨模块同名类（同一简单类名不得出现在多个模块主码）' python3 scripts/check-duplicate-classes.py

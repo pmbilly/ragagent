@@ -47,9 +47,9 @@ import tools.jackson.databind.node.ObjectNode;
 /**
  * 知识问答 service 面（chat_pipeline 的调用方）。
  *
- * <p>实现边界：检索执行面暂缺（hybridSearch adapter 为空实现）、
- * web_fetch/网页抓取在 RAG 路径可用。Langfuse span
- * 为 no-op seam，span 生命周期调用点保留。</p>
+ * <p>检索由管线插件执行（{@code PluginSearch} → {@code PipelinePorts} 装配的检索面）；
+ * web_fetch/网页抓取在 RAG 路径可用。Langfuse span 为 no-op seam，
+ * span 生命周期调用点保留。</p>
  *
  * <p>KnowledgeQA/KnowledgeQAByEvent/SearchKnowledge
  * 三条入口流是单一状态机,解析与降级已拆至 SessionQaResolution/SessionQaFallback。</p>

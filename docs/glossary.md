@@ -48,7 +48,7 @@
 | 术语 | 含义 | 代码落点 |
 |---|---|---|
 | **package-info** | 每个包的设计说明，共 166 份，是事实上的架构文档 | 各包 `package-info.java`；索引见 `architecture/packages.md` |
-| **守卫 / guard** | `scripts/run-guards.sh` 里的 24 条架构/契约检查 | `scripts/` |
+| **守卫 / guard** | `scripts/run-guards.sh` 里的 25 条架构/契约检查 | `scripts/` |
 | **棘轮 / ratchet** | 只许减不许增的基线（大文件、域间边、命名口径等） | `scripts/*.baseline.json` |
 | **契约 / contract** | 跨模块公开 API、SPI 与不可变载荷；纯 JDK | `contract/` |
 | **端口 / port** | 业务域消费能力的接口；实现由组合根注入 | `contract/.../*Port.java` |

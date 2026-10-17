@@ -12,10 +12,10 @@ import java.time.OffsetDateTime;
 /**
  * sessions 表实体。
  *
- * <p><b>响应形态</b>：GET /sessions/{id}、POST /sessions、PUT /sessions/{id}
- * 都直接返回本对象（201/200 + 裸对象，无 {@code {data,success}} 信封）；JSON 键名＝Java 字段名
- * （camelCase）、键序＝字段声明序，所有字段恒输出（禁止条件键：未置顶时
- * {@code pinnedAt:null}、无 IM 来源时 {@code imPlatform:""}）。</p>
+ * <p><b>响应形态</b>：GET /sessions/{id}、POST /sessions、PUT /sessions/{id} 由
+ * {@code ApiResultAdvice} 包成统一外壳 {@code {code,message,data}}，{@code data} 即本对象
+ * （camelCase 键、键序＝字段声明序，所有字段恒输出：未置顶时 {@code pinnedAt:null}、
+ * 无 IM 来源时 {@code imPlatform:""}）。</p>
  *
  * <h2>落库隐式行为清单</h2>
  * <ul>
