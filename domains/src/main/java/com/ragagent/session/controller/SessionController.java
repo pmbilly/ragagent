@@ -127,12 +127,7 @@ public class SessionController {
         }
 
         Session saved;
-        try {
-            saved = sessionService.createSession(created);
-        } catch (RuntimeException e) {
-            // 500，异常原文透出
-            throw toInternal(e);
-        }
+        saved = sessionService.createSession(created);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
@@ -173,12 +168,8 @@ public class SessionController {
         int size = bindPagination(pageSize, "pageSize", true);
 
         SessionPage result;
-        try {
-            result = sessionService.listSessions(
-                    SessionListQuery.of(keyword, source, agentId, p, size));
-        } catch (RuntimeException e) {
-            throw toInternal(e);
-        }
+        result = sessionService.listSessions(
+                SessionListQuery.of(keyword, source, agentId, p, size));
 
         return new SessionListResponse(result.items(), result.page(), result.pageSize(),
                 result.total());
@@ -296,11 +287,7 @@ public class SessionController {
     public ApiResponse<Void> batchDeleteSessions(
             @RequestBody @Valid BatchDeleteSessionsRequest req) {
         if (Boolean.TRUE.equals(req.deleteAll())) {
-            try {
-                sessionService.deleteAllSessions();
-            } catch (RuntimeException e) {
-                throw toInternal(e);
-            }
+            sessionService.deleteAllSessions();
         return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
         }
 
@@ -375,11 +362,7 @@ public class SessionController {
             throw new BizException(AppError.badRequest("invalid session id"));
         }
         long rows;
-        try {
-            rows = sessionService.setSessionPinned(id, pinned);
-        } catch (RuntimeException e) {
-            throw toInternal(e);
-        }
+        rows = sessionService.setSessionPinned(id, pinned);
         if (rows == 0) {
             throw BizException.notFound("session not found");
         }
@@ -407,11 +390,7 @@ public class SessionController {
             throw toInternal(e);
         }
         List<MessageArtifact> artifacts;
-        try {
-            artifacts = messageService.getSessionArtifacts(sessionId);
-        } catch (RuntimeException e) {
-            throw BizException.internal(e.getMessage());
-        }
+        artifacts = messageService.getSessionArtifacts(sessionId);
         return artifactListItems(artifacts);
     }
 
@@ -530,11 +509,7 @@ public class SessionController {
             throw toInternal(e);
         }
         String title;
-        try {
-            title = sessionService.generateTitle(session, request.messages(), "");
-        } catch (RuntimeException e) {
-            throw toInternal(e);
-        }
+        title = sessionService.generateTitle(session, request.messages(), "");
         return new GenerateTitleResponse(title);
     }
 

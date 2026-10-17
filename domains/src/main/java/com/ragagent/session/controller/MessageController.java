@@ -121,15 +121,11 @@ public class MessageController {
     public ResponseEntity<MessageSearchResult> searchMessages(
             @RequestBody @Valid SearchMessagesRequest request) {
         MessageSearchResult result;
-        try {
-            result = messageService.searchMessages(
-                    LogSanitizer.sanitize(request.query()),
-                    request.mode(),
-                    request.limit() == null ? 0 : request.limit(),
-                    request.sessionIds());
-        } catch (RuntimeException e) {
-            throw toInternal(e);
-        }
+        result = messageService.searchMessages(
+                LogSanitizer.sanitize(request.query()),
+                request.mode(),
+                request.limit() == null ? 0 : request.limit(),
+                request.sessionIds());
 
         return ResponseEntity.ok(result);
     }
@@ -139,11 +135,7 @@ public class MessageController {
     @GetMapping("/api/v1/messages/chat-history-stats")
     public ResponseEntity<ChatHistoryKbStats> getChatHistoryKbStats() {
         ChatHistoryKbStats stats;
-        try {
-            stats = messageService.getChatHistoryKbStats();
-        } catch (RuntimeException e) {
-            throw toInternal(e);
-        }
+        stats = messageService.getChatHistoryKbStats();
         return ResponseEntity.ok(stats);
     }
 

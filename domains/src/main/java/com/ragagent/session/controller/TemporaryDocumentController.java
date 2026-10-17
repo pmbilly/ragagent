@@ -135,11 +135,7 @@ public class TemporaryDocumentController {
             throw toInternal(e);
         }
         List<TemporaryDocument> documents;
-        try {
-            documents = temporaryDocuments.list(currentTenantId(), sid);
-        } catch (RuntimeException e) {
-            throw BizException.internal(e.getMessage());
-        }
+        documents = temporaryDocuments.list(currentTenantId(), sid);
         return ResponseEntity.ok(documents);
     }
 
@@ -158,11 +154,7 @@ public class TemporaryDocumentController {
             throw toInternal(e);
         }
         TemporaryDocument document;
-        try {
-            document = temporaryDocuments.get(currentTenantId(), sid, attachmentId);
-        } catch (RuntimeException e) {
-            throw BizException.internal(e.getMessage());
-        }
+        document = temporaryDocuments.get(currentTenantId(), sid, attachmentId);
         if (document == null) {
             throw BizException.notFound("Attachment not found");
         }
@@ -234,11 +226,7 @@ public class TemporaryDocumentController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        try {
-            temporaryDocuments.delete(currentTenantId(), sid, attachmentId);
-        } catch (RuntimeException e) {
-            throw BizException.internal(e.getMessage());
-        }
+        temporaryDocuments.delete(currentTenantId(), sid, attachmentId);
         return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 

@@ -125,11 +125,7 @@ public class VectorStoreController {
         store.setEngineType(engineType);
         store.setConnectionConfig(configOf(body, "connectionConfig"));
         store.setIndexConfig(indexOf(body, "indexConfig"));
-        try {
-            service.create(store);
-        } catch (RuntimeException e) {
-            throw e; // AppError 原样进信封
-        }
+        service.create(store);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(VectorStoreResponse.of(store, "user", false));
     }
