@@ -68,9 +68,9 @@
 |---|---|---|
 | **L1** | 迁移叙事清零（退役/旧/历史/备案/已知差异/Go，共 769 处） | ✅ 基线 196 → **0**（守卫硬零） |
 | **L2** | 行号与 Go 语法锚点（`L141-144`/`uuid.New()`/旧模块名 `common`）+ 构建脚本批次号 | ✅ 16 处注释 + 8 个构建脚本 |
-| **L3** | 修 7 处文档失真（README ×4 + 3 个类注释） | 待做 |
-| **L4** | 补 156 个 `package-info`（职责/依赖/从哪读起） | 待做 |
-| **L5** | 注释压缩：删 614 处分隔线，类头 ≤40 行，注释密度 ≤15% | 待做 |
+| **L3** | 修 7 处文档失真（README ×4 + 3 个类注释） | ✅ `check-doc-truth` 上线 |
+| **L4** | 补 156 个 `package-info`（职责/依赖/从哪读起） | ✅ 覆盖率 100%（322 包） |
+| **L5** | 注释装饰清理：491 行纯装饰分隔线删除、216 行统一格式 | ✅ `check-comment-decor` 硬零 |
 | **L6** | "未实现/暂缺"收敛到 `docs/known-gaps.md` | 待做 |
 | **L7** | 死代码删除（空包、未接线 port、`platform/session`、`platform/tool`） | 待做 |
 | **L8** | 日志降噪：warn 893 → ≤200 | 待做 |
@@ -305,6 +305,9 @@ boot           14 件                      →  boot
 | L1c | 2026-10-18 | **迁移叙事清零收尾**：137 文件 / 159 处——备案→实现边界、退役→移除/关闭、旧版→早期版本或回落路径、迁移期与 Go 锚点删除；修 `KnowledgeBaseService` 的 `\uXXXX` 转义乱码段与 14 处替换后语句不通。**守卫升级为硬零**（基线 `{}`），红态探针复验（加一行叙事即红）。 | **24 守卫** · **5022 / 0 / 4** · spotlessCheck build 2m29s |
 
 | L2 | 2026-10-18 | **行号引用与 Go 语法锚点清零**：16 处注释把 `L141-144`/`L100/L129`/`L2302` 改为类名/方法名指路，删 `uuid.New()`/`Order(...)`；8 个构建脚本的批次号/日期戳/§ 引用清零，`platform` 与 `contract` 头部注释按现状重写。守卫扩面：`check-go-anchors` 增加行号与 Go 语法模式（只扫注释行），`check-internal-codes` 增加 C3 覆盖 `*.kts`；两条各验红态探针。 | **24 守卫** · **5022 / 0 / 4** · spotlessCheck build 2m22s |
+
+| L3+L4 | 2026-10-18 | **文档失真修正 + package-info 补齐**：README 统一外壳补「基础设施端点除外」、删除 `frontend/pnpm-workspace.yaml`（npm 残留）；`Session` 的「裸对象」改为 `ApiResultAdvice` 包壳、`SessionKnowledgeQaService` 删「hybridSearch 空实现」、`RagAgentApplication` 的 `common/*` 改 `platform` 配置包。**生成 156 个 package-info**（职责＝包内主要类型、依赖＝跨模块 import、入口＝Controller/Service/Repository），覆盖率 48%→100%（322 包）；`packages.md` 与 `module-package-map.md` 重生成；新增 `check-doc-truth.py`（D1 模块数/D2 控制器数/D3 package-info 覆盖），**第 25 条守卫**。 | **25 守卫** · **5022 / 0 / 4** · build 2m10s |
+| L5 | 2026-10-18 | **注释装饰清理**：删 491 行纯装饰分隔线（`// ═══`/`// ===`/`// ---`），216 行带文字分隔线统一为 `// ── 段名 ──`；新增 `check-comment-decor.py`（**第 26 条守卫**，红态探针已验）。**不设注释密度硬指标**——密度会奖励删信息，本仓注释承载契约与线程纪律（实测 18.6%，最大类头 63 行，分布健康）。 | **26 守卫** · **5022 / 0 / 4** · build 3m04s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
