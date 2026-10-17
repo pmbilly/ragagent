@@ -1,5 +1,6 @@
 package com.ragagent.auth.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.time.Instant;
@@ -241,7 +242,7 @@ public class TenantAPIPrincipalController {
     private static APIPrincipalConfigRequest bindRequest(String rawBody) {
         if (rawBody == null || rawBody.isEmpty()) {
             throw new BizException(AppError.validation("Invalid request data")
-                    .withDetails("No content to map due to end-of-input"));
+                    .withDetails(JsonBodyErrors.EMPTY_BODY));
         }
         try {
             JsonNode node = MAPPER.readTree(rawBody);
@@ -255,7 +256,7 @@ public class TenantAPIPrincipalController {
     private static APIPrincipalTestTokenRequest bindTestTokenRequest(String rawBody) {
         if (rawBody == null || rawBody.isEmpty()) {
             throw new BizException(AppError.validation("Invalid request data")
-                    .withDetails("No content to map due to end-of-input"));
+                    .withDetails(JsonBodyErrors.EMPTY_BODY));
         }
         try {
             JsonNode node = MAPPER.readTree(rawBody);

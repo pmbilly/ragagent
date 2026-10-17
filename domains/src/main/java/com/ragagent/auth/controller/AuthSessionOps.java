@@ -1,6 +1,7 @@
 package com.ragagent.auth.controller;
 
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.auth.dto.AuthLoginResponse;
 import com.ragagent.auth.dto.TokenPairResponse;
@@ -72,7 +73,7 @@ final class AuthSessionOps {
 
     RefreshTokenRequest bindRefreshBody(String rawBody) {
         if (rawBody == null || rawBody.isBlank()) {
-            throw service.invalidParams("Invalid refresh token request", "No content to map due to end-of-input");
+            throw service.invalidParams("Invalid refresh token request", JsonBodyErrors.EMPTY_BODY);
         }
         com.fasterxml.jackson.databind.JsonNode root;
         try {
@@ -149,7 +150,7 @@ final class AuthSessionOps {
 
     long bindSwitchTenantRequest(String rawBody) {
         if (rawBody == null || rawBody.isBlank()) {
-            throw service.invalidParams("Invalid workspace switch request", "No content to map due to end-of-input");
+            throw service.invalidParams("Invalid workspace switch request", JsonBodyErrors.EMPTY_BODY);
         }
         com.fasterxml.jackson.databind.JsonNode root;
         try {

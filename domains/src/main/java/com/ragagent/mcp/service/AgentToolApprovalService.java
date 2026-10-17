@@ -1,5 +1,6 @@
 package com.ragagent.mcp.service;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -56,7 +57,7 @@ public class AgentToolApprovalService {
             throw BizException.internal("Tool approval gate is not configured");
         }
         if (body == null) {
-            throw BizException.badRequest("No content to map due to end-of-input");
+            throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
         }
 
         Decision decision = decisionFrom(body);

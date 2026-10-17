@@ -1,5 +1,6 @@
 package com.ragagent.mcp.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -289,7 +290,7 @@ public class McpServiceController {
         long tenantId = requireTenant();
         String serviceId = sanitize(id);
         if (body == null) {
-            throw BizException.badRequest("No content to map due to end-of-input");
+            throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
         }
         // 路径参数已由框架做过 URL 解码；这里不要再解一次，
         // 否则名字里带字面 "%" 的工具名会被破坏。

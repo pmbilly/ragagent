@@ -1,5 +1,6 @@
 package com.ragagent.mcp.service;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -65,7 +66,7 @@ public class McpOAuthFlowService {
         }
         if (req == null) {
             // 空 body → 400，文案固定为 "No content to map due to end-of-input"（有契约测试钉死；直连路由同 handler 同文案）
-            throw BizException.badRequest("No content to map due to end-of-input");
+            throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
         }
         String redirectUri = trim(req.redirectUri());
         if (redirectUri.isEmpty()) {
@@ -155,7 +156,7 @@ public class McpOAuthFlowService {
         }
         if (body == null) {
             // 空 body → 400 "No content to map due to end-of-input"（同 authorize-url）
-            throw BizException.badRequest("No content to map due to end-of-input");
+            throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
         }
         String serviceId = trim(body.serviceId());
         if (serviceId.isEmpty()) {

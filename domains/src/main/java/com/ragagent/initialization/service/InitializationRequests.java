@@ -1,5 +1,6 @@
 package com.ragagent.initialization.service;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public final class InitializationRequests {
             int questionGenerationCount, String questionGenerationInstructions) {}
     static KBModelConfigRequest bindKBModelConfigRequest(String rawBody) {
         if (rawBody == null || rawBody.isEmpty()) {
-            throw new BizException(AppError.badRequest("No content to map due to end-of-input"));
+            throw new BizException(AppError.badRequest(JsonBodyErrors.EMPTY_BODY));
         }
         JsonNode n;
         try {
@@ -39,7 +40,7 @@ public final class InitializationRequests {
                     e.getMessage()));
         }
         if (n == null || !n.isObject()) {
-            throw new BizException(AppError.badRequest("No content to map due to end-of-input"));
+            throw new BizException(AppError.badRequest(JsonBodyErrors.EMPTY_BODY));
         }
         String llmModelId = ModelConnectivityTestService.text(n, "llmModelId");
         if (llmModelId.isEmpty()) {
@@ -100,7 +101,7 @@ public final class InitializationRequests {
             List<Object> nodeExtractNodes, List<Object> nodeExtractRelations) {}
     static InitializationRequest bindInitializationRequest(String rawBody) {
         if (rawBody == null || rawBody.isEmpty()) {
-            throw new BizException(AppError.badRequest("No content to map due to end-of-input"));
+            throw new BizException(AppError.badRequest(JsonBodyErrors.EMPTY_BODY));
         }
         JsonNode n;
         try {
@@ -110,7 +111,7 @@ public final class InitializationRequests {
                     e.getMessage()));
         }
         if (n == null || !n.isObject()) {
-            throw new BizException(AppError.badRequest("No content to map due to end-of-input"));
+            throw new BizException(AppError.badRequest(JsonBodyErrors.EMPTY_BODY));
         }
         JsonNode llm = n.get("llm");
         JsonNode emb = n.get("embedding");

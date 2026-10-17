@@ -1,5 +1,6 @@
 package com.ragagent.agentmanagement.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
@@ -217,7 +218,7 @@ public class AgentController {
      */
     private static AgentRequest bindAgentRequest(String rawBody, boolean requireName) {
         if (rawBody == null || rawBody.isEmpty()) {
-            throw invalidParams("No content to map due to end-of-input");
+            throw invalidParams(JsonBodyErrors.EMPTY_BODY);
         }
         JsonNode node;
         try {

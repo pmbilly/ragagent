@@ -1,5 +1,6 @@
 package com.ragagent.session.qa;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public final class QaRequestBinder {
         // 空 body 用 Jackson 标准消息；其余错误留给下面的解析
         // try/catch（Jackson 原生消息）。
         if (rawBody == null || rawBody.isEmpty()) {
-            throw BizException.badRequest("No content to map due to end-of-input");
+            throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
         }
         try {
             return BIND_JSON.readValue(rawBody, type);

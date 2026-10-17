@@ -1,5 +1,6 @@
 package com.ragagent.initialization.service;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import java.time.OffsetDateTime;
@@ -266,7 +267,7 @@ public final class OllamaManageService {
     /** 绑定进匿名 struct 的公共段（EOF / 语法错 / 非对象）。 */
     static JsonNode bindJsonObject(String rawBody) {
         if (rawBody == null || rawBody.isEmpty()) {
-            throw new BizException(AppError.badRequest("No content to map due to end-of-input"));
+            throw new BizException(AppError.badRequest(JsonBodyErrors.EMPTY_BODY));
         }
         JsonNode n;
         try {

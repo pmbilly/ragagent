@@ -1,5 +1,6 @@
 package com.ragagent.datasource.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import java.util.Map;
@@ -171,7 +172,7 @@ public class DataSourceCredentialsController {
      */
     private static PutRequest parsePutBody(String rawBody) {
         if (rawBody == null || rawBody.isBlank()) {
-            throw new BizException(AppError.badRequest("No content to map due to end-of-input"));
+            throw new BizException(AppError.badRequest(JsonBodyErrors.EMPTY_BODY));
         }
         try {
             return MAPPER.readValue(rawBody, PutRequest.class);

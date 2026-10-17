@@ -1,5 +1,6 @@
 package com.ragagent.auth.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import java.util.ArrayList;
@@ -334,7 +335,7 @@ public class TenantMemberController {
     static JsonNode bindJson(String rawBody) {
         if (rawBody == null || rawBody.isEmpty()) {
             throw new BizException(AppError.validation("invalid request body")
-                    .withDetails("No content to map due to end-of-input"));
+                    .withDetails(JsonBodyErrors.EMPTY_BODY));
         }
         try {
             return MAPPER.readTree(rawBody);

@@ -1,5 +1,6 @@
 package com.ragagent.auth.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.RequestFields;
 import java.util.List;
 
@@ -34,7 +35,7 @@ final class AuthBindingSupport {
 
     <T> T parseBody(String rawBody, Class<T> type, String message) {
         if (rawBody == null || rawBody.isBlank()) {
-            throw invalidParams(message, "No content to map due to end-of-input");
+            throw invalidParams(message, JsonBodyErrors.EMPTY_BODY);
         }
         try {
             // Jackson 默认忽略未知字段（与既定绑定语义一致）

@@ -1,5 +1,6 @@
 package com.ragagent.mcp.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -52,7 +53,7 @@ final class McpServiceCrudOps {
             @RequestBody(required = false) McpServiceCreateRequest req) {
         if (req == null) {
             // 空 body → "No content to map due to end-of-input"
-            throw BizException.badRequest("No content to map due to end-of-input");
+            throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
         }
         long tenantId = McpServiceController.requireTenant();
         McpService service = req.toService();
@@ -126,7 +127,7 @@ final class McpServiceCrudOps {
     public ResponseEntity<?> updateMCPService(@PathVariable("id") String id,
                                               @RequestBody(required = false) JsonNode updateData) {
         if (updateData == null) {
-            throw BizException.badRequest("No content to map due to end-of-input");
+            throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
         }
         if (!updateData.isObject() && !updateData.isNull()) {
             throw BizException.badRequest(

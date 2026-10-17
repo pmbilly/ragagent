@@ -1,5 +1,6 @@
 package com.ragagent.auth.apikey.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -230,7 +231,7 @@ public class TenantAPIKeyController {
      */
     private static TenantAPIKeyRequest parseBody(String rawBody) {
         if (rawBody == null || rawBody.isBlank()) {
-            throw invalidRequestData("No content to map due to end-of-input");
+            throw invalidRequestData(JsonBodyErrors.EMPTY_BODY);
         }
         try {
             TenantAPIKeyRequest req = MAPPER.readValue(rawBody, TenantAPIKeyRequest.class);

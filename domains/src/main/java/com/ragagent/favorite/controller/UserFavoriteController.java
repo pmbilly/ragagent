@@ -1,5 +1,6 @@
 package com.ragagent.favorite.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.List;
 
@@ -85,7 +86,7 @@ public class UserFavoriteController {
 
     private AddFavoriteRequest bindBody(String rawBody) {
         if (rawBody == null || rawBody.isBlank()) {
-            throw invalidBody("No content to map due to end-of-input");
+            throw invalidBody(JsonBodyErrors.EMPTY_BODY);
         }
         try {
             return MAPPER.readValue(rawBody, AddFavoriteRequest.class);

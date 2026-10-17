@@ -1,5 +1,6 @@
 package com.ragagent.embedchannel.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -473,7 +474,7 @@ void ensureSession(String sessionId) {
      */
     static EmbedChannelRequest bind(String rawBody) {
         if (rawBody == null || rawBody.isEmpty()) {
-            throw new PlainErrorException(400, "No content to map due to end-of-input");
+            throw new PlainErrorException(400, JsonBodyErrors.EMPTY_BODY);
         }
         try {
             return MAPPER.readValue(rawBody, EmbedChannelRequest.class);

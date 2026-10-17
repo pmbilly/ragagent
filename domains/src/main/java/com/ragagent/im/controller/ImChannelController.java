@@ -1,5 +1,6 @@
 package com.ragagent.im.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import java.util.ArrayList;
@@ -454,7 +455,7 @@ public class ImChannelController {
 
     private static UpdateRequest bindUpdate(String rawBody) {
         if (rawBody == null || rawBody.isEmpty()) {
-            throw new PlainErrorException(400, "No content to map due to end-of-input");
+            throw new PlainErrorException(400, JsonBodyErrors.EMPTY_BODY);
         }
         try {
             return MAPPER.readValue(rawBody, UpdateRequest.class);

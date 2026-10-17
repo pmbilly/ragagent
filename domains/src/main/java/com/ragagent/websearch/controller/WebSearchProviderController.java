@@ -1,5 +1,6 @@
 package com.ragagent.websearch.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.websearch.provider.WebSearchProvider;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
@@ -362,7 +363,7 @@ public class WebSearchProviderController {
 
     static JsonNode parseBody(String rawBody) {
         if (rawBody == null || rawBody.isEmpty()) {
-            throw BizException.badRequest("No content to map due to end-of-input");
+            throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
         }
         try {
             return MAPPER.readTree(rawBody);
@@ -386,7 +387,7 @@ public class WebSearchProviderController {
     /** 绑定 JSON：EOF / 解析器原文 → 400 code 1000 */
     static <T> T bind(String rawBody, Class<T> type) {
         if (rawBody == null || rawBody.isEmpty()) {
-            throw BizException.badRequest("No content to map due to end-of-input");
+            throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
         }
         try {
             return MAPPER.readValue(rawBody, type);

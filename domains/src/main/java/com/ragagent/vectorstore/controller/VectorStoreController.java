@@ -1,5 +1,6 @@
 package com.ragagent.vectorstore.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import java.util.ArrayList;
@@ -270,7 +271,7 @@ public class VectorStoreController {
 
     private static JsonNode parseOrValidator(String rawBody) {
         if (rawBody == null || rawBody.isEmpty()) {
-            throw BizException.badRequest("No content to map due to end-of-input");
+            throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
         }
         try {
             return MAPPER.readTree(rawBody);
@@ -305,7 +306,7 @@ public class VectorStoreController {
 
     private static <T> T bind(String rawBody, Class<T> type) {
         if (rawBody == null || rawBody.isEmpty()) {
-            throw BizException.badRequest("No content to map due to end-of-input");
+            throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
         }
         try {
             return MAPPER.readValue(rawBody, type);

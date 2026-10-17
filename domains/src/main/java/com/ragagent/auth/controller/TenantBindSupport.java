@@ -1,5 +1,6 @@
 package com.ragagent.auth.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.ragagent.contract.error.AppError;
@@ -35,7 +36,7 @@ final class TenantBindSupport {
      */
     static <T> T bindBody(String rawBody, Class<T> type, String message) {
         if (rawBody == null || rawBody.isBlank()) {
-            throw invalidParams(message, "No content to map due to end-of-input");
+            throw invalidParams(message, JsonBodyErrors.EMPTY_BODY);
         }
         try {
             return MAPPER.readValue(rawBody, type);

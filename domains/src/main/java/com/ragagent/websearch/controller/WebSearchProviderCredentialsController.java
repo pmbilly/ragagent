@@ -1,5 +1,6 @@
 package com.ragagent.websearch.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -105,7 +106,7 @@ public class WebSearchProviderCredentialsController {
     /** 解析 api_key：键缺失/null → null（查询语义）；空 body → 400 EOF；坏 JSON → 400 解析器原文 */
     private static String parseApiKey(String rawBody) {
         if (rawBody == null || rawBody.isEmpty()) {
-            throw BizException.badRequest("No content to map due to end-of-input");
+            throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
         }
         JsonNode body;
         try {

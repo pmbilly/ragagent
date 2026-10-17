@@ -1,5 +1,6 @@
 package com.ragagent.auth.controller;
 
+import com.ragagent.platform.web.JsonBodyErrors;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +107,7 @@ final class TenantCrudOps {
      */
     private UpdateTenantRequest bindUpdateTenantRequest(String rawBody) {
         if (rawBody == null || rawBody.isBlank()) {
-            throw TenantBindSupport.invalidParams("Invalid request data", "No content to map due to end-of-input");
+            throw TenantBindSupport.invalidParams("Invalid request data", JsonBodyErrors.EMPTY_BODY);
         }
         com.fasterxml.jackson.databind.JsonNode root;
         try {
