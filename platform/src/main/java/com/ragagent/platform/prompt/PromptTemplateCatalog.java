@@ -112,7 +112,7 @@ public final class PromptTemplateCatalog {
                 Map<String, I18n> i18n = new LinkedHashMap<>();
                 JsonNode i18nNode = t.get("i18n");
                 if (i18nNode != null && i18nNode.isObject()) {
-                    i18nNode.fields().forEachRemaining(e -> {
+                    i18nNode.properties().forEach(e -> {
                         JsonNode v = e.getValue();
                         i18n.put(e.getKey(), new I18n(
                                 v.path("name").asText(""), v.path("description").asText("")));

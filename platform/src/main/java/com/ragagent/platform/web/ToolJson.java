@@ -73,7 +73,7 @@ public final class ToolJson {
     private static JsonNode sorted(JsonNode node) {
         if (node instanceof ObjectNode obj) {
             List<Map.Entry<String, JsonNode>> entries = new ArrayList<>();
-            obj.fields().forEachRemaining(entries::add);
+            entries.addAll(obj.properties());
             entries.sort(Map.Entry.comparingByKey());
             ObjectNode out = JsonNodeFactory.instance.objectNode();
             for (Map.Entry<String, JsonNode> e : entries) {

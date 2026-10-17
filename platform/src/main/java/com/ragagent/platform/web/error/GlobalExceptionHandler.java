@@ -122,7 +122,7 @@ public class GlobalExceptionHandler {
             org.springframework.web.method.annotation.HandlerMethodValidationException ex,
             HttpServletRequest req) {
         java.util.List<String> lines = new java.util.ArrayList<>();
-        ex.getAllValidationResults().forEach(r ->
+        ex.getParameterValidationResults().forEach(r ->
                 r.getResolvableErrors().forEach(err -> {
                     String msg = translateMessage(err.getDefaultMessage());
                     lines.add(msg.matches("^[a-z][A-Za-z0-9_]*: .*") ? msg : extractField(err) + ": " + msg);

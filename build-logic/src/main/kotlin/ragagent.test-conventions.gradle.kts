@@ -2,6 +2,12 @@ plugins {
     java
 }
 
+// Boot 3.5 管理 JUnit 5.12；Gradle 8.14 自带 launcher 较旧，不显式对齐会让
+// 整个 Test Executor 在 discovery 阶段失败（OutputDirectoryProvider not available）。
+dependencies {
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 

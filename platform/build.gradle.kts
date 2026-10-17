@@ -40,8 +40,10 @@ dependencies {
     api("org.springframework.data:spring-data-redis")
     api("org.slf4j:slf4j-api")
     implementation(libs.protobuf.java)
-    // mybatis-plus：提供 org.apache.ibatis.* 与 com.baomidou.*（含 net.sf.jsqlparser）
+    // mybatis-plus：提供 org.apache.ibatis.* 与 com.baomidou.*
     api(libs.mybatis.plus.starter)
+    // 3.5.9+ 把 JSQLParser 支持拆成独立 artifact；平台 SQL 守卫直接用 net.sf.jsqlparser
+    api(libs.mybatis.plus.jsqlparser)
     compileOnly("jakarta.servlet:jakarta.servlet-api")
     compileOnly("jakarta.validation:jakarta.validation-api")
 
