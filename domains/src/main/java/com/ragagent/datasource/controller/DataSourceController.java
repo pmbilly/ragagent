@@ -106,11 +106,11 @@ public class DataSourceController {
     public ResponseEntity<?> createDataSource(@RequestBody(required = false) String rawBody) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
-            return error(401, "unauthorized: workspace context missing");
+            throw BizException.unauthorized( "unauthorized: workspace context missing");
         }
         DataSource req = parseDataSource(rawBody);
         if (req == null) {
-            return error(400, "invalid request");
+            throw BizException.badRequest( "invalid request");
         }
         ResponseEntity<?> kbError = kbGuard.check(tenantId, req.getKnowledgeBaseId());
         if (kbError != null) {
@@ -121,7 +121,7 @@ public class DataSourceController {
         try {
             ds = service.createDataSource(req);
         } catch (RuntimeException e) {
-            return error(400, e.getMessage());
+            throw BizException.badRequest( e.getMessage());
         }
         return ResponseEntity.status(201).body(DataSourceResponse.from(ds));
     }
@@ -131,7 +131,7 @@ public class DataSourceController {
     public ResponseEntity<?> getDataSource(@PathVariable("id") String id) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
-            return error(401, "unauthorized");
+            throw BizException.unauthorized( "unauthorized");
         }
         Owned owned = ownDataSource(tenantId, id);
         return ResponseEntity.ok(DataSourceResponse.from(owned.ds()));
@@ -148,7 +148,7 @@ public class DataSourceController {
             @RequestParam(value = "kbId", required = false) String kbId) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
-            return error(401, "unauthorized: workspace context missing");
+            throw BizException.unauthorized( "unauthorized: workspace context missing");
         }
         String kb = kbId == null ? "" : kbId;
         ResponseEntity<?> kbError = kbGuard.check(tenantId, kb);
@@ -159,7 +159,7 @@ public class DataSourceController {
         try {
             dataSources = service.listDataSources(kb);
         } catch (RuntimeException e) {
-            return error(500, "failed to list data sources");
+            throw BizException.internal( "failed to list data sources");
         }
         List<DataSourceResponse> out = new ArrayList<>();
         for (DataSource ds : dataSources) {
@@ -182,11 +182,11 @@ public class DataSourceController {
                                               @RequestBody(required = false) String rawBody) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
-            return error(401, "unauthorized");
+            throw BizException.unauthorized( "unauthorized");
         }
         DataSource req = parseDataSource(rawBody);
         if (req == null) {
-            return error(400, "invalid request");
+            throw BizException.badRequest( "invalid request");
         }
         Owned owned = ownDataSource(tenantId, id);
         req.setId(id);
@@ -196,7 +196,7 @@ public class DataSourceController {
         try {
             ds = service.updateDataSource(req);
         } catch (RuntimeException e) {
-            return error(400, e.getMessage());
+            throw BizException.badRequest( e.getMessage());
         }
         return ResponseEntity.ok(DataSourceResponse.from(ds));
     }
@@ -224,13 +224,13 @@ public class DataSourceController {
     public ResponseEntity<?> validateConnection(@PathVariable("id") String id) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
-            return error(401, "unauthorized");
+            throw BizException.unauthorized( "unauthorized");
         }
         ownDataSource(tenantId, id);
         try {
             service.validateConnection(id);
         } catch (RuntimeException e) {
-            return error(400, e.getMessage());
+            throw BizException.badRequest( e.getMessage());
         }
         return ResponseEntity.ok(statusBody("connected"));
     }
@@ -245,7 +245,7 @@ public class DataSourceController {
     public ResponseEntity<?> validateCredentials(@RequestBody(required = false) String rawBody) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
-            return error(401, "unauthorized");
+            throw BizException.unauthorized( "unauthorized");
         }
         ValidateCredentialsRequest req = null;
         try {
@@ -257,12 +257,12 @@ public class DataSourceController {
         }
         // 字段校验：字符串判空、map 判 null（空 map 是合法的）
         if (req == null || req.type() == null || req.type().isEmpty() || req.credentials() == null) {
-            return error(400, "invalid request: type and credentials are required");
+            throw BizException.badRequest( "invalid request: type and credentials are required");
         }
         try {
             service.validateCredentials(req.type(), req.credentials());
         } catch (RuntimeException e) {
-            return error(400, e.getMessage());
+            throw BizException.badRequest( e.getMessage());
         }
         return ResponseEntity.ok(statusBody("connected"));
     }
@@ -283,14 +283,14 @@ public class DataSourceController {
             @RequestParam(value = "parentId", required = false) String parentId) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
-            return error(401, "unauthorized");
+            throw BizException.unauthorized( "unauthorized");
         }
         ownDataSource(tenantId, id);
         List<Resource> resources;
         try {
             resources = service.listAvailableResources(id, parentId == null ? "" : parentId);
         } catch (RuntimeException e) {
-            return error(400, e.getMessage());
+            throw BizException.badRequest( e.getMessage());
         }
         return ResponseEntity.ok(resources == null ? new ArrayList<Resource>() : resources);
     }
@@ -307,7 +307,7 @@ public class DataSourceController {
                                                       @RequestBody(required = false) String rawBody) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
-            return error(401, "unauthorized");
+            throw BizException.unauthorized( "unauthorized");
         }
         ownDataSource(tenantId, id);
         ResolveAncestorsRequest req;
@@ -316,13 +316,13 @@ public class DataSourceController {
                     ? new ResolveAncestorsRequest(null)
                     : MAPPER.readValue(rawBody, ResolveAncestorsRequest.class);
         } catch (Exception e) {
-            return error(400, e.getMessage());
+            throw BizException.badRequest( e.getMessage());
         }
         List<String> ancestors;
         try {
             ancestors = service.resolveResourceAncestors(id, req.resourceIds());
         } catch (RuntimeException e) {
-            return error(400, e.getMessage());
+            throw BizException.badRequest( e.getMessage());
         }
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("ancestors", ancestors == null ? new ArrayList<String>() : ancestors);
@@ -345,14 +345,14 @@ public class DataSourceController {
     public ResponseEntity<?> manualSync(@PathVariable("id") String id) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
-            return error(401, "unauthorized");
+            throw BizException.unauthorized( "unauthorized");
         }
         ownDataSource(tenantId, id);
         SyncLog syncLog;
         try {
             syncLog = service.manualSync(id);
         } catch (RuntimeException e) {
-            return error(400, e.getMessage());
+            throw BizException.badRequest( e.getMessage());
         }
         return ResponseEntity.ok(syncLog);
     }
@@ -362,13 +362,13 @@ public class DataSourceController {
     public ResponseEntity<?> pauseDataSource(@PathVariable("id") String id) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
-            return error(401, "unauthorized");
+            throw BizException.unauthorized( "unauthorized");
         }
         ownDataSource(tenantId, id);
         try {
             service.pauseDataSource(id);
         } catch (RuntimeException e) {
-            return error(400, e.getMessage());
+            throw BizException.badRequest( e.getMessage());
         }
         return ResponseEntity.ok(statusBody("paused"));
     }
@@ -378,13 +378,13 @@ public class DataSourceController {
     public ResponseEntity<?> resumeDataSource(@PathVariable("id") String id) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
-            return error(401, "unauthorized");
+            throw BizException.unauthorized( "unauthorized");
         }
         ownDataSource(tenantId, id);
         try {
             service.resumeDataSource(id);
         } catch (RuntimeException e) {
-            return error(400, e.getMessage());
+            throw BizException.badRequest( e.getMessage());
         }
         return ResponseEntity.ok(statusBody("active"));
     }
@@ -404,7 +404,7 @@ public class DataSourceController {
                                          @RequestParam(value = "offset", required = false) String offset) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
-            return error(401, "unauthorized");
+            throw BizException.unauthorized( "unauthorized");
         }
         ownDataSource(tenantId, id);
 
@@ -412,7 +412,7 @@ public class DataSourceController {
         if (limit != null && !limit.isEmpty()) {
             Integer v = parseInt(limit);
             if (v == null || v <= 0 || v > MAX_LIST_PAGE_SIZE) {
-                return error(400, "limit must be between 1 and " + MAX_LIST_PAGE_SIZE);
+                throw BizException.badRequest( "limit must be between 1 and " + MAX_LIST_PAGE_SIZE);
             }
             limitValue = v;
         }
@@ -428,7 +428,7 @@ public class DataSourceController {
         try {
             logs = service.getSyncLogs(id, limitValue, offsetValue);
         } catch (RuntimeException e) {
-            return error(400, e.getMessage());
+            throw BizException.badRequest( e.getMessage());
         }
         return ResponseEntity.ok(logs == null ? new ArrayList<SyncLog>() : logs);
     }
@@ -445,13 +445,13 @@ public class DataSourceController {
     public ResponseEntity<?> getSyncLog(@PathVariable("logId") String logId) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
-            return error(401, "unauthorized");
+            throw BizException.unauthorized( "unauthorized");
         }
         SyncLog syncLog;
         try {
             syncLog = service.getSyncLog(logId);
         } catch (RuntimeException e) {
-            return error(404, "sync log not found");
+            throw BizException.notFound( "sync log not found");
         }
         ownDataSource(tenantId, syncLog.getDataSourceId());
         return ResponseEntity.ok(syncLog);
@@ -516,18 +516,6 @@ public class DataSourceController {
     }
 
     /**
-     * 统一错误形态：**恒抛** {@link BizException} —— 走 GlobalExceptionHandler 出
-     * {@code {code,message,data}}。
-     *
-     * <p>刻意保留原签名（返回类型仍是 {@code ResponseEntity<Map<String,Object>>}）：本类有 35 处
-     * {@code return error(...)} 调用，恒抛让这些调用点一行不动、
-     * 语义一致（这些路径本来就只可能以错误结束）。</p>
-     */
-    static ResponseEntity<Map<String, Object>> error(int status, String message) {
-        throw new BizException(AppError.ofHttpStatus(status, message));
-    }
-
-    /**
      * 知识库归属 + API-Key KB 白名单的联合守卫。
      *
      * <p>抽成独立 bean 而不是 controller 的私有方法：凭据子资源那个控制器也要用
@@ -550,7 +538,7 @@ public class DataSourceController {
          */
         ResponseEntity<?> check(long tenantId, String kbId) {
             if (kbId == null || kbId.isEmpty()) {
-                return error(400, "kb_id is required");
+                throw BizException.badRequest( "kb_id is required");
             }
             // ⚠️ 这里**不能**用 kbService.getKnowledgeBase(id)：那个方法带租户过滤，
             // 会把"库不存在"与"库属于别人"压成同一个 404；本守卫要保持
@@ -558,15 +546,15 @@ public class DataSourceController {
             // 故走不带租户条件的 KnowledgeBridge.findKnowledgeBase。
             KnowledgeBaseRowView kb = knowledge.findKnowledgeBase(kbId);
             if (kb == null) {
-                return error(404, "knowledge base not found");
+                throw BizException.notFound( "knowledge base not found");
             }
             if (kb.getTenantId() == null || kb.getTenantId() != tenantId) {
-                return error(403, "access denied");
+                throw BizException.forbidden( "access denied");
             }
             try {
                 TenantAPIKeyScope.authorizeKnowledgeBases(List.of(kbId));
             } catch (RuntimeException e) {
-                return error(403, e.getMessage());
+                throw BizException.forbidden( e.getMessage());
             }
             return null;
         }
