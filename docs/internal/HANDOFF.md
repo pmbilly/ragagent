@@ -74,8 +74,8 @@
 | **L6** | "未实现/暂缺"收敛到 `docs/known-gaps.md` | ✅ 18 项 + 9 处指针 |
 | **L7** | 死代码删除（空包、`@Deprecated`、`platform/session`；`platform/tool` 归 L22） | ✅ `@Deprecated` 归零 |
 | **L8** | 日志分级：404/跳过 → debug、配置缺失 → info（不设总数门） | ✅ 116 处降级（893→777） |
-| **L9** | 删 151 处控制器 catch，统一交 `GlobalExceptionHandler`（保留 cause） | 待做 |
-| **L10** | 错误形态统一为 `{code,message,data}`（**行为变更**，金片重录） | 待做 |
+| **L9** | 删纯转发的控制器 catch（12 处），统一交 `GlobalExceptionHandler` | ✅ 其余带业务语义或金片钉住，保留 |
+| **L10** | 错误形态统一为 `{code,message,data}`（**行为变更**） | ✅ 删 2 个异常类 + RawJsonError；金片 8 条 |
 | **L11** | 异常语义守卫扩到 domains 全量 | 待做 |
 | **L12** | 数据访问定规：单表→Mapper，跨表/方言/事务→Repository；22 处 controller 下沉 | 待做 |
 | **L13** | 4 个核心实体 → `XxxView` record（**行为变更**） | 待做 |
@@ -310,6 +310,10 @@ boot           14 件                      →  boot
 | L5 | 2026-10-18 | **注释装饰清理**：删 491 行纯装饰分隔线（`// ═══`/`// ===`/`// ---`），216 行带文字分隔线统一为 `// ── 段名 ──`；新增 `check-comment-decor.py`（**第 26 条守卫**，红态探针已验）。**不设注释密度硬指标**——密度会奖励删信息，本仓注释承载契约与线程纪律（实测 18.6%，最大类头 63 行，分布健康）。 | **26 守卫** · **5022 / 0 / 4** · build 3m04s |
 
 | L6~L8 | 2026-10-18 | **缺口登记 + 死代码 + 日志分级**：新增 `docs/known-gaps.md`（18 项，状态/影响/替代/涉及类）；9 处类注释加指针、6 处误报改措辞；新增 `check-known-gaps.py`（第 27 条）。删 `@Deprecated getDocumentRawContent` + 2 个未用 record + 空包 `platform/session`，全仓 `@Deprecated` 归零。日志：116 处 warn 降级（95 debug / 21 info），warn 893→777；新增 `check-log-level.py`（第 28 条，warn 不得用于 404/跳过）。 | **28 守卫** · **5022 / 0 / 4** · build 2m48s |
+
+| L9 | 2026-10-18 | **内联纯转发的 500 包装**：12 处 `catch (RuntimeException) { throw toInternal(e); }` 删除（MessageController / SessionController / TemporaryDocumentController / VectorStoreController）；保留带业务语义的 catch（notFound 转换、上下文前缀、条件分支）。WebSearchProviderController 保持原样（5 条金片钉住其 500 文案）。 | **28 守卫** · **5022 / 0 / 4** · build 2m15s |
+| L10a | 2026-10-18 | **删除两个纯字符串异常**：`PlainErrorException`（22 处）→ `BizException` 工厂、`GuardForbiddenException`（7 处）→ `BizException.forbidden`；删两个类 + `GlobalExceptionHandler` 两个 handler（-40 行）；金片 8 条（`Forbidden:` 前缀去掉）、测试断言 1 条、前端 4 处 `data.error.message`→`data.message`。 | **28 守卫** · **5022 / 0 / 4** · build 1m58s · 前端 type-check 0 |
+| L10b | 2026-10-18 | **删除 Wiki 的 RawJsonError 转译补丁**：43 处 `new RawJsonError(...)` → `BizException` 工厂 / `AppError.ofHttpStatus`；删嵌套异常类与 `@ExceptionHandler`；`WikiRequestSupport` 三个返回类型改 `BizException`；测试断言 3 处。**补 `docs/api-response-convention.md`**（此前被 5 处代码引用但文件不存在）与 baseline 两条例外理由。 | **28 守卫** · **5022 / 0 / 4** · build 1m53s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
