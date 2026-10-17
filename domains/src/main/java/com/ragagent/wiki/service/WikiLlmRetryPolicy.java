@@ -106,10 +106,8 @@ public final class WikiLlmRetryPolicy {
         }
 
         // 供应商把 HTTP 状态格式化成 "API request failed with status NNN: ..." —— 先匹配它
-        for (String marker : TRANSIENT_STATUS_MARKERS) {
-            if (message.contains(marker)) {
-                return true;
-            }
+        if (TRANSIENT_STATUS_MARKERS.stream().anyMatch(message::contains)) {
+            return true;
         }
 
         String lower = message.toLowerCase(Locale.ROOT);

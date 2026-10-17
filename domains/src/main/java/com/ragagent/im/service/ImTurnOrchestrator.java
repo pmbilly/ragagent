@@ -125,7 +125,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
             SessionQaPort sessionQaPort,
             EventBusFactory eventBusFactory,
             AgentLookup agentLookup,
-            java.util.Optional<Resolver> storageResolver,
+            ObjectProvider<Resolver> storageResolver,
             ObjectProvider<StringRedisTemplate> redisTemplates,
             ObjectProvider<DocReaderParsePort> docReaders,
             ObjectProvider<KnowledgeCatalogPort> knowledgeServices,
@@ -140,7 +140,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
         this.channelSessions = channelSessions;
         this.sessionQaPort = sessionQaPort;
         this.agentLookup = agentLookup;
-        this.storageResolver = storageResolver.orElse(null);
+        this.storageResolver = storageResolver.getIfAvailable();
         this.streamPipeline = new ImStreamPipeline(this, eventBusFactory);
         this.outboundFormatter = new ImOutboundFormatter(this);
         this.sessionResolver = new ImSessionResolver(this);

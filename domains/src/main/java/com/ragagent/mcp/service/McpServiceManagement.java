@@ -10,7 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 import com.ragagent.platform.access.TenantContext;
@@ -39,6 +38,7 @@ import com.ragagent.mcp.protocol.McpOAuthSupport;
 import com.ragagent.mcp.protocol.McpServiceUrls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 /**
@@ -54,7 +54,7 @@ import org.springframework.stereotype.Service;
  *
  * <p>协议客户端（{@code com.ragagent.mcp.protocol}）由协议模块提供；
  * 本层只通过 {@link McpClientFactory} / {@link McpClientManager} 使用它。
- * 两者都可缺省装配（{@code Optional}）：协议模块未接线时服务仍能启动，
+ * 两者都可缺省装配（{@code ObjectProvider}）：协议模块未接线时服务仍能启动，
  * 只有真的去连 MCP 服务时才会报"not available"。</p>
  */
 @Service
@@ -71,18 +71,20 @@ public class McpServiceManagement {
 
     private final McpServiceMapper mcpServiceMapper;
     private final McpMetadataService metadataService;
-    private final Optional<McpClientManager> clientManager;
-    private final Optional<McpOAuthSupport> oauthSupport;
+    /** 协议模块未接线时为 null（接线期降级，见 closeClientQuietly / clients）。 */
+    private final McpClientManager clientManager;
+    /** 可缺省装配：协议模块未接线时为 null。 */
+    private final McpOAuthSupport oauthSupport;
 
     public McpServiceManagement(McpServiceMapper mcpServiceMapper,
                              McpMetadataService metadataService,
                              SsrfGuard ssrfGuard,
-                             Optional<McpClientManager> clientManager,
-                             Optional<McpOAuthSupport> oauthSupport) {
+                             ObjectProvider<McpClientManager> clientManager,
+                             ObjectProvider<McpOAuthSupport> oauthSupport) {
         this.mcpServiceMapper = mcpServiceMapper;
         this.metadataService = metadataService;
-        this.clientManager = clientManager;
-        this.oauthSupport = oauthSupport;
+        this.clientManager = clientManager.getIfAvailable();
+        this.oauthSupport = oauthSupport.getIfAvailable();
         // 出站 URL 校验器与协议层共用同一实例（对照 LlmTransport.setSsrfGuard 的注入方式），
         // 否则 DB 运行时调谐过的白名单只对一半调用点生效。
         McpServiceUrls.setSsrfGuard(ssrfGuard);
@@ -377,7 +379,7 @@ public class McpServiceManagement {
         if (service.getAuthConfig() != null && service.getAuthConfig().isOAuth()) {
             // OAuth：补充 tenant / principal / oauthSupport
             config = new McpClientConfig(service, TenantContext.currentTenantId(),
-                    McpPrincipal.fromContext(), null, oauthSupport.orElse(null));
+                    McpPrincipal.fromContext(), null, oauthSupport);
         }
 
         McpClient client;
@@ -568,13 +570,17 @@ public class McpServiceManagement {
      * 这是**接线期的降级**，不是可选的优化；管理器一旦就位必须真的关。
      */
     private void closeClientQuietly(String serviceId) {
-        clientManager.ifPresent(m -> m.closeClient(serviceId));
+        if (clientManager != null) {
+            clientManager.closeClient(serviceId);
+        }
     }
 
     /** 取管理器；缺失说明协议模块尚未装配，属服务端配置错误 */
     private McpClientManager clients() {
-        return clientManager.orElseThrow(() ->
-                BizException.internal("MCP client manager is not available"));
+        if (clientManager == null) {
+            throw BizException.internal("MCP client manager is not available");
+        }
+        return clientManager;
     }
 
     /** null 归一化为空串 */

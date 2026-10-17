@@ -9,13 +9,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import org.springframework.beans.factory.ObjectProvider;
 import java.util.stream.Stream;
 
 import com.ragagent.TestSchema;
@@ -66,8 +67,10 @@ class McpServiceServiceTest {
         whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         ssrfGuard.reloadWhitelist("example.com,127.0.0.1");
         clientManager = mock(McpClientManager.class);
+        ObjectProvider<McpClientManager> managers = mock(ObjectProvider.class);
+        when(managers.getIfAvailable()).thenReturn(clientManager);
         svc = new McpServiceManagement(mcpServiceMapper, metadataService, ssrfGuard,
-                Optional.of(clientManager), Optional.empty());
+                managers, mock(ObjectProvider.class));
     }
 
     @AfterEach

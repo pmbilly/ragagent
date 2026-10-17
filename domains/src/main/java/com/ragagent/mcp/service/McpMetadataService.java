@@ -1,6 +1,7 @@
 package com.ragagent.mcp.service;
 
 import com.ragagent.platform.web.JsonMappers;
+import org.springframework.beans.factory.ObjectProvider;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -12,7 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -66,14 +66,15 @@ public class McpMetadataService {
 
     private final McpServiceMapper mcpServiceMapper;
     private final McpMetadataRepository metadataRepo;
-    private final Optional<McpOAuthSupport> oauthSupport;
+    /** 可缺省装配：协议模块未接线时为 null（不是可选优化，是接线期降级）。 */
+    private final McpOAuthSupport oauthSupport;
 
     public McpMetadataService(McpServiceMapper mcpServiceMapper,
                               McpMetadataRepository metadataRepo,
-                              Optional<McpOAuthSupport> oauthSupport) {
+                              ObjectProvider<McpOAuthSupport> oauthSupport) {
         this.mcpServiceMapper = mcpServiceMapper;
         this.metadataRepo = metadataRepo;
-        this.oauthSupport = oauthSupport;
+        this.oauthSupport = oauthSupport.getIfAvailable();
     }
 
     private static OffsetDateTime now() {
@@ -266,7 +267,7 @@ public class McpMetadataService {
         McpClientConfig config = new McpClientConfig(service);
         if (service.getAuthConfig() != null && service.getAuthConfig().isOAuth()) {
             config = new McpClientConfig(service, tenant, McpPrincipal.oauthPrincipalFromContext(),
-                    null, oauthSupport.orElse(null));
+                    null, oauthSupport);
         }
 
         McpClient client;
