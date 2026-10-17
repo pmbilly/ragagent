@@ -26,6 +26,7 @@ import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.platform.redis.RedisPubSub;
 import com.ragagent.platform.redis.SpringRedisPubSub;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.contract.event.EventBusFactory;
 import com.ragagent.im.domain.ChannelSessionEntity;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.mapper.ChannelSessionMapper;
@@ -122,6 +123,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
 
     public ImTurnOrchestrator(ImChannelMapper channels, ChannelSessionMapper channelSessions,
             SessionQaPort sessionQaPort,
+            EventBusFactory eventBusFactory,
             AgentLookup agentLookup,
             java.util.Optional<Resolver> storageResolver,
             ObjectProvider<StringRedisTemplate> redisTemplates,
@@ -139,11 +141,11 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
         this.sessionQaPort = sessionQaPort;
         this.agentLookup = agentLookup;
         this.storageResolver = storageResolver.orElse(null);
-        this.streamPipeline = new ImStreamPipeline(this);
+        this.streamPipeline = new ImStreamPipeline(this, eventBusFactory);
         this.outboundFormatter = new ImOutboundFormatter(this);
         this.sessionResolver = new ImSessionResolver(this);
         this.qaRequests = new ImQaRequests(this);
-        this.qaRunner = new ImQaRunner(this);
+        this.qaRunner = new ImQaRunner(this, eventBusFactory);
         this.attachmentPreparer = new ImAttachmentPreparer(docReaders);
         ImRedisStore store = null;
         RedisPubSub pubSub = null;

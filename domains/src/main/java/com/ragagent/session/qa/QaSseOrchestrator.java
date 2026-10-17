@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.event.EventBusFactory;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
@@ -63,13 +63,17 @@ public final class QaSseOrchestrator {
     private final SseFrameWriter sseFrameWriter;
     private final QaTurnFinalizer turnFinalizer;
 
-    public QaSseOrchestrator(StreamManager streamManager, StreamEventEmitter emitter, SessionService sessionService, MessageService messageService, SseFrameWriter sseFrameWriter, QaTurnFinalizer turnFinalizer) {
+    /** 每轮一个独立总线（生命周期随轮次）；经工厂端口创建，不 new 实现类。 */
+    private final EventBusFactory eventBusFactory;
+
+    public QaSseOrchestrator(StreamManager streamManager, StreamEventEmitter emitter, SessionService sessionService, MessageService messageService, SseFrameWriter sseFrameWriter, QaTurnFinalizer turnFinalizer, EventBusFactory eventBusFactory) {
         this.streamManager = streamManager;
         this.emitter = emitter;
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.sseFrameWriter = sseFrameWriter;
         this.turnFinalizer = turnFinalizer;
+        this.eventBusFactory = eventBusFactory;
     }
 
     public SseStreamContext setupSSEStream(QaRequestContext reqCtx, boolean generateTitle, QaMode mode) {
@@ -77,7 +81,7 @@ public final class QaSseOrchestrator {
         streamCtx.assistantMessage = reqCtx.assistantMessage;
         streamCtx.tenantSnapshot = TenantContextSnapshot.capture();
 
-        EventBusInterface eventBus = new EventBus();
+        EventBusInterface eventBus = eventBusFactory.create();
         streamCtx.eventBus = eventBus;
 
         // Mid-run steering：仅 agent 模式有引擎排空点

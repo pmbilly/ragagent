@@ -5,7 +5,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.event.EventBusFactory;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.im.runtime.AdapterInterfaces.FullOutputProgressSender;
 import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;
@@ -36,9 +37,11 @@ final class ImQaRunner {
     private static final Logger log = LoggerFactory.getLogger(ImQaRunner.class);
 
     private final ImTurnOrchestrator service;
+    private final EventBusFactory eventBusFactory;
 
-    ImQaRunner(ImTurnOrchestrator service) {
+    ImQaRunner(ImTurnOrchestrator service, EventBusFactory eventBusFactory) {
         this.service = service;
+        this.eventBusFactory = eventBusFactory;
     }
 
     // ── QA 执行 ──────────────────────────────────────────────────────────
@@ -169,7 +172,7 @@ final class ImQaRunner {
     // ── runQA：事件收集 + 消息落库 ────────────────────────────────────────
 
     QaOutcome runQA(QaAttach attach, ImAttachmentPreparer.Prepared prepared) {
-        EventBus eventBus = new EventBus();
+        EventBusInterface eventBus = eventBusFactory.create();
         StringBuilder answerBuilder = new StringBuilder();
         AtomicReference<Exception> qaErr = new AtomicReference<>();
         java.util.concurrent.CountDownLatch done = new java.util.concurrent.CountDownLatch(1);

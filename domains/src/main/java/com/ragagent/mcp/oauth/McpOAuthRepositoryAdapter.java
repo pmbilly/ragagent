@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.mcp.domain.McpOAuthClient;
 import com.ragagent.mcp.domain.McpOAuthToken;
-import com.ragagent.mcp.mapper.McpOAuthRepository;
+import com.ragagent.mcp.repository.McpOAuthRepository;
 
 /**
  * {@link OAuthRepository} 的生产实现：纯转发到既有的

@@ -31,7 +31,7 @@ import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
-import com.ragagent.mcp.mapper.McpMetadataRepository;
+import com.ragagent.mcp.repository.McpMetadataRepository;
 import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;

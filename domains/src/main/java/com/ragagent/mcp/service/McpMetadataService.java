@@ -23,7 +23,7 @@ import com.ragagent.mcp.domain.McpMetadataSummary;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
-import com.ragagent.mcp.mapper.McpMetadataRepository;
+import com.ragagent.mcp.repository.McpMetadataRepository;
 import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.ragagent.mcp.protocol.InitializeResult;
 import com.ragagent.mcp.protocol.McpClient;

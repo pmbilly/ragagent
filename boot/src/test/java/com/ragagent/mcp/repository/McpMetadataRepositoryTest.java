@@ -14,7 +14,6 @@ import com.ragagent.TestSchema;
 import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpMetadataSummary;
 import com.ragagent.mcp.domain.McpTool;
-import com.ragagent.mcp.mapper.McpMetadataRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

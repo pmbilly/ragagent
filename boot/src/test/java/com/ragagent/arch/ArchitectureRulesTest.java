@@ -599,15 +599,13 @@ class ArchitectureRulesTest {
      * {@code websearch.mapper.WebSearchProviderRepository}（二者都是 {@code @Mapper} 接口，
      * 只是名字以 Repository 结尾）。余 9 条现场核对均为 {@code @Component}/{@code @Repository}
      * 的**手写门面**，收敛路径仍是「碰到哪域归哪域」搬去该域 {@code repository/}。</p>
+     * <p><b>评审修复批② 收紧（9 → 6）</b>：mcp 域三条门面已搬至 {@code mcp/repository/}。</p>
      */
     private static final Set<String> REPOSITORY_IN_MAPPER_BASELINE = Set.of(
             "com.ragagent.audit.mapper.AuditLogRepository",
             "com.ragagent.auth.apikey.mapper.TenantAPIKeyRepository",
             "com.ragagent.datasource.mapper.DataSourceRepository",
             "com.ragagent.datasource.mapper.SyncLogRepository",
-            "com.ragagent.mcp.mapper.McpMetadataRepository",
-            "com.ragagent.mcp.mapper.McpOAuthRepository",
-            "com.ragagent.mcp.mapper.McpToolApprovalRepository",
             "com.ragagent.storage.mapper.ResourceRepository",
             "com.ragagent.storage.mapper.StorageBackendRepository");
 

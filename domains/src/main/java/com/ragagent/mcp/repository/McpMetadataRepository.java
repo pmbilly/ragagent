@@ -1,4 +1,4 @@
-package com.ragagent.mcp.mapper;
+package com.ragagent.mcp.repository;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import javax.sql.DataSource;
 
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.mcp.domain.McpMetadata;
+import com.ragagent.mcp.mapper.McpMetadataMapper;
 import com.ragagent.mcp.domain.McpMetadataSummary;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;

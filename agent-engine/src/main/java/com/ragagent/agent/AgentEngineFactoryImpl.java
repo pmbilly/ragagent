@@ -21,6 +21,7 @@ import com.ragagent.contract.agent.AgentEngineRequest;
 import com.ragagent.contract.agent.PinnedMCPServiceInfo;
 import com.ragagent.contract.agent.PinnedSkillInfo;
 import com.ragagent.contract.agent.SkillCatalogPort;
+import com.ragagent.contract.event.EventBusFactory;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.pipeline.McpToolingGateway;
@@ -45,15 +46,22 @@ public class AgentEngineFactoryImpl implements AgentEngineFactory {
 
     private final SkillCatalogPort skillCatalog;
     private final McpToolRegistrationPort mcpTools;
+    private final EventBusFactory eventBusFactory;
 
-    public AgentEngineFactoryImpl(SkillCatalogPort skillCatalog, McpToolRegistrationPort mcpTools) {
+    public AgentEngineFactoryImpl(SkillCatalogPort skillCatalog, McpToolRegistrationPort mcpTools,
+            EventBusFactory eventBusFactory) {
         this.skillCatalog = skillCatalog;
         this.mcpTools = mcpTools;
+        this.eventBusFactory = eventBusFactory;
     }
 
     @Override
     public AgentEngineHandle create(AgentEngineRequest request, LlmChatClient chatModel,
                                     EventBusInterface eventBus) {
+        // 调用方未带总线时经工厂端口补一个（每轮独立；引擎内部的 new 兜底仍保留为防御默认）
+        if (eventBus == null) {
+            eventBus = eventBusFactory.create();
+        }
         // 1) 工具注册表 + 输出上限 + 域侧外部工具
         ToolRegistry toolRegistry = new ToolRegistry();
         if (request.spec().getMaxToolOutputChars() > 0) {

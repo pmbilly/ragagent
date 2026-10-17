@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 import com.ragagent.TestSchema;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.domain.McpToolPolicyPatch;
-import com.ragagent.mcp.mapper.McpToolApprovalRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

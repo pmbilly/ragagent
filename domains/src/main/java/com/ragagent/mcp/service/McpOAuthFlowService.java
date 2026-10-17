@@ -34,6 +34,9 @@ public class McpOAuthFlowService {
 
     private static final Logger log = LoggerFactory.getLogger(McpOAuthFlowService.class);
 
+    /** 前端地址缺失时的兜底。 */
+    static final String FALLBACK_REDIRECT = "/";
+
     private final OAuthManager oauth;
     private final McpServiceManagement svc;
     private final ObjectProvider<ToolApprovalGate> gate;
@@ -70,7 +73,7 @@ public class McpOAuthFlowService {
         }
         String frontendRedirect = trim(req.frontendRedirect());
         if (frontendRedirect.isEmpty()) {
-            frontendRedirect = "/";
+            frontendRedirect = FALLBACK_REDIRECT;
         }
 
         McpService service;

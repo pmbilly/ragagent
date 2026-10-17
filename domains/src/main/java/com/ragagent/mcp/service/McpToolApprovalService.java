@@ -7,7 +7,7 @@ import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpToolApproval;
 import com.ragagent.mcp.domain.McpToolPolicyPatch;
 import com.ragagent.mcp.mapper.McpServiceMapper;
-import com.ragagent.mcp.mapper.McpToolApprovalRepository;
+import com.ragagent.mcp.repository.McpToolApprovalRepository;
 import org.springframework.stereotype.Service;
 
 /**

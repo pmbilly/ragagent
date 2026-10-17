@@ -8,7 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.contract.event.Event;
-import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.event.EventBusFactory;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;
 import com.ragagent.im.runtime.ImFormat;
@@ -39,9 +40,11 @@ final class ImStreamPipeline {
     private static final Logger log = LoggerFactory.getLogger(ImStreamPipeline.class);
 
     private final ImTurnOrchestrator service;
+    private final EventBusFactory eventBusFactory;
 
-    ImStreamPipeline(ImTurnOrchestrator service) {
+    ImStreamPipeline(ImTurnOrchestrator service, EventBusFactory eventBusFactory) {
         this.service = service;
+        this.eventBusFactory = eventBusFactory;
     }
 
     void handleMessageStream(IncomingMessage msg, QaAttach attach,
@@ -55,7 +58,7 @@ final class ImStreamPipeline {
             return;
         }
 
-        EventBus eventBus = new EventBus();
+        EventBusInterface eventBus = eventBusFactory.create();
         StreamBuffers buf = new StreamBuffers();
         java.util.concurrent.CountDownLatch done = new java.util.concurrent.CountDownLatch(1);
         java.util.concurrent.CountDownLatch complete = new java.util.concurrent.CountDownLatch(1);
@@ -227,7 +230,7 @@ final class ImStreamPipeline {
     }
 
     /** 事件订阅组。 */
-    private void subscribeStreamEvents(EventBus eventBus, StreamBuffers buf,
+    private void subscribeStreamEvents(EventBusInterface eventBus, StreamBuffers buf,
             java.util.concurrent.CountDownLatch done,
             java.util.concurrent.CountDownLatch complete, boolean useAgent) {
         eventBus.on(EventType.EVENT_AGENT_FINAL_ANSWER, evt -> {

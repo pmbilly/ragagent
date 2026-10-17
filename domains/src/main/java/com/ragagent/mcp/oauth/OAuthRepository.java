@@ -12,7 +12,7 @@ import com.ragagent.mcp.domain.McpOAuthToken;
  * <p><b>为什么抽一层接口</b>：上层（manager / runtime / token store）依赖接口而非具体仓储，
  * 测试可用内存 fake 验证租约与 principal 隔离；
  * 生产实现见 {@link McpOAuthRepositoryAdapter}（转发到
- * {@link com.ragagent.mcp.mapper.McpOAuthRepository}）。</p>
+ * {@link com.ragagent.mcp.repository.McpOAuthRepository}）。</p>
  *
  * <p><b>不变式（硬契约，实现方必须保证）</b>：
  * <ul>
