@@ -11,6 +11,7 @@ import com.ragagent.session.qa.QaEntryRunner;
 import com.ragagent.session.qa.QaRequestBinder;
 import com.ragagent.session.service.QaSupport;
 import com.ragagent.session.service.SessionKnowledgeQaService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Session")
 public class KnowledgeQaController {
 
 

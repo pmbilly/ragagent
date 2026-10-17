@@ -1,6 +1,5 @@
 package com.ragagent.mcp.controller;
 
-
 import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.dto.McpCredentialsResponse;
@@ -9,6 +8,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/mcp-services")
+@Tag(name = "MCP")
 public class McpCredentialsController {
 
     private static final Logger log = LoggerFactory.getLogger(McpCredentialsController.class);

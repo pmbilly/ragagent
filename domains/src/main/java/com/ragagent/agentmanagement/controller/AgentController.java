@@ -18,6 +18,7 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Agent Management")
 public class AgentController {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();

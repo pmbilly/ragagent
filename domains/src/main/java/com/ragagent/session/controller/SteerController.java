@@ -18,6 +18,7 @@ import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,6 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Session")
 public class SteerController {
 
     private static final Logger log = LoggerFactory.getLogger(SteerController.class);

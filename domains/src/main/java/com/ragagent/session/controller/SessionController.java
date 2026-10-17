@@ -26,6 +26,7 @@ import com.ragagent.session.dto.UpdateSessionRequest;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.SessionStopService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +75,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Session")
 public class SessionController {
 
     private static final Logger log = LoggerFactory.getLogger(SessionController.class);

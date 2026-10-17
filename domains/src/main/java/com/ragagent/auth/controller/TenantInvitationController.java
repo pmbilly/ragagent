@@ -18,6 +18,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.RequestFields;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Auth")
 public class TenantInvitationController {
 
     /** 前端基础地址两级查找（config 属性 → FRONTEND_BASE_URL env）。 */

@@ -12,6 +12,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Agent Management")
 public class SkillCatalogController {
 
     private static final ObjectMapper AUDIT_MAPPER = JsonMappers.lenient();

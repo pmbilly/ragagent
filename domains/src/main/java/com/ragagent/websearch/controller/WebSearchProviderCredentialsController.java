@@ -10,6 +10,7 @@ import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.service.WebSearchProviderService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/web-search-providers")
+@Tag(name = "Web Search")
 public class WebSearchProviderCredentialsController {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();

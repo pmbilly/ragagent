@@ -15,6 +15,7 @@ import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.service.AgentResolver;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.TemporaryDocumentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -44,6 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 @ApiResult
+@Tag(name = "Session")
 public class TemporaryDocumentController {
 
     private static final Logger log = LoggerFactory.getLogger(TemporaryDocumentController.class);

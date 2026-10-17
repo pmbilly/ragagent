@@ -45,6 +45,7 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.platform.web.RejectEmptyBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -93,6 +94,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/auth")
+@Tag(name = "Auth")
 public class AuthController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);

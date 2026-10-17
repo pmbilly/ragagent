@@ -25,6 +25,7 @@ import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.NonNullBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Knowledge")
 public class FaqController {
 
 

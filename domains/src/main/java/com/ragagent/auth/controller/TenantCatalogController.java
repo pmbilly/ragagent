@@ -12,6 +12,7 @@ import com.ragagent.platform.config.TenantProperties;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.platform.web.ApiResult;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Auth")
 public class TenantCatalogController {
     final TenantService tenantService;
     final TenantMemberService memberService;

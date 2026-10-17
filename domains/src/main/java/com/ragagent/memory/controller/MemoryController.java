@@ -20,6 +20,7 @@ import com.ragagent.memory.service.MemoryScopeExceptions;
 import com.ragagent.memory.service.MemoryService;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +98,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Memory")
 public class MemoryController {
 
     private static final Logger log = LoggerFactory.getLogger(MemoryController.class);

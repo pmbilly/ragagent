@@ -5,6 +5,7 @@ import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.platform.storage.fileserve.FileProxyPort;
 import com.ragagent.platform.storage.fileserve.FileServeHttp;
 import com.ragagent.platform.web.ApiResult;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Knowledge")
 public class KnowledgeBaseFileProxyController {
 
     private final ChunkAccessGuard kbGuard;

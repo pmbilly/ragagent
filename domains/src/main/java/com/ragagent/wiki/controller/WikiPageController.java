@@ -1,6 +1,5 @@
 package com.ragagent.wiki.controller;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.audit.WikiActivityAudit;
 import com.ragagent.contract.error.AppError;
@@ -9,6 +8,7 @@ import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.wiki.service.page.WikiLintService;
 import com.ragagent.wiki.service.page.WikiPageService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.ResponseEntity;
@@ -80,6 +80,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/knowledgebase/{kbId}/wiki")
+@Tag(name = "Wiki")
 public class WikiPageController {
 
     private final WikiKbAccessGuard kbGuard;

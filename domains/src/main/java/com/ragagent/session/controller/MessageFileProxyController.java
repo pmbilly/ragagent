@@ -6,6 +6,7 @@ import com.ragagent.platform.storage.fileserve.FileServeHttp;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.service.MessageService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Session")
 public class MessageFileProxyController {
 
     private final MessageService messageService;

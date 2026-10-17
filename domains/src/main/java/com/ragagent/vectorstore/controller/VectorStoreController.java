@@ -18,6 +18,7 @@ import com.ragagent.vectorstore.domain.VectorStore;
 import com.ragagent.vectorstore.dto.VectorStoreResponse;
 import com.ragagent.vectorstore.dto.VectorStoreTypes;
 import com.ragagent.vectorstore.service.VectorStoreConfigService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,6 +55,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/vector-stores")
+@Tag(name = "Vector Store")
 public class VectorStoreController {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();

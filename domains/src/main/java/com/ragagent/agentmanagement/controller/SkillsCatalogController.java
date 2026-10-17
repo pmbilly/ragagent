@@ -3,6 +3,7 @@ package com.ragagent.agentmanagement.controller;
 import com.ragagent.contract.agent.SkillCatalogPort;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResult;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Agent Management")
 public class SkillsCatalogController {
 
     private final SkillCatalogPort catalog;

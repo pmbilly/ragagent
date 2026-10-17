@@ -101,6 +101,13 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
 
+        // 通道 1.1：API 文档（仅 GET）。默认关闭时 springdoc 不注册端点，
+        // 这里会落到 DispatcherServlet 的 404；生产不会暴露。
+        if ("GET".equals(request.getMethod()) && isSpringdocPath(request.getRequestURI())) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         // 通道 1.5：embed 公开面（embed 路由组不经全局 Auth，
         // 由 com.ragagent.embedchannel 的 EmbedAuthFilter 自行鉴权，本过滤器整体让路）。
         if (request.getRequestURI().startsWith("/api/v1/embed/")) {
@@ -179,6 +186,15 @@ public class AuthFilter extends OncePerRequestFilter {
     static boolean isNoAuthAPI(String path, String method) {
         Set<String> methods = NO_AUTH_API.get(path);
         return methods != null && methods.contains(method);
+    }
+
+    /** springdoc 路径（仅 GET 放行；是否真的启用由 springdoc.enabled 决定）。 */
+    static boolean isSpringdocPath(String path) {
+        return path != null
+                && (path.equals("/swagger-ui.html")
+                || path.startsWith("/swagger-ui/")
+                || path.equals("/v3/api-docs")
+                || path.startsWith("/v3/api-docs/"));
     }
 
     /**

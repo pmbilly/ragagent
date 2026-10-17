@@ -29,6 +29,7 @@ import com.ragagent.model.service.ModelService.ModelNotFoundException;
 import com.ragagent.platform.storage.config.UploadLimits;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -59,6 +60,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/models")
+@Tag(name = "Model")
 public class ModelDebugController {
 
 

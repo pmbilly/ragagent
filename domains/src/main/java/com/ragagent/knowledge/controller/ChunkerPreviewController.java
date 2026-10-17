@@ -13,6 +13,7 @@ import com.ragagent.knowledge.dto.chunk.PreviewPayload;
 import com.ragagent.knowledge.dto.chunk.PreviewRequest;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.NonNullBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -52,6 +53,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Knowledge")
 public class ChunkerPreviewController {
 
     /** 64k 码点上限（防任务堆积的主缓解）。 */

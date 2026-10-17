@@ -14,6 +14,7 @@ import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import com.ragagent.platform.web.error.PlainErrorException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "IM")
 public class ImChannelController {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();

@@ -18,6 +18,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,6 +59,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Datasource")
 public class DataSourceController {
 
     /**

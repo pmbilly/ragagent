@@ -18,6 +18,7 @@ import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.platform.web.RejectEmptyBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/models")
+@Tag(name = "Model")
 public class ModelController {
 
     private static final Logger log = LoggerFactory.getLogger(ModelController.class);

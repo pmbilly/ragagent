@@ -12,6 +12,7 @@ import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.session.dto.SearchMessagesRequest;
 import com.ragagent.session.service.MessageHistoryService;
 import com.ragagent.session.service.MessageService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Session")
 public class MessageController {
 
     private static final Logger log = LoggerFactory.getLogger(MessageController.class);

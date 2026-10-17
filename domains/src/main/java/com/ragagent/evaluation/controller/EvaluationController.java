@@ -9,6 +9,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.RejectEmptyBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/evaluation")
+@Tag(name = "Evaluation")
 public class EvaluationController {
 
     private final EvaluationService evaluationService;

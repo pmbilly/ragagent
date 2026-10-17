@@ -15,6 +15,7 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import io.jsonwebtoken.Jwts;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
@@ -44,6 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Auth")
 public class TenantAPIPrincipalController {
 
     static final String DEFAULT_DIRECT_HEADER = "X-External-User-ID";

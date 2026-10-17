@@ -12,6 +12,7 @@ import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.error.GuardForbiddenException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Audit")
 public class AuditLogController {
 
     private final AuditLogService auditLogService;

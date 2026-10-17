@@ -1,10 +1,10 @@
 package com.ragagent.session.controller;
 
-
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.session.service.suggestion.MessageSuggestionFacade;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Session")
 public class MessageSuggestionController {
 
     private final MessageSuggestionFacade suggestionFacade;

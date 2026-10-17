@@ -10,6 +10,7 @@ import com.ragagent.model.service.ModelService.ModelNotFoundException;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/models")
+@Tag(name = "Model")
 public class ModelCredentialsController {
 
 

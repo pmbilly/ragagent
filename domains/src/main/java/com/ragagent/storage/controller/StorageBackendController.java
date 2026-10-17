@@ -14,6 +14,7 @@ import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.dto.StorageBackendResponse;
 import com.ragagent.storage.dto.StorageConfig;
 import com.ragagent.storage.service.StorageBackendService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -43,6 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/storage-backends")
+@Tag(name = "Storage")
 public class StorageBackendController {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();

@@ -17,6 +17,7 @@ import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -65,6 +66,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/tenants/{id}/api-keys")
+@Tag(name = "Auth")
 public class TenantAPIKeyController {
 
     private static final Logger log = LoggerFactory.getLogger(TenantAPIKeyController.class);

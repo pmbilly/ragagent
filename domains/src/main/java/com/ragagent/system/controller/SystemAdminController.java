@@ -1,6 +1,5 @@
 package com.ragagent.system.controller;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.apikey.APIKeyScopeType;
@@ -25,6 +24,7 @@ import com.ragagent.system.domain.SystemSetting;
 import com.ragagent.system.dto.SystemDtos;
 import com.ragagent.system.service.SystemAdminUserService;
 import com.ragagent.system.service.SystemSettingService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -60,6 +60,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/system/admin")
+@Tag(name = "System")
 public class SystemAdminController {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();

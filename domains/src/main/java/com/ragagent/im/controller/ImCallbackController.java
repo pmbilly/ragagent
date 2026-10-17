@@ -1,12 +1,12 @@
 package com.ragagent.im.controller;
 
-
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
 import com.ragagent.im.runtime.CallbackExchange;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.service.ImChannelService;
 import com.ragagent.im.service.ImTurnOrchestrator;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.LinkedHashMap;
@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 // 协议原样，如微信/云之家 ACK）。ApiResultAdvice.supports() 对 void 返回类型直接跳过，
 // 因此即便类上有 @ApiResult 也不会包装/双写。响应体形状是**平台协议**，不是本仓 API 约定。
 @RestController
+@Tag(name = "IM")
 public class ImCallbackController {
 
     private static final Logger log = LoggerFactory.getLogger(ImCallbackController.class);

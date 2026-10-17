@@ -28,6 +28,7 @@ import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.support.LogSanitizer;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -71,6 +72,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Session")
 public class SessionStreamController {
 
     private static final Logger log = LoggerFactory.getLogger(SessionStreamController.class);

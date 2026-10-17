@@ -78,6 +78,8 @@ dependencies {
 
     // tiktoken BPE 编码器（cl100k_base；纯 BPE、纯 Java、零传递依赖）
     implementation(libs.jtokkit)
+    // OpenAPI 注解（@Tag）：仅编译期；运行期由 :boot 的 springdoc 提供
+    compileOnly(libs.swagger.annotations.jakarta)
 
     // 测试
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")

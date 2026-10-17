@@ -18,6 +18,7 @@ import com.ragagent.system.dto.SystemDtos;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
 import com.ragagent.system.service.ParserEngineRegistry;
 import com.ragagent.system.service.SystemInfoService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,6 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/system")
+@Tag(name = "System")
 public class SystemController {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();

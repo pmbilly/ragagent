@@ -17,6 +17,7 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Datasource")
 public class DataSourceCredentialsController {
 
     private static final Logger log = LoggerFactory.getLogger(DataSourceCredentialsController.class);

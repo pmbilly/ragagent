@@ -22,6 +22,7 @@ import com.ragagent.websearch.provider.EmptyTestResults;
 import com.ragagent.websearch.provider.WebSearchProvider;
 import com.ragagent.websearch.provider.WebSearchProviderRegistry;
 import com.ragagent.websearch.service.WebSearchProviderService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/web-search-providers")
+@Tag(name = "Web Search")
 public class WebSearchProviderController {
 
     private static final Logger log = LoggerFactory.getLogger(WebSearchProviderController.class);

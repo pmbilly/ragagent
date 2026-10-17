@@ -1,8 +1,8 @@
 package com.ragagent.websearch.controller;
 
-
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.websearch.dto.WebSearchProviderTypes;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Web Search")
 public class WebSearchController {
 
     @GetMapping("/api/v1/web-search/providers")

@@ -1,6 +1,5 @@
 package com.ragagent.initialization.controller;
 
-
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -19,6 +18,7 @@ import com.ragagent.platform.prompt.ExtractPrompts;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.ApiResult;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ApiResult
+@Tag(name = "Initialization")
 public class InitializationController {
 
 

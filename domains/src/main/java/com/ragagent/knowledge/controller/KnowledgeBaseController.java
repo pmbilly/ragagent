@@ -31,6 +31,7 @@ import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.platform.web.error.GuardForbiddenException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +69,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1/knowledge-bases")
+@Tag(name = "Knowledge")
 public class KnowledgeBaseController {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeBaseController.class);

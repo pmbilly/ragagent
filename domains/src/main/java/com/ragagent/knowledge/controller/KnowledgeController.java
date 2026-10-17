@@ -30,6 +30,7 @@ import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.NonNullBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -62,6 +63,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @ApiResult
 @RequestMapping("/api/v1")
+@Tag(name = "Knowledge")
 public class KnowledgeController {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeController.class);
