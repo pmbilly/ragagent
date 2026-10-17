@@ -6,6 +6,7 @@ import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConstants;
 import com.ragagent.datasource.domain.DataSourceException;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import com.ragagent.platform.persistence.TxTemplate;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -48,9 +49,9 @@ public class DataSourceRepository {
     private static final String PG_JSON = "typeHandler=" + PgJsonTypeHandler.class.getName();
 
     private final DataSourceMapper mapper;
-    private final DataSourceTxTemplate tx;
+    private final TxTemplate tx;
 
-    public DataSourceRepository(DataSourceMapper mapper, DataSourceTxTemplate tx) {
+    public DataSourceRepository(DataSourceMapper mapper, TxTemplate tx) {
         this.mapper = mapper;
         this.tx = tx;
     }

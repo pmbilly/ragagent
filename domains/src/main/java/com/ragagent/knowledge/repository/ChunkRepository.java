@@ -16,6 +16,7 @@ import com.ragagent.knowledge.mapper.ChunkRevisionMapper;
 import com.ragagent.knowledge.support.ChunkRowViews;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.persistence.PageRequests;
+import com.ragagent.platform.persistence.TxTemplate;
 import com.ragagent.platform.text.CleanInvalidUtf8;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -69,12 +70,12 @@ public class ChunkRepository implements ChunkSearchGateway {
 
     private final ChunkMapper chunkMapper;
     private final ChunkRevisionMapper revisionMapper;
-    private final ChunkTxTemplate tx;
+    private final TxTemplate tx;
     /** 方言探测（构造期问一次）：ListPaged 的 FAQ 关键词搜索分支。 */
     private final boolean postgres;
 
     public ChunkRepository(ChunkMapper chunkMapper, ChunkRevisionMapper revisionMapper,
-                           ChunkTxTemplate tx, DataSource dataSource) {
+                           TxTemplate tx, DataSource dataSource) {
         this.chunkMapper = chunkMapper;
         this.revisionMapper = revisionMapper;
         this.tx = tx;

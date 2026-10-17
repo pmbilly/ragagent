@@ -118,6 +118,22 @@ Thread.ofVirtual().start(() -> TenantScope.run(snap, () -> {
 
 **去哪改**：`boot/.../RagAgentApplication.java` 的注解；新增属性类时把包加进去。不要改成根包扫描——会把一批未注册的配置类一并绑定，属行为变化。
 
+## 9. 数据访问有两套写法，选择规则是确定的
+
+| 写法 | 数量 | 适用 |
+|---|---|---|
+| MyBatis-Plus `Mapper`（`*/mapper/*Mapper.java`） | 76 | 单表 CRUD、条件查询 |
+| `Repository`（`*/repository/*Repository.java`） | 28 | 跨表、方言差异（PostgreSQL/SQLite）、事务模板、复杂聚合 |
+
+**选择规则**：单表且无方言分支 → `Mapper`；出现跨表、方言判断或需要事务模板 → `Repository`。
+
+**两条硬规矩**：
+
+1. **软删条件显式写**：每条查询显式加 `deleted_at IS NULL`，不用 `@TableLogic`（datetime 逻辑删除值在 MyBatis-Plus 各版本行为敏感）。
+2. **controller 不得直接注入 Mapper**：HTTP 面只编排，数据访问在 service / repository。由 `check-controller-purity.py` 强制（当前违例 0）。
+
+**去哪改**：单表查询改 Mapper；涉及方言或跨表时在 `repository/` 加方法，别在 service 里拼两套 SQL。
+
 ## 相关文档
 
 - 调用链：[`request-path.md`](request-path.md)

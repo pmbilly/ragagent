@@ -61,6 +61,9 @@ import tools.jackson.databind.JsonNode;
  * <p>状态机：pending →(CAS)→ processing →（无富化子任务）→ completed +
  * enable_status=enabled + processed_at；任一步失败 → failed + error_message；
  * deleting/cancelled 检查点短路。</p>
+ * <p><b>事务边界</b>：整条链路<b>不包一个大事务</b>——每阶段独立提交，靠上述状态机 +
+ * 幂等重入保证最终一致（解析/向量化是外部调用，包在事务里会长时间持锁）。需要原子性的
+ * 多步写（如 chunk 行 + 向量索引元数据）各自经 {@code platform.persistence.TxTemplate}。</p>
  * <p>三个关键不变量：</p>
  * <ol>
  * <li><b>索引文本形态</b>：嵌入文本与 embeddings.content 一致，均为
