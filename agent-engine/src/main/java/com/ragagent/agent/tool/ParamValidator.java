@@ -60,7 +60,7 @@ public final class ParamValidator {
                 if (!r.isString()) {
                     continue;
                 }
-                String fieldName = r.textValue();
+                String fieldName = r.stringValue();
                 JsonNode val = args.get(fieldName);
                 if (val == null || val.isNull()) {
                     errs.add(new ValidationError(fieldName,
@@ -94,7 +94,7 @@ public final class ParamValidator {
 
         List<ValidationError> errs = new ArrayList<>();
         JsonNode typeNode = prop.get("type");
-        String targetType = typeNode != null && typeNode.isString() ? typeNode.textValue() : "";
+        String targetType = typeNode != null && typeNode.isString() ? typeNode.stringValue() : "";
 
         // 类型检查
         if (!targetType.isEmpty() && !checkType(val, targetType)) {
@@ -130,7 +130,7 @@ public final class ParamValidator {
 
         // 字符串长度按 UTF-8 字节计（CJK 多字节字符按字节计账）
         if (targetType.equals("string") && val.isString()) {
-            String s = val.textValue();
+            String s = val.stringValue();
             int byteLen = s.getBytes(java.nio.charset.StandardCharsets.UTF_8).length;
             double[] minLen = getFloat(prop, "minLength");
             if (minLen != null && byteLen < minLen[0]) {
@@ -211,7 +211,7 @@ public final class ParamValidator {
         if (n.isNull()) {
             return "<nil>";
         }
-        return n.isString() ? n.textValue() : n.toString();
+        return n.isString() ? n.stringValue() : n.toString();
     }
 
     /** 浮点文本（'g' 最短形态：1 → "1"、0.5 → "0.5"）。 */

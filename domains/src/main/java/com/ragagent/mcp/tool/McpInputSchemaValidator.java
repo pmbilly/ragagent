@@ -137,7 +137,7 @@ public final class McpInputSchemaValidator {
             return null;
         }
         JsonNode ref = node.get("$ref");
-        if (ref != null && ref.isString() && !ref.textValue().startsWith("#")) {
+        if (ref != null && ref.isString() && !ref.stringValue().startsWith("#")) {
             return EXTERNAL_REF_MESSAGE;
         }
         return null;
@@ -165,11 +165,11 @@ public final class McpInputSchemaValidator {
         if (typeNode != null) {
             boolean ok;
             if (typeNode.isString()) {
-                ok = typeMatches(value, typeNode.textValue());
+                ok = typeMatches(value, typeNode.stringValue());
             } else if (typeNode.isArray()) {
                 ok = false;
                 for (JsonNode t : typeNode) {
-                    if (t.isString() && typeMatches(value, t.textValue())) {
+                    if (t.isString() && typeMatches(value, t.stringValue())) {
                         ok = true;
                         break;
                     }
@@ -218,12 +218,12 @@ public final class McpInputSchemaValidator {
         if (value.isString()) {
             JsonNode minLength = schema.get("minLength");
             if (minLength != null && minLength.isNumber()
-                    && value.textValue().codePointCount(0, value.textValue().length()) < minLength.intValue()) {
+                    && value.stringValue().codePointCount(0, value.stringValue().length()) < minLength.intValue()) {
                 return "string is shorter than minLength";
             }
             JsonNode maxLength = schema.get("maxLength");
             if (maxLength != null && maxLength.isNumber()
-                    && value.textValue().codePointCount(0, value.textValue().length()) > maxLength.intValue()) {
+                    && value.stringValue().codePointCount(0, value.stringValue().length()) > maxLength.intValue()) {
                 return "string is longer than maxLength";
             }
         }
@@ -259,8 +259,8 @@ public final class McpInputSchemaValidator {
             if (required != null && required.isArray()) {
                 List<String> missing = new ArrayList<>();
                 for (JsonNode r : required) {
-                    if (r.isString() && !value.has(r.textValue())) {
-                        missing.add(r.textValue());
+                    if (r.isString() && !value.has(r.stringValue())) {
+                        missing.add(r.stringValue());
                     }
                 }
                 if (!missing.isEmpty()) {
@@ -338,7 +338,7 @@ public final class McpInputSchemaValidator {
         // 本地 $ref（#/$defs/... 等 JSON Pointer）
         JsonNode ref = schema.get("$ref");
         if (ref != null && ref.isString()) {
-            String pointer = ref.textValue();
+            String pointer = ref.stringValue();
             if (!pointer.startsWith("#")) {
                 return EXTERNAL_REF_MESSAGE;
             }

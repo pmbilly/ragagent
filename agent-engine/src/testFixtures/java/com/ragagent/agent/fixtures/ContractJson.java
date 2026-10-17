@@ -122,13 +122,13 @@ public final class ContractJson {
             JsonNode nested = tryNested(mapper, raw);
             if (nested != null) {
                 try {
-                    return mapper.getNodeFactory().textNode(mapper.writeValueAsString(canonical(nested, mapper)));
+                    return mapper.getNodeFactory().stringNode(mapper.writeValueAsString(canonical(nested, mapper)));
                 } catch (Exception ignored) {
                     return node;
                 }
             }
             String utc = toUtc(raw);
-            return utc.equals(raw) ? node : mapper.getNodeFactory().textNode(utc);
+            return utc.equals(raw) ? node : mapper.getNodeFactory().stringNode(utc);
         }
         return node;
     }

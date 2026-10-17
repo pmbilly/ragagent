@@ -583,7 +583,7 @@ public class GitLabConnector implements StreamingConnector {
             if (!entry.getValue().isString()) {
                 break;
             }
-            out.put(entry.getKey(), entry.getValue().textValue());
+            out.put(entry.getKey(), entry.getValue().stringValue());
         }
         return out;
     }

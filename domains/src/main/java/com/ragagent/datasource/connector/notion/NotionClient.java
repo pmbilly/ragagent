@@ -258,7 +258,7 @@ public final class NotionClient {
             JsonNode first = dataSources.get(0);
             JsonNode idNode = first == null ? null : first.get("id");
             if (idNode != null && idNode.isString()) {
-                dataSourceId = idNode.textValue();
+                dataSourceId = idNode.stringValue();
             }
         }
         return new NotionDatabaseInfo(db, dataSourceId);

@@ -56,7 +56,7 @@ public final class ParamCaster {
                 continue;
             }
             JsonNode typeNode = propDef.get("type");
-            String targetType = typeNode != null && typeNode.isString() ? typeNode.textValue() : "";
+            String targetType = typeNode != null && typeNode.isString() ? typeNode.stringValue() : "";
             if (targetType.isEmpty()) {
                 continue;
             }
@@ -87,7 +87,7 @@ public final class ParamCaster {
         switch (targetType) {
             case "array": {
                 if (val.isString()) {
-                    String s = val.textValue();
+                    String s = val.stringValue();
                     // 先试 JSON 解析（处理 "[{...}]" → 数组）
                     try {
                         JsonNode parsed = ObjectMapperHolder.MAPPER.readTree(s);
@@ -106,7 +106,7 @@ public final class ParamCaster {
             }
             case "boolean": {
                 if (val.isString()) {
-                    String lower = val.textValue().toLowerCase();
+                    String lower = val.stringValue().toLowerCase();
                     switch (lower) {
                         case "true", "1", "yes":
                             return F.booleanNode(true);
@@ -131,7 +131,7 @@ public final class ParamCaster {
             case "integer": {
                 if (val.isString()) {
                     try {
-                        long i = Long.parseLong(val.textValue());
+                        long i = Long.parseLong(val.stringValue());
                         return F.numberNode(i);
                     } catch (NumberFormatException ignored) {
                         // fall through
@@ -149,7 +149,7 @@ public final class ParamCaster {
             case "number": {
                 if (val.isString()) {
                     try {
-                        double f = Double.parseDouble(val.textValue());
+                        double f = Double.parseDouble(val.stringValue());
                         if (!Double.isNaN(f) && !Double.isInfinite(f)) {
                             return F.numberNode(f);
                         }
@@ -162,14 +162,14 @@ public final class ParamCaster {
             case "string": {
                 // 非字符串 → 字符串（数字或 bool 被当成非字符串传来）
                 if (val.isBoolean()) {
-                    return F.textNode(val.booleanValue() ? "true" : "false");
+                    return F.stringNode(val.booleanValue() ? "true" : "false");
                 }
                 if (val.isFloatingPointNumber()) {
                     // 最短 'f' 定点形态（123.5 → "123.5"、42.0 → "42"）
-                    return F.textNode(plainFloatText(val.doubleValue()));
+                    return F.stringNode(plainFloatText(val.doubleValue()));
                 }
                 if (val.isIntegralNumber()) {
-                    return F.textNode(String.valueOf(val.longValue()));
+                    return F.stringNode(String.valueOf(val.longValue()));
                 }
                 break;
             }

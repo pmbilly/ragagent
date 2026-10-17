@@ -252,10 +252,10 @@ public class QdrantRetrieveRepository
             for (String field : List.of(FIELD_CHUNK_ID, FIELD_KNOWLEDGE_ID,
                     FIELD_KNOWLEDGE_BASE_ID, FIELD_SOURCE_ID)) {
                 createFieldIndex(name, field, QdrantRestClient.mapper().getNodeFactory()
-                        .textNode("keyword"));
+                        .stringNode("keyword"));
             }
             createFieldIndex(name, FIELD_IS_ENABLED,
-                    QdrantRestClient.mapper().getNodeFactory().textNode("bool"));
+                    QdrantRestClient.mapper().getNodeFactory().stringNode("bool"));
             ObjectNode textSchema = QdrantRestClient.object();
             textSchema.put("type", "text");
             textSchema.put("tokenizer", "multilingual");

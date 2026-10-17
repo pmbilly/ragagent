@@ -246,7 +246,7 @@ final class WikiIngestExtractDedup {
                 if (target == null || !target.isString()) {
                     continue;
                 }
-                String existingSlug = target.textValue();
+                String existingSlug = target.stringValue();
                 String reason = dedup.dedupMergeRejectReason(
                         item.getSlug(), existingSlug, itemCandidates.get(item.getSlug()));
                 if (reason != null && !reason.isEmpty()) {

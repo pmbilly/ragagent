@@ -499,7 +499,7 @@ public class RemoteApiChat implements LlmChatClient {
         if (node == null || !node.isString()) {
             return "";
         }
-        return node.textValue();
+        return node.stringValue();
     }
 
     private static boolean isBlank(String s) {

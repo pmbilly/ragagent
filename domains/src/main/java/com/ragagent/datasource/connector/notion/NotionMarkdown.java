@@ -498,7 +498,7 @@ final class NotionMarkdown {
         if (val == null || !val.isString()) {
             return "";
         }
-        return val.textValue();
+        return val.stringValue();
     }
 
     /** 取布尔字段；取不到回 {@code false}。 */
@@ -528,11 +528,11 @@ final class NotionMarkdown {
         }
         JsonNode typeNode = icon.get("type");
         if (typeNode == null || !typeNode.isString()
-                || !"emoji".equals(typeNode.textValue())) {
+                || !"emoji".equals(typeNode.stringValue())) {
             return "";
         }
         JsonNode emoji = icon.get("emoji");
-        return emoji != null && emoji.isString() ? emoji.textValue() : "";
+        return emoji != null && emoji.isString() ? emoji.stringValue() : "";
     }
 
     /** 文件对象 + 渲染后的 caption。 */
@@ -610,7 +610,7 @@ final class NotionMarkdown {
             return "";
         }
         JsonNode pageId = raw.get("page_id");
-        return pageId != null && pageId.isString() ? pageId.textValue() : "";
+        return pageId != null && pageId.isString() ? pageId.stringValue() : "";
     }
 
     /**

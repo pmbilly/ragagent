@@ -432,7 +432,7 @@ public class WikiIngestTaxonomy {
                         path.add("");
                         continue;
                     }
-                    path.add(seg.isString() ? seg.textValue() : seg.asString(""));
+                    path.add(seg.isString() ? seg.stringValue() : seg.asString(""));
                 }
             }
             out.put(slug, path);

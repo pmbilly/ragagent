@@ -77,9 +77,9 @@ public final class NotionBlock {
                 return block;
             }
             JsonNode idNode = node.get("id");
-            block.id = idNode != null && idNode.isString() ? idNode.textValue() : null;
+            block.id = idNode != null && idNode.isString() ? idNode.stringValue() : null;
             JsonNode typeNode = node.get("type");
-            block.type = typeNode != null && typeNode.isString() ? typeNode.textValue() : null;
+            block.type = typeNode != null && typeNode.isString() ? typeNode.stringValue() : null;
             JsonNode hasChildrenNode = node.get("has_children");
             block.hasChildren = hasChildrenNode != null && hasChildrenNode.asBoolean(false);
 

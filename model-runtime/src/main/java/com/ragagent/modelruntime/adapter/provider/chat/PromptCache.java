@@ -411,7 +411,7 @@ public final class PromptCache {
             return false;
         }
         if (content.isString()) {
-            String text = content.textValue();
+            String text = content.stringValue();
             if (text.isEmpty()) {
                 return false;
             }
@@ -483,7 +483,7 @@ public final class PromptCache {
     }
 
     private static String textOrEmpty(JsonNode node) {
-        return node != null && node.isString() ? node.textValue() : "";
+        return node != null && node.isString() ? node.stringValue() : "";
     }
 
 }

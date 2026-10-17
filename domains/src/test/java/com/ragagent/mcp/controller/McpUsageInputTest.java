@@ -134,10 +134,4 @@ class McpUsageInputTest {
         assertTrue(node.get("tools").size() <= 12, "字符预算必须挡住超量工具");
         assertEquals(20 - node.get("tools").size(), node.get("omitted_tools").asInt());
     }
-
-    private static List<String> iterableToList(java.util.Iterator<String> it) {
-        List<String> out = new ArrayList<>();
-        it.forEachRemaining(out::add);
-        return out;
-    }
 }

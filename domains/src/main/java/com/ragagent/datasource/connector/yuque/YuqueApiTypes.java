@@ -86,7 +86,7 @@ public final class YuqueApiTypes {
                     return new FlexibleStatus("");
                 }
                 if (node.isString()) {
-                    return new FlexibleStatus(node.textValue());
+                    return new FlexibleStatus(node.stringValue());
                 }
                 // 整数形态：解到 int64 语义，于是浮点 / 布尔 / 数组 / 对象会
                 // 大声失败，而不是被悄悄字符串化。
