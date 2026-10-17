@@ -7,7 +7,7 @@ import static com.ragagent.wiki.controller.WikiRequestSupport.q;
 import static com.ragagent.wiki.controller.WikiRequestSupport.requiredFieldErrors;
 import static com.ragagent.wiki.controller.WikiRequestSupport.sanitize;
 
-import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.domain.issue.WikiLintReport;
 import com.ragagent.wiki.service.page.WikiLintService;
@@ -16,7 +16,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -112,19 +111,19 @@ final class WikiMaintenanceOps {
 
         String issueId = sanitize(issueIdParam);
         if (issueId.isEmpty()) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "Issue ID is required");
+            throw BizException.badRequest("Issue ID is required");
         }
 
         JsonNode node = WikiRequestSupport.readJsonBody(json, rawBody);
         String bindingErrors = requiredFieldErrors(node, "Status");
         if (bindingErrors != null) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+            throw BizException.badRequest(
                     "Invalid request body: " + bindingErrors);
         }
         String status = node.path("status").asString();
 
         if (!"pending".equals(status) && !"ignored".equals(status) && !"resolved".equals(status)) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+            throw BizException.badRequest(
                     "Invalid status. Must be pending, ignored, or resolved");
         }
 

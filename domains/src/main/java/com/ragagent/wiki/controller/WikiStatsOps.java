@@ -8,8 +8,8 @@ import static com.ragagent.wiki.controller.WikiRequestSupport.q;
 import static com.ragagent.wiki.controller.WikiRequestSupport.query;
 import static com.ragagent.wiki.controller.WikiRequestSupport.trimSpace;
 
+import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.wiki.WikiIndex;
-import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.graph.WikiGraph;
 import com.ragagent.wiki.domain.page.WikiStats;
@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -99,12 +98,12 @@ final class WikiStatsOps {
             mode = WikiGraph.MODE_OVERVIEW;
         }
         if (!WikiGraph.MODE_OVERVIEW.equals(mode) && !WikiGraph.MODE_EGO.equals(mode)) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "mode must be 'overview' or 'ego'");
+            throw BizException.badRequest("mode must be 'overview' or 'ego'");
         }
 
         String center = trimSpace(request.getParameter("center"));
         if (WikiGraph.MODE_EGO.equals(mode) && center.isEmpty()) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "center is required when mode=ego");
+            throw BizException.badRequest("center is required when mode=ego");
         }
 
         int depth = GRAPH_DEFAULT_DEPTH;
@@ -112,7 +111,7 @@ final class WikiStatsOps {
         if (rawDepth != null && !rawDepth.isEmpty()) {
             Integer parsed = atoiOrNull(rawDepth);
             if (parsed == null || parsed < 1) {
-                throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+                throw BizException.badRequest(
                         "depth must be a positive integer");
             }
             if (parsed > GRAPH_MAX_DEPTH) {
@@ -126,7 +125,7 @@ final class WikiStatsOps {
         if (rawLimit != null && !rawLimit.isEmpty()) {
             Integer parsed = atoiOrNull(rawLimit);
             if (parsed == null || parsed < 1) {
-                throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+                throw BizException.badRequest(
                         "limit must be a positive integer");
             }
             if (parsed > GRAPH_MAX_LIMIT) {
@@ -178,7 +177,7 @@ final class WikiStatsOps {
 
         String searchQuery = q(request, "q");
         if (searchQuery.isEmpty()) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "Search query 'q' is required");
+            throw BizException.badRequest("Search query 'q' is required");
         }
         int limit = atoi(query(request, "limit", "10"));
 

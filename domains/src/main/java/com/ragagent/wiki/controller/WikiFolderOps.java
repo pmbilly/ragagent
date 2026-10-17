@@ -7,8 +7,8 @@ import static com.ragagent.wiki.controller.WikiRequestSupport.requiredFieldError
 import static com.ragagent.wiki.controller.WikiRequestSupport.sanitize;
 import static com.ragagent.wiki.controller.WikiRequestSupport.trimSpace;
 
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.folder.WikiFolder;
 import com.ragagent.wiki.domain.folder.WikiFolderCreateRequest;
@@ -101,7 +101,7 @@ final class WikiFolderOps {
 
         String folderId = sanitize(folderIdParam);
         if (folderId.isEmpty()) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "Folder ID is required");
+            throw BizException.badRequest("Folder ID is required");
         }
         WikiFolderUpdateRequest req = WikiRequestSupport.bind(json, rawBody, WikiFolderUpdateRequest.class);
 
@@ -123,7 +123,7 @@ final class WikiFolderOps {
 
         String folderId = sanitize(folderIdParam);
         if (folderId.isEmpty()) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "Folder ID is required");
+            throw BizException.badRequest("Folder ID is required");
         }
         try {
             wikiService.deleteFolder(kbId, folderId);
@@ -144,7 +144,7 @@ final class WikiFolderOps {
         JsonNode node = WikiRequestSupport.readJsonBody(json, rawBody);
         String bindingErrors = requiredFieldErrors(node, "Slug");
         if (bindingErrors != null) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+            throw BizException.badRequest(
                     "Invalid request body: " + bindingErrors);
         }
         WikiPageMoveRequest req = WikiRequestSupport.toType(json, node, WikiPageMoveRequest.class);
@@ -152,7 +152,7 @@ final class WikiFolderOps {
         String slug = trimSpace(req.slug());
         if (slug.isEmpty()) {
             // 必填校验已挡住空 slug，此分支实际不可达（防御性保留）
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "Page slug is required");
+            throw BizException.badRequest("Page slug is required");
         }
 
         WikiPage page;

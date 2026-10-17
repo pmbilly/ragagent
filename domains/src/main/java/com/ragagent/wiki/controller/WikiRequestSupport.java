@@ -1,11 +1,11 @@
 package com.ragagent.wiki.controller;
 
+import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.RequestFields;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
 import com.ragagent.wiki.domain.folder.WikiFolderConflictException;
 import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;
 import com.ragagent.wiki.domain.folder.WikiFolderNotFoundException;
@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -148,9 +147,9 @@ final class WikiRequestSupport {
         return ResponseEntity.status(status).body(body);
     }
 
-    /** 500 错误：{@code {"error": <异常消息>}} 形态。 */
-    static RawJsonError internal(String message) {
-        return new RawJsonError(HttpStatus.INTERNAL_SERVER_ERROR.value(), message);
+    /** 500 错误。 */
+    static BizException internal(String message) {
+        return BizException.internal(message);
     }
 
     /** 单键 {@code {"message":...}} 响应。 */
@@ -173,12 +172,12 @@ final class WikiRequestSupport {
      * 文件夹/页面的 sentinel error → 状态码。
      * 其余错误一律 500，文案取异常消息。
      */
-    static RawJsonError mapFolderError(RuntimeException e) {
+    static BizException mapFolderError(RuntimeException e) {
         if (e instanceof WikiFolderNotFoundException || e instanceof WikiPageNotFoundException) {
-            return new RawJsonError(HttpStatus.NOT_FOUND.value(), errText(e));
+            return BizException.notFound(errText(e));
         }
         if (e instanceof WikiFolderConflictException || e instanceof WikiFolderNotEmptyException) {
-            return new RawJsonError(HttpStatus.CONFLICT.value(), errText(e));
+            return BizException.conflict(errText(e));
         }
         return internal(errText(e));
     }
@@ -191,7 +190,7 @@ final class WikiRequestSupport {
      */
     static JsonNode readJsonBody(ObjectMapper json, String rawBody) {
         if (rawBody == null || rawBody.isBlank()) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "Invalid request body: EOF");
+            throw BizException.badRequest("Invalid request body: EOF");
         }
         try {
             JsonNode node = json.readTree(rawBody);
@@ -201,14 +200,14 @@ final class WikiRequestSupport {
                 return json.createObjectNode();
             }
             if (!node.isObject()) {
-                throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+                throw BizException.badRequest(
                         "Invalid request body: " + ToolJson.expectedObjectMessage(node));
             }
             return node;
-        } catch (RawJsonError e) {
+        } catch (BizException e) {
             throw e;
         } catch (Exception e) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+            throw BizException.badRequest(
                     "Invalid request body: " + e.getMessage());
         }
     }
@@ -218,7 +217,7 @@ final class WikiRequestSupport {
         try {
             return json.treeToValue(node, type);
         } catch (Exception e) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+            throw BizException.badRequest(
                     "Invalid request body: " + e.getMessage());
         }
     }

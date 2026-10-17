@@ -1,9 +1,7 @@
 package com.ragagent.wiki.controller;
 
 import com.ragagent.contract.audit.WikiActivityAudit;
-import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
-import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.wiki.service.page.WikiLintService;
 import com.ragagent.wiki.service.page.WikiPageService;
@@ -12,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -236,37 +233,4 @@ public class WikiPageController {
     }
 
     // ── 守卫 / 校验 ──
-
-
-
-    /**
-     * handler 直写的 raw JSON 错误
-     * ——它与全局错误信封（{@code {"success":false,"error":{...}}}）形态不同，
-     * 所以不能走 BizException。
-     */
-    static final class RawJsonError extends RuntimeException {
-
-        private final int status;
-
-        RawJsonError(int status, String errorMessage) {
-            super(errorMessage);
-            this.status = status;
-        }
-
-        int status() {
-            return status;
-        }
-    }
-
-    /**
-     * 裸错误（{@link RawJsonError}）→ <b>统一外壳</b>。
-     *
-     * <p>码值取 {@link AppError#ofHttpStatus} 的通用段（400/403/404 ⇒ 1010/1002/1003），
-     * HTTP 状态码按原样返回；守卫/ops 仍抛 {@link RawJsonError} 经此处转换。</p>
-     */
-    @ExceptionHandler(RawJsonError.class)
-    public ResponseEntity<ApiResponse<Void>> handleRawJsonError(RawJsonError ex) {
-        AppError err = AppError.ofHttpStatus(ex.status(), ex.getMessage());
-        return ResponseEntity.status(ex.status()).body(ApiResponse.fail(err.code(), err.message()));
-    }
 }

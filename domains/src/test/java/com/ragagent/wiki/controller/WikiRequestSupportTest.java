@@ -1,7 +1,9 @@
 package com.ragagent.wiki.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.contract.error.BizException;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
@@ -13,15 +15,20 @@ class WikiRequestSupportTest {
     @Test
     void nonObjectBodyYieldsJsonTypeName() {
         assertThatThrownBy(() -> WikiRequestSupport.readJsonBody(MAPPER, "[1,2]"))
-                .isInstanceOf(WikiPageController.RawJsonError.class)
-                .hasMessage("Invalid request body: expected JSON object, got array");
+                .isInstanceOf(BizException.class)
+                .satisfies(e -> assertThat(((BizException) e).appError().message())
+                        .isEqualTo("Invalid request body: expected JSON object, got array"));
         assertThatThrownBy(() -> WikiRequestSupport.readJsonBody(MAPPER, "\"s\""))
-                .hasMessage("Invalid request body: expected JSON object, got string");
+                .isInstanceOf(BizException.class)
+                .satisfies(e -> assertThat(((BizException) e).appError().message())
+                        .isEqualTo("Invalid request body: expected JSON object, got string"));
     }
 
     @Test
     void emptyBodyKeepsEofMessage() {
         assertThatThrownBy(() -> WikiRequestSupport.readJsonBody(MAPPER, " "))
-                .hasMessage("Invalid request body: EOF");
+                .isInstanceOf(BizException.class)
+                .satisfies(e -> assertThat(((BizException) e).appError().message())
+                        .isEqualTo("Invalid request body: EOF"));
     }
 }

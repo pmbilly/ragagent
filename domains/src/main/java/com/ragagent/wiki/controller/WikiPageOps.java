@@ -13,10 +13,10 @@ import static com.ragagent.wiki.controller.WikiRequestSupport.query;
 import static com.ragagent.wiki.controller.WikiRequestSupport.requiredFieldErrors;
 import static com.ragagent.wiki.controller.WikiRequestSupport.trimSpace;
 
+import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageConflictException;
 import com.ragagent.wiki.domain.page.WikiPageListRequest;
@@ -127,11 +127,11 @@ final class WikiPageOps {
         page.setPageType(trimSpace(page.getPageType()));
         page.setStatus(trimSpace(page.getStatus()));
         if (!page.getPageType().isEmpty() && !WikiConstants.isValidPageType(page.getPageType())) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+            throw BizException.badRequest(
                     "Invalid page_type: " + page.getPageType());
         }
         if (!page.getStatus().isEmpty() && !WikiConstants.isValidPageStatus(page.getStatus())) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+            throw BizException.badRequest(
                     "Invalid status: " + page.getStatus());
         }
 
@@ -158,14 +158,14 @@ final class WikiPageOps {
 
         String slug = getSlugParam(slugParam);
         if (slug.isEmpty()) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "Page slug is required");
+            throw BizException.badRequest("Page slug is required");
         }
 
         WikiPage page;
         try {
             page = wikiService.getPageBySlug(kbId, slug);
         } catch (WikiPageNotFoundException e) {
-            throw new RawJsonError(HttpStatus.NOT_FOUND.value(), "Wiki page not found");
+            throw BizException.notFound("Wiki page not found");
         } catch (RuntimeException e) {
             throw internal(errText(e));
         }
@@ -188,7 +188,7 @@ final class WikiPageOps {
 
         String slug = getSlugParam(slugParam);
         if (slug.isEmpty()) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "Page slug is required");
+            throw BizException.badRequest("Page slug is required");
         }
 
         WikiPageUpdateRequest req = WikiRequestSupport.bind(json, rawBody, WikiPageUpdateRequest.class);
@@ -204,7 +204,7 @@ final class WikiPageOps {
         try {
             existing = wikiService.getPageBySlug(kbId, slug);
         } catch (WikiPageNotFoundException e) {
-            throw new RawJsonError(HttpStatus.NOT_FOUND.value(), "Wiki page not found");
+            throw BizException.notFound("Wiki page not found");
         } catch (RuntimeException e) {
             throw internal(errText(e));
         }
@@ -232,14 +232,14 @@ final class WikiPageOps {
         if (req.pageType() != null) {
             existing.setPageType(trimSpace(req.pageType()));
             if (!WikiConstants.isValidPageType(existing.getPageType())) {
-                throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+                throw BizException.badRequest(
                         "Invalid page_type: " + existing.getPageType());
             }
         }
         if (req.status() != null) {
             existing.setStatus(trimSpace(req.status()));
             if (!WikiConstants.isValidPageStatus(existing.getStatus())) {
-                throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+                throw BizException.badRequest(
                         "Invalid status: " + existing.getStatus());
             }
         }
@@ -251,9 +251,9 @@ final class WikiPageOps {
         try {
             updated = wikiService.updatePage(existing);
         } catch (WikiPageNotFoundException e) {
-            throw new RawJsonError(HttpStatus.NOT_FOUND.value(), "Wiki page not found");
+            throw BizException.notFound("Wiki page not found");
         } catch (WikiPageConflictException e) {
-            throw new RawJsonError(HttpStatus.CONFLICT.value(),
+            throw BizException.conflict(
                     "Wiki page was modified by someone else");
         } catch (RuntimeException e) {
             throw internal(errText(e));
@@ -277,7 +277,7 @@ final class WikiPageOps {
 
         String slug = getSlugParam(slugParam);
         if (slug.isEmpty()) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "Page slug is required");
+            throw BizException.badRequest("Page slug is required");
         }
 
         WikiPage page = null;
@@ -290,7 +290,7 @@ final class WikiPageOps {
         try {
             wikiService.deletePage(kbId, slug);
         } catch (WikiPageNotFoundException e) {
-            throw new RawJsonError(HttpStatus.NOT_FOUND.value(), "Wiki page not found");
+            throw BizException.notFound("Wiki page not found");
         } catch (RuntimeException e) {
             throw internal(errText(e));
         }
@@ -314,20 +314,20 @@ final class WikiPageOps {
 
         String slug = getSlugParam(slugParam);
         if (slug.isEmpty()) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "Page slug is required");
+            throw BizException.badRequest("Page slug is required");
         }
 
         String rawVersion = request.getParameter("version");
         if (rawVersion != null && !rawVersion.isEmpty()) {
             Integer version = atoiOrNull(rawVersion);
             if (version == null || version < 1) {
-                throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "Invalid version");
+                throw BizException.badRequest("Invalid version");
             }
             WikiPageRevision rev;
             try {
                 rev = wikiService.getRevision(kbId, slug, version);
             } catch (WikiPageNotFoundException e) {
-                throw new RawJsonError(HttpStatus.NOT_FOUND.value(), "Wiki page revision not found");
+                throw BizException.notFound("Wiki page revision not found");
             } catch (RuntimeException e) {
                 throw internal(errText(e));
             }
@@ -350,7 +350,7 @@ final class WikiPageOps {
         try {
             resp = wikiService.listRevisions(kbId, slug, limit, offset);
         } catch (WikiPageNotFoundException e) {
-            throw new RawJsonError(HttpStatus.NOT_FOUND.value(), "Wiki page not found");
+            throw BizException.notFound("Wiki page not found");
         } catch (RuntimeException e) {
             throw internal(errText(e));
         }
@@ -372,17 +372,17 @@ final class WikiPageOps {
         JsonNode node = WikiRequestSupport.readJsonBody(json, rawBody);
         String bindingErrors = requiredFieldErrors(node, "Slug", "Version");
         if (bindingErrors != null) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+            throw BizException.badRequest(
                     "Invalid request body: " + bindingErrors);
         }
         WikiPageRevertRequest req = WikiRequestSupport.toType(json, node, WikiPageRevertRequest.class);
 
         String slug = trimSpace(req.slug());
         if (slug.isEmpty()) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "Page slug is required");
+            throw BizException.badRequest("Page slug is required");
         }
         if (req.version() < 1) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), "Invalid version");
+            throw BizException.badRequest("Invalid version");
         }
 
         WikiPage updated;
@@ -390,12 +390,12 @@ final class WikiPageOps {
             // 回滚编辑以"revert"来源归属这次编辑
             updated = wikiService.revertPageToVersion(kbId, slug, req.version());
         } catch (WikiPageNotFoundException e) {
-            throw new RawJsonError(HttpStatus.NOT_FOUND.value(), "Wiki page or revision not found");
+            throw BizException.notFound("Wiki page or revision not found");
         } catch (WikiPageConflictException e) {
-            throw new RawJsonError(HttpStatus.CONFLICT.value(),
+            throw BizException.conflict(
                     "Wiki page was modified by someone else");
         } catch (WikiRevertToCurrentVersionException e) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(), errText(e));
+            throw BizException.badRequest(errText(e));
         } catch (RuntimeException e) {
             throw internal(errText(e));
         }

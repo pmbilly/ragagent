@@ -6,9 +6,7 @@ import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 
 /**
  * WikiPageController 的 KB 访问与所有权守卫：API-Key 数据面白名单、租户判定、
@@ -48,7 +46,7 @@ final class WikiKbAccessGuard {
      */
     KnowledgeBaseView requireWikiKB(String kbId, boolean write) {
         if (kbId == null || kbId.isEmpty()) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+            throw BizException.badRequest(
                     WikiRequestSupport.appErrorText(400, "Knowledge base ID is required"));
         }
 
@@ -79,7 +77,7 @@ final class WikiKbAccessGuard {
         }
 
         if (!kb.isWikiEnabled()) {
-            throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
+            throw BizException.badRequest(
                     WikiRequestSupport.appErrorText(400, "Wiki feature is not enabled for this knowledge base"));
         }
         return kb;
