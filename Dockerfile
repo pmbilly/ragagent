@@ -15,8 +15,10 @@ FROM gradle:8.14-jdk21 AS builder
 WORKDIR /build
 
 # 先拷贝构建脚本与依赖清单，最大化层缓存
-COPY settings.gradle.kts build.gradle.kts gradlew gradlew.bat ./
+COPY settings.gradle.kts build.gradle.kts gradle.properties gradlew gradlew.bat ./
 COPY gradle ./gradle
+# includeBuild("build-logic")：各模块的 ragagent.java-conventions 约定插件在这里，漏拷即配置阶段失败
+COPY build-logic ./build-logic
 # proto 源目录是生成代码的唯一来源（:common 的 OTLP、:domains 的 docreader）——漏拷即编译失败
 COPY otlp-proto ./otlp-proto
 COPY docreader ./docreader
