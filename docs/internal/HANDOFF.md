@@ -66,7 +66,7 @@
 
 | 批 | 内容 | 状态 |
 |---|---|---|
-| **L1** | 迁移叙事清零（退役/旧/历史/备案/已知差异/Go，共 769 处） | 待做 |
+| **L1** | 迁移叙事清零（退役/旧/历史/备案/已知差异/Go，共 769 处） | 🔄 守卫上线 · 196→173（L1b 清 23 处） |
 | **L2** | 行号与 Go 语法锚点（`L141-144`/`uuid.New()`/旧模块名 `common`）+ 构建脚本批次号 | 待做 |
 | **L3** | 修 7 处文档失真（README ×4 + 3 个类注释） | 待做 |
 | **L4** | 补 156 个 `package-info`（职责/依赖/从哪读起） | 待做 |
@@ -123,7 +123,8 @@
   ```bash
   cd ~/ragagent && env -u SYSTEM_AES_KEY JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./gradlew spotlessCheck build
   ```
-  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（最近基数 **4996 / 失败 0 / 跳过 4**）。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
+  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（最近基数 **5022 / 失败 0 / 跳过 4**，含 agent-engine 155 条——旧口径 4867 漏算该模块）。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
+  **环境前置**：PG `max_connections=100`，多个 boot jar 残留会占满连接（实测 5 个实例 = 50 条 ⇒ `too many clients`）。跑闸门前先 `ps -Ao pid,command | grep '[b]oot/build/libs/boot'` 清残留。
 - 前端（触契约时）：`cd frontend && npx vue-tsc --build --force` + `npm test`。
 
 ## 7. 测试与安全网
@@ -297,6 +298,9 @@ boot           14 件                      →  boot
 | R1 收官 | 2026-10-16 | **R1 余项判定**（勘察取证 + 用户拍板）：① 检索公开面 → **并入 R3**（域侧直注实现类 `CompositeRetrieveEngine`12/`HybridSearchService`10/`VectorStoreService`9；索引面签名穿透 `Embedder`{模型族}与可变 setter `IndexInfo`；方案点名的 SearchHit/IndexService/SearchPolicy 全仓无对应物、域侧无消费者）② `contract.agent` 6 件 → **并入 R5**（跨域消费者仅 `boot/.../EngineRecordingTest`；AgentEngine 唯一生产调用方 `SessionAgentQaService` 在同模块；六件全仓无对应物）③ `contract.execution` → **判"不建"**（`contract.tool.ToolCancellation`/`ToolExecContext` 已在，引擎另有 `Supplier<String> cancellationSource`；进度为事件流无 sink 需求） | 判定入 §2.9 + 计划 v2 R1 行；R5 新情报：`AgentEngine` 直连 `platform.tracing.langfuse` 与 `platform.access/event`（拆 agent 时 platform 边比 engine 边重） |
 | R1b-1 | 2026-10-16 | 契约面先行第二件：`retrieval.domain` 整包 4 件（WebSearchResult/Filters/Request/ImageInfo）→ `contract.websearch`（§8.1 目标落点）；ImageInfo 注解对位进 `ContractJsonMixinsWebSearch`；修 `AgentReferencesData` 陈旧 javadoc | 15 守卫绿 · 金片 1349 一致 · json-key 换锚 `--write`（离开 1 / 进入 1）· gate 1m57s / **4996 / 失败 0 / 跳过 4** · 冒烟 200；首轮闸门 `ImRedisStoreTest` 单例失败 → 隔离重跑 7/0 绿（已知 Redis 瞬态族） |
 | R1a | 2026-10-16 | 契约面先行第一件：`llm.domain` 11 件聊天形状 `git mv` → `contract.model.chat`（ChatMessage/ChatOptions/ChatResponse/ChatTool/FunctionCall/FunctionDef/ImageUrl/MessageContentPart/ToolCall/CacheRetention/ChatConfig）+ Jackson 注解逐条对位进 `platform.web.ContractJsonMixinsModelChat`（ContractJsonModule 注册）+ 4 处不透明 JSON 字段改 `Object`（format/parameters/providerMetadata）· **逐件过跨域消费者判据**（ImageUrl 为 MessageContentPart 公开形状件随迁；StreamResponse/ProviderMetadataMaps 留 R2 公开面分层） | 15 守卫全绿（金片 1349 一致 · R10 无新增边 · C8 无新增）· json-key 换锚 `--write`（离开 5 / 进入 1，均换包）· gate 2m15s / **4996 / 失败 0 / 跳过 4** · 定向 engine 456 + domains 266 · 冒烟 sessions/knowledge-bases/models 200（后端已重启） |
+
+| L1a | 2026-10-18 | **迁移叙事守卫上线（v0.5.0 起点）**：新增 `scripts/check-comment-narrative.py`（只扫注释行；拦退役/备案/Go 锚点/迁移期/旧实现五类；基线 196 处 / 147 文件，棘轮只许减）；红态探针（`BaseTool` 加一行叙事 → 红 → 恢复绿）；接入 `run-guards.sh`（**24 守卫**）；新增 `docs/internal/plans/readability-remediation-v0.5.0.md`（L1~L22）并登记 §5.0。 | **24 守卫全绿**（纯脚本/文档，全量闸门并入 L1b 验证） |
+| L1b | 2026-10-18 | **迁移叙事清理第一批（mcp / vectorstore / wiki）**：23 处 / 12 文件——历史说明删除、当前约束改成现在时、业务语义换中性词（连接"退役"→"关闭"、工具"退役"→"从快照移除"）；顺带修正 `WikiPageController` 引用的已不存在包 `com.ragagent.org`；基线 196 → 173。 | **24 守卫** · **5022 / 0 / 4** · spotlessCheck build 1m58s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
