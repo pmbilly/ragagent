@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -26,7 +29,9 @@ import tools.jackson.databind.ObjectMapper;
  *
  * <p><b>录制时用本机时区（CST +0800）而不是 UTC</b>——
  * Java 侧 {@code ZeroTimeSerializer} 把时间归一化到 JVM 默认时区，
- * 用 UTC 录的话两边会差一个时区偏移，那是**录制方法**的问题不是实现的问题。</p>
+ * 用 UTC 录的话两边会差一个时区偏移，那是**录制方法**的问题不是实现的问题。
+ * 同理，本类在 {@code @BeforeAll} 把 JVM 时区钉到 {@code Asia/Shanghai}：
+ * 否则 UTC 机器（CI）上序列化出 {@code Z}，与期望的 {@code +08:00} 差 8 小时。</p>
  *
  * <p>这份语料同时钉住三件容易看走眼的事：</p>
  * <ol>
@@ -40,6 +45,9 @@ class AgentStepsJsonTest {
     /** 键名 = Java 字段名（camelCase，无逐字段注解）：裸 mapper（本类型的两个时间方法自带序列化器，不需要 JavaTimeModule）。 */
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
+    /** 语料按 CST 录制（见类注释）：本类跑之前钉住、跑完还原。 */
+    private static TimeZone originalZone;
+
     /** 本机时区，见类注释。 */
     private static OffsetDateTime localTime(int hour) {
         return java.time.ZonedDateTime.of(2026, 9, 18, hour, 0, 0, 0, ZoneId.systemDefault())
@@ -48,6 +56,17 @@ class AgentStepsJsonTest {
 
     private static String write(Object value) throws Exception {
         return MAPPER.writeValueAsString(value);
+    }
+
+    @BeforeAll
+    static void pinZone() {
+        originalZone = TimeZone.getDefault();
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
+    }
+
+    @AfterAll
+    static void restoreZone() {
+        TimeZone.setDefault(originalZone);
     }
 
     // ── 场景 1：满字段 ──────────────────────────────────────────────────────
