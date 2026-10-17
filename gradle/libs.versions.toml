@@ -2,7 +2,7 @@
 #
 # 起因：Boot BOM、mybatis-plus starter、protobuf / neo4j / sqlite / archunit 等
 # 曾在多个模块各写一遍 —— 升级时漏改一处就是「模块间版本漂移」，而且只在运行期才暴露。
-# 当前目标线：Spring Boot 3.5.16 / MyBatis-Plus 3.5.17 / springdoc 2.8.17。
+# 当前目标线：Spring Boot 4.1.1 / MyBatis-Plus 3.5.17 / springdoc 3.1.1。
 #
 # 范围（刻意的）：只登记**带显式版本号**的坐标与插件。版本由 Boot BOM 统一管理的依赖
 # （starter-* / flyway / h2 / junit-platform-launcher / spring-security-crypto 等）**不**登记
@@ -11,7 +11,7 @@
 # 命名：别名用 kebab-case，Kotlin 访问器把 `-` 读作 `.`（`mybatis-plus-starter` → `libs.mybatis.plus.starter`）。
 
 [versions]
-spring-boot = "3.5.16"
+spring-boot = "4.1.1"
 spring-dependency-management = "1.1.6"
 protobufPlugin = "0.9.4"
 spotless = "8.10.3"
@@ -30,7 +30,7 @@ jtokkit = "1.1.0"
 aliyun-oss = "3.18.1"
 qcloud-cos = "5.6.227"
 volcengine-tos = "2.9.19"
-springdoc = "2.8.17"
+springdoc = "3.1.1"
 swagger-annotations = "2.2.22"
 
 [libraries]
@@ -38,7 +38,7 @@ swagger-annotations = "2.2.22"
 spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 
 # ── 跨模块共享 ─────────────────────────────────────────────────────────────
-mybatis-plus-starter = { module = "com.baomidou:mybatis-plus-spring-boot3-starter", version.ref = "mybatis-plus" }
+mybatis-plus-starter = { module = "com.baomidou:mybatis-plus-spring-boot4-starter", version.ref = "mybatis-plus" }
 mybatis-plus-jsqlparser = { module = "com.baomidou:mybatis-plus-jsqlparser", version.ref = "mybatis-plus" }
 protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
 protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }

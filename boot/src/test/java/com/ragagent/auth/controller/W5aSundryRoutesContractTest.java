@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
@@ -316,22 +316,22 @@ class W5aSundryRoutesContractTest {
         return m.group(1);
     }
 
-    private void assertGolden(MockHttpServletRequestBuilder req, int status, String goldenName)
+    private void assertGolden(org.springframework.test.web.servlet.RequestBuilder req, int status, String goldenName)
             throws Exception {
         expect(status, req, goldenName, s -> s);
     }
 
-    private void assertGolden(MockHttpServletRequestBuilder req, int status, String goldenName,
+    private void assertGolden(org.springframework.test.web.servlet.RequestBuilder req, int status, String goldenName,
                               UnaryOperator<String> extraMask) throws Exception {
         expect(status, req, goldenName, extraMask);
     }
 
-    private MvcResult expect(int status, MockHttpServletRequestBuilder req, String goldenName)
+    private MvcResult expect(int status, org.springframework.test.web.servlet.RequestBuilder req, String goldenName)
             throws Exception {
         return expect(status, req, goldenName, s -> s);
     }
 
-    private MvcResult expect(int status, MockHttpServletRequestBuilder req, String goldenName,
+    private MvcResult expect(int status, org.springframework.test.web.servlet.RequestBuilder req, String goldenName,
                              UnaryOperator<String> extraMask) throws Exception {
         MvcResult r = mockMvc.perform(req).andReturn();
         assertEquals(status, r.getResponse().getStatus(), goldenName + " 状态码不符: " + raw(r));

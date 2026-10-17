@@ -38,8 +38,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -932,7 +932,7 @@ class DataSourceHttpContractTest {
         return m.group(1);
     }
 
-    private MvcResult perform(MockHttpServletRequestBuilder builder) throws Exception {
+    private MvcResult perform(org.springframework.test.web.servlet.RequestBuilder builder) throws Exception {
         return mockMvc.perform(builder).andReturn();
     }
 

@@ -41,8 +41,10 @@ def main() -> int:
         if found != boot_mm:
             problems.append(f"V1 README 写的是 Spring Boot {found}，目录为 {boot}")
 
-    # V2 Boot 3.5 ↔ springdoc 2.8.x
-    if boot_mm == "3.5" and not springdoc.startswith("2.8."):
+    # V2 Boot 与 springdoc 对应线
+    if boot_mm == "4.1" and not springdoc.startswith("3.1."):
+        problems.append(f"V2 Boot {boot} 应配 springdoc 3.1.x，当前 {springdoc}")
+    elif boot_mm == "3.5" and not springdoc.startswith("2.8."):
         problems.append(f"V2 Boot {boot} 应配 springdoc 2.8.x，当前 {springdoc}")
 
     # V3 jsqlparser artifact 与 starter 共用版本引用

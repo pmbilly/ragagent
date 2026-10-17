@@ -8,10 +8,6 @@ server:
 spring:
   application:
     name: ragagent
-  jackson:
-    deserialization:
-      # 未知属性不报错（与 JsonMappers.lenient() 同一策略：落库/外部 JSON 常带旧键）
-      fail-on-unknown-properties: false
   servlet:
     multipart:
       # 上传限值 60MB：让 service 层的大小校验（50MB）先触发、给出业务化错误；

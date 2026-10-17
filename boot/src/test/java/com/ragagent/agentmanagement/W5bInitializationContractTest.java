@@ -20,8 +20,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -367,7 +367,7 @@ class W5bInitializationContractTest {
                         .multipart(url).header("Authorization", bearer);
     }
 
-    private MvcResult result(MockHttpServletRequestBuilder builder) throws Exception {
+    private MvcResult result(org.springframework.test.web.servlet.RequestBuilder builder) throws Exception {
         return mockMvc.perform(builder).andReturn();
     }
 
@@ -380,7 +380,7 @@ class W5bInitializationContractTest {
         return r;
     }
 
-    private void assertGolden(MockHttpServletRequestBuilder builder, int status, String golden)
+    private void assertGolden(org.springframework.test.web.servlet.RequestBuilder builder, int status, String golden)
             throws Exception {
         MvcResult r = mockMvc.perform(builder).andReturn();
         assertEquals(status, r.getResponse().getStatus(),

@@ -35,7 +35,8 @@ dependencies {
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-aop")
+    // Boot 4 移除了 starter-aop；AOP 代理由 spring-aop（context 传递）提供，补 AspectJ weaver
+    implementation("org.aspectj:aspectjweaver")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
     // 数据库

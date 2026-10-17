@@ -22,8 +22,8 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -397,7 +397,7 @@ class TenantCatalogContractTest {
     }
 
     /** 静态 golden：状态码 + 响应体逐字节。 */
-    private void assertGolden(MockHttpServletRequestBuilder req, int status, String goldenName)
+    private void assertGolden(org.springframework.test.web.servlet.RequestBuilder req, int status, String goldenName)
             throws Exception {
         MvcResult r = mockMvc.perform(req).andReturn();
         assertEquals(status, r.getResponse().getStatus(), goldenName + " 状态码不符: " + raw(r));
@@ -405,7 +405,7 @@ class TenantCatalogContractTest {
     }
 
     /** 掩码 golden：两侧同掩码后逐字节。 */
-    private void assertMasked(MockHttpServletRequestBuilder req, int status, String goldenName)
+    private void assertMasked(org.springframework.test.web.servlet.RequestBuilder req, int status, String goldenName)
             throws Exception {
         MvcResult r = mockMvc.perform(req).andReturn();
         assertEquals(status, r.getResponse().getStatus(), goldenName + " 状态码不符: " + raw(r));

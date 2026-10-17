@@ -22,8 +22,8 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -296,7 +296,7 @@ class AttachmentContractTest {
         return m.group(1);
     }
 
-    private MvcResult perform(MockHttpServletRequestBuilder builder) throws Exception {
+    private MvcResult perform(org.springframework.test.web.servlet.RequestBuilder builder) throws Exception {
         return mockMvc.perform(builder).andReturn();
     }
 

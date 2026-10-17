@@ -164,6 +164,12 @@ public class GlobalExceptionHandler {
             if (field != null) {
                 details = field + ": 类型不正确";
             }
+        } else if (cause instanceof tools.jackson.databind.exc.MismatchedInputException mie
+                && !mie.getPath().isEmpty()) {
+            String field = mie.getPath().get(mie.getPath().size() - 1).getPropertyName();
+            if (field != null) {
+                details = field + ": 类型不正确";
+            }
         }
         AppError e = new AppError(ErrorCode.BAD_REQUEST.value(), "请求参数不合法", details, 400);
         return respond(e, req);

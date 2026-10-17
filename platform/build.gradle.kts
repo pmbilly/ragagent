@@ -31,6 +31,8 @@ dependencies {
     // jakarta 六类，无云 SDK、无 jjwt、无 jdbc 驱动）—— 不用 starter 以免把自动配置漏进库。
     api("com.fasterxml.jackson.core:jackson-databind")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    // Boot 4 过渡期：GlobalExceptionHandler 需要识别 tools.jackson 的 MismatchedInputException
+    compileOnly("tools.jackson.core:jackson-databind")
     api("org.springframework:spring-context")
     api("org.springframework:spring-web")
     api("org.springframework:spring-webmvc")

@@ -14,12 +14,11 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
  * 契约测试：auth OIDC 4 端点（未配置 = disabled 分支全覆盖）。
@@ -124,7 +123,7 @@ class OidcContractTest {
     // ── 辅助 ──────────────────────────────────────────────────────────────
 
     /** 静态 golden：状态码 + 响应体逐字节。 */
-    private void assertGolden(MockHttpServletRequestBuilder req, int status, String goldenName)
+    private void assertGolden(org.springframework.test.web.servlet.RequestBuilder req, int status, String goldenName)
             throws Exception {
         MvcResult r = mockMvc.perform(req).andReturn();
         assertEquals(status, r.getResponse().getStatus(), goldenName + " 状态码不符: " + raw(r));
@@ -132,7 +131,7 @@ class OidcContractTest {
     }
 
     /** 302 信封 golden：MockMvc 结果组与录制脚本同构的信封 JSON 后逐字节比对。 */
-    private void assertEnvelope(MockHttpServletRequestBuilder req, String goldenName)
+    private void assertEnvelope(org.springframework.test.web.servlet.RequestBuilder req, String goldenName)
             throws Exception {
         MvcResult r = mockMvc.perform(req).andReturn();
         assertEquals(302, r.getResponse().getStatus(), goldenName + " 状态码不符: " + raw(r));

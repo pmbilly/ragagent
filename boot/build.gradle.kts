@@ -24,7 +24,11 @@ dependencies {
     // 组合根本身用到的 API（:domains 的 compileOnly/implementation 不会传递到编译面）
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-aop")
+    // Boot 4 移除了 starter-aop；AOP 代理由 spring-aop（context 传递）提供，补 AspectJ weaver
+    implementation("org.aspectj:aspectjweaver")
+    // 过渡期 Jackson 2 兼容：提供 com.fasterxml.jackson ObjectMapper bean，
+    // 让尚未迁 tools.jackson 的业务代码先跑起来；Jackson 3 迁移完成后删除。
+    implementation("org.springframework.boot:spring-boot-jackson2")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation(libs.mybatis.plus.starter)
     // OpenAPI JSON（dev-only，默认关闭；UI 由 boot 的 /scalar 页面承载）
@@ -36,6 +40,8 @@ dependencies {
     testImplementation(testFixtures(project(":domains")))
     testImplementation(testFixtures(project(":platform")))   // EmbeddedRedis（共享测试基座）
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    // Boot 4：@AutoConfigureMockMvc 迁到 spring-boot-webmvc-test
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     // 集成测试走内存库（与 :domains 同口径）。⚠️ testRuntimeOnly **不可传递** ⇒ 必须显式声明，
     // 否则测试会落到 application.yml 里的真 PG URL 上，TestSchema 的 H2 专有 DDL 直接 bad SQL grammar。
     testRuntimeOnly("com.h2database:h2")
