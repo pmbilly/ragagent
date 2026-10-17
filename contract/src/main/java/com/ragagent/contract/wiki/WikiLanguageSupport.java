@@ -32,9 +32,7 @@ public final class WikiLanguageSupport {
     /** 当前请求 locale 的线程本地承载 */
     private static final ThreadLocal<String> CURRENT_LOCALE = new ThreadLocal<>();
 
-    // ═══════════════════════════════════════════════════════════════
     // locale 上下文
-    // ═══════════════════════════════════════════════════════════════
 
     /** 设置当前请求的 locale（空值 = 清除）。 */
     public static void setCurrentLocale(String locale) {
@@ -56,9 +54,7 @@ public final class WikiLanguageSupport {
         return v == null ? "" : v;
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 解析
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 部署默认语言的原始值（{@code WEKNORA_LANGUAGE}）——**启动期快照**。

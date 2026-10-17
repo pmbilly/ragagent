@@ -70,9 +70,7 @@ public class WikiIngestService implements WikiIngestPort {
     /** 默认索引导语；现有导语为空或等于它时按"首次生成"处理。 */
     static final String LEGACY_INDEX_PLACEHOLDER = "Wiki index - table of contents";
 
-    // ═══════════════════════════════════════════════════════════════
     // 依赖
-    // ═══════════════════════════════════════════════════════════════
 
     final WikiPageService wikiService;
     final TaskPendingOpsRepository pendingRepo;
@@ -230,9 +228,7 @@ public class WikiIngestService implements WikiIngestPort {
         this.llm = new WikiIngestLlmSupport(this);
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 模式判定 / Lite 锁
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 是否处于 "Lite 模式"（没有跨进程协调）。
@@ -289,9 +285,7 @@ public class WikiIngestService implements WikiIngestPort {
         liteFinalizeLocks.remove(kbId);
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 任务分派
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 按任务类型分派。
@@ -322,9 +316,7 @@ public class WikiIngestService implements WikiIngestPort {
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 清理作用域
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 开一个脱钩的清理作用域。
@@ -347,9 +339,7 @@ public class WikiIngestService implements WikiIngestPort {
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 投递 / Finalize 通道（实现移至 WikiIngestEnqueueOps，门面薄委托）
-    // ═══════════════════════════════════════════════════════════════
 
     public boolean enqueueWikiPendingOp(TaskPendingOp op) {
         return enqueueOps.enqueueWikiPendingOp(op);
@@ -404,9 +394,7 @@ public class WikiIngestService implements WikiIngestPort {
         return enqueueOps.scheduleStaleClaimRecheck(payload);
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 队列消费（实现移至 WikiIngestQueueOps，门面薄委托）
-    // ═══════════════════════════════════════════════════════════════
 
     public PendingBatch peekPendingList(String kbId, int limit) {
         return queueOps.peekPendingList(kbId, limit);
@@ -428,9 +416,7 @@ public class WikiIngestService implements WikiIngestPort {
         queueOps.trimPendingListDetached(ids);
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 失败结算（实现移至 WikiIngestSettleOps，门面薄委托）
-    // ═══════════════════════════════════════════════════════════════
 
     public void finalizeWikiSubtask(String knowledgeId) {
         settleOps.finalizeWikiSubtask(knowledgeId);
@@ -444,9 +430,7 @@ public class WikiIngestService implements WikiIngestPort {
         return settleOps.requeueFailedOpsDetached(payload, ops);
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 文档存活与正文重建（实现移至 WikiIngestContentSupport，门面薄委托）
-    // ═══════════════════════════════════════════════════════════════
 
     public boolean isKnowledgeGone(String kbId, String knowledgeId) {
         return contentOps.isKnowledgeGone(kbId, knowledgeId);
@@ -468,16 +452,12 @@ public class WikiIngestService implements WikiIngestPort {
 
 
 
-    // ═══════════════════════════════════════════════════════════════
     // 队列消费
-    // ═══════════════════════════════════════════════════════════════
 
     /** 窥视/认领结果：解码后的 op 列表 + 被触及的原始行 id。 */
     public record PendingBatch(List<WikiPendingOp> ops, List<Long> peekedIds) {}
 
-    // ═══════════════════════════════════════════════════════════════
     // 锁与限流
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 把对<b>同一个共享 wiki 页面</b>的

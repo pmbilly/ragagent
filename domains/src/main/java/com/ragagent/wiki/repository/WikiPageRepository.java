@@ -98,7 +98,7 @@ public class WikiPageRepository {
         return postgres;
     }
 
-    // ──────────────────────────── 结果载体 ────────────────────────────
+    // ── 结果载体 ──
 
     /** 列表查询结果：当前页数据 + 过滤后的总数。 */
     public record PageList(List<WikiPage> pages, long total) {}
@@ -112,7 +112,7 @@ public class WikiPageRepository {
     /** 修订列表结果：本页快照 + 总数。 */
     public record RevisionList(List<WikiPageRevision> revisions, long total) {}
 
-    // ──────────────────────────── 页面写入 ────────────────────────────
+    // ── 页面写入 ──
 
     /** 自动时间戳语义：只补 null，不覆盖已赋值 */
     private static void touch(WikiPage page) {
@@ -219,7 +219,7 @@ public class WikiPageRepository {
         }
     }
 
-    // ──────────────────────────── 页面读取 ────────────────────────────
+    // ── 页面读取 ──
 
     public WikiPage getByID(String id) {
         WikiPage page = pages.selectLiveById(id);
@@ -337,7 +337,7 @@ public class WikiPageRepository {
         return pages.listByTypeRecent(kbId, pageType, WikiConstants.STATUS_ARCHIVED, lim);
     }
 
-    // ──────────────────────── source_refs 溯源 ────────────────────────
+    // ── source_refs 溯源 ──
 
     /**
      * 找出引用了指定 source knowledge id 的页面。
@@ -456,7 +456,7 @@ public class WikiPageRepository {
         return new CursorPage(rows, nextCursor);
     }
 
-    // ──────────────────────────── 相似度匹配 ────────────────────────────
+    // ── 相似度匹配 ──
 
     /**
      * PG {@code pg_trgm} 三元组相似度检索。
@@ -567,7 +567,7 @@ public class WikiPageRepository {
         return new ArrayList<>(seen);
     }
 
-    // ──────────────────────────── 全量 / 删除 ────────────────────────────
+    // ── 全量 / 删除 ──
 
     /** 非归档，page_type ASC, title ASC */
     public List<WikiPage> listAll(String kbId) {
@@ -599,7 +599,7 @@ public class WikiPageRepository {
         }
     }
 
-    // ──────────────────────────── 检索 / 统计 ────────────────────────────
+    // ── 检索 / 统计 ──
 
     /**
      * 按命中位置排序的全文检索。
@@ -636,7 +636,7 @@ public class WikiPageRepository {
                 WikiConstants.PAGE_TYPE_INDEX);
     }
 
-    // ──────────────────────────── 修订历史 ────────────────────────────
+    // ── 修订历史 ──
 
     /** 最新在前，content 省略，附总数 */
     public RevisionList listRevisions(String kbId, String pageID, int limit, int offset) {
@@ -682,7 +682,7 @@ public class WikiPageRepository {
         revisions.deleteByPageId(pageID);
     }
 
-    // ──────────────────────────── 页面问题 ────────────────────────────
+    // ── 页面问题 ──
 
     public void createIssue(WikiPageIssue issue) {
         OffsetDateTime now = OffsetDateTime.now();

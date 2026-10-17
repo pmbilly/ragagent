@@ -621,7 +621,7 @@ final class ModelOutput {
         return output + "\n\nError: " + errMsg;
     }
 
-    // ---- map 取值助手（mapsValue/stringValue/intValue/boolValue/stringSliceValue）----
+    // ── map 取值助手（mapsValue/stringValue/intValue/boolValue/stringSliceValue） ──
 
     private static JsonNode toNode(Object value) {
         if (value == null) {

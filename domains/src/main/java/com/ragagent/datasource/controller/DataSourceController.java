@@ -79,7 +79,7 @@ public class DataSourceController {
         this.kbGuard = kbGuard;
     }
 
-    // ══════════════════════════ 连接器目录 ══════════════════════════
+    // ── 连接器目录 ──
 
     /**
      * 列出可用连接器。
@@ -93,7 +93,7 @@ public class DataSourceController {
         return ConnectorCatalog.listAvailableConnectors();
     }
 
-    // ══════════════════════════ CRUD ══════════════════════════
+    // ── CRUD ──
 
     /**
      * 新建数据源：成功是 <b>201</b> Created。
@@ -217,7 +217,7 @@ public class DataSourceController {
         return ApiResponse.ok();   // 204 退役：空体与「外壳恒存在」冲突
     }
 
-    // ══════════════════════════ 连接与资源 ══════════════════════════
+    // ── 连接与资源 ──
 
     /** 校验已存连接：成功回 {@code {"status":"connected"}}。 */
     @PostMapping("/api/v1/datasource/{id}/validate")
@@ -333,7 +333,7 @@ public class DataSourceController {
     record ResolveAncestorsRequest(List<String> resourceIds) {
     }
 
-    // ══════════════════════════ 同步控制 ══════════════════════════
+    // ── 同步控制 ──
 
     /**
      * 手动触发同步：返回新建的 sync_log 裸实体。
@@ -389,7 +389,7 @@ public class DataSourceController {
         return ResponseEntity.ok(statusBody("active"));
     }
 
-    // ══════════════════════════ 同步日志 ══════════════════════════
+    // ── 同步日志 ──
 
     /**
      * 查询同步日志列表。
@@ -457,7 +457,7 @@ public class DataSourceController {
         return ResponseEntity.ok(syncLog);
     }
 
-    // ══════════════════════════ 归属守卫 ══════════════════════════
+    // ── 归属守卫 ──
 
     private record Owned(DataSource ds) {
     }
@@ -482,7 +482,7 @@ public class DataSourceController {
         return new Owned(ds);
     }
 
-    // ══════════════════════════ 工具 ══════════════════════════
+    // ── 工具 ──
 
     /**
      * 解析请求体：空 body 与非法 JSON 都回

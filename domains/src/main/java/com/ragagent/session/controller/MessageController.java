@@ -66,7 +66,7 @@ public class MessageController {
         this.messageHistory = messageHistory;
     }
 
-    // ══════════════════════════ 加载消息历史 ══════════════════════════
+    // ── 加载消息历史 ──
 
     /**
      * <p>⚠️ {@code limit} 是**容错**的：非整数回落默认 20（解析失败 → 记日志 +
@@ -84,7 +84,7 @@ public class MessageController {
                 messageHistory.loadMessages(sessionId, limit, beforeTime, resourceUrls));
     }
 
-    // ══════════════════════════ 删除消息 ══════════════════════════
+    // ── 删除消息 ──
 
     /**
      * 两个 404 文案**刻意不同**：
@@ -110,7 +110,7 @@ public class MessageController {
         return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
-    // ══════════════════════════ 搜索 ══════════════════════════
+    // ── 搜索 ──
 
     /**
      * <p>⚠️ {@code query} 空串/缺失在 DTO 校验层就被拒（{@code @NotBlank}，
@@ -134,7 +134,7 @@ public class MessageController {
         return ResponseEntity.ok(result);
     }
 
-    // ══════════════════════════ 聊天历史统计 ══════════════════════════
+    // ── 聊天历史统计 ──
 
     @GetMapping("/api/v1/messages/chat-history-stats")
     public ResponseEntity<ChatHistoryKbStats> getChatHistoryKbStats() {
@@ -147,7 +147,7 @@ public class MessageController {
         return ResponseEntity.ok(stats);
     }
 
-    // ══════════════════════════ 公共 ══════════════════════════
+    // ── 公共 ──
 
     /**
      * public 拒绝 → 403，

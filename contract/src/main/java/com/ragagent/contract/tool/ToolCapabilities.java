@@ -67,17 +67,17 @@ public final class ToolCapabilities {
 
     private static Map<String, ToolRequirement> buildRequirements() {
         Map<String, ToolRequirement> m = new LinkedHashMap<>();
-        // ---- 基础/推理（无 KB 依赖，不消费文件）----
+    // ── 基础/推理（无 KB 依赖，不消费文件） ──
         m.put("thinking", ToolRequirement.NONE);
         m.put("todo_write", ToolRequirement.NONE);
-        // ---- RAG / chunk 检索（需要至少一个建了 chunk 索引的 KB）----
+    // ── RAG / chunk 检索（需要至少一个建了 chunk 索引的 KB） ──
         m.put("knowledge_search", ToolRequirement.chunkRetrieval());
         m.put("grep_chunks", ToolRequirement.chunkRetrieval());
         m.put("list_knowledge_chunks", ToolRequirement.chunkRetrieval());
         m.put("query_knowledge_graph", ToolRequirement.chunkRetrieval());
         m.put("get_document_info", ToolRequirement.chunkRetrieval());
         m.put("database_query", ToolRequirement.chunkRetrieval());
-        // ---- Wiki（操作 wiki 页面；不消费任意文件 ID）----
+    // ── Wiki（操作 wiki 页面；不消费任意文件 ID） ──
         m.put("wiki_search", ToolRequirement.wikiOnly());
         m.put("wiki_read_page", ToolRequirement.wikiOnly());
         m.put("wiki_read_source_doc", ToolRequirement.wikiOnly());
@@ -88,7 +88,7 @@ public final class ToolCapabilities {
         m.put("wiki_delete_page", ToolRequirement.wikiOnly());
         m.put("wiki_read_issue", ToolRequirement.wikiOnly());
         m.put("wiki_update_issue", ToolRequirement.wikiOnly());
-        // ---- 数据分析（读 RAG ingest 出的表格摘要/列 chunk）----
+    // ── 数据分析（读 RAG ingest 出的表格摘要/列 chunk） ──
         m.put("data_analysis", ToolRequirement.chunkRetrieval());
         m.put("data_schema", ToolRequirement.chunkRetrieval());
         return Map.copyOf(m);

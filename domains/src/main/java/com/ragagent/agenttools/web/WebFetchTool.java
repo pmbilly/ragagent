@@ -476,9 +476,7 @@ public class WebFetchTool extends BaseTool {
         return result;
     }
 
-    // ==================================================================
     // 快照缓存（readPage / completeStore / storePage）
-    // ==================================================================
 
     /**
      * 读页：缓存命中即回；未命中且 offset>0 → snapshot_expired（可重试）；
@@ -604,9 +602,7 @@ public class WebFetchTool extends BaseTool {
                 "timed out waiting for page snapshot: " + cause);
     }
 
-    // ==================================================================
     // URL 归一（canonicalFetchURL / normalizeGitHubURL）
-    // ==================================================================
 
     /**
      * canonical URL：GitHub blob → raw.githubusercontent.com；去 fragment；

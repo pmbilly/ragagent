@@ -60,9 +60,7 @@ public final class ProviderAdapters {
         return new BaseProvider();
     }
 
-    // ------------------------------------------------------------------
     // 阿里云 Qwen thinking 模型：enable_thinking（每次必发，非流式强制关闭）
-    // ------------------------------------------------------------------
 
     public static final class QwenThinking implements ProviderAdapter {
 
@@ -82,10 +80,8 @@ public final class ProviderAdapters {
         }
     }
 
-    // ------------------------------------------------------------------
     // LKEAP：thinking 走 {"thinking":{"type":...}}，仅 DeepSeek V3.x
     // 系列默认开启思维链、保持不动（落回 BaseProvider）。
-    // ------------------------------------------------------------------
 
     public static final class Lkeap implements ProviderAdapter {
 
@@ -105,9 +101,7 @@ public final class ProviderAdapters {
         }
     }
 
-    // ------------------------------------------------------------------
     // DeepSeek：不支持 tool_choice
-    // ------------------------------------------------------------------
 
     public static final class Deepseek implements ProviderAdapter {
 
@@ -124,9 +118,7 @@ public final class ProviderAdapters {
         }
     }
 
-    // ------------------------------------------------------------------
     // Generic(vLLM) / NVIDIA / LiteLLM：thinking 走 chat_template_kwargs
-    // ------------------------------------------------------------------
 
     public static final class Generic implements ProviderAdapter {
 
@@ -167,9 +159,7 @@ public final class ProviderAdapters {
         }
     }
 
-    // ------------------------------------------------------------------
     // Gemini OpenAI 兼容层：工具思考签名放在 extra_content
-    // ------------------------------------------------------------------
 
     public static final class Gemini implements ProviderAdapter {
 
@@ -211,9 +201,7 @@ public final class ProviderAdapters {
         }
     }
 
-    // ------------------------------------------------------------------
     // 火山引擎 Ark：thinking 走 {"thinking":{"type":...}}
-    // ------------------------------------------------------------------
 
     public static final class Volcengine implements ProviderAdapter {
 
@@ -228,9 +216,7 @@ public final class ProviderAdapters {
         }
     }
 
-    // ------------------------------------------------------------------
     // Azure OpenAI：api-key 鉴权（reasoning 变体另剥采样参数）
-    // ------------------------------------------------------------------
 
     public static class Azure implements ProviderAdapter {
 
@@ -258,9 +244,7 @@ public final class ProviderAdapters {
         }
     }
 
-    // ------------------------------------------------------------------
     // OpenAI reasoning / GPT-5：无采样参数，必须用 max_completion_tokens
-    // ------------------------------------------------------------------
 
     public static final class OpenAiReasoning implements ProviderAdapter {
 
@@ -280,9 +264,7 @@ public final class ProviderAdapters {
         }
     }
 
-    // ------------------------------------------------------------------
     // Moonshot：v1 模型只接受 temperature=1
-    // ------------------------------------------------------------------
 
     public static final class Moonshot implements ProviderAdapter {
 

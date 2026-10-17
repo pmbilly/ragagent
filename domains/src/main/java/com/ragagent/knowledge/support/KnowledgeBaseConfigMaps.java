@@ -32,7 +32,7 @@ public final class KnowledgeBaseConfigMaps {
     private KnowledgeBaseConfigMaps() {
     }
 
-    // ===== ASR =====
+    // ── ASR ──
 
     /** 领域形状 → 视图（null 透传）。 */
     public static AsrConfigView toView(KnowledgeBaseAsrConfig c) {
@@ -50,7 +50,7 @@ public final class KnowledgeBaseConfigMaps {
         return c;
     }
 
-    // ===== 分块 =====
+    // ── 分块 ──
 
     public static ChunkingConfigView toView(KnowledgeBaseChunkingConfig c) {
         if (c == null) {
@@ -95,7 +95,7 @@ public final class KnowledgeBaseConfigMaps {
         return c;
     }
 
-    // ===== 图像处理 =====
+    // ── 图像处理 ──
 
     public static ImageProcessingConfigView toView(KnowledgeBaseImageProcessingConfig c) {
         return c == null ? null : new ImageProcessingConfigView(c.getModelId());
@@ -110,7 +110,7 @@ public final class KnowledgeBaseConfigMaps {
         return c;
     }
 
-    // ===== 索引策略 =====
+    // ── 索引策略 ──
 
     public static IndexingStrategyView toView(KnowledgeBaseIndexingStrategy s) {
         return s == null ? null
@@ -130,7 +130,7 @@ public final class KnowledgeBaseConfigMaps {
         return s;
     }
 
-    // ===== VLM =====
+    // ── VLM ──
 
     public static VlmConfigView toView(KnowledgeBaseVlmConfig c) {
         if (c == null) {
@@ -156,7 +156,7 @@ public final class KnowledgeBaseConfigMaps {
         return c;
     }
 
-    // ===== 存储 =====
+    // ── 存储 ──
 
     public static StorageConfigView toView(KnowledgeBaseStorageConfig c) {
         if (c == null) {
@@ -185,7 +185,7 @@ public final class KnowledgeBaseConfigMaps {
         return c;
     }
 
-    // ===== 存储提供方 =====
+    // ── 存储提供方 ──
 
     public static StorageProviderConfigView toView(KnowledgeBaseStorageProviderConfig c) {
         return c == null ? null : new StorageProviderConfigView(c.getProvider());

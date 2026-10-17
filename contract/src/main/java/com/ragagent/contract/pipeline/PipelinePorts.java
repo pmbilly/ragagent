@@ -137,7 +137,7 @@ public final class PipelinePorts {
         List<WebSearchResult> search(String providerId, WebSearchConfig config,
                                       String query);
     }
-    // ----- 占位接口（管线只判空、从不调用方法） -----
+    // ── 占位接口（管线只判空、从不调用方法） ──
 
     /** 租户面端口——chat 管线取租户信息的最小子集。 */
     public interface TenantService {

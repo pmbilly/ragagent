@@ -143,7 +143,7 @@ public final class McpInputSchemaValidator {
         return null;
     }
 
-    // ---- 校验器 ----
+    // ── 校验器 ──
 
     private String validate(JsonNode schema, JsonNode value, JsonNode root, int depth) {
         if (depth > MAX_DEPTH) {

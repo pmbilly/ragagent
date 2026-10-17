@@ -11,9 +11,7 @@ public final class WikiTextUtils {
 
     private WikiTextUtils() {}
 
-    // ═══════════════════════════════════════════════════════════════
     // slugify / 截断 / 预览
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 把任意标题压成
@@ -134,9 +132,7 @@ public final class WikiTextUtils {
         return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // SUMMARY 行解析
-    // ═══════════════════════════════════════════════════════════════
 
     /** (summary, content) 二元组。 */
     public record SummaryLine(String summary, String content) {}
@@ -178,9 +174,7 @@ public final class WikiTextUtils {
         return new SummaryLine("", value);
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // LLM JSON 清洗
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 剥掉 markdown 代码围栏包装，
@@ -262,9 +256,7 @@ public final class WikiTextUtils {
         return buf.toString();
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 内部工具
-    // ═══════════════════════════════════════════════════════════════
 
     /** 不存在才追加，返回同一个/新列表 */
     public static java.util.List<String> appendUnique(java.util.List<String> arr, String s) {

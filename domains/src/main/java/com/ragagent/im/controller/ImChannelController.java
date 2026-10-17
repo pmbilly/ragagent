@@ -53,7 +53,7 @@ public class ImChannelController {
         this.service = service;
     }
 
-    // ═══════════════════ 请求体 ═══════════════════
+    // ── 请求体 ──
 
     record CreateRequest(
             String platform,
@@ -77,7 +77,7 @@ public class ImChannelController {
             String agentId) {
     }
 
-    // ═══════════════════ CRUD ═══════════════════
+    // ── CRUD ──
 
     /** 创建渠道：201 + 裸资源行。 */
     @PostMapping("/api/v1/agents/{id}/im-channels")
@@ -263,7 +263,7 @@ public class ImChannelController {
         return ResponseEntity.ok(channelRow(channel));
     }
 
-    // ═══════════════════ 微信扫码（绑定分支 + 接缝） ═══════════════════
+    // ── 微信扫码（绑定分支 + 接缝） ──
 
     /**
      * 扫码出站（iLink）：{@code WechatQRCodeService} bean 缺位时保留接缝文案
@@ -342,7 +342,7 @@ public class ImChannelController {
     record QrcodeRequest(String qrcode) {
     }
 
-    // ═══════════════════ 响应行（三套键序并存） ═══════════════════
+    // ── 响应行（三套键序并存） ──
 
     /** 渠道行（create/update/toggle 的资源行），键名即字段名。 */
     private static Map<String, Object> channelRow(ImChannelEntity ch) {
@@ -403,7 +403,7 @@ public class ImChannelController {
         }
     }
 
-    // ═══════════════════ 工具 ═══════════════════
+    // ── 工具 ──
 
     /**
      * credentials 列语义：显式 {@code null} 与缺键都等价于"无值"

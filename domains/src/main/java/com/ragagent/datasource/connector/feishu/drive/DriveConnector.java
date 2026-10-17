@@ -298,9 +298,7 @@ public class DriveConnector implements StreamingConnector {
         return SyncEngine.fetchStreamEngine(client, config, cursor, handler, ops);
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // driveOps：把云盘连接器适配到共享同步引擎
-    // ──────────────────────────────────────────────────────────────────
 
     /**
      * 携带 region（用于 channel 与 URL），并负责编解码
@@ -394,9 +392,7 @@ public class DriveConnector implements StreamingConnector {
         }
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 单文件抓取
-    // ──────────────────────────────────────────────────────────────────
 
     /**
      * 抓一个云盘文件的内容并转成 FetchedItems。
@@ -511,9 +507,7 @@ public class DriveConnector implements StreamingConnector {
         }
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 辅助函数
-    // ──────────────────────────────────────────────────────────────────
 
     /**
      * 根是 {@code "folderToken"}，

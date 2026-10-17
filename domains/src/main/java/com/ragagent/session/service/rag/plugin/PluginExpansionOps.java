@@ -30,7 +30,6 @@ final class PluginExpansionOps {
     }
 
     // 查询扩展
-    // ------------------------------------------------------------------
 
     /** 低召回时的本地变体检索，并发窗口 16。 */
     public List<SearchResult> runQueryExpansion(ChatManage chatManage) {

@@ -145,13 +145,9 @@ final class SessionQaFallback {
         return new FallbackPrepared(registry.encodeMessages(messages), registry);
     }
 
-    // ==================================================================
     // 兜底流的渲染与发射（自门面外提：这些方法的唯一调用方本来就是本类）
-    // ==================================================================
 
-    // ==================================================================
     // fallback
-    // ==================================================================
 
     /** 渲染 fallback prompt。 */
     String renderFallbackPrompt(ChatManage chatManage) {

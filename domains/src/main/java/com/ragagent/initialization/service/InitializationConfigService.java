@@ -47,7 +47,7 @@ public final class InitializationConfigService {
         this.ssrfGuard = ssrfGuard;
     }
 
-    // ══════════════ GET /initialization/config/:kbId ══════════════
+    // ── GET /initialization/config/:kbId ──
 
     public Map<String, Object> getConfig(String kbId) {
         knowledgeCatalog.requireKbAccess(kbId);
@@ -73,7 +73,7 @@ public final class InitializationConfigService {
         return configResponse(models, kb, hasFiles(kbId));
     }
 
-    // ══════════════ POST /initialization/initialize/:kbId ══════════════
+    // ── POST /initialization/initialize/:kbId ──
 
     public Map<String, Object> initialize(String kbId,
             String rawBody) {
@@ -116,7 +116,7 @@ public final class InitializationConfigService {
         return data;
     }
 
-    // ══════════════ PUT /initialization/config/:kbId ══════════════
+    // ── PUT /initialization/config/:kbId ──
 
     public Map<String, Object> updateConfig(String kbId,
             String rawBody) {
@@ -279,13 +279,13 @@ public final class InitializationConfigService {
         return out;
     }
 
-    // ══════════════ 绑定 ══════════════
+    // ── 绑定 ──
 
 
 
 
 
-    // ══════════════ 守卫与校验 ══════════════
+    // ── 守卫与校验 ──
 
     private KnowledgeBaseRowView kbForWrite(String kbId) {
         knowledgeCatalog.requireKbAccess(kbId);
@@ -362,7 +362,7 @@ public final class InitializationConfigService {
         }
     }
 
-    // ══════════════ 模型处理 ══════════════
+    // ── 模型处理 ──
 
     private record ModelDescriptor(String type, String name, String source, String description,
             String baseUrl, String apiKey, int dimension, String interfaceType) {}
@@ -487,7 +487,7 @@ public final class InitializationConfigService {
         knowledgeCatalog.updateKnowledgeBase(kb);
     }
 
-    // ══════════════ GET config 响应（全 map 字母序）══════════════
+    // ── GET config 响应（全 map 字母序） ──
 
     private Map<String, Object> configResponse(List<ModelView> models, KnowledgeBaseRowView kb,
             boolean hasFiles) {
@@ -647,7 +647,7 @@ public final class InitializationConfigService {
         return config;
     }
 
-    // ══════════════ 小工具 ══════════════
+    // ── 小工具 ──
 
     private boolean hasFiles(String kbId) {
         return knowledgeCatalog.hasFiles(kbId);

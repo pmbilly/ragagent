@@ -78,7 +78,7 @@ public final class SqlGuard {
         return securedSQL;
     }
 
-    // ==================== Phase 1-7 校验 ====================
+    // ── Phase 1-7 校验 ──
 
     /**
      * 校验配置（option 开关组）。两个工厂：

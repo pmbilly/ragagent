@@ -166,9 +166,7 @@ public class SessionKnowledgeQaService {
         return ids;
     }
 
-    // ==================================================================
     // KnowledgeQA 主流程
-    // ==================================================================
 
     public void knowledgeQA(QaSupport.QaRequest req, EventBusInterface eventBus) {
         agentResolver.resolveInto(req);
@@ -302,9 +300,7 @@ public class SessionKnowledgeQaService {
         log.info("Knowledge base question answering initiated");
     }
 
-    // ==================================================================
     // KnowledgeQAByEvent
-    // ==================================================================
 
     public void knowledgeQAByEvent(ChatManage chatManage, List<PipelineEventType> eventList) {
         log.info("Start processing knowledge base question answering through events");
@@ -409,9 +405,7 @@ public class SessionKnowledgeQaService {
         return Thread.currentThread().isInterrupted();
     }
 
-    // ==================================================================
     // SearchKnowledge
-    // ==================================================================
 
     public List<SearchResult> searchKnowledge(List<String> knowledgeBaseIds, List<String> knowledgeIds,
             List<TagScope> tagScopes, String query) {
@@ -527,9 +521,7 @@ public class SessionKnowledgeQaService {
         return chatManage.getMergeResult() == null ? new ArrayList<>() : chatManage.getMergeResult();
     }
 
-    // ==================================================================
     // 共享 QA helpers
-    // ==================================================================
 
     /**
      * 判定骨架（见 {@link #callerCanReadKb}）：
@@ -562,9 +554,7 @@ public class SessionKnowledgeQaService {
 
 
 
-    // ==================================================================
     // 纯函数族
-    // ==================================================================
 
     public static Map<String, List<String>> mergeTagScopesByKb(List<TagScope> scopes) {
         Map<String, List<String>> byKb = new LinkedHashMap<>();
@@ -657,9 +647,7 @@ public class SessionKnowledgeQaService {
         return "en-US";
     }
 
-    // ==================================================================
     // 轻量视图
-    // ==================================================================
 
     /** resolveKnowledgeBases 的二元返回。 */
     public record KnowledgeResolution(List<String> kbIds, List<String> knowledgeIds) {}

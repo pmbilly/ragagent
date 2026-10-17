@@ -77,9 +77,7 @@ public final class DocxBlocks {
     private DocxBlocks() {
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 块载荷
-    // ──────────────────────────────────────────────────────────────────
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record TextRun(@JsonProperty("content") String content) {
@@ -479,9 +477,7 @@ public final class DocxBlocks {
         }
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // blocks API 响应
-    // ──────────────────────────────────────────────────────────────────
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record DocxBlocksData(
@@ -498,9 +494,7 @@ public final class DocxBlocks {
             @JsonProperty("data") DocxBlocksData data) {
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // sheets-v2 取值
-    // ──────────────────────────────────────────────────────────────────
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record SheetValueRange(@JsonProperty("values") List<List<Object>> values) {
@@ -518,9 +512,7 @@ public final class DocxBlocks {
             @JsonProperty("data") SheetValuesData data) {
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // bitable-v1 字段与记录
-    // ──────────────────────────────────────────────────────────────────
 
     /** 一列的渲染所需信息。 */
     public record BitableColumn(String name, int fieldType, String dateFormatter) {
@@ -574,9 +566,7 @@ public final class DocxBlocks {
             @JsonProperty("data") BitableRecordsData data) {
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 纯函数
-    // ──────────────────────────────────────────────────────────────────
 
     /** {@link #capRows} 的返回值。 */
     public record Capped<T>(List<T> rows, boolean truncated) {

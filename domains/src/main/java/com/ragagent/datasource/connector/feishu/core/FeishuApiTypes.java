@@ -34,9 +34,7 @@ public final class FeishuApiTypes {
     private FeishuApiTypes() {
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 通用信封
-    // ──────────────────────────────────────────────────────────────────
 
     /** 飞书所有响应的公共信封。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -52,9 +50,7 @@ public final class FeishuApiTypes {
             @JsonProperty("expire") int expire) {
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // wiki 空间 / 节点
-    // ──────────────────────────────────────────────────────────────────
 
     /** 一个飞书 wiki 空间。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -317,9 +313,7 @@ public final class FeishuApiTypes {
         }
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 文档原始内容（已废弃路径）
-    // ──────────────────────────────────────────────────────────────────
 
     /** 已废弃的 raw_content 路径的 {@code data} 段。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -334,9 +328,7 @@ public final class FeishuApiTypes {
             @JsonProperty("data") DocRawContentData data) {
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 导出任务 API
-    // ──────────────────────────────────────────────────────────────────
 
     /** 导出任务的 ticket。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -378,9 +370,7 @@ public final class FeishuApiTypes {
             @JsonProperty("data") ExportTaskStatusData data) {
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // Drive（云盘）文件
-    // ──────────────────────────────────────────────────────────────────
 
     /** {@code drive/v1/metas} 里的一条。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -569,9 +559,7 @@ public final class FeishuApiTypes {
             @JsonProperty("data") DriveFolderMetaData data) {
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 部分失败载体
-    // ──────────────────────────────────────────────────────────────────
 
     /** 某棵子树的列举失败。 */
     public record WikiNodeListFailure(WikiNode node, RuntimeException err) {

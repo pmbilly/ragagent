@@ -123,9 +123,7 @@ public class InProcessWikiIngestTaskQueue implements WikiIngestTaskQueue {
         return activeTaskIds.size();
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 执行 / 重试
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 执行一次任务，失败则按重试策略重排。

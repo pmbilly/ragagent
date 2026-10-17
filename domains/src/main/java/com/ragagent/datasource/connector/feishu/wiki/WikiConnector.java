@@ -244,9 +244,7 @@ public class WikiConnector implements StreamingConnector {
         return SyncEngine.fetchStreamEngine(client, config, cursor, handler, ops);
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // wikiOps：把 wiki 连接器适配到共享同步引擎
-    // ──────────────────────────────────────────────────────────────────
 
     /**
      * 携带 region（用于渲染 URL），并负责
@@ -352,9 +350,7 @@ public class WikiConnector implements StreamingConnector {
         }
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 单节点抓取
-    // ──────────────────────────────────────────────────────────────────
 
     /**
      * 抓一个 wiki 节点的内容并转成 FetchedItem 列表。
@@ -511,9 +507,7 @@ public class WikiConnector implements StreamingConnector {
         return FeishuSupport.orGoZero(FeishuSupport.parseFeishuTimestamp(node.getNodeCreateTime()));
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 辅助函数
-    // ──────────────────────────────────────────────────────────────────
 
     /** 拼 {@code "spaceID:nodeToken"} 形式的资源 ID。 */
     static String makeWikiNodeResourceId(String spaceId, String nodeToken) {

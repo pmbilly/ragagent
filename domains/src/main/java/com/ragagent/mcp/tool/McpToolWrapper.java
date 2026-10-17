@@ -355,7 +355,7 @@ public class McpToolWrapper implements AgentTool {
         }
     }
 
-    // ---- 纯函数区 ----
+    // ── 纯函数区 ──
 
     /** MCP 内容项的文本 + 图片提取结果。 */
     record ContentExtract(String text, List<String> images, int skippedImages) {

@@ -40,7 +40,7 @@ public final class McpProtocol {
     /** 空闲连接清理周期（5 分钟）。 */
     public static final Duration IDLE_CLEANUP_INTERVAL = Duration.ofMinutes(5);
 
-    // ---- 传输层常量 ----
+    // ── 传输层常量 ──
 
     /** 会话 ID 响应头；服务端在 initialize 响应里下发，后续请求必须回传。 */
     public static final String HEADER_SESSION_ID = "Mcp-Session-Id";
@@ -63,7 +63,7 @@ public final class McpProtocol {
     /** SSE `event:` 名——JSON-RPC 消息帧。 */
     public static final String SSE_EVENT_MESSAGE = "message";
 
-    // ---- 工具目录上限：租户可控的端点不可信 ----
+    // ── 工具目录上限：租户可控的端点不可信 ──
 
     /** 分页上限：恶意/死循环服务端不能把目录无限撑大。 */
     public static final int MAX_TOOL_LIST_PAGES = 100;
@@ -74,7 +74,7 @@ public final class McpProtocol {
     /** 单个工具 inputSchema 的字节上限。 */
     public static final int MAX_TOOL_SCHEMA_BYTES = 256 * 1024;
 
-    // ---- 方法名 ----
+    // ── 方法名 ──
 
     public static final String METHOD_INITIALIZE = "initialize";
     public static final String METHOD_INITIALIZED_NOTIFICATION = "notifications/initialized";

@@ -90,7 +90,7 @@ public class QaAgentConfig implements AgentRunSpec {
     public List<String> getPinnedMcpServiceIds() { return pinnedMcpServiceIds; }
     public void setPinnedMcpServiceIds(List<String> v) { pinnedMcpServiceIds = v; }
 
-    // ══════════════ 引擎消费字段的存取（原继承自 AgentConfig）══════════════
+    // ── 引擎消费字段的存取（原继承自 AgentConfig） ──
 
     @Override public int getMaxIterations() { return maxIterations; }
     public void setMaxIterations(int v) { maxIterations = v; }

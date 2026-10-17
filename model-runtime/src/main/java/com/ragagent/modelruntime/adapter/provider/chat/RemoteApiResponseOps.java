@@ -21,9 +21,7 @@ final class RemoteApiResponseOps {
         this.service = service;
     }
 
-    // ------------------------------------------------------------------
     // 非流式响应解析
-    // ------------------------------------------------------------------
 
     /** 取 choices[0]，剥 thinking 标签，带出 tool_calls 与 usage。 */
     ChatResponse parseCompletionResponse(JsonNode resp) {

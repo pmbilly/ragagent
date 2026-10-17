@@ -144,9 +144,7 @@ public final class McpClientManager {
         }
     }
 
-    // ------------------------------------------------------------------
     // 取连接
-    // ------------------------------------------------------------------
 
     /**
      * 取已有连接或新建连接。
@@ -320,9 +318,7 @@ public final class McpClientManager {
         }
     }
 
-    // ------------------------------------------------------------------
     // 查询 / 关闭
-    // ------------------------------------------------------------------
 
     /** 只按"纯 serviceId"键查（OAuth 的按 principal 连接不在此列）。 */
     public McpClient getClient(String serviceId) {
@@ -454,9 +450,7 @@ public final class McpClientManager {
         }
     }
 
-    // ------------------------------------------------------------------
     // 内部工具
-    // ------------------------------------------------------------------
 
     /** 缓存键：OAuth 服务按 principal 隔离，其余按 serviceId。 */
     static String cacheKey(McpService service, TenantContext.Principal principal) {

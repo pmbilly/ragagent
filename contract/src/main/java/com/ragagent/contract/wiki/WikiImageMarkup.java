@@ -83,9 +83,7 @@ public final class WikiImageMarkup {
         minTextContentRunes = value;
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 脱敏 / 还原
-    // ═══════════════════════════════════════════════════════════════
 
     /** 脱敏结果：脱敏后数据 + token→URL 还原表。 */
     public record MaskedTemplateData(Map<String, String> masked, Map<String, String> tokenToUrl) {}
@@ -290,9 +288,7 @@ public final class WikiImageMarkup {
         return sb.toString();
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 图片标记剥离 / 实质文本判定
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 删掉"只有图片"的占位

@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  */
 final class QueryTextOps {
 
-    // ----- 中英停用词 -----
+    // ── 中英停用词 ──
 
     static final Set<String> STOPWORDS = Set.of(
             "的", "是", "在", "了", "和", "与", "或",

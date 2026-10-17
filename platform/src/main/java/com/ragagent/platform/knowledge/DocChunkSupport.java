@@ -86,7 +86,7 @@ public final class DocChunkSupport {
         Map<String, String> collect(long tenantId, List<String> chunkIds);
     }
 
-    // ==================== ImageInfo ====================
+    // ── ImageInfo ──
 
     /** 图片信息三字段：URL/Caption/OCRText。 */
     public record ImageInfoRow(String url, String caption, String ocrText) {

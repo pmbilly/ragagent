@@ -21,7 +21,6 @@ public final class WikiPrompts {
 
     private WikiPrompts() {}
 
-    // ═══════════════════════════════════════════════════════════════
     /**
      * <p>为一批 ingest 产出的 entity / concept 页面<b>一次性</b>分配目录路径（category），让整批落在同一棵连贯的树上并复用既有文件夹——而不是每个页面各自并行地发明自己的目录（在建库首批、KB 还没有任何目录可锚定时分叉最严重）。结果只在 reduce 阶段应用到<b>尚无 category</b> 的页面，因此用户编辑与既有归档永不被打乱。</p>
      */
@@ -64,7 +63,6 @@ Output format:
   ]
 }""";
 
-    // ═══════════════════════════════════════════════════════════════
     /**
      * <p>为新入库文档生成结构化摘要页。<b>文件名与标题刻意不传给 LLM</b>：WeKnora 里上传的文档常带与内容无关的文件名（例如按扫描仪型号命名的 {@code MX5280.pdf}），真实抽取内容单薄时把这种文件名喂给模型会诱发幻觉摘要。模型只能依据下方给出的文档正文。</p>
      */
@@ -96,7 +94,6 @@ You are a wiki editor. Given the following document content, create a structured
 
 Output the SUMMARY line first, then the Markdown content. Do not include any other preamble.""";
 
-    // ═══════════════════════════════════════════════════════════════
     /**
      * <p>单次 LLM 调用同时抽取 entities 与 concepts，返回带 {@code "entities"} / {@code "concepts"} 两个数组的 JSON 对象。取代原先分开的单项抽取 prompt。</p>
      */
@@ -177,7 +174,6 @@ Output ONLY valid JSON. Example:
   ]
 }""";
 
-    // ═══════════════════════════════════════════════════════════════
     /**
      * <p>chunk-cited 管线的 Pass 0：让 LLM 扫出文档里全部 entity / concept 的<b>骨架</b>（name、slug、aliases、短描述、短 details）。重活——把每个 slug 挂到具体的佐证 chunk 上——由第二遍完成（见 {@link #WIKI_CHUNK_CITATION_PROMPT}）。因为不必再携带逐项完整事实，长文档下本 prompt 依然便宜。</p>
      */
@@ -261,7 +257,6 @@ Output ONLY valid JSON. Example:
   ]
 }""";
 
-    // ═══════════════════════════════════════════════════════════════
     /**
      * <p>chunk-cited 管线的 Pass 1..N：读一批 chunk，为每个候选 entity/concept 列出<b>实质性讨论</b>它的 chunk ID。这样逐 slug 的「事实」保持逐字原文（chunk 文本），而不是让 LLM 转述。<b>块序对 provider 前缀缓存有语义</b>：静态规则、输出 schema 与逐文档稳定的 {@code <candidate_slugs>} 都排在逐批变化的 {@code <chunks>} <b>之前</b>；同一文档内只有 {@code ChunksXML} 逐批变化，因此第一批之后的每一批都共享那段长长的 {@code [rules | candidate_slugs]} 前缀，不必为静态规则重复计费。</p>
      */
@@ -324,7 +319,6 @@ If nothing in this batch is cite-worthy, return: {"citations": {}, "new_slugs": 
 
 Now apply the instructions above to the chunks and output ONLY the JSON.""";
 
-    // ═══════════════════════════════════════════════════════════════
     /**
      * <p>只含每次页面更新共享的规则。把页面身份与源数据排除在本条消息之外，给 provider 留出跨 reduce 批次可缓存的<b>长且字节稳定</b>的前缀。</p>
      */
@@ -350,7 +344,6 @@ You are a wiki editor tasked with updating an existing wiki page. You must proce
 
 Output the SUMMARY line first, followed by the updated Markdown content, with no other preamble.""";
 
-    // ═══════════════════════════════════════════════════════════════
     /**
      * <p>承载逐批与逐页数据。文档级 source context <b>刻意放在最前</b>：同一源文档产出的所有页面因此共享最长可能的公共前缀，之后才因页面元数据而分叉。</p>
      */
@@ -415,7 +408,6 @@ The <new_information> block above is assembled from VERBATIM source chunks alrea
 
 Output the SUMMARY line first, then the updated Markdown content. Do not include any other preamble.""";
 
-    // ═══════════════════════════════════════════════════════════════
     /**
      * <p>为<b>新建</b>索引页生成导语（仅首次）。</p>
      */
@@ -435,7 +427,6 @@ You are a wiki editor. Write a brief introduction for a wiki knowledge base inde
 
 Output ONLY the title and introduction paragraph. Do NOT generate any directory listings or page links.""";
 
-    // ═══════════════════════════════════════════════════════════════
     /**
      * <p>增量更新既有索引页的导语，使其反映最近变化。</p>
      */
@@ -465,7 +456,6 @@ You are a wiki editor. Update the introduction section of a wiki index page to r
 
 Output ONLY the updated title and introduction paragraph. Do NOT generate any directory listings or page links.""";
 
-    // ═══════════════════════════════════════════════════════════════
     /**
      * <p>让 LLM 判定新抽取项与既有 wiki 页面之间的重复。每个条目自带<b>它自己</b>的一小串表面相似的既有页面（其 {@code <candidates>}），因此去重退化为针对少量真正相似页面的<b>逐条目局部 yes/no 决策</b>，跨条目错配在结构上无从表达。</p>
      */
@@ -519,7 +509,6 @@ If no items match any existing pages, return: {"merges": {}}
 Output ONLY valid JSON. Example:
 {"merges": {"entity/acme-corporation": "entity/acme-corp", "concept/rag": "concept/retrieval-augmented-generation"}}""";
 
-    // ═══════════════════════════════════════════════════════════════
     /**
      * <p>注入 {@link #WIKI_CANDIDATE_SLUG_PROMPT} 的粒度指引块之一（focused 档）。</p>
      *
@@ -543,7 +532,6 @@ EXCLUDE (even if named explicitly):
 
 If you are unsure whether an item belongs, LEAVE IT OUT. A clean, focused index is more valuable than a comprehensive but noisy one.""";
 
-    // ═══════════════════════════════════════════════════════════════
     /**
      * <p>注入 {@link #WIKI_CANDIDATE_SLUG_PROMPT} 的粒度指引块之一（standard 档）。</p>
      *
@@ -567,7 +555,6 @@ EXCLUDE:
 
 Aim for a tight, curated index. When in doubt about a marginal item, prefer to EXCLUDE it.""";
 
-    // ═══════════════════════════════════════════════════════════════
     /**
      * <p>注入 {@link #WIKI_CANDIDATE_SLUG_PROMPT} 的粒度指引块之一（exhaustive 档）。</p>
      *
@@ -610,9 +597,7 @@ Use this mode when the knowledge base functions as a technical glossary rather t
             WIKI_GRANULARITY_GUIDANCE_EXHAUSTIVE
     );
 
-    // ═══════════════════════════════════════════════════════════════
     // 粒度指引 / purpose（函数派生值，非常量）
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 返回注入 {@link #WIKI_CANDIDATE_SLUG_PROMPT} 模板的指引文本。

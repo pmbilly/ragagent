@@ -205,9 +205,7 @@ public class RedisWikiIngestTaskQueue implements WikiIngestTaskQueue {
         worker.shutdownNow();
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 调度 / 执行 / 重试
-    // ═══════════════════════════════════════════════════════════════
 
     private void dispatchLoop() {
         while (!Thread.currentThread().isInterrupted()) {

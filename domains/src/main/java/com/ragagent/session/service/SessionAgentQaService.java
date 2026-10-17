@@ -102,9 +102,7 @@ public class SessionAgentQaService {
                         vlmDescriberWiring);
     }
 
-    // ==================================================================
     // AgentQA
-    // ==================================================================
 
     public void agentQA(QaSupport.QaRequest req, EventBusInterface eventBus) {
         agentResolver.resolveInto(req);
@@ -272,14 +270,10 @@ public class SessionAgentQaService {
         }
     }
 
-    // ==================================================================
     // buildAgentConfig
-    // ==================================================================
 
 
-    // ==================================================================
     // CreateAgentEngine
-    // ==================================================================
 
 
     // ── resolveKBAndDocInfos ────────
@@ -310,9 +304,7 @@ public class SessionAgentQaService {
         return LangfuseReranker.wrap(modelRuntime.rerankerFor(modelCatalog.findModel(modelId)));
     }
 
-    // ==================================================================
     // LoadAgentHistory
-    // ==================================================================
 
 
 }

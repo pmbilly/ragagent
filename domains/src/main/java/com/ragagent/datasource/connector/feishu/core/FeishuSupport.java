@@ -66,9 +66,7 @@ public final class FeishuSupport {
     private FeishuSupport() {
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 配置解析
-    // ──────────────────────────────────────────────────────────────────
 
     /**
      * 从 {@code DataSourceConfig} 的
@@ -123,9 +121,7 @@ public final class FeishuSupport {
         return feishuConfig;
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 类型与时间
-    // ──────────────────────────────────────────────────────────────────
 
     /**
      * 这个 obj_type 能不能同步。
@@ -168,9 +164,7 @@ public final class FeishuSupport {
         return v == null ? ZeroTimeSerializer.ZERO_DATE_TIME : v;
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 文件名净化
-    // ──────────────────────────────────────────────────────────────────
 
     /**
      * 去掉文件名里的非法字符，并在
@@ -262,9 +256,7 @@ public final class FeishuSupport {
         return s == null ? 0 : s.getBytes(StandardCharsets.UTF_8).length;
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 图片嗅探
-    // ──────────────────────────────────────────────────────────────────
 
     /** 图片嗅探结果：扩展名 + content type + 是否受支持。 */
     public record ImageExt(String ext, String contentType, boolean ok) {
@@ -391,9 +383,7 @@ public final class FeishuSupport {
         return true;
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 资源 ID 拆分（wiki: "spaceID:nodeToken"；drive: "folderToken:fileToken"）
-    // ──────────────────────────────────────────────────────────────────
 
     /**
      * 在<b>第一个</b>分隔符处切分。
@@ -410,9 +400,7 @@ public final class FeishuSupport {
         return new String[]{s.substring(0, i), s.substring(i + sep.length())};
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // URL 转义（PathEscape / QueryEscape 语义）
-    // ──────────────────────────────────────────────────────────────────
 
     /**
      * 路径段转义。

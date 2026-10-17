@@ -26,9 +26,7 @@ final class MergeParentOps {
         this.service = service;
     }
 
-    // ------------------------------------------------------------------
     // 父块解析（text→parent / image→text→grandparent）
-    // ------------------------------------------------------------------
 
     List<SearchResult> resolveParentChunks(ChatManage chatManage, List<SearchResult> results) {
         if (results.isEmpty() || service.chunkRepo == null) {
@@ -255,9 +253,7 @@ final class MergeParentOps {
     }
 
 
-    // ------------------------------------------------------------------
     // 短上下文邻居扩展
-    // ------------------------------------------------------------------
 
     List<SearchResult> expandShortContextWithNeighbors(ChatManage chatManage, List<SearchResult> results) {
         final int minLen = 350;

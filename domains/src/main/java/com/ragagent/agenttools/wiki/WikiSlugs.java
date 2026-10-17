@@ -8,7 +8,7 @@ public final class WikiSlugs {
     }
 
 
-    // ==================== slug 工具 ====================
+    // ── slug 工具 ──
 
     /**
      * slug 归一化：lowercase + trim + 空格转 '-'；

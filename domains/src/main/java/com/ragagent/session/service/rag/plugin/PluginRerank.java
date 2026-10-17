@@ -517,9 +517,7 @@ public final class PluginRerank implements Plugin {
         return selected;
     }
 
-    // ------------------------------------------------------------------
     // 段落清洗
-    // ------------------------------------------------------------------
 
     private static final Pattern RE_CODE_BLOCK =
             Pattern.compile("(?s)```[^\\r\\n]*\\r?\\n(.*?)\\r?\\n?```");

@@ -101,7 +101,7 @@ public class WikiPageController {
         this.maintenanceOps = new WikiMaintenanceOps(wikiService, lintService, kbGuard, json);
     }
 
-    // ════════════════════════════ 页面 CRUD ════════════════════════════
+    // ── 页面 CRUD ──
 
     @GetMapping("/pages")
     public ResponseEntity<?> listPages(@PathVariable("kbId") String kbId, HttpServletRequest request) {
@@ -133,7 +133,7 @@ public class WikiPageController {
         return pageOps.deletePage(kbId, slugParam);
     }
 
-    // ════════════════════════════ 修订历史 ════════════════════════════
+    // ── 修订历史 ──
 
     @GetMapping("/revisions/{*slug}")
     public ResponseEntity<?> listRevisions(@PathVariable("kbId") String kbId,
@@ -148,7 +148,7 @@ public class WikiPageController {
         return pageOps.revertPage(kbId, rawBody);
     }
 
-    // ════════════════════════════ 文件夹树 ════════════════════════════
+    // ── 文件夹树 ──
 
     @GetMapping("/folders")
     public ResponseEntity<?> listFolders(@PathVariable("kbId") String kbId, HttpServletRequest request) {
@@ -180,14 +180,14 @@ public class WikiPageController {
         return folderOps.movePage(kbId, rawBody);
     }
 
-    // ══════════════════════════════ 特殊页 ══════════════════════════════
+    // ── 特殊页 ──
 
     @GetMapping("/index")
     public ResponseEntity<?> getIndex(@PathVariable("kbId") String kbId, HttpServletRequest request) {
         return statsOps.getIndex(kbId, request);
     }
 
-    // ════════════════════════════ 图谱 / 统计 ════════════════════════════
+    // ── 图谱 / 统计 ──
 
     @GetMapping("/graph")
     public ResponseEntity<?> getGraph(@PathVariable("kbId") String kbId, HttpServletRequest request) {
@@ -204,7 +204,7 @@ public class WikiPageController {
         return statsOps.searchPages(kbId, request);
     }
 
-    // ════════════════════════════ 检索 / 维护 ════════════════════════════
+    // ── 检索 / 维护 ──
 
     @PostMapping("/rebuild-links")
     public ResponseEntity<?> rebuildLinks(@PathVariable("kbId") String kbId) {
@@ -221,7 +221,7 @@ public class WikiPageController {
         return maintenanceOps.autoFix(kbId);
     }
 
-    // ══════════════════════════════ 问题 ══════════════════════════════
+    // ── 问题 ──
 
     @GetMapping("/issues")
     public ResponseEntity<?> listIssues(@PathVariable("kbId") String kbId, HttpServletRequest request) {
@@ -235,7 +235,7 @@ public class WikiPageController {
         return maintenanceOps.updateIssueStatus(kbId, issueIdParam, rawBody);
     }
 
-    // ══════════════════════════ 守卫 / 校验 ══════════════════════════
+    // ── 守卫 / 校验 ──
 
 
 

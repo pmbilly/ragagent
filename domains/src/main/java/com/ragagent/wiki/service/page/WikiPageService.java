@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public interface WikiPageService {
 
-    // ──────────────────────────── 页面写入 ────────────────────────────
+    // ── 页面写入 ──
 
     /**
      * 新建页面，解析出链、
@@ -60,7 +60,7 @@ public interface WikiPageService {
      */
     void updateAutoLinkedContent(WikiPage page);
 
-    // ──────────────────────────── 页面读取 ────────────────────────────
+    // ── 页面读取 ──
 
     WikiPage getPageBySlug(String kbId, String slug);
 
@@ -121,7 +121,7 @@ public interface WikiPageService {
      */
     void rebuildIndexPage(String kbId);
 
-    // ──────────────────────────── 批量读取 ────────────────────────────
+    // ── 批量读取 ──
 
     /** 全部非归档页面，不分页 */
     List<WikiPage> listAllPages(String kbId);
@@ -157,13 +157,13 @@ public interface WikiPageService {
 
     List<List<String>> listDistinctCategoryPaths(String kbId, int maxPaths);
 
-    // ──────────────────────────── 统计 / 检索 ────────────────────────────
+    // ── 统计 / 检索 ──
 
     Map<String, Long> countByType(String kbId);
 
     List<WikiPage> searchPages(String kbId, String query, int limit);
 
-    // ──────────────────────────── 文件夹树 ────────────────────────────
+    // ── 文件夹树 ──
 
     /**
      * parentID（"" = 根）的直接子文件夹，
@@ -202,7 +202,7 @@ public interface WikiPageService {
     /** 把页面移入文件夹并刷新缓存路径 */
     WikiPage movePage(String kbId, String slug, String folderID);
 
-    // ──────────────────────────── 修订历史 ────────────────────────────
+    // ── 修订历史 ──
 
     /** 最新在前、不含 content，附当前版本 */
     WikiPageRevisionListResponse listRevisions(String kbId, String slug, int limit, int offset);
@@ -218,7 +218,7 @@ public interface WikiPageService {
      */
     WikiPage revertPageToVersion(String kbId, String slug, int version);
 
-    // ──────────────────────────── 页面问题 ────────────────────────────
+    // ── 页面问题 ──
 
     WikiPageIssue createIssue(WikiPageIssue issue);
 

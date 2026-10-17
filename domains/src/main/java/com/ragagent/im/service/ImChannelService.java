@@ -45,7 +45,7 @@ public class ImChannelService {
         this.imTurnOrchestrator = imTurnOrchestrator;
     }
 
-    // ═══════════════════ 钩子 ═══════════════════
+    // ── 钩子 ──
 
     /** 创建钩子：兜底 + session_mode 校验 + bot_identity。 */
     public void beforeCreate(ImChannelEntity ch) {
@@ -102,7 +102,7 @@ public class ImChannelService {
         }
     }
 
-    // ═══════════════════ bot_identity ═══════════════════
+    // ── bot_identity ──
 
     /** 凭据 JSON 的键序无关读取；解析失败 → ""。 */
     public String computeBotIdentity(ImChannelEntity ch) {
@@ -204,7 +204,7 @@ public class ImChannelService {
         }
     }
 
-    // ═══════════════════ CRUD ═══════════════════
+    // ── CRUD ──
 
     /**
      * 创建：重复 bot 检查在前（409），落库前过创建钩子（session_mode

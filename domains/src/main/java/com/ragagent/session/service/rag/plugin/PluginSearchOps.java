@@ -37,7 +37,6 @@ final class PluginSearchOps {
     }
 
     // searchByTargets
-    // ------------------------------------------------------------------
 
     /**
      * 按 embedding 模型分组检索。共享模型（name+endpoint）的整库目标合并成一次
@@ -306,9 +305,7 @@ final class PluginSearchOps {
         }
     }
 
-    // ------------------------------------------------------------------
     // web 检索
-    // ------------------------------------------------------------------
 
     List<SearchResult> searchWebIfEnabled(ChatManage chatManage) {
         if (!chatManage.isWebSearchEnabled() || service.webSearchService == null || service.tenantService == null) {

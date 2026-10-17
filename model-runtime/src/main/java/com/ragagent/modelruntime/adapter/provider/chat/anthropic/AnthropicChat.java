@@ -110,9 +110,7 @@ public class AnthropicChat implements LlmChatClient {
         this.customHeaders = config.getCustomHeaders();
     }
 
-    // ------------------------------------------------------------------
     // 对外接口
-    // ------------------------------------------------------------------
 
     /** 非流式（但服务端可能仍回 SSE，本方法两者都吃）。 */
     @Override
@@ -231,9 +229,7 @@ public class AnthropicChat implements LlmChatClient {
         return modelId;
     }
 
-    // ------------------------------------------------------------------
     // endpoint 拼接
-    // ------------------------------------------------------------------
 
     /**
      * <b>三种形态</b>——
@@ -278,9 +274,7 @@ public class AnthropicChat implements LlmChatClient {
         }
     }
 
-    // ------------------------------------------------------------------
     // 请求体构造
-    // ------------------------------------------------------------------
 
     /**
      * 构造 Anthropic 请求体。
@@ -339,9 +333,7 @@ public class AnthropicChat implements LlmChatClient {
         return req;
     }
 
-    // ------------------------------------------------------------------
     // 非流式解析
-    // ------------------------------------------------------------------
 
     /** 解析非流式响应。 */
     public ChatResponse parseResponse(AnthropicResponse resp) {
@@ -587,9 +579,7 @@ public class AnthropicChat implements LlmChatClient {
         put(streamQueue, chunk);
     }
 
-    // ------------------------------------------------------------------
     // usage 合并
-    // ------------------------------------------------------------------
 
     /** 缓存读写计数与"是否上报过"标记的合并结果。 */
     record CacheCounters(int read, int write, boolean reported) {
@@ -643,9 +633,7 @@ public class AnthropicChat implements LlmChatClient {
         return current;
     }
 
-    // ------------------------------------------------------------------
     // HTTP 细节
-    // ------------------------------------------------------------------
 
     /** 建 builder（只带超时，头部顺序由调用方拼：标准头 → 自定义头）。 */
     private static HttpRequest.Builder newRequestBuilder(String endpoint, Duration timeout) {

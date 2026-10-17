@@ -21,7 +21,7 @@ public class ConversationProperties {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    // ---- config.yaml conversation 段（dev 缺省值逐项对照） ----
+    // ── config.yaml conversation 段（dev 缺省值逐项对照） ──
     private int maxRounds = 5;
     private double keywordThreshold = 0.3;
     private int embeddingTopK = 30;
@@ -44,7 +44,7 @@ public class ConversationProperties {
     private String extractRelationshipsPromptId = "default_extract_relationships";
     private String generateQuestionsPromptId = "default_generate_questions";
 
-    // ---- summary 子段 ----
+    // ── summary 子段 ──
     private int summaryMaxInputChars = 16384;
     private double summaryRepeatPenalty = 1.0;
     private double summaryTemperature = 0.3;
@@ -54,7 +54,7 @@ public class ConversationProperties {
             </think>
             NO_MATCH""";
 
-    // ---- 回填产物（运行时字段，不参与配置绑定） ----
+    // ── 回填产物（运行时字段，不参与配置绑定） ──
     private String fallbackPrompt = "";
     private String rewritePromptSystem = "";
     private String rewritePromptUser = "";
@@ -131,7 +131,7 @@ public class ConversationProperties {
         return byId;
     }
 
-    // ---- getters/setters（Spring 绑定） ----
+    // ── getters/setters（Spring 绑定） ──
     public int getMaxRounds() { return maxRounds; }
     public void setMaxRounds(int v) { maxRounds = v; }
     public double getKeywordThreshold() { return keywordThreshold; }

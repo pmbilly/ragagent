@@ -74,7 +74,7 @@ public final class SearchAuth {
     public interface KnowledgeScopeReader extends KnowledgeFetcher, KnowledgeTagsFetcher {
     }
 
-    // ---- 去重非空字符串 ----
+    // ── 去重非空字符串 ──
 
     public static List<String> dedupNonEmptyStrings(List<String> values) {
         Map<String, Boolean> seen = new LinkedHashMap<>();

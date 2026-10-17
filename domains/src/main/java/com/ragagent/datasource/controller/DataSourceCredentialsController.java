@@ -125,7 +125,7 @@ public class DataSourceCredentialsController {
         return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
-    // ══════════════════════════ 归属判定 ══════════════════════════
+    // ── 归属判定 ──
 
     /**
      * 归属判定：与 {@code DataSourceController} 那份是<b>同型</b>，
@@ -160,7 +160,7 @@ public class DataSourceCredentialsController {
         return ds;
     }
 
-    // ══════════════════════════ 请求体 ══════════════════════════
+    // ── 请求体 ──
 
     /**
      * 解析 PUT 的请求体。

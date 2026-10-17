@@ -39,9 +39,7 @@ public final class QaSupport {
         AGENT
     }
 
-    // ==================================================================
     // QA 请求上下文
-    // ==================================================================
     public static final class QaRequestContext {
         public String sessionId = "";
         public String requestId = "";
@@ -155,9 +153,7 @@ public final class QaSupport {
         }
     }
 
-    // ==================================================================
     // SSE 流上下文
-    // ==================================================================
     public static final class SseStreamContext {
         public EventBusInterface eventBus;
         /** 虚拟线程上显式传租户的快照 */
@@ -172,9 +168,7 @@ public final class QaSupport {
         public boolean liveRunExists;
     }
 
-    // ==================================================================
     // 纯函数辅助族
-    // ==================================================================
 
     /** 抽取图片 URL 与 caption 文本。 */
     public static ImageExtraction extractImageUrlsAndOcrText(List<QaRequestsImage> images) {
@@ -399,9 +393,7 @@ public final class QaSupport {
         return out;
     }
 
-    // ==================================================================
     // steer 引擎侧共用的纯函数与常量
-    // ==================================================================
 
     public static final String STEER_DELIVERY_INJECT = "inject";
     public static final String STEER_DELIVERY_AFTER = "after";
@@ -503,9 +495,7 @@ public final class QaSupport {
         return s == null ? "" : s;
     }
 
-    // ==================================================================
     // QARequest（service 面入参）
-    // ==================================================================
     public static final class QaRequest {
         public Session session;
         public String query = "";

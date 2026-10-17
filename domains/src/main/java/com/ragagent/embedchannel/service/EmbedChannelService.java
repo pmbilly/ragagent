@@ -68,7 +68,7 @@ public class EmbedChannelService {
         this.deploymentProperties = deploymentProperties;
     }
 
-    // ═══════════════════ 规范化 ═══════════════════
+    // ── 规范化 ──
 
     public static String normalizeWidgetPosition(String position) {
         String trimmed = position == null ? "" : position.trim();
@@ -86,7 +86,7 @@ public class EmbedChannelService {
         return SUPPORTED_LOCALES.contains(trimmed) ? trimmed : "";
     }
 
-    // ═══════════════════ 校验（文案固定） ═══════════════════
+    // ── 校验（文案固定） ──
 
     /** allowed_origins 校验；生产判定取部署模式属性。 */
     public void validateAllowedOrigins(List<String> origins) {
@@ -209,7 +209,7 @@ public class EmbedChannelService {
         }
     }
 
-    // ═══════════════════ agent 归属 ═══════════════════
+    // ── agent 归属 ──
 
     /**
      * agent 归属校验：未知/跨租户 agent 一律归一为 500 "operation failed"
@@ -225,7 +225,7 @@ public class EmbedChannelService {
         }
     }
 
-    // ═══════════════════ CRUD ═══════════════════
+    // ── CRUD ──
 
     /** 创建渠道：校验归属与图标、生成发布令牌、写入默认值。 */
     public EmbedChannelEntity create(long tenantId, String agentId, EmbedChannelEntity req) {
@@ -422,7 +422,7 @@ public class EmbedChannelService {
         return ch;
     }
 
-    // ═══════════════════ token / 签名 ═══════════════════
+    // ── token / 签名 ──
 
     /** 签发 session token：无可用 store → 503。 */
     public IssueResult issueSessionToken(String channelId) {
@@ -516,7 +516,7 @@ public class EmbedChannelService {
         return issueSessionToken(ch.getId());
     }
 
-    // ═══════════════════ 公开 config / chunk / 推荐问题 ═══════════════════
+    // ── 公开 config / chunk / 推荐问题 ──
 
     /** 公开 config：键按声明序输出，零值键省略。 */
     public ObjectNode publicConfig(EmbedChannelEntity ch) {

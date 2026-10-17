@@ -21,7 +21,7 @@ public final class ToolDefinitions {
             + "otherwise match its inputSchema. If the definition is unavailable, use "
             + "discover_mcp_tools(mode=\"describe\", serverId=..., toolName=...).";
 
-    // ---- 工具名常量 ----
+    // ── 工具名常量 ──
 
     /** 能力域 MCP 发现与调用；不是租户可选的内建工具。 */
     public static final String TOOL_DISCOVER_MCP_TOOLS = "discover_mcp_tools";
@@ -63,7 +63,7 @@ public final class ToolDefinitions {
     public static final String TOOL_WIKI_READ_ISSUE = "wiki_read_issue";
     public static final String TOOL_WIKI_UPDATE_ISSUE = "wiki_update_issue";
 
-    // ---- 已移除工具（只为解码历史与忽略过期 allowlist 条目而保留；无实现无注册无模型可见）----
+    // ── 已移除工具（只为解码历史与忽略过期 allowlist 条目而保留；无实现无注册无模型可见） ──
     public static final String LEGACY_TOOL_EXECUTE_SKILL_SCRIPT = "execute_skill_script";
     public static final String LEGACY_TOOL_READ_SKILL = "read_skill";
     public static final String LEGACY_TOOL_READ_SANDBOX_FILE = "read_sandbox_file";

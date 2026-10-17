@@ -45,9 +45,7 @@ public final class PromptCache {
     private PromptCache() {
     }
 
-    // ------------------------------------------------------------------
     // 指纹与 cache key
-    // ------------------------------------------------------------------
 
     /**
  * 短、不可逆的标识，用于日志与缓存路由（实现见 {@code platform.prompt.PromptFingerprints}，
@@ -67,9 +65,7 @@ public final class PromptCache {
         return PromptFingerprints.buildPromptCacheKey(tenantId, modelId, purpose, prefixFingerprint);
     }
 
-    // ------------------------------------------------------------------
     // 缓存账目
-    // ------------------------------------------------------------------
 
     /**
      * 该 provider 是否会走缓存上报通道。
@@ -181,9 +177,7 @@ public final class PromptCache {
         }
     }
 
-    // ------------------------------------------------------------------
     // 策略、key 截断、retention
-    // ------------------------------------------------------------------
 
     /**
      * 按 <b>码点</b>截断到 64，
@@ -286,9 +280,7 @@ public final class PromptCache {
         return new CacheControlMarker("ephemeral", ttl);
     }
 
-    // ------------------------------------------------------------------
     // 请求体注入
-    // ------------------------------------------------------------------
 
     /**
      * 往已经成形的 OpenAI 兼容请求体里注入缓存路由与断点。
@@ -457,9 +449,7 @@ public final class PromptCache {
         headers.set("x-session-affinity", sessionId);
     }
 
-    // ------------------------------------------------------------------
     // 内部工具
-    // ------------------------------------------------------------------
 
     /** JSON 指针字段缺省/显式 null 都按 0。 */
     private static int valueOrZero(JsonNode value) {

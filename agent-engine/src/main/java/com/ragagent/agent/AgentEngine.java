@@ -103,7 +103,6 @@ public class AgentEngine {
     /** 循环结束注入最多多跑一轮。 */
     static final int MAX_STEER_OVERRUNS = 1;
 
-    // ==================================================================
     // 引擎字段
     /** 本轮运行规格（只读；会话侧 agent 配置的引擎读面）。 */
     final AgentRunSpec config;
@@ -190,9 +189,7 @@ public class AgentEngine {
     final ReActIteration iteration;
     final ContextDebugEmitter contextDebug;
 
-    // ==================================================================
     // 构造
-    // ==================================================================
 
     public AgentEngine(AgentRunSpec config, LlmChatClient chatModel, ToolRegistry toolRegistry,
             EventBusInterface eventBus, List<KnowledgeBaseInfo> knowledgeBasesInfo,
@@ -285,7 +282,7 @@ public class AgentEngine {
         return cancellationSource == null ? null : cancellationSource.get();
     }
 
-    // ---- 包内测试 seam（生产装配走构造器/setter）----
+    // ── 包内测试 seam（生产装配走构造器/setter） ──
 
     ToolRegistry getRegistryForTest() {
         return toolRegistry;
@@ -316,7 +313,7 @@ public class AgentEngine {
         return compactor == null ? null : compactor.settings();
     }
 
-    // ---- 包内测试/跨段 seam 委托（实现随 ReAct 各段协作者）----
+    // ── 包内测试/跨段 seam 委托（实现随 ReAct 各段协作者） ──
 
     AgentToolCall runToolCall(ToolCall tc, int i, int iteration, int round,
             String sessionId, String assistantMessageID, TenantContextSnapshot tenant) {
@@ -336,7 +333,6 @@ public class AgentEngine {
         return think.streamThinkingToEventBus(messages, tools, iteration, sessionId);
     }
 
-    // ==================================================================
     // token 预算与迭代上限
 
     int estimateCurrentTokens(List<ChatMessage> messages) {
@@ -399,7 +395,6 @@ public class AgentEngine {
         return AgentConsts.llmStallTimeout(config == null ? null : config.getLlmCallTimeout());
     }
 
-    // ==================================================================
     // 执行主入口
     /** 便捷重载（无图片）。 */
     public AgentState execute(String sessionId, String messageId, String query,
@@ -555,7 +550,6 @@ public class AgentEngine {
         return s.substring(0, s.offsetByCodePoints(0, n)) + "…";
     }
 
-    // ==================================================================
     // ReAct 主循环
     /** 消息列表的可变引用代理（模拟引用传参）。 */
     static final class MsgRef {
@@ -648,7 +642,6 @@ public class AgentEngine {
     record WindowOutcome(List<ChatMessage> messages, boolean changed) {
     }
 
-    // ==================================================================
     // finish reason 判定（供测试与 ReAct 迭代共用）
 
     /** 自然停 finish reason。 */

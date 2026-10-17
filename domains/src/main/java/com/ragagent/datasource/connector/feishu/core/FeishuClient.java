@@ -210,17 +210,11 @@ public class FeishuClient implements DocxMarkdown.SheetReader {
         return driveOps.listDriveFilesRecursiveFrom(folderToken);
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 认证
-    // ──────────────────────────────────────────────────────────────────
 
-    // ──────────────────────────────────────────────────────────────────
     // 通用请求（JSON API）
-    // ──────────────────────────────────────────────────────────────────
 
-    // ──────────────────────────────────────────────────────────────────
     // wiki：空间 / 节点
-    // ──────────────────────────────────────────────────────────────────
 
     /**
      * 已废弃路径，仅为兼容保留。
@@ -239,12 +233,10 @@ public class FeishuClient implements DocxMarkdown.SheetReader {
         return resp.data() == null || resp.data().content() == null ? "" : resp.data().content();
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 导出任务 API
     //   1. POST /drive/v1/export_tasks            → 建任务，拿 ticket
     //   2. GET  /drive/v1/export_tasks/:ticket    → 轮询到 job_status=0
     //   3. GET  /drive/v1/export_tasks/file/:ticket/download → 下载字节
-    // ──────────────────────────────────────────────────────────────────
 
     /** 建导出任务，返回 ticket。 */
     String createExportTask(String token, String objType, String fileExtension) {
@@ -355,9 +347,7 @@ public class FeishuClient implements DocxMarkdown.SheetReader {
     public record ExportDownload(byte[] data, String fileName) {
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // Drive 文件下载
-    // ──────────────────────────────────────────────────────────────────
 
     /**
      * 按 file token 下载云盘文件。
@@ -447,17 +437,13 @@ public class FeishuClient implements DocxMarkdown.SheetReader {
         throw lastErr != null ? lastErr : new ConnectorException("download failed: " + path);
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // Drive（云盘）文件列举
-    // ──────────────────────────────────────────────────────────────────
 
     /** 云盘文件列表的一页。 */
     public record DriveFilePage(List<DriveFile> files, String nextPageToken) {
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // docx 块
-    // ──────────────────────────────────────────────────────────────────
 
     /**
      * 把一篇 docx 的全部 block 拉成一个扁平的
@@ -668,9 +654,7 @@ public class FeishuClient implements DocxMarkdown.SheetReader {
         return new BitableTable(rows, truncated);
     }
 
-    // ──────────────────────────────────────────────────────────────────
     // 小工具
-    // ──────────────────────────────────────────────────────────────────
 
     /** null 列表归一成空列表：循环/追加前统一处理。 */
     static <T> List<T> nvl(List<T> list) {

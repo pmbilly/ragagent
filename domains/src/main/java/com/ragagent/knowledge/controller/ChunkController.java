@@ -72,7 +72,7 @@ public class ChunkController {
         this.guard = guard;
     }
 
-    // ══════════════════════════ 读 ══════════════════════════
+    // ── 读 ──
 
     /** 分页钳位：page&lt;1→1、size&lt;1→10、size&gt;100→100（size 的小值是合法值，非 clamp）。 */
     @GetMapping("/api/v1/chunks/{knowledgeId}")
@@ -138,7 +138,7 @@ public class ChunkController {
         return ResponseEntity.ok(items);
     }
 
-    // ══════════════════════════ 更新 / 回滚 ══════════════════════════
+    // ── 更新 / 回滚 ──
 
     /** 业务失败（fmt.Errorf 族）→ 500 信封 message=原文。 */
     @PutMapping("/api/v1/chunks/{knowledgeId}/{id}")
@@ -189,7 +189,7 @@ public class ChunkController {
         return updatedResponse(updated, knowledgeId);
     }
 
-    // ══════════════════════════ 生成问题 ══════════════════════════
+    // ── 生成问题 ──
 
     @PutMapping("/api/v1/chunks/by-id/{id}/questions")
     public ResponseEntity<GeneratedQuestionResponse> upsertGeneratedQuestion(
@@ -249,7 +249,7 @@ public class ChunkController {
         return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
-    // ══════════════════════════ 删除 ══════════════════════════
+    // ── 删除 ──
 
     @DeleteMapping("/api/v1/chunks/{knowledgeId}/{id}")
     public ApiResponse<Void> deleteChunk(
@@ -285,7 +285,7 @@ public class ChunkController {
         return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
-    // ══════════════════════════ 共用 ══════════════════════════
+    // ── 共用 ──
 
     /** 取 chunk 并校验属于 URL 里的 :knowledge_id（同租户横向越权防线）；守卫链先行。 */
     private Chunk fetchChunkAndVerifyOwnership(String knowledgeId, String id) {

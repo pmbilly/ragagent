@@ -371,9 +371,7 @@ public final class NotionConnector implements Connector {
         return a.toInstant().equals(b.toInstant());
     }
 
-    // ──────────────────────────────────────────────────────────────────────
     // 内部：发现与排除集
-    // ──────────────────────────────────────────────────────────────────────
 
     /** 发现结果：选中子树内的页面 + 排除集。 */
     private static final class DiscoverResult {
@@ -514,9 +512,7 @@ public final class NotionConnector implements Connector {
         return computeExcludedSet(ids, parentOf, selectedIds);
     }
 
-    // ──────────────────────────────────────────────────────────────────────
     // 内部：文件上传解析
-    // ──────────────────────────────────────────────────────────────────────
 
     /**
      * 走一遍块树，把 {@code file_upload}
@@ -548,9 +544,7 @@ public final class NotionConnector implements Connector {
         }
     }
 
-    // ──────────────────────────────────────────────────────────────────────
     // 内部：父子与默认值
-    // ──────────────────────────────────────────────────────────────────────
 
     /**
      * 判断对象在工作区层级里的位置。

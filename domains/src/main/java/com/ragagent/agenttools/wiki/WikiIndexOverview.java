@@ -10,7 +10,7 @@ public final class WikiIndexOverview {
     }
 
 
-    // ==================== wiki 工具共享 helper ====================
+    // ── wiki 工具共享 helper ──
 
     /** 索引概览的默认条数上限。 */
     public static final int WIKI_INDEX_AGENT_TOP_K = 20;

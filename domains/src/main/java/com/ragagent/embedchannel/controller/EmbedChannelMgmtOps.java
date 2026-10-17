@@ -28,7 +28,7 @@ final class EmbedChannelMgmtOps {
         this.ctrl = ctrl;
     }
 
-    // ═══════════════════ 管理面 ═══════════════════
+    // ── 管理面 ──
 
     /** 创建渠道：201 + 裸对象（键字母序）。 */
     public ResponseEntity<Map<String, Object>> create(@PathVariable("id") String agentId,

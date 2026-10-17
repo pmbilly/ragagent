@@ -96,7 +96,7 @@ public class CustomAgentService {
         }
     }
 
-    // ═══════════════════ 查询 ═══════════════════
+    // ── 查询 ──
 
     /** 查询单个 agent（内建优先 DB，回落注册表）。config 树已补默认。 */
     public CustomAgentResult getAgentByID(String id, String locale) {
@@ -253,7 +253,7 @@ public class CustomAgentService {
         }
     }
 
-    // ═══════════════════ 写路径 ═══════════════════
+    // ── 写路径 ──
 
     /** 创建 agent（service 校验 + 落库；config 已补默认）。 */
     public CustomAgentResult createAgent(String name, String description, String avatar, ObjectNode config) {
@@ -416,7 +416,7 @@ public class CustomAgentService {
         return new CustomAgentResult(created, cfg);
     }
 
-    // ═══════════════════ suggested-questions(委托) ═══════════════════
+    // ── suggested-questions(委托) ──
 
     public ArrayNode getSuggestedQuestions(String agentId, List<String> kbIds,
             List<String> knowledgeIds, List<AgentSuggestedQuestions.TagScope> tagScopes, int limit,

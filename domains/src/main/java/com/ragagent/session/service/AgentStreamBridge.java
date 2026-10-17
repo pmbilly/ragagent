@@ -74,7 +74,7 @@ public final class AgentStreamBridge {
     /** SSE 发射缝（各 handler 的"组装 + 试追加 + 日志"样板收拢处）。 */
     private final AgentStreamEmitter emitter;
     private final EventBusInterface eventBus;
-    // ---- State tracking ----
+    // ── State tracking ──
     private final List<SearchResult> knowledgeRefs = new ArrayList<>();
     private String finalAnswer = "";
     /** Per-answer-event-ID accumulation, so superseded preambles can be dropped */

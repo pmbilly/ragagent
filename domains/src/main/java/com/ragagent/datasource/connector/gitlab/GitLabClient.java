@@ -93,9 +93,7 @@ public final class GitLabClient {
         return baseUrl;
     }
 
-    // ------------------------------------------------------------------
     // 端点
-    // ------------------------------------------------------------------
 
     /**
      * 验证 PRIVATE-TOKEN 被这个 GitLab 实例接受。
@@ -216,9 +214,7 @@ public final class GitLabClient {
                 Comparison.class);
     }
 
-    // ------------------------------------------------------------------
     // 纯函数
-    // ------------------------------------------------------------------
 
     /**
      * 把 GitLab 项目标识编码成 URL 路径段。
@@ -290,9 +286,7 @@ public final class GitLabClient {
         return b.toString();
     }
 
-    // ------------------------------------------------------------------
     // HTTP 细节
-    // ------------------------------------------------------------------
 
     private <T> T get(String endpoint, Class<T> type) {
         return get(endpoint, MAPPER.getTypeFactory().constructType(type));
@@ -345,9 +339,7 @@ public final class GitLabClient {
     private record Page<T>(List<T> items, String nextPage) {
     }
 
-    // ------------------------------------------------------------------
     // GitLab 的响应形状（内部，不是契约）
-    // ------------------------------------------------------------------
 
     /**
      * GitLab 返回了非 2xx。

@@ -14,7 +14,7 @@ public final class ChunkPatterns {
     private ChunkPatterns() {
     }
 
-    // ---- 边界优先级 ----
+    // ── 边界优先级 ──
     public static final int PRIO_FORM_FEED = 100;
     public static final int PRIO_NUMBERED_HEAD = 90;
     public static final int PRIO_CHAPTER_MARKER = 85;

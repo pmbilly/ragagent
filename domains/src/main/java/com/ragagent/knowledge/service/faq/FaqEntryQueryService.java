@@ -72,7 +72,7 @@ public class FaqEntryQueryService {
         return tid == null ? 0 : tid;
     }
 
-    // ══════════════════ 列表 ═══════════════════════════════════════════
+    // ── 列表 ──
 
     /**
      * 分页已由 handler 解析钳位。
@@ -131,7 +131,7 @@ public class FaqEntryQueryService {
         return new FaqEntryPage(entries, page, pageSize, total);
     }
 
-    // ══════════════════ 详情 ═══════════════════════════════════════════
+    // ── 详情 ──
     public FaqEntry getEntry(String kbId, long entrySeqId) {
         if (entrySeqId <= 0) {
             throw new BizException(AppError.badRequest("条目ID不能为空"));
@@ -171,7 +171,7 @@ public class FaqEntryQueryService {
     }
 
 
-    // ══════════════════ 导出 ═══════════════════════════════════════════
+    // ── 导出 ──
     public byte[] exportCsv(String kbId) {
         KnowledgeBase kb = faqGuard.validateFAQKnowledgeBase(kbId);
         long tid = tenantId();
@@ -282,7 +282,7 @@ public class FaqEntryQueryService {
         return b ? "TRUE" : "FALSE";
     }
 
-    // ══════════════════ 搜索 ═══════════════════════════════════════════
+    // ── 搜索 ──
 
     /**
      * 参数归一化与

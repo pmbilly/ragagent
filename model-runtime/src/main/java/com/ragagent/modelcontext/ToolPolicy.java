@@ -183,7 +183,7 @@ final class ToolPolicy {
         return ISSUE_HANDLE_SHAPE.matcher(value).matches();
     }
 
-    // ---- 依赖 Registry 的策略逻辑（收拢为静态）----
+    // ── 依赖 Registry 的策略逻辑（收拢为静态） ──
 
     /**
      * 处理模型句柄内嵌在结构化文本、或属于工具私有身份空间的小集合参数
@@ -297,7 +297,7 @@ final class ToolPolicy {
         return output;
     }
 
-    // ---- JSON 字符串值遍历（rewriteJSONStringValues / walkJSONStringValues）----
+    // ── JSON 字符串值遍历（rewriteJSONStringValues / walkJSONStringValues） ──
 
     static String rewriteJSONStringValues(String raw, java.util.function.BinaryOperator<String> rewrite) {
         JsonNode value = ModelJsonValues.parse(raw);
@@ -338,7 +338,7 @@ final class ToolPolicy {
         walkJSONValue("", value, rewrite);
     }
 
-    // ---- 供 Registry 复用的其余包级函数 ----
+    // ── 供 Registry 复用的其余包级函数 ──
 
     /**
      * 有些 provider 会把 items 双重编码。只在 web_fetch 的数组上解包；

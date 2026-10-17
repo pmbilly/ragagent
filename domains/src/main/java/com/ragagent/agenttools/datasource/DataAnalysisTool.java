@@ -116,7 +116,7 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
         return this;
     }
 
-    // ==================== 装载路径 ====================
+    // ── 装载路径 ──
 
     boolean recordCreatedTable(String tableName) {
         if (createdTables.contains(tableName)) {
@@ -290,7 +290,7 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
         return "k_" + (knowledge.id() == null ? "" : knowledge.id()).replace("-", "_");
     }
 
-    // ==================== Execute ====================
+    // ── Execute ──
 
     @Override
     public ToolResult execute(ToolRequest request) {
@@ -469,7 +469,7 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
         return r;
     }
 
-    // ==================== 标识符调和与错误建议 ====================
+    // ── 标识符调和与错误建议 ──
 
     /** 单引号翻倍，防 SQL 字符串字面量逃逸。 */
     static String sqlSingleQuoteEscape(String s) {

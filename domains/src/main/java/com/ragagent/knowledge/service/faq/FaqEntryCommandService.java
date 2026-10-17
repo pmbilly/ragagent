@@ -97,7 +97,7 @@ public class FaqEntryCommandService {
         return tid == null ? 0 : tid;
     }
 
-    // ══════════════════ 创建 ═══════════════════════════════════════════
+    // ── 创建 ──
 
     /**
      * 判定顺序 契约样例依赖：
@@ -191,7 +191,7 @@ public class FaqEntryCommandService {
         }
     }
 
-    // ══════════════════ 更新 / 相似问 ══════════════════════════════════
+    // ── 更新 / 相似问 ──
 
     /**
      * <b>先落库后失败</b>：chunk 更新先于 embedding 模型解析——无模型 KB 上
@@ -379,7 +379,7 @@ public class FaqEntryCommandService {
         return entry;
     }
 
-    // ══════════════════ 批量字段 / 标签 ════════════════════════════════
+    // ── 批量字段 / 标签 ──
 
     /** null tag = 0 = 移除标签。 */
     public void updateEntryTagBatch(String kbId, Map<Long, Long> updates) {
@@ -546,7 +546,7 @@ public class FaqEntryCommandService {
                         "batch", true));
     }
 
-    // ══════════════════ 删除 ═══════════════════════════════════════════
+    // ── 删除 ──
 
     /**
      * 授权先行、逐条软删，
@@ -671,7 +671,7 @@ public class FaqEntryCommandService {
     }
 
 
-    // ══════════════════ 私有：重复检查 ══════════════════════
+    // ── 私有：重复检查 ──
 
     /** 1-3 步本地判定、4 步一条 DB 查询、5-7 步报错语义。 */
     private void checkFAQQuestionDuplicate(long tenantId, String kbId, String excludeChunkId,

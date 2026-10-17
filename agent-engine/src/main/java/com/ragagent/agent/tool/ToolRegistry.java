@@ -57,7 +57,7 @@ public class ToolRegistry {
     /** 工具输出上限（字符数）；0 = 用 DefaultMaxToolOutput。 */
     private int maxToolOutputSize;
 
-    // ---- 校验失败的追加提示（文本属于各工具文件，registry 拼接点先就位）----
+    // ── 校验失败的追加提示（文本属于各工具文件，registry 拼接点先就位） ──
     static final String WRITE_SANDBOX_MISSING_FIELD_HINT =
             "\nIf the previous call was truncated, retry with a complete JSON object: "
                     + "put `path` first (e.g. /workspace/output/script.py), then `content`. Split large files.";
@@ -317,9 +317,7 @@ public class ToolRegistry {
         }
     }
 
-    // =====================================================================
     // MCP 编排端口（逻辑在 MCP 适配层 McpTooling，装配期注入）
-    // =====================================================================
 
     /** 注入 MCP 编排端口（未接线时所有 MCP 调用为空操作 / null）。 */
     public void setMcpTooling(McpToolingGateway gateway) {

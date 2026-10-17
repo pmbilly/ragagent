@@ -156,7 +156,7 @@ public class DataSourceService implements DataSourceSyncHandler {
         this.executor = new DataSourceSyncExecutor(this);
     }
 
-    // ══════════════════════════ 管理面 ══════════════════════════
+    // ── 管理面 ──
 
     /**
      * 新建数据源。
@@ -504,7 +504,7 @@ public class DataSourceService implements DataSourceSyncHandler {
         return ancestors;
     }
 
-    // ══════════════════════════ 同步控制 ══════════════════════════
+    // ── 同步控制 ──
 
     /**
      * 手动触发同步。

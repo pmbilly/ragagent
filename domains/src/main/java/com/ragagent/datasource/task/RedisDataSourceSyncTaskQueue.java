@@ -134,9 +134,7 @@ public class RedisDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue {
         worker.shutdownNow();
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 执行 / 重试
-    // ═══════════════════════════════════════════════════════════════
 
     private void accept(String member) {
         QueueMember queued;

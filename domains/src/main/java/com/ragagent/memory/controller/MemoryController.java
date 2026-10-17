@@ -123,7 +123,7 @@ public class MemoryController {
         this.consolidationService = consolidationService;
     }
 
-    // ══════════════════════════ 设置 ══════════════════════════
+    // ── 设置 ──
 
     /** 响应是裸 {@link MemorySettings}（camelCase）。 */
     @GetMapping("/api/v1/memory/settings")
@@ -152,7 +152,7 @@ public class MemoryController {
         return getSettings();
     }
 
-    // ══════════════════════════ 条目 ══════════════════════════
+    // ── 条目 ──
 
     /**
      * 列出记忆条目（分页）。
@@ -276,7 +276,7 @@ public class MemoryController {
         return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
-    // ══════════════════════════ 主题 ══════════════════════════
+    // ── 主题 ──
 
     /** 列出话题计数：{@code {items,page,pageSize,total}}。 */
     @GetMapping("/api/v1/memory/topics")
@@ -319,7 +319,7 @@ public class MemoryController {
         return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
-    // ══════════════════════════ 文档亲和度 ══════════════════════════
+    // ── 文档亲和度 ──
 
     /** 列出文档亲和度：{@code {items,page,pageSize,total}}。 */
     @GetMapping("/api/v1/memory/documents")
@@ -347,7 +347,7 @@ public class MemoryController {
         return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
-    // ══════════════════════════ 导出 / 整理 ══════════════════════════
+    // ── 导出 / 整理 ──
 
     /**
      * 导出调用者的全部记忆。
@@ -431,7 +431,7 @@ public class MemoryController {
         }
     }
 
-    // ══════════════════════════ 工具方法 ══════════════════════════
+    // ── 工具方法 ──
 
     /**
  * {@code {items, page, pageSize, total}}——三个列表端点的响应（分页形态）。

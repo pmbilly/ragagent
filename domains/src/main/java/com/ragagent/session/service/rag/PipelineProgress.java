@@ -218,7 +218,7 @@ public final class PipelineProgress {
         emit(chatManage.getEventBus(), toolResultEvent(chatManage.getSessionId(), data));
     }
 
-    // ----- 内部 -----
+    // ── 内部 ──
 
     static boolean hasKBRetrievalTargets(ChatManage chatManage) {
         if (chatManage == null) {
@@ -279,7 +279,7 @@ public final class PipelineProgress {
         return "web_search".equalsIgnoreCase(result.getKnowledgeSource());
     }
 
-    // ----- 事件构造 -----
+    // ── 事件构造 ──
 
     private static Event toolCallEvent(String sessionId, String toolCallId, String toolName,
                                        Map<String, Object> arguments) {

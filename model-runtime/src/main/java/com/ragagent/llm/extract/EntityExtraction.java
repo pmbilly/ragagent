@@ -32,9 +32,7 @@ public final class EntityExtraction {
 
     private EntityExtraction() {}
 
-    // ------------------------------------------------------------------
     // Extractor
-    // ------------------------------------------------------------------
 
     /** 抽取器。 */
     public static final class Extractor {
@@ -68,9 +66,7 @@ public final class EntityExtraction {
         public List<GraphRelation> relation = new ArrayList<>();
     }
 
-    // ------------------------------------------------------------------
     // QAPromptGenerator
-    // ------------------------------------------------------------------
 
     /** QA 提示词生成器。 */
     public static final class QAPromptGenerator {
@@ -141,9 +137,7 @@ public final class EntityExtraction {
         return node.isContainer() ? node.toString() : node.asString();
     }
 
-    // ------------------------------------------------------------------
     // Formater
-    // ------------------------------------------------------------------
 
     /** 格式化/解析器（json + 围栏形态）。 */
     public static final class Formater {

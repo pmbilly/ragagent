@@ -42,7 +42,7 @@ public final class PipelineCommon {
 
     private PipelineCommon() {}
 
-    // ----- 日志快捷方式 -----
+    // ── 日志快捷方式 ──
 
     static void info(String stage, String action, Map<String, Object> fields) {
         PipelineLog.info(stage, action, fields);
@@ -56,7 +56,7 @@ public final class PipelineCommon {
         PipelineLog.error(stage, action, fields);
     }
 
-    // ----- 模型准备 -----
+    // ── 模型准备 ──
 
     /** (chatModel, opt) 组合返回。 */
     public record PreparedChatModel(LlmChatClient chatModel, ChatOptions options) {}
@@ -88,7 +88,7 @@ public final class PipelineCommon {
         return new PreparedChatModel(chatModel, opt);
     }
 
-    // ----- 消息组装 -----
+    // ── 消息组装 ──
 
     /**
      * 渲染系统提示词 + 历史 + 当前用户消息。
@@ -209,7 +209,7 @@ public final class PipelineCommon {
         return String.join("\n", parts);
     }
 
-    // ----- 并发工具 -----
+    // ── 并发工具 ──
 
     /** 具名并发任务。 */
     public record ParallelTask(String name, java.util.function.Supplier<PluginError> run) {}

@@ -106,9 +106,7 @@ public final class PluginMerge implements Plugin {
         return next.next();
     }
 
-    // ------------------------------------------------------------------
     // 输入选择 / 去重 / 历史注入
-    // ------------------------------------------------------------------
 
     /** rerank 优先，回落按分数降序的检索结果。 */
     private List<SearchResult> selectInputResults(ChatManage chatManage) {
@@ -255,9 +253,7 @@ public final class PluginMerge implements Plugin {
         next.add(id);
         r.setSubChunkId(next);
     }
-    // ------------------------------------------------------------------
     // FAQ 答案回填
-    // ------------------------------------------------------------------
 
     public List<SearchResult> resolveParentChunks(ChatManage chatManage, List<SearchResult> results) {
         return parentOps.resolveParentChunks(chatManage, results);
@@ -395,9 +391,7 @@ public final class PluginMerge implements Plugin {
         return builder.toString().trim();
     }
 
-    // ------------------------------------------------------------------
     // 历史引用过滤
-    // ------------------------------------------------------------------
 
     /** Jaccard ≥ 0.15 的历史引用，分数打 6 折，上限 3 条。 */
     public static List<SearchResult> filterHistoryResults(ChatManage chatManage, List<SearchResult> currentResults) {
@@ -469,9 +463,7 @@ public final class PluginMerge implements Plugin {
         return s.substring(0, end);
     }
 
-    // ------------------------------------------------------------------
     // 顺序合并
-    // ------------------------------------------------------------------
 
     /**
      * 可信对按位置合并；含编辑/扩展/过期内容的对

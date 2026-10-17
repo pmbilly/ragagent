@@ -10,9 +10,7 @@ public final class WikiBatchConstants {
 
     private WikiBatchConstants() {}
 
-    // ═══════════════════════════════════════════════════════════════
     // chunk 引用批次
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 单个 chunk 引用批次的
@@ -33,9 +31,7 @@ public final class WikiBatchConstants {
     /** 句柄编号的零填充宽度 */
     public static final int CHUNK_HANDLE_WIDTH = 3;
 
-    // ═══════════════════════════════════════════════════════════════
     // 去重预筛
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 每个新条目的相似度探测返回
@@ -57,9 +53,7 @@ public final class WikiBatchConstants {
      */
     public static final int DEDUP_SMALL_CORPUS_BYPASS = 25;
 
-    // ═══════════════════════════════════════════════════════════════
     // 目录规划
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 渲染进 prompt 的既存目录数上限。
@@ -95,9 +89,7 @@ public final class WikiBatchConstants {
     public static final String TAXONOMY_EMPTY_TREE_HINT =
             "(none yet — this knowledge base has no folders, design a fresh directory)";
 
-    // ═══════════════════════════════════════════════════════════════
     // 抽取指令的作用域标签
-    // ═══════════════════════════════════════════════════════════════
 
     /** 抽取指令的作用域标签值 */
     public static final String INSTRUCTION_SCOPE_EXTRACTION = "wiki_extraction";
@@ -108,9 +100,7 @@ public final class WikiBatchConstants {
     /** 无既有 slug 时给 prompt 的占位提示 */
     public static final String NO_PREVIOUS_SLUGS_HINT = "(none — this is a new document)";
 
-    // ═══════════════════════════════════════════════════════════════
     // 批次执行内联字面量
-    // ═══════════════════════════════════════════════════════════════
 
     /** 页面类型哨兵字面量（summary） */
     public static final String PAGE_TYPE_SUMMARY_LITERAL = "summary";

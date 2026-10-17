@@ -97,9 +97,7 @@ public final class JsonFieldExtractor {
         return done;
     }
 
-    // ------------------------------------------------------------------
     // 状态机
-    // ------------------------------------------------------------------
 
     /**
      * 返回字段字符串值内容开始的字节偏移
@@ -210,9 +208,7 @@ public final class JsonFieldExtractor {
         return n;
     }
 
-    // ------------------------------------------------------------------
     // 反转义
-    // ------------------------------------------------------------------
 
     /** 还原转义，作用在字节区间 {@code [from, to)} 上。 */
     private static String unescapeJsonString(byte[] data, int from, int to) {
@@ -286,9 +282,7 @@ public final class JsonFieldExtractor {
         out.writeBytes(new String(Character.toChars(cp)).getBytes(StandardCharsets.UTF_8));
     }
 
-    // ------------------------------------------------------------------
     // 字节工具
-    // ------------------------------------------------------------------
 
     private void append(byte[] data) {
         ensureCapacity(length + data.length);

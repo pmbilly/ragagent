@@ -27,7 +27,7 @@ public final class PluginError {
         this.errorType = errorType == null ? "" : errorType;
     }
 
-    // ----- 预定义错误（恒同一实例） -----
+    // ── 预定义错误（恒同一实例） ──
 
     public static final PluginError SEARCH_NOTHING =
             new PluginError(null, "No relevant content found", "search_nothing");

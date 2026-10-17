@@ -18,7 +18,7 @@ public interface AgentRunSpec {
     /** ReAct 轮次上限哨兵：负数 = 无上限。 */
     int UNLIMITED_MAX_ITERATIONS = -1;
 
-    // ---- 引擎消费的持久化字段 ----
+    // ── 引擎消费的持久化字段 ──
     int getMaxIterations();
 
     List<String> getAllowedTools();
@@ -47,7 +47,7 @@ public interface AgentRunSpec {
 
     boolean isParallelToolCalls();
 
-    // ---- 运行时字段（不持久化）----
+    // ── 运行时字段（不持久化） ──
     boolean isChatModelSupportsVision();
 
     String getVlmModelId();

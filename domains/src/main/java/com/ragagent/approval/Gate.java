@@ -133,9 +133,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
         return PUBSUB_CHANNEL_BASE;
     }
 
-    // ------------------------------------------------------------------
     // 策略查询
-    // ------------------------------------------------------------------
 
     /**
      * 是否需要停下来等人工确认。
@@ -182,9 +180,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
         return ToolEnabledChecks.enabledTools(ctx, checker, tenantId, serviceId, names);
     }
 
-    // ------------------------------------------------------------------
     // 等待审批
-    // ------------------------------------------------------------------
 
     /**
      * 先发 “approval required” 事件，
@@ -316,9 +312,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
         }
     }
 
-    // ------------------------------------------------------------------
     // 决议
-    // ------------------------------------------------------------------
 
     /**
      * 完成一个待决审批。
@@ -436,9 +430,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
         return null;
     }
 
-    // ------------------------------------------------------------------
     // 跨实例订阅
-    // ------------------------------------------------------------------
 
     /**
      * 监听跨实例 Resolve 广播并投递给本地等待者。
@@ -529,9 +521,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
         };
     }
 
-    // ------------------------------------------------------------------
     // 事件发送
-    // ------------------------------------------------------------------
 
     /** 发结果事件（失败只吞掉） */
     private void emitResolved(PendingRequest req, String pendingId, Decision d) {
@@ -565,9 +555,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
         }
     }
 
-    // ------------------------------------------------------------------
     // 生命周期 / 工具
-    // ------------------------------------------------------------------
 
     /**
      * 停止跨实例订阅线程（Spring 容器关闭/测试隔离需要一个确定的出口）。没配 Redis 时为空操作。

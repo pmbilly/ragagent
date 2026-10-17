@@ -27,9 +27,7 @@ final class QaWebSearchParams {
         this.service = service;
     }
 
-    // ==================================================================
     // web search 解析
-    // ==================================================================
 
     String resolveWebSearchProviderId(QaSupport.QaRequest req, long tenantId) {
         if (req.agentConfig != null) {

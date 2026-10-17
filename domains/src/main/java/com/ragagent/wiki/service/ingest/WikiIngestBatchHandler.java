@@ -121,9 +121,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
         this.reduce = new WikiIngestReducePhase(this);
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 统计载体
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 一次批处理的全部计数变量。
@@ -150,9 +148,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
         int maxInflight = 0;
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // KB / 知识 / 分块 的批量读取
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 按 id 取 KB，未找到返回 {@code null}。
@@ -198,9 +194,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
                 : WikiConfig.fromJson(node.toString());
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 批次上下文
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 构造本次运行使用的
@@ -353,9 +347,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
         return WikiExtractionGranularity.STANDARD;
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 后续调度
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 若该 KB 的
@@ -411,9 +403,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
         return true;
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // ProcessWikiIngest 主流程
-    // ═══════════════════════════════════════════════════════════════
 
     @Override
     public void processWikiIngest(WikiIngestPayload payload) {
@@ -448,9 +438,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
         run.finalize.processWikiFinalize(payload);
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 小工具
-    // ═══════════════════════════════════════════════════════════════
 
 /** {@code reduceSlugUpdates} 的多值返回载体。 */
     public record ReduceOutcome(boolean changed, String affectedType,

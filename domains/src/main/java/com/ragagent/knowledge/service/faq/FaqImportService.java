@@ -93,7 +93,7 @@ public class FaqImportService {
         return tid == null ? 0 : tid;
     }
 
-    // ══════════════════ 导入（Upsert）与进度 ═══════════════════════════
+    // ── 导入（Upsert）与进度 ──
 
     /**
      * binding 校验
@@ -543,7 +543,7 @@ public class FaqImportService {
         }
     }
 
-    // ══════════════════ 导入任务（进程内） ═════════════════════════════
+    // ── 导入任务（进程内） ──
 
     /** 进程内导入任务的参数。 */
     record ImportJob(long tenantId, String taskId, String kbId, String knowledgeId,

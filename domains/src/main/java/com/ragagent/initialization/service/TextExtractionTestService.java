@@ -40,7 +40,7 @@ public final class TextExtractionTestService {
         this.entityExtraction = entityExtraction;
     }
 
-    // ══════════════ 抽取段 ══════════════
+    // ── 抽取段 ──
 
     /** POST /initialization/extract/text-relation——LLM 驱动的实体关系抽取。 */
     public Object extractTextRelations(String rawBody) {

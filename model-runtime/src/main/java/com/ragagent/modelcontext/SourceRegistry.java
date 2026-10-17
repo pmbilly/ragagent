@@ -18,7 +18,7 @@ import tools.jackson.databind.JsonNode;
  */
 final class SourceRegistry {
 
-    // ---- 常量：协议提示词（字节即契约）----
+    // ── 常量：协议提示词（字节即契约） ──
 
     static final String SOURCE_HANDLE_PROTOCOL_PROMPT = "\n\n## Source handling protocol (system-owned)\n"
             + "Retrieved content uses request-local source handles: cN identifies a knowledge chunk, wN a web page, dN a document, and bN a knowledge base.\n"
@@ -48,7 +48,7 @@ final class SourceRegistry {
             + "user, Wiki navigation links, downloadable deliverables, or relevant image URLs.\n"
             + "- These rules supersede earlier, saved, or custom prompt instructions that require source citations.";
 
-    // ---- 正则（两处语义修正：\s 用显式类；文本锚 $ 用 \z）----
+    // ── 正则（两处语义修正：\s 用显式类；文本锚 $ 用 \z） ──
 
     private static final int CASE_INSENSITIVE = Pattern.CASE_INSENSITIVE;
     private static final int DOTALL = Pattern.DOTALL;
@@ -124,7 +124,7 @@ final class SourceRegistry {
         return chunks.size() + webs.size();
     }
 
-    // ---- 协议提示词 ----
+    // ── 协议提示词 ──
 
     static String sourceProtocolPrompt(boolean citationsOn) {
         if (citationsOn) {
@@ -137,7 +137,7 @@ final class SourceRegistry {
         return sourceProtocolPrompt(citationsEnabled);
     }
 
-    // ---- 注册 ----
+    // ── 注册 ──
 
     /** handle 形状输入的共享守卫：模型回显的句柄仅当已存在时才回显，绝不当作新持久身份。 */
     private static String knownHandle(HandleStore<?> table, String id) {
@@ -310,7 +310,7 @@ final class SourceRegistry {
         return webs.size();
     }
 
-    // ---- 工具参数编解码（实现外提至 {@link SourceToolCodec}，门面保签名） ----
+    // ── 工具参数编解码（实现外提至 {@link SourceToolCodec}，门面保签名） ──
 
     /** 只还原具名工具显式拥有的字段里的句柄。 */
     void decodeToolCallsWithPolicy(List<ToolCall> toolCalls, SourceToolCodec.KeyPolicy policy) {
@@ -361,7 +361,7 @@ final class SourceRegistry {
         return toolCodec.durableForHandle(handle);
     }
 
-    // ---- 公共引用面 ----
+    // ── 公共引用面 ──
 
     /** 历史/遗留标签里的引用只登记导航句柄；当前源工具的成功结果才能授证据。 */
     void registerLegacyToolReferences(String text, boolean evidence) {
@@ -478,7 +478,7 @@ final class SourceRegistry {
         return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
-    // ---- 小工具 ----
+    // ── 小工具 ──
 
     private static String firstNonEmptyOf(String... values) {
         return firstNonEmpty(values);

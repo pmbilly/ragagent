@@ -5,7 +5,7 @@ import java.util.List;
 
 /** agent wiki 工具的页面 seam 视图。 */
 
-    // ==================== seam 视图 ====================
+    // ── seam 视图 ──
 
     /** Wiki 页视图（可变，供重命名/回滚就地改写字段）。 */
     public final class PageView {

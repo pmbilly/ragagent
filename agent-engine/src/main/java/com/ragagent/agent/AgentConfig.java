@@ -39,7 +39,7 @@ public class AgentConfig implements AgentRunSpec {
      */
     public static final int UNLIMITED_MAX_ITERATIONS = AgentRunSpec.UNLIMITED_MAX_ITERATIONS;
 
-    // ---- 引擎消费的持久化字段 ----
+    // ── 引擎消费的持久化字段 ──
     private int maxIterations;
     private List<String> allowedTools;
     private double temperature;
@@ -56,7 +56,7 @@ public class AgentConfig implements AgentRunSpec {
     private int compactionKeepRecentTokens;
     private boolean parallelToolCalls;
 
-    // ---- 运行时字段（不持久化）----
+    // ── 运行时字段（不持久化） ──
     /** 已解析的模型能力，客户端给不了。 */
     @JsonIgnore
     private boolean chatModelSupportsVision;

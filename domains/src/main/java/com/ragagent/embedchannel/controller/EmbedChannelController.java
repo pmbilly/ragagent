@@ -101,7 +101,7 @@ final FileProxyPort fileProxyService;
         this.delegateOps = new EmbedChannelDelegateOps(this);
     }
 
-    // ═══════════════════ 请求体 ═══════════════════
+    // ── 请求体 ──
 
     record EmbedChannelRequest( String name, Boolean enabled, JsonNode allowedOrigins, String welcomeMessage, Integer rateLimitPerMinute, Integer rateLimitPerDay, String primaryColor, String pageTitle, String headerTitleMode, Boolean showSuggestedQuestions, Boolean showThinking, String widgetPosition, Boolean allowWebSearch, Boolean allowFileUpload, String defaultLocale, String webhookUrl, String webhookSecret, String agentId, String launcherIcon) {
     }
@@ -291,7 +291,7 @@ final FileProxyPort fileProxyService;
         return delegateOps.toolApprovals(sessionId, pendingId, rawBody);
     }
 
-    // ═══════════════════ ensureSession ═══════════════════
+    // ── ensureSession ──
 
     /**
      * 会话门：失败直接抛 {@link PlainErrorException}
@@ -367,7 +367,7 @@ void ensureSession(String sessionId) {
         return true;
     }
 
-    // ═══════════════════ 响应组构件 ═══════════════════
+    // ── 响应组构件 ──
 
     /**
      * 渠道行视图：键字母序。publishToken 非空才带键。
@@ -446,7 +446,7 @@ void ensureSession(String sessionId) {
         };
     }
 
-    // ═══════════════════ 工具 ═══════════════════
+    // ── 工具 ──
 
     static long currentTenant() {
         Long tid = TenantContext.currentTenantId();

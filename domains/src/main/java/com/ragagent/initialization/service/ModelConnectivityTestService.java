@@ -53,7 +53,7 @@ public final class ModelConnectivityTestService {
         this.documentReader = documentReader;
     }
 
-    // ══════════════ 模型连通性测试段 ══════════════
+    // ── 模型连通性测试段 ──
 
     /** POST /initialization/remote/check——chat 模块最小化连通性调用。 */
     public Object remoteCheck(String rawBody) {
@@ -346,7 +346,7 @@ public final class ModelConnectivityTestService {
         }
     }
 
-    // ══════════════ ModelTestRequest 绑定与共用件 ══════════════
+    // ── ModelTestRequest 绑定与共用件 ──
 
     private record ModelTestRequest(String source, String modelName, String baseUrl, String apiKey,
             String provider, String interfaceType, int dimension, boolean supportsDimensionOverride,

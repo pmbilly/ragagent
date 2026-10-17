@@ -193,7 +193,6 @@ public final class PluginSearch implements Plugin {
 
 
 
-    // ------------------------------------------------------------------
 
 
     /** 薄委托：见 {@link QueryTextOps#extractKeywords}（测试直调）。 */

@@ -89,7 +89,7 @@ public class ParsedChunk {
         this.parentIndex = parentIndex;
     }
 
-    // ---- record 风格访问器别名（DB 实体列名 start_at/end_at 对应命名） ----
+    // ── record 风格访问器别名（DB 实体列名 start_at/end_at 对应命名） ──
 
     public String content() {
         return content;

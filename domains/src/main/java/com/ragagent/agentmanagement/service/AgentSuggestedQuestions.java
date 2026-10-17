@@ -429,7 +429,7 @@ public final class AgentSuggestedQuestions {
         return out;
     }
 
-    // ═══════════════════ 小工具 ═══════════════════
+    // ── 小工具 ──
 
     public static ObjectNode parse(String raw) {
         if (raw == null || raw.isEmpty()) {

@@ -195,9 +195,7 @@ public class RemoteApiChat implements LlmChatClient {
         return requestOps.shapedRequest(messages, opts, isStream);
     }
 
-    // ------------------------------------------------------------------
     // 出站流水线
-    // ------------------------------------------------------------------
 
     /**
      * 组装最终出站请求（body + endpoint + 缓存策略）。
@@ -280,9 +278,7 @@ public class RemoteApiChat implements LlmChatClient {
     private static String statusError(HttpResponse<?> resp, String body) {
         return RemoteHttpOps.statusError(resp, body);
     }
-    // ------------------------------------------------------------------
     // 非流式
-    // ------------------------------------------------------------------
 
     @Override
     public ChatResponse chat(List<ChatMessage> messages, ChatOptions opts) {
@@ -336,9 +332,7 @@ public class RemoteApiChat implements LlmChatClient {
         return result;
     }
 
-    // ------------------------------------------------------------------
     // 流式
-    // ------------------------------------------------------------------
 
     @Override
     public ChatStream chatStream(List<ChatMessage> messages, ChatOptions opts) {
@@ -424,9 +418,7 @@ public class RemoteApiChat implements LlmChatClient {
     static String removeThinkingContent(String content) {
         return RemoteApiResponseOps.removeThinkingContent(content);
     }
-    // ------------------------------------------------------------------
     // 日志与访问器
-    // ------------------------------------------------------------------
 
     /** null 安全的标准用量日志行。 */
     void logUsage(TokenUsage usage) {

@@ -46,9 +46,7 @@ public class WikiIngestDedupService implements WikiDedupSupport {
         this.claimStore = claimStore;
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 合并合法性校验
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 用确定性、
@@ -84,9 +82,7 @@ public class WikiIngestDedupService implements WikiDedupSupport {
         return "";
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 身份认领
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 在 Reduce 开始之前，
@@ -150,9 +146,7 @@ public class WikiIngestDedupService implements WikiDedupSupport {
         return claim;
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 身份收敛（WikiDedupSupport）
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 应用确定性
@@ -215,9 +209,7 @@ public class WikiIngestDedupService implements WikiDedupSupport {
         return out;
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 精确身份页的挂载与解析
-    // ═══════════════════════════════════════════════════════════════
 
     /** 身份页缓存键 */
     static String identityPageCacheKey(String pageType, String identity) {
@@ -371,9 +363,7 @@ public class WikiIngestDedupService implements WikiDedupSupport {
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 引用遍之后的重认领与批次级重映射
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 在引用发现之后

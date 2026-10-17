@@ -30,9 +30,7 @@ public final class AgentPrompts {
     private AgentPrompts() {
     }
 
-    // ------------------------------------------------------------------
     // 小型格式化器
-    // ------------------------------------------------------------------
 
     /** 文件大小的人类可读格式。 */
     public static String formatFileSize(long size) {
@@ -101,9 +99,7 @@ public final class AgentPrompts {
         }
     }
 
-    // ------------------------------------------------------------------
     // 提示词数据类型
-    // ------------------------------------------------------------------
 
     // 值类型（RecentDocInfo / SelectedDocumentInfo / Pinned*Info / KnowledgeBaseInfo /
     // PlaceholderDefinition）已外提至 com.ragagent.agent.prompt（F5b-2）。
@@ -118,9 +114,7 @@ public final class AgentPrompts {
         return result;
     }
 
-    // ------------------------------------------------------------------
     // 知识库目录 XML
-    // ------------------------------------------------------------------
 
     /** 知识库信息格式化为提示词 XML。 */
     public static String formatKnowledgeBaseList(List<KnowledgeBaseInfo> kbInfos) {
@@ -165,9 +159,7 @@ public final class AgentPrompts {
         return r;
     }
 
-    // ------------------------------------------------------------------
     // 占位符渲染
-    // ------------------------------------------------------------------
 
     /**
      * 渲染模板里的占位符。
@@ -214,9 +206,7 @@ public final class AgentPrompts {
         return AgentPromptPlaceholders.renderPromptPlaceholders(result, vals);
     }
 
-    // ------------------------------------------------------------------
     // 技能目录 + 工具指引
-    // ------------------------------------------------------------------
 
     /**
      * 本轮点名的技能正文块。与 Level 1 的 {@code Available skills} 目录区分：
@@ -293,9 +283,7 @@ public final class AgentPrompts {
     }
 
 
-    // ------------------------------------------------------------------
     // 系统提示词组装
-    // ------------------------------------------------------------------
 
 
     /** 系统提示词构建的可选参数。 */

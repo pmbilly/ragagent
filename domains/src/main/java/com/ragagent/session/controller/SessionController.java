@@ -104,7 +104,7 @@ public class SessionController {
         return BizException.internal(e.getMessage());
     }
 
-    // ══════════════════════════ 创建 ══════════════════════════
+    // ── 创建 ──
 
     /** 创建会话：<b>201</b> + 裸 {@code Session}。 */
     @PostMapping("/api/v1/sessions")
@@ -137,7 +137,7 @@ public class SessionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-    // ══════════════════════════ 读取 ══════════════════════════
+    // ── 读取 ──
 
     @GetMapping("/api/v1/sessions/{id}")
     public ResponseEntity<Session> getSession(@PathVariable("id") String id) {
@@ -220,7 +220,7 @@ public class SessionController {
                 AppError.badRequest("分页参数不合法").withDetails(details));
     }
 
-    // ══════════════════════════ 更新 ══════════════════════════
+    // ── 更新 ──
 
     /**
      * 更新成功后**重新加载**再返回
@@ -268,7 +268,7 @@ public class SessionController {
 
 
 
-    // ══════════════════════════ 删除 ══════════════════════════
+    // ── 删除 ──
 
     /** 删除会话：同步删除 → <b>200</b> + {@code ApiResponse} 外壳。 */
     @DeleteMapping("/api/v1/sessions/{id}")
@@ -329,7 +329,7 @@ public class SessionController {
         return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
-    // ══════════════════════════ 清空消息 ══════════════════════════
+    // ── 清空消息 ──
 
     /**
      * 会话本身保留，消息全软删（含建议与聊天历史知识清理——在 MessageService 里）。
@@ -352,7 +352,7 @@ public class SessionController {
         return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
-    // ══════════════════════════ 置顶 ══════════════════════════
+    // ── 置顶 ──
 
     /** 置顶：200 + {@code {"pinned":true}}。 */
     @PostMapping("/api/v1/sessions/{sessionId}/pin")
@@ -386,7 +386,7 @@ public class SessionController {
         return new SessionPinResponse(pinned);
     }
 
-    // ══════════════════════════ 产物 ══════════════════════════
+    // ── 产物 ──
 
     /**
      * 会话全部 assistant 消息的产物元数据，**不含存储 URL**——客户端不能绕过
@@ -507,7 +507,7 @@ public class SessionController {
 
 
 
-    // ══════════════════════════ 生成标题 ══════════════════════════
+    // ── 生成标题 ──
 
     /**
      * 写会话行，用严格 owner 范围
@@ -538,7 +538,7 @@ public class SessionController {
         return new GenerateTitleResponse(title);
     }
 
-    // ══════════════════════════ 停止生成 ══════════════════════════
+    // ── 停止生成 ──
 
     /**
      * <p>⚠️ 错误形态与组内其他端点不同：错误体是 {@code {"error": "…"}} 纯字符串信封

@@ -302,7 +302,7 @@ public final class Registry {
         return ToolPolicy.encodeToolPrivateResult(this, toolName, output);
     }
 
-    // ---- MCP 服务/工具句柄与参数改写 ----
+    // ── MCP 服务/工具句柄与参数改写 ──
 
     /** MCP 路由身份属于 bridge 而非远端 schema（对照 mcpArgumentTable）。 */
     private record McpArgumentTable(String key, HandleTable table) {
@@ -523,7 +523,7 @@ public final class Registry {
         return text;
     }
 
-    // ---- MCP 结果来源发现 ----
+    // ── MCP 结果来源发现 ──
 
     /** MCP 结果里观察到的字面 HTTP(S) 链接索引上限。 */
     static final int MAX_MCP_SOURCE_CANDIDATES = 50;

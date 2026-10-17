@@ -75,9 +75,7 @@ public class OllamaChat implements LlmChatClient {
         this.ollamaService = ollamaService;
     }
 
-    // ------------------------------------------------------------------
     // 对外接口
-    // ------------------------------------------------------------------
 
     /**
      * 非流式。
@@ -249,9 +247,7 @@ public class OllamaChat implements LlmChatClient {
         ollamaService.ensureModelAvailable(modelName);
     }
 
-    // ------------------------------------------------------------------
     // 请求体构造
-    // ------------------------------------------------------------------
 
     /** {@code isStream} 决定 stream 标志。 */
     OllamaChatRequest buildChatRequest(List<ChatMessage> messages, ChatOptions opts, boolean isStream) {
@@ -333,9 +329,7 @@ public class OllamaChat implements LlmChatClient {
         return ollamaTools;
     }
 
-    // ------------------------------------------------------------------
     // 工具调用互转
-    // ------------------------------------------------------------------
 
     /** ID 解析回整数 index（非数字 → 0），arguments 解析成对象。 */
     List<OllamaToolCall> toolCallFrom(List<ToolCall> toolCalls) {
@@ -417,9 +411,7 @@ public class OllamaChat implements LlmChatClient {
         }
     }
 
-    // ------------------------------------------------------------------
     // 内部工具
-    // ------------------------------------------------------------------
 
     private void logUsage(TokenUsage usage) {
         if (usage == null || !log.isInfoEnabled()) {

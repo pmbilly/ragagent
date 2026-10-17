@@ -64,9 +64,7 @@ public final class DefaultMcpClient implements McpClient {
         return McpProtocol.DEFAULT_TIMEOUT;
     }
 
-    // ------------------------------------------------------------------
     // 连接
-    // ------------------------------------------------------------------
 
     @Override
     public void connect(McpContext ctx) {
@@ -98,9 +96,7 @@ public final class DefaultMcpClient implements McpClient {
         transport.close();
     }
 
-    // ------------------------------------------------------------------
     // initialize
-    // ------------------------------------------------------------------
 
     @Override
     public InitializeResult initialize(McpContext ctx) {
@@ -190,9 +186,7 @@ public final class DefaultMcpClient implements McpClient {
         return instructions;
     }
 
-    // ------------------------------------------------------------------
     // tools
-    // ------------------------------------------------------------------
 
     @Override
     public List<McpTool> listTools(McpContext ctx) {
@@ -271,9 +265,7 @@ public final class DefaultMcpClient implements McpClient {
         }
     }
 
-    // ------------------------------------------------------------------
     // resources / tools/call
-    // ------------------------------------------------------------------
 
     @Override
     public List<McpResource> listResources(McpContext ctx) {
@@ -362,9 +354,7 @@ public final class DefaultMcpClient implements McpClient {
         }
     }
 
-    // ------------------------------------------------------------------
     // 状态
-    // ------------------------------------------------------------------
 
     @Override
     public boolean isConnected() {
@@ -376,9 +366,7 @@ public final class DefaultMcpClient implements McpClient {
         return service == null ? null : service.getId();
     }
 
-    // ------------------------------------------------------------------
     // 内部工具
-    // ------------------------------------------------------------------
 
     /** 发一条带数字 ID 的请求并做通用错误处理。 */
     private JsonRpcResponse send(String method, Object params, McpContext ctx) {

@@ -33,7 +33,7 @@ final class EmbedChannelPublicOps {
         this.ctrl = ctrl;
     }
 
-    // ═══════════════════ 公开面（EmbedAuthFilter 已跑） ═══════════════════
+    // ── 公开面（EmbedAuthFilter 已跑） ──
 
     /** 只有 publish token 能换 session token。 */
     public ResponseEntity<Map<String, Object>> exchange(@PathVariable("channelId") String channelId) {

@@ -96,9 +96,7 @@ public class OllamaService implements OllamaAdminPort {
         return baseUrl;
     }
 
-    // ------------------------------------------------------------------
     // 可用性
-    // ------------------------------------------------------------------
 
     /**
      * {@code HEAD /} 探活。
@@ -262,9 +260,7 @@ public class OllamaService implements OllamaAdminPort {
         }
     }
 
-    // ------------------------------------------------------------------
     // 模型管理
-    // ------------------------------------------------------------------
 
     /** 不可用且 optional → "unavailable"。 */
     @Override
@@ -370,9 +366,7 @@ public class OllamaService implements OllamaAdminPort {
         return name != null && !name.isEmpty() && !name.contains(" ");
     }
 
-    // ------------------------------------------------------------------
     // 推理
-    // ------------------------------------------------------------------
 
     /** 每收到一行 NDJSON 就回调一次。 */
     @FunctionalInterface
@@ -417,9 +411,7 @@ public class OllamaService implements OllamaAdminPort {
         streamNdjson("/api/generate", request, fn::onProgress);
     }
 
-    // ------------------------------------------------------------------
     // HTTP 细节
-    // ------------------------------------------------------------------
 
     /** POST 并整段读取响应 + {@code checkError}。 */
     private JsonNode postJson(String path, Object body) {

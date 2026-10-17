@@ -169,7 +169,7 @@ public class InitializationController {
         return ResponseEntity.ok(textTest.fabriText(rawBody));
     }
 
-    // ══════════════ multipart 解析失败兜底（controller 侧） ══════════════
+    // ── multipart 解析失败兜底（controller 侧） ──
 
 
     /** 非致命 multipart 解析错误。 */

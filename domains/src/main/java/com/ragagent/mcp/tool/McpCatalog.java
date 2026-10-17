@@ -685,7 +685,7 @@ public final class McpCatalog {
         return McpToolWrapper.sanitizeName(name);
     }
 
-    // ---- 小工具 ----
+    // ── 小工具 ──
 
     static byte[] utf8(String s) {
         return s.getBytes(StandardCharsets.UTF_8);

@@ -66,7 +66,7 @@ public class FaqController {
         this.guard = guard;
     }
 
-    // ══════════════════════════ 读 ══════════════════════════
+    // ── 读 ──
 
     @GetMapping("/api/v1/knowledge-bases/{id}/faq/entries")
     public ResponseEntity<FaqEntryPage> listEntries(
@@ -154,7 +154,7 @@ public class FaqController {
         return ResponseEntity.ok(faqImport.getImportProgress(task));
     }
 
-    // ══════════════════════════ 写 ══════════════════════════
+    // ── 写 ──
 
     @PostMapping("/api/v1/knowledge-bases/{id}/faq/entries")
     public ResponseEntity<FaqTaskStartResponse> upsertEntries(
@@ -252,7 +252,7 @@ public class FaqController {
         return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
-    // ══════════════════════════ 路由守卫 ══════════════════════════
+    // ── 路由守卫 ──
 
     /** 读路由：解析 KB（404）→ API-Key 白名单 → 跨租户 403。 */
     private KnowledgeBase requireKbRead(String kbId) {
@@ -268,7 +268,7 @@ public class FaqController {
         return guard.requireKbAccess(kbId);
     }
 
-    // ══════════════════════════ 参数解析 ══════════════════════════
+    // ── 参数解析 ──
 
     /** 导入进度面：任务租户必须与调用方一致，否则 404（不泄露他租户任务存在性）。 */
     private void requireTaskProgressTenant(String taskId) {

@@ -356,9 +356,7 @@ final class NotionMarkdown {
         b.append('\n');
     }
 
-    // ──────────────────────────────────────────────────────────────────────
     // 富文本渲染
-    // ──────────────────────────────────────────────────────────────────────
 
     /** 渲染富文本片段序列。 */
     static String renderRichText(List<NotionRichText> texts) {
@@ -463,9 +461,7 @@ final class NotionMarkdown {
         return text;
     }
 
-    // ──────────────────────────────────────────────────────────────────────
     // 原始内容抽取
-    // ──────────────────────────────────────────────────────────────────────
 
     /** 取 {@code rich_text} 数组；{@code raw} 为 null 或不是对象 → {@code null}。 */
     static List<NotionRichText> extractRichText(JsonNode raw) {

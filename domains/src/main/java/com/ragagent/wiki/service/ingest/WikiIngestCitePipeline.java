@@ -58,9 +58,7 @@ public class WikiIngestCitePipeline {
         this.chunkPort = chunkPort;
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 线格式类型
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 一次
@@ -118,9 +116,7 @@ public class WikiIngestCitePipeline {
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // Pass 0：候选 slug 抽取
-    // ═══════════════════════════════════════════════════════════════
 
     /** Pass 0 的抽取结果 */
     public record CandidateSlugs(List<ExtractedItem> entities,
@@ -276,9 +272,7 @@ public class WikiIngestCitePipeline {
         return out.isEmpty() ? WikiBatchConstants.NO_PREVIOUS_SLUGS_HINT : out;
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 分桶与渲染
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 把 chunk 分成
@@ -403,9 +397,7 @@ public class WikiIngestCitePipeline {
         return sb.toString();
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // Pass 1..N：分块分类
-    // ═══════════════════════════════════════════════════════════════
 
     /** 分类结果：slug → chunk 引用、新 slug、批次数 */
     public record CitationResult(Map<String, List<String>> citations,
@@ -548,9 +540,7 @@ public class WikiIngestCitePipeline {
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // Reduce 侧的 chunk 正文解析
-    // ═══════════════════════════════════════════════════════════════
 
     /**
      * 按 knowledge ID 分批，
@@ -629,9 +619,7 @@ public class WikiIngestCitePipeline {
         return sb.toString();
     }
 
-    // ═══════════════════════════════════════════════════════════════
     // 引用合并
-    // ═══════════════════════════════════════════════════════════════
 
     /** 合并结果：回填后的列表与未获引用计数 */
     public record MergedCitations(List<ExtractedItem> entities,

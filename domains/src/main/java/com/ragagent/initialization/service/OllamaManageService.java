@@ -38,7 +38,7 @@ public final class OllamaManageService {
         this.downloadTasks = downloadTasks;
     }
 
-    // ══════════════ ollama 管理段 ══════════════
+    // ── ollama 管理段 ──
 
     /** GET /initialization/ollama/status——StartService 失败仍是 200 + available:false。 */
     public Object ollamaStatus() {

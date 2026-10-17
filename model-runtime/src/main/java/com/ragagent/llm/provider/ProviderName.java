@@ -10,7 +10,7 @@ package com.ragagent.llm.provider;
  */
 public enum ProviderName {
 
-    // ---- 声明序即注册表与展示顺序（OpenAI 起，Azure OpenAI 止） ----
+    // ── 声明序即注册表与展示顺序（OpenAI 起，Azure OpenAI 止） ──
     OPENAI("openai"),
     ANTHROPIC("anthropic"),
     ALIYUN("aliyun"),

@@ -78,9 +78,7 @@ public class GitLabConnector implements StreamingConnector {
         return DataSourceConstants.CONNECTOR_TYPE_GITLAB;
     }
 
-    // ------------------------------------------------------------------
     // 配置
-    // ------------------------------------------------------------------
 
     /**
      * 用数据源自己的凭据建一个客户端。
@@ -107,9 +105,7 @@ public class GitLabConnector implements StreamingConnector {
         return value instanceof String s ? s : "";
     }
 
-    // ------------------------------------------------------------------
     // Connector
-    // ------------------------------------------------------------------
 
     /**
      * 先建客户端（凭据缺失优先于配置错误报出），
@@ -328,9 +324,7 @@ public class GitLabConnector implements StreamingConnector {
         return gitLabCursor(next);
     }
 
-    // ------------------------------------------------------------------
     // 流式内部
-    // ------------------------------------------------------------------
 
     /**
      * 按 compare 的 diff 逐条 emit。
@@ -414,9 +408,7 @@ public class GitLabConnector implements StreamingConnector {
         void visit(String file);
     }
 
-    // ------------------------------------------------------------------
     // item 构造
-    // ------------------------------------------------------------------
 
     /**
      * 构造一个文件条目。
@@ -464,9 +456,7 @@ public class GitLabConnector implements StreamingConnector {
         return item;
     }
 
-    // ------------------------------------------------------------------
     // 纯函数
-    // ------------------------------------------------------------------
 
     /** 取扩展名（小写）后查支持表。 */
     static boolean isSupportedFile(String file) {
@@ -533,9 +523,7 @@ public class GitLabConnector implements StreamingConnector {
         return new String[]{value.substring(0, idx), value.substring(idx + 1)};
     }
 
-    // ------------------------------------------------------------------
     // cursor
-    // ------------------------------------------------------------------
 
     /**
      * 把 {@code projects} 映射包成

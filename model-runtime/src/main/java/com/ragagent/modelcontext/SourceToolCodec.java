@@ -31,7 +31,7 @@ final class SourceToolCodec {
         this.reg = reg;
     }
 
-    // ---- 工具参数编解码 ----
+    // ── 工具参数编解码 ──
 
     /** 工具参数策略：某 tool 的某 key 是否归该工具契约。 */
     interface KeyPolicy {

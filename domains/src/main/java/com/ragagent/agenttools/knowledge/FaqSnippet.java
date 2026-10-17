@@ -27,7 +27,7 @@ public final class FaqSnippet {
     /** 工具输出里相似问的展示上限。 */
     public static final int FAQ_MAX_SIMILAR_QUESTIONS_DISPLAY = 5;
 
-    // ---- 检索工具命中摘要的边界（grep_chunks / knowledge_search）----
+    // ── 检索工具命中摘要的边界（grep_chunks / knowledge_search） ──
     static final int SNIPPET_MAX_TOTAL_RUNES = 800;
     static final int SNIPPET_MAX_ANSWER_RUNES = 600;
 
@@ -175,7 +175,7 @@ public final class FaqSnippet {
         }
     }
 
-    // ---- 命中摘要 ----
+    // ── 命中摘要 ──
 
     /**
      * knowledge_search 命中的 "Q: … | A: …" 摘要（查询词命中的相似问优先于标准问题）。
@@ -341,7 +341,7 @@ public final class FaqSnippet {
         return tokens;
     }
 
-    // ---- 依赖 knowledge 域的适配 ----
+    // ── 依赖 knowledge 域的适配 ──
 
     static boolean isFaqChunk(ChunkFacts c) {
         return "faq".equals(c.chunkType());
@@ -368,7 +368,7 @@ public final class FaqSnippet {
         return meta.standardQuestion == null ? "" : meta.standardQuestion.strip();
     }
 
-    // ---- 共享小工具 ----
+    // ── 共享小工具 ──
 
     /** XML 最小转义（{@code & ' " < >}）。 */
     public static String xmlEscape(String s) {

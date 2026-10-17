@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public final class ChatManage {
 
-    // ===== 请求段（不可变配置） =====
+    // ── 请求段（不可变配置） ──
 
     private String query = "";
     private String sessionId = "";
@@ -91,7 +91,7 @@ public final class ChatManage {
     private int webFetchTopN;
     private String language = "";
 
-    // ===== 状态段 =====
+    // ── 状态段 ──
 
     private String rewriteQuery = "";
     private String intent = "";
@@ -113,13 +113,13 @@ public final class ChatManage {
     private String memoryPrompt = "";
     private List<PipelineUsedMemoryView> usedMemories;
 
-    // ===== 运行时段 =====
+    // ── 运行时段 ──
 
     private EventBusInterface eventBus;
     private String messageId = "";
     private String userMessageId = "";
 
-    // ----- 请求段访问器 -----
+    // ── 请求段访问器 ──
 
     public String getQuery() { return query; }
     public void setQuery(String v) { query = v == null ? "" : v; }
@@ -213,7 +213,7 @@ public final class ChatManage {
     public String getLanguage() { return language; }
     public void setLanguage(String v) { language = v == null ? "" : v; }
 
-    // ----- 状态段访问器 -----
+    // ── 状态段访问器 ──
 
     public String getRewriteQuery() { return rewriteQuery; }
     public void setRewriteQuery(String v) { rewriteQuery = v == null ? "" : v; }
@@ -253,7 +253,7 @@ public final class ChatManage {
     public List<PipelineUsedMemoryView> getUsedMemories() { return usedMemories; }
     public void setUsedMemories(List<PipelineUsedMemoryView> v) { usedMemories = v; }
 
-    // ----- 运行时段访问器 -----
+    // ── 运行时段访问器 ──
 
     public EventBusInterface getEventBus() { return eventBus; }
     public void setEventBus(EventBusInterface v) { eventBus = v; }
@@ -262,7 +262,7 @@ public final class ChatManage {
     public String getUserMessageId() { return userMessageId; }
     public void setUserMessageId(String v) { userMessageId = v == null ? "" : v; }
 
-    // ----- 行为 -----
+    // ── 行为 ──
 
     /**
      * 当前执行是否要跑检索阶段。

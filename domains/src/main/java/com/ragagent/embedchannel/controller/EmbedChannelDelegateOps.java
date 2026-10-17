@@ -32,7 +32,7 @@ final class EmbedChannelDelegateOps {
         this.ctrl = ctrl;
     }
 
-    // ═══════════════════ QA / 文件代理委托 ═══════════════════
+    // ── QA / 文件代理委托 ──
 
     /** patch 后委托 KnowledgeQA。 */
     public void knowledgeChat(@PathVariable("sessionId") String sessionId,
