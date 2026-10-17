@@ -8,27 +8,9 @@
 plugins {
     `java-library`
     `java-test-fixtures`   // EmbeddedRedis（平台侧测试基座，domains/engine/boot 共用）
-    id("io.spring.dependency-management")
-    id("com.diffplug.spotless")
     id("com.google.protobuf")   // OTLP proto（tracing 核心随 B163 迁入 platform/tracing）
-}
-
-spotless {
-    java {
-        ratchetFrom("seed")
-        targetExclude("build/**")
-        // import 口径（2026-10 全仓重排同款）：\# 前缀=static 块置顶，空串=其余单块 ASCII 序
-        importOrder("\\#", "")
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
+    id("ragagent.java-conventions")
+    id("ragagent.test-conventions")
 }
 
 sourceSets["main"].proto {
@@ -39,12 +21,6 @@ sourceSets["main"].proto {
 protobuf {
     protoc {
         artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
-    }
-}
-
-dependencyManagement {
-    imports {
-        mavenBom(libs.spring.boot.dependencies.get().toString())
     }
 }
 
@@ -74,23 +50,6 @@ dependencies {
     // 主源码用 compileOnly 的 API（servlet/validation），测试期也要在类路径上（B163 实测）
     testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("jakarta.validation:jakarta.validation-api")
-}
-
-tasks.withType<Test> {
-    // B162 实测踩到：platform 侧测试（自 :common 迁入，2026-10-16） ⇒ 缺 useJUnitPlatform() 也看不出来；
-    // 若缺 useJUnitPlatform() 则测试类会**静默不跑**（build 里 common tests=0）⇒ 补上（与 engine 同口径）。
-    useJUnitPlatform()
-    // 惰性求值：本模块的 testRuntimeClasspath 不能在配置期解析自身元数据（2026-10-16 实测
-    // "project :platform local metadata has not been calculated yet"）⇒ 放进 doFirst。
-    doFirst {
-        val byteBuddyAgent = configurations.testRuntimeClasspath.get().files
-            .firstOrNull { it.name.startsWith("byte-buddy-agent-") }
-        if (byteBuddyAgent != null) {
-            jvmArgs("-javaagent:$byteBuddyAgent")
-        }
-    }
-    jvmArgs("-XX:+EnableDynamicAgentLoading")
-    maxHeapSize = "1g"
 }
 
 // 编译期静态分析最小面（与 :contract 同款；见该模块注释）。-serial 排除同因：

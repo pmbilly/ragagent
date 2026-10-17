@@ -13,32 +13,8 @@
 plugins {
     `java-library`
     `java-test-fixtures`   // 共享测试基建（GoRecording*/契约夹具：随 agent 树自 domains 迁来）
-    id("io.spring.dependency-management")
-    id("com.diffplug.spotless")
-}
-
-spotless {
-    java {
-        ratchetFrom("seed")
-        targetExclude("build/**")
-        // import 口径（2026-10 全仓重排同款）：\# 前缀=static 块置顶，空串=其余单块 ASCII 序
-        importOrder("\\#", "")
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-dependencyManagement {
-    imports {
-        mavenBom(libs.spring.boot.dependencies.get().toString())
-    }
+    id("ragagent.java-conventions")
+    id("ragagent.test-conventions")
 }
 
 dependencies {
@@ -63,16 +39,4 @@ dependencies {
 
     testImplementation(testFixtures(project(":platform")))   // EmbeddedRedis 等平台测试基座
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-    // Mockito inline 在 JDK 21+ 自挂 attach 会被拒（与 engine/domains 同法挂 byte-buddy-agent）。
-    val byteBuddyAgent = configurations.testRuntimeClasspath.get().files
-        .firstOrNull { it.name.startsWith("byte-buddy-agent-") }
-    if (byteBuddyAgent != null) {
-        jvmArgs("-javaagent:$byteBuddyAgent")
-    }
-    jvmArgs("-XX:+EnableDynamicAgentLoading")
-    maxHeapSize = "1g"
 }

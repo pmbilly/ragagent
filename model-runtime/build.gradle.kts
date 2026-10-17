@@ -10,32 +10,8 @@
 // `api` 传递可见本模块类型——待 R2c 组装权下沉（`ModelAccessResolver` + 组装入组合根）后收窄。
 plugins {
     `java-library`
-    id("io.spring.dependency-management")
-    id("com.diffplug.spotless")
-}
-
-spotless {
-    java {
-        ratchetFrom("seed")
-        targetExclude("build/**")
-        // import 口径（2026-10 全仓重排同款）：\# 前缀=static 块置顶，空串=其余单块 ASCII 序
-        importOrder("\\#", "")
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-dependencyManagement {
-    imports {
-        mavenBom(libs.spring.boot.dependencies.get().toString())
-    }
+    id("ragagent.java-conventions")
+    id("ragagent.test-conventions")
 }
 
 dependencies {
@@ -55,16 +31,4 @@ dependencies {
 
     testImplementation(testFixtures(project(":platform")))   // EmbeddedRedis
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-    // Mockito inline 在 JDK 21+ 自挂 attach 会被拒（与 engine/domains 同法挂 byte-buddy-agent）。
-    val byteBuddyAgent = configurations.testRuntimeClasspath.get().files
-        .firstOrNull { it.name.startsWith("byte-buddy-agent-") }
-    if (byteBuddyAgent != null) {
-        jvmArgs("-javaagent:$byteBuddyAgent")
-    }
-    jvmArgs("-XX:+EnableDynamicAgentLoading")
-    maxHeapSize = "1g"
 }

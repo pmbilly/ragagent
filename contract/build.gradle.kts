@@ -12,25 +12,7 @@
 // 依赖方向：domains / engine / common / boot → contract；contract → 无（纯 JDK）。
 plugins {
     `java-library`
-    id("com.diffplug.spotless")
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-spotless {
-    java {
-        ratchetFrom("seed")
-        targetExclude("build/**")
-        // import 口径（2026-10 全仓重排同款）：\# 前缀=static 块置顶，空串=其余单块 ASCII 序
-        importOrder("\\#", "")
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
+    id("ragagent.java-conventions")
 }
 
 // 编译期静态分析最小面：契约层最稳定，全量 lint + 警告即错误先行

@@ -8,32 +8,8 @@
 plugins {
     java
     id("org.springframework.boot")
-    id("io.spring.dependency-management")
-    id("com.diffplug.spotless")
-}
-
-spotless {
-    java {
-        ratchetFrom("seed")
-        targetExclude("build/**")
-        // import 口径（2026-10 全仓重排同款）：\# 前缀=static 块置顶，空串=其余单块 ASCII 序
-        importOrder("\\#", "")
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-dependencyManagement {
-    imports {
-        mavenBom(libs.spring.boot.dependencies.get().toString())
-    }
+    id("ragagent.java-conventions")
+    id("ragagent.test-conventions")
 }
 
 dependencies {
@@ -94,21 +70,10 @@ val syncMigrations = tasks.register<Copy>("syncMigrations") {
 tasks.named("processResources") { dependsOn(syncMigrations) }
 
 tasks.withType<Test> {
-    useJUnitPlatform()
     // 契约夹具按「模块相对 + server/ 兜底」两候选读 **文件路径**（18 处调用点 + GoldenContract 内置）；
     // 集成测试从 :server 迁到 :boot 后，工作目录变成 boot/ ⇒ 两个候选都落空（B165 实测 97 处失败）。
     // 统一把工作目录设为**仓库根**，两候选中的第二个（domains/src/testFixtures/resources/contracts/…）即可命中。
     workingDir = rootDir
-    // ⚠️ 惰性取（doFirst）：配置期解析 testRuntimeClasspath 会与其他项目请求本模块 testFixtures
-    // 元数据相撞（B165 实测：":server local metadata has not been calculated yet"）。
-    doFirst {
-        val byteBuddyAgent = configurations.testRuntimeClasspath.get().files
-            .firstOrNull { it.name.startsWith("byte-buddy-agent-") }
-        if (byteBuddyAgent != null) {
-            jvmArgs("-javaagent:$byteBuddyAgent")
-        }
-    }
-    jvmArgs("-XX:+EnableDynamicAgentLoading")
     maxHeapSize = "2g"
     // 测试沙箱化：DOCREADER_ADDR 一律置空（与 :domains 同口径）
     environment("DOCREADER_ADDR", "")

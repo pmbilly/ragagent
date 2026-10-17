@@ -8,6 +8,8 @@
 
 前置：JDK 21、Docker、Node 22+。不需要预先安装 PostgreSQL / Redis。
 
+> 本机没有 JDK 21 时，Gradle 会通过 foojay resolver 自动下载；构建样板统一在 `build-logic/`，模块构建文件只声明依赖。
+
 ---
 
 ## 0–30 分钟：跑通

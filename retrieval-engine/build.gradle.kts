@@ -10,32 +10,8 @@
 // 本模块类型——R3d 端口化后再收窄成逐消费点显式声明。
 plugins {
     `java-library`
-    id("io.spring.dependency-management")
-    id("com.diffplug.spotless")
-}
-
-spotless {
-    java {
-        ratchetFrom("seed")
-        targetExclude("build/**")
-        // import 口径（2026-10 全仓重排同款）：\# 前缀=static 块置顶，空串=其余单块 ASCII 序
-        importOrder("\\#", "")
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-dependencyManagement {
-    imports {
-        mavenBom(libs.spring.boot.dependencies.get().toString())
-    }
+    id("ragagent.java-conventions")
+    id("ragagent.test-conventions")
 }
 
 dependencies {
@@ -63,17 +39,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-    // Mockito inline 在 JDK 21+ 自挂 attach 会被拒（与 engine/domains 同法挂 byte-buddy-agent）。
-    val byteBuddyAgent = configurations.testRuntimeClasspath.get().files
-        .firstOrNull { it.name.startsWith("byte-buddy-agent-") }
-    if (byteBuddyAgent != null) {
-        jvmArgs("-javaagent:$byteBuddyAgent")
-    }
-    jvmArgs("-XX:+EnableDynamicAgentLoading")
-    maxHeapSize = "1g"
-}
+
 
 // ── 集成测试任务（随 R3c 从 :engine 原样搬来）───────────────────────────────
 // `*IT` 不匹配 Gradle 默认收集模式 ⇒ 必须给显式入口，且**不接 check**（要真实外部服务，env 门控）：
@@ -82,17 +48,9 @@ tasks.withType<Test> {
 val integrationTest = tasks.register<Test>("integrationTest") {
     group = "verification"
     description = "集成测试（*IT）：需真实外部服务，env 门控，默认不接 check"
-    useJUnitPlatform()
     testClassesDirs = sourceSets["test"].output.classesDirs
     classpath = sourceSets["test"].runtimeClasspath
     include("**/*IT.class")
-    val byteBuddyAgent = configurations.testRuntimeClasspath.get().files
-        .firstOrNull { it.name.startsWith("byte-buddy-agent-") }
-    if (byteBuddyAgent != null) {
-        jvmArgs("-javaagent:$byteBuddyAgent")
-    }
-    jvmArgs("-XX:+EnableDynamicAgentLoading")
-    maxHeapSize = "1g"
 }
 
 // 反向显式化：默认 test 任务**不**收 `*IT`（今天靠默认模式排除，写出来免得将来被人改掉口径）。

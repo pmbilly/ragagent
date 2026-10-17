@@ -85,6 +85,14 @@ graph TD
 
 按模块名找代码失败时，用 [`packages.md`](packages.md)（由 `scripts/gen-arch-index.py` 从 166 份 `package-info.java` 生成）。
 
+## 构建约定
+
+- `build-logic/` 提供两套 convention：
+  - `ragagent.java-conventions`：JDK 21 toolchain、Spotless（ratchet + import 口径）、Boot BOM；
+  - `ragagent.test-conventions`：JUnit Platform、Mockito `byte-buddy-agent`（惰性挂载）、默认 1g 测试堆。
+- 模块 `build.gradle.kts` 只声明**依赖与模块专属任务**（proto、migrations、`integrationTest`、`bootRun` 等），不要再复制 toolchain/Spotless/BOM/测试样板。
+- Gradle wrapper `8.14.3`；本机缺 JDK 21 时由 foojay resolver 自动下载。
+
 ## 推荐阅读顺序
 
 1. `contract`：先看 `AgentRunSpec`、`ToolResult`、`SearchResult`，知道跨模块传什么；

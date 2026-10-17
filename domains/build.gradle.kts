@@ -1,49 +1,14 @@
 plugins {
     java
     `java-test-fixtures`   // 共享测试基建（TestSchema/契约夹具/桩服务器：B164 起）
-    id("io.spring.dependency-management")
     id("com.google.protobuf")
-    id("com.diffplug.spotless")
-}
-
-// 格式卫生：ratchet 从 seed 起只检查后续触碰的文件（避免全仓格式化大爆炸混入无关 diff）；
-// 全量 formatter 待评估。
-spotless {
-    java {
-        ratchetFrom("seed")
-        // 与 common/engine/boot 同规格：**生成代码不格式化**。此前本模块（当时叫 :server）没有这行，
-        // 改名后 ratchet 把 build/generated/source/proto 下的 protoc 产物也当成"触碰过"⇒ spotless 红（B167 实测）。
-        targetExclude("build/**")
-        // import 口径（2026-10 全仓重排同款）：\# 前缀=static 块置顶，空串=其余单块 ASCII 序
-        importOrder("\\#", "")
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-}
-
-/**
- * build-info.properties（/system/info 用）：version 显式对齐前端 package.json 的 0.8.0，
- * 否则前端按「后端版本 != 前端版本」显示「版本不匹配」告警。
- */
-
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
+    id("ragagent.java-conventions")
+    id("ragagent.test-conventions")
 }
 
 configurations {
     compileOnly {
         extendsFrom(configurations.annotationProcessor.get())
-    }
-}
-
-// 依赖版本由 Boot BOM 统一（原由 org.springframework.boot 插件自动附带；B165 拆 :boot 后显式声明）
-dependencyManagement {
-    imports {
-        mavenBom(libs.spring.boot.dependencies.get().toString())
     }
 }
 
@@ -164,21 +129,6 @@ configurations.named("testFixturesImplementation") { extendsFrom(configurations.
 configurations.named("testFixturesRuntimeOnly") { extendsFrom(configurations.getByName("runtimeOnly")) }
 
 tasks.withType<Test> {
-    // CI 也提供真库（ci.yml 的 postgres 服务 + 灌 V1__baseline.sql，B158）⇒ 无需按标签排除录测试；
-    // 两个录测试在 CI 与本地同口径：真 PG 不可达即显式失败（不允许跳过）。
-    useJUnitPlatform()
-    // Mockito inline 在 JDK 21+ 自挂 attach 会被拒（MockitoInitializationException 批量假失败）：
-    // 把 byte-buddy-agent 显式挂为 javaagent，Mockito 检测到已装入的 instrumentation 后不再 attach。
-    // ⚠️ 惰性取（doFirst）：配置期解析 testRuntimeClasspath 会与其他项目请求本模块 testFixtures
-    // 元数据相撞（B165 实测：":server local metadata has not been calculated yet"）。
-    doFirst {
-        val byteBuddyAgent = configurations.testRuntimeClasspath.get().files
-            .firstOrNull { it.name.startsWith("byte-buddy-agent-") }
-        if (byteBuddyAgent != null) {
-            jvmArgs("-javaagent:$byteBuddyAgent")
-        }
-    }
-    jvmArgs("-XX:+EnableDynamicAgentLoading")
     // 并行分叉（2026-10-09 B142）：此前是**单 fork 串行**跑完 4,792 条 ⇒ 10 核机器上测试期间 9 核闲着，
     // 而套件是 I/O 型长尾（Top 20 类占 55%，全是 HTTP 契约往返与嵌入式 Redis）⇒ 分叉收益直接。
     // 实测：全量测试 214s → 见 §15.1.1 B142 记录（连跑三遍验稳定性）。
