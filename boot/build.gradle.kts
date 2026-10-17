@@ -26,9 +26,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     // Boot 4 移除了 starter-aop；AOP 代理由 spring-aop（context 传递）提供，补 AspectJ weaver
     implementation("org.aspectj:aspectjweaver")
-    // 过渡期 Jackson 2 兼容：提供 com.fasterxml.jackson ObjectMapper bean，
-    // 让尚未迁 tools.jackson 的业务代码先跑起来；Jackson 3 迁移完成后删除。
-    implementation("org.springframework.boot:spring-boot-jackson2")
+    // 过渡期 Jackson 2 ObjectMapper 由 WebConfig 显式提供（不再引 Boot 的
+    // spring-boot-jackson2 自动配置）；Jackson 3 迁移完成后删除该 bean。
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation(libs.mybatis.plus.starter)
     // OpenAPI JSON（dev-only，默认关闭；UI 由 boot 的 /scalar 页面承载）

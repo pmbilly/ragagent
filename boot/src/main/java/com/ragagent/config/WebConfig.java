@@ -16,7 +16,7 @@ import com.ragagent.platform.config.DeploymentProperties;
 import com.ragagent.platform.config.TenantProperties;
 import com.ragagent.platform.tracing.langfuse.LangfuseHttpInterceptor;
 import com.ragagent.platform.web.ApiResultInterceptor;
-import com.ragagent.platform.web.ContractJsonModule;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RbacInterceptor;
 import com.ragagent.platform.web.RequestIdFilter;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
@@ -41,17 +41,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     /**
- * Spring MVC 侧的 Jackson 装配：注册契约载荷的 mixin 模块（契约面纯 JDK 的配套）。
- *
- * <p>没有这一处，HTTP 出参/入参的键名与省略策略会回退成 Jackson 默认——即"线格式在
- * HTTP 这条路径上静默变化"。其余路径（jsonb/事件/SSE/上下文/Langfuse）各自显式注册。</p>
- */
+     * 过渡期 Jackson 2 ObjectMapper：业务代码仍直接使用 Jackson 2。
+     *
+     * <p>不再引 `spring-boot-jackson2` 自动配置，改由 {@link JsonMappers#lenient()}
+     * 显式提供（含契约 mixin / JavaTime / 宽松读策略）。Jackson 3 迁移完成后删除。</p>
+     */
     @Bean
-    public org.springframework.boot.jackson2.autoconfigure.Jackson2ObjectMapperBuilderCustomizer
-            contractJsonCustomizer() {
-        // 过渡期：HTTP 仍由 Jackson 3 负责；这个 bean 保证注入 Jackson 2 ObjectMapper 的
-        // 业务组件能拿到带契约 mixin 的实例。Jackson 3 迁移完成后改为 JacksonModule。
-        return builder -> builder.modulesToInstall(new ContractJsonModule());
+    public com.fasterxml.jackson.databind.ObjectMapper jackson2ObjectMapper() {
+        return JsonMappers.lenient();
     }
 
     /** 过渡桥：让 Jackson 3 原样输出 Jackson 2 JsonNode（见模块类注释）。 */
