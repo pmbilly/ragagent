@@ -15,14 +15,13 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
-import static org.mockito.Mockito.mock;
 
-import org.springframework.beans.factory.ObjectProvider;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.TestObjectProviders;
 import com.ragagent.TestSchema;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.SsrfGuard;
@@ -81,8 +80,9 @@ class McpMetadataServiceTest {
         whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         ssrfGuard.reloadWhitelist("127.0.0.1,example.com");
         svc = new McpServiceManagement(mcpServiceMapper, null, ssrfGuard,
-                mock(ObjectProvider.class), mock(ObjectProvider.class));
-        metadata = new McpMetadataService(mcpServiceMapper, metadataRepo, mock(ObjectProvider.class));
+                TestObjectProviders.empty(), TestObjectProviders.empty());
+        metadata = new McpMetadataService(mcpServiceMapper, metadataRepo,
+                TestObjectProviders.empty());
     }
 
     @AfterEach
