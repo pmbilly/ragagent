@@ -40,7 +40,7 @@ final class WikiIngestMapPhase {
 
     /**
      * 对单篇文档跑完整 Map 阶段
-     * ——取消守卫、分块重建、Pass 0 抽取（含旧版回落）、摘要与引用并行、引用回填、
+     * ——取消守卫、分块重建、Pass 0 抽取（含早期版本回落）、摘要与引用并行、引用回填、
      * 身份重认领、新旧页面调和。
      *
      * @return {@code result == null && updates == null} 表示该文档在某个终态、不可重试的
@@ -109,7 +109,7 @@ final class WikiIngestMapPhase {
         String sourceRef = knowledgeID;
         Set<String> oldPageSlugs = handler.ingestService.getExistingPageSlugsForKnowledge(kbId, knowledgeID);
 
-        // Pass 0：轻量候选 slug 抽取（只有骨架）。失败时回落到旧版单次抽取器，让文档仍能
+        // Pass 0：轻量候选 slug 抽取（只有骨架）。失败时回落到单次抽取器（fallback），让文档仍能
         // 被摄取，只是没有 chunk 级引用。
         List<ExtractedItem> extractedEntities;
         List<ExtractedItem> extractedConcepts;
@@ -228,7 +228,7 @@ final class WikiIngestMapPhase {
             }
         });
         parallel.add(() -> {
-            // Pass 0 回落到旧版路径时跳过引用阶段——旧版输出本身已包含改写过的 Details，
+            // Pass 0 走回落路径时跳过引用阶段——该路径输出本身已包含改写过的 Details，
             // 再做 chunk 引用是多余的，只会白花 LLM 调用。
             if (pass0FailedFinal) {
                 citationsHolder[0] = new LinkedHashMap<>();
@@ -376,7 +376,7 @@ final class WikiIngestMapPhase {
         //       （若这是唯一来源则可能删除页面）。用<b>新</b>正文作为撤回语境——如果 LLM
         //       找到匹配的事实就裁掉它们，否则这次撤回近似 no-op，这没问题。
         //   (b) oldSlug ∈ new 且是 entity/concept → reparse 换血：同时发出 "retract"
-        //       （携带文档<b>上一版</b>摘要正文作为旧版信号）与常规新增。reduce 阶段看到
+        //       （携带文档<b>上一版</b>摘要正文作为回落信号）与常规新增。reduce 阶段看到
         //       HasAdditions=1 + HasRetractions=1，WikiPageModifyUserPrompt 正确地告诉编辑
         //       模型一次性"删掉旧 K 段、加上新 K 段"——给出替换语义而不是"在旧 K 上追加新 K"。
         //   (c) oldSlug ∈ new 且是 summary 页 → 什么都不做（reduce 的 summary 分支会整体

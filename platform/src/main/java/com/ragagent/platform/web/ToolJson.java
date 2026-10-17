@@ -15,7 +15,7 @@ import tools.jackson.databind.node.ObjectNode;
 /**
  * 工具参数/输出的 JSON 编码（标准 Jackson 实现）。
  *
- * <p>历史上的手写逐字节对齐 writer 已退役：现在就是标准 Jackson 序列化；
+ * <p>历史上的手写逐字节对齐 writer 不再使用：现在就是标准 Jackson 序列化；
  * 仅保留<b>递归键排序</b>一条——LLM 载荷的字节稳定性前提（同一参数两次编码需同字节）。</p>
  */
 public final class ToolJson {

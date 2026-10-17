@@ -164,7 +164,7 @@ public class TenantAPIPrincipalController {
                             "HmacSHA256"))
                     .compact();
         } catch (RuntimeException e) {
-            // jjwt 对 <256bit 密钥抛 WeakKeyException——已知差异，见类注释
+            // jjwt 对 <256bit 密钥抛 WeakKeyException——实现边界，见类注释
             throw new BizException(AppError.internal("Failed to create API principal test token")
                     .withDetails(e.getMessage()));
         }

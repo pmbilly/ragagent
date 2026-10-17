@@ -68,7 +68,7 @@ import tools.jackson.databind.ObjectMapper;
  * （TenantService/SessionService/WebSearchStateService/WebSearchProviderRepository）
  * 仅判空或存而不读——Java 传 null 等价。</p>
  *
- * <h2>已知差异（备案）</h2>
+ * <h2>实现边界</h2>
  * <ul>
  *   <li><b>HybridSearch 执行面</b>：adapter 委托
  *       {@code HybridSearchPort}（pgvector + ParadeDB BM25 + RRF 融合 +

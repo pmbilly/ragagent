@@ -49,7 +49,7 @@ import tools.jackson.databind.node.ObjectNode;
  *       CALLBACK 帧交工作池。</li>
  * </ol>
  *
- * <h2>实现差异（备案）</h2>
+ * <h2>实现差异</h2>
  * <ul>
  *   <li>回调并发用固定大小工作池限制（语义等价：回调并发受限、
  *       控制帧优先）；</li>

@@ -301,7 +301,7 @@ public final class FeishuSupport {
      * 未命中任何签名时走"文本检查"：出现控制字符即
      * {@code application/octet-stream}，否则 {@code text/plain; charset=utf-8}。</p>
      *
-     * <p><b>已知差异</b>：标准嗅探表还容忍标签内部的空白与
+     * <p><b>实现边界</b>：标准嗅探表还容忍标签内部的空白与
      * {@code text/xml} 的部分写法；本实现只做显式前缀匹配，未命中的会落到 text/plain。
      * 该字符串只用于日志，不影响任何分支决策（分支只看 png/jpg/gif）。</p>
      */

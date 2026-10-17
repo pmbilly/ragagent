@@ -26,7 +26,7 @@ import tools.jackson.databind.ObjectMapper;
  * 临时性下载失败会让该键留空、下一轮重试，而不是被永久记成"未变"。</p>
  *
  * <h2>{@code kb_media} 是遗留字段</h2>
- * <p>保留它只为让旧版本写下的游标仍能反序列化；<b>从不写入、从不读取</b>。
+ * <p>保留它只为让早期版本写下的游标仍能反序列化；<b>从不写入、从不读取</b>。
  * 序列化时空值不出现。</p>
  *
  * <h2>为什么要有 to/from connectorCursor</h2>

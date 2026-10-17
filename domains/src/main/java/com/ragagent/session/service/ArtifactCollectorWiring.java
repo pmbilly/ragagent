@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 /**
  * AgentWebPages（agent 抓取页 web:// 快照）的生产装配。
  *
- * <p>沙箱产物排水器随沙箱裁剪退役；本类只剩进程级字节落盘
+ * <p>沙箱产物排水器随沙箱裁剪移除；本类只剩进程级字节落盘
  * 面与 web_page 绑定面。</p>
  */
 @Component

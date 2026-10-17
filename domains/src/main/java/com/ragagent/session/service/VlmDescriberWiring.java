@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  *
  * <p>装配链（配置解析 + SSRF 校验 + langfuse 观测 + 命名并发闸门）整段收在
  * {@link ModelRuntime#vlmPredictorFor} 内——本类只剩"取行 + 转交"，
- * 不再 import 任何模型族实现（原装配细节与"没有批级 60s 超时"的备案随之迁去那边）。</p>
+ * 不再 import 任何模型族实现（原装配细节与"没有批级 60s 超时"的随之迁去那边）。</p>
  *
  * <p>失败语义不变：任一步失败抛异常——调用方只记警告、不设置描述器
  * （引擎随后对无描述能力走 "cannot view" 提示词）。</p>

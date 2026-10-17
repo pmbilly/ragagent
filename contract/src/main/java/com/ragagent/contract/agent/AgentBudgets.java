@@ -2,7 +2,7 @@ package com.ragagent.contract.agent;
 
 /**
  * agent 轮次补全预算。
- * 沙箱写文件预算已随沙箱裁剪退役。
+ * 沙箱写文件预算已随沙箱裁剪移除。
  */
 public final class AgentBudgets {
 

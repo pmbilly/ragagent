@@ -40,7 +40,7 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
  *   <tr><td>ks3</td><td>ks3sdklib/aws-sdk-go（金山云的 AWS SDK 分支）</td>
  *       <td>同 obs：端点 + path-style</td></tr>
  *   <tr><td>minio</td><td>minio-go/v7（{@code Secure: useSSL}）</td>
- *       <td>S3 协议客户端 + path-style（MinIO 兼容 S3）——<b>差异备案</b>：presign
+ *       <td>S3 协议客户端 + path-style（MinIO 兼容 S3）——<b>差异</b>：presign
  *       细节与 minio-go 略有差别，功能等价</td></tr>
  * </table>
  *

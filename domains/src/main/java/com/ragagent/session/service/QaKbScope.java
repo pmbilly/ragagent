@@ -103,7 +103,7 @@ final class QaKbScope {
                 && !scope.allowsKnowledgeBases(java.util.List.of(kbId))) {
             return false;
         }
-        // ② 租户判定（空间分享裁撤：跨租户共享授权链已退役，仅本租户可读）。
+        // ② 租户判定（空间分享裁撤：跨租户共享授权链不再使用，仅本租户可读）。
         return SessionKnowledgeQaService.kbReadableByCaller(retrievalTenantId, ownerTenantId, () -> false);
     }
 }

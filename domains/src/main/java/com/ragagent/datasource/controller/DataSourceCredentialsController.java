@@ -40,9 +40,8 @@ import tools.jackson.databind.ObjectMapper;
  * <h2>错误形态（与 {@link DataSourceController} <b>一致</b>）</h2>
  * <p>两者都走<b>统一响应外壳</b> {@code {code,message,data}}（{@code @ApiResult} + 全局处理器），
  * 见 {@code docs/api-response-convention.md}。</p>
- * <p>退役记录：此前本类回 AppError 信封 {@code {"error":{…}}}、那边回纯字符串 {@code {"error":"…"}}，
- * 且文档写着"两种形态并存是有意为之，别统一" —— 那是 Go 迁移期产物 ✗；现已统一
- * （那边的纯字符串助手改为恒抛 {@code BizException}，本类的 code/details 语义不变）。</p>
+ * <p>两类的错误形态与状态码一致：均抛 {@code BizException}，由全局处理器按
+ * {@code @ApiResult} 输出外壳。</p>
  */
 @RestController
 @ApiResult

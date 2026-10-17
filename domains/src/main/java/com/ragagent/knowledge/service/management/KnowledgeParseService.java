@@ -44,7 +44,7 @@ public class KnowledgeParseService {
     /**
  * 重解析（reset + 入队）。
  *
- * <p> 说明：**接管语义保留**（Go 合约：连点两次重解析第二次返回 200 ——
+ * <p> 说明：**接管语义保留**（契约：连点两次重解析第二次返回 200 ——
  * {@code kg-reparse-null-config} 金片；对用户而言"再点一次就再跑一遍"也合理）。
  * 危险不在接管本身，而在"接管后旧尝试仍能写终态 / 清场到新尝试的数据"——那两处
  * 已按尝试划界（见 {@code KnowledgeProcessWorker.failOrComplete} 的 CAS 守卫与

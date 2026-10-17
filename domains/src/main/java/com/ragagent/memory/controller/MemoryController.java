@@ -58,7 +58,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <li>创建条目 → <b>201</b> + 裸条目；删除 / 拒绝 → <b>204</b>；</li>
  * <li>Export 保持下载语义：{@code {items, total, truncated}} + {@code Content-Disposition}。</li>
  * </ul>
- * <p>{@code Clear} 是同步删除，按 返 204——{@code {"removed":N}} 计数随信封一并退役；
+ * <p>{@code Clear} 是同步删除，按 返 204——{@code {"removed":N}} 计数随信封一并移除；
  * 前端不再展示条数（如需恢复，须先改标准）。</p>
  *
  * <h2>请求形态：标准 DTO 绑定（/）</h2>
@@ -264,7 +264,7 @@ public class MemoryController {
  * 与 {@code DELETE /memory/items/{id}} 是两条不同的路由。</p>
  *
  * <p>同步完成，按 返 <b>204</b>：{@code {"removed":N}}
- * 计数随信封一并退役，不再下发（前端原样展示条数的 toast 一并去掉）。</p>
+ * 计数随信封一并移除，不再下发（前端原样展示条数的 toast 一并去掉）。</p>
  */
     @DeleteMapping("/api/v1/memory/items")
     public ApiResponse<Void> clear() {
@@ -362,7 +362,7 @@ public class MemoryController {
      * <h2>响应形态</h2>
      * <ol>
      *   <li>体是裸 {@link com.ragagent.memory.dto.MemoryExportResponse}：
-     *       {@code {items, total, truncated}}——旧的 {@code {"data":…,"success":true}} 信封退役。</li>
+     *       {@code {items, total, truncated}}——旧的 {@code {"data":…,"success":true}} 信封不再输出。</li>
      *   <li>⚠️ <b>空仓库的 {@code items} 仍是 {@code null} 而不是 {@code []}</b>——
      *       只在真的有行时才建列表。这与
      *       {@code GET /memory/items} 的 {@code []} <b>不同</b>，别统一

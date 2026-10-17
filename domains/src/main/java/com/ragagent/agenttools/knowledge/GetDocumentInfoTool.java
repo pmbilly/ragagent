@@ -26,7 +26,7 @@ import tools.jackson.databind.JsonNode;
 
 /**
  * get_document_info 工具。
- * 多文档顺序处理，输出按入参序组装（metadata 多键的顺序为已知差异点——探针只用单键）。
+ * 多文档顺序处理，输出按入参序组装（metadata 多键的顺序为实现边界点——探针只用单键）。
  */
 public class GetDocumentInfoTool extends BaseTool {
 

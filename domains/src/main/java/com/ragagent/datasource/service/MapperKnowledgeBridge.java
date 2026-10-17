@@ -140,7 +140,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
      * 文件写入的<b>最小闭环</b>：重复内容检测 →
      * 落 Storage → 落 knowledges 行 → 交给处理队列。
      *
-     * <p>见 {@link KnowledgeBridge} 的"已知差异"：文件名安全校验、多模态/问题生成配置、
+     * <p>见 {@link KnowledgeBridge} 的"实现边界"：文件名安全校验、多模态/问题生成配置、
      * 标签关系、按 KB 选存储引擎、处理任务载荷形态都不在这里。</p>
      */
     @Override

@@ -14,7 +14,7 @@ import tools.jackson.databind.JsonNode;
  * 检索窗口与 image_info 的互相裁剪（{@code ImageURLsInContent / ImageURLsFromInfo} 已在
  * {@code knowledge.service.ChunkSearchUtil} 落地，本类<b>委托复用</b>不重复实现）。
  *
- * <p>已知差异（与 ChunkSearchUtil 同族）：Java 正则的 {@code \s} 含
+ * <p>边界（与 ChunkSearchUtil 同族）：Java 正则的 {@code \s} 含
  * {@code 0x0B}——URL 中出现垂直制表符不可能，见 ChunkSearchUtil 注释。</p>
  */
 public final class ImageInfoMatchUtil {

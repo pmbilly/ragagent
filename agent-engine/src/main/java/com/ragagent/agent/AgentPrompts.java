@@ -174,7 +174,7 @@ public final class AgentPrompts {
      *
      * <p>{{knowledge_bases}} 历史上展开成完整的绑定 KB XML 块；那块内容现在住在
      * user 消息的 {@code <runtimeContext>} 里，此占位符展开成一句短指针，让仍在
-     * 引用它的旧版/自定义模板优雅降级，而不是把细节倒两次。{@code <mustUse>} 不是
+     * 引用它的早期版本/自定义模板优雅降级，而不是把细节倒两次。{@code <mustUse>} 不是
      * 占位符——@ 提及时由 observe 注入 user 消息。</p>
      */
     public static String renderPromptPlaceholders(String template, List<KnowledgeBaseInfo> knowledgeBases) {

@@ -63,7 +63,7 @@ public final class ToolDefinitions {
     public static final String TOOL_WIKI_READ_ISSUE = "wiki_read_issue";
     public static final String TOOL_WIKI_UPDATE_ISSUE = "wiki_update_issue";
 
-    // ---- 已退役工具（只为解码历史与忽略过期 allowlist 条目而保留；无实现无注册无模型可见）----
+    // ---- 已移除工具（只为解码历史与忽略过期 allowlist 条目而保留；无实现无注册无模型可见）----
     public static final String LEGACY_TOOL_EXECUTE_SKILL_SCRIPT = "execute_skill_script";
     public static final String LEGACY_TOOL_READ_SKILL = "read_skill";
     public static final String LEGACY_TOOL_READ_SANDBOX_FILE = "read_sandbox_file";

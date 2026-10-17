@@ -29,7 +29,7 @@ import tools.jackson.databind.JsonNode;
  * totalChunkCount——整段 SQL 方言逻辑落在 seam 实现侧；
  * 本工具只留 seam 调用）。</p>
  *
- * <p>已知差异：JDK 正则与 RE2 方言不同（编译失败文案不同，探针不录非法 regex）；
+ * <p>实现边界：JDK 正则与 RE2 方言不同（编译失败文案不同，探针不录非法 regex）；
  * MMR 分词对中文内容走空白分词，冗余度可能不同（探针 MMR 场景用英文）；
  * 并列分数时排序结果不保证确定（探针语料避开并列）；
  * {@code knowledge_base_ids} 按出现序遍历。</p>
@@ -116,7 +116,7 @@ public class GrepChunksTool extends BaseTool {
             return failure("query parameter is required and must be a non-empty regex string");
         }
 
-        // 不区分大小写匹配（(?i) 前缀）。编译失败文案因正则引擎而异（已知差异）。
+        // 不区分大小写匹配（(?i) 前缀）。编译失败文案因正则引擎而异（实现边界）。
         final Pattern re;
         try {
             re = Pattern.compile("(?i)" + query);

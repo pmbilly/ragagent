@@ -30,7 +30,7 @@ import tools.jackson.databind.ObjectMapper;
  * （"正在思考..." 占位消息 + editMessageText 原地替换）+ {@code FileDownloader}
  * （getFile + file/bot 下载）。</p>
  *
- * <h2>实现差异（备案）</h2>
+ * <h2>实现差异</h2>
  * <ul>
  *   <li><b>API 基址可注入</b>：常量 {@link #DEFAULT_API_BASE} 作生产默认，
  *       包内构造可注入基址，测试用本地 stub 服务器（与 OTLP 导出器同一套路）。</li>

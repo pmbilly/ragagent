@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * 都必须匹配「本租户 + 本 owner + 本会话中一条活跃 assistant 消息」的 web_page
  * 绑定。实现 {@link WebFetchTool.WebPageSource}。</p>
  *
- * <h2>接缝与备案</h2>
+ * <h2>接缝与边界</h2>
  * <p>文件写字节面（本地 provider 的资源行创建）未落地，与 ArtifactCollector 生产装配
  * 共栈——{@link Store} 为其接缝：缺省 null 时 {@link #save} 走保存失败分支
  * （storageError 固定文案），页仍进本轮缓存；

@@ -359,9 +359,9 @@ public class KnowledgeBaseService
     }
 
     /**
-     * * tenant \u5168\u91cf + is_temporary=false + created_at DESC\u3002\u4e0d\u56de\u586b pin/creator_name/
-     * share_count\uff08Go \u8be5\u8def\u5f84\u4e0d\u505a\uff09\uff1b\u8ba1\u6570\u53ea\u8986\u76d6\u7c7b\u578b\u76f8\u5173\u5b57\u6bb5\uff08document\u2192
-     * knowledge_count\u3001faq\u2192chunk_count\uff09\uff0cprocessing \u72b6\u6001\u53ea\u7b97 pending/processing\u3002
+     * tenant 全量 + is_temporary=false + created_at DESC。不回填 pin/creator_name/
+     * share_count（该路径不做）；计数只覆盖类型相关字段（document→
+     * knowledge_count、faq→chunk_count），processing 状态只算 pending/processing。
      */
     public List<KnowledgeBase> listKnowledgeBasesByTenantId(long tenantId) {
         List<KnowledgeBase> all = kbRepository.listActiveByTenant(tenantId);

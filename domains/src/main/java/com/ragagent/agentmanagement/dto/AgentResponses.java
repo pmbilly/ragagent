@@ -57,7 +57,7 @@ public final class AgentResponses {
 
 
 
-    // 旧的 {success,data} 手搓外壳已退役：成功体统一由 @ApiResult + ApiResultAdvice
+    // 旧的 {success,data} 手搓外壳不再使用：成功体统一由 @ApiResult + ApiResultAdvice
     // 施加为 {code:0,message:"ok",data:…}；DELETE 的自定义文案由控制器直接返回
     // ApiResponse.ok(null, "Agent deleted successfully")。
 

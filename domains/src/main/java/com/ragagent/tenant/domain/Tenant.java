@@ -30,7 +30,7 @@ import tools.jackson.databind.JsonNode;
  * chat_history_config, retrieval_config, memory_config, created_at, updated_at,
  * deleted_at；api_principal_config 恒不输出。其余 null 恒输出显式 null。
  *
- * <p>备案：DB 列 {@code conversation_config}（000001 建列，
+ * <p>DB 列 {@code conversation_config}（000001 建列，
  * COMMENT "Global Conversation configuration for this tenant"）全仓零读写
  * ——疑似遗留死列，与 sessions 的同类未映射列同款处理：不映射，仅在此记录。</p>
  * 列表/详情等其余 API 输出仍统一经 dto.TenantResponse。

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
  *   <li>无租户 / 租户无云配置（{@code none}）⇒ 本地契约（{@code resource://…} 既定形态，契约样例锁定）；</li>
  *   <li>配了云但解析失败（{@code error} 非空）⇒ **不静默退回本地**：写面抛、读面折成
  *       {@code Failed to retrieve file} 信封、删除只记 warn；</li>
- *   <li>引用带 {@code local://} scheme ⇒ 归本地盘（Go local provider 的原生形态）。</li>
+ *   <li>引用带 {@code local://} scheme ⇒ 归本地盘（本地盘 provider 的原生形态）。</li>
  * </ul>
  */
 @Service

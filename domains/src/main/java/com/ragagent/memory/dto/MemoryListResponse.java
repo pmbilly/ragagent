@@ -7,7 +7,7 @@ import java.util.List;
  *
  * <p>形态照 {@code docs/knowledge-api-contract-v1.md} 的约定：
  * {@code {items, page, pageSize, total}}——旧信封
- * {@code {"data":[…],"success":true,"total":N}} 已退役。</p>
+ * {@code {"data":[…],"success":true,"total":N}} 不再使用。</p>
  *
  * <p>{@code page}/{@code pageSize} 由 controller 从 offset/limit 换算：
  * {@code pageSize = limit}、{@code page = offset / limit + 1}（整数除法，

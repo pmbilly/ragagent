@@ -100,7 +100,7 @@ public class KnowledgeBatchOpsService {
      * 列表计数），录制的两次连续 clear 都是 "task submitted" + 相同计数（worker 尚未
      * 动行）——Java 用 parse_status='deleting' 标记 + 计数维持这个窗口（行为收敛：
      * 后续读路径对 KB2 无感知；真正的回收与既有 deleteKnowledge 语义一致地缺位，
-     * 见类注释已知差异 ①）。
+     * 见类注释实现边界 ①）。
      * @return 本次列入清理的条数
      */
     @Transactional

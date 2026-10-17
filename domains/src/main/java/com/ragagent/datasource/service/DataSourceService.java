@@ -75,7 +75,7 @@ import tools.jackson.databind.ObjectMapper;
  * <p>仓储的 {@code findById} 未命中抛 {@link DataSourceException.NotFoundException}
  * ——service 原样上抛，由 handler 映射成 404。</p>
  *
- * <h2>已知差异（逐条都有理由，见各方法注释）</h2>
+ * <h2>实现边界（逐条都有理由，见各方法注释）</h2>
  * <ol>
  *   <li><b>进程内队列</b>：拿不到重试计数，
  *       所以 {@code streamStartCursor} 的 attempt 恒为 0（首次尝试）；

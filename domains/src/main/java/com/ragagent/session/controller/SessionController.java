@@ -51,7 +51,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <li>创建 → <b>201</b> + 裸 {@code Session}；读取/更新 → 200 + 裸 {@code Session}；</li>
  * <li>列表 → {@code {items,page,pageSize,total}}（{@link SessionListResponse}）；</li>
  * <li>删除 / 批量删除 / 清空消息 → <b>200</b> + {@code ApiResponse} 外壳（旧
- * {@code {"message":…,"success":true}} 裸文案与空体 204 均退役，前端不再解析服务端文案）；</li>
+ * {@code {"message":…,"success":true}} 裸文案与空体 204 均不再使用，前端不再解析服务端文案）；</li>
  * <li>置顶 → 200 + {@code {"pinned":bool}}（{@link SessionPinResponse}）；</li>
  * <li>产物列表 → 裸数组 {@code [ArtifactView]}；生成标题 → {@code {"title":"…"}}；</li>
  * <li>停止生成 → 成功 <b>200</b> + {@code ApiResponse} 外壳，无业务数据。</li>

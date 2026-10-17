@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  * <p>而"用户从没见过的页面"（上次配置保存之后新建的）<b>不在</b>排除集里，
  * 所以选中的父页面仍然会自动带上它们——见 {@code computeExcludedSet} 的注释。</p>
  *
- * <h2>已知差异（逐条都在测试里钉住）</h2>
+ * <h2>实现边界（逐条都在测试里钉住）</h2>
  * <ol>
  *   <li><b>遍历顺序确定</b>：变更循环、删除循环、发现循环都用
  *       {@code LinkedHashSet}/{@code LinkedHashMap} 保持"发现顺序"，

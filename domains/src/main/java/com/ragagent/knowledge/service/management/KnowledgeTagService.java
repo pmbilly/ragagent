@@ -47,7 +47,7 @@ import tools.jackson.databind.node.ObjectNode;
  *       {@link IllegalStateException} → 控制器本地 handler 输出 500 code=1007
  *       "Internal server error" 无 details 键（FAQ 同款，契约样例锁定）。</li>
  * </ul>
- * <h2>已知差异（备案）</h2>
+ * <h2>实现边界</h2>
  * <ul>
  *       （TypeKnowledgeListDelete / TypeIndexDelete）：Java 侧索引删除 no-op
  *       （向量索引随检索引擎批），document 型 KB 的 knowledge 文件异步删除同样

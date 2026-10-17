@@ -213,7 +213,7 @@ public class SpanTracker {
 
     /**
      * attempt ≤ 0 或 knowledge
-     * 为空 → false（旧版在飞任务不判取代）；否则比 {@link #latestAttempt} 更大即被取代。
+     * 为空 → false（早期版本的在飞任务不判取代）；否则比 {@link #latestAttempt} 更大即被取代。
      */
     public boolean isAttemptSuperseded(String knowledgeId, int attempt) {
         if (attempt <= 0 || knowledgeId == null || knowledgeId.isEmpty()) {

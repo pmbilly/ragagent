@@ -7,7 +7,7 @@ import tools.jackson.databind.ObjectMapper;
 /**
  * 分块图抽取任务的载荷（队列内传递）。
  *
- * <p>{@code knowledgeId} / {@code attempt} / {@code chunkIndex} 为 0 或空表示「旧版在飞任务」——
+ * <p>{@code knowledgeId} / {@code attempt} / {@code chunkIndex} 为 0 或空表示「早期版本的在飞任务」——
  * worker 侧据此跳过 span 记录（挂不到父 attempt 的 postprocess 阶段）。所有键恒输出。
  */
 public record ExtractChunkPayload(

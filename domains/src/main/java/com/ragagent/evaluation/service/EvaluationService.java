@@ -46,7 +46,7 @@ import org.springframework.stereotype.Service;
  * metrics → 清理临时知识与 KB。失败 → status=failed + err_msg=异常原文
  * （BizException 取 appError 原文）；全部成功 → status=success + metric 产出。</p>
  *
- * <p><b>已知差异（备案）</b>：① 指标分词走 MetricSegmenter 的降级实现（只影响
+ * <p><b>实现边界</b>：① 指标分词走 MetricSegmenter 的降级实现（只影响
  * BLEU/ROUGE；检索类指标逐值一致）；② NDCG 的 log2 以 frexp 同式仿真
  * （libm 差异或致末位分叉）；③ 清理用 deleteKnowledge + deleteKnowledgeBase，
  * 不做引用检查/副本保留；④ TenantContext 经 capture/replay 显式传播（虚拟线程无隐式继承）。</p>
@@ -59,7 +59,7 @@ import org.springframework.stereotype.Service;
  * <ul>
  *   <li>模型类型字面量为 {@code "Embedding"/"KnowledgeQA"/"Rerank"}（首字母大写）；</li>
  *   <li>KB 非空分支：读源 KB（{@code getKnowledgeBase} 带租户过滤，跨租户源 KB 会落
- *       404 同文案；已知差异）；</li>
+ *       404 同文案；实现边界）；</li>
  *   <li>"evaluation" KB 是真实创建（passage 建索引失败时不清理，会残留该 KB）。</li>
  * </ul>
  */

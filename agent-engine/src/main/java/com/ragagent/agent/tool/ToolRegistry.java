@@ -149,7 +149,7 @@ public class ToolRegistry {
     }
 
     /**
-     * 按名执行工具：取消检查 → 取工具 → 退役重定向 →
+     * 按名执行工具：取消检查 → 取工具 → 已下线工具重定向 →
      * MCP 目录守卫（鉴权先于 schema 校验）→ {@link #execute}。
      */
     public ToolResult executeTool(ToolCancellation cancellation, ToolExecContext meta, String name, JsonNode args) {

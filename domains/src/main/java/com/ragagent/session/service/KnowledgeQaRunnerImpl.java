@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  *
  * <p>迁移前这段逻辑在评估域（{@code EvaluationService#buildChatManage + knowledgeQAByEvent}）；
  * 契约化后评估域只构造请求、读产物，不再认识 {@code ChatManage}/{@code PipelineBuilder}。
- * 字段映射与旧实现逐字对齐（同一子集、同一 setter 顺序无关）。</p>
+ * 字段映射与消费面逐字对齐（同一子集、同一 setter 顺序无关）。</p>
  */
 @Component
 public class KnowledgeQaRunnerImpl implements KnowledgeQaRunner {

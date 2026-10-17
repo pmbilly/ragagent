@@ -126,7 +126,7 @@ public class TenantInvitationService {
     /**
      * auto-accept 开关判定
      * （{@code tenant.auto_accept_invitation} / {@code WEKNORA_TENANT_AUTO_ACCEPT_INVITATION}）。
-     * 已知差异：完整实现是 SystemSettingService 的 DB&gt;env&gt;false 三层；当前
+     * 实现边界：完整实现是 SystemSettingService 的 DB&gt;env&gt;false 三层；当前
      * 只保留 env 层（默认 false），DB 层随系统设置模块收口。
      */
     public static boolean autoAcceptInvitationEnabled() {

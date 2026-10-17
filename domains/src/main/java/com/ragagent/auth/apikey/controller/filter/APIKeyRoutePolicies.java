@@ -295,7 +295,7 @@ public final class APIKeyRoutePolicies {
      * {@code /vector-stores}=manage_vector_stores、
      * {@code /storage-backends}=manage_storage_backends。</p>
      *
-     * <p><b>刻意不登记</b>：{@code /api/v1/web-search/providers}（旧版运行时 provider
+     * <p><b>刻意不登记</b>：{@code /api/v1/web-search/providers}（早期版本运行时 provider
      * 列表，注册在组门禁之外）→ Key default-deny。</p>
      */
     private static void registerInfraConfigRoutes(APIKeyRouteAuthorizer a) {

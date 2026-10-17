@@ -24,7 +24,7 @@ import java.util.List;
  *   <li>派生判定（{@link #unlimitedIterations()}/{@link #citationsEnabled()}）是
  *       <b>方法</b>而非持久化字段 → Java 侧 {@code @JsonIgnore}；</li>
  *   <li>技能安装模式族（skillInstallMode/SkillInstallDir/BuiltinSkillInstallerID）与
- *       sandboxConfigId 随沙箱裁剪退役。</li>
+ *       sandboxConfigId 随沙箱裁剪移除。</li>
  * </ul>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)

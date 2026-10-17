@@ -12,7 +12,7 @@ import com.ragagent.platform.access.TracingContext;
  * 或 {@link #attachTraceparent(String)} 在本进程内续接（如后续 HTTP 请求处理
  * 早先请求派生的活）。</p>
  *
- * <p><b>已知差异（备案）</b>：采样位未反映实际采样决策
+ * <p><b>实现边界</b>：采样位未反映实际采样决策
  * （{@code LANGFUSE_SAMPLE_RATE}）；渲染器恒采样，故 flag 恒为 {@code 01}。
  * 默认 sampleRate=1.0 时与真实采样语义一致。</p>
  */

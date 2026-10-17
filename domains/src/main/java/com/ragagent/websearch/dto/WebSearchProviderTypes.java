@@ -7,7 +7,7 @@ import java.util.Map;
 
 
 /**
- * /web-search-providers/types 与旧版 /web-search/providers 共用的静态元数据。
+ * {@code /web-search-providers/types} 与 {@code /web-search/providers} 共用的静态元数据。
  * 条目顺序固定（契约，勿排序/增删）。
  */
 public final class WebSearchProviderTypes {

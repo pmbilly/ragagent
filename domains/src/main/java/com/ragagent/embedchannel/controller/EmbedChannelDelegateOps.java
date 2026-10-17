@@ -239,7 +239,7 @@ final class EmbedChannelDelegateOps {
         return ResponseEntity.ok(ctrl.mcpApprovalOps.authorizationStatus(serviceId, null));
     }
 
-    /** MCP OAuth 解析（gate 依赖分支；Gate 未接线时 500——已知差异）。 */
+    /** MCP OAuth 解析（gate 依赖分支；Gate 未接线时 500——实现边界）。 */
     public ApiResponse<Void> mcpResolve(
             @PathVariable("sessionId") String sessionId,
             @PathVariable("pendingId") String pendingId,
@@ -258,7 +258,7 @@ final class EmbedChannelDelegateOps {
         return ApiResponse.ok();
     }
 
-    /** 工具审批受理（gate 依赖分支；Gate 未接线时 500 = 已知差异）。 */
+    /** 工具审批受理（gate 依赖分支；Gate 未接线时 500 = 实现边界）。 */
     public ApiResponse<Void> toolApprovals(@PathVariable("sessionId") String sessionId,
                                            @PathVariable("pendingId") String pendingId,
                                            @RequestBody(required = false) String rawBody) {

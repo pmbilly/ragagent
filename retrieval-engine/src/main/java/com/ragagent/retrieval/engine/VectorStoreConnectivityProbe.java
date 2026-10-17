@@ -29,7 +29,7 @@ import tools.jackson.databind.ObjectMapper;
  * 向量店连通性探测（契约化搬迁）：引擎覆盖与文案逐字沿用原
  * {@code domains.vectorstore.service.VectorStoreConfigService#testConnection} 的实现。
  *
- * <p><b>TestConnection 的引擎覆盖（已知差异，原样保留）</b>：elasticsearch 走裸 HTTP GET
+ * <p><b>TestConnection 的引擎覆盖（实现边界，原样保留）</b>：elasticsearch 走裸 HTTP GET
  * （含 basic auth、不跟随重定向、版本解析）；milvus 走 REST {@code collections/list} 探针
  * （版本恒 ""）；postgres 用 JDBC 探测；weaviate/opensearch 走 HTTP 探测；
  * qdrant/tencent/doris 以驱动探针替代——连接被拒的**错误文案逐字一致**，

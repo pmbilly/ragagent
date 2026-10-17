@@ -31,7 +31,7 @@ import tools.jackson.databind.node.ObjectNode;
  *
  * 语义要点（golden 已锁定）：
  * - CreateModel：source=remote → active；其他 → downloading（本地 ollama 拉取不轮转，
- *   保持 downloading，记录为已知差异）
+ *   保持 downloading，记录为实现边界）
  * - GetModelByID：downloading → 500 "model is currently downloading"；download_failed → 500
  * - UpdateModel：内置模型仅系统管理员可改（403），系统管理员修改时 managed_by 清空
  * - 凭证永不经 PUT /models/:id 正文（controller 层快照保留）

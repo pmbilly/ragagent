@@ -48,7 +48,7 @@ import tools.jackson.databind.JsonNode;
  *       suggestionErrorCode / normalizeSuggestionText。</li>
  * </ul>
  *
- * <h2>已知差异</h2>
+ * <h2>实现边界</h2>
  * <ol>
  *   <li><b>langfuse span 未接线</b>：generate 的 AttachTraceparent/StartSpan
  *       属 langfuse 追踪（Java 侧 no-op，等价未启用部署）。</li>

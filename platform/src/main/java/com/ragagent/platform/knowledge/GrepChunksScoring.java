@@ -186,7 +186,7 @@ public final class GrepChunksScoring {
     }
 
     /**
-     * 轻量空白分词。已知差异：对含中文文本无词典分词，
+     * 轻量空白分词。实现边界：对含中文文本无词典分词，
      * 一律走空白分词（英文/纯空白场景逐位一致）。
      */
     public static Map<String, Boolean> tokenizeSimple(String text) {

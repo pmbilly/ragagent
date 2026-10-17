@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <li>load → 裸 {@code [Message]}；search → 裸 {@link MessageSearchResult}；
  * stats → 裸 {@code ChatHistoryKbStats}；</li>
  * <li>删除 → <b>200</b> + {@code ApiResponse} 外壳（旧 {@code {"message":…,"success":true}}
- * 裸文案与空体 204 均退役）。</li>
+ * 裸文案与空体 204 均不再使用）。</li>
  * </ul>
  *
  * <h2>错误门槛</h2>

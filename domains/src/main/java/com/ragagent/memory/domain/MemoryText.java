@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  * <h2>⚠️ 正则的注意点</h2>
  * <p>{@code \b} 当 ASCII 词边界（Java 默认 {@code \w} 是 {@code [A-Za-z0-9_]}），
  * 所以 {@code \b密码} **匹配不上**——CJK 那条规则刻意不写 {@code \b}，别顺手补。</p>
- * <p>{@code \s} 有一处已知差异（约定）：Java 的 {@code \s} 含 {@code \x0B}（垂直制表符）。
+ * <p>{@code \s} 有一处实现边界（约定）：Java 的 {@code \s} 含 {@code \x0B}（垂直制表符）。
  * 出现概率可忽略，故保留差异、不改成显式字符类。</p>
  */
 public final class MemoryText {

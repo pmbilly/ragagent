@@ -50,7 +50,7 @@ import tools.jackson.databind.node.ObjectNode;
  *       （均为缺省值，服务端可在接入点响应里覆盖）。</li>
  * </ol>
  *
- * <h2>实现差异（备案）</h2>
+ * <h2>实现差异</h2>
  * <ul>
  *   <li>接入点返回的 WS 地址做 <b>wss + SSRF 校验</b>（SDK 只做 scheme 解析；本仓长连接一贯校验）；</li>
  *   <li>事件 → 统一消息走 {@link LarkEventConverter}（与 webhook 的解析同一语义）；

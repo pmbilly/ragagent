@@ -8,7 +8,7 @@ import java.util.List;
  *
  * <p>本仓无真实 jieba（同 searchutil.SearchTextUtil 的既有降级），默认实现为
  * <b>二字滑窗近似</b>——与词典分词的边界会分叉：受影响的只有 BLEU/ROUGE（生成类指标），
- * <b>已知降级（备案）</b>；检索类指标（Precision/Recall/NDCG/MRR/MAP）不经过分词，
+ * <b>降级路径</b>；检索类指标（Precision/Recall/NDCG/MRR/MAP）不经过分词，
  * 不受影响。单测/联调可经 {@link #setSegmenter} 注入真实分词器恢复。</p>
  *
  * <p>纪律同 chatpipeline.QueryTokenizer：不在 searchutil 上加出口，在本包立同款接缝。</p>

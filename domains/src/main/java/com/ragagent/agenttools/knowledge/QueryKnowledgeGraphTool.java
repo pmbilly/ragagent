@@ -22,7 +22,7 @@ import tools.jackson.databind.JsonNode;
  * <p>seam：{@link GraphSearch}（按 ID 取知识库 + 混合检索）。多 KB 顺序执行
  * （结果按入参序汇集）。</p>
  *
- * <p>已知差异：按 score 的排序在并列时不保证稳定；graphConfigs/kbCounts
+ * <p>实现边界：按 score 的排序在并列时不保证稳定；graphConfigs/kbCounts
  * 多 KB 时输出文本段序不定，探针只用单 KB 场景做文本比对。</p>
  */
 public class QueryKnowledgeGraphTool extends BaseTool {

@@ -63,7 +63,7 @@ final class DataSourceSyncExecutor {
 
         boolean forceFull = payload.forceFull()
                 || DataSourceConstants.SYNC_MODE_FULL.equals(ds.getSyncMode());
-        // ⚠️ 已知差异：进程内队列拿不到重试计数 → attempt 恒 0
+        // ⚠️ 实现边界：进程内队列拿不到重试计数 → attempt 恒 0
         // （等价于"用户手动全量同步的第一次尝试"：丢掉 cursor、重抓全部）。
         int attempt = 0;
         SyncCursor startCursor;

@@ -13,12 +13,12 @@ import org.slf4j.LoggerFactory;
  * skill 生命周期管理——**指令型（playbook）**。
  *
  * <p>2026-09 裁剪定稿（选项 B）：技能 = 提示词注入的指令文档。模型凭 SKILL.md 指令
- * 用现有工具执行；沙箱镜像源、staging、shell 环境注入随沙箱一起退役（执行型扩展
+ * 用现有工具执行；沙箱镜像源、staging、shell 环境注入随沙箱一起移除（执行型扩展
  * 需求引导走 MCP）。本类只剩三级注入面：元数据目录（Level 1）、完整指令（Level 2）、
  * 附属文件（Level 3）。</p>
  *
  * <p><b>数据源抽象</b>：由 {@link SkillSource} 列表驱动——入库后生产实现是
- * {@link DbSkillSource}（skills 表）；宿主目录扫描（{@code Loader}）已随“技能入库”退役。
+ * {@link DbSkillSource}（skills 表）；宿主目录扫描（{@code Loader}）已随“技能入库”移除。
  * 多源时按配置顺序取第一个命中（同名先到先得）。</p>
  *
  * <p>实例是「每次装配一份」（见 {@code AgentEngineAssembler}），因此元数据缓存的生命周期

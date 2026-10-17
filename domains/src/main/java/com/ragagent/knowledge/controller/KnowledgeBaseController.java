@@ -228,7 +228,7 @@ public class KnowledgeBaseController {
         if (kbs.isEmpty()) {
             throw new BizException(AppError.notFound("knowledge base not found"));
         }
-        // 检索面只认本租户 KB（跨租户 org-share 授权链已退役）
+        // 检索面只认本租户 KB（跨租户 org-share 授权链不再使用）
         Long caller = TenantContext.currentTenantId();
         for (KnowledgeBase row : kbs) {
             if (row.getTenantId() == null || !row.getTenantId().equals(caller)) {

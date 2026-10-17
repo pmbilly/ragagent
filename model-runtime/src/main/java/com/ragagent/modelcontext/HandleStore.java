@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  * <p>{@code wordBounded} 在注册时编译一次：解码对每个流式分块都要跑，
  * 逐句柄逐分块重编译曾是性能热点。</p>
  *
- * <p>已知差异（备案）：遍历用插入序（LinkedHashMap）+ 稳定排序；「等长值」
+ * <p>实现边界：遍历用插入序（LinkedHashMap）+ 稳定排序；「等长值」
  * 并列处的顺序不确定。</p>
  */
 final class HandleStore<M> {

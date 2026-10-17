@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  *       上限、15s（重构前遗留值）、无浏览器。</li>
  * </ul>
  *
- * <h2>接缝与已知差异</h2>
+ * <h2>接缝与边界</h2>
  * <ol>
  *   <li><b>无头浏览器渲染无 Java 等价物</b> → {@link BrowserRenderer}
  *       接缝，默认实现恒失败 = 走 "browser unavailable" 分支（SPA 页面

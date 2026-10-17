@@ -36,9 +36,9 @@ import org.springframework.stereotype.Component;
  * <li>create：身份重复且完全一致 → 200 幂等返回既有行；仅部分冲突 → 409。</li>
  * </ul>
  *
- * <p><b>已知差异（Lite）</b>：撤管理员无 SELECT ... FOR UPDATE 事务，
+ * <p><b>实现边界（Lite）</b>：撤管理员无 SELECT ... FOR UPDATE 事务，
  * 用顺序读-判-写（SystemAdmin 面无并发竞争窗）。
- * 密码生成用 SecureRandom + base64url，输出长度可能与旧实现不同——
+ * 密码生成用 SecureRandom + base64url，输出长度可能与早先实现不同——
  * 生成密码只出现一次且契约测试掩码。</p>
  */
 @Component

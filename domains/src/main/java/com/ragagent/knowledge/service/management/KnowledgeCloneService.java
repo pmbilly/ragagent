@@ -88,7 +88,7 @@ public class KnowledgeCloneService {
      * remove=target 里的多余行；file_hash+completed 二次匹配），total=add+remove，
      * 逐步 "Processed X/N clone operations"，终态 completed/100 +
      * "Knowledge base clone completed successfully"（created_at=0 为既有行为）。
-     * <p><b>已知差异</b>：克隆只到"行级"（KB 行 + knowledge 行 + chunk 行），向量索引/
+     * <p><b>实现边界</b>：克隆只到"行级"（KB 行 + knowledge 行 + chunk 行），向量索引/
      * 文件对象/wiki/FAQ tag 映射不复制；transfer-state 续跑/重试语义未实现。</p>
      */
     public void startKBClone(long tenantId, String taskId, String sourceId, String targetId,
@@ -282,7 +282,7 @@ public class KnowledgeCloneService {
      * "callers that allow source/target KBs to bind to different stores must
      * perform their own cross-store migration"）。绑定店走引擎口，未绑定走
      * postgres 语义（pg 适配器的分页 + 三态 SourceID 改写 + ON CONFLICT DO NOTHING）。
-     * 本仓 clone worker 无对应回滚面——失败时进度任务标 failed（备案）。
+     * 本仓 clone worker 无对应回滚面——失败时进度任务标 failed。
      */
     private void copyKnowledgeVectors(Knowledge src, KnowledgeBase dst, String dstKnowledgeId,
                                       Map<String, String> srcToDstChunkIds) {

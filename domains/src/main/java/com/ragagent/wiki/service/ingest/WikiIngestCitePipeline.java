@@ -130,10 +130,10 @@ public class WikiIngestCitePipeline {
     /**
      * chunk-cited 管线的
      * <b>Pass 0</b>——扫全文，返回每个显著实体/概念的轻量<b>骨架</b>。
-     * 与旧版单次抽取不同，这一遍<b>刻意不</b>要求 LLM 逐项改写完整事实；
+     * 与单次抽取（fallback）不同，这一遍<b>刻意不</b>要求 LLM 逐项改写完整事实；
      * 那些将由分块引用遍提供。
      *
-     * <p>失败（LLM 或解析）时抛异常——调用方据此回落到旧版抽取器
+     * <p>失败（LLM 或解析）时抛异常——调用方据此回落到单次抽取器（fallback）
      * （{@link #extractEntitiesAndConceptsNoUpsert}）。</p>
      */
     public CandidateSlugs extractCandidateSlugs(LlmChatClient chatModel,
@@ -168,7 +168,7 @@ public class WikiIngestCitePipeline {
 
     /**
      *
-     * Pass 0 失败时回落的<b>旧版单次抽取器</b>。输出已经带有逐项改写过的 Details，
+     * Pass 0 失败时回落的<b>单次抽取器（fallback）</b>。输出已经带有逐项改写过的 Details，
      * 因此不需要（也不应该）再跑 chunk 引用遍。
      *
      * <p>与 Pass 0 主抽取器共享同一套 prompt 渲染、JSON 清洗与去重收敛路径。</p>

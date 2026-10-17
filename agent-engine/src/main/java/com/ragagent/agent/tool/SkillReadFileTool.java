@@ -30,7 +30,7 @@ import tools.jackson.databind.JsonNode;
  * 以及错误文案（越界走 {@code canonical relative file path without traversal}、
  * 不在允许名单走 {@code skill "x" is not available to this agent} 等）逐条对齐。</p>
  *
- * <p><b>本部署的范围</b>：沙箱已退役 → {@code /workspace} 与 {@code web://} 无实现，
+ * <p><b>本部署的范围</b>：沙箱不再使用 → {@code /workspace} 与 {@code web://} 无实现，
  * 非 {@code skill://} 路径按录像的 {@code exec_no_source} 文案明确报错（不假装存在）。</p>
  */
 public class SkillReadFileTool extends BaseTool {
@@ -80,7 +80,7 @@ public class SkillReadFileTool extends BaseTool {
             return fail(ERR_PATH_REQUIRED);
         }
         if (!path.startsWith("skill://")) {
-            // 沙箱退役：workspace / web:// 在本部署没有实现，明确报错而不是假装读到空
+            // 沙箱移除：workspace / web:// 在本部署没有实现，明确报错而不是假装读到空
             return fail(ERR_NO_SOURCE);
         }
         if (skills == null || !skills.isEnabled()) {

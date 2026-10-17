@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  *
  * <p>布局沿用既有盘上数据：{LOCAL_STORAGE_BASE_DIR}/{tenantId}/exports/
  * {safeName}_{unixNano}{ext}，引用形态 {@code local://{tenantId}/exports/...}。
- * ref 不进响应；**存量文件互读**依赖布局稳定——旧实现写入的文件要能继续 preview。</p>
+ * ref 不进响应；**存量文件互读**依赖布局稳定——已有文件要能继续 preview。</p>
  */
 @Component
 public class AttachmentFileStore {

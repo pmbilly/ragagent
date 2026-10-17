@@ -20,7 +20,7 @@ import tools.jackson.databind.JsonNode;
  *   parameter '%s' must have at most %d characters
  * </pre>
  *
- * <p>已知差异：多参数错误按参数在 JSON 里的出现序排列——required 错误恒在最前
+ * <p>实现边界：多参数错误按参数在 JSON 里的出现序排列——required 错误恒在最前
  * （schema 的 required 数组序）。</p>
  */
 public final class ParamValidator {

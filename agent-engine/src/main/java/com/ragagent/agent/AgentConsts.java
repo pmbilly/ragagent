@@ -87,7 +87,7 @@ public final class AgentConsts {
 
     /**
      * 单次工具执行的超时。一律默认 60 秒
-     * （shell_exec 的专用超时随沙箱裁剪退役）。
+     * （shell_exec 的专用超时随沙箱裁剪移除）。
      *
      * @param arguments 兼容变长签名，只消费第一个（JSON）
      */

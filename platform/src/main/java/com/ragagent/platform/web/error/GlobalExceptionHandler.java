@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
- * 统一错误形态（迁移期**两形态并存**，按路由分派）：
+ * 统一错误形态（**两形态并存**，按路由分派）：
  * - 命中 {@code @ApiResult} 控制器 → {@code {"code": N, "message": "...", "data": details}}
  * - 其余控制器 → 历史形态 {@code {"error": {code, message, details}}}
  *
@@ -254,7 +254,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 错误体形态分派（迁移期）：{@code @ApiResult} 路由 → 统一外壳
+     * 错误体形态分派：{@code @ApiResult} 路由 → 统一外壳
      * {@code {code, message, data}}（data 承载 details）；其余路由 → 历史形态。
      */
     private ResponseEntity<Object> respond(AppError e, HttpServletRequest req) {

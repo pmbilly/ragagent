@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  * - access claims：user_id, email, tenant_id, exp(+24h 秒), iat, type="access"
  * - refresh claims：user_id, exp(+7d 秒), iat, type="refresh"（无 email/tenant_id）
  *
- * 已知差异：jjwt 对 HS256 强制 key ≥ 256bit（SecretKeySpec 构造不校验，
+ * 实现边界：jjwt 对 HS256 强制 key ≥ 256bit（SecretKeySpec 构造不校验，
  * parse 时抛 WeakKeyException）。dev 无 JWT_SECRET 时走随机 32 字节，无影响。
  */
 @Component

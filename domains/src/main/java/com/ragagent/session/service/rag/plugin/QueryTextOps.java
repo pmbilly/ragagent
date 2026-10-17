@@ -78,7 +78,7 @@ final class QueryTextOps {
 
     /**
      * Han 连续段走 jieba CutForSearch（{@link QueryTokenizer} 分词 seam，
-     * 已知降级：默认实现为二字滑窗，可注入真实分词器恢复）；字母数字段整段成词。
+     * 降级路径：默认实现为二字滑窗，可注入真实分词器恢复）；字母数字段整段成词。
      */
     public static List<String> tokenize(String text) {
         List<String> tokens = new ArrayList<>();

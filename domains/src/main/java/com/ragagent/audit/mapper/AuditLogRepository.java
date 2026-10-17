@@ -106,7 +106,7 @@ public class AuditLogRepository {
         }
         w.orderByDesc(AuditLog::getId);
 
-        // 行帽 LIMIT 由分页插件生成（原 .last("LIMIT n") 拼接退役）
+        // 行帽 LIMIT 由分页插件生成（原 .last("LIMIT n") 拼接移除）
         List<AuditLog> rows = mapper.selectList(PageRequests.cap(limit), w);
         // 无行时统一返回空列表（响应体的 null vs [] 由控制器决定，见 AuditLogController）。
         return rows == null ? Collections.emptyList() : rows;

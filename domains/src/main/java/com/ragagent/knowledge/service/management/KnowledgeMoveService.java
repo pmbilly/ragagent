@@ -85,7 +85,7 @@ public class KnowledgeMoveService {
  * 入队 move 任务。
  * 初始进度 SetNX（键已存在不覆写）；worker 在虚拟线程里真实驱动状态机：
  * pending → processing（total=items）→ 逐条搬行（"Moved X/N knowledge items"）→
- * <p><b>已知差异（写链改道 + reparse 收尾后更新）</b>：reuse_vectors 模式已搬
+ * <p><b>实现边界（写链改道 + reparse 收尾）</b>：reuse_vectors 模式已搬
  * 向量行（同店 + 同模型校验后 MoveKnowledgeIndices——绑定店走引擎口、未绑定走 postgres
  * cleanupMovedSourceWiki / EnqueueWikiIngest 随 wiki 消费面）、transfer-state 续跑/重试
  * 语义未实现（Java 无该状态机，见 {@code moveOneKnowledgeRow} 注释）；任务队列 的

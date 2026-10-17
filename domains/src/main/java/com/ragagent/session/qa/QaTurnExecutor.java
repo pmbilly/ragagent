@@ -84,7 +84,7 @@ public final class QaTurnExecutor {
         String sessionId = reqCtx.sessionId;
 
         // 输入条状态（纯 UI memo）异步写：新虚拟线程没有 ThreadLocal——纪律 #1
-        // 要求显式捕获-重放。旧实现直接 start，租户读到 0、owner 为空，
+        // 要求显式捕获-重放。直接在派生线程 start，租户读到 0、owner 为空，
         // updateSessionLastRequestState 按 (tenant, owner) 过滤后静默 0 行。
         final TenantContextSnapshot memoTenant =
                 TenantContextSnapshot.capture();
@@ -235,7 +235,7 @@ public final class QaTurnExecutor {
                     // agent 收尾：steer 交接 + 完成 + 清除 live 标记
                     //
                     // 顺序纪律：收尾必须在**本线程上下文仍完整**时进行；TenantScope 的恢复
-                    // 在它之后。旧实现先 clear 再 runWithTenant，prev 已空、只剩 tenantId——
+                    // 在它之后。早先实现先 clear 再 runWithTenant，prev 已空、只剩 tenantId——
                     // completeAssistantMessage 的异步索引/follow-up 快照因此丢了
                     // principal/userId，owner 推导成 ""，embed（owner=embed_session:…）
                     // 与平台（owner=<userId>）会话双双 SessionNotFound。

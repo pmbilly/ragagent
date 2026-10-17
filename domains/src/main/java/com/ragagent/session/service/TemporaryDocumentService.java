@@ -33,7 +33,7 @@ import tools.jackson.databind.ObjectMapper;
  * <p>提示词渲染（ResolveForPrompt 的预算选块 + 图片 URL 选取）已拆至
  * {@link TemporaryDocumentPromptResolver}（步骤 2），本类保留公开入口并薄委托。</p>
  *
- * 已知差异：任务队列用进程内单线程 executor；
+ * 实现边界：任务队列用进程内单线程 executor；
  * 扩展白名单为静态表（未接解析引擎的动态列表）；
  * VLM 图片理解 / ASR 依赖运行时模型工厂，缺模型时 OCR/caption 降级跳过。
  */

@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  *   <li>agent 模式清理时机：completeAssistantMessage → follow-up 交接 → clearLiveRun。</li>
  * </ol>
  *
- * <h2>已备案差异</h2>
+ * <h2>实现边界</h2>
  * <ul>
  *   <li>共享 agent 解析：resolveAgent 共享优先、source==0 才回落 own；
  *       GetSharedAgentForTenant 的 ApplyBuiltinAgentLocalization 只覆盖

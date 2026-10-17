@@ -37,7 +37,7 @@ public class KnowledgeSpanService {
  * attempt 选择（显式 ?attempt=N 优先，
  * 否则 spans 表的 latestAttempt）→ ListByAttempt → buildSpanTree（真实行建树 +
  * 缺失 canonical stage 合成）→ last_error（span 失败行优先）。
- * 起 span 写入侧已接线（此前 spanRepo==null 分支的备案差异作废）。
+ * 起 span 写入侧已接线（此前 spanRepo==null 分支的差异作废）。
  * @return data 信封内层（JSON 对象体键按字母序：attempt/current_attempt/current_stage/
  * knowledge_id/[last_error]/latest_attempt/parse_status/trace）
  */

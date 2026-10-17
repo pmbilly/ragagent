@@ -44,7 +44,7 @@ import tools.jackson.databind.ObjectMapper;
  *       且时间戳须在 5 分钟窗内；secret 空则免验。</li>
  * </ul>
  *
- * <h2>措辞约定（备案）</h2>
+ * <h2>措辞约定</h2>
  * <p>失败信息的包装层固定为 "slack post message: …"，内层用 Slack API 响应的
  * {@code error} 字段。</p>
  */

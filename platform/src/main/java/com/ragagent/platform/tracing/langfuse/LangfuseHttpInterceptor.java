@@ -17,7 +17,7 @@ import org.springframework.web.servlet.HandlerMapping;
  * 命中 {@link #shouldTrace} 的路径才开 trace（在线推理/摄取/批处理/诊断/评估），
  * 从 {@code traceparent} 继承上游 trace id（sop3 关联），handler 链返回后自动收尾。
  *
- * <p><b>两处实现形态（备案）</b>：
+ * <p><b>两处实现形态</b>：
  * ① trace 名里的路径用 Spring 的路由模式（{@code /api/v1/kb/{id}}），
  * 同一网络语义、字符串形态与 {@code :id} 风格不同；
  * ② {@code response.size} 取 Content-Length 头（未设置 → -1；

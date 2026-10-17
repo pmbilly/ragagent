@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  * </ol>
  *
  * <p><b>知识/摘要行的跳过判据 = {@code knowledge.redis-enabled}</b>（与
- * {@code KnowledgeRedisWiring} 同一开关）。旧实现用 {@code REDIS_ADDR} 非空判断：
+ * {@code KnowledgeRedisWiring} 同一开关）。不用 {@code REDIS_ADDR} 非空判断：
  * 只把 Redis 用于 IM/embed 等其它面的部署会被误判成分布式，卡住的知识行**永不复位**
  * （前端永远转圈，HousekeepingService 只判 failed 不重投）。同理数据源同步日志按
  * {@code datasource.redis-enabled} 判断——三个开关各管各的任务基础设施。</p>

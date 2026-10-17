@@ -31,7 +31,7 @@ import tools.jackson.databind.node.StringNode;
 /**
  * 系统设置服务。
  *
- * <p><b>已知差异（Lite 取舍，Javadoc 即契约）</b>：没有 "preload + Redis pubsub 失效"
+ * <p><b>Lite 取舍（Javadoc 即契约）</b>：没有 "preload + Redis pubsub 失效"
  * 的跨副本缓存；本侧是<b>单实例</b>语义——每请求直读 DB，
  * 无缓存无 pubsub。行为差异只在多副本部署下可见（本副本 UI 改动不再即时广播给对端），
  * 解析优先级与响应形态逐字段固定。</p>
@@ -193,7 +193,7 @@ public class SystemSettingService implements SystemSettingGateway {
     // ── 管理面（List / Get / Update / Reset） ─────────────────────────────
 
     /**
-     * 持久行 + registry 虚拟行（按 key 排序），退役键剔除，
+     * 持久行 + registry 虚拟行（按 key 排序），跳过不再输出的键，
      * 额外（未知）行按 key 排序缀尾。
      */
     public List<SystemSetting> list() {

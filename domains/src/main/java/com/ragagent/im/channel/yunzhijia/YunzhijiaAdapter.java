@@ -52,7 +52,7 @@ import tools.jackson.databind.ObjectMapper;
  *       localhost 一律拒），另有公网 IP 判定（{@link YunzhijiaUrl#resolvePublicAddress}）。</li>
  * </ul>
  *
- * <h2>实现差异（备案）</h2>
+ * <h2>实现差异</h2>
  * <ul>
  *   <li>SSRF 防护在<b>请求前</b>解析并校验目标 IP（HttpClient 无自定义拨号口，
  *       做不到建连时校验）；{@link #allowPrivateHosts} 为测试口；</li>

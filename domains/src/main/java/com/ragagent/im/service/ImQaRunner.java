@@ -200,7 +200,7 @@ final class ImQaRunner {
             complete.countDown();
         });
         eventBus.on(EventType.EVENT_MCP_OAUTH_REQUIRED, evt -> {
-            // OAuth 待授权：IM 无法处理会话内提示 → 汇总成文末提示（此处仅记日志备案）。
+            // OAuth 待授权：IM 无法处理会话内提示 → 汇总成文末提示（此处仅记日志）。
             log.info("[IM] MCP OAuth required: {}", evt.getData());
         });
 

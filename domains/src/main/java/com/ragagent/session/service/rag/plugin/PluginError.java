@@ -48,7 +48,7 @@ public final class PluginError {
     public static final PluginError GET_HISTORY =
             new PluginError(null, "Failed to get conversation history", "get_history_failed");
 
-    /** 底层错误（可为 null）；对外只读，避免 Go 式公开字段。 */
+    /** 底层错误（可为 null）；对外只读，避免公开字段。 */
     public Throwable cause() {
         return err;
     }

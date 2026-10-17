@@ -23,7 +23,7 @@ import java.util.Map;
  *   <li>timestamp 用 RFC3339Nano（服务器本地时区偏移）。</li>
  * </ul></p>
  *
- * <p>已知差异：type 未设置时为 {@code null}。真实产出方（agent 引擎 / QA 主链路）恒会赋值。</p>
+ * <p>实现边界：type 未设置时为 {@code null}。真实产出方（agent 引擎 / QA 主链路）恒会赋值。</p>
  */
 @JsonPropertyOrder({"id", "type", "content", "done", "timestamp", "data", "usage"})
 public class StreamEvent {

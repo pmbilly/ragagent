@@ -26,7 +26,7 @@ import tools.jackson.databind.JsonNode;
  * <p>DB 执行经 {@link SqlQueryExecutor} seam（回放测试用 JDBC 实现连同一 dev PG
  * 端到端验证）。tenant_id 由构造期注入 {@link LongSupplier}（缺省 0）。</p>
  *
- * <p>已知差异：时间格式与 Java 序列化不同（语料避开 timestamp 列）；查询执行失败
+ * <p>实现边界：时间格式与 Java 序列化不同（语料避开 timestamp 列）；查询执行失败
  * 的 driver 错误文案不录语料。</p>
  */
 public class DatabaseQueryTool extends BaseTool {
@@ -164,7 +164,7 @@ public class DatabaseQueryTool extends BaseTool {
         try {
             queryResult = queryExecutor.query(securedSQL);
         } catch (RuntimeException e) {
-            // driver 错误文案因驱动而异——已知差异，语料不录执行失败。
+            // driver 错误文案因驱动而异——实现边界，语料不录执行失败。
             return failure("Query execution failed: " + e.getMessage());
         }
         List<String> columns = queryResult.columns() == null ? List.of() : queryResult.columns();

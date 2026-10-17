@@ -199,7 +199,7 @@ public class SkillCatalogController {
         }
         catalog.softDelete(row, tenant);
         audit(AuditAction.SKILL_DELETED, row, refs);
-        // 204 退役（空体与「外壳恒存在」冲突）⇒ 200 + {code:0,message:"ok",data:null}
+        // 不用 204（空体与「外壳恒存在」冲突）⇒ 200 + {code:0,message:"ok",data:null}
         return ApiResponse.ok();
     }
 

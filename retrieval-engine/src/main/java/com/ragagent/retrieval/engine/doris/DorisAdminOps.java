@@ -310,7 +310,7 @@ final class DorisAdminOps {
 
     /**
      * ANN 索引就绪判定：SHOW INDEX 按列名匹配 key_name / state（不同小版本
-     * 列序有差异）；找不到 idx_emb 行或旧版本无 state 列都视为已就绪。
+     * 列序有差异）；找不到 idx_emb 行或早期版本无 state 列都视为已就绪。
      */
     boolean annIndexReady(String tableName) {
         List<String[]> rows;
@@ -339,14 +339,14 @@ final class DorisAdminOps {
                 continue;
             }
             if (row[1] == null) {
-                // 旧版本不暴露 state 列，乐观认为已就绪。
+                // 早期版本不暴露 state 列，乐观认为已就绪。
                 return true;
             }
             if (!"FINISHED".equalsIgnoreCase(row[1]) && !"NORMAL".equalsIgnoreCase(row[1])) {
                 return false;
             }
         }
-        // 找到 idx_emb 且状态 FINISHED/NORMAL，或极旧版本不暴露该索引名 → 都视为就绪。
+        // 找到 idx_emb 且状态 FINISHED/NORMAL，或极早期版本不暴露该索引名 → 都视为就绪。
         return true;
     }
 

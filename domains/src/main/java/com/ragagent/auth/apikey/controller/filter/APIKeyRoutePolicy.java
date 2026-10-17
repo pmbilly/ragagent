@@ -12,7 +12,7 @@ import java.util.List;
  * 对机器主体永不适用；取而代之的是每条可被 API Key 访问的路由在这里声明一条策略，
  * 由门禁（{@link APIKeyRouteAuthorizer}）作为**唯一**执行点。
  * <b>没声明策略的路由对 API Key 一律拒绝</b>（fail-closed），
- * 这消除了旧版"记得加 APIKeyDeny"的坑。</p>
+ * 这消除了早期版本"记得加 APIKeyDeny"的坑。</p>
  *
  * @param platformOnly     拒绝租户绑定的 Key——**哪怕它是 full-access**。
  *                         用于 /system/admin 下的控制面路由与跨空间租户生命周期 API。

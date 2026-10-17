@@ -412,7 +412,7 @@ public class SessionService {
      * 单个删除 / 批量删除会话共用的「每会话清理」三件套
      * （知识 / 临时 KB / sandbox；建议删除在软删之后）。
      *
-     * <p><b>已知差异</b>：知识清理是同步尽力而为——删除请求会等
+     * <p><b>实现边界</b>：知识清理是同步尽力而为——删除请求会等
      * 知识清完才返回，HTTP 契约不变。临时 KB 清理（{@code DeleteWebSearchTempKBState}）失败被吞，
      * 无 HTTP 可见差异。</p>
      */

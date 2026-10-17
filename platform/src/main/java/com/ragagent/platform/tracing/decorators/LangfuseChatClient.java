@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * 由 {@code ModelRuntime.getChatModel} 在管理器启用时装配。
  * 未启用时 {@link #wrap} 原样返回，零成本。
  *
- * <p><b>已知差异（备案）</b>：调用点未携带 call_purpose / prompt_prefix_fingerprint
+ * <p><b>实现边界</b>：调用点未携带 call_purpose / prompt_prefix_fingerprint
  * 的元数据载体，两键恒为空串（真实取值不产出）。</p>
  */
 public final class LangfuseChatClient implements LlmChatClient {

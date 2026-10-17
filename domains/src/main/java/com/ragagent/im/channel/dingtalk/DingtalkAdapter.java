@@ -66,7 +66,7 @@ import tools.jackson.databind.node.ObjectNode;
  *       缓存留 5 分钟余量。</li>
  * </ul>
  *
- * <h2>实现差异（备案）</h2>
+ * <h2>实现差异</h2>
  * <ul>
  *   <li>孤儿流回收是惰性的（清理 5 分钟前的条目），在每次
  *       {@link #startStream} 时顺带清理；</li>

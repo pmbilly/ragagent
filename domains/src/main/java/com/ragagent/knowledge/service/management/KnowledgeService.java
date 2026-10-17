@@ -64,7 +64,7 @@ import tools.jackson.databind.node.ObjectNode;
  * image info、tags 批量、batch-delete/batch-reparse/clear-contents（任务队列 →
  * 同步尽力而为，HTTP 契约 = task_id + 文案）、folders 树升级为完整
  * BuildKnowledgeFolderTree、GET 侧回填 tags。</p>
- * <p><b>已知差异（记录于各类注释）</b>：
+ * <p><b>实现边界（记录于各类注释）</b>：
  *    软删（chunk+knowledge 行），HTTP 响应逐字节一致；② reparse 的资源清理只对齐
  *    "删 chunks"这一可观测子集；③ 刷新型摘要为进程内虚拟线程（任务队列 语义取舍，
  *    重试对齐 MaxRetry(3)）；④ updateChunkVector 全链已接线（ChunkVectorIndexer，

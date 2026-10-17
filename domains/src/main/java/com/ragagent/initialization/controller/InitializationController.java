@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  *       Admin+ → 403 纯字符串）→ KBAccessWrite → handler。</li>
  * </ol>
  *
- * <p>已知降级：PUT 的 storageBackendId 解析分支（StorageBackendResolver）未实现——
+ * <p>降级路径：PUT 的 storageBackendId 解析分支（StorageBackendResolver）未实现——
  * 现场景全走 provider 兼容投影；POST 建的 model 行 tenant_id=0（不回填租户）。</p>
  */
 @RestController

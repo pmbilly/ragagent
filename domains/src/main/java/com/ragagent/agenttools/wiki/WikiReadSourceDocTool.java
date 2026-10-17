@@ -28,7 +28,7 @@ import tools.jackson.databind.JsonNode;
  *
  * <p>{@code searchTargets != null} 即启用 scope 强制（空 scope 失败关闭）。
  * 正则用 {@code (?i)+query} 编译；正则方言在交集语法外行为不同
- * （编译失败文案差异列入报告已知差异）。</p>
+ * （编译失败文案差异列入报告实现边界）。</p>
  */
 public class WikiReadSourceDocTool extends BaseTool {
 

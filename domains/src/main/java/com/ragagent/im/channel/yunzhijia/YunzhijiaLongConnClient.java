@@ -42,7 +42,7 @@ import tools.jackson.databind.node.ObjectNode;
  *   <li>关连接/写文本都加锁并校验"还是当前连接"。</li>
  * </ul>
  *
- * <h2>实现差异（备案）</h2>
+ * <h2>实现差异</h2>
  * <p>Java 的 {@code java.net.http.WebSocket} 没有读 deadline 与自定义拨号器：
  * 读超时改为由心跳线程检查"距上次收帧超过 45s 即判死"；公网 IP 校验在连接前解析
  * （见 {@link YunzhijiaUrl#resolvePublicAddress}）。</p>

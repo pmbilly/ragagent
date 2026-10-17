@@ -138,7 +138,7 @@ final class MetricCommon {
     /**
      * log2 以 frexp 归一 + {@code Log(frac)*(1/Ln2)} 缩放实现，
      * 2 的整数幂走精确路径——避免 {@code log(x)/log(2)} 在整数幂上的末位抖动。
-     * libm 实现差异仍可能造成末位分叉（无法消除，备案）。
+     * libm 实现差异仍可能造成末位分叉（无法消除，）。
      */
     static double log2(double x) {
         if (x == 0) {

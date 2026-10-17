@@ -311,7 +311,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
         return template;
     }
 
-    /** knowledge 为空则空转（旧版在飞任务）。 */
+    /** knowledge 为空则空转（早期版本的在飞任务）。 */
     private void drainSubtask(String knowledgeId, String source) {
         if (knowledgeId == null || knowledgeId.isEmpty()) {
             return;

@@ -10,7 +10,7 @@ package com.ragagent.platform.persistence;
  * （由检索查询搬入）。三份完全一样却各自演化，属"同一政策多副本"的经典坏味道 ⇒ 合一，
  * 由本类承载；调用方一律 {@code LikeEscapes.escape(...)}。</p>
  *
- * <p><b>契约</b>：{@code value} 必须非 {@code null}（与三处旧实现一致——它们直接调 {@code replace}）；
+ * <p><b>契约</b>：{@code value} 必须非 {@code null}（与三处调用点一致——它们直接调 {@code replace}）；
  * 出参仍是"可直接拼进 LIKE 模式串"的裸转义文本。</p>
  */
 public final class LikeEscapes {

@@ -34,7 +34,7 @@ import tools.jackson.databind.ObjectMapper;
  * <ul>
  *   <li>列表：载荷是数组（空结果序列化为 {@code []} 而非 null），外面包外壳</li>
  *   <li>add：**201 保留**（+ 外壳体）；remove：幽灵删除也是成功（200 + 外壳）</li>
- *   <li>204 已退役（空体与「外壳恒存在」冲突）⇒ 成功统一 200/201 + 外壳</li>
+ *   <li>204 不使用（空体与「外壳恒存在」冲突）⇒ 成功统一 200/201 + 外壳</li>
  * </ul>
  *
  * <h2>错误形态：AppError + binding 细节进 details</h2>
@@ -74,7 +74,7 @@ public class UserFavoriteController {
         return ResponseEntity.status(201).body(ApiResponse.ok());
     }
 
-    /** 移除收藏：类型/id 校验失败 400；删 0 行照样成功（200 + 外壳；204 已退役）。 */
+    /** 移除收藏：类型/id 校验失败 400；删 0 行照样成功（200 + 外壳；204 不使用）。 */
     @DeleteMapping("/api/v1/user/favorites/{type}/{id}")
     public ApiResponse<Void> removeFavorite(@PathVariable String type, @PathVariable String id) {
         service.remove(favoriteUserId(), favoriteTenantId(), type, id);

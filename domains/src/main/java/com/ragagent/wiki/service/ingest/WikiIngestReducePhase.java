@@ -324,7 +324,7 @@ final class WikiIngestReducePhase {
                         sourceContextByRef.put(contextKey, "<document>\n<title>" + add.getDocTitle()
                                 + "</title>\n<context>\n" + sourceCtx + "\n</context>\n</document>\n");
                     }
-                    // 回落：没有引用可用（旧版路径 / 引用遍失败 / 坏的 chunk ID 被过滤掉）
+                    // 回落：没有引用可用（回落路径 / 引用遍失败 / 坏的 chunk ID 被过滤掉）
                     // 时，沿用简短的 Details 摘要，让页面仍得到真实文本。
                     String body = cited.isEmpty() ? item.getDetails() : cited;
                     newContentBuilder.append("<document>\n<title>").append(add.getDocTitle())

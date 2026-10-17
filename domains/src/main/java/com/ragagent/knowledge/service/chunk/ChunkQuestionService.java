@@ -102,7 +102,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
     /**
      * questionID 为空 =
      * 新建（服务端生成 UUID），否则就地更新既有问题并把 content_revision 钉到当前版本。
-     * metadata 序列化失败文案是 Jackson 的（已知差异族）。
+     * metadata 序列化失败文案是 Jackson 的（实现边界族）。
      */
     public GeneratedQuestion upsertGeneratedQuestion(String chunkId, String questionId, String question) {
         String trimmed = ChunkSearchUtil.trimSpace(question);

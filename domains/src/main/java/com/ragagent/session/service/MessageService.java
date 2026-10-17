@@ -43,7 +43,7 @@ import tools.jackson.databind.JsonNode;
  *   <li>统计：{@code GetChatHistoryKBStats}。</li>
  * </ul>
  *
- * <h2>已知差异（均不改变 HTTP 契约）</h2>
+ * <h2>实现边界（均不改变 HTTP 契约）</h2>
  * <ol>
  *   <li><b>聊天历史知识清理是同步尽力而为</b>：异步语义（错误全吞）。
  *       HTTP 响应不受影响。</li>
@@ -142,7 +142,7 @@ public class MessageService {
      * 所有消息的产物 URL 都被正文直接引用时零开销原样返回
      * （快路径）；否则取全会话产物表，把每条消息正文里引用的跨版本 URL 澄清成
      * 「历史版本 / 本轮生成」对照。存量会话与新生成轮获得同样的澄清——即使产生
-     * 旧版本的消息不在本页。调用方已授权会话读取。
+     * 早期版本的消息不在本页。调用方已授权会话读取。
      */
     private List<Message> clarifyReadArtifactVersions(String sessionId, List<Message> messages) {
         boolean needsHistory = false;

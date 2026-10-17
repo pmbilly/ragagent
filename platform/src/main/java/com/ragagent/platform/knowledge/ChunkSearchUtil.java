@@ -12,7 +12,7 @@ import tools.jackson.databind.ObjectMapper;
  * 生成问题的 source id 编码、空白裁剪与按码点截取。
  *
  * <p>无状态、零仓储依赖；知识库编辑链与聊天管线（search/merge）共用同一份实现，
- * 已知差异逐条标注在成员上。</p>
+ * 实现边界逐条标注在成员上。</p>
  */
 public final class ChunkSearchUtil {
 

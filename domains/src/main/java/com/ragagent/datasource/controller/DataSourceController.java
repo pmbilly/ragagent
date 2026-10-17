@@ -201,7 +201,7 @@ public class DataSourceController {
         return ResponseEntity.ok(DataSourceResponse.from(ds));
     }
 
-    /** 删除数据源：成功回 200 + {@link ApiResponse} 外壳（204 已退役）。 */
+    /** 删除数据源：成功回 200 + {@link ApiResponse} 外壳（204 不使用）。 */
     @DeleteMapping("/api/v1/datasource/{id}")
     public ApiResponse<Void> deleteDataSource(@PathVariable("id") String id) {
         Long tenantId = TenantContext.currentTenantId();

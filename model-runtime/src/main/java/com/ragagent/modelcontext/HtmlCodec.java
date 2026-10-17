@@ -11,7 +11,7 @@ import com.ragagent.platform.text.HtmlText;
  * <p>完整的 HTML5 实体表很大（含不带分号的 HTML5 形态）。
  * 本包的消费面只有「模型写出的标签属性值」与「MCP 结果里扫出的 URL」，实际
  * 出现的是五个基本实体与数字引用；这里覆盖它们加常用命名实体，更冷僻的
- * HTML5 命名实体按原样保留（已知差异）。</p>
+ * HTML5 命名实体按原样保留（实现边界）。</p>
  */
 final class HtmlCodec {
 

@@ -62,7 +62,7 @@ public final class WikiTexts {
     /**
      * 摘要片段：(?i)+query 的首个匹配前后各 60 runes、匹配自身至多 100
      * runes，压缩空白后以 "... ... ..." 包裹。正则编译失败返回 ""（正则方言
-     * 差异为已知差异点）。
+     * 差异为实现边界点）。
      */
     public static String extractSnippet(String content, String query) {
         if (content == null || content.isEmpty() || query == null || query.isEmpty()) {

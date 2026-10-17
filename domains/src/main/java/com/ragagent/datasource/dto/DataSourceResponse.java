@@ -23,7 +23,7 @@ import tools.jackson.databind.JsonNode;
  *    "status","conflictStrategy","syncDeletions","lastSyncAt","lastSyncCursor",
  *    "lastSyncResult","errorMessage","syncLogRetentionDays","createdAt","updatedAt",
  *    "totalItemsSynced","latestSyncLog","credentials"}
- *   ← 本类字段全 camel、零注解（原注写 snake 是 Go 期残留）
+ *   ← 本类字段全 camel、零注解
  * </pre>
  * <p>按字段声明序输出（不是字母序）——{@code config} 夹在 {@code type} 与
  * {@code syncSchedule} 之间、{@code credentials} 在最后。</p>

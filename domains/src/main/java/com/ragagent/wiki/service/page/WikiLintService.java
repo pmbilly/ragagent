@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
  * <p><b>实现说明</b>：4 万文档规模下，「一次性载入所有页面」是该方法的主要
  * 长尾（生产上偶发 OOM）。现在用 {@code ListPagesCursor} 以
  * {@value #LINT_CURSOR_BATCH} 条为一窗走页面集合，增量累积问题——无论 KB 多大，
- * 内存都有界。同时去掉了旧路径用来算活跃 slug 集合的全图调用：
+ * 内存都有界。活跃 slug 集合不走全图调用：
  * {@code ListAllSlugs} 是同一谓词（kbID + status&lt;&gt;archived）上的单列投影，
  * 答案一样而代价只有零头。</p>
  */

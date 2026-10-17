@@ -16,7 +16,7 @@ import tools.jackson.databind.ObjectMapper;
  * 所以请求当时知道的、而负载没带的作用域，到任务真正运行时已经没了。
  * 所有需要的信息都必须随负载携带。</p>
  *
- * <h2>⚠️ 一处已知差异</h2>
+ * <h2>⚠️ 一处边界</h2>
  * <ol>
  *   <li><b>{@code language} 恒为空串</b>：语言上下文（{@code LanguageContextKey}）
  *       尚未接入这条链路，因此没有来源。它只影响提示词语言，且只在这条内部链路上传递、

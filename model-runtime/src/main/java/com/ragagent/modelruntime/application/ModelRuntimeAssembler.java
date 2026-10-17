@@ -149,7 +149,7 @@ public class ModelRuntimeAssembler implements ModelRuntime {
  *
  * <p>装饰顺序与搬迁前一致：闸门在最外层（等待不计入 langfuse 计时）。</p>
  *
- * <p><b>已知差异（备案，随 从 VlmDescriberWiring 迁来）</b>：没有批级 60s 超时——
+ * <p><b>实现边界（随 从 VlmDescriberWiring 迁来）</b>：没有批级 60s 超时——
  * Java 侧调用是阻塞的、没有协作取消通道，实际超时由 {@code VLM_HTTP_TIMEOUT_SECONDS}
  * （缺省 180s）在 HTTP 层兜底。</p>
  */

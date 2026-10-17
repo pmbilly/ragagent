@@ -181,7 +181,7 @@ public class SequentialThinkingTool extends BaseTool {
                     args.path("branchId").asString(""),
                     args.path("needsMoreThoughts").asBoolean(false));
         } catch (RuntimeException e) {
-            // 解析失败文案固定 "Failed to parse args: "（内层消息因解析器而异——已知差异）
+            // 解析失败文案固定 "Failed to parse args: "（内层消息因解析器而异——实现边界）
             return failure("Failed to parse args: " + e.getMessage());
         }
 

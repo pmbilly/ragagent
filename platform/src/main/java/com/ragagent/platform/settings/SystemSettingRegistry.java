@@ -121,7 +121,7 @@ public final class SystemSettingRegistry {
         return REGISTRY.containsKey(key);
     }
 
-    /** List 时显式退役的旧聚合键：旧行继续可见会误导调用方。 */
+    /** List 时不输出的聚合键：旧行继续可见会误导调用方。 */
     public static final String RETIRED_KEY = "asynq.concurrency";
 
     /** "general" 兜底分类（virtualSetting 的 category=="" 分支；registry 内无空分类，防御保留）。 */

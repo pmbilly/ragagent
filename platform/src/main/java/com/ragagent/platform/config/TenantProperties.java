@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * - enableRbac：可空布尔，null → 默认 true（未显式关闭即强制开启，
  *   "operator did not opt out"）。env: WEKNORA_TENANT_ENABLE_RBAC
- * - enableCrossTenantAccess：随空间分享裁撤（跨租户授予链已退役）。
+ * - enableCrossTenantAccess：随空间分享裁撤（跨租户授予链不实现）。
  * - selfServiceCreationEnabled：指针语义，null → 默认 true。
  *   env: WEKNORA_TENANT_SELF_SERVICE_CREATION_ENABLED
  * - maxOwnedPerUser：自助创建的配额底座（0/null → 内置默认 10，由

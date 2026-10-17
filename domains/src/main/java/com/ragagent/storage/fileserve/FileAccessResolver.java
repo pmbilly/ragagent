@@ -189,7 +189,7 @@ public class FileAccessResolver {
         if ("user".equals(facts.role()) && owner != callerTenant) {
             throw FileAccessException.forbidden();
         }
-        // 空间分享裁撤：跨租户双授予（org-shared KB 证据链 + shared-agent 授予）已退役，
+        // 空间分享裁撤：跨租户双授予（org-shared KB 证据链 + shared-agent 授予）不再使用，
         // 消息文件授权只认本租户。
         if (owner != callerTenant) {
             throw FileAccessException.forbidden();

@@ -58,7 +58,7 @@ public final class QaTurnFinalizer {
     /**
      * 借用执行租户运行：只换执行租户，身份（principal/role/userId）原样保留。
      *
-     * <p>纪律 #1：借用必须**保存-恢复**而非 clear。旧实现在 finally 里先
+     * <p>纪律 #1：借用必须**保存-恢复**而非 clear。早先实现在 finally 里先
      * {@code clear()} 再读 {@code currentPrincipal()/currentRole()/currentUserId()}
      * 去还原——这些读取在 clear 之后恒为 null，等于把调用线程的身份永久抹掉、
      * 只还原了 tenantId。而本方法的调用点包含**同步 EventBus 的内联 handler**

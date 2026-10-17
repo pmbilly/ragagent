@@ -49,7 +49,7 @@ import java.util.concurrent.ConcurrentHashMap;
         /**
          * 仍在本作用域内的缓存 owner；空结果 = 调用方搜全部作用域。
          * 注意：缓存遍历序不保证确定，resolveUniqueWikiPage 的多 scope 歧义判定
-         * 受"排序影响查找序"影响（已知差异点）。
+         * 受"排序影响查找序"影响（实现边界点）。
          */
         public List<WikiScope> scopesForSlug(String slug, List<WikiScope> scopes) {
             if (slug == null || slug.isEmpty() || scopes == null || scopes.isEmpty()) {

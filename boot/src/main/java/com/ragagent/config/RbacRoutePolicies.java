@@ -354,7 +354,7 @@ final class RbacRoutePolicies {
         rbac.addRule("PUT", "/api/v1/web-search-providers/*", TenantRole.ADMIN, false);
         rbac.addRule("DELETE", "/api/v1/web-search-providers/*", TenantRole.ADMIN, false);
         rbac.addRule("GET", "/api/v1/web-search-providers/*", TenantRole.VIEWER, false);
-        // 旧版运行时 provider 列表（Viewer+）；原始 group 注册 → API Key default-deny
+        // 运行时 provider 列表（兼容端点，Viewer+）；原始 group 注册 → API Key default-deny
         rbac.addRule("GET", "/api/v1/web-search/providers", TenantRole.VIEWER, false);
         rbac.addRule("GET", "/api/v1/vector-stores/types", TenantRole.VIEWER, false);
         rbac.addRule("POST", "/api/v1/vector-stores/test", TenantRole.ADMIN, false);

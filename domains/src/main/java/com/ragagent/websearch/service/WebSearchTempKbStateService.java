@@ -150,7 +150,7 @@ public class WebSearchTempKbStateService {
 
         log.info("Cleaning temporary KB for session {}: {}", sessionId, kbId);
 
-        // 删除全部知识条目（清理面按既有备案走 deleteKnowledge 的同步尽力而为形态）
+        // 删除全部知识条目（沿用 deleteKnowledge 的同步尽力而为形态）
         List<String> knowledgeIds = state.knowledgeIds() == null ? List.of() : state.knowledgeIds();
         for (String kid : knowledgeIds) {
             try {

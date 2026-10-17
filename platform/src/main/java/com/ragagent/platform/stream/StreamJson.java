@@ -25,7 +25,7 @@ import tools.jackson.databind.module.SimpleModule;
  *       {@code config.JacksonConfig} 对 OffsetDateTime 的处置一致（RFC3339Nano，
  *       纳秒尾部零裁剪）。该覆盖在 JavaTimeModule
  *       之后注册（后者后注册者胜），由 {@code StreamJsonTest} 钉住。</li>
- *   <li><b>容忍未知属性</b>：Jackson 默认失败，这里关闭——旧版本写下的行不能因为多了个字段就整条读不出来。</li>
+ *   <li><b>容忍未知属性</b>：Jackson 默认失败，这里关闭——已有行不能因为多了个字段就整条读不出来。</li>
  * </ol>
  */
 public final class StreamJson {

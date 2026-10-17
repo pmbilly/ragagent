@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 数据库技能源：宿主目录退役后，技能来自 {@code skills} 表。
+ * 数据库技能源：宿主目录移除后，技能来自 {@code skills} 表。
  *
  * <p><b>实例是「每次装配一份」</b>——{@code AgentEngineAssembler} 在装配技能管理器时新建，
  * 因此缓存生命周期＝一次问答装配：每轮对话天然重读数据库，新建/删除技能对下一轮生效，

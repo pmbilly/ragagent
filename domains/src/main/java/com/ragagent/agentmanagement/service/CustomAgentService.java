@@ -29,7 +29,7 @@ import tools.jackson.databind.node.ObjectNode;
 /**
  * agents CRUD 家族 service。
  *
- * <p>已知降级（均不在 golden 场景内，报告与测试注释均有声明）：</p>
+ * <p>降级路径（均不在 golden 场景内，报告与测试注释均有声明）：</p>
  * <ul>
  *   <li>suggested-questions 的 wiki fallback 未实现。</li>
  *   <li>kb_selection_mode=all 的能力过滤只实现 quick-answer 的 vector/keyword any-of

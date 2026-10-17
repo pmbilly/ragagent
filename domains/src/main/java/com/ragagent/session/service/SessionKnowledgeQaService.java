@@ -47,7 +47,7 @@ import tools.jackson.databind.node.ObjectNode;
 /**
  * 知识问答 service 面（chat_pipeline 的调用方）。
  *
- * <p>已知差异（备案）：检索执行面暂缺（hybridSearch adapter 为空实现）、
+ * <p>实现边界：检索执行面暂缺（hybridSearch adapter 为空实现）、
  * web_fetch/网页抓取在 RAG 路径可用。Langfuse span
  * 为 no-op seam，span 生命周期调用点保留。</p>
  *

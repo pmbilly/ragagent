@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * skill 的来源。技能入库后唯一生产实现是 {@link DbSkillSource}
- * （读 skills 表；宿主目录扫描随“弃用宿主目录”一并退役）。
+ * （读 skills 表；宿主目录扫描随“弃用宿主目录”一并移除）。
  *
  * <p>方法组就是 agent 请求的 Progressive Disclosure 层级：系统提示词的元数据、
  * SKILL.md 正文、单个资源文件、文件清单、原始基路径。</p>

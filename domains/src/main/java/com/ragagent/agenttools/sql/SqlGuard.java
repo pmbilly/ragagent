@@ -9,13 +9,13 @@ import java.util.Map;
 /**
  * SQL 校验与安全注入。
  *
- * <p><b>已知差异</b>：本类用<b>手写轻量解析器</b>（tokenizer + 关键字级
+ * <p><b>实现边界</b>：本类用<b>手写轻量解析器</b>（tokenizer + 关键字级
  * FROM/WHERE 切分）替代 PostgreSQL 官方 parser——覆盖 database_query 语料支持的单条
  * SELECT 形态（FROM/JOIN [ON]、WHERE、GROUP BY、HAVING、ORDER BY、LIMIT/OFFSET、
  * 函数调用、{@code ::} 与 CAST 转型）。解析失败同样分类为 parse_error，但底层
  * parse 错误文案不同——该文案不进工具 error（Details 只留在
  * SQLValidationError.Details，工具只透 Message），故工具输出不受影响。
- * Deparse 归一化跳过（直接对原 SQL 注入）；多表条件序按出现序（确定性，已知差异）。</p>
+ * Deparse 归一化跳过（直接对原 SQL 注入）；多表条件序按出现序（确定性，实现边界）。</p>
  *
  * <p>校验错误的三元组（type/message/details）与 Phase 顺序（input → parse →
  * statement count → select-only → deep validate → table whitelist → injection
@@ -67,7 +67,7 @@ public final class SqlGuard {
             throw new SqlGuardException(validation);
         }
 
-        // 解析出的表→别名（出现序，确定；多表场景为已知差异点）。
+        // 解析出的表→别名（出现序，确定；多表场景为实现边界点）。
         Map<String, String> tablesInQuery = SqlSelectDeepChecker.parseTablesInQuery(sql);
 
         String securedSQL = SqlInjectionAnalyzer.injectTenantConditions(sql, tablesInQuery, tenantID);
