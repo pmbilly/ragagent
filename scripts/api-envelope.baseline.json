@@ -1,6 +1,6 @@
 {
   "pending": {
-    "domains/src/main/java/com/ragagent/im/controller/ImCallbackController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
-    "platform/src/main/java/com/ragagent/platform/web/health/HealthController.java": "已知例外（B200）：/health 是基础设施探针（k8s/docker healthcheck、外部监控 ✓）⇒ 保持 {\"status\":\"ok\"}，不进统一外壳；见 docs/api-response-convention.md"
+    "domains/src/main/java/com/ragagent/im/controller/ImCallbackController.java": "外部协议例外：平台回调 ACK（微信/云之家等）按第三方协议原样返回，不进统一外壳",
+    "platform/src/main/java/com/ragagent/platform/web/health/HealthController.java": "基础设施例外：/health 探针保持 {\"status\":\"ok\"}，见 docs/api-response-convention.md"
   }
 }
