@@ -106,44 +106,78 @@ public class AgentEngine {
 
     // ==================================================================
     // 引擎字段
+    /** 本轮运行规格（只读；会话侧 agent 配置的引擎读面）。 */
     final AgentRunSpec config;
+
+    /** 本轮工具注册表（模型函数定义 + MCP 动态刷新/清理）。 */
     final ToolRegistry toolRegistry;
+
+    /** 本轮对话模型客户端（provider 配置与观测装饰已在外层封装）。 */
     final LlmChatClient chatModel;
+
+    /** 事件出口（answer / thinking / tool / error 事件帧）。 */
     final EventBusInterface eventBus;
+
     /** 绑定知识库详情（提示词用）；测试需要直改 → 包内可见。 */
     List<KnowledgeBaseInfo> knowledgeBasesInfo;
+
     /** 用户 @ 选中的文档。 */
     List<SelectedDocumentInfo> selectedDocs;
+
     /** 本轮 @ 指定的 MCP 服务。 */
     List<PinnedMCPServiceInfo> pinnedMCPServices = List.of();
+
     /** 本轮 @ 指定的技能。 */
     List<PinnedSkillInfo> pinnedSkills = List.of();
+
     /** 引擎自己的 session id（emitContextCompacted 用它，不是执行入口的入参）。 */
     final String sessionId;
+
+    /** 显式系统提示词模板；空串 = 按有无知识库选默认模板（纯 agent / 渐进 RAG）。 */
     String systemPromptTemplate;
+
+    /** 会话侧注入的记忆片段（拼进系统提示词）；空串 = 无记忆段。 */
     String memoryPrompt = "";
+
+    /** 本轮技能管理器；null = 不挂技能（未启用，或目录读取失败降级）。 */
     Manager skillsManager;
+
     /** 提示词模板解析配置；null = 默认 base。 */
     AgentPromptTemplates.TemplatesConfig appConfig;
+
     /** 工具结果图片的 VLM 描述函数（可选）。 */
     ImageDescriberFunc imageDescriber;
+
+    /** token 估算器（预算判断、压缩与摘要共用同一套估算）。 */
     final TokenEstimator tokenEstimator = new TokenEstimator();
+
+    /** 上下文压缩器（超预算时裁剪历史；阈值取本轮 config）。 */
     Compactor compactor;
+
     /** 最近一次 LLM 调用的用量（usage 基线）。 */
     TokenUsage lastUsage = new TokenUsage();
+
     /** 最近一次 LLM 调用发送的消息数。 */
     int lastSentMsgCount;
+
     /** 本轮已用过的一次溢出压缩重试。 */
     boolean overflowRecovered;
+
     /** 压缩上次"腾不出空间"时的消息数。 */
     int compactionExhaustedAt;
+
     /** 请求内 model-context 边界。 */
     final Registry modelContext;
+
     /** 运行中注入通道；null = 禁用。 */
     SteerSink steerSink;
 
+    /** 本轮 steer 注入把预算耗尽的主循环拉回来一次（主循环消费一次即复位）。 */
     boolean allowSteerOverrun;
+
+    /** 已透支的轮数（上限 {@link #MAX_STEER_OVERRUNS}）。 */
     int steerOverruns;
+
     /** 取消探测；null = 永不取消。 */
     Supplier<String> cancellationSource;
 
