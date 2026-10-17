@@ -22,12 +22,12 @@ import tools.jackson.databind.ObjectMapper;
  *       {@code NON_DEFAULT} 对 int）。</li>
  * </ul>
  *
- * <p>读路径<b>容忍未知属性</b>：历史行里会有 {@code enabled} / {@code auto_ingest}
- * 等已退役的键，Jackson 默认会报错——故本类的
+ * <p>读路径<b>容忍未知属性</b>：已有行可能含 {@code enabled} / {@code auto_ingest}
+ * 等不再写入的键，Jackson 默认会报错——故本类的
  * {@link #fromJson(String)} 用配了 {@code FAIL_ON_UNKNOWN_PROPERTIES=false} 的 mapper。</p>
  *
  * <p><b>写侧必须用本类的字段名</b>：{@code knowledge_bases.wiki_config} 由 KB 更新请求的
- * {@code config.wiki_config} 原样落库（知识库模块不重写内层键）。历史前端按 snake 键书写
+ * {@code config.wiki_config} 原样落库（知识库模块不重写内层键）。snake 键不被接受
  * （{@code synthesis_model_id} / {@code max_pages_per_ingest} …），这些键<b>会被静默忽略</b>
  * ——表现为「界面选了合成模型但 wiki ingest 报 missing_synthesis_model」。</p>
  */

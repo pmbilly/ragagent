@@ -32,9 +32,9 @@ import org.slf4j.LoggerFactory;
  *       其余服务按 serviceId 共享一条连接；</li>
  *   <li><b>并发建连去重</b>：同一 key 上只跑一次建连，其余调用者等同一个 pending；
  *       无关服务之间<b>不得</b>因 I/O 持锁互相阻塞（建连在锁外、独立线程里跑）；</li>
- *   <li><b>UpdatedAt 版本失效</b>：服务的 updatedAt 变了 ⇒ 旧连接退役、重新建连；</li>
+ *   <li><b>UpdatedAt 版本失效</b>：服务的 updatedAt 变了 ⇒ 关闭旧连接并重新建连；</li>
  *   <li><b>等待者可独立取消</b>：某个等待者取消不影响共享连接；</li>
- *   <li><b>CloseClient 退役 pending</b>：正在建连的尝试也要能被关掉，并把错误交给等待者。</li>
+ *   <li><b>CloseClient 关闭 pending</b>：正在建连的尝试也要能被关掉，并把错误交给等待者。</li>
  * </ol>
  */
 public final class McpClientManager {
@@ -189,7 +189,7 @@ public final class McpClientManager {
                 if (Objects.equals(existing.version, version)) {
                     return existing;
                 }
-                // 配置已更新（updatedAt 变了）：退役旧连接，重建
+                // 配置已更新（updatedAt 变了）：关闭旧连接，重建
                 existing.disconnect();
                 clients.remove(key);
             }
@@ -271,7 +271,7 @@ public final class McpClientManager {
 
         lock.writeLock().lock();
         try {
-            // CloseClient / CloseAll 可能在这次建连途中把它退役掉
+            // CloseClient / CloseAll 可能在这次建连途中把它关闭
             if (connecting.get(key) != pending || life.isCancelled()) {
                 if (error == null) {
                     error = new McpException(McpErrorCode.CONNECTION_CLOSED, "context canceled");
@@ -336,7 +336,7 @@ public final class McpClientManager {
 
     /**
      * 关掉该服务的<b>所有</b>缓存连接（OAuth 下是每个 principal 一条），
-     * 并退役仍在建连中的尝试（键前缀匹配 {@code "<serviceID>\x00"}）。
+     * 并关闭仍在建连中的尝试（键前缀匹配 {@code "<serviceID>\x00"}）。
      */
     public void closeClient(String serviceId) {
         lock.writeLock().lock();

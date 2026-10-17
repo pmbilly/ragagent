@@ -26,7 +26,7 @@ public enum WikiExtractionGranularity {
 
     /**
      * 抽取每一个命名实体与可辨识概念，包括顺带提到的技术栈/库。
-     * 等价于引入粒度之前的旧行为，适合把知识库当词汇表而非精选 wiki 使用。
+     * 抽取范围最广的一档，适合把知识库当词汇表而非精选 wiki 使用。
      */
     EXHAUSTIVE("exhaustive");
 

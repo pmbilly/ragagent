@@ -362,7 +362,7 @@ public class WikiPageRepository {
      * 一次 IN 查询拿瘦投影。
      *
      * <p>空输入返回空 map。库里不存在的 slug 会被静默丢弃——调用方把"缺失"当作
-     * "没有这个页面"，与旧版 ListAll 的缺键语义相同。</p>
+     * "没有这个页面"，缺键按空结果处理。</p>
      */
     public Map<String, WikiPageLite> listBySlugs(String kbId, List<String> slugs) {
         if (slugs == null || slugs.isEmpty()) {
@@ -379,7 +379,7 @@ public class WikiPageRepository {
     /**
      * 按"撰写该摘要的 knowledge id"
      * 返回摘要页正文。先按 page_type 收窄（只有 summary 页的正文适合做 retract 框定），
-     * 再在 source_refs 里匹配裸 id 或 {@code "id|title"} 旧形态。
+     * 再在 source_refs 里匹配裸 id 或 {@code "id|title"} 两种写法。
      */
     public Map<String, String> listSummariesByKnowledgeIDs(String kbId, List<String> kids) {
         if (kids == null || kids.isEmpty()) {

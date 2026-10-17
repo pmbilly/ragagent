@@ -43,14 +43,11 @@ import tools.jackson.databind.ObjectMapper;
  * 本部署 RETRIEVE_DRIVER 未配置 → env 列表恒空（部署状态，golden 钉住）。</p>
  *
  * <p><b>响应形态（统一外壳 {@code {code,message,data}}，见 docs/api-response-convention.md）</b>：
- * 成功体一律外壳（列表/对象进 {@code data}；201 保留、204 退役 ⇒ 删除返 200 + 外壳）；
+ * 成功体一律外壳（列表/对象进 {@code data}；创建返 201，删除返 200 + 外壳，不用 204）；
  * 错误体同形（{@code {code,message,data}}），**HTTP 状态码随语义**（404/400/401…）。</p>
  *
- * <p>本类此前有四处**私有错误形态**（{@code {"error":"…"}} 纯字符串 + test 失败返 **200**），
- * 已全部退役：改由 {@code BizException(AppError…)} 走全局处理器 ⇒ 与其余域同形。
- * 其中「test 失败返 200」是 Go 期产物 ✗（200 却带错误体，前端只能靠字符串嗅探）；
- * 现在服务端错误就是真错误状态（400），前端用 resolve/reject 判断 ⇒ 顺带修掉
- * {@code VectorStoreSettings.vue} 里「读 res.success 恒为 undefined、成功分支永不亮」的存量缺陷。</p>
+ * <p>错误一律由 {@code BizException(AppError…)} 交给全局处理器，与其他域同形；
+ * 服务端错误返回真实 HTTP 状态（4xx），前端按 reject 分支处理。</p>
  */
 @RestController
 @ApiResult
@@ -100,7 +97,7 @@ public class VectorStoreController {
         }
         // ConnectionConfig 的必填校验不在这里做（嵌套结构校验行为不触发），
         // 直接落到引擎必填校验。
-        // 不再包成 200 + 纯字符串错误体（Go 期形态）⇒ 让 BizException 带自己的码/状态出去
+        // 错误由 BizException 携带码与状态，不在控制器内包装
         String version = service.testRawConnection(req.engineType(), req.connectionConfig());
         return ResponseEntity.ok(versionBody(version));
     }
@@ -329,6 +326,4 @@ public class VectorStoreController {
     }
 
 
-    // 本类原有的四处私有错误形态（{"error":"…"} 纯字符串 + test 失败 200）已退役 ——
-    // 统一走 BizException(AppError…) ⇒ 全局处理器按 @ApiResult 出 {code,message,data}。
 }

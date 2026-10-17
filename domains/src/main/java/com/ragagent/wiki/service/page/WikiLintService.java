@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
  * 与按 id 判文档是否还活着。两者都带 {@code deleted_at IS NULL}
  * （软删除的默认谓词）。</p>
  *
- * <p><b>实现说明</b>：4 万文档规模下，旧的「一次性载入所有页面」是该方法的主要
+ * <p><b>实现说明</b>：4 万文档规模下，「一次性载入所有页面」是该方法的主要
  * 长尾（生产上偶发 OOM）。现在用 {@code ListPagesCursor} 以
  * {@value #LINT_CURSOR_BATCH} 条为一窗走页面集合，增量累积问题——无论 KB 多大，
  * 内存都有界。同时去掉了旧路径用来算活跃 slug 集合的全图调用：

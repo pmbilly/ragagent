@@ -369,7 +369,7 @@ public final class McpCatalog {
 
     /**
      * 显式刷新失败后绝不回落到 stale 工具。原子替换快照也会让
-     * 服务端删除的工具退役。live=true 仅用于 list_tools refresh=true，会重列 MCP 服务器。
+     * 服务端删除的工具随之从快照移除。live=true 仅用于 list_tools refresh=true，会重列 MCP 服务器。
      * 返回 {tools, status, error}。
      */
     SnapshotResult snapshot(String id, boolean live) {

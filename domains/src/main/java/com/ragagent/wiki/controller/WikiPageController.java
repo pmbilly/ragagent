@@ -56,14 +56,13 @@ import tools.jackson.databind.ObjectMapper;
  * 写端点：创建者本人或 Admin+（否则 403）+ KB 写权限
  * </pre>
  * <p>Java 的 {@code RbacInterceptor} 只能表达"角色下限"，无法表达 KB 访问的
- * "own / org-shared / via shared agent" 解析，故 <b>KB 访问与所有权判定由 {@link WikiKbAccessGuard} 承接</b>，角色下限仍由 WebConfig 注册的规则负责。跨空间的两条授予路径
- * 复用 org 模块已落地的积木（{@code com.ragagent.org} 包的 {@code KbShareService} /
- * {@code AgentShareService} / {@code SharedAgentKBScope}）。</p>
+ * "own / org-shared / via shared agent" 解析，故 <b>KB 访问与所有权判定由 {@link WikiKbAccessGuard} 承接</b>，
+ * 角色下限仍由 WebConfig 注册的规则负责。跨空间授予路径本仓不实现——非本租户一律拒绝。</p>
  *
  * <p><b>⚠️ 通配 slug</b>：catch-all 路径参数捕获值<b>带前导 "/"</b>，
  * 取用前要先剥掉再去首尾空白清洗，见 {@code getSlugParam}。</p>
  *
- * <p><b>已知差异</b>：</p>
+ * <p><b>实现边界</b>：</p>
  * <ul>
  *   <li>图谱的"熟悉知识"叠加层（FamiliarKnowledgeIDs）无对应模块 → 该字段恒为 null。</li>
  *   <li>审计埋点由 {@link WikiActivityAudit} 接缝承接；实现 bean
@@ -262,9 +261,8 @@ public class WikiPageController {
     /**
      * 裸错误（{@link RawJsonError}）→ <b>统一外壳</b>。
      *
-     * <p>退役记录：此前直写 {@code {"error": "…"}}（Go 迁移期与录制脚本对齐的产物 ✗）。
-     * 现在码值取 {@link AppError#ofHttpStatus} 的通用段（400/403/404 ⇒ 1010/1002/1003 ✓），
-     * HTTP 状态码仍按原样返回 ✓，机制本身（守卫/ops 抛 RawJsonError）保留 ✓。</p>
+     * <p>码值取 {@link AppError#ofHttpStatus} 的通用段（400/403/404 ⇒ 1010/1002/1003），
+     * HTTP 状态码按原样返回；守卫/ops 仍抛 {@link RawJsonError} 经此处转换。</p>
      */
     @ExceptionHandler(RawJsonError.class)
     public ResponseEntity<ApiResponse<Void>> handleRawJsonError(RawJsonError ex) {

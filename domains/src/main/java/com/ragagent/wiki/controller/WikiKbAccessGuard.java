@@ -71,7 +71,7 @@ final class WikiKbAccessGuard {
         }
 
         if (!tenantId.equals(kb.getTenantId())) {
-            // 空间分享裁撤：跨租户授予链（org-share / shared-agent）已退役 → 直接拒绝
+            // 跨租户访问一律拒绝（本仓不实现 org-share / shared-agent 授予链）
             throw BizException.forbidden("Permission denied to access this knowledge base");
         }
 

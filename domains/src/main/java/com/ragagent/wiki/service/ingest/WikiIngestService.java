@@ -67,7 +67,7 @@ public class WikiIngestService implements WikiIngestPort {
 
     static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    /** 旧版默认索引导语；现有导语为空或等于它时按"首次生成"处理。 */
+    /** 默认索引导语；现有导语为空或等于它时按"首次生成"处理。 */
     static final String LEGACY_INDEX_PLACEHOLDER = "Wiki index - table of contents";
 
     // ═══════════════════════════════════════════════════════════════

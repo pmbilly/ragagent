@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  * {@link McpToolRegistrationPort} 的 MCP 域实现：注册编排（列表 → 启用过滤 →
  * 按需暴露）逐字保留自会话装配的原块——"selected 模式列出所选服务"、"只注册
  * 已启用服务"、各分支日志文案与级别均不变；身份与装载参数说明见
- * {@link McpExposure} / McpOAuthSupport 备案。
+ * {@link McpExposure} / {@code McpOAuthSupport}。
  */
 @Component
 public class McpToolRegistrationAdapter implements McpToolRegistrationPort {

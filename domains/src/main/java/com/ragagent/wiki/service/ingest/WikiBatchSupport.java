@@ -74,7 +74,7 @@ public final class WikiBatchSupport {
     // ═══════════════════════════════════════════════════════════════
 
     /**
-     * 匹配旧版生成页里残留的短 chunk 别名引用：
+     * 匹配早期生成页里残留的短 chunk 别名引用：
      * {@code [ \t]*\[c\d{3,}(?:\s*[,;]\s*c\d{3,})*\]}。
      */
     private static final Pattern INLINE_CHUNK_CITATION_REGEX =
