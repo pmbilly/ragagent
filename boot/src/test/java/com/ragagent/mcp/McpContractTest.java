@@ -17,8 +17,8 @@ import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.fixtures.GoldenContract;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.support.GoldenContract;
 import com.ragagent.tenant.domain.Tenant;
 import com.ragagent.tenant.mapper.TenantMapper;
 import java.nio.charset.StandardCharsets;
@@ -351,7 +351,7 @@ class McpContractTest {
 
     private void assertGoldenBody(String name, String actual, String label) throws Exception {
         if (REFRESH_FIXTURES) {
-            java.nio.file.Path path = com.ragagent.support.ContractPaths.resolveForWrite(name);
+            java.nio.file.Path path = com.ragagent.fixtures.ContractPaths.resolveForWrite(name);
             java.nio.file.Files.writeString(path, mask(actual));
             System.out.println("REFRESH " + name);
             return;

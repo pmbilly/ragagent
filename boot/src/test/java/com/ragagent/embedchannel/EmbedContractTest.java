@@ -541,7 +541,7 @@ class EmbedContractTest {
         assertEquals(status, r.getResponse().getStatus(), goldenName + " 状态码不符: " + raw(r));
         String actual = raw(r);
         if (REFRESH_FIXTURES) {
-            java.nio.file.Path path = com.ragagent.support.ContractPaths.resolveForWrite(goldenName);
+            java.nio.file.Path path = com.ragagent.fixtures.ContractPaths.resolveForWrite(goldenName);
             try {
                 java.nio.file.Files.writeString(path, mask(actual));
                 System.out.println("REFRESH " + goldenName);

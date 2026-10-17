@@ -1,4 +1,4 @@
-package com.ragagent.common;
+package com.ragagent.fixtures;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;

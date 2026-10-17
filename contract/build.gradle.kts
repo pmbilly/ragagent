@@ -13,6 +13,7 @@
 plugins {
     `java-library`
     id("ragagent.java-conventions")
+    id("ragagent.test-conventions")
 }
 
 // 编译期静态分析最小面：契约层最稳定，全量 lint + 警告即错误先行
@@ -22,4 +23,10 @@ tasks.named<JavaCompile>("compileJava") {
     options.compilerArgs.addAll(listOf("-Xlint:all,-serial", "-Werror"))
 }
 
-// 刻意留空：契约面零依赖（R1 由 ArchUnit 守，这里由"没有依赖可声明"再兜一层）。
+// 生产依赖刻意留空：契约面零依赖（R1 由 ArchUnit 守，这里由"没有依赖可声明"再兜一层）。
+// 测试面允许 JUnit / AssertJ —— 契约自身的纯 JDK 行为需要自测。
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.assertj:assertj-core")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}

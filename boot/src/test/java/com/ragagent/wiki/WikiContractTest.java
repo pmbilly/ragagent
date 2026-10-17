@@ -17,10 +17,10 @@ import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.fixtures.GoldenContract;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.support.GoldenContract;
 import com.ragagent.tenant.domain.Tenant;
 import com.ragagent.tenant.mapper.TenantMapper;
 import java.nio.charset.StandardCharsets;
@@ -344,7 +344,7 @@ class WikiContractTest {
     private static String goldenChecked(String name, String actualBody) throws Exception {
         String masked = mask(actualBody);
         if (REFRESH_FIXTURES) {
-            java.nio.file.Path file = com.ragagent.support.ContractPaths.resolveForWrite(name);
+            java.nio.file.Path file = com.ragagent.fixtures.ContractPaths.resolveForWrite(name);
             java.nio.file.Files.writeString(file, masked + "\n");
             return masked;
         }

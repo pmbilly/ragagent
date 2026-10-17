@@ -11,8 +11,8 @@ import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.fixtures.GoldenContract;
 import com.ragagent.knowledge.storage.LocalStorageService;
-import com.ragagent.support.GoldenContract;
 import com.ragagent.tenant.domain.Tenant;
 import com.ragagent.tenant.mapper.TenantMapper;
 import java.nio.charset.StandardCharsets;
@@ -260,7 +260,7 @@ class W5cFileProxyContractTest {
     }
 
     private Path golden(String name) {
-        return com.ragagent.support.ContractPaths.resolve(name);
+        return com.ragagent.fixtures.ContractPaths.resolve(name);
     }
 
     private String raw(MvcResult r) {

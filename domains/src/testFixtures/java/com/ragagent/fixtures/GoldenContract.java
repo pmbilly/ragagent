@@ -1,4 +1,4 @@
-package com.ragagent.support;
+package com.ragagent.fixtures;
 
 import com.ragagent.agent.fixtures.ContractJson;
 import java.nio.file.Files;

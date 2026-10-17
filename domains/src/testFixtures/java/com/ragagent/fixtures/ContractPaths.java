@@ -1,4 +1,4 @@
-package com.ragagent.support;
+package com.ragagent.fixtures;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

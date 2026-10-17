@@ -5,8 +5,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import com.ragagent.TestSchema;
+import com.ragagent.fixtures.GoldenContract;
 import com.ragagent.knowledge.storage.LocalStorageService;
-import com.ragagent.support.GoldenContract;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -98,7 +98,7 @@ class W5dTerminalEmbedContractTest {
     }
 
     private Path golden(String name) {
-        return com.ragagent.support.ContractPaths.resolve(name);
+        return com.ragagent.fixtures.ContractPaths.resolve(name);
     }
 
     private String readGolden(String name) throws Exception {

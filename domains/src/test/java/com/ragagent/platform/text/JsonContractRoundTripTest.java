@@ -1,6 +1,6 @@
 package com.ragagent.platform.text;
 
-import static com.ragagent.common.JsonRoundTrip.assertRoundTrips;
+import static com.ragagent.fixtures.JsonRoundTrip.assertRoundTrips;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;

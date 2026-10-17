@@ -11,7 +11,7 @@
     domains        → contract, platform, model-runtime   （仅 modelcontext；其余已在 R2c-3d 清零）
     boot           → 全部（组合根）
 
-本守卫的四条判据：
+本守卫的判据（A~E）：
 
   A) **主码依赖边**（src/main 的 import 解析到另一模块的 src/main 类）必须在上表矩阵内。
      新增边即红——除非同时把理由写进 ALLOWED_MAIN 并改这里（棘轮语义：矩阵只许减不许增）。
@@ -30,6 +30,12 @@
        组合根的启动类都放根包，类名不冲突、无遮蔽风险）。
      · 另有硬性判据 **D2：同一 FQN 不得出现在两个模块**（真重复类，classpath 上直接冲突）。
      · 测试树（src/test）沿用目标模块包名是**惯例**（为够到包私有成员），不在 D 的范围内。
+
+  E) **测试不得住在别模块的主码包**（`src/test` / `src/testFixtures`）。
+     这类文件会让"按模块找测试"的直觉失效，并掩盖模块边。存量以
+     `MISPLACED_TEST_ALLOW` 登记理由（棘轮：只许减）；新增即红，登记项消失也红
+     （提示同步删除登记）。另硬性禁止已解散模块的夹具包
+     `com.ragagent.common` / `com.ragagent.support` 回流。
 
 为什么不写成 ArchUnit：ArchUnit 看的是类/包，看不到 **Gradle 模块边界**；模块边是构建期事实，
 用脚本按源集判最直接（与 R9 包级 SCC 守卫同源）。
@@ -66,6 +72,32 @@ ALLOWED_TEST_EXTRA: dict[tuple[str, str], str] = {
 
 IMPORT_RE = re.compile(r"^import\s+(?:static\s+)?(com\.ragagent\.[\w.]+);", re.M)
 PKG_RE = re.compile(r"^package\s+([\w.]+);", re.M)
+
+# ── 判据 E 的存量登记（路径 → 理由；只许减）────────────────────────────────
+MISPLACED_TEST_ALLOW: dict[str, str] = {
+    "platform/src/test/java/com/ragagent/contract/knowledge/support/ParserEngineRulesTest.java":
+        "测契约规则，但需要 platform 的 JsonMappers；platform test → contract 是合法方向",
+    "domains/src/test/java/com/ragagent/embedding/EmbeddingWireTest.java":
+        "wire A/B 使用 domains 的 Model/ModelRowViews；迁 model-runtime 会形成 test→domains 反向边",
+    "domains/src/test/java/com/ragagent/rerank/RerankWireTest.java":
+        "同上：wire A/B 使用 domains 的 Model/ModelRowViews",
+    "domains/src/test/java/com/ragagent/llm/provider/ProviderCatalogParityTest.java":
+        "provider 目录测试使用 domains 的 ModelProviderDto；迁 model-runtime 会形成反向边",
+    "domains/src/test/java/com/ragagent/llm/provider/ProviderRegistryTest.java":
+        "provider 目录测试使用 domains 的 Model/ModelRowViews；迁 model-runtime 会形成反向边",
+    "domains/src/test/java/com/ragagent/platform/access/TracingCarrierNestingTest.java":
+        "用 domains 的任务载荷验证平台 tracing carrier；迁 platform 会形成反向边",
+    "domains/src/test/java/com/ragagent/platform/web/JsonFaceVocabularyTest.java":
+        "用 domains 的 DTO/配置验证平台 JSON 口径；迁 platform 会形成反向边",
+    "domains/src/test/java/com/ragagent/platform/text/JsonContractRoundTripTest.java":
+        "全仓 JSON 往返矩阵，天然需要 domains 载荷；迁 platform 会形成反向边",
+    "domains/src/test/java/com/ragagent/platform/tracing/langfuse/LangfuseEndToEndTest.java":
+        "端到端 trace 依赖 domains 的 MemoryTrace；迁 platform 会形成反向边",
+    "domains/src/test/java/com/ragagent/platform/tracing/langfuse/LangfuseTracingTest.java":
+        "同上：trace 测试依赖 domains 的 MemoryTrace",
+}
+
+GHOST_FIXTURE_PREFIXES = ("com.ragagent.common", "com.ragagent.support")
 
 
 def sources(module: str, kind: str) -> list[pathlib.Path]:
@@ -174,12 +206,57 @@ def main() -> int:
         problems.append(f"D2 同一类出现在多个模块：{fqn} —— {mods}")
     print(f"跨模块重复 FQN：{len(dup)} 个（要求 0）")
 
+    # E) 测试/夹具不得住在别模块的主码包（存量登记只许减）
+    used_allow: set[str] = set()
+    misplaced = 0
+    ghost = 0
+    for m in MODULES:
+        # 组合根的有意例外：boot 的 src/test 是 HTTP 集成测试聚合地，按业务包组织是刻意设计。
+        if m == "boot":
+            continue
+        for kind in ("test", "testFixtures"):
+            for f in sources(m, kind):
+                pm = PKG_RE.search(f.read_text(encoding="utf-8"))
+                if not pm:
+                    continue
+                pkg = pm.group(1)
+                rel = str(f.relative_to(ROOT))
+                others = {
+                    other
+                    for main_pkg_name, mods in main_pkg.items()
+                    # 根包 com.ragagent 是组合根启动类/通用夹具的惯例位置，不作为归属前缀。
+                    if main_pkg_name != "com.ragagent"
+                    and (pkg == main_pkg_name or pkg.startswith(main_pkg_name + "."))
+                    for other in mods
+                    if other != m
+                }
+                if others:
+                    misplaced += 1
+                    if rel in MISPLACED_TEST_ALLOW:
+                        used_allow.add(rel)
+                    else:
+                        problems.append(
+                            f"E 测试/夹具住在别模块主码包：{rel}（{pkg} → {sorted(others)}）"
+                        )
+                if kind == "testFixtures" and any(
+                        pkg == g or pkg.startswith(g + ".") for g in GHOST_FIXTURE_PREFIXES):
+                    ghost += 1
+                    problems.append(f"E 已解散模块的夹具包回流：{rel}（{pkg}）")
+
+    for rel, reason in sorted(MISPLACED_TEST_ALLOW.items()):
+        if rel not in used_allow:
+            problems.append(
+                f"E 登记失效或已不跨模块：{rel} —— 请从 MISPLACED_TEST_ALLOW 删除（理由：{reason}）"
+            )
+    print(f"测试/夹具跨模块错位：{misplaced} 个（登记 {len(MISPLACED_TEST_ALLOW)} 条，只许减）")
+    print(f"已解散模块夹具包回流：{ghost} 个（要求 0）")
+
     if problems:
         print("\n✗ 模块图违例：")
         for p in problems:
             print("   " + p)
         return 1
-    print("\n✓ 模块图合规（主码矩阵 · 主码无同包 · 测试边已登记 · 夹具包无占用）")
+    print("\n✓ 模块图合规（主码矩阵 · 主码无同包 · 测试边已登记 · 测试无错位 · 夹具包无占用）")
     return 0
 
 
