@@ -1,12 +1,12 @@
 package com.ragagent.memory.service;
 
+import com.ragagent.contract.model.EmbeddingPort;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelFacts;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.platform.model.EmbeddingGateway;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
  *
  * <p><b>chat 客户端走契约端口 {@link ModelRuntime#chatClientFor}</b>（取数口径留在本类：
  * {@code findModel} 的状态闸门；构造与并发闸门装饰收在 model-runtime 一处）；
- * <b>embedding 走契约能力端口 {@link EmbeddingGateway}</b>（按模型事实嵌入），单条嵌入包一层。</p>
+ * <b>embedding 走契约能力端口 {@link EmbeddingPort}</b>（按模型事实嵌入），单条嵌入包一层。</p>
  */
 @Component
 public class DefaultMemoryModelResolver implements MemoryModelResolver {
@@ -29,14 +29,14 @@ public class DefaultMemoryModelResolver implements MemoryModelResolver {
 
     private final ModelCatalogPort modelCatalog;
     private final ModelRuntime modelRuntime;
-    private final EmbeddingGateway embeddingGateway;
+    private final EmbeddingPort embeddingPort;
 
     public DefaultMemoryModelResolver(ModelCatalogPort modelCatalog,
                                       ModelRuntime modelRuntime,
-                                      EmbeddingGateway embeddingGateway) {
+                                      EmbeddingPort embeddingPort) {
         this.modelCatalog = modelCatalog;
         this.modelRuntime = modelRuntime;
-        this.embeddingGateway = embeddingGateway;
+        this.embeddingPort = embeddingPort;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class DefaultMemoryModelResolver implements MemoryModelResolver {
                     "model " + modelId + " is not an embedding model (type=" + type + ")");
         }
         ModelParameters p = model.parameters();
-        List<float[]> vectors = embeddingGateway.embed(new ModelFacts(
+        List<float[]> vectors = embeddingPort.embed(new ModelFacts(
                 model.id(), model.name(),
                 p == null || p.getBaseUrl() == null ? "" : p.getBaseUrl(),
                 p == null || p.getApiKey() == null ? "" : p.getApiKey()), List.of(text));

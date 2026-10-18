@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.client;
 
+import com.ragagent.contract.model.EmbeddingPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelFacts;
-import com.ragagent.platform.model.EmbeddingGateway;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.net.URI;
@@ -22,7 +22,7 @@ import tools.jackson.databind.ObjectMapper;
  * POST {base_url}/embeddings，Bearer api_key；输入 batch 文本，返回 float 向量。
  */
 @Service
-public class EmbedderClient implements EmbeddingGateway {
+public class EmbedderClient implements EmbeddingPort {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
@@ -59,7 +59,7 @@ public class EmbedderClient implements EmbeddingGateway {
     }
 
     /**
-     * 能力端口的实现（{@link EmbeddingGateway}）：按模型事实嵌入文本。
+     * 能力端口的实现（{@link EmbeddingPort}）：按模型事实嵌入文本。
      *
      * <p>本类既有的 {@code embedBatch} 声明受检异常（Jackson 的 parse 异常），端口面
      * 不带受检异常，故在此收敛为同名消息的运行时异常——调用方看到的文案不变。</p>

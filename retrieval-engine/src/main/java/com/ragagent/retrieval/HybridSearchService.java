@@ -7,7 +7,9 @@ import com.ragagent.contract.knowledge.ChunkSearchGateway;
 import com.ragagent.contract.knowledge.KnowledgeBaseSearchFacts;
 import com.ragagent.contract.knowledge.KnowledgeBaseSearchGateway;
 import com.ragagent.contract.knowledge.KnowledgeDocumentGateway;
+import com.ragagent.contract.model.EmbeddingPort;
 import com.ragagent.contract.model.ModelFacts;
+import com.ragagent.contract.model.ModelFactsPort;
 import com.ragagent.contract.retrieval.HybridSearchPort;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.retrieval.SearchResult;
@@ -17,8 +19,6 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.config.RetrievalDriverProperties;
-import com.ragagent.platform.model.EmbeddingGateway;
-import com.ragagent.platform.model.ModelGateway;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
@@ -100,9 +100,9 @@ public class HybridSearchService implements HybridSearchPort {
     private final KnowledgeBaseSearchGateway kbGateway;
     final KnowledgeDocumentGateway documentGateway;
     final ChunkSearchGateway chunkGateway;
-    private final ModelGateway modelGateway;
+    private final ModelFactsPort modelFactsPort;
     private final TenantConfigLookup tenantConfigLookup;
-    private final EmbeddingGateway embeddingGateway;
+    private final EmbeddingPort embeddingPort;
     final RetrieveEngineRegistry engineRegistry;
 
     final HybridFusionOps fusionOps;
@@ -111,15 +111,15 @@ public class HybridSearchService implements HybridSearchPort {
 
     public HybridSearchService(KnowledgeBaseSearchGateway kbGateway,
             KnowledgeDocumentGateway documentGateway, ChunkSearchGateway chunkGateway,
-            ModelGateway modelGateway, TenantConfigLookup tenantConfigLookup, EmbeddingGateway embeddingGateway,
+            ModelFactsPort modelFactsPort, TenantConfigLookup tenantConfigLookup, EmbeddingPort embeddingPort,
             RetrieveEngineRegistry engineRegistry,
             TenantStoreOwnership storeOwnership, RetrievalDriverProperties driverProperties) {
         this.kbGateway = kbGateway;
         this.documentGateway = documentGateway;
         this.chunkGateway = chunkGateway;
-        this.modelGateway = modelGateway;
+        this.modelFactsPort = modelFactsPort;
         this.tenantConfigLookup = tenantConfigLookup;
-        this.embeddingGateway = embeddingGateway;
+        this.embeddingPort = embeddingPort;
         this.engineRegistry = engineRegistry;
         this.fusionOps = new HybridFusionOps(this);
         this.storeGroupOps = new HybridStoreGroupOps(this, storeOwnership, driverProperties.driver());
@@ -303,12 +303,12 @@ public class HybridSearchService implements HybridSearchPort {
         if (kb == null) {
             throw new RetrievalException("knowledge base not found");
         }
-        ModelFacts model = modelGateway.findFacts(kb.embeddingModelId());
+        ModelFacts model = modelFactsPort.findFacts(kb.embeddingModelId());
         if (model == null) {
             throw new RetrievalException("model not found: " + kb.embeddingModelId());
         }
         try {
-            List<float[]> vectors = embeddingGateway.embed(model, List.of(queryText));
+            List<float[]> vectors = embeddingPort.embed(model, List.of(queryText));
             if (vectors.isEmpty() || vectors.get(0) == null || vectors.get(0).length == 0) {
                 throw new RetrievalException("no embedding returned");
             }
@@ -365,7 +365,7 @@ public class HybridSearchService implements HybridSearchPort {
         TenantContextSnapshot target = ref.tenantId() != null ? prev.withTenantId(ref.tenantId()) : prev;
         return TenantScope.supply(target, () -> {
             try {
-                ModelFacts model = modelGateway.findFacts(ref.modelId());
+                ModelFacts model = modelFactsPort.findFacts(ref.modelId());
                 String baseUrl = model == null ? "" : model.baseUrl();
                 return model == null ? ref.modelId() : model.name() + "|" + baseUrl;
             } catch (Exception e) {

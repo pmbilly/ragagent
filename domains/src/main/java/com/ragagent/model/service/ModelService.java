@@ -5,12 +5,12 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.ModelFacts;
+import com.ragagent.contract.model.ModelFactsPort;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.mapper.ModelMapper;
 import com.ragagent.model.mapper.ModelUsageMapper;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.model.ModelGateway;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -38,10 +38,10 @@ import tools.jackson.databind.node.ObjectNode;
  * - DeleteModel：内置 400；被 KB/agent/长期记忆引用 → 400 code=2300 + usage details
  */
 @Service
-public class ModelService implements ModelGateway  {
+public class ModelService implements ModelFactsPort  {
 
     /**
-     * 跨域只读端口的实现（{@link ModelGateway}）：只回填调用侧需要的字段。
+     * 跨域只读端口的实现（{@link ModelFactsPort}）：只回填调用侧需要的字段。
      *
      * <p>空值归一为 {@code ""}（与消费方原先的 {@code p == null ? "" : p.getBaseUrl()} 一致；
      * 顺带消除了原先 {@code EmbedderClient.configFrom} 在 parameters 为 null 时的潜在 NPE）。</p>

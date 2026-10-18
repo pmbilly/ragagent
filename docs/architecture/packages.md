@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-325 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+324 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -33,7 +33,7 @@
 | `:contract` | `com.ragagent.contract.knowledge.projection` | 知识库投影：把实体行视图映射为契约视图/事实的唯一实现 （KnowledgeBaseViews / ChunkProjectionAdapter / KnowledgeProjectionAdapter）。 |
 | `:contract` | `com.ragagent.contract.knowledge.rule` | 知识库解析规则：ParserEngineRules（文件类型 → 默认解析引擎）。 |
 | `:contract` | `com.ragagent.contract.memory` | 记忆契约面：配置/条目视图/键与类目/召回与检索上下文。 |
-| `:contract` | `com.ragagent.contract.model` | 模型契约面：模型事实与运行时而面载荷。 |
+| `:contract` | `com.ragagent.contract.model` | 模型契约面：模型事实、运行时载荷与跨域能力端口。 |
 | `:contract` | `com.ragagent.contract.pipeline` | 管线 SPI：会话域管线（domains/session/rag）消费、业务域实现的端口 （MCP 工具网关/按需注册、工具注册表、网页检索执行器）。 |
 | `:contract` | `com.ragagent.contract.retrieval` | 检索契约面：检索类型/命中合并/目标。 |
 | `:contract` | `com.ragagent.contract.session` | 会话契约面：管线消息视图与消息端口。 |
@@ -297,7 +297,6 @@
 | `:platform` | `com.ragagent.platform.event` | 平台事件总线面（由 com.ragagent.event 迁入，对齐方案 的 platform.event/）： Event / EventBus / EventJson 等 12 类——进程内事件总线与载荷编解码。 |
 | `:platform` | `com.ragagent.platform.http` | 平台 HTTP 面：SSRF 策略下的安全抓取工具，以及全进程共享的裸 HTTP 传输层 （com.ragagent.platform.http.LlmTransport：连接级 SSRF 校验 + |
 | `:platform` | `com.ragagent.platform.knowledge` | 平台 · 知识库：FaqChunkMetadataCodec / ImageInfoMatchUtil / GrepChunksScoring…。 |
-| `:platform` | `com.ragagent.platform.model` | 平台模型网关面：模型/向量网关（provider 归 model-runtime）。 |
 | `:platform` | `com.ragagent.platform.persistence` | 平台持久化面：MyBatis 拦截器（全表写守卫 / 租户过滤）、分页请求、JSONB / 时间类型处理器、方言与 LIKE 转义。 |
 | `:platform` | `com.ragagent.platform.prompt` | 平台提示词面：模板目录、常量、占位符与组装。 |
 | `:platform` | `com.ragagent.platform.redis` | 平台 · Redis：SpringRedisPubSub / RedisPubSub。 |

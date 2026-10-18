@@ -6,7 +6,7 @@
 ## 统计
 
 - 域间（解耦）：**20**
-- 跨模块（必要）：**8**
+- 跨模块（必要）：**10**
 
 ## 明细
 
@@ -18,6 +18,7 @@
 | `DocumentChunkingPort` | `DocumentChunkingAdapter` | domains | session | 域间（解耦） |
 | `EmbedSessionPort` | `EmbedSessionAdapter` | domains | embedchannel | 域间（解耦） |
 | `EmbeddingModelPort` | `EmbeddingModelAdapter` | domains | wiki | 域间（解耦） |
+| `EmbeddingPort` | `EmbedderClient` | domains | memory、retrieval-engine | 跨模块（必要） |
 | `EntityExtractionPort` | `EntityExtractionAdapter` | model-runtime | initialization、knowledge、session | 跨模块（必要） |
 | `FileUrlPort` | `DefaultFileUrlPort` | domains | platform、session、storage | 跨模块（必要） |
 | `GlobalFileServicePort` | `GlobalFileServiceAdapter` | domains | session | 域间（解耦） |
@@ -28,6 +29,7 @@
 | `KnowledgeSpanPort` | `KnowledgeSpanAdapter` | domains | wiki | 域间（解耦） |
 | `McpToolRegistrationPort` | `McpToolRegistrationAdapter` | domains | agent-engine | 跨模块（必要） |
 | `ModelCatalogPort` | `ModelCatalogAdapter` | domains | evaluation、initialization、knowledge、mcp、memory、model-runtime、session、wiki | 跨模块（必要） |
+| `ModelFactsPort` | `ModelService` | domains | retrieval-engine | 跨模块（必要） |
 | `OllamaAdminPort` | `OllamaService` | model-runtime | initialization | 跨模块（必要） |
 | `ProviderFileStorePort` | `ProviderFileStoreAdapter` | domains | knowledge | 域间（解耦） |
 | `ResourceCatalogPort` | `ResourceCatalogAdapter` | domains | knowledge、session | 域间（解耦） |

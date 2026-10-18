@@ -11,13 +11,13 @@ import com.ragagent.contract.knowledge.ChunkSearchGateway;
 import com.ragagent.contract.knowledge.KnowledgeBaseSearchGateway;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.contract.knowledge.KnowledgeDocumentGateway;
+import com.ragagent.contract.model.EmbeddingPort;
+import com.ragagent.contract.model.ModelFactsPort;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.config.RetrievalDriverProperties;
-import com.ragagent.platform.model.EmbeddingGateway;
-import com.ragagent.platform.model.ModelGateway;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
@@ -62,7 +62,7 @@ class HybridResultOpsContextExpansionTest {
 
         HybridSearchService service = new HybridSearchService(
                 kbGateway, documentGateway, chunkGateway,
-                mock(ModelGateway.class), mock(TenantConfigLookup.class), mock(EmbeddingGateway.class),
+                mock(ModelFactsPort.class), mock(TenantConfigLookup.class), mock(EmbeddingPort.class),
                 mock(RetrieveEngineRegistry.class),
                 mock(TenantStoreOwnership.class), new RetrievalDriverProperties(null));
         ops = new HybridResultOps(service);

@@ -13,14 +13,14 @@ import com.ragagent.contract.knowledge.ChunkSearchGateway;
 import com.ragagent.contract.knowledge.KnowledgeBaseSearchFacts;
 import com.ragagent.contract.knowledge.KnowledgeBaseSearchGateway;
 import com.ragagent.contract.knowledge.KnowledgeDocumentGateway;
+import com.ragagent.contract.model.EmbeddingPort;
 import com.ragagent.contract.model.ModelFacts;
+import com.ragagent.contract.model.ModelFactsPort;
 import com.ragagent.contract.retrieval.RetrieveEngineException;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.config.RetrievalDriverProperties;
-import com.ragagent.platform.model.EmbeddingGateway;
-import com.ragagent.platform.model.ModelGateway;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
@@ -52,9 +52,9 @@ class HybridSearchServiceStoreGroupTest {
     private KnowledgeBaseSearchGateway kbGateway;
     private KnowledgeDocumentGateway documentGateway;
     private ChunkSearchGateway chunkGateway;
-    private ModelGateway modelGateway;
+    private ModelFactsPort modelFactsPort;
     private TenantConfigLookup tenantService;
-    private EmbeddingGateway embeddingGateway;
+    private EmbeddingPort embeddingPort;
     private RetrieveEngineRegistry registry;
     private TenantStoreOwnership ownership;
     private HybridSearchService service;
@@ -64,13 +64,13 @@ class HybridSearchServiceStoreGroupTest {
         kbGateway = mock(KnowledgeBaseSearchGateway.class);
         documentGateway = mock(KnowledgeDocumentGateway.class);
         chunkGateway = mock(ChunkSearchGateway.class);
-        modelGateway = mock(ModelGateway.class);
+        modelFactsPort = mock(ModelFactsPort.class);
         tenantService = mock(TenantConfigLookup.class);
-        embeddingGateway = mock(EmbeddingGateway.class);
+        embeddingPort = mock(EmbeddingPort.class);
         registry = mock(RetrieveEngineRegistry.class);
         ownership = mock(TenantStoreOwnership.class);
-        service = new HybridSearchService(kbGateway, documentGateway, chunkGateway, modelGateway,
-                tenantService, embeddingGateway, registry, ownership,
+        service = new HybridSearchService(kbGateway, documentGateway, chunkGateway, modelFactsPort,
+                tenantService, embeddingPort, registry, ownership,
                 new RetrievalDriverProperties(null)); // 与改前一致：未配置驱动 → 有效引擎为空
     }
 
@@ -103,8 +103,8 @@ class HybridSearchServiceStoreGroupTest {
 
     @Test
     void multiKbWithDifferentEmbeddingModelsIsRejected() {
-        when(modelGateway.findFacts("emb-a")).thenReturn(facts("modelA"));
-        when(modelGateway.findFacts("emb-b")).thenReturn(facts("modelB"));
+        when(modelFactsPort.findFacts("emb-a")).thenReturn(facts("modelA"));
+        when(modelFactsPort.findFacts("emb-b")).thenReturn(facts("modelB"));
         when(kbGateway.findSearchFacts("kb-a")).thenReturn(kb("kb-a", null, "emb-a"));
         when(kbGateway.findSearchFacts("kb-b")).thenReturn(kb("kb-b", null, "emb-b"));
 
@@ -119,7 +119,7 @@ class HybridSearchServiceStoreGroupTest {
 
     @Test
     void multiKbSharingOneEmbeddingModelPassesValidation() {
-        when(modelGateway.findFacts(anyString())).thenReturn(facts("shared"));
+        when(modelFactsPort.findFacts(anyString())).thenReturn(facts("shared"));
         when(kbGateway.findSearchFacts("kb-a")).thenReturn(zeroStrategyKb("kb-a", "emb-a"));
         when(kbGateway.findSearchFacts("kb-b")).thenReturn(zeroStrategyKb("kb-b", "emb-a"));
         // env-store 组的引擎解析在 RETRIEVE_DRIVER 已配置的机器上也会发生——桩成真实件，

@@ -20,7 +20,7 @@
 
 | 域 | 种类 | 文件 | 控制器 | 对外契约面 | 前端页面 |
 |---|---|---:|---:|---:|---|
-| `knowledge` | 产品能力 | 245 | 8 | 12 | `views/knowledge` |
+| `knowledge` | 产品能力 | 245 | 8 | 13 | `views/knowledge` |
 | `session` | 产品能力 | 179 | 8 | 2 | `views/chat` |
 | `wiki` | 产品能力 | 160 | 1 | 1 | `views/knowledge/wiki` |
 | `memory` | 产品能力 | 84 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
@@ -38,7 +38,7 @@
 | `audit` | 控制面 | 19 | 1 | 1 | `views/system/SystemAuditLog.vue` |
 | `system` | 控制面 | 16 | 2 | 1 | `views/system` |
 | `tenant` | 控制面 | 10 | — | 1 | `views/settings/TenantInfo.vue` |
-| `model` | 能力配置 | 31 | 3 | 1 | `views/settings/ModelSettings.vue` |
+| `model` | 能力配置 | 31 | 3 | 2 | `views/settings/ModelSettings.vue` |
 | `vectorstore` | 能力配置 | 17 | 1 | — | `views/settings/VectorStoreSettings.vue` |
 | `initialization` | 初始化向导 | 13 | 1 | — | `views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue` |
 | `approval` | 策略库 | 7 | — | — | `views/chat/components/ToolApprovalCard.vue` |
@@ -49,7 +49,7 @@
 
 | 域 | HTTP 入口 | 对外契约面 |
 |---|---|---|
-| `knowledge` | `ChunkController`、`ChunkerPreviewController`、`FaqController`、`KnowledgeBaseController`、`KnowledgeBaseFileProxyController`、`KnowledgeController`、`KnowledgeOperationsController`、`KnowledgeTagController` | `ChunkSearchGateway`、`DocReaderAdminPort`、`DocReaderParsePort`、`DocumentChunkingPort`、`EmbeddingModelPort`、`KnowledgeBaseCatalogPort`、`KnowledgeBaseGateway`、`KnowledgeBaseSearchGateway`、`KnowledgeCatalogPort`、`KnowledgeDocumentGateway`、`KnowledgeMaintenancePort`、`KnowledgeSpanPort` |
+| `knowledge` | `ChunkController`、`ChunkerPreviewController`、`FaqController`、`KnowledgeBaseController`、`KnowledgeBaseFileProxyController`、`KnowledgeController`、`KnowledgeOperationsController`、`KnowledgeTagController` | `ChunkSearchGateway`、`DocReaderAdminPort`、`DocReaderParsePort`、`DocumentChunkingPort`、`EmbeddingModelPort`、`EmbeddingPort`、`KnowledgeBaseCatalogPort`、`KnowledgeBaseGateway`、`KnowledgeBaseSearchGateway`、`KnowledgeCatalogPort`、`KnowledgeDocumentGateway`、`KnowledgeMaintenancePort`、`KnowledgeSpanPort` |
 | `session` | `KnowledgeQaController`、`MessageController`、`MessageFileProxyController`、`MessageSuggestionController`、`SessionController`、`SessionStreamController`、`SteerController`、`TemporaryDocumentController` | `EmbedSessionPort`、`SessionQaPort` |
 | `wiki` | `WikiPageController` | `WikiPageOpsPort` |
 | `memory` | `MemoryController` | — |
@@ -67,7 +67,7 @@
 | `audit` | `AuditLogController` | `AuditWritePort` |
 | `system` | `SystemAdminController`、`SystemController` | `SystemSettingGateway` |
 | `tenant` | —（无 HTTP 面） | `TenantStorageQuotaPort` |
-| `model` | `ModelController`、`ModelCredentialsController`、`ModelDebugController` | `ModelCatalogPort` |
+| `model` | `ModelController`、`ModelCredentialsController`、`ModelDebugController` | `ModelCatalogPort`、`ModelFactsPort` |
 | `vectorstore` | `VectorStoreController` | — |
 | `initialization` | `InitializationController` | — |
 | `approval` | —（无 HTTP 面） | — |

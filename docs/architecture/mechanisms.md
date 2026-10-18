@@ -38,7 +38,7 @@
 - KB **绑定了外部 vector store**（`vectorWrites.boundEngine(...) != null`）→ 走引擎口：`modelRuntimeAssembler.getEmbeddingModel(...)` 拿 `Embedder`，批量/重试由引擎承担；
 - **未绑定**（本地 pg 直连）→ `EmbedderClient.configFrom(...)` 直接 `POST {base_url}/embeddings`。
 
-查询侧同理：`HybridSearchService` 对 pg 用 `EmbeddingGateway`（`EmbedderClient` 实现）；外部引擎在自己的 `batchIndex` / search 内部嵌入。
+查询侧同理：`HybridSearchService` 对 pg 用 `EmbeddingPort`（`EmbedderClient` 实现）；外部引擎在自己的 `batchIndex` / search 内部嵌入。
 
 **原因**：外部引擎的批大小、超时、重试语义由引擎决定；本地 pg 保留 Go 时代的直连路径，避免为了"统一"引入一层不必要的工厂。
 

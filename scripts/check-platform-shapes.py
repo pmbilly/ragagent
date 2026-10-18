@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """C8：platform 只剩技术适配（判定标准二）——业务形状命名红旗只许减不许增。
 
-红旗命名（文件名即主类型名）：View / Port / Request / Response / Payload / Facts 结尾。
+红旗命名（文件名即主类型名）：View / Port / Request / Response / Payload / Facts / Gateway 结尾。
 命中即必须在 scripts/platform-shapes.baseline.json 的 allowed 里（逐条附登记理由）；
 新增 ⇒ ✗；基线条目不再命中 ⇒ 提示可清理（不失败）。
 
@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "platform/src/main/java"
 BASELINE = ROOT / "scripts/platform-shapes.baseline.json"
-SUFFIXES = ("View", "Port", "Request", "Response", "Payload", "Facts")
+SUFFIXES = ("View", "Port", "Request", "Response", "Payload", "Facts", "Gateway")
 
 
 def main() -> int:
