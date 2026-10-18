@@ -1,10 +1,10 @@
 package com.ragagent.system.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ragagent.auth.api.AdminUserAdapter;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.contract.auth.AdminUserPort;
 import com.ragagent.contract.auth.AdminUserView;
 import com.ragagent.contract.settings.SystemSettingGateway;
 import com.ragagent.platform.access.TenantContext;
@@ -61,7 +61,7 @@ public class SystemSettingService implements SystemSettingGateway {
     private final SsrfGuard ssrfGuard;
     /** 三层解析的 ENV 层（Spring Environment，不读裸 System.getenv；键名由调用方给）。 */
     private final Environment environment;
-    private final AdminUserPort adminUserPort;
+    private final AdminUserAdapter adminUserPort;
     /** 配置兜底：未配置 → self_serve。 */
     @Value("${weknora.auth.registration-mode:}")
     private String configuredRegistrationMode;
@@ -70,7 +70,7 @@ public class SystemSettingService implements SystemSettingGateway {
                                 AuditWritePort auditWriter,
                                 SsrfGuard ssrfGuard,
                                 Environment environment,
-                                AdminUserPort adminUserPort) {
+                                AdminUserAdapter adminUserPort) {
         this.adminUserPort = adminUserPort;
         this.mapper = mapper;
         this.auditWriter = auditWriter;

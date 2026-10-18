@@ -10,7 +10,6 @@ import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
-import com.ragagent.contract.apikey.ApiKeyAuthPort;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
 import com.ragagent.platform.access.TenantContext;
 import java.io.IOException;
@@ -236,8 +235,8 @@ class APIKeyAuthChannelPrincipalTest {
     }
 
     /** servlet 请求 → 契约中性输入（与 AuthFilter 边界构造逐字一致）。 */
-    private static ApiKeyAuthPort.AuthRequest toRequest(MockHttpServletRequest request) {
-        return new ApiKeyAuthPort.AuthRequest(request.getHeader("X-API-Key"),
+    private static ApiKeyAuthRequest toRequest(MockHttpServletRequest request) {
+        return new ApiKeyAuthRequest(request.getHeader("X-API-Key"),
                 request.getHeader("X-Tenant-ID"),
                 request.getHeader("X-External-User-ID"),
                 request.getHeader("X-External-User-Token"),
@@ -245,9 +244,9 @@ class APIKeyAuthChannelPrincipalTest {
     }
 
     /** 契约结果 → 响应（与 AuthFilter 边界写出逐字一致，供 status/body 断言）。 */
-    private static MockHttpServletResponse toResponse(ApiKeyAuthPort.AuthResult result) {
+    private static MockHttpServletResponse toResponse(ApiKeyAuthResult result) {
         MockHttpServletResponse response = new MockHttpServletResponse();
-        if (result instanceof ApiKeyAuthPort.AuthResult.Rejected rejected) {
+        if (result instanceof ApiKeyAuthResult.Rejected rejected) {
             response.setStatus(rejected.status());
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");

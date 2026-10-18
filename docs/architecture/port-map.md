@@ -5,17 +5,13 @@
 
 ## 统计
 
-- 域内（可评估内联）：**1**
-- 域间（解耦）：**26**
+- 域间（解耦）：**23**
 - 跨模块（必要）：**8**
 
 ## 明细
 
 | Port | 实现类 | 实现模块 | 调用方域 | 类型 |
 |---|---|---|---|---|
-| `AdminUserPort` | `AdminUserAdapter` | domains | system | 域间（解耦） |
-| `ApiKeyAdminPort` | `ApiKeyAdminAdapter` | domains | auth、system | 域间（解耦） |
-| `ApiKeyAuthPort` | `APIKeyAuthChannel` | domains | auth | 域内（可评估内联） |
 | `AuditWritePort` | `AuditWriteAdapter` | domains | agentmanagement、auth、datasource、knowledge、system | 域间（解耦） |
 | `ChunkPort` | `ChunkPortAdapter` | domains | wiki | 域间（解耦） |
 | `DocReaderAdminPort` | `DocReaderAdminAdapter` | domains | system | 域间（解耦） |
@@ -42,7 +38,6 @@
 | `StorageBackendPort` | `StorageBackendPortAdapter` | domains | knowledge、system | 域间（解耦） |
 | `TenantStorageQuotaPort` | `TenantStorageQuotaAdapter` | domains | knowledge、system | 域间（解耦） |
 | `ToolRegistryPort` | `ToolRegistryPortImpl` | agent-engine | agent-engine、mcp | 跨模块（必要） |
-| `UserLookupPort` | `UserLookupAdapter` | domains | agentmanagement | 域间（解耦） |
 | `WebSearchProviderPort` | `WebSearchSupportAdapter` | domains | session | 域间（解耦） |
 | `WebSearchTempStatePort` | `WebSearchSupportAdapter` | domains | session | 域间（解耦） |
 | `WikiFinalizePort` | `DefaultWikiKnowledgeFinalizer` | domains | knowledge | 域间（解耦） |

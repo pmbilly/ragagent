@@ -1,9 +1,9 @@
 package com.ragagent.auth.controller;
 
+import com.ragagent.auth.apikey.service.ApiKeyAdminAdapter;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.contract.apikey.ApiKeyAdminPort;
 import com.ragagent.contract.knowledge.KnowledgeBaseProvisioner;
 import com.ragagent.contract.settings.SystemSettingGateway;
 import com.ragagent.contract.tenant.TenantRowView;
@@ -49,7 +49,7 @@ public class TenantCatalogController {
     final TenantMemberService memberService;
     final UserService userService;
     final SystemSettingGateway systemSettingService;
-    final ApiKeyAdminPort apiKeyAdmin;
+    final ApiKeyAdminAdapter apiKeyAdmin;
     final KnowledgeBaseProvisioner knowledgeProvisioner;
     final TenantProperties tenantProperties;
     final SsrfGuard ssrfGuard;
@@ -71,7 +71,7 @@ public class TenantCatalogController {
                                    TenantMemberService memberService,
                                    UserService userService,
                                    SystemSettingGateway systemSettingService,
-                                   ApiKeyAdminPort apiKeyAdmin,
+                                   ApiKeyAdminAdapter apiKeyAdmin,
                                    KnowledgeBaseProvisioner knowledgeProvisioner,
                                    TenantProperties tenantProperties,
                                    SsrfGuard ssrfGuard,

@@ -1,9 +1,12 @@
 package com.ragagent.system.service;
 
+import com.ragagent.auth.api.AdminUserAdapter;
+import com.ragagent.auth.api.AdminUserPage;
+import com.ragagent.auth.api.AuthUserErrors;
+import com.ragagent.auth.api.CreateUserResult;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.contract.auth.AdminUserPort;
 import com.ragagent.contract.auth.AdminUserView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
@@ -15,7 +18,7 @@ import org.springframework.stereotype.Service;
 /**
  * 系统管理员 用户管理的**系统侧壳**：审计写入 + 控制器委托面。
  *
- * <p><b>本刀（C-13a）后</b>：用户/租户/成员的实际读写都归 auth 域（{@link AdminUserPort} 的实现
+ * <p><b>本刀（C-13a）后</b>：用户/租户/成员的实际读写都归 auth 域（{@link AdminUserAdapter} 的实现
  * {@code auth/api/AdminUserAdapter}）——system 不再直引 {@code auth.mapper.UserMapper} /
  * {@code TenantService} / {@code TenantMemberService}（HANDOFF）。本类只负责：</p>
  * <ul>
@@ -31,15 +34,15 @@ public class SystemAdminUserService {
     private static final Logger log = LoggerFactory.getLogger(SystemAdminUserService.class);
 
     /** 身份冲突错误原文（再导出自端口，供控制器 / 契约测试引用）。 */
-    public static final String ERR_USER_EMAIL_EXISTS = AdminUserPort.ERR_USER_EMAIL_EXISTS;
-    public static final String ERR_USER_USERNAME_EXISTS = AdminUserPort.ERR_USER_USERNAME_EXISTS;
-    public static final String ERR_USER_IDENTITY_CONFLICT = AdminUserPort.ERR_USER_IDENTITY_CONFLICT;
+    public static final String ERR_USER_EMAIL_EXISTS = AuthUserErrors.EMAIL_EXISTS;
+    public static final String ERR_USER_USERNAME_EXISTS = AuthUserErrors.USERNAME_EXISTS;
+    public static final String ERR_USER_IDENTITY_CONFLICT = AuthUserErrors.IDENTITY_CONFLICT;
 
-    private final AdminUserPort adminUserPort;
+    private final AdminUserAdapter adminUserPort;
     private final SystemSettingService settingService;
     private final AuditWritePort auditWriter;
 
-    public SystemAdminUserService(AdminUserPort adminUserPort,
+    public SystemAdminUserService(AdminUserAdapter adminUserPort,
                                   SystemSettingService settingService,
                                   AuditWritePort auditWriter) {
         this.adminUserPort = adminUserPort;
@@ -61,7 +64,7 @@ public class SystemAdminUserService {
         return adminUserPort.byUsername(username);
     }
 
-    public AdminUserPort.AdminUserPage listSystemAdmins(int offset, int limit) {
+    public AdminUserPage listSystemAdmins(int offset, int limit) {
         return adminUserPort.listSystemAdmins(offset, limit);
     }
 
@@ -77,7 +80,7 @@ public class SystemAdminUserService {
         adminUserPort.resetPassword(user.getId(), newPassword);
     }
 
-    public AdminUserPort.CreateResult adminCreateUser(String rawUsername, String rawEmail,
+    public CreateUserResult adminCreateUser(String rawUsername, String rawEmail,
                                                      String password, boolean passwordPresent,
                                                      String provisioning) {
         return adminUserPort.createUser(rawUsername, rawEmail, password, passwordPresent, provisioning,

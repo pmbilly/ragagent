@@ -57,6 +57,9 @@
     }
   },
   "edges": {
+    "agentmanagement→auth": [
+      "CustomAgentService"
+    ],
     "auth→tenant": [
       "TenantService"
     ],
@@ -91,6 +94,11 @@
       "AgentToolWikiBackends",
       "AgentWebPages",
       "QaWiring"
+    ],
+    "system→auth": [
+      "SystemAdminController",
+      "SystemAdminUserService",
+      "SystemSettingService"
     ]
   }
 }

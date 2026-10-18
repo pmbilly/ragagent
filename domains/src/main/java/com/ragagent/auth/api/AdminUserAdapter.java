@@ -9,7 +9,6 @@ import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.auth.service.PasswordPolicy;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.contract.auth.AdminUserPort;
 import com.ragagent.contract.auth.AdminUserView;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -44,7 +43,7 @@ import org.springframework.stereotype.Component;
  * 生成密码只出现一次且契约测试掩码。</p>
  */
 @Component
-public class AdminUserAdapter implements AdminUserPort {
+public class AdminUserAdapter {
 
     private static final Logger log = LoggerFactory.getLogger(AdminUserAdapter.class);
 
@@ -74,13 +73,11 @@ public class AdminUserAdapter implements AdminUserPort {
 
 
     /** @return null = 通过；否则 = 错误消息（契约原文）。实现委托 PasswordPolicy.validate。 */
-    @Override
     public String validatePasswordPolicy(String password, boolean complexEnabled) {
         return PasswordPolicy.validate(password, complexEnabled);
     }
 
     /** 生成直到过策略（复杂 → 16 位复杂密码）。 */
-    @Override
     public String generatePolicyCompliantPassword(boolean complexEnabled) {
         java.security.SecureRandom random = new java.security.SecureRandom();
         while (true) {
@@ -106,7 +103,6 @@ public class AdminUserAdapter implements AdminUserPort {
 
     // ── promote / revoke / list ───────────────────────────────────────────
 
-    @Override
     public AdminUserView byId(String id) {
         return toView(byIdEntity(id));
     }
@@ -117,7 +113,6 @@ public class AdminUserAdapter implements AdminUserPort {
                         .eq(User::getId, id).isNull(User::getDeletedAt).last("LIMIT 1"));
     }
 
-    @Override
     public AdminUserView byEmail(String email) {
         return toView(byEmailEntity(email));
     }
@@ -128,7 +123,6 @@ public class AdminUserAdapter implements AdminUserPort {
     }
 
     /** 真实写分支（幂等分支由 controller 处理）。 */
-    @Override
     public AdminUserView promote(AdminUserView user) {
         User entity = toEntity(user);
         entity.setIsSystemAdmin(true);
@@ -142,7 +136,6 @@ public class AdminUserAdapter implements AdminUserPort {
      * 撤管理员（无事务，顺序读-判-写）：
      * @return user 行；self/last-admin/not-found 抛 AppError 信封（400/404）。
      */
-    @Override
     public AdminUserView revoke(String userId, String callerId) {
         if (userId.equals(callerId)) {
             throw new BizException(AppError.badRequest(
@@ -165,8 +158,7 @@ public class AdminUserAdapter implements AdminUserPort {
         return toView(user);
     }
 
-    @Override
-    public AdminUserPort.AdminUserPage listSystemAdmins(int offset, int limit) {
+    public AdminUserPage listSystemAdmins(int offset, int limit) {
         Long total = countSystemAdmins();
         // offset/limit 语义的 API：atOffset 表达任意偏移，LIMIT/OFFSET 交给分页插件
         List<User> users = userMapper.selectList(PageRequests.atOffset(offset, limit),
@@ -179,7 +171,7 @@ public class AdminUserAdapter implements AdminUserPort {
         for (User u : users) {
             views.add(toView(u));
         }
-        return new AdminUserPort.AdminUserPage(views, total == null ? 0 : total);
+        return new AdminUserPage(views, total == null ? 0 : total);
     }
 
     private Long countSystemAdmins() {
@@ -191,7 +183,6 @@ public class AdminUserAdapter implements AdminUserPort {
     // ── reset-password ────────────────────────────────────────────────────
 
     /** 换 hash + 吊销全部会话。 */
-    @Override
     public void resetPassword(String userId, String newPassword) {
         User user = byIdEntity(userId);
         if (user == null) {
@@ -215,8 +206,7 @@ public class AdminUserAdapter implements AdminUserPort {
 
     // ── create-user ──────────────────────────────────────────────────────
 
-    @Override
-    public AdminUserPort.CreateResult createUser(String rawUsername, String rawEmail,
+    public CreateUserResult createUser(String rawUsername, String rawEmail,
                                                 String password, boolean passwordPresent,
                                                 String provisioning, boolean complexEnabled) {
         String username = LogSanitizer.sanitize(rawUsername == null ? "" : rawUsername.trim());
@@ -236,16 +226,16 @@ public class AdminUserAdapter implements AdminUserPort {
         try {
             existing = register(username, email, effectivePassword, provisioning);
         } catch (DuplicateIdentityException dup) {
-            User row = AdminUserPort.ERR_USER_EMAIL_EXISTS.equals(dup.message)
+            User row = AuthUserErrors.EMAIL_EXISTS.equals(dup.message)
                     ? byEmailEntity(email)
                     : byUsernameEntity(username);
             if (row != null && username.equals(row.getUsername()) && email.equals(row.getEmail())) {
-                return new AdminUserPort.CreateResult.Idempotent(toView(row));
+                return new CreateUserResult.Idempotent(toView(row));
             }
-            throw new BizException(AppError.conflict(AdminUserPort.ERR_USER_IDENTITY_CONFLICT));
+            throw new BizException(AppError.conflict(AuthUserErrors.IDENTITY_CONFLICT));
         }
-        return generated ? new AdminUserPort.CreateResult.Created(toView(existing), effectivePassword)
-                : new AdminUserPort.CreateResult.Created(toView(existing), "");
+        return generated ? new CreateUserResult.Created(toView(existing), effectivePassword)
+                : new CreateUserResult.Created(toView(existing), "");
     }
 
     /** 部分身份冲突（email 与 username 各自命中不同行）的载体。 */
@@ -258,7 +248,6 @@ public class AdminUserAdapter implements AdminUserPort {
         }
     }
 
-    @Override
     public AdminUserView byUsername(String username) {
         return toView(byUsernameEntity(username));
     }
@@ -271,10 +260,10 @@ public class AdminUserAdapter implements AdminUserPort {
     /** create_personal 租户：建空间 + Owner 成员；失败回滚。 */
     private User register(String username, String email, String hashedPassword, String provisioning) {
         if (byEmailEntity(email) != null) {
-            throw new DuplicateIdentityException(AdminUserPort.ERR_USER_EMAIL_EXISTS);
+            throw new DuplicateIdentityException(AuthUserErrors.EMAIL_EXISTS);
         }
         if (byUsernameEntity(username) != null) {
-            throw new DuplicateIdentityException(AdminUserPort.ERR_USER_USERNAME_EXISTS);
+            throw new DuplicateIdentityException(AuthUserErrors.USERNAME_EXISTS);
         }
         TenantRowView createdTenant = null;
         if ("create_personal".equals(provisioning)) {

@@ -1,14 +1,15 @@
 package com.ragagent.system.controller;
 
+import com.ragagent.auth.api.AdminUserPage;
+import com.ragagent.auth.api.CreateUserResult;
+import com.ragagent.auth.apikey.service.ApiKeyAdminAdapter;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.apikey.APIKeyScopeType;
-import com.ragagent.contract.apikey.ApiKeyAdminPort;
 import com.ragagent.contract.apikey.TenantAPIKeyCreateResponse;
 import com.ragagent.contract.apikey.TenantAPIKeyResponse;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.contract.auth.AdminUserPort;
 import com.ragagent.contract.auth.AdminUserView;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -67,13 +68,13 @@ public class SystemAdminController {
 
     private final SystemAdminUserService users;
     private final SystemSettingService settings;
-    private final ApiKeyAdminPort apiKeyAdmin;
+    private final ApiKeyAdminAdapter apiKeyAdmin;
     private final AuditWritePort auditWriter;
     private final TenantStorageQuotaPort tenantStorageQuotaPort;
 
     public SystemAdminController(SystemAdminUserService users,
                                  SystemSettingService settings,
-                                 ApiKeyAdminPort apiKeyAdmin,
+                                 ApiKeyAdminAdapter apiKeyAdmin,
                                  AuditWritePort auditWriter,
                                  TenantStorageQuotaPort tenantStorageQuotaPort) {
         this.tenantStorageQuotaPort = tenantStorageQuotaPort;
@@ -168,7 +169,7 @@ public class SystemAdminController {
         if (lim > 200) {
             lim = 200;
         }
-        AdminUserPort.AdminUserPage page = users.listSystemAdmins(off, lim);
+        AdminUserPage page = users.listSystemAdmins(off, lim);
         List<SystemDtos.UserInfoResponse> infos = new ArrayList<>();
         for (AdminUserView u : page.users()) {
             infos.add(SystemDtos.UserInfoResponse.from(u));
@@ -227,11 +228,11 @@ public class SystemAdminController {
             throw new BizException(AppError.badRequest("Invalid user creation request"));
         }
         boolean passwordPresent = req.password() != null;
-        AdminUserPort.CreateResult result = users.adminCreateUser(
+        CreateUserResult result = users.adminCreateUser(
                 req.username(), req.email(), req.password(), passwordPresent,
                 users.resolveDefaultTenantMode());
         return switch (result) {
-            case AdminUserPort.CreateResult.Idempotent idem -> {
+            case CreateUserResult.Idempotent idem -> {
                 users.emitAdminAudit(AuditAction.SYSTEM_USER_CREATED, idem.user(), Map.of(
                         "target_email", idem.user().getEmail(),
                         "target_username", idem.user().getUsername(),
@@ -240,7 +241,7 @@ public class SystemAdminController {
                 yield ResponseEntity.ok(new SystemDtos.CreateUserResponse(
                         SystemDtos.UserInfoResponse.from(idem.user()), null));
             }
-            case AdminUserPort.CreateResult.Created created -> {
+            case CreateUserResult.Created created -> {
                 users.emitAdminAudit(AuditAction.SYSTEM_USER_CREATED, created.user(), Map.of(
                         "target_email", created.user().getEmail(),
                         "target_username", created.user().getUsername(),

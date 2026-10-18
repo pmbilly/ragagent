@@ -3,7 +3,6 @@ package com.ragagent.auth.apikey.service;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
 import com.ragagent.contract.apikey.APIKeyScopeType;
-import com.ragagent.contract.apikey.ApiKeyAdminPort;
 import com.ragagent.contract.apikey.TenantAPIKeyCreateResponse;
 import com.ragagent.contract.apikey.TenantAPIKeyResponse;
 import java.time.OffsetDateTime;
@@ -12,13 +11,11 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link ApiKeyAdminPort} 的属主模块实现。
- *
- * <p>原先是 {@code SystemAdminController} 直接调 {@code TenantAPIKeyService} + 自己脱敏 ✗；
- * 现在脱敏与投影都收在这里，调用方只看到 common 载荷 ✓。</p>
+ * API-Key 管理面（认证族内直接依赖）：脱敏、投影与窄面都收在这里，
+ * 调用方只看 {@code TenantAPIKeyResponse} / {@code TenantAPIKeyCreateResponse} 载荷。
  */
 @Component
-public class ApiKeyAdminAdapter implements ApiKeyAdminPort {
+public class ApiKeyAdminAdapter {
 
     private final TenantAPIKeyService service;
 
@@ -26,7 +23,6 @@ public class ApiKeyAdminAdapter implements ApiKeyAdminPort {
         this.service = service;
     }
 
-    @Override
     public List<TenantAPIKeyResponse> listPlatformMasked() {
         List<TenantAPIKeyResponse> out = new ArrayList<>();
         for (TenantAPIKey key : service.listPlatform()) {
@@ -35,7 +31,6 @@ public class ApiKeyAdminAdapter implements ApiKeyAdminPort {
         return out;
     }
 
-    @Override
     public TenantAPIKeyCreateResponse createPlatformMasked(String name, List<String> capabilities,
                                                            OffsetDateTime expiresAt) {
         var result = service.create(new TenantAPIKeyService.TenantAPIKeyServiceCreateRequest(
@@ -44,12 +39,10 @@ public class ApiKeyAdminAdapter implements ApiKeyAdminPort {
         return TenantAPIKeyCreateResponse.of(masked, result.token());
     }
 
-    @Override
     public void revokePlatform(long id) {
         service.revokePlatform(id);
     }
 
-    @Override
     public String createDefaultTenantKey(long tenantId) {
         var result = service.create(new TenantAPIKeyService.TenantAPIKeyServiceCreateRequest(
                 tenantId, null, "default", true, null, null, null));

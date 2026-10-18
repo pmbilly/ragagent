@@ -2,18 +2,17 @@ package com.ragagent.auth.api;
 
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.contract.auth.UserLookupPort;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link UserLookupPort} 的 auth 侧实现：委托 {@code UserService#getUsersByIds}
- * （租户范围与空集合短路语义在服务内逐字保留），只投影展示字段。</p>
+ * 用户目录读面（agentmanagement 直接注入）：委托 {@code UserService#getUsersByIds}，
+ * 租户范围与空集合短路语义在服务内保留，只投影展示字段 {@link AuthUserView}。
  */
 @Component
-public class UserLookupAdapter implements UserLookupPort {
+public class UserLookupAdapter {
 
     private final UserService userService;
 
@@ -21,11 +20,10 @@ public class UserLookupAdapter implements UserLookupPort {
         this.userService = userService;
     }
 
-    @Override
-    public Map<String, UserView> byIds(Collection<String> ids) {
+    public Map<String, AuthUserView> byIds(Collection<String> ids) {
         Map<String, User> rows = userService.getUsersByIds(ids);
-        Map<String, UserView> out = new LinkedHashMap<>(rows.size());
-        rows.forEach((id, u) -> out.put(id, new UserView(u.getId(), u.getUsername(), u.getEmail())));
+        Map<String, AuthUserView> out = new LinkedHashMap<>(rows.size());
+        rows.forEach((id, u) -> out.put(id, new AuthUserView(u.getId(), u.getUsername(), u.getEmail())));
         return out;
     }
 }

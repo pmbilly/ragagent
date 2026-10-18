@@ -1,5 +1,7 @@
 package com.ragagent.auth.apikey.controller.filter;
 
+import com.ragagent.auth.apikey.controller.filter.ApiKeyAuthResult.Passed;
+import com.ragagent.auth.apikey.controller.filter.ApiKeyAuthResult.Rejected;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
@@ -7,9 +9,6 @@ import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
-import com.ragagent.contract.apikey.ApiKeyAuthPort;
-import com.ragagent.contract.apikey.ApiKeyAuthPort.AuthResult.Passed;
-import com.ragagent.contract.apikey.ApiKeyAuthPort.AuthResult.Rejected;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
 import com.ragagent.platform.access.TenantContext;
@@ -41,7 +40,7 @@ import org.springframework.stereotype.Component;
  * 而契约要求接受任意长度密钥，故手工实现）。</p>
  */
 @Component
-public class APIKeyAuthChannel implements ApiKeyAuthPort {
+public class APIKeyAuthChannel {
 
     private static final int MAX_EXTERNAL_USER_ID_LEN = 128;
     private static final long MAX_EXTERNAL_USER_TOKEN_TTL_SECONDS = 24 * 3600L;
@@ -66,7 +65,7 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
      * @return {@code true} = 认证通过（已写入上下文，调用方继续过滤链）；
      *         {@code false} = 已写出错误响应，调用方**不得**继续
      */
-    public AuthResult authenticate(AuthRequest request) {
+    public ApiKeyAuthResult authenticate(ApiKeyAuthRequest request) {
         TenantAPIKey key;
         try {
             key = apiKeyService.authenticate(request.apiKeyHeader());
@@ -89,7 +88,7 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
                 if (targetTenantId <= 0) {
                     return new Rejected(400, "{\"error\":\"Invalid X-Tenant-ID header\"}");
                 }
-                AuthResult attachResult = attachTenantKey(request, targetTenantId, key);
+                ApiKeyAuthResult attachResult = attachTenantKey(request, targetTenantId, key);
                 if (attachResult instanceof Rejected) {
                     return attachResult;
                 }
@@ -110,7 +109,7 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
                             "{\"error\":\"Forbidden: workspace API key cannot switch workspaces\"}");
                 }
             }
-            AuthResult attachResult = attachTenantKey(request, tenantId, key);
+            ApiKeyAuthResult attachResult = attachTenantKey(request, tenantId, key);
             if (attachResult instanceof Rejected) {
                 return attachResult;
             }
@@ -138,7 +137,7 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
      * @return false 表示已写响应（租户不存在）
      */
     /** 租户身份 + 首位用户（或合成用户）+ API 主体模式解析。 */
-    private AuthResult attachTenantKey(AuthRequest request,
+    private ApiKeyAuthResult attachTenantKey(ApiKeyAuthRequest request,
                                        long tenantId, TenantAPIKey key) {
         if (!tenantService.exists(tenantId)) {
             // 统一 401 invalid API key（不泄露"租户不存在"）
@@ -186,7 +185,7 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
             String error) {}
 
     private ApiPrincipalResolutionOut resolveApiPrincipal(long tenantId,
-            APIPrincipalConfig cfg, AuthRequest request) {
+            APIPrincipalConfig cfg, ApiKeyAuthRequest request) {
         // fallback = api_tenant/<tenantId>；cfg 缺失/mode 空/tenant 模式 → 回落
         if (cfg == null || cfg.mode == null || cfg.mode.isEmpty()
                 || APIPrincipalConfig.MODE_TENANT.equals(cfg.mode)) {

@@ -1,9 +1,11 @@
 package com.ragagent.auth.controller.filter;
 
+import com.ragagent.auth.apikey.controller.filter.APIKeyAuthChannel;
+import com.ragagent.auth.apikey.controller.filter.ApiKeyAuthRequest;
+import com.ragagent.auth.apikey.controller.filter.ApiKeyAuthResult;
 import com.ragagent.auth.service.TokenValidationException;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.auth.service.ValidatedToken;
-import com.ragagent.contract.apikey.ApiKeyAuthPort;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,11 +60,11 @@ public class AuthFilter extends OncePerRequestFilter {
 
     private final UserService userService;
     private final WsAuthSupport wsAuthSupport;
-    private final ApiKeyAuthPort apiKeyAuthChannel;
+    private final APIKeyAuthChannel apiKeyAuthChannel;
 
     public AuthFilter(UserService userService,
                       WsAuthSupport wsAuthSupport,
-                      ApiKeyAuthPort apiKeyAuthChannel) {
+                      APIKeyAuthChannel apiKeyAuthChannel) {
         this.userService = userService;
         this.wsAuthSupport = wsAuthSupport;
         this.apiKeyAuthChannel = apiKeyAuthChannel;
@@ -162,15 +164,15 @@ public class AuthFilter extends OncePerRequestFilter {
         // 鉴权通过时由 channel 自行写入 principal/scope 上下文，不再往下走其它通道。
         String apiKey = request.getHeader("X-API-Key");
         if (apiKey != null && !apiKey.isEmpty()) {
-            ApiKeyAuthPort.AuthResult result = apiKeyAuthChannel.authenticate(
-                    new ApiKeyAuthPort.AuthRequest(apiKey,
+            ApiKeyAuthResult result = apiKeyAuthChannel.authenticate(
+                    new ApiKeyAuthRequest(apiKey,
                             request.getHeader("X-Tenant-ID"),
                             request.getHeader("X-External-User-ID"),
                             request.getHeader("X-External-User-Token"),
                             request.getRequestURI(), request.getMethod()));
             switch (result) {
-                case ApiKeyAuthPort.AuthResult.Passed passed -> chain.doFilter(request, response);
-                case ApiKeyAuthPort.AuthResult.Rejected rejected ->
+                case ApiKeyAuthResult.Passed passed -> chain.doFilter(request, response);
+                case ApiKeyAuthResult.Rejected rejected ->
                         writeJson(response, rejected.status(), rejected.jsonBody());
             }
             return;
