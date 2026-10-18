@@ -1,6 +1,5 @@
 package com.ragagent.knowledge.api;
 
-import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
 import com.ragagent.knowledge.domain.Chunk;
@@ -13,12 +12,11 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link ChunkPort} 的 knowledge 侧实现。
+ * chunk 读写面（知识族内直接依赖：wiki 摄取与页面渲染注入本类）。
  *
- * <p>"实体 → L1 载荷"的公用投影已抽到
+ * <p>"实体 → 载荷"的公用投影在
  * {@link com.ragagent.contract.knowledge.support.ChunkProjectionAdapter#view}
- * /{@link com.ragagent.contract.knowledge.support.ChunkProjectionAdapter#viewAll}
- * （原先作为静态助手挂在本类，令 `repository` 反向依赖 `service` ⇒ 现落环外 `support/`）。
+ * /{@link com.ragagent.contract.knowledge.support.ChunkProjectionAdapter#viewAll}。
  *
  * <p>四个方法的过滤条件/降级姿态与迁移前的 wiki 侧实现<b>逐字一致</b>：
  * {@code textChunks} 来自 {@code WikiIngestBatchHandler}、{@code chunksByIds} 来自
@@ -26,7 +24,7 @@ import org.springframework.stereotype.Component;
  * {@code enrichContentWithImageInfo} 来自 {@code DefaultWikiImageEnricher}。</p>
  */
 @Component
-public class ChunkPortAdapter implements ChunkPort {
+public class ChunkPortAdapter {
 
     private final ChunkRepository chunkRepository;
 
@@ -34,13 +32,11 @@ public class ChunkPortAdapter implements ChunkPort {
         this.chunkRepository = chunkRepository;
     }
 
-    @Override
     public List<ChunkView> textChunks(long tenantId, String knowledgeId) {
         List<Chunk> rows = chunkRepository.listTextChunks(tenantId, knowledgeId);
         return ChunkProjectionAdapter.viewAll(ChunkRowViews.rowViews(rows));
     }
 
-    @Override
     public List<ChunkView> chunksByIds(long tenantId, List<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return List.of();
@@ -49,12 +45,10 @@ public class ChunkPortAdapter implements ChunkPort {
         return ChunkProjectionAdapter.viewAll(ChunkRowViews.rowViews(rows));
     }
 
-    @Override
     public void deleteChunk(long tenantId, String chunkId) {
         chunkRepository.deleteScoped(tenantId, chunkId);
     }
 
-    @Override
     public String enrichContentWithImageInfo(String content, long tenantId, List<String> textChunkIds) {
         if (textChunkIds == null || textChunkIds.isEmpty()) {
             return content;

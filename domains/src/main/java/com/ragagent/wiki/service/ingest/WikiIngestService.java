@@ -5,7 +5,6 @@ import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.contract.wiki.WikiIngestPort;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
@@ -61,7 +60,7 @@ import tools.jackson.databind.ObjectMapper;
  * </ul>
  */
 @Service
-public class WikiIngestService implements WikiIngestPort {
+public class WikiIngestService {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestService.class);
 
@@ -345,7 +344,7 @@ public class WikiIngestService implements WikiIngestPort {
         return enqueueOps.enqueueWikiPendingOp(op);
     }
 
-    public WikiIngestPort.EnqueueResult enqueueWikiIngest(long tenantId, String kbId, String knowledgeId) {
+    public WikiEnqueueResult enqueueWikiIngest(long tenantId, String kbId, String knowledgeId) {
         return enqueueOps.enqueueWikiIngest(tenantId, kbId, knowledgeId);
     }
 

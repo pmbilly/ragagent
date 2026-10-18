@@ -25,7 +25,6 @@ import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
-import com.ragagent.contract.wiki.WikiFinalizePort;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -36,6 +35,7 @@ import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.llm.extract.EntityExtractionAdapter;
 import com.ragagent.platform.prompt.ExtractPrompts;
+import com.ragagent.wiki.service.DefaultWikiKnowledgeFinalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -107,7 +107,7 @@ class ChunkExtractServiceTest {
     private KnowledgeRepository knowledgeRepository;
     private KnowledgeBaseRepository kbRepository;
     private SpanTracker spanTracker;
-    private WikiFinalizePort finalizer;
+    private DefaultWikiKnowledgeFinalizer finalizer;
     private RecordingGraphRepo graphRepo;
     private ChunkExtractService service;
 
@@ -120,7 +120,7 @@ class ChunkExtractServiceTest {
         knowledgeRepository = mock(KnowledgeRepository.class);
         kbRepository = mock(KnowledgeBaseRepository.class);
         spanTracker = mock(SpanTracker.class);
-        finalizer = mock(WikiFinalizePort.class);
+        finalizer = mock(DefaultWikiKnowledgeFinalizer.class);
         graphRepo = new RecordingGraphRepo();
 
         chunk = new Chunk();

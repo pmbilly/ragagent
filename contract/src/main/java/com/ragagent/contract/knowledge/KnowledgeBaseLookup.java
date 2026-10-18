@@ -9,8 +9,8 @@ package com.ragagent.contract.knowledge;
  * 但不应依赖 {@code knowledge} 的领域模型与 mapper。端口定义在中性包 {@code common.knowledge}，
  * 由 {@code knowledge} 侧实现（与本项目其他端口同法：接口进 common、实现留业务域）。</p>
  *
- * <p><b>本端口只覆盖读侧</b>：chunk 读写、知识行写、span、嵌入见
- * {@link com.ragagent.contract.knowledge.ChunkPort}/{@link com.ragagent.contract.knowledge.KnowledgeFinalizePort}/{@link com.ragagent.contract.knowledge.KnowledgeSpanPort}/
+ * <p><b>本端口只覆盖读侧</b>；chunk 读写与知识行收尾属知识族内部调用（不经契约端口），
+ * span 与嵌入仍见 {@link com.ragagent.contract.knowledge.KnowledgeSpanPort} /
  * {@link com.ragagent.contract.knowledge.EmbeddingModelPort}。</p>
  */
 public interface KnowledgeBaseLookup {

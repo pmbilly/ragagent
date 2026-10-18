@@ -5,7 +5,7 @@
 
 ## 统计
 
-- 域间（解耦）：**23**
+- 域间（解耦）：**19**
 - 跨模块（必要）：**8**
 
 ## 明细
@@ -13,7 +13,6 @@
 | Port | 实现类 | 实现模块 | 调用方域 | 类型 |
 |---|---|---|---|---|
 | `AuditWritePort` | `AuditWriteAdapter` | domains | agentmanagement、auth、datasource、knowledge、system | 域间（解耦） |
-| `ChunkPort` | `ChunkPortAdapter` | domains | wiki | 域间（解耦） |
 | `DocReaderAdminPort` | `DocReaderAdminAdapter` | domains | system | 域间（解耦） |
 | `DocReaderParsePort` | `DocReaderParseAdapter` | domains | im、initialization、session | 域间（解耦） |
 | `DocumentChunkingPort` | `DocumentChunkingAdapter` | domains | session | 域间（解耦） |
@@ -25,7 +24,6 @@
 | `HybridSearchPort` | `HybridSearchService` | retrieval-engine | knowledge、session | 跨模块（必要） |
 | `KnowledgeBaseCatalogPort` | `KnowledgeBaseCatalogAdapter` | domains | agentmanagement | 域间（解耦） |
 | `KnowledgeCatalogPort` | `KnowledgeCatalogAdapter` | domains | datasource、embedchannel、evaluation、im、initialization、knowledge、session | 域间（解耦） |
-| `KnowledgeFinalizePort` | `KnowledgeFinalizeAdapter` | domains | wiki | 域间（解耦） |
 | `KnowledgeMaintenancePort` | `KnowledgeMaintenanceAdapter` | domains | websearch | 域间（解耦） |
 | `KnowledgeSpanPort` | `KnowledgeSpanAdapter` | domains | wiki | 域间（解耦） |
 | `McpToolRegistrationPort` | `McpToolRegistrationAdapter` | domains | agent-engine | 跨模块（必要） |
@@ -40,6 +38,4 @@
 | `ToolRegistryPort` | `ToolRegistryPortImpl` | agent-engine | agent-engine、mcp | 跨模块（必要） |
 | `WebSearchProviderPort` | `WebSearchSupportAdapter` | domains | session | 域间（解耦） |
 | `WebSearchTempStatePort` | `WebSearchSupportAdapter` | domains | session | 域间（解耦） |
-| `WikiFinalizePort` | `DefaultWikiKnowledgeFinalizer` | domains | knowledge | 域间（解耦） |
-| `WikiIngestPort` | `WikiIngestService` | domains | knowledge、wiki | 域间（解耦） |
 | `WikiPageOpsPort` | `WikiPageOpsAdapter` | domains | session | 域间（解耦） |

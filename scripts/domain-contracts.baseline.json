@@ -37,6 +37,10 @@
           "auth",
           "system",
           "tenant"
+        ],
+        "knowledge": [
+          "knowledge",
+          "wiki"
         ]
       },
       "edges": {
@@ -52,7 +56,9 @@
         "session→memory": "conversation 族内：会话装配与记忆召回/抽取直接建立在记忆域之上（4 个端口据此可内联）✓",
         "memory→session": "conversation 族内：记忆域读会话消息（SessionMessagePort 据此可内联）✓",
         "system→auth": "identity 族内：系统管理面读用户/租户主体 ✓",
-        "agentmanagement→auth": "identity 族内：Agent 管理读租户成员与用户主体（agentmanagement 同时属 agent-runtime 与 identity）✓"
+        "agentmanagement→auth": "identity 族内：Agent 管理读租户成员与用户主体（agentmanagement 同时属 agent-runtime 与 identity）✓",
+        "wiki→knowledge": "知识族内：wiki 摄取与页面渲染直接读 chunk / 知识行（ChunkPort 据此内联）✓",
+        "knowledge→wiki": "知识族内：知识处理完成后触发 wiki 落页与再摄取（WikiFinalizePort/WikiIngestPort 据此内联）✓"
       }
     }
   },
@@ -62,6 +68,11 @@
     ],
     "auth→tenant": [
       "TenantService"
+    ],
+    "knowledge→wiki": [
+      "ChunkExtractService",
+      "KnowledgeProcessWorker",
+      "QuestionGenerationService"
     ],
     "memory→session": [
       "MemoryExtractionService",
@@ -99,6 +110,13 @@
       "SystemAdminController",
       "SystemAdminUserService",
       "SystemSettingService"
+    ],
+    "wiki→knowledge": [
+      "DefaultWikiChunkCleaner",
+      "DefaultWikiImageEnricher",
+      "DefaultWikiKnowledgeFinalizer",
+      "WikiIngestBatchHandler",
+      "WikiIngestCitePipeline"
     ]
   }
 }

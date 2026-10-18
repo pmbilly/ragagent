@@ -6,10 +6,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.knowledge.api.ChunkPortAdapter;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.wiki.service.page.NewSlugFromCitation;
 import java.util.ArrayList;
@@ -263,7 +263,7 @@ class WikiIngestCitePipelineTest {
     @DisplayName("分类遍把 cNNN 句柄翻回真实 chunk UUID（未知句柄丢弃）")
     void classifyChunkCitationsTranslatesHandles() {
         WikiIngestService svc = mock(WikiIngestService.class);
-        ChunkPort chunkPort = mock(ChunkPort.class);
+        ChunkPortAdapter chunkPort = mock(ChunkPortAdapter.class);
 
         // 两个批次：每个批次各自从 c000 起编号，因此同一个句柄在两个批次里指向不同 chunk。
         // 这正是"句柄必须按批次翻译"的原因——把它当成全局编号就会串页。
@@ -317,7 +317,7 @@ class WikiIngestCitePipelineTest {
     @DisplayName("无候选或无分块时分类遍短路")
     void classifyShortCircuits() {
         WikiIngestService svc = mock(WikiIngestService.class);
-        WikiIngestCitePipeline pipeline = new WikiIngestCitePipeline(svc, mock(ChunkPort.class));
+        WikiIngestCitePipeline pipeline = new WikiIngestCitePipeline(svc, mock(ChunkPortAdapter.class));
 
         WikiIngestCitePipeline.CitationResult r1 = pipeline.classifyChunkCitations(
                 mock(LlmChatClient.class), "  ", List.of(textChunk(0, 5, "x")), "zh", null);

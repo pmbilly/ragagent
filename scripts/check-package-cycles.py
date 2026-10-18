@@ -124,7 +124,44 @@ for _a, _b in l2_to_l3:
     _pat = re.compile(r"^import com\.ragagent\." + _b + r"\.", re.M)
     l2_to_l3_sites[_a + "->" + _b] = sum(
         len(_pat.findall(_p.read_text(encoding="utf-8"))) for _p in DOMAIN_FILES.get(_a, ()))
-relapsed = sorted((a, b) for a, b in DECOUPLED if b in edge.get(a, ()))
+def _family_map():
+    try:
+        d = json.loads((pathlib.Path(__file__).parent / "domain-contracts.baseline.json").read_text(encoding="utf-8"))
+        fams = (d.get("tiers", {}).get("intra-family", {}) or {}).get("families") or {}
+        out = {}
+        for name, doms in fams.items():
+            for dom in doms:
+                out.setdefault(dom, set()).add(name)
+        return out
+    except Exception:
+        return {}
+
+
+FAM_OF = _family_map()
+
+
+def _same_family(*doms):
+    """任一共同族即豁免（域可同时属于多个族，如 agentmanagement）。"""
+    sets = [FAM_OF.get(d) or set() for d in doms]
+    if not sets or any(not s for s in sets):
+        return False
+    return bool(set.intersection(*sets))
+
+
+def _domain_of_pkg(name):
+    """包名 → 顶层域：兼容 `com.ragagent.knowledge.api` 与 `contract.model` 两种形态。"""
+    parts = name.split(".")
+    if parts[:2] == ["com", "ragagent"]:
+        return parts[2] if len(parts) > 2 else ""
+    return parts[0]
+
+
+def _scc_in_one_family(members):
+    doms = {_domain_of_pkg(m) for m in members}
+    return _same_family(*doms)
+
+relapsed = sorted((a, b) for a, b in DECOUPLED
+                   if b in edge.get(a, ()) and not _same_family(a, b))
 
 # L1 核心底座：不得依赖业务域（R5）
 L1_CORE = {"common", "event", "stream", "tracing", "contract", "platform"}  # B258/B259：同上
@@ -335,33 +372,6 @@ for _pkg, _fs in _pkg_files.items():
 package_sccs = sccs_of(sorted(_pkg_files), _pkg_edge)
 
 # ── 族内豁免（v0.6.0 分层解耦）：同族域之间的双向/间接环是刻意允许的 ──
-def _family_map():
-    try:
-        d = json.loads((pathlib.Path(__file__).parent / "domain-contracts.baseline.json").read_text(encoding="utf-8"))
-        fams = (d.get("tiers", {}).get("intra-family", {}) or {}).get("families") or {}
-        out = {}
-        for name, doms in fams.items():
-            for dom in doms:
-                out.setdefault(dom, set()).add(name)
-        return out
-    except Exception:
-        return {}
-
-
-FAM_OF = _family_map()
-
-
-def _same_family(*doms):
-    """任一共同族即豁免（域可同时属于多个族，如 agentmanagement）。"""
-    sets = [FAM_OF.get(d) or set() for d in doms]
-    if not sets or any(not s for s in sets):
-        return False
-    return bool(set.intersection(*sets))
-
-
-def _scc_in_one_family(members):
-    doms = {m.split(".")[0] for m in members}
-    return _same_family(*doms)
 
 
 cycles = [c for c in cycles if not _same_family(*c)]

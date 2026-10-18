@@ -1,7 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
 import com.ragagent.contract.text.Whitespace;
-import com.ragagent.contract.wiki.WikiIngestPort;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
 import com.ragagent.wiki.domain.TaskPendingOp;
@@ -61,31 +60,31 @@ final class WikiIngestEnqueueOps {
      *         <b>触发错误可能与 accepted=true 同时返回</b>，
      *         调用方可以只重试 KB 级的触发而不追加重复的操作。
      */
-    WikiIngestPort.EnqueueResult enqueueWikiIngest(long tenantId, String kbId, String knowledgeId) {
+    WikiEnqueueResult enqueueWikiIngest(long tenantId, String kbId, String knowledgeId) {
         TaskPendingOp op;
         try {
             op = newWikiIngestPendingOp(tenantId, kbId, knowledgeId);
         } catch (Exception e) {
             log.warn("wiki ingest: failed to marshal pending op for {}", knowledgeId, e);
-            return new WikiIngestPort.EnqueueResult(false, e);
+            return new WikiEnqueueResult(false, e);
         }
         boolean accepted;
         try {
             accepted = enqueueWikiPendingOp(op);
         } catch (Exception e) {
             log.warn("wiki ingest: failed to enqueue pending op for {}", knowledgeId, e);
-            return new WikiIngestPort.EnqueueResult(false, e);
+            return new WikiEnqueueResult(false, e);
         }
         if (!accepted) {
             log.info("wiki ingest: skip enqueue for deleted KB {}", kbId);
-            return new WikiIngestPort.EnqueueResult(false, null);
+            return new WikiEnqueueResult(false, null);
         }
         try {
             enqueueWikiIngestTrigger(tenantId, kbId);
         } catch (Exception e) {
-            return new WikiIngestPort.EnqueueResult(true, e);
+            return new WikiEnqueueResult(true, e);
         }
-        return new WikiIngestPort.EnqueueResult(true, null);
+        return new WikiEnqueueResult(true, null);
     }
 
     /**

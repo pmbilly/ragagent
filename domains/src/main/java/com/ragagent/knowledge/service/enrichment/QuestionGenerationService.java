@@ -1,6 +1,5 @@
 package com.ragagent.knowledge.service.enrichment;
 
-import com.ragagent.contract.wiki.WikiFinalizePort;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkQuestionPort;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -14,6 +13,7 @@ import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantScopes;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
+import com.ragagent.wiki.service.DefaultWikiKnowledgeFinalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +42,7 @@ public class QuestionGenerationService implements QuestionGenerationConsumer {
     private final KnowledgeRepository knowledgeRepository;
     private final KnowledgeBaseRepository kbRepository;
     private final SpanTracker spanTracker;
-    private final WikiFinalizePort finalizer;
+    private final DefaultWikiKnowledgeFinalizer finalizer;
     private final ChunkQuestionPort chunkService;
 
     @Autowired
@@ -50,7 +50,7 @@ public class QuestionGenerationService implements QuestionGenerationConsumer {
                                      KnowledgeRepository knowledgeRepository,
                                      KnowledgeBaseRepository kbRepository,
                                      SpanTracker spanTracker,
-                                     WikiFinalizePort finalizer,
+                                     DefaultWikiKnowledgeFinalizer finalizer,
                                      ChunkQuestionPort chunkService) {
         this.chunkRepository = chunkRepository;
         this.knowledgeRepository = knowledgeRepository;

@@ -7,7 +7,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
+import com.ragagent.knowledge.api.FinalizeResult;
+import com.ragagent.knowledge.api.KnowledgeFinalizeAdapter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +21,7 @@ import org.junit.jupiter.api.Test;
  */
 class WikiKnowledgeFinalizerTest {
 
-    private final KnowledgeFinalizePort finalizePort = mock(KnowledgeFinalizePort.class);
+    private final KnowledgeFinalizeAdapter finalizePort = mock(KnowledgeFinalizeAdapter.class);
     private final DefaultWikiKnowledgeFinalizer finalizer =
             new DefaultWikiKnowledgeFinalizer(finalizePort);
 
@@ -28,7 +29,7 @@ class WikiKnowledgeFinalizerTest {
     @DisplayName("Result → Outcome 直通映射")
     void mapsResultToOutcome() {
         when(finalizePort.finalizeSubtask(any(), any()))
-                .thenReturn(new KnowledgeFinalizePort.Result(true, true));
+                .thenReturn(new FinalizeResult(true, true));
 
         DefaultWikiKnowledgeFinalizer.Outcome outcome = finalizer.finalizeSubtask("kid-1");
 
@@ -41,7 +42,7 @@ class WikiKnowledgeFinalizerTest {
     @DisplayName("晋升未命中不是错误")
     void promoteMissIsNotAnError() {
         when(finalizePort.finalizeSubtask(any(), any()))
-                .thenReturn(new KnowledgeFinalizePort.Result(true, false));
+                .thenReturn(new FinalizeResult(true, false));
 
         DefaultWikiKnowledgeFinalizer.Outcome outcome = finalizer.finalizeSubtask("kid-1");
 
@@ -54,7 +55,7 @@ class WikiKnowledgeFinalizerTest {
     @DisplayName("端口降级时不抛")
     void portDegradationDoesNotThrow() {
         when(finalizePort.finalizeSubtask(any(), any()))
-                .thenReturn(new KnowledgeFinalizePort.Result(false, false));
+                .thenReturn(new FinalizeResult(false, false));
 
         finalizer.finalizeWikiSubtask("kid-1");
 
@@ -75,7 +76,7 @@ class WikiKnowledgeFinalizerTest {
     @DisplayName("晋升成功走日志分支")
     void promotedLogs() {
         when(finalizePort.finalizeSubtask(any(), any()))
-                .thenReturn(new KnowledgeFinalizePort.Result(true, true));
+                .thenReturn(new FinalizeResult(true, true));
 
         finalizer.finalizeWikiSubtask("kid-1");
 

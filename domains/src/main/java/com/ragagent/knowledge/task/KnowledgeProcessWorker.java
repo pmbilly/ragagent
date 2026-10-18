@@ -9,8 +9,6 @@ import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.contract.retrieval.VectorIndexStore;
-import com.ragagent.contract.wiki.WikiFinalizePort;
-import com.ragagent.contract.wiki.WikiIngestPort;
 import com.ragagent.knowledge.chunker.Chunker;
 import com.ragagent.knowledge.chunker.ParsedChunk;
 import com.ragagent.knowledge.chunker.SplitterConfig;
@@ -39,6 +37,9 @@ import com.ragagent.platform.access.TracingContext;
 import com.ragagent.platform.knowledge.ImageRefRewriter;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
+import com.ragagent.wiki.service.DefaultWikiKnowledgeFinalizer;
+import com.ragagent.wiki.service.ingest.WikiEnqueueResult;
+import com.ragagent.wiki.service.ingest.WikiIngestService;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -108,9 +109,9 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     /** wiki 交接；
      *  ObjectProvider 装配：wiki 域与 knowledge 域互不反向依赖，延迟解析更稳。 */
     private final ObjectProvider<
-            WikiIngestPort> wikiIngestService;
+            WikiIngestService> wikiIngestService;
     private final ObjectProvider<
-            WikiFinalizePort> wikiKnowledgeFinalizer;
+            DefaultWikiKnowledgeFinalizer> wikiKnowledgeFinalizer;
     /** 分块图抽取队列（未接线时 fan-out 直接释放槽位，行不搁浅）。 */
     private final ObjectProvider<
             ChunkExtractTaskQueue> chunkExtractQueue;
@@ -133,9 +134,9 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                                   SpanTracker spanTracker,
                                   RetrieveGraphRepository graphRepository,
                                   ObjectProvider<
-                                          WikiIngestPort> wikiIngestService,
+                                          WikiIngestService> wikiIngestService,
                                   ObjectProvider<
-                                          WikiFinalizePort> wikiKnowledgeFinalizer,
+                                          DefaultWikiKnowledgeFinalizer> wikiKnowledgeFinalizer,
                                   ObjectProvider<
                                           ChunkExtractTaskQueue> chunkExtractQueue,
                                   ObjectProvider<
@@ -662,7 +663,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
      * 。
      */
     private void enqueueWikiIngest(String knowledgeId, Knowledge k) {
-        WikiIngestPort service = wikiIngestService.getIfAvailable();
+        WikiIngestService service = wikiIngestService.getIfAvailable();
         if (service == null) {
             log.info("[KnowledgePostProcess] Wiki ingest service unavailable, releasing slot for {}",
                     knowledgeId);
@@ -670,7 +671,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             return;
         }
         try {
-            WikiIngestPort.EnqueueResult result = service
+            WikiEnqueueResult result = service
                     .enqueueWikiIngest(k.getTenantId(), k.getKnowledgeBaseId(), knowledgeId);
             if (result.accepted()) {
                 log.info("[KnowledgePostProcess] Enqueued wiki ingest task for {}", knowledgeId);
@@ -692,7 +693,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
      * finalizer 缺席时静默——行由 finalizing housekeeping sweep 兜底。
      */
     private void releaseWikiSlot(String knowledgeId) {
-        WikiFinalizePort finalizer =
+        DefaultWikiKnowledgeFinalizer finalizer =
                 wikiKnowledgeFinalizer.getIfAvailable();
         if (finalizer == null) {
             return;

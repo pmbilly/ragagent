@@ -1,7 +1,7 @@
 package com.ragagent.wiki.service;
 
-import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
-import com.ragagent.contract.wiki.WikiFinalizePort;
+import com.ragagent.knowledge.api.FinalizeResult;
+import com.ragagent.knowledge.api.KnowledgeFinalizeAdapter;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import org.slf4j.Logger;
@@ -33,20 +33,19 @@ import org.springframework.stereotype.Component;
  * 只有一个能匹配晋升的 WHERE）。{@code rows == 0} 视为静默成功（计数已被他人归零并晋升）。</p>
  */
 @Component
-public class DefaultWikiKnowledgeFinalizer implements WikiFinalizePort, WikiKnowledgeFinalizer {
+public class DefaultWikiKnowledgeFinalizer implements WikiKnowledgeFinalizer {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultWikiKnowledgeFinalizer.class);
 
-    private final KnowledgeFinalizePort finalizePort;
+    private final KnowledgeFinalizeAdapter finalizePort;
 
-    public DefaultWikiKnowledgeFinalizer(KnowledgeFinalizePort finalizePort) {
+    public DefaultWikiKnowledgeFinalizer(KnowledgeFinalizeAdapter finalizePort) {
         this.finalizePort = finalizePort;
     }
 
     /** 供测试/可观测：本次调用是否真正发生了"计数归零后的晋升" */
     public record Outcome(boolean decremented, boolean promoted) { }
 
-    @Override
     public void finalizeWikiSubtask(String knowledgeId) {
         Outcome outcome = finalizeSubtask(knowledgeId);
         if (outcome.promoted()) {
@@ -65,7 +64,7 @@ public class DefaultWikiKnowledgeFinalizer implements WikiFinalizePort, WikiKnow
             return new Outcome(false, false);
         }
         // 递减 + 带守卫的晋升（含 try/catch 与告警日志）在 knowledge 侧端口内完成，语义不变。
-        KnowledgeFinalizePort.Result r = finalizePort.finalizeSubtask(
+        FinalizeResult r = finalizePort.finalizeSubtask(
                 knowledgeId, OffsetDateTime.now(ZoneOffset.UTC));
         return new Outcome(r.decremented(), r.promoted());
     }

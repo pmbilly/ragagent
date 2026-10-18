@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
@@ -68,7 +67,7 @@ class KnowledgeFinalizeAdapterTest {
     void decrementThenPromote() {
         when(knowledgeMapper.update(isNull(), any())).thenReturn(1);
 
-        KnowledgeFinalizePort.Result result = adapter.finalizeSubtask("kid-1", NOW);
+        FinalizeResult result = adapter.finalizeSubtask("kid-1", NOW);
 
         assertThat(result.decremented()).isTrue();
         assertThat(result.promoted()).isTrue();
@@ -104,7 +103,7 @@ class KnowledgeFinalizeAdapterTest {
                 .thenReturn(1)   // 递减命中
                 .thenReturn(0);  // 晋升未命中
 
-        KnowledgeFinalizePort.Result result = adapter.finalizeSubtask("kid-1", NOW);
+        FinalizeResult result = adapter.finalizeSubtask("kid-1", NOW);
 
         assertThat(result.decremented()).isTrue();
         assertThat(result.promoted()).isFalse();
@@ -120,7 +119,7 @@ class KnowledgeFinalizeAdapterTest {
                 .thenReturn(0)   // 递减未命中
                 .thenReturn(0);
 
-        KnowledgeFinalizePort.Result result = adapter.finalizeSubtask("kid-1", NOW);
+        FinalizeResult result = adapter.finalizeSubtask("kid-1", NOW);
 
         assertThat(result.decremented()).isFalse();
         assertThat(result.promoted()).isFalse();
@@ -134,7 +133,7 @@ class KnowledgeFinalizeAdapterTest {
         when(knowledgeMapper.update(isNull(), any()))
                 .thenThrow(new IllegalStateException("db down"));
 
-        KnowledgeFinalizePort.Result result = adapter.finalizeSubtask("kid-1", NOW);
+        FinalizeResult result = adapter.finalizeSubtask("kid-1", NOW);
 
         assertThat(result.decremented()).isFalse();
         assertThat(result.promoted()).isFalse();
@@ -149,7 +148,7 @@ class KnowledgeFinalizeAdapterTest {
                 .thenReturn(1)
                 .thenThrow(new IllegalStateException("db down"));
 
-        KnowledgeFinalizePort.Result result = adapter.finalizeSubtask("kid-1", NOW);
+        FinalizeResult result = adapter.finalizeSubtask("kid-1", NOW);
 
         assertThat(result.decremented()).isTrue();
         assertThat(result.promoted()).isFalse();

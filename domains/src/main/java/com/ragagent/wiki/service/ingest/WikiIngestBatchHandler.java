@@ -2,7 +2,6 @@ package com.ragagent.wiki.service.ingest;
 
 
 import com.ragagent.contract.audit.WikiActivityAudit;
-import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
@@ -11,6 +10,7 @@ import com.ragagent.contract.knowledge.KnowledgeView;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.knowledge.api.ChunkPortAdapter;
 import com.ragagent.platform.access.TenantScopes;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.domain.WikiConfig;
@@ -76,7 +76,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
     final WikiIngestDedupService dedupService;
     final WikiModelResolver modelResolver;
     final WikiFinalizeLock finalizeLock;
-    final ChunkPort chunkPort;
+    final ChunkPortAdapter chunkPort;
     final KnowledgeBaseLookup kbLookup;
     final ObjectProvider<WikiActivityAudit> auditProvider;
     final ObjectProvider<WikiIngestTaskQueue> taskQueueProvider;
@@ -97,7 +97,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
                                   WikiIngestDedupService dedupService,
                                   WikiModelResolver modelResolver,
                                   WikiFinalizeLock finalizeLock,
-                                  ChunkPort chunkPort,
+                                  ChunkPortAdapter chunkPort,
                                   KnowledgeBaseLookup kbLookup,
                                   ObjectProvider<WikiActivityAudit> auditProvider,
                                   ObjectProvider<WikiIngestTaskQueue> taskQueueProvider,

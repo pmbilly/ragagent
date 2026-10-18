@@ -40,15 +40,6 @@
       "com.ragagent.retrieval.engine.sqlite",
       "com.ragagent.retrieval.engine.tencentvectordb",
       "com.ragagent.retrieval.engine.weaviate"
-    ],
-    [
-      "com.ragagent.session.service.rag",
-      "com.ragagent.session.service.rag.plugin",
-      "com.ragagent.session.service.rag.support"
-    ],
-    [
-      "com.ragagent.wiki.service.ingest",
-      "com.ragagent.wiki.service.page"
     ]
   ],
   "depend_on_config": [],
