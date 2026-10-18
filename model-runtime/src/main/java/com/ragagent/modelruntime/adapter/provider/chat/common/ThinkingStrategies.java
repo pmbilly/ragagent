@@ -1,6 +1,6 @@
 package com.ragagent.modelruntime.adapter.provider.chat.common;
 
-import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.ChatOptions;
 import java.util.Map;
 import tools.jackson.databind.node.ObjectNode;
 

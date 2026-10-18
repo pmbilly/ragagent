@@ -5,7 +5,7 @@ import static com.ragagent.session.rag.Rec46cSupport.json;
 import static com.ragagent.session.rag.Rec46cSupport.searchResultsShape;
 
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.contract.retrieval.SearchChunkMerge;
+import com.ragagent.contract.knowledge.SearchChunkMerge;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.session.rag.plugin.PluginMerge;

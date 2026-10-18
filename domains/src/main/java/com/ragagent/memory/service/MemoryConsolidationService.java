@@ -2,10 +2,10 @@ package com.ragagent.memory.service;
 
 import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatOptions;
+import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.memory.domain.MemoryConsolidationResult;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.item.MemoryItem;

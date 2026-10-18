@@ -1,6 +1,6 @@
 package com.ragagent.modelruntime.adapter.provider.chat.common;
 
-import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.ChatOptions;
 import com.ragagent.llm.provider.AliyunProvider;
 import com.ragagent.llm.provider.MoonshotProvider;
 import com.ragagent.llm.provider.OpenAIProvider;

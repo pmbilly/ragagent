@@ -1,7 +1,7 @@
 package com.ragagent.modelruntime.adapter.provider.chat.common;
 
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatOptions;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpHeaders;

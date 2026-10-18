@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.ToolCall;
 import com.ragagent.contract.retrieval.SearchResult;
 import java.util.List;
 import java.util.Map;

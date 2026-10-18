@@ -3,6 +3,7 @@ package com.ragagent.embedchannel;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.embedchannel.controller.filter.EmbedAuthFilter;
 import com.ragagent.embedchannel.service.EmbedChannelService;
+import com.ragagent.embedchannel.support.EmbedRateLimiter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

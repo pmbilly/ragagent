@@ -1,4 +1,4 @@
-package com.ragagent.embedchannel;
+package com.ragagent.embedchannel.support;
 
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import java.nio.charset.StandardCharsets;

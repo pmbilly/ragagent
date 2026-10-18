@@ -1,7 +1,6 @@
 package com.ragagent.contract.model;
 
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.contract.model.chat.ChatConfig;
 
 /**
  * 模型运行时端口（契约面）：按模型 id 造出可直接调用的能力客户端。

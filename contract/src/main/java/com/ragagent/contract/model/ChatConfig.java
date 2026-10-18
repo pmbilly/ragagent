@@ -1,4 +1,4 @@
-package com.ragagent.contract.model.chat;
+package com.ragagent.contract.model;
 
 import java.util.Map;
 

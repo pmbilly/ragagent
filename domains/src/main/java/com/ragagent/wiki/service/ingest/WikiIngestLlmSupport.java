@@ -1,9 +1,9 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatOptions;
+import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.text.Whitespace;
 import com.ragagent.contract.wiki.WikiImageMarkup;
 import com.ragagent.platform.access.TenantContext;

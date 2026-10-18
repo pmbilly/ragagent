@@ -1,8 +1,5 @@
 package com.ragagent.contract.model;
 
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
 import java.util.List;
 
 /**

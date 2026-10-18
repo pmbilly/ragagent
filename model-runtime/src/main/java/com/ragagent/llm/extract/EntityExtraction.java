@@ -2,10 +2,10 @@ package com.ragagent.llm.extract;
 
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.graph.GraphRelation;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatOptions;
+import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.platform.prompt.PipelineConfig.PromptTemplateStructured;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;

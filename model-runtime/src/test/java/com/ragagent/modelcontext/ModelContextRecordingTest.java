@@ -3,11 +3,11 @@ package com.ragagent.modelcontext;
 import static com.ragagent.modelcontext.ModelContextGolden.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.chat.ChatTool;
-import com.ragagent.contract.model.chat.FunctionCall;
-import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatResponse;
+import com.ragagent.contract.model.ChatTool;
+import com.ragagent.contract.model.FunctionCall;
+import com.ragagent.contract.model.ToolCall;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.web.JsonMappers;

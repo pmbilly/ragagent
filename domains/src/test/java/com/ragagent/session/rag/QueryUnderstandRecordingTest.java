@@ -8,7 +8,7 @@ import static com.ragagent.session.rag.Rec46cSupport.mask;
 import static com.ragagent.session.rag.Rec46cSupport.message;
 import static com.ragagent.session.rag.Rec46cSupport.msgsJSON;
 
-import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.contract.session.MessageImage;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;

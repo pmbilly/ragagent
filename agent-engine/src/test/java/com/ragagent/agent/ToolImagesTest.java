@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.agent.AgentToolCall;
-import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.List;

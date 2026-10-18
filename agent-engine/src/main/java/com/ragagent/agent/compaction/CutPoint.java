@@ -1,7 +1,7 @@
 package com.ragagent.agent.compaction;
 
 import com.ragagent.agent.budget.TokenEstimator;
-import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.ChatMessage;
 import java.util.ArrayList;
 import java.util.List;
 

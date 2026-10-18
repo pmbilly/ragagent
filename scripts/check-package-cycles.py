@@ -16,6 +16,14 @@
   R8 禁内联全限定名（依赖图完整性）：R1/R1b/R3 只解析 import 行，代码里写成
      `com.ragagent.x.y.Z` 的引用是图盲区——字节码依赖早已存在，图里却没有边。
      唯一允许形态是「必要消歧」（简单名已被已导入类型 / 本文件声明 / 同包顶层类型占用）。
+  **允许的内聚环（2026-10-18 实测登记，勿当债重提）**：
+    · retrieval.engine ⇄ engine.{doris,elasticsearch,milvus,opensearch,qdrant,sqlite,tencentvectordb,weaviate}
+      —— 父包是注册表/工厂，子包是各引擎实现（插件模式）；
+    · embedding ⇄ embedding.provider、rerank ⇄ rerank.provider、agent.skills ⇄ agent.skills.mapper
+      —— 同上；
+    · contract.model ⇄ contract.retrieval —— StreamResponse 携带检索引用快照（SearchResult），
+      是「流响应回传引用」的产品耦合；断它需要造一个更窄的引用类型，收益低于成本。
+
   R9 包级 SCC 棘轮：R1b 只看**顶层域**，子包级的环（如 knowledge 的
      repository/security/service/task、agent 的 compaction/prompt 回引根包）在它视野之外。
      按完整包（com.ragagent.a.b）聚合 import 边求强连通分量，分组/成员只许减；

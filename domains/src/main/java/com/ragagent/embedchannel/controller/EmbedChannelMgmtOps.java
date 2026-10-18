@@ -1,9 +1,9 @@
 package com.ragagent.embedchannel.controller;
 
-import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.embedchannel.service.EmbedChannelService.UpdateCommand;
+import com.ragagent.embedchannel.support.EmbedError;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResponse;
 import java.util.LinkedHashMap;

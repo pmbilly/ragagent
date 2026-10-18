@@ -1,8 +1,8 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.ChatResponse;
+import com.ragagent.contract.model.ToolCall;
 import com.ragagent.llm.domain.ProviderMetadataMaps;
 import java.util.ArrayList;
 import java.util.List;

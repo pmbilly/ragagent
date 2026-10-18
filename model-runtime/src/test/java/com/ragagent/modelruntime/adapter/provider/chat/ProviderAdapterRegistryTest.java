@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.contract.model.chat.ChatConfig;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.ChatConfig;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatOptions;
+import com.ragagent.contract.model.ToolCall;
 import com.ragagent.llm.domain.ProviderMetadataMaps;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.modelruntime.adapter.provider.chat.common.BaseProvider;

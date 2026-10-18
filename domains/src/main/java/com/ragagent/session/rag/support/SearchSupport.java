@@ -1,7 +1,7 @@
 package com.ragagent.session.rag.support;
 
+import com.ragagent.contract.knowledge.SearchChunkMerge;
 import com.ragagent.contract.retrieval.RetrievalObsRows;
-import com.ragagent.contract.retrieval.SearchChunkMerge;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.session.rag.ChatManage;

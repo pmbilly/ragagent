@@ -1,4 +1,4 @@
-package com.ragagent.contract.model.chat;
+package com.ragagent.contract.model;
 
 /**
  * 函数调用详情。

@@ -1,17 +1,17 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
+import com.ragagent.contract.model.ChatConfig;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatOptions;
+import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.ChatStream;
+import com.ragagent.contract.model.ChatTool;
+import com.ragagent.contract.model.FunctionCall;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.contract.model.chat.ChatConfig;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.chat.ChatTool;
-import com.ragagent.contract.model.chat.FunctionCall;
-import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.ToolCall;
 import com.ragagent.llm.ollama.OllamaChatRequest;
 import com.ragagent.llm.ollama.OllamaMessage;
 import com.ragagent.llm.ollama.OllamaService;

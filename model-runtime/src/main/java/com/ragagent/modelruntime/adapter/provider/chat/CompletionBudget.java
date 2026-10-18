@@ -11,7 +11,7 @@ import tools.jackson.databind.node.ObjectNode;
  * max_completion_tokens 为互斥；火山 Ark 之类的网关会直接拒绝同时携带两者的请求
  * （Tencent/WeKnora#3014）。ChatOptions 上的两个字段是同一预算的输入别名
  * （YAML、老调用方、agent UI 各喂其中一个），都设时取较新的 MaxCompletionTokens
- * ——该逻辑在 {@link com.ragagent.contract.model.chat.ChatOptions#completionBudget()}。
+ * ——该逻辑在 {@link com.ragagent.contract.model.ChatOptions#completionBudget()}。
  */
 public enum CompletionBudget {
 

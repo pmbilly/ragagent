@@ -1,6 +1,6 @@
 package com.ragagent.contract.pipeline;
 
-import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.retrieval.SearchResult;
 import java.util.List;
 

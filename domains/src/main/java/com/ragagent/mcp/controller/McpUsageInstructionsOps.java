@@ -2,12 +2,12 @@ package com.ragagent.mcp.controller;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatOptions;
+import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;

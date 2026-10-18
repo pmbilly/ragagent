@@ -1,13 +1,13 @@
 package com.ragagent.session.service;
 
 import com.ragagent.agenttools.datasource.DataAnalysisSessionFactoryAdapter;
-import com.ragagent.contract.knowledge.EntityExtractionPort;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.contract.knowledge.support.KnowledgeBaseViews;
 import com.ragagent.contract.knowledge.support.KnowledgeProjectionAdapter;
+import com.ragagent.contract.model.EntityExtractionPort;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;

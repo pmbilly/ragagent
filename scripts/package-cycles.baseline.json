@@ -12,15 +12,8 @@
       "com.ragagent.agent.skills.mapper"
     ],
     [
-      "com.ragagent.contract.knowledge",
       "com.ragagent.contract.model",
-      "com.ragagent.contract.model.chat",
       "com.ragagent.contract.retrieval"
-    ],
-    [
-      "com.ragagent.embedchannel",
-      "com.ragagent.embedchannel.controller.filter",
-      "com.ragagent.embedchannel.service"
     ],
     [
       "com.ragagent.embedding",

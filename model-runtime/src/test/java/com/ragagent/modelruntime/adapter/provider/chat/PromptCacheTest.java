@@ -6,12 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.contract.model.CacheRetention;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatOptions;
+import com.ragagent.contract.model.ChatTool;
 import com.ragagent.contract.model.PromptCacheStatus;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.contract.model.chat.CacheRetention;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatTool;
 import com.ragagent.llm.provider.ProviderName;
 import java.util.List;
 import org.junit.jupiter.api.Test;

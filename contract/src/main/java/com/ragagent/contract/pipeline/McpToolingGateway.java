@@ -1,7 +1,7 @@
 package com.ragagent.contract.pipeline;
 
 import com.ragagent.contract.agent.ToolCallTarget;
-import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.ChatMessage;
 import java.util.List;
 
 /**

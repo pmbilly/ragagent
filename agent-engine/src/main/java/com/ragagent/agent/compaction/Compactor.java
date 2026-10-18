@@ -2,11 +2,11 @@ package com.ragagent.agent.compaction;
 
 import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.contract.agent.CompactionSettings;
+import com.ragagent.contract.model.CacheRetention;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatOptions;
+import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.CacheRetention;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
 import java.util.ArrayList;
 import java.util.List;
 

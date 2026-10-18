@@ -1,4 +1,4 @@
-package com.ragagent.embedchannel;
+package com.ragagent.embedchannel.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;

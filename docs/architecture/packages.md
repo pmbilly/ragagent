@@ -34,7 +34,6 @@
 | `:contract` | `com.ragagent.contract.knowledge.support` | 知识库 · 支撑：KnowledgeProjectionAdapter / ChunkProjectionAdapter / KnowledgeBaseViews…。 |
 | `:contract` | `com.ragagent.contract.memory` | 记忆契约面：配置/条目视图/键与类目/召回与检索上下文。 |
 | `:contract` | `com.ragagent.contract.model` | 模型契约面：模型事实与运行时而面载荷。 |
-| `:contract` | `com.ragagent.contract.model.chat` | 模型聊天契约面：聊天消息/选项/响应与工具定义等跨域共享形状。 |
 | `:contract` | `com.ragagent.contract.pipeline` | 管线 SPI（契约化）：`chatpipeline` 消费、业务域实现的端口（MCP 工具网关/按需注册、 工具注册表、网页检索执行器）。 |
 | `:contract` | `com.ragagent.contract.retrieval` | 检索契约面：检索类型/命中合并/目标。 |
 | `:contract` | `com.ragagent.contract.session` | 会话契约面：管线消息视图与消息端口。 |
@@ -109,6 +108,7 @@
 | `:domains` | `com.ragagent.embedchannel.domain` | 嵌入渠道 · 领域模型：EmbedChannelEntity。 |
 | `:domains` | `com.ragagent.embedchannel.mapper` | 嵌入渠道 · 映射：EmbedChannelMapper。 |
 | `:domains` | `com.ragagent.embedchannel.service` | 嵌入渠道 · 服务：EmbedChannelService / RedisEmbedTokenStore / EmbedTokenStore。 |
+| `:domains` | `com.ragagent.embedchannel.support` | 嵌入渠道 · 支撑件：错误文案（com.ragagent.embedchannel.support.EmbedError）、 令牌工具（com.ragagent.embedchannel.suppor |
 | `:domains` | `com.ragagent.evaluation` | 评估域：评估任务与指标计算（Rouge 等，见 metric/），对外入口 /api/v1/evaluation。 |
 | `:domains` | `com.ragagent.evaluation.controller` | 评测 · HTTP 层：EvaluationController。 |
 | `:domains` | `com.ragagent.evaluation.domain` | 评测 · 领域模型：QaPair。 |

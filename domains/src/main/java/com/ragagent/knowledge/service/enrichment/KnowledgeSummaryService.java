@@ -2,13 +2,13 @@ package com.ragagent.knowledge.service.enrichment;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.knowledge.SearchChunkMerge;
 import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatOptions;
+import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.retrieval.SearchChunkMerge;
 import com.ragagent.contract.wiki.WikiImageMarkup;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.knowledge.domain.Chunk;

@@ -2,9 +2,9 @@ package com.ragagent.agent;
 
 import com.ragagent.agent.domain.AgentState;
 import com.ragagent.contract.agent.AgentStep;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.chat.ChatTool;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatResponse;
+import com.ragagent.contract.model.ChatTool;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;

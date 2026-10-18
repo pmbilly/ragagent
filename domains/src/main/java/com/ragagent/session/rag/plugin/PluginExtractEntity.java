@@ -2,9 +2,9 @@ package com.ragagent.session.rag.plugin;
 
 import com.ragagent.contract.graph.EntityExtractionResult;
 import com.ragagent.contract.graph.GraphNode;
-import com.ragagent.contract.knowledge.EntityExtractionPort;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.contract.model.EntityExtractionPort;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.platform.prompt.PipelineConfig;

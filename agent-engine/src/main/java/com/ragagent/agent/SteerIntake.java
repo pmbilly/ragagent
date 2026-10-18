@@ -3,7 +3,7 @@ package com.ragagent.agent;
 import com.ragagent.agent.domain.AgentState;
 import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.payload.UserMessageInjectedData;
-import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;
 import java.util.ArrayList;

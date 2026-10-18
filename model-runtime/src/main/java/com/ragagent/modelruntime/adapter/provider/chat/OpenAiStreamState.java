@@ -1,7 +1,7 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.ToolCall;
 import com.ragagent.llm.domain.ProviderMetadataMaps;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingEmitter;
 import java.time.Duration;

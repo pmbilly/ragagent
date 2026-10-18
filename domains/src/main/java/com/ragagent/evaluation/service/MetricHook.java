@@ -1,6 +1,6 @@
 package com.ragagent.evaluation.service;
 
-import com.ragagent.contract.model.chat.ChatResponse;
+import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.evaluation.domain.QaPair;
 import com.ragagent.evaluation.dto.EvaluationDtos.MetricResult;

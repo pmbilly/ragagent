@@ -1,7 +1,7 @@
 package com.ragagent.platform.prompt;
 
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatOptions;
 import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

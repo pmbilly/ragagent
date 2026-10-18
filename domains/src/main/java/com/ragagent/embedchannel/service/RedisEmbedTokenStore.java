@@ -1,6 +1,6 @@
 package com.ragagent.embedchannel.service;
 
-import com.ragagent.embedchannel.EmbedTokens;
+import com.ragagent.embedchannel.support.EmbedTokens;
 import java.time.Duration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;

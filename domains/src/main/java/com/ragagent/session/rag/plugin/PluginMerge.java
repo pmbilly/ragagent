@@ -2,10 +2,10 @@ package com.ragagent.session.rag.plugin;
 
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.knowledge.SearchChunkMerge;
 import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.retrieval.RetrievalObsRows;
-import com.ragagent.contract.retrieval.SearchChunkMerge;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.contract.websearch.ImageInfo;

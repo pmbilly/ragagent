@@ -1,4 +1,4 @@
-package com.ragagent.contract.model.chat;
+package com.ragagent.contract.model;
 
 /**
  * 函数定义。JSON 字段序 = 声明序，三者均恒输出——

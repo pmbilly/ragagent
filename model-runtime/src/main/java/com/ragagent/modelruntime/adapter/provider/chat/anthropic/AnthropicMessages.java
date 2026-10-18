@@ -1,10 +1,10 @@
 package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatTool;
-import com.ragagent.contract.model.chat.MessageContentPart;
-import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatOptions;
+import com.ragagent.contract.model.ChatTool;
+import com.ragagent.contract.model.MessageContentPart;
+import com.ragagent.contract.model.ToolCall;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,7 @@
 package com.ragagent.modelruntime.application;
 
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ChatConfig;
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ModelCatalogPort;
@@ -10,7 +11,6 @@ import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.model.VlmConfig;
 import com.ragagent.contract.model.VlmPredictor;
-import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.embedding.EmbedderFactory;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.limiter.Release;

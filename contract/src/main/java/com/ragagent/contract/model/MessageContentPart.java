@@ -1,4 +1,4 @@
-package com.ragagent.contract.model.chat;
+package com.ragagent.contract.model;
 
 /**
  * 多内容消息的一部分。

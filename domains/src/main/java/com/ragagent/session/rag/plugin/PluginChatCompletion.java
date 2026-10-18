@@ -1,8 +1,8 @@
 package com.ragagent.session.rag.plugin;
 
+import com.ragagent.contract.model.ChatOptions;
+import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineCommon;

@@ -6,7 +6,7 @@ import com.ragagent.contract.graph.GraphData;
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.graph.GraphRelation;
 import com.ragagent.contract.graph.NameSpace;
-import com.ragagent.contract.knowledge.EntityExtractionPort;
+import com.ragagent.contract.model.EntityExtractionPort;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.RetrievalObsRows;

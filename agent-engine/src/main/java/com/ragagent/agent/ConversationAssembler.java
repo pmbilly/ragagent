@@ -9,7 +9,7 @@ import com.ragagent.contract.agent.PinnedSkillInstructions;
 import com.ragagent.contract.agent.RecentDocInfo;
 import com.ragagent.contract.agent.SelectedDocumentInfo;
 import com.ragagent.contract.agent.SystemPromptSection;
-import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import java.time.LocalDate;

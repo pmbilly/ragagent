@@ -1,4 +1,4 @@
-package com.ragagent.embedchannel;
+package com.ragagent.embedchannel.support;
 
 /**
  * embed 管理面的服务层错误。

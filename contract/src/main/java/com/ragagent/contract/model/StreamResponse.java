@@ -1,6 +1,5 @@
 package com.ragagent.contract.model;
 
-import com.ragagent.contract.model.chat.ToolCall;
 import com.ragagent.contract.retrieval.SearchResult;
 import java.util.List;
 import java.util.Map;

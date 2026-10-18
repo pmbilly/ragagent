@@ -1,9 +1,9 @@
 package com.ragagent.modelruntime.application;
 
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ChatConfig;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.VlmConfig;
-import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.embedding.EmbedderConfig;
 import com.ragagent.embedding.EmbedderConfigs;
 import com.ragagent.llm.provider.Config;

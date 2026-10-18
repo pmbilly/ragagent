@@ -13,12 +13,12 @@ import com.ragagent.contract.agent.PinnedSkillInfo;
 import com.ragagent.contract.agent.RecentDocInfo;
 import com.ragagent.contract.agent.SelectedDocumentInfo;
 import com.ragagent.contract.event.EventBusInterface;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatResponse;
+import com.ragagent.contract.model.ChatTool;
+import com.ragagent.contract.model.FunctionCall;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.model.chat.ChatTool;
-import com.ragagent.contract.model.chat.FunctionCall;
 import com.ragagent.platform.event.EventJson;
 import java.util.ArrayList;
 import java.util.List;
@@ -262,7 +262,7 @@ class EngineRecordingTest {
             Engine46bStubSupport.EventRecorder sink = new Engine46bStubSupport.EventRecorder()
                     .attach(engine.getBusForTest());
 
-            com.ragagent.contract.model.chat.ToolCall tc = new com.ragagent.contract.model.chat.ToolCall();
+            com.ragagent.contract.model.ToolCall tc = new com.ragagent.contract.model.ToolCall();
             tc.setId(c.id());
             tc.getFunction().setName("knowledge_search");
             tc.getFunction().setArguments(c.args());
@@ -473,7 +473,7 @@ class EngineRecordingTest {
 
     private static ChatMessage assistantWithCall(String id, String toolName, String args) {
         ChatMessage m = new ChatMessage("assistant", "");
-        com.ragagent.contract.model.chat.ToolCall call = new com.ragagent.contract.model.chat.ToolCall();
+        com.ragagent.contract.model.ToolCall call = new com.ragagent.contract.model.ToolCall();
         call.setId(id);
         call.setType("function");
         call.setFunction(new FunctionCall(toolName, args));

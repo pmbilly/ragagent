@@ -1,6 +1,5 @@
-package com.ragagent.contract.model.chat;
+package com.ragagent.contract.model;
 
-import com.ragagent.contract.model.TokenUsage;
 import java.util.List;
 
 /**

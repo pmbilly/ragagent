@@ -3,7 +3,7 @@ package com.ragagent.modelruntime.adapter.provider.chat;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.ToolCall;
 import com.ragagent.modelruntime.adapter.provider.chat.common.SseReader;
 import java.io.IOException;
 import java.io.InputStream;

@@ -2,13 +2,13 @@ package com.ragagent.session.rag;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ChatOptions;
+import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.ChatStream;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ChatOptions;
-import com.ragagent.contract.model.chat.ChatResponse;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.stream.QueuedChatStream;
 import com.ragagent.session.rag.plugin.PluginChatCompletionStream;

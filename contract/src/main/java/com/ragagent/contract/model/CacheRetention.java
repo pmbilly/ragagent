@@ -1,4 +1,4 @@
-package com.ragagent.contract.model.chat;
+package com.ragagent.contract.model;
 
 /**
  * provider prompt 缓存 TTL 控制。

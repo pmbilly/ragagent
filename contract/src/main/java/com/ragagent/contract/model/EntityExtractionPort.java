@@ -1,7 +1,6 @@
-package com.ragagent.contract.knowledge;
+package com.ragagent.contract.model;
 
 import com.ragagent.contract.graph.EntityExtractionResult;
-import com.ragagent.contract.model.LlmChatClient;
 
 /**
  * 实体关系抽取端口（业务域 → 模型运行时）。

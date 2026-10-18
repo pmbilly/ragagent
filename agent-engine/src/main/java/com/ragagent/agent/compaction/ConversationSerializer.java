@@ -1,7 +1,7 @@
 package com.ragagent.agent.compaction;
 
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ToolCall;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
 import java.nio.charset.StandardCharsets;

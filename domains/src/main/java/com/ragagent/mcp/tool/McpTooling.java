@@ -1,8 +1,8 @@
 package com.ragagent.mcp.tool;
 
 import com.ragagent.contract.agent.ToolCallTarget;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ToolCall;
 import com.ragagent.contract.pipeline.McpToolingGateway;
 import com.ragagent.contract.pipeline.ToolRegistryPort;
 import com.ragagent.contract.tool.AgentTool;

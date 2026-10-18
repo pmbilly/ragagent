@@ -1,6 +1,6 @@
 package com.ragagent.session.rag.support;
 
-import com.ragagent.contract.model.chat.ChatMessage;
+import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.tool.ToolResult;

@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ChatConfig;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.chat.ChatConfig;
 import com.ragagent.modelruntime.adapter.provider.chat.RemoteApiChat;
 import com.ragagent.modelruntime.adapter.provider.chat.anthropic.AnthropicChat;
 import com.ragagent.platform.http.LlmTransport;

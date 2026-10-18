@@ -3,7 +3,7 @@ package com.ragagent.retrieval.support;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.contract.retrieval.SearchChunkMerge;
+import com.ragagent.contract.knowledge.SearchChunkMerge;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.contract.retrieval.WebResultConverter;

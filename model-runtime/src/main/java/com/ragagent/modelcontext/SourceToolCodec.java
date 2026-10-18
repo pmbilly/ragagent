@@ -1,8 +1,8 @@
 package com.ragagent.modelcontext;
 
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.MessageContentPart;
-import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.MessageContentPart;
+import com.ragagent.contract.model.ToolCall;
 import com.ragagent.platform.web.ToolJson;
 import java.util.ArrayList;
 import java.util.Comparator;

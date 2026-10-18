@@ -1,8 +1,8 @@
 package com.ragagent.agent.compaction;
 
 import com.ragagent.agent.AgentToolNames;
-import com.ragagent.contract.model.chat.ChatMessage;
-import com.ragagent.contract.model.chat.ToolCall;
+import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.contract.model.ToolCall;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
