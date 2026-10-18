@@ -334,6 +334,8 @@ boot           14 件                      →  boot
 
 | L27 | 2026-10-18 | **identity 族内 4 个 Port 内联**（第二批解耦）：先把嵌套类型提为独立文件（`AdminUserPage` / `CreateUserResult` sealed / `AuthUserErrors` / `AuthUserView` / `ApiKeyAuthRequest` / `ApiKeyAuthResult` sealed），再删 `AdminUserPort` / `ApiKeyAdminPort` / `UserLookupPort` / `ApiKeyAuthPort`；4 个实现去 implements、6 处调用方改直接注入。**`contract` 的 `*Port` 39 → 31**；域间边族内 6 条 / 28 类。教训：删 Port 的真实成本在「接口里内嵌的 View/sealed/常量」，不在方法签名。 | **32 守卫** · **5022 / 0 / 4** · build 1m44s |
 
+| L28 | 2026-10-18 | **知识族内 4 个 Port 内联**（第三批解耦）：划族 `knowledge + wiki`（双向依赖，族内允许）；删 `ChunkPort` / `WikiFinalizePort` / `WikiIngestPort` / `KnowledgeFinalizePort`；提取 `WikiEnqueueResult` / `FinalizeResult`；两处守卫修正——包级 SCC 域名提取兼容 `com.ragagent.X` 与 `contract.X`、R4「已解耦包对回流」认族。**包级 SCC 9 → 7 组**（wiki 内部环被消除）。**`contract` 的 `*Port` 39 → 27**（累计删 12 个）。 | **32 守卫** · **5022 / 0 / 4** · build 1m48s |
+
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
 ## 13. 文档地图与归档
