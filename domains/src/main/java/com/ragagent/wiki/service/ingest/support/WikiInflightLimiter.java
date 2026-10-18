@@ -1,4 +1,4 @@
-package com.ragagent.wiki.service.ingest;
+package com.ragagent.wiki.service.ingest.support;
 
 /**
  * 按 KB 的在途批次上限。

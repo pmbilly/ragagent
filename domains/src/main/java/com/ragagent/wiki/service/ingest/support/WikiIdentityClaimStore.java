@@ -1,4 +1,4 @@
-package com.ragagent.wiki.service.ingest;
+package com.ragagent.wiki.service.ingest.support;
 
 /**
  * 归一化身份（页面类型 + 显示标题）的 slug 预留。

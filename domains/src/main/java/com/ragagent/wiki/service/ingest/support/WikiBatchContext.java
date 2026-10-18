@@ -1,4 +1,4 @@
-package com.ragagent.wiki.service.ingest;
+package com.ragagent.wiki.service.ingest.support;
 
 import com.ragagent.wiki.domain.WikiExtractionGranularity;
 import com.ragagent.wiki.domain.page.WikiPageLite;

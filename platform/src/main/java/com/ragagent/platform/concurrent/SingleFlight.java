@@ -1,4 +1,4 @@
-package com.ragagent.wiki.service.ingest;
+package com.ragagent.platform.concurrent;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
@@ -9,10 +9,8 @@ import java.util.concurrent.Executors;
 /**
  * 合并进程内<b>字节完全相同</b>的并发请求（in-flight 去重）。
  *
- * <p><b>解决什么问题</b>：wiki ingest 的一个 reduce 批次会并发地对同一份
- * {@code WikiPageModifyUserPrompt} 发起多个 LLM 请求（每个页面一个），而它们的
- * 消息体可能逐字节相同（同一页面、同一批新信息被两条路径同时更新）。并发相同的
- * 请求打到 provider 是纯粹的浪费与限流风险，合并成一次即可。</p>
+ * <p><b>解决什么问题</b>：同一批并发请求可能带着逐字节相同的内容（典型场景：多个页面
+ * 共享同一段提示词）。并发相同请求打到 provider 是纯粹的浪费与限流风险，合并成一次即可。</p>
  *
  * <h2>语义要点</h2>
  * <ul>

@@ -1,4 +1,4 @@
-package com.ragagent.wiki.service.ingest;
+package com.ragagent.wiki.service.ingest.support;
 
 import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import java.util.ArrayList;

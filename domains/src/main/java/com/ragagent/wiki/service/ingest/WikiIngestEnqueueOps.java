@@ -4,6 +4,7 @@ import com.ragagent.contract.text.Whitespace;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
 import com.ragagent.wiki.domain.TaskPendingOp;
+import com.ragagent.wiki.service.ingest.support.WikiEnqueueResult;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

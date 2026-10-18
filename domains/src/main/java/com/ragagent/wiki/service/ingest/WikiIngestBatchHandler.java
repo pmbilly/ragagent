@@ -1,6 +1,5 @@
 package com.ragagent.wiki.service.ingest;
 
-
 import com.ragagent.contract.audit.WikiActivityAudit;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
@@ -18,6 +17,8 @@ import com.ragagent.wiki.domain.WikiExtractionGranularity;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.repository.TaskPendingOpsRepository;
 import com.ragagent.wiki.service.WikiModelResolver;
+import com.ragagent.wiki.service.ingest.support.DocIngestResult;
+import com.ragagent.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.time.Duration;
@@ -52,7 +53,7 @@ import tools.jackson.databind.ObjectMapper;
  * <p>Standard 模式下若本批次异常退出（异常、超时、提前返回）而<b>尚未</b>结算它认领的
  * 行（trim + requeueFailedOps），必须释放认领，让下一次触发在几秒内就能重新认领，
  * 而不是干等 {@code CLAIM_STALE_AFTER}（90 分钟）。正常路径上 {@code claimsSettled}
- * 会翻成 true，使释放动作变成 no-op；释放走 {@link WikiCleanupScope} 的脱钩清理。</p>
+ * 会翻成 true，使释放动作变成 no-op；释放走 {@link com.ragagent.wiki.service.ingest.support.WikiCleanupScope} 的脱钩清理。</p>
  *
  * <h2>已知取舍</h2>
  * <ol>

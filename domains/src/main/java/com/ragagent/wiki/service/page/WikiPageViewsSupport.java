@@ -8,7 +8,7 @@ import com.ragagent.wiki.domain.page.WikiPageListRequest;
 import com.ragagent.wiki.domain.page.WikiPageListResponse;
 import com.ragagent.wiki.domain.page.WikiStats;
 import com.ragagent.wiki.repository.WikiPageRepository;
-import com.ragagent.wiki.service.ingest.WikiPendingOpsCounter;
+import com.ragagent.wiki.service.ingest.support.WikiPendingOpsCounter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

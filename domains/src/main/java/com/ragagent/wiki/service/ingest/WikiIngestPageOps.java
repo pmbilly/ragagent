@@ -2,6 +2,8 @@ package com.ragagent.wiki.service.ingest;
 
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.service.ingest.support.DocIngestResult;
+import com.ragagent.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.wiki.service.page.WikiCrossLinker;
 import com.ragagent.wiki.service.page.WikiDeadLinks;
 import com.ragagent.wiki.service.page.WikiTextUtils;

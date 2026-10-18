@@ -11,7 +11,7 @@ package com.ragagent.wiki.service;
  * （跨虚拟线程传递必须显式传值，禁止共享 ThreadLocal）。</p>
  *
  * <p><b>注意执行线程</b>：{@code generateWithTemplate} 里的 LLM 调用跑在
- * {@link com.ragagent.wiki.service.ingest.SingleFlight} 提交出去的虚拟线程上，因此元数据的设置与清除都在
+ * {@link com.ragagent.platform.concurrent.SingleFlight} 提交出去的虚拟线程上，因此元数据的设置与清除都在
  * <b>那个</b>线程内完成（在 {@code execute} 闭包里），而不是在调用方线程。</p>
  */
 public final class WikiLlmCallMetadata {

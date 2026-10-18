@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.contract.wiki.WikiImageMarkup;
+import com.ragagent.wiki.service.ingest.support.WikiIngestPreviews;
 import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.util.ArrayList;
 import java.util.List;

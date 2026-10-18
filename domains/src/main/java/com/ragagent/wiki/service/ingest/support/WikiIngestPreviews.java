@@ -1,4 +1,4 @@
-package com.ragagent.wiki.service.ingest;
+package com.ragagent.wiki.service.ingest.support;
 
 import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.wiki.service.page.NewSlugFromCitation;

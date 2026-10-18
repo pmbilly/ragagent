@@ -1,5 +1,7 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.wiki.service.ingest.support.WikiIdentityClaimStore;
+
 import java.util.Collections;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;

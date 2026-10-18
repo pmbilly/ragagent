@@ -123,7 +123,7 @@ def main() -> int:
         f"无新增 >{enforce_threshold} 的包"
     )
     if stale:
-        print("   可收紧（已降到阈值内）：" + "、".join(stale))
+        print("   可收紧（低于基线或已降到阈值内）：" + "、".join(stale))
         print("   对账后跑 python3 scripts/check-package-size.py --write")
     return 0
 

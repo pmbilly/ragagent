@@ -10,6 +10,8 @@ import com.ragagent.knowledge.api.ChunkPortAdapter;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.domain.WikiExtractionGranularity;
 import com.ragagent.wiki.prompt.WikiPrompts;
+import com.ragagent.wiki.service.ingest.support.CombinedExtraction;
+import com.ragagent.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.wiki.service.page.NewSlugFromCitation;
 import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.util.ArrayList;

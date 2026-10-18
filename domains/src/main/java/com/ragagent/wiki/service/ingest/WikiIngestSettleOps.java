@@ -3,6 +3,7 @@ package com.ragagent.wiki.service.ingest;
 import com.ragagent.wiki.domain.TaskDeadLetter;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import com.ragagent.wiki.service.WikiKnowledgeFinalizer;
+import com.ragagent.wiki.service.ingest.support.WikiCleanupScope;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;

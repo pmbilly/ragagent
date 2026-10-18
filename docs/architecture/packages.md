@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-324 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+326 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -268,8 +268,9 @@
 | `:domains` | `com.ragagent.wiki.prompt` | wiki 的提示词模板目录与渲染支撑。 |
 | `:domains` | `com.ragagent.wiki.repository` | 仓储门面层：把 mapper 的原子操作组合成页面/文件夹级的读写契约，并集中承载软删、 版本冲突与 PG 方言分支。 |
 | `:domains` | `com.ragagent.wiki.service` | wiki 用例层根包：**跨切面端口与 LLM/提示词适配**——分块清洗（ com.ragagent.wiki.service.WikiChunkCleaner + 缺省实现）、图片富化、知识收尾、 |
-| `:domains` | `com.ragagent.wiki.service.ingest` | wiki **摄取（ingest）管线**：批量/单篇入库的门面与协作者 （com.ragagent.wiki.service.ingest.WikiIngestService、 com.ragage |
+| `:domains` | `com.ragagent.wiki.service.ingest` | wiki 摄取管线：批量/单篇入库的门面与协作者 （com.ragagent.wiki.service.ingest.WikiIngestService、 com.ragagent.wiki.serv |
 | `:domains` | `com.ragagent.wiki.service.ingest.graph` | wiki 摄取·链接图面（拆自 wiki.service.ingest，对齐方案 的 service.ingest.graph/）： WikiGraphCalculator——从页面/引用计算链接图（入链、出链、孤儿）。 |
+| `:domains` | `com.ragagent.wiki.service.ingest.support` | wiki 摄取 · 支撑与 SPI：任务/队列/锁/限流/去重的契约、批上下文与无状态工具 （WikiBatchContext、WikiCleanupScope、WikiIngestPreviews 等）。 |
 | `:domains` | `com.ragagent.wiki.service.page` | wiki **页面**面：页面服务（接口门面 + 实现）、文件夹/视图支撑、链接与 lint （com.ragagent.wiki.service.page.WikiLinkify、WikiCross |
 | `:model-runtime` | `com.ragagent.embedding` | 嵌入向量 provider 客户端（库式域，无 HTTP 面）：com.ragagent.embedding.EmbedderFactory 选择器、 EmbeddingHttp/ProviderJson 传输与编码、池化与失败降级。 |
 | `:model-runtime` | `com.ragagent.embedding.provider` | 嵌入 provider 的**具体实现**（各家 HTTP 调用与响应解析）：OpenAI / AzureOpenAI / Gemini / Jina / Nvidia / Ollama / Aliy |
@@ -293,6 +294,7 @@
 | `:model-runtime` | `com.ragagent.rerank.provider` | 重排 provider 的**具体实现**：OpenAI / Jina / Nvidia / Aliyun / Volcengine / Zhipu / Lkeap / 各家 HTTP 调用与响应解析。 |
 | `:platform` | `com.ragagent.platform` | 平台面（platform，阶段 6 起逐步收纳）：框架适配、可靠执行与通用技术能力。 |
 | `:platform` | `com.ragagent.platform.access` | 平台访问上下文面（方案 的 platform.access/）：请求级会话与追踪载体。 |
+| `:platform` | `com.ragagent.platform.concurrent` | 平台并发原语：进程内 in-flight 去重（SingleFlight）等与业务无关的并发工具。 |
 | `:platform` | `com.ragagent.platform.config` | 平台配置面：部署属性与环境查找面。 |
 | `:platform` | `com.ragagent.platform.event` | 平台事件总线面（由 com.ragagent.event 迁入，对齐方案 的 platform.event/）： Event / EventBus / EventJson 等 12 类——进程内事件总线与载荷编解码。 |
 | `:platform` | `com.ragagent.platform.http` | 平台 HTTP 面：SSRF 策略下的安全抓取工具，以及全进程共享的裸 HTTP 传输层 （com.ragagent.platform.http.LlmTransport：连接级 SSRF 校验 + |

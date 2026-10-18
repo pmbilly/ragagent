@@ -11,6 +11,7 @@ import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageLite;
+import com.ragagent.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.wiki.service.page.WikiPageService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

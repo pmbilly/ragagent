@@ -1,6 +1,5 @@
 package com.ragagent.wiki.service.ingest;
 
-
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
@@ -8,6 +7,7 @@ import com.ragagent.platform.access.TenantScopes;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.domain.WikiConfig;
+import com.ragagent.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.wiki.service.page.WikiCrossLinker;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

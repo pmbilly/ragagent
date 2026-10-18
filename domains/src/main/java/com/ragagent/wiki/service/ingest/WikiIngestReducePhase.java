@@ -9,6 +9,7 @@ import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.text.CodePointOrder;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.prompt.WikiPrompts;
+import com.ragagent.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.wiki.service.page.WikiSlugHandles;
 import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.util.ArrayList;

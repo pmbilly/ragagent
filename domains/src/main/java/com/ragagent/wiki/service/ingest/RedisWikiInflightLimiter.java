@@ -1,5 +1,7 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.wiki.service.ingest.support.WikiInflightLimiter;
+
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
