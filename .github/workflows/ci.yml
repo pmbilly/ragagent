@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v7
       # 守卫跑**同一份** scripts/run-guards.sh：本地 `bash scripts/run-guards.sh` 即 CI 同口径。
       # 本地手敲守卫容易漏开关（如 check-json-key-case 的 --strict 默认只报告）⇒ 本地绿而 CI 红。
-      - name: 守卫（单一入口：scripts/run-guards.sh，含 29 条；本地同口径）
+      - name: 守卫（单一入口：scripts/run-guards.sh，含 30 条；本地同口径）
         run: bash scripts/run-guards.sh
   backend:
     name: 后端 build + test + spotless

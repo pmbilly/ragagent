@@ -48,6 +48,7 @@ run '日志异常（log 里禁止 Throwable.toString()/getMessage()）' python3 
 run '已知缺口（类注释声明缺口必须指向 docs/known-gaps.md）' python3 scripts/check-known-gaps.py
 run '日志级别（warn 不用于 404 / 跳过语义）' python3 scripts/check-log-level.py
 run '控制器纯度（HTTP 面只编排：禁直连 Mapper；裸转发 catch 只许减）' python3 scripts/check-controller-purity.py
+run '管线事件表（docs/architecture/pipeline-map.md 必须与插件代码同步）' python3 scripts/gen-pipeline-map.py --check
 run '跨模块同名类（同一简单类名不得出现在多个模块主码）' python3 scripts/check-duplicate-classes.py
 run '迁移代号（主码注释禁止批次号/日期戳；旧夹具名不得回流）' python3 scripts/check-internal-codes.py
 run '迁移叙事棘轮（v0.5.0 L1：注释只讲现在，不写迁移史）' python3 scripts/check-comment-narrative.py

@@ -83,13 +83,44 @@ public final class QaTurnExecutor {
             SseSink sink, CompletableFuture<Void> asyncDone) throws IOException {
         String sessionId = reqCtx.sessionId;
 
-        // 输入条状态（纯 UI memo）异步写：新虚拟线程没有 ThreadLocal——纪律 #1
-        // 要求显式捕获-重放。直接在派生线程 start，租户读到 0、owner 为空，
-        // updateSessionLastRequestState 按 (tenant, owner) 过滤后静默 0 行。
-        final TenantContextSnapshot memoTenant =
-                TenantContextSnapshot.capture();
+        persistLastRequestStateAsync(reqCtx, mode);
+        if (mode == QaMode.AGENT) {
+            rejectIfOtherAgentRunLive(reqCtx);
+        }
+        // agent 模式的 query 帧由 setupSSEStream 内的 writeAgentQueryEvent 直写流；
+        // 不向空 EventBus 发事件（该实例无任何订阅者）。
+
+        boolean createdUser = reqCtx.userMessageID.isEmpty();
+        boolean createdAssistant =
+                reqCtx.assistantMessage == null || reqCtx.assistantMessage.getId().isEmpty();
+        persistTurnOrFail(reqCtx);
+        carryOverSteerEvents(reqCtx, sessionId);
+
+        SseStreamContext streamCtx = setupSseOrRollback(
+                reqCtx, mode, generateTitle, createdUser, createdAssistant);
+        if (mode == QaMode.NORMAL) {
+            registerQuickAnswerHandlers(streamCtx, reqCtx, sessionId);
+        }
+        startAsyncRunner(reqCtx, mode, streamCtx, sessionId, asyncDone);
+
+        if (sink == null) {
+            return;
+        }
+        boolean shouldWaitForTitle = generateTitle && reqCtx.session.getTitle() != null
+                && reqCtx.session.getTitle().isEmpty();
+        sseOrchestrator.handleAgentEventsForSSE(sink, sessionId, reqCtx.assistantMessage.getId(),
+                reqCtx.requestId, streamCtx, shouldWaitForTitle, reqCtx.resourceRewriter);
+    }
+
+    /**
+     * 输入条状态（纯 UI memo）异步写。
+     *
+     * <p>派生线程没有 ThreadLocal：不显式捕获-重放，租户会读到 0、owner 为空，
+     * {@code updateSessionLastRequestState} 按 (tenant, owner) 过滤后静默 0 行。</p>
+     */
+    private void persistLastRequestStateAsync(QaRequestContext reqCtx, QaMode mode) {
+        final TenantContextSnapshot memoTenant = TenantContextSnapshot.capture();
         Thread.ofVirtual().start(() -> TenantScope.run(memoTenant, () -> {
-            // 派生线程同样按会话属主租户查
             SessionLookupScope.mark();
             try {
                 turnFinalizer.persistLastRequestState(reqCtx, mode);
@@ -97,37 +128,37 @@ public final class QaTurnExecutor {
                 SessionLookupScope.clear();
             }
         }));
+    }
 
-        if (mode == QaMode.AGENT) {
-            try {
-                rejectIfOtherAgentRunLive(reqCtx);
-            } catch (BizException e) {
-                throw e;
-            }
-        }
-
-        // agent 模式的 query 帧由 setupSSEStream 内的 writeAgentQueryEvent 直写流。
-        // 这里不再向空 EventBus 发事件：该实例无任何订阅者，纯 no-op。
-
-        boolean createdUser = reqCtx.userMessageID.isEmpty();
-        boolean createdAssistant = reqCtx.assistantMessage == null || reqCtx.assistantMessage.getId().isEmpty();
-
+    /** 消息落库；此刻流尚未建立，失败可直接走 HTTP 500。 */
+    private void persistTurnOrFail(QaRequestContext reqCtx) {
         try {
             persistTurnMessages(reqCtx);
         } catch (RuntimeException e) {
             throw BizException.internal(e.getMessage());
         }
+    }
 
-        // steer carry-over：本 run 公布为 live 之前接上
-        if (reqCtx.steerCarryOver != null && !reqCtx.steerCarryOver.isEmpty() && reqCtx.assistantMessage != null) {
+    /** steer carry-over：本 run 公布为 live 之前接上。 */
+    private void carryOverSteerEvents(QaRequestContext reqCtx, String sessionId) {
+        if (reqCtx.steerCarryOver != null && !reqCtx.steerCarryOver.isEmpty()
+                && reqCtx.assistantMessage != null) {
             try {
-                streamManager.appendSteerEvents(sessionId, reqCtx.assistantMessage.getId(), reqCtx.steerCarryOver);
+                streamManager.appendSteerEvents(
+                        sessionId, reqCtx.assistantMessage.getId(), reqCtx.steerCarryOver);
             } catch (RuntimeException e) {
                 log.warn("steer carry-over append failed for session {}", sessionId, e);
             }
         }
+    }
 
-        // SSE 装配
+    /**
+     * 建流并公布 live。
+     *
+     * <p>失败时先回滚已落库的消息，再抛：409 = 本会话已有另一轮在跑；503 = 公布失败。</p>
+     */
+    private SseStreamContext setupSseOrRollback(QaRequestContext reqCtx, QaMode mode,
+            boolean generateTitle, boolean createdUser, boolean createdAssistant) {
         SseStreamContext streamCtx = sseOrchestrator.setupSSEStream(reqCtx, generateTitle, mode);
         if (streamCtx.liveRunFailed) {
             rollbackTurnMessages(reqCtx, createdUser, createdAssistant);
@@ -136,53 +167,62 @@ public final class QaTurnExecutor {
             }
             throw BizException.serviceUnavailable("Failed to publish running turn");
         }
+        return streamCtx;
+    }
 
-        // 快答路径：timeline 记录器 + reasoning 累积 + 完成事件
-        if (mode == QaMode.NORMAL) {
-            sseOrchestrator.registerQuickAnswerTimelineRecorder(streamCtx.eventBus, streamCtx.assistantMessage);
-            streamCtx.eventBus.on(EventType.EVENT_AGENT_THOUGHT, evt -> {
-                if (evt.getData() instanceof AgentThoughtData data && !data.getContent().isEmpty()) {
-                    QaTurnSupport.appendQuickAnswerReasoning(streamCtx.assistantMessage, data.getContent());
+    /** 快答路径：timeline 记录器 + reasoning 累积 + 完成事件。 */
+    private void registerQuickAnswerHandlers(
+            SseStreamContext streamCtx, QaRequestContext reqCtx, String sessionId) {
+        sseOrchestrator.registerQuickAnswerTimelineRecorder(streamCtx.eventBus, streamCtx.assistantMessage);
+        streamCtx.eventBus.on(EventType.EVENT_AGENT_THOUGHT, evt -> {
+            if (evt.getData() instanceof AgentThoughtData data && !data.getContent().isEmpty()) {
+                QaTurnSupport.appendQuickAnswerReasoning(streamCtx.assistantMessage, data.getContent());
+            }
+        });
+        final boolean[] completionHandled = {false};
+        // 事件在桥接虚拟线程触发，TenantContext 是 ThreadLocal——注册时捕获
+        // session 租户，触发时 replay（与 stop 处理器同款纪律 #1）。
+        final long normalSessionTenantId = reqCtx.session.getTenantId();
+        streamCtx.eventBus.on(EventType.EVENT_AGENT_FINAL_ANSWER, evt -> {
+            if (!(evt.getData() instanceof AgentFinalAnswerData data)) {
+                return;
+            }
+            Message am = streamCtx.assistantMessage;
+            synchronized (am) {
+                am.setContent(am.getContent() + QaSupport.orEmpty(data.getContent()));
+                if (data.isFallback()) {
+                    am.setFallback(true);
                 }
-            });
-            final boolean[] completionHandled = {false};
-            // 事件在桥接虚拟线程触发，TenantContext 是 ThreadLocal——注册时捕获
-            // session 租户，触发时 replay（与 stop 处理器同款纪律 #1）。
-            final long normalSessionTenantId = reqCtx.session.getTenantId();
-            streamCtx.eventBus.on(EventType.EVENT_AGENT_FINAL_ANSWER, evt -> {
-                if (!(evt.getData() instanceof AgentFinalAnswerData data)) {
-                    return;
-                }
-                Message am = streamCtx.assistantMessage;
-                synchronized (am) {
-                    am.setContent(am.getContent() + QaSupport.orEmpty(data.getContent()));
-                    if (data.isFallback()) {
-                        am.setFallback(true);
+                if (data.isDone()) {
+                    if (completionHandled[0]) {
+                        return;
                     }
-                    if (data.isDone()) {
-                        if (completionHandled[0]) {
-                            return;
-                        }
-                        completionHandled[0] = true;
-                        log.info("Knowledge QA service completed for session: {}", sessionId);
-                        turnFinalizer.runWithTenant(normalSessionTenantId, () -> {
-                            turnFinalizer.completeAssistantMessage(streamCtx.assistantMessage, reqCtx.query,
-                                    reqCtx.userMessageID, normalSessionTenantId);
-                            Event done = new Event();
-                            done.setType(EventType.EVENT_AGENT_COMPLETE);
-                            done.setSessionId(sessionId);
-                            AgentCompleteData cd = new AgentCompleteData();
-                            cd.setFinalAnswer(am.getContent());
-                            done.setData(cd);
-                            streamCtx.eventBus.emit(done);
-                        });
-                    }
+                    completionHandled[0] = true;
+                    log.info("Knowledge QA service completed for session: {}", sessionId);
+                    turnFinalizer.runWithTenant(normalSessionTenantId, () -> {
+                        turnFinalizer.completeAssistantMessage(streamCtx.assistantMessage, reqCtx.query,
+                                reqCtx.userMessageID, normalSessionTenantId);
+                        Event done = new Event();
+                        done.setType(EventType.EVENT_AGENT_COMPLETE);
+                        done.setSessionId(sessionId);
+                        AgentCompleteData cd = new AgentCompleteData();
+                        cd.setFinalAnswer(am.getContent());
+                        done.setData(cd);
+                        streamCtx.eventBus.emit(done);
+                    });
                 }
-            });
-        }
+            }
+        });
+    }
 
-        // 异步执行（虚拟线程）。
-        // 纪律 #1：TenantContext 是 ThreadLocal，跨虚拟线程必须显式 capture/replay。
+    /**
+     * 异步执行段：租户快照 → 引擎调用 → 错误事件 → 收尾。
+     *
+     * <p>纪律 #1：TenantContext 是 ThreadLocal，跨虚拟线程必须显式 capture/replay。
+     * 共享 agent 以源租户为执行租户（模型/KB/MCP 解析范围；身份不变）。</p>
+     */
+    private void startAsyncRunner(QaRequestContext reqCtx, QaMode mode, SseStreamContext streamCtx,
+            String sessionId, CompletableFuture<Void> asyncDone) {
         // 共享 agent → 异步段以源租户为
         // 执行租户（模型/KB/MCP 解析范围；身份不变）；租户不存在则不切换。
         final TenantContextSnapshot requestTenant =
@@ -269,16 +309,6 @@ public final class QaTurnExecutor {
                 }
             }
         }));
-
-        // 主线程阻塞推 SSE（skipSSE 的 follow-up 无 HTTP 响应体：不推流，
-        // 由 executeQaInternal 的 asyncDone.join() 等异步段收尾）
-        if (sink == null) {
-            return;
-        }
-        boolean shouldWaitForTitle = generateTitle && reqCtx.session.getTitle() != null
-                && reqCtx.session.getTitle().isEmpty();
-        sseOrchestrator.handleAgentEventsForSSE(sink, sessionId, reqCtx.assistantMessage.getId(), reqCtx.requestId,
-                streamCtx, shouldWaitForTitle, reqCtx.resourceRewriter);
     }
     private void runFollowUp(QaRequestContext followUp) {
         // follow-up 是 skipSSE 的服务端自启轮（新虚拟线程执行）
