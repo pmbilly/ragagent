@@ -74,11 +74,12 @@
 
 ## 架构
 
-七个 Gradle 模块，**依赖单向、边界在编译期强制**：越界依赖无法编译，模块之间只认契约。
+八个 Gradle 模块，**依赖单向、边界在编译期强制**：越界依赖无法编译，模块之间只认契约。
 
 ```
 :boot              ──►  全部模块（组合根）
 :domains           ──►  :platform  :contract  :model-runtime（模型上下文词汇）
+:knowledge         ──►  :platform  :contract（对 domains 主码 0 出边）
 :agent-engine      ──►  :platform  :contract  :model-runtime（模型上下文词汇）
 :retrieval-engine  ──►  :platform  :contract
 :model-runtime     ──►  :platform  :contract
@@ -93,8 +94,11 @@
 | `:model-runtime` | **模型运行时**：27 家 LLM provider 的传输与出站请求体拼装、Embedding / 重排客户端族、模型上下文协议（工具调用与思考块解析）、抽取、Ollama 本地模型管理 | platform · contract |
 | `:retrieval-engine` | **检索引擎**：九种向量/检索后端的适配与注册、混合检索融合、重排管线、索引写入与向量店连通性探测 | platform · contract |
 | `:agent-engine` | **Agent 引擎**：ReAct 执行循环与阶段（think/act/observe/finalize）、工具注册表与工具框架、技能目录与装载、上下文压缩、预算与转向 | platform · contract · model-runtime |
-| `:domains` | **业务域**：22 个业务包（知识库、会话、Wiki、Agent 管理、MCP、IM、数据源、认证、租户、审计、审批、评测、记忆、收藏、系统设置……），含 51 个 HTTP 控制器与持久层 | platform · contract · model-runtime |
+| `:knowledge` | **知识库域**：文档摄取管线（解析 → 分块 → 向量化 → 富化）、FAQ、chunk 与标签、解析引擎适配；含 8 个控制器与持久层 | platform · contract |
+| `:domains` | **其余业务域**：21 个业务包（会话、Wiki、Agent 管理、MCP、IM、数据源、认证、租户、审计、审批、评测、记忆、收藏、系统设置……），含 43 个控制器与持久层 | platform · contract · model-runtime |
 | `:boot` | **组合根**：应用入口、全局装配与跨模块 Bean 装配、扫描与打包。只出不进（无任何模块依赖它） | 全部 |
+
+全部模块合计 **51 个 HTTP 控制器**。
 
 **三条设计原则**
 
@@ -234,7 +238,8 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 ├── model-runtime/       # :model-runtime  模型运行时
 ├── retrieval-engine/    # :retrieval-engine  检索引擎
 ├── agent-engine/        # :agent-engine  Agent 引擎
-├── domains/             # :domains   业务域（22 包）
+├── knowledge/           # :knowledge 知识库域（241 文件）
+├── domains/             # :domains   其余业务域（21 包）
 ├── boot/                # :boot      组合根与应用入口
 ├── frontend/            # Vue 3 + Vite 控制台
 ├── docreader/           # 文档解析 gRPC proto

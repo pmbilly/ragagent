@@ -3,7 +3,7 @@
 
 口径
 ====
-业务域 = `domains/src/main/java/com/ragagent/<域>/**`，域名取自方案 §8.9 的域清单（本文件 DOMAINS）。
+业务域 = `domains/src/main/java/com/ragagent/<域>/**`（`knowledge` 已独立成 Gradle 模块，不在本守卫范围）。
 跨域调用只许经 **`contract.*`（端口 / 载荷）** 或**装配层**（`config` / `platform` / `common`）——
 即：业务域 A 不得 `import com.ragagent.<业务域B>.*`（A≠B）。
 
@@ -56,7 +56,7 @@ BASELINE = os.path.join(ROOT, 'scripts/domain-contracts.baseline.json')
 # （跨模块边由模块图治理，见 §8.1；R10 只管 domains 内部各域之间）。
 DOMAINS = [
     'agentmanagement', 'agenttools', 'approval', 'audit', 'auth', 'datasource',
-    'embedchannel', 'evaluation', 'favorite', 'im', 'initialization', 'knowledge', 'mcp',
+    'embedchannel', 'evaluation', 'favorite', 'im', 'initialization', 'mcp',
     'memory', 'model', 'session', 'storage', 'system', 'tenant', 'vectorstore',
     'websearch', 'wiki',
 ]

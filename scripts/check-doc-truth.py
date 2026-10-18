@@ -24,7 +24,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-MODULES = ["contract", "platform", "model-runtime", "retrieval-engine", "agent-engine", "domains", "boot"]
+MODULES = ["contract", "platform", "model-runtime", "retrieval-engine", "agent-engine", "knowledge", "domains", "boot"]
 
 
 def module_count() -> int:
@@ -33,7 +33,10 @@ def module_count() -> int:
 
 
 def controller_count() -> int:
-    return sum(1 for _ in (ROOT / "domains" / "src" / "main" / "java").rglob("*Controller.java"))
+    # 只数业务控制器：/health 是基础设施探针，不在 README 的业务计数里
+    return sum(1 for m in MODULES
+               for f in (ROOT / m / "src" / "main" / "java").rglob("*Controller.java")
+               if f.name != "HealthController.java")
 
 
 def missing_package_info() -> list[str]:
@@ -54,12 +57,12 @@ def main() -> int:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     problems = []
 
-    if "七个 Gradle 模块" in readme:
+    if "八个 Gradle 模块" in readme:
         actual = module_count()
-        if actual != 7:
-            problems.append(f"D1 README 称七个模块，settings.gradle.kts 实际 {actual}")
+        if actual != 8:
+            problems.append(f"D1 README 称八个模块，settings.gradle.kts 实际 {actual}")
     else:
-        problems.append("D1 README 缺少「七个 Gradle 模块」锚点——模块数变化时请同步守卫")
+        problems.append("D1 README 缺少「八个 Gradle 模块」锚点——模块数变化时请同步守卫")
 
     m = re.search(r"(\d+)\s*个 HTTP 控制器", readme)
     if m:

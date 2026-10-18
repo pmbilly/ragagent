@@ -30,7 +30,7 @@ import os
 import sys
 import xml.etree.ElementTree as ET
 
-MODULES = ("domains", "platform", "model-runtime", "retrieval-engine", "agent-engine", "boot", "contract")
+MODULES = ("domains", "knowledge", "platform", "model-runtime", "retrieval-engine", "agent-engine", "boot", "contract")
 IN_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 MAX_ANNOTATE = 20
 

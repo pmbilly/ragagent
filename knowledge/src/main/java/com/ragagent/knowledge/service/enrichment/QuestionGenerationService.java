@@ -29,7 +29,7 @@ import tools.jackson.databind.JsonNode;
  * 本仓此前只有手动路径（{@code POST /chunks/by-id/{id}/questions/regenerate}），
  * 自动路径在 {@code KnowledgeService} 里为"未翻" ⇒ 刚导入的 KB 推荐问题恒为空。</p>
  * {@code generateAndStoreQuestionsForWorker}）→ 终态递减 finalizing 槽
- * （{@code finalizeSubtaskDetached} 的等价物 {@link com.ragagent.wiki.service.DefaultWikiKnowledgeFinalizer#finalizeSubtask}）。</p>
+ * （{@code finalizeSubtaskDetached} 的等价物 wiki 域的 subtask 收尾）。</p>
  */
 @Service
 public class QuestionGenerationService implements QuestionGenerationConsumer {
