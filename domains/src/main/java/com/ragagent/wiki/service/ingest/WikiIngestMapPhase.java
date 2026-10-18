@@ -71,107 +71,28 @@ final class WikiIngestMapPhase {
             return new WikiIngestBatchHandler.MapResult(null, null);
         }
 
-        List<ChunkView> chunks;
-        try {
-            chunks = handler.listTextChunksByKnowledgeID(payload.tenantId(), knowledgeID);
-        } catch (Exception e) {
-            handler.spans.failSpan(wikiSpan, "LIST_CHUNKS_FAILED", e.getMessage(), e);
-            throw new IllegalStateException("get chunks: " + e.getMessage(), e);
-        }
-        if (chunks.isEmpty()) {
-            log.info("wiki ingest: document {} has no chunks, skip", knowledgeID);
-            handler.spans.skipSpan(wikiSpan, "no_chunks");
+        DocumentContent doc = loadDocumentContent(payload, knowledgeID, wikiSpan);
+        if (doc == null) {
             return new WikiIngestBatchHandler.MapResult(null, null);
         }
-
-        String content = handler.ingestService.reconstructEnrichedContent(chunks, payload.tenantId());
-        int rawRuneCount = content.codePointCount(0, content.length());
-        if (rawRuneCount > WikiIngestConstants.MAX_CONTENT_FOR_WIKI) {
-            content = content.substring(0,
-                    content.offsetByCodePoints(0, WikiIngestConstants.MAX_CONTENT_FOR_WIKI));
-        }
-        log.info("wiki ingest: doc {} chunks={} content_len(raw={},truncated={})",
-                knowledgeID, chunks.size(), rawRuneCount, content.codePointCount(0, content.length()));
-
-        // 文档没有真实文本时拒绝跑 LLM 抽取——例如扫描版 PDF 的页面被转成图片、但 VLM OCR
-        // 什么都没产出。没有这道守卫，LLM 只剩图片标记，会兴高采烈地编造实体与概念。
-        if (!WikiImageMarkup.hasSufficientTextContent(content)) {
-            log.warn("wiki ingest: doc {} has insufficient text content after stripping image markup "
-                    + "(raw_len={}), skipping LLM extraction", knowledgeID, rawRuneCount);
-            handler.spans.skipSpan(wikiSpan, "insufficient_text_content");
-            return new WikiIngestBatchHandler.MapResult(null, null);
-        }
-
-        String docTitle = resolveDocTitle(knowledgeID, chunks);
+        List<ChunkView> chunks = doc.chunks();
+        String content = doc.content();
+        String docTitle = doc.docTitle();
 
         // 引用来源引用。<b>刻意</b>只用 knowledge ID（不用 docTitle，后者通常是上传文件名），
         // 这样文件名不会泄漏进下游 LLM prompt 可能读到的引用字符串里。
         String sourceRef = knowledgeID;
         Set<String> oldPageSlugs = handler.ingestService.getExistingPageSlugsForKnowledge(kbId, knowledgeID);
 
-        // Pass 0：轻量候选 slug 抽取（只有骨架）。失败时回落到单次抽取器（fallback），让文档仍能
-        // 被摄取，只是没有 chunk 级引用。
-        List<ExtractedItem> extractedEntities;
-        List<ExtractedItem> extractedConcepts;
-        Map<String, ExtractedItem> slugItems;
-        boolean pass0Failed = false;
-        log.info("wiki ingest: pass 0 — extracting candidate slugs for {}", knowledgeID);
-        Map<String, Object> extractInput = new LinkedHashMap<>();
-        extractInput.put("content_chars", content.codePointCount(0, content.length()));
-        extractInput.put("old_pages", oldPageSlugs == null ? 0 : oldPageSlugs.size());
-        KnowledgeSpanPort.SpanHandle extractSpan = handler.spans.beginSubSpan(wikiSpan,
-                "postprocess.wiki.extract", extractInput);
-        try {
-            WikiIngestCitePipeline.CandidateSlugs candidates = handler.citePipeline.extractCandidateSlugs(
-                    chatModel, kbId, content, lang, oldPageSlugs, batchCtx);
-            extractedEntities = candidates.entities();
-            extractedConcepts = candidates.concepts();
-            slugItems = candidates.slugItems();
-        } catch (RuntimeException e) {
-            log.warn("wiki ingest: pass 0 failed for {} () — falling back to legacy extractor", knowledgeID, e);
-            pass0Failed = true;
-            try {
-                WikiIngestCitePipeline.CandidateSlugs fallback =
-                        handler.citePipeline.extractEntitiesAndConceptsNoUpsert(
-                                chatModel, kbId, content, lang, oldPageSlugs, batchCtx);
-                extractedEntities = fallback.entities();
-                extractedConcepts = fallback.concepts();
-                slugItems = fallback.slugItems();
-            } catch (RuntimeException e2) {
-                log.warn("wiki ingest: legacy fallback also failed for {}", knowledgeID, e2);
-                handler.spans.failSpan(extractSpan, "EXTRACT_FAILED", e2.getMessage(), e2);
-                handler.spans.failSpan(wikiSpan, "EXTRACT_FAILED", e2.getMessage(), e2);
-                throw e2;
-            }
-        }
-        Map<String, Object> extractOut = new LinkedHashMap<>();
-        extractOut.put("entities", extractedEntities.size());
-        extractOut.put("concepts", extractedConcepts.size());
-        extractOut.put("pass0_fallback", pass0Failed);
-        extractOut.put("entities_preview", WikiIngestPreviews.previewExtractedItems(extractedEntities, 8));
-        extractOut.put("concepts_preview", WikiIngestPreviews.previewExtractedItems(extractedConcepts, 8));
-        handler.spans.endSpan(extractSpan, extractOut);
-
-        // 为 Summary 的 wiki-link 输入构造 slug 列表。
+        Extraction extraction = extractCandidatesWithFallback(
+                chatModel, kbId, content, lang, oldPageSlugs, batchCtx, wikiSpan, knowledgeID);
+        List<ExtractedItem> extractedEntities = extraction.entities();
+        List<ExtractedItem> extractedConcepts = extraction.concepts();
+        Map<String, ExtractedItem> slugItems = extraction.slugItems();
+        boolean pass0Failed = extraction.pass0Failed();
         List<String> summaryExtractedPages = new ArrayList<>(slugItems.keySet());
-        // Wiki 摘要 slug 由 knowledge ID 派生，而<b>不是</b> docTitle（通常是上传文件名）。
-        // 像 "summary/mx5280-pdf" 这样的文件名式 slug 会在下游 LLM prompt 读取的交叉链接
-        // 语境里暴露文件名；UUID 式 slug 更丑，但对幻觉安全。
-        String summarySlug = "summary/" + WikiTextUtils.slugify(knowledgeID);
-        StringBuilder slugListing = new StringBuilder();
-        for (String slug : summaryExtractedPages) {
-            ExtractedItem item = slugItems.get(slug);
-            if (item != null) {
-                String aliases = "";
-                if (!item.getAliases().isEmpty()) {
-                    aliases = " (Aliases: " + String.join(", ", item.getAliases()) + ")";
-                }
-                slugListing.append("- [[").append(slug).append("]] = ")
-                        .append(item.getName()).append(aliases).append('\n');
-            } else {
-                slugListing.append("- [[").append(slug).append("]]\n");
-            }
-        }
+        SlugListing slug = buildSlugListing(slugItems, knowledgeID);
+        String summarySlug = slug.summarySlug();
 
         // 摘要与分块分类在 Pass 0 输出给定的前提下互相独立——并行跑。
         // 摘要负责 wiki-link 注入；分类给每个候选 slug 挂上具体的 chunk ID。
@@ -201,7 +122,7 @@ final class WikiIngestMapPhase {
         final String contentFinal = content;
         final List<ExtractedItem> entitiesFinal = extractedEntities;
         final List<ExtractedItem> conceptsFinal = extractedConcepts;
-        final String slugListingFinal = slugListing.toString();
+        final String slugListingFinal = slug.listing();
         final String summarySlugFinal = summarySlug;
         List<Runnable> parallel = new ArrayList<>(2);
         parallel.add(() -> {
@@ -452,6 +373,139 @@ final class WikiIngestMapPhase {
         result.setMapStats(mapStats);
         result.setWikiSpan(wikiSpan);
         return new WikiIngestBatchHandler.MapResult(result, updates);
+    }
+
+    /** 单篇文档的内容载荷；三处终态跳过统一以 {@code null} 表达。 */
+    record DocumentContent(List<ChunkView> chunks, String content, String docTitle) {
+    }
+
+    /** Pass 0 抽取结果；{@code pass0Failed=true} 表示走的是单次抽取回落路径。 */
+    record Extraction(List<ExtractedItem> entities, List<ExtractedItem> concepts,
+                      Map<String, ExtractedItem> slugItems, boolean pass0Failed) {
+    }
+
+    /** Summary 的 wiki-link 输入：摘要页 slug + 逐行 slug 清单。 */
+    record SlugListing(String summarySlug, String listing) {
+    }
+
+    /**
+     * Pass 0 候选 slug 抽取 + 单次抽取回落。
+     *
+     * <p>回落路径是<b>有意的降级</b>：Pass 0 失败时文档仍要能被摄取，只是没有 chunk 级引用。
+     * 两条路径都失败才上抛（可重试）。</p>
+     */
+    Extraction extractCandidatesWithFallback(LlmChatClient chatModel, String kbId, String content,
+            String lang, Set<String> oldPageSlugs, WikiBatchContext batchCtx,
+            KnowledgeSpanPort.SpanHandle wikiSpan, String knowledgeID) {
+        log.info("wiki ingest: pass 0 — extracting candidate slugs for {}", knowledgeID);
+        Map<String, Object> extractInput = new LinkedHashMap<>();
+        extractInput.put("content_chars", content.codePointCount(0, content.length()));
+        extractInput.put("old_pages", oldPageSlugs == null ? 0 : oldPageSlugs.size());
+        KnowledgeSpanPort.SpanHandle extractSpan = handler.spans.beginSubSpan(wikiSpan,
+                "postprocess.wiki.extract", extractInput);
+
+        List<ExtractedItem> entities;
+        List<ExtractedItem> concepts;
+        Map<String, ExtractedItem> slugItems;
+        boolean pass0Failed = false;
+        try {
+            WikiIngestCitePipeline.CandidateSlugs candidates = handler.citePipeline.extractCandidateSlugs(
+                    chatModel, kbId, content, lang, oldPageSlugs, batchCtx);
+            entities = candidates.entities();
+            concepts = candidates.concepts();
+            slugItems = candidates.slugItems();
+        } catch (RuntimeException e) {
+            log.warn("wiki ingest: pass 0 failed for {} () — falling back to single-pass extractor",
+                    knowledgeID, e);
+            pass0Failed = true;
+            try {
+                WikiIngestCitePipeline.CandidateSlugs fallback =
+                        handler.citePipeline.extractEntitiesAndConceptsNoUpsert(
+                                chatModel, kbId, content, lang, oldPageSlugs, batchCtx);
+                entities = fallback.entities();
+                concepts = fallback.concepts();
+                slugItems = fallback.slugItems();
+            } catch (RuntimeException e2) {
+                log.warn("wiki ingest: single-pass fallback also failed for {}", knowledgeID, e2);
+                handler.spans.failSpan(extractSpan, "EXTRACT_FAILED", e2.getMessage(), e2);
+                handler.spans.failSpan(wikiSpan, "EXTRACT_FAILED", e2.getMessage(), e2);
+                throw e2;
+            }
+        }
+
+        Map<String, Object> extractOut = new LinkedHashMap<>();
+        extractOut.put("entities", entities.size());
+        extractOut.put("concepts", concepts.size());
+        extractOut.put("pass0_fallback", pass0Failed);
+        extractOut.put("entities_preview", WikiIngestPreviews.previewExtractedItems(entities, 8));
+        extractOut.put("concepts_preview", WikiIngestPreviews.previewExtractedItems(concepts, 8));
+        handler.spans.endSpan(extractSpan, extractOut);
+        return new Extraction(entities, concepts, slugItems, pass0Failed);
+    }
+
+    /**
+     * 构造 Summary 的 wiki-link 输入。
+     *
+     * <p>摘要 slug 由 knowledge ID 派生，而非 {@code docTitle}（通常是上传文件名）——
+     * 文件名式 slug 会在下游 LLM prompt 的交叉链接语境里暴露文件名。</p>
+     */
+    SlugListing buildSlugListing(Map<String, ExtractedItem> slugItems, String knowledgeID) {
+        StringBuilder listing = new StringBuilder();
+        for (Map.Entry<String, ExtractedItem> entry : slugItems.entrySet()) {
+            String slug = entry.getKey();
+            ExtractedItem item = entry.getValue();
+            listing.append("- [[").append(slug).append("]]");
+            if (item != null) {
+                listing.append(" = ").append(item.getName());
+                if (!item.getAliases().isEmpty()) {
+                    listing.append(" (Aliases: ").append(String.join(", ", item.getAliases())).append(")");
+                }
+            }
+            listing.append('\n');
+        }
+        return new SlugListing("summary/" + WikiTextUtils.slugify(knowledgeID), listing.toString());
+    }
+
+    /**
+     * 加载本篇文档的正文：chunk 列表 → 富文本重建 → 截断 → 文本充分性守卫。
+     *
+     * <p><b>三处返回 {@code null} 的终态</b>（不可重试，调用方直接跳过）：知识已删 /
+     * 无 chunk / 去图片标记后文本不足。每处都先 {@code skipSpan} 留 trace 证据。</p>
+     */
+    DocumentContent loadDocumentContent(WikiIngestPayload payload, String knowledgeID,
+            KnowledgeSpanPort.SpanHandle wikiSpan) {
+        List<ChunkView> chunks;
+        try {
+            chunks = handler.listTextChunksByKnowledgeID(payload.tenantId(), knowledgeID);
+        } catch (Exception e) {
+            handler.spans.failSpan(wikiSpan, "LIST_CHUNKS_FAILED", e.getMessage(), e);
+            throw new IllegalStateException("get chunks: " + e.getMessage(), e);
+        }
+        if (chunks.isEmpty()) {
+            log.info("wiki ingest: document {} has no chunks, skip", knowledgeID);
+            handler.spans.skipSpan(wikiSpan, "no_chunks");
+            return null;
+        }
+
+        String content = handler.ingestService.reconstructEnrichedContent(chunks, payload.tenantId());
+        int rawRuneCount = content.codePointCount(0, content.length());
+        if (rawRuneCount > WikiIngestConstants.MAX_CONTENT_FOR_WIKI) {
+            content = content.substring(0,
+                    content.offsetByCodePoints(0, WikiIngestConstants.MAX_CONTENT_FOR_WIKI));
+        }
+        log.info("wiki ingest: doc {} chunks={} content_len(raw={},truncated={})",
+                knowledgeID, chunks.size(), rawRuneCount, content.codePointCount(0, content.length()));
+
+        // 没有真实文本时拒绝跑 LLM 抽取——扫描版 PDF 的页面被转成图片、VLM OCR 又没产出，
+        // 只剩图片标记时 LLM 会编造实体与概念。
+        if (!WikiImageMarkup.hasSufficientTextContent(content)) {
+            log.warn("wiki ingest: doc {} has insufficient text content after stripping image markup "
+                    + "(raw_len={}), skipping LLM extraction", knowledgeID, rawRuneCount);
+            handler.spans.skipSpan(wikiSpan, "insufficient_text_content");
+            return null;
+        }
+
+        return new DocumentContent(chunks, content, resolveDocTitle(knowledgeID, chunks));
     }
 
     /**
