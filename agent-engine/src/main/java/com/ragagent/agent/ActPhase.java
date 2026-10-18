@@ -272,6 +272,80 @@ final class ActPhase {
                 () -> runToolCallInner(tc, i, iteration, round, sessionId, assistantMessageID));
     }
 
+    /** 参数解析结果：{@code Ok} 可执行；{@code Failed} 已是可直接返回的失败调用。 */
+    sealed interface ArgumentsOutcome {
+
+        record Ok(Map<String, Object> args) implements ArgumentsOutcome {
+        }
+
+        record Failed(AgentToolCall call) implements ArgumentsOutcome {
+        }
+    }
+
+    /** 构造「参数不可用」的失败调用（三处失败分支共用同一形状）。 */
+    private static AgentToolCall failedCall(ToolCall tc, String rawJson, String errorMessage) {
+        AgentToolCall c = new AgentToolCall();
+        c.setId(tc.getId());
+        c.setName(tc.getFunction().getName());
+        Map<String, Object> rawArgs = new LinkedHashMap<>();
+        rawArgs.put("_raw", rawJson);
+        c.setArgs(rawArgs);
+        c.setProviderMetadata(tc.getProviderMetadata());
+        ToolResult r = new ToolResult();
+        r.setSuccess(false);
+        r.setError(errorMessage);
+        c.setResult(r);
+        return c;
+    }
+
+    /**
+     * 解析工具参数；坏 JSON 走修复，修复后仍不可用或**被截断**则返回失败调用。
+     *
+     * <p>截断必须拒绝：补齐未终止的字符串/括号能让 payload 解析，但值是 provider 挤出的
+     * 残缺值——执行会写半个文件或搜半个查询还报成功。这是无 finish reason 断流的保险带。</p>
+     */
+    private ArgumentsOutcome parseArguments(ToolCall tc, String argsStr, String toolTag) {
+        try {
+            return new ArgumentsOutcome.Ok(parseArgsMap(argsStr));
+        } catch (Exception firstError) {
+            JsonRepair.RepairResult repaired = JsonRepair.repairJsonDetail(argsStr);
+            try {
+                parseArgsMap(repaired.repaired());
+            } catch (Exception ignored) {
+                log.error("{} Failed to parse arguments (repair failed)", toolTag, firstError);
+                return new ArgumentsOutcome.Failed(failedCall(tc, argsStr,
+                        "Failed to parse tool arguments: " + firstError.getMessage()
+                                + "\n\nIf the JSON looks cut off, the previous round likely hit the output "
+                                + "token cap. Retry with complete JSON (required fields first) and a smaller "
+                                + "payload.\n\n[Analyze the error above and try a different approach.]"));
+            }
+            if (repaired.truncated()) {
+                log.warn("{} Arguments were cut off mid-emission ({} bytes); refusing to execute",
+                        toolTag, argsStr == null ? 0 : argsStr.length());
+                return new ArgumentsOutcome.Failed(failedCall(tc, argsStr, TRUNCATED_ARGUMENTS_ERROR));
+            }
+            log.warn("{} Repaired malformed JSON arguments", toolTag);
+            // 首趟 model-context 扫不动坏 JSON：执行前解码修复后的 payload，
+            // 同时保留 tc.ModelArguments 里的原始 provider 载荷。
+            ToolCall decoded = new ToolCall();
+            decoded.setId(tc.getId());
+            decoded.setType(tc.getType());
+            decoded.setModelArguments("");
+            decoded.setFunction(new FunctionCall(tc.getFunction().getName(), repaired.repaired()));
+            decoded.setProviderMetadata(tc.getProviderMetadata());
+            engine.modelContext.decodeToolCalls(List.of(decoded));
+            tc.getFunction().setArguments(decoded.getFunction().getArguments());
+            tc.setArgumentResolution(decoded.getArgumentResolution());
+            tc.setUnresolvedHandles(decoded.getUnresolvedHandles());
+            try {
+                return new ArgumentsOutcome.Ok(parseArgsMap(tc.getFunction().getArguments()));
+            } catch (Exception e) {
+                return new ArgumentsOutcome.Failed(failedCall(tc, tc.getFunction().getArguments(),
+                        "Failed to parse repaired tool arguments: " + e.getMessage()));
+            }
+        }
+    }
+
     private AgentToolCall runToolCallInner(ToolCall tc, int i, int iteration,
             int round, String sessionId, String assistantMessageID) {
         log.info("[Agent][Round-{}][Tool {}] tenantId={}", round, tc.getFunction().getName(),
@@ -281,90 +355,12 @@ final class ActPhase {
         String toolTag = String.format("[Agent][Round-%d][Tool %s (%d/%s)]",
                 round, tc.getFunction().getName(), i + 1, total);
 
-        Map<String, Object> args = null;
         String argsStr = tc.getFunction().getArguments();
-        RuntimeException argsError = null;
-        try {
-            args = parseArgsMap(argsStr);
-        } catch (Exception e) {
-            argsError = e instanceof RuntimeException re ? re : new RuntimeException(e.getMessage(), e);
+        ArgumentsOutcome outcome = parseArguments(tc, argsStr, toolTag);
+        if (outcome instanceof ArgumentsOutcome.Failed failed) {
+            return failed.call();
         }
-        if (argsError != null) {
-            JsonRepair.RepairResult repaired = JsonRepair.repairJsonDetail(argsStr);
-            boolean repairOk = false;
-            try {
-                args = parseArgsMap(repaired.repaired());
-                repairOk = true;
-            } catch (Exception ignored) {
-                // fall through：解析仍失败
-            }
-            if (!repairOk) {
-                log.error("{} Failed to parse arguments (repair failed)", toolTag, argsError);
-                AgentToolCall c = new AgentToolCall();
-                c.setId(tc.getId());
-                c.setName(tc.getFunction().getName());
-                Map<String, Object> rawArgs = new LinkedHashMap<>();
-                rawArgs.put("_raw", argsStr);
-                c.setArgs(rawArgs);
-                c.setProviderMetadata(tc.getProviderMetadata());
-                ToolResult r = new ToolResult();
-                r.setSuccess(false);
-                r.setError("Failed to parse tool arguments: " + argsError.getMessage()
-                        + "\n\nIf the JSON looks cut off, the previous round likely hit the output token cap. "
-                        + "Retry with complete JSON (required fields first) and a smaller payload.\n\n"
-                        + "[Analyze the error above and try a different approach.]");
-                c.setResult(r);
-                return c;
-            }
-            // 补齐未终止的字符串/括号能让 payload 解析，但值仍是 provider 挤出的残缺值——
-            // 执行会写半个文件或搜半个查询还报成功，所以拒绝。这是无 finish reason 断流的保险带。
-            if (repaired.truncated()) {
-                log.warn("{} Arguments were cut off mid-emission ({} bytes); refusing to execute",
-                        toolTag, argsStr == null ? 0 : argsStr.length());
-                AgentToolCall c = new AgentToolCall();
-                c.setId(tc.getId());
-                c.setName(tc.getFunction().getName());
-                Map<String, Object> rawArgs = new LinkedHashMap<>();
-                rawArgs.put("_raw", argsStr);
-                c.setArgs(rawArgs);
-                c.setProviderMetadata(tc.getProviderMetadata());
-                ToolResult r = new ToolResult();
-                r.setSuccess(false);
-                r.setError(TRUNCATED_ARGUMENTS_ERROR);
-                c.setResult(r);
-                return c;
-            }
-            log.warn("{} Repaired malformed JSON arguments", toolTag);
-            // 首趟 model-context 扫不动坏 JSON：执行前解码修复后的 payload，
-            // 同时保留 tc.ModelArguments 里的原始 provider 载荷。
-            ToolCall decoded = new ToolCall();
-            decoded.setId(tc.getId());
-            decoded.setType(tc.getType());
-            decoded.setModelArguments("");
-            decoded.setFunction(new FunctionCall(tc.getFunction().getName(),
-                    repaired.repaired()));
-            decoded.setProviderMetadata(tc.getProviderMetadata());
-            engine.modelContext.decodeToolCalls(List.of(decoded));
-            tc.getFunction().setArguments(decoded.getFunction().getArguments());
-            tc.setArgumentResolution(decoded.getArgumentResolution());
-            tc.setUnresolvedHandles(decoded.getUnresolvedHandles());
-            try {
-                args = parseArgsMap(tc.getFunction().getArguments());
-            } catch (Exception e) {
-                AgentToolCall c = new AgentToolCall();
-                c.setId(tc.getId());
-                c.setName(tc.getFunction().getName());
-                Map<String, Object> rawArgs = new LinkedHashMap<>();
-                rawArgs.put("_raw", tc.getFunction().getArguments());
-                c.setArgs(rawArgs);
-                c.setProviderMetadata(tc.getProviderMetadata());
-                ToolResult r = new ToolResult();
-                r.setSuccess(false);
-                r.setError("Failed to parse repaired tool arguments: " + e.getMessage());
-                c.setResult(r);
-                return c;
-            }
-        }
+        Map<String, Object> args = ((ArgumentsOutcome.Ok) outcome).args();
 
         // provider 可见的代理调用保持完整；为活事件/持久展示/追踪解析独立的目标身份。
         ToolCallTarget target = null;
