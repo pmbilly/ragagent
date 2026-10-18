@@ -16,7 +16,6 @@ rootProject.name = "ragagent-java"
 includeBuild("build-logic")
 include("contract")
 include("domains")
-include("knowledge")
 include("platform")
 include("boot")
 include("model-runtime")

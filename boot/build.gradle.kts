@@ -21,7 +21,6 @@ dependencies {
     implementation(project(":retrieval-engine"))
 
     implementation(project(":domains"))
-    implementation(project(":knowledge"))
     // 组合根本身用到的 API（:domains 的 compileOnly/implementation 不会传递到编译面）
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")

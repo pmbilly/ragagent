@@ -49,7 +49,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-MODULES = ["contract", "platform", "model-runtime", "retrieval-engine", "agent-engine", "knowledge", "domains", "boot"]
+MODULES = ["contract", "platform", "model-runtime", "retrieval-engine", "agent-engine", "domains", "boot"]
 
 # ── 判据 A 的矩阵（主码依赖）──────────────────────────────────────────────
 ALLOWED_MAIN: dict[str, set[str]] = {
@@ -61,8 +61,6 @@ ALLOWED_MAIN: dict[str, set[str]] = {
     "agent-engine": {"contract", "platform", "model-runtime"},
     # modelcontext：同上（4 处；R2c-3d 已把其余模型族边清零）
     "domains": {"contract", "platform", "model-runtime"},
-    # 知识库域独立成模块：主码对 domains 0 出边
-    "knowledge": {"contract", "platform"},
     "boot": set(MODULES[:-1]),  # 组合根
 }
 
@@ -70,9 +68,6 @@ ALLOWED_MAIN: dict[str, set[str]] = {
 ALLOWED_TEST_EXTRA: dict[tuple[str, str], str] = {
     ("domains", "agent-engine"): "消费 agent-engine 的 testFixtures（录制夹具），同向不成环",
     ("domains", "model-runtime"): "测试桩直接用模型侧类型（Embedder/Reranker/ModelRuntime）",
-    ("domains", "knowledge"): "少量集成测试直接构造知识库载荷",
-    ("knowledge", "domains"): "4 处测试借用存储/租户实现做夹具",
-    ("knowledge", "model-runtime"): "测试用 llm.extract 做真实抽取",
 }
 
 IMPORT_RE = re.compile(r"^import\s+(?:static\s+)?(com\.ragagent\.[\w.]+);", re.M)

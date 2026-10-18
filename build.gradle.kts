@@ -37,7 +37,6 @@ dependencyManagement {
 dependencies {
     jacocoAggregation(project(":contract"))
     jacocoAggregation(project(":domains"))
-    jacocoAggregation(project(":knowledge"))
     jacocoAggregation(project(":model-runtime"))
     jacocoAggregation(project(":retrieval-engine"))
     jacocoAggregation(project(":agent-engine"))
