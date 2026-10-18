@@ -3,7 +3,7 @@ package com.ragagent.knowledge.controller;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.contract.knowledge.chunker.Tokens;
+import com.ragagent.contract.text.Tokens;
 import com.ragagent.knowledge.chunker.Chunker;
 import com.ragagent.knowledge.chunker.DocumentProfiler;
 import com.ragagent.knowledge.chunker.ParsedChunk;

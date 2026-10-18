@@ -1,12 +1,12 @@
 package com.ragagent.contract.knowledge;
 
-import com.ragagent.contract.knowledge.domain.AsrConfigView;
-import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
-import com.ragagent.contract.knowledge.domain.ImageProcessingConfigView;
-import com.ragagent.contract.knowledge.domain.IndexingStrategyView;
-import com.ragagent.contract.knowledge.domain.StorageConfigView;
-import com.ragagent.contract.knowledge.domain.StorageProviderConfigView;
-import com.ragagent.contract.knowledge.domain.VlmConfigView;
+import com.ragagent.contract.knowledge.config.AsrConfigView;
+import com.ragagent.contract.knowledge.config.ChunkingConfigView;
+import com.ragagent.contract.knowledge.config.ImageProcessingConfigView;
+import com.ragagent.contract.knowledge.config.IndexingStrategyView;
+import com.ragagent.contract.knowledge.config.StorageConfigView;
+import com.ragagent.contract.knowledge.config.StorageProviderConfigView;
+import com.ragagent.contract.knowledge.config.VlmConfigView;
 import java.time.OffsetDateTime;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge.domain;
+package com.ragagent.contract.knowledge.config;
 
 
 /** VLM（图像描述）配置视图——**不含** {@code apiKey}。 */

@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge.domain;
+package com.ragagent.contract.knowledge.config;
 
 
 /** 知识库对象存储配置视图（jsonb 列 {@code storage_config} 的跨域投影；字段与领域形状逐一对应）。 */

@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge.chunker;
+package com.ragagent.contract.text;
 
 import java.util.Map;
 

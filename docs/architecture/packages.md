@@ -28,10 +28,10 @@
 | `:contract` | `com.ragagent.contract.graph` | 图谱契约面：图数据/节点/关系/命名空间。 |
 | `:contract` | `com.ragagent.contract.json` | 契约 · JSON：ByteKeyOrder / JsonValues / ZeroTimes。 |
 | `:contract` | `com.ragagent.contract.knowledge` | 知识契约面：分块/库/文档的事实、视图、网关与端口。 |
-| `:contract` | `com.ragagent.contract.knowledge.chunker` | 知识库 · 分块：CodePoints / Tokens。 |
-| `:contract` | `com.ragagent.contract.knowledge.domain` | 知识库 · 领域模型：StorageProviderConfigView / ImageProcessingConfigView / IndexingStrategyView…。 |
-| `:contract` | `com.ragagent.contract.knowledge.service` | 知识库 · 服务：DuplicateKnowledgeDetails / DuplicateKnowledgeException。 |
-| `:contract` | `com.ragagent.contract.knowledge.support` | 知识库 · 支撑：KnowledgeProjectionAdapter / ChunkProjectionAdapter / KnowledgeBaseViews…。 |
+| `:contract` | `com.ragagent.contract.knowledge.config` | 知识库配置视图：ASR / 分块 / 图片处理 / 索引策略 / 存储 / 存储 provider / VLM 的配置形状。 |
+| `:contract` | `com.ragagent.contract.knowledge.error` | 知识库领域错误：DuplicateKnowledgeDetails / DuplicateKnowledgeException。 |
+| `:contract` | `com.ragagent.contract.knowledge.projection` | 知识库投影：把实体行视图映射为契约视图/事实的唯一实现 （KnowledgeBaseViews / ChunkProjectionAdapter / KnowledgeProjectionAdapter）。 |
+| `:contract` | `com.ragagent.contract.knowledge.rule` | 知识库解析规则：ParserEngineRules（文件类型 → 默认解析引擎）。 |
 | `:contract` | `com.ragagent.contract.memory` | 记忆契约面：配置/条目视图/键与类目/召回与检索上下文。 |
 | `:contract` | `com.ragagent.contract.model` | 模型契约面：模型事实与运行时而面载荷。 |
 | `:contract` | `com.ragagent.contract.pipeline` | 管线 SPI：会话域管线（domains/session/rag）消费、业务域实现的端口 （MCP 工具网关/按需注册、工具注册表、网页检索执行器）。 |
@@ -43,7 +43,7 @@
 | `:contract` | `com.ragagent.contract.storage.provider` | 存储 · 提供方：SeekableSource。 |
 | `:contract` | `com.ragagent.contract.storage.support` | 存储 · 支撑：StorageBackendResolver / StorageUrlContext / FileUrlPort…。 |
 | `:contract` | `com.ragagent.contract.tenant` | 租户契约面：租户角色等跨域值对象。 |
-| `:contract` | `com.ragagent.contract.text` | 契约文本工具面：契约载荷（wiki 标记/语言判定）共用的纯 JDK 文本原语。 |
+| `:contract` | `com.ragagent.contract.text` | 契约文本工具面：契约载荷共用的纯 JDK 文本原语 （TextConv / CodePoints / Tokens / 空白与语言判定）。 |
 | `:contract` | `com.ragagent.contract.tool` | 工具契约面：工具执行结果载荷与工具取消/能力词汇。 |
 | `:contract` | `com.ragagent.contract.vectorstore` | 向量库契约面：环境 store id、查找端口与视图。 |
 | `:contract` | `com.ragagent.contract.websearch` | 契约 · 网页搜索：WebSearchTempStatePort / WebSearchProviderPort / PipelinePageFetcher…。 |

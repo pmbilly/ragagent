@@ -9,7 +9,7 @@ import com.ragagent.contract.knowledge.ChunkPageView;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
-import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.contract.knowledge.projection.ChunkProjectionAdapter;
 import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.retrieval.ChunkTypes;

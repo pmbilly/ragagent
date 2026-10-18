@@ -1,7 +1,7 @@
 package com.ragagent.im.service;
 
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.knowledge.service.DuplicateKnowledgeException;
+import com.ragagent.contract.knowledge.error.DuplicateKnowledgeException;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCommandSet;
 import com.ragagent.im.runtime.ImFormat;

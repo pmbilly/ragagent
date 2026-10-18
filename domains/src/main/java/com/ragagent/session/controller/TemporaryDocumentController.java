@@ -3,7 +3,7 @@ package com.ragagent.session.controller;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.support.ParserEngineRules;
+import com.ragagent.contract.knowledge.rule.ParserEngineRules;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.text.ContentTypeByFilename;

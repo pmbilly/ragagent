@@ -1,7 +1,7 @@
 package com.ragagent.datasource.service;
 
 import com.ragagent.contract.knowledge.KnowledgeRowView;
-import com.ragagent.contract.knowledge.service.DuplicateKnowledgeException;
+import com.ragagent.contract.knowledge.error.DuplicateKnowledgeException;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceException;
 import com.ragagent.datasource.domain.FetchedItem;

@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import com.ragagent.contract.knowledge.chunker.CodePoints;
-import com.ragagent.contract.knowledge.chunker.Tokens;
+import com.ragagent.contract.text.CodePoints;
+import com.ragagent.contract.text.Tokens;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

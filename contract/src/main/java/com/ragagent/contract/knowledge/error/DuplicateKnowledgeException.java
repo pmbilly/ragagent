@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge.service;
+package com.ragagent.contract.knowledge.error;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;

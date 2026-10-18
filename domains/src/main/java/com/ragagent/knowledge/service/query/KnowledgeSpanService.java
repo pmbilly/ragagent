@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.service.query;
 
-import com.ragagent.contract.knowledge.support.KnowledgeProjectionAdapter;
+import com.ragagent.contract.knowledge.projection.KnowledgeProjectionAdapter;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.repository.KnowledgeSpanRepository;

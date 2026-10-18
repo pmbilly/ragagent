@@ -2,7 +2,7 @@ package com.ragagent.initialization.service;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
+import com.ragagent.contract.knowledge.config.ChunkingConfigView;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;

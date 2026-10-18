@@ -2,12 +2,12 @@ package com.ragagent.session.attachment;
 
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.contract.knowledge.DocumentChunkingPort;
-import com.ragagent.contract.knowledge.chunker.Tokens;
-import com.ragagent.contract.knowledge.support.ParserEngineRules;
+import com.ragagent.contract.knowledge.rule.ParserEngineRules;
 import com.ragagent.contract.model.AsrTranscriber;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.contract.text.Tokens;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.knowledge.ImageRefRewriter;
 import com.ragagent.platform.web.JsonMappers;

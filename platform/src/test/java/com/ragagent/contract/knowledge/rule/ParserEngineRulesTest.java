@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge.support;
+package com.ragagent.contract.knowledge.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

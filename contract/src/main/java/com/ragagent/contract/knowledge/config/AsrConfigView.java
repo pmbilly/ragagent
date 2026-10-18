@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge.domain;
+package com.ragagent.contract.knowledge.config;
 
 
 /** ASR（音频转写）配置视图。 */

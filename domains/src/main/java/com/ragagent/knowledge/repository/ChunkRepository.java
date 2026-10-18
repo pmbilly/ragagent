@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.ChunkSearchGateway;
-import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.contract.knowledge.projection.ChunkProjectionAdapter;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkNotFoundException;

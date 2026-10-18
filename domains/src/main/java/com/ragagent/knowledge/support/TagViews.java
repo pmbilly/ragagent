@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.support;
 
-import com.ragagent.contract.knowledge.support.KnowledgeProjectionAdapter;
+import com.ragagent.contract.knowledge.projection.KnowledgeProjectionAdapter;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.platform.web.JsonMappers;
 import tools.jackson.databind.ObjectMapper;

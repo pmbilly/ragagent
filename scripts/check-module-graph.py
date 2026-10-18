@@ -75,7 +75,7 @@ PKG_RE = re.compile(r"^package\s+([\w.]+);", re.M)
 
 # ── 判据 E 的存量登记（路径 → 理由；只许减）────────────────────────────────
 MISPLACED_TEST_ALLOW: dict[str, str] = {
-    "platform/src/test/java/com/ragagent/contract/knowledge/support/ParserEngineRulesTest.java":
+    "platform/src/test/java/com/ragagent/contract/knowledge/rule/ParserEngineRulesTest.java":
         "测契约规则，但需要 platform 的 JsonMappers；platform test → contract 是合法方向",
     "domains/src/test/java/com/ragagent/embedding/EmbeddingWireTest.java":
         "wire A/B 使用 domains 的 Model/ModelRowViews；迁 model-runtime 会形成 test→domains 反向边",

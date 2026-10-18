@@ -9,7 +9,7 @@ import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.contract.knowledge.KnowledgeParseStatus;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
-import com.ragagent.contract.knowledge.service.DuplicateKnowledgeException;
+import com.ragagent.contract.knowledge.error.DuplicateKnowledgeException;
 import com.ragagent.platform.http.UrlBytesFetcher;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.security.SsrfGuard;

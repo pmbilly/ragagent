@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.dto.kb;
 
-import com.ragagent.contract.knowledge.domain.AsrConfigView;
-import com.ragagent.contract.knowledge.domain.ChunkingConfigView;
-import com.ragagent.contract.knowledge.domain.ImageProcessingConfigView;
-import com.ragagent.contract.knowledge.domain.IndexingStrategyView;
+import com.ragagent.contract.knowledge.config.AsrConfigView;
+import com.ragagent.contract.knowledge.config.ChunkingConfigView;
+import com.ragagent.contract.knowledge.config.ImageProcessingConfigView;
+import com.ragagent.contract.knowledge.config.IndexingStrategyView;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeBaseVlmConfig;
 import com.ragagent.knowledge.support.KnowledgeBaseConfigMaps;

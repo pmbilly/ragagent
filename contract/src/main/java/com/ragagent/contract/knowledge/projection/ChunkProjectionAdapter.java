@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge.support;
+package com.ragagent.contract.knowledge.projection;
 
 
 import com.ragagent.contract.knowledge.ChunkFacts;

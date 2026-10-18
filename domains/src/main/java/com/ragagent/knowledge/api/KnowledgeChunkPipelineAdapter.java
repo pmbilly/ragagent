@@ -3,7 +3,7 @@ package com.ragagent.knowledge.api;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.ChunkRowView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.contract.knowledge.projection.ChunkProjectionAdapter;
 import com.ragagent.contract.pipeline.PipelinePorts;
 import java.util.ArrayList;
 import java.util.List;

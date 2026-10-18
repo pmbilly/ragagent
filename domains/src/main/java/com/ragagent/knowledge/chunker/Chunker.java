@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.chunker;
 
-import com.ragagent.contract.knowledge.chunker.CodePoints;
-import com.ragagent.contract.knowledge.chunker.Tokens;
+import com.ragagent.contract.text.CodePoints;
+import com.ragagent.contract.text.Tokens;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -3,7 +3,7 @@ package com.ragagent.knowledge.service.enrichment;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.SearchChunkMerge;
-import com.ragagent.contract.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.contract.knowledge.projection.ChunkProjectionAdapter;
 import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.model.ChatOptions;
 import com.ragagent.contract.model.ChatResponse;

@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge.chunker;
+package com.ragagent.contract.text;
 
 /**
  * 码点（Unicode code point）工具。
