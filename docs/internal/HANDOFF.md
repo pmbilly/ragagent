@@ -84,10 +84,10 @@
 | **L16** | `executeQA` 200 行 → 7 个具名步骤 | ✅ 主方法 ~30 行 |
 | **L17** | 插件表自动生成 + `--check` 守卫 | ✅ `pipeline-map.md`（14 事件 / 17 插件） |
 | **L18** | 插件契约三行（读/写/失败） | ✅ 写在 `Plugin` 接口（统一规则不逐个重复） |
-| **L19** | 拆 `:knowledge`（241 文件；切边 2 处；登记 7 个面） | 待做 |
-| **L20** | `modelcontext` 下沉 `contract`，剪 `domains`/`agent-engine` 两条依赖边 | 待做 |
-| **L21** | `platform/knowledge` 7 类、`platform/model` 2 类归位 | 待做 |
-| **L22** | 工具三处收敛：`BaseTool` → `agent-engine`，删 `platform/tool` | 待做 |
+| **L19** | 拆 `:knowledge`（241 文件） | ✅ 八模块；domains 2543 + knowledge 156 用例守恒 |
+| **L20** | `modelcontext` 下沉 `contract` | ⏸ 不可行：入口类 `Registry` 依赖 Jackson，搬进 contract 破坏「纯 JDK」红线 |
+| **L21** | `platform` 业务残留归位 | ⏸ 不可行：9 类被 6 个模块共享，移到 domains 会让 retrieval/agent-engine 反向依赖 |
+| **L22** | `BaseTool` 归位 `agent-engine` | ⏸ 不可行：domains/mcp 的 2 个工具用它，移过去会让 domains 反向依赖 agent-engine（R5c 刚清零） |
 
 **新增守卫**（各配红态探针）：`check-comment-narrative` / `check-doc-truth` / `check-controller-purity` / `check-pipeline-map` / `check-known-gaps`；另加 `scripts/readability-report.py` 输出 6 个指标。
 
@@ -322,6 +322,9 @@ boot           14 件                      →  boot
 
 | L16 | 2026-10-18 | **`executeQA` 拆分**：200 行 → 7 个具名步骤（memo 异步写 / 并发守卫 / 消息落库 / steer 交接 / 建流回滚 / 快答 handler / 异步执行），每步带"做什么 + 为什么"的 javadoc，顺序约束写进方法注释。纯重构，行为由 5022 条测试锁定。 | **30 守卫** · **5022 / 0 / 4** · build 1m48s |
 | L17+L18 | 2026-10-18 | **控制流可见化**：新增 `gen-pipeline-map.py`——从 `activationEvents()` + `QaWiring` 注册序 + `ChatManage` getter/setter 生成 `docs/architecture/pipeline-map.md`（14 事件 / 17 插件 / 读写字段），接入第 30 条守卫（红态探针已验）；`Plugin` 接口补「读 / 写 / 失败」三条契约，plugin 目录 package-info 指向事件表。 | **30 守卫** · **5022 / 0 / 4** |
+
+| L19 | 2026-10-18 | **拆出 `:knowledge`**：241 件主码 + 22 件测试（156 用例）迁出 domains；主码对 domains **0 出边**，测试期 4 处借 domains 存储/租户实现作夹具（单向）；新增模块构建（含 docreader proto）；守卫同步：模块图矩阵 + 测试边登记 + 域清单 + file-size 基线 + README 八模块/51 控制器；修一处跨模块 javadoc 引用。 | **30 守卫** · **5022 / 0 / 4**（domains 2543 + knowledge 156）· build 2m16s |
+| L20~L22 | 2026-10-18 | **评估后不做**（三条硬约束）：L20 `modelcontext` 进 contract 会被 Jackson 破坏纯 JDK 红线；L21 platform 的 9 个业务工具被 6 个模块共享，移走会让 retrieval/agent-engine 反向依赖；L22 `BaseTool` 移 agent-engine 会让 domains 反向依赖（R5c 刚清零）。三者都是「移动即破红线」，不是成本问题。 | — |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
