@@ -1,14 +1,16 @@
 package com.ragagent.auth.api;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.auth.domain.User;
+import com.ragagent.auth.mapper.AuthTokenMapper;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.auth.service.PasswordPolicy;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.contract.auth.AdminUserPort;
 import com.ragagent.contract.auth.AdminUserView;
-import com.ragagent.contract.auth.AuthTokenAdminPort;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.tenant.TenantRowView;
@@ -53,17 +55,17 @@ public class AdminUserAdapter implements AdminUserPort {
     static final String PASSWORD_SPECIAL_CHARS = "!@#$%^&*()_+-=[]{}|;:,.<>?";
 
     private final UserMapper userMapper;
-    private final AuthTokenAdminPort authTokenAdmin;
+    private final AuthTokenMapper authTokenMapper;
     private final TenantService tenantService;
     private final TenantMemberService memberService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public AdminUserAdapter(UserMapper userMapper,
-                            AuthTokenAdminPort authTokenAdmin,
+                            AuthTokenMapper authTokenMapper,
                             TenantService tenantService,
                             TenantMemberService memberService) {
         this.userMapper = userMapper;
-        this.authTokenAdmin = authTokenAdmin;
+        this.authTokenMapper = authTokenMapper;
         this.tenantService = tenantService;
         this.memberService = memberService;
     }
@@ -203,7 +205,9 @@ public class AdminUserAdapter implements AdminUserPort {
 
     private void revokeTokensByUserId(String userId) {
         try {
-            authTokenAdmin.revokeAllForUser(userId);
+            authTokenMapper.update(null, new LambdaUpdateWrapper<AuthToken>()
+                    .eq(AuthToken::getUserId, userId)
+                    .set(AuthToken::isIsRevoked, true));
         } catch (RuntimeException e) {
             log.warn("Failed to revoke tokens for user {}", userId, e);
         }

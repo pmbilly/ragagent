@@ -73,7 +73,7 @@
 | `:domains` | `com.ragagent.audit.mapper` | 审计 · 映射：AuditLogRepository / AuditLogMapper。 |
 | `:domains` | `com.ragagent.audit.service` | 审计 · 服务：AuditLogService / RbacDeniedAuditorRegistrar / WikiActivityAuditRecorder…。 |
 | `:domains` | `com.ragagent.auth` | 认证与租户域：登录/OIDC/令牌、用户与租户目录、RBAC 与会话身份。 |
-| `:domains` | `com.ragagent.auth.api` | 认证 · 端口实现：AuthTokenAdminAdapter / UserLookupAdapter / AdminUserAdapter。 |
+| `:domains` | `com.ragagent.auth.api` | 认证 · 端口实现：UserLookupAdapter / AdminUserAdapter。 |
 | `:domains` | `com.ragagent.auth.apikey` | API 密钥子域（auth 之下，机器调用凭据面）：租户级 API Key 的签发、校验与访问控制——路由策略（com.ragagent.auth.apikey.domain.APIKeyRouteP |
 | `:domains` | `com.ragagent.auth.apikey.controller` | apikey · HTTP 层：TenantAPIKeyController。 |
 | `:domains` | `com.ragagent.auth.apikey.controller.filter` | API Key 过滤器面（由 auth.apikey.filter 迁入 apikey.controller.filter，对齐方案）： 鉴权通道与网关拦截、路由授权与策略、范围清理与文件服务豁免、主体拒绝（9 类）。 |
