@@ -336,6 +336,10 @@ boot           14 件                      →  boot
 
 | L28 | 2026-10-18 | **知识族内 4 个 Port 内联**（第三批解耦）：划族 `knowledge + wiki`（双向依赖，族内允许）；删 `ChunkPort` / `WikiFinalizePort` / `WikiIngestPort` / `KnowledgeFinalizePort`；提取 `WikiEnqueueResult` / `FinalizeResult`；两处守卫修正——包级 SCC 域名提取兼容 `com.ragagent.X` 与 `contract.X`、R4「已解耦包对回流」认族。**包级 SCC 9 → 7 组**（wiki 内部环被消除）。**`contract` 的 `*Port` 39 → 27**（累计删 12 个）。 | **32 守卫** · **5022 / 0 / 4** · build 1m48s |
 
+| L29 | 2026-10-18 | **链路 A 注释纠错（A 档）**：删 `SessionAgentQaService` 尾部 4 段空注释 + 一段错挂在 `chatModel()` 上的 javadoc；`AgentStreamBridge` 的「应为 17」改为不写死；`EventManager.buildHandler` 补「先注册 → 外层 → 先执行」；`KnowledgeProcessWorker` 补进程内队列语义；`mechanisms.md` §10「可选 Bean 缺失行为一览」。 | **32 守卫** · **5022 / 0 / 4** |
+| L30 | 2026-10-18 | **`session/service/rag` 提升为 `session/rag`**：实测 rag 44 文件与非 rag service 44 文件 **import = 0**，两个不相干子系统挤在同一包；迁移同步 6 处守卫登记；**ArchUnit A17 规则扩面**（`isServicePackage` 纳入 `rag`，否则换包即静默脱管）。`session/service` 88 → 44 文件。 | **32 守卫** · **5022 / 0 / 4** |
+| L31 | 2026-10-18 | **链路 A 长方法拆分**：`mapOneDocument` 411 → 327（三个阶段方法）、`agentQA` 165 → 26（七步）、`runToolCallInner` 231 → 153（参数解析 + 失败调用 + sealed 结果）、`parseQARequest` 235 → 102（五个具名步骤）。**新增 `scripts/method-length-report.py`**（跳字符串的花括号计数）：实测 >150 行方法 **25 个**，而非外部报告的 167（`Fetcher.detectContentType` 报 374 实为 15、`ToolPolicy.normalizeMCPCallArguments` 报 276 实为 22）。 | **32 守卫** · **5022 / 0 / 4** |
+
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
 ## 13. 文档地图与归档
