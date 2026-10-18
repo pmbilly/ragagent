@@ -3,10 +3,11 @@ package com.ragagent.agenttools.wiki;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.agent.SearchAuth.KnowledgeScopeReader;
 import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +70,7 @@ public class WikiWritePageTool extends BaseTool {
 
     public WikiWritePageTool(WikiPages wikiPageService, List<String> kbIds,
                              KnowledgeScopeReader knowledgeService, WikiRouteResolver routes) {
-        super(ToolDefinitions.TOOL_WIKI_WRITE_PAGE, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_WIKI_WRITE_PAGE, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.wikiPageService = wikiPageService;
         this.knowledgeService = knowledgeService;
         this.kbIds = kbIds;

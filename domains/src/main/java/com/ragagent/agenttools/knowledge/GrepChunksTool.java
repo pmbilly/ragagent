@@ -3,12 +3,13 @@ package com.ragagent.agenttools.knowledge;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.knowledge.GrepChunkHit;
 import com.ragagent.platform.knowledge.GrepChunksScoring;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -100,7 +101,7 @@ public class GrepChunksTool extends BaseTool {
     private final LinkedHashSet<String> seenChunks = new LinkedHashSet<>();
 
     public GrepChunksTool(GrepChunkSearch chunkSearch, SearchTarget.SearchTargets searchTargets) {
-        super(ToolDefinitions.TOOL_GREP_CHUNKS, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_GREP_CHUNKS, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.chunkSearch = chunkSearch;
         this.searchTargets = searchTargets;
     }

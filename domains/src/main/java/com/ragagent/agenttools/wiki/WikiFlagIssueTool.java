@@ -3,10 +3,11 @@ package com.ragagent.agenttools.wiki;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.agent.SearchAuth.KnowledgeScopeReader;
 import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +59,7 @@ public class WikiFlagIssueTool extends BaseTool {
     private boolean scopeEnforced;
 
     public WikiFlagIssueTool(WikiPages wikiService, List<String> kbIds, WikiRouteResolver routes) {
-        super(ToolDefinitions.TOOL_WIKI_FLAG_ISSUE, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_WIKI_FLAG_ISSUE, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.wikiService = wikiService;
         this.kbIds = kbIds;
         this.routes = routes != null ? routes : new WikiRouteResolver();

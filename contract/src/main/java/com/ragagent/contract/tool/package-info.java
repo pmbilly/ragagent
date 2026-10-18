@@ -10,9 +10,8 @@
  * {@link com.ragagent.contract.tool.PendingRequest}、{@link com.ragagent.contract.tool.OAuthPendingRequest}、
  * {@link com.ragagent.contract.tool.ApprovalEventBus}、{@link com.ragagent.contract.tool.ApprovalEvent}。</p>
  *
- * <p><b>尚未迁入（登记）</b>：工具 SPI 主体（{@code AgentTool}/{@code BaseTool}/{@code ToolDefinitions}/
- * {@code ToolRequest}/{@code ToolExecContext}/{@code ToolRegistryPort}）——其签名带 Jackson
- * {@code JsonNode}、{@code platform.event.EventBus}、{@code llm.domain.ChatMessage} ⇒ 属 A② 登记的
- * 「JsonNode 载体」K 级重设计；解决后 {@code mcp→agent} 边（9 类）随之清零。</p>
+ * <p>工具 SPI：{@link com.ragagent.contract.tool.AgentTool} / {@link com.ragagent.contract.tool.BaseTool}
+ * （纯 JDK 基类，schema 为 {@code Object}）/ {@code ToolRequest} / {@code ToolExecContext} /
+ * {@code ToolRegistryPort}。{@code ToolDefinitions} 仍在 {@code agent-engine}（定义与注册逻辑）。</p>
  */
 package com.ragagent.contract.tool;

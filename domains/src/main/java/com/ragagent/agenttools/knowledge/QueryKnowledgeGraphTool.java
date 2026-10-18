@@ -1,12 +1,12 @@
 package com.ragagent.agenttools.knowledge;
 
-
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -128,7 +128,7 @@ public class QueryKnowledgeGraphTool extends BaseTool {
 
     public QueryKnowledgeGraphTool(GraphSearch graphSearch, SearchTargets searchTargets,
             SearchAuth.KnowledgeTagsFetcher tagsFetcher) {
-        super(ToolDefinitions.TOOL_QUERY_KNOWLEDGE_GRAPH, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_QUERY_KNOWLEDGE_GRAPH, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.graphSearch = graphSearch;
         this.searchTargets = searchTargets;
         this.scopeEnforced = searchTargets != null;

@@ -1,10 +1,10 @@
 package com.ragagent.agenttools.datasource;
 
-
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -69,7 +69,7 @@ public class DataSchemaTool extends BaseTool {
     private ScopeAuthorizer scopeAuthorizer;
 
     public DataSchemaTool(KnowledgeLookup knowledgeLookup, ChunkLister chunkLister, String... targetChunkTypes) {
-        super(ToolDefinitions.TOOL_DATA_SCHEMA, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_DATA_SCHEMA, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.knowledgeLookup = knowledgeLookup;
         this.chunkLister = chunkLister;
         this.targetChunkTypes = targetChunkTypes.length > 0

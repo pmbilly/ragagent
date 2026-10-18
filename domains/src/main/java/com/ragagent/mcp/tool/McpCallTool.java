@@ -3,9 +3,10 @@ package com.ragagent.mcp.tool;
 import com.ragagent.contract.pipeline.McpToolingGateway;
 import com.ragagent.contract.pipeline.ToolRegistryPort;
 import com.ragagent.contract.tool.AgentTool;
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class McpCallTool extends BaseTool {
 
     McpCallTool(String name, String description, String parameters, McpCatalog catalog,
             ToolRegistryPort registry, McpToolingGateway mcpTooling) {
-        super(name, description, parameters);
+        super(name, description, ToolSchemas.parse(parameters));
         this.catalog = catalog;
         this.registry = registry;
         this.mcpTooling = mcpTooling;

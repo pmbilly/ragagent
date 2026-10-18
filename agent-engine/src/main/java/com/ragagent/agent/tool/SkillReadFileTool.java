@@ -3,10 +3,11 @@ package com.ragagent.agent.tool;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.contract.agent.SkillCatalogPort;
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class SkillReadFileTool extends BaseTool {
     private final Manager skills;
 
     public SkillReadFileTool(Manager skills) {
-        super(ToolDefinitions.TOOL_READ_FILE, TOOL_DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_READ_FILE, TOOL_DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.skills = skills;
     }
 

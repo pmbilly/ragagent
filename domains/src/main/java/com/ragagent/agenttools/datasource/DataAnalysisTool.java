@@ -5,10 +5,11 @@ import com.ragagent.agenttools.sql.SqlGuard;
 import com.ragagent.contract.agent.Cleanable;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
 import java.math.BigDecimal;
@@ -102,7 +103,7 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
 
     public DataAnalysisTool(KnowledgeLoader knowledgeLoader, KnowledgeFileMaterializer materializer,
             AnalysisDuckDb duckDb, String sessionID) {
-        super(ToolDefinitions.TOOL_DATA_ANALYSIS, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_DATA_ANALYSIS, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.knowledgeLoader = knowledgeLoader;
         this.materializer = materializer;
         this.duckDb = duckDb;

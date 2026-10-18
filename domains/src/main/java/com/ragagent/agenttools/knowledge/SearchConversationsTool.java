@@ -1,9 +1,10 @@
 package com.ragagent.agenttools.knowledge;
 
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -87,7 +88,7 @@ public class SearchConversationsTool extends BaseTool {
     private final String currentSessionId;
 
     public SearchConversationsTool(ConversationSearch conversationSearch, String ownerId, String currentSessionId) {
-        super(ToolDefinitions.TOOL_SEARCH_CONVERSATIONS, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_SEARCH_CONVERSATIONS, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.conversationSearch = conversationSearch;
         this.ownerId = ownerId;
         this.currentSessionId = currentSessionId;

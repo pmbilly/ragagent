@@ -3,10 +3,11 @@ package com.ragagent.agenttools.sql;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
 import java.math.BigDecimal;
@@ -131,7 +132,7 @@ public class DatabaseQueryTool extends BaseTool {
 
     public DatabaseQueryTool(SqlQueryExecutor queryExecutor, SearchTarget.SearchTargets searchTargets,
             LongSupplier tenantIdProvider) {
-        super(ToolDefinitions.TOOL_DATABASE_QUERY, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_DATABASE_QUERY, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.queryExecutor = queryExecutor;
         this.searchTargets = searchTargets;
         this.tenantIdProvider = tenantIdProvider;

@@ -12,12 +12,13 @@ import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.ToolCall;
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.event.EventJson;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.stream.QueuedChatStream;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -393,7 +394,7 @@ final class Engine46bStubSupport {
         int calls;
 
         StubTool(String name) {
-            super(name, "test", "{\"type\":\"object\"}");
+            super(name, "test", ToolSchemas.parse("{\"type\":\"object\"}"));
         }
 
         @Override

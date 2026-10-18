@@ -1,9 +1,10 @@
 package com.ragagent.agenttools.wiki;
 
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class WikiRenamePageTool extends BaseTool {
     private final WikiRouteResolver routes;
 
     public WikiRenamePageTool(WikiPages wikiPageService, List<String> kbIds, WikiRouteResolver routes) {
-        super(ToolDefinitions.TOOL_WIKI_RENAME_PAGE, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_WIKI_RENAME_PAGE, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.wikiPageService = wikiPageService;
         this.kbIds = kbIds;
         this.routes = routes != null ? routes : new WikiRouteResolver();

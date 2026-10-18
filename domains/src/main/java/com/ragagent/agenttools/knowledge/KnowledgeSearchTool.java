@@ -3,10 +3,11 @@ package com.ragagent.agenttools.knowledge;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -257,7 +258,7 @@ public class KnowledgeSearchTool extends BaseTool {
     public KnowledgeSearchTool(KnowledgeSearchBackend backend, ChunkInfoBackend chunkBackend,
             ImageEnricher imageEnricher, RerankerModel reranker,
             SearchTarget.SearchTargets searchTargets, SearchConfig config) {
-        super(ToolDefinitions.TOOL_KNOWLEDGE_SEARCH, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_KNOWLEDGE_SEARCH, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.backend = backend;
         this.chunkBackend = chunkBackend;
         this.imageEnricher = imageEnricher;

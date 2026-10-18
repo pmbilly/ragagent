@@ -1,5 +1,6 @@
 package com.ragagent.agenttools.web;
 
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolOutput;
@@ -7,7 +8,7 @@ import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.websearch.FetchException;
 import com.ragagent.contract.websearch.ToolPageFetcher;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
 import java.net.URI;
@@ -134,7 +135,7 @@ public class WebFetchTool extends BaseTool {
 
     /** 测试注入口。 */
     WebFetchTool(PageFetcher fetcher) {
-        super(ToolDefinitions.TOOL_WEB_FETCH, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_WEB_FETCH, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.fetcher = fetcher;
     }
 

@@ -14,9 +14,9 @@ import org.springframework.data.redis.core.script.RedisScript;
 /**
  * Redis 任务队列骨架（多实例部署的共享任务表）。
  *
- * <p>被 knowledge / memory / datasource 的队列 Redis 实现复用
- * （wiki 域因有 TaskID 合并与死信语义自成一派，见
- * {@code wiki.service.ingest.RedisWikiIngestTaskQueue}）。</p>
+ * <p>被 knowledge / memory 的队列经 {@link RedisRetryingTaskQueue} 复用，
+ * datasource 直接复用；wiki 域因有 TaskID 合并与死信语义仍自成一派
+ * （{@code wiki.service.ingest.RedisWikiIngestTaskQueue}）。</p>
  *
  * <h2>Redis 结构</h2>
  * <ul>

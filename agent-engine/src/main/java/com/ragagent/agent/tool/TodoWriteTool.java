@@ -1,9 +1,10 @@
 package com.ragagent.agent.tool;
 
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -42,7 +43,7 @@ public class TodoWriteTool extends BaseTool {
             {"type":"object","properties":{"task":{"type":"string","description":"The complex task or question you need to create a plan for"},"steps":{"type":["null","array"],"items":{"type":"object","properties":{"id":{"type":"string","description":"Unique identifier for this step (e.g., 'step1', 'step2')"},"description":{"type":"string","description":"Clear description of what to investigate or accomplish in this step"},"status":{"type":"string","description":"Current status: pending (not started), in_progress (executing), completed (finished)"}},"required":["id","description","status"],"additionalProperties":false},"description":"Array of research plan steps with status tracking"}},"required":["steps"],"additionalProperties":false}""";
 
     public TodoWriteTool() {
-        super(ToolDefinitions.TOOL_TODO_WRITE, TOOL_DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_TODO_WRITE, TOOL_DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
     }
 
     // description 字面量过长（7247 字节）；这段是发给模型提示词的一部分，

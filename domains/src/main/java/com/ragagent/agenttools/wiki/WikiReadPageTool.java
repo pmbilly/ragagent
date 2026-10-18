@@ -2,10 +2,11 @@ package com.ragagent.agenttools.wiki;
 
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.agent.SearchAuth.KnowledgeTagsFetcher;
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -50,7 +51,7 @@ public class WikiReadPageTool extends BaseTool {
 
     public WikiReadPageTool(WikiPages wikiService, KnowledgeTagsFetcher tagsFetcher,
             List<WikiScope> scopes, WikiRouteResolver routes) {
-        super(ToolDefinitions.TOOL_WIKI_READ_PAGE, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_WIKI_READ_PAGE, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.wikiService = wikiService;
         this.tagsFetcher = tagsFetcher;
         this.scopes = scopes != null ? scopes : List.of();

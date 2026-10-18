@@ -4,6 +4,7 @@ import com.ragagent.datasource.DataSourceSyncEnqueueException;
 import com.ragagent.datasource.domain.DataSourceSyncPayload;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.platform.task.RetryPolicy;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import java.time.Duration;
 import java.util.Set;
@@ -13,7 +14,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
@@ -196,11 +196,6 @@ public class InProcessDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue
      * （wiki / memory 两份实现用的是同一公式）。
      */
     private long retryDelaySeconds(int attempt) {
-        Long override = retryDelayOverrideSeconds;
-        if (override != null) {
-            return Math.max(override, 0L);
-        }
-        long n = attempt;
-        return n * n * n * n + 15 + ThreadLocalRandom.current().nextInt(30) * (n + 1);
+        return new RetryPolicy(0, retryDelayOverrideSeconds).delaySeconds(attempt);
     }
 }

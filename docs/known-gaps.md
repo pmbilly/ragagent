@@ -96,11 +96,11 @@
 - **影响**：仅支持本地 Ollama（`localhost`），不处理自定义私部署路径。
 - **涉及**：`OllamaService`。
 
-## 15. 工具 SPI 主体尚未迁入 `contract.tool`
+## 15. `ToolDefinitions` 尚未迁入 `contract.tool`
 
-- **状态**：待迁移（架构债，见 v0.5.0 L22）。
-- **影响**：`AgentTool` / `BaseTool` / `ToolDefinitions` 仍在实现模块；契约面只有工具名常量与校验工具。
-- **涉及**：`contract/tool/package-info`、`platform/tool/BaseTool`、`agent-engine/tool`。
+- **状态**：部分完成（C5c）：`AgentTool` / `BaseTool` 已在 `contract.tool`，`BaseTool` 为纯 JDK 基类；`ToolDefinitions` 仍在 `agent-engine`。
+- **影响**：工具定义/注册逻辑留在运行面；schema JSON 解析由 `platform.tool.ToolSchemas` 承担。
+- **涉及**：`contract/tool/package-info`、`platform/tool/ToolSchemas`、`agent-engine/tool`。
 
 ## 16. 审批闸门未装配时的分支
 

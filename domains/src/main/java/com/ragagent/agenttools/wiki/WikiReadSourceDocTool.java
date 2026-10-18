@@ -3,6 +3,7 @@ package com.ragagent.agenttools.wiki;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
@@ -12,7 +13,7 @@ import com.ragagent.platform.knowledge.DocChunkSupport.ImageInfoCollector;
 import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoReader;
 import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoRow;
 import com.ragagent.platform.knowledge.DocChunkSupport.PagedChunks;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -70,7 +71,7 @@ public class WikiReadSourceDocTool extends BaseTool {
     public WikiReadSourceDocTool(KnowledgeInfoReader knowledgeReader, PagedChunks pagedChunks,
             ImageInfoCollector imageCollector,
             SearchTarget.SearchTargets searchTargets) {
-        super(ToolDefinitions.TOOL_WIKI_READ_SOURCE_DOC, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_WIKI_READ_SOURCE_DOC, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.knowledgeReader = knowledgeReader;
         this.pagedChunks = pagedChunks;
         this.imageCollector = imageCollector;

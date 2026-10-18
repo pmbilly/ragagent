@@ -1,10 +1,10 @@
 package com.ragagent.agenttools.knowledge;
 
-
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -85,7 +85,7 @@ public class SearchMemoryTool extends BaseTool {
     private final MemorySearch memorySearch;
 
     public SearchMemoryTool(MemorySearch memorySearch) {
-        super(ToolDefinitions.TOOL_SEARCH_MEMORY, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_SEARCH_MEMORY, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.memorySearch = memorySearch;
     }
 

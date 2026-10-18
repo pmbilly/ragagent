@@ -5,6 +5,7 @@ import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
@@ -13,7 +14,7 @@ import com.ragagent.platform.knowledge.DocChunkSupport.ChunkPage;
 import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoReader;
 import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoRow;
 import com.ragagent.platform.knowledge.DocChunkSupport.PagedChunks;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,7 +90,7 @@ public class GetDocumentInfoTool extends BaseTool {
 
     public GetDocumentInfoTool(KnowledgeInfoReader knowledgeReader, Function<String, ChunkFacts> chunkById,
             PagedChunks pagedChunks, SearchTarget.SearchTargets searchTargets) {
-        super(ToolDefinitions.TOOL_GET_DOCUMENT_INFO, DESCRIPTION, SCHEMA_JSON);
+        super(ToolDefinitions.TOOL_GET_DOCUMENT_INFO, DESCRIPTION, ToolSchemas.parse(SCHEMA_JSON));
         this.knowledgeReader = knowledgeReader;
         this.chunkById = chunkById;
         this.pagedChunks = pagedChunks;

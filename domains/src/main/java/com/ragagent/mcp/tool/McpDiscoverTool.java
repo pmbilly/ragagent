@@ -1,8 +1,9 @@
 package com.ragagent.mcp.tool;
 
+import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.platform.tool.BaseTool;
+import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ public class McpDiscoverTool extends BaseTool {
     private boolean advertiseSources;
 
     McpDiscoverTool(String name, String description, String parameters, McpCatalog catalog) {
-        super(name, description, parameters);
+        super(name, description, ToolSchemas.parse(parameters));
         this.catalog = catalog;
     }
 

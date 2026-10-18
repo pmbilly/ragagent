@@ -1,39 +1,21 @@
-package com.ragagent.platform.tool;
-
-import com.ragagent.contract.tool.AgentTool;
-import com.ragagent.platform.web.JsonMappers;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+package com.ragagent.contract.tool;
 
 /**
- * 工具基类。
- * 提供 name/description/schema 三件套与共享的输出格式化函数。
+ * 工具基类：name / description / schema 三件套与共享的输出格式化函数。
+ *
+ * <p>schema 必须是**纯 JDK JSON 值**（对象 → {@code Map}、数组 → {@code List}）；
+ * 从 JSON 字符串构造时由 {@code platform.tool.ToolSchemas} 解析，本类不依赖 Jackson。</p>
  */
 public abstract class BaseTool implements AgentTool {
 
-    private static final ObjectMapper SCHEMA_MAPPER = JsonMappers.lenient();
-
     private final String name;
     private final String description;
-    private final JsonNode schema;
+    private final Object schema;
 
-    protected BaseTool(String name, String description, JsonNode schema) {
+    protected BaseTool(String name, String description, Object schema) {
         this.name = name;
         this.description = description;
         this.schema = schema;
-    }
-
-    /** schema 以原始 JSON 字符串给出（解析保序，字节形态不变）。 */
-    protected BaseTool(String name, String description, String schemaJson) {
-        this(name, description, parse(schemaJson));
-    }
-
-    private static JsonNode parse(String schemaJson) {
-        try {
-            return SCHEMA_MAPPER.readTree(schemaJson);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("invalid tool schema JSON", e);
-        }
     }
 
     @Override
@@ -48,7 +30,7 @@ public abstract class BaseTool implements AgentTool {
 
     @Override
     public Object getParameters() {
-        return JsonMappers.toJavaValue(schema);
+        return schema;
     }
 
     /**
