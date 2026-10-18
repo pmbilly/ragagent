@@ -104,6 +104,11 @@ public class SessionAgentQaService {
 
     // AgentQA
 
+    /**
+     * AgentQA 单轮：解析 agent → 模型面 → 历史 → 建引擎 → 记忆/转向接缝 → 查询组装 → 执行。
+     *
+     * <p>七步各自独立成方法：单看本方法能读出整条链路顺序，细节按需下钻。</p>
+     */
     public void agentQA(QaSupport.QaRequest req, EventBusInterface eventBus) {
         agentResolver.resolveInto(req);
         String sessionId = req.session.getId();
@@ -118,155 +123,179 @@ public class SessionAgentQaService {
 
         // 补默认值（config 树在 parseQARequest 已跑一遍，这里再钉一次）
         AgentConfigJson.ensureDefaults(req.agentConfig);
-
-        // Build AgentConfig
         QaAgentConfig agentConfig = configAssembler.buildAgentConfig(req, agentTenantId);
 
-        {
-            // VLM runtime field
-            String vlm = req.agentConfig.path("vlmModelId").asString("");
-            if (!vlm.isEmpty()) {
-                agentConfig.setVlmModelId(vlm);
-            }
+        AgentModels models = applyModelConfig(req, agentConfig);
+        List<ChatMessage> llmContext = loadLlmContext(agentConfig, sessionId);
+        AgentEngineHandle engine = engineAssembler.createAgentEngine(agentConfig,
+                models.chatModel(), models.rerankModel(), eventBus, sessionId, req.assistantMessageId);
+        attachMemory(engine, req, sessionId, eventBus);
+        attachSteerAndCancel(engine, req);
 
-            // Resolve model ID
-            String effectiveModelId = knowledgeQa.resolveChatModelId(req, agentConfig.getKnowledgeBases(),
-                    agentConfig.getKnowledgeIds());
-            if (effectiveModelId.isEmpty()) {
-                throw new RuntimeException("summary model (model_id) is not configured in custom agent settings");
-            }
-            LlmChatClient summaryModel = chatModel(effectiveModelId);
+        AgentQuery query = buildAgentQuery(req, models.supportsVision());
+        executeAgent(engine, req, sessionId, query, llmContext, eventBus);
+    }
 
-            boolean supportsVision = false;
-            int modelContextWindow = 0;
-            try {
-                var info = modelCatalog.findModel(effectiveModelId);
-                if (info != null && info.parameters() != null) {
-                    supportsVision = info.parameters().isSupportsVision();
-                    modelContextWindow = info.parameters().getContextWindow();
-                }
-            } catch (RuntimeException e) {
-                // 获取失败 → 零值
-            }
-            agentConfig.setChatModelSupportsVision(supportsVision);
-            // 上下文 token 上限：显式设置 > 模型声明 > 缺省
-            agentConfig.setMaxContextTokens(agentConfig.getMaxContextTokens() > 0
-                    ? agentConfig.getMaxContextTokens()
-                    : (modelContextWindow > 0 ? modelContextWindow
-                            : AgentBudgets.DEFAULT_MAX_CONTEXT_TOKENS));
-            log.info("Agent context window: {} tokens (model {} declares {})",
-                    agentConfig.getMaxContextTokens(), effectiveModelId, modelContextWindow);
+    /** 单轮 agent 的模型面：chat 模型 + 可选 rerank + 是否支持视觉。 */
+    record AgentModels(LlmChatClient chatModel, Reranker rerankModel, boolean supportsVision) {
+    }
 
-            // Rerank model only when knowledge_search can run
-            Reranker rerankModel = null;
-            if (AgentConfigAssembler.agentRequiresRerankModel(req.agentConfig)) {
-                String rerankModelId = req.agentConfig.path("rerankModelId").asString("");
-                if (rerankModelId.isEmpty()) {
-                    throw new RuntimeException("rerank model is not configured: please set rerank_model_id on the agent");
-                }
-                rerankModel = rerankModel(rerankModelId);
-            } else {
-                log.info("knowledge_search is unavailable for the effective agent scope, "
-                        + "skipping rerank model initialization");
-            }
+    /** 组装后的 agent 查询：文本（含图片描述/引用/附件）+ 图片 URL 列表。 */
+    record AgentQuery(String text, List<String> imageUrls) {
+    }
 
-            // Multi-turn history 装载
-            List<ChatMessage> llmContext = new ArrayList<>();
-            if (agentConfig.isMultiTurnEnabled()) {
-                int historyTurns = agentConfig.getHistoryTurns() <= 0 ? 5 : agentConfig.getHistoryTurns();
-                try {
-                    llmContext = historyAssembler.loadAgentHistory(sessionId, historyTurns);
-                } catch (RuntimeException e) {
-                    log.warn("Failed to load agent history from DB, continuing without history", e);
-                    llmContext = new ArrayList<>();
-                }
-                log.info("Loaded {} history messages from DB (turns={})", llmContext.size(), historyTurns);
-            } else {
-                log.info("Multi-turn disabled for this agent, running without history");
-            }
+    /** VLM 覆盖、chat 模型解析、上下文窗口、按需 rerank。 */
+    private AgentModels applyModelConfig(QaSupport.QaRequest req, QaAgentConfig agentConfig) {
+        String vlm = req.agentConfig.path("vlmModelId").asString("");
+        if (!vlm.isEmpty()) {
+            agentConfig.setVlmModelId(vlm);
+        }
 
-            // Create agent engine
-            AgentEngineHandle engine = engineAssembler.createAgentEngine(agentConfig, summaryModel, rerankModel, eventBus,
-                    sessionId, req.assistantMessageId);
+        String effectiveModelId = knowledgeQa.resolveChatModelId(req, agentConfig.getKnowledgeBases(),
+                agentConfig.getKnowledgeIds());
+        if (effectiveModelId.isEmpty()) {
+            throw new RuntimeException("summary model (model_id) is not configured in custom agent settings");
+        }
+        LlmChatClient summaryModel = chatModel(effectiveModelId);
 
-            // Memory recall
-            if (memoryService != null && req.agentConfig.path("memoryEnabled").asBoolean(false)) {
-                var recall = memoryService.recall(req.query);
-                if (recall != null && recall.prompt() != null && !recall.prompt().isEmpty()) {
-                    engine.setMemoryPrompt(recall.prompt());
-                    List<PipelineUsedMemoryView> used = new ArrayList<>();
-                    if (recall.items() != null) {
-                        for (var item : recall.items()) {
-                            // 与 chatpipeline 的投影一致：kind 缺省空串
-                            used.add(new PipelineUsedMemoryView(item.getId(), null,
-                                    item.getContent()));
-                        }
-                    }
-                    Event evt = new Event();
-                    evt.setType(EventType.EVENT_MEMORY_RECALLED);
-                    evt.setSessionId(sessionId);
-                    evt.setData(new MemoryRecalledData(used));
-                    try {
-                        eventBus.emit(evt);
-                    } catch (RuntimeException e) {
-                        log.warn("Failed to emit memory recalled event", e);
-                    }
-                    log.info("Injected {} long-term memories into agent context", used.size());
-                }
+        boolean supportsVision = false;
+        int modelContextWindow = 0;
+        try {
+            var info = modelCatalog.findModel(effectiveModelId);
+            if (info != null && info.parameters() != null) {
+                supportsVision = info.parameters().isSupportsVision();
+                modelContextWindow = info.parameters().getContextWindow();
             }
+        } catch (RuntimeException e) {
+            // 取不到模型参数 → 零值，不阻断本轮
+        }
+        agentConfig.setChatModelSupportsVision(supportsVision);
+        // 上下文 token 上限：显式设置 > 模型声明 > 缺省
+        agentConfig.setMaxContextTokens(agentConfig.getMaxContextTokens() > 0
+                ? agentConfig.getMaxContextTokens()
+                : (modelContextWindow > 0 ? modelContextWindow
+                        : AgentBudgets.DEFAULT_MAX_CONTEXT_TOKENS));
+        log.info("Agent context window: {} tokens (model {} declares {})",
+                agentConfig.getMaxContextTokens(), effectiveModelId, modelContextWindow);
 
-            // Steer sink
-            if (req.steerSink != null) {
-                engine.setSteerSink(req.steerSink);
+        Reranker rerankModel = null;
+        if (AgentConfigAssembler.agentRequiresRerankModel(req.agentConfig)) {
+            String rerankModelId = req.agentConfig.path("rerankModelId").asString("");
+            if (rerankModelId.isEmpty()) {
+                throw new RuntimeException(
+                        "rerank model is not configured: please set rerank_model_id on the agent");
             }
-            // 用户停止的取消源（此前 seam 零调用方，stop 只翻 SSE 开关、引擎照跑）
-            if (req.cancellationProbe != null) {
-                engine.setCancellationSource(req.cancellationProbe);
-            }
+            rerankModel = rerankModel(rerankModelId);
+        } else {
+            log.info("knowledge_search is unavailable for the effective agent scope, "
+                    + "skipping rerank model initialization");
+        }
+        return new AgentModels(summaryModel, rerankModel, supportsVision);
+    }
 
-            // 查询组装
-            String agentQuery = req.query;
-            List<String> agentImageUrls = new ArrayList<>();
-            if (supportsVision && req.imageUrls != null && !req.imageUrls.isEmpty()) {
-                agentImageUrls = req.imageUrls;
-                log.info("Agent model supports vision, passing {} image(s) directly", agentImageUrls.size());
-            } else if (!req.imageDescription.isEmpty()) {
-                agentQuery = req.query + "\n\n[用户上传图片内容]\n" + req.imageDescription;
-                log.info("Agent model does not support vision, appending image description ({} chars)",
-                        req.imageDescription.length());
-            }
-            if (!req.quotedContext.isEmpty()) {
-                agentQuery += "\n\n" + req.quotedContext;
-            }
-            if (!req.attachments.isEmpty()) {
-                agentQuery += MessageAttachmentsPrompt.build(
-                        PipelineViews.ofAttachments(req.attachments));
-                log.info("Appended {} attachment(s) to agent query", req.attachments.size());
-            }
+    /** 多轮历史；装载失败退化为空上下文（不阻断本轮）。 */
+    private List<ChatMessage> loadLlmContext(QaAgentConfig agentConfig, String sessionId) {
+        if (!agentConfig.isMultiTurnEnabled()) {
+            log.info("Multi-turn disabled for this agent, running without history");
+            return new ArrayList<>();
+        }
+        int historyTurns = agentConfig.getHistoryTurns() <= 0 ? 5 : agentConfig.getHistoryTurns();
+        try {
+            List<ChatMessage> ctx = historyAssembler.loadAgentHistory(sessionId, historyTurns);
+            log.info("Loaded {} history messages from DB (turns={})", ctx.size(), historyTurns);
+            return ctx;
+        } catch (RuntimeException e) {
+            log.warn("Failed to load agent history from DB, continuing without history", e);
+            return new ArrayList<>();
+        }
+    }
 
-            // 执行（失败 emit error 事件后返回）
-            try {
-                engine.execute(sessionId, req.assistantMessageId, agentQuery, llmContext, agentImageUrls);
-            } catch (AgentExecutionException e) {
-                //：引擎是失败上报的**唯一所有者**——error 事件已在抛出前发出（含 event id、
-                // stage=agent_execution），这里只留带栈日志；再补一份会让客户端看到两次报错。
-                // 带栈：只打 e.toString() 会让这类"回答为空"的事故无从定位。
-                // （契约化：原先捕获的是引擎实现类的异常，现为契约面类型，语义不变。）
-                log.error("Agent execution failed", e);
-            } catch (RuntimeException e) {
-                // 兜底：引擎入口自身（建 span / 组装 prompt / 建工具集）失败不在引擎的 catch 范围内，
-                // 这类异常没有对应 error 事件，仍需本层补发（避免静默失败）。
-                log.error("Agent execution failed before engine error channel", e);
-                Event evt = new Event();
-                evt.setType(EventType.EVENT_ERROR);
-                evt.setSessionId(sessionId);
-                ErrorData errData = new ErrorData();
-                errData.setError(e.getMessage());
-                errData.setStage("agent_execution");
-                errData.setSessionId(sessionId);
-                evt.setData(errData);
-                eventBus.emit(evt);
+    /** 长期记忆召回：注入 prompt + 发 {@code EVENT_MEMORY_RECALLED}（失败不阻断）。 */
+    private void attachMemory(AgentEngineHandle engine, QaSupport.QaRequest req,
+            String sessionId, EventBusInterface eventBus) {
+        if (memoryService == null || !req.agentConfig.path("memoryEnabled").asBoolean(false)) {
+            return;
+        }
+        var recall = memoryService.recall(req.query);
+        if (recall == null || recall.prompt() == null || recall.prompt().isEmpty()) {
+            return;
+        }
+        engine.setMemoryPrompt(recall.prompt());
+        List<PipelineUsedMemoryView> used = new ArrayList<>();
+        if (recall.items() != null) {
+            for (var item : recall.items()) {
+                // 与 chatpipeline 的投影一致：kind 缺省空串
+                used.add(new PipelineUsedMemoryView(item.getId(), null, item.getContent()));
             }
+        }
+        Event evt = new Event();
+        evt.setType(EventType.EVENT_MEMORY_RECALLED);
+        evt.setSessionId(sessionId);
+        evt.setData(new MemoryRecalledData(used));
+        try {
+            eventBus.emit(evt);
+        } catch (RuntimeException e) {
+            log.warn("Failed to emit memory recalled event", e);
+        }
+        log.info("Injected {} long-term memories into agent context", used.size());
+    }
+
+    /** steer 交接与用户停止的取消源（两者都可空）。 */
+    private void attachSteerAndCancel(AgentEngineHandle engine, QaSupport.QaRequest req) {
+        if (req.steerSink != null) {
+            engine.setSteerSink(req.steerSink);
+        }
+        if (req.cancellationProbe != null) {
+            engine.setCancellationSource(req.cancellationProbe);
+        }
+    }
+
+    /** 查询组装：视觉直传图片，否则把 VLM 描述拼进文本；再补引用与附件。 */
+    private AgentQuery buildAgentQuery(QaSupport.QaRequest req, boolean supportsVision) {
+        String text = req.query;
+        List<String> imageUrls = new ArrayList<>();
+        if (supportsVision && req.imageUrls != null && !req.imageUrls.isEmpty()) {
+            imageUrls = req.imageUrls;
+            log.info("Agent model supports vision, passing {} image(s) directly", imageUrls.size());
+        } else if (!req.imageDescription.isEmpty()) {
+            text = req.query + "\n\n[用户上传图片内容]\n" + req.imageDescription;
+            log.info("Agent model does not support vision, appending image description ({} chars)",
+                    req.imageDescription.length());
+        }
+        if (!req.quotedContext.isEmpty()) {
+            text += "\n\n" + req.quotedContext;
+        }
+        if (!req.attachments.isEmpty()) {
+            text += MessageAttachmentsPrompt.build(PipelineViews.ofAttachments(req.attachments));
+            log.info("Appended {} attachment(s) to agent query", req.attachments.size());
+        }
+        return new AgentQuery(text, imageUrls);
+    }
+
+    /**
+     * 执行并处理两类失败。
+     *
+     * <p><b>纪律</b>：{@link AgentExecutionException} 是引擎已上报的失败——这里只记带栈日志；
+     * 再补一份 error 事件会让客户端看到两次报错。其余 {@link RuntimeException} 属引擎入口自身
+     * 失败（建 span / 组装 prompt / 建工具集），没有对应 error 事件，需本层补发。</p>
+     */
+    private void executeAgent(AgentEngineHandle engine, QaSupport.QaRequest req, String sessionId,
+            AgentQuery query, List<ChatMessage> llmContext, EventBusInterface eventBus) {
+        try {
+            engine.execute(sessionId, req.assistantMessageId, query.text(), llmContext, query.imageUrls());
+        } catch (AgentExecutionException e) {
+            log.error("Agent execution failed", e);
+        } catch (RuntimeException e) {
+            log.error("Agent execution failed before engine error channel", e);
+            Event evt = new Event();
+            evt.setType(EventType.EVENT_ERROR);
+            evt.setSessionId(sessionId);
+            ErrorData errData = new ErrorData();
+            errData.setError(e.getMessage());
+            errData.setStage("agent_execution");
+            errData.setSessionId(sessionId);
+            evt.setData(errData);
+            eventBus.emit(evt);
         }
     }
 
