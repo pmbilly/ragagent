@@ -332,6 +332,8 @@ boot           14 件                      →  boot
 | L25 | 2026-10-18 | **分层解耦（规则 + 第一批）**：`check-domain-contracts` 的 `tier_of` 支持族定义推导（两端同族即豁免，**含新增边/新增类**）；`check-package-cycles` 族内双向环/间接环/包级 SCC 豁免；族映射改为**多族归属**（`agentmanagement` 同属 agent-runtime 与 identity）。删 4 个 memory 族内 Port（Extraction/Recall/Search/SessionMessage），`MemoryAccessAdapter` → `MemoryAccess`、`SessionMessageView` 提为独立 record。**identity 族 4 个 Port 未删**：`AdminUserPort` 内嵌 Page/CreateResult/常量，类型搬迁成本大于「-4 接口」收益。 | **31 守卫** · **5022 / 0 / 4** · build 1m41s |
 | L26 | 2026-10-18 | **问答主链路一页纸**：新增 `docs/architecture/qa-flow.md`（Mermaid 时序图、4 入口判定、14 事件顺序、`executeQA` 七步表、改功能映射表、三条不变量、三个「去哪找」入口）；新增 `check-qa-flow.py`——文档里 `{@code Xxx}` 引用的类必须真实存在（红态探针已验），接入**第 32 条守卫**。 | **32 守卫** · **5022 / 0 / 4** · build 1m37s |
 
+| L27 | 2026-10-18 | **identity 族内 4 个 Port 内联**（第二批解耦）：先把嵌套类型提为独立文件（`AdminUserPage` / `CreateUserResult` sealed / `AuthUserErrors` / `AuthUserView` / `ApiKeyAuthRequest` / `ApiKeyAuthResult` sealed），再删 `AdminUserPort` / `ApiKeyAdminPort` / `UserLookupPort` / `ApiKeyAuthPort`；4 个实现去 implements、6 处调用方改直接注入。**`contract` 的 `*Port` 39 → 31**；域间边族内 6 条 / 28 类。教训：删 Port 的真实成本在「接口里内嵌的 View/sealed/常量」，不在方法签名。 | **32 守卫** · **5022 / 0 / 4** · build 1m44s |
+
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
 ## 13. 文档地图与归档
