@@ -1,7 +1,7 @@
 package com.ragagent.session.qa;
 
-import com.ragagent.contract.memory.MemoryExtractionPort;
 import com.ragagent.contract.session.SessionLastRequestState;
+import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.session.domain.document.TemporaryDocument;
@@ -37,17 +37,17 @@ public final class QaTurnFinalizer {
     private final MessageService messageService;
     private final MessageSuggestionService suggestionService;
     private final TemporaryDocumentService temporaryDocuments;
-    private final MemoryExtractionPort memoryExtraction;
+    private final MemoryAccess memoryExtraction;
 
     @Autowired   // 多构造器（含测试接缝）⇒ 显式指定装配用的这一个
     public QaTurnFinalizer(SessionService sessionService, MessageService messageService, MessageSuggestionService suggestionService, TemporaryDocumentService temporaryDocuments,
-            org.springframework.beans.factory.ObjectProvider<MemoryExtractionPort> memoryExtractionProvider) {
+            org.springframework.beans.factory.ObjectProvider<MemoryAccess> memoryExtractionProvider) {
         this(sessionService, messageService, suggestionService, temporaryDocuments,
                 memoryExtractionProvider.getIfAvailable());
     }
 
     /** 测试接缝：直接给端口实例（不经 Spring 装配）。 */
-    public QaTurnFinalizer(SessionService sessionService, MessageService messageService, MessageSuggestionService suggestionService, TemporaryDocumentService temporaryDocuments, MemoryExtractionPort memoryExtraction) {
+    public QaTurnFinalizer(SessionService sessionService, MessageService messageService, MessageSuggestionService suggestionService, TemporaryDocumentService temporaryDocuments, MemoryAccess memoryExtraction) {
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.suggestionService = suggestionService;

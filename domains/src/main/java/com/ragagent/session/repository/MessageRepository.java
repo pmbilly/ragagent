@@ -7,7 +7,6 @@ import com.ragagent.contract.memory.MemoryMessageCursor;
 import com.ragagent.contract.session.MessageArtifact;
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.contract.session.MessageImage;
-import com.ragagent.contract.session.SessionMessagePort;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.persistence.LikeEscapes;
 import com.ragagent.platform.persistence.PageRequests;
@@ -49,7 +48,7 @@ import org.springframework.stereotype.Component;
  * memory 游标分页在 {@link MessageMapper}。</p>
  */
 @Component
-public class MessageRepository implements SessionMessagePort {
+public class MessageRepository {
 
     /** jsonb 列的类型处理器全限定名（3 参 set 的 mapping 串）。 */
     private static final String PG_JSON = "com.ragagent.platform.persistence.PgJsonTypeHandler";
@@ -565,26 +564,24 @@ public class MessageRepository implements SessionMessagePort {
         return out;
     }
 
-    // ── SessionMessagePort 实现（memory 蒸馏用；复用上面既有查询后映射为视图）──
+    // ── 记忆蒸馏读面（memory 域直接注入本类；复用既有查询后映射为视图）──
 
-    @Override
-    public List<SessionMessagePort.SessionMessageView> listAfterCursor(
+        public List<SessionMessageView> listAfterCursor(
             String sessionId, java.time.OffsetDateTime afterCreatedAt, String afterId, int limit) {
         return listMessagesBySessionAfterCursor(
                         sessionId, new MemoryMessageCursor(afterCreatedAt, afterId), limit)
                 .stream().map(MessageRepository::toSessionMessageView).toList();
     }
 
-    @Override
-    public List<SessionMessagePort.SessionMessageView> listBeforeTime(
+        public List<SessionMessageView> listBeforeTime(
             String sessionId, java.time.OffsetDateTime beforeTime, int limit) {
         return getMessagesBySessionBeforeTime(sessionId, beforeTime, limit)
                 .stream().map(MessageRepository::toSessionMessageView).toList();
     }
 
-    private static SessionMessagePort.SessionMessageView toSessionMessageView(
+    private static SessionMessageView toSessionMessageView(
             Message message) {
-        return new SessionMessagePort.SessionMessageView(
+        return new SessionMessageView(
                 message.getId(), message.getRole(), message.getContent(), message.getCreatedAt());
     }
 }

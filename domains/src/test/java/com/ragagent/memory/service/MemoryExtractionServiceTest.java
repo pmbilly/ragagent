@@ -20,7 +20,6 @@ import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.model.chat.ChatOptions;
 import com.ragagent.contract.model.chat.ChatResponse;
-import com.ragagent.contract.session.SessionMessagePort;
 import com.ragagent.memory.domain.MemoryConflictException;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
@@ -29,6 +28,8 @@ import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.repository.MemoryRepository;
+import com.ragagent.session.repository.MessageRepository;
+import com.ragagent.session.repository.SessionMessageView;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ class MemoryExtractionServiceTest {
     private final MemoryRepository repo = mock(MemoryRepository.class);
     private final MemoryService memoryService = mock(MemoryService.class);
     private final MemoryVectorService vectorService = mock(MemoryVectorService.class);
-    private final SessionMessagePort sessionMessages = mock(SessionMessagePort.class);
+    private final MessageRepository sessionMessages = mock(MessageRepository.class);
     private final MemoryConsolidationService consolidation = mock(MemoryConsolidationService.class);
     @SuppressWarnings("unchecked")
     private final ObjectProvider<MemoryExtractTaskQueue> queueProvider = mock(ObjectProvider.class);
@@ -97,9 +98,9 @@ class MemoryExtractionServiceTest {
         return s;
     }
 
-    private static SessionMessagePort.SessionMessageView message(
+    private static SessionMessageView message(
             String id, String role, String content, OffsetDateTime at) {
-        return new SessionMessagePort.SessionMessageView(id, role, content, at);
+        return new SessionMessageView(id, role, content, at);
     }
 
     private static OffsetDateTime at(String iso) {
@@ -387,7 +388,7 @@ class MemoryExtractionServiceTest {
 
         @Test
         void aPageOverTheCapReportsMoreAndKeepsOnlyTheFirstForty() {
-            List<SessionMessagePort.SessionMessageView> rows = new ArrayList<>();
+            List<SessionMessageView> rows = new ArrayList<>();
             for (int i = 0; i < MemoryExtractionService.EXTRACT_MAX_MESSAGES_PER_RUN + 1; i++) {
                 rows.add(message("m" + i, "user", "行" + i, at("2026-03-02T09:00:00Z").plusMinutes(i)));
             }

@@ -3,7 +3,7 @@ package com.ragagent.session.qa;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import com.ragagent.contract.memory.MemoryExtractionPort;
+import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.session.service.MessageService;
@@ -28,7 +28,7 @@ class QaTurnFinalizerTenantContextTest {
 
     private final QaTurnFinalizer finalizer = new QaTurnFinalizer(mock(SessionService.class),
             mock(MessageService.class), mock(MessageSuggestionService.class),
-            mock(TemporaryDocumentService.class), mock(MemoryExtractionPort.class));
+            mock(TemporaryDocumentService.class), mock(MemoryAccess.class));
 
     @AfterEach
     void clearContext() {

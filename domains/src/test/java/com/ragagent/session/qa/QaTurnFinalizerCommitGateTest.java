@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.contract.memory.MemoryExtractionPort;
+import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionService;
@@ -37,7 +37,7 @@ class QaTurnFinalizerCommitGateTest {
 
     private final MessageService messageService = mock(MessageService.class);
     private final MessageSuggestionService suggestionService = mock(MessageSuggestionService.class);
-    private final MemoryExtractionPort memoryExtraction = mock(MemoryExtractionPort.class);
+    private final MemoryAccess memoryExtraction = mock(MemoryAccess.class);
     private final QaTurnFinalizer finalizer = new QaTurnFinalizer(mock(SessionService.class),
             messageService, suggestionService, mock(TemporaryDocumentService.class), memoryExtraction);
 

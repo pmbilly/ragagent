@@ -29,7 +29,13 @@
         "agent-runtime": [
           "agentmanagement",
           "agenttools",
+          "memory",
           "session"
+        ],
+        "identity": [
+          "auth",
+          "system",
+          "tenant"
         ]
       },
       "edges": {
@@ -41,13 +47,27 @@
         "agenttools→agent": "agent-runtime 族内：工具实现与调度直接建立在 `agent.tool.*`（`AgentTool`/`BaseTool`/`ToolRegistryPort`）之上——同族内 SPI ✓（**跨族**消费方 approval/im/mcp 的收入 ① 档，见 clearable.focus）",
         "session→agent": "agent-runtime 族内：会话装配与单轮执行建立在 agent 引擎之上 ✓",
         "session→agentmanagement": "agent-runtime 族内：会话装配读 agent 配置（`AgentResolver`/`AgentConfigAssembler`）✓",
-        "session→agenttools": "agent-runtime 族内：会话装配挂工具后端（`AgentToolBackends`/`AgentToolKbBackends`）✓"
+        "session→agenttools": "agent-runtime 族内：会话装配挂工具后端（`AgentToolBackends`/`AgentToolKbBackends`）✓",
+        "session→memory": "conversation 族内：会话装配与记忆召回/抽取直接建立在记忆域之上（4 个端口据此可内联）✓",
+        "memory→session": "conversation 族内：记忆域读会话消息（SessionMessagePort 据此可内联）✓",
+        "system→auth": "identity 族内：系统管理面读用户/租户主体 ✓",
+        "agentmanagement→auth": "identity 族内：Agent 管理读租户成员与用户主体 ✓"
       }
     }
   },
   "edges": {
     "auth→tenant": [
       "TenantService"
+    ],
+    "memory→session": [
+      "MemoryExtractionService",
+      "MemoryTranscriptOps"
+    ],
+    "session→memory": [
+      "AgentEngineAssembler",
+      "AgentToolBackends",
+      "QaTurnFinalizer",
+      "SessionAgentQaService"
     ],
     "session→agentmanagement": [
       "AgentConfigAssembler",

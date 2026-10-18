@@ -11,11 +11,11 @@ import com.ragagent.auth.service.TenantService;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.memory.MemorySearchHit;
 import com.ragagent.contract.memory.MemorySearchHits;
-import com.ragagent.contract.memory.MemorySearchPort;
 import com.ragagent.contract.pipeline.WebSearchExecutor;
 import com.ragagent.contract.retrieval.HybridSearchPort;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.wiki.WikiPageOpsPort;
+import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.session.domain.message.MessageSearchGroupItem;
@@ -46,12 +46,12 @@ class AgentToolBackendsKbToolTest {
 
     private AgentToolBackends backends;
     private MessageService messageService;
-    private MemorySearchPort memorySearch;
+    private MemoryAccess memorySearch;
 
     @BeforeEach
     void setUp() {
         messageService = mock(MessageService.class);
-        memorySearch = mock(MemorySearchPort.class);
+        memorySearch = mock(MemoryAccess.class);
         backends = new AgentToolBackends(
                 mock(KnowledgeCatalogPort.class),
                 mock(HybridSearchPort.class),

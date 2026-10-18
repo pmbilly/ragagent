@@ -1,9 +1,9 @@
 package com.ragagent.memory.service;
 
 import com.ragagent.contract.memory.MemoryKeys;
-import com.ragagent.contract.session.SessionMessagePort;
 import com.ragagent.memory.domain.MemoryExtractionSession;
 import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.session.repository.SessionMessageView;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ final class MemoryTranscriptOps {
      * 就被冲刷，所以水位线不会一步跨过它。</p>
      */
     CollectedSegments collectSessionSegments(MemoryExtractionSession session) {
-        List<SessionMessagePort.SessionMessageView> rows;
+        List<SessionMessageView> rows;
         try {
             rows = service.sessionMessages.listAfterCursor(session.getSessionId(), session.getCursor().getAt(), session.getCursor().getId(),
                     MemoryExtractionService.EXTRACT_MAX_MESSAGES_PER_RUN + 1);
@@ -55,7 +55,7 @@ final class MemoryTranscriptOps {
         OffsetDateTime[] lastAt = {null};
         boolean[] hasRows = {false};
 
-        for (SessionMessagePort.SessionMessageView message : rows) {
+        for (SessionMessageView message : rows) {
             if (message == null) {
                 continue;
             }
@@ -112,7 +112,7 @@ final class MemoryTranscriptOps {
         if (lines.isEmpty()) {
             return null;
         }
-        List<SessionMessagePort.SessionMessageView> before;
+        List<SessionMessageView> before;
         try {
             before = service.sessionMessages.listBeforeTime(sessionId, lines.get(0).at, MemoryExtractionService.EXTRACT_CONTEXT_LINES * 4);
         } catch (RuntimeException e) {
@@ -120,7 +120,7 @@ final class MemoryTranscriptOps {
             return null;
         }
         List<MemoryExtractionService.TranscriptLine> previous = new ArrayList<>();
-        for (SessionMessagePort.SessionMessageView message : before) {
+        for (SessionMessageView message : before) {
             if (message == null || !"user".equals(message.role())) {
                 continue;
             }

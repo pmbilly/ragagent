@@ -34,7 +34,6 @@ import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.contract.memory.MemorySearchHit;
 import com.ragagent.contract.memory.MemorySearchHits;
-import com.ragagent.contract.memory.MemorySearchPort;
 import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.pipeline.WebSearchExecutor;
 import com.ragagent.contract.retrieval.HybridSearchPort;
@@ -45,6 +44,7 @@ import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.websearch.ToolPageFetcher;
 import com.ragagent.contract.wiki.WikiPageOpsPort;
+import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.knowledge.DocChunkSupport;
 import com.ragagent.platform.settings.ConversationProperties;
@@ -86,7 +86,7 @@ public class AgentToolBackends {
     /** wiki 工具簇：WikiPages 端口实现与视图转换。 */
     private final AgentToolWikiBackends wikiBackends;
     private final MessageService messageService;
-    private final MemorySearchPort memorySearch;
+    private final MemoryAccess memorySearch;
     private final WebSearchExecutor webSearchExecutor;
     private final TenantConfigLookup tenantService;
     private final JdbcTemplate jdbc;
@@ -95,7 +95,7 @@ public class AgentToolBackends {
                              HybridSearchPort hybridSearchService,
                              ConversationProperties conversation,
                              MessageService messageService,
-                             MemorySearchPort memorySearch,
+                             MemoryAccess memorySearch,
                              WikiPageOpsPort wikiPageOps,
                              WebSearchExecutor webSearchExecutor,
                              TenantConfigLookup tenantService,

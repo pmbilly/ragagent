@@ -6,7 +6,7 @@
 ## 统计
 
 - 域内（可评估内联）：**1**
-- 域间（解耦）：**30**
+- 域间（解耦）：**26**
 - 跨模块（必要）：**8**
 
 ## 明细
@@ -33,14 +33,10 @@
 | `KnowledgeMaintenancePort` | `KnowledgeMaintenanceAdapter` | domains | websearch | 域间（解耦） |
 | `KnowledgeSpanPort` | `KnowledgeSpanAdapter` | domains | wiki | 域间（解耦） |
 | `McpToolRegistrationPort` | `McpToolRegistrationAdapter` | domains | agent-engine | 跨模块（必要） |
-| `MemoryExtractionPort` | `MemoryAccessAdapter` | domains | session | 域间（解耦） |
-| `MemoryRecallPort` | `MemoryAccessAdapter` | domains | session | 域间（解耦） |
-| `MemorySearchPort` | `MemoryAccessAdapter` | domains | session | 域间（解耦） |
 | `ModelCatalogPort` | `ModelCatalogAdapter` | domains | evaluation、initialization、knowledge、mcp、memory、model-runtime、session、wiki | 跨模块（必要） |
 | `OllamaAdminPort` | `OllamaService` | model-runtime | initialization | 跨模块（必要） |
 | `ProviderFileStorePort` | `ProviderFileStoreAdapter` | domains | knowledge | 域间（解耦） |
 | `ResourceCatalogPort` | `ResourceCatalogAdapter` | domains | knowledge、session | 域间（解耦） |
-| `SessionMessagePort` | `MessageRepository` | domains | memory | 域间（解耦） |
 | `SessionQaPort` | `SessionQaAdapter` | domains | im | 域间（解耦） |
 | `SkillCatalogPort` | `SkillCatalogService` | agent-engine | agent-engine、agentmanagement | 跨模块（必要） |
 | `StorageBackendPort` | `StorageBackendPortAdapter` | domains | knowledge、system | 域间（解耦） |

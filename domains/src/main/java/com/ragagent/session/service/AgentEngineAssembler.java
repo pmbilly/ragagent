@@ -18,13 +18,13 @@ import com.ragagent.contract.knowledge.FaqEntryView;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
-import com.ragagent.contract.memory.MemoryRecallPort;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ final class AgentEngineAssembler {
     private static final org.slf4j.Logger log =
             org.slf4j.LoggerFactory.getLogger(AgentEngineAssembler.class);
 
-    private final MemoryRecallPort memoryService;
+    private final MemoryAccess memoryService;
     private final SessionKnowledgeQaService knowledgeQa;
     private final AgentToolBackends toolBackends;
     private final ArtifactCollectorWiring artifactCollectorWiring;
@@ -53,7 +53,7 @@ final class AgentEngineAssembler {
     private final ResourceCatalogPort resourceCatalog;
     private final javax.sql.DataSource dataSource;
     private final VlmDescriberWiring vlmDescriberWiring;
-    AgentEngineAssembler(MemoryRecallPort memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeCatalogPort knowledgeService, AgentEngineFactory engineFactory, ResourceCatalogPort resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring) {
+    AgentEngineAssembler(MemoryAccess memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeCatalogPort knowledgeService, AgentEngineFactory engineFactory, ResourceCatalogPort resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring) {
         this.memoryService = memoryService;
         this.knowledgeQa = knowledgeQa;
         this.toolBackends = toolBackends;

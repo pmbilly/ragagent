@@ -10,7 +10,6 @@ import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.contract.event.payload.MemoryRecalledData;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.memory.MemoryRecallPort;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelRuntime;
@@ -18,6 +17,7 @@ import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.model.chat.ChatMessage;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.contract.storage.ResourceCatalogPort;
+import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
@@ -51,7 +51,7 @@ public class SessionAgentQaService {
     static final int AGENT_HISTORY_FETCH_MIN = 20;
 
     private final ModelCatalogPort modelCatalog;
-    private final MemoryRecallPort memoryService;
+    private final MemoryAccess memoryService;
     private final SessionKnowledgeQaService knowledgeQa;
 
     /** 历史/消息装配簇。 */
@@ -71,7 +71,7 @@ public class SessionAgentQaService {
 
     public SessionAgentQaService(MessageService messageService,
             ModelCatalogPort modelCatalog,
-            MemoryRecallPort memoryService,
+            MemoryAccess memoryService,
             SessionKnowledgeQaService knowledgeQa,
             AgentToolBackends toolBackends,
             ResourceCatalogPort resourceCatalog,

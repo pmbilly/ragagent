@@ -1,11 +1,8 @@
 package com.ragagent.memory.api;
 
-import com.ragagent.contract.memory.MemoryExtractionPort;
 import com.ragagent.contract.memory.MemoryRecall;
-import com.ragagent.contract.memory.MemoryRecallPort;
 import com.ragagent.contract.memory.MemorySearchHit;
 import com.ragagent.contract.memory.MemorySearchHits;
-import com.ragagent.contract.memory.MemorySearchPort;
 import com.ragagent.memory.service.MemoryExtractionService;
 import com.ragagent.memory.service.MemoryService;
 import java.util.ArrayList;
@@ -13,36 +10,33 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * 记忆三个 L1 端口的 memory 域实现：逐字转发域内服务，不新增缓冲、不改失败口径。
+ * 记忆域对外访问面（会话族内直接依赖：session 装配注入本类，不经契约端口）。
  *
- * <p>查找面把域内 {@code MemorySearchResult}（条目为实体）映射为 L1 载荷
- * {@link MemorySearchHit}（四字段原样传递，空值不归一）；域返回 null ⇒
- * {@link MemorySearchHits#UNAVAILABLE}（消费方视图结果等价）。</p>
+ * <p>逐字转发域内服务，不新增缓冲、不改失败口径。查找面把域内 {@code MemorySearchResult}
+ * （条目为实体）映射为载荷 {@link MemorySearchHit}（四字段原样传递，空值不归一）；
+ * 域返回 null ⇒ {@link MemorySearchHits#UNAVAILABLE}。</p>
  */
 @Component
-public class MemoryAccessAdapter implements MemoryRecallPort, MemorySearchPort, MemoryExtractionPort {
+public class MemoryAccess {
 
     private final MemoryService memoryService;
     private final MemoryExtractionService memoryExtraction;
 
-    public MemoryAccessAdapter(MemoryService memoryService,
+    public MemoryAccess(MemoryService memoryService,
                                MemoryExtractionService memoryExtraction) {
         this.memoryService = memoryService;
         this.memoryExtraction = memoryExtraction;
     }
 
-    @Override
-    public boolean memoryAvailable() {
+        public boolean memoryAvailable() {
         return memoryService.memoryAvailable();
     }
 
-    @Override
-    public MemoryRecall recall(String query) {
+        public MemoryRecall recall(String query) {
         return memoryService.recall(query);
     }
 
-    @Override
-    public MemorySearchHits search(String query, int limit) {
+        public MemorySearchHits search(String query, int limit) {
         var r = memoryService.searchMemory(query, limit);
         if (r == null) {
             return MemorySearchHits.UNAVAILABLE;
@@ -58,8 +52,7 @@ public class MemoryAccessAdapter implements MemoryRecallPort, MemorySearchPort, 
         return new MemorySearchHits(r.available(), items);
     }
 
-    @Override
-    public void scheduleExtraction(String sessionId, String messageId, String chatModelId) {
+        public void scheduleExtraction(String sessionId, String messageId, String chatModelId) {
         memoryExtraction.scheduleExtraction(sessionId, messageId, chatModelId);
     }
 }

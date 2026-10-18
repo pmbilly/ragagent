@@ -15,8 +15,8 @@
   ① clearable     目标 0（A③ 主线）：跨域能力 / 配置 / 数据读取 ⇒ 提到 contract 端口，调用方只 import contract
   ② owner         同数据属主（**登记，允许存在**）：管理面与他域实体/持久层是同一份数据
                   ⇒ 条件：读侧走 L1 端口、写/管理面集中在属主域（**本档新增仍判红，只许减**）
-  ③ intra-family  运行面族内（**豁免但冻结**）：同一运行面的零件互调（如 agent-runtime 四人组）
-                  ⇒ 族定义在基线 `tiers.intra-family.families`；**跨族**仍按 ①
+  ③ intra-family  运行面族内（**允许直接依赖**）：族定义在基线 `tiers.intra-family.families`；
+                  两端同族即豁免（含**新增边**与新增类）——这是 v0.6.0「分层解耦」规则；**跨族**仍按 ①
 未在 `tiers` 中登记的边**默认 ①**。
 
 为什么是棘轮而不是零容忍
@@ -25,7 +25,8 @@
 一次清零＝K 级重构 ✗。按仓内惯例（A16/A17/A11b 同族）：**基线化、只许减不许增** ——
 新增的"边"或"边内新增的引用类"立即判红，减小后用 `--write` 收紧。
 
-登记不是新增许可：把一条**新增**边标成 owner/intra-family 不能让它通过（棘轮先于分档）✓。
+登记不是新增许可：把一条**新增**边标成 owner 不能让它通过（棘轮先于分档）✓；
+但「族定义」是**规则**而非登记：两端同族的边天然豁免，新增也放行（分层解耦）。
 
 `--write` 的安全阀：**存在新增项时拒绝写入**（否则"顺手 --write"会把新增一起吞掉，
 与 `check-package-cycles.py` 的教训同族）；同时自动清理**陈旧登记**（边已消失的 tiers 条目）。
@@ -102,10 +103,15 @@ def load_baseline():
 
 
 def tier_of(tiers, edge):
+    """档位：显式 owner / 显式族内 / **族定义推导的族内** / 默认 clearable。"""
     if edge in (tiers.get(TIER_OWNER) or {}):
         return TIER_OWNER
     if edge in ((tiers.get(TIER_FAMILY) or {}).get('edges') or {}):
         return TIER_FAMILY
+    a, b = edge.split('→')
+    for doms in ((tiers.get(TIER_FAMILY) or {}).get('families') or {}).values():
+        if a in doms and b in doms:
+            return TIER_FAMILY
     return TIER_CLEARABLE
 
 
@@ -187,9 +193,12 @@ def main():
               '③ 族内边冻结不涨。减小后用 --write 收紧。')
         return 1 if problems else 0
 
-    new_edges = sorted(k for k in actual if k not in base)
+    new_edges = sorted(k for k in actual
+                       if k not in base and tier_of(tiers, k) != TIER_FAMILY)
     new_classes = {k: sorted(set(actual[k]) - set(base.get(k, [])))
-                   for k in actual if k in base and set(actual[k]) - set(base.get(k, []))}
+                   for k in actual
+                   if k in base and set(actual[k]) - set(base.get(k, []))
+                   and tier_of(tiers, k) != TIER_FAMILY}
     gone = {k: sorted(set(base.get(k, [])) - set(actual.get(k, [])))
             for k in base if set(base.get(k, [])) - set(actual.get(k, [])) or k not in actual}
 
