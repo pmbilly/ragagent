@@ -339,7 +339,11 @@ def _family_map():
     try:
         d = json.loads((pathlib.Path(__file__).parent / "domain-contracts.baseline.json").read_text(encoding="utf-8"))
         fams = (d.get("tiers", {}).get("intra-family", {}) or {}).get("families") or {}
-        return {dom: name for name, doms in fams.items() for dom in doms}
+        out = {}
+        for name, doms in fams.items():
+            for dom in doms:
+                out.setdefault(dom, set()).add(name)
+        return out
     except Exception:
         return {}
 
@@ -348,8 +352,11 @@ FAM_OF = _family_map()
 
 
 def _same_family(*doms):
-    names = {FAM_OF.get(d) for d in doms}
-    return len(names) == 1 and None not in names
+    """任一共同族即豁免（域可同时属于多个族，如 agentmanagement）。"""
+    sets = [FAM_OF.get(d) or set() for d in doms]
+    if not sets or any(not s for s in sets):
+        return False
+    return bool(set.intersection(*sets))
 
 
 def _scc_in_one_family(members):
