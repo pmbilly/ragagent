@@ -270,24 +270,6 @@ public class SessionAgentQaService {
         }
     }
 
-    // buildAgentConfig
-
-
-    // CreateAgentEngine
-
-
-    // ── resolveKBAndDocInfos ────────
-
-
-    /**
-     * web 抓取页的完整快照面。
-     * web_search 共享会话 web_fetch 的快照缓存（WithPageReader）；read_file 未被
-     * 沙箱路径注册时以 web:// 读取范围注册（描述随来源变化）。存储写字节面
-     * 未落地——经
-     * {@link AgentWebPages} 的接缝落保存失败分支，见类 Javadoc。
-     */
-
-
     private LlmChatClient chatModel(String modelId) {
         var model = modelCatalog.findModel(modelId);
         if (model == null) {
@@ -303,8 +285,5 @@ public class SessionAgentQaService {
         // langfuse generation 装饰（未启用时原样返回）
         return LangfuseReranker.wrap(modelRuntime.rerankerFor(modelCatalog.findModel(modelId)));
     }
-
-    // LoadAgentHistory
-
 
 }

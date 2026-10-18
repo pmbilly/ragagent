@@ -642,7 +642,7 @@ public final class AgentStreamBridge {
         }
     }
 
-    /** 已订阅事件类型数（自检用，应为 17）。 */
+    /** 已订阅的事件类型集合（自检用；增删订阅时与 {@link #subscribedEventTypes()} 同步）。 */
     public static Set<String> subscribedEventTypes() {
         Set<String> types = new LinkedHashSet<>();
         types.add(EventType.EVENT_AGENT_THOUGHT);

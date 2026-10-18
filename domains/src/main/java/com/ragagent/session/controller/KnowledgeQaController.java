@@ -27,6 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
  * chat 三入口。
  *
  * <h2>三个端点</h2>
+ * <h2>本类承载三个入口（类名只反映了第一个）</h2>
+ * <p>拆成三个控制器更符合命名，但三者在<b>同一条 SSE 装配路径</b>上
+ * （{@code QaEntryRunner} 收敛绑定→解析→执行），拆开只会让共用点变成三份 import，
+ * 所以保留同一类、用本节标明归属。</p>
  * <ul>
  *   <li>POST /api/v1/knowledge-chat/{sessionId} — KnowledgeQA（RAG/纯聊天管线）</li>
  *   <li>POST /api/v1/agent-chat/{sessionId} — AgentQA（agent 引擎）</li>

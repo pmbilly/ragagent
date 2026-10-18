@@ -59,6 +59,11 @@ import tools.jackson.databind.JsonNode;
  * 知识处理后台 worker：虚拟线程队列消费 knowledge 的解析主链路
  * （接管 → 预清理 → 取文本 → 分块落库 → 向量化 → 富化 fan-out / 完成），对外仅暴露
  * {@link #enqueue(String)}。跨线程显式传值（TenantContext 不共享，各阶段自行解析租户）。
+ * <p><b>队列语义（名字易误解）</b>：本类实现 {@code KnowledgeProcessingQueue}，但投递走的是
+ * <b>进程内虚拟线程执行器</b>（{@code newVirtualThreadPerTaskExecutor}）——<b>没有跨实例队列</b>。
+ * 多副本部署时，上传请求落到哪个副本就由哪个副本处理；进程重启会丢掉在飞任务
+ * （由启动恢复任务扫 pending 补投）。跨实例队列只覆盖<b>富化子任务</b>
+ * （{@code RedisQuestionGenerationTaskQueue} 等，见 {@code KnowledgeRedisWiring}）。</p>
  * <p>状态机：pending →(CAS)→ processing →（无富化子任务）→ completed +
  * enable_status=enabled + processed_at；任一步失败 → failed + error_message；
  * deleting/cancelled 检查点短路。</p>

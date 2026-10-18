@@ -47,7 +47,13 @@ public final class EventManager {
         }
     }
 
-    /** 构建给定插件列表的处理链（从最后一个插件往前包）。 */
+    /**
+     * 构建给定插件列表的处理链（从最后一个插件往前包）。
+     *
+     * <p><b>对使用者的含义</b>：{@code register} 越早 → 包在越外层 → <b>越先执行</b>。
+     * 所以「先注册」＝「管线靠前」，与 {@code QaWiring} 里的书写顺序一致；
+     * 完整顺序见 {@code docs/architecture/pipeline-map.md}。</p>
+     */
     private HandlerNode buildHandler(List<Plugin> plugins) {
         HandlerNode next = (eventType, chatManage) -> null;
         for (int i = plugins.size() - 1; i >= 0; i--) {

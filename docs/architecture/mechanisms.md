@@ -134,6 +134,21 @@ Thread.ofVirtual().start(() -> TenantScope.run(snap, () -> {
 
 **去哪改**：单表查询改 Mapper；涉及方言或跨表时在 `repository/` 加方法，别在 service 里拼两套 SQL。
 
+## 10. 可选 Bean：缺失时的行为一览
+
+全仓 77 处 `ObjectProvider.getIfAvailable()`——IDE 在注入点只看到接口，所以"缺 bean 时会发生什么"必须查表，不能靠猜。
+
+| 可选 Bean | 缺失后果 | 有日志？ | 依据 |
+|---|---|---|---|
+| `StreamManager`（Redis 版） | 退化为进程内 Memory 版：SSE 只在当前副本可见，跨实例 `/stop` 失效 | 启动日志 | `StreamManagerConfig` |
+| `SsrfGuard`（IM 出站） | 传给 IM adapter 工厂为 `null`，出站请求不做 SSRF 校验 | 无 | `ImAdapterWiringConfig` |
+| knowledge 四个 Redis 队列 | 开关关闭 = 用 InProcess（单实例语义）；开关打开但连不上 = **启动失败**（不静默退化） | 启动日志 | `KnowledgeRedisWiring` 类注释 |
+| 队列 handler（`DataSourceSyncHandler` 等） | 任务被丢弃，记 **ERROR**（非静默） | ✅ ERROR | `RedisDataSourceSyncTaskQueue` |
+| 富化服务（`WikiImageEnricher` 等） | 返回 null → 调用方走"端口缺席"退化分支 | 部分 | `known-gaps.md` 第 18 节 |
+| `WikiActivityAudit` | 审计写入退化为一条 debug 日志 | ✅ debug | `contract/audit/WikiActivityAudit` |
+
+**读代码时的判断顺序**：看到 `getIfAvailable()` → 查本表 → 表里没有 → 看该行 3 行内有没有 `null` 判断与日志。
+
 ## 相关文档
 
 - 调用链：[`request-path.md`](request-path.md)
