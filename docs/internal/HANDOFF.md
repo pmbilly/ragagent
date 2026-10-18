@@ -81,9 +81,9 @@
 | **L13** | 4 个核心实体 → `XxxView` record | ⏸ 评估后不做：收益（架构纯粹性）小于成本（157 金片 + 序列化细节）与可读性损失（多一层跳转） |
 | **L14** | 事务模板收敛 + 队列 worker 补事务边界说明 | ✅ 2 类合并为 `platform.persistence.TxTemplate` |
 | **L15** | `ChatManage` 拆分 | ⏸ 评估后不做：127 方法 = 60 字段 × 2，是 JavaBean 固有成本；拆分只把复杂度搬到两个类，插件链需持两个引用 |
-| **L16** | `executeQA` 200 行 → 6 个具名步骤（≤50 行/方法） | 待做 |
-| **L17** | 插件表自动生成（事件→插件→读写字段→兜底）+ `--check` 守卫 | 待做 |
-| **L18** | 17 个插件类头三行契约 | 待做 |
+| **L16** | `executeQA` 200 行 → 7 个具名步骤 | ✅ 主方法 ~30 行 |
+| **L17** | 插件表自动生成 + `--check` 守卫 | ✅ `pipeline-map.md`（14 事件 / 17 插件） |
+| **L18** | 插件契约三行（读/写/失败） | ✅ 写在 `Plugin` 接口（统一规则不逐个重复） |
 | **L19** | 拆 `:knowledge`（241 文件；切边 2 处；登记 7 个面） | 待做 |
 | **L20** | `modelcontext` 下沉 `contract`，剪 `domains`/`agent-engine` 两条依赖边 | 待做 |
 | **L21** | `platform/knowledge` 7 类、`platform/model` 2 类归位 | 待做 |
@@ -319,6 +319,9 @@ boot           14 件                      →  boot
 
 | L12 | 2026-10-18 | **控制器纯度守卫 + 数据访问定规**：`check-controller-purity.py`（第 29 条；controller 禁直连 Mapper 硬零 + `catch (RuntimeException)` 棘轮 139 只许减，红态探针已验）；`mechanisms.md` §9 记录 Mapper（76）/Repository（28）的选择规则。**实测 controller 直连 Mapper 为 0**（此前统计的 22 处是 `ObjectMapper` 误报）。 | **29 守卫** · **5022 / 0 / 4** |
 | L14 | 2026-10-18 | **事务模板收敛**：`DataSourceTxTemplate` / `ChunkTxTemplate` 合并为 `platform.persistence.TxTemplate`（Runnable + Supplier 两法），两个 Repository 改注入，删两人类；`MemoryTxTemplate` 保留（`FOR UPDATE` 行锁语义不同）；`KnowledgeProcessWorker` 补「为什么整链不包大事务」的边界说明。 | **29 守卫** · **5022 / 0 / 4** · build 2m18s |
+
+| L16 | 2026-10-18 | **`executeQA` 拆分**：200 行 → 7 个具名步骤（memo 异步写 / 并发守卫 / 消息落库 / steer 交接 / 建流回滚 / 快答 handler / 异步执行），每步带"做什么 + 为什么"的 javadoc，顺序约束写进方法注释。纯重构，行为由 5022 条测试锁定。 | **30 守卫** · **5022 / 0 / 4** · build 1m48s |
+| L17+L18 | 2026-10-18 | **控制流可见化**：新增 `gen-pipeline-map.py`——从 `activationEvents()` + `QaWiring` 注册序 + `ChatManage` getter/setter 生成 `docs/architecture/pipeline-map.md`（14 事件 / 17 插件 / 读写字段），接入第 30 条守卫（红态探针已验）；`Plugin` 接口补「读 / 写 / 失败」三条契约，plugin 目录 package-info 指向事件表。 | **30 守卫** · **5022 / 0 / 4** |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
