@@ -3,11 +3,6 @@
   "sccs": [],
   "package_sccs": [
     [
-      "com.ragagent.agent",
-      "com.ragagent.agent.compaction",
-      "com.ragagent.agent.prompt"
-    ],
-    [
       "com.ragagent.agent.skills",
       "com.ragagent.agent.skills.mapper"
     ],

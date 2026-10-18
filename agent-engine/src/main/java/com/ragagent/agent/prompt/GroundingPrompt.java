@@ -1,6 +1,6 @@
 package com.ragagent.agent.prompt;
 
-import com.ragagent.agent.AgentToolNames;
+import com.ragagent.agent.tool.AgentToolNames;
 import java.util.ArrayList;
 import java.util.List;
 

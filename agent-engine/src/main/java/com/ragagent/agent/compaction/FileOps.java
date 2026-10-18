@@ -1,6 +1,6 @@
 package com.ragagent.agent.compaction;
 
-import com.ragagent.agent.AgentToolNames;
+import com.ragagent.agent.tool.AgentToolNames;
 import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.model.ToolCall;
 import com.ragagent.platform.web.JsonMappers;

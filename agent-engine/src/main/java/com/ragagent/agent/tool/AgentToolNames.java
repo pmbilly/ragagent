@@ -1,10 +1,11 @@
-package com.ragagent.agent;
+package com.ragagent.agent.tool;
 
 /**
  * 工具名常量。
  *
- * <p>此处只收名字（compaction 的 fileops 与 grounding prompt 用）；
- * 注册表/工具定义本体在 {@code com.ragagent.agenttools}。</p>
+ * <p>放在 {@code agent.tool} 而不是根包：compaction（fileops）与 prompt（grounding）都要用，
+ * 若留根包会让它们反向依赖 {@code agent}，与根包对二者的正向依赖成环。</p>
+ * <p>注册表/工具定义本体在 {@code com.ragagent.agenttools}</p>
  */
 public final class AgentToolNames {
 
