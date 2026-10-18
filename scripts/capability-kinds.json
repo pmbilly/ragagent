@@ -1,0 +1,119 @@
+{
+  "note": "22 个业务域的能力种类。新增/删除域必须同步本文件；gen-domain-index.py --check 会校验。",
+  "kinds": {
+    "product": {
+      "label": "产品能力",
+      "description": "直接产生用户价值、按产品需求演进的业务能力。"
+    },
+    "integration": {
+      "label": "集成适配",
+      "description": "对接外部系统/渠道，变更主要由第三方 API 与协议驱动。"
+    },
+    "control": {
+      "label": "控制面",
+      "description": "租户、身份、系统设置与审计，变更主要由安全合规驱动。"
+    },
+    "capability-config": {
+      "label": "能力配置",
+      "description": "模型/检索等运行时能力的配置面，本身不实现运行时。"
+    },
+    "setup": {
+      "label": "初始化向导",
+      "description": "首次配置的编排面，只调契约端口，不承载业务规则。"
+    },
+    "policy": {
+      "label": "策略库",
+      "description": "无 HTTP、无持久化的纯策略/判定逻辑。"
+    }
+  },
+  "domains": {
+    "agentmanagement": {
+      "kind": "product",
+      "frontend": "views/agent"
+    },
+    "agenttools": {
+      "kind": "product",
+      "frontend": "views/chat（工具结果渲染）"
+    },
+    "approval": {
+      "kind": "policy",
+      "frontend": "views/chat/components/ToolApprovalCard.vue"
+    },
+    "audit": {
+      "kind": "control",
+      "frontend": "views/system/SystemAuditLog.vue"
+    },
+    "auth": {
+      "kind": "control",
+      "frontend": "views/auth · views/settings/TenantMembers.vue · views/system/PlatformAPIKeys.vue"
+    },
+    "datasource": {
+      "kind": "integration",
+      "frontend": "views/knowledge/settings/DataSourceSettings.vue"
+    },
+    "embedchannel": {
+      "kind": "integration",
+      "frontend": "views/embed"
+    },
+    "evaluation": {
+      "kind": "product",
+      "frontend": "—（暂无页面）"
+    },
+    "favorite": {
+      "kind": "product",
+      "frontend": "views/agent · views/knowledge（列表置顶/收藏）"
+    },
+    "im": {
+      "kind": "integration",
+      "frontend": "views/integrations/IntegrationSettingsSection.vue"
+    },
+    "initialization": {
+      "kind": "setup",
+      "frontend": "views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue"
+    },
+    "knowledge": {
+      "kind": "product",
+      "frontend": "views/knowledge"
+    },
+    "mcp": {
+      "kind": "integration",
+      "frontend": "views/settings/McpSettings.vue"
+    },
+    "memory": {
+      "kind": "product",
+      "frontend": "views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue"
+    },
+    "model": {
+      "kind": "capability-config",
+      "frontend": "views/settings/ModelSettings.vue"
+    },
+    "session": {
+      "kind": "product",
+      "frontend": "views/chat"
+    },
+    "storage": {
+      "kind": "integration",
+      "frontend": "views/settings/StorageBackendSettings.vue"
+    },
+    "system": {
+      "kind": "control",
+      "frontend": "views/system"
+    },
+    "tenant": {
+      "kind": "control",
+      "frontend": "views/settings/TenantInfo.vue"
+    },
+    "vectorstore": {
+      "kind": "capability-config",
+      "frontend": "views/settings/VectorStoreSettings.vue"
+    },
+    "websearch": {
+      "kind": "integration",
+      "frontend": "views/settings/WebSearchSettings.vue"
+    },
+    "wiki": {
+      "kind": "product",
+      "frontend": "views/knowledge/wiki"
+    }
+  }
+}

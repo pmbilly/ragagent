@@ -20,7 +20,7 @@
 | `:contract` | `com.ragagent.contract.agent` | 代理契约面：代理目录/定义/执行/进度/运行请求 + 渠道清理端口。 |
 | `:contract` | `com.ragagent.contract.apikey` | API Key 契约面：能力/作用域上下文与类型、管理端口、响应载荷。 |
 | `:contract` | `com.ragagent.contract.audit` | 审计契约面：wiki 活动审计 + 审计写入端口。 |
-| `:contract` | `com.ragagent.contract.auth` | 认证契约面：用户查找端口（跨域只经契约）。 |
+| `:contract` | `com.ragagent.contract.auth` | 认证契约面：跨域用户目录读端口（UserLookupPort）与展示视图 （AuthUserView），以及管理面载荷（AdminUserView / UserPreferences）。 |
 | `:contract` | `com.ragagent.contract.doc` | 文档解析服务（DocReader）的跨域端口面。 |
 | `:contract` | `com.ragagent.contract.error` | 契约 · 错误：ErrorCode / BizException / AppError。 |
 | `:contract` | `com.ragagent.contract.event` | 契约 · 事件：EventBusInterface / EventBusFactory / EventHandler…。 |
@@ -48,7 +48,7 @@
 | `:contract` | `com.ragagent.contract.vectorstore` | 向量库契约面：环境 store id、查找端口与视图。 |
 | `:contract` | `com.ragagent.contract.websearch` | 契约 · 网页搜索：WebSearchTempStatePort / WebSearchProviderPort / PipelinePageFetcher…。 |
 | `:contract` | `com.ragagent.contract.wiki` | Wiki 契约面：摄取/收尾端口与图片标记。 |
-| `:domains` | `com.ragagent.agentmanagement` | 智能体管理面（agent 域子包， 由顶层 agentm 并入）：内建智能体注册表与类型预设、 自定义智能体 CRUD（custom_agents 表）、技能目录、推荐问题流与 agent config jsonb。 |
+| `:domains` | `com.ragagent.agentmanagement` | 智能体管理面：内建智能体注册表与类型预设、自定义智能体 CRUD（custom_agents）、 技能目录、推荐问题流与 agent config jsonb。 |
 | `:domains` | `com.ragagent.agentmanagement.api` | Agent 管理 · 端口实现：AgentLookupAdapter。 |
 | `:domains` | `com.ragagent.agentmanagement.controller` | agent.management 的 @RestController 薄层：智能体 CRUD（com.ragagent.agentmanagement.controller.AgentControll |
 | `:domains` | `com.ragagent.agentmanagement.domain` | agent.management 实体（@TableName 跟随表名）。 |
@@ -57,22 +57,22 @@
 | `:domains` | `com.ragagent.agentmanagement.service` | 智能体管理用例实现：自定义智能体 CRUD（com.ragagent.agentmanagement.service.CustomAgentService）。 |
 | `:domains` | `com.ragagent.agentmanagement.service.builtin` | 内置智能体面（从 agentmanagement.service 切出，对齐方案）： BuiltinAgentRegistry——内置智能体定义、类型与提示词的注册表。 |
 | `:domains` | `com.ragagent.agentmanagement.service.config` | 智能体配置面（从 agentmanagement.service 切出，对齐方案）： agent config jsonb 读写（AgentConfigJson）、占位符（AgentPlacehold |
-| `:domains` | `com.ragagent.agenttools` | agent 工具**实现**面：把 Agent 的工具调用翻译为业务域公开用例，并把结果格式化为模型可读输出。 |
+| `:domains` | `com.ragagent.agenttools` | Agent 工具实现面：把工具调用翻译为业务域公开用例，并把结果格式化为模型可读输出。 |
 | `:domains` | `com.ragagent.agenttools.datasource` | agent 数据分析工具族：data_analysis / data_schema 两工具 + DuckDB 生产实现 （AnalysisDuckDbJdbc）与 chatpipeline 会话桥（D |
 | `:domains` | `com.ragagent.agenttools.knowledge` | agent 知识检索工具族：knowledge_search / grep_chunks / list_knowledge_chunks / query_knowledge_graph / get_d |
 | `:domains` | `com.ragagent.agenttools.sql` | agent SQL 工具族：database_query 工具与手写 SQL 安全守卫（SqlGuard + tokenizer / 深检查 / 注入分析协作者）。 |
 | `:domains` | `com.ragagent.agenttools.web` | agent 网页工具族：web_search / web_fetch 两件。 |
 | `:domains` | `com.ragagent.agenttools.wiki` | agent wiki 工具族：页面工具十件（读/写/改名/替换/删除/搜索/索引概览/读源文档/标记与更新 issue）+ 内容重写与路由解析（WikiContentRewrite / WikiRou |
-| `:domains` | `com.ragagent.approval` | 审批机制域：审批门（Gate）、待审请求/决议消息、Redis pubsub 适配与工具策略。 |
-| `:domains` | `com.ragagent.audit` | 审计日志域：审计条目的写入面（com.ragagent.audit.service.AuditLogService）、查询面与保留期清理 （com.ragagent.audit.service.Aud |
+| `:domains` | `com.ragagent.approval` | 工具审批域：审批门（Gate）、待审请求/决议消息、Redis pub/sub 适配与工具策略。 |
+| `:domains` | `com.ragagent.audit` | 审计日志域：审计条目的写入、查询与保留期清理。 |
 | `:domains` | `com.ragagent.audit.api` | 审计 · 端口实现：AuditWriteAdapter。 |
 | `:domains` | `com.ragagent.audit.controller` | 审计 · HTTP 层：AuditLogController。 |
 | `:domains` | `com.ragagent.audit.domain` | 审计 · 领域模型：AuditLogQuery / AuditLog。 |
 | `:domains` | `com.ragagent.audit.dto` | 审计 · 数据传输：AuditLogListResponse。 |
 | `:domains` | `com.ragagent.audit.mapper` | 审计 · 映射：AuditLogRepository / AuditLogMapper。 |
 | `:domains` | `com.ragagent.audit.service` | 审计 · 服务：AuditLogService / RbacDeniedAuditorRegistrar / WikiActivityAuditRecorder…。 |
-| `:domains` | `com.ragagent.auth` | 认证与租户域：登录/OIDC/令牌、用户与租户目录、RBAC 与会话身份。 |
-| `:domains` | `com.ragagent.auth.api` | 认证 · 域对外访问面（认证族内直接依赖）：UserLookupAdapter / AdminUserAdapter 与它们返回的视图（com.ragagent.auth.api.AdminUserP |
+| `:domains` | `com.ragagent.auth` | 认证与租户控制面：登录/OIDC/令牌、用户与租户目录、RBAC 与会话身份。 |
+| `:domains` | `com.ragagent.auth.api` | 认证 · 域内访问面：UserLookupAdapter（实现 contract.auth.UserLookupPort）、 AdminUserAdapter，以及域内视图（com.ragagent. |
 | `:domains` | `com.ragagent.auth.apikey` | API 密钥子域（auth 之下，机器调用凭据面）：租户级 API Key 的签发、校验与访问控制——路由策略（com.ragagent.auth.apikey.domain.APIKeyRouteP |
 | `:domains` | `com.ragagent.auth.apikey.controller` | apikey · HTTP 层：TenantAPIKeyController。 |
 | `:domains` | `com.ragagent.auth.apikey.controller.filter` | API Key 过滤器面（由 auth.apikey.filter 迁入 apikey.controller.filter，对齐方案）： 鉴权通道与网关拦截、路由授权与策略、范围清理与文件服务豁免、主体拒绝（9 类）。 |
@@ -86,7 +86,7 @@
 | `:domains` | `com.ragagent.auth.dto` | 认证 · 数据传输：UpdatePreferencesRequest / TenantInvitationResponse / InvitationLookupResponse…。 |
 | `:domains` | `com.ragagent.auth.mapper` | 认证 · 映射：TenantInvitationMapper / TenantMemberMapper / AuthTokenMapper…。 |
 | `:domains` | `com.ragagent.auth.service` | 认证 · 服务：TenantInvitationService / TenantMemberService / TenantService…。 |
-| `:domains` | `com.ragagent.datasource` | 数据源连接器域：外部知识源（Notion/Feishu/Yuque/RSS/IMA/GitLab 等，见 connector/）的抓取、游标推进、 同步编排（com.ragagent.datasour |
+| `:domains` | `com.ragagent.datasource` | 数据源连接器域：外部知识源（Notion/Feishu/Yuque/RSS/IMA/GitLab 等）的抓取、游标推进、 同步编排与数据源配置面。 |
 | `:domains` | `com.ragagent.datasource.connector.feishu.core` | feishu · core：FeishuCursorCodec / FeishuWikiTreeOps / FeishuTransport…。 |
 | `:domains` | `com.ragagent.datasource.connector.feishu.drive` | feishu · drive：DriveConnector。 |
 | `:domains` | `com.ragagent.datasource.connector.feishu.wiki` | feishu · Wiki：WikiConnector。 |
@@ -102,14 +102,14 @@
 | `:domains` | `com.ragagent.datasource.mapper` | 数据源 · 映射：DataSourceRepository / SyncLogRepository / DataSourceMapper…。 |
 | `:domains` | `com.ragagent.datasource.service` | 数据源 · 服务：DataSourceService / KnowledgeTagAutoTagProvider / DataSourceSyncResultOps…。 |
 | `:domains` | `com.ragagent.datasource.task` | 同步任务面（方案 的 task/）：同步任务队列（DataSourceSyncTaskQueue + InProcess/Redis 双实现）、任务处理器（DataSourceSyncHandler） |
-| `:domains` | `com.ragagent.embedchannel` | 嵌入渠道域：对外暴露的嵌入问答渠道（com.ragagent.embedchannel.controller.EmbedChannelController）及其鉴权过滤器、 渠道配置与令牌。 |
+| `:domains` | `com.ragagent.embedchannel` | 嵌入渠道域：对外暴露的嵌入问答渠道、渠道配置与令牌，以及渠道鉴权过滤器。 |
 | `:domains` | `com.ragagent.embedchannel.controller` | embedchannel 域控制器的 HTTP 端点与协作类（3 个协作类）。 |
 | `:domains` | `com.ragagent.embedchannel.controller.filter` | 嵌入渠道鉴权过滤器面（由 embedchannel.filter 迁入 controller.filter，对齐方案）： EmbedAuthFilter——对外嵌入问答的访客鉴权。 |
 | `:domains` | `com.ragagent.embedchannel.domain` | 嵌入渠道 · 领域模型：EmbedChannelEntity。 |
 | `:domains` | `com.ragagent.embedchannel.mapper` | 嵌入渠道 · 映射：EmbedChannelMapper。 |
 | `:domains` | `com.ragagent.embedchannel.service` | 嵌入渠道 · 服务：EmbedChannelService / RedisEmbedTokenStore / EmbedTokenStore。 |
 | `:domains` | `com.ragagent.embedchannel.support` | 嵌入渠道 · 支撑件：错误文案（com.ragagent.embedchannel.support.EmbedError）、 令牌工具（com.ragagent.embedchannel.suppor |
-| `:domains` | `com.ragagent.evaluation` | 评估域：评估任务与指标计算（Rouge 等，见 metric/），对外入口 /api/v1/evaluation。 |
+| `:domains` | `com.ragagent.evaluation` | 评估域：评估任务与指标计算（Rouge 等），对外入口 /api/v1/evaluation。 |
 | `:domains` | `com.ragagent.evaluation.controller` | 评测 · HTTP 层：EvaluationController。 |
 | `:domains` | `com.ragagent.evaluation.domain` | 评测 · 领域模型：QaPair。 |
 | `:domains` | `com.ragagent.evaluation.dto` | 评测 · 数据传输：EvaluationRequest / EvaluationDtos。 |
@@ -120,7 +120,7 @@
 | `:domains` | `com.ragagent.favorite.domain` | 收藏 · 领域模型：UserResourceFavorite。 |
 | `:domains` | `com.ragagent.favorite.mapper` | 收藏 · 映射：UserResourceFavoriteMapper。 |
 | `:domains` | `com.ragagent.favorite.service` | 收藏 · 服务：UserResourceFavoriteService。 |
-| `:domains` | `com.ragagent.im` | 即时通讯渠道域：九渠道适配（feishu/wechat/wecom/dingtalk/slack/mattermost/telegram/qqbot/yunzhijia，一渠道一子包） 与运行时（ru |
+| `:domains` | `com.ragagent.im` | 即时通讯渠道域：九渠道适配（feishu/wechat/wecom/dingtalk/slack/mattermost/telegram/qqbot/yunzhijia， 一渠道一子包）与运行时（会话映射、工具展示、入站消息派发）。 |
 | `:domains` | `com.ragagent.im.channel.dingtalk` | 渠道 · dingtalk：DingtalkAdapter / DingtalkAdapterFactory / DingtalkStreamClient。 |
 | `:domains` | `com.ragagent.im.channel.feishu` | 渠道 · feishu：FeishuAdapter / FeishuLongConnClient / FeishuAdapterFactory…。 |
 | `:domains` | `com.ragagent.im.channel.mattermost` | 渠道 · mattermost：MattermostAdapter / MattermostAdapterFactory / MattermostClient。 |
@@ -135,7 +135,7 @@
 | `:domains` | `com.ragagent.im.mapper` | IM · 映射：ChannelSessionMapper / ImChannelMapper。 |
 | `:domains` | `com.ragagent.im.runtime` | IM · 运行时：AdapterInterfaces / FeishuWecomCrypt / SlackAdapterCore…。 |
 | `:domains` | `com.ragagent.im.service` | IM · 服务：ImChannelService / ImAttachmentPreparer / ImKnowledgeBridgeOps…。 |
-| `:domains` | `com.ragagent.initialization` | 系统初始化与模型能力域：/api/v1/initialization/* 的初始化配置、Ollama 管理、模型连通性测试、 文本抽取试验与语音识别（ASR）。 |
+| `:domains` | `com.ragagent.initialization` | 初始化与能力自检域：/api/v1/initialization/* 的初始化配置、Ollama 管理、 模型连通性测试、文本抽取试验与语音识别（ASR）。 |
 | `:domains` | `com.ragagent.initialization.controller` | initialization 的 @RestController 薄层：端点注解与委托，逻辑在 service 协作者 （com.ragagent.initialization.controller. |
 | `:domains` | `com.ragagent.initialization.dto` | initialization 的响应装配类型（com.ragagent.initialization.dto.InitResponses）。 |
 | `:domains` | `com.ragagent.initialization.service` | initialization 用例实现：初始化配置（com.ragagent.initialization.service.InitializationConfigService）、 模型连通性测试、 |
@@ -167,7 +167,7 @@
 | `:domains` | `com.ragagent.knowledge.storage` | 知识库文件与对象存储：LocalStorageService（本地卷）+ TenantFileStorage（租户感知门面， 知识上传/读取/删除的唯一入口）。 |
 | `:domains` | `com.ragagent.knowledge.support` | 知识库的纯逻辑支撑：无状态、零依赖的算法与规则，不作为 Spring bean。 |
 | `:domains` | `com.ragagent.knowledge.task` | 知识库异步任务：队列与执行。 |
-| `:domains` | `com.ragagent.mcp` | MCP 域：Model Context Protocol 的仓内实现——协议（protocol/）、OAuth（oauth/，含回调与令牌存储）、 服务注册与调用面；对外 /api/v1/mcp-services。 |
+| `:domains` | `com.ragagent.mcp` | MCP 域：Model Context Protocol 的仓内实现——协议、OAuth（含回调与令牌存储）、 服务注册与调用面；对外 /api/v1/mcp-services。 |
 | `:domains` | `com.ragagent.mcp.api` | MCP · 端口实现：McpToolRegistrationAdapter / McpApprovalOpsAdapter。 |
 | `:domains` | `com.ragagent.mcp.controller` | mcp 域控制器的 HTTP 端点与协作类（2 个协作类）。 |
 | `:domains` | `com.ragagent.mcp.domain` | MCP · 领域模型：McpService / McpAuthConfigTypeHandler / McpToolListTypeHandler…。 |
@@ -178,7 +178,7 @@
 | `:domains` | `com.ragagent.mcp.repository` | MCP · 仓储：McpToolApprovalRepository / McpMetadataRepository / McpOAuthRepository。 |
 | `:domains` | `com.ragagent.mcp.service` | MCP · 服务：AgentToolApprovalService / McpToolApprovalService / McpOAuthFlowService…。 |
 | `:domains` | `com.ragagent.mcp.tool` | MCP 工具实现族（方案 的 tool/）：把 MCP 服务暴露的工具翻译为 Agent 工具—— 调用（McpCallTool）、发现与目录（McpDiscoverTool / McpCatalog |
-| `:domains` | `com.ragagent.memory` | 记忆域：用户长期记忆的抽取（com.ragagent.memory.service.MemoryExtractionService）、去重与合并、 检索与生命周期（租约、墓碑、容量； |
+| `:domains` | `com.ragagent.memory` | 记忆域：用户长期记忆的抽取、去重与合并、检索与生命周期（租约、墓碑、容量）。 |
 | `:domains` | `com.ragagent.memory.api` | 记忆 · 端口实现：MemoryPipelineAdapter / MemoryAccessAdapter。 |
 | `:domains` | `com.ragagent.memory.controller` | 记忆 · HTTP 层：MemoryController。 |
 | `:domains` | `com.ragagent.memory.domain` | 记忆域实体（留存面）：抽取会话/批次/失败/状态（MemoryExtraction*）、 渲染与投影（MemoryRender / MemoryDocView / MemoryTopicView / |
@@ -189,14 +189,14 @@
 | `:domains` | `com.ragagent.memory.mapper` | 记忆 · 映射：MemoryExtractionSessionMapper / MemoryItemEmbeddingMapper / MemoryDocAffinityMapper…。 |
 | `:domains` | `com.ragagent.memory.repository` | 仓储门面层：记忆域的持久化门面与其协作者。 |
 | `:domains` | `com.ragagent.memory.service` | 记忆 · 服务：MemoryConsolidationService / MemoryExtractionService / MemoryVectorService…。 |
-| `:domains` | `com.ragagent.model` | 模型配置域：模型条目 CRUD（com.ragagent.model.controller.ModelController）与调试面 （com.ragagent.model.controller.Mo |
+| `:domains` | `com.ragagent.model` | 模型配置域：模型条目 CRUD、凭据子资源与调试面（embedding 原始响应等）。 |
 | `:domains` | `com.ragagent.model.api` | 模型 · 端口实现：ModelCatalogAdapter。 |
 | `:domains` | `com.ragagent.model.controller` | 模型 · HTTP 层：ModelCredentialsController / ModelDebugController / ModelController。 |
 | `:domains` | `com.ragagent.model.domain` | 模型 · 领域模型：ModelParametersTypeHandler / Model。 |
 | `:domains` | `com.ragagent.model.dto` | 模型 · 数据传输：ModelCredentialFieldMetadata / ModelCredentialsPutRequest / ModelCredentialsResponse…。 |
 | `:domains` | `com.ragagent.model.mapper` | 模型 · 映射：ModelUsageMapper / ModelMapper。 |
 | `:domains` | `com.ragagent.model.service` | 模型 · 服务：ModelService / BuiltinModelsReconciler / ModelProviderCatalog…。 |
-| `:domains` | `com.ragagent.session` | 会话域：会话与消息的读写（com.ragagent.session.service.SessionService / com.ragagent.session.service.MessageServi |
+| `:domains` | `com.ragagent.session` | 会话域：会话与消息读写、两条问答入口（知识库问答 / Agent 问答）、SSE 流式桥与 会话侧管线装配（rag/：14 个阶段、17 个插件）。 |
 | `:domains` | `com.ragagent.session.api` | 会话 · 端口实现：KnowledgeQaEventAdapter / EmbedSessionOpsAdapter / EmbedSessionAdapter…。 |
 | `:domains` | `com.ragagent.session.controller` | session 域控制器的 HTTP 端点（协议适配层）。 |
 | `:domains` | `com.ragagent.session.controller.sse` | session 的 SSE 传输面（由 session.sse 迁入 controller.sse，对齐方案）： SseContract（帧契约）、SseFrameWriter（帧写出）、Stream |
@@ -215,7 +215,7 @@
 | `:domains` | `com.ragagent.session.service` | 会话 · 服务：SessionKnowledgeQaService / TemporaryDocumentService / SessionAgentQaService…。 |
 | `:domains` | `com.ragagent.session.service.suggestion` | 消息建议面（由 session.service 切出，对齐方案 的 service.suggestion/）： MessageSuggestionService（建议生成的编排与落库）与 Messag |
 | `:domains` | `com.ragagent.session.support` | 会话 · 支撑：MessageReferenceRewriter / PipelineViews。 |
-| `:domains` | `com.ragagent.storage` | 存储后端域：存储后端配置与凭据（com.ragagent.storage.service.StorageBackendService，对外 /api/v1/storage-backends） 与文件服 |
+| `:domains` | `com.ragagent.storage` | 存储后端域：存储后端配置与凭据（对外 /api/v1/storage-backends）与文件服务 （传输、解析、文件解析器）。 |
 | `:domains` | `com.ragagent.storage.api` | 存储 · 端口实现：StorageBackendPortAdapter / ProviderFileStoreAdapter / GlobalFileServiceAdapter…。 |
 | `:domains` | `com.ragagent.storage.config` | 存储 · 配置：LocalStorageEnvProperties / ResourceUrlModeProperties / StorageProviderEnv。 |
 | `:domains` | `com.ragagent.storage.controller` | 存储 · HTTP 层：StorageBackendController / FileProxyController。 |
@@ -226,24 +226,24 @@
 | `:domains` | `com.ragagent.storage.provider` | 存储 · 提供方：S3CompatibleFileService / SeekableFileService / LocalFileService…。 |
 | `:domains` | `com.ragagent.storage.service` | 存储 · 服务：ResourceCatalogService / StorageBackendService / DefaultStorageBackendProvisioner…。 |
 | `:domains` | `com.ragagent.storage.support` | 存储域的支撑层：存储 URL 解析与重写——签名 URL、流式重写与文件服务解析 （原顶层包 storageurl， 并入）。 |
-| `:domains` | `com.ragagent.system` | 系统设置域：系统设置的读写（com.ragagent.system.service.SystemSettingService）与管理员面 （/api/v1/system、/api/v1/system/admin）。 |
+| `:domains` | `com.ragagent.system` | 系统设置与管理员面：系统设置读写（/api/v1/system）与管理员操作 （/api/v1/system/admin）。 |
 | `:domains` | `com.ragagent.system.controller` | 系统 · HTTP 层：SystemAdminController / SystemController。 |
 | `:domains` | `com.ragagent.system.domain` | 系统 · 领域模型：SystemSetting。 |
 | `:domains` | `com.ragagent.system.dto` | 系统 · 数据传输：SystemDtos。 |
 | `:domains` | `com.ragagent.system.mapper` | 系统 · 映射：SystemSettingMapper。 |
 | `:domains` | `com.ragagent.system.service` | 系统 · 服务：SystemAdminUserService / SystemSettingService / SystemInfoService…。 |
-| `:domains` | `com.ragagent.tenant` | 租户域（由 common.tenant 搬出）：租户实体 com.ragagent.tenant.domain.Tenant、 TenantMapper、租户级配置 VO（APIPrincipalCo |
+| `:domains` | `com.ragagent.tenant` | 租户域：租户实体、MyBatis 持久化、租户级配置（API principal / 聊天历史 / 解析引擎 / 检索 / 存储引擎）与配置脱敏。 |
 | `:domains` | `com.ragagent.tenant.api` | 租户 · 端口实现：TenantStorageQuotaAdapter。 |
 | `:domains` | `com.ragagent.tenant.domain` | 租户 · 领域模型：APIPrincipalConfigTypeHandler / Tenant。 |
 | `:domains` | `com.ragagent.tenant.mapper` | 租户 · 映射：TenantMapper。 |
 | `:domains` | `com.ragagent.tenant.repository` | 租户仓储面（由 tenant 根包迁出，对齐方案 的 repository/）： Tenant（租户实体）、TenantLookup（按 id/域名查找）与 TenantConfigRedaction（配置脱敏，供查询面复用）。 |
-| `:domains` | `com.ragagent.vectorstore` | 向量库配置域：向量库类型目录（com.ragagent.vectorstore.dto.VectorStoreTypes）与配置校验/持久化 （com.ragagent.vectorstore.ser |
+| `:domains` | `com.ragagent.vectorstore` | 向量库配置域：向量库类型目录与配置校验/持久化，对外 /api/v1/vector-stores。 |
 | `:domains` | `com.ragagent.vectorstore.controller` | 向量库 · HTTP 层：VectorStoreController。 |
 | `:domains` | `com.ragagent.vectorstore.domain` | 向量库 · 领域模型：ConnectionConfigTypeHandler / IndexConfigTypeHandler / VectorStoreEngines…。 |
 | `:domains` | `com.ragagent.vectorstore.dto` | 向量库 · 数据传输：VectorStoreResponse / VectorStoreTypes。 |
 | `:domains` | `com.ragagent.vectorstore.mapper` | 向量库 · 映射：VectorStoreRepository。 |
 | `:domains` | `com.ragagent.vectorstore.service` | 向量库 · 服务：VectorStoreConfigService / VectorStoreLookupAdapter。 |
-| `:domains` | `com.ragagent.websearch` | 联网搜索域：搜索 provider 目录与凭据（对外 /api/v1/web-search-providers）、搜索执行 （com.ragagent.websearch.service.WebSea |
+| `:domains` | `com.ragagent.websearch` | 联网搜索域：搜索 provider 目录与凭据（对外 /api/v1/web-search-providers）、 搜索执行与各家 provider 适配。 |
 | `:domains` | `com.ragagent.websearch.api` | 网页搜索 · 端口实现：WebSearchBackendsAdapter / WebSearchSupportAdapter。 |
 | `:domains` | `com.ragagent.websearch.controller` | 网页搜索 · HTTP 层：WebSearchProviderCredentialsController / WebSearchProviderController / WebSearchController。 |
 | `:domains` | `com.ragagent.websearch.domain` | 网页搜索 · 领域模型：WebSearchParamsTypeHandler / WebSearchProviderParams / WebSearchProviderEntity。 |
@@ -252,7 +252,7 @@
 | `:domains` | `com.ragagent.websearch.mapper` | 网页搜索 · 映射：WebSearchProviderRepository。 |
 | `:domains` | `com.ragagent.websearch.provider` | 网页搜索 · 提供方：WebSearchProviderRegistry / ZhipuWebSearchProvider / DuckDuckGoProvider…。 |
 | `:domains` | `com.ragagent.websearch.service` | 网页搜索 · 服务：WebSearchTempKbStateService / WebSearchProviderService / WebSearchService。 |
-| `:domains` | `com.ragagent.wiki` | wiki 域:知识库内联百科(页面/修订/文件夹树/链接图/摄取管线)。 |
+| `:domains` | `com.ragagent.wiki` | wiki 域：知识库内联百科（页面/修订/文件夹树/链接图/摄取管线）。 |
 | `:domains` | `com.ragagent.wiki.api` | Wiki · 端口实现：WikiPageOpsAdapter。 |
 | `:domains` | `com.ragagent.wiki.controller` | wiki 的 @RestController:页面 CRUD/修订/文件夹/索引/图谱/统计/问题端点(raw-JSON 对齐形态,契约换锚时整体重写为 DTO)。 |
 | `:domains` | `com.ragagent.wiki.domain` | wiki 域留存面（拆簇后）：WikiConfig / WikiConstants / WikiException / WikiExtractionGranularity / WikiSourceRe |

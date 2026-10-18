@@ -56,6 +56,10 @@ run '迁移代号（主码注释禁止批次号/日期戳；旧夹具名不得�
 run '迁移叙事棘轮（v0.5.0 L1：注释只讲现在，不写迁移史）' python3 scripts/check-comment-narrative.py
 run '注释装饰（禁止整行横线分隔，统一 // ── 段名 ──）' python3 scripts/check-comment-decor.py
 run '模块/包映射（docs/architecture/module-package-map.md 必须与源码同步）' python3 scripts/gen-module-map.py --check
+run '业务域索引（docs/architecture/domain-index.md 必须与分类/源码同步）' python3 scripts/gen-domain-index.py --check
+run '业务域 package-info 四要素（种类/入口/契约面/依赖）' python3 scripts/check-package-info-fields.py
+run '能力种类边界（跨 kind 直连禁止；同 kind 允许）' python3 scripts/check-capability-kinds.py
+run '业务域包规模（>30 只许降；26-30 报警）' python3 scripts/check-package-size.py
 run '版本一致性（Boot / springdoc / MyBatis-Plus jsqlparser / wrapper / Dockerfile）' python3 scripts/check-version-consistency.py
 
 echo

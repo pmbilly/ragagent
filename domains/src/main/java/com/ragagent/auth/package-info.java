@@ -1,7 +1,10 @@
 /**
- * 认证与租户域：登录/OIDC/令牌、用户与租户目录、RBAC 与会话身份。
- * 子域 {@code apikey/}：租户级 API Key 的签发/校验/路由策略与认证通道（机器调用凭据）。
- * 对外入口 {@code /api/v1/auth}（{@link com.ragagent.auth.controller.AuthController}）与租户目录
- * （{@link com.ragagent.auth.controller.TenantCatalogController}）；身份经 {@code TenantContext} 下传全应用。
-  */
+ * 认证与租户控制面：登录/OIDC/令牌、用户与租户目录、RBAC 与会话身份。
+ * 子域 {@code apikey/} 管理租户级 API Key 的签发、校验与路由策略。
+ *
+ * <p><b>种类</b>：控制面<br>
+ * <b>入口</b>：{@code AuthController}、{@code TenantCatalogController}、{@code TenantMemberController}<br>
+ * <b>对外契约面</b>：{@code UserLookupPort}（身份经 {@code TenantContext} 与 contract 载荷下传）<br>
+ * <b>依赖</b>：{@code contract}、{@code platform}、同模块 {@code tenant}。</p>
+ */
 package com.ragagent.auth;

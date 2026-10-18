@@ -61,6 +61,10 @@ def domain_rows():
     return rows
 
 
+def package_info_count() -> int:
+    return sum(1 for module, _ in MODULES for p in java_files(module) if p.name == "package-info.java")
+
+
 def boot_test_roots() -> int:
     base = ROOT / "boot" / "src" / "test" / "java"
     roots = set()
@@ -119,7 +123,7 @@ def render() -> str:
         "",
         "## 相关",
         "",
-        "- [`packages.md`](packages.md)：166 份 `package-info` 的包级职责索引。",
+        f"- [`packages.md`](packages.md)：{package_info_count()} 份 `package-info` 的包级职责索引。",
         "- [`overview.md`](overview.md)：模块依赖图、设计原则、代码在哪。",
         "",
     ]

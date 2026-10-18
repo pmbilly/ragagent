@@ -6,9 +6,9 @@ import com.ragagent.agentmanagement.mapper.AgentQuestionMapper;
 import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
 import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
-import com.ragagent.auth.api.AuthUserView;
-import com.ragagent.auth.api.UserLookupAdapter;
 import com.ragagent.contract.agent.AgentChannelCleaner;
+import com.ragagent.contract.auth.AuthUserView;
+import com.ragagent.contract.auth.UserLookupPort;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.KnowledgeBaseCatalogPort;
@@ -41,7 +41,7 @@ public class CustomAgentService {
 
 
     private final CustomAgentMapper agentMapper;
-    private final UserLookupAdapter userLookup;
+    private final UserLookupPort userLookup;
     private final BuiltinAgentRegistry registry;
     /**
      * IM 渠道清理。ObjectProvider 延迟解析：实现方（{@code ImTurnOrchestrator}）直接依赖本类
@@ -58,7 +58,7 @@ public class CustomAgentService {
 
     public CustomAgentService(CustomAgentMapper agentMapper,
             AgentQuestionMapper questionMapper,
-            UserLookupAdapter userLookup,
+            UserLookupPort userLookup,
             KnowledgeBaseCatalogPort kbCatalog,
             BuiltinAgentRegistry registry,
             org.springframework.beans.factory.ObjectProvider<

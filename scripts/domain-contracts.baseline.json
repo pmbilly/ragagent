@@ -63,9 +63,6 @@
     }
   },
   "edges": {
-    "agentmanagement→auth": [
-      "CustomAgentService"
-    ],
     "auth→tenant": [
       "TenantService"
     ],
