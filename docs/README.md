@@ -11,8 +11,9 @@
 | 3 | [`architecture/overview.md`](architecture/overview.md) | 7 个模块、依赖矩阵、代码在哪 |
 | 4 | [`architecture/request-path.md`](architecture/request-path.md) | 一次问答经过哪些模块与类、日志关键字 |
 | 5 | [`architecture/rag-pipeline.md`](architecture/rag-pipeline.md) | 14 个管线阶段与插件装配表 |
-| 6 | [`architecture/mechanisms.md`](architecture/mechanisms.md) | 队列、事务、embedding、定时任务等反直觉机制 |
-| 7 | [`glossary.md`](glossary.md) | 业务术语与历史代号（K4 / A18 / R3d / B2xx） |
+| 6 | [`architecture/ingest-flow.md`](architecture/ingest-flow.md) | 一份文档从入口到入库、富化与收口的一页纸 |
+| 7 | [`architecture/mechanisms.md`](architecture/mechanisms.md) | 队列、事务、embedding、定时任务等反直觉机制 |
+| 8 | [`glossary.md`](glossary.md) | 业务术语与历史代号（K4 / A18 / R3d / B2xx） |
 
 查表：[`architecture/packages.md`](architecture/packages.md) —— 326 份 `package-info` 的包索引（由脚本生成，勿手改）。
 

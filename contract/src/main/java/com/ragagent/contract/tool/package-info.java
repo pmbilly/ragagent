@@ -11,7 +11,7 @@
  * {@link com.ragagent.contract.tool.ApprovalEventBus}、{@link com.ragagent.contract.tool.ApprovalEvent}。</p>
  *
  * <p>工具 SPI：{@link com.ragagent.contract.tool.AgentTool} / {@link com.ragagent.contract.tool.BaseTool}
- * （纯 JDK 基类，schema 为 {@code Object}）/ {@code ToolRequest} / {@code ToolExecContext} /
- * {@code ToolRegistryPort}。{@code ToolDefinitions} 仍在 {@code agent-engine}（定义与注册逻辑）。</p>
+ * （纯 JDK 基类，schema 为 {@code Object}）/ {@code ToolDefinitions} / {@code ToolRequest} /
+ * {@code ToolExecContext} / {@code ToolRegistryPort}。</p>
  */
 package com.ragagent.contract.tool;
