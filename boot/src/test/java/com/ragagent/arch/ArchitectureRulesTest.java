@@ -804,8 +804,8 @@ class ArchitectureRulesTest {
             "com.ragagent.knowledge.service.chunk.ChunkExtractService",
             // R4b：管线本体归位会话域后落在 service 包内——插件族依赖 langfuse 观测与具体技术
             // （管线本体的必要依赖，随 chatpipeline → session.service.rag 迁移登记）
-            "com.ragagent.session.service.rag.plugin.PluginRerank",
-            "com.ragagent.session.service.rag.plugin.PluginSearchOps",
+            "com.ragagent.session.rag.plugin.PluginRerank",
+            "com.ragagent.session.rag.plugin.PluginSearchOps",
             "com.ragagent.knowledge.service.management.KnowledgeBaseLookupAdapter",
             "com.ragagent.knowledge.service.enrichment.QuestionGenerationService",
             "com.ragagent.memory.service.InProcessMemoryExtractTaskQueue",
@@ -831,9 +831,15 @@ class ArchitectureRulesTest {
             "com.ragagent.wiki.service.page.RedisWikiSlugLock");
 
     /** service 层判据：包名任一段等于 {@code service}（对齐 ArchUnit {@code ..service..} 语义）。 */
+    /**
+     * 用例层判定：包名任一段是 {@code service}，或落在管线引擎 {@code rag} 下。
+     *
+     * <p>{@code rag} 是管线本体（原 {@code session.service.rag} 于 v0.5.0 提升为
+     * 独立子域）——它同样属用例层，A16/A17 的约束必须跟着走，否则换包即静默脱管。</p>
+     */
     private static boolean isServicePackage(String packageName) {
         for (String part : packageName.split("\\.")) {
-            if ("service".equals(part)) {
+            if ("service".equals(part) || "rag".equals(part)) {
                 return true;
             }
         }
@@ -974,7 +980,7 @@ class ArchitectureRulesTest {
     /** A18b 作用域：运行态与编排协作者所在包。 */
     private static boolean isRuntimePackage(String packageName) {
         return packageName.startsWith("com.ragagent.agent")
-                || packageName.startsWith("com.ragagent.session.service.rag")
+                || packageName.startsWith("com.ragagent.session.rag")
                 || packageName.startsWith("com.ragagent.session.controller");
     }
 

@@ -2,8 +2,8 @@ package com.ragagent.pipeline;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.session.service.rag.EventManager;
-import com.ragagent.session.service.rag.PipelineEventType;
+import com.ragagent.session.rag.EventManager;
+import com.ragagent.session.rag.PipelineEventType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

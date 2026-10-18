@@ -1,9 +1,9 @@
 package com.ragagent.session.api;
 
+import com.ragagent.session.rag.ChatManage;
+import com.ragagent.session.rag.PipelineEventType;
+import com.ragagent.session.rag.spi.KnowledgeQaEventPort;
 import com.ragagent.session.service.SessionKnowledgeQaService;
-import com.ragagent.session.service.rag.ChatManage;
-import com.ragagent.session.service.rag.PipelineEventType;
-import com.ragagent.session.service.rag.spi.KnowledgeQaEventPort;
 import java.util.List;
 import org.springframework.stereotype.Component;
 

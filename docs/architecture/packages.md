@@ -207,12 +207,12 @@
 | `:domains` | `com.ragagent.session.dto` | 会话 · 数据传输：BatchDeleteSessionsRequest / GenerateTitleResponse / SearchMessagesRequest…。 |
 | `:domains` | `com.ragagent.session.mapper` | 会话 · 映射：TemporaryDocumentMapper / MessageSuggestionMapper / MessageMapper…。 |
 | `:domains` | `com.ragagent.session.qa` | QA 轮的编排簇（阶段 5 从 session.controller 剥离）。 |
+| `:domains` | `com.ragagent.session.rag` | 聊天管线（库式域，无 HTTP 面）：可插拔的 Plugin 链——检索、合并、重排、实体抽取、数据分析、历史装载等， 由会话域按顺序驱动。 |
+| `:domains` | `com.ragagent.session.rag.plugin` | chat 管线的**插件实现**：Plugin 接口 + 18 个步骤实现 （query_understand → search → merge → rerank → into_chat_messag |
+| `:domains` | `com.ragagent.session.rag.spi` | 管线 · spi：KnowledgeQaEventPort。 |
+| `:domains` | `com.ragagent.session.rag.support` | chat 管线的**纯逻辑辅助**：检索结果去重/去包含（com.ragagent.session.rag.support.SearchSupport）、 查询分词与关键词抽取（com.ragagen |
 | `:domains` | `com.ragagent.session.repository` | 仓储门面层：把 mapper 的原子操作组合成领域可用的读写契约，并集中承载软删、全字段 UPDATE 与 PG/H2 方言分支。 |
 | `:domains` | `com.ragagent.session.service` | 会话 · 服务：SessionKnowledgeQaService / TemporaryDocumentService / SessionAgentQaService…。 |
-| `:domains` | `com.ragagent.session.service.rag` | 聊天管线（库式域，无 HTTP 面）：可插拔的 Plugin 链——检索、合并、重排、实体抽取、数据分析、历史装载等， 由会话域按顺序驱动。 |
-| `:domains` | `com.ragagent.session.service.rag.plugin` | chat 管线的**插件实现**：Plugin 接口 + 18 个步骤实现 （query_understand → search → merge → rerank → into_chat_messag |
-| `:domains` | `com.ragagent.session.service.rag.spi` | 管线 · spi：KnowledgeQaEventPort。 |
-| `:domains` | `com.ragagent.session.service.rag.support` | chat 管线的**纯逻辑辅助**：检索结果去重/去包含（com.ragagent.session.service.rag.support.SearchSupport）、 查询分词与关键词抽取（com |
 | `:domains` | `com.ragagent.session.service.suggestion` | 消息建议面（由 session.service 切出，对齐方案 的 service.suggestion/）： MessageSuggestionService（建议生成的编排与落库）与 Messag |
 | `:domains` | `com.ragagent.session.support` | 会话 · 支撑：MessageReferenceRewriter / PipelineViews。 |
 | `:domains` | `com.ragagent.storage` | 存储后端域：存储后端配置与凭据（com.ragagent.storage.service.StorageBackendService，对外 /api/v1/storage-backends） 与文件服 |
