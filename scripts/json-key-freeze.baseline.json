@@ -59,6 +59,7 @@
     "im/service/ImStopOps.java": "im/",
     "im/service/ImTurnOrchestrator.java": "im/",
     "knowledge/service/chunk/ChunkExtractService.java": "knowledge/service/chunk/ChunkExtractService",
+    "knowledge/task/KnowledgeChunkWriter.java": "knowledge/task/KnowledgeChunkWriter",
     "knowledge/task/KnowledgeProcessWorker.java": "knowledge/task/KnowledgeProcessWorker",
     "llm/ollama/OllamaChatResponse.java": "llm/",
     "llm/ollama/OllamaMessage.java": "llm/",

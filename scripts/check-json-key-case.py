@@ -106,7 +106,9 @@ FROZEN_PREFIXES = (
     'platform/web/ContractJsonMixins',
     'contract/wiki/ExtractedItem', 'session/rag/plugin', 'agent/AgentEngine',
     'agent/ReActIteration', 'retrieval/HybridSearchService', 'retrieval/vlm/VlmClient',
-    'knowledge/service/chunk/ChunkExtractService', 'knowledge/task/KnowledgeProcessWorker',  # B263㉟ 换锚：ChunkExtractService 迁 service/chunk
+    'knowledge/service/chunk/ChunkExtractService', 'knowledge/task/KnowledgeProcessWorker',
+    # C11b 阶段拆分：worker 内的 span 键随代码外移到取文本/分块协作者，冻结前缀同步换锚
+    'knowledge/task/KnowledgeTextExtractor', 'knowledge/task/KnowledgeChunkWriter',  # B263㉟ 换锚：ChunkExtractService 迁 service/chunk
     'memory/mapper', 'knowledge/domain/KnowledgeBase', 'mcp/domain/McpService',
     # 上游 API 载荷的适配器族（embedding/im/websearch/rerank/asr/vlm 的 provider 与客户端：
     # 键名由对方 API 定，冻结）
@@ -270,13 +272,13 @@ BASELINE: dict[str, set[str]] = {
     # Langfuse 任务 span 载荷（LangfuseTaskScope.start 的 metadata，观测面）
     'knowledge/service/enrichment/QuestionGenerationService.java': {'knowledge_id'},
     # Langfuse 任务 span 载荷（同上，观测面）
-    'memory/service/InProcessMemoryExtractTaskQueue.java': {'subject_id'},
+
     # span 观测面（同本文件既有条目）
     'memory/service/MemoryInsightOps.java': {'candidate_count', 'lexical_hits', 'matched_count', 'ranking_mode', 'subject_id', 'tenant_id', 'vector_hits', 'vector_outside', 'vector_skip'},
     # span 观测面（同本文件既有条目）
     'memory/service/MemoryRecallOps.java': {'block_runes', 'candidate_count', 'fused_candidates', 'interest_injected', 'interest_relevant', 'interest_total', 'lexical_hits', 'matched_count', 'prompt_runes', 'ranking_mode', 'resident_count', 'subject_id', 'tenant_id', 'used_count', 'vector_hits', 'vector_outside', 'vector_skip'},
     # Langfuse 任务 span 载荷（同上，观测面）
-    'memory/service/RedisMemoryExtractTaskQueue.java': {'subject_id'},
+
     # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake。同族见 contract/tool/ToolCapabilities.java 的登记（B257 改名自 agent/tools/，B260 迁入 agent/tool/，A③-⑨ 迁入 contract/tool/））
     'modelcontext/ToolPolicy.java': {'call_mcp_tool', 'data_schema', 'discover_mcp_tools', 'edit_sandbox_file', 'edit_skill_file', 'execute_skill_script', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'list_sandbox_files', 'query_knowledge_graph', 'read_file', 'read_sandbox_file', 'read_skill', 'search_conversations', 'search_memory', 'shell_exec', 'todo_write', 'web_fetch', 'web_search', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_write_page', 'write_sandbox_file', 'write_skill_file'},
     # span 观测面（followUpSpan.finish 的 metadata）

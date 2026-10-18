@@ -51,6 +51,17 @@ flowchart LR
    - `pending_subtasks_count = wiki 1 + 问题批数 + 图分块数`，`CAS processing → finalizing`。
 7. **子任务收口**：每个子任务完成/失败都减计数；归零后 `completed`（失败按状态机终止）。取消/删除会抢走行，晋升失败时不再覆盖状态。
 
+## 阶段类
+
+| 阶段 | 类 |
+|---|---|
+| 取文本 | {@link com.ragagent.knowledge.task.KnowledgeTextExtractor} |
+| 分块落库 | {@link com.ragagent.knowledge.task.KnowledgeChunkWriter} |
+| 预清理 / 向量化 / 清场 | {@link com.ragagent.knowledge.task.KnowledgeIndexStage} |
+| 富化计划 / 晋升 / fan-out / 收口 | {@link com.ragagent.knowledge.task.KnowledgeFinalizingStage} |
+
+{@link com.ragagent.knowledge.task.KnowledgeProcessWorker} 只保留接管、租户作用域、阶段排序与异常转发。
+
 ## 状态机
 
 | 状态 | 含义 | 谁推进 |

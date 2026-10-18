@@ -34,7 +34,7 @@
     "domains/src/main/java/com/ragagent/knowledge/service/enrichment/KnowledgeSummaryService.java": 655,
     "domains/src/main/java/com/ragagent/knowledge/service/faq/FaqEntryCommandService.java": 770,
     "domains/src/main/java/com/ragagent/knowledge/service/management/KnowledgeService.java": 727,
-    "domains/src/main/java/com/ragagent/knowledge/task/KnowledgeProcessWorker.java": 791,
+    "domains/src/main/java/com/ragagent/knowledge/task/KnowledgeProcessWorker.java": 206,
     "domains/src/main/java/com/ragagent/mcp/service/McpServiceManagement.java": 610,
     "domains/src/main/java/com/ragagent/mcp/tool/McpCatalog.java": 723,
     "domains/src/main/java/com/ragagent/memory/repository/MemoryIndexStore.java": 627,
