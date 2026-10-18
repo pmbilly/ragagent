@@ -84,7 +84,7 @@
 | **L16** | `executeQA` 200 行 → 7 个具名步骤 | ✅ 主方法 ~30 行 |
 | **L17** | 插件表自动生成 + `--check` 守卫 | ✅ `pipeline-map.md`（14 事件 / 17 插件） |
 | **L18** | 插件契约三行（读/写/失败） | ✅ 写在 `Plugin` 接口（统一规则不逐个重复） |
-| **L19** | 拆 `:knowledge`（241 文件） | ✅ 八模块；domains 2543 + knowledge 156 用例守恒 |
+| **L19** | 拆 `:knowledge`（241 文件） | ⏪ **已回退**（L23）：只换来独立编译，知识库代码仍分散 4 处 |
 | **L20** | `modelcontext` 下沉 `contract` | ⏸ 不可行：入口类 `Registry` 依赖 Jackson，搬进 contract 破坏「纯 JDK」红线 |
 | **L21** | `platform` 业务残留归位 | ⏸ 不可行：9 类被 6 个模块共享，移到 domains 会让 retrieval/agent-engine 反向依赖 |
 | **L22** | `BaseTool` 归位 `agent-engine` | ⏸ 不可行：domains/mcp 的 2 个工具用它，移过去会让 domains 反向依赖 agent-engine（R5c 刚清零） |
@@ -325,6 +325,9 @@ boot           14 件                      →  boot
 
 | L19 | 2026-10-18 | **拆出 `:knowledge`**：241 件主码 + 22 件测试（156 用例）迁出 domains；主码对 domains **0 出边**，测试期 4 处借 domains 存储/租户实现作夹具（单向）；新增模块构建（含 docreader proto）；守卫同步：模块图矩阵 + 测试边登记 + 域清单 + file-size 基线 + README 八模块/51 控制器；修一处跨模块 javadoc 引用。 | **30 守卫** · **5022 / 0 / 4**（domains 2543 + knowledge 156）· build 2m16s |
 | L20~L22 | 2026-10-18 | **评估后不做**（三条硬约束）：L20 `modelcontext` 进 contract 会被 Jackson 破坏纯 JDK 红线；L21 platform 的 9 个业务工具被 6 个模块共享，移走会让 retrieval/agent-engine 反向依赖；L22 `BaseTool` 移 agent-engine 会让 domains 反向依赖（R5c 刚清零）。三者都是「移动即破红线」，不是成本问题。 | — |
+
+| L23 | 2026-10-18 | **回退 `:knowledge` 合回 domains**（八模块 → 七模块）：拆分只带来看独立编译，知识库代码仍分散在 knowledge/retrieval/contract/platform 四处；11 个知识相关 Port 本就在跨域，收益小于「知识库到底在哪」的认知成本。244 主码 + 22 测试迁回，README/守卫/基线同步。 | **30 守卫** · **5022 / 0 / 4** · build 1m47s |
+| L24 | 2026-10-18 | **Port 层治理**：① 删 `AuthTokenAdminPort`（auth 域内两级转发，直接内联到 `AdminUserAdapter`）；② 新增 `scripts/gen-port-map.py` 生成 39 个 Port 的「接口 → 实现 → 调用方 → 是否跨界」表（跨模块 8 / 域间 30 / 域内 1），接入**第 31 条守卫**（红态探针已验）。**两项取消**：`BaseTool` 移 agent-engine 会让 domains 反向依赖（R5c 回退）；`approval` 是纯 Port 实现域（无 HTTP/service），无需分层模板。 | **31 守卫** · **5022 / 0 / 4** · build 1m43s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
