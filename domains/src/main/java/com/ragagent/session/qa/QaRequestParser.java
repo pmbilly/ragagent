@@ -152,151 +152,18 @@ public final class QaRequestParser {
             // 租户作用域随 wiki_config 面（命中条件是 KB 共享关系；dev 单租户等价于不动）。
         }
 
-        // 内联 base64 图片（落盘后回填 URL，消息/检索/VLM
-        // 三处消费同一引用；SSRF 已在上方清空客户端 url/caption）
-        if (!request.images().isEmpty()) {
-            if (rc.agentConfig == null || !rc.agentConfig.path("imageUploadEnabled").asBoolean(false)) {
-                log.warn("[{}] Image upload is not enabled for this agent, rejecting {} images",
-                        logPrefix, request.images().size());
-                throw BizException.badRequest("Image upload is not enabled for this agent");
-            }
-            long tenantId = rc.session.getTenantId();
-            for (var img : request.images()) {
-                QaSupport.QaRequestsImage view = new QaSupport.QaRequestsImage();
-                if (img.data != null && !img.data.isEmpty()) {
-                    byte[] bytes;
-                    try {
-                        bytes = Base64Support.decode(img.data);
-                    } catch (RuntimeException e) {
-                        throw BizException.badRequest("image decode failed: " + e.getMessage());
-                    }
-                    if (bytes.length == 0) {
-                        throw BizException.badRequest("image decode failed: empty payload");
-                    }
-                    if (bytes.length > QaTurnSupport.maxFileBytes()) {
-                        throw BizException.badRequest(
-                                "image exceeds size limit of " + QaTurnSupport.maxFileBytes() + " bytes");
-                    }
-                    try {
-                        view.url = temporaryDocuments.saveInlineImageBytes(tenantId, bytes);
-                    } catch (RuntimeException e) {
-                        throw BizException.internal("failed to save image: " + e.getMessage());
-                    }
-                }
-                rc.images.add(view);
-            }
-        }
+        saveInlineImages(rc, request, logPrefix);
 
-        // 内联附件（base64 直传，落临时附件表后走既有的 attachment_ids 解析链）
-        if (!request.attachmentUploads().isEmpty()) {
-            QaRequestBinder.decodeAndValidateAttachmentUploads(request.attachmentUploads(),
-                    QaSupport.MAX_ATTACHMENT_UPLOADS_PER_REQUEST,
-                    QaTurnSupport.maxFileBytes(),
-                    QaSupport.MAX_ATTACHMENT_UPLOAD_TOTAL_BYTES);
-            long tenantId = rc.session.getTenantId();
-            int i = 1;
-            for (var up : request.attachmentUploads()) {
-                byte[] data;
-                try {
-                    data = Base64Support.decode(up.data);
-                } catch (RuntimeException e) {
-                    throw BizException.badRequest("attachment " + i + " decode failed: " + e.getMessage());
-                }
-                try {
-                    TemporaryDocument doc = temporaryDocuments.create(tenantId, sessionId,
-                            up.fileName == null || up.fileName.isEmpty() ? "attachment-" + i : up.fileName,
-                            "", up.fileSize, data);
-                    rc.attachmentIDs.add(doc.getId());
-                } catch (IllegalArgumentException e) {
-                    throw BizException.badRequest("attachment " + i + ": " + e.getMessage());
-                }
-                i++;
-            }
-        }
+        saveInlineAttachments(rc, request, sessionId);
 
-        // 预上传附件：只取元数据（内容在 SSE 起流后解析）
-        if (!request.attachmentIds().isEmpty()) {
-            List<String> normalizedIds = QaSupport.normalizeTemporaryAttachmentIds(
-                    request.attachmentIds(), 5);
-            long tenantId = rc.session.getTenantId();
-            for (String id : normalizedIds) {
-                TemporaryDocument doc;
-                try {
-                    doc = temporaryDocuments.get(tenantId, sessionId, id);
-                } catch (RuntimeException e) {
-                    doc = null;
-                }
-                if (doc == null) {
-                    throw BizException.badRequest(
-                            "attachment " + LogSanitizer.sanitize(id)
-                                    + " was not found in this session");
-                }
-                if (rc.agentConfig != null) {
-                    List<String> supported = QaTurnSupport.stringListOf(rc.agentConfig.get("supportedFileTypes"));
-                    if (!supported.isEmpty()) {
-                        String ext = doc.getFileType() == null ? ""
-                                : (doc.getFileType().startsWith(".")
-                                        ? doc.getFileType().substring(1).toLowerCase()
-                                        : doc.getFileType().toLowerCase());
-                        if (!supported.contains(ext)) {
-                            throw BizException.badRequest(
-                                    "file type " + ext + " is not supported by this agent");
-                        }
-                    }
-                }
-                MessageAttachment meta = new MessageAttachment();
-                meta.setId(doc.getId());
-                meta.setUrlValue(doc.getResourceRef());
-                meta.setFileName(doc.getFileName());
-                meta.setFileType(doc.getFileType());
-                meta.setFileSize(doc.getFileSize());
-                rc.attachmentMetas.add(meta);
-            }
-            rc.attachmentIDs = normalizedIds;
-        }
+        collectPreuploadedAttachments(rc, request, sessionId);
 
-        // tag scopes / ids / mcp / skills
-        List<QaSupport.TagScope> mentionScopes = QaSupport.tagScopesFromMentionedItems(request.mentionedItems());
-        List<String> requestTagIds = QaSupport.dedupRequestStrings(request.tagIds());
-        String tagError = QaSupport.validateUnscopedTagIds(
-                QaSupport.orphanTagIdsForScope(requestTagIds, mentionScopes), merged.kbIds());
-        if (tagError != null) {
-            throw BizException.badRequest(tagError);
-        }
-        rc.tagScopes = QaSupport.mergeTagScopesFromRequestIds(mentionScopes, requestTagIds, merged.kbIds());
-        List<String> tagIds = QaSupport.dedupRequestStrings(QaRequestBinder.appendAll(request.tagIds(),
-                QaSupport.mentionedIdsByType(request.mentionedItems(), "tag")));
-        List<String> mcpServiceIds = QaSupport.dedupRequestStrings(QaRequestBinder.appendAll(request.mcpServiceIds(),
-                QaSupport.mentionedIdsByType(request.mentionedItems(), "mcp")));
-        List<String> skillNames = QaSupport.dedupRequestStrings(QaRequestBinder.appendAll(request.skillNames(),
-                QaSupport.mentionedIdsByType(request.mentionedItems(), "skill")));
+        collectMentionScopes(rc, request, merged);
 
-        // assistant 消息骨架（buildMessageExecutionContext 的 agent 字段）
-        String agentId = customAgent == null ? "" : customAgent.getId();
-        // 共享 agent 的租户以 effectiveTenantId 为准，为 0 才回落 agent 自身租户
-        long agentTenantId = resolvedAgent.effectiveTenantId() != 0 ? resolvedAgent.effectiveTenantId()
-                : (customAgent != null && customAgent.getTenantId() != null ? customAgent.getTenantId() : 0);
-        String modelId = request.summaryModelId;
-        if (modelId.isEmpty() && rc.agentConfig != null) {
-            modelId = rc.agentConfig.path("modelId").asString("");
-        }
-        Message assistant = new Message();
-        assistant.setSessionId(sessionId);
-        assistant.setRole("assistant");
-        assistant.setRequestId(rc.requestId);
-        assistant.setCompleted(false);
-        assistant.setChannel(request.channel);
-        assistant.setAgentId(agentId);
-        assistant.setAgentTenantId(agentTenantId);
-        assistant.setModelId(modelId);
-        assistant.setExecutionContext(new MessageExecutionContext());
-        rc.assistantMessage = assistant;
+        buildAssistantMessage(rc, request, customAgent, resolvedAgent);
 
         rc.knowledgeBaseIds = merged.kbIds();
         rc.knowledgeIds = merged.knowledgeIds();
-        rc.tagIds = tagIds;
-        rc.mcpServiceIds = mcpServiceIds;
-        rc.skillNames = skillNames;
         rc.summaryModelId = request.summaryModelId;
         rc.webSearchEnabled = request.webSearchEnabled;
         rc.mentionedItems = QaSupport.convertMentionedItems(request.mentionedItems());
@@ -304,5 +171,172 @@ public final class QaRequestParser {
         rc.reqAgentEnabled = request.agentEnabled;
         rc.reqAgentID = request.agentId;
         return new ParsedRequest(rc, request);
+    }
+
+    /** 内联 base64 图片：解码 → 大小校验 → 落临时文件 → 回填 URL（SSRF 已在调用方清空客户端 url）。 */
+    private void saveInlineImages(QaRequestContext rc, CreateKnowledgeQARequest request, String logPrefix) {
+    // 内联 base64 图片（落盘后回填 URL，消息/检索/VLM
+    // 三处消费同一引用；SSRF 已在上方清空客户端 url/caption）
+    if (!request.images().isEmpty()) {
+        if (rc.agentConfig == null || !rc.agentConfig.path("imageUploadEnabled").asBoolean(false)) {
+            log.warn("[{}] Image upload is not enabled for this agent, rejecting {} images",
+                    logPrefix, request.images().size());
+            throw BizException.badRequest("Image upload is not enabled for this agent");
+        }
+        long tenantId = rc.session.getTenantId();
+        for (var img : request.images()) {
+            QaSupport.QaRequestsImage view = new QaSupport.QaRequestsImage();
+            if (img.data != null && !img.data.isEmpty()) {
+                byte[] bytes;
+                try {
+                    bytes = Base64Support.decode(img.data);
+                } catch (RuntimeException e) {
+                    throw BizException.badRequest("image decode failed: " + e.getMessage());
+                }
+                if (bytes.length == 0) {
+                    throw BizException.badRequest("image decode failed: empty payload");
+                }
+                if (bytes.length > QaTurnSupport.maxFileBytes()) {
+                    throw BizException.badRequest(
+                            "image exceeds size limit of " + QaTurnSupport.maxFileBytes() + " bytes");
+                }
+                try {
+                    view.url = temporaryDocuments.saveInlineImageBytes(tenantId, bytes);
+                } catch (RuntimeException e) {
+                    throw BizException.internal("failed to save image: " + e.getMessage());
+                }
+            }
+            rc.images.add(view);
+        }
+    }
+
+    }
+
+    /** 内联附件：批量校验 → 解码 → 落临时附件表 → 记 id。 */
+    private void saveInlineAttachments(QaRequestContext rc, CreateKnowledgeQARequest request,
+            String sessionId) {
+    // 内联附件（base64 直传，落临时附件表后走既有的 attachment_ids 解析链）
+    if (!request.attachmentUploads().isEmpty()) {
+        QaRequestBinder.decodeAndValidateAttachmentUploads(request.attachmentUploads(),
+                QaSupport.MAX_ATTACHMENT_UPLOADS_PER_REQUEST,
+                QaTurnSupport.maxFileBytes(),
+                QaSupport.MAX_ATTACHMENT_UPLOAD_TOTAL_BYTES);
+        long tenantId = rc.session.getTenantId();
+        int i = 1;
+        for (var up : request.attachmentUploads()) {
+            byte[] data;
+            try {
+                data = Base64Support.decode(up.data);
+            } catch (RuntimeException e) {
+                throw BizException.badRequest("attachment " + i + " decode failed: " + e.getMessage());
+            }
+            try {
+                TemporaryDocument doc = temporaryDocuments.create(tenantId, sessionId,
+                        up.fileName == null || up.fileName.isEmpty() ? "attachment-" + i : up.fileName,
+                        "", up.fileSize, data);
+                rc.attachmentIDs.add(doc.getId());
+            } catch (IllegalArgumentException e) {
+                throw BizException.badRequest("attachment " + i + ": " + e.getMessage());
+            }
+            i++;
+        }
+    }
+
+    }
+
+    /** 预上传附件：只取元数据并校验文件类型（内容在 SSE 起流后解析）。 */
+    private void collectPreuploadedAttachments(QaRequestContext rc, CreateKnowledgeQARequest request,
+            String sessionId) {
+    // 预上传附件：只取元数据（内容在 SSE 起流后解析）
+    if (!request.attachmentIds().isEmpty()) {
+        List<String> normalizedIds = QaSupport.normalizeTemporaryAttachmentIds(
+                request.attachmentIds(), 5);
+        long tenantId = rc.session.getTenantId();
+        for (String id : normalizedIds) {
+            TemporaryDocument doc;
+            try {
+                doc = temporaryDocuments.get(tenantId, sessionId, id);
+            } catch (RuntimeException e) {
+                doc = null;
+            }
+            if (doc == null) {
+                throw BizException.badRequest(
+                        "attachment " + LogSanitizer.sanitize(id)
+                                + " was not found in this session");
+            }
+            if (rc.agentConfig != null) {
+                List<String> supported = QaTurnSupport.stringListOf(rc.agentConfig.get("supportedFileTypes"));
+                if (!supported.isEmpty()) {
+                    String ext = doc.getFileType() == null ? ""
+                            : (doc.getFileType().startsWith(".")
+                                    ? doc.getFileType().substring(1).toLowerCase()
+                                    : doc.getFileType().toLowerCase());
+                    if (!supported.contains(ext)) {
+                        throw BizException.badRequest(
+                                "file type " + ext + " is not supported by this agent");
+                    }
+                }
+            }
+            MessageAttachment meta = new MessageAttachment();
+            meta.setId(doc.getId());
+            meta.setUrlValue(doc.getResourceRef());
+            meta.setFileName(doc.getFileName());
+            meta.setFileType(doc.getFileType());
+            meta.setFileSize(doc.getFileSize());
+            rc.attachmentMetas.add(meta);
+        }
+        rc.attachmentIDs = normalizedIds;
+    }
+
+    }
+
+    /** tag / mcp / skill 的合并与 tag 作用域校验。 */
+    private void collectMentionScopes(QaRequestContext rc, CreateKnowledgeQARequest request,
+            KnowledgeTargets merged) {
+    // tag scopes / ids / mcp / skills
+    List<QaSupport.TagScope> mentionScopes = QaSupport.tagScopesFromMentionedItems(request.mentionedItems());
+    List<String> requestTagIds = QaSupport.dedupRequestStrings(request.tagIds());
+    String tagError = QaSupport.validateUnscopedTagIds(
+            QaSupport.orphanTagIdsForScope(requestTagIds, mentionScopes), merged.kbIds());
+    if (tagError != null) {
+        throw BizException.badRequest(tagError);
+    }
+    rc.tagScopes = QaSupport.mergeTagScopesFromRequestIds(mentionScopes, requestTagIds, merged.kbIds());
+    List<String> tagIds = QaSupport.dedupRequestStrings(QaRequestBinder.appendAll(request.tagIds(),
+            QaSupport.mentionedIdsByType(request.mentionedItems(), "tag")));
+    List<String> mcpServiceIds = QaSupport.dedupRequestStrings(QaRequestBinder.appendAll(request.mcpServiceIds(),
+            QaSupport.mentionedIdsByType(request.mentionedItems(), "mcp")));
+    List<String> skillNames = QaSupport.dedupRequestStrings(QaRequestBinder.appendAll(request.skillNames(),
+            QaSupport.mentionedIdsByType(request.mentionedItems(), "skill")));
+
+        rc.tagIds = tagIds;
+        rc.mcpServiceIds = mcpServiceIds;
+        rc.skillNames = skillNames;
+    }
+
+    /** assistant 消息骨架（后续由 QaTurnExecutor 补内容）。 */
+    private void buildAssistantMessage(QaRequestContext rc, CreateKnowledgeQARequest request,
+            CustomAgentEntity customAgent, AgentResolver.ResolvedAgent resolvedAgent) {
+    // assistant 消息骨架（buildMessageExecutionContext 的 agent 字段）
+    String agentId = customAgent == null ? "" : customAgent.getId();
+    // 共享 agent 的租户以 effectiveTenantId 为准，为 0 才回落 agent 自身租户
+    long agentTenantId = resolvedAgent.effectiveTenantId() != 0 ? resolvedAgent.effectiveTenantId()
+            : (customAgent != null && customAgent.getTenantId() != null ? customAgent.getTenantId() : 0);
+    String modelId = request.summaryModelId;
+    if (modelId.isEmpty() && rc.agentConfig != null) {
+        modelId = rc.agentConfig.path("modelId").asString("");
+    }
+    Message assistant = new Message();
+    assistant.setSessionId(rc.sessionId);
+    assistant.setRole("assistant");
+    assistant.setRequestId(rc.requestId);
+    assistant.setCompleted(false);
+    assistant.setChannel(request.channel);
+    assistant.setAgentId(agentId);
+    assistant.setAgentTenantId(agentTenantId);
+    assistant.setModelId(modelId);
+    assistant.setExecutionContext(new MessageExecutionContext());
+    rc.assistantMessage = assistant;
+
     }
 }
