@@ -26,14 +26,20 @@ import org.springframework.web.servlet.HandlerMapping;
  * 路由级 RBAC 拦截器（角色下限 / 系统管理员守卫 / 跨空间守卫）。
  *
  * 判定顺序：
- *  1. 角色达标（TenantRole level 比较）→ 放行
+ *  1. 命中规则且角色达标（TenantRole level 比较）→ 放行
  *  2. 跨空间超管（{@code EnableCrossTenantAccess && CanAccessAllTenants}）→ 放行
- *  3. EnableRBAC=false（滚动窗口）→ 记日志放行
- *  4. 否则 403 {"error":"Forbidden: insufficient workspace role"}
+ *  3. 显式公开/自服务规则（{@link #addPublicRule}）→ 放行（鉴权由其它守卫负责）
+ *  4. {@code /api/v1/**} 的真实控制器方法未命中任何规则 → 403
+ *     {@code {"error":"Forbidden: no route policy"}}；未映射路径仍由 Spring 返回 404
+ *  5. EnableRBAC=false（滚动窗口）→ 记日志放行
+ *  6. 否则 403 {"error":"Forbidden: insufficient workspace role"}
  *
  * API-key 主体在此短路放行（能力维度由 APIKeyGate 全权判定），
  * 见下方的 {@code APIKeyScopeContext.present()} 分支；系统管理员与所有权守卫
  * 随对应模块（system admin / KB / agent）落在各自入口。
+ *
+ * <p>HEAD 未命中时按 GET 规则/公开规则兜底：Spring 对 GET 自动派生 HEAD，
+ * 不能让它成为绕过方法级角色下限的旁路。</p>
  *
  * <p><b>拒绝审计</b>：拒绝分支会调用
  * {@link DeniedAuditor}，把拒绝落成一条 durable 的 {@code rbac.access_denied}
@@ -60,6 +66,9 @@ public class RbacInterceptor implements HandlerInterceptor {
      */
     public record Rule(String method, String pattern, TenantRole minRole, boolean orSystemAdmin,
                        boolean sysAdminOnly, boolean crossTenant) {}
+
+    /** 公开/自服务路由：不设角色下限，鉴权由 AuthFilter、渠道 token、签名或所有权层负责。 */
+    public record PublicRule(String method, String pattern) {}
 
     /**
      * 拒绝审计回调。
@@ -100,6 +109,7 @@ public class RbacInterceptor implements HandlerInterceptor {
     }
 
     private final List<Rule> rules = new ArrayList<>();
+    private final List<PublicRule> publicRules = new ArrayList<>();
     private final TenantProperties tenantProperties;
 
     public RbacInterceptor(TenantProperties tenantProperties) {
@@ -117,6 +127,15 @@ public class RbacInterceptor implements HandlerInterceptor {
      */
     public RbacInterceptor addSystemAdminRule(String method, String pattern) {
         rules.add(new Rule(method, pattern, TenantRole.ADMIN, false, true, false));
+        return this;
+    }
+
+    /**
+     * 登记公开/自服务路由：不设角色下限，跳过 RBAC；鉴权仍由其它守卫负责。
+     * <p>默认拒绝只对 {@code /api/v1/**} 生效，未登记且无规则的 API 路径返回 403。</p>
+     */
+    public RbacInterceptor addPublicRule(String method, String pattern) {
+        publicRules.add(new PublicRule(method, pattern));
         return this;
     }
 
@@ -138,7 +157,21 @@ public class RbacInterceptor implements HandlerInterceptor {
 
         Rule rule = match(request.getMethod(), request.getRequestURI());
         if (rule == null) {
-            // 未声明路由：该组默认无守卫，不拦截（API-key default-deny 属 APIKeyGate）
+            if (isPublic(request.getMethod(), request.getRequestURI())) {
+                return true;
+            }
+            // 只对“真实控制器方法”默认拒绝；未映射路径继续由 Spring 返回 404
+            // （否则 removed-route 契约测试会从 404 变成 403，掩盖“路由已删除”的事实）。
+            if (request.getRequestURI().startsWith("/api/v1/")
+                    && handler instanceof org.springframework.web.method.HandlerMethod) {
+                if (!tenantProperties.isRbacEnforced()) {
+                    log.warn("[rbac] unmatched route (logged but not enforced): user={} path={}",
+                            TenantContext.currentUserId(), request.getRequestURI());
+                    return true;
+                }
+                return denyUnmatched(request, response);
+            }
+            // 非 API 路径（静态资源、健康检查、文件签名 URL）不在默认拒绝面。
             return true;
         }
         if (check(rule)) {
@@ -211,7 +244,71 @@ public class RbacInterceptor implements HandlerInterceptor {
         return rule.pattern();
     }
 
+    /** 未命中任何规则时的审计模板：拿不到 Spring 模板就记 {@code unmatched}，不回落到原始 URI。 */
+    private static String routeTemplate(HttpServletRequest request) {
+        Object pattern = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        if (pattern instanceof String s && !s.isEmpty()) {
+            return s;
+        }
+        return "unmatched";
+    }
+
+    private boolean denyUnmatched(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        log.warn("[rbac] no route policy: user={} path={}",
+                TenantContext.currentUserId(), request.getRequestURI());
+        try {
+            Long tenantId = TenantContext.currentTenantId();
+            deniedAuditor.logDenied(
+                    tenantId == null ? 0L : tenantId,
+                    TenantContext.currentUserId(),
+                    TenantContext.currentRole(),
+                    "unmatched",
+                    routeTemplate(request),
+                    request.getMethod(),
+                    request.getRequestURI());
+        } catch (RuntimeException e) {
+            log.warn("[rbac] denied-audit write failed (ignored): path={}", request.getRequestURI(), e);
+        }
+        response.setStatus(403);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        String message = "Forbidden: no route policy";
+        if (ApiResultSupport.isActive(request)) {
+            response.getWriter().write(forbiddenEnvelope(message));
+            return false;
+        }
+        response.getWriter().write("{\"error\":\"" + message + "\"}");
+        return false;
+    }
+
+    private boolean isPublic(String method, String uri) {
+        if (matchPublic(method, uri) != null) {
+            return true;
+        }
+        return "HEAD".equals(method) && matchPublic("GET", uri) != null;
+    }
+
+    private PublicRule matchPublic(String method, String uri) {
+        for (PublicRule rule : publicRules) {
+            if (rule.method().equals(method) && MATCHER.match(rule.pattern(), uri)) {
+                return rule;
+            }
+        }
+        return null;
+    }
+
     private Rule match(String method, String uri) {
+        Rule rule = matchExact(method, uri);
+        if (rule == null && "HEAD".equals(method)) {
+            // Spring 对 GET 自动派生 HEAD；若不按 GET 规则兜底，HEAD 会成为
+            // 绕过方法级角色下限的旁路（只返回头，但仍泄露存在性/元数据）。
+            rule = matchExact("GET", uri);
+        }
+        return rule;
+    }
+
+    private Rule matchExact(String method, String uri) {
         for (Rule rule : rules) {
             if (rule.method().equals(method) && MATCHER.match(rule.pattern(), uri)) {
                 return rule;

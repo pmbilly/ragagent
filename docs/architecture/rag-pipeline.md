@@ -19,7 +19,7 @@
 
 ## 14 个阶段
 
-注册位置：`domains/.../session/service/QaWiring.java:371-391`。
+注册位置：`domains/.../session/assembly/QaWiring.java`。
 
 | 阶段 | 执行的插件（按序） | 说明 |
 |---|---|---|

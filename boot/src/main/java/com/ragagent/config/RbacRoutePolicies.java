@@ -4,7 +4,7 @@ import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.web.RbacInterceptor;
 
 /**
- * RBAC 规则表（集中登记所有带角色下限的路由声明）。
+ * RBAC 规则表（集中登记所有带角色下限的路由声明，以及显式公开/自服务路由）。
  *
  * <p>与 {@code APIKeyRoutePolicies} 在角色维度互为镜像：Java 侧路由注册分散在各控制器的
  * {@code @RequestMapping} 上，没有等价的"同一条语句"钩子，所以角色下限矩阵集中到本类——
@@ -267,11 +267,6 @@ final class RbacRoutePolicies {
         rbac.addRule("GET", "/api/v1/sessions/*/messages/*/artifacts", TenantRole.VIEWER, false);
         rbac.addRule("GET", "/api/v1/sessions/*/messages/*/artifacts/*/download", TenantRole.VIEWER, false);
 
-        // 沙箱终端票据：Viewer+（同 sessions 组口径）。WS 升级路由
-        // （GET …/sandbox/terminal）注册在 Auth 之前、票据自鉴权，
-        // 不经过 RBAC，不登记。
-        rbac.addRule("POST", "/api/v1/sessions/*/sandbox/terminal-ticket", TenantRole.VIEWER, false);
-
         // 消息面：message history 是 tenant-wide 面，
         // Viewer+ 把非成员挡在外面。静态段（search/chat-history-stats）先于通配。
         rbac.addRule("POST", "/api/v1/messages/search", TenantRole.VIEWER, false);
@@ -484,8 +479,8 @@ final class RbacRoutePolicies {
         // 管理端点：写（create/update/delete/rotate/toggle）Admin+，读（list/get/
         // preview/stats）Viewer+；wechat 扫码组全 Admin+（成功扫码会把个人
         // 微信绑到空间）。静态段先于通配段登记（AntPathMatcher 取首个命中）。
-        // /api/v1/embed/**（公开面）刻意**不**登记规则——它不经过 AuthFilter 与 RBAC，
-        // 由 EmbedAuthFilter 的 publish token 自证。
+        // /api/v1/embed/**（公开面）登记为 addPublicRule（C9b）：不设角色下限，
+        // 但不再落入“未命中规则默认放行”的盲区；鉴权仍由 EmbedAuthFilter 的 publish token 自证。
         rbac.addRule("POST", "/api/v1/agents/*/embed-channels", TenantRole.ADMIN, false);
         rbac.addRule("GET", "/api/v1/agents/*/embed-channels", TenantRole.VIEWER, false);
         rbac.addRule("GET", "/api/v1/embed-channels", TenantRole.VIEWER, false);
@@ -503,5 +498,64 @@ final class RbacRoutePolicies {
         rbac.addRule("POST", "/api/v1/im-channels/*/toggle", TenantRole.ADMIN, false);
         rbac.addRule("POST", "/api/v1/wechat/qrcode", TenantRole.ADMIN, false);
         rbac.addRule("POST", "/api/v1/wechat/qrcode/status", TenantRole.ADMIN, false);
+
+        // ── 公开/自服务路由（C9b）──
+        // 无角色下限，但并非“无鉴权”：登录态由 AuthFilter、渠道 token 由 EmbedAuthFilter、
+        // 文件由签名、邀请由 token、webhook 由签名、会话/消息由所有权守卫负责。
+        // 登记它们是为了关闭“/api/v1/** 未命中规则默认放行”的静默越权面。
+        rbac.addPublicRule("GET", "/api/v1/auth/config");
+        rbac.addPublicRule("GET", "/api/v1/auth/me");
+        rbac.addPublicRule("GET", "/api/v1/auth/oidc/callback");
+        rbac.addPublicRule("GET", "/api/v1/auth/oidc/config");
+        rbac.addPublicRule("GET", "/api/v1/auth/oidc/start");
+        rbac.addPublicRule("GET", "/api/v1/auth/oidc/url");
+        rbac.addPublicRule("GET", "/api/v1/auth/validate");
+        rbac.addPublicRule("GET", "/api/v1/embed/*/chunks/*");
+        rbac.addPublicRule("GET", "/api/v1/embed/*/config");
+        rbac.addPublicRule("GET", "/api/v1/embed/*/files");
+        rbac.addPublicRule("GET", "/api/v1/embed/*/messages/*/load");
+        rbac.addPublicRule("GET", "/api/v1/embed/*/sessions");
+        rbac.addPublicRule("GET", "/api/v1/embed/*/sessions/*/mcp-services/*/oauth/status");
+        rbac.addPublicRule("GET", "/api/v1/embed/*/sessions/*/messages/*/suggestions");
+        rbac.addPublicRule("GET", "/api/v1/embed/*/suggested-questions");
+        rbac.addPublicRule("GET", "/api/v1/files/presigned");
+        rbac.addPublicRule("GET", "/api/v1/im/callback/*");
+        rbac.addPublicRule("GET", "/api/v1/mcp-oauth/callback");
+        rbac.addPublicRule("GET", "/api/v1/me/invitations");
+        rbac.addPublicRule("GET", "/api/v1/me/invitations/pending-count");
+        rbac.addPublicRule("GET", "/api/v1/messages/*/load");
+        rbac.addPublicRule("GET", "/api/v1/tenants");
+        rbac.addPublicRule("GET", "/files");
+        rbac.addPublicRule("GET", "/r/*");
+        rbac.addPublicRule("HEAD", "/api/v1/files/presigned");
+        rbac.addPublicRule("HEAD", "/files");
+        rbac.addPublicRule("HEAD", "/r/*");
+        rbac.addPublicRule("POST", "/api/v1/auth/auto-setup");
+        rbac.addPublicRule("POST", "/api/v1/auth/change-password");
+        rbac.addPublicRule("POST", "/api/v1/auth/invitations/lookup");
+        rbac.addPublicRule("POST", "/api/v1/auth/login");
+        rbac.addPublicRule("POST", "/api/v1/auth/logout");
+        rbac.addPublicRule("POST", "/api/v1/auth/refresh");
+        rbac.addPublicRule("POST", "/api/v1/auth/register");
+        rbac.addPublicRule("POST", "/api/v1/auth/register-by-invite");
+        rbac.addPublicRule("POST", "/api/v1/auth/switch-tenant");
+        rbac.addPublicRule("POST", "/api/v1/embed/*/agent-chat/*");
+        rbac.addPublicRule("POST", "/api/v1/embed/*/exchange");
+        rbac.addPublicRule("POST", "/api/v1/embed/*/knowledge-chat/*");
+        rbac.addPublicRule("POST", "/api/v1/embed/*/sessions");
+        rbac.addPublicRule("POST", "/api/v1/embed/*/sessions/*/events");
+        rbac.addPublicRule("POST", "/api/v1/embed/*/sessions/*/mcp-oauth-resolutions/*");
+        rbac.addPublicRule("POST", "/api/v1/embed/*/sessions/*/mcp-oauth-resolutions/*/cancel");
+        rbac.addPublicRule("POST", "/api/v1/embed/*/sessions/*/mcp-services/*/oauth/authorize-url");
+        rbac.addPublicRule("POST", "/api/v1/embed/*/sessions/*/messages/*/suggestions");
+        rbac.addPublicRule("POST", "/api/v1/embed/*/sessions/*/stop");
+        rbac.addPublicRule("POST", "/api/v1/embed/*/sessions/*/suggestion-events");
+        rbac.addPublicRule("POST", "/api/v1/embed/*/sessions/*/tool-approvals/*");
+        rbac.addPublicRule("POST", "/api/v1/im/callback/*");
+        rbac.addPublicRule("POST", "/api/v1/me/invitations/accept-by-token");
+        rbac.addPublicRule("POST", "/api/v1/me/invitations/*/accept");
+        rbac.addPublicRule("POST", "/api/v1/me/invitations/*/decline");
+        rbac.addPublicRule("POST", "/api/v1/tenants");
+        rbac.addPublicRule("PUT", "/api/v1/auth/me/preferences");
     }
 }

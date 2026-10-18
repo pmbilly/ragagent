@@ -72,10 +72,10 @@ sequenceDiagram
 
 ### 1. `EventManager.trigger(PipelineEventType.CHUNK_SEARCH_PARALLEL, ...)` 的执行体在哪
 
-`EventManager` 只存两类映射：`eventType → List<Plugin>` 与 `eventType → 闭包链`。触发点（`SessionKnowledgeQaService`）只看到枚举常量，插件注册在另一个文件 `QaWiring`（约 371-391 行）：
+`EventManager` 只存两类映射：`eventType → List<Plugin>` 与 `eventType → 闭包链`。触发点（`SessionKnowledgeQaService`）只看到枚举常量，插件注册在另一个文件 `QaWiring`：
 
 ```
-domains/.../session/service/QaWiring.java:371-391
+domains/.../session/assembly/QaWiring.java
 ```
 
 `PluginSearchParallel` 的两个内部插件由 `QaWiring` 显式传入（构造注入）——它们**不注册**到 manager，只作为并行 fan-out 的内部执行体。这是刻意的（避免同一阶段出现第二个 handler），不要"顺手"把它们注册进去。

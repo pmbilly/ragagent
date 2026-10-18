@@ -1,0 +1,4 @@
+{
+  "note": "C9b 后应为空：公开/自服务路由已显式登记在 RbacRoutePolicies.addPublicRule；此文件只保留未登记路由的例外（新增即红）。",
+  "unguarded": {}
+}
