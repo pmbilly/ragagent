@@ -1,4 +1,4 @@
-package com.ragagent.session.service;
+package com.ragagent.session.conversation;
 
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.platform.stream.StreamEvent;

@@ -1,6 +1,6 @@
 /**
- * 会话域：会话与消息读写、两条问答入口（知识库问答 / Agent 问答）、SSE 流式桥与
- * 会话侧管线装配（{@code rag/}：14 个阶段、17 个插件）。
+ * 会话域：会话与消息读写（{@code conversation/}）、两条问答入口（知识库问答 / Agent 问答）、
+ * SSE 流桥、附件（{@code attachment/}）与会话侧管线（{@code rag/} + {@code assembly/}）。
  *
  * <p><b>种类</b>：产品能力<br>
  * <b>入口</b>：{@code KnowledgeQaController}、{@code SessionController}、{@code SessionStreamController}<br>

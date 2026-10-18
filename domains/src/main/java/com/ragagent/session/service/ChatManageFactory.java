@@ -2,6 +2,7 @@ package com.ragagent.session.service;
 
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.platform.settings.ConversationProperties;
+import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.SummaryConfig;
 import com.ragagent.session.service.SessionKnowledgeQaService.KnowledgeResolution;

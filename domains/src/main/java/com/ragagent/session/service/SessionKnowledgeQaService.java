@@ -1,7 +1,5 @@
 package com.ragagent.session.service;
 
-
-
 import static com.ragagent.session.service.QaSupport.TagScope;
 
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
@@ -22,6 +20,8 @@ import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.conversation.SessionLookupScope;
+import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.EventManager;
 import com.ragagent.session.rag.PipelineBuilder;

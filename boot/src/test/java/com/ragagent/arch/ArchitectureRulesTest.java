@@ -816,7 +816,7 @@ class ArchitectureRulesTest {
             "com.ragagent.model.service.BuiltinModelsReconciler",
             "com.ragagent.model.service.ModelService",
             "com.ragagent.session.service.suggestion.MessageSuggestionService",
-            "com.ragagent.session.service.QaWiring",
+            "com.ragagent.session.assembly.QaWiring",
             "com.ragagent.session.service.SessionAgentQaService",
             "com.ragagent.session.service.SessionKnowledgeQaService",
             "com.ragagent.system.service.SystemSettingService",
@@ -841,6 +841,16 @@ class ArchitectureRulesTest {
         for (String part : packageName.split("\\.")) {
             if ("service".equals(part) || "rag".equals(part)) {
                 return true;
+            }
+        }
+        // 会话域按用例层拆出的子包：与 service/rag 同属 A16/A17 约束面，
+        // 不纳入会因换包而静默脱管（agent 只按 session 前缀收，避免误扫 agent-engine）。
+        if (packageName.startsWith("com.ragagent.session.")) {
+            for (String name : new String[] {"conversation", "attachment", "assembly"}) {
+                if (packageName.equals("com.ragagent.session." + name)
+                        || packageName.startsWith("com.ragagent.session." + name + ".")) {
+                    return true;
+                }
             }
         }
         return false;

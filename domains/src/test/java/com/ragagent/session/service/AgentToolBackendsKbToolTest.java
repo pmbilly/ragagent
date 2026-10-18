@@ -18,6 +18,7 @@ import com.ragagent.contract.wiki.WikiPageOpsPort;
 import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.platform.settings.ConversationProperties;
+import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.domain.message.MessageSearchGroupItem;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import java.time.LocalDate;

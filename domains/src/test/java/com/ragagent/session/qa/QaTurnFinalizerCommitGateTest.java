@@ -15,10 +15,10 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.memory.api.MemoryAccess;
+import com.ragagent.session.attachment.TemporaryDocumentService;
+import com.ragagent.session.conversation.MessageService;
+import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.service.MessageService;
-import com.ragagent.session.service.SessionService;
-import com.ragagent.session.service.TemporaryDocumentService;
 import com.ragagent.session.service.suggestion.MessageSuggestionService;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

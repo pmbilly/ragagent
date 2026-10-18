@@ -22,6 +22,7 @@ import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
 import com.ragagent.platform.tracing.decorators.LangfuseReranker;
+import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.support.PipelineViews;
 import java.util.ArrayList;
 import java.util.List;

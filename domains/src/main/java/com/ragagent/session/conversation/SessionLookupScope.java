@@ -1,4 +1,4 @@
-package com.ragagent.session.service;
+package com.ragagent.session.conversation;
 
 /**
  * 「本请求按会话**属主租户**而非当前主体查会话」的请求级标记。

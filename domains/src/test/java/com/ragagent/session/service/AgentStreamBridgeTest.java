@@ -24,6 +24,7 @@ import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.session.conversation.AgentStreamBridge;
 import com.ragagent.session.domain.message.Message;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

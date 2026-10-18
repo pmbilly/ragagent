@@ -6,6 +6,6 @@
  * 记忆投影（{@link com.ragagent.session.rag.support.MemoryUsedMemories}）与匹配常量
  * （{@link com.ragagent.session.rag.support.MatchTypes}）。
  *
- * <p>无状态、无仓储依赖；插件（{@code chatpipeline.plugin}）与管线骨架（根包）都调用这里。</p>
+ * <p>无状态、无仓储依赖；插件（{@code com.ragagent.session.rag.plugin}）与管线骨架（根包）都调用这里。</p>
  */
 package com.ragagent.session.rag.support;

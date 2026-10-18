@@ -1,4 +1,4 @@
-package com.ragagent.session.service;
+package com.ragagent.session.attachment;
 
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.session.domain.document.TemporaryDocument;

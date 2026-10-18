@@ -1,4 +1,4 @@
-package com.ragagent.session.service;
+package com.ragagent.session.api;
 
 import com.ragagent.contract.pipeline.KnowledgeQaRunRequest;
 import com.ragagent.contract.pipeline.KnowledgeQaRunResult;

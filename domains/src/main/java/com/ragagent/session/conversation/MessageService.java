@@ -1,4 +1,4 @@
-package com.ragagent.session.service;
+package com.ragagent.session.conversation;
 
 import com.ragagent.contract.agent.ThinkBlocks;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;

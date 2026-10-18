@@ -24,6 +24,7 @@ import com.ragagent.contract.retrieval.RetrieveEngineException;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.session.domain.message.MessageWithSession;

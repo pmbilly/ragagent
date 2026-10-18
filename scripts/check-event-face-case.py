@@ -115,7 +115,7 @@ def check_routes() -> None:
 EVENT_MAP_FILES = {
     'session/qa/QaSseOrchestrator.java':
         'agentQuery/data 载荷生产侧（手工 put；B135b2 收尾 3 键）',
-    'session/service/AgentStreamBridge.java':
+    'session/conversation/AgentStreamBridge.java':
         'SSE 事件桥（手工 put；B93b 已 camel 38 处键位，B135b2 收尾 finalContent）',
     'session/controller/sse/StreamResponseBuilder.java':
         'SSE 响应构建 + Redis 回放的引用重建（读 SearchResult 形状）',

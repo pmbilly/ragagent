@@ -202,7 +202,7 @@ BASELINE: dict[str, set[str]] = {
     # SSE complete 事件的 data 键（B136 复核：与上条同属**冻结的线协议** §14.9l 前提判定 2；
     # 同上（SSE/消息载荷）
     # 批③下沉换锚：stop 事件 data 键随用例从 SessionController 搬至 SessionStopService（键名不动）
-    'session/service/SessionStopService.java': {'message_id', 'session_id'},
+    'session/conversation/SessionStopService.java': {'message_id', 'session_id'},
     # MyBatis 列名写入点（非 JSON 键）
     'session/repository/MessageRepository.java': {'agent_duration_ms', 'agent_id', 'agent_tenant_id', 'is_completed', 'is_fallback', 'knowledge_id', 'model_id', 'rendered_content', 'request_id', 'updated_at'},
     # 文件服务面（B136 复核）：HTTP query 参数名（`request.getParameter`，非 Spring 注解

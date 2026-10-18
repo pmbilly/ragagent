@@ -14,6 +14,8 @@ import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.websearch.WebSearchTempStatePort;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.settings.ConversationProperties;
+import com.ragagent.session.conversation.SessionLookupScope;
+import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.repository.MessageRepository;

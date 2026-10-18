@@ -1,4 +1,4 @@
-package com.ragagent.session.service;
+package com.ragagent.session.attachment;
 
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.contract.knowledge.DocumentChunkingPort;
@@ -11,9 +11,9 @@ import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.knowledge.ImageRefRewriter;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.attachment.TemporaryDocumentService.CreateOptions;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
-import com.ragagent.session.service.TemporaryDocumentService.CreateOptions;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;

@@ -60,6 +60,7 @@ run '业务域索引（docs/architecture/domain-index.md 必须与分类/源码�
 run '业务域 package-info 四要素（种类/入口/契约面/依赖）' python3 scripts/check-package-info-fields.py
 run '能力种类边界（跨 kind 直连禁止；同 kind 允许）' python3 scripts/check-capability-kinds.py
 run '业务域包规模（>30 只许降；26-30 报警）' python3 scripts/check-package-size.py
+run '引用真实性（package-info/公开文档不得断链、旧包名、死路径）' python3 scripts/check-reference-truth.py
 run '版本一致性（Boot / springdoc / MyBatis-Plus jsqlparser / wrapper / Dockerfile）' python3 scripts/check-version-consistency.py
 
 echo

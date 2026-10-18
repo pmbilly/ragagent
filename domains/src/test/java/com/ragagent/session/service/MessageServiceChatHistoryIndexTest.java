@@ -17,6 +17,7 @@ import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.HybridSearchPort;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;

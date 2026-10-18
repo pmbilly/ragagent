@@ -34,7 +34,11 @@ def load() -> dict:
 
 
 def render(data: dict, counts: Counter) -> str:
-    allowed = data["allowed"]
+    allowed = {
+        path: meta
+        for path, meta in data["allowed"].items()
+        if counts.get(path, 0) > data["enforceThreshold"]
+    }
     items = sorted(allowed.items(), key=lambda kv: (-counts.get(kv[0], 0), kv[0]))
     lines = [
         "{",
@@ -108,8 +112,10 @@ def main() -> int:
         if new:
             print("✗ 存在新增超限包，拒绝 --write；请先手工登记理由。")
             return 1
-        BASELINE.write_text(render(data, counts), encoding="utf-8")
-        print(f"✓ 基线已收紧：{len(allowed)} 个包")
+        rendered = render(data, counts)
+        BASELINE.write_text(rendered, encoding="utf-8")
+        kept = rendered.count('"files":')
+        print(f"✓ 基线已收紧：{kept} 个包")
         return 0
 
     print(

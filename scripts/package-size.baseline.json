@@ -8,11 +8,6 @@
       "reason": "wiki 摄取管线：map/reduce/finalize/index 四阶段 + 队列/锁/幂等；C4 拆 queue/stage/support",
       "target": 25
     },
-    "domains/src/main/java/com/ragagent/session/service": {
-      "files": 40,
-      "reason": "会话/Agent 装配/QA 辅助/附件/Wiring 混居；C3 拆 conversation/agent/qa/attachment/assembly",
-      "target": 25
-    },
     "domains/src/main/java/com/ragagent/mcp/oauth": {
       "files": 34,
       "reason": "OAuth 客户端/授权服务器/令牌存储同包；按 OAuth 生命周期内聚，暂不拆",

@@ -4,7 +4,7 @@
  * <ul>
  *   <li>{@code SessionRepository} — 会话行的读写契约（会话是本域聚合根）；</li>
  *   <li>{@code MessageRepository} — 消息读写契约，实现 {@code SessionMessagePort}
- *       （跨模块端口，供 {@code :engine} 的检索/管线侧消费）；</li>
+ *       （跨模块端口，供会话/记忆侧的检索与管线消费）；</li>
  *   <li>{@code MessageSuggestionRepository} — 追问建议的生成态与消费态；</li>
  *   <li>{@code TemporaryDocumentRepository} — 会话内临时文档（上传未入库的那份）。</li>
  * </ul>

@@ -17,6 +17,8 @@ import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.session.attachment.AttachmentFileStore;
+import com.ragagent.session.attachment.TemporaryDocumentService;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 import java.util.List;

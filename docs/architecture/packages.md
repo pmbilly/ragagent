@@ -1,15 +1,15 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-322 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+325 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
-| `:agent-engine` | `com.ragagent.agent` | ReAct 引擎域：AgentEngine 门面与八个段协作者（think/act/observe/prompt/finalize/steer/context-debug/ReAct 迭代）、 提示词装配、token 预算与取消探测。 |
+| `:agent-engine` | `com.ragagent.agent` | ReAct 引擎域：AgentEngine 门面与段协作者（think/act/observe/prompt/finalize/steer/context-debug/ReAct 迭代）、 提示词装配、token 预算与取消探测。 |
 | `:agent-engine` | `com.ragagent.agent.budget` | token 预算与上下文占用：TokenEstimator（token 估算，压缩与裁剪共用）、 AgentBudgets（轮次 / completion / 上下文预留等预算常量与换算）、 Cont |
 | `:agent-engine` | `com.ragagent.agent.compaction` | 上下文压缩：Compactor、溢出判定、截断点选择与压缩结果/原因类型。 |
 | `:agent-engine` | `com.ragagent.agent.domain` | 引擎状态类型：AgentState/AgentStep/AgentToolCall/ToolResult 等，落库 jsonb 与消息响应共用（键名改动须连带前端）。 |
-| `:agent-engine` | `com.ragagent.agent.prompt` | agent 侧提示词构件：AgentPromptTemplates（系统提示词模板按 mode 选取，经 common.prompt.PromptSource 装载）、GroundingPrompt（按当前工具清单生成 内容接地指引）。 |
+| `:agent-engine` | `com.ragagent.agent.prompt` | agent 侧提示词构件：AgentPromptTemplates（系统提示词模板按 mode 选取，经 platform.prompt.PromptSource 装载）、GroundingPrompt（按当前工具清单生成 内容接地指引）。 |
 | `:agent-engine` | `com.ragagent.agent.skills` | 指令型技能：SKILL.md 解析（Skill/Frontmatter）、宿主目录加载与技能管理器（提示词注入路径）。 |
 | `:agent-engine` | `com.ragagent.agent.skills.mapper` | 技能 · 映射：SkillMapper。 |
 | `:agent-engine` | `com.ragagent.agent.tool` | Agent 运行面的**工具框架**（`agent.tool/`）：工具契约与基类、定义与 schema、注册表、 参数校验与投射、执行上下文与预算、输出持久化、取消与能力标记、通用单件工具。 |
@@ -34,7 +34,7 @@
 | `:contract` | `com.ragagent.contract.knowledge.support` | 知识库 · 支撑：KnowledgeProjectionAdapter / ChunkProjectionAdapter / KnowledgeBaseViews…。 |
 | `:contract` | `com.ragagent.contract.memory` | 记忆契约面：配置/条目视图/键与类目/召回与检索上下文。 |
 | `:contract` | `com.ragagent.contract.model` | 模型契约面：模型事实与运行时而面载荷。 |
-| `:contract` | `com.ragagent.contract.pipeline` | 管线 SPI（契约化）：`chatpipeline` 消费、业务域实现的端口（MCP 工具网关/按需注册、 工具注册表、网页检索执行器）。 |
+| `:contract` | `com.ragagent.contract.pipeline` | 管线 SPI：会话域管线（domains/session/rag）消费、业务域实现的端口 （MCP 工具网关/按需注册、工具注册表、网页检索执行器）。 |
 | `:contract` | `com.ragagent.contract.retrieval` | 检索契约面：检索类型/命中合并/目标。 |
 | `:contract` | `com.ragagent.contract.session` | 会话契约面：管线消息视图与消息端口。 |
 | `:contract` | `com.ragagent.contract.settings` | 契约 · 设置：SystemSettingGateway。 |
@@ -50,15 +50,15 @@
 | `:contract` | `com.ragagent.contract.wiki` | Wiki 契约面：摄取/收尾端口与图片标记。 |
 | `:domains` | `com.ragagent.agentmanagement` | 智能体管理面：内建智能体注册表与类型预设、自定义智能体 CRUD（custom_agents）、 技能目录、推荐问题流与 agent config jsonb。 |
 | `:domains` | `com.ragagent.agentmanagement.api` | Agent 管理 · 端口实现：AgentLookupAdapter。 |
-| `:domains` | `com.ragagent.agentmanagement.controller` | agent.management 的 @RestController 薄层：智能体 CRUD（com.ragagent.agentmanagement.controller.AgentControll |
-| `:domains` | `com.ragagent.agentmanagement.domain` | agent.management 实体（@TableName 跟随表名）。 |
-| `:domains` | `com.ragagent.agentmanagement.dto` | agent.management 的响应装配类型（com.ragagent.agentmanagement.dto.AgentResponses）。 |
-| `:domains` | `com.ragagent.agentmanagement.mapper` | agent.management 的 MyBatis-Plus 接口与 jsonb 原串 TypeHandler。 |
+| `:domains` | `com.ragagent.agentmanagement.controller` | 智能体管理面的 HTTP 薄层：智能体 CRUD（com.ragagent.agentmanagement.controller.AgentController） 与技能目录（com.ragagent |
+| `:domains` | `com.ragagent.agentmanagement.domain` | 智能体管理实体（@TableName 跟随表名）。 |
+| `:domains` | `com.ragagent.agentmanagement.dto` | 智能体管理面的响应装配类型（com.ragagent.agentmanagement.dto.AgentResponses）。 |
+| `:domains` | `com.ragagent.agentmanagement.mapper` | 智能体管理面的 MyBatis-Plus 接口与 jsonb 原串 TypeHandler。 |
 | `:domains` | `com.ragagent.agentmanagement.service` | 智能体管理用例实现：自定义智能体 CRUD（com.ragagent.agentmanagement.service.CustomAgentService）。 |
 | `:domains` | `com.ragagent.agentmanagement.service.builtin` | 内置智能体面（从 agentmanagement.service 切出，对齐方案）： BuiltinAgentRegistry——内置智能体定义、类型与提示词的注册表。 |
 | `:domains` | `com.ragagent.agentmanagement.service.config` | 智能体配置面（从 agentmanagement.service 切出，对齐方案）： agent config jsonb 读写（AgentConfigJson）、占位符（AgentPlacehold |
 | `:domains` | `com.ragagent.agenttools` | Agent 工具实现面：把工具调用翻译为业务域公开用例，并把结果格式化为模型可读输出。 |
-| `:domains` | `com.ragagent.agenttools.datasource` | agent 数据分析工具族：data_analysis / data_schema 两工具 + DuckDB 生产实现 （AnalysisDuckDbJdbc）与 chatpipeline 会话桥（D |
+| `:domains` | `com.ragagent.agenttools.datasource` | agent 数据分析工具族：data_analysis / data_schema 两工具 + DuckDB 生产实现 （AnalysisDuckDbJdbc）与数据分析会话桥（DataAnalysisSessionBridge）。 |
 | `:domains` | `com.ragagent.agenttools.knowledge` | agent 知识检索工具族：knowledge_search / grep_chunks / list_knowledge_chunks / query_knowledge_graph / get_d |
 | `:domains` | `com.ragagent.agenttools.sql` | agent SQL 工具族：database_query 工具与手写 SQL 安全守卫（SqlGuard + tokenizer / 深检查 / 注入分析协作者）。 |
 | `:domains` | `com.ragagent.agenttools.web` | agent 网页工具族：web_search / web_fetch 两件。 |
@@ -73,7 +73,7 @@
 | `:domains` | `com.ragagent.audit.service` | 审计 · 服务：AuditLogService / RbacDeniedAuditorRegistrar / WikiActivityAuditRecorder…。 |
 | `:domains` | `com.ragagent.auth` | 认证与租户控制面：登录/OIDC/令牌、用户与租户目录、RBAC 与会话身份。 |
 | `:domains` | `com.ragagent.auth.api` | 认证 · 域内访问面：UserLookupAdapter（实现 contract.auth.UserLookupPort）、 AdminUserAdapter，以及域内视图（com.ragagent. |
-| `:domains` | `com.ragagent.auth.apikey` | API 密钥子域（auth 之下，机器调用凭据面）：租户级 API Key 的签发、校验与访问控制——路由策略（com.ragagent.auth.apikey.domain.APIKeyRouteP |
+| `:domains` | `com.ragagent.auth.apikey` | API 密钥子域（auth 之下，机器调用凭据面）：租户级 API Key 的签发、校验与访问控制。 |
 | `:domains` | `com.ragagent.auth.apikey.controller` | apikey · HTTP 层：TenantAPIKeyController。 |
 | `:domains` | `com.ragagent.auth.apikey.controller.filter` | API Key 过滤器面（由 auth.apikey.filter 迁入 apikey.controller.filter，对齐方案）： 鉴权通道与网关拦截、路由授权与策略、范围清理与文件服务豁免、主体拒绝（9 类）。 |
 | `:domains` | `com.ragagent.auth.apikey.domain` | apikey · 领域模型：APIKeyStringListTypeHandler / APIKeyRawJsonbTypeHandler / TenantAPIKeyProjections…。 |
@@ -154,7 +154,7 @@
 | `:domains` | `com.ragagent.knowledge.dto.faq` | FAQ 面载荷：条目/导入/搜索/合并（Faq*）与生成问题（*GeneratedQuestion*、AddSimilarQuestions*）。 |
 | `:domains` | `com.ragagent.knowledge.dto.kb` | 知识库本体载荷：增删改查/复制/副本，以及它的配置视图（ASR / VLM / 分块 / 索引策略 / 解析引擎规则）。 |
 | `:domains` | `com.ragagent.knowledge.dto.tag` | 标签面载荷：标签增删改查分页，以及知识库标签批量绑定与统计。 |
-| `:domains` | `com.ragagent.knowledge.index` | 索引面（`index/`）：知识条目与向量/检索引擎的绑定与写入适配。 |
+| `:domains` | `com.ragagent.knowledge.index` | 索引面：知识条目与向量/检索引擎的绑定与写入适配。 |
 | `:domains` | `com.ragagent.knowledge.mapper` | MyBatis-Plus mapper 接口层：每张表一个 *Mapper，只声明 SQL/条件构造， 不承载业务规则。 |
 | `:domains` | `com.ragagent.knowledge.repository` | 仓储门面层：把 mapper 的原子操作组合成领域可用的读写契约，并集中承载 软删三面孔、全字段 UPDATE、乐观锁冲突与 PG/H2 方言分支。 |
 | `:domains` | `com.ragagent.knowledge.service` | 知识库用例层（顶层残部）。 |
@@ -196,10 +196,13 @@
 | `:domains` | `com.ragagent.model.dto` | 模型 · 数据传输：ModelCredentialFieldMetadata / ModelCredentialsPutRequest / ModelCredentialsResponse…。 |
 | `:domains` | `com.ragagent.model.mapper` | 模型 · 映射：ModelUsageMapper / ModelMapper。 |
 | `:domains` | `com.ragagent.model.service` | 模型 · 服务：ModelService / BuiltinModelsReconciler / ModelProviderCatalog…。 |
-| `:domains` | `com.ragagent.session` | 会话域：会话与消息读写、两条问答入口（知识库问答 / Agent 问答）、SSE 流式桥与 会话侧管线装配（rag/：14 个阶段、17 个插件）。 |
-| `:domains` | `com.ragagent.session.api` | 会话 · 端口实现：KnowledgeQaEventAdapter / EmbedSessionOpsAdapter / EmbedSessionAdapter…。 |
+| `:domains` | `com.ragagent.session` | 会话域：会话与消息读写（conversation/）、两条问答入口（知识库问答 / Agent 问答）、 SSE 流桥、附件（attachment/）与会话侧管线（rag/ + assembly/）。 |
+| `:domains` | `com.ragagent.session.api` | 会话 · 端口实现：SessionQaAdapter / EmbedSessionAdapter / KnowledgeQaRunnerImpl 等契约端口的适配层。 |
+| `:domains` | `com.ragagent.session.assembly` | 会话侧装配：问答管线注册（QaWiring）与跨域协作件的接线点。 |
+| `:domains` | `com.ragagent.session.attachment` | 会话附件：临时文档的落盘、解析、提示词渲染与生命周期。 |
 | `:domains` | `com.ragagent.session.controller` | session 域控制器的 HTTP 端点（协议适配层）。 |
 | `:domains` | `com.ragagent.session.controller.sse` | session 的 SSE 传输面（由 session.sse 迁入 controller.sse，对齐方案）： SseContract（帧契约）、SseFrameWriter（帧写出）、Stream |
+| `:domains` | `com.ragagent.session.conversation` | 会话与消息生命周期：会话/消息读写、消息检索、停止会话与 SSE 流桥 （AgentStreamBridge / AgentStreamEmitter）。 |
 | `:domains` | `com.ragagent.session.domain` | 会话域实体（留存面；已切出三簇：conversation/（会话与分页）、 document/（临时文档）、message/（消息族 + artifact 版本化））。 |
 | `:domains` | `com.ragagent.session.domain.conversation` | 会话实体面（由 session.domain 切出，对齐方案）： Session 及其列表/分页/状态（SessionListItem / SessionListQuery / SessionPage |
 | `:domains` | `com.ragagent.session.domain.document` | 会话文档面（由 session.domain 切出，对齐方案）：TemporaryDocument。 |
@@ -212,7 +215,7 @@
 | `:domains` | `com.ragagent.session.rag.spi` | 管线 · spi：KnowledgeQaEventPort。 |
 | `:domains` | `com.ragagent.session.rag.support` | chat 管线的**纯逻辑辅助**：检索结果去重/去包含（com.ragagent.session.rag.support.SearchSupport）、 查询分词与关键词抽取（com.ragagen |
 | `:domains` | `com.ragagent.session.repository` | 仓储门面层：把 mapper 的原子操作组合成领域可用的读写契约，并集中承载软删、全字段 UPDATE 与 PG/H2 方言分支。 |
-| `:domains` | `com.ragagent.session.service` | 会话 · 服务：SessionKnowledgeQaService / TemporaryDocumentService / SessionAgentQaService…。 |
+| `:domains` | `com.ragagent.session.service` | 会话 · 编排核心：知识/Agent 两条问答服务、QA 上下文解析（ChatManageFactory / QaSupport）、Agent 工具后端与编排协作件。 |
 | `:domains` | `com.ragagent.session.service.suggestion` | 消息建议面（由 session.service 切出，对齐方案 的 service.suggestion/）： MessageSuggestionService（建议生成的编排与落库）与 Messag |
 | `:domains` | `com.ragagent.session.support` | 会话 · 支撑：MessageReferenceRewriter / PipelineViews。 |
 | `:domains` | `com.ragagent.storage` | 存储后端域：存储后端配置与凭据（对外 /api/v1/storage-backends）与文件服务 （传输、解析、文件解析器）。 |

@@ -6,13 +6,13 @@ import com.ragagent.contract.session.QaRequestPayload;
 import com.ragagent.contract.session.SessionQaPort;
 import com.ragagent.contract.session.SessionView;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.conversation.MessageService;
+import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.QaSupport;
 import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
-import com.ragagent.session.service.SessionService;
 import org.springframework.stereotype.Component;
 
 /**

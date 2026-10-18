@@ -49,6 +49,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.knowledge.DocChunkSupport;
 import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.domain.message.MessageSearchGroupItem;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import java.util.ArrayList;

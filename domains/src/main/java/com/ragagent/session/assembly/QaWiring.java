@@ -1,4 +1,4 @@
-package com.ragagent.session.service;
+package com.ragagent.session.assembly;
 
 import com.ragagent.agenttools.datasource.DataAnalysisSessionFactoryAdapter;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
@@ -30,6 +30,7 @@ import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
 import com.ragagent.platform.tracing.decorators.LangfuseReranker;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.rag.EventManager;
 import com.ragagent.session.rag.plugin.PluginChatCompletion;
 import com.ragagent.session.rag.plugin.PluginChatCompletionStream;

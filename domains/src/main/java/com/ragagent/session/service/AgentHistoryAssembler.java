@@ -8,6 +8,7 @@ import com.ragagent.contract.model.FunctionCall;
 import com.ragagent.contract.model.ToolCall;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.support.PipelineViews;
 import java.util.ArrayList;
