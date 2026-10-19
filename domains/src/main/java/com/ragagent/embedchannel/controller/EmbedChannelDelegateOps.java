@@ -55,7 +55,7 @@ final class EmbedChannelDelegateOps {
      */
     private void delegateEmbedChat(String sessionId, String rawBody, String resourceUrls,
             boolean agentMode, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
-        EmbedChannelEntity ch = EmbedChannelController.channel(EmbedChannelController.request0());
+        EmbedChannelEntity ch = EmbedChannelRows.channel(EmbedChannelController.request0());
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
         String patched = patchEmbedChatPayload(rawBody, ch, agentMode);
         if (agentMode && !"builtin-quick-answer".equals(ch.getAgentId())) {
@@ -195,7 +195,7 @@ final class EmbedChannelDelegateOps {
     public ApiResponse<Void> events(@PathVariable("sessionId") String sessionId,
                                     @RequestBody(required = false) String rawBody) {
         // 调用即鉴权（取不到渠道会抛 unauthorized）；返回值本方法不用
-        EmbedChannelController.channel(EmbedChannelController.request0());
+        EmbedChannelRows.channel(EmbedChannelController.request0());
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
         EventRequest req = null;
         if (rawBody != null && !rawBody.isEmpty()) {

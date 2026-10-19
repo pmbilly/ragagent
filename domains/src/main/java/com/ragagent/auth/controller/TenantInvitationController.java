@@ -1,11 +1,8 @@
 package com.ragagent.auth.controller;
 
-import com.ragagent.auth.domain.TenantInvitation;
-import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.TenantInvitationResponse;
+import com.ragagent.auth.service.TenantInvitationReadService;
 import com.ragagent.auth.service.TenantInvitationService;
-import com.ragagent.auth.service.TenantMemberReadService;
 import com.ragagent.auth.service.TenantRbacException;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
@@ -21,11 +18,9 @@ import com.ragagent.platform.web.RequestFields;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -54,25 +49,19 @@ import tools.jackson.databind.JsonNode;
 @Tag(name = "Auth")
 public class TenantInvitationController {
 
-    /** 前端基础地址两级查找（config 属性 → FRONTEND_BASE_URL env）。 */
-    private static final String FRONTEND_BASE_URL_PROPERTY = "FRONTEND_BASE_URL";
-
     private final TenantInvitationService invitationService;
     private final UserService userService;
     private final TenantService tenantService;
-    private final TenantMemberReadService memberReadService;
-    private final Environment environment;
+    private final TenantInvitationReadService readService;
 
     public TenantInvitationController(TenantInvitationService invitationService,
                                       UserService userService,
                                       TenantService tenantService,
-                                      TenantMemberReadService memberReadService,
-                                      Environment environment) {
+                                      TenantInvitationReadService readService) {
         this.invitationService = invitationService;
         this.userService = userService;
         this.tenantService = tenantService;
-        this.memberReadService = memberReadService;
-        this.environment = environment;
+        this.readService = readService;
     }
 
     // ── 租户侧 ─────────────────────────────────────────────────────────────
@@ -85,17 +74,17 @@ public class TenantInvitationController {
                 TenantMemberController.trimToEmpty(request.getParameter("include_terminal")));
         int[] pp = TenantMemberController.parseListPagination(request);
 
-        TenantInvitationService.InvitationPage page =
+        var page =
                 invitationService.listTenantInvitationsPage(tenantId, includeTerminal, pp[0], pp[1]);
-        Map<String, User> usersById = hydrateUsers(page.invitations());
+        var usersById = readService.hydrateUsers(page.invitations());
         // Share-link URL 内嵌注册 token——只有 Owner 及以上可以重取；其他角色看元数据
         boolean showShareLinks = currentRoleHasOwner();
         List<TenantInvitationResponse> resp = new ArrayList<>(page.invitations().size());
-        for (TenantInvitation inv : page.invitations()) {
+        for (var inv : page.invitations()) {
             // 租户视图不 hydrate 租户名（调用方已知道租户）——传 null
             resp.add(showShareLinks
-                    ? projectInvitationWithLink(inv, usersById, null)
-                    : projectInvitation(inv, usersById, null));
+                    ? readService.projectInvitationWithLink(inv, usersById, null)
+                    : readService.projectInvitation(inv, usersById, null));
         }
         // 响应键按字母序：invitations < page < pageSize < total
         Map<String, Object> data = new LinkedHashMap<>();
@@ -125,7 +114,7 @@ public class TenantInvitationController {
         }
         String message = body.path("message").isString() ? body.path("message").asString() : "";
 
-        User user = userService.getUserByEmail(TenantMemberController.trimToEmpty(email));
+        var user = userService.getUserByEmail(TenantMemberController.trimToEmpty(email));
         if (user == null) {
             throw new BizException(AppError.notFound(
                     "user with this email is not registered; ask them to sign up first"));
@@ -134,25 +123,15 @@ public class TenantInvitationController {
 
         // auto-accept 开关：跳过 pending 邀请、直接把已注册用户加成成员（含对账+采纳默认空间）
         if (TenantInvitationService.autoAcceptInvitationEnabled()) {
-            TenantMemberReadService.PreparedResponse r =
-                    autoAcceptInvitationAndRespond(user, tenantId, role, invitedBy);
+            var r =
+                    readService.autoAcceptInvitationAndRespond(user, tenantId, role, invitedBy);
             return ResponseEntity.status(r.status()).contentType(MediaType.APPLICATION_JSON).body(r.body());
         }
 
         try {
-            TenantInvitation inv = invitationService.create(tenantId, user.getId(), role, invitedBy, message);
-            Map<String, User> usersById = new HashMap<>();
-            usersById.put(user.getId(), user);
-            if (invitedBy != null) {
-                // 尽力 hydrate inviter——失败降级为只有 invitee 字段
-                User inviter = userService.getUserById(invitedBy);
-                if (inviter != null) {
-                    usersById.put(inviter.getId(), inviter);
-                }
-            }
-            // 创建邀请是 201
-            return ResponseEntity.status(201)
-                    .body(projectInvitation(inv, usersById, null));
+            return ResponseEntity.status(201).body(
+                    readService.createInvitationResponse(
+                            tenantId, user, role, invitedBy, message));
         } catch (TenantRbacException e) {
             switch (e.kind()) {
                 case INVALID_TENANT_ROLE -> throw e.asValidationError();
@@ -173,7 +152,7 @@ public class TenantInvitationController {
         long invIdNum = TenantMemberController.parseInvitationId(invId);
 
         // 跨租户校验邀请行的 tenant_id——不匹配渲染成同款 404（不泄漏存在性）
-        TenantInvitation inv = invitationService.getById(invIdNum);
+        var inv = invitationService.getById(invIdNum);
         if (inv == null) {
             throw new BizException(AppError.notFound("invitation not found"));
         }
@@ -207,24 +186,9 @@ public class TenantInvitationController {
         String message = body.path("message").isString() ? body.path("message").asString() : "";
         String invitedBy = TenantMemberController.invitedByForCaller(TenantContext.currentUserId());
 
-        TenantInvitation inv;
-        try {
-            inv = invitationService.createShareLink(tenantId, role, invitedBy, message);
-        } catch (TenantRbacException e) {
-            if (e.kind() == TenantRbacException.Kind.API_KEY_CANNOT_ASSIGN_OWNER) {
-                throw e.asForbidden();
-            }
-            throw new BizException(AppError.internal("failed to create share link").withDetails(e.getMessage()));
-        }
-        Map<String, User> usersById = new HashMap<>();
-        if (invitedBy != null) {
-            User inviter = userService.getUserById(invitedBy);
-            if (inviter != null) {
-                usersById.put(inviter.getId(), inviter);
-            }
-        }
-        return ResponseEntity.status(201)
-                .body(projectInvitationWithLink(inv, usersById, null));
+        var result = readService.createShareLinkResponse(
+                tenantId, role, invitedBy, message);
+        return ResponseEntity.status(201).body(result);
     }
 
     // ── 收件箱（/me/invitations*，登录即可、无角色门） ────────────────────────
@@ -235,12 +199,12 @@ public class TenantInvitationController {
         String caller = TenantMemberController.requireCaller();
         boolean includeTerminal = "true".equalsIgnoreCase(
                 TenantMemberController.trimToEmpty(request.getParameter("include_terminal")));
-        List<TenantInvitation> rows = invitationService.listByInvitee(caller, includeTerminal);
-        Map<String, User> usersById = hydrateUsers(rows);
-        Map<Long, TenantRowView> tenantsById = hydrateTenants(rows);
+        var rows = invitationService.listByInvitee(caller, includeTerminal);
+        var usersById = readService.hydrateUsers(rows);
+        Map<Long, TenantRowView> tenantsById = readService.hydrateTenants(rows);
         List<TenantInvitationResponse> resp = new ArrayList<>(rows.size());
-        for (TenantInvitation inv : rows) {
-            resp.add(projectInvitation(inv, usersById, tenantsById));
+        for (var inv : rows) {
+            resp.add(readService.projectInvitation(inv, usersById, tenantsById));
         }
         // 键按字母序：invitations < total（没有 page/pageSize 键）
         Map<String, Object> data = new LinkedHashMap<>();
@@ -264,14 +228,13 @@ public class TenantInvitationController {
     public Map<String, Object> acceptMyInvitation(@PathVariable("invId") String invId) {
         String caller = TenantMemberController.requireCaller();
         long invIdNum = TenantMemberController.parseInvitationId(invId);
-        TenantMember member;
         try {
-            member = invitationService.accept(invIdNum, caller);
+            var member = invitationService.accept(invIdNum, caller);
+            readService.adoptHomeTenantIfTenantless(caller, member);
+            return TenantInvitationReadService.membershipResponse(member, "");
         } catch (TenantRbacException e) {
             throw acceptDeclineError(e, "failed to accept invitation");
         }
-        adoptHomeTenantIfTenantless(caller, member);
-        return membershipResponse(member, "");
     }
 
     /** POST /me/invitations/{invId}/decline（拒绝；不建成员行） */
@@ -299,27 +262,24 @@ public class TenantInvitationController {
             throw new BizException(AppError.validation("token is required"));
         }
 
-        TenantMember member;
         try {
-            member = invitationService.acceptByToken(token, caller);
+            var member = invitationService.acceptByToken(token, caller);
+            readService.adoptHomeTenantIfTenantless(caller, member);
+            String tenantName = "";
+            TenantRowView tenant = tenantService.getTenantById(member.getTenantId());
+            if (tenant != null) {
+                tenantName = tenant.getName();
+            }
+            return TenantInvitationReadService.membershipResponse(member, tenantName);
         } catch (TenantRbacException e) {
             if (e.kind() == TenantRbacException.Kind.INVITATION_TOKEN_INVALID) {
-                // 无效/过期/撤销统一 410 Gone
                 throw new BizException(new AppError(
                         ErrorCode.NOT_FOUND.value(),
                         "invitation link is invalid or has been revoked", null, 410));
             }
-            throw new BizException(AppError.internal("failed to accept invitation").withDetails(e.getMessage()));
+            throw new BizException(AppError.internal("failed to accept invitation")
+                    .withDetails(e.getMessage()));
         }
-        adoptHomeTenantIfTenantless(caller, member);
-
-        // 供前端切换空间展示
-        String tenantName = "";
-        TenantRowView tenant = tenantService.getTenantById(member.getTenantId());
-        if (tenant != null) {
-            tenantName = tenant.getName();
-        }
-        return membershipResponse(member, tenantName);
     }
 
     // ── 共享投影 / 辅助 ─────────────────────────────────────────────────────
@@ -339,151 +299,6 @@ public class TenantInvitationController {
         }
     }
 
-    /**
-     * 直加成员 → 对账 stale pending 行 →
-     * 无空间用户采纳默认空间（失败 → 500 "member added but default workspace update failed"，
-     * 成员行**已**写入）→ 201 成员结构。
-     */
-    private TenantMemberReadService.PreparedResponse autoAcceptInvitationAndRespond(
-            User user, long tenantId, TenantRole role, String invitedBy) {
-        TenantMemberReadService.PreparedResponse r = memberReadService.addMemberAndRespond(
-                user.getId(), user.getEmail(), user.getUsername(), user.getAvatar(),
-                tenantId, role, invitedBy);
-        invitationService.markPendingAcceptedIfExists(tenantId, user.getId());
-        if (user.getTenantId() == null || user.getTenantId() == 0) {
-            user.setTenantId(tenantId);
-            try {
-                userService.updateUser(user);
-            } catch (RuntimeException e) {
-                throw new BizException(AppError.internal("member added but default workspace update failed")
-                        .withDetails(e.getMessage()));
-            }
-        }
-        return r;
-    }
-
-    /**
-     * tenantless 账户把首个接受的空间设为默认
-     * （成员关系才是授权来源；TenantID 只供登录/导航缺省）。更新失败 → 500。
-     */
-    private void adoptHomeTenantIfTenantless(String caller, TenantMember member) {
-        User user = userService.getUserById(caller);
-        if (user != null && (user.getTenantId() == null || user.getTenantId() == 0)) {
-            user.setTenantId(member.getTenantId());
-            try {
-                userService.updateUser(user);
-            } catch (RuntimeException e) {
-                throw new BizException(
-                        AppError.internal("invitation accepted but default workspace update failed")
-                                .withDetails(e.getMessage()));
-            }
-        }
-    }
-
-    /** inviter/invitee/tenant 字段尽力 hydrate，缺失降级为 id */
-    static TenantInvitationResponse projectInvitation(TenantInvitation inv,
-                                                      Map<String, User> usersById,
-                                                      Map<Long, TenantRowView> tenantsById) {
-        User invitee = usersById == null ? null : usersById.get(inv.getInviteeUserId());
-        User inviter = inv.getInvitedBy() == null || usersById == null
-                ? null
-                : usersById.get(inv.getInvitedBy());
-        TenantRowView tenant = tenantsById == null ? null : tenantsById.get(inv.getTenantId());
-        return new TenantInvitationResponse(
-                inv.getId(),
-                inv.getTenantId(),
-                tenant == null ? "" : tenant.getName(),
-                inv.getInviteeUserId(),
-                invitee == null ? "" : invitee.getEmail(),
-                invitee == null ? "" : invitee.getUsername(),
-                inv.getInvitedBy(),
-                inviter == null ? "" : inviter.getEmail(),
-                inviter == null ? "" : inviter.getUsername(),
-                inv.getRole(),
-                inv.getStatus(),
-                inv.getMessage(),
-                inv.getExpiresAt(),
-                inv.getRespondedAt(),
-                inv.getCreatedAt(),
-                "",
-                inv.getInviteeUserId() == null || inv.getInviteeUserId().isEmpty(),
-                inv.getAcceptedCount());
-    }
-
-    /**
-     * 仍处 pending 的 share-link 行附 invite_url
-     * （FrontendBaseURL 缺省 → 宿主相对 "/register?token=…"，SPA 自行解析 origin）。
-     * 收件箱路径**不**走这里（per-user 邀请没有可复制的 token）。
-     */
-    private TenantInvitationResponse projectInvitationWithLink(TenantInvitation inv,
-                                                               Map<String, User> usersById,
-                                                               Map<Long, TenantRowView> tenantsById) {
-        TenantInvitationResponse base = projectInvitation(inv, usersById, tenantsById);
-        String inviteUrl = "";
-        if (TenantInvitationService.STATUS_PENDING.equals(inv.getStatus())
-                && inv.getToken() != null && !inv.getToken().isEmpty()) {
-            inviteUrl = frontendBaseUrl() + "/register?token=" + inv.getToken();
-        }
-        return new TenantInvitationResponse(base.id(), base.tenantId(), base.tenantName(),
-                base.inviteeUserId(), base.inviteeEmail(), base.inviteeName(), base.invitedBy(),
-                base.inviterEmail(), base.inviterName(), base.role(), base.status(), base.message(),
-                base.expiresAt(), base.respondedAt(), base.createdAt(), inviteUrl,
-                base.isShareLink(), base.acceptedCount());
-    }
-
-    /**
-     * 配置属性 → 请求时 env（运维免重启滚动）→ 空串；
-     * 去尾斜杠。Java 侧 Environment.getProperty 同时覆盖 yaml 属性与
-     * FRONTEND_BASE_URL 环境变量（viper 绑定 + 运行时 env 的净效果一致）。
-     */
-    private String frontendBaseUrl() {
-        String candidate = environment.getProperty(FRONTEND_BASE_URL_PROPERTY, "");
-        String out = candidate == null ? "" : candidate.trim();
-        while (out.endsWith("/")) {
-            out = out.substring(0, out.length() - 1);
-        }
-        return out;
-    }
-
-    /** invitee + inviter 的并集批量查；失败降级空 map */
-    private Map<String, User> hydrateUsers(List<TenantInvitation> invs) {
-        Map<String, User> out = new HashMap<>();
-        if (invs == null || invs.isEmpty()) {
-            return out;
-        }
-        java.util.Set<String> ids = new java.util.HashSet<>();
-        for (TenantInvitation inv : invs) {
-            if (inv.getInviteeUserId() != null && !inv.getInviteeUserId().isEmpty()) {
-                ids.add(inv.getInviteeUserId());
-            }
-            if (inv.getInvitedBy() != null) {
-                ids.add(inv.getInvitedBy());
-            }
-        }
-        try {
-            return userService.getUsersByIds(ids);
-        } catch (RuntimeException e) {
-            return out;
-        }
-    }
-
-    /** /me 视图跨空间，需要租户名 */
-    private Map<Long, TenantRowView> hydrateTenants(List<TenantInvitation> invs) {
-        Map<Long, TenantRowView> out = new HashMap<>();
-        if (invs == null || invs.isEmpty()) {
-            return out;
-        }
-        java.util.Set<Long> ids = new java.util.HashSet<>();
-        for (TenantInvitation inv : invs) {
-            ids.add(inv.getTenantId());
-        }
-        try {
-            return tenantService.getTenantsByIds(ids);
-        } catch (RuntimeException e) {
-            return out;
-        }
-    }
-
     /** showShareLinks：调用方角色 ≥ Owner */
     private boolean currentRoleHasOwner() {
         return TenantRole.fromString(TenantContext.currentRole()).hasPermission(TenantRole.OWNER);
@@ -499,16 +314,4 @@ public class TenantInvitationController {
         }
     }
 
-    /** 成员关系响应体（camelCase；无租户名时输出空串）。 */
-    private static Map<String, Object> membershipResponse(TenantMember member, String tenantName) {
-        Map<String, Object> membership = new LinkedHashMap<>();
-        membership.put("joinedAt", member.getJoinedAt());
-        membership.put("role", member.getRole());
-        membership.put("status", member.getStatus());
-        membership.put("tenantId", member.getTenantId());
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("membership", membership);
-        body.put("tenantName", tenantName == null ? "" : tenantName);
-        return body;
-    }
 }

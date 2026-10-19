@@ -1,10 +1,4 @@
 {
   "note": "C10a 控制器领域实体导入基线：只许降；新增控制器/新增 import 即红。迁移到读模型/契约视图后跑 --write 收紧。",
-  "files": {
-    "com/ragagent/auth/controller/AuthController.java": 2,
-    "com/ragagent/auth/controller/TenantInvitationController.java": 3,
-    "com/ragagent/embedchannel/controller/EmbedChannelController.java": 1,
-    "com/ragagent/im/controller/ImChannelController.java": 1,
-    "com/ragagent/knowledge/controller/KnowledgeBaseController.java": 1
-  }
+  "files": {}
 }

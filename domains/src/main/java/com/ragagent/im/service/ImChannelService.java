@@ -210,6 +210,11 @@ public class ImChannelService {
      * 创建：重复 bot 检查在前（409），落库前过创建钩子（session_mode
      * 校验失败 → 500），成功后同步运行时（本实例重建 + 跨实例广播）。
      */
+    /** 空渠道实体工厂：控制器用 var 持有，不再 import 实体。 */
+    public ImChannelEntity newChannel() {
+        return new ImChannelEntity();
+    }
+
     public void createChannel(ImChannelEntity channel) {
         checkDuplicateBot(channel, "");
         beforeCreate(channel);

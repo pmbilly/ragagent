@@ -85,7 +85,7 @@ graph TD
 - 这**不是**待修的错位；改包名会产生 1600+ 文件的 diff，换不来行为收益。判据与理由见 `docs/internal/HANDOFF.md` 的模块/包映射说明。
 - 测试夹具包已从 `com.ragagent.common` / `com.ragagent.support` 改为 `com.ragagent.fixtures`；守卫会拦这两个已解散包回流。
 
-按模块名找代码失败时，先看 [`domain-index.md`](domain-index.md)（22 个业务域按 6 类能力组织：种类、入口、契约面、前端页面，由 `scripts/gen-domain-index.py` 生成），再看 [`module-package-map.md`](module-package-map.md)（7 个模块的包根 + 22 个业务域的包/控制器数量，由 `scripts/gen-module-map.py` 生成），最后看 [`packages.md`](packages.md)（由 `scripts/gen-arch-index.py` 从 336 份 `package-info.java` 生成）。
+按模块名找代码失败时，先看 [`domain-index.md`](domain-index.md)（22 个业务域按 6 类能力组织：种类、入口、契约面、前端页面，由 `scripts/gen-domain-index.py` 生成），再看 [`module-package-map.md`](module-package-map.md)（7 个模块的包根 + 22 个业务域的包/控制器数量，由 `scripts/gen-module-map.py` 生成），最后看 [`packages.md`](packages.md)（由 `scripts/gen-arch-index.py` 从 337 份 `package-info.java` 生成）。
 
 ## 构建约定
 

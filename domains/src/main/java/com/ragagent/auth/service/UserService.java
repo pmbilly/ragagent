@@ -690,6 +690,11 @@ public class UserService implements UserNameLookup {
     // ── Token 签发（对外） ─────────────────────────────────────────────────
 
     /** 按登录空间解析结果签发令牌对。 */
+    /** Object 入口：控制器不 import User 时的薄适配。 */
+    public String[] generateTokensFor(Object user) {
+        return generateTokens((User) user);
+    }
+
     public String[] generateTokens(User user) {
         return generateTokensForTenant(user, resolveLoginTenantId(user));
     }

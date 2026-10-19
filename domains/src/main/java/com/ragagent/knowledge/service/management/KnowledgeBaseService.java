@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service.management;
 
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
@@ -14,10 +15,12 @@ import com.ragagent.contract.storage.StorageBackendPort;
 import com.ragagent.contract.storage.StorageBackendView;
 import com.ragagent.contract.storage.StorageEnvLookup;
 import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.UserKbPin;
+import com.ragagent.knowledge.dto.KnowledgeBaseAccess;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
@@ -339,6 +342,79 @@ public class KnowledgeBaseService
      * * move/copy/duplicate 的 handler 链先按 id 找行、再自己判租户——跨租户行"存在"是
      * 403/404 分歧的前提，不能提前按租户收敛。
      */
+    /** 多库检索：白名单 + 租户归属校验后返回可用 id 列表。 */
+    public List<String> validatedSearchKbIds(String primaryId, List<String> requested) {
+        List<String> ids = requested != null && !requested.isEmpty()
+                ? new ArrayList<>(requested) : List.of(primaryId);
+        TenantAPIKeyScope.authorizeKnowledgeBases(ids);
+        List<KnowledgeBase> rows = new ArrayList<>();
+        for (String kbId : ids) {
+            KnowledgeBase row = getAllTenantById(kbId);
+            if (row != null) {
+                rows.add(row);
+            }
+        }
+        if (rows.isEmpty()) {
+            throw new BizException(AppError.notFound("knowledge base not found"));
+        }
+        Long caller = TenantContext.currentTenantId();
+        for (KnowledgeBase row : rows) {
+            if (row.getTenantId() == null || !row.getTenantId().equals(caller)) {
+                throw new BizException(AppError.notFound("knowledge base not found"));
+            }
+        }
+        boolean primaryFound = rows.stream().anyMatch(row -> row.getId().equals(primaryId));
+        if (!primaryFound) {
+            throw new BizException(AppError.notFound("knowledge base not found"));
+        }
+        return ids;
+    }
+
+    public KnowledgeBaseAccess resolveAccess(String kbId) {
+        if (kbId == null || kbId.isEmpty()) {
+            throw new BizException(AppError.badRequest("Knowledge base ID cannot be empty"));
+        }
+        TenantAPIKeyScope.authorizeKnowledgeBases(List.of(kbId));
+        KnowledgeBase kb = getAllTenantById(kbId);
+        if (kb == null) {
+            throw new BizException(AppError.notFound("knowledge base not found"));
+        }
+        Long caller = TenantContext.currentTenantId();
+        if (kb.getTenantId() == null || caller == null || !kb.getTenantId().equals(caller)) {
+            throw new BizException(AppError.forbidden(
+                    "Permission denied to access this knowledge base"));
+        }
+        return new KnowledgeBaseAccess(kb.getId(), kb.getTenantId(), kb.getCreatorId());
+    }
+
+    public void checkOwnership(String kbId) {
+        KnowledgeBase kb = getKnowledgeBase(kbId);
+        String role = TenantContext.currentRole();
+        String uid = TenantContext.currentUserId();
+        boolean admin = TenantRole.fromString(role).hasPermission(TenantRole.ADMIN);
+        if (!admin && (kb.getCreatorId() == null || kb.getCreatorId().isEmpty()
+                || !kb.getCreatorId().equals(uid))) {
+            throw BizException.forbidden("must own the resource or have the required role");
+        }
+    }
+
+    public KnowledgeBase newTarget(String id, long tenantId, String creatorId) {
+        KnowledgeBase kb = new KnowledgeBase();
+        kb.setId(id);
+        kb.setTenantId(tenantId);
+        kb.setCreatorId(creatorId);
+        return kb;
+    }
+
+    public void validateCloneCompatibilityByIds(String sourceId, String targetId) {
+        KnowledgeBase source = getAllTenantById(sourceId);
+        KnowledgeBase target = getAllTenantById(targetId);
+        if (source == null || target == null) {
+            throw new BizException(AppError.notFound("knowledge base not found"));
+        }
+        KnowledgeService.validateCloneCompatibility(source, target);
+    }
+
     public KnowledgeBase getAllTenantById(String id) {
         KnowledgeBase kb = kbRepository.findByIdOnly(id);
         if (kb != null) {

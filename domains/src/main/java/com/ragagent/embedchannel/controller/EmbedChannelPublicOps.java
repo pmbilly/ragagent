@@ -37,7 +37,7 @@ final class EmbedChannelPublicOps {
 
     /** 只有 publish token 能换 session token。 */
     public ResponseEntity<Map<String, Object>> exchange(@PathVariable("channelId") String channelId) {
-        EmbedChannelEntity ch = EmbedChannelController.channel(EmbedChannelController.request0());
+        EmbedChannelEntity ch = EmbedChannelRows.channel(EmbedChannelController.request0());
         String auth = EmbedChannelController.trim(EmbedChannelController.request0().getHeader("Authorization"));
         boolean publishToken = auth.startsWith("Embed ")
                 && !EmbedTokens.isSessionToken(auth.substring("Embed ".length()));
@@ -61,7 +61,7 @@ final class EmbedChannelPublicOps {
 
     /** 公开配置视图。 */
     public ResponseEntity<tools.jackson.databind.node.ObjectNode> config(@PathVariable("channelId") String channelId) {
-        EmbedChannelEntity ch = EmbedChannelController.channel(EmbedChannelController.request0());
+        EmbedChannelEntity ch = EmbedChannelRows.channel(EmbedChannelController.request0());
         return ResponseEntity.ok(ctrl.service.publicConfig(ch));
     }
 
@@ -69,7 +69,7 @@ final class EmbedChannelPublicOps {
     public ResponseEntity<Map<String, Object>> suggestedQuestions(
             @PathVariable("channelId") String channelId,
             @RequestParam(name = "limit", required = false) String limit) {
-        EmbedChannelEntity ch = EmbedChannelController.channel(EmbedChannelController.request0());
+        EmbedChannelEntity ch = EmbedChannelRows.channel(EmbedChannelController.request0());
         if (!ch.isShowSuggestedQuestions()) {
             Map<String, Object> data = new LinkedHashMap<>();
             data.put("questions", new ArrayList<>());
@@ -99,7 +99,7 @@ final class EmbedChannelPublicOps {
 
     /** 公开分块读取（白名单校验 + 404/403 分支）。 */
     public ResponseEntity<?> chunk(@PathVariable("chunkId") String chunkId) {
-        EmbedChannelEntity ch = EmbedChannelController.channel(EmbedChannelController.request0());
+        EmbedChannelEntity ch = EmbedChannelRows.channel(EmbedChannelController.request0());
         String cid = LogSanitizer.sanitize(chunkId);
         if (cid.isEmpty()) {
             return EmbedChannelController.plainError(400, "chunk_id is required");
@@ -117,7 +117,7 @@ final class EmbedChannelPublicOps {
     /** 创建访客会话：201 {id, sig}。访客 id（可选）随会话落库，供历史会话列表。 */
     public ResponseEntity<Map<String, Object>> createSession(
             @PathVariable("channelId") String channelId) {
-        EmbedChannelEntity ch = EmbedChannelController.channel(EmbedChannelController.request0());
+        EmbedChannelEntity ch = EmbedChannelRows.channel(EmbedChannelController.request0());
         long tenantId = EmbedChannelController.currentTenant();
         String visitor = EmbedChannelController.trim(
                 EmbedChannelController.request0().getHeader("X-Embed-Visitor"));
@@ -147,7 +147,7 @@ final class EmbedChannelPublicOps {
      */
     public ResponseEntity<Map<String, Object>> listSessions(
             @PathVariable("channelId") String channelId) {
-        EmbedChannelEntity ch = EmbedChannelController.channel(EmbedChannelController.request0());
+        EmbedChannelEntity ch = EmbedChannelRows.channel(EmbedChannelController.request0());
         long tenantId = EmbedChannelController.currentTenant();
         String visitor = EmbedChannelController.trim(
                 EmbedChannelController.request0().getHeader("X-Embed-Visitor"));

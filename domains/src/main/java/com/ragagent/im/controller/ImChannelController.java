@@ -3,7 +3,7 @@ package com.ragagent.im.controller;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.im.channel.wechat.WechatQRCodeService;
-import com.ragagent.im.domain.ImChannelEntity;
+import com.ragagent.im.dto.ImChannelRows;
 import com.ragagent.im.service.ImChannelService;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResponse;
@@ -92,7 +92,7 @@ public class ImChannelController {
         if (!isValidPlatform(req.platform())) {
             return plain(400, ImChannelService.INVALID_PLATFORM_ERROR);
         }
-        ImChannelEntity channel = new ImChannelEntity();
+        var channel = service.newChannel();
         channel.setTenantId(currentTenant());
         channel.setAgentId(agentId);
         channel.setPlatform(req.platform());
@@ -126,7 +126,7 @@ public class ImChannelController {
         } catch (RuntimeException e) {
             return plain(500, "failed to create channel");
         }
-        return ResponseEntity.status(201).body(channelRow(channel));
+        return ResponseEntity.status(201).body(ImChannelRows.channelRow(channel));
     }
 
     /** per-agent 列表 = 裸数组（凭据不出现在列表行，IMChannelSummary）。 */
@@ -135,17 +135,16 @@ public class ImChannelController {
         if (agentId == null || agentId.isEmpty()) {
             return plain(400, "agent_id is required");
         }
-        List<ImChannelEntity> channels;
         try {
-            channels = service.listChannelsByAgent(agentId, currentTenant());
+            var channels = service.listChannelsByAgent(agentId, currentTenant());
+            List<Map<String, Object>> data = new ArrayList<>();
+            for (var ch : channels) {
+                data.add(ImChannelRows.summaryRow(ch));
+            }
+            return ResponseEntity.ok(data);
         } catch (RuntimeException e) {
             return plain(500, "failed to list channels");
         }
-        List<Map<String, Object>> data = new ArrayList<>();
-        for (ImChannelEntity ch : channels) {
-            data.add(summaryRow(ch));
-        }
-        return ResponseEntity.ok(data);
     }
 
     /** 跨 agent 总览 = 裸数组（行带 agentName）。 */
@@ -187,7 +186,7 @@ public class ImChannelController {
         if (channelId == null || channelId.isEmpty()) {
             return plain(400, "channel id is required");
         }
-        ImChannelEntity channel = service.getChannelByIdAndTenant(channelId, currentTenant());
+        var channel = service.getChannelByIdAndTenant(channelId, currentTenant());
         if (channel == null) {
             return plain(404, "channel not found");
         }
@@ -230,7 +229,7 @@ public class ImChannelController {
         } catch (RuntimeException e) {
             return plain(500, "failed to update channel");
         }
-        return ResponseEntity.ok(channelRow(channel));
+        return ResponseEntity.ok(ImChannelRows.channelRow(channel));
     }
 
     /** 删除渠道：任何失败都落 500 "failed to delete channel"；成功 200 + {@code ApiResponse} 外壳。 */
@@ -253,13 +252,12 @@ public class ImChannelController {
         if (channelId == null || channelId.isEmpty()) {
             return plain(400, "channel id is required");
         }
-        ImChannelEntity channel;
         try {
-            channel = service.toggleChannel(channelId, currentTenant());
+            var channel = service.toggleChannel(channelId, currentTenant());
+            return ResponseEntity.ok(ImChannelRows.channelRow(channel));
         } catch (RuntimeException e) {
             return plain(500, "failed to toggle channel");
         }
-        return ResponseEntity.ok(channelRow(channel));
     }
 
     // ── 微信扫码（绑定分支 + 接缝） ──
@@ -341,67 +339,6 @@ public class ImChannelController {
     }
 
     // ── 响应行（三套键序并存） ──
-
-    /** 渠道行（create/update/toggle 的资源行），键名即字段名。 */
-    private static Map<String, Object> channelRow(ImChannelEntity ch) {
-        Map<String, Object> m = new LinkedHashMap<>();
-        m.put("id", ch.getId());
-        m.put("tenantId", ch.getTenantId());
-        m.put("agentId", ch.getAgentId());
-        m.put("platform", ch.getPlatform());
-        m.put("name", ch.getName());
-        m.put("enabled", ch.isEnabled());
-        m.put("mode", ch.getMode());
-        m.put("outputMode", ch.getOutputMode());
-        m.put("knowledgeBaseId", ch.getKnowledgeBaseId());
-        m.put("botIdentity", ch.getBotIdentity());
-        m.put("sessionMode", ch.getSessionMode());
-        m.put("credentials", rawJson(ch.getCredentials()));
-        m.put("createdAt", ch.getCreatedAt());
-        m.put("updatedAt", ch.getUpdatedAt());
-        m.put("deletedAt", null);
-        return m;
-    }
-
-    /** per-agent 列表行（IMChannelSummary：凭据不出行，只出 credentialsConfigured）。 */
-    private static Map<String, Object> summaryRow(ImChannelEntity ch) {
-        Map<String, Object> m = new LinkedHashMap<>();
-        m.put("id", ch.getId());
-        m.put("tenantId", ch.getTenantId());
-        m.put("agentId", ch.getAgentId());
-        m.put("platform", ch.getPlatform());
-        m.put("name", ch.getName());
-        m.put("enabled", ch.isEnabled());
-        m.put("mode", ch.getMode());
-        m.put("outputMode", ch.getOutputMode());
-        m.put("knowledgeBaseId", ch.getKnowledgeBaseId());
-        m.put("botIdentity", ch.getBotIdentity());
-        m.put("sessionMode", ch.getSessionMode());
-        m.put("credentialsConfigured", credentialsConfigured(ch.getCredentials()));
-        m.put("createdAt", ch.getCreatedAt());
-        m.put("updatedAt", ch.getUpdatedAt());
-        return m;
-    }
-
-    /** trim 后非 "" 且非 "{}"。 */
-    private static boolean credentialsConfigured(String credentials) {
-        String s = credentials == null ? "" : credentials.trim();
-        return !s.isEmpty() && !"{}".equals(s);
-    }
-
-    /** credentials 是任意 jsonb：坏 JSON 在绑定阶段已被拒，这里容错回 "{}"。 */
-    private static Object rawJson(String raw) {
-        if (raw == null || raw.isEmpty()) {
-            return MAPPER.createObjectNode();
-        }
-        try {
-            return MAPPER.readTree(raw);
-        } catch (Exception e) {
-            return MAPPER.createObjectNode();
-        }
-    }
-
-    // ── 工具 ──
 
     /**
      * credentials 列语义：显式 {@code null} 与缺键都等价于"无值"

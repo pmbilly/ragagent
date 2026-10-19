@@ -1,13 +1,12 @@
 package com.ragagent.auth.controller;
 
-import com.ragagent.auth.domain.TenantInvitation;
-import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.AuthConfigResponse;
 import com.ragagent.auth.dto.AuthLoginResponse;
 import com.ragagent.auth.dto.ChangePasswordRequest;
 import com.ragagent.auth.dto.CurrentUserResponse;
 import com.ragagent.auth.dto.InvitationLookupRequest;
 import com.ragagent.auth.dto.InvitationLookupResponse;
+import com.ragagent.auth.dto.InvitationLookupView;
 import com.ragagent.auth.dto.LoginRequest;
 import com.ragagent.auth.dto.Membership;
 import com.ragagent.auth.dto.OidcAuthUrlResponse;
@@ -19,13 +18,14 @@ import com.ragagent.auth.dto.TokenPairResponse;
 import com.ragagent.auth.dto.UpdatePreferencesRequest;
 import com.ragagent.auth.dto.UserCapabilities;
 import com.ragagent.auth.dto.UserInfo;
+import com.ragagent.auth.service.AuthAccountService;
 import com.ragagent.auth.service.LoginResult;
 import com.ragagent.auth.service.OidcConfig;
 import com.ragagent.auth.service.OidcService;
 import com.ragagent.auth.service.OidcStateCodec;
 import com.ragagent.auth.service.PasswordPolicy;
+import com.ragagent.auth.service.TenantInvitationReadService;
 import com.ragagent.auth.service.TenantInvitationService;
-import com.ragagent.auth.service.TenantRbacException;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.TokenValidationException;
 import com.ragagent.auth.service.UserService;
@@ -119,6 +119,8 @@ public class AuthController {
     final UserService userService;
     final TenantService tenantService;
     private final TenantInvitationService invitationService;
+    private final TenantInvitationReadService invitationReadService;
+    private final AuthAccountService accountService;
     private final SystemSettingGateway settingService;
     private final TenantProperties tenantProperties;
     final OidcConfig oidcConfig;
@@ -140,6 +142,8 @@ public class AuthController {
     public AuthController(UserService userService,
                           TenantService tenantService,
                           TenantInvitationService invitationService,
+                          TenantInvitationReadService invitationReadService,
+                          AuthAccountService accountService,
                           SystemSettingGateway settingService,
                           TenantProperties tenantProperties,
                           OidcConfig oidcConfig,
@@ -148,6 +152,8 @@ public class AuthController {
         this.userService = userService;
         this.tenantService = tenantService;
         this.invitationService = invitationService;
+        this.invitationReadService = invitationReadService;
+        this.accountService = accountService;
         this.settingService = settingService;
         this.tenantProperties = tenantProperties;
         this.oidcConfig = oidcConfig;
@@ -188,7 +194,7 @@ public class AuthController {
     // ── POST /register ─────────────────────────────────────────────────────
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(
+    public ResponseEntity<Object> register(
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false) RegisterRequest req) {
         // 1) invite_only 门（DB system_settings > cfg > self_serve）
         if ("invite_only".equals(resolveRegistrationMode())) {
@@ -221,13 +227,13 @@ public class AuthController {
             throw new BizException(AppError.validation(policyError));
         }
         // 5) 注册（租户供应模式服务端决定，不从请求读）
-        User user;
         try {
-            user = userService.register(username, email, req.password(), resolveDefaultTenantMode());
+            var user = userService.register(
+                    username, email, req.password(), resolveDefaultTenantMode());
+            return ResponseEntity.status(201).body(user);
         } catch (UserService.RegistrationException e) {
             throw new BizException(AppError.badRequest(e.getMessage()));
         }
-        return ResponseEntity.status(201).body(user);
     }
 
     // ── POST /auto-setup ───────────────────────────────────────────────────
@@ -238,7 +244,7 @@ public class AuthController {
             throw new BizException(AppError.forbidden("auto-setup is only available in lite edition"));
         }
         final String defaultEmail = "admin@weknora.local";
-        User user = userService.getUserByEmail(defaultEmail);
+        var user = userService.getUserByEmail(defaultEmail);
         if (user == null) {
             byte[] randomBytes = new byte[24];
             new SecureRandom().nextBytes(randomBytes);
@@ -277,21 +283,21 @@ public class AuthController {
         if (token.isEmpty()) {
             throw new BizException(AppError.validation("token is required"));
         }
-        TenantInvitation inv = lookupInvitationOr410(token);
+        var inv = lookupInvitationOr410(token);
 
         TenantRowView tenant = null;
         try {
-            tenant = tenantService.getTenantById(inv.getTenantId());
+            tenant = tenantService.getTenantById(inv.tenantId());
         } catch (RuntimeException e) {
-            log.warn("invitations/lookup: tenant {} lookup failed", inv.getTenantId(), e);
+            log.warn("invitations/lookup: tenant {} lookup failed", inv.tenantId(), e);
         }
         InvitationLookupResponse resp = new InvitationLookupResponse(
-                inv.getTenantId(),
+                inv.tenantId(),
                 tenant != null ? tenant.getName() : null,
-                inv.getRole(),
+                inv.role(),
                 // 对照 .UTC().Format("2006-01-02T15:04:05Z07:00")：UTC、无小数秒、Z 结尾
                 DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
-                        .format(inv.getExpiresAt().withOffsetSameInstant(ZoneOffset.UTC)));
+                        .format(inv.expiresAt().withOffsetSameInstant(ZoneOffset.UTC)));
         return ResponseEntity.ok(resp);
     }
 
@@ -318,7 +324,7 @@ public class AuthController {
                     AppError.validation("token, email, username and password are required"));
         }
 
-        TenantInvitation inv = lookupInvitationOr410(token);
+        var inv = lookupInvitationOr410(token);
 
         // 已有账号 → 409（分享链接流程是「新建账号并加入」，不是「老号加入」）
         if (userService.getUserByEmail(email) != null) {
@@ -330,60 +336,20 @@ public class AuthController {
             throw new BizException(AppError.validation(policyError));
         }
 
-        User user;
-        try {
-            user = userService.register(username, email, req.password(),
-                    UserService.PROVISIONING_TENANTLESS);
-        } catch (UserService.RegistrationException e) {
-            throw new BizException(AppError.badRequest(e.getMessage()));
-        }
+        var completedUser = accountService.completeInviteRegistration(
+                registerUser(username, email, req.password()), inv.tenantId(), token);
 
-        // 受邀空间成为初始/主空间
-        user.setTenantId(inv.getTenantId());
-        user.setUpdatedAt(java.time.OffsetDateTime.now(ZoneOffset.UTC)); // 显式刷 updated_at（写回不会自动刷新该列）
-        try {
-            userService.updateUser(user);
-        } catch (RuntimeException e) {
-            try {
-                userService.deleteUser(user.getId());
-            } catch (RuntimeException ignored) {
-                // 尽力清理半建账号（错误忽略）
-            }
-            throw new BizException(AppError.internal("failed to finalise invited account")
-                    .withDetails(e.getMessage()));
-        }
-
-        try {
-            invitationService.acceptByToken(token, user.getId());
-        } catch (RuntimeException e) {
-            // 竞态：lookup 与 accept 之间链接被撤。保留新号但还原成 tenantless；
-            // 修复也失败则删掉半个身份。
-            log.error("register-by-invite: accept failed for user {}", user.getId(), e);
-            try {
-                userService.restoreTenantless(user);
-            } catch (RuntimeException rollbackErr) {
-                log.error("register-by-invite: failed to restore tenantless user {}", user.getId(), rollbackErr);
-                try {
-                    userService.deleteUser(user.getId());
-                } catch (RuntimeException ignored) {
-                    // 尽力
-                }
-            }
-            throw new BizException(new AppError(1003,
-                    "invitation link is no longer valid; please log in to your new account", null, 410));
-        }
-
-        String[] tokens = generateTokensOr500(user, "token generation failed");
+        String[] tokens = generateTokensOr500(completedUser, "token generation failed");
         TenantRowView tenant = null;
         try {
-            tenant = tenantService.getTenantById(inv.getTenantId());
+            tenant = tenantService.getTenantById(inv.tenantId());
         } catch (RuntimeException ignored) {
             // tenantNameOrEmpty 容忍 null，取不到也不让请求失败
         }
         List<Membership> memberships = List.of(
-                new Membership(inv.getTenantId(), tenantNameOrEmpty(tenant), inv.getRole()));
+                new Membership(inv.tenantId(), tenantNameOrEmpty(tenant), inv.role()));
         return ResponseEntity.status(201).body(
-                buildAuthLoginResponse(user, tenant, memberships, tokens[0], tokens[1]));
+                buildAuthLoginResponse(completedUser, tenant, memberships, tokens[0], tokens[1]));
     }
 
     // ── GET /config（无鉴权公共读） ─────────────────────────────────────────
@@ -422,7 +388,11 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<CurrentUserResponse> getCurrentUser() {
-        User user = currentUserOr401();
+        var user = userService.getCurrentUser();
+        if (user == null) {
+            throw new BizException(AppError.unauthorized("Failed to get user information")
+                    .withDetails("user not found in context"));
+        }
         // 取**活动**空间（AuthFilter 按 X-Tenant-ID/JWT claim 解析的），不是用户的主空间
         Long ctxTenant = TenantContext.currentTenantId();
         long activeTenantId = ctxTenant == null ? 0 : ctxTenant;
@@ -462,12 +432,12 @@ public class AuthController {
     public ResponseEntity<UserPreferences> updateMyPreferences(
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false)
                     UpdatePreferencesRequest req) {
-        User user = currentUserOr401();
+        String userId = currentUserIdOr401();
         UserPreferences patch = new UserPreferences();
         patch.setLastActiveTenantId(req.lastActiveTenantId());
         UserPreferences prefs;
         try {
-            prefs = userService.updateUserPreferences(user.getId(), patch);
+            prefs = userService.updateUserPreferences(userId, patch);
         } catch (UserService.PreferencesException e) {
             throw new BizException(AppError.badRequest("Failed to update preferences")
                     .withDetails(e.getMessage()));
@@ -481,9 +451,9 @@ public class AuthController {
     public ApiResponse<Void> changePassword(
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false)
                     ChangePasswordRequest req) {
-        User user = currentUserOr401();
+        String userId = currentUserIdOr401();
         try {
-            userService.changePassword(user.getId(), req.oldPassword(), req.newPassword());
+            userService.changePassword(userId, req.oldPassword(), req.newPassword());
         } catch (UserService.ChangePasswordException e) {
             switch (e.kind()) {
                 case POLICY -> throw new BizException(AppError.validation("Password policy violation")
@@ -556,28 +526,31 @@ public class AuthController {
 
     // ── 共享辅助 ──────────────────────────────────────────────────────────
 
-    User currentUserOr401() {
-        User user = userService.getCurrentUser();
+    private Object registerUser(String username, String email, String password) {
+        try {
+            return userService.register(username, email, password,
+                    UserService.PROVISIONING_TENANTLESS);
+        } catch (UserService.RegistrationException e) {
+            throw new BizException(AppError.badRequest(e.getMessage()));
+        }
+    }
+
+    String currentUserIdOr401() {
+        var user = userService.getCurrentUser();
         if (user == null) {
             throw new BizException(AppError.unauthorized("Failed to get user information")
                     .withDetails("user not found in context"));
         }
-        return user;
+        return user.getId();
     }
 
-    TenantInvitation lookupInvitationOr410(String token) {
-        try {
-            return invitationService.lookupByToken(token);
-        } catch (TenantRbacException e) {
-            // 把「未知/过期/撤销」坍缩成 410，不泄露被盗 token 曾占用哪个槽位
-            throw new BizException(new AppError(1003,
-                    "invitation link is invalid or has been revoked", null, 410));
-        }
+    InvitationLookupView lookupInvitationOr410(String token) {
+        return invitationReadService.lookupView(token);
     }
 
-    String[] generateTokensOr500(User user, String message) {
+    String[] generateTokensOr500(Object user, String message) {
         try {
-            return userService.generateTokens(user);
+            return userService.generateTokensFor(user);
         } catch (RuntimeException e) {
             throw new BizException(AppError.internal(message).withDetails(e.getMessage()));
         }
@@ -651,7 +624,7 @@ public class AuthController {
         return s == null || s.isEmpty();
     }
 
-    AuthLoginResponse buildAuthLoginResponse(User user,
+    AuthLoginResponse buildAuthLoginResponse(Object user,
             TenantRowView activeTenant, List<Membership> memberships, String token, String refreshToken) {
         return bindingSupport.buildAuthLoginResponse(user, activeTenant,
                 memberships, token, refreshToken);

@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-336 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+337 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -110,7 +110,7 @@
 | `:domains` | `com.ragagent.embedchannel.domain` | 嵌入渠道 · 领域模型：EmbedChannelEntity。 |
 | `:domains` | `com.ragagent.embedchannel.mapper` | 嵌入渠道 · 映射：EmbedChannelMapper。 |
 | `:domains` | `com.ragagent.embedchannel.service` | 嵌入渠道 · 服务：EmbedChannelService / RedisEmbedTokenStore / EmbedTokenStore。 |
-| `:domains` | `com.ragagent.embedchannel.support` | 嵌入渠道 · 支撑件：错误文案（com.ragagent.embedchannel.support.EmbedError）、 令牌工具（com.ragagent.embedchannel.suppor |
+| `:domains` | `com.ragagent.embedchannel.support` | Embed · 支撑类型：错误、令牌与限流。 |
 | `:domains` | `com.ragagent.evaluation` | 评估域：评估任务与指标计算（Rouge 等），对外入口 /api/v1/evaluation。 |
 | `:domains` | `com.ragagent.evaluation.controller` | 评测 · HTTP 层：EvaluationController。 |
 | `:domains` | `com.ragagent.evaluation.domain` | 评测 · 领域模型：QaPair。 |
@@ -136,6 +136,7 @@
 | `:domains` | `com.ragagent.im.channel.yunzhijia` | 渠道 · yunzhijia：YunzhijiaAdapter / YunzhijiaLongConnClient / YunzhijiaAdapterFactory…。 |
 | `:domains` | `com.ragagent.im.controller` | IM · HTTP 层：ImCallbackController / ImChannelController。 |
 | `:domains` | `com.ragagent.im.domain` | IM · 领域模型：ChannelSessionEntity / ImChannelEntity。 |
+| `:domains` | `com.ragagent.im.dto` | IM · 传输形状：渠道响应行。 |
 | `:domains` | `com.ragagent.im.mapper` | IM · 映射：ChannelSessionMapper / ImChannelMapper。 |
 | `:domains` | `com.ragagent.im.runtime` | IM · 运行时：AdapterInterfaces / FeishuWecomCrypt / SlackAdapterCore…。 |
 | `:domains` | `com.ragagent.im.service` | IM · 服务：ImChannelService / ImAttachmentPreparer / ImKnowledgeBridgeOps…。 |

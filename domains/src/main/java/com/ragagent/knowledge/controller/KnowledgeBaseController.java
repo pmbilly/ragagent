@@ -11,7 +11,6 @@ import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.storage.support.PublicModeForbiddenException;
 import com.ragagent.contract.storage.support.ResourceModeException;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.HybridSearchRequest;
 import com.ragagent.knowledge.dto.doc.RebuildIndexResponse;
 import com.ragagent.knowledge.dto.kb.CopyKnowledgeBaseRequest;
@@ -55,14 +54,14 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * <p><b>守卫顺序</b>（契约样例依赖，不能重排）：hybrid-search/duplicate 的路由带
  * KBAccessRead（{@code guard.requireKbAccess}）；copy 的源/目标在 body，handler 内
- * {@link #resolveHandlerKbAccess}——跨租户 403 文案与 move 的 handler 检查刻意不同。</p>
+ * {@code kbService.resolveAccess}——跨租户 403 文案与 move 的 handler 检查刻意不同。</p>
  *
  * <p><b>响应契约</b>（见 {@code docs/knowledge-api-contract-v1.md}）：知识库对象统一由
  * {@link KnowledgeBaseResponse} 输出（camelCase、可空字段显式 null、内部字段不下发）；
  * 成功响应不再包 {@code {data, success}} 信封——单资源直接返回对象、列表直接返回数组，
  * 删除返回 204。</p>
  *
- * <p><b>待办</b>：create 仍把请求体直接绑定 {@link KnowledgeBase} 实体（含 storage_config
+ * <p><b>待办</b>：create 仍把请求体直接绑定 知识库实体 实体（含 storage_config
  * 兼容），待改为独立请求 DTO。</p>
  */
 @RestController
@@ -93,7 +92,7 @@ public class KnowledgeBaseController {
     public ResponseEntity<KnowledgeBaseResponse> createKnowledgeBase(
             @RequestBody(required = false) CreateKnowledgeBaseRequest request) {
         log.info("Start creating knowledge base");
-        KnowledgeBase kb = kbService.createKnowledgeBase(
+        var kb = kbService.createKnowledgeBase(
                 request == null ? CreateKnowledgeBaseRequest.empty().toEntity() : request.toEntity());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(KnowledgeBaseResponse.from(KnowledgeBaseRowViews.rowView(kb), kbService.retrieveDriver()));
@@ -104,7 +103,7 @@ public class KnowledgeBaseController {
     public ResponseEntity<List<KnowledgeBaseResponse>> listKnowledgeBases(
             @RequestParam(value = "creator", required = false) String creator) {
         log.info("Start listing knowledge bases");
-        List<KnowledgeBase> kbs = kbService.listKnowledgeBases(creator);
+        var kbs = kbService.listKnowledgeBases(creator);
         var scope = APIKeyScopeContext.current();
         if (scope != null && scope.isKnowledgeBaseRestricted()) {
             kbs = kbs.stream().filter(kb -> scope.allowsKnowledgeBase(kb.getId())).toList();
@@ -116,7 +115,7 @@ public class KnowledgeBaseController {
     @GetMapping("/{id}")
     public ResponseEntity<KnowledgeBaseResponse> getKnowledgeBase(@PathVariable("id") String id) {
         log.info("Start retrieving knowledge base, ID: {}", id);
-        KnowledgeBase kb = kbService.getKnowledgeBase(id);
+        var kb = kbService.getKnowledgeBase(id);
         return ResponseEntity.ok(KnowledgeBaseResponse.from(KnowledgeBaseRowViews.rowView(kb), kbService.retrieveDriver()));
     }
 
@@ -125,8 +124,8 @@ public class KnowledgeBaseController {
             @PathVariable("id") String id,
             @Valid @NonNullBody @RequestBody UpdateKnowledgeBaseRequest req) {
         log.info("Start updating knowledge base, ID: {}", id);
-        KnowledgeBase existing = kbService.getKnowledgeBase(id);
-        checkOwnership(existing);
+        var existing = kbService.getKnowledgeBase(id);
+        kbService.checkOwnership(existing.getId());
         if (req.name() != null && req.name().isEmpty()) {
             throw new BizException(AppError.badRequest("请求参数不合法").withDetails("name: 不能为空"));
         }
@@ -134,22 +133,12 @@ public class KnowledgeBaseController {
         return ResponseEntity.ok(KnowledgeBaseResponse.from(KnowledgeBaseRowViews.rowView(existing), kbService.retrieveDriver()));
     }
 
-    /** 创建者本人或 Admin+，否则 403（不泄漏存在性）。 */
-    private static void checkOwnership(KnowledgeBase kb) {
-        String role = TenantContext.currentRole();
-        String uid = TenantContext.currentUserId();
-        boolean admin = TenantRole.fromString(role).hasPermission(TenantRole.ADMIN);
-        if (!admin && (kb.getCreatorId().isEmpty() || !kb.getCreatorId().equals(uid))) {
-            throw BizException.forbidden("must own the resource or have the required role");
-        }
-    }
-
     /** 删除知识库；成功返回 204（无响应体，见契约文档）。 */
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteKnowledgeBase(@PathVariable("id") String id) {
         log.info("Start deleting knowledge base, ID: {}", id);
-        KnowledgeBase existing = kbService.getKnowledgeBase(id);
-        checkOwnership(existing);
+        var existing = kbService.getKnowledgeBase(id);
+        kbService.checkOwnership(existing.getId());
         if (!TenantRole.fromString(TenantContext.currentRole()).hasPermission(TenantRole.ADMIN)) {
             throw new BizException(AppError.forbidden("Only knowledge base owner can delete"));
         }
@@ -160,14 +149,14 @@ public class KnowledgeBaseController {
     @PutMapping("/{id}/pin")
     public ResponseEntity<KnowledgeBaseResponse> togglePin(@PathVariable("id") String id) {
         log.info("Start toggling pin for knowledge base, ID: {}", id);
-        KnowledgeBase kb = kbService.togglePin(id);
+        var kb = kbService.togglePin(id);
         return ResponseEntity.ok(KnowledgeBaseResponse.from(KnowledgeBaseRowViews.rowView(kb), kbService.retrieveDriver()));
     }
 
     @GetMapping("/{id}/move-targets")
     public ResponseEntity<List<KnowledgeBaseResponse>> listMoveTargets(@PathVariable("id") String id) {
         log.info("Start listing move targets, ID: {}", id);
-        List<KnowledgeBase> targets = kbService.listMoveTargets(id);
+        var targets = kbService.listMoveTargets(id);
         String driver = kbService.retrieveDriver();
         return ResponseEntity.ok(targets.stream().map(kb -> KnowledgeBaseResponse.from(KnowledgeBaseRowViews.rowView(kb), driver)).toList());
     }
@@ -194,7 +183,7 @@ public class KnowledgeBaseController {
     private ResponseEntity<List<SearchResult>> hybridSearch(String id, HybridSearchRequest req,
             String resourceUrls) {
         log.info("Start hybrid search");
-        KnowledgeBase kb = guard.requireKbAccess(id);
+        var kb = guard.requireKbAccess(id);
         boolean precomputedVectorOnly = req.queryEmbedding() != null
                 && req.queryEmbedding().length > 0
                 && Boolean.TRUE.equals(req.disableKeywordsMatch())
@@ -217,27 +206,8 @@ public class KnowledgeBaseController {
                 ? new ArrayList<>(req.knowledgeBaseIds())
                 : List.of(kb.getId());
         TenantAPIKeyScope.authorizeKnowledgeBases(searchKbIds);
-        List<KnowledgeBase> kbs = new ArrayList<>();
-        for (String kbId : searchKbIds) {
-            KnowledgeBase row = kbService.getAllTenantById(kbId);
-            if (row != null) {
-                kbs.add(row);
-            }
-        }
-        if (kbs.isEmpty()) {
-            throw new BizException(AppError.notFound("knowledge base not found"));
-        }
-        // 检索面只认本租户 KB（跨租户 org-share 授权链不再使用）
-        Long caller = TenantContext.currentTenantId();
-        for (KnowledgeBase row : kbs) {
-            if (row.getTenantId() == null || !row.getTenantId().equals(caller)) {
-                throw new BizException(AppError.notFound("knowledge base not found"));
-            }
-        }
-        boolean primaryFound = kbs.stream().anyMatch(row -> row.getId().equals(kb.getId()));
-        if (!primaryFound) {
-            throw new BizException(AppError.notFound("knowledge base not found"));
-        }
+        kbService.validatedSearchKbIds(kb.getId(), req.knowledgeBaseIds());
+
         // 检索执行：pgvector + ParadeDB BM25 + RRF + FAQ 后处理 + 富化装配
         SearchParams params = new SearchParams();
         params.setQueryText(req.queryText() == null ? "" : req.queryText());
@@ -271,8 +241,8 @@ public class KnowledgeBaseController {
         if (caller == 0) {
             throw new BizException(AppError.unauthorized("Unauthorized"));
         }
-        KnowledgeBase sourceKb = resolveHandlerKbAccess(sourceId);
-        if (sourceKb.getTenantId() == null || sourceKb.getTenantId() != caller) {
+        var source = kbService.resolveAccess(sourceId);
+        if (source.tenantId() == null || source.tenantId() != caller) {
             throw new BizException(AppError.forbidden("No permission to copy this knowledge base"));
         }
         String taskId = explicitTaskId;
@@ -282,56 +252,37 @@ public class KnowledgeBaseController {
             requireTaskProgressTenant(taskId);
         }
         boolean create = targetId.isEmpty();
-        KnowledgeBase targetKb = new KnowledgeBase();
-        targetKb.setId(UUID.randomUUID().toString());
-        targetKb.setTenantId(caller);
+        String reservedTargetId;
         String creatorId = "";
         if (create) {
             String uid = TenantContext.currentUserId();
             if (uid != null && !uid.startsWith("system-")) {
-                targetKb.setCreatorId(uid);
                 creatorId = uid;
             }
+            reservedTargetId = UUID.randomUUID().toString();
+            kbService.newTarget(reservedTargetId, caller, creatorId);
         } else {
-            KnowledgeBase existing = resolveHandlerKbAccess(targetId);
-            if (existing.getTenantId() == null || existing.getTenantId() != caller) {
+            var existing = kbService.resolveAccess(targetId);
+            if (existing.tenantId() == null || existing.tenantId() != caller) {
                 throw new BizException(AppError.forbidden("No permission to copy to this knowledge base"));
             }
-            // 非创建者且非 Admin+ 拒绝替换内容
             String role = TenantContext.currentRole();
             boolean admin = TenantRole.fromString(role).hasPermission(TenantRole.ADMIN);
-            if (!admin && (existing.getCreatorId() == null || existing.getCreatorId().isEmpty()
-                    || !existing.getCreatorId().equals(TenantContext.currentUserId()))) {
-                throw new BizException(AppError.forbidden("No permission to replace this knowledge base's contents"));
+            if (!admin && (existing.creatorId() == null || existing.creatorId().isEmpty()
+                    || !existing.creatorId().equals(TenantContext.currentUserId()))) {
+                throw new BizException(AppError.forbidden(
+                        "No permission to replace this knowledge base's contents"));
             }
             try {
-                KnowledgeService.validateCloneCompatibility(sourceKb, existing);
+                kbService.validateCloneCompatibilityByIds(sourceId, targetId);
             } catch (IllegalArgumentException e) {
                 throw new BizException(AppError.badRequest(e.getMessage()));
             }
-            targetKb = existing;
+            reservedTargetId = targetId;
         }
-        String reservedTargetId = targetKb.getId();
         knowledgeService.startKBClone(caller, taskId, sourceId, reservedTargetId, create, creatorId);
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(new CopyKnowledgeBaseResponse(taskId, sourceId, reservedTargetId));
-    }
-
-    /** handler 内 KB 访问（Viewer 面）：API-Key 白名单 → 查行 → 租户归属；缺失 404、跨租户 403。 */
-    private KnowledgeBase resolveHandlerKbAccess(String kbId) {
-        if (kbId == null || kbId.isEmpty()) {
-            throw new BizException(AppError.badRequest("Knowledge base ID cannot be empty"));
-        }
-        TenantAPIKeyScope.authorizeKnowledgeBases(List.of(kbId));
-        KnowledgeBase kb = kbService.getAllTenantById(kbId);
-        if (kb == null) {
-            throw new BizException(AppError.notFound("knowledge base not found"));
-        }
-        Long caller = TenantContext.currentTenantId();
-        if (kb.getTenantId() == null || caller == null || !kb.getTenantId().equals(caller)) {
-            throw new BizException(AppError.forbidden("Permission denied to access this knowledge base"));
-        }
-        return kb;
     }
 
     /** 复制进度（前端轮询直到 {@code terminal}）。 */
@@ -373,7 +324,7 @@ public class KnowledgeBaseController {
         }
         guard.requireKbAccess(kbId);
         long callerTenant = TenantContext.currentTenantId() == null ? 0 : TenantContext.currentTenantId();
-        KnowledgeBase sourceKb = kbService.getAllTenantById(kbId);
+        var sourceKb = kbService.getAllTenantById(kbId);
         if (sourceKb == null) {
             throw new BizException(AppError.notFound("Knowledge base not found"));
         }
@@ -395,7 +346,7 @@ public class KnowledgeBaseController {
         }
         guard.requireKbAccess(sourceId);
         long callerTenant = TenantContext.currentTenantId() == null ? 0 : TenantContext.currentTenantId();
-        KnowledgeBase sourceKb = kbService.getAllTenantById(sourceId);
+        var sourceKb = kbService.getAllTenantById(sourceId);
         if (sourceKb == null) {
             // 路由守卫已兜住缺失；此分支保留 handler 的 NotFound 文案
             throw new BizException(AppError.notFound("Source knowledge base not found"));
@@ -404,7 +355,7 @@ public class KnowledgeBaseController {
             log.warn("Knowledge base duplicate rejected: source belongs to another tenant");
             throw new BizException(AppError.forbidden("No permission to duplicate this knowledge base"));
         }
-        KnowledgeBase targetKb = knowledgeService.duplicateKnowledgeBase(sourceId);
+        var targetKb = knowledgeService.duplicateKnowledgeBase(sourceId);
         return ResponseEntity.status(HttpStatus.CREATED).body(new DuplicateKnowledgeBaseResponse(
                 sourceId, targetKb.getId(),
                 KnowledgeBaseResponse.from(KnowledgeBaseRowViews.rowView(targetKb), kbService.retrieveDriver())));

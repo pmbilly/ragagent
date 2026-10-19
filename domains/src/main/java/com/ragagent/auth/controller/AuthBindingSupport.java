@@ -18,7 +18,7 @@ import java.util.List;
  */
 final class AuthBindingSupport {
 
-    AuthLoginResponse buildAuthLoginResponse(User user, TenantRowView activeTenant,
+    AuthLoginResponse buildAuthLoginResponse(Object user, TenantRowView activeTenant,
                                              List<Membership> memberships,
                                              String token, String refreshToken) {
         TenantResponse tenantResp = null;
@@ -28,7 +28,7 @@ final class AuthBindingSupport {
             tenantResp = TenantResponse.from(activeTenant,
                     TenantRole.fromString(role).hasPermission(TenantRole.ADMIN));
         }
-        return new AuthLoginResponse(user, tenantResp, memberships, token, refreshToken);
+        return new AuthLoginResponse((User) user, tenantResp, memberships, token, refreshToken);
     }
 
 

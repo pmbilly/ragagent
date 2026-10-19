@@ -62,7 +62,7 @@ final class EmbedChannelMgmtOps {
         try {
             EmbedChannelEntity ch = ctrl.service.create(EmbedChannelController.currentTenant(), LogSanitizer.sanitize(agentId), input);
             // 201 + 裸对象
-            return ResponseEntity.status(201).body(EmbedChannelController.row(ch, true));
+            return ResponseEntity.status(201).body(EmbedChannelRows.row(ch, true));
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
         }
@@ -73,7 +73,7 @@ final class EmbedChannelMgmtOps {
         try {
             List<EmbedChannelEntity> rows =
                     ctrl.service.listByAgent(EmbedChannelController.currentTenant(), LogSanitizer.sanitize(agentId));
-            return ResponseEntity.ok(EmbedChannelController.rows(rows));
+            return ResponseEntity.ok(EmbedChannelRows.rows(rows));
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
         }
@@ -82,7 +82,7 @@ final class EmbedChannelMgmtOps {
     /** 全租户渠道列表（跨 agent，publish token 永不出现在列表里）。 */
     public ResponseEntity<List<Map<String, Object>>> listAll() {
         try {
-            return ResponseEntity.ok(EmbedChannelController.rows(ctrl.service.listByTenant(EmbedChannelController.currentTenant())));
+            return ResponseEntity.ok(EmbedChannelRows.rows(ctrl.service.listByTenant(EmbedChannelController.currentTenant())));
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
         }
@@ -92,7 +92,7 @@ final class EmbedChannelMgmtOps {
     public ResponseEntity<Map<String, Object>> get(@PathVariable("channelId") String channelId) {
         try {
             EmbedChannelEntity ch = ctrl.service.getOwnedChannel(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
-            return ResponseEntity.ok(EmbedChannelController.row(ch, true));
+            return ResponseEntity.ok(EmbedChannelRows.row(ch, true));
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
         }
@@ -139,7 +139,7 @@ final class EmbedChannelMgmtOps {
                 ? "null" : req.allowedOrigins().toString();
         try {
             EmbedChannelEntity ch = ctrl.service.update(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId), cmd);
-            return ResponseEntity.ok(EmbedChannelController.row(ch, false));
+            return ResponseEntity.ok(EmbedChannelRows.row(ch, false));
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
         }
@@ -159,7 +159,7 @@ final class EmbedChannelMgmtOps {
     public ResponseEntity<Map<String, Object>> rotate(@PathVariable("channelId") String channelId) {
         try {
             var result = ctrl.service.rotateToken(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
-            return ResponseEntity.ok(EmbedChannelController.row(result.channel(), result.token()));
+            return ResponseEntity.ok(EmbedChannelRows.row(result.channel(), result.token()));
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
         }
