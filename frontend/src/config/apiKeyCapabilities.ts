@@ -12,6 +12,8 @@ export type ApiKeyCapabilityGroup = {
   capabilities: ApiKeyCapabilityOption[]
 }
 
+// run_evaluations 是已下线能力的兼容保留：不提供勾选（见下方 GROUPS），
+// 但已持久化的 Key 仍可能携带，解析/展示不能丢。
 export const TENANT_API_KEY_CAPABILITIES: TenantAPIKeyCapability[] = [
   'retrieve', 'chat', 'read_agents', 'ingest', 'manage_kbs',
   'message_history', 'manage_agents', 'manage_mcp_services',
@@ -74,7 +76,6 @@ export const TENANT_API_KEY_CAPABILITY_GROUPS: ApiKeyCapabilityGroup[] = [
       { value: 'manage_storage_backends', labelKey: 'integrations.api.capabilityManageStorageBackends', hintKey: 'integrations.api.capabilityManageStorageBackendsHint' },
       { value: 'manage_web_search', labelKey: 'integrations.api.capabilityManageWebSearch', hintKey: 'integrations.api.capabilityManageWebSearchHint' },
       { value: 'manage_channels', labelKey: 'integrations.api.capabilityManageChannels', hintKey: 'integrations.api.capabilityManageChannelsHint' },
-      { value: 'run_evaluations', labelKey: 'integrations.api.capabilityRunEvaluations', hintKey: 'integrations.api.capabilityRunEvaluationsHint' },
       { value: 'manage_tenant_settings', labelKey: 'integrations.api.capabilityManageTenantSettings', hintKey: 'integrations.api.capabilityManageTenantSettingsHint' },
     ],
   },
