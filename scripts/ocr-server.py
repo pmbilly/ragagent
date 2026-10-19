@@ -42,41 +42,78 @@ def _boxes(result) -> list[dict]:
 
 
 def _columns(boxes: list[dict], gap: float) -> list[list[dict]]:
-    """按中心 x 把文本块聚成列：相邻中心差超过 gap 即换列。"""
-    ordered = sorted(boxes, key=lambda b: b["cx"])
-    columns: list[list[dict]] = []
-    current: list[dict] = []
+    """把文本块聚成列：中心接近或 x 区间显著重叠都算同一列。
+
+    同一张卡片里的英文名/中文名/价格长短差异大，只比中心会把它们拆成两列。
+    """
+    columns: list[dict] = []
+    for box in sorted(boxes, key=lambda b: b["x1"]):
+        placed = False
+        for column in columns:
+            center = sum(b["cx"] for b in column["items"]) / len(column["items"])
+            overlap = min(box["x2"], column["x2"]) - max(box["x1"], column["x1"])
+            width = min(box["x2"] - box["x1"], column["x2"] - column["x1"])
+            if abs(box["cx"] - center) <= gap or (width > 0 and overlap > 0.5 * width):
+                column["items"].append(box)
+                column["x1"] = min(column["x1"], box["x1"])
+                column["x2"] = max(column["x2"], box["x2"])
+                placed = True
+                break
+        if not placed:
+            columns.append({"x1": box["x1"], "x2": box["x2"], "items": [box]})
+    return [column["items"] for column in sorted(columns, key=lambda c: c["x1"])]
+
+
+def _bands(boxes: list[dict], gap: float) -> list[list[dict]]:
+    """按页面级水平空白带切分上下层。
+
+    先合并所有框的 y 覆盖区间，只在「整行都没有文字」的位置切开——多列并排时
+    各列文本的 y 起点可能不同，逐框比较会误切，投影法不会。
+    """
+    spans = sorted((b["y1"], b["y2"]) for b in boxes)
+    merged: list[list[float]] = []
+    for start, end in spans:
+        if merged and start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+    cuts = [(merged[i][1] + merged[i + 1][0]) / 2
+            for i in range(len(merged) - 1)
+            if merged[i + 1][0] - merged[i][1] > gap]
+    groups: dict[int, list[dict]] = {}
+    for box in boxes:
+        index = sum(1 for cut in cuts if box["cy"] > cut)
+        groups.setdefault(index, []).append(box)
+    return [groups[key] for key in sorted(groups)]
+
+
+def _has_parallel_columns(boxes: list[dict]) -> bool:
+    """同一水平行内存在两个不重叠的文本块，才算真正的多列。"""
+    ordered = sorted(boxes, key=lambda b: b["cy"])
+    row: list[dict] = []
+
+    def row_has_columns(items: list[dict]) -> bool:
+        if len(items) < 2:
+            return False
+        spans = sorted((b["x1"], b["x2"]) for b in items)
+        return any(spans[i][1] < spans[i + 1][0] - 5 for i in range(len(spans) - 1))
+
     for box in ordered:
-        if current and box["cx"] - current[-1]["cx"] > gap:
-            columns.append(current)
-            current = []
-        current.append(box)
-    if current:
-        columns.append(current)
-    return columns
-
-
-def _is_multi_column(boxes: list[dict], gap: float) -> bool:
-    """同一水平带内出现不同 x 簇的文本，才按多列处理。"""
-    columns = _columns(boxes, gap)
-    if len(columns) < 2:
-        return False
-    for i in range(len(columns)):
-        for j in range(i + 1, len(columns)):
-            for left in columns[i]:
-                for right in columns[j]:
-                    overlap = min(left["y2"], right["y2"]) - max(left["y1"], right["y1"])
-                    if overlap > 0.5 * min(left["y2"] - left["y1"], right["y2"] - right["y1"]):
-                        return True
-    return False
+        if row and box["cy"] - row[0]["cy"] > max(b["y2"] - b["y1"] for b in row):
+            if row_has_columns(row):
+                return True
+            row = []
+        row.append(box)
+    return row_has_columns(row)
 
 
 def recognize(data: bytes) -> str:
     """识别图片字节，按版面坐标还原列关系。
 
     PPT 导出的页面多为卡片/多列排版，纯按检测顺序输出会把「车名 → 价格 → 定位」
-    的对应关系拍平。多列页把横跨页面的宽块（标题/页脚/总结句）单独成段，其余按列
-    聚类、列内按 y 排序；单列页仍按 y 排序，避免短标题被拆成假列。
+    的对应关系拍平。这里用较大的水平空白把页面分成上下区块（如「上 4 列 + 下 3 列」
+    会落在两个区块），区块内按 x 聚列、列内按 y 排序；整行标题作为宽块按自己的
+    y 位置输出，不再固定丢到页尾。
     """
     with tempfile.NamedTemporaryFile(suffix=".jpg") as tmp:
         tmp.write(data)
@@ -86,29 +123,29 @@ def recognize(data: bytes) -> str:
     if not boxes:
         return ""
 
-    page_width = max(b["x2"] for b in boxes)
-    page_height = max(b["y2"] for b in boxes)
-    gap = max(page_width * 0.05, 50)
+    page_width = max(b["x2"] for b in boxes) - min(b["x1"] for b in boxes)
+    page_height = max(b["y2"] for b in boxes) - min(b["y1"] for b in boxes)
+    column_gap = max(page_width * 0.03, 30)
     wide = page_width * 0.45
-    top: list[dict] = []
-    bottom: list[dict] = []
-    normal: list[dict] = []
-    for box in boxes:
-        if (box["x2"] - box["x1"]) > wide:
-            (top if box["cy"] < page_height * 0.25 else bottom).append(box)
-        else:
-            normal.append(box)
-
-    if not _is_multi_column(normal, gap):
-        return "\n".join(b["text"] for b in sorted(boxes, key=lambda b: b["y1"]))
 
     sections: list[str] = []
-    if top:
-        sections.append("\n".join(b["text"] for b in sorted(top, key=lambda b: b["y1"])))
-    for column in _columns(normal, gap):
-        sections.append("\n".join(b["text"] for b in sorted(column, key=lambda b: b["y1"])))
-    if bottom:
-        sections.append("\n".join(b["text"] for b in sorted(bottom, key=lambda b: b["y1"])))
+    for band in _bands(boxes, max(page_height * 0.12, 60)):
+        if not _has_parallel_columns(band):
+            # 单列层：标题与正文是上下关系，按 y 输出；聚列会把不相邻的标题并在一起。
+            sections.append("\n".join(b["text"] for b in sorted(band, key=lambda b: b["y1"])))
+            continue
+        wide_rows = [b for b in band if (b["x2"] - b["x1"]) > wide]
+        normal = [b for b in band if (b["x2"] - b["x1"]) <= wide]
+        # 宽块（标题/页脚）与列块按各自起始 y 排序，宽块不再一律提前。
+        entries: list[tuple[float, float, str]] = []
+        for row in wide_rows:
+            entries.append((row["y1"], row["x1"], row["text"]))
+        for column in _columns(normal, column_gap):
+            ordered = sorted(column, key=lambda b: b["y1"])
+            entries.append((ordered[0]["y1"], min(b["x1"] for b in ordered),
+                            "\n".join(b["text"] for b in ordered)))
+        entries.sort(key=lambda entry: (entry[0], entry[1]))
+        sections.extend(text for _y, _x, text in entries)
     return "\n\n".join(section for section in sections if section)
 
 

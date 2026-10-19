@@ -370,6 +370,7 @@ boot           14 件                      →  boot
 | P1-2 | 2026-10-19 | **NORMAL 失败也落完成位**（评估文档 P0-1 的后半）：`QaTurnExecutor` 的 finally 只对 AGENT 收尾，NORMAL 的完成位全靠事件管线发 done，管线早段异常时消息永久 `completed=false`。补 `failed` 标志 + finally 的 NORMAL 分支，调 `completeAssistantMessage`（CAS 幂等）；抽 `finalizeNormalOnFailure` 供测试钉住。红态验证：临时置空实现 → 测试失败，恢复即绿。 | **40 守卫** · **cleanTest 5003 / 0 / 4** |
 | OC-1 | 2026-10-19 | **入库图片 OCR（本地 RapidOCR，不走大模型）**：新增 `KnowledgeImageOcr`（只认正文 `exports` 图片引用 → 并发调 OCR 服务 → 文字插回引用下方）+ `KnowledgeOcrProperties`（`knowledge.ocr.*`）；`KnowledgeTextExtractor` 解析后接入，多模态 span 由 OCR 阶段记录（删 `KnowledgeIndexStage.skipMultimodal` 固定占位）；新增 `scripts/ocr-server.py`（`POST /ocr` → `{"text"}`）。单图失败降级、`maxPages` 默认 30、endpoint 为空即关闭。 | **40 守卫** · **5006 / 0 / 4** · 真机：4-1 重解析 30 图全成（新增 6204 字 / 16.5s），分块 12→34、字符 4839→14021；检索「凯美瑞 车型定位」命中摘要 |
 | OC-2 | 2026-10-19 | **OCR 输出按坐标还原多列关系**：`ocr-server.py` 保留检测框坐标——横跨页面 >45% 的宽块（标题/页脚/总结句）单独成段，其余按 x 中心聚列、列内按 y 排序；先判「同一水平带是否出现不同 x 簇」区分单列/多列，单列页仍按 y 输出，避免短标题被拆成假列。纯脚本改动，无新依赖。 | **40 守卫全绿** · 真机：四列页由「名称/价格/定位各自成行」还原为「凯美瑞+17.18-25.98万+15万级…」四组；单列页顺序不变；4-1 重解析 34 块 / 13021 字 |
+| OC-3 | 2026-10-19 | **OCR 版面重排分层化**：按页面级水平空白投影（>12% 页高）把页面切成上下区块——「上 4 列 + 下 3 列」落在不同区块各自聚列；单列层（同行无不重叠文本块）直接按 y 输出，标题与正文不再被聚成假列；宽块与列块统一按起始 y 交错排序（整行标题不再固定丢页尾）；列聚类同时看中心与 x 区间重叠，合并同卡片的中英文名。纯脚本，无新依赖。 | **40 守卫全绿** · 真机：单列页顺序恢复「小结 → 1/2/3 标题+正文」；四列页仍为四组；4-1 重解析 34 块 / 13805 字 |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
