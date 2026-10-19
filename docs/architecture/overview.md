@@ -37,7 +37,7 @@ graph TD
 | `:model-runtime` | 27 家 LLM provider、Embedding / Rerank 客户端、模型上下文装配、抽取、Ollama | platform · contract | `com.ragagent.{embedding,llm,modelcontext,modelruntime,rerank}` |
 | `:retrieval-engine` | 九种向量/检索后端、混合检索融合、重排管线、索引写入 | platform · contract | `com.ragagent.retrieval.*` |
 | `:agent-engine` | ReAct 循环、工具注册表、技能、上下文压缩、预算与转向 | platform · contract · model-runtime | `com.ragagent.agent.*` |
-| `:domains` | 20 个业务域；50 个 HTTP 控制器；持久层 | platform · contract · model-runtime | `com.ragagent.<domain>.*` |
+| `:domains` | 20 个业务域；51 个 HTTP 控制器；持久层 | platform · contract · model-runtime | `com.ragagent.<domain>.*` |
 | `:boot` | 应用入口、全局装配、跨模块 Bean、扫描与打包；只出不进 | 全部 | `com.ragagent` + `com.ragagent.config` |
 
 三条设计原则：
@@ -75,7 +75,7 @@ graph TD
 | `wiki` / `vectorstore` / `memory` / `initialization` / `favorite` / `embedchannel` / `audit` | 各 1 | 各自单面 |
 | `approval` / `agenttools` | 0 | 无独立 HTTP 面（工具或内部能力） |
 
-合计 50 个控制器。域的完整清单：`agentmanagement`、`agenttools`、`approval`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki`。
+合计 51 个控制器。域的完整清单：`agentmanagement`、`agenttools`、`approval`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki`。
 
 ## 模块名与包名不完全对应（刻意）
 

@@ -310,6 +310,8 @@
 | PUT | `/api/v1/storage-backends/{id}` | ADMIN | `StorageBackendController` |
 | PUT | `/api/v1/storage-backends/{id}/default` | ADMIN | `StorageBackendController` |
 | POST | `/api/v1/storage-backends/{id}/test` | ADMIN | `StorageBackendController` |
+| POST | `/api/v1/storage/engine-check` | ADMIN | `StorageEngineController` |
+| GET | `/api/v1/storage/engine-status` | VIEWER | `StorageEngineController` |
 | GET | `/api/v1/system/admin/api-keys` | SYSTEM_ADMIN | `SystemAdminController` |
 | POST | `/api/v1/system/admin/api-keys` | SYSTEM_ADMIN | `SystemAdminController` |
 | DELETE | `/api/v1/system/admin/api-keys/{keyId}` | SYSTEM_ADMIN | `SystemAdminController` |
@@ -333,8 +335,6 @@
 | GET | `/api/v1/system/info` | VIEWER | `SystemController` |
 | GET | `/api/v1/system/parser-engines` | VIEWER | `SystemController` |
 | POST | `/api/v1/system/parser-engines/check` | ADMIN | `SystemController` |
-| POST | `/api/v1/system/storage-engine-check` | ADMIN | `SystemController` |
-| GET | `/api/v1/system/storage-engine-status` | VIEWER | `SystemController` |
 | GET | `/api/v1/tenants` | PUBLIC | `TenantCatalogController` |
 | POST | `/api/v1/tenants` | PUBLIC | `TenantCatalogController` |
 | GET | `/api/v1/tenants/all` | VIEWER | `TenantCatalogController` |

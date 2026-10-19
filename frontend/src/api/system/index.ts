@@ -255,7 +255,7 @@ export async function getStorageEngineConfig(): Promise<{ data: StorageEngineCon
 // 编辑器资源 store 使用，故保留。
 
 export function getStorageEngineStatus(): Promise<GetStorageEngineStatusResponse> {
-  return get('/api/v1/system/storage-engine-status')
+  return get('/api/v1/storage/engine-status')
 }
 
 export interface StorageCheckRequest {
@@ -276,7 +276,7 @@ export interface StorageCheckResponse {
 }
 
 export function checkStorageEngine(req: StorageCheckRequest): Promise<StorageCheckResponse> {
-  return post('/api/v1/system/storage-engine-check', req)
+  return post('/api/v1/storage/engine-check', req)
 }
 
 // ---- System Admin Management ----

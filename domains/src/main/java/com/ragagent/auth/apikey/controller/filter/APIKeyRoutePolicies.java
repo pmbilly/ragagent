@@ -167,8 +167,8 @@ public final class APIKeyRoutePolicies {
         a.registerGin("GET", base + "/parser-engines", system);
         a.registerGin("POST", base + "/parser-engines/check", system);
         a.registerGin("POST", base + "/docreader/reconnect", system);
-        a.registerGin("GET", base + "/storage-engine-status", system);
-        a.registerGin("POST", base + "/storage-engine-check", system);
+        a.registerGin("GET", "/api/v1/storage/engine-status", system);
+        a.registerGin("POST", "/api/v1/storage/engine-check", system);
         // capabilities 的 any() 覆写在组策略之后登记（后登记覆盖先登记）
         a.registerGin("GET", base + "/capabilities", APIKeyRoutePolicy.any());
 

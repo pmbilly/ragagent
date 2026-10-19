@@ -165,56 +165,7 @@ public class SystemController {
                 true, addr, docReader.config().transport(), engines));
     }
 
-    // ── GET /storage-engine-status ────────────────────────────────────────
-
-    @GetMapping("/storage-engine-status")
-    public ResponseEntity<SystemDtos.StorageEngineStatusResponse> storageEngineStatus() {
-        var status = storageProbe.status(currentTenantId());
-        List<SystemDtos.StorageEngineStatusItem> engines = status.engines().stream()
-                .map(e -> new SystemDtos.StorageEngineStatusItem(
-                        e.provider(), e.allowed(), e.configured(), e.description()))
-                .toList();
-        return ResponseEntity.ok(new SystemDtos.StorageEngineStatusResponse(
-                engines, status.allowedProviders(), status.minioEnvAvailable()));
-    }
-
-    // ── POST /storage-engine-check ────────────────────────────────────────
-
-    /**
-     * 连通性检测。
-     *
-     * <p>请求体 = 存储配置表单（键名 snake，与前端的存储设置一致；该配置最终落租户
-     * jsonb，与上一致地待解冻后统一 DTO 化）。</p>
-     */
-    @PostMapping("/storage-engine-check")
-    public ResponseEntity<SystemDtos.StorageCheckResponse> storageEngineCheck(
-            @RequestBody(required = false) String rawBody) {
-        JsonNode body = parseBody(rawBody);
-        if (body == null) {
-            throw new BizException(AppError.badRequest("请求参数不合法").withDetails("请求体格式不正确"));
-        }
-        String provider = body.path("provider").asString("");
-        if (!storageProbe.isAllowed(provider)) {
-            throw new BizException(AppError.forbidden("该存储引擎已被禁用"));
-        }
-        JsonNode cfg = body.get(provider);
-        var outcome = storageProbe.check(provider, configMap(cfg), currentTenantId());
-        return ResponseEntity.ok(
-                new SystemDtos.StorageCheckResponse(outcome.ok(), outcome.message(), false));
-    }
-
     // ── 租户/引擎上下文 ───────────────────────────────────────────────────
-
-    /** ShouldBindJSON 等价：解析失败（含 EOF）→ null，调用方落各自的 400 文案。 */
-    /** 契约端口只收纯 JDK 值：对象节点转 Map，其余视为缺失。 */
-    @SuppressWarnings("unchecked")
-    private static Map<String, Object> configMap(JsonNode node) {
-        if (node == null || node.isNull()) {
-            return null;
-        }
-        Object value = JsonMappers.toJavaValue(node);
-        return value instanceof Map<?, ?> map ? (Map<String, Object>) map : null;
-    }
 
     private static JsonNode parseBody(String rawBody) {
         if (rawBody == null || rawBody.isBlank()) {

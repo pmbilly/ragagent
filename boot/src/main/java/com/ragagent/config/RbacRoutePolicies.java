@@ -230,8 +230,8 @@ final class RbacRoutePolicies {
         rbac.addRule("GET", "/api/v1/system/parser-engines", TenantRole.VIEWER, false);
         rbac.addRule("POST", "/api/v1/system/parser-engines/check", TenantRole.ADMIN, false);
         rbac.addRule("POST", "/api/v1/system/docreader/reconnect", TenantRole.ADMIN, false);
-        rbac.addRule("GET", "/api/v1/system/storage-engine-status", TenantRole.VIEWER, false);
-        rbac.addRule("POST", "/api/v1/system/storage-engine-check", TenantRole.ADMIN, false);
+        rbac.addRule("GET", "/api/v1/storage/engine-status", TenantRole.VIEWER, false);
+        rbac.addRule("POST", "/api/v1/storage/engine-check", TenantRole.ADMIN, false);
         rbac.addSystemAdminRule("POST", "/api/v1/system/admin/promote");
         rbac.addSystemAdminRule("POST", "/api/v1/system/admin/revoke");
         rbac.addSystemAdminRule("GET", "/api/v1/system/admin/list");

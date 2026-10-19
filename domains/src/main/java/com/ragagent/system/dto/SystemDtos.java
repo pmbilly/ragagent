@@ -107,28 +107,6 @@ public final class SystemDtos {
             List<ParserEngineInfo> engines) {
     }
 
-    /** 存储引擎状态项。 */
-    public record StorageEngineStatusItem(
-            String name,
-            boolean allowed,
-            boolean available,
-            String description) {
-    }
-
-    /** 存储引擎状态清单。 */
-    public record StorageEngineStatusResponse(
-            List<StorageEngineStatusItem> engines,
-            List<String> allowedProviders,
-            boolean minioEnvAvailable) {
-    }
-
-    /** 存储连通性检测结果（bucketCreated 仅成功建桶时为 true）。 */
-    public record StorageCheckResponse(
-            boolean ok,
-            String message,
-            boolean bucketCreated) {
-    }
-
     /** 运行时工作池。 */
     public record RuntimeWorkerPool(
             String name,

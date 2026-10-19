@@ -257,7 +257,7 @@ class SystemContractTest {
     /** storage-engine-status：H2 干净租户 → 与录制金片字节一致（全确定性）。 */
     @Test
     void storageStatusMatchesGo() throws Exception {
-        MvcResult r = mockMvc.perform(get("/api/v1/system/storage-engine-status")
+        MvcResult r = mockMvc.perform(get("/api/v1/storage/engine-status")
                 .header("Authorization", owner)).andReturn();
         assertEquals(200, r.getResponse().getStatus(), raw(r));
         assertEquals(golden("sys-storage-status.json"), raw(r));
@@ -307,22 +307,22 @@ class SystemContractTest {
 
     @Test
     void storageCheckMatchesGo() throws Exception {
-        MvcResult m = mockMvc.perform(jsonBody(post("/api/v1/system/storage-engine-check"), sysAdmin,
+        MvcResult m = mockMvc.perform(jsonBody(post("/api/v1/storage/engine-check"), sysAdmin,
                 "{\"provider\":\"minio\"}")).andReturn();
         assertEquals(200, m.getResponse().getStatus(), raw(m));
         assertEquals(golden("sys-storage-check-minio-empty.json"), raw(m));
 
-        MvcResult b = mockMvc.perform(jsonBody(post("/api/v1/system/storage-engine-check"), sysAdmin,
+        MvcResult b = mockMvc.perform(jsonBody(post("/api/v1/storage/engine-check"), sysAdmin,
                 "{\"provider\":\"bogus\"}")).andReturn();
         assertEquals(403, b.getResponse().getStatus(), raw(b));
         assertEquals(golden("sys-storage-check-bogus.json"), raw(b));
 
-        MvcResult j = mockMvc.perform(jsonBody(post("/api/v1/system/storage-engine-check"), sysAdmin, "nope"))
+        MvcResult j = mockMvc.perform(jsonBody(post("/api/v1/storage/engine-check"), sysAdmin, "nope"))
                 .andReturn();
         assertEquals(400, j.getResponse().getStatus(), raw(j));
         assertEquals(golden("sys-storage-check-badjson.json"), raw(j));
 
-        MvcResult l = mockMvc.perform(jsonBody(post("/api/v1/system/storage-engine-check"), sysAdmin,
+        MvcResult l = mockMvc.perform(jsonBody(post("/api/v1/storage/engine-check"), sysAdmin,
                 "{\"provider\":\"local\"}")).andReturn();
         assertEquals(200, l.getResponse().getStatus(), raw(l));
         assertEquals(golden("sys-storage-check-local.json"), raw(l));
