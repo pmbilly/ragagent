@@ -1,4 +1,4 @@
-package com.ragagent.storage.mapper;
+package com.ragagent.storage.repository;
 
 import com.ragagent.storage.domain.StoredResource;
 import java.sql.ResultSet;

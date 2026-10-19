@@ -327,8 +327,8 @@ class ArchitectureRulesTest {
             Map.entry("com.ragagent.system.service.SystemInfoService", "PG 专有 SQL（系统元数据）"),
             Map.entry("com.ragagent.vectorstore.service.VectorStoreConfigService", "PG 专有 SQL（向量库配置）"),
             Map.entry("com.ragagent.memory.repository.MemoryVectorStore", "列存在性探测（JDBC 元数据）"),
-            Map.entry("com.ragagent.storage.mapper.ResourceRepository", "PG 专有 SQL（存储资源查询，JdbcClient）"),
-            Map.entry("com.ragagent.storage.mapper.StorageBackendRepository", "PG 专有 SQL（存储后端元数据，JdbcClient）"));
+            Map.entry("com.ragagent.storage.repository.ResourceRepository", "PG 专有 SQL（存储资源查询，JdbcClient）"),
+            Map.entry("com.ragagent.storage.repository.StorageBackendRepository", "PG 专有 SQL（存储后端元数据，JdbcClient）"));
 
     @Test
     @DisplayName("A7：裸 JDBC（JdbcTemplate/java.sql 连接与语句/DataSource）只许白名单类")
@@ -585,26 +585,12 @@ class ArchitectureRulesTest {
     }
 
     /**
-     * 棘轮基线：{@code :domains} 内 {@code mapper} 包里仍留着的 9 个仓储门面。
-     * 登记理由：本规则上线时 session / wiki / memory 三域已清零（9 类 + memory 协作者 4 类），
-     * 余下域按「碰到哪域归哪域」逐域收敛，基线只许减不许增。
-     * <p>口径不含 {@code :engine} 的 {@code retrieval/engine/**}——引擎适配仓储与检索是一套
-     * 自成体系的目录约定，不适用本分层划分。</p>
-     * <p><b>B267 收紧（11 → 9）</b>：检测从「名字以 {@code Repository} 结尾」升级为<b>注解判据</b>——
-     * 真 MyBatis-Plus 映射接口（带 {@code @Mapper} 或祖先链含 {@code BaseMapper}）不再算门面，
-     * 两条**命名巧合**的假阳性随之下线：{@code vectorstore.mapper.VectorStoreRepository}、
-     * {@code websearch.mapper.WebSearchProviderRepository}（二者都是 {@code @Mapper} 接口，
-     * 只是名字以 Repository 结尾）。余 9 条现场核对均为 {@code @Component}/{@code @Repository}
-     * 的**手写门面**，收敛路径仍是「碰到哪域归哪域」搬去该域 {@code repository/}。</p>
-     * <p><b>评审修复批② 收紧（9 → 6）</b>：mcp 域三条门面已搬至 {@code mcp/repository/}。</p>
+     * 棘轮基线：已清零（全仓手写门面都已在该域 {@code repository/} 包）。
+     *
+     * <p>口径不含 {@code retrieval/engine/**}——引擎适配仓储与检索是一套自成体系的目录约定，
+     * 不适用本分层划分。</p>
      */
-    private static final Set<String> REPOSITORY_IN_MAPPER_BASELINE = Set.of(
-            "com.ragagent.audit.mapper.AuditLogRepository",
-            "com.ragagent.auth.apikey.mapper.TenantAPIKeyRepository",
-            "com.ragagent.datasource.mapper.DataSourceRepository",
-            "com.ragagent.datasource.mapper.SyncLogRepository",
-            "com.ragagent.storage.mapper.ResourceRepository",
-            "com.ragagent.storage.mapper.StorageBackendRepository");
+    private static final Set<String> REPOSITORY_IN_MAPPER_BASELINE = Set.of();
 
     @Test
     @DisplayName("A11b：仓储门面不得留在 mapper 包（A11 的镜像面：mapper 只放 MyBatis-Plus 接口）")
@@ -738,7 +724,6 @@ class ArchitectureRulesTest {
             Set.of(
             "com.ragagent.agentmanagement.service.AgentSuggestedQuestions",
             "com.ragagent.agentmanagement.service.CustomAgentService",
-            "com.ragagent.audit.service.AuditLogService",
             "com.ragagent.auth.apikey.service.TenantAPIKeyService",
             "com.ragagent.auth.service.TenantInvitationService",
             "com.ragagent.auth.service.TenantMemberService",
@@ -746,9 +731,6 @@ class ArchitectureRulesTest {
             "com.ragagent.auth.service.UserService",
             "com.ragagent.auth.service.UserSessionOps",
             "com.ragagent.datasource.service.DataSourceService",
-            "com.ragagent.datasource.service.DataSourceSupport",
-            "com.ragagent.datasource.service.DataSourceSyncExecutor",
-            "com.ragagent.datasource.service.DataSourceSyncResultOps",
             "com.ragagent.datasource.service.DataSourceWiring",
             "com.ragagent.embedchannel.service.EmbedChannelService",
             "com.ragagent.favorite.service.UserResourceFavoriteService",
@@ -773,9 +755,6 @@ class ArchitectureRulesTest {
             "com.ragagent.mcp.service.McpToolApprovalService",
             "com.ragagent.model.service.BuiltinModelsReconciler",
             "com.ragagent.model.service.ModelService",
-            "com.ragagent.storage.service.DefaultStorageBackendProvisioner",
-            "com.ragagent.storage.service.ResourceCatalogService",
-            "com.ragagent.storage.service.StorageBackendService",
             "com.ragagent.system.service.SystemSettingService",
             "com.ragagent.vectorstore.service.VectorStoreConfigService",
             "com.ragagent.vectorstore.service.VectorStoreLookupAdapter",

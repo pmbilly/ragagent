@@ -12,7 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.audit.mapper.AuditLogRepository;
+import com.ragagent.audit.repository.AuditLogRepository;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.audit.service.RbacDeniedAuditorRegistrar;
 import com.ragagent.contract.apikey.APIKeyScopeContext;

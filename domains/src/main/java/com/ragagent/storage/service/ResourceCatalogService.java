@@ -2,7 +2,7 @@ package com.ragagent.storage.service;
 
 import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.storage.domain.StoredResource;
-import com.ragagent.storage.mapper.ResourceRepository;
+import com.ragagent.storage.repository.ResourceRepository;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

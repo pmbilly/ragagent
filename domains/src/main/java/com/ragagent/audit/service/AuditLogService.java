@@ -4,7 +4,7 @@ package com.ragagent.audit.service;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.audit.dto.AuditLogQuery;
-import com.ragagent.audit.mapper.AuditLogRepository;
+import com.ragagent.audit.repository.AuditLogRepository;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.platform.web.JsonMappers;

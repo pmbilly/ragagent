@@ -7,7 +7,7 @@ import com.ragagent.TestSchema;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.auth.apikey.mapper.TenantAPIKeyMapper;
 import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
-import com.ragagent.auth.apikey.mapper.TenantAPIKeyRepository;
+import com.ragagent.auth.apikey.repository.TenantAPIKeyRepository;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

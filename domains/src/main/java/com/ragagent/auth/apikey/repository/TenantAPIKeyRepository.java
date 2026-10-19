@@ -1,7 +1,9 @@
-package com.ragagent.auth.apikey.mapper;
+package com.ragagent.auth.apikey.repository;
 
 import com.ragagent.auth.apikey.domain.APIKeyStringListTypeHandler;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
+import com.ragagent.auth.apikey.mapper.TenantAPIKeyMapper;
+import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.platform.security.CryptoService;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

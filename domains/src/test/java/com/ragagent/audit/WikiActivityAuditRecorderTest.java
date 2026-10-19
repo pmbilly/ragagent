@@ -6,7 +6,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
 import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.audit.mapper.AuditLogRepository;
+import com.ragagent.audit.repository.AuditLogRepository;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.audit.service.WikiActivityAuditRecorder;
 import com.ragagent.contract.audit.AuditAction;

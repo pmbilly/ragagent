@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-343 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+346 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -70,6 +70,7 @@
 | `:domains` | `com.ragagent.audit.domain` | 审计 · 领域模型：AuditLog。 |
 | `:domains` | `com.ragagent.audit.dto` | 审计 · 数据传输：AuditLogListResponse / AuditLogQuery。 |
 | `:domains` | `com.ragagent.audit.mapper` | 审计 · 映射：AuditLogRepository / AuditLogMapper。 |
+| `:domains` | `com.ragagent.audit.repository` | 审计日志仓储门面：对 audit.mapper.AuditLogMapper 的查询与写入封装。 |
 | `:domains` | `com.ragagent.audit.service` | 审计 · 服务：AuditLogService / RbacDeniedAuditorRegistrar / WikiActivityAuditRecorder…。 |
 | `:domains` | `com.ragagent.auth` | 认证与租户控制面：登录/OIDC/令牌、用户与租户目录、RBAC 与会话身份。 |
 | `:domains` | `com.ragagent.auth.api` | 认证 · 域内访问面：UserLookupAdapter（实现 contract.auth.UserLookupPort）、 AdminUserAdapter，以及域内视图（com.ragagent. |
@@ -79,6 +80,7 @@
 | `:domains` | `com.ragagent.auth.apikey.domain` | apikey · 领域模型：APIKeyStringListTypeHandler / APIKeyRawJsonbTypeHandler / TenantAPIKeyProjections…。 |
 | `:domains` | `com.ragagent.auth.apikey.dto` | 租户 API Key · 传输形状：请求体与实体到响应的投影。 |
 | `:domains` | `com.ragagent.auth.apikey.mapper` | apikey · 映射：TenantAPIKeyRepository / TenantAPIKeyMapper / TenantAPIKeyNotFoundException。 |
+| `:domains` | `com.ragagent.auth.apikey.repository` | API Key 仓储门面：对 auth.apikey.mapper 的读写封装与不存在异常转换。 |
 | `:domains` | `com.ragagent.auth.apikey.service` | apikey · 服务：TenantAPIKeyService / ApiKeyAdminAdapter / TenantAPIKeyBootstrap…。 |
 | `:domains` | `com.ragagent.auth.config` | 认证 · 配置：JwtProperties。 |
 | `:domains` | `com.ragagent.auth.controller` | auth 域控制器的 HTTP 端点与协作类（7 个协作类）。 |
@@ -102,6 +104,7 @@
 | `:domains` | `com.ragagent.datasource.domain.connector` | 连接器契约面（方案 的 domain.connector/）：连接器 SPI（Connector / StreamingConnector）、流式回调（StreamHandler）、目录与注册表 （C |
 | `:domains` | `com.ragagent.datasource.dto` | 数据源 · 数据传输：DatasourceCredentialFieldMetadata / DatasourceCredentialsResponse / DataSourceConfigDto…。 |
 | `:domains` | `com.ragagent.datasource.mapper` | 数据源 · 映射：DataSourceRepository / SyncLogRepository / DataSourceMapper…。 |
+| `:domains` | `com.ragagent.datasource.repository` | 数据源与同步日志仓储门面：对 datasource.mapper 的读写封装。 |
 | `:domains` | `com.ragagent.datasource.service` | 数据源 · 服务：DataSourceService / KnowledgeTagAutoTagProvider / DataSourceSyncResultOps…。 |
 | `:domains` | `com.ragagent.datasource.task` | 同步任务面（方案 的 task/）：同步任务队列（DataSourceSyncTaskQueue + InProcess/Redis 双实现）、任务处理器（DataSourceSyncHandler） |
 | `:domains` | `com.ragagent.embedchannel` | 嵌入渠道域：对外暴露的嵌入问答渠道、渠道配置与令牌，以及渠道鉴权过滤器。 |
@@ -238,8 +241,8 @@
 | `:domains` | `com.ragagent.storage.domain` | 存储 · 领域模型：StoredResource / StorageBackend。 |
 | `:domains` | `com.ragagent.storage.dto` | 存储 · 数据传输：StorageBackendResponse / StorageConfig。 |
 | `:domains` | `com.ragagent.storage.fileserve` | 存储 · 文件服务：ProviderFileContentService / BackendScopedFileService / LocalFileContentService…。 |
-| `:domains` | `com.ragagent.storage.mapper` | 存储 · 映射：StorageBackendRepository / ResourceRepository。 |
 | `:domains` | `com.ragagent.storage.provider` | 存储 · 提供方：S3CompatibleFileService / SeekableFileService / LocalFileService…。 |
+| `:domains` | `com.ragagent.storage.repository` | 存储后端与资源仓储门面：存储元数据与资源行的查询（JdbcClient 方言 SQL）。 |
 | `:domains` | `com.ragagent.storage.service` | 存储 · 服务：ResourceCatalogService / StorageBackendService / DefaultStorageBackendProvisioner…。 |
 | `:domains` | `com.ragagent.storage.support` | 存储域的支撑层：存储 URL 解析与重写——签名 URL、流式重写与文件服务解析 （原顶层包 storageurl， 并入）。 |
 | `:domains` | `com.ragagent.system` | 系统设置与管理员面：系统设置读写（/api/v1/system）与管理员操作 （/api/v1/system/admin）。 |

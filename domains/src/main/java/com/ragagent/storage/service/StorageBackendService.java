@@ -8,7 +8,7 @@ import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.dto.StorageConfig;
-import com.ragagent.storage.mapper.StorageBackendRepository;
+import com.ragagent.storage.repository.StorageBackendRepository;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;

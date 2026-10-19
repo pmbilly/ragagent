@@ -4,7 +4,7 @@ import com.ragagent.contract.storage.StorageBackendPort;
 import com.ragagent.contract.storage.StorageBackendView;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.storage.domain.StorageBackend;
-import com.ragagent.storage.mapper.StorageBackendRepository;
+import com.ragagent.storage.repository.StorageBackendRepository;
 import com.ragagent.storage.service.StorageBackendService;
 import java.util.List;
 import org.springframework.stereotype.Component;

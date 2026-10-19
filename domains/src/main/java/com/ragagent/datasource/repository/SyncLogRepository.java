@@ -1,9 +1,10 @@
-package com.ragagent.datasource.mapper;
+package com.ragagent.datasource.repository;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.datasource.domain.DataSourceConstants;
 import com.ragagent.datasource.domain.DataSourceException;
 import com.ragagent.datasource.domain.SyncLog;
+import com.ragagent.datasource.mapper.SyncLogMapper;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;

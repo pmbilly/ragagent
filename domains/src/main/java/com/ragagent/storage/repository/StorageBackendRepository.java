@@ -1,4 +1,4 @@
-package com.ragagent.storage.mapper;
+package com.ragagent.storage.repository;
 
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.web.JsonMappers;

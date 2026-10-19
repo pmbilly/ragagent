@@ -26,7 +26,7 @@ import org.apache.ibatis.annotations.Update;
  *       {@code CryptoService.encryptAESGCM} 后再传进来。</li>
  *   <li><b>解密读取</b>：{@code selectByHash} <b>不解密</b>（认证只比对摘要）；
  *       其余读语句都要解密。
- *       解密动作在 {@link TenantAPIKeyRepository} 里做，不在这里——
+ *       解密动作在 {@code TenantAPIKeyRepository} 里做，不在这里——
  *       哪条读路径解密，按方法名肉眼可查。</li>
  *   <li><b>jsonb 列</b>：写路径用 {@link com.ragagent.auth.apikey.domain.APIKeyRawJsonbTypeHandler}（参数是**已编码文本**，
  *       null 编码为字面量 {@code null}）；读路径用 {@link APIKeyStringListTypeHandler}。

@@ -10,7 +10,7 @@ import com.ragagent.datasource.domain.DataSourceConstants;
 import com.ragagent.datasource.domain.DataSourceException;
 import com.ragagent.datasource.domain.SyncCursor;
 import com.ragagent.datasource.domain.SyncResult;
-import com.ragagent.datasource.mapper.DataSourceRepository;
+import com.ragagent.datasource.repository.DataSourceRepository;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;

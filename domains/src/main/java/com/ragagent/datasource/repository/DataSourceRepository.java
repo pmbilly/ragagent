@@ -1,10 +1,11 @@
-package com.ragagent.datasource.mapper;
+package com.ragagent.datasource.repository;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConstants;
 import com.ragagent.datasource.domain.DataSourceException;
+import com.ragagent.datasource.mapper.DataSourceMapper;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.platform.persistence.TxTemplate;
 import com.ragagent.platform.web.ZeroTimeSerializer;
