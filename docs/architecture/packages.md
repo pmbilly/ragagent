@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-357 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+352 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -257,11 +257,6 @@
 | `:domains` | `com.ragagent.system.mapper` | 系统 · 映射：SystemSettingMapper。 |
 | `:domains` | `com.ragagent.system.repository` | 系统设置仓储门面：全量读取、按键读写与删除。 |
 | `:domains` | `com.ragagent.system.service` | 系统 · 服务：SystemAdminUserService / SystemSettingService / SystemInfoService…。 |
-| `:domains` | `com.ragagent.tenant` | 租户域：租户实体、MyBatis 持久化、租户级配置（API principal / 聊天历史 / 解析引擎 / 检索 / 存储引擎）与配置脱敏。 |
-| `:domains` | `com.ragagent.tenant.api` | 租户 · 端口实现：TenantStorageQuotaAdapter。 |
-| `:domains` | `com.ragagent.tenant.domain` | 租户 · 领域模型：APIPrincipalConfigTypeHandler / Tenant。 |
-| `:domains` | `com.ragagent.tenant.mapper` | 租户 · 映射：TenantMapper。 |
-| `:domains` | `com.ragagent.tenant.repository` | 租户仓储面（由 tenant 根包迁出，对齐方案 的 repository/）： Tenant（租户实体）、TenantLookup（按 id/域名查找）与 TenantConfigRedaction（配置脱敏，供查询面复用）。 |
 | `:domains` | `com.ragagent.vectorstore` | 向量库配置域：向量库类型目录与配置校验/持久化，对外 /api/v1/vector-stores。 |
 | `:domains` | `com.ragagent.vectorstore.config` | 向量存储 · 环境配置：EnvVectorStores 的读取与查询视图。 |
 | `:domains` | `com.ragagent.vectorstore.controller` | 向量库 · HTTP 层：VectorStoreController。 |

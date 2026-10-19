@@ -1,8 +1,8 @@
-package com.ragagent.tenant.api;
+package com.ragagent.auth.api;
 
+import com.ragagent.auth.domain.Tenant;
+import com.ragagent.auth.mapper.TenantMapper;
 import com.ragagent.contract.tenant.TenantStorageQuotaPort;
-import com.ragagent.tenant.domain.Tenant;
-import com.ragagent.tenant.mapper.TenantMapper;
 import java.sql.Timestamp;
 import java.time.Instant;
 import org.springframework.jdbc.core.JdbcTemplate;

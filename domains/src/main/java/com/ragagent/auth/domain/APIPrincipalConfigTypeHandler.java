@@ -1,4 +1,4 @@
-package com.ragagent.tenant.domain;
+package com.ragagent.auth.domain;
 
 import com.ragagent.contract.tenant.APIPrincipalConfig;
 import com.ragagent.platform.security.CryptoService;

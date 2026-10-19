@@ -1,10 +1,10 @@
-package com.ragagent.tenant.repository;
+package com.ragagent.auth.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.auth.domain.Tenant;
+import com.ragagent.auth.mapper.TenantMapper;
 import com.ragagent.platform.persistence.PageRequests;
-import com.ragagent.tenant.domain.Tenant;
-import com.ragagent.tenant.mapper.TenantMapper;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;

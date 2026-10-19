@@ -6,14 +6,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import com.ragagent.TestSchema;
+import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
+import com.ragagent.auth.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.contract.auth.UserPreferences;
 import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.tenant.domain.Tenant;
-import com.ragagent.tenant.mapper.TenantMapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

@@ -95,10 +95,6 @@
       "kind": "control",
       "frontend": "views/system"
     },
-    "tenant": {
-      "kind": "control",
-      "frontend": "views/settings/TenantInfo.vue"
-    },
     "vectorstore": {
       "kind": "capability-config",
       "frontend": "views/settings/VectorStoreSettings.vue"

@@ -60,7 +60,7 @@ graph TD
 | 跨模块 Bean / 端口实现 | `boot/src/main/java/com/ragagent/config/` |
 | 跨模块公开类型 | `contract/src/main/java/com/ragagent/contract/` |
 
-## 21 个业务域
+## 20 个业务域
 
 控制器数量只是"有没有 HTTP 面"的指标，不代表复杂度：
 
@@ -73,9 +73,9 @@ graph TD
 | `model` / `websearch` / `agentmanagement` | 各 3 | 模型配置、搜索提供商、Agent 管理 |
 | `system` / `storage` / `im` / `datasource` | 各 2 | 系统信息、存储后端、IM 渠道、数据源 |
 | `wiki` / `vectorstore` / `memory` / `initialization` / `favorite` / `embedchannel` / `audit` | 各 1 | 各自单面 |
-| `approval` / `tenant` / `agenttools` | 0 | 无独立 HTTP 面（工具或内部能力） |
+| `approval` / `agenttools` | 0 | 无独立 HTTP 面（工具或内部能力） |
 
-合计 50 个控制器。域的完整清单：`agentmanagement`、`agenttools`、`approval`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`tenant`、`vectorstore`、`websearch`、`wiki`。
+合计 50 个控制器。域的完整清单：`agentmanagement`、`agenttools`、`approval`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki`。
 
 ## 模块名与包名不完全对应（刻意）
 

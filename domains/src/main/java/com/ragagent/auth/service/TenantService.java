@@ -1,5 +1,8 @@
 package com.ragagent.auth.service;
 
+import com.ragagent.auth.domain.Tenant;
+import com.ragagent.auth.repository.TenantAdmin;
+import com.ragagent.auth.repository.TenantLookup;
 import com.ragagent.auth.repository.TenantMemberRepository;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -9,10 +12,6 @@ import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.persistence.LikeEscapes;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.tenant.domain.Tenant;
-
-import com.ragagent.tenant.repository.TenantAdmin;
-import com.ragagent.tenant.repository.TenantLookup;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Collection;

@@ -20,9 +20,7 @@
         "⏸ `session` 的能力边（`knowledge`17 / `storage`14 / `model`12 / `memory`7 / `settings`5 / `websearch`4 / `wiki`2 / `approval`2 ＝ 63 类）与零散小边（`agentmanagement→audit`(1) / `embedchannel→knowledge`(2) / `system→storage`(2) / `session→mcp`(2)）同手法逐个收"
       ]
     },
-    "owner": {
-      "auth→tenant": "域属主边：租户/成员/RBAC 的管理面计划上就在 auth（§8.9：`auth/service/TenantService`、`auth/domain/TenantMember`；`tenant/` 只留 3 包/10 文件＝配置类 + `mapper/TenantMapper` + `repository/{Tenant,TenantConfigRedaction,TenantLookup}`）⇒ auth 依赖 tenant 持久层写租户数据。条件：读侧已走 L1 端口（`TenantConfigLookup`/`apiPrincipalConfig`/`exists`/`memoryConfig`/`parserEngineConfig`/`storageEngineConfig` ✓）；写/管理面集中在属主域 ✓。清零路径与计划面清单相悖（搬管理面）或改公开 API 形状（实体→视图）⇒ 需拍板。"
-    },
+    "owner": {},
     "intra-family": {
       "note": "运行面族内：**豁免但冻结**（本档新增类仍判红）。族判据＝同一 runtime 的零件互调，不为拆而拆（B211 试切 `:channels` 回退的结论「紧耦合对内聚优先」）。跨族仍按 ① 档。",
       "families": {
@@ -35,8 +33,7 @@
         "identity": [
           "agentmanagement",
           "auth",
-          "system",
-          "tenant"
+          "system"
         ],
         "knowledge": [
           "knowledge",
@@ -63,9 +60,6 @@
     }
   },
   "edges": {
-    "auth→tenant": [
-      "TenantService"
-    ],
     "knowledge→wiki": [
       "ChunkExtractService",
       "KnowledgeFinalizingStage",

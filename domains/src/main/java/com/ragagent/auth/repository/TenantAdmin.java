@@ -1,6 +1,6 @@
-package com.ragagent.tenant.repository;
+package com.ragagent.auth.repository;
 
-import com.ragagent.tenant.domain.Tenant;
+import com.ragagent.auth.domain.Tenant;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
