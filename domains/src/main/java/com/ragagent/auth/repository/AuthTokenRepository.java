@@ -42,6 +42,14 @@ public class AuthTokenRepository {
         mapper.updateById(record);
     }
 
+    /** 吊销该用户全部**未吊销**令牌（不刷 updated_at；成员移除清理用）。 */
+    public void revokeActiveByUserId(String userId) {
+        mapper.update(null, new LambdaUpdateWrapper<AuthToken>()
+                .eq(AuthToken::getUserId, userId)
+                .eq(AuthToken::isIsRevoked, false)
+                .set(AuthToken::isIsRevoked, true));
+    }
+
     /** 吊销该用户全部令牌：{@code is_revoked=true}，同时刷 {@code updated_at}。 */
     public void revokeByUserId(String userId) {
         mapper.update(null, new LambdaUpdateWrapper<AuthToken>()

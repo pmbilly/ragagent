@@ -1,20 +1,16 @@
 package com.ragagent.auth.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
-import com.ragagent.auth.mapper.AuthTokenMapper;
-import com.ragagent.auth.mapper.TenantMemberMapper;
-import com.ragagent.auth.mapper.UserMapper;
+import com.ragagent.auth.repository.AuthTokenRepository;
+import com.ragagent.auth.repository.TenantMemberRepository;
+import com.ragagent.auth.repository.UserRepository;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -57,18 +53,18 @@ public class TenantMemberService {
     public static final int LIST_DEFAULT_PAGE_SIZE = 20;
     public static final int LIST_MAX_PAGE_SIZE = 100;
 
-    private final TenantMemberMapper memberMapper;
-    private final UserMapper userMapper;
-    private final AuthTokenMapper authTokenMapper;
+    private final TenantMemberRepository memberRepo;
+    private final UserRepository userRepo;
+    private final AuthTokenRepository tokenRepo;
     private final AuditWritePort auditWriter;
 
-    public TenantMemberService(TenantMemberMapper memberMapper,
-                               UserMapper userMapper,
-                               AuthTokenMapper authTokenMapper,
+    public TenantMemberService(TenantMemberRepository memberRepo,
+                               UserRepository userRepo,
+                               AuthTokenRepository tokenRepo,
             AuditWritePort auditWriter) {
-        this.memberMapper = memberMapper;
-        this.userMapper = userMapper;
-        this.authTokenMapper = authTokenMapper;
+        this.memberRepo = memberRepo;
+        this.userRepo = userRepo;
+        this.tokenRepo = tokenRepo;
         this.auditWriter = auditWriter;
     }
 
@@ -76,21 +72,12 @@ public class TenantMemberService {
 
     /** 单条成员查询：找不到返回 null */
     public TenantMember getMembership(String userId, long tenantId) {
-        return memberMapper.selectOne(new LambdaQueryWrapper<TenantMember>()
-                .eq(TenantMember::getUserId, userId)
-                .eq(TenantMember::getTenantId, tenantId)
-                .isNull(TenantMember::getDeletedAt)
-                .orderByAsc(TenantMember::getId)
-                .last("LIMIT 1"));
+        return memberRepo.findMembership(userId, tenantId);
     }
 
     /** 用户的成员行列表：按 joined_at, id 升序（稳定序） */
     public List<TenantMember> listByUser(String userId) {
-        return memberMapper.selectList(new LambdaQueryWrapper<TenantMember>()
-                .eq(TenantMember::getUserId, userId)
-                .isNull(TenantMember::getDeletedAt)
-                .orderByAsc(TenantMember::getJoinedAt)
-                .orderByAsc(TenantMember::getId));
+        return memberRepo.listByUser(userId);
     }
 
     /**
@@ -117,11 +104,7 @@ public class TenantMemberService {
 
     /** 目标空间是否存在 active 成员（不含软删除行） */
     public boolean hasAnyActiveMembers(long tenantId) {
-        Long count = memberMapper.selectCount(new LambdaQueryWrapper<TenantMember>()
-                .eq(TenantMember::getTenantId, tenantId)
-                .eq(TenantMember::getStatus, STATUS_ACTIVE)
-                .isNull(TenantMember::getDeletedAt));
-        return count != null && count > 0;
+        return memberRepo.countByStatus(tenantId, STATUS_ACTIVE) > 0;
     }
 
     /**
@@ -139,7 +122,7 @@ public class TenantMemberService {
         m.setJoinedAt(now);
         m.setCreatedAt(now);
         m.setUpdatedAt(now);
-        memberMapper.insert(m);
+        memberRepo.insert(m);
         return m;
     }
 
@@ -167,42 +150,24 @@ public class TenantMemberService {
             pageSize = LIST_MAX_PAGE_SIZE;
         }
 
-        LambdaQueryWrapper<TenantMember> scope = new LambdaQueryWrapper<TenantMember>()
-                .eq(TenantMember::getTenantId, tenantId)
-                .isNull(TenantMember::getDeletedAt);
+        // 关键字过滤先解析成用户 id 集；为空说明无人匹配，直接返回空页
+        java.util.Collection<String> userIds = null;
         if (!q.isEmpty()) {
             List<String> ids = userIdsMatching(q);
             if (ids.isEmpty()) {
                 return new MemberPage(new ArrayList<>(), 0);
             }
-            scope.in(TenantMember::getUserId, ids);
+            userIds = ids;
         }
-        long total = memberMapper.selectCount(scope);
-
-        LambdaQueryWrapper<TenantMember> listScope = new LambdaQueryWrapper<TenantMember>()
-                .eq(TenantMember::getTenantId, tenantId)
-                .isNull(TenantMember::getDeletedAt)
-                .orderByAsc(TenantMember::getJoinedAt)
-                .orderByAsc(TenantMember::getId);
-        if (!q.isEmpty()) {
-            listScope.in(TenantMember::getUserId, userIdsMatching(q));
-        }
-        return new MemberPage(
-                memberMapper.selectList(PageRequests.range(page, pageSize), listScope), total);
+        long total = memberRepo.countPage(tenantId, userIds);
+        return new MemberPage(memberRepo.listPage(tenantId, userIds, page, pageSize), total);
     }
 
     /** escapeLikePattern（\ % _ 依次转义）+ % 包裹，交由 LOWER(... LIKE LOWER(?)) 匹配 */
     private List<String> userIdsMatching(String q) {
         String escaped = q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
         String like = "%" + escaped + "%";
-        LambdaQueryWrapper<User> w = new LambdaQueryWrapper<User>()
-                .select(User::getId)
-                .apply("(LOWER(email) LIKE LOWER({0}) OR LOWER(username) LIKE LOWER({1}))", like, like);
-        List<String> ids = new ArrayList<>();
-        for (User u : userMapper.selectList(w)) {
-            ids.add(u.getId());
-        }
-        return ids;
+        return userRepo.listIdsByKeyword(like);
     }
 
     /**
@@ -262,12 +227,7 @@ public class TenantMemberService {
                 throw TenantRbacException.lastOwner();
             }
         }
-        memberMapper.update(null, new LambdaUpdateWrapper<TenantMember>()
-                .eq(TenantMember::getUserId, userId)
-                .eq(TenantMember::getTenantId, tenantId)
-                .isNull(TenantMember::getDeletedAt)
-                .set(TenantMember::getRole, newRole.value())
-                .set(TenantMember::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+        memberRepo.updateRole(userId, tenantId, newRole.value(), OffsetDateTime.now(ZoneOffset.UTC));
         emitRoleChangeAudit(tenantId, userId, oldRole, newRole.value());
     }
 
@@ -283,11 +243,7 @@ public class TenantMemberService {
         if (TenantRole.OWNER.value().equals(current.getRole()) && !hasOtherActiveOwner(userId, tenantId)) {
             throw TenantRbacException.lastOwner();
         }
-        memberMapper.update(null, new LambdaUpdateWrapper<TenantMember>()
-                .eq(TenantMember::getUserId, userId)
-                .eq(TenantMember::getTenantId, tenantId)
-                .isNull(TenantMember::getDeletedAt)
-                .set(TenantMember::getDeletedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+        memberRepo.softDelete(userId, tenantId, OffsetDateTime.now(ZoneOffset.UTC));
 
         // 审计区分"自愿 leave"（caller == target）与"被移除"
         String actor = TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId();
@@ -300,13 +256,8 @@ public class TenantMemberService {
 
     /** 最后 Owner 判定：是否存在**其他** active Owner */
     private boolean hasOtherActiveOwner(String userId, long tenantId) {
-        Long count = memberMapper.selectCount(new LambdaQueryWrapper<TenantMember>()
-                .eq(TenantMember::getTenantId, tenantId)
-                .ne(TenantMember::getUserId, userId)
-                .eq(TenantMember::getRole, TenantRole.OWNER.value())
-                .eq(TenantMember::getStatus, STATUS_ACTIVE)
-                .isNull(TenantMember::getDeletedAt));
-        return count != null && count > 0;
+        return memberRepo.countByRoleExcludingUser(
+                tenantId, TenantRole.OWNER.value(), userId, STATUS_ACTIVE) > 0;
     }
 
     /**
@@ -317,10 +268,7 @@ public class TenantMemberService {
      */
     private void cleanupRemovedMemberState(String userId, long tenantId) {
         try {
-            User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                    .eq(User::getId, userId)
-                    .isNull(User::getDeletedAt)
-                    .last("LIMIT 1"));
+            User user = userRepo.findById(userId);
             if (user != null) {
                 boolean tenantPointerChanged = false;
                 boolean prefChanged = false;
@@ -335,23 +283,18 @@ public class TenantMemberService {
                 if (prefChanged) {
                     user.setTenantId(null); // 让 updateById 跳过该列，tenant_id 由下方显式置 NULL
                     user.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-                    userMapper.updateById(user);
+                    userRepo.updateById(user);
                 }
                 if (tenantPointerChanged) {
                     // 显式写 NULL，别写 0（FK 拒绝）
-                    userMapper.update(null, new LambdaUpdateWrapper<User>()
-                            .eq(User::getId, userId)
-                            .set(User::getTenantId, null));
+                    userRepo.clearTenantId(userId);
                 }
             }
         } catch (RuntimeException e) {
             log.warn("RemoveMember cleanup: failed to clear stale tenant pointers for user {} tenant {}", userId, tenantId, e);
         }
         try {
-            authTokenMapper.update(null, new LambdaUpdateWrapper<AuthToken>()
-                    .eq(AuthToken::getUserId, userId)
-                    .eq(AuthToken::isIsRevoked, false)
-                    .set(AuthToken::isIsRevoked, true));
+            tokenRepo.revokeActiveByUserId(userId);
         } catch (RuntimeException e) {
             log.warn("RemoveMember cleanup: failed to revoke tokens for user {}", userId, e);
         }

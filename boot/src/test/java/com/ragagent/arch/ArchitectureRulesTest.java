@@ -724,8 +724,6 @@ class ArchitectureRulesTest {
             Set.of(
             "com.ragagent.agentmanagement.service.AgentSuggestedQuestions",
             "com.ragagent.agentmanagement.service.CustomAgentService",
-            "com.ragagent.auth.service.TenantMemberService",
-            "com.ragagent.auth.service.TenantService",
             "com.ragagent.auth.service.UserService",
             "com.ragagent.datasource.service.DataSourceService",
             "com.ragagent.datasource.service.DataSourceWiring",
@@ -768,8 +766,6 @@ class ArchitectureRulesTest {
      */
     private static final Set<String> SERVICE_TECH_BASELINE =
             Set.of(
-            "com.ragagent.auth.service.TenantMemberService",
-            "com.ragagent.auth.service.TenantService",
             "com.ragagent.auth.service.UserService",
             "com.ragagent.datasource.service.DataSourceService",
             "com.ragagent.embedchannel.service.RedisEmbedTokenStore",

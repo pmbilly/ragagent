@@ -1,8 +1,6 @@
 package com.ragagent.auth.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.auth.mapper.TenantMemberMapper;
+import com.ragagent.auth.repository.TenantMemberRepository;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.storage.StorageBackendProvisioner;
@@ -10,10 +8,10 @@ import com.ragagent.contract.tenant.APIPrincipalConfig;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.persistence.LikeEscapes;
-import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.tenant.domain.Tenant;
-import com.ragagent.tenant.mapper.TenantMapper;
+
+import com.ragagent.tenant.repository.TenantAdmin;
 import com.ragagent.tenant.repository.TenantLookup;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -41,24 +39,21 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
     private static final Logger log = LoggerFactory.getLogger(TenantService.class);
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final TenantMapper tenantMapper;
-    private final TenantMemberMapper memberMapper;
+    private final TenantAdmin tenantAdmin;
+    private final TenantMemberRepository memberRepo;
     private final StorageBackendProvisioner storageProvisioner;
 
-    public TenantService(TenantMapper tenantMapper,
-                         TenantMemberMapper memberMapper,
+    public TenantService(TenantAdmin tenantAdmin,
+                         TenantMemberRepository memberRepo,
                          StorageBackendProvisioner storageProvisioner) {
-        this.tenantMapper = tenantMapper;
-        this.memberMapper = memberMapper;
+        this.tenantAdmin = tenantAdmin;
+        this.memberRepo = memberRepo;
         this.storageProvisioner = storageProvisioner;
     }
 
     /** 按 id 取**实体**（域内/端口实现用；不存在返回 null）。 */
     Tenant tenantRow(long id) {
-        Tenant t = tenantMapper.selectOne(new LambdaQueryWrapper<Tenant>()
-                .eq(Tenant::getId, id)
-                .isNull(Tenant::getDeletedAt)
-                .last("LIMIT 1"));
+        Tenant t = tenantAdmin.byId(id);
         if (t != null) {
             normalizeRetrieverEngines(t);
             normalizeContextConfig(t);
@@ -144,9 +139,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         if (ids == null || ids.isEmpty()) {
             return out;
         }
-        for (Tenant t : tenantMapper.selectList(new LambdaQueryWrapper<Tenant>()
-                .in(Tenant::getId, ids)
-                .isNull(Tenant::getDeletedAt))) {
+        for (Tenant t : tenantAdmin.byIds(ids)) {
             normalizeRetrieverEngines(t);
             normalizeContextConfig(t);
             out.put(t.getId(), toView(t));
@@ -156,9 +149,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
 
     /** 全量列表，created_at DESC，软删除过滤 */
     public List<TenantRowView> listAllTenants() {
-        List<Tenant> tenants = tenantMapper.selectList(new LambdaQueryWrapper<Tenant>()
-                .isNull(Tenant::getDeletedAt)
-                .orderByDesc(Tenant::getCreatedAt));
+        List<Tenant> tenants = tenantAdmin.listAll();
         for (Tenant t : tenants) {
             normalizeRetrieverEngines(t);
             normalizeContextConfig(t);
@@ -176,32 +167,14 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
     public record TenantSearchPage(List<TenantRowView> tenants, long total) {}
 
     public TenantSearchPage searchTenants(String keyword, long tenantId, int page, int pageSize) {
-        String kw = keyword == null ? "" : keyword;
-        var wrapper = new LambdaQueryWrapper<Tenant>().isNull(Tenant::getDeletedAt);
-        if (tenantId > 0 && !kw.isEmpty()) {
-            String like = LikeEscapes.escape(kw);
-            final long id = tenantId;
-            wrapper.and(w -> w.eq(Tenant::getId, id)
-                    .or().like(Tenant::getName, like)
-                    .or().like(Tenant::getDescription, like));
-        } else if (tenantId > 0) {
-            wrapper.eq(Tenant::getId, tenantId);
-        } else if (!kw.isEmpty()) {
-            String like = LikeEscapes.escape(kw);
-            wrapper.and(w -> w.like(Tenant::getName, like)
-                    .or().like(Tenant::getDescription, like));
-        }
-        Long total = tenantMapper.selectCount(wrapper);
-        wrapper.orderByDesc(Tenant::getCreatedAt);
-        // page<=0 是"不分页"语义（拉全量）；分页时 LIMIT/OFFSET 交给分页插件按方言生成
-        List<Tenant> tenants = page > 0 && pageSize > 0
-                ? tenantMapper.selectList(PageRequests.range(page, pageSize), wrapper)
-                : tenantMapper.selectList(wrapper);
+        String escaped = LikeEscapes.escape(keyword == null ? "" : keyword);
+        long total = tenantAdmin.count(escaped, tenantId);
+        List<Tenant> tenants = tenantAdmin.search(escaped, tenantId, page, pageSize);
         for (Tenant t : tenants) {
             normalizeRetrieverEngines(t);
             normalizeContextConfig(t);
         }
-        return new TenantSearchPage(toViews(tenants), total == null ? 0 : total);
+        return new TenantSearchPage(toViews(tenants), total);
     }
 
     /** LIKE 转义：\ → \\、% → \%、_ → \_（顺序敏感，先转义反斜杠） */
@@ -217,7 +190,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         java.time.OffsetDateTime now = java.time.OffsetDateTime.now(java.time.ZoneOffset.UTC);
         view.setUpdatedAt(now);
         Tenant tenant = toEntity(view);
-        tenantMapper.updateById(tenant);
+        tenantAdmin.updateById(tenant);
         copyInto(view, tenant);
         return toView(tenant);
     }
@@ -235,7 +208,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         }
         Map<String, String> oldBuckets = Map.of();
         if (tenant.getId() != null && tenant.getId() != 0) {
-            Tenant old = tenantMapper.selectById(tenant.getId());
+            Tenant old = tenantAdmin.byIdIncludingDeleted(tenant.getId());
             if (old != null) {
                 oldBuckets = bucketNames(old.getStorageEngineConfig());
             }
@@ -243,8 +216,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         Map<String, String> newBuckets = bucketNames(cfg);
         // 汇总其他租户的占用（软删除行不参与）
         Map<String, java.util.Set<String>> usedByOthers = new HashMap<>();
-        for (Tenant t : tenantMapper.selectList(new LambdaQueryWrapper<Tenant>()
-                .isNull(Tenant::getDeletedAt))) {
+        for (Tenant t : tenantAdmin.listLive()) {
             if (t.getId() != null && t.getId().equals(tenant.getId())) {
                 continue;
             }
@@ -319,14 +291,14 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         tenant.setCreatedAt(now);
         tenant.setUpdatedAt(now);
         validateStorageBucketUniqueness(view);
-        tenantMapper.insert(tenant);
+        tenantAdmin.insert(tenant);
         try {
             createDefaultStorageBackend(tenant);
         } catch (RuntimeException e) {
             // 默认后端创建失败 → 删租户回滚，错误上抛
             // （此时还没有关联行，回滚是安全的）
             try {
-                tenantMapper.deleteById(tenant.getId());
+                tenantAdmin.deleteById(tenant.getId());
             } catch (RuntimeException rollbackErr) {
                 log.warn("createTenant rollback: failed to delete tenant {}", tenant.getId(), rollbackErr);
             }
@@ -348,7 +320,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         // 回写 updated_at（第二次写，晚于 created_at）
         tenant.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
         try {
-            tenantMapper.updateById(tenant);
+            tenantAdmin.updateById(tenant);
         } catch (RuntimeException e) {
             try {
                 storageProvisioner.deleteForTenant(tenant.getId(), backendId);
@@ -367,14 +339,8 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
      */
     public void deleteTenant(long id) {
         java.time.OffsetDateTime now = java.time.OffsetDateTime.now(java.time.ZoneOffset.UTC);
-        memberMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<TenantMember>()
-                .eq(TenantMember::getTenantId, id)
-                .isNull(TenantMember::getDeletedAt)
-                .set(TenantMember::getDeletedAt, now));
-        tenantMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Tenant>()
-                .eq(Tenant::getId, id)
-                .isNull(Tenant::getDeletedAt)
-                .set(Tenant::getDeletedAt, now));
+        memberRepo.softDeleteByTenant(id, now);
+        tenantAdmin.softDeleteById(id, now);
     }
 
     /**

@@ -13,7 +13,7 @@
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 20 | 152 | 0 |
 | `:retrieval-engine` | `retrieval` | 15 | 95 | 0 |
 | `:agent-engine` | `agent` | 9 | 67 | 0 |
-| `:domains` | `agentmanagement`、`agenttools`、`approval`、`audit`、`auth`、`datasource`、`embedchannel`、`evaluation`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`tenant`、`vectorstore`、`websearch`、`wiki` | 245 | 1549 | 51 |
+| `:domains` | `agentmanagement`、`agenttools`、`approval`、`audit`、`auth`、`datasource`、`embedchannel`、`evaluation`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`tenant`、`vectorstore`、`websearch`、`wiki` | 245 | 1553 | 51 |
 | `:boot` | `(根包)`、`config` | 2 | 19 | 0 |
 
 ## 22 个业务域（domains）
@@ -24,7 +24,7 @@
 | `agenttools` | `com.ragagent.agenttools` | 58 | 0 |
 | `approval` | `com.ragagent.approval` | 7 | 0 |
 | `audit` | `com.ragagent.audit` | 20 | 1 |
-| `auth` | `com.ragagent.auth` | 111 | 6 |
+| `auth` | `com.ragagent.auth` | 113 | 6 |
 | `datasource` | `com.ragagent.datasource` | 145 | 2 |
 | `embedchannel` | `com.ragagent.embedchannel` | 23 | 1 |
 | `evaluation` | `com.ragagent.evaluation` | 26 | 1 |
@@ -38,7 +38,7 @@
 | `session` | `com.ragagent.session` | 184 | 8 |
 | `storage` | `com.ragagent.storage` | 54 | 2 |
 | `system` | `com.ragagent.system` | 17 | 2 |
-| `tenant` | `com.ragagent.tenant` | 10 | 0 |
+| `tenant` | `com.ragagent.tenant` | 12 | 0 |
 | `vectorstore` | `com.ragagent.vectorstore` | 18 | 1 |
 | `websearch` | `com.ragagent.websearch` | 49 | 3 |
 | `wiki` | `com.ragagent.wiki` | 163 | 1 |
