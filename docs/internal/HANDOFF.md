@@ -1,11 +1,11 @@
-# ragagent 交接文档（v0.3.0 · 载体纠偏 + 三 runtime 版）
+# ragagent 交接文档（v0.6.x 工作版）
 
 > **内部迁移作战文档（非新人入口）**：新人请从仓库根 `README.md` → `docs/README.md` 开始。
 > 本文件记录重构/迁移的过程与决策，路径与读数随批次变化，不是当前架构说明。
 
 > **版本谱系**：v0.1.0 归档 `docs/internal/handoff/archive/HANDOFF-v0.1.0-2026-10-13.md`；**v0.2.0 全文归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`**（含 B232~B267 全部逐批记录、v0.2.0 结构规范与 C/G1/D/E 系列过程记录）。
 > 本版 2026-10-16 生效：**只留活信息**；历史一概在归档，追溯用 `git log --grep`。
-> 工作分支：`v0.4.0`。
+> 工作分支：`v0.6.x`（2026-10-19 自 `main` 切出）。
 
 ## ⭐ 接手须知（5 分钟）
 
@@ -18,12 +18,12 @@
 
 - **终态（方案 §5.1）**：7 个 Gradle 模块 —— contract / platform / agent-engine / retrieval-engine / model-runtime / domains / boot；单进程分层单体；跨模块只经 contract。
 - **现状（2026-10-17）**：**7 模块** —— `:contract` · `:platform` · `:model-runtime` · `:retrieval-engine` · `:agent-engine` · `:domains` · `:boot`。`:common` 与 `:engine` 均已解散。
-- **当前阶段（v0.3.0）**：**载体纠偏（P1~P5）+ 三 runtime（R1~R6）** ⇒ 计划见 §5。
+- **当前阶段（v0.6.x）**：v0.5.0 可读性专项收尾（L1~L22，余 L11）+ **v0.6.0 业务内聚专项（H 系列，已立项）** ⇒ 计划见 §5.0 / §5.0b。
 
 ## 1. 仓库身份与分支
 
 - 远程 `origin` = `https://github.com/pmbilly/ragagent.git`（公开）；主分支 `main`（停 `ef89e4ab`，含 v0.2.0 结项 + 缺陷修复）。
-- 分支谱系：`v0.1.0`（归档）· `v0.2.0`（R 系列 36 批，已合并 main 并推送）· `v0.3.0`（P1~P5 两模块纠偏）· `v0.4.0`（R1~R6 三 runtime，已合并 main）· **`v0.5.0`（当前工作分支；2026-10-18 自 `main` 切出，可读性专项 L1~L22）**。
+- 分支谱系：`v0.1.0`（归档）· `v0.2.0`（R 系列 36 批，已合并 main 并推送）· `v0.3.0`（P1~P5 两模块纠偏）· `v0.4.0`（R1~R6 三 runtime，已合并 main）· `v0.5.0`（可读性专项 L1~L50，已合并 main）· **`v0.6.x`（当前工作分支；2026-10-19 自 `main` 切出，业务内聚专项 H 系列）**。
 - 网络实录：本机↔github 的 https 不稳；用 `git -c http.version=HTTP/1.1 push …` + 重试。
 - 兼容边界：**系统未上线、无历史数据包袱、前端适配后端**（知识库模块三约束，全线适用）。
 
@@ -90,6 +90,32 @@
 | **L22** | `BaseTool` 归位 `agent-engine` | ⏸ 不可行：domains/mcp 的 2 个工具用它，移过去会让 domains 反向依赖 agent-engine（R5c 刚清零） |
 
 **新增守卫**（各配红态探针）：`check-comment-narrative` / `check-doc-truth` / `check-controller-purity` / `check-pipeline-map` / `check-known-gaps`；另加 `scripts/readability-report.py` 输出 6 个指标。
+
+### 5.0b 下一阶段（已立项，待启动）：v0.6.0「业务内聚专项」（H 系列）
+
+> 完整方案：`docs/internal/plans/architecture-remediation-v0.6.0.md`。
+> 同日评估（现状盘点与 G 系列出处）：`docs/internal/plans/architecture-assessment-2026-10-20.md`。
+> 定位：**不改 7 模块骨架**，只收三件事——链路内聚（H1~H3）、横切内聚（H4/H5）、边界内聚（H6~H8）。
+
+| 批 | 内容 | 状态 |
+|---|---|---|
+| **H0** | 判据先行：端口准入 / 契约形状预算 / 平台依赖面三条守卫 + 业务能力映射一页纸 | 待做 |
+| **H1** | 问答 `TurnLifecycle`（收 2 个轮询 + 3 把锁） | 待做 |
+| **H2a** | 问答运行时段：抽 `TurnRuntime`（3 字段） | 待做 |
+| **H2b** | 问答请求段：`TurnInputView`（41 字段只读）+ `QaRequestContext` 收口 | 待做 |
+| **H2c** | 问答状态段：15 字段按 5 组暴露，删 `ChatManage` | 待做 |
+| **H3** | 入库 `IngestJob` 状态机 + `IngestStage` 接口 | 待做 |
+| **H4a** | 任务端口：`TaskQueue` + `TaskProgress`，测试钩子 4→1 | 待做 |
+| **H4b** | 任务实现：datasource → memory → knowledge → wiki 分批 | 待做 |
+| **H5a** | 分页统一（7→1，后台强制分页） | 待做 |
+| **H5b** | 软删校验守卫（79 基线只减，不做自动注入） | 待做 |
+| **H6** | 契约形状治理（`KnowledgeCatalogPort` 34 方法拆窄、`*RowView` 回域） | 待做 |
+| **H7** | platform 判据换血（依赖面 + 域词汇） | 待做 |
+| **H8** | 适配层逻辑化（不切模块、零搬迁）：协议包落点守卫 + `integration-map.md` | 待做 |
+| **H9** | 管理面模板化（凭证 4→1、DTO 后缀 5→3） | 待做 |
+
+**顺序**：G1（P0）→ G10 → H0 → G2/G3/G4 → **H5a（分页最急）** → H4a → H4b → H5b → H1 → H2a/H2b/H2c → H3 → H6/H7/H8 → H9。
+**拍板结论（2026-10-20）**：H2 渐进三刀（配消费点棘轮）· H4 先端口后按域迁实现（wiki 最后）· H5 不做自动注入（先分页、后校验守卫）· H8 不切模块。详见方案 §7。
 
 ### 5.1 历史批次（v0.3.0 P1~P5 / v0.4.0 R1~R6，全部 ✅）
 
