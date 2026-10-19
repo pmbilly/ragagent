@@ -22,6 +22,7 @@ frontend/package.json.md5
 .claude/
 .codebuddy/
 .workbuddy/
+.zcodeignore
 
 # OS
 .DS_Store
