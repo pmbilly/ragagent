@@ -97,257 +97,32 @@ final class WikiIngestMapPhase {
         SlugListing slug = buildSlugListing(slugItems, knowledgeID);
         String summarySlug = slug.summarySlug();
 
-        // 摘要与分块分类在 Pass 0 输出给定的前提下互相独立——并行跑。
-        // 摘要负责 wiki-link 注入；分类给每个候选 slug 挂上具体的 chunk ID。
-        final String[] summaryContentHolder = { null };
-        final RuntimeException[] summaryErrHolder = { null };
-        @SuppressWarnings("unchecked")
-        final Map<String, List<String>>[] citationsHolder = new Map[] { Map.of() };
-        @SuppressWarnings("unchecked")
-        final List<NewSlugFromCitation>[] newSlugsHolder = new List[] { List.of() };
-        final int[] batchCountHolder = { 0 };
+        ClassifyResult classified = classifyAndMerge(chatModel, chunks, content, lang,
+                extractedEntities, extractedConcepts, slugItems, summaryExtractedPages,
+                summarySlug, slug.listing(), pass0Failed, batchCtx, wikiSpan, knowledgeID, kbId);
+        extractedEntities = classified.entities();
+        extractedConcepts = classified.concepts();
+        slugItems = classified.slugItems();
+        List<DocIngestResult.PageRef> extractedPages = classified.extractedPages();
+        Set<String> citedChunkSet = classified.citedChunkSet();
+        int uncited = classified.uncited();
 
-        Map<String, Object> summaryInput = new LinkedHashMap<>();
-        summaryInput.put("content_chars", content.codePointCount(0, content.length()));
-        summaryInput.put("extracted_slugs", summaryExtractedPages.size());
-        KnowledgeSpanPort.SpanHandle summarySpan = handler.spans.beginSubSpan(wikiSpan,
-                "postprocess.wiki.summary", summaryInput);
-        Map<String, Object> classifyInput = new LinkedHashMap<>();
-        classifyInput.put("chunks", chunks.size());
-        classifyInput.put("candidates", extractedEntities.size() + extractedConcepts.size());
-        // 两条调用在同一个 wikiSpan 父节点下并行跑——它们的子 span 在 trace 视图里会视觉
-        // 重叠，这正确反映了它们的墙钟并发。
-        KnowledgeSpanPort.SpanHandle classifySpan = pass0Failed
-                ? null
-                : handler.spans.beginSubSpan(wikiSpan, "postprocess.wiki.classify", classifyInput);
-
-        final boolean pass0FailedFinal = pass0Failed;
-        final String contentFinal = content;
-        final List<ExtractedItem> entitiesFinal = extractedEntities;
-        final List<ExtractedItem> conceptsFinal = extractedConcepts;
-        final String slugListingFinal = slug.listing();
-        final String summarySlugFinal = summarySlug;
-        List<Runnable> parallel = new ArrayList<>(2);
-        parallel.add(() -> {
-            try {
-                String generated = handler.ingestService.generateWithTemplate(chatModel,
-                        WikiPrompts.WIKI_SUMMARY_PROMPT,
-                        Map.of(
-                                "Content", contentFinal,
-                                "Language", lang == null ? "" : lang,
-                                "ExtractedSlugs", slugListingFinal,
-                                "CustomInstructions",
-                                batchCtx == null ? "" : batchCtx.getContentInstructions(),
-                                "InstructionScope", WikiBatchConstants.INSTRUCTION_SCOPE_CONTENT));
-                summaryContentHolder[0] = generated;
-                WikiTextUtils.SummaryLine parts = WikiTextUtils.splitSummaryLine(generated);
-                Map<String, Object> summaryOut = new LinkedHashMap<>();
-                summaryOut.put("chars", generated.codePointCount(0, generated.length()));
-                summaryOut.put("summary_line", WikiTextUtils.previewText(parts.summary(), 160));
-                summaryOut.put("body_preview", WikiTextUtils.previewText(parts.content(), 320));
-                handler.spans.endSpan(summarySpan, summaryOut);
-            } catch (RuntimeException e) {
-                summaryErrHolder[0] = e;
-                handler.spans.failSpan(summarySpan, "SUMMARY_FAILED", e.getMessage(), e);
-            }
-        });
-        parallel.add(() -> {
-            // Pass 0 走回落路径时跳过引用阶段——该路径输出本身已包含改写过的 Details，
-            // 再做 chunk 引用是多余的，只会白花 LLM 调用。
-            if (pass0FailedFinal) {
-                citationsHolder[0] = new LinkedHashMap<>();
-                return;
-            }
-            String candidatesXml = WikiIngestCitePipeline.renderCandidateSlugsXML(
-                    entitiesFinal, conceptsFinal);
-            WikiIngestCitePipeline.CitationResult citationResult = handler.citePipeline.classifyChunkCitations(
-                    chatModel, candidatesXml, chunks, lang, batchCtx);
-            citationsHolder[0] = citationResult.citations();
-            newSlugsHolder[0] = citationResult.newSlugs();
-            batchCountHolder[0] = citationResult.batchCount();
-            Map<String, Object> classifyOut = new LinkedHashMap<>();
-            classifyOut.put("cited_slugs", citationResult.citations().size());
-            classifyOut.put("new_slugs", citationResult.newSlugs().size());
-            classifyOut.put("batches", citationResult.batchCount());
-            classifyOut.put("top_cited",
-                    WikiIngestPreviews.topCitedSlugs(citationResult.citations(), 8));
-            classifyOut.put("new_slugs_sample",
-                    WikiIngestPreviews.previewNewSlugs(citationResult.newSlugs(), 8));
-            handler.spans.endSpan(classifySpan, classifyOut);
-        });
-        WikiBatchSupport.fanOut(2, parallel);
-
-        // 把引用合并回条目结构（不失败；没有引用的条目简单保留 Description+Details 回落）。
-        WikiIngestCitePipeline.MergedCitations merged = WikiIngestCitePipeline.mergeCitationsIntoItems(
-                extractedEntities, extractedConcepts, citationsHolder[0], newSlugsHolder[0]);
-        extractedEntities = merged.entities();
-        extractedConcepts = merged.concepts();
-        int uncited = merged.uncited();
-        WikiIngestDedupService.Identities reclaimed = handler.dedupService.reclaimExtractedIdentities(
-                kbId, extractedEntities, extractedConcepts, batchCtx);
-        extractedEntities = reclaimed.entities();
-        extractedConcepts = reclaimed.concepts();
-
-        // 重建 slugItems，让"没能挺过合并的陈旧条目"与"引用遍发现的崭新 slug"都反映到
-        // summaryExtractedPages 的追踪里。
-        slugItems = new LinkedHashMap<>();
-        for (ExtractedItem item : extractedEntities) {
-            if (!item.getSlug().isEmpty() && !item.getName().isEmpty()) {
-                slugItems.put(item.getSlug(), item);
-            }
-        }
-        for (ExtractedItem item : extractedConcepts) {
-            if (!item.getSlug().isEmpty() && !item.getName().isEmpty()) {
-                slugItems.put(item.getSlug(), item);
-            }
-        }
-
-        // extractedPages 记录本文件物化出的每一个 wiki 页面（entities、concepts，加上下面
-        // 追加的摘要页）。slug 用于链接/撤回记账；title 保留给 trace 输出与 finalize 处理用。
-        List<DocIngestResult.PageRef> extractedPages = new ArrayList<>(slugItems.size() + 1);
-        for (Map.Entry<String, ExtractedItem> e : slugItems.entrySet()) {
-            String title = e.getValue().getName();
-            if (title.isEmpty()) {
-                title = e.getKey();
-            }
-            extractedPages.add(new DocIngestResult.PageRef(e.getKey(), title));
-        }
-
-        // 统计所有 slug 引用到的不同 chunk 数（用于日志）。
-        Set<String> citedChunkSet = WikiIngestCitePipeline.citedChunkSet(citationsHolder[0]);
-
-        List<SlugUpdate> updates = new ArrayList<>();
-        // docSummaryLine 是用于简短日志/审计预览与 retract prompt 里 <document_added> 块的
-        // 一句话标题。docSummary 是挂到每个 entity/concept 更新上的完整摘要正文，
-        // 让编辑模型在 <source_context> 里拿到丰富的框定信息。
-        String docSummaryLine;
-        String docSummary;
-
-        RuntimeException summaryErr = summaryErrHolder[0];
-        if (summaryErr != null) {
-            // 摘要是被摄取文档的头号产物——没有摘要页的文档只算半摄取，而且会让
-            // entity/concept 更新悬空、没有根可以链回索引。历史上这里只记日志就走，
-            // 意味着一发瞬时 504 会永久丢掉该文档的摘要页。
-            //
-            // 这里返回错误会把该 op 送进 failedOps（见 ProcessWikiIngest 的 map 阶段循环），
-            // requeueFailedOps 随后把它追加回待办列表，让下一批次重试。
-            // generateWithTemplate 内部的退避重试已经在我们放弃之前耗尽了 LLM 自己的瞬时
-            // 错误预算。
-            log.error("wiki ingest: generate summary failed for {}, will requeue", knowledgeID, summaryErr);
-            handler.spans.failSpan(wikiSpan, "SUMMARY_FAILED", summaryErr.getMessage(), summaryErr);
-            throw new IllegalStateException("generate summary: " + summaryErr.getMessage(), summaryErr);
-        }
-        String summaryContent = summaryContentHolder[0] == null ? "" : summaryContentHolder[0];
-        WikiTextUtils.SummaryLine parts = WikiTextUtils.splitSummaryLine(summaryContent);
-        String sumLine = parts.summary();
-        String sumBody = parts.content();
-        if (sumBody.isEmpty()) {
-            sumBody = summaryContent;
-        }
-        if (sumLine.isEmpty()) {
-            sumLine = docTitle;
-        }
-        docSummaryLine = sumLine;
-        docSummary = sumBody;
-        if (docSummary.trim().isEmpty()) {
-            docSummary = sumLine;
-        }
-
-        SlugUpdate summaryUpdate = new SlugUpdate(summarySlugFinal, SlugUpdate.TYPE_SUMMARY);
-        summaryUpdate.setDocTitle(docTitle);
-        summaryUpdate.setKnowledgeId(knowledgeID);
-        summaryUpdate.setSourceRef(sourceRef);
-        summaryUpdate.setLanguage(lang);
-        summaryUpdate.setSummaryLine(sumLine);
-        summaryUpdate.setSummaryBody(sumBody);
-        updates.add(summaryUpdate);
-        extractedPages.add(new DocIngestResult.PageRef(summarySlugFinal, docTitle));
-
-        // Entities
-        for (ExtractedItem item : extractedEntities) {
-            if (item.getSlug().isEmpty()) {
-                continue;
-            }
-            SlugUpdate u = new SlugUpdate(item.getSlug(), SlugUpdate.TYPE_ENTITY);
-            u.setItem(item);
-            u.setDocTitle(docTitle);
-            u.setKnowledgeId(knowledgeID);
-            u.setSourceRef(sourceRef);
-            u.setLanguage(lang);
-            u.setSourceChunks(item.getSourceChunks());
-            u.setDocSummary(docSummary);
-            updates.add(u);
-        }
-
-        // Concepts
-        for (ExtractedItem item : extractedConcepts) {
-            if (item.getSlug().isEmpty()) {
-                continue;
-            }
-            SlugUpdate u = new SlugUpdate(item.getSlug(), SlugUpdate.TYPE_CONCEPT);
-            u.setItem(item);
-            u.setDocTitle(docTitle);
-            u.setKnowledgeId(knowledgeID);
-            u.setSourceRef(sourceRef);
-            u.setLanguage(lang);
-            u.setSourceChunks(item.getSourceChunks());
-            u.setDocSummary(docSummary);
-            updates.add(u);
-        }
-
-        // 调和旧页面集合与新的抽取结果。三种情形：
-        //   (a) oldSlug ∉ new  → "retractStale"：文档不再提及该主题，剥掉它的引用
-        //       （若这是唯一来源则可能删除页面）。用<b>新</b>正文作为撤回语境——如果 LLM
-        //       找到匹配的事实就裁掉它们，否则这次撤回近似 no-op，这没问题。
-        //   (b) oldSlug ∈ new 且是 entity/concept → reparse 换血：同时发出 "retract"
-        //       （携带文档<b>上一版</b>摘要正文作为回落信号）与常规新增。reduce 阶段看到
-        //       HasAdditions=1 + HasRetractions=1，WikiPageModifyUserPrompt 正确地告诉编辑
-        //       模型一次性"删掉旧 K 段、加上新 K 段"——给出替换语义而不是"在旧 K 上追加新 K"。
-        //   (c) oldSlug ∈ new 且是 summary 页 → 什么都不做（reduce 的 summary 分支会整体
-        //       覆盖，多发一次 retract 只会是死重）。
-        //
-        // priorContribution 是文档的<b>最后一份</b>摘要正文，在此处懒取
-        // （而不是预先装进批次上下文）。首次摄取时为空——那时 oldPageSlugs 也为空，
-        // 因此永远不会咨询它。
-        String priorContribution = batchCtx == null
-                ? "" : batchCtx.summaryContentByKnowledgeId(knowledgeID);
-
-        Set<String> newSlugSet = new LinkedHashSet<>();
-        for (DocIngestResult.PageRef ref : extractedPages) {
-            newSlugSet.add(ref.slug());
-        }
-
-        int reparseOverlap = 0;
-        int staleCount = 0;
-        if (oldPageSlugs != null) {
-            for (String oldSlug : oldPageSlugs) {
-                if (newSlugSet.contains(oldSlug)) {
-                    // 跳过 summary slug——它们会被 summary 更新整体覆盖，多发一次 retract
-                    // 在下游只会被丢弃。
-                    if (oldSlug.startsWith("summary/")) {
-                        continue;
-                    }
-                    reparseOverlap++;
-                    updates.add(SlugUpdate.retract(oldSlug, knowledgeID, docTitle,
-                            priorContribution, lang));
-                    continue;
-                }
-                staleCount++;
-                SlugUpdate u = new SlugUpdate(oldSlug, SlugUpdate.TYPE_RETRACT_STALE);
-                u.setRetractDocContent(content);
-                u.setDocTitle(docTitle);
-                u.setKnowledgeId(knowledgeID);
-                u.setLanguage(lang);
-                updates.add(u);
-            }
-        }
+        UpdateResult updateResult = buildUpdates(extractedEntities, extractedConcepts,
+                extractedPages, classified.summaryContent(), summarySlug, docTitle, knowledgeID,
+                sourceRef, lang, oldPageSlugs, content,
+                batchCtx, classified.summaryErr(), wikiSpan);
+        List<SlugUpdate> updates = updateResult.updates();
+        String docSummary = updateResult.docSummary();
+        String docSummaryLine = updateResult.docSummaryLine();
+        int reparseOverlap = updateResult.reparseOverlap();
+        int staleCount = updateResult.staleCount();
 
         log.info("wiki ingest: mapped knowledge {} title={} candidates={} chunks={} batches={} "
                         + "cited_chunks={} uncited_slugs={} new_slugs={} updates={} reparse_slugs={} "
                         + "stale_slugs={} pass0_fallback={} elapsed={}ms",
                 knowledgeID, WikiTextUtils.previewText(docTitle, 80),
-                slugItems.size(), chunks.size(), batchCountHolder[0], citedChunkSet.size(),
-                uncited, newSlugsHolder[0].size(), updates.size(), reparseOverlap, staleCount,
+                slugItems.size(), chunks.size(), classified.batchCount(), citedChunkSet.size(),
+                uncited, classified.newSlugCount(), updates.size(), reparseOverlap, staleCount,
                 pass0Failed, System.currentTimeMillis() - docStartedAt);
 
         // Map 阶段的指标挂到 postprocess.wiki span 的 output 上，但<b>不</b>在这里 EndSpan
@@ -359,14 +134,14 @@ final class WikiIngestMapPhase {
         mapStats.put("candidate_slugs", slugItems.size());
         mapStats.put("cited_chunks", citedChunkSet.size());
         mapStats.put("uncited_slugs", uncited);
-        mapStats.put("new_slugs", newSlugsHolder[0].size());
+        mapStats.put("new_slugs", classified.newSlugCount());
         mapStats.put("updates", updates.size());
         mapStats.put("reparse_slugs", reparseOverlap);
         mapStats.put("stale_slugs", staleCount);
         mapStats.put("extracted_pages", extractedPages.size());
         mapStats.put("summary_chars", docSummary.codePointCount(0, docSummary.length()));
         mapStats.put("pass0_fallback", pass0Failed);
-        mapStats.put("classify_batches", batchCountHolder[0]);
+        mapStats.put("classify_batches", classified.batchCount());
         mapStats.put("summary_preview", WikiTextUtils.previewText(docSummaryLine, 160));
 
         DocIngestResult result = new DocIngestResult(knowledgeID);
@@ -536,4 +311,278 @@ final class WikiIngestMapPhase {
         }
         return knowledgeID;
     }
+    private record UpdateResult(List<SlugUpdate> updates, String docSummary,
+            String docSummaryLine, int reparseOverlap, int staleCount) {
+    }
+    private UpdateResult buildUpdates(List<ExtractedItem> extractedEntities,
+            List<ExtractedItem> extractedConcepts, List<DocIngestResult.PageRef> extractedPages,
+            String summaryContent, String summarySlug, String docTitle, String knowledgeID,
+            String sourceRef, String lang, Set<String> oldPageSlugs, String content,
+            WikiBatchContext batchCtx, RuntimeException summaryErr,
+            KnowledgeSpanPort.SpanHandle wikiSpan) {
+        List<SlugUpdate> updates = new ArrayList<>();
+        // docSummaryLine 是用于简短日志/审计预览与 retract prompt 里 <document_added> 块的
+        // 一句话标题。docSummary 是挂到每个 entity/concept 更新上的完整摘要正文，
+        // 让编辑模型在 <source_context> 里拿到丰富的框定信息。
+        String docSummaryLine;
+        String docSummary;
+
+        if (summaryErr != null) {
+            // 摘要是被摄取文档的头号产物——没有摘要页的文档只算半摄取，而且会让
+            // entity/concept 更新悬空、没有根可以链回索引。历史上这里只记日志就走，
+            // 意味着一发瞬时 504 会永久丢掉该文档的摘要页。
+            //
+            // 这里返回错误会把该 op 送进 failedOps（见 ProcessWikiIngest 的 map 阶段循环），
+            // requeueFailedOps 随后把它追加回待办列表，让下一批次重试。
+            // generateWithTemplate 内部的退避重试已经在我们放弃之前耗尽了 LLM 自己的瞬时
+            // 错误预算。
+            log.error("wiki ingest: generate summary failed for {}, will requeue", knowledgeID, summaryErr);
+            handler.spans.failSpan(wikiSpan, "SUMMARY_FAILED", summaryErr.getMessage(), summaryErr);
+            throw new IllegalStateException("generate summary: " + summaryErr.getMessage(), summaryErr);
+        }
+
+        WikiTextUtils.SummaryLine parts = WikiTextUtils.splitSummaryLine(summaryContent);
+        String sumLine = parts.summary();
+        String sumBody = parts.content();
+        if (sumBody.isEmpty()) {
+            sumBody = summaryContent;
+        }
+        if (sumLine.isEmpty()) {
+            sumLine = docTitle;
+        }
+        docSummaryLine = sumLine;
+        docSummary = sumBody;
+        if (docSummary.trim().isEmpty()) {
+            docSummary = sumLine;
+        }
+
+        SlugUpdate summaryUpdate = new SlugUpdate(summarySlug, SlugUpdate.TYPE_SUMMARY);
+        summaryUpdate.setDocTitle(docTitle);
+        summaryUpdate.setKnowledgeId(knowledgeID);
+        summaryUpdate.setSourceRef(sourceRef);
+        summaryUpdate.setLanguage(lang);
+        summaryUpdate.setSummaryLine(sumLine);
+        summaryUpdate.setSummaryBody(sumBody);
+        updates.add(summaryUpdate);
+        extractedPages.add(new DocIngestResult.PageRef(summarySlug, docTitle));
+
+        // Entities
+        for (ExtractedItem item : extractedEntities) {
+            if (item.getSlug().isEmpty()) {
+                continue;
+            }
+            SlugUpdate u = new SlugUpdate(item.getSlug(), SlugUpdate.TYPE_ENTITY);
+            u.setItem(item);
+            u.setDocTitle(docTitle);
+            u.setKnowledgeId(knowledgeID);
+            u.setSourceRef(sourceRef);
+            u.setLanguage(lang);
+            u.setSourceChunks(item.getSourceChunks());
+            u.setDocSummary(docSummary);
+            updates.add(u);
+        }
+
+        // Concepts
+        for (ExtractedItem item : extractedConcepts) {
+            if (item.getSlug().isEmpty()) {
+                continue;
+            }
+            SlugUpdate u = new SlugUpdate(item.getSlug(), SlugUpdate.TYPE_CONCEPT);
+            u.setItem(item);
+            u.setDocTitle(docTitle);
+            u.setKnowledgeId(knowledgeID);
+            u.setSourceRef(sourceRef);
+            u.setLanguage(lang);
+            u.setSourceChunks(item.getSourceChunks());
+            u.setDocSummary(docSummary);
+            updates.add(u);
+        }
+
+        // 调和旧页面集合与新的抽取结果。三种情形：
+        //   (a) oldSlug ∉ new  → "retractStale"：文档不再提及该主题，剥掉它的引用
+        //       （若这是唯一来源则可能删除页面）。用<b>新</b>正文作为撤回语境——如果 LLM
+        //       找到匹配的事实就裁掉它们，否则这次撤回近似 no-op，这没问题。
+        //   (b) oldSlug ∈ new 且是 entity/concept → reparse 换血：同时发出 "retract"
+        //       （携带文档<b>上一版</b>摘要正文作为回落信号）与常规新增。reduce 阶段看到
+        //       HasAdditions=1 + HasRetractions=1，WikiPageModifyUserPrompt 正确地告诉编辑
+        //       模型一次性"删掉旧 K 段、加上新 K 段"——给出替换语义而不是"在旧 K 上追加新 K"。
+        //   (c) oldSlug ∈ new 且是 summary 页 → 什么都不做（reduce 的 summary 分支会整体
+        //       覆盖，多发一次 retract 只会是死重）。
+        //
+        // priorContribution 是文档的<b>最后一份</b>摘要正文，在此处懒取
+        // （而不是预先装进批次上下文）。首次摄取时为空——那时 oldPageSlugs 也为空，
+        // 因此永远不会咨询它。
+        String priorContribution = batchCtx == null
+                ? "" : batchCtx.summaryContentByKnowledgeId(knowledgeID);
+
+        Set<String> newSlugSet = new LinkedHashSet<>();
+        for (DocIngestResult.PageRef ref : extractedPages) {
+            newSlugSet.add(ref.slug());
+        }
+
+        int reparseOverlap = 0;
+        int staleCount = 0;
+        if (oldPageSlugs != null) {
+            for (String oldSlug : oldPageSlugs) {
+                if (newSlugSet.contains(oldSlug)) {
+                    // 跳过 summary slug——它们会被 summary 更新整体覆盖，多发一次 retract
+                    // 在下游只会被丢弃。
+                    if (oldSlug.startsWith("summary/")) {
+                        continue;
+                    }
+                    reparseOverlap++;
+                    updates.add(SlugUpdate.retract(oldSlug, knowledgeID, docTitle,
+                            priorContribution, lang));
+                    continue;
+                }
+                staleCount++;
+                SlugUpdate u = new SlugUpdate(oldSlug, SlugUpdate.TYPE_RETRACT_STALE);
+                u.setRetractDocContent(content);
+                u.setDocTitle(docTitle);
+                u.setKnowledgeId(knowledgeID);
+                u.setLanguage(lang);
+                updates.add(u);
+            }
+        }
+
+        return new UpdateResult(updates, docSummary, docSummaryLine, reparseOverlap, staleCount);
+    }
+
+
+    private record ClassifyResult(List<ExtractedItem> entities, List<ExtractedItem> concepts,
+            Map<String, ExtractedItem> slugItems, List<DocIngestResult.PageRef> extractedPages,
+            Set<String> citedChunkSet, int uncited, String summaryContent,
+            RuntimeException summaryErr, int batchCount, int newSlugCount) {
+    }
+    private ClassifyResult classifyAndMerge(LlmChatClient chatModel, List<ChunkView> chunks,
+            String content, String lang, List<ExtractedItem> extractedEntities,
+            List<ExtractedItem> extractedConcepts, Map<String, ExtractedItem> slugItems,
+            List<String> summaryExtractedPages, String summarySlug, String slugListing,
+            boolean pass0Failed, WikiBatchContext batchCtx,
+            KnowledgeSpanPort.SpanHandle wikiSpan, String knowledgeID, String kbId) {
+        // 摘要与分块分类在 Pass 0 输出给定的前提下互相独立——并行跑。
+        // 摘要负责 wiki-link 注入；分类给每个候选 slug 挂上具体的 chunk ID。
+        final String[] summaryContentHolder = { null };
+        final RuntimeException[] summaryErrHolder = { null };
+        @SuppressWarnings("unchecked")
+        final Map<String, List<String>>[] citationsHolder = new Map[] { Map.of() };
+        @SuppressWarnings("unchecked")
+        final List<NewSlugFromCitation>[] newSlugsHolder = new List[] { List.of() };
+        final int[] batchCountHolder = { 0 };
+
+        Map<String, Object> summaryInput = new LinkedHashMap<>();
+        summaryInput.put("content_chars", content.codePointCount(0, content.length()));
+        summaryInput.put("extracted_slugs", summaryExtractedPages.size());
+        KnowledgeSpanPort.SpanHandle summarySpan = handler.spans.beginSubSpan(wikiSpan,
+                "postprocess.wiki.summary", summaryInput);
+        Map<String, Object> classifyInput = new LinkedHashMap<>();
+        classifyInput.put("chunks", chunks.size());
+        classifyInput.put("candidates", extractedEntities.size() + extractedConcepts.size());
+        // 两条调用在同一个 wikiSpan 父节点下并行跑——它们的子 span 在 trace 视图里会视觉
+        // 重叠，这正确反映了它们的墙钟并发。
+        KnowledgeSpanPort.SpanHandle classifySpan = pass0Failed
+                ? null
+                : handler.spans.beginSubSpan(wikiSpan, "postprocess.wiki.classify", classifyInput);
+
+        final boolean pass0FailedFinal = pass0Failed;
+        final String contentFinal = content;
+        final List<ExtractedItem> entitiesFinal = extractedEntities;
+        final List<ExtractedItem> conceptsFinal = extractedConcepts;
+        final String slugListingFinal = slugListing;
+        final String summarySlugFinal = summarySlug;
+        List<Runnable> parallel = new ArrayList<>(2);
+        parallel.add(() -> {
+            try {
+                String generated = handler.ingestService.generateWithTemplate(chatModel,
+                        WikiPrompts.WIKI_SUMMARY_PROMPT,
+                        Map.of(
+                                "Content", contentFinal,
+                                "Language", lang == null ? "" : lang,
+                                "ExtractedSlugs", slugListingFinal,
+                                "CustomInstructions",
+                                batchCtx == null ? "" : batchCtx.getContentInstructions(),
+                                "InstructionScope", WikiBatchConstants.INSTRUCTION_SCOPE_CONTENT));
+                summaryContentHolder[0] = generated;
+                WikiTextUtils.SummaryLine parts = WikiTextUtils.splitSummaryLine(generated);
+                Map<String, Object> summaryOut = new LinkedHashMap<>();
+                summaryOut.put("chars", generated.codePointCount(0, generated.length()));
+                summaryOut.put("summary_line", WikiTextUtils.previewText(parts.summary(), 160));
+                summaryOut.put("body_preview", WikiTextUtils.previewText(parts.content(), 320));
+                handler.spans.endSpan(summarySpan, summaryOut);
+            } catch (RuntimeException e) {
+                summaryErrHolder[0] = e;
+                handler.spans.failSpan(summarySpan, "SUMMARY_FAILED", e.getMessage(), e);
+            }
+        });
+        parallel.add(() -> {
+            // Pass 0 走回落路径时跳过引用阶段——该路径输出本身已包含改写过的 Details，
+            // 再做 chunk 引用是多余的，只会白花 LLM 调用。
+            if (pass0FailedFinal) {
+                citationsHolder[0] = new LinkedHashMap<>();
+                return;
+            }
+            String candidatesXml = WikiIngestCitePipeline.renderCandidateSlugsXML(
+                    entitiesFinal, conceptsFinal);
+            WikiIngestCitePipeline.CitationResult citationResult = handler.citePipeline.classifyChunkCitations(
+                    chatModel, candidatesXml, chunks, lang, batchCtx);
+            citationsHolder[0] = citationResult.citations();
+            newSlugsHolder[0] = citationResult.newSlugs();
+            batchCountHolder[0] = citationResult.batchCount();
+            Map<String, Object> classifyOut = new LinkedHashMap<>();
+            classifyOut.put("cited_slugs", citationResult.citations().size());
+            classifyOut.put("new_slugs", citationResult.newSlugs().size());
+            classifyOut.put("batches", citationResult.batchCount());
+            classifyOut.put("top_cited",
+                    WikiIngestPreviews.topCitedSlugs(citationResult.citations(), 8));
+            classifyOut.put("new_slugs_sample",
+                    WikiIngestPreviews.previewNewSlugs(citationResult.newSlugs(), 8));
+            handler.spans.endSpan(classifySpan, classifyOut);
+        });
+        WikiBatchSupport.fanOut(2, parallel);
+
+        // 把引用合并回条目结构（不失败；没有引用的条目简单保留 Description+Details 回落）。
+        WikiIngestCitePipeline.MergedCitations merged = WikiIngestCitePipeline.mergeCitationsIntoItems(
+                extractedEntities, extractedConcepts, citationsHolder[0], newSlugsHolder[0]);
+        extractedEntities = merged.entities();
+        extractedConcepts = merged.concepts();
+        int uncited = merged.uncited();
+        WikiIngestDedupService.Identities reclaimed = handler.dedupService.reclaimExtractedIdentities(
+                kbId, extractedEntities, extractedConcepts, batchCtx);
+        extractedEntities = reclaimed.entities();
+        extractedConcepts = reclaimed.concepts();
+
+        // 重建 slugItems，让"没能挺过合并的陈旧条目"与"引用遍发现的崭新 slug"都反映到
+        // summaryExtractedPages 的追踪里。
+        slugItems = new LinkedHashMap<>();
+        for (ExtractedItem item : extractedEntities) {
+            if (!item.getSlug().isEmpty() && !item.getName().isEmpty()) {
+                slugItems.put(item.getSlug(), item);
+            }
+        }
+        for (ExtractedItem item : extractedConcepts) {
+            if (!item.getSlug().isEmpty() && !item.getName().isEmpty()) {
+                slugItems.put(item.getSlug(), item);
+            }
+        }
+
+        // extractedPages 记录本文件物化出的每一个 wiki 页面（entities、concepts，加上下面
+        // 追加的摘要页）。slug 用于链接/撤回记账；title 保留给 trace 输出与 finalize 处理用。
+        List<DocIngestResult.PageRef> extractedPages = new ArrayList<>(slugItems.size() + 1);
+        for (Map.Entry<String, ExtractedItem> e : slugItems.entrySet()) {
+            String title = e.getValue().getName();
+            if (title.isEmpty()) {
+                title = e.getKey();
+            }
+            extractedPages.add(new DocIngestResult.PageRef(e.getKey(), title));
+        }
+
+        // 统计所有 slug 引用到的不同 chunk 数（用于日志）。
+        Set<String> citedChunkSet = WikiIngestCitePipeline.citedChunkSet(citationsHolder[0]);
+
+        return new ClassifyResult(extractedEntities, extractedConcepts, slugItems,
+                extractedPages, citedChunkSet, uncited, summaryContentHolder[0],
+                summaryErrHolder[0], batchCountHolder[0], newSlugsHolder[0].size());
+    }
+
+
 }
