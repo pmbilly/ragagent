@@ -724,10 +724,6 @@ class ArchitectureRulesTest {
             Set.of(
             "com.ragagent.datasource.service.DataSourceService",
             "com.ragagent.datasource.service.DataSourceWiring",
-            "com.ragagent.im.service.ImChannelRuntimeOps",
-            "com.ragagent.im.service.ImChannelService",
-            "com.ragagent.im.service.ImTurnOrchestrator",
-            "com.ragagent.im.service.ImSessionResolver",
             "com.ragagent.knowledge.service.EmbeddingModelAdapter",
             "com.ragagent.knowledge.service.faq.FaqBatchOps",
             "com.ragagent.knowledge.service.faq.FaqEntryCommandService",
@@ -758,7 +754,6 @@ class ArchitectureRulesTest {
             Set.of(
             "com.ragagent.datasource.service.DataSourceService",
             "com.ragagent.embedchannel.service.RedisEmbedTokenStore",
-            "com.ragagent.im.service.ImTurnOrchestrator",
             "com.ragagent.knowledge.service.management.KnowledgeService",
             "com.ragagent.knowledge.service.chunk.ChunkExtractService",
             // R4b：管线本体归位会话域后落在 service 包内——插件族依赖 langfuse 观测与具体技术

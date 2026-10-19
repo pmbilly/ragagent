@@ -2,7 +2,7 @@ package com.ragagent.im.service;
 
 import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.im.domain.ImChannelEntity;
-import com.ragagent.im.mapper.ImChannelMapper;
+import com.ragagent.im.repository.ImChannelRepository;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -33,14 +33,14 @@ public class ImChannelService {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final ImChannelMapper mapper;
+    private final ImChannelRepository repo;
     private final AgentLookup agentLookup;
     private final ObjectProvider<ImTurnOrchestrator> imTurnOrchestrator;
 
-    public ImChannelService(ImChannelMapper mapper,
+    public ImChannelService(ImChannelRepository repo,
                             AgentLookup agentLookup,
                             ObjectProvider<ImTurnOrchestrator> imTurnOrchestrator) {
-        this.mapper = mapper;
+        this.repo = repo;
         this.agentLookup = agentLookup;
         this.imTurnOrchestrator = imTurnOrchestrator;
     }
@@ -220,7 +220,7 @@ public class ImChannelService {
         beforeCreate(channel);
         channel.setCreatedAt(OffsetDateTime.now());
         channel.setUpdatedAt(OffsetDateTime.now());
-        mapper.insertChannel(channel);
+        repo.insertChannel(channel);
         notifyRuntime(channel.getId());
     }
 
@@ -229,7 +229,7 @@ public class ImChannelService {
         checkDuplicateBot(channel, channel.getId());
         beforeSave(channel);
         channel.setUpdatedAt(OffsetDateTime.now());
-        mapper.saveChannel(channel);
+        repo.saveChannel(channel);
         notifyRuntime(channel.getId());
     }
 
@@ -255,7 +255,7 @@ public class ImChannelService {
 
     /** 删除：0 行受影响 → ChannelNotFound（handler 落 500）；成功后同步运行时。 */
     public void deleteChannel(String channelId, long tenantId) {
-        int rows = mapper.softDelete(channelId, tenantId, OffsetDateTime.now());
+        int rows = repo.softDelete(channelId, tenantId, OffsetDateTime.now());
         if (rows == 0) {
             throw new ChannelNotFoundException();
         }
@@ -264,14 +264,14 @@ public class ImChannelService {
 
     /** 切换启用：取一行（无行 → handler 500）→ 取反 → 保存 → 同步运行时。 */
     public ImChannelEntity toggleChannel(String channelId, long tenantId) {
-        ImChannelEntity ch = mapper.getByIdAndTenant(channelId, tenantId);
+        ImChannelEntity ch = repo.getByIdAndTenant(channelId, tenantId);
         if (ch == null) {
             throw new ChannelNotFoundException();
         }
         ch.setEnabled(!ch.isEnabled());
         beforeSave(ch);
         ch.setUpdatedAt(OffsetDateTime.now());
-        mapper.saveChannel(ch);
+        repo.saveChannel(ch);
         notifyRuntime(channelId);
         return ch;
     }
@@ -285,11 +285,11 @@ public class ImChannelService {
     }
 
     public List<ImChannelEntity> listChannelsByAgent(String agentId, long tenantId) {
-        return mapper.listByAgent(agentId, tenantId);
+        return repo.listByAgent(agentId, tenantId);
     }
 
     public List<Map<String, Object>> listChannelsByTenant(long tenantId) {
-        return mapper.listByTenantWithAgent(tenantId,
+        return repo.listByTenantWithAgent(tenantId,
                 agentLookup.builtinAgentIds());
     }
 
@@ -315,7 +315,7 @@ public class ImChannelService {
      * @return 渠道行（仅 enabled 且 404/503 检查已过的调用点使用）
      */
     public ImChannelEntity ensureChannelForCallback(String channelId) {
-        ImChannelEntity fresh = mapper.getById(channelId);
+        ImChannelEntity fresh = repo.getById(channelId);
         if (fresh == null) {
             // 记录不存在 → 404 "channel not found"
             throw new CallbackChannelNotFoundException();
@@ -334,7 +334,7 @@ public class ImChannelService {
         if (botKey == null || botKey.isEmpty()) {
             return;
         }
-        ImChannelEntity existing = mapper.findByBotIdentity(botKey, excludeId);
+        ImChannelEntity existing = repo.findByBotIdentity(botKey, excludeId);
         if (existing == null) {
             return;
         }
@@ -372,6 +372,6 @@ public class ImChannelService {
     }
 
     public ImChannelEntity getChannelByIdAndTenant(String channelId, long tenantId) {
-        return mapper.getByIdAndTenant(channelId, tenantId);
+        return repo.getByIdAndTenant(channelId, tenantId);
     }
 }

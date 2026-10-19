@@ -11,8 +11,8 @@ import com.ragagent.contract.session.SessionView;
 import com.ragagent.contract.storage.support.Resolver;
 import com.ragagent.im.domain.ChannelSessionEntity;
 import com.ragagent.im.domain.ImChannelEntity;
-import com.ragagent.im.mapper.ChannelSessionMapper;
-import com.ragagent.im.mapper.ImChannelMapper;
+import com.ragagent.im.repository.ChannelSessionRepository;
+import com.ragagent.im.repository.ImChannelRepository;
 import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
 import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;
 import com.ragagent.im.runtime.Commands;
@@ -21,6 +21,7 @@ import com.ragagent.im.runtime.Commands.CommandRegistry;
 import com.ragagent.im.runtime.Commands.CommandResult;
 import com.ragagent.im.runtime.ImCommandSet;
 import com.ragagent.im.runtime.ImFormat;
+import com.ragagent.im.runtime.ImRedisRuntime;
 import com.ragagent.im.runtime.ImRedisStore;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
@@ -30,7 +31,6 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.redis.RedisPubSub;
-import com.ragagent.platform.redis.SpringRedisPubSub;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.web.JsonMappers;
 import jakarta.annotation.PreDestroy;
@@ -45,7 +45,6 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
@@ -69,8 +68,8 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
     static final ObjectMapper JSON = JsonMappers.lenient();
 
 
-    final ImChannelMapper channels;
-    final ChannelSessionMapper channelSessions;
+    final ImChannelRepository channels;
+    final ChannelSessionRepository channelSessions;
     final SessionQaPort sessionQaPort;
     final AgentLookup agentLookup;
     final Resolver storageResolver;
@@ -118,18 +117,17 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
         }
     }
 
-    public ImTurnOrchestrator(ImChannelMapper channels, ChannelSessionMapper channelSessions,
+    public ImTurnOrchestrator(ImChannelRepository channels, ChannelSessionRepository channelSessions,
             SessionQaPort sessionQaPort,
             EventBusFactory eventBusFactory,
             AgentLookup agentLookup,
             ObjectProvider<Resolver> storageResolver,
-            ObjectProvider<StringRedisTemplate> redisTemplates,
+            ImRedisRuntime redisRuntime,
             ObjectProvider<DocReaderParsePort> docReaders,
             ObjectProvider<KnowledgeCatalogPort> knowledgeServices,
             @Value("${im.workers:5}") int workers,
             @Value("${im.max-queue:50}") int maxQueue,
             @Value("${im.max-per-user:3}") int maxPerUser,
-            @Value("${im.redis-enabled:false}") boolean redisEnabled,
             @Value("${im.global-max-workers:0}") int globalMaxWorkers,
             @Value("${im.rate-limit-window-sec:60}") int rateLimitWindowSec,
             @Value("${im.rate-limit-max:10}") int rateLimitMax) {
@@ -144,23 +142,8 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
         this.qaRequests = new ImQaRequests(this);
         this.qaRunner = new ImQaRunner(this, eventBusFactory);
         this.attachmentPreparer = new ImAttachmentPreparer(docReaders);
-        ImRedisStore store = null;
-        RedisPubSub pubSub = null;
-        if (redisEnabled) {
-            StringRedisTemplate template = redisTemplates.getIfAvailable();
-            if (template == null) {
-                throw new IllegalStateException(
-                        "im.redis-enabled=true but no Redis connection is configured");
-            }
-            // 启动即验：配置成 Redis 却连不上时不静默退化（同 StreamManagerConfig 的口径）
-            try {
-                template.getConnectionFactory().getConnection().ping();
-            } catch (RuntimeException e) {
-                throw new IllegalStateException("failed to connect to Redis: " + e.getMessage(), e);
-            }
-            store = new ImRedisStore(template);
-            pubSub = new SpringRedisPubSub(template.getConnectionFactory());
-        }
+        ImRedisStore store = redisRuntime.store();
+        RedisPubSub pubSub = redisRuntime.pubSub();
         this.qaQueue = new QaQueue(workers, maxQueue, maxPerUser, task -> {
             QaTask t = (QaTask) task.attach();
             qaRunner.executeQARequest(t);

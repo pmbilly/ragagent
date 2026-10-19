@@ -1,7 +1,7 @@
 package com.ragagent.im.service;
 
 import com.ragagent.im.domain.ImChannelEntity;
-import com.ragagent.im.mapper.ImChannelMapper;
+import com.ragagent.im.repository.ImChannelRepository;
 import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
 import com.ragagent.im.runtime.ImRedisKeys;
 import com.ragagent.im.runtime.ImRedisStore;
@@ -45,7 +45,7 @@ final class ImChannelRuntimeOps {
     /** 非 leader 的抢锁重试间隔。 */
     private static final long LEADER_RETRY_MILLIS = 10_000L;
 
-    private final ImChannelMapper channels;
+    private final ImChannelRepository channels;
     private final Map<String, ImTurnOrchestrator.ChannelState> channelStates;
     private final QaQueue qaQueue;
     private final ImRedisStore redisStore;
@@ -65,7 +65,7 @@ final class ImChannelRuntimeOps {
     /** 订阅循环与重试调度的退出标志（停止时置位）。 */
     private final AtomicBoolean shuttingDown = new AtomicBoolean(false);
 
-    ImChannelRuntimeOps(ImChannelMapper channels, Map<String, ImTurnOrchestrator.ChannelState> channelStates,
+    ImChannelRuntimeOps(ImChannelRepository channels, Map<String, ImTurnOrchestrator.ChannelState> channelStates,
             QaQueue qaQueue, ImRedisStore redisStore, RedisPubSub redisPubSub,
             BiConsumer<IncomingMessage, String> msgHandler) {
         this.channels = channels;

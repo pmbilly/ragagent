@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-353 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+354 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -145,6 +145,7 @@
 | `:domains` | `com.ragagent.im.domain` | IM · 领域模型：ChannelSessionEntity / ImChannelEntity。 |
 | `:domains` | `com.ragagent.im.dto` | IM · 传输形状：渠道响应行。 |
 | `:domains` | `com.ragagent.im.mapper` | IM · 映射：ChannelSessionMapper / ImChannelMapper。 |
+| `:domains` | `com.ragagent.im.repository` | IM 仓储门面：渠道配置行与渠道会话映射的读写。 |
 | `:domains` | `com.ragagent.im.runtime` | IM · 运行时：AdapterInterfaces / FeishuWecomCrypt / SlackAdapterCore…。 |
 | `:domains` | `com.ragagent.im.service` | IM · 服务：ImChannelService / ImAttachmentPreparer / ImKnowledgeBridgeOps…。 |
 | `:domains` | `com.ragagent.initialization` | 初始化与能力自检域：/api/v1/initialization/* 的初始化配置、Ollama 管理、 模型连通性测试、文本抽取试验与语音识别（ASR）。 |
