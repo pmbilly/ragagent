@@ -1,6 +1,5 @@
 package com.ragagent.knowledge.support;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ragagent.contract.knowledge.KnowledgePageView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -150,10 +149,10 @@ public final class KnowledgeRowViews {
 
     /** MyBatis-Plus 分页（实体页 → 契约分页视图；null 透传）。 */
     public static KnowledgePageView pageView(
-            Page<Knowledge> p) {
+            KnowledgePage p) {
         if (p == null) {
             return null;
         }
-        return new KnowledgePageView(rowViews(p.getRecords()), p.getTotal());
+        return new KnowledgePageView(rowViews(p.items()), p.total());
     }
 }

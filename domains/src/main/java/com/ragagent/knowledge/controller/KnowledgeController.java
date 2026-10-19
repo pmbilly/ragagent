@@ -156,10 +156,10 @@ public class KnowledgeController {
         boolean folderPresent = folderPath != null;
         var result = knowledgeService.listKnowledge(
                         kbId, page, pageSize, keyword, parseStatus, fileType, folderPath, folderPresent);
-        List<KnowledgeResponse> items = result.getRecords().stream()
+        List<KnowledgeResponse> items = result.items().stream()
                 .map(KnowledgeResponse::from)
                 .toList();
-        return ResponseEntity.ok(new KnowledgeListResponse(items, page, pageSize, result.getTotal()));
+        return ResponseEntity.ok(new KnowledgeListResponse(items, page, pageSize, result.total()));
     }
 
     /** 文件夹树（结构由数据驱动，保持不透明 JSON 载荷）。 */

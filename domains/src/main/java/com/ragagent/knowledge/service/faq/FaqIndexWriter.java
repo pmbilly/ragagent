@@ -2,6 +2,7 @@ package com.ragagent.knowledge.service.faq;
 
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.contract.model.Embedder;
+import com.ragagent.contract.model.EmbeddingPort;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelRuntime;
@@ -11,7 +12,6 @@ import com.ragagent.contract.retrieval.IndexRow;
 import com.ragagent.contract.retrieval.SourceTypes;
 import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.contract.tenant.TenantStorageQuotaPort;
-import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.knowledge.config.BatchEmbedProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -20,6 +20,7 @@ import com.ragagent.knowledge.index.ChunkVectorIndexer;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.knowledge.support.EmbeddingFacts;
 import com.ragagent.platform.access.TenantContext;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class FaqIndexWriter {
     private final TenantStorageQuotaPort tenantStorage;
     private final KnowledgeVectorWrites vectorWrites;
     private final VectorIndexStore vectorStore;
-    private final EmbedderClient embedder;
+    private final EmbeddingPort embedder;
     private final ModelRuntime modelRuntimeAssembler;
     private final ModelCatalogPort modelCatalog;
     /** 批量向量化批大小（属性绑定）。 */
@@ -56,7 +57,7 @@ public class FaqIndexWriter {
                           KnowledgeVectorWrites vectorWrites,
                           VectorIndexStore vectorStore,
                           ModelCatalogPort modelCatalog,
-                          EmbedderClient embedder,
+                          EmbeddingPort embedder,
                           ModelRuntime modelRuntimeAssembler,
                           BatchEmbedProperties batchEmbedProperties) {
         this.knowledgeRepository = knowledgeRepository;
@@ -186,7 +187,7 @@ public class FaqIndexWriter {
             return;
         }
         vectorStore.deleteByChunkId(chunkIds);
-        EmbedderClient.EmbedConfig cfg = EmbedderClient.configFrom(embeddingModel);
+        var embeddingFacts = EmbeddingFacts.of(embeddingModel);
         int batchSize = ChunkVectorIndexer.embedBatchSize(batchEmbedProperties.embedSize());
         for (int from = 0; from < rows.size(); from += batchSize) {
             int to = Math.min(from + batchSize, rows.size());
@@ -197,8 +198,8 @@ public class FaqIndexWriter {
             }
             List<float[]> vectors;
             try {
-                vectors = embedder.embedBatch(cfg, texts);
-            } catch (Exception e) {
+                vectors = embedder.embed(embeddingFacts, texts);
+            } catch (RuntimeException e) {
                 throw new IllegalStateException(e.getMessage() == null ? e.toString() : e.getMessage(), e);
             }
             vectorStore.saveIndexRows(batchRows, vectors);

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.dto.KnowledgeSearchScope;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.knowledge.support.KnowledgePage;
 import com.ragagent.platform.persistence.LikeEscapes;
 import com.ragagent.platform.persistence.PageRequests;
 import java.time.OffsetDateTime;
@@ -291,6 +292,33 @@ public class KnowledgeRepository {
             Page<Knowledge> page,
             LambdaQueryWrapper<Knowledge> qw) {
         return knowledgeMapper.selectPage(page, qw);
+    }
+
+    /**
+     * 知识条目搜索分页：按标题关键字 / 解析状态 / 文件类型 / 目录路径过滤。
+     *
+     * <p>条件构造收在仓储侧，用例层只传语义参数——分页插件类型不外泄。</p>
+     */
+    public KnowledgePage searchPage(String kbId, long page, long pageSize,
+            String keyword, String parseStatus, String fileType, String folderPath, boolean folderPresent) {
+        LambdaQueryWrapper<Knowledge> qw = new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getKnowledgeBaseId, kbId)
+                .isNull(Knowledge::getDeletedAt)
+                .orderByDesc(Knowledge::getCreatedAt);
+        if (keyword != null && !keyword.isEmpty()) {
+            qw.like(Knowledge::getTitle, keyword);
+        }
+        if (parseStatus != null && !parseStatus.isEmpty()) {
+            qw.eq(Knowledge::getParseStatus, parseStatus);
+        }
+        if (fileType != null && !fileType.isEmpty()) {
+            qw.eq(Knowledge::getFileType, fileType);
+        }
+        if (folderPresent) {
+            qw.eq(Knowledge::getFolderPath, folderPath == null ? "" : folderPath);
+        }
+        Page<Knowledge> result = knowledgeMapper.selectPage(new Page<>(page, pageSize), qw);
+        return new KnowledgePage(result.getRecords(), result.getTotal());
     }
 
     /** 仅按 id 取未软删行（无租户过滤；守卫/权限解析用）。 */

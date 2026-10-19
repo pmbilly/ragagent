@@ -1,8 +1,6 @@
 package com.ragagent.knowledge.service.management;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
@@ -33,6 +31,7 @@ import com.ragagent.knowledge.service.query.KnowledgeSearchService;
 import com.ragagent.knowledge.service.query.KnowledgeSpanService;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
+import com.ragagent.knowledge.support.KnowledgePage;
 import com.ragagent.knowledge.support.KnowledgePaths;
 import com.ragagent.knowledge.support.KnowledgeRowViews;
 import com.ragagent.knowledge.support.TagViews;
@@ -368,28 +367,13 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
 
     // ── 查询 / 更新 / 删除 ────────────────────────────────────────────────
 
-    /** 真分页（page 默认 1，page_size 默认 20 上限 1000） */
-    public Page<Knowledge> listKnowledge(String kbId, long page, long pageSize,
+    /** 真分页（page 默认 1，page_size 默认 20 上限 1000）。 */
+    public KnowledgePage listKnowledge(String kbId, long page, long pageSize,
                                          String keyword, String parseStatus, String fileType,
                                          String folderPath, boolean folderPresent) {
         requireKb(kbId);
-        LambdaQueryWrapper<Knowledge> qw = new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getKnowledgeBaseId, kbId)
-                .isNull(Knowledge::getDeletedAt)
-                .orderByDesc(Knowledge::getCreatedAt);
-        if (keyword != null && !keyword.isEmpty()) {
-            qw.like(Knowledge::getTitle, keyword);
-        }
-        if (parseStatus != null && !parseStatus.isEmpty()) {
-            qw.eq(Knowledge::getParseStatus, parseStatus);
-        }
-        if (fileType != null && !fileType.isEmpty()) {
-            qw.eq(Knowledge::getFileType, fileType);
-        }
-        if (folderPresent) {
-            qw.eq(Knowledge::getFolderPath, folderPath == null ? "" : folderPath);
-        }
-        return knowledgeRepository.selectPage(new Page<>(page, pageSize), qw);
+        return knowledgeRepository.searchPage(
+                kbId, page, pageSize, keyword, parseStatus, fileType, folderPath, folderPresent);
     }
 
     public Knowledge getKnowledge(String id) {

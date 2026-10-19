@@ -18,7 +18,7 @@
 | `DocumentChunkingPort` | `DocumentChunkingAdapter` | domains | session | 域间（解耦） |
 | `EmbedSessionPort` | `EmbedSessionAdapter` | domains | embedchannel | 域间（解耦） |
 | `EmbeddingModelPort` | `EmbeddingModelAdapter` | domains | wiki | 域间（解耦） |
-| `EmbeddingPort` | `EmbedderClient` | domains | memory、retrieval-engine | 跨模块（必要） |
+| `EmbeddingPort` | `EmbedderClient` | domains | knowledge、memory、retrieval-engine | 跨模块（必要） |
 | `EntityExtractionPort` | `EntityExtractionAdapter` | model-runtime | initialization、knowledge、session | 跨模块（必要） |
 | `FileUrlPort` | `DefaultFileUrlPort` | domains | platform、session、storage | 跨模块（必要） |
 | `GlobalFileServicePort` | `GlobalFileServiceAdapter` | domains | session | 域间（解耦） |

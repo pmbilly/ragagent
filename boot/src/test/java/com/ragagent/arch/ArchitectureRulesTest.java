@@ -715,14 +715,11 @@ class ArchitectureRulesTest {
      * A16 棘轮基线：{@code ..service..} 包内仍直接依赖边界层
      * （{@code controller} / {@code mapper} / {@code task} / {@code client} / {@code channel}）的类。
      *
-     * <p>登记理由（2026-10-13 整改立项，方案 §12.1 第 1 条）：边界层由装配层与外部调用，
-     * 用例层经 repository / 端口使用外部能力。实测存量 <b>69 类</b>入基线
-     * （mapper / task / client 混合命中；controller 与 channel 已为 0）——
-     * 只许减、新增即红，存量随结构收敛批次逐域消化。</p>
+     * <p><b>已清零（2026-10-19，L36~L44c）</b>：立规时存量 69 类，按「碰到哪域归哪域」
+     * 逐域收敛——门面化（mapper → repository）、端口化（task/client → 自有接口）、
+     * 落点纠偏（适配器 → api、装配 → config）三条路走完。本规则现为零基线纯禁令。</p>
      */
-    private static final Set<String> SERVICE_BOUNDARY_BASELINE =
-            Set.of(
-            "com.ragagent.knowledge.service.faq.FaqIndexWriter");
+    private static final Set<String> SERVICE_BOUNDARY_BASELINE = Set.of();
 
     /**
      * A17 棘轮基线：{@code ..service..} 包内仍直接依赖具体技术实现
@@ -734,7 +731,6 @@ class ArchitectureRulesTest {
      */
     private static final Set<String> SERVICE_TECH_BASELINE =
             Set.of(
-            "com.ragagent.knowledge.service.management.KnowledgeService",
             // R4b：管线本体归位会话域后落在 service 包内——插件族依赖 langfuse 观测与具体技术
             // （管线本体的必要依赖，随 chatpipeline → session.service.rag 迁移登记）
             "com.ragagent.session.rag.plugin.PluginRerank",
