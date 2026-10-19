@@ -15,6 +15,7 @@ import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.knowledge.client.DocReaderClient;
+import com.ragagent.knowledge.config.KnowledgeOcrProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -62,6 +63,7 @@ class KnowledgeProcessWorkerImageWiringTest {
             fileStorage,
             extractedImageStore,
             docReader,
+            new KnowledgeOcrProperties("", 30, 60, 1),
             mock(VectorIndexStore.class),
             mock(ModelCatalogPort.class),
             mock(KnowledgeVectorWrites.class),

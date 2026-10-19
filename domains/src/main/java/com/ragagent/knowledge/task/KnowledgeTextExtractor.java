@@ -13,30 +13,35 @@ import java.util.Map;
 /**
  * 入库阶段一：取文本。
  *
- * <p>manual 直接读 {@code metadata.content}；文件经 docreader 解析，图片引用落盘并重写 URL。
- * 阶段 span 记录文件类型/名称与字符量；失败只收口 span，异常向上抛给 worker。</p>
+ * <p>manual 直接读 {@code metadata.content}；文件经 docreader 解析，图片引用落盘并重写 URL，
+ * 随后交给图片 OCR 在引用下方补文字。阶段 span 记录文件类型/名称与字符量；失败只收口 span，
+ * 异常向上抛给 worker。</p>
  */
 final class KnowledgeTextExtractor {
 
     private final TenantFileStorage fileStorage;
     private final ExtractedImageStore extractedImageStore;
     private final DocReaderClient docReader;
+    private final KnowledgeImageOcr imageOcr;
     private final SpanTracker spanTracker;
 
     KnowledgeTextExtractor(TenantFileStorage fileStorage,
             ExtractedImageStore extractedImageStore,
             DocReaderClient docReader,
+            KnowledgeImageOcr imageOcr,
             SpanTracker spanTracker) {
         this.fileStorage = fileStorage;
         this.extractedImageStore = extractedImageStore;
         this.docReader = docReader;
+        this.imageOcr = imageOcr;
         this.spanTracker = spanTracker;
     }
 
     String extract(Knowledge k, int attempt, String knowledgeId) throws Exception {
         if ("manual".equals(k.getType())) {
-            return k.getMetadata() != null && k.getMetadata().hasNonNull("content")
+            String content = k.getMetadata() != null && k.getMetadata().hasNonNull("content")
                     ? k.getMetadata().get("content").asString() : "";
+            return imageOcr.enrich(k, content, attempt, knowledgeId);
         }
         SpanTracker.SpanHandle docSpan = beginStageSpan(attempt, knowledgeId,
                 KnowledgeProcessingSpan.STAGE_DOC_READER,
@@ -59,7 +64,7 @@ final class KnowledgeTextExtractor {
             throw e;
         }
         endStageSpan(docSpan, Map.of("chars", markdown.length()));
-        return markdown;
+        return imageOcr.enrich(k, markdown, attempt, knowledgeId);
     }
 
     private SpanTracker.SpanHandle beginStageSpan(int attempt, String knowledgeId,

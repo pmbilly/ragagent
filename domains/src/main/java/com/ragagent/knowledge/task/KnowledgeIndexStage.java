@@ -113,10 +113,6 @@ final class KnowledgeIndexStage {
                 "chunks_embedded", chunks.size()));
     }
 
-    void skipMultimodal(int attempt, String knowledgeId) {
-        skipStageSpan(attempt, knowledgeId, KnowledgeProcessingSpan.STAGE_MULTIMODAL, "skipped");
-    }
-
     /** 清该知识在源 KB 命名空间下的旧图谱（失败仅告警——图里可能本来就没有这条知识）。 */
     private void deleteGraphData(String knowledgeBaseId, String knowledgeId) {
         try {

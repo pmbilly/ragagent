@@ -54,6 +54,10 @@ export DB_NAME="${DB_NAME:-$(env_value DB_NAME)}"
 # 检索引擎：未配置 = 检索关闭（问答拿不到知识库上下文，且不会报错）。
 export RETRIEVE_DRIVER="${RETRIEVE_DRIVER:-$(env_value RETRIEVE_DRIVER)}"
 
+# 入库图片 OCR（本地服务）：留空 = 关闭，行为与未接入时一致。
+export OCR_ENDPOINT="${OCR_ENDPOINT:-$(env_value OCR_ENDPOINT)}"
+export OCR_MAX_PAGES="${OCR_MAX_PAGES:-$(env_value OCR_MAX_PAGES)}"
+
 # Java 侧自有配置
 export JWT_SECRET="${JWT_SECRET:-$(env_value JWT_SECRET)}"
 export JWT_SECRET="${JWT_SECRET:-java-e2e-jwt-secret-key-0123456789abcdef}"

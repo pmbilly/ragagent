@@ -6,6 +6,7 @@ import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.client.EmbedderClient;
+import com.ragagent.knowledge.config.KnowledgeOcrProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -88,6 +89,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                                   TenantFileStorage fileStorage,
                                   ExtractedImageStore extractedImageStore,
                                   DocReaderClient docReader,
+                                  KnowledgeOcrProperties ocrProperties,
                                   VectorIndexStore vectorStore,
                                   ModelCatalogPort modelCatalog,
                                   KnowledgeVectorWrites vectorWrites,
@@ -108,7 +110,8 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         this.kbRepository = kbRepository;
         this.spanTracker = spanTracker;
         this.textExtractor = new KnowledgeTextExtractor(
-                fileStorage, extractedImageStore, docReader, spanTracker);
+                fileStorage, extractedImageStore, docReader,
+                new KnowledgeImageOcr(fileStorage, ocrProperties, spanTracker), spanTracker);
         this.chunkWriter = new KnowledgeChunkWriter(chunkRepository, spanTracker);
         this.indexStage = new KnowledgeIndexStage(
                 chunkRepository, extractedImageStore, vectorStore, modelCatalog, vectorWrites,
@@ -188,7 +191,6 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                         k, kb, knowledgeId, markdown, attempt);
                 attemptChunkIds = chunks.stream().map(Chunk::getId).toList();
                 indexStage.embedChunks(k, kb, embedConfig, chunks, knowledgeId, attempt);
-                indexStage.skipMultimodal(attempt, knowledgeId);
                 finalizingStage.finalizeProcessing(k, kb, knowledgeId, attempt, chunks);
             } catch (Exception inner) {
                 indexStage.cleanupFailedAttempt(knowledgeId, attemptChunkIds, k, kb, embedConfig);
