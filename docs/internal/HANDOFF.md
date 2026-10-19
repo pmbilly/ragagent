@@ -130,7 +130,8 @@
 ## 7. 测试与安全网
 
 - 回归网：**~4996 用例 / 1,349 契约金片**；每一步（哪怕纯移动）结束必须全绿。
-- 已知偶发（全量并发下，单独重跑即绿，勿误判回归）：`WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool` · `EvaluationContractTest.getTerminalRunsExecution` · `EmbedRateLimiterTest.redisPathSharesBudgetAcrossInstances` · Redis 瞬态族（`RedisDataSourceSyncTaskQueueTest` 等，**建议给测试侧 Lettuce 加超时/重试**，仍在 housekeeping 队列）。
+- 已知偶发（全量并发下，单独重跑即绿，勿误判回归）：`WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool` · `EvaluationContractTest.getTerminalRunsExecution` · `EmbedRateLimiterTest.redisPathSharesBudgetAcrossInstances`。
+- **Redis 瞬态族已修（2026-10-19）**：根因是 `EmbeddedRedis` 用 `ServerSocket(0)` 探端口在 `maxParallelForks` 下会撞——后到者借用先到者的实例，先到者 close 杀进程后连接全断。现改为固定端口池 + 跨进程 `FileLock`，红态探针 `EmbeddedRedisPortAllocationTest` 守着；全量连跑 5 遍 0 失败。再见到同类失败按真回归查。
 - 覆盖率：**未执行基线**（`-Pcoverage`）⇒ 本项目**不声称任何覆盖率数字**（开放项）。
 - 前端：`vue-tsc` 是最终文件集上的最后一步（`tsx --test` 只转译不查类型）。
 
@@ -352,6 +353,7 @@ boot           14 件                      →  boot
 | L38 | 2026-10-19 | **六个小域门面化**：favorite / system / model（含 usage）/ vectorstore / embedchannel / agentmanagement（含 question）各建 `repository` 门面，9 个 service 不再注入 mapper。vectorstore 的 mapper 同时更名 `VectorStoreRepository` → `VectorStoreMapper`（A11 命名对齐，为门面腾出原名）。**A16 −9、A17 −3**。 | **40 守卫** · **5030 / 0 / 4**（首轮 2 例 Redis 瞬态，隔离绿） |
 | L39 | 2026-10-19 | **IM 域门面 + Redis 运行面外提**：新增 `im/repository/ImChannelRepository`、`ChannelSessionRepository`；4 个 service 不再持有 mapper。新增 `im/runtime/ImRedisRuntime`——把 `im.redis-enabled` 判定、连接 ping 校验、`ImRedisStore`/`RedisPubSub` 创建从编排器构造体移出，编排器只取现成实例。**A16 −4、A17 −1（im 清零）**。 | **40 守卫** · **5030 / 0 / 4** |
 | L40 | 2026-10-19 | **memory 运行面外提**：`MemoryTrace`（langfuse 门面）、进程内/Redis 两个蒸馏队列、队列装配搬到 `memory/runtime`；`MemoryExtractPayload`、`MemoryExtractTaskQueue` 搬到 `memory/domain`。新增 `MemoryExtractHandler` 执行端口——队列不再认 `MemoryExtractionService` 类型（否则 runtime ↔ service 成环）；service 实现该端口并把 `LangfuseTracing.inject()` 换成 `MemoryTrace.inject()`。换锚：json-key 前缀/键级基线与快照、Redis 队列测试随实现搬包。**A17 −5（memory 清零）**。 | **40 守卫** · **5030 / 0 / 4**（首轮 1 例 Redis 瞬态，隔离绿） |
+| L41 | 2026-10-19 | **Redis 测试端口竞态修复（测试基建）**：`EmbeddedRedis` 弃 `ServerSocket(0)` 探测，改固定端口池（16390..16453）+ 跨进程 `FileLock`（同 JVM 重叠锁按占用跳过）；`close()` 改为先杀进程再关连接池。新增红态探针 `EmbeddedRedisPortAllocationTest`（4 并发实例断言端口互异）。**Redis 瞬态族移出「已知偶发」**。 | **40 守卫** · **全量连跑 5 遍（2 遍无缓存）0 失败** |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
