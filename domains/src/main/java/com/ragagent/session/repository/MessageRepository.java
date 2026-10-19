@@ -7,6 +7,7 @@ import com.ragagent.contract.memory.MemoryMessageCursor;
 import com.ragagent.contract.session.MessageArtifact;
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.contract.session.MessageImage;
+import com.ragagent.contract.session.SessionMessageView;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.persistence.LikeEscapes;
 import com.ragagent.platform.persistence.PageRequests;

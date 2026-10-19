@@ -5,7 +5,7 @@
 
 ## 统计
 
-- 域间（解耦）：**20**
+- 域间（解耦）：**21**
 - 跨模块（必要）：**10**
 
 ## 明细
@@ -28,6 +28,7 @@
 | `KnowledgeMaintenancePort` | `KnowledgeMaintenanceAdapter` | domains | websearch | 域间（解耦） |
 | `KnowledgeSpanPort` | `KnowledgeSpanAdapter` | domains | wiki | 域间（解耦） |
 | `McpToolRegistrationPort` | `McpToolRegistrationAdapter` | domains | agent-engine | 跨模块（必要） |
+| `MessageTranscriptPort` | `MessageTranscriptAdapter` | domains | memory | 域间（解耦） |
 | `ModelCatalogPort` | `ModelCatalogAdapter` | domains | evaluation、initialization、knowledge、mcp、memory、model-runtime、session、wiki | 跨模块（必要） |
 | `ModelFactsPort` | `ModelService` | domains | retrieval-engine | 跨模块（必要） |
 | `OllamaAdminPort` | `OllamaService` | model-runtime | initialization | 跨模块（必要） |

@@ -20,6 +20,8 @@ import com.ragagent.contract.model.ChatOptions;
 import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.ChatStream;
 import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.session.MessageTranscriptPort;
+import com.ragagent.contract.session.SessionMessageView;
 import com.ragagent.memory.domain.MemoryExtractPayload;
 import com.ragagent.memory.domain.MemoryExtractTaskQueue;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
@@ -30,8 +32,6 @@ import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.repository.MemoryRepository;
 import com.ragagent.memory.support.MemoryConflictException;
-import com.ragagent.session.repository.MessageRepository;
-import com.ragagent.session.repository.SessionMessageView;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ class MemoryExtractionServiceTest {
     private final MemoryRepository repo = mock(MemoryRepository.class);
     private final MemoryService memoryService = mock(MemoryService.class);
     private final MemoryVectorService vectorService = mock(MemoryVectorService.class);
-    private final MessageRepository sessionMessages = mock(MessageRepository.class);
+    private final MessageTranscriptPort sessionMessages = mock(MessageTranscriptPort.class);
     private final MemoryConsolidationService consolidation = mock(MemoryConsolidationService.class);
     @SuppressWarnings("unchecked")
     private final ObjectProvider<MemoryExtractTaskQueue> queueProvider = mock(ObjectProvider.class);

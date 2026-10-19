@@ -4,6 +4,7 @@ import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.contract.memory.MemoryMessageCursor;
+import com.ragagent.contract.session.MessageTranscriptPort;
 import com.ragagent.memory.domain.MemoryExtractHandler;
 import com.ragagent.memory.domain.MemoryExtractPayload;
 import com.ragagent.memory.domain.MemoryExtractTaskQueue;
@@ -22,7 +23,6 @@ import com.ragagent.memory.support.MemoryConflictException;
 import com.ragagent.platform.access.TenantScopes;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.session.repository.MessageRepository;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -114,7 +114,7 @@ public class MemoryExtractionService implements MemoryExtractHandler {
     final MemoryRepository repo;
     final MemoryService memoryService;
     final MemoryVectorService vectorService;
-    final MessageRepository sessionMessages;
+    final MessageTranscriptPort sessionMessages;
     final MemoryConsolidationService consolidationService;
     final ObjectProvider<MemoryExtractTaskQueue> queueProvider;
 
@@ -127,7 +127,7 @@ public class MemoryExtractionService implements MemoryExtractHandler {
     public MemoryExtractionService(MemoryRepository repo,
                                    MemoryService memoryService,
                                    MemoryVectorService vectorService,
-                                   MessageRepository sessionMessages,
+                                   MessageTranscriptPort sessionMessages,
                                    MemoryConsolidationService consolidationService,
                                    ObjectProvider<MemoryExtractTaskQueue> queueProvider) {
         this.repo = repo;

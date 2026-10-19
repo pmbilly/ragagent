@@ -21,7 +21,7 @@
 | 域 | 种类 | 文件 | 控制器 | 对外契约面 | 前端页面 |
 |---|---|---:|---:|---:|---|
 | `knowledge` | 产品能力 | 257 | 8 | 13 | `views/knowledge` |
-| `session` | 产品能力 | 187 | 8 | 2 | `views/chat` |
+| `session` | 产品能力 | 187 | 8 | 3 | `views/chat` |
 | `wiki` | 产品能力 | 166 | 1 | 1 | `views/knowledge/wiki` |
 | `memory` | 产品能力 | 89 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
 | `agenttools` | 产品能力 | 58 | — | — | `views/chat（工具结果渲染）` |
@@ -50,7 +50,7 @@
 | 域 | HTTP 入口 | 对外契约面 |
 |---|---|---|
 | `knowledge` | `ChunkController`、`ChunkerPreviewController`、`FaqController`、`KnowledgeBaseController`、`KnowledgeBaseFileProxyController`、`KnowledgeController`、`KnowledgeOperationsController`、`KnowledgeTagController` | `ChunkSearchGateway`、`DocReaderAdminPort`、`DocReaderParsePort`、`DocumentChunkingPort`、`EmbeddingModelPort`、`EmbeddingPort`、`KnowledgeBaseCatalogPort`、`KnowledgeBaseGateway`、`KnowledgeBaseSearchGateway`、`KnowledgeCatalogPort`、`KnowledgeDocumentGateway`、`KnowledgeMaintenancePort`、`KnowledgeSpanPort` |
-| `session` | `KnowledgeQaController`、`MessageController`、`MessageFileProxyController`、`MessageSuggestionController`、`SessionController`、`SessionStreamController`、`SteerController`、`TemporaryDocumentController` | `EmbedSessionPort`、`SessionQaPort` |
+| `session` | `KnowledgeQaController`、`MessageController`、`MessageFileProxyController`、`MessageSuggestionController`、`SessionController`、`SessionStreamController`、`SteerController`、`TemporaryDocumentController` | `EmbedSessionPort`、`MessageTranscriptPort`、`SessionQaPort` |
 | `wiki` | `WikiPageController` | `WikiPageOpsPort` |
 | `memory` | `MemoryController` | — |
 | `agenttools` | —（无 HTTP 面） | — |

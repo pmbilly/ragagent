@@ -1,4 +1,4 @@
-package com.ragagent.session.repository;
+package com.ragagent.contract.session;
 
 import java.time.OffsetDateTime;
 
