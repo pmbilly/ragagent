@@ -724,7 +724,6 @@ class ArchitectureRulesTest {
             Set.of(
             "com.ragagent.agentmanagement.service.AgentSuggestedQuestions",
             "com.ragagent.agentmanagement.service.CustomAgentService",
-            "com.ragagent.auth.service.TenantInvitationService",
             "com.ragagent.auth.service.TenantMemberService",
             "com.ragagent.auth.service.TenantService",
             "com.ragagent.auth.service.UserService",
@@ -769,7 +768,6 @@ class ArchitectureRulesTest {
      */
     private static final Set<String> SERVICE_TECH_BASELINE =
             Set.of(
-            "com.ragagent.auth.service.TenantInvitationService",
             "com.ragagent.auth.service.TenantMemberService",
             "com.ragagent.auth.service.TenantService",
             "com.ragagent.auth.service.UserService",

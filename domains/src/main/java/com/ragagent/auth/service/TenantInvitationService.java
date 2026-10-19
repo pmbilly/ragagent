@@ -1,17 +1,14 @@
 package com.ragagent.auth.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.auth.domain.TenantInvitation;
 import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.auth.mapper.TenantInvitationMapper;
+import com.ragagent.auth.repository.TenantInvitationRepository;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.config.AppEnvLookup;
-import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.platform.web.JsonMappers;
 import java.security.SecureRandom;
 import java.time.Duration;
@@ -59,20 +56,20 @@ public class TenantInvitationService {
     /** token 字节数：32 字节 → base64url 43 字符 */
     private static final int TOKEN_BYTES = 32;
 
-    public static final String STATUS_PENDING = "pending";
+    public static final String STATUS_PENDING = TenantInvitationRepository.STATUS_PENDING;
     public static final String STATUS_ACCEPTED = "accepted";
     public static final String STATUS_DECLINED = "declined";
     public static final String STATUS_REVOKED = "revoked";
-    public static final String STATUS_EXPIRED = "expired";
+    public static final String STATUS_EXPIRED = TenantInvitationRepository.STATUS_EXPIRED;
 
-    private final TenantInvitationMapper invitationMapper;
+    private final TenantInvitationRepository invitationRepo;
     private final TenantMemberService memberService;
     private final AuditWritePort auditWriter;
 
-    public TenantInvitationService(TenantInvitationMapper invitationMapper,
+    public TenantInvitationService(TenantInvitationRepository invitationRepo,
                                    TenantMemberService memberService,
             AuditWritePort auditWriter) {
-        this.invitationMapper = invitationMapper;
+        this.invitationRepo = invitationRepo;
         this.memberService = memberService;
         this.auditWriter = auditWriter;
     }
@@ -145,10 +142,7 @@ public class TenantInvitationService {
 
     /** 按 id 窄查询（无 sweep），找不到返回 null */
     public TenantInvitation getById(long id) {
-        return invitationMapper.selectOne(new LambdaQueryWrapper<TenantInvitation>()
-                .eq(TenantInvitation::getId, id)
-                .isNull(TenantInvitation::getDeletedAt)
-                .last("LIMIT 1"));
+        return invitationRepo.findById(id);
     }
 
     /** 租户侧邀请分页：id DESC + pending 过滤（include_terminal=false） */
@@ -163,24 +157,9 @@ public class TenantInvitationService {
         if (pageSize > 100) {
             pageSize = 100;
         }
-        // count 查询不能带 ORDER BY（H2 报 "Column ID must be in the GROUP BY list"）
-        LambdaQueryWrapper<TenantInvitation> scope = new LambdaQueryWrapper<TenantInvitation>()
-                .eq(TenantInvitation::getTenantId, tenantId)
-                .isNull(TenantInvitation::getDeletedAt);
-        if (!includeTerminal) {
-            scope.eq(TenantInvitation::getStatus, STATUS_PENDING);
-        }
-        long total = invitationMapper.selectCount(scope);
-
-        LambdaQueryWrapper<TenantInvitation> listScope = new LambdaQueryWrapper<TenantInvitation>()
-                .eq(TenantInvitation::getTenantId, tenantId)
-                .isNull(TenantInvitation::getDeletedAt)
-                .orderByDesc(TenantInvitation::getId);
-        if (!includeTerminal) {
-            listScope.eq(TenantInvitation::getStatus, STATUS_PENDING);
-        }
+        long total = invitationRepo.countTenant(tenantId, includeTerminal);
         return new InvitationPage(
-                invitationMapper.selectList(PageRequests.range(page, pageSize), listScope), total);
+                invitationRepo.listTenantPage(tenantId, includeTerminal, page, pageSize), total);
     }
 
     public record InvitationPage(List<TenantInvitation> invitations, long total) {
@@ -189,24 +168,13 @@ public class TenantInvitationService {
     /** 跨空间收件箱：id DESC，无分页 */
     public List<TenantInvitation> listByInvitee(String inviteeUserId, boolean includeTerminal) {
         sweep();
-        LambdaQueryWrapper<TenantInvitation> q = new LambdaQueryWrapper<TenantInvitation>()
-                .eq(TenantInvitation::getInviteeUserId, inviteeUserId)
-                .isNull(TenantInvitation::getDeletedAt)
-                .orderByDesc(TenantInvitation::getId);
-        if (!includeTerminal) {
-            q.eq(TenantInvitation::getStatus, STATUS_PENDING);
-        }
-        return invitationMapper.selectList(q);
+        return invitationRepo.listByInvitee(inviteeUserId, includeTerminal);
     }
 
     /** 收件箱 pending 计数 */
     public long countPendingByInvitee(String inviteeUserId) {
         sweep();
-        Long count = invitationMapper.selectCount(new LambdaQueryWrapper<TenantInvitation>()
-                .eq(TenantInvitation::getInviteeUserId, inviteeUserId)
-                .eq(TenantInvitation::getStatus, STATUS_PENDING)
-                .isNull(TenantInvitation::getDeletedAt));
-        return count == null ? 0 : count;
+        return invitationRepo.countPendingByInvitee(inviteeUserId);
     }
 
     // ── 创建 ───────────────────────────────────────────────────────────────
@@ -241,7 +209,7 @@ public class TenantInvitationService {
         OffsetDateTime dbNow = OffsetDateTime.now(ZoneOffset.UTC);
         inv.setCreatedAt(dbNow);
         inv.setUpdatedAt(dbNow);
-        invitationMapper.insert(inv);
+        invitationRepo.insert(inv);
         emitAudit(tenantId, AuditAction.INVITATION_SENT, String.valueOf(inv.getId()), inviteeUserId, inv.getRole());
         return inv;
     }
@@ -272,7 +240,7 @@ public class TenantInvitationService {
         OffsetDateTime dbNow = OffsetDateTime.now(ZoneOffset.UTC);
         inv.setCreatedAt(dbNow);
         inv.setUpdatedAt(dbNow);
-        invitationMapper.insert(inv);
+        invitationRepo.insert(inv);
         // TargetUserID 刻意为空——share-link 还没有 invitee
         emitAudit(tenantId, AuditAction.INVITATION_SENT, String.valueOf(inv.getId()), "", inv.getRole());
         return inv;
@@ -374,11 +342,7 @@ public class TenantInvitationService {
             throw TenantRbacException.invitationTokenInvalid();
         }
         sweep();
-        TenantInvitation inv = invitationMapper.selectOne(new LambdaQueryWrapper<TenantInvitation>()
-                .eq(TenantInvitation::getToken, token)
-                .eq(TenantInvitation::getStatus, STATUS_PENDING)
-                .isNull(TenantInvitation::getDeletedAt)
-                .last("LIMIT 1"));
+        TenantInvitation inv = invitationRepo.findPendingByToken(token);
         if (inv == null) {
             throw TenantRbacException.invitationTokenInvalid();
         }
@@ -429,9 +393,7 @@ public class TenantInvitationService {
 
     private void bumpAcceptedCountBestEffort(long id) {
         try {
-            int rows = invitationMapper.update(null, new LambdaUpdateWrapper<TenantInvitation>()
-                    .eq(TenantInvitation::getId, id)
-                    .setSql("accepted_count = accepted_count + 1"));
+            int rows = invitationRepo.bumpAcceptedCount(id);
             if (rows == 0) {
                 log.warn("share-link {} accepted_count bump failed: row missing", id);
             }
@@ -445,13 +407,7 @@ public class TenantInvitationService {
 
     /** pending 唯一性查询：partial unique index 保证 ≤1 行 */
     private TenantInvitation getPendingByPair(long tenantId, String inviteeUserId) {
-        return invitationMapper.selectOne(new LambdaQueryWrapper<TenantInvitation>()
-                .eq(TenantInvitation::getTenantId, tenantId)
-                .eq(TenantInvitation::getInviteeUserId, inviteeUserId)
-                .eq(TenantInvitation::getStatus, STATUS_PENDING)
-                .isNull(TenantInvitation::getDeletedAt)
-                .orderByAsc(TenantInvitation::getId)
-                .last("LIMIT 1"));
+        return invitationRepo.findPendingByPair(tenantId, inviteeUserId);
     }
 
     /**
@@ -459,14 +415,7 @@ public class TenantInvitationService {
      * 影响 0 行 = 并发点击输掉了竞态 → ErrInvitationNotPending。
      */
     private void markStatusIfPending(long id, String status) {
-        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        int rows = invitationMapper.update(null, new LambdaUpdateWrapper<TenantInvitation>()
-                .eq(TenantInvitation::getId, id)
-                .eq(TenantInvitation::getStatus, STATUS_PENDING)
-                .isNull(TenantInvitation::getDeletedAt)
-                .set(TenantInvitation::getStatus, status)
-                .set(TenantInvitation::getRespondedAt, now)
-                .set(TenantInvitation::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+        int rows = invitationRepo.markStatusIfPending(id, status);
         if (rows == 0) {
             throw TenantRbacException.invitationNotPending();
         }
@@ -501,13 +450,7 @@ public class TenantInvitationService {
      */
     private void sweep() {
         try {
-            OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-            invitationMapper.update(null, new LambdaUpdateWrapper<TenantInvitation>()
-                    .eq(TenantInvitation::getStatus, STATUS_PENDING)
-                    .lt(TenantInvitation::getExpiresAt, now)
-                    .set(TenantInvitation::getStatus, STATUS_EXPIRED)
-                    .set(TenantInvitation::getRespondedAt, now)
-                    .set(TenantInvitation::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+            invitationRepo.sweepExpired();
         } catch (RuntimeException e) {
             log.warn("tenant_invitation lazy sweep failed", e);
         }
