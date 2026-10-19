@@ -66,6 +66,9 @@ public final class QaSseOrchestrator {
     /** 每轮一个独立总线（生命周期随轮次）；经工厂端口创建，不 new 实现类。 */
     private final EventBusFactory eventBusFactory;
 
+    /** 单次 SSE 推送连接的最长存活时间；与 stop watcher 的 2 小时一致。 */
+    private static final long MAX_STREAM_DURATION_MILLIS = 2 * 60 * 60 * 1000L;
+
     public QaSseOrchestrator(StreamManager streamManager, StreamEventEmitter emitter, SessionService sessionService, MessageService messageService, SseFrameWriter sseFrameWriter, QaTurnFinalizer turnFinalizer, EventBusFactory eventBusFactory) {
         this.streamManager = streamManager;
         this.emitter = emitter;
@@ -224,9 +227,10 @@ public final class QaSseOrchestrator {
         StreamEventEmitter.ClientState client = clientGone::get;
 
         int lastOffset = 0;
+        long deadline = System.currentTimeMillis() + MAX_STREAM_DURATION_MILLIS;
         log.info("Starting pull-based SSE streaming for session={}, message={}", sessionId, assistantMessageId);
 
-        while (true) {
+        while (System.currentTimeMillis() < deadline) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -283,6 +287,12 @@ public final class QaSseOrchestrator {
                     log.info("Connection closed during event sending, stopping");
                     return;
                 }
+                if (evt.getType() == ResponseType.ERROR && evt.isDone()) {
+                    // ERROR+done 是终态元素：错误帧已由 emitStreamEvent 写出，不再轮询
+                    log.info("Agent stream terminated with error, session={}, message={}",
+                            sessionId, assistantMessageId);
+                    return;
+                }
             }
             lastOffset = batch.nextOffset();
             if (streamCompleted) {
@@ -291,6 +301,12 @@ public final class QaSseOrchestrator {
                     long titleDeadline = System.currentTimeMillis() + 3000;
                     titleWait:
                     while (System.currentTimeMillis() < titleDeadline) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            break titleWait;
+                        }
                         StreamBatch titleBatch;
                         try {
                             titleBatch = streamManager.getEvents(sessionId, assistantMessageId, lastOffset);
@@ -317,6 +333,7 @@ public final class QaSseOrchestrator {
                 return;
             }
         }
+        log.warn("Agent stream polling exceeded max duration, session={}, message={}", sessionId, assistantMessageId);
     }
     private static final Set<String> QUICK_ANSWER_TIMELINE_TOOLS = Set.of(
             "query_understand", "knowledge_search", "attachment_parsing", "image_analysis");

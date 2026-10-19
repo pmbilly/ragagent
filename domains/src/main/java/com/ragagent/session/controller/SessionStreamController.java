@@ -82,6 +82,9 @@ public class SessionStreamController {
     /** 轮询间隔（毫秒）。 */
     private static final long POLL_INTERVAL_MILLIS = 100L;
 
+    /** 单次续传连接的最长存活时间；与 stop watcher 的 2 小时一致。 */
+    private static final long MAX_STREAM_DURATION_MILLIS = 2 * 60 * 60 * 1000L;
+
     private final SessionService sessionService;
     private final MessageService messageService;
     private final StreamManager streamManager;
@@ -269,7 +272,8 @@ public class SessionStreamController {
 
         // 继续轮询新事件
         int currentOffset = batch.nextOffset();
-        while (true) {
+        long deadline = System.currentTimeMillis() + MAX_STREAM_DURATION_MILLIS;
+        while (System.currentTimeMillis() < deadline) {
             try {
                 Thread.sleep(POLL_INTERVAL_MILLIS);
             } catch (InterruptedException e) {
@@ -302,6 +306,12 @@ public class SessionStreamController {
                         completedNow = true;
                     }
                     emitter.emitStreamEvent(new ServletSseSink(response), evt, requestId, resourceRewriter, client);
+                    if (evt.getType() == ResponseType.ERROR && evt.isDone()) {
+                        // ERROR+done 是终态元素：错误帧已写出，不再轮询
+                        log.info("Stream terminated with error, session ID: {}, message ID: {}",
+                                sessionId, messageId);
+                        return;
+                    }
                 }
             } catch (IOException e) {
                 clientGone.set(true);
@@ -316,6 +326,12 @@ public class SessionStreamController {
                 SseContract.sendCompletionEvent(response, requestId);
                 return;
             }
+        }
+        log.warn("Stream polling exceeded max duration, session ID: {}, message ID: {}", sessionId, messageId);
+        try {
+            emitter.flushHeldStreamContent(new ServletSseSink(response), requestId, resourceRewriter, client);
+        } catch (IOException ignored) {
+            // 客户端已断开
         }
     }
 

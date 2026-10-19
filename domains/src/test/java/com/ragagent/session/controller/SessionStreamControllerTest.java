@@ -7,6 +7,8 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.auth.service.TenantService;
@@ -266,6 +268,32 @@ class SessionStreamControllerTest {
 
         assertThat(body).contains("part1").contains("part2").contains("\"complete\"");
         assertThat(body.indexOf("part1")).isLessThan(body.indexOf("part2"));
+    }
+
+    /**
+     * 未完成的流中途收到 {@code error}+done：错误帧写出后**立即收尾**，不再读后续 offset。
+     * 修复前会当作普通事件继续轮询，直到客户端断开——HTTP 线程被永久占用。
+     */
+    @Test
+    void liveStreamStopsOnErrorDone() throws Exception {
+        givenSession();
+        givenMessage(REQUEST_ID);
+        when(streamManager.getEvents(anyString(), anyString(), eq(0)))
+                .thenReturn(new StreamBatch(new ArrayList<>(
+                        List.of(event("e1", ResponseType.ANSWER, "part1", false))), 1));
+        when(streamManager.getEvents(anyString(), anyString(), eq(1)))
+                .thenReturn(new StreamBatch(new ArrayList<>(
+                        List.of(event("e2", ResponseType.ERROR, "boom", true))), 2));
+        // 修复前会继续读 offset=2（拿到 complete 才收尾）；修复后不应触碰
+        when(streamManager.getEvents(anyString(), anyString(), eq(2)))
+                .thenReturn(new StreamBatch(new ArrayList<>(
+                        List.of(event("e3", ResponseType.COMPLETE, "", true))), 3));
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        String body = invoke(MESSAGE_ID, null, response);
+
+        assertThat(body).contains("boom");
+        verify(streamManager, never()).getEvents(anyString(), anyString(), eq(2));
     }
 
     // ── 辅助函数 ────────────────────────────────────────────────────────────
