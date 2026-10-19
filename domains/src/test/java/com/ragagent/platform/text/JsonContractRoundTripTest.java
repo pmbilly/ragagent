@@ -5,7 +5,7 @@ import static com.ragagent.fixtures.JsonRoundTrip.assertRoundTrips;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
+import com.ragagent.auth.apikey.dto.TenantAPIKeyProjections;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.InvitationLookupResponse;
 import com.ragagent.auth.dto.OidcAuthUrlResponse;

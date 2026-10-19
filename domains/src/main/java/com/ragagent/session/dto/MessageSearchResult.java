@@ -1,4 +1,4 @@
-package com.ragagent.session.domain.message;
+package com.ragagent.session.dto;
 
 import java.util.List;
 

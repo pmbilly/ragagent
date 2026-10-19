@@ -1,5 +1,6 @@
-package com.ragagent.auth.apikey.domain;
+package com.ragagent.auth.apikey.dto;
 
+import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.apikey.APIKeyScopeType;
 import com.ragagent.contract.apikey.TenantAPIKeyResponse;

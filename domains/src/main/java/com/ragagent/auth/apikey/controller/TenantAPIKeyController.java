@@ -1,8 +1,8 @@
 package com.ragagent.auth.apikey.controller;
 
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyRequest;
+import com.ragagent.auth.apikey.dto.TenantAPIKeyProjections;
+import com.ragagent.auth.apikey.dto.TenantAPIKeyRequest;
 import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.auth.apikey.service.TenantAPIKeyValidator;

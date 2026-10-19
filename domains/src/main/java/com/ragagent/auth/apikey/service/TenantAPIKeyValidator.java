@@ -1,7 +1,7 @@
 package com.ragagent.auth.apikey.service;
 
 
-import com.ragagent.auth.apikey.domain.TenantAPIKeyRequest;
+import com.ragagent.auth.apikey.dto.TenantAPIKeyRequest;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;

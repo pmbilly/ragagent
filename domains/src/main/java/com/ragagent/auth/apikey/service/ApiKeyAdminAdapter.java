@@ -1,7 +1,7 @@
 package com.ragagent.auth.apikey.service;
 
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
+import com.ragagent.auth.apikey.dto.TenantAPIKeyProjections;
 import com.ragagent.contract.apikey.APIKeyScopeType;
 import com.ragagent.contract.apikey.TenantAPIKeyCreateResponse;
 import com.ragagent.contract.apikey.TenantAPIKeyResponse;

@@ -1,14 +1,15 @@
 package com.ragagent.session.controller;
 
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.session.MessageView;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.session.conversation.MessageHistoryService;
 import com.ragagent.session.conversation.MessageService;
-import com.ragagent.session.domain.ChatHistoryKbStats;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.message.MessageSearchResult;
+import com.ragagent.session.dto.ChatHistoryKbStats;
+import com.ragagent.session.dto.MessageSearchResult;
+import com.ragagent.session.dto.MessageViewMapper;
 import com.ragagent.session.dto.SearchMessagesRequest;
 import com.ragagent.session.support.MessageNotFoundException;
 import com.ragagent.session.support.SessionNotFoundException;
@@ -74,14 +75,15 @@ public class MessageController {
      * {@code SanitizeForLog}。</p>
      */
     @GetMapping("/api/v1/messages/{sessionId}/load")
-    public ResponseEntity<List<Message>> loadMessages(
+    public ResponseEntity<List<MessageView>> loadMessages(
             @PathVariable("sessionId") String sessionId,
             @RequestParam(name = "limit", required = false) String limit,
             @RequestParam(name = "beforeTime", required = false) String beforeTime,
             @RequestParam(name = "resourceUrls", required = false) String resourceUrls) {
         // 解析/消毒/引用重写在 MessageHistoryService（HTTP 与 embed 委托面共用）
-        return ResponseEntity.ok(
-                messageHistory.loadMessages(sessionId, limit, beforeTime, resourceUrls));
+        return ResponseEntity.ok(messageHistory.loadMessages(
+                        sessionId, limit, beforeTime, resourceUrls).stream()
+                .map(MessageViewMapper::from).toList());
     }
 
     // ── 删除消息 ──

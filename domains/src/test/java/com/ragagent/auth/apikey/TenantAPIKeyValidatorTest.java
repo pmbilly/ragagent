@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.ragagent.auth.apikey.domain.TenantAPIKeyRequest;
+import com.ragagent.auth.apikey.dto.TenantAPIKeyRequest;
 import com.ragagent.auth.apikey.service.TenantAPIKeyValidator;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;

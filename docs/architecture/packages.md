@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-332 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+333 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -77,6 +77,7 @@
 | `:domains` | `com.ragagent.auth.apikey.controller` | apikey · HTTP 层：TenantAPIKeyController。 |
 | `:domains` | `com.ragagent.auth.apikey.controller.filter` | API Key 过滤器面（由 auth.apikey.filter 迁入 apikey.controller.filter，对齐方案）： 鉴权通道与网关拦截、路由授权与策略、范围清理与文件服务豁免、主体拒绝（9 类）。 |
 | `:domains` | `com.ragagent.auth.apikey.domain` | apikey · 领域模型：APIKeyStringListTypeHandler / APIKeyRawJsonbTypeHandler / TenantAPIKeyProjections…。 |
+| `:domains` | `com.ragagent.auth.apikey.dto` | 租户 API Key · 传输形状：请求体与实体到响应的投影。 |
 | `:domains` | `com.ragagent.auth.apikey.mapper` | apikey · 映射：TenantAPIKeyRepository / TenantAPIKeyMapper / TenantAPIKeyNotFoundException。 |
 | `:domains` | `com.ragagent.auth.apikey.service` | apikey · 服务：TenantAPIKeyService / ApiKeyAdminAdapter / TenantAPIKeyBootstrap…。 |
 | `:domains` | `com.ragagent.auth.config` | 认证 · 配置：JwtProperties。 |

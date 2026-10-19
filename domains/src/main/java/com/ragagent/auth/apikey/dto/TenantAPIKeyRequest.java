@@ -1,4 +1,4 @@
-package com.ragagent.auth.apikey.domain;
+package com.ragagent.auth.apikey.dto;
 
 import java.util.List;
 

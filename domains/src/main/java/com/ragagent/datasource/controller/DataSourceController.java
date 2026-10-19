@@ -6,10 +6,9 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.datasource.catalog.ConnectorCatalog;
 import com.ragagent.datasource.catalog.ConnectorMetadata;
-import com.ragagent.datasource.domain.DataSource;
-import com.ragagent.datasource.domain.Resource;
-import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.dto.DataSourceResponse;
+import com.ragagent.datasource.dto.SyncLogResponse;
+import com.ragagent.datasource.service.DataSourceReadService;
 import com.ragagent.datasource.service.DataSourceService;
 import com.ragagent.datasource.service.KnowledgeBridge;
 import com.ragagent.platform.access.TenantContext;
@@ -30,6 +29,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -72,10 +72,13 @@ public class DataSourceController {
     static final int MAX_LIST_PAGE_SIZE = 100;
 
     private final DataSourceService service;
+    private final DataSourceReadService readService;
     private final KnowledgeBaseOwnerGuard kbGuard;
 
-    public DataSourceController(DataSourceService service, KnowledgeBaseOwnerGuard kbGuard) {
+    public DataSourceController(DataSourceService service, DataSourceReadService readService,
+                                KnowledgeBaseOwnerGuard kbGuard) {
         this.service = service;
+        this.readService = readService;
         this.kbGuard = kbGuard;
     }
 
@@ -108,22 +111,21 @@ public class DataSourceController {
         if (tenantId == null || tenantId == 0L) {
             throw BizException.unauthorized( "unauthorized: workspace context missing");
         }
-        DataSource req = parseDataSource(rawBody);
+        JsonNode req = parseBody(rawBody);
         if (req == null) {
             throw BizException.badRequest( "invalid request");
         }
-        ResponseEntity<?> kbError = kbGuard.check(tenantId, req.getKnowledgeBaseId());
+        ResponseEntity<?> kbError = kbGuard.check(
+                tenantId, req.path("knowledgeBaseId").asString(""));
         if (kbError != null) {
             return kbError;
         }
-        req.setTenantId(tenantId);
-        DataSource ds;
         try {
-            ds = service.createDataSource(req);
+            return ResponseEntity.status(201)
+                    .body(readService.create(req, tenantId));
         } catch (RuntimeException e) {
             throw BizException.badRequest( e.getMessage());
         }
-        return ResponseEntity.status(201).body(DataSourceResponse.from(ds));
     }
 
     /** 查询单个数据源。 */
@@ -133,8 +135,8 @@ public class DataSourceController {
         if (tenantId == null || tenantId == 0L) {
             throw BizException.unauthorized( "unauthorized");
         }
-        Owned owned = ownDataSource(tenantId, id);
-        return ResponseEntity.ok(DataSourceResponse.from(owned.ds()));
+        DataSourceResponse owned = ownDataSource(tenantId, id);
+        return ResponseEntity.ok(owned);
     }
 
     /**
@@ -155,17 +157,11 @@ public class DataSourceController {
         if (kbError != null) {
             return kbError;
         }
-        List<DataSource> dataSources;
         try {
-            dataSources = service.listDataSources(kb);
+            return ResponseEntity.ok(readService.list(kb));
         } catch (RuntimeException e) {
             throw BizException.internal( "failed to list data sources");
         }
-        List<DataSourceResponse> out = new ArrayList<>();
-        for (DataSource ds : dataSources) {
-            out.add(DataSourceResponse.from(ds));
-        }
-        return ResponseEntity.ok(out);
     }
 
     /**
@@ -184,21 +180,17 @@ public class DataSourceController {
         if (tenantId == null || tenantId == 0L) {
             throw BizException.unauthorized( "unauthorized");
         }
-        DataSource req = parseDataSource(rawBody);
+        JsonNode req = parseBody(rawBody);
         if (req == null) {
             throw BizException.badRequest( "invalid request");
         }
-        Owned owned = ownDataSource(tenantId, id);
-        req.setId(id);
-        req.setTenantId(owned.ds().getTenantId());
-        req.setKnowledgeBaseId(owned.ds().getKnowledgeBaseId());
-        DataSource ds;
+        DataSourceResponse owned = ownDataSource(tenantId, id);
         try {
-            ds = service.updateDataSource(req);
+            return ResponseEntity.ok(readService.update(
+                    id, req, tenantId, owned.getKnowledgeBaseId()));
         } catch (RuntimeException e) {
             throw BizException.badRequest( e.getMessage());
         }
-        return ResponseEntity.ok(DataSourceResponse.from(ds));
     }
 
     /** 删除数据源：成功回 200 + {@link ApiResponse} 外壳（204 不使用）。 */
@@ -286,13 +278,12 @@ public class DataSourceController {
             throw BizException.unauthorized( "unauthorized");
         }
         ownDataSource(tenantId, id);
-        List<Resource> resources;
         try {
-            resources = service.listAvailableResources(id, parentId == null ? "" : parentId);
+            return ResponseEntity.ok(readService.resources(
+                    id, parentId == null ? "" : parentId));
         } catch (RuntimeException e) {
             throw BizException.badRequest( e.getMessage());
         }
-        return ResponseEntity.ok(resources == null ? new ArrayList<Resource>() : resources);
     }
 
     /**
@@ -348,13 +339,11 @@ public class DataSourceController {
             throw BizException.unauthorized( "unauthorized");
         }
         ownDataSource(tenantId, id);
-        SyncLog syncLog;
         try {
-            syncLog = service.manualSync(id);
+            return ResponseEntity.ok(readService.manualSync(id));
         } catch (RuntimeException e) {
             throw BizException.badRequest( e.getMessage());
         }
-        return ResponseEntity.ok(syncLog);
     }
 
     /** 暂停数据源。 */
@@ -424,13 +413,11 @@ public class DataSourceController {
             }
         }
 
-        List<SyncLog> logs;
         try {
-            logs = service.getSyncLogs(id, limitValue, offsetValue);
+            return ResponseEntity.ok(readService.syncLogs(id, limitValue, offsetValue));
         } catch (RuntimeException e) {
             throw BizException.badRequest( e.getMessage());
         }
-        return ResponseEntity.ok(logs == null ? new ArrayList<SyncLog>() : logs);
     }
 
     /**
@@ -447,20 +434,17 @@ public class DataSourceController {
         if (tenantId == null || tenantId == 0L) {
             throw BizException.unauthorized( "unauthorized");
         }
-        SyncLog syncLog;
+        SyncLogResponse syncLog;
         try {
-            syncLog = service.getSyncLog(logId);
+            syncLog = readService.syncLog(logId);
         } catch (RuntimeException e) {
             throw BizException.notFound( "sync log not found");
         }
-        ownDataSource(tenantId, syncLog.getDataSourceId());
+        ownDataSource(tenantId, syncLog.dataSourceId());
         return ResponseEntity.ok(syncLog);
     }
 
     // ── 归属守卫 ──
-
-    private record Owned(DataSource ds) {
-    }
 
     /**
      * 归属判定：
@@ -471,15 +455,15 @@ public class DataSourceController {
      * {@code BizException}（API-Key 白名单拒绝），把它一起 catch 成 404
      * 会把 403 变成 404——这是"一个 id 能不能用来探测存在性"的实质区别。</p>
      */
-    private Owned ownDataSource(long tenantId, String id) {
-        DataSource ds;
+    private DataSourceResponse ownDataSource(long tenantId, String id) {
+        DataSourceResponse ds;
         try {
-            ds = service.getDataSource(id);
+            ds = readService.get(id);
         } catch (RuntimeException e) {
             throw new BizException(AppError.ofHttpStatus(404, "data source not found"));
         }
         kbGuard.check(tenantId, ds.getKnowledgeBaseId());
-        return new Owned(ds);
+        return ds;
     }
 
     // ── 工具 ──
@@ -489,12 +473,12 @@ public class DataSourceController {
      * {@code invalid request}（本类的 handler 只用这一句，不像凭据那个控制器会带上
      * 解析器原文）。
      */
-    private static DataSource parseDataSource(String rawBody) {
+    private static JsonNode parseBody(String rawBody) {
         if (rawBody == null || rawBody.isBlank()) {
             return null;
         }
         try {
-            return MAPPER.readValue(rawBody, DataSource.class);
+            return MAPPER.readTree(rawBody);
         } catch (Exception e) {
             return null;
         }

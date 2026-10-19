@@ -4,8 +4,7 @@ import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.contract.knowledge.KnowledgeParseStatus;
 import com.ragagent.knowledge.dto.BatchDeleteRequest;
 import com.ragagent.knowledge.dto.KnowledgeSearchScope;
 import com.ragagent.knowledge.dto.chunk.BatchReparseRequest;
@@ -161,7 +160,7 @@ public class KnowledgeOperationsController {
         } else {
             // updates 非空（@NotEmpty 已保证）：取首条 knowledge 推导授权 KB（单键确定性一致）
             String firstKnowledgeId = req.updates().keySet().iterator().next();
-            Knowledge k = guards.resolveKnowledgeHandlerLevel(LogSanitizer.sanitize(firstKnowledgeId), true);
+            var k = guards.resolveKnowledgeHandlerLevel(LogSanitizer.sanitize(firstKnowledgeId), true);
             authorizedKbId = k.getKnowledgeBaseId();
         }
         guards.batchAccessChecks(authorizedKbId);
@@ -181,11 +180,11 @@ public class KnowledgeOperationsController {
         }
         List<String> ids = guards.requireBatchIds(req.ids(), "ids");
         guards.batchAccessChecks(kbId);
-        List<Knowledge> rows = knowledgeService.getKnowledgeBatch(KnowledgeRouteGuards.tenantId(), ids);
+        var rows = knowledgeService.getKnowledgeBatch(KnowledgeRouteGuards.tenantId(), ids);
         if (rows.size() != ids.size()) {
             throw new BizException(AppError.badRequest("One or more knowledge entries not found"));
         }
-        for (Knowledge k : rows) {
+        for (var k : rows) {
             guards.rejectMoving(k);
             if (!k.getKnowledgeBaseId().equals(kbId)) {
                 throw new BizException(AppError.badRequest("Knowledge " + k.getId()
@@ -208,11 +207,11 @@ public class KnowledgeOperationsController {
         String kbId = LogSanitizer.sanitize(parsed.kbId());
         List<String> ids = parsed.ids();
         guards.batchAccessChecks(kbId);
-        List<Knowledge> rows = knowledgeService.getKnowledgeBatch(KnowledgeRouteGuards.tenantId(), ids);
+        var rows = knowledgeService.getKnowledgeBatch(KnowledgeRouteGuards.tenantId(), ids);
         if (rows.size() != ids.size()) {
             throw new BizException(AppError.badRequest("some knowledge entries were not found"));
         }
-        for (Knowledge k : rows) {
+        for (var k : rows) {
             guards.rejectMoving(k);
             if (!k.getKnowledgeBaseId().equals(kbId)) {
                 throw new BizException(AppError.badRequest("Knowledge " + k.getId()
@@ -265,7 +264,7 @@ public class KnowledgeOperationsController {
             @PathVariable("id") String id,
             @Valid @NonNullBody @RequestBody RenameFolderRequest req) {
         String kbId = LogSanitizer.sanitize(id);
-        KnowledgeBase routeKb = knowledgeService.findKb(kbId);
+        var routeKb = knowledgeService.findKb(kbId);
         if (routeKb != null) {
             guards.requireOwnedKb(routeKb);
         }
@@ -294,7 +293,7 @@ public class KnowledgeOperationsController {
         TenantAPIKeyScope.authorizeKnowledgeBases(
                 List.of(sourceKbId, targetKbId));
         // 源库：存在性（404 大写 S）→ 租户（403）→ ownership（信封）；目标库同链
-        KnowledgeBase sourceKb = knowledgeService.findKb(sourceKbId);
+        var sourceKb = knowledgeService.findKb(sourceKbId);
         if (sourceKb == null) {
             throw new BizException(AppError.notFound("Source knowledge base not found"));
         }
@@ -302,7 +301,7 @@ public class KnowledgeOperationsController {
             throw new BizException(AppError.forbidden("No permission to access source knowledge base"));
         }
         guards.batchAccessChecks(sourceKb.getId());
-        KnowledgeBase targetKb = knowledgeService.findKb(targetKbId);
+        var targetKb = knowledgeService.findKb(targetKbId);
         if (targetKb == null) {
             throw new BizException(AppError.notFound("Target knowledge base not found"));
         }
@@ -325,7 +324,7 @@ public class KnowledgeOperationsController {
         }
         List<String> uniqueIds = new ArrayList<>(seen);
         for (String kId : uniqueIds) {
-            Knowledge k = knowledgeService.getKnowledgeInTenant(callerTenant, kId);
+            var k = knowledgeService.getKnowledgeInTenant(callerTenant, kId);
             if (k == null) {
                 throw new BizException(AppError.badRequest("Knowledge item " + kId + " not found"));
             }
@@ -333,7 +332,7 @@ public class KnowledgeOperationsController {
                 throw new BizException(AppError.badRequest(
                         "Knowledge item " + kId + " does not belong to the source knowledge base"));
             }
-            if (!Knowledge.PARSE_COMPLETED.equals(k.getParseStatus())) {
+            if (!KnowledgeParseStatus.PARSE_COMPLETED.equals(k.getParseStatus())) {
                 throw new BizException(AppError.badRequest("Knowledge item " + kId
                         + " is not in completed status (current: " + k.getParseStatus() + ")"));
             }
