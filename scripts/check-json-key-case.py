@@ -286,7 +286,7 @@ BASELINE: dict[str, set[str]] = {
     # span 观测面（同本文件既有条目）
     'session/service/SessionKnowledgeQaService.java': {'error_type', 'event_type', 'knowledge_base_ids', 'search_targets', 'total_stages'},
     # 队列任务 span 载荷（观测面；同名键在别处是 DB 列名，此处不是）
-    'wiki/service/ingest/WikiIngestTaskRunner.java': {'knowledge_base_id'},
+    'wiki/repository/ingest/WikiIngestTaskRunner.java': {'knowledge_base_id'},
     'wiki/service/page/NewSlugFromCitation.java': {'source_chunks'},
 }
 

@@ -3,7 +3,7 @@ package com.ragagent.wiki.service.ingest;
 /**
  * 批次执行 / 分块引用 / 去重 / 目录规划各子流程的常量。
  *
- * <p><b>为什么单独一个常量类而不塞进 {@link WikiIngestConstants}</b>：那边已冻结
+ * <p><b>为什么单独一个常量类而不塞进 {@code WikiIngestConstants}</b>：那边已冻结
  * wiki ingest 主流程的常量，本类承载各子流程的常量，职责分开、互不牵动。</p>
  */
 public final class WikiBatchConstants {

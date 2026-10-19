@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.ragagent.TestSchema;
 import com.ragagent.wiki.domain.TaskDeadLetter;
 import com.ragagent.wiki.domain.TaskPendingOp;
-import com.ragagent.wiki.service.ingest.WikiIngestConstants;
+import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

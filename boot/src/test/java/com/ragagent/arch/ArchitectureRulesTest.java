@@ -821,13 +821,7 @@ class ArchitectureRulesTest {
             "com.ragagent.session.service.SessionKnowledgeQaService",
             "com.ragagent.system.service.SystemSettingService",
             "com.ragagent.websearch.service.WebSearchTempKbStateService",
-            "com.ragagent.wiki.service.ingest.RedisWikiDeletedTombstoneStore",
-            "com.ragagent.wiki.service.ingest.RedisWikiFinalizeLock",
-            "com.ragagent.wiki.service.ingest.RedisWikiIdentityClaimStore",
-            "com.ragagent.wiki.service.ingest.RedisWikiInflightLimiter",
-            "com.ragagent.wiki.service.ingest.RedisWikiIngestTaskQueue",
             "com.ragagent.wiki.service.ingest.WikiIngestEnqueueOps",
-            "com.ragagent.wiki.service.ingest.WikiIngestTaskRunner",
             "com.ragagent.wiki.service.page.RedisWikiSlugLock");
 
     /** service 层判据：包名任一段等于 {@code service}（对齐 ArchUnit {@code ..service..} 语义）。 */

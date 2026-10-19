@@ -2,6 +2,7 @@ package com.ragagent.wiki.service.ingest;
 
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.wiki.SlugUpdate;
+import com.ragagent.wiki.repository.ingest.WikiDeletedTombstoneStore;
 import com.ragagent.wiki.service.WikiImageEnricher;
 import java.util.ArrayList;
 import java.util.List;

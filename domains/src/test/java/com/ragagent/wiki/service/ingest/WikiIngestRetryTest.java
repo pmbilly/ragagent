@@ -2,6 +2,7 @@ package com.ragagent.wiki.service.ingest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.wiki.service.WikiLlmRetryPolicy;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

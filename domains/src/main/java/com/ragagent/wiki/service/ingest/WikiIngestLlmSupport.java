@@ -10,6 +10,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.concurrent.SingleFlight;
 import com.ragagent.platform.prompt.PromptFingerprints;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.wiki.prompt.WikiPromptTemplate;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.wiki.service.WikiLlmCallMetadata;

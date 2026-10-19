@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-337 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+339 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -273,15 +273,17 @@
 | `:domains` | `com.ragagent.wiki.domain.folder` | wiki 文件夹面（拆自 wiki.domain，对齐方案）：WikiFolder 与其创建/更新/列表请求-响应、冲突与"非空""不存在"异常。 |
 | `:domains` | `com.ragagent.wiki.domain.graph` | wiki 链接图面（拆自 wiki.domain）：WikiGraph（页面入链/出链视图）。 |
 | `:domains` | `com.ragagent.wiki.domain.index` | wiki 索引面（拆自 wiki.domain）：WikiIndex / WikiIndexEntry（目录树条目）与 WikiCategoryPaths（分类路径规范化）。 |
+| `:domains` | `com.ragagent.wiki.domain.ingest` | ingest 领域形状与跨层端口：任务载荷（WikiIngestTask / WikiIngestPayload）、 finalize 变更行、超时常量，以及队列侧需要的槽位收尾端口。 |
 | `:domains` | `com.ragagent.wiki.domain.issue` | wiki 巡检问题面（拆自 wiki.domain）：WikiLintIssue / WikiLintReport（lint 单条问题与汇总报告）。 |
 | `:domains` | `com.ragagent.wiki.domain.page` | wiki 页面面（拆自 wiki.domain）：WikiPage 与页面修订、列表/移动/回滚/裁剪请求-响应、冲突与"不存在"异常，以及页面统计 WikiStats。 |
 | `:domains` | `com.ragagent.wiki.mapper` | wiki 的 MyBatis-Plus 接口（@MapperScan 扫描范围内）。 |
 | `:domains` | `com.ragagent.wiki.prompt` | wiki 的提示词模板目录与渲染支撑。 |
 | `:domains` | `com.ragagent.wiki.repository` | 仓储门面层：把 mapper 的原子操作组合成页面/文件夹级的读写契约，并集中承载软删、 版本冲突与 PG 方言分支。 |
+| `:domains` | `com.ragagent.wiki.repository.ingest` | wiki 摄取的存储与并发协调：任务队列、finalize 锁、身份认领、在途限流、删除墓碑。 |
 | `:domains` | `com.ragagent.wiki.service` | wiki 用例层根包：**跨切面端口与 LLM/提示词适配**——分块清洗（ com.ragagent.wiki.service.WikiChunkCleaner + 缺省实现）、图片富化、知识收尾、 |
 | `:domains` | `com.ragagent.wiki.service.ingest` | wiki 摄取管线：批量/单篇入库的门面与协作者 （com.ragagent.wiki.service.ingest.WikiIngestService、 com.ragagent.wiki.serv |
 | `:domains` | `com.ragagent.wiki.service.ingest.graph` | wiki 摄取·链接图面（拆自 wiki.service.ingest，对齐方案 的 service.ingest.graph/）： WikiGraphCalculator——从页面/引用计算链接图（入链、出链、孤儿）。 |
-| `:domains` | `com.ragagent.wiki.service.ingest.support` | wiki 摄取 · 支撑与 SPI：任务/队列/锁/限流/去重的契约、批上下文与无状态工具 （WikiBatchContext、WikiCleanupScope、WikiIngestPreviews 等）。 |
+| `:domains` | `com.ragagent.wiki.service.ingest.support` | wiki 摄取 · 支撑：批上下文、去重工具与预览等无状态叶子类型 （WikiBatchContext、WikiCleanupScope、WikiIngestPreviews 等）。 |
 | `:domains` | `com.ragagent.wiki.service.page` | wiki **页面**面：页面服务（接口门面 + 实现）、文件夹/视图支撑、链接与 lint （com.ragagent.wiki.service.page.WikiLinkify、WikiCross |
 | `:model-runtime` | `com.ragagent.embedding` | 嵌入向量 provider 客户端（库式域，无 HTTP 面）：com.ragagent.embedding.EmbedderFactory 选择器、 EmbeddingHttp/ProviderJson 传输与编码、池化与失败降级。 |
 | `:model-runtime` | `com.ragagent.embedding.provider` | 嵌入 provider 的**具体实现**（各家 HTTP 调用与响应解析）：OpenAI / AzureOpenAI / Gemini / Jina / Nvidia / Ollama / Aliy |

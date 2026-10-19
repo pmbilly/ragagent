@@ -3,11 +3,6 @@
   "enforceThreshold": 30,
   "note": "业务域单包文件数棘轮：>30 必须登记且只许降；26-30 只报警。拆分计划见 C3/C4。",
   "allowed": {
-    "domains/src/main/java/com/ragagent/wiki/service/ingest": {
-      "files": 46,
-      "reason": "wiki 摄取管线：39 类 SCC（map/reduce/finalize/index + 队列/锁/幂等共享状态）；无回边叶子已移 support/；剩余核心拆分即环，保持内聚",
-      "target": 46
-    },
     "domains/src/main/java/com/ragagent/mcp/oauth": {
       "files": 34,
       "reason": "OAuth 客户端/授权服务器/令牌存储同包；按 OAuth 生命周期内聚，暂不拆",

@@ -6,6 +6,8 @@ import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.platform.text.CodePointOrder;
 import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
+import com.ragagent.wiki.domain.ingest.WikiIngestPayload;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

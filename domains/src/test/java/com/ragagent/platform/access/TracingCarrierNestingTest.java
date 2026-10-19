@@ -9,7 +9,7 @@ import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.memory.service.MemoryExtractPayload;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.wiki.service.ingest.WikiIngestPayload;
+import com.ragagent.wiki.domain.ingest.WikiIngestPayload;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;

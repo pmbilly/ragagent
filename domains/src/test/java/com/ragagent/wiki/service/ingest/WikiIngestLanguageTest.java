@@ -6,6 +6,8 @@ import com.ragagent.contract.text.Whitespace;
 import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.domain.TaskPendingOp;
+import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
+import com.ragagent.wiki.domain.ingest.WikiPendingOp;
 import com.ragagent.wiki.prompt.WikiPromptTemplate;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import java.util.List;

@@ -20,7 +20,7 @@ public final class WikiBatchSupport {
     /**
      * 失败的 LLM 调用看起来是否像上游 429 / 配额耗尽。
      *
-     * <p>它把后续调度器掰到更长的 {@link WikiIngestConstants#RATE_LIMIT_BACKOFF}
+     * <p>它把后续调度器掰到更长的 {@code WikiIngestConstants#RATE_LIMIT_BACKOFF}
      * 上，这样重试就不会继续捶打一个已经打满的 rpm 预算。实现是纯字符串包含判断
      * （大小写不敏感）——<b>不要</b>改成按异常类型判定，
      * 因为 LLM 客户端的错误是跨 20 多家供应商拼出来的人类可读消息。</p>

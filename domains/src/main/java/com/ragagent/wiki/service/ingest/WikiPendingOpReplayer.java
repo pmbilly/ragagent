@@ -1,6 +1,7 @@
 package com.ragagent.wiki.service.ingest;
 
 import com.ragagent.wiki.domain.TaskPendingOp;
+import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.wiki.repository.TaskPendingOpsRepository;
 import java.util.List;
 import org.slf4j.Logger;
