@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-363 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+357 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -119,12 +119,6 @@
 | `:domains` | `com.ragagent.embedchannel.repository` | 嵌入渠道仓储门面：渠道行的查询、写入与软删。 |
 | `:domains` | `com.ragagent.embedchannel.service` | 嵌入渠道 · 服务：EmbedChannelService / RedisEmbedTokenStore / EmbedTokenStore。 |
 | `:domains` | `com.ragagent.embedchannel.support` | Embed · 支撑类型：错误、令牌与限流。 |
-| `:domains` | `com.ragagent.evaluation` | 评估域：评估任务与指标计算（Rouge 等），对外入口 /api/v1/evaluation。 |
-| `:domains` | `com.ragagent.evaluation.controller` | 评测 · HTTP 层：EvaluationController。 |
-| `:domains` | `com.ragagent.evaluation.domain` | 评测 · 领域模型：QaPair。 |
-| `:domains` | `com.ragagent.evaluation.dto` | 评测 · 数据传输：EvaluationRequest / EvaluationDtos。 |
-| `:domains` | `com.ragagent.evaluation.metric` | 评测 · 指标：MetricSegmenter / PrecisionMetric / MetricCommon…。 |
-| `:domains` | `com.ragagent.evaluation.service` | 评测 · 服务：EvaluationService / DatasetService / EvaluationPromptDefaults…。 |
 | `:domains` | `com.ragagent.favorite` | 收藏域：用户对资源的收藏闭环（controller/service/mapper/domain 各一，最小完整域）。 |
 | `:domains` | `com.ragagent.favorite.controller` | 收藏 · HTTP 层：UserFavoriteController。 |
 | `:domains` | `com.ragagent.favorite.domain` | 收藏 · 领域模型：UserResourceFavorite。 |

@@ -24,12 +24,12 @@
 | `GlobalFileServicePort` | `GlobalFileServiceAdapter` | domains | session | 域间（解耦） |
 | `HybridSearchPort` | `HybridSearchService` | retrieval-engine | knowledge、session | 跨模块（必要） |
 | `KnowledgeBaseCatalogPort` | `KnowledgeBaseCatalogAdapter` | domains | agentmanagement | 域间（解耦） |
-| `KnowledgeCatalogPort` | `KnowledgeCatalogAdapter` | domains | datasource、embedchannel、evaluation、im、initialization、knowledge、session | 域间（解耦） |
+| `KnowledgeCatalogPort` | `KnowledgeCatalogAdapter` | domains | datasource、embedchannel、im、initialization、knowledge、session | 域间（解耦） |
 | `KnowledgeMaintenancePort` | `KnowledgeMaintenanceAdapter` | domains | websearch | 域间（解耦） |
 | `KnowledgeSpanPort` | `KnowledgeSpanAdapter` | domains | wiki | 域间（解耦） |
 | `McpToolRegistrationPort` | `McpToolRegistrationAdapter` | domains | agent-engine | 跨模块（必要） |
 | `MessageTranscriptPort` | `MessageTranscriptAdapter` | domains | memory | 域间（解耦） |
-| `ModelCatalogPort` | `ModelCatalogAdapter` | domains | evaluation、initialization、knowledge、mcp、memory、model-runtime、session、wiki | 跨模块（必要） |
+| `ModelCatalogPort` | `ModelCatalogAdapter` | domains | initialization、knowledge、mcp、memory、model-runtime、session、wiki | 跨模块（必要） |
 | `ModelFactsPort` | `ModelService` | domains | retrieval-engine | 跨模块（必要） |
 | `OllamaAdminPort` | `OllamaService` | model-runtime | initialization | 跨模块（必要） |
 | `ProviderFileStorePort` | `ProviderFileStoreAdapter` | domains | knowledge | 域间（解耦） |

@@ -250,7 +250,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
 
     /**
      * 段落<b>直接成 chunk</b>（不经 docreader/chunker），
-     * 同步建索引后立即可检索。评估链路（EvalDataset 的临时 "evaluation" KB）专用。
+     * 同步建索引后立即可检索。临时知识库（建库后立即检索）专用。
      * <p>固定语义：type="passage"、title 零值 ""、channel 空 → "web"；逐段 ValidateInput
      * 空段跳过后索引不回填）、Start/End 按码点数累计；终态
      * enable_status=enabled + processed_at + updated_at，parse_status 有文本 chunk 时

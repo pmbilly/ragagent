@@ -55,10 +55,6 @@
       "kind": "integration",
       "frontend": "views/embed"
     },
-    "evaluation": {
-      "kind": "product",
-      "frontend": "—（暂无页面）"
-    },
     "favorite": {
       "kind": "product",
       "frontend": "views/agent · views/knowledge（列表置顶/收藏）"

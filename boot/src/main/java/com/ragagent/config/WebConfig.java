@@ -172,7 +172,6 @@ public class WebConfig implements WebMvcConfigurer {
                 "/api/v1/datasource/**",
                 "/api/v1/web-search-providers/**", "/api/v1/web-search/**",
                 "/api/v1/vector-stores/**", "/api/v1/storage-backends/**",
-                "/api/v1/evaluation/**",
                 "/api/v1/user/favorites/**", "/api/v1/chunker/**",
                 "/api/v1/skills/**",
                 "/api/v1/agents/**",

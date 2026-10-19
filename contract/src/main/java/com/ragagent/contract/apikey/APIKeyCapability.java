@@ -53,6 +53,7 @@ public final class APIKeyCapability {
     /** 租户级联网搜索供应商配置与凭据。 */
     public static final String MANAGE_WEB_SEARCH = "manage_web_search";
     /** 跑/看评测任务，无需完整租户所有权。 */
+    /** 评估域已下线（L49）；保留取值以免已持久化的 API Key 解析失败。 */
     public static final String RUN_EVALUATIONS = "run_evaluations";
     /** 租户成员与邀请的管理。<b>不含</b> API Key 管理、租户删除、所有权转移。 */
     public static final String MANAGE_MEMBERS = "manage_members";

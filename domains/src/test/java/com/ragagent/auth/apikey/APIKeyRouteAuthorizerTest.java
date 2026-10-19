@@ -336,8 +336,6 @@ class APIKeyRouteAuthorizerTest {
                 .containsExactly(APIKeyCapability.MANAGE_STORAGE_BACKENDS);
         assertThat(APIKeyRoutePolicy.manageWebSearch(base).capabilities())
                 .containsExactly(APIKeyCapability.MANAGE_WEB_SEARCH);
-        assertThat(APIKeyRoutePolicy.runEvaluations(base).capabilities())
-                .containsExactly(APIKeyCapability.RUN_EVALUATIONS);
         assertThat(APIKeyRoutePolicy.manageMembers(base).capabilities())
                 .containsExactly(APIKeyCapability.MANAGE_MEMBERS);
         assertThat(APIKeyRoutePolicy.manageTenantSettings(base).capabilities())

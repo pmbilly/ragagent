@@ -149,11 +149,6 @@ public record APIKeyRoutePolicy(boolean platformOnly, boolean requireFullAccess,
         return base.withCapability(APIKeyCapability.MANAGE_WEB_SEARCH);
     }
 
-    /** 在 base 上叠加 run_evaluations 能力。 */
-    public static APIKeyRoutePolicy runEvaluations(APIKeyRoutePolicy base) {
-        return base.withCapability(APIKeyCapability.RUN_EVALUATIONS);
-    }
-
     /** 在 base 上叠加 manage_members 能力。 */
     public static APIKeyRoutePolicy manageMembers(APIKeyRoutePolicy base) {
         return base.withCapability(APIKeyCapability.MANAGE_MEMBERS);

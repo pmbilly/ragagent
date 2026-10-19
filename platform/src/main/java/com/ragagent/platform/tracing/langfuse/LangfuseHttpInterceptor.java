@@ -215,8 +215,7 @@ public class LangfuseHttpInterceptor implements HandlerInterceptor {
                 || path.startsWith("/api/v1/initialization/rerank/check")
                 || path.startsWith("/api/v1/initialization/asr/check")
                 || path.startsWith("/api/v1/initialization/multimodal/test")
-                || path.startsWith("/api/v1/initialization/extract/")
-                || path.startsWith("/api/v1/evaluation")) {
+                || path.startsWith("/api/v1/initialization/extract/")) {
             return true;
         }
         // 摄取（会入队 LLM 异步工作的 POST/PUT）

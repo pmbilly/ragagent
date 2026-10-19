@@ -13,7 +13,7 @@
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 20 | 152 | 0 |
 | `:retrieval-engine` | `retrieval` | 15 | 95 | 0 |
 | `:agent-engine` | `agent` | 9 | 67 | 0 |
-| `:domains` | `agentmanagement`、`agenttools`、`approval`、`audit`、`auth`、`datasource`、`embedchannel`、`evaluation`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`tenant`、`vectorstore`、`websearch`、`wiki` | 261 | 1593 | 51 |
+| `:domains` | `agentmanagement`、`agenttools`、`approval`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`tenant`、`vectorstore`、`websearch`、`wiki` | 255 | 1567 | 50 |
 | `:boot` | `(根包)`、`config` | 2 | 19 | 0 |
 
 ## 22 个业务域（domains）
@@ -27,7 +27,6 @@
 | `auth` | `com.ragagent.auth` | 113 | 6 |
 | `datasource` | `com.ragagent.datasource` | 149 | 2 |
 | `embedchannel` | `com.ragagent.embedchannel` | 25 | 1 |
-| `evaluation` | `com.ragagent.evaluation` | 26 | 1 |
 | `favorite` | `com.ragagent.favorite` | 13 | 1 |
 | `im` | `com.ragagent.im` | 102 | 2 |
 | `initialization` | `com.ragagent.initialization` | 13 | 1 |
@@ -58,7 +57,7 @@
 
 - `:model-runtime` 有 5 个主码包根（`embedding` / `llm` / `modelcontext` / `modelruntime` / `rerank`），
   按能力族拆分，不与模块同名。
-- `:boot` 的测试树有 25 个业务包根：集成测试必须从 HTTP 面进，只能住在组合根。
+- `:boot` 的测试树有 24 个业务包根：集成测试必须从 HTTP 面进，只能住在组合根。
 - `domains` 测试树仍有 10 个跨模块测试（platform 5、model-runtime 4、contract 1），
   依赖 domains 载荷，迁走会形成反向边；登记在 `scripts/check-module-graph.py` 的
   `MISPLACED_TEST_ALLOW`（带理由，只许减）。
@@ -67,5 +66,5 @@
 
 ## 相关
 
-- [`packages.md`](packages.md)：363 份 `package-info` 的包级职责索引。
+- [`packages.md`](packages.md)：357 份 `package-info` 的包级职责索引。
 - [`overview.md`](overview.md)：模块依赖图、设计原则、代码在哪。

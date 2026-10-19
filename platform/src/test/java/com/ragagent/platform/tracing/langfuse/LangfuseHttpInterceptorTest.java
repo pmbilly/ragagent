@@ -56,7 +56,6 @@ class LangfuseHttpInterceptorTest {
         assertTrue(LangfuseHttpInterceptor.shouldTrace("/api/v1/knowledge-search", "POST"));
         assertTrue(LangfuseHttpInterceptor.shouldTrace(
                 "/api/v1/sessions/{id}/generate_title", "POST"));
-        assertTrue(LangfuseHttpInterceptor.shouldTrace("/api/v1/evaluation", "POST"));
         assertTrue(LangfuseHttpInterceptor.shouldTrace(
                 "/api/v1/initialization/remote/check", "POST"));
         // 摄取（POST/PUT）
@@ -104,8 +103,8 @@ class LangfuseHttpInterceptorTest {
     @Test
     @DisplayName("生命周期：命中路径开 trace → 收尾导出 output(status/size) + 清上下文")
     void startsAndFinishesTrace() {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/v1/evaluation");
-        request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/api/v1/evaluation");
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/v1/initialization/extract/run");
+        request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/api/v1/initialization/extract/run");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         assertTrue(interceptor.preHandle(request, response, new Object()));
@@ -117,8 +116,8 @@ class LangfuseHttpInterceptorTest {
         assertEquals(1, exported.size());
         RecordedSpan root = exported.get(0);
         assertEquals("trace", root.attributes.get(LangfuseAttributes.ATTR_OBS_TYPE));
-        assertEquals("POST /api/v1/evaluation", root.attributes.get(LangfuseAttributes.ATTR_TRACE_NAME));
-        assertEquals("{\"http.method\":\"POST\",\"http.path\":\"/api/v1/evaluation\",\"http.query\":\"\"}",
+        assertEquals("POST /api/v1/initialization/extract/run", root.attributes.get(LangfuseAttributes.ATTR_TRACE_NAME));
+        assertEquals("{\"http.method\":\"POST\",\"http.path\":\"/api/v1/initialization/extract/run\",\"http.query\":\"\"}",
                 root.attributes.get(LangfuseAttributes.ATTR_TRACE_METADATA));
         assertEquals("{\"response.size\":-1,\"status\":200}",
                 root.attributes.get(LangfuseAttributes.ATTR_TRACE_OUTPUT));
@@ -129,8 +128,8 @@ class LangfuseHttpInterceptorTest {
     @Test
     @DisplayName("traceparent 继承：根 span 继承上游 trace id 并挂到上游 span 下")
     void inheritsUpstreamTraceparent() {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/v1/evaluation");
-        request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/api/v1/evaluation");
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/v1/initialization/extract/run");
+        request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/api/v1/initialization/extract/run");
         request.addHeader("traceparent",
                 "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01");
         MockHttpServletResponse response = new MockHttpServletResponse();

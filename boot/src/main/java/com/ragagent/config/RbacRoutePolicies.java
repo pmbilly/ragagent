@@ -249,11 +249,6 @@ final class RbacRoutePolicies {
         rbac.addSystemAdminRule("POST", "/api/v1/system/admin/runtime/queues/*/tasks/*/actions/*");
         rbac.addSystemAdminRule("DELETE", "/api/v1/system/admin/runtime/queues/*/archived");
         rbac.addSystemAdminRule("POST", "/api/v1/system/admin/tenants/apply-default-storage-quota");
-
-        // 评估：POST 驱动 LLM+检索（Admin+），
-        // GET 读结果（Viewer+）。
-        rbac.addRule("POST", "/api/v1/evaluation", TenantRole.ADMIN, false);
-        rbac.addRule("GET", "/api/v1/evaluation", TenantRole.VIEWER, false);
     }
 
     private static void registerSessionsMessagesMemory(RbacInterceptor rbac) {

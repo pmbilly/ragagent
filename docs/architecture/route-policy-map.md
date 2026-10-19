@@ -94,8 +94,6 @@
 | POST | `/api/v1/embed/{channelId}/sessions/{sessionId}/suggestion-events` | PUBLIC | `EmbedChannelController` |
 | POST | `/api/v1/embed/{channelId}/sessions/{sessionId}/tool-approvals/{pendingId}` | PUBLIC | `EmbedChannelController` |
 | GET | `/api/v1/embed/{channelId}/suggested-questions` | PUBLIC | `EmbedChannelController` |
-| GET | `/api/v1/evaluation/` | VIEWER | `EvaluationController` |
-| POST | `/api/v1/evaluation/` | ADMIN | `EvaluationController` |
 | GET | `/api/v1/faq/import/progress/{taskId}` | VIEWER | `FaqController` |
 | GET | `/api/v1/files/presigned` | PUBLIC | `FileProxyController` |
 | HEAD | `/api/v1/files/presigned` | PUBLIC | `FileProxyController` |

@@ -9,7 +9,7 @@
 
 | 种类 | 域数 | 文件 | 控制器 | 说明 |
 |---|---:|---:|---:|---|
-| **产品能力** | 8 | 823 | 23 | 直接产生用户价值、按产品需求演进的业务能力。 |
+| **产品能力** | 7 | 797 | 22 | 直接产生用户价值、按产品需求演进的业务能力。 |
 | **集成适配** | 6 | 531 | 14 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
 | **控制面** | 4 | 164 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
 | **能力配置** | 2 | 55 | 4 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
@@ -26,7 +26,6 @@
 | `memory` | 产品能力 | 89 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
 | `agenttools` | 产品能力 | 58 | — | — | `views/chat（工具结果渲染）` |
 | `agentmanagement` | 产品能力 | 27 | 3 | — | `views/agent` |
-| `evaluation` | 产品能力 | 26 | 1 | — | —（暂无页面） |
 | `favorite` | 产品能力 | 13 | 1 | — | `views/agent · views/knowledge（列表置顶/收藏）` |
 | `datasource` | 集成适配 | 149 | 2 | — | `views/knowledge/settings/DataSourceSettings.vue` |
 | `mcp` | 集成适配 | 148 | 4 | 2 | `views/settings/McpSettings.vue` |
@@ -55,7 +54,6 @@
 | `memory` | `MemoryController` | — |
 | `agenttools` | —（无 HTTP 面） | — |
 | `agentmanagement` | `AgentController`、`SkillCatalogController`、`SkillsCatalogController` | — |
-| `evaluation` | `EvaluationController` | — |
 | `favorite` | `UserFavoriteController` | — |
 | `datasource` | `DataSourceController`、`DataSourceCredentialsController` | — |
 | `mcp` | `AgentToolApprovalController`、`McpCredentialsController`、`McpOAuthController`、`McpServiceController` | `McpToolRegistrationPort`、`McpToolingGateway` |

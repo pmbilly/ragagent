@@ -52,7 +52,6 @@ public final class APIKeyRoutePolicies {
         registerInfraConfigRoutes(authorizer);
         registerTenantMemberRoutes(authorizer);
         registerSystemRoutes(authorizer);
-        registerEvaluationRoutes(authorizer);
         registerFileRoutes(authorizer);
         registerAgentAndInfraRoutes(authorizer);
     }
@@ -202,17 +201,6 @@ public final class APIKeyRoutePolicies {
         a.registerGin("GET", "/api/v1/system/admin/audit-log",
                 APIKeyRoutePolicy.platform(
                         APIKeyCapability.SYSTEM_AUDIT_READ));
-    }
-
-    /**
-     * 评估：整组
-     * {@code runEvaluations(fullAccess())}——full-access 或显式
-     * run_evaluations；POST/GET 同策略（角色维度 Admin/Viewer 由 RBAC 另行把关）。
-     */
-    private static void registerEvaluationRoutes(APIKeyRouteAuthorizer a) {
-        APIKeyRoutePolicy evaluation = APIKeyRoutePolicy.runEvaluations(APIKeyRoutePolicy.fullAccess());
-        a.registerGin("POST", "/api/v1/evaluation", evaluation);
-        a.registerGin("GET", "/api/v1/evaluation", evaluation);
     }
 
     /**

@@ -61,7 +61,6 @@ import com.ragagent.datasource.domain.TaskInitiator;
 import com.ragagent.datasource.dto.DataSourceResponse;
 import com.ragagent.datasource.dto.DatasourceCredentialFieldMetadata;
 import com.ragagent.datasource.dto.DatasourceCredentialsResponse;
-import com.ragagent.evaluation.dto.EvaluationDtos;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
 import com.ragagent.knowledge.domain.KnowledgeBaseAsrConfig;
@@ -1252,35 +1251,6 @@ class JsonContractRoundTripTest {
         row.setLastModifiedByName("javasysadmin");
         assertRoundTrips(row, SystemSetting.class,
                 "types.SystemSetting ← system.domain.SystemSetting（value jsonb + enum/name omitempty）");
-    }
-
-    @Test
-    void evaluationDetailRoundTrips() {
-        // EvaluationDetail（task+params）直接作响应体；可空字段显式 null
-        // （metric 未产出、summaryConfig.thinking 未设置时均为 null）。
-        var task = new EvaluationDtos.EvaluationTask();
-        task.id = "evaluation_10002_1789790586130_89a7491e_default";
-        task.tenantId = 10002L;
-        task.datasetId = "default";
-        task.status = 0;
-        var params = new EvaluationDtos.PipelineParams();
-        params.maxRounds = 5;
-        params.vectorThreshold = 0.2;
-        params.keywordThreshold = 0.3;
-        params.embeddingTopK = 30;
-        params.rerankTopK = 30;
-        params.rerankThreshold = 0.3;
-        params.chatModelId = "fake-chat-model-id";
-        var summary = new EvaluationDtos.SummaryConfigParams();
-        summary.repeatPenalty = 1.0;
-        summary.temperature = 0.3;
-        summary.maxCompletionTokens = 2048;
-        params.summaryConfig = summary;
-        var detail = new EvaluationDtos.EvaluationDetail();
-        detail.task = task;
-        detail.params = params;
-        assertRoundTrips(detail, EvaluationDtos.EvaluationDetail.class,
-                "evaluation.dto.EvaluationDetail（metric 显式 null + thinking null）");
     }
 
     // ── auth 注册族响应体 ────────────────────────────────────────────────
