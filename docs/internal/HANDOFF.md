@@ -347,6 +347,7 @@ boot           14 件                      →  boot
 | L36 | 2026-10-19 | **手写门面搬出 mapper 包**：6 个 `@Component`/`@Repository` 门面归位 `audit` / `auth.apikey` / `datasource`(×2) / `storage`(×2) 的 `repository/`；`storage/mapper` 清空删除。**A11b 基线 6 → 0**（零容忍）；**A16 基线 −7**（AuditLogService、DataSourceSupport/SyncExecutor/SyncResultOps、storage 三件）。 | **40 守卫** · **5030 / 0 / 4**（首轮 1 例 Redis 瞬态，隔离绿）· javadoc 0 错 |
 | L37a | 2026-10-19 | **auth 令牌门面**：新增 `auth/repository/AuthTokenRepository`（按串查询/落库/单行吊销/整用户吊销）；`UserService` 与 `UserSessionOps` 不再持有 `AuthTokenMapper`；`TenantAPIKeyNotFoundException` 从 `mapper/` 移到 `auth/apikey/` 根包（放 `domain/` 会命中 C10「控制器不得 import 领域类型」——该规则本意是防实体泄漏，异常作为控制器捕获面不适用，故换落点而非改守卫）。**A16 −2、A17 −1**。 | **40 守卫** · **5030 / 0 / 4** |
 | L37b | 2026-10-19 | **auth 邀请门面**：新增 `auth/repository/TenantInvitationRepository`，12 处持久化调用下沉（id/token/pair 查询、租户分页 count+list、收件箱列表与计数、插入、`accepted_count` 原子自增、pending 原子翻转、过期清扫）；状态常量单一来源（service 的 `STATUS_PENDING`/`STATUS_EXPIRED` 引用仓储常量）。**A16 −1、A17 −1**。 | **40 守卫** · **5030 / 0 / 4** |
+| L37c | 2026-10-19 | **租户管理跨域解耦 + 成员门面**：新增 `tenant/repository/TenantAdmin`（域侧端口，返回实体，按 `TenantLookup` 注释只给 L3 用）+ `TenantAdminImpl`（12 处调用下沉）；`TenantService` 不再持有 tenant 域 `TenantMapper`。新增 `auth/repository/TenantMemberRepository`、`UserRepository`；`AuthTokenRepository` 扩展 `revokeActiveByUserId`。附带：成员分页的关键字过滤原对用户表查两次，改为解析一次 id 集复用。**A16 −2、A17 −2**。 | **40 守卫** · **5030 / 0 / 4** |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
