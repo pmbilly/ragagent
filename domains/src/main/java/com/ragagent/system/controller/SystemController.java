@@ -3,10 +3,8 @@ package com.ragagent.system.controller;
 import com.ragagent.contract.doc.DocReaderAdminPort;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.storage.StorageBackendPort;
-import com.ragagent.contract.storage.StorageBackendView;
+import com.ragagent.contract.storage.StorageConnectivityPort;
 import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.ApiResult;
@@ -16,12 +14,9 @@ import com.ragagent.system.service.DeploymentCapabilitiesHolder;
 import com.ragagent.system.service.ParserEngineRegistry;
 import com.ragagent.system.service.SystemInfoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
-import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,8 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ObjectNode;
 
 /**
  * /api/v1/system 组：读端（capabilities/info/parser-engines/storage-engine-status）Viewer+；
@@ -52,19 +45,13 @@ import tools.jackson.databind.node.ObjectNode;
 @Tag(name = "System")
 public class SystemController {
 
-    private static final ObjectMapper MAPPER = JsonMappers.lenient();
-    /** cosFieldPattern/ossFieldPattern（同一正则）。 */
-    private static final Pattern FIELD_PATTERN = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9._-]{0,62}$");
-
     private final SystemInfoService infoService;
     private final ParserEngineRegistry parserEngines;
     private final TenantConfigLookup tenantConfigLookup;
     private final DocReaderAdminPort docReader;
     private final SsrfGuard ssrfGuard;
     private final DeploymentCapabilitiesHolder capabilitiesHolder;
-    private final StorageBackendPort storageBackendPort;
-    /** env 读取面（不读裸 System.getenv；含 DOCREADER_* 与存储 env 可用性探测）。 */
-    private final Environment environment;
+    private final StorageConnectivityPort storageProbe;
 
     public SystemController(SystemInfoService infoService,
                             ParserEngineRegistry parserEngines,
@@ -72,16 +59,14 @@ public class SystemController {
                             DocReaderAdminPort docReader,
                             SsrfGuard ssrfGuard,
                             DeploymentCapabilitiesHolder capabilitiesHolder,
-                            StorageBackendPort storageBackendPort,
-                            Environment environment) {
+                            StorageConnectivityPort storageProbe) {
         this.infoService = infoService;
         this.parserEngines = parserEngines;
         this.tenantConfigLookup = tenantConfigLookup;
         this.docReader = docReader;
         this.ssrfGuard = ssrfGuard;
         this.capabilitiesHolder = capabilitiesHolder;
-        this.storageBackendPort = storageBackendPort;
-        this.environment = environment;
+        this.storageProbe = storageProbe;
     }
 
     // ── GET /capabilities ─────────────────────────────────────────────────
@@ -102,7 +87,7 @@ public class SystemController {
     @GetMapping("/info")
     public ResponseEntity<SystemDtos.SystemInfoResponse> info() {
         long tenantId = currentTenantId();
-        boolean minioEnabled = isMinioConfigured(tenantId);
+        boolean minioEnabled = storageProbe.isMinioConfigured(tenantId);
         String dbVersion = infoService.dbVersion();
         SystemDtos.SystemInfoResponse response = new SystemDtos.SystemInfoResponse(
                 infoService.getVersion(),
@@ -184,43 +169,13 @@ public class SystemController {
 
     @GetMapping("/storage-engine-status")
     public ResponseEntity<SystemDtos.StorageEngineStatusResponse> storageEngineStatus() {
-        long tenantId = currentTenantId();
-        Map<String, Boolean> activeBackend = infoService.activeBackendProviders(tenantId);
-        boolean minioConfigured = isMinioConfigured(tenantId) || truthy(activeBackend.get("minio"));
-        boolean minioEnvAvailable = infoService.isMinioEnvAvailable();
-        var allowed = infoService.allowList().allowedMap();
-        List<String> allowedProviders = new ArrayList<>();
-        for (String provider : infoService.allowList().supported()) {
-            if (allowed.contains(provider)) {
-                allowedProviders.add(provider);
-            }
-        }
-        List<SystemDtos.StorageEngineStatusItem> engines = List.of(
-                new SystemDtos.StorageEngineStatusItem("local", allowed.contains("local"), true,
-                        "本地文件系统存储，仅适合单机部署"),
-                new SystemDtos.StorageEngineStatusItem("minio", allowed.contains("minio"),
-                        minioConfigured || minioEnvAvailable,
-                        "S3 兼容的自托管对象存储，适合内网和私有云部署"),
-                new SystemDtos.StorageEngineStatusItem("cos", allowed.contains("cos"),
-                        isCosConfigured(tenantId) || truthy(activeBackend.get("cos")),
-                        "腾讯云对象存储服务，适合公有云部署，支持 CDN 加速"),
-                new SystemDtos.StorageEngineStatusItem("tos", allowed.contains("tos"),
-                        isTosConfigured(tenantId) || truthy(activeBackend.get("tos")),
-                        "火山引擎对象存储服务，适合公有云部署"),
-                new SystemDtos.StorageEngineStatusItem("s3", allowed.contains("s3"),
-                        isS3Configured(tenantId) || truthy(activeBackend.get("s3")),
-                        "AWS S3 与兼容对象存储服务，适合公有云与混合云部署"),
-                new SystemDtos.StorageEngineStatusItem("oss", allowed.contains("oss"),
-                        isOssConfigured(tenantId) || truthy(activeBackend.get("oss")),
-                        "阿里云对象存储服务，适合公有云部署，支持 S3 兼容协议"),
-                new SystemDtos.StorageEngineStatusItem("ks3", allowed.contains("ks3"),
-                        isKs3Configured(tenantId) || truthy(activeBackend.get("ks3")),
-                        "金山云对象存储服务，适合公有云部署"),
-                new SystemDtos.StorageEngineStatusItem("obs", allowed.contains("obs"),
-                        isObsConfigured(tenantId) || truthy(activeBackend.get("obs")),
-                        "华为云对象存储服务，适合公有云部署"));
+        var status = storageProbe.status(currentTenantId());
+        List<SystemDtos.StorageEngineStatusItem> engines = status.engines().stream()
+                .map(e -> new SystemDtos.StorageEngineStatusItem(
+                        e.provider(), e.allowed(), e.configured(), e.description()))
+                .toList();
         return ResponseEntity.ok(new SystemDtos.StorageEngineStatusResponse(
-                engines, allowedProviders, minioEnvAvailable));
+                engines, status.allowedProviders(), status.minioEnvAvailable()));
     }
 
     // ── POST /storage-engine-check ────────────────────────────────────────
@@ -239,258 +194,28 @@ public class SystemController {
             throw new BizException(AppError.badRequest("请求参数不合法").withDetails("请求体格式不正确"));
         }
         String provider = body.path("provider").asString("");
-        if (!infoService.allowList().isAllowed(provider)) {
+        if (!storageProbe.isAllowed(provider)) {
             throw new BizException(AppError.forbidden("该存储引擎已被禁用"));
         }
         JsonNode cfg = body.get(provider);
-        return switch (provider) {
-            case "minio" -> checkMinio(cfg);
-            case "cos" -> checkCos(cfg);
-            case "tos" -> checkGeneric(cfg, "TOS",
-                    List.of("Endpoint", "Region", "Access Key", "Secret Key", "Bucket 名称"), "endpoint");
-            case "s3" -> checkS3(cfg);
-            case "oss" -> checkOss(cfg);
-            case "ks3" -> checkGeneric(cfg, "KS3",
-                    List.of("Endpoint", "Region", "Access Key", "Secret Key", "Bucket 名称"), "endpoint");
-            case "obs" -> checkObs(cfg);
-            // default（含 local 与空 provider）：本地存储无需检测
-            default -> ResponseEntity.ok(
-                    new SystemDtos.StorageCheckResponse(true, "本地存储无需检测", false));
-        };
-    }
-
-    private ResponseEntity<SystemDtos.StorageCheckResponse> checkResponse(boolean ok, String message) {
-        return ResponseEntity.ok(new SystemDtos.StorageCheckResponse(ok, message, false));
-    }
-
-    private ResponseEntity<SystemDtos.StorageCheckResponse> checkMinio(JsonNode cfg) {
-        if (cfg == null || cfg.isNull()) {
-            return checkResponse(false, "未提供 MinIO 配置");
-        }
-        String bucketName = cfg.path("bucket_name").asString("");
-        if (!bucketName.isEmpty() && !FIELD_PATTERN.matcher(bucketName).matches()) {
-            return checkResponse(false, "Bucket 名称格式不正确，仅允许字母、数字、点、连字符");
-        }
-        // mode != "remote" → env 兜底（任一缺失即拒绝）
-        String endpoint = cfg.path("endpoint").asString("");
-        String accessKey = cfg.path("access_key_id").asString("");
-        String secretKey = cfg.path("secret_access_key").asString("");
-        if (!"remote".equals(cfg.path("mode").asString(""))) {
-            endpoint = orEnv(endpoint, "MINIO_ENDPOINT");
-            accessKey = orEnv(accessKey, "MINIO_ACCESS_KEY_ID");
-            secretKey = orEnv(secretKey, "MINIO_SECRET_ACCESS_KEY");
-        }
-        if (endpoint.isEmpty() || accessKey.isEmpty() || secretKey.isEmpty()) {
-            return checkResponse(false, "Endpoint、Access Key、Secret Key 不能为空");
-        }
-        if ("remote".equals(cfg.path("mode").asString(""))) {
-            String blocked = blockedStorageEndpoint(endpoint);
-            if (blocked != null) {
-                return checkResponse(false, blocked);
-            }
-        }
-        return connectivityFallback("minio", cfg, endpoint, bucketName);
-    }
-
-    private ResponseEntity<SystemDtos.StorageCheckResponse> checkCos(JsonNode cfg) {
-        if (cfg == null || cfg.isNull()) {
-            return checkResponse(false, "未提供 COS 配置");
-        }
-        String secretId = cfg.path("secret_id").asString("");
-        String secretKey = cfg.path("secret_key").asString("");
-        String region = cfg.path("region").asString("");
-        String bucketName = cfg.path("bucket_name").asString("");
-        if (secretId.isEmpty() || secretKey.isEmpty() || region.isEmpty() || bucketName.isEmpty()) {
-            return checkResponse(false, "Secret ID、Secret Key、Region、Bucket 名称不能为空");
-        }
-        if (!FIELD_PATTERN.matcher(region).matches()) {
-            return checkResponse(false, "Region 格式不正确，仅允许字母、数字、点、连字符");
-        }
-        if (!FIELD_PATTERN.matcher(bucketName).matches()) {
-            return checkResponse(false, "Bucket 名称格式不正确，仅允许字母、数字、点、连字符");
-        }
-        return connectivityFallback("cos", cfg, region, bucketName);
-    }
-
-    private ResponseEntity<SystemDtos.StorageCheckResponse> checkS3(JsonNode cfg) {
-        if (cfg == null || cfg.isNull()) {
-            return checkResponse(false, "未提供 S3 配置");
-        }
-        String region = cfg.path("region").asString("");
-        String bucketName = cfg.path("bucket_name").asString("");
-        String accessKey = cfg.path("access_key").asString("");
-        String secretKey = cfg.path("secret_key").asString("");
-        if (region.isEmpty() || bucketName.isEmpty()) {
-            return checkResponse(false, "Region、Bucket 名称不能为空");
-        }
-        if (accessKey.isEmpty() != secretKey.isEmpty()) {
-            return checkResponse(false, "Access Key 与 Secret Key 必须同时填写或同时留空（使用 AWS 默认凭证链）");
-        }
-        String endpoint = cfg.path("endpoint").asString("");
-        if (!endpoint.isEmpty()) {
-            String blocked = blockedStorageEndpoint(endpoint);
-            if (blocked != null) {
-                return checkResponse(false, blocked);
-            }
-        }
-        return connectivityFallback("s3", cfg, endpoint, bucketName);
-    }
-
-    private ResponseEntity<SystemDtos.StorageCheckResponse> checkOss(JsonNode cfg) {
-        if (cfg == null || cfg.isNull()) {
-            return checkResponse(false, "未提供 OSS 配置");
-        }
-        String endpoint = cfg.path("endpoint").asString("");
-        String accessKey = cfg.path("access_key").asString("");
-        String secretKey = cfg.path("secret_key").asString("");
-        String bucketName = cfg.path("bucket_name").asString("");
-        if (endpoint.isEmpty() || accessKey.isEmpty() || secretKey.isEmpty() || bucketName.isEmpty()) {
-            return checkResponse(false, "Endpoint、Access Key、Secret Key、Bucket Name 不能为空");
-        }
-        String ssrfEndpoint = endpoint.replaceFirst("^https://", "").replaceFirst("^http://", "");
-        String blocked = blockedStorageEndpoint(ssrfEndpoint);
-        if (blocked != null) {
-            return checkResponse(false, blocked);
-        }
-        String region = cfg.path("region").asString("");
-        if (!FIELD_PATTERN.matcher(region).matches()) {
-            return checkResponse(false, "Region 格式不正确，仅允许字母、数字、点、连字符");
-        }
-        if (!FIELD_PATTERN.matcher(bucketName).matches()) {
-            return checkResponse(false, "Bucket 名称格式不正确，仅允许字母、数字、点、连字符");
-        }
-        return connectivityFallback("oss", cfg, endpoint, bucketName);
-    }
-
-    private ResponseEntity<SystemDtos.StorageCheckResponse> checkObs(JsonNode cfg) {
-        if (cfg == null || cfg.isNull()) {
-            return checkResponse(false, "未提供 OBS 配置");
-        }
-        String endpoint = cfg.path("endpoint").asString("");
-        String region = cfg.path("region").asString("");
-        String accessKey = cfg.path("access_key").asString("");
-        String secretKey = cfg.path("secret_key").asString("");
-        String bucketName = cfg.path("bucket_name").asString("");
-        if (endpoint.isEmpty() || region.isEmpty() || accessKey.isEmpty() || secretKey.isEmpty()
-                || bucketName.isEmpty()) {
-            return checkResponse(false, "Endpoint、Region、Access Key、Secret Key、Bucket 名称不能为空");
-        }
-        String ssrfEndpoint = endpoint.replaceFirst("^https://", "").replaceFirst("^http://", "");
-        String blocked = blockedStorageEndpoint(ssrfEndpoint);
-        if (blocked != null) {
-            return checkResponse(false, blocked);
-        }
-        if (!FIELD_PATTERN.matcher(region).matches()) {
-            return checkResponse(false, "Region 格式不正确，仅允许字母、数字、点、连字符");
-        }
-        if (!FIELD_PATTERN.matcher(bucketName).matches()) {
-            return checkResponse(false, "Bucket 名称格式不正确，仅允许字母、数字、点、连字符");
-        }
-        return connectivityFallback("obs", cfg, endpoint, bucketName);
-    }
-
-    /** TOS/KS3 共用（同样的必填与 SSRF 分支顺序）。 */
-    private ResponseEntity<SystemDtos.StorageCheckResponse> checkGeneric(
-            JsonNode cfg, String label, List<String> requiredFields, String endpointField) {
-        if (cfg == null || cfg.isNull()) {
-            return checkResponse(false, "未提供 " + label + " 配置");
-        }
-        String endpoint = cfg.path(endpointField).asString("");
-        String region = cfg.path("region").asString("");
-        String accessKey = cfg.path("access_key").asString("");
-        String secretKey = cfg.path("secret_key").asString("");
-        String bucketName = cfg.path("bucket_name").asString("");
-        if (endpoint.isEmpty() || region.isEmpty() || accessKey.isEmpty() || secretKey.isEmpty()
-                || bucketName.isEmpty()) {
-            return checkResponse(false, String.join("、", requiredFields) + "不能为空");
-        }
-        String blocked = blockedStorageEndpoint(endpoint);
-        if (blocked != null) {
-            return checkResponse(false, blocked);
-        }
-        return connectivityFallback(label.toLowerCase(), cfg, endpoint, bucketName);
-    }
-
-    /**
-     * 真实连通性检测：复用存储后端端口的探测（同一套 SDK 探测）。
-     * 失败文案按异常消息子串分派（403 / 404|NoSuchBucket|NotFound / AccessDenied）；
-     * 各 SDK 错误串不完全一致 → 失败文案是实现边界
-     * （golden 只覆盖缺配置 / SSRF / 禁用 provider 等确定性分支）。
-     */
-    private ResponseEntity<SystemDtos.StorageCheckResponse> connectivityFallback(
-            String provider, JsonNode cfg, String endpoint, String bucketName) {
-        StorageBackendView backend =
-                new StorageBackendView();
-        backend.setTenantId(currentTenantId());
-        backend.setProvider(provider);
-        ObjectNode config = MAPPER.createObjectNode();
-        config.put("mode", "remote");
-        config.put("endpoint", endpoint);
-        config.put("region", cfg.path("region").asString(""));
-        config.put("access_key_id", accessKeyOf(provider, cfg));
-        config.put("secret_access_key", secretKeyOf(provider, cfg));
-        config.put("bucket_name", bucketName);
-        config.put("use_ssl", cfg.path("use_ssl").asBoolean(false));
-        backend.setConfig(config);
-        try {
-            storageBackendPort.test(backend);
-        } catch (RuntimeException e) {
-            String msg = e.getMessage() == null ? "" : e.getMessage();
-            if (msg.contains("403") || msg.contains("AccessDenied")) {
-                return checkResponse(false, authFailedMessage(provider));
-            }
-            if (msg.contains("404") || msg.contains("NoSuchBucket") || msg.contains("NotFound")) {
-                return checkResponse(false, "Bucket「" + bucketName + "」不存在，请检查名称和 Region");
-            }
-            return checkResponse(false, storageBackendPort.sanitizeConnectivity(msg));
-        }
-        String message = "连接成功，Bucket「" + bucketName + "」已确认存在";
-        if ("minio".equals(provider) && bucketName.isEmpty()) {
-            message = "连接成功";
-        }
-        return checkResponse(true, message);
-    }
-
-    private static String accessKeyOf(String provider, JsonNode cfg) {
-        return "minio".equals(provider)
-                ? cfg.path("access_key_id").asString("")
-                : cfg.path("access_key").asString("");
-    }
-
-    private static String secretKeyOf(String provider, JsonNode cfg) {
-        return "minio".equals(provider)
-                ? cfg.path("secret_access_key").asString("")
-                : cfg.path("secret_key").asString("");
-    }
-
-    private static String authFailedMessage(String provider) {
-        return switch (provider) {
-            case "minio" -> "认证失败，请检查 Access Key / Secret Key 是否正确";
-            case "cos" -> "认证失败，请检查 Secret ID / Secret Key 是否正确";
-            case "tos" -> "认证失败，请检查 Access Key / Secret Key 是否正确";
-            case "s3" -> "认证失败，请检查静态密钥或 AWS IAM Role / 默认凭证链权限";
-            case "oss" -> "认证失败，请检查 Access Key / Secret Key 是否正确";
-            case "ks3" -> "认证失败，请检查 Access Key / Secret Key 是否正确";
-            default -> "认证失败，请检查 Access Key / Secret Key 是否正确";
-        };
-    }
-
-    private String blockedStorageEndpoint(String endpoint) {
-        String trimmed = endpoint == null ? "" : endpoint.trim();
-        if (trimmed.isEmpty()) {
-            return "无效的地址";
-        }
-        try {
-            ssrfGuard.validateURLForSSRF(trimmed);
-            return null;
-        } catch (RuntimeException e) {
-            return ssrfGuard.formatSSRFError("存储 Endpoint", trimmed, e);
-        }
+        var outcome = storageProbe.check(provider, configMap(cfg), currentTenantId());
+        return ResponseEntity.ok(
+                new SystemDtos.StorageCheckResponse(outcome.ok(), outcome.message(), false));
     }
 
     // ── 租户/引擎上下文 ───────────────────────────────────────────────────
 
     /** ShouldBindJSON 等价：解析失败（含 EOF）→ null，调用方落各自的 400 文案。 */
+    /** 契约端口只收纯 JDK 值：对象节点转 Map，其余视为缺失。 */
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> configMap(JsonNode node) {
+        if (node == null || node.isNull()) {
+            return null;
+        }
+        Object value = JsonMappers.toJavaValue(node);
+        return value instanceof Map<?, ?> map ? (Map<String, Object>) map : null;
+    }
+
     private static JsonNode parseBody(String rawBody) {
         if (rawBody == null || rawBody.isBlank()) {
             return null;
@@ -506,11 +231,6 @@ public class SystemController {
     private long currentTenantId() {
         Long tid = TenantContext.currentTenantId();
         return tid == null ? 0 : tid;
-    }
-
-    private TenantStorageView currentTenant() {
-        long tid = currentTenantId();
-        return tid <= 0 ? null : tenantConfigLookup.storageView(tid);
     }
 
     /** overrides 组装：租户 ParserEngineConfig → map。 */
@@ -583,89 +303,6 @@ public class SystemController {
         }
     }
 
-    private boolean isMinioConfigured(long tenantId) {
-        TenantStorageView tenant = currentTenant();
-        if (tenant != null && tenant.storageEngineConfig() != null) {
-            JsonNode minio = JsonMappers.toJsonNode(tenant.storageEngineConfig()).get("minio");
-            if (minio != null && !minio.isNull() && "remote".equals(minio.path("mode").asString(""))) {
-                return !minio.path("endpoint").asString("").isEmpty()
-                        && !minio.path("access_key_id").asString("").isEmpty()
-                        && !minio.path("secret_access_key").asString("").isEmpty();
-            }
-        }
-        return infoService.isMinioEnvAvailable();
-    }
-
-    private boolean hasAllNonEmpty(long tenantId, String provider, List<String> fields, boolean envFallback) {
-        TenantStorageView tenant = currentTenant();
-        if (tenant != null && tenant.storageEngineConfig() != null) {
-            JsonNode conf = JsonMappers.toJsonNode(tenant.storageEngineConfig()).get(provider);
-            if (conf != null && !conf.isNull()) {
-                for (String f : fields) {
-                    if (conf.path(f).asString("").isEmpty()) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-        return envFallback;
-    }
-
-    private boolean isTosConfigured(long tenantId) {
-        return hasAllNonEmpty(tenantId, "tos",
-                List.of("endpoint", "region", "access_key", "secret_key", "bucket_name"),
-                infoService.isMinioEnvAvailable() && envAll("TOS_ENDPOINT", "TOS_REGION",
-                        "TOS_ACCESS_KEY", "TOS_SECRET_KEY", "TOS_BUCKET_NAME"));
-    }
-
-    private boolean isObsConfigured(long tenantId) {
-        return hasAllNonEmpty(tenantId, "obs",
-                List.of("endpoint", "region", "access_key", "secret_key", "bucket_name"),
-                envAll("OBS_ENDPOINT", "OBS_REGION", "OBS_ACCESS_KEY", "OBS_SECRET_KEY", "OBS_BUCKET_NAME"));
-    }
-
-    private boolean envAll(String... names) {
-        for (String n : names) {
-            String v = environment.getProperty(n);
-            if (v == null || v.isEmpty()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isCosConfigured(long tenantId) {
-        return hasAllNonEmpty(tenantId, "cos",
-                List.of("secret_id", "secret_key", "region", "bucket_name"), false);
-    }
-
-    private boolean isOssConfigured(long tenantId) {
-        return hasAllNonEmpty(tenantId, "oss",
-                List.of("endpoint", "region", "access_key", "secret_key", "bucket_name"), false);
-    }
-
-    private boolean isKs3Configured(long tenantId) {
-        return hasAllNonEmpty(tenantId, "ks3",
-                List.of("endpoint", "region", "access_key", "secret_key", "bucket_name"), false);
-    }
-
-    /** region/bucket 非空 + (accessKey 空) == (secretKey 空)。 */
-    private boolean isS3Configured(long tenantId) {
-        TenantStorageView tenant = currentTenant();
-        if (tenant != null && tenant.storageEngineConfig() != null) {
-            JsonNode s3 = JsonMappers.toJsonNode(tenant.storageEngineConfig()).get("s3");
-            if (s3 != null && !s3.isNull()) {
-                String accessKey = s3.path("access_key").asString("");
-                String secretKey = s3.path("secret_key").asString("");
-                return !s3.path("region").asString("").isEmpty()
-                        && !s3.path("bucket_name").asString("").isEmpty()
-                        && (accessKey.isEmpty()) == (secretKey.isEmpty());
-            }
-        }
-        return false;
-    }
-
     // ── 响应组装辅助 ──────────────────────────────────────────────────────
 
     /** parser-engines 响应组装（连接态 + docreader 信息 + 引擎清单）。 */
@@ -677,18 +314,6 @@ public class SystemController {
                 parserEngines.listAllEngines(connected, overrides, remote);
         return new SystemDtos.ParserEnginesResponse(
                 connected, docReader.config().addr(), docReader.config().transport(), engines);
-    }
-
-    private String orEnv(String value, String envName) {
-        if (!value.isEmpty()) {
-            return value;
-        }
-        String v = environment.getProperty(envName);
-        return v == null ? "" : v;
-    }
-
-    private static boolean truthy(Boolean b) {
-        return b != null && b;
     }
 
 }

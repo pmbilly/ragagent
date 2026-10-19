@@ -1,19 +1,14 @@
 package com.ragagent.system.service;
 
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
-import com.ragagent.contract.storage.StorageBackendPort;
-import com.ragagent.contract.storage.StorageBackendView;
 import com.ragagent.platform.config.RetrievalDriverProperties;
-import com.ragagent.platform.storage.config.StorageAllowList;
 import java.sql.Connection;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.ObjectProvider;
@@ -44,8 +39,6 @@ public class SystemInfoService {
     private static final DateTimeFormatter RFC3339_UTC =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").withZone(ZoneOffset.UTC);
 
-    private final StorageAllowList allowList;
-    private final StorageBackendPort storageBackendPort;
     private final DataSource dataSource;
     /** 构建期生成的 META-INF/build-info.properties；缺失（如纯 IDE 运行）时回退 "unknown"。 */
     private final ObjectProvider<BuildProperties> buildProperties;
@@ -68,15 +61,11 @@ public class SystemInfoService {
     @Value("${weknora.system.java-version:}")
     private String javaVersionOverride;
 
-    public SystemInfoService(StorageAllowList allowList,
-                             StorageBackendPort storageBackendPort,
-                             DataSource dataSource,
+    public SystemInfoService(                             DataSource dataSource,
                              ObjectProvider<BuildProperties> buildProperties,
                              RetrieveGraphRepository graphRepository,
                              RetrievalDriverProperties driverProperties,
                              Environment environment) {
-        this.allowList = allowList;
-        this.storageBackendPort = storageBackendPort;
         this.dataSource = dataSource;
         this.buildProperties = buildProperties;
         this.driverProperties = driverProperties;
@@ -183,15 +172,6 @@ public class SystemInfoService {
         return "Not Enabled";
     }
 
-    public boolean isMinioEnvAvailable() {
-        return env("MINIO_ENDPOINT") && env("MINIO_ACCESS_KEY_ID") && env("MINIO_SECRET_ACCESS_KEY");
-    }
-
-    private boolean env(String name) {
-        String v = environment.getProperty(name);
-        return v != null && !v.isEmpty();
-    }
-
     /**
      * 读 flyway_schema_history：Java 侧迁移由 Flyway 执行，
      * 版本号同源。H2 测试库无 flyway_schema_history → 空串（键省略）。
@@ -221,32 +201,5 @@ public class SystemInfoService {
     public long uptimeSeconds() {
         long start = java.lang.management.ManagementFactory.getRuntimeMXBean().getStartTime();
         return Duration.between(Instant.ofEpochMilli(start), Instant.now()).toSeconds();
-    }
-
-    /**
-     * status=active 的多实例后端 provider 集合
-     * （小写去空白；查询失败回落空集合走 legacy 检查，同为 best-effort）。
-     */
-    public Map<String, Boolean> activeBackendProviders(long tenantId) {
-        Map<String, Boolean> result = new LinkedHashMap<>();
-        if (tenantId <= 0) {
-            return result;
-        }
-        try {
-            for (StorageBackendView backend : storageBackendPort.list(tenantId)) {
-                if (backend == null || !"active".equals(backend.getStatus())) {
-                    continue;
-                }
-                String provider = backend.getProvider() == null ? "" : backend.getProvider();
-                result.put(provider.toLowerCase().trim(), true);
-            }
-        } catch (RuntimeException e) {
-            // best-effort：查询失败记 WARN 并回落 legacy 配置检查（空集合）
-        }
-        return result;
-    }
-
-    public StorageAllowList allowList() {
-        return allowList;
     }
 }

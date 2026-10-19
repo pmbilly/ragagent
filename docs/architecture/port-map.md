@@ -5,7 +5,7 @@
 
 ## 统计
 
-- 域间（解耦）：**21**
+- 域间（解耦）：**22**
 - 跨模块（必要）：**10**
 
 ## 明细
@@ -36,7 +36,8 @@
 | `ResourceCatalogPort` | `ResourceCatalogAdapter` | domains | knowledge、session | 域间（解耦） |
 | `SessionQaPort` | `SessionQaAdapter` | domains | im | 域间（解耦） |
 | `SkillCatalogPort` | `SkillCatalogService` | agent-engine | agent-engine、agentmanagement | 跨模块（必要） |
-| `StorageBackendPort` | `StorageBackendPortAdapter` | domains | knowledge、system | 域间（解耦） |
+| `StorageBackendPort` | `StorageBackendPortAdapter` | domains | knowledge、storage | 域间（解耦） |
+| `StorageConnectivityPort` | `StorageConnectivityService` | domains | system | 域间（解耦） |
 | `TenantStorageQuotaPort` | `TenantStorageQuotaAdapter` | domains | knowledge、system | 域间（解耦） |
 | `ToolRegistryPort` | `ToolRegistryPortImpl` | agent-engine | agent-engine、mcp | 跨模块（必要） |
 | `UserLookupPort` | `UserLookupAdapter` | domains | agentmanagement | 域间（解耦） |
