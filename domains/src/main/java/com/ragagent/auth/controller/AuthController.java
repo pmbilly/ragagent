@@ -25,7 +25,6 @@ import com.ragagent.auth.service.OidcService;
 import com.ragagent.auth.service.OidcStateCodec;
 import com.ragagent.auth.service.PasswordPolicy;
 import com.ragagent.auth.service.TenantInvitationReadService;
-import com.ragagent.auth.service.TenantInvitationService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.TokenValidationException;
 import com.ragagent.auth.service.UserService;
@@ -118,7 +117,6 @@ public class AuthController {
 
     final UserService userService;
     final TenantService tenantService;
-    private final TenantInvitationService invitationService;
     private final TenantInvitationReadService invitationReadService;
     private final AuthAccountService accountService;
     private final SystemSettingGateway settingService;
@@ -141,7 +139,6 @@ public class AuthController {
 
     public AuthController(UserService userService,
                           TenantService tenantService,
-                          TenantInvitationService invitationService,
                           TenantInvitationReadService invitationReadService,
                           AuthAccountService accountService,
                           SystemSettingGateway settingService,
@@ -151,7 +148,6 @@ public class AuthController {
                           OidcStateCodec oidcStateCodec) {
         this.userService = userService;
         this.tenantService = tenantService;
-        this.invitationService = invitationService;
         this.invitationReadService = invitationReadService;
         this.accountService = accountService;
         this.settingService = settingService;

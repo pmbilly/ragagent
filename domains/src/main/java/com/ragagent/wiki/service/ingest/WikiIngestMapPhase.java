@@ -489,7 +489,6 @@ final class WikiIngestMapPhase {
         final List<ExtractedItem> entitiesFinal = extractedEntities;
         final List<ExtractedItem> conceptsFinal = extractedConcepts;
         final String slugListingFinal = slugListing;
-        final String summarySlugFinal = summarySlug;
         List<Runnable> parallel = new ArrayList<>(2);
         parallel.add(() -> {
             try {
