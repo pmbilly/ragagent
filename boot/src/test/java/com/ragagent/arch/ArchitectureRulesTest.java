@@ -725,20 +725,12 @@ class ArchitectureRulesTest {
      * A17 棘轮基线：{@code ..service..} 包内仍直接依赖具体技术实现
      * （MyBatis / Redis / Servlet / Langfuse）的类。
      *
-     * <p>登记理由（方案 §12.1 第 2 条）：service 只做用例与政策编排，技术实现归
-     * repository / client / task 等边界类。实测存量 <b>60 类</b>入基线
-     * （MyBatis / Redis / Langfuse 混合命中）——只许减、新增即红。</p>
+     * <p><b>已清零（2026-10-19，L37~L45）</b>：立规时存量 60 类。收敛路径——
+     * MyBatis/Redis 走 repository 门面或运行面外提；langfuse 走域内观测门面
+     * （返回自有 Scope/SpanHandle，不泄露框架类型）；装饰器收进运行面入口。
+     * 本规则现为零基线纯禁令。</p>
      */
-    private static final Set<String> SERVICE_TECH_BASELINE =
-            Set.of(
-            // R4b：管线本体归位会话域后落在 service 包内——插件族依赖 langfuse 观测与具体技术
-            // （管线本体的必要依赖，随 chatpipeline → session.service.rag 迁移登记）
-            "com.ragagent.session.rag.plugin.PluginRerank",
-            "com.ragagent.session.rag.plugin.PluginSearchOps",
-            "com.ragagent.session.service.suggestion.MessageSuggestionService",
-            "com.ragagent.session.assembly.QaWiring",
-            "com.ragagent.session.service.SessionAgentQaService",
-            "com.ragagent.session.service.SessionKnowledgeQaService");
+    private static final Set<String> SERVICE_TECH_BASELINE = Set.of();
 
     /** service 层判据：包名任一段等于 {@code service}（对齐 ArchUnit {@code ..service..} 语义）。 */
     /**

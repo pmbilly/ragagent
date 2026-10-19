@@ -15,14 +15,12 @@ import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
-import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
-import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageSuggestionEvent;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.session.repository.MessageSuggestionRepository;
+import com.ragagent.session.runtime.SessionTrace;
 import com.ragagent.session.support.SessionOwnerIds;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -108,7 +106,7 @@ public class MessageSuggestionService {
         var spanEc = message.getExecutionContext();
         // 派生请求先按 ExecutionContext 里存的 traceparent 续接**原对话**的 trace，再开
         // follow_up.suggestions span——否则下游 generation 会自动开一个孤儿根
-        LangfuseTracing.attachTraceparent(
+        SessionTrace.attachTraceparent(
                 spanEc == null ? null : spanEc.getLangfuseTraceparent());
         Map<String, Object> spanConfig = followUps(
                 spanEc == null ? null : spanEc.getQuestionSuggestions());
@@ -119,10 +117,9 @@ public class MessageSuggestionService {
         Map<String, Object> spanMeta = new LinkedHashMap<>();
         spanMeta.put("count", spanConfig == null ? null : spanConfig.get("count"));
         spanMeta.put("modelId", strVal(spanConfig, "modelId"));
-        Span followUpSpan =
-                LangfuseManager.get().startSpan(
-                        new LangfuseManager.SpanOptions(
-                                "follow_up.suggestions", spanInput, spanMeta));
+        SessionTrace.SpanHandle followUpSpan =
+                SessionTrace.start(
+                                "follow_up.suggestions", spanInput, spanMeta);
         MessageSuggestionSet result;
         try {
             result = ensureFollowUpsInner(message, sessionId, assistantMessageId, regenerate);

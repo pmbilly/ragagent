@@ -20,9 +20,8 @@ import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
-import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
-import com.ragagent.platform.tracing.decorators.LangfuseReranker;
 import com.ragagent.session.conversation.MessageService;
+import com.ragagent.session.runtime.SessionModels;
 import com.ragagent.session.support.PipelineViews;
 import java.util.ArrayList;
 import java.util.List;
@@ -308,12 +307,12 @@ public class SessionAgentQaService {
         // 取数口径留在此处（findModel 的状态闸门）；构造走 model-runtime 的工厂面
         // （并发闸门装饰在那边装配， 的 NPE 教训随之固化）。
         // langfuse generation 装饰（未启用时原样返回）
-        return LangfuseChatClient.wrap(modelRuntime.chatClientFor(model));
+        return SessionModels.chat(modelRuntime.chatClientFor(model));
     }
 
     private Reranker rerankModel(String modelId) {
         // langfuse generation 装饰（未启用时原样返回）
-        return LangfuseReranker.wrap(modelRuntime.rerankerFor(modelCatalog.findModel(modelId)));
+        return SessionModels.rerank(modelRuntime.rerankerFor(modelCatalog.findModel(modelId)));
     }
 
 }

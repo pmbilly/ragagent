@@ -17,8 +17,6 @@ import com.ragagent.contract.websearch.WebSearchProviderPort;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.settings.ConversationProperties;
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
-import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.conversation.SessionLookupScope;
 import com.ragagent.session.conversation.SessionService;
@@ -31,6 +29,7 @@ import com.ragagent.session.rag.PipelineProgress;
 import com.ragagent.session.rag.PipelineProgress.StageProgress;
 import com.ragagent.session.rag.SummaryConfig;
 import com.ragagent.session.rag.plugin.PluginError;
+import com.ragagent.session.runtime.SessionTrace;
 import com.ragagent.session.support.PipelineViews;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -176,11 +175,10 @@ public class SessionKnowledgeQaService {
 
         // qa.setup span 包住请求装配段（KB/模型解析、检索目标构建、
         // agent 覆盖应用）——补上 trace 开始到首个阶段观测之间的可见空档
-        Span setupSpan =
-                LangfuseManager.get().startSpan(
-                        new LangfuseManager.SpanOptions(
+        SessionTrace.SpanHandle setupSpan =
+                SessionTrace.start(
                                 "qa.setup", null,
-                                java.util.Map.of("sessionId", sessionId == null ? "" : sessionId)));
+                                java.util.Map.of("sessionId", sessionId == null ? "" : sessionId));
 
         // Resolve knowledge bases using shared helper
         KnowledgeResolution kb = resolution.resolveKnowledgeBases(req);
@@ -321,14 +319,13 @@ public class SessionKnowledgeQaService {
             // 阶段 span 包住本阶段；CHAT_COMPLETION_STREAM 跳过——
             // 该阶段的 chat.completion.stream generation 已覆盖完整时长，再套一层
             // 会产出"视觉上超出父节点"的子观测
-            Span stageSpan = null;
+            SessionTrace.SpanHandle stageSpan = null;
             if (eventType != PipelineEventType.CHAT_COMPLETION_STREAM) {
-                stageSpan = LangfuseManager.get().startSpan(
-                        new LangfuseManager.SpanOptions(
+                stageSpan = SessionTrace.start(
                                 "pipeline." + eventType.key(), null,
                                 java.util.Map.of("event_type", eventType.key(),
                                         "session_id", chatManage.getSessionId() == null
-                                                ? "" : chatManage.getSessionId())));
+                                                ? "" : chatManage.getSessionId()));
             }
             if (eventType == PipelineEventType.QUERY_UNDERSTAND
                     && PipelineProgress.shouldEmitQueryUnderstandProgress(chatManage)) {
@@ -489,12 +486,11 @@ public class SessionKnowledgeQaService {
         for (PipelineEventType event : searchEvents) {
             log.info("Starting to trigger search event: {}", event.key());
             // search_knowledge 流的阶段 span（恒开，含 SEARCH_NOTHING）
-            Span stageSpan =
-                    LangfuseManager.get().startSpan(
-                            new LangfuseManager.SpanOptions(
+            SessionTrace.SpanHandle stageSpan =
+                    SessionTrace.start(
                                     "pipeline." + event.key(), null,
                                     java.util.Map.of("event_type", event.key(),
-                                            "flow", "search_knowledge")));
+                                            "flow", "search_knowledge"));
             PluginError err = eventManager.trigger(event, chatManage);
 
             // SEARCH_NOTHING 不算错误；其余带底层错误消息收尾

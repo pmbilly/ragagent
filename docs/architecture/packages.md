@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-362 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+363 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -241,6 +241,7 @@
 | `:domains` | `com.ragagent.session.rag.spi` | 管线 · spi：KnowledgeQaEventPort。 |
 | `:domains` | `com.ragagent.session.rag.support` | chat 管线的**纯逻辑辅助**：检索结果去重/去包含（com.ragagent.session.rag.support.SearchSupport）、 查询分词与关键词抽取（com.ragagen |
 | `:domains` | `com.ragagent.session.repository` | 仓储门面层：把 mapper 的原子操作组合成领域可用的读写契约，并集中承载软删、全字段 UPDATE 与 PG/H2 方言分支。 |
+| `:domains` | `com.ragagent.session.runtime` | 会话运行面：模型观测装饰入口与 span 门面。 |
 | `:domains` | `com.ragagent.session.service` | 会话 · 编排核心：知识/Agent 两条问答服务、QA 上下文解析（ChatManageFactory / QaSupport）、Agent 工具后端与编排协作件。 |
 | `:domains` | `com.ragagent.session.service.suggestion` | 消息建议面（由 session.service 切出，对齐方案 的 service.suggestion/）： MessageSuggestionService（建议生成的编排与落库）与 Messag |
 | `:domains` | `com.ragagent.session.support` | 会话 · 支撑：MessageReferenceRewriter / PipelineViews。 |

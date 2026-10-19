@@ -12,12 +12,12 @@ import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.runtime.SessionTrace;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -121,8 +121,7 @@ public final class PluginRerank implements Plugin {
         spanInput.put("passages_preview", passagesPreview);
         Map<String, Object> spanMeta = new LinkedHashMap<>();
         spanMeta.put("sessionId", chatManage.getSessionId());
-        var rerankSpan = LangfuseManager.get().startSpan(
-                new LangfuseManager.SpanOptions("rerank", spanInput, spanMeta));
+        var rerankSpan = SessionTrace.start("rerank", spanInput, spanMeta);
 
         Map<String, Object> bp = new LinkedHashMap<>();
         bp.put("total_cnt", chatManage.getSearchResult().size());

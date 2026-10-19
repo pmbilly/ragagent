@@ -27,8 +27,6 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.platform.settings.ConversationProperties;
-import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
-import com.ragagent.platform.tracing.decorators.LangfuseReranker;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.rag.EventManager;
@@ -49,6 +47,7 @@ import com.ragagent.session.rag.plugin.PluginSearchEntity;
 import com.ragagent.session.rag.plugin.PluginSearchParallel;
 import com.ragagent.session.rag.plugin.PluginWebFetch;
 import com.ragagent.session.rag.plugin.PluginWikiBoost;
+import com.ragagent.session.runtime.SessionModels;
 import com.ragagent.session.support.PipelineViews;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
@@ -113,7 +112,7 @@ public class QaWiring {
                 }
                 // 取数口径留在此处（findModel 的状态闸门）；构造走 model-runtime 工厂面
                 // langfuse generation 装饰（未启用时原样返回）
-                return LangfuseChatClient.wrap(modelRuntime.chatClientFor(model));
+                return SessionModels.chat(modelRuntime.chatClientFor(model));
             }
 
             @Override
@@ -123,7 +122,7 @@ public class QaWiring {
                     return null;
                 }
                 // langfuse generation 装饰（未启用时原样返回）
-                return LangfuseReranker.wrap(modelRuntime.rerankerFor(model));
+                return SessionModels.rerank(modelRuntime.rerankerFor(model));
             }
         };
     }

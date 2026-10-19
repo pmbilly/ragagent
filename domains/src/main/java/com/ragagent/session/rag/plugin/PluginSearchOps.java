@@ -11,10 +11,9 @@ import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
-import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.runtime.SessionTrace;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -335,11 +334,11 @@ final class PluginSearchOps {
         f.put("provider_id", providerId);
         PipelineLog.info("Search", "web_request", f);
 
-        Span webSpan = LangfuseManager.get().startSpan(new LangfuseManager.SpanOptions(
+        SessionTrace.SpanHandle webSpan = SessionTrace.start(
                 "web_search",
                 mapOf("provider_id", providerId, "query", chatManage.getRewriteQuery(),
                         "max_results", webConfig == null ? 0 : webConfig.getMaxResults()),
-                null));
+                null);
         List<WebSearchResult> webResults;
         try {
             webResults = service.webSearchService.search(providerId, webConfig, chatManage.getRewriteQuery());
