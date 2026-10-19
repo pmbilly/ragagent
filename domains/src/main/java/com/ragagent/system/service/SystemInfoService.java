@@ -14,7 +14,6 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
-import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Service;
 
@@ -46,8 +45,6 @@ public class SystemInfoService {
     private final RetrieveGraphRepository graphRepository;
     /** RETRIEVE_DRIVER（属性绑定，不读裸 env；未配置 → 页面显示「未配置」）。 */
     private final RetrievalDriverProperties driverProperties;
-    /** env 读取面（存储 env 可用性探测等按名读取）。 */
-    private final Environment environment;
 
     /** 覆盖项（配置/测试可固定值）；为空则取构建信息或运行时值。edition 无构建注入。 */
     @Value("${weknora.system.version:}")
@@ -61,15 +58,13 @@ public class SystemInfoService {
     @Value("${weknora.system.java-version:}")
     private String javaVersionOverride;
 
-    public SystemInfoService(                             DataSource dataSource,
+    public SystemInfoService(DataSource dataSource,
                              ObjectProvider<BuildProperties> buildProperties,
                              RetrieveGraphRepository graphRepository,
-                             RetrievalDriverProperties driverProperties,
-                             Environment environment) {
+                             RetrievalDriverProperties driverProperties) {
         this.dataSource = dataSource;
         this.buildProperties = buildProperties;
         this.driverProperties = driverProperties;
-        this.environment = environment;
         this.graphRepository = graphRepository;
     }
 
