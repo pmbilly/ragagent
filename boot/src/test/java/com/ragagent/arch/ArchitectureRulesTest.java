@@ -722,12 +722,8 @@ class ArchitectureRulesTest {
      */
     private static final Set<String> SERVICE_BOUNDARY_BASELINE =
             Set.of(
-            "com.ragagent.agentmanagement.service.AgentSuggestedQuestions",
-            "com.ragagent.agentmanagement.service.CustomAgentService",
             "com.ragagent.datasource.service.DataSourceService",
             "com.ragagent.datasource.service.DataSourceWiring",
-            "com.ragagent.embedchannel.service.EmbedChannelService",
-            "com.ragagent.favorite.service.UserResourceFavoriteService",
             "com.ragagent.im.service.ImChannelRuntimeOps",
             "com.ragagent.im.service.ImChannelService",
             "com.ragagent.im.service.ImTurnOrchestrator",
@@ -747,11 +743,6 @@ class ArchitectureRulesTest {
             "com.ragagent.mcp.service.McpMetadataService",
             "com.ragagent.mcp.service.McpServiceManagement",
             "com.ragagent.mcp.service.McpToolApprovalService",
-            "com.ragagent.model.service.BuiltinModelsReconciler",
-            "com.ragagent.model.service.ModelService",
-            "com.ragagent.system.service.SystemSettingService",
-            "com.ragagent.vectorstore.service.VectorStoreConfigService",
-            "com.ragagent.vectorstore.service.VectorStoreLookupAdapter",
             "com.ragagent.websearch.service.WebSearchProviderService",
             "com.ragagent.websearch.service.WebSearchService");
 
@@ -781,13 +772,10 @@ class ArchitectureRulesTest {
             "com.ragagent.memory.service.MemoryTaskQueueWiring",
             "com.ragagent.memory.service.MemoryTrace",
             "com.ragagent.memory.service.RedisMemoryExtractTaskQueue",
-            "com.ragagent.model.service.BuiltinModelsReconciler",
-            "com.ragagent.model.service.ModelService",
             "com.ragagent.session.service.suggestion.MessageSuggestionService",
             "com.ragagent.session.assembly.QaWiring",
             "com.ragagent.session.service.SessionAgentQaService",
             "com.ragagent.session.service.SessionKnowledgeQaService",
-            "com.ragagent.system.service.SystemSettingService",
             "com.ragagent.websearch.service.WebSearchTempKbStateService",
             "com.ragagent.wiki.service.ingest.WikiIngestEnqueueOps",
             "com.ragagent.wiki.service.page.RedisWikiSlugLock");

@@ -1,9 +1,8 @@
 package com.ragagent.model.service;
 
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.model.domain.Model;
-import com.ragagent.model.mapper.ModelMapper;
+import com.ragagent.model.repository.ModelRepository;
 import com.ragagent.platform.config.AppEnvLookup;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,10 +39,10 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
     private static final long DEFAULT_TENANT_ID = 10000;
     private static final Pattern ENV_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
 
-    private final ModelMapper modelMapper;
+    private final ModelRepository modelRepo;
 
-    public BuiltinModelsReconciler(ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
+    public BuiltinModelsReconciler(ModelRepository modelRepo) {
+        this.modelRepo = modelRepo;
     }
 
     @Override
@@ -88,7 +87,7 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
                 continue;
             }
             // 运行时覆盖保留（含软删除的手工行，查询不过滤 deleted_at）
-            Model existing = modelMapper.selectById(id);
+            Model existing = modelRepo.byIdIncludingDeleted(id);
             if (existing != null && !MANAGED_BY_YAML.equals(str(existing.getManagedBy()))) {
                 log.info("[builtin-models] preserving runtime override: id={}", id);
                 continue;
@@ -113,12 +112,7 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
 
             if (m.isIsDefault()) {
                 // 同 (tenant_id, type) 桶内清其他默认（排除自身）
-                modelMapper.update(null, new LambdaUpdateWrapper<Model>()
-                        .eq(Model::getTenantId, m.getTenantId())
-                        .eq(Model::getType, m.getType())
-                        .ne(Model::getId, m.getId())
-                        .eq(Model::isIsDefault, true)
-                        .set(Model::isIsDefault, false));
+                modelRepo.clearDefaultForBucket(m.getTenantId(), m.getType(), m.getId());
             }
             upsert(m);
             applied++;
@@ -128,15 +122,10 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
 
         // 漂移清扫：YAML 托管且不在文件中的行软删除
         int pruned = 0;
-        List<Model> managed = modelMapper.selectList(
-                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Model>()
-                        .eq(Model::getManagedBy, MANAGED_BY_YAML)
-                        .isNull(Model::getDeletedAt));
+        List<Model> managed = modelRepo.listManagedBy(MANAGED_BY_YAML);
         for (Model row : managed) {
             if (!yamlIds.contains(row.getId())) {
-                modelMapper.update(null, new LambdaUpdateWrapper<Model>()
-                        .eq(Model::getId, row.getId())
-                        .set(Model::getDeletedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+                modelRepo.softDeleteById(row.getId(), OffsetDateTime.now(ZoneOffset.UTC));
                 pruned++;
             }
         }
@@ -149,20 +138,19 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
      * 恒为 now，不携带它才能避免已存在行的 created_at 每次启动被改写。
      */
     private void upsert(Model m) {
-        LambdaUpdateWrapper<Model> uw = new LambdaUpdateWrapper<Model>().eq(Model::getId, m.getId());
         OffsetDateTime createdAt = m.getCreatedAt();
         m.setCreatedAt(null);
         try {
             // MyBatis-Plus 无原生 upsert：先按 id 尝试更新，影响 0 行则插入（PK 冲突兜底）
             // 并发安全由 PK 唯一约束保证：插入冲突时重试更新
-            int updated = modelMapper.update(m, uw);
+            int updated = modelRepo.updateByIdNonNull(m);
             if (updated == 0) {
                 m.setCreatedAt(createdAt);
                 try {
-                    modelMapper.insert(m);
+                    modelRepo.insert(m);
                 } catch (org.springframework.dao.DuplicateKeyException ex) {
                     m.setCreatedAt(null);
-                    modelMapper.update(m, new LambdaUpdateWrapper<Model>().eq(Model::getId, m.getId()));
+                    modelRepo.updateByIdNonNull(m);
                 }
             }
         } finally {

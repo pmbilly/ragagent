@@ -1,6 +1,5 @@
 package com.ragagent.system.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.auth.api.AdminUserAdapter;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
@@ -12,7 +11,7 @@ import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.settings.SystemSettingRegistry;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.system.domain.SystemSetting;
-import com.ragagent.system.mapper.SystemSettingMapper;
+import com.ragagent.system.repository.SystemSettingRepository;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -55,7 +54,7 @@ public class SystemSettingService implements SystemSettingGateway {
     private static final Logger log = LoggerFactory.getLogger(SystemSettingService.class);
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final SystemSettingMapper mapper;
+    private final SystemSettingRepository repo;
     private final AuditWritePort auditWriter;
     /** 白名单是进程级静态——注入任意实例即可（reloadWhitelist 改的是静态字段）。 */
     private final SsrfGuard ssrfGuard;
@@ -66,13 +65,13 @@ public class SystemSettingService implements SystemSettingGateway {
     @Value("${weknora.auth.registration-mode:}")
     private String configuredRegistrationMode;
 
-    public SystemSettingService(SystemSettingMapper mapper,
+    public SystemSettingService(SystemSettingRepository repo,
                                 AuditWritePort auditWriter,
                                 SsrfGuard ssrfGuard,
                                 Environment environment,
                                 AdminUserAdapter adminUserPort) {
         this.adminUserPort = adminUserPort;
-        this.mapper = mapper;
+        this.repo = repo;
         this.auditWriter = auditWriter;
         this.ssrfGuard = ssrfGuard;
         this.environment = environment;
@@ -198,7 +197,7 @@ public class SystemSettingService implements SystemSettingGateway {
      */
     public List<SystemSetting> list() {
         Map<String, SystemSetting> byKey = new ConcurrentHashMap<>();
-        for (SystemSetting row : mapper.selectList(new LambdaQueryWrapper<>())) {
+        for (SystemSetting row : repo.listAll()) {
             byKey.put(row.getKey(), row);
         }
         byKey.remove(SystemSettingRegistry.RETIRED_KEY);
@@ -302,9 +301,9 @@ public class SystemSettingService implements SystemSettingGateway {
         row.setUpdatedAt(now);
         if (prev == null) {
             row.setCreatedAt(now);
-            mapper.insert(row);
+            repo.insert(row);
         } else {
-            mapper.updateById(row);
+            repo.updateById(row);
         }
 
         SystemSetting persisted = selectByKey(key);
@@ -326,8 +325,7 @@ public class SystemSettingService implements SystemSettingGateway {
             throw new IllegalArgumentException("unknown setting key \"" + key + "\"");
         }
         SystemSetting prev = selectByKey(key);
-        int deleted = mapper.delete(new LambdaQueryWrapper<SystemSetting>()
-                .eq(SystemSetting::getKey, key));
+        int deleted = repo.deleteByKey(key);
         boolean rowDeleted = deleted > 0;
         dispatchSideEffects(key);
         if (rowDeleted && prev != null) {
@@ -338,9 +336,7 @@ public class SystemSettingService implements SystemSettingGateway {
     // ── 内部 ─────────────────────────────────────────────────────────────
 
     private SystemSetting selectByKey(String key) {
-        return mapper.selectOne(new LambdaQueryWrapper<SystemSetting>()
-                .eq(SystemSetting::getKey, key)
-                .last("LIMIT 1"));
+        return repo.findByKey(key);
     }
 
     /** id=0 + 零值时间（实体字段默认值即零值）。 */

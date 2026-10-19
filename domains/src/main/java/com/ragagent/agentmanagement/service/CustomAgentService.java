@@ -2,8 +2,8 @@ package com.ragagent.agentmanagement.service;
 
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.dto.CustomAgentResult;
-import com.ragagent.agentmanagement.mapper.AgentQuestionMapper;
-import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
+import com.ragagent.agentmanagement.repository.AgentQuestionRepository;
+import com.ragagent.agentmanagement.repository.CustomAgentRepository;
 import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.contract.agent.AgentChannelCleaner;
@@ -40,7 +40,7 @@ import tools.jackson.databind.node.ObjectNode;
 public class CustomAgentService {
 
 
-    private final CustomAgentMapper agentMapper;
+    private final CustomAgentRepository agentRepo;
     private final UserLookupPort userLookup;
     private final BuiltinAgentRegistry registry;
     /**
@@ -56,18 +56,18 @@ public class CustomAgentService {
     /** 推荐问题流协作者。 */
     private final AgentSuggestedQuestions suggestedQuestions;
 
-    public CustomAgentService(CustomAgentMapper agentMapper,
-            AgentQuestionMapper questionMapper,
+    public CustomAgentService(CustomAgentRepository agentRepo,
+            AgentQuestionRepository questionRepo,
             UserLookupPort userLookup,
             KnowledgeBaseCatalogPort kbCatalog,
             BuiltinAgentRegistry registry,
             org.springframework.beans.factory.ObjectProvider<
                     AgentChannelCleaner> agentChannelCleanerProvider) {
-        this.agentMapper = agentMapper;
+        this.agentRepo = agentRepo;
         this.userLookup = userLookup;
         this.registry = registry;
         this.agentChannelCleanerProvider = agentChannelCleanerProvider;
-        this.suggestedQuestions = new AgentSuggestedQuestions(this, questionMapper, kbCatalog);
+        this.suggestedQuestions = new AgentSuggestedQuestions(this, questionRepo, kbCatalog);
     }
 
     static long tenantId() {
@@ -86,7 +86,7 @@ public class CustomAgentService {
         if (admin) {
             return;
         }
-        CustomAgentEntity row = agentMapper.getByIDAndTenant(id, tenantId());
+        CustomAgentEntity row = agentRepo.getByIDAndTenant(id, tenantId());
         if (row != null) {
             String creator = row.getCreatedBy() == null ? "" : row.getCreatedBy();
             String uid = TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId();
@@ -104,7 +104,7 @@ public class CustomAgentService {
             throw new BizException(AppError.badRequest("agent ID cannot be empty"));
         }
         long tenant = tenantId();
-        CustomAgentEntity row = agentMapper.getByIDAndTenant(id, tenant);
+        CustomAgentEntity row = agentRepo.getByIDAndTenant(id, tenant);
         if (row != null) {
             ObjectNode cfg = AgentConfigJson.ensureDefaults(AgentSuggestedQuestions.parse(row.getConfig()));
             if (BuiltinAgentRegistry.isBuiltinAgentID(id)) {
@@ -147,7 +147,7 @@ public class CustomAgentService {
      */
     public ListResult listAgents(String creatorFilter, String locale) {
         long tenant = tenantId();
-        List<CustomAgentEntity> all = agentMapper.listByTenant(tenant);
+        List<CustomAgentEntity> all = agentRepo.listByTenant(tenant);
         Set<String> builtinInDb = new HashSet<>();
         List<CustomAgentResult> prepared = new ArrayList<>();
         for (CustomAgentEntity row : all) {
@@ -285,7 +285,7 @@ public class CustomAgentService {
             throw new BizException(AppError.badRequest(err));
         }
         agent.setConfig(config.toString());
-        agentMapper.insertAgent(agent);
+        agentRepo.insertAgent(agent);
         return new CustomAgentResult(agent, config);
     }
 
@@ -299,7 +299,7 @@ public class CustomAgentService {
         if (BuiltinAgentRegistry.isBuiltinAgentID(id)) {
             return updateBuiltinAgent(id, config, tenant);
         }
-        CustomAgentEntity existing = agentMapper.getByIDAndTenant(id, tenant);
+        CustomAgentEntity existing = agentRepo.getByIDAndTenant(id, tenant);
         if (existing == null) {
             throw new BizException(AppError.notFound("Agent not found"));
         }
@@ -322,7 +322,7 @@ public class CustomAgentService {
         if (entry == null) {
             throw new BizException(AppError.notFound("Agent not found"));
         }
-        CustomAgentEntity existing = agentMapper.getByIDAndTenant(id, tenant);
+        CustomAgentEntity existing = agentRepo.getByIDAndTenant(id, tenant);
         if (existing != null) {
             existing.setUpdatedAt(OffsetDateTime.now());
             CustomAgentResult r = persistWithDefaults(existing, config, false);
@@ -355,9 +355,9 @@ public class CustomAgentService {
         }
         entity.setConfig(config.toString());
         if (insert) {
-            agentMapper.insertAgent(entity);
+            agentRepo.insertAgent(entity);
         } else {
-            agentMapper.updateAgent(entity);
+            agentRepo.updateAgent(entity);
         }
         return new CustomAgentResult(entity, config);
     }
@@ -371,14 +371,14 @@ public class CustomAgentService {
             throw new BizException(AppError.forbidden("Cannot delete built-in agent"));
         }
         long tenant = tenantId();
-        CustomAgentEntity existing = agentMapper.getByIDAndTenant(id, tenant);
+        CustomAgentEntity existing = agentRepo.getByIDAndTenant(id, tenant);
         if (existing == null) {
             throw new BizException(AppError.notFound("Agent not found"));
         }
         if (existing.isBuiltin()) {
             throw new BizException(AppError.forbidden("Cannot delete built-in agent"));
         }
-        agentMapper.softDelete(id, tenant);
+        agentRepo.softDelete(id, tenant);
 
         // 软删该 agent 的全部 IM 渠道并停止运行中的适配器，
         // 避免概览列表与运行中的适配器比 agent 活得更久。
@@ -412,7 +412,7 @@ public class CustomAgentService {
         }
         ObjectNode cfg = (ObjectNode) source.config().deepCopy();
         AgentConfigJson.ensureDefaults(cfg);
-        agentMapper.insertAgent(created);
+        agentRepo.insertAgent(created);
         return new CustomAgentResult(created, cfg);
     }
 

@@ -11,7 +11,7 @@ import com.ragagent.vectorstore.config.EnvVectorStores;
 import com.ragagent.vectorstore.domain.VectorStore;
 import com.ragagent.vectorstore.domain.VectorStoreEngines;
 import com.ragagent.vectorstore.dto.VectorStoreResponse;
-import com.ragagent.vectorstore.mapper.VectorStoreRepository;
+import com.ragagent.vectorstore.repository.VectorStoreRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

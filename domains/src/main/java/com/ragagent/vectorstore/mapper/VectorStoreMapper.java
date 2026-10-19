@@ -18,7 +18,7 @@ import org.apache.ibatis.annotations.Update;
  * List 排序 created_at DESC（与 wsp 的 ASC 相反，既有行为如此）。
  */
 @Mapper
-public interface VectorStoreRepository {
+public interface VectorStoreMapper {
 
     String COLS = "id, tenant_id, name, engine_type, connection_config, index_config, "
             + "created_at, updated_at, deleted_at";

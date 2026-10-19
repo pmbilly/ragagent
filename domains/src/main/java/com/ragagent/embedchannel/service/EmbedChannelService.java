@@ -4,7 +4,7 @@ import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.contract.knowledge.ChunkRowView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
-import com.ragagent.embedchannel.mapper.EmbedChannelMapper;
+import com.ragagent.embedchannel.repository.EmbedChannelRepository;
 import com.ragagent.embedchannel.support.EmbedError;
 import com.ragagent.embedchannel.support.EmbedTokens;
 import com.ragagent.platform.access.TenantContext;
@@ -49,14 +49,14 @@ public class EmbedChannelService {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final EmbedChannelMapper repo;
+    private final EmbedChannelRepository repo;
     private final AgentLookup agentLookup;
     private final KnowledgeCatalogPort knowledgeCatalog;
     private final EmbedTokenStore tokenStore;
     /** 部署形态（是否生产影响 embed 渠道来源白名单校验）。 */
     private final DeploymentProperties deploymentProperties;
 
-    public EmbedChannelService(EmbedChannelMapper repo,
+    public EmbedChannelService(EmbedChannelRepository repo,
                                AgentLookup agentLookup,
                                KnowledgeCatalogPort knowledgeCatalog,
                                EmbedTokenStore tokenStore,

@@ -2,7 +2,7 @@ package com.ragagent.favorite.service;
 
 import com.ragagent.contract.error.BizException;
 import com.ragagent.favorite.domain.UserResourceFavorite;
-import com.ragagent.favorite.mapper.UserResourceFavoriteMapper;
+import com.ragagent.favorite.repository.UserResourceFavoriteRepository;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -22,23 +22,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserResourceFavoriteService {
 
-    private final UserResourceFavoriteMapper mapper;
+    private final UserResourceFavoriteRepository repo;
 
-    public UserResourceFavoriteService(UserResourceFavoriteMapper mapper) {
-        this.mapper = mapper;
+    public UserResourceFavoriteService(UserResourceFavoriteRepository repo) {
+        this.repo = repo;
     }
 
     /** 类型必须命中白名单，否则 400。 */
     public List<UserResourceFavorite> list(String userId, Long tenantId, String resourceType) {
         requireValidType(resourceType);
-        return mapper.list(userId, tenantId, resourceType);
+        return repo.list(userId, tenantId, resourceType);
     }
 
     /** 先校验再插入（已存在则幂等跳过，不报错）。 */
     public void add(String userId, Long tenantId, String resourceType, String resourceId) {
         requireValidType(resourceType);
         requireNonEmptyId(resourceId);
-        if (mapper.find(userId, tenantId, resourceType, resourceId) != null) {
+        if (repo.find(userId, tenantId, resourceType, resourceId) != null) {
             return;
         }
         UserResourceFavorite favorite = new UserResourceFavorite();
@@ -47,7 +47,7 @@ public class UserResourceFavoriteService {
         favorite.setResourceType(resourceType);
         favorite.setResourceId(resourceId);
         favorite.setCreatedAt(OffsetDateTime.now());
-        mapper.insert(favorite);
+        repo.insert(favorite);
     }
 
     /**
@@ -57,7 +57,7 @@ public class UserResourceFavoriteService {
     public void remove(String userId, Long tenantId, String resourceType, String resourceId) {
         requireValidType(resourceType);
         requireNonEmptyId(resourceId);
-        mapper.delete(userId, tenantId, resourceType, resourceId);
+        repo.delete(userId, tenantId, resourceType, resourceId);
     }
 
     private static void requireValidType(String resourceType) {

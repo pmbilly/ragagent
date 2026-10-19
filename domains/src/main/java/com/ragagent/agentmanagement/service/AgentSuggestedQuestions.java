@@ -1,7 +1,7 @@
 package com.ragagent.agentmanagement.service;
 
 import com.ragagent.agentmanagement.dto.CustomAgentResult;
-import com.ragagent.agentmanagement.mapper.AgentQuestionMapper;
+import com.ragagent.agentmanagement.repository.AgentQuestionRepository;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.knowledge.KnowledgeBaseCatalogPort;
@@ -31,14 +31,14 @@ public final class AgentSuggestedQuestions {
 
 
     private final CustomAgentService agents;
-    private final AgentQuestionMapper questionMapper;
+    private final AgentQuestionRepository questionRepo;
     /** KB 目录走公开端口（原经 {@code agents.kbService} 直连 knowledge.service）。 */
     private final KnowledgeBaseCatalogPort kbCatalog;
 
-    AgentSuggestedQuestions(CustomAgentService agents, AgentQuestionMapper questionMapper,
+    AgentSuggestedQuestions(CustomAgentService agents, AgentQuestionRepository questionRepo,
             KnowledgeBaseCatalogPort kbCatalog) {
         this.agents = agents;
-        this.questionMapper = questionMapper;
+        this.questionRepo = questionRepo;
         this.kbCatalog = kbCatalog;
     }
 
@@ -195,7 +195,7 @@ public final class AgentSuggestedQuestions {
         if (explicitKbIds.isEmpty() && knowledgeIds.isEmpty() && tagIds.isEmpty()) {
             return; // 三个范围全空 → 直接返回空
         }
-        List<Map<String, Object>> rows = questionMapper.listRecommendedFaqChunks(groupTenant,
+        List<Map<String, Object>> rows = questionRepo.listRecommendedFaqChunks(groupTenant,
                 explicitKbIds, !explicitKbIds.isEmpty(),
                 knowledgeIds, !knowledgeIds.isEmpty(),
                 tagIds, !tagIds.isEmpty(), fetchLimit);
@@ -212,7 +212,7 @@ public final class AgentSuggestedQuestions {
 
     private void docQuery(long groupTenant, List<String> explicitKbIds, List<String> knowledgeIds,
             int fetchLimit, Map<String, List<Object[]>> buckets, Set<String> seen) {
-        List<Map<String, Object>> rows = questionMapper.listRecentDocumentChunksWithQuestions(
+        List<Map<String, Object>> rows = questionRepo.listRecentDocumentChunksWithQuestions(
                 groupTenant, explicitKbIds, !explicitKbIds.isEmpty(),
                 knowledgeIds, !knowledgeIds.isEmpty(), fetchLimit);
         for (Map<String, Object> row : rows) {
@@ -385,7 +385,7 @@ public final class AgentSuggestedQuestions {
         for (Map.Entry<Long, List<String>> g : kbGroups.entrySet()) {
             for (String kbId : g.getValue()) {
                 List<String> requested = mergeUnique(null, byKb.get(kbId));
-                List<Map<String, Object>> tags = questionMapper.findTags(g.getKey(), requested);
+                List<Map<String, Object>> tags = questionRepo.findTags(g.getKey(), requested);
                 Set<String> requestedSet = new HashSet<>(requested);
                 List<String> valid = new ArrayList<>();
                 for (Map<String, Object> t : tags) {
@@ -400,7 +400,7 @@ public final class AgentSuggestedQuestions {
                 outKbIds = mergeUnique(outKbIds, List.of(kbId));
                 tagIdsByTenant.computeIfAbsent(g.getKey(), k -> new ArrayList<>())
                         .addAll(mergeUnique(null, valid));
-                List<String> knowledge = questionMapper.listKnowledgeIdsByTagIds(
+                List<String> knowledge = questionRepo.listKnowledgeIdsByTagIds(
                         g.getKey(), kbId, valid);
                 outKnowledgeIds = mergeUnique(outKnowledgeIds, knowledge);
             }
@@ -414,7 +414,7 @@ public final class AgentSuggestedQuestions {
         if (kbIds == null || kbIds.isEmpty()) {
             return out;
         }
-        List<Map<String, Object>> rows = questionMapper.findKbs(kbIds);
+        List<Map<String, Object>> rows = questionRepo.findKbs(kbIds);
         Map<String, Long> tenantByKb = new LinkedHashMap<>();
         for (Map<String, Object> row : rows) {
             tenantByKb.put((String) row.get("id"), ((Number) row.get("tenantId")).longValue());

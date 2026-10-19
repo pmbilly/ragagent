@@ -1,7 +1,5 @@
 package com.ragagent.model.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.ModelFacts;
@@ -14,8 +12,8 @@ import com.ragagent.model.dto.ModelCredentialsResponse;
 import com.ragagent.model.dto.ModelDebugTarget;
 import com.ragagent.model.dto.ModelDetailResponse;
 import com.ragagent.model.dto.UpdateModelRequest;
-import com.ragagent.model.mapper.ModelMapper;
-import com.ragagent.model.mapper.ModelUsageMapper;
+import com.ragagent.model.repository.ModelRepository;
+import com.ragagent.model.repository.ModelUsageRepository;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
@@ -74,13 +72,13 @@ public class ModelService implements ModelFactsPort  {
     public static final String STATUS_DOWNLOADING = "downloading";
     public static final String STATUS_DOWNLOAD_FAILED = "download_failed";
 
-    private final ModelMapper modelMapper;
-    private final ModelUsageMapper usageMapper;
+    private final ModelRepository modelRepo;
+    private final ModelUsageRepository usageRepo;
     private final TenantConfigLookup tenantConfigLookup;
 
-    public ModelService(ModelMapper modelMapper, ModelUsageMapper usageMapper, TenantConfigLookup tenantConfigLookup) {
-        this.modelMapper = modelMapper;
-        this.usageMapper = usageMapper;
+    public ModelService(ModelRepository modelRepo, ModelUsageRepository usageRepo, TenantConfigLookup tenantConfigLookup) {
+        this.modelRepo = modelRepo;
+        this.usageRepo = usageRepo;
         this.tenantConfigLookup = tenantConfigLookup;
     }
 
@@ -105,7 +103,7 @@ public class ModelService implements ModelFactsPort  {
         } else {
             model.setStatus(STATUS_DOWNLOADING);
         }
-        modelMapper.insert(model);
+        modelRepo.insert(model);
         log.info("Model created successfully: {}", model.getId());
         return model;
     }
@@ -136,18 +134,12 @@ public class ModelService implements ModelFactsPort  {
 
     /** WHERE (tenant_id = ? OR is_builtin = true) AND deleted_at IS NULL */
     public Model getByIdVisible(long tenantId, String id) {
-        return modelMapper.selectOne(new LambdaQueryWrapper<Model>()
-                .eq(Model::getId, id)
-                .and(w -> w.eq(Model::getTenantId, tenantId).or().eq(Model::isIsBuiltin, true))
-                .isNull(Model::getDeletedAt)
-                .last("LIMIT 1"));
+        return modelRepo.findVisible(tenantId, id);
     }
 
     /** 无排序（DB 自然序）。 */
     public List<Model> listModels() {
-        return modelMapper.selectList(new LambdaQueryWrapper<Model>()
-                .and(w -> w.eq(Model::getTenantId, tenantId()).or().eq(Model::isIsBuiltin, true))
-                .isNull(Model::getDeletedAt));
+        return modelRepo.listVisible(tenantId());
     }
 
     /**
@@ -167,7 +159,7 @@ public class ModelService implements ModelFactsPort  {
             model.setIsBuiltin(true);
             model.setManagedBy("");
         }
-        modelMapper.updateById(model);
+        modelRepo.updateById(model);
         log.info("Model updated successfully: {}", model.getId());
         return model;
     }
@@ -201,7 +193,7 @@ public class ModelService implements ModelFactsPort  {
         if (existing.isIsBuiltin()) {
             existing.setManagedBy("");
         }
-        modelMapper.updateById(existing);
+        modelRepo.updateById(existing);
         log.info("Model credentials updated: id={}", id);
         return existing;
     }
@@ -241,7 +233,7 @@ public class ModelService implements ModelFactsPort  {
         if (existing.isIsBuiltin()) {
             existing.setManagedBy("");
         }
-        modelMapper.updateById(existing);
+        modelRepo.updateById(existing);
         log.info("Model credential cleared by user: id={} field={}", id, field);
     }
 
@@ -267,10 +259,7 @@ public class ModelService implements ModelFactsPort  {
             throw new BizException(new AppError(2300, formatInUseMessage(kbCount, agentCount, memory), usage, 400));
         }
         // 软删除：UPDATE deleted_at = now
-        modelMapper.update(null, new LambdaUpdateWrapper<Model>()
-                .eq(Model::getId, id)
-                .eq(Model::getTenantId, tid)
-                .set(Model::getDeletedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+        modelRepo.softDelete(id, tid, OffsetDateTime.now(ZoneOffset.UTC));
         log.info("Model deleted successfully: {}", id);
     }
 
@@ -310,7 +299,7 @@ public class ModelService implements ModelFactsPort  {
         ArrayNode memoryBindings = memory.putArray("bindings");
 
         long kbTotal = 0;
-        for (Map<String, Object> row : usageMapper.listKnowledgeBaseRows(tid)) {
+        for (Map<String, Object> row : usageRepo.listKnowledgeBaseRows(tid)) {
             List<String> bindings = kbBindings(row, modelId);
             if (bindings.isEmpty()) {
                 continue;
@@ -326,7 +315,7 @@ public class ModelService implements ModelFactsPort  {
         }
 
         long agentTotal = 0;
-        for (Map<String, Object> row : usageMapper.listCustomAgentRows(tid)) {
+        for (Map<String, Object> row : usageRepo.listCustomAgentRows(tid)) {
             List<String> bindings = agentBindings(row, modelId);
             if (bindings.isEmpty()) {
                 continue;

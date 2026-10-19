@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-347 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+353 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -54,6 +54,7 @@
 | `:domains` | `com.ragagent.agentmanagement.domain` | 智能体管理实体（@TableName 跟随表名）。 |
 | `:domains` | `com.ragagent.agentmanagement.dto` | 智能体管理面的响应装配类型（com.ragagent.agentmanagement.dto.AgentResponses）。 |
 | `:domains` | `com.ragagent.agentmanagement.mapper` | 智能体管理面的 MyBatis-Plus 接口与 jsonb 原串 TypeHandler。 |
+| `:domains` | `com.ragagent.agentmanagement.repository` | Agent 定义与推荐问题的仓储门面：自定义 Agent 行与跨表取样的只读查询。 |
 | `:domains` | `com.ragagent.agentmanagement.service` | 智能体管理用例实现：自定义智能体 CRUD（com.ragagent.agentmanagement.service.CustomAgentService）。 |
 | `:domains` | `com.ragagent.agentmanagement.service.builtin` | 内置智能体面（从 agentmanagement.service 切出，对齐方案）： BuiltinAgentRegistry——内置智能体定义、类型与提示词的注册表。 |
 | `:domains` | `com.ragagent.agentmanagement.service.config` | 智能体配置面（从 agentmanagement.service 切出，对齐方案）： agent config jsonb 读写（AgentConfigJson）、占位符（AgentPlacehold |
@@ -113,6 +114,7 @@
 | `:domains` | `com.ragagent.embedchannel.controller.filter` | 嵌入渠道鉴权过滤器面（由 embedchannel.filter 迁入 controller.filter，对齐方案）： EmbedAuthFilter——对外嵌入问答的访客鉴权。 |
 | `:domains` | `com.ragagent.embedchannel.domain` | 嵌入渠道 · 领域模型：EmbedChannelEntity。 |
 | `:domains` | `com.ragagent.embedchannel.mapper` | 嵌入渠道 · 映射：EmbedChannelMapper。 |
+| `:domains` | `com.ragagent.embedchannel.repository` | 嵌入渠道仓储门面：渠道行的查询、写入与软删。 |
 | `:domains` | `com.ragagent.embedchannel.service` | 嵌入渠道 · 服务：EmbedChannelService / RedisEmbedTokenStore / EmbedTokenStore。 |
 | `:domains` | `com.ragagent.embedchannel.support` | Embed · 支撑类型：错误、令牌与限流。 |
 | `:domains` | `com.ragagent.evaluation` | 评估域：评估任务与指标计算（Rouge 等），对外入口 /api/v1/evaluation。 |
@@ -126,6 +128,7 @@
 | `:domains` | `com.ragagent.favorite.domain` | 收藏 · 领域模型：UserResourceFavorite。 |
 | `:domains` | `com.ragagent.favorite.dto` | 收藏 · 传输形状：用户资源收藏的响应视图。 |
 | `:domains` | `com.ragagent.favorite.mapper` | 收藏 · 映射：UserResourceFavoriteMapper。 |
+| `:domains` | `com.ragagent.favorite.repository` | 收藏仓储门面：四键复合主键的查询、插入与删除。 |
 | `:domains` | `com.ragagent.favorite.service` | 收藏 · 服务：UserResourceFavoriteService。 |
 | `:domains` | `com.ragagent.im` | 即时通讯渠道域：九渠道适配（feishu/wechat/wecom/dingtalk/slack/mattermost/telegram/qqbot/yunzhijia， 一渠道一子包）与运行时（会话映射、工具展示、入站消息派发）。 |
 | `:domains` | `com.ragagent.im.callback` | IM · 平台回调处理：渠道校验、适配器验签/解析与 ACK 直写。 |
@@ -212,6 +215,7 @@
 | `:domains` | `com.ragagent.model.domain` | 模型 · 领域模型：ModelParametersTypeHandler / Model。 |
 | `:domains` | `com.ragagent.model.dto` | 模型 · 数据传输：ModelCredentialFieldMetadata / ModelCredentialsPutRequest / ModelCredentialsResponse…。 |
 | `:domains` | `com.ragagent.model.mapper` | 模型 · 映射：ModelUsageMapper / ModelMapper。 |
+| `:domains` | `com.ragagent.model.repository` | 模型仓储门面：可见性查询、写入、软删与内置模型对账；另有使用关系只读仓储。 |
 | `:domains` | `com.ragagent.model.service` | 模型 · 服务：ModelService / BuiltinModelsReconciler / ModelProviderCatalog…。 |
 | `:domains` | `com.ragagent.session` | 会话域：会话与消息读写（conversation/）、两条问答入口（知识库问答 / Agent 问答）、 SSE 流桥、附件（attachment/）与会话侧管线（rag/ + assembly/）。 |
 | `:domains` | `com.ragagent.session.api` | 会话 · 端口实现：SessionQaAdapter / EmbedSessionAdapter / KnowledgeQaRunnerImpl 等契约端口的适配层。 |
@@ -251,6 +255,7 @@
 | `:domains` | `com.ragagent.system.domain` | 系统 · 领域模型：SystemSetting。 |
 | `:domains` | `com.ragagent.system.dto` | 系统管理 · 传输形状：系统设置响应视图。 |
 | `:domains` | `com.ragagent.system.mapper` | 系统 · 映射：SystemSettingMapper。 |
+| `:domains` | `com.ragagent.system.repository` | 系统设置仓储门面：全量读取、按键读写与删除。 |
 | `:domains` | `com.ragagent.system.service` | 系统 · 服务：SystemAdminUserService / SystemSettingService / SystemInfoService…。 |
 | `:domains` | `com.ragagent.tenant` | 租户域：租户实体、MyBatis 持久化、租户级配置（API principal / 聊天历史 / 解析引擎 / 检索 / 存储引擎）与配置脱敏。 |
 | `:domains` | `com.ragagent.tenant.api` | 租户 · 端口实现：TenantStorageQuotaAdapter。 |
@@ -262,7 +267,8 @@
 | `:domains` | `com.ragagent.vectorstore.controller` | 向量库 · HTTP 层：VectorStoreController。 |
 | `:domains` | `com.ragagent.vectorstore.domain` | 向量库 · 领域模型：ConnectionConfigTypeHandler / IndexConfigTypeHandler / VectorStoreEngines…。 |
 | `:domains` | `com.ragagent.vectorstore.dto` | 向量库 · 数据传输：VectorStoreResponse / VectorStoreTypes。 |
-| `:domains` | `com.ragagent.vectorstore.mapper` | 向量库 · 映射：VectorStoreRepository。 |
+| `:domains` | `com.ragagent.vectorstore.mapper` | 向量库 · 映射：com.ragagent.vectorstore.mapper.VectorStoreMapper。 |
+| `:domains` | `com.ragagent.vectorstore.repository` | 向量库仓储门面：VectorStoreMapper 显式 SQL 方法的收口点。 |
 | `:domains` | `com.ragagent.vectorstore.service` | 向量库 · 服务：VectorStoreConfigService / VectorStoreLookupAdapter。 |
 | `:domains` | `com.ragagent.websearch` | 联网搜索域：搜索 provider 目录与凭据（对外 /api/v1/web-search-providers）、 搜索执行与各家 provider 适配。 |
 | `:domains` | `com.ragagent.websearch.api` | 网页搜索 · 端口实现：WebSearchBackendsAdapter / WebSearchSupportAdapter。 |

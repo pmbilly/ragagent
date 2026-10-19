@@ -9,10 +9,10 @@
 
 | 种类 | 域数 | 文件 | 控制器 | 说明 |
 |---|---:|---:|---:|---|
-| **产品能力** | 8 | 805 | 23 | 直接产生用户价值、按产品需求演进的业务能力。 |
-| **集成适配** | 6 | 516 | 14 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
-| **控制面** | 4 | 162 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
-| **能力配置** | 2 | 50 | 4 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
+| **产品能力** | 8 | 810 | 23 | 直接产生用户价值、按产品需求演进的业务能力。 |
+| **集成适配** | 6 | 518 | 14 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
+| **控制面** | 4 | 164 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
+| **能力配置** | 2 | 55 | 4 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
 | **初始化向导** | 1 | 13 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
 | **策略库** | 1 | 7 | 0 | 无 HTTP、无持久化的纯策略/判定逻辑。 |
 
@@ -25,21 +25,21 @@
 | `wiki` | 产品能力 | 163 | 1 | 1 | `views/knowledge/wiki` |
 | `memory` | 产品能力 | 87 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
 | `agenttools` | 产品能力 | 58 | — | — | `views/chat（工具结果渲染）` |
+| `agentmanagement` | 产品能力 | 27 | 3 | — | `views/agent` |
 | `evaluation` | 产品能力 | 26 | 1 | — | —（暂无页面） |
-| `agentmanagement` | 产品能力 | 24 | 3 | — | `views/agent` |
-| `favorite` | 产品能力 | 11 | 1 | — | `views/agent · views/knowledge（列表置顶/收藏）` |
+| `favorite` | 产品能力 | 13 | 1 | — | `views/agent · views/knowledge（列表置顶/收藏）` |
 | `mcp` | 集成适配 | 147 | 4 | 2 | `views/settings/McpSettings.vue` |
 | `datasource` | 集成适配 | 145 | 2 | — | `views/knowledge/settings/DataSourceSettings.vue` |
 | `im` | 集成适配 | 98 | 2 | — | `views/integrations/IntegrationSettingsSection.vue` |
 | `storage` | 集成适配 | 54 | 2 | 5 | `views/settings/StorageBackendSettings.vue` |
 | `websearch` | 集成适配 | 49 | 3 | 2 | `views/settings/WebSearchSettings.vue` |
-| `embedchannel` | 集成适配 | 23 | 1 | — | `views/embed` |
+| `embedchannel` | 集成适配 | 25 | 1 | — | `views/embed` |
 | `auth` | 控制面 | 113 | 6 | 1 | `views/auth · views/settings/TenantMembers.vue · views/system/PlatformAPIKeys.vue` |
 | `audit` | 控制面 | 20 | 1 | 1 | `views/system/SystemAuditLog.vue` |
-| `system` | 控制面 | 17 | 2 | 1 | `views/system` |
+| `system` | 控制面 | 19 | 2 | 1 | `views/system` |
 | `tenant` | 控制面 | 12 | — | 1 | `views/settings/TenantInfo.vue` |
-| `model` | 能力配置 | 32 | 3 | 2 | `views/settings/ModelSettings.vue` |
-| `vectorstore` | 能力配置 | 18 | 1 | — | `views/settings/VectorStoreSettings.vue` |
+| `model` | 能力配置 | 35 | 3 | 2 | `views/settings/ModelSettings.vue` |
+| `vectorstore` | 能力配置 | 20 | 1 | — | `views/settings/VectorStoreSettings.vue` |
 | `initialization` | 初始化向导 | 13 | 1 | — | `views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue` |
 | `approval` | 策略库 | 7 | — | — | `views/chat/components/ToolApprovalCard.vue` |
 
@@ -54,8 +54,8 @@
 | `wiki` | `WikiPageController` | `WikiPageOpsPort` |
 | `memory` | `MemoryController` | — |
 | `agenttools` | —（无 HTTP 面） | — |
-| `evaluation` | `EvaluationController` | — |
 | `agentmanagement` | `AgentController`、`SkillCatalogController`、`SkillsCatalogController` | — |
+| `evaluation` | `EvaluationController` | — |
 | `favorite` | `UserFavoriteController` | — |
 | `mcp` | `AgentToolApprovalController`、`McpCredentialsController`、`McpOAuthController`、`McpServiceController` | `McpToolRegistrationPort`、`McpToolingGateway` |
 | `datasource` | `DataSourceController`、`DataSourceCredentialsController` | — |
