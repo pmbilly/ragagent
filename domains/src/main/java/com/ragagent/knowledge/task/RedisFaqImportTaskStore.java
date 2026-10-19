@@ -1,6 +1,7 @@
 package com.ragagent.knowledge.task;
 
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
+import com.ragagent.knowledge.support.FaqImportTaskStore;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.util.List;

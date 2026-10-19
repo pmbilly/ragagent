@@ -23,7 +23,7 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.FaqChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
-import com.ragagent.knowledge.task.FaqImportTaskStore;
+import com.ragagent.knowledge.support.FaqImportTaskStore;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;

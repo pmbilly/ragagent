@@ -17,7 +17,7 @@ import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.FaqChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
-import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
+import com.ragagent.knowledge.support.KnowledgeTaskRunner;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
@@ -88,11 +88,11 @@ public class KnowledgeTagService {
 
     private static final int INDEX_DELETE_BATCH_SIZE = 100;
     /** 后台任务执行器（统一命名与关停）。 */
-    private final KnowledgeTaskExecutor taskExecutor;
+    private final KnowledgeTaskRunner taskExecutor;
 
 
     public KnowledgeTagService(FaqChunkRepository faqChunkRepository,
-                               KnowledgeTaskExecutor taskExecutor, KnowledgeBaseService kbService,
+                               KnowledgeTaskRunner taskExecutor, KnowledgeBaseService kbService,
                                KnowledgeTagRepository tagRepo,
                                ChunkRepository chunkRepo,
                                AuditWritePort auditWriter,

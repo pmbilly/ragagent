@@ -11,6 +11,7 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.support.GraphChunkSelector;
+import com.ragagent.knowledge.support.KnowledgeProcessedEvent;
 import com.ragagent.knowledge.support.QuestionBatchPlanner;
 import com.ragagent.platform.access.TracingContext;
 import com.ragagent.platform.tracing.langfuse.LangfuseTracing;

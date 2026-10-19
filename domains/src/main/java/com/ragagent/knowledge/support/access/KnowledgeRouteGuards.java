@@ -7,7 +7,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.access.KnowledgeReadPort;
 import com.ragagent.knowledge.service.access.KnowledgeAccessGuard;
-import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
+import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.platform.access.TenantContext;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

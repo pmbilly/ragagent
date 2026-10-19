@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.knowledge.support.KnowledgeTaskRunner;
 import jakarta.annotation.PreDestroy;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,11 +18,12 @@ import org.springframework.stereotype.Component;
  * （{@code TenantContext} 不共享 ThreadLocal）。</p>
  */
 @Component
-public class KnowledgeTaskExecutor {
+public class KnowledgeTaskExecutor implements KnowledgeTaskRunner {
 
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     /** 提交一个后台任务（无命名）。 */
+    @Override
     public void submit(Runnable task) {
         executor.submit(task);
     }
@@ -31,6 +33,7 @@ public class KnowledgeTaskExecutor {
      *
      * @param taskName 任务名（写入线程名，便于线程转储/诊断时区分）
      */
+    @Override
     public void submit(String taskName, Runnable task) {
         executor.submit(() -> {
             Thread.currentThread().setName(taskName);

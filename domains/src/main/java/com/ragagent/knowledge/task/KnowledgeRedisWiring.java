@@ -2,6 +2,8 @@ package com.ragagent.knowledge.task;
 
 import com.ragagent.knowledge.domain.ChunkExtractConsumer;
 import com.ragagent.knowledge.domain.QuestionGenerationConsumer;
+import com.ragagent.knowledge.support.FaqImportTaskStore;
+import com.ragagent.knowledge.support.KnowledgeTaskProgressStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

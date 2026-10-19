@@ -3,8 +3,8 @@ package com.ragagent.knowledge.api;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.knowledge.support.KnowledgeHashes;
 import com.ragagent.knowledge.support.KnowledgePaths;
+import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
-import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
 import org.springframework.stereotype.Component;
 
 /**

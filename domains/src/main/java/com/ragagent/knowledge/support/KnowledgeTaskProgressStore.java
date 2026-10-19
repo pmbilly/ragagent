@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.task;
+package com.ragagent.knowledge.support;
 
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 import com.ragagent.knowledge.dto.kb.KBCloneProgress;
@@ -6,8 +6,8 @@ import com.ragagent.knowledge.dto.kb.KBCloneProgress;
 /**
  * move / clone 任务的进度端口（轮询端点读取）。
  *
- * <p><b>两种实现</b>：进程内（{@link InProcessKnowledgeTaskProgressStore}，
- * 缺省/单实例语义）；Redis（{@link RedisKnowledgeTaskProgressStore}，
+ * <p><b>两种实现</b>：进程内（{@code InProcessKnowledgeTaskProgressStore}，
+ * 缺省/单实例语义）；Redis（{@code RedisKnowledgeTaskProgressStore}，
  * {@code knowledge.redis-enabled=true} 时以 {@code @Primary} 生效——进度跨实例可见，
  * 轮询被负载均衡路由到任意副本都能读到）。</p>
  *

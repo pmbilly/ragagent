@@ -16,8 +16,8 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.service.image.ExtractedImageStore;
-import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
-import com.ragagent.knowledge.task.KnowledgeTaskProgressStore;
+import com.ragagent.knowledge.support.KnowledgeTaskProgressStore;
+import com.ragagent.knowledge.support.KnowledgeTaskRunner;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Instant;
@@ -56,10 +56,10 @@ public class KnowledgeCloneService {
     private final ExtractedImageStore extractedImageStore;
     private final ModelRuntime modelRuntimeAssembler;
     /** 后台任务执行器（统一命名与关停）。 */
-    private final KnowledgeTaskExecutor taskExecutor;
+    private final KnowledgeTaskRunner taskExecutor;
 
 
-    public KnowledgeCloneService(KnowledgeTaskExecutor taskExecutor, KnowledgeRepository knowledgeRepository,
+    public KnowledgeCloneService(KnowledgeTaskRunner taskExecutor, KnowledgeRepository knowledgeRepository,
             KnowledgeBaseRepository kbRepository,
             ChunkRepository chunkRepo,
             KnowledgeBaseService knowledgeBaseService,

@@ -18,7 +18,7 @@ import com.ragagent.knowledge.service.access.ChunkAccessGuard;
 import com.ragagent.knowledge.service.faq.FaqEntryCommandService;
 import com.ragagent.knowledge.service.faq.FaqEntryQueryService;
 import com.ragagent.knowledge.service.faq.FaqImportService;
-import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
+import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResponse;

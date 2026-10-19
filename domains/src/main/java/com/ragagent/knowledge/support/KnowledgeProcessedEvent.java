@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.task;
+package com.ragagent.knowledge.support;
 
 /**
  * 单个知识处理完成事件（worker finalize 后发布）。

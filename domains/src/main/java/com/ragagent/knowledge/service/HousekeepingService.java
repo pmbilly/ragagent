@@ -3,7 +3,7 @@ package com.ragagent.knowledge.service;
 
 import com.ragagent.knowledge.config.HousekeepingProperties;
 import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
+import com.ragagent.knowledge.support.KnowledgeTaskRunner;
 import jakarta.annotation.PreDestroy;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -111,10 +111,10 @@ public class HousekeepingService {
     }
 
     /** 后台任务执行器（统一命名与关停）。 */
-    private final KnowledgeTaskExecutor taskExecutor;
+    private final KnowledgeTaskRunner taskExecutor;
 
     @Autowired
-    public HousekeepingService(JdbcTemplate jdbc, KnowledgeTaskExecutor taskExecutor,
+    public HousekeepingService(JdbcTemplate jdbc, KnowledgeTaskRunner taskExecutor,
                                HousekeepingProperties properties) {
         this(jdbc, null,
                 documentProcessTimeoutFromEnv(properties.documentProcessTimeout()),
@@ -124,7 +124,7 @@ public class HousekeepingService {
     /** 测试口：显式给阈值与开关/注入 inspector。 */
     HousekeepingService(JdbcTemplate jdbc, KnowledgeQueueInspector inspector,
                         Duration documentProcessTimeout, boolean enabled,
-                        KnowledgeTaskExecutor taskExecutor) {
+                        KnowledgeTaskRunner taskExecutor) {
         this.jdbc = jdbc;
         this.inspector = inspector;
         this.documentProcessTimeout = documentProcessTimeout;

@@ -23,7 +23,7 @@ import com.ragagent.knowledge.service.access.KnowledgeAccessGuard;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.knowledge.support.KnowledgeBaseRowViews;
-import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
+import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.storage.support.ResourceUrlMode;
 import com.ragagent.platform.web.ApiResponse;

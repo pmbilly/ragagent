@@ -2,6 +2,7 @@ package com.ragagent.knowledge.task;
 
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 import com.ragagent.knowledge.dto.kb.KBCloneProgress;
+import com.ragagent.knowledge.support.KnowledgeTaskProgressStore;
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Component;

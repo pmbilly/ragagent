@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.task;
+package com.ragagent.knowledge.support;
 
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 
@@ -8,8 +8,8 @@ import com.ragagent.knowledge.dto.faq.FaqImportProgress;
  * <p><b>三个并发面</b>：按 taskId 的进度快照、按 kbId 的 running 锁（含实例标识，
  * 多实例部署时区分持有者）、按 key 的创建互斥。</p>
  *
- * <p><b>两种实现</b>：进程内（{@link InProcessFaqImportTaskStore}，缺省/单实例语义，
- * 重启即清空）；Redis（{@link RedisFaqImportTaskStore}，
+ * <p><b>两种实现</b>：进程内（{@code InProcessFaqImportTaskStore}，缺省/单实例语义，
+ * 重启即清空）；Redis（{@code RedisFaqImportTaskStore}，
  * {@code knowledge.redis-enabled=true} 时以 {@code @Primary} 生效——进度与 running 锁
  * 跨实例共享，"同一知识库已有导入任务"的拦截在多副本下仍然成立）。</p>
  */

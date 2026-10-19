@@ -16,8 +16,8 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
-import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
-import com.ragagent.knowledge.task.KnowledgeTaskProgressStore;
+import com.ragagent.knowledge.support.KnowledgeTaskProgressStore;
+import com.ragagent.knowledge.support.KnowledgeTaskRunner;
 import com.ragagent.platform.access.TenantContext;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -47,10 +47,10 @@ public class KnowledgeMoveService {
     private final IndexEngineResolver indexEngineResolver;
     private final RetrieveGraphRepository graphRepository;
     /** 后台任务执行器（统一命名与关停）。 */
-    private final KnowledgeTaskExecutor taskExecutor;
+    private final KnowledgeTaskRunner taskExecutor;
 
 
-    public KnowledgeMoveService(KnowledgeTaskExecutor taskExecutor, KnowledgeRepository knowledgeRepository,
+    public KnowledgeMoveService(KnowledgeTaskRunner taskExecutor, KnowledgeRepository knowledgeRepository,
             KnowledgeBaseRepository kbRepository,
             ChunkRepository chunkRepo,
             KnowledgeTagRepository tagRepository,

@@ -22,8 +22,8 @@ import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.service.KnowledgeAccessHelper;
 import com.ragagent.knowledge.support.ChunkRowViews;
-import com.ragagent.knowledge.task.KnowledgeProcessedEvent;
-import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
+import com.ragagent.knowledge.support.KnowledgeProcessedEvent;
+import com.ragagent.knowledge.support.KnowledgeTaskRunner;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.knowledge.ImageInfoEnricher;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
@@ -59,10 +59,10 @@ public class KnowledgeSummaryService {
     private final ConversationProperties conversationProps;
     private final KnowledgeAccessHelper access;
     /** 后台任务执行器（统一命名与关停）。 */
-    private final KnowledgeTaskExecutor taskExecutor;
+    private final KnowledgeTaskRunner taskExecutor;
 
     public KnowledgeSummaryService(
-        KnowledgeTaskExecutor taskExecutor,
+        KnowledgeTaskRunner taskExecutor,
                             KnowledgeRepository knowledgeRepository,
                             KnowledgeBaseRepository kbRepository,
                             ChunkRepository chunkRepo,

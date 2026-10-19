@@ -1,6 +1,7 @@
 package com.ragagent.knowledge.task;
 
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
+import com.ragagent.knowledge.support.FaqImportTaskStore;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Component;

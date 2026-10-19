@@ -723,17 +723,8 @@ class ArchitectureRulesTest {
     private static final Set<String> SERVICE_BOUNDARY_BASELINE =
             Set.of(
             "com.ragagent.knowledge.service.EmbeddingModelAdapter",
-            "com.ragagent.knowledge.service.faq.FaqBatchOps",
-            "com.ragagent.knowledge.service.faq.FaqEntryCommandService",
-            "com.ragagent.knowledge.service.faq.FaqImportService",
             "com.ragagent.knowledge.service.faq.FaqIndexWriter",
-            "com.ragagent.knowledge.service.faq.FaqValidateOps",
-            "com.ragagent.knowledge.service.HousekeepingService",
-            "com.ragagent.knowledge.service.management.KnowledgeBaseLookupAdapter",
-            "com.ragagent.knowledge.service.management.KnowledgeCloneService",
-            "com.ragagent.knowledge.service.management.KnowledgeMoveService",
-            "com.ragagent.knowledge.service.enrichment.KnowledgeSummaryService",
-            "com.ragagent.knowledge.service.management.KnowledgeTagService");
+            "com.ragagent.knowledge.service.management.KnowledgeBaseLookupAdapter");
 
     /**
      * A17 棘轮基线：{@code ..service..} 包内仍直接依赖具体技术实现

@@ -19,9 +19,9 @@ import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
-import com.ragagent.knowledge.task.FaqImportTaskStore;
-import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
-import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
+import com.ragagent.knowledge.support.FaqImportTaskStore;
+import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
+import com.ragagent.knowledge.support.KnowledgeTaskRunner;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 import java.time.Instant;
@@ -60,10 +60,10 @@ public class FaqImportService {
     final FaqChunkCodec faqChunkCodec;
     final FaqIndexWriter faqIndexWriter;
     /** 后台任务执行器（统一命名与关停）。 */
-    private final KnowledgeTaskExecutor taskExecutor;
+    private final KnowledgeTaskRunner taskExecutor;
 
 
-    public FaqImportService(KnowledgeTaskExecutor taskExecutor,
+    public FaqImportService(KnowledgeTaskRunner taskExecutor,
                             KnowledgeRepository knowledgeRepository,
                             KnowledgeTagRepository tagRepository,
                             FaqImportTaskStore taskStore,
