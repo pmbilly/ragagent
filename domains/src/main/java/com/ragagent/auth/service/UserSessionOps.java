@@ -1,6 +1,5 @@
 package com.ragagent.auth.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
@@ -8,8 +7,6 @@ import com.ragagent.auth.dto.Membership;
 import com.ragagent.contract.auth.UserPreferences;
 import com.ragagent.contract.tenant.TenantRowView;
 import io.jsonwebtoken.Claims;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 /**
@@ -80,9 +77,7 @@ final class UserSessionOps {
         }
 
         // 撤销状态检查（记录缺失 / 已吊销 → 同一文案）
-        AuthToken record = svc.authTokenMapper.selectOne(new LambdaQueryWrapper<AuthToken>()
-                .eq(AuthToken::getToken, refreshTokenString)
-                .last("LIMIT 1"));
+        AuthToken record = svc.findTokenByString(refreshTokenString);
         if (record == null || record.isIsRevoked()) {
             throw new UserService.RefreshTokenException("refresh token is revoked");
         }
@@ -97,9 +92,7 @@ final class UserSessionOps {
         }
 
         // 吊销旧 refresh token（整行写回，updated_at 一并刷新）
-        record.setIsRevoked(true);
-        record.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        svc.authTokenMapper.updateById(record);
+        svc.revokeTokenRecord(record);
 
         // 按 last-active 偏好解析空间后签发
         return svc.generateTokens(u);
@@ -155,13 +148,9 @@ final class UserSessionOps {
         // 尽力吊销旧 refresh（失败只记日志，不拖垮切换）
         if (currentRefreshToken != null && !currentRefreshToken.isBlank()) {
             try {
-                AuthToken record = svc.authTokenMapper.selectOne(new LambdaQueryWrapper<AuthToken>()
-                        .eq(AuthToken::getToken, currentRefreshToken)
-                        .last("LIMIT 1"));
+                AuthToken record = svc.findTokenByString(currentRefreshToken);
                 if (record != null) {
-                    record.setIsRevoked(true);
-                    record.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-                    svc.authTokenMapper.updateById(record);
+                    svc.revokeTokenRecord(record);
                 }
             } catch (RuntimeException e) {
                 UserService.log.warn("Failed to revoke previous refresh token during tenant switch", e);

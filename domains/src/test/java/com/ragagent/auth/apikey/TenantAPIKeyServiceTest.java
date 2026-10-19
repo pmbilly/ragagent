@@ -15,7 +15,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.repository.TenantAPIKeyRepository;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import java.time.OffsetDateTime;

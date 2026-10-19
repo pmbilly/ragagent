@@ -1,9 +1,9 @@
 package com.ragagent.auth.apikey.controller.filter;
 
+import com.ragagent.auth.apikey.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.controller.filter.ApiKeyAuthResult.Passed;
 import com.ragagent.auth.apikey.controller.filter.ApiKeyAuthResult.Rejected;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.TenantService;

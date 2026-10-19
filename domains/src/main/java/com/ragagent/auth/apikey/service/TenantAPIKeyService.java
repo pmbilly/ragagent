@@ -1,7 +1,7 @@
 package com.ragagent.auth.apikey.service;
 
+import com.ragagent.auth.apikey.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.repository.TenantAPIKeyRepository;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.apikey.APIKeyScopeType;

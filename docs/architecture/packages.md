@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-346 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+347 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -79,7 +79,7 @@
 | `:domains` | `com.ragagent.auth.apikey.controller.filter` | API Key 过滤器面（由 auth.apikey.filter 迁入 apikey.controller.filter，对齐方案）： 鉴权通道与网关拦截、路由授权与策略、范围清理与文件服务豁免、主体拒绝（9 类）。 |
 | `:domains` | `com.ragagent.auth.apikey.domain` | apikey · 领域模型：APIKeyStringListTypeHandler / APIKeyRawJsonbTypeHandler / TenantAPIKeyProjections…。 |
 | `:domains` | `com.ragagent.auth.apikey.dto` | 租户 API Key · 传输形状：请求体与实体到响应的投影。 |
-| `:domains` | `com.ragagent.auth.apikey.mapper` | apikey · 映射：TenantAPIKeyRepository / TenantAPIKeyMapper / TenantAPIKeyNotFoundException。 |
+| `:domains` | `com.ragagent.auth.apikey.mapper` | apikey · 映射：TenantAPIKeyMapper。 |
 | `:domains` | `com.ragagent.auth.apikey.repository` | API Key 仓储门面：对 auth.apikey.mapper 的读写封装与不存在异常转换。 |
 | `:domains` | `com.ragagent.auth.apikey.service` | apikey · 服务：TenantAPIKeyService / ApiKeyAdminAdapter / TenantAPIKeyBootstrap…。 |
 | `:domains` | `com.ragagent.auth.config` | 认证 · 配置：JwtProperties。 |
@@ -88,6 +88,7 @@
 | `:domains` | `com.ragagent.auth.domain` | 认证 · 领域模型：TenantConfigRedaction / TenantInvitation / TenantMember…。 |
 | `:domains` | `com.ragagent.auth.dto` | 认证 · 数据传输：UpdatePreferencesRequest / TenantInvitationResponse / InvitationLookupResponse…。 |
 | `:domains` | `com.ragagent.auth.mapper` | 认证 · 映射：TenantInvitationMapper / TenantMemberMapper / AuthTokenMapper…。 |
+| `:domains` | `com.ragagent.auth.repository` | 认证域仓储门面：会话令牌的查询、签发落库与吊销。 |
 | `:domains` | `com.ragagent.auth.service` | 认证 · 服务：TenantInvitationService / TenantMemberService / TenantService…。 |
 | `:domains` | `com.ragagent.datasource` | 数据源连接器域：外部知识源（Notion/Feishu/Yuque/RSS/IMA/GitLab 等）的抓取、游标推进、 同步编排与数据源配置面。 |
 | `:domains` | `com.ragagent.datasource.catalog` | 数据源 · 连接器目录：类型元数据与可用连接器清单（不参与持久化）。 |

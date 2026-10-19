@@ -6,8 +6,8 @@ import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.LoginRequest;
 import com.ragagent.auth.dto.Membership;
-import com.ragagent.auth.mapper.AuthTokenMapper;
 import com.ragagent.auth.mapper.UserMapper;
+import com.ragagent.auth.repository.AuthTokenRepository;
 import com.ragagent.contract.auth.UserPreferences;
 import com.ragagent.contract.settings.SystemSettingGateway;
 import com.ragagent.contract.tenant.TenantRole;
@@ -46,7 +46,7 @@ public class UserService implements UserNameLookup {
     static final String TOKEN_TYPE_REFRESH = "refresh_token";
 
     private final UserMapper userMapper;
-    final AuthTokenMapper authTokenMapper;
+    final AuthTokenRepository authTokenRepo;
     final TenantService tenantService;
     final TenantMemberService memberService;
     private final UserSessionOps sessionOps;
@@ -55,13 +55,13 @@ public class UserService implements UserNameLookup {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public UserService(UserMapper userMapper,
-                       AuthTokenMapper authTokenMapper,
+                       AuthTokenRepository authTokenRepo,
                        TenantService tenantService,
                        TenantMemberService memberService,
                        JwtService jwtService,
                        SystemSettingGateway settingService) {
         this.userMapper = userMapper;
-        this.authTokenMapper = authTokenMapper;
+        this.authTokenRepo = authTokenRepo;
         this.tenantService = tenantService;
         this.memberService = memberService;
         this.jwtService = jwtService;
@@ -137,9 +137,7 @@ public class UserService implements UserNameLookup {
             throw new TokenValidationException("terminal ticket cannot be used as access token");
         }
 
-        AuthToken tokenRecord = authTokenMapper.selectOne(new LambdaQueryWrapper<AuthToken>()
-                .eq(AuthToken::getToken, tokenString)
-                .last("LIMIT 1"));
+        AuthToken tokenRecord = authTokenRepo.findByToken(tokenString);
         if (tokenRecord == null || tokenRecord.isIsRevoked()) {
             throw new TokenValidationException("token is revoked");
         }
@@ -426,7 +424,7 @@ public class UserService implements UserNameLookup {
             record.setToken(tokenValue);
             record.setTokenType(tokenType);
             record.setExpiresAt(expiresAt);
-            authTokenMapper.insert(record);
+            authTokenRepo.insert(record);
         } catch (RuntimeException e) {
             // 落库失败不使登录失败
             log.warn("Failed to persist {} (user={})", tokenType, userId, e);
@@ -645,10 +643,17 @@ public class UserService implements UserNameLookup {
 
     /** 吊销该用户全部令牌：is_revoked=true，同时刷 updated_at。 */
     public void revokeTokensByUserId(String userId) {
-        authTokenMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<AuthToken>()
-                .eq(AuthToken::getUserId, userId)
-                .set(AuthToken::isIsRevoked, true)
-                .set(AuthToken::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+        authTokenRepo.revokeByUserId(userId);
+    }
+
+    /** 按 token 串查一条（缺失返回 null）。 */
+    AuthToken findTokenByString(String token) {
+        return authTokenRepo.findByToken(token);
+    }
+
+    /** 整行写回并吊销（刷新 updated_at）。 */
+    void revokeTokenRecord(AuthToken record) {
+        authTokenRepo.revoke(record);
     }
 
     // ── logout / refresh / switch-tenant（实现外提至 {@link UserSessionOps}） ────

@@ -1,4 +1,4 @@
-package com.ragagent.auth.apikey.mapper;
+package com.ragagent.auth.apikey;
 
 /**
  * "API Key 不存在 / 已撤销 / 已过期"的领域异常。
