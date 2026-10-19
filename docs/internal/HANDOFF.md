@@ -362,6 +362,7 @@ boot           14 件                      →  boot
 | L44c | 2026-10-19 | **A16 清零**：新增 `support/KnowledgePage` + `KnowledgeRepository.searchPage`（条件构造与分页插件类型收进仓储，`KnowledgeService` 不再 import MyBatis）；新增 `support/EmbeddingFacts`，`FaqIndexWriter` 改注入 `contract` 的 `EmbeddingPort`。**A16 基线 45 → 0**；A17 −1（knowledge 清零）。换锚：port-map。 | **40 守卫** · **cleanTest 5031 / 0 / 4** |
 | L45 | 2026-10-19 | **A17 清零（收官）**：新增 `session/runtime/SessionModels`（`LangfuseChatClient`/`LangfuseReranker` 的 wrap 收口）与 `SessionTrace`（`start` 返回自有 `SpanHandle`、`attachTraceparent` 转发）；6 个 session 类改用它，不再 import langfuse/decorators。**三张棘轮全部归零：A16 45→0、A17 35→0、A11b 6→0**。 | **40 守卫** · **cleanTest 5031 / 0 / 4** |
 | L46 | 2026-10-19 | **跨域直连清零**（评估文档点名项）：`SessionMessageView` 搬 `contract/session`（跨域读模型）；新增 `MessageTranscriptPort` + `session/api/MessageTranscriptAdapter`；`MemoryExtractionService` 改注入端口，不再直接持有 `session.repository.MessageRepository`。**memory 域对 session 的直接 import 清零（2 → 0）**。 | **40 守卫** · **cleanTest 5031 / 0 / 4** |
+| L47 | 2026-10-19 | **7 厂商存储探测归位 storage**（评估文档点名项）：新增 `contract/storage/StorageConnectivityPort`（配置以纯 JDK `Map` 传入）+ `storage/service/StorageConnectivityService` 实现；`SystemController` 694 → 319 行，`SystemInfoService` 252 → 205（三个存储方法移出）。**走端口而非直接 import**——直连会给 system→storage 新增域间边（实测 `check-domain-contracts` 报红）。换锚：json-key 基线键随实现搬迁、domain-contracts 收紧 2 处。 | **40 守卫** · **cleanTest 5031 / 0 / 4** · 金片字节一致 |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
