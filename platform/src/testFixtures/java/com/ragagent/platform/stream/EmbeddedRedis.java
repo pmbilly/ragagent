@@ -2,10 +2,13 @@ package com.ragagent.platform.stream;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +21,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  * 测试用的一次性 Redis。
  *
  * <h2>为什么不用 Spring 的自动配置</h2>
- * {@code RedisStreamManager} 的语义有一半在 <b>Lua 脚本与真实 TTL</b> 里：
- * steer 的去重/CAS、live-run 标记的续期，都不是能用内存假实现替代的东西
- * （本项目其他 Redis 依赖点靠 {@code Fake*} 替身测，是因为那些接口的语义在 Java 侧；
- * 这里不是）。所以起一个真 redis-server。
+ * {@code RedisStreamManager} 的语义有一半在 <b>Lua 脚本与真实 TTL</b> 里：steer 的去重/CAS、
+ * live-run 标记的续期，都不是能用内存假实现替代的东西（本项目其他 Redis 依赖点靠
+ * {@code Fake*} 替身测，是因为那些接口的语义在 Java 侧；这里不是）。所以起一个真 redis-server。
  *
  * <h2>取二进制的方式</h2>
  * 依次尝试：
@@ -32,17 +34,41 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  * </ol>
  * 只绑 {@code 127.0.0.1}、只走回环，不依赖外部网络。
  *
+ * <h2>端口分配：文件锁互斥，不做探测</h2>
+ * 早先用 {@code new ServerSocket(0)} 探空闲端口，在 {@code maxParallelForks} 下会撞：
+ * 两个 fork 可能拿到同一端口，先 bind 成功者的实例被后到者"借用"，前者跑完关进程时
+ * 后者的连接全断（表现为 {@code Unable to connect to Redis}）。
+ *
+ * <p>现在改为固定端口池 + 跨进程文件锁：拿到 {@code port-<n>.lock} 的排他锁才用该端口，
+ * 锁持有到 {@link #close()}；进程异常退出时操作系统自动释放。这样端口分配是确定互斥的，
+ * 不依赖概率。</p>
+ *
  * <p>跨包共享的测试基建：本包（StreamManager 的 Lua/TTL）与 IM 域 Redis 面
  * （{@code im.runtime.ImRedisStore} 的闸门 CAS / marker / inflight）同用。</p>
  */
 public final class EmbeddedRedis implements AutoCloseable {
 
+    /** 端口池起点。选在高位段，避开常见服务端口。 */
+    private static final int PORT_POOL_START = 16390;
+
+    /** 端口池容量：远大于并行 fork 数，留足重试空间。 */
+    private static final int PORT_POOL_SIZE = 64;
+
+    /** 锁文件目录（按临时目录隔离，跨 fork 共享）。 */
+    private static final Path LOCK_DIR =
+            Path.of(System.getProperty("java.io.tmpdir"), "ragagent-redis-ports");
+
     private final Process process;
     private final LettuceConnectionFactory connectionFactory;
     private final StringRedisTemplate template;
+    private final FileChannel portLockChannel;
+    private final FileLock portLock;
 
-    private EmbeddedRedis(Process process, String host, int port) {
+    private EmbeddedRedis(Process process, String host, int port,
+            FileChannel portLockChannel, FileLock portLock) {
         this.process = process;
+        this.portLockChannel = portLockChannel;
+        this.portLock = portLock;
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         this.connectionFactory = new LettuceConnectionFactory(config);
         this.connectionFactory.afterPropertiesSet();
@@ -53,8 +79,7 @@ public final class EmbeddedRedis implements AutoCloseable {
     /**
      * 启动实例；不可用时返回 {@code null}（调用方据此 assume 跳过）。
      *
-     * <p>进程启动失败不抛异常——测试环境没有 redis-server 是常态，
-     * 该跳过而不是让整个构建红掉。</p>
+     * <p>进程启动失败不抛异常——测试环境没有 redis-server 是常态，该跳过而不是让整个构建红掉。</p>
      */
     public static EmbeddedRedis tryStart() {
         String external = System.getenv("REDIS_TEST_ADDR");
@@ -62,41 +87,69 @@ public final class EmbeddedRedis implements AutoCloseable {
             int colon = external.lastIndexOf(':');
             String h = external.substring(0, colon);
             int p = Integer.parseInt(external.substring(colon + 1));
-            return new EmbeddedRedis(null, h, p);
+            return new EmbeddedRedis(null, h, p, null, null);
         }
 
         Path binary = findRedisServer();
         if (binary == null) {
             return null;
         }
-        // 端口分配是 TOCTOU：freePort() 关掉探测 socket 到 redis-server 真正 bind 之间，
-        // 另一个测试 JVM（maxParallelForks）可能选中同一端口——那时 awaitPort 会**成功**，
-        // 但连到的是别人家的 redis，且会被先跑完的那个 fork 一起杀掉（实测
-        // "Unable to connect to Redis"）。所以：失败就换端口重试，且必须**确认自己起的进程还活着**。
-        for (int attempt = 0; attempt < 5; attempt++) {
-            int port = freePort();
-            List<String> cmd = new ArrayList<>(List.of(
-                    binary.toString(),
-                    "--port", Integer.toString(port),
-                    "--bind", "127.0.0.1",
-                    "--save", "",
-                    "--appendonly", "no",
-                    "--daemonize", "no"));
-            Process process;
+        try {
+            Files.createDirectories(LOCK_DIR);
+        } catch (IOException e) {
+            return null;
+        }
+
+        for (int offset = 0; offset < PORT_POOL_SIZE; offset++) {
+            int port = PORT_POOL_START + offset;
+            FileChannel channel = null;
+            FileLock lock = null;
             try {
-                process = new ProcessBuilder(cmd)
-                        .redirectOutput(ProcessBuilder.Redirect.DISCARD)
-                        .redirectErrorStream(true)
-                        .start();
+                channel = FileChannel.open(LOCK_DIR.resolve("port-" + port + ".lock"),
+                        StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+                lock = channel.tryLock();
+            } catch (OverlappingFileLockException e) {
+                // 同 JVM 内已有线程持有该锁（跨 JVM 由 tryLock 返回 null 表达）
+                releaseQuietly(channel, null);
+                continue;
             } catch (IOException e) {
+                releaseQuietly(channel, lock);
                 continue;
             }
-            if (awaitPort(process, "127.0.0.1", port, Duration.ofSeconds(10))) {
-                return new EmbeddedRedis(process, "127.0.0.1", port);
+            if (lock == null) {
+                // 该端口已被另一个 fork 持有
+                releaseQuietly(channel, null);
+                continue;
             }
-            process.destroyForcibly();
+
+            Process process = start(binary, port);
+            if (process != null && awaitPort(process, "127.0.0.1", port, Duration.ofSeconds(10))) {
+                return new EmbeddedRedis(process, "127.0.0.1", port, channel, lock);
+            }
+            if (process != null) {
+                process.destroyForcibly();
+            }
+            releaseQuietly(channel, lock);
         }
         return null;
+    }
+
+    private static Process start(Path binary, int port) {
+        List<String> cmd = new ArrayList<>(List.of(
+                binary.toString(),
+                "--port", Integer.toString(port),
+                "--bind", "127.0.0.1",
+                "--save", "",
+                "--appendonly", "no",
+                "--daemonize", "no"));
+        try {
+            return new ProcessBuilder(cmd)
+                    .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                    .redirectErrorStream(true)
+                    .start();
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     public StringRedisTemplate template() {
@@ -112,11 +165,7 @@ public final class EmbeddedRedis implements AutoCloseable {
 
     @Override
     public void close() {
-        try {
-            connectionFactory.destroy();
-        } catch (RuntimeException ignored) {
-            // 关连接失败不影响测试结论
-        }
+        // 先杀进程再关连接池：避免杀进程瞬间连接池在后台重连
         if (process != null) {
             process.destroy();
             try {
@@ -126,6 +175,29 @@ public final class EmbeddedRedis implements AutoCloseable {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 process.destroyForcibly();
+            }
+        }
+        try {
+            connectionFactory.destroy();
+        } catch (RuntimeException ignored) {
+            // 关连接失败不影响测试结论
+        }
+        releaseQuietly(portLockChannel, portLock);
+    }
+
+    private static void releaseQuietly(FileChannel channel, FileLock lock) {
+        if (lock != null) {
+            try {
+                lock.release();
+            } catch (IOException ignored) {
+                // 进程退出时由操作系统兜底
+            }
+        }
+        if (channel != null) {
+            try {
+                channel.close();
+            } catch (IOException ignored) {
+                // 同上
             }
         }
     }
@@ -147,15 +219,7 @@ public final class EmbeddedRedis implements AutoCloseable {
         return null;
     }
 
-    private static int freePort() {
-        try (ServerSocket socket = new ServerSocket(0)) {
-            return socket.getLocalPort();
-        } catch (IOException e) {
-            throw new IllegalStateException("no free port for embedded redis", e);
-        }
-    }
-
-    /** 等到端口可连**且自己起的进程仍然存活**——进程先死说明端口被别人抢了，不是我们的实例。 */
+    /** 等到端口可连**且自己起的进程仍然存活**——进程先死说明端口被占用，不是我们的实例。 */
     private static boolean awaitPort(Process process, String host, int port, Duration timeout) {
         long deadline = System.nanoTime() + timeout.toNanos();
         while (System.nanoTime() < deadline) {
