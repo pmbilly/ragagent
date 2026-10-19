@@ -107,13 +107,41 @@ def _has_parallel_columns(boxes: list[dict]) -> bool:
     return row_has_columns(row)
 
 
+def _reading_order_boxes(boxes: list[dict], tolerance: float) -> list[dict]:
+    """按行阅读：y 差在容差内视为同一行，行内按 x 从左到右。"""
+    rows: list[list[dict]] = []
+    for box in sorted(boxes, key=lambda b: b["cy"]):
+        if rows and abs(box["cy"] - rows[-1][0]["cy"]) <= tolerance:
+            rows[-1].append(box)
+        else:
+            rows.append([box])
+    ordered: list[dict] = []
+    for row in rows:
+        ordered.extend(sorted(row, key=lambda b: b["x1"]))
+    return ordered
+
+
+def _reading_order_entries(entries: list[tuple[float, float, str]],
+                           tolerance: float) -> list[tuple[float, float, str]]:
+    """块级阅读顺序：起始 y 相近的块视为同一行，行内按 x 从左到右。"""
+    rows: list[list[tuple[float, float, str]]] = []
+    for entry in sorted(entries, key=lambda e: e[0]):
+        if rows and abs(entry[0] - rows[-1][0][0]) <= tolerance:
+            rows[-1].append(entry)
+        else:
+            rows.append([entry])
+    ordered: list[tuple[float, float, str]] = []
+    for row in rows:
+        ordered.extend(sorted(row, key=lambda e: e[1]))
+    return ordered
+
+
 def recognize(data: bytes) -> str:
     """识别图片字节，按版面坐标还原列关系。
 
     PPT 导出的页面多为卡片/多列排版，纯按检测顺序输出会把「车名 → 价格 → 定位」
     的对应关系拍平。这里用较大的水平空白把页面分成上下区块（如「上 4 列 + 下 3 列」
-    会落在两个区块），区块内按 x 聚列、列内按 y 排序；整行标题作为宽块按自己的
-    y 位置输出，不再固定丢到页尾。
+    会落在两个区块），区块内按 x 聚列；行内允许小幅 y 误差，按 x 从左到右。
     """
     with tempfile.NamedTemporaryFile(suffix=".jpg") as tmp:
         tmp.write(data)
@@ -127,25 +155,26 @@ def recognize(data: bytes) -> str:
     page_height = max(b["y2"] for b in boxes) - min(b["y1"] for b in boxes)
     column_gap = max(page_width * 0.03, 30)
     wide = page_width * 0.45
+    row_tolerance = max(page_height * 0.02, 16)
 
     sections: list[str] = []
     for band in _bands(boxes, max(page_height * 0.12, 60)):
         if not _has_parallel_columns(band):
-            # 单列层：标题与正文是上下关系，按 y 输出；聚列会把不相邻的标题并在一起。
-            sections.append("\n".join(b["text"] for b in sorted(band, key=lambda b: b["y1"])))
+            # 单列层：标题与正文是上下关系，按阅读顺序输出；聚列会把不相邻的标题并在一起。
+            sections.append("\n\n".join(
+                b["text"] for b in _reading_order_boxes(band, row_tolerance)))
             continue
         wide_rows = [b for b in band if (b["x2"] - b["x1"]) > wide]
         normal = [b for b in band if (b["x2"] - b["x1"]) <= wide]
-        # 宽块（标题/页脚）与列块按各自起始 y 排序，宽块不再一律提前。
         entries: list[tuple[float, float, str]] = []
         for row in wide_rows:
             entries.append((row["y1"], row["x1"], row["text"]))
         for column in _columns(normal, column_gap):
-            ordered = sorted(column, key=lambda b: b["y1"])
+            ordered = _reading_order_boxes(column, row_tolerance)
             entries.append((ordered[0]["y1"], min(b["x1"] for b in ordered),
-                            "\n".join(b["text"] for b in ordered)))
-        entries.sort(key=lambda entry: (entry[0], entry[1]))
-        sections.extend(text for _y, _x, text in entries)
+                            "\n\n".join(b["text"] for b in ordered)))
+        sections.extend(text for _y, _x, text in
+                        _reading_order_entries(entries, row_tolerance))
     return "\n\n".join(section for section in sections if section)
 
 
