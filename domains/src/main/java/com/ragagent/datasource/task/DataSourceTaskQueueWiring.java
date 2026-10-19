@@ -1,5 +1,7 @@
 package com.ragagent.datasource.task;
 
+import com.ragagent.datasource.domain.DataSourceSyncHandler;
+import com.ragagent.datasource.domain.DataSourceSyncTaskQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;

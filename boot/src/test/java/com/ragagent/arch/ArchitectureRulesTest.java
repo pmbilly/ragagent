@@ -722,8 +722,6 @@ class ArchitectureRulesTest {
      */
     private static final Set<String> SERVICE_BOUNDARY_BASELINE =
             Set.of(
-            "com.ragagent.datasource.service.DataSourceService",
-            "com.ragagent.datasource.service.DataSourceWiring",
             "com.ragagent.knowledge.service.EmbeddingModelAdapter",
             "com.ragagent.knowledge.service.faq.FaqBatchOps",
             "com.ragagent.knowledge.service.faq.FaqEntryCommandService",
@@ -738,9 +736,7 @@ class ArchitectureRulesTest {
             "com.ragagent.knowledge.service.management.KnowledgeTagService",
             "com.ragagent.mcp.service.McpMetadataService",
             "com.ragagent.mcp.service.McpServiceManagement",
-            "com.ragagent.mcp.service.McpToolApprovalService",
-            "com.ragagent.websearch.service.WebSearchProviderService",
-            "com.ragagent.websearch.service.WebSearchService");
+            "com.ragagent.mcp.service.McpToolApprovalService");
 
     /**
      * A17 棘轮基线：{@code ..service..} 包内仍直接依赖具体技术实现
@@ -752,7 +748,6 @@ class ArchitectureRulesTest {
      */
     private static final Set<String> SERVICE_TECH_BASELINE =
             Set.of(
-            "com.ragagent.datasource.service.DataSourceService",
             "com.ragagent.embedchannel.service.RedisEmbedTokenStore",
             "com.ragagent.knowledge.service.management.KnowledgeService",
             "com.ragagent.knowledge.service.chunk.ChunkExtractService",
@@ -766,7 +761,6 @@ class ArchitectureRulesTest {
             "com.ragagent.session.assembly.QaWiring",
             "com.ragagent.session.service.SessionAgentQaService",
             "com.ragagent.session.service.SessionKnowledgeQaService",
-            "com.ragagent.websearch.service.WebSearchTempKbStateService",
             "com.ragagent.wiki.service.ingest.WikiIngestEnqueueOps",
             "com.ragagent.wiki.service.page.RedisWikiSlugLock");
 

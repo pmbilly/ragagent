@@ -1,6 +1,5 @@
-package com.ragagent.datasource.task;
+package com.ragagent.datasource.domain;
 
-import com.ragagent.datasource.domain.DataSourceSyncPayload;
 import java.time.Duration;
 
 /**

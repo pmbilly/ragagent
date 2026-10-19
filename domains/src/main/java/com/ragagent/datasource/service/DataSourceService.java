@@ -8,17 +8,17 @@ import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.DataSourceConstants;
 import com.ragagent.datasource.domain.DataSourceException;
+import com.ragagent.datasource.domain.DataSourceSchedulePort;
+import com.ragagent.datasource.domain.DataSourceSyncHandler;
 import com.ragagent.datasource.domain.DataSourceSyncPayload;
+import com.ragagent.datasource.domain.DataSourceSyncTaskQueue;
 import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorRegistry;
 import com.ragagent.datasource.repository.DataSourceRepository;
 import com.ragagent.datasource.repository.SyncLogRepository;
-import com.ragagent.datasource.task.DataSourceSyncHandler;
-import com.ragagent.datasource.task.DataSourceSyncTaskQueue;
-import com.ragagent.datasource.task.Scheduler;
-import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
+import com.ragagent.datasource.runtime.DataSourceTrace;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -115,7 +115,7 @@ public class DataSourceService implements DataSourceSyncHandler {
     final KnowledgeBridge knowledge;
     final DataSourceSyncTaskQueue taskQueue;
     final ConnectorRegistry connectorRegistry;
-    final Scheduler scheduler;
+    final DataSourceSchedulePort scheduler;
     final TenantConfigLookup tenantService;
     final AuditWritePort auditWriter;
     final AutoTagProvider autoTagProvider;
@@ -137,7 +137,7 @@ public class DataSourceService implements DataSourceSyncHandler {
                              KnowledgeBridge knowledge,
                              DataSourceSyncTaskQueue taskQueue,
                              ConnectorRegistry connectorRegistry,
-                             Scheduler scheduler,
+                             DataSourceSchedulePort scheduler,
                              TenantConfigLookup tenantService,
                              AuditWritePort auditWriter,
                              AutoTagProvider autoTagProvider) {
@@ -548,12 +548,12 @@ public class DataSourceService implements DataSourceSyncHandler {
         DataSourceSyncPayload payload = DataSourceSyncPayload.withTracing(
                 DataSourceSupport.taskInitiatorFromContext(), "manual", dsId, ds.getTenantId(),
                 syncLog.getId(), false, 0,
-                LangfuseTracing.inject());
+                DataSourceTrace.inject());
 
         try {
             // Outcome 在此路径未分支处理（重复任务 TASK_ID_CONFLICT 亦按已受理继续）——
             // 如需区分请先对齐 DataSourceSyncTaskQueue.Outcome 的文档语义
-            taskQueue.enqueue(payload, taskId, Scheduler.MAX_RETRY, Scheduler.TASK_TIMEOUT);
+            taskQueue.enqueue(payload, taskId, DataSourceSchedulePort.MAX_RETRY, DataSourceSchedulePort.TASK_TIMEOUT);
         } catch (RuntimeException e) {
             log.error("[datasource] failed to enqueue sync task", e);
             syncLog.setStatus(DataSourceConstants.SYNC_LOG_STATUS_FAILED);

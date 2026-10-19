@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-355 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+359 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -93,6 +93,7 @@
 | `:domains` | `com.ragagent.auth.service` | 认证 · 服务：TenantInvitationService / TenantMemberService / TenantService…。 |
 | `:domains` | `com.ragagent.datasource` | 数据源连接器域：外部知识源（Notion/Feishu/Yuque/RSS/IMA/GitLab 等）的抓取、游标推进、 同步编排与数据源配置面。 |
 | `:domains` | `com.ragagent.datasource.catalog` | 数据源 · 连接器目录：类型元数据与可用连接器清单（不参与持久化）。 |
+| `:domains` | `com.ragagent.datasource.config` | 数据源装配：连接器注册表、调度器与生命周期 Bean。 |
 | `:domains` | `com.ragagent.datasource.connector.feishu.core` | feishu · core：FeishuCursorCodec / FeishuWikiTreeOps / FeishuTransport…。 |
 | `:domains` | `com.ragagent.datasource.connector.feishu.drive` | feishu · drive：DriveConnector。 |
 | `:domains` | `com.ragagent.datasource.connector.feishu.wiki` | feishu · Wiki：WikiConnector。 |
@@ -107,6 +108,7 @@
 | `:domains` | `com.ragagent.datasource.dto` | 数据源 · 数据传输：DatasourceCredentialFieldMetadata / DatasourceCredentialsResponse / DataSourceConfigDto…。 |
 | `:domains` | `com.ragagent.datasource.mapper` | 数据源 · 映射：DataSourceRepository / SyncLogRepository / DataSourceMapper…。 |
 | `:domains` | `com.ragagent.datasource.repository` | 数据源与同步日志仓储门面：对 datasource.mapper 的读写封装。 |
+| `:domains` | `com.ragagent.datasource.runtime` | 数据源运行面：同步任务的观测入口。 |
 | `:domains` | `com.ragagent.datasource.service` | 数据源 · 服务：DataSourceService / KnowledgeTagAutoTagProvider / DataSourceSyncResultOps…。 |
 | `:domains` | `com.ragagent.datasource.task` | 同步任务面（方案 的 task/）：同步任务队列（DataSourceSyncTaskQueue + InProcess/Redis 双实现）、任务处理器（DataSourceSyncHandler） |
 | `:domains` | `com.ragagent.embedchannel` | 嵌入渠道域：对外暴露的嵌入问答渠道、渠道配置与令牌，以及渠道鉴权过滤器。 |
@@ -281,6 +283,8 @@
 | `:domains` | `com.ragagent.websearch.fetch` | 网页搜索 · 抓取：PipelinePageFetcherImpl / ToolPageFetcherImpl / BrowserRenderer…。 |
 | `:domains` | `com.ragagent.websearch.mapper` | 网页搜索 · 映射：WebSearchProviderRepository。 |
 | `:domains` | `com.ragagent.websearch.provider` | 网页搜索 · 提供方：WebSearchProviderRegistry / ZhipuWebSearchProvider / DuckDuckGoProvider…。 |
+| `:domains` | `com.ragagent.websearch.repository` | 联网搜索仓储门面：提供方配置的查询与写入。 |
+| `:domains` | `com.ragagent.websearch.runtime` | 联网搜索运行面：临时知识库的 Redis 状态。 |
 | `:domains` | `com.ragagent.websearch.service` | 网页搜索 · 服务：WebSearchTempKbStateService / WebSearchProviderService / WebSearchService。 |
 | `:domains` | `com.ragagent.wiki` | wiki 域：知识库内联百科（页面/修订/文件夹树/链接图/摄取管线）。 |
 | `:domains` | `com.ragagent.wiki.api` | Wiki · 端口实现：WikiPageOpsAdapter。 |

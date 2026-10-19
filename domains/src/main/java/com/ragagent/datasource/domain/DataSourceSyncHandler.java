@@ -1,11 +1,10 @@
-package com.ragagent.datasource.task;
+package com.ragagent.datasource.domain;
 
-import com.ragagent.datasource.domain.DataSourceSyncPayload;
 
 /**
  * 数据源同步任务（{@code datasource:sync}）的执行端口。
  *
- * <p>本模块（connector 层）只声明端口：{@link InProcessDataSourceSyncTaskQueue}
+ * <p>本模块（connector 层）只声明端口：{@code InProcessDataSourceSyncTaskQueue}
  * 用它把队列里的任务真正跑起来，而实现由 service 层提供
  * （与 wiki 的 {@code WikiIngestBatchHandler} / memory 的
  * {@code MemoryExtractionService} 同一处置）。</p>

@@ -3,7 +3,9 @@ package com.ragagent.datasource.task;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConstants;
 import com.ragagent.datasource.domain.DataSourceException;
+import com.ragagent.datasource.domain.DataSourceSchedulePort;
 import com.ragagent.datasource.domain.DataSourceSyncPayload;
+import com.ragagent.datasource.domain.DataSourceSyncTaskQueue;
 import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.repository.DataSourceRepository;
@@ -66,15 +68,15 @@ import org.springframework.scheduling.support.CronTrigger;
  *       {@code status=running} + {@code started_at=now(UTC)}。</li>
  * </ol>
  */
-public class Scheduler {
+public class Scheduler implements DataSourceSchedulePort {
 
     private static final Logger log = LoggerFactory.getLogger(Scheduler.class);
 
-    /** 任务失败后的最大重试次数。 */
-    public static final int MAX_RETRY = 5;
+    /** 任务失败后的最大重试次数（定义在端口上）。 */
+    public static final int MAX_RETRY = DataSourceSchedulePort.MAX_RETRY;
 
-    /** 单次任务执行的超时。 */
-    public static final Duration TASK_TIMEOUT = Duration.ofHours(2);
+    /** 单次任务执行的超时（定义在端口上）。 */
+    public static final Duration TASK_TIMEOUT = DataSourceSchedulePort.TASK_TIMEOUT;
 
     /** TaskID 的分钟粒度时间戳（UTC，格式 {@code yyyyMMddHHmm}）。 */
     private static final DateTimeFormatter TASK_ID_MINUTE =
@@ -182,6 +184,7 @@ public class Scheduler {
      * <p>非 active 或没有表达式时<b>只移除、不注册</b>——这正是"暂停一个数据源后
      * 它的定时任务真的停掉"的实现点。</p>
      */
+    @Override
     public void addOrUpdate(DataSource ds) {
         lock.lock();
         try {
@@ -200,6 +203,7 @@ public class Scheduler {
     }
 
     /** 移除某数据源的 cron 任务。 */
+    @Override
     public void remove(String dataSourceId) {
         lock.lock();
         try {

@@ -20,7 +20,7 @@ import org.apache.ibatis.annotations.Update;
  * 自定义 SQL 的 parameters 列必须显式声明 typeHandler（注解 SQL 不套实体注解）。</p>
  */
 @Mapper
-public interface WebSearchProviderRepository {
+public interface WebSearchProviderMapper {
 
     String COLS = "id, tenant_id, name, provider, description, parameters, is_default, "
             + "created_at, updated_at, deleted_at";

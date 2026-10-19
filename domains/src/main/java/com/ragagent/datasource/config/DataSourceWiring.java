@@ -1,4 +1,4 @@
-package com.ragagent.datasource.service;
+package com.ragagent.datasource.config;
 
 import com.ragagent.datasource.connector.feishu.core.FeishuRegion;
 import com.ragagent.datasource.connector.feishu.drive.DriveConnector;
@@ -8,11 +8,11 @@ import com.ragagent.datasource.connector.ima.ImaConnector;
 import com.ragagent.datasource.connector.notion.NotionConnector;
 import com.ragagent.datasource.connector.rss.RssConnector;
 import com.ragagent.datasource.connector.yuque.YuqueConnector;
+import com.ragagent.datasource.domain.DataSourceSyncTaskQueue;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorRegistry;
 import com.ragagent.datasource.repository.DataSourceRepository;
 import com.ragagent.datasource.repository.SyncLogRepository;
-import com.ragagent.datasource.task.DataSourceSyncTaskQueue;
 import com.ragagent.datasource.task.Scheduler;
 import java.util.ArrayList;
 import java.util.List;

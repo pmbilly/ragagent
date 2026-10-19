@@ -1,4 +1,4 @@
-package com.ragagent.websearch.service;
+package com.ragagent.websearch.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

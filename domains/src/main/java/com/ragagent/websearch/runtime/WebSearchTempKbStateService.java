@@ -1,4 +1,4 @@
-package com.ragagent.websearch.service;
+package com.ragagent.websearch.runtime;
 
 import com.ragagent.contract.knowledge.KnowledgeMaintenancePort;
 import com.ragagent.platform.web.JsonMappers;

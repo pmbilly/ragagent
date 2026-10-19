@@ -5,7 +5,7 @@ import com.ragagent.websearch.config.WebSearchProviderParams;
 import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.dto.WebSearchProviderResponse;
 import com.ragagent.websearch.dto.WebSearchProviderTestTarget;
-import com.ragagent.websearch.mapper.WebSearchProviderRepository;
+import com.ragagent.websearch.repository.WebSearchProviderRepository;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
