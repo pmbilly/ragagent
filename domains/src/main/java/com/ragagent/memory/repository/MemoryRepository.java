@@ -1,12 +1,10 @@
 package com.ragagent.memory.repository;
 
 import com.ragagent.contract.memory.MemoryMessageCursor;
-import com.ragagent.memory.domain.MemoryDocAffinity;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
 import com.ragagent.memory.domain.MemoryExtractionSession;
 import com.ragagent.memory.domain.MemoryExtractionState;
-import com.ragagent.memory.domain.MemoryPage;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryItemEmbedding;
@@ -15,6 +13,8 @@ import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.domain.vector.MemoryVectorHit;
 import com.ragagent.memory.domain.vector.MemoryVectorQuery;
+import com.ragagent.memory.dto.MemoryDocAffinity;
+import com.ragagent.memory.dto.MemoryPage;
 import com.ragagent.memory.mapper.MemoryDocAffinityMapper;
 import com.ragagent.memory.mapper.MemoryExtractionSessionMapper;
 import com.ragagent.memory.mapper.MemoryItemEmbeddingMapper;

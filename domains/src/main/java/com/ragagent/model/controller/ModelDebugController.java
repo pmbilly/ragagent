@@ -17,11 +17,10 @@ import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.VlmPredictor;
-import com.ragagent.model.domain.Model;
 import com.ragagent.model.dto.ModelDebugAsrResponse;
 import com.ragagent.model.dto.ModelDebugChatResponse;
 import com.ragagent.model.dto.ModelDebugResult;
-import com.ragagent.model.service.ModelRowViews;
+import com.ragagent.model.dto.ModelDebugTarget;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
 import com.ragagent.platform.storage.config.UploadLimits;
@@ -94,9 +93,9 @@ public class ModelDebugController {
             throw new BizException(AppError.badRequest("Model ID cannot be empty"));
         }
 
-        Model model;
+        ModelDebugTarget model;
         try {
-            model = modelService.getModelByID(id);
+            model = modelService.getDebugTarget(id);
         } catch (ModelNotFoundException e) {
             throw new BizException(AppError.notFound("Model not found"));
         }
@@ -145,7 +144,7 @@ public class ModelDebugController {
                 requestPreview(model, input, documents, opts, fileName, fileSize);
         Map<String, Object> observations = new TreeMap<>(); // 按键排序输出
 
-        return switch (model.getType() == null ? "" : model.getType()) {
+        return switch (model.type() == null ? "" : model.type()) {
             case "KnowledgeQA" -> debugChat(model, input, opts, startedNanos, requestPreview, observations);
             case "Embedding" -> debugEmbedding(model, input, startedNanos, requestPreview, observations);
             case "Rerank" -> debugRerank(model, input, documents, startedNanos, requestPreview, observations);
@@ -157,7 +156,7 @@ public class ModelDebugController {
 
     // ── KnowledgeQA ──────────────────────────────────────────────────────
 
-    private ResponseEntity<ModelDebugResult> debugChat(Model model, String input, DebugOptions opts,
+    private ResponseEntity<ModelDebugResult> debugChat(ModelDebugTarget model, String input, DebugOptions opts,
                                         long startedNanos, Map<String, Object> requestPreview,
                                         Map<String, Object> observations) {
         if (input.trim().isEmpty()) {
@@ -165,7 +164,7 @@ public class ModelDebugController {
         }
         LlmChatClient instance;
         try {
-            instance = runtimeFactory.getChatModel(model.getId());
+            instance = runtimeFactory.getChatModel(model.id());
         } catch (RuntimeException e) {
             return writeResult(startedNanos, requestPreview, null, e.getMessage(), observations);
         }
@@ -187,7 +186,9 @@ public class ModelDebugController {
         chatOpts.setThinking(opts.thinking);
 
         // 组 chat 配置 + thinking 观测
-        ChatConfig chatConfig = runtimeFactory.chatConfigFor(ModelRowViews.of(model));
+        ChatConfig chatConfig = runtimeFactory.chatConfigFor(new ModelRowView(
+                model.id(), model.name(), model.type(), model.source(), model.status(),
+                model.isDefault(), model.parameters()));
         String thinkingControl = runtimeFactory.effectiveThinkingControl(chatConfig);
         observations.put("stream", true);
         observations.put("requestedThinking", opts.thinking != null && opts.thinking);
@@ -261,14 +262,14 @@ public class ModelDebugController {
 
     // ── Embedding ────────────────────────────────────────────────────────
 
-    private ResponseEntity<ModelDebugResult> debugEmbedding(Model model, String input, long startedNanos,
+    private ResponseEntity<ModelDebugResult> debugEmbedding(ModelDebugTarget model, String input, long startedNanos,
                                              Map<String, Object> requestPreview, Map<String, Object> observations) {
         if (input.trim().isEmpty()) {
             throw new BizException(AppError.badRequest("input cannot be empty"));
         }
         Embedder instance;
         try {
-            instance = runtimeFactory.getEmbeddingModel(model.getId());
+            instance = runtimeFactory.getEmbeddingModel(model.id());
         } catch (RuntimeException e) {
             return writeResult(startedNanos, requestPreview, null, e.getMessage(), observations);
         }
@@ -285,7 +286,7 @@ public class ModelDebugController {
 
     // ── Rerank ───────────────────────────────────────────────────────────
 
-    private ResponseEntity<ModelDebugResult> debugRerank(Model model, String input, List<String> documents,
+    private ResponseEntity<ModelDebugResult> debugRerank(ModelDebugTarget model, String input, List<String> documents,
                                           long startedNanos, Map<String, Object> requestPreview,
                                           Map<String, Object> observations) {
         if (input.trim().isEmpty() || documents == null || documents.isEmpty()) {
@@ -293,7 +294,7 @@ public class ModelDebugController {
         }
         Reranker instance;
         try {
-            instance = runtimeFactory.getRerankModel(model.getId());
+            instance = runtimeFactory.getRerankModel(model.id());
         } catch (RuntimeException e) {
             return writeResult(startedNanos, requestPreview, null, e.getMessage(), observations);
         }
@@ -310,7 +311,7 @@ public class ModelDebugController {
 
     // ── VLLM ─────────────────────────────────────────────────────────────
 
-    private ResponseEntity<ModelDebugResult> debugVlm(Model model, String input, byte[] fileBytes,
+    private ResponseEntity<ModelDebugResult> debugVlm(ModelDebugTarget model, String input, byte[] fileBytes,
                                        long startedNanos, Map<String, Object> requestPreview,
                                        Map<String, Object> observations) {
         if (fileBytes == null || fileBytes.length == 0) {
@@ -318,7 +319,7 @@ public class ModelDebugController {
         }
         ModelRowView vlmModel;
         try {
-            vlmModel = runtimeFactory.getVlmModel(model.getId());
+            vlmModel = runtimeFactory.getVlmModel(model.id());
         } catch (RuntimeException e) {
             return writeResult(startedNanos, requestPreview, null, e.getMessage(), observations);
         }
@@ -344,22 +345,22 @@ public class ModelDebugController {
 
     // ── ASR ──────────────────────────────────────────────────────────────
 
-    private ResponseEntity<ModelDebugResult> debugAsr(Model model, byte[] fileBytes, String fileName,
+    private ResponseEntity<ModelDebugResult> debugAsr(ModelDebugTarget model, byte[] fileBytes, String fileName,
                                        long startedNanos, Map<String, Object> requestPreview,
                                        Map<String, Object> observations) {
         if (fileBytes == null || fileBytes.length == 0) {
             throw new BizException(AppError.badRequest("audio file is required"));
         }
         try {
-            runtimeFactory.getAsrModel(model.getId());
+            runtimeFactory.getAsrModel(model.id());
         } catch (RuntimeException e) {
             return writeResult(startedNanos, requestPreview, null, e.getMessage(), observations);
         }
-        ModelParameters p = model.getParameters();
+        ModelParameters p = model.parameters();
         // language 不从模型来（恒空），customHeaders 透传
         var config = new AsrTranscriber.AsrConfig(
-                p == null ? "" : p.getBaseUrl(), model.getName(), p == null ? "" : p.getApiKey(),
-                model.getId(), "", p == null ? null : p.getCustomHeaders());
+                p == null ? "" : p.getBaseUrl(), model.name(), p == null ? "" : p.getApiKey(),
+                model.id(), "", p == null ? null : p.getCustomHeaders());
         AsrTranscriber.TranscriptionResult result = null;
         String error = null;
         try {
@@ -399,9 +400,9 @@ public class ModelDebugController {
      * 请求预览（只含非密字段）：顶层键按字母序输出（确定性）；
      * options 各键仅在显式给出时出现（键序 = 声明序）。
      */
-    private Map<String, Object> requestPreview(Model model, String input, List<String> documents,
+    private Map<String, Object> requestPreview(ModelDebugTarget model, String input, List<String> documents,
                                                DebugOptions opts, String fileName, long fileSize) {
-        ModelParameters p = model.getParameters();
+        ModelParameters p = model.parameters();
         Map<String, Object> preview = new TreeMap<>();
         if (p != null && p.getCustomHeaders() != null && !p.getCustomHeaders().isEmpty()) {
             // 只露头名（值可能含密钥），排序输出保证确定性
@@ -421,9 +422,9 @@ public class ModelDebugController {
         if (p != null && p.getExtraConfig() != null) {
             preview.put("modelExtraConfig", redactedDebugConfig(p.getExtraConfig()));
         }
-        preview.put("modelId", model.getId());
-        preview.put("modelName", model.getName());
-        preview.put("modelType", model.getType());
+        preview.put("modelId", model.id());
+        preview.put("modelName", model.name());
+        preview.put("modelType", model.type());
 
         Map<String, Object> options = new LinkedHashMap<>();
         if (opts.systemPrompt != null && !opts.systemPrompt.isEmpty()) {
@@ -444,7 +445,7 @@ public class ModelDebugController {
         preview.put("options", options);
 
         preview.put("provider", p == null || p.getProvider() == null ? "" : p.getProvider());
-        preview.put("source", model.getSource());
+        preview.put("source", model.source());
         return preview;
     }
 

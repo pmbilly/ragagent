@@ -1,8 +1,10 @@
 package com.ragagent.websearch.service;
 
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.websearch.config.WebSearchProviderParams;
 import com.ragagent.websearch.domain.WebSearchProviderEntity;
-import com.ragagent.websearch.domain.WebSearchProviderParams;
+import com.ragagent.websearch.dto.WebSearchProviderResponse;
+import com.ragagent.websearch.dto.WebSearchProviderTestTarget;
 import com.ragagent.websearch.mapper.WebSearchProviderRepository;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -43,6 +45,69 @@ public class WebSearchProviderService {
 
     public List<WebSearchProviderEntity> list(long tenantId) {
         return repo.list(tenantId);
+    }
+
+    // ── 控制面读模型（控制器不再 import WebSearchProviderEntity） ─────────
+
+    public List<WebSearchProviderResponse> listResponses(long tenantId, boolean canViewSecrets) {
+        return WebSearchProviderResponse.listOf(repo.list(tenantId), canViewSecrets);
+    }
+
+    /** {@code null} = provider 不存在。 */
+    public WebSearchProviderResponse getResponse(long tenantId, String id, boolean canViewSecrets) {
+        WebSearchProviderEntity entity = repo.getByID(tenantId, id);
+        return entity == null ? null : WebSearchProviderResponse.from(entity, canViewSecrets);
+    }
+
+    public WebSearchProviderResponse createResponse(long tenantId, String name, String provider,
+            String description, WebSearchProviderParams parameters, boolean isDefault,
+            boolean canViewSecrets) {
+        WebSearchProviderEntity entity = new WebSearchProviderEntity();
+        entity.setId(java.util.UUID.randomUUID().toString());
+        entity.setTenantId(tenantId);
+        entity.setName(name);
+        entity.setProvider(provider);
+        entity.setDescription(description);
+        entity.setParameters(parameters);
+        entity.setDefault(isDefault);
+        create(entity);
+        return WebSearchProviderResponse.from(entity, canViewSecrets);
+    }
+
+    /** 更新并回读；{@code null} = provider 不存在。api_key/provider 不可经本路径改变。 */
+    public WebSearchProviderResponse updateResponse(long tenantId, String id, String name,
+            String description, WebSearchProviderParams parameters, Boolean isDefault,
+            boolean canViewSecrets) {
+        WebSearchProviderEntity existing = repo.getByID(tenantId, id);
+        if (existing == null) {
+            return null;
+        }
+        WebSearchProviderParams merged = parameters == null
+                ? new WebSearchProviderParams() : parameters;
+        WebSearchProviderParams existingParams = existing.getParameters() == null
+                ? new WebSearchProviderParams() : existing.getParameters();
+        merged.setApiKey(existingParams.getApiKey());
+        if (merged.getExtraConfig() == null) {
+            merged.setExtraConfig(existingParams.getExtraConfig());
+        }
+        WebSearchProviderEntity updated = new WebSearchProviderEntity();
+        updated.setId(id);
+        updated.setTenantId(tenantId);
+        updated.setName(name == null || name.isEmpty() ? existing.getName() : name);
+        updated.setProvider(existing.getProvider());
+        updated.setDescription(description == null || description.isEmpty()
+                ? existing.getDescription() : description);
+        updated.setParameters(merged);
+        updated.setDefault(isDefault != null && isDefault);
+        update(updated);
+        WebSearchProviderEntity refreshed = repo.getByID(tenantId, id);
+        return refreshed == null ? null : WebSearchProviderResponse.from(refreshed, canViewSecrets);
+    }
+
+    /** {@code null} = provider 不存在。 */
+    public WebSearchProviderTestTarget getTestTarget(long tenantId, String id) {
+        WebSearchProviderEntity entity = repo.getByID(tenantId, id);
+        return entity == null ? null : WebSearchProviderTestTarget.from(entity);
     }
 
     /** 创建 provider：校验（失败=普通 error）→ 清默认（失败仅告警）→ 落库 */
@@ -91,8 +156,8 @@ public class WebSearchProviderService {
         repo.update(provider, OffsetDateTime.now());
     }
 
-    /** 更新凭据：key 缺失/为空/与现值相同 → 不写库，直接返回现有行 */
-    public WebSearchProviderEntity updateCredentials(long tenantId, String id, String apiKey) {
+    /** 更新凭据：key 缺失/为空/与现值相同 → 不写库；返回写完后的“已配置”状态。 */
+    public boolean updateCredentials(long tenantId, String id, String apiKey) {
         WebSearchProviderEntity existing = repo.getByID(tenantId, id);
         if (existing == null) {
             throw failed("web search provider not found");
@@ -103,7 +168,20 @@ public class WebSearchProviderService {
             existing.setParameters(params);
             repo.update(existing, OffsetDateTime.now());
         }
-        return existing;
+        return configured(params);
+    }
+
+    /** 查询凭据状态：{@code null} = provider 不存在（控制器据此回 404）。 */
+    public Boolean credentialConfigured(long tenantId, String id) {
+        WebSearchProviderEntity existing = repo.getByID(tenantId, id);
+        if (existing == null) {
+            return null;
+        }
+        return configured(existing.getParameters());
+    }
+
+    private static boolean configured(WebSearchProviderParams params) {
+        return params != null && params.getApiKey() != null && !params.getApiKey().isEmpty();
     }
 
     /** 清除凭据：幂等（本就为空 → no-op） */

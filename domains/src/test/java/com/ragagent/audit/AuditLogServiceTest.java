@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.audit.domain.AuditLogQuery;
+import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.mapper.AuditLogRepository;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.contract.audit.AuditAction;

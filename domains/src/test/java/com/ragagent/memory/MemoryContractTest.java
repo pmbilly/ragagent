@@ -3,10 +3,10 @@ package com.ragagent.memory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.contract.memory.MemoryConfig;
-import com.ragagent.memory.domain.MemoryConsolidationResult;
-import com.ragagent.memory.domain.MemoryDocView;
-import com.ragagent.memory.domain.MemoryTopicView;
-import com.ragagent.memory.domain.scope.MemorySettings;
+import com.ragagent.memory.config.MemorySettings;
+import com.ragagent.memory.dto.MemoryConsolidationResult;
+import com.ragagent.memory.dto.MemoryDocView;
+import com.ragagent.memory.dto.MemoryTopicView;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;

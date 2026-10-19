@@ -9,19 +9,20 @@ import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.memory.MemoryContext;
-import com.ragagent.memory.domain.MemoryConflictException;
-import com.ragagent.memory.domain.MemoryDocAffinity;
-import com.ragagent.memory.domain.MemoryDocView;
-import com.ragagent.memory.domain.MemoryPage;
+import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.domain.MemoryRender;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryTopicStat;
-import com.ragagent.memory.domain.MemoryTopicView;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.scope.MemoryScope;
-import com.ragagent.memory.domain.scope.MemorySettings;
 import com.ragagent.memory.domain.scope.MemorySubject;
+import com.ragagent.memory.dto.MemoryDocAffinity;
+import com.ragagent.memory.dto.MemoryDocView;
+import com.ragagent.memory.dto.MemoryItemResponse;
+import com.ragagent.memory.dto.MemoryPage;
+import com.ragagent.memory.dto.MemoryTopicView;
 import com.ragagent.memory.repository.MemoryRepository;
+import com.ragagent.memory.support.MemoryConflictException;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.Duration;
@@ -205,6 +206,30 @@ public class MemoryService {
     /** 实现随协作者 {@link MemoryCatalogOps}。 */
         public MemoryItem createItem(String kind, String content, int importance) {
         return catalogOps.createItem(kind, content, importance);
+    }
+
+    // ── 控制面读模型（控制器不再 import MemoryItem） ─────────────────────
+
+    public MemoryPage<MemoryItemResponse> listItemViews(String status, int limit, int offset) {
+        MemoryPage<MemoryItem> page = listItems(status, limit, offset);
+        return new MemoryPage<>(
+                page.items().stream().map(MemoryItemResponse::from).toList(), page.total());
+    }
+
+    public MemoryItemResponse createItemView(String kind, String content, int importance) {
+        return MemoryItemResponse.from(createItem(kind, content, importance));
+    }
+
+    public MemoryItemResponse updateItemView(String id, String content, int importance) {
+        return MemoryItemResponse.from(updateItem(id, content, importance));
+    }
+
+    public MemoryItemResponse confirmItemView(String id) {
+        return MemoryItemResponse.from(confirmItem(id));
+    }
+
+    public MemoryItemResponse promoteTopicView(String id) {
+        return MemoryItemResponse.from(promoteTopic(id));
     }
 
     /** 实现随协作者 {@link MemoryCatalogOps}。 */

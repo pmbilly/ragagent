@@ -1,5 +1,5 @@
 /**
- * 网页搜索 · 领域模型：WebSearchParamsTypeHandler / WebSearchProviderParams / WebSearchProviderEntity。
+ * 网页搜索 · 领域模型：WebSearchParamsTypeHandler / WebSearchProviderEntity。
  *
  * <p>依赖 {@code platform}。</p>
  */

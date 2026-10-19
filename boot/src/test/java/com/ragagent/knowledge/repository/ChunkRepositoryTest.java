@@ -7,12 +7,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.ChunkNotFoundException;
 import com.ragagent.knowledge.domain.ChunkPage;
 import com.ragagent.knowledge.domain.ChunkRevision;
-import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
 import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.mapper.ChunkRevisionMapper;
+import com.ragagent.knowledge.support.ChunkNotFoundException;
+import com.ragagent.knowledge.support.ChunkRevisionConflictException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;

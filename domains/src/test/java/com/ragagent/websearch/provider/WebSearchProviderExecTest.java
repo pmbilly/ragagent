@@ -6,7 +6,7 @@ import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.websearch.WebSearchFilters;
 import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.websearch.domain.WebSearchProviderParams;
+import com.ragagent.websearch.config.WebSearchProviderParams;
 import com.ragagent.websearch.service.WebSearchService;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;

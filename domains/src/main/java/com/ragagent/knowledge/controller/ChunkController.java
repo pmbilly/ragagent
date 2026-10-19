@@ -3,11 +3,6 @@ package com.ragagent.knowledge.controller;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.GeneratedQuestion;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.ChunkNotFoundException;
-import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.knowledge.dto.chunk.ChunkPageResponse;
 import com.ragagent.knowledge.dto.chunk.ChunkResponse;
 import com.ragagent.knowledge.dto.chunk.ChunkRevisionResponse;
@@ -17,9 +12,12 @@ import com.ragagent.knowledge.dto.chunk.UpdateChunkRequest;
 import com.ragagent.knowledge.dto.faq.DeleteGeneratedQuestionRequest;
 import com.ragagent.knowledge.dto.faq.GeneratedQuestionResponse;
 import com.ragagent.knowledge.dto.faq.UpsertGeneratedQuestionRequest;
+import com.ragagent.knowledge.service.access.ChunkAccessGuard;
 import com.ragagent.knowledge.service.chunk.ChunkEditService;
 import com.ragagent.knowledge.service.chunk.ChunkQuestionService;
 import com.ragagent.knowledge.service.chunk.ChunkReadService;
+import com.ragagent.knowledge.support.ChunkNotFoundException;
+import com.ragagent.knowledge.support.ChunkRevisionConflictException;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResponse;
@@ -117,13 +115,11 @@ public class ChunkController {
             throw new BizException(AppError.badRequest("Chunk ID cannot be empty"));
         }
         guard.requireKbAccess(guard.kbIdFromChunkParam(chunkId));
-        final Chunk chunk;
         try {
-            chunk = chunkRead.getChunkByIdOnly(chunkId);
+            return ResponseEntity.ok(chunkRead.getChunkResponseByIdOnly(chunkId));
         } catch (ChunkNotFoundException e) {
             throw new BizException(AppError.notFound("Chunk not found"));
         }
-        return ResponseEntity.ok(ChunkResponse.from(chunk));
     }
 
     /** 分块修订历史（直接返回数组）。 */
@@ -131,8 +127,8 @@ public class ChunkController {
     public ResponseEntity<List<ChunkRevisionResponse>> listChunkRevisions(
             @PathVariable("knowledgeId") String knowledgeId,
             @PathVariable("id") String id) {
-        Chunk chunk = fetchChunkAndVerifyOwnership(knowledgeId, id);
-        List<ChunkRevisionResponse> items = chunkEdit.listChunkRevisions(chunk.getId()).stream()
+        String chunkId = fetchChunkAndVerifyOwnership(knowledgeId, id);
+        List<ChunkRevisionResponse> items = chunkEdit.listChunkRevisions(chunkId).stream()
                 .map(ChunkRevisionResponse::from)
                 .toList();
         return ResponseEntity.ok(items);
@@ -146,12 +142,12 @@ public class ChunkController {
             @PathVariable("knowledgeId") String knowledgeId,
             @PathVariable("id") String id,
             @Valid @RejectEmptyBody @RequestBody(required = false) UpdateChunkRequest req) {
-        Chunk chunk = fetchChunkAndVerifyOwnership(knowledgeId, id);
+        String chunkId = fetchChunkAndVerifyOwnership(knowledgeId, id);
         UpdateChunkRequest body = req == null ? new UpdateChunkRequest(null, null, null) : req;
-        Chunk updated;
         try {
-            updated = chunkEdit.updateDocumentChunk(
-                    chunk.getId(), body.content(), body.enabled(), body.expectedRevision());
+            var updated = chunkEdit.updateDocumentChunk(
+                    chunkId, body.content(), body.enabled(), body.expectedRevision());
+            return updatedResponse(ChunkResponse.from(updated), knowledgeId);
         } catch (ChunkRevisionConflictException e) {
             throw new BizException(AppError.conflict(
                     "Chunk was modified by another user; refresh and retry"));
@@ -160,7 +156,6 @@ public class ChunkController {
         } catch (RuntimeException e) {
             throw new BizException(AppError.internal(errText(e)));
         }
-        return updatedResponse(updated, knowledgeId);
     }
 
     /** 非 AppError 在这里是 <b>400</b> 不是 500（revert 端点特有）。 */
@@ -169,15 +164,15 @@ public class ChunkController {
             @PathVariable("knowledgeId") String knowledgeId,
             @PathVariable("id") String id,
             @Valid @RejectEmptyBody @RequestBody(required = false) RevertChunkRequest req) {
-        Chunk chunk = fetchChunkAndVerifyOwnership(knowledgeId, id);
+        String chunkId = fetchChunkAndVerifyOwnership(knowledgeId, id);
         RevertChunkRequest body = req == null ? new RevertChunkRequest(null, null) : req;
         if (body.revision() != null && body.revision() < 0) {
             throw new BizException(AppError.badRequest("revision must be a non-negative integer"));
         }
-        Chunk updated;
         try {
-            updated = chunkEdit.revertDocumentChunk(chunk.getId(), body.revision(),
+            var updated = chunkEdit.revertDocumentChunk(chunkId, body.revision(),
                     body.expectedRevision());
+            return updatedResponse(ChunkResponse.from(updated), knowledgeId);
         } catch (ChunkRevisionConflictException e) {
             throw new BizException(AppError.conflict(
                     "Chunk was modified by another user; refresh and retry"));
@@ -186,7 +181,6 @@ public class ChunkController {
         } catch (RuntimeException e) {
             throw new BizException(AppError.badRequest(errText(e)));
         }
-        return updatedResponse(updated, knowledgeId);
     }
 
     // ── 生成问题 ──
@@ -255,9 +249,9 @@ public class ChunkController {
     public ApiResponse<Void> deleteChunk(
             @PathVariable("knowledgeId") String knowledgeId,
             @PathVariable("id") String id) {
-        Chunk chunk = fetchChunkAndVerifyOwnership(knowledgeId, id);
+        String chunkId = fetchChunkAndVerifyOwnership(knowledgeId, id);
         try {
-            chunkEdit.deleteChunk(chunk.getId());
+            chunkEdit.deleteChunk(chunkId);
         } catch (BizException e) {
             throw e;
         } catch (RuntimeException e) {
@@ -288,7 +282,7 @@ public class ChunkController {
     // ── 共用 ──
 
     /** 取 chunk 并校验属于 URL 里的 :knowledge_id（同租户横向越权防线）；守卫链先行。 */
-    private Chunk fetchChunkAndVerifyOwnership(String knowledgeId, String id) {
+    private String fetchChunkAndVerifyOwnership(String knowledgeId, String id) {
         String kgId = LogSanitizer.sanitize(knowledgeId);
         if (kgId.isEmpty()) {
             throw new BizException(AppError.badRequest("Knowledge ID cannot be empty"));
@@ -299,34 +293,35 @@ public class ChunkController {
         }
         guard.requireOwnedChunkKbByKnowledge(kgId);
         guard.requireKbAccess(guard.kbIdFromKnowledgeParam(kgId));
-        final Chunk chunk;
+        String ownedChunkId;
         try {
-            chunk = chunkRead.getChunkById(tenantId(), chunkId);
+            ownedChunkId = chunkRead.chunkIdIfOwned(tenantId(), kgId, chunkId);
         } catch (ChunkNotFoundException e) {
             throw new BizException(AppError.notFound("Chunk not found"));
         }
-        if (!chunk.getKnowledgeId().equals(kgId)) {
+        if (ownedChunkId == null) {
             throw new BizException(AppError.forbidden("No permission to access this chunk"));
         }
-        return chunk;
+        return ownedChunkId;
     }
 
     /** 更新/回滚的成功响应；knowledge 摘要重载失败仅 WARN（两键缺席）。 */
-    private ResponseEntity<ChunkUpdateResponse> updatedResponse(Chunk chunk, String knowledgeId) {
-        Knowledge knowledge = null;
+    private ResponseEntity<ChunkUpdateResponse> updatedResponse(
+            ChunkResponse response, String knowledgeId) {
+        ChunkReadService.SummaryReload knowledge = null;
         try {
-            knowledge = chunkRead.findForSummaryReload(knowledgeId, tenantId());
+            knowledge = chunkRead.findSummaryReloadView(knowledgeId, tenantId());
         } catch (RuntimeException e) {
             log.warn("Chunk updated but failed to reload summary status for {}: {}",
                     LogSanitizer.sanitize(knowledgeId), errText(e));
         }
         if (knowledge == null) {
-            return ResponseEntity.ok(new ChunkUpdateResponse(ChunkResponse.from(chunk), null, null));
+            return ResponseEntity.ok(new ChunkUpdateResponse(response, null, null));
         }
         return ResponseEntity.ok(new ChunkUpdateResponse(
-                ChunkResponse.from(chunk),
-                emptyToNull(knowledge.getDescription()),
-                emptyToNull(knowledge.getSummaryStatus())));
+                response,
+                emptyToNull(knowledge.description()),
+                emptyToNull(knowledge.summaryStatus())));
     }
 
     /**

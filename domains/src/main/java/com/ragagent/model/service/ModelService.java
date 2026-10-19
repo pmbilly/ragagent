@@ -6,8 +6,14 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.ModelFacts;
 import com.ragagent.contract.model.ModelFactsPort;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.model.domain.Model;
+import com.ragagent.model.dto.CreateModelRequest;
+import com.ragagent.model.dto.ModelCredentialsResponse;
+import com.ragagent.model.dto.ModelDebugTarget;
+import com.ragagent.model.dto.ModelDetailResponse;
+import com.ragagent.model.dto.UpdateModelRequest;
 import com.ragagent.model.mapper.ModelMapper;
 import com.ragagent.model.mapper.ModelUsageMapper;
 import com.ragagent.platform.access.TenantContext;
@@ -433,6 +439,95 @@ public class ModelService implements ModelFactsPort  {
 
     private static String text(JsonNode node) {
         return node == null || node.isNull() ? null : node.asString();
+    }
+
+    // ── 控制面读模型（控制器不再 import Model 实体） ─────────────────────
+
+    public ModelDetailResponse createModelResponse(long tenantId, CreateModelRequest req,
+            boolean canViewIntegrationSecrets) {
+        Model model = new Model();
+        model.setTenantId(tenantId);
+        model.setName(req.name());
+        model.setDisplayName(req.displayName());
+        model.setType(req.type());
+        model.setSource(req.source());
+        model.setDescription(req.description());
+        model.setParameters(req.parameters().toDomain());
+        model = createModel(model);
+        return ModelDetailResponse.from(model, canViewIntegrationSecrets,
+                canManageBuiltin(model));
+    }
+
+    public ModelDetailResponse getModelResponse(String id, boolean canViewIntegrationSecrets) {
+        Model model = getModelByID(id);
+        return ModelDetailResponse.from(model, canViewIntegrationSecrets,
+                canManageBuiltin(model));
+    }
+
+    public List<ModelDetailResponse> listModelResponses(boolean canViewIntegrationSecrets) {
+        return listModels().stream()
+                .map(model -> ModelDetailResponse.from(model, canViewIntegrationSecrets,
+                        canManageBuiltin(model)))
+                .toList();
+    }
+
+    public ModelDetailResponse updateModelResponse(String id, UpdateModelRequest req,
+            boolean canViewIntegrationSecrets) {
+        Model model = getModelByID(id);
+        if (req.name() != null && !req.name().isEmpty()) {
+            model.setName(req.name());
+        }
+        if (req.displayName() != null) {
+            model.setDisplayName(req.displayName());
+        }
+        model.setDescription(req.description());
+
+        var stored = model.getParameters();
+        String storedApiKey = stored.getApiKey();
+        String storedAppSecret = stored.getAppSecret();
+        ModelParameters newParams = req.parameters() != null
+                ? req.parameters().toDomain() : new ModelParameters();
+        newParams.setApiKey(storedApiKey);
+        newParams.setAppSecret(storedAppSecret);
+        newParams.setParameterSize(stored.getParameterSize());
+        if (newParams.getInterfaceType().isEmpty()) {
+            newParams.setInterfaceType(stored.getInterfaceType());
+        }
+        if (newParams.getAppId().isEmpty()) {
+            newParams.setAppId(stored.getAppId());
+        }
+        if (newParams.getExtraConfig() == null) {
+            newParams.setExtraConfig(stored.getExtraConfig());
+        }
+        model.setParameters(newParams);
+        model.setSource(req.source());
+        model.setType(req.type());
+        model = updateModel(model);
+        return ModelDetailResponse.from(model, canViewIntegrationSecrets,
+                canManageBuiltin(model));
+    }
+
+    public ModelCredentialsResponse credentialsResponse(String id) {
+        Model model = getModelByID(id);
+        return ModelCredentialsResponse.of(
+                !model.getParameters().getApiKey().isEmpty(),
+                !model.getParameters().getAppSecret().isEmpty());
+    }
+
+    public ModelCredentialsResponse updateCredentialsResponse(String id, String apiKey,
+            String appSecret) {
+        Model model = updateModelCredentials(id, apiKey, appSecret);
+        return ModelCredentialsResponse.of(
+                !model.getParameters().getApiKey().isEmpty(),
+                !model.getParameters().getAppSecret().isEmpty());
+    }
+
+    public ModelDebugTarget getDebugTarget(String id) {
+        return ModelDebugTarget.from(getModelByID(id));
+    }
+
+    private static boolean canManageBuiltin(Model model) {
+        return model.isIsBuiltin() && TenantContext.isSystemAdmin();
     }
 
     /** 模型不存在（404 "Model not found"） */

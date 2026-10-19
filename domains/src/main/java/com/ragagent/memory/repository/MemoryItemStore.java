@@ -1,12 +1,12 @@
 package com.ragagent.memory.repository;
 
 import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.memory.domain.MemoryConflictException;
-import com.ragagent.memory.domain.MemoryPage;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryTombstone;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
+import com.ragagent.memory.dto.MemoryPage;
+import com.ragagent.memory.support.MemoryConflictException;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.Duration;
 import java.time.OffsetDateTime;

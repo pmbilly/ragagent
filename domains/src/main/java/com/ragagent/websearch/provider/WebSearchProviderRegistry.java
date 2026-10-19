@@ -1,6 +1,6 @@
 package com.ragagent.websearch.provider;
 
-import com.ragagent.websearch.domain.WebSearchProviderParams;
+import com.ragagent.websearch.config.WebSearchProviderParams;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;

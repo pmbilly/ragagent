@@ -4,6 +4,8 @@ package com.ragagent.datasource.domain.connector;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.datasource.catalog.ConnectorCatalog;
+import com.ragagent.datasource.catalog.ConnectorMetadata;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.DataSourceConstants;
 import com.ragagent.datasource.domain.FetchedItem;

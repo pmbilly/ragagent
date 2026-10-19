@@ -38,7 +38,8 @@ import java.util.List;
  * </ol>
  *
  * <h2>JSON 形态</h2>
- * <p>本类型**不是**响应体（handler 回的是 {@link MemoryTopicView}），但键序按字段声明序：
+ * <p>本类型**不是**响应体（handler 回的是
+ * {@link com.ragagent.memory.dto.MemoryTopicView}），但键序按字段声明序：
  * </p>
  * <pre>
  * MemoryTopicStat{} →
@@ -99,7 +100,8 @@ public class MemoryTopicStat {
 
     /**
      * {@code null} 是合法状态（响应输出 {@code null}），**不**归一成空列表——
-     * 归一化只发生在投影函数 {@link MemoryTopicView#fromStat} 里。
+     * 归一化只发生在投影函数
+     * {@link com.ragagent.memory.dto.MemoryTopicView#fromStat} 里。
      */
     public List<String> getAliases() { return aliases; }
     public void setAliases(List<String> v) {

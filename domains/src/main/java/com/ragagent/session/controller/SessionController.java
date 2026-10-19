@@ -3,29 +3,29 @@ package com.ragagent.session.controller;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.session.MessageArtifact;
+import com.ragagent.contract.session.SessionView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.session.conversation.MessageService;
+import com.ragagent.session.conversation.SessionReadService;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.conversation.SessionStopService;
-import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.session.domain.conversation.SessionListQuery;
-import com.ragagent.session.domain.conversation.SessionNotFoundException;
-import com.ragagent.session.domain.conversation.SessionOwnerIds;
-import com.ragagent.session.domain.conversation.SessionPage;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.dto.ArtifactView;
 import com.ragagent.session.dto.BatchDeleteSessionsRequest;
 import com.ragagent.session.dto.CreateSessionRequest;
 import com.ragagent.session.dto.GenerateTitleRequest;
 import com.ragagent.session.dto.GenerateTitleResponse;
+import com.ragagent.session.dto.SessionListQuery;
 import com.ragagent.session.dto.SessionListResponse;
+import com.ragagent.session.dto.SessionPage;
 import com.ragagent.session.dto.SessionPinResponse;
 import com.ragagent.session.dto.StopSessionRequest;
 import com.ragagent.session.dto.UpdateSessionRequest;
+import com.ragagent.session.support.MessageNotFoundException;
+import com.ragagent.session.support.SessionNotFoundException;
+import com.ragagent.session.support.SessionOwnerIds;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
@@ -81,13 +81,16 @@ public class SessionController {
     private static final Logger log = LoggerFactory.getLogger(SessionController.class);
 
     private final SessionService sessionService;
+    private final SessionReadService sessionReadService;
     private final MessageService messageService;
     private final SessionStopService sessionStopService;
 
     public SessionController(SessionService sessionService,
+                             SessionReadService sessionReadService,
                              MessageService messageService,
                              SessionStopService sessionStopService) {
         this.sessionService = sessionService;
+        this.sessionReadService = sessionReadService;
         this.messageService = messageService;
         this.sessionStopService = sessionStopService;
     }
@@ -108,48 +111,35 @@ public class SessionController {
 
     /** 创建会话：<b>201</b> + 裸 {@code Session}。 */
     @PostMapping("/api/v1/sessions")
-    public ResponseEntity<Session> createSession(@RequestBody @Valid CreateSessionRequest request) {
+    public ResponseEntity<SessionView> createSession(@RequestBody @Valid CreateSessionRequest request) {
         // 请求体绑定校验（@Valid）先于租户校验
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null) {
             throw new BizException(AppError.unauthorized("Unauthorized"));
         }
-
-        Session created = new Session();
-        created.setTenantId(tenantId);
-        created.setTitle(request.title() == null ? "" : request.title());
-        created.setDescription(Session.sanitizeClientSessionDescription(
-                request.description() == null ? "" : request.description(), ""));
         // API-Key 调用方按外部身份隔离；否则落到普通 user id / 空（历史行语义）
         String ownerId = SessionOwnerIds.currentSessionOwnerId();
-        if (ownerId != null && !ownerId.isEmpty()) {
-            created.setUserId(ownerId);
-        }
-
-        Session saved;
-        saved = sessionService.createSession(created);
-
+        SessionView saved = sessionReadService.create(
+                tenantId, request.title(), request.description(), ownerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     // ── 读取 ──
 
     @GetMapping("/api/v1/sessions/{id}")
-    public ResponseEntity<Session> getSession(@PathVariable("id") String id) {
+    public ResponseEntity<SessionView> getSession(@PathVariable("id") String id) {
         String sessionId = LogSanitizer.sanitize(id);
         if (sessionId.isEmpty()) {
             throw new BizException(AppError.badRequest("invalid session id"));
         }
-        Session session;
         try {
-            session = sessionService.getSession(sessionId);
+            return ResponseEntity.ok(sessionReadService.get(sessionId));
         } catch (SessionNotFoundException e) {
             log.debug("Session not found, ID: {}", sessionId);
             throw BizException.notFound(e.getMessage());
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        return ResponseEntity.ok(session);
     }
 
     /**
@@ -218,7 +208,7 @@ public class SessionController {
      * （拿完整的落库时间戳），这是响应与请求体不同源的原因。
      */
     @PutMapping("/api/v1/sessions/{id}")
-    public ResponseEntity<Session> updateSession(
+    public ResponseEntity<SessionView> updateSession(
             @PathVariable("id") String id,
             @RequestBody @Valid UpdateSessionRequest request) {
         String sessionId = LogSanitizer.sanitize(id);
@@ -229,32 +219,15 @@ public class SessionController {
         if (tenantId == null) {
             throw new BizException(AppError.unauthorized("Unauthorized"));
         }
-
-        Session session = new Session();
-        session.setTitle(request.title() == null ? "" : request.title());
-        session.setDescription(request.description() == null ? "" : request.description());
-        session.setId(sessionId);
-        session.setTenantId(tenantId);
-
         try {
-            sessionService.updateSession(session);
+            return ResponseEntity.ok(sessionReadService.update(
+                    sessionId, tenantId, request.title(), request.description()));
         } catch (SessionNotFoundException e) {
             log.debug("Session not found, ID: {}", sessionId);
             throw BizException.notFound(e.getMessage());
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-
-        Session updated;
-        try {
-            updated = sessionService.getSession(sessionId);
-        } catch (SessionNotFoundException e) {
-            throw BizException.notFound(e.getMessage());
-        } catch (RuntimeException e) {
-            throw toInternal(e);
-        }
-
-        return ResponseEntity.ok(updated);
     }
 
 
@@ -411,17 +384,16 @@ public class SessionController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        Message message;
+        List<MessageArtifact> artifacts;
         try {
-            message = messageService.getMessage(sessionId, mid);
+            artifacts = messageService.getArtifacts(sessionId, mid);
         } catch (MessageNotFoundException e) {
             // 不存在 → 404 "message not found"（固定文案）
             throw BizException.notFound("message not found");
         } catch (RuntimeException e) {
             throw BizException.notFound("message not found");
         }
-        return artifactListItems(
-                message.getArtifacts() == null ? List.of() : message.getArtifacts());
+        return artifactListItems(artifacts == null ? List.of() : artifacts);
     }
 
     /**
@@ -455,14 +427,15 @@ public class SessionController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        Message message;
+        List<MessageArtifact> artifacts;
         try {
-            message = messageService.getMessage(sessionId, mid);
+            artifacts = messageService.getArtifacts(sessionId, mid);
         } catch (RuntimeException e) {
             throw BizException.notFound("message not found");
         }
-        List<MessageArtifact> artifacts =
-                message.getArtifacts() == null ? List.of() : message.getArtifacts();
+        if (artifacts == null) {
+            artifacts = List.of();
+        }
         if (index >= artifacts.size()) {
             throw BizException.notFound("artifact index out of range");
         }
@@ -499,18 +472,16 @@ public class SessionController {
         if (sessionId == null || sessionId.isEmpty()) {
             throw new BizException(AppError.badRequest("invalid session id"));
         }
-        Session session;
         try {
-            session = sessionService.getOwnedSession(sessionId);
+            String title = sessionReadService.generateTitleForOwnedSession(
+                    sessionId, request.messages());
+            return new GenerateTitleResponse(title);
         } catch (SessionNotFoundException e) {
             log.debug("Session not found, ID: {}", sessionId);
             throw BizException.notFound(e.getMessage());
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        String title;
-        title = sessionService.generateTitle(session, request.messages(), "");
-        return new GenerateTitleResponse(title);
     }
 
     // ── 停止生成 ──

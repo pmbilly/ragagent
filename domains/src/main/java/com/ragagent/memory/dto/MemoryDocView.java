@@ -1,0 +1,63 @@
+package com.ragagent.memory.dto;
+
+import com.ragagent.platform.web.ZeroTimeSerializer;
+import java.time.OffsetDateTime;
+
+/**
+ * 这个人反复从中取材的文档。
+ *
+ * <p>六个字段都恒输出。</p>
+ */
+public class MemoryDocView {
+
+    private String id = "";
+
+    private String knowledgeId = "";
+
+    private String knowledgeBaseId = "";
+
+    private String title = "";
+
+    private int hits;
+
+    private OffsetDateTime lastUsedAt = ZeroTimeSerializer.ZERO_DATE_TIME;
+
+    public String getId() { return id; }
+    public void setId(String v) { id = v == null ? "" : v; }
+
+    public String getKnowledgeId() { return knowledgeId; }
+    public void setKnowledgeId(String v) { knowledgeId = v == null ? "" : v; }
+
+    public String getKnowledgeBaseId() { return knowledgeBaseId; }
+    public void setKnowledgeBaseId(String v) { knowledgeBaseId = v == null ? "" : v; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String v) { title = v == null ? "" : v; }
+
+    public int getHits() { return hits; }
+    public void setHits(int v) { hits = v; }
+
+    public OffsetDateTime getLastUsedAt() { return lastUsedAt; }
+    public void setLastUsedAt(OffsetDateTime v) {
+        lastUsedAt = v == null ? ZeroTimeSerializer.ZERO_DATE_TIME : v;
+    }
+
+    /**
+     * 从一条 {@link MemoryDocAffinity} 行投影出视图。
+     *
+     * @return {@code row} 为 null 时回 null
+     */
+    public static MemoryDocView fromAffinity(MemoryDocAffinity row) {
+        if (row == null) {
+            return null;
+        }
+        MemoryDocView view = new MemoryDocView();
+        view.setId(row.getId());
+        view.setKnowledgeId(row.getKnowledgeId());
+        view.setKnowledgeBaseId(row.getKnowledgeBaseId());
+        view.setTitle(row.getTitle());
+        view.setHits(row.getHits());
+        view.setLastUsedAt(row.getLastUsedAt());
+        return view;
+    }
+}

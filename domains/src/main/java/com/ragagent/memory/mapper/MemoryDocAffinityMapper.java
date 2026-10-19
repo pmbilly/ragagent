@@ -1,7 +1,7 @@
 package com.ragagent.memory.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.memory.domain.MemoryDocAffinity;
+import com.ragagent.memory.dto.MemoryDocAffinity;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.apache.ibatis.annotations.Delete;

@@ -106,6 +106,11 @@ public class MessageService {
      * <p>会话那一步不能省——只查 {@code (session_id, message_id)} 会绕过
      * 本函数里 {@code loadSessionForRead} 建立的那套可见性判定。</p>
      */
+    /** 消息产物列表：控制器不持有 Message 实体。 */
+    public List<MessageArtifact> getArtifacts(String sessionId, String messageId) {
+        return getMessage(sessionId, messageId).getArtifacts();
+    }
+
     public Message getMessage(String sessionId, String messageId) {
         long tenantId = requireTenantId();
         SessionService.loadSessionForRead(

@@ -12,9 +12,9 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
-import com.ragagent.websearch.domain.WebSearchProviderEntity;
-import com.ragagent.websearch.domain.WebSearchProviderParams;
+import com.ragagent.websearch.config.WebSearchProviderParams;
 import com.ragagent.websearch.dto.WebSearchProviderResponse;
+import com.ragagent.websearch.dto.WebSearchProviderTestTarget;
 import com.ragagent.websearch.dto.WebSearchProviderTypes;
 import com.ragagent.websearch.provider.EmptyTestResults;
 import com.ragagent.websearch.provider.WebSearchProvider;
@@ -24,7 +24,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -118,37 +117,33 @@ public class WebSearchProviderController {
         if (!missing.isEmpty()) {
             throw validatorError(missing.toArray(new String[0]));
         }
-        WebSearchProviderEntity providerEntity = new WebSearchProviderEntity();
-        providerEntity.setId(UUID.randomUUID().toString());
-        providerEntity.setTenantId(tenantId);
-        providerEntity.setName(sanitize(name));
-        providerEntity.setProvider(provider);
-        providerEntity.setDescription(sanitize(textOrEmpty(body, "description")));
-        providerEntity.setParameters(paramsOf(body));
-        providerEntity.setDefault(boolOrFalse(body, "isDefault"));
+        WebSearchProviderResponse created;
         try {
-            service.create(providerEntity);
+            created = service.createResponse(tenantId, sanitize(name), provider,
+                    sanitize(textOrEmpty(body, "description")), paramsOf(body),
+                    boolOrFalse(body, "isDefault"), canViewIntegrationSecrets());
         } catch (RuntimeException e) {
             log.warn("Failed to create web search provider", e);
             throw BizException.internal(e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(WebSearchProviderResponse.from(providerEntity, canViewIntegrationSecrets()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping
     public ResponseEntity<?> listProviders() {
         long tenantId = requireTenant();
-        List<WebSearchProviderEntity> providers = service.list(tenantId);
-        return ResponseEntity.ok(
-                WebSearchProviderResponse.listOf(providers, canViewIntegrationSecrets()));
+        return ResponseEntity.ok(service.listResponses(tenantId, canViewIntegrationSecrets()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getProvider(@PathVariable("id") String id) {
         long tenantId = requireTenant();
-        WebSearchProviderEntity provider = owned(tenantId, id);
-        return ResponseEntity.ok(WebSearchProviderResponse.from(provider, canViewIntegrationSecrets()));
+        WebSearchProviderResponse provider = service.getResponse(
+                tenantId, id, canViewIntegrationSecrets());
+        if (provider == null) {
+            throw notFoundPure("web search provider not found");
+        }
+        return ResponseEntity.ok(provider);
     }
 
     /** 更新请求：无 required 字段；merge 规则见下 */
@@ -164,41 +159,21 @@ public class WebSearchProviderController {
             @RequestBody(required = false) String rawBody) {
         long tenantId = requireTenant();
         // ownership 检查先于 body 反序列化（未知 id + 坏 body 都是 404）
-        WebSearchProviderEntity existing = owned(tenantId, id);
-        UpdateProviderRequest req = bind(rawBody, UpdateProviderRequest.class);
-
-        // api_key 绝不从本端点流动：强制保留存量（deprecated 告警仅日志）
-        WebSearchProviderParams merged = req.parameters() == null ? new WebSearchProviderParams() : req.parameters();
-        WebSearchProviderParams existingParams =
-                existing.getParameters() == null ? new WebSearchProviderParams() : existing.getParameters();
-        merged.setApiKey(existingParams.getApiKey());
-        // extra_config 为 null（请求缺省）时保留存量
-        if (merged.getExtraConfig() == null) {
-            merged.setExtraConfig(existingParams.getExtraConfig());
+        if (service.getResponse(tenantId, id, false) == null) {
+            throw notFoundPure("web search provider not found");
         }
-        // 顶层 name/description：请求缺省（空串）时保留存量
-        String mergedName = req.name() == null || req.name().isEmpty() ? existing.getName() : req.name();
-        String mergedDescription = req.description() == null || req.description().isEmpty()
-                ? existing.getDescription() : req.description();
-
-        WebSearchProviderEntity updated = new WebSearchProviderEntity();
-        updated.setId(id);
-        updated.setTenantId(tenantId);
-        updated.setName(sanitize(mergedName));
-        updated.setProvider(existing.getProvider()); // provider 类型创建后不可变
-        updated.setDescription(sanitize(mergedDescription));
-        updated.setParameters(merged);
-        updated.setDefault(req.isDefault() != null && req.isDefault());
+        UpdateProviderRequest req = bind(rawBody, UpdateProviderRequest.class);
+        String name = req.name() == null ? null : sanitize(req.name());
+        String description = req.description() == null ? null : sanitize(req.description());
         try {
-            service.update(updated);
+            WebSearchProviderResponse updated = service.updateResponse(tenantId, id, name,
+                    description, req.parameters(), req.isDefault(), canViewIntegrationSecrets());
+            if (updated != null) {
+                return ResponseEntity.ok(updated);
+            }
         } catch (RuntimeException e) {
             log.warn("Failed to update web search provider {}", id, e);
             throw BizException.internal(e.getMessage());
-        }
-        // Re-fetch to get the full stored state
-        WebSearchProviderEntity refreshed = service.getByID(tenantId, id);
-        if (refreshed != null) {
-            return ResponseEntity.ok(WebSearchProviderResponse.from(refreshed, canViewIntegrationSecrets()));
         }
         return ResponseEntity.ok(connectedBody());
     }
@@ -206,7 +181,9 @@ public class WebSearchProviderController {
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteProvider(@PathVariable("id") String id) {
         long tenantId = requireTenant();
-        owned(tenantId, id);
+        if (service.getResponse(tenantId, id, false) == null) {
+            throw notFoundPure("web search provider not found");
+        }
         try {
             service.delete(tenantId, id);
         } catch (RuntimeException e) {
@@ -221,8 +198,11 @@ public class WebSearchProviderController {
     @PostMapping("/{id}/test")
     public ResponseEntity<?> testProviderByID(@PathVariable("id") String id) {
         long tenantId = requireTenant();
-        WebSearchProviderEntity provider = owned(tenantId, id);
-        doTestSearch(provider.getProvider(), provider.getParameters());
+        WebSearchProviderTestTarget target = service.getTestTarget(tenantId, id);
+        if (target == null) {
+            throw notFoundPure("web search provider not found");
+        }
+        doTestSearch(target.providerType(), target.parameters());
         return ResponseEntity.ok(connectedBody());
     }
 
@@ -267,19 +247,6 @@ public class WebSearchProviderController {
         public TestFailure(String message) {
             super(message);
         }
-    }
-
-    private WebSearchProviderEntity owned(long tenantId, String id) {
-        WebSearchProviderEntity provider;
-        try {
-            provider = service.getByID(tenantId, id);
-        } catch (RuntimeException e) {
-            throw BizException.internal("failed to query provider");
-        }
-        if (provider == null) {
-            throw notFoundPure("web search provider not found");
-        }
-        return provider;
     }
 
     /** getOwned 的 404 是纯字符串形态（不走全局错误信封） */

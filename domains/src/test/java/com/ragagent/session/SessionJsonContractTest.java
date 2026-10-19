@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.ragagent.contract.session.SessionLastRequestState;
 import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.session.domain.conversation.SessionListItem;
+import com.ragagent.session.dto.SessionListItem;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;

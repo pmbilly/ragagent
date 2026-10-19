@@ -62,6 +62,7 @@ run '能力种类边界（跨 kind 直连禁止；同 kind 允许）' python3 sc
 run '业务域包规模（>30 只许降；26-30 报警）' python3 scripts/check-package-size.py
 run '引用真实性（package-info/公开文档不得断链、旧包名、死路径）' python3 scripts/check-reference-truth.py
 run '路由权限覆盖（未登记公开路由/幽灵规则/对照表过期）' python3 scripts/check-route-policy.py
+run '控制器实体导入（C10：只许降）' python3 scripts/check-controller-entity-imports.py
 run '入库链路文档（ingest-flow.md 引用的类必须存在）' python3 scripts/check-ingest-flow.py
 run '版本一致性（Boot / springdoc / MyBatis-Plus jsqlparser / wrapper / Dockerfile）' python3 scripts/check-version-consistency.py
 

@@ -25,9 +25,8 @@ import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.session.controller.sse.StreamEventEmitter;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionService;
-import com.ragagent.session.domain.conversation.SessionNotFoundException;
-import com.ragagent.session.domain.message.Message;
-import com.ragagent.session.domain.message.MessageNotFoundException;
+import com.ragagent.session.support.MessageNotFoundException;
+import com.ragagent.session.support.SessionNotFoundException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -199,9 +198,13 @@ public class SessionStreamController {
         //   会话不可见 → 404 "session not found"
         //   消息不存在 → 404 "record not found"
         //   其它       → 500
-        Message message;
         try {
-            message = messageService.getMessage(sessionId, messageId);
+            if (messageService.getMessage(sessionId, messageId) == null) {
+                // 防御分支：仓储查不到时抛异常，正常不可达；保留作兜底落点。
+                log.debug("Incomplete message not found, session ID: {}, message ID: {}", sessionId, messageId);
+                writeJsonError(response, 404, "Incomplete message not found");
+                return;
+            }
         } catch (SessionNotFoundException e) {
             log.debug("Session not found, ID: {}", sessionId);
             throw BizException.notFound(e.getMessage());
@@ -212,14 +215,7 @@ public class SessionStreamController {
             throw BizException.internal(e.getMessage());
         }
 
-        if (message == null) {
-            // 防御分支：仓储查不到时抛异常，正常不可达；保留作兜底落点。
-            log.debug("Incomplete message not found, session ID: {}, message ID: {}", sessionId, messageId);
-            writeJsonError(response, 404, "Incomplete message not found");
-            return;
-        }
-
-        String requestId = message.getRequestId();
+        String requestId = messageService.getMessage(sessionId, messageId).getRequestId();
 
         // 从 offset 0 读初始事件
         StreamBatch batch;

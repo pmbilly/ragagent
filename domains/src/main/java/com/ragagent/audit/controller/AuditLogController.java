@@ -1,8 +1,7 @@
 package com.ragagent.audit.controller;
 
-import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.audit.domain.AuditLogQuery;
 import com.ragagent.audit.dto.AuditLogListResponse;
+import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -12,7 +11,6 @@ import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -86,8 +84,7 @@ public class AuditLogController {
                 action, outcome, actor,
                 "", "", true);
 
-        List<AuditLog> entries = listOrInternalError(tenantId, q);
-        return ResponseEntity.ok(AuditLogListResponse.of(entries));
+        return ResponseEntity.ok(listOrInternalError(tenantId, q));
     }
 
     // ── 知识库活动流 ─────────────────────────────────────────────────────
@@ -148,8 +145,7 @@ public class AuditLogController {
                 action, outcome, actor,
                 "knowledge_base", kbId, false);
 
-        List<AuditLog> entries = listOrInternalError(kbTenant, q);
-        return ResponseEntity.ok(AuditLogListResponse.of(entries));
+        return ResponseEntity.ok(listOrInternalError(kbTenant, q));
     }
 
     // ── 平台审计流 ───────────────────────────────────────────────────────
@@ -177,8 +173,7 @@ public class AuditLogController {
                 action, outcome, actor,
                 "", "", false);
 
-        List<AuditLog> entries = listOrInternalError(0L, q);
-        return ResponseEntity.ok(AuditLogListResponse.of(entries));
+        return ResponseEntity.ok(listOrInternalError(0L, q));
     }
 
     // ── 工具方法 ─────────────────────────────────────────────────────────
@@ -190,9 +185,9 @@ public class AuditLogController {
      * 若不在这里转换，异常会落到 {@code GlobalExceptionHandler.handleOther}，
      * 消息被换成固定的 {@code "Internal server error"}。</p>
      */
-    private List<AuditLog> listOrInternalError(long tenantId, AuditLogQuery q) {
+    private AuditLogListResponse listOrInternalError(long tenantId, AuditLogQuery q) {
         try {
-            return auditLogService.list(tenantId, q);
+            return auditLogService.listResponse(tenantId, q);
         } catch (BizException e) {
             throw e;
         } catch (RuntimeException e) {

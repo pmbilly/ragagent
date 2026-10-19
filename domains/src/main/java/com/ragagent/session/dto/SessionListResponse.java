@@ -1,6 +1,5 @@
 package com.ragagent.session.dto;
 
-import com.ragagent.session.domain.conversation.SessionListItem;
 import java.util.List;
 
 /**

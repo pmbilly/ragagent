@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-326 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+332 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -67,8 +67,8 @@
 | `:domains` | `com.ragagent.audit` | 审计日志域：审计条目的写入、查询与保留期清理。 |
 | `:domains` | `com.ragagent.audit.api` | 审计 · 端口实现：AuditWriteAdapter。 |
 | `:domains` | `com.ragagent.audit.controller` | 审计 · HTTP 层：AuditLogController。 |
-| `:domains` | `com.ragagent.audit.domain` | 审计 · 领域模型：AuditLogQuery / AuditLog。 |
-| `:domains` | `com.ragagent.audit.dto` | 审计 · 数据传输：AuditLogListResponse。 |
+| `:domains` | `com.ragagent.audit.domain` | 审计 · 领域模型：AuditLog。 |
+| `:domains` | `com.ragagent.audit.dto` | 审计 · 数据传输：AuditLogListResponse / AuditLogQuery。 |
 | `:domains` | `com.ragagent.audit.mapper` | 审计 · 映射：AuditLogRepository / AuditLogMapper。 |
 | `:domains` | `com.ragagent.audit.service` | 审计 · 服务：AuditLogService / RbacDeniedAuditorRegistrar / WikiActivityAuditRecorder…。 |
 | `:domains` | `com.ragagent.auth` | 认证与租户控制面：登录/OIDC/令牌、用户与租户目录、RBAC 与会话身份。 |
@@ -87,6 +87,7 @@
 | `:domains` | `com.ragagent.auth.mapper` | 认证 · 映射：TenantInvitationMapper / TenantMemberMapper / AuthTokenMapper…。 |
 | `:domains` | `com.ragagent.auth.service` | 认证 · 服务：TenantInvitationService / TenantMemberService / TenantService…。 |
 | `:domains` | `com.ragagent.datasource` | 数据源连接器域：外部知识源（Notion/Feishu/Yuque/RSS/IMA/GitLab 等）的抓取、游标推进、 同步编排与数据源配置面。 |
+| `:domains` | `com.ragagent.datasource.catalog` | 数据源 · 连接器目录：类型元数据与可用连接器清单（不参与持久化）。 |
 | `:domains` | `com.ragagent.datasource.connector.feishu.core` | feishu · core：FeishuCursorCodec / FeishuWikiTreeOps / FeishuTransport…。 |
 | `:domains` | `com.ragagent.datasource.connector.feishu.drive` | feishu · drive：DriveConnector。 |
 | `:domains` | `com.ragagent.datasource.connector.feishu.wiki` | feishu · Wiki：WikiConnector。 |
@@ -158,6 +159,7 @@
 | `:domains` | `com.ragagent.knowledge.mapper` | MyBatis-Plus mapper 接口层：每张表一个 *Mapper，只声明 SQL/条件构造， 不承载业务规则。 |
 | `:domains` | `com.ragagent.knowledge.repository` | 仓储门面层：把 mapper 的原子操作组合成领域可用的读写契约，并集中承载 软删三面孔、全字段 UPDATE、乐观锁冲突与 PG/H2 方言分支。 |
 | `:domains` | `com.ragagent.knowledge.service` | 知识库用例层（顶层残部）。 |
+| `:domains` | `com.ragagent.knowledge.service.access` | 知识 · 访问守卫：chunk 路由的 KB/所有权判定。 |
 | `:domains` | `com.ragagent.knowledge.service.chunk` | 分块面（从 service 切出的第二个子面）：分块的编辑、抽取与读取。 |
 | `:domains` | `com.ragagent.knowledge.service.enrichment` | 富化面（从 service 切出的子面）：处理管线完成后的 LLM 富化——摘要与问题生成。 |
 | `:domains` | `com.ragagent.knowledge.service.faq` | FAQ 面（从 service 整簇切出的第一个子面）。 |
@@ -165,7 +167,8 @@
 | `:domains` | `com.ragagent.knowledge.service.management` | 知识域**应用/门面面**（起）：对外的门面 KnowledgeService，以及它向下编排的 用例服务（知识库/文件夹、文件与手工内容、解析生命周期、克隆/移动/标签/批处理）。 |
 | `:domains` | `com.ragagent.knowledge.service.query` | 查询面（从 service 切出，按 命名）：检索与 span 读取。 |
 | `:domains` | `com.ragagent.knowledge.storage` | 知识库文件与对象存储：LocalStorageService（本地卷）+ TenantFileStorage（租户感知门面， 知识上传/读取/删除的唯一入口）。 |
-| `:domains` | `com.ragagent.knowledge.support` | 知识库的纯逻辑支撑：无状态、零依赖的算法与规则，不作为 Spring bean。 |
+| `:domains` | `com.ragagent.knowledge.support` | 知识 · 支撑类型：chunk 异常等不属于实体的共享词汇。 |
+| `:domains` | `com.ragagent.knowledge.support.access` | 知识 · 路由守卫支撑：批量访问检查与任务 id 解析（非 service 层）。 |
 | `:domains` | `com.ragagent.knowledge.task` | 知识库异步任务：队列与执行。 |
 | `:domains` | `com.ragagent.mcp` | MCP 域：Model Context Protocol 的仓内实现——协议、OAuth（含回调与令牌存储）、 服务注册与调用面；对外 /api/v1/mcp-services。 |
 | `:domains` | `com.ragagent.mcp.api` | MCP · 端口实现：McpToolRegistrationAdapter / McpApprovalOpsAdapter。 |
@@ -180,6 +183,7 @@
 | `:domains` | `com.ragagent.mcp.tool` | MCP 工具实现族（方案 的 tool/）：把 MCP 服务暴露的工具翻译为 Agent 工具—— 调用（McpCallTool）、发现与目录（McpDiscoverTool / McpCatalog |
 | `:domains` | `com.ragagent.memory` | 记忆域：用户长期记忆的抽取、去重与合并、检索与生命周期（租约、墓碑、容量）。 |
 | `:domains` | `com.ragagent.memory.api` | 记忆 · 端口实现：MemoryPipelineAdapter / MemoryAccessAdapter。 |
+| `:domains` | `com.ragagent.memory.config` | 记忆 · 配置值：MemorySettings（记忆开关、阈值与策略）。 |
 | `:domains` | `com.ragagent.memory.controller` | 记忆 · HTTP 层：MemoryController。 |
 | `:domains` | `com.ragagent.memory.domain` | 记忆域实体（留存面）：抽取会话/批次/失败/状态（MemoryExtraction*）、 渲染与投影（MemoryRender / MemoryDocView / MemoryTopicView / |
 | `:domains` | `com.ragagent.memory.domain.item` | 记忆条目面（拆自 memory.domain，对齐方案 的 domain.item/）： MemoryItem（可检索的条目）、MemoryItemEmbedding（其向量）、 MemoryTombstone（删除墓碑）。 |
@@ -189,6 +193,7 @@
 | `:domains` | `com.ragagent.memory.mapper` | 记忆 · 映射：MemoryExtractionSessionMapper / MemoryItemEmbeddingMapper / MemoryDocAffinityMapper…。 |
 | `:domains` | `com.ragagent.memory.repository` | 仓储门面层：记忆域的持久化门面与其协作者。 |
 | `:domains` | `com.ragagent.memory.service` | 记忆 · 服务：MemoryConsolidationService / MemoryExtractionService / MemoryVectorService…。 |
+| `:domains` | `com.ragagent.memory.support` | 记忆 · 支撑类型：冲突异常等跨层共享但不属于实体的词汇。 |
 | `:domains` | `com.ragagent.model` | 模型配置域：模型条目 CRUD、凭据子资源与调试面（embedding 原始响应等）。 |
 | `:domains` | `com.ragagent.model.api` | 模型 · 端口实现：ModelCatalogAdapter。 |
 | `:domains` | `com.ragagent.model.controller` | 模型 · HTTP 层：ModelCredentialsController / ModelDebugController / ModelController。 |
@@ -248,8 +253,9 @@
 | `:domains` | `com.ragagent.vectorstore.service` | 向量库 · 服务：VectorStoreConfigService / VectorStoreLookupAdapter。 |
 | `:domains` | `com.ragagent.websearch` | 联网搜索域：搜索 provider 目录与凭据（对外 /api/v1/web-search-providers）、 搜索执行与各家 provider 适配。 |
 | `:domains` | `com.ragagent.websearch.api` | 网页搜索 · 端口实现：WebSearchBackendsAdapter / WebSearchSupportAdapter。 |
+| `:domains` | `com.ragagent.websearch.config` | 网页搜索 · 配置值：WebSearchProviderParams（provider 的 parameters 载荷）。 |
 | `:domains` | `com.ragagent.websearch.controller` | 网页搜索 · HTTP 层：WebSearchProviderCredentialsController / WebSearchProviderController / WebSearchController。 |
-| `:domains` | `com.ragagent.websearch.domain` | 网页搜索 · 领域模型：WebSearchParamsTypeHandler / WebSearchProviderParams / WebSearchProviderEntity。 |
+| `:domains` | `com.ragagent.websearch.domain` | 网页搜索 · 领域模型：WebSearchParamsTypeHandler / WebSearchProviderEntity。 |
 | `:domains` | `com.ragagent.websearch.dto` | 网页搜索 · 数据传输：WebSearchProviderResponse / WebSearchProviderTypes。 |
 | `:domains` | `com.ragagent.websearch.fetch` | 网页搜索 · 抓取：PipelinePageFetcherImpl / ToolPageFetcherImpl / BrowserRenderer…。 |
 | `:domains` | `com.ragagent.websearch.mapper` | 网页搜索 · 映射：WebSearchProviderRepository。 |

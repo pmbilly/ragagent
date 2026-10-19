@@ -2,9 +2,7 @@ package com.ragagent.model.controller;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.model.domain.Model;
 import com.ragagent.model.dto.CreateModelRequest;
 import com.ragagent.model.dto.ModelDetailResponse;
 import com.ragagent.model.dto.ModelProviderDto;
@@ -20,7 +18,6 @@ import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.platform.web.RejectEmptyBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +68,7 @@ public class ModelController {
         if (tenantId == null || tenantId == 0) {
             throw new BizException(AppError.badRequest("Workspace ID cannot be empty"));
         }
-        ModelParameters parameters = req.parameters().toDomain();
+        var parameters = req.parameters().toDomain();
         // SSRF 校验
         if (!parameters.getBaseUrl().isEmpty()) {
             try {
@@ -82,19 +79,10 @@ public class ModelController {
                         ssrfGuard.formatSSRFError("Base URL", parameters.getBaseUrl(), e)));
             }
         }
-
-        Model model = new Model();
-        model.setTenantId(tenantId);
-        model.setName(req.name());
-        model.setDisplayName(req.displayName());
-        model.setType(req.type());
-        model.setSource(req.source());
-        model.setDescription(req.description());
-        model.setParameters(parameters);
-        model = modelService.createModel(model);
-        log.info("Model created successfully, ID: {}, Name: {}", model.getId(), model.getName());
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ModelDetailResponse.from(model, canViewIntegrationSecrets(), canManageBuiltin(model)));
+        ModelDetailResponse created = modelService.createModelResponse(
+                tenantId, req, canViewIntegrationSecrets());
+        log.info("Model created successfully, ID: {}, Name: {}", created.id(), created.name());
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     /** 读取模型（Viewer+）。 */
@@ -104,14 +92,12 @@ public class ModelController {
         if (isBlank(id)) {
             throw new BizException(AppError.badRequest("Model ID cannot be empty"));
         }
-        Model model;
         try {
-            model = modelService.getModelByID(id);
+            return ResponseEntity.ok(modelService.getModelResponse(id, canViewIntegrationSecrets()));
         } catch (ModelNotFoundException e) {
             log.debug("Model not found, ID: {}", id);
             throw new BizException(AppError.notFound("Model not found"));
         }
-        return ResponseEntity.ok(ModelDetailResponse.from(model, canViewIntegrationSecrets(), canManageBuiltin(model)));
     }
 
     /** 模型列表（Viewer+）。 */
@@ -122,12 +108,7 @@ public class ModelController {
         if (tenantId == null || tenantId == 0) {
             throw new BizException(AppError.badRequest("Workspace ID cannot be empty"));
         }
-        List<Model> models = modelService.listModels();
-        List<ModelDetailResponse> data = new ArrayList<>(models.size());
-        for (Model m : models) {
-            data.add(ModelDetailResponse.from(m, canViewIntegrationSecrets(), canManageBuiltin(m)));
-        }
-        return ResponseEntity.ok(data);
+        return ResponseEntity.ok(modelService.listModelResponses(canViewIntegrationSecrets()));
     }
 
     /**
@@ -141,22 +122,6 @@ public class ModelController {
         if (isBlank(id)) {
             throw new BizException(AppError.badRequest("Model ID cannot be empty"));
         }
-        Model model;
-        try {
-            model = modelService.getModelByID(id);
-        } catch (ModelNotFoundException e) {
-            log.debug("Model not found, ID: {}", id);
-            throw new BizException(AppError.notFound("Model not found"));
-        }
-
-        if (req.name() != null && !req.name().isEmpty()) {
-            model.setName(req.name());
-        }
-        if (req.displayName() != null) {
-            model.setDisplayName(req.displayName());
-        }
-        model.setDescription(req.description());
-
         if (req.parameters() != null && req.parameters().baseUrl() != null
                 && !req.parameters().baseUrl().isEmpty()) {
             try {
@@ -167,38 +132,15 @@ public class ModelController {
                         ssrfGuard.formatSSRFError("Base URL", req.parameters().baseUrl(), e)));
             }
         }
-        // 凭证永不经 PUT 正文：快照保留
-        var stored = model.getParameters();
-        String storedApiKey = stored.getApiKey();
-        String storedAppSecret = stored.getAppSecret();
-        ModelParameters newParams = req.parameters() != null
-                ? req.parameters().toDomain() : new ModelParameters();
-        if (!isBlank(newParams.getApiKey()) && !newParams.getApiKey().equals(storedApiKey)) {
-            log.debug("deprecated: apiKey in PUT /models/{} body is ignored; use PUT /credentials instead", id);
+        try {
+            ModelDetailResponse updated = modelService.updateModelResponse(
+                    id, req, canViewIntegrationSecrets());
+            log.info("Model updated successfully, ID: {}", id);
+            return ResponseEntity.ok(updated);
+        } catch (ModelNotFoundException e) {
+            log.debug("Model not found, ID: {}", id);
+            throw new BizException(AppError.notFound("Model not found"));
         }
-        if (!isBlank(newParams.getAppSecret()) && !newParams.getAppSecret().equals(storedAppSecret)) {
-            log.debug("deprecated: appSecret in PUT /models/{} body is ignored; use PUT /credentials instead", id);
-        }
-        newParams.setApiKey(storedApiKey);
-        newParams.setAppSecret(storedAppSecret);
-        // 后端托管字段：前端不传的保留原值
-        newParams.setParameterSize(stored.getParameterSize());
-        if (newParams.getInterfaceType().isEmpty()) {
-            newParams.setInterfaceType(stored.getInterfaceType());
-        }
-        if (newParams.getAppId().isEmpty()) {
-            newParams.setAppId(stored.getAppId());
-        }
-        if (newParams.getExtraConfig() == null) {
-            newParams.setExtraConfig(stored.getExtraConfig());
-        }
-        model.setParameters(newParams);
-        model.setSource(req.source());
-        model.setType(req.type());
-
-        model = modelService.updateModel(model);
-        log.info("Model updated successfully, ID: {}", id);
-        return ResponseEntity.ok(ModelDetailResponse.from(model, canViewIntegrationSecrets(), canManageBuiltin(model)));
     }
 
     /** 删除模型（Admin+）→ 204 无响应体。 */
@@ -237,10 +179,6 @@ public class ModelController {
 
     private static boolean canViewIntegrationSecrets() {
         return TenantRole.fromString(TenantContext.currentRole()).hasPermission(TenantRole.ADMIN);
-    }
-
-    private static boolean canManageBuiltin(Model m) {
-        return m.isIsBuiltin() && TenantContext.isSystemAdmin();
     }
 
     private static boolean isBlank(String s) {

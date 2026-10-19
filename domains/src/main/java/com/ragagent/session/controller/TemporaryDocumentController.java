@@ -1,6 +1,5 @@
 package com.ragagent.session.controller;
 
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.rule.ParserEngineRules;
@@ -12,9 +11,9 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.attachment.TemporaryDocumentService;
 import com.ragagent.session.conversation.SessionService;
-import com.ragagent.session.domain.conversation.SessionNotFoundException;
-import com.ragagent.session.domain.document.TemporaryDocument;
+import com.ragagent.session.dto.TemporaryDocumentResponse;
 import com.ragagent.session.service.AgentResolver;
+import com.ragagent.session.support.SessionNotFoundException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +64,7 @@ public class TemporaryDocumentController {
 
     /** 上传附件（202 受理，解析异步）。 */
     @PostMapping("/api/v1/sessions/{sessionId}/attachments")
-    public ResponseEntity<TemporaryDocument> upload(
+    public ResponseEntity<TemporaryDocumentResponse> upload(
             @PathVariable("sessionId") String sessionId,
             @RequestParam(value = "file", required = false) MultipartFile file,
             @RequestParam(value = "agentId", required = false) String agentId,
@@ -94,25 +93,54 @@ public class TemporaryDocumentController {
         // agent_source_tenant_id / 共享 agent 分支随空间分享裁撤：只解析自有 agent
         var resolved = agentResolver.resolve(agentId, 0);
         var agent = resolved.row();
-        TemporaryDocumentService.CreateOptions options =
-                agentOptions(agent, extNoDot(file.getOriginalFilename()), parserEngine);
+        String ext = extNoDot(file.getOriginalFilename());
+        TemporaryDocumentService.CreateOptions options = TemporaryDocumentService.CreateOptions
+                .empty().withParserEngine(parserEngine == null ? "" : parserEngine.strip());
+        if (agent != null) {
+            var cfg = AgentResolver.parseAgentConfig(agent);
+            List<String> supported = stringListOf(cfg.get("supportedFileTypes"));
+            if (!supported.isEmpty() && !containsFileType(supported, ext)) {
+                throw new BizException(AppError.badRequest("file type is not supported by this agent"));
+            }
+            if (isAudioExtension(ext)) {
+                if (!cfg.path("audioUploadEnabled").asBoolean(false)
+                        || cfg.path("asrModelId").asString("").isEmpty()) {
+                    throw new BizException(AppError.badRequest(
+                            "audio upload is not enabled or no ASR model is configured"));
+                }
+                options = options.withAsrModelId(cfg.path("asrModelId").asString(""));
+            }
+            if (options.parserEngine().isEmpty() || "auto".equals(options.parserEngine())) {
+                String engine = ParserEngineRules.resolve(
+                        JsonMappers.toJavaValue(cfg.get("chatParserEngineRules")), ext);
+                if (!engine.isEmpty()) {
+                    options = options.withParserEngine(engine);
+                }
+            }
+            if (cfg.path("imageUploadEnabled").asBoolean(false)
+                    && !cfg.path("vlmModelId").asString("").isEmpty()) {
+                options = options.withVlm(cfg.path("vlmModelId").asString(""),
+                        cfg.path("attachmentImageUnderstanding").asBoolean(false),
+                        cfg.path("attachmentOcrMaxPages").asInt(0));
+            }
+        }
         byte[] data;
         try {
             data = file.getBytes();
         } catch (Exception e) {
             throw new BizException(AppError.badRequest("failed to open attachment"));
         }
-        TemporaryDocument document;
         try {
-            document = temporaryDocuments.create(currentTenantId(), sid,
+            var document = temporaryDocuments.create(currentTenantId(), sid,
                     file.getOriginalFilename(), file.getContentType(), file.getSize(), data,
                     options);
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(TemporaryDocumentResponse.from(document));
         } catch (IllegalArgumentException e) {
             throw new BizException(AppError.badRequest(e.getMessage()));
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(document);
     }
 
     /** 超过 multipart 上限：错误文案固定为 "http: request body too large"。 */
@@ -123,7 +151,7 @@ public class TemporaryDocumentController {
     }
 
     @GetMapping({"/api/v1/sessions/{id}/attachments", "/api/v1/sessions/{sessionId}/attachments"})
-    public ResponseEntity<List<TemporaryDocument>> list(
+    public ResponseEntity<List<TemporaryDocumentResponse>> list(
             @PathVariable(value = "id", required = false) String id,
             @PathVariable(value = "sessionId", required = false) String sessionIdFallback) {
         String sid = sessionParam(id, sessionIdFallback);
@@ -134,14 +162,13 @@ public class TemporaryDocumentController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        List<TemporaryDocument> documents;
-        documents = temporaryDocuments.list(currentTenantId(), sid);
-        return ResponseEntity.ok(documents);
+        return ResponseEntity.ok(temporaryDocuments.list(currentTenantId(), sid).stream()
+                .map(TemporaryDocumentResponse::from).toList());
     }
 
     @GetMapping({"/api/v1/sessions/{id}/attachments/{attachmentId}",
             "/api/v1/sessions/{sessionId}/attachments/{attachmentId}"})
-    public ResponseEntity<TemporaryDocument> get(
+    public ResponseEntity<TemporaryDocumentResponse> get(
             @PathVariable(value = "id", required = false) String id,
             @PathVariable(value = "sessionId", required = false) String sessionIdFallback,
             @PathVariable("attachmentId") String attachmentId) {
@@ -153,12 +180,11 @@ public class TemporaryDocumentController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        TemporaryDocument document;
-        document = temporaryDocuments.get(currentTenantId(), sid, attachmentId);
+        var document = temporaryDocuments.get(currentTenantId(), sid, attachmentId);
         if (document == null) {
             throw BizException.notFound("Attachment not found");
         }
-        return ResponseEntity.ok(document);
+        return ResponseEntity.ok(TemporaryDocumentResponse.from(document));
     }
 
     /**
@@ -237,44 +263,6 @@ public class TemporaryDocumentController {
      * supported_file_types 拒收 / 音频需 ASR / agent 级 parser engine 回落（显式 engine
      * 为空或 auto 时）/ VLM 图片理解选项。租户级 parser 规则由 parse worker 兜底。
      */
-    private static TemporaryDocumentService.CreateOptions agentOptions(
-            CustomAgentEntity agent,
-            String ext, String parserEngine) {
-        TemporaryDocumentService.CreateOptions options = TemporaryDocumentService.CreateOptions
-                .empty().withParserEngine(parserEngine == null ? "" : parserEngine.strip());
-        if (agent == null) {
-            return options;
-        }
-        tools.jackson.databind.node.ObjectNode cfg =
-                AgentResolver.parseAgentConfig(agent);
-        List<String> supported = stringListOf(cfg.get("supportedFileTypes"));
-        if (!supported.isEmpty() && !containsFileType(supported, ext)) {
-            throw new BizException(AppError.badRequest("file type is not supported by this agent"));
-        }
-        if (isAudioExtension(ext)) {
-            if (!cfg.path("audioUploadEnabled").asBoolean(false)
-                    || cfg.path("asrModelId").asString("").isEmpty()) {
-                throw new BizException(AppError.badRequest(
-                        "audio upload is not enabled or no ASR model is configured"));
-            }
-            options = options.withAsrModelId(cfg.path("asrModelId").asString(""));
-        }
-        if (options.parserEngine().isEmpty() || "auto".equals(options.parserEngine())) {
-            String engine = ParserEngineRules.resolve(
-                    JsonMappers.toJavaValue(cfg.get("chatParserEngineRules")), ext);
-            if (!engine.isEmpty()) {
-                options = options.withParserEngine(engine);
-            }
-        }
-        if (cfg.path("imageUploadEnabled").asBoolean(false)
-                && !cfg.path("vlmModelId").asString("").isEmpty()) {
-            options = options.withVlm(cfg.path("vlmModelId").asString(""),
-                    cfg.path("attachmentImageUnderstanding").asBoolean(false),
-                    cfg.path("attachmentOcrMaxPages").asInt(0));
-        }
-        return options;
-    }
-
     /** 取小写扩展名（不带点）。 */
     private static String extNoDot(String fileName) {
         String name = fileName == null ? "" : fileName;

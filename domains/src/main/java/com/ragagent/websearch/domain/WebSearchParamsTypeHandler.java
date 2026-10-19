@@ -2,6 +2,7 @@ package com.ragagent.websearch.domain;
 
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.websearch.config.WebSearchProviderParams;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

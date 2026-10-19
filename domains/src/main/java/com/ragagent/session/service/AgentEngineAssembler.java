@@ -26,7 +26,7 @@ import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.session.domain.conversation.SessionOwnerIds;
+import com.ragagent.session.support.SessionOwnerIds;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

@@ -1,6 +1,5 @@
 package com.ragagent.memory.dto;
 
-import com.ragagent.memory.domain.item.MemoryItem;
 import java.util.List;
 
 /**
@@ -16,5 +15,5 @@ import java.util.List;
  * <p>它是"下载"：调用方还带 {@code Content-Disposition} 头（文件名固定
  * {@code weknora-memories.json}），但 Content-Type 仍是普通 JSON。</p>
  */
-public record MemoryExportResponse(List<MemoryItem> items, long total, boolean truncated) {
+public record MemoryExportResponse(List<MemoryItemResponse> items, long total, boolean truncated) {
 }

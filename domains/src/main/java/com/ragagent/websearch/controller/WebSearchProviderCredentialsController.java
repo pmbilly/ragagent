@@ -6,7 +6,6 @@ import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.service.WebSearchProviderService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.LinkedHashMap;
@@ -51,19 +50,19 @@ public class WebSearchProviderCredentialsController {
         long tenantId = tenantId();
         String apiKey = parseApiKey(rawBody);
         if (apiKey == null) {
-            WebSearchProviderEntity provider = safeGet(tenantId, id);
-            if (provider == null) {
+            Boolean configured = service.credentialConfigured(tenantId, id);
+            if (configured == null) {
                 throw BizException.notFound("web search provider not found");
             }
-            return ResponseEntity.ok(fieldsBody(configured(provider)));
+            return ResponseEntity.ok(fieldsBody(configured));
         }
-        WebSearchProviderEntity updated;
+        boolean configured;
         try {
-            updated = service.updateCredentials(tenantId, id, apiKey);
+            configured = service.updateCredentials(tenantId, id, apiKey);
         } catch (RuntimeException e) {
             throw BizException.internal("failed to update credentials: " + e.getMessage());
         }
-        return ResponseEntity.ok(fieldsBody(configured(updated)));
+        return ResponseEntity.ok(fieldsBody(configured));
     }
 
     @DeleteMapping("/{id}/credentials/{field}")
@@ -90,18 +89,6 @@ public class WebSearchProviderCredentialsController {
             throw BizException.badRequest("Workspace ID cannot be empty");
         }
         return tenantId;
-    }
-
-    private WebSearchProviderEntity safeGet(long tenantId, String id) {
-        try {
-            return service.getByID(tenantId, id);
-        } catch (RuntimeException e) {
-            return null;
-        }
-    }
-
-    private static boolean configured(WebSearchProviderEntity row) {
-        return row != null && row.getParameters() != null && !row.getParameters().getApiKey().isEmpty();
     }
 
     /** 解析 api_key：键缺失/null → null（查询语义）；空 body → 400 EOF；坏 JSON → 400 解析器原文 */

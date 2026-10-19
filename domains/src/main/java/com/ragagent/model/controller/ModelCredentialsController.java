@@ -2,7 +2,6 @@ package com.ragagent.model.controller;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.model.domain.Model;
 import com.ragagent.model.dto.ModelCredentialsPutRequest;
 import com.ragagent.model.dto.ModelCredentialsResponse;
 import com.ragagent.model.service.ModelService;
@@ -51,25 +50,18 @@ public class ModelCredentialsController {
             req = new ModelCredentialsPutRequest(null, null);
         }
         if (req.apiKey() == null && req.appSecret() == null) {
-            Model m;
             try {
-                m = modelService.getModelByID(id);
+                return ResponseEntity.ok(modelService.credentialsResponse(id));
             } catch (ModelNotFoundException e) {
                 throw new BizException(AppError.notFound("Model not found"));
             }
-            return ResponseEntity.ok(ModelCredentialsResponse.of(
-                    !m.getParameters().getApiKey().isEmpty(),
-                    !m.getParameters().getAppSecret().isEmpty()));
         }
-        Model updated;
         try {
-            updated = modelService.updateModelCredentials(id, req.apiKey(), req.appSecret());
+            return ResponseEntity.ok(modelService.updateCredentialsResponse(
+                    id, req.apiKey(), req.appSecret()));
         } catch (ModelNotFoundException e) {
             throw new BizException(AppError.notFound("Model not found"));
         }
-        return ResponseEntity.ok(ModelCredentialsResponse.of(
-                !updated.getParameters().getApiKey().isEmpty(),
-                !updated.getParameters().getAppSecret().isEmpty()));
     }
 
     /** 清除单个凭据字段（Admin+）→ 204。 */

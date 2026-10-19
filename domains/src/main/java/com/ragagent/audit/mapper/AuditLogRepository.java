@@ -2,7 +2,7 @@ package com.ragagent.audit.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.audit.domain.AuditLogQuery;
+import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.platform.persistence.PageRequests;
 import java.time.OffsetDateTime;

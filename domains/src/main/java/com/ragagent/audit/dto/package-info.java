@@ -1,5 +1,5 @@
 /**
- * 审计 · 数据传输：AuditLogListResponse。
+ * 审计 · 数据传输：AuditLogListResponse / AuditLogQuery。
  *
  * <p>依赖 {@code audit}。</p>
  */

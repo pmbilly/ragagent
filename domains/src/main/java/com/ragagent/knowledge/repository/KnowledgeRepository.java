@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeSearchScope;
+import com.ragagent.knowledge.dto.KnowledgeSearchScope;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.platform.persistence.LikeEscapes;
 import com.ragagent.platform.persistence.PageRequests;

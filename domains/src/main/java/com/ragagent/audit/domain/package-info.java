@@ -1,5 +1,5 @@
 /**
- * 审计 · 领域模型：AuditLogQuery / AuditLog。
+ * 审计 · 领域模型：AuditLog。
  *
  * <p>依赖 {@code platform}。</p>
  */

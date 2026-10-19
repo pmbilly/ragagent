@@ -11,7 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.ragagent.audit.controller.AuditLogController;
 import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.audit.domain.AuditLogQuery;
+import com.ragagent.audit.dto.AuditLogListResponse;
+import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
@@ -58,8 +59,9 @@ class AuditLogControllerTest {
     /** 建一套 harness：服务桩 + 可选 KB 行 + standalone MockMvc。 */
     private void harness(ListFn listFn) {
         svc = mock(AuditLogService.class);
-        when(svc.list(anyLong(), any(AuditLogQuery.class)))
-                .thenAnswer(inv -> listFn.apply(inv.getArgument(0), inv.getArgument(1)));
+        when(svc.listResponse(anyLong(), any(AuditLogQuery.class)))
+                .thenAnswer(inv -> AuditLogListResponse.of(
+                        listFn.apply(inv.getArgument(0), inv.getArgument(1))));
         mvc = MockMvcBuilders
                 .standaloneSetup(new AuditLogController(svc, kbGateway))
                 .setControllerAdvice(new GlobalExceptionHandler())

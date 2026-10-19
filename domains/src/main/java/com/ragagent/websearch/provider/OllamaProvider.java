@@ -2,7 +2,7 @@ package com.ragagent.websearch.provider;
 
 import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.web.ProviderJson;
-import com.ragagent.websearch.domain.WebSearchProviderParams;
+import com.ragagent.websearch.config.WebSearchProviderParams;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;

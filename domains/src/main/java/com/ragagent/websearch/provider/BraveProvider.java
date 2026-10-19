@@ -3,7 +3,7 @@ package com.ragagent.websearch.provider;
 import com.ragagent.contract.websearch.WebSearchFilters;
 import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.web.ProviderJson;
-import com.ragagent.websearch.domain.WebSearchProviderParams;
+import com.ragagent.websearch.config.WebSearchProviderParams;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;

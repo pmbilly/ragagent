@@ -2,7 +2,8 @@ package com.ragagent.audit.service;
 
 
 import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.audit.domain.AuditLogQuery;
+import com.ragagent.audit.dto.AuditLogListResponse;
+import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.mapper.AuditLogRepository;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
@@ -199,6 +200,11 @@ public class AuditLogService {
      * <p>handler 在到达这里之前已经做了 PathTenantMatch + Admin 守卫，
      * 所以这里<b>不</b>重复校验租户作用域。</p>
      */
+    /** 控制器读面：返回已组装的分页响应，避免控制器 import 领域实体。 */
+    public AuditLogListResponse listResponse(long tenantId, AuditLogQuery q) {
+        return AuditLogListResponse.of(list(tenantId, q));
+    }
+
     public List<AuditLog> list(long tenantId, AuditLogQuery q) {
         return repo.list(tenantId, q);
     }

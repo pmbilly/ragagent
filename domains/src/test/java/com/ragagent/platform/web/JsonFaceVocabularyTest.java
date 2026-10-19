@@ -11,7 +11,7 @@ import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.memory.domain.MemoryExtractionState;
-import com.ragagent.websearch.domain.WebSearchProviderParams;
+import com.ragagent.websearch.config.WebSearchProviderParams;
 import com.ragagent.wiki.domain.WikiConfig;
 import java.lang.reflect.Field;
 import java.lang.reflect.RecordComponent;

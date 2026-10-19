@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.TestSchema;
 import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.audit.domain.AuditLogQuery;
+import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.mapper.AuditLogRepository;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;

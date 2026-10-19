@@ -3,21 +3,21 @@ package com.ragagent.memory.controller;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.memory.domain.MemoryConflictException;
-import com.ragagent.memory.domain.MemoryConsolidationResult;
-import com.ragagent.memory.domain.MemoryDocView;
-import com.ragagent.memory.domain.MemoryPage;
-import com.ragagent.memory.domain.MemoryTopicView;
-import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.memory.domain.scope.MemorySettings;
+import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.dto.CreateMemoryItemRequest;
+import com.ragagent.memory.dto.MemoryConsolidationResult;
+import com.ragagent.memory.dto.MemoryDocView;
 import com.ragagent.memory.dto.MemoryExportResponse;
+import com.ragagent.memory.dto.MemoryItemResponse;
 import com.ragagent.memory.dto.MemoryListResponse;
+import com.ragagent.memory.dto.MemoryPage;
+import com.ragagent.memory.dto.MemoryTopicView;
 import com.ragagent.memory.dto.UpdateMemoryItemRequest;
 import com.ragagent.memory.dto.UpdateMemorySettingsRequest;
 import com.ragagent.memory.service.MemoryConsolidationService;
 import com.ragagent.memory.service.MemoryScopeExceptions;
 import com.ragagent.memory.service.MemoryService;
+import com.ragagent.memory.support.MemoryConflictException;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -164,7 +164,7 @@ public class MemoryController {
      * {@code items:null} 仍是两种形态，别统一（两条路径的既有差别）。</p>
      */
     @GetMapping("/api/v1/memory/items")
-    public MemoryListResponse<MemoryItem> listItems(
+    public MemoryListResponse<MemoryItemResponse> listItems(
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "limit", required = false) String limit,
             @RequestParam(value = "offset", required = false) String offset) {
@@ -173,9 +173,9 @@ public class MemoryController {
         }
         int[] paging = listPaging(limit, offset);
 
-        MemoryPage<MemoryItem> page;
+        MemoryPage<MemoryItemResponse> page;
         try {
-            page = memoryService.listItems(status == null ? "" : status, paging[0], paging[1]);
+            page = memoryService.listItemViews(status == null ? "" : status, paging[0], paging[1]);
         } catch (RuntimeException e) {
             throw fail(e, "Failed to list memories");
         }
@@ -198,10 +198,10 @@ public class MemoryController {
 
     /** 创建条目：<b>201</b> + 裸条目。 */
     @PostMapping("/api/v1/memory/items")
-    public ResponseEntity<MemoryItem> createItem(@RequestBody @Valid CreateMemoryItemRequest req) {
-        MemoryItem item;
+    public ResponseEntity<MemoryItemResponse> createItem(@RequestBody @Valid CreateMemoryItemRequest req) {
+        MemoryItemResponse item;
         try {
-            item = memoryService.createItem(
+            item = memoryService.createItemView(
                     orEmpty(req.kind()), orEmpty(req.content()), orZero(req.importance()));
         } catch (RuntimeException e) {
             throw fail(e, "Failed to create memory");
@@ -211,11 +211,11 @@ public class MemoryController {
 
     /** 编辑条目：200 + 裸条目。 */
     @PutMapping("/api/v1/memory/items/{id}")
-    public MemoryItem updateItem(
+    public MemoryItemResponse updateItem(
             @PathVariable("id") String id,
             @RequestBody @Valid UpdateMemoryItemRequest req) {
         try {
-            return memoryService.updateItem(id, orEmpty(req.content()), orZero(req.importance()));
+            return memoryService.updateItemView(id, orEmpty(req.content()), orZero(req.importance()));
         } catch (RuntimeException e) {
             throw fail(e, "Failed to update memory");
         }
@@ -234,9 +234,9 @@ public class MemoryController {
 
     /** 接受一条待确认的推断条目：200 + 裸条目。 */
     @PostMapping("/api/v1/memory/items/{id}/confirm")
-    public MemoryItem confirmItem(@PathVariable("id") String id) {
+    public MemoryItemResponse confirmItem(@PathVariable("id") String id) {
         try {
-            return memoryService.confirmItem(id);
+            return memoryService.confirmItemView(id);
         } catch (RuntimeException e) {
             throw fail(e, "Failed to confirm memory");
         }
@@ -300,9 +300,9 @@ public class MemoryController {
  * 故按 的单资源形态返 200 + 裸条目（不套 的 201）。</p>
  */
     @PostMapping("/api/v1/memory/topics/{id}/promote")
-    public MemoryItem promoteTopic(@PathVariable("id") String id) {
+    public MemoryItemResponse promoteTopic(@PathVariable("id") String id) {
         try {
-            return memoryService.promoteTopic(id);
+            return memoryService.promoteTopicView(id);
         } catch (RuntimeException e) {
             throw fail(e, "Failed to promote topic");
         }
@@ -377,17 +377,17 @@ public class MemoryController {
      */
     @GetMapping("/api/v1/memory/export")
     public ResponseEntity<MemoryExportResponse> export() {
-        List<MemoryItem> items = null;
+        List<MemoryItemResponse> items = null;
         long total = 0;
         while (true) {
-            MemoryPage<MemoryItem> page;
+            MemoryPage<MemoryItemResponse> page;
             try {
-                page = memoryService.listItems("", EXPORT_PAGE_SIZE, itemCount(items));
+                page = memoryService.listItemViews("", EXPORT_PAGE_SIZE, itemCount(items));
             } catch (RuntimeException e) {
                 throw fail(e, "Failed to export memories");
             }
             total = page.total();
-            List<MemoryItem> pageItems = page.items();
+            List<MemoryItemResponse> pageItems = page.items();
             if (pageItems != null && !pageItems.isEmpty()) {
                 if (items == null) {
                     // 只在真的有行时才建列表：null 与空列表的形态必须保住（见方法注释）。
