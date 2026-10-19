@@ -344,6 +344,7 @@ boot           14 件                      →  boot
 | L34a | 2026-10-19 | **wiki 队列的槽位收尾端口**：队列实现（Redis/进程内）此前直接 new `WikiIngestTaskRunner` 并持有 `WikiIngestService`，搬出 service 包会形成 repository → service 反向依赖。抽 `WikiIngestSlotReleaser`（单方法）到 `wiki.domain.ingest`，队列与 TaskRunner 只依赖该端口。 | **40 守卫** · :domains 编译 · wiki 定向测试 |
 | L34b | 2026-10-19 | **wiki ingest 拆包**：技术实现移出用例层，46 → 24 文件。`wiki/repository/ingest`（5 端口 + Redis/进程内两套实现 + TaskRunner，17）；`wiki/domain/ingest`（载荷/finalize 行/超时常量，7）；`service/ingest` 只留管线门面与阶段协作者。**A17 基线收紧 6 条**；换锚：json-key 的 TaskRunner 路径、包规模基线、三份索引；javadoc 断链 5 处降级 `{@code}`。 | **40 守卫** · **clean + 5030 / 0 / 4** · javadoc 0 错 |
 | L35 | 2026-10-19 | **mcp/oauth 拆子包**：34 文件 → `model`(7) / `error`(7) / `store`(7) / `wiring`(3) / 根(9)。`OAuthConfig`（持 TokenStore）与 `OAuthAuthorizationRequiredException`（持 OAuthHandler）刻意留根——放进 model/error 会让四包两两成环（实测 SCC +1，已回归 5 组）。换锚：json-key 4 条路径、包规模基线移除该条目、三份索引；javadoc 断链 7 处降级。 | **40 守卫** · **5030 / 0 / 4** · javadoc 0 错 |
+| L36 | 2026-10-19 | **手写门面搬出 mapper 包**：6 个 `@Component`/`@Repository` 门面归位 `audit` / `auth.apikey` / `datasource`(×2) / `storage`(×2) 的 `repository/`；`storage/mapper` 清空删除。**A11b 基线 6 → 0**（零容忍）；**A16 基线 −7**（AuditLogService、DataSourceSupport/SyncExecutor/SyncResultOps、storage 三件）。 | **40 守卫** · **5030 / 0 / 4**（首轮 1 例 Redis 瞬态，隔离绿）· javadoc 0 错 |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
