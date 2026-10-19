@@ -211,6 +211,7 @@ boot           14 件                      →  boot
 10. **先测后改**：行为变更先给失败测试/反例；金片/合约测试会挡住"看起来对但违约"的改动。
 11. **改名/批量替换**：只替换"匹配文本本身即完整类型"的 FQN；带左边界排除（`(?<![\w.])`）；每批编译 + 跑 `check-package-cycles.py`。
 12. **baseline `--write` 不是消红按钮**：先区分 ①换锚 ②分类缺失 ③真违例；存在新增时 `--write` 必须拒绝。
+13. **用例层欠账收敛三手法**（L36~L45 清零 69 类时定型）：① **门面化**——service 注入 mapper ⇒ 建 `repository/XxxRepository` 薄转发；② **端口化**——service 依赖具体类（task 执行器 / client / 调度的 Scheduler）⇒ 抽 `domain` 或 `support` 的窄接口，实现侧 `implements`；③ **落点纠偏**——类本身没错、住错包（适配器 → `api`、`@Configuration` → `config`、Redis 实现 → `repository`/`runtime`）。**落点先过三关**：C10（控制器不 import `..domain..`）· A16（包名任一段等于 `controller/mapper/task/client/channel`）· 包规模红线（>30 文件）——三者常互斥，`support` 往往是唯一都放行的地方。
 
 ## 10. 批次纪律（v0.2.0 §15.2 十二条，全部保留）
 

@@ -87,6 +87,12 @@ import tools.jackson.databind.json.JsonMapper;
  * 棘轮化的，走 A6-A9 的代码内基线模式——Set/Map 逐条登记（附理由）+ {@link #ratchet}
  * 双断言：基线外新增违例即红（拦增量），基线条目不再违例也红（防规则空转，强制随清理
  * 收紧）。不引入 FreezingArchRule 的存储文件；包级棘轮仍在脚本里。</p>
+ *
+ * <p><b>零基线规则</b>：A6 / A9 / A11b / A16 / A17 的基线已是空集——含义与"有基线的棘轮"
+ * 不同：不是"允许存量、只拦增量"，而是<b>新增一行即红</b>。改动 service 层时按三条路选落点：
+ * 持久化走 {@code repository} 门面、外部能力走自有端口、适配器/装配分别归 {@code api}/
+ * {@code config}。落点还会同时受 C10（控制器不 import {@code ..domain..}）与包规模红线
+ * 约束，选之前先看这两条，能少试两轮。</p>
  */
 class ArchitectureRulesTest {
 
