@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.api;
 
 import com.ragagent.contract.knowledge.EmbeddingModelPort;
 import com.ragagent.contract.model.ModelCatalogPort;

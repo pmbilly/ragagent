@@ -10,9 +10,9 @@ import com.ragagent.knowledge.domain.span.SpanTracker;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.knowledge.runtime.KnowledgeTrace;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantScopes;
-import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import com.ragagent.wiki.service.DefaultWikiKnowledgeFinalizer;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,10 +74,10 @@ public class QuestionGenerationService implements QuestionGenerationConsumer {
         QuestionBatchPayload p = QuestionBatchPayload.fromJson(payloadJson);
         // 同 ChunkExtractService：队列线程无租户上下文，而问题生成要按租户可见性解析 chat 模型。
         try (TenantScopes.TenantScope ignoredScope = TenantScopes.enter(p.tenantId());
-                LangfuseTaskScope scope = LangfuseTaskScope.start(TASK_TYPE_QUESTION_GENERATION, p.tracing(),
+                KnowledgeTrace.Scope scope = KnowledgeTrace.startTask(TASK_TYPE_QUESTION_GENERATION, p.tracing(),
                 Map.of("knowledge_id", p.knowledgeId(),
                         "batch_index", String.valueOf(p.batchIndex())),
-                LangfuseTaskScope.previewPayload(payloadJson))) {
+                KnowledgeTrace.previewPayload(payloadJson))) {
             handle(p, terminal);
         }
     }

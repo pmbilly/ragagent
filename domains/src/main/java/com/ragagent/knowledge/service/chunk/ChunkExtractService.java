@@ -21,11 +21,11 @@ import com.ragagent.knowledge.domain.span.SpanTracker;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.knowledge.runtime.KnowledgeTrace;
 import com.ragagent.platform.access.TenantScopes;
 import com.ragagent.platform.prompt.ExtractPrompts;
 import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.platform.prompt.PromptInstructions;
-import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import com.ragagent.wiki.service.DefaultWikiKnowledgeFinalizer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -126,9 +126,9 @@ public class ChunkExtractService implements ChunkExtractConsumer {
         // 富化跑在队列虚拟线程上：没有 HTTP Filter 填 TenantContext，而模型解析按租户可见性
         // 过滤（payload 已显式携带租户）⇒ 这里进入作用域，别让自建模型查不到。
         try (TenantScopes.TenantScope ignoredScope = TenantScopes.enter(p.tenantId());
-                LangfuseTaskScope scope = LangfuseTaskScope.start(TASK_TYPE_CHUNK_EXTRACT, p.tracing(),
+                KnowledgeTrace.Scope scope = KnowledgeTrace.startTask(TASK_TYPE_CHUNK_EXTRACT, p.tracing(),
                 Map.of("chunk_id", p.chunkId(), "knowledge_id", p.knowledgeId()),
-                LangfuseTaskScope.previewPayload(payloadJson))) {
+                KnowledgeTrace.previewPayload(payloadJson))) {
             handle(p, terminal);
         }
     }

@@ -722,9 +722,7 @@ class ArchitectureRulesTest {
      */
     private static final Set<String> SERVICE_BOUNDARY_BASELINE =
             Set.of(
-            "com.ragagent.knowledge.service.EmbeddingModelAdapter",
-            "com.ragagent.knowledge.service.faq.FaqIndexWriter",
-            "com.ragagent.knowledge.service.management.KnowledgeBaseLookupAdapter");
+            "com.ragagent.knowledge.service.faq.FaqIndexWriter");
 
     /**
      * A17 棘轮基线：{@code ..service..} 包内仍直接依赖具体技术实现
@@ -737,13 +735,10 @@ class ArchitectureRulesTest {
     private static final Set<String> SERVICE_TECH_BASELINE =
             Set.of(
             "com.ragagent.knowledge.service.management.KnowledgeService",
-            "com.ragagent.knowledge.service.chunk.ChunkExtractService",
             // R4b：管线本体归位会话域后落在 service 包内——插件族依赖 langfuse 观测与具体技术
             // （管线本体的必要依赖，随 chatpipeline → session.service.rag 迁移登记）
             "com.ragagent.session.rag.plugin.PluginRerank",
             "com.ragagent.session.rag.plugin.PluginSearchOps",
-            "com.ragagent.knowledge.service.management.KnowledgeBaseLookupAdapter",
-            "com.ragagent.knowledge.service.enrichment.QuestionGenerationService",
             "com.ragagent.session.service.suggestion.MessageSuggestionService",
             "com.ragagent.session.assembly.QaWiring",
             "com.ragagent.session.service.SessionAgentQaService",

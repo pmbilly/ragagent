@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service.management;
+package com.ragagent.knowledge.api;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
