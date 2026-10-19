@@ -15,11 +15,11 @@
 | 7 | [`architecture/mechanisms.md`](architecture/mechanisms.md) | 队列、事务、embedding、定时任务等反直觉机制 |
 | 8 | [`glossary.md`](glossary.md) | 业务术语与历史代号（K4 / A18 / R3d / B2xx） |
 
-查表：[`architecture/packages.md`](architecture/packages.md) —— 337 份 `package-info` 的包索引（由脚本生成，勿手改）。
+查表：[`architecture/packages.md`](architecture/packages.md) —— 352 份 `package-info` 的包索引（由脚本生成，勿手改）。
 
-先看模块：[`architecture/module-package-map.md`](architecture/module-package-map.md) —— 7 个模块的包根、22 个业务域的包/控制器数量（由脚本生成，勿手改）。
+先看模块：[`architecture/module-package-map.md`](architecture/module-package-map.md) —— 7 个模块的包根、20 个业务域的包/控制器数量（由脚本生成，勿手改）。
 
-先看业务分类：[`architecture/domain-index.md`](architecture/domain-index.md) —— 22 个域按 6 类能力组织，含入口、契约面与前端页面（由脚本生成，勿手改）。
+先看业务分类：[`architecture/domain-index.md`](architecture/domain-index.md) —— 20 个域按 6 类能力组织，含入口、契约面与前端页面（由脚本生成，勿手改）。
 
 查权限：[`architecture/route-policy-map.md`](architecture/route-policy-map.md) —— 386 条路由 → RBAC 角色下限/公开自服务登记（由脚本生成，勿手改）。
 

@@ -20,9 +20,16 @@ CONFIG = ROOT / "scripts" / "capability-kinds.json"
 OUT = ROOT / "docs" / "architecture" / "domain-index.md"
 DOMAINS = ROOT / "domains" / "src" / "main" / "java" / "com" / "ragagent"
 CONTRACT = ROOT / "contract" / "src" / "main" / "java" / "com" / "ragagent" / "contract"
+FRONTEND_SRC = ROOT / "frontend" / "src"
 
 IMPLEMENTS_RE = re.compile(r"\bimplements\s+([^{]+)\{")
 INTERFACE_RE = re.compile(r"\binterface\s+(\w+)")
+
+
+def frontend_paths(raw: str):
+    """登记值是 `views/a · views/b.vue`；括号里是说明文字，不参与校验。"""
+    cleaned = re.sub(r"（[^）]*）", "", raw)
+    return [part.strip() for part in cleaned.split("·") if part.strip()]
 
 
 def load_config():
@@ -43,6 +50,10 @@ def load_config():
             problems.append(f"{name}: 未知种类 {meta.get('kind')!r}")
         if not meta.get("frontend"):
             problems.append(f"{name}: 缺少 frontend 登记")
+        else:
+            for path in frontend_paths(meta["frontend"]):
+                if not (FRONTEND_SRC / path).exists():
+                    problems.append(f"{name}: 前端路径不存在 → {path}")
     for kind, meta in kinds.items():
         if not any(m.get("kind") == kind for m in domains.values()):
             problems.append(f"种类 {kind!r} 没有任何域使用")
@@ -170,7 +181,7 @@ def render(kinds, domains) -> str:
         "[`capability-kinds.json`](../../scripts/capability-kinds.json) 登记。",
         "2. **依赖规则**：`check-capability-kinds.py` 上线后执行（产品能力不得直连集成/控制面等）。",
         "3. **端口明细**的权威来源是 [`port-map.md`](port-map.md)；本页只做域级汇总。",
-        "4. **前端页面**是人工登记；改页面路由时同步改 JSON，否则 `--check` 不报（它只校验代码侧）。",
+        "4. **前端页面**是人工登记；改页面路由时同步改 JSON——路径不存在时 `--check` 会报红。",
         "",
     ]
     return "\n".join(lines)

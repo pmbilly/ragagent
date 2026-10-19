@@ -4,7 +4,7 @@
 这张表回答"类/包属于哪个模块"，包内职责见 [`packages.md`](packages.md)，
 整体分层与设计原则见 [`overview.md`](overview.md)。
 
-## 七个模块
+## 7 个模块
 
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
@@ -16,7 +16,7 @@
 | `:domains` | `agentmanagement`、`agenttools`、`approval`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 250 | 1564 | 50 |
 | `:boot` | `(根包)`、`config` | 2 | 19 | 0 |
 
-## 22 个业务域（domains）
+## 20 个业务域（domains）
 
 | 域 | 主码包 | 文件 | 控制器 |
 |---|---|---:|---:|
@@ -46,7 +46,7 @@
 1. **先看包根**：`com.ragagent.contract.*` → `:contract`；`platform` → `:platform`；
    `agent` → `:agent-engine`；`retrieval` → `:retrieval-engine`；
    `embedding` / `llm` / `modelcontext` / `modelruntime` / `rerank` → `:model-runtime`；
-   其余 22 个包根 → `:domains`；`com.ragagent.config` 与根包 → `:boot`。
+   其余 20 个包根 → `:domains`；`com.ragagent.config` 与根包 → `:boot`。
 2. **HTTP 路由**在 `domains/src/main/java/com/ragagent/<域>/controller/`；
    跨模块公开类型在 `contract/`，端口实现与全局 Bean 在 `boot/config/`。
 3. **测试**：业务域测试住在 `domains/src/test/`；HTTP 集成测试住在 `boot/src/test/`；

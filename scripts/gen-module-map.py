@@ -2,8 +2,8 @@
 """生成模块/包映射（docs/architecture/module-package-map.md）。
 
 回答两个问题：
-  1. 7 个模块各有哪些主码包根、多少包/文件/控制器；
-  2. 22 个业务域各对应哪个包、多少文件/控制器。
+  1. 各模块有哪些主码包根、多少包/文件/控制器；
+  2. 各业务域对应哪个包、多少文件/控制器（域数从源码实测，不写死）。
 
 `--check` 校验生成物与源码一致；接入 `run-guards.sh`，改包/加控制器后不更新文档即红。
 """
@@ -76,6 +76,7 @@ def boot_test_roots() -> int:
 
 
 def render() -> str:
+    domains = domain_rows()
     lines = [
         "<!-- 由 scripts/gen-module-map.py 生成；不要手改。 -->",
         "# 模块与包映射",
@@ -83,7 +84,7 @@ def render() -> str:
         "这张表回答\"类/包属于哪个模块\"，包内职责见 [`packages.md`](packages.md)，",
         "整体分层与设计原则见 [`overview.md`](overview.md)。",
         "",
-        "## 七个模块",
+        f"## {len(MODULES)} 个模块",
         "",
         "| 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |",
         "|---|---|---:|---:|---:|",
@@ -91,12 +92,12 @@ def render() -> str:
     lines.extend(module_row(m, label) for m, label in MODULES)
     lines += [
         "",
-        "## 22 个业务域（domains）",
+        f"## {len(domains)} 个业务域（domains）",
         "",
         "| 域 | 主码包 | 文件 | 控制器 |",
         "|---|---|---:|---:|",
     ]
-    lines.extend(domain_rows())
+    lines.extend(domains)
     lines += [
         "",
         "## 查找规则",
@@ -104,7 +105,7 @@ def render() -> str:
         "1. **先看包根**：`com.ragagent.contract.*` → `:contract`；`platform` → `:platform`；",
         "   `agent` → `:agent-engine`；`retrieval` → `:retrieval-engine`；",
         "   `embedding` / `llm` / `modelcontext` / `modelruntime` / `rerank` → `:model-runtime`；",
-        "   其余 22 个包根 → `:domains`；`com.ragagent.config` 与根包 → `:boot`。",
+        f"   其余 {len(domains)} 个包根 → `:domains`；`com.ragagent.config` 与根包 → `:boot`。",
         "2. **HTTP 路由**在 `domains/src/main/java/com/ragagent/<域>/controller/`；",
         "   跨模块公开类型在 `contract/`，端口实现与全局 Bean 在 `boot/config/`。",
         "3. **测试**：业务域测试住在 `domains/src/test/`；HTTP 集成测试住在 `boot/src/test/`；",

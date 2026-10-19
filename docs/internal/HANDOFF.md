@@ -219,7 +219,7 @@ boot           14 件                      →  boot
 | `check-log-exceptions.py` | log 里禁止 `Throwable.toString()` / `.getMessage()` | 硬零 |
 | `check-duplicate-classes.py` | 同一简单类名不得出现在多个模块主码 | 硬零 |
 | `check-internal-codes.py` | 主码注释禁止批次号/裸日期戳（ISO-8601 时间示例保留）；旧夹具名不得回流 | 硬零 |
-| `gen-module-map.py --check` | 模块/包根、22 域文件/控制器数量与 `module-package-map.md` 同步 | 硬零 |
+| `gen-module-map.py --check` | 模块/包根、业务域文件/控制器数量与 `module-package-map.md` 同步 | 硬零 |
 | `check-version-consistency.py` | Boot/springdoc/MyBatis-Plus jsqlparser/README/wrapper/Dockerfile 版本一致 | 硬零 |
 | ArchUnit `ArchitectureRulesTest` | A1~A20（含 A16/A17 边界禁令、A18 状态所有权、A19 分层、A20 装配契约） | 各基线只许减 |
 

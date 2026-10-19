@@ -73,4 +73,4 @@
 1. **找需求落点**：先按“种类”判断，再看域明细；新增域必须先在 [`capability-kinds.json`](../../scripts/capability-kinds.json) 登记。
 2. **依赖规则**：`check-capability-kinds.py` 上线后执行（产品能力不得直连集成/控制面等）。
 3. **端口明细**的权威来源是 [`port-map.md`](port-map.md)；本页只做域级汇总。
-4. **前端页面**是人工登记；改页面路由时同步改 JSON，否则 `--check` 不报（它只校验代码侧）。
+4. **前端页面**是人工登记；改页面路由时同步改 JSON——路径不存在时 `--check` 会报红。
