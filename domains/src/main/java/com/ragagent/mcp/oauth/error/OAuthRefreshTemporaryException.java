@@ -1,4 +1,4 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.error;
 
 /**
  * 刷新因<b>临时</b>原因失败——token 必须保留。

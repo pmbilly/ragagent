@@ -9,7 +9,7 @@ import com.ragagent.contract.tool.OAuthPendingRequest;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolExecContext;
 import com.ragagent.mcp.domain.McpService;
-import com.ragagent.mcp.oauth.OAuthReauthorizationRequiredException;
+import com.ragagent.mcp.oauth.error.OAuthReauthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;

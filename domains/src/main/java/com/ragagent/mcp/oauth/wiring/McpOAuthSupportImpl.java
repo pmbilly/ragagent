@@ -1,9 +1,16 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.wiring;
 
 import com.ragagent.mcp.domain.McpAdvancedConfig;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.domain.McpService;
+import com.ragagent.mcp.oauth.OAuthConfig;
+import com.ragagent.mcp.oauth.OAuthHandler;
+import com.ragagent.mcp.oauth.OAuthRuntime;
+import com.ragagent.mcp.oauth.OAuthTransport;
+import com.ragagent.mcp.oauth.store.DbTokenStore;
+import com.ragagent.mcp.oauth.store.ManagedTokenStore;
+import com.ragagent.mcp.oauth.store.OAuthRepository;
 import com.ragagent.mcp.protocol.McpClientConfig;
 import com.ragagent.mcp.protocol.McpException;
 import com.ragagent.mcp.protocol.McpOAuthRuntime;

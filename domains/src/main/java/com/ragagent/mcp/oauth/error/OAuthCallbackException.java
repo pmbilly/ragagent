@@ -1,4 +1,4 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.error;
 
 /**
  * 回调处理失败，<b>并携带"即便失败也要把浏览器弹回去"的两个值</b>。

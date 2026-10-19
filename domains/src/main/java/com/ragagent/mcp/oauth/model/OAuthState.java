@@ -1,4 +1,4 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.platform.access.TenantContext;
@@ -45,11 +45,11 @@ public record OAuthState(
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Principal(String type, String id) {
 
-        static Principal of(TenantContext.Principal p) {
+        public static Principal of(TenantContext.Principal p) {
             return p == null ? new Principal("", "") : new Principal(nz(p.type()), nz(p.id()));
         }
 
-        TenantContext.Principal toContextPrincipal() {
+        public TenantContext.Principal toContextPrincipal() {
             return new TenantContext.Principal(nz(type), nz(id));
         }
     }

@@ -2,6 +2,12 @@ package com.ragagent.mcp.oauth;
 
 import com.ragagent.mcp.domain.McpOAuthToken;
 import com.ragagent.mcp.domain.McpPrincipal;
+import com.ragagent.mcp.oauth.error.OAuthError;
+import com.ragagent.mcp.oauth.error.OAuthProtocolException;
+import com.ragagent.mcp.oauth.error.OAuthReauthorizationRequiredException;
+import com.ragagent.mcp.oauth.error.OAuthRefreshTemporaryException;
+import com.ragagent.mcp.oauth.model.OAuthToken;
+import com.ragagent.mcp.oauth.store.OAuthRepository;
 import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.mcp.protocol.McpOAuthRuntime;

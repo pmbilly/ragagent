@@ -1,4 +1,4 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.store;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -6,6 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ragagent.mcp.domain.McpPrincipal;
+import com.ragagent.mcp.oauth.OAuthManager;
+import com.ragagent.mcp.oauth.error.OAuthProtocolException;
+import com.ragagent.mcp.oauth.error.OAuthStateNotFoundException;
+import com.ragagent.mcp.oauth.model.OAuthAttempt;
+import com.ragagent.mcp.oauth.model.OAuthState;
 import com.ragagent.platform.access.TenantContext;
 import org.junit.jupiter.api.Test;
 

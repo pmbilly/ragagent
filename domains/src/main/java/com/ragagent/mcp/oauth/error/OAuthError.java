@@ -1,4 +1,4 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.error;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

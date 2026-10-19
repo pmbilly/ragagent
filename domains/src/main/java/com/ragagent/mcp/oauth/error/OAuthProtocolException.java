@@ -1,4 +1,4 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.error;
 
 /**
  * OAuth 协议层失败（两种错误形态：带结构化 {@link OAuthError}，或仅带原始状态与响应体）。

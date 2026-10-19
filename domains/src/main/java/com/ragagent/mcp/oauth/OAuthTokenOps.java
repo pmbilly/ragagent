@@ -1,5 +1,9 @@
 package com.ragagent.mcp.oauth;
 
+import com.ragagent.mcp.oauth.error.OAuthError;
+import com.ragagent.mcp.oauth.error.OAuthProtocolException;
+import com.ragagent.mcp.oauth.model.AuthServerMetadata;
+import com.ragagent.mcp.oauth.model.OAuthToken;
 import com.ragagent.mcp.protocol.McpContext;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;

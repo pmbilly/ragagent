@@ -27,7 +27,7 @@ import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.ragagent.mcp.oauth.FakeOAuthRepository;
 import com.ragagent.mcp.oauth.OAuthManager;
 import com.ragagent.mcp.oauth.OAuthServerStub;
-import com.ragagent.mcp.oauth.OAuthStateStore;
+import com.ragagent.mcp.oauth.store.OAuthStateStore;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpServiceUrls;
 import com.ragagent.mcp.service.McpServiceManagement;

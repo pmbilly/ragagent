@@ -1,4 +1,4 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.model;
 
 import java.time.OffsetDateTime;
 

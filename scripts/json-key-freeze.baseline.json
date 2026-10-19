@@ -65,11 +65,7 @@
     "llm/ollama/OllamaMessage.java": "llm/",
     "llm/ollama/OllamaService.java": "llm/",
     "llm/provider/Config.java": "llm/",
-    "mcp/oauth/AuthServerMetadata.java": "mcp/oauth",
     "mcp/oauth/OAuthDiscovery.java": "mcp/oauth",
-    "mcp/oauth/OAuthError.java": "mcp/oauth",
-    "mcp/oauth/OAuthProtectedResource.java": "mcp/oauth",
-    "mcp/oauth/OAuthToken.java": "mcp/oauth",
     "mcp/oauth/OAuthTokenOps.java": "mcp/oauth",
     "memory/service/MemoryExtractPayload.java": "memory/service/MemoryExtractPayload",
     "memory/service/MemoryExtractionLlm.java": "memory/service/MemoryExtractionLlm",
@@ -143,6 +139,10 @@
     "websearch/provider/OllamaProvider.java": "websearch/provider",
     "websearch/provider/SearxngProvider.java": "websearch/provider",
     "websearch/provider/TavilyProvider.java": "websearch/provider",
-    "websearch/provider/ZhipuWebSearchProvider.java": "websearch/provider"
+    "websearch/provider/ZhipuWebSearchProvider.java": "websearch/provider",
+    "mcp/oauth/model/AuthServerMetadata.java": "mcp/oauth",
+    "mcp/oauth/error/OAuthError.java": "mcp/oauth",
+    "mcp/oauth/model/OAuthProtectedResource.java": "mcp/oauth",
+    "mcp/oauth/model/OAuthToken.java": "mcp/oauth"
   }
 }

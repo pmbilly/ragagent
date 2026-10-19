@@ -1,5 +1,6 @@
 package com.ragagent.mcp.oauth;
 
+import com.ragagent.mcp.oauth.error.OAuthProtocolException;
 import com.ragagent.mcp.protocol.McpHttp;
 import java.io.IOException;
 import java.io.InputStream;

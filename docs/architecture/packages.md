@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-339 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+343 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -180,7 +180,11 @@
 | `:domains` | `com.ragagent.mcp.domain` | MCP · 领域模型：McpService / McpAuthConfigTypeHandler / McpToolListTypeHandler…。 |
 | `:domains` | `com.ragagent.mcp.dto` | MCP · 数据传输：McpToolApprovalPolicyRequest / McpCredentialFieldMetadata / ResolveToolApprovalRequest…。 |
 | `:domains` | `com.ragagent.mcp.mapper` | MCP · 映射：McpToolApprovalMapper / McpOAuthClientMapper / McpOAuthTokenMapper…。 |
-| `:domains` | `com.ragagent.mcp.oauth` | MCP · OAuth：McpOAuthRepositoryAdapter / OAuthRepository / OAuthAuthorizationStatus…。 |
+| `:domains` | `com.ragagent.mcp.oauth` | MCP · OAuth 流程：授权发现、令牌获取/刷新、传输与运行时，以及配置 （OAuthConfig）与「需要授权」异常（OAuthAuthorizationRequiredException）。 |
+| `:domains` | `com.ragagent.mcp.oauth.error` | OAuth 异常族与标准错误体：协议错误、需要授权/重新授权、无令牌、状态缺失。 |
+| `:domains` | `com.ragagent.mcp.oauth.model` | OAuth 协议模型：授权服务器元数据、发现结果、令牌、授权状态与 PKCE。 |
+| `:domains` | `com.ragagent.mcp.oauth.store` | OAuth 存储：令牌仓库与授权状态的端口，以及数据库/Redis 实现。 |
+| `:domains` | `com.ragagent.mcp.oauth.wiring` | OAuth 装配：把配置、存储与流程组装成对 MCP 侧暴露的支持面。 |
 | `:domains` | `com.ragagent.mcp.protocol` | MCP · 协议：StreamableHttpTransport / ReadResourceResult / ServerCapabilities…。 |
 | `:domains` | `com.ragagent.mcp.repository` | MCP · 仓储：McpToolApprovalRepository / McpMetadataRepository / McpOAuthRepository。 |
 | `:domains` | `com.ragagent.mcp.service` | MCP · 服务：AgentToolApprovalService / McpToolApprovalService / McpOAuthFlowService…。 |

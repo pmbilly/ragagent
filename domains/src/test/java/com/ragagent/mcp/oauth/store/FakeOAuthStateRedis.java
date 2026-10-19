@@ -1,4 +1,4 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.store;
 
 import java.time.Duration;
 import java.util.HashMap;

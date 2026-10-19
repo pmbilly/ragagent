@@ -1,4 +1,4 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.error;
 
 /**
  * state / attempt 不存在或已过期（两种固定文案分别对应 state 与 attempt）。

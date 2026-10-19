@@ -10,7 +10,7 @@
 | 种类 | 域数 | 文件 | 控制器 | 说明 |
 |---|---:|---:|---:|---|
 | **产品能力** | 8 | 805 | 23 | 直接产生用户价值、按产品需求演进的业务能力。 |
-| **集成适配** | 6 | 511 | 14 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
+| **集成适配** | 6 | 515 | 14 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
 | **控制面** | 4 | 153 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
 | **能力配置** | 2 | 50 | 4 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
 | **初始化向导** | 1 | 13 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
@@ -28,8 +28,8 @@
 | `evaluation` | 产品能力 | 26 | 1 | — | —（暂无页面） |
 | `agentmanagement` | 产品能力 | 24 | 3 | — | `views/agent` |
 | `favorite` | 产品能力 | 11 | 1 | — | `views/agent · views/knowledge（列表置顶/收藏）` |
+| `mcp` | 集成适配 | 147 | 4 | 2 | `views/settings/McpSettings.vue` |
 | `datasource` | 集成适配 | 144 | 2 | — | `views/knowledge/settings/DataSourceSettings.vue` |
-| `mcp` | 集成适配 | 143 | 4 | 2 | `views/settings/McpSettings.vue` |
 | `im` | 集成适配 | 98 | 2 | — | `views/integrations/IntegrationSettingsSection.vue` |
 | `storage` | 集成适配 | 54 | 2 | 5 | `views/settings/StorageBackendSettings.vue` |
 | `websearch` | 集成适配 | 49 | 3 | 2 | `views/settings/WebSearchSettings.vue` |
@@ -57,8 +57,8 @@
 | `evaluation` | `EvaluationController` | — |
 | `agentmanagement` | `AgentController`、`SkillCatalogController`、`SkillsCatalogController` | — |
 | `favorite` | `UserFavoriteController` | — |
-| `datasource` | `DataSourceController`、`DataSourceCredentialsController` | — |
 | `mcp` | `AgentToolApprovalController`、`McpCredentialsController`、`McpOAuthController`、`McpServiceController` | `McpToolRegistrationPort`、`McpToolingGateway` |
+| `datasource` | `DataSourceController`、`DataSourceCredentialsController` | — |
 | `im` | `ImCallbackController`、`ImChannelController` | — |
 | `storage` | `FileProxyController`、`StorageBackendController` | `FileUrlPort`、`GlobalFileServicePort`、`ProviderFileStorePort`、`ResourceCatalogPort`、`StorageBackendPort` |
 | `websearch` | `WebSearchController`、`WebSearchProviderController`、`WebSearchProviderCredentialsController` | `WebSearchProviderPort`、`WebSearchTempStatePort` |

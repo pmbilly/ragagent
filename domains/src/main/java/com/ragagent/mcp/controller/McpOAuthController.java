@@ -1,7 +1,7 @@
 package com.ragagent.mcp.controller;
 
-import com.ragagent.mcp.oauth.OAuthCallbackException;
 import com.ragagent.mcp.oauth.OAuthManager;
+import com.ragagent.mcp.oauth.error.OAuthCallbackException;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.service.McpOAuthFlowService;
 import com.ragagent.mcp.service.McpOAuthFlowService.AuthorizeRequest;

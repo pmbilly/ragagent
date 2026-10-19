@@ -1,5 +1,8 @@
 package com.ragagent.mcp.oauth;
 
+import com.ragagent.mcp.oauth.error.OAuthNoTokenException;
+import com.ragagent.mcp.oauth.model.AuthServerMetadata;
+import com.ragagent.mcp.oauth.model.OAuthToken;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;

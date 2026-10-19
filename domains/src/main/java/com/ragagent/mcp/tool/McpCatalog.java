@@ -7,7 +7,7 @@ import com.ragagent.contract.tool.ToolEnabledChecker;
 import com.ragagent.contract.tool.ToolEnabledChecks;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.mcp.domain.McpService;
-import com.ragagent.mcp.oauth.OAuthReauthorizationRequiredException;
+import com.ragagent.mcp.oauth.error.OAuthReauthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpOAuthRequiredException;
 import com.ragagent.platform.web.JsonMappers;

@@ -1,4 +1,4 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.error;
 
 /**
  * 无法在不重新征得用户同意的情况下恢复出可用的 access token。

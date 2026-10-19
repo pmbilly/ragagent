@@ -1,5 +1,6 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.store;
 
+import com.ragagent.mcp.oauth.model.OAuthToken;
 import com.ragagent.mcp.protocol.McpContext;
 
 /**
@@ -7,14 +8,14 @@ import com.ragagent.mcp.protocol.McpContext;
  *
  * <p>契约：
  * <ul>
- *   <li>尚未授权时抛 {@link OAuthNoTokenException}，<b>不要</b>与其它运维错误混为一谈；</li>
+ *   <li>尚未授权时抛 {@code OAuthNoTokenException}，<b>不要</b>与其它运维错误混为一谈；</li>
  *   <li>其它错误（库连接失败、IO）原样上抛；</li>
  *   <li>操作前检查取消状态，已取消则抛取消错误。</li>
  * </ul>
  */
 public interface OAuthTokenStore {
 
-    /** 读当前 token；未授权抛 {@link OAuthNoTokenException}。 */
+    /** 读当前 token；未授权抛 {@code OAuthNoTokenException}。 */
     OAuthToken getToken(McpContext ctx);
 
     /** 保存新签发或刷新后的 token。 */

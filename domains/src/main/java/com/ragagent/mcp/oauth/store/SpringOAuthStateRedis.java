@@ -1,4 +1,4 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.store;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;

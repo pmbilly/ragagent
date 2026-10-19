@@ -1,4 +1,4 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.error;
 
 /**
  * 当前 principal 尚未授权该服务（哨兵文案 {@code "no token available"}）。

@@ -1,5 +1,8 @@
 package com.ragagent.mcp.oauth;
 
+import com.ragagent.mcp.oauth.error.OAuthProtocolException;
+import com.ragagent.mcp.oauth.model.AuthServerMetadata;
+import com.ragagent.mcp.oauth.model.OAuthProtectedResource;
 import com.ragagent.mcp.protocol.McpContext;
 import java.net.URI;
 import java.net.URISyntaxException;

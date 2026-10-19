@@ -7,6 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ragagent.mcp.domain.McpPrincipal;
+import com.ragagent.mcp.oauth.error.OAuthProtocolException;
+import com.ragagent.mcp.oauth.model.AuthServerMetadata;
+import com.ragagent.mcp.oauth.model.OAuthToken;
+import com.ragagent.mcp.oauth.model.Pkce;
+import com.ragagent.mcp.oauth.store.DbTokenStore;
+import com.ragagent.mcp.oauth.store.OAuthTokenStore;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.mcp.protocol.McpServiceUrls;
 import com.ragagent.platform.access.TenantContext;

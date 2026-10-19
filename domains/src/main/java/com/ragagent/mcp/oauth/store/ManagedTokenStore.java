@@ -1,5 +1,6 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.store;
 
+import com.ragagent.mcp.oauth.model.OAuthToken;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.platform.access.TenantContext;
 
@@ -14,7 +15,7 @@ import com.ragagent.platform.access.TenantContext;
  * <b>数据库里的真实过期时间不变</b>——
  * 预检（{@code ensureFresh}）还要靠它。</p>
  *
- * <p>本类<b>不自行刷新</b>：刷新交给 {@link OAuthRuntime}。</p>
+ * <p>本类<b>不自行刷新</b>：刷新交给 {@code OAuthRuntime}。</p>
  */
 public class ManagedTokenStore extends DbTokenStore {
 

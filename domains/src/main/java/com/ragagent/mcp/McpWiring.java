@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Configuration;
 public class McpWiring {
 
     /**
-     * MCP 连接池。OAuth 支持由 {@link com.ragagent.mcp.oauth.McpOAuthSupportImpl} 提供（协议层预留的注入点）。
+     * MCP 连接池。OAuth 支持由 {@link com.ragagent.mcp.oauth.wiring.McpOAuthSupportImpl} 提供（协议层预留的注入点）。
      */
     @Bean(destroyMethod = "shutdown")
     public McpClientManager mcpClientManager(ObjectProvider<McpOAuthSupport> oauthSupport) {

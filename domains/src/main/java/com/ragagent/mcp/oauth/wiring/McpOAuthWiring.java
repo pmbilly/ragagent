@@ -1,6 +1,11 @@
-package com.ragagent.mcp.oauth;
+package com.ragagent.mcp.oauth.wiring;
 
 import com.ragagent.mcp.mapper.McpServiceMapper;
+import com.ragagent.mcp.oauth.OAuthManager;
+import com.ragagent.mcp.oauth.store.OAuthRepository;
+import com.ragagent.mcp.oauth.store.OAuthStateRedis;
+import com.ragagent.mcp.oauth.store.OAuthStateStore;
+import com.ragagent.mcp.oauth.store.SpringOAuthStateRedis;
 import com.ragagent.mcp.protocol.McpOAuthSupport;
 import com.ragagent.mcp.repository.McpOAuthRepository;
 import org.springframework.beans.factory.ObjectProvider;
