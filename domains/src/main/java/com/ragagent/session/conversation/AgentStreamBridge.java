@@ -1,7 +1,6 @@
 package com.ragagent.session.conversation;
 
 import com.ragagent.contract.agent.AgentStep;
-import com.ragagent.contract.agent.ToolResultPersist;
 import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.event.payload.AgentCompleteData;
@@ -31,6 +30,7 @@ import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.support.PipelineViews;
+import com.ragagent.session.support.ToolResultPersist;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -325,7 +325,7 @@
 | `:platform` | `com.ragagent.platform.config` | 平台配置面：部署属性与环境查找面。 |
 | `:platform` | `com.ragagent.platform.event` | 平台事件总线面（由 com.ragagent.event 迁入，对齐方案 的 platform.event/）： Event / EventBus / EventJson 等 12 类——进程内事件总线与载荷编解码。 |
 | `:platform` | `com.ragagent.platform.http` | 平台 HTTP 面：SSRF 策略下的安全抓取工具，以及全进程共享的裸 HTTP 传输层 （com.ragagent.platform.http.LlmTransport：连接级 SSRF 校验 + |
-| `:platform` | `com.ragagent.platform.knowledge` | 平台 · 知识库：FaqChunkMetadataCodec / ImageInfoMatchUtil / GrepChunksScoring…。 |
+| `:platform` | `com.ragagent.platform.knowledge` | 平台 · 知识/文本/图片工具：分块文本检索、文档分块组装、FAQ 元数据编解码、图片引用富化与重写。 |
 | `:platform` | `com.ragagent.platform.persistence` | 平台持久化面：MyBatis 拦截器（全表写守卫 / 租户过滤）、分页请求、JSONB / 时间类型处理器、方言与 LIKE 转义。 |
 | `:platform` | `com.ragagent.platform.prompt` | 平台提示词面：模板目录、常量、占位符与组装。 |
 | `:platform` | `com.ragagent.platform.redis` | 平台 · Redis：SpringRedisPubSub / RedisPubSub。 |

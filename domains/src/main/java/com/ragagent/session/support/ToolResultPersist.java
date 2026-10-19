@@ -1,5 +1,7 @@
-package com.ragagent.contract.agent;
+package com.ragagent.session.support;
 
+import com.ragagent.contract.agent.AgentStep;
+import com.ragagent.contract.agent.AgentToolCall;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolResult;
 import java.util.LinkedHashMap;
