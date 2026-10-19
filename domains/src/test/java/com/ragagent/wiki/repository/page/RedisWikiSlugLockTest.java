@@ -1,4 +1,4 @@
-package com.ragagent.wiki.service.page;
+package com.ragagent.wiki.repository.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.platform.stream.EmbeddedRedis;
+import com.ragagent.wiki.domain.page.WikiSlugLock;
 import java.time.Duration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

@@ -17,7 +17,7 @@ import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
  *   <li>取锁失败（别人持有）时安全地 no-op——对方会排空通道并在还有行时重排。</li>
  * </ul>
  *
- * <p><b>装配</b>：与 {@link com.ragagent.wiki.service.page.WikiSlugLock} 同一模式——{@link InProcessWikiFinalizeLock}
+ * <p><b>装配</b>：与 {@link com.ragagent.wiki.domain.page.WikiSlugLock} 同一模式——{@link InProcessWikiFinalizeLock}
  * 是无条件 {@code @Component}（Lite 模式 / 单副本），多副本部署应注册
  * {@link RedisWikiFinalizeLock} 为 {@code @Primary}。</p>
  */

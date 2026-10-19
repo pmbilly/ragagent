@@ -7,7 +7,6 @@ import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.dto.McpMetadata;
-import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.ragagent.mcp.protocol.InitializeResult;
 import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientConfig;
@@ -16,6 +15,7 @@ import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.mcp.protocol.McpOAuthRequiredException;
 import com.ragagent.mcp.protocol.McpOAuthSupport;
 import com.ragagent.mcp.repository.McpMetadataRepository;
+import com.ragagent.mcp.repository.McpServiceRepository;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
@@ -63,15 +63,15 @@ public class McpMetadataService {
     /** 整个刷新的 30 秒超时 */
     private static final Duration REFRESH_TIMEOUT = Duration.ofSeconds(30);
 
-    private final McpServiceMapper mcpServiceMapper;
+    private final McpServiceRepository mcpServiceRepo;
     private final McpMetadataRepository metadataRepo;
     /** 可缺省装配：协议模块未接线时为 null（不是可选优化，是接线期降级）。 */
     private final McpOAuthSupport oauthSupport;
 
-    public McpMetadataService(McpServiceMapper mcpServiceMapper,
+    public McpMetadataService(McpServiceRepository mcpServiceRepo,
                               McpMetadataRepository metadataRepo,
                               ObjectProvider<McpOAuthSupport> oauthSupport) {
-        this.mcpServiceMapper = mcpServiceMapper;
+        this.mcpServiceRepo = mcpServiceRepo;
         this.metadataRepo = metadataRepo;
         this.oauthSupport = oauthSupport.getIfAvailable();
     }
@@ -94,7 +94,7 @@ public class McpMetadataService {
 
     /** 服务不存在或 tenant==0 一律 serviceNotFound */
     private McpService loadService(long tenant, String id) {
-        McpService service = mcpServiceMapper.getByIdForTenant(tenant, id);
+        McpService service = mcpServiceRepo.getByIdForTenant(tenant, id);
         if (service == null || tenant == 0) {
             throw McpMetadataException.serviceNotFound();
         }
@@ -205,7 +205,7 @@ public class McpMetadataService {
             throw McpMetadataException.invalidOrTooLarge(McpMetadataException.Kind.TOO_LARGE);
         }
 
-        McpService current = mcpServiceMapper.getByIdForTenant(tenant, service.getId());
+        McpService current = mcpServiceRepo.getByIdForTenant(tenant, service.getId());
         if (current == null
                 || !Objects.equals(McpConfigFingerprint.of(current), snapshot.getConfigFingerprint())) {
             // 刷新途中连接配置被改：不发布任何部分目录

@@ -733,10 +733,7 @@ class ArchitectureRulesTest {
             "com.ragagent.knowledge.service.management.KnowledgeCloneService",
             "com.ragagent.knowledge.service.management.KnowledgeMoveService",
             "com.ragagent.knowledge.service.enrichment.KnowledgeSummaryService",
-            "com.ragagent.knowledge.service.management.KnowledgeTagService",
-            "com.ragagent.mcp.service.McpMetadataService",
-            "com.ragagent.mcp.service.McpServiceManagement",
-            "com.ragagent.mcp.service.McpToolApprovalService");
+            "com.ragagent.knowledge.service.management.KnowledgeTagService");
 
     /**
      * A17 棘轮基线：{@code ..service..} 包内仍直接依赖具体技术实现
@@ -748,7 +745,6 @@ class ArchitectureRulesTest {
      */
     private static final Set<String> SERVICE_TECH_BASELINE =
             Set.of(
-            "com.ragagent.embedchannel.service.RedisEmbedTokenStore",
             "com.ragagent.knowledge.service.management.KnowledgeService",
             "com.ragagent.knowledge.service.chunk.ChunkExtractService",
             // R4b：管线本体归位会话域后落在 service 包内——插件族依赖 langfuse 观测与具体技术
@@ -760,9 +756,7 @@ class ArchitectureRulesTest {
             "com.ragagent.session.service.suggestion.MessageSuggestionService",
             "com.ragagent.session.assembly.QaWiring",
             "com.ragagent.session.service.SessionAgentQaService",
-            "com.ragagent.session.service.SessionKnowledgeQaService",
-            "com.ragagent.wiki.service.ingest.WikiIngestEnqueueOps",
-            "com.ragagent.wiki.service.page.RedisWikiSlugLock");
+            "com.ragagent.session.service.SessionKnowledgeQaService");
 
     /** service 层判据：包名任一段等于 {@code service}（对齐 ArchUnit {@code ..service..} 语义）。 */
     /**

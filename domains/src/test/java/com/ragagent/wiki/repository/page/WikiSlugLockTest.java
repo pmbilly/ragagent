@@ -1,7 +1,8 @@
-package com.ragagent.wiki.service.page;
+package com.ragagent.wiki.repository.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.wiki.domain.page.WikiSlugLock;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

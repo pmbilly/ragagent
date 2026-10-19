@@ -1,5 +1,6 @@
-package com.ragagent.wiki.service.page;
+package com.ragagent.wiki.repository.page;
 
+import com.ragagent.wiki.domain.page.WikiSlugLock;
 import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;

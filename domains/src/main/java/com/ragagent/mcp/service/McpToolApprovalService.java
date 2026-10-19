@@ -4,7 +4,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpToolApproval;
 import com.ragagent.mcp.domain.McpToolPolicyPatch;
-import com.ragagent.mcp.mapper.McpServiceMapper;
+import com.ragagent.mcp.repository.McpServiceRepository;
 import com.ragagent.mcp.repository.McpToolApprovalRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -24,11 +24,11 @@ import org.springframework.stereotype.Service;
 public class McpToolApprovalService {
 
     private final McpToolApprovalRepository repo;
-    private final McpServiceMapper mcpServiceMapper;
+    private final McpServiceRepository mcpServiceRepo;
 
-    public McpToolApprovalService(McpToolApprovalRepository repo, McpServiceMapper mcpServiceMapper) {
+    public McpToolApprovalService(McpToolApprovalRepository repo, McpServiceRepository mcpServiceRepo) {
         this.repo = repo;
-        this.mcpServiceMapper = mcpServiceMapper;
+        this.mcpServiceRepo = mcpServiceRepo;
     }
 
     /** 先校验服务可见，再列策略（可为空列表） */
@@ -72,7 +72,7 @@ public class McpToolApprovalService {
     }
 
     private void requireService(long tenantId, String serviceId) {
-        McpService svc = mcpServiceMapper.getByIdForTenant(tenantId, serviceId);
+        McpService svc = mcpServiceRepo.getByIdForTenant(tenantId, serviceId);
         if (svc == null) {
             throw BizException.notFound("mcp service not found");
         }

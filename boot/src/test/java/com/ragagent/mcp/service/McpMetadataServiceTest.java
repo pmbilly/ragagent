@@ -20,6 +20,7 @@ import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.dto.McpMetadata;
 import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.ragagent.mcp.repository.McpMetadataRepository;
+import com.ragagent.mcp.repository.McpServiceRepository;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.SsrfGuard;
 import com.sun.net.httpserver.HttpServer;
@@ -77,9 +78,9 @@ class McpMetadataServiceTest {
         TestSchema.resetData(jdbc);
         whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         ssrfGuard.reloadWhitelist("127.0.0.1,example.com");
-        svc = new McpServiceManagement(mcpServiceMapper, null, ssrfGuard,
+        svc = new McpServiceManagement(new McpServiceRepository(mcpServiceMapper), null, ssrfGuard,
                 TestObjectProviders.empty(), TestObjectProviders.empty());
-        metadata = new McpMetadataService(mcpServiceMapper, metadataRepo,
+        metadata = new McpMetadataService(new McpServiceRepository(mcpServiceMapper), metadataRepo,
                 TestObjectProviders.empty());
     }
 

@@ -4,6 +4,7 @@ import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.contract.knowledge.ChunkRowView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
+import com.ragagent.embedchannel.domain.EmbedTokenStore;
 import com.ragagent.embedchannel.repository.EmbedChannelRepository;
 import com.ragagent.embedchannel.support.EmbedError;
 import com.ragagent.embedchannel.support.EmbedTokens;

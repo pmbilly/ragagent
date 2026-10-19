@@ -17,6 +17,7 @@ import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.ragagent.mcp.protocol.McpClientManager;
+import com.ragagent.mcp.repository.McpServiceRepository;
 import com.ragagent.platform.security.SsrfGuard;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -65,7 +66,7 @@ class McpServiceServiceTest {
         whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         ssrfGuard.reloadWhitelist("example.com,127.0.0.1");
         clientManager = mock(McpClientManager.class);
-        svc = new McpServiceManagement(mcpServiceMapper, metadataService, ssrfGuard,
+        svc = new McpServiceManagement(new McpServiceRepository(mcpServiceMapper), metadataService, ssrfGuard,
                 TestObjectProviders.of(clientManager), TestObjectProviders.empty());
     }
 

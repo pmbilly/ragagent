@@ -1,6 +1,7 @@
 package com.ragagent.wiki;
 
 import com.ragagent.wiki.domain.ingest.WikiIngestSlotReleaser;
+import com.ragagent.wiki.domain.page.WikiSlugLock;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import com.ragagent.wiki.repository.ingest.RedisWikiDeletedTombstoneStore;
 import com.ragagent.wiki.repository.ingest.RedisWikiFinalizeLock;
@@ -13,8 +14,7 @@ import com.ragagent.wiki.repository.ingest.WikiIdentityClaimStore;
 import com.ragagent.wiki.repository.ingest.WikiInflightLimiter;
 import com.ragagent.wiki.repository.ingest.WikiIngestTaskHandler;
 import com.ragagent.wiki.repository.ingest.WikiIngestTaskQueue;
-import com.ragagent.wiki.service.page.RedisWikiSlugLock;
-import com.ragagent.wiki.service.page.WikiSlugLock;
+import com.ragagent.wiki.repository.page.RedisWikiSlugLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;

@@ -1,4 +1,4 @@
-package com.ragagent.wiki.service.page;
+package com.ragagent.wiki.domain.page;
 
 import java.time.Duration;
 
@@ -15,9 +15,9 @@ import java.time.Duration;
  *
  * <p><b>可插拔设计</b>：本接口拆成 {@link #tryLock} / {@link #unlock}，实现有两份：</p>
  * <ul>
- *   <li>{@link InProcessWikiSlugLock} —— {@code ConcurrentHashMap<String, ReentrantLock>}
+ *   <li>{@code InProcessWikiSlugLock} —— {@code ConcurrentHashMap<String, ReentrantLock>}
  *       的进程内实现（<b>默认</b>）。</li>
- *   <li>{@link RedisWikiSlugLock} —— SetNX 实现（跨实例）。</li>
+ *   <li>{@code RedisWikiSlugLock} —— SetNX 实现（跨实例）。</li>
  * </ul>
  *
  * <p><b>⚠️ 多实例差异</b>：进程内实现的互斥范围只有<b>单个 JVM</b>；Redis 实现

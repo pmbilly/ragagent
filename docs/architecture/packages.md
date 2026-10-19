@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-359 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+361 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -300,6 +300,8 @@
 | `:domains` | `com.ragagent.wiki.prompt` | wiki 的提示词模板目录与渲染支撑。 |
 | `:domains` | `com.ragagent.wiki.repository` | 仓储门面层：把 mapper 的原子操作组合成页面/文件夹级的读写契约，并集中承载软删、 版本冲突与 PG 方言分支。 |
 | `:domains` | `com.ragagent.wiki.repository.ingest` | wiki 摄取的存储与并发协调：任务队列、finalize 锁、身份认领、在途限流、删除墓碑。 |
+| `:domains` | `com.ragagent.wiki.repository.page` | wiki 页面仓储面：slug 锁的进程内/Redis 实现。 |
+| `:domains` | `com.ragagent.wiki.runtime` | wiki 运行面：入库任务的观测入口。 |
 | `:domains` | `com.ragagent.wiki.service` | wiki 用例层根包：**跨切面端口与 LLM/提示词适配**——分块清洗（ com.ragagent.wiki.service.WikiChunkCleaner + 缺省实现）、图片富化、知识收尾、 |
 | `:domains` | `com.ragagent.wiki.service.ingest` | wiki 摄取管线：批量/单篇入库的门面与协作者 （com.ragagent.wiki.service.ingest.WikiIngestService、 com.ragagent.wiki.serv |
 | `:domains` | `com.ragagent.wiki.service.ingest.graph` | wiki 摄取·链接图面（拆自 wiki.service.ingest，对齐方案 的 service.ingest.graph/）： WikiGraphCalculator——从页面/引用计算链接图（入链、出链、孤儿）。 |

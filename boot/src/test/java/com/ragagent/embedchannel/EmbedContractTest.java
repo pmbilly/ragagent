@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.ragagent.TestSchema;
 import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
-import com.ragagent.embedchannel.service.EmbedTokenStore;
+import com.ragagent.embedchannel.domain.EmbedTokenStore;
 import com.ragagent.embedchannel.support.EmbedTokens;
 import java.time.Duration;
 import java.util.Map;

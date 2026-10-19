@@ -12,7 +12,6 @@ import com.ragagent.mcp.domain.McpTestResult;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.domain.McpTransportType;
 import com.ragagent.mcp.dto.McpCredentialsState;
-import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.ragagent.mcp.protocol.InitializeResult;
 import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientConfig;
@@ -22,6 +21,7 @@ import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.mcp.protocol.McpOAuthRequiredException;
 import com.ragagent.mcp.protocol.McpOAuthSupport;
 import com.ragagent.mcp.protocol.McpServiceUrls;
+import com.ragagent.mcp.repository.McpServiceRepository;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.security.SsrfGuard;
@@ -69,19 +69,19 @@ public class McpServiceManagement {
             "stdio transport is disabled for security reasons; "
                     + "please use SSE or HTTP Streamable transport instead";
 
-    private final McpServiceMapper mcpServiceMapper;
+    private final McpServiceRepository mcpServiceRepo;
     private final McpMetadataService metadataService;
     /** 协议模块未接线时为 null（接线期降级，见 closeClientQuietly / clients）。 */
     private final McpClientManager clientManager;
     /** 可缺省装配：协议模块未接线时为 null。 */
     private final McpOAuthSupport oauthSupport;
 
-    public McpServiceManagement(McpServiceMapper mcpServiceMapper,
+    public McpServiceManagement(McpServiceRepository mcpServiceRepo,
                              McpMetadataService metadataService,
                              SsrfGuard ssrfGuard,
                              ObjectProvider<McpClientManager> clientManager,
                              ObjectProvider<McpOAuthSupport> oauthSupport) {
-        this.mcpServiceMapper = mcpServiceMapper;
+        this.mcpServiceRepo = mcpServiceRepo;
         this.metadataService = metadataService;
         this.clientManager = clientManager.getIfAvailable();
         this.oauthSupport = oauthSupport.getIfAvailable();
@@ -121,12 +121,12 @@ public class McpServiceManagement {
         service.setCreatedAt(ts);
         service.setUpdatedAt(ts);
 
-        mcpServiceMapper.insert(service);
+        mcpServiceRepo.insert(service);
     }
 
     /** **返回未脱敏实体**；不存在 → "MCP service not found" */
     public McpService getMCPServiceByID(long tenantId, String id) {
-        McpService service = mcpServiceMapper.getByIdForTenant(tenantId, id);
+        McpService service = mcpServiceRepo.getByIdForTenant(tenantId, id);
         if (service == null) {
             throw BizException.notFound("MCP service not found");
         }
@@ -135,12 +135,12 @@ public class McpServiceManagement {
 
     /** 裸查询：不存在返回 null（内部/可选场景用） */
     public McpService findByID(long tenantId, String id) {
-        return mcpServiceMapper.getByIdForTenant(tenantId, id);
+        return mcpServiceRepo.getByIdForTenant(tenantId, id);
     }
 
     /** 同样返回未脱敏实体 */
     public List<McpService> listMCPServices(long tenantId) {
-        return mcpServiceMapper.listForTenant(tenantId);
+        return mcpServiceRepo.listForTenant(tenantId);
     }
 
     /** 空 ids 直接返回空列表（不查库） */
@@ -148,7 +148,7 @@ public class McpServiceManagement {
         if (ids == null || ids.isEmpty()) {
             return List.of();
         }
-        return mcpServiceMapper.listByIdsForTenant(tenantId, ids);
+        return mcpServiceRepo.listByIdsForTenant(tenantId, ids);
     }
 
     /** 实现在 McpMetadataService，此处转发以对齐接口形状 */
@@ -176,7 +176,7 @@ public class McpServiceManagement {
     public void updateMCPService(McpService service, Map<String, Boolean> updateFields) {
         Map<String, Boolean> fields = updateFields == null ? Map.of() : updateFields;
 
-        McpService existing = mcpServiceMapper.getByIdForTenant(service.getTenantId(), service.getId());
+        McpService existing = mcpServiceRepo.getByIdForTenant(service.getTenantId(), service.getId());
         if (existing == null) {
             throw BizException.internal("MCP service not found");
         }
@@ -283,7 +283,7 @@ public class McpServiceManagement {
         validateOutboundUrls(existing);
         existing.setUpdatedAt(now());
 
-        mcpServiceMapper.updatePartial(existing);
+        mcpServiceRepo.updatePartial(existing);
 
         // ── 是否发生了"关键配置变更"（URL / stdio / 传输类型 / 自定义头 / 鉴权形态） ──
         boolean configChanged = false;
@@ -343,7 +343,7 @@ public class McpServiceManagement {
 
     /** builtin 拒绝；先关连接再软删 */
     public void deleteMCPService(long tenantId, String id) {
-        McpService existing = mcpServiceMapper.getByIdForTenant(tenantId, id);
+        McpService existing = mcpServiceRepo.getByIdForTenant(tenantId, id);
         if (existing == null) {
             throw BizException.internal("MCP service not found");
         }
@@ -351,7 +351,7 @@ public class McpServiceManagement {
             throw BizException.internal("builtin MCP services cannot be deleted");
         }
         closeClientQuietly(id);
-        mcpServiceMapper.softDelete(tenantId, id, now());
+        mcpServiceRepo.softDelete(tenantId, id, now());
         log.info("MCP service deleted: {} (ID: {})", LogSanitizer.sanitize(existing.getName()), id);
     }
 
@@ -523,7 +523,7 @@ public class McpServiceManagement {
         }
 
         existing.setUpdatedAt(now());
-        mcpServiceMapper.updatePartial(existing);
+        mcpServiceRepo.updatePartial(existing);
 
         closeClientQuietly(id);
         log.info("MCP credentials updated, connection closed: {} (ID: {})",
@@ -566,7 +566,7 @@ public class McpServiceManagement {
         }
 
         existing.setUpdatedAt(now());
-        mcpServiceMapper.updatePartial(existing);
+        mcpServiceRepo.updatePartial(existing);
 
         closeClientQuietly(id);
         log.info("MCP credential cleared by user: id={} field={}, connection closed",
