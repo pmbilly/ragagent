@@ -1,22 +1,11 @@
 package com.ragagent.initialization.controller;
 
-import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.model.AsrTranscriber;
-import com.ragagent.contract.model.EntityExtractionPort;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.model.OllamaAdminPort;
 import com.ragagent.initialization.service.InitializationConfigService;
 import com.ragagent.initialization.service.ModelConnectivityTestService;
-import com.ragagent.initialization.service.OllamaDownloadTaskStore;
 import com.ragagent.initialization.service.OllamaManageService;
 import com.ragagent.initialization.service.TextExtractionTestService;
-import com.ragagent.platform.prompt.ExtractPrompts;
-import com.ragagent.platform.security.CryptoService;
-import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.ApiResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -55,17 +44,14 @@ public class InitializationController {
     private final ModelConnectivityTestService modelTest;
     private final TextExtractionTestService textTest;
 
-    public InitializationController(KnowledgeCatalogPort knowledgeCatalog,
-            ModelCatalogPort modelCatalog, ModelRuntime modelRuntime, SsrfGuard ssrfGuard,
-            OllamaAdminPort ollamaService, OllamaDownloadTaskStore downloadTasks,
-            AsrTranscriber asrTranscriber, ExtractPrompts extractPrompts,
-            EntityExtractionPort entityExtraction,
-            DocReaderParsePort documentReader,
-            CryptoService cryptoService) {
-        this.configService = new InitializationConfigService(knowledgeCatalog, modelCatalog, ssrfGuard);
-        this.ollamaManage = new OllamaManageService(ollamaService, downloadTasks);
-        this.modelTest = new ModelConnectivityTestService(modelCatalog, ssrfGuard, modelRuntime, asrTranscriber, documentReader);
-        this.textTest = new TextExtractionTestService(extractPrompts, modelTest, entityExtraction);
+    public InitializationController(InitializationConfigService configService,
+            OllamaManageService ollamaManage,
+            ModelConnectivityTestService modelTest,
+            TextExtractionTestService textTest) {
+        this.configService = configService;
+        this.ollamaManage = ollamaManage;
+        this.modelTest = modelTest;
+        this.textTest = textTest;
     }
 
     @GetMapping("/api/v1/initialization/config/{kbId}")

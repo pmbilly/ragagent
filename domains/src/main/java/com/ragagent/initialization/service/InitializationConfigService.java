@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
@@ -31,6 +32,7 @@ import tools.jackson.databind.node.ObjectNode;
  *
  * <p>initialization 薄层化的产物：端点注解留在 controller，方法体逐字迁移至此。</p>
  */
+@Service
 public final class InitializationConfigService {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();

@@ -16,6 +16,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ArrayNode;
@@ -26,6 +27,7 @@ import tools.jackson.databind.node.ObjectNode;
  *
  * <p>initialization 薄层化的产物：端点注解留在 controller，方法体逐字迁移至此。</p>
  */
+@Service
 public final class OllamaManageService {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
