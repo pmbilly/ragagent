@@ -339,6 +339,7 @@ boot           14 件                      →  boot
 | L29 | 2026-10-18 | **链路 A 注释纠错（A 档）**：删 `SessionAgentQaService` 尾部 4 段空注释 + 一段错挂在 `chatModel()` 上的 javadoc；`AgentStreamBridge` 的「应为 17」改为不写死；`EventManager.buildHandler` 补「先注册 → 外层 → 先执行」；`KnowledgeProcessWorker` 补进程内队列语义；`mechanisms.md` §10「可选 Bean 缺失行为一览」。 | **32 守卫** · **5022 / 0 / 4** |
 | L30 | 2026-10-18 | **`session/service/rag` 提升为 `session/rag`**：实测 rag 44 文件与非 rag service 44 文件 **import = 0**，两个不相干子系统挤在同一包；迁移同步 6 处守卫登记；**ArchUnit A17 规则扩面**（`isServicePackage` 纳入 `rag`，否则换包即静默脱管）。`session/service` 88 → 44 文件。 | **32 守卫** · **5022 / 0 / 4** |
 | L31 | 2026-10-18 | **链路 A 长方法拆分**：`mapOneDocument` 411 → 327（三个阶段方法）、`agentQA` 165 → 26（七步）、`runToolCallInner` 231 → 153（参数解析 + 失败调用 + sealed 结果）、`parseQARequest` 235 → 102（五个具名步骤）。**新增 `scripts/method-length-report.py`**（跳字符串的花括号计数）：实测 >150 行方法 **25 个**，而非外部报告的 167（`Fetcher.detectContentType` 报 374 实为 15、`ToolPolicy.normalizeMCPCallArguments` 报 276 实为 22）。 | **32 守卫** · **5022 / 0 / 4** |
+| L32 | 2026-10-19 | **RBAC 注册长方法拆分**：`RbacRoutePolicies.registerAll` 526 行 → 13 个按路由族命名的私有方法（models/knowledge/chunks/faq/mcp/wiki/audit/session/datasource/infra/tenant/misc/agents/embed/public），`registerAll` 只保留固定顺序调用列表；**登记顺序即匹配优先级**，调用顺序逐段保持。文件 619 → 598，过 B121 阈值；`route-recon` 与 `W5aSundryRoutesContractTest` / `ArchitectureRulesTest` 全绿。长方法 >150：24 → 23。 | **40 守卫** · **boot 全量** · build 1m29s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
