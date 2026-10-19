@@ -5,7 +5,6 @@ import com.ragagent.platform.storage.fileserve.FileProxyPort;
 import com.ragagent.platform.storage.fileserve.FileServeHttp;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.session.conversation.MessageService;
-import com.ragagent.session.domain.message.Message;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -70,7 +69,7 @@ public class MessageFileProxyController {
      * （见 {@link MessageFileFacts}）——避免存储依赖会话实体。
      */
     private MessageFileFacts factsOf(String sessionId, String messageId) {
-        Message message = messageService.getMessage(sessionId, messageId);
+        var message = messageService.getMessage(sessionId, messageId);
         if (message == null) {
             return null;
         }

@@ -1053,7 +1053,6 @@ class ArchitectureRulesTest {
     private static final Set<String> DOMAIN_TECH_DEPENDENCY_BASELINE = Set.of(
             "com.ragagent.datasource.domain.connector.ConnectorHttpWiring",
             "com.ragagent.knowledge.domain.access.FaqGuard",
-            "com.ragagent.knowledge.domain.access.KnowledgeAccessGuard",
             "com.ragagent.knowledge.domain.span.SpanTracker");
 
     @Test

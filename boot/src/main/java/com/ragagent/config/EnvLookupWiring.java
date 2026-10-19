@@ -1,6 +1,6 @@
 package com.ragagent.config;
 
-import com.ragagent.vectorstore.domain.EnvVectorStores;
+import com.ragagent.vectorstore.config.EnvVectorStores;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;

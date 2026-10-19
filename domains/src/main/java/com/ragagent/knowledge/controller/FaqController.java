@@ -2,7 +2,6 @@ package com.ragagent.knowledge.controller;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.doc.UpdateLastImportDisplayStatusRequest;
 import com.ragagent.knowledge.dto.faq.AddSimilarQuestionsRequest;
 import com.ragagent.knowledge.dto.faq.FaqBatchUpsertPayload;
@@ -255,17 +254,17 @@ public class FaqController {
     // ── 路由守卫 ──
 
     /** 读路由：解析 KB（404）→ API-Key 白名单 → 跨租户 403。 */
-    private KnowledgeBase requireKbRead(String kbId) {
-        return guard.requireKbAccess(kbId);
+    private void requireKbRead(String kbId) {
+        guard.requireKbAccess(kbId);
     }
 
     /**
      * 写路由：所有权判定先行（非创建者且非 Admin+ → 403 纯字符串），再 KB 访问层。
      * 判定顺序 契约样例依赖（faq-create-contrib / faq-list-cross），不能重排。
      */
-    private KnowledgeBase requireKbWrite(String kbId) {
+    private void requireKbWrite(String kbId) {
         guard.requireOwnedKbInCallerSpace(kbId);
-        return guard.requireKbAccess(kbId);
+        guard.requireKbAccess(kbId);
     }
 
     // ── 参数解析 ──

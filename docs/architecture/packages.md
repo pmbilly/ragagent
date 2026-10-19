@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-333 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+334 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -247,6 +247,7 @@
 | `:domains` | `com.ragagent.tenant.mapper` | 租户 · 映射：TenantMapper。 |
 | `:domains` | `com.ragagent.tenant.repository` | 租户仓储面（由 tenant 根包迁出，对齐方案 的 repository/）： Tenant（租户实体）、TenantLookup（按 id/域名查找）与 TenantConfigRedaction（配置脱敏，供查询面复用）。 |
 | `:domains` | `com.ragagent.vectorstore` | 向量库配置域：向量库类型目录与配置校验/持久化，对外 /api/v1/vector-stores。 |
+| `:domains` | `com.ragagent.vectorstore.config` | 向量存储 · 环境配置：EnvVectorStores 的读取与查询视图。 |
 | `:domains` | `com.ragagent.vectorstore.controller` | 向量库 · HTTP 层：VectorStoreController。 |
 | `:domains` | `com.ragagent.vectorstore.domain` | 向量库 · 领域模型：ConnectionConfigTypeHandler / IndexConfigTypeHandler / VectorStoreEngines…。 |
 | `:domains` | `com.ragagent.vectorstore.dto` | 向量库 · 数据传输：VectorStoreResponse / VectorStoreTypes。 |

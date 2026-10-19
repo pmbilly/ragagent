@@ -1,10 +1,10 @@
-package com.ragagent.knowledge.domain.access;
+package com.ragagent.knowledge.service.access;
 
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.service.access.ChunkAccessGuard;
+import com.ragagent.knowledge.domain.access.KnowledgeReadPort;
 import com.ragagent.platform.access.TenantContext;
 import org.springframework.stereotype.Component;
 

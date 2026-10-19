@@ -11,7 +11,7 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
-import com.ragagent.vectorstore.domain.EnvVectorStores;
+import com.ragagent.vectorstore.config.EnvVectorStores;
 import com.ragagent.vectorstore.domain.VectorStore;
 import com.ragagent.vectorstore.dto.VectorStoreResponse;
 import com.ragagent.vectorstore.dto.VectorStoreTypes;

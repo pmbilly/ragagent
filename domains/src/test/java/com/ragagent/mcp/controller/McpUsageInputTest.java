@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.domain.McpToolApproval;
+import com.ragagent.mcp.dto.McpMetadata;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -60,7 +60,7 @@ class McpUsageInputTest {
 
     @Test
     void buildsWhitelistedPayloadInGoFieldOrder() throws Exception {
-        String json = McpServiceController.buildMCPUsageInput(
+        String json = McpUsageInstructionsOps.buildMCPUsageInput(
                 service("svc"), snapshot(List.of(tool("t1", "d1"))), List.of());
 
         JsonNode node = JSON.readTree(json);
@@ -85,7 +85,7 @@ class McpUsageInputTest {
         disabled.setToolName("t2");
         disabled.setEnabled(false);
 
-        String json = McpServiceController.buildMCPUsageInput(
+        String json = McpUsageInstructionsOps.buildMCPUsageInput(
                 service("svc"), snapshot(List.of(tool("t1", "d1"), tool("t2", "d2"))),
                 List.of(disabled));
 
@@ -95,7 +95,7 @@ class McpUsageInputTest {
 
     @Test
     void rejectsWhenNoEnabledTools() {
-        BizException e = assertThrows(BizException.class, () -> McpServiceController.buildMCPUsageInput(
+        BizException e = assertThrows(BizException.class, () -> McpUsageInstructionsOps.buildMCPUsageInput(
                 service("svc"), snapshot(List.of()), List.of()));
         assertEquals("no enabled MCP tools are available to summarize", e.appError().message());
     }
@@ -106,7 +106,7 @@ class McpUsageInputTest {
         for (int i = 0; i < 120; i++) {
             tools.add(tool("tool-" + i, ""));
         }
-        String json = McpServiceController.buildMCPUsageInput(service("svc"), snapshot(tools), List.of());
+        String json = McpUsageInstructionsOps.buildMCPUsageInput(service("svc"), snapshot(tools), List.of());
 
         JsonNode node = JSON.readTree(json);
         assertEquals(100, node.get("tools").size(), "工具条数上限 100");
@@ -115,7 +115,7 @@ class McpUsageInputTest {
 
     @Test
     void omittedToolsKeyAbsentWhenNothingOmitted() throws Exception {
-        String json = McpServiceController.buildMCPUsageInput(
+        String json = McpUsageInstructionsOps.buildMCPUsageInput(
                 service("svc"), snapshot(List.of(tool("t1", "d1"))), List.of());
         assertFalse(json.contains("omitted_tools"), "omitempty：没有省略时不出该键：" + json);
     }
@@ -128,7 +128,7 @@ class McpUsageInputTest {
         for (int i = 0; i < 20; i++) {
             tools.add(tool("t" + i, big));
         }
-        String json = McpServiceController.buildMCPUsageInput(service("svc"), snapshot(tools), List.of());
+        String json = McpUsageInstructionsOps.buildMCPUsageInput(service("svc"), snapshot(tools), List.of());
 
         JsonNode node = JSON.readTree(json);
         assertTrue(node.get("tools").size() <= 12, "字符预算必须挡住超量工具");

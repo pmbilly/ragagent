@@ -2,11 +2,11 @@ package com.ragagent.mcp.service;
 
 import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.domain.McpConfigFingerprint;
-import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpMetadataSummary;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
+import com.ragagent.mcp.dto.McpMetadata;
 import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.ragagent.mcp.protocol.InitializeResult;
 import com.ragagent.mcp.protocol.McpClient;

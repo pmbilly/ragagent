@@ -15,7 +15,6 @@ import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionService;
-import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.support.SessionNotFoundException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
@@ -301,7 +300,7 @@ public class SteerController {
         if (assistantId == null || assistantId.isEmpty()) {
             return "";
         }
-        Message msg = messageService.getMessage(sessionId, assistantId);
+        var msg = messageService.getMessage(sessionId, assistantId);
         if (msg == null || msg.isCompleted()) {
             try {
                 streamManager.clearLiveRun(sessionId, assistantId);

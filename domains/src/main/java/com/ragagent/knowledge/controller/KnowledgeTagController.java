@@ -2,7 +2,6 @@ package com.ragagent.knowledge.controller;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.dto.tag.CreateTagRequest;
 import com.ragagent.knowledge.dto.tag.DeleteTagRequest;
 import com.ragagent.knowledge.dto.tag.KnowledgeTagResponse;
@@ -83,7 +82,7 @@ public class KnowledgeTagController {
         guard.requireOwnedKbInCallerSpace(kbId);
         guard.requireKbAccess(kbId);
 
-        KnowledgeTag tag = tagService.createTag(kbId,
+        var tag = tagService.createTag(kbId,
                 LogSanitizer.sanitize(req.name()), LogSanitizer.sanitize(req.color()),
                 req.sortOrder() == null ? 0 : req.sortOrder());
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -100,7 +99,7 @@ public class KnowledgeTagController {
         guard.requireKbAccess(kbId);
 
         String tagId = tagService.resolveTagId(LogSanitizer.sanitize(tagIdParam));
-        KnowledgeTag tag = tagService.updateTag(tagId, req.name(), req.color(), req.sortOrder());
+        var tag = tagService.updateTag(tagId, req.name(), req.color(), req.sortOrder());
         return ResponseEntity.ok(KnowledgeTagResponse.from(tag));
     }
 

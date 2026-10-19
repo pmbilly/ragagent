@@ -1,10 +1,8 @@
 package com.ragagent.knowledge.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.dto.TaskIdResponse;
 import com.ragagent.knowledge.dto.chunk.UpdateImageInfoRequest;
 import com.ragagent.knowledge.dto.doc.ClearContentsResponse;
@@ -102,7 +100,7 @@ public class KnowledgeController {
         log.info("Start creating knowledge from file, KB: {}", kbId);
         JsonNode customMetadata = KnowledgeRouteGuards.parseJsonParam(MAPPER, metadataJson, "metadata");
         byte[] content = LocalStorageService.readAll(file.getInputStream());
-        Knowledge k = knowledgeService.createFromFile(
+        var k = knowledgeService.createFromFile(
                 kbId, content,
                 fileName != null && !fileName.isEmpty() ? fileName : file.getOriginalFilename(),
                 fileName, customMetadata, channel);
@@ -120,7 +118,7 @@ public class KnowledgeController {
         } catch (SsrfGuard.SsrfException e) {
             throw new BizException(AppError.badRequest(ssrfGuard.formatSSRFError("URL", req.url(), e)));
         }
-        Knowledge k = knowledgeService.createFromUrl(kbId, req.url(),
+        var k = knowledgeService.createFromUrl(kbId, req.url(),
                 req.fileName(), req.fileType(), req.title(), req.channel());
         return ResponseEntity.status(HttpStatus.CREATED).body(KnowledgeResponse.from(k));
     }
@@ -131,7 +129,7 @@ public class KnowledgeController {
             @PathVariable("id") String kbId,
             @Valid @NonNullBody @RequestBody CreateManualRequest req) {
         log.info("Start creating manual knowledge, KB: {}", kbId);
-        Knowledge k = knowledgeService.createManual(kbId, req.title(),
+        var k = knowledgeService.createManual(kbId, req.title(),
                 req.content() == null ? "" : req.content(),
                 req.status() == null ? "" : req.status(),
                 req.channel());
@@ -156,8 +154,7 @@ public class KnowledgeController {
             throw new BizException(AppError.badRequest("pageSize must be between 1 and 1000"));
         }
         boolean folderPresent = folderPath != null;
-        Page<Knowledge> result =
-                knowledgeService.listKnowledge(
+        var result = knowledgeService.listKnowledge(
                         kbId, page, pageSize, keyword, parseStatus, fileType, folderPath, folderPresent);
         List<KnowledgeResponse> items = result.getRecords().stream()
                 .map(KnowledgeResponse::from)
@@ -197,17 +194,11 @@ public class KnowledgeController {
         if (ids == null) {
             throw new BizException(AppError.badRequest("请求参数不合法").withDetails("ids: 不能为空"));
         }
-        List<Knowledge> knowledges;
-        if (LogSanitizer.sanitize(kbId == null ? "" : kbId).isEmpty()) {
-            knowledges = knowledgeService.getKnowledgeBatchWithSharedAccess(callerTenant, ids);
-        } else {
-            String safeKbId = LogSanitizer.sanitize(kbId);
-            guards.batchAccessChecks(safeKbId);
-            knowledges = knowledgeService.getKnowledgeBatch(callerTenant, ids);
-            knowledges = knowledges.stream()
-                    .filter(k -> safeKbId.equals(k.getKnowledgeBaseId())).toList();
-        }
-        return ResponseEntity.ok(knowledges.stream().map(KnowledgeResponse::from).toList());
+        var knowledges = LogSanitizer.sanitize(kbId == null ? "" : kbId).isEmpty()
+                ? knowledgeService.getKnowledgeBatchWithSharedAccess(callerTenant, ids).stream()
+                        .map(KnowledgeResponse::from).toList()
+                : filteredKnowledgeBatch(callerTenant, ids, kbId);
+        return ResponseEntity.ok(knowledges);
     }
 
     /** {@code /stages} 与 {@code /spans} 两个路径同 handler（不透明 JSON 载荷）。 */
@@ -217,7 +208,7 @@ public class KnowledgeController {
             @RequestParam(value = "attempt", required = false) String attempt) {
         String safeId = requireKnowledgeId(id);
         guards.resolveKnowledgeByGuard(safeId, false);
-        Knowledge knowledge = knowledgeService.getKnowledge(safeId);
+        var knowledge = knowledgeService.getKnowledge(safeId);
         int requestedAttempt = 0;
         if (attempt != null && !attempt.trim().isEmpty()) {
             try {
@@ -237,16 +228,12 @@ public class KnowledgeController {
     public ResponseEntity<KnowledgeResponse> regenerateKnowledgeSummary(
             @PathVariable("id") String id) {
         String safeId = requireKnowledgeId(id);
-        Knowledge knowledge = guards.resolveKnowledgeByGuard(safeId, true);
-        Knowledge result;
-        if (knowledge.getSummaryStatus() == null || knowledge.getSummaryStatus().isEmpty()
-                || "none".equals(knowledge.getSummaryStatus())) {
-            result = knowledgeService.regenerateKnowledgeSummary(safeId);
-        } else {
-            knowledgeService.requestKnowledgeSummaryRefresh(safeId);
-            result = knowledgeService.getKnowledge(safeId);
-        }
-        return ResponseEntity.ok(KnowledgeResponse.from(result));
+        var knowledge = guards.resolveKnowledgeByGuard(safeId, true);
+        var result = knowledge.getSummaryStatus() == null || knowledge.getSummaryStatus().isEmpty()
+                || "none".equals(knowledge.getSummaryStatus())
+                ? KnowledgeResponse.from(knowledgeService.regenerateKnowledgeSummary(safeId))
+                : refreshAndReload(safeId);
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping("/knowledge/manual/{id}")
@@ -255,7 +242,7 @@ public class KnowledgeController {
             @Valid @NonNullBody @RequestBody UpdateManualRequest req) {
         String safeId = requireKnowledgeId(id);
         guards.resolveKnowledgeByGuard(safeId, true);
-        Knowledge k = knowledgeService.updateManualKnowledge(safeId,
+        var k = knowledgeService.updateManualKnowledge(safeId,
                 req.title(), req.content(), req.status(), req.channel());
         return ResponseEntity.ok(KnowledgeResponse.from(k));
     }
@@ -271,7 +258,7 @@ public class KnowledgeController {
             @RequestBody(required = false) JsonNode body) {
         String safeId = requireKnowledgeId(id);
         guards.resolveKnowledgeByGuard(safeId, true);
-        Knowledge k = knowledgeService.reparseKnowledge(safeId);
+        var k = knowledgeService.reparseKnowledge(safeId);
         return ResponseEntity.ok(KnowledgeResponse.from(k));
     }
 
@@ -281,7 +268,7 @@ public class KnowledgeController {
             @PathVariable("id") String id) {
         String safeId = requireKnowledgeId(id);
         guards.resolveKnowledgeByGuard(safeId, true);
-        Knowledge k = knowledgeService.cancelKnowledgeParse(safeId);
+        var k = knowledgeService.cancelKnowledgeParse(safeId);
         return ResponseEntity.ok(KnowledgeResponse.from(k));
     }
 
@@ -345,7 +332,7 @@ public class KnowledgeController {
         log.info("Start updating knowledge, ID: {}", id);
         String safeId = requireKnowledgeId(id);
         guards.resolveKnowledgeByGuard(safeId, true);
-        Knowledge k = knowledgeService.updateKnowledge(safeId, request);
+        var k = knowledgeService.updateKnowledge(safeId, request);
         return ResponseEntity.ok(KnowledgeResponse.from(k));
     }
 
@@ -382,6 +369,21 @@ public class KnowledgeController {
         }
         int count = knowledgeService.clearKnowledgeBaseContents(kbId);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(new ClearContentsResponse(count));
+    }
+
+    private List<KnowledgeResponse> filteredKnowledgeBatch(long tenant, List<String> ids,
+            String kbId) {
+        String safeKbId = LogSanitizer.sanitize(kbId);
+        guards.batchAccessChecks(safeKbId);
+        return knowledgeService.getKnowledgeBatch(tenant, ids).stream()
+                .filter(k -> safeKbId.equals(k.getKnowledgeBaseId()))
+                .map(KnowledgeResponse::from)
+                .toList();
+    }
+
+    private KnowledgeResponse refreshAndReload(String safeId) {
+        knowledgeService.requestKnowledgeSummaryRefresh(safeId);
+        return KnowledgeResponse.from(knowledgeService.getKnowledge(safeId));
     }
 
     private String requireKnowledgeId(String id) {

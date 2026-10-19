@@ -7,7 +7,7 @@ import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.contract.vectorstore.VectorStoreConnectivity;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.vectorstore.domain.EnvVectorStores;
+import com.ragagent.vectorstore.config.EnvVectorStores;
 import com.ragagent.vectorstore.domain.VectorStore;
 import com.ragagent.vectorstore.domain.VectorStoreEngines;
 import com.ragagent.vectorstore.mapper.VectorStoreRepository;

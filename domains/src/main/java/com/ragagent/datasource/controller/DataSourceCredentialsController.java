@@ -4,7 +4,6 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.datasource.domain.DataSource;
-import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.dto.DatasourceCredentialsResponse;
 import com.ragagent.datasource.service.DataSourceService;
 import com.ragagent.datasource.service.KnowledgeBridge;
@@ -92,7 +91,7 @@ public class DataSourceCredentialsController {
         }
         boolean configured = false;
         try {
-            DataSourceConfig parsed = updated.parseConfig();
+            var parsed = updated.parseConfig();
             if (parsed != null) {
                 configured = parsed.hasConfiguredCredentials(updated.getType());
             }

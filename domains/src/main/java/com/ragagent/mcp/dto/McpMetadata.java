@@ -1,5 +1,6 @@
-package com.ragagent.mcp.domain;
+package com.ragagent.mcp.dto;
 
+import com.ragagent.mcp.domain.McpTool;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,8 @@ import java.util.List;
  *       BaseMapper 方法，故 {@code McpMetadataMapper} **不继承 BaseMapper**，
  *       全部语句显式书写</li>
  *   <li>无 DeletedAt → 无软删除</li>
- *   <li>tools 列：{@code serializer:json;type:jsonb;not null} → {@link McpToolListTypeHandler}</li>
+ *   <li>tools 列：{@code serializer:json;type:jsonb;not null} →
+ *       {@link com.ragagent.mcp.domain.McpToolListTypeHandler}</li>
  *   <li>Stale 是派生字段，**不落库**</li>
  *   <li>synced_at 由调用方赋值（无自动时间戳）</li>
  * </ul>

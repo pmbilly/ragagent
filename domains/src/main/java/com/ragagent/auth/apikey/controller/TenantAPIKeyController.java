@@ -1,6 +1,5 @@
 package com.ragagent.auth.apikey.controller;
 
-import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.auth.apikey.dto.TenantAPIKeyProjections;
 import com.ragagent.auth.apikey.dto.TenantAPIKeyRequest;
 import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
@@ -87,7 +86,7 @@ public class TenantAPIKeyController {
     public ResponseEntity<List<TenantAPIKeyResponse>> list(@PathVariable("id") String rawId) {
         long tenantId = parseWorkspaceIdOrBadRequest(rawId);
         List<TenantAPIKeyResponse> data = new ArrayList<>();
-        for (TenantAPIKey key : apiKeyService.listByTenant(tenantId)) {
+        for (var key : apiKeyService.listByTenant(tenantId)) {
             data.add(TenantAPIKeyProjections.from(key));
         }
         return ResponseEntity.ok(data);
@@ -160,16 +159,16 @@ public class TenantAPIKeyController {
             expiresAt = Instant.ofEpochSecond(req.expiresAtUnix()).atOffset(ZoneOffset.UTC);
         }
 
-        TenantAPIKey updated;
         try {
-            updated = apiKeyService.update(new TenantAPIKeyService.TenantAPIKeyServiceUpdateRequest(
-                    tenantId, keyId, req.name(), req.fullAccess(),
-                    req.knowledgeBaseIds(), req.capabilities(), expiresAt));
+            var updated = apiKeyService.update(
+                    new TenantAPIKeyService.TenantAPIKeyServiceUpdateRequest(
+                            tenantId, keyId, req.name(), req.fullAccess(),
+                            req.knowledgeBaseIds(), req.capabilities(), expiresAt));
+            return ResponseEntity.ok(TenantAPIKeyProjections.from(updated));
         } catch (RuntimeException e) {
             // 任何服务层错误都落到 404（含 TenantAPIKeyNotFoundException）
             throw new BizException(AppError.notFound("API key not found"));
         }
-        return ResponseEntity.ok(TenantAPIKeyProjections.from(updated));
     }
 
     // ── 删除（软撤销） ──

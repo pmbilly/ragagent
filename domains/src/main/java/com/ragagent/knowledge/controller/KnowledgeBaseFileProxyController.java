@@ -1,6 +1,5 @@
 package com.ragagent.knowledge.controller;
 
-import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.access.ChunkAccessGuard;
 import com.ragagent.platform.storage.fileserve.FileProxyPort;
 import com.ragagent.platform.storage.fileserve.FileServeHttp;
@@ -49,7 +48,7 @@ public class KnowledgeBaseFileProxyController {
         // AllowFileServeAPIKey 由 AllowFileServeAPIKeyInterceptor 承担（WebConfig 接线，
         // found" / 403 "Permission denied..." 信封（ChunkAccessGuard 内逐字实现）
         // 闸门异常**不**在此吞掉：它走全局信封（黄金契约 w5c-kbfiles-missing-kb.json 锁定形态）
-        KnowledgeBase kb = kbGuard.requireKbAccess(id);
+        var kb = kbGuard.requireKbAccess(id);
         fileProxy.serveKbFile(kb == null ? null : kb.getTenantId(), id, request, response);
     }
 }

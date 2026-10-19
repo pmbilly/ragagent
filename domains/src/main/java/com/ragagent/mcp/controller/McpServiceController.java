@@ -5,11 +5,10 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.mcp.domain.McpMetadata;
-import com.ragagent.mcp.domain.McpService;
-import com.ragagent.mcp.domain.McpToolApproval;
+import com.ragagent.mcp.dto.McpMetadata;
 import com.ragagent.mcp.dto.McpServiceCreateRequest;
 import com.ragagent.mcp.dto.McpToolApprovalPolicyRequest;
+import com.ragagent.mcp.dto.McpToolApprovalResponse;
 import com.ragagent.mcp.dto.RoleVisibility;
 import com.ragagent.mcp.service.McpMetadataException;
 import com.ragagent.mcp.service.McpMetadataService;
@@ -170,14 +169,9 @@ public class McpServiceController {
         // 这两处直接抛业务异常后返回，不经过 mcpMetadataAppError。
         // 若把它们放进 try，自己抛出的 403 会被 default 分支改写成 400。
         if (refresh) {
-            McpService service;
-            try {
-                service = mcpServiceService.getMCPServiceByID(tenant, serviceId);
-            } catch (RuntimeException e) {
-                log.error("MCP metadata refresh: service lookup failed, service_id={}", serviceId, e);
-                throw McpMetadataException.serviceNotFound();
-            }
-            if (!isOAuth(service) && !mayWriteSharedMCPMetadata()) {
+            var service = mcpServiceService.getMCPServiceByID(tenant, serviceId);
+            if ((service.getAuthConfig() == null || !service.getAuthConfig().isOAuth())
+                    && !mayWriteSharedMCPMetadata()) {
                 throw BizException.forbidden(
                         "Refreshing a shared MCP directory requires an administrator");
             }
@@ -245,12 +239,6 @@ public class McpServiceController {
         return usageOps.generateMCPUsageInstructions(id, body);
     }
 
-    /** 薄委托：见 {@link McpUsageInstructionsOps#buildMCPUsageInput}。 */
-    static String buildMCPUsageInput(McpService service, McpMetadata snapshot,
-                                     List<McpToolApproval> policies) {
-        return McpUsageInstructionsOps.buildMCPUsageInput(service, snapshot, policies);
-    }
-
     /** 薄委托：见 {@link McpUsageInstructionsOps#mcpUsageExcerpt}。 */
     static String mcpUsageExcerpt(String value, int limit) {
         return McpUsageInstructionsOps.mcpUsageExcerpt(value, limit);
@@ -263,9 +251,10 @@ public class McpServiceController {
     public ResponseEntity<?> listMCPToolApprovals(@PathVariable("id") String id) {
         long tenantId = requireTenant();
         String serviceId = sanitize(id);
-        List<McpToolApproval> rows;
+        List<McpToolApprovalResponse> out;
         try {
-            rows = mcpToolApprovalService.listByService(tenantId, serviceId);
+            out = mcpToolApprovalService.listByService(tenantId, serviceId).stream()
+                    .map(McpToolApprovalResponse::from).toList();
         } catch (RuntimeException e) {
             // 区分"服务不存在"与内部错误，让客户端拿到准确状态码而不是一概 404
             if (isNotFound(e)) {
@@ -275,7 +264,7 @@ public class McpServiceController {
             throw BizException.internal(rawMessage(e));
         }
         // 列表返回裸数组（不再是 {data:[...],success:true}）
-        return ResponseEntity.ok(rows);
+        return ResponseEntity.ok(out);
     }
 
     /**
@@ -326,10 +315,6 @@ public class McpServiceController {
 
     static boolean canViewIntegrationSecrets() {
         return RoleVisibility.canViewIntegrationSecrets();
-    }
-
-    private static boolean isOAuth(McpService service) {
-        return service.getAuthConfig() != null && service.getAuthConfig().isOAuth();
     }
 
     /** 取业务文案而非包装串 */

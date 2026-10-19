@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.ragagent.TestSchema;
-import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpMetadataSummary;
 import com.ragagent.mcp.domain.McpTool;
+import com.ragagent.mcp.dto.McpMetadata;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;

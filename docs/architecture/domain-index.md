@@ -10,9 +10,9 @@
 | 种类 | 域数 | 文件 | 控制器 | 说明 |
 |---|---:|---:|---:|---|
 | **产品能力** | 8 | 798 | 23 | 直接产生用户价值、按产品需求演进的业务能力。 |
-| **集成适配** | 6 | 502 | 14 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
+| **集成适配** | 6 | 503 | 14 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
 | **控制面** | 4 | 148 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
-| **能力配置** | 2 | 49 | 4 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
+| **能力配置** | 2 | 50 | 4 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
 | **初始化向导** | 1 | 13 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
 | **策略库** | 1 | 7 | 0 | 无 HTTP、无持久化的纯策略/判定逻辑。 |
 
@@ -29,7 +29,7 @@
 | `agentmanagement` | 产品能力 | 24 | 3 | — | `views/agent` |
 | `favorite` | 产品能力 | 9 | 1 | — | `views/agent · views/knowledge（列表置顶/收藏）` |
 | `datasource` | 集成适配 | 143 | 2 | — | `views/knowledge/settings/DataSourceSettings.vue` |
-| `mcp` | 集成适配 | 141 | 4 | 2 | `views/settings/McpSettings.vue` |
+| `mcp` | 集成适配 | 142 | 4 | 2 | `views/settings/McpSettings.vue` |
 | `im` | 集成适配 | 94 | 2 | — | `views/integrations/IntegrationSettingsSection.vue` |
 | `storage` | 集成适配 | 53 | 2 | 5 | `views/settings/StorageBackendSettings.vue` |
 | `websearch` | 集成适配 | 49 | 3 | 2 | `views/settings/WebSearchSettings.vue` |
@@ -39,7 +39,7 @@
 | `system` | 控制面 | 16 | 2 | 1 | `views/system` |
 | `tenant` | 控制面 | 10 | — | 1 | `views/settings/TenantInfo.vue` |
 | `model` | 能力配置 | 32 | 3 | 2 | `views/settings/ModelSettings.vue` |
-| `vectorstore` | 能力配置 | 17 | 1 | — | `views/settings/VectorStoreSettings.vue` |
+| `vectorstore` | 能力配置 | 18 | 1 | — | `views/settings/VectorStoreSettings.vue` |
 | `initialization` | 初始化向导 | 13 | 1 | — | `views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue` |
 | `approval` | 策略库 | 7 | — | — | `views/chat/components/ToolApprovalCard.vue` |
 

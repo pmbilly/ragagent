@@ -1,27 +1,19 @@
 {
   "note": "C10a 控制器领域实体导入基线：只许降；新增控制器/新增 import 即红。迁移到读模型/契约视图后跑 --write 收紧。",
   "files": {
-    "com/ragagent/auth/apikey/controller/TenantAPIKeyController.java": 1,
     "com/ragagent/auth/controller/AuthController.java": 2,
     "com/ragagent/auth/controller/TenantInvitationController.java": 3,
     "com/ragagent/auth/controller/TenantMemberController.java": 2,
-    "com/ragagent/datasource/controller/DataSourceCredentialsController.java": 2,
+    "com/ragagent/datasource/controller/DataSourceCredentialsController.java": 1,
     "com/ragagent/embedchannel/controller/EmbedChannelController.java": 1,
     "com/ragagent/favorite/controller/UserFavoriteController.java": 1,
     "com/ragagent/im/controller/ImCallbackController.java": 1,
     "com/ragagent/im/controller/ImChannelController.java": 1,
-    "com/ragagent/knowledge/controller/FaqController.java": 1,
-    "com/ragagent/knowledge/controller/KnowledgeBaseController.java": 2,
-    "com/ragagent/knowledge/controller/KnowledgeBaseFileProxyController.java": 1,
-    "com/ragagent/knowledge/controller/KnowledgeController.java": 1,
-    "com/ragagent/knowledge/controller/KnowledgeTagController.java": 1,
+    "com/ragagent/knowledge/controller/KnowledgeBaseController.java": 1,
     "com/ragagent/mcp/controller/McpCredentialsController.java": 1,
-    "com/ragagent/mcp/controller/McpServiceController.java": 3,
-    "com/ragagent/session/controller/MessageFileProxyController.java": 1,
     "com/ragagent/session/controller/MessageSuggestionController.java": 1,
-    "com/ragagent/session/controller/SteerController.java": 1,
     "com/ragagent/storage/controller/StorageBackendController.java": 1,
     "com/ragagent/system/controller/SystemAdminController.java": 1,
-    "com/ragagent/vectorstore/controller/VectorStoreController.java": 2
+    "com/ragagent/vectorstore/controller/VectorStoreController.java": 1
   }
 }

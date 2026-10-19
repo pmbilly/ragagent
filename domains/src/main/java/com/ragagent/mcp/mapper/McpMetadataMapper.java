@@ -1,8 +1,8 @@
 package com.ragagent.mcp.mapper;
 
-import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpMetadataSummary;
 import com.ragagent.mcp.domain.McpToolListTypeHandler;
+import com.ragagent.mcp.dto.McpMetadata;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.apache.ibatis.annotations.Insert;
