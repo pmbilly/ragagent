@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.contract.model.ChatResponse;
+import com.ragagent.memory.domain.MemoryExtractPayload;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.domain.item.MemoryItem;

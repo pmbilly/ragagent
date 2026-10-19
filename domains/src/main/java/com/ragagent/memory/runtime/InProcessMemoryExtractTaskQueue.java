@@ -1,5 +1,8 @@
-package com.ragagent.memory.service;
+package com.ragagent.memory.runtime;
 
+import com.ragagent.memory.domain.MemoryExtractHandler;
+import com.ragagent.memory.domain.MemoryExtractPayload;
+import com.ragagent.memory.domain.MemoryExtractTaskQueue;
 import com.ragagent.platform.task.InProcessTaskQueue;
 import com.ragagent.platform.task.RetryPolicy;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
@@ -28,10 +31,10 @@ public class InProcessMemoryExtractTaskQueue implements MemoryExtractTaskQueue {
     /** 任务类型，也是任务观测的 span/根名。 */
     static final String TASK_TYPE_MEMORY_EXTRACT = "memory:extract";
 
-    private final ObjectProvider<MemoryExtractionService> handlerProvider;
+    private final ObjectProvider<MemoryExtractHandler> handlerProvider;
     private final InProcessTaskQueue queue;
 
-    public InProcessMemoryExtractTaskQueue(ObjectProvider<MemoryExtractionService> handlerProvider) {
+    public InProcessMemoryExtractTaskQueue(ObjectProvider<MemoryExtractHandler> handlerProvider) {
         this.handlerProvider = handlerProvider;
         this.queue = new InProcessTaskQueue("memory-extract", new RetryPolicy(MAX_RETRY), this::run);
     }
@@ -54,7 +57,7 @@ public class InProcessMemoryExtractTaskQueue implements MemoryExtractTaskQueue {
     }
 
     private void run(String body, boolean finalAttempt) {
-        MemoryExtractionService handler = handlerProvider.getIfAvailable();
+        MemoryExtractHandler handler = handlerProvider.getIfAvailable();
         if (handler == null) {
             log.warn("memory: no extraction handler bean, dropping task");
             return;

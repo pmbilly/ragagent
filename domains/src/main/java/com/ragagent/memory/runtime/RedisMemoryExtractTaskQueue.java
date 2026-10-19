@@ -1,5 +1,8 @@
-package com.ragagent.memory.service;
+package com.ragagent.memory.runtime;
 
+import com.ragagent.memory.domain.MemoryExtractHandler;
+import com.ragagent.memory.domain.MemoryExtractPayload;
+import com.ragagent.memory.domain.MemoryExtractTaskQueue;
 import com.ragagent.platform.task.RedisRetryingTaskQueue;
 import com.ragagent.platform.task.RetryPolicy;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
@@ -33,10 +36,10 @@ public class RedisMemoryExtractTaskQueue implements MemoryExtractTaskQueue {
     private static final String KEY_PREFIX = "memory:task:extract";
 
     private final RedisRetryingTaskQueue queue;
-    private final ObjectProvider<MemoryExtractionService> handlerProvider;
+    private final ObjectProvider<MemoryExtractHandler> handlerProvider;
 
     public RedisMemoryExtractTaskQueue(StringRedisTemplate template,
-            ObjectProvider<MemoryExtractionService> handlerProvider) {
+            ObjectProvider<MemoryExtractHandler> handlerProvider) {
         this.handlerProvider = handlerProvider;
         this.queue = new RedisRetryingTaskQueue(
                 template,
@@ -68,7 +71,7 @@ public class RedisMemoryExtractTaskQueue implements MemoryExtractTaskQueue {
     }
 
     private void run(String body, boolean finalAttempt) {
-        MemoryExtractionService handler = handlerProvider.getIfAvailable();
+        MemoryExtractHandler handler = handlerProvider.getIfAvailable();
         if (handler == null) {
             log.warn("memory: no extraction handler bean, dropping task");
             return;

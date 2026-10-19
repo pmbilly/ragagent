@@ -1,5 +1,7 @@
-package com.ragagent.memory.service;
+package com.ragagent.memory.runtime;
 
+import com.ragagent.memory.domain.MemoryExtractHandler;
+import com.ragagent.memory.domain.MemoryExtractTaskQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -39,7 +41,7 @@ public class MemoryTaskQueueWiring {
     @Bean
     @Primary
     public MemoryExtractTaskQueue redisMemoryExtractTaskQueue(StringRedisTemplate template,
-            ObjectProvider<MemoryExtractionService> handlerProvider) {
+            ObjectProvider<MemoryExtractHandler> handlerProvider) {
         return new RedisMemoryExtractTaskQueue(template, handlerProvider);
     }
 }

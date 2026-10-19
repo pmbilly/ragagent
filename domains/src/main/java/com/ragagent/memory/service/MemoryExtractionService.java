@@ -4,6 +4,9 @@ import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.contract.memory.MemoryMessageCursor;
+import com.ragagent.memory.domain.MemoryExtractHandler;
+import com.ragagent.memory.domain.MemoryExtractPayload;
+import com.ragagent.memory.domain.MemoryExtractTaskQueue;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
 import com.ragagent.memory.domain.MemoryExtractionSession;
@@ -14,9 +17,9 @@ import com.ragagent.memory.domain.item.MemoryTombstone;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.repository.MemoryRepository;
+import com.ragagent.memory.runtime.MemoryTrace;
 import com.ragagent.memory.support.MemoryConflictException;
 import com.ragagent.platform.access.TenantScopes;
-import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.session.repository.MessageRepository;
@@ -54,7 +57,7 @@ import tools.jackson.databind.ObjectMapper;
  * </ol>
  */
 @Component
-public class MemoryExtractionService {
+public class MemoryExtractionService implements MemoryExtractHandler {
 
     private static final Logger log = LoggerFactory.getLogger(MemoryExtractionService.class);
 
@@ -222,7 +225,7 @@ public class MemoryExtractionService {
         MemoryExtractPayload payload = MemoryExtractPayload.withTracing(
                 scope.tenantId(), scope.subjectId(),
                 sessionId, messageId, chatModelId, "",
-                LangfuseTracing.inject());
+                MemoryTrace.inject());
         try {
             queue.enqueue(payload, delay);
         } catch (RuntimeException e) {

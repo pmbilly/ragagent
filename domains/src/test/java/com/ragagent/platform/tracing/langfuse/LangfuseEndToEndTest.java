@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.memory.service.MemoryTrace;
+import com.ragagent.memory.runtime.MemoryTrace;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TracingContext;
 import com.sun.net.httpserver.HttpServer;

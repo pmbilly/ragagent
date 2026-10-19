@@ -9,6 +9,7 @@ import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
+import com.ragagent.memory.runtime.MemoryTrace;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;

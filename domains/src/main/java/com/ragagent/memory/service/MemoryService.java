@@ -10,6 +10,7 @@ import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.memory.MemoryContext;
 import com.ragagent.memory.config.MemorySettings;
+import com.ragagent.memory.domain.MemoryExtractPayload;
 import com.ragagent.memory.domain.MemoryRender;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryTopicStat;

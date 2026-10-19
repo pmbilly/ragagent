@@ -5,6 +5,7 @@ import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.vector.MemoryVectorHit;
+import com.ragagent.memory.runtime.MemoryTrace;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

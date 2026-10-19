@@ -1,4 +1,4 @@
-package com.ragagent.memory.service;
+package com.ragagent.memory.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

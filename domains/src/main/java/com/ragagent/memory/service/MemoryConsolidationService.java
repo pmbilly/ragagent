@@ -6,6 +6,7 @@ import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.model.ChatOptions;
 import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.memory.domain.MemoryExtractPayload;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.scope.MemoryScope;

@@ -7,7 +7,7 @@ import com.ragagent.datasource.domain.DataSourceSyncPayload;
 import com.ragagent.datasource.domain.TaskInitiator;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
-import com.ragagent.memory.service.MemoryExtractPayload;
+import com.ragagent.memory.domain.MemoryExtractPayload;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.domain.ingest.WikiIngestPayload;
 import java.util.List;

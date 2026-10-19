@@ -1,4 +1,4 @@
-package com.ragagent.memory.service;
+package com.ragagent.memory.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -8,6 +8,9 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.memory.domain.MemoryExtractHandler;
+import com.ragagent.memory.domain.MemoryExtractPayload;
+import com.ragagent.memory.service.MemoryExtractionService;
 import com.ragagent.platform.stream.EmbeddedRedis;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -50,9 +53,9 @@ class RedisMemoryExtractTaskQueueTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static ObjectProvider<MemoryExtractionService> handlerProvider(
+    private static ObjectProvider<MemoryExtractHandler> handlerProvider(
             MemoryExtractionService handler) {
-        ObjectProvider<MemoryExtractionService> p = mock(ObjectProvider.class);
+        ObjectProvider<MemoryExtractHandler> p = mock(ObjectProvider.class);
         when(p.getIfAvailable()).thenReturn(handler);
         return p;
     }

@@ -93,7 +93,7 @@ FROZEN_PREFIXES = (
     'contract/tool/ToolResult',
     'llm/', 'modelruntime/', 'platform/tenant', 'contract/tenant/ParserEngineConfig',
     'contract/retrieval/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
-    'memory/service/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
+    'memory/domain/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
     'platform/tracing/langfuse', 'platform/tracing/decorators', 'retrieval/engine/doris', 'websearch/ImageInfo',
     # R4a 换锚：6 个 Langfuse 装饰器（tracing/decorators → platform/tracing/decorators）——包名带上了
     # platform 前缀，模块相对路径随之变化（与上一行同族；三件流句柄迁 platform/stream 无蛇键，不入册）。
@@ -177,7 +177,7 @@ BASELINE: dict[str, set[str]] = {
     # memory 观测/追踪载荷（非契约）
     'memory/service/MemoryRecallSelector.java': {'outside_pool', 'skip_reason'},
     # memory 观测/追踪载荷（非契约）
-    'memory/service/MemoryTrace.java': {'conditioned_items', 'document_count', 'interest_count', 'recalled_items', 'recalled_items_truncated'},
+    'memory/runtime/MemoryTrace.java': {'conditioned_items', 'document_count', 'interest_count', 'recalled_items', 'recalled_items_truncated'},
     # WeKnora Cloud 第三方 API
     # Cypher 字段
     'retrieval/graph/Neo4jGraphRepository.java': {'knowledge_id', 'source_labels', 'target_labels'},

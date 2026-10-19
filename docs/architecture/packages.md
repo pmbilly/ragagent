@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-354 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+355 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -208,6 +208,7 @@
 | `:domains` | `com.ragagent.memory.dto` | 记忆模块对外 HTTP 响应/请求的 DTO。 |
 | `:domains` | `com.ragagent.memory.mapper` | 记忆 · 映射：MemoryExtractionSessionMapper / MemoryItemEmbeddingMapper / MemoryDocAffinityMapper…。 |
 | `:domains` | `com.ragagent.memory.repository` | 仓储门面层：记忆域的持久化门面与其协作者。 |
+| `:domains` | `com.ragagent.memory.runtime` | 长期记忆运行面：langfuse 观测门面、蒸馏队列的进程内/Redis 实现与装配。 |
 | `:domains` | `com.ragagent.memory.service` | 记忆 · 服务：MemoryConsolidationService / MemoryExtractionService / MemoryVectorService…。 |
 | `:domains` | `com.ragagent.memory.support` | 记忆 · 支撑类型：冲突异常等跨层共享但不属于实体的词汇。 |
 | `:domains` | `com.ragagent.model` | 模型配置域：模型条目 CRUD、凭据子资源与调试面（embedding 原始响应等）。 |

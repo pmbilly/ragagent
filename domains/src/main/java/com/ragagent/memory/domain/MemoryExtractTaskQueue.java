@@ -1,4 +1,4 @@
-package com.ragagent.memory.service;
+package com.ragagent.memory.domain;
 
 import java.time.Duration;
 

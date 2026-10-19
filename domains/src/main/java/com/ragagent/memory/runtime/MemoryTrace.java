@@ -1,9 +1,11 @@
-package com.ragagent.memory.service;
+package com.ragagent.memory.runtime;
 
 
 import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.platform.access.TracingContext;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,6 +36,11 @@ public final class MemoryTrace {
                 .startSpan(new LangfuseManager.SpanOptions(
                         name, input, null));
         return new Span(name, input, inner);
+    }
+
+    /** 当前 trace 上下文（任务载荷携带用；未启用时返回空载体）。 */
+    public static TracingContext inject() {
+        return LangfuseTracing.inject();
     }
 
     /** 真 span 的薄包装（保留 name/input 访问器供调用点/测试用）。 */

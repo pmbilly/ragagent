@@ -20,6 +20,8 @@ import com.ragagent.contract.model.ChatOptions;
 import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.ChatStream;
 import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.memory.domain.MemoryExtractPayload;
+import com.ragagent.memory.domain.MemoryExtractTaskQueue;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
 import com.ragagent.memory.domain.MemoryExtractionSession;
