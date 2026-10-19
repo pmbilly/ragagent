@@ -226,7 +226,10 @@ public class AuthController {
         try {
             var user = userService.register(
                     username, email, req.password(), resolveDefaultTenantMode());
-            return ResponseEntity.status(201).body(user);
+            // 返回投影而非实体：passwordHash 不再依赖 @JsonIgnore 兜底，
+            // 形状与 /auth/me 一致（UserInfo）
+            return ResponseEntity.status(201)
+                    .body(UserInfo.from(user, user.isCanAccessAllTenants()));
         } catch (UserService.RegistrationException e) {
             throw new BizException(AppError.badRequest(e.getMessage()));
         }

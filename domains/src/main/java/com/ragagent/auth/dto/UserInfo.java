@@ -6,7 +6,7 @@ import java.time.OffsetDateTime;
 
 /**
  * 用户信息投影。
- * 用于 GET /auth/validate 与 GET /auth/me 的 user 字段。
+ * 用于 POST /auth/register 的响应体，以及 GET /auth/validate 与 GET /auth/me 的 user 字段。
  *
  * 与 User 实体序列化的差别：**没有 deleted_at 字段**。
  * avatar 恒输出（零值 ""）；tenant_id 恒输出（零值 0）；
