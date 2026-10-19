@@ -99,7 +99,7 @@
 
 | 批 | 内容 | 状态 |
 |---|---|---|
-| **H0** | 判据先行：端口准入 / 契约形状预算 / 平台依赖面三条守卫 + 业务能力映射一页纸 | 待做 |
+| **H0** | 判据先行：端口准入 / 契约形状预算 / 平台依赖面三条守卫 + 业务能力映射一页纸 | ✅ 2026-10-20 |
 | **H1** | 问答 `TurnLifecycle`（收 2 个轮询 + 3 把锁） | 待做 |
 | **H2a** | 问答运行时段：抽 `TurnRuntime`（3 字段） | 待做 |
 | **H2b** | 问答请求段：`TurnInputView`（41 字段只读）+ `QaRequestContext` 收口 | 待做 |
@@ -213,7 +213,9 @@ boot           14 件                      →  boot
 | `check-exception-semantics.py` | 检索引擎 catch 不得清空边界条件 | 0 |
 | `check-package-dirs.py` | 包声明 ↔ 目录一致（含 testFixtures） | 0 |
 | `check-module-graph.py` | 主码依赖矩阵 · 同包 · 测试边登记 · 测试错位登记 · 夹具包 | 登记表（只许减） |
-| `check-platform-shapes.py` | platform 业务形状红旗 | `platform-shapes.baseline.json` |
+| `check-platform-shapes.py` | platform 业务形状（业务词包 / 业务词文件 / 红旗命名三档） | `platform-shapes.baseline.json`（16 条） |
+| `check-contract-shape.py` | R1/R2 契约形状预算（端口 ≤7 方法 / 行视图禁入 / 字段 ≤20） | `contract-shape.baseline.json`（22 条，只许减） |
+| `check-port-budget.py` | R1 端口准入（域内 / 无实现端口 = 0） | `port-budget.baseline.json`（空） |
 | `gen-arch-index.py --check` | `package-info` 与 `docs/architecture/packages.md` 同步 | 硬零 |
 | `check-tenant-scope.py` | 跨线程身份必须走 `TenantScope`；禁止裸 capture/replay | 硬零 |
 | `check-log-exceptions.py` | log 里禁止 `Throwable.toString()` / `.getMessage()` | 硬零 |
@@ -400,6 +402,7 @@ boot           14 件                      →  boot
 | OC-4 | 2026-10-19 | **OCR 阅读顺序与分段**：行内容差（2% 页高）视为同一行，行内按 x 从左到右（不再严格按 y1 排序）；块级同样按「行容差 + 行内 x」排序；行与行、列与列统一用空行分隔。 | **40 守卫全绿** · 真机：四列页同一行英文名按 CAMRY/HIGH/SIENNA 从左到右；4-1 重解析 37 块 / 13906 字 |
 | OC-5 | 2026-10-19 | **OCR 分段收敛**：空行只加在列组/行块之间，列内各行恢复单换行——OC-4 的逐行空行会让分块被 `\n\n` 切碎（37 块）。阅读顺序与列合并逻辑不变。 | **40 守卫全绿** · 4-1 重解析 34 块 / 13751 字 |
 | G1 | 2026-10-20 | **SSE 终态收口**：`QaSseOrchestrator.handleAgentEventsForSSE` 与 `SessionStreamController` 续传循环认 `ERROR+done` 终态（不再 100ms 空转）；两条轮询各加 2h 存活上限；title 等待加 50ms sleep 消忙转。新增红态测试 2 例（旧行为下 2/2 失败）。 | **40 守卫全绿** · **5008 / 0 / 4** · spotlessCheck build 1m47s · 冒烟 sessions/knowledge-bases/models 200 |
+| H0 | 2026-10-20 | **判据先行**：新增 `check-contract-shape.py`（端口 ≤7 / `*RowView`·`*PageView` 禁入 / 字段 ≤20；22 条基线）+ `check-port-budget.py`（域内/无实现端口 = 0；空基线）；`check-platform-shapes.py` 换血为"业务词包 / 业务词文件 / 红旗命名"三档（16 条基线）；新增 `docs/architecture/business-capability-map.md`（六条链路 → 入口/编排/落点）。三条守卫各验红态探针。 | **42 守卫全绿** · guards 1 轮 |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

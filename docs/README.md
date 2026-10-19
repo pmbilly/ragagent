@@ -17,6 +17,8 @@
 
 查表：[`architecture/packages.md`](architecture/packages.md) —— 352 份 `package-info` 的包索引（由脚本生成，勿手改）。
 
+按业务链路查：[`architecture/business-capability-map.md`](architecture/business-capability-map.md) —— 六条链路（知识生产 / 问答 / Agent / 渠道 / 配置 / 初始化）→ 入口、编排、落点。
+
 先看模块：[`architecture/module-package-map.md`](architecture/module-package-map.md) —— 7 个模块的包根、20 个业务域的包/控制器数量（由脚本生成，勿手改）。
 
 先看业务分类：[`architecture/domain-index.md`](architecture/domain-index.md) —— 20 个域按 6 类能力组织，含入口、契约面与前端页面（由脚本生成，勿手改）。

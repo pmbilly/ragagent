@@ -1,0 +1,73 @@
+{
+  "note": "R1/R2 契约形状预算的存量债务。端口方法数只能降；行视图条目只能删；字段数只能降。新增条目必须先处置（拆窄/回域/收窄），不得直接登记。治理批次：H6。",
+  "ports": {
+    "KnowledgeCatalogPort": {
+      "methods": 34,
+      "reason": "knowledge 域门面倒灌（读/写/分块四段）；H6 拆成 ≤3 个窄端口或回域"
+    },
+    "SkillCatalogPort": {
+      "methods": 14,
+      "reason": "agent 技能目录（列表/查找/增删改/引用/指令）；H6 拆窄"
+    },
+    "WikiPageOpsPort": {
+      "methods": 13,
+      "reason": "wiki 页面操作门面；H6 拆窄"
+    },
+    "ProviderFileStorePort": {
+      "methods": 10,
+      "reason": "文件存储提供者能力面；H6 评估是否按读写拆"
+    },
+    "ModelCatalogPort": {
+      "methods": 9,
+      "reason": "模型目录（跨模块必要端口）；方法数略超，H6 评估"
+    }
+  },
+  "rows": {
+    "com/ragagent/contract/knowledge/ChunkRowView.java": "持久层行投影（分块表），应回 knowledge 域；H6",
+    "com/ragagent/contract/knowledge/KnowledgeRowView.java": "持久层行投影（知识表），应回 knowledge 域；H6",
+    "com/ragagent/contract/knowledge/KnowledgeBaseRowView.java": "持久层行投影（知识库表），应回 knowledge 域；H6",
+    "com/ragagent/contract/tenant/TenantRowView.java": "持久层行投影（租户表），应回 auth 域；H6",
+    "com/ragagent/contract/wiki/WikiPageView.java": "wiki 页面视图，应回 wiki 域；H6",
+    "com/ragagent/contract/knowledge/ChunkPageView.java": "分页壳，H6 统一 PageView 后回域",
+    "com/ragagent/contract/knowledge/FaqEntryPageView.java": "分页壳，H6 统一 PageView 后回域",
+    "com/ragagent/contract/knowledge/KnowledgePageView.java": "分页壳，H6 统一 PageView 后回域"
+  },
+  "fields": {
+    "com/ragagent/contract/knowledge/ChunkRowView.java": {
+      "fields": 30,
+      "reason": "持久层行，字段≈表列；H6 回域"
+    },
+    "com/ragagent/contract/knowledge/KnowledgeRowView.java": {
+      "fields": 30,
+      "reason": "持久层行，字段≈表列；H6 回域"
+    },
+    "com/ragagent/contract/knowledge/KnowledgeBaseResponse.java": {
+      "fields": 32,
+      "reason": "HTTP 响应载体（控制器直接用）；H6 回 knowledge/dto"
+    },
+    "com/ragagent/contract/retrieval/SearchResult.java": {
+      "fields": 25,
+      "reason": "检索命中元数据（跨模块消费）；H6 评估拆分"
+    },
+    "com/ragagent/contract/session/MessageView.java": {
+      "fields": 26,
+      "reason": "会话读模型（跨域消费）；H6 评估拆分"
+    },
+    "com/ragagent/contract/tenant/ParserEngineConfig.java": {
+      "fields": 27,
+      "reason": "解析引擎配置载体（配置项枚举）；H6 评估分组"
+    },
+    "com/ragagent/contract/tenant/StorageEngineConfig.java": {
+      "fields": 63,
+      "reason": "多厂商存储配置平铺；H6 按厂商拆"
+    },
+    "com/ragagent/contract/tenant/TenantRowView.java": {
+      "fields": 21,
+      "reason": "租户行投影；H6 回 auth 域"
+    },
+    "com/ragagent/contract/wiki/WikiPageView.java": {
+      "fields": 27,
+      "reason": "wiki 页面视图；H6 回域"
+    }
+  }
+}

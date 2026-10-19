@@ -108,7 +108,7 @@ boot（组合根，唯一装配点）
 | 规则 | 内容 | 守卫 |
 |---|---|---|
 | **R1 端口准入** | 分两档：① **跨模块 Port**——必须有 ≥2 实现、或有替换场景、或该能力是模块间唯一合法通道；② **域间 Port（同模块）**——受 R10 约束可保留，但必须"窄"：≤7 方法、只吃契约形状、不退化成域门面；单实现单调用且 ≤2 方法的退回域内 `api` 包，不占 contract | 扩 `gen-port-map.py` 三列；新增 `check-port-budget.py` |
-| **R2 形状预算** | 契约类字段 ≤12；Port ≤7 方法；分页统一 `PageView<T>`；`*RowView` 禁入契约 | 新增 `check-contract-shape.py`（红态探针） |
+| **R2 形状预算** | 契约类字段 ≤20（先卡明显膨胀，H6 后收紧到 12）；Port ≤7 方法；分页统一 `PageView<T>`；`*RowView` 禁入契约 | 新增 `check-contract-shape.py`（红态探针） |
 | **R3 平台判据** | platform 不得 import `contract.<业务域>`；不得出现域词汇（知识/分块/会话/模型/渠道） | 换血 `check-platform-shapes.py`：从"后缀"改为"依赖面 + 词汇表" |
 | **R4 链路单一入口** | 每条链路一个 orchestration 入口；第二编排层不得 import `controller/` | 目录规则 + 文档断言 |
 | **R5 横切唯一** | 任务/事件/推流/分页/软删/租户/限流 各一套实现 | 每个横切一张只许减的登记表 |
@@ -133,7 +133,7 @@ boot（组合根，唯一装配点）
 
 | 批 | 内容 | 估时 | 验收 |
 |---|---|---|---|
-| **H0 判据先行** | R1~R3 三条守卫（各配红态探针）+ `business-capability-map.md`（业务链路 → 模块/包/类，一页纸）；R4/R5 的登记表随 H1/H4/H5 落地 | 1-1.5 人日 | 3 守卫绿；新增 Port / 形状 / 平台业务件即红 |
+| **H0 判据先行** ✅ | R1~R3 三条守卫（各配红态探针）+ `business-capability-map.md`（业务链路 → 模块/包/类，一页纸）；R4/R5 的登记表随 H1/H4/H5 落地 | ✅ 2026-10-20 | **42 守卫绿**；新增 Port / 形状 / 平台业务件即红；基线 22 + 16 + 0 条 |
 | **H1 问答-状态机** | 建 `TurnLifecycle`，把 `QaSseOrchestrator` 的 stop watcher + agent 轮询 + 3 把锁收进一个状态机；行为不变（golden + 契约测试锁定） | 2-3 人日 | 两个轮询合一；`QaSseOrchestrator` 不再 import `controller.sse`；会话/SSE 契约测试全绿 |
 | **H2a 问答-运行时段** | 抽 `TurnRuntime`（`eventBus`/`messageId`/`userMessageId`）；`ChatManage` 不再持有运行时字段 | 1-1.5 人日 | `cloneChatManage` 少复制 3 字段；会话测试全绿 |
 | **H2b 问答-请求段** | 建 `TurnInputView`（41 字段只读接口），`ChatManage implements`；插件改收视图；`QaRequestContext` 34 字段随之收口 | 1.5-2 人日 | 插件包内 `ChatManage` 引用只许减；契约测试全绿 |

@@ -105,3 +105,4 @@ graph TD
 6. `boot/config`：最后看装配，知道端口实现从哪来。
 
 下一步读 [`request-path.md`](request-path.md)（一次问答怎么走）与 [`mechanisms.md`](mechanisms.md)（哪些地方反直觉）。
+按业务链路找落点：`business-capability-map.md`（六条链路 → 入口/编排/落点）。
