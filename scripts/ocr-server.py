@@ -161,7 +161,7 @@ def recognize(data: bytes) -> str:
     for band in _bands(boxes, max(page_height * 0.12, 60)):
         if not _has_parallel_columns(band):
             # 单列层：标题与正文是上下关系，按阅读顺序输出；聚列会把不相邻的标题并在一起。
-            sections.append("\n\n".join(
+            sections.append("\n".join(
                 b["text"] for b in _reading_order_boxes(band, row_tolerance)))
             continue
         wide_rows = [b for b in band if (b["x2"] - b["x1"]) > wide]
@@ -172,7 +172,7 @@ def recognize(data: bytes) -> str:
         for column in _columns(normal, column_gap):
             ordered = _reading_order_boxes(column, row_tolerance)
             entries.append((ordered[0]["y1"], min(b["x1"] for b in ordered),
-                            "\n\n".join(b["text"] for b in ordered)))
+                            "\n".join(b["text"] for b in ordered)))
         sections.extend(text for _y, _x, text in
                         _reading_order_entries(entries, row_tolerance))
     return "\n\n".join(section for section in sections if section)
