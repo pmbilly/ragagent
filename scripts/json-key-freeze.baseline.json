@@ -3,6 +3,7 @@
   "files": {
     "agent/AgentEngine.java": "agent/AgentEngine",
     "agent/ReActIteration.java": "agent/ReActIteration",
+    "contract/tenant/ParserEngineConfig.java": "contract/tenant/ParserEngineConfig",
     "datasource/connector/feishu/core/DocxBlocks.java": "datasource/connector/feishu/core/DocxBlocks",
     "datasource/connector/feishu/core/FeishuApiTypes.java": "datasource/connector/feishu/core/FeishuApiTypes",
     "datasource/connector/feishu/core/FeishuClient.java": "datasource/connector/feishu/core/FeishuClient",

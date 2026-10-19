@@ -9,9 +9,9 @@
 
 | 种类 | 域数 | 文件 | 控制器 | 说明 |
 |---|---:|---:|---:|---|
-| **产品能力** | 7 | 799 | 22 | 直接产生用户价值、按产品需求演进的业务能力。 |
+| **产品能力** | 7 | 801 | 22 | 直接产生用户价值、按产品需求演进的业务能力。 |
 | **集成适配** | 6 | 533 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
-| **控制面** | 3 | 159 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
+| **控制面** | 3 | 158 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
 | **能力配置** | 2 | 55 | 4 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
 | **初始化向导** | 1 | 13 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
 | **策略库** | 1 | 7 | 0 | 无 HTTP、无持久化的纯策略/判定逻辑。 |
@@ -20,7 +20,7 @@
 
 | 域 | 种类 | 文件 | 控制器 | 对外契约面 | 前端页面 |
 |---|---|---:|---:|---:|---|
-| `knowledge` | 产品能力 | 259 | 8 | 13 | `views/knowledge` |
+| `knowledge` | 产品能力 | 261 | 8 | 14 | `views/knowledge` |
 | `session` | 产品能力 | 187 | 8 | 3 | `views/chat` |
 | `wiki` | 产品能力 | 166 | 1 | 1 | `views/knowledge/wiki` |
 | `memory` | 产品能力 | 89 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
@@ -35,7 +35,7 @@
 | `embedchannel` | 集成适配 | 25 | 1 | — | `views/embed` |
 | `auth` | 控制面 | 120 | 6 | 2 | `views/auth · views/settings/TenantMembers.vue · views/system/PlatformAPIKeys.vue` |
 | `audit` | 控制面 | 20 | 1 | 1 | `views/system/SystemAuditLog.vue` |
-| `system` | 控制面 | 19 | 2 | 1 | `views/system` |
+| `system` | 控制面 | 18 | 2 | 1 | `views/system` |
 | `model` | 能力配置 | 35 | 3 | 2 | `views/settings/ModelSettings.vue` |
 | `vectorstore` | 能力配置 | 20 | 1 | — | `views/settings/VectorStoreSettings.vue` |
 | `initialization` | 初始化向导 | 13 | 1 | — | `views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue` |
@@ -47,7 +47,7 @@
 
 | 域 | HTTP 入口 | 对外契约面 |
 |---|---|---|
-| `knowledge` | `ChunkController`、`ChunkerPreviewController`、`FaqController`、`KnowledgeBaseController`、`KnowledgeBaseFileProxyController`、`KnowledgeController`、`KnowledgeOperationsController`、`KnowledgeTagController` | `ChunkSearchGateway`、`DocReaderAdminPort`、`DocReaderParsePort`、`DocumentChunkingPort`、`EmbeddingModelPort`、`EmbeddingPort`、`KnowledgeBaseCatalogPort`、`KnowledgeBaseGateway`、`KnowledgeBaseSearchGateway`、`KnowledgeCatalogPort`、`KnowledgeDocumentGateway`、`KnowledgeMaintenancePort`、`KnowledgeSpanPort` |
+| `knowledge` | `ChunkController`、`ChunkerPreviewController`、`FaqController`、`KnowledgeBaseController`、`KnowledgeBaseFileProxyController`、`KnowledgeController`、`KnowledgeOperationsController`、`KnowledgeTagController` | `ChunkSearchGateway`、`DocReaderAdminPort`、`DocReaderParsePort`、`DocumentChunkingPort`、`EmbeddingModelPort`、`EmbeddingPort`、`KnowledgeBaseCatalogPort`、`KnowledgeBaseGateway`、`KnowledgeBaseSearchGateway`、`KnowledgeCatalogPort`、`KnowledgeDocumentGateway`、`KnowledgeMaintenancePort`、`KnowledgeSpanPort`、`ParserEngineCatalogPort` |
 | `session` | `KnowledgeQaController`、`MessageController`、`MessageFileProxyController`、`MessageSuggestionController`、`SessionController`、`SessionStreamController`、`SteerController`、`TemporaryDocumentController` | `EmbedSessionPort`、`MessageTranscriptPort`、`SessionQaPort` |
 | `wiki` | `WikiPageController` | `WikiPageOpsPort` |
 | `memory` | `MemoryController` | — |

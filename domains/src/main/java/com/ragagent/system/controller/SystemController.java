@@ -1,9 +1,11 @@
 package com.ragagent.system.controller;
 
 import com.ragagent.contract.doc.DocReaderAdminPort;
+import com.ragagent.contract.doc.ParserEngineCatalogPort;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.storage.StorageConnectivityPort;
+import com.ragagent.contract.tenant.ParserEngineConfig;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.SsrfGuard;
@@ -11,7 +13,6 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.system.dto.SystemDtos;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
-import com.ragagent.system.service.ParserEngineRegistry;
 import com.ragagent.system.service.SystemInfoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.LinkedHashMap;
@@ -46,7 +47,7 @@ import tools.jackson.databind.JsonNode;
 public class SystemController {
 
     private final SystemInfoService infoService;
-    private final ParserEngineRegistry parserEngines;
+    private final ParserEngineCatalogPort parserEngines;
     private final TenantConfigLookup tenantConfigLookup;
     private final DocReaderAdminPort docReader;
     private final SsrfGuard ssrfGuard;
@@ -54,7 +55,7 @@ public class SystemController {
     private final StorageConnectivityPort storageProbe;
 
     public SystemController(SystemInfoService infoService,
-                            ParserEngineRegistry parserEngines,
+                            ParserEngineCatalogPort parserEngines,
                             TenantConfigLookup tenantConfigLookup,
                             DocReaderAdminPort docReader,
                             SsrfGuard ssrfGuard,
@@ -127,7 +128,7 @@ public class SystemController {
         if (body == null) {
             throw new BizException(AppError.badRequest("请求参数不合法").withDetails("请求体格式不正确"));
         }
-        Map<String, String> overrides = overridesFromRaw(body);
+        Map<String, String> overrides = overridesFromBody(body);
         return ResponseEntity.ok(engineListBody(overrides));
     }
 
@@ -158,9 +159,9 @@ public class SystemController {
             // 下游 docreader 不可达：503（错误语义化）
             throw new BizException(AppError.serviceUnavailable("连接失败: " + e.getMessage()));
         }
-        List<SystemDtos.ParserEngineInfo> engines = parserEngines.listAllEngines(
+        List<DocReaderAdminPort.RemoteEngineView> engines = parserEngines.listAll(
                 true, engineOverrides(),
-                parserEngines.fetchRemoteEngines(true, engineOverrides()));
+                parserEngines.fetchRemote(true, engineOverrides()));
         return ResponseEntity.ok(new SystemDtos.ParserEnginesResponse(
                 true, addr, docReader.config().transport(), engines));
     }
@@ -186,72 +187,23 @@ public class SystemController {
 
     /** overrides 组装：租户 ParserEngineConfig → map。 */
     private Map<String, String> engineOverrides() {
-        Map<String, String> overrides = new LinkedHashMap<>();
-        JsonNode parserCfg = JsonMappers.toJsonNode(tenantConfigLookup.parserEngineConfig(currentTenantId()));
-        if (parserCfg != null) {
-            overrides.putAll(overridesFromRaw(parserCfg));
-        }
-        return overrides;
+        JsonNode parserCfg = JsonMappers.toJsonNode(
+                tenantConfigLookup.parserEngineConfig(currentTenantId()));
+        return overridesFromBody(parserCfg);
     }
 
-    /** 从 jsonb 按固定键集提取解析引擎覆盖项。 */
-    static Map<String, String> overridesFromRaw(JsonNode node) {
-        Map<String, String> overrides = new LinkedHashMap<>();
+    /** jsonb 节点 → 契约配置的 Map 形态（键集与 snake 键名在 contract 侧）。 */
+    private static Map<String, String> overridesFromBody(JsonNode node) {
         if (node == null || node.isNull() || !node.isObject()) {
-            return overrides;
+            return new LinkedHashMap<>();
         }
-        putString(overrides, node, "mineru_endpoint");
-        putString(overrides, node, "mineru_api_key");
-        putString(overrides, node, "mineru_model");
-        putString(overrides, node, "mineru_vlm_server_url");
-        putBool(overrides, node, "mineru_enable_formula");
-        putBool(overrides, node, "mineru_enable_table");
-        // mineru_parse_method：显式值归一；否则 legacy enable_ocr 推导
-        String method = node.path("mineru_parse_method").asString("").trim().toLowerCase();
-        JsonNode legacyOcr = node.get("mineru_enable_ocr");
-        String resolved = switch (method) {
-            case "auto" -> "auto";
-            case "ocr" -> "ocr";
-            case "txt" -> "txt";
-            default -> legacyOcr != null && legacyOcr.isBoolean() && !legacyOcr.asBoolean() ? "txt" : "auto";
-        };
-        if (!node.path("mineru_parse_method").asString("").isEmpty() || (legacyOcr != null && legacyOcr.isBoolean())) {
-            overrides.put("mineru_parse_method", resolved);
+        Object value = JsonMappers.toJavaValue(node);
+        if (!(value instanceof Map<?, ?> map)) {
+            return new LinkedHashMap<>();
         }
-        putBool(overrides, node, "mineru_enable_ocr");
-        putString(overrides, node, "mineru_language");
-        putString(overrides, node, "mineru_cloud_model");
-        putBool(overrides, node, "mineru_cloud_enable_formula");
-        putBool(overrides, node, "mineru_cloud_enable_table");
-        putBool(overrides, node, "mineru_cloud_enable_ocr");
-        putString(overrides, node, "mineru_cloud_language");
-        putString(overrides, node, "odl_hybrid");
-        putString(overrides, node, "odl_hybrid_url");
-        putString(overrides, node, "odl_hybrid_mode");
-        putBool(overrides, node, "odl_hybrid_fallback");
-        putBool(overrides, node, "odl_markdown_with_html");
-        putString(overrides, node, "paddleocr_vl_endpoint");
-        putBool(overrides, node, "paddleocr_vl_use_seal_recognition");
-        putBool(overrides, node, "paddleocr_vl_use_chart_recognition");
-        putString(overrides, node, "paddleocr_vl_cloud_token");
-        putString(overrides, node, "paddleocr_vl_cloud_model");
-        putBool(overrides, node, "paddleocr_vl_cloud_use_seal_recognition");
-        putBool(overrides, node, "paddleocr_vl_cloud_use_chart_recognition");
-        return overrides;
-    }
-
-    private static void putString(Map<String, String> m, JsonNode node, String field) {
-        String v = node.path(field).asString("");
-        if (!v.isEmpty()) {
-            m.put(field, v);
-        }
-    }
-
-    private static void putBool(Map<String, String> m, JsonNode node, String field) {
-        JsonNode v = node.get(field);
-        if (v != null && v.isBoolean()) {
-            m.put(field, String.valueOf(v.asBoolean()));
-        }
+        @SuppressWarnings("unchecked")
+        Map<String, Object> raw = (Map<String, Object>) map;
+        return ParserEngineConfig.overridesFrom(raw);
     }
 
     // ── 响应组装辅助 ──────────────────────────────────────────────────────
@@ -259,10 +211,10 @@ public class SystemController {
     /** parser-engines 响应组装（连接态 + docreader 信息 + 引擎清单）。 */
     private SystemDtos.ParserEnginesResponse engineListBody(Map<String, String> overrides) {
         boolean connected = docReader.isConnected();
-        List<SystemDtos.ParserEngineInfo> remote =
-                parserEngines.fetchRemoteEngines(connected, overrides);
-        List<SystemDtos.ParserEngineInfo> engines =
-                parserEngines.listAllEngines(connected, overrides, remote);
+        List<DocReaderAdminPort.RemoteEngineView> remote =
+                parserEngines.fetchRemote(connected, overrides);
+        List<DocReaderAdminPort.RemoteEngineView> engines =
+                parserEngines.listAll(connected, overrides, remote);
         return new SystemDtos.ParserEnginesResponse(
                 connected, docReader.config().addr(), docReader.config().transport(), engines);
     }

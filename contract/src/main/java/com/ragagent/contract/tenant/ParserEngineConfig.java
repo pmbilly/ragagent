@@ -1,6 +1,8 @@
 package com.ragagent.contract.tenant;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -126,4 +128,74 @@ public class ParserEngineConfig {
     public void setPaddleOcrVlCloudUseSealRecognition(Boolean v) { paddleOcrVlCloudUseSealRecognition = v; }
     public Boolean getPaddleOcrVlCloudUseChartRecognition() { return paddleOcrVlCloudUseChartRecognition; }
     public void setPaddleOcrVlCloudUseChartRecognition(Boolean v) { paddleOcrVlCloudUseChartRecognition = v; }
+
+    /**
+     * 从租户配置 jsonb 的 Map 形态提取解析引擎覆盖项（snake 键）。
+     *
+     * <p>纯 JDK：不依赖 Jackson——调用方负责把 jsonb 转成 {@code Map<String,Object>}。
+     * 键集是租户配置契约的一部分，所以和配置类放在一起，不留在管理面控制器里。</p>
+     */
+    public static Map<String, String> overridesFrom(Map<String, Object> raw) {
+        Map<String, String> out = new LinkedHashMap<>();
+        if (raw == null) {
+            return out;
+        }
+        putString(out, raw, "mineru_endpoint");
+        putString(out, raw, "mineru_api_key");
+        putString(out, raw, "mineru_model");
+        putString(out, raw, "mineru_vlm_server_url");
+        putBool(out, raw, "mineru_enable_formula");
+        putBool(out, raw, "mineru_enable_table");
+        // mineru_parse_method：显式值归一；否则 legacy enable_ocr 推导
+        String method = str(raw, "mineru_parse_method").trim().toLowerCase();
+        Object legacyOcr = raw.get("mineru_enable_ocr");
+        String resolved = switch (method) {
+            case "auto" -> "auto";
+            case "ocr" -> "ocr";
+            case "txt" -> "txt";
+            default -> legacyOcr instanceof Boolean b && !b ? "txt" : "auto";
+        };
+        if (!str(raw, "mineru_parse_method").isEmpty() || legacyOcr instanceof Boolean) {
+            out.put("mineru_parse_method", resolved);
+        }
+        putBool(out, raw, "mineru_enable_ocr");
+        putString(out, raw, "mineru_language");
+        putString(out, raw, "mineru_cloud_model");
+        putBool(out, raw, "mineru_cloud_enable_formula");
+        putBool(out, raw, "mineru_cloud_enable_table");
+        putBool(out, raw, "mineru_cloud_enable_ocr");
+        putString(out, raw, "mineru_cloud_language");
+        putString(out, raw, "odl_hybrid");
+        putString(out, raw, "odl_hybrid_url");
+        putString(out, raw, "odl_hybrid_mode");
+        putBool(out, raw, "odl_hybrid_fallback");
+        putBool(out, raw, "odl_markdown_with_html");
+        putString(out, raw, "paddleocr_vl_endpoint");
+        putBool(out, raw, "paddleocr_vl_use_seal_recognition");
+        putBool(out, raw, "paddleocr_vl_use_chart_recognition");
+        putString(out, raw, "paddleocr_vl_cloud_token");
+        putString(out, raw, "paddleocr_vl_cloud_model");
+        putBool(out, raw, "paddleocr_vl_cloud_use_seal_recognition");
+        putBool(out, raw, "paddleocr_vl_cloud_use_chart_recognition");
+        return out;
+    }
+
+    private static String str(Map<String, Object> raw, String field) {
+        Object v = raw.get(field);
+        return v instanceof String s ? s : "";
+    }
+
+    private static void putString(Map<String, String> out, Map<String, Object> raw, String field) {
+        String v = str(raw, field);
+        if (!v.isEmpty()) {
+            out.put(field, v);
+        }
+    }
+
+    private static void putBool(Map<String, String> out, Map<String, Object> raw, String field) {
+        Object v = raw.get(field);
+        if (v instanceof Boolean b) {
+            out.put(field, String.valueOf(b));
+        }
+    }
 }

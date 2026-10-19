@@ -403,6 +403,7 @@ boot           14 件                      →  boot
 | OC-5 | 2026-10-19 | **OCR 分段收敛**：空行只加在列组/行块之间，列内各行恢复单换行——OC-4 的逐行空行会让分块被 `\n\n` 切碎（37 块）。阅读顺序与列合并逻辑不变。 | **40 守卫全绿** · 4-1 重解析 34 块 / 13751 字 |
 | G1 | 2026-10-20 | **SSE 终态收口**：`QaSseOrchestrator.handleAgentEventsForSSE` 与 `SessionStreamController` 续传循环认 `ERROR+done` 终态（不再 100ms 空转）；两条轮询各加 2h 存活上限；title 等待加 50ms sleep 消忙转。新增红态测试 2 例（旧行为下 2/2 失败）。 | **40 守卫全绿** · **5008 / 0 / 4** · spotlessCheck build 1m47s · 冒烟 sessions/knowledge-bases/models 200 |
 | H0 | 2026-10-20 | **判据先行**：新增 `check-contract-shape.py`（端口 ≤7 / `*RowView`·`*PageView` 禁入 / 字段 ≤20；22 条基线）+ `check-port-budget.py`（域内/无实现端口 = 0；空基线）；`check-platform-shapes.py` 换血为"业务词包 / 业务词文件 / 红旗命名"三档（16 条基线）；新增 `docs/architecture/business-capability-map.md`（六条链路 → 入口/编排/落点）。三条守卫各验红态探针。 | **42 守卫全绿** · guards 1 轮 |
+| G2 | 2026-10-20 | **整改尾巴**：evaluation 前端勾选项移除（类型/标签保留兼容已存 Key）· approval 明示为 mcp 策略域 · 存储探测 HTTP 面迁 storage（`/api/v1/storage/engine-status|check`，新增 `StorageEngineController` + DTO 随迁）· 解析引擎目录归 knowledge（`contract.doc.ParserEngineCatalogPort` + 8 引擎实现搬 `knowledge/service/parser`；37 个配置键归 `ParserEngineConfig.overridesFrom`）· 连通性双头**不合并**（未保存配置测试 vs 已保存模型调试是两个真实场景） | **42 守卫全绿** · 前端 753 / type-check 0 · boot `SystemContractTest` · Port 32→33 |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

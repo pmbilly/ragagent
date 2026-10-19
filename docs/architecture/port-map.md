@@ -5,7 +5,7 @@
 
 ## 统计
 
-- 域间（解耦）：**22**
+- 域间（解耦）：**23**
 - 跨模块（必要）：**10**
 
 ## 明细
@@ -13,7 +13,7 @@
 | Port | 实现类 | 实现模块 | 调用方域 | 类型 |
 |---|---|---|---|---|
 | `AuditWritePort` | `AuditWriteAdapter` | domains | agentmanagement、auth、datasource、knowledge、system | 域间（解耦） |
-| `DocReaderAdminPort` | `DocReaderAdminAdapter` | domains | system | 域间（解耦） |
+| `DocReaderAdminPort` | `DocReaderAdminAdapter` | domains | knowledge、system | 域间（解耦） |
 | `DocReaderParsePort` | `DocReaderParseAdapter` | domains | im、initialization、session | 域间（解耦） |
 | `DocumentChunkingPort` | `DocumentChunkingAdapter` | domains | session | 域间（解耦） |
 | `EmbedSessionPort` | `EmbedSessionAdapter` | domains | embedchannel | 域间（解耦） |
@@ -32,6 +32,7 @@
 | `ModelCatalogPort` | `ModelCatalogAdapter` | domains | initialization、knowledge、mcp、memory、model-runtime、session、wiki | 跨模块（必要） |
 | `ModelFactsPort` | `ModelService` | domains | retrieval-engine | 跨模块（必要） |
 | `OllamaAdminPort` | `OllamaService` | model-runtime | initialization | 跨模块（必要） |
+| `ParserEngineCatalogPort` | `ParserEngineCatalog` | domains | system | 域间（解耦） |
 | `ProviderFileStorePort` | `ProviderFileStoreAdapter` | domains | knowledge | 域间（解耦） |
 | `ResourceCatalogPort` | `ResourceCatalogAdapter` | domains | knowledge、session | 域间（解耦） |
 | `SessionQaPort` | `SessionQaAdapter` | domains | im | 域间（解耦） |

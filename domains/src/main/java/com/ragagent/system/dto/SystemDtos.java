@@ -2,6 +2,7 @@ package com.ragagent.system.dto;
 
 import com.ragagent.contract.auth.AdminUserView;
 import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.contract.doc.DocReaderAdminPort;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -90,21 +91,12 @@ public final class SystemDtos {
             long uptimeSeconds) {
     }
 
-    /** 解析引擎信息（无可用原因时显式 null）。 */
-    public record ParserEngineInfo(
-            String name,
-            String description,
-            List<String> fileTypes,
-            boolean available,
-            String unavailableReason) {
-    }
-
     /** parser-engines 响应（连接态 + docreader 信息 + 引擎清单）。 */
     public record ParserEnginesResponse(
             boolean connected,
             String docreaderAddr,
             String docreaderTransport,
-            List<ParserEngineInfo> engines) {
+            List<DocReaderAdminPort.RemoteEngineView> engines) {
     }
 
     /** 运行时工作池。 */

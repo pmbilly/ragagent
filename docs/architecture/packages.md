@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-352 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+353 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -174,6 +174,7 @@
 | `:domains` | `com.ragagent.knowledge.service.faq` | FAQ 面（从 service 整簇切出的第一个子面）。 |
 | `:domains` | `com.ragagent.knowledge.service.image` | 服务 · 图片：ExtractedImageStore。 |
 | `:domains` | `com.ragagent.knowledge.service.management` | 知识域**应用/门面面**（起）：对外的门面 KnowledgeService，以及它向下编排的 用例服务（知识库/文件夹、文件与手工内容、解析生命周期、克隆/移动/标签/批处理）。 |
+| `:domains` | `com.ragagent.knowledge.service.parser` | 解析引擎目录：本地静态注册表 + docreader 远端发现的合并（ParserEngineCatalog）。 |
 | `:domains` | `com.ragagent.knowledge.service.query` | 查询面（从 service 切出，按 命名）：检索与 span 读取。 |
 | `:domains` | `com.ragagent.knowledge.storage` | 知识库文件与对象存储：LocalStorageService（本地卷）+ TenantFileStorage（租户感知门面， 知识上传/读取/删除的唯一入口）。 |
 | `:domains` | `com.ragagent.knowledge.support` | 知识库任务面领域类型：任务提交端口、进度存储、导入任务存储与任务 id/事件。 |
