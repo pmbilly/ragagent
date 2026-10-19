@@ -10,8 +10,11 @@ import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.vectorstore.config.EnvVectorStores;
 import com.ragagent.vectorstore.domain.VectorStore;
 import com.ragagent.vectorstore.domain.VectorStoreEngines;
+import com.ragagent.vectorstore.dto.VectorStoreResponse;
 import com.ragagent.vectorstore.mapper.VectorStoreRepository;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -85,6 +88,81 @@ public class VectorStoreConfigService {
 
     public List<VectorStore> list(long tenantId) {
         return repo.list(tenantId);
+    }
+
+    // ── 控制面读模型（控制器不再 import VectorStore） ────────────────────
+
+    public List<VectorStoreResponse> listResponses(long tenantId) {
+        List<VectorStoreResponse> all = new ArrayList<>();
+        for (VectorStore env : envStores()) {
+            all.add(VectorStoreResponse.of(env, "env", true));
+        }
+        for (VectorStore store : list(tenantId)) {
+            all.add(VectorStoreResponse.of(store, "user", false));
+        }
+        return all;
+    }
+
+    /** {@code null} = 不存在。 */
+    public VectorStoreResponse getResponse(long tenantId,
+            String id) {
+        if (EnvVectorStores.isEnvStoreId(id)) {
+            VectorStore env = findEnvStore(id);
+            return env == null ? null
+                    : VectorStoreResponse.of(env, "env", true);
+        }
+        VectorStore store = getByID(tenantId, id);
+        return store == null ? null
+                : VectorStoreResponse.of(store, "user", false);
+    }
+
+    public VectorStoreResponse createResponse(long tenantId,
+            String name, String engineType, ConnectionConfig connection,
+            IndexConfig index) {
+        VectorStore store = new VectorStore();
+        store.setId(UUID.randomUUID().toString());
+        store.setTenantId(tenantId);
+        store.setName(name);
+        store.setEngineType(engineType);
+        store.setConnectionConfig(connection);
+        store.setIndexConfig(index);
+        create(store);
+        return VectorStoreResponse.of(store, "user", false);
+    }
+
+    public VectorStoreResponse updateNameResponse(long tenantId,
+            String id, String name) {
+        VectorStore updated = new VectorStore();
+        updated.setId(id);
+        updated.setTenantId(tenantId);
+        updated.setName(name);
+        updateName(updated);
+        VectorStore result = getByID(tenantId, id);
+        return result == null ? null
+                : VectorStoreResponse.of(result, "user", false);
+    }
+
+    /** 探测连通性；{@code null} = 不存在，空串 = 探测成功但无版本号。 */
+    public String testResponse(long tenantId, String id) {
+        if (EnvVectorStores.isEnvStoreId(id)) {
+            VectorStore env = findEnvStore(id);
+            return env == null ? null
+                    : testConnection(env.getEngineType(), env.getConnectionConfig());
+        }
+        VectorStore store = getByID(tenantId, id);
+        if (store == null) {
+            return null;
+        }
+        String version = testConnection(store.getEngineType(), store.getConnectionConfig());
+        if (!version.isEmpty() && !version.equals(store.getConnectionConfig().version)) {
+            try {
+                store.getConnectionConfig().version = version;
+                saveDetectedVersion(store);
+            } catch (RuntimeException ignored) {
+                // 仅记 WARN 后继续（不影响响应）
+            }
+        }
+        return version;
     }
 
     /** 在副本上写 connection_config.version */

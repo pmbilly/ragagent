@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-335 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+336 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -124,6 +124,7 @@
 | `:domains` | `com.ragagent.favorite.mapper` | 收藏 · 映射：UserResourceFavoriteMapper。 |
 | `:domains` | `com.ragagent.favorite.service` | 收藏 · 服务：UserResourceFavoriteService。 |
 | `:domains` | `com.ragagent.im` | 即时通讯渠道域：九渠道适配（feishu/wechat/wecom/dingtalk/slack/mattermost/telegram/qqbot/yunzhijia， 一渠道一子包）与运行时（会话映射、工具展示、入站消息派发）。 |
+| `:domains` | `com.ragagent.im.callback` | IM · 平台回调处理：渠道校验、适配器验签/解析与 ACK 直写。 |
 | `:domains` | `com.ragagent.im.channel.dingtalk` | 渠道 · dingtalk：DingtalkAdapter / DingtalkAdapterFactory / DingtalkStreamClient。 |
 | `:domains` | `com.ragagent.im.channel.feishu` | 渠道 · feishu：FeishuAdapter / FeishuLongConnClient / FeishuAdapterFactory…。 |
 | `:domains` | `com.ragagent.im.channel.mattermost` | 渠道 · mattermost：MattermostAdapter / MattermostAdapterFactory / MattermostClient。 |

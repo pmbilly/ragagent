@@ -1,11 +1,9 @@
 package com.ragagent.auth.controller;
 
-import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.TenantMemberResponse;
+import com.ragagent.auth.service.TenantMemberReadService;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantRbacException;
-import com.ragagent.auth.service.UserService;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.tenant.TenantRole;
@@ -18,7 +16,6 @@ import com.ragagent.platform.web.RequestFields;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,11 +52,12 @@ public class TenantMemberController {
     private static final String SYNTHETIC_PREFIX = "system-";
 
     private final TenantMemberService memberService;
-    private final UserService userService;
+    private final TenantMemberReadService readService;
 
-    public TenantMemberController(TenantMemberService memberService, UserService userService) {
+    public TenantMemberController(TenantMemberService memberService,
+                                  TenantMemberReadService readService) {
         this.memberService = memberService;
-        this.userService = userService;
+        this.readService = readService;
     }
 
     // ── 路由 ───────────────────────────────────────────────────────────────
@@ -71,34 +69,7 @@ public class TenantMemberController {
         String q = trimToEmpty(request.getParameter("q"));
         int[] pp = parseListPagination(request);
 
-        TenantMemberService.MemberPage page = memberService.listMembersPage(tenantId, q, pp[0], pp[1]);
-
-        // 一批 hydrate：查不到的用户降级为空字段而非丢行，悬挂成员仍可被 Owner 清理
-        List<String> ids = new ArrayList<>();
-        for (TenantMember m : page.members()) {
-            ids.add(m.getUserId());
-        }
-        Map<String, User> usersById = userService.getUsersByIds(ids);
-
-        List<TenantMemberResponse> resp = new ArrayList<>(page.members().size());
-        for (TenantMember m : page.members()) {
-            User u = usersById.get(m.getUserId());
-            resp.add(new TenantMemberResponse(
-                    m.getUserId(),
-                    u == null ? "" : u.getEmail(),
-                    u == null ? "" : u.getUsername(),
-                    u == null ? "" : u.getAvatar(),
-                    m.getRole(),
-                    m.getStatus(),
-                    m.getInvitedBy(),
-                    m.getJoinedAt()));
-        }
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("members", resp);
-        data.put("page", pp[0]);
-        data.put("pageSize", pp[1]);
-        data.put("total", page.total());
-        return data;
+        return readService.listMembers(tenantId, q, pp[0], pp[1]);
     }
 
     /** POST /tenants/{id}/members（Owner+，直加路径；201 + TenantMemberResponse） */
@@ -119,15 +90,9 @@ public class TenantMemberController {
             throw new BizException(AppError.validation("role must be one of owner/admin/contributor/viewer"));
         }
 
-        User user = userService.getUserByEmail(trimToEmpty(email));
-        if (user == null) {
-            // ErrUserNotFound 是刻意的"还没注册"信号 → 404 让 UI 提示先注册
-            throw new BizException(AppError.notFound(
-                    "user with this email is not registered; ask them to sign up first"));
-        }
-
         String invitedBy = invitedByForCaller(TenantContext.currentUserId());
-        PreparedResponse r = addMemberAndRespond(user, tenantId, role, invitedBy);
+        TenantMemberReadService.PreparedResponse r = readService.addByEmail(
+                trimToEmpty(email), tenantId, role, invitedBy);
         return org.springframework.http.ResponseEntity.status(r.status()).body(r.body());
     }
 
@@ -214,31 +179,6 @@ public class TenantMemberController {
     }
 
     // ── 共享辅助（成员/邀请两组共用） ──────────────────────────────────────
-
-    /** addMemberAndRespond 的结果：body + 显式状态码（201 直加成功用） */
-    public record PreparedResponse(TenantMemberResponse body, int status) {
-    }
-
-    /**
-     * 直加成员：成功 → 201 + TenantMemberResponse；
-     * 哨兵 → 400/403/409/500 映射。
-     * 公开给 TenantInvitationController（auto-accept 分支共用）。
-     */
-    public PreparedResponse addMemberAndRespond(User user, long tenantId, TenantRole role, String invitedBy) {
-        try {
-            TenantMember member = memberService.addMemberChecked(user.getId(), tenantId, role, invitedBy);
-            // 与列表端点同形，前端免二次往返
-            return new PreparedResponse(memberResponse(member, user), 201);
-        } catch (TenantRbacException e) {
-            switch (e.kind()) {
-                case INVALID_TENANT_ROLE -> throw e.asValidationError();
-                case API_KEY_CANNOT_ASSIGN_OWNER -> throw e.asForbidden();
-                case MEMBERSHIP_ALREADY_EXISTS -> throw e.asConflict();
-                default -> throw new BizException(AppError.internal("failed to add member")
-                        .withDetails(e.getMessage()));
-            }
-        }
-    }
 
     /** 路径租户 ID 解析（通常已被 PathTenantMatch 拦在前面，保留同文案） */
     static long parseTenantId(String raw) {
@@ -375,20 +315,7 @@ public class TenantMemberController {
         return at > 0 && at == email.lastIndexOf('@') && at < email.length() - 1;
     }
 
-    /** TenantMemberResponse 组装（直加路径的 email/username/avatar 来自刚查到的 user） */
-    static TenantMemberResponse memberResponse(TenantMember member, User user) {
-        return new TenantMemberResponse(
-                member.getUserId(),
-                user == null ? "" : user.getEmail(),
-                user == null ? "" : user.getUsername(),
-                user == null ? "" : user.getAvatar(),
-                member.getRole(),
-                member.getStatus(),
-                member.getInvitedBy(),
-                member.getJoinedAt());
-    }
 
-    /** 请求上下文的 caller user id（缺失 → 401） */
     static String requireCaller() {
         String caller = TenantContext.currentUserId();
         if (caller == null || caller.isEmpty()) {
@@ -403,7 +330,8 @@ public class TenantMemberController {
             return new String(buf, java.nio.charset.StandardCharsets.UTF_8);
         }
         try {
-            return new String(request.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            return new String(request.getInputStream().readAllBytes(),
+                    java.nio.charset.StandardCharsets.UTF_8);
         } catch (java.io.IOException e) {
             return "";
         }

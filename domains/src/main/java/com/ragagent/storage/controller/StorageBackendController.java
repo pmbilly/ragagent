@@ -9,9 +9,8 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
-import com.ragagent.storage.domain.StorageBackend;
-import com.ragagent.storage.dto.StorageBackendResponse;
 import com.ragagent.storage.dto.StorageConfig;
+import com.ragagent.storage.service.StorageBackendReadService;
 import com.ragagent.storage.service.StorageBackendService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
@@ -50,10 +49,14 @@ public class StorageBackendController {
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final StorageBackendService service;
+    private final StorageBackendReadService readService;
     private final StorageAllowList allowList;
 
-    public StorageBackendController(StorageBackendService service, StorageAllowList allowList) {
+    public StorageBackendController(StorageBackendService service,
+                                    StorageBackendReadService readService,
+                                    StorageAllowList allowList) {
         this.service = service;
+        this.readService = readService;
         this.allowList = allowList;
     }
 
@@ -74,18 +77,8 @@ public class StorageBackendController {
     public ResponseEntity<?> testRaw(@RequestBody(required = false) String rawBody) {
         long tenantId = tenantId();
         StorageBackendRequest req = bind(rawBody);
-        StorageBackend backend = carrier(tenantId, req);
-        try {
-            service.validate(backend);
-        } catch (BizException e) {
-            throw e; // c.Error → 信封（code 1010）
-        }
-        try {
-            service.test(backend);
-        } catch (RuntimeException e) {
-            return ResponseEntity.ok(failureBody(e));
-        }
-        return ResponseEntity.ok(connectedBody(true));
+        return ResponseEntity.ok(readService.testRawResponse(
+                tenantId, req.name(), req.provider(), req.config(), req.status()));
     }
 
     /** 创建后端：201 + 裸资源。 */
@@ -93,21 +86,16 @@ public class StorageBackendController {
     public ResponseEntity<?> create(@RequestBody(required = false) String rawBody) {
         long tenantId = tenantId();
         StorageBackendRequest req = bind(rawBody);
-        StorageBackend backend = carrier(tenantId, req);
-        service.create(backend);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response(backend));
+        return ResponseEntity.status(HttpStatus.CREATED).body(readService.createResponse(
+                tenantId, req.name(), req.provider(), req.config(), req.status()));
     }
 
     /** 列表 = {items, defaultStorageBackendId}（游标外的附加字段形态）。 */
     @GetMapping
     public ResponseEntity<?> list() {
         long tenantId = tenantId();
-        List<StorageBackendResponse> result = new ArrayList<>();
-        for (StorageBackend b : service.listBackends(tenantId)) {
-            result.add(response(b));
-        }
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("items", result);
+        body.put("items", readService.listResponses(tenantId));
         body.put("defaultStorageBackendId",
                 tenantId == 0 ? null : service.tenantDefaultBackendId(tenantId));
         return ResponseEntity.ok(body);
@@ -116,8 +104,11 @@ public class StorageBackendController {
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable("id") String id) {
         long tenantId = tenantId();
-        StorageBackend backend = getOwned(tenantId, id);
-        return ResponseEntity.ok(response(backend));
+        Object backend = readService.getResponse(tenantId, id);
+        if (backend == null) {
+            throw BizException.notFound("storage backend not found");
+        }
+        return ResponseEntity.ok(backend);
     }
 
     @PutMapping("/{id}")
@@ -126,11 +117,12 @@ public class StorageBackendController {
         long tenantId = tenantId();
         // 先绑定请求体再进 service（未知 id + 坏 body → 400，非 404）
         StorageBackendRequest req = bind(rawBody);
-        StorageBackend backend = carrier(tenantId, req);
-        backend.setId(id);
-        service.update(backend);
-        StorageBackend refreshed = getOwned(tenantId, id);
-        return ResponseEntity.ok(response(refreshed));
+        Object updated = readService.updateResponse(
+                tenantId, id, req.name(), req.provider(), req.config(), req.status());
+        if (updated == null) {
+            throw BizException.notFound("storage backend not found");
+        }
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
@@ -148,79 +140,18 @@ public class StorageBackendController {
     @PostMapping("/{id}/test")
     public ResponseEntity<?> testByID(@PathVariable("id") String id) {
         long tenantId = tenantId();
-        StorageBackend backend = getOwned(tenantId, id);
-        try {
-            service.test(backend);
-        } catch (RuntimeException e) {
-            return ResponseEntity.ok(failureBody(e));
+        Map<String, Object> result = readService.testByIdResponse(tenantId, id);
+        if (result == null) {
+            throw BizException.notFound("storage backend not found");
         }
-        return ResponseEntity.ok(connectedBody(true));
+        return ResponseEntity.ok(result);
     }
 
     // ── 内部 ───────────────────────────────────────────────────────────
 
-    private StorageBackend getOwned(long tenantId, String id) {
-        StorageBackend backend = service.getBackend(tenantId, id);
-        if (backend == null) {
-            throw BizException.notFound("storage backend not found");
-        }
-        return backend;
-    }
-
     private static long tenantId() {
         Long tenantId = TenantContext.currentTenantId();
         return tenantId == null ? 0 : tenantId;
-    }
-
-    private static StorageBackend carrier(long tenantId, StorageBackendRequest req) {
-        StorageBackend b = new StorageBackend();
-        b.setTenantId(tenantId);
-        b.setName(req.name());
-        b.setProvider(req.provider());
-        b.setConfig(req.config() == null
-                ? MAPPER.valueToTree(new StorageConfig())
-                : MAPPER.valueToTree(req.config()));
-        b.setStatus(req.status() == null ? "" : req.status());
-        return b;
-    }
-
-    private StorageBackendResponse response(StorageBackend b) {
-        StorageBackendResponse r = new StorageBackendResponse();
-        r.id = b.getId();
-        r.tenantId = b.getTenantId() == null ? 0 : b.getTenantId();
-        r.name = b.getName();
-        r.provider = b.getProvider();
-        r.config = service.maskedConfig(b);
-        r.source = b.getSource();
-        r.status = b.getStatus();
-        r.legacyAlias = b.isLegacyAlias();
-        r.createdAt = b.getCreatedAt();
-        r.updatedAt = b.getUpdatedAt();
-        r.deletedAt = b.getDeletedAt();
-        return r;
-    }
-
-    /** AppError 取 message，其余清洗（HTTP 状态保持 200） */
-    private static Map<String, Object> failureBody(RuntimeException e) {
-        String message;
-        if (e instanceof BizException biz) {
-            message = biz.appError().message();
-        } else if (e instanceof StorageBackendService.ConnectorFailure cf) {
-            message = StorageBackendService.sanitizeConnectivity(cf.getMessage());
-        } else {
-            message = StorageBackendService.sanitizeConnectivity(e.getMessage());
-        }
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("connected", false);
-        body.put("error", message);
-        return body;
-    }
-
-    /** 连通性测试的成功体：{connected:true}（与 failureBody 同形对称）。 */
-    private static Map<String, Object> connectedBody(boolean connected) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("connected", connected);
-        return body;
     }
 
     private static StorageBackendRequest bind(String rawBody) {

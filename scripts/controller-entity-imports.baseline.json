@@ -3,12 +3,8 @@
   "files": {
     "com/ragagent/auth/controller/AuthController.java": 2,
     "com/ragagent/auth/controller/TenantInvitationController.java": 3,
-    "com/ragagent/auth/controller/TenantMemberController.java": 2,
     "com/ragagent/embedchannel/controller/EmbedChannelController.java": 1,
-    "com/ragagent/im/controller/ImCallbackController.java": 1,
     "com/ragagent/im/controller/ImChannelController.java": 1,
-    "com/ragagent/knowledge/controller/KnowledgeBaseController.java": 1,
-    "com/ragagent/storage/controller/StorageBackendController.java": 1,
-    "com/ragagent/vectorstore/controller/VectorStoreController.java": 1
+    "com/ragagent/knowledge/controller/KnowledgeBaseController.java": 1
   }
 }

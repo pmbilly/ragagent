@@ -12,8 +12,6 @@ import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import com.ragagent.vectorstore.config.EnvVectorStores;
-import com.ragagent.vectorstore.domain.VectorStore;
-import com.ragagent.vectorstore.dto.VectorStoreResponse;
 import com.ragagent.vectorstore.dto.VectorStoreTypes;
 import com.ragagent.vectorstore.service.VectorStoreConfigService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +19,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -118,44 +115,26 @@ public class VectorStoreController {
         if (!missing.isEmpty()) {
             throw validator(missing.toArray(new String[0]));
         }
-        VectorStore store = new VectorStore();
-        store.setId(UUID.randomUUID().toString());
-        store.setTenantId(tenantId);
-        store.setName(name);
-        store.setEngineType(engineType);
-        store.setConnectionConfig(configOf(body, "connectionConfig"));
-        store.setIndexConfig(indexOf(body, "indexConfig"));
-        service.create(store);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(VectorStoreResponse.of(store, "user", false));
+        var created = service.createResponse(tenantId, name, engineType,
+                configOf(body, "connectionConfig"), indexOf(body, "indexConfig"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     /** env stores 在前、DB stores 在后（合并顺序固定） */
     @GetMapping
     public ResponseEntity<?> listStores() {
         long tenantId = requireTenant();
-        List<VectorStoreResponse> all = new ArrayList<>();
-        for (VectorStore env : service.envStores()) {
-            all.add(VectorStoreResponse.of(env, "env", true));
-        }
-        for (VectorStore s : service.list(tenantId)) {
-            all.add(VectorStoreResponse.of(s, "user", false));
-        }
-        return ResponseEntity.ok(all);
+        return ResponseEntity.ok(service.listResponses(tenantId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getStore(@PathVariable("id") String id) {
         long tenantId = requireTenant();
-        if (EnvVectorStores.isEnvStoreId(id)) {
-            VectorStore env = service.findEnvStore(id);
-            if (env == null) {
-                throw notFoundPure();
-            }
-            return ResponseEntity.ok(VectorStoreResponse.of(env, "env", true));
+        Object response = service.getResponse(tenantId, id);
+        if (response == null) {
+            throw notFoundPure();
         }
-        VectorStore store = owned(tenantId, id);
-        return ResponseEntity.ok(VectorStoreResponse.of(store, "user", false));
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
@@ -165,22 +144,18 @@ public class VectorStoreController {
         if (EnvVectorStores.isEnvStoreId(id)) {
             throw readonlyEnv();
         }
-        owned(tenantId, id);
+        if (service.getResponse(tenantId, id) == null) {
+            throw notFoundPure();
+        }
         UpdateStoreRequest req = bind(rawBody, UpdateStoreRequest.class);
         if (req.name() == null || req.name().isEmpty()) {
             throw validator("Name");
         }
-        VectorStore updated = new VectorStore();
-        updated.setId(id);
-        updated.setTenantId(tenantId);
-        updated.setName(req.name());
-        service.updateName(updated);
-        VectorStore result = service.getByID(tenantId, id);
-        if (result != null) {
-            return ResponseEntity.ok(VectorStoreResponse.of(result, "user", false));
+        Object result = service.updateNameResponse(tenantId, id, req.name());
+        if (result == null) {
+            throw notFoundPure();
         }
-        // owned() 已确认存在，理论不可达；防御分支按 404 走
-        throw notFoundPure();
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/{id}")
@@ -189,7 +164,9 @@ public class VectorStoreController {
         if (EnvVectorStores.isEnvStoreId(id)) {
             throw readonlyEnv();
         }
-        owned(tenantId, id);
+        if (service.getResponse(tenantId, id) == null) {
+            throw notFoundPure();
+        }
         service.delete(tenantId, id);
         return ApiResponse.ok();
     }
@@ -197,42 +174,14 @@ public class VectorStoreController {
     @PostMapping("/{id}/test")
     public ResponseEntity<?> testStoreByID(@PathVariable("id") String id) {
         long tenantId = requireTenant();
-        if (EnvVectorStores.isEnvStoreId(id)) {
-            VectorStore env = service.findEnvStore(id);
-            if (env == null) {
-                throw notFoundPure();
-            }
-            String version = service.testConnection(env.getEngineType(), env.getConnectionConfig());
-            return ResponseEntity.ok(versionBody(version));
-        }
-        VectorStore store = owned(tenantId, id);
-        String version = service.testConnection(store.getEngineType(), store.getConnectionConfig());
-        // 探测到版本且与存量不同 → 回存（SaveDetectedVersion）
-        if (!version.isEmpty() && !version.equals(store.getConnectionConfig().version)) {
-            try {
-                store.getConnectionConfig().version = version;
-                service.saveDetectedVersion(store);
-            } catch (RuntimeException e) {
-                // 仅记 WARN 后继续（不影响响应）
-            }
+        String version = service.testResponse(tenantId, id);
+        if (version == null) {
+            throw notFoundPure();
         }
         return ResponseEntity.ok(versionBody(version));
     }
 
     // ── 内部 ───────────────────────────────────────────────────────────
-
-    private VectorStore owned(long tenantId, String id) {
-        VectorStore store;
-        try {
-            store = service.getByID(tenantId, id);
-        } catch (RuntimeException e) {
-            throw BizException.internal("failed to query vector store");
-        }
-        if (store == null) {
-            throw notFoundPure();
-        }
-        return store;
-    }
 
     private static ConnectionConfig configOf(JsonNode body, String field) {
         JsonNode n = body.get(field);

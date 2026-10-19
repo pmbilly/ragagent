@@ -30,6 +30,8 @@ import tools.jackson.databind.ObjectMapper;
 @Service
 public class StorageBackendService {
 
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
+
     public static final String SOURCE_USER = "user";
     public static final String SOURCE_ENV = "env";
     public static final String STATUS_ACTIVE = "active";
@@ -53,7 +55,6 @@ public class StorageBackendService {
         return repo.getByID(tenantId, id).orElse(null);
     }
 
-    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     /** 路径规范化：收敛 ../ 与 ..（近似语义，非完整实现），用于 path_prefix 规范化比较 */
 
     private final StorageBackendRepository repo;
@@ -77,9 +78,6 @@ public class StorageBackendService {
         this.localStorageBaseDir = localStorageBaseDir;
     }
 
-    // ── 校验 ──────────────────────────────────────────────────────────────
-
-    /** 校验：**会就地修改** name（trim）/provider（小写）/status（缺省 active） */
     public void validate(StorageBackend b) {
         if (b.getTenantId() == null || b.getTenantId() == 0) {
             throw validation("tenant_id is required");

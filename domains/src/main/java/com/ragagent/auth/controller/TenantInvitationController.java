@@ -5,6 +5,7 @@ import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.TenantInvitationResponse;
 import com.ragagent.auth.service.TenantInvitationService;
+import com.ragagent.auth.service.TenantMemberReadService;
 import com.ragagent.auth.service.TenantRbacException;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
@@ -59,18 +60,18 @@ public class TenantInvitationController {
     private final TenantInvitationService invitationService;
     private final UserService userService;
     private final TenantService tenantService;
-    private final TenantMemberController memberController;
+    private final TenantMemberReadService memberReadService;
     private final Environment environment;
 
     public TenantInvitationController(TenantInvitationService invitationService,
                                       UserService userService,
                                       TenantService tenantService,
-                                      TenantMemberController memberController,
+                                      TenantMemberReadService memberReadService,
                                       Environment environment) {
         this.invitationService = invitationService;
         this.userService = userService;
         this.tenantService = tenantService;
-        this.memberController = memberController;
+        this.memberReadService = memberReadService;
         this.environment = environment;
     }
 
@@ -133,7 +134,7 @@ public class TenantInvitationController {
 
         // auto-accept 开关：跳过 pending 邀请、直接把已注册用户加成成员（含对账+采纳默认空间）
         if (TenantInvitationService.autoAcceptInvitationEnabled()) {
-            TenantMemberController.PreparedResponse r =
+            TenantMemberReadService.PreparedResponse r =
                     autoAcceptInvitationAndRespond(user, tenantId, role, invitedBy);
             return ResponseEntity.status(r.status()).contentType(MediaType.APPLICATION_JSON).body(r.body());
         }
@@ -343,10 +344,11 @@ public class TenantInvitationController {
      * 无空间用户采纳默认空间（失败 → 500 "member added but default workspace update failed"，
      * 成员行**已**写入）→ 201 成员结构。
      */
-    private TenantMemberController.PreparedResponse autoAcceptInvitationAndRespond(
+    private TenantMemberReadService.PreparedResponse autoAcceptInvitationAndRespond(
             User user, long tenantId, TenantRole role, String invitedBy) {
-        TenantMemberController.PreparedResponse r =
-                memberController.addMemberAndRespond(user, tenantId, role, invitedBy);
+        TenantMemberReadService.PreparedResponse r = memberReadService.addMemberAndRespond(
+                user.getId(), user.getEmail(), user.getUsername(), user.getAvatar(),
+                tenantId, role, invitedBy);
         invitationService.markPendingAcceptedIfExists(tenantId, user.getId());
         if (user.getTenantId() == null || user.getTenantId() == 0) {
             user.setTenantId(tenantId);
