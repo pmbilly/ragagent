@@ -1,13 +1,12 @@
 package com.ragagent.auth.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.LoginRequest;
 import com.ragagent.auth.dto.Membership;
-import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.auth.repository.AuthTokenRepository;
+import com.ragagent.auth.repository.UserRepository;
 import com.ragagent.contract.auth.UserPreferences;
 import com.ragagent.contract.settings.SystemSettingGateway;
 import com.ragagent.contract.tenant.TenantRole;
@@ -45,7 +44,7 @@ public class UserService implements UserNameLookup {
     private static final String TOKEN_TYPE_ACCESS = "access_token";
     static final String TOKEN_TYPE_REFRESH = "refresh_token";
 
-    private final UserMapper userMapper;
+    private final UserRepository userRepo;
     final AuthTokenRepository authTokenRepo;
     final TenantService tenantService;
     final TenantMemberService memberService;
@@ -54,13 +53,13 @@ public class UserService implements UserNameLookup {
     private final SystemSettingGateway settingService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public UserService(UserMapper userMapper,
+    public UserService(UserRepository userRepo,
                        AuthTokenRepository authTokenRepo,
                        TenantService tenantService,
                        TenantMemberService memberService,
                        JwtService jwtService,
                        SystemSettingGateway settingService) {
-        this.userMapper = userMapper;
+        this.userRepo = userRepo;
         this.authTokenRepo = authTokenRepo;
         this.tenantService = tenantService;
         this.memberService = memberService;
@@ -160,11 +159,7 @@ public class UserService implements UserNameLookup {
 
     /** 软删除过滤；找不到返回 null */
     public User getUserByEmail(String email) {
-        return userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getEmail, email)
-                .isNull(User::getDeletedAt)
-                .orderByAsc(User::getId)
-                .last("LIMIT 1"));
+        return userRepo.findByEmail(email);
     }
 
     /**
@@ -174,19 +169,12 @@ public class UserService implements UserNameLookup {
      * 走合成用户兜底 {@code system-<tenantId>}。
      */
     public User getUserByTenantIdFirst(long tenantId) {
-        return userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getTenantId, tenantId)
-                .isNull(User::getDeletedAt)
-                .orderByAsc(User::getCreatedAt)
-                .last("LIMIT 1"));
+        return userRepo.findByTenantIdFirst(tenantId);
     }
 
     /** 软删除过滤；找不到返回 null */
     public User getUserById(String id) {
-        return userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getId, id)
-                .isNull(User::getDeletedAt)
-                .last("LIMIT 1"));
+        return userRepo.findById(id);
     }
 
     /**
@@ -198,9 +186,7 @@ public class UserService implements UserNameLookup {
         if (ids == null || ids.isEmpty()) {
             return out;
         }
-        for (User u : userMapper.selectList(new LambdaQueryWrapper<User>()
-                .in(User::getId, ids)
-                .isNull(User::getDeletedAt))) {
+        for (User u : userRepo.listByIds(ids)) {
             out.put(u.getId(), u);
         }
         return out;
@@ -208,7 +194,7 @@ public class UserService implements UserNameLookup {
 
     /** 整行写回。调用方负责设置 updatedAt（写回不会自动刷新该列）。 */
     public void updateUser(User user) {
-        userMapper.updateById(user);
+        userRepo.updateById(user);
     }
 
     /**
@@ -218,15 +204,12 @@ public class UserService implements UserNameLookup {
     public void restoreTenantless(User user) {
         user.setTenantId(null);
         user.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        userMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<User>()
-                .eq(User::getId, user.getId())
-                .set(User::getTenantId, null)
-                .set(User::getUpdatedAt, user.getUpdatedAt()));
+        userRepo.restoreTenantless(user.getId(), user.getUpdatedAt());
     }
 
     /** register-by-invite 修复失败时的半建号清理。 */
     public void deleteUser(String id) {
-        userMapper.deleteById(id);
+        userRepo.deleteById(id);
     }
 
     // ── memberships 组装 ──────────────────────────────────────────────────
@@ -349,9 +332,7 @@ public class UserService implements UserNameLookup {
             // jsonb 列，两参 set 带 typeHandler 字段会 MyBatisSystemException（须用三参 set）。
             // 只写 tenant_id=NULL——preferences.last_active_tenant_id 的存量偏差无害
             // （pref==home 与 home 走同一条解析路径，净行为一致；已记录为已知偏差）。
-            userMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<User>()
-                    .eq(User::getId, user.getId())
-                    .set(User::getTenantId, null));
+            userRepo.clearTenantId(user.getId());
         } catch (RuntimeException e) {
             log.warn("clearStaleHomeTenant: failed to persist cleared home for user {} (was tenant {})", user.getId(), staleHome, e);
         }
@@ -380,7 +361,7 @@ public class UserService implements UserNameLookup {
             long tid = member.getTenantId();
             user.setTenantId(tid);
             try {
-                userMapper.updateById(user);
+                userRepo.updateById(user);
             } catch (RuntimeException e) {
                 log.warn("resolveLoginTenantID: failed to persist tenant {} for tenantless user {}", tid, user.getId(), e);
                 user.setTenantId(0L);
@@ -396,7 +377,7 @@ public class UserService implements UserNameLookup {
             user.getPreferences().setLastActiveTenantId(null);
         }
         try {
-            userMapper.updateById(user);
+            userRepo.updateById(user);
         } catch (RuntimeException e) {
             log.warn("clearLastActiveTenantPreference: failed to persist cleared preference for user {}", user.getId(), e);
         }
@@ -501,9 +482,9 @@ public class UserService implements UserNameLookup {
             if (createdTenant == null) {
                 // tenantless：getter 会把 null 归一成 0，必须走省略 tenant_id 列的插入
                 // （落 SQL NULL；写 0 在真 PG 违反 fk_users_tenant）
-                userMapper.insertTenantless(user);
+                userRepo.insertTenantless(user);
             } else {
-                userMapper.insert(user);
+                userRepo.insert(user);
             }
         } catch (RuntimeException e) {
             log.error("Failed to create user", e);
@@ -524,7 +505,7 @@ public class UserService implements UserNameLookup {
             } catch (RuntimeException e) {
                 log.error("Failed to create owner membership for user {} tenant {}", user.getId(), createdTenant.getId(), e);
                 try {
-                    userMapper.deleteById(user.getId());
+                    userRepo.deleteById(user.getId());
                 } catch (RuntimeException ignored) {
                     // 尽力回滚，失败忽略
                 }
@@ -541,11 +522,7 @@ public class UserService implements UserNameLookup {
 
     /** 软删除过滤；找不到返回 null */
     public User getUserByUsername(String username) {
-        return userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, username)
-                .isNull(User::getDeletedAt)
-                .orderByAsc(User::getId)
-                .last("LIMIT 1"));
+        return userRepo.findByUsername(username);
     }
 
     /** 从请求上下文取当前用户（AuthFilter 已鉴权）。 */
@@ -576,7 +553,7 @@ public class UserService implements UserNameLookup {
         }
         user.setPreferences(merged);
         user.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        userMapper.updateById(user);
+        userRepo.updateById(user);
         return merged;
     }
 
@@ -633,7 +610,7 @@ public class UserService implements UserNameLookup {
             user.getPreferences().setOidcOnlyLogin(false);
         }
         try {
-            userMapper.updateById(user);
+            userRepo.updateById(user);
         } catch (RuntimeException e) {
             throw new ChangePasswordException(ChangePasswordFailure.OTHER, e.getMessage());
         }
