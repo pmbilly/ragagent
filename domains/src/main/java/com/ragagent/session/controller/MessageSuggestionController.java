@@ -2,7 +2,7 @@ package com.ragagent.session.controller;
 
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
-import com.ragagent.session.domain.message.MessageSuggestionSet;
+import com.ragagent.session.dto.MessageSuggestionResponse;
 import com.ragagent.session.service.suggestion.MessageSuggestionFacade;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -43,12 +43,13 @@ public class MessageSuggestionController {
      * （不是解析器原文，与其他端点不同）。
      */
     @PostMapping("/api/v1/sessions/{sessionId}/messages/{messageId}/suggestions")
-    public ResponseEntity<MessageSuggestionSet> ensure(
+    public ResponseEntity<MessageSuggestionResponse> ensure(
             @PathVariable("sessionId") String sessionId,
             @PathVariable("messageId") String messageId,
             @RequestBody(required = false) String rawBody) {
-        MessageSuggestionSet set = suggestionFacade.ensureFollowUpsBody(sessionId, messageId, rawBody);
-        return ResponseEntity.status(MessageSuggestionFacade.statusFor(set)).body(set);
+        var set = suggestionFacade.ensureFollowUpsBody(sessionId, messageId, rawBody);
+        return ResponseEntity.status(MessageSuggestionFacade.statusFor(set))
+                .body(MessageSuggestionResponse.from(set));
     }
 
     /**
@@ -57,13 +58,14 @@ public class MessageSuggestionController {
      */
     @GetMapping({"/api/v1/sessions/{sessionId}/messages/{messageId}/suggestions",
             "/api/v1/sessions/{id}/messages/{messageId}/suggestions"})
-    public ResponseEntity<MessageSuggestionSet> get(
+    public ResponseEntity<MessageSuggestionResponse> get(
             @PathVariable(value = "sessionId", required = false) String sessionId,
             @PathVariable(value = "id", required = false) String idFallback,
             @PathVariable("messageId") String messageId) {
         String sid = sessionId == null || sessionId.isEmpty() ? idFallback : sessionId;
-        MessageSuggestionSet set = suggestionFacade.getFollowUpsSanitized(sid, messageId);
-        return ResponseEntity.status(MessageSuggestionFacade.statusFor(set)).body(set);
+        var set = suggestionFacade.getFollowUpsSanitized(sid, messageId);
+        return ResponseEntity.status(MessageSuggestionFacade.statusFor(set))
+                .body(MessageSuggestionResponse.from(set));
     }
 
     /**

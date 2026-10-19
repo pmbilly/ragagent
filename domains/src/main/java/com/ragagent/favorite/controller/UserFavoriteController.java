@@ -2,7 +2,7 @@ package com.ragagent.favorite.controller;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.favorite.domain.UserResourceFavorite;
+import com.ragagent.favorite.dto.FavoriteResponse;
 import com.ragagent.favorite.service.UserResourceFavoriteService;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResponse;
@@ -60,10 +60,11 @@ public class UserFavoriteController {
 
  /** 列表 = 裸数组；?type= 缺失/非法 → 400（空串不命中白名单）。 */
     @GetMapping("/api/v1/user/favorites")
-    public ResponseEntity<List<UserResourceFavorite>> listFavorites(@RequestParam(required = false) String type) {
+    public ResponseEntity<List<FavoriteResponse>> listFavorites(@RequestParam(required = false) String type) {
         String userId = favoriteUserId();
         Long tenantId = favoriteTenantId();
-        return ResponseEntity.ok(service.list(userId, tenantId, type));
+        return ResponseEntity.ok(service.list(userId, tenantId, type).stream()
+                .map(FavoriteResponse::from).toList());
     }
 
     /** 添加收藏：body 是 {type,id}；创建成功 **201 + 外壳体**（绑定文案见类注释）。 */

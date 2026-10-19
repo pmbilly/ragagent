@@ -11,6 +11,7 @@ import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTestResult;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.domain.McpTransportType;
+import com.ragagent.mcp.dto.McpCredentialsState;
 import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.ragagent.mcp.protocol.InitializeResult;
 import com.ragagent.mcp.protocol.McpClient;
@@ -478,6 +479,25 @@ public class McpServiceManagement {
      *
      * <p>写成功后必须关连接：否则下一次上游调用仍带旧凭据。</p>
      */
+    public McpCredentialsState credentialsState(long tenantId, String id) {
+        return state(getMCPServiceByID(tenantId, id));
+    }
+
+    public McpCredentialsState updateCredentialsState(long tenantId, String id,
+            String apiKey, String token) {
+        return state(updateMCPCredentials(tenantId, id, apiKey, token));
+    }
+
+    private static McpCredentialsState state(McpService service) {
+        if (service.getAuthConfig() == null) {
+            return new McpCredentialsState(false, false);
+        }
+        String key = service.getAuthConfig().getApiKey();
+        String token = service.getAuthConfig().getToken();
+        return new McpCredentialsState(
+                key != null && !key.isEmpty(), token != null && !token.isEmpty());
+    }
+
     public McpService updateMCPCredentials(long tenantId, String id, String apiKey, String token) {
         McpService existing = getMCPServiceByID(tenantId, id);
         if (existing.isIsBuiltin()) {

@@ -1,6 +1,4 @@
 /**
- * 系统 · 数据传输：SystemDtos。
- *
- * <p>依赖 {@code contract}。</p>
+ * 系统管理 · 传输形状：系统设置响应视图。
  */
 package com.ragagent.system.dto;

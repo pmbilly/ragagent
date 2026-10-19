@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-334 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+335 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -120,6 +120,7 @@
 | `:domains` | `com.ragagent.favorite` | 收藏域：用户对资源的收藏闭环（controller/service/mapper/domain 各一，最小完整域）。 |
 | `:domains` | `com.ragagent.favorite.controller` | 收藏 · HTTP 层：UserFavoriteController。 |
 | `:domains` | `com.ragagent.favorite.domain` | 收藏 · 领域模型：UserResourceFavorite。 |
+| `:domains` | `com.ragagent.favorite.dto` | 收藏 · 传输形状：用户资源收藏的响应视图。 |
 | `:domains` | `com.ragagent.favorite.mapper` | 收藏 · 映射：UserResourceFavoriteMapper。 |
 | `:domains` | `com.ragagent.favorite.service` | 收藏 · 服务：UserResourceFavoriteService。 |
 | `:domains` | `com.ragagent.im` | 即时通讯渠道域：九渠道适配（feishu/wechat/wecom/dingtalk/slack/mattermost/telegram/qqbot/yunzhijia， 一渠道一子包）与运行时（会话映射、工具展示、入站消息派发）。 |
@@ -238,7 +239,7 @@
 | `:domains` | `com.ragagent.system` | 系统设置与管理员面：系统设置读写（/api/v1/system）与管理员操作 （/api/v1/system/admin）。 |
 | `:domains` | `com.ragagent.system.controller` | 系统 · HTTP 层：SystemAdminController / SystemController。 |
 | `:domains` | `com.ragagent.system.domain` | 系统 · 领域模型：SystemSetting。 |
-| `:domains` | `com.ragagent.system.dto` | 系统 · 数据传输：SystemDtos。 |
+| `:domains` | `com.ragagent.system.dto` | 系统管理 · 传输形状：系统设置响应视图。 |
 | `:domains` | `com.ragagent.system.mapper` | 系统 · 映射：SystemSettingMapper。 |
 | `:domains` | `com.ragagent.system.service` | 系统 · 服务：SystemAdminUserService / SystemSettingService / SystemInfoService…。 |
 | `:domains` | `com.ragagent.tenant` | 租户域：租户实体、MyBatis 持久化、租户级配置（API principal / 聊天历史 / 解析引擎 / 检索 / 存储引擎）与配置脱敏。 |

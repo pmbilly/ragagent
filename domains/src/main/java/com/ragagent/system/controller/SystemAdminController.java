@@ -20,8 +20,8 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.platform.web.RejectEmptyBody;
-import com.ragagent.system.domain.SystemSetting;
 import com.ragagent.system.dto.SystemDtos;
+import com.ragagent.system.dto.SystemSettingResponse;
 import com.ragagent.system.service.SystemAdminUserService;
 import com.ragagent.system.service.SystemSettingService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -338,19 +338,16 @@ public class SystemAdminController {
     // ──：系统设置 ──────────────────────────────────────────────────────
 
     @GetMapping("/settings")
-    public ResponseEntity<List<Object>> listSettings() {
-        List<Object> out = new ArrayList<>();
-        for (var row : settings.list()) {
-            out.add(normalizeRow(row));
-        }
-        return ResponseEntity.ok(out);
+    public ResponseEntity<List<SystemSettingResponse>> listSettings() {
+        return ResponseEntity.ok(settings.list().stream()
+                .map(SystemSettingResponse::from).toList());
     }
 
     @GetMapping("/settings/{key}")
-    public ResponseEntity<SystemSetting> getSetting(
+    public ResponseEntity<SystemSettingResponse> getSetting(
             @PathVariable("key") String key) {
         try {
-            return ResponseEntity.ok(normalizeRow(settings.get(key)));
+            return ResponseEntity.ok(SystemSettingResponse.from(settings.get(key)));
         } catch (IllegalArgumentException e) {
             throw new BizException(AppError.badRequest(e.getMessage()));
         }
@@ -361,13 +358,13 @@ public class SystemAdminController {
     }
 
     @PutMapping("/settings/{key}")
-    public ResponseEntity<SystemSetting> updateSetting(
+    public ResponseEntity<SystemSettingResponse> updateSetting(
             @PathVariable("key") String key,
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false)
                     UpdateSettingRequest req) {
         try {
-            return ResponseEntity.ok(
-                    normalizeRow(settings.update(key, MAPPER.valueToTree(req.value()))));
+            return ResponseEntity.ok(SystemSettingResponse.from(
+                    settings.update(key, MAPPER.valueToTree(req.value()))));
         } catch (IllegalArgumentException e) {
             throw new BizException(AppError.badRequest(e.getMessage()));
         }
@@ -381,15 +378,6 @@ public class SystemAdminController {
             throw new BizException(AppError.badRequest(e.getMessage()));
         }
         return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
-    }
-
-    /** 虚拟行的 id 归一为 0（零值输出 0，不是 null）。 */
-    private static SystemSetting normalizeRow(
-            SystemSetting row) {
-        if (row.getId() == null) {
-            row.setId(0L);
-        }
-        return row;
     }
 
     // ── 运行时队列（Lite） ────────────────────────────────────────────────

@@ -1,8 +1,8 @@
 package com.ragagent.mcp.controller;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.dto.McpCredentialsResponse;
+import com.ragagent.mcp.dto.McpCredentialsState;
 import com.ragagent.mcp.service.McpServiceManagement;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
@@ -80,28 +80,25 @@ public class McpCredentialsController {
         // 无事可做——但不报 400（这是良性的空操作）：读出当前状态原样返回，
         // 客户端会把它当成一次正常的保存。
         if (req.apiKey() == null && req.token() == null) {
-            McpService service;
+            McpCredentialsState state;
             try {
-                service = svc.getMCPServiceByID(tenantId, serviceId);
+                state = svc.credentialsState(tenantId, serviceId);
             } catch (RuntimeException e) {
                 throw BizException.notFound("MCP service not found");
             }
-            if (service == null) {
-                throw BizException.notFound("MCP service not found");
-            }
             return ok(McpCredentialsResponse.of(
-                    configured(service, true), configured(service, false)));
+                    state.apiKeyConfigured(), state.tokenConfigured()));
         }
 
-        McpService updated;
+        McpCredentialsState state;
         try {
-            updated = svc.updateMCPCredentials(tenantId, serviceId, req.apiKey(), req.token());
+            state = svc.updateCredentialsState(tenantId, serviceId, req.apiKey(), req.token());
         } catch (RuntimeException e) {
             log.error("failed to update credentials, service_id={}", serviceId, e);
             throw BizException.internal("failed to update credentials: " + rawMessage(e));
         }
         return ok(McpCredentialsResponse.of(
-                configured(updated, true), configured(updated, false)));
+                state.apiKeyConfigured(), state.tokenConfigured()));
     }
 
     /**
@@ -126,16 +123,6 @@ public class McpCredentialsController {
             throw BizException.internal("failed to clear credential: " + rawMessage(e));
         }
         return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
-    }
-
-    /** 判定"已配置"：配置非 null 且对应字段非空串 */
-    private static boolean configured(McpService service, boolean apiKey) {
-        if (service.getAuthConfig() == null) {
-            return false;
-        }
-        String value = apiKey ? service.getAuthConfig().getApiKey()
-                : service.getAuthConfig().getToken();
-        return value != null && !value.isEmpty();
     }
 
     private static long requireTenant() {

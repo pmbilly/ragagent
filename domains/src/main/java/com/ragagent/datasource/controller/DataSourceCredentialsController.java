@@ -3,8 +3,9 @@ package com.ragagent.datasource.controller;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
-import com.ragagent.datasource.domain.DataSource;
+import com.ragagent.datasource.dto.DataSourceOwnership;
 import com.ragagent.datasource.dto.DatasourceCredentialsResponse;
+import com.ragagent.datasource.service.DataSourceReadService;
 import com.ragagent.datasource.service.DataSourceService;
 import com.ragagent.datasource.service.KnowledgeBridge;
 import com.ragagent.platform.access.TenantContext;
@@ -53,10 +54,14 @@ public class DataSourceCredentialsController {
 
 
     private final DataSourceService service;
+    private final DataSourceReadService readService;
     private final KnowledgeBridge kbBridge;
 
-    public DataSourceCredentialsController(DataSourceService service, KnowledgeBridge kbBridge) {
+    public DataSourceCredentialsController(DataSourceService service,
+                                          DataSourceReadService readService,
+                                          KnowledgeBridge kbBridge) {
         this.service = service;
+        this.readService = readService;
         this.kbBridge = kbBridge;
     }
 
@@ -70,7 +75,7 @@ public class DataSourceCredentialsController {
     @PutMapping("/api/v1/datasource/{id}/credentials")
     public ResponseEntity<?> put(@PathVariable("id") String id,
                                  @RequestBody(required = false) String rawBody) {
-        DataSource ds = ownDataSource(id);
+        DataSourceOwnership ds = ownDataSource(id);
         PutRequest req = parsePutBody(rawBody);
         // 字段校验（map 判 null）+ 紧随其后的非空校验
         if (req == null || req.credentials() == null) {
@@ -81,22 +86,13 @@ public class DataSourceCredentialsController {
                     "credentials map must be non-empty; to remove credentials use "
                             + "DELETE /credentials/credentials"));
         }
-        DataSource updated;
+        boolean configured;
         try {
-            updated = service.updateDataSourceCredentials(ds.getId(), req.credentials());
+            configured = readService.updateCredentials(ds.id(), req.credentials());
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to update credentials for data_source_id={}", ds.getId(), e);
+            log.error("[datasource] failed to update credentials for data_source_id={}", ds.id(), e);
             throw new BizException(AppError.badRequest(
                     "failed to update credentials: " + e.getMessage()));
-        }
-        boolean configured = false;
-        try {
-            var parsed = updated.parseConfig();
-            if (parsed != null) {
-                configured = parsed.hasConfiguredCredentials(updated.getType());
-            }
-        } catch (RuntimeException ignored) {
-            // 解析失败或结果为 null 都按"未配置"处理
         }
         return ResponseEntity.ok(DatasourceCredentialsResponse.credentials(configured));
     }
@@ -110,14 +106,14 @@ public class DataSourceCredentialsController {
     @DeleteMapping("/api/v1/datasource/{id}/credentials/{field}")
     public ApiResponse<Void> deleteField(@PathVariable("id") String id,
                                          @PathVariable("field") String field) {
-        DataSource ds = ownDataSource(id);
+        DataSourceOwnership ds = ownDataSource(id);
         if (!"credentials".equals(field)) {
             throw new BizException(AppError.badRequest("unknown credential field: " + field));
         }
         try {
-            service.clearDataSourceCredentials(ds.getId());
+            service.clearDataSourceCredentials(ds.id());
         } catch (RuntimeException e) {
-            log.error("[datasource] failed to clear credentials for data_source_id={}", ds.getId(), e);
+            log.error("[datasource] failed to clear credentials for data_source_id={}", ds.id(), e);
             throw new BizException(AppError.internal(
                     "failed to clear credentials: " + e.getMessage()));
         }
@@ -130,14 +126,14 @@ public class DataSourceCredentialsController {
      * 归属判定：与 {@code DataSourceController} 那份是<b>同型</b>，
      * 但错误映射不同（见类注释）。
      */
-    private DataSource ownDataSource(String id) {
+    private DataSourceOwnership ownDataSource(String id) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
             throw new BizException(AppError.badRequest("Workspace ID cannot be empty"));
         }
-        DataSource ds;
+        DataSourceOwnership ds;
         try {
-            ds = service.getDataSource(id);
+            ds = readService.ownership(id);
         } catch (RuntimeException e) {
             throw new BizException(AppError.notFound("data source not found"));
         }
@@ -146,13 +142,11 @@ public class DataSourceCredentialsController {
         }
         KnowledgeBaseRowView kb = null;
         try {
-            kb = kbBridge.findKnowledgeBase(ds.getKnowledgeBaseId());
+            kb = kbBridge.findKnowledgeBase(ds.knowledgeBaseId());
         } catch (RuntimeException ignored) {
             // 查询失败按"库不存在"处理
         }
-        // ⚠️ 必须用 Objects.equals：两边都是包装类型 Long，`!=` 比的是**引用**——
-        // 租户 id 10002 超出 Long 缓存区间（-128..127），装箱后的两个实例恒不相等，
-        // 于是每个请求都落 404。这是最容易无声踩到的一条。
+        // 必须用 Objects.equals：Long 装箱值超出缓存区间时 `!=` 比引用。
         if (kb == null || !java.util.Objects.equals(kb.getTenantId(), tenantId)) {
             throw new BizException(AppError.notFound("data source not found"));
         }

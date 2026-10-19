@@ -4,16 +4,11 @@
     "com/ragagent/auth/controller/AuthController.java": 2,
     "com/ragagent/auth/controller/TenantInvitationController.java": 3,
     "com/ragagent/auth/controller/TenantMemberController.java": 2,
-    "com/ragagent/datasource/controller/DataSourceCredentialsController.java": 1,
     "com/ragagent/embedchannel/controller/EmbedChannelController.java": 1,
-    "com/ragagent/favorite/controller/UserFavoriteController.java": 1,
     "com/ragagent/im/controller/ImCallbackController.java": 1,
     "com/ragagent/im/controller/ImChannelController.java": 1,
     "com/ragagent/knowledge/controller/KnowledgeBaseController.java": 1,
-    "com/ragagent/mcp/controller/McpCredentialsController.java": 1,
-    "com/ragagent/session/controller/MessageSuggestionController.java": 1,
     "com/ragagent/storage/controller/StorageBackendController.java": 1,
-    "com/ragagent/system/controller/SystemAdminController.java": 1,
     "com/ragagent/vectorstore/controller/VectorStoreController.java": 1
   }
 }

@@ -1,11 +1,13 @@
 package com.ragagent.datasource.service;
 
 import com.ragagent.datasource.domain.DataSource;
+import com.ragagent.datasource.dto.DataSourceOwnership;
 import com.ragagent.datasource.dto.DataSourceResponse;
 import com.ragagent.datasource.dto.ResourceResponse;
 import com.ragagent.datasource.dto.SyncLogResponse;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 
@@ -40,6 +42,23 @@ public class DataSourceReadService {
         ds.setTenantId(tenantId);
         ds.setKnowledgeBaseId(kbId);
         return DataSourceResponse.from(dataSourceService.updateDataSource(ds));
+    }
+
+    public DataSourceOwnership ownership(String id) {
+        var ds = dataSourceService.getDataSource(id);
+        return ds == null ? null
+                : new DataSourceOwnership(
+                        ds.getId(), ds.getKnowledgeBaseId());
+    }
+
+    public boolean updateCredentials(String id, Map<String, Object> credentials) {
+        var updated = dataSourceService.updateDataSourceCredentials(id, credentials);
+        try {
+            var parsed = updated.parseConfig();
+            return parsed != null && parsed.hasConfiguredCredentials(updated.getType());
+        } catch (RuntimeException ignored) {
+            return false;
+        }
     }
 
     public List<ResourceResponse> resources(String dsId, String parentId) {
