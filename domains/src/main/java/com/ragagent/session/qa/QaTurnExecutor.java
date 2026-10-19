@@ -237,6 +237,7 @@ public final class QaTurnExecutor {
         }
         Thread.Builder.OfVirtual runner = Thread.ofVirtual();
         runner.start(() -> TenantScope.run(requestTenant, () -> {
+            boolean failed = false;
             try {
                 // 本线程上的会话/消息查询按会话属主
                 // 租户范围——共享 agent 场景下当前主体不是属主，带 user 范围会查不到。
@@ -252,6 +253,7 @@ public final class QaTurnExecutor {
                     agentQaService.agentQA(qaReq, streamCtx.eventBus);
                 }
             } catch (RuntimeException serviceErr) {
+                failed = true;
                 log.error("QA service failed for session {}", sessionId, serviceErr);
                 Event errEvt = new Event();
                 errEvt.setType(EventType.EVENT_ERROR);
@@ -301,6 +303,12 @@ public final class QaTurnExecutor {
                         }
                         log.info("Agent QA service completed for session: {}", sessionId);
                     });
+                } else if (failed) {
+                    // NORMAL 早段失败：事件管线不会发出 done，完成位必须在此兜底——
+                    // 否则该行消息永久 completed=false（AGENT 侧一直有 finally 收尾，
+                    // 这条不对称正是缺陷来源）。completeAssistantMessage 是 CAS 幂等，
+                    // 与成功路径的事件收尾并发时只有一方赢。
+                    finalizeNormalOnFailure(reqCtx, streamCtx);
                 }
                 // 收尾（含身份相关的库写）完成后再清会话范围标记；租户上下文由 TenantScope 恢复
                 SessionLookupScope.clear();
@@ -310,6 +318,23 @@ public final class QaTurnExecutor {
             }
         }));
     }
+    /**
+     * NORMAL 失败收尾：把 assistant 消息提交为完成态。
+     *
+     * <p>包级可见是为定向测试能直接钉住这条不变量——它不是一个独立用例，只是
+     * finally 里的兜底动作。</p>
+     */
+    void finalizeNormalOnFailure(QaRequestContext reqCtx, SseStreamContext streamCtx) {
+        Message am = streamCtx.assistantMessage;
+        if (am == null) {
+            return;
+        }
+        Long sessionTenant = reqCtx.session.getTenantId();
+        turnFinalizer.runWithTenant(sessionTenant,
+                () -> turnFinalizer.completeAssistantMessage(
+                        am, reqCtx.query, reqCtx.userMessageID, sessionTenant));
+    }
+
     private void runFollowUp(QaRequestContext followUp) {
         // follow-up 是 skipSSE 的服务端自启轮（新虚拟线程执行）
         Thread.ofVirtual().start(() -> {
