@@ -361,6 +361,7 @@ boot           14 件                      →  boot
 | L44b | 2026-10-19 | **knowledge 适配器归位 + 观测门面**：`EmbeddingModelAdapter`、`KnowledgeBaseLookupAdapter` 搬 `knowledge/api`（本就是端口适配器）。新增 `runtime/KnowledgeTrace`——`startTask` 返回自有 `Scope` 包装（用例层不 import langfuse）、`previewPayload` 返回 `Object`；`ChunkExtractService`/`QuestionGenerationService` 改用它。**A16 −2（余 1）、A17 −3（knowledge 余 2）**。 | **40 守卫** · **5031 / 0 / 4** |
 | L44c | 2026-10-19 | **A16 清零**：新增 `support/KnowledgePage` + `KnowledgeRepository.searchPage`（条件构造与分页插件类型收进仓储，`KnowledgeService` 不再 import MyBatis）；新增 `support/EmbeddingFacts`，`FaqIndexWriter` 改注入 `contract` 的 `EmbeddingPort`。**A16 基线 45 → 0**；A17 −1（knowledge 清零）。换锚：port-map。 | **40 守卫** · **cleanTest 5031 / 0 / 4** |
 | L45 | 2026-10-19 | **A17 清零（收官）**：新增 `session/runtime/SessionModels`（`LangfuseChatClient`/`LangfuseReranker` 的 wrap 收口）与 `SessionTrace`（`start` 返回自有 `SpanHandle`、`attachTraceparent` 转发）；6 个 session 类改用它，不再 import langfuse/decorators。**三张棘轮全部归零：A16 45→0、A17 35→0、A11b 6→0**。 | **40 守卫** · **cleanTest 5031 / 0 / 4** |
+| L46 | 2026-10-19 | **跨域直连清零**（评估文档点名项）：`SessionMessageView` 搬 `contract/session`（跨域读模型）；新增 `MessageTranscriptPort` + `session/api/MessageTranscriptAdapter`；`MemoryExtractionService` 改注入端口，不再直接持有 `session.repository.MessageRepository`。**memory 域对 session 的直接 import 清零（2 → 0）**。 | **40 守卫** · **cleanTest 5031 / 0 / 4** |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
