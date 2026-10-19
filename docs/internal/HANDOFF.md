@@ -350,6 +350,7 @@ boot           14 件                      →  boot
 | L37c | 2026-10-19 | **租户管理跨域解耦 + 成员门面**：新增 `tenant/repository/TenantAdmin`（域侧端口，返回实体，按 `TenantLookup` 注释只给 L3 用）+ `TenantAdminImpl`（12 处调用下沉）；`TenantService` 不再持有 tenant 域 `TenantMapper`。新增 `auth/repository/TenantMemberRepository`、`UserRepository`；`AuthTokenRepository` 扩展 `revokeActiveByUserId`。附带：成员分页的关键字过滤原对用户表查两次，改为解析一次 id 集复用。**A16 −2、A17 −2**。 | **40 守卫** · **5030 / 0 / 4** |
 | L37d | 2026-10-19 | **UserService 收口**：`UserRepository` 扩为完整门面（邮箱/用户名/租户首用户、批量 id、插入含 tenantless 省略列、整行回写、`tenant_id` 置 NULL、恢复 tenantless、物理删除）；14 处 `userMapper` 调用下沉，service 不再 import MyBatis/mapper。**auth 域 A16/A17 清零（6 → 0）**。 | **40 守卫** · **5030 / 0 / 4** |
 | L38 | 2026-10-19 | **六个小域门面化**：favorite / system / model（含 usage）/ vectorstore / embedchannel / agentmanagement（含 question）各建 `repository` 门面，9 个 service 不再注入 mapper。vectorstore 的 mapper 同时更名 `VectorStoreRepository` → `VectorStoreMapper`（A11 命名对齐，为门面腾出原名）。**A16 −9、A17 −3**。 | **40 守卫** · **5030 / 0 / 4**（首轮 2 例 Redis 瞬态，隔离绿） |
+| L39 | 2026-10-19 | **IM 域门面 + Redis 运行面外提**：新增 `im/repository/ImChannelRepository`、`ChannelSessionRepository`；4 个 service 不再持有 mapper。新增 `im/runtime/ImRedisRuntime`——把 `im.redis-enabled` 判定、连接 ping 校验、`ImRedisStore`/`RedisPubSub` 创建从编排器构造体移出，编排器只取现成实例。**A16 −4、A17 −1（im 清零）**。 | **40 守卫** · **5030 / 0 / 4** |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
