@@ -3,6 +3,7 @@ package com.ragagent.wiki.service.ingest;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.domain.TaskDeadLetter;
+import com.ragagent.wiki.domain.ingest.WikiIngestSlotReleaser;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
@@ -34,14 +35,14 @@ final class WikiIngestTaskRunner {
 
     private final ObjectProvider<WikiIngestTaskHandler> handlerProvider;
     private final ObjectProvider<TaskDeadLetterRepository> deadLetterProvider;
-    private final ObjectProvider<WikiIngestService> ingestServiceProvider;
+    private final ObjectProvider<WikiIngestSlotReleaser> slotReleaserProvider;
 
     WikiIngestTaskRunner(ObjectProvider<WikiIngestTaskHandler> handlerProvider,
             ObjectProvider<TaskDeadLetterRepository> deadLetterProvider,
-            ObjectProvider<WikiIngestService> ingestServiceProvider) {
+            ObjectProvider<WikiIngestSlotReleaser> slotReleaserProvider) {
         this.handlerProvider = handlerProvider;
         this.deadLetterProvider = deadLetterProvider;
-        this.ingestServiceProvider = ingestServiceProvider;
+        this.slotReleaserProvider = slotReleaserProvider;
     }
 
     /**
@@ -118,7 +119,7 @@ final class WikiIngestTaskRunner {
         if (!WikiIngestTask.TYPE_WIKI_INGEST.equals(task.type())) {
             return;
         }
-        WikiIngestService service = ingestServiceProvider.getIfAvailable();
+        WikiIngestSlotReleaser service = slotReleaserProvider.getIfAvailable();
         if (service == null) {
             return;   // 未接线（测试/裁剪装配）
         }

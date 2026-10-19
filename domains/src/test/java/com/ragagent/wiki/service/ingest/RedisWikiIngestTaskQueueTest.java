@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.ragagent.platform.stream.EmbeddedRedis;
 import com.ragagent.wiki.domain.TaskDeadLetter;
+import com.ragagent.wiki.domain.ingest.WikiIngestSlotReleaser;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -67,8 +68,8 @@ class RedisWikiIngestTaskQueueTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static ObjectProvider<WikiIngestService> ingestServiceProvider() {
-        ObjectProvider<WikiIngestService> p = mock(ObjectProvider.class);
+    private static ObjectProvider<WikiIngestSlotReleaser> ingestServiceProvider() {
+        ObjectProvider<WikiIngestSlotReleaser> p = mock(ObjectProvider.class);
         when(p.getIfAvailable()).thenReturn(null);
         return p;
     }

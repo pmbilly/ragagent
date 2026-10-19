@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.wiki.domain.TaskDeadLetter;
+import com.ragagent.wiki.domain.ingest.WikiIngestSlotReleaser;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import java.time.Duration;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -89,12 +90,12 @@ class InProcessWikiIngestTaskQueueTest {
     }
 
     private void buildQueue(WikiIngestTaskHandler taskHandler, TaskDeadLetterRepository deadLetters,
-                            WikiIngestService ingestService) {
+                            WikiIngestSlotReleaser ingestService) {
         queue = new InProcessWikiIngestTaskQueue(
                 taskHandler == null ? emptyProvider() : providerOf(taskHandler),
                 deadLetters == null ? emptyProvider() : providerOf(deadLetters),
                 ingestService == null
-                        ? providerOf(Mockito.mock(WikiIngestService.class))
+                        ? providerOf(Mockito.mock(WikiIngestSlotReleaser.class))
                         : providerOf(ingestService));
     }
 

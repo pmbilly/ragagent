@@ -1,5 +1,6 @@
 package com.ragagent.wiki;
 
+import com.ragagent.wiki.domain.ingest.WikiIngestSlotReleaser;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import com.ragagent.wiki.service.ingest.RedisWikiDeletedTombstoneStore;
 import com.ragagent.wiki.service.ingest.RedisWikiFinalizeLock;
@@ -111,9 +112,9 @@ public class WikiRedisWiring {
     public WikiIngestTaskQueue redisWikiIngestTaskQueue(StringRedisTemplate template,
             ObjectProvider<WikiIngestTaskHandler> handlerProvider,
             ObjectProvider<TaskDeadLetterRepository> deadLetterProvider,
-            ObjectProvider<WikiIngestService> ingestServiceProvider) {
+            ObjectProvider<WikiIngestSlotReleaser> slotReleaserProvider) {
         return new RedisWikiIngestTaskQueue(template, handlerProvider, deadLetterProvider,
-                ingestServiceProvider);
+                slotReleaserProvider);
     }
 
     /** 跨实例可见的删除墓碑（快路径；正确性不依赖它，DB 回落仍在）。 */

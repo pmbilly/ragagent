@@ -1,6 +1,7 @@
 package com.ragagent.wiki.service.ingest;
 
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.domain.ingest.WikiIngestSlotReleaser;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import java.time.Duration;
 import java.util.List;
@@ -157,9 +158,9 @@ public class RedisWikiIngestTaskQueue implements WikiIngestTaskQueue {
     public RedisWikiIngestTaskQueue(StringRedisTemplate template,
             ObjectProvider<WikiIngestTaskHandler> handlerProvider,
             ObjectProvider<TaskDeadLetterRepository> deadLetterProvider,
-            ObjectProvider<WikiIngestService> ingestServiceProvider) {
+            ObjectProvider<WikiIngestSlotReleaser> slotReleaserProvider) {
         this.template = template;
-        this.runner = new WikiIngestTaskRunner(handlerProvider, deadLetterProvider, ingestServiceProvider);
+        this.runner = new WikiIngestTaskRunner(handlerProvider, deadLetterProvider, slotReleaserProvider);
         this.dispatcher.submit(this::dispatchLoop);
     }
 

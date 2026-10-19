@@ -1,5 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.wiki.domain.ingest.WikiIngestSlotReleaser;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -83,8 +84,8 @@ public class InProcessWikiIngestTaskQueue implements WikiIngestTaskQueue {
     public InProcessWikiIngestTaskQueue(
             ObjectProvider<WikiIngestTaskHandler> handlerProvider,
             ObjectProvider<TaskDeadLetterRepository> deadLetterProvider,
-            ObjectProvider<WikiIngestService> ingestServiceProvider) {
-        this.runner = new WikiIngestTaskRunner(handlerProvider, deadLetterProvider, ingestServiceProvider);
+            ObjectProvider<WikiIngestSlotReleaser> slotReleaserProvider) {
+        this.runner = new WikiIngestTaskRunner(handlerProvider, deadLetterProvider, slotReleaserProvider);
     }
 
     @Override

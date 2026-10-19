@@ -8,6 +8,7 @@ import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.platform.concurrent.SingleFlight;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.domain.TaskPendingOp;
+import com.ragagent.wiki.domain.ingest.WikiIngestSlotReleaser;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import com.ragagent.wiki.repository.TaskPendingOpsRepository;
 import com.ragagent.wiki.service.WikiImageEnricher;
@@ -67,7 +68,7 @@ import tools.jackson.databind.ObjectMapper;
  * </ul>
  */
 @Service
-public class WikiIngestService {
+public class WikiIngestService implements WikiIngestSlotReleaser {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestService.class);
 
@@ -360,6 +361,7 @@ public class WikiIngestService {
     }
 
     /** 队列侧任务级重试耗尽后的槽位收尾——见 {@code WikiIngestSettleOps#releaseSlotsForAbandonedTask}。 */
+    @Override
     public void releaseSlotsForAbandonedTask(String kbId) {
         settleOps.releaseSlotsForAbandonedTask(kbId);
     }
