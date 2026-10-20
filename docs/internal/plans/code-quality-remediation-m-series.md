@@ -69,7 +69,7 @@
 
 **顺序**：M1 → M2a → M2b → M3a → M3b → M3c → M4a → M4b → M5 → M6a → M6b → M6c → M6d → M6e → M7。
 
-**进度（2026-10-20）**：M1 ✅（方法长度守卫上线，基线 32，红态探针已验；45 守卫绿）· M2a ✅（钉钉拆 3 类、流表 key 带渠道、token 单飞 + 60s TTL 下限）· M2b ✅（会话批量删除、KB 单次查询）· M3a ✅（`Hashes` 落地，SHA-256 实现 20 → 2：platform + contract 例外）· M3c ✅（4 份 `sanitizeForLog` 归零，`UnicodeText.trim` 收 auth/RSS 副本）。全量构建 5038 / 0 / 4。M3b 待启动。
+**进度（2026-10-20）**：M1 ✅（方法长度守卫上线，基线 32，红态探针已验；45 守卫绿）· M2a ✅（钉钉拆 3 类、流表 key 带渠道、token 单飞 + 60s TTL 下限）· M2b ✅（会话批量删除、KB 单次查询）· M3a ✅（`Hashes` 落地，SHA-256 实现 20 → 2：platform + contract 例外）· M3b ✅（`ActivityAuditRecorder` 合并 Faq/Tag/DataSource 三份 KB 活动审计）· M3c ✅（4 份 `sanitizeForLog` 归零，`UnicodeText.trim` 收 auth/RSS 副本）。全量构建 5042 / 0 / 4。M4 起待启动。
 
 ## 4. 明确不做 / 待拍板
 

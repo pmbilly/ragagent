@@ -1,7 +1,6 @@
 package com.ragagent.knowledge.service.faq;
 
 import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -25,8 +24,8 @@ import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.support.FaqImportTaskStore;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.audit.ActivityAuditRecorder;
 import com.ragagent.platform.security.Hashes;
-import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -38,8 +37,6 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ObjectNode;
 
 /**
  * FAQ 条目命令面：创建、更新、相似问追加、批量字段/标签更新与删除，
@@ -51,8 +48,6 @@ public class FaqEntryCommandService {
 
     private static final Logger log = LoggerFactory.getLogger(FaqEntryCommandService.class);
 
-    /** 审计 details 的节点构造走统一策略（JsonMappers.lenient）。 */
-    private static final ObjectMapper JSON = JsonMappers.lenient();
 
     private final ChunkRepository chunkRepository;
     private final FaqChunkRepository faqChunkRepository;
@@ -61,7 +56,7 @@ public class FaqEntryCommandService {
     private final FaqImportTaskStore taskStore;
     private final VectorIndexStore vectorStore;
     private final KnowledgeVectorWrites vectorWrites;
-    private final AuditWritePort auditWriter;
+    private final ActivityAuditRecorder activityAudit;
     private final FaqGuard faqGuard;
     private final FaqChunkCodec faqChunkCodec;
     private final FaqIndexWriter faqIndexWriter;
@@ -84,7 +79,7 @@ public class FaqEntryCommandService {
         this.taskStore = taskStore;
         this.vectorStore = vectorStore;
         this.vectorWrites = vectorWrites;
-        this.auditWriter = auditWriter;
+        this.activityAudit = new ActivityAuditRecorder(auditWriter);
         this.faqGuard = faqGuard;
         this.faqChunkCodec = faqChunkCodec;
         this.faqIndexWriter = faqIndexWriter;
@@ -626,46 +621,10 @@ public class FaqEntryCommandService {
         }
     }
 
-    /**
-     * 尽力而为的 KB 活动审计。
-     * ScopeType=knowledge_base、ScopeID=kbID、Outcome=success、details 按字母序。
-     */
+    /** 尽力而为的 KB 活动审计；写入规则见 {@link ActivityAuditRecorder}。 */
     private void recordKbActivity(long tenantId, String kbId, String action,
                                   String targetType, String targetId, Map<String, Object> details) {
-        if (kbId == null || kbId.isEmpty()) {
-            return;
-        }
-        long tid = tenantId;
-        if (tid == 0) {
-            Long ctxTenant = TenantContext.currentTenantId();
-            tid = ctxTenant == null ? 0L : ctxTenant;
-        }
-        if (tid == 0) {
-            return;
-        }
-        String actorId = TenantContext.currentUserId() == null
-                ? "" : TenantContext.currentUserId();
-        String actorRole = actorId.isEmpty() ? ""
-                : TenantContext.currentRole() == null
-                ? "" : TenantContext.currentRole();
-
-        ObjectNode detailsNode = JSON.createObjectNode();
-        details.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .forEachOrdered(e -> detailsNode.set(e.getKey(),
-                        JSON.valueToTree(e.getValue())));
-        auditWriter.logBestEffort(new AuditWritePort.AuditRecord(
-                tid,
-                actorId,
-                actorRole,
-                action,
-                targetType,
-                targetId,
-                "",
-                "knowledge_base",
-                kbId,
-                AuditOutcome.SUCCESS,
-                detailsNode.toString()));
+        activityAudit.record(tenantId, "knowledge_base", kbId, action, targetType, targetId, details);
     }
 
 

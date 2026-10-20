@@ -1,7 +1,5 @@
 package com.ragagent.datasource.service;
 
-import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.datasource.domain.DataSource;
@@ -206,78 +204,27 @@ final class DataSourceSupport {
     }
 
     /**
-     * 记录一条知识库活动审计。
+     * 记录一条知识库活动审计（写入规则见 {@code ActivityAuditRecorder}）。
      *
      * <p>本模块只发"汇总事件"——同步期间的单条变更一律被压掉
      * （{@code suppressed} 参数），由调用点自己保证只发汇总。</p>
-     *
-     * <p>details 的键序按字母序输出，
-     * 所以这里用 {@link TreeMap} 构造（与 {@code WikiActivityAuditRecorder} 同款处置）。</p>
      */
     void recordKbActivity(long tenantId, String kbId, String action, String targetType,
                           String targetId, String outcome, Map<String, Object> details,
                           ActivityTask task, boolean suppressed) {
-        if (suppressed) {
-            return;
-        }
-        if (kbId == null || kbId.isEmpty() || action == null || action.isEmpty()) {
-            return;
-        }
-        long tid = tenantId;
-        if (tid == 0) {
-            Long ctx = TenantContext.currentTenantId();
-            tid = ctx == null ? 0L : ctx;
-        }
-        if (tid == 0) {
-            return;
-        }
-        String effOutcome = outcome == null || outcome.isEmpty() ? AuditOutcome.SUCCESS : outcome;
-
-        Map<String, Object> activityDetails = new TreeMap<>();
-        if (details != null) {
-            activityDetails.putAll(details);
-        }
-        if (task != null) {
-            if (task.taskId() != null && !task.taskId().isEmpty()
-                    && !activityDetails.containsKey("taskId")) {
-                activityDetails.put("taskId", task.taskId());
-            }
-            if (task.trigger() != null && !task.trigger().isEmpty()
-                    && !activityDetails.containsKey("trigger")) {
-                activityDetails.put("trigger", task.trigger());
-            }
-            if (!activityDetails.containsKey("processingStatus")) {
-                switch (effOutcome) {
-                    case AuditOutcome.ACCEPTED -> activityDetails.put("processingStatus", "pending");
-                    case AuditOutcome.SUCCESS -> activityDetails.put("processingStatus", "completed");
-                    case AuditOutcome.PARTIAL -> activityDetails.put("processingStatus", "partial");
-                    case AuditOutcome.FAILED, AuditOutcome.DENIED ->
-                            activityDetails.put("processingStatus", "failed");
-                    case AuditOutcome.CANCELED ->
-                            activityDetails.put("processingStatus", "canceled");
-                    default -> { }
-                }
-            }
-        }
-
-        tools.jackson.databind.JsonNode detailsNode =
-                activityDetails.isEmpty() ? null : DataSourceService.MAPPER.valueToTree(activityDetails);
-
-        String actorId = nullToEmpty(TenantContext.currentUserId());
-        String actorRole = actorId.isEmpty() ? "" : nullToEmpty(TenantContext.currentRole());
-
-        service.auditWriter.logBestEffort(new AuditWritePort.AuditRecord(
-                tid,
-                actorId,
-                actorRole,
+        service.activityAudit.record(
+                tenantId,
+                "knowledge_base",
+                kbId,
                 action,
                 targetType,
                 targetId,
-                "",
-                "knowledge_base",
-                kbId,
-                effOutcome,
-                detailsNode == null ? null : detailsNode.toString()));
+                outcome,
+                details,
+                task == null ? "" : task.taskId(),
+                task == null ? "" : task.trigger(),
+                task != null,
+                suppressed);
     }
 
     static String nullToEmpty(String v) {

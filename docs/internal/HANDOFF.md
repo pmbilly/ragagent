@@ -157,7 +157,7 @@
 | **M2a** | 钉钉：流表 key 加 channelId、token 单飞 + 负 TTL；拆解析/API/卡片流 | ✅ 2026-10-20 |
 | **M2b** | 会话批量删除批量化 + 知识检索 KB 缓存（去逐条查/重复查） | ✅ 2026-10-20 |
 | **M3a** | `platform.security.Hashes`：SHA-256 19 处替换（contract 1 处登记为例外） | ✅ 2026-10-20 |
-| **M3b** | `platform.audit.ActivityAuditRecorder`：合并 3 份 `recordKbActivity` | 待启动 |
+| **M3b** | `platform.audit.ActivityAuditRecorder`：合并 3 份 `recordKbActivity` | ✅ 2026-10-20 |
 | **M3c** | `LogSanitizer` 替换 4 份 `sanitizeForLog`；`trimUnicodeWhitespace` 入 `platform.text` | ✅ 2026-10-20 |
 | **M4a** | `UserService.register` 改 `@Transactional` + 失败注入测试；删外层手写补偿 | 待启动 |
 | **M4b** | 事务边界约定（`mechanisms.md`）+ mcp/storage/session/im/datasource 多写审计 | 待启动 |
@@ -494,6 +494,7 @@ boot           14 件                      →  boot
 | M2b | 2026-10-20 | **会话批量删除去 N+1**：`SessionRepository.getByIds`（软删+owner 范围一次取）替代逐条 `get`；`MessageSuggestionRepository.deleteBySessionIds` 一条 `IN` 替代逐会话删；`KnowledgeSearchService` 首轮缓存 KB，去掉同一 scope 的第二次 `findById` | 会话/建议仓储定向测试全绿 · 全量 5034 / 0 / 4 |
 | M3a | 2026-10-20 | **SHA-256 收敛**：新增 `platform.security.Hashes`（sha256/hex/hexPrefix/sha256Hex[Prefix]/sha256Base64Url）；替换 19 处手工实现，contract 的 `FaqChunkMetadata` 保留为纯 JDK 例外；`PromptFingerprints` 分段 NUL 拼接改为 `\0` 转义（替换时误写真实 NUL，已修）。**实测修正报告**：报告称 18 处，实为 20 个文件 | SHA-256 `MessageDigest` 实现 **20 → 2** · Hashes NIST 向量 4 测试 · 45 守卫绿 · build 1m58s / **5038 / 0 / 4** |
 | M3c | 2026-10-20 | **日志消毒/trim 单源化**：删 4 份 `sanitizeForLog`（UserService / McpMetadataService / ModelDebugController / PipelineLog），统一 `platform.security.LogSanitizer`；新增 `platform.text.UnicodeText.trim`，收纳 auth 与 RSS 的 Unicode 空白副本；`AuthController` 不再反向依赖 `UserService` 静态工具 | `sanitizeForLog` 4 → 0 · 45 守卫绿 · build 2m9s / **5034 / 0 / 4** |
+| M3b | 2026-10-20 | **KB 活动审计共享记录器**：新增 `platform.audit.ActivityAuditRecorder`（租户兜底/操作者提取/details 字母序/best-effort；任务上下文按 outcome 映射 processingStatus）；FaqEntryCommandService / KnowledgeTagService / DataSourceSupport 三份 `recordKbActivity` 的实现收敛为薄委托；删除三处各自维护的 JSON/审计样板与无用 imports | 新增 4 例记录器测试（排序/suppressed/任务字段/租户兜底）· 45 守卫绿 · build 2m22s / **5042 / 0 / 4** |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

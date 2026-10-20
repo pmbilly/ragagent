@@ -18,6 +18,7 @@ import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorRegistry;
 import com.ragagent.datasource.repository.DataSourceRepository;
 import com.ragagent.datasource.repository.SyncLogRepository;
+import com.ragagent.platform.audit.ActivityAuditRecorder;
 import com.ragagent.platform.tracing.TraceInjector;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
@@ -117,7 +118,7 @@ public class DataSourceService implements DataSourceSyncHandler {
     final ConnectorRegistry connectorRegistry;
     final DataSourceSchedulePort scheduler;
     final TenantConfigLookup tenantService;
-    final AuditWritePort auditWriter;
+    final ActivityAuditRecorder activityAudit;
     final AutoTagProvider autoTagProvider;
 
     /** 结果落库协作者（构造期装配）。 */
@@ -148,7 +149,7 @@ public class DataSourceService implements DataSourceSyncHandler {
         this.connectorRegistry = connectorRegistry;
         this.scheduler = scheduler;
         this.tenantService = tenantService;
-        this.auditWriter = auditWriter;
+        this.activityAudit = new ActivityAuditRecorder(auditWriter);
         this.autoTagProvider = autoTagProvider;
         this.resultOps = new DataSourceSyncResultOps(this);
         this.support = new DataSourceSupport(this);

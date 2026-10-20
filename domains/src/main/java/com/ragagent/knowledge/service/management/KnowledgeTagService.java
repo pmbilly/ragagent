@@ -1,7 +1,6 @@
 package com.ragagent.knowledge.service.management;
 
 import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -19,7 +18,7 @@ import com.ragagent.knowledge.repository.FaqChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.support.KnowledgeTaskRunner;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.audit.ActivityAuditRecorder;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,8 +28,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ObjectNode;
 
 /**
  * <h2>路由链与 Java 落地</h2>
@@ -59,7 +56,6 @@ import tools.jackson.databind.node.ObjectNode;
 public class KnowledgeTagService {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeTagService.class);
-    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     /** 未打标签的 FAQ 条目统一显示名。 */
     public static final String UNTAGGED_TAG_NAME = "未分类";
 
@@ -69,7 +65,7 @@ public class KnowledgeTagService {
     private final KnowledgeTagRepository tagRepo;
     private final FaqChunkRepository faqChunkRepository;
     private final ChunkRepository chunkRepo;
-    private final AuditWritePort auditWriter;
+    private final ActivityAuditRecorder activityAudit;
     /** 向量索引回收。 */
     private final VectorIndexStore vectorStore;
     /** 绑定 store 的向量写路由（绑定 KB 的索引清理走引擎口）。 */
@@ -106,7 +102,7 @@ public class KnowledgeTagService {
         this.kbService = kbService;
         this.tagRepo = tagRepo;
         this.chunkRepo = chunkRepo;
-        this.auditWriter = auditWriter;
+        this.activityAudit = new ActivityAuditRecorder(auditWriter);
         this.vectorStore = vectorStore;
         this.vectorWrites = vectorWrites;
         this.modelRuntimeAssembler = modelRuntimeAssembler;
@@ -410,44 +406,10 @@ public class KnowledgeTagService {
         return m;
     }
 
-    /**
-     * 尽力而为的 KB 活动审计。
-     * ScopeType=knowledge_base、ScopeID=kbID、TargetType/TargetID 如实、
-     * Outcome=success、details 按字母序（map 序列化语义）。
-     */
+    /** 尽力而为的 KB 活动审计；写入规则见 {@link ActivityAuditRecorder}。 */
     private void recordKbActivity(long tenantId, String kbId, String action,
                                   String targetType, String targetId, Map<String, Object> details) {
-        if (kbId == null || kbId.isEmpty()) {
-            return;
-        }
-        long tid = tenantId;
-        if (tid == 0) {
-            Long ctxTenant = TenantContext.currentTenantId();
-            tid = ctxTenant == null ? 0L : ctxTenant;
-        }
-        if (tid == 0) {
-            return;
-        }
-        String actorId = TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId();
-        String actorRole = actorId.isEmpty() ? "" : TenantContext.currentRole() == null
-                ? "" : TenantContext.currentRole();
-
-        ObjectNode detailsNode = MAPPER.createObjectNode();
-        details.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .forEachOrdered(e -> detailsNode.set(e.getKey(), MAPPER.valueToTree(e.getValue())));
-        auditWriter.logBestEffort(new AuditWritePort.AuditRecord(
-                tid,
-                actorId,
-                actorRole,
-                action,
-                targetType,
-                targetId,
-                "",
-                SCOPE_KNOWLEDGE_BASE,
-                kbId,
-                AuditOutcome.SUCCESS,
-                detailsNode.toString()));
+        activityAudit.record(tenantId, SCOPE_KNOWLEDGE_BASE, kbId, action, targetType, targetId, details);
     }
 
     /**

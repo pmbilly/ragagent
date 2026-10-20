@@ -5,15 +5,15 @@
 
 ## 统计
 
-- 域间（解耦）：**23**
+- 域间（解耦）：**22**
 - 复合面（随复合端口）：**7**
-- 跨模块（必要）：**10**
+- 跨模块（必要）：**11**
 
 ## 明细
 
 | Port | 实现类 | 实现模块 | 调用方域 | 类型 |
 |---|---|---|---|---|
-| `AuditWritePort` | `AuditWriteAdapter` | domains | agentmanagement、auth、datasource、knowledge、system | 域间（解耦） |
+| `AuditWritePort` | `AuditWriteAdapter` | domains | agentmanagement、auth、datasource、knowledge、platform、system | 跨模块（必要） |
 | `ChunkFaqReadPort` | — | ? | — | 复合面（随复合端口） |
 | `DocReaderAdminPort` | `DocReaderAdminAdapter` | domains | knowledge、system | 域间（解耦） |
 | `DocReaderParsePort` | `DocReaderParseAdapter` | domains | im、initialization、session | 域间（解耦） |
