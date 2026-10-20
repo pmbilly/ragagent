@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-354 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+355 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -156,6 +156,7 @@
 | `:domains` | `com.ragagent.knowledge.controller` | 知识库 HTTP 面：薄绑定层（@Valid DTO → service → 裸资源视图），线格式 camelCase、无信封； 无手搓解析与信封拼装。 |
 | `:domains` | `com.ragagent.knowledge.domain` | 知识库持久化实体与 JSON 结构（MyBatis-Plus 注解 + Jackson 序列化注解）。 |
 | `:domains` | `com.ragagent.knowledge.domain.access` | 知识库访问守卫：KnowledgeRouteGuards（路由级租户/成员校验）+ KnowledgeAccessGuard（知识库读写权限）+ ChunkAccessGuard（chunk 写守卫） |
+| `:domains` | `com.ragagent.knowledge.domain.ingest` | 知识 · 入库状态：5 个 canonical 阶段（IngestStage）与一次尝试的内存态 （IngestJob）。 |
 | `:domains` | `com.ragagent.knowledge.domain.span` | 处理轨迹（span）追踪：SpanTracker 维护 attempt/stage/sub-span 的开启与收口， 落库经 KnowledgeSpanRepository。 |
 | `:domains` | `com.ragagent.knowledge.dto` | 知识库域的**请求/响应载荷**（HTTP 面 DTO，无逻辑）。 |
 | `:domains` | `com.ragagent.knowledge.dto.chunk` | chunk 面载荷：chunk 读写与修订、重解析、内容预览（Chunk* / *Reparse* / Preview*）。 |

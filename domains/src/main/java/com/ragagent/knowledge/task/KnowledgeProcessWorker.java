@@ -10,6 +10,8 @@ import com.ragagent.knowledge.config.KnowledgeOcrProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.ingest.IngestJob;
+import com.ragagent.knowledge.domain.ingest.IngestStage;
 import com.ragagent.knowledge.domain.span.SpanTracker;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
@@ -169,6 +171,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         } catch (RuntimeException e) {
             log.warn("[SpanTracker] openAttempt failed kid={}", knowledgeId, e);
         }
+        IngestJob job = IngestJob.start(knowledgeId, attempt);
         try {
             Knowledge k = knowledgeRepository.findByIdAny(knowledgeId);
             if (k == null || k.isAborted()) {
@@ -183,15 +186,21 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             //：记下本次尝试的 chunk id——失败清场只删它们（见 cleanupFailedAttempt）。
             List<String> attemptChunkIds = List.of();
             try {
+                job = job.progress(IngestStage.DOC_READER);
                 String markdown = textExtractor.extract(k, attempt, knowledgeId);
                 if (knowledgeRepository.findByIdAny(knowledgeId).isAborted()) {
                     return; // 中途取消检查点
                 }
+                job = job.progress(IngestStage.CHUNKING);
                 List<Chunk> chunks = chunkWriter.chunkAndPersist(
                         k, kb, knowledgeId, markdown, attempt);
                 attemptChunkIds = chunks.stream().map(Chunk::getId).toList();
+                job = job.progress(IngestStage.EMBEDDING);
                 indexStage.embedChunks(k, kb, embedConfig, chunks, knowledgeId, attempt);
+                job = job.progress(IngestStage.POST_PROCESS);
                 finalizingStage.finalizeProcessing(k, kb, knowledgeId, attempt, chunks);
+                job = job.completed();
+                log.debug("process knowledge {} completed at {}", knowledgeId, job.stage());
             } catch (Exception inner) {
                 indexStage.cleanupFailedAttempt(knowledgeId, attemptChunkIds, k, kb, embedConfig);
                 throw inner;
@@ -200,7 +209,9 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             String message = e.getMessage() == null ? e.toString() : e.getMessage();
             // 处理体抛错 → span/根记 outcome=error（scope.finish 幂等，随后的 close 不会覆盖）
             scope.finish("error", message);
-            log.warn("process knowledge {} failed", knowledgeId, e);
+            job = job.failed();
+            log.warn("process knowledge {} failed stage={} status={}",
+                    knowledgeId, job.stage(), job.status(), e);
             finalizingStage.failOrComplete(knowledgeId, attempt, message);
         }
     }

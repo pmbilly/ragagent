@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.domain;
 
+import com.ragagent.knowledge.domain.ingest.IngestStage;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -26,12 +27,12 @@ public class KnowledgeProcessingSpan {
     public static final String STATUS_SKIPPED = "skipped";
     public static final String STATUS_CANCELLED = "cancelled";
 
-    // ── stage 名 ───────────────────────────────────────────────────────
-    public static final String STAGE_DOC_READER = "docreader";
-    public static final String STAGE_CHUNKING = "chunking";
-    public static final String STAGE_EMBEDDING = "embedding";
-    public static final String STAGE_MULTIMODAL = "multimodal";
-    public static final String STAGE_POST_PROCESS = "postprocess";
+    // ── stage 名（唯一来源：IngestStage） ─────────────────────────────
+    public static final String STAGE_DOC_READER = IngestStage.DOC_READER.code();
+    public static final String STAGE_CHUNKING = IngestStage.CHUNKING.code();
+    public static final String STAGE_EMBEDDING = IngestStage.EMBEDDING.code();
+    public static final String STAGE_MULTIMODAL = IngestStage.MULTIMODAL.code();
+    public static final String STAGE_POST_PROCESS = IngestStage.POST_PROCESS.code();
 
     /**
  * 5 个 canonical 阶段名（顺序即展示顺序）。
@@ -40,8 +41,7 @@ public class KnowledgeProcessingSpan {
  * 而 {@code domain → service} 是不能有的反向边；{@code KnowledgeProcessingSpan.ALL_STAGES} 现委任本常量
  * （对外公共常量不变）。</p>
  */
-    public static final List<String> ALL_STAGES =
-            List.of(STAGE_DOC_READER, STAGE_CHUNKING, STAGE_EMBEDDING, STAGE_MULTIMODAL, STAGE_POST_PROCESS);
+    public static final List<String> ALL_STAGES = IngestStage.codes();
 
     private long id;
     private String knowledgeId = "";

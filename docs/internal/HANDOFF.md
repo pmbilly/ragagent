@@ -105,7 +105,7 @@
 | **H2a** | 问答运行时段：抽 `TurnRuntime`（3 字段） | ✅ 2026-10-20 |
 | **H2b** | H2b-1 ✅ 只读视图；H2b-2 ✅ 插件签名改 `PipelineState`（插件包 0 处 `ChatManage` 引用）；H2b-3 `QaRequestContext` 收口 待做 | H2b-2 ✅ 2026-10-20 |
 | **H2c** | 状态段六组全部抽离（Answer / Rerank / Merged / QueryPlan / Entity / SearchOutcome）；`ChatManage` 只剩 history / usedMemories 等流转字段 | ✅ 2026-10-20 |
-| **H3** | 入库 `IngestJob` 状态机 + `IngestStage` 接口 | 待做 |
+| **H3** | H3-1 ✅ `IngestStage` 枚举 + `IngestJob` 尝试状态；余 CAS 4→1 与 `KnowledgeTaskExecutor` 收口 | H3-1 ✅ 2026-10-20 |
 | **H4a** | 任务契约：`TaskQueue`（命名/启停/测试钩子）+ `RetryDelayOverride`；6 套队列接口继承；钩子机制 5→1。H4b 迁实现 | H4a-1 ✅ 2026-10-20 |
 | **H4b** | 任务实现：**datasource ✅ + wiki ✅**（均迁到 `RedisRetryingTaskQueue`）；memory/knowledge 已在基座 | H4b-2 ✅ 2026-10-20 |
 | **H5a** | 分页统一：**H5a-1 ✅** 形状收敛（`PageResult<T>`，11 类型 → 1）；H5a-2 待做（管理端点加分页参数 + 前端） | H5a-1 ✅ 2026-10-20 |
@@ -423,6 +423,7 @@ boot           14 件                      →  boot
 | H2c-5 | 2026-10-20 | **实体组抽离**：新增 `session.rag.EntityContext`（entity/entityKbIds/entityKnowledge）；`ChatManage` 删 3 字段 + 6 访问器，改为 `getEntityContext()`；5 个文件、15 处调用点改链式访问（含并发分支的 `fOrig`）；克隆整组复制且容器换新。 | **42 守卫全绿** · **5022 / 0 / 4** · build 2m7s |
 | H2c-6 | 2026-10-20 | **检索产出抽离（H2c 收尾）**：新增 `session.rag.SearchOutcome`（results/graph）；`ChatManage` 删 searchResult/graphResult 字段 + 4 访问器，改为 `getSearchOutcome()`；12 个文件、64 处调用点改链式访问（含 `chunkCM`/`entityCM` 并发分支）；clone 不复制产出（结构上保证）；管线表覆盖。 | **42 守卫全绿** · **5022 / 0 / 4** · build 2m2s |
 | H2b-2 | 2026-10-20 | **插件签名去 `ChatManage`**：新增 `session.rag.PipelineState`（`TurnInputView` + 六组状态 + history/usedMemories + `needsRetrieval`/`citationsEnabled`/`setRerankThreshold`/`fork`）；`ChatManage implements PipelineState`，`fork()` 统一并发副本；`Plugin.onEvent` / `EventManager` 改收 `PipelineState`；17 个插件 + 4 个辅助类 + 测试夹具同步，**插件包 `ChatManage` 引用 0**。管线表生成器识别新签名。**余**：`QaRequestContext` 34 字段收口。 | **42 守卫全绿** · **5022 / 0 / 4** · build 2m41s |
+| H3-1 | 2026-10-20 | **入库阶段枚举与尝试状态**：新增 `knowledge.domain.ingest.IngestStage`（5 canonical 阶段，span 常量与 `ALL_STAGES` 的唯一来源）与 `IngestJob`（PENDING→PROCESSING→COMPLETED/FAILED，终态不可逆）；`KnowledgeProcessWorker` 按 DOC_READER→CHUNKING→EMBEDDING→POST_PROCESS 推进，失败日志带阶段/状态。**未新增持久化状态**：权威仍是 `parse_status` + span 根行。 | **42 守卫全绿** · **5025 / 0 / 4**（domains +3）· build 2m22s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

@@ -138,7 +138,7 @@ boot（组合根，唯一装配点）
 | **H2a 问答-运行时段** ✅ | 抽 `TurnRuntime`（`eventBus`/`messageId`/`userMessageId`）；`ChatManage` 不再持有运行时字段，调用点经 `getRuntime()` | ✅ 2026-10-20 | 运行时段在类型上不可复制；会话测试全绿 |
 | **H2b 问答-请求段** | **H2b-1 ✅**：`TurnInputView` + `ChatManage implements`；**H2b-2 ✅**：`PipelineState` + 插件签名改造（插件包 0 处 `ChatManage`）；**H2b-3 待做**：`QaRequestContext` 34 字段收口 | H2b-2 ✅ 2026-10-20 | 插件只依赖状态接口 |
 | **H2c 问答-状态段** ✅ | 六组全部抽离：Answer / Rerank / Merged / QueryPlan / Entity / SearchOutcome；`ChatManage` 只剩 history / usedMemories 等流转字段 | ✅ 2026-10-20 | 各组写入点收敛；`cloneChatManage` 仅复制查询计划/实体/记忆/渲染上下文 |
-| **H3 入库-状态机** | `IngestJob` 状态机（替代 4 处 CAS）+ `IngestStage` 接口（现有 5 个 stage 就地实现）+ 删 `KnowledgeTaskExecutor` | 3-4 人日 | 阶段显式化；主码 CAS 4→1；入库链路必读类 ≤10 |
+| **H3 入库-状态机** | **H3-1 ✅**：`IngestStage` 枚举（5 阶段唯一来源）+ `IngestJob` 尝试状态（PENDING→PROCESSING→COMPLETED/FAILED）；worker 按阶段推进。**余**：CAS 4→1、5 个 stage 实现 `IngestStage` 接口、删 `KnowledgeTaskExecutor` | H3-1 ✅ 2026-10-20 | 阶段显式化；持久化状态仍以 `parse_status` 为准 |
 | **H4a 任务-端口** | **H4a-1 ✅**：`TaskQueue`（name/start/stop/setRetryDelayOverrideSeconds）+ `RetryDelayOverride`；6 套队列接口继承；钩子 5→1 机制。**H4a-2/H4b**：`submit/lease/renew/progress/retry/park` 完整端口随实现迁移落地 | H4a-1 ✅ 2026-10-20 | 业务只依赖端口；钩子 5→1 |
 | **H4b 任务-实现** ✅ | **datasource ✅ + wiki ✅**：基座补 per-task 预算/超时/幂等 + `FailurePolicy`（死信回调 / 锁冲突退避）；datasource ~120 行、wiki ~200 行薄适配；memory/knowledge 已在基座 | ✅ 2026-10-20 | 跨实例可恢复；wiki 特例参数化 |
 | **H5a 分页统一** | **H5a-1 ✅**：`contract.pagination.PageResult<T>` 统一 11 个分页类型；**H5a-2**：管理端点加分页参数（默认页大小）+ 前端同步 | H5a-1 ✅ 2026-10-20；H5a-2 1 人日 | 形状 7→1；后台列表全部可分页 |
