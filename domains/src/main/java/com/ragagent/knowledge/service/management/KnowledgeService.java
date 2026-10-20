@@ -41,12 +41,8 @@ import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,6 +94,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     private final KnowledgeFileService knowledgeFileService;
     private final KnowledgeParseService knowledgeParseService;
     private final KnowledgeBatchOpsService batchOpsService;
+    private final KnowledgeTagBatchService tagBatchService;
     /** 抽取图片的落点/回收（删除文档时一并清理）。 */
     private final ExtractedImageStore extractedImageStore;
 
@@ -117,6 +114,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
                             KnowledgeFileService knowledgeFileService,
                             KnowledgeParseService knowledgeParseService,
                             KnowledgeBatchOpsService batchOpsService,
+                            KnowledgeTagBatchService tagBatchService,
                             ExtractedImageStore extractedImageStore) {
         this.knowledgeRepository = knowledgeRepository;
         this.chunkRepository = chunkRepository;
@@ -134,6 +132,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         this.knowledgeFileService = knowledgeFileService;
         this.knowledgeParseService = knowledgeParseService;
         this.batchOpsService = batchOpsService;
+        this.tagBatchService = tagBatchService;
         this.extractedImageStore = extractedImageStore;
     }
 
@@ -528,85 +527,9 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     /**
      * * authorizedKBID 为空 = 未显式给 kb_id（由首条 knowledge 推导的授权范围）。
      */
-    @Transactional
+    /** 标签批量；事务在 {@link KnowledgeTagBatchService#updateTagBatch}。 */
     public void updateKnowledgeTagBatch(String authorizedKBID, Map<String, List<String>> updates) {
-        if (updates == null || updates.isEmpty()) {
-            return;
-        }
-        List<String> knowledgeIDs = new ArrayList<>(updates.keySet());
-        knowledgeIDs.sort(String::compareTo);
-        // 授权 KB = 显式 kb_id；无 kb_id 时 = 首条（排序后最靠前的）knowledge 所属 KB
-        String grantedKbId = authorizedKBID;
-        if (grantedKbId == null || grantedKbId.isEmpty()) {
-            Knowledge first = getKnowledge(knowledgeIDs.get(0));
-            grantedKbId = first.getKnowledgeBaseId();
-        }
-        List<Knowledge> knowledgeList = loadKnowledgeWriteBatch(knowledgeIDs, grantedKbId);
-        long tenantId = knowledgeList.get(0).getTenantId();
-
-        if (authorizedKBID != null && !authorizedKBID.isEmpty()) {
-            if (knowledgeList.size() != updates.size()) {
-                throw BizException.forbidden("some knowledge IDs are not accessible in the authorized scope");
-            }
-            for (Knowledge k : knowledgeList) {
-                if (!k.getKnowledgeBaseId().equals(authorizedKBID)) {
-                    throw BizException.forbidden("knowledge " + k.getId()
-                            + " does not belong to authorized knowledge base");
-                }
-            }
-        }
-        // 收集 + 校验标签
-        Set<String> tagIDSet = new TreeSet<>();
-        for (List<String> tagIDs : updates.values()) {
-            for (String tagID : tagIDs) {
-                if (tagID != null && !tagID.isEmpty()) {
-                    tagIDSet.add(tagID);
-                }
-            }
-        }
-        Map<String, KnowledgeTag> tagMap = new HashMap<>();
-        if (!tagIDSet.isEmpty()) {
-            List<KnowledgeTag> tags = tagRepository.listTagsByIds(tenantId, List.copyOf(tagIDSet));
-            for (KnowledgeTag tag : tags) {
-                tagMap.put(tag.getId(), tag);
-            }
-        }
-        for (Knowledge k : knowledgeList) {
-            List<String> tagIDs = updates.get(k.getId());
-            if (tagIDs == null) {
-                continue;
-            }
-            for (String tagID : tagIDs) {
-                if (tagID == null || tagID.isEmpty()) {
-                    continue;
-                }
-                KnowledgeTag tag = tagMap.get(tagID);
-                if (tag == null) {
-                    throw BizException.badRequest("标签 " + tagID + " 不存在");
-                }
-                if (tag.getTenantId() == null || tag.getTenantId() != tenantId
-                        || !tag.getKnowledgeBaseId().equals(k.getKnowledgeBaseId())) {
-                    throw BizException.badRequest("标签 " + tagID + " 不属于知识库 " + k.getKnowledgeBaseId());
-                }
-            }
-        }
-        for (String knowledgeID : knowledgeIDs) {
-            setKnowledgeTags(knowledgeID, updates.get(knowledgeID));
-        }
-    }
-
-    /** 删旧 + 插新（空/重复 id 跳过）。 */
-    private void setKnowledgeTags(String knowledgeId, List<String> tagIDs) {
-        tagRepository.deleteRelations(knowledgeId);
-        if (tagIDs == null || tagIDs.isEmpty()) {
-            return;
-        }
-        Set<String> seen = new LinkedHashSet<>();
-        for (String tagID : tagIDs) {
-            if (tagID != null && !tagID.isEmpty() && seen.add(tagID)) {
-                tagRepository.insertRelation(knowledgeId, tagID);
-            }
-        }
+        tagBatchService.updateTagBatch(authorizedKBID, updates);
     }
 
     // ── 批量删除 / 批量重解析 / 清空（委托 KnowledgeBatchOpsService） ──
