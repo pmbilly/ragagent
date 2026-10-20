@@ -188,6 +188,8 @@ export function useEmbedChatSession(options: {
     isScrollType = false,
     scrollHeight?: number,
   ) => {
+    // 懒创建：会话尚未落库（新建对话后的空白态）时没有历史可拉，别打出 /messages//load
+    if (!data.sessionId) return
     if (isScrollType) {
       if (historyLoadingMore.value || !hasMoreHistory.value) return
       historyLoadingMore.value = true
