@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-353 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+352 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -108,7 +108,6 @@
 | `:domains` | `com.ragagent.datasource.dto` | 数据源 · 数据传输：DatasourceCredentialFieldMetadata / DatasourceCredentialsResponse / DataSourceConfigDto…。 |
 | `:domains` | `com.ragagent.datasource.mapper` | 数据源 · 映射：DataSourceRepository / SyncLogRepository / DataSourceMapper…。 |
 | `:domains` | `com.ragagent.datasource.repository` | 数据源与同步日志仓储门面：对 datasource.mapper 的读写封装。 |
-| `:domains` | `com.ragagent.datasource.runtime` | 数据源运行面：同步任务的观测入口。 |
 | `:domains` | `com.ragagent.datasource.service` | 数据源 · 服务：DataSourceService / KnowledgeTagAutoTagProvider / DataSourceSyncResultOps…。 |
 | `:domains` | `com.ragagent.datasource.task` | 同步任务面（方案 的 task/）：同步任务队列（DataSourceSyncTaskQueue + InProcess/Redis 双实现）、任务处理器（DataSourceSyncHandler） |
 | `:domains` | `com.ragagent.embedchannel` | 嵌入渠道域：对外暴露的嵌入问答渠道、渠道配置与令牌，以及渠道鉴权过滤器。 |
@@ -293,7 +292,6 @@
 | `:domains` | `com.ragagent.wiki.repository` | 仓储门面层：把 mapper 的原子操作组合成页面/文件夹级的读写契约，并集中承载软删、 版本冲突与 PG 方言分支。 |
 | `:domains` | `com.ragagent.wiki.repository.ingest` | wiki 摄取的存储与并发协调：任务队列、finalize 锁、身份认领、在途限流、删除墓碑。 |
 | `:domains` | `com.ragagent.wiki.repository.page` | wiki 页面仓储面：slug 锁的进程内/Redis 实现。 |
-| `:domains` | `com.ragagent.wiki.runtime` | wiki 运行面：入库任务的观测入口。 |
 | `:domains` | `com.ragagent.wiki.service` | wiki 用例层根包：**跨切面端口与 LLM/提示词适配**——分块清洗（ com.ragagent.wiki.service.WikiChunkCleaner + 缺省实现）、图片富化、知识收尾、 |
 | `:domains` | `com.ragagent.wiki.service.ingest` | wiki 摄取管线：批量/单篇入库的门面与协作者 （com.ragagent.wiki.service.ingest.WikiIngestService、 com.ragagent.wiki.serv |
 | `:domains` | `com.ragagent.wiki.service.ingest.graph` | wiki 摄取·链接图面（拆自 wiki.service.ingest，对齐方案 的 service.ingest.graph/）： WikiGraphCalculator——从页面/引用计算链接图（入链、出链、孤儿）。 |
@@ -338,6 +336,7 @@
 | `:platform` | `com.ragagent.platform.task` | 平台任务面：Redis 任务队列核心（RedisTaskQueueCore）、 Redis 重试执行循环（RedisRetryingTaskQueue）、进程内执行队列 （InProcessTaskQ |
 | `:platform` | `com.ragagent.platform.text` | 平台文本面（的 `platform.text/`）：HTML→Markdown、实体/空白/代码点处理、路径与文件类型推断。 |
 | `:platform` | `com.ragagent.platform.tool` | 平台工具技术适配：工具 schema 的 JSON 解析（ToolSchemas）。 |
+| `:platform` | `com.ragagent.platform.tracing` | 观测技术面：Langfuse/OTLP 适配与 trace 载体注入。 |
 | `:platform` | `com.ragagent.platform.tracing.decorators` | 追踪 · decorators：LangfuseChatClient / LangfuseEmbedder / LangfusePayloads…。 |
 | `:platform` | `com.ragagent.platform.tracing.langfuse` | 平台追踪面（Langfuse OTel 适配； |
 | `:platform` | `com.ragagent.platform.web` | 平台 Web 面：统一响应外壳、JSON 映射、分页/字段参数、请求 ID 过滤器、非空体/RBAC 拦截器与序列化器。 |

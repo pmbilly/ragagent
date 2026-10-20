@@ -10,17 +10,16 @@ import java.util.Collection;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 
-/** {@link TenantAdmin} 的 MyBatis-Plus 实现；所有 {@code tenants} 条件构造收口在这里。 */
+/** 租户表的 MyBatis-Plus 门面：所有 {@code tenants} 条件构造收口在这里。 */
 @Repository
-public class TenantAdminImpl implements TenantAdmin {
+public class TenantRepository {
 
     private final TenantMapper mapper;
 
-    public TenantAdminImpl(TenantMapper mapper) {
+    public TenantRepository(TenantMapper mapper) {
         this.mapper = mapper;
     }
 
-    @Override
     public Tenant byId(long id) {
         return mapper.selectOne(new LambdaQueryWrapper<Tenant>()
                 .eq(Tenant::getId, id)
@@ -28,12 +27,10 @@ public class TenantAdminImpl implements TenantAdmin {
                 .last("LIMIT 1"));
     }
 
-    @Override
     public Tenant byIdIncludingDeleted(long id) {
         return mapper.selectById(id);
     }
 
-    @Override
     public List<Tenant> byIds(Collection<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return List.of();
@@ -43,26 +40,22 @@ public class TenantAdminImpl implements TenantAdmin {
                 .isNull(Tenant::getDeletedAt));
     }
 
-    @Override
     public List<Tenant> listAll() {
         return mapper.selectList(new LambdaQueryWrapper<Tenant>()
                 .isNull(Tenant::getDeletedAt)
                 .orderByDesc(Tenant::getCreatedAt));
     }
 
-    @Override
     public List<Tenant> listLive() {
         return mapper.selectList(new LambdaQueryWrapper<Tenant>()
                 .isNull(Tenant::getDeletedAt));
     }
 
-    @Override
     public long count(String escapedKeyword, long tenantId) {
         Long total = mapper.selectCount(searchScope(escapedKeyword, tenantId));
         return total == null ? 0 : total;
     }
 
-    @Override
     public List<Tenant> search(String escapedKeyword, long tenantId, int page, int pageSize) {
         LambdaQueryWrapper<Tenant> wrapper = searchScope(escapedKeyword, tenantId)
                 .orderByDesc(Tenant::getCreatedAt);
@@ -96,22 +89,18 @@ public class TenantAdminImpl implements TenantAdmin {
         return wrapper;
     }
 
-    @Override
     public void insert(Tenant tenant) {
         mapper.insert(tenant);
     }
 
-    @Override
     public void updateById(Tenant tenant) {
         mapper.updateById(tenant);
     }
 
-    @Override
     public void deleteById(long id) {
         mapper.deleteById(id);
     }
 
-    @Override
     public void softDeleteById(long id, OffsetDateTime now) {
         mapper.update(null, new LambdaUpdateWrapper<Tenant>()
                 .eq(Tenant::getId, id)

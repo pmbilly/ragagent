@@ -18,7 +18,7 @@ import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorRegistry;
 import com.ragagent.datasource.repository.DataSourceRepository;
 import com.ragagent.datasource.repository.SyncLogRepository;
-import com.ragagent.datasource.runtime.DataSourceTrace;
+import com.ragagent.platform.tracing.TraceInjector;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -548,7 +548,7 @@ public class DataSourceService implements DataSourceSyncHandler {
         DataSourceSyncPayload payload = DataSourceSyncPayload.withTracing(
                 DataSourceSupport.taskInitiatorFromContext(), "manual", dsId, ds.getTenantId(),
                 syncLog.getId(), false, 0,
-                DataSourceTrace.inject());
+                TraceInjector.inject());
 
         try {
             // Outcome 在此路径未分支处理（重复任务 TASK_ID_CONFLICT 亦按已受理继续）——

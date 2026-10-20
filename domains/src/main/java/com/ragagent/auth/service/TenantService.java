@@ -1,9 +1,9 @@
 package com.ragagent.auth.service;
 
 import com.ragagent.auth.domain.Tenant;
-import com.ragagent.auth.repository.TenantAdmin;
 import com.ragagent.auth.repository.TenantLookup;
 import com.ragagent.auth.repository.TenantMemberRepository;
+import com.ragagent.auth.repository.TenantRepository;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.storage.StorageBackendProvisioner;
@@ -38,11 +38,11 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
     private static final Logger log = LoggerFactory.getLogger(TenantService.class);
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final TenantAdmin tenantAdmin;
+    private final TenantRepository tenantAdmin;
     private final TenantMemberRepository memberRepo;
     private final StorageBackendProvisioner storageProvisioner;
 
-    public TenantService(TenantAdmin tenantAdmin,
+    public TenantService(TenantRepository tenantAdmin,
                          TenantMemberRepository memberRepo,
                          StorageBackendProvisioner storageProvisioner) {
         this.tenantAdmin = tenantAdmin;

@@ -11,6 +11,7 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.runtime.KnowledgeTrace;
+import com.ragagent.knowledge.support.SubtaskDrain;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantScopes;
 import com.ragagent.wiki.service.DefaultWikiKnowledgeFinalizer;
@@ -116,7 +117,8 @@ public class QuestionGenerationService implements QuestionGenerationConsumer {
             }
             // 终态释放槽位
             if (succeeded || terminal) {
-                drainSubtask(p.knowledgeId(), "question_batch[" + p.batchIndex() + "]");
+                SubtaskDrain.drain(p.knowledgeId(), "question_batch[" + p.batchIndex() + "]",
+                        () -> finalizer.finalizeWikiSubtask(p.knowledgeId()), log);
             }
         }
     }
@@ -203,16 +205,4 @@ public class QuestionGenerationService implements QuestionGenerationConsumer {
         return c == null || c.getContent() == null ? "" : c.getContent();
     }
 
-    /** knowledge 为空则空转（早期版本的在飞任务）。 */
-    private void drainSubtask(String knowledgeId, String source) {
-        if (knowledgeId == null || knowledgeId.isEmpty()) {
-            return;
-        }
-        try {
-            finalizer.finalizeWikiSubtask(knowledgeId);
-        } catch (RuntimeException e) {
-            // best-effort：递减失败不破坏任务语义（行由 housekeeping sweep 兜底）
-            log.warn("finalize subtask decrement failed source={} knowledge={}", source, knowledgeId, e);
-        }
-    }
 }

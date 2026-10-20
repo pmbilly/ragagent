@@ -2,6 +2,7 @@ package com.ragagent.wiki.service.ingest;
 
 import com.ragagent.contract.text.Whitespace;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.platform.tracing.TraceInjector;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.domain.ingest.WikiFinalizeChange;
 import com.ragagent.wiki.domain.ingest.WikiFinalizeRow;
@@ -11,7 +12,6 @@ import com.ragagent.wiki.domain.ingest.WikiIngestTask;
 import com.ragagent.wiki.domain.ingest.WikiPendingOp;
 import com.ragagent.wiki.domain.ingest.WikiRetractPayload;
 import com.ragagent.wiki.repository.ingest.WikiIngestTaskQueue;
-import com.ragagent.wiki.runtime.WikiTrace;
 import com.ragagent.wiki.service.ingest.support.WikiEnqueueResult;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -130,7 +130,7 @@ final class WikiIngestEnqueueOps {
         // 请求的 traceparent 打进负载，worker 侧续接同一棵树
         WikiIngestPayload trigger = WikiIngestPayload.withTracing(
                 tenantId, kbId, WikiLanguageSupport.languageFromContextOrDefault(),
-                WikiTrace.inject());
+                TraceInjector.inject());
         WikiIngestTaskQueue queue = service.taskQueue.getIfAvailable();
         if (queue == null) {
             throw new IllegalStateException("enqueue wiki ingest trigger: task queue is not wired");
@@ -189,7 +189,7 @@ final class WikiIngestEnqueueOps {
 
         WikiIngestPayload trigger = WikiIngestPayload.withTracing(
                 payload.tenantId(), payload.knowledgeBaseId(), payload.language(),
-                WikiTrace.inject());
+                TraceInjector.inject());
         WikiIngestTaskQueue queue = service.taskQueue.getIfAvailable();
         if (queue == null) {
             throw new IllegalStateException("wiki retract: task queue is not wired");

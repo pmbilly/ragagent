@@ -22,6 +22,7 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.runtime.KnowledgeTrace;
+import com.ragagent.knowledge.support.SubtaskDrain;
 import com.ragagent.platform.access.TenantScopes;
 import com.ragagent.platform.prompt.ExtractPrompts;
 import com.ragagent.platform.prompt.PipelineConfig;
@@ -174,7 +175,8 @@ public class ChunkExtractService implements ChunkExtractConsumer {
         } finally {
             // 3) 终态释放槽位（成功或最后一次尝试才递减——重试链只释放一次）
             if (succeeded || terminal) {
-                drainSubtask(p.knowledgeId(), "graph_chunk[" + p.chunkIndex() + "]");
+                SubtaskDrain.drain(p.knowledgeId(), "graph_chunk[" + p.chunkIndex() + "]",
+                        () -> finalizer.finalizeWikiSubtask(p.knowledgeId()), log);
             }
             // 4) 子 span 收尾
             if (gSpan != null) {
@@ -309,19 +311,6 @@ public class ChunkExtractService implements ChunkExtractConsumer {
         example.setRelation(relations);
         template.setExamples(List.of(example));
         return template;
-    }
-
-    /** knowledge 为空则空转（早期版本的在飞任务）。 */
-    private void drainSubtask(String knowledgeId, String source) {
-        if (knowledgeId == null || knowledgeId.isEmpty()) {
-            return;
-        }
-        try {
-            finalizer.finalizeWikiSubtask(knowledgeId);
-        } catch (RuntimeException e) {
-            // best-effort：递减失败不破坏任务语义（行由 housekeeping sweep 兜底）
-            log.warn("finalize subtask decrement failed source={} knowledge={}", source, knowledgeId, e);
-        }
     }
 
     private static String text(JsonNode node, String field) {

@@ -149,6 +149,23 @@ Thread.ofVirtual().start(() -> TenantScope.run(snap, () -> {
 
 **读代码时的判断顺序**：看到 `getIfAvailable()` → 查本表 → 表里没有 → 看该行 3 行内有没有 `null` 判断与日志。
 
+## 11. `runtime` 包的四种含义
+
+`*/runtime` 不是同一层，读代码前先看它属于哪一种：
+
+| 含义 | 例子 | 判据 |
+|---|---|---|
+| **观测门面** | `knowledge/runtime/KnowledgeTrace`、`memory/runtime/MemoryTrace`、`session/runtime/SessionTrace` | 只把 trace 载体注入任务载荷 / 开 Span；不含业务逻辑 |
+| **技术实现外提** | `memory/runtime` 的队列 + wiring、`websearch/runtime/WebSearchTempKbStateService` | 把技术实现从用例层移出，避免 service ↔ 实现成环 |
+| **域共享内核** | `session/runtime/SessionModels` | 域内多个 service 共用的模型装饰器集合 |
+| **业务运行时** | `im/runtime`（命令集 / 格式化 / 工具展示） | 承载真正的渠道业务逻辑 |
+
+**规则**：
+
+1. 新增 `runtime` 包必须在 `package-info` 首句写明属于上表哪一义；
+2. 只需"注入 trace 载体"时用 `platform.tracing.TraceInjector`，不要新建 16 行门面（datasource / wiki 的两个已合并）；
+3. 需要自有 Span 生命周期（start / attachTraceparent）才建域门面（`SessionTrace` / `KnowledgeTrace` / `MemoryTrace`）。
+
 ## 相关文档
 
 - 调用链：[`request-path.md`](request-path.md)
