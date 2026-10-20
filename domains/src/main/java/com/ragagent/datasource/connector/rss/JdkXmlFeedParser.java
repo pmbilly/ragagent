@@ -1,6 +1,7 @@
 package com.ragagent.datasource.connector.rss;
 
 import com.ragagent.platform.text.HtmlEntities;
+import com.ragagent.platform.text.UnicodeText;
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
@@ -388,7 +389,7 @@ public final class JdkXmlFeedParser implements FeedParser {
      * 这正是 gofeed 对 {@code <description><p>x</p></description>} 的行为。</p>
      */
     private static String parseText(Element element) {
-        return RssUtil.trimUnicodeWhitespace(innerXml(element));
+        return UnicodeText.trim(innerXml(element));
     }
 
     /** 元素的内层 XML（文本节点已解码，CDATA 拆掉标记，嵌套元素还原成标签）。 */
@@ -555,7 +556,7 @@ public final class JdkXmlFeedParser implements FeedParser {
      * @return 解析失败回 {@code null}（跳过该条、不中断同步）
      */
     static OffsetDateTime parseDate(String raw) {
-        String d = RssUtil.trimUnicodeWhitespace(raw);
+        String d = UnicodeText.trim(raw);
         if (d.isEmpty()) {
             return null;
         }

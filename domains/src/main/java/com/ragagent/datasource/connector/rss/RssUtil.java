@@ -1,5 +1,6 @@
 package com.ragagent.datasource.connector.rss;
 
+import com.ragagent.platform.text.UnicodeText;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -20,11 +21,9 @@ import java.util.Map;
  * 必须与既有数据逐字节一致——游标要落 {@code last_sync_cursor} 这个 jsonb 列，
  * 新旧数据要能互读。</p>
  *
- * <h2>为什么把 {@code trimUnicodeWhitespace} 单列出来</h2>
- * <p>这里需要的空白集合按 {@code unicode.IsSpace} 语义：
- * 而 Java 的 {@code String.trim()} 只处理 {@code <= U+0020}、
- * {@code String.strip()} 用 {@code Character.isWhitespace}（<b>不含</b> U+00A0 / U+2007 / U+202F）。
- * 三者不同，所以显式实现（与 memory 模块的 {@code isUnicodeWhitespace} 同一处置）。</p>
+ * <h2>空白口径</h2>
+ * <p>去两端空白走 {@link UnicodeText#trim(String)}：完整空白集合
+ * （含 U+00A0 / U+2007 / U+202F），不是 {@code String.trim()} / {@code strip()}。</p>
  */
 final class RssUtil {
 
@@ -122,7 +121,7 @@ final class RssUtil {
             return "";
         }
         for (String v : values) {
-            if (v != null && !trimUnicodeWhitespace(v).isEmpty()) {
+            if (v != null && !UnicodeText.trim(v).isEmpty()) {
                 return v;
             }
         }
@@ -145,7 +144,7 @@ final class RssUtil {
      * 于是 {@code "a\nb"} → {@code "a b"}（不是 {@code "ab"}）。别照搬别的模块。</p>
      */
     static String sanitizeFileName(String name) {
-        String n = trimUnicodeWhitespace(name);
+        String n = UnicodeText.trim(name);
         if (n.isEmpty()) {
             return "untitled";
         }
@@ -158,7 +157,7 @@ final class RssUtil {
                 default -> replaced.append(c);
             }
         }
-        String result = trimUnicodeWhitespace(replaced.toString());
+        String result = UnicodeText.trim(replaced.toString());
         if (result.isEmpty()) {
             return "untitled";
         }
@@ -171,33 +170,6 @@ final class RssUtil {
     }
 
     // ── 内部工具 ───────────────────────────────────────────────────────────
-
-    /** 去两端的 Unicode 空白（见类注释的空白集合）。 */
-    static String trimUnicodeWhitespace(String s) {
-        if (s == null || s.isEmpty()) {
-            return "";
-        }
-        int start = 0;
-        int end = s.length();
-        while (start < end && isUnicodeWhitespace(s.charAt(start))) {
-            start++;
-        }
-        while (end > start && isUnicodeWhitespace(s.charAt(end - 1))) {
-            end--;
-        }
-        return s.substring(start, end);
-    }
-
-    /**
-     * 空白判定。
-     *
-     * <p>{@code Character.isWhitespace} 已经覆盖 {@code \t \n \v \f \r}、U+0085 与大部分 Zs，
-     * 但<b>不含</b> U+00A0 / U+2007 / U+202F（Java 视它们为"非断行空格"）。
-     * 这里需要的空白集合<b>含</b>这三个。</p>
-     */
-    private static boolean isUnicodeWhitespace(char c) {
-        return Character.isWhitespace(c) || c == '\u00A0' || c == '\u2007' || c == '\u202F';
-    }
 
     /**
      * 截到 {@code maxBytes} 之后，只要最后一个字节序列不是完整的 UTF-8 码点就再退一个字节。

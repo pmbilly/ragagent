@@ -6,6 +6,7 @@ import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.Membership;
 import com.ragagent.contract.auth.UserPreferences;
 import com.ragagent.contract.tenant.TenantRowView;
+import com.ragagent.platform.text.UnicodeText;
 import io.jsonwebtoken.Claims;
 import java.util.List;
 
@@ -46,7 +47,7 @@ final class UserSessionOps {
             throw new UserService.LogoutException("invalid token");
         }
         Object raw = claims.get("user_id");
-        if (!(raw instanceof String userId) || UserService.trimUnicodeWhitespace(userId).isEmpty()) {
+        if (!(raw instanceof String userId) || UnicodeText.trim(userId).isEmpty()) {
             throw new UserService.LogoutException("invalid user ID in token");
         }
         return userId;

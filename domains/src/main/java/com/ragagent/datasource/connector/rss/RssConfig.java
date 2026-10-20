@@ -2,6 +2,7 @@ package com.ragagent.datasource.connector.rss;
 
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.platform.text.UnicodeText;
 import com.ragagent.platform.web.ContractJsonModule;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -141,7 +142,7 @@ final class RssConfig {
         if (!(raw instanceof String s)) {
             return "";
         }
-        return RssUtil.trimUnicodeWhitespace(s);
+        return UnicodeText.trim(s);
     }
 
     /**
@@ -173,7 +174,7 @@ final class RssConfig {
                 }
                 i++;
             }
-            String u = RssUtil.trimUnicodeWhitespace(feedUrls.substring(start, i));
+            String u = UnicodeText.trim(feedUrls.substring(start, i));
             if (u.isEmpty()) {
                 continue;
             }
@@ -192,12 +193,12 @@ final class RssConfig {
      * 同名后者覆盖前者。最终 map 为空时返回 {@code null}。</p>
      */
     Map<String, String> parseHeaders() {
-        if (authHeaders == null || RssUtil.trimUnicodeWhitespace(authHeaders).isEmpty()) {
+        if (authHeaders == null || UnicodeText.trim(authHeaders).isEmpty()) {
             return null;
         }
         Map<String, String> headers = new LinkedHashMap<>();
         for (String rawLine : authHeaders.split("\n", -1)) {
-            String line = RssUtil.trimUnicodeWhitespace(rawLine);
+            String line = UnicodeText.trim(rawLine);
             if (line.isEmpty()) {
                 continue;
             }
@@ -205,8 +206,8 @@ final class RssConfig {
             if (idx <= 0) {
                 continue;
             }
-            String name = RssUtil.trimUnicodeWhitespace(line.substring(0, idx));
-            String value = RssUtil.trimUnicodeWhitespace(line.substring(idx + 1));
+            String name = UnicodeText.trim(line.substring(0, idx));
+            String value = UnicodeText.trim(line.substring(idx + 1));
             if (name.isEmpty()) {
                 continue;
             }

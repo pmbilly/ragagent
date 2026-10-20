@@ -1,6 +1,7 @@
 package com.ragagent.auth.service;
 
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.text.UnicodeText;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -72,7 +73,7 @@ public class OidcService {
 
     /** 端点 SSRF 校验 */
     private void validateEndpoint(String label, String endpoint, boolean required) {
-        String ep = endpoint == null ? "" : UserService.trimUnicodeWhitespace(endpoint);
+        String ep = endpoint == null ? "" : UnicodeText.trim(endpoint);
         if (ep.isEmpty()) {
             if (required) {
                 throw new OidcException("OIDC " + label + " endpoint is required");
@@ -97,7 +98,7 @@ public class OidcService {
         RANDOM.nextBytes(nonceBytes);
         String nonce = Base64.getUrlEncoder().withoutPadding().encodeToString(nonceBytes);
 
-        String state = stateCodec.sign(nonce, UserService.trimUnicodeWhitespace(redirectUri), 0);
+        String state = stateCodec.sign(nonce, UnicodeText.trim(redirectUri), 0);
 
         // query 键按字母序
         StringBuilder query = new StringBuilder();
@@ -160,6 +161,6 @@ public class OidcService {
     private static final char[] HEX = "0123456789ABCDEF".toCharArray();
 
     private static boolean isBlank(String s) {
-        return s == null || UserService.trimUnicodeWhitespace(s).isEmpty();
+        return s == null || UnicodeText.trim(s).isEmpty();
     }
 }

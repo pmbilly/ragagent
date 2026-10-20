@@ -158,7 +158,7 @@
 | **M2b** | 会话批量删除批量化 + 知识检索 KB 缓存（去逐条查/重复查） | ✅ 2026-10-20 |
 | **M3a** | `platform.security.Hashes`：SHA-256 19 处替换（contract 1 处登记为例外） | 待启动 |
 | **M3b** | `platform.audit.ActivityAuditRecorder`：合并 3 份 `recordKbActivity` | 待启动 |
-| **M3c** | `LogSanitizer` 替换 4 份 `sanitizeForLog`；`trimUnicodeWhitespace` 入 `platform.text` | 待启动 |
+| **M3c** | `LogSanitizer` 替换 4 份 `sanitizeForLog`；`trimUnicodeWhitespace` 入 `platform.text` | ✅ 2026-10-20 |
 | **M4a** | `UserService.register` 改 `@Transactional` + 失败注入测试；删外层手写补偿 | 待启动 |
 | **M4b** | 事务边界约定（`mechanisms.md`）+ mcp/storage/session/im/datasource 多写审计 | 待启动 |
 | **M5** | Memory：`MemoryScopeGate` 单次求值 + 写管线/模型解析提取 + 孤儿注释；保留门面委托 | 待启动 |

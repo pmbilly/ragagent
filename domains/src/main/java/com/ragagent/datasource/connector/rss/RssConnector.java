@@ -9,6 +9,7 @@ import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.platform.text.HtmlToMarkdown;
 import com.ragagent.platform.text.JdkHtmlToMarkdown;
+import com.ragagent.platform.text.UnicodeText;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -209,11 +210,11 @@ public class RssConnector implements Connector {
                 out.add(res);
                 continue;
             }
-            String title = RssUtil.trimUnicodeWhitespace(feed.title());
+            String title = UnicodeText.trim(feed.title());
             if (!title.isEmpty()) {
                 res.setName(title);
             }
-            res.setDescription(RssUtil.trimUnicodeWhitespace(feed.description()));
+            res.setDescription(UnicodeText.trim(feed.description()));
             if (!RssUtil.nullToEmpty(feed.link()).isEmpty()) {
                 res.setUrl(feed.link());
             }
@@ -444,7 +445,7 @@ public class RssConnector implements Connector {
         // 抽取器不可用（UnavailableArticleExtractor 恒抛）时直接跳过文章页请求：
         // 抓回的字节必被丢弃，每个条目白付一次外网请求（评审修正）。
         String contentHtml = feedContent;
-        if (!RssUtil.trimUnicodeWhitespace(item.link()).isEmpty() && fullTextAvailable) {
+        if (!UnicodeText.trim(item.link()).isEmpty() && fullTextAvailable) {
             try {
                 ArticleExtractor.ExtractedArticle article = client.extractArticle(item.link());
                 contentHtml = article.contentHtml();
@@ -500,17 +501,17 @@ public class RssConnector implements Connector {
      */
     private String htmlToMarkdown(String html) {
         String raw = RssUtil.nullToEmpty(html);
-        if (RssUtil.trimUnicodeWhitespace(raw).isEmpty()) {
+        if (UnicodeText.trim(raw).isEmpty()) {
             return "";
         }
         try {
             String md = markdownConverter.convert(raw);
-            if (md == null || RssUtil.trimUnicodeWhitespace(md).isEmpty()) {
-                return RssUtil.trimUnicodeWhitespace(raw);
+            if (md == null || UnicodeText.trim(md).isEmpty()) {
+                return UnicodeText.trim(raw);
             }
-            return RssUtil.trimUnicodeWhitespace(md);
+            return UnicodeText.trim(md);
         } catch (RuntimeException e) {
-            return RssUtil.trimUnicodeWhitespace(raw);
+            return UnicodeText.trim(raw);
         }
     }
 

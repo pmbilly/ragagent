@@ -309,7 +309,7 @@ public class McpMetadataService {
                     break;
                 }
                 log.debug("MCP metadata tool[{}] service_id={} name={} description_len={} schema_len={}",
-                        i, service.getId(), sanitizeForLog(tool.getName()),
+                        i, service.getId(), LogSanitizer.sanitize(tool.getName()),
                         utf8Length(tool.getDescription()), schemaLength(tool));
                 logged++;
             }
@@ -369,8 +369,4 @@ public class McpMetadataService {
         }
     }
 
-    /** 日志脱敏（工具名来自上游，可能带控制字符） */
-    private static String sanitizeForLog(String s) {
-        return LogSanitizer.sanitize(s);
-    }
 }

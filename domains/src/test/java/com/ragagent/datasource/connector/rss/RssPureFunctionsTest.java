@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.platform.text.UnicodeText;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.LinkedHashMap;
@@ -170,11 +171,11 @@ class RssPureFunctionsTest {
     @Test
     void trimCoversUnicodeSpacesJavaWouldMiss() {
         // 这里的空白判定含 U+00A0 / U+2007 / U+202F，Java 的 strip() 与 trim() 都不管它们。
-        assertThat(RssUtil.trimUnicodeWhitespace(" a ")).isEqualTo("a");
-        assertThat(RssUtil.trimUnicodeWhitespace(" b ")).isEqualTo("b");
-        assertThat(RssUtil.trimUnicodeWhitespace("\t\nc\r ")).isEqualTo("c");
-        assertThat(RssUtil.trimUnicodeWhitespace(null)).isEmpty();
-        assertThat(RssUtil.trimUnicodeWhitespace("   ")).isEmpty();
+        assertThat(UnicodeText.trim(" a ")).isEqualTo("a");
+        assertThat(UnicodeText.trim(" b ")).isEqualTo("b");
+        assertThat(UnicodeText.trim("\t\nc\r ")).isEqualTo("c");
+        assertThat(UnicodeText.trim(null)).isEmpty();
+        assertThat(UnicodeText.trim("   ")).isEmpty();
     }
 
     // ── Config.feedURLList ────────────────────────────────────────────────

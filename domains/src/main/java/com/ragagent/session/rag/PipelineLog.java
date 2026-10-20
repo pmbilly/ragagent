@@ -1,5 +1,6 @@
 package com.ragagent.session.rag;
 
+import com.ragagent.platform.security.LogSanitizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ public final class PipelineLog {
             Map<String, Object> sorted = new TreeMap<>(fields);
             for (Map.Entry<String, Object> e : sorted.entrySet()) {
                 b.append(' ').append(e.getKey()).append('=')
-                        .append(sanitizeForLog(formatValue(e.getValue())));
+                        .append(LogSanitizer.sanitize(formatValue(e.getValue())));
             }
         }
         return b.toString();
@@ -100,22 +101,6 @@ public final class PipelineLog {
         return sb.append('"').toString();
     }
 
-    /** \n\r\t → 空格、其余 控制符移除。 */
-    private static String sanitizeForLog(String input) {
-        if (input == null || input.isEmpty()) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder(input.length());
-        for (int i = 0; i < input.length(); i++) {
-            char ch = input.charAt(i);
-            if (ch == '\n' || ch == '\r' || ch == '\t') {
-                sb.append(' ');
-            } else if (ch >= 0x20) {
-                sb.append(ch);
-            }
-        }
-        return sb.toString();
-    }
 
     public static int runeLength(String s) {
         return s.codePointCount(0, s.length());

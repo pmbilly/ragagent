@@ -1,6 +1,7 @@
 package com.ragagent.auth.service;
 
 import com.ragagent.auth.config.JwtProperties;
+import com.ragagent.platform.text.UnicodeText;
 import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -69,10 +70,10 @@ public class OidcStateCodec {
      * public 供契约测试签 state（测试需与录制脚本等价的入口）。
      */
     public String sign(String nonce, String redirectUri, long issuedAt) {
-        if (nonce == null || UserService.trimUnicodeWhitespace(nonce).isEmpty()) {
+        if (nonce == null || UnicodeText.trim(nonce).isEmpty()) {
             throw new IllegalArgumentException("oidc state nonce is required");
         }
-        if (redirectUri == null || UserService.trimUnicodeWhitespace(redirectUri).isEmpty()) {
+        if (redirectUri == null || UnicodeText.trim(redirectUri).isEmpty()) {
             throw new IllegalArgumentException("oidc state redirect_uri is required");
         }
         long iat = issuedAt == 0 ? Instant.now().getEpochSecond() : issuedAt;
@@ -86,7 +87,7 @@ public class OidcStateCodec {
 
     /** 校验并解码 state。 */
     public Payload verify(String rawState) {
-        String raw = rawState == null ? "" : UserService.trimUnicodeWhitespace(rawState);
+        String raw = rawState == null ? "" : UnicodeText.trim(rawState);
         String[] parts = raw.split("\\.", -1); // 全切（保留尾空段）
         if (parts.length != 2) {
             throw new StateException("invalid oidc state format");
@@ -115,7 +116,7 @@ public class OidcStateCodec {
         String nonce = node.path("nonce").isString() ? node.path("nonce").asString() : "";
         String redirectUri = node.path("redirect_uri").isString() ? node.path("redirect_uri").asString() : "";
         long iat = node.path("iat").isIntegralNumber() ? node.path("iat").asLong() : 0;
-        if (UserService.trimUnicodeWhitespace(redirectUri).isEmpty()) {
+        if (UnicodeText.trim(redirectUri).isEmpty()) {
             throw new StateException("state.redirect_uri is required");
         }
         if (iat == 0) {

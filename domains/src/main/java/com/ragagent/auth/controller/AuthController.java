@@ -37,7 +37,9 @@ import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.config.TenantProperties;
+import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.settings.SystemSettingRegistry;
+import com.ragagent.platform.text.UnicodeText;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
@@ -215,8 +217,8 @@ public class AuthController {
                     String.join("\n", bindingErrors));
         }
         // 3) 消毒（密码刻意不消毒：SanitizeForLog 会改写控制字符，导致注册成功却登录不上）
-        String username = UserService.sanitizeForLog(req.username());
-        String email = UserService.sanitizeForLog(req.email());
+        String username = LogSanitizer.sanitize(req.username());
+        String email = LogSanitizer.sanitize(req.email());
         // 4) 密码策略（运行时可调：DB system_settings 优先）
         String policyError = PasswordPolicy.validate(req.password(), userService.complexPasswordEnabled());
         if (policyError != null) {
@@ -278,7 +280,7 @@ public class AuthController {
     public ResponseEntity<InvitationLookupResponse> lookupInvitation(
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false)
                     InvitationLookupRequest req) {
-        String token = UserService.trimUnicodeWhitespace(req.token());
+        String token = UnicodeText.trim(req.token());
         if (token.isEmpty()) {
             throw new BizException(AppError.validation("token is required"));
         }
@@ -315,9 +317,9 @@ public class AuthController {
             throw AuthBindingSupport.invalidParams("Invalid registration parameters",
                     String.join("\n", bindingErrors));
         }
-        String token = UserService.trimUnicodeWhitespace(req.token());
-        String email = UserService.trimUnicodeWhitespace(req.email()).toLowerCase(Locale.ROOT);
-        String username = UserService.trimUnicodeWhitespace(req.username());
+        String token = UnicodeText.trim(req.token());
+        String email = UnicodeText.trim(req.email()).toLowerCase(Locale.ROOT);
+        String username = UnicodeText.trim(req.username());
         if (token.isEmpty() || email.isEmpty() || username.isEmpty() || isBlank(req.password())) {
             throw new BizException(
                     AppError.validation("token, email, username and password are required"));

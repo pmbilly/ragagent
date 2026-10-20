@@ -12,6 +12,7 @@ import com.ragagent.contract.settings.SystemSettingGateway;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.security.UserNameLookup;
 import io.jsonwebtoken.Claims;
 import java.time.OffsetDateTime;
@@ -452,8 +453,8 @@ public class UserService implements UserNameLookup {
         TenantRowView createdTenant = null;
         if (PROVISIONING_CREATE_PERSONAL.equals(mode)) {
             TenantRowView tenant = new TenantRowView();
-            // 租户名再过一遍 sanitizeForLog（入口已对 username 消毒，此处幂等）
-            tenant.setName(sanitizeForLog(username) + "'s Workspace");
+            // 租户名再过一遍日志消毒（入口已对 username 消毒，此处幂等）
+            tenant.setName(LogSanitizer.sanitize(username) + "'s Workspace");
             tenant.setDescription("Default workspace");
             tenant.setStatus("active");
             try {
@@ -687,42 +688,6 @@ public class UserService implements UserNameLookup {
     public boolean complexPasswordEnabled() {
         return settingService.getBool(
                 "auth.complex_password_enabled", "WEKNORA_AUTH_COMPLEX_PASSWORD_ENABLED", false);
-    }
-
-    /** 日志消毒：\n \r \t → 空格，其余控制字符（{@code <32}）剔除。 */
-    public static String sanitizeForLog(String input) {
-        if (input == null || input.isEmpty()) {
-            return "";
-        }
-        String s = input.replace("\n", " ").replace("\r", " ").replace("\t", " ");
-        StringBuilder b = new StringBuilder(s.length());
-        s.codePoints().forEach(cp -> {
-            if (cp >= 32) {
-                b.appendCodePoint(cp);
-            }
-        });
-        return b.toString();
-    }
-
-    /**
-     * 全 Unicode 空白 trim：String 的 trim/strip 都不含 U+00A0，
-     * 这里按完整空白字符集显式处理（正则 `\s` 同样不含这些）。
-     */
-    public static String trimUnicodeWhitespace(String s) {
-        int start = 0;
-        int end = s.length();
-        while (start < end && isUnicodeWhitespace(s.charAt(start))) {
-            start++;
-        }
-        while (end > start && isUnicodeWhitespace(s.charAt(end - 1))) {
-            end--;
-        }
-        return s.substring(start, end);
-    }
-
-    private static boolean isUnicodeWhitespace(char c) {
-        // 空白全集：'\t' '\n' '\v' '\f' '\r' ' ' U+0085 U+00A0 + 其他 Unicode 空白
-        return Character.isWhitespace(c) || Character.isSpaceChar(c) || c == '\u0085' || c == '\u00A0';
     }
 
     // ── UserNameLookup（B97b：非 auth 域经端口取名，不再依赖本类）─────

@@ -23,6 +23,7 @@ import com.ragagent.model.dto.ModelDebugResult;
 import com.ragagent.model.dto.ModelDebugTarget;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
+import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.storage.config.UploadLimits;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
@@ -88,7 +89,7 @@ public class ModelDebugController {
                                         @RequestParam(value = "documents", required = false) String documentsRaw,
                                         @RequestParam(value = "file", required = false) MultipartFile file) {
         long startedNanos = System.nanoTime();
-        id = sanitizeForLog(id);
+        id = LogSanitizer.sanitize(id);
         if (id == null || id.isEmpty()) {
             throw new BizException(AppError.badRequest("Model ID cannot be empty"));
         }
@@ -572,20 +573,6 @@ public class ModelDebugController {
 
     // ── 小工具 ───────────────────────────────────────────────────────────
 
-    /** 日志脱敏：\n\r\t → 空格，其余 控制符移除。 */
-    private static String sanitizeForLog(String input) {
-        if (input == null || input.isEmpty()) {
-            return "";
-        }
-        String s = input.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ');
-        StringBuilder sb = new StringBuilder(s.length());
-        s.codePoints().forEach(r -> {
-            if (r >= 32) {
-                sb.appendCodePoint(r);
-            }
-        });
-        return sb.toString();
-    }
 
     private static String fileName(MultipartFile file) {
         return file == null ? null : file.getOriginalFilename();
