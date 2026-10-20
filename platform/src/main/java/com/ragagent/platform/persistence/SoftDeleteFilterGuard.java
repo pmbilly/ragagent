@@ -28,7 +28,8 @@ import org.slf4j.LoggerFactory;
  * 而不是靠 {@code IS NOT NULL} 绕过。</p>
  *
  * <p><b>表注册表</b>：由 {@code V1__baseline.sql} 推导（CREATE TABLE 块内含
- * {@code deleted_at} 列的 26 张表）；新增带软删列的表时同步维护。</p>
+ * {@code deleted_at} 列的 26 张表）后**逐表定性**，现 25 张——{@code knowledge_tags}
+ * 虽有该列但从不写（硬删），已移出注册表；新增带软删列的表时同步维护。</p>
  */
 public class SoftDeleteFilterGuard implements InnerInterceptor {
 
@@ -37,21 +38,42 @@ public class SoftDeleteFilterGuard implements InnerInterceptor {
     /** 三档处置模式。 */
     public enum Mode { OFF, ALERT, ENFORCE }
 
-    /** 带 {@code deleted_at} 列的表（由基线迁移推导）。 */
+    /**
+     * 带 {@code deleted_at} 列且**真按软删语义使用**的表（由基线迁移推导后逐表定性）。
+     *
+     * <p>{@code knowledge_tags} 不在此列：基线里虽有该列，但应用从不写它——
+     * 标签删除是硬删（{@code DELETE FROM knowledge_tags}），软删谓词对它无意义。</p>
+     */
     public static final Set<String> SOFT_DELETE_TABLES = Set.of(
             "chunks", "custom_agents", "data_sources", "embed_channels",
-            "im_channel_sessions", "im_channels", "knowledge_bases", "knowledge_tags",
-            "knowledges", "mcp_services", "messages", "models", "resources", "sessions",
+            "im_channel_sessions", "im_channels", "knowledge_bases", "knowledges",
+            "mcp_services", "messages", "models", "resources", "sessions",
             "skills", "storage_backends", "temporary_documents", "tenant_invitations",
             "tenant_members", "tenants", "users", "vector_stores", "web_search_providers",
             "wiki_folders", "wiki_page_issues", "wiki_pages");
 
     /**
-     * 确需读已删行的语句（回收站 / 恢复 / 审计 / 去重对账），逐条登记理由。
+     * 确需读已删行的语句（回收站 / 恢复 / 审计 / 对账），逐条登记理由。
      *
-     * <p>空集是起点：先以 alert 档盘面，把存量违规定性后再登记；之后只许减。</p>
+     * <p>族别口径：
+     * <ul>
+     * <li><b>渠道来源判定面</b>——{@code /clear} 软删映射行后会话仍来自 IM，
+     * 来源判定必须看到历史映射；</li>
+     * <li><b>按 id 取行 + 调用方判定</b>——恢复/对账/管线任务需要看到已软删行
+     * （如判定 {@code aborted} 后跳过），由调用方自行判 {@code deleted_at}；</li>
+     * <li><b>唯一性/配额对账面</b>——软删行的旧值仍占用桶名、仍需按租户计额。</li>
+     * </ul>
+     * 只许减：新增条目必须能指出调用方如何判定已删行。</p>
      */
-    public static final Set<String> ALLOWED_STATEMENTS = Set.of();
+    public static final Set<String> ALLOWED_STATEMENTS = Set.of(
+            // 渠道来源判定：/clear 软删映射行后会话仍来自 IM（SessionRepository.getImPlatform）
+            "com.ragagent.session.mapper.SessionMapper.selectImPlatform",
+            // 以下五条都是「按 id 取行、调用方判定」，对应各自的 findByIdAny / byIdIncludingDeleted
+            "com.ragagent.auth.mapper.TenantMapper.selectById",              // 桶唯一性对账 + 配额读
+            "com.ragagent.knowledge.mapper.ChunkMapper.selectById",          // 调用方自判 deleted_at
+            "com.ragagent.knowledge.mapper.KnowledgeBaseMapper.selectById",  // 管线/凭据回填
+            "com.ragagent.knowledge.mapper.KnowledgeMapper.selectById",      // 管线判 aborted 后跳过
+            "com.ragagent.model.mapper.ModelMapper.selectById");             // 内置模型对账
 
     private final Mode mode;
 

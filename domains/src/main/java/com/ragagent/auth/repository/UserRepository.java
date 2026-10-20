@@ -69,6 +69,7 @@ public class UserRepository {
     public List<String> listIdsByKeyword(String like) {
         LambdaQueryWrapper<User> w = new LambdaQueryWrapper<User>()
                 .select(User::getId)
+                .isNull(User::getDeletedAt)
                 .apply("(LOWER(email) LIKE LOWER({0}) OR LOWER(username) LIKE LOWER({1}))", like, like);
         List<String> ids = new ArrayList<>();
         for (User u : mapper.selectList(w)) {

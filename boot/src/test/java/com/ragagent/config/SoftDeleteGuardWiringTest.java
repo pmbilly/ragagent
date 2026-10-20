@@ -21,7 +21,7 @@ class SoftDeleteGuardWiringTest {
     @Autowired
     private MybatisPlusInterceptor interceptor;
 
-    @Value("${weknora.persistence.soft-delete-guard:alert}")
+    @Value("${weknora.persistence.soft-delete-guard:enforce}")
     private String expectedMode;
 
     @Test

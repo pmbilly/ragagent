@@ -165,6 +165,7 @@ public class KnowledgeRepository {
                 .select(Knowledge::getId, Knowledge::getFolderPath)
                 .eq(Knowledge::getTenantId, tenantId)
                 .eq(Knowledge::getKnowledgeBaseId, knowledgeBaseId)
+                .isNull(Knowledge::getDeletedAt)
                 .and(w -> w.eq(Knowledge::getFolderPath, prefix)
                         .or().likeRight(Knowledge::getFolderPath, prefix + "/")));
     }

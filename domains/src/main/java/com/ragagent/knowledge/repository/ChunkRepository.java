@@ -154,6 +154,7 @@ public class ChunkRepository implements ChunkSearchGateway {
                 .eq(Chunk::getTenantId, tenantId)
                 .eq(Chunk::getKnowledgeId, knowledgeId)
                 .eq(Chunk::getChunkType, ChunkTypes.TEXT)
+                .isNull(Chunk::getDeletedAt)
                 .orderByAsc(Chunk::getChunkIndex));
     }
 

@@ -555,7 +555,8 @@ public class MessageRepository {
         }
         Map<String, String> titles = new HashMap<>();
         for (Session s : sessionMapper.selectList(new LambdaQueryWrapper<Session>()
-                .in(Session::getId, ids))) {
+                .in(Session::getId, ids)
+                .isNull(Session::getDeletedAt))) {
             titles.put(s.getId(), s.getTitle() == null ? "" : s.getTitle());
         }
         List<MessageWithSession> out = new ArrayList<>(rows.size());

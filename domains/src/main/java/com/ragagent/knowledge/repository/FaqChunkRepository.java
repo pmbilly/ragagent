@@ -84,7 +84,8 @@ public class FaqChunkRepository {
                             .select(Chunk::getId, Chunk::getContentHash)
                             .eq(Chunk::getTenantId, tenantId)
                             .eq(Chunk::getKnowledgeId, knowledgeId)
-                            .eq(Chunk::getChunkType, "faq"));
+                            .eq(Chunk::getChunkType, "faq")
+                            .isNull(Chunk::getDeletedAt));
             if (batch.isEmpty()) {
                 break;
             }
@@ -111,7 +112,8 @@ public class FaqChunkRepository {
                             .eq(Chunk::getTenantId, tenantId)
                             .eq(Chunk::getKnowledgeBaseId, kbId)
                             .eq(Chunk::getChunkType, "faq")
-                            .eq(Chunk::getStatus, STATUS_INDEXED));
+                            .eq(Chunk::getStatus, STATUS_INDEXED)
+                            .isNull(Chunk::getDeletedAt));
             if (batch.isEmpty()) {
                 break;
             }
@@ -146,7 +148,8 @@ public class FaqChunkRepository {
                 .eq(Chunk::getKnowledgeBaseId, kbId)
                 .eq(Chunk::getChunkType, "faq")
                 .in(Chunk::getStatus, STATUS_DEFAULT, 1, STATUS_INDEXED)
-                .ne(Chunk::getId, excludeChunkId));
+                .ne(Chunk::getId, excludeChunkId)
+                .isNull(Chunk::getDeletedAt));
         Set<String> wanted = new HashSet<>(questions);
         for (Chunk c : candidates) {
             FaqChunkMetadata meta = parseFaqMetadata(c.getMetadata());
@@ -182,6 +185,7 @@ public class FaqChunkRepository {
                             .eq(Chunk::getKnowledgeId, knowledgeId)
                             .eq(Chunk::getChunkType, "faq")
                             .eq(Chunk::getStatus, STATUS_INDEXED)
+                            .isNull(Chunk::getDeletedAt)
                             .orderByAsc(Chunk::getCreatedAt));
             if (batch.isEmpty()) {
                 break;
@@ -265,7 +269,8 @@ public class FaqChunkRepository {
                 .select(Chunk::getId)
                 .eq(Chunk::getTenantId, tenantId)
                 .eq(Chunk::getKnowledgeBaseId, kbId)
-                .eq(Chunk::getChunkType, "faq");
+                .eq(Chunk::getChunkType, "faq")
+                .isNull(Chunk::getDeletedAt);
         if (tagId != null && !tagId.isEmpty()) {
             selection.eq(Chunk::getTagId, tagId);
         }

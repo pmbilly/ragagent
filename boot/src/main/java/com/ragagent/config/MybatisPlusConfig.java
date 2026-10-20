@@ -23,7 +23,7 @@ public class MybatisPlusConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor(
             @Value("${weknora.persistence.tenant-filter-guard:enforce}") TenantFilterGuard.Mode guardMode,
-            @Value("${weknora.persistence.soft-delete-guard:alert}") SoftDeleteFilterGuard.Mode softDeleteMode) {
+            @Value("${weknora.persistence.soft-delete-guard:enforce}") SoftDeleteFilterGuard.Mode softDeleteMode) {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         PaginationInnerInterceptor pagination = new PaginationInnerInterceptor();
         pagination.setMaxLimit(1000L);

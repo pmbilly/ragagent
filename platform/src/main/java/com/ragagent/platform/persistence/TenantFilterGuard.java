@@ -99,6 +99,8 @@ public class TenantFilterGuard implements InnerInterceptor {
             "com.ragagent.datasource.mapper.DataSourceMapper.selectActive",
             "com.ragagent.datasource.mapper.SyncLogMapper.countByStatus",
             "com.ragagent.datasource.mapper.SyncLogMapper.selectLatest",
+            // 过期附件回收：全局扫 expires_at，天然跨租户（同 mapper 的其它 selectList 均带 tenant_id）
+            "com.ragagent.session.mapper.TemporaryDocumentMapper.selectList",
             // ── 跨空间身份关系面 ──
             "com.ragagent.auth.mapper.TenantMemberMapper.selectList",
             "com.ragagent.auth.mapper.TenantInvitationMapper.selectCount",
