@@ -169,6 +169,32 @@ class EngineFactoryTest {
     }
 
     @Test
+    @DisplayName("注册表完整性：每个 EngineTypes.ENGINE_* 常量都必须有构造 + 地址策略登记")
+    void everyEngineConstantIsRegistered() {
+        List<String> types = new java.util.ArrayList<>();
+        for (java.lang.reflect.Field field : EngineTypes.class.getFields()) {
+            if (!field.getName().startsWith("ENGINE_") || field.getType() != String.class) {
+                continue;
+            }
+            try {
+                types.add((String) field.get(null));
+            } catch (ReflectiveOperationException e) {
+                throw new IllegalStateException("读 EngineTypes 常量失败：" + field.getName(), e);
+            }
+        }
+        List<String> unregistered = new java.util.ArrayList<>();
+        for (String type : types) {
+            try {
+                EngineFactory.validateRuntimeVectorStoreAddresses(
+                        store(type, new ConnectionConfig(), null), null);
+            } catch (EngineNotSupportedException e) {
+                unregistered.add(type + " -> " + e.getMessage());
+            }
+        }
+        assertTrue(unregistered.isEmpty(), "未登记的引擎类型：" + unregistered);
+    }
+
+    @Test
     @DisplayName("地址策略：SSRF 拒绝 → <label> failed SSRF validation；空地址放行")
     void rejectsBadAddress() {
         SsrfGuard rejecting = new SsrfGuard() {

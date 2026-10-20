@@ -21,7 +21,7 @@
 
 | 报告项 | 处置 | 理由 |
 |---|---|---|
-| T1 统一"类型→工厂注册表"协议 | **缩窄采纳**：每族一张表，**不建** `:platform` 通用 `CapabilityRegistry<T>` | 只有向量库/存储两个消费方，配置形状不同；通用件会把注册顺序、错误文案、SSRF 绑定从 1 个文件摊到 3 个模块。真实缺陷是同一 engine-type 维度有 **4 张表**（`EngineFactory` 构造 + 运行时 SSRF、`VectorStoreConfigService` 必填校验 + 保存面 SSRF），且两套 SSRF 策略跨模块各写一遍 |
+| T1 统一"类型→工厂注册表"协议 | **缩窄采纳**：每族一张表，**不建** `:platform` 通用 `CapabilityRegistry<T>` | 只有向量库/存储两个消费方，配置形状不同；通用件会把注册顺序、错误文案、SSRF 绑定从 1 个文件摊到 3 个模块。真实缺陷是同一 engine-type 维度有 **4 张表**（`EngineFactory` 构造 + 运行时 SSRF、`VectorStoreConfigService` 必填校验 + 保存面 SSRF）。**更正报告一处措辞**：两套 SSRF 策略虽跨模块各写一遍，但**两者都是 fail-closed**（漏登记即报错，不是静默放行）⇒ 属口径一致性成本，不是安全漏洞 |
 | T2 装配权集中 | **只做登记**（ADR-003 a）；**否决**把 `QaWiring` 上移 boot | `QaWiring` 装配 17 个 `session.rag.plugin` + 5 个域内协作者；上移等于把域内实现面拉进组合根（boot 19→25+ 文件，全是 session 内部类型） |
 | T3 跨域实体清零 | **采纳**，但**不新造** `AgentConfigView` | `contract.agent.AgentLookup.AgentView` 就是为此建的（注释写明"不再传实体"）；只差 `tenantId`——session 有两处安全相关读取：`QaKbScope` 定检索租户、`QaMentionTagScope` 做租户相等判断 |
 | T4 文档计数守卫 | **采纳**（按上表口径） | 注释里的计数一律删除，能机械校验的数字才写进 README |
@@ -33,11 +33,11 @@
 |---|---|---|---|
 | **K0** 文档口径 | README/overview/构建注释五处计数对齐；`check-doc-truth.py` 扩 D2（业务控制器 + 探针）/D4（金片双口径）/D5（provider 注册数），三条各配红态探针 | 守卫绿；红态探针三条均红并复原 | ✅ 2026-10-20 |
 | **K4** 装配点登记 | `overview.md` 增"装配点清单"（22 个装配类按组合根/域内/模块内三档登记）；登记"agent-engine 经根包组件扫描装配"；新增 `check-wiring-points.py`（W1 集合相等 / W2 分类落点 / W3 理由 / W4 文档同步） | 四条判据红态探针均验证 | ✅ 2026-10-20 |
-| **K1** 引擎注册合表 | `EngineFactory` 两张 switch 合成一张（type → 构造 + 地址策略），错误文案逐字保留；`FileServiceFactory` 删 `IMPLEMENTED`/`PENDING` 死集合；可选：与 `VectorStoreConfigService` 两张表共享契约侧元数据（纯 JDK） | 金片零变化；`unsupported engine type` / `no SSRF address policy` 文案逐字回归 | 待做 |
+| **K1** 引擎注册合表 | `EngineFactory`：9 个引擎合成一张 `SPECS`（构造 + 地址策略同行登记），`EngineSpec` 强制"声明地址字段或显式免检"，否则类初始化失败；删掉不可达的 `unsupported engine type` 分支；新增"每个 `ENGINE_*` 常量必须有注册项"的完整性测试（摘掉一条注册即红）。`FileServiceFactory`：删 `IMPLEMENTED`/`PENDING` 死集合与配套不可达分支，测试断言改为行为断言 | 文案逐字不变；43 守卫绿 · **5026 / 0 / 4** · build 2m16s；**未做**跨模块 SSRF 元数据共享（理由见 §2 T1） | ✅ 2026-10-20 |
 | **K2** 实体渗漏清零 | `AgentView` 补 `tenantId`；8 文件改持视图；`ResolvedAgent` 删恒 false 的 `sharedAgentReadOnly`；`check-domain-contracts.py` 增"跨域 import 落在 `.domain.` 即红"，基线 8 → 0 | agent 相关金片零变化；基线收紧到 0 | 待做 |
 | **K3** LLM 目录单源化 | `ModelProviderCatalog.ENTRIES` 由 `ProviderRegistry.list()` 生成；`ProviderCatalogParityTest` 降级为"同源"断言；`validateConfig` 登记已知缺口 | `contracts/model-providers.json` 金片字节一致（顺序敏感） | 待做 |
 
-**顺序**：K0 ✅ → K4 ✅ → K1 → K2 → K3（K2 独立，可与 K1 互换）。
+**顺序**：K0 ✅ → K4 ✅ → K1 ✅ → K2 → K3。
 
 ## 4. 不做
 

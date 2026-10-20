@@ -108,13 +108,18 @@ class ProviderBatchTwoTest {
         assertEquals("incomplete tos config", assertThrows(IllegalArgumentException.class,
                 () -> FileServiceFactory.fromStorageConfig("tos", sec, "/tmp")).getMessage());
 
-        // 已补齐：不再有"未实现"的 provider
-        assertTrue(FileServiceFactory.PENDING.isEmpty());
-        assertTrue(FileServiceFactory.IMPLEMENTED.containsAll(
-                java.util.Set.of("local", "s3", "minio", "obs", "ks3", "oss", "cos", "tos")));
-        // 未知 provider 仍是明确报错（不是未实现异常）
-        assertThrows(IllegalArgumentException.class,
-                () -> FileServiceFactory.fromStorageConfig("ceph", sec, "/tmp"));
-        assertFalse(FileServiceFactory.IMPLEMENTED.contains("ceph"));
+        // 八个 provider 都被工厂认得：空配置只会得到 incomplete 文案，不是 unsupported
+        for (String provider : java.util.List.of("local", "s3", "minio", "obs", "ks3",
+                "oss", "cos", "tos")) {
+            try {
+                FileServiceFactory.fromStorageConfig(provider, new StorageEngineConfig(), "/tmp");
+            } catch (IllegalArgumentException e) {
+                assertFalse(e.getMessage().startsWith("unsupported provider"),
+                        provider + ": " + e.getMessage());
+            }
+        }
+        // 未知 provider 仍是明确报错
+        assertEquals("unsupported provider \"ceph\"", assertThrows(IllegalArgumentException.class,
+                () -> FileServiceFactory.fromStorageConfig("ceph", sec, "/tmp")).getMessage());
     }
 }

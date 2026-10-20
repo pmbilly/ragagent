@@ -7,7 +7,6 @@ import com.ragagent.platform.storage.fileserve.StoragePaths;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
-import java.util.Set;
 
 /**
  * 按租户存储配置造 provider 专属 {@link FileService}。
@@ -28,12 +27,6 @@ public final class FileServiceFactory {
     public static final String ENV_EXTERNAL_URL = "APP_EXTERNAL_URL";
     /** provider 缺省前缀（s3/obs/ks3 均以 {@code weknora/} 起）。 */
     public static final String DEFAULT_PATH_PREFIX = "weknora/";
-
-    /** 已实现的 provider（local + S3 协议族 + oss/cos/tos）。 */
-    static final Set<String> IMPLEMENTED =
-            Set.of("local", "s3", "minio", "obs", "ks3", "oss", "cos", "tos");
-    /** 已无"未实现"的 provider（保留集合以便扩展时复用判定）。 */
-    static final Set<String> PENDING = Set.of();
 
     private FileServiceFactory() {
     }
@@ -189,13 +182,7 @@ public final class FileServiceFactory {
                         c.getPathPrefix(), trim(c.getTempBucketName()), trim(c.getTempRegion()),
                         ssrfGuard), p);
             }
-            default -> {
-                if (PENDING.contains(p)) {
-                    throw new UnsupportedOperationException(
-                            "provider \"" + p + "\" not implemented yet (A3 phase 2)");
-                }
-                throw new IllegalArgumentException("unsupported provider \"" + p + "\"");
-            }
+            default -> throw new IllegalArgumentException("unsupported provider \"" + p + "\"");
         }
     }
 
