@@ -57,6 +57,7 @@ grpc:
 weknora:
   persistence:
     tenant-filter-guard: ${WEKNORA_TENANT_FILTER_GUARD:enforce}   # off | alert | enforce：SELECT 缺失租户谓词探测（B71 定性后默认 enforce；降档排障用 alert/off）
+    soft-delete-guard: ${WEKNORA_SOFT_DELETE_GUARD:enforce}        # off | alert | enforce：SELECT 缺失 deleted_at 谓词探测（默认 enforce；降档排障用 alert/off）
   stream:
     type: ${STREAM_MANAGER_TYPE:memory}   # memory | redis（精确匹配，其余值一律按 memory）
     prefix: ${REDIS_PREFIX:}              # 原样拼接、不裁尾部冒号（"stream:" 会拼出双冒号；键名兼容性要求如此）

@@ -9,6 +9,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.ragagent.platform.persistence.FullTableWriteGuard;
+import com.ragagent.platform.persistence.SoftDeleteFilterGuard;
 import com.ragagent.platform.persistence.TenantFilterGuard;
 import java.util.Collections;
 import org.apache.ibatis.builder.StaticSqlSource;
@@ -132,13 +133,14 @@ class TenantFilterGuardTest {
     }
 
     @Test
-    @DisplayName("装配顺序：分页 → 全表防护 → 租户探测")
+    @DisplayName("装配顺序：分页 → 全表防护 → 租户探测 → 软删探测")
     void wiringOrder() {
         var chain = new MybatisPlusConfig().mybatisPlusInterceptor(
-                TenantFilterGuard.Mode.ALERT).getInterceptors();
-        assertThat(chain).hasSize(3);
+                TenantFilterGuard.Mode.ALERT, SoftDeleteFilterGuard.Mode.ALERT).getInterceptors();
+        assertThat(chain).hasSize(4);
         assertThat(chain.get(0)).isInstanceOf(com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor.class);
         assertThat(chain.get(1)).isInstanceOf(FullTableWriteGuard.class);
         assertThat(chain.get(2)).isInstanceOf(TenantFilterGuard.class);
+        assertThat(chain.get(3)).isInstanceOf(SoftDeleteFilterGuard.class);
     }
 }

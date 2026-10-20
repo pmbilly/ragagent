@@ -142,7 +142,7 @@ boot（组合根，唯一装配点）
 | **H4a 任务-端口** | **H4a-1 ✅**：`TaskQueue`（name/start/stop/setRetryDelayOverrideSeconds）+ `RetryDelayOverride`；6 套队列接口继承；钩子 5→1 机制。**H4a-2/H4b**：`submit/lease/renew/progress/retry/park` 完整端口随实现迁移落地 | H4a-1 ✅ 2026-10-20 | 业务只依赖端口；钩子 5→1 |
 | **H4b 任务-实现** | 按域迁实现：datasource sync → memory → knowledge 富化 → wiki（最复杂最后）；每批删 2 个 InProcess/Redis 双实现类 | 3-5 人日 | 10 个实现类删除；跨实例可恢复；wiki 死信与锁特例参数化 |
 | **H5a 分页统一** | **H5a-1 ✅**：`contract.pagination.PageResult<T>` 统一 11 个分页类型；**H5a-2**：管理端点加分页参数（默认页大小）+ 前端同步 | H5a-1 ✅ 2026-10-20；H5a-2 1 人日 | 形状 7→1；后台列表全部可分页 |
-| **H5b 软删校验** | 扩 `TenantFilterGuard`：带 `deleted_at` 表的 SELECT 必须含谓词；79 处登记基线只许减；**不做自动注入**；限流端口同批 | 1 人日 | 新增漏写即红；基线只减 |
+| **H5b 软删校验** ✅ | 新增 `SoftDeleteFilterGuard`：26 张带 `deleted_at` 的表，SELECT 主查询必须含谓词；**不做自动注入**；允许清单按需登记。实测存量 0 违规 | ✅ 2026-10-20 | 新增漏写即红；允许清单为空 |
 | **H5c 软删收敛（可选）** | 仅在语义一致的表上逐步收进 `@TableLogic` / repository 基类；不追求 79→0 | 2-3 人日 | 不做满，只做低风险表 |
 | **H6 契约-形状治理** | `KnowledgeCatalogPort` 拆窄（或退回域内）；`*RowView/*PageView` 回域；`PageView<T>` 统一；代理税端口逐个裁决 | 2-3 人日 | R1/R2 守卫绿；contract 类型净减；Port ≤7 方法 |
 | **H7 平台-判据换血** | `check-platform-shapes.py` 改依赖面 + 域词汇；`platform.knowledge` / `settings` / `prompt` 业务件按 G3/G7 归位 | 1-2 人日 | platform 业务件 0（新判据）；与 G3 合并验收 |

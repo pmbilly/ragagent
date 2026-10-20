@@ -127,10 +127,11 @@ Thread.ofVirtual().start(() -> TenantScope.run(snap, () -> {
 
 **选择规则**：单表且无方言分支 → `Mapper`；出现跨表、方言判断或需要事务模板 → `Repository`。
 
-**两条硬规矩**：
+**三条硬规矩**：
 
 1. **软删条件显式写**：每条查询显式加 `deleted_at IS NULL`，不用 `@TableLogic`（datetime 逻辑删除值在 MyBatis-Plus 各版本行为敏感）。
 2. **controller 不得直接注入 Mapper**：HTTP 面只编排，数据访问在 service / repository。由 `check-controller-purity.py` 强制（当前违例 0）。
+3. **软删谓词有机器探测**：`SoftDeleteFilterGuard`（26 张带 `deleted_at` 的表，默认 enforce）在 SELECT 主查询缺谓词时直接红；确需读已删行（回收站/审计/恢复/去重）在 `ALLOWED_STATEMENTS` 登记理由。
 
 **去哪改**：单表查询改 Mapper；涉及方言或跨表时在 `repository/` 加方法，别在 service 里拼两套 SQL。
 

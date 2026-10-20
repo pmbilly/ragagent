@@ -3,16 +3,18 @@ package com.ragagent.config;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.ragagent.platform.persistence.FullTableWriteGuard;
+import com.ragagent.platform.persistence.SoftDeleteFilterGuard;
 import com.ragagent.platform.persistence.TenantFilterGuard;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * MyBatis-Plus 插件：物理分页 + total 统计 + 全表改删防护 + 租户过滤探测。
+ * MyBatis-Plus 插件：物理分页 + total 统计 + 全表改删防护 + 租户过滤探测 + 软删过滤探测。
  * ListKnowledge 真分页依赖分页拦截器；{@link FullTableWriteGuard} 机器强制
- * 「禁止无条件全局更新/删除」；{@link TenantFilterGuard} 探测 SELECT 缺失租户谓词
- * （语句逐条定性收口后默认 enforce，env 可降 alert/off）。顺序按 MP 官方建议：改造 SQL 的在前
+ * 「禁止无条件全局更新/删除」；{@link TenantFilterGuard} 探测 SELECT 缺失租户谓词；
+ * {@link SoftDeleteFilterGuard} 探测带 {@code deleted_at} 的表缺软删谓词
+ * （两者默认 enforce，env 可降 alert/off）。顺序按 MP 官方建议：改造 SQL 的在前
  * （分页），不改写 SQL 的放最后（三道防护）。
  */
 @Configuration
@@ -20,13 +22,15 @@ public class MybatisPlusConfig {
 
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor(
-            @Value("${weknora.persistence.tenant-filter-guard:enforce}") TenantFilterGuard.Mode guardMode) {
+            @Value("${weknora.persistence.tenant-filter-guard:enforce}") TenantFilterGuard.Mode guardMode,
+            @Value("${weknora.persistence.soft-delete-guard:alert}") SoftDeleteFilterGuard.Mode softDeleteMode) {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         PaginationInnerInterceptor pagination = new PaginationInnerInterceptor();
         pagination.setMaxLimit(1000L);
         interceptor.addInnerInterceptor(pagination);
         interceptor.addInnerInterceptor(new FullTableWriteGuard());
         interceptor.addInnerInterceptor(new TenantFilterGuard(guardMode));
+        interceptor.addInnerInterceptor(new SoftDeleteFilterGuard(softDeleteMode));
         return interceptor;
     }
 }
