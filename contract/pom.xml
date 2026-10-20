@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  契约层：纯 JDK 的公开 API / SPI / 不可变载荷。
+
+  门槛：把「契约面纯 JDK」从 ArchUnit 的静态规则升格为编译期约束——生产依赖块为空，
+  一沾框架/其他模块就编译不过。测试面允许 JUnit / AssertJ。
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.ragagent</groupId>
+    <artifactId>ragagent-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>contract</artifactId>
+  <name>contract</name>
+
+  <dependencies>
+    <!-- 生产依赖刻意留空：契约面零依赖（ArchUnit 守一层，这里「没有依赖可声明」再兜一层） -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <compilerArgs>
+            <!-- 契约层最稳定：全量 lint + 警告即错误先行（其余模块按棘轮节奏跟进）。
+                 -serial 排除：异常类的 serialVersionUID 告警在本仓契约面全是噪音。 -->
+            <arg>-Xlint:all,-serial</arg>
+            <arg>-Werror</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -177,6 +177,20 @@
 
 **不排期**：M8 响应信封统一（线格式变更，需产品/前端会签）。
 
+### 5.0f 并行专项：X 系列「构建迁移 Gradle → Maven」（`v0.7.x`）
+
+> 方案：`docs/internal/plans/build-migration-maven-x-series.md`。动因（2026-10-20 拍板）：公司/团队标准是 Maven。
+> 硬约束：Gradle 保留到「同一提交下 `mvn verify` 与 `./gradlew build` 同时全绿」才删；业务代码只允许 3 处构建耦合例外（`ContractPaths`、`ArchitectureRulesTest` 排除规则、迁移脚本路径）。
+
+| 批 | 内容 | 状态 |
+|---|---|---|
+| **X1** | 骨架与依赖：根 pom + 7 子 pom、Boot BOM、proto/gRPC（xolstice 0.6.1）、repackage | ✅ 2026-10-21 |
+| **X2** | 测试面：拆 3 个 fixtures 模块（1481 文件）、surefire、路径/工作目录/ArchUnit/ContractPaths | 待做 |
+| **X3** | 质量闸门：spotless ratchet / javadoc / jacoco / 45 守卫 / 迁移脚本 / 起服等价 | 待做 |
+| **X4** | 切换收尾：守卫重写、脚本/CI/Docker/文档、删 Gradle | 待做 |
+
+**X1 读数（2026-10-21）**：`mvn -Dmaven.test.skip=true package` 绿 · `java -jar` 起服 `Started 22.0s` + `/health` 200 + 认证端点 401 · fat jar **189M = Gradle 189M** · 依赖清单差异 8 项全部定性 · 45 守卫绿。
+
 ### 5.1 历史批次（v0.3.0 P1~P5 / v0.4.0 R1~R6，全部 ✅）
 
 > **阶段路线（续，2026-10-16）**：**R1~R6（三 runtime + 模块收口）在 `v0.4.0` 全部完成** ⇒ **推送 `v0.4.0` + 合并 `main`**。 **✅ 2026-10-16 已执行**：`v0.4.0` 推送（995696f9..e3dce136）→ `main` 快进合并并推送（`c07786fe` → 含本记录的 tip）。**R1~R6 收口读数**：七模块 → 六模块（`:engine` 解散）、末轮增出 `:agent-engine`（七模块新图，见 §8.1 终检）；domains 对全部运行时模块只剩契约 + `modelcontext` 终态边；**16 守卫全绿**（新增模块图守卫）· 测试 5000 / 0 / 4。
@@ -519,6 +533,7 @@ boot           14 件                      →  boot
 | EMB-1 | 2026-10-20 | **嵌入建议开关联动**：渠道「推荐问题」定为总闸（开场 + 追问都受它控制）；公开配置新增 `agentStarterQuestionsEnabled` / `agentFollowUpQuestionsEnabled`（读智能体 `questionSuggestions` 的两个 enabled）；widget 侧开场与追问分别按「总闸 && 分闸」门控——智能体关闭追问时不再每轮发 ensure/get（此前白跑并留下 suppressed 行）；渠道开关文案 5 语言同步为总闸口径。 | 契约金片 `emb-pub-config` 24→26 键已签字 · 前端 type-check / 753 / i18n 11 全绿 · **45 守卫绿** · **5046 / 0 / 4** · build 2m13s · 真机：公开配置两开关正确，widget 加载只发 1 次 starters、追问请求 0、控制台 0 报错 |
 | EMB-1b | 2026-10-20 | **懒创建空白态不再拉历史**：新建对话把 sessionId 清空后，消息区高度变化触发的滚动事件仍会走分页加载 ⇒ `GET /messages//load` 404。`useEmbedChatSession.getmsgList` 增加空 sessionId 早退（唯一收口）。 | 红态探针（撤守卫复现 1 条空会话请求 + 2 条控制台 404，恢复后 0/0）· 前端 type-check / 753 / build 绿 · 纯前端，未跑后端闸门 |
 | EMB-1c | 2026-10-20 | **启动重复请求归因，换票单飞**：打开页曾见 config ×2 / exchange ×2 / load ×2——config 是宿主外观 + iframe 配置各一次（设计）；load 是存量句柄探测（limit=1）+ 正式历史（limit=20，设计）；exchange 是宿主 `iframe load` 与 `bootstrap_request` 各推一次 `provide_token`，iframe 两次都换 ⇒ 改为同票并发单飞 + 已换过的票迟到重推直接忽略。 | 真机时序（刷新前/后）：exchange **2→1**，config=2、load=2 保持（已说明来源）· 前端 type-check / 753 / build 绿 |
+| X1 | 2026-10-21 | **Maven 骨架与依赖**：根 pom + 7 子 pom（contract/platform/model-runtime/retrieval-engine/agent-engine/domains/boot）；Boot BOM 接管 protobuf 4.35.1 / grpc 1.83.1 / neo4j 6.1.0 / sqlite 3.53.2.1（toml 的声明值被 BOM 覆盖，Maven 侧必须同口径）；protoc 对齐 4.35.1（3.25 生成的 `GeneratedMessageV3` 在 4.x 刷废弃警告，与 `-Werror` 相撞）；guava 钉 `33.6.0-jre`（否则 Maven 选 android 变体）；repackage 显式 exclude servlet-api（插件会打 provided）；迁移脚本同步到仓库根 `build/` + `spring-boot:run` 工作目录钉仓库根。 | `mvn -Dmaven.test.skip=true package` 绿 · `java -jar` 起服 **Started 22.0s** / `/health` 200 / 认证端点 401 · fat jar **189M = Gradle 189M** · 依赖差异 8 项全定性（Gradle 多 6 个 dom4j optional XPath 死重；Maven 多 okio 1.12 + kotlin-stdlib-common，okhttp 2.7.5 链路）· **45 守卫绿** |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

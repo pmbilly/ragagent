@@ -1,6 +1,7 @@
-# Java / Gradle
+# Java（构建产物：Gradle 用 build/，Maven 用 target/）
 .gradle/
 build/
+target/
 server/build/
 # IDE 的 Java 语言服务器（jdt.ls）编译输出
 bin/

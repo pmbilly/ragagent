@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  根构建：版本单一来源 + Boot BOM + 插件版本统一。
+
+  与 Gradle 时代的对应关系：
+    gradle/libs.versions.toml        → 本文件 <properties>
+    build-logic 的 java-conventions  → compiler 配置（release 21 / -parameters / UTF-8）
+    build-logic 的 test-conventions  → surefire 配置（JUnit Platform / 动态 agent 加载）
+    allprojects { repositories }     → 仓库声明（镜像走 ~/.m2/settings.xml，不写进 pom）
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.ragagent</groupId>
+  <artifactId>ragagent-parent</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>ragagent-java</name>
+
+  <modules>
+    <module>contract</module>
+    <module>platform</module>
+    <module>model-runtime</module>
+    <module>retrieval-engine</module>
+    <module>agent-engine</module>
+    <module>domains</module>
+    <module>boot</module>
+  </modules>
+
+  <properties>
+    <java.version>21</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <!-- 平台线：Boot BOM 统一 starter-*/flyway/h2/junit 等版本，其余在此登记 -->
+    <spring-boot.version>4.1.1</spring-boot.version>
+    <!-- protoc 与 BOM 的 protobuf-java 对齐：3.25 生成的 GeneratedMessageV3 在 4.x 运行时会刷废弃警告，
+         与 -Werror 相撞（实测 platform 编译直接失败） -->
+    <protobuf.version>4.35.1</protobuf.version>
+    <grpc.version>1.66.0</grpc.version>
+    <mybatis-plus.version>3.5.17</mybatis-plus.version>
+    <archunit.version>1.3.0</archunit.version>
+    <jjwt.version>0.12.6</jjwt.version>
+    <awssdk.version>2.31.68</awssdk.version>
+    <duckdb.version>1.1.3</duckdb.version>
+    <grpc-client-starter.version>3.1.0.RELEASE</grpc-client-starter.version>
+    <javax-annotation.version>1.3.2</javax-annotation.version>
+    <jtokkit.version>1.1.0</jtokkit.version>
+    <aliyun-oss.version>3.18.1</aliyun-oss.version>
+    <qcloud-cos.version>5.6.227</qcloud-cos.version>
+    <volcengine-tos.version>2.9.19</volcengine-tos.version>
+    <springdoc.version>3.1.1</springdoc.version>
+    <!-- springdoc 传递到 2.2.55；BOM 不管这一项，显式对齐 Gradle 实测值 -->
+    <swagger-annotations.version>2.2.55</swagger-annotations.version>
+    <jakarta-servlet.version>6.1.0</jakarta-servlet.version>
+
+    <!-- 插件版本 -->
+    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+    <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
+    <maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
+    <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
+    <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+    <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
+    <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
+    <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- 平台 BOM：只此一处，子模块不得自行 import -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring-boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- 本仓模块：Maven 不做版本推断，模块间依赖统一在此定版 -->
+      <dependency>
+        <groupId>com.ragagent</groupId>
+        <artifactId>contract</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.ragagent</groupId>
+        <artifactId>platform</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.ragagent</groupId>
+        <artifactId>model-runtime</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.ragagent</groupId>
+        <artifactId>retrieval-engine</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.ragagent</groupId>
+        <artifactId>agent-engine</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.ragagent</groupId>
+        <artifactId>domains</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- 带显式版本者（原 libs.versions.toml 的 libraries 段） -->
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
+        <version>${mybatis-plus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-jsqlparser</artifactId>
+        <version>${mybatis-plus.version}</version>
+      </dependency>
+      <!-- protobuf-java / grpc-protobuf / grpc-stub 的**运行时库版本归 Boot BOM**
+           （Gradle 侧同口径：BOM 覆盖显式声明，实测解析到 protobuf 4.35.1 / grpc 1.83.1）。
+           ${protobuf.version} 与 ${grpc.version} 只用于 protoc / protoc-gen-grpc-java 二进制。 -->
+      <dependency>
+        <groupId>net.devh</groupId>
+        <artifactId>grpc-client-spring-boot-starter</artifactId>
+        <version>${grpc-client-starter.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.annotation</groupId>
+        <artifactId>javax.annotation-api</artifactId>
+        <version>${javax-annotation.version}</version>
+      </dependency>
+      <!-- neo4j / sqlite 亦归 Boot BOM（Gradle 实测：6.1.0 / 3.53.2.1） -->
+      <dependency>
+        <groupId>com.tngtech.archunit</groupId>
+        <artifactId>archunit</artifactId>
+        <version>${archunit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-api</artifactId>
+        <version>${jjwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-impl</artifactId>
+        <version>${jjwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-jackson</artifactId>
+        <version>${jjwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>s3</artifactId>
+        <version>${awssdk.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.aliyun.oss</groupId>
+        <artifactId>aliyun-sdk-oss</artifactId>
+        <version>${aliyun-oss.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.qcloud</groupId>
+        <artifactId>cos_api</artifactId>
+        <version>${qcloud-cos.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.volcengine</groupId>
+        <artifactId>ve-tos-java-sdk</artifactId>
+        <version>${volcengine-tos.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.duckdb</groupId>
+        <artifactId>duckdb_jdbc</artifactId>
+        <version>${duckdb.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.knuddels</groupId>
+        <artifactId>jtokkit</artifactId>
+        <version>${jtokkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+        <version>${springdoc.version}</version>
+      </dependency>
+      <!-- BOM 不管 swagger 注解；显式钉 Gradle 实测值，避免 Maven 的「最近优先」退化到旧版 -->
+      <dependency>
+        <groupId>io.swagger.core.v3</groupId>
+        <artifactId>swagger-annotations-jakarta</artifactId>
+        <version>${swagger-annotations.version}</version>
+      </dependency>
+
+      <!-- Guava 的 jre / android 是**版本后缀**两种变体：Maven 的「最近优先」会选到 android，
+           而 Gradle 取 jre。android 变体缺部分 JRE 类，运行期会 NoClassDefFoundError -->
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>33.6.0-jre</version>
+      </dependency>
+
+      <!-- servlet API 必须 provided：否则会被某个 compile 传递依赖带进 fat jar，
+           与 tomcat-embed-core 自带的类重复。版本与 BOM 同步（升级 Boot 时核对）。 -->
+      <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>${jakarta-servlet.version}</version>
+        <scope>provided</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <extensions>
+      <!-- 提供 ${os.detected.classifier}：protoc / protoc-gen-grpc-java 按平台取二进制 -->
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>${os-maven-plugin.version}</version>
+      </extension>
+    </extensions>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <configuration>
+            <release>${java.version}</release>
+            <!-- MyBatis 无 @Param 的参数绑定、Spring MVC/Jackson 参数名反射都依赖它 -->
+            <parameters>true</parameters>
+            <encoding>${project.build.sourceEncoding}</encoding>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire-plugin.version}</version>
+          <configuration>
+            <!-- Mockito inline 在 JDK 21+ 自挂 attach 会被拒 -->
+            <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${maven-failsafe-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>${maven-resources-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${jacoco-maven-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${spring-boot.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.xolstice.maven.plugins</groupId>
+          <artifactId>protobuf-maven-plugin</artifactId>
+          <version>${protobuf-maven-plugin.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

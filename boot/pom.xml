@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  组合根模块：入口 + 全局装配 + 扫描 + 打包。
+
+  config/ 与 RagAgentApplication 是只出不进的组合根；集成测试（@SpringBootTest）也住这里
+  —— 它们隐式依赖 @SpringBootConfiguration（包级向上搜索），而 :domains 看不到 :boot。
+  依赖方向：boot → 各模块（一路向下，无环）。
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.ragagent</groupId>
+    <artifactId>ragagent-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>boot</artifactId>
+  <name>boot</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>agent-engine</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>model-runtime</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>retrieval-engine</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>domains</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>platform</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>contract</artifactId>
+    </dependency>
+
+    <!-- 组合根本身用到的 API（:domains 的 provided/实现不会传递到编译面） -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjweaver</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.baomidou</groupId>
+      <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
+    </dependency>
+    <!-- OpenAPI JSON（dev-only，默认关闭；UI 由 boot 的 /scalar 页面承载） -->
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Boot 4：@AutoConfigureMockMvc 迁到 spring-boot-webmvc-test -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- 集成测试走内存库（test scope 不可传递 ⇒ 必须显式声明，
+         否则测试会落到 application.yml 里的真 PG URL 上） -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- 迁移脚本同步：application.yml 的 filesystem:./build/generated-migrations 是**相对工作目录**，
+           所以产物写到仓库根的 build/（与 Gradle 的 bootRun 同路径，两套构建并存期互不干扰） -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>sync-migrations</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.basedir}/../build/generated-migrations</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/../migrations/versioned</directory>
+                  <includes>
+                    <include>V*.sql</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <!-- 起服工作目录钉在仓库根：与 java -jar 同口径，application.yml 的相对路径才稳定 -->
+          <workingDirectory>${project.basedir}/..</workingDirectory>
+          <excludes>
+            <!-- repackage 连 provided 一起打进 fat jar；servlet API 类由 tomcat-embed-core 提供。
+                 排除后与 Gradle 的 bootJar（只打 runtimeClasspath）同口径。 -->
+            <exclude>
+              <groupId>jakarta.servlet</groupId>
+              <artifactId>jakarta.servlet-api</artifactId>
+            </exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  agent 引擎模块：com.ragagent.agent。
+
+  依赖方向：agent-engine → platform → contract；对其它域出边 0，
+  model-runtime 是合法终态边（工具注册表与流解码属模型侧的 agent 词汇）。
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.ragagent</groupId>
+    <artifactId>ragagent-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>agent-engine</artifactId>
+  <name>agent-engine</name>
+
+  <dependencies>
+    <!-- 底座：agent 面签名大量使用契约词汇与平台件 ⇒ 传递 -->
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>platform</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>contract</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>model-runtime</artifactId>
+    </dependency>
+
+    <!-- 依实测 import 面声明：jackson / spring / slf4j 传递，jtokkit 与 mybatis-plus 实现 -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.knuddels</groupId>
+      <artifactId>jtokkit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.baomidou</groupId>
+      <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
