@@ -191,8 +191,8 @@ class PipelineLifecycleRecordingTest {
         Map<String, Object> s1 = new LinkedHashMap<>();
         s1.put("next", next[0]);
         s1.put("err", errOf(err));
-        s1.put("user_content", cm.getUserContent());
-        s1.put("rendered", cm.getRenderedContexts());
+        s1.put("user_content", cm.getAnswer().getUserContent());
+        s1.put("rendered", cm.getAnswer().getRenderedContexts());
         assertRec("into_chat", "no_retrieval_template", json(s1));
 
         // 2) 图片描述 + 引用 + 附件
@@ -205,7 +205,7 @@ class PipelineLifecycleRecordingTest {
         cm2.setImageDescription("一只猫坐在垫子上");
         cm2.setQuotedContext("被引用的话");
         p.onEvent(PipelineEventType.INTO_CHAT_MESSAGE, cm2, () -> null);
-        assertRec("into_chat", "image_quoted_attachments", json(Map.of("user_content", cm2.getUserContent())));
+        assertRec("into_chat", "image_quoted_attachments", json(Map.of("user_content", cm2.getAnswer().getUserContent())));
 
         // 3) 普通检索路径
         ChatManage cm3 = new ChatManage();
@@ -229,8 +229,8 @@ class PipelineLifecycleRecordingTest {
         cm3.setMergeResult(merge);
         p.onEvent(PipelineEventType.INTO_CHAT_MESSAGE, cm3, () -> null);
         Map<String, Object> s3 = new LinkedHashMap<>();
-        s3.put("user_content", cm3.getUserContent());
-        s3.put("rendered", cm3.getRenderedContexts());
+        s3.put("user_content", cm3.getAnswer().getUserContent());
+        s3.put("rendered", cm3.getAnswer().getRenderedContexts());
         assertRec("into_chat", "documents", json(s3));
 
         // 4) FAQ 优先
@@ -255,8 +255,8 @@ class PipelineLifecycleRecordingTest {
         cm4.setMergeResult(new ArrayList<>(List.of(d1, f1, f2)));
         p.onEvent(PipelineEventType.INTO_CHAT_MESSAGE, cm4, () -> null);
         Map<String, Object> s4 = new LinkedHashMap<>();
-        s4.put("user_content", cm4.getUserContent());
-        s4.put("rendered", cm4.getRenderedContexts());
+        s4.put("user_content", cm4.getAnswer().getUserContent());
+        s4.put("rendered", cm4.getAnswer().getRenderedContexts());
         assertRec("into_chat", "faq_priority", json(s4));
 
         // 5) 非法查询
@@ -266,7 +266,7 @@ class PipelineLifecycleRecordingTest {
         PluginError err5 = p.onEvent(PipelineEventType.INTO_CHAT_MESSAGE, cm5, () -> null);
         Map<String, Object> s5 = new LinkedHashMap<>();
         s5.put("err", errOf(err5));
-        s5.put("user_content", cm5.getUserContent());
+        s5.put("user_content", cm5.getAnswer().getUserContent());
         assertRec("into_chat", "invalid_query", json(s5));
 
         // 6) 非法改写回落
@@ -275,7 +275,7 @@ class PipelineLifecycleRecordingTest {
         cm6.setIntent(QueryIntent.CHITCHAT);
         cm6.setRewriteQuery("onclick=恶意");
         p.onEvent(PipelineEventType.INTO_CHAT_MESSAGE, cm6, () -> null);
-        assertRec("into_chat", "invalid_rewrite", json(Map.of("user_content", cm6.getUserContent())));
+        assertRec("into_chat", "invalid_rewrite", json(Map.of("user_content", cm6.getAnswer().getUserContent())));
 
         // 7) document header 转义
         SearchResult hd1 = Rec46cSupport.sr("h", "", "k1", 0d);
@@ -308,7 +308,7 @@ class PipelineLifecycleRecordingTest {
         c1.setKnowledgeBaseId("kb1");
         c1.setKnowledgeTitle("标题一");
         cm.setMergeResult(new ArrayList<>(List.of(c1)));
-        cm.setUserContent("Q");
+        cm.getAnswer().setUserContent("Q");
         var out1 = ReferencesSupport.prepareMessagesWithModelContext(cm);
         Map<String, Object> s1 = new LinkedHashMap<>();
         s1.put("messages", msgsJSON(out1.messages()));
@@ -338,7 +338,7 @@ class PipelineLifecycleRecordingTest {
         SearchResult w2 = Rec46cSupport.sr("https://example.com/b", "网页摘要 B", "", 0d);
         w2.setKnowledgeSource("web_search");
         cm2.setMergeResult(new ArrayList<>(List.of(k1, w1, k2, w2)));
-        cm2.setUserContent("Q");
+        cm2.getAnswer().setUserContent("Q");
         var out2 = ReferencesSupport.prepareMessagesWithModelContext(cm2);
         assertRec("references", "citations_on", mask(json(msgsJSON(out2.messages()))));
 
@@ -350,8 +350,8 @@ class PipelineLifecycleRecordingTest {
         sc3.setPrompt("CTX {{contexts}} {{query}}");
         cm3.setSummaryConfig(sc3);
         cm3.setIntent(QueryIntent.KB_SEARCH);
-        cm3.setUserContent("U");
-        cm3.setRenderedContexts("<context id=\"1\">原始内容</context>");
+        cm3.getAnswer().setUserContent("U");
+        cm3.getAnswer().setRenderedContexts("<context id=\"1\">原始内容</context>");
         SearchResult k3 = Rec46cSupport.sr("c1", "知识内容", "k1", 0d);
         k3.setKnowledgeTitle("T");
         k3.setChunkType("text");
@@ -368,7 +368,7 @@ class PipelineLifecycleRecordingTest {
         cm4.setSummaryConfig(sc4);
         cm4.setFaqPriorityEnabled(true);
         cm4.setIntent(QueryIntent.KB_SEARCH);
-        cm4.setUserContent("U");
+        cm4.getAnswer().setUserContent("U");
         SearchResult d1 = Rec46cSupport.sr("d1", "文档", "k1", 0d);
         d1.setChunkType("text");
         d1.setKnowledgeTitle("D");
@@ -413,8 +413,8 @@ class PipelineLifecycleRecordingTest {
         sc.setThinking(true);
         cm.setSummaryConfig(sc);
         cm.setIntent(QueryIntent.KB_SEARCH);
-        cm.setUserContent("组装后的用户内容");
-        cm.setRenderedContexts("<context id=\"1\">内容</context>");
+        cm.getAnswer().setUserContent("组装后的用户内容");
+        cm.getAnswer().setRenderedContexts("<context id=\"1\">内容</context>");
         History h = new History();
         h.setQuery("旧问");
         h.setAnswer("旧答");
@@ -424,8 +424,8 @@ class PipelineLifecycleRecordingTest {
         Map<String, Object> s1 = new LinkedHashMap<>();
         s1.put("next", next[0]);
         s1.put("err", errOf(err));
-        s1.put("answer", cm.getChatResponse().getContent());
-        s1.put("finishReason", cm.getChatResponse().getFinishReason());
+        s1.put("answer", cm.getAnswer().getChatResponse().getContent());
+        s1.put("finishReason", cm.getAnswer().getChatResponse().getFinishReason());
         s1.put("llm_calls", c.calls);
         assertRec("completion", "normal", mask(json(s1)));
 
@@ -472,7 +472,7 @@ class PipelineLifecycleRecordingTest {
         sc.setThinking(true);
         cm.setSummaryConfig(sc);
         cm.setIntent(QueryIntent.CHITCHAT);
-        cm.setUserContent("流式用户内容");
+        cm.getAnswer().setUserContent("流式用户内容");
         History h = new History();
         h.setQuery("旧问");
         h.setAnswer("旧答");
@@ -503,7 +503,7 @@ class PipelineLifecycleRecordingTest {
         sc2.setPrompt("S");
         cm2.setSummaryConfig(sc2);
         cm2.setIntent(QueryIntent.CHITCHAT);
-        cm2.setUserContent("U");
+        cm2.getAnswer().setUserContent("U");
         cm2.getRuntime().setEventBus(bus2);
         p2.onEvent(PipelineEventType.CHAT_COMPLETION_STREAM, cm2, () -> null);
         Thread.sleep(200);
@@ -524,7 +524,7 @@ class PipelineLifecycleRecordingTest {
         sc3.setPrompt("S");
         cm3.setSummaryConfig(sc3);
         cm3.setIntent(QueryIntent.CHITCHAT);
-        cm3.setUserContent("U");
+        cm3.getAnswer().setUserContent("U");
         cm3.getRuntime().setEventBus(bus3);
         p3.onEvent(PipelineEventType.CHAT_COMPLETION_STREAM, cm3, () -> null);
         Thread.sleep(200);
@@ -545,7 +545,7 @@ class PipelineLifecycleRecordingTest {
         sc4.setPrompt("S");
         cm4.setSummaryConfig(sc4);
         cm4.setIntent(QueryIntent.CHITCHAT);
-        cm4.setUserContent("U");
+        cm4.getAnswer().setUserContent("U");
         cm4.getRuntime().setEventBus(bus4);
         p4.onEvent(PipelineEventType.CHAT_COMPLETION_STREAM, cm4, () -> null);
         Thread.sleep(200);
@@ -562,7 +562,7 @@ class PipelineLifecycleRecordingTest {
         sc5.setPrompt("S");
         cm5.setSummaryConfig(sc5);
         cm5.setIntent(QueryIntent.CHITCHAT);
-        cm5.setUserContent("U");
+        cm5.getAnswer().setUserContent("U");
         PluginError err5 = p5.onEvent(PipelineEventType.CHAT_COMPLETION_STREAM, cm5, () -> null);
         assertRec("stream", "no_eventbus", json(errOf(err5)));
 

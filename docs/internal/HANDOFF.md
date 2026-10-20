@@ -104,7 +104,7 @@
 | **H1b** | H1b-1 ✅ 去 `controller.sse` 反向依赖；H1b-2 收锁与状态持久化 待做 | H1b-1 ✅ 2026-10-20 |
 | **H2a** | 问答运行时段：抽 `TurnRuntime`（3 字段） | ✅ 2026-10-20 |
 | **H2b** | H2b-1 ✅ 只读视图 + 只读辅助收口；H2b-2 插件签名 + `QaRequestContext` 收口 待做 | H2b-1 ✅ 2026-10-20 |
-| **H2c** | 问答状态段：15 字段按 5 组暴露，删 `ChatManage` | 待做 |
+| **H2c** | H2c-1 ✅ 答复组（`AnswerState`）；余 4 组（QueryPlan / SearchOutcome / RerankOutcome / MergedContext）待做 | H2c-1 ✅ 2026-10-20 |
 | **H3** | 入库 `IngestJob` 状态机 + `IngestStage` 接口 | 待做 |
 | **H4a** | 任务契约：`TaskQueue`（命名/启停/测试钩子）+ `RetryDelayOverride`；6 套队列接口继承；钩子机制 5→1。H4b 迁实现 | H4a-1 ✅ 2026-10-20 |
 | **H4b** | 任务实现：**datasource ✅ + wiki ✅**（均迁到 `RedisRetryingTaskQueue`）；memory/knowledge 已在基座 | H4b-2 ✅ 2026-10-20 |
@@ -416,6 +416,7 @@ boot           14 件                      →  boot
 | H1b-1 | 2026-10-20 | **编排层去 `controller.sse` 反向依赖**：`StreamEventEmitter` / `StreamResponseBuilder` 移入 `session.service.sse`；新增 `SseFrameSink` 端口，`controller.sse.SseFrameWriter` 实现它（Servlet 直写与头部契约留在 controller）；`QaSseOrchestrator` 不再 import `controller.*`。事件命名守卫名单、包索引同步。 | **42 守卫全绿** · **5021 / 0 / 4** · build 3m12s |
 | H2a | 2026-10-20 | **运行时段抽离**：新增 `session.rag.TurnRuntime`（eventBus / messageId / userMessageId）；`ChatManage` 删 3 字段 + 6 访问器，改为 `getRuntime()`；11 个文件的调用点改为 `getRuntime().getX()`；`cloneChatManage` 不再需要"故意不复制"的说明。 | **42 守卫全绿** · **5021 / 0 / 4** · build 2m19s |
 | H2b-1 | 2026-10-20 | **请求段只读视图**：新增 `session.rag.TurnInputView`（41 个请求/配置 getter），`ChatManage implements`；`PipelineCommon.prepareChatModel` 与 `targets` 改收视图，模型准备不再依赖可变 `ChatManage`。插件的 `onEvent` 仍收 `ChatManage`（状态写入），签名随 H2c 状态段一起改。 | **42 守卫全绿** · **5022 / 0 / 4**（domains +1）· build 2m9s |
+| H2c-1 | 2026-10-20 | **答复组抽离**：新增 `session.rag.AnswerState`（userContent / renderedContexts / chatResponse）；`ChatManage` 删 3 字段 + 6 访问器，改为 `getAnswer()`；12 个文件、51 处调用点改链式访问；`cloneChatManage` 只复制 renderedContexts（与原复制面一致）。`gen-pipeline-map.py` 支持状态组链式访问并过滤包装 getter。 | **42 守卫全绿** · **5022 / 0 / 4** · build 2m1s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

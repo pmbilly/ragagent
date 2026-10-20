@@ -46,12 +46,21 @@ def plugin_meta() -> dict:
         events = re.findall(r"PipelineEventType\.([A-Z_]+)", text)
         var = re.search(r"ChatManage\s+(\w+)\s*[,)]", text)
         accesses = re.findall(rf"\b{re.escape(var.group(1))}\.(get|set|is)([A-Z]\w*)\(", text) if var else []
+        # 状态组经 getter 链访问：cm.getAnswer().setUserContent(...) / cm.getRuntime().getEventBus()
+        if var:
+            accesses += re.findall(
+                rf"\b{re.escape(var.group(1))}\.get(?:Answer|Runtime)\(\)\.(get|set|is)([A-Z]\w*)\(",
+                text)
         reads, writes = set(), set()
+        state_wrappers = {"answer", "runtime"}
         for kind, field in accesses:
+            field_name = field[0].lower() + field[1:]
+            if field_name in state_wrappers:
+                continue
             if kind == "set":
-                writes.add(field[0].lower() + field[1:])
+                writes.add(field_name)
             else:
-                reads.add(field[0].lower() + field[1:])
+                reads.add(field_name)
         meta[name] = dict(events=sorted(set(events)), reads=sorted(reads), writes=sorted(writes))
     return meta
 

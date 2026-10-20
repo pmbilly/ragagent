@@ -139,7 +139,7 @@ class PipelineCoreRecordingTest {
         shape.put("entity", clone.getEntity());
         shape.put("entity_kb", clone.getEntityKbIds());
         shape.put("entity_knowledge", clone.getEntityKnowledge());
-        shape.put("rendered", clone.getRenderedContexts());
+        shape.put("rendered", clone.getAnswer().getRenderedContexts());
         shape.put("search_result", null);
         shape.put("rerank_result", null);
         shape.put("merge_result", null);
@@ -242,7 +242,7 @@ class PipelineCoreRecordingTest {
         Map<String, String> ek = new LinkedHashMap<>();
         ek.put("k1", "kb1");
         cm.setEntityKnowledge(ek);
-        cm.setRenderedContexts("rc");
+        cm.getAnswer().setRenderedContexts("rc");
         return cm;
     }
 

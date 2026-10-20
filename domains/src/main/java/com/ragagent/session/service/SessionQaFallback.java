@@ -57,7 +57,7 @@ final class SessionQaFallback {
         String fallbackContent = chatManage.getFallbackResponse();
         ChatResponse response = new ChatResponse();
         response.setContent(fallbackContent);
-        chatManage.setChatResponse(response);
+        chatManage.getAnswer().setChatResponse(response);
         emitFallbackAnswer(chatManage, fallbackContent);
     }
 
@@ -284,7 +284,7 @@ final class SessionQaFallback {
                 if (response.isDone()) {
                     ChatResponse cr = new ChatResponse();
                     cr.setContent(finalContent.toString());
-                    chatManage.setChatResponse(cr);
+                    chatManage.getAnswer().setChatResponse(cr);
                     streamCompleted = true;
                     log.info("Fallback streaming response completed");
                     break;

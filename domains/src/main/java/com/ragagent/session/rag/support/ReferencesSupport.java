@@ -114,10 +114,10 @@ public final class ReferencesSupport {
         boolean replaced = false;
         int[] candidates = {0, last};
         for (int index : candidates) {
-            if (!chatManage.getRenderedContexts().isEmpty()
-                    && messages.get(index).getContent().contains(chatManage.getRenderedContexts())) {
+            if (!chatManage.getAnswer().getRenderedContexts().isEmpty()
+                    && messages.get(index).getContent().contains(chatManage.getAnswer().getRenderedContexts())) {
                 messages.get(index).setContent(messages.get(index).getContent()
-                        .replace(chatManage.getRenderedContexts(), modelContexts));
+                        .replace(chatManage.getAnswer().getRenderedContexts(), modelContexts));
                 replaced = true;
             }
         }

@@ -36,7 +36,7 @@ public final class PluginChatCompletion implements Plugin {
     public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         Map<String, Object> in = new LinkedHashMap<>();
         in.put("sessionId", chatManage.getSessionId());
-        in.put("user_question", chatManage.getUserContent());
+        in.put("user_question", chatManage.getAnswer().getUserContent());
         in.put("history_rounds", chatManage.getHistory() == null ? 0 : chatManage.getHistory().size());
         in.put("chat_model", chatManage.getChatModelId());
         PipelineLog.info("Completion", "input", in);
@@ -91,7 +91,7 @@ public final class PluginChatCompletion implements Plugin {
         out.put("prompt_tokens", chatResponse.getUsage() == null
                 ? 0 : chatResponse.getUsage().getPromptTokens());
         PipelineLog.info("Completion", "output", out);
-        chatManage.setChatResponse(chatResponse);
+        chatManage.getAnswer().setChatResponse(chatResponse);
         return next.next();
     }
 }

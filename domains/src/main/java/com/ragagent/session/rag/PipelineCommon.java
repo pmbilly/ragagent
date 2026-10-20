@@ -102,7 +102,7 @@ public final class PipelineCommon {
         Map<String, String> vals = new LinkedHashMap<>();
         vals.put("query", chatManage.getQuery());
         vals.put("language", chatManage.getLanguage());
-        vals.put("contexts", chatManage.getRenderedContexts());
+        vals.put("contexts", chatManage.getAnswer().getRenderedContexts());
         String systemPrompt = AgentPromptPlaceholdersHolder.render(base, vals);
         systemPrompt += PromptComposer.SOURCES_AND_OUTPUT_SUFFIX;
         systemPrompt += chatManage.getMemoryPrompt();
@@ -113,7 +113,7 @@ public final class PipelineCommon {
         appendHistoryMessages(chatMessages, chatManage.getHistory());
 
         // 当前用户消息：仅 chat 模型支持视觉时带图（非 vision 靠 UserContent 里的文本描述）。
-        ChatMessage userMsg = new ChatMessage("user", chatManage.getUserContent());
+        ChatMessage userMsg = new ChatMessage("user", chatManage.getAnswer().getUserContent());
         if (chatManage.isChatModelSupportsVision()
                 && chatManage.getImages() != null && !chatManage.getImages().isEmpty()) {
             userMsg.setImages(chatManage.getImages());

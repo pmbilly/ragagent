@@ -254,7 +254,7 @@ public class SessionKnowledgeQaService {
                 userContent += MessageAttachmentsPrompt.build(
                         PipelineViews.ofAttachments(req.attachments));
             }
-            chatManage.setUserContent(userContent);
+            chatManage.getAnswer().setUserContent(userContent);
 
             pipeline = PipelineBuilder.builder()
                     .addIf(hasHistory, PipelineEventType.LOAD_HISTORY)

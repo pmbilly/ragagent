@@ -124,15 +124,15 @@ public final class PluginIntoChatMessage implements Plugin {
                 vals.put("query", userContent);
                 vals.put("contexts", "");
                 vals.put("language", chatManage.getLanguage());
-                chatManage.setUserContent(
+                chatManage.getAnswer().setUserContent(
                         AgentPromptPlaceholders.renderPromptPlaceholders(tpl, vals));
             } else {
-                chatManage.setUserContent(userContent);
+                chatManage.getAnswer().setUserContent(userContent);
             }
 
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("sessionId", chatManage.getSessionId());
-            f.put("user_content_len", chatManage.getUserContent().length());
+            f.put("user_content_len", chatManage.getAnswer().getUserContent().length());
             f.put("has_template", !chatManage.getSummaryConfig().getContextTemplate().isEmpty());
             PipelineLog.info("IntoChatMessage", "no_search_with_template", f);
             return next.next();
@@ -188,11 +188,11 @@ public final class PluginIntoChatMessage implements Plugin {
             }
         }
 
-        chatManage.setRenderedContexts(contextsBuilder.toString());
+        chatManage.getAnswer().setRenderedContexts(contextsBuilder.toString());
 
         Map<String, String> vals = new LinkedHashMap<>();
         vals.put("query", safeQuery);
-        vals.put("contexts", chatManage.getRenderedContexts());
+        vals.put("contexts", chatManage.getAnswer().getRenderedContexts());
         vals.put("language", chatManage.getLanguage());
         String userContent = AgentPromptPlaceholders.renderPromptPlaceholders(
                 chatManage.getSummaryConfig().getContextTemplate(), vals);
@@ -207,10 +207,10 @@ public final class PluginIntoChatMessage implements Plugin {
             userContent += MessageAttachmentsPrompt.build(chatManage.getAttachments());
         }
 
-        chatManage.setUserContent(userContent);
+        chatManage.getAnswer().setUserContent(userContent);
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("sessionId", chatManage.getSessionId());
-        out.put("user_content_len", chatManage.getUserContent().length());
+        out.put("user_content_len", chatManage.getAnswer().getUserContent().length());
         out.put("faq_priority", chatManage.isFaqPriorityEnabled());
         out.put("intent", chatManage.getIntent());
         out.put("image_description", chatManage.getImageDescription());
@@ -223,28 +223,28 @@ public final class PluginIntoChatMessage implements Plugin {
 
     /** UserContent ≠ Query 时异步回写用户消息。 */
     private void persistRenderedContent(ChatManage chatManage) {
-        if (chatManage.getRuntime().getUserMessageId().isEmpty() || chatManage.getUserContent().isEmpty()) {
+        if (chatManage.getRuntime().getUserMessageId().isEmpty() || chatManage.getAnswer().getUserContent().isEmpty()) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("sessionId", chatManage.getSessionId());
             f.put("userMessageId", chatManage.getRuntime().getUserMessageId());
-            f.put("has_user_content", !chatManage.getUserContent().isEmpty());
+            f.put("has_user_content", !chatManage.getAnswer().getUserContent().isEmpty());
             f.put("reason", "empty_id_or_content");
             PipelineLog.info("IntoChatMessage", "persist_rendered_content_skip", f);
             return;
         }
-        if (chatManage.getUserContent().equals(chatManage.getQuery())) {
+        if (chatManage.getAnswer().getUserContent().equals(chatManage.getQuery())) {
             return;
         }
         Map<String, Object> f = new LinkedHashMap<>();
         f.put("sessionId", chatManage.getSessionId());
         f.put("userMessageId", chatManage.getRuntime().getUserMessageId());
-        f.put("rendered_content_len", chatManage.getUserContent().length());
+        f.put("rendered_content_len", chatManage.getAnswer().getUserContent().length());
         PipelineLog.info("IntoChatMessage", "persist_rendered_content", f);
         final ChatManage cm = chatManage;
         Thread.ofVirtual().start(() -> {
             try {
                 messageService.updateMessageRenderedContent(cm.getSessionId(),
-                        cm.getRuntime().getUserMessageId(), cm.getUserContent());
+                        cm.getRuntime().getUserMessageId(), cm.getAnswer().getUserContent());
             } catch (RuntimeException e) {
                 Map<String, Object> w = new LinkedHashMap<>();
                 w.put("sessionId", cm.getSessionId());

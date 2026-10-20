@@ -1,7 +1,6 @@
 package com.ragagent.session.rag;
 
 import com.ragagent.contract.graph.GraphData;
-import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
@@ -20,8 +19,8 @@ import java.util.Map;
  *   <li><b>请求段（不可变配置）</b>：query/sessionId/userId/maxRounds、检索参数、重排参数、
  *       模型参数、改写开关、FAQ 策略、多模态/附件、web 检索开关、summaryConfig。</li>
  *   <li><b>状态段（插件间流转）</b>：rewriteQuery/intent/history、searchResult/rerankResult/
- *       mergeResult/graphResult/entity 系列/userContent/renderedContexts/chatResponse、
- *       imageDescription/quotedContext/systemPromptOverride/memoryPrompt/usedMemories。</li>
+ *       mergeResult/graphResult/entity 系列、imageDescription/quotedContext/systemPromptOverride/
+ *       memoryPrompt/usedMemories；答复组见 {@link AnswerState}。</li>
  *   <li><b>运行时段</b>：见 {@link TurnRuntime}（事件总线 + 消息 id），不在本类字段里。</li>
  * </ul>
  *
@@ -29,7 +28,7 @@ import java.util.Map;
  * <p>请求段全量复制（SearchTarget 不可变，列表换新）；状态段<b>只复制</b> rewriteQuery/intent/
  * imageDescription/quotedContext/systemPromptOverride/memoryPrompt/usedMemories/renderedContexts/
  * entity/entityKBIDs/entityKnowledge——<b>history、searchResult、rerankResult、mergeResult、
- * userContent、chatResponse、renderedContexts 的运行中数据以及运行时段句柄都不复制</b>。</p>
+ * userContent、chatResponse 以及运行时段句柄都不复制</b>。</p>
  *
  * <p>本类型不落 jsonb 也不作响应体，不进 JsonContractRoundTripTest。</p>
  */
@@ -103,9 +102,8 @@ public final class ChatManage implements TurnInputView {
     private List<String> entityKbIds;
     private Map<String, String> entityKnowledge;
     private GraphData graphResult;
-    private String userContent = "";
-    private String renderedContexts = "";
-    private ChatResponse chatResponse;
+    /** 答复组（用户消息 / 渲染上下文 / 模型回复）。 */
+    private final AnswerState answer = new AnswerState();
     private String imageDescription = "";
     private String quotedContext = "";
     private String systemPromptOverride = "";
@@ -234,12 +232,7 @@ public final class ChatManage implements TurnInputView {
     public void setEntityKnowledge(Map<String, String> v) { entityKnowledge = v; }
     public GraphData getGraphResult() { return graphResult; }
     public void setGraphResult(GraphData v) { graphResult = v; }
-    public String getUserContent() { return userContent; }
-    public void setUserContent(String v) { userContent = v == null ? "" : v; }
-    public String getRenderedContexts() { return renderedContexts; }
-    public void setRenderedContexts(String v) { renderedContexts = v == null ? "" : v; }
-    public ChatResponse getChatResponse() { return chatResponse; }
-    public void setChatResponse(ChatResponse v) { chatResponse = v; }
+    public AnswerState getAnswer() { return answer; }
     public String getImageDescription() { return imageDescription; }
     public void setImageDescription(String v) { imageDescription = v == null ? "" : v; }
     public String getQuotedContext() { return quotedContext; }
@@ -327,7 +320,7 @@ public final class ChatManage implements TurnInputView {
         c.systemPromptOverride = systemPromptOverride;
         c.memoryPrompt = memoryPrompt;
         c.usedMemories = usedMemories == null ? null : new ArrayList<>(usedMemories);
-        c.renderedContexts = renderedContexts;
+        c.answer.setRenderedContexts(answer.getRenderedContexts());
         c.entity = entity == null ? new ArrayList<>() : new ArrayList<>(entity);
         c.entityKbIds = entityKbIds == null ? new ArrayList<>() : new ArrayList<>(entityKbIds);
         c.entityKnowledge = entityKnowledge == null ? new HashMap<>() : new LinkedHashMap<>(entityKnowledge);

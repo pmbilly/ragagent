@@ -65,7 +65,7 @@ public final class PluginChatCompletionStream implements Plugin {
     public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         Map<String, Object> in = new LinkedHashMap<>();
         in.put("sessionId", chatManage.getSessionId());
-        in.put("user_question", chatManage.getUserContent());
+        in.put("user_question", chatManage.getAnswer().getUserContent());
         in.put("history_rounds", chatManage.getHistory() == null ? 0 : chatManage.getHistory().size());
         in.put("chat_model", chatManage.getChatModelId());
         PipelineLog.info("Stream", "input", in);

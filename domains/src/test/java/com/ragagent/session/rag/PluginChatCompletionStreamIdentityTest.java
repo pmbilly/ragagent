@@ -104,7 +104,7 @@ class PluginChatCompletionStreamIdentityTest {
         sc.setPrompt("SYS {{query}}");
         cm.setSummaryConfig(sc);
         cm.setIntent(QueryIntent.CHITCHAT);
-        cm.setUserContent("U");
+        cm.getAnswer().setUserContent("U");
         cm.getRuntime().setEventBus(bus);
         return cm;
     }

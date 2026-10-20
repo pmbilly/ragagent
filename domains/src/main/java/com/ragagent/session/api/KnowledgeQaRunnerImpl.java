@@ -33,7 +33,7 @@ public class KnowledgeQaRunnerImpl implements KnowledgeQaRunner {
         ChatManage chatManage = toChatManage(request);
         knowledgeQaEvents.knowledgeQAByEvent(chatManage, PipelineBuilder.presets().get("rag"));
         return new KnowledgeQaRunResult(chatManage.getSearchResult(), chatManage.getRerankResult(),
-                chatManage.getChatResponse());
+                chatManage.getAnswer().getChatResponse());
     }
 
     /** 契约请求 → 运行时上下文（字段子集与迁移前逐字一致）。 */
