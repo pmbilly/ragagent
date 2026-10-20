@@ -103,7 +103,7 @@
 | **H1a** | 问答终态单赢家：`TurnLifecycle`（收尾闸门 + SSE/续传两处观察者口径） | ✅ 2026-10-20 |
 | **H1b** | H1b-1 ✅ 去 `controller.sse` 反向依赖；H1b-2 收锁与状态持久化 待做 | H1b-1 ✅ 2026-10-20 |
 | **H2a** | 问答运行时段：抽 `TurnRuntime`（3 字段） | ✅ 2026-10-20 |
-| **H2b** | 问答请求段：`TurnInputView`（41 字段只读）+ `QaRequestContext` 收口 | 待做 |
+| **H2b** | H2b-1 ✅ 只读视图 + 只读辅助收口；H2b-2 插件签名 + `QaRequestContext` 收口 待做 | H2b-1 ✅ 2026-10-20 |
 | **H2c** | 问答状态段：15 字段按 5 组暴露，删 `ChatManage` | 待做 |
 | **H3** | 入库 `IngestJob` 状态机 + `IngestStage` 接口 | 待做 |
 | **H4a** | 任务契约：`TaskQueue`（命名/启停/测试钩子）+ `RetryDelayOverride`；6 套队列接口继承；钩子机制 5→1。H4b 迁实现 | H4a-1 ✅ 2026-10-20 |
@@ -415,6 +415,7 @@ boot           14 件                      →  boot
 | H1a | 2026-10-20 | **轮次终态单赢家**：新增 `session.service.TurnLifecycle`（STREAMING→FINALIZING→DONE/FAILED，终态不可逆）；`QaTurnExecutor` 的收尾闸门由局部 `boolean[1]` 改为 `finish(DONE)`；SSE 推送与续传两个观察者循环改用 `isTerminalEvent`（COMPLETE 或 ERROR+done）统一口径。新增状态机单测 4 例。**余**：H1b 收 3 把锁与状态持久化。 | **42 守卫全绿** · **5021 / 0 / 4**（domains +4）· build 3m34s |
 | H1b-1 | 2026-10-20 | **编排层去 `controller.sse` 反向依赖**：`StreamEventEmitter` / `StreamResponseBuilder` 移入 `session.service.sse`；新增 `SseFrameSink` 端口，`controller.sse.SseFrameWriter` 实现它（Servlet 直写与头部契约留在 controller）；`QaSseOrchestrator` 不再 import `controller.*`。事件命名守卫名单、包索引同步。 | **42 守卫全绿** · **5021 / 0 / 4** · build 3m12s |
 | H2a | 2026-10-20 | **运行时段抽离**：新增 `session.rag.TurnRuntime`（eventBus / messageId / userMessageId）；`ChatManage` 删 3 字段 + 6 访问器，改为 `getRuntime()`；11 个文件的调用点改为 `getRuntime().getX()`；`cloneChatManage` 不再需要"故意不复制"的说明。 | **42 守卫全绿** · **5021 / 0 / 4** · build 2m19s |
+| H2b-1 | 2026-10-20 | **请求段只读视图**：新增 `session.rag.TurnInputView`（41 个请求/配置 getter），`ChatManage implements`；`PipelineCommon.prepareChatModel` 与 `targets` 改收视图，模型准备不再依赖可变 `ChatManage`。插件的 `onEvent` 仍收 `ChatManage`（状态写入），签名随 H2c 状态段一起改。 | **42 守卫全绿** · **5022 / 0 / 4**（domains +1）· build 2m9s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

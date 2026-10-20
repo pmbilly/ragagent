@@ -63,14 +63,14 @@ public final class PipelineCommon {
 
     /** 取 chat 模型并从 SummaryConfig 组 ChatOptions。失败抛异常。 */
     public static PreparedChatModel prepareChatModel(PipelinePorts.ModelService modelService,
-                                                     ChatManage chatManage) {
-        LlmChatClient chatModel = modelService.getChatModel(chatManage.getChatModelId());
+                                                     TurnInputView input) {
+        LlmChatClient chatModel = modelService.getChatModel(input.getChatModelId());
         if (chatModel == null) {
             throw new PipelinePorts.PipelinePortException(
-                    "chat model " + chatManage.getChatModelId() + " not found");
+                    "chat model " + input.getChatModelId() + " not found");
         }
         ChatOptions opt = new ChatOptions();
-        SummaryConfig sc = chatManage.getSummaryConfig();
+        SummaryConfig sc = input.getSummaryConfig();
         opt.setTemperature(sc.getTemperature());
         opt.setTopP(sc.getTopP());
         opt.setSeed(sc.getSeed());
@@ -79,7 +79,7 @@ public final class PipelineCommon {
         opt.setFrequencyPenalty(sc.getFrequencyPenalty());
         opt.setPresencePenalty(sc.getPresencePenalty());
         opt.setThinking(sc.getThinking());
-        opt.setPromptCacheKey(chatManage.getSessionId());
+        opt.setPromptCacheKey(input.getSessionId());
         if (opt.getThinking() != null) {
             Map<String, Object> fields = new LinkedHashMap<>();
             fields.put("enabled", opt.getThinking());
@@ -310,7 +310,7 @@ public final class PipelineCommon {
     }
 
     /** 供 MergeSupport 用。 */
-    static List<SearchTarget> targets(ChatManage cm) {
-        return cm.getSearchTargets();
+    static List<SearchTarget> targets(TurnInputView input) {
+        return input.getSearchTargets();
     }
 }

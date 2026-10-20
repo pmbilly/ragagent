@@ -33,7 +33,7 @@ import java.util.Map;
  *
  * <p>本类型不落 jsonb 也不作响应体，不进 JsonContractRoundTripTest。</p>
  */
-public final class ChatManage {
+public final class ChatManage implements TurnInputView {
 
     // ── 请求段（不可变配置） ──
 
