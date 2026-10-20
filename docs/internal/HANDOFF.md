@@ -110,7 +110,7 @@
 | **H4b** | 任务实现：**datasource ✅ + wiki ✅**（均迁到 `RedisRetryingTaskQueue`）；memory/knowledge 已在基座 | H4b-2 ✅ 2026-10-20 |
 | **H5a** | 分页统一：**H5a-1 ✅** 形状收敛（`PageResult<T>`，11 类型 → 1）；H5a-2 待做（管理端点加分页参数 + 前端） | H5a-1 ✅ 2026-10-20 |
 | **H5b** | 软删校验守卫：`SoftDeleteFilterGuard`（26 表 / 默认 enforce）；实测 0 条存量违规，允许清单为空 | ✅ 2026-10-20 |
-| **H6** | 契约形状治理（`KnowledgeCatalogPort` 34 方法拆窄、`*RowView` 回域） | 待做 |
+| **H6** | H6-1 ✅ `KnowledgeCatalogPort` 38→7 窄端口（复合接口兼容）；余 `*RowView` 回域、字段 20→12、其余 4 个宽端口 | H6-1 ✅ 2026-10-20 |
 | **H7** | platform 判据换血（依赖面 + 域词汇） | 待做 |
 | **H8** | 适配层逻辑化（不切模块、零搬迁）：协议包落点守卫 + `integration-map.md` | 待做 |
 | **H9** | 管理面模板化（凭证 4→1、DTO 后缀 5→3） | 待做 |
@@ -426,6 +426,7 @@ boot           14 件                      →  boot
 | H3-1 | 2026-10-20 | **入库阶段枚举与尝试状态**：新增 `knowledge.domain.ingest.IngestStage`（5 canonical 阶段，span 常量与 `ALL_STAGES` 的唯一来源）与 `IngestJob`（PENDING→PROCESSING→COMPLETED/FAILED，终态不可逆）；`KnowledgeProcessWorker` 按 DOC_READER→CHUNKING→EMBEDDING→POST_PROCESS 推进，失败日志带阶段/状态。**未新增持久化状态**：权威仍是 `parse_status` + span 根行。 | **42 守卫全绿** · **5025 / 0 / 4**（domains +3）· build 2m22s |
 | H3-2 | 2026-10-20 | **入库状态迁移收口**：新增 `IngestStateRepository`（6 个 `parse_status` 迁移：casPendingToProcessing / promoteToFinalizing / promoteFinalizingToCompleted / completeIfOwned / failIfProcessing / markIndexedEnabled），从 `KnowledgeRepository` 整块搬出（净减 88 行）；worker / finalizing / finalize adapter 改注入状态仓储；3 个测试构造与桩同步。**未合并 SQL**：各迁移条件不同，保持独立方法。 | **42 守卫全绿** · **5025 / 0 / 4** · build 2m11s |
 | H3-3 | 2026-10-20 | **收尾核验（两项不做）**：① `KnowledgeTaskExecutor` 被 8 处消费（FAQ 导入 / 移动 / 标签索引 / KB 克隆 / 摘要刷新 / housekeeping），是域级后台执行器，不是入库专用壳；删除会把这些服务重新散回 `Thread.ofVirtual()`，与 G4 的线程收口相反。② 5 个 stage 的通用接口需要 `IngestContext` 承载全部中间产物，等于把 `IngestJob` + worker 局部变量再造一遍；现有 stage 已有类型化签名与 span 跟踪，接口化无行为收益。 | **42 守卫全绿** · **5025 / 0 / 4** · 无代码变更 |
+| H6-1 | 2026-10-20 | **知识目录端口拆窄**：`KnowledgeCatalogPort` 38 方法拆 7 个窄端口（KnowledgeEntryRead / ChunkFaqRead / KnowledgeBaseRead / KnowledgeBaseWrite / KnowledgeIngestLookup / KnowledgeContentWrite / KnowledgeDelete），复合接口空体继承保持兼容；适配器与 20+ 消费方零改动。`gen-port-map.py` 识别"复合面（随复合端口）"，端口准入不再把窄面当域内/无实现；契约形状基线移除 KnowledgeCatalogPort（34→0）。 | **42 守卫全绿** · **5025 / 0 / 4** · build 2m34s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

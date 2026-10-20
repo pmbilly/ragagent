@@ -6,6 +6,7 @@
 ## 统计
 
 - 域间（解耦）：**23**
+- 复合面（随复合端口）：**7**
 - 跨模块（必要）：**10**
 
 ## 明细
@@ -13,6 +14,7 @@
 | Port | 实现类 | 实现模块 | 调用方域 | 类型 |
 |---|---|---|---|---|
 | `AuditWritePort` | `AuditWriteAdapter` | domains | agentmanagement、auth、datasource、knowledge、system | 域间（解耦） |
+| `ChunkFaqReadPort` | — | ? | — | 复合面（随复合端口） |
 | `DocReaderAdminPort` | `DocReaderAdminAdapter` | domains | knowledge、system | 域间（解耦） |
 | `DocReaderParsePort` | `DocReaderParseAdapter` | domains | im、initialization、session | 域间（解耦） |
 | `DocumentChunkingPort` | `DocumentChunkingAdapter` | domains | session | 域间（解耦） |
@@ -24,7 +26,13 @@
 | `GlobalFileServicePort` | `GlobalFileServiceAdapter` | domains | session | 域间（解耦） |
 | `HybridSearchPort` | `HybridSearchService` | retrieval-engine | knowledge、session | 跨模块（必要） |
 | `KnowledgeBaseCatalogPort` | `KnowledgeBaseCatalogAdapter` | domains | agentmanagement | 域间（解耦） |
+| `KnowledgeBaseReadPort` | — | ? | — | 复合面（随复合端口） |
+| `KnowledgeBaseWritePort` | — | ? | — | 复合面（随复合端口） |
 | `KnowledgeCatalogPort` | `KnowledgeCatalogAdapter` | domains | datasource、embedchannel、im、initialization、knowledge、session | 域间（解耦） |
+| `KnowledgeContentWritePort` | — | ? | — | 复合面（随复合端口） |
+| `KnowledgeDeletePort` | — | ? | — | 复合面（随复合端口） |
+| `KnowledgeEntryReadPort` | — | ? | — | 复合面（随复合端口） |
+| `KnowledgeIngestLookupPort` | — | ? | — | 复合面（随复合端口） |
 | `KnowledgeMaintenancePort` | `KnowledgeMaintenanceAdapter` | domains | websearch | 域间（解耦） |
 | `KnowledgeSpanPort` | `KnowledgeSpanAdapter` | domains | wiki | 域间（解耦） |
 | `McpToolRegistrationPort` | `McpToolRegistrationAdapter` | domains | agent-engine | 跨模块（必要） |

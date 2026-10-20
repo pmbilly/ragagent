@@ -144,7 +144,7 @@ boot（组合根，唯一装配点）
 | **H5a 分页统一** | **H5a-1 ✅**：`contract.pagination.PageResult<T>` 统一 11 个分页类型；**H5a-2**：管理端点加分页参数（默认页大小）+ 前端同步 | H5a-1 ✅ 2026-10-20；H5a-2 1 人日 | 形状 7→1；后台列表全部可分页 |
 | **H5b 软删校验** ✅ | 新增 `SoftDeleteFilterGuard`：26 张带 `deleted_at` 的表，SELECT 主查询必须含谓词；**不做自动注入**；允许清单按需登记。实测存量 0 违规 | ✅ 2026-10-20 | 新增漏写即红；允许清单为空 |
 | **H5c 软删收敛（可选）** | 仅在语义一致的表上逐步收进 `@TableLogic` / repository 基类；不追求 79→0 | 2-3 人日 | 不做满，只做低风险表 |
-| **H6 契约-形状治理** | `KnowledgeCatalogPort` 拆窄（或退回域内）；`*RowView/*PageView` 回域；`PageView<T>` 统一；代理税端口逐个裁决 | 2-3 人日 | R1/R2 守卫绿；contract 类型净减；Port ≤7 方法 |
+| **H6 契约-形状治理** | **H6-1 ✅** `KnowledgeCatalogPort` 38→7 窄端口（复合接口兼容；端口表识别复合面）；**余**：`*RowView/*PageView` 回域、字段预算 20→12、其余 4 个宽端口裁决 | H6-1 ✅ 2026-10-20 | R1/R2 守卫绿；Port ≤7 方法；基线只减 |
 | **H7 平台-判据换血** | `check-platform-shapes.py` 改依赖面 + 域词汇；`platform.knowledge` / `settings` / `prompt` 业务件按 G3/G7 归位 | 1-2 人日 | platform 业务件 0（新判据）；与 G3 合并验收 |
 | **H8 适配层逻辑化** | **不切模块、不搬文件**。加落点规则 + 守卫：协议实现只能在 `<域>/{connector\|channel\|protocol\|oauth\|provider}`；这些包不得 import 本域 `service/domain`，也不得跨域；生成 `integration-map.md`（协议包 / 管理面包 / SPI / 外部线格式） | 1-2 人日 | 新守卫绿（红态探针：connector 里 import 本域 service 即红）；映射表覆盖 5 域 |
 | **H9 管理面模板化** | 凭证托管 4→1；CRUD 形状/分页/错误统一；`Responses/Dtos/Types/Rows/Views` → `Request/Response/Row` | 2-3 人日 | 4 套凭证 → 1；DTO 后缀 5→3；前端 api 同步 |

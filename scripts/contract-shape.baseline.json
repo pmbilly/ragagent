@@ -1,10 +1,6 @@
 {
   "note": "R1/R2 契约形状预算的存量债务。端口方法数只能降；行视图条目只能删；字段数只能降。新增条目必须先处置（拆窄/回域/收窄），不得直接登记。治理批次：H6。",
   "ports": {
-    "KnowledgeCatalogPort": {
-      "methods": 34,
-      "reason": "knowledge 域门面倒灌（读/写/分块四段）；H6 拆成 ≤3 个窄端口或回域"
-    },
     "SkillCatalogPort": {
       "methods": 14,
       "reason": "agent 技能目录（列表/查找/增删改/引用/指令）；H6 拆窄"

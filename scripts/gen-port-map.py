@@ -32,6 +32,7 @@ import _source_roots as _sr  # noqa: E402
 OUT = ROOT / "docs/architecture/port-map.md"
 IMPL = re.compile(r"\bimplements\s+([^{]+)")
 USES = re.compile(r"^import\s+com\.ragagent\.contract\.[\w.]*\.(\w+Port);", re.M)
+EXTENDS = re.compile(r"\binterface\s+(\w+)\s+extends\s+([^{]+)\{")
 
 
 def module_of(path: pathlib.Path) -> str:
@@ -68,6 +69,14 @@ def main() -> int:
             if m.group(1) in ports:
                 users.setdefault(m.group(1), []).append(f)
 
+    # 被其它 Port extends 的窄面：随复合端口评估，不单独判「域内/无实现」
+    facets = set()
+    for p in ports.values():
+        for m in EXTENDS.finditer(p.read_text(encoding="utf-8", errors="ignore")):
+            for name in re.findall(r"\b(\w+Port)\b", m.group(2)):
+                if name in ports and name != m.group(1):
+                    facets.add(name)
+
     rows = []
     for name in sorted(ports):
         imps = impls.get(name, [])
@@ -76,7 +85,9 @@ def main() -> int:
         callers = sorted({domain_of(f) for f in users.get(name, []) if f not in impl_set})
         impl_mod = module_of(impl) if impl else "?"
         caller_mods = sorted({module_of(f) for f in users.get(name, []) if f not in impl_set})
-        if impl and any(m != impl_mod for m in caller_mods):
+        if name in facets:
+            kind = "复合面（随复合端口）"
+        elif impl and any(m != impl_mod for m in caller_mods):
             kind = "跨模块（必要）"
         elif impl and any(d != domain_of(impl) for d in callers):
             kind = "域间（解耦）"
