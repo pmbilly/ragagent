@@ -17,6 +17,7 @@ import com.ragagent.knowledge.domain.span.SpanTracker;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.IngestStateRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.service.image.ExtractedImageStore;
@@ -46,10 +47,12 @@ import org.springframework.context.ApplicationEventPublisher;
 class KnowledgeProcessWorkerTenantScopeTest {
 
     private final KnowledgeRepository knowledgeRepository = mock(KnowledgeRepository.class);
+    private final IngestStateRepository ingestStateRepository = mock(IngestStateRepository.class);
     @SuppressWarnings("unchecked")
 
     private final KnowledgeProcessWorker worker = new KnowledgeProcessWorker(
             knowledgeRepository,
+            ingestStateRepository,
             mock(KnowledgeBaseRepository.class),
             mock(ChunkRepository.class),
             mock(TenantFileStorage.class),
@@ -79,7 +82,7 @@ class KnowledgeProcessWorkerTenantScopeTest {
     void pipelineRunsInsideCapturedTenantScope() {
         TenantContext.clear();                       // 模拟 worker 虚拟线程：没有 Filter 链填过
         AtomicReference<Long> tenantSeenInPipeline = new AtomicReference<>();
-        when(knowledgeRepository.casPendingToProcessing(anyString(), any()))
+        when(ingestStateRepository.casPendingToProcessing(anyString(), any()))
                 .thenAnswer(invocation -> {
                     tenantSeenInPipeline.set(TenantContext.currentTenantId());
                     return 0;                        // 静默退出：只需证明进管线时租户已在
@@ -99,7 +102,7 @@ class KnowledgeProcessWorkerTenantScopeTest {
         row.setTenantId(7L);
         when(knowledgeRepository.findByIdAny("kid-2")).thenReturn(row);
         AtomicReference<Long> tenantSeenInPipeline = new AtomicReference<>();
-        when(knowledgeRepository.casPendingToProcessing(anyString(), any()))
+        when(ingestStateRepository.casPendingToProcessing(anyString(), any()))
                 .thenAnswer(invocation -> {
                     tenantSeenInPipeline.set(TenantContext.currentTenantId());
                     return 0;

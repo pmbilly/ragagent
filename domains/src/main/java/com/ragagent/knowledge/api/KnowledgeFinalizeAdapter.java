@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.api;
 
+import com.ragagent.knowledge.repository.IngestStateRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import java.time.OffsetDateTime;
 import org.slf4j.Logger;
@@ -18,9 +19,12 @@ public class KnowledgeFinalizeAdapter {
     private static final Logger log = LoggerFactory.getLogger(KnowledgeFinalizeAdapter.class);
 
     private final KnowledgeRepository knowledgeRepository;
+    private final IngestStateRepository ingestStateRepository;
 
-    public KnowledgeFinalizeAdapter(KnowledgeRepository knowledgeRepository) {
+    public KnowledgeFinalizeAdapter(KnowledgeRepository knowledgeRepository,
+                                    IngestStateRepository ingestStateRepository) {
         this.knowledgeRepository = knowledgeRepository;
+        this.ingestStateRepository = ingestStateRepository;
     }
 
     public FinalizeResult finalizeSubtask(String knowledgeId, OffsetDateTime now) {
@@ -41,7 +45,7 @@ public class KnowledgeFinalizeAdapter {
         // 2) 带守卫的晋升（无条件尝试，见端口注释）
         boolean promoted;
         try {
-            int rows = knowledgeRepository.promoteFinalizingToCompleted(knowledgeId, now);
+            int rows = ingestStateRepository.promoteFinalizingToCompleted(knowledgeId, now);
             promoted = rows > 0;
         } catch (RuntimeException e) {
             log.warn("finalize subtask promote failed source=wiki knowledge={}", knowledgeId, e);

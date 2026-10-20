@@ -8,6 +8,7 @@ import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.knowledge.domain.span.SpanTracker;
 import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.IngestStateRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.support.GraphChunkSelector;
@@ -39,6 +40,7 @@ final class KnowledgeFinalizingStage {
     private static final Logger log = LoggerFactory.getLogger(KnowledgeFinalizingStage.class);
 
     private final KnowledgeRepository knowledgeRepository;
+    private final IngestStateRepository ingestStateRepository;
     private final KnowledgeBaseRepository kbRepository;
     private final ChunkRepository chunkRepository;
     private final ApplicationEventPublisher eventPublisher;
@@ -50,6 +52,7 @@ final class KnowledgeFinalizingStage {
 
     KnowledgeFinalizingStage(
             KnowledgeRepository knowledgeRepository,
+            IngestStateRepository ingestStateRepository,
             KnowledgeBaseRepository kbRepository,
             ChunkRepository chunkRepository,
             ApplicationEventPublisher eventPublisher,
@@ -59,6 +62,7 @@ final class KnowledgeFinalizingStage {
             ObjectProvider<ChunkExtractTaskQueue> chunkExtractQueue,
             ObjectProvider<QuestionGenerationTaskQueue> questionGenerationQueue) {
         this.knowledgeRepository = knowledgeRepository;
+        this.ingestStateRepository = ingestStateRepository;
         this.kbRepository = kbRepository;
         this.chunkRepository = chunkRepository;
         this.eventPublisher = eventPublisher;
@@ -192,7 +196,7 @@ final class KnowledgeFinalizingStage {
      * + {@code processed_at}。{@code storage_size} 的 Java 侧计算未接线，保持既有形态。
      */
     private void markIndexedEnabled(String knowledgeId) {
-        knowledgeRepository.markIndexedEnabled(knowledgeId, OffsetDateTime.now(ZoneOffset.UTC));
+        ingestStateRepository.markIndexedEnabled(knowledgeId, OffsetDateTime.now(ZoneOffset.UTC));
     }
 
     /**
@@ -203,7 +207,7 @@ final class KnowledgeFinalizingStage {
      * 富化且不得覆盖状态。</p>
      */
     private boolean promoteFinalizing(String knowledgeId, int pendingSubtasks) {
-        int promoted = knowledgeRepository.promoteToFinalizing(knowledgeId, pendingSubtasks,
+        int promoted = ingestStateRepository.promoteToFinalizing(knowledgeId, pendingSubtasks,
                 OffsetDateTime.now(ZoneOffset.UTC));
         if (promoted > 0) {
             log.info("[KnowledgePostProcess] Knowledge {} entered finalizing ({} subtask(s) pending)",
@@ -338,7 +342,7 @@ final class KnowledgeFinalizingStage {
             KnowledgeBase rowKb = row == null ? null
                     : kbRepository.findByIdAny(row.getKnowledgeBaseId());
             boolean summaryModelConfigured = hasSummaryModel(rowKb);
-            int completedRows = knowledgeRepository.completeIfOwned(knowledgeId, summaryModelConfigured,
+            int completedRows = ingestStateRepository.completeIfOwned(knowledgeId, summaryModelConfigured,
                     OffsetDateTime.now(ZoneOffset.UTC));
             if (completedRows == 0) {
                 log.info("[KnowledgeProcess] completion write skipped for {}: row not owned", knowledgeId);
@@ -353,7 +357,7 @@ final class KnowledgeFinalizingStage {
             }
         } else {
             // CAS：只有仍由本次处理占用的行（processing）才许翻 failed。
-            int failedRows = knowledgeRepository.failIfProcessing(knowledgeId, abbreviate(error),
+            int failedRows = ingestStateRepository.failIfProcessing(knowledgeId, abbreviate(error),
                     OffsetDateTime.now(ZoneOffset.UTC));
             if (failedRows == 0) {
                 log.info("[KnowledgeProcess] failure write skipped for {}: row not processing", knowledgeId);

@@ -24,6 +24,7 @@ import com.ragagent.knowledge.domain.span.SpanTracker;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.IngestStateRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.service.image.ExtractedImageStore;
@@ -48,6 +49,7 @@ class KnowledgeProcessWorkerImageWiringTest {
     private static final String REWRITTEN = "![x](local://1/exports/x.jpg)";
 
     private final KnowledgeRepository knowledgeRepository = mock(KnowledgeRepository.class);
+    private final IngestStateRepository ingestStateRepository = mock(IngestStateRepository.class);
     private final KnowledgeBaseRepository kbRepository = mock(KnowledgeBaseRepository.class);
     private final ChunkRepository chunkRepository = mock(ChunkRepository.class);
     private final TenantFileStorage fileStorage = mock(TenantFileStorage.class);
@@ -58,6 +60,7 @@ class KnowledgeProcessWorkerImageWiringTest {
     @SuppressWarnings("unchecked")
     private final KnowledgeProcessWorker worker = new KnowledgeProcessWorker(
             knowledgeRepository,
+            ingestStateRepository,
             kbRepository,
             chunkRepository,
             fileStorage,
@@ -89,7 +92,7 @@ class KnowledgeProcessWorkerImageWiringTest {
         k.setFileType("pdf");
         k.setFilePath("resource://1/kid-img/a.pdf");
         k.setParseStatus(Knowledge.PARSE_PROCESSING);
-        when(knowledgeRepository.casPendingToProcessing(eq(KNOWLEDGE_ID), any())).thenReturn(1);
+        when(ingestStateRepository.casPendingToProcessing(eq(KNOWLEDGE_ID), any())).thenReturn(1);
         when(knowledgeRepository.findByIdAny(KNOWLEDGE_ID)).thenReturn(k);
 
         KnowledgeBase kb = new KnowledgeBase();

@@ -16,6 +16,7 @@ import com.ragagent.knowledge.domain.span.SpanTracker;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.IngestStateRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.service.image.ExtractedImageStore;
@@ -78,6 +79,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             Executors.newVirtualThreadPerTaskExecutor();
 
     private final KnowledgeRepository knowledgeRepository;
+    private final IngestStateRepository ingestStateRepository;
     private final KnowledgeBaseRepository kbRepository;
     private final KnowledgeTextExtractor textExtractor;
     private final KnowledgeChunkWriter chunkWriter;
@@ -86,6 +88,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private final SpanTracker spanTracker;
 
     public KnowledgeProcessWorker(KnowledgeRepository knowledgeRepository,
+                                  IngestStateRepository ingestStateRepository,
                                   KnowledgeBaseRepository kbRepository,
                                   ChunkRepository chunkRepository,
                                   TenantFileStorage fileStorage,
@@ -109,6 +112,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                                   ObjectProvider<
                                           QuestionGenerationTaskQueue> questionGenerationQueue) {
         this.knowledgeRepository = knowledgeRepository;
+        this.ingestStateRepository = ingestStateRepository;
         this.kbRepository = kbRepository;
         this.spanTracker = spanTracker;
         this.textExtractor = new KnowledgeTextExtractor(
@@ -119,7 +123,8 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                 chunkRepository, extractedImageStore, vectorStore, modelCatalog, vectorWrites,
                 chunkVectorIndexer, modelRuntimeAssembler, graphRepository, spanTracker);
         this.finalizingStage = new KnowledgeFinalizingStage(
-                knowledgeRepository, kbRepository, chunkRepository, eventPublisher, spanTracker,
+                knowledgeRepository, ingestStateRepository, kbRepository, chunkRepository,
+                eventPublisher, spanTracker,
                 wikiIngestService, wikiKnowledgeFinalizer, chunkExtractQueue, questionGenerationQueue);
     }
 
@@ -158,7 +163,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private void processInner(String knowledgeId,
                               LangfuseTaskScope scope) {
         // CAS pending → processing：被抢/已取消则静默退出
-        int updated = knowledgeRepository.casPendingToProcessing(knowledgeId,
+        int updated = ingestStateRepository.casPendingToProcessing(knowledgeId,
                 OffsetDateTime.now(ZoneOffset.UTC));
         if (updated == 0) {
             return;

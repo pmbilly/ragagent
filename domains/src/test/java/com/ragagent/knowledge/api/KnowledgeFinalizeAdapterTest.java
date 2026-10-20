@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.knowledge.repository.IngestStateRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -55,7 +56,8 @@ class KnowledgeFinalizeAdapterTest {
     private final KnowledgeMapper knowledgeMapper = mock(KnowledgeMapper.class);
     /** 真实仓储包住 mock mapper：适配器改走仓储后，wrapper 级断言（SQL 文本与守卫条件）原样保留。 */
     private final KnowledgeFinalizeAdapter adapter =
-            new KnowledgeFinalizeAdapter(new KnowledgeRepository(knowledgeMapper));
+            new KnowledgeFinalizeAdapter(new KnowledgeRepository(knowledgeMapper),
+                    new IngestStateRepository(knowledgeMapper));
 
     /**
      * 两次写入的形状：先递减（{@code pending_subtasks_count > 0} 守卫），
