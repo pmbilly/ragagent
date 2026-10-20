@@ -11,10 +11,10 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PORT="${SMOKE_PORT:-18083}"
 LOG="${SMOKE_LOG:-/tmp/ragagent-ci-smoke.log}"
-JAR="$(find "$ROOT/boot/build/libs" -maxdepth 1 -name 'boot-*-SNAPSHOT.jar' ! -name '*-plain.jar' | head -1)"
+JAR="$(find "$ROOT/boot/target" -maxdepth 1 -name 'boot-*.jar' ! -name '*.jar.original' | head -1)"
 
 if [[ -z "$JAR" ]]; then
-    echo "✗ 未找到 boot jar，请先 ./gradlew :boot:bootJar" >&2
+    echo "✗ 未找到 boot jar，请先 mvn -B -Dmaven.test.skip=true -pl boot -am package" >&2
     exit 1
 fi
 

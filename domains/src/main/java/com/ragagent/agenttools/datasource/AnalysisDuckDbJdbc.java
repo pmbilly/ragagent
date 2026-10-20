@@ -15,7 +15,7 @@ import java.util.List;
  * （DataAnalysisTool.cleanup）按表 DROP。exec/query 在连接上串行——DuckDB 单连接
  * 不保证并发语句安全。</p>
  *
- * <p>依赖 {@code org.duckdb:duckdb_jdbc}（build.gradle 已引入）。{@code read_xlsx}
+ * <p>依赖 {@code org.duckdb:duckdb_jdbc}（pom.xml 已引入）。{@code read_xlsx}
  * /{@code st_read_meta} 属 DuckDB 扩展（excel/spatial），运行期自动安装失败时
  * Excel 路径报运行时错误、sheet 枚举回落首 sheet；
  * CSV 路径（read_csv_auto 为内置）不依赖扩展。</p>

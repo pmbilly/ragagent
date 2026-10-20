@@ -3,7 +3,7 @@
 
 判据（硬零，不做棘轮）：
   C1 导入根：contract/src/main 只允许 java. / javax. / com.ragagent.
-  C2 构建依赖：contract/build.gradle.kts 不得声明 api / implementation /
+  C2 构建依赖：contract/pom.xml 不得声明非 test 作用域的依赖（
      compileOnly / runtimeOnly / annotationProcessor（测试依赖除外）。
   C3 框架形状：contract/src/main 不得出现 Spring / MyBatis / JPA 注解，
      也不得实现 TypeHandler。
@@ -19,7 +19,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / "contract" / "src" / "main" / "java"
-BUILD_FILE = ROOT / "contract" / "build.gradle.kts"
+BUILD_FILE = ROOT / "contract" / "pom.xml"
 
 ALLOWED_IMPORT_ROOTS = ("java.", "javax.", "com.ragagent.")
 
@@ -27,10 +27,10 @@ IMPORT_RE = re.compile(r"^import\s+(?:static\s+)?([\w.]+);", re.M)
 COMMENT_BLOCK_RE = re.compile(r"/\*.*?\*/", re.S)
 COMMENT_LINE_RE = re.compile(r"//[^\n]*")
 
-# C2：只盯生产依赖；testImplementation / testRuntimeOnly 等测试面允许。
-PROD_DEP_RE = re.compile(
-    r"^\s*(api|implementation|compileOnly|runtimeOnly|annotationProcessor)\s*\("
-)
+# C2：只盯生产依赖；scope=test 的声明允许（契约自身的纯 JDK 行为需要自测）。
+DEP_BLOCK_RE = re.compile(r"<dependency>(.*?)</dependency>", re.S)
+DEP_ARTIFACT_RE = re.compile(r"<artifactId>([^<]+)</artifactId>")
+DEP_SCOPE_RE = re.compile(r"<scope>([^<]+)</scope>")
 
 # C3：契约面出现这些形状即视为装配/持久化代码回流。
 FORBIDDEN_SHAPES = (
@@ -51,7 +51,7 @@ FORBIDDEN_SHAPES = (
 def contract_sources() -> list[pathlib.Path]:
     if not SRC.is_dir():
         return []
-    return sorted(p for p in SRC.rglob("*.java") if "/build/" not in str(p))
+    return sorted(p for p in SRC.rglob("*.java") if "/build/" not in str(p) and "/target/" not in str(p))
 
 
 def check_imports(files: list[pathlib.Path]) -> list[str]:
@@ -68,11 +68,18 @@ def check_imports(files: list[pathlib.Path]) -> list[str]:
 def check_build() -> list[str]:
     if not BUILD_FILE.is_file():
         return [f"C2 缺少构建文件：{BUILD_FILE.relative_to(ROOT)}"]
+    text = BUILD_FILE.read_text(encoding="utf-8")
+    m = re.search(r"<dependencies>(.*?)</dependencies>", text, re.S)
+    seg = m.group(1) if m else ""
     problems = []
-    for lineno, line in enumerate(BUILD_FILE.read_text(encoding="utf-8").splitlines(), 1):
-        if PROD_DEP_RE.match(line):
+    for blk in DEP_BLOCK_RE.findall(seg):
+        artifact = DEP_ARTIFACT_RE.search(blk)
+        scope = DEP_SCOPE_RE.search(blk)
+        actual = scope.group(1) if scope else "compile"
+        if actual != "test":
+            name = artifact.group(1) if artifact else "?"
             problems.append(
-                f"C2 {BUILD_FILE.relative_to(ROOT)}:{lineno}: {line.strip()}"
+                f"C2 {BUILD_FILE.relative_to(ROOT)}: {name} (scope={actual})"
                 "（契约面不允许生产依赖）"
             )
     return problems

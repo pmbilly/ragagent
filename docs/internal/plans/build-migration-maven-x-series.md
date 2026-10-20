@@ -182,14 +182,19 @@ pom.xml                     根：properties（版本单一来源）+ dependency
   3. **X2 的 test-jar 副作用**：`ContractBoundaryRulesTest` 只用 `DO_NOT_INCLUDE_TESTS`，对 `-tests.jar` 里的测试类不生效（`mvn verify` 走 jar 形态才暴露，`mvn test` 走 target/test-classes 时不暴露）⇒ 补显式排除。
   4. **静态快照污染（既有债，本轮顺手修了一个源头）**：`StorageRuntimeEnv` 是进程级静态，`DefaultStorageBackendProvisionerTest` 把 `storage.type` 配成 s3 后不恢复，上下文复用的后续测试会读到 s3（实测 `FaqContractTest` 的 CSV 导出走云分支、返回 null）。已在 `@AfterAll` 恢复。这类"静态 + 上下文缓存"的债尚未全清，X4 登记为待办。
 
-### X4 切换收尾（规模 M）
+### X4 切换收尾（规模 M）——✅ 2026-10-21
 
-- 重写 6 个守卫 + 12 处路径过滤 + `ci-log-annotate`；`_source_roots.MODULE_DIRS` 登记 3 个夹具模块。
-- 脚本（`java-server-up/down`、`ci-smoke`、`acceptance`、`refactor-harness`、`migrate-domain`、`audit-contract-fixtures`）改命令；`audit-contract-fixtures.sh` 里已过期的 `:server:test` 顺手修正为当前模块。
-- CI：`mvn -B verify` 接为唯一闸门；Dockerfile 换 `maven:3.9-eclipse-temurin-21` + `/root/.m2` 缓存；`.gitignore` 加 `target/`；`.vscode` 去掉 `java.import.gradle.*`。
-- 文档：README/getting-started/HANDOFF 的**操作口径**全改；**历史执行记录（§12 等）保留原文并加一行时间注记**（改写历史＝造假）。
-- 删 Gradle：`build.gradle.kts` ×8、`settings.gradle.kts` ×2、`gradle/`、`gradlew*`、`gradle.properties`、`build-logic/`、`libs.versions.toml`。
-- **退出判据**：删 Gradle 前后各跑一次 `mvn -B verify` 全绿；`scripts/java-server-up.sh` 起服 + `/health` 200；`docker build` 出镜像并起服；耗时登记（冷/热构建、全量测试）写入 §12。
+- 重写 6 个守卫：版本一致性（读根 pom 的 `<properties>` + Dockerfile 的 JDK）、契约纯度（读 `contract/pom.xml` 的非 test 依赖）、文档事实（数根 pom 的 `<modules>`）、测试汇总（`target/surefire-reports`）、陈旧检测（`target/classes`）、CI 日志注解（Maven 关键字）；11 处源码扫描补 `target/` 排除。
+- 脚本：`java-server-up.sh` 改「package + `java -jar`」（`spring-boot:run` 在多模块 reactor 会对每个 `-am` 模块执行 goal，非组合根模块没有主类）、`ci-smoke.sh` 改 `boot/target`、`acceptance.sh`/`migrate-domain.py`/`audit-contract-fixtures.sh`/`refactor-harness.sh` 改 Maven 命令（顺手修正已过期的 `:server` 模块名），模板脚本去掉自动 `git push`。
+- CI：`mvn -B verify` 接为唯一闸门，`setup-gradle` 换 `setup-java` 的 `cache: maven`；Dockerfile 换 `maven:3.9-eclipse-temurin-21` + `/root/.m2` 缓存 + 显式 `-Dspotless.check.skip=true`。
+- 文档：README / getting-started / HANDOFF / architecture-overview 的**操作口径**全改；历史记录（`docs/internal/handoff/**`、`plans/*` 历史方案、§12 执行记录）**保留原文**——改写历史＝造假。
+- 删 Gradle：`build.gradle.kts` ×8、`settings.gradle.kts`、`gradle/`（含 `libs.versions.toml` 与 wrapper）、`gradlew*`、`gradle.properties`、`build-logic/`。
+- **退出判据（全部达成）**：删 Gradle 后 `mvn -B verify` 全绿（5042 有效用例 + 45 守卫）；`scripts/java-server-up.sh` 起服 → `ready` + `/health` 200 + 认证端点 401；`docker build` 成功 + 复刻 CI 自检（`app.jar` 与 `build/generated-migrations/V1__baseline.sql` 都在）。
+- **X4 实测修正**：
+  1. **第三处构建耦合点**（方案只登记了 2 处）：`SourceRoots.repoRoot()` 也靠 `settings.gradle.kts` 找仓库根 ⇒ 删 Gradle 后 `JsonPropertyHygieneTest` 直接红；已改双候选。
+  2. **lettuce 是 optional**：`spring-data-redis` 把 lettuce 标 optional，Gradle 会传递、Maven 不会 ⇒ fat jar 缺 Redis 客户端 ⇒ 起服报 `StringRedisTemplate` 找不到。已在 domains 补 compile 依赖（各消费者测试面各自再声明一次）。
+  3. `boot` 的 `mvn -pl boot -am spring-boot:run` **不可用**（会对每个 `-am` 模块执行 goal）；起服统一走 `package + java -jar`。
+  4. `mvn verify` 比 `mvn test` 多出的 package 阶段会让 test-jar 以 jar 形态进 classpath，`ContractBoundaryRulesTest` 才暴露（已在 X3 修）。
 
 ## 7. 总验收判据
 

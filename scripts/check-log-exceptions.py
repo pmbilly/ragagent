@@ -103,7 +103,7 @@ def split_args(s: str) -> list[str]:
 def java_files() -> list[pathlib.Path]:
     files = []
     for root in ROOTS:
-        files.extend(p for p in root.rglob("*.java") if "/build/" not in str(p))
+        files.extend(p for p in root.rglob("*.java") if "/build/" not in str(p) and "/target/" not in str(p))
     return sorted(files)
 
 

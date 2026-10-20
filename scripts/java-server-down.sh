@@ -10,8 +10,8 @@
 # 照样打印 "ready" ✗ —— 于是旧进程那份"陈旧 jar"的全端点 500 会被误读成"刚改的代码炸了"。
 # up 脚本现已自挡端口占用（B216）；本脚本补齐停服这一步。
 #
-# 实现取"按端口找进程树"而不是 `gradlew --stop`：后者会把所有 Gradle daemon 一起停掉
-# （连带影响其他会话的构建），而 bootRun 的 JVM 就是监听该端口的进程。
+# 实现取"按端口找进程树"：监听该端口的 JVM 就是要停的那个，
+# 与它是 `java -jar` 还是 `mvn spring-boot:run` 起的无关。
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

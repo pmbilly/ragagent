@@ -65,7 +65,7 @@ done < "$OUT/candidates.txt"
 echo "已临时移出 $moved 个候选夹具，开始跑全量测试（约 3 分钟）…"
 
 export JAVA_HOME=${JAVA_HOME:-/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home}
-env -u SYSTEM_AES_KEY -u RETRIEVE_DRIVER -u SSRF_WHITELIST_EXTRA ./gradlew :server:test --console=plain > "$OUT/test.log" 2>&1
+env -u SYSTEM_AES_KEY -u RETRIEVE_DRIVER -u SSRF_WHITELIST_EXTRA mvn -B -pl boot test > "$OUT/test.log" 2>&1
 rc=$?
 echo "测试退出码: ${rc}（非 0 即说明有候选被引用）"
 

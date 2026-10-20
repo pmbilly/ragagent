@@ -99,7 +99,7 @@ GHOST_FIXTURE_PREFIXES = ("com.ragagent.common", "com.ragagent.support")
 
 
 def sources(module: str, kind: str) -> list[pathlib.Path]:
-    return [f for f in pathlib.Path(ROOT / module).glob(f"src/{kind}/java/**/*.java") if "/build/" not in str(f)]
+    return [f for f in pathlib.Path(ROOT / module).glob(f"src/{kind}/java/**/*.java") if "/build/" not in str(f) and "/target/" not in str(f)]
 
 
 def build_fqn_map() -> tuple[dict[str, set[str]], dict[str, set[str]], dict[str, set[str]]]:

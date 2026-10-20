@@ -225,16 +225,6 @@
     </dependencies>
   </dependencyManagement>
 
-  <!-- 全模块测试面共享：test-jar 的依赖不传递，而 EmbeddedRedis（platform 的 testFixtures）
-       在每个消费者的 test 类路径上都需要 lettuce。Gradle 侧由 testFixtures 的运行时元素传递。 -->
-  <dependencies>
-    <dependency>
-      <groupId>io.lettuce</groupId>
-      <artifactId>lettuce-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
   <build>
     <extensions>
       <!-- 提供 ${os.detected.classifier}：protoc / protoc-gen-grpc-java 按平台取二进制 -->

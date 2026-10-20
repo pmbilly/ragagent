@@ -149,11 +149,9 @@ graph TD
 
 ## 构建约定
 
-- `build-logic/` 提供两套 convention：
-  - `ragagent.java-conventions`：JDK 21 toolchain、Spotless（ratchet + import 口径）、Boot BOM；
-  - `ragagent.test-conventions`：JUnit Platform、Mockito `byte-buddy-agent`（惰性挂载）、默认 1g 测试堆。
-- 模块 `build.gradle.kts` 只声明**依赖与模块专属任务**（proto、migrations、`integrationTest`、`bootRun` 等），不要再复制 toolchain/Spotless/BOM/测试样板。
-- Gradle wrapper `8.14.3`；本机缺 JDK 21 时由 foojay resolver 自动下载。
+- 根 `pom.xml` 集中三件事：版本属性（单一来源）、Boot BOM（`<dependencyManagement>`）、插件版本与公共配置（compiler / surefire / javadoc / spotless）。
+- 模块 `pom.xml` 只声明**依赖与模块专属插件**（proto、test-jar、failsafe 等），不要再复制版本、BOM、测试样板。
+- 基础镜像 `maven:3.9-eclipse-temurin-21`；本机需自备 JDK 21 并设置 `JAVA_HOME`（Maven 不像 Gradle toolchain 那样自动下载 JDK）。
 
 ## 推荐阅读顺序
 

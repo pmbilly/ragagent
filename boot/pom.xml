@@ -221,6 +221,21 @@
               </arguments>
             </configuration>
           </execution>
+          <!-- 陈旧提醒：只提示不阻断（脚本永远 exit 0），与 Gradle 的 finalizedBy 同语义 -->
+          <execution>
+            <id>dev-stale-warn</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>bash</executable>
+              <workingDirectory>${project.basedir}/..</workingDirectory>
+              <arguments>
+                <argument>scripts/dev-stale-check.sh</argument>
+              </arguments>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
     </plugins>

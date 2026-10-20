@@ -95,11 +95,11 @@ curl -s -H "Authorization: Bearer ${TOKEN}" http://localhost:8083/api/v1/system/
 改完跑：
 
 ```bash
-# 定向测试（迭代期）
-./gradlew :domains:test --tests "com.ragagent.session.*"
+# 定向测试（迭代期；单模块构建前先 `mvn -B -DskipTests install`）
+mvn -B -pl domains test -Dtest='com.ragagent.session.*'
 
-# 批末全量闸门（必跑）
-./gradlew spotlessCheck build
+# 批末全量闸门（必跑：格式 + javadoc + 45 守卫 + 全量测试）
+mvn -B verify
 
 # 守卫（与 CI 同一份入口）
 bash scripts/run-guards.sh
@@ -126,7 +126,7 @@ cd frontend && npm run type-check && npm test
 | 上传时报 500 / 原始文件丢失 | 存储目录不可写，或指向 `/tmp` | 设 `LOCAL_STORAGE_BASE_DIR` 到持久目录 |
 | Redis `NOAUTH` / `invalid password` | `.env` 的 `REDIS_PASSWORD` 与服务端不一致 | 本仓 dev Redis 无密码：注释掉该行；有密码则两边一致 |
 | 端口 8083 被占用 | 旧后端还在跑 | `bash scripts/java-server-down.sh --stop` |
-| 起服后全端点 500 | 服务运行期间跑过 `./gradlew build`，类路径 jar 被就地重写 | 停服重启（与业务代码无关） |
+| 改了代码但行为没变 / 起服后全端点 500 | 服务运行期间跑过 `mvn package`：jar 被替换，但进程仍跑旧代码（`spring-boot:run` 则是 `target/classes` 被就地重写） | 停服重启（与业务代码无关） |
 | `No retrievable indexing pipelines` | 同"没有引用" | 同上 |
 | `docker compose up` 端口冲突 | 本机已有另一套 PG/Redis 占用 15432/16379 | 复用现有服务，或先停掉旧容器 |
 
@@ -140,12 +140,12 @@ cd frontend && npm run type-check && npm test
 | `bash scripts/dev-up.sh` | 基础设施 + 后端；`--with-frontend` 连前端一起起 |
 | `bash scripts/java-server-up.sh` / `-down.sh` | 起/停后端（日志 `/tmp/ragagent-java-server.log`） |
 | `bash scripts/token.sh 8083` | 取测试账号 JWT |
-| `./gradlew :domains:test --tests "com.ragagent.session.*"` | 定向测试 |
-| `./gradlew spotlessCheck build` | 全量闸门 |
-| `bash scripts/run-guards.sh` | 23 条架构/契约守卫 |
+| `mvn -B -pl domains test -Dtest='com.ragagent.session.*'` | 定向测试 |
+| `mvn -B verify` | 全量闸门（格式 + javadoc + 守卫 + 全量测试） |
+| `bash scripts/run-guards.sh` | 45 条架构/契约守卫 |
 | `python3 scripts/test-summary.py` | 测试条数、失败与跳过清单 |
 | `python3 scripts/gen-arch-index.py` | 重新生成 `docs/architecture/packages.md` |
-| `SPRINGDOC_ENABLED=true ./gradlew :boot:bootRun` | 本地打开 Scalar API 文档（`:8083/scalar`） |
+| `SPRINGDOC_ENABLED=true bash scripts/java-server-up.sh` | 本地打开 Scalar API 文档（`:8083/scalar`） |
 
 ---
 

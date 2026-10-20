@@ -1,13 +1,13 @@
 #!/bin/bash
 # 落刀流水线模板（§13.1 / §13.4）：脚本补丁 → 落刀 → 干跑断言 → 编译 → 测试 → spotless → 忠实性 → 文档 → 提交。
 # 用法：复制本文件为 /tmp/runN.sh，改 [填这里] 段与 docs/commit 段，然后 `bash /tmp/runN.sh`。
-# 铁律：① Gradle 一律显式 ./gradlew；② 守卫断言正向证据（BUILD SUCCESSFUL + 测试 XML failures+errors==0）；
+# 铁律：① Maven 一律显式 `mvn -B`；② 守卫断言正向证据（BUILD SUCCESS + 测试 XML failures+errors==0）；
 #       ③ 任一环失败自动回退，绝不提交半成品；④ 命令 >8KB 会被平台拒绝 → 一定写成文件再执行。
 set -u
 cd /Users/billy/ragagent
 rm -f /tmp/faith_ok /tmp/tests_ok
 export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
-BASE=server/src/main/java/com/ragagent/[填这里：包路径]
+BASE=domains/src/main/java/com/ragagent/[填这里：包路径]
 SRC=$BASE/[填这里：门面类].java
 BAK=/tmp/refactor.bak
 cp $SRC $BAK
@@ -20,8 +20,8 @@ PYEOF
 python3 /tmp/slice.py 2>&1 | tail -12 || exit 0
 
 # ── ② 编译（正向守卫） ──────────────────────────────────────────────────
-./gradlew :server:compileJava > /tmp/slice.log 2>&1
-if ! grep -q "BUILD SUCCESSFUL" /tmp/slice.log; then
+mvn -B -q -pl domains -am -Dmaven.test.skip=true compile > /tmp/slice.log 2>&1
+if ! grep -q "BUILD SUCCESS" /tmp/slice.log; then
   grep -A 3 -E "\.java:[0-9]+: error" /tmp/slice.log | head -14
   cp $BAK $SRC; rm -f $BASE/[填这里：新协作者].java
   echo "[已自动回退]"; exit 0
@@ -29,13 +29,13 @@ fi
 echo "[编译干净]"
 
 # ── ③ 测试（读 XML，失败数为 0 且用例数达标） + spotless ─────────────────
-./gradlew :server:test --tests "com.ragagent.session.*" 2>&1 | grep -E "FAILED|BUILD|tests completed" | head -4
-./gradlew :server:spotlessApply -q 2>&1 | tail -1
-./gradlew :server:spotlessCheck 2>&1 | grep -E "BUILD" | head -1
+mvn -B -pl domains test -Dtest='com.ragagent.session.*' 2>&1 | grep -E "Tests run|BUILD" | tail -3
+mvn -B -q -pl domains spotless:apply 2>&1 | tail -1
+mvn -B -pl domains spotless:check 2>&1 | grep -E "BUILD" | head -1
 python3 - <<'PYEOF'
 import glob, re, pathlib
 bad = tot = 0
-for f in glob.glob("server/build/test-results/test/TEST-com.ragagent.*.xml"):
+for f in glob.glob("domains/target/surefire-reports/TEST-com.ragagent.*.xml"):
     m = re.search(r'tests="(\d+)" skipped="(\d+)" failures="(\d+)" errors="(\d+)"', open(f, encoding="utf-8").read())
     if m: tot += int(m.group(1)); bad += int(m.group(3)) + int(m.group(4))
 print(f"测试 {tot} 条，失败 {bad}")
@@ -50,10 +50,10 @@ import pathlib
 pathlib.Path("/tmp/faith_ok").write_text("ok")
 PYEOF
 
-# ── ⑤ 文档 + 提交（两关都过才提交） ─────────────────────────────────────
+# ── ⑤ 文档 + 提交（两关都过才提交；推送等用户明确指令，本模板不做） ──────
 if [ "$(cat /tmp/tests_ok)" = "ok" ] && [ -f /tmp/faith_ok ]; then
   # [填这里]：§11 总览表加一行 + §14.3 计数刷新（实测值）
-  git add -A server/src docs/internal/HANDOFF.md && git commit -q -F /tmp/msg.txt && git push 2>&1 | tail -2
+  git add -A domains/src docs/internal/HANDOFF.md && git commit -q -F /tmp/msg.txt
   git --no-pager log --oneline -1
 else
   echo "[测试或忠实性未过，不提交]"

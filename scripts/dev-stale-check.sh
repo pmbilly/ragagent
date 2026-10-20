@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# dev server「陈旧」检测（B186）。
+# dev server「陈旧」检测（B186；X4 起改看 Maven 的 target/classes）。
 #
 # 背景（B184 记录、B186 再次实测）：本仓 dev server（`scripts/java-server-up.sh` 起的
-# `:boot:bootRun`）类路径里是**模块 jar**（`domains-0.0.1-SNAPSHOT.jar` 等），而构建会
-# **就地重写**这些 jar ⇒ 运行中的 JVM：已加载的类走旧视图、**惰性加载的类直接加载不到**
-# ⇒ 两种症状：
+# `mvn -pl boot -am spring-boot:run`）类路径里是**各模块的 target/classes**，而构建会
+# **就地重写**这些 class 文件 ⇒ 运行中的 JVM：已加载的类走旧视图、**惰性加载的类
+# 版本不一致** ⇒ 两种症状：
 #   · 全端点点 500（日志 `unhandled exception … ClassNotFoundException`）—— 2026-10-10 首见；
 #   · 某条"少走"的功能路径卡住/中断（日志 `NoClassDefFoundError: …/tools/wiki/WikiTexts`，
 #     前端表现为工具卡片**一直转圈**）—— 2026-10-10 二次实测（wiki 搜索）。
 #
-# 本脚本判断「正在跑的 dev server 是否比刚构建的产物更旧」；根 build 的 build 任务收尾时自动调用，
-# 也可随时手动跑：bash scripts/dev-stale-check.sh
+# 本脚本判断「正在跑的 dev server 是否比刚构建的产物更旧」；`mvn verify` 收尾时由 boot
+# 模块的 exec 调用，也可随时手动跑：bash scripts/dev-stale-check.sh
 # **永远退出 0**（只提醒，不阻断构建）。
 set -uo pipefail
 
@@ -33,20 +33,22 @@ START_EPOCH="$(date -j -f "%b %d %T %Y" "${START_RAW}" +%s 2>/dev/null \
     || date -d "${START_RAW}" +%s 2>/dev/null)"
 [ -z "${START_EPOCH}" ] && exit 0
 
-# 最新模块产物时刻
-NEWEST_JAR="$(ls -t domains/build/libs/*.jar \
-    model-runtime/build/libs/*.jar retrieval-\
-    boot/build/libs/*.jar 2>/dev/null | head -1)"
-[ -z "${NEWEST_JAR}" ] && exit 0
-JAR_EPOCH="$(stat -f %m "${NEWEST_JAR}" 2>/dev/null || stat -c %Y "${NEWEST_JAR}" 2>/dev/null)"
-[ -z "${JAR_EPOCH}" ] && exit 0
+# 最新模块产物时刻（按目录 mtime 取最新的 target/classes）
+NEWEST_ARTIFACT="$(ls -dt domains/target/classes \
+    model-runtime/target/classes retrieval-engine/target/classes \
+    agent-engine/target/classes platform/target/classes \
+    contract/target/classes boot/target/classes 2>/dev/null | head -1)"
+[ -z "${NEWEST_ARTIFACT}" ] && exit 0
+ARTIFACT_EPOCH="$(stat -f %m "${NEWEST_ARTIFACT}" 2>/dev/null \
+    || stat -c %Y "${NEWEST_ARTIFACT}" 2>/dev/null)"
+[ -z "${ARTIFACT_EPOCH}" ] && exit 0
 
-if [ "${JAR_EPOCH}" -gt "${START_EPOCH}" ]; then
+if [ "${ARTIFACT_EPOCH}" -gt "${START_EPOCH}" ]; then
     echo ""
     echo "⚠️  dev server 已陈旧（B184/B186）：它在 ${PORT} 上启动于 $(date -r "${START_EPOCH}" '+%H:%M:%S')，"
-    echo "    而构建产物已更新到 $(date -r "${JAR_EPOCH}" '+%H:%M:%S')（${NEWEST_JAR#*/}）。"
-    echo "    该 JVM 现在处于「惰性类加载会 NoClassDefFoundError」状态 ⇒ 可能表现为"
-    echo "    全端点 500，或某条功能路径卡住（如 wiki 搜索的卡片一直转圈）。"
+    echo "    而构建产物已更新到 $(date -r "${ARTIFACT_EPOCH}" '+%H:%M:%S')（${NEWEST_ARTIFACT}）。"
+    echo "    该 JVM 的类路径已被就地重写 ⇒ 可能表现为全端点 500，或某条功能路径卡住"
+    echo "    （如 wiki 搜索的卡片一直转圈）。"
     echo "    处置：bash scripts/java-server-up.sh   ← 重启即恢复（与业务代码无关）"
     echo ""
 fi

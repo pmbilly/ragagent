@@ -31,7 +31,7 @@
 
 1. **保留分层单体，渐进整改**；不整体重写、不拆微服务（整改方案 §0/§13）。
 2. **域内命名**：`controller / service / mapper / repository / domain / dto / config`（方案 §6）；`agenttools`/`agentmanagement` 命名（§7，B257 已执行）。
-3. **模块名 = 顶层包名**：契约面取**单数 `contract`**（不取方案字面的 `contracts`；理由见 `contract/build.gradle.kts` 头注释，已登记）。
+3. **模块名 = 顶层包名**：契约面取**单数 `contract`**（不取方案字面的 `contracts`；理由见 `contract/pom.xml` 头注释，已登记）。
 4. **三个 runtime 平级、互不引用实现**；跨模块协作经 contract、由 boot 注入（方案 §5.2）。
 5. **域间只经契约（R10）**：①可清零档 = **0** ✅；②属主边 2 条（`auth→tenant`、`system→auth`）**登记维持**；③同族 5 条（agent 家族）**冻结**。
 6. **线格式（1,349 金片）逐字节不变**；协议变更属**产品决策**、不夹带（`check-contract-sync` 是执行面）。
@@ -187,7 +187,7 @@
 | **X1** | 骨架与依赖：根 pom + 7 子 pom、Boot BOM、proto/gRPC（xolstice 0.6.1）、repackage | ✅ 2026-10-21 |
 | **X2** | 测试面：夹具改 **test-jar**（不搬文件）、surefire 分叉/环境/工作目录、ContractPaths 双候选、ArchUnit 四形态排除 | ✅ 2026-10-21 |
 | **X3** | 质量闸门：spotless ratchet / javadoc `-Werror` / jacoco profile / 45 守卫挂 boot verify / 迁移脚本 | ✅ 2026-10-21 |
-| **X4** | 切换收尾：守卫重写、脚本/CI/Docker/文档、删 Gradle | 待做 |
+| **X4** | 切换收尾：6 守卫重写 + 11 处路径过滤、脚本/CI/Docker/文档、删 Gradle | ✅ 2026-10-21 |
 
 **X1 读数（2026-10-21）**：`mvn -Dmaven.test.skip=true package` 绿 · `java -jar` 起服 `Started 22.0s` + `/health` 200 + 认证端点 401 · fat jar **189M = Gradle 189M** · 依赖清单差异 8 项全部定性 · 45 守卫绿。
 
@@ -196,6 +196,9 @@
 已知债：boot 的 `FaqContractTest` 与先跑测试共享 Spring 上下文，单 JVM 串行时走云存储分支失败（Gradle 4 分叉掩盖）；Maven 按同口径 `forkCount=2` 后一致，隔离债待修。
 
 **X3 读数（2026-10-21）**：`mvn verify` **连跑两遍全绿**（spotless 3.10.4 ratchet + javadoc `-Werror` + 5042 有效用例 + 45 守卫）· **三类红态探针各红一次**（乱序 import / `{@link NoSuchTypeXYZ}` / 游离子目录）· `-Pcoverage -pl contract verify` 产出 `jacoco.exec` + 报告。
+
+**X4 读数（2026-10-21，Gradle 已删）**：`mvn -B verify` 全绿（5042 有效用例 + 45 守卫）· `java-server-up.sh` 起服 `ready` + `/health` 200 + 认证端点 401 · `docker build` 成功 + 镜像自检（`app.jar` 与 `V1__baseline.sql` 都在）· 全量 verify 约 5–6 分钟（冷编译，Maven 无增量）。
+四个实测修正：① 第三处构建耦合 `SourceRoots.repoRoot()`（删 Gradle 后 `JsonPropertyHygieneTest` 红）；② `spring-data-redis` 的 lettuce 是 optional（Gradle 传递、Maven 不传 ⇒ fat jar 缺 Redis 客户端，起服报 `StringRedisTemplate` 缺失）；③ `mvn -pl boot -am spring-boot:run` 会对每个 `-am` 模块执行 goal，起服改 `package + java -jar`；④ 版本/契约纯度/文档事实守卫的读数源全部改根 pom。
 四个实测坑：① surefire 必须 `@{argLine}`（`${argLine}` 配置期解析，jacoco agent 挂不上）；② 守卫绑 boot 的 verify（根 pom 的 verify 在 reactor 最前面）；③ `ContractBoundaryRulesTest` 的 `DO_NOT_INCLUDE_TESTS` 对 `-tests.jar` 无效（补显式排除）；④ `StorageRuntimeEnv` 静态快照污染（`DefaultStorageBackendProvisionerTest` 配了 s3 不恢复 ⇒ `FaqContractTest` CSV 走云分支），已加 `@AfterAll` 恢复。
 
 ### 5.1 历史批次（v0.3.0 P1~P5 / v0.4.0 R1~R6，全部 ✅）
@@ -224,11 +227,11 @@
 - 前端：`VITE_DEV_PROXY_TARGET=http://localhost:8083`（vite 默认值已改 8083）。
 - `LOCAL_STORAGE_BASE_DIR` 必须持久目录（严禁 /tmp，macOS 会清理 ⇒ 原始文件丢失）。
 - **起停服**：`bash scripts/java-server-up.sh` / `bash scripts/java-server-down.sh`（up 自挡端口占用；down 是唯一正确停服方式）。
-- **⚠️ 跑完 `./gradlew build/test` 必须重启后端**（构建就地重写 `build/classes` ⇒ 在线服务 500/NoClassDefFoundError，重启即解，别查代码）。
+- **⚠️ 跑完 `mvn verify` 必须重启后端**（jar 被替换而进程仍跑旧代码 ⇒ 表现为"改了没生效"；用 `spring-boot:run` 时则是 `target/classes` 被就地重写）。
 - CI 三 job：guards（`bash scripts/run-guards.sh` 为准）· backend（spotless ratchet + 全量测试 + 灌 `V1__baseline.sql` 进全新 ParadeDB）· frontend（type-check + test + build）。`seed` tag 已推送（spotless ratchet 需要）。
 - 全量闸门（**推送/批次收尾必跑**；迭代中按 §9 分档）：
   ```bash
-  cd ~/ragagent && env -u SYSTEM_AES_KEY JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./gradlew spotlessCheck build
+  cd ~/ragagent && env -u SYSTEM_AES_KEY JAVA_HOME=/opt/homebrew/opt/openjdk@21 mvn -B verify
   ```
   期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（最近基数 **5046 / 失败 0 / 跳过 4**，含 agent-engine 155 条——旧口径 4867 漏算该模块）。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
   **环境前置**：PG `max_connections=100`，多个 boot jar 残留会占满连接（实测 5 个实例 = 50 条 ⇒ `too many clients`）。跑闸门前先 `ps -Ao pid,command | grep '[b]oot/build/libs/boot'` 清残留。
@@ -543,6 +546,7 @@ boot           14 件                      →  boot
 | X1 | 2026-10-21 | **Maven 骨架与依赖**：根 pom + 7 子 pom（contract/platform/model-runtime/retrieval-engine/agent-engine/domains/boot）；Boot BOM 接管 protobuf 4.35.1 / grpc 1.83.1 / neo4j 6.1.0 / sqlite 3.53.2.1（toml 的声明值被 BOM 覆盖，Maven 侧必须同口径）；protoc 对齐 4.35.1（3.25 生成的 `GeneratedMessageV3` 在 4.x 刷废弃警告，与 `-Werror` 相撞）；guava 钉 `33.6.0-jre`（否则 Maven 选 android 变体）；repackage 显式 exclude servlet-api（插件会打 provided）；迁移脚本同步到仓库根 `build/` + `spring-boot:run` 工作目录钉仓库根。 | `mvn -Dmaven.test.skip=true package` 绿 · `java -jar` 起服 **Started 22.0s** / `/health` 200 / 认证端点 401 · fat jar **189M = Gradle 189M** · 依赖差异 8 项全定性（Gradle 多 6 个 dom4j optional XPath 死重；Maven 多 okio 1.12 + kotlin-stdlib-common，okhttp 2.7.5 链路）· **45 守卫绿** |
 | X2 | 2026-10-21 | **测试面等价**：夹具不搬文件 —— `build-helper` 把 `src/testFixtures/{java,resources}` 挂进 test 源集 + `maven-jar-plugin:test-jar` 产出 `-tests.jar`（拆独立模块会撞 `domains → domains-fixtures → domains` 的 reactor 循环，Gradle 能忍、Maven 不许）；`ContractPaths` 仓库根双候选（`settings.gradle.kts` / **带 `<modules>` 的父 pom**，不能只判 pom 存在）；`ArchitectureRulesTest` 排除四形态（`classes/java/test`、`target/test-classes`、`-test-fixtures.jar`、`-tests.jar`）；surefire `forkCount=2` + `DOCREADER_ADDR=""` + domains 时区 2g + boot 工作目录钉仓库根；`-Werror` 收窄到 `default-compile`（plugin 级配置会误伤测试编译）。 | `mvn test` **连跑两遍全绿** · **有效用例 5042 = Gradle 5042**（Gradle 5046−4 / Maven 5044−2；surefire 对 `@BeforeAll+assumption` 不计入跳过）· 45 守卫绿 · `./gradlew build` 2m2s 仍绿 · 暴露既有债：boot `FaqContractTest` 单 JVM 串行时共享 Spring 上下文走云存储分支失败（Gradle 4 分叉掩盖，待修） |
 | X3 | 2026-10-21 | **质量闸门**：spotless-maven-plugin 3.10.4（ratchetFrom seed，includes 补 testFixtures）+ javadoc doclint 绑 verify 并**收紧为 `-Werror`**（Gradle 侧只告警）+ jacoco profile（prepare-agent/report）+ 45 守卫改绑 **boot 的 verify**（根 pom 的 verify 在 reactor 最前）+ 迁移脚本同步到仓库根 `build/`。修 4 个实测坑：surefire 必须 `@{argLine}` 晚绑定、`ContractBoundaryRulesTest` 补 `-tests.jar` 排除、`StorageRuntimeEnv` 静态快照恢复（s3 配置外溢）、守卫阶段位置。 | `mvn verify` **连跑两遍全绿**（有效用例 5042 / 45 守卫 / spotless / javadoc）· **三类红态探针各红一次**（乱序 import / `{@link NoSuchTypeXYZ}` / 游离子目录）· `-Pcoverage -pl contract verify` 出 `jacoco.exec` + HTML 报告 |
+| X4 | 2026-10-21 | **切换收尾（Gradle 已删）**：6 守卫重写读数源（版本→根 pom properties、契约纯度→contract/pom.xml、文档事实→根 pom modules、测试汇总→surefire-reports、陈旧检测→target/classes、CI 注解→Maven 关键字）+ 11 处源码扫描补 `target/` 排除；脚本改命令（起服 `package + java -jar`、`ci-smoke` 读 `boot/target`、`acceptance`/`migrate-domain`/`audit-contract-fixtures`/`refactor-harness`）；CI 换 `setup-java cache: maven` + `mvn -B verify`；Dockerfile 换 `maven:3.9-eclipse-temurin-21` + `/root/.m2`；README/getting-started/HANDOFF/overview 操作口径全改（历史记录原文保留）；删 8 个 build.gradle.kts + settings + wrapper + build-logic。实测修正：`SourceRoots.repoRoot()`（第三处耦合）、lettuce 的 optional 传递差异、`-am spring-boot:run` 不可用。 | `mvn -B verify` 全绿（5042 + 45 守卫）· 起服 `ready` + `/health` 200 + 401 · `docker build` 成功 + 镜像自检 OK · 全量 verify 约 5–6 分钟 |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

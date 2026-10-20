@@ -45,6 +45,12 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-redis</artifactId>
     </dependency>
+    <!-- spring-data-redis 把 lettuce 标成 optional：Gradle 会传递、Maven 不会。
+         缺了它就没有 RedisConnectionFactory ⇒ StringRedisTemplate 不装配（实测起服即失败）。 -->
+    <dependency>
+      <groupId>io.lettuce</groupId>
+      <artifactId>lettuce-core</artifactId>
+    </dependency>
     <!-- Boot 4 移除了 starter-aop；AOP 代理由 spring-aop（context 传递）提供，补 AspectJ weaver -->
     <dependency>
       <groupId>org.aspectj</groupId>

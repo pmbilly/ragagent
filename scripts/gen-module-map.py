@@ -27,7 +27,7 @@ PKG_RE = re.compile(r"^package\s+([\w.]+);", re.M)
 
 
 def java_files(module: str, kind: str = "main"):
-    return [p for p in (ROOT / module / "src" / kind / "java").rglob("*.java") if "/build/" not in str(p)]
+    return [p for p in (ROOT / module / "src" / kind / "java").rglob("*.java") if "/build/" not in str(p) and "/target/" not in str(p)]
 
 
 def package_of(path: pathlib.Path) -> str:
@@ -55,7 +55,7 @@ def domain_rows():
     base = ROOT / "domains" / "src" / "main" / "java" / "com" / "ragagent"
     rows = []
     for d in sorted(p for p in base.iterdir() if p.is_dir()):
-        files = [p for p in d.rglob("*.java") if "/build/" not in str(p)]
+        files = [p for p in d.rglob("*.java") if "/build/" not in str(p) and "/target/" not in str(p)]
         controllers = sum(1 for p in files if p.name.endswith("Controller.java"))
         rows.append(f"| `{d.name}` | `com.ragagent.{d.name}` | {len(files)} | {controllers} |")
     return rows

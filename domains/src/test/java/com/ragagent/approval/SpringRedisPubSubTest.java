@@ -41,7 +41,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
  * （见 {@link GateCrossInstanceTest}）。</p>
  *
  * <p>若开发用 Redis 开了密码（docker-compose 的 {@code --requirepass ${REDIS_PASSWORD}}），
- * 跑测试时带上同名环境变量即可：{@code REDIS_PASSWORD=... ./gradlew test}；
+ * 跑测试时带上同名环境变量即可：{@code REDIS_PASSWORD=... mvn -B verify}；
  * 未设置且 Redis 要求认证时本类自动跳过（不把口令写进仓库）。
  * 注意：Java 侧 application.yml 目前也没配 spring.data.redis.password，
  * 接线 Redis 时同样需要补上。</p>

@@ -65,7 +65,7 @@ def build_index():
     stems = set()
     by_package = {}
     for path in ROOT.rglob("*.java"):
-        if "/build/" in str(path):
+        if "/build/" in str(path) or "/target/" in str(path):
             continue
         text = path.read_text(encoding="utf-8", errors="ignore")
         match = PKG_RE.search(text)
@@ -107,7 +107,7 @@ def resolve_link(link: str, current_pkg: str, fqns, packages, stems, by_package)
 def target_files():
     files = []
     for path in ROOT.rglob("package-info.java"):
-        if "/build/" in str(path) or "/docs/" in str(path):
+        if "/build/" in str(path) or "/target/" in str(path) or "/target/" in str(path) or "/docs/" in str(path):
             continue
         files.append(path)
     docs = [ROOT / "README.md"]

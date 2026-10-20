@@ -73,7 +73,7 @@
 
 ## 架构
 
-七个 Gradle 模块，**依赖单向、边界在编译期强制**：越界依赖无法编译，模块之间只认契约。
+七个 Maven 模块，**依赖单向、边界在编译期强制**：越界依赖无法编译，模块之间只认契约。
 
 ```
 :boot              ──►  全部模块（组合根）
@@ -140,8 +140,8 @@ cp .env.example .env
 # 2) 基础设施：PostgreSQL(15432) + Redis(16379) + 文档解析服务(50051)
 docker compose up -d
 
-# 3) 启动后端（:8083；bootRun 会读取仓库根的 .env）
-./gradlew :boot:bootRun
+# 3) 启动后端（:8083；脚本先构建再起 jar，环境变量口径与 dev-env.sh 一致）
+bash scripts/java-server-up.sh
 
 # 4) 启动前端（:5173，/api 代理到 8083）
 cd frontend && npm ci && npm run dev
@@ -208,7 +208,7 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 - **风格**：REST + JSON（键一律 camelCase），流式接口走 SSE
 - **认证**：`Authorization: Bearer <JWT>`；服务间/脚本可用 API Key
 - **响应外壳**：统一 `{ "code": …, "message": …, "data": … }`，错误码与可空字段显式声明
-- **API 文档**：默认关闭；本地 `SPRINGDOC_ENABLED=true ./gradlew :boot:bootRun` 后访问 `http://localhost:8083/scalar`（Scalar UI，生产保持 false）
+- **API 文档**：默认关闭；本地 `SPRINGDOC_ENABLED=true bash scripts/java-server-up.sh` 后访问 `http://localhost:8083/scalar`（Scalar UI，生产保持 false）
 
 | 资源 | 前缀 |
 |---|---|
@@ -251,10 +251,10 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 
 ```bash
 # 后端全量闸门：格式检查 + 架构守卫 + 单元/合约测试 + javadoc
-./gradlew build
+mvn -B verify
 
-# 定向测试（迭代用）
-./gradlew :domains:test --tests "com.ragagent.session.*"
+# 定向测试（迭代用；单模块构建前需先 `mvn -B -DskipTests install`，否则跨模块夹具解析不到）
+mvn -B -pl domains test -Dtest='com.ragagent.session.*'
 
 # 仅跑架构守卫（包循环、契约纯度、模块依赖矩阵、命名口径……只许减不许增的棘轮）
 bash scripts/run-guards.sh
@@ -274,9 +274,9 @@ cd frontend && npm run type-check && npm test
 **参与贡献**
 
 1. 从 `main` 切出特性分支，保持提交粒度可回滚；
-2. 提交前本地跑通 `./gradlew build`（与 CI 同口径）与前端 `npm run type-check && npm test`；
+2. 提交前本地跑通 `mvn -B verify`（与 CI 同口径）与前端 `npm run type-check && npm test`；
 3. 涉及 HTTP 契约的改动，请同步前端类型并重录契约金片；
-4. 新增依赖请登记到 `gradle/libs.versions.toml`（版本唯一来源），不要写在模块构建文件里。
+4. 新增依赖请登记到根 `pom.xml` 的 `<properties>` + `<dependencyManagement>`（版本唯一来源），不要写在模块 pom 里。
 
 ## 许可与致谢
 

@@ -1,8 +1,6 @@
-# Java（构建产物：Gradle 用 build/，Maven 用 target/）
-.gradle/
+# Java 构建产物（target/ = Maven；build/ 保留给运行期迁移脚本目录）
 build/
 target/
-server/build/
 # IDE 的 Java 语言服务器（jdt.ls）编译输出
 bin/
 *.class

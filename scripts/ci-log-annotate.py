@@ -14,25 +14,22 @@ from __future__ import annotations
 import os
 import sys
 
-# 这些行是"为什么会红"的直接线索；顺序即优先级。
+# 这些行是"为什么会红"的直接线索；顺序即优先级（Maven 口径）。
 ANCHORS = (
-    "What went wrong",
-    "Execution failed for task",
-    "There were failing tests",
+    "Failed to execute goal",
+    "There are test failures",
+    "Failures: ",
     "OutOfMemoryError",
-    "Gradle Test Executor",
-    "Process 'Gradle",
-    "Daemon disappeared",
+    "There was an error in the forked process",
     "Could not resolve",
     "error:",
     "Caused by:",
-    "FAILURE:",
-    "BUILD FAILED",
-    "Exit value",
-    "> Task :",
+    "BUILD FAILURE",
+    "Reactor Summary",
+    "[ERROR]",
 )
-# 命中这些词的行才值得从 "> Task :" 里挑出来（否则该锚点噪音太大）。
-TASK_NOISE_OK = ("FAILED",)
+# 命中这些词的行才值得从 "Reactor Summary" 里挑出来（否则该锚点噪音太大）。
+TASK_NOISE_OK = ("FAILURE", "SKIPPED")
 
 
 def main() -> int:
@@ -62,7 +59,7 @@ def main() -> int:
         if hit is None:
             continue
         picks.append((i, ln.strip()[:220]))
-        if hit == "What went wrong":                       # 这一块是根因正文，带上下文
+        if hit == "Failed to execute goal":                # 这一块是根因正文，带上下文
             for j in range(i + 1, min(i + 7, len(lines))):
                 if lines[j].strip():
                     picks.append((j, lines[j].strip()[:220]))

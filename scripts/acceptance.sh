@@ -13,7 +13,7 @@
 #   - 五批划分 = B1 纪律（agent/chatpipeline 与 Spring 包分批，避免 Mockito attach 假红）
 #   - 每批失败即停并指明批次；全绿输出 ACCEPTANCE PASS
 #   - --changed 映射：改动文件 → 领域包 → 批次；命中「共享面」自动升格为全量五批：
-#     build/gradle 文件、gradle.properties、settings*、server/src 下的根包与资源、
+#     pom.xml 与模块构建脚本、domains/src 下的根包与资源、
 #     migrations/、以及未知新域（映射不认识的包一律保守处理）
 #   - 为什么不是每次全量：五个 --tests 过滤器互为 task 输入 → 批次间不共享缓存，
 #     全量一次约 3.5 分钟。日常提交用 --changed（秒~分钟级），交付门再全量。
@@ -166,11 +166,10 @@ fi
 run_batch() {
   local name="$1" filters="" d t0 t1
   for d in $(batch_domains "$name"); do
-    filters="$filters --tests com.ragagent.${d}.*"
+    filters="${filters:+${filters},}com.ragagent.${d}.*"
   done
   t0=$(date +%s)
-  # shellcheck disable=SC2086
-  if ./gradlew :server:test $filters > "/tmp/acceptance-${name}.log" 2>&1; then
+  if mvn -B -pl boot test -Dtest="$filters" > "/tmp/acceptance-${name}.log" 2>&1; then
     t1=$(date +%s)
     echo "   PASS（$((t1 - t0))s）"
   else

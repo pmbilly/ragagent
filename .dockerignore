@@ -23,11 +23,13 @@
 **/node_modules/
 frontend/
 
-# Gradle 缓存与构建产物（builder stage 内会重新构建）
+# 构建缓存与产物（builder stage 内会重新构建）
 **/.gradle/
 .gradle/
 **/build/
 build/
+**/target/
+target/
 
 # 日志 / 临时文件
 logs/

@@ -5,12 +5,10 @@
 #   scripts/java-server-up.sh
 #   SSRF_WHITELIST_EXTRA=mcp.example.com scripts/java-server-up.sh
 #
-# ⚠️ **改完代码必须重启本脚本起的服务**（2026-10-10 实测，B184）：`:boot:bootRun` 的类路径里是
-# **模块 jar**（`domains-0.0.1-SNAPSHOT.jar` 等，栈里显示为 `~[domains-…jar:na]`），而构建会
-# **就地重写**这些 jar ⇒ 运行中的 JVM 已加载的类走旧视图、**惰性加载的类直接加载不到** ⇒
-# 症状：**全端点 500** + 日志 `unhandled exception: … ClassNotFoundException /
-# NoClassDefFoundError / TypeNotPresentException`（全是本仓自己的类）。与业务代码无关，
-# 停掉重启即可；在服务运行中跑 `gradlew build` / `--rerun` 会稳定触发。
+# ⚠️ **改完代码必须重启本脚本起的服务**（2026-10-10 实测，B184）：这里起的是
+# `boot/target/*.jar` 的**一次性快照**，重新构建只会替换磁盘上的 jar，进程仍跑旧代码
+# （表现为"改了没生效"，与业务代码无关）。停掉重启即可；
+# 在服务运行中跑 `mvn package` / `mvn verify` 后记得重启。
 #
 # 与 Go 版**共用同一个 dev 数据库**——这正是 e2e 的价值：H2 测不出的差异
 # （NOT NULL 零值、jsonb 键序、DDL 默认值）只会在真 PG 上暴露。
@@ -43,11 +41,23 @@ if lsof -ti :"${JAVA_PORT}" >/dev/null 2>&1; then
     exit 1
 fi
 
+if [ -z "${JAVA_HOME:-}" ] && ! command -v java >/dev/null 2>&1; then
+    echo "✗ 未找到 JDK：请先 export JAVA_HOME（如 /opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home）"
+    exit 1
+fi
+JAVA_BIN="${JAVA_HOME:+${JAVA_HOME}/bin/}java"
+
+# 先构建再起 jar：Maven 的 spring-boot:run 在多模块 reactor 里会对每个 -am 模块执行该 goal，
+# 非组合根模块没有主类 ⇒ 直接用 package + java -jar。工作目录是仓库根，
+# application.yml 的相对路径（build/generated-migrations）口径不变。
+mvn -B -q -Dmaven.test.skip=true -pl boot -am package >> "${LOG}" 2>&1 \
+    || { echo "✗ 构建失败，见 ${LOG}"; exit 1; }
+
 SERVER_PORT="${JAVA_PORT}" \
 JWT_SECRET="${JWT_SECRET}" \
 SYSTEM_AES_KEY="${SYSTEM_AES_KEY}" \
 LOCAL_STORAGE_BASE_DIR="${LOCAL_STORAGE_BASE_DIR}" \
-./gradlew :boot:bootRun --console=plain > "${LOG}" 2>&1 &   # 模块拆分后组合根在 :boot（B165）
+"${JAVA_BIN}" -jar boot/target/boot-0.0.1-SNAPSHOT.jar >> "${LOG}" 2>&1 &
 
 echo "==> waiting for readiness（Spring 启动 + Flyway 校验，约 20-40 秒）"
 wait_for_port "${JAVA_PORT}" /api/v1/knowledge-bases 40

@@ -99,6 +99,12 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- EmbeddedRedis（testFixtures）需要；test-jar 的依赖不传递，消费方各自声明 -->
+    <dependency>
+      <groupId>io.lettuce</groupId>
+      <artifactId>lettuce-core</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

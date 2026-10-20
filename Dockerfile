@@ -11,26 +11,23 @@
 # `server`、漏拷三个模块、proto 源目录未拷 ⇒ `docker build` 必然失败。**镜像构建现已进入
 # CI 的 `docker` job**（.github/workflows/ci.yml），路径腐化会被当场逮住，别再让它悄悄烂掉。
 
-FROM gradle:8.14-jdk21 AS builder
+FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /build
 
-# 先拷贝构建脚本与依赖清单，最大化层缓存
-COPY settings.gradle.kts build.gradle.kts gradle.properties gradlew gradlew.bat ./
-COPY gradle ./gradle
-# includeBuild("build-logic")：各模块的 ragagent.java-conventions 约定插件在这里，漏拷即配置阶段失败
-COPY build-logic ./build-logic
-# proto 源目录是生成代码的唯一来源（:common 的 OTLP、:domains 的 docreader）——漏拷即编译失败
+# 先拷贝全部 pom（含根 pom），最大化层缓存
+COPY pom.xml ./
+COPY contract/pom.xml ./contract/
+COPY platform/pom.xml ./platform/
+COPY model-runtime/pom.xml ./model-runtime/
+COPY retrieval-engine/pom.xml ./retrieval-engine/
+COPY agent-engine/pom.xml ./agent-engine/
+COPY domains/pom.xml ./domains/
+COPY boot/pom.xml ./boot/
+# proto 源目录是生成代码的唯一来源（platform 的 OTLP、domains 的 docreader）——漏拷即编译失败
 COPY otlp-proto ./otlp-proto
 COPY docreader ./docreader
 COPY migrations ./migrations
-# 七个 Gradle 模块：先拷贝各自构建脚本（源码变动不使这一层失效），再拷贝源码
-COPY contract/build.gradle.kts ./contract/
-COPY platform/build.gradle.kts ./platform/
-COPY model-runtime/build.gradle.kts ./model-runtime/
-COPY retrieval-engine/build.gradle.kts ./retrieval-engine/
-COPY agent-engine/build.gradle.kts ./agent-engine/
-COPY domains/build.gradle.kts ./domains/
-COPY boot/build.gradle.kts ./boot/
+# 七个 Maven 模块：每个模块目录同时带上 pom（上面的分层拷贝只为缓存友好）
 COPY contract ./contract
 COPY platform ./platform
 COPY model-runtime ./model-runtime
@@ -39,14 +36,13 @@ COPY agent-engine ./agent-engine
 COPY domains ./domains
 COPY boot ./boot
 
-# 产物名随 Gradle 默认规则（boot-0.0.1-SNAPSHOT.jar），用 glob 排除 -plain.jar；
-# cache mount 让重复构建复用依赖与 wrapper 发行版（BuildKit）。
-# -x test：镜像构建不跑测试（闸门在 CI 的 backend job）。
-# spotless ratchet 自 seed tag 需 .git 上下文，而 .dockerignore 排除了 .git ⇒ 显式关掉
-# （bootJar 不依赖 spotless；格式检查归 spotlessCheck）。
-RUN --mount=type=cache,target=/root/.gradle \
-    ./gradlew :boot:bootJar --no-daemon -x test -x spotlessCheck -x spotlessJava \
-    && cp "$(find boot/build/libs -maxdepth 1 -name '*.jar' ! -name '*-plain.jar' | head -1)" /app.jar \
+# 产物名随 Maven 坐标（boot-0.0.1-SNAPSHOT.jar）；repackage 会留下 .jar.original，不能误取。
+# cache mount 让重复构建复用 ~/.m2（BuildKit）。
+# -DskipTests：镜像构建不跑测试（闸门在 CI 的 backend job）。
+# spotless ratchet 自 seed tag 需 .git 上下文，而 .dockerignore 排除了 .git ⇒ 显式跳过。
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn -B -DskipTests -Dspotless.check.skip=true package \
+    && cp boot/target/boot-0.0.1-SNAPSHOT.jar /app.jar \
     && test -s /app.jar
 
 FROM eclipse-temurin:21-jre

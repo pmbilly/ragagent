@@ -66,7 +66,7 @@ def load_config():
 
 
 def java_files(domain_dir: pathlib.Path):
-    return [p for p in domain_dir.rglob("*.java") if "/build/" not in str(p)]
+    return [p for p in domain_dir.rglob("*.java") if "/build/" not in str(p) and "/target/" not in str(p)]
 
 
 def controllers(domain_dir: pathlib.Path):

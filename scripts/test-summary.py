@@ -51,7 +51,7 @@ def main() -> int:
     found_any = False
     for mod in MODULES:
         t = f = s = 0
-        for p in sorted(glob.glob(f"{mod}/build/test-results/test/TEST-*.xml")):
+        for p in sorted(glob.glob(f"{mod}/target/surefire-reports/TEST-*.xml")):
             found_any = True
             r = ET.parse(p).getroot()
             t += int(r.get("tests") or 0)

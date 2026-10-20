@@ -273,9 +273,7 @@ def cmd_converge(test_filters, rounds=40):
     env.setdefault('JAVA_HOME', '/opt/homebrew/opt/openjdk@21')
     budget = {}
     for rnd in range(rounds):
-        cmd = ['./gradlew', ':boot:test', '--rerun']
-        for f in test_filters:
-            cmd += ['--tests', f]
+        cmd = ['mvn', '-B', '-pl', 'boot', 'test', '-Dtest=' + ','.join(test_filters)]
         run = subprocess.run(cmd, capture_output=True, text=True, env=env)
         if run.returncode != 0 and 'error:' in (run.stdout + run.stderr):
             # 编译失败 ⇒ 没有测试结果 ⇒ 不能当成"全绿" ✗（B199 实测假绿一次 ✓）

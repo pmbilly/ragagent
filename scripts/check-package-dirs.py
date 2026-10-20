@@ -45,7 +45,7 @@ def check() -> list[str]:
     pattern = os.path.join(ROOT, "*/src/*/java/**/*.java")
     for abs_path in sorted(glob.glob(pattern, recursive=True)):
         rel = os.path.relpath(abs_path, ROOT)
-        if "/build/" in rel or rel.startswith("build/"):
+        if "/build/" in rel or rel.startswith("build/") or "/target/" in rel or rel.startswith("target/"):
             continue
         with open(abs_path, encoding="utf-8") as fh:
             text = fh.read()

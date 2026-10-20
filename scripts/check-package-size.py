@@ -24,7 +24,7 @@ def scan() -> Counter:
     counts = Counter(
         p.parent.relative_to(ROOT).as_posix()
         for p in SRC.rglob("*.java")
-        if "/build/" not in str(p)
+        if "/build/" not in str(p) and "/target/" not in str(p)
     )
     return counts
 
