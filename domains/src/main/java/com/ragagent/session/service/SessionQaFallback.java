@@ -120,7 +120,7 @@ final class SessionQaFallback {
         }
         PipelineCommon.appendHistoryMessages(messages, chatManage.getHistory());
         String query = chatManage.getQuery();
-        String rq = chatManage.getRewriteQuery() == null ? "" : chatManage.getRewriteQuery().trim();
+        String rq = chatManage.getQueryPlan().getRewriteQuery() == null ? "" : chatManage.getQueryPlan().getRewriteQuery().trim();
         if (!rq.isEmpty()) {
             query = rq;
         }
@@ -152,7 +152,7 @@ final class SessionQaFallback {
     /** 渲染 fallback prompt。 */
     String renderFallbackPrompt(ChatManage chatManage) {
         String query = chatManage.getQuery();
-        String rq = chatManage.getRewriteQuery() == null ? "" : chatManage.getRewriteQuery().trim();
+        String rq = chatManage.getQueryPlan().getRewriteQuery() == null ? "" : chatManage.getQueryPlan().getRewriteQuery().trim();
         if (!rq.isEmpty()) {
             query = rq;
         }
@@ -161,11 +161,11 @@ final class SessionQaFallback {
                 "query", query,
                 "language", chatManage.getLanguage(),
                 "kb_documents", kbDocuments));
-        if (!chatManage.getImageDescription().isEmpty() && !chatManage.isChatModelSupportsVision()) {
-            result += "\n\n[用户上传图片内容]\n" + chatManage.getImageDescription();
+        if (!chatManage.getQueryPlan().getImageDescription().isEmpty() && !chatManage.isChatModelSupportsVision()) {
+            result += "\n\n[用户上传图片内容]\n" + chatManage.getQueryPlan().getImageDescription();
         }
-        if (!chatManage.getQuotedContext().isEmpty()) {
-            result += "\n\n" + chatManage.getQuotedContext();
+        if (!chatManage.getQueryPlan().getQuotedContext().isEmpty()) {
+            result += "\n\n" + chatManage.getQueryPlan().getQuotedContext();
         }
         return result;
     }

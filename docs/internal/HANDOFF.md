@@ -104,7 +104,7 @@
 | **H1b** | H1b-1 ✅ 去 `controller.sse` 反向依赖；H1b-2 收锁与状态持久化 待做 | H1b-1 ✅ 2026-10-20 |
 | **H2a** | 问答运行时段：抽 `TurnRuntime`（3 字段） | ✅ 2026-10-20 |
 | **H2b** | H2b-1 ✅ 只读视图 + 只读辅助收口；H2b-2 插件签名 + `QaRequestContext` 收口 待做 | H2b-1 ✅ 2026-10-20 |
-| **H2c** | H2c-1 ✅ 答复组、H2c-2 ✅ 重排组、H2c-3 ✅ 合并组；余 2 组（QueryPlan / SearchOutcome）待做 | H2c-3 ✅ 2026-10-20 |
+| **H2c** | H2c-1 ✅ 答复组、H2c-2 ✅ 重排组、H2c-3 ✅ 合并组、H2c-4 ✅ 查询计划；余 1 组（SearchOutcome）待做 | H2c-4 ✅ 2026-10-20 |
 | **H3** | 入库 `IngestJob` 状态机 + `IngestStage` 接口 | 待做 |
 | **H4a** | 任务契约：`TaskQueue`（命名/启停/测试钩子）+ `RetryDelayOverride`；6 套队列接口继承；钩子机制 5→1。H4b 迁实现 | H4a-1 ✅ 2026-10-20 |
 | **H4b** | 任务实现：**datasource ✅ + wiki ✅**（均迁到 `RedisRetryingTaskQueue`）；memory/knowledge 已在基座 | H4b-2 ✅ 2026-10-20 |
@@ -419,6 +419,7 @@ boot           14 件                      →  boot
 | H2c-1 | 2026-10-20 | **答复组抽离**：新增 `session.rag.AnswerState`（userContent / renderedContexts / chatResponse）；`ChatManage` 删 3 字段 + 6 访问器，改为 `getAnswer()`；12 个文件、51 处调用点改链式访问；`cloneChatManage` 只复制 renderedContexts（与原复制面一致）。`gen-pipeline-map.py` 支持状态组链式访问并过滤包装 getter。 | **42 守卫全绿** · **5022 / 0 / 4** · build 2m1s |
 | H2c-2 | 2026-10-20 | **重排组抽离**：新增 `session.rag.RerankOutcome`（results）；`ChatManage` 删 1 字段 + 2 访问器，改为 `getRerank()`；11 个文件、41 处调用点改链式访问；管线表覆盖重排组链式访问。 | **42 守卫全绿** · **5022 / 0 / 4** · build 2m14s |
 | H2c-3 | 2026-10-20 | **合并组抽离**：新增 `session.rag.MergedContext`（results）；`ChatManage` 删 mergeResult 字段 + 2 访问器，改为 `getMerged()`；10 个文件、33 处调用点改链式访问；管线表覆盖合并组链式访问。 | **42 守卫全绿** · **5022 / 0 / 4** · build 2m14s |
+| H2c-4 | 2026-10-20 | **查询计划抽离**：新增 `session.rag.QueryPlan`（rewriteQuery/intent/imageDescription/quotedContext/systemPromptOverride/memoryPrompt）；`ChatManage` 删 6 字段 + 12 访问器，改为 `getQueryPlan()`；24 个文件、138 处调用点改链式访问；克隆时整组复制；`needsRetrieval` 内部读取改走查询计划。 | **42 守卫全绿** · **5022 / 0 / 4** · build 2m14s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

@@ -56,14 +56,14 @@ class QueryUnderstandRecordingTest {
         PluginQueryUnderstand p = new PluginQueryUnderstand(null, null, null, null);
         for (int i = 0; i < PARSE_CORPUS.length; i++) {
             ChatManage cm = new ChatManage();
-            cm.setRewriteQuery("original user query");
-            cm.setIntent(QueryIntent.KB_SEARCH);
+            cm.getQueryPlan().setRewriteQuery("original user query");
+            cm.getQueryPlan().setIntent(QueryIntent.KB_SEARCH);
             p.parseOutput(cm, PARSE_CORPUS[i]);
             Map<String, Object> shape = new LinkedHashMap<>();
             shape.put("input", PARSE_CORPUS[i]);
-            shape.put("rewrite", cm.getRewriteQuery());
-            shape.put("intent", cm.getIntent());
-            shape.put("img_desc", cm.getImageDescription());
+            shape.put("rewrite", cm.getQueryPlan().getRewriteQuery());
+            shape.put("intent", cm.getQueryPlan().getIntent());
+            shape.put("img_desc", cm.getQueryPlan().getImageDescription());
             assertRec("qu_parse", String.format("case%02d", i), json(shape));
         }
     }
@@ -98,11 +98,11 @@ class QueryUnderstandRecordingTest {
         for (Case c : cases) {
             ChatManage cm = new ChatManage();
             cm.setIntentPromptOverrides(c.over());
-            cm.setIntent(c.intent());
+            cm.getQueryPlan().setIntent(c.intent());
             boolean applied = PluginQueryUnderstand.applyIntentPromptOverride(cm, c.global());
             Map<String, Object> shape = new LinkedHashMap<>();
             shape.put("applied", applied);
-            shape.put("override", cm.getSystemPromptOverride());
+            shape.put("override", cm.getQueryPlan().getSystemPromptOverride());
             assertRec("qu_intent", c.key(), json(shape));
         }
     }
@@ -199,7 +199,7 @@ class QueryUnderstandRecordingTest {
         PluginError err1 = qu1.plugin().onEvent(PipelineEventType.QUERY_UNDERSTAND, cm1,
                 () -> { next1[0] = true; return null; });
         Map<String, Object> s1 = new LinkedHashMap<>();
-        s1.put("rewrite", cm1.getRewriteQuery());
+        s1.put("rewrite", cm1.getQueryPlan().getRewriteQuery());
         s1.put("next", next1[0]);
         s1.put("err", errOf(err1));
         s1.put("llm_calls", qu1.chat().calls.size());
@@ -224,8 +224,8 @@ class QueryUnderstandRecordingTest {
         PluginError err2 = qu2.plugin().onEvent(PipelineEventType.QUERY_UNDERSTAND, cm2,
                 () -> { next2[0] = true; return null; });
         Map<String, Object> s2 = new LinkedHashMap<>();
-        s2.put("rewrite", cm2.getRewriteQuery());
-        s2.put("intent", cm2.getIntent());
+        s2.put("rewrite", cm2.getQueryPlan().getRewriteQuery());
+        s2.put("intent", cm2.getQueryPlan().getIntent());
         s2.put("next", next2[0]);
         s2.put("err", errOf(err2));
         s2.put("llm_calls", qu2.chat().calls);
@@ -246,7 +246,7 @@ class QueryUnderstandRecordingTest {
         PluginError err3 = qu3.plugin().onEvent(PipelineEventType.QUERY_UNDERSTAND, cm3,
                 () -> { next3[0] = true; return null; });
         Map<String, Object> s3 = new LinkedHashMap<>();
-        s3.put("rewrite", cm3.getRewriteQuery());
+        s3.put("rewrite", cm3.getQueryPlan().getRewriteQuery());
         s3.put("next", next3[0]);
         s3.put("err", errOf(err3));
         s3.put("llm_calls", qu3.chat().calls.size());
@@ -265,8 +265,8 @@ class QueryUnderstandRecordingTest {
         qu4.plugin().onEvent(PipelineEventType.QUERY_UNDERSTAND, cm4,
                 () -> { next4[0] = true; return null; });
         Map<String, Object> s4 = new LinkedHashMap<>();
-        s4.put("rewrite", cm4.getRewriteQuery());
-        s4.put("intent", cm4.getIntent());
+        s4.put("rewrite", cm4.getQueryPlan().getRewriteQuery());
+        s4.put("intent", cm4.getQueryPlan().getIntent());
         s4.put("next", next4[0]);
         assertRec("qu_on_event", "unparsable_degrade", json(s4));
 
@@ -301,8 +301,8 @@ class QueryUnderstandRecordingTest {
         cm6.setIntentPromptOverrides(ov);
         qu6.plugin().onEvent(PipelineEventType.QUERY_UNDERSTAND, cm6, () -> null);
         Map<String, Object> s6 = new LinkedHashMap<>();
-        s6.put("intent", cm6.getIntent());
-        s6.put("override", cm6.getSystemPromptOverride());
+        s6.put("intent", cm6.getQueryPlan().getIntent());
+        s6.put("override", cm6.getQueryPlan().getSystemPromptOverride());
         assertRec("qu_on_event", "intent_override", json(s6));
 
         // 7) vision 模型路径
@@ -322,9 +322,9 @@ class QueryUnderstandRecordingTest {
         cm7.setVlmModelId("vlm-1");
         qu7.plugin().onEvent(PipelineEventType.QUERY_UNDERSTAND, cm7, () -> null);
         Map<String, Object> s7 = new LinkedHashMap<>();
-        s7.put("rewrite", cm7.getRewriteQuery());
-        s7.put("img_desc", cm7.getImageDescription());
-        s7.put("intent", cm7.getIntent());
+        s7.put("rewrite", cm7.getQueryPlan().getRewriteQuery());
+        s7.put("img_desc", cm7.getQueryPlan().getImageDescription());
+        s7.put("intent", cm7.getQueryPlan().getIntent());
         s7.put("llm_calls", qu7.chat().calls);
         assertRec("qu_on_event", "vision_images", mask(json(s7)));
 
@@ -344,7 +344,7 @@ class QueryUnderstandRecordingTest {
         cm8.setVlmModelId("vlm-1");
         p8.onEvent(PipelineEventType.QUERY_UNDERSTAND, cm8, () -> null);
         Map<String, Object> s8 = new LinkedHashMap<>();
-        s8.put("rewrite", cm8.getRewriteQuery());
+        s8.put("rewrite", cm8.getQueryPlan().getRewriteQuery());
         s8.put("calls", c8.calls.size());
         assertRec("qu_on_event", "vlm_fallback", json(s8));
 
@@ -374,8 +374,8 @@ class QueryUnderstandRecordingTest {
         p9.onEvent(PipelineEventType.QUERY_UNDERSTAND, cm9b, () -> null);
         Map<String, Object> s9 = new LinkedHashMap<>();
         s9.put("model_calls", ms9.calls);
-        s9.put("rewrite_a", cm9.getRewriteQuery());
-        s9.put("rewrite_b", cm9b.getRewriteQuery());
+        s9.put("rewrite_a", cm9.getQueryPlan().getRewriteQuery());
+        s9.put("rewrite_b", cm9b.getQueryPlan().getRewriteQuery());
         assertRec("qu_on_event", "query_understand_model", json(s9));
     }
 
@@ -474,7 +474,7 @@ class QueryUnderstandRecordingTest {
         hist.add(h1);
         hist.add(h2);
         cm.setHistory(hist);
-        cm.setMemoryPrompt("\n\n<memory>MEM</memory>");
+        cm.getQueryPlan().setMemoryPrompt("\n\n<memory>MEM</memory>");
 
         var msgs = PipelineCommon.prepareMessagesWithHistory(cm);
         assertRec("history_messages", "with_memory", mask(json(msgsJSON(msgs))));
@@ -484,7 +484,7 @@ class QueryUnderstandRecordingTest {
         SummaryConfig sc2 = new SummaryConfig();
         sc2.setPrompt("BASE");
         cm2.setSummaryConfig(sc2);
-        cm2.setSystemPromptOverride("OVERRIDE {{query}}");
+        cm2.getQueryPlan().setSystemPromptOverride("OVERRIDE {{query}}");
         var msgs2 = PipelineCommon.prepareMessagesWithHistory(cm2);
         assertRec("history_messages", "override", mask(json(msgsJSON(msgs2))));
 

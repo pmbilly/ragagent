@@ -409,7 +409,7 @@ public final class PluginMerge implements Plugin {
             existingIDs.put(r.getId(), Boolean.TRUE);
         }
 
-        String query = chatManage.getRewriteQuery();
+        String query = chatManage.getQueryPlan().getRewriteQuery();
         if (query.isEmpty()) {
             query = chatManage.getQuery();
         }

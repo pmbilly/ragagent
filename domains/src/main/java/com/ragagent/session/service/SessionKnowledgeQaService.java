@@ -453,7 +453,7 @@ public class SessionKnowledgeQaService {
         chatManage.setKeywordThreshold(rc.keywordThreshold());
         chatManage.setRerankTopK(rc.rerankTopK());
         chatManage.setRerankThreshold(rc.rerankThreshold());
-        chatManage.setRewriteQuery(query);
+        chatManage.getQueryPlan().setRewriteQuery(query);
 
         // Use rerank model from RetrievalConfig if set, otherwise first available
         if (rc.rerankModelId() != null && !rc.rerankModelId().isEmpty()) {

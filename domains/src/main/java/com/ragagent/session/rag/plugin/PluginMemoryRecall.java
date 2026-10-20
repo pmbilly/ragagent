@@ -65,7 +65,7 @@ public final class PluginMemoryRecall implements Plugin {
             return next.next();
         }
 
-        chatManage.setMemoryPrompt(prompt);
+        chatManage.getQueryPlan().setMemoryPrompt(prompt);
         List<MemoryItemView> items = recall.items() == null ? List.of() : recall.items();
         List<PipelineUsedMemoryView> used = MemoryUsedMemories.usedMemoriesFromItems(items);
         chatManage.setUsedMemories(used);

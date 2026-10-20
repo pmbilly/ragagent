@@ -68,7 +68,7 @@ public final class PluginQueryUnderstand implements Plugin {
 
     @Override
     public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
-        chatManage.setRewriteQuery(chatManage.getQuery());
+        chatManage.getQueryPlan().setRewriteQuery(chatManage.getQuery());
 
         boolean hasImages = chatManage.getImages() != null && !chatManage.getImages().isEmpty();
         boolean needRewrite = chatManage.isEnableRewrite();
@@ -144,7 +144,7 @@ public final class PluginQueryUnderstand implements Plugin {
         parseOutput(chatManage, response.getContent());
 
         // 图片描述异步落库（不阻塞本轮结果）
-        if (!chatManage.getImageDescription().isEmpty() && !chatManage.getRuntime().getUserMessageId().isEmpty()) {
+        if (!chatManage.getQueryPlan().getImageDescription().isEmpty() && !chatManage.getRuntime().getUserMessageId().isEmpty()) {
             Thread.ofVirtual().start(() -> updateUserMessageImageCaption(chatManage));
         }
 
@@ -153,17 +153,17 @@ public final class PluginQueryUnderstand implements Plugin {
             if (applyIntentPromptOverride(chatManage, config.getIntentSystemPrompts())) {
                 Map<String, Object> f = new LinkedHashMap<>();
                 f.put("sessionId", chatManage.getSessionId());
-                f.put("intent", chatManage.getIntent());
+                f.put("intent", chatManage.getQueryPlan().getIntent());
                 PipelineLog.info("QueryUnderstand", "prompt_override", f);
             }
         }
 
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("sessionId", chatManage.getSessionId());
-        out.put("rewrite_query", chatManage.getRewriteQuery());
-        out.put("intent", chatManage.getIntent());
-        out.put("has_image_desc", !chatManage.getImageDescription().isEmpty());
-        out.put("has_prompt_override", !chatManage.getSystemPromptOverride().isEmpty());
+        out.put("rewrite_query", chatManage.getQueryPlan().getRewriteQuery());
+        out.put("intent", chatManage.getQueryPlan().getIntent());
+        out.put("has_image_desc", !chatManage.getQueryPlan().getImageDescription().isEmpty());
+        out.put("has_prompt_override", !chatManage.getQueryPlan().getSystemPromptOverride().isEmpty());
         out.put("original_output", response.getContent());
         PipelineLog.info("QueryUnderstand", "output", out);
         return next.next();
@@ -190,7 +190,7 @@ public final class PluginQueryUnderstand implements Plugin {
         }
         // 载荷不可变：换掉首图描述后整体回写（会话侧端口实现负责映射回实体）
         List<PipelineMessageImageView> images = new ArrayList<>(msg.images());
-        images.set(0, images.get(0).withCaption(chatManage.getImageDescription()));
+        images.set(0, images.get(0).withCaption(chatManage.getQueryPlan().getImageDescription()));
         try {
             messageService.updateMessageImages(chatManage.getSessionId(),
                     chatManage.getRuntime().getUserMessageId(), images);
@@ -383,10 +383,10 @@ public final class PluginQueryUnderstand implements Plugin {
         if (output != null) {
             String rewrite = output.rewriteQuery == null ? "" : output.rewriteQuery.trim();
             if (!rewrite.isEmpty()) {
-                chatManage.setRewriteQuery(rewrite);
+                chatManage.getQueryPlan().setRewriteQuery(rewrite);
             }
-            chatManage.setIntent(output.intent);
-            chatManage.setImageDescription(output.imageDescription == null
+            chatManage.getQueryPlan().setIntent(output.intent);
+            chatManage.getQueryPlan().setImageDescription(output.imageDescription == null
                     ? "" : output.imageDescription.trim());
         }
         // 解析失败：保留原查询与意图
@@ -487,22 +487,22 @@ public final class PluginQueryUnderstand implements Plugin {
 
     /** agent 覆写优先，空白回落全局。返回是否应用。 */
     public static boolean applyIntentPromptOverride(ChatManage chatManage, Map<String, String> globalPrompts) {
-        String intentKey = chatManage.getIntent();
+        String intentKey = chatManage.getQueryPlan().getIntent();
         if (chatManage.getIntentPromptOverrides() != null) {
             String raw = chatManage.getIntentPromptOverrides().get(intentKey);
             if (raw != null && !raw.trim().isEmpty()) {
-                chatManage.setSystemPromptOverride(raw);
+                chatManage.getQueryPlan().setSystemPromptOverride(raw);
             }
         }
-        if (chatManage.getSystemPromptOverride().isEmpty()) {
+        if (chatManage.getQueryPlan().getSystemPromptOverride().isEmpty()) {
             if (globalPrompts != null) {
                 String prompt = globalPrompts.get(intentKey);
                 if (prompt != null) {
-                    chatManage.setSystemPromptOverride(prompt);
+                    chatManage.getQueryPlan().setSystemPromptOverride(prompt);
                 }
             }
         }
-        return !chatManage.getSystemPromptOverride().isEmpty();
+        return !chatManage.getQueryPlan().getSystemPromptOverride().isEmpty();
     }
 
     /** 历史格式化为文本块序列。 */

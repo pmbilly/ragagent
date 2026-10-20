@@ -18,18 +18,16 @@ import java.util.Map;
  * <ul>
  *   <li><b>请求段（不可变配置）</b>：query/sessionId/userId/maxRounds、检索参数、重排参数、
  *       模型参数、改写开关、FAQ 策略、多模态/附件、web 检索开关、summaryConfig。</li>
- *   <li><b>状态段（插件间流转）</b>：rewriteQuery/intent/history、searchResult/
- *       graphResult/entity 系列、imageDescription/quotedContext/systemPromptOverride/
- *       memoryPrompt/usedMemories；答复组见 {@link AnswerState}，重排结果见
- *       {@link RerankOutcome}，合并结果见 {@link MergedContext}。</li>
+ *   <li><b>状态段（插件间流转）</b>：history、searchResult/graphResult/entity 系列、
+ *       usedMemories；查询计划见 {@link QueryPlan}，答复组见 {@link AnswerState}，
+ *       重排结果见 {@link RerankOutcome}，合并结果见 {@link MergedContext}。</li>
  *   <li><b>运行时段</b>：见 {@link TurnRuntime}（事件总线 + 消息 id），不在本类字段里。</li>
  * </ul>
  *
  * <h2>{@link #cloneChatManage()} 的复制面</h2>
- * <p>请求段全量复制（SearchTarget 不可变，列表换新）；状态段<b>只复制</b> rewriteQuery/intent/
- * imageDescription/quotedContext/systemPromptOverride/memoryPrompt/usedMemories/renderedContexts/
- * entity/entityKBIDs/entityKnowledge——<b>history、searchResult、合并结果、
- * userContent、chatResponse、重排结果以及运行时段句柄都不复制</b>。</p>
+ * <p>请求段全量复制（SearchTarget 不可变，列表换新）；状态段<b>只复制</b> 查询计划整组/
+ * usedMemories/renderedContexts/entity/entityKBIDs/entityKnowledge——<b>history、
+ * searchResult、合并结果、userContent、chatResponse、重排结果以及运行时段句柄都不复制</b>。</p>
  *
  * <p>本类型不落 jsonb 也不作响应体，不进 JsonContractRoundTripTest。</p>
  */
@@ -92,8 +90,8 @@ public final class ChatManage implements TurnInputView {
 
     // ── 状态段 ──
 
-    private String rewriteQuery = "";
-    private String intent = "";
+    /** 查询计划（改写/意图/图像/引用/提示词覆盖/记忆段落）。 */
+    private final QueryPlan queryPlan = new QueryPlan();
     private List<History> history;
 
     private List<SearchResult> searchResult;
@@ -107,10 +105,7 @@ public final class ChatManage implements TurnInputView {
     private GraphData graphResult;
     /** 答复组（用户消息 / 渲染上下文 / 模型回复）。 */
     private final AnswerState answer = new AnswerState();
-    private String imageDescription = "";
-    private String quotedContext = "";
-    private String systemPromptOverride = "";
-    private String memoryPrompt = "";
+
     private List<PipelineUsedMemoryView> usedMemories;
 
     // ── 运行时段 ──
@@ -214,10 +209,7 @@ public final class ChatManage implements TurnInputView {
 
     // ── 状态段访问器 ──
 
-    public String getRewriteQuery() { return rewriteQuery; }
-    public void setRewriteQuery(String v) { rewriteQuery = v == null ? "" : v; }
-    public String getIntent() { return intent; }
-    public void setIntent(String v) { intent = v == null ? "" : v; }
+    public QueryPlan getQueryPlan() { return queryPlan; }
     public List<History> getHistory() { return history; }
     public void setHistory(List<History> v) { history = v; }
 
@@ -234,14 +226,7 @@ public final class ChatManage implements TurnInputView {
     public GraphData getGraphResult() { return graphResult; }
     public void setGraphResult(GraphData v) { graphResult = v; }
     public AnswerState getAnswer() { return answer; }
-    public String getImageDescription() { return imageDescription; }
-    public void setImageDescription(String v) { imageDescription = v == null ? "" : v; }
-    public String getQuotedContext() { return quotedContext; }
-    public void setQuotedContext(String v) { quotedContext = v == null ? "" : v; }
-    public String getSystemPromptOverride() { return systemPromptOverride; }
-    public void setSystemPromptOverride(String v) { systemPromptOverride = v == null ? "" : v; }
-    public String getMemoryPrompt() { return memoryPrompt; }
-    public void setMemoryPrompt(String v) { memoryPrompt = v == null ? "" : v; }
+
     public List<PipelineUsedMemoryView> getUsedMemories() { return usedMemories; }
     public void setUsedMemories(List<PipelineUsedMemoryView> v) { usedMemories = v; }
 
@@ -256,10 +241,10 @@ public final class ChatManage implements TurnInputView {
      * web_search 意图只有开 web 检索才需要；其余委托给 intent 判定。
      */
     public boolean needsRetrieval() {
-        if (QueryIntent.WEB_SEARCH.equals(intent)) {
+        if (QueryIntent.WEB_SEARCH.equals(queryPlan.getIntent())) {
             return webSearchEnabled;
         }
-        return QueryIntent.needsKbRetrieval(intent);
+        return QueryIntent.needsKbRetrieval(queryPlan.getIntent());
     }
 
     /** 未指定（null）时默认 true。 */
@@ -314,12 +299,12 @@ public final class ChatManage implements TurnInputView {
         c.webFetchTopN = webFetchTopN;
         c.language = language;
         // 状态段只复制复制面列出的字段；history/结果集/userContent 等不复制
-        c.rewriteQuery = rewriteQuery;
-        c.intent = intent;
-        c.imageDescription = imageDescription;
-        c.quotedContext = quotedContext;
-        c.systemPromptOverride = systemPromptOverride;
-        c.memoryPrompt = memoryPrompt;
+        c.queryPlan.setRewriteQuery(queryPlan.getRewriteQuery());
+        c.queryPlan.setIntent(queryPlan.getIntent());
+        c.queryPlan.setImageDescription(queryPlan.getImageDescription());
+        c.queryPlan.setQuotedContext(queryPlan.getQuotedContext());
+        c.queryPlan.setSystemPromptOverride(queryPlan.getSystemPromptOverride());
+        c.queryPlan.setMemoryPrompt(queryPlan.getMemoryPrompt());
         c.usedMemories = usedMemories == null ? null : new ArrayList<>(usedMemories);
         c.answer.setRenderedContexts(answer.getRenderedContexts());
         c.entity = entity == null ? new ArrayList<>() : new ArrayList<>(entity);

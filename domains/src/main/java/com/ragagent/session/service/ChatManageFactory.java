@@ -32,9 +32,9 @@ final class ChatManageFactory {
         cm.setImages(req.imageUrls);
         cm.setAttachments(PipelineViews.ofAttachments(req.attachments));
         cm.setLanguage(SessionKnowledgeQaService.currentLanguage());
-        cm.setRewriteQuery(req.query);
-        cm.setImageDescription(req.imageDescription);
-        cm.setQuotedContext(req.quotedContext);
+        cm.getQueryPlan().setRewriteQuery(req.query);
+        cm.getQueryPlan().setImageDescription(req.imageDescription);
+        cm.getQueryPlan().setQuotedContext(req.quotedContext);
         cm.getRuntime().setEventBus(eventBus);
         cm.getRuntime().setMessageId(req.assistantMessageId);
         cm.getRuntime().setUserMessageId(req.userMessageId);

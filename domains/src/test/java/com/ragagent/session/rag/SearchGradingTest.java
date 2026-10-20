@@ -48,7 +48,7 @@ class SearchGradingTest {
     private static ChatManage chatManageWithKb(String sessionId, String kbId) {
         ChatManage cm = new ChatManage();
         cm.setSessionId(sessionId);
-        cm.setRewriteQuery("向量数据库是什么");
+        cm.getQueryPlan().setRewriteQuery("向量数据库是什么");
         cm.setEmbeddingTopK(5);
         cm.setTenantId(1);
         cm.setSearchTargets(new ArrayList<>(List.of(

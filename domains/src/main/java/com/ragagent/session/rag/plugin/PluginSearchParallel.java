@@ -53,7 +53,7 @@ public final class PluginSearchParallel implements Plugin {
         Map<String, Object> start = new LinkedHashMap<>();
         start.put("sessionId", chatManage.getSessionId());
         start.put("has_entities", chatManage.getEntity() != null && !chatManage.getEntity().isEmpty());
-        start.put("rewrite_query", chatManage.getRewriteQuery());
+        start.put("rewrite_query", chatManage.getQueryPlan().getRewriteQuery());
         PipelineLog.info("SearchParallel", "start", start);
 
         ChatManage chunkCM = chatManage.cloneChatManage();

@@ -73,7 +73,7 @@ class PipelineLifecycleRecordingTest {
         ChatManage cmDA = new ChatManage();
         cmDA.setDataAnalysisEnabled(true);
         ChatManage cmIntent = new ChatManage();
-        cmIntent.setIntent(QueryIntent.GREETING);
+        cmIntent.getQueryPlan().setIntent(QueryIntent.GREETING);
         assertRec("progress", "is_consolidated_flags", json(List.of(
                 PipelineProgress.isConsolidatedRetrievalStage(PipelineEventType.WEB_FETCH, cmWeb),
                 PipelineProgress.isConsolidatedRetrievalStage(PipelineEventType.WEB_FETCH, cm),
@@ -107,7 +107,7 @@ class PipelineLifecycleRecordingTest {
         ChatManage cmE = new ChatManage();
         cmE.setSessionId("sp");
         cmE.setQuery("原始问题");
-        cmE.setRewriteQuery("改写后");
+        cmE.getQueryPlan().setRewriteQuery("改写后");
         cmE.getRuntime().setEventBus(bus);
         cmE.getMerged().setResults(new ArrayList<>(List.of(
                 Rec46cSupport.sr("r1", "", "k", 0d), Rec46cSupport.sr("r2", "", "k", 0d),
@@ -185,7 +185,7 @@ class PipelineLifecycleRecordingTest {
         SummaryConfig sc = new SummaryConfig();
         sc.setContextTemplate("Q: {{query}}\nL: {{language}}\nC: {{contexts}}");
         cm.setSummaryConfig(sc);
-        cm.setIntent(QueryIntent.CHITCHAT);
+        cm.getQueryPlan().setIntent(QueryIntent.CHITCHAT);
         boolean[] next = {false};
         PluginError err = p.onEvent(PipelineEventType.INTO_CHAT_MESSAGE, cm, () -> { next[0] = true; return null; });
         Map<String, Object> s1 = new LinkedHashMap<>();
@@ -201,9 +201,9 @@ class PipelineLifecycleRecordingTest {
         cm2.setChatModelSupportsVision(false);
         cm2.setAttachments(new ArrayList<>(List.of(new PipelineMessageAttachmentView(
                 "a.txt", ".txt", 0, null, "txt 内容", false, 0, 0, 0))));
-        cm2.setIntent(QueryIntent.IMAGE_ONLY);
-        cm2.setImageDescription("一只猫坐在垫子上");
-        cm2.setQuotedContext("被引用的话");
+        cm2.getQueryPlan().setIntent(QueryIntent.IMAGE_ONLY);
+        cm2.getQueryPlan().setImageDescription("一只猫坐在垫子上");
+        cm2.getQueryPlan().setQuotedContext("被引用的话");
         p.onEvent(PipelineEventType.INTO_CHAT_MESSAGE, cm2, () -> null);
         assertRec("into_chat", "image_quoted_attachments", json(Map.of("user_content", cm2.getAnswer().getUserContent())));
 
@@ -262,7 +262,7 @@ class PipelineLifecycleRecordingTest {
         // 5) 非法查询
         ChatManage cm5 = new ChatManage();
         cm5.setQuery("<script>alert(1)</script>");
-        cm5.setIntent(QueryIntent.CHITCHAT);
+        cm5.getQueryPlan().setIntent(QueryIntent.CHITCHAT);
         PluginError err5 = p.onEvent(PipelineEventType.INTO_CHAT_MESSAGE, cm5, () -> null);
         Map<String, Object> s5 = new LinkedHashMap<>();
         s5.put("err", errOf(err5));
@@ -272,8 +272,8 @@ class PipelineLifecycleRecordingTest {
         // 6) 非法改写回落
         ChatManage cm6 = new ChatManage();
         cm6.setQuery("正常查询");
-        cm6.setIntent(QueryIntent.CHITCHAT);
-        cm6.setRewriteQuery("onclick=恶意");
+        cm6.getQueryPlan().setIntent(QueryIntent.CHITCHAT);
+        cm6.getQueryPlan().setRewriteQuery("onclick=恶意");
         p.onEvent(PipelineEventType.INTO_CHAT_MESSAGE, cm6, () -> null);
         assertRec("into_chat", "invalid_rewrite", json(Map.of("user_content", cm6.getAnswer().getUserContent())));
 
@@ -302,7 +302,7 @@ class PipelineLifecycleRecordingTest {
         SummaryConfig sc = new SummaryConfig();
         sc.setPrompt("P {{query}} {{contexts}}");
         cm.setSummaryConfig(sc);
-        cm.setIntent(QueryIntent.KB_SEARCH);
+        cm.getQueryPlan().setIntent(QueryIntent.KB_SEARCH);
         SearchResult c1 = Rec46cSupport.sr("c1", "知识内容一", "k1", 0d);
         c1.setChunkType("text");
         c1.setKnowledgeBaseId("kb1");
@@ -322,7 +322,7 @@ class PipelineLifecycleRecordingTest {
         SummaryConfig sc2 = new SummaryConfig();
         sc2.setPrompt("P");
         cm2.setSummaryConfig(sc2);
-        cm2.setIntent(QueryIntent.KB_SEARCH);
+        cm2.getQueryPlan().setIntent(QueryIntent.KB_SEARCH);
         SearchResult k1 = Rec46cSupport.sr("c1", "知识内容一", "k1", 0d);
         k1.setKnowledgeBaseId("kb1");
         k1.setKnowledgeTitle("标题一");
@@ -349,7 +349,7 @@ class PipelineLifecycleRecordingTest {
         SummaryConfig sc3 = new SummaryConfig();
         sc3.setPrompt("CTX {{contexts}} {{query}}");
         cm3.setSummaryConfig(sc3);
-        cm3.setIntent(QueryIntent.KB_SEARCH);
+        cm3.getQueryPlan().setIntent(QueryIntent.KB_SEARCH);
         cm3.getAnswer().setUserContent("U");
         cm3.getAnswer().setRenderedContexts("<context id=\"1\">原始内容</context>");
         SearchResult k3 = Rec46cSupport.sr("c1", "知识内容", "k1", 0d);
@@ -367,7 +367,7 @@ class PipelineLifecycleRecordingTest {
         sc4.setPrompt("P");
         cm4.setSummaryConfig(sc4);
         cm4.setFaqPriorityEnabled(true);
-        cm4.setIntent(QueryIntent.KB_SEARCH);
+        cm4.getQueryPlan().setIntent(QueryIntent.KB_SEARCH);
         cm4.getAnswer().setUserContent("U");
         SearchResult d1 = Rec46cSupport.sr("d1", "文档", "k1", 0d);
         d1.setChunkType("text");
@@ -412,7 +412,7 @@ class PipelineLifecycleRecordingTest {
         sc.setPresencePenalty(0.2);
         sc.setThinking(true);
         cm.setSummaryConfig(sc);
-        cm.setIntent(QueryIntent.KB_SEARCH);
+        cm.getQueryPlan().setIntent(QueryIntent.KB_SEARCH);
         cm.getAnswer().setUserContent("组装后的用户内容");
         cm.getAnswer().setRenderedContexts("<context id=\"1\">内容</context>");
         History h = new History();
@@ -471,7 +471,7 @@ class PipelineLifecycleRecordingTest {
         sc.setPrompt("SYS {{query}} time={{current_time}}");
         sc.setThinking(true);
         cm.setSummaryConfig(sc);
-        cm.setIntent(QueryIntent.CHITCHAT);
+        cm.getQueryPlan().setIntent(QueryIntent.CHITCHAT);
         cm.getAnswer().setUserContent("流式用户内容");
         History h = new History();
         h.setQuery("旧问");
@@ -502,7 +502,7 @@ class PipelineLifecycleRecordingTest {
         SummaryConfig sc2 = new SummaryConfig();
         sc2.setPrompt("S");
         cm2.setSummaryConfig(sc2);
-        cm2.setIntent(QueryIntent.CHITCHAT);
+        cm2.getQueryPlan().setIntent(QueryIntent.CHITCHAT);
         cm2.getAnswer().setUserContent("U");
         cm2.getRuntime().setEventBus(bus2);
         p2.onEvent(PipelineEventType.CHAT_COMPLETION_STREAM, cm2, () -> null);
@@ -523,7 +523,7 @@ class PipelineLifecycleRecordingTest {
         SummaryConfig sc3 = new SummaryConfig();
         sc3.setPrompt("S");
         cm3.setSummaryConfig(sc3);
-        cm3.setIntent(QueryIntent.CHITCHAT);
+        cm3.getQueryPlan().setIntent(QueryIntent.CHITCHAT);
         cm3.getAnswer().setUserContent("U");
         cm3.getRuntime().setEventBus(bus3);
         p3.onEvent(PipelineEventType.CHAT_COMPLETION_STREAM, cm3, () -> null);
@@ -544,7 +544,7 @@ class PipelineLifecycleRecordingTest {
         SummaryConfig sc4 = new SummaryConfig();
         sc4.setPrompt("S");
         cm4.setSummaryConfig(sc4);
-        cm4.setIntent(QueryIntent.CHITCHAT);
+        cm4.getQueryPlan().setIntent(QueryIntent.CHITCHAT);
         cm4.getAnswer().setUserContent("U");
         cm4.getRuntime().setEventBus(bus4);
         p4.onEvent(PipelineEventType.CHAT_COMPLETION_STREAM, cm4, () -> null);
@@ -561,7 +561,7 @@ class PipelineLifecycleRecordingTest {
         SummaryConfig sc5 = new SummaryConfig();
         sc5.setPrompt("S");
         cm5.setSummaryConfig(sc5);
-        cm5.setIntent(QueryIntent.CHITCHAT);
+        cm5.getQueryPlan().setIntent(QueryIntent.CHITCHAT);
         cm5.getAnswer().setUserContent("U");
         PluginError err5 = p5.onEvent(PipelineEventType.CHAT_COMPLETION_STREAM, cm5, () -> null);
         assertRec("stream", "no_eventbus", json(errOf(err5)));

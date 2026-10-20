@@ -97,7 +97,7 @@ public final class PluginIntoChatMessage implements Plugin {
         // 意图化无检索路径：模板渲染只注 runtime 元数据
         if (!chatManage.needsRetrieval()) {
             String userContent = safeQuery;
-            String rewrite = chatManage.getRewriteQuery().trim();
+            String rewrite = chatManage.getQueryPlan().getRewriteQuery().trim();
             if (!rewrite.isEmpty()) {
                 String safeRewrite = InputSanitizer.validateInput(rewrite);
                 if (safeRewrite != null) {
@@ -108,11 +108,11 @@ public final class PluginIntoChatMessage implements Plugin {
                     PipelineLog.warn("IntoChatMessage", "invalid_rewrite_query_fallback", f);
                 }
             }
-            if (!chatManage.getImageDescription().isEmpty() && !chatManage.isChatModelSupportsVision()) {
-                userContent += "\n\n[用户上传图片内容]\n" + chatManage.getImageDescription();
+            if (!chatManage.getQueryPlan().getImageDescription().isEmpty() && !chatManage.isChatModelSupportsVision()) {
+                userContent += "\n\n[用户上传图片内容]\n" + chatManage.getQueryPlan().getImageDescription();
             }
-            if (!chatManage.getQuotedContext().isEmpty()) {
-                userContent += "\n\n" + chatManage.getQuotedContext();
+            if (!chatManage.getQueryPlan().getQuotedContext().isEmpty()) {
+                userContent += "\n\n" + chatManage.getQueryPlan().getQuotedContext();
             }
             if (chatManage.getAttachments() != null && !chatManage.getAttachments().isEmpty()) {
                 userContent += MessageAttachmentsPrompt.build(chatManage.getAttachments());
@@ -197,11 +197,11 @@ public final class PluginIntoChatMessage implements Plugin {
         String userContent = AgentPromptPlaceholders.renderPromptPlaceholders(
                 chatManage.getSummaryConfig().getContextTemplate(), vals);
 
-        if (!chatManage.getImageDescription().isEmpty() && !chatManage.isChatModelSupportsVision()) {
-            userContent += "\n\n[用户上传图片内容]\n" + chatManage.getImageDescription();
+        if (!chatManage.getQueryPlan().getImageDescription().isEmpty() && !chatManage.isChatModelSupportsVision()) {
+            userContent += "\n\n[用户上传图片内容]\n" + chatManage.getQueryPlan().getImageDescription();
         }
-        if (!chatManage.getQuotedContext().isEmpty()) {
-            userContent += "\n\n" + chatManage.getQuotedContext();
+        if (!chatManage.getQueryPlan().getQuotedContext().isEmpty()) {
+            userContent += "\n\n" + chatManage.getQueryPlan().getQuotedContext();
         }
         if (chatManage.getAttachments() != null && !chatManage.getAttachments().isEmpty()) {
             userContent += MessageAttachmentsPrompt.build(chatManage.getAttachments());
@@ -212,8 +212,8 @@ public final class PluginIntoChatMessage implements Plugin {
         out.put("sessionId", chatManage.getSessionId());
         out.put("user_content_len", chatManage.getAnswer().getUserContent().length());
         out.put("faq_priority", chatManage.isFaqPriorityEnabled());
-        out.put("intent", chatManage.getIntent());
-        out.put("image_description", chatManage.getImageDescription());
+        out.put("intent", chatManage.getQueryPlan().getIntent());
+        out.put("image_description", chatManage.getQueryPlan().getImageDescription());
         out.put("chat_model_supports_vision", chatManage.isChatModelSupportsVision());
         PipelineLog.info("IntoChatMessage", "output", out);
 

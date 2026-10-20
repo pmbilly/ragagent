@@ -103,7 +103,7 @@ class PluginChatCompletionStreamIdentityTest {
         SummaryConfig sc = new SummaryConfig();
         sc.setPrompt("SYS {{query}}");
         cm.setSummaryConfig(sc);
-        cm.setIntent(QueryIntent.CHITCHAT);
+        cm.getQueryPlan().setIntent(QueryIntent.CHITCHAT);
         cm.getAnswer().setUserContent("U");
         cm.getRuntime().setEventBus(bus);
         return cm;

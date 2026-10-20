@@ -128,13 +128,13 @@ class PipelineCoreRecordingTest {
         shape.put("fetch_enabled", clone.isWebFetchEnabled());
         shape.put("fetch_topn", clone.getWebFetchTopN());
         shape.put("language", clone.getLanguage());
-        shape.put("rewrite_query", clone.getRewriteQuery());
-        shape.put("intent", clone.getIntent());
+        shape.put("rewrite_query", clone.getQueryPlan().getRewriteQuery());
+        shape.put("intent", clone.getQueryPlan().getIntent());
         shape.put("history", 0);
-        shape.put("image_desc", clone.getImageDescription());
-        shape.put("quoted", clone.getQuotedContext());
-        shape.put("sys_override", clone.getSystemPromptOverride());
-        shape.put("memory_prompt", clone.getMemoryPrompt());
+        shape.put("image_desc", clone.getQueryPlan().getImageDescription());
+        shape.put("quoted", clone.getQueryPlan().getQuotedContext());
+        shape.put("sys_override", clone.getQueryPlan().getSystemPromptOverride());
+        shape.put("memory_prompt", clone.getQueryPlan().getMemoryPrompt());
         shape.put("used_memories", clone.getUsedMemories().size());
         shape.put("entity", clone.getEntity());
         shape.put("entity_kb", clone.getEntityKbIds());
@@ -229,12 +229,12 @@ class PipelineCoreRecordingTest {
         cm.setWebFetchEnabled(true);
         cm.setWebFetchTopN(2);
         cm.setLanguage("zh");
-        cm.setRewriteQuery("rq");
-        cm.setIntent(QueryIntent.KB_SEARCH);
-        cm.setImageDescription("desc");
-        cm.setQuotedContext("qc");
-        cm.setSystemPromptOverride("spo");
-        cm.setMemoryPrompt("mp");
+        cm.getQueryPlan().setRewriteQuery("rq");
+        cm.getQueryPlan().setIntent(QueryIntent.KB_SEARCH);
+        cm.getQueryPlan().setImageDescription("desc");
+        cm.getQueryPlan().setQuotedContext("qc");
+        cm.getQueryPlan().setSystemPromptOverride("spo");
+        cm.getQueryPlan().setMemoryPrompt("mp");
         cm.setUsedMemories(new ArrayList<>(List.of(
                 new PipelineUsedMemoryView("m1", "fact", "c"))));
         cm.setEntity(new ArrayList<>(List.of("e1")));
@@ -260,7 +260,7 @@ class PipelineCoreRecordingTest {
         for (String[] c : cases) {
             ChatManage m = new ChatManage();
             m.setWebSearchEnabled(Boolean.parseBoolean(c[1]));
-            m.setIntent(c[0]);
+            m.getQueryPlan().setIntent(c[0]);
             Map<String, Object> row = new LinkedHashMap<>();
             row.put("intent", c[0]);
             row.put("web", Boolean.parseBoolean(c[1]));

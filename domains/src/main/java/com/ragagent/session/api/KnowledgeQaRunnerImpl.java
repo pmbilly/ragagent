@@ -53,7 +53,7 @@ public class KnowledgeQaRunnerImpl implements KnowledgeQaRunner {
         cm.setRewritePromptUser(request.rewritePromptUser());
 
         cm.setQuery(request.question());
-        cm.setRewriteQuery(request.question());
+        cm.getQueryPlan().setRewriteQuery(request.question());
         cm.setKnowledgeBaseIds(new ArrayList<>(List.of(request.knowledgeBaseId())));
         cm.setSearchTargets(new ArrayList<>(
                 List.of(SearchTarget.wholeKb(request.knowledgeBaseId(), request.tenantId()))));

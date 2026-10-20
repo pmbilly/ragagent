@@ -67,7 +67,7 @@ public final class PluginRerank implements Plugin {
         in.put("candidate_cnt", chatManage.getSearchResult() == null ? 0 : chatManage.getSearchResult().size());
         in.put("rerank_model", chatManage.getRerankModelId());
         in.put("rerank_thresh", chatManage.getRerankThreshold());
-        in.put("rewrite_query", chatManage.getRewriteQuery());
+        in.put("rewrite_query", chatManage.getQueryPlan().getRewriteQuery());
         PipelineLog.info("Rerank", "input", in);
 
         if (chatManage.getSearchResult() == null || chatManage.getSearchResult().isEmpty()) {
@@ -111,7 +111,7 @@ public final class PluginRerank implements Plugin {
 
         var passagesPreview = RetrievalObsRows.summarizePassagePreviews(candidatesToRerank, passages, 25);
         Map<String, Object> spanInput = new LinkedHashMap<>();
-        spanInput.put("query", chatManage.getRewriteQuery());
+        spanInput.put("query", chatManage.getQueryPlan().getRewriteQuery());
         spanInput.put("candidate_count", candidatesToRerank.size());
         spanInput.put("rerank_model_id", chatManage.getRerankModelId());
         spanInput.put("threshold", chatManage.getRerankThreshold());
@@ -137,7 +137,7 @@ public final class PluginRerank implements Plugin {
             double originalThreshold = chatManage.getRerankThreshold();
             List<RankResult> first;
             try {
-                first = rerank(chatManage, rerankModel, chatManage.getRewriteQuery(), passages, candidatesToRerank);
+                first = rerank(chatManage, rerankModel, chatManage.getQueryPlan().getRewriteQuery(), passages, candidatesToRerank);
             } catch (RuntimeException rerankErr) {
                 // API 失败 → 回退原检索结果
                 Map<String, Object> f = new LinkedHashMap<>();
@@ -172,7 +172,7 @@ public final class PluginRerank implements Plugin {
                 chatManage.setRerankThreshold(degradedThreshold);
                 List<RankResult> second;
                 try {
-                    second = rerank(chatManage, rerankModel, chatManage.getRewriteQuery(), passages, candidatesToRerank);
+                    second = rerank(chatManage, rerankModel, chatManage.getQueryPlan().getRewriteQuery(), passages, candidatesToRerank);
                 } catch (RuntimeException rerankErr) {
                     chatManage.setRerankThreshold(originalThreshold);
                     Map<String, Object> fw = new LinkedHashMap<>();

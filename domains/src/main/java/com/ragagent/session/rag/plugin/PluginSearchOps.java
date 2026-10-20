@@ -46,7 +46,7 @@ final class PluginSearchOps {
             return null;
         }
 
-        String queryText = chatManage.getRewriteQuery().trim();
+        String queryText = chatManage.getQueryPlan().getRewriteQuery().trim();
 
         // 批量取 KB 决定分组；失败全部落空 key 组（HybridSearch 逐 KB 算向量，优雅降级）
         List<String> kbIds = new ArrayList<>(chatManage.getSearchTargets().size());
@@ -336,12 +336,12 @@ final class PluginSearchOps {
 
         SessionTrace.SpanHandle webSpan = SessionTrace.start(
                 "web_search",
-                mapOf("provider_id", providerId, "query", chatManage.getRewriteQuery(),
+                mapOf("provider_id", providerId, "query", chatManage.getQueryPlan().getRewriteQuery(),
                         "max_results", webConfig == null ? 0 : webConfig.getMaxResults()),
                 null);
         List<WebSearchResult> webResults;
         try {
-            webResults = service.webSearchService.search(providerId, webConfig, chatManage.getRewriteQuery());
+            webResults = service.webSearchService.search(providerId, webConfig, chatManage.getQueryPlan().getRewriteQuery());
         } catch (RuntimeException e) {
             webSpan.finish(null, null, e.getMessage());
             Map<String, Object> w = new LinkedHashMap<>();

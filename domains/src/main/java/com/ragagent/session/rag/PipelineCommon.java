@@ -96,8 +96,8 @@ public final class PipelineCommon {
      */
     public static List<ChatMessage> prepareMessagesWithHistory(ChatManage chatManage) {
         String base = chatManage.getSummaryConfig().getPrompt();
-        if (!chatManage.getSystemPromptOverride().isEmpty()) {
-            base = chatManage.getSystemPromptOverride();
+        if (!chatManage.getQueryPlan().getSystemPromptOverride().isEmpty()) {
+            base = chatManage.getQueryPlan().getSystemPromptOverride();
         }
         Map<String, String> vals = new LinkedHashMap<>();
         vals.put("query", chatManage.getQuery());
@@ -105,7 +105,7 @@ public final class PipelineCommon {
         vals.put("contexts", chatManage.getAnswer().getRenderedContexts());
         String systemPrompt = AgentPromptPlaceholdersHolder.render(base, vals);
         systemPrompt += PromptComposer.SOURCES_AND_OUTPUT_SUFFIX;
-        systemPrompt += chatManage.getMemoryPrompt();
+        systemPrompt += chatManage.getQueryPlan().getMemoryPrompt();
 
         List<ChatMessage> chatMessages = new ArrayList<>();
         chatMessages.add(new ChatMessage("system", systemPrompt));

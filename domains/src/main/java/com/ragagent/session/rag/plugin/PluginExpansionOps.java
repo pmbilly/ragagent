@@ -148,7 +148,7 @@ final class PluginExpansionOps {
      * 去疑问词），最多 5 条。
      */
     public List<String> expandQueries(ChatManage chatManage) {
-        String query = chatManage.getRewriteQuery().trim();
+        String query = chatManage.getQueryPlan().getRewriteQuery().trim();
         if (query.isEmpty()) {
             return null;
         }

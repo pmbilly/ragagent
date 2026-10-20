@@ -158,11 +158,11 @@ class RerankRecordingTest {
     private ChatManage rerankCm() {
         ChatManage cm = new ChatManage();
         cm.setSessionId("sr");
-        cm.setRewriteQuery("重排查询");
+        cm.getQueryPlan().setRewriteQuery("重排查询");
         cm.setRerankModelId("rr-1");
         cm.setRerankThreshold(0.3);
         cm.setRerankTopK(3);
-        cm.setIntent(QueryIntent.KB_SEARCH);
+        cm.getQueryPlan().setIntent(QueryIntent.KB_SEARCH);
         cm.setSearchTargets(new ArrayList<>(List.of(
                 new SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
         List<SearchResult> sr = new ArrayList<>(List.of(
@@ -314,7 +314,7 @@ class RerankRecordingTest {
 
         // 10) skips
         ChatManage cm10 = new ChatManage();
-        cm10.setIntent(QueryIntent.GREETING);
+        cm10.getQueryPlan().setIntent(QueryIntent.GREETING);
         boolean[] n10 = {false};
         p.onEvent(PipelineEventType.CHUNK_RERANK, cm10, () -> { n10[0] = true; return null; });
         ChatManage cm11 = rerankCm();
@@ -413,7 +413,7 @@ class RerankRecordingTest {
         Map<String, Object> s1 = new LinkedHashMap<>();
         s1.put("next", next[0]);
         s1.put("err", errOf(err));
-        s1.put("prompt", cm.getMemoryPrompt());
+        s1.put("prompt", cm.getQueryPlan().getMemoryPrompt());
         s1.put("used", Rec46cSupport.usedShape(cm.getUsedMemories()));
         s1.put("events", bus.eventsJson());
         assertRec("memory_recall", "injected", json(s1));
@@ -429,7 +429,7 @@ class RerankRecordingTest {
         p2.onEvent(PipelineEventType.MEMORY_RECALL, cm2, () -> { next2[0] = true; return null; });
         Map<String, Object> s2 = new LinkedHashMap<>();
         s2.put("next", next2[0]);
-        s2.put("prompt", cm2.getMemoryPrompt());
+        s2.put("prompt", cm2.getQueryPlan().getMemoryPrompt());
         s2.put("used", cm2.getUsedMemories() == null ? 0 : cm2.getUsedMemories().size());
         s2.put("events", bus2.all().size());
         assertRec("memory_recall", "empty", json(s2));

@@ -377,7 +377,7 @@ class MergeRecordingTest {
                 histRef("h1dup", "k1", "WeKnora 是一个企业知识库检索系统，支持多种检索方式与重排序能力", 0.9)));
         ChatManage cm = new ChatManage();
         cm.setQuery("知识库检索");
-        cm.setRewriteQuery("企业知识库 检索方式");
+        cm.getQueryPlan().setRewriteQuery("企业知识库 检索方式");
         History h = new History();
         h.setQuery("旧问题");
         h.setAnswer("旧回答");

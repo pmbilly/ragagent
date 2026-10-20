@@ -105,8 +105,8 @@ public final class PipelineProgress {
         String toolCallId = UUID.randomUUID().toString();
         Map<String, Object> args = new LinkedHashMap<>();
         args.put("searchSource", retrievalSearchSource(chatManage));
-        if (!chatManage.getRewriteQuery().isEmpty()) {
-            args.put("query", chatManage.getRewriteQuery());
+        if (!chatManage.getQueryPlan().getRewriteQuery().isEmpty()) {
+            args.put("query", chatManage.getQueryPlan().getRewriteQuery());
         } else if (!chatManage.getQuery().isEmpty()) {
             args.put("query", chatManage.getQuery());
         }

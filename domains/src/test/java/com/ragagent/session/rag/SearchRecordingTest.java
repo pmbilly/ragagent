@@ -64,7 +64,7 @@ class SearchRecordingTest {
         for (int i = 0; i < EXPAND_QUERIES.length; i++) {
             ChatManage cm = new ChatManage();
             cm.setQuery(EXPAND_QUERIES[i]);
-            cm.setRewriteQuery(EXPAND_QUERIES[i]);
+            cm.getQueryPlan().setRewriteQuery(EXPAND_QUERIES[i]);
             List<String> out = p.expandQueries(cm);
             Map<String, Object> shape = new LinkedHashMap<>();
             shape.put("query", EXPAND_QUERIES[i]);
@@ -105,7 +105,7 @@ class SearchRecordingTest {
         kbSvc.hybrid.put("kb-1", hits);
         PluginSearch p2 = new PluginSearch(kbSvc, null, null);
         ChatManage cm = new ChatManage();
-        cm.setRewriteQuery("知识库检索怎么配置");
+        cm.getQueryPlan().setRewriteQuery("知识库检索怎么配置");
         cm.setQuery("知识库检索怎么配置");
         cm.setEmbeddingTopK(2);
         cm.setRerankTopK(2);
@@ -123,7 +123,7 @@ class SearchRecordingTest {
         assertRec("expansion", "run_expansion", json(shape));
 
         ChatManage cm2 = new ChatManage();
-        cm2.setRewriteQuery("  ");
+        cm2.getQueryPlan().setRewriteQuery("  ");
         List<String> emptyOut = p2.expandQueries(cm2);
         Map<String, Object> emptyShape = new LinkedHashMap<>();
         emptyShape.put("out", emptyOut);
@@ -258,7 +258,7 @@ class SearchRecordingTest {
         PluginSearch p2 = mkSearch(kbSvc, null);
         ChatManage cm2 = new ChatManage();
         cm2.setSessionId("s2");
-        cm2.setRewriteQuery("查询语句");
+        cm2.getQueryPlan().setRewriteQuery("查询语句");
         cm2.setEmbeddingTopK(5);
         cm2.setVectorThreshold(0.4);
         cm2.setKeywordThreshold(0.5);
@@ -282,7 +282,7 @@ class SearchRecordingTest {
         PluginSearch p3 = mkSearch(kbLow, null);
         ChatManage cm3 = new ChatManage();
         cm3.setSessionId("s3");
-        cm3.setRewriteQuery("知识库 检索 配置 教程");
+        cm3.getQueryPlan().setRewriteQuery("知识库 检索 配置 教程");
         cm3.setQuery("知识库 检索 配置 教程");
         cm3.setEmbeddingTopK(4);
         cm3.setRerankTopK(2);
@@ -310,7 +310,7 @@ class SearchRecordingTest {
         PluginSearch p4 = mkSearch(kbNone, ws);
         ChatManage cm4 = new ChatManage();
         cm4.setSessionId("s4");
-        cm4.setRewriteQuery("web query");
+        cm4.getQueryPlan().setRewriteQuery("web query");
         cm4.setEmbeddingTopK(5);
         cm4.setSearchTargets(new ArrayList<>());
         cm4.setKnowledgeBaseIds(new ArrayList<>());
@@ -332,7 +332,7 @@ class SearchRecordingTest {
         PluginSearch p5 = mkSearch(kbBad, ws);
         ChatManage cm5 = new ChatManage();
         cm5.setSessionId("s5");
-        cm5.setRewriteQuery("并发检索");
+        cm5.getQueryPlan().setRewriteQuery("并发检索");
         cm5.setEmbeddingTopK(10);
         cm5.setSearchTargets(new ArrayList<>(List.of(
                 new SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
@@ -355,7 +355,7 @@ class SearchRecordingTest {
         PluginSearch p6 = mkSearch(kbDegrade, null);
         ChatManage cm6 = new ChatManage();
         cm6.setSessionId("s6");
-        cm6.setRewriteQuery("树状筛选器 新建入口");
+        cm6.getQueryPlan().setRewriteQuery("树状筛选器 新建入口");
         cm6.setEmbeddingTopK(10);
         cm6.setSearchTargets(new ArrayList<>(List.of(
                 new SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
@@ -376,7 +376,7 @@ class SearchRecordingTest {
         PluginSearch p7 = mkSearch(kbFAQ, null);
         ChatManage cm7 = new ChatManage();
         cm7.setSessionId("s7");
-        cm7.setRewriteQuery("退款规则");
+        cm7.getQueryPlan().setRewriteQuery("退款规则");
         cm7.setEmbeddingTopK(10);
         cm7.setSearchTargets(new ArrayList<>(List.of(
                 new SearchTarget("knowledge_base", "faq-1", 1, null, null, null, false))));
@@ -393,7 +393,7 @@ class SearchRecordingTest {
         PluginSearch p8 = mkSearch(kbWiki, null);
         ChatManage cm8 = new ChatManage();
         cm8.setSessionId("s8");
-        cm8.setRewriteQuery("wiki only");
+        cm8.getQueryPlan().setRewriteQuery("wiki only");
         cm8.setEmbeddingTopK(10);
         cm8.setSearchTargets(new ArrayList<>(List.of(
                 new SearchTarget("knowledge_base", "wiki-1", 1, null, null, null, false))));
@@ -409,7 +409,7 @@ class SearchRecordingTest {
         PluginSearch p9 = mkSearch(kbEmpty, null);
         ChatManage cm9 = new ChatManage();
         cm9.setSessionId("s9");
-        cm9.setRewriteQuery("没有结果的查询");
+        cm9.getQueryPlan().setRewriteQuery("没有结果的查询");
         cm9.setEmbeddingTopK(5);
         cm9.setSearchTargets(new ArrayList<>(List.of(
                 new SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
@@ -432,7 +432,7 @@ class SearchRecordingTest {
         kbSvc.hybrid.put("kb-b", new ArrayList<>(List.of(Rec46cSupport.sr("b-1", "B 文档命中", "kb", 0.6))));
         PluginSearch p = new PluginSearch(kbSvc, null, null);
         ChatManage cm = new ChatManage();
-        cm.setRewriteQuery("共享模型查询");
+        cm.getQueryPlan().setRewriteQuery("共享模型查询");
         cm.setEmbeddingTopK(3);
         cm.setVectorThreshold(0.35);
         cm.setKeywordThreshold(0.45);
@@ -453,7 +453,7 @@ class SearchRecordingTest {
         kbSvc2.hybrid.put("kb-c", new ArrayList<>(List.of(Rec46cSupport.sr("c-1", "C 命中", "kc", 0.55))));
         PluginSearch p2 = new PluginSearch(kbSvc2, null, null);
         ChatManage cm2 = new ChatManage();
-        cm2.setRewriteQuery("指定文档");
+        cm2.getQueryPlan().setRewriteQuery("指定文档");
         cm2.setEmbeddingTopK(2);
         cm2.setSearchTargets(new ArrayList<>(List.of(
                 new SearchTarget("knowledge", "kb-c", 1,
@@ -488,7 +488,7 @@ class SearchRecordingTest {
         PluginSearch p = new PluginSearch(kbSvc, null, null);
         ChatManage cm = new ChatManage();
         cm.setQuery("你好");
-        cm.setRewriteQuery("你好");
+        cm.getQueryPlan().setRewriteQuery("你好");
         cm.setEmbeddingTopK(2);
         cm.setVectorThreshold(0.5);
         cm.setKeywordThreshold(0.6);
@@ -525,7 +525,7 @@ class SearchRecordingTest {
         ChatManage cm = new ChatManage();
         cm.setSessionId("sp1");
         cm.setQuery("实体查询");
-        cm.setRewriteQuery("实体查询");
+        cm.getQueryPlan().setRewriteQuery("实体查询");
         cm.setEmbeddingTopK(5);
         cm.setTenantId(1);
         cm.setSearchTargets(new ArrayList<>(List.of(
@@ -548,7 +548,7 @@ class SearchRecordingTest {
         ChatManage cm2 = new ChatManage();
         cm2.setSessionId("sp2");
         cm2.setQuery("普通");
-        cm2.setRewriteQuery("普通");
+        cm2.getQueryPlan().setRewriteQuery("普通");
         cm2.setEmbeddingTopK(5);
         cm2.setTenantId(1);
         cm2.setSearchTargets(new ArrayList<>(List.of(
@@ -564,7 +564,7 @@ class SearchRecordingTest {
 
         // intent skip
         ChatManage cm3 = new ChatManage();
-        cm3.setIntent(QueryIntent.GREETING);
+        cm3.getQueryPlan().setIntent(QueryIntent.GREETING);
         boolean[] next3 = {false};
         p2.onEvent(PipelineEventType.CHUNK_SEARCH_PARALLEL, cm3, () -> { next3[0] = true; return null; });
         Map<String, Object> s3 = new LinkedHashMap<>();
@@ -582,7 +582,7 @@ class SearchRecordingTest {
         ChatManage cm4 = new ChatManage();
         cm4.setSessionId("sp4");
         cm4.setQuery("空");
-        cm4.setRewriteQuery("空");
+        cm4.getQueryPlan().setRewriteQuery("空");
         cm4.setEmbeddingTopK(5);
         cm4.setTenantId(1);
         cm4.setSearchTargets(new ArrayList<>(List.of(

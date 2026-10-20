@@ -158,7 +158,7 @@ public final class PluginSearch implements Plugin {
     private void logInput(ChatManage chatManage) {
         Map<String, Object> f = new LinkedHashMap<>();
         f.put("sessionId", chatManage.getSessionId());
-        f.put("rewrite_query", chatManage.getRewriteQuery());
+        f.put("rewrite_query", chatManage.getQueryPlan().getRewriteQuery());
         f.put("search_targets", chatManage.getSearchTargets().size());
         f.put("tenantId", chatManage.getTenantId());
         f.put("web_enabled", chatManage.isWebSearchEnabled());
