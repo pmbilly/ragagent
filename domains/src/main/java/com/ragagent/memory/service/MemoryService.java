@@ -9,7 +9,6 @@ import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.memory.MemoryContext;
 import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.domain.MemoryExtractPayload;
 import com.ragagent.memory.domain.MemoryRender;
@@ -17,14 +16,12 @@ import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.scope.MemoryScope;
-import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.dto.MemoryDocAffinity;
 import com.ragagent.memory.dto.MemoryDocView;
 import com.ragagent.memory.dto.MemoryItemResponse;
 import com.ragagent.memory.dto.MemoryTopicView;
 import com.ragagent.memory.repository.MemoryRepository;
 import com.ragagent.memory.support.MemoryConflictException;
-import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -35,8 +32,6 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 
 /**
  * 跨会话长期记忆的写入、召回与记忆管理器。
@@ -76,20 +71,13 @@ public class MemoryService {
     /** 到达改写器的背景上限。 */
     static final int RETRIEVAL_BACKGROUND_RUNE_BUDGET = 240;
 
-    /**
- * 读 {@code tenants.memory_config} 用的映射器。
- *
- * <p>必须容忍未知属性：那一列是历史 jsonb，配置里多一个键就让记忆整体失效
- * 是这里最不该发生的事（第 6 条）。</p>
- */
-    static final ObjectMapper CONFIG_MAPPER = JsonMappers.lenient();
-
     final MemoryRepository repo;
     final TenantConfigLookup tenantService;
     final MemoryVectorService vectorService;
     final MemoryRecallSelector recallSelector;
     final MemoryTopicResolver topicResolver;
     final MemoryModelResolver modelResolver;
+    final MemoryScopeGate scopeGate;
 
     /** 目录管理协作者（构造期装配）。 */
     final MemoryCatalogOps catalogOps;
@@ -107,6 +95,7 @@ public class MemoryService {
                          MemoryTopicResolver topicResolver,
                          MemoryModelResolver modelResolver) {
         this.repo = repo;
+        this.scopeGate = new MemoryScopeGate(repo, tenantService);
         this.catalogOps = new MemoryCatalogOps(this);
         this.insightOps = new MemoryInsightOps(this);
         this.recallOps = new MemoryRecallOps(this);
@@ -303,95 +292,28 @@ public class MemoryService {
      * 会是空串而不是 {@code explicit_only}，只有 {@link #getSettings} 会去补它。</p>
      */
     MemoryConfig workspaceConfig(long tenantId) {
-        JsonNode node;
-        try {
-            node = JsonMappers.toJsonNode(tenantService.memoryConfig(tenantId));
-        } catch (RuntimeException e) {
-            log.warn("memory: load workspace config failed", e);
-            return new MemoryConfig();
-        }
-        if (node == null || node.isNull()) {
-            return new MemoryConfig();
-        }
-        MemoryConfig cfg;
-        try {
-            cfg = CONFIG_MAPPER.treeToValue(node, MemoryConfig.class);
-        } catch (Exception e) {
-            log.warn("memory: unparsable workspace memory config", e);
-            return new MemoryConfig();
-        }
-        if (cfg == null) {
-            return new MemoryConfig();
-        }
-        cfg.normalize();
-        return cfg;
+        return scopeGate.workspaceConfig(tenantId);
     }
 
     /**
      * 解析作用域并检查每一层开关。
      *
-     * <p>第二个分量在"不许用记忆"时恒为 false，读路径把它当"没有记忆"而不是失败。</p>
+     * <p>第三个分量在"不许用记忆"时恒为 false，读路径把它当"没有记忆"而不是失败；
+     * 第四个分量是禁用原因，与判定来自同一次求值（见 {@link MemoryScopeGate}）。</p>
      */
-    record ScopeState(MemoryScope scope, MemoryConfig cfg, boolean ok) {
+    record ScopeState(MemoryScope scope, MemoryConfig cfg, boolean ok, String reason) {
+        ScopeState(MemoryScope scope, MemoryConfig cfg, boolean ok) {
+            this(scope, cfg, ok, "");
+        }
     }
 
     ScopeState enabledScope() {
-        MemoryScope scope;
-        try {
-            scope = MemoryScopes.resolve();
-        } catch (MemoryScopeExceptions.NoScope e) {
-            return new ScopeState(null, null, false);
-        }
-        MemoryConfig cfg = workspaceConfig(scope.tenantId());
-        if (!cfg.memoryEnabled()) {
-            return new ScopeState(scope, cfg, false);
-        }
-        if (!MemoryContext.allowedForAgent()) {
-            return new ScopeState(scope, cfg, false);
-        }
-        MemorySubject subject;
-        try {
-            subject = repo.getSubject(scope);
-        } catch (RuntimeException e) {
-            log.warn("memory: load subject failed", e);
-            return new ScopeState(scope, cfg, false);
-        }
-        // 主体行在第一次写入时创建。它不存在意味着这个人还什么都没存，
-        // 对写路径来说仍然算"启用"。
-        if (subject != null && !subject.isEnabled()) {
-            return new ScopeState(scope, cfg, false);
-        }
-        return new ScopeState(scope, cfg, true);
+        return scopeGate.evaluate();
     }
 
-    /**
-     * 解释这次请求为什么没有记忆。
-     * 只在 {@code enabledScope} 返回 false 时调用。
-     */
+    /** 解释这次请求为什么没有记忆；与 {@link #enabledScope()} 同一次求值。 */
     String scopeDisableReason() {
-        MemoryScope scope;
-        try {
-            scope = MemoryScopes.resolve();
-        } catch (MemoryScopeExceptions.NoScope e) {
-            return "no_principal";
-        }
-        MemoryConfig cfg = workspaceConfig(scope.tenantId());
-        if (!cfg.memoryEnabled()) {
-            return "workspace_disabled";
-        }
-        if (!MemoryContext.allowedForAgent()) {
-            return "agent_disabled";
-        }
-        MemorySubject subject;
-        try {
-            subject = repo.getSubject(scope);
-        } catch (RuntimeException e) {
-            return "subject_load_failed";
-        }
-        if (subject != null && !subject.isEnabled()) {
-            return "user_disabled";
-        }
-        return "unknown";
+        return scopeGate.evaluate().reason();
     }
 
     /**
@@ -683,14 +605,6 @@ public class MemoryService {
             log.warn("memory: rebuild block store failed", e);
         }
     }
-
-    // 记忆管理器（列表 / 主题 / 文档 / CRUD）
-
-    // 检索条件化
-
-    // 按需查找
-
-    // 抽取模型的解析（供抽取/归并/话题三处共用）
 
     /**
      * 解析记忆管线该用哪个模型。

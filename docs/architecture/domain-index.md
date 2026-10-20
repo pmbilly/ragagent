@@ -9,7 +9,7 @@
 
 | 种类 | 域数 | 文件 | 控制器 | 说明 |
 |---|---:|---:|---:|---|
-| **产品能力** | 7 | 809 | 22 | 直接产生用户价值、按产品需求演进的业务能力。 |
+| **产品能力** | 7 | 810 | 22 | 直接产生用户价值、按产品需求演进的业务能力。 |
 | **集成适配** | 6 | 534 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
 | **控制面** | 3 | 156 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
 | **能力配置** | 2 | 55 | 4 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
@@ -23,7 +23,7 @@
 | `knowledge` | 产品能力 | 260 | 8 | 13 | `views/knowledge` |
 | `session` | 产品能力 | 199 | 8 | 3 | `views/chat` |
 | `wiki` | 产品能力 | 164 | 1 | 1 | `views/knowledge/wiki` |
-| `memory` | 产品能力 | 88 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
+| `memory` | 产品能力 | 89 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
 | `agenttools` | 产品能力 | 58 | — | — | `views/chat（工具结果渲染）` |
 | `agentmanagement` | 产品能力 | 27 | 3 | — | `views/agent` |
 | `favorite` | 产品能力 | 13 | 1 | — | `views/agent · views/knowledge（列表置顶/收藏）` |

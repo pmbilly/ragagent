@@ -97,6 +97,7 @@ class MemoryServiceOrchestrationTest {
         void unavailableWithoutAPrincipal() {
             TenantContext.set(TENANT, null, "viewer", false, "", false);
             assertThat(memoryService.memoryAvailable()).isFalse();
+            assertThat(memoryService.scopeDisableReason()).isEqualTo("no_principal");
             // ⚠️ 两条路抛的不是同一个异常：
             //   1) 经过 enabledScope 的写路径 → Disabled（enabledScope 把
             //      MemoryScopes.resolve 的失败吞成了"没开"，所以 handler 给 400 而不是 401）；
@@ -114,6 +115,7 @@ class MemoryServiceOrchestrationTest {
             jdbc.update("UPDATE tenants SET memory_config = ? WHERE id = ?",
                     "{\"enabled\":false}", TENANT);
             assertThat(memoryService.memoryAvailable()).isFalse();
+            assertThat(memoryService.scopeDisableReason()).isEqualTo("workspace_disabled");
             assertThatThrownBy(() -> memoryService.createItem("fact", "x", 3))
                     .isInstanceOf(MemoryScopeExceptions.Disabled.class);
         }
@@ -122,14 +124,17 @@ class MemoryServiceOrchestrationTest {
         void unavailableWhenTheAgentMarkedThisRequestDisabled() {
             MemoryContext.markDisabled();
             assertThat(memoryService.memoryAvailable()).isFalse();
+            assertThat(memoryService.scopeDisableReason()).isEqualTo("agent_disabled");
         }
 
         @Test
         void setEnabledFlipsTheUsersOwnOptOut() {
             memoryService.setEnabled(false);
             assertThat(memoryService.memoryAvailable()).isFalse();
+            assertThat(memoryService.scopeDisableReason()).isEqualTo("user_disabled");
             memoryService.setEnabled(true);
             assertThat(memoryService.memoryAvailable()).isTrue();
+            assertThat(memoryService.scopeDisableReason()).isEmpty();
         }
     }
 
