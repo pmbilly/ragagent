@@ -102,7 +102,7 @@
 | **H0** | 判据先行：端口准入 / 契约形状预算 / 平台依赖面三条守卫 + 业务能力映射一页纸 | ✅ 2026-10-20 |
 | **H1a** | 问答终态单赢家：`TurnLifecycle`（收尾闸门 + SSE/续传两处观察者口径） | ✅ 2026-10-20 |
 | **H1b** | H1b-1 ✅ 去 `controller.sse` 反向依赖；H1b-2 收锁与状态持久化 待做 | H1b-1 ✅ 2026-10-20 |
-| **H2a** | 问答运行时段：抽 `TurnRuntime`（3 字段） | 待做 |
+| **H2a** | 问答运行时段：抽 `TurnRuntime`（3 字段） | ✅ 2026-10-20 |
 | **H2b** | 问答请求段：`TurnInputView`（41 字段只读）+ `QaRequestContext` 收口 | 待做 |
 | **H2c** | 问答状态段：15 字段按 5 组暴露，删 `ChatManage` | 待做 |
 | **H3** | 入库 `IngestJob` 状态机 + `IngestStage` 接口 | 待做 |
@@ -414,6 +414,7 @@ boot           14 件                      →  boot
 | H4b-2 | 2026-10-20 | **wiki 队列迁基座**：`RedisRetryingTaskQueue` 加 `FailurePolicy`（重试延迟 + 终态死信回调）与 `TaskSpec.idempotencyTtlSeconds` 覆盖；`RedisWikiIngestTaskQueue` 从 393 行降到 ~200 行，只留 TaskID 合并、载荷编解码、锁冲突 15s 与 slot 释放；成员 JSON 改为基座 `QueueMember`（在飞旧格式不兼容，pre-release 可接受）。6 个 wiki 队列测试（延迟 / 合并 / 重试 / 死信 / 租约回收）全绿。 | **42 守卫全绿** · **5017 / 0 / 4** · build 3m47s |
 | H1a | 2026-10-20 | **轮次终态单赢家**：新增 `session.service.TurnLifecycle`（STREAMING→FINALIZING→DONE/FAILED，终态不可逆）；`QaTurnExecutor` 的收尾闸门由局部 `boolean[1]` 改为 `finish(DONE)`；SSE 推送与续传两个观察者循环改用 `isTerminalEvent`（COMPLETE 或 ERROR+done）统一口径。新增状态机单测 4 例。**余**：H1b 收 3 把锁与状态持久化。 | **42 守卫全绿** · **5021 / 0 / 4**（domains +4）· build 3m34s |
 | H1b-1 | 2026-10-20 | **编排层去 `controller.sse` 反向依赖**：`StreamEventEmitter` / `StreamResponseBuilder` 移入 `session.service.sse`；新增 `SseFrameSink` 端口，`controller.sse.SseFrameWriter` 实现它（Servlet 直写与头部契约留在 controller）；`QaSseOrchestrator` 不再 import `controller.*`。事件命名守卫名单、包索引同步。 | **42 守卫全绿** · **5021 / 0 / 4** · build 3m12s |
+| H2a | 2026-10-20 | **运行时段抽离**：新增 `session.rag.TurnRuntime`（eventBus / messageId / userMessageId）；`ChatManage` 删 3 字段 + 6 访问器，改为 `getRuntime()`；11 个文件的调用点改为 `getRuntime().getX()`；`cloneChatManage` 不再需要"故意不复制"的说明。 | **42 守卫全绿** · **5021 / 0 / 4** · build 2m19s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

@@ -68,7 +68,7 @@ final class SessionQaFallback {
             return;
         }
         String promptContent = renderFallbackPrompt(chatManage);
-        EventBusInterface eventBus = chatManage.getEventBus();
+        EventBusInterface eventBus = chatManage.getRuntime().getEventBus();
         if (eventBus == null) {
             log.info("EventBus not available for streaming fallback, falling back to fixed response");
             handleFixedFallback(chatManage);
@@ -238,7 +238,7 @@ final class SessionQaFallback {
     void consumeFallbackStream(ChatManage chatManage,
             ChatStream responseChan, Registry modelContext) {
         String fallbackId = EventIds.generateEventID("fallback");
-        EventBusInterface eventBus = chatManage.getEventBus();
+        EventBusInterface eventBus = chatManage.getRuntime().getEventBus();
         StringBuilder finalContent = new StringBuilder();
         boolean streamCompleted = false;
         var decoder = modelContext.streamDecoder();
@@ -301,7 +301,7 @@ final class SessionQaFallback {
 
     /** 发送 knowledge_references 事件。 */
     static void emitKnowledgeReferencesEvent(ChatManage chatManage) {
-        if (chatManage == null || chatManage.getEventBus() == null
+        if (chatManage == null || chatManage.getRuntime().getEventBus() == null
                 || chatManage.getMergeResult() == null || chatManage.getMergeResult().isEmpty()) {
             return;
         }
@@ -312,7 +312,7 @@ final class SessionQaFallback {
         evt.setSessionId(chatManage.getSessionId());
         evt.setData(new AgentReferencesData(chatManage.getMergeResult(), 0));
         try {
-            chatManage.getEventBus().emit(evt);
+            chatManage.getRuntime().getEventBus().emit(evt);
         } catch (RuntimeException e) {
             log.error("Failed to emit references event", e);
         }
@@ -320,7 +320,7 @@ final class SessionQaFallback {
 
     /** 发送 fallback 答案。 */
     void emitFallbackAnswer(ChatManage chatManage, String content) {
-        EventBusInterface eventBus = chatManage.getEventBus();
+        EventBusInterface eventBus = chatManage.getRuntime().getEventBus();
         if (eventBus == null) {
             return;
         }

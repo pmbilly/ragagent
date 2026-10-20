@@ -99,7 +99,7 @@ public final class PipelineProgress {
 
     /** 发单个 pending knowledge_search tool_call。 */
     public static StageProgress beginRetrievalProgress(ChatManage chatManage) {
-        if (chatManage == null || chatManage.getEventBus() == null) {
+        if (chatManage == null || chatManage.getRuntime().getEventBus() == null) {
             return null;
         }
         String toolCallId = UUID.randomUUID().toString();
@@ -110,13 +110,13 @@ public final class PipelineProgress {
         } else if (!chatManage.getQuery().isEmpty()) {
             args.put("query", chatManage.getQuery());
         }
-        emit(chatManage.getEventBus(), toolCallEvent(chatManage.getSessionId(), toolCallId,
+        emit(chatManage.getRuntime().getEventBus(), toolCallEvent(chatManage.getSessionId(), toolCallId,
                 RETRIEVAL_PROGRESS_TOOL, args));
         return new StageProgress(toolCallId, RETRIEVAL_PROGRESS_TOOL);
     }
 
     public static StageProgress beginQueryUnderstandProgress(ChatManage chatManage) {
-        if (chatManage == null || chatManage.getEventBus() == null
+        if (chatManage == null || chatManage.getRuntime().getEventBus() == null
                 || !shouldEmitQueryUnderstandProgress(chatManage)) {
             return null;
         }
@@ -128,14 +128,14 @@ public final class PipelineProgress {
         if (chatManage.getImages() != null && !chatManage.getImages().isEmpty()) {
             args.put("hasImages", true);
         }
-        emit(chatManage.getEventBus(), toolCallEvent(chatManage.getSessionId(), toolCallId,
+        emit(chatManage.getRuntime().getEventBus(), toolCallEvent(chatManage.getSessionId(), toolCallId,
                 QUERY_UNDERSTAND_PROGRESS_TOOL, args));
         return new StageProgress(toolCallId, QUERY_UNDERSTAND_PROGRESS_TOOL);
     }
 
     public static void endQueryUnderstandProgress(ChatManage chatManage, StageProgress progress,
                                                   long startMillis, PluginError stageErr) {
-        if (progress == null || chatManage == null || chatManage.getEventBus() == null) {
+        if (progress == null || chatManage == null || chatManage.getRuntime().getEventBus() == null) {
             return;
         }
         boolean success = stageErr == null;
@@ -151,13 +151,13 @@ public final class PipelineProgress {
         data.setError(errMsg);
         data.setSuccess(success);
         data.setDurationMs(durationMs);
-        emit(chatManage.getEventBus(), toolResultEvent(chatManage.getSessionId(), data));
+        emit(chatManage.getRuntime().getEventBus(), toolResultEvent(chatManage.getSessionId(), data));
     }
 
     /** 命中分档文案 + searchSource + ErrSearchNothing 候选语义。 */
     public static void endRetrievalProgress(ChatManage chatManage, StageProgress progress,
                                             long startMillis, PluginError stageErr) {
-        if (progress == null || chatManage == null || chatManage.getEventBus() == null) {
+        if (progress == null || chatManage == null || chatManage.getRuntime().getEventBus() == null) {
             return;
         }
 
@@ -215,7 +215,7 @@ public final class PipelineProgress {
         data.setSuccess(success);
         data.setDurationMs(durationMs);
         data.setData(structured);
-        emit(chatManage.getEventBus(), toolResultEvent(chatManage.getSessionId(), data));
+        emit(chatManage.getRuntime().getEventBus(), toolResultEvent(chatManage.getSessionId(), data));
     }
 
     // ── 内部 ──

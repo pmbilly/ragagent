@@ -132,7 +132,7 @@ class PluginChatCompletionStreamTerminalTest {
         cm.setSummaryConfig(sc);
         cm.setIntent(QueryIntent.CHITCHAT);
         cm.setUserContent("U");
-        cm.setEventBus(bus);
+        cm.getRuntime().setEventBus(bus);
         return cm;
     }
 

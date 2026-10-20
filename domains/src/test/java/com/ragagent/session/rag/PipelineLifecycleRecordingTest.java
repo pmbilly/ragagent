@@ -108,7 +108,7 @@ class PipelineLifecycleRecordingTest {
         cmE.setSessionId("sp");
         cmE.setQuery("原始问题");
         cmE.setRewriteQuery("改写后");
-        cmE.setEventBus(bus);
+        cmE.getRuntime().setEventBus(bus);
         cmE.setMergeResult(new ArrayList<>(List.of(
                 Rec46cSupport.sr("r1", "", "k", 0d), Rec46cSupport.sr("r2", "", "k", 0d),
                 Rec46cSupport.sr("r3", "", "k", 0d))));
@@ -121,7 +121,7 @@ class PipelineLifecycleRecordingTest {
         ChatManage cmE2 = new ChatManage();
         cmE2.setSessionId("sp2");
         cmE2.setQuery("q");
-        cmE2.setEventBus(bus2);
+        cmE2.getRuntime().setEventBus(bus2);
         cmE2.setSearchResult(new ArrayList<>(List.of(
                 Rec46cSupport.sr("c1", "", "k", 0d), Rec46cSupport.sr("c2", "", "k", 0d))));
         PipelineProgress.StageProgress prog2 = PipelineProgress.beginRetrievalProgress(cmE2);
@@ -134,7 +134,7 @@ class PipelineLifecycleRecordingTest {
         cmE3.setSessionId("sp3");
         cmE3.setQuery("");
         cmE3.setWebSearchEnabled(true);
-        cmE3.setEventBus(bus3);
+        cmE3.getRuntime().setEventBus(bus3);
         PipelineProgress.StageProgress prog3 = PipelineProgress.beginRetrievalProgress(cmE3);
         PipelineProgress.endRetrievalProgress(cmE3, prog3, 0,
                 PluginError.SEARCH.withError(new RuntimeException("检索失败原因")));
@@ -146,7 +146,7 @@ class PipelineLifecycleRecordingTest {
         cmE4.setSessionId("sp4");
         cmE4.setQuery("理解这个问题");
         cmE4.setEnableRewrite(true);
-        cmE4.setEventBus(bus4);
+        cmE4.getRuntime().setEventBus(bus4);
         PipelineProgress.StageProgress prog4 = PipelineProgress.beginQueryUnderstandProgress(cmE4);
         PipelineProgress.endQueryUnderstandProgress(cmE4, prog4, 0, null);
         assertRec("progress", "qu_events", bus4.eventsJson());
@@ -155,7 +155,7 @@ class PipelineLifecycleRecordingTest {
         Rec46cSupport.RecBus bus5 = new Rec46cSupport.RecBus();
         ChatManage cmE5 = new ChatManage();
         cmE5.setSessionId("sp5");
-        cmE5.setEventBus(bus5);
+        cmE5.getRuntime().setEventBus(bus5);
         SearchResult w1 = Rec46cSupport.sr("w1", "", "k", 0d);
         w1.setChunkType("web_search");
         SearchResult d1 = Rec46cSupport.sr("d1", "", "k", 0d);
@@ -477,7 +477,7 @@ class PipelineLifecycleRecordingTest {
         h.setQuery("旧问");
         h.setAnswer("旧答");
         cm.setHistory(new ArrayList<>(List.of(h)));
-        cm.setEventBus(bus);
+        cm.getRuntime().setEventBus(bus);
         boolean[] next = {false};
         PluginError err = p.onEvent(PipelineEventType.CHAT_COMPLETION_STREAM, cm, () -> { next[0] = true; return null; });
         Thread.sleep(200);
@@ -504,7 +504,7 @@ class PipelineLifecycleRecordingTest {
         cm2.setSummaryConfig(sc2);
         cm2.setIntent(QueryIntent.CHITCHAT);
         cm2.setUserContent("U");
-        cm2.setEventBus(bus2);
+        cm2.getRuntime().setEventBus(bus2);
         p2.onEvent(PipelineEventType.CHAT_COMPLETION_STREAM, cm2, () -> null);
         Thread.sleep(200);
         assertRec("stream", "duplicate_done", bus2.eventsJson());
@@ -525,7 +525,7 @@ class PipelineLifecycleRecordingTest {
         cm3.setSummaryConfig(sc3);
         cm3.setIntent(QueryIntent.CHITCHAT);
         cm3.setUserContent("U");
-        cm3.setEventBus(bus3);
+        cm3.getRuntime().setEventBus(bus3);
         p3.onEvent(PipelineEventType.CHAT_COMPLETION_STREAM, cm3, () -> null);
         Thread.sleep(200);
         assertRec("stream", "error_chunk", bus3.eventsJson());
@@ -546,7 +546,7 @@ class PipelineLifecycleRecordingTest {
         cm4.setSummaryConfig(sc4);
         cm4.setIntent(QueryIntent.CHITCHAT);
         cm4.setUserContent("U");
-        cm4.setEventBus(bus4);
+        cm4.getRuntime().setEventBus(bus4);
         p4.onEvent(PipelineEventType.CHAT_COMPLETION_STREAM, cm4, () -> null);
         Thread.sleep(200);
         assertRec("stream", "handle_flush", bus4.eventsJson());

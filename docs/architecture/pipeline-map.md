@@ -15,7 +15,7 @@
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginMemoryRecall | `eventBus`、`query`、`sessionId`、`usedMemories` | `memoryPrompt`、`usedMemories` |
+| PluginMemoryRecall | `query`、`runtime`、`sessionId`、`usedMemories` | `memoryPrompt`、`usedMemories` |
 
 ### `QUERY_UNDERSTAND`
 
@@ -86,7 +86,7 @@
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginChatCompletionStream | `chatModelId`、`eventBus`、`history`、`sessionId`、`userContent` | — |
+| PluginChatCompletionStream | `chatModelId`、`history`、`runtime`、`sessionId`、`userContent` | — |
 
 ### `FILTER_TOP_K`
 

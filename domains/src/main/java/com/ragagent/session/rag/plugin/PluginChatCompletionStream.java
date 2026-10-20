@@ -90,13 +90,13 @@ public final class PluginChatCompletionStream implements Plugin {
         PipelineLog.info("Stream", "user_message", um);
 
         // 事件流必需 EventBus
-        if (chatManage.getEventBus() == null) {
+        if (chatManage.getRuntime().getEventBus() == null) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("sessionId", chatManage.getSessionId());
             PipelineLog.error("Stream", "eventbus_missing", f);
             return PluginError.MODEL_CALL.withError(new RuntimeException("EventBus is required for streaming"));
         }
-        EventBusInterface eventBus = chatManage.getEventBus();
+        EventBusInterface eventBus = chatManage.getRuntime().getEventBus();
 
         Map<String, Object> er = new LinkedHashMap<>();
         er.put("sessionId", chatManage.getSessionId());

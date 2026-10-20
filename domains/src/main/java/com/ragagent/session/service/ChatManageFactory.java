@@ -35,9 +35,9 @@ final class ChatManageFactory {
         cm.setRewriteQuery(req.query);
         cm.setImageDescription(req.imageDescription);
         cm.setQuotedContext(req.quotedContext);
-        cm.setEventBus(eventBus);
-        cm.setMessageId(req.assistantMessageId);
-        cm.setUserMessageId(req.userMessageId);
+        cm.getRuntime().setEventBus(eventBus);
+        cm.getRuntime().setMessageId(req.assistantMessageId);
+        cm.getRuntime().setUserMessageId(req.userMessageId);
         return cm;
     }
 

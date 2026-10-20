@@ -144,7 +144,7 @@ public final class PluginQueryUnderstand implements Plugin {
         parseOutput(chatManage, response.getContent());
 
         // 图片描述异步落库（不阻塞本轮结果）
-        if (!chatManage.getImageDescription().isEmpty() && !chatManage.getUserMessageId().isEmpty()) {
+        if (!chatManage.getImageDescription().isEmpty() && !chatManage.getRuntime().getUserMessageId().isEmpty()) {
             Thread.ofVirtual().start(() -> updateUserMessageImageCaption(chatManage));
         }
 
@@ -173,11 +173,11 @@ public final class PluginQueryUnderstand implements Plugin {
     private void updateUserMessageImageCaption(ChatManage chatManage) {
         PipelineMessageView msg;
         try {
-            msg = messageService.getMessage(chatManage.getSessionId(), chatManage.getUserMessageId());
+            msg = messageService.getMessage(chatManage.getSessionId(), chatManage.getRuntime().getUserMessageId());
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("sessionId", chatManage.getSessionId());
-            f.put("userMessageId", chatManage.getUserMessageId());
+            f.put("userMessageId", chatManage.getRuntime().getUserMessageId());
             f.put("error", e.getMessage());
             PipelineLog.warn("QueryUnderstand", "get_user_message", f);
             return;
@@ -193,11 +193,11 @@ public final class PluginQueryUnderstand implements Plugin {
         images.set(0, images.get(0).withCaption(chatManage.getImageDescription()));
         try {
             messageService.updateMessageImages(chatManage.getSessionId(),
-                    chatManage.getUserMessageId(), images);
+                    chatManage.getRuntime().getUserMessageId(), images);
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("sessionId", chatManage.getSessionId());
-            f.put("userMessageId", chatManage.getUserMessageId());
+            f.put("userMessageId", chatManage.getRuntime().getUserMessageId());
             f.put("error", e.getMessage());
             PipelineLog.warn("QueryUnderstand", "update_image_caption", f);
         }

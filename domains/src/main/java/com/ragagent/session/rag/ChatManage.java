@@ -1,6 +1,5 @@
 package com.ragagent.session.rag;
 
-import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.graph.GraphData;
 import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.retrieval.SearchResult;
@@ -23,7 +22,7 @@ import java.util.Map;
  *   <li><b>状态段（插件间流转）</b>：rewriteQuery/intent/history、searchResult/rerankResult/
  *       mergeResult/graphResult/entity 系列/userContent/renderedContexts/chatResponse、
  *       imageDescription/quotedContext/systemPromptOverride/memoryPrompt/usedMemories。</li>
- *   <li><b>运行时段</b>：eventBus/messageId/userMessageID。</li>
+ *   <li><b>运行时段</b>：见 {@link TurnRuntime}（事件总线 + 消息 id），不在本类字段里。</li>
  * </ul>
  *
  * <h2>{@link #cloneChatManage()} 的复制面</h2>
@@ -115,9 +114,8 @@ public final class ChatManage {
 
     // ── 运行时段 ──
 
-    private EventBusInterface eventBus;
-    private String messageId = "";
-    private String userMessageId = "";
+    /** 运行时段（事件总线 + 消息 id）；逐执行句柄，不参与 cloneChatManage。 */
+    private final TurnRuntime runtime = new TurnRuntime();
 
     // ── 请求段访问器 ──
 
@@ -255,12 +253,7 @@ public final class ChatManage {
 
     // ── 运行时段访问器 ──
 
-    public EventBusInterface getEventBus() { return eventBus; }
-    public void setEventBus(EventBusInterface v) { eventBus = v; }
-    public String getMessageId() { return messageId; }
-    public void setMessageId(String v) { messageId = v == null ? "" : v; }
-    public String getUserMessageId() { return userMessageId; }
-    public void setUserMessageId(String v) { userMessageId = v == null ? "" : v; }
+    public TurnRuntime getRuntime() { return runtime; }
 
     // ── 行为 ──
 
@@ -281,8 +274,7 @@ public final class ChatManage {
     }
 
     /**
-     * 复制面见类注释。运行时段字段
-     * （eventBus 等）是逐执行句柄，<b>不复制</b>。
+     * 复制面见类注释。运行时段在 {@link TurnRuntime}，逐执行句柄，<b>不复制</b>。
      */
     public ChatManage cloneChatManage() {
         ChatManage c = new ChatManage();

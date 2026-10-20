@@ -407,7 +407,7 @@ class RerankRecordingTest {
         ChatManage cm = new ChatManage();
         cm.setSessionId("sm1");
         cm.setQuery("如何调优检索");
-        cm.setEventBus(bus);
+        cm.getRuntime().setEventBus(bus);
         boolean[] next = {false};
         PluginError err = p.onEvent(PipelineEventType.MEMORY_RECALL, cm, () -> { next[0] = true; return null; });
         Map<String, Object> s1 = new LinkedHashMap<>();
@@ -424,7 +424,7 @@ class RerankRecordingTest {
         ChatManage cm2 = new ChatManage();
         cm2.setSessionId("sm2");
         cm2.setQuery("q");
-        cm2.setEventBus(bus2);
+        cm2.getRuntime().setEventBus(bus2);
         boolean[] next2 = {false};
         p2.onEvent(PipelineEventType.MEMORY_RECALL, cm2, () -> { next2[0] = true; return null; });
         Map<String, Object> s2 = new LinkedHashMap<>();

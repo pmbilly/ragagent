@@ -223,10 +223,10 @@ public final class PluginIntoChatMessage implements Plugin {
 
     /** UserContent ≠ Query 时异步回写用户消息。 */
     private void persistRenderedContent(ChatManage chatManage) {
-        if (chatManage.getUserMessageId().isEmpty() || chatManage.getUserContent().isEmpty()) {
+        if (chatManage.getRuntime().getUserMessageId().isEmpty() || chatManage.getUserContent().isEmpty()) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("sessionId", chatManage.getSessionId());
-            f.put("userMessageId", chatManage.getUserMessageId());
+            f.put("userMessageId", chatManage.getRuntime().getUserMessageId());
             f.put("has_user_content", !chatManage.getUserContent().isEmpty());
             f.put("reason", "empty_id_or_content");
             PipelineLog.info("IntoChatMessage", "persist_rendered_content_skip", f);
@@ -237,18 +237,18 @@ public final class PluginIntoChatMessage implements Plugin {
         }
         Map<String, Object> f = new LinkedHashMap<>();
         f.put("sessionId", chatManage.getSessionId());
-        f.put("userMessageId", chatManage.getUserMessageId());
+        f.put("userMessageId", chatManage.getRuntime().getUserMessageId());
         f.put("rendered_content_len", chatManage.getUserContent().length());
         PipelineLog.info("IntoChatMessage", "persist_rendered_content", f);
         final ChatManage cm = chatManage;
         Thread.ofVirtual().start(() -> {
             try {
                 messageService.updateMessageRenderedContent(cm.getSessionId(),
-                        cm.getUserMessageId(), cm.getUserContent());
+                        cm.getRuntime().getUserMessageId(), cm.getUserContent());
             } catch (RuntimeException e) {
                 Map<String, Object> w = new LinkedHashMap<>();
                 w.put("sessionId", cm.getSessionId());
-                w.put("userMessageId", cm.getUserMessageId());
+                w.put("userMessageId", cm.getRuntime().getUserMessageId());
                 w.put("error", e.getMessage());
                 PipelineLog.warn("IntoChatMessage", "persist_rendered_content_error", w);
             }

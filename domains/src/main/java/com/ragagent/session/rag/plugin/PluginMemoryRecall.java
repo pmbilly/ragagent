@@ -69,7 +69,7 @@ public final class PluginMemoryRecall implements Plugin {
         List<MemoryItemView> items = recall.items() == null ? List.of() : recall.items();
         List<PipelineUsedMemoryView> used = MemoryUsedMemories.usedMemoriesFromItems(items);
         chatManage.setUsedMemories(used);
-        emitMemoryRecalled(chatManage.getEventBus(), chatManage.getSessionId(), used);
+        emitMemoryRecalled(chatManage.getRuntime().getEventBus(), chatManage.getSessionId(), used);
 
         List<String> memoryIDs = new ArrayList<>();
         for (MemoryItemView item : items) {
