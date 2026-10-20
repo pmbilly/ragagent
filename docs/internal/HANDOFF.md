@@ -159,8 +159,8 @@
 | **M3a** | `platform.security.Hashes`：SHA-256 19 处替换（contract 1 处登记为例外） | ✅ 2026-10-20 |
 | **M3b** | `platform.audit.ActivityAuditRecorder`：合并 3 份 `recordKbActivity` | ✅ 2026-10-20 |
 | **M3c** | `LogSanitizer` 替换 4 份 `sanitizeForLog`；`trimUnicodeWhitespace` 入 `platform.text` | ✅ 2026-10-20 |
-| **M4a** | `UserService.register` 改 `@Transactional` + 失败注入测试；删外层手写补偿 | 待启动 |
-| **M4b** | 事务边界约定（`mechanisms.md`）+ mcp/storage/session/im/datasource 多写审计 | 待启动 |
+| **M4a** | `UserService.register` 改 `@Transactional` + 失败注入测试；删外层手写补偿 | ✅ 2026-10-20 |
+| **M4b** | 事务边界约定（`mechanisms.md`）+ mcp/storage/session/im/datasource 多写审计 | ✅ 2026-10-20 |
 | **M5** | Memory：`MemoryScopeGate` 单次求值 + 写管线/模型解析提取 + 孤儿注释；保留门面委托 | 待启动 |
 | **M6a** | FaqEntryCommandService：projector / duplicate checker / batch updater；4 处尾块归一 | 待启动 |
 | **M6b** | UserService：`LoginTenantResolver` + `UserRegistrationService`；保留 `generateTokensFor(Object)` | 待启动 |
@@ -495,6 +495,8 @@ boot           14 件                      →  boot
 | M3a | 2026-10-20 | **SHA-256 收敛**：新增 `platform.security.Hashes`（sha256/hex/hexPrefix/sha256Hex[Prefix]/sha256Base64Url）；替换 19 处手工实现，contract 的 `FaqChunkMetadata` 保留为纯 JDK 例外；`PromptFingerprints` 分段 NUL 拼接改为 `\0` 转义（替换时误写真实 NUL，已修）。**实测修正报告**：报告称 18 处，实为 20 个文件 | SHA-256 `MessageDigest` 实现 **20 → 2** · Hashes NIST 向量 4 测试 · 45 守卫绿 · build 1m58s / **5038 / 0 / 4** |
 | M3c | 2026-10-20 | **日志消毒/trim 单源化**：删 4 份 `sanitizeForLog`（UserService / McpMetadataService / ModelDebugController / PipelineLog），统一 `platform.security.LogSanitizer`；新增 `platform.text.UnicodeText.trim`，收纳 auth 与 RSS 的 Unicode 空白副本；`AuthController` 不再反向依赖 `UserService` 静态工具 | `sanitizeForLog` 4 → 0 · 45 守卫绿 · build 2m9s / **5034 / 0 / 4** |
 | M3b | 2026-10-20 | **KB 活动审计共享记录器**：新增 `platform.audit.ActivityAuditRecorder`（租户兜底/操作者提取/details 字母序/best-effort；任务上下文按 outcome 映射 processingStatus）；FaqEntryCommandService / KnowledgeTagService / DataSourceSupport 三份 `recordKbActivity` 的实现收敛为薄委托；删除三处各自维护的 JSON/审计样板与无用 imports | 新增 4 例记录器测试（排序/suppressed/任务字段/租户兜底）· 45 守卫绿 · build 2m22s / **5042 / 0 / 4** |
+| M4a | 2026-10-20 | **register 声明式事务**：`UserService.register` 加 `@Transactional(rollbackFor = Exception.class)`，删除\"先删用户再删租户\"的外层手写补偿（保留错误文案逐字符不变）；`AuthRegisterRollbackTest` 用 `@MockitoBean TenantMemberService` 注入成员行失败，断言 tenant/user 零残留。**红绿探针**：先删补偿、不加事务 → 测试红（行残留）；加注解 → 绿。`CreateTenant` 内层默认存储后端补偿未动（管理员创建路径仍共用） | 新增 1 例回滚测试 · 45 守卫绿 · build 2m10s / **5043 / 0 / 4** |
+| M4b | 2026-10-20 | **事务边界约定**：`mechanisms.md` §5 改写为\"整轮问答不开事务、多表写才开\"，补 `register` 事务、best-effort 清理（会话删除/数据源逐条落库）与自调用失效三条规则；审计 mcp/storage 建单条写、session 清理 best-effort，未发现需补事务的明确缺口 | 文档同步 · 45 守卫绿 |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

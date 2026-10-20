@@ -58,19 +58,24 @@
 
 **去哪改**：先确认是"单实例定时"还是"多实例协作"；后者看 `*RedisWiring` 与 `Scheduler`。
 
-## 5. session 域 0 事务，知识/Wiki 仓储层有事务
+## 5. 事务边界：整轮问答不开事务，多表写才开
 
-**现象**：`domains/.../session` 没有 `@Transactional`；knowledge/wiki 的仓储层有；另有少量 `TransactionTemplate`（`StorageBackendService`、`VectorStoreConfigService`）。
+**现象**：`domains/.../session` 没有 `@Transactional`；knowledge/wiki 的仓储层有；`auth` 只有 `UserService.register` 一处（租户→用户→Owner 成员行）；另有少量 `TransactionTemplate`（`StorageBackendService`、`VectorStoreConfigService`）。
 
 **原因**：一轮问答横跨 LLM 流式输出（数秒到数分钟）、外部调用与 SSE。把整轮包进一个事务会长时间持锁，且外部副作用无法回滚。因此：
 
 - 单条消息的落库/状态推进各自成事务；
 - 失败路径由 `QaTurnFinalizer` 手工补偿（提交/回滚/后续轮次交接）；
-- 需要原子性的多表写才用 `TransactionTemplate`。
+- 需要原子性的多表写才用 `TransactionTemplate`；
+- 清理类动作（会话删除、数据源同步的逐条落库）刻意 **best-effort**：单条失败只记日志/留待重试，不因一条失败回滚整批。
 
-**规则**：不要给 `QaTurnExecutor` / `SessionKnowledgeQaService` 加一个大 `@Transactional`；它会把流式期间的所有读也卷进同一个连接。
+**规则**：
 
-**去哪改**：`QaTurnFinalizer`、各域 repository、`StorageBackendService`。
+1. 不要给 `QaTurnExecutor` / `SessionKnowledgeQaService` 加一个大 `@Transactional`；它会把流式期间的所有读也卷进同一个连接。
+2. 多表一致性用 `@Transactional(rollbackFor = Exception.class)`；best-effort 清理不要加（失败语义会从"尽力"变成"整批回滚"）。
+3. 同类自调用（`this.method()`）上 `@Transactional` 不生效；需要时用独立 bean（参照 `MemoryTxTemplate`）。
+
+**去哪改**：`UserService.register`、`QaTurnFinalizer`、各域 repository、`StorageBackendService`。
 
 ## 6. 身份不随虚拟线程传播
 

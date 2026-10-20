@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 用户 service。
@@ -428,8 +429,9 @@ public class UserService implements UserNameLookup {
 
     /**
      * 创建顺序：租户（含默认存储后端）→ 用户 → Owner 成员行；
-     * 任一步失败按既定顺序回滚（先删用户、再删租户），错误消息逐字符保持既有文案。
+     * 任一步失败由事务整体回滚，错误消息逐字符保持既有文案。
      */
+    @Transactional(rollbackFor = Exception.class)
     public User register(String username, String email, String password, String provisioning) {
         if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
             throw new RegistrationException("username, email and password are required");
@@ -489,32 +491,15 @@ public class UserService implements UserNameLookup {
             }
         } catch (RuntimeException e) {
             log.error("Failed to create user", e);
-            if (createdTenant != null) {
-                try {
-                    tenantService.deleteTenant(createdTenant.getId());
-                } catch (RuntimeException rollbackErr) {
-                    log.error("Failed to roll back tenant {} after user creation failure", createdTenant.getId(), rollbackErr);
-                }
-            }
             throw new RegistrationException("failed to create user");
         }
 
-        // Owner 成员行引导：失败则删用户+删租户并报错
+        // Owner 成员行引导：失败由事务整体回滚（见类级 register 的 @Transactional）
         if (createdTenant != null) {
             try {
                 memberService.addMember(user.getId(), createdTenant.getId(), TenantRole.OWNER.value(), null);
             } catch (RuntimeException e) {
                 log.error("Failed to create owner membership for user {} tenant {}", user.getId(), createdTenant.getId(), e);
-                try {
-                    userRepo.deleteById(user.getId());
-                } catch (RuntimeException ignored) {
-                    // 尽力回滚，失败忽略
-                }
-                try {
-                    tenantService.deleteTenant(createdTenant.getId());
-                } catch (RuntimeException ignored) {
-                    // 同上
-                }
                 throw new RegistrationException("failed to finalise workspace ownership");
             }
         }
