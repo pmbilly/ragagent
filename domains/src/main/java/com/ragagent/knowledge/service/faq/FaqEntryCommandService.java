@@ -53,8 +53,6 @@ public class FaqEntryCommandService {
     private final KnowledgeRepository knowledgeRepository;
     private final KnowledgeTagRepository tagRepository;
     private final FaqImportTaskStore taskStore;
-    private final VectorIndexStore vectorStore;
-    private final KnowledgeVectorWrites vectorWrites;
     private final ActivityAuditRecorder activityAudit;
     private final FaqGuard faqGuard;
     private final FaqChunkCodec faqChunkCodec;
@@ -79,8 +77,6 @@ public class FaqEntryCommandService {
         this.knowledgeRepository = knowledgeRepository;
         this.tagRepository = tagRepository;
         this.taskStore = taskStore;
-        this.vectorStore = vectorStore;
-        this.vectorWrites = vectorWrites;
         this.activityAudit = new ActivityAuditRecorder(auditWriter);
         this.faqGuard = faqGuard;
         this.faqChunkCodec = faqChunkCodec;

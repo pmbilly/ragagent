@@ -41,7 +41,6 @@ public class StorageFileResolver {
 
     private static final Logger log = LoggerFactory.getLogger(StorageFileResolver.class);
 
-    private final StorageBackendRepository backendRepo;
     private final ResourceCatalogService catalog;
     private final StorageBackendLocator backendResolver;
     private final StorageEnvProvisioner envProvisioner;
@@ -49,7 +48,6 @@ public class StorageFileResolver {
     @Autowired
     public StorageFileResolver(StorageBackendRepository backendRepo, ResourceCatalogService catalog,
             List<StorageProviderEnv.ProviderEnvFamily> providerEnvs) {
-        this.backendRepo = backendRepo;
         this.catalog = catalog;
         Map<String, StorageProviderEnv.ProviderEnvFamily> envs = new LinkedHashMap<>();
         if (providerEnvs != null) {
@@ -279,10 +277,6 @@ public class StorageFileResolver {
             JsonMappers.lenient();
     private static String textOrNull(JsonNode n) {
         return n == null || n.isNull() ? null : n.asString();
-    }
-
-    private static String textOr(JsonNode n, String def) {
-        return n == null || n.isNull() ? def : n.asString();
     }
 
     /**
