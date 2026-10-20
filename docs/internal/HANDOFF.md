@@ -171,7 +171,7 @@
 | **M6d** | McpCatalog：`McpJsonCodec` / `McpToolNaming`；保留提示词常量与 DTO 巢居 | ✅ 2026-10-20 |
 | **M6e-1** | KnowledgeService：类 javadoc 重写 + 悬空 javadoc/多余空行清理（注释腐烂） | ✅ 2026-10-20 |
 | **M6e-2** | KnowledgeService：`KnowledgeTagBatchService`（标签批量与 N+1 写） | ✅ 2026-10-20 |
-| **M7** | 卫生：Service/Ops/Support 判据、api/ 包说明；响应信封登记待拍板 | 待启动 |
+| **M7** | 卫生：Service/Ops/Support 判据、api/ 包说明；响应信封登记待拍板 | ✅ 2026-10-20 |
 
 **不排期**：M8 响应信封统一（线格式变更，需产品/前端会签）。
 
@@ -512,6 +512,7 @@ boot           14 件                      →  boot
 | M6d | 2026-10-20 | **MCP 编解码/命名拆分**：`McpJsonCodec`（插入序 struct、enum 注入、调用解码、discovery failure、cursor base64）、`McpToolNaming`（ref 哈希、注册名、描述截断、摘要）；call site 全量改指新类，McpCatalog 只留提示词常量、DTO 巢居与目录状态机，723 → 543 行 | 45 守卫绿 · MCP 域/boot 契约测试绿 · build 2m8s / **5046 / 0 / 4** |
 | M6e-1 | 2026-10-20 | **KnowledgeService 注释卫生**：类 javadoc 重写为当前门面/协作者/状态机；删除 3 处悬空 javadoc（duplicate mapper、同包开放、共享批量取的乱码说明），收敛多余空行；共享批量取注释改为“当前与 getKnowledgeBatch 同实现”。无逻辑变更 | 45 守卫绿 · 知识库核心契约测试绿 · build 2m9s / **5046 / 0 / 4** |
 | M6e-2 | 2026-10-20 | **标签批量抽类**：`KnowledgeTagBatchService` 承载授权范围推导、一次标签读取、逐条删旧插新与 @Transactional；门面只留委托，不再叠事务。KnowledgeService 624 行；标签批量契约（KnowledgeOperations）绿 | 45 守卫绿 · 知识库契约测试绿 · build 2m17s / **5046 / 0 / 4** |
+| M7 | 2026-10-20 | **命名与文档收口**：`overview.md` 增协作者命名判据（Service/Ops/Support/Adapter/Resolver 等，禁止 Default*Service/Manager/Helper）、`api/` = contract 端口实现说明、响应信封双轨登记（M8 待会签）；Memory/Knowledge 注释腐烂已在 M5a/M6e-1 清理 | 文档守卫绿 · 无代码变更 |
 | H5b-fix | 2026-10-20 | **软删守卫档位纠偏**：H5b 的「存量 0 违规」是假绿——测试 `application.yml` 覆盖了主配置且未写该键，落回 `@Value` 默认 `alert`。把 `MybatisPlusConfig` 默认改 `enforce`（与主配置一致）后红出 13 条语句并逐条定性：补谓词 9 处（FaqChunk 5 / ChunkRepository / KnowledgeRepository / MessageRepository / UserRepository）、登记 6 条确需读已删行（selectImPlatform、KB/Knowledge/Chunk/Model 的 selectById、TenantMapper.selectById）、`knowledge_tags` 移出注册表（列存在但硬删，从不写）；另登记租户守卫的过期附件回收面。 | 全量 **test 绿**（boot 1349 例含新增红态面）· 待 spotlessCheck build |
 | EMB-1 | 2026-10-20 | **嵌入建议开关联动**：渠道「推荐问题」定为总闸（开场 + 追问都受它控制）；公开配置新增 `agentStarterQuestionsEnabled` / `agentFollowUpQuestionsEnabled`（读智能体 `questionSuggestions` 的两个 enabled）；widget 侧开场与追问分别按「总闸 && 分闸」门控——智能体关闭追问时不再每轮发 ensure/get（此前白跑并留下 suppressed 行）；渠道开关文案 5 语言同步为总闸口径。 | 契约金片 `emb-pub-config` 24→26 键已签字 · 前端 type-check / 753 / i18n 11 全绿 · **45 守卫绿** · **5046 / 0 / 4** · build 2m13s · 真机：公开配置两开关正确，widget 加载只发 1 次 starters、追问请求 0、控制台 0 报错 |
 | EMB-1b | 2026-10-20 | **懒创建空白态不再拉历史**：新建对话把 sessionId 清空后，消息区高度变化触发的滚动事件仍会走分页加载 ⇒ `GET /messages//load` 404。`useEmbedChatSession.getmsgList` 增加空 sessionId 早退（唯一收口）。 | 红态探针（撤守卫复现 1 条空会话请求 + 2 条控制台 404，恢复后 0/0）· 前端 type-check / 753 / build 绿 · 纯前端，未跑后端闸门 |

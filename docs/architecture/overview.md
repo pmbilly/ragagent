@@ -59,6 +59,23 @@ graph TD
 | 管线阶段与插件 | `domains/.../session/service/rag/`，装配在 `QaWiring` |
 | 跨模块 Bean / 端口实现 | `boot/src/main/java/com/ragagent/config/`；域内装配点见下方「装配点」 |
 | 跨模块公开类型 | `contract/src/main/java/com/ragagent/contract/` |
+| 域对外的端口实现 | `<域>/api/`：实现 `contract` 端口（Adapter），供其他域或装配层依赖；不要反向依赖 controller |
+
+## 协作者命名（M7 判据）
+
+| 后缀 | 判据 | 形态 |
+|---|---|---|
+| `*Service` | 有状态、依赖协作的用例编排；可能开事务 | Spring bean |
+| `*Ops` | 同一门面的运行面/通道面切片，必须由门面构造并共享其状态 | 包级类，不单独成 bean（避免循环依赖） |
+| `*Support` | 无状态或轻量协作器，不持有运行时状态、不依赖 Spring 代理 | 包级类/静态方法 |
+| `*Adapter` | 实现 `contract` 端口，放在 `<域>/api/` | Spring bean |
+| `*Resolver` / `*Locator` / `*Codec` / `*Projector` | 单一职责的技术协作者（解析/查找/编解码/投影） | 包级类，不起门面 |
+
+不新增 `Default*Service`、`*Manager`、`*Helper` 这类无判据命名；已有类不强制改名（改名单独评估调用面）。
+
+## 响应信封（待会签）
+
+新接口统一用 `platform.web.ApiResponse`；`DataSourceController` / `EmbedChannelController` 的 `{"error": ...}` 是既有线格式，前端与金片依赖，**不夹在代码质量批里统一**，待产品/前端会签后单独立项（M8）。
 
 ## 装配点（`@Configuration`）
 
