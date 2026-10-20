@@ -40,6 +40,7 @@ run '路径/包对应（B263㉖：源码目录必须与 package 声明一致，�
 run '域间只经契约（R10/A③：跨域只经 contract 或装配层，棘轮只许减）' python3 scripts/check-domain-contracts.py
 run '契约层纯度（C1/C2/C3：contract 只允许纯 JDK；导入根 · 构建依赖 · 框架形状）' python3 scripts/check-contract-purity.py
 run '模块图（R6：主码矩阵 · 主码无同包 · 测试边登记 · 测试无错位 · 夹具不占别模块包）' python3 scripts/check-module-graph.py
+run '装配点清单（W1~W4：@Configuration 必须登记；分类/理由/overview 三处一致）' python3 scripts/check-wiring-points.py
 run 'platform 业务形状（C8：业务词包/业务词文件/红旗命名三档；只许减不许增）' python3 scripts/check-platform-shapes.py
 run '契约形状预算（R1/R2：端口 ≤7 方法 / 行视图禁入 / 字段 ≤20）' python3 scripts/check-contract-shape.py
 run '端口准入（R1：域内端口 / 无实现端口必须为 0）' python3 scripts/check-port-budget.py

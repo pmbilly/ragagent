@@ -1,0 +1,93 @@
+{
+  "note": "装配点清单（W1~W4）：每个 @Configuration 类必须在此登记。分类只有三种——composition-root（:boot 组合根，跨模块 Bean 的唯一集中地）、domain-internal（domains 域内装配：装配的是本域实现或本域数据，上移会把域内类型拉进组合根）、module-internal（能力模块自己的基建装配）。新增/删除装配类必须同时改本文件与 docs/architecture/overview.md「装配点」一节，否则 check-wiring-points.py 报红。",
+  "points": {
+    "com.ragagent.config.EnvLookupWiring": {
+      "kind": "composition-root",
+      "why": "向量库 env 族的查找面：把 System::getenv 收敛到 Spring Environment，测试可覆盖"
+    },
+    "com.ragagent.config.ImAdapterWiringConfig": {
+      "kind": "composition-root",
+      "why": "9 个 IM 渠道适配器工厂逐行注册进编排器（跨模块能力装配）"
+    },
+    "com.ragagent.config.ModelConcurrencyGovernorWiring": {
+      "kind": "composition-root",
+      "why": "模型并发闸门：limit 取 DB→env→缺省，后端在进程内/共享实现间选择"
+    },
+    "com.ragagent.config.ModelRuntimeBeansWiring": {
+      "kind": "composition-root",
+      "why": "模型运行时两个进程级 bean（跨模块组装权归组合根）"
+    },
+    "com.ragagent.config.MybatisPlusConfig": {
+      "kind": "composition-root",
+      "why": "持久层插件链：分页 + 全表写防护 + 租户过滤探测 + 软删过滤探测"
+    },
+    "com.ragagent.config.RetrievalEngineWiringConfig": {
+      "kind": "composition-root",
+      "why": "检索引擎注册表与环境店注册（RETRIEVE_DRIVER 按段注册进程级引擎）"
+    },
+    "com.ragagent.config.RuntimeSnapshotWiring": {
+      "kind": "composition-root",
+      "why": "启动期只读快照：语言默认值、上传限额、AES 密钥、SSRF 白名单等静态读取面"
+    },
+    "com.ragagent.config.WebConfig": {
+      "kind": "composition-root",
+      "why": "Web 壳：Jackson/CORS/请求 ID 过滤器与拦截器链（API Key 闸门、信封、RBAC、追踪）"
+    },
+    "com.ragagent.datasource.config.DataSourceWiring": {
+      "kind": "domain-internal",
+      "why": "数据源连接器注册（ConnectorRegistry）：连接器实现全在本域"
+    },
+    "com.ragagent.datasource.task.DataSourceTaskQueueWiring": {
+      "kind": "domain-internal",
+      "why": "本域任务队列的 Memory/Redis 实现选择"
+    },
+    "com.ragagent.embedchannel.EmbedWiring": {
+      "kind": "domain-internal",
+      "why": "嵌入渠道运行时装配：消费会话域端口，装配的是本域入口流程"
+    },
+    "com.ragagent.knowledge.task.KnowledgeRedisWiring": {
+      "kind": "domain-internal",
+      "why": "知识域进度/索引队列与锁的 Redis 实现选择"
+    },
+    "com.ragagent.mcp.McpWiring": {
+      "kind": "domain-internal",
+      "why": "MCP 服务与工具发现装配：客户端与协议实现在本域"
+    },
+    "com.ragagent.mcp.oauth.wiring.McpOAuthWiring": {
+      "kind": "domain-internal",
+      "why": "MCP OAuth 授权链装配：授权流程与存储在本域"
+    },
+    "com.ragagent.memory.runtime.MemoryTaskQueueWiring": {
+      "kind": "domain-internal",
+      "why": "记忆抽取队列的实现选择"
+    },
+    "com.ragagent.session.assembly.QaWiring": {
+      "kind": "domain-internal",
+      "why": "chat 管线装配：17 个插件类与管线端口适配器都是本域内部类型，上移会把域内实现拉进组合根"
+    },
+    "com.ragagent.storage.fileserve.StorageUrlWiringConfig": {
+      "kind": "domain-internal",
+      "why": "存储 URL 签名策略装配：策略与 provider 面都在本域"
+    },
+    "com.ragagent.wiki.WikiRedisWiring": {
+      "kind": "domain-internal",
+      "why": "wiki 队列与分布式锁的 Redis 实现选择"
+    },
+    "com.ragagent.platform.http.LlmTransportWiring": {
+      "kind": "module-internal",
+      "why": "把可运行时调谐的 SsrfGuard 单例交给 LLM 传输层（避免各建实例）"
+    },
+    "com.ragagent.platform.stream.StreamManagerConfig": {
+      "kind": "module-internal",
+      "why": "SSE 流管理器 Memory/Redis 实现选择；选 Redis 时启动即 Ping"
+    },
+    "com.ragagent.platform.tracing.decorators.LangfuseWiring": {
+      "kind": "module-internal",
+      "why": "langfuse 追踪装饰器装配：未配置即 no-op，配置无效拒启"
+    },
+    "com.ragagent.retrieval.graph.Neo4jGraphConfig": {
+      "kind": "module-internal",
+      "why": "图仓储装配：NEO4J_ENABLE 门控，未启用时退化为 no-op"
+    }
+  }
+}

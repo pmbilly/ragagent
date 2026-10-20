@@ -125,7 +125,7 @@
 | 批 | 内容 | 状态 |
 |---|---|---|
 | **K0** | 文档口径：README/overview/构建注释计数对齐 + `check-doc-truth.py` 扩 D2（业务控制器+探针）/D4（金片双口径）/D5（provider 注册数） | ✅ 2026-10-20 |
-| **K4** | 装配点登记（10 个域内 wiring + 组件扫描面）+ 清单守卫 | 待做 |
+| **K4** | 装配点登记：22 个 `@Configuration` 三档（组合根 8 / 域内 10 / 模块内 4）+ `check-wiring-points.py`（W1~W4）+ agent-engine 组件扫描面登记 | ✅ 2026-10-20 |
 | **K1** | `EngineFactory` 两表合表 + `FileServiceFactory` 死集合清理 | 待做 |
 | **K2** | 跨域实体清零（复用 `AgentLookup.AgentView`）+ 新判据基线 8→0 | 待做 |
 | **K3** | `ModelProviderCatalog` 由 `ProviderRegistry` 生成 | 待做 |
@@ -442,6 +442,7 @@ boot           14 件                      →  boot
 | H3-3 | 2026-10-20 | **收尾核验（两项不做）**：① `KnowledgeTaskExecutor` 被 8 处消费（FAQ 导入 / 移动 / 标签索引 / KB 克隆 / 摘要刷新 / housekeeping），是域级后台执行器，不是入库专用壳；删除会把这些服务重新散回 `Thread.ofVirtual()`，与 G4 的线程收口相反。② 5 个 stage 的通用接口需要 `IngestContext` 承载全部中间产物，等于把 `IngestJob` + worker 局部变量再造一遍；现有 stage 已有类型化签名与 span 跟踪，接口化无行为收益。 | **42 守卫全绿** · **5025 / 0 / 4** · 无代码变更 |
 | H6-1 | 2026-10-20 | **知识目录端口拆窄**：`KnowledgeCatalogPort` 38 方法拆 7 个窄端口（KnowledgeEntryRead / ChunkFaqRead / KnowledgeBaseRead / KnowledgeBaseWrite / KnowledgeIngestLookup / KnowledgeContentWrite / KnowledgeDelete），复合接口空体继承保持兼容；适配器与 20+ 消费方零改动。`gen-port-map.py` 识别"复合面（随复合端口）"，端口准入不再把窄面当域内/无实现；契约形状基线移除 KnowledgeCatalogPort（34→0）。 | **42 守卫全绿** · **5025 / 0 / 4** · build 2m34s |
 | K0 | 2026-10-20 | **文档计数对齐 + 守卫扩面**：README 27→26（3 处）、overview 23→24 与 27→26、"全部模块合计 51 个 HTTP 控制器"→"51 个业务控制器（另有 1 个 `/health` 探针）"、金片口径写实（1,349 JSON + 5 非 JSON 样本）；`contract/build.gradle.kts` 金片/ContractTest 数按实测、"零依赖"改"生产依赖块为空"；`domains/build.gradle.kts` 删"约 18 处"改指守卫。`check-doc-truth.py` 扩 D2（业务控制器 + 探针）/D4（金片双口径）/D5（provider 注册数），三条红态探针均验证。**核实评估报告**："1,433 份金片"不实、控制器属措辞、19 个 `@Configuration` 实为 10 真装配 + 7 properties；结论落 `docs/internal/plans/architecture-remediation-k-series.md` | **42 守卫全绿** · spotlessCheck 绿 · compileJava/compileTestJava 绿（无 Java 改动，未跑全量测试） |
+| K4 | 2026-10-20 | **装配点清单**：新增 `scripts/wiring-points.baseline.json`（22 个 `@Configuration` 按组合根 8 / 域内 10 / 模块内 4 登记，每条带理由）与 `check-wiring-points.py`（W1 扫描集==清单集 / W2 分类与落点一致 / W3 理由非空 / W4 overview 文档同步）；`overview.md` 增「装配点」一节，并修正设计原则 2 与「跨模块 Bean」行的表述（agent-engine 组件扫描面登记为已知机制）；守卫接入 run-guards 第 43 条。**红态探针四条**：临时装配类（短形式 + FQN 两种写法）、陈旧登记、分类错位、文档缺项，均红并复原。首轮探针暴露 FQN 写法漏检，已补判据 | **43 守卫全绿** · spotlessCheck 绿（无 Java 改动） |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

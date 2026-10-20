@@ -2,7 +2,7 @@
 
 - 出处：`docs/architecture-review/01-architecture-assessment.md`（本地草稿，已被 `.gitignore` 排除，故结论落本文）
 - 定位：**不动七模块拓扑、不拆 domains、不加新模块**；只收"扩展注册面 / 装配点可见性 / 跨域实体 / 文档计数"四件结构性摩擦
-- 与 H 系列关系：正交，可并行；每批独立全绿，闸门同 H（42 守卫 + 全量测试 + spotlessCheck）
+- 与 H 系列关系：正交，可并行；每批独立全绿，闸门同 H（43 守卫 + 全量测试 + spotlessCheck）
 
 ## 1. 报告核实结论
 
@@ -32,12 +32,12 @@
 | 批 | 内容 | 验收 | 状态 |
 |---|---|---|---|
 | **K0** 文档口径 | README/overview/构建注释五处计数对齐；`check-doc-truth.py` 扩 D2（业务控制器 + 探针）/D4（金片双口径）/D5（provider 注册数），三条各配红态探针 | 守卫绿；红态探针三条均红并复原 | ✅ 2026-10-20 |
-| **K4** 装配点登记 | `overview.md` 增"装配点清单"（10 个域内 wiring 逐个登记 + 为何留在域内）；登记"agent-engine 经根包组件扫描装配"；新增守卫：`@Configuration` 类名 ⊆ 清单 | 新增 wiring 未登记即红（红态探针） | 待做 |
+| **K4** 装配点登记 | `overview.md` 增"装配点清单"（22 个装配类按组合根/域内/模块内三档登记）；登记"agent-engine 经根包组件扫描装配"；新增 `check-wiring-points.py`（W1 集合相等 / W2 分类落点 / W3 理由 / W4 文档同步） | 四条判据红态探针均验证 | ✅ 2026-10-20 |
 | **K1** 引擎注册合表 | `EngineFactory` 两张 switch 合成一张（type → 构造 + 地址策略），错误文案逐字保留；`FileServiceFactory` 删 `IMPLEMENTED`/`PENDING` 死集合；可选：与 `VectorStoreConfigService` 两张表共享契约侧元数据（纯 JDK） | 金片零变化；`unsupported engine type` / `no SSRF address policy` 文案逐字回归 | 待做 |
 | **K2** 实体渗漏清零 | `AgentView` 补 `tenantId`；8 文件改持视图；`ResolvedAgent` 删恒 false 的 `sharedAgentReadOnly`；`check-domain-contracts.py` 增"跨域 import 落在 `.domain.` 即红"，基线 8 → 0 | agent 相关金片零变化；基线收紧到 0 | 待做 |
 | **K3** LLM 目录单源化 | `ModelProviderCatalog.ENTRIES` 由 `ProviderRegistry.list()` 生成；`ProviderCatalogParityTest` 降级为"同源"断言；`validateConfig` 登记已知缺口 | `contracts/model-providers.json` 金片字节一致（顺序敏感） | 待做 |
 
-**顺序**：K0 ✅ → K4 → K1 → K2 → K3（K2 独立，可与 K1 互换）。
+**顺序**：K0 ✅ → K4 ✅ → K1 → K2 → K3（K2 独立，可与 K1 互换）。
 
 ## 4. 不做
 
