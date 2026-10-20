@@ -11,9 +11,9 @@ import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.ImageInfoCollector;
 import com.ragagent.session.rag.support.MatchTypes;
 import com.ragagent.session.rag.support.SearchSupport;
@@ -52,7 +52,7 @@ public final class PluginSearchEntity implements Plugin {
     }
 
     @Override
-    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, PipelineState chatManage, Plugin.Chain next) {
         List<String> entity = chatManage.getEntityContext().getEntity();
         if (entity == null || entity.isEmpty()) {
             PipelineLog.info("search_entity", "no_entity", new LinkedHashMap<>());
@@ -161,7 +161,7 @@ public final class PluginSearchEntity implements Plugin {
     }
 
     /** 上下文无租户时回落 chatManage 携带的租户 ID。 */
-    private long currentTenantId(ChatManage chatManage) {
+    private long currentTenantId(PipelineState chatManage) {
         Long tid = TenantContext.currentTenantId();
         if (tid != null && tid != 0) {
             return tid;

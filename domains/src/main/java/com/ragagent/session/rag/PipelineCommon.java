@@ -94,7 +94,7 @@ public final class PipelineCommon {
      * 渲染系统提示词 + 历史 + 当前用户消息。
      * SystemPromptOverride 优先于 SummaryConfig.Prompt；记忆段落接在系统提示词最末。
      */
-    public static List<ChatMessage> prepareMessagesWithHistory(ChatManage chatManage) {
+    public static List<ChatMessage> prepareMessagesWithHistory(PipelineState chatManage) {
         String base = chatManage.getSummaryConfig().getPrompt();
         if (!chatManage.getQueryPlan().getSystemPromptOverride().isEmpty()) {
             base = chatManage.getQueryPlan().getSystemPromptOverride();

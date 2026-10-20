@@ -1,10 +1,10 @@
 package com.ragagent.session.rag.plugin;
 
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.SearchSupport;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -20,7 +20,7 @@ import java.util.Map;
  * 而不是藏在类体里。两者都是无状态服务引用，可与 CHUNK_SEARCH / ENTITY_SEARCH
  * 的注册实例共用。</p>
  *
- * <p>Deep-copy：并发任务各自持有 {@code cloneChatManage()} 的副本（检索结果清空）
+ * <p>Deep-copy：并发任务各自持有 {@code fork()} 的独立副本（检索结果清空）
  * 避免并发读写共享列表。SEARCH_NOTHING 会被吞掉（两个检索任务把它归为无结果）；
  * 合并序恒 chunk 在前 entity 在后（确定性）。全空时优先返回 chunk_search 的错误
  * （errs map 命中），否则 SEARCH_NOTHING。</p>
@@ -41,7 +41,7 @@ public final class PluginSearchParallel implements Plugin {
     }
 
     @Override
-    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, PipelineState chatManage, Plugin.Chain next) {
         if (!chatManage.needsRetrieval()) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("sessionId", chatManage.getSessionId());
@@ -56,14 +56,14 @@ public final class PluginSearchParallel implements Plugin {
         start.put("rewrite_query", chatManage.getQueryPlan().getRewriteQuery());
         PipelineLog.info("SearchParallel", "start", start);
 
-        ChatManage chunkCM = chatManage.cloneChatManage();
+        PipelineState chunkCM = chatManage.fork();
         chunkCM.getSearchOutcome().setResults(null);
-        ChatManage entityCM = chatManage.cloneChatManage();
+        PipelineState entityCM = chatManage.fork();
         entityCM.getSearchOutcome().setResults(null);
 
-        final ChatManage fChunkCM = chunkCM;
-        final ChatManage fEntityCM = entityCM;
-        final ChatManage fOrig = chatManage;
+        final PipelineState fChunkCM = chunkCM;
+        final PipelineState fEntityCM = entityCM;
+        final PipelineState fOrig = chatManage;
 
         Map<String, PluginError> errs = PipelineCommon.runParallel(
                 new PipelineCommon.ParallelTask("chunk_search", () -> {

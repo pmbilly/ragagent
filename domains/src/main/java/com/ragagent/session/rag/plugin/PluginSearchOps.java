@@ -11,8 +11,8 @@ import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.runtime.SessionTrace;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -41,7 +41,7 @@ final class PluginSearchOps {
      * 按 embedding 模型分组检索。共享模型（name+endpoint）的整库目标合并成一次
      * HybridSearch；特定文档目标逐目标检索。
      */
-    public List<SearchResult> searchByTargets(ChatManage chatManage) {
+    public List<SearchResult> searchByTargets(PipelineState chatManage) {
         if (chatManage.getSearchTargets().isEmpty()) {
             return null;
         }
@@ -117,7 +117,7 @@ final class PluginSearchOps {
         }
         return results;
     }
-    private void searchModelGroup(String modelKey, List<SearchTarget> targets, ChatManage chatManage,
+    private void searchModelGroup(String modelKey, List<SearchTarget> targets, PipelineState chatManage,
                                   String queryText, Map<String, KnowledgeBaseView> kbMap,
                                   List<SearchResult> results, Throwable[] firstErr,
                                   java.util.concurrent.atomic.AtomicBoolean errOnce, Object lock) {
@@ -254,7 +254,7 @@ final class PluginSearchOps {
         return kb != null && kb.isKeywordEnabled();
     }
 
-    private List<SearchResult> searchSingleTarget(ChatManage chatManage, SearchTarget t,
+    private List<SearchResult> searchSingleTarget(PipelineState chatManage, SearchTarget t,
                                                   String queryText, float[] queryEmbedding,
                                                   boolean disableVector) {
         if (SearchTarget.TYPE_KNOWLEDGE.equals(t.type())
@@ -306,7 +306,7 @@ final class PluginSearchOps {
 
     // web 检索
 
-    List<SearchResult> searchWebIfEnabled(ChatManage chatManage) {
+    List<SearchResult> searchWebIfEnabled(PipelineState chatManage) {
         if (!chatManage.isWebSearchEnabled() || service.webSearchService == null || service.tenantService == null) {
             return null;
         }

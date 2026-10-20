@@ -1,9 +1,9 @@
 package com.ragagent.session.rag.plugin;
 
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +22,7 @@ public final class PluginFilterTopK implements Plugin {
     }
 
     @Override
-    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, PipelineState chatManage, Plugin.Chain next) {
         if (!chatManage.needsRetrieval()) {
             return next.next();
         }

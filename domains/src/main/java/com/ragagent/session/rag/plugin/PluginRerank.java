@@ -13,10 +13,10 @@ import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.runtime.SessionTrace;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -58,7 +58,7 @@ public final class PluginRerank implements Plugin {
     }
 
     @Override
-    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, PipelineState chatManage, Plugin.Chain next) {
         if (!chatManage.needsRetrieval()) {
             return next.next();
         }
@@ -274,7 +274,7 @@ public final class PluginRerank implements Plugin {
     /** rerank span 的观测输出面。 */
     private static Map<String, Object> buildRerankSpanOutput(
             List<SearchResult> candidates, List<String> passages, List<RankResult> modelScores,
-            List<SearchResult> composite, List<SearchResult> finalResults, ChatManage chatManage,
+            List<SearchResult> composite, List<SearchResult> finalResults, PipelineState chatManage,
             boolean thresholdDegraded) {
         List<Map<String, Object>> modelRows = new ArrayList<>(modelScores.size());
         for (int i = 0; i < modelScores.size(); i++) {
@@ -315,7 +315,7 @@ public final class PluginRerank implements Plugin {
     }
 
     /** 清洗空段 → 模型调用 → 阈值过滤 → top1 兜底。失败抛异常。 */
-    private List<RankResult> rerank(ChatManage chatManage, Reranker rerankModel, String query,
+    private List<RankResult> rerank(PipelineState chatManage, Reranker rerankModel, String query,
                                     List<String> passages, List<SearchResult> candidates) {
         Map<String, Object> mc = new LinkedHashMap<>();
         mc.put("query_variant", query);
@@ -446,7 +446,7 @@ public final class PluginRerank implements Plugin {
     }
 
     /** MMR 多样性选择：预计算 token 集（并发）→ 迭代选 k。 */
-    static List<SearchResult> applyMMR(ChatManage chatManage, List<SearchResult> results, int k, double lambda) {
+    static List<SearchResult> applyMMR(PipelineState chatManage, List<SearchResult> results, int k, double lambda) {
         if (k <= 0 || results.isEmpty()) {
             return null;
         }

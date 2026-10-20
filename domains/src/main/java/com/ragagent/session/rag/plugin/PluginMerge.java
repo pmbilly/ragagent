@@ -13,10 +13,10 @@ import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.MatchTypes;
 import com.ragagent.session.rag.support.SearchSupport;
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ public final class PluginMerge implements Plugin {
     }
 
     @Override
-    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, PipelineState chatManage, Plugin.Chain next) {
         if (!chatManage.needsRetrieval()) {
             return next.next();
         }
@@ -109,7 +109,7 @@ public final class PluginMerge implements Plugin {
     // 输入选择 / 去重 / 历史注入
 
     /** rerank 优先，回落按分数降序的检索结果。 */
-    private List<SearchResult> selectInputResults(ChatManage chatManage) {
+    private List<SearchResult> selectInputResults(PipelineState chatManage) {
         if (chatManage.getRerank().getResults() != null && !chatManage.getRerank().getResults().isEmpty()) {
             return chatManage.getRerank().getResults();
         }
@@ -135,7 +135,7 @@ public final class PluginMerge implements Plugin {
     }
 
     /** 历史引用注入后重去重。 */
-    private List<SearchResult> injectHistoryResults(ChatManage chatManage, List<SearchResult> current) {
+    private List<SearchResult> injectHistoryResults(PipelineState chatManage, List<SearchResult> current) {
         List<SearchResult> historyResults = filterHistoryResults(chatManage, current);
         if (historyResults == null || historyResults.isEmpty()) {
             return current;
@@ -255,15 +255,15 @@ public final class PluginMerge implements Plugin {
     }
     // FAQ 答案回填
 
-    public List<SearchResult> resolveParentChunks(ChatManage chatManage, List<SearchResult> results) {
+    public List<SearchResult> resolveParentChunks(PipelineState chatManage, List<SearchResult> results) {
         return parentOps.resolveParentChunks(chatManage, results);
     }
 
-    public List<SearchResult> expandShortContextWithNeighbors(ChatManage chatManage, List<SearchResult> results) {
+    public List<SearchResult> expandShortContextWithNeighbors(PipelineState chatManage, List<SearchResult> results) {
         return parentOps.expandShortContextWithNeighbors(chatManage, results);
     }
 
-    public List<SearchResult> populateFAQAnswers(ChatManage chatManage, List<SearchResult> results) {
+    public List<SearchResult> populateFAQAnswers(PipelineState chatManage, List<SearchResult> results) {
         if (results.isEmpty() || chunkRepo == null) {
             return results;
         }
@@ -394,7 +394,7 @@ public final class PluginMerge implements Plugin {
     // 历史引用过滤
 
     /** Jaccard ≥ 0.15 的历史引用，分数打 6 折，上限 3 条。 */
-    public static List<SearchResult> filterHistoryResults(ChatManage chatManage, List<SearchResult> currentResults) {
+    public static List<SearchResult> filterHistoryResults(PipelineState chatManage, List<SearchResult> currentResults) {
         final double minSimilarity = 0.15;
         final double historyScoreDiscount = 0.6;
         final int maxHistoryResults = 3;

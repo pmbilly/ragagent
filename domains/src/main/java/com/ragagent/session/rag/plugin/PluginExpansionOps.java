@@ -5,8 +5,8 @@ import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -32,7 +32,7 @@ final class PluginExpansionOps {
     // 查询扩展
 
     /** 低召回时的本地变体检索，并发窗口 16。 */
-    public List<SearchResult> runQueryExpansion(ChatManage chatManage) {
+    public List<SearchResult> runQueryExpansion(PipelineState chatManage) {
         Map<String, Object> f = new LinkedHashMap<>();
         f.put("current", chatManage.getSearchOutcome().getResults().size());
         f.put("threshold", chatManage.getEmbeddingTopK());
@@ -147,7 +147,7 @@ final class PluginExpansionOps {
      * 无 LLM 的本地变体生成（去停用词、引号短语、分隔符切段、
      * 去疑问词），最多 5 条。
      */
-    public List<String> expandQueries(ChatManage chatManage) {
+    public List<String> expandQueries(PipelineState chatManage) {
         String query = chatManage.getQueryPlan().getRewriteQuery().trim();
         if (query.isEmpty()) {
             return null;

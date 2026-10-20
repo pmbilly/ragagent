@@ -6,8 +6,8 @@ import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.platform.knowledge.ImageInfoEnricher;
 import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.ImageInfoCollector;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -28,7 +28,7 @@ final class MergeParentOps {
 
     // 父块解析（text→parent / image→text→grandparent）
 
-    List<SearchResult> resolveParentChunks(ChatManage chatManage, List<SearchResult> results) {
+    List<SearchResult> resolveParentChunks(PipelineState chatManage, List<SearchResult> results) {
         if (results.isEmpty() || service.chunkRepo == null) {
             return results;
         }
@@ -255,7 +255,7 @@ final class MergeParentOps {
 
     // 短上下文邻居扩展
 
-    List<SearchResult> expandShortContextWithNeighbors(ChatManage chatManage, List<SearchResult> results) {
+    List<SearchResult> expandShortContextWithNeighbors(PipelineState chatManage, List<SearchResult> results) {
         final int minLen = 350;
         final int maxLen = 850;
 

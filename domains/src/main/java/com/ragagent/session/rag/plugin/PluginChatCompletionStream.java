@@ -17,10 +17,10 @@ import com.ragagent.modelcontext.StreamDecoder;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.event.EventType;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.ReferencesSupport;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -62,7 +62,7 @@ public final class PluginChatCompletionStream implements Plugin {
     }
 
     @Override
-    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, PipelineState chatManage, Plugin.Chain next) {
         Map<String, Object> in = new LinkedHashMap<>();
         in.put("sessionId", chatManage.getSessionId());
         in.put("user_question", chatManage.getAnswer().getUserContent());
@@ -131,7 +131,7 @@ public final class PluginChatCompletionStream implements Plugin {
         // 消费线程（虚拟线程）
         // 纪律 #1（A5）：ThreadLocal 不跨线程——必须在本线程 capture、在消费线程 replay，
         // 否则消费线程看到空身份（owner 推导成 ""、下游索引/建议/记忆全部 SessionNotFound）。
-        final ChatManage cm = chatManage;
+        final PipelineState cm = chatManage;
         final ChatStream queue = responseQueue;
         final Registry modelContext = assembly.registry();
         final TenantContextSnapshot identity = TenantContextSnapshot.capture();
@@ -142,7 +142,7 @@ public final class PluginChatCompletionStream implements Plugin {
     }
 
     /** 流消费循环（独立虚拟线程上执行）。 */
-    private static void consumeStream(ChatManage chatManage, EventBusInterface eventBus,
+    private static void consumeStream(PipelineState chatManage, EventBusInterface eventBus,
                                       Registry modelContext,
                                       ChatStream responseQueue) {
         StreamDecoder answerDecoder = modelContext.streamDecoder();
@@ -264,7 +264,7 @@ public final class PluginChatCompletionStream implements Plugin {
      * done 时完成消息并发 COMPLETE）。异常收束（队列关闭 / 空闲超时 / ERROR+done）原先
      * 只 flush 不补终态 ⇒ assistant 停在未完成、SSE 永远轮询。</p>
      */
-    private static void endStream(EventBusInterface eventBus, ChatManage chatManage,
+    private static void endStream(EventBusInterface eventBus, PipelineState chatManage,
                                   String thinkingID, String answerID,
                                   StreamDecoder thinkingDecoder, StreamDecoder answerDecoder,
                                   AtomicBoolean thinkingOpen, AtomicBoolean answerCompleted) {
@@ -274,7 +274,7 @@ public final class PluginChatCompletionStream implements Plugin {
     }
 
     /** 补一帧终态答案（空内容 + done=true）；已终态则不重复发。 */
-    private static void emitTerminalAnswer(EventBusInterface eventBus, ChatManage chatManage,
+    private static void emitTerminalAnswer(EventBusInterface eventBus, PipelineState chatManage,
                                            String answerID, AtomicBoolean answerCompleted) {
         if (!answerCompleted.compareAndSet(false, true)) {
             return;
@@ -303,7 +303,7 @@ public final class PluginChatCompletionStream implements Plugin {
         }
     }
 
-    private static void closeThinking(EventBusInterface eventBus, ChatManage chatManage,
+    private static void closeThinking(EventBusInterface eventBus, PipelineState chatManage,
                                       String thinkingID, AtomicBoolean thinkingOpen) {
         if (!thinkingOpen.compareAndSet(true, false)) {
             return;
@@ -325,7 +325,7 @@ public final class PluginChatCompletionStream implements Plugin {
      * 流解码器扣留的句柄尾巴在此放出（引用跨分片桥接）；
      * 正常收束与取消路径都必须调用。
      */
-    private static void flushDecoders(EventBusInterface eventBus, ChatManage chatManage,
+    private static void flushDecoders(EventBusInterface eventBus, PipelineState chatManage,
                                       String thinkingID, String answerID,
                                       StreamDecoder thinkingDecoder, StreamDecoder answerDecoder) {
         String thinkingTail = thinkingDecoder.flush();

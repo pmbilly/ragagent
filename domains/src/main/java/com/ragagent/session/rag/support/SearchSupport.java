@@ -4,9 +4,9 @@ import com.ragagent.contract.knowledge.SearchChunkMerge;
 import com.ragagent.contract.retrieval.RetrievalObsRows;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTextUtil;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.History;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,7 +26,7 @@ public final class SearchSupport {
      * 从最近一轮带引用的历史里取引用，
      * 全部标 {@link MatchTypes#HISTORY}。
      */
-    public static List<SearchResult> getSearchResultFromHistory(ChatManage chatManage) {
+    public static List<SearchResult> getSearchResultFromHistory(PipelineState chatManage) {
         List<History> history = chatManage.getHistory();
         if (history == null || history.isEmpty()) {
             return null;

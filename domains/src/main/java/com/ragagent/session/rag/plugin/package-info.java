@@ -2,7 +2,7 @@
  * chat 管线的**插件实现**：{@link Plugin} 接口 + 18 个步骤实现
  * （query_understand → search → merge → rerank → into_chat_message → chat_completion 等）。
  *
- * <p>每个插件响应哪些事件、读写了 {@code ChatManage} 的哪些字段：
+ * <p>每个插件响应哪些事件、读写了 {@code PipelineState} 的哪些字段：
  * {@code docs/architecture/pipeline-map.md}（由代码生成）。</p>
  *
  * <p>装配在 {@link com.ragagent.session.rag.PipelineBuilder}（根包），

@@ -20,7 +20,7 @@ public final class EventManager {
     /** 带参处理链（不含管线上下文参数）。 */
     @FunctionalInterface
     interface HandlerNode {
-        PluginError invoke(PipelineEventType eventType, ChatManage chatManage);
+        PluginError invoke(PipelineEventType eventType, PipelineState state);
     }
 
     /** Map&lt;eventType, List&lt;Plugin&gt;&gt;：注册序。 */
@@ -66,10 +66,10 @@ public final class EventManager {
     }
 
     /** 触发事件。无 handler 返回 null。 */
-    public PluginError trigger(PipelineEventType eventType, ChatManage chatManage) {
+    public PluginError trigger(PipelineEventType eventType, PipelineState state) {
         HandlerNode handler = handlers == null ? null : handlers.get(eventType);
         if (handler != null) {
-            return handler.invoke(eventType, chatManage);
+            return handler.invoke(eventType, state);
         }
         return null;
     }

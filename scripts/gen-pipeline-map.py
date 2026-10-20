@@ -44,7 +44,7 @@ def plugin_meta() -> dict:
             continue
         name = f.stem
         events = re.findall(r"PipelineEventType\.([A-Z_]+)", text)
-        var = re.search(r"ChatManage\s+(\w+)\s*[,)]", text)
+        var = re.search(r"(?:ChatManage|PipelineState)\s+(\w+)\s*[,)]", text)
         accesses = re.findall(rf"\b{re.escape(var.group(1))}\.(get|set|is)([A-Z]\w*)\(", text) if var else []
         # 状态组经 getter 链访问：cm.getAnswer().setUserContent(...) / cm.getRuntime().getEventBus()
         if var:

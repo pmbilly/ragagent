@@ -6,9 +6,9 @@ import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.SearchSupport;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -61,7 +61,7 @@ public final class PluginSearch implements Plugin {
     }
 
     @Override
-    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, PipelineState chatManage, Plugin.Chain next) {
         boolean hasKBTargets = SearchTarget.SearchTargets.hasKnowledgeRetrievalScope(
                 new SearchTarget.SearchTargets(chatManage.getSearchTargets()),
                 chatManage.getKnowledgeBaseIds(), chatManage.getKnowledgeIds());
@@ -155,7 +155,7 @@ public final class PluginSearch implements Plugin {
         return PluginError.SEARCH_NOTHING;
     }
 
-    private void logInput(ChatManage chatManage) {
+    private void logInput(PipelineState chatManage) {
         Map<String, Object> f = new LinkedHashMap<>();
         f.put("sessionId", chatManage.getSessionId());
         f.put("rewrite_query", chatManage.getQueryPlan().getRewriteQuery());
@@ -181,12 +181,12 @@ public final class PluginSearch implements Plugin {
     }
 
     /** 薄委托：见 {@link PluginSearchOps#searchByTargets}。 */
-    public List<SearchResult> searchByTargets(ChatManage chatManage) {
+    public List<SearchResult> searchByTargets(PipelineState chatManage) {
         return searchOps.searchByTargets(chatManage);
     }
 
     /** 薄委托：见 {@link PluginSearchOps#searchWebIfEnabled}（onEvent 消费）。 */
-    List<SearchResult> searchWebIfEnabled(ChatManage chatManage) {
+    List<SearchResult> searchWebIfEnabled(PipelineState chatManage) {
         return searchOps.searchWebIfEnabled(chatManage);
     }
 
@@ -221,12 +221,12 @@ public final class PluginSearch implements Plugin {
     }
 
     /** 薄委托：见 {@link PluginExpansionOps#runQueryExpansion}。 */
-    public List<SearchResult> runQueryExpansion(ChatManage chatManage) {
+    public List<SearchResult> runQueryExpansion(PipelineState chatManage) {
         return expansionOps.runQueryExpansion(chatManage);
     }
 
     /** 薄委托：见 {@link PluginExpansionOps#expandQueries}。 */
-    public List<String> expandQueries(ChatManage chatManage) {
+    public List<String> expandQueries(PipelineState chatManage) {
         return expansionOps.expandQueries(chatManage);
     }
 }

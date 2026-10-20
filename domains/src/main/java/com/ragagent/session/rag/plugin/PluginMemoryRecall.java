@@ -10,9 +10,9 @@ import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.RetrievalObsRows;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.platform.event.EventType;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.MemoryUsedMemories;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -38,7 +38,7 @@ public final class PluginMemoryRecall implements Plugin {
     }
 
     @Override
-    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, PipelineState chatManage, Plugin.Chain next) {
         if (memoryService == null) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("sessionId", chatManage.getSessionId());

@@ -4,10 +4,10 @@ import com.ragagent.contract.model.ChatOptions;
 import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.ReferencesSupport;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * CHAT_COMPLETION 阶段插件：
  * 非流式生成——组消息（历史 + 模型上下文句柄化）→ 调模型 → 解码响应 →
- * ChatResponse 挂回 ChatManage。
+ * ChatResponse 挂回 PipelineState。
  *
  * <p>提示词缓存指纹元数据不接线（LLM 客户端无 ctx 形参、无消费点）。</p>
  */
@@ -33,7 +33,7 @@ public final class PluginChatCompletion implements Plugin {
     }
 
     @Override
-    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, PipelineState chatManage, Plugin.Chain next) {
         Map<String, Object> in = new LinkedHashMap<>();
         in.put("sessionId", chatManage.getSessionId());
         in.put("user_question", chatManage.getAnswer().getUserContent());

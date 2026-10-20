@@ -136,7 +136,7 @@ boot（组合根，唯一装配点）
 | **H0 判据先行** ✅ | R1~R3 三条守卫（各配红态探针）+ `business-capability-map.md`（业务链路 → 模块/包/类，一页纸）；R4/R5 的登记表随 H1/H4/H5 落地 | ✅ 2026-10-20 | **42 守卫绿**；新增 Port / 形状 / 平台业务件即红；基线 22 + 16 + 0 条 |
 | **H1 问答-状态机** | **H1a ✅**：`TurnLifecycle` 作终态单赢家；**H1b-1 ✅**：`StreamEventEmitter`/`StreamResponseBuilder` 移 `service.sse`，`SseFrameSink` 端口，编排层不再依赖 `controller`。**H1b-2 待做**：stop watcher + 轮询 + 3 把锁收进状态机 | H1a/H1b-1 ✅ 2026-10-20 | 终态不可逆；编排层无 controller 反向依赖 |
 | **H2a 问答-运行时段** ✅ | 抽 `TurnRuntime`（`eventBus`/`messageId`/`userMessageId`）；`ChatManage` 不再持有运行时字段，调用点经 `getRuntime()` | ✅ 2026-10-20 | 运行时段在类型上不可复制；会话测试全绿 |
-| **H2b 问答-请求段** | **H2b-1 ✅**：`TurnInputView`（41 字段只读）+ `ChatManage implements` + 只读辅助收口；**H2b-2 待做**：插件签名改收视图、`QaRequestContext` 34 字段收口 | H2b-1 ✅ 2026-10-20 | 只读路径不再依赖可变对象；插件引用待 H2c 一并降 |
+| **H2b 问答-请求段** | **H2b-1 ✅**：`TurnInputView` + `ChatManage implements`；**H2b-2 ✅**：`PipelineState` + 插件签名改造（插件包 0 处 `ChatManage`）；**H2b-3 待做**：`QaRequestContext` 34 字段收口 | H2b-2 ✅ 2026-10-20 | 插件只依赖状态接口 |
 | **H2c 问答-状态段** ✅ | 六组全部抽离：Answer / Rerank / Merged / QueryPlan / Entity / SearchOutcome；`ChatManage` 只剩 history / usedMemories 等流转字段 | ✅ 2026-10-20 | 各组写入点收敛；`cloneChatManage` 仅复制查询计划/实体/记忆/渲染上下文 |
 | **H3 入库-状态机** | `IngestJob` 状态机（替代 4 处 CAS）+ `IngestStage` 接口（现有 5 个 stage 就地实现）+ 删 `KnowledgeTaskExecutor` | 3-4 人日 | 阶段显式化；主码 CAS 4→1；入库链路必读类 ≤10 |
 | **H4a 任务-端口** | **H4a-1 ✅**：`TaskQueue`（name/start/stop/setRetryDelayOverrideSeconds）+ `RetryDelayOverride`；6 套队列接口继承；钩子 5→1 机制。**H4a-2/H4b**：`submit/lease/renew/progress/retry/park` 完整端口随实现迁移落地 | H4a-1 ✅ 2026-10-20 | 业务只依赖端口；钩子 5→1 |

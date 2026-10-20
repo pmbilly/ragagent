@@ -7,9 +7,9 @@ import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.security.InputSanitizer;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.ReferencesSupport;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -46,7 +46,7 @@ public final class PluginIntoChatMessage implements Plugin {
     }
 
     @Override
-    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, PipelineState chatManage, Plugin.Chain next) {
         Map<String, Object> in = new LinkedHashMap<>();
         in.put("sessionId", chatManage.getSessionId());
         in.put("merge_result_cnt", chatManage.getMerged().getResults() == null ? 0 : chatManage.getMerged().getResults().size());
@@ -222,7 +222,7 @@ public final class PluginIntoChatMessage implements Plugin {
     }
 
     /** UserContent ≠ Query 时异步回写用户消息。 */
-    private void persistRenderedContent(ChatManage chatManage) {
+    private void persistRenderedContent(PipelineState chatManage) {
         if (chatManage.getRuntime().getUserMessageId().isEmpty() || chatManage.getAnswer().getUserContent().isEmpty()) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("sessionId", chatManage.getSessionId());
@@ -240,7 +240,7 @@ public final class PluginIntoChatMessage implements Plugin {
         f.put("userMessageId", chatManage.getRuntime().getUserMessageId());
         f.put("rendered_content_len", chatManage.getAnswer().getUserContent().length());
         PipelineLog.info("IntoChatMessage", "persist_rendered_content", f);
-        final ChatManage cm = chatManage;
+        final PipelineState cm = chatManage;
         Thread.ofVirtual().start(() -> {
             try {
                 messageService.updateMessageRenderedContent(cm.getSessionId(),

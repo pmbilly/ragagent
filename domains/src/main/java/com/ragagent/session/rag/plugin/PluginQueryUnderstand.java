@@ -11,11 +11,11 @@ import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.History;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -67,7 +67,7 @@ public final class PluginQueryUnderstand implements Plugin {
     }
 
     @Override
-    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, PipelineState chatManage, Plugin.Chain next) {
         chatManage.getQueryPlan().setRewriteQuery(chatManage.getQuery());
 
         boolean hasImages = chatManage.getImages() != null && !chatManage.getImages().isEmpty();
@@ -170,7 +170,7 @@ public final class PluginQueryUnderstand implements Plugin {
     }
 
     /** 把生成的图片描述写回用户消息。 */
-    private void updateUserMessageImageCaption(ChatManage chatManage) {
+    private void updateUserMessageImageCaption(PipelineState chatManage) {
         PipelineMessageView msg;
         try {
             msg = messageService.getMessage(chatManage.getSessionId(), chatManage.getRuntime().getUserMessageId());
@@ -204,7 +204,7 @@ public final class PluginQueryUnderstand implements Plugin {
     }
 
     /** MaxRounds ≤ 0 视为显式关闭多轮，不回落全局默认。 */
-    private List<History> loadHistory(ChatManage chatManage) {
+    private List<History> loadHistory(PipelineState chatManage) {
         if (chatManage.getMaxRounds() <= 0) {
             return null;
         }
@@ -234,7 +234,7 @@ public final class PluginQueryUnderstand implements Plugin {
     private record ModelChoice(LlmChatClient model, boolean useImages) {}
 
     /** 有图优先 vision，再 VLM；无图走 QU 覆写并回落。 */
-    private ModelChoice selectModel(ChatManage chatManage, boolean hasImages) {
+    private ModelChoice selectModel(PipelineState chatManage, boolean hasImages) {
         if (hasImages) {
             if (chatManage.isChatModelSupportsVision()) {
                 try {
@@ -295,7 +295,7 @@ public final class PluginQueryUnderstand implements Plugin {
     }
 
     /** system/user 提示词组装（conversation/query/language 占位符）。 */
-    public String[] buildPrompts(ChatManage chatManage, List<History> historyList) {
+    public String[] buildPrompts(PipelineState chatManage, List<History> historyList) {
         String userPrompt = config.getRewritePromptUser();
         if (!chatManage.getRewritePromptUser().isEmpty()) {
             userPrompt = chatManage.getRewritePromptUser();
@@ -336,7 +336,7 @@ public final class PluginQueryUnderstand implements Plugin {
      * 给改写器"谁在问"的常驻背景。刻意不进 UsedMemories
      * （这里读的是全量背景，MEMORY_RECALL 才按相关性与本轮答案对账）。
      */
-    private String memoryBackground(ChatManage chatManage) {
+    private String memoryBackground(PipelineState chatManage) {
         if (memoryService == null) {
             return "";
         }
@@ -373,7 +373,7 @@ public final class PluginQueryUnderstand implements Plugin {
     /**
      * 解析模型输出；解析失败保持原查询与原意图（blank 直接返回）。
      */
-    public void parseOutput(ChatManage chatManage, String raw) {
+    public void parseOutput(PipelineState chatManage, String raw) {
         String content = raw == null ? "" : raw.trim();
         if (content.isEmpty()) {
             return;
@@ -486,7 +486,7 @@ public final class PluginQueryUnderstand implements Plugin {
     }
 
     /** agent 覆写优先，空白回落全局。返回是否应用。 */
-    public static boolean applyIntentPromptOverride(ChatManage chatManage, Map<String, String> globalPrompts) {
+    public static boolean applyIntentPromptOverride(PipelineState chatManage, Map<String, String> globalPrompts) {
         String intentKey = chatManage.getQueryPlan().getIntent();
         if (chatManage.getIntentPromptOverrides() != null) {
             String raw = chatManage.getIntentPromptOverrides().get(intentKey);

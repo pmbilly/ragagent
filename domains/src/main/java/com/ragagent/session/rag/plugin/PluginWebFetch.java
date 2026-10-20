@@ -2,9 +2,9 @@ package com.ragagent.session.rag.plugin;
 
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.websearch.PipelinePageFetcher;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineState;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,7 +32,7 @@ public final class PluginWebFetch implements Plugin {
     }
 
     @Override
-    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, PipelineState chatManage, Plugin.Chain next) {
         if (!chatManage.isWebFetchEnabled() || !chatManage.isWebSearchEnabled()) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("reason", "disabled");

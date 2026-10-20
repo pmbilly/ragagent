@@ -7,8 +7,8 @@ import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.platform.knowledge.ImageInfoEnricher;
 import com.ragagent.platform.prompt.PromptComposer;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineCommon;
+import com.ragagent.session.rag.PipelineState;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,7 +34,7 @@ public final class ReferencesSupport {
      * 返回消息与 Registry 的组装结果。
      * citationsEnabled 为 null 视为开启（Registry 的构造参数语义）。
      */
-    public static Assembly prepareMessagesWithModelContext(ChatManage chatManage) {
+    public static Assembly prepareMessagesWithModelContext(PipelineState chatManage) {
         boolean citationsEnabled = chatManage == null || chatManage.citationsEnabled();
         Registry registry = new Registry(citationsEnabled);
         if (chatManage == null) {
@@ -139,7 +139,7 @@ public final class ReferencesSupport {
     }
 
     /** 引用排序：FAQ 优先开启时 FAQ 结果排前。 */
-    static List<SearchResult> orderedPipelineReferences(ChatManage chatManage) {
+    static List<SearchResult> orderedPipelineReferences(PipelineState chatManage) {
         if (chatManage == null) {
             return null;
         }

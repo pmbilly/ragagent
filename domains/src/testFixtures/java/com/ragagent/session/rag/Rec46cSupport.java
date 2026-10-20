@@ -372,7 +372,7 @@ final class Rec46cSupport {
         }
 
         @Override
-        public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Chain next) {
+        public PluginError onEvent(PipelineEventType eventType, PipelineState state, Chain next) {
             calls.add(name + ">in");
             if (fail != null) {
                 return fail;

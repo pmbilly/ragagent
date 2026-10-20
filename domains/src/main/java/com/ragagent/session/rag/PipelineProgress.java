@@ -50,7 +50,7 @@ public final class PipelineProgress {
         }
     }
 
-    public static boolean shouldEmitQueryUnderstandProgress(ChatManage chatManage) {
+    public static boolean shouldEmitQueryUnderstandProgress(PipelineState chatManage) {
         if (chatManage == null) {
             return false;
         }
@@ -59,7 +59,7 @@ public final class PipelineProgress {
     }
 
     /** 是否属于共用检索进度窗口的阶段。 */
-    public static boolean isConsolidatedRetrievalStage(PipelineEventType stage, ChatManage chatManage) {
+    public static boolean isConsolidatedRetrievalStage(PipelineEventType stage, PipelineState chatManage) {
         if (chatManage == null) {
             return false;
         }
@@ -80,7 +80,7 @@ public final class PipelineProgress {
 
     /** 最后一个共用检索进度窗口的阶段（无命中返回 null）。 */
     public static PipelineEventType lastConsolidatedRetrievalStage(List<PipelineEventType> eventList,
-                                                                   ChatManage chatManage) {
+                                                                   PipelineState chatManage) {
         PipelineEventType last = null;
         for (PipelineEventType stage : eventList) {
             if (isConsolidatedRetrievalStage(stage, chatManage)) {
@@ -98,7 +98,7 @@ public final class PipelineProgress {
     }
 
     /** 发单个 pending knowledge_search tool_call。 */
-    public static StageProgress beginRetrievalProgress(ChatManage chatManage) {
+    public static StageProgress beginRetrievalProgress(PipelineState chatManage) {
         if (chatManage == null || chatManage.getRuntime().getEventBus() == null) {
             return null;
         }
@@ -115,7 +115,7 @@ public final class PipelineProgress {
         return new StageProgress(toolCallId, RETRIEVAL_PROGRESS_TOOL);
     }
 
-    public static StageProgress beginQueryUnderstandProgress(ChatManage chatManage) {
+    public static StageProgress beginQueryUnderstandProgress(PipelineState chatManage) {
         if (chatManage == null || chatManage.getRuntime().getEventBus() == null
                 || !shouldEmitQueryUnderstandProgress(chatManage)) {
             return null;
@@ -133,7 +133,7 @@ public final class PipelineProgress {
         return new StageProgress(toolCallId, QUERY_UNDERSTAND_PROGRESS_TOOL);
     }
 
-    public static void endQueryUnderstandProgress(ChatManage chatManage, StageProgress progress,
+    public static void endQueryUnderstandProgress(PipelineState chatManage, StageProgress progress,
                                                   long startMillis, PluginError stageErr) {
         if (progress == null || chatManage == null || chatManage.getRuntime().getEventBus() == null) {
             return;
@@ -155,7 +155,7 @@ public final class PipelineProgress {
     }
 
     /** 命中分档文案 + searchSource + ErrSearchNothing 候选语义。 */
-    public static void endRetrievalProgress(ChatManage chatManage, StageProgress progress,
+    public static void endRetrievalProgress(PipelineState chatManage, StageProgress progress,
                                             long startMillis, PluginError stageErr) {
         if (progress == null || chatManage == null || chatManage.getRuntime().getEventBus() == null) {
             return;
@@ -220,7 +220,7 @@ public final class PipelineProgress {
 
     // ── 内部 ──
 
-    static boolean hasKBRetrievalTargets(ChatManage chatManage) {
+    static boolean hasKBRetrievalTargets(PipelineState chatManage) {
         if (chatManage == null) {
             return false;
         }
@@ -229,7 +229,7 @@ public final class PipelineProgress {
                 chatManage.getKnowledgeBaseIds(), chatManage.getKnowledgeIds());
     }
 
-    static String retrievalSearchSource(ChatManage chatManage) {
+    static String retrievalSearchSource(PipelineState chatManage) {
         boolean hasKB = hasKBRetrievalTargets(chatManage);
         boolean hasWeb = chatManage != null && chatManage.isWebSearchEnabled();
         if (hasKB && hasWeb) {
@@ -241,7 +241,7 @@ public final class PipelineProgress {
         return RETRIEVAL_SOURCE_KNOWLEDGE;
     }
 
-    static List<SearchResult> retrievalResults(ChatManage chatManage) {
+    static List<SearchResult> retrievalResults(PipelineState chatManage) {
         if (chatManage.getMerged().getResults() != null && !chatManage.getMerged().getResults().isEmpty()) {
             return chatManage.getMerged().getResults();
         }
@@ -251,7 +251,7 @@ public final class PipelineProgress {
         return chatManage.getSearchOutcome().getResults();
     }
 
-    static long[] retrievalResultBreakdown(ChatManage chatManage) {
+    static long[] retrievalResultBreakdown(PipelineState chatManage) {
         long total = 0;
         long docCount = 0;
         long webCount = 0;

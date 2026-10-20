@@ -9,8 +9,8 @@ import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineEventType;
+import com.ragagent.session.rag.PipelineState;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -56,7 +56,7 @@ public final class PluginExtractEntity implements Plugin {
     }
 
     @Override
-    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, PipelineState chatManage, Plugin.Chain next) {
         if (!neo4jEnabled) {
             return next.next();
         }

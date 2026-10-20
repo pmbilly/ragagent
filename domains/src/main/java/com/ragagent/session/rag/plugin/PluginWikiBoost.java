@@ -5,8 +5,8 @@ import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineEventType;
+import com.ragagent.session.rag.PipelineState;
 import java.util.List;
 
 /**
@@ -29,7 +29,7 @@ public final class PluginWikiBoost implements Plugin {
     }
 
     @Override
-    public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
+    public PluginError onEvent(PipelineEventType eventType, PipelineState chatManage, Plugin.Chain next) {
         PluginError err = next.next();
         if (err != null) {
             return err;
