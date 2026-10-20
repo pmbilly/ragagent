@@ -55,19 +55,18 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 /**
- * （覆盖 file/url/manual 创建、分页列表、get/update/delete、folders；
- *  处理管道 = pending→processing→(docreader→chunk→embed)→completed/failed，
- *  任务队列 以进程内虚拟线程队列替代（响应契约一致，重试/取消语义见本仓约定））。
- * <p><b>文档操作面扩展</b>：spans 合成树、regenerate-summary（无 summary
- * model 的确定性 400）、manual 更新、reparse/cancel-parse、download/preview 文件解析、
- * image info、tags 批量、batch-delete/batch-reparse/clear-contents（任务队列 →
- * 同步尽力而为，HTTP 契约 = task_id + 文案）、folders 树升级为完整
- * BuildKnowledgeFolderTree、GET 侧回填 tags。</p>
- * <p><b>实现边界（记录于各类注释）</b>：
- *    软删（chunk+knowledge 行），HTTP 响应逐字节一致；② reparse 的资源清理只对齐
- *    "删 chunks"这一可观测子集；③ 刷新型摘要为进程内虚拟线程（任务队列 语义取舍，
- *    重试对齐 MaxRetry(3)）；④ updateChunkVector 全链已接线（ChunkVectorIndexer，
- *    含真 embedding 与生成问题行重建）。</p>
+ * 知识库文档管理门面：file/url/manual 创建、分页列表、get/update/delete、folders 与标签批量。
+ *
+ * <p>专项能力在同包协作者：解析队列（{@code KnowledgeProcessWorker}）、摘要
+ * （{@code KnowledgeSummaryService}）、文件（{@code KnowledgeFileService}）、解析
+ * （{@code KnowledgeParseService}）、批量（{@code KnowledgeBatchOpsService}）、文件夹
+ * （{@code KnowledgeFolderService}）、span（{@code KnowledgeSpanService}）、检索
+ * （{@code KnowledgeSearchService}）、移动/克隆（{@code KnowledgeMoveService} /
+ * {@code KnowledgeCloneService}）。本类保留门面、创建路径、共享常量与跨协作者编排。</p>
+ *
+ * <p>状态机：pending→processing→(docreader→chunk→embed)→completed/failed；解析任务由
+ * {@code KnowledgeProcessWorker} 消费。批量删除/重解析/清空的 HTTP 契约是
+ * {@code task_id} + 文案。</p>
  */
 @Service
 public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGateway {
@@ -76,8 +75,6 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     // 专项能力已拆出 ProcessWorker/Summary/File/Parse/BatchOps 等协作者，本类保持聚合面。
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
-
-    /** duplicate 的配置克隆用：知识实体带 OffsetDateTime，往返 mapper 必须挂 JSR310（本仓约定 步 3 教训）。 */
 
     /** 5 个 canonical 阶段名（委任 {@link KnowledgeProcessingSpan#ALL_STAGES}，公共常量不变）。 */
     public static final List<String> ALL_STAGES = KnowledgeProcessingSpan.ALL_STAGES;
@@ -362,9 +359,6 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         return MAPPER.createObjectNode();
     }
 
-    /** 同包开放（KnowledgeSummaryPipelineService.updateManualKnowledge 复用）。 */
-
-
     // ── 查询 / 更新 / 删除 ────────────────────────────────────────────────
 
     /** 真分页（page 默认 1，page_size 默认 20 上限 1000）。 */
@@ -397,9 +391,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         return access.getKnowledgeBatch(tenantId, ids);
     }
 
-    /**
-     * 本仓未实现，共享路径的"补捞"只对同租户行有效，而租户内行
-     */
+    /** 共享访问口径：当前与 {@link #getKnowledgeBatch} 同实现（端口语义保留）。 */
     public List<Knowledge> getKnowledgeBatchWithSharedAccess(long tenantId, List<String> ids) {
         return access.getKnowledgeBatchWithSharedAccess(tenantId, ids);
     }
@@ -408,8 +400,6 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
      * 跨域只读端口的实现（{@link KnowledgeDocumentGateway}）：检索结果装配按 id 批量取
      * 文档元数据，语义与 {@link #getKnowledgeBatchWithSharedAccess} 一致。
      */
-
-
     @Override
     public List<KnowledgeDocumentFacts> findAccessibleDocuments(long tenantId, List<String> knowledgeIds) {
         List<KnowledgeDocumentFacts> out = new ArrayList<>();
