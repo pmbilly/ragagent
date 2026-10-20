@@ -37,12 +37,34 @@ public final class RedisRetryingTaskQueue implements TaskQueue {
         void handle(String body, boolean finalAttempt);
     }
 
+    /** 把 handler 抛出的任意失败归一为运行时异常，供 {@link FailurePolicy} 解包原始原因。 */
+    public static class TaskFailure extends RuntimeException {
+        public TaskFailure(Throwable cause) {
+            super(cause == null ? "task failed" : cause.toString(), cause);
+        }
+    }
+
+    /** 失败策略：重试延迟与终态死信回调；{@code null} = policy 公式 + 无死信。 */
+    public interface FailurePolicy {
+        /** 返回 {@code null} = 用 policy 默认退避；返回 ≥0 = 指定秒数（仍受测试覆盖值钳制）。 */
+        Long retryDelaySeconds(int attempt, Throwable failure);
+
+        /** 重试耗尽（终态失败）；默认无操作。 */
+        default void onDeadLetter(String body, int attempt, Throwable failure) {
+        }
+    }
+
     /** 每次提交的参数；缺省字段走队列自身的 policy/无超时/无幂等。 */
     public record TaskSpec(Integer maxRetry, Long timeoutMillis, String idempotencyKey,
-                           String idempotencyPrefix) {
+                           String idempotencyPrefix, Long idempotencyTtlSeconds) {
 
         public static TaskSpec of(Integer maxRetry) {
-            return new TaskSpec(maxRetry, null, null, null);
+            return new TaskSpec(maxRetry, null, null, null, null);
+        }
+
+        public static TaskSpec idempotent(Integer maxRetry, Long timeoutMillis, String key,
+                                          String prefix, Long ttlSeconds) {
+            return new TaskSpec(maxRetry, timeoutMillis, key, prefix, ttlSeconds);
         }
     }
 
@@ -54,6 +76,7 @@ public final class RedisRetryingTaskQueue implements TaskQueue {
     private final String taskName;
     private final RetryPolicy policy;
     private final Handler handler;
+    private final FailurePolicy failurePolicy;
     private final ExecutorService worker = Executors.newVirtualThreadPerTaskExecutor();
     private final ScheduledExecutorService scheduler;
 
@@ -62,11 +85,17 @@ public final class RedisRetryingTaskQueue implements TaskQueue {
 
     public RedisRetryingTaskQueue(StringRedisTemplate template, String keyPrefix, String taskName,
             RetryPolicy policy, Handler handler) {
+        this(template, keyPrefix, taskName, policy, handler, null);
+    }
+
+    public RedisRetryingTaskQueue(StringRedisTemplate template, String keyPrefix, String taskName,
+            RetryPolicy policy, Handler handler, FailurePolicy failurePolicy) {
         this.core = new RedisTaskQueueCore(template, keyPrefix);
         this.template = template;
         this.taskName = taskName;
         this.policy = policy;
         this.handler = handler;
+        this.failurePolicy = failurePolicy;
         this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread thread = new Thread(r, taskName.replace(' ', '-') + "-renew");
             thread.setDaemon(true);
@@ -95,8 +124,10 @@ public final class RedisRetryingTaskQueue implements TaskQueue {
             try {
                 reserved = template.opsForValue().setIfAbsent(
                         effective.idempotencyPrefix() + effective.idempotencyKey(), "1",
-                        Duration.ofSeconds(idempotencyTtlSeconds(
-                                effective.maxRetry(), effective.timeoutMillis())));
+                        Duration.ofSeconds(effective.idempotencyTtlSeconds() != null
+                                ? effective.idempotencyTtlSeconds()
+                                : idempotencyTtlSeconds(
+                                        effective.maxRetry(), effective.timeoutMillis())));
             } catch (RuntimeException e) {
                 throw new IllegalStateException("task queue reserve failed: " + e.getMessage(), e);
             }
@@ -190,10 +221,17 @@ public final class RedisRetryingTaskQueue implements TaskQueue {
         }
         if (isFinalAttempt(queued)) {
             log.warn("{} task gave up after {} attempts", taskName, queued.attempt(), failure);
+            if (failurePolicy != null) {
+                try {
+                    failurePolicy.onDeadLetter(queued.body(), queued.attempt(), failure);
+                } catch (RuntimeException e) {
+                    log.warn("{} task: dead-letter callback failed", taskName, e);
+                }
+            }
             complete(member, queued);
             return;
         }
-        long delaySeconds = delaySeconds(queued.attempt());
+        long delaySeconds = delaySeconds(queued.attempt(), failure);
         log.warn("{} task failed (attempt {}/{}), retrying in {}s",
                 taskName, queued.attempt(), maxRetry(queued) + 1, delaySeconds, failure);
         core.requeue(member, toJson(new QueueMember(queued.body(), queued.attempt() + 1,
@@ -215,8 +253,11 @@ public final class RedisRetryingTaskQueue implements TaskQueue {
         return queued.maxRetry() != null ? queued.maxRetry() : policy.maxRetry();
     }
 
-    private long delaySeconds(int attempt) {
-        return retryDelay.resolve(policy.delaySeconds(attempt));
+    private long delaySeconds(int attempt, Throwable failure) {
+        Long custom = failurePolicy == null
+                ? null : failurePolicy.retryDelaySeconds(attempt, failure);
+        long fallback = custom != null ? Math.max(custom, 0) : policy.delaySeconds(attempt);
+        return retryDelay.resolve(fallback);
     }
 
     private void releaseIdempotency(String prefix, String key) {

@@ -200,8 +200,8 @@ class RedisWikiIngestTaskQueueTest {
 
         queue = newQueue(handler, null);
         // 手工模拟"另一个实例取走后崩溃"：proc 里一个租约已过期的成员
-        String member = MAPPER.writeValueAsString(RedisWikiIngestTaskQueue.QueuedTask.of(
-                ingestTask("t-5", Duration.ZERO, 0), 1));
+        String member = RedisWikiIngestTaskQueue.memberOf(
+                ingestTask("t-5", Duration.ZERO, 0), 1);
         redis.template().opsForZSet().add(RedisWikiIngestTaskQueue.KEY_PROC, member,
                 System.currentTimeMillis() - 1000);
 

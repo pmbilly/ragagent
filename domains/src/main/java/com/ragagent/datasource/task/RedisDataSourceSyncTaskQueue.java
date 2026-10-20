@@ -70,7 +70,8 @@ public class RedisDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue {
         try {
             RedisRetryingTaskQueue.SubmitOutcome outcome = queue.submit(
                     payload.toJson(), 0L,
-                    new RedisRetryingTaskQueue.TaskSpec(maxRetry, timeoutMillis, taskId, ID_PREFIX));
+                    RedisRetryingTaskQueue.TaskSpec.idempotent(
+                            maxRetry, timeoutMillis, taskId, ID_PREFIX, null));
             return outcome == RedisRetryingTaskQueue.SubmitOutcome.DUPLICATE
                     ? Outcome.TASK_ID_CONFLICT : Outcome.ENQUEUED;
         } catch (RuntimeException e) {
