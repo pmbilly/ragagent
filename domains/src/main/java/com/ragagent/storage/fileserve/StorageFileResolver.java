@@ -2,12 +2,10 @@ package com.ragagent.storage.fileserve;
 
 import com.ragagent.contract.storage.StorageEnvLookup;
 import com.ragagent.contract.storage.fileserve.FileContentService;
-import com.ragagent.contract.storage.fileserve.OpenedFile;
 import com.ragagent.contract.storage.fileserve.WritableFileContentService;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.security.CryptoService;
-import com.ragagent.platform.security.Hashes;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.platform.web.JsonMappers;
@@ -17,7 +15,6 @@ import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.FileServiceFactory;
 import com.ragagent.storage.repository.StorageBackendRepository;
 import com.ragagent.storage.service.ResourceCatalogService;
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -222,116 +219,26 @@ public class StorageFileResolver {
         String baseDir = localBaseDir == null || localBaseDir.isEmpty()
                 ? StoragePaths.localStorageBaseDir() : localBaseDir;
 
-        switch (p) {
-            case "local": {
-                String dir = baseDir;
-                JsonNode local = sec == null ? null : sec.get("local");
-                if (local != null) {
-                    String pathPrefix = textOrNull(local.get("pathPrefix"));
-                    if (pathPrefix != null && !pathPrefix.trim().isEmpty()) {
-                        String joined = LocalFileContentService.joinPath(dir, pathPrefix.trim());
-                        try {
-                            dir = LocalFileContentService.safePathUnderBase(dir, joined);
-                        } catch (Exception ignored) {
-                            // safePathUnderBase 失败 → 忽略，baseDir 原样
-                        }
+        if ("local".equals(p)) {
+            String dir = baseDir;
+            JsonNode local = sec == null ? null : sec.get("local");
+            if (local != null) {
+                String pathPrefix = textOrNull(local.get("pathPrefix"));
+                if (pathPrefix != null && !pathPrefix.trim().isEmpty()) {
+                    String joined = LocalFileContentService.joinPath(dir, pathPrefix.trim());
+                    try {
+                        dir = LocalFileContentService.safePathUnderBase(dir, joined);
+                    } catch (Exception ignored) {
+                        // safePathUnderBase 失败 → 忽略，baseDir 原样
                     }
                 }
-                String externalURL = env("APP_EXTERNAL_URL");
-                return new FactoryResult(new LocalFileContentService(dir, externalURL), p, null);
             }
-            case "minio": {
-                JsonNode m = sec == null ? null : sec.get("minio");
-                if (m == null) {
-                    return new FactoryResult(null, p, "missing minio config");
-                }
-                boolean remote = "remote".equals(textOr(m.get("mode"), ""));
-                String endpoint = remote ? textOr(m.get("endpoint"), "").trim() : env("MINIO_ENDPOINT");
-                String accessKey = remote ? textOr(m.get("accessKeyId"), "").trim() : env("MINIO_ACCESS_KEY_ID");
-                String secretKey = remote ? textOr(m.get("secretAccessKey"), "").trim() : env("MINIO_SECRET_ACCESS_KEY");
-                String bucket = textOr(m.get("bucketName"), "").trim();
-                if (bucket.isEmpty()) {
-                    bucket = env("MINIO_BUCKET_NAME");
-                }
-                if (endpoint.isEmpty() || accessKey.isEmpty() || secretKey.isEmpty() || bucket.isEmpty()) {
-                    return new FactoryResult(null, p, "incomplete minio config");
-                }
-                // 完备性检查通过后由工厂构造 MinIO（S3 协议族）客户端
-                return providerBacked(p, sec, baseDir);
-            }
-            case "cos": {
-                JsonNode c = sec == null ? null : sec.get("cos");
-                if (c == null || textOr(c.get("secretId"), "").isEmpty() || textOr(c.get("secretKey"), "").isEmpty()
-                        || textOr(c.get("bucketName"), "").isEmpty() || textOr(c.get("region"), "").isEmpty()) {
-                    return new FactoryResult(null, p, "incomplete cos config");
-                }
-                return providerBacked(p, sec, baseDir);
-            }
-            case "tos": {
-                JsonNode t = sec == null ? null : sec.get("tos");
-                if (t == null || textOr(t.get("endpoint"), "").isEmpty() || textOr(t.get("region"), "").isEmpty()
-                        || textOr(t.get("accessKey"), "").isEmpty() || textOr(t.get("secretKey"), "").isEmpty()
-                        || textOr(t.get("bucketName"), "").isEmpty()) {
-                    return new FactoryResult(null, p, "incomplete tos config");
-                }
-                return providerBacked(p, sec, baseDir);
-            }
-            case "s3": {
-                JsonNode s = sec == null ? null : sec.get("s3");
-                if (s == null || textOr(s.get("region"), "").isEmpty() || textOr(s.get("bucketName"), "").isEmpty()) {
-                    return new FactoryResult(null, p, "incomplete s3 config");
-                }
-                boolean hasKey = !textOr(s.get("accessKey"), "").isEmpty();
-                boolean hasSecret = !textOr(s.get("secretKey"), "").isEmpty();
-                if (hasKey != hasSecret) {
-                    return new FactoryResult(null, p, "incomplete s3 config");
-                }
-                return providerBacked(p, sec, baseDir);
-            }
-            case "obs": {
-                JsonNode o = sec == null ? null : sec.get("obs");
-                String endpoint = o != null ? textOr(o.get("endpoint"), "").trim() : "";
-                String accessKey = o != null ? textOr(o.get("accessKey"), "").trim() : "";
-                String secretKey = o != null ? textOr(o.get("secretKey"), "").trim() : "";
-                String bucket = o != null ? textOr(o.get("bucketName"), "").trim() : "";
-                if (endpoint.isEmpty()) {
-                    endpoint = env("OBS_ENDPOINT");
-                }
-                if (accessKey.isEmpty()) {
-                    accessKey = env("OBS_ACCESS_KEY");
-                }
-                if (secretKey.isEmpty()) {
-                    secretKey = env("OBS_SECRET_KEY");
-                }
-                if (bucket.isEmpty()) {
-                    bucket = env("OBS_BUCKET_NAME");
-                }
-                if (endpoint.isEmpty() || accessKey.isEmpty() || secretKey.isEmpty() || bucket.isEmpty()) {
-                    return new FactoryResult(null, p, "incomplete obs config");
-                }
-                return providerBacked(p, sec, baseDir);
-            }
-            case "oss": {
-                JsonNode o = sec == null ? null : sec.get("oss");
-                if (o == null || textOr(o.get("endpoint"), "").isEmpty() || textOr(o.get("region"), "").isEmpty()
-                        || textOr(o.get("accessKey"), "").isEmpty() || textOr(o.get("secretKey"), "").isEmpty()
-                        || textOr(o.get("bucketName"), "").isEmpty()) {
-                    return new FactoryResult(null, p, "incomplete oss config");
-                }
-                return providerBacked(p, sec, baseDir);
-            }
-            case "ks3": {
-                JsonNode k = sec == null ? null : sec.get("ks3");
-                if (k == null || textOr(k.get("endpoint"), "").isEmpty() || textOr(k.get("region"), "").isEmpty()
-                        || textOr(k.get("accessKey"), "").isEmpty() || textOr(k.get("secretKey"), "").isEmpty()
-                        || textOr(k.get("bucketName"), "").isEmpty()) {
-                    return new FactoryResult(null, p, "incomplete ks3 config");
-                }
-                return providerBacked(p, sec, baseDir);
-            }
-            default:
-                return new FactoryResult(null, p, "unsupported provider \"" + p + "\"");
+            String externalURL = env("APP_EXTERNAL_URL");
+            return new FactoryResult(new LocalFileContentService(dir, externalURL), p, null);
         }
+        // 云 provider 的完备性校验与文案由 FileServiceFactory 单点产出；
+        // 这里不再逐 provider 重复一套 switch（两套字符串曾各自维护）。
+        return providerBacked(p, sec, baseDir);
     }
 
     /**
@@ -444,7 +351,7 @@ public class StorageFileResolver {
      * provider 家族键读取（{@code MINIO_*} / {@code OBS_*} / {@code APP_EXTERNAL_URL} …）——
      * 走存储域统一查找面；未配置 → 空串。
      */
-    private static String env(String key) {
+    static String env(String key) {
         String v = StorageEnvLookup.get(key);
         return v == null ? "" : v.trim();
     }
@@ -599,7 +506,7 @@ public class StorageFileResolver {
             log.info("[Router] {} tenant storage config missing or invalid, fallback to global file "
                     + "service: tenant_id={} provider={} err={}", logTag, tenant.tenantId(), provider,
                     resolution.error());
-            return new Resolution(new DecoratedFileService(globalFileService, catalog), globalStorageType, null);
+            return new Resolution(new ResourceCatalogFileService(globalFileService, catalog), globalStorageType, null);
         }
         log.warn("[Router] {} resolve file service failed without fallback: tenant_id={} provider={} "
                 + "global_storage_type={} err={}", logTag, tenant.tenantId(), provider, globalStorageType,
@@ -608,152 +515,6 @@ public class StorageFileResolver {
     }
 
     // ── resourceCatalogFileService 装饰器 ───────────────────────────────────
-
-    /**
-     * GetFile 先把手柄换成物理路径；
-     * GetFileURL 对手柄在外部 URL 在位时派生 /r/ 令牌。
-     */
-    private record DecoratedFileService(FileContentService inner, ResourceCatalogService catalog)
-            implements WritableFileContentService {
-
-        @Override
-        public OpenedFile getFile(String filePath) throws IOException {
-            ResourceCatalogService.ResolvedPath resolved = catalog.resolvePath(filePath);
-            if (resolved.error()) {
-                throw new IOException("resource not found");
-            }
-            return inner.getFile(resolved.physicalPath());
-        }
-
-        @Override
-        public String getFileURL(String filePath) throws IOException {
-            ResourceCatalogService.ResolvedPath resolved = catalog.resolvePath(filePath);
-            if (resolved.error()) {
-                throw new IllegalStateException("resource not found");
-            }
-            String physical = resolved.physicalPath();
-            boolean isResource = resolved.resource() != null;
-            String externalURL = env("APP_EXTERNAL_URL").replaceAll("/+$", "");
-            if (isResource && !externalURL.isEmpty()) {
-                var token = catalog.createAccessGrant(filePath, java.time.Duration.ofHours(2));
-                if (token.isPresent()) {
-                    return externalURL + "/r/" + token.get();
-                }
-                throw new IllegalStateException("failed to allocate resource access token");
-            }
-            return inner.getFileURL(physical);
-        }
-
-        /**
-         * 物理落盘 →
-         * SHA-256 内容哈希 → 资源注册（失败回删物理文件）→ 返回 resource:// 手柄。
-         */
-        @Override
-        public String saveBytes(byte[] data, long tenantId, String fileName, boolean temp)
-                throws IOException {
-            String physical;
-            if (inner instanceof WritableFileContentService writable) {
-                physical = writable.saveBytes(data, tenantId, fileName, temp);
-            } else {
-                throw new IOException("storage provider does not support saving bytes");
-            }
-            String hash = sha256Hex(data);
-            try {
-                String kind = resourceKind(fileName);
-                String mimeType = probeMimeType(fileName);
-                return catalog.register(tenantId, physical, new ResourceCatalogService.ResourceRegistration(
-                        kind, mimeType, baseName(fileName), data.length, hash, temp));
-            } catch (RuntimeException e) {
-                if (inner instanceof WritableFileContentService w) {
-                    try {
-                        w.deleteFile(physical);
-                    } catch (IOException ignored) {
-                        // register 失败尽力回删物理文件
-                    }
-                }
-                throw new IOException("register stored resource: " + e.getMessage(), e);
-            }
-        }
-
-        /** 物理删除 + 资源软删。 */
-        @Override
-        public void deleteFile(String filePath) throws IOException {
-            ResourceCatalogService.ResolvedPath resolved = catalog.resolvePath(filePath);
-            if (resolved.error()) {
-                throw new IOException("resource not found");
-            }
-            if (!(inner instanceof WritableFileContentService writable)) {
-                throw new IOException("storage provider does not support deleting files");
-            }
-            writable.deleteFile(resolved.physicalPath());
-            if (resolved.resource() != null) {
-                try {
-                    catalog.markDeleted(filePath);
-                } catch (RuntimeException e) {
-                    throw new IOException("mark resource deleted: " + e.getMessage(), e);
-                }
-            }
-        }
-
-        private static String sha256Hex(byte[] data) {
-            return Hashes.sha256Hex(data);
-        }
-
-        /** mime 前缀 → image/audio/video，否则 file。 */
-        private static String resourceKind(String name) {
-            String mimeType = probeMimeType(name);
-            if (mimeType.startsWith("image/")) {
-                return "image";
-            }
-            if (mimeType.startsWith("audio/")) {
-                return "audio";
-            }
-            if (mimeType.startsWith("video/")) {
-                return "video";
-            }
-            return "file";
-        }
-
-        /** mime.TypeByExtension 的有界版：内置表 + Files 探测，未知 → ""。 */
-        private static String probeMimeType(String name) {
-            String ext = name == null ? "" : name.toLowerCase(java.util.Locale.ROOT);
-            int dot = ext.lastIndexOf('.');
-            ext = dot < 0 ? "" : ext.substring(dot);
-            String builtIn = switch (ext) {
-                case ".html", ".htm" -> "text/html; charset=utf-8";
-                case ".css" -> "text/css; charset=utf-8";
-                case ".js", ".mjs" -> "text/javascript; charset=utf-8";
-                case ".json" -> "application/json";
-                case ".pdf" -> "application/pdf";
-                case ".txt" -> "text/plain; charset=utf-8";
-                case ".md", ".markdown" -> "text/markdown; charset=utf-8";
-                case ".svg" -> "image/svg+xml";
-                case ".png" -> "image/png";
-                case ".jpg", ".jpeg" -> "image/jpeg";
-                case ".gif" -> "image/gif";
-                case ".webp" -> "image/webp";
-                case ".avif" -> "image/avif";
-                case ".wasm" -> "application/wasm";
-                case ".xml" -> "text/xml; charset=utf-8";
-                default -> null;
-            };
-            if (builtIn != null) {
-                return builtIn;
-            }
-            try {
-                String probed = java.nio.file.Files.probeContentType(java.nio.file.Path.of("f" + ext));
-                return probed == null ? "" : probed;
-            } catch (IOException e) {
-                return "";
-            }
-        }
-
-        private static String baseName(String name) {
-            String n = name == null ? "" : name;
-            int slash = Math.max(n.lastIndexOf('/'), n.lastIndexOf('\\'));
-            return slash < 0 ? n : n.substring(slash + 1);
-        }
-    }
 
     /**
      * 生产装配的进程级默认服务（恒 local 基座）。
@@ -765,6 +526,6 @@ public class StorageFileResolver {
 
     /** 测试/装饰辅助：给定 inner 的 resource:// 装饰视图（读+写）。 */
     public WritableFileContentService decorate(FileContentService inner) {
-        return new DecoratedFileService(inner, catalog);
+        return new ResourceCatalogFileService(inner, catalog);
     }
 }
