@@ -141,7 +141,7 @@
 | **L0** | README 删"评测"承诺（能力清单 + 端点表两处）；报告更正落档 | ✅ 2026-10-20 |
 | **L1** | 引擎类型常量单源化：`contract.vectorstore.VectorEngineTypes`（9 全集 / 7 可配置，差额 = postgres/sqlite） | ✅ 2026-10-20 |
 | **L3** | 工具清单守卫（`check-tool-registry.py`，第 44 条）+ API-Key 幽灵规则检查 + `Skill(s)` 控制器改名 | ✅ 2026-10-20 |
-| **L2** | embedding 单路径（删 knowledge 域内 `EmbedderClient`，统一走 `ModelRuntime`） | 待做 |
+| **L2** | embedding 单路径：**取证后拆两刀**——L2a 先把严格响应校验（条数/index/维度）补进 model-runtime，L2b 再切 pg 路径并删 `EmbedderClient` | 待做 |
 
 **否决项**：RBAC 双表不合并（主语/语法/语义都不同）；工具装配暂不端口化（请求级构造 + 三个分发 switch，先加守卫）。
 

@@ -41,9 +41,13 @@
 | **L0** 文档与口径 | README 删"评测"两处；本报告 4 处更正落档 | D1~D5 守卫绿 | ✅ 2026-10-20 |
 | **L1** 引擎常量单源化 | 新增 `contract.vectorstore.VectorEngineTypes`（9 全集 + 7 可配置 + 差额=env 引擎）；`EngineTypes` 改别名、`VectorStoreEngines` 引用契约；两条测试钉住 | 43 守卫绿；常量测试绿；金片零变化 | ✅ 2026-10-20 |
 | **L3** 扩展清单守卫 | ① 新增 `check-tool-registry.py`（T1 实现必须有分发 / T2 分发必须有实现 / T3 工具名不重复），第 44 条守卫；② `check-route-policy.py` 扩 API-Key 策略表幽灵规则（205 条规则）；③ 两个技能控制器改名：`SkillCatalogAdminController` / `SkillPickerController` | 四条红态探针均验证；44 守卫绿 · **5028 / 0 / 4** | ✅ 2026-10-20 |
-| **L2** embedding 单路径 | model-runtime 提供 `EmbeddingPort` 实现；删 `knowledge/client/EmbedderClient`；pg 路径改走 `ModelRuntime` | 金片零变化；embedding 桩测试逐条对拍 | 待做 |
+| **L2** embedding 单路径 | **拆两刀（见下）**：L2a 把严格响应校验补进 model-runtime；L2b 切 pg 路径并删 `knowledge/client/EmbedderClient` | 校验测试先立、再切换；金片零变化 | 待做 |
 
-**顺序**：L0 ✅ → L1 ✅ → L3 ✅ → L2。
+**L2 取证结论（2026-10-20，实施前推翻原方案）**：报告建议"删 `EmbedderClient`、pg 路径改走 `ModelRuntime`"，但实测 `EmbedderClient` 承担了一组运行时路径**没有**的响应校验——`data` 缺失、单条空向量、批内维度不一致、`index` 越界/重复、返回条数不符，并按 `index` 归位（同仓注释明确：pg 写库是 `rows[i] ↔ vectors[i]` 按位置配行，顺序错/少条/混维会**静默写错向量**）。model-runtime 的 9 个 provider 解析只按响应顺序 `append`（如 `OpenAiEmbedder` 直接遍历 `data` 追加），没有这些检查。
+
+因此顺序必须反过来：**先 L2a** 在 model-runtime 建统一校验（`ConcurrencyEmbedder` 是所有 embedder 的包装层，可做条数/维度校验；`index` 归位需落在 OpenAI 族的解析里），并配与大客户端同口径的测试；**再 L2b** 切 pg 路径、删客户端。否则"单路径"会以静默向量错位为代价。
+
+**顺序**：L0 ✅ → L1 ✅ → L3 ✅ → L2a → L2b（L2 原方案实施前被取证推翻，拆两刀）。
 
 ## 4. 不做
 
