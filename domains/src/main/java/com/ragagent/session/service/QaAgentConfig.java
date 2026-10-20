@@ -42,7 +42,6 @@ public class QaAgentConfig implements AgentRunSpec {
     private List<String> mcpServices = new ArrayList<>();
     private int mcpAuthWaitTimeout;
     private boolean retrieveKbOnlyWhenMentioned;
-    private boolean sharedAgentReadOnly;
     private List<String> knowledgeBases = new ArrayList<>();
     private List<String> knowledgeIds = new ArrayList<>();
     private SearchTargets searchTargets;
@@ -69,8 +68,6 @@ public class QaAgentConfig implements AgentRunSpec {
     public void setMcpAuthWaitTimeout(int v) { mcpAuthWaitTimeout = v; }
     public boolean isRetrieveKbOnlyWhenMentioned() { return retrieveKbOnlyWhenMentioned; }
     public void setRetrieveKbOnlyWhenMentioned(boolean v) { retrieveKbOnlyWhenMentioned = v; }
-    public boolean isSharedAgentReadOnly() { return sharedAgentReadOnly; }
-    public void setSharedAgentReadOnly(boolean v) { sharedAgentReadOnly = v; }
     public List<String> getKnowledgeBases() { return knowledgeBases; }
     public void setKnowledgeBases(List<String> v) { knowledgeBases = v == null ? new ArrayList<>() : v; }
     public List<String> getKnowledgeIds() { return knowledgeIds; }

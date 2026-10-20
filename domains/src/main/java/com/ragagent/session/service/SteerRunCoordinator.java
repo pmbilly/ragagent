@@ -236,7 +236,6 @@ public class SteerRunCoordinator {
         copy.webSearchEnabled = src.webSearchEnabled;
         copy.mentionedItems = new java.util.ArrayList<>(src.mentionedItems);
         copy.effectiveTenantId = src.effectiveTenantId;
-        copy.sharedAgentReadOnly = src.sharedAgentReadOnly;
         copy.images = src.images;
         copy.userMessageID = src.userMessageID;
         copy.userCreatedAt = src.userCreatedAt;

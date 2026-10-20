@@ -1,6 +1,5 @@
 package com.ragagent.session.service;
 
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.session.rag.ChatManage;
@@ -30,7 +29,7 @@ final class QaChatManageOverrides {
             return;
         }
         ObjectNode c = AgentConfigJson.ensureDefaults(req.agentConfig);
-        SessionQaResolution.Prompts prompts = resolveCustomAgentPrompts(req.agentRow, c);
+        SessionQaResolution.Prompts prompts = resolveCustomAgentPrompts(c);
         if (!prompts.system().isEmpty()) {
             cm.getSummaryConfig().setPrompt(prompts.system());
             log.info("Using custom agent's system_prompt");
@@ -121,8 +120,7 @@ final class QaChatManageOverrides {
             cm.setIntentPromptOverrides(overrides);
         }
     }
-    SessionQaResolution.Prompts resolveCustomAgentPrompts(
-            CustomAgentEntity agent, ObjectNode c) {
+    SessionQaResolution.Prompts resolveCustomAgentPrompts(ObjectNode c) {
         if (c == null) {
             return new SessionQaResolution.Prompts("", "");
         }

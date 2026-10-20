@@ -65,7 +65,13 @@ public interface AgentLookup {
     /** agent 的推荐问题（按 KB 过滤）；无配置 / 失败返回 {@code null}（调用方按"无推荐"处理）。 */
     List<Object> suggestedQuestions(String agentId, List<String> kbIds, int limit);
 
-    /** agent 只读视图（跨域传递用；租户归属由 {@code #isAgentOwned} 表达，不再传实体）。 */
-    record AgentView(String id, String name, String description, String avatar, String configJson) {
+    /**
+     * agent 只读视图（跨域传递用；不再传实体）。
+     *
+     * <p>{@code tenantId} 是解析该 agent 时的租户归属：会话域用它决定检索租户、
+     * 并判断 agent 作用域是否适用于当前会话，故必须随视图一起带出。</p>
+     */
+    record AgentView(String id, String name, String description, String avatar,
+                     String configJson, Long tenantId) {
     }
 }

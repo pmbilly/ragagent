@@ -34,10 +34,10 @@
 | **K0** 文档口径 | README/overview/构建注释五处计数对齐；`check-doc-truth.py` 扩 D2（业务控制器 + 探针）/D4（金片双口径）/D5（provider 注册数），三条各配红态探针 | 守卫绿；红态探针三条均红并复原 | ✅ 2026-10-20 |
 | **K4** 装配点登记 | `overview.md` 增"装配点清单"（22 个装配类按组合根/域内/模块内三档登记）；登记"agent-engine 经根包组件扫描装配"；新增 `check-wiring-points.py`（W1 集合相等 / W2 分类落点 / W3 理由 / W4 文档同步） | 四条判据红态探针均验证 | ✅ 2026-10-20 |
 | **K1** 引擎注册合表 | `EngineFactory`：9 个引擎合成一张 `SPECS`（构造 + 地址策略同行登记），`EngineSpec` 强制"声明地址字段或显式免检"，否则类初始化失败；删掉不可达的 `unsupported engine type` 分支；新增"每个 `ENGINE_*` 常量必须有注册项"的完整性测试（摘掉一条注册即红）。`FileServiceFactory`：删 `IMPLEMENTED`/`PENDING` 死集合与配套不可达分支，测试断言改为行为断言 | 文案逐字不变；43 守卫绿 · **5026 / 0 / 4** · build 2m16s；**未做**跨模块 SSRF 元数据共享（理由见 §2 T1） | ✅ 2026-10-20 |
-| **K2** 实体渗漏清零 | `AgentView` 补 `tenantId`；8 文件改持视图；`ResolvedAgent` 删恒 false 的 `sharedAgentReadOnly`；`check-domain-contracts.py` 增"跨域 import 落在 `.domain.` 即红"，基线 8 → 0 | agent 相关金片零变化；基线收紧到 0 | 待做 |
+| **K2** 实体渗漏清零 | `AgentView` 补 `tenantId`（视图原就为此设计，未新造投影）；8 个 session 文件改持视图，两处从未使用的实体参数一并删除；`ResolvedAgent` 删恒 false 的 `sharedAgentReadOnly` 并清 6 处消费点（含死分支与过滤方法）；`check-domain-contracts.py` 增 E1"跨域 `.domain.` import 即红"，基线 0。**副作用**：域间边参考类 33 → 27（session→agentmanagement 11 → 5） | 跨域实体 import 0 · 43 守卫绿 · **5026 / 0 / 4** · build 2m28s | ✅ 2026-10-20 |
 | **K3** LLM 目录单源化 | `ModelProviderCatalog.ENTRIES` 由 `ProviderRegistry.list()` 生成；`ProviderCatalogParityTest` 降级为"同源"断言；`validateConfig` 登记已知缺口 | `contracts/model-providers.json` 金片字节一致（顺序敏感） | 待做 |
 
-**顺序**：K0 ✅ → K4 ✅ → K1 ✅ → K2 → K3。
+**顺序**：K0 ✅ → K4 ✅ → K1 ✅ → K2 ✅ → K3。
 
 ## 4. 不做
 

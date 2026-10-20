@@ -2,7 +2,7 @@ package com.ragagent.session.service;
 
 
 
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ final class QaMentionTagScope {
             // 防止调用方注入范围外的 KB/知识 id。
             // ⚠️ Long 一律 equals（装箱比较：超出缓存区间的 id 用 == 恒不等）
             if (req.agentRow != null && req.session != null
-                    && !java.util.Objects.equals(req.agentRow.getTenantId(),
+                    && !java.util.Objects.equals(req.agentRow.tenantId(),
                             req.session.getTenantId())) {
                 SessionQaResolution.MentionScope scope = restrictMentionsToAgentScope(req.agentRow, req.agentConfig,
                         req.session.getTenantId(), kbIds, knowledgeIds);
@@ -67,7 +67,7 @@ final class QaMentionTagScope {
         return new SessionKnowledgeQaService.KnowledgeResolution(kbIds, knowledgeIds);
     }
     public SessionQaResolution.MentionScope restrictMentionsToAgentScope(
-            CustomAgentEntity agent, ObjectNode agentCfg,
+            AgentLookup.AgentView agent, ObjectNode agentCfg,
             long sessionTenantId, List<String> kbIds, List<String> knowledgeIds) {
         List<String> allowed = kbScope.resolveKnowledgeBasesFromAgent(agent, agentCfg, sessionTenantId);
         if (allowed.isEmpty()) {
@@ -87,7 +87,7 @@ final class QaMentionTagScope {
         if (knowledgeIds != null && !knowledgeIds.isEmpty()) {
             List<KnowledgeRowView> rows;
             try {
-                rows = service.knowledgeCatalog.getKnowledgeBatch(agent.getTenantId(), knowledgeIds);
+                rows = service.knowledgeCatalog.getKnowledgeBatch(agent.tenantId(), knowledgeIds);
             } catch (RuntimeException e) {
                 log.warn("Failed to validate knowledge IDs against agent scope, blocking all", e);
                 rows = null;
@@ -107,7 +107,7 @@ final class QaMentionTagScope {
         return new SessionQaResolution.MentionScope(filteredKbs, filteredKnowledge);
     }
     public List<QaSupport.TagScope> restrictTagScopesToAgentScope(
-            CustomAgentEntity agent, ObjectNode agentCfg,
+            AgentLookup.AgentView agent, ObjectNode agentCfg,
             long sessionTenantId, List<QaSupport.TagScope> tagScopes) {
         if (tagScopes == null || tagScopes.isEmpty()) {
             return new ArrayList<>();

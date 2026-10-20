@@ -1,6 +1,6 @@
 package com.ragagent.session.service;
 
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
@@ -30,7 +30,7 @@ final class QaKbScope {
     }
 
     public List<String> resolveKnowledgeBasesFromAgent(
-            CustomAgentEntity agent, ObjectNode agentCfg, long sessionTenantId) {
+            AgentLookup.AgentView agent, ObjectNode agentCfg, long sessionTenantId) {
         if (agentCfg == null) {
             return new ArrayList<>();
         }
@@ -84,8 +84,8 @@ final class QaKbScope {
     }
     public long resolveRetrievalTenantId(QaSupport.QaRequest req) {
         long retrievalTenantId = req.session.getTenantId();
-        if (req.agentRow != null && req.agentRow.getTenantId() != null && req.agentRow.getTenantId() != 0) {
-            retrievalTenantId = req.agentRow.getTenantId();
+        if (req.agentRow != null && req.agentRow.tenantId() != null && req.agentRow.tenantId() != 0) {
+            retrievalTenantId = req.agentRow.tenantId();
             log.info("Using agent tenant {} for retrieval scope", retrievalTenantId);
         } else {
             Long ctxTenant = TenantContext.currentTenantId();

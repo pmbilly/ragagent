@@ -1,5 +1,5 @@
 {
-  "note": "R10「域间只经契约」棘轮基线（方案 §5.1）。edges 键＝\"源域→目标域\"，值＝引用该域的源类名；tiers 为三档口径：clearable（目标 0）/ owner（同数据属主，登记允许）/ intra-family（运行面族内，豁免+冻结），未登记的边默认 clearable。只许减：新增边/新增类即红，登记不是新增许可。收紧用 --write（存在新增时会被拒绝，并清理陈旧登记）。",
+  "note": "R10「域间只经契约」棘轮基线（方案 §5.1）。edges 键＝\"源域→目标域\"，值＝引用该域的源类名；tiers 为三档口径：clearable（目标 0）/ owner（同数据属主，登记允许）/ intra-family（运行面族内，豁免+冻结），未登记的边默认 clearable。只许减：新增边/新增类即红，登记不是新增许可。收紧用 --write（存在新增时会被拒绝，并清理陈旧登记）。entity-imports 为跨域 `.domain.` 实体 import 基线（E1，目标 0，不吃族内豁免）。",
   "tiers": {
     "note": "三档口径（2026-10-14 定）。目标不是\"0 条边\"而是\"0 条未分类边\"：每条边要么清掉，要么有明确分级理由 —— 一刀切清零会逼出假抽象（给实体字段清单造端口 ✗）。未在本节登记的边**默认 clearable**。登记不是新增许可：把新增边标成 owner/intra-family 不能放行（棘轮先于分档）。",
     "clearable": {
@@ -82,16 +82,10 @@
     ],
     "session→agentmanagement": [
       "AgentConfigAssembler",
-      "AgentResolver",
       "MessageSuggestionService",
       "QaChatManageOverrides",
-      "QaKbScope",
-      "QaMentionTagScope",
       "QaRequestParser",
-      "QaSupport",
-      "SessionAgentQaService",
-      "SessionKnowledgeQaService",
-      "SessionQaResolution"
+      "SessionAgentQaService"
     ],
     "system→auth": [
       "SystemAdminController",
@@ -105,5 +99,9 @@
       "WikiIngestBatchHandler",
       "WikiIngestCitePipeline"
     ]
+  },
+  "entity-imports": {
+    "note": "跨域 `.domain.` 实体 import 基线（E1，只许减，目标 0）。值为源文件相对 domains 源码根的路径；族内豁免不适用于实体层。收紧用 --write。",
+    "files": []
   }
 }

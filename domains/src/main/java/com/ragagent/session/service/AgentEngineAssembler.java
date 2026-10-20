@@ -301,9 +301,6 @@ final class AgentEngineAssembler {
         List<String> allowedTools = new ArrayList<>(config.getAllowedTools().isEmpty()
                 ? ToolDefinitions.defaultAllowedTools()
                 : config.getAllowedTools());
-        if (config.isSharedAgentReadOnly()) {
-            allowedTools = filterSharedAgentWriteTools(allowedTools);
-        }
 
         // Capability detection from SearchTargets
         boolean hasVectorKb = false;
@@ -466,18 +463,4 @@ final class AgentEngineAssembler {
         return out;
     }
 
-    /** 过滤共享 agent 只读模式下不允许的写工具。 */
-    private static List<String> filterSharedAgentWriteTools(List<String> allowed) {
-        List<String> sourceWrites = List.of(
-                ToolDefinitions.TOOL_WIKI_FLAG_ISSUE, ToolDefinitions.TOOL_WIKI_UPDATE_ISSUE,
-                ToolDefinitions.TOOL_WIKI_WRITE_PAGE, ToolDefinitions.TOOL_WIKI_REPLACE_TEXT,
-                ToolDefinitions.TOOL_WIKI_RENAME_PAGE, ToolDefinitions.TOOL_WIKI_DELETE_PAGE);
-        List<String> filtered = new ArrayList<>();
-        for (String name : allowed) {
-            if (!sourceWrites.contains(name)) {
-                filtered.add(name);
-            }
-        }
-        return filtered;
-    }
 }

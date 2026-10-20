@@ -58,7 +58,6 @@ final class AgentConfigAssembler {
         ac.setLlmCallTimeout(c.path("llmCallTimeout").asInt(0));
         ac.setMaxCompletionTokens(c.path("maxCompletionTokens").asInt(0));
         ac.setRetainRetrievalHistory(c.path("retainRetrievalHistory").asBoolean(false));
-        ac.setSharedAgentReadOnly(req.sharedAgentReadOnly);
 
         // skills 配置（configureSkillsFromAgent）；指令型数据源 =
         // 宿主技能目录（选项 B），不再有沙箱镜像技能集
@@ -106,8 +105,7 @@ final class AgentConfigAssembler {
 
         // Per-request skill/MCP scope
         applyPerRequestSkillScope(ac, skillsMode, req.skillNames);
-        applyPerRequestMcpScope(ac, stringListOf(c.get("mcpServices")),
-                req.sharedAgentReadOnly, req.mcpServiceIds);
+        applyPerRequestMcpScope(ac, stringListOf(c.get("mcpServices")), req.mcpServiceIds);
 
         // Custom system prompt
         Prompts prompts = resolveAgentPrompts(req);
@@ -186,7 +184,7 @@ final class AgentConfigAssembler {
     }
     /** 逐请求 MCP 范围收敛。 */
     private static void applyPerRequestMcpScope(QaAgentConfig ac, List<String> agentPresetMcps,
-            boolean isSharedAgent, List<String> requested) {
+            List<String> requested) {
         if (requested == null || requested.isEmpty()) {
             return;
         }
@@ -195,10 +193,10 @@ final class AgentConfigAssembler {
             return;
         }
         List<String> mentioned = dedupPreservingOrder(requested);
-        var scope = resolvePerRequestMcpScope(mentioned, agentPresetMcps, ac.getMcpSelectionMode(), isSharedAgent);
+        var scope = resolvePerRequestMcpScope(mentioned, agentPresetMcps, ac.getMcpSelectionMode());
         if (scope.effective().isEmpty()) {
-            log.debug("Ignoring @MCP scope outside agent preset: requested={} agent={} shared={}",
-                    requested, agentPresetMcps, isSharedAgent);
+            log.debug("Ignoring @MCP scope outside agent preset: requested={} agent={}",
+                    requested, agentPresetMcps);
             return;
         }
         ac.setPinnedMcpServiceIds(scope.effective());
@@ -207,15 +205,9 @@ final class AgentConfigAssembler {
     }
     private record McpScope(List<String> effective, String mode) {}
     private static McpScope resolvePerRequestMcpScope(List<String> mentioned, List<String> agentMcps,
-            String selectionMode, boolean isSharedAgent) {
+            String selectionMode) {
         if (mentioned.isEmpty()) {
             return new McpScope(new ArrayList<>(), selectionMode);
-        }
-        if (isSharedAgent) {
-            mentioned = intersectPreservingRequestOrder(mentioned, agentMcps);
-            if (mentioned.isEmpty()) {
-                return new McpScope(new ArrayList<>(), selectionMode);
-            }
         }
         List<String> effective = new ArrayList<>();
         switch (selectionMode) {

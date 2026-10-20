@@ -2,7 +2,7 @@ package com.ragagent.session.service;
 
 import static com.ragagent.session.service.QaSupport.TagScope;
 
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
@@ -115,7 +115,7 @@ public class SessionKnowledgeQaService {
     }
 
     public SessionQaResolution.MentionScope restrictMentionsToAgentScope(
-            CustomAgentEntity agent, ObjectNode agentCfg,
+            AgentLookup.AgentView agent, ObjectNode agentCfg,
             long sessionTenantId, List<String> kbIds, List<String> knowledgeIds) {
         return resolution.restrictMentionsToAgentScope(agent, agentCfg, sessionTenantId, kbIds, knowledgeIds);
     }

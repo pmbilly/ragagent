@@ -2,8 +2,8 @@ package com.ragagent.session.qa;
 
 import static com.ragagent.session.service.QaSupport.KnowledgeTargets;
 
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
+import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.session.MessageAttachment;
@@ -128,13 +128,12 @@ public final class QaRequestParser {
         // 解析 agent：共享优先，source==0 才回落自有
         var resolvedAgent = agentResolver.resolve(request.agentId,
                 request.agentSourceTenantId);
-        CustomAgentEntity customAgent = resolvedAgent.row();
+        AgentLookup.AgentView customAgent = resolvedAgent.agent();
         if (request.agentSourceTenantId != 0 && customAgent == null) {
             throw BizException.notFound("Shared agent not found");
         }
         rc.agentRow = customAgent;
         rc.effectiveTenantId = resolvedAgent.effectiveTenantId();
-        rc.sharedAgentReadOnly = resolvedAgent.sharedAgentReadOnly();
         if (customAgent != null) {
             ObjectNode cfg = AgentResolver.parseAgentConfig(customAgent);
             AgentConfigJson.ensureDefaults(cfg);
@@ -148,7 +147,7 @@ public final class QaRequestParser {
                 merged.kbIds(), merged.knowledgeIds());
 
         // wiki fixer 的租户作用域：内建 agent id 不匹配即跳过（同款守卫）
-        if (rc.agentConfig != null && "builtin-wiki-fixer".equals(customAgent.getId())) {
+        if (rc.agentConfig != null && "builtin-wiki-fixer".equals(customAgent.id())) {
             // 租户作用域随 wiki_config 面（命中条件是 KB 共享关系；dev 单租户等价于不动）。
         }
 
@@ -316,12 +315,12 @@ public final class QaRequestParser {
 
     /** assistant 消息骨架（后续由 QaTurnExecutor 补内容）。 */
     private void buildAssistantMessage(QaRequestContext rc, CreateKnowledgeQARequest request,
-            CustomAgentEntity customAgent, AgentResolver.ResolvedAgent resolvedAgent) {
+            AgentLookup.AgentView customAgent, AgentResolver.ResolvedAgent resolvedAgent) {
     // assistant 消息骨架（buildMessageExecutionContext 的 agent 字段）
-    String agentId = customAgent == null ? "" : customAgent.getId();
+    String agentId = customAgent == null ? "" : customAgent.id();
     // 共享 agent 的租户以 effectiveTenantId 为准，为 0 才回落 agent 自身租户
     long agentTenantId = resolvedAgent.effectiveTenantId() != 0 ? resolvedAgent.effectiveTenantId()
-            : (customAgent != null && customAgent.getTenantId() != null ? customAgent.getTenantId() : 0);
+            : (customAgent != null && customAgent.tenantId() != null ? customAgent.tenantId() : 0);
     String modelId = request.summaryModelId;
     if (modelId.isEmpty() && rc.agentConfig != null) {
         modelId = rc.agentConfig.path("modelId").asString("");

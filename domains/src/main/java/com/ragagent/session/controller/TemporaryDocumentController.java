@@ -92,7 +92,7 @@ public class TemporaryDocumentController {
         // "file size must be between 1 byte and 50MB" 兜底
         // agent_source_tenant_id / 共享 agent 分支随空间分享裁撤：只解析自有 agent
         var resolved = agentResolver.resolve(agentId, 0);
-        var agent = resolved.row();
+        var agent = resolved.agent();
         String ext = extNoDot(file.getOriginalFilename());
         TemporaryDocumentService.CreateOptions options = TemporaryDocumentService.CreateOptions
                 .empty().withParserEngine(parserEngine == null ? "" : parserEngine.strip());

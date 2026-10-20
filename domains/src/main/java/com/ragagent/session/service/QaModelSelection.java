@@ -34,15 +34,15 @@ final class QaModelSelection {
         if (req.agentConfig != null) {
             configuredAgentModelId = req.agentConfig.path("modelId").asString("").trim();
             if (configuredAgentModelId.isEmpty()
-                    && !"builtin-wiki-fixer".equals(req.agentRow.getId())) {
+                    && !"builtin-wiki-fixer".equals(req.agentRow.id())) {
                 throw new RuntimeException("chat model is not configured: please set model_id on agent "
-                        + req.agentRow.getId());
+                        + req.agentRow.id());
             }
             if (!configuredAgentModelId.isEmpty()) {
                 ModelRowView model = findModel(configuredAgentModelId);
                 if (model == null || !"KnowledgeQA".equals(model.type())) {
                     throw new RuntimeException("configured chat model " + configuredAgentModelId
-                            + " is unavailable for agent " + req.agentRow.getId());
+                            + " is unavailable for agent " + req.agentRow.id());
                 }
             }
         }

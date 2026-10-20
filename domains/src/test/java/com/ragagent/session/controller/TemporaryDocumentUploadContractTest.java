@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.session.attachment.TemporaryDocumentService;
@@ -45,7 +45,7 @@ class TemporaryDocumentUploadContractTest {
         agentResolver = mock(AgentResolver.class);
         when(agentResolver.resolve(org.mockito.ArgumentMatchers.anyString(),
                 org.mockito.ArgumentMatchers.anyLong()))
-                .thenReturn(new AgentResolver.ResolvedAgent(null, 0L, false));
+                .thenReturn(new AgentResolver.ResolvedAgent(null, 0L));
         controller = new TemporaryDocumentController(sessionService, temporaryDocuments,
                 agentResolver);
         TenantContext.set(TENANT, null, null, false, "u-1", false);
@@ -67,13 +67,8 @@ class TemporaryDocumentUploadContractTest {
                 "hello".getBytes());
     }
 
-    private static CustomAgentEntity agent(String configJson) {
-        CustomAgentEntity a = new CustomAgentEntity();
-        a.setId("a-1");
-        a.setName("own-agent");
-        a.setTenantId(TENANT);
-        a.setConfig(configJson);
-        return a;
+    private static AgentLookup.AgentView agent(String configJson) {
+        return new AgentLookup.AgentView("a-1", "own-agent", "", "", configJson, TENANT);
     }
 
     private void stubCreate() {
@@ -94,9 +89,9 @@ class TemporaryDocumentUploadContractTest {
 
     @Test
     void unsupportedFileTypeForAgentIs400() {
-        CustomAgentEntity own = agent("{\"supportedFileTypes\":[\"pdf\"]}");
+        AgentLookup.AgentView own = agent("{\"supportedFileTypes\":[\"pdf\"]}");
         when(agentResolver.resolve("a-1", 0L))
-                .thenReturn(new AgentResolver.ResolvedAgent(own, 0L, false));
+                .thenReturn(new AgentResolver.ResolvedAgent(own, 0L));
 
         assertThatThrownBy(() -> controller.upload("s-1", file("notes.txt"), "a-1", "",
                 multipartRequest()))
@@ -106,9 +101,9 @@ class TemporaryDocumentUploadContractTest {
 
     @Test
     void supportedFileTypeMatchesWithDotAndCase() {
-        CustomAgentEntity own = agent("{\"supportedFileTypes\":[\".TXT\"]}");
+        AgentLookup.AgentView own = agent("{\"supportedFileTypes\":[\".TXT\"]}");
         when(agentResolver.resolve("a-1", 0L))
-                .thenReturn(new AgentResolver.ResolvedAgent(own, 0L, false));
+                .thenReturn(new AgentResolver.ResolvedAgent(own, 0L));
         stubCreate();
 
         var response = controller.upload("s-1", file("notes.txt"), "a-1", "",
@@ -119,9 +114,9 @@ class TemporaryDocumentUploadContractTest {
 
     @Test
     void audioWithoutAsrConfigIs400() {
-        CustomAgentEntity own = agent("{\"audioUploadEnabled\":false}");
+        AgentLookup.AgentView own = agent("{\"audioUploadEnabled\":false}");
         when(agentResolver.resolve("a-1", 0L))
-                .thenReturn(new AgentResolver.ResolvedAgent(own, 0L, false));
+                .thenReturn(new AgentResolver.ResolvedAgent(own, 0L));
 
         assertThatThrownBy(() -> controller.upload("s-1", file("voice.mp3"), "a-1", "",
                 multipartRequest()))
@@ -131,10 +126,10 @@ class TemporaryDocumentUploadContractTest {
 
     @Test
     void audioWithAsrConfigWritesAsrModelId() {
-        CustomAgentEntity own = agent(
+        AgentLookup.AgentView own = agent(
                 "{\"audioUploadEnabled\":true,\"asrModelId\":\"asr-1\"}");
         when(agentResolver.resolve("a-1", 0L))
-                .thenReturn(new AgentResolver.ResolvedAgent(own, 0L, false));
+                .thenReturn(new AgentResolver.ResolvedAgent(own, 0L));
         stubCreate();
 
         controller.upload("s-1", file("voice.mp3"), "a-1", "", multipartRequest());
@@ -144,10 +139,10 @@ class TemporaryDocumentUploadContractTest {
 
     @Test
     void agentParserRuleFillsEngineWhenNotExplicit() {
-        CustomAgentEntity own = agent(
+        AgentLookup.AgentView own = agent(
                 "{\"chatParserEngineRules\":[{\"file_types\":[\"txt\"],\"engine\":\"markitdown\"}]}");
         when(agentResolver.resolve("a-1", 0L))
-                .thenReturn(new AgentResolver.ResolvedAgent(own, 0L, false));
+                .thenReturn(new AgentResolver.ResolvedAgent(own, 0L));
         stubCreate();
 
         controller.upload("s-1", file("notes.txt"), "a-1", "auto", multipartRequest());
@@ -157,10 +152,10 @@ class TemporaryDocumentUploadContractTest {
 
     @Test
     void explicitParserEngineIsKept() {
-        CustomAgentEntity own = agent(
+        AgentLookup.AgentView own = agent(
                 "{\"chatParserEngineRules\":[{\"file_types\":[\"txt\"],\"engine\":\"markitdown\"}]}");
         when(agentResolver.resolve("a-1", 0L))
-                .thenReturn(new AgentResolver.ResolvedAgent(own, 0L, false));
+                .thenReturn(new AgentResolver.ResolvedAgent(own, 0L));
         stubCreate();
 
         controller.upload("s-1", file("notes.txt"), "a-1", " simple ", multipartRequest());
@@ -170,7 +165,7 @@ class TemporaryDocumentUploadContractTest {
 
     @Test
     void withoutAgentKeepsCallerScopeAndEmptyOptions() {
-        when(agentResolver.resolve(null, 0L)).thenReturn(new AgentResolver.ResolvedAgent(null, 0L, false));
+        when(agentResolver.resolve(null, 0L)).thenReturn(new AgentResolver.ResolvedAgent(null, 0L));
         stubCreate();
 
         var response = controller.upload("s-1", file("notes.txt"), null, null,

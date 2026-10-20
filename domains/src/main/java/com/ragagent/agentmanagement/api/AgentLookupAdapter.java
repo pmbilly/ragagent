@@ -75,7 +75,7 @@ public class AgentLookupAdapter implements AgentLookup {
                 return null;
             }
             return new AgentView(row.getId(), row.getName(), row.getDescription(), row.getAvatar(),
-                    row.getConfig());
+                    row.getConfig(), row.getTenantId());
         } catch (RuntimeException e) {
             return null;
         }

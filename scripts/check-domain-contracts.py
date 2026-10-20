@@ -31,6 +31,12 @@
 `--write` 的安全阀：**存在新增项时拒绝写入**（否则"顺手 --write"会把新增一起吞掉，
 与 `check-package-cycles.py` 的教训同族）；同时自动清理**陈旧登记**（边已消失的 tiers 条目）。
 
+E1 跨域实体 import（独立判据，不吃族内豁免）
+=============================================
+业务域 A 不得 import 业务域 B 的 `...domain.*`（ORM 实体 / 持久化值对象）。R10 的三档
+管的是**服务依赖**，族内允许服务互调；实体形状是**持久层耦合**——他域字段变更会直接
+涟漪到本域 API 形状，比服务依赖更难拆。基线 `entity-imports.files` 只许减，目标 0。
+
 为什么是脚本而不是 ArchUnit：本规则是**包（域）级**判据 + 数百条基线，
 与 `check-package-cycles.py` / `check-json-key-case.py` 同类；类级规则仍在 ArchUnit（A1~A20）。
 
@@ -62,6 +68,10 @@ DOMAINS = [
     'websearch', 'wiki',
 ]
 
+# 跨域实体层 import（落在 `.domain.` 包）：持久化形状不得跨域，不吃族内豁免（E1）
+ENTITY_IMPORT = re.compile(
+    r'^import (?:static )?com\.ragagent\.(\w+)\.(?:[\w]+\.)*domain\.[\w.]+;', re.M)
+
 TIER_CLEARABLE = 'clearable'
 TIER_OWNER = 'owner'
 TIER_FAMILY = 'intra-family'
@@ -90,16 +100,36 @@ def scan():
     return {f'{a}→{b}': sorted(v) for (a, b), v in edges.items()}
 
 
+def scan_entity_imports():
+    """跨域实体层 import：{源文件（相对 domains 源码根）: [目标域]}。"""
+    hits = {}
+    for a in DOMAINS:
+        base = os.path.join(DOMAIN_SRC, a)
+        for dp, _, fs in os.walk(base):
+            if '/build/' in dp:
+                continue
+            for f in fs:
+                if not f.endswith('.java') or f == 'package-info.java':
+                    continue
+                path = os.path.join(dp, f)
+                s = open(path, encoding='utf-8', newline='').read()
+                targets = sorted({m for m in ENTITY_IMPORT.findall(s) if m != a})
+                if targets:
+                    hits[os.path.relpath(path, DOMAIN_SRC)] = targets
+    return hits
+
+
 def load_baseline():
-    """返回 (edges, tiers)。基线文件不存在或没有 tiers 时，分档退化为"全部 ①"。"""
+    """返回 (edges, tiers, entity_files)。基线缺失时三者皆空（分档退化为"全部 ①"）。"""
     if not os.path.exists(BASELINE):
-        return {}, {}
+        return {}, {}, set()
     d = json.load(open(BASELINE, encoding='utf-8'))
     tiers = d.get('tiers') or {}
     tiers.setdefault(TIER_CLEARABLE, {})
     tiers.setdefault(TIER_OWNER, {})
     tiers.setdefault(TIER_FAMILY, {})
-    return d.get('edges', {}), tiers
+    entity_files = set((d.get('entity-imports') or {}).get('files') or [])
+    return d.get('edges', {}), tiers, entity_files
 
 
 def tier_of(tiers, edge):
@@ -162,13 +192,19 @@ def main():
     args = ap.parse_args()
 
     actual = scan()
-    base, tiers = load_baseline()
+    entities = scan_entity_imports()
+    base, tiers, entity_base = load_baseline()
     problems, stale = audit_tiers(tiers, actual)
+    new_entities = sorted(set(entities) - entity_base)
+    stale_entities = sorted(entity_base - set(entities))
 
     if args.list:
         _, lines = summarize(tiers, actual)
         print(f'域→域边 {len(actual)} 条（基线 {len(base)} 条）· 三档进度：')
         print('\n'.join(lines))
+        print(f'跨域 .domain. 实体 import：{len(entities)} 处（基线 {len(entity_base)}，只许减）')
+        for path, targets in sorted(entities.items()):
+            print(f'    {path} -> {", ".join(targets)}')
         if problems:
             print('✗ 分档元数据自检失败：' + '；'.join(problems))
         if stale:
@@ -205,13 +241,15 @@ def main():
     if args.write:
         # 首建（基线文件不存在）＝登记现状，允许写入；此后只许减。
         bootstrap = not os.path.exists(BASELINE)
-        if (new_edges or new_classes) and not bootstrap:
+        if (new_edges or new_classes or new_entities) and not bootstrap:
             print('✗ 拒绝 --write：基线之外出现**新增**（先按下面清单收口，再收紧基线）')
             for k in new_edges:
                 print(f'    ＋ 新边 {k}（{len(actual[k])} 类）{actual[k][:4]}'
                       f'  ⇒ 默认入 {TIER_MARK[TIER_CLEARABLE]} clearable（目标 0）')
             for k, v in new_classes.items():
                 print(f'    ＋ {k} 新增类 {v}')
+            for path in new_entities:
+                print(f'    ＋ 实体 import {path} -> {entities[path]}（E1 目标 0）')
             return 1
         if problems:
             print('✗ 拒绝 --write：分档元数据自检失败：' + '；'.join(problems))
@@ -220,7 +258,8 @@ def main():
         for e in stale:
             (tiers.get(TIER_OWNER) or {}).pop(e, None)
             ((tiers.get(TIER_FAMILY) or {}).get('edges') or {}).pop(e, None)
-        payload = {'note': base_note(), 'tiers': tiers, 'edges': actual}
+        payload = {'note': base_note(), 'tiers': tiers, 'edges': actual,
+                   'entity-imports': {'note': entity_note(), 'files': sorted(entities)}}
         with open(BASELINE, 'w', encoding='utf-8') as fh:
             fh.write(json.dumps(payload, ensure_ascii=False, indent=2) + '\n')
         _, lines = summarize(tiers, actual)
@@ -235,10 +274,11 @@ def main():
             print(f'    {p}')
         return 1
 
-    if not new_edges and not new_classes:
+    if not new_edges and not new_classes and not new_entities:
         _, lines = summarize(tiers, actual)
         print(f'✓ 域间只经契约：{len(actual)} 条边（基线 {len(base)}）/ '
-              f'{sum(len(v) for v in actual.values())} 个类，无新增')
+              f'{sum(len(v) for v in actual.values())} 个类，无新增'
+              f'；跨域实体 import {len(entities)} 处（基线 {len(entity_base)}）')
         print('\n'.join(lines))
         if stale:
             print(f'  可清理 {len(stale)} 条陈旧登记（边已消失）——跑 --write')
@@ -246,24 +286,37 @@ def main():
             print(f'  可收紧 {len(gone)} 处（减小了）——对账后跑 --write：')
             for k, v in list(sorted(gone.items()))[:6]:
                 print(f'    － {k}: {v[:4]}')
+        if stale_entities:
+            print(f'  可清理 {len(stale_entities)} 条实体基线（已迁走）——跑 --write：'
+                  f'{stale_entities[:4]}')
         return 0
 
-    print('✗ 域间出现**新增**直接依赖（跨域只经 contract / 装配层）：')
+    print('✗ 域间出现**新增**直接依赖/实体 import（跨域只经 contract / 装配层）：')
     for k in new_edges:
         print(f'    ＋ 新边 {k}（{len(actual[k])} 类）{actual[k][:5]}'
               f'  ⇒ 默认入 {TIER_MARK[TIER_CLEARABLE]} clearable（目标 0）：把该能力提到 contract 端口')
     for k, v in sorted(new_classes.items()):
         print(f'    ＋ {k}（{TIER_MARK[tier_of(tiers, k)]} {tier_of(tiers, k)}）新增 {v}')
+    for path in new_entities:
+        print(f'    ＋ 实体 import {path} -> {", ".join(entities[path])}'
+              f'  ⇒ E1 目标 0：改持契约投影（如 contract.agent.AgentLookup.AgentView）')
     print('  正解：把该能力提到 contract 端口（或改经装配层注入），不要直接 import 他域实现类。')
-    print('  注意：**登记不是新增许可** —— 把新边写进 owner/intra-family 也不能放行（棘轮先于分档）。')
+    print('  注意：**登记不是新增许可** —— 把新边写进 owner/intra-family 也不能放行（棘轮先于分档）；'
+          '实体 import 不吃族内豁免。')
     return 1
+
+
+def entity_note():
+    return ('跨域 `.domain.` 实体 import 基线（E1，只许减，目标 0）。值为源文件相对 domains 源码根的路径；'
+            '族内豁免不适用于实体层。收紧用 --write。')
 
 
 def base_note():
     return ('R10「域间只经契约」棘轮基线（方案 §5.1）。edges 键＝"源域→目标域"，值＝引用该域的源类名；'
             'tiers 为三档口径：clearable（目标 0）/ owner（同数据属主，登记允许）/ intra-family'
             '（运行面族内，豁免+冻结），未登记的边默认 clearable。只许减：新增边/新增类即红，'
-            '登记不是新增许可。收紧用 --write（存在新增时会被拒绝，并清理陈旧登记）。')
+            '登记不是新增许可。收紧用 --write（存在新增时会被拒绝，并清理陈旧登记）。'
+            'entity-imports 为跨域 `.domain.` 实体 import 基线（E1，目标 0，不吃族内豁免）。')
 
 
 if __name__ == '__main__':
