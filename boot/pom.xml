@@ -84,6 +84,30 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- 跨模块测试夹具（Gradle: testFixtures(project(...))） -->
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>domains</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>platform</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <!-- test-jar 的依赖不传递（Gradle 的 testFixturesApi 会传递）⇒ 录制夹具要显式再声明一次 -->
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>agent-engine</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
@@ -160,6 +184,16 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- 契约夹具按「模块相对 + 仓库根」两候选读**文件路径** ⇒ 工作目录钉仓库根 -->
+          <argLine>-Xmx2g -XX:+EnableDynamicAgentLoading</argLine>
+          <workingDirectory>${project.basedir}/..</workingDirectory>
+        </configuration>
       </plugin>
     </plugins>
   </build>

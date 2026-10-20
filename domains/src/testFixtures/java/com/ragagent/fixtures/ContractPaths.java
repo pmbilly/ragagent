@@ -1,5 +1,6 @@
 package com.ragagent.fixtures;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -11,8 +12,8 @@ import java.util.List;
  * （{@code Path.of("src/test/resources/contracts/x.json")}），而集成测试从 {@code :server}
  * 迁到 {@code :boot} 后工作目录变成 {@code boot/} ⇒ 两个候选同时落空（迁移当时实测 97 处失败）。
  * 另有一大批调用点走**类路径**读（{@code ClassPathResource("contracts/…")}）。两套读法并存
- * 本身就是脆弱源 ✗，故统一到本类：从工作目录向上找 {@code settings.gradle.kts} 定位仓库根，
- * 再按候选目录顺序解析 —— 与模块、与 CWD 都无关。
+ * 本身就是脆弱源 ✗，故统一到本类：从工作目录向上找构建根标记（{@code settings.gradle.kts}
+ * 或 {@code pom.xml}）定位仓库根，再按候选目录顺序解析 —— 与模块、与 CWD 都无关。
  */
 public final class ContractPaths {
 
@@ -26,13 +27,35 @@ public final class ContractPaths {
 
     private static Path repoRoot() {
         Path p = Path.of("").toAbsolutePath();
-        while (p != null && !Files.exists(p.resolve("settings.gradle.kts"))) {
+        while (p != null && !isBuildRoot(p)) {
             p = p.getParent();
         }
         if (p == null) {
-            throw new IllegalStateException("找不到仓库根（settings.gradle.kts）");
+            throw new IllegalStateException("找不到仓库根（settings.gradle.kts 或带 modules 的 pom.xml）");
         }
         return p;
+    }
+
+    /**
+     * 构建根判定：Gradle 用 {@code settings.gradle.kts}；Maven 用**父 pom**。
+     *
+     * <p>不能只看 {@code pom.xml} 是否存在 —— 每个子模块都有 pom，从 {@code domains/} 起就会误判成根
+     * （实测：金片目录解析成 {@code domains/domains/src/testFixtures/…}）。父 pom 的判据是
+     * {@code <modules>} 段，子模块 pom 没有。</p>
+     */
+    private static boolean isBuildRoot(Path dir) {
+        if (Files.exists(dir.resolve("settings.gradle.kts"))) {
+            return true;
+        }
+        Path pom = dir.resolve("pom.xml");
+        if (!Files.exists(pom)) {
+            return false;
+        }
+        try {
+            return Files.readString(pom).contains("<modules>");
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     /** 解析单个金片文件（保留原调用点的文件名语义）。 */

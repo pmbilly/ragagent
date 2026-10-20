@@ -33,6 +33,7 @@
     <java.version>21</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <contract.refresh>false</contract.refresh>
 
     <!-- 平台线：Boot BOM 统一 starter-*/flyway/h2/junit 等版本，其余在此登记 -->
     <spring-boot.version>4.1.1</spring-boot.version>
@@ -65,6 +66,8 @@
     <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
     <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
     <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
+    <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
+    <maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
   </properties>
 
   <dependencyManagement>
@@ -216,6 +219,16 @@
     </dependencies>
   </dependencyManagement>
 
+  <!-- 全模块测试面共享：test-jar 的依赖不传递，而 EmbeddedRedis（platform 的 testFixtures）
+       在每个消费者的 test 类路径上都需要 lettuce。Gradle 侧由 testFixtures 的运行时元素传递。 -->
+  <dependencies>
+    <dependency>
+      <groupId>io.lettuce</groupId>
+      <artifactId>lettuce-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
   <build>
     <extensions>
       <!-- 提供 ${os.detected.classifier}：protoc / protoc-gen-grpc-java 按平台取二进制 -->
@@ -247,6 +260,19 @@
           <configuration>
             <!-- Mockito inline 在 JDK 21+ 自挂 attach 会被拒 -->
             <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+            <!-- 与 Gradle 的 maxParallelForks 同口径：按测试类分派到 2 个 JVM。
+                 Gradle 侧按核数自适应（根 cores/4、domains/boot cores/2），Maven 无内建核数属性，
+                 取固定的 2：本机接近、CI（4 核 × 2g fork）也不会 OOM。 -->
+            <forkCount>2</forkCount>
+            <reuseForks>true</reuseForks>
+            <!-- 测试沙箱：DOCREADER_ADDR 一律置空，避免继承 shell 里 source 过的 dev-env.sh -->
+            <environmentVariables>
+              <DOCREADER_ADDR></DOCREADER_ADDR>
+            </environmentVariables>
+            <!-- 契约夹具重录开关：-Dcontract.refresh=true 时写回金片（平时是断言） -->
+            <systemPropertyVariables>
+              <contract.refresh>${contract.refresh}</contract.refresh>
+            </systemPropertyVariables>
           </configuration>
         </plugin>
 
@@ -284,6 +310,20 @@
           <groupId>org.xolstice.maven.plugins</groupId>
           <artifactId>protobuf-maven-plugin</artifactId>
           <version>${protobuf-maven-plugin.version}</version>
+        </plugin>
+
+        <!-- testFixtures 源集：Gradle 有 `java-test-fixtures`，Maven 没有 ⇒ 挂进 test 源集，
+             再用 test-jar 产出 -tests.jar 供跨模块消费（同模块测试直接可见，无循环依赖） -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>${build-helper-maven-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${maven-jar-plugin.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>

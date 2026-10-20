@@ -14,7 +14,7 @@
 | 分几批 | X1 骨架 / X2 测试面 / X3 质量闸门 / X4 切换收尾 |
 | 怎么算成功 | 同一提交下 `mvn -B verify` 与 `./gradlew build` **同时全绿**：测试条数一致、45 条守卫全绿、可执行 jar 与镜像能起服；之后才删 Gradle |
 | 最大代价 | Maven 没有增量编译与构建缓存：日常「改一个类跑一次测试」会明显变慢（测试段可用 surefire 分叉缓解，编译段无法） |
-| 最大风险 | `java-test-fixtures`（1481 个夹具文件、被 4 个模块交叉依赖）在 Maven 无对应机制，必须拆 3 个独立模块 |
+| 最大风险 | `java-test-fixtures`（1504 个夹具文件、被 4 个模块交叉依赖）在 Maven 无对应机制；拆独立模块会撞 reactor 循环依赖，实际改用 test-jar（X2 已验证可行） |
 
 ## 2. 现状基线（实测，不是估计）
 
@@ -47,13 +47,17 @@ Gradle 的 `java-test-fixtures` 提供三样东西：独立源集、`-test-fixtu
 2. `ArchitectureRulesTest` 的导入排除规则里写着 `-test-fixtures.jar` 与 `/classes/java/testFixtures/` ⇒ 产物名变了会**整段漏排**，A1 规则会把测试基建当生产代码判红。
 3. 契约测试按**文件路径**读金片（`workingDir = rootDir`），domains 与 boot 两套 `maxHeapSize`/时区/`DOCREADER_ADDR` 配置必须原样搬。
 
-改造方式：拆 3 个独立夹具模块（普通 jar，承载 main 源集），依赖方向 `xxx-fixtures → xxx`，消费者以 `test` scope 依赖。
+改造方式（**X2 实测修正**）：原计划的「拆 3 个独立夹具模块」**在 Maven 下不可行** —— domains 自己的测试要用自己的夹具（`TestSchema`/`GoldenContract`），
+会让 reactor 出现 `domains → domains-fixtures → domains` 的循环依赖（Gradle 因 test 配置与 main 分离能容忍，Maven 直接报 cyclic reference）。
 
-- `platform-fixtures`（+ lettuce-core）
-- `agent-engine-fixtures`（→ platform-fixtures）
-- `domains-fixtures`（→ domains + agent-engine-fixtures + platform-fixtures）
+改用 Maven 的标准机制：
 
-代价：1481 个文件搬家（金片 5.9 MB），守卫的 `_source_roots.MODULE_DIRS` 要登记新模块（否则「夹具不占别模块包」规则静默失明）。
+- 保留物理布局 `src/testFixtures/{java,resources}`（**不搬文件**，Gradle 的 `java-test-fixtures` 完全不动）；
+- 三个模块用 `build-helper-maven-plugin` 把该目录挂进 **test 源集**（同模块测试直接可见，无循环）；
+- 再用 `maven-jar-plugin:test-jar` 产出 `-tests.jar` 供跨模块消费（`<type>test-jar</type>`），等价于 Gradle 的 `testFixtures(project(...))`。
+
+已知成本（实测）：test-jar 的依赖**不传递** ⇒ 消费者要显式再声明夹具用到的第三方（现在只有 `lettuce-core`，已在根 pom 的 test 面统一）；
+ArchUnit 的导入排除要覆盖四种产物形态（`classes/java/test`、`target/test-classes`、`-test-fixtures.jar`、`-tests.jar`）。
 
 ### 3.2 proto / gRPC 代码生成
 
@@ -66,7 +70,8 @@ Gradle 的 `java-test-fixtures` 提供三样东西：独立源集、`-test-fixtu
 
 Gradle 的 `com.google.protobuf` 插件换成 Maven 的 protobuf 插件（候选：`org.xolstice.maven.plugins`（事实标准、多年未更新）与 `io.github.ascopes`（活跃、支持 protoc 插件链））。X1 必须实测通过后再定版，判据：生成目录纳入编译、`protoc`/`protoc-gen-grpc-java` 二进制按平台自动解析（本机 arm64、CI 与 Docker 为 linux-x86_64）。
 
-另有一个已知坑要在 Maven 侧确认：domains 里那条「testFixtures 不生成 proto」的排除逻辑在 Maven 下不再需要（夹具拆成独立模块后天然不生成）。
+另有一个已知坑：domains 的「testFixtures 不生成 proto」排除逻辑是 Gradle 插件的行为，Maven 侧不存在对等物
+（`protobuf-maven-plugin` 只处理 `src/main/proto`，testFixtures 挂在 test 源集也不会触发生成）⇒ Gradle 侧配置原样保留即可。
 
 ### 3.3 质量闸门七件套
 
@@ -155,13 +160,17 @@ pom.xml                     根：properties（版本单一来源）+ dependency
 - 剩余差异（已解释，不补）：Gradle 多 6 个 dom4j 的 optional XPath 传递依赖（jaxen/xpp3/xsdlib…，主码 0 处使用，属死重）；Maven 多 `okio 1.12.0` + `kotlin-stdlib-common`（okhttp 2.7.5 链路，Maven 保留旧 okio 反而更完整）。
 - 不做：不拆夹具模块（X2）、不接闸门、不动 CI。
 
-### X2 测试面（规模 L，风险最高）
+### X2 测试面（规模 L，风险最高）——✅ 2026-10-21
 
-- 拆 3 个 fixtures 模块，搬 1481 个夹具文件（含 5.9 MB 金片），包名不变。
-- `ContractPaths` 仓库根探测改**双候选**（`settings.gradle.kts` | `pom.xml`）——并存期两套都能定位，X4 后只留 pom。
-- `ArchitectureRulesTest` 排除规则加 `-tests.jar` / `-fixtures.jar` 两种形态（兼容期都排）。
-- surefire 接入：`forkCount` 分叉、堆 2g、时区 `Asia/Shanghai`、`DOCREADER_ADDR=""`、`contract.refresh` 透传、boot 的工作目录设为仓库根。
-- **退出判据**：`mvn -B test` 全模块通过，测试条数与 Gradle XML 汇总**逐模块一致**；连跑两遍不 flaky（契约测试连真 Postgres，按既有约定必须两遍）。
+- 夹具改用 **test-jar**（见 §3.1 的实测修正）：`build-helper` 挂 test 源集 + `maven-jar-plugin:test-jar` 产出 `-tests.jar`；物理布局不搬。
+- `ContractPaths` 仓库根探测改**双候选**（`settings.gradle.kts` | 带 `<modules>` 的父 `pom.xml`）。
+  坑：不能只判 `pom.xml` 存在 —— 每个子模块都有 pom，从 `domains/` 起就会误判成根（实测金片路径变成 `domains/domains/...`）。
+- `ArchitectureRulesTest` 排除规则覆盖四种形态（`classes/java/test`、`target/test-classes`、`-test-fixtures.jar`、`-tests.jar`）。
+- surefire：`forkCount=2`、`DOCREADER_ADDR=""`、`contract.refresh` 透传、domains 的 `user.timezone=Asia/Shanghai` + 2g、boot 的工作目录钉仓库根 + 2g。
+- `-Werror` 收窄到 `default-compile` 执行（Gradle 里是任务级参数，Maven 的 plugin-level configuration 会误伤测试编译）。
+- **退出判据（全部达成）**：`mvn -B test` 两遍全绿；**有效用例 5042 = Gradle 5042**（Gradle 5046−4 跳过，Maven 5044−2 跳过）；45 守卫绿；`./gradlew build` 仍绿。
+- **等价性口径**：Maven 与 Gradle 对 `@BeforeAll + assumption` 的跳过报告不同（Gradle 计 2 个 skipped，surefire 计 0 个用例），因此对齐判据是「有效执行用例数」而非「XML tests 原始和」。
+- **实测暴露的既有债（不夹在迁移里修）**：boot 的 `FaqContractTest` 与某个先跑测试共享 Spring 上下文，单 JVM 串行时会走「云存储」分支而失败；Gradle 的 4 分叉掩盖了它。Maven 侧按 Gradle 同口径取 `forkCount=2` 后一致全绿，该隔离债登记待办。
 
 ### X3 质量闸门（规模 M）
 

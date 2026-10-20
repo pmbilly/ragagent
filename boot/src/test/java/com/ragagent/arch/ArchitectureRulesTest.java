@@ -109,13 +109,13 @@ class ArchitectureRulesTest {
             // 类路径上以 jar 形态出现）被整段排除，A7 基线条目随即报"已不再违例"（实测踩到，
             // 探针四变体定位：asURI 版命中 0、Location.contains 版命中 1）。
             // 改用 Location.contains 排除测试类。
-            // testFixtures 也是测试基建（如 EmbeddedRedis 的 getenv 探测 redis-server）——
-            // 拆分前它们在 src/test/java 下本就被排除，故一并排除，保持 A1 只盯 main 的语义。
-            // 注意：项目依赖在 ArchUnit 眼里是 **jar**（实测）⇒ testFixtures 以
-            // <模块>-test-fixtures.jar 形态出现，dir 与 jar 两种写法都要排。
+            // 测试夹具也是测试基建（EmbeddedRedis / TestSchema / 金片加载器），不属于 A1 的治理对象。
+            // 四种形态都要排：Gradle 的 classes/java/test 与 <模块>-test-fixtures.jar；
+            // Maven 的 target/test-classes（reactor 内直接引目录）与 <模块>-tests.jar。
             .withImportOption(location -> !location.contains("/classes/java/test/")
-                    && !location.contains("/classes/java/testFixtures/")   // 本模块 testFixtures（dir 形态）
-                    && !location.contains("-test-fixtures.jar"))            // 跨模块 testFixtures（jar 形态）
+                    && !location.contains("/target/test-classes/")
+                    && !location.contains("-test-fixtures.jar")
+                    && !location.contains("-tests.jar"))
             .importPackages("com.ragagent");
 
     /**

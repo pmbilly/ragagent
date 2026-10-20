@@ -55,6 +55,15 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
+    <!-- EmbeddedRedis（Gradle: testFixtures(project(":platform"))） -->
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>platform</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>

@@ -185,11 +185,15 @@
 | 批 | 内容 | 状态 |
 |---|---|---|
 | **X1** | 骨架与依赖：根 pom + 7 子 pom、Boot BOM、proto/gRPC（xolstice 0.6.1）、repackage | ✅ 2026-10-21 |
-| **X2** | 测试面：拆 3 个 fixtures 模块（1481 文件）、surefire、路径/工作目录/ArchUnit/ContractPaths | 待做 |
+| **X2** | 测试面：夹具改 **test-jar**（不搬文件）、surefire 分叉/环境/工作目录、ContractPaths 双候选、ArchUnit 四形态排除 | ✅ 2026-10-21 |
 | **X3** | 质量闸门：spotless ratchet / javadoc / jacoco / 45 守卫 / 迁移脚本 / 起服等价 | 待做 |
 | **X4** | 切换收尾：守卫重写、脚本/CI/Docker/文档、删 Gradle | 待做 |
 
 **X1 读数（2026-10-21）**：`mvn -Dmaven.test.skip=true package` 绿 · `java -jar` 起服 `Started 22.0s` + `/health` 200 + 认证端点 401 · fat jar **189M = Gradle 189M** · 依赖清单差异 8 项全部定性 · 45 守卫绿。
+
+**X2 读数（2026-10-21）**：`mvn test` 连跑两遍全绿 · **有效用例 5042 = Gradle 5042**（Gradle 5046−4 跳过 / Maven 5044−2 跳过）· 45 守卫绿 · `./gradlew build` 2m2s 仍绿。
+夹具方案实测修正：拆独立模块会撞 `domains → domains-fixtures → domains` 的 reactor 循环 ⇒ 改用 build-helper（挂 test 源集）+ test-jar（`-tests.jar`）。
+已知债：boot 的 `FaqContractTest` 与先跑测试共享 Spring 上下文，单 JVM 串行时走云存储分支失败（Gradle 4 分叉掩盖）；Maven 按同口径 `forkCount=2` 后一致，隔离债待修。
 
 ### 5.1 历史批次（v0.3.0 P1~P5 / v0.4.0 R1~R6，全部 ✅）
 
@@ -534,6 +538,7 @@ boot           14 件                      →  boot
 | EMB-1b | 2026-10-20 | **懒创建空白态不再拉历史**：新建对话把 sessionId 清空后，消息区高度变化触发的滚动事件仍会走分页加载 ⇒ `GET /messages//load` 404。`useEmbedChatSession.getmsgList` 增加空 sessionId 早退（唯一收口）。 | 红态探针（撤守卫复现 1 条空会话请求 + 2 条控制台 404，恢复后 0/0）· 前端 type-check / 753 / build 绿 · 纯前端，未跑后端闸门 |
 | EMB-1c | 2026-10-20 | **启动重复请求归因，换票单飞**：打开页曾见 config ×2 / exchange ×2 / load ×2——config 是宿主外观 + iframe 配置各一次（设计）；load 是存量句柄探测（limit=1）+ 正式历史（limit=20，设计）；exchange 是宿主 `iframe load` 与 `bootstrap_request` 各推一次 `provide_token`，iframe 两次都换 ⇒ 改为同票并发单飞 + 已换过的票迟到重推直接忽略。 | 真机时序（刷新前/后）：exchange **2→1**，config=2、load=2 保持（已说明来源）· 前端 type-check / 753 / build 绿 |
 | X1 | 2026-10-21 | **Maven 骨架与依赖**：根 pom + 7 子 pom（contract/platform/model-runtime/retrieval-engine/agent-engine/domains/boot）；Boot BOM 接管 protobuf 4.35.1 / grpc 1.83.1 / neo4j 6.1.0 / sqlite 3.53.2.1（toml 的声明值被 BOM 覆盖，Maven 侧必须同口径）；protoc 对齐 4.35.1（3.25 生成的 `GeneratedMessageV3` 在 4.x 刷废弃警告，与 `-Werror` 相撞）；guava 钉 `33.6.0-jre`（否则 Maven 选 android 变体）；repackage 显式 exclude servlet-api（插件会打 provided）；迁移脚本同步到仓库根 `build/` + `spring-boot:run` 工作目录钉仓库根。 | `mvn -Dmaven.test.skip=true package` 绿 · `java -jar` 起服 **Started 22.0s** / `/health` 200 / 认证端点 401 · fat jar **189M = Gradle 189M** · 依赖差异 8 项全定性（Gradle 多 6 个 dom4j optional XPath 死重；Maven 多 okio 1.12 + kotlin-stdlib-common，okhttp 2.7.5 链路）· **45 守卫绿** |
+| X2 | 2026-10-21 | **测试面等价**：夹具不搬文件 —— `build-helper` 把 `src/testFixtures/{java,resources}` 挂进 test 源集 + `maven-jar-plugin:test-jar` 产出 `-tests.jar`（拆独立模块会撞 `domains → domains-fixtures → domains` 的 reactor 循环，Gradle 能忍、Maven 不许）；`ContractPaths` 仓库根双候选（`settings.gradle.kts` / **带 `<modules>` 的父 pom**，不能只判 pom 存在）；`ArchitectureRulesTest` 排除四形态（`classes/java/test`、`target/test-classes`、`-test-fixtures.jar`、`-tests.jar`）；surefire `forkCount=2` + `DOCREADER_ADDR=""` + domains 时区 2g + boot 工作目录钉仓库根；`-Werror` 收窄到 `default-compile`（plugin 级配置会误伤测试编译）。 | `mvn test` **连跑两遍全绿** · **有效用例 5042 = Gradle 5042**（Gradle 5046−4 / Maven 5044−2；surefire 对 `@BeforeAll+assumption` 不计入跳过）· 45 守卫绿 · `./gradlew build` 2m2s 仍绿 · 暴露既有债：boot `FaqContractTest` 单 JVM 串行时共享 Spring 上下文走云存储分支失败（Gradle 4 分叉掩盖，待修） |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

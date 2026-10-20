@@ -159,6 +159,22 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- 跨模块测试夹具：Gradle 的 testFixtures(project(...)) 在 Maven 侧等价于 test-jar -->
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>platform</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>agent-engine</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
@@ -198,6 +214,53 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>test-fixtures-source</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+              <goal>add-test-resource</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/testFixtures/java</source>
+              </sources>
+              <resources>
+                <resource>
+                  <directory>src/testFixtures/resources</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- 与 Gradle 同口径：单测试 JVM 2g（多个 @SpringBootTest 上下文各自驻留）。
+               时区钉死 Asia/Shanghai：线格式断言里的时间戳就是 +08:00，CI runner 是 UTC。 -->
+          <argLine>-Xmx2g -XX:+EnableDynamicAgentLoading -Duser.timezone=Asia/Shanghai</argLine>
+        </configuration>
       </plugin>
     </plugins>
   </build>
