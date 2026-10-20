@@ -137,7 +137,7 @@ boot（组合根，唯一装配点）
 | **H1 问答-状态机** | **H1a ✅**：`TurnLifecycle` 作终态单赢家；**H1b-1 ✅**：`StreamEventEmitter`/`StreamResponseBuilder` 移 `service.sse`，`SseFrameSink` 端口，编排层不再依赖 `controller`。**H1b-2 待做**：stop watcher + 轮询 + 3 把锁收进状态机 | H1a/H1b-1 ✅ 2026-10-20 | 终态不可逆；编排层无 controller 反向依赖 |
 | **H2a 问答-运行时段** ✅ | 抽 `TurnRuntime`（`eventBus`/`messageId`/`userMessageId`）；`ChatManage` 不再持有运行时字段，调用点经 `getRuntime()` | ✅ 2026-10-20 | 运行时段在类型上不可复制；会话测试全绿 |
 | **H2b 问答-请求段** | **H2b-1 ✅**：`TurnInputView`（41 字段只读）+ `ChatManage implements` + 只读辅助收口；**H2b-2 待做**：插件签名改收视图、`QaRequestContext` 34 字段收口 | H2b-1 ✅ 2026-10-20 | 只读路径不再依赖可变对象；插件引用待 H2c 一并降 |
-| **H2c 问答-状态段** | **H2c-1 ✅ 答复组**、**H2c-2 ✅ 重排组**、**H2c-3 ✅ 合并组**、**H2c-4 ✅ 查询计划**；余 1 组（SearchOutcome） | H2c-1~4 ✅ 2026-10-20 | 四组写入点均已收敛 |
+| **H2c 问答-状态段** | **H2c-1 ✅ 答复组**、**H2c-2 ✅ 重排组**、**H2c-3 ✅ 合并组**、**H2c-4 ✅ 查询计划**、**H2c-5 ✅ 实体组**；余 SearchOutcome 核心（searchResult/graphResult） | H2c-1~5 ✅ 2026-10-20 | 五组写入点均已收敛 |
 | **H3 入库-状态机** | `IngestJob` 状态机（替代 4 处 CAS）+ `IngestStage` 接口（现有 5 个 stage 就地实现）+ 删 `KnowledgeTaskExecutor` | 3-4 人日 | 阶段显式化；主码 CAS 4→1；入库链路必读类 ≤10 |
 | **H4a 任务-端口** | **H4a-1 ✅**：`TaskQueue`（name/start/stop/setRetryDelayOverrideSeconds）+ `RetryDelayOverride`；6 套队列接口继承；钩子 5→1 机制。**H4a-2/H4b**：`submit/lease/renew/progress/retry/park` 完整端口随实现迁移落地 | H4a-1 ✅ 2026-10-20 | 业务只依赖端口；钩子 5→1 |
 | **H4b 任务-实现** ✅ | **datasource ✅ + wiki ✅**：基座补 per-task 预算/超时/幂等 + `FailurePolicy`（死信回调 / 锁冲突退避）；datasource ~120 行、wiki ~200 行薄适配；memory/knowledge 已在基座 | ✅ 2026-10-20 | 跨实例可恢复；wiki 特例参数化 |

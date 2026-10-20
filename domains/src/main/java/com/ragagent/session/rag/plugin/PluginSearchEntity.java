@@ -53,14 +53,14 @@ public final class PluginSearchEntity implements Plugin {
 
     @Override
     public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
-        List<String> entity = chatManage.getEntity();
+        List<String> entity = chatManage.getEntityContext().getEntity();
         if (entity == null || entity.isEmpty()) {
             PipelineLog.info("search_entity", "no_entity", new LinkedHashMap<>());
             return next.next();
         }
 
-        List<String> knowledgeBaseIDs = chatManage.getEntityKbIds();
-        Map<String, String> entityKnowledge = chatManage.getEntityKnowledge();
+        List<String> knowledgeBaseIDs = chatManage.getEntityContext().getEntityKbIds();
+        Map<String, String> entityKnowledge = chatManage.getEntityContext().getEntityKnowledge();
 
         if ((knowledgeBaseIDs == null || knowledgeBaseIDs.isEmpty())
                 && (entityKnowledge == null || entityKnowledge.isEmpty())) {

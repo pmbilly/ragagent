@@ -530,7 +530,7 @@ class SearchRecordingTest {
         cm.setTenantId(1);
         cm.setSearchTargets(new ArrayList<>(List.of(
                 new SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
-        cm.setEntity(new ArrayList<>(List.of("实体A", "实体B")));
+        cm.getEntityContext().setEntity(new ArrayList<>(List.of("实体A", "实体B")));
         boolean[] next = {false};
         PluginError err = p.onEvent(PipelineEventType.CHUNK_SEARCH_PARALLEL, cm,
                 () -> { next[0] = true; return null; });

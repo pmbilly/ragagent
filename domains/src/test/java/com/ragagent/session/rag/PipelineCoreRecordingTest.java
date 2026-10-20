@@ -136,9 +136,9 @@ class PipelineCoreRecordingTest {
         shape.put("sys_override", clone.getQueryPlan().getSystemPromptOverride());
         shape.put("memory_prompt", clone.getQueryPlan().getMemoryPrompt());
         shape.put("used_memories", clone.getUsedMemories().size());
-        shape.put("entity", clone.getEntity());
-        shape.put("entity_kb", clone.getEntityKbIds());
-        shape.put("entity_knowledge", clone.getEntityKnowledge());
+        shape.put("entity", clone.getEntityContext().getEntity());
+        shape.put("entity_kb", clone.getEntityContext().getEntityKbIds());
+        shape.put("entity_knowledge", clone.getEntityContext().getEntityKnowledge());
         shape.put("rendered", clone.getAnswer().getRenderedContexts());
         shape.put("search_result", null);
         shape.put("rerank_result", null);
@@ -237,11 +237,11 @@ class PipelineCoreRecordingTest {
         cm.getQueryPlan().setMemoryPrompt("mp");
         cm.setUsedMemories(new ArrayList<>(List.of(
                 new PipelineUsedMemoryView("m1", "fact", "c"))));
-        cm.setEntity(new ArrayList<>(List.of("e1")));
-        cm.setEntityKbIds(new ArrayList<>(List.of("kb1")));
+        cm.getEntityContext().setEntity(new ArrayList<>(List.of("e1")));
+        cm.getEntityContext().setEntityKbIds(new ArrayList<>(List.of("kb1")));
         Map<String, String> ek = new LinkedHashMap<>();
         ek.put("k1", "kb1");
-        cm.setEntityKnowledge(ek);
+        cm.getEntityContext().setEntityKnowledge(ek);
         cm.getAnswer().setRenderedContexts("rc");
         return cm;
     }

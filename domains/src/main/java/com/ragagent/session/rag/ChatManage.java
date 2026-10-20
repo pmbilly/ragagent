@@ -6,7 +6,6 @@ import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,16 +17,17 @@ import java.util.Map;
  * <ul>
  *   <li><b>请求段（不可变配置）</b>：query/sessionId/userId/maxRounds、检索参数、重排参数、
  *       模型参数、改写开关、FAQ 策略、多模态/附件、web 检索开关、summaryConfig。</li>
- *   <li><b>状态段（插件间流转）</b>：history、searchResult/graphResult/entity 系列、
- *       usedMemories；查询计划见 {@link QueryPlan}，答复组见 {@link AnswerState}，
- *       重排结果见 {@link RerankOutcome}，合并结果见 {@link MergedContext}。</li>
+ *   <li><b>状态段（插件间流转）</b>：history、searchResult/graphResult、usedMemories；
+ *       实体见 {@link EntityContext}，查询计划见 {@link QueryPlan}，答复组见
+ *       {@link AnswerState}，重排结果见 {@link RerankOutcome}，合并结果见
+ *       {@link MergedContext}。</li>
  *   <li><b>运行时段</b>：见 {@link TurnRuntime}（事件总线 + 消息 id），不在本类字段里。</li>
  * </ul>
  *
  * <h2>{@link #cloneChatManage()} 的复制面</h2>
  * <p>请求段全量复制（SearchTarget 不可变，列表换新）；状态段<b>只复制</b> 查询计划整组/
- * usedMemories/renderedContexts/entity/entityKBIDs/entityKnowledge——<b>history、
- * searchResult、合并结果、userContent、chatResponse、重排结果以及运行时段句柄都不复制</b>。</p>
+ * 实体上下文/usedMemories/renderedContexts——<b>history、searchResult、合并结果、
+ * userContent、chatResponse、重排结果以及运行时段句柄都不复制</b>。</p>
  *
  * <p>本类型不落 jsonb 也不作响应体，不进 JsonContractRoundTripTest。</p>
  */
@@ -99,9 +99,8 @@ public final class ChatManage implements TurnInputView {
     private final RerankOutcome rerank = new RerankOutcome();
     /** 合并结果（CHUNK_MERGE 写，DATA_ANALYSIS 读写）。 */
     private final MergedContext merged = new MergedContext();
-    private List<String> entity;
-    private List<String> entityKbIds;
-    private Map<String, String> entityKnowledge;
+    /** 实体上下文（实体/所属 KB/实体知识映射）。 */
+    private final EntityContext entityContext = new EntityContext();
     private GraphData graphResult;
     /** 答复组（用户消息 / 渲染上下文 / 模型回复）。 */
     private final AnswerState answer = new AnswerState();
@@ -217,12 +216,7 @@ public final class ChatManage implements TurnInputView {
     public void setSearchResult(List<SearchResult> v) { searchResult = v; }
     public RerankOutcome getRerank() { return rerank; }
     public MergedContext getMerged() { return merged; }
-    public List<String> getEntity() { return entity; }
-    public void setEntity(List<String> v) { entity = v; }
-    public List<String> getEntityKbIds() { return entityKbIds; }
-    public void setEntityKbIds(List<String> v) { entityKbIds = v; }
-    public Map<String, String> getEntityKnowledge() { return entityKnowledge; }
-    public void setEntityKnowledge(Map<String, String> v) { entityKnowledge = v; }
+    public EntityContext getEntityContext() { return entityContext; }
     public GraphData getGraphResult() { return graphResult; }
     public void setGraphResult(GraphData v) { graphResult = v; }
     public AnswerState getAnswer() { return answer; }
@@ -307,9 +301,7 @@ public final class ChatManage implements TurnInputView {
         c.queryPlan.setMemoryPrompt(queryPlan.getMemoryPrompt());
         c.usedMemories = usedMemories == null ? null : new ArrayList<>(usedMemories);
         c.answer.setRenderedContexts(answer.getRenderedContexts());
-        c.entity = entity == null ? new ArrayList<>() : new ArrayList<>(entity);
-        c.entityKbIds = entityKbIds == null ? new ArrayList<>() : new ArrayList<>(entityKbIds);
-        c.entityKnowledge = entityKnowledge == null ? new HashMap<>() : new LinkedHashMap<>(entityKnowledge);
+        c.entityContext.copyFrom(entityContext);
         return c;
     }
 }

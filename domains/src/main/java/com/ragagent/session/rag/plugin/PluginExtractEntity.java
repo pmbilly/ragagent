@@ -108,7 +108,7 @@ public final class PluginExtractEntity implements Plugin {
             return next.next();
         }
 
-        chatManage.setEntityKbIds(new ArrayList<>(enabledKBSet.keySet()));
+        chatManage.getEntityContext().setEntityKbIds(new ArrayList<>(enabledKBSet.keySet()));
 
         Map<String, String> entityKnowledge = new LinkedHashMap<>();
         for (Map.Entry<String, String> e : knowledgeToKBMap.entrySet()) {
@@ -116,7 +116,7 @@ public final class PluginExtractEntity implements Plugin {
                 entityKnowledge.put(e.getKey(), e.getValue());
             }
         }
-        chatManage.setEntityKnowledge(entityKnowledge);
+        chatManage.getEntityContext().setEntityKnowledge(entityKnowledge);
 
         PipelineConfig.PromptTemplateStructured tpl = new PipelineConfig.PromptTemplateStructured();
         tpl.setDescription(template == null ? "" : template.getDescription());
@@ -131,7 +131,7 @@ public final class PluginExtractEntity implements Plugin {
         for (GraphNode node : graph.nodes()) {
             nodes.add(node.getName());
         }
-        chatManage.setEntity(nodes);
+        chatManage.getEntityContext().setEntity(nodes);
         return next.next();
     }
 

@@ -52,7 +52,7 @@ public final class PluginSearchParallel implements Plugin {
 
         Map<String, Object> start = new LinkedHashMap<>();
         start.put("sessionId", chatManage.getSessionId());
-        start.put("has_entities", chatManage.getEntity() != null && !chatManage.getEntity().isEmpty());
+        start.put("has_entities", chatManage.getEntityContext().getEntity() != null && !chatManage.getEntityContext().getEntity().isEmpty());
         start.put("rewrite_query", chatManage.getQueryPlan().getRewriteQuery());
         PipelineLog.info("SearchParallel", "start", start);
 
@@ -77,7 +77,7 @@ public final class PluginSearchParallel implements Plugin {
                     return isNothing ? null : err;
                 }),
                 new PipelineCommon.ParallelTask("entity_search", () -> {
-                    if (fOrig.getEntity() == null || fOrig.getEntity().isEmpty()) {
+                    if (fOrig.getEntityContext().getEntity() == null || fOrig.getEntityContext().getEntity().isEmpty()) {
                         Map<String, Object> f = new LinkedHashMap<>();
                         f.put("reason", "no_entities");
                         PipelineLog.info("SearchParallel", "entity_search_skip", f);
