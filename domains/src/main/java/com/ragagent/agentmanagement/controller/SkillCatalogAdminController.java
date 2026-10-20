@@ -48,14 +48,14 @@ import tools.jackson.databind.node.ObjectNode;
 @RestController
 @ApiResult
 @Tag(name = "Agent Management")
-public class SkillCatalogController {
+public class SkillCatalogAdminController {
 
     private static final ObjectMapper AUDIT_MAPPER = JsonMappers.lenient();
 
     private final SkillCatalogPort catalog;
     private final AuditWritePort auditWriter;
 
-    public SkillCatalogController(SkillCatalogPort catalog, AuditWritePort auditWriter) {
+    public SkillCatalogAdminController(SkillCatalogPort catalog, AuditWritePort auditWriter) {
         this.catalog = catalog;
         this.auditWriter = auditWriter;
     }

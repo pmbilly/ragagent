@@ -51,6 +51,7 @@ run '日志异常（log 里禁止 Throwable.toString()/getMessage()）' python3 
 run '已知缺口（类注释声明缺口必须指向 docs/known-gaps.md）' python3 scripts/check-known-gaps.py
 run '日志级别（warn 不用于 404 / 跳过语义）' python3 scripts/check-log-level.py
 run '控制器纯度（HTTP 面只编排：禁直连 Mapper；裸转发 catch 只许减）' python3 scripts/check-controller-purity.py
+run '工具注册一致性（工具名常量 ↔ agenttools 实现 ↔ 分发 switch）' python3 scripts/check-tool-registry.py
 run '管线事件表（docs/architecture/pipeline-map.md 必须与插件代码同步）' python3 scripts/gen-pipeline-map.py --check
 run 'Port 对照表（docs/architecture/port-map.md 必须与接口/实现/调用方同步）' python3 scripts/gen-port-map.py --check
 run '链路文档（docs/architecture/qa-flow.md 引用的类必须存在）' python3 scripts/check-qa-flow.py

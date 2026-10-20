@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 前端与 embed/chat 侧无需改动。</p>
  *
  * <p>{@code skillsAvailable} 恒为 true：技能能力始终可用，列表为空由前端渲染
- * 「还没有技能」空态。管理面（新建/删除）见 {@link SkillCatalogController}。</p>
+ * 「还没有技能」空态。管理面（新建/删除）见 {@link SkillCatalogAdminController}。</p>
  *
  * <p>外壳统一 {@code {code,message,data}}（{@link ApiResult}）——**载荷形状不变**，
  * 只是外面多一层（前端在 utils/request.ts 一处解包）。</p>
@@ -28,11 +28,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResult
 @Tag(name = "Agent Management")
-public class SkillsCatalogController {
+public class SkillPickerController {
 
     private final SkillCatalogPort catalog;
 
-    public SkillsCatalogController(SkillCatalogPort catalog) {
+    public SkillPickerController(SkillCatalogPort catalog) {
         this.catalog = catalog;
     }
 

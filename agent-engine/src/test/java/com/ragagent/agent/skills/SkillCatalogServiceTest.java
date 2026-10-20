@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 /**
  * 技能入库的**纯逻辑**校验（无 Spring/DB）：组装 → 运行期解析器自校验 → 身份一致性。
  *
- * <p>DB 写入/查询由 {@code SkillCatalogController} 的实测冒烟覆盖（建→列表→409→force 删除）。</p>
+ * <p>DB 写入/查询由 {@code SkillCatalogAdminController} 的实测冒烟覆盖（建→列表→409→force 删除）。</p>
  */
 class SkillCatalogServiceTest {
 

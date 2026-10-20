@@ -52,7 +52,7 @@
 | `wiki` | `WikiPageController` | `WikiPageOpsPort` |
 | `memory` | `MemoryController` | — |
 | `agenttools` | —（无 HTTP 面） | — |
-| `agentmanagement` | `AgentController`、`SkillCatalogController`、`SkillsCatalogController` | — |
+| `agentmanagement` | `AgentController`、`SkillCatalogAdminController`、`SkillPickerController` | — |
 | `favorite` | `UserFavoriteController` | — |
 | `mcp` | `AgentToolApprovalController`、`McpCredentialsController`、`McpOAuthController`、`McpServiceController` | `McpToolRegistrationPort`、`McpToolingGateway` |
 | `datasource` | `DataSourceController`、`DataSourceCredentialsController` | — |

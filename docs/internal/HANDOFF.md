@@ -140,7 +140,7 @@
 |---|---|---|
 | **L0** | README 删"评测"承诺（能力清单 + 端点表两处）；报告更正落档 | ✅ 2026-10-20 |
 | **L1** | 引擎类型常量单源化：`contract.vectorstore.VectorEngineTypes`（9 全集 / 7 可配置，差额 = postgres/sqlite） | ✅ 2026-10-20 |
-| **L3** | 工具清单守卫（`ToolDefinitions` ↔ 实现 ↔ 三个分发 switch）+ API-Key 策略表覆盖检查 + `Skill(s)` 控制器改名 | 待做 |
+| **L3** | 工具清单守卫（`check-tool-registry.py`，第 44 条）+ API-Key 幽灵规则检查 + `Skill(s)` 控制器改名 | ✅ 2026-10-20 |
 | **L2** | embedding 单路径（删 knowledge 域内 `EmbedderClient`，统一走 `ModelRuntime`） | 待做 |
 
 **否决项**：RBAC 双表不合并（主语/语法/语义都不同）；工具装配暂不端口化（请求级构造 + 三个分发 switch，先加守卫）。
@@ -461,6 +461,7 @@ boot           14 件                      →  boot
 | K3 | 2026-10-20 | **LLM 目录单源化**：`ModelProviderCatalog.ENTRIES` 改为 `ProviderRegistry.list().stream().map(...)`，展示名/描述/默认 URL/模型类型全部取自 `ProviderInfo`，`toFrontend` 只做表示层映射（26 条手写清单删除）；`ProviderCatalogParityTest` 删除（单源后同义反复），新增 `ProviderRegistryCompletenessTest`（`ProviderName` 全集 == `list()`，漏注册/漏进 allProviders 即红）；`check-module-graph` 的错位测试登记随之 10 → 9；`Provider.validateConfig` 登记 `known-gaps.md` 第 19 条并在接口注释留指针（首次写法用了 § 编号，被迁移代号守卫拦下，已改为条目名） | **43 守卫全绿** · 目录金片 `model-providers*.json` 字节一致 · build 1m44s / **5026 / 0 / 4** |
 | L0 | 2026-10-20 | **删除不存在的评测承诺**（用户拍板"评测不做"）：README 能力清单与端点表两处删除；`docs/internal/plans/business-link-remediation-l-series.md` 落档 02 报告的 4 处核实更正（评测承诺在 README 而非"全仓没有"、连接器 catalog 前端不可选、生成式文档自带同步守卫、端口/规模数字属报告后增长）与 P1-1~P1-5 的采纳/降级/否决理由 | **43 守卫全绿** · 无 Java 改动 |
 | L1 | 2026-10-20 | **引擎类型常量单源化**：新增 `contract.vectorstore.VectorEngineTypes`（9 全集 / 7 可配置，差额恰为 postgres+sqlite）；`retrieval.engine.EngineTypes` 的 9 个 `ENGINE_*` 改为契约别名（switch case 仍为编译期常量）；`vectorstore.domain.VectorStoreEngines` 白名单改引 `CONFIGURABLE`；新增两条测试钉住"9/7/差额"与"EngineTypes 暴露集合==契约全集"；`module-package-map.md` 随源码重生成 | **43 守卫全绿** · spotless 绿 · build 2m42s / **5028 / 0 / 4**（+2 常量一致性测试） |
+| L3 | 2026-10-20 | **扩展清单守卫**：① 新增 `check-tool-registry.py`（第 44 条）——`agenttools` 的 `super(ToolDefinitions.TOOL_X)` ↔ `AgentToolBackends` 三个 switch 的 `case` 双向对齐、工具名值不重复；三条判据各配红态探针。② `check-route-policy.py` 扩 API-Key 策略表：每条 `registerGin` 必须命中控制器路由（未登记 = default deny 是有意语义，只查幽灵规则），205 条规则 0 幽灵；红态探针已验证。③ 两个技能控制器改名消除"s 之差"：`SkillCatalogController`→`SkillCatalogAdminController`（管理面 `/skills/catalog/**`）、`SkillsCatalogController`→`SkillPickerController`（选择器 `GET /skills`），路由不变；生成式文档与注释同步 | **44 守卫全绿** · spotless 绿 · build 2m16s / **5028 / 0 / 4** |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

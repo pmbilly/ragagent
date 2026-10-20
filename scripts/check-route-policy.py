@@ -6,7 +6,9 @@
   · 规则来自 `boot/.../RbacRoutePolicies.java` 的 `addRule` / `addSystemAdminRule`；
   · 匹配按 Spring Ant 语义：`*` 一段、`**` 任意段；路径变量归一为 `*`，`{*slug}` 归一为 `**`；
   · 未命中规则的路由必须出现在 `scripts/route-policy.baseline.json`（写明公开/所有权理由）；
-  · 基线里已不再未命中的条目、以及不命中任何路由的“幽灵规则”都会判失败。
+  · 基线里已不再未命中的条目、以及不命中任何路由的“幽灵规则”都会判失败；
+  · `APIKeyRoutePolicies` 的每条 `registerGin` 也必须命中一条控制器路由（未登记 = default deny
+    是有意语义，所以只查“幽灵规则”，不要求每条路由都有 API-Key 策略）。
 
 用法：
   python3 scripts/check-route-policy.py            # 检查
@@ -21,6 +23,8 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DOMAINS = ROOT / "domains/src/main/java"
 POLICIES = ROOT / "boot/src/main/java/com/ragagent/config/RbacRoutePolicies.java"
+APIKEY_POLICIES = ROOT / ("domains/src/main/java/com/ragagent/auth/apikey/controller/filter/"
+                          "APIKeyRoutePolicies.java")
 BASELINE = ROOT / "scripts/route-policy.baseline.json"
 MAP = ROOT / "docs/architecture/route-policy-map.md"
 
@@ -187,6 +191,19 @@ def parse_rules() -> list[dict]:
     return rules
 
 
+def gin_pattern(path: str) -> str:
+    """gin 模板 → 段级模式（`:x` → `*`，`*x` → `**`）。"""
+    path = re.sub(r"\*[^/]+", "**", path)
+    return re.sub(r":[^/]+", "*", path)
+
+
+def parse_api_key_rules() -> list[dict]:
+    """API-Key 策略表的条目（方法 + 段级模式）。"""
+    text = APIKEY_POLICIES.read_text(encoding="utf-8")
+    return [{"method": method, "pattern": gin_pattern(path)}
+            for method, path in re.findall(r'registerGin\("(\w+)",\s*"([^"]+)"', text)]
+
+
 def normalize_route(path: str) -> str:
     path = re.sub(r"\{[^}]*\*[^}]*\}", "**", path)
     path = re.sub(r"\{[^}]+\}", "*", path)
@@ -210,6 +227,8 @@ def segment_match(pattern: str, path: str) -> bool:
 
 
 def matches(route: dict, rule: dict) -> bool:
+    if rule["method"] == "*":
+        return segment_match(rule["pattern"], normalize_route(route["path"]))
     methods = {route["method"]}
     if route["method"] == "HEAD":
         methods.add("GET")
@@ -314,6 +333,13 @@ def check() -> int:
         problems.append("幽灵规则（不命中任何路由）：" + ", ".join(ghosts[:10])
                         + (" …" if len(ghosts) > 10 else ""))
 
+    api_rules = parse_api_key_rules()
+    api_ghosts = [f'{rule["method"]} {rule["pattern"]}' for rule in api_rules
+                  if not any(matches(route, rule) for route in routes)]
+    if api_ghosts:
+        problems.append("API-Key 幽灵规则（不命中任何路由）：" + ", ".join(api_ghosts[:10])
+                        + (" …" if len(api_ghosts) > 10 else ""))
+
     expected_map = build_map(routes, rules, baseline)
     if not MAP.exists() or MAP.read_text(encoding="utf-8") != expected_map:
         problems.append("路由对照表缺失或过期：运行 python3 scripts/check-route-policy.py --map")
@@ -324,7 +350,8 @@ def check() -> int:
             print("   " + problem)
         return 1
     print(f"✓ 路由权限覆盖：{len(routes)} 条路由 / {len(rules)} 条规则；"
-          f"受保护 {protected}，登记公开/自服务 {public}")
+          f"受保护 {protected}，登记公开/自服务 {public}；"
+          f"API-Key 规则 {len(api_rules)} 条无幽灵")
     return 0
 
 

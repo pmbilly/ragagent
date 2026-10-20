@@ -447,10 +447,10 @@ final class RbacRoutePolicies {
         // 沙箱配置面：
         // 静态段（workspace-policy/templates/query）先于 /:id 通配登记（AntPathMatcher
         // 取首个命中）；:id/sandboxes 在 :id 之前。List/Get 是 Viewer+，其余 Admin+。
-        // GET /skills（指令型技能目录，agent/management/SkillsCatalogController）：选择器数据源，
+        // GET /skills（指令型技能目录，agent/management/SkillPickerController）：选择器数据源，
         // Viewer+。
         rbac.addRule("GET", "/api/v1/skills", TenantRole.VIEWER, false);
-        // 技能管理面（agent/management/SkillCatalogController）：技能归属空间（另有平台内置
+        // 技能管理面（agent/management/SkillCatalogAdminController）：技能归属空间（另有平台内置
         // 只读层），管理面由「空间 admin」掌控。静态段 /catalog 与 /catalog/* 的 files
         // 子路径逐条登记（AntPathMatcher 取首个命中）。列出/编辑的对象是
         // 「平台内置层（只读）+ 当前空间」，写入只作用于当前空间。
