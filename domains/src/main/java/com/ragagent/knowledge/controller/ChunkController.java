@@ -3,7 +3,7 @@ package com.ragagent.knowledge.controller;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.GeneratedQuestion;
-import com.ragagent.knowledge.dto.chunk.ChunkPageResponse;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.knowledge.dto.chunk.ChunkResponse;
 import com.ragagent.knowledge.dto.chunk.ChunkRevisionResponse;
 import com.ragagent.knowledge.dto.chunk.ChunkUpdateResponse;
@@ -74,7 +74,7 @@ public class ChunkController {
 
     /** 分页钳位：page&lt;1→1、size&lt;1→10、size&gt;100→100（size 的小值是合法值，非 clamp）。 */
     @GetMapping("/api/v1/chunks/{knowledgeId}")
-    public ResponseEntity<ChunkPageResponse> listKnowledgeChunks(
+    public ResponseEntity<PageResult<ChunkResponse>> listKnowledgeChunks(
             @PathVariable("knowledgeId") String knowledgeId,
             @RequestParam(value = "page", required = false) String page,
             @RequestParam(value = "pageSize", required = false) String pageSize,
@@ -105,7 +105,7 @@ public class ChunkController {
                 tenantId(), kgId, (pageValue - 1) * sizeValue, sizeValue, types);
 
         List<ChunkResponse> items = result.items().stream().map(ChunkResponse::from).toList();
-        return ResponseEntity.ok(new ChunkPageResponse(items, pageValue, sizeValue, result.total()));
+        return ResponseEntity.ok(PageResult.of(items, result.total(), pageValue, sizeValue));
     }
 
     @GetMapping("/api/v1/chunks/by-id/{id}")

@@ -3,10 +3,10 @@ package com.ragagent.session;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.TestSchema;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.dto.SessionListItem;
 import com.ragagent.session.dto.SessionListQuery;
-import com.ragagent.session.dto.SessionPage;
 import com.ragagent.session.repository.SessionRepository;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -245,7 +245,7 @@ class SessionQueryPagedTest {
             Thread.sleep(5);
         }
 
-        SessionPage first =
+        PageResult<SessionListItem> first =
                 repo.queryPaged(SessionListQuery.of(null, "", null, 1, 2).withScope(TENANT, "u1"));
         assertThat(first.total()).isEqualTo(3);
         assertThat(first.items()).hasSize(2);
@@ -253,7 +253,7 @@ class SessionQueryPagedTest {
         assertThat(first.pageSize()).isEqualTo(2);
         assertThat(first.items().get(0).getTitle()).isEqualTo("s2");
 
-        SessionPage second =
+        PageResult<SessionListItem> second =
                 repo.queryPaged(SessionListQuery.of(null, "", null, 2, 2).withScope(TENANT, "u1"));
         assertThat(second.items()).hasSize(1);
         assertThat(second.items().get(0).getTitle()).isEqualTo("s0");

@@ -11,12 +11,12 @@ import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgePageView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.contract.knowledge.KnowledgeTagView;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.dto.faq.FaqEntry;
-import com.ragagent.knowledge.dto.faq.FaqEntryPage;
 import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
@@ -168,7 +168,7 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     public FaqEntryPageView listFaqEntries(String kbId, int page, int pageSize,
             List<String> tagUuids, long legacyTagSeqId,
             String keyword, String searchField, String sortOrder, Boolean isEnabled) {
-        FaqEntryPage domain = faqEntryQueryService.listEntries(kbId, page, pageSize, tagUuids,
+        PageResult<FaqEntry> domain = faqEntryQueryService.listEntries(kbId, page, pageSize, tagUuids,
                 legacyTagSeqId, keyword, searchField, sortOrder, isEnabled);
         if (domain == null) {
             return null;

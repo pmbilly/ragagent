@@ -13,6 +13,7 @@ import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.session.SessionLastRequestState;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.contract.websearch.WebSearchTempStatePort;
@@ -25,8 +26,8 @@ import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.dto.SessionListItem;
 import com.ragagent.session.dto.SessionListQuery;
-import com.ragagent.session.dto.SessionPage;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
@@ -261,7 +262,7 @@ public class SessionService {
      * 且命中时**丢掉按人裁剪**（Drop per-user owner scope）。其余来源保持调用方
      * 自己的 owner 范围。</p>
      */
-    public SessionPage listSessions(SessionListQuery query) {
+    public PageResult<SessionListItem> listSessions(SessionListQuery query) {
         long tenantId = requireTenantId();
         String userId;
         if (Session.listSourceRequiresAdmin(query.source())) {

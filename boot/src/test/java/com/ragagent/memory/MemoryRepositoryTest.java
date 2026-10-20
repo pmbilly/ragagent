@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
 import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.domain.item.MemoryItem;
@@ -13,7 +14,6 @@ import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
 import com.ragagent.memory.dto.MemoryDocAffinity;
-import com.ragagent.memory.dto.MemoryPage;
 import com.ragagent.memory.repository.MemoryRepository;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.Duration;
@@ -297,11 +297,11 @@ class MemoryRepositoryTest {
         archived.setStatus(MemoryKinds.STATUS_ARCHIVED);
         repo.createItem(archived);
 
-        MemoryPage<MemoryItem> all = repo.listItems(scope, "", 0, 0);
+        PageResult<MemoryItem> all = repo.listItems(scope, "", 0, 0);
         assertThat(all.total()).isEqualTo(2);
         assertThat(all.items()).hasSize(2);
 
-        MemoryPage<MemoryItem> active = repo.listItems(scope, MemoryKinds.STATUS_ACTIVE, 0, 0);
+        PageResult<MemoryItem> active = repo.listItems(scope, MemoryKinds.STATUS_ACTIVE, 0, 0);
         assertThat(active.total()).isEqualTo(1);
         assertThat(active.items()).extracting(MemoryItem::getContent).containsExactly("a");
     }
@@ -674,7 +674,7 @@ class MemoryRepositoryTest {
 
         repo.markTopicPromoted(scope, "a");
 
-        MemoryPage<MemoryTopicStat> page = repo.listUnpromotedTopics(scope, 0, 0);
+        PageResult<MemoryTopicStat> page = repo.listUnpromotedTopics(scope, 0, 0);
         assertThat(page.total()).isEqualTo(1);
         assertThat(page.items()).extracting(MemoryTopicStat::getNormalizedKey).containsExactly("b");
         assertThat(repo.topicByKey(scope, "a").getPromotedAt()).isNotNull();
@@ -764,7 +764,7 @@ class MemoryRepositoryTest {
         repo.bumpDocAffinity(scope, List.of(doc("k2", "引用了两次")));
         repo.bumpDocAffinity(scope, List.of(doc("k2", "引用了两次")));
 
-        MemoryPage<MemoryDocAffinity> page = repo.listFamiliarDocs(scope, 0, 0, 0);
+        PageResult<MemoryDocAffinity> page = repo.listFamiliarDocs(scope, 0, 0, 0);
         assertThat(page.total()).isEqualTo(1);
         assertThat(page.items()).extracting(MemoryDocAffinity::getKnowledgeId).containsExactly("k2");
 

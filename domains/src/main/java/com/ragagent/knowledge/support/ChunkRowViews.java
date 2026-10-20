@@ -2,8 +2,8 @@ package com.ragagent.knowledge.support;
 
 import com.ragagent.contract.knowledge.ChunkPageView;
 import com.ragagent.contract.knowledge.ChunkRowView;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.ChunkPage;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,7 @@ public final class ChunkRowViews {
     }
 
     /** 分页（域内 `ChunkPage` → L1 `ChunkPageView`；null 透传）。 */
-    public static ChunkPageView pageView(ChunkPage p) {
+    public static ChunkPageView pageView(PageResult<Chunk> p) {
         if (p == null) {
             return null;
         }

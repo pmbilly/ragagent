@@ -6,13 +6,13 @@ import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.dto.tag.KnowledgeTagWithStats;
-import com.ragagent.knowledge.dto.tag.TagPageResult;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.FaqChunkRepository;
@@ -118,7 +118,7 @@ public class KnowledgeTagService {
     /**
      * @return PageResult 形态 {total, page, page_size, data:[tag+stats]}
      */
-    public TagPageResult listTags(String kbId, Integer page, Integer pageSize, String keyword) {
+    public PageResult<KnowledgeTagWithStats> listTags(String kbId, Integer page, Integer pageSize, String keyword) {
         if (kbId == null || kbId.isEmpty()) {
             throw BizException.badRequest("知识库ID不能为空");
         }
@@ -128,7 +128,7 @@ public class KnowledgeTagService {
         //（org-share 分支未实现，见类注释）；requireKBWrite 同理。
         long tenantId = TenantContext.currentTenantId() == null ? 0 : TenantContext.currentTenantId();
 
-        KnowledgeTagRepository.TagPage result = tagRepo.listByKb(tenantId, kb.getId(), page, pageSize, trimmedKeyword);
+        PageResult<KnowledgeTag> result = tagRepo.listByKb(tenantId, kb.getId(), page, pageSize, trimmedKeyword);
         List<KnowledgeTagWithStats> data = new ArrayList<>();
         if (!result.items().isEmpty()) {
             List<String> tagIds = new ArrayList<>(result.items().size());
@@ -146,7 +146,7 @@ public class KnowledgeTagService {
                 data.add(KnowledgeTagWithStats.from(t, c[0], c[1]));
             }
         }
-        return new TagPageResult(data, result.page(), result.pageSize(), result.total());
+        return PageResult.of(data, result.total(), result.page(), result.pageSize());
     }
 
     // ── 写：CreateTag（tag） ────────────────────────────────────

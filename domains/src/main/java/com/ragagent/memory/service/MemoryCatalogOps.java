@@ -3,6 +3,7 @@ package com.ragagent.memory.service;
 import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryTopicStat;
@@ -11,7 +12,6 @@ import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.dto.MemoryDocAffinity;
 import com.ragagent.memory.dto.MemoryDocView;
-import com.ragagent.memory.dto.MemoryPage;
 import com.ragagent.memory.dto.MemoryTopicView;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -37,15 +37,15 @@ final class MemoryCatalogOps {
     }
 
     /** 记忆管理器的条目列表。 */
-    public MemoryPage<MemoryItem> listItems(String status, int limit, int offset) {
+    public PageResult<MemoryItem> listItems(String status, int limit, int offset) {
         MemoryScope scope = MemoryScopes.resolve();
         return service.repo.listItems(scope, status, limit, offset);
     }
 
     /** 已计数但还没被提升的主体的视图。 */
-    public MemoryPage<MemoryTopicView> listTopics(int limit, int offset) {
+    public PageResult<MemoryTopicView> listTopics(int limit, int offset) {
         MemoryScope scope = MemoryScopes.resolve();
-        MemoryPage<MemoryTopicStat> page = service.repo.listUnpromotedTopics(scope, limit, offset);
+        PageResult<MemoryTopicStat> page = service.repo.listUnpromotedTopics(scope, limit, offset);
         int threshold = service.workspaceConfig(scope.tenantId()).effectiveInterestThreshold();
         List<MemoryTopicView> views = new ArrayList<>(page.items().size());
         for (MemoryTopicStat stat : page.items()) {
@@ -54,7 +54,7 @@ final class MemoryCatalogOps {
                 views.add(view);
             }
         }
-        return new MemoryPage<>(views, page.total());
+        return PageResult.of(views, page.total());
     }
 
     /**
@@ -106,9 +106,9 @@ final class MemoryCatalogOps {
     }
 
     /** 当作习惯被引用过足够多次的文档。 */
-    public MemoryPage<MemoryDocView> listDocuments(int limit, int offset) {
+    public PageResult<MemoryDocView> listDocuments(int limit, int offset) {
         MemoryScope scope = MemoryScopes.resolve();
-        MemoryPage<MemoryDocAffinity> page = service.repo.listFamiliarDocs(
+        PageResult<MemoryDocAffinity> page = service.repo.listFamiliarDocs(
                 scope, MemoryConfig.MEMORY_DOC_AFFINITY_MIN_HITS, limit, offset);
         List<MemoryDocView> views = new ArrayList<>(page.items().size());
         for (MemoryDocAffinity row : page.items()) {
@@ -117,7 +117,7 @@ final class MemoryCatalogOps {
                 views.add(view);
             }
         }
-        return new MemoryPage<>(views, page.total());
+        return PageResult.of(views, page.total());
     }
 
     /** 不再把某个文档当个人检索信号。 */
@@ -331,7 +331,7 @@ final class MemoryCatalogOps {
             if (budget <= 0) {
                 return;
             }
-            MemoryPage<MemoryItem> page;
+            PageResult<MemoryItem> page;
             try {
                 page = service.repo.listItems(scope, status, budget, 0);
             } catch (RuntimeException e) {

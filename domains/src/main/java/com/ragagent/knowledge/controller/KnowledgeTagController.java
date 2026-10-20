@@ -2,10 +2,11 @@ package com.ragagent.knowledge.controller;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.knowledge.dto.tag.CreateTagRequest;
 import com.ragagent.knowledge.dto.tag.DeleteTagRequest;
 import com.ragagent.knowledge.dto.tag.KnowledgeTagResponse;
-import com.ragagent.knowledge.dto.tag.TagPageResult;
+import com.ragagent.knowledge.dto.tag.KnowledgeTagWithStats;
 import com.ragagent.knowledge.dto.tag.UpdateTagRequest;
 import com.ragagent.knowledge.service.access.ChunkAccessGuard;
 import com.ragagent.knowledge.service.management.KnowledgeTagService;
@@ -49,7 +50,7 @@ public class KnowledgeTagController {
     }
 
     @GetMapping("/api/v1/knowledge-bases/{id}/tags")
-    public ResponseEntity<TagPageResult> listTags(
+    public ResponseEntity<PageResult<KnowledgeTagWithStats>> listTags(
             @PathVariable("id") String id,
             @RequestParam(value = "page", required = false) String page,
             @RequestParam(value = "pageSize", required = false) String pageSize,

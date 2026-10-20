@@ -2,6 +2,7 @@ package com.ragagent.session.controller;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.session.MessageArtifact;
 import com.ragagent.contract.session.SessionView;
 import com.ragagent.platform.access.TenantContext;
@@ -17,9 +18,9 @@ import com.ragagent.session.dto.BatchDeleteSessionsRequest;
 import com.ragagent.session.dto.CreateSessionRequest;
 import com.ragagent.session.dto.GenerateTitleRequest;
 import com.ragagent.session.dto.GenerateTitleResponse;
+import com.ragagent.session.dto.SessionListItem;
 import com.ragagent.session.dto.SessionListQuery;
 import com.ragagent.session.dto.SessionListResponse;
-import com.ragagent.session.dto.SessionPage;
 import com.ragagent.session.dto.SessionPinResponse;
 import com.ragagent.session.dto.StopSessionRequest;
 import com.ragagent.session.dto.UpdateSessionRequest;
@@ -157,7 +158,7 @@ public class SessionController {
         int p = bindPagination(page, "page", false);
         int size = bindPagination(pageSize, "pageSize", true);
 
-        SessionPage result;
+        PageResult<SessionListItem> result;
         result = sessionService.listSessions(
                 SessionListQuery.of(keyword, source, agentId, p, size));
 

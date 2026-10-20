@@ -3,17 +3,16 @@ package com.ragagent.knowledge.service.faq;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.retrieval.HybridSearchPort;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.ChunkPage;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.domain.access.FaqGuard;
 import com.ragagent.knowledge.dto.faq.FaqEntry;
-import com.ragagent.knowledge.dto.faq.FaqEntryPage;
 import com.ragagent.knowledge.dto.faq.FaqExportEntry;
 import com.ragagent.knowledge.dto.faq.FaqSearchRequest;
 import com.ragagent.knowledge.repository.ChunkRepository;
@@ -77,7 +76,7 @@ public class FaqEntryQueryService {
     /**
      * 分页已由 handler 解析钳位。
      */
-    public FaqEntryPage listEntries(String kbId, int page, int pageSize,
+    public PageResult<FaqEntry> listEntries(String kbId, int page, int pageSize,
                                            List<String> tagUuids, long legacyTagSeqId,
                                            String keyword, String searchField,
                                            String sortOrder, Boolean isEnabled) {
@@ -98,7 +97,7 @@ public class FaqEntryQueryService {
                 }
                 tags = List.of(tag.getId());
             }
-            ChunkPage result = chunkRepository.listPagedChunksByKnowledgeId(
+            PageResult<Chunk> result = chunkRepository.listPagedChunksByKnowledgeId(
                     effectiveTenant, faqKnowledge.getId(), (page - 1) * pageSize, pageSize,
                     List.of("faq"), tags, keyword, searchField, sortOrder, "faq", isEnabled);
             total = result.total();
@@ -128,7 +127,7 @@ public class FaqEntryQueryService {
                 entries.add(entry);
             }
         }
-        return new FaqEntryPage(entries, page, pageSize, total);
+        return PageResult.of(entries, total, page, pageSize);
     }
 
     // ── 详情 ──

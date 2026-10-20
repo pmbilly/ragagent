@@ -2,13 +2,13 @@ package com.ragagent.knowledge.controller;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.knowledge.dto.doc.UpdateLastImportDisplayStatusRequest;
 import com.ragagent.knowledge.dto.faq.AddSimilarQuestionsRequest;
 import com.ragagent.knowledge.dto.faq.FaqBatchUpsertPayload;
 import com.ragagent.knowledge.dto.faq.FaqDeleteRequest;
 import com.ragagent.knowledge.dto.faq.FaqEntry;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
-import com.ragagent.knowledge.dto.faq.FaqEntryPage;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
 import com.ragagent.knowledge.dto.faq.FaqEntryTagBatchRequest;
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
@@ -68,7 +68,7 @@ public class FaqController {
     // ── 读 ──
 
     @GetMapping("/api/v1/knowledge-bases/{id}/faq/entries")
-    public ResponseEntity<FaqEntryPage> listEntries(
+    public ResponseEntity<PageResult<FaqEntry>> listEntries(
             @PathVariable("id") String id,
             @RequestParam(value = "page", required = false) String page,
             @RequestParam(value = "pageSize", required = false) String pageSize,

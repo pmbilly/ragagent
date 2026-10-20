@@ -1,13 +1,13 @@
 package com.ragagent.system.service;
 
 import com.ragagent.auth.api.AdminUserAdapter;
-import com.ragagent.auth.api.AdminUserPage;
 import com.ragagent.auth.api.AuthUserErrors;
 import com.ragagent.auth.api.CreateUserResult;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.contract.auth.AdminUserView;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.Map;
@@ -64,7 +64,7 @@ public class SystemAdminUserService {
         return adminUserPort.byUsername(username);
     }
 
-    public AdminUserPage listSystemAdmins(int offset, int limit) {
+    public PageResult<AdminUserView> listSystemAdmins(int offset, int limit) {
         return adminUserPort.listSystemAdmins(offset, limit);
     }
 

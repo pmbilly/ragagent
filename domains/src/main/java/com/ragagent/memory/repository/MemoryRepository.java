@@ -1,6 +1,7 @@
 package com.ragagent.memory.repository;
 
 import com.ragagent.contract.memory.MemoryMessageCursor;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
 import com.ragagent.memory.domain.MemoryExtractionSession;
@@ -14,7 +15,6 @@ import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.domain.vector.MemoryVectorHit;
 import com.ragagent.memory.domain.vector.MemoryVectorQuery;
 import com.ragagent.memory.dto.MemoryDocAffinity;
-import com.ragagent.memory.dto.MemoryPage;
 import com.ragagent.memory.mapper.MemoryDocAffinityMapper;
 import com.ragagent.memory.mapper.MemoryExtractionSessionMapper;
 import com.ragagent.memory.mapper.MemoryItemEmbeddingMapper;
@@ -264,7 +264,7 @@ public class MemoryRepository {
     }
 
     /** 实现随协作者 {@link MemoryItemStore}。 */
-        public MemoryPage<MemoryItem> listItems(MemoryScope scope, String status, int limit, int offset) {
+        public PageResult<MemoryItem> listItems(MemoryScope scope, String status, int limit, int offset) {
         return itemStore.listItems(scope, status, limit, offset);
     }
 
@@ -349,7 +349,7 @@ public class MemoryRepository {
     }
 
     /** 实现随协作者 {@link MemoryIndexStore}。 */
-        public MemoryPage<MemoryTopicStat> listUnpromotedTopics(MemoryScope scope, int limit, int offset) {
+        public PageResult<MemoryTopicStat> listUnpromotedTopics(MemoryScope scope, int limit, int offset) {
         return indexStore.listUnpromotedTopics(scope, limit, offset);
     }
 
@@ -384,7 +384,7 @@ public class MemoryRepository {
     }
 
     /** 实现随协作者 {@link MemoryIndexStore}。 */
-        public MemoryPage<MemoryDocAffinity> listFamiliarDocs(MemoryScope scope, int minHits, int limit, int offset) {
+        public PageResult<MemoryDocAffinity> listFamiliarDocs(MemoryScope scope, int minHits, int limit, int offset) {
         return indexStore.listFamiliarDocs(scope, minHits, limit, offset);
     }
 

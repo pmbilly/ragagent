@@ -5,6 +5,7 @@ import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.TenantMemberResponse;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.tenant.TenantRole;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -25,15 +26,15 @@ public class TenantMemberReadService {
     }
 
     public Map<String, Object> listMembers(long tenantId, String q, int page, int pageSize) {
-        TenantMemberService.MemberPage rows =
+        PageResult<TenantMember> rows =
                 memberService.listMembersPage(tenantId, q, page, pageSize);
         List<String> ids = new ArrayList<>();
-        for (TenantMember m : rows.members()) {
+        for (TenantMember m : rows.items()) {
             ids.add(m.getUserId());
         }
         Map<String, User> usersById = userService.getUsersByIds(ids);
-        List<TenantMemberResponse> resp = new ArrayList<>(rows.members().size());
-        for (TenantMember m : rows.members()) {
+        List<TenantMemberResponse> resp = new ArrayList<>(rows.items().size());
+        for (TenantMember m : rows.items()) {
             resp.add(memberResponse(m, usersById.get(m.getUserId())));
         }
         Map<String, Object> data = new LinkedHashMap<>();

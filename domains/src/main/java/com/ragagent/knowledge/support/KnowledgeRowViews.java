@@ -2,6 +2,7 @@ package com.ragagent.knowledge.support;
 
 import com.ragagent.contract.knowledge.KnowledgePageView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
@@ -149,7 +150,7 @@ public final class KnowledgeRowViews {
 
     /** MyBatis-Plus 分页（实体页 → 契约分页视图；null 透传）。 */
     public static KnowledgePageView pageView(
-            KnowledgePage p) {
+            PageResult<Knowledge> p) {
         if (p == null) {
             return null;
         }

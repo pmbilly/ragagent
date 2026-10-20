@@ -6,6 +6,7 @@ import com.ragagent.auth.repository.TenantInvitationRepository;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.config.AppEnvLookup;
@@ -146,7 +147,7 @@ public class TenantInvitationService {
     }
 
     /** 租户侧邀请分页：id DESC + pending 过滤（include_terminal=false） */
-    public InvitationPage listTenantInvitationsPage(long tenantId, boolean includeTerminal, int page, int pageSize) {
+    public PageResult<TenantInvitation> listTenantInvitationsPage(long tenantId, boolean includeTerminal, int page, int pageSize) {
         sweep();
         if (page < 1) {
             page = 1;
@@ -158,11 +159,8 @@ public class TenantInvitationService {
             pageSize = 100;
         }
         long total = invitationRepo.countTenant(tenantId, includeTerminal);
-        return new InvitationPage(
+        return PageResult.of(
                 invitationRepo.listTenantPage(tenantId, includeTerminal, page, pageSize), total);
-    }
-
-    public record InvitationPage(List<TenantInvitation> invitations, long total) {
     }
 
     /** 跨空间收件箱：id DESC，无分页 */

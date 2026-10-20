@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.service.chunk;
 
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.ChunkPage;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.dto.chunk.ChunkResponse;
 import com.ragagent.knowledge.repository.ChunkRepository;
@@ -39,7 +39,7 @@ public class ChunkReadService {
      */
     public ChunkPageView listPagedChunks(long tenantId, String knowledgeId, int offset, int limit,
                                         List<String> types) {
-        ChunkPage page = chunkRepository.listPagedChunksByKnowledgeId(
+        PageResult<Chunk> page = chunkRepository.listPagedChunksByKnowledgeId(
                 tenantId, knowledgeId, offset, limit, types, null, "", "", "", "", null);
         return new ChunkPageView(page.items(), page.total());
     }

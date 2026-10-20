@@ -12,6 +12,7 @@ import com.ragagent.auth.service.TenantService;
 import com.ragagent.contract.auth.AdminUserView;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.platform.security.LogSanitizer;
@@ -158,7 +159,7 @@ public class AdminUserAdapter {
         return toView(user);
     }
 
-    public AdminUserPage listSystemAdmins(int offset, int limit) {
+    public PageResult<AdminUserView> listSystemAdmins(int offset, int limit) {
         Long total = countSystemAdmins();
         // offset/limit 语义的 API：atOffset 表达任意偏移，LIMIT/OFFSET 交给分页插件
         List<User> users = userMapper.selectList(PageRequests.atOffset(offset, limit),
@@ -171,7 +172,7 @@ public class AdminUserAdapter {
         for (User u : users) {
             views.add(toView(u));
         }
-        return new AdminUserPage(views, total == null ? 0 : total);
+        return PageResult.of(views, total == null ? 0 : total);
     }
 
     private Long countSystemAdmins() {

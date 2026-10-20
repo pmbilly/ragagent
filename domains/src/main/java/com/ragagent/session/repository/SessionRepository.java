@@ -2,6 +2,7 @@ package com.ragagent.session.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.session.SessionLastRequestState;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.persistence.LikeEscapes;
@@ -10,7 +11,6 @@ import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.dto.SessionListItem;
 import com.ragagent.session.dto.SessionListQuery;
-import com.ragagent.session.dto.SessionPage;
 import com.ragagent.session.mapper.SessionMapper;
 import com.ragagent.session.support.SessionNotFoundException;
 import com.ragagent.session.support.SessionOwnerIds;
@@ -277,7 +277,7 @@ public class SessionRepository {
      * （H2 两个都不支持）。方言在进程生命周期内不变，
      * 故与 wiki 一样在构造期探测一次。</p>
      */
-    public SessionPage queryPaged(SessionListQuery q) {
+    public PageResult<SessionListItem> queryPaged(SessionListQuery q) {
         String rawSource = q.source() == null ? "" : q.source().trim();
         String src = rawSource.toLowerCase(Locale.ROOT);
 
@@ -310,7 +310,7 @@ public class SessionRepository {
         List<SessionListItem> items = mapper.queryPaged(q, postgres, keywordLike, src, channelDesc,
                 embedLike, apiTenantLike, apiExternalLike, skillMarker, size, (page - 1) * size);
 
-        return new SessionPage(items, total, page, size);
+        return PageResult.of(items, total, page, size);
     }
 
     /**

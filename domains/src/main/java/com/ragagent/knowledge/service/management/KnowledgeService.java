@@ -9,6 +9,7 @@ import com.ragagent.contract.knowledge.KnowledgeDocumentGateway;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.contract.knowledge.error.DuplicateKnowledgeException;
 import com.ragagent.contract.knowledge.projection.KnowledgeProjectionAdapter;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -31,7 +32,6 @@ import com.ragagent.knowledge.service.query.KnowledgeSearchService;
 import com.ragagent.knowledge.service.query.KnowledgeSpanService;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
-import com.ragagent.knowledge.support.KnowledgePage;
 import com.ragagent.knowledge.support.KnowledgePaths;
 import com.ragagent.knowledge.support.KnowledgeRowViews;
 import com.ragagent.knowledge.support.TagViews;
@@ -368,7 +368,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     // ── 查询 / 更新 / 删除 ────────────────────────────────────────────────
 
     /** 真分页（page 默认 1，page_size 默认 20 上限 1000）。 */
-    public KnowledgePage listKnowledge(String kbId, long page, long pageSize,
+    public PageResult<Knowledge> listKnowledge(String kbId, long page, long pageSize,
                                          String keyword, String parseStatus, String fileType,
                                          String folderPath, boolean folderPresent) {
         requireKb(kbId);

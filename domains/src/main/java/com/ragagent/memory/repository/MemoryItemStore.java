@@ -1,11 +1,11 @@
 package com.ragagent.memory.repository;
 
 import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryTombstone;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
-import com.ragagent.memory.dto.MemoryPage;
 import com.ragagent.memory.support.MemoryConflictException;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.Duration;
@@ -177,12 +177,12 @@ final class MemoryItemStore {
      *
      * <p>{@code limit <= 0} 时取 50（硬编码）；返回值同时带总数与这一页。</p>
      */
-    public MemoryPage<MemoryItem> listItems(MemoryScope scope, String status, int limit, int offset) {
+    public PageResult<MemoryItem> listItems(MemoryScope scope, String status, int limit, int offset) {
         long total = repo.itemMapper.countListItems(scope.tenantId(), scope.subjectId(), status);
         int effectiveLimit = limit <= 0 ? 50 : limit;
         List<MemoryItem> items = repo.itemMapper.listItems(scope.tenantId(), scope.subjectId(), status,
                 effectiveLimit, offset);
-        return new MemoryPage<>(items, total);
+        return PageResult.of(items, total);
     }
 
     /**

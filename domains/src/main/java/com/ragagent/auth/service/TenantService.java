@@ -6,6 +6,7 @@ import com.ragagent.auth.repository.TenantMemberRepository;
 import com.ragagent.auth.repository.TenantRepository;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.storage.StorageBackendProvisioner;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
 import com.ragagent.contract.tenant.TenantConfigLookup;
@@ -163,9 +164,8 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
      * LIKE 参数先过 {@code LikeEscapes.escape}（\ % _ 反斜杠转义，PG LIKE 默认 ESCAPE 就是反斜杠）。
      * 先 Count 再 Offset/Limit，恒 created_at DESC。
      */
-    public record TenantSearchPage(List<TenantRowView> tenants, long total) {}
 
-    public TenantSearchPage searchTenants(String keyword, long tenantId, int page, int pageSize) {
+    public PageResult<TenantRowView> searchTenants(String keyword, long tenantId, int page, int pageSize) {
         String escaped = LikeEscapes.escape(keyword == null ? "" : keyword);
         long total = tenantAdmin.count(escaped, tenantId);
         List<Tenant> tenants = tenantAdmin.search(escaped, tenantId, page, pageSize);
@@ -173,7 +173,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
             normalizeRetrieverEngines(t);
             normalizeContextConfig(t);
         }
-        return new TenantSearchPage(toViews(tenants), total);
+        return PageResult.of(toViews(tenants), total);
     }
 
     /** LIKE 转义：\ → \\、% → \%、_ → \_（顺序敏感，先转义反斜杠） */

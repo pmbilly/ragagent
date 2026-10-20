@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.repository;
 
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
 import com.ragagent.platform.persistence.DatabaseDialects;
@@ -126,13 +127,12 @@ public class KnowledgeTagRepository {
         return tagMapper.selectKnowledgeIdsByTagIds(tenantId, kbId, tagIds);
     }
 
-    /** 标签分页结果（仓储内使用；对外形状见 {@code dto.TagPageResult}）。 */
-    public record TagPage(List<KnowledgeTag> items, long total, int page, int pageSize) {}
+    /** 标签分页结果（仓储内使用）。 */
 
     /**
      * Pagination.GetPage/GetPageSize 归一（page&lt;1→1、size&lt;1→20、&gt;1000→1000）。
      */
-    public TagPage listByKb(long tenantId, String kbId, Integer page, Integer pageSize, String keyword) {
+    public PageResult<KnowledgeTag> listByKb(long tenantId, String kbId, Integer page, Integer pageSize, String keyword) {
         int pageNo = page == null || page < 1 ? 1 : page;
         int size = pageSize == null || pageSize < 1 ? 20 : Math.min(pageSize, 1000);
         String escaped = keyword == null ? "" : keyword
@@ -144,7 +144,7 @@ public class KnowledgeTagRepository {
         List<KnowledgeTag> items = escaped.isEmpty()
                 ? tagMapper.listByKB(tenantId, kbId, size, offset)
                 : tagMapper.listByKBKeyword(tenantId, kbId, escaped, size, offset);
-        return new TagPage(items, total, pageNo, size);
+        return PageResult.of(items, total, pageNo, size);
     }
 
     public long[] countReferences(long tenantId, String kbId, String tagId) {

@@ -3,10 +3,10 @@ package com.ragagent.knowledge.repository;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.dto.KnowledgeSearchScope;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.knowledge.support.KnowledgePage;
 import com.ragagent.platform.persistence.LikeEscapes;
 import com.ragagent.platform.persistence.PageRequests;
 import java.time.OffsetDateTime;
@@ -299,7 +299,7 @@ public class KnowledgeRepository {
      *
      * <p>条件构造收在仓储侧，用例层只传语义参数——分页插件类型不外泄。</p>
      */
-    public KnowledgePage searchPage(String kbId, long page, long pageSize,
+    public PageResult<Knowledge> searchPage(String kbId, long page, long pageSize,
             String keyword, String parseStatus, String fileType, String folderPath, boolean folderPresent) {
         LambdaQueryWrapper<Knowledge> qw = new LambdaQueryWrapper<Knowledge>()
                 .eq(Knowledge::getKnowledgeBaseId, kbId)
@@ -318,7 +318,7 @@ public class KnowledgeRepository {
             qw.eq(Knowledge::getFolderPath, folderPath == null ? "" : folderPath);
         }
         Page<Knowledge> result = knowledgeMapper.selectPage(new Page<>(page, pageSize), qw);
-        return new KnowledgePage(result.getRecords(), result.getTotal());
+        return PageResult.of(result.getRecords(), result.getTotal());
     }
 
     /** 仅按 id 取未软删行（无租户过滤；守卫/权限解析用）。 */

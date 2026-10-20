@@ -4,6 +4,7 @@ import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.contract.memory.MemoryMessageCursor;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
 import com.ragagent.memory.domain.MemoryExtractionLeaseLostException;
@@ -14,7 +15,6 @@ import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
 import com.ragagent.memory.dto.MemoryDocAffinity;
-import com.ragagent.memory.dto.MemoryPage;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -186,10 +186,10 @@ final class MemoryIndexStore {
     }
 
     /** 已计数、尚未变成兴趣的主题（分页）。 */
-    public MemoryPage<MemoryTopicStat> listUnpromotedTopics(MemoryScope scope, int limit, int offset) {
+    public PageResult<MemoryTopicStat> listUnpromotedTopics(MemoryScope scope, int limit, int offset) {
         long total = repo.topicMapper.countUnpromoted(scope.tenantId(), scope.subjectId());
         int effectiveLimit = limit <= 0 ? 50 : limit;
-        return new MemoryPage<>(repo.topicMapper.listUnpromoted(scope.tenantId(), scope.subjectId(),
+        return PageResult.of(repo.topicMapper.listUnpromoted(scope.tenantId(), scope.subjectId(),
                 effectiveLimit, offset), total);
     }
 
@@ -278,11 +278,11 @@ final class MemoryIndexStore {
      * 熟悉文档列表：{@code minHits < 1} 时回落到
      * {@code MemoryDocAffinityMinHits}（= 2，一次引用是噪声、两次才是模式）。
      */
-    public MemoryPage<MemoryDocAffinity> listFamiliarDocs(MemoryScope scope, int minHits, int limit, int offset) {
+    public PageResult<MemoryDocAffinity> listFamiliarDocs(MemoryScope scope, int minHits, int limit, int offset) {
         int effectiveMinHits = minHits < 1 ? MemoryConfig.MEMORY_DOC_AFFINITY_MIN_HITS : minHits;
         long total = repo.affinityMapper.countFamiliar(scope.tenantId(), scope.subjectId(), effectiveMinHits);
         int effectiveLimit = limit <= 0 ? 50 : limit;
-        return new MemoryPage<>(repo.affinityMapper.listFamiliar(scope.tenantId(), scope.subjectId(),
+        return PageResult.of(repo.affinityMapper.listFamiliar(scope.tenantId(), scope.subjectId(),
                 effectiveMinHits, effectiveLimit, offset), total);
     }
 

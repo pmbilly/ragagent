@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.ChunkSearchGateway;
 import com.ragagent.contract.knowledge.projection.ChunkProjectionAdapter;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.ChunkPage;
 import com.ragagent.knowledge.domain.ChunkRevision;
 import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.mapper.ChunkRevisionMapper;
@@ -251,7 +251,7 @@ public class ChunkRepository implements ChunkSearchGateway {
      *                     JSON 路径（PG 用 {@code ->> + ILIKE}，非 PG 分支是 MySQL 语法）
      * @param knowledgeType "faq" 决定排序键与搜索面
      */
-    public ChunkPage listPagedChunksByKnowledgeId(
+    public PageResult<Chunk> listPagedChunksByKnowledgeId(
             long tenantId, String knowledgeId, int offset, int limit,
             List<String> chunkTypes, List<String> tagIds,
             String keyword, String searchField, String sortOrder,
@@ -278,7 +278,7 @@ public class ChunkRepository implements ChunkSearchGateway {
                 data.orderByAsc(Chunk::getChunkIndex);
             }
         }
-        return new ChunkPage(chunkMapper.selectList(PageRequests.atOffset(offset, limit), data), total);
+        return PageResult.of(chunkMapper.selectList(PageRequests.atOffset(offset, limit), data), total);
     }
 
     /**

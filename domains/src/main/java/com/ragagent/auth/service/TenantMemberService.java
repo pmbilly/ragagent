@@ -9,6 +9,7 @@ import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
@@ -128,17 +129,13 @@ public class TenantMemberService {
 
     // ── HTTP 面 ────────────────────────────────────────────────────────────
 
-    /** 分页结果（成员行 + 总数） */
-    public record MemberPage(List<TenantMember> members, long total) {
-    }
-
     /**
      * 成员分页：trim query、page&lt;1→1、size&lt;1→20、size&gt;100→100，
      * joined_at ASC, id ASC。q 非空时按 LOWER(email/username) LIKE 命中的用户 id
      * 做 user_id IN 过滤；users 行缺失（悬挂成员）
      * 在 q 非空时被排除（join 语义），q 为空时全部计入。
      */
-    public MemberPage listMembersPage(long tenantId, String query, int page, int pageSize) {
+    public PageResult<TenantMember> listMembersPage(long tenantId, String query, int page, int pageSize) {
         String q = query == null ? "" : query.trim();
         if (page < 1) {
             page = 1;
@@ -155,12 +152,12 @@ public class TenantMemberService {
         if (!q.isEmpty()) {
             List<String> ids = userIdsMatching(q);
             if (ids.isEmpty()) {
-                return new MemberPage(new ArrayList<>(), 0);
+                return PageResult.of(new ArrayList<>(), 0);
             }
             userIds = ids;
         }
         long total = memberRepo.countPage(tenantId, userIds);
-        return new MemberPage(memberRepo.listPage(tenantId, userIds, page, pageSize), total);
+        return PageResult.of(memberRepo.listPage(tenantId, userIds, page, pageSize), total);
     }
 
     /** escapeLikePattern（\ % _ 依次转义）+ % 包裹，交由 LOWER(... LIKE LOWER(?)) 匹配 */

@@ -1,11 +1,12 @@
 package com.ragagent.session.api;
 
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.session.EmbedSessionOps;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
 import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.dto.SessionListItem;
 import com.ragagent.session.dto.SessionListQuery;
-import com.ragagent.session.dto.SessionPage;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.session.support.SessionOwnerIds;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class EmbedSessionOpsAdapter implements EmbedSessionOps {
     @Override
     public long countSessions(long tenantId, String channelId) {
         SessionListQuery query = SessionListQuery.of(null, "embed:" + channelId, null, 1, 1);
-        SessionPage items = sessionRepository.queryPaged(query.withScope(tenantId, ""));
+        PageResult<SessionListItem> items = sessionRepository.queryPaged(query.withScope(tenantId, ""));
         return items.total();
     }
 

@@ -7,6 +7,7 @@ import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRetrievalContext;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.memory.MemoryContext;
 import com.ragagent.memory.config.MemorySettings;
@@ -20,7 +21,6 @@ import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.dto.MemoryDocAffinity;
 import com.ragagent.memory.dto.MemoryDocView;
 import com.ragagent.memory.dto.MemoryItemResponse;
-import com.ragagent.memory.dto.MemoryPage;
 import com.ragagent.memory.dto.MemoryTopicView;
 import com.ragagent.memory.repository.MemoryRepository;
 import com.ragagent.memory.support.MemoryConflictException;
@@ -170,12 +170,12 @@ public class MemoryService {
     // ── 记忆管理器/检索侧：实现随协作者（MemoryCatalogOps / MemoryInsightOps） ──
 
     /** 实现随协作者 {@link MemoryCatalogOps}。 */
-        public MemoryPage<MemoryItem> listItems(String status, int limit, int offset) {
+        public PageResult<MemoryItem> listItems(String status, int limit, int offset) {
         return catalogOps.listItems(status, limit, offset);
     }
 
     /** 实现随协作者 {@link MemoryCatalogOps}。 */
-        public MemoryPage<MemoryTopicView> listTopics(int limit, int offset) {
+        public PageResult<MemoryTopicView> listTopics(int limit, int offset) {
         return catalogOps.listTopics(limit, offset);
     }
 
@@ -190,7 +190,7 @@ public class MemoryService {
     }
 
     /** 实现随协作者 {@link MemoryCatalogOps}。 */
-        public MemoryPage<MemoryDocView> listDocuments(int limit, int offset) {
+        public PageResult<MemoryDocView> listDocuments(int limit, int offset) {
         return catalogOps.listDocuments(limit, offset);
     }
 
@@ -211,9 +211,9 @@ public class MemoryService {
 
     // ── 控制面读模型（控制器不再 import MemoryItem） ─────────────────────
 
-    public MemoryPage<MemoryItemResponse> listItemViews(String status, int limit, int offset) {
-        MemoryPage<MemoryItem> page = listItems(status, limit, offset);
-        return new MemoryPage<>(
+    public PageResult<MemoryItemResponse> listItemViews(String status, int limit, int offset) {
+        PageResult<MemoryItem> page = listItems(status, limit, offset);
+        return PageResult.of(
                 page.items().stream().map(MemoryItemResponse::from).toList(), page.total());
     }
 

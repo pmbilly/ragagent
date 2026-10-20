@@ -115,7 +115,7 @@ public class TenantCatalogController {
         var result = tenantService.searchTenants(keyword == null ? "" : keyword,
                 tenantId == null ? 0 : tenantId, page, pageSize);
         Map<String, Object> body = new java.util.LinkedHashMap<>();
-        body.put("items", result.tenants());
+        body.put("items", result.items());
         body.put("total", result.total());
         body.put("page", page);
         body.put("pageSize", pageSize);
@@ -125,7 +125,7 @@ public class TenantCatalogController {
     /** GET /tenants/all —— 全量目录（跨空间访问权由守卫组承担；无分页）。 */
     @GetMapping("/api/v1/tenants/all")
     public List<TenantRowView> listAllTenants() {
-        return tenantService.searchTenants("", 0, 0, 0).tenants();
+        return tenantService.searchTenants("", 0, 0, 0).items();
     }
 
     @GetMapping("/api/v1/tenants/{id}")

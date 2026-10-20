@@ -3,6 +3,7 @@ package com.ragagent.memory.controller;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.dto.CreateMemoryItemRequest;
 import com.ragagent.memory.dto.MemoryConsolidationResult;
@@ -10,7 +11,6 @@ import com.ragagent.memory.dto.MemoryDocView;
 import com.ragagent.memory.dto.MemoryExportResponse;
 import com.ragagent.memory.dto.MemoryItemResponse;
 import com.ragagent.memory.dto.MemoryListResponse;
-import com.ragagent.memory.dto.MemoryPage;
 import com.ragagent.memory.dto.MemoryTopicView;
 import com.ragagent.memory.dto.UpdateMemoryItemRequest;
 import com.ragagent.memory.dto.UpdateMemorySettingsRequest;
@@ -173,7 +173,7 @@ public class MemoryController {
         }
         int[] paging = listPaging(limit, offset);
 
-        MemoryPage<MemoryItemResponse> page;
+        PageResult<MemoryItemResponse> page;
         try {
             page = memoryService.listItemViews(status == null ? "" : status, paging[0], paging[1]);
         } catch (RuntimeException e) {
@@ -284,7 +284,7 @@ public class MemoryController {
             @RequestParam(value = "limit", required = false) String limit,
             @RequestParam(value = "offset", required = false) String offset) {
         int[] paging = listPaging(limit, offset);
-        MemoryPage<MemoryTopicView> page;
+        PageResult<MemoryTopicView> page;
         try {
             page = memoryService.listTopics(paging[0], paging[1]);
         } catch (RuntimeException e) {
@@ -327,7 +327,7 @@ public class MemoryController {
             @RequestParam(value = "limit", required = false) String limit,
             @RequestParam(value = "offset", required = false) String offset) {
         int[] paging = listPaging(limit, offset);
-        MemoryPage<MemoryDocView> page;
+        PageResult<MemoryDocView> page;
         try {
             page = memoryService.listDocuments(paging[0], paging[1]);
         } catch (RuntimeException e) {
@@ -380,7 +380,7 @@ public class MemoryController {
         List<MemoryItemResponse> items = null;
         long total = 0;
         while (true) {
-            MemoryPage<MemoryItemResponse> page;
+            PageResult<MemoryItemResponse> page;
             try {
                 page = memoryService.listItemViews("", EXPORT_PAGE_SIZE, itemCount(items));
             } catch (RuntimeException e) {
@@ -444,7 +444,7 @@ public class MemoryController {
  *
  * @param paging {@link #listPaging} 的返回值：{limit, offset}
  */
-    private static <T> MemoryListResponse<T> pageBody(MemoryPage<T> page, int[] paging) {
+    private static <T> MemoryListResponse<T> pageBody(PageResult<T> page, int[] paging) {
         int limit = paging[0];
         int offset = paging[1];
         return new MemoryListResponse<>(page.items(), offset / limit + 1L, limit, page.total());

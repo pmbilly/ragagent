@@ -1,6 +1,5 @@
 package com.ragagent.system.controller;
 
-import com.ragagent.auth.api.AdminUserPage;
 import com.ragagent.auth.api.CreateUserResult;
 import com.ragagent.auth.apikey.service.ApiKeyAdminAdapter;
 import com.ragagent.contract.apikey.APIKeyCapability;
@@ -13,6 +12,7 @@ import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.contract.auth.AdminUserView;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.tenant.TenantStorageQuotaPort;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResponse;
@@ -169,9 +169,9 @@ public class SystemAdminController {
         if (lim > 200) {
             lim = 200;
         }
-        AdminUserPage page = users.listSystemAdmins(off, lim);
+        PageResult<AdminUserView> page = users.listSystemAdmins(off, lim);
         List<SystemDtos.UserInfoResponse> infos = new ArrayList<>();
-        for (AdminUserView u : page.users()) {
+        for (AdminUserView u : page.items()) {
             infos.add(SystemDtos.UserInfoResponse.from(u));
         }
         return ResponseEntity.ok(new SystemDtos.SystemAdminListResponse(page.total(), infos));

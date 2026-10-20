@@ -76,11 +76,11 @@ public class TenantInvitationController {
 
         var page =
                 invitationService.listTenantInvitationsPage(tenantId, includeTerminal, pp[0], pp[1]);
-        var usersById = readService.hydrateUsers(page.invitations());
+        var usersById = readService.hydrateUsers(page.items());
         // Share-link URL 内嵌注册 token——只有 Owner 及以上可以重取；其他角色看元数据
         boolean showShareLinks = currentRoleHasOwner();
-        List<TenantInvitationResponse> resp = new ArrayList<>(page.invitations().size());
-        for (var inv : page.invitations()) {
+        List<TenantInvitationResponse> resp = new ArrayList<>(page.items().size());
+        for (var inv : page.items()) {
             // 租户视图不 hydrate 租户名（调用方已知道租户）——传 null
             resp.add(showShareLinks
                     ? readService.projectInvitationWithLink(inv, usersById, null)

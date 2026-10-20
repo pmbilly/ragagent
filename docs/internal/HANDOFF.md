@@ -107,7 +107,7 @@
 | **H3** | 入库 `IngestJob` 状态机 + `IngestStage` 接口 | 待做 |
 | **H4a** | 任务端口：`TaskQueue` + `TaskProgress`，测试钩子 4→1 | 待做 |
 | **H4b** | 任务实现：datasource → memory → knowledge → wiki 分批 | 待做 |
-| **H5a** | 分页统一（7→1，后台强制分页） | 待做 |
+| **H5a** | 分页统一：**H5a-1 ✅** 形状收敛（`PageResult<T>`，11 类型 → 1）；H5a-2 待做（管理端点加分页参数 + 前端） | H5a-1 ✅ 2026-10-20 |
 | **H5b** | 软删校验守卫（79 基线只减，不做自动注入） | 待做 |
 | **H6** | 契约形状治理（`KnowledgeCatalogPort` 34 方法拆窄、`*RowView` 回域） | 待做 |
 | **H7** | platform 判据换血（依赖面 + 域词汇） | 待做 |
@@ -406,6 +406,7 @@ boot           14 件                      →  boot
 | G2 | 2026-10-20 | **整改尾巴**：evaluation 前端勾选项移除（类型/标签保留兼容已存 Key）· approval 明示为 mcp 策略域 · 存储探测 HTTP 面迁 storage（`/api/v1/storage/engine-status|check`，新增 `StorageEngineController` + DTO 随迁）· 解析引擎目录归 knowledge（`contract.doc.ParserEngineCatalogPort` + 8 引擎实现搬 `knowledge/service/parser`；37 个配置键归 `ParserEngineConfig.overridesFrom`）· 连通性双头**不合并**（未保存配置测试 vs 已保存模型调试是两个真实场景） | **42 守卫全绿** · 前端 753 / type-check 0 · boot `SystemContractTest` · Port 32→33 |
 | G3 | 2026-10-20 | **还乡 2.0（逐件核验版）**：`ToolResultPersist` 下移 `session/support`（contract 净减 1；纯 JDK、contract 内无回引、消费方仅 session 两处）。**其余三类经核验不可还乡**：① `platform/knowledge` 8 件全部被 ≥2 个业务族消费且依赖 Jackson/ImageIO（进不了 contract、归域会跨族直连）⇒ 留 platform 并重写 package-info 说明判据；② `MemoryKeys` 被 `contract.memory.MemoryConfig` 内部引用（`runeLength`/`runeSlice`）⇒ 留 contract；③ `model↔retrieval` 包环实测已不存在（SCC 5 组基线未变）。 | **42 守卫全绿** · **5008 / 0 / 4** · build 1m52s |
 | G4 | 2026-10-20 | **门面尾巴**：① `SubtaskDrain` 抽取（问题生成 / 图谱抽取两份逐字递减合一；收 `Runnable` 避免新增 knowledge→wiki 边）；② `TenantAdmin` 端口折叠为 `TenantRepository`（单实现单消费方同域，删 1 接口 + 12 处 `@Override`）；③ `DataSourceTrace`/`WikiTrace` 两个 16 行双胞胎合并为 `platform.tracing.TraceInjector`（删 2 类 2 包）；④ `mechanisms.md` 增 `runtime` 包四义词典与三条规则。**未做**：finalizer 6 行 import 换 Adapter——knowledge↔wiki 是族内直连，加端口属代理税（与 R1 冲突）。 | **42 守卫全绿** · **5008 / 0 / 4** · build 1m50s |
+| H5a-1 | 2026-10-20 | **分页形状统一**：新增 `contract.pagination.PageResult<T>(items,total,page,pageSize)`；11 个分页类型收敛（ChunkPageResponse / FaqEntryPage / TagPageResult / KnowledgePage / MemoryPage / AdminUserPage / TagPage / ChunkPage / SessionPage / TenantSearchPage / InvitationPage / MemberPage）；净删 6 个类、−218 行。wire 仅 `AdminUserPage.users→items`（无消费方）。**余**：12 个管理列表加分页参数 + 前端（H5a-2，需逐页定默认页大小，属产品交互）。 | **42 守卫全绿** · **5008 / 0 / 4** · build 2m1s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

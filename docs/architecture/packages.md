@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-352 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+353 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -34,6 +34,7 @@
 | `:contract` | `com.ragagent.contract.knowledge.rule` | 知识库解析规则：ParserEngineRules（文件类型 → 默认解析引擎）。 |
 | `:contract` | `com.ragagent.contract.memory` | 记忆契约面：配置/条目视图/键与类目/召回与检索上下文。 |
 | `:contract` | `com.ragagent.contract.model` | 模型契约面：模型事实、运行时载荷与跨域能力端口。 |
+| `:contract` | `com.ragagent.contract.pagination` | 分页契约：统一的 com.ragagent.contract.pagination.PageResult。 |
 | `:contract` | `com.ragagent.contract.pipeline` | 管线 SPI：会话域管线（domains/session/rag）消费、业务域实现的端口 （MCP 工具网关/按需注册、工具注册表、网页检索执行器）。 |
 | `:contract` | `com.ragagent.contract.retrieval` | 检索契约面：检索类型/命中合并/目标。 |
 | `:contract` | `com.ragagent.contract.session` | 会话契约面：管线消息视图与消息端口。 |

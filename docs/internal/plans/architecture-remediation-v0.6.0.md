@@ -141,7 +141,7 @@ boot（组合根，唯一装配点）
 | **H3 入库-状态机** | `IngestJob` 状态机（替代 4 处 CAS）+ `IngestStage` 接口（现有 5 个 stage 就地实现）+ 删 `KnowledgeTaskExecutor` | 3-4 人日 | 阶段显式化；主码 CAS 4→1；入库链路必读类 ≤10 |
 | **H4a 任务-端口** | `TaskQueue`（submit/lease/renew/progress/retry/park）+ `TaskProgress` 端口；7 套各自 implements；4 份 `setRetryDelayOverrideSeconds` 测试钩子统一为可注入 `RetryPolicy` | 1-2 人日 | 业务只依赖端口；钩子 4→1 |
 | **H4b 任务-实现** | 按域迁实现：datasource sync → memory → knowledge 富化 → wiki（最复杂最后）；每批删 2 个 InProcess/Redis 双实现类 | 3-5 人日 | 10 个实现类删除；跨实例可恢复；wiki 死信与锁特例参数化 |
-| **H5a 分页统一** | `PageRequest/PageResponse` 一种；管理端点强制分页（带默认值）；前端同步 | 1 人日 | 分页 7→1；后台列表全部可分页 |
+| **H5a 分页统一** | **H5a-1 ✅**：`contract.pagination.PageResult<T>` 统一 11 个分页类型；**H5a-2**：管理端点加分页参数（默认页大小）+ 前端同步 | H5a-1 ✅ 2026-10-20；H5a-2 1 人日 | 形状 7→1；后台列表全部可分页 |
 | **H5b 软删校验** | 扩 `TenantFilterGuard`：带 `deleted_at` 表的 SELECT 必须含谓词；79 处登记基线只许减；**不做自动注入**；限流端口同批 | 1 人日 | 新增漏写即红；基线只减 |
 | **H5c 软删收敛（可选）** | 仅在语义一致的表上逐步收进 `@TableLogic` / repository 基类；不追求 79→0 | 2-3 人日 | 不做满，只做低风险表 |
 | **H6 契约-形状治理** | `KnowledgeCatalogPort` 拆窄（或退回域内）；`*RowView/*PageView` 回域；`PageView<T>` 统一；代理税端口逐个裁决 | 2-3 人日 | R1/R2 守卫绿；contract 类型净减；Port ≤7 方法 |
