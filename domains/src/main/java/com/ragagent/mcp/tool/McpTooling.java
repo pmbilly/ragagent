@@ -191,10 +191,10 @@ public final class McpTooling implements McpToolingGateway {
                 c.rememberAdvertised(tool);
                 McpToolWrapper bound = new McpToolWrapper(tool.service, tool.mcpTool, tool.mcpManager,
                         tool.gate, tool.authWaitTimeoutSeconds, tool.tenantId);
-                bound.registeredName = McpCatalog.mcpRegisteredName(tool);
+                bound.registeredName = McpToolNaming.mcpRegisteredName(tool);
                 bound.serverInstructions = tool.serverInstructions;
                 bound.withOAuthWaiter(tool.oauthWaiter());
-                registry.registerTool(new McpRegisteredTool(bound, c, McpCatalog.mcpToolRef(tool)));
+                registry.registerTool(new McpRegisteredTool(bound, c, McpToolNaming.mcpToolRef(tool)));
                 registry.setDeferred(ToolDefinitions.TOOL_CALL_MCP_TOOL, false);
             }
         }
@@ -272,9 +272,9 @@ public final class McpTooling implements McpToolingGateway {
         if (proxy.authorizeForPresentation() != null) {
             return null;
         }
-        McpCatalog.DecodeResult decoded;
+        McpJsonCodec.DecodeResult decoded;
         try {
-            decoded = McpCatalog.decodeMcpCall(raw);
+            decoded = McpJsonCodec.decodeMcpCall(raw);
         } catch (IllegalArgumentException e) {
             return null;
         }

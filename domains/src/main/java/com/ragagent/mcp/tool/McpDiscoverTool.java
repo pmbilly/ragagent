@@ -26,7 +26,7 @@ public class McpDiscoverTool extends BaseTool {
 
     /** 目录不可用的统一失败形态。 */
     static ToolResult mcpDiscoveryFailure(String err, String status) {
-        return McpCatalog.mcpDiscoveryFailure(err, status);
+        return McpJsonCodec.mcpDiscoveryFailure(err, status);
     }
 
     /**
@@ -143,28 +143,28 @@ public class McpDiscoverTool extends BaseTool {
                                 out.put("serverInstructions", tool.serverInstructions);
                             }
                             McpCatalog.McpToolSummary summary = new McpCatalog.McpToolSummary();
-                            summary.toolRef = McpCatalog.mcpToolRef(tool);
+                            summary.toolRef = McpToolNaming.mcpToolRef(tool);
                             summary.serverId = args.serverId();
                             summary.serverName = tool.service.getName();
                             summary.name = tool.mcpTool.getName();
                             summary.description = tool.mcpTool.getDescription();
                             out.putAll(summary.toMap(true));
                             if (advertiseSources) {
-                                out.put("functionName", McpCatalog.mcpRegisteredName(tool));
+                                out.put("functionName", McpToolNaming.mcpRegisteredName(tool));
                             }
                             String usage = tool.service.effectiveUsageInstructions();
                             if (!usage.isEmpty()) {
                                 out.put("usageInstructions", usage);
                             }
                             out.put("inputSchema", JsonMappers.toJsonNode(tool.getParameters()));
-                            ToolResult result = McpCatalog.mcpJsonResult(out);
+                            ToolResult result = McpJsonCodec.mcpJsonResult(out);
                             if (result.getOutput().codePointCount(0, result.getOutput().length())
                                     > McpCatalog.MAX_MCP_DEFINITION_CHARS) {
                                 return mcpDiscoveryFailure(String.format(
                                         "tool definition exceeds the supported %d-character limit",
                                         McpCatalog.MAX_MCP_DEFINITION_CHARS), "error");
                             }
-                            catalog.described.put(McpCatalog.mcpToolRef(tool), Boolean.TRUE);
+                            catalog.described.put(McpToolNaming.mcpToolRef(tool), Boolean.TRUE);
                             return result;
                         }
                         if ("search".equals(args.mode())
@@ -175,7 +175,7 @@ public class McpDiscoverTool extends BaseTool {
                         if (page.tools == null) {
                             page.tools = new ArrayList<>();
                         }
-                        page.tools.add(McpCatalog.summarizeMcpTool(tool));
+                        page.tools.add(McpToolNaming.summarizeMcpTool(tool));
                     }
                 }
                 if ("describe".equals(args.mode()) && !matched) {
@@ -256,7 +256,7 @@ public class McpDiscoverTool extends BaseTool {
         for (String id : ids) {
             String row;
             try {
-                row = McpCatalog.STRUCT_JSON.writeValueAsString(catalog.servers.get(id).summary(id).toMap());
+                row = McpJsonCodec.STRUCT_JSON.writeValueAsString(catalog.servers.get(id).summary(id).toMap());
             } catch (Exception e) {
                 continue;
             }

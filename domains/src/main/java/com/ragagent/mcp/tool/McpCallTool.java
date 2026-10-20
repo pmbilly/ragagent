@@ -47,7 +47,7 @@ public class McpCallTool extends BaseTool {
             }
         }
         refs.sort(String::compareTo);
-        String schema = McpCatalog.mcpSchemaWithEnum(McpCatalog.MCP_CALL_SCHEMA, "toolRef", refs);
+        String schema = McpJsonCodec.mcpSchemaWithEnum(McpCatalog.MCP_CALL_SCHEMA, "toolRef", refs);
         return parseTree(schema);
     }
 
@@ -64,7 +64,7 @@ public class McpCallTool extends BaseTool {
     public ToolResult execute(ToolRequest request) {
         ResolveResult resolved = resolve(request, JsonMappers.toJsonNode(request.args()));
         if (resolved.error() != null) {
-            return McpCatalog.mcpDiscoveryFailure(resolved.error(), "unavailable");
+            return McpJsonCodec.mcpDiscoveryFailure(resolved.error(), "unavailable");
         }
         return registry.executeInternal(request.cancellation(), request.execMeta(), resolved.tool(), resolved.argsNode());
     }
@@ -78,9 +78,9 @@ public class McpCallTool extends BaseTool {
         if (authErr != null) {
             return new ResolveResult(null, null, authErr);
         }
-        McpCatalog.DecodeResult decoded;
+        McpJsonCodec.DecodeResult decoded;
         try {
-            decoded = McpCatalog.decodeMcpCall(raw);
+            decoded = McpJsonCodec.decodeMcpCall(raw);
         } catch (IllegalArgumentException e) {
             return new ResolveResult(null, null, e.getMessage());
         }
@@ -98,7 +98,7 @@ public class McpCallTool extends BaseTool {
         }
         if (snap.tools() != null) {
             for (McpToolWrapper tool : snap.tools()) {
-                if (McpCatalog.mcpToolRef(tool).equals(ref)) {
+                if (McpToolNaming.mcpToolRef(tool).equals(ref)) {
                     String checkErr = catalog.checkEnabled(tool);
                     if (checkErr != null) {
                         return new ResolveResult(null, null, checkErr);

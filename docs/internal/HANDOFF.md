@@ -168,7 +168,7 @@
 | **M6b** | UserService：`LoginTenantResolver` + `UserRegistrationService`；保留 `generateTokensFor(Object)` | ✅ 2026-10-20 |
 | **M6c-1** | StorageFileResolver：删重复 provider 完备性 switch（工厂 Single Source）+ 提 `ResourceCatalogFileService` | ✅ 2026-10-20 |
 | **M6c-2** | StorageFileResolver：`StorageBackendLocator` / `StorageConfigProjector` / `StorageEnvProvisioner` 提取 | ✅ 2026-10-20 |
-| **M6d** | McpCatalog：`McpJsonCodec` / `McpToolNaming`；保留提示词常量与 DTO 巢居 | 待启动 |
+| **M6d** | McpCatalog：`McpJsonCodec` / `McpToolNaming`；保留提示词常量与 DTO 巢居 | ✅ 2026-10-20 |
 | **M6e** | KnowledgeService：`KnowledgeTagBatchService` + 注释卫生；保留门面与事务包装 | 待启动 |
 | **M7** | 卫生：Service/Ops/Support 判据、api/ 包说明；响应信封登记待拍板 | 待启动 |
 
@@ -508,6 +508,7 @@ boot           14 件                      →  boot
 | M6b | 2026-10-20 | **UserService 拆注册与登录空间**：`UserRegistrationService`（三步同事务，注册/重名/文案不变）+ `LoginTenantResolver`（preference→home→首个 membership + 失效自愈写库）；门面保留 `register` / `resolveLoginTenantId` 委托与 `generateTokensFor(Object)`。738 → 501 行；新增登录空间解析 3 例单测（偏好命中/失效回落/无 home 回落首个成员） | 45 守卫绿 · auth 全域测试绿 · build 2m7s / **5046 / 0 / 4** |
 | M6c-1 | 2026-10-20 | **StorageFileResolver 去重与装饰器外提**：删 8 分支 provider 完备性 switch（110 行）+ 重复错误文案，云 provider 统一走 `FileServiceFactory`（local 特例保留）；嵌套 `DecoratedFileService` 提为 `ResourceCatalogFileService`（读/写/URL/资源登记），`env` 改包级供其复用。770 → 531 行；presigned 400 文案与 provider 构造语义不变 | 45 守卫绿 · 存储域/boot 测试绿 · build 2m17s / **5046 / 0 / 4** |
 | M6c-2 | 2026-10-20 | **Storage 协作者拆分**：`StorageBackendLocator`（backend id → legacy alias → 默认后端 + stub 租户补全）、`StorageConfigProjector`（行 camel → 引擎 snake 改名 + 两族凭据解密）、`StorageEnvProvisioner`（env 快照 → System 行）；门面保留公开入口与委托，531 → 374 行。类名避开 contract 同名（`StorageBackendResolver`） | 45 守卫绿 · 存储域/boot 测试绿 · build 2m13s / **5046 / 0 / 4** |
+| M6d | 2026-10-20 | **MCP 编解码/命名拆分**：`McpJsonCodec`（插入序 struct、enum 注入、调用解码、discovery failure、cursor base64）、`McpToolNaming`（ref 哈希、注册名、描述截断、摘要）；call site 全量改指新类，McpCatalog 只留提示词常量、DTO 巢居与目录状态机，723 → 543 行 | 45 守卫绿 · MCP 域/boot 契约测试绿 · build 2m8s / **5046 / 0 / 4** |
 | H5b-fix | 2026-10-20 | **软删守卫档位纠偏**：H5b 的「存量 0 违规」是假绿——测试 `application.yml` 覆盖了主配置且未写该键，落回 `@Value` 默认 `alert`。把 `MybatisPlusConfig` 默认改 `enforce`（与主配置一致）后红出 13 条语句并逐条定性：补谓词 9 处（FaqChunk 5 / ChunkRepository / KnowledgeRepository / MessageRepository / UserRepository）、登记 6 条确需读已删行（selectImPlatform、KB/Knowledge/Chunk/Model 的 selectById、TenantMapper.selectById）、`knowledge_tags` 移出注册表（列存在但硬删，从不写）；另登记租户守卫的过期附件回收面。 | 全量 **test 绿**（boot 1349 例含新增红态面）· 待 spotlessCheck build |
 | EMB-1 | 2026-10-20 | **嵌入建议开关联动**：渠道「推荐问题」定为总闸（开场 + 追问都受它控制）；公开配置新增 `agentStarterQuestionsEnabled` / `agentFollowUpQuestionsEnabled`（读智能体 `questionSuggestions` 的两个 enabled）；widget 侧开场与追问分别按「总闸 && 分闸」门控——智能体关闭追问时不再每轮发 ensure/get（此前白跑并留下 suppressed 行）；渠道开关文案 5 语言同步为总闸口径。 | 契约金片 `emb-pub-config` 24→26 键已签字 · 前端 type-check / 753 / i18n 11 全绿 · **45 守卫绿** · **5046 / 0 / 4** · build 2m13s · 真机：公开配置两开关正确，widget 加载只发 1 次 starters、追问请求 0、控制台 0 报错 |
 | EMB-1b | 2026-10-20 | **懒创建空白态不再拉历史**：新建对话把 sessionId 清空后，消息区高度变化触发的滚动事件仍会走分页加载 ⇒ `GET /messages//load` 404。`useEmbedChatSession.getmsgList` 增加空 sessionId 早退（唯一收口）。 | 红态探针（撤守卫复现 1 条空会话请求 + 2 条控制台 404，恢复后 0/0）· 前端 type-check / 753 / build 绿 · 纯前端，未跑后端闸门 |

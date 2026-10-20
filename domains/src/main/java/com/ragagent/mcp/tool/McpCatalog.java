@@ -2,26 +2,19 @@ package com.ragagent.mcp.tool;
 
 import com.ragagent.contract.tool.Cancellation;
 import com.ragagent.contract.tool.ToolApprovalGate;
-import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolEnabledChecker;
 import com.ragagent.contract.tool.ToolEnabledChecks;
-import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.oauth.error.OAuthReauthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpOAuthRequiredException;
-import com.ragagent.platform.security.Hashes;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.ToolJson;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
-import tools.jackson.databind.JsonNode;
 
 /**
  * MCP 目录：一个 Agent 引擎、一个授权主体独有。只有 server 快照可变；可执行的
@@ -186,14 +179,14 @@ public final class McpCatalog {
                 // 路由部分保持有界。describe 连同完整工具定义返回完整 instructions，
                 // 不逐工具重复。
                 if (instructions.codePointCount(0, instructions.length()) > 512) {
-                    instructions = shortByRunes(instructions, 512) + "... (read describe for complete server instructions)";
+                    instructions = McpToolNaming.shortByRunes(instructions, 512) + "... (read describe for complete server instructions)";
                 }
                 McpServerSummary s = new McpServerSummary();
                 s.serverId = id;
                 s.name = service == null ? "" : service.getName();
                 s.status = status;
                 s.instructions = instructions;
-                s.usageInstructions = service == null ? "" : McpCatalog.shortMcpDescription(service.effectiveUsageInstructions());
+                s.usageInstructions = service == null ? "" : McpToolNaming.shortMcpDescription(service.effectiveUsageInstructions());
                 return s;
             } finally {
                 lock.unlock();
@@ -425,7 +418,7 @@ public final class McpCatalog {
                     entry.store(service, null, errStatus);
                     return new SnapshotResult(null, errStatus, String.format(
                             "MCP server %s is %s; retry discovery after resolving its connection or authentication",
-                            quoteGo(service.getName()), errStatus));
+                            McpJsonCodec.quoteGo(service.getName()), errStatus));
                 }
                 List<McpToolWrapper> sorted = new ArrayList<>(fresh == null ? List.of() : fresh);
                 sorted.sort((a, b) -> a.mcpTool.getName().compareTo(b.mcpTool.getName()));
@@ -496,17 +489,6 @@ public final class McpCatalog {
         return null;
     }
 
-    /**
-     * 对<b>未修改</b>的身份做哈希，而不是有损的 64 字符函数名：
-     * Unicode 名与消毒后碰撞的名字保持可区分。引用同时绑定定义：schema 刷新后
-     * 必须重新 describe，而不是用旧形状的参数执行。
-     */
-    static String mcpToolRef(McpToolWrapper tool) {
-        String schema = tool.parametersJson();
-        String joined = tool.service.getId() + "\0" + tool.mcpTool.getName() + "\0" + schema;
-        return "mcpt_" + Hashes.sha256Hex(joined);
-    }
-
     boolean describedRef(String ref) {
         return described.containsKey(ref);
     }
@@ -519,125 +501,18 @@ public final class McpCatalog {
     }
 
     boolean advertised(McpToolWrapper tool) {
-        String ref = mcpToolRef(tool);
+        String ref = McpToolNaming.mcpToolRef(tool);
         if (describedRef(ref)) {
             return true;
         }
         if (historyRefs.containsKey(ref)) {
             return true;
         }
-        return historyNames.containsKey(mcpRegisteredName(tool));
+        return historyNames.containsKey(McpToolNaming.mcpRegisteredName(tool));
     }
 
     void rememberAdvertised(McpToolWrapper tool) {
-        described.put(mcpToolRef(tool), Boolean.TRUE);
-    }
-
-    /** 描述截断：>200 码点截到 197 + "..."。 */
-    static String shortMcpDescription(String s) {
-        if (s == null) {
-            return "";
-        }
-        if (s.codePointCount(0, s.length()) > 200) {
-            return shortByRunes(s, 197) + "...";
-        }
-        return s;
-    }
-
-    static String shortByRunes(String s, int maxRunes) {
-        if (s.length() == s.codePointCount(0, s.length())) {
-            return s.substring(0, Math.min(maxRunes, s.length()));
-        }
-        int i = 0;
-        int runes = 0;
-        while (i < s.length() && runes < maxRunes) {
-            int cp = s.codePointAt(i);
-            i += Character.charCount(cp);
-            runes++;
-        }
-        return s.substring(0, i);
-    }
-
-    static McpToolSummary summarizeMcpTool(McpToolWrapper tool) {
-        McpToolSummary s = new McpToolSummary();
-        if (tool.service != null) {
-            s.serverName = tool.service.getName();
-        }
-        s.toolRef = mcpToolRef(tool);
-        s.serverId = tool.service.getId();
-        s.name = tool.mcpTool.getName();
-        s.description = shortMcpDescription(tool.mcpTool.getDescription());
-        return s;
-    }
-
-    /** 目录不可用的统一失败形态（registry.mcpDiscoveryFailure 的目录侧别名）。 */
-    static ToolResult mcpDiscoveryFailure(String err, String status) {
-        ToolResult r = new ToolResult();
-        r.setSuccess(false);
-        r.setError(err);
-        Map<String, Object> data = new HashMap<>();
-        data.put("status", status);
-        r.setData(data);
-        return r;
-    }
-
-    /**
-     * struct 形态 JSON 编码器：**插入序**（字段声明序）——
-     * 不能用 {@link ToolJson}.write（它按 map 语义排序键，struct 契约会乱序）。
-     * （不做 HTML 转义。）
-     */
-    static final tools.jackson.databind.ObjectMapper STRUCT_JSON =
-            JsonMappers.lenient();
-
-    /** 结果 JSON（插入序键序；序列化失败走 error 页）。 */
-    static ToolResult mcpJsonResult(Object value) {
-        try {
-            return mcpJsonResult(STRUCT_JSON.writeValueAsString(value));
-        } catch (Exception e) {
-            return mcpDiscoveryFailure("MCP definition is not valid JSON", "error");
-        }
-    }
-
-    /** Output 文本直用的重载（页已序列化过时避免二次转换）。 */
-    static ToolResult mcpJsonResult(String json) {
-        ToolResult r = new ToolResult();
-        r.setSuccess(true);
-        r.setOutput(json);
-        return r;
-    }
-
-    /** 把 enum 注入 schema 的 properties[key]（map 键序经 ToolJson 排序）。 */
-    static String mcpSchemaWithEnum(String raw, String key, List<String> values) {
-        if (values == null || values.isEmpty()) {
-            return raw;
-        }
-        try {
-            tools.jackson.databind.ObjectMapper plain = JsonMappers.lenient();
-            JsonNode schema = plain.readTree(raw);
-            ((tools.jackson.databind.node.ObjectNode) schema.path("properties").path(key))
-                    .set("enum", plain.valueToTree(values));
-            return ToolJson.write(schema);
-        } catch (Exception e) {
-            return raw;
-        }
-    }
-
-    /** ref 解码；失败 message 以 mcpCallArgumentsHint 结尾。 */
-    static DecodeResult decodeMcpCall(JsonNode raw) {
-        String toolRef = raw.path("toolRef").asString("");
-        JsonNode arguments = raw.get("arguments");
-        boolean bad = toolRef.isEmpty()
-                || arguments == null
-                || arguments.isNull()
-                || arguments.isMissingNode()
-                || !arguments.isObject();
-        if (bad) {
-            throw new IllegalArgumentException("toolRef and an arguments object are required." + ToolDefinitions.MCP_CALL_ARGUMENTS_HINT);
-        }
-        return new DecodeResult(toolRef, arguments);
-    }
-
-    record DecodeResult(String toolRef, JsonNode arguments) {
+        described.put(McpToolNaming.mcpToolRef(tool), Boolean.TRUE);
     }
 
     /** 已缓存定义中按 ref 精确读取。 */
@@ -648,7 +523,7 @@ public final class McpCatalog {
             try {
                 if (entry.tools != null) {
                     for (McpToolWrapper tool : entry.tools) {
-                        if (mcpToolRef(tool).equals(ref)) {
+                        if (McpToolNaming.mcpToolRef(tool).equals(ref)) {
                             found = tool;
                             break;
                         }
@@ -664,38 +539,5 @@ public final class McpCatalog {
         return null;
     }
 
-    /**
-     * 注册名派生：独立于枚举顺序与 schema 修订。
-     * 哈希原始 server/tool 身份——单独消毒 Unicode 或截断名会静默别名不同的工具。
-     * 保留 ASCII 提示段方便模型阅读。
-     */
-    static String mcpRegisteredName(McpToolWrapper tool) {
-        String sum = Hashes.sha256Hex(tool.service.getId() + "\0" + tool.mcpTool.getName());
-        String hint = sanitizeName(tool.service.getName()) + "_" + sanitizeName(tool.mcpTool.getName());
-        final int suffixChars = 16;
-        final int maxHint = ToolDefinitions.MAX_FUNCTION_NAME_LENGTH - "mcp_".length() - 1 - suffixChars;
-        if (hint.length() > maxHint) {
-            hint = hint.substring(0, maxHint);
-        }
-        return "mcp_" + hint + "_" + sum.substring(0, suffixChars);
-    }
 
-    static String sanitizeName(String name) {
-        return McpToolWrapper.sanitizeName(name);
-    }
-
-    // ── 小工具 ──
-
-    static String quoteGo(String s) {
-        return ToolJson.quoted(s);
-    }
-
-    /** cursor 的 base64url 编码（无 padding）。 */
-    static String b64UrlEncode(byte[] data) {
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(data);
-    }
-
-    static byte[] b64UrlDecode(String s) {
-        return Base64.getUrlDecoder().decode(s);
-    }
 }

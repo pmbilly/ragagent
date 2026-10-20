@@ -69,7 +69,7 @@ final class McpCatalogPagination {
         fingerprintSeed.put("Tools", toolSeeds);
         String fingerprint;
         try {
-            fingerprint = Hashes.sha256Hex(McpCatalog.STRUCT_JSON.writeValueAsBytes(fingerprintSeed));
+            fingerprint = Hashes.sha256Hex(McpJsonCodec.STRUCT_JSON.writeValueAsBytes(fingerprintSeed));
         } catch (Exception e) {
             fingerprint = "";
         }
@@ -78,7 +78,7 @@ final class McpCatalogPagination {
             String err = null;
             int offset = 0;
             try {
-                byte[] decoded = McpCatalog.b64UrlDecode(args.cursor());
+                byte[] decoded = McpJsonCodec.b64UrlDecode(args.cursor());
                 JsonNode cursorNode = JsonMappers.lenient().readTree(decoded);
                 String f = cursorNode.path("f").asString("");
                 int o = cursorNode.path("o").asInt(-1);
@@ -91,7 +91,7 @@ final class McpCatalogPagination {
                 err = "invalid";
             }
             if (err != null) {
-                return McpCatalog.mcpDiscoveryFailure(
+                return McpJsonCodec.mcpDiscoveryFailure(
                         "directory cursor is invalid or the directory changed; restart listing without cursor",
                         "error");
             }
@@ -102,7 +102,7 @@ final class McpCatalogPagination {
             total = page.servers == null ? 0 : page.servers.size();
         }
         if (start > total) {
-            return McpCatalog.mcpDiscoveryFailure("directory cursor is out of range", "error");
+            return McpJsonCodec.mcpDiscoveryFailure("directory cursor is out of range", "error");
         }
         page.total = total;
         int end = Math.min(start + args.limit(), total);
@@ -114,7 +114,7 @@ final class McpCatalogPagination {
                 cursor.put("f", fingerprint);
                 cursor.put("o", end);
                 try {
-                    resultPage.nextCursor = McpCatalog.b64UrlEncode(McpCatalog.STRUCT_JSON.writeValueAsBytes(cursor));
+                    resultPage.nextCursor = McpJsonCodec.b64UrlEncode(McpJsonCodec.STRUCT_JSON.writeValueAsBytes(cursor));
                 } catch (Exception ignored) {
                     // 序列化不会失败；保形
                 }
@@ -142,15 +142,15 @@ final class McpCatalogPagination {
             }
             ToolResult result;
             try {
-                result = McpCatalog.mcpJsonResult(resultPage.toMap(false));
+                result = McpJsonCodec.mcpJsonResult(resultPage.toMap(false));
             } catch (Exception e) {
-                return McpCatalog.mcpDiscoveryFailure("MCP definition is not valid JSON", "error");
+                return McpJsonCodec.mcpDiscoveryFailure("MCP definition is not valid JSON", "error");
             }
             if (result.getOutput().codePointCount(0, result.getOutput().length()) <= outputBudget) {
                 return result;
             }
             if (end - start <= 1) {
-                return McpCatalog.mcpDiscoveryFailure("one directory entry exceeds the output budget", "error");
+                return McpJsonCodec.mcpDiscoveryFailure("one directory entry exceeds the output budget", "error");
             }
             end--;
         }
@@ -183,10 +183,10 @@ final class McpCatalogPagination {
             row.serverId = id;
             row.name = service.getName();
             row.status = "not_loaded";
-            row.usageInstructions = McpCatalog.shortMcpDescription(service.effectiveUsageInstructions());
+            row.usageInstructions = McpToolNaming.shortMcpDescription(service.effectiveUsageInstructions());
             String encoded;
             try {
-                encoded = McpCatalog.STRUCT_JSON.writeValueAsString(row.toMap());
+                encoded = McpJsonCodec.STRUCT_JSON.writeValueAsString(row.toMap());
             } catch (Exception e) {
                 continue;
             }
@@ -201,7 +201,7 @@ final class McpCatalogPagination {
                 ids.size()) + preview;
         // ID 对这个受限定目录是稳定的。把它们枚举进 schema，模型就会选授权的标识符
         // 而不是从散文里复现自由格式的 UUID。空目录省掉 enum，list_servers 仍是合法调用。
-        String discoveryParameters = McpCatalog.mcpSchemaWithEnum(McpCatalog.MCP_DISCOVERY_SCHEMA, "serverId", ids);
+        String discoveryParameters = McpJsonCodec.mcpSchemaWithEnum(McpCatalog.MCP_DISCOVERY_SCHEMA, "serverId", ids);
         registry.registerTool(new McpDiscoverTool(
                 ToolDefinitions.TOOL_DISCOVER_MCP_TOOLS, description, discoveryParameters, c));
         registry.registerTool(new McpCallTool(

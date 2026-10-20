@@ -52,16 +52,16 @@ public class McpRegisteredTool extends McpToolWrapper implements McpCatalogGuard
     public ToolResult execute(ToolRequest request) {
         McpCatalog.SnapshotResult snap = catalog.snapshot(service.getId(), false);
         if (snap.error() != null) {
-            return McpCatalog.mcpDiscoveryFailure(snap.error(), "unavailable");
+            return McpJsonCodec.mcpDiscoveryFailure(snap.error(), "unavailable");
         }
         if (snap.tools() != null) {
             for (McpToolWrapper current : snap.tools()) {
-                if (!McpCatalog.mcpToolRef(current).equals(ref)) {
+                if (!McpToolNaming.mcpToolRef(current).equals(ref)) {
                     continue;
                 }
                 String checkErr = catalog.checkEnabled(current);
                 if (checkErr != null) {
-                    return McpCatalog.mcpDiscoveryFailure(checkErr, "unavailable");
+                    return McpJsonCodec.mcpDiscoveryFailure(checkErr, "unavailable");
                 }
                 // 用最新服务配置，保留广告名供审批/审计记录。registry 已按该 schema 校验过。
                 McpToolWrapper target = new McpToolWrapper(
@@ -73,7 +73,7 @@ public class McpRegisteredTool extends McpToolWrapper implements McpCatalogGuard
                 return target.execute(request);
             }
         }
-        return McpCatalog.mcpDiscoveryFailure(
+        return McpJsonCodec.mcpDiscoveryFailure(
                 "MCP tool definition changed or was removed; rediscover before calling",
                 "unavailable");
     }
