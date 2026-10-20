@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine;
 
+import com.ragagent.contract.vectorstore.VectorEngineTypes;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,8 @@ import java.util.Map;
  * <p>pg 引擎（{@link PgVectorRetrieveRepository}）
  * 以"窄口 + 嵌套类型"独立落地（IndexHit/RetrieveResult 嵌在类里，契约已锁定），
  * 本类供<b>新增引擎</b>（ES/Qdrant/…）共用，不动既有 pg 件。</p>
+ *
+ * <p>引擎类型字面量的唯一来源是 {@link VectorEngineTypes}（本类只做别名）。</p>
  */
 public final class EngineTypes {
 
@@ -17,16 +20,18 @@ public final class EngineTypes {
     }
 
     // ── 引擎与检索类型常量 ──────────────────────────────────────────────────
+    // 引擎类型字面量的唯一来源是 contract.vectorstore.VectorEngineTypes；本类别名仅为
+    // 既有调用点稳定（switch case 仍要求编译期常量，别名满足）。
 
-    public static final String ENGINE_ELASTICSEARCH = "elasticsearch";
-    public static final String ENGINE_QDRANT = "qdrant";
-    public static final String ENGINE_MILVUS = "milvus";
-    public static final String ENGINE_WEAVIATE = "weaviate";
-    public static final String ENGINE_DORIS = "doris";
-    public static final String ENGINE_TENCENT_VECTORDB = "tencent_vectordb";
-    public static final String ENGINE_OPENSEARCH = "opensearch";
-    public static final String ENGINE_POSTGRES = "postgres";
-    public static final String ENGINE_SQLITE = "sqlite";
+    public static final String ENGINE_ELASTICSEARCH = VectorEngineTypes.ELASTICSEARCH;
+    public static final String ENGINE_QDRANT = VectorEngineTypes.QDRANT;
+    public static final String ENGINE_MILVUS = VectorEngineTypes.MILVUS;
+    public static final String ENGINE_WEAVIATE = VectorEngineTypes.WEAVIATE;
+    public static final String ENGINE_DORIS = VectorEngineTypes.DORIS;
+    public static final String ENGINE_TENCENT_VECTORDB = VectorEngineTypes.TENCENT_VECTORDB;
+    public static final String ENGINE_OPENSEARCH = VectorEngineTypes.OPENSEARCH;
+    public static final String ENGINE_POSTGRES = VectorEngineTypes.POSTGRES;
+    public static final String ENGINE_SQLITE = VectorEngineTypes.SQLITE;
 
     public static final String RETRIEVER_VECTOR = "vector";
     public static final String RETRIEVER_KEYWORDS = "keywords";

@@ -45,7 +45,6 @@
 - **工具族（35+）**：知识检索、Wiki 读写、文档与图片分析、SQL/数据表分析（DuckDB）、网页搜索与抓取、思维链、待办清单、技能读取……
 - **技能（Skills）**：以 `SKILL.md` 为载体的三级注入（元数据 / 正文 / 资源），支持平台内置层与租户自建
 - **会话能力**：多轮上下文、长期记忆召回、运行中转向（steer）与取消、消息附件与图片
-- **评测**：按 RAG 预设重放问答对，产出检索/重排/生成三段指标
 
 </details>
 
@@ -224,7 +223,6 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 | 网页搜索提供商 | `/api/v1/web-search-providers` |
 | 存储后端 | `/api/v1/storage-backends` |
 | 系统设置与运维 | `/api/v1/system` |
-| 评测 | `/api/v1/evaluation` |
 | 文件代理 / 预签名 | `/api/v1/files/presigned` · `/r/{token}` |
 
 ## 目录结构

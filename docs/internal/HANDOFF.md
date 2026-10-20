@@ -132,6 +132,19 @@
 
 **否决项**：不建通用 `CapabilityRegistry<T>`；不搬 `QaWiring` 上移 boot（理由见方案 §2）。
 
+### 5.0d 并行专项：L 系列「业务链路对齐」（v0.6.x）
+
+> 方案：`docs/internal/plans/business-link-remediation-l-series.md`（含对 2026-10-20 业务链路评估的核实结论：4 处更正）。
+
+| 批 | 内容 | 状态 |
+|---|---|---|
+| **L0** | README 删"评测"承诺（能力清单 + 端点表两处）；报告更正落档 | ✅ 2026-10-20 |
+| **L1** | 引擎类型常量单源化：`contract.vectorstore.VectorEngineTypes`（9 全集 / 7 可配置，差额 = postgres/sqlite） | ✅ 2026-10-20 |
+| **L3** | 工具清单守卫（`ToolDefinitions` ↔ 实现 ↔ 三个分发 switch）+ API-Key 策略表覆盖检查 + `Skill(s)` 控制器改名 | 待做 |
+| **L2** | embedding 单路径（删 knowledge 域内 `EmbedderClient`，统一走 `ModelRuntime`） | 待做 |
+
+**否决项**：RBAC 双表不合并（主语/语法/语义都不同）；工具装配暂不端口化（请求级构造 + 三个分发 switch，先加守卫）。
+
 ### 5.1 历史批次（v0.3.0 P1~P5 / v0.4.0 R1~R6，全部 ✅）
 
 > **阶段路线（续，2026-10-16）**：**R1~R6（三 runtime + 模块收口）在 `v0.4.0` 全部完成** ⇒ **推送 `v0.4.0` + 合并 `main`**。 **✅ 2026-10-16 已执行**：`v0.4.0` 推送（995696f9..e3dce136）→ `main` 快进合并并推送（`c07786fe` → 含本记录的 tip）。**R1~R6 收口读数**：七模块 → 六模块（`:engine` 解散）、末轮增出 `:agent-engine`（七模块新图，见 §8.1 终检）；domains 对全部运行时模块只剩契约 + `modelcontext` 终态边；**16 守卫全绿**（新增模块图守卫）· 测试 5000 / 0 / 4。
@@ -446,6 +459,8 @@ boot           14 件                      →  boot
 | K1 | 2026-10-20 | **引擎注册合表**：`EngineFactory` 的两张 switch（构造 + 运行时 SSRF）合成一张 `SPECS` 注册表，`EngineSpec` 强制"声明地址字段或显式 `addressExempt`"（否则类初始化失败）；删掉不可达的 `unsupported engine type` 兜底；新增完整性测试（遍历 `EngineTypes.ENGINE_*` 断言每个常量都有注册项）。**红态验证**：摘掉 milvus 注册项 → 完整性测试与 Milvus 构造测试同时红，恢复后绿。`FileServiceFactory` 删 `IMPLEMENTED`/`PENDING` 死集合与配套不可达分支，测试从"断言集合内容"改为行为断言（8 个 provider 认得、ceph 报 unsupported 原文）。**未做**：跨模块 SSRF 元数据共享——两条路径都 fail-closed，属口径一致性成本而非安全漏洞 | **43 守卫全绿** · spotlessCheck 绿 · build 2m16s / **5026 / 0 / 4**（+1 完整性测试） |
 | K2 | 2026-10-20 | **跨域实体渗漏清零**：`contract.agent.AgentLookup.AgentView` 补 `tenantId`（复用既有端口，不新造投影）；8 个 session 文件改持视图（`AgentResolver` 注入 `AgentLookup`；两处从未使用的实体参数一并删除）；`ResolvedAgent` 删恒 false 的 `sharedAgentReadOnly`，清 6 处消费点（`QaSupport`×3 / `QaAgentConfig`×3 / `AgentConfigAssembler` 的 MCP 范围分支 / `AgentEngineAssembler` 的写工具过滤）。`check-domain-contracts.py` 增 **E1** 判据（跨域 `.domain.` import 即红，不吃族内豁免，基线 0）；红态探针：临时加回一行实体 import → 红并复原。**副作用**：域间边参考类 33 → 27（session→agentmanagement 11 → 5） | **43 守卫全绿** · 跨域实体 import 0 · build 2m28s / **5026 / 0 / 4** |
 | K3 | 2026-10-20 | **LLM 目录单源化**：`ModelProviderCatalog.ENTRIES` 改为 `ProviderRegistry.list().stream().map(...)`，展示名/描述/默认 URL/模型类型全部取自 `ProviderInfo`，`toFrontend` 只做表示层映射（26 条手写清单删除）；`ProviderCatalogParityTest` 删除（单源后同义反复），新增 `ProviderRegistryCompletenessTest`（`ProviderName` 全集 == `list()`，漏注册/漏进 allProviders 即红）；`check-module-graph` 的错位测试登记随之 10 → 9；`Provider.validateConfig` 登记 `known-gaps.md` 第 19 条并在接口注释留指针（首次写法用了 § 编号，被迁移代号守卫拦下，已改为条目名） | **43 守卫全绿** · 目录金片 `model-providers*.json` 字节一致 · build 1m44s / **5026 / 0 / 4** |
+| L0 | 2026-10-20 | **删除不存在的评测承诺**（用户拍板"评测不做"）：README 能力清单与端点表两处删除；`docs/internal/plans/business-link-remediation-l-series.md` 落档 02 报告的 4 处核实更正（评测承诺在 README 而非"全仓没有"、连接器 catalog 前端不可选、生成式文档自带同步守卫、端口/规模数字属报告后增长）与 P1-1~P1-5 的采纳/降级/否决理由 | **43 守卫全绿** · 无 Java 改动 |
+| L1 | 2026-10-20 | **引擎类型常量单源化**：新增 `contract.vectorstore.VectorEngineTypes`（9 全集 / 7 可配置，差额恰为 postgres+sqlite）；`retrieval.engine.EngineTypes` 的 9 个 `ENGINE_*` 改为契约别名（switch case 仍为编译期常量）；`vectorstore.domain.VectorStoreEngines` 白名单改引 `CONFIGURABLE`；新增两条测试钉住"9/7/差额"与"EngineTypes 暴露集合==契约全集"；`module-package-map.md` 随源码重生成 | **43 守卫全绿** · spotless 绿 · build 2m42s / **5028 / 0 / 4**（+2 常量一致性测试） |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
