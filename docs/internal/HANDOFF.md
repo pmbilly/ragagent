@@ -205,8 +205,9 @@
   ```bash
   cd ~/ragagent && env -u SYSTEM_AES_KEY JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./gradlew spotlessCheck build
   ```
-  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（最近基数 **5022 / 失败 0 / 跳过 4**，含 agent-engine 155 条——旧口径 4867 漏算该模块）。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
+  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（最近基数 **5046 / 失败 0 / 跳过 4**，含 agent-engine 155 条——旧口径 4867 漏算该模块）。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
   **环境前置**：PG `max_connections=100`，多个 boot jar 残留会占满连接（实测 5 个实例 = 50 条 ⇒ `too many clients`）。跑闸门前先 `ps -Ao pid,command | grep '[b]oot/build/libs/boot'` 清残留。
+- **dev 数据修复（2026-10-20）**：软删守卫误拦窗口（H5b~H5b-fix 之间）里生成失败的 5 条 embed 历史回答，已按会话用 embed `ensure` 补建 `message_suggestion_sets`（状态 `suppressed/disabled`，该智能体追问关闭）；全库 embed 历史已无「缺建议集合」行。
 - 前端（触契约时）：`cd frontend && npx vue-tsc --build --force` + `npm test`。
 
 ## 7. 测试与安全网
@@ -504,6 +505,10 @@ boot           14 件                      →  boot
 | M6a-1 | 2026-10-20 | **FAQ 投影/查重抽类**：`FaqEntryProjector` 收编创建/更新/相似问三处尾块（原每处把同一 tag 查两次，现一次）；`FaqDuplicateChecker` 收编 72 行本地规则 + 单次 DB 查询。命令服务只留用例与编排，770 → 597 行；FAQ 金片零变化。批量字段更新（153 行）留 M6a-2 | 45 守卫绿 · FAQ 契约测试绿 · build 2m11s / **5043 / 0 / 4** |
 | M6a-2 | 2026-10-20 | **FAQ 批量字段更新抽类**：`FaqBatchFieldUpdater`（byTag 一条 UPDATE / byId 逐条比对 / flag 位运算 / 引擎三态同步 / 活动审计），命令服务只留入口与事务编排，597 → 450 行。方法长度基线收紧 32 → 31（旧条目随搬迁失效） | 45 守卫绿 · FAQ 契约测试绿 · build 2m7s / **5046 / 0 / 4** |
 | M6b | 2026-10-20 | **UserService 拆注册与登录空间**：`UserRegistrationService`（三步同事务，注册/重名/文案不变）+ `LoginTenantResolver`（preference→home→首个 membership + 失效自愈写库）；门面保留 `register` / `resolveLoginTenantId` 委托与 `generateTokensFor(Object)`。738 → 501 行；新增登录空间解析 3 例单测（偏好命中/失效回落/无 home 回落首个成员） | 45 守卫绿 · auth 全域测试绿 · build 2m7s / **5046 / 0 / 4** |
+| H5b-fix | 2026-10-20 | **软删守卫档位纠偏**：H5b 的「存量 0 违规」是假绿——测试 `application.yml` 覆盖了主配置且未写该键，落回 `@Value` 默认 `alert`。把 `MybatisPlusConfig` 默认改 `enforce`（与主配置一致）后红出 13 条语句并逐条定性：补谓词 9 处（FaqChunk 5 / ChunkRepository / KnowledgeRepository / MessageRepository / UserRepository）、登记 6 条确需读已删行（selectImPlatform、KB/Knowledge/Chunk/Model 的 selectById、TenantMapper.selectById）、`knowledge_tags` 移出注册表（列存在但硬删，从不写）；另登记租户守卫的过期附件回收面。 | 全量 **test 绿**（boot 1349 例含新增红态面）· 待 spotlessCheck build |
+| EMB-1 | 2026-10-20 | **嵌入建议开关联动**：渠道「推荐问题」定为总闸（开场 + 追问都受它控制）；公开配置新增 `agentStarterQuestionsEnabled` / `agentFollowUpQuestionsEnabled`（读智能体 `questionSuggestions` 的两个 enabled）；widget 侧开场与追问分别按「总闸 && 分闸」门控——智能体关闭追问时不再每轮发 ensure/get（此前白跑并留下 suppressed 行）；渠道开关文案 5 语言同步为总闸口径。 | 契约金片 `emb-pub-config` 24→26 键已签字 · 前端 type-check / 753 / i18n 11 全绿 · **45 守卫绿** · **5046 / 0 / 4** · build 2m13s · 真机：公开配置两开关正确，widget 加载只发 1 次 starters、追问请求 0、控制台 0 报错 |
+| EMB-1b | 2026-10-20 | **懒创建空白态不再拉历史**：新建对话把 sessionId 清空后，消息区高度变化触发的滚动事件仍会走分页加载 ⇒ `GET /messages//load` 404。`useEmbedChatSession.getmsgList` 增加空 sessionId 早退（唯一收口）。 | 红态探针（撤守卫复现 1 条空会话请求 + 2 条控制台 404，恢复后 0/0）· 前端 type-check / 753 / build 绿 · 纯前端，未跑后端闸门 |
+| EMB-1c | 2026-10-20 | **启动重复请求归因，换票单飞**：打开页曾见 config ×2 / exchange ×2 / load ×2——config 是宿主外观 + iframe 配置各一次（设计）；load 是存量句柄探测（limit=1）+ 正式历史（limit=20，设计）；exchange 是宿主 `iframe load` 与 `bootstrap_request` 各推一次 `provide_token`，iframe 两次都换 ⇒ 改为同票并发单飞 + 已换过的票迟到重推直接忽略。 | 真机时序（刷新前/后）：exchange **2→1**，config=2、load=2 保持（已说明来源）· 前端 type-check / 753 / build 绿 |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
