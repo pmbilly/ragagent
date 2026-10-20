@@ -3,9 +3,11 @@
   "message": "ok",
   "data": {
     "agentAvatar": "",
+    "agentFollowUpQuestionsEnabled": false,
     "agentId": "<uuid>",
     "agentImageUploadEnabled": false,
     "agentName": "emb-agent",
+    "agentStarterQuestionsEnabled": true,
     "agentWebSearchEnabled": true,
     "allowFileUpload": true,
     "allowWebSearch": true,

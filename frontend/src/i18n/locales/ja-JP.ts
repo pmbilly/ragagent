@@ -2090,7 +2090,7 @@ export default {
     welcomePlaceholder: 'こんにちは。何かお手伝いできることはありますか？',
     welcomeMessageDesc: '訪問者が最初のメッセージを送る前に埋め込みチャットに表示されます。空欄にすると非表示になります',
     showSuggestedQuestions: '質問候補',
-    showSuggestedQuestionsDesc: '訪問者の最初のメッセージの前に、エージェント設定と連携ナレッジベースをもとにした質問候補を表示します',
+    showSuggestedQuestionsDesc: '総合スイッチ：埋め込みウィジェットに質問候補（最初の質問候補と追加の質問候補）を表示するか制御します。各種類の生成可否はエージェント側の設定に従います',
     showThinking: '思考プロセスを表示',
     showThinkingDesc: '訪問者にモデルの思考プロセスを表示します。オフの場合は思考中の点滅インジケータのみが表示されます',
     originsHint: '1行に1つの完全なオリジンを入力します（例: https://shop.example.com）。1件以上必須です。*.example.comのようなサブドメインのワイルドカードに対応しています',

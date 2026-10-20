@@ -9,6 +9,8 @@
     :kb-ids="kbIds"
     :welcome-message="welcomeMessage"
     :show-suggested-questions="showSuggestedQuestions"
+    :agent-starter-questions-enabled="agentStarterQuestionsEnabled"
+    :agent-follow-up-questions-enabled="agentFollowUpQuestionsEnabled"
     :show-thinking="showThinking"
     :allow-web-search="allowWebSearch"
     :agent-web-search-enabled="agentWebSearchEnabled"
@@ -38,6 +40,8 @@ defineProps<{
   kbIds: string[]
   welcomeMessage?: string
   showSuggestedQuestions?: boolean
+  agentStarterQuestionsEnabled?: boolean
+  agentFollowUpQuestionsEnabled?: boolean
   showThinking?: boolean
   allowWebSearch?: boolean
   agentWebSearchEnabled?: boolean

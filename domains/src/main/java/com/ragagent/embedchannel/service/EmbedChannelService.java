@@ -528,11 +528,17 @@ public class EmbedChannelService {
         String agentAvatar = meta[2];
         boolean agentWebSearch = false;
         boolean agentImageUpload = false;
+        boolean agentStarters = false;
+        boolean agentFollowUps = false;
         AgentLookup.AgentView agent = tryAgent(ch.getAgentId());
         if (agent != null) {
             JsonNode cfg = parseConfig(agent);
             agentWebSearch = cfg.path("webSearchEnabled").asBoolean(false);
             agentImageUpload = cfg.path("imageUploadEnabled").asBoolean(false);
+            // 两类建议问题各自的智能体开关；渠道开关是总闸，前端按「总闸 && 分闸」门控
+            JsonNode suggestions = cfg.path("questionSuggestions");
+            agentStarters = suggestions.path("starters").path("enabled").asBoolean(false);
+            agentFollowUps = suggestions.path("followUps").path("enabled").asBoolean(false);
         }
         // 键名＝实体字段名（camelCase）；且**全部键恒输出**——
         // 空集合写 []、空串照写，widget 侧不必再猜"这个键这次在不在"。
@@ -558,6 +564,8 @@ public class EmbedChannelService {
         n.put("allowFileUpload", ch.isAllowFileUpload());
         n.put("agentWebSearchEnabled", agentWebSearch);
         n.put("agentImageUploadEnabled", agentImageUpload);
+        n.put("agentStarterQuestionsEnabled", agentStarters);
+        n.put("agentFollowUpQuestionsEnabled", agentFollowUps);
         n.put("defaultLocale", normalizeDefaultLocale(ch.getDefaultLocale()));
         n.put("launcherIcon", ch.getLauncherIcon() == null ? "" : ch.getLauncherIcon());
         return n;

@@ -52,6 +52,8 @@
         :kb-ids="kbIds"
         :welcome-message="config.welcomeMessage"
         :show-suggested-questions="config.showSuggestedQuestions !== false"
+        :agent-starter-questions-enabled="config.agentStarterQuestionsEnabled === true"
+        :agent-follow-up-questions-enabled="config.agentFollowUpQuestionsEnabled === true"
         :show-thinking="config.showThinking === true"
         :allow-web-search="config.allowWebSearch === true"
         :agent-web-search-enabled="config.agentWebSearchEnabled === true"

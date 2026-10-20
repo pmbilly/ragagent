@@ -2090,7 +2090,7 @@ export default {
     welcomePlaceholder: 'Hi! How can I help you?',
     welcomeMessageDesc: 'Shown in the embed chat before the visitor sends their first message; leave blank to hide',
     showSuggestedQuestions: 'Suggested questions',
-    showSuggestedQuestionsDesc: 'Show starter prompts before the first visitor message, from agent config and linked knowledge bases',
+    showSuggestedQuestionsDesc: 'Master switch for suggested questions in the widget: starter prompts and follow-up suggestions. Each type still depends on its own agent setting',
     showThinking: 'Show thinking process',
     showThinkingDesc: "Show the model's thinking process to visitors; when off, only a blinking indicator is shown while thinking",
     originsHint: 'One full origin per line (e.g. https://shop.example.com), at least one required; *.example.com subdomain wildcards supported',

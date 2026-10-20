@@ -151,6 +151,8 @@ const props = defineProps<{
   kbIds: string[]
   welcomeMessage?: string
   showSuggestedQuestions?: boolean
+  agentStarterQuestionsEnabled?: boolean
+  agentFollowUpQuestionsEnabled?: boolean
   showThinking?: boolean
   allowWebSearch?: boolean
   agentWebSearchEnabled?: boolean
@@ -176,6 +178,14 @@ const suggestedQuestions = ref<SuggestedQuestion[]>([])
 const suggestedLoading = ref(false)
 const hostContextRef = ref<Record<string, unknown>>(props.hostContext || {})
 
+/** 渠道「推荐问题」是总闸；开场/追问各自再看智能体开关（与联网/上传同款 AND）。 */
+const starterQuestionsEnabled = computed(
+  () => props.showSuggestedQuestions === true && props.agentStarterQuestionsEnabled === true,
+)
+const followUpQuestionsEnabled = computed(
+  () => props.showSuggestedQuestions === true && props.agentFollowUpQuestionsEnabled === true,
+)
+
 const loadFollowUpSuggestions = async (
   message: Record<string, unknown>,
   ensure = false,
@@ -183,7 +193,7 @@ const loadFollowUpSuggestions = async (
 ) => {
   const messageId = String(message.id || message.assistantMessageId || '')
   const targetSessionId = props.sessionId
-  if (!props.showSuggestedQuestions || !messageId || !targetSessionId || message.suggestionsDismissed) return
+  if (!followUpQuestionsEnabled.value || !messageId || !targetSessionId || message.suggestionsDismissed) return
   message.suggestionLoading = true
   try {
     let response = ensure
@@ -315,14 +325,14 @@ const showGlobalTypingIndicator = computed(() =>
 const showWelcome = computed(() => hasWelcomeText.value && !hasUserMessage.value)
 
 const showSuggestedBlock = computed(() =>
-  props.showSuggestedQuestions
+  starterQuestionsEnabled.value
   && !hasUserMessage.value
   && !loading.value
   && !historyLoading.value
   && (suggestedLoading.value || suggestedQuestions.value.length > 0))
 
 const fetchSuggestedQuestions = async () => {
-  if (!props.showSuggestedQuestions || !props.channelId || !props.token) {
+  if (!starterQuestionsEnabled.value || !props.channelId || !props.token) {
     suggestedQuestions.value = []
     return
   }
@@ -398,7 +408,7 @@ onUnmounted(() => {
 })
 
 watch(
-  () => [props.showSuggestedQuestions, props.channelId, props.token] as const,
+  () => [starterQuestionsEnabled.value, props.channelId, props.token] as const,
   () => { fetchSuggestedQuestions() },
 )
 </script>

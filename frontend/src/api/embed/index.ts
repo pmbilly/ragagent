@@ -56,6 +56,10 @@ export interface EmbedChannelPublicConfig {
   allowFileUpload: boolean
   agentWebSearchEnabled: boolean
   agentImageUploadEnabled: boolean
+  /** 智能体的开场推荐问题开关（渠道 showSuggestedQuestions 为总闸）。 */
+  agentStarterQuestionsEnabled: boolean
+  /** 智能体的追问建议开关（渠道 showSuggestedQuestions 为总闸）。 */
+  agentFollowUpQuestionsEnabled: boolean
   defaultLocale: string
 }
 
