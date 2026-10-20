@@ -13,6 +13,7 @@ import com.ragagent.datasource.domain.DataSourceSyncPayload;
 import com.ragagent.datasource.domain.DataSourceSyncTaskQueue;
 import com.ragagent.datasource.domain.TaskInitiator;
 import com.ragagent.platform.stream.EmbeddedRedis;
+import com.ragagent.platform.task.RedisRetryingTaskQueue;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -174,8 +175,8 @@ class RedisDataSourceSyncTaskQueueTest {
 
         queue = newQueue(handler);
         // 手工模拟"另一个实例取走后崩溃"：proc 里一个租约已过期的成员
-        String member = MAPPER.writeValueAsString(new RedisDataSourceSyncTaskQueue.QueueMember(
-                syncPayload().toJson(), "dssync:ds-1:202610061203", 0, 60_000, 1));
+        String member = MAPPER.writeValueAsString(new RedisRetryingTaskQueue.QueueMember(
+                syncPayload().toJson(), 1, 0, 60_000L, null, null));
         redis.template().opsForZSet().add("datasource:sync:proc", member,
                 System.currentTimeMillis() - 1000);
 

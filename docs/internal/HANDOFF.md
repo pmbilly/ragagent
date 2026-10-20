@@ -106,7 +106,7 @@
 | **H2c** | 问答状态段：15 字段按 5 组暴露，删 `ChatManage` | 待做 |
 | **H3** | 入库 `IngestJob` 状态机 + `IngestStage` 接口 | 待做 |
 | **H4a** | 任务契约：`TaskQueue`（命名/启停/测试钩子）+ `RetryDelayOverride`；6 套队列接口继承；钩子机制 5→1。H4b 迁实现 | H4a-1 ✅ 2026-10-20 |
-| **H4b** | 任务实现：datasource → memory → knowledge → wiki 分批 | 待做 |
+| **H4b** | 任务实现：**datasource ✅**（迁到 `RedisRetryingTaskQueue`）；memory/knowledge 已在基座；wiki 待迁（死信/锁冲突特例） | H4b-1 ✅ 2026-10-20 |
 | **H5a** | 分页统一：**H5a-1 ✅** 形状收敛（`PageResult<T>`，11 类型 → 1）；H5a-2 待做（管理端点加分页参数 + 前端） | H5a-1 ✅ 2026-10-20 |
 | **H5b** | 软删校验守卫：`SoftDeleteFilterGuard`（26 表 / 默认 enforce）；实测 0 条存量违规，允许清单为空 | ✅ 2026-10-20 |
 | **H6** | 契约形状治理（`KnowledgeCatalogPort` 34 方法拆窄、`*RowView` 回域） | 待做 |
@@ -409,6 +409,7 @@ boot           14 件                      →  boot
 | H5a-1 | 2026-10-20 | **分页形状统一**：新增 `contract.pagination.PageResult<T>(items,total,page,pageSize)`；11 个分页类型收敛（ChunkPageResponse / FaqEntryPage / TagPageResult / KnowledgePage / MemoryPage / AdminUserPage / TagPage / ChunkPage / SessionPage / TenantSearchPage / InvitationPage / MemberPage）；净删 6 个类、−218 行。wire 仅 `AdminUserPage.users→items`（无消费方）。**余**：12 个管理列表加分页参数 + 前端（H5a-2，需逐页定默认页大小，属产品交互）。 | **42 守卫全绿** · **5008 / 0 / 4** · build 2m1s |
 | H4a-1 | 2026-10-20 | **任务契约与重试钩子统一**：新增 `platform.task.TaskQueue`（name/start/stop/setRetryDelayOverrideSeconds 默认契约）与 `RetryDelayOverride`（null=fallback、覆盖钳非负）；6 套域队列接口继承 `TaskQueue`；5 处重复的字段+setter+解析收敛为共享 holder（datasource 2 / wiki 2 / platform 1）；投递方法保留各自语义（taskId / 上限 / 超时 / 延迟）。**余**：H4b 把实现迁到 `RedisRetryingTaskQueue` 基座。 | **42 守卫全绿** · **5012 / 0 / 4**（platform +4）· build 1m57s |
 | H5b | 2026-10-20 | **软删过滤探测**：新增 `platform.persistence.SoftDeleteFilterGuard`（26 张带 `deleted_at` 的表，`off/alert/enforce` 三档，默认 enforce），挂 MyBatis 插件链第 4 位；SELECT 主查询缺 `deleted_at` 谓词即抛 `MybatisPlusException`。实测存量 **0 条违规**（79 处手写谓词已覆盖），`ALLOWED_STATEMENTS` 为空；v1 边界同租户守卫（JOIN 次表/UNION/FROM 子查询不查、解析失败放行）。新增守卫单测 5 例 + 装配档位测试 1 例。 | **42 守卫全绿** · **5013 / 0 / 4**（boot +1）· build 1m45s |
+| H4b-1 | 2026-10-20 | **datasource 队列迁基座**：`RedisRetryingTaskQueue` 补齐 per-task `maxRetry` / `timeoutMillis` / 幂等键 / 提交结果（`TaskSpec` / `SubmitOutcome`），成员 JSON 对缺省字段兼容；`RedisDataSourceSyncTaskQueue` 从 292 行降到 ~120 行，只保留 TaskID 去重、载荷解码与 trace 包装；6 个队列测试（去重 / 重试 / 超时 / 租约回收）全绿。**余**：wiki（死信 + 锁冲突 15s + slot releaser）。 | **42 守卫全绿** · **5013 / 0 / 4** · build 2m23s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

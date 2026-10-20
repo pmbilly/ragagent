@@ -140,7 +140,7 @@ boot（组合根，唯一装配点）
 | **H2c 问答-状态段** | 15 状态字段按 5 组暴露（QueryPlan / SearchOutcome / RerankOutcome / MergedContext / Answer）；删 `ChatManage` | 1.5-2 人日 | `cloneChatManage` 消失；36 个消费类 → ≤10 |
 | **H3 入库-状态机** | `IngestJob` 状态机（替代 4 处 CAS）+ `IngestStage` 接口（现有 5 个 stage 就地实现）+ 删 `KnowledgeTaskExecutor` | 3-4 人日 | 阶段显式化；主码 CAS 4→1；入库链路必读类 ≤10 |
 | **H4a 任务-端口** | **H4a-1 ✅**：`TaskQueue`（name/start/stop/setRetryDelayOverrideSeconds）+ `RetryDelayOverride`；6 套队列接口继承；钩子 5→1 机制。**H4a-2/H4b**：`submit/lease/renew/progress/retry/park` 完整端口随实现迁移落地 | H4a-1 ✅ 2026-10-20 | 业务只依赖端口；钩子 5→1 |
-| **H4b 任务-实现** | 按域迁实现：datasource sync → memory → knowledge 富化 → wiki（最复杂最后）；每批删 2 个 InProcess/Redis 双实现类 | 3-5 人日 | 10 个实现类删除；跨实例可恢复；wiki 死信与锁特例参数化 |
+| **H4b 任务-实现** | **H4b-1 ✅ datasource**：基座补 per-task 预算/超时/幂等，队列降到 ~120 行薄适配；memory/knowledge 已在基座；**余** wiki（死信 + 锁冲突 15s + slot releaser） | H4b-1 ✅ 2026-10-20 | 跨实例可恢复；wiki 特例参数化 |
 | **H5a 分页统一** | **H5a-1 ✅**：`contract.pagination.PageResult<T>` 统一 11 个分页类型；**H5a-2**：管理端点加分页参数（默认页大小）+ 前端同步 | H5a-1 ✅ 2026-10-20；H5a-2 1 人日 | 形状 7→1；后台列表全部可分页 |
 | **H5b 软删校验** ✅ | 新增 `SoftDeleteFilterGuard`：26 张带 `deleted_at` 的表，SELECT 主查询必须含谓词；**不做自动注入**；允许清单按需登记。实测存量 0 违规 | ✅ 2026-10-20 | 新增漏写即红；允许清单为空 |
 | **H5c 软删收敛（可选）** | 仅在语义一致的表上逐步收进 `@TableLogic` / repository 基类；不追求 79→0 | 2-3 人日 | 不做满，只做低风险表 |
