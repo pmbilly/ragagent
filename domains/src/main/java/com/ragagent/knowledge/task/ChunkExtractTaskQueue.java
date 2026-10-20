@@ -1,13 +1,14 @@
 package com.ragagent.knowledge.task;
 
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
+import com.ragagent.platform.task.TaskQueue;
 
 /**
  * 分块图抽取任务的投递口。
  * Timeout 30 分钟），Java 侧是进程内队列——契约保持一致（入队即异步执行、
  * 失败按重试预算重试、耗尽后放弃并记日志）。</p>
  */
-public interface ChunkExtractTaskQueue {
+public interface ChunkExtractTaskQueue extends TaskQueue {
 
     /**
      * 投递一个分块抽取任务（载荷含追踪载体，worker 侧续接同一棵树）。

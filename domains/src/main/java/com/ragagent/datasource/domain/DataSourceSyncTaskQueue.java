@@ -1,5 +1,7 @@
 package com.ragagent.datasource.domain;
 
+import com.ragagent.platform.task.TaskQueue;
+
 import java.time.Duration;
 
 /**
@@ -23,7 +25,7 @@ import java.time.Duration;
  *       并写下 {@code "enqueue failed: <原因>"}，所以本方法<b>抛异常</b>而不是静默丢弃。</li>
  * </ol>
  */
-public interface DataSourceSyncTaskQueue {
+public interface DataSourceSyncTaskQueue extends TaskQueue {
 
     /** 队列名。 */
     String QUEUE_SYNC = "sync";

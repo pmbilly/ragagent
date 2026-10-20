@@ -1,5 +1,7 @@
 package com.ragagent.memory.domain;
 
+import com.ragagent.platform.task.TaskQueue;
+
 import java.time.Duration;
 
 /**
@@ -19,7 +21,7 @@ import java.time.Duration;
  *       所以本方法**抛异常**而不是静默丢弃。</li>
  * </ol>
  */
-public interface MemoryExtractTaskQueue {
+public interface MemoryExtractTaskQueue extends TaskQueue {
 
     /**
      * 投递一个蒸馏任务。

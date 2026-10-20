@@ -1,6 +1,7 @@
 package com.ragagent.knowledge.task;
 
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
+import com.ragagent.platform.task.TaskQueue;
 
 /**
  * 问题生成批任务的投递口。
@@ -8,7 +9,7 @@ import com.ragagent.knowledge.domain.QuestionBatchPayload;
  * <p>投递失败抛异常——调用方（post-process 的 fan-out）据此释放该批占用的 finalizing 槽，
  * 避免行搁浅在 finalizing。</p>
  */
-public interface QuestionGenerationTaskQueue {
+public interface QuestionGenerationTaskQueue extends TaskQueue {
 
     /** 投递一个批任务（载荷含追踪载体，worker 侧续接同一棵树）。 */
     void enqueue(QuestionBatchPayload payload);

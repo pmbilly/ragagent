@@ -39,7 +39,7 @@ abstract class AbstractRedisKnowledgeTaskQueue {
     }
 
     /** 供测试覆盖重试延迟（秒）。 */
-    void setRetryDelayOverrideSeconds(Long seconds) {
+    public void setRetryDelayOverrideSeconds(Long seconds) {
         queue.setRetryDelayOverrideSeconds(seconds);
     }
 

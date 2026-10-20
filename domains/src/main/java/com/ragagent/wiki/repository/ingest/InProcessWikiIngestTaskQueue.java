@@ -1,5 +1,6 @@
 package com.ragagent.wiki.repository.ingest;
 
+import com.ragagent.platform.task.RetryDelayOverride;
 import com.ragagent.wiki.domain.ingest.WikiIngestSlotReleaser;
 import com.ragagent.wiki.domain.ingest.WikiIngestTask;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
@@ -67,19 +68,12 @@ public class InProcessWikiIngestTaskQueue implements WikiIngestTaskQueue {
     /** 传输无关的执行/归档逻辑（与 Redis 队列共用）。 */
     private final WikiIngestTaskRunner runner;
 
-    /**
-     * 测试钩子：覆盖重试延迟（秒）。{@code null} = 用
-     * {@link WikiIngestTaskRunner#retryDelaySeconds} 的默认公式。
-     *
-     * <p>存在的理由很实际：默认退避是 {@code n^4 + 15 + rand(30)*(n+1)} 秒，
-     * 第一次重试就要等 15–45 秒。若不覆盖，重试与死信归档这两条路径在单测里
-     * 根本跑不动，于是只能靠代码审阅——那等于没测。</p>
-     */
-    private volatile Long retryDelayOverrideSeconds;
+    /** 测试钩子：覆盖重试延迟（秒）；{@code null} = 用默认退避公式。 */
+    private final RetryDelayOverride retryDelay = new RetryDelayOverride();
 
-    /** 供测试覆盖重试延迟（秒）。 */
+    @Override
     public void setRetryDelayOverrideSeconds(Long seconds) {
-        this.retryDelayOverrideSeconds = seconds;
+        retryDelay.set(seconds);
     }
 
     public InProcessWikiIngestTaskQueue(
@@ -174,10 +168,8 @@ public class InProcessWikiIngestTaskQueue implements WikiIngestTaskQueue {
             return;
         }
 
-        Long override = retryDelayOverrideSeconds;
-        long delaySeconds = override != null
-                ? override
-                : WikiIngestTaskRunner.retryDelaySeconds(retriesUsed + 1, failure);
+        long delaySeconds = retryDelay.resolve(
+                WikiIngestTaskRunner.retryDelaySeconds(retriesUsed + 1, failure));
         log.warn("wiki task queue: {} failed (attempt {}/{}), retrying in {}s",
                 task.type(), attempt, task.maxRetry() + 1, delaySeconds, failure);
         scheduler.schedule(() -> worker.execute(() -> run(task, attempt + 1)),

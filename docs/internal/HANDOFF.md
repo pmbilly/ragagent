@@ -105,7 +105,7 @@
 | **H2b** | 问答请求段：`TurnInputView`（41 字段只读）+ `QaRequestContext` 收口 | 待做 |
 | **H2c** | 问答状态段：15 字段按 5 组暴露，删 `ChatManage` | 待做 |
 | **H3** | 入库 `IngestJob` 状态机 + `IngestStage` 接口 | 待做 |
-| **H4a** | 任务端口：`TaskQueue` + `TaskProgress`，测试钩子 4→1 | 待做 |
+| **H4a** | 任务契约：`TaskQueue`（命名/启停/测试钩子）+ `RetryDelayOverride`；6 套队列接口继承；钩子机制 5→1。H4b 迁实现 | H4a-1 ✅ 2026-10-20 |
 | **H4b** | 任务实现：datasource → memory → knowledge → wiki 分批 | 待做 |
 | **H5a** | 分页统一：**H5a-1 ✅** 形状收敛（`PageResult<T>`，11 类型 → 1）；H5a-2 待做（管理端点加分页参数 + 前端） | H5a-1 ✅ 2026-10-20 |
 | **H5b** | 软删校验守卫（79 基线只减，不做自动注入） | 待做 |
@@ -407,6 +407,7 @@ boot           14 件                      →  boot
 | G3 | 2026-10-20 | **还乡 2.0（逐件核验版）**：`ToolResultPersist` 下移 `session/support`（contract 净减 1；纯 JDK、contract 内无回引、消费方仅 session 两处）。**其余三类经核验不可还乡**：① `platform/knowledge` 8 件全部被 ≥2 个业务族消费且依赖 Jackson/ImageIO（进不了 contract、归域会跨族直连）⇒ 留 platform 并重写 package-info 说明判据；② `MemoryKeys` 被 `contract.memory.MemoryConfig` 内部引用（`runeLength`/`runeSlice`）⇒ 留 contract；③ `model↔retrieval` 包环实测已不存在（SCC 5 组基线未变）。 | **42 守卫全绿** · **5008 / 0 / 4** · build 1m52s |
 | G4 | 2026-10-20 | **门面尾巴**：① `SubtaskDrain` 抽取（问题生成 / 图谱抽取两份逐字递减合一；收 `Runnable` 避免新增 knowledge→wiki 边）；② `TenantAdmin` 端口折叠为 `TenantRepository`（单实现单消费方同域，删 1 接口 + 12 处 `@Override`）；③ `DataSourceTrace`/`WikiTrace` 两个 16 行双胞胎合并为 `platform.tracing.TraceInjector`（删 2 类 2 包）；④ `mechanisms.md` 增 `runtime` 包四义词典与三条规则。**未做**：finalizer 6 行 import 换 Adapter——knowledge↔wiki 是族内直连，加端口属代理税（与 R1 冲突）。 | **42 守卫全绿** · **5008 / 0 / 4** · build 1m50s |
 | H5a-1 | 2026-10-20 | **分页形状统一**：新增 `contract.pagination.PageResult<T>(items,total,page,pageSize)`；11 个分页类型收敛（ChunkPageResponse / FaqEntryPage / TagPageResult / KnowledgePage / MemoryPage / AdminUserPage / TagPage / ChunkPage / SessionPage / TenantSearchPage / InvitationPage / MemberPage）；净删 6 个类、−218 行。wire 仅 `AdminUserPage.users→items`（无消费方）。**余**：12 个管理列表加分页参数 + 前端（H5a-2，需逐页定默认页大小，属产品交互）。 | **42 守卫全绿** · **5008 / 0 / 4** · build 2m1s |
+| H4a-1 | 2026-10-20 | **任务契约与重试钩子统一**：新增 `platform.task.TaskQueue`（name/start/stop/setRetryDelayOverrideSeconds 默认契约）与 `RetryDelayOverride`（null=fallback、覆盖钳非负）；6 套域队列接口继承 `TaskQueue`；5 处重复的字段+setter+解析收敛为共享 holder（datasource 2 / wiki 2 / platform 1）；投递方法保留各自语义（taskId / 上限 / 超时 / 延迟）。**余**：H4b 把实现迁到 `RedisRetryingTaskQueue` 基座。 | **42 守卫全绿** · **5012 / 0 / 4**（platform +4）· build 1m57s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

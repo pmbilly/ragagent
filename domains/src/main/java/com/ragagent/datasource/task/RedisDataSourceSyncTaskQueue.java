@@ -5,6 +5,7 @@ import com.ragagent.datasource.domain.DataSourceSyncHandler;
 import com.ragagent.datasource.domain.DataSourceSyncPayload;
 import com.ragagent.datasource.domain.DataSourceSyncTaskQueue;
 import com.ragagent.platform.task.RedisTaskQueueCore;
+import com.ragagent.platform.task.RetryDelayOverride;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
@@ -83,8 +84,8 @@ public class RedisDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue {
                 return t;
             });
 
-    /** 测试钩子：覆盖重试退避（秒）。{@code null} = 用默认公式。 */
-    private volatile Long retryDelayOverrideSeconds;
+    /** 测试钩子：覆盖重试退避（秒）；{@code null} = 用默认公式。 */
+    private final RetryDelayOverride retryDelay = new RetryDelayOverride();
 
     public RedisDataSourceSyncTaskQueue(StringRedisTemplate template,
             ObjectProvider<DataSourceSyncHandler> handlerProvider) {
@@ -94,9 +95,9 @@ public class RedisDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue {
         this.core.start(this::accept);
     }
 
-    /** 供测试覆盖重试退避（秒）。 */
+    @Override
     public void setRetryDelayOverrideSeconds(Long seconds) {
-        this.retryDelayOverrideSeconds = seconds;
+        retryDelay.set(seconds);
     }
 
     @Override
@@ -272,12 +273,9 @@ public class RedisDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue {
      * （wiki / memory 两份实现用的是同一公式）。
      */
     private long retryDelaySeconds(int attempt) {
-        Long override = retryDelayOverrideSeconds;
-        if (override != null) {
-            return Math.max(override, 0L);
-        }
         long n = attempt;
-        return n * n * n * n + 15 + ThreadLocalRandom.current().nextInt(30) * (n + 1);
+        long fallback = n * n * n * n + 15 + ThreadLocalRandom.current().nextInt(30) * (n + 1);
+        return retryDelay.resolve(fallback);
     }
 
     private static String toJson(QueueMember member) {

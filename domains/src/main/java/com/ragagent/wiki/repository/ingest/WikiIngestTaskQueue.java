@@ -1,5 +1,6 @@
 package com.ragagent.wiki.repository.ingest;
 
+import com.ragagent.platform.task.TaskQueue;
 import com.ragagent.wiki.domain.ingest.WikiIngestTask;
 /**
  * wiki 后台任务的投递端口。
@@ -20,7 +21,7 @@ import com.ragagent.wiki.domain.ingest.WikiIngestTask;
  *   <li><b>超时</b>（{@code Timeout}）：60 分钟（ingest）/ 30 分钟（finalize）。</li>
  * </ol>
  */
-public interface WikiIngestTaskQueue {
+public interface WikiIngestTaskQueue extends TaskQueue {
 
     /**
      * 投递一个任务。

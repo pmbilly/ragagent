@@ -6,6 +6,7 @@ import com.ragagent.datasource.domain.DataSourceSyncPayload;
 import com.ragagent.datasource.domain.DataSourceSyncTaskQueue;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.platform.task.RetryDelayOverride;
 import com.ragagent.platform.task.RetryPolicy;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import java.time.Duration;
@@ -67,22 +68,16 @@ public class InProcessDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue
     /** 执行器：每个尝试一个虚拟线程。 */
     private final ExecutorService worker = Executors.newVirtualThreadPerTaskExecutor();
 
-    /**
-     * 测试钩子：覆盖重试退避（秒）。{@code null} = 用默认公式。
-     *
-     * <p>存在的理由与 wiki/memory 那两份完全一样：默认退避是
-     * {@code n^4 + 15 + rand(30)*(n+1)} 秒，第一次重试就要等 15–45 秒，
-     * 不覆盖的话重试路径在单测里根本跑不动。</p>
-     */
-    private volatile Long retryDelayOverrideSeconds;
+    /** 测试钩子：覆盖重试退避（秒）；{@code null} = 用默认公式。 */
+    private final RetryDelayOverride retryDelay = new RetryDelayOverride();
 
     public InProcessDataSourceSyncTaskQueue(ObjectProvider<DataSourceSyncHandler> handlerProvider) {
         this.handlerProvider = handlerProvider;
     }
 
-    /** 供测试覆盖重试退避（秒）。 */
+    @Override
     public void setRetryDelayOverrideSeconds(Long seconds) {
-        this.retryDelayOverrideSeconds = seconds;
+        retryDelay.set(seconds);
     }
 
     @Override
@@ -198,6 +193,6 @@ public class InProcessDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue
      * （wiki / memory 两份实现用的是同一公式）。
      */
     private long retryDelaySeconds(int attempt) {
-        return new RetryPolicy(0, retryDelayOverrideSeconds).delaySeconds(attempt);
+        return retryDelay.resolve(new RetryPolicy(0, null).delaySeconds(attempt));
     }
 }

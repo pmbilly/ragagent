@@ -36,7 +36,7 @@ public final class RedisRetryingTaskQueue {
     private final ScheduledExecutorService scheduler;
 
     /** 测试钩子：覆盖重试延迟（秒）；{@code null} = 用 policy 公式。 */
-    private volatile Long retryDelayOverrideSeconds;
+    private final RetryDelayOverride retryDelay = new RetryDelayOverride();
 
     public RedisRetryingTaskQueue(StringRedisTemplate template, String keyPrefix, String taskName,
             RetryPolicy policy, Handler handler) {
@@ -63,7 +63,7 @@ public final class RedisRetryingTaskQueue {
 
     /** 供测试覆盖重试延迟（秒）。 */
     public void setRetryDelayOverrideSeconds(Long seconds) {
-        this.retryDelayOverrideSeconds = seconds;
+        retryDelay.set(seconds);
     }
 
     /** 停掉调度、执行与续期资源（幂等）。 */
@@ -117,8 +117,7 @@ public final class RedisRetryingTaskQueue {
     }
 
     private long delaySeconds(int attempt) {
-        Long override = retryDelayOverrideSeconds;
-        return override != null ? Math.max(override, 0L) : policy.delaySeconds(attempt);
+        return retryDelay.resolve(policy.delaySeconds(attempt));
     }
 
     private static String toJson(QueueMember member) {

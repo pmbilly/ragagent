@@ -1,5 +1,6 @@
 package com.ragagent.wiki.repository.ingest;
 
+import com.ragagent.platform.task.RetryDelayOverride;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.domain.ingest.WikiIngestSlotReleaser;
 import com.ragagent.wiki.domain.ingest.WikiIngestTask;
@@ -149,12 +150,8 @@ public class RedisWikiIngestTaskQueue implements WikiIngestTaskQueue {
     /** 执行器：每个任务一个虚拟线程；并发总量由 KB 的在途上限约束。 */
     private final ExecutorService worker = Executors.newVirtualThreadPerTaskExecutor();
 
-    /**
-     * 测试钩子：覆盖重试延迟（秒）。{@code null} = 用
-     * {@link WikiIngestTaskRunner#retryDelaySeconds} 的默认公式
-     * （与 {@link InProcessWikiIngestTaskQueue} 同口径）。
-     */
-    private volatile Long retryDelayOverrideSeconds;
+    /** 测试钩子：覆盖重试延迟（秒）；{@code null} = 用默认退避公式。 */
+    private final RetryDelayOverride retryDelay = new RetryDelayOverride();
 
     public RedisWikiIngestTaskQueue(StringRedisTemplate template,
             ObjectProvider<WikiIngestTaskHandler> handlerProvider,
@@ -165,9 +162,9 @@ public class RedisWikiIngestTaskQueue implements WikiIngestTaskQueue {
         this.dispatcher.submit(this::dispatchLoop);
     }
 
-    /** 供测试覆盖重试延迟（秒）。 */
+    @Override
     public void setRetryDelayOverrideSeconds(Long seconds) {
-        this.retryDelayOverrideSeconds = seconds;
+        retryDelay.set(seconds);
     }
 
     @Override
@@ -301,10 +298,8 @@ public class RedisWikiIngestTaskQueue implements WikiIngestTaskQueue {
             return;
         }
 
-        Long override = retryDelayOverrideSeconds;
-        long delaySeconds = override != null
-                ? override
-                : WikiIngestTaskRunner.retryDelaySeconds(retriesUsed + 1, failure);
+        long delaySeconds = retryDelay.resolve(
+                WikiIngestTaskRunner.retryDelaySeconds(retriesUsed + 1, failure));
         log.warn("wiki task queue: {} failed (attempt {}/{}), retrying in {}s",
                 task.type(), attempt, task.maxRetry() + 1, delaySeconds, failure);
         requeue(member, QueuedTask.of(task, attempt + 1), delaySeconds);

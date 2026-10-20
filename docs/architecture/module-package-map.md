@@ -9,7 +9,7 @@
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
 | `:contract` | `contract` | 33 | 353 | 0 |
-| `:platform` | `platform` | 25 | 191 | 1 |
+| `:platform` | `platform` | 25 | 193 | 1 |
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 20 | 152 | 0 |
 | `:retrieval-engine` | `retrieval` | 15 | 95 | 0 |
 | `:agent-engine` | `agent` | 9 | 67 | 0 |
