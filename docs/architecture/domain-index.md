@@ -10,7 +10,7 @@
 | 种类 | 域数 | 文件 | 控制器 | 说明 |
 |---|---:|---:|---:|---|
 | **产品能力** | 7 | 815 | 22 | 直接产生用户价值、按产品需求演进的业务能力。 |
-| **集成适配** | 6 | 535 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
+| **集成适配** | 6 | 538 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
 | **控制面** | 3 | 158 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
 | **能力配置** | 2 | 55 | 4 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
 | **初始化向导** | 1 | 13 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
@@ -30,7 +30,7 @@
 | `mcp` | 集成适配 | 148 | 4 | 2 | `views/settings/McpSettings.vue` |
 | `datasource` | 集成适配 | 147 | 2 | — | `views/knowledge/settings/DataSourceSettings.vue` |
 | `im` | 集成适配 | 105 | 2 | — | `views/integrations/IntegrationSettingsSection.vue` |
-| `storage` | 集成适配 | 58 | 3 | 6 | `views/settings/StorageBackendSettings.vue` |
+| `storage` | 集成适配 | 61 | 3 | 6 | `views/settings/StorageBackendSettings.vue` |
 | `websearch` | 集成适配 | 52 | 3 | 2 | `views/settings/WebSearchSettings.vue` |
 | `embedchannel` | 集成适配 | 25 | 1 | — | `views/embed` |
 | `auth` | 控制面 | 120 | 6 | 2 | `views/auth · views/settings/TenantMembers.vue · views/system/PlatformAPIKeys.vue` |

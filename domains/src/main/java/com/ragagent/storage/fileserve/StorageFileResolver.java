@@ -6,7 +6,6 @@ import com.ragagent.contract.storage.fileserve.WritableFileContentService;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.security.CryptoService;
-import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.storage.config.StorageProviderEnv;
@@ -26,53 +25,40 @@ import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 
 /**
- * 运行时存储解析器，三个职责：
+ * 运行时存储解析门面：backend 解析、配置投影、provider 工厂与 failover 编排。
  *
- * <ul>
- *   <li>{@code resolveBackend / resolveFileService / hydrateTenantStorage}
- *       （backendID 优先、provider 是 legacy 回落）；</li>
- *   <li>{@code newFileServiceFromStorageConfig}（provider 完备性检查——错误文案会
- *       出现在 presigned-preview 的 400 body 里，是固定线格式）；</li>
- *   <li>{@code resolveTenantFileServiceWithFallback}（租户解析失败且 provider 等于
- *       全局 STORAGE_TYPE 时回落进程级服务）。</li>
- * </ul>
+ * <p>协作者：backend 选择 / 租户视图补全在 {@link StorageBackendLocator}，实例行 →
+ * 引擎配置（改名 + 凭据解密）在 {@link StorageConfigProjector}，环境快照在
+ * {@link StorageEnvProvisioner}，{@code resource://} 装饰在
+ * {@link ResourceCatalogFileService}。本类保留公开入口与错误通道。</p>
  *
- * <h2>云 provider 的 SDK 客户端</h2>
- * <p>配置完备的 minio/cos/tos/s3/oss/obs/ks3 经 {@code FileServiceFactory}
- * （八个 provider 实现：local + S3 协议族 + 三家厂商原生 SDK）造真实客户端，
- * 再由 {@link ProviderFileContentService} 适配回本包的 {@link FileContentService}。
- * 配置<b>不完备</b>时的错误文案由工厂产出
- * （"missing minio config" / "incomplete cos config" / {@code unsupported provider "%s"}）。
- * local 一支走 {@link LocalFileContentService}（与 provider 工厂的 local 语义一致；
- * 收敛为单一实现属清理项）。</p>
- *
- * <p>同时承载 resource catalog 装饰器的可见行为：
- * 打开 {@code resource://} 手柄先换物理路径；{@code GetFileURL} 对手柄在
- * APP_EXTERNAL_URL 在位时派生 /r/ 能力令牌。</p>
+ * <p>云 provider 的 SDK 客户端经 {@link FileServiceFactory} 构造（local + S3 协议族 +
+ * 厂商原生 SDK），完备性错误文案由工厂单点产出，会出现在 presigned-preview 的 400 body 里
+ * ——那是固定线格式，改文案前先找金片。</p>
  */
 @Service
 public class StorageFileResolver {
 
     private static final Logger log = LoggerFactory.getLogger(StorageFileResolver.class);
 
-    /** 进程级默认解密器（与 Spring 的 CryptoService 同语义：无状态，getAESKey() 读 env）。 */
-    private static final CryptoService CRYPTO = new CryptoService();
-
     private final StorageBackendRepository backendRepo;
     private final ResourceCatalogService catalog;
-    private final Map<String, StorageProviderEnv.ProviderEnvFamily> providerEnvs;
+    private final StorageBackendLocator backendResolver;
+    private final StorageEnvProvisioner envProvisioner;
 
     @Autowired
     public StorageFileResolver(StorageBackendRepository backendRepo, ResourceCatalogService catalog,
             List<StorageProviderEnv.ProviderEnvFamily> providerEnvs) {
         this.backendRepo = backendRepo;
         this.catalog = catalog;
-        this.providerEnvs = new LinkedHashMap<>();
+        Map<String, StorageProviderEnv.ProviderEnvFamily> envs = new LinkedHashMap<>();
         if (providerEnvs != null) {
             for (StorageProviderEnv.ProviderEnvFamily env : providerEnvs) {
-                this.providerEnvs.put(env.provider(), env);
+                envs.put(env.provider(), env);
             }
         }
+        this.backendResolver = new StorageBackendLocator(backendRepo);
+        this.envProvisioner = new StorageEnvProvisioner(envs);
     }
 
     /**
@@ -106,7 +92,7 @@ public class StorageFileResolver {
         TenantStorageView hydrated = hydrateTenantStorage(tenant);
         Objects.requireNonNull(hydrated);
 
-        BackendResolution backend = resolveBackend(hydrated, backendId, provider);
+        StorageBackendLocator.Result backend = backendResolver.resolve(hydrated, backendId, provider);
         if (backend.error() != null) {
             return new Resolution(null, "", backend.error());
         }
@@ -142,61 +128,13 @@ public class StorageFileResolver {
         return new Resolution(decorate(inner.service()), inner.provider(), null);
     }
 
-    private record BackendResolution(StorageBackend backend, String error) {
-    }
-
-    /** backend 解析：legacy alias 与默认后端两级回落。 */
-    private BackendResolution resolveBackend(TenantStorageView tenant, String backendId, String provider) {
-        String id = backendId == null ? "" : backendId.trim();
-        String p = provider == null ? "" : provider.trim().toLowerCase(java.util.Locale.ROOT);
-        if (id.isEmpty() && !p.isEmpty()) {
-            StorageBackend alias = backendRepo.findLegacyAlias(tenant.tenantId(), p);
-            if (alias != null) {
-                return new BackendResolution(alias, null);
-            }
-        }
-        if (id.isEmpty()) {
-            id = tenant.defaultStorageBackendId() == null ? "" : tenant.defaultStorageBackendId().trim();
-        }
-        if (!id.isEmpty()) {
-            StorageBackend backend = backendRepo.getByID(tenant.tenantId(), id).orElse(null);
-            if (backend == null) {
-                return new BackendResolution(null, "storage backend not found");
-            }
-            if (!"active".equals(backend.getStatus())) {
-                return new BackendResolution(null, "storage backend is not active");
-            }
-            return new BackendResolution(backend, null);
-        }
-        return new BackendResolution(null, null);
-    }
-
     /** stub TenantStorageView 从库行补 DefaultStorageBackendId/配置。 */
     private TenantStorageView hydrateTenantStorage(TenantStorageView tenant) {
-        if (tenant.tenantId() == 0 || backendRepo == null) {
-            // 仓储缺位（纯单元测试构造）时跳过补全：本方法只是"从库行补 stub 字段"的优化，
-            // 补不了就按调用方给的实体走。
-            return tenant;
-        }
-        if (tenant.defaultStorageBackendId() != null && !tenant.defaultStorageBackendId().trim().isEmpty()) {
-            return tenant;
-        }
-        String storedDefault = backendRepo.tenantDefaultBackendId(tenant.tenantId());
-        if (storedDefault != null && !storedDefault.isEmpty()) {
-            return new TenantStorageView(tenant.tenantId(), storedDefault, tenant.storageEngineConfig());
-        }
-        return tenant;
+        return backendResolver.hydrate(tenant);
     }
 
     private static String storageEngineDefaultProvider(JsonNode sec) {
-        if (sec == null) {
-            return "";
-        }
-        JsonNode dp = sec.get("defaultProvider");
-        if (dp == null || !dp.isString()) {
-            return "";
-        }
-        return dp.asString().trim().toLowerCase(java.util.Locale.ROOT);
+        return StorageBackendLocator.defaultProvider(sec);
     }
 
     // ── 配置 → FileService 工厂 ─────────────────────────────────────────────
@@ -283,7 +221,7 @@ public class StorageFileResolver {
             return new ProviderResolution(null, "", "workspace context missing");
         }
         TenantStorageView hydrated = hydrateTenantStorage(tenant);
-        BackendResolution backend = resolveBackend(hydrated, backendId, provider);
+        StorageBackendLocator.Result backend = backendResolver.resolve(hydrated, backendId, provider);
         if (backend.error() != null) {
             return new ProviderResolution(null, "", backend.error());
         }
@@ -358,102 +296,14 @@ public class StorageFileResolver {
 
     // ── StorageBackend.ToStorageEngineConfig / FromEnvironment ─────────────
 
-    /** 实例模型 → 单例配置投影。 */
+    /** 实例模型 → 单例配置投影；实现见 {@link StorageConfigProjector}。 */
     static JsonNode toStorageEngineConfig(StorageBackend b) {
-        return toStorageEngineConfig(b, CRYPTO);
+        return StorageConfigProjector.toStorageEngineConfig(b);
     }
 
-    /**
-     * 实例行 → provider 段（**凭据必须解密**）。
-     *
-     * <p>jsonb 里的私钥是**存储密文**（{@code enc:v1:…}，见
-     * {@code StorageBackendService.serializeConfig} / {@code configOf}）。按存储层的
-     * 同一语义（{@code decryptStoredSecret}：带前缀才解密、无前缀原样）就地解密
-     * 两族命名，否则云读一律 403（S3: {@code The Access Key Id you provided does not
-     * exist in our records}）。</p>
-     *
-     * <p>测试可注入 crypto：{@code getAESKey()} 读 32 字节 env，单测用子类固定密钥。</p>
-     */
+    /** 实例行 → provider 段（凭据必须解密）；实现见 {@link StorageConfigProjector}。 */
     static JsonNode toStorageEngineConfig(StorageBackend b, CryptoService crypto) {
-        var cfg = new tools.jackson.databind.node.ObjectNode(
-                JsonMappers.lenient().getNodeFactory());
-        cfg.put("defaultProvider", b.getProvider());
-        JsonNode c = b.getConfig();
-        switch (b.getProvider() == null ? "" : b.getProvider()) {
-            case "local" -> {
-                var local = cfg.putObject("local");
-                local.put("pathPrefix", textValue(c, "pathPrefix"));
-            }
-            default -> {
-                // local 之外只需 defaultProvider
-                // 与 provider 段（完备性检查读 sec.<provider>.*）。实例行配置是 camelCase
-                //（StorageConfig 键名=字段名），这里改写成引擎面既定的 snake 键；凭据先解密。
-                if (c != null) {
-                    var copy = c.deepCopy();
-                    renameConfigKeys(copy, b.getProvider());
-                    decryptCredentials(copy, crypto);
-                    cfg.set(b.getProvider(), copy);
-                }
-            }
-        }
-        return cfg;
-    }
-
-    /**
-     * 行配置（camelCase）→ 各 provider 段字段名。自由键原样保留。
-     *
-     * <p><b>凭据两键按 provider 分族</b>：各段的字段名并不统一——
-     * {@code MinioEngineConfig} 认 {@code accessKeyId}/{@code secretAccessKey}、
-     * {@code CosEngineConfig} 认 {@code secretId}/{@code secretKey}、
-     * 其余（s3/tos/oss/ks3/obs）认 {@code accessKey}/{@code secretKey}。</p>
-     *
-     * <p>此前这里统一改写成 minio 形态，于是<b>除 minio 外的行配置凭据被 Jackson 静默丢弃</b>
-     * （转换器配了 {@code FAIL_ON_UNKNOWN_PROPERTIES=false}，未知键不报错）——云读退化为
-     * 「无凭据」（403/匿名），且行校验恰好「两边都空 ⇒ 通过」不报错。护栏见
-     * {@code ProviderWiringTest#backendRowCredentialsBindToProviderSection}。</p>
-     */
-    private static void renameConfigKeys(tools.jackson.databind.JsonNode providerConfig, String provider) {
-        if (!(providerConfig instanceof tools.jackson.databind.node.ObjectNode obj)) {
-            return;
-        }
-        String p = provider == null ? "" : provider.trim().toLowerCase(java.util.Locale.ROOT);
-        String accessField = switch (p) {
-            case "minio" -> "accessKeyId";
-            case "cos" -> "secretId";
-            default -> "accessKey";
-        };
-        String secretField = "minio".equals(p) ? "secretAccessKey" : "secretKey";
-        moveKey(obj, "accessKeyId", accessField);
-        moveKey(obj, "secretAccessKey", secretField);
-    }
-
-    /** 改键：目标键已存在时保留现状（行里显式给的引擎面键优先）。 */
-    private static void moveKey(tools.jackson.databind.node.ObjectNode obj, String from, String to) {
-        var v = obj.remove(from);
-        if (v != null && !obj.has(to)) {
-            obj.set(to, v);
-        }
-    }
-
-    /** 解密两族凭据命名（只有带 {@code enc:v1:} 前缀的才是密文，其余原样——照存储层语义）。 */
-    private static void decryptCredentials(tools.jackson.databind.JsonNode providerConfig,
-            CryptoService crypto) {
-        for (String field : new String[]{
-                "accessKeyId", "secretAccessKey", "secretId", "secretKey", "accessKey"}) {
-            tools.jackson.databind.JsonNode value = providerConfig.get(field);
-            if (value != null && value.isString()) {
-                ((tools.jackson.databind.node.ObjectNode) providerConfig)
-                        .put(field, crypto.decryptStoredSecret(value.asString()));
-            }
-        }
-    }
-
-    private static String textValue(JsonNode node, String field) {
-        if (node == null) {
-            return "";
-        }
-        JsonNode v = node.get(field);
-        return v == null || v.isNull() ? "" : v.asString();
+        return StorageConfigProjector.toStorageEngineConfig(b, crypto);
     }
 
     /**
@@ -466,27 +316,7 @@ public class StorageFileResolver {
      * 投影路径</b>，键名漂移不再可能。</p>
      */
     StorageBackend storageBackendFromEnvironment(long tenantId) {
-        String provider = StorageRuntimeEnv.storageType()
-                .trim().toLowerCase(java.util.Locale.ROOT);
-        if (provider.isEmpty()) {
-            provider = "local";
-        }
-        StorageProviderEnv.ProviderEnvFamily family = providerEnvs.get(provider);
-        if (family == null) {
-            // 与改前同形：环境里没有这个 provider 的快照 / 未知 provider → null
-            return null;
-        }
-        StorageBackend b = new StorageBackend();
-        b.setTenantId(tenantId);
-        b.setName("System " + provider.toUpperCase(java.util.Locale.ROOT));
-        b.setProvider(provider);
-        b.setSource("env");
-        b.setStatus("active");
-        b.setLegacyAlias(true);
-        var cfg = JsonMappers.lenient().createObjectNode();
-        family.writeConfig(cfg);
-        b.setConfig(cfg);
-        return b;
+        return envProvisioner.fromEnvironment(tenantId);
     }
 
     // ── 租户级解析失败回落 ──────────────────────────────────────────────────
