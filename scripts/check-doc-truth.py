@@ -48,7 +48,7 @@ def probe_count() -> int:
 
 
 def provider_count() -> int:
-    # 注册数只看静态块；它与 allProviders() 清单的一致性由 ProviderCatalogParityTest 的名单比对兜底
+    # 注册数只看静态块；它与 ProviderName 全集的一致性由 ProviderRegistryCompletenessTest 兜底
     text = (ROOT / "model-runtime/src/main/java/com/ragagent/llm/provider/ProviderRegistry.java") \
         .read_text(encoding="utf-8")
     return len(re.findall(r"^\s*register\(new \w+Provider\(\)\);", text, re.M))

@@ -128,7 +128,7 @@
 | **K4** | 装配点登记：22 个 `@Configuration` 三档（组合根 8 / 域内 10 / 模块内 4）+ `check-wiring-points.py`（W1~W4）+ agent-engine 组件扫描面登记 | ✅ 2026-10-20 |
 | **K1** | `EngineFactory` 两表合表（9 引擎一张 `SPECS`，构造 + 地址策略同行；完整性测试）+ `FileServiceFactory` 死集合清理 | ✅ 2026-10-20 |
 | **K2** | 跨域实体清零：`AgentView` 补 `tenantId`、8 文件改持视图、删恒 false 残留字段；守卫增 E1 判据（基线 0） | ✅ 2026-10-20 |
-| **K3** | `ModelProviderCatalog` 由 `ProviderRegistry` 生成 | 待做 |
+| **K3** | LLM 目录单源化：`ModelProviderCatalog` 由 `ProviderRegistry.list()` 生成；parity 测试换成注册表完整性测试；`validateConfig` 登记已知缺口 | ✅ 2026-10-20 |
 
 **否决项**：不建通用 `CapabilityRegistry<T>`；不搬 `QaWiring` 上移 boot（理由见方案 §2）。
 
@@ -445,6 +445,7 @@ boot           14 件                      →  boot
 | K4 | 2026-10-20 | **装配点清单**：新增 `scripts/wiring-points.baseline.json`（22 个 `@Configuration` 按组合根 8 / 域内 10 / 模块内 4 登记，每条带理由）与 `check-wiring-points.py`（W1 扫描集==清单集 / W2 分类与落点一致 / W3 理由非空 / W4 overview 文档同步）；`overview.md` 增「装配点」一节，并修正设计原则 2 与「跨模块 Bean」行的表述（agent-engine 组件扫描面登记为已知机制）；守卫接入 run-guards 第 43 条。**红态探针四条**：临时装配类（短形式 + FQN 两种写法）、陈旧登记、分类错位、文档缺项，均红并复原。首轮探针暴露 FQN 写法漏检，已补判据 | **43 守卫全绿** · spotlessCheck 绿（无 Java 改动） |
 | K1 | 2026-10-20 | **引擎注册合表**：`EngineFactory` 的两张 switch（构造 + 运行时 SSRF）合成一张 `SPECS` 注册表，`EngineSpec` 强制"声明地址字段或显式 `addressExempt`"（否则类初始化失败）；删掉不可达的 `unsupported engine type` 兜底；新增完整性测试（遍历 `EngineTypes.ENGINE_*` 断言每个常量都有注册项）。**红态验证**：摘掉 milvus 注册项 → 完整性测试与 Milvus 构造测试同时红，恢复后绿。`FileServiceFactory` 删 `IMPLEMENTED`/`PENDING` 死集合与配套不可达分支，测试从"断言集合内容"改为行为断言（8 个 provider 认得、ceph 报 unsupported 原文）。**未做**：跨模块 SSRF 元数据共享——两条路径都 fail-closed，属口径一致性成本而非安全漏洞 | **43 守卫全绿** · spotlessCheck 绿 · build 2m16s / **5026 / 0 / 4**（+1 完整性测试） |
 | K2 | 2026-10-20 | **跨域实体渗漏清零**：`contract.agent.AgentLookup.AgentView` 补 `tenantId`（复用既有端口，不新造投影）；8 个 session 文件改持视图（`AgentResolver` 注入 `AgentLookup`；两处从未使用的实体参数一并删除）；`ResolvedAgent` 删恒 false 的 `sharedAgentReadOnly`，清 6 处消费点（`QaSupport`×3 / `QaAgentConfig`×3 / `AgentConfigAssembler` 的 MCP 范围分支 / `AgentEngineAssembler` 的写工具过滤）。`check-domain-contracts.py` 增 **E1** 判据（跨域 `.domain.` import 即红，不吃族内豁免，基线 0）；红态探针：临时加回一行实体 import → 红并复原。**副作用**：域间边参考类 33 → 27（session→agentmanagement 11 → 5） | **43 守卫全绿** · 跨域实体 import 0 · build 2m28s / **5026 / 0 / 4** |
+| K3 | 2026-10-20 | **LLM 目录单源化**：`ModelProviderCatalog.ENTRIES` 改为 `ProviderRegistry.list().stream().map(...)`，展示名/描述/默认 URL/模型类型全部取自 `ProviderInfo`，`toFrontend` 只做表示层映射（26 条手写清单删除）；`ProviderCatalogParityTest` 删除（单源后同义反复），新增 `ProviderRegistryCompletenessTest`（`ProviderName` 全集 == `list()`，漏注册/漏进 allProviders 即红）；`check-module-graph` 的错位测试登记随之 10 → 9；`Provider.validateConfig` 登记 `known-gaps.md` 第 19 条并在接口注释留指针（首次写法用了 § 编号，被迁移代号守卫拦下，已改为条目名） | **43 守卫全绿** · 目录金片 `model-providers*.json` 字节一致 · build 1m44s / **5026 / 0 / 4** |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

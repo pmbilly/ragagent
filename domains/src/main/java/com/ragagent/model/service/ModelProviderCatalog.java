@@ -1,17 +1,24 @@
 package com.ragagent.model.service;
 
+import com.ragagent.llm.provider.ModelType;
+import com.ragagent.llm.provider.ProviderInfo;
+import com.ragagent.llm.provider.ProviderRegistry;
 import com.ragagent.model.dto.ModelProviderDto;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.springframework.stereotype.Component;
 
 /**
- * 模型厂商注册表（静态数据 + 查询）。
+ * 模型厂商 HTTP 目录。
  *
- * 静态数据由 golden（contracts/model-providers.json）生成，
- * 顺序 = 声明序；defaultUrls/modelTypes 输出形态（前端字符串）与 golden 字节一致。
- * 消费面：List / ListByModelType / DetectProvider / ValidateConfig。
+ * <p><b>单一数据源</b>：厂商的展示名、描述、默认 URL 与模型类型只写在 {@code model-runtime}
+ * 的 Provider 实现里，本类从 {@link ProviderRegistry#list()} 取元数据，只做表示层转换
+ * （枚举字面量 → 前端字符串）。新增厂商不再需要改这里。</p>
+ *
+ * <p>对外字节由金片 {@code contracts/model-providers.json} 钉住：顺序 = 注册表声明序，
+ * {@code defaultUrls} 经 {@link TreeMap} 输出为字母序。</p>
  */
 @Component
 public class ModelProviderCatalog {
@@ -44,139 +51,21 @@ public class ModelProviderCatalog {
                                  Map<String, String> defaultUrls, List<String> modelTypes,
                                  List<String> backendTypes) {}
 
-    // @formatter:off
-    private static final List<ProviderEntry> ENTRIES = List.of(
-            new ProviderEntry("generic", "自定义 (OpenAI兼容接口)", "Generic API endpoint (OpenAI-compatible)",
-                    Map.of(),
-                    List.of("chat", "embedding", "rerank", "vllm", "asr"),
-                    List.of("KnowledgeQA", "Embedding", "Rerank", "VLLM", "ASR")),
+    private static final List<ProviderEntry> ENTRIES = ProviderRegistry.list().stream()
+            .map(ModelProviderCatalog::toEntry)
+            .toList();
 
-            new ProviderEntry("aliyun", "阿里云 DashScope", "qwen-plus, tongyi-embedding-vision-plus, qwen3-rerank, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://dashscope.aliyuncs.com/compatible-mode/v1"), Map.entry("embedding", "https://dashscope.aliyuncs.com/compatible-mode/v1"), Map.entry("rerank", "https://dashscope.aliyuncs.com/api/v1/services/rerank/text-rerank/text-rerank"), Map.entry("vllm", "https://dashscope.aliyuncs.com/compatible-mode/v1")),
-                    List.of("chat", "embedding", "rerank", "vllm"),
-                    List.of("KnowledgeQA", "Embedding", "Rerank", "VLLM")),
-
-            new ProviderEntry("zhipu", "智谱 BigModel", "glm-4.7, embedding-3, rerank, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://open.bigmodel.cn/api/paas/v4"), Map.entry("embedding", "https://open.bigmodel.cn/api/paas/v4"), Map.entry("rerank", "https://open.bigmodel.cn/api/paas/v4/rerank"), Map.entry("vllm", "https://open.bigmodel.cn/api/paas/v4")),
-                    List.of("chat", "embedding", "rerank", "vllm"),
-                    List.of("KnowledgeQA", "Embedding", "Rerank", "VLLM")),
-
-            new ProviderEntry("volcengine", "火山引擎 Volcengine", "doubao-1-5-pro-32k-250115, doubao-embedding-vision-250615, doubao-seed-rerank, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://ark.cn-beijing.volces.com/api/v3"), Map.entry("embedding", "https://ark.cn-beijing.volces.com/api/v3/embeddings/multimodal"), Map.entry("rerank", "https://api-knowledgebase.mlp.cn-beijing.volces.com"), Map.entry("vllm", "https://ark.cn-beijing.volces.com/api/v3")),
-                    List.of("chat", "embedding", "rerank", "vllm"),
-                    List.of("KnowledgeQA", "Embedding", "Rerank", "VLLM")),
-
-            new ProviderEntry("hunyuan", "腾讯混元 Hunyuan", "hunyuan-pro, hunyuan-standard, hunyuan-embedding, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://api.hunyuan.cloud.tencent.com/v1"), Map.entry("embedding", "https://api.hunyuan.cloud.tencent.com/v1")),
-                    List.of("chat", "embedding"),
-                    List.of("KnowledgeQA", "Embedding")),
-
-            new ProviderEntry("siliconflow", "硅基流动 SiliconFlow", "deepseek-ai/DeepSeek-V3.1, etc.",
-                    Map.ofEntries(Map.entry("asr", "https://api.siliconflow.cn/v1"), Map.entry("chat", "https://api.siliconflow.cn/v1"), Map.entry("embedding", "https://api.siliconflow.cn/v1"), Map.entry("rerank", "https://api.siliconflow.cn/v1"), Map.entry("vllm", "https://api.siliconflow.cn/v1")),
-                    List.of("chat", "embedding", "rerank", "vllm", "asr"),
-                    List.of("KnowledgeQA", "Embedding", "Rerank", "VLLM", "ASR")),
-
-            new ProviderEntry("deepseek", "DeepSeek", "deepseek-chat, deepseek-reasoner, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://api.deepseek.com/v1")),
-                    List.of("chat"),
-                    List.of("KnowledgeQA")),
-
-            new ProviderEntry("minimax", "MiniMax", "MiniMax-M3, MiniMax-M2.7, MiniMax-M2.7-highspeed, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://api.minimaxi.com/v1")),
-                    List.of("chat"),
-                    List.of("KnowledgeQA")),
-
-            new ProviderEntry("moonshot", "月之暗面 Moonshot", "kimi-k2-turbo-preview, moonshot-v1-8k-vision-preview, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://api.moonshot.ai/v1"), Map.entry("vllm", "https://api.moonshot.ai/v1")),
-                    List.of("chat", "vllm"),
-                    List.of("KnowledgeQA", "VLLM")),
-
-            new ProviderEntry("modelscope", "魔搭 ModelScope", "Qwen/Qwen3-8B, Qwen/Qwen3-Embedding-8B, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://api-inference.modelscope.cn/v1"), Map.entry("embedding", "https://api-inference.modelscope.cn/v1"), Map.entry("vllm", "https://api-inference.modelscope.cn/v1")),
-                    List.of("chat", "embedding", "vllm"),
-                    List.of("KnowledgeQA", "Embedding", "VLLM")),
-
-            new ProviderEntry("qianfan", "百度千帆 Baidu Cloud", "ernie-5.0-thinking-preview, embedding-v1, bce-reranker-base, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://qianfan.baidubce.com/v2"), Map.entry("embedding", "https://qianfan.baidubce.com/v2"), Map.entry("rerank", "https://qianfan.baidubce.com/v2"), Map.entry("vllm", "https://qianfan.baidubce.com/v2")),
-                    List.of("chat", "embedding", "rerank", "vllm"),
-                    List.of("KnowledgeQA", "Embedding", "Rerank", "VLLM")),
-
-            new ProviderEntry("qiniu", "七牛云 Qiniu", "deepseek/deepseek-v3.2-251201, z-ai/glm-4.7, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://api.qnaigc.com/v1")),
-                    List.of("chat"),
-                    List.of("KnowledgeQA")),
-
-            new ProviderEntry("openai", "OpenAI", "gpt-5.2, gpt-5-mini, etc.",
-                    Map.ofEntries(Map.entry("asr", "https://api.openai.com/v1"), Map.entry("chat", "https://api.openai.com/v1"), Map.entry("embedding", "https://api.openai.com/v1"), Map.entry("rerank", "https://api.openai.com/v1"), Map.entry("vllm", "https://api.openai.com/v1")),
-                    List.of("chat", "embedding", "rerank", "vllm", "asr"),
-                    List.of("KnowledgeQA", "Embedding", "Rerank", "VLLM", "ASR")),
-
-            new ProviderEntry("anthropic", "Anthropic", "Claude models via native Anthropic Messages API",
-                    Map.ofEntries(Map.entry("chat", "https://api.anthropic.com/v1")),
-                    List.of("chat"),
-                    List.of("KnowledgeQA")),
-
-            new ProviderEntry("gemini", "Google Gemini", "gemini-3-flash-preview, gemini-2.5-pro, gemini-embedding-2, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://generativelanguage.googleapis.com/v1beta/openai"), Map.entry("embedding", "https://generativelanguage.googleapis.com/v1beta")),
-                    List.of("chat", "embedding"),
-                    List.of("KnowledgeQA", "Embedding")),
-
-            new ProviderEntry("openrouter", "OpenRouter", "openai/gpt-5.2-chat, google/gemini-3-flash-preview, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://openrouter.ai/api/v1"), Map.entry("embedding", "https://openrouter.ai/api/v1"), Map.entry("vllm", "https://openrouter.ai/api/v1")),
-                    List.of("chat", "embedding", "vllm"),
-                    List.of("KnowledgeQA", "Embedding", "VLLM")),
-
-            new ProviderEntry("litellm", "LiteLLM", "Self-hosted LiteLLM proxy: one OpenAI-compatible endpoint to 100+ providers.",
-                    Map.ofEntries(Map.entry("chat", "http://your_litellm_proxy/v1"), Map.entry("embedding", "http://your_litellm_proxy/v1"), Map.entry("vllm", "http://your_litellm_proxy/v1")),
-                    List.of("chat", "embedding", "vllm"),
-                    List.of("KnowledgeQA", "Embedding", "VLLM")),
-
-            new ProviderEntry("requesty", "Requesty", "openai/gpt-4o-mini, anthropic/claude-sonnet-4-5, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://router.requesty.ai/v1"), Map.entry("embedding", "https://router.requesty.ai/v1"), Map.entry("vllm", "https://router.requesty.ai/v1")),
-                    List.of("chat", "embedding", "vllm"),
-                    List.of("KnowledgeQA", "Embedding", "VLLM")),
-
-            new ProviderEntry("jina", "Jina", "jina-clip-v1, jina-embeddings-v2-base-zh, etc.",
-                    Map.ofEntries(Map.entry("embedding", "https://api.jina.ai/v1"), Map.entry("rerank", "https://api.jina.ai/v1")),
-                    List.of("embedding", "rerank"),
-                    List.of("Embedding", "Rerank")),
-
-            new ProviderEntry("mimo", "小米 MiMo", "mimo-v2-flash",
-                    Map.ofEntries(Map.entry("chat", "https://api.xiaomimimo.com/v1")),
-                    List.of("chat"),
-                    List.of("KnowledgeQA")),
-
-            new ProviderEntry("longcat", "LongCat AI", "LongCat-Flash-Chat, LongCat-Flash-Thinking, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://api.longcat.chat/openai/v1")),
-                    List.of("chat"),
-                    List.of("KnowledgeQA")),
-
-            new ProviderEntry("lkeap", "腾讯云 LKEAP", "DeepSeek-R1, DeepSeek-V3, lke-reranker-base 等",
-                    Map.ofEntries(Map.entry("chat", "https://api.lkeap.cloud.tencent.com/v1"), Map.entry("rerank", "https://lkeap.tencentcloudapi.com")),
-                    List.of("chat", "rerank"),
-                    List.of("KnowledgeQA", "Rerank")),
-
-            new ProviderEntry("gpustack", "GPUStack", "Choose your deployed model on GPUStack",
-                    Map.ofEntries(Map.entry("asr", "http://your_gpustack_server_url/v1-openai"), Map.entry("chat", "http://your_gpustack_server_url/v1-openai"), Map.entry("embedding", "http://your_gpustack_server_url/v1-openai"), Map.entry("rerank", "http://your_gpustack_server_url/v1"), Map.entry("vllm", "http://your_gpustack_server_url/v1-openai")),
-                    List.of("chat", "embedding", "rerank", "vllm", "asr"),
-                    List.of("KnowledgeQA", "Embedding", "Rerank", "VLLM", "ASR")),
-
-            new ProviderEntry("nvidia", "NVIDIA", "deepseek-ai-deepseek-v3_1, nv-embed-v1, rerank-qa-mistral-4b, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://integrate.api.nvidia.com/v1"), Map.entry("embedding", "https://integrate.api.nvidia.com/v1"), Map.entry("rerank", "https://ai.api.nvidia.com/v1/retrieval/nvidia/reranking"), Map.entry("vllm", "https://integrate.api.nvidia.com/v1")),
-                    List.of("chat", "embedding", "rerank", "vllm"),
-                    List.of("KnowledgeQA", "Embedding", "Rerank", "VLLM")),
-
-            new ProviderEntry("novita", "Novita AI", "moonshotai/kimi-k2.5, zai-org/glm-5, minimax/minimax-m2.7, qwen/qwen3-embedding-0.6b, etc.",
-                    Map.ofEntries(Map.entry("chat", "https://api.novita.ai/openai/v1"), Map.entry("embedding", "https://api.novita.ai/openai/v1"), Map.entry("vllm", "https://api.novita.ai/openai/v1")),
-                    List.of("chat", "embedding", "vllm"),
-                    List.of("KnowledgeQA", "Embedding", "VLLM")),
-
-            new ProviderEntry("azure_openai", "Azure OpenAI", "gpt-4o, gpt-4, text-embedding-ada-002, etc.",
-                    Map.ofEntries(Map.entry("asr", "https://{resource}.openai.azure.com"), Map.entry("chat", "https://{resource}.openai.azure.com"), Map.entry("embedding", "https://{resource}.openai.azure.com"), Map.entry("rerank", "https://{resource}.openai.azure.com"), Map.entry("vllm", "https://{resource}.openai.azure.com")),
-                    List.of("chat", "embedding", "vllm", "asr"),
-                    List.of("KnowledgeQA", "Embedding", "VLLM", "ASR"))
-    );
-    // @formatter:on
+    private static ProviderEntry toEntry(ProviderInfo info) {
+        Map<String, String> urls = new LinkedHashMap<>();
+        info.defaultUrls().forEach((type, url) -> urls.put(toFrontend(type.value()), url));
+        return new ProviderEntry(
+                info.name().value(),
+                info.displayName(),
+                info.description(),
+                urls,
+                info.modelTypes().stream().map(t -> toFrontend(t.value())).toList(),
+                info.modelTypes().stream().map(ModelType::value).toList());
+    }
 
     /** 全量（注册表顺序）。 */
     public List<ModelProviderDto> list() {

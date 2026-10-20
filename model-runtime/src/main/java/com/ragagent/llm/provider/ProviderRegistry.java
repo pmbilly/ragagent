@@ -9,11 +9,12 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 服务商注册表 + DetectProvider。
  *
- * ⚠️ 与 com.ragagent.model.service.ModelProviderCatalog 不是一回事：那个是模型模块的 HTTP 目录
- * 响应（golden 数据 + 前端字符串映射），本类供运行时路由与校验使用。
+ * HTTP 目录（com.ragagent.model.service.ModelProviderCatalog）由 {@link #list()} 生成，
+ * 展示名/描述/默认 URL/模型类型都只写在各 Provider 的 {@link ProviderInfo} 里。
  *
- * 注册由本类静态块按 {@link #allProviders()} 的顺序显式完成
- * （新增厂商时两处都要加：本静态块 + {@link #allProviders()}）。
+ * <p>注册由本类静态块按 {@link #allProviders()} 的顺序显式完成
+ * （新增厂商：ProviderName 加枚举 + Provider 实现 + 本静态块一行 + {@link #allProviders()} 一行；
+ * 目录层无需改动，完整性由 {@code ProviderRegistryCompletenessTest} 与目录金片双重看守）。</p>
  * 并发访问用 {@link ConcurrentHashMap}。
  */
 public final class ProviderRegistry {

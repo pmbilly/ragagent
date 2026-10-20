@@ -81,8 +81,6 @@ MISPLACED_TEST_ALLOW: dict[str, str] = {
         "wire A/B 使用 domains 的 Model/ModelRowViews；迁 model-runtime 会形成 test→domains 反向边",
     "domains/src/test/java/com/ragagent/rerank/RerankWireTest.java":
         "同上：wire A/B 使用 domains 的 Model/ModelRowViews",
-    "domains/src/test/java/com/ragagent/llm/provider/ProviderCatalogParityTest.java":
-        "provider 目录测试使用 domains 的 ModelProviderDto；迁 model-runtime 会形成反向边",
     "domains/src/test/java/com/ragagent/llm/provider/ProviderRegistryTest.java":
         "provider 目录测试使用 domains 的 Model/ModelRowViews；迁 model-runtime 会形成反向边",
     "domains/src/test/java/com/ragagent/platform/access/TracingCarrierNestingTest.java":

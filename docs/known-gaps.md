@@ -119,3 +119,10 @@
 - **影响**：Wiki 页面内容不写入 `chunks` 表，不参与常规 RAG 检索（走 Wiki 专用检索）。
 - **替代**：需要参与 RAG 的内容请走知识库文件；Wiki 检索走 `/api/v1/knowledgebase/{kbId}/wiki` 接口。
 - **涉及**：`WikiChunkCleaner`、`WikiIngestService`。
+
+## 19. `Provider.validateConfig()`
+
+- **状态**：设计取舍——SPI 保留，当前**未接线**（只有测试调用）。
+- **影响**：保存模型配置时不做厂商侧校验；缺 key / 缺模型名只在实际调用时以厂商错误暴露。
+- **替代**：`ModelService` 的字段级校验在保存路径（apiKey / model 非空）；厂商错误在首次调用返回。
+- **涉及**：`Provider`（26 个实现）、`ProviderValidationTest`。
