@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-353 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+354 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -222,7 +222,7 @@
 | `:domains` | `com.ragagent.session.assembly` | 会话侧装配：问答管线注册（QaWiring）与跨域协作件的接线点。 |
 | `:domains` | `com.ragagent.session.attachment` | 会话附件：临时文档的落盘、解析、提示词渲染与生命周期。 |
 | `:domains` | `com.ragagent.session.controller` | session 域控制器的 HTTP 端点（协议适配层）。 |
-| `:domains` | `com.ragagent.session.controller.sse` | session 的 SSE 传输面（由 session.sse 迁入 controller.sse，对齐方案）： SseContract（帧契约）、SseFrameWriter（帧写出）、Stream |
+| `:domains` | `com.ragagent.session.controller.sse` | 会话 · SSE 传输面：SseContract（头部契约）与 SseFrameWriter （Servlet 直写 + 帧组装）。 |
 | `:domains` | `com.ragagent.session.conversation` | 会话与消息生命周期：会话/消息读写、消息检索、停止会话与 SSE 流桥 （AgentStreamBridge / AgentStreamEmitter）。 |
 | `:domains` | `com.ragagent.session.domain` | 会话域实体（留存面；已切出三簇：conversation/（会话与分页）、 document/（临时文档）、message/（消息族 + artifact 版本化））。 |
 | `:domains` | `com.ragagent.session.domain.conversation` | 会话实体面（由 session.domain 切出，对齐方案）： Session 及其列表/分页/状态（SessionListItem / SessionListQuery / SessionPage |
@@ -238,6 +238,7 @@
 | `:domains` | `com.ragagent.session.repository` | 仓储门面层：把 mapper 的原子操作组合成领域可用的读写契约，并集中承载软删、全字段 UPDATE 与 PG/H2 方言分支。 |
 | `:domains` | `com.ragagent.session.runtime` | 会话运行面：模型观测装饰入口与 span 门面。 |
 | `:domains` | `com.ragagent.session.service` | 会话 · 编排核心：知识/Agent 两条问答服务、QA 上下文解析（ChatManageFactory / QaSupport）、Agent 工具后端与编排协作件。 |
+| `:domains` | `com.ragagent.session.service.sse` | 会话 · SSE 组装（传输无关）：事件 → 响应体（StreamResponseBuilder）、 重写与写出（StreamEventEmitter）、帧写出端口（SseFrameSink）。 |
 | `:domains` | `com.ragagent.session.service.suggestion` | 消息建议面（由 session.service 切出，对齐方案 的 service.suggestion/）： MessageSuggestionService（建议生成的编排与落库）与 Messag |
 | `:domains` | `com.ragagent.session.support` | 会话 · 支撑：MessageReferenceRewriter / PipelineViews。 |
 | `:domains` | `com.ragagent.storage` | 存储后端域：存储后端配置与凭据（对外 /api/v1/storage-backends）与文件服务 （传输、解析、文件解析器）。 |

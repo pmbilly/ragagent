@@ -21,9 +21,6 @@ import com.ragagent.platform.stream.LiveRunExistsException;
 import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
-import com.ragagent.session.controller.sse.SseContract;
-import com.ragagent.session.controller.sse.SseFrameWriter;
-import com.ragagent.session.controller.sse.StreamEventEmitter;
 import com.ragagent.session.conversation.AgentStreamBridge;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionService;
@@ -33,6 +30,8 @@ import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.QaSupport.SseStreamContext;
 import com.ragagent.session.service.SteerSinkBridge;
 import com.ragagent.session.service.TurnLifecycle;
+import com.ragagent.session.service.sse.SseFrameSink;
+import com.ragagent.session.service.sse.StreamEventEmitter;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -61,7 +60,7 @@ public final class QaSseOrchestrator {
     private final StreamEventEmitter emitter;
     private final SessionService sessionService;
     private final MessageService messageService;
-    private final SseFrameWriter sseFrameWriter;
+    private final SseFrameSink sseFrameWriter;
     private final QaTurnFinalizer turnFinalizer;
 
     /** 每轮一个独立总线（生命周期随轮次）；经工厂端口创建，不 new 实现类。 */
@@ -70,7 +69,7 @@ public final class QaSseOrchestrator {
     /** 单次 SSE 推送连接的最长存活时间；与 stop watcher 的 2 小时一致。 */
     private static final long MAX_STREAM_DURATION_MILLIS = 2 * 60 * 60 * 1000L;
 
-    public QaSseOrchestrator(StreamManager streamManager, StreamEventEmitter emitter, SessionService sessionService, MessageService messageService, SseFrameWriter sseFrameWriter, QaTurnFinalizer turnFinalizer, EventBusFactory eventBusFactory) {
+    public QaSseOrchestrator(StreamManager streamManager, StreamEventEmitter emitter, SessionService sessionService, MessageService messageService, SseFrameSink sseFrameWriter, QaTurnFinalizer turnFinalizer, EventBusFactory eventBusFactory) {
         this.streamManager = streamManager;
         this.emitter = emitter;
         this.sessionService = sessionService;
@@ -330,7 +329,7 @@ public final class QaSseOrchestrator {
                         }
                     }
                 }
-                SseContract.sendCompletionEvent(sink, requestId);
+                // 完成信号由 complete 事件标志（SseContract 的完成方法为空操作）
                 return;
             }
         }

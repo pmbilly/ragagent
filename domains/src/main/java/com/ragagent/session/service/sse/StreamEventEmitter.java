@@ -1,4 +1,4 @@
-package com.ragagent.session.controller.sse;
+package com.ragagent.session.service.sse;
 
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  *       <td>终止型事件先冲掉扣留尾巴，再写一帧</td></tr>
  *   <tr><td>{@link #flushHeldStreamContent}</td>
  *       <td>把扣留缓冲里剩下的尾巴作为**独立事件**补发</td></tr>
- *   <tr><td>{@link SseFrameWriter#write}</td>
+ *   <tr><td>{@link SseFrameSink#write}</td>
  *       <td>真正的字节写出（{@code event:message\ndata:…\n\n}）</td></tr>
  * </table>
  *
@@ -56,9 +56,9 @@ public class StreamEventEmitter {
     /** 扣留键的分隔符（NUL，正文里不可能出现）。 */
     private static final char HOLDBACK_KEY_SEPARATOR = '\0';
 
-    private final SseFrameWriter frameWriter;
+    private final SseFrameSink frameWriter;
 
-    public StreamEventEmitter(SseFrameWriter frameWriter) {
+    public StreamEventEmitter(SseFrameSink frameWriter) {
         this.frameWriter = frameWriter;
     }
 

@@ -1,4 +1,4 @@
-package com.ragagent.session.controller.sse;
+package com.ragagent.session.service.sse;
 
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;

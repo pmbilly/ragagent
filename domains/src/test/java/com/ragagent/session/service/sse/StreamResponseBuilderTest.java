@@ -1,4 +1,4 @@
-package com.ragagent.session.controller.sse;
+package com.ragagent.session.service.sse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -8,6 +8,7 @@ import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.controller.sse.SseContract;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

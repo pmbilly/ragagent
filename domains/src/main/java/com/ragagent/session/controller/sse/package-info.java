@@ -1,11 +1,10 @@
 /**
- * session 的 SSE 传输面（由 {@code session.sse} 迁入 {@code controller.sse}，对齐方案）：
- * {@code SseContract}（帧契约）、{@code SseFrameWriter}（帧写出）、{@code StreamEventEmitter}
- * （事件 → SSE 帧）、{@code StreamResponseBuilder}（响应组装 + Redis 回放引用重建）。
+ * 会话 · SSE 传输面：{@code SseContract}（头部契约）与 {@code SseFrameWriter}
+ * （Servlet 直写 + 帧组装）。
  *
- * <p><b>切出/迁入依据</b>：四类对 session 域内包**零依赖**（出边只到 {@code common}/{@code llm}/
- * {@code storage}/{@code platform}），消费者是控制器（{@code SessionStreamController} /
- * {@code KnowledgeQaController}）与 {@code qa} 编排 ⇒ 迁入后只有 {@code controller → controller.sse}
- * 与 {@code qa → controller.sse} 的单向边，包级 SCC 不扩大。</p>
+ * <p>传输无关的事件→响应组装在 {@code session.service.sse}
+ * （{@code StreamEventEmitter} / {@code StreamResponseBuilder} / {@code SseFrameSink}）；
+ * 本包只保留与 Servlet 强绑定的两端，供控制器使用。编排层依赖
+ * {@code SseFrameSink} 端口，不反向依赖本包。</p>
  */
 package com.ragagent.session.controller.sse;

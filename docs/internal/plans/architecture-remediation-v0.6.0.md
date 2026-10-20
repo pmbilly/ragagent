@@ -134,7 +134,7 @@ boot（组合根，唯一装配点）
 | 批 | 内容 | 估时 | 验收 |
 |---|---|---|---|
 | **H0 判据先行** ✅ | R1~R3 三条守卫（各配红态探针）+ `business-capability-map.md`（业务链路 → 模块/包/类，一页纸）；R4/R5 的登记表随 H1/H4/H5 落地 | ✅ 2026-10-20 | **42 守卫绿**；新增 Port / 形状 / 平台业务件即红；基线 22 + 16 + 0 条 |
-| **H1 问答-状态机** | **H1a ✅**：`TurnLifecycle`（STREAMING→FINALIZING→DONE/FAILED）作终态单赢家；收尾闸门与 SSE/续传观察者口径统一。**H1b 待做**：把 stop watcher + agent 轮询 + 3 把锁收进状态机；`QaSseOrchestrator` 去 `controller.sse` 反向依赖 | H1a ✅ 2026-10-20 | 终态不可逆；观察者口径 1 处 |
+| **H1 问答-状态机** | **H1a ✅**：`TurnLifecycle` 作终态单赢家；**H1b-1 ✅**：`StreamEventEmitter`/`StreamResponseBuilder` 移 `service.sse`，`SseFrameSink` 端口，编排层不再依赖 `controller`。**H1b-2 待做**：stop watcher + 轮询 + 3 把锁收进状态机 | H1a/H1b-1 ✅ 2026-10-20 | 终态不可逆；编排层无 controller 反向依赖 |
 | **H2a 问答-运行时段** | 抽 `TurnRuntime`（`eventBus`/`messageId`/`userMessageId`）；`ChatManage` 不再持有运行时字段 | 1-1.5 人日 | `cloneChatManage` 少复制 3 字段；会话测试全绿 |
 | **H2b 问答-请求段** | 建 `TurnInputView`（41 字段只读接口），`ChatManage implements`；插件改收视图；`QaRequestContext` 34 字段随之收口 | 1.5-2 人日 | 插件包内 `ChatManage` 引用只许减；契约测试全绿 |
 | **H2c 问答-状态段** | 15 状态字段按 5 组暴露（QueryPlan / SearchOutcome / RerankOutcome / MergedContext / Answer）；删 `ChatManage` | 1.5-2 人日 | `cloneChatManage` 消失；36 个消费类 → ≤10 |

@@ -2,6 +2,7 @@ package com.ragagent.session.controller.sse;
 
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.session.SseSink;
+import com.ragagent.session.service.sse.SseFrameSink;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -41,7 +42,7 @@ import tools.jackson.databind.ObjectMapper;
  * </ol>
  */
 @Component
-public class SseFrameWriter {
+public class SseFrameWriter implements SseFrameSink {
 
     /**
      * SSE 渲染最终写出的 Content-Type（渲染器无条件覆盖，见类注释）。
@@ -78,6 +79,7 @@ public class SseFrameWriter {
     }
 
     /** 组帧（序列化 + {@code event:}/{@code data:} 行）——写出口无关（servlet 直写与 SseSink 共用）。 */
+    @Override
     public String frameOf(StreamResponse payload) throws IOException {
         String json;
         try {
@@ -93,6 +95,7 @@ public class SseFrameWriter {
     }
 
     /** 写一帧到 {@link SseSink}（embed/QA 会话流的出口）。 */
+    @Override
     public void write(SseSink sink, StreamResponse payload) throws IOException {
         sink.writeFrame(frameOf(payload));
     }
