@@ -1,0 +1,135 @@
+{
+  "note": ">150 行方法基线：只许减；新增必须人工登记理由；--write 不新增条目。",
+  "threshold": 150,
+  "growthSlack": 10,
+  "methods": {
+    "agent-engine/src/main/java/com/ragagent/agent/ActPhase.java#runToolCallInner": {
+      "lines": 153,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "agent-engine/src/main/java/com/ragagent/agent/ReActIteration.java#runReActIterationBody": {
+      "lines": 174,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "agent-engine/src/main/java/com/ragagent/agent/ThinkPhase.java#streamLLMToEventBus": {
+      "lines": 151,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/agenttools/knowledge/GetDocumentInfoTool.java#execute": {
+      "lines": 196,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/agenttools/knowledge/KnowledgeSearchOutputFormatter.java#formatOutput": {
+      "lines": 227,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/agenttools/knowledge/ListKnowledgeChunksTool.java#execute": {
+      "lines": 151,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/agenttools/knowledge/QueryKnowledgeGraphTool.java#execute": {
+      "lines": 240,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/agenttools/sql/SqlSelectDeepChecker.java#deepCheck": {
+      "lines": 275,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/agenttools/wiki/WikiReadSourceDocTool.java#execute": {
+      "lines": 246,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/agenttools/wiki/WikiWritePageTool.java#execute": {
+      "lines": 151,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/datasource/connector/notion/NotionMarkdown.java#renderBlock": {
+      "lines": 210,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/datasource/connector/yuque/YuqueConnector.java#walk": {
+      "lines": 182,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/datasource/service/DataSourceSyncExecutor.java#handle": {
+      "lines": 225,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/initialization/service/InitializationConfigService.java#configResponse": {
+      "lines": 157,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/knowledge/service/faq/FaqEntryCommandService.java#updateEntryFieldsBatch": {
+      "lines": 153,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/knowledge/service/faq/FaqValidateOps.java#validateAppendMode": {
+      "lines": 239,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/mcp/controller/McpServiceCrudOps.java#updateMCPService": {
+      "lines": 170,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/mcp/service/McpServiceManagement.java#updateMCPService": {
+      "lines": 165,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/mcp/tool/McpDiscoverTool.java#execute": {
+      "lines": 151,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/mcp/tool/McpInputSchemaValidator.java#validate": {
+      "lines": 209,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/memory/service/MemoryRecallOps.java#recall": {
+      "lines": 152,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/session/controller/SessionStreamController.java#continueStream": {
+      "lines": 177,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/session/rag/plugin/MergeParentOps.java#expandShortContextWithNeighbors": {
+      "lines": 223,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/session/rag/plugin/MergeParentOps.java#resolveParentChunks": {
+      "lines": 169,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/session/rag/plugin/PluginIntoChatMessage.java#onEvent": {
+      "lines": 174,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/session/rag/plugin/PluginRerank.java#onEvent": {
+      "lines": 212,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/session/service/QaSearchTargets.java#buildSearchTargets": {
+      "lines": 157,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/wiki/service/ingest/WikiIngestFinalizePhase.java#runFinalize": {
+      "lines": 192,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/wiki/service/ingest/WikiIngestReducePhase.java#reduceSlugUpdatesBody": {
+      "lines": 309,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/wiki/service/ingest/WikiIngestRunSupport.java#runIngestPhases": {
+      "lines": 372,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/wiki/service/ingest/graph/WikiGraphCalculator.java#compute": {
+      "lines": 153,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "domains/src/main/java/com/ragagent/wiki/service/page/WikiLintService.java#runLint": {
+      "lines": 253,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    }
+  }
+}

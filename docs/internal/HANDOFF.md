@@ -18,7 +18,7 @@
 
 - **终态（方案 §5.1）**：7 个 Gradle 模块 —— contract / platform / agent-engine / retrieval-engine / model-runtime / domains / boot；单进程分层单体；跨模块只经 contract。
 - **现状（2026-10-17）**：**7 模块** —— `:contract` · `:platform` · `:model-runtime` · `:retrieval-engine` · `:agent-engine` · `:domains` · `:boot`。`:common` 与 `:engine` 均已解散。
-- **当前阶段（v0.6.x）**：v0.5.0 可读性专项收尾（L1~L22，余 L11）+ **v0.6.0 业务内聚专项（H 系列，已立项）** ⇒ 计划见 §5.0 / §5.0b。
+- **当前阶段（v0.6.x）**：v0.5.0 可读性专项收尾（L1~L22，余 L11）+ v0.6.0 业务内聚专项（H 系列）+ 并行 K/L 专项 + **M 系列「后端代码质量收口」（待启动）** ⇒ 计划见 §5.0 / §5.0b / §5.0c~e。
 
 ## 1. 仓库身份与分支
 
@@ -144,6 +144,32 @@
 | **L2** | embedding 单路径：L2a `EmbeddingVectors` 统一校验（条数/空向量/维度/index 归位）；L2b 删 `EmbedderClient`、pg 路径改走 `ModelRuntime`、`EmbeddingPort` 由运行时适配器实现 | ✅ 2026-10-20 |
 
 **否决项**：RBAC 双表不合并（主语/语法/语义都不同）；工具装配暂不端口化（请求级构造 + 三个分发 switch，先加守卫）。
+
+### 5.0e 并行专项：M 系列「后端代码质量收口」（v0.6.x，待启动）
+
+> 方案：`docs/internal/plans/code-quality-remediation-m-series.md`（含对 2026-10-20 后端代码质量评估 03 的核实：5 处数字失真、2 条建议已过期或不成立）。
+> 定位：不追 300 行硬指标；只收五类欠账——并发正确性（M2）、重复实现（M3）、事务边界（M4）、Memory 内聚（M5）、7 个大文件（M6）。
+
+| 批 | 内容 | 状态 |
+|---|---|---|
+| **M0** | 核实 03 报告：大文件/事务/SHA/软删/N+1 实测；产出 M 系列方案 | ✅ 2026-10-20 |
+| **M1** | 规模棘轮：方法 >150 行基线 32（新增即红、存量只减，+10 行 bugfix 余量）+ 红态探针；**不设 300 行硬门**（沿用 600/30） | ✅ 2026-10-20 |
+| **M2a** | 钉钉：流表 key 加 channelId、token 单飞 + 负 TTL；拆解析/API/卡片流 | 待启动 |
+| **M2b** | 会话批量删除批量化 + 知识检索 KB 缓存（去逐条查/重复查） | 待启动 |
+| **M3a** | `platform.security.Hashes`：SHA-256 19 处替换（contract 1 处登记为例外） | 待启动 |
+| **M3b** | `platform.audit.ActivityAuditRecorder`：合并 3 份 `recordKbActivity` | 待启动 |
+| **M3c** | `LogSanitizer` 替换 4 份 `sanitizeForLog`；`trimUnicodeWhitespace` 入 `platform.text` | 待启动 |
+| **M4a** | `UserService.register` 改 `@Transactional` + 失败注入测试；删外层手写补偿 | 待启动 |
+| **M4b** | 事务边界约定（`mechanisms.md`）+ mcp/storage/session/im/datasource 多写审计 | 待启动 |
+| **M5** | Memory：`MemoryScopeGate` 单次求值 + 写管线/模型解析提取 + 孤儿注释；保留门面委托 | 待启动 |
+| **M6a** | FaqEntryCommandService：projector / duplicate checker / batch updater；4 处尾块归一 | 待启动 |
+| **M6b** | UserService：`LoginTenantResolver` + `UserRegistrationService`；保留 `generateTokensFor(Object)` | 待启动 |
+| **M6c** | StorageFileResolver：删重复 provider 校验、提 backend resolver / config projector / env provisioner / resource catalog service | 待启动 |
+| **M6d** | McpCatalog：`McpJsonCodec` / `McpToolNaming`；保留提示词常量与 DTO 巢居 | 待启动 |
+| **M6e** | KnowledgeService：`KnowledgeTagBatchService` + 注释卫生；保留门面与事务包装 | 待启动 |
+| **M7** | 卫生：Service/Ops/Support 判据、api/ 包说明；响应信封登记待拍板 | 待启动 |
+
+**不排期**：M8 响应信封统一（线格式变更，需产品/前端会签）。
 
 ### 5.1 历史批次（v0.3.0 P1~P5 / v0.4.0 R1~R6，全部 ✅）
 
