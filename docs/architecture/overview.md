@@ -32,9 +32,9 @@ graph TD
 
 | 模块 | 职责 | 依赖 | 源码根 |
 |---|---|---|---|
-| `:contract` | 公开 API、SPI、不可变载荷；**纯 JDK，零生产依赖** | 无 | `com.ragagent.contract.*`（23 个子包） |
+| `:contract` | 公开 API、SPI、不可变载荷；**纯 JDK，零生产依赖** | 无 | `com.ragagent.contract.*`（24 个子包） |
 | `:platform` | Web 外壳、错误形态、SSRF、事件总线、SSE 流、追踪、提示词与配置装载 | contract | `com.ragagent.platform.*`（19 个子包） |
-| `:model-runtime` | 27 家 LLM provider、Embedding / Rerank 客户端、模型上下文装配、抽取、Ollama | platform · contract | `com.ragagent.{embedding,llm,modelcontext,modelruntime,rerank}` |
+| `:model-runtime` | 26 家 LLM provider、Embedding / Rerank 客户端、模型上下文装配、抽取、Ollama | platform · contract | `com.ragagent.{embedding,llm,modelcontext,modelruntime,rerank}` |
 | `:retrieval-engine` | 九种向量/检索后端、混合检索融合、重排管线、索引写入 | platform · contract | `com.ragagent.retrieval.*` |
 | `:agent-engine` | ReAct 循环、工具注册表、技能、上下文压缩、预算与转向 | platform · contract · model-runtime | `com.ragagent.agent.*` |
 | `:domains` | 20 个业务域；51 个 HTTP 控制器；持久层 | platform · contract · model-runtime | `com.ragagent.<domain>.*` |

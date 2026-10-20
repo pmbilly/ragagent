@@ -52,7 +52,7 @@
 <details open>
 <summary><b>集成与接入</b></summary>
 
-- **27 家 LLM 提供商**：OpenAI、Anthropic、Gemini、DeepSeek、通义千问（阿里云）、智谱、火山引擎、月之暗面、MiniMax、Ollama 本地部署……统一为同一套模型配置与调用面
+- **26 家 LLM 提供商**：OpenAI、Anthropic、Gemini、DeepSeek、通义千问（阿里云）、智谱、火山引擎、月之暗面、MiniMax、Ollama 本地部署……统一为同一套模型配置与调用面
 - **Embedding / 重排客户端族**：按模型能力自动装配，支持批处理与并发控制
 - **MCP（Model Context Protocol）**：接入外部 MCP 服务、按需发现工具、OAuth 授权，高危工具走人工审批闸门；另附独立交付的 MCP 参考服务
 - **IM 渠道（9 种）**：飞书、企业微信、钉钉、微信、Telegram、Slack、Mattermost、QQ 机器人、云之家 —— 平台验签回调 + 长连接
@@ -88,15 +88,15 @@
 
 | 模块 | 职责 | 依赖 |
 |---|---|---|
-| `:contract` | **契约面**：纯 JDK 的公开 API、SPI 与不可变载荷（agent / knowledge / session / model / retrieval / tool / pipeline / tenant / websearch / vectorstore …）。构建文件不声明任何依赖 —— 契约纯度由编译期保证 | 无 |
+| `:contract` | **契约面**：纯 JDK 的公开 API、SPI 与不可变载荷（agent / knowledge / session / model / retrieval / tool / pipeline / tenant / websearch / vectorstore …）。构建文件的生产依赖块为空（仅测试面有依赖）—— 契约纯度由编译期保证 | 无 |
 | `:platform` | **技术底座**：Web 统一外壳与错误形态、SSRF 防护、事件总线、SSE 流管理、追踪装饰、提示词与配置装载、通用文本/知识工具 | contract |
-| `:model-runtime` | **模型运行时**：27 家 LLM provider 的传输与出站请求体拼装、Embedding / 重排客户端族、模型上下文协议（工具调用与思考块解析）、抽取、Ollama 本地模型管理 | platform · contract |
+| `:model-runtime` | **模型运行时**：26 家 LLM provider 的传输与出站请求体拼装、Embedding / 重排客户端族、模型上下文协议（工具调用与思考块解析）、抽取、Ollama 本地模型管理 | platform · contract |
 | `:retrieval-engine` | **检索引擎**：九种向量/检索后端的适配与注册、混合检索融合、重排管线、索引写入与向量店连通性探测 | platform · contract |
 | `:agent-engine` | **Agent 引擎**：ReAct 执行循环与阶段（think/act/observe/finalize）、工具注册表与工具框架、技能目录与装载、上下文压缩、预算与转向 | platform · contract · model-runtime |
 | `:domains` | **业务域**：20 个业务包（知识库、会话、Wiki、Agent 管理、MCP、IM、数据源、认证（含租户）、审计、审批、记忆、收藏、系统设置……），含 51 个控制器与持久层 | platform · contract · model-runtime |
 | `:boot` | **组合根**：应用入口、全局装配与跨模块 Bean 装配、扫描与打包。只出不进（无任何模块依赖它） | 全部 |
 
-全部模块合计 **51 个 HTTP 控制器**。
+全部模块合计 **51 个业务控制器**（另有 1 个 `/health` 基础设施探针）。
 
 **三条设计原则**
 
@@ -124,7 +124,7 @@ POST（SSE）                                     ← 前端 / 任意 HTTP 客�
 | 数据访问 | MyBatis-Plus + 手写 SQL/仓储门面 · Flyway 迁移（`migrations/versioned/`） |
 | 数据库 | PostgreSQL 17 + pgvector（默认以 ParadeDB 提供检索能力）· Redis 7（事件流、限流、跨实例协调） |
 | 检索引擎 | pgvector · Elasticsearch · OpenSearch · Milvus · Qdrant · Weaviate · 腾讯 VectorDB · Doris · SQLite |
-| 模型接入 | 27 家 LLM 提供商 · Embedding / 重排客户端族 · Ollama 本地模型 |
+| 模型接入 | 26 家 LLM 提供商 · Embedding / 重排客户端族 · Ollama 本地模型 |
 | 文档解析 | 独立 gRPC 服务（proto 随仓库交付，构建期生成本地客户端） |
 | 其它 | 数据分析走 DuckDB JDBC · OTLP 追踪导出 · gRPC / protobuf |
 | 前端 | Vue 3.5 + Vite 7 + TypeScript + Pinia + Vue Router（国际化支持） |
@@ -267,7 +267,7 @@ cd frontend && npm run type-check && npm test
 
 **质量保障**
 
-- **契约金片**：1,349 份逐字节钉死的 HTTP 响应样本 —— 改动响应形状必须显式重录，杜绝"接口悄悄变了"
+- **契约金片**：1,349 份逐字节钉死的 JSON 响应样本，另有 5 份下载/导出类样本（`.body` + `.headers` 成对）—— 改动响应形状必须显式重录，杜绝"接口悄悄变了"
 - **架构规则**：模块依赖矩阵、契约层纯度、禁止裸读环境变量、禁止双装配与分层倒挂等，均由 ArchUnit + 脚本守卫在 CI 强制
 - **测试**：约 5,000 条用例；Redis / 外部驱动等环境相关用例可跳过，但跳过项需登记理由（覆盖的消失是累积性的）
 - **集成测试**：Milvus / Weaviate 等驱动集成测试需真实服务，由环境变量门控、按需触发

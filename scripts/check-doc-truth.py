@@ -13,8 +13,11 @@ README 是新人第一份材料，数字漂了比没有更糟：曾出现"每个
 ## 判据
 
   D1 `七个 Gradle 模块` ↔ `settings.gradle.kts` 的 include 数；
-  D2 `N 个 HTTP 控制器` ↔ `domains` 下 `*Controller.java` 数；
-  D3 `每个包有 package-info.java` ↔ 主码含 java 的包全部存在 package-info。
+  D2 `N 个业务控制器` ↔ 业务控制器数；README 声明的 `/health` 探针数 ↔ 实际探针类数；
+  D3 `每个包有 package-info.java` ↔ 主码含 java 的包全部存在 package-info；
+  D4 `N 份 JSON 响应样本` ↔ 金片目录 `*.json` 数；`M 份下载/导出类样本` ↔ `*.body` 数
+     （一个非 JSON 样本由 `.body` + `.headers` 成对落盘，按文件总数会被重复计数）；
+  D5 `N 家 LLM` ↔ `ProviderRegistry` 静态块注册数（README 多处出现时每处都必须一致）。
 
 锚点消失（文案被改写）同样报红：守卫与文档必须同步演进，否则校验会静默失效。
 """
@@ -37,6 +40,24 @@ def controller_count() -> int:
     return sum(1 for m in MODULES
                for f in (ROOT / m / "src" / "main" / "java").rglob("*Controller.java")
                if f.name != "HealthController.java")
+
+
+def probe_count() -> int:
+    return sum(1 for m in MODULES
+               for _ in (ROOT / m / "src" / "main" / "java").rglob("HealthController.java"))
+
+
+def provider_count() -> int:
+    # 注册数只看静态块；它与 allProviders() 清单的一致性由 ProviderCatalogParityTest 的名单比对兜底
+    text = (ROOT / "model-runtime/src/main/java/com/ragagent/llm/provider/ProviderRegistry.java") \
+        .read_text(encoding="utf-8")
+    return len(re.findall(r"^\s*register\(new \w+Provider\(\)\);", text, re.M))
+
+
+def golden_counts() -> tuple[int, int]:
+    # 样本口径：JSON 一份一个样本；非 JSON 样本由 .body + .headers 成对落盘，只数 .body
+    d = ROOT / "domains/src/testFixtures/resources/contracts"
+    return (len(list(d.glob("*.json"))), len(list(d.glob("*.body"))))
 
 
 def missing_package_info() -> list[str]:
@@ -64,13 +85,41 @@ def main() -> int:
     else:
         problems.append("D1 README 缺少「七个 Gradle 模块」锚点——模块数变化时请同步守卫")
 
-    m = re.search(r"(\d+)\s*个 HTTP 控制器", readme)
+    m = re.search(r"(\d+)\s*个业务控制器", readme)
     if m:
         actual = controller_count()
         if int(m.group(1)) != actual:
-            problems.append(f"D2 README 称 {m.group(1)} 个控制器，实际 {actual}")
+            problems.append(f"D2 README 称 {m.group(1)} 个业务控制器，实际 {actual}")
+        probe = re.search(r"另有\s*(\d+)\s*个\s*`/health`", readme)
+        if not probe:
+            problems.append("D2 README 缺少「另有 N 个 `/health` 探针」锚点")
+        elif int(probe.group(1)) != probe_count():
+            problems.append(f"D2 README 称 {probe.group(1)} 个 /health 探针，实际 {probe_count()}")
     else:
-        problems.append("D2 README 缺少「N 个 HTTP 控制器」锚点")
+        problems.append("D2 README 缺少「N 个业务控制器」锚点")
+
+    g = re.search(r"(\d[\d,]*)\s*份逐字节钉死的 JSON 响应样本", readme)
+    if g:
+        declared = int(g.group(1).replace(",", ""))
+        json_n, body_n = golden_counts()
+        if declared != json_n:
+            problems.append(f"D4 README 称 {declared} 份 JSON 金片，实际 {json_n}")
+        b = re.search(r"另有\s*(\d+)\s*份下载/导出类样本", readme)
+        if not b:
+            problems.append("D4 README 缺少「另有 M 份下载/导出类样本」锚点")
+        elif int(b.group(1)) != body_n:
+            problems.append(f"D4 README 称 {b.group(1)} 份非 JSON 样本，实际 {body_n}")
+    else:
+        problems.append("D4 README 缺少「N 份 JSON 响应样本」锚点")
+
+    llm = re.findall(r"(\d+)\s*家 LLM", readme)
+    if llm:
+        actual = provider_count()
+        for declared in sorted(set(llm)):
+            if int(declared) != actual:
+                problems.append(f"D5 README 称 {declared} 家 LLM，ProviderRegistry 实际注册 {actual}")
+    else:
+        problems.append("D5 README 缺少「N 家 LLM」锚点")
 
     if "每个包有 `package-info.java`" in readme:
         missing = missing_package_info()
@@ -87,7 +136,7 @@ def main() -> int:
         print("  改 README 与改代码必须同一提交；锚点消失也要同步更新本守卫。")
         return 1
 
-    print("✓ 文档事实：模块数 / 控制器数 / package-info 覆盖与 README 一致")
+    print("✓ 文档事实：模块数 / 控制器与探针数 / package-info 覆盖 / 金片数 / LLM 注册数与 README 一致")
     return 0
 
 

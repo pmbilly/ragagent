@@ -1,11 +1,11 @@
 // 契约层：纯 JDK 的公开 API / SPI / 不可变载荷。
 //
 // 模块名取**单数** `contract`（＝顶层包 com.ragagent.contract）：本仓约定「模块名 = 顶层包名」，
-// 且 `contracts` 已被 domains 的契约夹具目录占用：1,426 个
-// 金片 + 49 个 *ContractTest。
+// 且 `contracts` 已被 domains 的契约夹具目录占用：1,349 份 JSON 金片 + 5 份非 JSON 样本，
+// 另有 48 个 *ContractTest。
 //
 // 门槛：把「契约面纯 JDK」从 ArchUnit 的**静态规则**升格为**编译期硬约束** ——
-// 本模块**没有任何依赖块**，一沾框架/其他模块就编译不过，回流即时红。
+// 本模块的生产依赖块为空，一沾框架/其他模块就编译不过，回流即时红。
 // 依赖方向：其余模块 → contract；contract → 无（纯 JDK）。
 plugins {
     `java-library`

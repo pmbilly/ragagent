@@ -16,9 +16,9 @@ dependencies {
     // agent 引擎：**主码已零依赖**（55 个消费文件全部改走 contract.agent）
     // ⇒ 过渡边摘除；仅测试夹具面仍需（RecordingSupport/GoRecording45* 在 agent-engine fixtures）。
 
-    // 模型运行时：不再经 :engine 传递（engine 已解散）。**过渡边**——domains 尚余约 18 处
-    // 对模型族实现面的 import（Ollama 管理面 / llm.extract 族 / modelcontext 工具 SPI 等），
-    // 按清单逐项收（`modelcontext` 为合法终态边）。
+    // 模型运行时：不再经 :engine 传递（engine 已解散）。**过渡边**——domains 对模型族实现面
+    // 只剩少量模型词汇与工具 SPI（`modelcontext` 为合法终态边），新增引用由
+    // `check-module-graph.py` 的 domains→model-runtime 边看守。
     implementation(project(":model-runtime"))
 
     // 共享内核（platform + event）
