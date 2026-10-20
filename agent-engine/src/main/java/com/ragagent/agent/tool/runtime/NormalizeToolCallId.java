@@ -1,8 +1,6 @@
 package com.ragagent.agent.tool.runtime;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import com.ragagent.platform.security.Hashes;
 
 /**
  * 工具调用 ID 归一化。
@@ -59,20 +57,11 @@ public final class NormalizeToolCallId {
     }
 
     private static byte[] sha256(String s) {
-        try {
-            return MessageDigest.getInstance("SHA-256").digest(s.getBytes(StandardCharsets.UTF_8));
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 unavailable", e);
-        }
+        return Hashes.sha256(s);
     }
 
     /** 取前 n 字节的小写十六进制。 */
     private static String hex(byte[] hash, int nBytes) {
-        StringBuilder sb = new StringBuilder(nBytes * 2);
-        for (int i = 0; i < nBytes; i++) {
-            sb.append(Character.forDigit((hash[i] >> 4) & 0xF, 16));
-            sb.append(Character.forDigit(hash[i] & 0xF, 16));
-        }
-        return sb.toString();
+        return Hashes.hexPrefix(hash, nBytes);
     }
 }
