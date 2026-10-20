@@ -162,7 +162,7 @@
 | **M4a** | `UserService.register` 改 `@Transactional` + 失败注入测试；删外层手写补偿 | ✅ 2026-10-20 |
 | **M4b** | 事务边界约定（`mechanisms.md`）+ mcp/storage/session/im/datasource 多写审计 | ✅ 2026-10-20 |
 | **M5a** | Memory 开关单次求值：`MemoryScopeGate` 返回 `(scope,cfg,ok,reason)`，`enabledScope`/`scopeDisableReason` 同源；清孤儿节注释 | ✅ 2026-10-20 |
-| **M5b** | Memory 写管线/模型解析提取（`MemoryWritePipeline` / `MemoryExtractionModelResolver`）；保留门面委托 | 待启动 |
+| **M5b** | Memory 写管线/模型解析提取（`MemoryWritePipeline` / `MemoryExtractionModelResolver`）；保留门面委托 | ✅ 2026-10-20 |
 | **M6a** | FaqEntryCommandService：projector / duplicate checker / batch updater；4 处尾块归一 | 待启动 |
 | **M6b** | UserService：`LoginTenantResolver` + `UserRegistrationService`；保留 `generateTokensFor(Object)` | 待启动 |
 | **M6c** | StorageFileResolver：删重复 provider 校验、提 backend resolver / config projector / env provisioner / resource catalog service | 待启动 |
@@ -499,6 +499,7 @@ boot           14 件                      →  boot
 | M4a | 2026-10-20 | **register 声明式事务**：`UserService.register` 加 `@Transactional(rollbackFor = Exception.class)`，删除\"先删用户再删租户\"的外层手写补偿（保留错误文案逐字符不变）；`AuthRegisterRollbackTest` 用 `@MockitoBean TenantMemberService` 注入成员行失败，断言 tenant/user 零残留。**红绿探针**：先删补偿、不加事务 → 测试红（行残留）；加注解 → 绿。`CreateTenant` 内层默认存储后端补偿未动（管理员创建路径仍共用） | 新增 1 例回滚测试 · 45 守卫绿 · build 2m10s / **5043 / 0 / 4** |
 | M4b | 2026-10-20 | **事务边界约定**：`mechanisms.md` §5 改写为\"整轮问答不开事务、多表写才开\"，补 `register` 事务、best-effort 清理（会话删除/数据源逐条落库）与自调用失效三条规则；审计 mcp/storage 建单条写、session 清理 best-effort，未发现需补事务的明确缺口 | 文档同步 · 45 守卫绿 |
 | M5a | 2026-10-20 | **Memory 开关单次求值**：新增 `MemoryScopeGate`（workspace→agent→subject 一次判定，返回 `(scope,cfg,ok,reason)`）；`ScopeState` 增 reason 并保留 3 参构造兼容旧测试；`enabledScope`/`scopeDisableReason` 改同一求值，删除两套并行实现；清 4 条孤儿节注释与失效 mapper 常量。开关测试补 `no_principal`/`workspace_disabled`/`agent_disabled`/`user_disabled` 原因断言 | 45 守卫绿 · build 1m55s / **5043 / 0 / 4** |
+| M5b | 2026-10-20 | **Memory 写管线/模型解析提取**：新增 `MemoryWritePipeline`（写入清洗/脱敏/墓碑/去重/容量/常驻块/向量）与 `MemoryExtractionModelResolver`（显式配置→任务携带→工作区问答模型）；`MemoryService` 保留同签名门面委托（兄弟类与测试调用点零改动），770 → 440 行 | 45 守卫绿 · build 2m18s / **5043 / 0 / 4** |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

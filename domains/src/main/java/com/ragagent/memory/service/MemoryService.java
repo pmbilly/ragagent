@@ -1,18 +1,12 @@
 package com.ragagent.memory.service;
 
 import com.ragagent.contract.memory.MemoryConfig;
-import com.ragagent.contract.memory.MemoryKeys;
-import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRetrievalContext;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.domain.MemoryExtractPayload;
-import com.ragagent.memory.domain.MemoryRender;
-import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.scope.MemoryScope;
@@ -21,14 +15,12 @@ import com.ragagent.memory.dto.MemoryDocView;
 import com.ragagent.memory.dto.MemoryItemResponse;
 import com.ragagent.memory.dto.MemoryTopicView;
 import com.ragagent.memory.repository.MemoryRepository;
-import com.ragagent.memory.support.MemoryConflictException;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -78,6 +70,8 @@ public class MemoryService {
     final MemoryTopicResolver topicResolver;
     final MemoryModelResolver modelResolver;
     final MemoryScopeGate scopeGate;
+    final MemoryWritePipeline writePipeline;
+    final MemoryExtractionModelResolver extractionModelResolver;
 
     /** 目录管理协作者（构造期装配）。 */
     final MemoryCatalogOps catalogOps;
@@ -96,6 +90,8 @@ public class MemoryService {
                          MemoryModelResolver modelResolver) {
         this.repo = repo;
         this.scopeGate = new MemoryScopeGate(repo, tenantService);
+        this.writePipeline = new MemoryWritePipeline(repo, vectorService);
+        this.extractionModelResolver = new MemoryExtractionModelResolver(modelResolver);
         this.catalogOps = new MemoryCatalogOps(this);
         this.insightOps = new MemoryInsightOps(this);
         this.recallOps = new MemoryRecallOps(this);
@@ -382,279 +378,39 @@ public class MemoryService {
         return write(state.scope(), state.cfg(), item);
     }
 
-    /**
-     * **唯一的插入路径**。
-     *
-     * <p>"记住这个"这条显式路由与后台蒸馏任务都走它，所以清洗、矛盾消解、块重建
-     * 与容量执行都不可能被一个新来的调用方绕过去。</p>
-     */
+    /** **唯一的插入路径**；实现见 {@link MemoryWritePipeline}。 */
     MemoryItem write(MemoryScope scope, MemoryConfig cfg, MemoryItem item) {
-        return writeReplacing(scope, cfg, item, "");
+        return writePipeline.write(scope, cfg, item);
     }
 
-    /**
-     * 写入并可选地"替换"一条已有条目。
-     *
-     * <p>顺序有语义：清洗 → 脱敏 → 校验 kind → 墓碑（两查）→ 确保主体存在
-     * → 找冲突 → 包含去重 → 构造条目 → save → 容量 → 重建块 → 存向量。</p>
-     */
+    /** 写入并可选替换；顺序语义见 {@link MemoryWritePipeline#writeReplacing}。 */
     MemoryItem writeReplacing(MemoryScope scope, MemoryConfig cfg, MemoryItem item, String targetId) {
-        String content = MemoryText.sanitizeMemoryContent(item.getContent());
-        if (content.isEmpty()) {
-            throw new MemoryScopeExceptions.EmptyContent();
-        }
-        // 在任何东西看这条陈述之前先脱敏。记忆会被注入到之后每一轮的系统提示词里，
-        // 所以一条到达存储的凭据不只是被留存，而是被反复发给模型。
-        MemoryText.Redaction redaction = MemoryText.redactSensitive(content);
-        if (redaction.changed()) {
-            if (MemoryText.isMostlyRedacted(redaction.content())) {
-                log.info("memory: dropped a statement that was mostly sensitive material");
-                throw new MemoryScopeExceptions.SensitiveContent();
-            }
-            log.info("memory: redacted sensitive material before storing");
-            content = MemoryText.sanitizeMemoryContent(redaction.content());
-        }
-        if (!MemoryKinds.isValid(item.getKind())) {
-            item.setKind(MemoryKinds.KIND_FACT);
-        }
-
-        // 用户刻意忘掉的东西，不能在蒸馏下次读到那条消息时回来。两次检查，因为重新推导出来的
-        // 陈述通常措辞略有不同、哈希对不上：精确指纹，以及"它来自的那条消息曾经产出过
-        // 一条被用户拒绝的记忆"。
-        boolean forgotten = repo.hasTombstone(scope, MemoryText.fingerprint(content));
-        if (!forgotten && !item.getSourceMessageId().isEmpty()
-                && MemoryKinds.ORIGIN_EXTRACTED.equals(item.getOrigin())) {
-            // 只有后台路径被这样拦。显式的"记住这个"是用户在**再次**要求，永远该赢。
-            forgotten = repo.hasTombstoneForMessage(scope, item.getSourceMessageId(),
-                    REJECTED_MESSAGE_WINDOW);
-        }
-        if (forgotten) {
-            log.info("memory: skipped a statement the user previously deleted");
-            throw new MemoryScopeExceptions.PreviouslyForgotten();
-        }
-        repo.ensureSubject(scope);
-
-        String topic = MemoryText.sanitizeMemoryTopic(item.getTopic());
-        String normalizedKey = MemoryKeys.itemKey(topic, content);
-        MemoryItem existing;
-        if (targetId != null && !targetId.isEmpty()) {
-            existing = repo.getItem(scope, targetId);
-            if (existing == null) {
-                throw new MemoryConflictException();
-            }
-        } else {
-            existing = repo.findActiveByKey(scope, normalizedKey);
-        }
-        if (existing != null && MemoryKinds.STATUS_ACTIVE.equals(existing.getStatus())
-                && MemoryText.sanitizeMemoryContent(existing.getContent()).equals(content)) {
-            // 同一个主题上的同一句话：什么都没变，所以保留原来的时间戳，
-            // 而不是每一轮都把这一行翻搅一遍。
-            return existing;
-        }
-        if (existing == null) {
-            // 同一个事实常常到两次：一次因为用户说了"记住…"，又一次来自后台蒸馏，
-            // 措辞略有不同（"我们的生产库是 X" vs "生产库是 X"）。它们拿到不同的主题
-            // key，所以只靠 key 匹配会让两条都进来，用户就看到自己的记忆重复了。
-            ContainedDuplicate duplicate = findContainedDuplicate(scope, item.getKind(), content);
-            MemoryItem candidate = duplicate.item();
-            if (candidate != null && !duplicate.longer()
-                    && (MemoryKinds.STATUS_ACTIVE.equals(candidate.getStatus())
-                    || MemoryKinds.STATUS_PENDING.equals(statusForWrite(item)))) {
-                return candidate;
-            }
-            // 新陈述包住了旧的，让它取代。
-            existing = candidate;
-        }
-
-        MemoryItem stored = new MemoryItem();
-        stored.setId(UUID.randomUUID().toString());
-        stored.setTenantId(scope.tenantId());
-        stored.setSubjectId(scope.subjectId());
-        stored.setKind(item.getKind());
-        stored.setContent(content);
-        stored.setTopic(topic);
-        stored.setNormalizedKey(normalizedKey);
-        stored.setImportance(MemoryText.clampImportance(item.getImportance()));
-        stored.setOrigin(item.getOrigin());
-        stored.setStatus(statusForWrite(item));
-        stored.setSourceSessionId(item.getSourceSessionId());
-        stored.setSourceMessageId(item.getSourceMessageId());
-        stored.setValidFrom(OffsetDateTime.now());
-        stored.setExpiresAt(item.getExpiresAt());
-        if (stored.getOrigin().isEmpty()) {
-            stored.setOrigin(MemoryKinds.ORIGIN_EXTRACTED);
-        }
-        if (existing != null) {
-            targetId = existing.getId();
-        }
-        repo.saveItem(scope, stored, targetId);
-
-        enforceCapacity(scope, cfg);
-        rebuildBlock(scope);
-        // 一条没有向量的记忆对语义召回是不可见的，所以这跑在**每一次**写入上。
-        // 尽力而为：嵌入失败不能让写入失败，补扫会捡起漏掉的。
-        vectorService.storeItemEmbedding(scope, cfg, stored);
-        return stored;
+        return writePipeline.writeReplacing(scope, cfg, item, targetId);
     }
 
-    /** {@link #findContainedDuplicate} 的结果。 */
-    record ContainedDuplicate(MemoryItem item, boolean longer) {
-    }
-
-    /**
-     * 在同 kind 的**活着**的记忆里找一条，
-     * 其陈述包含（或被包含于）新来的这条。
-     *
-     * <p>包含是刻意的全部规则。它便宜、对一个读自己记忆列表的用户可解释，
-     * 而且它不会把两条仅仅同主题的陈述合并——只合并"短的那条没有说出长的没说的东西"
-     * 这种情形。返回的 bool 报告新陈述是不是两者中更长的那条。</p>
-     */
-    private ContainedDuplicate findContainedDuplicate(MemoryScope scope, String kind, String content) {
-        List<MemoryItem> candidates = repo.listLive(scope, kind, 200);
-        String normalized = MemoryText.normalizeMemoryForMatch(content);
-        if (normalized.isEmpty()) {
-            return new ContainedDuplicate(null, false);
-        }
-        if (candidates == null) {
-            return new ContainedDuplicate(null, false);
-        }
-        for (MemoryItem candidate : candidates) {
-            if (candidate == null) {
-                continue;
-            }
-            String existing = MemoryText.normalizeMemoryForMatch(candidate.getContent());
-            if (existing.isEmpty()) {
-                continue;
-            }
-            if (existing.contains(normalized)) {
-                return new ContainedDuplicate(candidate, false);
-            }
-            if (normalized.contains(existing)) {
-                return new ContainedDuplicate(candidate, true);
-            }
-        }
-        return new ContainedDuplicate(null, false);
-    }
-
-    /**
-     * 一条记忆是立刻生效还是等用户确认。
-     *
-     * <p>用户**说**的东西立刻生效。系统**猜**的关于他的东西（他的角色、他的领域，
-     * 从提问里推断出来的）则提出来等他确认。推断既是价值所在也是伤害所在：
-     * 一个被悄悄当成事实的错误猜测，是记忆功能彻底失去信任的方式；
-     * 而且与 ChatGPT 的后台层不同，这一层始终可审计。</p>
-     */
+    /** 立刻生效还是等确认；规则见 {@link MemoryWritePipeline#statusForWrite}。 */
     static String statusForWrite(MemoryItem item) {
-        if (item.isInferred()
-                && !MemoryKinds.ORIGIN_EXPLICIT.equals(item.getOrigin())
-                && !MemoryKinds.ORIGIN_MANUAL.equals(item.getOrigin())) {
-            return MemoryKinds.STATUS_PENDING;
-        }
-        return MemoryKinds.STATUS_ACTIVE;
+        return MemoryWritePipeline.statusForWrite(item);
     }
 
-    /**
-     * 主体超过上限后归档排名最低的条目。
-     * 这是系统里**唯一**的自动遗忘。
-     */
+    /** 容量维护；实现见 {@link MemoryWritePipeline#enforceCapacity}。 */
     void enforceCapacity(MemoryScope scope, MemoryConfig cfg) {
-        int maxItems = cfg.effectiveMaxItems();
-        long count;
-        try {
-            count = repo.countActive(scope);
-        } catch (RuntimeException e) {
-            log.warn("memory: count active failed", e);
-            return;
-        }
-        if (count <= maxItems) {
-            return;
-        }
-        long archived;
-        try {
-            archived = repo.archiveLowestRanked(scope, maxItems);
-        } catch (RuntimeException e) {
-            log.warn("memory: archive overflow failed", e);
-            return;
-        }
-        log.info("memory: archived {} items over the {} cap", archived, maxItems);
+        writePipeline.enforceCapacity(scope, cfg);
     }
 
-    /**
-     * 重新渲染常驻块，让读路径始终只是一次主键查找。
-     * 每次变更之后都会调用。
-     */
+    /** 重建常驻块；实现见 {@link MemoryWritePipeline#rebuildBlock}。 */
     void rebuildBlock(MemoryScope scope) {
-        List<MemoryItem> items;
-        try {
-            items = repo.listActiveResident(scope, 60);
-        } catch (RuntimeException e) {
-            log.warn("memory: rebuild block load failed", e);
-            return;
-        }
-        long count;
-        try {
-            count = repo.countActive(scope);
-        } catch (RuntimeException e) {
-            log.warn("memory: rebuild block count failed", e);
-            return;
-        }
-        String block = MemoryRender.renderMemoryBlock(items);
-        try {
-            repo.updateSubjectBlock(scope, block, (int) count);
-        } catch (RuntimeException e) {
-            log.warn("memory: rebuild block store failed", e);
-        }
+        writePipeline.rebuildBlock(scope);
     }
 
-    /**
-     * 解析记忆管线该用哪个模型。
-     *
-     * <p>设置界面说"抽取模型留空 = 用对话本身用的那个模型"，所以留空必须**解析出**
-     * 一个模型，而不是关掉什么。本包里的每一个调用方都要经过这里：当只有抽取调用
-     * 应用了回落时，话题解析器会在每一个没挑过模型的工作区上悄悄失去它的模型层——
-     * 而默认情况下**所有**工作区都没挑过。</p>
-     */
+    /** 抽取模型解析；回落规则见 {@link MemoryExtractionModelResolver}。 */
     String extractionModelId(MemoryConfig cfg, MemoryExtractPayload payload) {
-        if (cfg != null && !cfg.getExtractModelId().isEmpty()) {
-            return cfg.getExtractModelId();
-        }
-        if (payload != null && !payload.chatModelId().isEmpty()) {
-            return payload.chatModelId();
-        }
-        // 产生这个任务的那一轮并不总是带着回答它所使用的模型——真正的模型是在 QA 管线里
-        // 解析的，而且没有被写回消息。回落到工作区自己的问答模型，能把文档承诺的
-        // "留空 = 用对话模型"从"记忆悄悄什么都不做"里救回来。
-        return workspaceChatModelId();
+        return extractionModelResolver.extractionModelId(cfg, payload);
     }
 
-    /**
-     * 给这个工作区挑一个可用的问答模型。
-     *
-     * <p>选择被记进日志，因为它是一个猜测：没有显式配置抽取模型时，没有任何记录说明
-     * 这个工作区希望后台工作用哪个模型，而**悄悄**挑一个只有在事后可见时才可接受。</p>
-     */
+    /** 工作区问答模型回落；实现见 {@link MemoryExtractionModelResolver}。 */
     String workspaceChatModelId() {
-        List<ModelRowView> models;
-        try {
-            models = modelResolver.listModels();
-        } catch (RuntimeException e) {
-            log.warn("memory: list models for extraction fallback failed", e);
-            return "";
-        }
-        if (models == null) {
-            return "";
-        }
-        for (ModelRowView model : models) {
-            if (model == null || !"KnowledgeQA".equals(model.type())) {
-                continue;
-            }
-            if (!model.status().isEmpty() && !ModelCatalogPort.ACTIVE_STATUS.equals(model.status())) {
-                continue;
-            }
-            log.info("memory: no extraction model configured, using workspace model {}", model.id());
-            return model.id();
-        }
-        return "";
+        return extractionModelResolver.workspaceChatModelId();
     }
 
     // ── 供兄弟类使用的小访问器 ───────────────────────────────────────────
