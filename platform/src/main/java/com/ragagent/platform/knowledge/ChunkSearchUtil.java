@@ -1,5 +1,6 @@
 package com.ragagent.platform.knowledge;
 
+import com.ragagent.platform.security.Hashes;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -169,18 +170,7 @@ public final class ChunkSearchUtil {
                 <= MAX_GENERATED_QUESTION_SOURCE_ID_LENGTH) {
             return candidate;
         }
-        try {
-            byte[] digest = java.security.MessageDigest.getInstance("SHA-256")
-                    .digest(questionId.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-            StringBuilder hex = new StringBuilder(24);
-            for (int i = 0; i < 12; i++) {
-                hex.append(Character.forDigit((digest[i] >> 4) & 0xF, 16));
-                hex.append(Character.forDigit(digest[i] & 0xF, 16));
-            }
-            return chunkId + "-q" + hex;
-        } catch (java.security.NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e); // JLS：SHA-256 恒存在
-        }
+        return chunkId + "-q" + Hashes.sha256HexPrefix(questionId, 24);
     }
 
     /**

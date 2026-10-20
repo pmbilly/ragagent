@@ -5,9 +5,7 @@ import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.auth.apikey.repository.TenantAPIKeyRepository;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.apikey.APIKeyScopeType;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import com.ragagent.platform.security.Hashes;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
@@ -267,18 +265,7 @@ public class TenantAPIKeyService {
      * public 是为了让跨包测试能直接驱动它。
      */
     public static String hashToken(String token) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] sum = digest.digest(token.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder(sum.length * 2);
-            for (byte b : sum) {
-                sb.append(Character.forDigit((b >> 4) & 0xF, 16));
-                sb.append(Character.forDigit(b & 0xF, 16));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 unavailable", e);
-        }
+        return Hashes.sha256Hex(token);
     }
 
     /**

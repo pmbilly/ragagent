@@ -7,6 +7,7 @@ import com.ragagent.contract.storage.fileserve.WritableFileContentService;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.security.CryptoService;
+import com.ragagent.platform.security.Hashes;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.platform.web.JsonMappers;
@@ -695,16 +696,7 @@ public class StorageFileResolver {
         }
 
         private static String sha256Hex(byte[] data) {
-            try {
-                java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
-                StringBuilder sb = new StringBuilder();
-                for (byte b : md.digest(data)) {
-                    sb.append(String.format("%02x", b));
-                }
-                return sb.toString();
-            } catch (java.security.NoSuchAlgorithmException e) {
-                throw new IllegalStateException(e);
-            }
+            return Hashes.sha256Hex(data);
         }
 
         /** mime 前缀 → image/audio/video，否则 file。 */

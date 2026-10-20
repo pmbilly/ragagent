@@ -2,10 +2,8 @@ package com.ragagent.memory.domain;
 
 import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.platform.security.Hashes;
 import com.ragagent.platform.text.ListMerges;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -149,19 +147,7 @@ public final class MemoryText {
         if (normalized.isEmpty()) {
             return "";
         }
-        try {
-            byte[] sum = MessageDigest.getInstance("SHA-256")
-                    .digest(normalized.getBytes(StandardCharsets.UTF_8));
-            StringBuilder hex = new StringBuilder(sum.length * 2);
-            for (byte b : sum) {
-                hex.append(Character.forDigit((b >> 4) & 0xF, 16));
-                hex.append(Character.forDigit(b & 0xF, 16));
-            }
-            return hex.toString();
-        } catch (NoSuchAlgorithmException e) {
-            // SHA-256 是 JDK 必备算法，不可达；保留抛出而不是静默降级。
-            throw new IllegalStateException("SHA-256 unavailable", e);
-        }
+        return Hashes.sha256Hex(normalized);
     }
 
     // ── 敏感信息脱敏 ───────────────────────────────────────────────────────

@@ -25,10 +25,8 @@ import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.support.FaqImportTaskStore;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.Hashes;
 import com.ragagent.platform.web.JsonMappers;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -751,17 +749,7 @@ public class FaqEntryCommandService {
 
 
     private static String sha256Hex(String input) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            StringBuilder hex = new StringBuilder();
-            for (byte b : digest.digest(input.getBytes(StandardCharsets.UTF_8))) {
-                hex.append(Character.forDigit((b >> 4) & 0xF, 16));
-                hex.append(Character.forDigit(b & 0xF, 16));
-            }
-            return hex.substring(0, 32); // 契约：内容哈希取前 16 字节
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
+        return Hashes.sha256HexPrefix(input, 32); // 契约：内容哈希取前 16 字节
     }
 
 

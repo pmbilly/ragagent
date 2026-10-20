@@ -1,9 +1,8 @@
 package com.ragagent.datasource.connector.rss;
 
+import com.ragagent.platform.security.Hashes;
 import com.ragagent.platform.text.UnicodeText;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -243,19 +242,7 @@ final class RssUtil {
 
     /** 小写十六进制 SHA-256 的前 16 个字符。 */
     private static String sha256HexPrefix(String value) {
-        MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 is required by the JDK", e);
-        }
-        byte[] sum = digest.digest(value.getBytes(StandardCharsets.UTF_8));
-        StringBuilder hex = new StringBuilder(16);
-        for (int i = 0; i < 8; i++) {
-            hex.append(Character.forDigit((sum[i] >> 4) & 0xF, 16));
-            hex.append(Character.forDigit(sum[i] & 0xF, 16));
-        }
-        return hex.toString();
+        return Hashes.sha256HexPrefix(value, 16);
     }
 
 }

@@ -2,11 +2,11 @@ package com.ragagent.rerank.provider;
 
 import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.Reranker;
+import com.ragagent.platform.security.Hashes;
 import com.ragagent.platform.web.ProviderJson;
 import com.ragagent.rerank.RerankHttp;
 import com.ragagent.rerank.RerankerConfig;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import javax.crypto.Mac;
@@ -248,9 +248,8 @@ public final class LkeapReranker implements Reranker {
                     new String(resp.body(), StandardCharsets.UTF_8));
         }
 
-        static String sha256Hex(byte[] data) throws Exception {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            return hex(md.digest(data));
+        static String sha256Hex(byte[] data) {
+            return Hashes.sha256Hex(data);
         }
 
         static byte[] hmacSha256(byte[] key, String content) throws Exception {
@@ -260,11 +259,7 @@ public final class LkeapReranker implements Reranker {
         }
 
         static String hex(byte[] data) {
-            StringBuilder sb = new StringBuilder(data.length * 2);
-            for (byte b : data) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
+            return Hashes.hex(data);
         }
     }
 }

@@ -1,11 +1,10 @@
 package com.ragagent.storage.service;
 
+import com.ragagent.platform.security.Hashes;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.repository.ResourceRepository;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Base64;
@@ -40,17 +39,7 @@ public class ResourceCatalogService {
 
     /** 位置哈希：SHA-256 hex。 */
     public static String locationHash(String path) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] sum = md.digest(path.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder(sum.length * 2);
-            for (byte b : sum) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
+        return Hashes.sha256Hex(path);
     }
 
     /** 非 resource:// 引用 → empty；缺失/已删 → empty。 */

@@ -1,5 +1,6 @@
 package com.ragagent.im.runtime;
 
+import com.ragagent.platform.security.Hashes;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -72,13 +73,7 @@ public final class FeishuWecomCrypt {
         } catch (IllegalArgumentException e) {
             throw new CryptException("base64 decode: " + e.getMessage());
         }
-        byte[] keyHash;
-        try {
-            keyHash = MessageDigest.getInstance("SHA-256")
-                    .digest(encryptKey.getBytes(StandardCharsets.UTF_8));
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+        byte[] keyHash = Hashes.sha256(encryptKey);
         if (ciphertext.length < BLOCK) {
             throw new CryptException("ciphertext too short");
         }

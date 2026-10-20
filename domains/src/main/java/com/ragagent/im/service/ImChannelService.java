@@ -3,6 +3,7 @@ package com.ragagent.im.service;
 import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.repository.ImChannelRepository;
+import com.ragagent.platform.security.Hashes;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -191,17 +192,7 @@ public class ImChannelService {
     }
 
     private static String hexSha256(String input) {
-        try {
-            byte[] digest = java.security.MessageDigest.getInstance("SHA-256")
-                    .digest(input.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder(digest.length * 2);
-            for (byte b : digest) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (java.security.NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
+        return Hashes.sha256Hex(input);
     }
 
     // ── CRUD ──

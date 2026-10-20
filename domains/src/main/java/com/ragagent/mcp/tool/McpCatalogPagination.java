@@ -9,6 +9,7 @@ import com.ragagent.mcp.tool.McpCatalog.McpDiscoveryArgs;
 import com.ragagent.mcp.tool.McpCatalog.McpDiscoveryPage;
 import com.ragagent.mcp.tool.McpCatalog.McpServerSummary;
 import com.ragagent.mcp.tool.McpCatalog.McpToolSummary;
+import com.ragagent.platform.security.Hashes;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -68,7 +69,7 @@ final class McpCatalogPagination {
         fingerprintSeed.put("Tools", toolSeeds);
         String fingerprint;
         try {
-            fingerprint = McpCatalog.hex(McpCatalog.sha256(McpCatalog.STRUCT_JSON.writeValueAsBytes(fingerprintSeed)));
+            fingerprint = Hashes.sha256Hex(McpCatalog.STRUCT_JSON.writeValueAsBytes(fingerprintSeed));
         } catch (Exception e) {
             fingerprint = "";
         }

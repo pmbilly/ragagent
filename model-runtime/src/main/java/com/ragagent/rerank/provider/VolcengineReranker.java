@@ -2,6 +2,7 @@ package com.ragagent.rerank.provider;
 
 import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.Reranker;
+import com.ragagent.platform.security.Hashes;
 import com.ragagent.platform.web.ProviderJson;
 import com.ragagent.rerank.RerankHttp;
 import com.ragagent.rerank.RerankerConfig;
@@ -265,9 +266,8 @@ public     static final int MAX_DOCUMENTS = 50;
             return path == null || path.isEmpty() ? "/" : path;
         }
 
-        static String sha256Hex(byte[] data) throws Exception {
-            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
-            return hex(md.digest(data));
+        static String sha256Hex(byte[] data) {
+            return Hashes.sha256Hex(data);
         }
 
         static byte[] hmacSha256(byte[] key, String content) throws Exception {
@@ -277,11 +277,7 @@ public     static final int MAX_DOCUMENTS = 50;
         }
 
         static String hex(byte[] data) {
-            StringBuilder sb = new StringBuilder(data.length * 2);
-            for (byte b : data) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
+            return Hashes.hex(data);
         }
     }
 

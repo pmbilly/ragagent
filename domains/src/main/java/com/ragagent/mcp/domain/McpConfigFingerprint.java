@@ -1,8 +1,6 @@
 package com.ragagent.mcp.domain;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import com.ragagent.platform.security.Hashes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,18 +34,7 @@ public final class McpConfigFingerprint {
             return null;
         }
         String raw = canonicalJson(service);
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] sum = digest.digest(raw.getBytes(StandardCharsets.UTF_8));
-            StringBuilder hex = new StringBuilder(sum.length * 2);
-            for (byte b : sum) {
-                hex.append(Character.forDigit((b >> 4) & 0xf, 16));
-                hex.append(Character.forDigit(b & 0xf, 16));
-            }
-            return hex.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 unavailable", e);
-        }
+        return Hashes.sha256Hex(raw);
     }
 
     /** 暴露规范化 JSON，便于测试比对。 */

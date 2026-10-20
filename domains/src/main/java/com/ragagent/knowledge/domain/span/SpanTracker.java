@@ -3,8 +3,7 @@ package com.ragagent.knowledge.domain.span;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeSpanRepository;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+import com.ragagent.platform.security.Hashes;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -86,18 +85,7 @@ public class SpanTracker {
         if (count <= MAX_SPAN_NAME_LEN) {
             return name;
         }
-        byte[] digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-256")
-                    .digest(name.getBytes(StandardCharsets.UTF_8));
-        } catch (Exception e) {
-            throw new IllegalStateException("SHA-256 unavailable", e);
-        }
-        StringBuilder hex = new StringBuilder();
-        for (int i = 0; i < 4; i++) {
-            hex.append(String.format("%02x", digest[i]));
-        }
-        String suffix = "~" + hex;
+        String suffix = "~" + Hashes.sha256HexPrefix(name, 8);
         int suffixCount = suffix.codePointCount(0, suffix.length());
         int keep = MAX_SPAN_NAME_LEN - suffixCount;
         if (keep < 1) {

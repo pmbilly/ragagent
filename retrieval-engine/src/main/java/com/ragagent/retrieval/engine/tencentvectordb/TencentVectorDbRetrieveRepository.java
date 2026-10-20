@@ -1,6 +1,7 @@
 package com.ragagent.retrieval.engine.tencentvectordb;
 
 import com.ragagent.contract.vectorstore.IndexConfig;
+import com.ragagent.platform.security.Hashes;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import com.ragagent.retrieval.engine.EngineTypes;
@@ -13,8 +14,6 @@ import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbBm25.SparseV
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRestClient.Json;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRestClient.TencentVectorDbApiException;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -411,22 +410,8 @@ public class TencentVectorDbRetrieveRepository
         if (original.startsWith(srcChunk + "-")) {
             return targetChunkId + "-" + original.substring(srcChunk.length() + 1);
         }
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            digest.update(targetChunkId.getBytes(StandardCharsets.UTF_8));
-            digest.update((byte) 0);
-            digest.update(srcChunk.getBytes(StandardCharsets.UTF_8));
-            digest.update((byte) 0);
-            digest.update(original.getBytes(StandardCharsets.UTF_8));
-            byte[] sum = digest.digest();
-            StringBuilder hex = new StringBuilder();
-            for (int i = 0; i < 8; i++) {
-                hex.append(String.format("%02x", sum[i]));
-            }
-            return targetChunkId + "-" + hex;
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("sha256 unavailable", e);
-        }
+        String composite = targetChunkId + " " + srcChunk + " " + original;
+        return targetChunkId + "-" + Hashes.sha256HexPrefix(composite, 16);
     }
 
     @Override

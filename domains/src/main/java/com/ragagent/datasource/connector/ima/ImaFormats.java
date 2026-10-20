@@ -1,12 +1,11 @@
 package com.ragagent.datasource.connector.ima;
 
+import com.ragagent.platform.security.Hashes;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 
 /**
@@ -167,9 +166,6 @@ public final class ImaFormats {
                 || cp == 0x00A0 || cp == 0x3000);
     }
 
-    /** 限定在 ASCII 字符集内的 SHA-256 十六进制（小写）。 */
-    private static final char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
-
     /**
      * 能扛住"同名替换"的稳定身份（IMA 在服务端就地替换
      * 同名文件时会重新分配 media_id）。
@@ -184,21 +180,7 @@ public final class ImaFormats {
      */
     public static String logicalKey(String kbId, String parentFolderId, String title) {
         String composite = nullSafe(kbId) + '\u001f' + nullSafe(parentFolderId) + '\u001f' + nullSafe(title);
-        MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            // JDK 必须带 SHA-256；走到这里说明运行环境坏了。
-            throw new IllegalStateException("SHA-256 unavailable", e);
-        }
-        byte[] hash = digest.digest(composite.getBytes(StandardCharsets.UTF_8));
-        StringBuilder sb = new StringBuilder(36);
-        sb.append("ima_");
-        for (int i = 0; i < 16; i++) {
-            sb.append(HEX_DIGITS[(hash[i] >> 4) & 0xF]);
-            sb.append(HEX_DIGITS[hash[i] & 0xF]);
-        }
-        return sb.toString();
+        return "ima_" + Hashes.sha256HexPrefix(composite, 32);
     }
 
     /** null 与空串等价。 */

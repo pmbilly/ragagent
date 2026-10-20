@@ -10,10 +10,9 @@ import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.oauth.error.OAuthReauthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpOAuthRequiredException;
+import com.ragagent.platform.security.Hashes;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -505,7 +504,7 @@ public final class McpCatalog {
     static String mcpToolRef(McpToolWrapper tool) {
         String schema = tool.parametersJson();
         String joined = tool.service.getId() + "\0" + tool.mcpTool.getName() + "\0" + schema;
-        return "mcpt_" + hex(sha256(utf8(joined)));
+        return "mcpt_" + Hashes.sha256Hex(joined);
     }
 
     boolean describedRef(String ref) {
@@ -671,7 +670,7 @@ public final class McpCatalog {
      * 保留 ASCII 提示段方便模型阅读。
      */
     static String mcpRegisteredName(McpToolWrapper tool) {
-        String sum = hex(sha256(utf8(tool.service.getId() + "\0" + tool.mcpTool.getName())));
+        String sum = Hashes.sha256Hex(tool.service.getId() + "\0" + tool.mcpTool.getName());
         String hint = sanitizeName(tool.service.getName()) + "_" + sanitizeName(tool.mcpTool.getName());
         final int suffixChars = 16;
         final int maxHint = ToolDefinitions.MAX_FUNCTION_NAME_LENGTH - "mcp_".length() - 1 - suffixChars;
@@ -686,27 +685,6 @@ public final class McpCatalog {
     }
 
     // ── 小工具 ──
-
-    static byte[] utf8(String s) {
-        return s.getBytes(StandardCharsets.UTF_8);
-    }
-
-    static byte[] sha256(byte[] data) {
-        try {
-            return MessageDigest.getInstance("SHA-256").digest(data);
-        } catch (Exception e) {
-            throw new IllegalStateException("sha-256 unavailable", e);
-        }
-    }
-
-    static String hex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder(bytes.length * 2);
-        for (byte b : bytes) {
-            sb.append(Character.forDigit((b >> 4) & 0xf, 16));
-            sb.append(Character.forDigit(b & 0xf, 16));
-        }
-        return sb.toString();
-    }
 
     static String quoteGo(String s) {
         return ToolJson.quoted(s);

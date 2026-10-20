@@ -1,8 +1,6 @@
 package com.ragagent.mcp.oauth.model;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import com.ragagent.platform.security.Hashes;
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -39,14 +37,7 @@ public final class Pkce {
 
     /** 计算 S256 code_challenge（BASE64URL(SHA256(verifier))）。 */
     public static String generateCodeChallenge(String codeVerifier) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(codeVerifier.getBytes(StandardCharsets.UTF_8));
-            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
-        } catch (NoSuchAlgorithmException e) {
-            // JDK 必然带 SHA-256；到这一步说明运行环境损坏
-            throw new IllegalStateException("SHA-256 is not available", e);
-        }
+        return Hashes.sha256Base64Url(codeVerifier);
     }
 
     /** 生成 state 随机串（32 字符）。 */
