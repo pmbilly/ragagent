@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.TestSchema;
 import com.ragagent.contract.storage.StorageBackendProvisioner;
+import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.dto.StorageConfig;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,15 @@ class DefaultStorageBackendProvisionerTest {
     private StorageBackendProvisioner provisioner;
     @Autowired
     private StorageBackendService storageService;
+
+    /**
+     * 全局快照是**静态**的：本类把 storage.type 配成 s3，而 Spring 上下文复用不会重新 install，
+     * 不恢复就会污染后续复用上下文的其他测试（实测：FaqContractTest 的 CSV 导出走了云分支）。
+     */
+    @AfterAll
+    static void restoreStorageEnv() {
+        StorageRuntimeEnv.install("", "", "");
+    }
 
     @BeforeEach
     void seed() {

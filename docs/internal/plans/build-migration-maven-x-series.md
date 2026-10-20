@@ -77,14 +77,14 @@ Gradle 的 `com.google.protobuf` 插件换成 Maven 的 protobuf 插件（候选
 
 当前闸门是「一条 `build` 全包」，Maven 侧要逐项找回等价物：
 
-| 能力 | Gradle 现状 | Maven 等价物 | 风险 |
+| 能力 | Gradle 现状 | Maven 等价物（X3 实测定稿） | 实测坑 |
 |---|---|---|---|
-| 格式检查 | Spotless `ratchetFrom("seed")`（只查 seed 之后触碰的文件）+ importOrder + removeUnusedImports | `spotless-maven-plugin`（2.x 支持 ratchetFrom） | ratchet 基线 tag 依赖 `.git`，Docker 构建需 `-Dspotless.check.skip=true` |
-| Javadoc 引用校验 | `-Xdoclint:reference -quiet` + `-Xmaxerrs 10000`，挂 `check` | `maven-javadoc-plugin` 的 additionalOptions，绑 `verify` | 失败即构建失败，口径不能放松 |
-| 编译参数 | 全局 `-parameters`；contract/platform 额外 `-Xlint:all,-serial -Werror` | `maven-compiler-plugin` `<parameters>true</parameters>` + 模块级 `compilerArgs` | `-Werror` 在 Maven 下会被插件自身提示误伤，需实测收窄 |
-| 覆盖率 | jacoco 全模块 `-Pcoverage` 显式开关 + 聚合报告 | `jacoco-maven-plugin` + `report-aggregate`（聚合模块） | 「不加参数就报错」的防呆要保留 |
-| 守卫 | 45 条挂 `check`（`rootProject.tasks.named("guards")`） | `exec-maven-plugin` 绑根 pom `verify`，`<inherited>false</inherited>`（否则每个子模块各跑一遍） | 子模块单独构建时不触发，需在文档写明「闸门只在根跑」 |
-| 迁移脚本 | `syncMigrations` Copy 到 `<模块>/build/generated-migrations` | `maven-resources-plugin:copy-resources` → `target/generated-migrations` | Flyway 的 `filesystem:./build/generated-migrations` 是**相对工作目录**，配置要同步改 |
+| 格式检查 | Spotless `ratchetFrom("seed")`（只查 seed 之后触碰的文件）+ importOrder + removeUnusedImports | `spotless-maven-plugin` **3.10.4**；`ratchetFrom` 生效（假 tag 会报 "No such reference"） | `<includes>` 必须手写三条（main/test/**testFixtures**）—— Maven 默认只挂前两个；Docker 构建需 `-Dspotless.check.skip=true` |
+| Javadoc 引用校验 | `-Xdoclint:reference -quiet` + `-Xmaxerrs 10000`，挂 `check` | `maven-javadoc-plugin` additionalOptions + `-Werror`，绑 `verify` | **收紧了一档**：Gradle 侧只告警不阻断，接入时全仓 0 条 reference warning ⇒ 加 `-Werror` 兑现「构建期就红」的承诺 |
+| 编译参数 | 全局 `-parameters`；contract/platform 额外 `-Xlint:all,-serial -Werror` | `maven-compiler-plugin` `<parameters>true</parameters>` + `default-compile` execution 级 `compilerArgs` | plugin 级 `-Werror` 会误伤 **testCompile**（Gradle 是任务级）⇒ 必须限定 execution |
+| 覆盖率 | jacoco 全模块 `-Pcoverage` 显式开关 + 聚合报告 | `jacoco-maven-plugin` 0.8.13 + profile `coverage`（prepare-agent + report） | **surefire 必须写 `@{argLine}`**（晚绑定）；`${argLine}` 在配置期就被解析，jacoco 后置设置的 `-javaagent` 挂不上（实测 exec 文件不生成）。聚合报告未做，登记待办 |
+| 守卫 | 45 条挂 `check`（`rootProject.tasks.named("guards")`） | `exec-maven-plugin` 绑 **boot 的 verify** | 不能绑根 pom：Maven 按模块逐个跑完整生命周期，根的 verify 会在**最前面**执行 |
+| 迁移脚本 | `syncMigrations` Copy 到 `<模块>/build/generated-migrations` | `maven-resources-plugin:copy-resources` → **仓库根 `build/generated-migrations`** | 保持原路径不动（`application.yml` 零改动），并把 `spring-boot:run` 工作目录钉在仓库根 |
 | dev 起服 | `bootRun` 逐项注入根 `.env` | `mvn -pl boot -am spring-boot:run` + `scripts/dev-env.sh`（已是同口径） | Maven 下 `spring-boot:run` 用 `target/classes` ⇒ 反而消除了「jar 就地重写导致全端点 500」的老坑 |
 
 ### 3.4 守卫与工具链的构建系统耦合（必须同批改，否则静默失明）
@@ -172,10 +172,15 @@ pom.xml                     根：properties（版本单一来源）+ dependency
 - **等价性口径**：Maven 与 Gradle 对 `@BeforeAll + assumption` 的跳过报告不同（Gradle 计 2 个 skipped，surefire 计 0 个用例），因此对齐判据是「有效执行用例数」而非「XML tests 原始和」。
 - **实测暴露的既有债（不夹在迁移里修）**：boot 的 `FaqContractTest` 与某个先跑测试共享 Spring 上下文，单 JVM 串行时会走「云存储」分支而失败；Gradle 的 4 分叉掩盖了它。Maven 侧按 Gradle 同口径取 `forkCount=2` 后一致全绿，该隔离债登记待办。
 
-### X3 质量闸门（规模 M）
+### X3 质量闸门（规模 M）——✅ 2026-10-21
 
-- Spotless（ratchetFrom seed）· Javadoc doclint 挂 verify · `-parameters` · contract/platform 的 `-Werror` · JaCoCo（含 `-Pcoverage` 防呆）· `exec` 跑 45 条守卫（根 pom，`inherited=false`）· 迁移脚本同步 · dev-stale 提醒。
-- **退出判据**：`mvn -B verify` 一条命令＝原 `./gradlew build` 的全部效果；故意制造 3 类失败（格式/注释引用/守卫违例）各红一次，证明不是空转。
+- Spotless 3.10.4（ratchetFrom seed）· Javadoc doclint + `-Werror` 挂 verify · `-parameters` · contract/platform 的 `-Werror`（execution 级）· JaCoCo profile · `exec` 跑 45 条守卫（绑 **boot** 的 verify）· 迁移脚本同步（X1 已做）。
+- **退出判据（全部达成）**：`mvn -B verify` 连跑两遍全绿（有效用例 5042、45 守卫、spotless、javadoc）；三类**红态探针**各红一次 —— ① 乱序 import（spotless 报格式违例）② `{@link NoSuchTypeXYZ}`（javadoc `-Werror` 报 reference not found）③ 游离子目录（守卫 S1 报游离目录）。
+- **X3 实测发现（都已修）**：
+  1. surefire 的 `argLine` 必须用 `@{argLine}`（晚绑定）。`${argLine}` 在**配置期**就解析成基值，jacoco 后置设置的 `-javaagent` 永远挂不上（实测 exec 文件不生成）。
+  2. 守卫不能绑根 pom：Maven 按模块逐个跑完生命周期，根的 `verify` 会在**最前面**执行 ⇒ 绑到 reactor 最后一个模块（boot）。
+  3. **X2 的 test-jar 副作用**：`ContractBoundaryRulesTest` 只用 `DO_NOT_INCLUDE_TESTS`，对 `-tests.jar` 里的测试类不生效（`mvn verify` 走 jar 形态才暴露，`mvn test` 走 target/test-classes 时不暴露）⇒ 补显式排除。
+  4. **静态快照污染（既有债，本轮顺手修了一个源头）**：`StorageRuntimeEnv` 是进程级静态，`DefaultStorageBackendProvisionerTest` 把 `storage.type` 配成 s3 后不恢复，上下文复用的后续测试会读到 s3（实测 `FaqContractTest` 的 CSV 导出走云分支、返回 null）。已在 `@AfterAll` 恢复。这类"静态 + 上下文缓存"的债尚未全清，X4 登记为待办。
 
 ### X4 切换收尾（规模 M）
 

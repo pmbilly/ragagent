@@ -23,6 +23,10 @@ class ContractBoundaryRulesTest {
 
     private static final JavaClasses MAIN = new ClassFileImporter()
             .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+            // 跨模块夹具以 jar 形态出现（Maven 的 -tests.jar / Gradle 的 -test-fixtures.jar），
+            // Predefined.DO_NOT_INCLUDE_TESTS 对这种形态不生效（实测），必须显式排掉
+            .withImportOption(location -> !location.contains("-tests.jar")
+                    && !location.contains("-test-fixtures.jar"))
             .importPackages("com.ragagent");
 
     /**

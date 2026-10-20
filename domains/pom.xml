@@ -259,8 +259,12 @@
         <configuration>
           <!-- 与 Gradle 同口径：单测试 JVM 2g（多个 @SpringBootTest 上下文各自驻留）。
                时区钉死 Asia/Shanghai：线格式断言里的时间戳就是 +08:00，CI runner 是 UTC。 -->
-          <argLine>-Xmx2g -XX:+EnableDynamicAgentLoading -Duser.timezone=Asia/Shanghai</argLine>
+          <argLine>@{argLine} -Xmx2g -Duser.timezone=Asia/Shanghai</argLine>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

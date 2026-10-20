@@ -34,6 +34,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <contract.refresh>false</contract.refresh>
+    <!-- Mockito inline 在 JDK 21+ 自挂 attach 会被拒 ⇒ -XX:+EnableDynamicAgentLoading。
+         同时 jacoco 的 prepare-agent 会在这个属性上**前置** -javaagent，
+         所以 surefire 必须引用属性而非字面量，否则 -Pcoverage 时 agent 挂不上。 -->
+    <argLine>-XX:+EnableDynamicAgentLoading</argLine>
 
     <!-- 平台线：Boot BOM 统一 starter-*/flyway/h2/junit 等版本，其余在此登记 -->
     <spring-boot.version>4.1.1</spring-boot.version>
@@ -68,6 +72,8 @@
     <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
     <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
     <maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
+    <spotless-maven-plugin.version>3.10.4</spotless-maven-plugin.version>
+    <exec-maven-plugin.version>3.5.0</exec-maven-plugin.version>
   </properties>
 
   <dependencyManagement>
@@ -258,8 +264,9 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven-surefire-plugin.version}</version>
           <configuration>
-            <!-- Mockito inline 在 JDK 21+ 自挂 attach 会被拒 -->
-            <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+            <!-- @{...} 是 surefire 的**晚绑定**语法（${...} 在配置期就被解析，jacoco 的
+                 prepare-agent 后置设置就读不到）⇒ -Pcoverage 时 -javaagent 才能挂上 -->
+            <argLine>@{argLine}</argLine>
             <!-- 与 Gradle 的 maxParallelForks 同口径：按测试类分派到 2 个 JVM。
                  Gradle 侧按核数自适应（根 cores/4、domains/boot cores/2），Maven 无内建核数属性，
                  取固定的 2：本机接近、CI（4 核 × 2g fork）也不会 OOM。 -->
@@ -282,10 +289,49 @@
           <version>${maven-failsafe-plugin.version}</version>
         </plugin>
 
+        <!-- 各模块的 Javadoc 共用一个门槛：只启用 doclint 的「引用」检查组。
+             理由：本仓真实漂移过多次 —— 改名/搬家后注释里的 {@link}/{@code}/{@see} 还指着旧类型
+             （此前人工修过 ≥5 次）。交给 javadoc 自己的解析器判定，零维护成本；
+             HTML 风格（</p>、heading 顺序）与 @param 完整性刻意不纳入 —— 噪声大、价值低。 -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>${maven-javadoc-plugin.version}</version>
+          <configuration>
+            <!-- 先关掉插件默认的 doclint=all，再用 additionalOptions 只开 reference -->
+            <doclint>none</doclint>
+            <additionalOptions>
+              <additionalOption>-Xdoclint:reference</additionalOption>
+              <additionalOption>-quiet</additionalOption>
+              <additionalOption>-Xmaxerrs</additionalOption>
+              <additionalOption>10000</additionalOption>
+              <!-- 比 Gradle 侧更严一档：Gradle 的 javadoc 只告警不阻断，而 build.gradle.kts 的注释
+                   本就宣称「构建期就红」。接入时实测全仓 0 条 reference warning，故收紧为阻断。 -->
+              <additionalOption>-Werror</additionalOption>
+            </additionalOptions>
+          </configuration>
+          <executions>
+            <execution>
+              <id>javadoc-check</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>javadoc</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>${spotless-maven-plugin.version}</version>
+        </plugin>
+
+        <!-- 守卫：单入口 scripts/run-guards.sh（本地与 CI 同口径） -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>${exec-maven-plugin.version}</version>
         </plugin>
 
         <plugin>
@@ -327,5 +373,70 @@
         </plugin>
       </plugins>
     </pluginManagement>
+
+    <plugins>
+      <!-- 格式检查：ratchet 从 seed 起只检查后续触碰的文件（与 Gradle 的 spotless 同口径）。
+           根模块无 java 源码 ⇒ 自动跳过；子模块继承本配置。 -->
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <configuration>
+          <ratchetFrom>seed</ratchetFrom>
+          <java>
+            <includes>
+              <include>src/main/java/**/*.java</include>
+              <include>src/test/java/**/*.java</include>
+              <include>src/testFixtures/java/**/*.java</include>
+            </includes>
+            <!-- \# 前缀=static 块置顶，空串=其余单块 ASCII 序 -->
+            <importOrder>
+              <order>\#,</order>
+            </importOrder>
+            <removeUnusedImports/>
+            <trimTrailingWhitespace/>
+            <endWithNewline/>
+          </java>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
+
+  <profiles>
+    <!-- 覆盖率：默认**不插桩**（jacoco agent 让全量闸门慢约 25%），显式 `-Pcoverage` 才采集。
+         Gradle 侧有 doFirst 防呆（忘了加 -Pcoverage 直接报错）；Maven 没有等价拦截，
+         不加 profile 时既不插桩也不出报告 —— 该差异已登记在方案 §3.3。 -->
+    <profile>
+      <id>coverage</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>report</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

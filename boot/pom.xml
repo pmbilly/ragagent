@@ -191,9 +191,37 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <!-- 契约夹具按「模块相对 + 仓库根」两候选读**文件路径** ⇒ 工作目录钉仓库根 -->
-          <argLine>-Xmx2g -XX:+EnableDynamicAgentLoading</argLine>
+          <argLine>@{argLine} -Xmx2g</argLine>
           <workingDirectory>${project.basedir}/..</workingDirectory>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+
+      <!-- 守卫挂在本模块的 verify：boot 是 reactor 最后一个模块。
+           （放根 pom 会在最前面执行 —— Maven 是按模块逐个跑完整个生命周期） -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>guards</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>bash</executable>
+              <workingDirectory>${project.basedir}/..</workingDirectory>
+              <arguments>
+                <argument>scripts/run-guards.sh</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
