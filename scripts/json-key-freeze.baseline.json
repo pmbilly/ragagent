@@ -29,7 +29,7 @@
     "embedding/provider/OllamaEmbedder.java": "embedding/provider",
     "embedding/provider/OpenAiEmbedder.java": "embedding/provider",
     "embedding/provider/ZhipuEmbedder.java": "embedding/provider",
-    "im/channel/dingtalk/DingtalkAdapter.java": "im/",
+    "im/channel/dingtalk/DingtalkCallbackParser.java": "im/",
     "im/channel/dingtalk/DingtalkStreamClient.java": "im/",
     "im/channel/feishu/FeishuAdapter.java": "im/",
     "im/channel/feishu/FeishuCallbackOps.java": "im/",

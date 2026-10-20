@@ -44,7 +44,7 @@ public class DingtalkAdapterFactory implements ImTurnOrchestrator.AdapterFactory
                 ImCredentials.getString(creds, "client_id"),
                 ImCredentials.getString(creds, "client_secret"),
                 ImCredentials.getString(creds, "card_template_id"),
-                apiBaseUrl, ssrfGuard);
+                apiBaseUrl, ssrfGuard, channel.getId());
 
         String mode = ImCredentials.resolveMode(channel, "websocket");
         switch (mode) {

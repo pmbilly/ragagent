@@ -22,6 +22,10 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,7 +86,7 @@ class DingtalkAdapterTest {
         if (server != null) {
             server.stop(0);
         }
-        DingtalkAdapter.STREAMS.clear();
+        DingtalkCardStream.STREAMS.clear();
     }
 
     private DingtalkAdapter adapter(String clientSecret, String cardTemplateId) {
@@ -338,7 +342,7 @@ class DingtalkAdapterTest {
         Captured last = captured.get(captured.size() - 1);
         assertTrue(last.body().contains("\"isFinalize\":true"));
         assertTrue(last.body().contains("定稿内容"));
-        assertNull(DingtalkAdapter.STREAMS.get(streamId));
+        assertNull(DingtalkCardStream.STREAMS.get(streamId));
 
         // 未知流 ID
         assertThrows(IllegalStateException.class,
@@ -424,10 +428,74 @@ class DingtalkAdapterTest {
         assertThrows(IllegalArgumentException.class,
                 () -> new DingtalkAdapterFactory(null, apiBase).create(bad, (m, c) -> { }));
 
-        assertTrue(DingtalkAdapter.isAllowedDownloadHost("https://x.aliyuncs.com/a.jpg"));
-        assertTrue(DingtalkAdapter.isAllowedDownloadHost("https://cdn.dingtalk.com/x"));
-        assertTrue(!DingtalkAdapter.isAllowedDownloadHost("https://evil.com/x"));
-        assertTrue(!DingtalkAdapter.isAllowedDownloadHost("not-a-url"));
+        assertTrue(DingtalkApiClient.isAllowedDownloadHost("https://x.aliyuncs.com/a.jpg"));
+        assertTrue(DingtalkApiClient.isAllowedDownloadHost("https://cdn.dingtalk.com/x"));
+        assertTrue(!DingtalkApiClient.isAllowedDownloadHost("https://evil.com/x"));
+        assertTrue(!DingtalkApiClient.isAllowedDownloadHost("not-a-url"));
+    }
+
+    @Test
+    @DisplayName("流 ID 带渠道维度：同 user/message 在不同渠道互不覆盖")
+    void streamIdIsScopedByChannel() throws Exception {
+        DingtalkAdapter a = new DingtalkAdapter("c", "s", "", apiBase, null, "ch-a");
+        DingtalkAdapter b = new DingtalkAdapter("c", "s", "", apiBase, null, "ch-b");
+        IncomingMessage m = new IncomingMessage();
+        m.platform = ImTypes.PLATFORM_DINGTALK;
+        m.userId = "u1";
+        m.messageId = "m1";
+        m.chatType = ImTypes.CHAT_TYPE_DIRECT;
+
+        String s1 = a.startStream(m);
+        String s2 = b.startStream(m);
+
+        assertEquals("dt:ch-a:u1:m1", s1);
+        assertEquals("dt:ch-b:u1:m1", s2);
+        assertNotNull(DingtalkCardStream.STREAMS.get(s1));
+        assertNotNull(DingtalkCardStream.STREAMS.get(s2));
+    }
+
+    @Test
+    @DisplayName("token 单飞：并发未命中只打一次 token 端点")
+    void tokenFetchIsSingleFlight() throws Exception {
+        responder = req -> {
+            if (req.path().endsWith("/oauth2/accessToken")) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                return StubResponse.json("{\"accessToken\":\"T1\",\"expireIn\":7200}");
+            }
+            return StubResponse.json("{}");
+        };
+        DingtalkApiClient client = new DingtalkApiClient("id", "sec", apiBase, null);
+        ExecutorService pool = Executors.newFixedThreadPool(2);
+        try {
+            Future<String> first = pool.submit(client::getAccessToken);
+            Future<String> second = pool.submit(client::getAccessToken);
+            assertEquals("T1", first.get(5, TimeUnit.SECONDS));
+            assertEquals("T1", second.get(5, TimeUnit.SECONDS));
+        } finally {
+            pool.shutdownNow();
+        }
+        long tokenCalls = captured.stream()
+                .filter(c -> c.path().endsWith("/oauth2/accessToken")).count();
+        assertEquals(1, tokenCalls);
+    }
+
+    @Test
+    @DisplayName("expireIn 小于 300 不产生负 TTL：token 不立刻过期")
+    void shortExpireInDoesNotMakeTokenImmediatelyExpired() throws Exception {
+        responder = req -> StubResponse.json("{\"accessToken\":\"T1\",\"expireIn\":0}");
+        DingtalkApiClient client = new DingtalkApiClient("id", "sec", apiBase, null);
+        assertEquals("T1", client.getAccessToken());
+
+        responder = req -> StubResponse.json("{\"accessToken\":\"T2\",\"expireIn\":7200}");
+        assertEquals("T1", client.getAccessToken());
+
+        long tokenCalls = captured.stream()
+                .filter(c -> c.path().endsWith("/oauth2/accessToken")).count();
+        assertEquals(1, tokenCalls);
     }
 
     // ── 桩 ──────────────────────────────────────────────────────────────────

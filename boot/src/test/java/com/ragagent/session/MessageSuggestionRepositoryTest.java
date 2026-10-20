@@ -196,4 +196,31 @@ class MessageSuggestionRepositoryTest {
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM message_suggestion_sets",
                 Integer.class)).isZero();
     }
+
+    @Test
+    void deleteBySessionIdsRemovesOnlyListedSessions() {
+        repo.acquireGeneration(candidate("m1"), false);
+        MessageSuggestionSet other = candidate("m2");
+        other.setSessionId("sess-2");
+        repo.acquireGeneration(other, false);
+
+        repo.deleteBySessionIds(TENANT, List.of("sess-1"));
+
+        assertThat(jdbc.queryForObject(
+                "SELECT COUNT(*) FROM message_suggestion_sets WHERE session_id = 'sess-1'",
+                Integer.class)).isZero();
+        assertThat(jdbc.queryForObject(
+                "SELECT COUNT(*) FROM message_suggestion_sets WHERE session_id = 'sess-2'",
+                Integer.class)).isEqualTo(1);
+    }
+
+    @Test
+    void deleteBySessionIdsWithEmptyListIsNoOp() {
+        repo.acquireGeneration(candidate("m1"), false);
+
+        repo.deleteBySessionIds(TENANT, List.of());
+
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM message_suggestion_sets",
+                Integer.class)).isEqualTo(1);
+    }
 }

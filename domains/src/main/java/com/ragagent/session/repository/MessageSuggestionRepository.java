@@ -193,6 +193,16 @@ public class MessageSuggestionRepository {
                 .eq(MessageSuggestionSet::getSessionId, sessionId));
     }
 
+    /** **硬删**（批量）：批量删除会话时一条语句清完，避免逐会话往返。 */
+    public void deleteBySessionIds(long tenantId, List<String> sessionIds) {
+        if (sessionIds == null || sessionIds.isEmpty()) {
+            return;
+        }
+        mapper.delete(new LambdaQueryWrapper<MessageSuggestionSet>()
+                .eq(MessageSuggestionSet::getTenantId, tenantId)
+                .in(MessageSuggestionSet::getSessionId, sessionIds));
+    }
+
     /** {@code AcquireGeneration} 的返回：命中的集合 + 是否由本方抢到生成权。 */
     public record AcquireResult(MessageSuggestionSet set, boolean acquired) {
     }

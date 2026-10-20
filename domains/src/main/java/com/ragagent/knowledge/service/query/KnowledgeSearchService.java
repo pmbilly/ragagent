@@ -60,11 +60,17 @@ public class KnowledgeSearchService {
         if (scopes == null || scopes.isEmpty()) {
             return new SearchOutcome(null, false, 0);
         }
-        // JOIN 语义：KB 行必须存在（同租户）且 type=document
+        // JOIN 语义：KB 行必须存在（同租户）且 type=document。首轮把 KB 缓存下来，
+        // 名称回填直接用，避免同一 scope 查两次。
         List<KnowledgeSearchScope> valid = new ArrayList<>();
+        Map<KnowledgeSearchScope, KnowledgeBase> kbByScope = new HashMap<>();
         for (KnowledgeSearchScope s : scopes) {
             KnowledgeBase kb = kbRepository.findById(s.tenantId(), s.kbId());
-            if (kb != null && "document".equals(kb.getType())) {
+            if (kb == null) {
+                continue;
+            }
+            kbByScope.put(s, kb);
+            if ("document".equals(kb.getType())) {
                 valid.add(s);
             }
         }
@@ -79,10 +85,10 @@ public class KnowledgeSearchService {
         if (hasMore) {
             rows = rows.subList(0, limit);
         }
-        // knowledge_base_name 回填
+        // knowledge_base_name 回填（复用首轮缓存）
         Map<String, String> names = new HashMap<>();
         for (KnowledgeSearchScope s : valid) {
-            KnowledgeBase kb = kbRepository.findById(s.tenantId(), s.kbId());
+            KnowledgeBase kb = kbByScope.get(s);
             if (kb != null) {
                 names.put(kb.getId(), kb.getName());
             }

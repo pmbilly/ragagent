@@ -154,8 +154,8 @@
 |---|---|---|
 | **M0** | 核实 03 报告：大文件/事务/SHA/软删/N+1 实测；产出 M 系列方案 | ✅ 2026-10-20 |
 | **M1** | 规模棘轮：方法 >150 行基线 32（新增即红、存量只减，+10 行 bugfix 余量）+ 红态探针；**不设 300 行硬门**（沿用 600/30） | ✅ 2026-10-20 |
-| **M2a** | 钉钉：流表 key 加 channelId、token 单飞 + 负 TTL；拆解析/API/卡片流 | 待启动 |
-| **M2b** | 会话批量删除批量化 + 知识检索 KB 缓存（去逐条查/重复查） | 待启动 |
+| **M2a** | 钉钉：流表 key 加 channelId、token 单飞 + 负 TTL；拆解析/API/卡片流 | ✅ 2026-10-20 |
+| **M2b** | 会话批量删除批量化 + 知识检索 KB 缓存（去逐条查/重复查） | ✅ 2026-10-20 |
 | **M3a** | `platform.security.Hashes`：SHA-256 19 处替换（contract 1 处登记为例外） | 待启动 |
 | **M3b** | `platform.audit.ActivityAuditRecorder`：合并 3 份 `recordKbActivity` | 待启动 |
 | **M3c** | `LogSanitizer` 替换 4 份 `sanitizeForLog`；`trimUnicodeWhitespace` 入 `platform.text` | 待启动 |

@@ -33,7 +33,6 @@ import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.session.support.SessionNotFoundException;
 import com.ragagent.session.support.SessionOwnerIds;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -348,30 +347,21 @@ public class SessionService {
         long tenantId = requireTenantId();
         String userId = SessionOwnerIds.currentSessionOwnerId();
 
-        List<String> visibleIds = new ArrayList<>();
-        for (String id : ids) {
-            try {
-                sessionRepository.get(tenantId, userId, id);
-                visibleIds.add(id);
-            } catch (SessionNotFoundException notFound) {
-                // 该 id 不可见就跳过，不算错误
-            }
-        }
-        if (visibleIds.isEmpty()) {
+        List<Session> visible = sessionRepository.getByIds(tenantId, userId, ids);
+        if (visible.isEmpty()) {
             throw new SessionNotFoundException();
         }
+        List<String> visibleIds = visible.stream().map(Session::getId).toList();
 
         for (String id : visibleIds) {
             cleanupSessionResources(tenantId, id);
         }
 
         sessionRepository.batchDelete(tenantId, userId, visibleIds);
-        for (String id : visibleIds) {
-            try {
-                suggestionRepository.deleteBySessionId(tenantId, id);
-            } catch (RuntimeException e) {
-                log.warn("Failed to delete suggestions for session {}", id, e);
-            }
+        try {
+            suggestionRepository.deleteBySessionIds(tenantId, visibleIds);
+        } catch (RuntimeException e) {
+            log.warn("Failed to delete suggestions for {} sessions", visibleIds.size(), e);
         }
     }
 
@@ -398,13 +388,12 @@ public class SessionService {
 
         sessionRepository.deleteAllByTenantId(tenantId, userId);
 
-        if (sessions != null) {
-            for (Session session : sessions) {
-                try {
-                    suggestionRepository.deleteBySessionId(tenantId, session.getId());
-                } catch (RuntimeException e) {
-                    log.warn("Failed to delete suggestions for session {}", session.getId(), e);
-                }
+        if (sessions != null && !sessions.isEmpty()) {
+            List<String> sessionIds = sessions.stream().map(Session::getId).toList();
+            try {
+                suggestionRepository.deleteBySessionIds(tenantId, sessionIds);
+            } catch (RuntimeException e) {
+                log.warn("Failed to delete suggestions for {} sessions", sessionIds.size(), e);
             }
         }
     }

@@ -172,6 +172,22 @@ public class SessionRepository {
         return session;
     }
 
+    /**
+     * 批量取可见会话（软删过滤 + user 范围）；缺失/不可见的 id 不在返回集中。
+     * 批量删除用它替代逐条 {@link #get}。
+     */
+    public List<Session> getByIds(long tenantId, String userId, List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        LambdaQueryWrapper<Session> w = new LambdaQueryWrapper<Session>()
+                .eq(Session::getTenantId, tenantId)
+                .in(Session::getId, ids)
+                .isNull(Session::getDeletedAt);
+        applyUserScope(w, userId);
+        return mapper.selectList(w);
+    }
+
     /** **不带 user 范围**（管理员越权读的第二跳）。 */
     public Session getById(long tenantId, String id) {
         LambdaQueryWrapper<Session> w = new LambdaQueryWrapper<Session>()

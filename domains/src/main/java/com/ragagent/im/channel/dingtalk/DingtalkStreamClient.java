@@ -312,7 +312,7 @@ public class DingtalkStreamClient {
             throws Exception {
         String data = frame.path("data").asString("");
         JsonNode payload = data.isEmpty() ? MAPPER.createObjectNode() : MAPPER.readTree(data);
-        IncomingMessage msg = DingtalkAdapter.parseCallbackMessage(payload);
+        IncomingMessage msg = DingtalkCallbackParser.parseCallbackMessage(payload);
         if (!msg.fileKey.isEmpty()) {
             msg.extra.put("robot_code", fallbackRobotCode);
         }
