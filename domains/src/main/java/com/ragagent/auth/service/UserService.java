@@ -9,10 +9,8 @@ import com.ragagent.auth.repository.AuthTokenRepository;
 import com.ragagent.auth.repository.UserRepository;
 import com.ragagent.contract.auth.UserPreferences;
 import com.ragagent.contract.settings.SystemSettingGateway;
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.security.UserNameLookup;
 import io.jsonwebtoken.Claims;
 import java.time.OffsetDateTime;
@@ -24,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 用户 service。
@@ -53,6 +50,8 @@ public class UserService implements UserNameLookup {
     private final UserSessionOps sessionOps;
     final JwtService jwtService;
     private final SystemSettingGateway settingService;
+    private final UserRegistrationService registrationService;
+    private final LoginTenantResolver loginTenantResolver;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public UserService(UserRepository userRepo,
@@ -60,13 +59,16 @@ public class UserService implements UserNameLookup {
                        TenantService tenantService,
                        TenantMemberService memberService,
                        JwtService jwtService,
-                       SystemSettingGateway settingService) {
+                       SystemSettingGateway settingService,
+                       UserRegistrationService registrationService) {
         this.userRepo = userRepo;
         this.authTokenRepo = authTokenRepo;
         this.tenantService = tenantService;
         this.memberService = memberService;
         this.jwtService = jwtService;
         this.settingService = settingService;
+        this.registrationService = registrationService;
+        this.loginTenantResolver = new LoginTenantResolver(userRepo, tenantService, memberService);
         this.sessionOps = new UserSessionOps(this);
     }
 
@@ -265,124 +267,9 @@ public class UserService implements UserNameLookup {
 
     // ── 登录空间解析（preference → home → 首个 membership） ────────────────
 
-    /** 解析登录目标空间：last-active 偏好优先，偏好失效即清除并回退。 */
+    /** 解析登录目标空间；状态机与失效自愈见 {@link LoginTenantResolver}。 */
     long resolveLoginTenantId(User user) {
-        if (user == null) {
-            return 0;
-        }
-        Long pref = user.getPreferences() != null
-                ? user.getPreferences().getLastActiveTenantId() : null;
-        long home = user.getTenantId() == null ? 0 : user.getTenantId();
-        if (pref == null || pref == 0 || pref == home) {
-            return homeOrFirstMembershipTenant(user);
-        }
-        long preferred = pref;
-
-        if (tenantService.getTenantById(preferred) == null) {
-            log.warn("resolveLoginTenantID: preferred tenant {} not loadable for user {}, "
-                    + "clearing preference and falling back to home", preferred, user.getId());
-            clearLastActiveTenantPreference(user);
-            return homeOrFirstMembershipTenant(user);
-        }
-
-        if (!user.isCanAccessAllTenants()) {
-            TenantMember member = memberService.getMembership(user.getId(), preferred);
-            if (member == null || !TenantMemberService.STATUS_ACTIVE.equals(member.getStatus())) {
-                log.warn("resolveLoginTenantID: user {} no longer has active membership in tenant {}, "
-                        + "clearing preference and falling back to home", user.getId(), preferred);
-                clearLastActiveTenantPreference(user);
-                return homeOrFirstMembershipTenant(user);
-            }
-        }
-        return preferred;
-    }
-
-    /** home 空间优先；无 home 或 home 失去 active 成员资格时回退首个 membership。 */
-    private long homeOrFirstMembershipTenant(User user) {
-        if (user == null) {
-            return 0;
-        }
-        long home = user.getTenantId() == null ? 0 : user.getTenantId();
-        if (home == 0) {
-            return resolveFirstMembershipTenant(user);
-        }
-        if (user.isCanAccessAllTenants()) {
-            return home;
-        }
-        TenantMember member = memberService.getMembership(user.getId(), home);
-        if (member != null && TenantMemberService.STATUS_ACTIVE.equals(member.getStatus())) {
-            return home;
-        }
-        log.warn("homeOrFirstMembershipTenant: user {} home tenant {} has no active membership, "
-                + "clearing stale home and re-resolving", user.getId(), home);
-        clearStaleHomeTenant(user);
-        return resolveFirstMembershipTenant(user);
-    }
-
-    /** 清掉失效 home：tenant_id 归零并落库（失败仅记日志） */
-    private void clearStaleHomeTenant(User user) {
-        long staleHome = user.getTenantId() == null ? 0 : user.getTenantId();
-        user.setTenantId(0L);
-        if (user.getPreferences() != null
-                && staleHome != 0
-                && Long.valueOf(staleHome).equals(user.getPreferences().getLastActiveTenantId())) {
-            user.getPreferences().setLastActiveTenantId(null);
-        }
-        try {
-            // tenant_id 置空必须显式写 SQL NULL。
-            // ⚠️ 两个坑：tenant_id=0 写进 UPDATE 会炸 FK fk_users_tenant；preferences 是
-            // jsonb 列，两参 set 带 typeHandler 字段会 MyBatisSystemException（须用三参 set）。
-            // 只写 tenant_id=NULL——preferences.last_active_tenant_id 的存量偏差无害
-            // （pref==home 与 home 走同一条解析路径，净行为一致；已记录为已知偏差）。
-            userRepo.clearTenantId(user.getId());
-        } catch (RuntimeException e) {
-            log.warn("clearStaleHomeTenant: failed to persist cleared home for user {} (was tenant {})", user.getId(), staleHome, e);
-        }
-    }
-
-    /**
-     * tenantless 身份采用最早 active membership，
-     * 并尽力持久化为 home（持久化失败不阻塞，仍返回该 membership 的 tenant）。
-     */
-    private long resolveFirstMembershipTenant(User user) {
-        if (user == null) {
-            return 0;
-        }
-        List<TenantMember> members = memberService.listByUser(user.getId());
-        for (TenantMember member : members) {
-            if (member == null
-                    || member.getTenantId() == null || member.getTenantId() == 0
-                    || !TenantMemberService.STATUS_ACTIVE.equals(member.getStatus())) {
-                continue;
-            }
-            if (tenantService.getTenantById(member.getTenantId()) == null) {
-                log.warn("resolveLoginTenantID: tenant {} for tenantless user {} is unavailable",
-                        member.getTenantId(), user.getId());
-                continue;
-            }
-            long tid = member.getTenantId();
-            user.setTenantId(tid);
-            try {
-                userRepo.updateById(user);
-            } catch (RuntimeException e) {
-                log.warn("resolveLoginTenantID: failed to persist tenant {} for tenantless user {}", tid, user.getId(), e);
-                user.setTenantId(0L);
-            }
-            return tid;
-        }
-        return 0;
-    }
-
-    /** 清 last-active 偏好并落库（失败仅记日志） */
-    private void clearLastActiveTenantPreference(User user) {
-        if (user.getPreferences() != null) {
-            user.getPreferences().setLastActiveTenantId(null);
-        }
-        try {
-            userRepo.updateById(user);
-        } catch (RuntimeException e) {
-            log.warn("clearLastActiveTenantPreference: failed to persist cleared preference for user {}", user.getId(), e);
-        }
+        return loginTenantResolver.resolve(user);
     }
 
     // ── Token 签发 ────────────────────────────────────────────────────────
@@ -427,83 +314,9 @@ public class UserService implements UserNameLookup {
         }
     }
 
-    /**
-     * 创建顺序：租户（含默认存储后端）→ 用户 → Owner 成员行；
-     * 任一步失败由事务整体回滚，错误消息逐字符保持既有文案。
-     */
-    @Transactional(rollbackFor = Exception.class)
+    /** 注册用例；事务在 {@link UserRegistrationService}。 */
     public User register(String username, String email, String password, String provisioning) {
-        if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            throw new RegistrationException("username, email and password are required");
-        }
-        if (getUserByEmail(email) != null) {
-            throw new RegistrationException("user with this email already exists");
-        }
-        if (getUserByUsername(username) != null) {
-            throw new RegistrationException("user with this username already exists");
-        }
-        String hashedPassword = passwordEncoder.encode(password);
-
-        String mode = provisioning;
-        if (mode == null || mode.isEmpty()) {
-            mode = PROVISIONING_CREATE_PERSONAL;
-        }
-        if (!PROVISIONING_CREATE_PERSONAL.equals(mode) && !PROVISIONING_TENANTLESS.equals(mode)) {
-            throw new RegistrationException("invalid tenant provisioning mode \"" + mode + "\"");
-        }
-
-        TenantRowView createdTenant = null;
-        if (PROVISIONING_CREATE_PERSONAL.equals(mode)) {
-            TenantRowView tenant = new TenantRowView();
-            // 租户名再过一遍日志消毒（入口已对 username 消毒，此处幂等）
-            tenant.setName(LogSanitizer.sanitize(username) + "'s Workspace");
-            tenant.setDescription("Default workspace");
-            tenant.setStatus("active");
-            try {
-                createdTenant = tenantService.createTenant(tenant);
-            } catch (RuntimeException e) {
-                log.error("Failed to create workspace", e);
-                throw new RegistrationException("failed to create workspace");
-            }
-        }
-
-        User user = new User();
-        user.setId(UUID.randomUUID().toString());
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPasswordHash(hashedPassword);
-        // tenantless 时 tenant_id 落库为 SQL NULL
-        // （写 0 会违反 fk_users_tenant）；读回时由领域层归一为 0
-        user.setTenantId(createdTenant != null ? createdTenant.getId() : null);
-        user.setIsActive(true);
-        user.setPreferences(new UserPreferences());
-        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        user.setCreatedAt(now);
-        user.setUpdatedAt(now);
-
-        try {
-            if (createdTenant == null) {
-                // tenantless：getter 会把 null 归一成 0，必须走省略 tenant_id 列的插入
-                // （落 SQL NULL；写 0 在真 PG 违反 fk_users_tenant）
-                userRepo.insertTenantless(user);
-            } else {
-                userRepo.insert(user);
-            }
-        } catch (RuntimeException e) {
-            log.error("Failed to create user", e);
-            throw new RegistrationException("failed to create user");
-        }
-
-        // Owner 成员行引导：失败由事务整体回滚（见类级 register 的 @Transactional）
-        if (createdTenant != null) {
-            try {
-                memberService.addMember(user.getId(), createdTenant.getId(), TenantRole.OWNER.value(), null);
-            } catch (RuntimeException e) {
-                log.error("Failed to create owner membership for user {} tenant {}", user.getId(), createdTenant.getId(), e);
-                throw new RegistrationException("failed to finalise workspace ownership");
-            }
-        }
-        return user;
+        return registrationService.register(username, email, password, provisioning);
     }
 
     /** 软删除过滤；找不到返回 null */
