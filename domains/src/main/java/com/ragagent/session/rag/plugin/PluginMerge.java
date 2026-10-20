@@ -102,7 +102,7 @@ public final class PluginMerge implements Plugin {
         mergedChunks = dedup("final_dedup", mergedChunks);
         mergedChunks = SearchSupport.removePartialOverlaps(mergedChunks);
 
-        chatManage.setMergeResult(mergedChunks);
+        chatManage.getMerged().setResults(mergedChunks);
         return next.next();
     }
 

@@ -513,8 +513,8 @@ public class SessionKnowledgeQaService {
         }
 
         log.info("Knowledge base search completed, found {} results",
-                chatManage.getMergeResult() == null ? 0 : chatManage.getMergeResult().size());
-        return chatManage.getMergeResult() == null ? new ArrayList<>() : chatManage.getMergeResult();
+                chatManage.getMerged().getResults() == null ? 0 : chatManage.getMerged().getResults().size());
+        return chatManage.getMerged().getResults() == null ? new ArrayList<>() : chatManage.getMerged().getResults();
     }
 
     // 共享 QA helpers

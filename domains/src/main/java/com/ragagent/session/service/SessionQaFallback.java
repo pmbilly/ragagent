@@ -302,15 +302,15 @@ final class SessionQaFallback {
     /** 发送 knowledge_references 事件。 */
     static void emitKnowledgeReferencesEvent(ChatManage chatManage) {
         if (chatManage == null || chatManage.getRuntime().getEventBus() == null
-                || chatManage.getMergeResult() == null || chatManage.getMergeResult().isEmpty()) {
+                || chatManage.getMerged().getResults() == null || chatManage.getMerged().getResults().isEmpty()) {
             return;
         }
-        log.info("Emitting references event with {} results (pre-answer)", chatManage.getMergeResult().size());
+        log.info("Emitting references event with {} results (pre-answer)", chatManage.getMerged().getResults().size());
         Event evt = new Event();
         evt.setId(EventIds.generateEventID("references"));
         evt.setType(EventType.EVENT_AGENT_REFERENCES);
         evt.setSessionId(chatManage.getSessionId());
-        evt.setData(new AgentReferencesData(chatManage.getMergeResult(), 0));
+        evt.setData(new AgentReferencesData(chatManage.getMerged().getResults(), 0));
         try {
             chatManage.getRuntime().getEventBus().emit(evt);
         } catch (RuntimeException e) {

@@ -19,15 +19,16 @@ import java.util.Map;
  *   <li><b>请求段（不可变配置）</b>：query/sessionId/userId/maxRounds、检索参数、重排参数、
  *       模型参数、改写开关、FAQ 策略、多模态/附件、web 检索开关、summaryConfig。</li>
  *   <li><b>状态段（插件间流转）</b>：rewriteQuery/intent/history、searchResult/
- *       mergeResult/graphResult/entity 系列、imageDescription/quotedContext/systemPromptOverride/
- *       memoryPrompt/usedMemories；答复组见 {@link AnswerState}，重排结果见 {@link RerankOutcome}。</li>
+ *       graphResult/entity 系列、imageDescription/quotedContext/systemPromptOverride/
+ *       memoryPrompt/usedMemories；答复组见 {@link AnswerState}，重排结果见
+ *       {@link RerankOutcome}，合并结果见 {@link MergedContext}。</li>
  *   <li><b>运行时段</b>：见 {@link TurnRuntime}（事件总线 + 消息 id），不在本类字段里。</li>
  * </ul>
  *
  * <h2>{@link #cloneChatManage()} 的复制面</h2>
  * <p>请求段全量复制（SearchTarget 不可变，列表换新）；状态段<b>只复制</b> rewriteQuery/intent/
  * imageDescription/quotedContext/systemPromptOverride/memoryPrompt/usedMemories/renderedContexts/
- * entity/entityKBIDs/entityKnowledge——<b>history、searchResult、mergeResult、
+ * entity/entityKBIDs/entityKnowledge——<b>history、searchResult、合并结果、
  * userContent、chatResponse、重排结果以及运行时段句柄都不复制</b>。</p>
  *
  * <p>本类型不落 jsonb 也不作响应体，不进 JsonContractRoundTripTest。</p>
@@ -98,7 +99,8 @@ public final class ChatManage implements TurnInputView {
     private List<SearchResult> searchResult;
     /** 重排结果（CHUNK_RERANK 写，下游只读）。 */
     private final RerankOutcome rerank = new RerankOutcome();
-    private List<SearchResult> mergeResult;
+    /** 合并结果（CHUNK_MERGE 写，DATA_ANALYSIS 读写）。 */
+    private final MergedContext merged = new MergedContext();
     private List<String> entity;
     private List<String> entityKbIds;
     private Map<String, String> entityKnowledge;
@@ -222,8 +224,7 @@ public final class ChatManage implements TurnInputView {
     public List<SearchResult> getSearchResult() { return searchResult; }
     public void setSearchResult(List<SearchResult> v) { searchResult = v; }
     public RerankOutcome getRerank() { return rerank; }
-    public List<SearchResult> getMergeResult() { return mergeResult; }
-    public void setMergeResult(List<SearchResult> v) { mergeResult = v; }
+    public MergedContext getMerged() { return merged; }
     public List<String> getEntity() { return entity; }
     public void setEntity(List<String> v) { entity = v; }
     public List<String> getEntityKbIds() { return entityKbIds; }

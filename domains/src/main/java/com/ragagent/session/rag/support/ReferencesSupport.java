@@ -45,7 +45,7 @@ public final class ReferencesSupport {
             messages.get(0).setContent(
                     PromptComposer.appendProtocol(messages.get(0).getContent(), registry.protocolPrompt()));
         }
-        if (chatManage.getMergeResult() == null || chatManage.getMergeResult().isEmpty()
+        if (chatManage.getMerged().getResults() == null || chatManage.getMerged().getResults().isEmpty()
                 || messages.isEmpty()) {
             return new Assembly(messages, registry);
         }
@@ -144,15 +144,15 @@ public final class ReferencesSupport {
             return null;
         }
         if (!chatManage.isFaqPriorityEnabled()) {
-            return chatManage.getMergeResult();
+            return chatManage.getMerged().getResults();
         }
-        List<SearchResult> ordered = new ArrayList<>(chatManage.getMergeResult().size());
-        for (SearchResult result : chatManage.getMergeResult()) {
+        List<SearchResult> ordered = new ArrayList<>(chatManage.getMerged().getResults().size());
+        for (SearchResult result : chatManage.getMerged().getResults()) {
             if (result != null && ChunkTypes.FAQ.equals(result.getChunkType())) {
                 ordered.add(result);
             }
         }
-        for (SearchResult result : chatManage.getMergeResult()) {
+        for (SearchResult result : chatManage.getMerged().getResults()) {
             if (result != null && !ChunkTypes.FAQ.equals(result.getChunkType())) {
                 ordered.add(result);
             }

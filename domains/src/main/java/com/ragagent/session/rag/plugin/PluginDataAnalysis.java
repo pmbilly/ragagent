@@ -63,7 +63,7 @@ public final class PluginDataAnalysis implements Plugin {
         }
         // 1. 找 CSV/Excel 命中
         List<SearchResult> dataFiles = new ArrayList<>();
-        List<SearchResult> mergeResult = chatManage.getMergeResult();
+        List<SearchResult> mergeResult = chatManage.getMerged().getResults();
         for (SearchResult result : mergeResult) {
             if (isDataFile(result.getKnowledgeFilename())) {
                 dataFiles.add(result);
@@ -71,7 +71,7 @@ public final class PluginDataAnalysis implements Plugin {
         }
 
         // 过滤表格列/摘要块
-        chatManage.setMergeResult(filterOutTableChunks(mergeResult));
+        chatManage.getMerged().setResults(filterOutTableChunks(mergeResult));
 
         if (dataFiles.isEmpty()) {
             return next.next();
@@ -160,7 +160,7 @@ public final class PluginDataAnalysis implements Plugin {
             analysisResult.setKnowledgeTitle(knowledge.title());
             analysisResult.setKnowledgeFilename(knowledge.fileName());
             analysisResult.setKnowledgeDescription(knowledge.description());
-            chatManage.getMergeResult().add(analysisResult);
+            chatManage.getMerged().getResults().add(analysisResult);
         } finally {
             tool.cleanup();
         }

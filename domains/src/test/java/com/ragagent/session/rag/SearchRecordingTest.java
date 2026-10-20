@@ -183,12 +183,12 @@ class SearchRecordingTest {
                 Rec46cSupport.sr("m2", "c2", "k2", 0.9),
                 Rec46cSupport.sr("m3", "c3", "k1", 0.9),
                 Rec46cSupport.sr("m4", "c4", "k3", 0.1)));
-        cm.setMergeResult(merge);
+        cm.getMerged().setResults(merge);
         boolean[] next = {false};
         p.onEvent(PipelineEventType.FILTER_TOP_K, cm, () -> { next[0] = true; return null; });
         Map<String, Object> s1 = new LinkedHashMap<>();
         s1.put("next", next[0]);
-        s1.put("out", searchResultsShape(cm.getMergeResult()));
+        s1.put("out", searchResultsShape(cm.getMerged().getResults()));
         assertRec("filter_top_k", "merge", json(s1));
 
         ChatManage cm2 = new ChatManage();

@@ -49,12 +49,12 @@ public final class PluginIntoChatMessage implements Plugin {
     public PluginError onEvent(PipelineEventType eventType, ChatManage chatManage, Plugin.Chain next) {
         Map<String, Object> in = new LinkedHashMap<>();
         in.put("sessionId", chatManage.getSessionId());
-        in.put("merge_result_cnt", chatManage.getMergeResult() == null ? 0 : chatManage.getMergeResult().size());
+        in.put("merge_result_cnt", chatManage.getMerged().getResults() == null ? 0 : chatManage.getMerged().getResults().size());
         in.put("template_len", chatManage.getSummaryConfig().getContextTemplate().length());
         PipelineLog.info("IntoChatMessage", "input", in);
 
-        List<SearchResult> mergeResult = chatManage.getMergeResult() == null
-                ? new ArrayList<>() : chatManage.getMergeResult();
+        List<SearchResult> mergeResult = chatManage.getMerged().getResults() == null
+                ? new ArrayList<>() : chatManage.getMerged().getResults();
 
         // FAQ 优先时的分组
         List<SearchResult> faqResults = new ArrayList<>();

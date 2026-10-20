@@ -109,7 +109,7 @@ class PipelineLifecycleRecordingTest {
         cmE.setQuery("原始问题");
         cmE.setRewriteQuery("改写后");
         cmE.getRuntime().setEventBus(bus);
-        cmE.setMergeResult(new ArrayList<>(List.of(
+        cmE.getMerged().setResults(new ArrayList<>(List.of(
                 Rec46cSupport.sr("r1", "", "k", 0d), Rec46cSupport.sr("r2", "", "k", 0d),
                 Rec46cSupport.sr("r3", "", "k", 0d))));
         PipelineProgress.StageProgress prog = PipelineProgress.beginRetrievalProgress(cmE);
@@ -162,7 +162,7 @@ class PipelineLifecycleRecordingTest {
         d1.setChunkType("text");
         SearchResult w2 = Rec46cSupport.sr("w2", "", "k", 0d);
         w2.setKnowledgeSource("web_search");
-        cmE5.setMergeResult(new ArrayList<>(List.of(w1, d1, w2)));
+        cmE5.getMerged().setResults(new ArrayList<>(List.of(w1, d1, w2)));
         PipelineProgress.StageProgress prog5 = PipelineProgress.beginRetrievalProgress(cmE5);
         PipelineProgress.endRetrievalProgress(cmE5, prog5, 0, null);
         assertRec("progress", "mixed_source_events", bus5.eventsJson());
@@ -226,7 +226,7 @@ class PipelineLifecycleRecordingTest {
         merge.add(c1);
         merge.add(c2);
         merge.add(c3);
-        cm3.setMergeResult(merge);
+        cm3.getMerged().setResults(merge);
         p.onEvent(PipelineEventType.INTO_CHAT_MESSAGE, cm3, () -> null);
         Map<String, Object> s3 = new LinkedHashMap<>();
         s3.put("user_content", cm3.getAnswer().getUserContent());
@@ -252,7 +252,7 @@ class PipelineLifecycleRecordingTest {
         f1.setKnowledgeTitle("FAQ 库");
         SearchResult f2 = Rec46cSupport.sr("f2", "低分 FAQ", "", 0.4);
         f2.setChunkType("faq");
-        cm4.setMergeResult(new ArrayList<>(List.of(d1, f1, f2)));
+        cm4.getMerged().setResults(new ArrayList<>(List.of(d1, f1, f2)));
         p.onEvent(PipelineEventType.INTO_CHAT_MESSAGE, cm4, () -> null);
         Map<String, Object> s4 = new LinkedHashMap<>();
         s4.put("user_content", cm4.getAnswer().getUserContent());
@@ -307,7 +307,7 @@ class PipelineLifecycleRecordingTest {
         c1.setChunkType("text");
         c1.setKnowledgeBaseId("kb1");
         c1.setKnowledgeTitle("标题一");
-        cm.setMergeResult(new ArrayList<>(List.of(c1)));
+        cm.getMerged().setResults(new ArrayList<>(List.of(c1)));
         cm.getAnswer().setUserContent("Q");
         var out1 = ReferencesSupport.prepareMessagesWithModelContext(cm);
         Map<String, Object> s1 = new LinkedHashMap<>();
@@ -337,7 +337,7 @@ class PipelineLifecycleRecordingTest {
         k2.setChunkType("text");
         SearchResult w2 = Rec46cSupport.sr("https://example.com/b", "网页摘要 B", "", 0d);
         w2.setKnowledgeSource("web_search");
-        cm2.setMergeResult(new ArrayList<>(List.of(k1, w1, k2, w2)));
+        cm2.getMerged().setResults(new ArrayList<>(List.of(k1, w1, k2, w2)));
         cm2.getAnswer().setUserContent("Q");
         var out2 = ReferencesSupport.prepareMessagesWithModelContext(cm2);
         assertRec("references", "citations_on", mask(json(msgsJSON(out2.messages()))));
@@ -355,7 +355,7 @@ class PipelineLifecycleRecordingTest {
         SearchResult k3 = Rec46cSupport.sr("c1", "知识内容", "k1", 0d);
         k3.setKnowledgeTitle("T");
         k3.setChunkType("text");
-        cm3.setMergeResult(new ArrayList<>(List.of(k3)));
+        cm3.getMerged().setResults(new ArrayList<>(List.of(k3)));
         var out3 = ReferencesSupport.prepareMessagesWithModelContext(cm3);
         assertRec("references", "rendered_replacement", mask(json(msgsJSON(out3.messages()))));
 
@@ -378,7 +378,7 @@ class PipelineLifecycleRecordingTest {
         SearchResult f2 = Rec46cSupport.sr("f2", "FAQ 二", "kf", 0d);
         f2.setChunkType("faq");
         f2.setChunkIndex(1);
-        cm4.setMergeResult(new ArrayList<>(List.of(d1, f1, f2)));
+        cm4.getMerged().setResults(new ArrayList<>(List.of(d1, f1, f2)));
         var out4 = ReferencesSupport.prepareMessagesWithModelContext(cm4);
         assertRec("references", "faq_order", mask(json(msgsJSON(out4.messages()))));
 

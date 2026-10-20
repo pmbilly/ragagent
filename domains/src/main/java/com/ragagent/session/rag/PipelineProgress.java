@@ -242,8 +242,8 @@ public final class PipelineProgress {
     }
 
     static List<SearchResult> retrievalResults(ChatManage chatManage) {
-        if (chatManage.getMergeResult() != null && !chatManage.getMergeResult().isEmpty()) {
-            return chatManage.getMergeResult();
+        if (chatManage.getMerged().getResults() != null && !chatManage.getMerged().getResults().isEmpty()) {
+            return chatManage.getMerged().getResults();
         }
         if (chatManage.getRerank().getResults() != null && !chatManage.getRerank().getResults().isEmpty()) {
             return chatManage.getRerank().getResults();

@@ -49,10 +49,10 @@ def plugin_meta() -> dict:
         # 状态组经 getter 链访问：cm.getAnswer().setUserContent(...) / cm.getRuntime().getEventBus()
         if var:
             accesses += re.findall(
-                rf"\b{re.escape(var.group(1))}\.get(?:Answer|Runtime|Rerank)\(\)\.(get|set|is)([A-Z]\w*)\(",
+                rf"\b{re.escape(var.group(1))}\.get(?:Answer|Runtime|Rerank|Merged)\(\)\.(get|set|is)([A-Z]\w*)\(",
                 text)
         reads, writes = set(), set()
-        state_wrappers = {"answer", "runtime", "rerank"}
+        state_wrappers = {"answer", "runtime", "rerank", "merged"}
         for kind, field in accesses:
             field_name = field[0].lower() + field[1:]
             if field_name in state_wrappers:

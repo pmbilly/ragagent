@@ -62,13 +62,13 @@
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginMerge | `query`、`results`、`rewriteQuery`、`searchResult`、`sessionId`、`tenantId` | `mergeResult` |
+| PluginMerge | `query`、`results`、`rewriteQuery`、`searchResult`、`sessionId`、`tenantId` | `results` |
 
 ### `DATA_ANALYSIS`
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginDataAnalysis | `chatModelId`、`mergeResult`、`query`、`sessionId` | `mergeResult` |
+| PluginDataAnalysis | `chatModelId`、`query`、`results`、`sessionId` | `results` |
 
 ### `INTO_CHAT_MESSAGE`
 
@@ -92,7 +92,7 @@
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginFilterTopK | `mergeResult`、`rerankTopK`、`results`、`searchResult`、`sessionId` | `mergeResult`、`results`、`searchResult` |
+| PluginFilterTopK | `rerankTopK`、`results`、`searchResult`、`sessionId` | `results`、`searchResult` |
 
 ## 注册顺序（`QaWiring`）
 
