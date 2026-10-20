@@ -161,6 +161,8 @@ public final class QaSupport {
         public volatile boolean cancelled;
         public Message assistantMessage;
         public SteerSinkBridge steerSink;
+        /** 本轮终态单赢家：三个收尾点（推送/续传/事件总线）共用。 */
+        public final TurnLifecycle lifecycle = new TurnLifecycle();
         /** SetLiveRun failed → executeQA must not start the engine */
         public boolean liveRunFailed;
         public String liveRunErr = "";

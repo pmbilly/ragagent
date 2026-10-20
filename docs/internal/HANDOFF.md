@@ -100,7 +100,8 @@
 | 批 | 内容 | 状态 |
 |---|---|---|
 | **H0** | 判据先行：端口准入 / 契约形状预算 / 平台依赖面三条守卫 + 业务能力映射一页纸 | ✅ 2026-10-20 |
-| **H1** | 问答 `TurnLifecycle`（收 2 个轮询 + 3 把锁） | 待做 |
+| **H1a** | 问答终态单赢家：`TurnLifecycle`（收尾闸门 + SSE/续传两处观察者口径） | ✅ 2026-10-20 |
+| **H1b** | 问答收锁与状态持久化（3 把锁 → 状态机内） | 待做 |
 | **H2a** | 问答运行时段：抽 `TurnRuntime`（3 字段） | 待做 |
 | **H2b** | 问答请求段：`TurnInputView`（41 字段只读）+ `QaRequestContext` 收口 | 待做 |
 | **H2c** | 问答状态段：15 字段按 5 组暴露，删 `ChatManage` | 待做 |
@@ -411,6 +412,7 @@ boot           14 件                      →  boot
 | H5b | 2026-10-20 | **软删过滤探测**：新增 `platform.persistence.SoftDeleteFilterGuard`（26 张带 `deleted_at` 的表，`off/alert/enforce` 三档，默认 enforce），挂 MyBatis 插件链第 4 位；SELECT 主查询缺 `deleted_at` 谓词即抛 `MybatisPlusException`。实测存量 **0 条违规**（79 处手写谓词已覆盖），`ALLOWED_STATEMENTS` 为空；v1 边界同租户守卫（JOIN 次表/UNION/FROM 子查询不查、解析失败放行）。新增守卫单测 5 例 + 装配档位测试 1 例。 | **42 守卫全绿** · **5013 / 0 / 4**（boot +1）· build 1m45s |
 | H4b-1 | 2026-10-20 | **datasource 队列迁基座**：`RedisRetryingTaskQueue` 补齐 per-task `maxRetry` / `timeoutMillis` / 幂等键 / 提交结果（`TaskSpec` / `SubmitOutcome`），成员 JSON 对缺省字段兼容；`RedisDataSourceSyncTaskQueue` 从 292 行降到 ~120 行，只保留 TaskID 去重、载荷解码与 trace 包装；6 个队列测试（去重 / 重试 / 超时 / 租约回收）全绿。**余**：wiki（死信 + 锁冲突 15s + slot releaser）。 | **42 守卫全绿** · **5013 / 0 / 4** · build 2m23s |
 | H4b-2 | 2026-10-20 | **wiki 队列迁基座**：`RedisRetryingTaskQueue` 加 `FailurePolicy`（重试延迟 + 终态死信回调）与 `TaskSpec.idempotencyTtlSeconds` 覆盖；`RedisWikiIngestTaskQueue` 从 393 行降到 ~200 行，只留 TaskID 合并、载荷编解码、锁冲突 15s 与 slot 释放；成员 JSON 改为基座 `QueueMember`（在飞旧格式不兼容，pre-release 可接受）。6 个 wiki 队列测试（延迟 / 合并 / 重试 / 死信 / 租约回收）全绿。 | **42 守卫全绿** · **5017 / 0 / 4** · build 3m47s |
+| H1a | 2026-10-20 | **轮次终态单赢家**：新增 `session.service.TurnLifecycle`（STREAMING→FINALIZING→DONE/FAILED，终态不可逆）；`QaTurnExecutor` 的收尾闸门由局部 `boolean[1]` 改为 `finish(DONE)`；SSE 推送与续传两个观察者循环改用 `isTerminalEvent`（COMPLETE 或 ERROR+done）统一口径。新增状态机单测 4 例。**余**：H1b 收 3 把锁与状态持久化。 | **42 守卫全绿** · **5021 / 0 / 4**（domains +4）· build 3m34s |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

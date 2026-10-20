@@ -25,6 +25,7 @@ import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.session.controller.sse.StreamEventEmitter;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionService;
+import com.ragagent.session.service.TurnLifecycle;
 import com.ragagent.session.support.MessageNotFoundException;
 import com.ragagent.session.support.SessionNotFoundException;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -306,7 +307,7 @@ public class SessionStreamController {
                         completedNow = true;
                     }
                     emitter.emitStreamEvent(new ServletSseSink(response), evt, requestId, resourceRewriter, client);
-                    if (evt.getType() == ResponseType.ERROR && evt.isDone()) {
+                    if (TurnLifecycle.isTerminalEvent(evt) && evt.getType() != ResponseType.COMPLETE) {
                         // ERROR+done 是终态元素：错误帧已写出，不再轮询
                         log.info("Stream terminated with error, session ID: {}, message ID: {}",
                                 sessionId, messageId);

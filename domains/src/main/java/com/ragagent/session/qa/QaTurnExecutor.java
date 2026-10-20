@@ -26,6 +26,7 @@ import com.ragagent.session.service.QaSupport.SseStreamContext;
 import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SteerRunCoordinator;
+import com.ragagent.session.service.TurnLifecycle;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -179,7 +180,7 @@ public final class QaTurnExecutor {
                 QaTurnSupport.appendQuickAnswerReasoning(streamCtx.assistantMessage, data.getContent());
             }
         });
-        final boolean[] completionHandled = {false};
+
         // 事件在桥接虚拟线程触发，TenantContext 是 ThreadLocal——注册时捕获
         // session 租户，触发时 replay（与 stop 处理器同款纪律 #1）。
         final long normalSessionTenantId = reqCtx.session.getTenantId();
@@ -194,10 +195,9 @@ public final class QaTurnExecutor {
                     am.setFallback(true);
                 }
                 if (data.isDone()) {
-                    if (completionHandled[0]) {
-                        return;
+                    if (!streamCtx.lifecycle.finish(TurnLifecycle.State.DONE)) {
+                        return; // 已由另一条收尾路径赢下终态
                     }
-                    completionHandled[0] = true;
                     log.info("Knowledge QA service completed for session: {}", sessionId);
                     turnFinalizer.runWithTenant(normalSessionTenantId, () -> {
                         turnFinalizer.completeAssistantMessage(streamCtx.assistantMessage, reqCtx.query,

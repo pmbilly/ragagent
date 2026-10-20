@@ -32,6 +32,7 @@ import com.ragagent.session.service.QaSupport.QaMode;
 import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.QaSupport.SseStreamContext;
 import com.ragagent.session.service.SteerSinkBridge;
+import com.ragagent.session.service.TurnLifecycle;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -213,7 +214,7 @@ public final class QaSseOrchestrator {
                 if (evt.getType() == ResponseType.COMPLETE) {
                     return;
                 }
-                if (evt.getType() == ResponseType.ERROR && evt.isDone()) {
+                if (TurnLifecycle.isTerminalEvent(evt) && evt.getType() != ResponseType.COMPLETE) {
                     return;
                 }
             }
@@ -287,7 +288,7 @@ public final class QaSseOrchestrator {
                     log.info("Connection closed during event sending, stopping");
                     return;
                 }
-                if (evt.getType() == ResponseType.ERROR && evt.isDone()) {
+                if (TurnLifecycle.isTerminalEvent(evt) && evt.getType() != ResponseType.COMPLETE) {
                     // ERROR+done 是终态元素：错误帧已由 emitStreamEvent 写出，不再轮询
                     log.info("Agent stream terminated with error, session={}, message={}",
                             sessionId, assistantMessageId);
