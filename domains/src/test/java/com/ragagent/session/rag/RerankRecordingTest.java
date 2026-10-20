@@ -196,7 +196,7 @@ class RerankRecordingTest {
         Map<String, Object> s1 = new LinkedHashMap<>();
         s1.put("next", next[0]);
         s1.put("err", errOf(err));
-        s1.put("rerank", searchResultsShape(cm.getRerankResult()));
+        s1.put("rerank", searchResultsShape(cm.getRerank().getResults()));
         s1.put("model_calls", rr.calls);
         // 录制探针的 ms 未挂 calls 指针 → model_lookup 录成 null（形状备案）
         s1.put("model_lookup", null);
@@ -215,7 +215,7 @@ class RerankRecordingTest {
         Map<String, Object> s2 = new LinkedHashMap<>();
         s2.put("next", next2[0]);
         s2.put("err", errOf(err2));
-        s2.put("rerank", searchResultsShape(cm2.getRerankResult()));
+        s2.put("rerank", searchResultsShape(cm2.getRerank().getResults()));
         s2.put("model_calls", rr2.calls);
         s2.put("threshold_restored", cm2.getRerankThreshold());
         assertRec("rerank", "threshold_degrade", json(s2));
@@ -231,7 +231,7 @@ class RerankRecordingTest {
         s3.put("next", next3[0]);
         s3.put("err", errOf(err3));
         s3.put("ids", resultIDs(cm3.getSearchResult()));
-        s3.put("rerank", cm3.getRerankResult() == null ? 0 : cm3.getRerankResult().size());
+        s3.put("rerank", cm3.getRerank().getResults() == null ? 0 : cm3.getRerank().getResults().size());
         assertRec("rerank", "api_error_fallback", json(s3));
 
         // 4) fallback top1
@@ -243,7 +243,7 @@ class RerankRecordingTest {
         PluginError err4 = p4.onEvent(PipelineEventType.CHUNK_RERANK, cm4, () -> null);
         Map<String, Object> s4 = new LinkedHashMap<>();
         s4.put("err", errOf(err4));
-        s4.put("rerank", searchResultsShape(cm4.getRerankResult()));
+        s4.put("rerank", searchResultsShape(cm4.getRerank().getResults()));
         assertRec("rerank", "fallback_top1", json(s4));
 
         // 5) fallback skip
@@ -269,7 +269,7 @@ class RerankRecordingTest {
         PluginError err6 = p6.onEvent(PipelineEventType.CHUNK_RERANK, cm6, () -> null);
         Map<String, Object> s6 = new LinkedHashMap<>();
         s6.put("err", errOf(err6));
-        s6.put("rerank", searchResultsShape(cm6.getRerankResult()));
+        s6.put("rerank", searchResultsShape(cm6.getRerank().getResults()));
         assertRec("rerank", "scope_override_fallback", json(s6));
 
         // 7) FAQ boost
@@ -282,7 +282,7 @@ class RerankRecordingTest {
         cm7.setFaqPriorityEnabled(true);
         cm7.setFaqScoreBoost(1.5);
         p7.onEvent(PipelineEventType.CHUNK_RERANK, cm7, () -> null);
-        assertRec("rerank", "faq_boost", json(searchResultsShape(cm7.getRerankResult())));
+        assertRec("rerank", "faq_boost", json(searchResultsShape(cm7.getRerank().getResults())));
 
         // 8) MMR
         Rec46cSupport.StubReranker rr8 = new Rec46cSupport.StubReranker()
@@ -296,8 +296,8 @@ class RerankRecordingTest {
         cm8.setRerankTopK(2);
         p8.onEvent(PipelineEventType.CHUNK_RERANK, cm8, () -> null);
         Map<String, Object> s8 = new LinkedHashMap<>();
-        s8.put("ids", resultIDs(cm8.getRerankResult()));
-        s8.put("scores", scores(cm8.getRerankResult()));
+        s8.put("ids", resultIDs(cm8.getRerank().getResults()));
+        s8.put("scores", scores(cm8.getRerank().getResults()));
         assertRec("rerank", "mmr", json(s8));
 
         // 9) model missing
@@ -362,23 +362,23 @@ class RerankRecordingTest {
         List<SearchResult> rr = new ArrayList<>(List.of(
                 cand("doc-1", "x", "k", 0.9),
                 cand("wiki-1", "x", "k", 0.6, r -> r.setChunkType("wiki_page"))));
-        cm.setRerankResult(rr);
+        cm.getRerank().setResults(rr);
         boolean[] nextCalled = {false};
         PluginError err = p.onEvent(PipelineEventType.CHUNK_RERANK, cm, () -> { nextCalled[0] = true; return null; });
         Map<String, Object> s1 = new LinkedHashMap<>();
         s1.put("next", nextCalled[0]);
         s1.put("err", errOf(err));
-        s1.put("ids", resultIDs(cm.getRerankResult()));
-        s1.put("scores", scores(cm.getRerankResult()));
+        s1.put("ids", resultIDs(cm.getRerank().getResults()));
+        s1.put("scores", scores(cm.getRerank().getResults()));
         assertRec("wiki_boost", "boost", json(s1));
 
         int callsBefore = kbSvc.byIDOnlyCalls;
         ChatManage cm2 = new ChatManage();
-        cm2.setRerankResult(new ArrayList<>(List.of(cand("d", "x", "k", 0.5))));
+        cm2.getRerank().setResults(new ArrayList<>(List.of(cand("d", "x", "k", 0.5))));
         p.onEvent(PipelineEventType.CHUNK_RERANK, cm2, () -> null);
         Map<String, Object> s2 = new LinkedHashMap<>();
         s2.put("kb_calls", kbSvc.byIDOnlyCalls - callsBefore);
-        s2.put("scores", scores(cm2.getRerankResult()));
+        s2.put("scores", scores(cm2.getRerank().getResults()));
         assertRec("wiki_boost", "no_wiki_chunk", json(s2));
 
         Rec46cSupport.StubKBService kbSvc2 = new Rec46cSupport.StubKBService();
@@ -387,10 +387,10 @@ class RerankRecordingTest {
         ChatManage cm3 = new ChatManage();
         cm3.setSearchTargets(new ArrayList<>(List.of(
                 new SearchTarget("knowledge_base", "dkb", 1, null, null, null, false))));
-        cm3.setRerankResult(new ArrayList<>(List.of(
+        cm3.getRerank().setResults(new ArrayList<>(List.of(
                 cand("w", "x", "k", 0.5, r -> r.setChunkType("wiki_page")))));
         p3.onEvent(PipelineEventType.CHUNK_RERANK, cm3, () -> null);
-        assertRec("wiki_boost", "no_wiki_kb", json(scores(cm3.getRerankResult())));
+        assertRec("wiki_boost", "no_wiki_kb", json(scores(cm3.getRerank().getResults())));
     }
 
     // ----- memory_recall / memory_affinity（对照 recMemoryRecall/recMemoryAffinity） -----
@@ -451,7 +451,7 @@ class RerankRecordingTest {
         mem.affinity.put("k2", 30);
         PluginMemoryAffinity p = new PluginMemoryAffinity(mem);
         ChatManage cm = new ChatManage();
-        cm.setRerankResult(new ArrayList<>(List.of(
+        cm.getRerank().setResults(new ArrayList<>(List.of(
                 cand("r1", "x", "k1", 0.8),
                 cand("r2", "x", "k2", 0.85),
                 cand("r3", "x", "k3", 0.9),
@@ -461,16 +461,16 @@ class RerankRecordingTest {
         Map<String, Object> s1 = new LinkedHashMap<>();
         s1.put("next", nextCalled[0]);
         s1.put("err", errOf(err));
-        s1.put("ids", resultIDs(cm.getRerankResult()));
-        s1.put("scores", scores(cm.getRerankResult()));
+        s1.put("ids", resultIDs(cm.getRerank().getResults()));
+        s1.put("scores", scores(cm.getRerank().getResults()));
         assertRec("memory_affinity", "boost", json(s1));
 
         Rec46cSupport.StubMemoryService mem2 = new Rec46cSupport.StubMemoryService();
         PluginMemoryAffinity p2 = new PluginMemoryAffinity(mem2);
         ChatManage cm2 = new ChatManage();
-        cm2.setRerankResult(new ArrayList<>(List.of(cand("x", "x", "k9", 0.5))));
+        cm2.getRerank().setResults(new ArrayList<>(List.of(cand("x", "x", "k9", 0.5))));
         p2.onEvent(PipelineEventType.CHUNK_RERANK, cm2, () -> null);
-        assertRec("memory_affinity", "empty_affinity", json(scores(cm2.getRerankResult())));
+        assertRec("memory_affinity", "empty_affinity", json(scores(cm2.getRerank().getResults())));
 
         Rec46cSupport.StubMemoryService mem3 = new Rec46cSupport.StubMemoryService();
         PluginMemoryAffinity p3 = new PluginMemoryAffinity(mem3);

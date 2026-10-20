@@ -240,7 +240,7 @@ public final class PluginRerank implements Plugin {
 
         int k = Math.min(reranked.size(), Math.max(1, chatManage.getRerankTopK()));
         List<SearchResult> finalResults = applyMMR(chatManage, reranked, k, 0.7);
-        chatManage.setRerankResult(finalResults);
+        chatManage.getRerank().setResults(finalResults);
 
         int topN = Math.min(3, reranked.size());
         for (int i = 0; i < topN; i++) {
@@ -252,7 +252,7 @@ public final class PluginRerank implements Plugin {
             PipelineLog.info("Rerank", "composite_top", f);
         }
 
-        if (chatManage.getRerankResult() == null || chatManage.getRerankResult().isEmpty()) {
+        if (chatManage.getRerank().getResults() == null || chatManage.getRerank().getResults().isEmpty()) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("filtered_cnt", 0);
             PipelineLog.warn("Rerank", "output", f);
@@ -263,10 +263,10 @@ public final class PluginRerank implements Plugin {
         }
 
         spanOutput = buildRerankSpanOutput(candidatesToRerank, passages, rawRerankResp,
-                reranked, chatManage.getRerankResult(), chatManage, thresholdDegraded);
+                reranked, chatManage.getRerank().getResults(), chatManage, thresholdDegraded);
         rerankSpan.finish(spanOutput, null, null);
         Map<String, Object> f = new LinkedHashMap<>();
-        f.put("filtered_cnt", chatManage.getRerankResult().size());
+        f.put("filtered_cnt", chatManage.getRerank().getResults().size());
         PipelineLog.info("Rerank", "output", f);
         return next.next();
     }

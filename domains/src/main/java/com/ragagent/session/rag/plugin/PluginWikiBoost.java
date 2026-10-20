@@ -35,7 +35,7 @@ public final class PluginWikiBoost implements Plugin {
             return err;
         }
 
-        List<SearchResult> rerankResult = chatManage.getRerankResult();
+        List<SearchResult> rerankResult = chatManage.getRerank().getResults();
         if (rerankResult == null || rerankResult.isEmpty()) {
             return null;
         }

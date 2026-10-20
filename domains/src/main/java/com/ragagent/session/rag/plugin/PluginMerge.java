@@ -59,7 +59,7 @@ public final class PluginMerge implements Plugin {
         }
         Map<String, Object> in = new LinkedHashMap<>();
         in.put("sessionId", chatManage.getSessionId());
-        in.put("candidate_cnt", chatManage.getRerankResult() == null ? 0 : chatManage.getRerankResult().size());
+        in.put("candidate_cnt", chatManage.getRerank().getResults() == null ? 0 : chatManage.getRerank().getResults().size());
         PipelineLog.info("Merge", "input", in);
 
         // Step 1: 输入选择
@@ -110,8 +110,8 @@ public final class PluginMerge implements Plugin {
 
     /** rerank 优先，回落按分数降序的检索结果。 */
     private List<SearchResult> selectInputResults(ChatManage chatManage) {
-        if (chatManage.getRerankResult() != null && !chatManage.getRerankResult().isEmpty()) {
-            return chatManage.getRerankResult();
+        if (chatManage.getRerank().getResults() != null && !chatManage.getRerank().getResults().isEmpty()) {
+            return chatManage.getRerank().getResults();
         }
         Map<String, Object> f = new LinkedHashMap<>();
         f.put("reason", "empty_rerank_result");

@@ -245,8 +245,8 @@ public final class PipelineProgress {
         if (chatManage.getMergeResult() != null && !chatManage.getMergeResult().isEmpty()) {
             return chatManage.getMergeResult();
         }
-        if (chatManage.getRerankResult() != null && !chatManage.getRerankResult().isEmpty()) {
-            return chatManage.getRerankResult();
+        if (chatManage.getRerank().getResults() != null && !chatManage.getRerank().getResults().isEmpty()) {
+            return chatManage.getRerank().getResults();
         }
         return chatManage.getSearchResult();
     }

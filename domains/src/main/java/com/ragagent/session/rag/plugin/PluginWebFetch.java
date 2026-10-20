@@ -45,7 +45,7 @@ public final class PluginWebFetch implements Plugin {
             topN = 3;
         }
 
-        List<SearchResult> rerankResult = chatManage.getRerankResult();
+        List<SearchResult> rerankResult = chatManage.getRerank().getResults();
         List<SearchResult> webResults = new ArrayList<>();
         if (rerankResult != null) {
             for (SearchResult r : rerankResult) {

@@ -37,7 +37,7 @@ public final class PluginMemoryAffinity implements Plugin {
         if (err != null) {
             return err;
         }
-        List<SearchResult> rerankResult = chatManage.getRerankResult();
+        List<SearchResult> rerankResult = chatManage.getRerank().getResults();
         if (memoryService == null || rerankResult == null || rerankResult.isEmpty()) {
             return null;
         }

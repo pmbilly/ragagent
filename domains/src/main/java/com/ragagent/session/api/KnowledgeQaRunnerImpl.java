@@ -32,7 +32,7 @@ public class KnowledgeQaRunnerImpl implements KnowledgeQaRunner {
     public KnowledgeQaRunResult runRag(KnowledgeQaRunRequest request) {
         ChatManage chatManage = toChatManage(request);
         knowledgeQaEvents.knowledgeQAByEvent(chatManage, PipelineBuilder.presets().get("rag"));
-        return new KnowledgeQaRunResult(chatManage.getSearchResult(), chatManage.getRerankResult(),
+        return new KnowledgeQaRunResult(chatManage.getSearchResult(), chatManage.getRerank().getResults(),
                 chatManage.getAnswer().getChatResponse());
     }
 

@@ -48,21 +48,21 @@
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginRerank | `faqPriorityEnabled`、`faqScoreBoost`、`rerankModelId`、`rerankResult`、`rerankThreshold`、`rerankTopK` | `rerankResult`、`rerankThreshold`、`searchResult` |
-| PluginWikiBoost | `rerankResult`、`searchTargets` | — |
-| PluginMemoryAffinity | `rerankResult` | — |
+| PluginRerank | `faqPriorityEnabled`、`faqScoreBoost`、`rerankModelId`、`rerankThreshold`、`rerankTopK`、`results` | `rerankThreshold`、`results`、`searchResult` |
+| PluginWikiBoost | `results`、`searchTargets` | — |
+| PluginMemoryAffinity | `results` | — |
 
 ### `WEB_FETCH`
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginWebFetch | `rerankResult`、`webFetchEnabled`、`webFetchTopN`、`webSearchEnabled` | — |
+| PluginWebFetch | `results`、`webFetchEnabled`、`webFetchTopN`、`webSearchEnabled` | — |
 
 ### `CHUNK_MERGE`
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginMerge | `query`、`rerankResult`、`rewriteQuery`、`searchResult`、`sessionId`、`tenantId` | `mergeResult` |
+| PluginMerge | `query`、`results`、`rewriteQuery`、`searchResult`、`sessionId`、`tenantId` | `mergeResult` |
 
 ### `DATA_ANALYSIS`
 
@@ -92,7 +92,7 @@
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginFilterTopK | `mergeResult`、`rerankResult`、`rerankTopK`、`searchResult`、`sessionId` | `mergeResult`、`rerankResult`、`searchResult` |
+| PluginFilterTopK | `mergeResult`、`rerankTopK`、`results`、`searchResult`、`sessionId` | `mergeResult`、`results`、`searchResult` |
 
 ## 注册顺序（`QaWiring`）
 

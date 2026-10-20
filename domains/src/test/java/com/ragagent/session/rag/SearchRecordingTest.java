@@ -193,10 +193,10 @@ class SearchRecordingTest {
 
         ChatManage cm2 = new ChatManage();
         cm2.setRerankTopK(1);
-        cm2.setRerankResult(new ArrayList<>(List.of(
+        cm2.getRerank().setResults(new ArrayList<>(List.of(
                 Rec46cSupport.sr("r1", "c", "k", 0.5), Rec46cSupport.sr("r2", "c", "k", 0.7))));
         p.onEvent(PipelineEventType.FILTER_TOP_K, cm2, () -> null);
-        assertRec("filter_top_k", "rerank", json(searchResultsShape(cm2.getRerankResult())));
+        assertRec("filter_top_k", "rerank", json(searchResultsShape(cm2.getRerank().getResults())));
 
         ChatManage cm3 = new ChatManage();
         cm3.setRerankTopK(3);

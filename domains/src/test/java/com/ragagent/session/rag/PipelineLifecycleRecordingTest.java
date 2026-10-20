@@ -724,11 +724,11 @@ class PipelineLifecycleRecordingTest {
         rr.add(webResult("http://127.0.0.1:9/empty", "旧摘要三"));
         rr.add(webResult("http://127.0.0.1:9/fail-host", "旧摘要四"));
         rr.add(webResult("doc-1", "非 web 不动"));
-        cm3.setRerankResult(rr);
+        cm3.getRerank().setResults(rr);
         boolean[] next3 = {false};
         p.onEvent(PipelineEventType.WEB_FETCH, cm3, () -> { next3[0] = true; return null; });
         List<Map<String, Object>> shape = new ArrayList<>();
-        for (SearchResult r : cm3.getRerankResult()) {
+        for (SearchResult r : cm3.getRerank().getResults()) {
             Map<String, Object> row = new LinkedHashMap<>();
             row.put("id", r.getId());
             // len 按 UTF-8 字节数计

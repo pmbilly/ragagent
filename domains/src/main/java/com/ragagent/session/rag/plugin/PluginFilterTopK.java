@@ -30,7 +30,7 @@ public final class PluginFilterTopK implements Plugin {
         in.put("sessionId", chatManage.getSessionId());
         in.put("topK", chatManage.getRerankTopK());
         in.put("merge_cnt", chatManage.getMergeResult() == null ? 0 : chatManage.getMergeResult().size());
-        in.put("rerank_cnt", chatManage.getRerankResult() == null ? 0 : chatManage.getRerankResult().size());
+        in.put("rerank_cnt", chatManage.getRerank().getResults() == null ? 0 : chatManage.getRerank().getResults().size());
         in.put("search_cnt", chatManage.getSearchResult() == null ? 0 : chatManage.getSearchResult().size());
         PipelineLog.info("FilterTopK", "input", in);
 
@@ -38,8 +38,8 @@ public final class PluginFilterTopK implements Plugin {
 
         if (chatManage.getMergeResult() != null && !chatManage.getMergeResult().isEmpty()) {
             chatManage.setMergeResult(filterTopK(chatManage.getMergeResult(), topK));
-        } else if (chatManage.getRerankResult() != null && !chatManage.getRerankResult().isEmpty()) {
-            chatManage.setRerankResult(filterTopK(chatManage.getRerankResult(), topK));
+        } else if (chatManage.getRerank().getResults() != null && !chatManage.getRerank().getResults().isEmpty()) {
+            chatManage.getRerank().setResults(filterTopK(chatManage.getRerank().getResults(), topK));
         } else if (chatManage.getSearchResult() != null && !chatManage.getSearchResult().isEmpty()) {
             chatManage.setSearchResult(filterTopK(chatManage.getSearchResult(), topK));
         } else {
@@ -50,7 +50,7 @@ public final class PluginFilterTopK implements Plugin {
 
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("merge_cnt", chatManage.getMergeResult() == null ? 0 : chatManage.getMergeResult().size());
-        out.put("rerank_cnt", chatManage.getRerankResult() == null ? 0 : chatManage.getRerankResult().size());
+        out.put("rerank_cnt", chatManage.getRerank().getResults() == null ? 0 : chatManage.getRerank().getResults().size());
         out.put("search_cnt", chatManage.getSearchResult() == null ? 0 : chatManage.getSearchResult().size());
         PipelineLog.info("FilterTopK", "output", out);
         return next.next();
