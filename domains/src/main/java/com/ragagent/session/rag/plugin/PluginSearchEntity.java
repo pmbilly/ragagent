@@ -83,10 +83,10 @@ public final class PluginSearchEntity implements Plugin {
             }
         }
 
-        chatManage.setGraphResult(new GraphData(allNodes, allRelations));
+        chatManage.getSearchOutcome().setGraph(new GraphData(allNodes, allRelations));
 
         long tenantId = currentTenantId(chatManage);
-        List<String> chunkIDs = filterSeenChunk(chatManage.getGraphResult(), chatManage.getSearchResult());
+        List<String> chunkIDs = filterSeenChunk(chatManage.getSearchOutcome().getGraph(), chatManage.getSearchOutcome().getResults());
         if (chunkIDs.isEmpty()) {
             PipelineLog.info("search_entity", "no_new_chunk", new LinkedHashMap<>());
             return next.next();
@@ -125,12 +125,12 @@ public final class PluginSearchEntity implements Plugin {
             entityResults.add(chunk2SearchResult(chunk, knowledgeMap.get(chunk.knowledgeId())));
         }
         enrichSearchResultsImageInfo(tenantId, entityResults);
-        if (chatManage.getSearchResult() == null) {
-            chatManage.setSearchResult(new ArrayList<>());
+        if (chatManage.getSearchOutcome().getResults() == null) {
+            chatManage.getSearchOutcome().setResults(new ArrayList<>());
         }
-        chatManage.getSearchResult().addAll(entityResults);
-        chatManage.setSearchResult(SearchSupport.removeDuplicateResults(chatManage.getSearchResult()));
-        if (chatManage.getSearchResult() == null || chatManage.getSearchResult().isEmpty()) {
+        chatManage.getSearchOutcome().getResults().addAll(entityResults);
+        chatManage.getSearchOutcome().setResults(SearchSupport.removeDuplicateResults(chatManage.getSearchOutcome().getResults()));
+        if (chatManage.getSearchOutcome().getResults() == null || chatManage.getSearchOutcome().getResults().isEmpty()) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("sessionId", chatManage.getSessionId());
             PipelineLog.info("search_entity", "no_new_result", f);

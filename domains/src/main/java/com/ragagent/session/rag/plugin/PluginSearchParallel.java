@@ -57,9 +57,9 @@ public final class PluginSearchParallel implements Plugin {
         PipelineLog.info("SearchParallel", "start", start);
 
         ChatManage chunkCM = chatManage.cloneChatManage();
-        chunkCM.setSearchResult(null);
+        chunkCM.getSearchOutcome().setResults(null);
         ChatManage entityCM = chatManage.cloneChatManage();
-        entityCM.setSearchResult(null);
+        entityCM.getSearchOutcome().setResults(null);
 
         final ChatManage fChunkCM = chunkCM;
         final ChatManage fEntityCM = entityCM;
@@ -71,7 +71,7 @@ public final class PluginSearchParallel implements Plugin {
                             PipelineEventType.CHUNK_SEARCH, fChunkCM, () -> null);
                     boolean isNothing = err == PluginError.SEARCH_NOTHING;
                     Map<String, Object> f = new LinkedHashMap<>();
-                    f.put("resultCount", fChunkCM.getSearchResult() == null ? 0 : fChunkCM.getSearchResult().size());
+                    f.put("resultCount", fChunkCM.getSearchOutcome().getResults() == null ? 0 : fChunkCM.getSearchOutcome().getResults().size());
                     f.put("has_error", err != null && !isNothing);
                     PipelineLog.info("SearchParallel", "chunk_search_done", f);
                     return isNothing ? null : err;
@@ -87,7 +87,7 @@ public final class PluginSearchParallel implements Plugin {
                             PipelineEventType.ENTITY_SEARCH, fEntityCM, () -> null);
                     boolean isNothing = err == PluginError.SEARCH_NOTHING;
                     Map<String, Object> f = new LinkedHashMap<>();
-                    f.put("resultCount", fEntityCM.getSearchResult() == null ? 0 : fEntityCM.getSearchResult().size());
+                    f.put("resultCount", fEntityCM.getSearchOutcome().getResults() == null ? 0 : fEntityCM.getSearchOutcome().getResults().size());
                     f.put("has_error", err != null && !isNothing);
                     PipelineLog.info("SearchParallel", "entity_search_done", f);
                     return isNothing ? null : err;
@@ -95,13 +95,13 @@ public final class PluginSearchParallel implements Plugin {
 
         // 合并两路结果（chunk 在前 entity 在后）+ 去重
         List<SearchResult> merged = new ArrayList<>();
-        if (chunkCM.getSearchResult() != null) {
-            merged.addAll(chunkCM.getSearchResult());
+        if (chunkCM.getSearchOutcome().getResults() != null) {
+            merged.addAll(chunkCM.getSearchOutcome().getResults());
         }
-        if (entityCM.getSearchResult() != null) {
-            merged.addAll(entityCM.getSearchResult());
+        if (entityCM.getSearchOutcome().getResults() != null) {
+            merged.addAll(entityCM.getSearchOutcome().getResults());
         }
-        chatManage.setSearchResult(SearchSupport.removeDuplicateResults(merged));
+        chatManage.getSearchOutcome().setResults(SearchSupport.removeDuplicateResults(merged));
 
         for (Map.Entry<String, PluginError> e : errs.entrySet()) {
             Map<String, Object> f = new LinkedHashMap<>();
@@ -113,13 +113,13 @@ public final class PluginSearchParallel implements Plugin {
 
         Map<String, Object> done = new LinkedHashMap<>();
         done.put("sessionId", chatManage.getSessionId());
-        done.put("chunk_results", chunkCM.getSearchResult() == null ? 0 : chunkCM.getSearchResult().size());
-        done.put("entity_results", entityCM.getSearchResult() == null ? 0 : entityCM.getSearchResult().size());
-        done.put("total_results", chatManage.getSearchResult() == null ? 0 : chatManage.getSearchResult().size());
+        done.put("chunk_results", chunkCM.getSearchOutcome().getResults() == null ? 0 : chunkCM.getSearchOutcome().getResults().size());
+        done.put("entity_results", entityCM.getSearchOutcome().getResults() == null ? 0 : entityCM.getSearchOutcome().getResults().size());
+        done.put("total_results", chatManage.getSearchOutcome().getResults() == null ? 0 : chatManage.getSearchOutcome().getResults().size());
         done.put("error_count", errs.size());
         PipelineLog.info("SearchParallel", "complete", done);
 
-        if (chatManage.getSearchResult() == null || chatManage.getSearchResult().isEmpty()) {
+        if (chatManage.getSearchOutcome().getResults() == null || chatManage.getSearchOutcome().getResults().isEmpty()) {
             PluginError err = errs.get("chunk_search");
             if (err != null) {
                 return err;

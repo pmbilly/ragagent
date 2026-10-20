@@ -116,7 +116,7 @@ public final class PluginMerge implements Plugin {
         Map<String, Object> f = new LinkedHashMap<>();
         f.put("reason", "empty_rerank_result");
         PipelineLog.warn("Merge", "fallback", f);
-        List<SearchResult> result = chatManage.getSearchResult();
+        List<SearchResult> result = chatManage.getSearchOutcome().getResults();
         result.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
         return result;
     }

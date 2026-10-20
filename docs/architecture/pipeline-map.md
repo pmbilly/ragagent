@@ -28,27 +28,27 @@
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginSearchParallel | `entity`、`rewriteQuery`、`searchResult`、`sessionId` | `searchResult` |
-| PluginSearch | `embeddingTopK`、`enableQueryExpansion`、`keywordThreshold`、`knowledgeBaseIds`、`knowledgeIds`、`rewriteQuery` | `searchResult` |
+| PluginSearchParallel | `entity`、`results`、`rewriteQuery`、`sessionId` | `results` |
+| PluginSearch | `embeddingTopK`、`enableQueryExpansion`、`keywordThreshold`、`knowledgeBaseIds`、`knowledgeIds`、`results` | `results` |
 
 ### `CHUNK_SEARCH_PARALLEL`
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginSearchParallel | `entity`、`rewriteQuery`、`searchResult`、`sessionId` | `searchResult` |
+| PluginSearchParallel | `entity`、`results`、`rewriteQuery`、`sessionId` | `results` |
 
 ### `ENTITY_SEARCH`
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginSearchParallel | `entity`、`rewriteQuery`、`searchResult`、`sessionId` | `searchResult` |
-| PluginSearchEntity | `entity`、`entityKbIds`、`entityKnowledge`、`graphResult`、`searchResult`、`sessionId` | `graphResult`、`searchResult` |
+| PluginSearchParallel | `entity`、`results`、`rewriteQuery`、`sessionId` | `results` |
+| PluginSearchEntity | `entity`、`entityKbIds`、`entityKnowledge`、`graph`、`results`、`sessionId` | `graph`、`results` |
 
 ### `CHUNK_RERANK`
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginRerank | `faqPriorityEnabled`、`faqScoreBoost`、`rerankModelId`、`rerankThreshold`、`rerankTopK`、`results` | `rerankThreshold`、`results`、`searchResult` |
+| PluginRerank | `faqPriorityEnabled`、`faqScoreBoost`、`rerankModelId`、`rerankThreshold`、`rerankTopK`、`results` | `rerankThreshold`、`results` |
 | PluginWikiBoost | `results`、`searchTargets` | — |
 | PluginMemoryAffinity | `results` | — |
 
@@ -62,7 +62,7 @@
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginMerge | `query`、`results`、`rewriteQuery`、`searchResult`、`sessionId`、`tenantId` | `results` |
+| PluginMerge | `query`、`results`、`rewriteQuery`、`sessionId`、`tenantId` | `results` |
 
 ### `DATA_ANALYSIS`
 
@@ -92,7 +92,7 @@
 
 | 插件 | 读 | 写 |
 |---|---|---|
-| PluginFilterTopK | `rerankTopK`、`results`、`searchResult`、`sessionId` | `results`、`searchResult` |
+| PluginFilterTopK | `rerankTopK`、`results`、`sessionId` | `results` |
 
 ## 注册顺序（`QaWiring`）
 

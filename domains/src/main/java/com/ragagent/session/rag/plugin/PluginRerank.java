@@ -64,13 +64,13 @@ public final class PluginRerank implements Plugin {
         }
         Map<String, Object> in = new LinkedHashMap<>();
         in.put("sessionId", chatManage.getSessionId());
-        in.put("candidate_cnt", chatManage.getSearchResult() == null ? 0 : chatManage.getSearchResult().size());
+        in.put("candidate_cnt", chatManage.getSearchOutcome().getResults() == null ? 0 : chatManage.getSearchOutcome().getResults().size());
         in.put("rerank_model", chatManage.getRerankModelId());
         in.put("rerank_thresh", chatManage.getRerankThreshold());
         in.put("rewrite_query", chatManage.getQueryPlan().getRewriteQuery());
         PipelineLog.info("Rerank", "input", in);
 
-        if (chatManage.getSearchResult() == null || chatManage.getSearchResult().isEmpty()) {
+        if (chatManage.getSearchOutcome().getResults() == null || chatManage.getSearchOutcome().getResults().isEmpty()) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("reason", "empty_search_result");
             PipelineLog.info("Rerank", "skip", f);
@@ -97,7 +97,7 @@ public final class PluginRerank implements Plugin {
         // 组 passages（空段落跳过）
         List<String> passages = new ArrayList<>();
         List<SearchResult> candidatesToRerank = new ArrayList<>();
-        for (SearchResult result : chatManage.getSearchResult()) {
+        for (SearchResult result : chatManage.getSearchOutcome().getResults()) {
             String passage = getEnrichedPassage(result);
             if (passage.trim().isEmpty()) {
                 Map<String, Object> f = new LinkedHashMap<>();
@@ -124,7 +124,7 @@ public final class PluginRerank implements Plugin {
         var rerankSpan = SessionTrace.start("rerank", spanInput, spanMeta);
 
         Map<String, Object> bp = new LinkedHashMap<>();
-        bp.put("total_cnt", chatManage.getSearchResult().size());
+        bp.put("total_cnt", chatManage.getSearchOutcome().getResults().size());
         bp.put("candidate_cnt", candidatesToRerank.size());
         PipelineLog.info("Rerank", "build_passages", bp);
 
@@ -144,7 +144,7 @@ public final class PluginRerank implements Plugin {
                 f.put("error", rerankErr.getMessage());
                 f.put("candidate_cnt", candidatesToRerank.size());
                 PipelineLog.warn("Rerank", "api_error_fallback", f);
-                chatManage.setSearchResult(new ArrayList<>(candidatesToRerank));
+                chatManage.getSearchOutcome().setResults(new ArrayList<>(candidatesToRerank));
                 spanOutput.put("stage", "api_error_fallback");
                 spanOutput.put("candidate_count", candidatesToRerank.size());
                 spanOutput.put("error", rerankErr.getMessage());
@@ -179,7 +179,7 @@ public final class PluginRerank implements Plugin {
                     fw.put("error", rerankErr.getMessage());
                     fw.put("candidate_cnt", candidatesToRerank.size());
                     PipelineLog.warn("Rerank", "api_error_fallback", fw);
-                    chatManage.setSearchResult(new ArrayList<>(candidatesToRerank));
+                    chatManage.getSearchOutcome().setResults(new ArrayList<>(candidatesToRerank));
                     spanOutput.put("stage", "api_error_fallback");
                     spanOutput.put("candidate_count", candidatesToRerank.size());
                     spanOutput.put("threshold_degraded", true);
@@ -199,10 +199,10 @@ public final class PluginRerank implements Plugin {
         mr.put("result_cnt", rerankResp.size());
         PipelineLog.info("Rerank", "model_response", mr);
 
-        logRerankInputScoreSample(chatManage.getSearchResult());
+        logRerankInputScoreSample(chatManage.getSearchOutcome().getResults());
 
-        for (int i = 0; i < chatManage.getSearchResult().size(); i++) {
-            SearchResult sr = chatManage.getSearchResult().get(i);
+        for (int i = 0; i < chatManage.getSearchOutcome().getResults().size(); i++) {
+            SearchResult sr = chatManage.getSearchOutcome().getResults().get(i);
             if (sr.getMetadata() == null) {
                 sr.setMetadata(new LinkedHashMap<>());
             }

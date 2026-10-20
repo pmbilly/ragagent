@@ -115,7 +115,7 @@ class SearchRecordingTest {
                 new SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
         List<SearchResult> first = new ArrayList<>();
         first.add(Rec46cSupport.sr("hit-0", "原命中", "k0", 0.9));
-        cm.setSearchResult(first);
+        cm.getSearchOutcome().setResults(first);
         List<SearchResult> out = p2.runQueryExpansion(cm);
         Map<String, Object> shape = new LinkedHashMap<>();
         shape.put("results", searchResultsShape(out));
@@ -200,9 +200,9 @@ class SearchRecordingTest {
 
         ChatManage cm3 = new ChatManage();
         cm3.setRerankTopK(3);
-        cm3.setSearchResult(new ArrayList<>(List.of(Rec46cSupport.sr("s1", "c", "k", 0.2))));
+        cm3.getSearchOutcome().setResults(new ArrayList<>(List.of(Rec46cSupport.sr("s1", "c", "k", 0.2))));
         p.onEvent(PipelineEventType.FILTER_TOP_K, cm3, () -> null);
-        assertRec("filter_top_k", "search", json(searchResultsShape(cm3.getSearchResult())));
+        assertRec("filter_top_k", "search", json(searchResultsShape(cm3.getSearchOutcome().getResults())));
 
         ChatManage cm4 = new ChatManage();
         cm4.setRerankTopK(3);
@@ -270,7 +270,7 @@ class SearchRecordingTest {
         Map<String, Object> s2 = new LinkedHashMap<>();
         s2.put("next", next[0]);
         s2.put("err", errOf(err2));
-        s2.put("results", searchResultsShape(cm2.getSearchResult()));
+        s2.put("results", searchResultsShape(cm2.getSearchOutcome().getResults()));
         s2.put("params", kbSvc.paramsJson());
         assertRec("search", "happy", json(s2));
 
@@ -295,8 +295,8 @@ class SearchRecordingTest {
         Map<String, Object> s3 = new LinkedHashMap<>();
         s3.put("next", next3[0]);
         s3.put("err", errOf(err3));
-        s3.put("count", cm3.getSearchResult().size());
-        s3.put("ids", resultIDs(cm3.getSearchResult()));
+        s3.put("count", cm3.getSearchOutcome().getResults().size());
+        s3.put("ids", resultIDs(cm3.getSearchOutcome().getResults()));
         assertRec("search", "expansion_trigger", json(s3));
 
         // 4) web only
@@ -322,7 +322,7 @@ class SearchRecordingTest {
         Map<String, Object> s4b = new LinkedHashMap<>();
         s4b.put("next", next4[0]);
         s4b.put("err", errOf(err4));
-        s4b.put("results", searchResultsShape(cm4.getSearchResult()));
+        s4b.put("results", searchResultsShape(cm4.getSearchOutcome().getResults()));
         assertRec("search", "web_only", json(s4b));
 
         // 5) web rescue
@@ -344,7 +344,7 @@ class SearchRecordingTest {
         Map<String, Object> s5 = new LinkedHashMap<>();
         s5.put("next", next5[0]);
         s5.put("err", errOf(err5));
-        s5.put("ids", resultIDs(cm5.getSearchResult()));
+        s5.put("ids", resultIDs(cm5.getSearchOutcome().getResults()));
         assertRec("search", "web_rescue", json(s5));
 
         // 6) embed degrade to keyword
@@ -365,7 +365,7 @@ class SearchRecordingTest {
         Map<String, Object> s6 = new LinkedHashMap<>();
         s6.put("next", next6[0]);
         s6.put("err", errOf(err6));
-        s6.put("ids", resultIDs(cm6.getSearchResult()));
+        s6.put("ids", resultIDs(cm6.getSearchOutcome().getResults()));
         s6.put("params", kbDegrade.paramsJson());
         assertRec("search", "embed_degrade_keyword", json(s6));
 
@@ -537,8 +537,8 @@ class SearchRecordingTest {
         Map<String, Object> s1 = new LinkedHashMap<>();
         s1.put("next", next[0]);
         s1.put("err", errOf(err));
-        s1.put("ids", resultIDs(cm.getSearchResult()));
-        s1.put("graph_nodes", Rec46cSupport.graphShape(cm.getGraphResult()));
+        s1.put("ids", resultIDs(cm.getSearchOutcome().getResults()));
+        s1.put("graph_nodes", Rec46cSupport.graphShape(cm.getSearchOutcome().getGraph()));
         assertRec("search_parallel", "both", json(s1));
 
         // chunk only
@@ -559,7 +559,7 @@ class SearchRecordingTest {
         Map<String, Object> s2 = new LinkedHashMap<>();
         s2.put("next", next2[0]);
         s2.put("err", errOf(err2));
-        s2.put("ids", resultIDs(cm2.getSearchResult()));
+        s2.put("ids", resultIDs(cm2.getSearchOutcome().getResults()));
         assertRec("search_parallel", "chunk_only", json(s2));
 
         // intent skip
@@ -569,7 +569,7 @@ class SearchRecordingTest {
         p2.onEvent(PipelineEventType.CHUNK_SEARCH_PARALLEL, cm3, () -> { next3[0] = true; return null; });
         Map<String, Object> s3 = new LinkedHashMap<>();
         s3.put("next", next3[0]);
-        s3.put("n", cm3.getSearchResult() == null ? 0 : cm3.getSearchResult().size());
+        s3.put("n", cm3.getSearchOutcome().getResults() == null ? 0 : cm3.getSearchOutcome().getResults().size());
         assertRec("search_parallel", "intent_skip", json(s3));
 
         // empty → search_nothing

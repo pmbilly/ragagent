@@ -122,7 +122,7 @@ class PipelineLifecycleRecordingTest {
         cmE2.setSessionId("sp2");
         cmE2.setQuery("q");
         cmE2.getRuntime().setEventBus(bus2);
-        cmE2.setSearchResult(new ArrayList<>(List.of(
+        cmE2.getSearchOutcome().setResults(new ArrayList<>(List.of(
                 Rec46cSupport.sr("c1", "", "k", 0d), Rec46cSupport.sr("c2", "", "k", 0d))));
         PipelineProgress.StageProgress prog2 = PipelineProgress.beginRetrievalProgress(cmE2);
         PipelineProgress.endRetrievalProgress(cmE2, prog2, 0, PluginError.SEARCH_NOTHING);

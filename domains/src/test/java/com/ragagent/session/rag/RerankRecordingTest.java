@@ -169,7 +169,7 @@ class RerankRecordingTest {
                 cand("c1", "第一段候选内容，语义相关", "k1", 0.8),
                 cand("c2", "第二段候选内容，语义稍弱", "k2", 0.6),
                 cand("c3", "   ", "k3", 0.7)));
-        cm.setSearchResult(sr);
+        cm.getSearchOutcome().setResults(sr);
         return cm;
     }
 
@@ -200,7 +200,7 @@ class RerankRecordingTest {
         s1.put("model_calls", rr.calls);
         // 录制探针的 ms 未挂 calls 指针 → model_lookup 录成 null（形状备案）
         s1.put("model_lookup", null);
-        s1.put("search_kept", searchResultsShape(cm.getSearchResult()));
+        s1.put("search_kept", searchResultsShape(cm.getSearchOutcome().getResults()));
         assertRec("rerank", "normal", json(s1));
 
         // 2) threshold degrade
@@ -230,7 +230,7 @@ class RerankRecordingTest {
         Map<String, Object> s3 = new LinkedHashMap<>();
         s3.put("next", next3[0]);
         s3.put("err", errOf(err3));
-        s3.put("ids", resultIDs(cm3.getSearchResult()));
+        s3.put("ids", resultIDs(cm3.getSearchOutcome().getResults()));
         s3.put("rerank", cm3.getRerank().getResults() == null ? 0 : cm3.getRerank().getResults().size());
         assertRec("rerank", "api_error_fallback", json(s3));
 
@@ -277,7 +277,7 @@ class RerankRecordingTest {
                 .add(Rec46cSupport.rankResults(0, 0.9), null);
         PluginRerank p7 = new PluginRerank(msWith(rr7, null));
         ChatManage cm7 = rerankCm();
-        cm7.setSearchResult(new ArrayList<>(List.of(
+        cm7.getSearchOutcome().setResults(new ArrayList<>(List.of(
                 cand("faq-1", "FAQ 内容", "kf", 0.5, r -> r.setChunkType("faq")))));
         cm7.setFaqPriorityEnabled(true);
         cm7.setFaqScoreBoost(1.5);
@@ -289,7 +289,7 @@ class RerankRecordingTest {
                 .add(Rec46cSupport.rankResults(0, 0.9, 1, 0.85, 2, 0.8), null);
         PluginRerank p8 = new PluginRerank(msWith(rr8, null));
         ChatManage cm8 = rerankCm();
-        cm8.setSearchResult(new ArrayList<>(List.of(
+        cm8.getSearchOutcome().setResults(new ArrayList<>(List.of(
                 cand("m1", "知识库检索系统的混合检索能力介绍，包含向量与关键词", "k1", 0.9),
                 cand("m2", "知识库检索系统的混合检索能力介绍，包含向量与关键词两种方式", "k2", 0.85),
                 cand("m3", "完全不同的另一段文字，说的是数据导入与文档解析的流程说明", "k3", 0.8))));
@@ -318,7 +318,7 @@ class RerankRecordingTest {
         boolean[] n10 = {false};
         p.onEvent(PipelineEventType.CHUNK_RERANK, cm10, () -> { n10[0] = true; return null; });
         ChatManage cm11 = rerankCm();
-        cm11.setSearchResult(new ArrayList<>());
+        cm11.getSearchOutcome().setResults(new ArrayList<>());
         boolean[] n11 = {false};
         p.onEvent(PipelineEventType.CHUNK_RERANK, cm11, () -> { n11[0] = true; return null; });
         ChatManage cm12 = rerankCm();

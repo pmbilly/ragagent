@@ -34,7 +34,7 @@ final class PluginExpansionOps {
     /** 低召回时的本地变体检索，并发窗口 16。 */
     public List<SearchResult> runQueryExpansion(ChatManage chatManage) {
         Map<String, Object> f = new LinkedHashMap<>();
-        f.put("current", chatManage.getSearchResult().size());
+        f.put("current", chatManage.getSearchOutcome().getResults().size());
         f.put("threshold", chatManage.getEmbeddingTopK());
         PipelineLog.info("Search", "recall_low", f);
 

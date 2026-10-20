@@ -126,25 +126,25 @@ public final class PluginSearch implements Plugin {
             PipelineLog.warn("Search", "kb_search_partial_failure", f);
         }
 
-        chatManage.setSearchResult(allResults);
+        chatManage.getSearchOutcome().setResults(allResults);
 
-        SearchSupport.logSearchScoreSample("result_score_before_normalize", chatManage.getSearchResult());
+        SearchSupport.logSearchScoreSample("result_score_before_normalize", chatManage.getSearchOutcome().getResults());
 
         // 低召回 → 本地查询扩展补召回
         int minRecall = Math.max(1, chatManage.getEmbeddingTopK());
-        if (chatManage.isEnableQueryExpansion() && chatManage.getSearchResult().size() < minRecall) {
+        if (chatManage.isEnableQueryExpansion() && chatManage.getSearchOutcome().getResults().size() < minRecall) {
             List<SearchResult> expResults = runQueryExpansion(chatManage);
             if (expResults != null && !expResults.isEmpty()) {
-                chatManage.getSearchResult().addAll(expResults);
+                chatManage.getSearchOutcome().getResults().addAll(expResults);
             }
         }
 
-        SearchSupport.logSearchScoreSample("final_score", chatManage.getSearchResult());
+        SearchSupport.logSearchScoreSample("final_score", chatManage.getSearchOutcome().getResults());
 
-        if (!chatManage.getSearchResult().isEmpty()) {
+        if (!chatManage.getSearchOutcome().getResults().isEmpty()) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("sessionId", chatManage.getSessionId());
-            f.put("resultCount", chatManage.getSearchResult().size());
+            f.put("resultCount", chatManage.getSearchOutcome().getResults().size());
             PipelineLog.info("Search", "output", f);
             return next.next();
         }
