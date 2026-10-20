@@ -110,12 +110,28 @@ export function useEmbedBridge(channelId: Ref<string>) {
   let hostPublishToken = ''
   // 正在等待"向宿主重新要票"的回调（换票用，见 waitForHostToken）。
   let pendingHostToken: ((token: string) => void) | null = null
+  // 发布票换会话票的单飞：宿主会同时用 iframe load 与 bootstrap_request 各推一次票，
+  // 并发换两次会多占一份 Redis 会话票。
+  let exchangeCall: { publishToken: string; promise: ReturnType<typeof exchangeEmbedSession> } | null = null
+  // 已经换成会话票的发布票：宿主迟到重复推同一张票时不再换。
+  let adoptedPublishToken = ''
   let hostLocalePinned = false
   if (typeof window !== 'undefined') {
     hostLocalePinned = Boolean(readEmbedLocaleFromUrl())
     if (hostLocalePinned) {
       syncEmbedLocaleFromUrl(activeLocale)
     }
+  }
+
+  /** 同一张发布票的并发换票共享一次请求（调用方各自处理异常语义）。 */
+  const exchangeShared = (id: string, publishToken: string) => {
+    if (exchangeCall?.publishToken === publishToken) return exchangeCall.promise
+    let promise: ReturnType<typeof exchangeEmbedSession>
+    promise = exchangeEmbedSession(id, publishToken).finally(() => {
+      if (exchangeCall?.promise === promise) exchangeCall = null
+    })
+    exchangeCall = { publishToken, promise }
+    return promise
   }
 
   const bootstrap = async (embedToken: string) => {
@@ -142,9 +158,10 @@ export function useEmbedBridge(channelId: Ref<string>) {
         // 留一份发布票：会话票过期时用它再换（不依赖宿主再推一次）。
         hostPublishToken = embedToken
         try {
-          const exchangeRes = await exchangeEmbedSession(id, embedToken)
+          const exchangeRes = await exchangeShared(id, embedToken)
           if (exchangeRes?.sessionToken) {
             apiToken = exchangeRes.sessionToken
+            adoptedPublishToken = embedToken
           } else if (!import.meta.env.DEV) {
             // Fail closed in production: a missing session token must not silently
             // fall back to the long-lived publish token.
@@ -224,10 +241,15 @@ export function useEmbedBridge(channelId: Ref<string>) {
       return
     }
     hostPublishToken = provided
+    // 同一张发布票已换过会话票（宿主会推两次）：别再换，也别覆盖当前会话票。
+    if (provided === adoptedPublishToken && isEmbedSessionToken(token.value)) return
     try {
-      const res = await exchangeEmbedSession(id, provided)
+      const res = await exchangeShared(id, provided)
       const next = String(res?.sessionToken || '').trim()
-      if (next) token.value = next
+      if (next) {
+        token.value = next
+        adoptedPublishToken = provided
+      }
     } catch {
       // 换票失败保持旧票：不打断当前会话，下一次 401 会再触发一轮。
     }
