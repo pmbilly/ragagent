@@ -163,7 +163,8 @@
 | **M4b** | 事务边界约定（`mechanisms.md`）+ mcp/storage/session/im/datasource 多写审计 | ✅ 2026-10-20 |
 | **M5a** | Memory 开关单次求值：`MemoryScopeGate` 返回 `(scope,cfg,ok,reason)`，`enabledScope`/`scopeDisableReason` 同源；清孤儿节注释 | ✅ 2026-10-20 |
 | **M5b** | Memory 写管线/模型解析提取（`MemoryWritePipeline` / `MemoryExtractionModelResolver`）；保留门面委托 | ✅ 2026-10-20 |
-| **M6a** | FaqEntryCommandService：projector / duplicate checker / batch updater；4 处尾块归一 | 待启动 |
+| **M6a-1** | FaqEntryCommandService：`FaqEntryProjector`（4 处尾块归一，tag 每次只查一次）+ `FaqDuplicateChecker`（72 行规则抽类） | ✅ 2026-10-20 |
+| **M6a-2** | FAQ 批量字段更新（`FaqBatchFieldUpdater`，153 行方法） | 待启动 |
 | **M6b** | UserService：`LoginTenantResolver` + `UserRegistrationService`；保留 `generateTokensFor(Object)` | 待启动 |
 | **M6c** | StorageFileResolver：删重复 provider 校验、提 backend resolver / config projector / env provisioner / resource catalog service | 待启动 |
 | **M6d** | McpCatalog：`McpJsonCodec` / `McpToolNaming`；保留提示词常量与 DTO 巢居 | 待启动 |
@@ -500,6 +501,7 @@ boot           14 件                      →  boot
 | M4b | 2026-10-20 | **事务边界约定**：`mechanisms.md` §5 改写为\"整轮问答不开事务、多表写才开\"，补 `register` 事务、best-effort 清理（会话删除/数据源逐条落库）与自调用失效三条规则；审计 mcp/storage 建单条写、session 清理 best-effort，未发现需补事务的明确缺口 | 文档同步 · 45 守卫绿 |
 | M5a | 2026-10-20 | **Memory 开关单次求值**：新增 `MemoryScopeGate`（workspace→agent→subject 一次判定，返回 `(scope,cfg,ok,reason)`）；`ScopeState` 增 reason 并保留 3 参构造兼容旧测试；`enabledScope`/`scopeDisableReason` 改同一求值，删除两套并行实现；清 4 条孤儿节注释与失效 mapper 常量。开关测试补 `no_principal`/`workspace_disabled`/`agent_disabled`/`user_disabled` 原因断言 | 45 守卫绿 · build 1m55s / **5043 / 0 / 4** |
 | M5b | 2026-10-20 | **Memory 写管线/模型解析提取**：新增 `MemoryWritePipeline`（写入清洗/脱敏/墓碑/去重/容量/常驻块/向量）与 `MemoryExtractionModelResolver`（显式配置→任务携带→工作区问答模型）；`MemoryService` 保留同签名门面委托（兄弟类与测试调用点零改动），770 → 440 行 | 45 守卫绿 · build 2m18s / **5043 / 0 / 4** |
+| M6a-1 | 2026-10-20 | **FAQ 投影/查重抽类**：`FaqEntryProjector` 收编创建/更新/相似问三处尾块（原每处把同一 tag 查两次，现一次）；`FaqDuplicateChecker` 收编 72 行本地规则 + 单次 DB 查询。命令服务只留用例与编排，770 → 597 行；FAQ 金片零变化。批量字段更新（153 行）留 M6a-2 | 45 守卫绿 · FAQ 契约测试绿 · build 2m11s / **5043 / 0 / 4** |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

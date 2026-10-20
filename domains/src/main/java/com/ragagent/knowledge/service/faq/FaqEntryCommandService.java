@@ -60,6 +60,8 @@ public class FaqEntryCommandService {
     private final FaqGuard faqGuard;
     private final FaqChunkCodec faqChunkCodec;
     private final FaqIndexWriter faqIndexWriter;
+    private final FaqEntryProjector projector;
+    private final FaqDuplicateChecker duplicateChecker;
 
     public FaqEntryCommandService(ChunkRepository chunkRepository,
                                   KnowledgeRepository knowledgeRepository,
@@ -83,6 +85,8 @@ public class FaqEntryCommandService {
         this.faqGuard = faqGuard;
         this.faqChunkCodec = faqChunkCodec;
         this.faqIndexWriter = faqIndexWriter;
+        this.projector = new FaqEntryProjector(tagRepository, faqChunkCodec);
+        this.duplicateChecker = new FaqDuplicateChecker(faqChunkRepository, faqChunkCodec);
     }
 
     private static long tenantId() {
@@ -110,7 +114,7 @@ public class FaqEntryCommandService {
             throw new BizException(AppError.conflict("相同标准问的 FAQ 条目正在创建中，请勿重复提交"));
         }
         try {
-            checkFAQQuestionDuplicate(tid, kb.getId(), "", meta);
+            duplicateChecker.check(tid, kb.getId(), "", meta);
 
             Knowledge faqKnowledge = faqIndexWriter.ensureFAQKnowledge(tid, kb);
             if (faqKnowledge == null) {
@@ -157,22 +161,7 @@ public class FaqEntryCommandService {
             chunk.setStatus(2); // indexed
             chunkRepository.updateChunk(chunk);
 
-            Map<String, Long> tagSeqIdMap = new LinkedHashMap<>();
-            if (!chunk.getTagId().isEmpty()) {
-                KnowledgeTag tag = tagRepository.listTagsByIds(tid, List.of(chunk.getTagId()))
-                        .stream().findFirst().orElse(null);
-                if (tag != null) {
-                    tagSeqIdMap.put(tag.getId(), tag.getSeqId());
-                }
-            }
-            FaqEntry entry = faqChunkCodec.chunkToFAQEntry(chunk, kb, tagSeqIdMap);
-            if (!chunk.getTagId().isEmpty()) {
-                KnowledgeTag tag = tagRepository.listTagsByIds(tid, List.of(chunk.getTagId()))
-                        .stream().findFirst().orElse(null);
-                if (tag != null) {
-                    entry = entry.withTagName(tag.getName());
-                }
-            }
+            FaqEntry entry = projector.toEntry(tid, chunk, kb);
             log.info("FAQ entry created: kb={}, entry={}", kb.getId(), chunk.getSeqId());
             recordKbActivity(tid, kb.getId(), AuditAction.KNOWLEDGE_CREATED,
                     "faq_entry", chunk.getId(),
@@ -207,7 +196,7 @@ public class FaqEntryCommandService {
         }
         FaqChunkMetadata meta = faqGuard.sanitizeFAQEntryPayload(payload);
 
-        checkFAQQuestionDuplicate(tid, kb.getId(), chunk.getId(), meta);
+        duplicateChecker.check(tid, kb.getId(), chunk.getId(), meta);
 
         FaqChunkMetadata existing = faqChunkCodec.currentFaqMetadata(chunk);
         if (existing != null) {
@@ -251,22 +240,7 @@ public class FaqEntryCommandService {
         // indexFAQChunks 全删该 chunk 行后重插（净效果等价）；索引失败原样返回
         faqIndexWriter.indexFAQChunks(kb, faqKnowledge, List.of(chunk), embeddingModel, false);
 
-        Map<String, Long> tagSeqIdMap = new LinkedHashMap<>();
-        if (!chunk.getTagId().isEmpty()) {
-            KnowledgeTag tag = tagRepository.listTagsByIds(tid, List.of(chunk.getTagId()))
-                    .stream().findFirst().orElse(null);
-            if (tag != null) {
-                tagSeqIdMap.put(tag.getId(), tag.getSeqId());
-            }
-        }
-        FaqEntry entry = faqChunkCodec.chunkToFAQEntry(chunk, kb, tagSeqIdMap);
-        if (!chunk.getTagId().isEmpty()) {
-            KnowledgeTag tag = tagRepository.listTagsByIds(tid, List.of(chunk.getTagId()))
-                    .stream().findFirst().orElse(null);
-            if (tag != null) {
-                entry = entry.withTagName(tag.getName());
-            }
-        }
+        FaqEntry entry = projector.toEntry(tid, chunk, kb);
         log.info("FAQ entry updated: kb={}, entry={}", kb.getId(), chunk.getSeqId());
         recordKbActivity(tid, kb.getId(), AuditAction.KNOWLEDGE_UPDATED,
                 "faq_entry", chunk.getId(),
@@ -315,16 +289,8 @@ public class FaqEntryCommandService {
             newQuestions.add(q);
         }
 
-        Map<String, Long> tagSeqIdMap = new LinkedHashMap<>();
-        if (!chunk.getTagId().isEmpty()) {
-            KnowledgeTag tag = tagRepository.listTagsByIds(tid, List.of(chunk.getTagId()))
-                    .stream().findFirst().orElse(null);
-            if (tag != null) {
-                tagSeqIdMap.put(tag.getId(), tag.getSeqId());
-            }
-        }
         if (newQuestions.isEmpty()) {
-            return faqChunkCodec.chunkToFAQEntry(chunk, kb, tagSeqIdMap);
+            return projector.toEntry(tid, chunk, kb);
         }
 
         FaqChunkMetadata tempMeta = new FaqChunkMetadata();
@@ -334,7 +300,7 @@ public class FaqEntryCommandService {
             tempMeta.similarQuestions.addAll(meta.similarQuestions);
         }
         tempMeta.similarQuestions.addAll(newQuestions);
-        checkFAQQuestionDuplicate(tid, kb.getId(), chunk.getId(), tempMeta);
+        duplicateChecker.check(tid, kb.getId(), chunk.getId(), tempMeta);
 
         if (meta.similarQuestions == null) {
             meta.similarQuestions = new ArrayList<>();
@@ -357,14 +323,7 @@ public class FaqEntryCommandService {
         // 相似问追加后全量重索引；失败原样返回
         faqIndexWriter.indexFAQChunks(kb, faqKnowledge, List.of(chunk), embeddingModel, false);
 
-        FaqEntry entry = faqChunkCodec.chunkToFAQEntry(chunk, kb, tagSeqIdMap);
-        if (!chunk.getTagId().isEmpty()) {
-            KnowledgeTag tag = tagRepository.listTagsByIds(tid, List.of(chunk.getTagId()))
-                    .stream().findFirst().orElse(null);
-            if (tag != null) {
-                entry = entry.withTagName(tag.getName());
-            }
-        }
+        FaqEntry entry = projector.toEntry(tid, chunk, kb);
         recordKbActivity(tid, kb.getId(), AuditAction.KNOWLEDGE_UPDATED,
                 "faq_entry", chunk.getId(),
                 Map.of("entryId", chunk.getSeqId() == null ? 0L : chunk.getSeqId(),
@@ -626,85 +585,6 @@ public class FaqEntryCommandService {
                                   String targetType, String targetId, Map<String, Object> details) {
         activityAudit.record(tenantId, "knowledge_base", kbId, action, targetType, targetId, details);
     }
-
-
-    // ── 私有：重复检查 ──
-
-    /** 1-3 步本地判定、4 步一条 DB 查询、5-7 步报错语义。 */
-    private void checkFAQQuestionDuplicate(long tenantId, String kbId, String excludeChunkId,
-                                           FaqChunkMetadata meta) {
-        List<String> similar = meta.similarQuestions == null ? List.of() : meta.similarQuestions;
-        List<String> negative = meta.negativeQuestions == null ? List.of() : meta.negativeQuestions;
-
-        for (String q : similar) {
-            if (q.equals(meta.standardQuestion)) {
-                throw new BizException(AppError.badRequest("相似问「" + q + "」不能与标准问相同"));
-            }
-        }
-        Set<String> seen = new LinkedHashSet<>();
-        for (String q : similar) {
-            if (!seen.add(q)) {
-                throw new BizException(AppError.badRequest("相似问「" + q + "」重复"));
-            }
-        }
-        Set<String> positiveQuestions = new LinkedHashSet<>();
-        positiveQuestions.add(meta.standardQuestion);
-        positiveQuestions.addAll(similar);
-        Set<String> negativeSeen = new LinkedHashSet<>();
-        for (String q : negative) {
-            if (q.isEmpty()) {
-                continue;
-            }
-            if (q.equals(meta.standardQuestion)) {
-                throw new BizException(AppError.badRequest("反例问题「" + q + "」不能与标准问相同"));
-            }
-            if (positiveQuestions.contains(q)) {
-                throw new BizException(AppError.badRequest("反例问题「" + q + "」不能与相似问相同"));
-            }
-            if (!negativeSeen.add(q)) {
-                throw new BizException(AppError.badRequest("反例问题「" + q + "」重复"));
-            }
-        }
-
-        List<String> allQuestions = new ArrayList<>();
-        allQuestions.add(meta.standardQuestion);
-        allQuestions.addAll(similar);
-
-        Chunk dupChunk = faqChunkRepository.findFAQChunkWithDuplicateQuestion(
-                tenantId, kbId, excludeChunkId, allQuestions);
-        if (dupChunk == null) {
-            return;
-        }
-        FaqChunkMetadata existingMeta = faqChunkCodec.sanitizedFaqMetadata(dupChunk);
-        if (existingMeta == null) {
-            throw new BizException(AppError.badRequest("标准问或相似问与已有条目重复"));
-        }
-        Set<String> existingSimilarSet = new LinkedHashSet<>();
-        if (existingMeta.similarQuestions != null) {
-            for (String q : existingMeta.similarQuestions) {
-                if (!q.isEmpty()) {
-                    existingSimilarSet.add(q);
-                }
-            }
-        }
-        if (!meta.standardQuestion.isEmpty()) {
-            if (meta.standardQuestion.equals(existingMeta.standardQuestion)
-                    || existingSimilarSet.contains(meta.standardQuestion)) {
-                throw new BizException(AppError.badRequest("标准问「" + meta.standardQuestion + "」已存在"));
-            }
-        }
-        for (String q : similar) {
-            if (q.isEmpty()) {
-                continue;
-            }
-            if (q.equals(existingMeta.standardQuestion) || existingSimilarSet.contains(q)) {
-                throw new BizException(AppError.badRequest("相似问「" + q + "」已存在"));
-            }
-        }
-        throw new BizException(AppError.badRequest("标准问或相似问与已有条目重复"));
-    }
-
-
 
 
     private static String sha256Hex(String input) {
