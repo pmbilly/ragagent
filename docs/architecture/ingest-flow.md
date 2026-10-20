@@ -91,7 +91,7 @@ flowchart LR
 3. {@link com.ragagent.knowledge.repository.KnowledgeRepository} /
    {@link com.ragagent.knowledge.repository.KnowledgeBaseRepository} /
    {@link com.ragagent.knowledge.repository.ChunkRepository} — 行与 chunk 的读写
-4. {@link com.ragagent.knowledge.client.EmbedderClient} — 向量化配置与调用
+4. {@link com.ragagent.embedding.EmbeddingVectors} — 向量化响应校验（客户端由 ModelRuntime 按模型 id 装配）
 5. {@link com.ragagent.knowledge.task.ChunkExtractTaskQueue} /
    {@link com.ragagent.knowledge.task.QuestionGenerationTaskQueue} — 异步子任务
 6. {@link com.ragagent.wiki.service.ingest.WikiIngestService} — wiki 交接

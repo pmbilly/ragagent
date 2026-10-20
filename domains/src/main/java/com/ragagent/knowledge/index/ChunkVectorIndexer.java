@@ -13,7 +13,6 @@ import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.contract.retrieval.IndexRow;
 import com.ragagent.contract.retrieval.SourceTypes;
 import com.ragagent.contract.retrieval.VectorIndexStore;
-import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.knowledge.config.BatchEmbedProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -58,7 +57,6 @@ public class ChunkVectorIndexer {
     private final KnowledgeBaseRepository kbRepository;
     private final KnowledgeRepository knowledgeRepository;
     private final ModelCatalogPort modelCatalog;
-    private final EmbedderClient embedder;
     private final VectorIndexStore vectorStore;
     private final KnowledgeVectorWrites vectorWrites;
     private final ModelRuntime modelRuntimeAssembler;
@@ -68,7 +66,6 @@ public class ChunkVectorIndexer {
     public ChunkVectorIndexer(KnowledgeBaseRepository kbRepository,
                               KnowledgeRepository knowledgeRepository,
                               ModelCatalogPort modelCatalog,
-                              EmbedderClient embedder,
                               VectorIndexStore vectorStore,
                               KnowledgeVectorWrites vectorWrites,
                               ModelRuntime modelRuntimeAssembler,
@@ -76,7 +73,6 @@ public class ChunkVectorIndexer {
         this.kbRepository = kbRepository;
         this.knowledgeRepository = knowledgeRepository;
         this.modelCatalog = modelCatalog;
-        this.embedder = embedder;
         this.vectorStore = vectorStore;
         this.vectorWrites = vectorWrites;
         this.modelRuntimeAssembler = modelRuntimeAssembler;
@@ -173,7 +169,7 @@ public class ChunkVectorIndexer {
             indexAndStoreViaEngine(kb, boundEngine, chunks);
             return;
         }
-        EmbedderClient.EmbedConfig cfg = EmbedderClient.configFrom(embeddingModel);
+        Embedder runtimeEmbedder = modelRuntimeAssembler.getEmbeddingModel(embeddingModel.id());
         List<IndexRow> rows = new ArrayList<>();
         List<String> ids = new ArrayList<>();
         Map<String, Knowledge> knowledgeCache = new HashMap<>();
@@ -224,7 +220,7 @@ public class ChunkVectorIndexer {
             }
             List<float[]> vectors;
             try {
-                vectors = embedder.embedBatch(cfg, texts);
+                vectors = runtimeEmbedder.batchEmbed(texts);
             } catch (Exception e) {
                 throw new BizException(AppError.badRequest(
                         e.getMessage() == null ? e.toString() : e.getMessage()));

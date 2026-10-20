@@ -9,7 +9,6 @@ import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.contract.retrieval.VectorIndexStore;
-import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -67,22 +66,22 @@ final class KnowledgeIndexStage {
 
     /** 失败清场（按尝试划界——只删本次产出的 chunks；清单未知时退回知识粒度兜底；向量仍知识粒度）。 */
     void cleanupFailedAttempt(String knowledgeId, List<String> attemptChunkIds,
-            Knowledge k, KnowledgeBase kb, EmbedderClient.EmbedConfig embedConfig) {
+            Knowledge k, KnowledgeBase kb, String embeddingModelId) {
         if (attemptChunkIds.isEmpty()) {
             log.warn("[KnowledgeProcess] no enumerable chunks; knowledge-wide cleanup for {}", knowledgeId);
             chunkRepository.deleteByKnowledgeId(knowledgeId);
         } else {
             chunkRepository.deleteByIds(attemptChunkIds);
         }
-        deleteKnowledgeVectors(k, kb, embedConfig, knowledgeId);
+        deleteKnowledgeVectors(k, kb, embeddingModelId, knowledgeId);
     }
 
     /** 预清理：回收旧抽取图片 + 删旧 chunks 行（无条件）+ 向量行（仅启用且模型可用）+ 旧图谱（失败仅告警）。 */
     void preClean(Knowledge k, KnowledgeBase kb,
-            EmbedderClient.EmbedConfig embedConfig, String knowledgeId) {
+            String embeddingModelId, String knowledgeId) {
         extractedImageStore.releaseFor(k.getTenantId() == null ? 0L : k.getTenantId(), knowledgeId);
         chunkRepository.deleteByKnowledgeId(knowledgeId);
-        deleteKnowledgeVectors(k, kb, embedConfig, knowledgeId);
+        deleteKnowledgeVectors(k, kb, embeddingModelId, knowledgeId);
         deleteGraphData(k.getKnowledgeBaseId(), knowledgeId);
     }
 
@@ -91,9 +90,9 @@ final class KnowledgeIndexStage {
      * 直连只服务未绑定 KB）；index 内容 = title + chunk 的 embeddingContent；向量化
      * 未启用 → embedding 阶段记 skip。
      */
-    void embedChunks(Knowledge k, KnowledgeBase kb, EmbedderClient.EmbedConfig embedConfig,
+    void embedChunks(Knowledge k, KnowledgeBase kb, String embeddingModelId,
             List<Chunk> chunks, String knowledgeId, int attempt) throws Exception {
-        if (embedConfig == null) {
+        if (embeddingModelId == null) {
             skipStageSpan(attempt, knowledgeId, KnowledgeProcessingSpan.STAGE_EMBEDDING, "skipped");
             return;
         }
@@ -128,7 +127,7 @@ final class KnowledgeIndexStage {
      * （GetEmbeddingModel → DeleteByKnowledgeIDList）；未绑定保持 pg 直连。
      */
     private void deleteKnowledgeVectors(Knowledge k, KnowledgeBase kb,
-            EmbedderClient.EmbedConfig embedConfig, String knowledgeId) {
+            String embeddingModelId, String knowledgeId) {
         IndexEngine boundEngine = vectorWrites.boundEngine(kb, k.getTenantId());
         if (boundEngine != null) {
             try {
@@ -143,12 +142,13 @@ final class KnowledgeIndexStage {
             }
             return;
         }
-        if (embedConfig != null) {
+        if (embeddingModelId != null) {
             vectorStore.deleteByKnowledgeId(List.of(knowledgeId));
         }
     }
 
-    EmbedderClient.EmbedConfig resolveEmbedConfig(Knowledge k, KnowledgeBase kb) {
+    /** 解析本知识使用的 embedding 模型 id；null = 向量/关键词都关（embedding 阶段跳过）。 */
+    String resolveEmbeddingModelId(Knowledge k, KnowledgeBase kb) {
         if (!(kb.getIndexingStrategy().isVectorEnabled() || kb.getIndexingStrategy().isKeywordEnabled())) {
             return null;
         }
@@ -161,7 +161,7 @@ final class KnowledgeIndexStage {
         if (model == null) {
             throw new IllegalStateException("embedding model not found: " + modelId);
         }
-        return EmbedderClient.configFrom(model);
+        return modelId;
     }
 
     private SpanTracker.SpanHandle beginStageSpan(int attempt, String knowledgeId,

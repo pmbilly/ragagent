@@ -31,14 +31,15 @@ public final class ConcurrencyEmbedder implements Embedder, EmbedderPooler {
     @Override
     public float[] embed(String text) {
         try (var release = gate()) {
-            return inner.embed(text);
+            return EmbeddingVectors.checkOne(inner.embed(text));
         }
     }
 
     @Override
     public List<float[]> batchEmbed(List<String> texts) {
         try (var release = gate()) {
-            return inner.batchEmbed(texts);
+            // 所有 provider 的统一出口：条数/空向量/批内维度在此把关（index 归位在 OpenAI 族解析里）
+            return EmbeddingVectors.check(inner.batchEmbed(texts), texts.size());
         }
     }
 

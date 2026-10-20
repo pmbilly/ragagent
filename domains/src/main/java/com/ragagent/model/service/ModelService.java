@@ -48,7 +48,7 @@ public class ModelService implements ModelFactsPort  {
      * 跨域只读端口的实现（{@link ModelFactsPort}）：只回填调用侧需要的字段。
      *
      * <p>空值归一为 {@code ""}（与消费方原先的 {@code p == null ? "" : p.getBaseUrl()} 一致；
-     * 顺带消除了原先 {@code EmbedderClient.configFrom} 在 parameters 为 null 时的潜在 NPE）。</p>
+     * parameters 为 null 时也不会 NPE）。</p>
      */
     @Override
     public ModelFacts findFacts(String modelId) {

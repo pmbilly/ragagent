@@ -22,7 +22,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 /**
  * K10b（登记项）：按位置配行的最后一道闸——行/向量数量不符必须在写库前抛出。
  *
- * <p>上游顺序与数量问题已在 {@code EmbedderClient.embedBatch} 收口（K10a），这里是
+ * <p>上游顺序与数量问题已在 {@code embedding.EmbeddingVectors} 收口，这里是
  * "调用方自己拼的两张表长度不一致"的兜底：错位/少条不许静默写错行。</p>
  */
 class VectorStoreServiceIndexRowArityTest {

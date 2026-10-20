@@ -151,7 +151,7 @@
 | `:domains` | `com.ragagent.knowledge` | 知识库域：知识的存储、处理管线与检索面。 |
 | `:domains` | `com.ragagent.knowledge.api` | 知识库 · 端口实现：KnowledgeChunkPipelineAdapter / KnowledgeBaseCatalogAdapter / KnowledgeFinalizeAdapter…。 |
 | `:domains` | `com.ragagent.knowledge.chunker` | 知识库 · 分块：HeuristicSplitter / DocumentProfiler / HeadingHierarchy…。 |
-| `:domains` | `com.ragagent.knowledge.client` | 知识库出站客户端：DocReaderClient（文档解析服务）、EmbedderClient（向量化服务）。 |
+| `:domains` | `com.ragagent.knowledge.client` | 知识库出站客户端：DocReaderClient（文档解析服务）。 |
 | `:domains` | `com.ragagent.knowledge.config` | 知识库 · 配置：HousekeepingProperties / BatchEmbedProperties / DocReaderProperties。 |
 | `:domains` | `com.ragagent.knowledge.controller` | 知识库 HTTP 面：薄绑定层（@Valid DTO → service → 裸资源视图），线格式 camelCase、无信封； 无手搓解析与信封拼装。 |
 | `:domains` | `com.ragagent.knowledge.domain` | 知识库持久化实体与 JSON 结构（MyBatis-Plus 注解 + Jackson 序列化注解）。 |

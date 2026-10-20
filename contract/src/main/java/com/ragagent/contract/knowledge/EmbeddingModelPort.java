@@ -5,9 +5,8 @@ import java.util.List;
 /**
  * 嵌入模型端口：wiki 按模型 id 取 embedding 客户端。
  *
- * <p>实现留在 {@code knowledge} 侧（{@code ModelService} 取模型 → embedding 类型闸门 →
- * {@code EmbedderClient.configFrom} → {@code embedBatch}）。wiki 侧只拿一个函数式客户端，
- * 不再接触 {@code EmbedderClient.EmbedConfig}。</p>
+ * <p>实现留在 {@code knowledge} 侧（取模型 → embedding 类型闸门 → {@code ModelRuntime}
+ * 按 id 装配客户端）。wiki 侧只拿一个函数式客户端。</p>
  *
  * <p>类型闸门语义不变：非 embedding 模型抛 {@code IllegalStateException}
  * （调用方据此降级为"喂全部目录"）。</p>

@@ -9,8 +9,8 @@ import java.util.List;
  * <h2>为什么是端口</h2>
  * <p>本模块的 {@code ModelService} 只实现了配置 CRUD，运行时工厂
  * （{@code GetChatModel} / {@code GetEmbeddingModel}）由这里定义<b>窄端口</b>，
- * 并提供一个基于既有 {@code ChatConfig}/{@code LlmChatClients}/
- * {@code EmbedderClient} 的默认实现；将来若把工厂收进 {@code ModelService}，
+ * 并提供基于 {@code ChatConfig}/{@code LlmChatClients}/{@code ModelRuntime} 的默认实现；
+ * 将来若把工厂收进 {@code ModelService}，
  * 只需替换实现 bean。</p>
  *
  * <p><b>失败语义</b>：两个方法在模型缺失、状态异常或类型不符时

@@ -9,7 +9,7 @@
 | **知识库 / KB** | 一组文档、分块、索引配置的集合；检索与问答的作用域 | `domains/.../knowledge/domain/KnowledgeBase.java` |
 | **文档 / knowledge** | 上传到知识库的一份原始文件（PDF/Markdown/网页等） | `domains/.../knowledge/domain/Knowledge.java` |
 | **分块 / chunk** | 文档切分后的检索单元；`parent_text` 类型是给长上下文用的父块 | `domains/.../knowledge/domain/Chunk.java` |
-| **向量化 / embedding** | 把文本变成向量。注意：`EmbedChannel` **不是**它，见下 | `contract/.../model/Embedder.java`、`domains/.../knowledge/client/EmbedderClient.java` |
+| **向量化 / embedding** | 把文本变成向量。注意：`EmbedChannel` **不是**它，见下 | `contract/.../model/Embedder.java`、`model-runtime/.../embedding/EmbeddingVectors.java` |
 | **检索引擎 / retrieve engine** | pgvector / ES / Milvus 等后端适配；由 `RETRIEVE_DRIVER` 或 KB 绑定选择 | `retrieval-engine/.../engine/EngineRegistry.java` |
 | **混合检索 / hybrid search** | 向量召回 + 关键词召回，融合后交重排 | `retrieval-engine/.../HybridSearchService.java` |
 | **重排 / rerank** | 对召回结果二次打分排序；可选模型 | `model-runtime/.../rerank/`、`PluginRerank` |

@@ -42,7 +42,7 @@ public class DefaultWikiModelResolver implements WikiModelResolver {
     @Override
     public WikiEmbeddingModel getEmbeddingModel(String modelId) {
         // embedding 类型闸门（非 embedding 模型抛 IllegalStateException）与
-        // EmbedderClient 配置解析在 knowledge 侧端口内完成；wiki 只拿函数式客户端。
+        // 模型装配在 knowledge 侧端口内完成（ModelRuntime 按 id 装配）；wiki 只拿函数式客户端。
         EmbeddingModelPort.Embedder embedder = embeddingPort.embedderFor(modelId);
         return embedder::batchEmbed;
     }

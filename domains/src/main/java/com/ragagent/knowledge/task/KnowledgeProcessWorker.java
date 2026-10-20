@@ -5,7 +5,6 @@ import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.knowledge.client.DocReaderClient;
-import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.knowledge.config.KnowledgeOcrProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -186,8 +185,8 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             if (kb == null) {
                 throw new IllegalStateException("knowledge base not found");
             }
-            EmbedderClient.EmbedConfig embedConfig = indexStage.resolveEmbedConfig(k, kb);
-            indexStage.preClean(k, kb, embedConfig, knowledgeId);
+            String embeddingModelId = indexStage.resolveEmbeddingModelId(k, kb);
+            indexStage.preClean(k, kb, embeddingModelId, knowledgeId);
             //：记下本次尝试的 chunk id——失败清场只删它们（见 cleanupFailedAttempt）。
             List<String> attemptChunkIds = List.of();
             try {
@@ -201,13 +200,13 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                         k, kb, knowledgeId, markdown, attempt);
                 attemptChunkIds = chunks.stream().map(Chunk::getId).toList();
                 job = job.progress(IngestStage.EMBEDDING);
-                indexStage.embedChunks(k, kb, embedConfig, chunks, knowledgeId, attempt);
+                indexStage.embedChunks(k, kb, embeddingModelId, chunks, knowledgeId, attempt);
                 job = job.progress(IngestStage.POST_PROCESS);
                 finalizingStage.finalizeProcessing(k, kb, knowledgeId, attempt, chunks);
                 job = job.completed();
                 log.debug("process knowledge {} completed at {}", knowledgeId, job.stage());
             } catch (Exception inner) {
-                indexStage.cleanupFailedAttempt(knowledgeId, attemptChunkIds, k, kb, embedConfig);
+                indexStage.cleanupFailedAttempt(knowledgeId, attemptChunkIds, k, kb, embeddingModelId);
                 throw inner;
             }
         } catch (Exception e) {

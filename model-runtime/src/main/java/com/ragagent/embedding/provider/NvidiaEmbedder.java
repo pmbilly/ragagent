@@ -3,9 +3,9 @@ package com.ragagent.embedding.provider;
 import com.ragagent.embedding.EmbedQueryContext;
 import com.ragagent.embedding.EmbedderPooler;
 import com.ragagent.embedding.EmbeddingHttp;
+import com.ragagent.embedding.EmbeddingVectors;
 import com.ragagent.platform.web.ProviderJson;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ObjectNode;
@@ -68,10 +68,6 @@ public final class NvidiaEmbedder extends BaseEmbedder {
             throw new EmbeddingHttp.EmbeddingException("unmarshal response: "
                     + resp.bodyText());
         }
-        List<float[]> embeddings = new ArrayList<>();
-        for (JsonNode data : response.path("data")) {
-            embeddings.add(ProviderJson.floatArray(data.path("embedding")));
-        }
-        return embeddings;
+        return EmbeddingVectors.fromData(response.path("data"), resp.bodyText(), texts.size());
     }
 }

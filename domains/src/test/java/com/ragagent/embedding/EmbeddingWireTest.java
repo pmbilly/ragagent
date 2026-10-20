@@ -137,7 +137,7 @@ class EmbeddingWireTest {
 
     @Test
     void openAiDefaultOmitsDimensions() {
-        Stub stub = new Stub("{\"data\":[{\"embedding\":[0.1,0.2,0.3],\"index\":0},{\"embedding\":[0.4],\"index\":1}]}");
+        Stub stub = new Stub("{\"data\":[{\"embedding\":[0.1,0.2,0.3],\"index\":0},{\"embedding\":[0.4,0.5,0.6],\"index\":1}]}");
         try {
             Embedder e = new OpenAiEmbedder("sk-test", stub.url(), "text-embedding-3-small",
                     511, 256, "emb-1", null);
@@ -154,7 +154,7 @@ class EmbeddingWireTest {
 
     @Test
     void openAiOverrideSendsDimensions() {
-        Stub stub = new Stub("{\"data\":[{\"embedding\":[0.1,0.2,0.3],\"index\":0}]}");
+        Stub stub = new Stub("{\"data\":[{\"embedding\":[0.1,0.2,0.3],\"index\":0},{\"embedding\":[0.4,0.5,0.6],\"index\":1}]}");
         try {
             OpenAiEmbedder e = new OpenAiEmbedder("sk-test", stub.url(),
                     "text-embedding-3-small", 511, 256, "emb-1", null);
@@ -234,7 +234,7 @@ class EmbeddingWireTest {
 
     @Test
     void jinaUsesTruncateBooleanAndDimensions() {
-        Stub stub = new Stub("{\"data\":[{\"embedding\":[0.1,0.2],\"index\":0}]}");
+        Stub stub = new Stub("{\"data\":[{\"embedding\":[0.1,0.2],\"index\":0},{\"embedding\":[0.3,0.4],\"index\":1}]}");
         try {
             JinaEmbedder e = new JinaEmbedder("sk-test", stub.url(), "jina-embeddings-v3",
                     0, 1024, "emb-4", null);
@@ -323,7 +323,7 @@ class EmbeddingWireTest {
 
     @Test
     void zhipuRequestShape() {
-        Stub stub = new Stub("{\"data\":[{\"embedding\":[0.1],\"index\":0}]}");
+        Stub stub = new Stub("{\"data\":[{\"embedding\":[0.1],\"index\":0},{\"embedding\":[0.2],\"index\":1}]}");
         try {
             Embedder e = new ZhipuEmbedder("sk-test", stub.url(), "embedding-3", 511, 0, "emb-8", null);
             embed(e, "hello world", "second text");
