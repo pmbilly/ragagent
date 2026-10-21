@@ -1,0 +1,76 @@
+# 内置模型声明（样例）——「第一次问答」必需的一步。
+#
+# 用法：
+#   1) cp config/builtin_models.yaml.example config/builtin_models.yaml
+#   2) 在 .env 里补 LLM_BASE_URL / LLM_API_KEY（或用下方 local + Ollama 的写法，不需要 key）
+#   3) 重启后端（bash scripts/java-server-down.sh --stop && bash scripts/java-server-up.sh）
+#
+# 生效路径：默认 ./config/builtin_models.yaml（相对启动工作目录），可用 BUILTIN_MODELS_CONFIG 覆盖。
+#   文件不存在 = 完全跳过（no-op），不会往 models 表写任何行。
+# 变量插值：字符串里的 ${VAR} 在启动时按环境变量展开；**变量未设置时原样保留**（即凭据无效）。
+#
+# 字段（只读这些键，多写不会生效）：
+#   id          必填，≤64 字符；按 id 幂等 upsert（重复启动不会重复插入）
+#   tenant_id   缺省 10000（系统租户）
+#   name        模型标识（发给供应商的 model 名，如 gpt-4o-mini / qwen2.5:7b）
+#   type        必填：KnowledgeQA（对话）/ Embedding（向量）/ Rerank / VLLM / ASR
+#   source      remote（默认，HTTP）/ local（本地 Ollama 等）
+#   description 可选说明
+#   is_default  同一 (tenant_id, type) 桶内只允许一个默认
+#   status      active（默认）
+#   parameters:
+#     baseUrl          供应商地址（OpenAI 兼容写 .../v1）
+#     apiKey           凭据；用 ${LLM_API_KEY} 插值，避免明文入库
+#     interfaceType    openai / ollama；留空按 source 推断（local → ollama，否则 openai）
+#     embeddingParameters:
+#       dimension                 向量维度（必须与模型一致，否则相似度无意义）
+#       truncatePromptTokens      可选
+#       supportsDimensionOverride 可选
+#
+# 注意：本文件托管的所有行由启动时对账维护 —— 从文件里删掉某条，下次启动会把它**软删除**。
+
+builtin_models:
+  # ── 对话模型 ────────────────────────────────────────────────────────
+  - id: builtin-chat
+    name: gpt-4o-mini          # ← 换成你的供应商支持的模型名
+    type: KnowledgeQA
+    source: remote
+    is_default: true
+    parameters:
+      baseUrl: ${LLM_BASE_URL}   # 如 https://api.openai.com/v1
+      apiKey: ${LLM_API_KEY}
+      interfaceType: openai
+
+  # ── 向量模型（知识库入库 / 检索必需，维度要与模型一致）──────────────
+  - id: builtin-embedding
+    name: text-embedding-3-small
+    type: Embedding
+    source: remote
+    is_default: true
+    parameters:
+      baseUrl: ${LLM_BASE_URL}
+      apiKey: ${LLM_API_KEY}
+      interfaceType: openai
+      embeddingParameters:
+        dimension: 1536
+
+  # ── 本地 Ollama（不需要 key；把上面两条注释掉再启用这两条）───────────
+  # - id: builtin-chat-ollama
+  #   name: qwen2.5:7b
+  #   type: KnowledgeQA
+  #   source: local
+  #   is_default: true
+  #   parameters:
+  #     baseUrl: http://localhost:11434
+  #     apiKey: ""
+  #
+  # - id: builtin-embedding-ollama
+  #   name: nomic-embed-text
+  #   type: Embedding
+  #   source: local
+  #   is_default: true
+  #   parameters:
+  #     baseUrl: http://localhost:11434
+  #     apiKey: ""
+  #     embeddingParameters:
+  #       dimension: 768

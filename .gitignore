@@ -29,6 +29,8 @@ frontend/package.json.md5
 .env
 *.local
 /data/
+# 内置模型声明（含真实凭据，只提交 .example）
+config/builtin_models.yaml
 
 # 测试产物
 

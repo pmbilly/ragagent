@@ -137,13 +137,18 @@ POST（SSE）                                     ← 前端 / 任意 HTTP 客�
 # 1) 配置：dev 端口 8083、检索驱动 postgres、固定 JWT 密钥都在这里
 cp .env.example .env
 
-# 2) 基础设施：PostgreSQL(15432) + Redis(16379) + 文档解析服务(50051)
+# 2) 配模型（**首次问答必需**）：复制样例，并在 .env 里补 LLM_BASE_URL / LLM_API_KEY
+#    （用本地 Ollama 的话改样例末尾那段，不需要 key）
+#    不配的话页面能打开，但第一次提问会失败——系统里没有任何可用模型
+cp config/builtin_models.yaml.example config/builtin_models.yaml
+
+# 3) 基础设施：PostgreSQL(15432) + Redis(16379) + 文档解析服务(50051)
 docker compose up -d
 
-# 3) 启动后端（:8083；脚本先构建再起 jar，环境变量口径与 dev-env.sh 一致）
+# 4) 启动后端（:8083；脚本先构建再起 jar，环境变量口径与 dev-env.sh 一致）
 bash scripts/java-server-up.sh
 
-# 4) 启动前端（:5173，/api 代理到 8083）
+# 5) 启动前端（:5173，/api 代理到 8083）
 cd frontend && npm ci && npm run dev
 ```
 

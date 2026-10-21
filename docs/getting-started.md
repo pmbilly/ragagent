@@ -18,18 +18,32 @@
 
 ```bash
 cp .env.example .env          # dev 默认值：8083 / postgres 检索 / 固定 JWT 密钥
+cp config/builtin_models.yaml.example config/builtin_models.yaml   # 模型声明，见下
 bash scripts/doctor.sh        # 体检：缺什么会直接给修复命令
 bash scripts/dev-up.sh        # 基础设施 + 后端；或按 README 四条命令手动起
 ```
 
-起服日志里应看到两行关键信息：
+**模型是问答的前提，系统不自带 LLM。** 上面复制的样例默认声明两个模型（对话 + 向量），走 OpenAI 兼容接口，
+需要你在 `.env` 里补两项：
+
+```bash
+LLM_BASE_URL=https://api.openai.com/v1     # 换成你的供应商地址
+LLM_API_KEY=sk-...                         # 也支持把样例里的 ${LLM_API_KEY} 换成真实值
+```
+
+用本地 Ollama 的话，改样例末尾那段（`source: local`、`baseUrl: http://localhost:11434`，不需要 key），
+把默认的两条注释掉。**不配模型时页面能打开、知识库能上传，但第一次提问必然失败**——这是新人最常见的卡点。
+
+起服日志里应看到三行关键信息：
 
 ```
 [capabilities] retrieval=postgres engines=1 | jwt=env | storage=/Users/<you>/ragagent-data/files | redis=localhost:16379 | stream=memory
+[builtin-models] applied: 2 upserted, 0 pruned from ./config/builtin_models.yaml
 Tomcat started on port 8083 (http)
 ```
 
-`retrieval=OFF` 或 `jwt=RANDOM` 都是**降级信号**，先按日志里的 WARN 修 `.env`，不要继续。
+第二行说明模型声明已生效；**看不到这行**通常意味着文件没复制、路径不对（工作目录不是仓库根）或 YAML 解析失败，
+此时提问会报"没有可用模型"。`retrieval=OFF` 或 `jwt=RANDOM` 则都是**降级信号**，先按日志里的 WARN 修 `.env`，不要继续。
 
 ### 2. 确认后端与前端
 
