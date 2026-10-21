@@ -41,11 +41,11 @@
     },
     "audit": {
       "kind": "control",
-      "frontend": "views/system/SystemAuditLog.vue"
+      "frontend": "views/settings/panels/SystemAuditLog.vue"
     },
     "auth": {
       "kind": "control",
-      "frontend": "views/auth · views/settings/TenantMembers.vue · views/system/PlatformAPIKeys.vue"
+      "frontend": "views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue"
     },
     "datasource": {
       "kind": "integration",
@@ -93,7 +93,7 @@
     },
     "system": {
       "kind": "control",
-      "frontend": "views/system"
+      "frontend": "views/settings/panels"
     },
     "vectorstore": {
       "kind": "capability-config",
