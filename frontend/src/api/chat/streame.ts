@@ -41,6 +41,11 @@ export function useStream() {
   let buffer: string[] = []
   let renderTimer: number | null = null
 
+  // 空闲超时：服务端有 deadline，但连接半死（代理掐流、网络假活）时前端会一直转圈。
+  // 超过这个时长没有任何帧就判定卡死，主动收束并报错。
+  const IDLE_TIMEOUT_MS = 120_000
+  let idleTimer: ReturnType<typeof setTimeout> | null = null
+
   // 启动流式请求
   // QA 请求体键＝服务端字段名（§14.9l S4）：全部 camelCase，含提及项元素与
   // SuggestionAttribution 的内部键（S3 已收口）。sessionId/url 是前端路由参数，不属请求体。
@@ -185,10 +190,12 @@ export function useStream() {
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           console.log(`[TTFB] response:headers requestId=${requestID} elapsed_ms=${(performance.now() - sentAt).toFixed(1)}`);
           isLoading.value = false;
+          armIdle();
         },
 
         onmessage: (ev) => {
           if (myGeneration !== streamGeneration) return
+          armIdle()
           const parsed = JSON.parse(ev.data);
           // Log first answer chunk for end-to-end TTFB measurement.
           // Filter by event type so non-answer events (references, tool
@@ -201,6 +208,11 @@ export function useStream() {
           // 执行自定义处理
           if (chunkHandler) {
             chunkHandler(parsed);
+          }
+          // 业务错误帧：服务端不保证立刻断流（deadline 之外还可能是代理吞掉 FIN）
+          // ⇒ 前端主动收束，否则 loading 会一直转。
+          if (parsed?.responseType === 'error') {
+            stopStream();
           }
         },
 
@@ -242,13 +254,30 @@ export function useStream() {
   }
 
 
+  const disarmIdle = () => {
+    if (idleTimer) {
+      clearTimeout(idleTimer)
+      idleTimer = null
+    }
+  }
+
   // 停止流
   const stopStream = () => {
+    disarmIdle()
     streamGeneration++
     controller.abort();
     controller = new AbortController(); // 重置控制器（如需重新发起）
     isStreaming.value = false;
     isLoading.value = false;
+  }
+
+  /** 每收到一帧就重置；超时说明连接已卡死，收束并给出可读原因。 */
+  const armIdle = () => {
+    disarmIdle()
+    idleTimer = setTimeout(() => {
+      error.value = i18n.global.t('error.streamTimeout')
+      stopStream()
+    }, IDLE_TIMEOUT_MS)
   }
 
   // 组件卸载时自动清理

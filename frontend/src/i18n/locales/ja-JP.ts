@@ -3747,6 +3747,7 @@ export default {
     missingKbId: 'ナレッジベースIDがありません',
     tokenNotFound: 'ログイントークンが見つかりません。再度ログインしてください',
     streamFailed: 'ストリーム接続に失敗しました',
+    streamTimeout: '応答がタイムアウトしました：長時間データを受信していません',
     auth: {
       loginFailed: 'ログインに失敗しました',
       registerFailed: '登録に失敗しました',

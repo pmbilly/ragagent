@@ -2304,6 +2304,7 @@ export default {
     missingKbId: 'Отсутствует ID базы знаний',
     tokenNotFound: 'Токен входа не найден, войдите снова',
     streamFailed: 'Ошибка потокового соединения',
+    streamTimeout: 'Тайм-аут ответа: данные давно не поступали',
     initialization: {
       checkFailed: 'Проверка не пройдена',
       testFailed: 'Тест не пройден'

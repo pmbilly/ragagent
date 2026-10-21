@@ -2306,6 +2306,7 @@ export default {
     missingKbId: '缺少知识库ID',
     tokenNotFound: '未找到登录令牌，请重新登录',
     streamFailed: '流式连接失败',
+    streamTimeout: '响应超时：长时间没有收到数据，已停止等待',
     initialization: {
       checkFailed: '检查失败',
       testFailed: '测试失败'

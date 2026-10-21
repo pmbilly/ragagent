@@ -3747,6 +3747,7 @@ export default {
     missingKbId: 'Missing knowledge base ID',
     tokenNotFound: 'Login token not found, please log in again',
     streamFailed: 'Stream connection failed',
+    streamTimeout: 'Response timed out: no data received for a long time',
     auth: {
       loginFailed: 'Login failed',
       registerFailed: 'Registration failed',

@@ -2304,6 +2304,7 @@ export default {
     missingKbId: '지식베이스 ID가 누락되었습니다',
     tokenNotFound: '로그인 토큰을 찾을 수 없습니다. 다시 로그인해주세요',
     streamFailed: '스트림 연결 실패',
+    streamTimeout: '응답 시간 초과: 오랫동안 데이터를 받지 못했습니다',
     initialization: {
       checkFailed: '검사 실패',
       testFailed: '테스트 실패'

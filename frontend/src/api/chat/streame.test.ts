@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { after, before, test } from 'node:test'
+import { after, before, mock, test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import { createServer, type ViteDevServer } from 'vite'
 import { createSSRApp } from 'vue'
@@ -7,14 +7,20 @@ import { renderToString } from 'vue/server-renderer'
 
 let server: ViteDevServer
 let useStream: typeof import('./streame').useStream
-let transport: { requests: Array<{ url: string; options: { body: string } }> }
+let transport: { requests: Array<{ url: string; options: any }> }
 const originalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage')
 before(async () => {
   Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: {
     getItem: (key: string) => key === 'weknora_token' ? 'test-token' : null,
   } })
   const mocks: Record<string, string> = {
-    '@microsoft/fetch-event-source': `export const requests = []; export async function fetchEventSource(url, options) { requests.push({url, options}); }`,
+    // 建立连接后立刻回调 onopen（真实 fetchEventSource 也是拿到响应头就回调），
+    // 这样测试才能把 options 里的回调当"服务端"来驱动。
+    '@microsoft/fetch-event-source': `export const requests = [];
+      export async function fetchEventSource(url, options) {
+        requests.push({ url, options });
+        options.onopen?.({ ok: true, status: 200 });
+      }`,
     '@/utils/index': `export const generateRandomString = () => 'test-request';`,
     '@/i18n': `export default { global: { t: key => key, locale: { value: 'zh-CN' } } };`,
   }
@@ -61,4 +67,40 @@ test('SSE HTTP body preserves web search selection alongside other tools', async
     assert.deepEqual(body.skillNames, ['report'])
     assert.equal(stream.lastStreamRequest.value?.body?.webSearchEnabled, true)
   } finally { stream.stopStream() }
+})
+
+test('error 帧让流主动收束（不再等连接自己断）', async () => {
+  let stream!: ReturnType<typeof useStream>
+  await renderToString(createSSRApp({ setup() { stream = useStream(); return () => null } }))
+  const chunks: unknown[] = []
+  stream.onChunk(chunk => chunks.push(chunk))
+  try {
+    await stream.startStream({ sessionId: 's1', query: 'q', method: 'POST', url: '/api/v1/chat' })
+    const request = transport.requests.at(-1)!
+
+    request.options.onmessage({ data: JSON.stringify({ responseType: 'error', content: '模型调用失败' }) })
+
+    assert.equal(chunks.length, 1, '错误帧仍要交给上层渲染失败态')
+    assert.equal(stream.isStreaming.value, false, '收束后不应再显示"正在生成"')
+    assert.equal(request.options.signal.aborted, true, '连接必须被中止，否则服务端不断流就一直转')
+  } finally { stream.stopStream() }
+})
+
+test('长时间没有帧：超时收束并给出可读原因', async () => {
+  let stream!: ReturnType<typeof useStream>
+  await renderToString(createSSRApp({ setup() { stream = useStream(); return () => null } }))
+  mock.timers.enable({ apis: ['setTimeout'] })
+  try {
+    await stream.startStream({ sessionId: 's2', query: 'q', method: 'POST', url: '/api/v1/chat' })
+    const request = transport.requests.at(-1)!
+
+    mock.timers.tick(120_001)
+
+    assert.equal(stream.error.value, 'error.streamTimeout')
+    assert.equal(stream.isStreaming.value, false)
+    assert.equal(request.options.signal.aborted, true)
+  } finally {
+    mock.timers.reset()
+    stream.stopStream()
+  }
 })

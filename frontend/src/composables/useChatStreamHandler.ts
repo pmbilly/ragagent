@@ -1193,6 +1193,30 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
       return
     }
 
+    // 业务错误帧：绝不能当正文渲染（此前 content 会直接进 fullContent，用户看到的是
+    // 一段"像回答的错误文案"，既没有失败态也没有原因提示）。
+    if (data.responseType === 'error') {
+      const errorMsg = String(data.content || t('chat.processError'))
+      const failedMessage = findLastMessage((item) => {
+        if (item.role !== 'assistant') return false
+        if (item.requestId === data.id) return true
+        return item.id === data.id
+      })
+      if (failedMessage) {
+        failedMessage.content = ''
+        failedMessage.error = errorMsg
+        failedMessage.completed = true
+        failedMessage.thinking = false
+      }
+      loading.value = false
+      isReplying.value = false
+      fullContent.value = ''
+      currentAssistantMessageId.value = ''
+      reportError(errorMsg)
+      console.error('[Chat Error]', errorMsg)
+      return
+    }
+
     const existingMessage = findLastMessage((item) => {
       if (item.role !== 'assistant') return false
       if (item.requestId === data.id) return true
