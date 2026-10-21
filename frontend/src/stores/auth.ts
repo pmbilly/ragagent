@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { UserInfo, TenantInfo, KnowledgeBaseInfo, MembershipInfo } from '@/api/auth'
+import type { UserInfo, KnowledgeBaseInfo, MembershipInfo } from '@/api/auth'
 import { userInfoFromApi } from '@/api/auth'
-import type { TenantInfo as TenantInfoFromAPI } from '@/api/tenant'
+import type { TenantInfo } from '@/api/tenant'
 import i18n from '@/i18n'
 import { reloadFontFromStorage } from '@/composables/useFont'
 import { reloadThemeFromStorage } from '@/composables/useTheme'
@@ -36,7 +36,7 @@ export const useAuthStore = defineStore('auth', () => {
   const currentKnowledgeBase = ref<KnowledgeBaseInfo | null>(null)
   const selectedTenantId = ref<number | null>(null)
   const selectedTenantName = ref<string | null>(null)
-  const allTenants = ref<TenantInfoFromAPI[]>([])
+  const allTenants = ref<TenantInfo[]>([])
   // memberships lists every tenant the user can authenticate into,
   // along with their role in each. Populated from /auth/login response.
   // v1 deployments will typically have length 1; the field is wired now
@@ -283,7 +283,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const setAllTenants = (tenants: TenantInfoFromAPI[]) => {
+  const setAllTenants = (tenants: TenantInfo[]) => {
     allTenants.value = tenants
   }
 
@@ -349,9 +349,9 @@ export const useAuthStore = defineStore('auth', () => {
       const tenantSnapshot = response.tenant
       if (tenantSnapshot) {
         setTenant({
-          id: String(tenantSnapshot.id) || '',
+          id: tenantSnapshot.id,
           name: tenantSnapshot.name || '',
-          owner_id: tenantSnapshot.owner_id || u.id || '',
+          ownerId: tenantSnapshot.ownerId || u.id || '',
           description: tenantSnapshot.description,
           status: tenantSnapshot.status,
           business: tenantSnapshot.business,

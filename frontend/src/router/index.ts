@@ -215,9 +215,9 @@ function persistLoginResponse(authStore: ReturnType<typeof useAuthStore>, respon
       authStore.setRefreshToken(response.refresh_token)
     }
     authStore.setTenant({
-      id: String(response.tenant.id) || '',
+      id: response.tenant.id,
       name: response.tenant.name || '',
-      owner_id: response.user.id || '',
+      ownerId: response.user.id || '',
       createdAt: response.tenant.createdAt || new Date().toISOString(),
       updatedAt: response.tenant.updatedAt || new Date().toISOString()
     })
@@ -249,9 +249,9 @@ async function hydrateSessionFromToken(authStore: ReturnType<typeof useAuthStore
     const tenant = response.tenant
     if (tenant) {
       authStore.setTenant({
-        id: String(tenant.id) || '',
+        id: tenant.id,
         name: tenant.name || '',
-        owner_id: tenant.owner_id || user.id || '',
+        ownerId: tenant.ownerId || user.id || '',
         description: tenant.description,
         status: tenant.status,
         business: tenant.business,

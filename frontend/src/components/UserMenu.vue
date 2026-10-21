@@ -553,9 +553,9 @@ const loadUserInfo = async () => {
       // 无 tenant）必须显式清空，否则会残留上一账号/上一会话的空间快照。
       if (response.tenant) {
         authStore.setTenant({
-          id: String(response.tenant.id),
+          id: response.tenant.id,
           name: response.tenant.name,
-          owner_id: user.id,
+          ownerId: user.id,
           createdAt: response.tenant.createdAt,
           updatedAt: response.tenant.updatedAt
         })

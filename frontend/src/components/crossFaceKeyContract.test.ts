@@ -402,7 +402,6 @@ test('api 面 snake 记号棘轮：只许减不许增', () => {
     'api/model/modelUsage.ts:summary_model': BINDING_CODE_INTERNAL_MAP,
     'api/model/modelUsage.ts:vlm_model': BINDING_CODE_INTERNAL_MAP,
     'api/model/modelUsage.ts:wiki_synthesis_model': BINDING_CODE_INTERNAL_MAP,
-    'api/auth/index.ts:owner_id': '已核实：前端本地快照键（注释已声明后端 TenantResponse 无此键）',
     'api/embed/index.ts:channel_id': '已核实：embed 宿主↔iframe 消息协议（widget.js 与 Vue 侧同一套键）',
     'api/embed/index.ts:session_id': '已核实：同上',
     'api/knowledge-base/index.ts:tag_ids': '已核实：列表筛选查询参数（后端按 snake 接收）',

@@ -3,13 +3,16 @@ import i18n from '@/i18n'
 
 const t = (key: string) => i18n.global.t(key)
 
-// 空间信息接口
+// 空间信息接口（**唯一真源**；auth 侧从这里 re-export，不要再另立一份）
 export interface TenantInfo {
+  /** 后端 TenantResponse 的 id 是 Long ⇒ number */
   id: number
   name: string
   description?: string
   status?: string
   business?: string
+  /** 仅客户端态使用（setTenant 快照）；后端 TenantResponse 无此键 */
+  ownerId?: string
   storageQuota?: number
   storageUsed?: number
   createdAt: string

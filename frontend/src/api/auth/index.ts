@@ -1,4 +1,5 @@
 import { post, get, put } from '@/utils/request'
+import type { TenantInfo } from '../tenant'
 import i18n from '@/i18n'
 
 const t = (key: string) => i18n.global.t(key)
@@ -158,20 +159,9 @@ export function userInfoFromApi(
   }
 }
 
-// 空间信息接口
-export interface TenantInfo {
-  id: string
-  name: string
-  description?: string
-  status?: string
-  business?: string
-  /** 仅客户端态使用（setTenant 快照）；后端 TenantResponse 无此键 */
-  owner_id?: string
-  storageQuota?: number
-  storageUsed?: number
-  createdAt: string
-  updatedAt: string
-}
+// 空间信息接口：真源在 `api/tenant`（两处曾各定义一份，id 还一个 string 一个 number）。
+// 这里只 re-export，保持 auth 侧既有 import 路径可用。
+export type { TenantInfo }
 
 // 知识库信息接口
 export interface KnowledgeBaseInfo {

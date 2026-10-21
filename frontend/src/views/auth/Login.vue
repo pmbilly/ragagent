@@ -440,9 +440,9 @@ const persistLoginResponse = async (response: any, skipRedirect = false) => {
     }
     if (activeTenant) {
       authStore.setTenant({
-        id: String(activeTenant.id) || '',
+        id: activeTenant.id,
         name: activeTenant.name || '',
-        owner_id: response.user.id || '',
+        ownerId: response.user.id || '',
         createdAt: activeTenant.createdAt || new Date().toISOString(),
         updatedAt: activeTenant.updatedAt || new Date().toISOString()
       })
