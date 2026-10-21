@@ -102,7 +102,7 @@
 8. 域归属尾巴：initialization 的 ollama/* 归 model；连通性双头合一或明示分工（表单预检 vs 调试）；Skill 双控制器合一（L3 只改名）；approval 拍板执行（§3）
 9. 横切升级（D 批排序更新）：**schema 对账守卫**（TestSchema vs V1 表名/列名对账，性价比最高）——✅ 2026-10-21（P1.9a，第 46 条守卫；顺带补出 `user_kb_pins.tenant_id` 的实体缺口，见 HANDOFF）→ metrics（半天）→ PG+flyway 测试 profile → @RouteSecurity（L3 已否决合并，注解化收益需重估）（§4.5）
 10. H 系列待做：H5a-2 分页四端点、H7 platform 判据换血（本轮实证：方法签名级域词与 prompt/RbacInterceptor 不可见）、H8 适配层逻辑化、H9 管理面模板化；H6-1 的 7 个零消费者窄端口要么启用要么撤（§4.4/§4.5）
-11. 前端对齐四坑：api/system 拆 3-4 文件、api/tenant 并入 auth+TenantInfo 单定义、PageResult 前端镜像、views/system 与 agentmanagement 的错位（§4.6）
+11. 前端对齐四坑：api/system 拆 3-4 文件、api/tenant 并入 auth+TenantInfo 单定义、PageResult 前端镜像、views/system 与 agentmanagement 的错位（§4.6）——TenantInfo 合一 ✅（P1.11a）、目录归位 ✅（P1.11b：`views/platform`→`layout`、`views/system`→`settings/panels`）、`api/system` 拆分 ⏳；PageResult ❌ 需后端先统一线格式，与会签项同性质
 
 **P2（卫生回潮治理，按收益排序）**
 12. 三大长方法收敛：372/309/275（wiki 摄取两件+deepCheck）；>100 行方法 109 只减棘轮
