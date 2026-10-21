@@ -95,7 +95,7 @@
 
 **P1（结构，10）**
 3. SSE 前端收尾：NORMAL 路径 error 分支 + message.error + stopStream 主动收束 + 超时兜底 + 红态测试（§2.3）
-4. 工具清单单源化：≥8 份字面量收敛到 ToolDefinitions，前端表由生成/契约锁定；**T4 守卫**（第四 switch case 集 ≡ AgentToolBackends case 集，堵静默丢工具）（§4.1）
+4. 工具清单单源化：≥8 份字面量收敛到 ToolDefinitions，前端表由生成/契约锁定；**T4 守卫**（第四 switch case 集 ≡ AgentToolBackends case 集，堵静默丢工具）（§4.1）——T4 ✅ 2026-10-21（P1.4a，判据按实测收敛为「装配 switch ⊇ 分发 case」，因为装配还含 7 个 agent-engine 内置工具）；**字面量收敛未做**
 5. QaRequestContext 收口（H2b-3）：33 可变字段→builder 构造+只读快照传异步段（§4.1）
 6. 还乡 2.0 终版：GrepChunksScoring 回 agenttools（3 文件小改）；ImageInfoMatchUtil 留 platform 修文案（真理由=被 platform 姊妹件 ImageInfoEnricher 8 处调用，搬走断链）；其余 6 件维持；contract 11 个单域消费类随消费者回域（MemoryKeys 连 MemoryConfig 一起）；新增 gen-contract-consumers 消费者答案守卫（§2.2/§4.4）
 7. 配置真相源收口（原 G7 未启动）：存储三头→storage_backends 表（KV 降只读兼容一版）；websearch KV 兼容路径下线计时；parser 三头归位（§3/§4.3）

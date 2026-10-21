@@ -12,7 +12,9 @@
 
   T1 `agenttools` 里每个 `super(ToolDefinitions.TOOL_X, …)` 都必须在分发 switch 有 case；
   T2 分发里的每个 `case ToolDefinitions.TOOL_X` 都必须有对应的实现类；
-  T3 `ToolDefinitions` 的 `TOOL_*` 常量值不得重复。
+  T3 `ToolDefinitions` 的 `TOOL_*` 常量值不得重复；
+  T4 分发里的每个 case 都必须被 `AgentEngineAssembler.buildTools` 覆盖
+     （后者的 default 只 `log.warn`，漏 case 的后果是运行期静默丢工具）。
 
 范围：只覆盖 `agenttools`（22 个业务工具）。agent-engine 内置的 3 个工具与 MCP 动态工具
 不走这两个 switch，不在本判据内。
@@ -37,6 +39,7 @@ DISPATCH = ROOT / "domains/src/main/java/com/ragagent/session/service/AgentToolB
 CONSTANT = re.compile(r"public static final String (TOOL_\w+)\s*=\s*\"([^\"]+)\"")
 IMPLEMENTED = re.compile(r"super\(\s*ToolDefinitions\.(TOOL_\w+)")
 DISPATCHED = re.compile(r"case ToolDefinitions\.(TOOL_\w+)")
+ASSEMBLER = ROOT / "domains/src/main/java/com/ragagent/session/service/AgentEngineAssembler.java"
 
 
 def definitions() -> dict[str, str]:
@@ -56,6 +59,22 @@ def dispatched() -> set[str]:
     return set(DISPATCHED.findall(DISPATCH.read_text(encoding="utf-8")))
 
 
+def assembler_covered() -> set[str]:
+    """`AgentEngineAssembler.buildTools` 的 switch 覆盖了哪些工具常量。
+
+    该 switch 的 default 只 `log.warn("Unknown tool")`（不抛、不编译失败），
+    漏 case 的表现是**运行期静默丢工具**——模型选了工具、装配层却造不出实例。
+    这是第四条清单，之前没有任何守卫盯着它与 AgentToolBackends 的包含关系。
+    """
+    src = ASSEMBLER.read_text(encoding="utf-8")
+    start = src.find("private List<AgentTool> buildTools(")
+    if start < 0:
+        raise SystemExit("✗ 未找到 AgentEngineAssembler.buildTools（判据失效，请更新守卫）")
+    end = src.find("default ->", start)
+    segment = src[start:end if end > 0 else len(src)]
+    return set(re.findall(r"ToolDefinitions\.(TOOL_\w+)", segment))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--list", action="store_true", help="按工具名打印实现与分发")
@@ -70,6 +89,11 @@ def main() -> int:
         problems.append(f"T1 {name} 有实现（{impl[name][0]}）但分发 switch 没有 case")
     for name in sorted(dispatch - set(impl)):
         problems.append(f"T2 分发引用了 {name}，但 agenttools 里没有对应实现")
+    covered = assembler_covered()
+    for name in sorted(dispatch - covered):
+        problems.append(
+            f"T4 {name} 在 AgentToolBackends 有 case，但 AgentEngineAssembler.buildTools 未覆盖"
+            "（运行期会落到 default 被静默丢弃）")
     for name in sorted(set(impl) & dispatch):
         if name not in consts:
             problems.append(f"T3 {name} 不在 ToolDefinitions 常量表")
@@ -97,7 +121,7 @@ def main() -> int:
         print()
 
     print(f"✓ 工具注册一致：{len(impl)} 个 agenttools 实现 / {len(dispatch)} 条分发 / "
-          f"{len(consts)} 个工具名常量")
+          f"{len(consts)} 个工具名常量 / 装配 switch 覆盖 {len(covered)} 个")
     return 0
 
 
