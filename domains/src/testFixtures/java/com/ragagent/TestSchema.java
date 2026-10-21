@@ -143,10 +143,8 @@ public final class TestSchema {
                 "editor_id VARCHAR(64) NOT NULL DEFAULT '', edit_source VARCHAR(16) NOT NULL DEFAULT 'user'," +
                 "edited_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP," +
                 "created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP)");
-        // 生产表 tenant_id 是 NOT NULL 且无默认；但实体尚未映射该列（已登记缺口，待补实体/写入点），
-        // 测试库给 0 默认值，避免插入路径被该列挡住。
         jdbc.execute("CREATE TABLE IF NOT EXISTS user_kb_pins (" +
-                "user_id VARCHAR(36) NOT NULL, knowledge_base_id VARCHAR(36) NOT NULL, tenant_id BIGINT NOT NULL DEFAULT 0," +
+                "user_id VARCHAR(36) NOT NULL, knowledge_base_id VARCHAR(36) NOT NULL, tenant_id BIGINT NOT NULL," +
                 "pinned_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP)");
         // ── knowledge_tags + knowledge_tag_relations（列序/类型以迁移
         // 000063 为准；seq_id 是迁移 000010 加的 NOT NULL 序列列，

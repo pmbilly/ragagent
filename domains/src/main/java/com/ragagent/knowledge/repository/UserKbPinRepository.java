@@ -20,17 +20,19 @@ public class UserKbPinRepository {
         this.pinMapper = pinMapper;
     }
 
-    /** per-(user,kb) 取置顶行（找不到返回 {@code null}）。 */
-    public UserKbPin findByUserAndKb(String userId, String knowledgeBaseId) {
+    /** per-(tenant,user,kb) 取置顶行（找不到返回 {@code null}）。 */
+    public UserKbPin findByUserAndKb(long tenantId, String userId, String knowledgeBaseId) {
         return pinMapper.selectOne(new LambdaQueryWrapper<UserKbPin>()
+                .eq(UserKbPin::getTenantId, tenantId)
                 .eq(UserKbPin::getUserId, userId)
                 .eq(UserKbPin::getKnowledgeBaseId, knowledgeBaseId)
                 .last("LIMIT 1"));
     }
 
-    /** 删除 per-(user,kb) 置顶行（幂等：无行则 0 行） */
-    public void deleteByUserAndKb(String userId, String knowledgeBaseId) {
+    /** 删除 per-(tenant,user,kb) 置顶行（幂等：无行则 0 行） */
+    public void deleteByUserAndKb(long tenantId, String userId, String knowledgeBaseId) {
         pinMapper.delete(new LambdaQueryWrapper<UserKbPin>()
+                .eq(UserKbPin::getTenantId, tenantId)
                 .eq(UserKbPin::getUserId, userId)
                 .eq(UserKbPin::getKnowledgeBaseId, knowledgeBaseId));
     }

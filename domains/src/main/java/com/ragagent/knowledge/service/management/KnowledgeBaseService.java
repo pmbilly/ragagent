@@ -518,7 +518,7 @@ public class KnowledgeBaseService
         if (uid == null || uid.isEmpty()) {
             return;
         }
-        UserKbPin pin = pinRepository.findByUserAndKb(uid, kb.getId());
+        UserKbPin pin = pinRepository.findByUserAndKb(tenantId(), uid, kb.getId());
         if (pin != null) {
             kb.setIsPinned(true);
             kb.setPinnedAt(pin.getPinnedAt());
@@ -613,11 +613,13 @@ public class KnowledgeBaseService
             throw new BizException(AppError.notFound("knowledge base not found"));
         }
         String uid = TenantContext.currentUserId();
-        UserKbPin existing = pinRepository.findByUserAndKb(uid, id);
+        long tid = tenantId();
+        UserKbPin existing = pinRepository.findByUserAndKb(tid, uid, id);
         if (existing != null) {
-            pinRepository.deleteByUserAndKb(uid, id);
+            pinRepository.deleteByUserAndKb(tid, uid, id);
         } else {
             UserKbPin pin = new UserKbPin();
+            pin.setTenantId(tid);
             pin.setUserId(uid);
             pin.setKnowledgeBaseId(id);
             pin.setPinnedAt(OffsetDateTime.now(ZoneOffset.UTC));
