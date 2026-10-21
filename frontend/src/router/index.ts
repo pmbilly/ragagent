@@ -90,7 +90,7 @@ const router = createRouter({
       path: "/platform",
       name: "Platform",
       redirect: "/platform/knowledge-bases",
-      component: () => import("../views/platform/index.vue"),
+      component: () => import("../views/layout/index.vue"),
       meta: { requiresInit: true, requiresAuth: true },
       children: [
         {

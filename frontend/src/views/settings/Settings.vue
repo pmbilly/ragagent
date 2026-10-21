@@ -215,11 +215,11 @@ import ParserEngineSettings from './ParserEngineSettings.vue'
 // KV 引擎配置，已被后端行（含凭据 + 连通性测试 + 设默认）取代，故删除孤儿并正名。
 import StorageBackendSettings from './StorageBackendSettings.vue'
 import TenantMembers from './TenantMembers.vue'
-import SystemSettings from '@/views/system/SystemSettings.vue'
-import RuntimeQueues from '@/views/system/RuntimeQueues.vue'
-import PlatformAPIKeys from '@/views/system/PlatformAPIKeys.vue'
-import SystemAuditLog from '@/views/system/SystemAuditLog.vue'
-import SkillManagement from '@/views/system/SkillManagement.vue'
+import SystemSettings from './panels/SystemSettings.vue'
+import RuntimeQueues from './panels/RuntimeQueues.vue'
+import PlatformAPIKeys from './panels/PlatformAPIKeys.vue'
+import SystemAuditLog from './panels/SystemAuditLog.vue'
+import SkillManagement from './panels/SkillManagement.vue'
 import IntegrationSettingsSection from '@/views/integrations/IntegrationSettingsSection.vue'
 import {
   INTEGRATION_PREVIEW_ITEMS,
