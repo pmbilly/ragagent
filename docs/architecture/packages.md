@@ -65,7 +65,6 @@
 | `:domains` | `com.ragagent.agenttools.sql` | agent SQL 工具族：database_query 工具与手写 SQL 安全守卫（SqlGuard + tokenizer / 深检查 / 注入分析协作者）。 |
 | `:domains` | `com.ragagent.agenttools.web` | agent 网页工具族：web_search / web_fetch 两件。 |
 | `:domains` | `com.ragagent.agenttools.wiki` | agent wiki 工具族：页面工具十件（读/写/改名/替换/删除/搜索/索引概览/读源文档/标记与更新 issue）+ 内容重写与路由解析（WikiContentRewrite / WikiRou |
-| `:domains` | `com.ragagent.approval` | 工具审批域：审批门（Gate）、待审请求/决议消息、Redis pub/sub 适配与工具策略。 |
 | `:domains` | `com.ragagent.audit` | 审计日志域：审计条目的写入、查询与保留期清理。 |
 | `:domains` | `com.ragagent.audit.api` | 审计 · 端口实现：AuditWriteAdapter。 |
 | `:domains` | `com.ragagent.audit.controller` | 审计 · HTTP 层：AuditLogController。 |
@@ -144,7 +143,7 @@
 | `:domains` | `com.ragagent.im.repository` | IM 仓储门面：渠道配置行与渠道会话映射的读写。 |
 | `:domains` | `com.ragagent.im.runtime` | IM · 运行时：AdapterInterfaces / FeishuWecomCrypt / SlackAdapterCore…。 |
 | `:domains` | `com.ragagent.im.service` | IM · 服务：ImChannelService / ImAttachmentPreparer / ImKnowledgeBridgeOps…。 |
-| `:domains` | `com.ragagent.initialization` | 初始化与能力自检域：/api/v1/initialization/* 的初始化配置、Ollama 管理、 模型连通性测试、文本抽取试验与语音识别（ASR）。 |
+| `:domains` | `com.ragagent.initialization` | 初始化与能力自检域：/api/v1/initialization/* 的初始化配置、未保存模型的 连通性预检、文本抽取试验与语音识别（ASR）。 |
 | `:domains` | `com.ragagent.initialization.controller` | initialization 的 @RestController 薄层：端点注解与委托，逻辑在 service 协作者 （com.ragagent.initialization.controller. |
 | `:domains` | `com.ragagent.initialization.dto` | initialization 的响应装配类型（com.ragagent.initialization.dto.InitResponses）。 |
 | `:domains` | `com.ragagent.initialization.service` | initialization 用例实现：初始化配置（com.ragagent.initialization.service.InitializationConfigService）、 模型连通性测试、 |
@@ -183,6 +182,7 @@
 | `:domains` | `com.ragagent.knowledge.task` | 知识库异步任务：队列、进度与执行。 |
 | `:domains` | `com.ragagent.mcp` | MCP 域：Model Context Protocol 的仓内实现——协议、OAuth（含回调与令牌存储）、 服务注册与调用面；对外 /api/v1/mcp-services。 |
 | `:domains` | `com.ragagent.mcp.api` | MCP · 端口实现：McpToolRegistrationAdapter / McpApprovalOpsAdapter。 |
+| `:domains` | `com.ragagent.mcp.approval` | 工具审批域：审批门（Gate）、待审请求/决议消息、Redis pub/sub 适配与工具策略。 |
 | `:domains` | `com.ragagent.mcp.controller` | mcp 域控制器的 HTTP 端点与协作类（2 个协作类）。 |
 | `:domains` | `com.ragagent.mcp.domain` | MCP · 领域模型：McpService / McpAuthConfigTypeHandler / McpToolListTypeHandler…。 |
 | `:domains` | `com.ragagent.mcp.dto` | MCP · 数据传输：McpToolApprovalPolicyRequest / McpCredentialFieldMetadata / ResolveToolApprovalRequest…。 |
@@ -210,7 +210,7 @@
 | `:domains` | `com.ragagent.memory.runtime` | 长期记忆运行面：langfuse 观测门面、蒸馏队列的进程内/Redis 实现与装配。 |
 | `:domains` | `com.ragagent.memory.service` | 记忆 · 服务：MemoryConsolidationService / MemoryExtractionService / MemoryVectorService…。 |
 | `:domains` | `com.ragagent.memory.support` | 记忆 · 支撑类型：冲突异常等跨层共享但不属于实体的词汇。 |
-| `:domains` | `com.ragagent.model` | 模型配置域：模型条目 CRUD、凭据子资源与调试面（embedding 原始响应等）。 |
+| `:domains` | `com.ragagent.model` | 模型配置域：模型条目 CRUD、凭据子资源、Ollama 管理与调试面（embedding 原始响应等）。 |
 | `:domains` | `com.ragagent.model.api` | 模型 · 端口实现：ModelCatalogAdapter。 |
 | `:domains` | `com.ragagent.model.controller` | 模型 · HTTP 层：ModelCredentialsController / ModelDebugController / ModelController。 |
 | `:domains` | `com.ragagent.model.domain` | 模型 · 领域模型：ModelParametersTypeHandler / Model。 |

@@ -1,4 +1,4 @@
-package com.ragagent.approval;
+package com.ragagent.mcp.approval;
 
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.tool.ApprovalEvent;

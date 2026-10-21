@@ -4,7 +4,6 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.initialization.service.InitializationConfigService;
 import com.ragagent.initialization.service.ModelConnectivityTestService;
-import com.ragagent.initialization.service.OllamaManageService;
 import com.ragagent.initialization.service.TextExtractionTestService;
 import com.ragagent.platform.web.ApiResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * initialization 路由。系统级端点（ollama 管理、模型连通性测试、抽取）
- * 的守卫：JWT 侧 Viewer+/Admin+、API-Key 全部 manage_models(fullAccess)。
+ * initialization 路由：KB 配置/初始化 + 未保存模型的连通性预检 + 文本抽取。
+ * 守卫：JWT 侧 Viewer+/Admin+、API-Key 全部 manage_models(fullAccess)。
+ *
+ * <p>Ollama 管理端点已归 {@code /api/v1/models/ollama/**}（模型域）。</p>
  *
  * <p>守卫层次（golden 钉死顺序，不能重排）：</p>
  * <ol>
@@ -40,16 +41,13 @@ public class InitializationController {
 
 
     private final InitializationConfigService configService;
-    private final OllamaManageService ollamaManage;
     private final ModelConnectivityTestService modelTest;
     private final TextExtractionTestService textTest;
 
     public InitializationController(InitializationConfigService configService,
-            OllamaManageService ollamaManage,
             ModelConnectivityTestService modelTest,
             TextExtractionTestService textTest) {
         this.configService = configService;
-        this.ollamaManage = ollamaManage;
         this.modelTest = modelTest;
         this.textTest = textTest;
     }
@@ -69,36 +67,6 @@ public class InitializationController {
     public ResponseEntity<Object> updateConfig(@PathVariable("kbId") String kbId,
             @RequestBody(required = false) String rawBody) {
         return ResponseEntity.ok(configService.updateConfig(kbId, rawBody));
-    }
-
-    @GetMapping("/api/v1/initialization/ollama/status")
-    public ResponseEntity<Object> ollamaStatus() {
-        return ResponseEntity.ok(ollamaManage.ollamaStatus());
-    }
-
-    @GetMapping("/api/v1/initialization/ollama/models")
-    public ResponseEntity<Object> ollamaModels() {
-        return ResponseEntity.ok(ollamaManage.ollamaModels());
-    }
-
-    @PostMapping("/api/v1/initialization/ollama/models/check")
-    public ResponseEntity<Object> ollamaModelsCheck(@RequestBody(required = false) String rawBody) {
-        return ResponseEntity.ok(ollamaManage.ollamaModelsCheck(rawBody));
-    }
-
-    @PostMapping("/api/v1/initialization/ollama/models/download")
-    public ResponseEntity<Object> ollamaModelDownload(@RequestBody(required = false) String rawBody) {
-        return ResponseEntity.ok(ollamaManage.ollamaModelDownload(rawBody));
-    }
-
-    @GetMapping("/api/v1/initialization/ollama/download/progress/{taskId}")
-    public ResponseEntity<Object> downloadProgress(@PathVariable("taskId") String taskId) {
-        return ResponseEntity.ok(ollamaManage.downloadProgress(taskId));
-    }
-
-    @GetMapping("/api/v1/initialization/ollama/download/tasks")
-    public ResponseEntity<Object> downloadTasksList() {
-        return ResponseEntity.ok(ollamaManage.downloadTasksList());
     }
 
     @PostMapping("/api/v1/initialization/remote/check")

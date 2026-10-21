@@ -1,4 +1,4 @@
-package com.ragagent.approval;
+package com.ragagent.mcp.approval;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

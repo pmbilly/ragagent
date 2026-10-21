@@ -2,7 +2,7 @@
 """生成业务域索引（docs/architecture/domain-index.md）。
 
 回答三个问题：
-  1. 这个域属于哪类能力（6 类：产品能力 / 集成适配 / 控制面 / 能力配置 / 初始化向导 / 策略库）；
+  1. 这个域属于哪类能力（种类从 capability-kinds.json 读取，不写死数量）；
   2. 它有没有 HTTP 面、前端页面在哪；
   3. 它对外提供哪些契约端口。
 
@@ -124,7 +124,7 @@ def render(kinds, domains) -> str:
         "> 分类配置在 [`scripts/capability-kinds.json`](../../scripts/capability-kinds.json)；",
         "> 端口权威表在 [`port-map.md`](port-map.md)。",
         "",
-        "## 六类能力",
+        f"## {len(kinds)} 类能力",
         "",
         "| 种类 | 域数 | 文件 | 控制器 | 说明 |",
         "|---|---:|---:|---:|---|",

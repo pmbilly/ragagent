@@ -29,7 +29,10 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 /**
- * 技能管理（**空间级**，租户 admin）：查看 / 新建 / 编辑 / 删除。
+ * 技能 HTTP 面：选择器（{@code GET /skills}）与管理面（{@code /skills/catalog/**}）。
+ *
+ * <p>两个投影同源（{@link SkillCatalogPort}）：选择器只给 name/description，
+ * 管理面给版本、引用者与只读标记；同一控制器内按路径前缀区分。</p>
  *
  * <p><b>技能归属空间</b>（此前为平台级）：列出与编辑的对象是
  * 「平台内置层（只读）+ 当前空间」；写入只作用于当前空间，平台内置行返回 403。</p>
@@ -48,14 +51,14 @@ import tools.jackson.databind.node.ObjectNode;
 @RestController
 @ApiResult
 @Tag(name = "Agent Management")
-public class SkillCatalogAdminController {
+public class SkillController {
 
     private static final ObjectMapper AUDIT_MAPPER = JsonMappers.lenient();
 
     private final SkillCatalogPort catalog;
     private final AuditWritePort auditWriter;
 
-    public SkillCatalogAdminController(SkillCatalogPort catalog, AuditWritePort auditWriter) {
+    public SkillController(SkillCatalogPort catalog, AuditWritePort auditWriter) {
         this.catalog = catalog;
         this.auditWriter = auditWriter;
     }
@@ -115,6 +118,28 @@ public class SkillCatalogAdminController {
             skills.add(summary(row, catalog.listReferences(row.slug(), row.name(), tenant)));
         }
         return ResponseEntity.ok(Map.of("skills", skills));
+    }
+
+    /** 技能选择器条目（与裁剪前 GET /api/v1/skills 的 {name, description} 同形）。 */
+    public record SkillInfoResponse(String name, String description) {
+    }
+
+    /**
+     * 前端技能选择器的数据源：可见范围 = 平台内置层 + 当前空间。
+     *
+     * <p>与管理面 {@code GET /skills/catalog} 的区别只在投影：选择器只要 name/description，
+     * 管理面要版本、引用者与只读标记。两者同域同源，合在一个控制器里避免"同名同义两个入口"。</p>
+     */
+    @GetMapping("/api/v1/skills")
+    public ResponseEntity<Map<String, Object>> listSkills() {
+        Map<String, Object> body = new java.util.LinkedHashMap<>();
+        List<SkillInfoResponse> response = new ArrayList<>();
+        for (SkillCatalogPort.SkillRow row : catalog.listVisible(TenantContext.currentTenantId())) {
+            response.add(new SkillInfoResponse(row.name(), row.description()));
+        }
+        body.put("skills", response);
+        body.put("skillsAvailable", true);
+        return ResponseEntity.ok(body);
     }
 
     @PostMapping("/api/v1/skills/catalog")

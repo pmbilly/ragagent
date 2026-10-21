@@ -564,6 +564,8 @@ boot           14 件                      →  boot
 
 | P1.5 | 2026-10-21 | **工具名单一来源（N5 后端半边）**：删除 `agent-engine/.../AgentToolNames.java`（第二份 20 常量表），`FileOps`/`GroundingPrompt` 改用 `contract.tool.ToolDefinitions`；`ToolCapabilities` 的 20 个能力表键、`ToolPolicy` 的 49 个句柄策略键与 4 个局部常量全部改引用 `ToolDefinitions`（键集前后机器比对一致）。守卫扩 T5/T6：T5 除 `ToolDefinitions` 外不得再出现「`TOOL_*` 常量 = 已知工具名」的第二份清单（值比对，长文案常量不误报）；T6 前端 `tool-capabilities.ts` 的键必须是后端已声明工具名（可少不可凭空多）。IM 显示名表与前端图标表保留为**展示映射**（未命中回落原名，不参与注册）。 | 定向 35 用例绿（ModelContextRecording 30 / ToolPolicy 4 / ToolCapabilities 1）· 红态探针：注入第二份 `TOOL_KNOWLEDGE_SEARCH` 常量 ⇒ T5 红；前端加 `probe_tool` ⇒ T6 红 · 47 守卫绿 · `mvn -B clean verify` 绿（5062 / 0 / 2） |
 
+| P1.8 | 2026-10-21 | **域归属尾巴（N9）**：① approval 7 文件 + 9 测试/夹具整体并入 `com.ragagent.mcp.approval`，保留运行期唯一实现 `ToolApprovalGateFactoryImpl`（`McpWiring` 注入契约接口，包移动不影响装配）；能力分类删 `approval` 域与空 `policy` 种类 ⇒ **19 域 / 5 类**。② 两个 Skill 控制器合并为 `SkillController`：`GET /skills` 选择器与 `/skills/catalog/**` 管理面同源 `SkillCatalogPort`，路由与权限不变。③ 6 个 ollama 端点从 `initialization` 归 `model`，URL 改 `/api/v1/models/ollama/**`；`OllamaManageService`/`OllamaDownloadTaskStore` 迁 `model.service`；跨服务复用的 `bindObject/text/orEmpty/timeAsIs/isoTime` 下沉 `platform.web.JsonBodies`，避免 model→initialization 反向边。④ 连通性双头写进两个域 package-info：未保存表单预检（initialization）vs 已保存模型调试（model）。 | 定向绿：approval 5 类 56 用例 / APIKey 路由 16 / JsonBodies 1 / W5b HTTP 契约 4 · 47 守卫绿 · `mvn -B clean verify` 全绿（5062 / 0 / 2） |
+
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
 ## 13. 文档地图与归档

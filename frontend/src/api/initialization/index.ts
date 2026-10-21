@@ -197,7 +197,7 @@ export function initializeSystemByKB(kbId: string, config: InitializationConfig)
 // 检查Ollama服务状态
 export function checkOllamaStatus(): Promise<{ available: boolean; version?: string; error?: string; baseUrl?: string }> {
     return new Promise((resolve, reject) => {
-        get('/api/v1/initialization/ollama/status')
+        get('/api/v1/models/ollama/status')
             .then((response: any) => {
                 resolve(response || { available: false });
             })
@@ -219,7 +219,7 @@ export interface OllamaModelInfo {
 // 列出已安装的 Ollama 模型（详细信息）
 export function listOllamaModels(): Promise<OllamaModelInfo[]> {
     return new Promise((resolve, reject) => {
-        get('/api/v1/initialization/ollama/models')
+        get('/api/v1/models/ollama/models')
             .then((response: any) => {
                 resolve((response?.models) || []);
             })
@@ -233,7 +233,7 @@ export function listOllamaModels(): Promise<OllamaModelInfo[]> {
 // 检查Ollama模型状态
 export function checkOllamaModels(models: string[]): Promise<{ models: Record<string, boolean> }> {
     return new Promise((resolve, reject) => {
-        post('/api/v1/initialization/ollama/models/check', { models })
+        post('/api/v1/models/ollama/models/check', { models })
             .then((response: any) => {
                 resolve(response || { models: {} });
             })
@@ -247,7 +247,7 @@ export function checkOllamaModels(models: string[]): Promise<{ models: Record<st
 // 启动Ollama模型下载（异步）
 export function downloadOllamaModel(modelName: string): Promise<{ taskId: string; modelName: string; status: string; progress: number }> {
     return new Promise((resolve, reject) => {
-        post('/api/v1/initialization/ollama/models/download', { modelName })
+        post('/api/v1/models/ollama/models/download', { modelName })
             .then((response: any) => {
                 resolve(response || { taskId: '', modelName, status: 'failed', progress: 0 });
             })
@@ -261,7 +261,7 @@ export function downloadOllamaModel(modelName: string): Promise<{ taskId: string
 // 查询下载进度
 export function getDownloadProgress(taskId: string): Promise<DownloadTask> {
     return new Promise((resolve, reject) => {
-        get(`/api/v1/initialization/ollama/download/progress/${taskId}`)
+        get(`/api/v1/models/ollama/download/progress/${taskId}`)
             .then((response: any) => {
                 resolve(response);
             })
@@ -275,7 +275,7 @@ export function getDownloadProgress(taskId: string): Promise<DownloadTask> {
 // 获取所有下载任务
 export function listDownloadTasks(): Promise<DownloadTask[]> {
     return new Promise((resolve, reject) => {
-        get('/api/v1/initialization/ollama/download/tasks')
+        get('/api/v1/models/ollama/download/tasks')
             .then((response: any) => {
                 resolve(response || []);
             })

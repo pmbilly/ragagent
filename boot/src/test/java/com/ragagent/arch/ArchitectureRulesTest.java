@@ -1064,7 +1064,7 @@ class ArchitectureRulesTest {
     /**
  * 基线：**已于 清零**（零容忍——新增即红）。
  *
- * <p>清零路径（都走"`common/&lt;域&gt;/XxxPort` + 该域 `api/` 适配器"）：`SkillCatalogAdminController`
+ * <p>清零路径（都走"`common/&lt;域&gt;/XxxPort` + 该域 `api/` 适配器"）：`SkillController`
  * 的 audit 直连 → {@code common.audit.AuditWritePort}；`CustomAgentService` 的 knowledge 直连
  * → {@code common.knowledge.KnowledgeBaseCatalogPort}、auth 直连
  * → {@code common.auth.UserLookupPort}；`AgentSuggestedQuestions` 的条目经复核为**过期**（它只依赖

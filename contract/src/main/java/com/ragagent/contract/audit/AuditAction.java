@@ -36,7 +36,7 @@ public final class AuditAction {
     /** 惰性清扫把超期 pending 置为 expired；actor 为空（system）。 */
     public static final String INVITATION_EXPIRED = "rbac.invitation_expired";
 
-    // ── 平台级技能库（SkillCatalogAdminController） ───────────────────────────
+    // ── 平台级技能库（SkillController） ───────────────────────────
 
     /** 新建技能：details 带 id/slug/name。 */
     public static final String SKILL_CREATED = "skill.created";

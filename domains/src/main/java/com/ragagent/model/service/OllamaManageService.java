@@ -1,14 +1,13 @@
-package com.ragagent.initialization.service;
+package com.ragagent.model.service;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.OllamaAdminPort;
 import com.ragagent.contract.model.OllamaModelInfo;
 import com.ragagent.platform.config.AppEnvLookup;
-import com.ragagent.platform.web.JsonBodyErrors;
+import com.ragagent.platform.web.JsonBodies;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
-import com.ragagent.platform.web.ToolJson;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,7 @@ public final class OllamaManageService {
 
     // ── ollama 管理段 ──
 
-    /** GET /initialization/ollama/status——StartService 失败仍是 200 + available:false。 */
+    /** GET /models/ollama/status——StartService 失败仍是 200 + available:false。 */
     public Object ollamaStatus() {
         // 展示用基址的缺省是 host.docker.internal（与 OllamaService 的
         // localhost:11434 连接缺省刻意不同）
@@ -70,7 +69,7 @@ public final class OllamaManageService {
         return data;
     }
 
-    /** GET /initialization/ollama/models——ListModelsDetailed（name/size/digest/modified_at）。 */
+    /** GET /models/ollama/models——ListModelsDetailed（name/size/digest/modified_at）。 */
     public Object ollamaModels() {
         ensureOllamaStarted();
         List<OllamaModelInfo> models;
@@ -88,12 +87,12 @@ public final class OllamaManageService {
             n.put("digest", m.digest());
             // modifiedAt 保持 UTC 输出（Z 后缀），不做服务器本地时区转换
             // （与 startTime 的本地时区路径刻意不同）
-            n.put("modifiedAt", ModelConnectivityTestService.timeAsIs(m.modifiedAt()));
+            n.put("modifiedAt", JsonBodies.timeAsIs(m.modifiedAt()));
         }
         return data;
     }
 
-    /** POST /initialization/ollama/models/check——逐模型可用性（map 按名字母序）。 */
+    /** POST /models/ollama/models/check——逐模型可用性（map 按名字母序）。 */
     public Object ollamaModelsCheck(String rawBody) {
         List<String> models = bindOllamaModelsCheck(rawBody);
         ensureOllamaStarted();
@@ -115,7 +114,7 @@ public final class OllamaManageService {
         return data;
     }
 
-    /** POST /initialization/ollama/models/download——建任务 + 虚拟线程异步拉取。 */
+    /** POST /models/ollama/models/download——建任务 + 虚拟线程异步拉取。 */
     public Object ollamaModelDownload(String rawBody) {
         String modelName = bindDownloadRequest(rawBody);
         ensureOllamaStarted();
@@ -155,7 +154,7 @@ public final class OllamaManageService {
         return data;
     }
 
-    /** GET /initialization/ollama/download/progress/:taskId——DownloadTask 按 struct 序输出。 */
+    /** GET /models/ollama/download/progress/:taskId——DownloadTask 按 struct 序输出。 */
     public Object downloadProgress(String taskId) {
         if (taskId == null || taskId.isEmpty()) {
             throw new BizException(AppError.badRequest("任务ID不能为空"));
@@ -167,7 +166,7 @@ public final class OllamaManageService {
         return taskNode(task);
     }
 
-    /** GET /initialization/ollama/download/tasks——全量任务列表（map 序随机）。 */
+    /** GET /models/ollama/download/tasks——全量任务列表（map 序随机）。 */
     public Object downloadTasksList() {
         ArrayNode arr = MAPPER.createArrayNode();
         for (var task : downloadTasks.list()) {
@@ -194,9 +193,9 @@ public final class OllamaManageService {
         n.put("status", task.status);
         n.putRawValue("progress", new tools.jackson.databind.util.RawValue(Double.toString(task.progress)));
         n.put("message", task.message);
-        n.put("startTime", ModelConnectivityTestService.isoTimeText(task.startTime));
+        n.put("startTime", JsonBodies.isoTime(task.startTime));
         if (task.endTime != null) {
-            n.put("endTime", ModelConnectivityTestService.isoTimeText(task.endTime));
+            n.put("endTime", JsonBodies.isoTime(task.endTime));
         }
         return n;
     }
@@ -243,7 +242,7 @@ public final class OllamaManageService {
     }
 
     private static List<String> bindOllamaModelsCheck(String rawBody) {
-        JsonNode n = bindJsonObject(rawBody);
+        JsonNode n = JsonBodies.bindObject(rawBody);
         JsonNode models = n.get("models");
         List<String> out = new ArrayList<>();
         if (models != null && models.isArray()) {
@@ -257,35 +256,13 @@ public final class OllamaManageService {
     }
 
     private static String bindDownloadRequest(String rawBody) {
-        JsonNode n = bindJsonObject(rawBody);
-        String modelName = ModelConnectivityTestService.text(n, "modelName");
+        JsonNode n = JsonBodies.bindObject(rawBody);
+        String modelName = JsonBodies.text(n, "modelName");
         if (modelName.isEmpty()) {
             throw new BizException(AppError.badRequest(
                     RequestFields.message("ModelName", "required")));
         }
         return modelName;
-    }
-
-    /** 绑定进匿名 struct 的公共段（EOF / 语法错 / 非对象）。 */
-    static JsonNode bindJsonObject(String rawBody) {
-        if (rawBody == null || rawBody.isEmpty()) {
-            throw new BizException(AppError.badRequest(JsonBodyErrors.EMPTY_BODY));
-        }
-        JsonNode n;
-        try {
-            n = MAPPER.readTree(rawBody);
-        } catch (Exception e) {
-            throw new BizException(AppError.badRequest(e.getMessage()));
-        }
-        if (n == null) {
-            // body 为字面 "null" → 等价空对象绑定，不报错
-            n = MAPPER.createObjectNode();
-        }
-        if (!n.isObject()) {
-            throw new BizException(AppError.badRequest(
-                    ToolJson.expectedObjectMessage(n)));
-        }
-        return n;
     }
 
 }

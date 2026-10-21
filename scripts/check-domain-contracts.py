@@ -62,7 +62,7 @@ BASELINE = os.path.join(ROOT, 'scripts/domain-contracts.baseline.json')
 # R5a（2026-10-16）：`agent` 已切出为模块 `:agent-engine` ⇒ 不再计入域清单
 # （跨模块边由模块图治理，见 §8.1；R10 只管 domains 内部各域之间）。
 DOMAINS = [
-    'agentmanagement', 'agenttools', 'approval', 'audit', 'auth', 'datasource',
+    'agentmanagement', 'agenttools', 'audit', 'auth', 'datasource',
     'embedchannel', 'favorite', 'im', 'initialization', 'knowledge', 'mcp',
     'memory', 'model', 'session', 'storage', 'system', 'vectorstore',
     'websearch', 'wiki',

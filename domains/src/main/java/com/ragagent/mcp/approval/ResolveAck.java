@@ -1,4 +1,4 @@
-package com.ragagent.approval;
+package com.ragagent.mcp.approval;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

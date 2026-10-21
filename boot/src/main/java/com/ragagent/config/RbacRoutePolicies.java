@@ -447,10 +447,10 @@ final class RbacRoutePolicies {
         // 沙箱配置面：
         // 静态段（workspace-policy/templates/query）先于 /:id 通配登记（AntPathMatcher
         // 取首个命中）；:id/sandboxes 在 :id 之前。List/Get 是 Viewer+，其余 Admin+。
-        // GET /skills（指令型技能目录，agent/management/SkillPickerController）：选择器数据源，
+        // GET /skills（指令型技能目录，agent/management/SkillController）：选择器数据源，
         // Viewer+。
         rbac.addRule("GET", "/api/v1/skills", TenantRole.VIEWER, false);
-        // 技能管理面（agent/management/SkillCatalogAdminController）：技能归属空间（另有平台内置
+        // 技能管理面（agent/management/SkillController）：技能归属空间（另有平台内置
         // 只读层），管理面由「空间 admin」掌控。静态段 /catalog 与 /catalog/* 的 files
         // 子路径逐条登记（AntPathMatcher 取首个命中）。列出/编辑的对象是
         // 「平台内置层（只读）+ 当前空间」，写入只作用于当前空间。
@@ -485,14 +485,14 @@ final class RbacRoutePolicies {
         rbac.addRule("POST", "/api/v1/initialization/initialize/*", TenantRole.CONTRIBUTOR, false);
         rbac.addRule("PUT", "/api/v1/initialization/config/*", TenantRole.CONTRIBUTOR, false);
 
-        // ── initialization 系统级 14 条 ──
+        // ── initialization 系统级 8 条（ollama 6 条已归 model） ──
         // "不绑某个 KB 的系统级检测/下载"：JWT 侧只读探测 Viewer+、变更 Admin+。
-        rbac.addRule("GET", "/api/v1/initialization/ollama/status", TenantRole.VIEWER, false);
-        rbac.addRule("GET", "/api/v1/initialization/ollama/models", TenantRole.VIEWER, false);
-        rbac.addRule("POST", "/api/v1/initialization/ollama/models/check", TenantRole.ADMIN, false);
-        rbac.addRule("POST", "/api/v1/initialization/ollama/models/download", TenantRole.ADMIN, false);
-        rbac.addRule("GET", "/api/v1/initialization/ollama/download/progress/*", TenantRole.VIEWER, false);
-        rbac.addRule("GET", "/api/v1/initialization/ollama/download/tasks", TenantRole.VIEWER, false);
+        rbac.addRule("GET", "/api/v1/models/ollama/status", TenantRole.VIEWER, false);
+        rbac.addRule("GET", "/api/v1/models/ollama/models", TenantRole.VIEWER, false);
+        rbac.addRule("POST", "/api/v1/models/ollama/models/check", TenantRole.ADMIN, false);
+        rbac.addRule("POST", "/api/v1/models/ollama/models/download", TenantRole.ADMIN, false);
+        rbac.addRule("GET", "/api/v1/models/ollama/download/progress/*", TenantRole.VIEWER, false);
+        rbac.addRule("GET", "/api/v1/models/ollama/download/tasks", TenantRole.VIEWER, false);
         rbac.addRule("POST", "/api/v1/initialization/remote/check", TenantRole.ADMIN, false);
         rbac.addRule("POST", "/api/v1/initialization/embedding/test", TenantRole.ADMIN, false);
         rbac.addRule("POST", "/api/v1/initialization/rerank/check", TenantRole.ADMIN, false);

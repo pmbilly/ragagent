@@ -104,15 +104,15 @@ public final class APIKeyRoutePolicies {
         a.registerGin("PUT", "/api/v1/initialization/config/:kbId",
                 APIKeyRoutePolicy.manageKnowledgeBases(agFull));
 
-        // ── initialization 系统级 14 条 ──
+        // ── initialization 系统级 8 条（ollama 6 条已归 model） ──
         // 全部 apiKeyManageModels(apiKeyFullAccess())：full-access 或显式 manage_models。
         APIKeyRoutePolicy initModels = APIKeyRoutePolicy.manageModels(APIKeyRoutePolicy.fullAccess());
-        a.registerGin("GET", "/api/v1/initialization/ollama/status", initModels);
-        a.registerGin("GET", "/api/v1/initialization/ollama/models", initModels);
-        a.registerGin("POST", "/api/v1/initialization/ollama/models/check", initModels);
-        a.registerGin("POST", "/api/v1/initialization/ollama/models/download", initModels);
-        a.registerGin("GET", "/api/v1/initialization/ollama/download/progress/:taskId", initModels);
-        a.registerGin("GET", "/api/v1/initialization/ollama/download/tasks", initModels);
+        a.registerGin("GET", "/api/v1/models/ollama/status", initModels);
+        a.registerGin("GET", "/api/v1/models/ollama/models", initModels);
+        a.registerGin("POST", "/api/v1/models/ollama/models/check", initModels);
+        a.registerGin("POST", "/api/v1/models/ollama/models/download", initModels);
+        a.registerGin("GET", "/api/v1/models/ollama/download/progress/:taskId", initModels);
+        a.registerGin("GET", "/api/v1/models/ollama/download/tasks", initModels);
         a.registerGin("POST", "/api/v1/initialization/remote/check", initModels);
         a.registerGin("POST", "/api/v1/initialization/embedding/test", initModels);
         a.registerGin("POST", "/api/v1/initialization/rerank/check", initModels);

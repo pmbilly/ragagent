@@ -4,7 +4,7 @@
  * 运行与工具调度在 {@code agent-engine}。
  *
  * <p><b>种类</b>：产品能力<br>
- * <b>入口</b>：{@code AgentController}、{@code SkillCatalogAdminController}<br>
+ * <b>入口</b>：{@code AgentController}、{@code SkillController}<br>
  * <b>对外契约面</b>：无（配置经 {@code contract.agent} 载荷消费）<br>
  * <b>依赖</b>：{@code contract}、{@code platform}。</p>
  *

@@ -1,5 +1,5 @@
 {
-  "note": "22 个业务域的能力种类。新增/删除域必须同步本文件；gen-domain-index.py --check 会校验。",
+  "note": "19 个业务域的能力种类。新增/删除域必须同步本文件；gen-domain-index.py --check 会校验。",
   "kinds": {
     "product": {
       "label": "产品能力",
@@ -20,10 +20,6 @@
     "setup": {
       "label": "初始化向导",
       "description": "首次配置的编排面，只调契约端口，不承载业务规则。"
-    },
-    "policy": {
-      "label": "策略库",
-      "description": "无 HTTP、无持久化的纯策略/判定逻辑。"
     }
   },
   "domains": {
@@ -34,10 +30,6 @@
     "agenttools": {
       "kind": "product",
       "frontend": "views/chat（工具结果渲染）"
-    },
-    "approval": {
-      "kind": "policy",
-      "frontend": "views/chat/components/ToolApprovalCard.vue"
     },
     "audit": {
       "kind": "control",

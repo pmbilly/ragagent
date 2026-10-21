@@ -17,6 +17,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.config.AppEnvLookup;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.storage.config.UploadLimits;
+import com.ragagent.platform.web.JsonBodies;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import java.time.OffsetDateTime;
@@ -356,7 +357,7 @@ public final class ModelConnectivityTestService {
             String modelId) {}
 
     private static ModelTestRequest bindModelTestRequest(String rawBody) {
-        JsonNode n = OllamaManageService.bindJsonObject(rawBody);
+        JsonNode n = JsonBodies.bindObject(rawBody);
         String modelName = text(n, "modelName");
         if (modelName.isEmpty()) {
             throw new BizException(AppError.badRequest(

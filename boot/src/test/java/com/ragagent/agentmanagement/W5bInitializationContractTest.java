@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ragagent.TestSchema;
 import com.ragagent.agent.fixtures.ContractJson;
-import com.ragagent.initialization.service.OllamaDownloadTaskStore;
+import com.ragagent.model.service.OllamaDownloadTaskStore;
 import com.ragagent.platform.security.SsrfGuard;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
@@ -123,18 +123,18 @@ class W5bInitializationContractTest {
     @Test
     @Order(1)
     void downFamily() throws Exception {
-        assertGolden(get("/api/v1/initialization/ollama/status", null), 401, "w5b-noauth.json");
-        assertGolden(get("/api/v1/initialization/ollama/status", viewerBearer()), 200,
+        assertGolden(get("/api/v1/models/ollama/status", null), 401, "w5b-noauth.json");
+        assertGolden(get("/api/v1/models/ollama/status", viewerBearer()), 200,
                 "w5b-ollama-status-down.json");
-        assertGolden(get("/api/v1/initialization/ollama/models", bearer), 500,
+        assertGolden(get("/api/v1/models/ollama/models", bearer), 500,
                 "w5b-ollama-models-down.json");
-        assertGolden(post("/api/v1/initialization/ollama/models/check", bearer,
+        assertGolden(post("/api/v1/models/ollama/models/check", bearer,
                 "{\"models\":[\"stub-model\"]}"), 500, "w5b-ollama-check-down.json");
-        assertGolden(post("/api/v1/initialization/ollama/models/download", bearer,
+        assertGolden(post("/api/v1/models/ollama/models/download", bearer,
                 "{\"modelName\":\"stub-model\"}"), 500, "w5b-ollama-download-down.json");
-        assertGolden(get("/api/v1/initialization/ollama/download/progress/" + MISSING_TASK, bearer),
+        assertGolden(get("/api/v1/models/ollama/download/progress/" + MISSING_TASK, bearer),
                 404, "w5b-progress-missing.json");
-        assertGolden(get("/api/v1/initialization/ollama/download/tasks", bearer), 200,
+        assertGolden(get("/api/v1/models/ollama/download/tasks", bearer), 200,
                 "w5b-tasks-empty.json");
         // viewer 打 Admin+ 路由 → RBAC 403
         assertGolden(post("/api/v1/initialization/remote/check", viewerBearer(), "{}"), 403,
@@ -147,25 +147,25 @@ class W5bInitializationContractTest {
     @Order(2)
     void upFamily() throws Exception {
         W5bStubServers.startOllama();
-        assertGolden(get("/api/v1/initialization/ollama/status", bearer), 200,
+        assertGolden(get("/api/v1/models/ollama/status", bearer), 200,
                 "w5b-ollama-status-up.json");
-        assertGolden(get("/api/v1/initialization/ollama/models", bearer), 200,
+        assertGolden(get("/api/v1/models/ollama/models", bearer), 200,
                 "w5b-ollama-models.json");
-        assertGolden(post("/api/v1/initialization/ollama/models/check", bearer,
+        assertGolden(post("/api/v1/models/ollama/models/check", bearer,
                 "{\"models\":[\"stub-model\",\"absent-model\"]}"), 200, "w5b-ollama-check.json");
-        assertGolden(post("/api/v1/initialization/ollama/models/check", bearer, "{}"), 400,
+        assertGolden(post("/api/v1/models/ollama/models/check", bearer, "{}"), 400,
                 "w5b-ollama-check-badbody.json");
-        assertGolden(post("/api/v1/initialization/ollama/models/download", bearer,
+        assertGolden(post("/api/v1/models/ollama/models/download", bearer,
                 "{\"modelName\":\"stub-model\"}"), 200, "w5b-download-exists.json");
 
         // 建任务 → 轮询到 completed（stub 剧本固定 → 终态确定）
-        MvcResult created = expect(200, post("/api/v1/initialization/ollama/models/download",
+        MvcResult created = expect(200, post("/api/v1/models/ollama/models/download",
                 bearer, "{\"modelName\":\"fresh-model\"}"), "w5b-download-created.json");
         String taskId = jsonPath(created, "taskId");
         String finalBody = "";
         for (int i = 0; i < 50; i++) {
             MvcResult progress = result(get(
-                    "/api/v1/initialization/ollama/download/progress/" + taskId, bearer));
+                    "/api/v1/models/ollama/download/progress/" + taskId, bearer));
             finalBody = raw(progress);
             if (finalBody.contains("\"status\":\"completed\"")
                     || finalBody.contains("\"status\":\"failed\"")) {
@@ -174,7 +174,7 @@ class W5bInitializationContractTest {
             Thread.sleep(100);
         }
         compareGolden(finalBody, 200, "w5b-progress-done.json");
-        assertGolden(get("/api/v1/initialization/ollama/download/tasks", bearer), 200,
+        assertGolden(get("/api/v1/models/ollama/download/tasks", bearer), 200,
                 "w5b-tasks-one.json");
     }
 

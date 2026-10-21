@@ -39,7 +39,7 @@
 | `MessageTranscriptPort` | `MessageTranscriptAdapter` | domains | memory | 域间（解耦） |
 | `ModelCatalogPort` | `ModelCatalogAdapter` | domains | initialization、knowledge、mcp、memory、model-runtime、session、wiki | 跨模块（必要） |
 | `ModelFactsPort` | `ModelService` | domains | retrieval-engine | 跨模块（必要） |
-| `OllamaAdminPort` | `OllamaService` | model-runtime | initialization | 跨模块（必要） |
+| `OllamaAdminPort` | `OllamaService` | model-runtime | model | 跨模块（必要） |
 | `ParserEngineCatalogPort` | `ParserEngineCatalog` | domains | system | 域间（解耦） |
 | `ProviderFileStorePort` | `ProviderFileStoreAdapter` | domains | knowledge | 域间（解耦） |
 | `ResourceCatalogPort` | `ResourceCatalogAdapter` | domains | knowledge、session | 域间（解耦） |

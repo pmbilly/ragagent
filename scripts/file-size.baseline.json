@@ -7,7 +7,7 @@
     "agent-engine/src/main/java/com/ragagent/agent/AgentEngine.java": 709,
     "domains/src/main/java/com/ragagent/agenttools/knowledge/GrepChunksTool.java": 648,
     "domains/src/main/java/com/ragagent/agenttools/web/WebFetchTool.java": 688,
-    "domains/src/main/java/com/ragagent/approval/Gate.java": 656,
+    "domains/src/main/java/com/ragagent/mcp/approval/Gate.java": 656,
     "domains/src/main/java/com/ragagent/auth/apikey/controller/filter/APIKeyRoutePolicies.java": 717,
     "domains/src/main/java/com/ragagent/auth/controller/AuthController.java": 642,
     "domains/src/main/java/com/ragagent/auth/service/UserService.java": 756,

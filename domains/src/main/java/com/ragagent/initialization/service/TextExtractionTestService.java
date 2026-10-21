@@ -11,6 +11,7 @@ import com.ragagent.contract.model.EntityExtractionPort;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.platform.prompt.ExtractPrompts;
 import com.ragagent.platform.prompt.PipelineConfig.PromptTemplateStructured;
+import com.ragagent.platform.web.JsonBodies;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,14 +49,14 @@ public final class TextExtractionTestService {
     public Object extractTextRelations(String rawBody) {
         JsonNode n;
         try {
-            n = OllamaManageService.bindJsonObject(rawBody);
+            n = JsonBodies.bindObject(rawBody);
         } catch (BizException e) {
             // bind 失败统一是这句固定文案
             throw new BizException(AppError.badRequest("文本关系提取请求参数错误"));
         }
-        String t = ModelConnectivityTestService.text(n, "text");
+        String t = JsonBodies.text(n, "text");
         List<String> tags = InitializationRequests.toStringList(n.get("tags"));
-        String modelId = ModelConnectivityTestService.text(n, "modelId");
+        String modelId = JsonBodies.text(n, "modelId");
         boolean tagsInvalid = n.get("tags") == null || !n.get("tags").isArray() || tags.isEmpty();
         if (t.isEmpty() || tagsInvalid || modelId.isEmpty()) {
             // text/tags 等必填字段缺失时先落 bind 错误文案
@@ -135,12 +136,12 @@ public final class TextExtractionTestService {
     public Object fabriText(String rawBody) {
         JsonNode n;
         try {
-            n = OllamaManageService.bindJsonObject(rawBody);
+            n = JsonBodies.bindObject(rawBody);
         } catch (BizException e) {
             throw new BizException(AppError.badRequest("invalid fabri text request parameters"));
         }
         List<String> tags = InitializationRequests.toStringList(n.get("tags"));
-        String modelId = ModelConnectivityTestService.text(n, "modelId");
+        String modelId = JsonBodies.text(n, "modelId");
         if (modelId.isEmpty()) {
             throw new BizException(AppError.badRequest("invalid fabri text request parameters"));
         }

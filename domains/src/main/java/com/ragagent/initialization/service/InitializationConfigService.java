@@ -17,6 +17,7 @@ import com.ragagent.initialization.dto.InitResponses;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.config.AppEnvLookup;
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.web.JsonBodies;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,8 +58,8 @@ public final class InitializationConfigService {
             throw new BizException(AppError.notFound("知识库不存在"));
         }
         List<ModelView> models = new ArrayList<>();
-        for (String id : List.of(ModelConnectivityTestService.orEmpty(kb.getEmbeddingModelId()), ModelConnectivityTestService.orEmpty(kb.getSummaryModelId()),
-                ModelConnectivityTestService.orEmpty(kb.getVlmConfig().modelId()))) {
+        for (String id : List.of(JsonBodies.orEmpty(kb.getEmbeddingModelId()), JsonBodies.orEmpty(kb.getSummaryModelId()),
+                JsonBodies.orEmpty(kb.getVlmConfig().modelId()))) {
             if (id.isEmpty()) {
                 continue;
             }
@@ -412,9 +413,9 @@ public final class InitializationConfigService {
 
     private String findExistingModelId(KnowledgeBaseRowView kb, String type) {
         return switch (type) {
-            case "Embedding" -> ModelConnectivityTestService.orEmpty(kb.getEmbeddingModelId());
-            case "KnowledgeQA" -> ModelConnectivityTestService.orEmpty(kb.getSummaryModelId());
-            case "VLLM" -> ModelConnectivityTestService.orEmpty(kb.getVlmConfig().modelId());
+            case "Embedding" -> JsonBodies.orEmpty(kb.getEmbeddingModelId());
+            case "KnowledgeQA" -> JsonBodies.orEmpty(kb.getSummaryModelId());
+            case "VLLM" -> JsonBodies.orEmpty(kb.getVlmConfig().modelId());
             default -> "";
         };
     }
@@ -505,20 +506,20 @@ public final class InitializationConfigService {
                     && !m.isIsBuiltin();
             switch (m.getType()) {
                 case "KnowledgeQA" -> config.put("llm", sortedBlock(Map.of(
-                        "source", ModelConnectivityTestService.orEmpty(m.getSource()),
-                        "modelName", ModelConnectivityTestService.orEmpty(m.getName()),
+                        "source", JsonBodies.orEmpty(m.getSource()),
+                        "modelName", JsonBodies.orEmpty(m.getName()),
                         "baseUrl", baseUrl,
                         "credentials", Map.of("apiKey", hasKey))));
                 case "Embedding" -> config.put("embedding", sortedBlock(Map.of(
-                        "source", ModelConnectivityTestService.orEmpty(m.getSource()),
-                        "modelName", ModelConnectivityTestService.orEmpty(m.getName()),
+                        "source", JsonBodies.orEmpty(m.getSource()),
+                        "modelName", JsonBodies.orEmpty(m.getName()),
                         "baseUrl", baseUrl,
                         "dimension", m.getParameters() == null ? 0
                                 : m.getParameters().getEmbeddingParameters().getDimension(),
                         "credentials", Map.of("apiKey", hasKey))));
                 case "Rerank" -> config.put("rerank", sortedBlock(Map.of(
                         "enabled", true,
-                        "modelName", ModelConnectivityTestService.orEmpty(m.getName()),
+                        "modelName", JsonBodies.orEmpty(m.getName()),
                         "baseUrl", baseUrl,
                         "credentials", Map.of("apiKey", hasKey))));
                 case "VLLM" -> {
@@ -529,7 +530,7 @@ public final class InitializationConfigService {
                         config.put("multimodal", mm);
                     }
                     mm.put("vlm", sortedBlock(Map.of(
-                            "modelName", ModelConnectivityTestService.orEmpty(m.getName()),
+                            "modelName", JsonBodies.orEmpty(m.getName()),
                             "baseUrl", baseUrl,
                             "interfaceType", m.getParameters() == null ? ""
                                     : m.getParameters().getInterfaceType(),

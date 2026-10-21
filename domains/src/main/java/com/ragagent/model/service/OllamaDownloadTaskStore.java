@@ -1,4 +1,4 @@
-package com.ragagent.initialization.service;
+package com.ragagent.model.service;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

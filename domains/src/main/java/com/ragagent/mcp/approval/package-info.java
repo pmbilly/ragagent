@@ -13,4 +13,4 @@
  * <p><b>数据归属</b>：审批记录与待审数据落在 {@code mcp} 域（{@code mcp_tool_approvals}），
  * 本域只持决策机与执行策略——这是「策略库」而非「数据域」的刻意分工。</p>
  */
-package com.ragagent.approval;
+package com.ragagent.mcp.approval;

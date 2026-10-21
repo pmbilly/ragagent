@@ -9,31 +9,30 @@
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
 | `:contract` | `contract` | 33 | 361 | 0 |
-| `:platform` | `platform` | 26 | 200 | 1 |
+| `:platform` | `platform` | 26 | 201 | 1 |
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 20 | 154 | 0 |
 | `:retrieval-engine` | `retrieval` | 15 | 95 | 0 |
 | `:agent-engine` | `agent` | 9 | 66 | 0 |
-| `:domains` | `agentmanagement`、`agenttools`、`approval`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 251 | 1590 | 51 |
+| `:domains` | `agentmanagement`、`agenttools`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 251 | 1590 | 51 |
 | `:boot` | `(根包)`、`config` | 2 | 19 | 0 |
 
-## 20 个业务域（domains）
+## 19 个业务域（domains）
 
 | 域 | 主码包 | 文件 | 控制器 |
 |---|---|---:|---:|
-| `agentmanagement` | `com.ragagent.agentmanagement` | 27 | 3 |
+| `agentmanagement` | `com.ragagent.agentmanagement` | 26 | 2 |
 | `agenttools` | `com.ragagent.agenttools` | 58 | 0 |
-| `approval` | `com.ragagent.approval` | 7 | 0 |
 | `audit` | `com.ragagent.audit` | 20 | 1 |
 | `auth` | `com.ragagent.auth` | 120 | 6 |
 | `datasource` | `com.ragagent.datasource` | 147 | 2 |
 | `embedchannel` | `com.ragagent.embedchannel` | 25 | 1 |
 | `favorite` | `com.ragagent.favorite` | 13 | 1 |
 | `im` | `com.ragagent.im` | 106 | 2 |
-| `initialization` | `com.ragagent.initialization` | 13 | 1 |
+| `initialization` | `com.ragagent.initialization` | 11 | 1 |
 | `knowledge` | `com.ragagent.knowledge` | 264 | 8 |
-| `mcp` | `com.ragagent.mcp` | 150 | 4 |
+| `mcp` | `com.ragagent.mcp` | 157 | 4 |
 | `memory` | `com.ragagent.memory` | 91 | 1 |
-| `model` | `com.ragagent.model` | 35 | 3 |
+| `model` | `com.ragagent.model` | 38 | 4 |
 | `session` | `com.ragagent.session` | 199 | 8 |
 | `storage` | `com.ragagent.storage` | 61 | 3 |
 | `system` | `com.ragagent.system` | 18 | 2 |
@@ -46,7 +45,7 @@
 1. **先看包根**：`com.ragagent.contract.*` → `:contract`；`platform` → `:platform`；
    `agent` → `:agent-engine`；`retrieval` → `:retrieval-engine`；
    `embedding` / `llm` / `modelcontext` / `modelruntime` / `rerank` → `:model-runtime`；
-   其余 20 个包根 → `:domains`；`com.ragagent.config` 与根包 → `:boot`。
+   其余 19 个包根 → `:domains`；`com.ragagent.config` 与根包 → `:boot`。
 2. **HTTP 路由**在 `domains/src/main/java/com/ragagent/<域>/controller/`；
    跨模块公开类型在 `contract/`，端口实现与全局 Bean 在 `boot/config/`。
 3. **测试**：业务域测试住在 `domains/src/test/`；HTTP 集成测试住在 `boot/src/test/`；

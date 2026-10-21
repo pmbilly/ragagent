@@ -149,9 +149,9 @@ boot（组合根，只出不进；@Configuration 8 组合根档）
 
 ### 7.3 拍板清单（连挂轮次标注）
 
-1. **approval 域**（挂三轮）：并入 mcp（红队：零边代价）或保留并明示为「mcp 的策略实现域」。
+1. **approval 域**（挂三轮）：✅ 2026-10-21 并入 `com.ragagent.mcp.approval`（19 域）；保留运行期唯一实现 `ToolApprovalGateFactoryImpl`，测试与夹具同批搬迁。
 2. **tenants KV 三键**（本轮新）：加密迁移（与 N1 同批）或降级只读兼容一版后下线。
-3. **initialization 职责**（挂两轮）：明示为「上手向导域」并将 ollama/* 归 model，或整域并入 model。
+3. **initialization 职责**（挂两轮）：✅ 2026-10-21 明示为「上手向导域」；6 个 ollama 端点归 `/api/v1/models/ollama/**`，连通性双头按「未保存表单预检 vs 已保存模型调试」分工。
 4. **NORMAL 失败轮异步副作用**（挂一轮，10-20 §7.3-5）：失败轮是否照常排索引/建议/记忆。
 5. **G9 前端启动时机**（挂两轮）：top5 巨石 27,110 行四天零提交；建议随 N12 后独立立项。
 6. **platform/prompt 11 份 YAML**（挂两轮）：归 domains 资源目录或文档化为「提示词装载设施」。
@@ -203,7 +203,7 @@ boot（组合根，只出不进；@Configuration 8 组合根档）
 
 ### 9.3 计划裁决
 
-- **维持 7 模块 / 20 域**：证据（6 条冻结边 / 27 类 / clearable 0、三 runtime 无重复基建）支持红队结论，不翻案。
+- **维持 7 模块 / 20 域（approval 并入后为 19）**：证据（6 条冻结边 / 27 类 / clearable 0、三 runtime 无重复基建）支持红队结论，不翻案。
 - **P0 已闭环**：IM credentials（`ImCredentialsTypeHandler`）与 tenants 三键（`JsonSecrets` + `SecretJsonTypeHandler`）均为写时加密、读兼容明文；复测无裸明文写入路径。
 - **顺序调整建议**：①先落「可复现度量 + 计数棘轮」再谈下降（本次已做）；②N5 工具单源仍应排在 N6 还乡前（四个 switch 的静默丢工具是运行期故障面，还乡只是包位）；③N8 配置收口 2–3 人日偏乐观，建议拆 N8a storage / N8b parser / N8c websearch，各自带兼容窗口；④N10 的 metrics 与 PG+flyway profile 无业务收益，可后排；⑤N12 的 PageResult 镜像依赖后端统一线格式（与 M8 同性质），不要与 `api/system` 拆分捆绑。
 - **不建议做**：把 >100 行方法逐项登记成 109 条基线（噪声大、每次合法拆分都要改）；用计数预算（本次采用）即可拦住「整体变差」。
@@ -213,4 +213,5 @@ boot（组合根，只出不进；@Configuration 8 组合根档）
 - **P1.16 文档信任收口**：356 份计数两处、`TenantFilterGuard` 悬空引用与残缺文案、`knowledge/task/package-info` 重写、`IngestStage` 注释、`platform-shapes.baseline` 两条失真、HANDOFF 域间边 51→27。
 - **P2.1 卫生预算计数守卫（第 47 条）**：`check-hygiene-budget.py` 固定口径（>100 行方法 109 / trim 副本 11 / ≥8 参构造器 53），只许减、`--write` 拒绝上调；红态探针已验。顺带修 `complexity-report.py` 扫描根与跨行构造器计数。
 - **P1.5 工具名单一来源（N5 后端半边）**：删除 `AgentToolNames` 第二份 20 常量表；`ToolCapabilities` 20 键、`ToolPolicy` 49 键 + 4 个局部常量改引用 `ToolDefinitions`（键集前后比对一致）；守卫扩 T5（别处不得再声明已知工具名常量）与 T6（前端能力表键 ⊆ 后端工具名），各配红态探针。
-- **剩余队列**：N5 前端表生成式改造（本次只做「可少不可多」的契约锁定）、N7 QaRequestContext、N6 还乡终版+消费者守卫、N9 域归属、N8 配置收口、N10 横切、N11 长方法/构造器实拆、N12 前端拆分。
+- **P1.8 域归属尾巴（N9）**：approval 并入 `mcp.approval`（19 域）；Skill 两个控制器合并为 `SkillController`（选择器 + 管理面同源）；6 个 ollama 端点归 `/api/v1/models/ollama/**`，服务与下载任务存储迁入 `model.service`，跨域复用的 JSON 助手下沉 `platform.web.JsonBodies`；连通性双头按「未保存表单预检 vs 已保存模型调试」写进两个域的 package-info。
+- **剩余队列**：N5 前端表生成式改造（本次只做「可少不可多」的契约锁定）、N7 QaRequestContext、N6 还乡终版+消费者守卫、N8 配置收口、N10 横切、N11 长方法/构造器实拆、N12 前端拆分。

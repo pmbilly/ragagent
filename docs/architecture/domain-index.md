@@ -5,16 +5,15 @@
 > 分类配置在 [`scripts/capability-kinds.json`](../../scripts/capability-kinds.json)；
 > 端口权威表在 [`port-map.md`](port-map.md)。
 
-## 六类能力
+## 5 类能力
 
 | 种类 | 域数 | 文件 | 控制器 | 说明 |
 |---|---:|---:|---:|---|
-| **产品能力** | 7 | 816 | 22 | 直接产生用户价值、按产品需求演进的业务能力。 |
-| **集成适配** | 6 | 541 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
+| **产品能力** | 7 | 815 | 21 | 直接产生用户价值、按产品需求演进的业务能力。 |
+| **集成适配** | 6 | 548 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
 | **控制面** | 3 | 158 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
-| **能力配置** | 2 | 55 | 4 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
-| **初始化向导** | 1 | 13 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
-| **策略库** | 1 | 7 | 0 | 无 HTTP、无持久化的纯策略/判定逻辑。 |
+| **能力配置** | 2 | 58 | 5 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
+| **初始化向导** | 1 | 11 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
 
 ## 域明细
 
@@ -25,9 +24,9 @@
 | `wiki` | 产品能力 | 164 | 1 | 1 | `views/knowledge/wiki` |
 | `memory` | 产品能力 | 91 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
 | `agenttools` | 产品能力 | 58 | — | — | `views/chat（工具结果渲染）` |
-| `agentmanagement` | 产品能力 | 27 | 3 | — | `views/agent` |
+| `agentmanagement` | 产品能力 | 26 | 2 | — | `views/agent` |
 | `favorite` | 产品能力 | 13 | 1 | — | `views/agent · views/knowledge（列表置顶/收藏）` |
-| `mcp` | 集成适配 | 150 | 4 | 2 | `views/settings/McpSettings.vue` |
+| `mcp` | 集成适配 | 157 | 4 | 2 | `views/settings/McpSettings.vue` |
 | `datasource` | 集成适配 | 147 | 2 | — | `views/knowledge/settings/DataSourceSettings.vue` |
 | `im` | 集成适配 | 106 | 2 | — | `views/integrations/IntegrationSettingsSection.vue` |
 | `storage` | 集成适配 | 61 | 3 | 6 | `views/settings/StorageBackendSettings.vue` |
@@ -36,10 +35,9 @@
 | `auth` | 控制面 | 120 | 6 | 2 | `views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue` |
 | `audit` | 控制面 | 20 | 1 | 1 | `views/settings/panels/SystemAuditLog.vue` |
 | `system` | 控制面 | 18 | 2 | 1 | `views/settings/panels` |
-| `model` | 能力配置 | 35 | 3 | 2 | `views/settings/ModelSettings.vue` |
+| `model` | 能力配置 | 38 | 4 | 2 | `views/settings/ModelSettings.vue` |
 | `vectorstore` | 能力配置 | 20 | 1 | — | `views/settings/VectorStoreSettings.vue` |
-| `initialization` | 初始化向导 | 13 | 1 | — | `views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue` |
-| `approval` | 策略库 | 7 | — | — | `views/chat/components/ToolApprovalCard.vue` |
+| `initialization` | 初始化向导 | 11 | 1 | — | `views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue` |
 
 > 文件数含 `package-info`，与 `module-package-map.md` 同口径；契约面含 `*Port` 与 `*Gateway`（后者在 C5b 统一为 `*Port`）。
 
@@ -52,7 +50,7 @@
 | `wiki` | `WikiPageController` | `WikiPageOpsPort` |
 | `memory` | `MemoryController` | — |
 | `agenttools` | —（无 HTTP 面） | — |
-| `agentmanagement` | `AgentController`、`SkillCatalogAdminController`、`SkillPickerController` | — |
+| `agentmanagement` | `AgentController`、`SkillController` | — |
 | `favorite` | `UserFavoriteController` | — |
 | `mcp` | `AgentToolApprovalController`、`McpCredentialsController`、`McpOAuthController`、`McpServiceController` | `McpToolRegistrationPort`、`McpToolingGateway` |
 | `datasource` | `DataSourceController`、`DataSourceCredentialsController` | — |
@@ -63,10 +61,9 @@
 | `auth` | `AuthController`、`TenantAPIKeyController`、`TenantAPIPrincipalController`、`TenantCatalogController`、`TenantInvitationController`、`TenantMemberController` | `TenantStorageQuotaPort`、`UserLookupPort` |
 | `audit` | `AuditLogController` | `AuditWritePort` |
 | `system` | `SystemAdminController`、`SystemController` | `SystemSettingGateway` |
-| `model` | `ModelController`、`ModelCredentialsController`、`ModelDebugController` | `ModelCatalogPort`、`ModelFactsPort` |
+| `model` | `ModelController`、`ModelCredentialsController`、`ModelDebugController`、`ModelOllamaController` | `ModelCatalogPort`、`ModelFactsPort` |
 | `vectorstore` | `VectorStoreController` | — |
 | `initialization` | `InitializationController` | — |
-| `approval` | —（无 HTTP 面） | — |
 
 ## 怎么用
 
