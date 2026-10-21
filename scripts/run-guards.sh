@@ -70,6 +70,7 @@ run '路由权限覆盖（未登记公开路由/幽灵规则/对照表过期）'
 run '控制器实体导入（C10：只许降）' python3 scripts/check-controller-entity-imports.py
 run '入库链路文档（ingest-flow.md 引用的类必须存在）' python3 scripts/check-ingest-flow.py
 run '版本一致性（Boot / springdoc / MyBatis-Plus jsqlparser / wrapper / Dockerfile）' python3 scripts/check-version-consistency.py
+run 'schema 对账（TestSchema 建表 vs migrations/versioned）' python3 scripts/check-schema-parity.py
 
 echo
 # 汇总行**自计数**（B267 结项实测的漂移）：加第 12 个守卫时头注释/README/CI 都改了，唯独这里

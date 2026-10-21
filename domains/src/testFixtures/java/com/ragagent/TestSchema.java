@@ -29,7 +29,7 @@ public final class TestSchema {
                 "name VARCHAR NOT NULL, description VARCHAR NOT NULL DEFAULT '', status VARCHAR NOT NULL DEFAULT 'active'," +
                 "retriever_engines VARCHAR NOT NULL DEFAULT '[]', business VARCHAR NOT NULL DEFAULT ''," +
                 "storage_quota BIGINT NOT NULL DEFAULT 10737418240, storage_used BIGINT NOT NULL DEFAULT 0," +
-                "context_config VARCHAR, web_search_config VARCHAR, parser_engine_config VARCHAR, credentials VARCHAR," +
+                "agent_config VARCHAR, context_config VARCHAR, conversation_config VARCHAR, web_search_config VARCHAR, parser_engine_config VARCHAR, credentials VARCHAR," +
                 "storage_engine_config VARCHAR, default_storage_backend_id VARCHAR(36)," +
                 "chat_history_config VARCHAR, retrieval_config VARCHAR, memory_config VARCHAR," +
                 "api_principal_config VARCHAR," +
@@ -78,7 +78,8 @@ public final class TestSchema {
                 "embedding_model_id VARCHAR(64), summary_model_id VARCHAR(64)," +
                 "image_processing_config VARCHAR, vlm_config VARCHAR, asr_config VARCHAR, wiki_config VARCHAR," +
                 "type VARCHAR(32) NOT NULL DEFAULT 'document'," +
-                "is_temporary BOOLEAN NOT NULL DEFAULT FALSE, description TEXT, creator_id VARCHAR(36)," +
+                "is_temporary BOOLEAN NOT NULL DEFAULT FALSE, is_pinned BOOLEAN NOT NULL DEFAULT FALSE," +
+                "pinned_at TIMESTAMP WITH TIME ZONE, description TEXT, creator_id VARCHAR(36)," +
                 "chunking_config VARCHAR NOT NULL DEFAULT '{}'," +
                 "storage_provider_config VARCHAR, storage_backend_id VARCHAR(36)," +
                 "storage_config VARCHAR NOT NULL DEFAULT '{}', vector_store_id VARCHAR(36)," +
@@ -91,7 +92,7 @@ public final class TestSchema {
         // 共享智能体响应要序列化 description/avatar/is_builtin/created_by/时间戳。
         jdbc.execute("CREATE TABLE IF NOT EXISTS custom_agents (" +
                 "id VARCHAR(36) PRIMARY KEY, name VARCHAR(255) NOT NULL, description TEXT," +
-                "avatar VARCHAR(64) DEFAULT '', is_builtin BOOLEAN NOT NULL DEFAULT FALSE," +
+                "avatar VARCHAR(64) DEFAULT '', is_builtin BOOLEAN NOT NULL DEFAULT FALSE, runnable_by_viewer BOOLEAN NOT NULL DEFAULT TRUE," +
                 "tenant_id BIGINT NOT NULL, created_by VARCHAR(36) DEFAULT ''," +
                 "config VARCHAR, created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP," +
                 "updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP," +
@@ -129,7 +130,7 @@ public final class TestSchema {
                 "start_at INTEGER NOT NULL, end_at INTEGER NOT NULL," +
                 "pre_chunk_id VARCHAR, next_chunk_id VARCHAR, chunk_type VARCHAR(20) NOT NULL DEFAULT 'text'," +
                 "parent_chunk_id VARCHAR, relation_chunks VARCHAR, indirect_relation_chunks VARCHAR," +
-                "metadata VARCHAR, content_hash VARCHAR, image_info TEXT, context_header TEXT," +
+                "metadata VARCHAR, content_hash VARCHAR, image_info TEXT, video_info TEXT, context_header TEXT," +
                 "created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP," +
                 "updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP," +
                 "deleted_at TIMESTAMP WITH TIME ZONE)");
@@ -142,8 +143,10 @@ public final class TestSchema {
                 "editor_id VARCHAR(64) NOT NULL DEFAULT '', edit_source VARCHAR(16) NOT NULL DEFAULT 'user'," +
                 "edited_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP," +
                 "created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+        // 生产表 tenant_id 是 NOT NULL 且无默认；但实体尚未映射该列（已登记缺口，待补实体/写入点），
+        // 测试库给 0 默认值，避免插入路径被该列挡住。
         jdbc.execute("CREATE TABLE IF NOT EXISTS user_kb_pins (" +
-                "user_id VARCHAR(36) NOT NULL, knowledge_base_id VARCHAR(36) NOT NULL," +
+                "user_id VARCHAR(36) NOT NULL, knowledge_base_id VARCHAR(36) NOT NULL, tenant_id BIGINT NOT NULL DEFAULT 0," +
                 "pinned_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP)");
         // ── knowledge_tags + knowledge_tag_relations（列序/类型以迁移
         // 000063 为准；seq_id 是迁移 000010 加的 NOT NULL 序列列，
@@ -392,11 +395,26 @@ public final class TestSchema {
                 "tenant_id BIGINT NOT NULL," +
                 "title VARCHAR(255)," +
                 "description TEXT," +
+                "knowledge_base_id VARCHAR(36)," +
+                "max_rounds INTEGER NOT NULL DEFAULT 5," +
+                "enable_rewrite BOOLEAN NOT NULL DEFAULT TRUE," +
+                "fallback_strategy VARCHAR(255) NOT NULL DEFAULT 'fixed'," +
+                "fallback_response VARCHAR NOT NULL DEFAULT '很抱歉，我暂时无法回答这个问题。'," +
+                "keyword_threshold DOUBLE PRECISION NOT NULL DEFAULT 0.5," +
+                "vector_threshold DOUBLE PRECISION NOT NULL DEFAULT 0.5," +
+                "rerank_model_id VARCHAR(64)," +
+                "embedding_top_k INTEGER NOT NULL DEFAULT 10," +
+                "rerank_top_k INTEGER NOT NULL DEFAULT 10," +
+                "rerank_threshold DOUBLE PRECISION NOT NULL DEFAULT 0.65," +
+                "summary_model_id VARCHAR(64)," +
+                "summary_parameters VARCHAR NOT NULL DEFAULT '{}'," +
                 "user_id VARCHAR(512)," +
                 "embed_visitor_id VARCHAR(128)," +
                 "is_pinned BOOLEAN NOT NULL DEFAULT FALSE," +
                 "pinned_at TIMESTAMP WITH TIME ZONE," +
                 "agent_config VARCHAR," +
+                "context_config VARCHAR," +
+                "agent_id VARCHAR(36)," +
                 "created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP," +
                 "updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP," +
                 "deleted_at TIMESTAMP WITH TIME ZONE)");
@@ -774,6 +792,7 @@ public final class TestSchema {
                 "model_id VARCHAR(64) NOT NULL DEFAULT ''," +
                 "dims INTEGER NOT NULL DEFAULT 0," +
                 "vector VARBINARY," +
+                "embedding VARBINARY," +
                 "created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP," +
                 "updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP)");
         jdbc.execute("CREATE INDEX IF NOT EXISTS idx_mem_emb_scope " +
@@ -823,13 +842,14 @@ public final class TestSchema {
                 "resource_id VARCHAR(64) NOT NULL," +
                 "created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP," +
                 "PRIMARY KEY (user_id, tenant_id, resource_type, resource_id))");
-        // embed_channels（迁移 000060 全列；allow_memory 列无实体字段映射，不建）
+        // embed_channels（迁移 000060 全列）
         jdbc.execute("CREATE TABLE IF NOT EXISTS embed_channels (" +
                 "id VARCHAR(36) PRIMARY KEY," +
                 "tenant_id BIGINT NOT NULL," +
                 "agent_id VARCHAR(36) NOT NULL DEFAULT 'builtin-quick-answer'," +
                 "name VARCHAR(255) NOT NULL DEFAULT ''," +
                 "enabled BOOLEAN NOT NULL DEFAULT TRUE," +
+                "allow_memory BOOLEAN NOT NULL DEFAULT FALSE," +
                 "publish_token VARCHAR(64) NOT NULL DEFAULT ''," +
                 "allowed_origins VARCHAR NOT NULL DEFAULT '[]'," +
                 "welcome_message VARCHAR NOT NULL DEFAULT ''," +
@@ -867,6 +887,15 @@ public final class TestSchema {
                 "created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP," +
                 "updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP," +
                 "deleted_at TIMESTAMP WITH TIME ZONE)");
+
+        // skills（迁移 V1 末尾追加；tenant_id NULL = 平台内置层，全员可见只读）
+        jdbc.execute("CREATE TABLE IF NOT EXISTS skills (" +
+                "id VARCHAR(64) PRIMARY KEY, slug VARCHAR(64) NOT NULL, name VARCHAR(128) NOT NULL," +
+                "description VARCHAR NOT NULL DEFAULT '', content VARCHAR NOT NULL," +
+                "version INTEGER NOT NULL DEFAULT 1, created_by VARCHAR(64) NOT NULL DEFAULT ''," +
+                "created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP," +
+                "updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP," +
+                "deleted_at TIMESTAMP WITH TIME ZONE, tenant_id INTEGER)");
     }
 
     /**
@@ -911,6 +940,7 @@ public final class TestSchema {
         jdbc.execute("DELETE FROM mcp_oauth_tokens");
         jdbc.execute("DELETE FROM mcp_oauth_clients");
         jdbc.execute("DELETE FROM mcp_services");
+        jdbc.execute("DELETE FROM skills");
         jdbc.execute("DELETE FROM wiki_page_issues");
         jdbc.execute("DELETE FROM wiki_page_revisions");
         jdbc.execute("DELETE FROM wiki_pages");

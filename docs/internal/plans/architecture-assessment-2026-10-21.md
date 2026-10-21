@@ -100,7 +100,7 @@
 6. 还乡 2.0 终版：GrepChunksScoring 回 agenttools（3 文件小改）；ImageInfoMatchUtil 留 platform 修文案（真理由=被 platform 姊妹件 ImageInfoEnricher 8 处调用，搬走断链）；其余 6 件维持；contract 11 个单域消费类随消费者回域（MemoryKeys 连 MemoryConfig 一起）；新增 gen-contract-consumers 消费者答案守卫（§2.2/§4.4）
 7. 配置真相源收口（原 G7 未启动）：存储三头→storage_backends 表（KV 降只读兼容一版）；websearch KV 兼容路径下线计时；parser 三头归位（§3/§4.3）
 8. 域归属尾巴：initialization 的 ollama/* 归 model；连通性双头合一或明示分工（表单预检 vs 调试）；Skill 双控制器合一（L3 只改名）；approval 拍板执行（§3）
-9. 横切升级（D 批排序更新）：**schema 对账守卫**（TestSchema vs V1 表名/列名对账，性价比最高）→ metrics（半天）→ PG+flyway 测试 profile → @RouteSecurity（L3 已否决合并，注解化收益需重估）（§4.5）
+9. 横切升级（D 批排序更新）：**schema 对账守卫**（TestSchema vs V1 表名/列名对账，性价比最高）——✅ 2026-10-21（P1.9a，第 46 条守卫；顺带补出 `user_kb_pins.tenant_id` 的实体缺口，见 HANDOFF）→ metrics（半天）→ PG+flyway 测试 profile → @RouteSecurity（L3 已否决合并，注解化收益需重估）（§4.5）
 10. H 系列待做：H5a-2 分页四端点、H7 platform 判据换血（本轮实证：方法签名级域词与 prompt/RbacInterceptor 不可见）、H8 适配层逻辑化、H9 管理面模板化；H6-1 的 7 个零消费者窄端口要么启用要么撤（§4.4/§4.5）
 11. 前端对齐四坑：api/system 拆 3-4 文件、api/tenant 并入 auth+TenantInfo 单定义、PageResult 前端镜像、views/system 与 agentmanagement 的错位（§4.6）
 
