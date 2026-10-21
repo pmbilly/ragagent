@@ -569,6 +569,8 @@ boot           14 件                      →  boot
 
 | P1.6 | 2026-10-21 | **还乡复核 + 契约消费者守卫（N6 可执行部分）**：① `GrepChunksScoring` 从 `platform.knowledge` 回 `agenttools.knowledge`（消费方只有 `GrepChunksTool` / `KnowledgeSearchRanking`；仍复用 platform 的 `GrepChunkHit` 结果视图），platform-shapes 豁免撤 1 条。② 复核报告「11 个单域类回域、约 −1,500 行」：**不可直接执行**——`MemoryKeys` 与 `MemoryConfig`/`MemoryKinds` 相互引用，而 `MemoryConfig` 还被 auth 与 platform 测试消费；`ToolCapabilities` 虽只有 im 主码消费，但它是与 `ToolDefinitions` 并列的工具词汇且被前端镜像；`JsonValues`/`TextConv`/`DuplicateKnowledgeDetails` 是 contract 内部助手。③ 新增 `gen-contract-consumers.py`（第 48 条守卫）：每个 public 顶层契约类型必须至少有一个消费者（跨模块 import 或 contract 内同包引用）；`--check` 零消费者即红。 | 定向编译绿 · 红态探针：加一个无引用的 `ConsumerProbe` ⇒ 328→329 / 零消费者 1 立即红 · 48 守卫绿 · `mvn -B clean verify` 绿（5062 / 0 / 2） |
 
+| P1.7 | 2026-10-21 | **QaRequestContext 跨线程读收口（N7 实战半边）**：`persistLastRequestStateAsync` 原先把整个可变上下文交给新虚拟线程，而主线程随后还要写 `userMessageID`/`assistantMessage`。改为在**调用线程**用 `lastRequestStateSnapshot` 定型 `SessionLastRequestState`（列表 `List.copyOf`），异步段只拿 `sessionId + 快照`；`QaRequestContext` 类注释写明字段的线程归属。复核其余异步段：`startAsyncRunner` 在落库之后启动，写入先于 `Thread.start`（happens-before 成立），附件解析由 runner 线程独占；因此未做 33 字段 builder 大改，只修真实敞口。 | 新增 3 条单测（快照不随上下文变更、快照列表不可变、null 列表归一为空）· 48 守卫绿 · `mvn -B clean verify` 绿（5065 / 0 / 2） |
+
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
 ## 13. 文档地图与归档

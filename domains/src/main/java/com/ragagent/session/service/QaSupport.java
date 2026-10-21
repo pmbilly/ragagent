@@ -39,6 +39,14 @@ public final class QaSupport {
         AGENT
     }
 
+    /**
+     * 一轮 QA 的可变上下文。
+     *
+     * <p><b>线程归属</b>：请求输入字段在 {@code executeQA} 之前写完、之后只读；轮次状态
+     * （{@code userMessageID}/{@code assistantMessage}/{@code userCreatedAt}）由落库簇在
+     * 启动异步 runner 之前写完；附件解析结果由 runner 线程独占写。跨线程传递优先用
+     * 不可变快照（如输入条状态快照），不要直接把本对象交给新线程。</p>
+     */
     // QA 请求上下文
     public static final class QaRequestContext {
         public String sessionId = "";

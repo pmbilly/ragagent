@@ -106,28 +106,42 @@ public final class QaTurnFinalizer {
         }
         return false;
     }
-    public void persistLastRequestState(QaRequestContext reqCtx, QaMode mode) {
+    /**
+     * 在**调用线程**把输入条状态定型成快照。
+     *
+     * <p>异步写库只拿这个快照，不再回调 {@code QaRequestContext} 的可变字段——
+     * 那些字段属于执行/落库簇，写入时机在本快照之后。</p>
+     */
+    public SessionLastRequestState lastRequestStateSnapshot(QaRequestContext reqCtx, QaMode mode) {
         boolean agentEnabled = reqCtx.reqAgentEnabled;
         if (mode == QaMode.AGENT && reqCtx.agentConfig != null) {
             agentEnabled = SessionKnowledgeQaService.isAgentMode(reqCtx.agentConfig);
         }
+        SessionLastRequestState state = new SessionLastRequestState();
+        state.setAgentId(QaSupport.orEmpty(reqCtx.reqAgentID));
+        state.setAgentEnabled(agentEnabled);
+        state.setModelId(reqCtx.summaryModelId);
+        state.setKnowledgeBaseIds(copy(reqCtx.knowledgeBaseIds));
+        state.setKnowledgeIds(copy(reqCtx.knowledgeIds));
+        state.setTagIds(copy(reqCtx.tagIds));
+        state.setMcpServiceIds(copy(reqCtx.mcpServiceIds));
+        state.setSkillNames(copy(reqCtx.skillNames));
+        state.setMentionedItems(copy(reqCtx.mentionedItems));
+        state.setWebSearchEnabled(reqCtx.webSearchEnabled);
+        return state;
+    }
+
+    /** 写输入条状态；只接受 {@link #lastRequestStateSnapshot} 的产物。 */
+    public void persistLastRequestState(String sessionId, SessionLastRequestState state) {
         try {
-            SessionLastRequestState state =
-                    new SessionLastRequestState();
-            state.setAgentId(QaSupport.orEmpty(reqCtx.reqAgentID));
-            state.setAgentEnabled(agentEnabled);
-            state.setModelId(reqCtx.summaryModelId);
-            state.setKnowledgeBaseIds(reqCtx.knowledgeBaseIds);
-            state.setKnowledgeIds(reqCtx.knowledgeIds);
-            state.setTagIds(reqCtx.tagIds);
-            state.setMcpServiceIds(reqCtx.mcpServiceIds);
-            state.setSkillNames(reqCtx.skillNames);
-            state.setMentionedItems(reqCtx.mentionedItems);
-            state.setWebSearchEnabled(reqCtx.webSearchEnabled);
-            sessionService.updateSessionLastRequestState(reqCtx.sessionId, state);
+            sessionService.updateSessionLastRequestState(sessionId, state);
         } catch (RuntimeException e) {
-            log.warn("persist last_request_state failed for session {}", reqCtx.sessionId, e);
+            log.warn("persist last_request_state failed for session {}", sessionId, e);
         }
+    }
+
+    private static <T> List<T> copy(List<T> values) {
+        return values == null ? List.of() : List.copyOf(values);
     }
     /**
      * 收尾 assistant 消息：**CAS 置完成态**（全轮一次性提交门），只有赢家才异步排

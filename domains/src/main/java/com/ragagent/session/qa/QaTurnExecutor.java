@@ -10,6 +10,7 @@ import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.contract.session.MessageExecutionContext;
 import com.ragagent.contract.session.MessageImage;
+import com.ragagent.contract.session.SessionLastRequestState;
 import com.ragagent.contract.session.SseSink;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContextSnapshot;
@@ -121,10 +122,12 @@ public final class QaTurnExecutor {
      */
     private void persistLastRequestStateAsync(QaRequestContext reqCtx, QaMode mode) {
         final TenantContextSnapshot memoTenant = TenantContextSnapshot.capture();
+        final String sessionId = reqCtx.sessionId;
+        final SessionLastRequestState snapshot = turnFinalizer.lastRequestStateSnapshot(reqCtx, mode);
         Thread.ofVirtual().start(() -> TenantScope.run(memoTenant, () -> {
             SessionLookupScope.mark();
             try {
-                turnFinalizer.persistLastRequestState(reqCtx, mode);
+                turnFinalizer.persistLastRequestState(sessionId, snapshot);
             } finally {
                 SessionLookupScope.clear();
             }
