@@ -5,7 +5,6 @@ import static com.ragagent.agenttools.knowledge.KnowledgeSearchTool.nz;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.RankResult;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.ResultWithMeta;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.SearchResultView;
-import com.ragagent.platform.knowledge.GrepChunksScoring;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

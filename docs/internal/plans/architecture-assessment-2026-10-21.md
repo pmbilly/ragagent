@@ -214,4 +214,5 @@ boot（组合根，只出不进；@Configuration 8 组合根档）
 - **P2.1 卫生预算计数守卫（第 47 条）**：`check-hygiene-budget.py` 固定口径（>100 行方法 109 / trim 副本 11 / ≥8 参构造器 53），只许减、`--write` 拒绝上调；红态探针已验。顺带修 `complexity-report.py` 扫描根与跨行构造器计数。
 - **P1.5 工具名单一来源（N5 后端半边）**：删除 `AgentToolNames` 第二份 20 常量表；`ToolCapabilities` 20 键、`ToolPolicy` 49 键 + 4 个局部常量改引用 `ToolDefinitions`（键集前后比对一致）；守卫扩 T5（别处不得再声明已知工具名常量）与 T6（前端能力表键 ⊆ 后端工具名），各配红态探针。
 - **P1.8 域归属尾巴（N9）**：approval 并入 `mcp.approval`（19 域）；Skill 两个控制器合并为 `SkillController`（选择器 + 管理面同源）；6 个 ollama 端点归 `/api/v1/models/ollama/**`，服务与下载任务存储迁入 `model.service`，跨域复用的 JSON 助手下沉 `platform.web.JsonBodies`；连通性双头按「未保存表单预检 vs 已保存模型调试」写进两个域的 package-info。
-- **剩余队列**：N5 前端表生成式改造（本次只做「可少不可多」的契约锁定）、N7 QaRequestContext、N6 还乡终版+消费者守卫、N8 配置收口、N10 横切、N11 长方法/构造器实拆、N12 前端拆分。
+- **P1.6 还乡复核 + 消费者守卫**：`GrepChunksScoring` 回 `agenttools.knowledge`（唯一真正干净的一件）；报告「11 个单域类回域、−1,500 行」复测不可直接执行——`MemoryKeys` 与 `MemoryConfig`/`MemoryKinds` 互引，而 `MemoryConfig` 还被 auth 与 platform 测试消费；`ToolCapabilities` 是工具词汇且被前端镜像；`JsonValues`/`TextConv`/`DuplicateKnowledgeDetails` 是 contract 内部助手。新增 `gen-contract-consumers.py`（第 48 条守卫）回答「谁在消费我」，零消费者即红。
+- **剩余队列**：N5 前端表生成式改造（本次只做「可少不可多」的契约锁定）、N6 的 11 类回域需按形状重划（仅剩 `ToolCapabilities`/`TenantRowView` 等有讨论价值）、N7 QaRequestContext、N8 配置收口、N10 横切、N11 长方法/构造器实拆、N12 前端拆分。

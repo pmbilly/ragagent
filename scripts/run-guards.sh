@@ -45,6 +45,7 @@ run '模块图（R6：主码矩阵 · 主码无同包 · 测试边登记 · 测�
 run '装配点清单（W1~W4：@Configuration 必须登记；分类/理由/overview 三处一致）' python3 scripts/check-wiring-points.py
 run 'platform 业务形状（C8：业务词包/业务词文件/红旗命名三档；只许减不许增）' python3 scripts/check-platform-shapes.py
 run '契约形状预算（R1/R2：端口 ≤7 方法 / 行视图禁入 / 字段 ≤20）' python3 scripts/check-contract-shape.py
+run '契约消费者答案（每个 public 契约类型至少有一个消费者）' python3 scripts/gen-contract-consumers.py --check
 run '端口准入（R1：域内端口 / 无实现端口必须为 0）' python3 scripts/check-port-budget.py
 run '架构索引（docs/architecture/packages.md 必须与 package-info 同步）' python3 scripts/gen-arch-index.py --check
 run '文档事实（README 的模块数/控制器数/package-info 覆盖率必须与代码一致）' python3 scripts/check-doc-truth.py

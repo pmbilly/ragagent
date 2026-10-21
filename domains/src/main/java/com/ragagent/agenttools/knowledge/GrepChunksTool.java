@@ -8,7 +8,6 @@ import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.knowledge.GrepChunkHit;
-import com.ragagent.platform.knowledge.GrepChunksScoring;
 import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;

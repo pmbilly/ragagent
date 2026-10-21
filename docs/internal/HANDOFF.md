@@ -302,6 +302,7 @@ boot           14 件                      →  boot
 | `check-module-graph.py` | 主码依赖矩阵 · 同包 · 测试边登记 · 测试错位登记 · 夹具包 | 登记表（只许减） |
 | `check-platform-shapes.py` | platform 业务形状（业务词包 / 业务词文件 / 红旗命名三档） | `platform-shapes.baseline.json`（16 条） |
 | `check-contract-shape.py` | R1/R2 契约形状预算（端口 ≤7 方法 / 行视图禁入 / 字段 ≤20） | `contract-shape.baseline.json`（22 条，只许减） |
+| `gen-contract-consumers.py --check` | 每个 public 契约类型至少有一个消费者（跨模块 import 或 contract 内同包引用） | 硬零 |
 | `check-port-budget.py` | R1 端口准入（域内 / 无实现端口 = 0） | `port-budget.baseline.json`（空） |
 | `gen-arch-index.py --check` | `package-info` 与 `docs/architecture/packages.md` 同步 | 硬零 |
 | `check-tenant-scope.py` | 跨线程身份必须走 `TenantScope`；禁止裸 capture/replay | 硬零 |
@@ -565,6 +566,8 @@ boot           14 件                      →  boot
 | P1.5 | 2026-10-21 | **工具名单一来源（N5 后端半边）**：删除 `agent-engine/.../AgentToolNames.java`（第二份 20 常量表），`FileOps`/`GroundingPrompt` 改用 `contract.tool.ToolDefinitions`；`ToolCapabilities` 的 20 个能力表键、`ToolPolicy` 的 49 个句柄策略键与 4 个局部常量全部改引用 `ToolDefinitions`（键集前后机器比对一致）。守卫扩 T5/T6：T5 除 `ToolDefinitions` 外不得再出现「`TOOL_*` 常量 = 已知工具名」的第二份清单（值比对，长文案常量不误报）；T6 前端 `tool-capabilities.ts` 的键必须是后端已声明工具名（可少不可凭空多）。IM 显示名表与前端图标表保留为**展示映射**（未命中回落原名，不参与注册）。 | 定向 35 用例绿（ModelContextRecording 30 / ToolPolicy 4 / ToolCapabilities 1）· 红态探针：注入第二份 `TOOL_KNOWLEDGE_SEARCH` 常量 ⇒ T5 红；前端加 `probe_tool` ⇒ T6 红 · 47 守卫绿 · `mvn -B clean verify` 绿（5062 / 0 / 2） |
 
 | P1.8 | 2026-10-21 | **域归属尾巴（N9）**：① approval 7 文件 + 9 测试/夹具整体并入 `com.ragagent.mcp.approval`，保留运行期唯一实现 `ToolApprovalGateFactoryImpl`（`McpWiring` 注入契约接口，包移动不影响装配）；能力分类删 `approval` 域与空 `policy` 种类 ⇒ **19 域 / 5 类**。② 两个 Skill 控制器合并为 `SkillController`：`GET /skills` 选择器与 `/skills/catalog/**` 管理面同源 `SkillCatalogPort`，路由与权限不变。③ 6 个 ollama 端点从 `initialization` 归 `model`，URL 改 `/api/v1/models/ollama/**`；`OllamaManageService`/`OllamaDownloadTaskStore` 迁 `model.service`；跨服务复用的 `bindObject/text/orEmpty/timeAsIs/isoTime` 下沉 `platform.web.JsonBodies`，避免 model→initialization 反向边。④ 连通性双头写进两个域 package-info：未保存表单预检（initialization）vs 已保存模型调试（model）。 | 定向绿：approval 5 类 56 用例 / APIKey 路由 16 / JsonBodies 1 / W5b HTTP 契约 4 · 47 守卫绿 · `mvn -B clean verify` 全绿（5062 / 0 / 2） |
+
+| P1.6 | 2026-10-21 | **还乡复核 + 契约消费者守卫（N6 可执行部分）**：① `GrepChunksScoring` 从 `platform.knowledge` 回 `agenttools.knowledge`（消费方只有 `GrepChunksTool` / `KnowledgeSearchRanking`；仍复用 platform 的 `GrepChunkHit` 结果视图），platform-shapes 豁免撤 1 条。② 复核报告「11 个单域类回域、约 −1,500 行」：**不可直接执行**——`MemoryKeys` 与 `MemoryConfig`/`MemoryKinds` 相互引用，而 `MemoryConfig` 还被 auth 与 platform 测试消费；`ToolCapabilities` 虽只有 im 主码消费，但它是与 `ToolDefinitions` 并列的工具词汇且被前端镜像；`JsonValues`/`TextConv`/`DuplicateKnowledgeDetails` 是 contract 内部助手。③ 新增 `gen-contract-consumers.py`（第 48 条守卫）：每个 public 顶层契约类型必须至少有一个消费者（跨模块 import 或 contract 内同包引用）；`--check` 零消费者即红。 | 定向编译绿 · 红态探针：加一个无引用的 `ConsumerProbe` ⇒ 328→329 / 零消费者 1 立即红 · 48 守卫绿 · `mvn -B clean verify` 绿（5062 / 0 / 2） |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
