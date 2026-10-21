@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import com.ragagent.platform.persistence.SecretJsonTypeHandler;
 import java.time.OffsetDateTime;
 import tools.jackson.databind.JsonNode;
 
@@ -64,16 +65,16 @@ public class Tenant {
     @TableField(typeHandler = PgJsonTypeHandler.class)
     private JsonNode contextConfig;
 
-    @TableField(typeHandler = PgJsonTypeHandler.class)
+    @TableField(typeHandler = SecretJsonTypeHandler.class)
     private JsonNode webSearchConfig;
 
-    @TableField(typeHandler = PgJsonTypeHandler.class)
+    @TableField(typeHandler = SecretJsonTypeHandler.class)
     private JsonNode parserEngineConfig;
 
     @TableField(typeHandler = PgJsonTypeHandler.class)
     private JsonNode credentials;
 
-    @TableField(typeHandler = PgJsonTypeHandler.class)
+    @TableField(typeHandler = SecretJsonTypeHandler.class)
     private JsonNode storageEngineConfig;
     /** 可空：null 时整键省略 */
     private String defaultStorageBackendId;
