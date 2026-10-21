@@ -180,7 +180,7 @@
 | `:domains` | `com.ragagent.knowledge.storage` | 知识库文件与对象存储：LocalStorageService（本地卷）+ TenantFileStorage（租户感知门面， 知识上传/读取/删除的唯一入口）。 |
 | `:domains` | `com.ragagent.knowledge.support` | 知识库任务面领域类型：任务提交端口、进度存储、导入任务存储与任务 id/事件。 |
 | `:domains` | `com.ragagent.knowledge.support.access` | 知识 · 路由守卫支撑：批量访问检查与任务 id 解析（非 service 层）。 |
-| `:domains` | `com.ragagent.knowledge.task` | 知识库异步任务：队列与执行。 |
+| `:domains` | `com.ragagent.knowledge.task` | 知识库异步任务：队列、进度与执行。 |
 | `:domains` | `com.ragagent.mcp` | MCP 域：Model Context Protocol 的仓内实现——协议、OAuth（含回调与令牌存储）、 服务注册与调用面；对外 /api/v1/mcp-services。 |
 | `:domains` | `com.ragagent.mcp.api` | MCP · 端口实现：McpToolRegistrationAdapter / McpApprovalOpsAdapter。 |
 | `:domains` | `com.ragagent.mcp.controller` | mcp 域控制器的 HTTP 端点与协作类（2 个协作类）。 |

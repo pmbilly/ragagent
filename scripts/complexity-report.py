@@ -23,9 +23,9 @@ import re
 import sys
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
-ROOTS = ("domains", "engine", "common", "boot")
+ROOTS = ("contract", "platform", "model-runtime", "retrieval-engine", "agent-engine", "domains", "boot")
 BRANCH = re.compile(r"\b(if|for|while|catch)\s*\(|\bcase\s|&&|\|\||\?:")
-CTOR = re.compile(r"^(\s{4})(?:public|protected|private)?\s*([A-Z]\w*)\s*\(([^)]*)\)\s*\{")
+CTOR = re.compile(r"^[ \t]*(?:public|protected|private)?[ \t]*([A-Z]\w*)[ \t]*\(", re.M)
 FIELD = re.compile(r"^(\s{4})public\s+(?!static|final)([\w<>,.\[\]\s]+)\s+(\w+)\s*[;=]")
 
 
@@ -52,17 +52,25 @@ def params_count(raw: str) -> int:
 
 
 def scan(path: pathlib.Path) -> tuple[list, list, list]:
-    lines = path.read_text(encoding="utf-8", errors="ignore").splitlines()
+    text = path.read_text(encoding="utf-8", errors="ignore")
+    lines = text.splitlines()
     rel = str(path.relative_to(REPO))
     ctors, fields, methods = [], [], []
     cls = path.stem
-    for i, line in enumerate(lines):
-        m = CTOR.match(line)
-        if m and m.group(2) == cls:
-            n = params_count(m.group(3))
-            if n > 8:
-                ctors.append((rel, i + 1, n))
+    for m in CTOR.finditer(text):
+        if m.group(1) != cls:
             continue
+        i, depth = m.end(), 1
+        while i < len(text) and depth > 0:
+            if text[i] == "(":
+                depth += 1
+            elif text[i] == ")":
+                depth -= 1
+            i += 1
+        n = params_count(text[m.end():i - 1])
+        if n > 8:
+            ctors.append((rel, text[:m.start()].count("\n") + 1, n))
+    for i, line in enumerate(lines):
         f = FIELD.match(line)
         if f:
             fields.append((rel, i + 1, f.group(3).strip()))

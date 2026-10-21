@@ -15,7 +15,7 @@
 | 7 | [`architecture/mechanisms.md`](architecture/mechanisms.md) | 队列、事务、embedding、定时任务等反直觉机制 |
 | 8 | [`glossary.md`](glossary.md) | 业务术语与历史代号（K4 / A18 / R3d / B2xx） |
 
-查表：[`architecture/packages.md`](architecture/packages.md) —— 352 份 `package-info` 的包索引（由脚本生成，勿手改）。
+查表：[`architecture/packages.md`](architecture/packages.md) —— 356 份 `package-info` 的包索引（由脚本生成，勿手改）。
 
 按业务链路查：[`architecture/business-capability-map.md`](architecture/business-capability-map.md) —— 六条链路（知识生产 / 问答 / Agent / 渠道 / 配置 / 初始化）→ 入口、编排、落点。
 

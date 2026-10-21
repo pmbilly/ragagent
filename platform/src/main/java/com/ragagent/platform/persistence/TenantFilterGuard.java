@@ -19,14 +19,13 @@ import org.slf4j.LoggerFactory;
  * <p>背景：手工租户条件散落各仓储，漏写一处就是数据面越权（曾有技能读全表跨租户可见的实证）。
  * 与 TenantLineInnerInterceptor（SQL 级自动改写）相比，本类<b>不改写 SQL</b>，
  * 只检查「注册表的表在 SELECT 主查询里是否出现 {@code tenant_id} 谓词」，缺失按模式处置。
- * 这样避开了 TenantLine 的三个硬伤（见
- * {@code docs/persistence-tenant-filtering-evaluation.md}）：与
- * {@code tenant_id IS NULL = 平台内置} 的语义冲突、方言 SQL 解析失败即炸、ignore 表清单维护。</p>
+ * 这样避开了 TenantLine 的三个硬伤：与 {@code tenant_id IS NULL = 平台内置}
+ * 的语义冲突、方言 SQL 解析失败即炸、ignore 表清单维护。</p>
  *
  * <p><b>三档模式</b>（{@code weknora.persistence.tenant-filter-guard}，默认 enforce）：
  * {@code off} 关闭；{@code alert} 只告警（盘面用）；{@code enforce} 抛
  * {@link MybatisPlusException}——已完成逐表定性（72 条存量语句归入
- * {@link #ALLOWED_STATEMENTS}），默认档自 起为 enforce；未登记的新增
+ * {@link #ALLOWED_STATEMENTS}），默认档为 enforce；未登记的新增
  * 无租户谓词查询会在执行期直接红。</p>
  *
  * <p><b>v1 边界（刻意从窄，减少告警噪音）</b>：只查 SELECT 主 from-item 表（「读全表」型越权是主攻面），

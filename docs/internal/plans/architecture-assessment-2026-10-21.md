@@ -173,3 +173,43 @@ boot（组合根，只出不进；@Configuration 8 组合根档）
 | package-info | — | 356/356=100% | 稳 |
 | 30 天热点 | knowledge>session>wiki | knowledge 1,991>session 1,865>wiki 876 | 热区未转移 |
 | 前端 | 129,334 行，top5=27,110 | 129,350 行，top5=27,110 逐字节未动 | 冻结 |
+
+## 9. 同日复核与落地（2026-10-21 收尾）
+
+> 方法：对 §1/§2/§4/§6 的每条量化断言用脚本或 grep 复测；四条承重结论重跑。结论：**骨架与多数缺陷判断成立，一处量化结论不成立，两处表述需修正，计划顺序基本合理**。
+
+### 9.1 属实（复测证据）
+
+| 断言 | 复测 |
+|---|---|
+| >100 行方法 109，top 372/309/275 | `method-length-report.py --threshold 100` 实跑：109 / 372 / 309 / 275 ✅ |
+| 构造器极值 20 参 | `KnowledgeProcessWorker` 构造器逐参数点数 = 20 ✅ |
+| QaRequestContext 33 个 public 可变字段 | 逐字段点数 = 33 ✅ |
+| approval 7 文件、0 编译期消费者、0 控制器/持久层 | main 树 7 文件（含 package-info）、全仓 `.approval.` import 0 ✅ |
+| MULTIMODAL 无人推进 | 仅 `KnowledgeImageOcr`/`SpanTracker` 借用 span 名，OCR 在 DOC_READER 内 ✅（但「列于 EMBEDDING 前」❌，见 9.2） |
+| 文档漂移 | `docs/README` 352（实测 356）、`overview` 352、`TenantFilterGuard:23` 指向已删文档 ✅ |
+| task package-info 失真 | 仍称 InProcess 为唯一实现，实际 Redis 四件 `@Primary` ✅ |
+| 前端 | `api/system/index.ts` 1,252 行/56 interface、PageResult 镜像 0、`PipelineState chatManage` 68 处 ✅ |
+| 工具清单多头 | 同一批 `TOOL_WIKI_*` 常量散落 6+ 个后端文件 ✅ |
+
+### 9.2 需修正（报告自身失真或口径问题）
+
+1. **「trim 私拷贝 39→72」不成立**：39 是 `private static String trim(...)` 的严格口径；72 是放宽到全部 `String trimXxx(String)` 后的数（实测 70–71）。同口径复测仍是 **11 个通用 trim 副本**，没有翻倍。这是本轮唯一被列为「回潮最陡」的指标，实际是口径漂移。
+2. **「MULTIMODAL 列于 EMBEDDING 前」不成立**：枚举顺序是 `DOC_READER → CHUNKING → EMBEDDING → MULTIMODAL → POST_PROCESS`。「不是独立推进阶段」成立，但理由应写成「依赖表挂 CHUNKING、OCR 在 DOC_READER 内完成」。
+3. **「approval 零消费者 ⇒ 并入 mcp 零代价」需限定**：0 是**编译期 import**；运行期 `McpWiring` 注入 contract 的 `ToolApprovalGateFactory`，`ToolApprovalGateFactoryImpl` 是唯一实现。只能搬迁/改名，不能删除；搬迁要同步 port-map/wiring 登记。
+4. **N 编号与已执行提交冲突**：提交里 `N1=上手路径、N2=IM 凭据、N3=租户 KV、N4=Maven 尾巴`；§7.2 表里 `N1=凭据、N2=上手、N3=文档、N4=SSE`。后续引用一律以提交为准，§7.2 的 N 编号视为作废。
+5. **§2.3 的 SSE 前端欠账已过期**：`useChatStreamHandler.ts` 现有 NORMAL 路径 `case 'error'` + `message.error`（P1.3 已落），§6-3 可结项。
+6. **度量不可复现是普遍问题**：`complexity-report.py` 原扫描根含已解散的 `engine/common`、漏 4 个现存模块，构造器只报 1 处（真实 38）；「≥8 参 51」与本轮固定口径 53 的差异也来自口径。报告反复强调「读数要能复现」，自身附录却混用了临时 grep——这比单个数字错误更值得修。
+
+### 9.3 计划裁决
+
+- **维持 7 模块 / 20 域**：证据（6 条冻结边 / 27 类 / clearable 0、三 runtime 无重复基建）支持红队结论，不翻案。
+- **P0 已闭环**：IM credentials（`ImCredentialsTypeHandler`）与 tenants 三键（`JsonSecrets` + `SecretJsonTypeHandler`）均为写时加密、读兼容明文；复测无裸明文写入路径。
+- **顺序调整建议**：①先落「可复现度量 + 计数棘轮」再谈下降（本次已做）；②N5 工具单源仍应排在 N6 还乡前（四个 switch 的静默丢工具是运行期故障面，还乡只是包位）；③N8 配置收口 2–3 人日偏乐观，建议拆 N8a storage / N8b parser / N8c websearch，各自带兼容窗口；④N10 的 metrics 与 PG+flyway profile 无业务收益，可后排；⑤N12 的 PageResult 镜像依赖后端统一线格式（与 M8 同性质），不要与 `api/system` 拆分捆绑。
+- **不建议做**：把 >100 行方法逐项登记成 109 条基线（噪声大、每次合法拆分都要改）；用计数预算（本次采用）即可拦住「整体变差」。
+
+### 9.4 本轮落地
+
+- **P1.16 文档信任收口**：356 份计数两处、`TenantFilterGuard` 悬空引用与残缺文案、`knowledge/task/package-info` 重写、`IngestStage` 注释、`platform-shapes.baseline` 两条失真、HANDOFF 域间边 51→27。
+- **P2.1 卫生预算计数守卫（第 47 条）**：`check-hygiene-budget.py` 固定口径（>100 行方法 109 / trim 副本 11 / ≥8 参构造器 53），只许减、`--write` 拒绝上调；红态探针已验。顺带修 `complexity-report.py` 扫描根与跨行构造器计数。
+- **剩余队列**（未动）：N5 工具单源、N7 QaRequestContext、N6 还乡终版+消费者守卫、N9 域归属、N8 配置收口、N10 横切、N11 长方法/构造器实拆、N12 前端拆分。

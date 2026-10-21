@@ -233,14 +233,14 @@
   ```bash
   cd ~/ragagent && env -u SYSTEM_AES_KEY JAVA_HOME=/opt/homebrew/opt/openjdk@21 mvn -B verify
   ```
-  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（最近基数 **5046 / 失败 0 / 跳过 4**，含 agent-engine 155 条——旧口径 4867 漏算该模块）。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
+  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（最近基数 **5062 / 失败 0 / 跳过 2**，含 agent-engine 155 条——旧口径 4867 漏算该模块）。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
   **环境前置**：PG `max_connections=100`，多个 boot jar 残留会占满连接（实测 5 个实例 = 50 条 ⇒ `too many clients`）。跑闸门前先 `ps -Ao pid,command | grep '[b]oot/build/libs/boot'` 清残留。
 - **dev 数据修复（2026-10-20）**：软删守卫误拦窗口（H5b~H5b-fix 之间）里生成失败的 5 条 embed 历史回答，已按会话用 embed `ensure` 补建 `message_suggestion_sets`（状态 `suppressed/disabled`，该智能体追问关闭）；全库 embed 历史已无「缺建议集合」行。
 - 前端（触契约时）：`cd frontend && npx vue-tsc --build --force` + `npm test`。
 
 ## 7. 测试与安全网
 
-- 回归网：**~4996 用例 / 1,349 契约金片**；每一步（哪怕纯移动）结束必须全绿。
+- 回归网：**~5062 用例 / 1,349 契约金片**；每一步（哪怕纯移动）结束必须全绿。
 - 已知偶发（全量并发下，单独重跑即绿，勿误判回归）：`WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool` · `EvaluationContractTest.getTerminalRunsExecution` · `EmbedRateLimiterTest.redisPathSharesBudgetAcrossInstances`。
 - **Redis 瞬态族已修（2026-10-19）**：根因是 `EmbeddedRedis` 用 `ServerSocket(0)` 探端口在 `maxParallelForks` 下会撞——后到者借用先到者的实例，先到者 close 杀进程后连接全断。现改为固定端口池 + 跨进程 `FileLock`，红态探针 `EmbeddedRedisPortAllocationTest` 守着；全量连跑 5 遍 0 失败。再见到同类失败按真回归查。
 - 覆盖率：**未执行基线**（`-Pcoverage`）⇒ 本项目**不声称任何覆盖率数字**（开放项）。
@@ -284,12 +284,13 @@ boot           14 件                      →  boot
 | 守卫 | 语义 | 基线 |
 |---|---|---|
 | `check-package-cycles.py` | 环/分层/域依赖/SCC（R1~R9） | `package-cycles.baseline.json`（只许减；SCC 12 组） |
-| `check-domain-contracts.py` | **R10 域间只经契约**（分档①②③） | `domain-contracts.baseline.json`（**6 条边 / 51 类**；①0/②2/③5） |
+| `check-domain-contracts.py` | **R10 域间只经契约**（分档①②③） | `domain-contracts.baseline.json`（**6 条边 / 27 类**；clearable 0） |
 | `check-contract-purity.py` | C1 导入根（纯 JDK）· C2 构建依赖 · C3 框架形状 | 硬零，无基线 |
 | `check-contract-sync.py` | 金片键签名变化必须签字 | 1,349 金片 |
 | `check-json-key-case.py --strict` | 换锚棘轮 + 冻结覆盖快照 | 冻结面登记 |
 | `check-event-face-case.py` | 事件面/路由面命名口径 | — |
 | `check-file-size.py` | 大文件棘轮（>600 棘轮，≥800 须登记） | `file-size.baseline.json` |
+| `check-hygiene-budget.py` | 卫生预算计数（>100 行方法 / 通用 trim 副本 / ≥8 参构造器） | `hygiene-budget.baseline.json`（109 / 11 / 53，只许减） |
 | `check-go-anchors.py` | Go 锚点注释棘轮 | 0 |
 | `check-fe-contract-keys.py` | 前端契约键棘轮 | 只许减 |
 | `check-stray-dirs.py` | 游离/死包目录 | 0 |
@@ -556,6 +557,9 @@ boot           14 件                      →  boot
 | P1.4a | 2026-10-21 | **T4 工具装配守卫**：`check-tool-registry.py` 从 T1~T3 扩到 T4 —— 解析 `AgentEngineAssembler.buildTools` 的 switch（到 `default ->` 为止），判据用**包含关系**而非相等：`AgentToolBackends` 的每个 case 都必须被它覆盖。理由是装配 switch 还覆盖 7 个 agent-engine 内置工具（thinking / todo_write / shell_exec / read_file / 写改列沙箱），它们不在 AgentToolBackends 里；评估原文的「≡」按实测收敛为「⊇」。该 switch 的 `default` 只 `log.warn`，漏 case 的后果是运行期静默丢工具。 | 22 agenttools 实现 / 22 条分发 / 33 个常量 / 装配覆盖 29 · 红态探针：从装配 switch 删掉 `TOOL_WEB_FETCH` 的 case ⇒ T4 立即报错 · 46 守卫绿 |
 | P1.11a | 2026-10-21 | **TenantInfo 双定义合一**：`api/auth` 与 `api/tenant` 各定义一份，`id` 一处 `string` 一处 `number`（后端本就是 `Long`）⇒ `stores/auth` 只能靠 import 别名区分。合并到 `api/tenant` 作唯一真源、auth 侧 re-export；`id` 统一 `number`，六处 `id: String(x.id) \|\| ''` 的旧兜底删除；`owner_id` 顺带改 camel 并撤掉 `crossFaceKeyContract` 的 BASELINE 豁免。 | vue-tsc 通过 · 755 测试全过 · build 32s |
 | P1.11b | 2026-10-21 | **目录归位**（消除两个同名陷阱）：`views/platform` 实为登录后主布局壳（Menu + RouterView + 全局设置/命令面板/邀请铃铛/新手引导），与后端 platform 模块同名纯属巧合 ⇒ `views/layout`；`views/system` 在路由里**零引用**，12 个文件全是 `views/settings/Settings.vue` 的 tab 子组件（含 agent 域的 `SkillManagement`）⇒ `views/settings/panels`。只改目录与 import 路径，路由 URL / 菜单 / tab 顺序 / 组件逻辑全未动。顺带修 `UploadConfirmDialog.test.ts` 里用 `new URL('../../platform/index.vue')` 拼的硬编码路径（绝对路径搜索抓不到）。 | vue-tsc 通过 · 755 测试全过 · build 45s · git 全部识别为 rename（历史保留） |
+
+| P1.16 | 2026-10-21 | **文档信任收口**（第四轮评估 §6-16）：`docs/README` 与 `overview` 的 352 份 package-info → 356；`TenantFilterGuard` 删掉指向已删文档 `persistence-tenant-filtering-evaluation.md` 的悬空引用与残缺的「默认档自 起」；`knowledge/task/package-info` 重写为「Redis @Primary + InProcess 回退」，并纠正 `KnowledgeTaskIdCodec` 不在本包；`IngestStage` 注明枚举顺序非依赖顺序、MULTIMODAL 只是 OCR 借用的 span 名；`platform-shapes.baseline` 修正 GrepChunksScoring（单域 agenttools、无 Jackson）与 ImageInfoMatchUtil（platform 姊妹件复用）两条失真文案；HANDOFF 域间边读数 51→27 类。 | 47 守卫绿（含受影响守卫逐个实跑） |
+| P2.1 | 2026-10-21 | **卫生预算计数守卫（第 47 条）**：评估报告的「trim 私拷贝 39→72」实测是口径漂移（39=private-only 正则，72=放宽到全部 `String trimXxx(String)`）；为使回潮可验收，新增 `check-hygiene-budget.py` 固定三个可复现口径——>100 行方法 109、通用 trim 副本 11、≥8 参构造器 53，计数只许减，`--write` 拒绝上调。顺带修 `complexity-report.py` 的扫描根（原含已解散的 engine/common，漏 contract/platform/三 runtime，构造器只报 1 处而真实 38 处）。 | 红态探针：注入 101 行方法 ⇒ methodsOver100 109→110 立即红 · 47 守卫绿 · `mvn -B clean verify` 全绿（**5062 / 0 / 2**）· dev 后端已重启 |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
