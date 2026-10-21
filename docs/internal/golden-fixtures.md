@@ -21,12 +21,13 @@ platform/src/testFixtures/resources/golden/
 
 ## 重录
 
-1. 重跑 Go 录制程序，生成新的 JSONL / JSON；
-2. 用同一 key 规则生成 `<bundle>.json`（key 为常量名，46C 为 `group/key`）；
-3. 重新生成 `<bundle>.json.sha256`；
-4. 跑引用该 bundle 的测试与全量闸门。
+> Go 仓已冻结、录制脚本已删除（2026-10-21）。"重录"现在的含义是**按新实现同步常量**，不是重跑录制程序。
 
-禁止直接手改 JSON 或 `.sha256`。新增 bundle 时同步在 `platform/src/testFixtures/resources/golden/` 放置两个文件，并让使用方模块依赖 `testFixtures(project(":platform"))`。
+1. 从当前 Java 实现导出同一 bundle 的 JSON（key 规则不变：常量名，46C 为 `group/key`）；
+2. 重新生成 `<bundle>.json.sha256`；
+3. 跑引用该 bundle 的测试与全量闸门（`mvn -B verify`）。
+
+禁止直接手改 JSON 或 `.sha256`。新增 bundle 时同步在 `platform/src/testFixtures/resources/golden/` 放置两个文件，并让使用方模块依赖 `platform` 的 `test-jar`（Maven 侧的 `testFixtures` 等价物）。
 
 ## 类名
 

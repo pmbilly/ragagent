@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * <h2>时间格式为什么在这里重写了一遍</h2>
  * <p>格式化逻辑与 {@link ZeroTimeSerializer} 完全一致，但它是 {@code ValueSerializer}
- * 而不是工具类，且在 {@code com.ragagent.common.web} 下（不在本模块可改范围）。
+ * 而不是工具类，且在 {@code com.ragagent.platform.web} 下（不在本模块可改范围）。
  * 改动 {@code ZeroTimeSerializer} 时必须同步改这里。</p>
  */
 public final class FeishuCursorCodec {

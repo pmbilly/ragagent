@@ -17,8 +17,8 @@ package com.ragagent.datasource.domain;
  * <h2>⚠️ 放这个包是权宜，后续应提升</h2>
  * <p>它是"跨模块公用类型"（与 {@code com.ragagent.contract.tenant.TenantRole} 同类），
  * 目前只有 datasource 用它，所以先落在本模块的 {@code domain} 下。
- * 等第二个模块需要它时，应提升到 {@code com.ragagent.common.context}
- * （与 {@code TenantContext} 同级），而不是各自复制一份。</p>
+ * 等第二个模块需要它时，应提升到 {@code com.ragagent.platform.access}
+ * （与 {@code TenantContext} 同包），而不是各自复制一份。</p>
  *
  * <h2>为什么 {@code role} 是 {@code String} 而不是 {@code TenantRole} 枚举</h2>
  * <p>{@code role} 的取值就是字符串（{@code TenantRole} 的字面量）。

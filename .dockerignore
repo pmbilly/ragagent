@@ -24,8 +24,6 @@
 frontend/
 
 # 构建缓存与产物（builder stage 内会重新构建）
-**/.gradle/
-.gradle/
 **/build/
 build/
 **/target/

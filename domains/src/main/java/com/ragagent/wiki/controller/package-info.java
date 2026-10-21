@@ -3,7 +3,7 @@
  * <p><b>本包含控制器的「包私有协作类」</b>（{@code {@code WikiActivityRecorder} / {@code WikiFolderOps} / {@code WikiKbAccessGuard} / {@code WikiMaintenanceOps} / {@code WikiPageOps} / {@code WikiRequestSupport} / {@code WikiStatsOps}}）：它们是**表现层的一部分**，不是放错位置。</p>
  *
  * <p><b>判据与证据</b>（全仓核过）：controller 包里的 25 个非控制器文件 —— 21 个直接依赖
- * Web/MVC 类型（{@code org.springframework.web} / {@code jakarta.servlet} / {@code com.ragagent.common.web}）；
+ * Web/MVC 类型（{@code org.springframework.web} / {@code jakarta.servlet} / {@code com.ragagent.platform.web}）；
  * 其余 4 个虽不依赖 Web 类型，但**引用控制器自身类型**（{@code KnowledgeQaController} / {@code QaRequestBinder} /
  * {@code SessionStreamController} / {@code WikiRequestSupport}）⇒ 搬到 service 会造出
  * {@code service → controller} 的**真倒挂**✗，比原问题更糟。故一律**保持原位**✓（它们全部是

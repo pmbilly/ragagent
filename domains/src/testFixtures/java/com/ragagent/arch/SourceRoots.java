@@ -17,8 +17,8 @@ public final class SourceRoots {
 
     private SourceRoots() {}
 
-    /** 已知过期：仍是 Gradle 时代的四模块列表（common/engine 已解散）。迁移批次不动它。 */
-    private static final String[] MODULES = {"domains", "common", "engine", "boot"};
+    /** 架构测试实际扫描的模块（`common`/`engine` 已解散，从列表移除；扩面需先核过规则覆盖）。 */
+    private static final String[] MODULES = {"domains", "boot"};
 
     public static Path repoRoot() {
         Path p = Path.of("").toAbsolutePath();

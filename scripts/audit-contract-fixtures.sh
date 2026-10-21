@@ -22,7 +22,7 @@ set -uo pipefail
 
 REPO=$(cd "$(dirname "$0")/.." && pwd)
 cd "$REPO"
-FX_DIR="server/src/test/resources/contracts"
+FX_DIR="domains/src/testFixtures/resources/contracts"
 OUT=/tmp/contract-fixture-audit
 mkdir -p "$OUT"
 STASH=$(mktemp -d)
@@ -40,7 +40,9 @@ import pathlib, re, sys
 fx_dir, out = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
 fixtures = {p.name for p in fx_dir.glob('*.json')}
 literals = set()
-for p in pathlib.Path('server/src/test/java').rglob('*.java'):
+for p in list(pathlib.Path('domains/src/test/java').rglob('*.java')) + list(
+        pathlib.Path('domains/src/testFixtures/java').rglob('*.java')) + list(
+        pathlib.Path('boot/src/test/java').rglob('*.java')):
     literals.update(re.findall(r'"([^"\n]{2,80})"', p.read_text(encoding='utf-8', errors='ignore')))
 
 direct = {f for f in fixtures if f in literals or f[:-5] in literals}
@@ -65,7 +67,7 @@ done < "$OUT/candidates.txt"
 echo "已临时移出 $moved 个候选夹具，开始跑全量测试（约 3 分钟）…"
 
 export JAVA_HOME=${JAVA_HOME:-/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home}
-env -u SYSTEM_AES_KEY -u RETRIEVE_DRIVER -u SSRF_WHITELIST_EXTRA mvn -B -pl boot test > "$OUT/test.log" 2>&1
+env -u SYSTEM_AES_KEY -u RETRIEVE_DRIVER -u SSRF_WHITELIST_EXTRA mvn -B test > "$OUT/test.log" 2>&1
 rc=$?
 echo "测试退出码: ${rc}（非 0 即说明有候选被引用）"
 
@@ -75,7 +77,8 @@ import pathlib, re, sys
 out = pathlib.Path(sys.argv[1])
 candidates = [l.strip() for l in (out / 'candidates.txt').read_text(encoding='utf-8').split('\n') if l.strip()]
 blob = ''
-for p in pathlib.Path('server/build/test-results/test').glob('TEST-*.xml'):
+for p in list(pathlib.Path('boot/target/surefire-reports').glob('TEST-*.xml')) + list(
+        pathlib.Path('domains/target/surefire-reports').glob('TEST-*.xml')):
     blob += p.read_text(encoding='utf-8', errors='ignore')
 referenced = [f for f in candidates if f in blob]
 orphans = [f for f in candidates if f not in blob]
@@ -98,7 +101,7 @@ for name in orphans:
     r = subprocess.run(['bash', '-c',
         f"grep -rlw --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=build "
         f"--exclude-dir=dist '{name}' . 2>/dev/null | "
-        f"grep -vE '^./server/src/test/(resources/contracts|java)' | head -1"],
+        f"grep -vE '^./domains/src/testFixtures/(resources/contracts|java)' | head -1"],
         capture_output=True, text=True).stdout.strip()
     (keep if r else deletable).append(name if not r else f'{name}  <- {r}')
 (out / 'keep-as-evidence.txt').write_text('\n'.join(keep) + ('\n' if keep else ''), encoding='utf-8')
