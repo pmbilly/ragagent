@@ -68,29 +68,29 @@ public final class ToolCapabilities {
     private static Map<String, ToolRequirement> buildRequirements() {
         Map<String, ToolRequirement> m = new LinkedHashMap<>();
     // ── 基础/推理（无 KB 依赖，不消费文件） ──
-        m.put("thinking", ToolRequirement.NONE);
-        m.put("todo_write", ToolRequirement.NONE);
+        m.put(ToolDefinitions.TOOL_THINKING, ToolRequirement.NONE);
+        m.put(ToolDefinitions.TOOL_TODO_WRITE, ToolRequirement.NONE);
     // ── RAG / chunk 检索（需要至少一个建了 chunk 索引的 KB） ──
-        m.put("knowledge_search", ToolRequirement.chunkRetrieval());
-        m.put("grep_chunks", ToolRequirement.chunkRetrieval());
-        m.put("list_knowledge_chunks", ToolRequirement.chunkRetrieval());
-        m.put("query_knowledge_graph", ToolRequirement.chunkRetrieval());
-        m.put("get_document_info", ToolRequirement.chunkRetrieval());
-        m.put("database_query", ToolRequirement.chunkRetrieval());
+        m.put(ToolDefinitions.TOOL_KNOWLEDGE_SEARCH, ToolRequirement.chunkRetrieval());
+        m.put(ToolDefinitions.TOOL_GREP_CHUNKS, ToolRequirement.chunkRetrieval());
+        m.put(ToolDefinitions.TOOL_LIST_KNOWLEDGE_CHUNKS, ToolRequirement.chunkRetrieval());
+        m.put(ToolDefinitions.TOOL_QUERY_KNOWLEDGE_GRAPH, ToolRequirement.chunkRetrieval());
+        m.put(ToolDefinitions.TOOL_GET_DOCUMENT_INFO, ToolRequirement.chunkRetrieval());
+        m.put(ToolDefinitions.TOOL_DATABASE_QUERY, ToolRequirement.chunkRetrieval());
     // ── Wiki（操作 wiki 页面；不消费任意文件 ID） ──
-        m.put("wiki_search", ToolRequirement.wikiOnly());
-        m.put("wiki_read_page", ToolRequirement.wikiOnly());
-        m.put("wiki_read_source_doc", ToolRequirement.wikiOnly());
-        m.put("wiki_flag_issue", ToolRequirement.wikiOnly());
-        m.put("wiki_write_page", ToolRequirement.wikiOnly());
-        m.put("wiki_replace_text", ToolRequirement.wikiOnly());
-        m.put("wiki_rename_page", ToolRequirement.wikiOnly());
-        m.put("wiki_delete_page", ToolRequirement.wikiOnly());
-        m.put("wiki_read_issue", ToolRequirement.wikiOnly());
-        m.put("wiki_update_issue", ToolRequirement.wikiOnly());
+        m.put(ToolDefinitions.TOOL_WIKI_SEARCH, ToolRequirement.wikiOnly());
+        m.put(ToolDefinitions.TOOL_WIKI_READ_PAGE, ToolRequirement.wikiOnly());
+        m.put(ToolDefinitions.TOOL_WIKI_READ_SOURCE_DOC, ToolRequirement.wikiOnly());
+        m.put(ToolDefinitions.TOOL_WIKI_FLAG_ISSUE, ToolRequirement.wikiOnly());
+        m.put(ToolDefinitions.TOOL_WIKI_WRITE_PAGE, ToolRequirement.wikiOnly());
+        m.put(ToolDefinitions.TOOL_WIKI_REPLACE_TEXT, ToolRequirement.wikiOnly());
+        m.put(ToolDefinitions.TOOL_WIKI_RENAME_PAGE, ToolRequirement.wikiOnly());
+        m.put(ToolDefinitions.TOOL_WIKI_DELETE_PAGE, ToolRequirement.wikiOnly());
+        m.put(ToolDefinitions.TOOL_WIKI_READ_ISSUE, ToolRequirement.wikiOnly());
+        m.put(ToolDefinitions.TOOL_WIKI_UPDATE_ISSUE, ToolRequirement.wikiOnly());
     // ── 数据分析（读 RAG ingest 出的表格摘要/列 chunk） ──
-        m.put("data_analysis", ToolRequirement.chunkRetrieval());
-        m.put("data_schema", ToolRequirement.chunkRetrieval());
+        m.put(ToolDefinitions.TOOL_DATA_ANALYSIS, ToolRequirement.chunkRetrieval());
+        m.put(ToolDefinitions.TOOL_DATA_SCHEMA, ToolRequirement.chunkRetrieval());
         return Map.copyOf(m);
     }
 

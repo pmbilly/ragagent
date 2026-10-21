@@ -12,7 +12,7 @@
 | `:platform` | `platform` | 26 | 200 | 1 |
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 20 | 154 | 0 |
 | `:retrieval-engine` | `retrieval` | 15 | 95 | 0 |
-| `:agent-engine` | `agent` | 9 | 67 | 0 |
+| `:agent-engine` | `agent` | 9 | 66 | 0 |
 | `:domains` | `agentmanagement`、`agenttools`、`approval`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 251 | 1590 | 51 |
 | `:boot` | `(根包)`、`config` | 2 | 19 | 0 |
 

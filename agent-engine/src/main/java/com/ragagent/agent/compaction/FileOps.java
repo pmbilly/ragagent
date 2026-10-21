@@ -1,8 +1,8 @@
 package com.ragagent.agent.compaction;
 
-import com.ragagent.agent.tool.AgentToolNames;
 import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.model.ToolCall;
+import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,10 +77,10 @@ final class FileOps {
                         }
                         String fn = tc.getFunction().getName() == null ? "" : tc.getFunction().getName();
                         switch (fn) {
-                            case AgentToolNames.TOOL_WRITE_SANDBOX_FILE -> appendUnique(ops.written, path);
-                            case AgentToolNames.TOOL_EDIT_SANDBOX_FILE -> appendUnique(ops.edited, path);
-                            case AgentToolNames.TOOL_READ_FILE,
-                                 AgentToolNames.LEGACY_TOOL_READ_SANDBOX_FILE -> appendUnique(ops.read, path);
+                            case ToolDefinitions.TOOL_WRITE_SANDBOX_FILE -> appendUnique(ops.written, path);
+                            case ToolDefinitions.TOOL_EDIT_SANDBOX_FILE -> appendUnique(ops.edited, path);
+                            case ToolDefinitions.TOOL_READ_FILE,
+                                 ToolDefinitions.LEGACY_TOOL_READ_SANDBOX_FILE -> appendUnique(ops.read, path);
                             default -> {
                             }
                         }

@@ -1,6 +1,6 @@
 package com.ragagent.agent.prompt;
 
-import com.ragagent.agent.tool.AgentToolNames;
+import com.ragagent.contract.tool.ToolDefinitions;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,12 +28,12 @@ public final class GroundingPrompt {
         List<String> safeNames = names == null ? List.of() : names;
         List<String> kbTools = new ArrayList<>();
         for (String name : new String[] {
-                AgentToolNames.TOOL_KNOWLEDGE_SEARCH, AgentToolNames.TOOL_GREP_CHUNKS,
-                AgentToolNames.TOOL_LIST_KNOWLEDGE_CHUNKS, AgentToolNames.TOOL_GET_DOCUMENT_INFO,
-                AgentToolNames.TOOL_WIKI_SEARCH, AgentToolNames.TOOL_WIKI_READ_PAGE,
-                AgentToolNames.TOOL_WIKI_READ_SOURCE_DOC, AgentToolNames.TOOL_QUERY_KNOWLEDGE_GRAPH,
-                AgentToolNames.TOOL_DATA_SCHEMA, AgentToolNames.TOOL_DATA_ANALYSIS,
-                AgentToolNames.TOOL_DATABASE_QUERY
+                ToolDefinitions.TOOL_KNOWLEDGE_SEARCH, ToolDefinitions.TOOL_GREP_CHUNKS,
+                ToolDefinitions.TOOL_LIST_KNOWLEDGE_CHUNKS, ToolDefinitions.TOOL_GET_DOCUMENT_INFO,
+                ToolDefinitions.TOOL_WIKI_SEARCH, ToolDefinitions.TOOL_WIKI_READ_PAGE,
+                ToolDefinitions.TOOL_WIKI_READ_SOURCE_DOC, ToolDefinitions.TOOL_QUERY_KNOWLEDGE_GRAPH,
+                ToolDefinitions.TOOL_DATA_SCHEMA, ToolDefinitions.TOOL_DATA_ANALYSIS,
+                ToolDefinitions.TOOL_DATABASE_QUERY
         }) {
             if (safeNames.contains(name)) {
                 kbTools.add(name);
@@ -47,18 +47,18 @@ public final class GroundingPrompt {
                     + "entries are routing hints, not retrieved evidence; do not exhaust unrelated bases. "
                     + "Choose an available search or reader appropriate to the scope.\n");
         }
-        if (safeNames.contains(AgentToolNames.TOOL_WEB_SEARCH)) {
+        if (safeNames.contains(ToolDefinitions.TOOL_WEB_SEARCH)) {
             b.append("- web_search is available: use it when relevant local evidence is missing, "
                     + "insufficient, or needs external/current verification. Prefer authoritative sources and "
                     + "verify the requested version and prerequisites. Do not send private source content to "
                     + "external search.\n");
         }
-        if (safeNames.contains(AgentToolNames.TOOL_WEB_FETCH)) {
+        if (safeNames.contains(ToolDefinitions.TOOL_WEB_FETCH)) {
             b.append("- web_fetch is available: read relevant supplied or discovered URLs when "
                     + "their content is needed to support claims; a search snippet alone may omit essential "
                     + "conditions.\n");
         }
-        if (safeNames.contains(AgentToolNames.TOOL_DISCOVER_MCP_TOOLS)) {
+        if (safeNames.contains(ToolDefinitions.TOOL_DISCOVER_MCP_TOOLS)) {
             b.append("- Connected MCP services may provide relevant evidence or actions. Use the "
                     + "selected service when applicable; a service description or a discovered tool is not "
                     + "itself evidence that an action was performed.\n");

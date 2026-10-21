@@ -212,4 +212,5 @@ boot（组合根，只出不进；@Configuration 8 组合根档）
 
 - **P1.16 文档信任收口**：356 份计数两处、`TenantFilterGuard` 悬空引用与残缺文案、`knowledge/task/package-info` 重写、`IngestStage` 注释、`platform-shapes.baseline` 两条失真、HANDOFF 域间边 51→27。
 - **P2.1 卫生预算计数守卫（第 47 条）**：`check-hygiene-budget.py` 固定口径（>100 行方法 109 / trim 副本 11 / ≥8 参构造器 53），只许减、`--write` 拒绝上调；红态探针已验。顺带修 `complexity-report.py` 扫描根与跨行构造器计数。
-- **剩余队列**（未动）：N5 工具单源、N7 QaRequestContext、N6 还乡终版+消费者守卫、N9 域归属、N8 配置收口、N10 横切、N11 长方法/构造器实拆、N12 前端拆分。
+- **P1.5 工具名单一来源（N5 后端半边）**：删除 `AgentToolNames` 第二份 20 常量表；`ToolCapabilities` 20 键、`ToolPolicy` 49 键 + 4 个局部常量改引用 `ToolDefinitions`（键集前后比对一致）；守卫扩 T5（别处不得再声明已知工具名常量）与 T6（前端能力表键 ⊆ 后端工具名），各配红态探针。
+- **剩余队列**：N5 前端表生成式改造（本次只做「可少不可多」的契约锁定）、N7 QaRequestContext、N6 还乡终版+消费者守卫、N9 域归属、N8 配置收口、N10 横切、N11 长方法/构造器实拆、N12 前端拆分。

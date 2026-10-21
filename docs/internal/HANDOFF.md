@@ -291,6 +291,7 @@ boot           14 件                      →  boot
 | `check-event-face-case.py` | 事件面/路由面命名口径 | — |
 | `check-file-size.py` | 大文件棘轮（>600 棘轮，≥800 须登记） | `file-size.baseline.json` |
 | `check-hygiene-budget.py` | 卫生预算计数（>100 行方法 / 通用 trim 副本 / ≥8 参构造器） | `hygiene-budget.baseline.json`（109 / 11 / 53，只许减） |
+| `check-tool-registry.py` | 工具注册一致性（T1~T4 实现/分发/装配；T5 工具名常量只许在 ToolDefinitions；T6 前端能力表键 ⊆ 后端工具名） | 22 实现 / 22 条分发 / 33 个常量 |
 | `check-go-anchors.py` | Go 锚点注释棘轮 | 0 |
 | `check-fe-contract-keys.py` | 前端契约键棘轮 | 只许减 |
 | `check-stray-dirs.py` | 游离/死包目录 | 0 |
@@ -560,6 +561,8 @@ boot           14 件                      →  boot
 
 | P1.16 | 2026-10-21 | **文档信任收口**（第四轮评估 §6-16）：`docs/README` 与 `overview` 的 352 份 package-info → 356；`TenantFilterGuard` 删掉指向已删文档 `persistence-tenant-filtering-evaluation.md` 的悬空引用与残缺的「默认档自 起」；`knowledge/task/package-info` 重写为「Redis @Primary + InProcess 回退」，并纠正 `KnowledgeTaskIdCodec` 不在本包；`IngestStage` 注明枚举顺序非依赖顺序、MULTIMODAL 只是 OCR 借用的 span 名；`platform-shapes.baseline` 修正 GrepChunksScoring（单域 agenttools、无 Jackson）与 ImageInfoMatchUtil（platform 姊妹件复用）两条失真文案；HANDOFF 域间边读数 51→27 类。 | 47 守卫绿（含受影响守卫逐个实跑） |
 | P2.1 | 2026-10-21 | **卫生预算计数守卫（第 47 条）**：评估报告的「trim 私拷贝 39→72」实测是口径漂移（39=private-only 正则，72=放宽到全部 `String trimXxx(String)`）；为使回潮可验收，新增 `check-hygiene-budget.py` 固定三个可复现口径——>100 行方法 109、通用 trim 副本 11、≥8 参构造器 53，计数只许减，`--write` 拒绝上调。顺带修 `complexity-report.py` 的扫描根（原含已解散的 engine/common，漏 contract/platform/三 runtime，构造器只报 1 处而真实 38 处）。 | 红态探针：注入 101 行方法 ⇒ methodsOver100 109→110 立即红 · 47 守卫绿 · `mvn -B clean verify` 全绿（**5062 / 0 / 2**）· dev 后端已重启 |
+
+| P1.5 | 2026-10-21 | **工具名单一来源（N5 后端半边）**：删除 `agent-engine/.../AgentToolNames.java`（第二份 20 常量表），`FileOps`/`GroundingPrompt` 改用 `contract.tool.ToolDefinitions`；`ToolCapabilities` 的 20 个能力表键、`ToolPolicy` 的 49 个句柄策略键与 4 个局部常量全部改引用 `ToolDefinitions`（键集前后机器比对一致）。守卫扩 T5/T6：T5 除 `ToolDefinitions` 外不得再出现「`TOOL_*` 常量 = 已知工具名」的第二份清单（值比对，长文案常量不误报）；T6 前端 `tool-capabilities.ts` 的键必须是后端已声明工具名（可少不可凭空多）。IM 显示名表与前端图标表保留为**展示映射**（未命中回落原名，不参与注册）。 | 定向 35 用例绿（ModelContextRecording 30 / ToolPolicy 4 / ToolCapabilities 1）· 红态探针：注入第二份 `TOOL_KNOWLEDGE_SEARCH` 常量 ⇒ T5 红；前端加 `probe_tool` ⇒ T6 红 · 47 守卫绿 · `mvn -B clean verify` 绿（5062 / 0 / 2） |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

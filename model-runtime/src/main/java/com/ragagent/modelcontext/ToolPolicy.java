@@ -1,6 +1,7 @@
 package com.ragagent.modelcontext;
 
 import com.ragagent.contract.model.ToolCall;
+import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.platform.web.ToolJson;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -17,11 +18,6 @@ import tools.jackson.databind.node.StringNode;
  * 内建工具字段句柄策略的完整 allowlist。字段名本身刻意不够：动态 MCP 工具可能用同名而语义无关，必须保持不透明。
  */
 final class ToolPolicy {
-
-    static final String TOOL_DATABASE_QUERY = "database_query";
-    static final String TOOL_DATA_ANALYSIS = "data_analysis";
-    static final String TOOL_WIKI_READ_ISSUE = "wiki_read_issue";
-    static final String TOOL_WIKI_UPDATE_ISSUE = "wiki_update_issue";
 
     private static final Pattern ISSUE_HANDLE_SHAPE = Pattern.compile("^i[1-9][0-9]*$");
 
@@ -102,42 +98,42 @@ final class ToolPolicy {
 
     /** 字段句柄策略表（键集与每个字段逐条对应）。 */
     private static final Map<String, ToolHandlePolicy> TOOL_HANDLE_POLICIES = Map.ofEntries(
-            Map.entry("discover_mcp_tools", policy("serverId", true, true, null, null, false, null, null, false)),
-            Map.entry("call_mcp_tool", policy("toolRef", false, true, null, null, false, null, null, false)),
-            Map.entry("read_file", ToolHandlePolicy.EMPTY),
-            Map.entry("knowledge_search", policy("", false, false, keys("knowledgeBaseIds"), null, true, null, null, false)),
-            Map.entry("grep_chunks", policy("", false, false, null, null, true, null, null, false)),
-            Map.entry("list_knowledge_chunks", policy("", false, false, keys("knowledgeId", "faqId", "chunkId"), null, true, null, null, false)),
-            Map.entry("get_document_info", policy("", false, false, keys("knowledgeIds", "faqIds"), null, true, null, null, false)),
-            Map.entry("search_conversations", ToolHandlePolicy.EMPTY),
-            Map.entry("search_memory", ToolHandlePolicy.EMPTY),
-            Map.entry("query_knowledge_graph", policy("", false, false, keys("knowledgeBaseIds"), null, true, null, null, false)),
-            Map.entry(TOOL_DATABASE_QUERY, policy("", false, false, null, keys("sql"), true, null, null, false)),
-            Map.entry(TOOL_DATA_ANALYSIS, policy("", false, false, keys("knowledgeId"), keys("sql"), false, null, null, false)),
-            Map.entry("data_schema", policy("", false, false, keys("knowledgeId"), null, false, null, null, false)),
-            Map.entry("web_fetch", policy("", false, false, keys("url", "urls"), null, true, null, null, false)),
-            Map.entry("web_search", policy("", false, false, null, null, true, null, null, false)),
-            Map.entry("wiki_read_page", policy("", false, false, null, null, true, null, null, false)),
-            Map.entry("wiki_read_source_doc", policy("", false, false, keys("knowledgeId"), null, true, null, null, false)),
-            Map.entry("wiki_write_page", policy("", false, false, keys("sourceRefs"), null, false, null, null, false)),
-            Map.entry("wiki_replace_text", policy("", false, false, keys("sourceRefs"), null, false, null, null, false)),
-            Map.entry("wiki_flag_issue", policy("", false, false, keys("suspectedKnowledgeIds"), null, false, null, null, false)),
-            Map.entry("wiki_search", policy("", false, false, keys("knowledgeBaseId"), null, true, null, null, false)),
-            Map.entry(TOOL_WIKI_READ_ISSUE, policy("", false, false, null, null, true, keys("issueId"), keys("id"), true)),
-            Map.entry(TOOL_WIKI_UPDATE_ISSUE, policy("", false, false, null, null, false, keys("issueId"), null, true)),
-            Map.entry("wiki_rename_page", policy("", false, false, null, null, true, null, null, false)),
-            Map.entry("wiki_delete_page", policy("", false, false, null, null, true, null, null, false)),
-            Map.entry("thinking", ToolHandlePolicy.EMPTY),
-            Map.entry("todo_write", ToolHandlePolicy.EMPTY),
-            Map.entry("read_skill", ToolHandlePolicy.EMPTY),
-            Map.entry("execute_skill_script", ToolHandlePolicy.EMPTY),
-            Map.entry("shell_exec", ToolHandlePolicy.EMPTY),
-            Map.entry("list_sandbox_files", ToolHandlePolicy.EMPTY),
-            Map.entry("read_sandbox_file", ToolHandlePolicy.EMPTY),
-            Map.entry("write_sandbox_file", ToolHandlePolicy.EMPTY),
-            Map.entry("edit_sandbox_file", ToolHandlePolicy.EMPTY),
-            Map.entry("write_skill_file", ToolHandlePolicy.EMPTY),
-            Map.entry("edit_skill_file", ToolHandlePolicy.EMPTY));
+            Map.entry(ToolDefinitions.TOOL_DISCOVER_MCP_TOOLS, policy("serverId", true, true, null, null, false, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_CALL_MCP_TOOL, policy("toolRef", false, true, null, null, false, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_READ_FILE, ToolHandlePolicy.EMPTY),
+            Map.entry(ToolDefinitions.TOOL_KNOWLEDGE_SEARCH, policy("", false, false, keys("knowledgeBaseIds"), null, true, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_GREP_CHUNKS, policy("", false, false, null, null, true, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_LIST_KNOWLEDGE_CHUNKS, policy("", false, false, keys("knowledgeId", "faqId", "chunkId"), null, true, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_GET_DOCUMENT_INFO, policy("", false, false, keys("knowledgeIds", "faqIds"), null, true, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_SEARCH_CONVERSATIONS, ToolHandlePolicy.EMPTY),
+            Map.entry(ToolDefinitions.TOOL_SEARCH_MEMORY, ToolHandlePolicy.EMPTY),
+            Map.entry(ToolDefinitions.TOOL_QUERY_KNOWLEDGE_GRAPH, policy("", false, false, keys("knowledgeBaseIds"), null, true, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_DATABASE_QUERY, policy("", false, false, null, keys("sql"), true, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_DATA_ANALYSIS, policy("", false, false, keys("knowledgeId"), keys("sql"), false, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_DATA_SCHEMA, policy("", false, false, keys("knowledgeId"), null, false, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_WEB_FETCH, policy("", false, false, keys("url", "urls"), null, true, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_WEB_SEARCH, policy("", false, false, null, null, true, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_WIKI_READ_PAGE, policy("", false, false, null, null, true, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_WIKI_READ_SOURCE_DOC, policy("", false, false, keys("knowledgeId"), null, true, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_WIKI_WRITE_PAGE, policy("", false, false, keys("sourceRefs"), null, false, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_WIKI_REPLACE_TEXT, policy("", false, false, keys("sourceRefs"), null, false, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_WIKI_FLAG_ISSUE, policy("", false, false, keys("suspectedKnowledgeIds"), null, false, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_WIKI_SEARCH, policy("", false, false, keys("knowledgeBaseId"), null, true, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_WIKI_READ_ISSUE, policy("", false, false, null, null, true, keys("issueId"), keys("id"), true)),
+            Map.entry(ToolDefinitions.TOOL_WIKI_UPDATE_ISSUE, policy("", false, false, null, null, false, keys("issueId"), null, true)),
+            Map.entry(ToolDefinitions.TOOL_WIKI_RENAME_PAGE, policy("", false, false, null, null, true, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_WIKI_DELETE_PAGE, policy("", false, false, null, null, true, null, null, false)),
+            Map.entry(ToolDefinitions.TOOL_THINKING, ToolHandlePolicy.EMPTY),
+            Map.entry(ToolDefinitions.TOOL_TODO_WRITE, ToolHandlePolicy.EMPTY),
+            Map.entry(ToolDefinitions.LEGACY_TOOL_READ_SKILL, ToolHandlePolicy.EMPTY),
+            Map.entry(ToolDefinitions.LEGACY_TOOL_EXECUTE_SKILL_SCRIPT, ToolHandlePolicy.EMPTY),
+            Map.entry(ToolDefinitions.TOOL_SHELL_EXEC, ToolHandlePolicy.EMPTY),
+            Map.entry(ToolDefinitions.TOOL_LIST_SANDBOX_FILES, ToolHandlePolicy.EMPTY),
+            Map.entry(ToolDefinitions.LEGACY_TOOL_READ_SANDBOX_FILE, ToolHandlePolicy.EMPTY),
+            Map.entry(ToolDefinitions.TOOL_WRITE_SANDBOX_FILE, ToolHandlePolicy.EMPTY),
+            Map.entry(ToolDefinitions.TOOL_EDIT_SANDBOX_FILE, ToolHandlePolicy.EMPTY),
+            Map.entry(ToolDefinitions.TOOL_WRITE_SKILL_FILE, ToolHandlePolicy.EMPTY),
+            Map.entry(ToolDefinitions.TOOL_EDIT_SKILL_FILE, ToolHandlePolicy.EMPTY));
 
     /** 该工具是否有显式 model-handle 策略。 */
     static boolean hasToolPolicy(String toolName) {
