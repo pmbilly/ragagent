@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.platform.persistence.JsonbRawStringTypeHandler;
 import java.time.OffsetDateTime;
 
 /**
@@ -22,8 +21,9 @@ import java.time.OffsetDateTime;
  *   <li><b>软删除</b>：显式 {@code deleted_at IS NULL}（不用 @TableLogic）。</li>
  *   <li><b>唯一索引</b> idx_im_channels_bot_identity（部分索引，deleted_at IS NULL AND
  *       bot_identity != ''）——迁移为准；应用层靠 checkDuplicateBot 先查（409 文案）。</li>
- *   <li><b>credentials 是 jsonb</b>：raw 文本直通；落库保留请求原文键序
- *       （真 PG 上由 jsonb 列的规范化统一两侧，读写方依赖该列行为）。</li>
+ *   <li><b>credentials 是 jsonb 且落库加密</b>：{@link ImCredentialsTypeHandler} 写前包成
+ *       {@code {"enc":"enc:v1:..."}}（列必须是合法 JSON），读取时解密回原文；
+ *       历史明文行宽容读取，下次写回自动转密文。</li>
  * </ol>
  */
 @TableName(value = "im_channels", autoResultMap = true)
@@ -52,7 +52,7 @@ public class ImChannelEntity {
 
     private String sessionMode;
 
-    @TableField(value = "credentials", typeHandler = JsonbRawStringTypeHandler.class)
+    @TableField(value = "credentials", typeHandler = ImCredentialsTypeHandler.class)
     private String credentials;
 
     private OffsetDateTime createdAt;

@@ -2,36 +2,51 @@ package com.ragagent.im.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ragagent.im.domain.ImChannelEntity;
+import com.ragagent.im.domain.ImCredentialsTypeHandler;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.ResultMap;
+import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 /**
  * im_channels 仓储（列集见 migrations 000021/000023/000024/000028）。
+ *
+ * <p><b>读路径必须显式 resultMap</b>：自定义 {@code @Select} 不读 {@code @TableField} 的
+ * typeHandler（那是 MyBatis-Plus 给内置方法生成的），不声明就会把 credentials 的
+ * {@code {"enc":...}} 密文原样吐给上层。故在读方法上统一引用 {@code imChannelMap}。</p>
  */
 public interface ImChannelMapper extends BaseMapper<ImChannelEntity> {
 
     /** 按 id + 租户取一行（update/toggle 用）。 */
     @Select("SELECT * FROM im_channels WHERE id = #{id} AND tenant_id = #{tenantId} "
             + "AND deleted_at IS NULL")
+    @Results(id = "imChannelMap", value = {
+            @Result(column = "credentials", property = "credentials",
+                    typeHandler = ImCredentialsTypeHandler.class)
+    })
     ImChannelEntity getByIdAndTenant(@Param("id") String id, @Param("tenantId") long tenantId);
 
     /** 按 id 取一行（回调面用）：无租户过滤。 */
     @Select("SELECT * FROM im_channels WHERE id = #{id} AND deleted_at IS NULL")
+    @ResultMap("imChannelMap")
     ImChannelEntity getById(@Param("id") String id);
 
     /** LoadAndStartChannels 的启动读取（enabled 且未软删）。 */
     @Select("SELECT * FROM im_channels WHERE enabled = TRUE AND deleted_at IS NULL")
+    @ResultMap("imChannelMap")
     java.util.List<ImChannelEntity> listEnabled();
 
     /** 按 agent 列出，created_at DESC。 */
     @Select("SELECT * FROM im_channels WHERE agent_id = #{agentId} AND tenant_id = #{tenantId} "
             + "AND deleted_at IS NULL ORDER BY created_at DESC")
+    @ResultMap("imChannelMap")
     List<ImChannelEntity> listByAgent(@Param("agentId") String agentId,
             @Param("tenantId") long tenantId);
 
@@ -65,6 +80,7 @@ public interface ImChannelMapper extends BaseMapper<ImChannelEntity> {
             + "AND deleted_at IS NULL "
             + "<if test=\"excludeId != null and excludeId != ''\">AND id != #{excludeId}</if> "
             + "LIMIT 1</script>")
+    @ResultMap("imChannelMap")
     ImChannelEntity findByBotIdentity(@Param("botIdentity") String botIdentity,
             @Param("excludeId") String excludeId);
 
@@ -74,7 +90,7 @@ public interface ImChannelMapper extends BaseMapper<ImChannelEntity> {
             + "created_at, updated_at) VALUES "
             + "(#{e.id}, #{e.tenantId}, #{e.agentId}, #{e.platform}, #{e.name}, #{e.enabled}, "
             + "#{e.mode}, #{e.outputMode}, #{e.knowledgeBaseId}, #{e.botIdentity}, #{e.sessionMode}, "
-            + "#{e.credentials,typeHandler=com.ragagent.platform.persistence.JsonbRawStringTypeHandler}, "
+            + "#{e.credentials,typeHandler=com.ragagent.im.domain.ImCredentialsTypeHandler}, "
             + "#{e.createdAt}, #{e.updatedAt})")
     void insertChannel(@Param("e") ImChannelEntity e);
 
@@ -83,7 +99,7 @@ public interface ImChannelMapper extends BaseMapper<ImChannelEntity> {
             + "name = #{e.name}, enabled = #{e.enabled}, mode = #{e.mode}, "
             + "output_mode = #{e.outputMode}, knowledge_base_id = #{e.knowledgeBaseId}, "
             + "bot_identity = #{e.botIdentity}, session_mode = #{e.sessionMode}, "
-            + "credentials = #{e.credentials,typeHandler=com.ragagent.platform.persistence.JsonbRawStringTypeHandler}, "
+            + "credentials = #{e.credentials,typeHandler=com.ragagent.im.domain.ImCredentialsTypeHandler}, "
             + "updated_at = #{e.updatedAt} "
             + "WHERE id = #{e.id} AND deleted_at IS NULL")
     int saveChannel(@Param("e") ImChannelEntity e);
