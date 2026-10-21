@@ -395,6 +395,13 @@
           </execution>
         </executions>
       </plugin>
+      <!-- Javadoc 引用校验：在所有子模块的 verify 阶段执行（配置与 executions 在 pluginManagement）。
+           根模块 packaging=pom 时插件自动跳过（实测 "Skipping ... report goal"），
+           所以模块 pom 不再各自声明一份。 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
     </plugins>
   </build>
 

@@ -40,7 +40,10 @@ import org.springframework.test.web.servlet.MvcResult;
  * 不比：Java 实现直接落 failed 终态并释放 running key，而录制侧的中间态 running
  * 会持续数分钟（约定 §9 已记录的中间态差异），该文件仅作存档。</p>
  */
-@SpringBootTest
+// 独立上下文：本类播种 FAQ 数据并读存储快照，与别的 @SpringBootTest 共享上下文时，
+// 曾因 StorageRuntimeEnv 的静态快照被前一个测试改写而失败（Gradle 4 分叉掩盖、Maven 分叉数不同即复现）。
+// 下面这个属性只参与 Spring 上下文缓存键，不改任何行为 —— 强制本类持有自己的上下文。
+@SpringBootTest(properties = "ragagent.test.context=faq-import")
 @AutoConfigureMockMvc
 class FaqContractTest {
 

@@ -90,8 +90,8 @@
 ## 6. 问题清单（分级汇总）
 
 **P0（2）**
-1. 凭据加密两处明文：IM credentials（TypeHandler 模式现成，仿 McpSecretTypeHandler）+ tenants KV 三键（需拍板：加密迁移 or 降只读兼容）（§4.3）
-2. 上手路径断链：两文档补「配模型 key」步骤 + builtin_models.yaml 样例转正（10 分钟级，四轮未修）（§4.3）
+1. 凭据加密两处明文：IM credentials（TypeHandler 模式现成，仿 McpSecretTypeHandler）+ tenants KV 三键（需拍板：加密迁移 or 降只读兼容）（§4.3）——✅ 2026-10-21（N2/N3：jsonb 内嵌密文 + 逐字段加密；**写时加密、读兼容历史明文**，存量行在下次保存时转密文）
+2. 上手路径断链：两文档补「配模型 key」步骤 + builtin_models.yaml 样例转正（10 分钟级，四轮未修）（§4.3）——✅ 2026-10-21（N1）
 
 **P1（结构，10）**
 3. SSE 前端收尾：NORMAL 路径 error 分支 + message.error + stopStream 主动收束 + 超时兜底 + 红态测试（§2.3）
@@ -110,7 +110,7 @@
 14. KnowledgeProcessWorker 20 参参数对象化；IM 域 ImTurnOrchestrator 15 参同类
 15. 插件词汇机械收尾：`PipelineState chatManage` 68 处参数名改名 + TurnInputView 过时注释
 16. 文档信任三连+两处失真：ci.yml 32→45、overview 352→356、TenantFilterGuard 悬空引用；knowledge/task/package-info 重写；platform-shapes baseline 3 处文案修正 + package-info OR 判据澄清；MULTIMODAL 错序 1 行
-17. Maven 债：javadoc 配置上移根 pom、jacoco 聚合、FaqContractTest 上下文隔离
+17. Maven 债：javadoc 配置上移根 pom、jacoco 聚合、FaqContractTest 上下文隔离 ——✅ 2026-10-21（N4 已清零，见 HANDOFF §12）
 18. 批次代号新残留 7 处+叙事 15 处清洗；G9 前端巨石独立立项（首刀 WikiBrowser，仓内范式现成）
 
 ## 7. 目标架构方案
