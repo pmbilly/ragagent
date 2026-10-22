@@ -10,6 +10,8 @@
   <img alt="License" src="https://img.shields.io/badge/License-MIT-blue">
 </p>
 
+[GitHub](https://github.com/pmbilly/ragagent) · [文档](https://github.com/pmbilly/ragagent/tree/main/docs) · [Issues](https://github.com/pmbilly/ragagent/issues)
+
 ---
 
 ## 目录

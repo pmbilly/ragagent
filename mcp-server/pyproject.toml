@@ -9,10 +9,10 @@ description = "RagAgent MCP Server - Model Context Protocol server for RagAgent 
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
-    {name = "RagAgent Team"}
+    {name = "RagAgent Team", email = "cnbilly@qq.com"}
 ]
 maintainers = [
-    {name = "RagAgent Team"}
+    {name = "RagAgent Team", email = "cnbilly@qq.com"}
 ]
 keywords = ["mcp", "model-context-protocol", "ragagent", "knowledge-management", "api-server"]
 classifiers = [
@@ -51,6 +51,11 @@ test = [
 ]
 
 [project.urls]
+Homepage = "https://github.com/pmbilly/ragagent"
+Documentation = "https://github.com/pmbilly/ragagent/tree/main/docs"
+Repository = "https://github.com/pmbilly/ragagent/tree/main/mcp-server"
+"Bug Reports" = "https://github.com/pmbilly/ragagent/issues"
+Changelog = "https://github.com/pmbilly/ragagent/blob/main/mcp-server/CHANGELOG.md"
 Upstream = "https://github.com/Tencent/WeKnora"
 
 [project.scripts]

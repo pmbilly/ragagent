@@ -35,10 +35,11 @@ setup(
     name="ragagent-mcp",
     version="1.1.1",
     author="RagAgent Team",
+    author_email="cnbilly@qq.com",
     description="RagAgent MCP Server - Model Context Protocol server for RagAgent API",
     long_description=read_readme(),
     long_description_content_type="text/markdown",
-    url="https://github.com/Tencent/WeKnora",
+    url="https://github.com/pmbilly/ragagent",
     py_modules=["ragagent_mcp_server", "upload_paths", "main", "run_server", "run", "test_module"],
     classifiers=[
         "Development Status :: 4 - Beta",
