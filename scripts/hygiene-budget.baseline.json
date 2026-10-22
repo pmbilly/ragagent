@@ -2,7 +2,7 @@
   "note": "卫生预算计数基线：只许减；--write 只收紧，不上调。口径见 scripts/check-hygiene-budget.py。",
   "metrics": {
     "ctorsOver8": 53,
-    "methodsOver100": 108,
+    "methodsOver100": 107,
     "trimCopies": 11
   }
 }

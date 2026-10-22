@@ -84,25 +84,7 @@ final class KnowledgeSearchOutputFormatter {
     /** 工具输出渲染。 */
     ToolResult formatOutput(List<ResultWithMeta> results, List<String> kbsToSearch, List<String> queries) {
         if (results.isEmpty()) {
-            Map<String, Object> data = new LinkedHashMap<>();
-            data.put("knowledgeBaseIds", kbsToSearch);
-            data.put("results", List.of());
-            data.put("count", 0);
-            if (!queries.isEmpty()) {
-                data.put("queries", queries);
-            }
-            String output = String.format(Locale.ROOT,
-                    "No relevant content found in %d knowledge base(s).\n\n", kbsToSearch.size())
-                    + "=== ⚠️ CRITICAL - Next Steps ===\n"
-                    + "- ❌ DO NOT use training data or general knowledge to answer\n"
-                    + "- ✅ If web_search is enabled: You MUST use web_search to find information\n"
-                    + "- ✅ If web_search is disabled: State 'I couldn't find relevant information in the knowledge base'\n"
-                    + "- NEVER fabricate or infer answers - ONLY use retrieved content\n";
-            ToolResult r = new ToolResult();
-            r.setSuccess(true);
-            r.setOutput(output);
-            r.setData(data);
-            return r;
+            return emptyResult(kbsToSearch, queries);
         }
 
         Map<String, Integer> kbCounts = new LinkedHashMap<>();
@@ -125,154 +107,19 @@ final class KnowledgeSearchOutputFormatter {
 
         for (int i = 0; i < results.size(); i++) {
             ResultWithMeta result = results.get(i);
-            FaqChunkMetadata faqMeta = null;
-            if (KnowledgeSearchTool.KB_TYPE_FAQ.equals(result.knowledgeBaseType)) {
-                faqMeta = getFAQMetadata(nz(result.sr.id), faqMetadataCache);
-            }
+            FaqChunkMetadata faqMeta = KnowledgeSearchTool.KB_TYPE_FAQ.equals(result.knowledgeBaseType)
+                    ? getFAQMetadata(nz(result.sr.id), faqMetadataCache) : null;
 
             knowledgeChunkMap.computeIfAbsent(nz(result.sr.knowledgeId), k -> new LinkedHashSet<>())
                     .add(result.sr.chunkIndex);
             knowledgeTitleMap.put(nz(result.sr.knowledgeId), nz(result.sr.knowledgeTitle));
-
-            if (!knowledgeTotalMap.containsKey(nz(result.sr.knowledgeId))) {
-                long effectiveTenantID = tool.searchTargets == null ? 0
-                        : tool.searchTargets.getTenantIdForKb(nz(result.sr.knowledgeBaseId));
-                if (effectiveTenantID == 0) {
-                    knowledgeTotalMap.put(nz(result.sr.knowledgeId), 0L);
-                } else {
-                    long total;
-                    try {
-                        total = tool.chunkBackend.totalChunks(effectiveTenantID, nz(result.sr.knowledgeId));
-                    } catch (RuntimeException e) {
-                        total = 0;
-                    }
-                    knowledgeTotalMap.put(nz(result.sr.knowledgeId), total);
-                }
-            }
+            knowledgeTotalMap.computeIfAbsent(nz(result.sr.knowledgeId),
+                    k -> totalChunksFor(result));
 
             boolean seen = !tool.seenChunks.add(nz(result.sr.id));
-            boolean isFAQ = faqMeta != null;
-
             String sourceQuery = nz(result.sourceQuery);
-            if (seen) {
-                if (isFAQ) {
-                    ob.append(String.format(Locale.ROOT,
-                            "<faq rank=\"%d\" faqId=\"%s\" index=\"%d\" knowledgeBaseId=\"%s\" knowledgeTitle=\"%s\" score=\"%.3f\" sourceQuery=\"%s\" already_seen=\"true\">\n",
-                            i + 1, FaqSnippet.xmlEscape(nz(result.sr.id)), result.sr.chunkIndex,
-                            FaqSnippet.xmlEscape(nz(result.sr.knowledgeBaseId)),
-                            FaqSnippet.xmlEscape(nz(result.sr.knowledgeTitle)),
-                            result.sr.score, FaqSnippet.xmlEscape(sourceQuery)));
-                } else {
-                    ob.append(String.format(Locale.ROOT,
-                            "<chunk rank=\"%d\" chunkId=\"%s\" chunkIndex=\"%d\" knowledgeId=\"%s\" knowledgeBaseId=\"%s\" knowledgeTitle=\"%s\" score=\"%.3f\" sourceQuery=\"%s\" already_seen=\"true\">\n",
-                            i + 1, FaqSnippet.xmlEscape(nz(result.sr.id)), result.sr.chunkIndex,
-                            FaqSnippet.xmlEscape(nz(result.sr.knowledgeId)),
-                            FaqSnippet.xmlEscape(nz(result.sr.knowledgeBaseId)),
-                            FaqSnippet.xmlEscape(nz(result.sr.knowledgeTitle)),
-                            result.sr.score, FaqSnippet.xmlEscape(sourceQuery)));
-                }
-                ob.append("<note>(content omitted, already returned in a previous knowledge_search call this session)</note>\n");
-                ob.append(isFAQ ? "</faq>\n" : "</chunk>\n");
-            } else {
-                if (isFAQ) {
-                    ob.append(String.format(Locale.ROOT,
-                            "<faq rank=\"%d\" faqId=\"%s\" index=\"%d\" knowledgeBaseId=\"%s\" knowledgeTitle=\"%s\" score=\"%.3f\" sourceQuery=\"%s\">\n",
-                            i + 1, FaqSnippet.xmlEscape(nz(result.sr.id)), result.sr.chunkIndex,
-                            FaqSnippet.xmlEscape(nz(result.sr.knowledgeBaseId)),
-                            FaqSnippet.xmlEscape(nz(result.sr.knowledgeTitle)),
-                            result.sr.score, FaqSnippet.xmlEscape(sourceQuery)));
-                } else {
-                    ob.append(String.format(Locale.ROOT,
-                            "<chunk rank=\"%d\" chunkId=\"%s\" chunkIndex=\"%d\" knowledgeId=\"%s\" knowledgeBaseId=\"%s\" knowledgeTitle=\"%s\" score=\"%.3f\" sourceQuery=\"%s\">\n",
-                            i + 1, FaqSnippet.xmlEscape(nz(result.sr.id)), result.sr.chunkIndex,
-                            FaqSnippet.xmlEscape(nz(result.sr.knowledgeId)),
-                            FaqSnippet.xmlEscape(nz(result.sr.knowledgeBaseId)),
-                            FaqSnippet.xmlEscape(nz(result.sr.knowledgeTitle)),
-                            result.sr.score, FaqSnippet.xmlEscape(sourceQuery)));
-                }
-                String snippet = "";
-                if (faqMeta != null) {
-                    snippet = FaqSnippet.faqMatchSnippetFromQueries(faqMeta, queries);
-                }
-                if (snippet.isEmpty()) {
-                    snippet = extractSnippetForQueries(nz(result.sr.content), queries);
-                }
-                if (!snippet.isEmpty()) {
-                    ob.append(String.format(Locale.ROOT, "<matchSnippet>%s</matchSnippet>\n",
-                            FaqSnippet.xmlEscape(snippet)));
-                }
-                // content 原样输出，不做 xmlEscape（输出契约）。
-                ob.append(String.format(Locale.ROOT, "<content>%s</content>\n", nz(result.sr.content)));
-
-                if (!nz(result.sr.imageInfo).isEmpty()) {
-                    List<ImageInfoRow> imageInfos = parseImageInfoList(result.sr.imageInfo);
-                    for (ImageInfoRow img : imageInfos) {
-                        String md = DocChunkSupport.buildImageInfoMarkdownWithURL(img.url(), img);
-                        if (!md.isEmpty()) {
-                            ob.append(md).append('\n');
-                        }
-                    }
-                }
-
-                if (isFAQ) {
-                    FaqSnippet.writeFaqFieldsXml(ob, faqMeta);
-                    ob.append("</faq>\n");
-                } else {
-                    ob.append("</chunk>\n");
-                }
-            }
-
-            Map<String, Object> formatted = new LinkedHashMap<>();
-            formatted.put("resultIndex", i + 1);
-            formatted.put("content", nz(result.sr.content));
-            formatted.put("knowledgeId", nz(result.sr.knowledgeId));
-            formatted.put("knowledgeBaseId", nz(result.sr.knowledgeBaseId));
-            formatted.put("knowledgeTitle", nz(result.sr.knowledgeTitle));
-            formatted.put("knowledgeMetadata", nz(result.sr.knowledgeCustomMetadata));
-            formatted.put("matchType", result.sr.matchType);
-            formatted.put("sourceQuery", sourceQuery);
-            formatted.put("queryType", nz(result.queryType));
-            formatted.put("knowledgeBaseType", nz(result.knowledgeBaseType));
-            formattedResults.add(formatted);
-
-            Map<String, Object> last = formatted;
-
-            if (!nz(result.sr.imageInfo).isEmpty()) {
-                List<Map<String, String>> imageList = new ArrayList<>();
-                for (ImageInfoRow img : parseImageInfoList(result.sr.imageInfo)) {
-                    Map<String, String> imgData = new LinkedHashMap<>();
-                    if (!nz(img.url()).isEmpty()) {
-                        imgData.put("url", img.url());
-                    }
-                    if (!nz(img.caption()).isEmpty()) {
-                        imgData.put("caption", img.caption());
-                    }
-                    if (!nz(img.ocrText()).isEmpty()) {
-                        imgData.put("ocrText", img.ocrText());
-                    }
-                    if (!imgData.isEmpty()) {
-                        imageList.add(imgData);
-                    }
-                }
-                if (!imageList.isEmpty()) {
-                    last.put("images", imageList);
-                }
-            }
-
-            if (faqMeta != null) {
-                last.put("faqId", nz(result.sr.id));
-                last.put("index", result.sr.chunkIndex);
-                if (!nz(faqMeta.standardQuestion).isEmpty()) {
-                    last.put("faqStandardQuestion", faqMeta.standardQuestion);
-                }
-                FaqSnippet.appendSimilarQuestionsToChunkData(last, faqMeta.similarQuestions);
-                if (faqMeta.answers != null && !faqMeta.answers.isEmpty()) {
-                    last.put("faqAnswers", faqMeta.answers);
-                }
-            } else {
-                last.put("chunkId", nz(result.sr.id));
-                last.put("chunkIndex", result.sr.chunkIndex);
-            }
+            appendResultXml(ob, i, result, faqMeta, queries, seen, sourceQuery);
+            formattedResults.add(formattedResult(i, result, faqMeta, sourceQuery));
         }
 
         ob.append("<retrievalStatistics>\n");
@@ -308,6 +155,169 @@ final class KnowledgeSearchOutputFormatter {
         r.setOutput(ob.toString());
         r.setData(data);
         return r;
+    }
+
+
+    /** 空结果：固定文案 + 空 data。 */
+    private ToolResult emptyResult(List<String> kbsToSearch, List<String> queries) {
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("knowledgeBaseIds", kbsToSearch);
+        data.put("results", List.of());
+        data.put("count", 0);
+        if (!queries.isEmpty()) {
+            data.put("queries", queries);
+        }
+        String output = String.format(Locale.ROOT,
+                "No relevant content found in %d knowledge base(s).\n\n", kbsToSearch.size())
+                + "=== ⚠️ CRITICAL - Next Steps ===\n"
+                + "- ❌ DO NOT use training data or general knowledge to answer\n"
+                + "- ✅ If web_search is enabled: You MUST use web_search to find information\n"
+                + "- ✅ If web_search is disabled: State 'I couldn't find relevant information in the knowledge base'\n"
+                + "- NEVER fabricate or infer answers - ONLY use retrieved content\n";
+        ToolResult r = new ToolResult();
+        r.setSuccess(true);
+        r.setOutput(output);
+        r.setData(data);
+        return r;
+    }
+
+    /** 单条结果的 XML 片段（已见 / 新命中两条路径）。 */
+    private void appendResultXml(StringBuilder ob, int i, ResultWithMeta result,
+                                 FaqChunkMetadata faqMeta, List<String> queries,
+                                 boolean seen, String sourceQuery) {
+        boolean isFAQ = faqMeta != null;
+        if (seen) {
+            if (isFAQ) {
+                ob.append(String.format(Locale.ROOT,
+                        "<faq rank=\"%d\" faqId=\"%s\" index=\"%d\" knowledgeBaseId=\"%s\" knowledgeTitle=\"%s\" score=\"%.3f\" sourceQuery=\"%s\" already_seen=\"true\">\n",
+                        i + 1, FaqSnippet.xmlEscape(nz(result.sr.id)), result.sr.chunkIndex,
+                        FaqSnippet.xmlEscape(nz(result.sr.knowledgeBaseId)),
+                        FaqSnippet.xmlEscape(nz(result.sr.knowledgeTitle)),
+                        result.sr.score, FaqSnippet.xmlEscape(sourceQuery)));
+            } else {
+                ob.append(String.format(Locale.ROOT,
+                        "<chunk rank=\"%d\" chunkId=\"%s\" chunkIndex=\"%d\" knowledgeId=\"%s\" knowledgeBaseId=\"%s\" knowledgeTitle=\"%s\" score=\"%.3f\" sourceQuery=\"%s\" already_seen=\"true\">\n",
+                        i + 1, FaqSnippet.xmlEscape(nz(result.sr.id)), result.sr.chunkIndex,
+                        FaqSnippet.xmlEscape(nz(result.sr.knowledgeId)),
+                        FaqSnippet.xmlEscape(nz(result.sr.knowledgeBaseId)),
+                        FaqSnippet.xmlEscape(nz(result.sr.knowledgeTitle)),
+                        result.sr.score, FaqSnippet.xmlEscape(sourceQuery)));
+            }
+            ob.append("<note>(content omitted, already returned in a previous knowledge_search call this session)</note>\n");
+            ob.append(isFAQ ? "</faq>\n" : "</chunk>\n");
+            return;
+        }
+        if (isFAQ) {
+            ob.append(String.format(Locale.ROOT,
+                    "<faq rank=\"%d\" faqId=\"%s\" index=\"%d\" knowledgeBaseId=\"%s\" knowledgeTitle=\"%s\" score=\"%.3f\" sourceQuery=\"%s\">\n",
+                    i + 1, FaqSnippet.xmlEscape(nz(result.sr.id)), result.sr.chunkIndex,
+                    FaqSnippet.xmlEscape(nz(result.sr.knowledgeBaseId)),
+                    FaqSnippet.xmlEscape(nz(result.sr.knowledgeTitle)),
+                    result.sr.score, FaqSnippet.xmlEscape(sourceQuery)));
+        } else {
+            ob.append(String.format(Locale.ROOT,
+                    "<chunk rank=\"%d\" chunkId=\"%s\" chunkIndex=\"%d\" knowledgeId=\"%s\" knowledgeBaseId=\"%s\" knowledgeTitle=\"%s\" score=\"%.3f\" sourceQuery=\"%s\">\n",
+                    i + 1, FaqSnippet.xmlEscape(nz(result.sr.id)), result.sr.chunkIndex,
+                    FaqSnippet.xmlEscape(nz(result.sr.knowledgeId)),
+                    FaqSnippet.xmlEscape(nz(result.sr.knowledgeBaseId)),
+                    FaqSnippet.xmlEscape(nz(result.sr.knowledgeTitle)),
+                    result.sr.score, FaqSnippet.xmlEscape(sourceQuery)));
+        }
+        String snippet = "";
+        if (faqMeta != null) {
+            snippet = FaqSnippet.faqMatchSnippetFromQueries(faqMeta, queries);
+        }
+        if (snippet.isEmpty()) {
+            snippet = extractSnippetForQueries(nz(result.sr.content), queries);
+        }
+        if (!snippet.isEmpty()) {
+            ob.append(String.format(Locale.ROOT, "<matchSnippet>%s</matchSnippet>\n",
+                    FaqSnippet.xmlEscape(snippet)));
+        }
+        // content 原样输出，不做 xmlEscape（输出契约）。
+        ob.append(String.format(Locale.ROOT, "<content>%s</content>\n", nz(result.sr.content)));
+
+        if (!nz(result.sr.imageInfo).isEmpty()) {
+            for (ImageInfoRow img : parseImageInfoList(result.sr.imageInfo)) {
+                String md = DocChunkSupport.buildImageInfoMarkdownWithURL(img.url(), img);
+                if (!md.isEmpty()) {
+                    ob.append(md).append('\n');
+                }
+            }
+        }
+        if (isFAQ) {
+            FaqSnippet.writeFaqFieldsXml(ob, faqMeta);
+            ob.append("</faq>\n");
+        } else {
+            ob.append("</chunk>\n");
+        }
+    }
+
+    /** 单条结果的结构化 data 条目。 */
+    private Map<String, Object> formattedResult(int i, ResultWithMeta result,
+                                                FaqChunkMetadata faqMeta, String sourceQuery) {
+        Map<String, Object> formatted = new LinkedHashMap<>();
+        formatted.put("resultIndex", i + 1);
+        formatted.put("content", nz(result.sr.content));
+        formatted.put("knowledgeId", nz(result.sr.knowledgeId));
+        formatted.put("knowledgeBaseId", nz(result.sr.knowledgeBaseId));
+        formatted.put("knowledgeTitle", nz(result.sr.knowledgeTitle));
+        formatted.put("knowledgeMetadata", nz(result.sr.knowledgeCustomMetadata));
+        formatted.put("matchType", result.sr.matchType);
+        formatted.put("sourceQuery", sourceQuery);
+        formatted.put("queryType", nz(result.queryType));
+        formatted.put("knowledgeBaseType", nz(result.knowledgeBaseType));
+
+        if (!nz(result.sr.imageInfo).isEmpty()) {
+            List<Map<String, String>> imageList = new ArrayList<>();
+            for (ImageInfoRow img : parseImageInfoList(result.sr.imageInfo)) {
+                Map<String, String> imgData = new LinkedHashMap<>();
+                if (!nz(img.url()).isEmpty()) {
+                    imgData.put("url", img.url());
+                }
+                if (!nz(img.caption()).isEmpty()) {
+                    imgData.put("caption", img.caption());
+                }
+                if (!nz(img.ocrText()).isEmpty()) {
+                    imgData.put("ocrText", img.ocrText());
+                }
+                if (!imgData.isEmpty()) {
+                    imageList.add(imgData);
+                }
+            }
+            if (!imageList.isEmpty()) {
+                formatted.put("images", imageList);
+            }
+        }
+        if (faqMeta != null) {
+            formatted.put("faqId", nz(result.sr.id));
+            formatted.put("index", result.sr.chunkIndex);
+            if (!nz(faqMeta.standardQuestion).isEmpty()) {
+                formatted.put("faqStandardQuestion", faqMeta.standardQuestion);
+            }
+            FaqSnippet.appendSimilarQuestionsToChunkData(formatted, faqMeta.similarQuestions);
+            if (faqMeta.answers != null && !faqMeta.answers.isEmpty()) {
+                formatted.put("faqAnswers", faqMeta.answers);
+            }
+        } else {
+            formatted.put("chunkId", nz(result.sr.id));
+            formatted.put("chunkIndex", result.sr.chunkIndex);
+        }
+        return formatted;
+    }
+
+    /** 单篇文档的总 chunk 数；租户不可解析或后端失败回 0。 */
+    private long totalChunksFor(ResultWithMeta result) {
+        long effectiveTenantID = tool.searchTargets == null ? 0
+                : tool.searchTargets.getTenantIdForKb(nz(result.sr.knowledgeBaseId));
+        if (effectiveTenantID == 0) {
+            return 0L;
+        }
+        try {
+            return tool.chunkBackend.totalChunks(effectiveTenantID, nz(result.sr.knowledgeId));
+        } catch (RuntimeException e) {
+            return 0L;
+        }
     }
 
     /** ImageInfo JSON 解析（url/caption/ocr_text 数组）。 */

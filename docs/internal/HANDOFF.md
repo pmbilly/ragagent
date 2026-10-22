@@ -290,7 +290,7 @@ boot           14 件                      →  boot
 | `check-json-key-case.py --strict` | 换锚棘轮 + 冻结覆盖快照 | 冻结面登记 |
 | `check-event-face-case.py` | 事件面/路由面命名口径 | — |
 | `check-file-size.py` | 大文件棘轮（>600 棘轮，≥800 须登记） | `file-size.baseline.json` |
-| `check-hygiene-budget.py` | 卫生预算计数（>100 行方法 / 通用 trim 副本 / ≥8 参构造器） | `hygiene-budget.baseline.json`（108 / 11 / 53，只许减） |
+| `check-hygiene-budget.py` | 卫生预算计数（>100 行方法 / 通用 trim 副本 / ≥8 参构造器） | `hygiene-budget.baseline.json`（107 / 11 / 53，只许减） |
 | `check-tool-registry.py` | 工具注册一致性（T1~T4 实现/分发/装配；T5 工具名常量只许在 ToolDefinitions；T6 前端能力表键 ⊆ 后端工具名） | 22 实现 / 22 条分发 / 33 个常量 |
 | `check-go-anchors.py` | Go 锚点注释棘轮 | 0 |
 | `check-fe-contract-keys.py` | 前端契约键棘轮 | 只许减 |
@@ -572,6 +572,8 @@ boot           14 件                      →  boot
 | P1.7 | 2026-10-21 | **QaRequestContext 跨线程读收口（N7 实战半边）**：`persistLastRequestStateAsync` 原先把整个可变上下文交给新虚拟线程，而主线程随后还要写 `userMessageID`/`assistantMessage`。改为在**调用线程**用 `lastRequestStateSnapshot` 定型 `SessionLastRequestState`（列表 `List.copyOf`），异步段只拿 `sessionId + 快照`；`QaRequestContext` 类注释写明字段的线程归属。复核其余异步段：`startAsyncRunner` 在落库之后启动，写入先于 `Thread.start`（happens-before 成立），附件解析由 runner 线程独占；因此未做 33 字段 builder 大改，只修真实敞口。 | 新增 3 条单测（快照不随上下文变更、快照列表不可变、null 列表归一为空）· 48 守卫绿 · `mvn -B clean verify` 绿（5065 / 0 / 2） |
 
 | P2.2 | 2026-10-22 | **长方法实拆第一刀（Faq append 校验）**：`FaqValidateOps.validateAppendMode` 239 行 → 五个具名步骤（现有索引装载 / 标准问首遍 / 批次问题索引 / 相似问过滤 / 反例过滤 / 合并后校验），主方法只留编排与进度落库；拆出的 `ExistingIndex`/`StdQPass`/`PostValidation` 三个 record 承载中间态。**行为逐字保留**（错误文案、失败行序、进度写入点未动）。 | 定向 `FaqContractTest` 13 用例绿 · >100 行方法 109→**108**、>150 行 31→**30**；两个基线已 `--write` 收紧 · 48 守卫绿 · `mvn -B clean verify` 绿（5065 / 0 / 2） |
+
+| P2.3 | 2026-10-22 | **长方法实拆第二刀（knowledge_search 输出）**：`KnowledgeSearchOutputFormatter.formatOutput` 227 行 → 四个具名片段：空结果文案（`emptyResult`）、单条 XML（`appendResultXml`，已见/新命中两路）、结构化 data（`formattedResult`）、单文档总块数（`totalChunksFor`）；主方法只留循环与统计装配。**XML 逐字保留**（属性顺序、转义、already_seen 注释未动）。新增 3 条特征测试（chunk XML/data、二次调用 already_seen、空结果文案）补上原先为 0 的直接覆盖。 | 定向 3 用例绿 · >100 行方法 108→**107**、>150 行 30→**29**；两个基线已收紧 · 48 守卫绿 · `mvn -B clean verify` 绿（5068 / 0 / 2） |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
