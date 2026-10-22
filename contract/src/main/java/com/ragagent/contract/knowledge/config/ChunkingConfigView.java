@@ -30,8 +30,7 @@ public record ChunkingConfigView(
 
     /** 主摄取未消费的键（顺序固定；空 = 全部生效）；知识域形状 {@code ingestionInactiveKeys()} 委托本方法。 */
     public static List<String> inactiveKeys(boolean enableParentChild, int parentChunkSize,
-                                            int childChunkSize, boolean hasParserEngineRules,
-                                            String tableMetadataInstructions) {
+                                            int childChunkSize, String tableMetadataInstructions) {
         List<String> inactive = new ArrayList<>();
         if (enableParentChild) {
             inactive.add("enableParentChild");
@@ -41,9 +40,6 @@ public record ChunkingConfigView(
             if (childChunkSize > 0) {
                 inactive.add("childChunkSize");
             }
-        }
-        if (hasParserEngineRules) {
-            inactive.add("parserEngineRules");
         }
         if (tableMetadataInstructions != null && !tableMetadataInstructions.isBlank()) {
             inactive.add("tableMetadataInstructions");

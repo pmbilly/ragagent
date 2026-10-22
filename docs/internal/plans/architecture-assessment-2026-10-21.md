@@ -219,5 +219,5 @@ boot（组合根，只出不进；@Configuration 8 组合根档）
 - **P2.2/P2.3/P2.5 长方法实拆前三刀**：`FaqValidateOps.validateAppendMode` 239 行拆成五个具名步骤 + 三个中间态 record；`KnowledgeSearchOutputFormatter.formatOutput` 227 行拆成空结果/单条 XML/结构化 data/总块数四个片段（新增 3 条特征测试补直接覆盖）；`WikiIngestReducePhase.reduceSlugUpdatesBody` 309 行拆成 `PageDraft` + 五个具名段（页面/分类/撤回/新增/生成）。>100 行方法 109→106，>150 行 31→28，两个基线已收紧。
 - **P2.4 指标面落地（N10 半边）**：boot 引入 actuator，只暴露 `health/info/metrics`；domains 用 Micrometer 记录 `ragagent.qa.turns` / `ragagent.qa.failures`（tag=mode）。端点走现有认证链（匿名 401 / JWT 200），不新增匿名运维面。N10 还剩 PG+flyway 测试 profile 与 `@RouteSecurity` 重估。
 - **P1.9/P1.10 配置收口（N8a/N8c，2026-10-22 拍板后执行）**：storage KV 写接口改 405，表为唯一写入口；启动迁移把存量 KV 段落成 `source=legacy` 后端行（凭据仍加密）；GET 保留一版只读。websearch 从租户 KV 删除 `provider`/`apiKey`（凭据归 provider 表），其余默认值保留；执行面仍支持 L2 直接传入内联凭据。
-- **N8 余额**：parser 三头（env / tenants KV / system HTTP）尚未定真相源，单独一批处理。
+- **P1.11 parser 配置归位（N8b）**：复核发现 parser 并没有三份重复真相源，真正的缺口是 **KB 级规则不生效**——`KnowledgeTextExtractor` 固定向 docreader 传 `parserEngine=null`，而 UI 上 `parserEngineRules` 可编辑、可回显。已按文件类型解析显式命中规则并传入；未命中保持服务端默认；`inactiveKeys` 删除该项，能力矩阵不再撒谎。三层作用域（agent 上传 / KB 入库 / 租户兜底）写进 `ParserEngineConfig` javadoc。
 - **剩余队列**：N5 前端表生成式改造（本次只做「可少不可多」的契约锁定）、N6 的 11 类回域需按形状重划（仅剩 `ToolCapabilities`/`TenantRowView` 等有讨论价值）、N8 配置收口（待拍板）、N10 横切、N11 剩余长方法/构造器实拆、N12 前端拆分。

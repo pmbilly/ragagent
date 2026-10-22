@@ -115,7 +115,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         this.kbRepository = kbRepository;
         this.spanTracker = spanTracker;
         this.textExtractor = new KnowledgeTextExtractor(
-                fileStorage, extractedImageStore, docReader,
+                fileStorage, extractedImageStore, docReader, kbRepository,
                 new KnowledgeImageOcr(fileStorage, ocrProperties, spanTracker), spanTracker);
         this.chunkWriter = new KnowledgeChunkWriter(chunkRepository, spanTracker);
         this.indexStage = new KnowledgeIndexStage(

@@ -15,6 +15,11 @@ import java.util.Map;
  * 承载（契约面纯 JDK）；chat_parser_engine_rules 的元素类型不建强类型——
  * 规则由 agent 侧配置，租户级只是透传保留（合并的 legacy 分支），
  * 用 JsonNode 带过，键序与原文一致。</p>
+ *
+ * <p><b>作用域</b>：本配置的引擎端点/密钥是租户级默认；解析规则分三层——
+ * agent 的 {@code chatParserEngineRules} 用于聊天附件上传时的首层回落，
+ * KB 的 {@code chunking_config.parserEngineRules} 用于知识入库（按文件类型选引擎），
+ * 本段的 {@code chatParserEngineRules} 只作两者的历史兜底。</p>
  */
 
 public class ParserEngineConfig {

@@ -202,7 +202,7 @@ public final class InitializationConfigService {
         kb.setChunkingConfig(new ChunkingConfigView(chunkSize, chunkOverlap, separators, parserRules,
                 enableParentChild, parentChunkSize, childChunkSize, strategy, tokenLimit, languages,
                 tableMetadata, ChunkingConfigView.inactiveKeys(enableParentChild, parentChunkSize,
-                        childChunkSize, parserRules != null && !parserRules.isEmpty(), tableMetadata)));
+                        childChunkSize, tableMetadata)));
 
         if (!req.multimodalEnabled()) {
             vlmModelId = "";
@@ -444,7 +444,6 @@ public final class InitializationConfigService {
                 prevChunking.tableMetadataInstructions(),
                 ChunkingConfigView.inactiveKeys(prevChunking.enableParentChild(),
                         prevChunking.parentChunkSize(), prevChunking.childChunkSize(),
-                        prevChunking.parserEngineRules() != null && !prevChunking.parserEngineRules().isEmpty(),
                         prevChunking.tableMetadataInstructions())));
 
         if (req.multimodalEnabled()) {

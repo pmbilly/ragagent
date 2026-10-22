@@ -1,14 +1,20 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.contract.knowledge.rule.ParserEngineRules;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.domain.span.SpanTracker;
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.service.image.ExtractedImageStore;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.platform.knowledge.ImageRefRewriter;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 入库阶段一：取文本。
@@ -19,20 +25,25 @@ import java.util.Map;
  */
 final class KnowledgeTextExtractor {
 
+    private static final Logger log = LoggerFactory.getLogger(KnowledgeTextExtractor.class);
+
     private final TenantFileStorage fileStorage;
     private final ExtractedImageStore extractedImageStore;
     private final DocReaderClient docReader;
+    private final KnowledgeBaseRepository kbRepository;
     private final KnowledgeImageOcr imageOcr;
     private final SpanTracker spanTracker;
 
     KnowledgeTextExtractor(TenantFileStorage fileStorage,
             ExtractedImageStore extractedImageStore,
             DocReaderClient docReader,
+            KnowledgeBaseRepository kbRepository,
             KnowledgeImageOcr imageOcr,
             SpanTracker spanTracker) {
         this.fileStorage = fileStorage;
         this.extractedImageStore = extractedImageStore;
         this.docReader = docReader;
+        this.kbRepository = kbRepository;
         this.imageOcr = imageOcr;
         this.spanTracker = spanTracker;
     }
@@ -53,7 +64,8 @@ final class KnowledgeTextExtractor {
             byte[] content = fileStorage.read(
                     k.getTenantId() == null ? 0L : k.getTenantId(), k.getFilePath());
             DocReaderClient.ParseResult parsed = docReader.read(
-                    content, k.getFileName(), k.getFileType(), k.getTitle(), null);
+                    content, k.getFileName(), k.getFileType(), k.getTitle(),
+                    resolveParserEngine(k));
             List<ImageRefRewriter.RefRow> rows = parsed.imageRefs() == null ? List.of()
                     : parsed.imageRefs().stream().map(r -> new ImageRefRewriter.RefRow(
                             r.originalRef(), r.filename(), r.mimeType(), r.imageData())).toList();
@@ -65,6 +77,44 @@ final class KnowledgeTextExtractor {
         }
         endStageSpan(docSpan, Map.of("chars", markdown.length()));
         return imageOcr.enrich(k, markdown, attempt, knowledgeId);
+    }
+
+    /**
+     * KB 级 {@code parserEngineRules} → 引擎名；未配置/不命中返回空（docreader 默认路由）。
+     *
+     * <p>这是该配置的唯一消费点：此前 worker 固定传 {@code null}，UI 上的规则是空操作。</p>
+     */
+    String resolveParserEngine(Knowledge k) {
+        String kbId = k.getKnowledgeBaseId();
+        if (kbId == null || kbId.isBlank()) {
+            return "";
+        }
+        try {
+            KnowledgeBase kb = kbRepository.findByIdOnly(kbId);
+            if (kb == null) {
+                return "";
+            }
+            List<KnowledgeBaseChunkingConfig.ParserEngineRule> rules =
+                    kb.getChunkingConfig().getParserEngineRules();
+            if (rules == null || rules.isEmpty()) {
+                return "";
+            }
+            String fileType = ParserEngineRules.normalize(k.getFileType());
+            for (KnowledgeBaseChunkingConfig.ParserEngineRule rule : rules) {
+                if (rule.getFileTypes() == null || rule.getEngine() == null) {
+                    continue;
+                }
+                for (String candidate : rule.getFileTypes()) {
+                    if (ParserEngineRules.normalize(candidate).equals(fileType)) {
+                        return rule.getEngine().trim();
+                    }
+                }
+            }
+            return "";
+        } catch (RuntimeException e) {
+            log.warn("resolve parser engine failed for knowledge {}", k.getId(), e);
+            return "";
+        }
     }
 
     private SpanTracker.SpanHandle beginStageSpan(int attempt, String knowledgeId,

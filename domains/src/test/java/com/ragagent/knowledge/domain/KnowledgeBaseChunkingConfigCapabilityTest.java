@@ -20,7 +20,7 @@ import tools.jackson.databind.ObjectMapper;
  *
  * <p>背景：`chunkingConfig` 是 KB 保存/更新面自由可写的 jsonb，但主摄取
  * （{@code KnowledgeProcessWorker}）只消费其中一部分——`enableParentChild` 系列、
- * `parserEngineRules`、`tableMetadataInstructions` 都没有进摄取链路。此前两处"静默"：
+ * `tableMetadataInstructions` 没有进摄取链路。此前两处"静默"：
  * <ol>
  *   <li>JSON 损坏 → {@code from()} 回落空默认，摄取悄悄按 512/80 跑完；</li>
  *   <li>未生效的字段照收不误，视图原样回显，用户无法分辨"生效了"和"被忽略"。</li>
@@ -71,8 +71,9 @@ class KnowledgeBaseChunkingConfigCapabilityTest {
         assertTrue(inactive.contains("enableParentChild"), "父子块开关未进摄取链路: " + inactive);
         assertTrue(inactive.contains("parentChunkSize"), "父子块尺寸同上: " + inactive);
         assertTrue(inactive.contains("childChunkSize"), "父子块尺寸同上: " + inactive);
-        assertTrue(inactive.contains("parserEngineRules"), "worker 固定 parserEngine=null: " + inactive);
         assertTrue(inactive.contains("tableMetadataInstructions"), "全仓无消费点: " + inactive);
+        assertTrue(!inactive.contains("parserEngineRules"),
+                "parserEngineRules 已接入 worker（按扩展名选引擎），不得再标未生效: " + inactive);
     }
 
     @Test
