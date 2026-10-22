@@ -103,10 +103,6 @@
       "lines": 192,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
-    "domains/src/main/java/com/ragagent/wiki/service/ingest/WikiIngestReducePhase.java#reduceSlugUpdatesBody": {
-      "lines": 309,
-      "reason": "存量基线（M1 首次登记，2026-10-20）"
-    },
     "domains/src/main/java/com/ragagent/wiki/service/ingest/WikiIngestRunSupport.java#runIngestPhases": {
       "lines": 372,
       "reason": "存量基线（M1 首次登记，2026-10-20）"

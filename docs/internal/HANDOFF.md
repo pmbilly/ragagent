@@ -291,7 +291,7 @@ boot           14 件                      →  boot
 | `check-json-key-case.py --strict` | 换锚棘轮 + 冻结覆盖快照 | 冻结面登记 |
 | `check-event-face-case.py` | 事件面/路由面命名口径 | — |
 | `check-file-size.py` | 大文件棘轮（>600 棘轮，≥800 须登记） | `file-size.baseline.json` |
-| `check-hygiene-budget.py` | 卫生预算计数（>100 行方法 / 通用 trim 副本 / ≥8 参构造器） | `hygiene-budget.baseline.json`（107 / 11 / 53，只许减） |
+| `check-hygiene-budget.py` | 卫生预算计数（>100 行方法 / 通用 trim 副本 / ≥8 参构造器） | `hygiene-budget.baseline.json`（106 / 11 / 53，只许减） |
 | `check-tool-registry.py` | 工具注册一致性（T1~T4 实现/分发/装配；T5 工具名常量只许在 ToolDefinitions；T6 前端能力表键 ⊆ 后端工具名） | 22 实现 / 22 条分发 / 33 个常量 |
 | `check-go-anchors.py` | Go 锚点注释棘轮 | 0 |
 | `check-fe-contract-keys.py` | 前端契约键棘轮 | 只许减 |
@@ -577,6 +577,8 @@ boot           14 件                      →  boot
 | P2.3 | 2026-10-22 | **长方法实拆第二刀（knowledge_search 输出）**：`KnowledgeSearchOutputFormatter.formatOutput` 227 行 → 四个具名片段：空结果文案（`emptyResult`）、单条 XML（`appendResultXml`，已见/新命中两路）、结构化 data（`formattedResult`）、单文档总块数（`totalChunksFor`）；主方法只留循环与统计装配。**XML 逐字保留**（属性顺序、转义、already_seen 注释未动）。新增 3 条特征测试（chunk XML/data、二次调用 already_seen、空结果文案）补上原先为 0 的直接覆盖。 | 定向 3 用例绿 · >100 行方法 108→**107**、>150 行 30→**29**；两个基线已收紧 · 48 守卫绿 · `mvn -B clean verify` 绿（5068 / 0 / 2） |
 
 | P2.4 | 2026-10-22 | **指标面落地（N10 半边）**：boot 引入 `spring-boot-starter-actuator`，只暴露 `health/info/metrics`（env/beans/heapdump 等不开）；domains 引入 `micrometer-core`，在 `QaTurnExecutor` 记录 `ragagent.qa.turns` 与 `ragagent.qa.failures`（tag=mode）。端点复用现有认证链：**匿名 401、带 JWT 200**，不新增匿名运维面。 | 真机：`/actuator/metrics` 带令牌 200 / 匿名 401，`/actuator/health` 200 · 48 守卫绿 · `mvn -B clean verify` 绿（5068 / 0 / 2） |
+
+| P2.5 | 2026-10-22 | **长方法实拆第三刀（wiki reduce）**：`WikiIngestReducePhase.reduceSlugUpdatesBody` 309 行 → `PageDraft` 承载页面/分类/拼装缓冲，主体只留编排；四个具名段：`openDraft`（查页/建页/分类）、`applySummary`、`applyRetracts`、`applyAdditions`、`generateContent`（模板渲染 + 句柄编解码）。**页面字段写入序、refs 合并、失败语义逐字保留**。 | 定向 `WikiIngest*Test` 209 用例绿（含 Reduce 14）· >100 行方法 107→**106**、>150 行 29→**28**；两个基线已收紧 · 48 守卫绿 · `mvn -B clean verify` 绿（5068 / 0 / 2） |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

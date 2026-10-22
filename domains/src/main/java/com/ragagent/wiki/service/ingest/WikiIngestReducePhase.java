@@ -170,308 +170,342 @@ final class WikiIngestReducePhase {
                                                 long tenantId, WikiBatchContext batchCtx,
                                                 WikiPage[] pageHolder) {
         try {
-            // findPageBySlug 查无此页时返回 null 而不是抛错——not found 是正常路径
-            // （下面合成新页），不能让它冒泡成 reduce 失败。
-            WikiPage page = handler.wikiService.findPageBySlug(kbId, slug);
-            pageHolder[0] = page;
-            boolean exists = page != null;
+            PageDraft draft = openDraft(kbId, slug, tenantId, updates);
+            if (draft == null) {
+                return new WikiIngestBatchHandler.ReduceOutcome(false, "", false, null);
+            }
+            pageHolder[0] = draft.page;
 
-            if (!exists) {
-                boolean hasAdditions = false;
-                for (SlugUpdate u : updates) {
-                    if (SlugUpdate.TYPE_ENTITY.equals(u.getType())
-                            || SlugUpdate.TYPE_CONCEPT.equals(u.getType())
-                            || SlugUpdate.TYPE_SUMMARY.equals(u.getType())) {
-                        hasAdditions = true;
-                        break;
-                    }
-                }
-                if (!hasAdditions) {
-                    return new WikiIngestBatchHandler.ReduceOutcome(false, "", false, null);
-                }
-
-                page = new WikiPage();
-                pageHolder[0] = page;
-                page.setId(UUID.randomUUID().toString());
-                page.setTenantId(tenantId);
-                page.setKnowledgeBaseId(kbId);
-                page.setSlug(slug);
-                page.setStatus(WikiConstants.STATUS_DRAFT);
-                page.setSourceRefs(new ArrayList<>());
-                page.setAliases(new ArrayList<>());
+            if (draft.summaryUpdate != null) {
+                applySummary(draft);
+                return new WikiIngestBatchHandler.ReduceOutcome(true, draft.affectedType, false, null);
             }
 
-            String affectedType = "ingest";
+            applyRetracts(draft, batchCtx);
+            applyAdditions(draft, tenantId);
+            Generation generation = generateContent(draft, chatModel, kbId, batchCtx);
 
-            SlugUpdate summaryUpdate = null;
-            List<SlugUpdate> retracts = new ArrayList<>();
-            List<SlugUpdate> additions = new ArrayList<>();
-
-            for (SlugUpdate u : updates) {
-                if (SlugUpdate.TYPE_SUMMARY.equals(u.getType())) {
-                    summaryUpdate = u;
-                } else if (u.isRetractType()) {
-                    retracts.add(u);
-                    affectedType = "retract";
-                } else if (SlugUpdate.TYPE_ENTITY.equals(u.getType())
-                        || SlugUpdate.TYPE_CONCEPT.equals(u.getType())) {
-                    additions.add(u);
-                    affectedType = "ingest"; // 新增覆盖 retract 的类型判定
-                }
-            }
-
-            if (summaryUpdate != null) {
-                page.setTitle(summaryUpdate.getDocTitle() + " - Summary");
-                page.setContent(summaryUpdate.getSummaryBody());
-                page.setSummary(summaryUpdate.getSummaryLine());
-                page.setPageType(WikiConstants.PAGE_TYPE_SUMMARY);
-                page.setSourceRefs(WikiIngestBatchHandler.appendUnique(page.getSourceRefs(), summaryUpdate.getSourceRef()));
-                // 摘要页不携带 chunk 级引用（它们是从整篇正文生成的文档级概要）。
-                // 清理该 slug 曾经是 entity 页并被改造成摘要页时可能残留的陈旧 chunk ref。
-                page.setChunkRefs(new ArrayList<>());
-                if (exists) {
-                    handler.wikiService.updatePage(page);
-                } else {
-                    handler.wikiService.createPage(page);
-                }
-                return new WikiIngestBatchHandler.ReduceOutcome(true, affectedType, false, null);
-            }
-
-            StringBuilder remainingSourcesContent = new StringBuilder();
-            StringBuilder deletedContent = new StringBuilder();
-            StringBuilder relatedSlugs = new StringBuilder();
-            StringBuilder newContentBuilder = new StringBuilder();
-            StringBuilder sharedSourceContexts = new StringBuilder();
-
-            String language = WikiLanguageSupport.resolveSlugUpdateLanguage(updates);
-
-            if (!retracts.isEmpty()) {
-                for (SlugUpdate r : retracts) {
-                    deletedContent.append("<document>\n<title>").append(r.getDocTitle())
-                            .append("</title>\n<content>\n").append(r.getRetractDocContent())
-                            .append("\n</content>\n</document>\n\n");
-                }
-
-                Set<String> retractKIDs = new LinkedHashSet<>();
-                for (SlugUpdate r : retracts) {
-                    retractKIDs.add(r.getKnowledgeId());
-                }
-
-                for (String ref : page.getSourceRefs()) {
-                    int pipeIdx = ref.indexOf('|');
-                    String refKnowledgeID;
-                    String refTitle;
-                    if (pipeIdx > 0) {
-                        refKnowledgeID = ref.substring(0, pipeIdx);
-                        refTitle = ref.substring(pipeIdx + 1);
-                    } else {
-                        refKnowledgeID = ref;
-                        refTitle = ref;
-                    }
-
-                    if (retractKIDs.contains(refKnowledgeID)) {
-                        continue;
-                    }
-
-                    String refContent = batchCtx == null
-                            ? "" : batchCtx.summaryContentByKnowledgeId(refKnowledgeID);
-                    if (!refContent.isEmpty()) {
-                        remainingSourcesContent.append("<document>\n<title>").append(refTitle)
-                                .append("</title>\n<content>\n").append(refContent)
-                                .append("\n</content>\n</document>\n\n");
-                    } else {
-                        remainingSourcesContent.append("<document>\n<title>").append(refTitle)
-                                .append("</title>\n<content>\n(summary not available)\n</content>\n")
-                                .append("</document>\n\n");
-                    }
-                }
-                if (remainingSourcesContent.length() == 0) {
-                    remainingSourcesContent.append("(no remaining sources)");
-                }
-
-                List<String> newRefs = new ArrayList<>();
-                for (String ref : page.getSourceRefs()) {
-                    int pipeIdx = ref.indexOf('|');
-                    String refKnowledgeID = pipeIdx > 0 ? ref.substring(0, pipeIdx) : ref;
-                    if (!retractKIDs.contains(refKnowledgeID)) {
-                        newRefs.add(ref);
-                    }
-                }
-                page.setSourceRefs(newRefs);
-            }
-
-            if (!additions.isEmpty()) {
-                // 把 SourceChunks 解析成 chunk 正文：按 knowledge ID 一批查询，让
-                // <new_information> 块可以逐字引用 chunk，而不是依赖简短的 Details 改写。
-                Map<String, String> chunkContentByID =
-                        handler.citePipeline.resolveCitedChunks(tenantId, additions);
-                // 一份文档摘要被该文档派生的每个页面共享。在任何页面专属元数据之前渲染一个
-                // 确定性的、去重的块，让 provider 的前缀缓存能在并行的 reduce 调用之间复用。
-                Map<String, String> sourceContextByRef = new LinkedHashMap<>();
-
-                for (SlugUpdate add : additions) {
-                    ExtractedItem item = add.getItem() == null ? new ExtractedItem() : add.getItem();
-                    String cited = WikiIngestCitePipeline.collectCitedChunkContent(
-                            add.sourceChunksOrEmpty(), chunkContentByID);
-                    // 用文档级摘要正文把 chunk 框起来，让编辑模型既知道文档讲什么，也知道它
-                    // 是哪一类文档（简历 vs 公告 vs 产品页 vs 日程）。只有一句话的标题对较长、
-                    // 多主题的源文档来说太薄了。
-                    String sourceCtx = add.getDocSummary().trim();
-                    if (!sourceCtx.isEmpty()) {
-                        String contextKey = add.getSourceRef();
-                        if (contextKey.isEmpty()) {
-                            contextKey = add.getKnowledgeId() + "\u0000" + add.getDocTitle();
-                        }
-                        sourceContextByRef.put(contextKey, "<document>\n<title>" + add.getDocTitle()
-                                + "</title>\n<context>\n" + sourceCtx + "\n</context>\n</document>\n");
-                    }
-                    // 回落：没有引用可用（回落路径 / 引用遍失败 / 坏的 chunk ID 被过滤掉）
-                    // 时，沿用简短的 Details 摘要，让页面仍得到真实文本。
-                    String body = cited.isEmpty() ? item.getDetails() : cited;
-                    newContentBuilder.append("<document>\n<title>").append(add.getDocTitle())
-                            .append("</title>\n<content>\n**").append(item.getName())
-                            .append("**: ").append(item.getDescription())
-                            .append("\n\n").append(body)
-                            .append("\n</content>\n</document>\n\n");
-
-                    for (String alias : item.getAliases()) {
-                        page.setAliases(WikiIngestBatchHandler.appendUnique(page.getAliases(), alias));
-                    }
-                    page.setSourceRefs(WikiIngestBatchHandler.appendUnique(page.getSourceRefs(), add.getSourceRef()));
-
-                    if (page.getTitle().isEmpty()) {
-                        page.setTitle(item.getName());
-                    }
-                    if (page.getPageType().isEmpty()) {
-                        page.setPageType(add.getType());
-                    }
-                }
-
-                List<String> contextKeys = new ArrayList<>(sourceContextByRef.keySet());
-                contextKeys.sort(CodePointOrder::compare);
-                for (String key : contextKeys) {
-                    sharedSourceContexts.append(sourceContextByRef.get(key));
-                }
-            }
-
-            boolean changed = false;
-            boolean additionFailed = false;
-
-            if (!additions.isEmpty() || !retracts.isEmpty()) {
-                Map<String, String> titles = batchCtx == null
-                        ? Map.of() : batchCtx.slugTitleMany(new ArrayList<>(page.getOutLinks()));
-
-                // slugHandles 把高熵 slug 藏到短引用句柄（ref-1、ref-2…）后面给编辑 LLM 用，
-                // 生成之后再映射回真实 slug（见下面的 decodeContent）。
-                WikiSlugHandles slugHandles = new WikiSlugHandles();
-
-                // 把每条出链 slug 藏到请求局部句柄后面，编辑模型因此永远不用重打真实 slug
-                // ——UUID 式摘要 slug（summary/<uuid>）就是这样被弄花成 404 链接的。
-                // <valid_wiki_links> 清单与 <existing_page_content> 里已有的 [[...]] 引用用的
-                // 是<b>同一张</b>句柄表，因此模型看到一个一致、可安全复制的标识空间；
-                // 我们在生成之后把句柄翻回真实 slug。
-                Set<String> known = new LinkedHashSet<>(page.getOutLinks());
-                for (String outSlug : page.getOutLinks()) {
-                    slugHandles.handle(outSlug); // 预分配，让顺序稳定
-                }
-                for (String outSlug : page.getOutLinks()) {
-                    String title = titles.get(outSlug);
-                    if (title != null && !title.isEmpty()) {
-                        relatedSlugs.append("- ").append(slugHandles.handle(outSlug))
-                                .append(" (").append(title).append(")\n");
-                    }
-                }
-
-                // 较早生成的页面可能仍含 [c003] 这类短 chunk 别名。它们是内部摄取元数据；
-                // 保持编辑语境干净，让后续更新不会把它们复制进重写的正文。
-                String existingContent = WikiBatchSupport.stripInlineChunkCitations(page.getContent());
-                existingContent = slugHandles.encodeContent(existingContent, known);
-                if (!exists || existingContent.isEmpty()) {
-                    existingContent = "(New page)";
-                }
-
-                String hasAdditionsStr = additions.isEmpty() ? "" : "1";
-                String hasRetractionsStr = retracts.isEmpty() ? "" : "1";
-
-                // title/type 仍未设置时优雅回落（对良构更新不该发生——两者都在上面的
-                // additions 循环里填好，而纯 retract 路径要求页面已存在——但保持防御性，
-                // 免得给 LLM 喂一个空的身份块）。
-                String pageTitle = page.getTitle().isEmpty() ? slug : page.getTitle();
-                String pageType = page.getPageType().isEmpty()
-                        ? WikiBatchConstants.PAGE_TYPE_FALLBACK : page.getPageType();
-                String pageAliases = String.join(", ", page.getAliases());
-
-                try {
-                    String updatedContent = handler.ingestService.generateWithTemplate(chatModel,
-                            WikiPrompts.WIKI_PAGE_MODIFY_USER_PROMPT,
-                            Map.ofEntries(
-                                    Map.entry("HasAdditions", hasAdditionsStr),
-                                    Map.entry("HasRetractions", hasRetractionsStr),
-                                    Map.entry("PageSlug", slug),
-                                    Map.entry("PageTitle", pageTitle),
-                                    Map.entry("PageType", pageType),
-                                    Map.entry("PageAliases", pageAliases),
-                                    Map.entry("ExistingContent", existingContent),
-                                    Map.entry("SharedSourceContexts", sharedSourceContexts.toString()),
-                                    Map.entry("NewContent", newContentBuilder.toString()),
-                                    Map.entry("DeletedContent", deletedContent.toString()),
-                                    Map.entry("RemainingSourcesContent", remainingSourcesContent.toString()),
-                                    Map.entry("AvailableSlugs", relatedSlugs.toString()),
-                                    Map.entry("Language", language == null ? "" : language),
-                                    Map.entry("CustomInstructions",
-                                            batchCtx == null ? "" : batchCtx.getContentInstructions()),
-                                    Map.entry("InstructionScope", WikiBatchConstants.INSTRUCTION_SCOPE_CONTENT)));
-
-                    if (updatedContent != null && !updatedContent.isEmpty()) {
-                        // 在正文被解析/存储<b>之前</b>，把模型从编码语境里抄来的请求局部句柄
-                        // （ref-N）翻回真实 slug，让 out_links 重新反映真实页面。
-                        updatedContent = slugHandles.decodeContent(updatedContent);
-                        WikiTextUtils.SummaryLine updated = WikiTextUtils.splitSummaryLine(updatedContent);
-                        page.setContent(updated.content().isEmpty() ? updatedContent : updated.content());
-                        if (!updated.summary().isEmpty()) {
-                            page.setSummary(updated.summary());
-                        }
-                        changed = true;
-                    }
-                } catch (RuntimeException genErr) {
-                    log.warn("wiki ingest: update/retract failed for slug {}", slug, genErr);
-                    // 标记新增失败，让批次能净化该文档摘要页里陈旧的 [[slug]] 引用，并把缺失
-                    // 的页面排除出 finalize 处理。纯 retract 的失败不会毒化任何东西
-                    // （页面保持原样），因此不标记。
-                    if (!additions.isEmpty()) {
-                        additionFailed = true;
-                    }
-                    // <b>不</b>把 LLM 错误向上传播：它已经记过日志，再抛出去只会
-                    // 让上层再记一次 "reduce failed for slug"。
-                }
-            }
-
-            // 应用批次的 handler.taxonomy 计划，但只对尚未归档的页面——新页面因此得到连贯的目录，
-            // 而先前已归档或用户移动过的页面保持原位（手工编辑是权威的）。
-            // 页面的 category_path 缓存由 CreatePage/UpdatePage 从 folder_id 派生，
-            // 因此这里只赋 folder_id 就够了。
-            if (page.getFolderId().isEmpty() && batchCtx != null) {
+            if (draft.page.getFolderId().isEmpty() && batchCtx != null) {
                 String fid = batchCtx.getPlannedFolderId().get(slug);
                 if (fid != null && !fid.isEmpty()) {
-                    page.setFolderId(fid);
+                    draft.page.setFolderId(fid);
                 }
             }
-
-            if (changed) {
-                // 就地刷新 chunk ref，让它们随行的其余部分一起持久化。纯 retract 更新
-                // （无新增）保留既有 refs；新增轮次把新引用的 chunk 追加到已有之上（去重）。
-                page.setChunkRefs(mergeChunkRefs(page.getChunkRefs(), additions));
-                if (exists) {
-                    handler.wikiService.updatePage(page);
+            if (generation.changed()) {
+                draft.page.setChunkRefs(mergeChunkRefs(draft.page.getChunkRefs(), draft.additions));
+                if (draft.exists) {
+                    handler.wikiService.updatePage(draft.page);
                 } else {
-                    handler.wikiService.createPage(page);
+                    handler.wikiService.createPage(draft.page);
                 }
-                return new WikiIngestBatchHandler.ReduceOutcome(true, affectedType, additionFailed, null);
+                return new WikiIngestBatchHandler.ReduceOutcome(
+                        true, draft.affectedType, generation.additionFailed(), null);
             }
-
-            return new WikiIngestBatchHandler.ReduceOutcome(false, "", additionFailed, null);
+            return new WikiIngestBatchHandler.ReduceOutcome(false, "", generation.additionFailed(), null);
         } catch (RuntimeException e) {
             return new WikiIngestBatchHandler.ReduceOutcome(false, "", false, e);
+        }
+    }
+
+    /** 一次 reduce 的可变草稿：页面 + 分类结果 + 各段拼装缓冲。 */
+    private static final class PageDraft {
+        final WikiPage page;
+        final boolean exists;
+        final String slug;
+        String language = "";
+        String affectedType = "ingest";
+        SlugUpdate summaryUpdate;
+        final List<SlugUpdate> retracts = new ArrayList<>();
+        final List<SlugUpdate> additions = new ArrayList<>();
+        final StringBuilder remainingSourcesContent = new StringBuilder();
+        final StringBuilder deletedContent = new StringBuilder();
+        final StringBuilder relatedSlugs = new StringBuilder();
+        final StringBuilder newContentBuilder = new StringBuilder();
+        final StringBuilder sharedSourceContexts = new StringBuilder();
+
+        PageDraft(WikiPage page, boolean exists, String slug) {
+            this.page = page;
+            this.exists = exists;
+            this.slug = slug;
+        }
+    }
+
+    /** 查页/建页并按类型分组；新页且无新增时返回 null（no-op）。 */
+    private PageDraft openDraft(String kbId, String slug, long tenantId, List<SlugUpdate> updates) {
+        WikiPage page = handler.wikiService.findPageBySlug(kbId, slug);
+        boolean exists = page != null;
+        if (!exists) {
+            boolean hasAdditions = false;
+            for (SlugUpdate u : updates) {
+                if (SlugUpdate.TYPE_ENTITY.equals(u.getType())
+                        || SlugUpdate.TYPE_CONCEPT.equals(u.getType())
+                        || SlugUpdate.TYPE_SUMMARY.equals(u.getType())) {
+                    hasAdditions = true;
+                    break;
+                }
+            }
+            if (!hasAdditions) {
+                return null;
+            }
+            page = new WikiPage();
+            page.setId(UUID.randomUUID().toString());
+            page.setTenantId(tenantId);
+            page.setKnowledgeBaseId(kbId);
+            page.setSlug(slug);
+            page.setStatus(WikiConstants.STATUS_DRAFT);
+            page.setSourceRefs(new ArrayList<>());
+            page.setAliases(new ArrayList<>());
+        }
+        PageDraft draft = new PageDraft(page, exists, slug);
+        for (SlugUpdate u : updates) {
+            if (SlugUpdate.TYPE_SUMMARY.equals(u.getType())) {
+                draft.summaryUpdate = u;
+            } else if (u.isRetractType()) {
+                draft.retracts.add(u);
+                draft.affectedType = "retract";
+            } else if (SlugUpdate.TYPE_ENTITY.equals(u.getType())
+                    || SlugUpdate.TYPE_CONCEPT.equals(u.getType())) {
+                draft.additions.add(u);
+                draft.affectedType = "ingest"; // 新增覆盖 retract 的类型判定
+            }
+        }
+        draft.language = WikiLanguageSupport.resolveSlugUpdateLanguage(updates);
+        return draft;
+    }
+
+    /** 摘要页：整页覆盖，写完即结束本轮 reduce。 */
+    private void applySummary(PageDraft draft) {
+        WikiPage page = draft.page;
+        SlugUpdate summaryUpdate = draft.summaryUpdate;
+        page.setTitle(summaryUpdate.getDocTitle() + " - Summary");
+        page.setContent(summaryUpdate.getSummaryBody());
+        page.setSummary(summaryUpdate.getSummaryLine());
+        page.setPageType(WikiConstants.PAGE_TYPE_SUMMARY);
+        page.setSourceRefs(WikiIngestBatchHandler.appendUnique(page.getSourceRefs(), summaryUpdate.getSourceRef()));
+        // 摘要页不携带 chunk 级引用（它们是从整篇正文生成的文档级概要）。
+        // 清理该 slug 曾经是 entity 页并被改造成摘要页时可能残留的陈旧 chunk ref。
+        page.setChunkRefs(new ArrayList<>());
+        if (draft.exists) {
+            handler.wikiService.updatePage(page);
+        } else {
+            handler.wikiService.createPage(page);
+        }
+    }
+
+    /** 撤回：拼 deleted/remaining 两段上下文，并摘掉被撤回来源的 refs。 */
+    private void applyRetracts(PageDraft draft, WikiBatchContext batchCtx) {
+        if (draft.retracts.isEmpty()) {
+            return;
+        }
+        WikiPage page = draft.page;
+        StringBuilder deletedContent = draft.deletedContent;
+        StringBuilder remainingSourcesContent = draft.remainingSourcesContent;
+        for (SlugUpdate r : draft.retracts) {
+            deletedContent.append("<document>\n<title>").append(r.getDocTitle())
+                    .append("</title>\n<content>\n").append(r.getRetractDocContent())
+                    .append("\n</content>\n</document>\n\n");
+        }
+
+        Set<String> retractKIDs = new LinkedHashSet<>();
+        for (SlugUpdate r : draft.retracts) {
+            retractKIDs.add(r.getKnowledgeId());
+        }
+
+        for (String ref : page.getSourceRefs()) {
+            int pipeIdx = ref.indexOf('|');
+            String refKnowledgeID;
+            String refTitle;
+            if (pipeIdx > 0) {
+                refKnowledgeID = ref.substring(0, pipeIdx);
+                refTitle = ref.substring(pipeIdx + 1);
+            } else {
+                refKnowledgeID = ref;
+                refTitle = ref;
+            }
+
+            if (retractKIDs.contains(refKnowledgeID)) {
+                continue;
+            }
+
+            String refContent = batchCtx == null
+                    ? "" : batchCtx.summaryContentByKnowledgeId(refKnowledgeID);
+            if (!refContent.isEmpty()) {
+                remainingSourcesContent.append("<document>\n<title>").append(refTitle)
+                        .append("</title>\n<content>\n").append(refContent)
+                        .append("\n</content>\n</document>\n\n");
+            } else {
+                remainingSourcesContent.append("<document>\n<title>").append(refTitle)
+                        .append("</title>\n<content>\n(summary not available)\n</content>\n")
+                        .append("</document>\n\n");
+            }
+        }
+        if (remainingSourcesContent.length() == 0) {
+            remainingSourcesContent.append("(no remaining sources)");
+        }
+
+        List<String> newRefs = new ArrayList<>();
+        for (String ref : page.getSourceRefs()) {
+            int pipeIdx = ref.indexOf('|');
+            String refKnowledgeID = pipeIdx > 0 ? ref.substring(0, pipeIdx) : ref;
+            if (!retractKIDs.contains(refKnowledgeID)) {
+                newRefs.add(ref);
+            }
+        }
+        page.setSourceRefs(newRefs);
+    }
+
+    /** 新增：解析引用 chunk、拼 new_information 上下文，并回填别名/来源/标题/类型。 */
+    private void applyAdditions(PageDraft draft, long tenantId) {
+        if (draft.additions.isEmpty()) {
+            return;
+        }
+        WikiPage page = draft.page;
+        // 把 SourceChunks 解析成 chunk 正文：按 knowledge ID 一批查询，让
+        // <new_information> 块可以逐字引用 chunk，而不是依赖简短的 Details 改写。
+        Map<String, String> chunkContentByID =
+                handler.citePipeline.resolveCitedChunks(tenantId, draft.additions);
+        // 一份文档摘要被该文档派生的每个页面共享。在任何页面专属元数据之前渲染一个
+        // 确定性的、去重的块，让 provider 的前缀缓存能在并行的 reduce 调用之间复用。
+        Map<String, String> sourceContextByRef = new LinkedHashMap<>();
+
+        for (SlugUpdate add : draft.additions) {
+            ExtractedItem item = add.getItem() == null ? new ExtractedItem() : add.getItem();
+            String cited = WikiIngestCitePipeline.collectCitedChunkContent(
+                    add.sourceChunksOrEmpty(), chunkContentByID);
+            // 用文档级摘要正文把 chunk 框起来，让编辑模型既知道文档讲什么，也知道它
+            // 是哪一类文档（简历 vs 公告 vs 产品页 vs 日程）。只有一句话的标题对较长、
+            // 多主题的源文档来说太薄了。
+            String sourceCtx = add.getDocSummary().trim();
+            if (!sourceCtx.isEmpty()) {
+                String contextKey = add.getSourceRef();
+                if (contextKey.isEmpty()) {
+                    contextKey = add.getKnowledgeId() + "\u0000" + add.getDocTitle();
+                }
+                sourceContextByRef.put(contextKey, "<document>\n<title>" + add.getDocTitle()
+                        + "</title>\n<context>\n" + sourceCtx + "\n</context>\n</document>\n");
+            }
+            // 回落：没有引用可用（回落路径 / 引用遍失败 / 坏的 chunk ID 被过滤掉）
+            // 时，沿用简短的 Details 摘要，让页面仍得到真实文本。
+            String body = cited.isEmpty() ? item.getDetails() : cited;
+            draft.newContentBuilder.append("<document>\n<title>").append(add.getDocTitle())
+                    .append("</title>\n<content>\n**").append(item.getName())
+                    .append("**: ").append(item.getDescription())
+                    .append("\n\n").append(body)
+                    .append("\n</content>\n</document>\n\n");
+
+            for (String alias : item.getAliases()) {
+                page.setAliases(WikiIngestBatchHandler.appendUnique(page.getAliases(), alias));
+            }
+            page.setSourceRefs(WikiIngestBatchHandler.appendUnique(page.getSourceRefs(), add.getSourceRef()));
+
+            if (page.getTitle().isEmpty()) {
+                page.setTitle(item.getName());
+            }
+            if (page.getPageType().isEmpty()) {
+                page.setPageType(add.getType());
+            }
+        }
+
+        List<String> contextKeys = new ArrayList<>(sourceContextByRef.keySet());
+        contextKeys.sort(CodePointOrder::compare);
+        for (String key : contextKeys) {
+            draft.sharedSourceContexts.append(sourceContextByRef.get(key));
+        }
+    }
+
+    /** 生成结果：是否写出正文、新增是否失败。 */
+    private record Generation(boolean changed, boolean additionFailed) {
+    }
+
+    /** 调模板生成整页正文；只有新增失败才标记 additionFailed（纯撤回不毒化页面）。 */
+    private Generation generateContent(PageDraft draft, LlmChatClient chatModel,
+                                       String kbId, WikiBatchContext batchCtx) {
+        if (draft.additions.isEmpty() && draft.retracts.isEmpty()) {
+            return new Generation(false, false);
+        }
+        WikiPage page = draft.page;
+        Map<String, String> titles = batchCtx == null
+                ? Map.of() : batchCtx.slugTitleMany(new ArrayList<>(page.getOutLinks()));
+
+        // slugHandles 把高熵 slug 藏到短引用句柄（ref-1、ref-2…）后面给编辑 LLM 用，
+        // 生成之后再映射回真实 slug（见下面的 decodeContent）。
+        WikiSlugHandles slugHandles = new WikiSlugHandles();
+
+        // 把每条出链 slug 藏到请求局部句柄后面，编辑模型因此永远不用重打真实 slug
+        // ——UUID 式摘要 slug（summary/<uuid>）就是这样被弄花成 404 链接的。
+        // <valid_wiki_links> 清单与 <existing_page_content> 里已有的 [[...]] 引用用的
+        // 是<b>同一张</b>句柄表，因此模型看到一个一致、可安全复制的标识空间；
+        // 我们在生成之后把句柄翻回真实 slug。
+        Set<String> known = new LinkedHashSet<>(page.getOutLinks());
+        for (String outSlug : page.getOutLinks()) {
+            slugHandles.handle(outSlug); // 预分配，让顺序稳定
+        }
+        for (String outSlug : page.getOutLinks()) {
+            String title = titles.get(outSlug);
+            if (title != null && !title.isEmpty()) {
+                draft.relatedSlugs.append("- ").append(slugHandles.handle(outSlug))
+                        .append(" (").append(title).append(")\n");
+            }
+        }
+
+        // 较早生成的页面可能仍含 [c003] 这类短 chunk 别名。它们是内部摄取元数据；
+        // 保持编辑语境干净，让后续更新不会把它们复制进重写的正文。
+        String existingContent = WikiBatchSupport.stripInlineChunkCitations(page.getContent());
+        existingContent = slugHandles.encodeContent(existingContent, known);
+        if (!draft.exists || existingContent.isEmpty()) {
+            existingContent = "(New page)";
+        }
+
+        String hasAdditionsStr = draft.additions.isEmpty() ? "" : "1";
+        String hasRetractionsStr = draft.retracts.isEmpty() ? "" : "1";
+
+        // title/type 仍未设置时优雅回落（对良构更新不该发生——两者都在上面的
+        // additions 循环里填好，而纯 retract 路径要求页面已存在——但保持防御性，
+        // 免得给 LLM 喂一个空的身份块）。
+        String pageTitle = page.getTitle().isEmpty() ? draft.slug : page.getTitle();
+        String pageType = page.getPageType().isEmpty()
+                ? WikiBatchConstants.PAGE_TYPE_FALLBACK : page.getPageType();
+        String pageAliases = String.join(", ", page.getAliases());
+
+        try {
+            String updatedContent = handler.ingestService.generateWithTemplate(chatModel,
+                    WikiPrompts.WIKI_PAGE_MODIFY_USER_PROMPT,
+                    Map.ofEntries(
+                            Map.entry("HasAdditions", hasAdditionsStr),
+                            Map.entry("HasRetractions", hasRetractionsStr),
+                            Map.entry("PageSlug", draft.slug),
+                            Map.entry("PageTitle", pageTitle),
+                            Map.entry("PageType", pageType),
+                            Map.entry("PageAliases", pageAliases),
+                            Map.entry("ExistingContent", existingContent),
+                            Map.entry("SharedSourceContexts", draft.sharedSourceContexts.toString()),
+                            Map.entry("NewContent", draft.newContentBuilder.toString()),
+                            Map.entry("DeletedContent", draft.deletedContent.toString()),
+                            Map.entry("RemainingSourcesContent", draft.remainingSourcesContent.toString()),
+                            Map.entry("AvailableSlugs", draft.relatedSlugs.toString()),
+                            Map.entry("Language", draft.language == null ? "" : draft.language),
+                            Map.entry("CustomInstructions",
+                                    batchCtx == null ? "" : batchCtx.getContentInstructions()),
+                            Map.entry("InstructionScope", WikiBatchConstants.INSTRUCTION_SCOPE_CONTENT)));
+
+            if (updatedContent != null && !updatedContent.isEmpty()) {
+                // 在正文被解析/存储<b>之前</b>，把模型从编码语境里抄来的请求局部句柄
+                // （ref-N）翻回真实 slug，让 out_links 重新反映真实页面。
+                updatedContent = slugHandles.decodeContent(updatedContent);
+                WikiTextUtils.SummaryLine updated = WikiTextUtils.splitSummaryLine(updatedContent);
+                page.setContent(updated.content().isEmpty() ? updatedContent : updated.content());
+                if (!updated.summary().isEmpty()) {
+                    page.setSummary(updated.summary());
+                }
+                return new Generation(true, false);
+            }
+            return new Generation(false, false);
+        } catch (RuntimeException genErr) {
+            log.warn("wiki ingest: update/retract failed for slug {}", draft.slug, genErr);
+            // 标记新增失败，让批次能净化该文档摘要页里陈旧的 [[slug]] 引用，并把缺失
+            // 的页面排除出 finalize 处理。纯 retract 的失败不会毒化任何东西
+            // （页面保持原样），因此不标记。
+            return new Generation(false, !draft.additions.isEmpty());
         }
     }
 
