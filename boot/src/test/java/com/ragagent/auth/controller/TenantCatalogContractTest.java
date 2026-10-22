@@ -251,13 +251,13 @@ class TenantCatalogContractTest {
         assertGolden(kvGet("web-search-config", alpha), 200, "ct-kv-ws-get-default.json");
         assertGolden(kvPut("web-search-config", alpha,
                 "{\"max_results\":5,\"include_date\":true,\"compression_method\":\"summary\","
-                        + "\"blacklist\":[\"bad.com\"],\"api_key\":\"ak-secret-123\","
+                        + "\"blacklist\":[\"bad.com\"],"
                         + "\"proxy_url\":\"http://proxy.local:8080\"}"),
                 200, "ct-kv-ws-put.json");
         assertGolden(kvGet("web-search-config", alpha), 200, "ct-kv-ws-get-after.json");
         assertGolden(kvPut("web-search-config", alpha,
                 "{\"max_results\":7,\"compression_method\":\"none\","
-                        + "\"api_key\":\"***\",\"proxy_url\":\"***\"}"),
+                        + "\"proxy_url\":\"***\"}"),
                 200, "ct-kv-ws-put-preserve.json");
         assertGolden(kvPut("web-search-config", alpha, "{\"max_results\":51}"),
                 400, "ct-kv-ws-put-bad51.json");
@@ -287,7 +287,7 @@ class TenantCatalogContractTest {
     // ════════════════ 6) KV storage-engine-config ════════════════
 
     @Test
-    void kvStorageMatchesGo() throws Exception {
+    void kvStorageWriteIsMovedToBackendTable() throws Exception {
         long alpha = createAlpha();
         assertGolden(kvGet("storage-engine-config", alpha), 200, "ct-kv-storage-get-default.json");
         assertGolden(kvPut("storage-engine-config", alpha,
@@ -295,16 +295,9 @@ class TenantCatalogContractTest {
                         + "\"endpoint\":\"http://minio.example.com\",\"accessKeyId\":\"AK\","
                         + "\"secretAccessKey\":\"SK\",\"bucketName\":\"b\",\"useSsl\":false,"
                         + "\"pathPrefix\":\"p\"}}"),
-                200, "ct-kv-storage-put.json");
-        assertGolden(kvGet("storage-engine-config", alpha), 200, "ct-kv-storage-get-after.json");
-        assertGolden(kvPut("storage-engine-config", alpha,
-                "{\"defaultProvider\":\"minio\",\"minio\":{\"mode\":\"remote\","
-                        + "\"endpoint\":\"http://minio2.example.com\",\"accessKeyId\":\"***\","
-                        + "\"secretAccessKey\":\"***\",\"bucketName\":\"b2\",\"useSsl\":true,"
-                        + "\"pathPrefix\":\"p2\"}}"),
-                200, "ct-kv-storage-put-preserve.json");
-        assertGolden(kvPut("storage-engine-config", alpha, "{\"defaultProvider\":\" \"}"),
-                200, "ct-kv-storage-put-empty-provider.json");
+                405, "ct-kv-storage-put-moved.json");
+        // 写入被拒后读面不变：真相源只在 storage_backends 表。
+        assertGolden(kvGet("storage-engine-config", alpha), 200, "ct-kv-storage-get-default.json");
     }
 
     // ════════════════ 7) KV chat-history-config（enable 自动建隐藏 KB） ════

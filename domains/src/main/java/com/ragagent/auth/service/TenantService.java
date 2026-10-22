@@ -9,6 +9,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.storage.StorageBackendProvisioner;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
+import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.persistence.LikeEscapes;
@@ -328,6 +329,57 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
             }
             throw e;
         }
+    }
+
+    /**
+     * 启动迁移：把存量 KV {@code storage-engine-config} 落成一行 legacy 后端并回写默认 id。
+     *
+     * <p>KV 写接口已停用；没有这一步，只有 KV 配置的租户会在重启后失去 provider 兜底。
+     * 幂等：已有默认后端 id 的租户直接跳过。单租户失败只记日志，不阻断启动。</p>
+     */
+    public int migrateLegacyStorageBackends() {
+        int migrated = 0;
+        for (Tenant tenant : tenantAdmin.listLive()) {
+            if (tenant.getDefaultStorageBackendId() != null
+                    && !tenant.getDefaultStorageBackendId().isBlank()) {
+                continue;
+            }
+            JsonNode raw = tenant.getStorageEngineConfig();
+            if (raw == null || raw.isNull() || raw.isEmpty()) {
+                continue;
+            }
+            StorageEngineConfig config;
+            try {
+                config = MAPPER.treeToValue(raw, StorageEngineConfig.class);
+            } catch (Exception e) {
+                log.warn("legacy storage migration: parse failed for tenant {}", tenant.getId(), e);
+                continue;
+            }
+            if (config == null) {
+                continue;
+            }
+            String backendId = null;
+            try {
+                backendId = storageProvisioner.provisionFromLegacy(tenant.getId(), config);
+                if (backendId == null) {
+                    continue;
+                }
+                tenant.setDefaultStorageBackendId(backendId);
+                tenant.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+                tenantAdmin.updateById(tenant);
+                migrated++;
+            } catch (RuntimeException e) {
+                log.warn("legacy storage migration failed for tenant {}", tenant.getId(), e);
+                if (backendId != null) {
+                    try {
+                        storageProvisioner.deleteForTenant(tenant.getId(), backendId);
+                    } catch (RuntimeException cleanupErr) {
+                        log.warn("legacy storage migration cleanup failed for backend {}", backendId, cleanupErr);
+                    }
+                }
+            }
+        }
+        return migrated;
     }
 
 

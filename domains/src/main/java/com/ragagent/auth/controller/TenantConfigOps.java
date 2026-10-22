@@ -18,7 +18,6 @@ import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.prompt.PromptTemplateCatalog;
 import com.ragagent.platform.web.JsonMappers;
-import java.util.List;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import tools.jackson.databind.JsonNode;
@@ -70,7 +69,8 @@ final class TenantConfigOps {
         return switch (key) {
             case "web-search-config" -> putWebSearch(rawBody);
             case "parser-engine-config" -> putParserEngine(rawBody);
-            case "storage-engine-config" -> putStorageEngine(rawBody);
+            case "storage-engine-config" -> throw new BizException(AppError.ofHttpStatus(405,
+                    "storage config is managed by /api/v1/storage-backends"));
             case "chat-history-config" -> putChatHistory(rawBody);
             case "retrieval-config" -> putRetrieval(rawBody);
             case "memory-config" -> putMemory(rawBody);
@@ -228,48 +228,12 @@ final class TenantConfigOps {
 
     // ── storage-engine-config ──────────────────────────────────────────────
 
+    /** 只读兼容一版：写入口已迁到 {@code /api/v1/storage-backends}，本键仅回显存量值。 */
     private StorageEngineConfig getStorageEngine() {
         TenantRowView tenant = requireContextTenant();
         StorageEngineConfig data = TenantConfigRedaction.storageEngineForResponse(
                 parseConfig(JsonMappers.toJsonNode(tenant.getStorageEngineConfig()), StorageEngineConfig.class));
         return data == null ? new StorageEngineConfig() : data;
-    }
-
-    private Object putStorageEngine(String rawBody) {
-        StorageEngineConfig cfg = TenantBindSupport.bindBody(rawBody, StorageEngineConfig.class, "Invalid request data");
-        if (cfg == null) {
-            cfg = new StorageEngineConfig();
-        }
-        // provider 归一 → 缺省取 firstAllowed → 白名单校验（在租户检查之前）
-        String provider = cfg.getDefaultProvider().trim().toLowerCase(java.util.Locale.ROOT);
-        if (provider.isEmpty()) {
-            provider = firstAllowedStorageProvider();
-        }
-        if (provider.isEmpty()) {
-            throw new BizException(AppError.badRequest(
-                    "No storage provider is allowed by STORAGE_ALLOW_LIST"));
-        }
-        if (!service.storageAllowList.isAllowed(provider)) {
-            throw new BizException(AppError.badRequest(
-                    "Storage provider is not allowed by STORAGE_ALLOW_LIST"));
-        }
-        cfg.setDefaultProvider(provider);
-        TenantRowView tenant = requireContextTenant();
-        StorageEngineConfig merged = TenantConfigRedaction.mergeStorageEngine(
-                cfg, parseConfig(JsonMappers.toJsonNode(tenant.getStorageEngineConfig()), StorageEngineConfig.class));
-        tenant.setStorageEngineConfig(TenantBindSupport.MAPPER.valueToTree(merged));
-        try {
-            service.tenantService.updateTenant(tenant);
-        } catch (RuntimeException e) {
-            throw updateFailed("Failed to update workspace storage engine config", e);
-        }
-        return TenantConfigRedaction.storageEngineForResponse(merged);
-    }
-
-    /** 白名单序的第一个允许项（全允许时为 local） */
-    private String firstAllowedStorageProvider() {
-        List<String> allowed = service.storageAllowList.allowedList();
-        return allowed.isEmpty() ? "" : allowed.get(0);
     }
 
     // ── chat-history-config ────────────────────────────────────────────────

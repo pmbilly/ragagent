@@ -1,0 +1,5 @@
+{
+  "code": 1004,
+  "message": "storage config is managed by /api/v1/storage-backends",
+  "data": null
+}

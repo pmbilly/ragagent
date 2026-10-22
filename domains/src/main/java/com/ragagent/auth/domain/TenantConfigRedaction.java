@@ -48,7 +48,6 @@ public final class TenantConfigRedaction {
             return null;
         }
         cfg.applyEffective();
-        cfg.setApiKey("");
         if (!cfg.getProxyUrl().trim().isEmpty()) {
             cfg.setProxyUrl(REDACTED);
         }
@@ -66,7 +65,6 @@ public final class TenantConfigRedaction {
             prev = existing;
             prev.applyEffective();
         }
-        incoming.setApiKey(preserveIfRedacted(incoming.getApiKey(), prev.getApiKey()));
         incoming.setProxyUrl(preserveIfRedacted(incoming.getProxyUrl(), prev.getProxyUrl()));
         return incoming;
     }

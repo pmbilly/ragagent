@@ -1322,12 +1322,10 @@ class JsonContractRoundTripTest {
 
     @Test
     void tenantKvConfigsRoundTrip() {
-        // WebSearchConfig：空值省略家族（空串/0/false 全省略）；api_key 序列化抑制
-        // （write-only：响应与回读都见不到，黑名单保留）
+        // WebSearchConfig：空值省略家族（空串/0/false 全省略）；黑名单保留。
+        // provider 与凭据由 web-search-providers 表管理，不在本投影。
         WebSearchConfig ws =
                 new WebSearchConfig();
-        ws.setProvider("tavily");
-        ws.setApiKey("ak-secret");
         ws.setMaxResults(5);
         ws.setIncludeDate(true);
         ws.setCompressionMethod("summary");

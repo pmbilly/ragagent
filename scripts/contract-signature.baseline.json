@@ -825,25 +825,13 @@
    "f9d434d42098",
    3
   ],
-  "ct-kv-storage-get-after.json": [
-   "2807a5feccc8",
-   12
-  ],
   "ct-kv-storage-get-default.json": [
    "13a859054a73",
    4
   ],
-  "ct-kv-storage-put-empty-provider.json": [
-   "13a859054a73",
-   4
-  ],
-  "ct-kv-storage-put-preserve.json": [
-   "2807a5feccc8",
-   12
-  ],
-  "ct-kv-storage-put.json": [
-   "2807a5feccc8",
-   12
+  "ct-kv-storage-put-moved.json": [
+   "f9d434d42098",
+   3
   ],
   "ct-kv-unsupported.json": [
    "f9d434d42098",

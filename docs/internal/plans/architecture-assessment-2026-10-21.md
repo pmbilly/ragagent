@@ -218,5 +218,6 @@ boot（组合根，只出不进；@Configuration 8 组合根档）
 - **P1.7 QaRequestContext 跨线程读收口（N7 实战半边）**：`persistLastRequestStateAsync` 改为在调用线程生成 `SessionLastRequestState` 快照（列表防御性拷贝），异步段只拿 `sessionId + 快照`；类注释写明字段线程归属。复核其余异步段：`startAsyncRunner` 在落库之后启动、写入先于 `Thread.start`，附件解析由 runner 独占，因此未做 33 字段 builder 大改——真实敞口只有输入条状态写库这一处。新增 3 条快照单测。
 - **P2.2/P2.3/P2.5 长方法实拆前三刀**：`FaqValidateOps.validateAppendMode` 239 行拆成五个具名步骤 + 三个中间态 record；`KnowledgeSearchOutputFormatter.formatOutput` 227 行拆成空结果/单条 XML/结构化 data/总块数四个片段（新增 3 条特征测试补直接覆盖）；`WikiIngestReducePhase.reduceSlugUpdatesBody` 309 行拆成 `PageDraft` + 五个具名段（页面/分类/撤回/新增/生成）。>100 行方法 109→106，>150 行 31→28，两个基线已收紧。
 - **P2.4 指标面落地（N10 半边）**：boot 引入 actuator，只暴露 `health/info/metrics`；domains 用 Micrometer 记录 `ragagent.qa.turns` / `ragagent.qa.failures`（tag=mode）。端点走现有认证链（匿名 401 / JWT 200），不新增匿名运维面。N10 还剩 PG+flyway 测试 profile 与 `@RouteSecurity` 重估。
-- **N8 未启动的原因**：storage KV 仍被 `FileServiceResolver` 当 provider 兜底读取；把 PUT 降只读会改变 `TenantCatalogContractTest` 的 4 条 KV 金片（线格式红线，需产品确认）。websearch KV 则是**唯一运行期真相源**（无表替代），不是"双头"。建议把 N8 拆成「先定真相源与兼容窗口」的拍板项，再动代码。
+- **P1.9/P1.10 配置收口（N8a/N8c，2026-10-22 拍板后执行）**：storage KV 写接口改 405，表为唯一写入口；启动迁移把存量 KV 段落成 `source=legacy` 后端行（凭据仍加密）；GET 保留一版只读。websearch 从租户 KV 删除 `provider`/`apiKey`（凭据归 provider 表），其余默认值保留；执行面仍支持 L2 直接传入内联凭据。
+- **N8 余额**：parser 三头（env / tenants KV / system HTTP）尚未定真相源，单独一批处理。
 - **剩余队列**：N5 前端表生成式改造（本次只做「可少不可多」的契约锁定）、N6 的 11 类回域需按形状重划（仅剩 `ToolCapabilities`/`TenantRowView` 等有讨论价值）、N8 配置收口（待拍板）、N10 横切、N11 剩余长方法/构造器实拆、N12 前端拆分。

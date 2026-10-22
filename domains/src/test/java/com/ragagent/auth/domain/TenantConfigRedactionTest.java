@@ -185,15 +185,13 @@ class TenantConfigRedactionTest {
     // ── WebSearch ────────────────────────────────────────────────────────────
 
     @Test
-    @DisplayName("WebSearch 响应面：api_key 清空、proxy_url 打码，并做 Effective 归一化")
-    void webSearchForResponseClearsApiKeyAndRedactsProxy() {
+    @DisplayName("WebSearch 响应面：proxy_url 打码，并做 Effective 归一化")
+    void webSearchForResponseRedactsProxy() {
         WebSearchConfig cfg = new WebSearchConfig();
-        cfg.setApiKey(SECRET);
         cfg.setProxyUrl("http://proxy.internal:8080");
 
         WebSearchConfig out = TenantConfigRedaction.webSearchForResponse(cfg);
 
-        assertThat(out.getApiKey()).isEmpty();
         assertThat(out.getProxyUrl()).isEqualTo(REDACTED);
         // Effective 归一化随之生效（响应面不吐"未配置"的原始零值）
         assertThat(out.getMaxResults()).isPositive();
@@ -211,18 +209,15 @@ class TenantConfigRedactionTest {
     }
 
     @Test
-    @DisplayName("WebSearch 更新面：占位符/空串保留旧值，真值覆盖")
-    void mergeWebSearchPreservesRedactedFields() {
+    @DisplayName("WebSearch 更新面：空串保留旧 proxy，真值覆盖")
+    void mergeWebSearchPreservesProxy() {
         WebSearchConfig existing = new WebSearchConfig();
-        existing.setApiKey("old-key");
         existing.setProxyUrl("http://old.proxy");
 
         WebSearchConfig incoming = new WebSearchConfig();
-        incoming.setApiKey(REDACTED);
         incoming.setProxyUrl("");
         WebSearchConfig merged = TenantConfigRedaction.mergeWebSearch(incoming, existing);
 
-        assertThat(merged.getApiKey()).isEqualTo("old-key");
         assertThat(merged.getProxyUrl()).isEqualTo("http://old.proxy");
     }
 

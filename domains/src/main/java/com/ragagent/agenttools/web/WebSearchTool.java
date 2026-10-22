@@ -177,8 +177,8 @@ public class WebSearchTool extends BaseTool {
         // 压缩强制 none——agent 显式读页，RAG 压缩属快答管线
         // （CompressionMethod 在 search 执行路径不被消费，仅声明）。
         WebSearchRequest searchRequest = new WebSearchRequest(
-                tenantConfig.getProvider(),
-                tenantConfig.getApiKey(),
+                "",
+                "",
                 effectiveMax,
                 tenantConfig.isIncludeDate(),
                 tenantConfig.getBlacklist(),

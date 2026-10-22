@@ -100,7 +100,7 @@ public class WebSearchService {
                         + " (" + entity.getProvider() + "): " + e.getMessage());
             }
         }
-        // 兼容路径：deprecated 的 config.Provider（warn 日志）
+        // 直接调用方（L2 WebSearchRequest）可带内联 provider/apiKey；租户 KV 路径不再产生它们。
         if (cfg.provider != null && !cfg.provider.isEmpty()) {
             WebSearchProviderParams base = new WebSearchProviderParams();
             base.setApiKey(cfg.apiKey);
@@ -306,8 +306,6 @@ public class WebSearchService {
      * jsonb 形状以 session 配置为准，这里只承载执行所需）。
      */
     public static final class WebSearchConfig {
-        public String provider = "";
-        public String apiKey = "";
         public WebSearchFilters filters = WebSearchFilters.EMPTY;
         public int maxResults;
         public boolean includeDate;
@@ -315,6 +313,9 @@ public class WebSearchService {
         public String embeddingModelId = "";
         public int documentFragments;
         public String proxyUrl = "";
+        /** 直接调用方（L2 请求）的内联 provider/apiKey；租户 KV 不再写它们。 */
+        public String provider = "";
+        public String apiKey = "";
 
         public WebSearchFilters getFilters() {
             return filters;
@@ -332,12 +333,10 @@ public class WebSearchService {
             }
             out.blacklist = cfg.getBlacklist() == null
                     ? new java.util.ArrayList<>() : new java.util.ArrayList<>(cfg.getBlacklist());
-            out.apiKey = cfg.getApiKey() == null ? "" : cfg.getApiKey();
             out.documentFragments = cfg.getDocumentFragments();
             out.embeddingModelId = cfg.getEmbeddingModelId() == null ? "" : cfg.getEmbeddingModelId();
             out.includeDate = cfg.isIncludeDate();
             out.maxResults = cfg.getMaxResults();
-            out.provider = cfg.getProvider() == null ? "" : cfg.getProvider();
             out.proxyUrl = cfg.getProxyUrl() == null ? "" : cfg.getProxyUrl();
             return out;
             // 尚有 rerank_model_id/embedding_dimension 两个键未在执行形状 WebSearchConfig

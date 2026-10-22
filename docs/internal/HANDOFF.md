@@ -580,6 +580,9 @@ boot           14 件                      →  boot
 
 | P2.5 | 2026-10-22 | **长方法实拆第三刀（wiki reduce）**：`WikiIngestReducePhase.reduceSlugUpdatesBody` 309 行 → `PageDraft` 承载页面/分类/拼装缓冲，主体只留编排；四个具名段：`openDraft`（查页/建页/分类）、`applySummary`、`applyRetracts`、`applyAdditions`、`generateContent`（模板渲染 + 句柄编解码）。**页面字段写入序、refs 合并、失败语义逐字保留**。 | 定向 `WikiIngest*Test` 209 用例绿（含 Reduce 14）· >100 行方法 107→**106**、>150 行 29→**28**；两个基线已收紧 · 48 守卫绿 · `mvn -B clean verify` 绿（5068 / 0 / 2） |
 
+| P1.9 | 2026-10-22 | **storage 配置收口（N8a）**：① `/api/v1/tenants/kv/storage-engine-config` 的 PUT 改 **405**，文案指向 `/api/v1/storage-backends`；GET 保留一版只读兼容。② 新增 `StorageBackendProvisioner.provisionFromLegacy`：把旧 KV 段（含 COS/TOS 的 `secretId`/`accessKey` 键）翻成行面 generic 两键，凭据仍走 `StorageConfigCodec` 加密落库，`source=legacy` + `legacyAlias=true`。③ `LegacyStorageMigrationRunner` 启动时对有 KV、无默认后端行的租户自动迁移并回写默认 id；单租户失败隔离，迁移失败不阻断启动。 | 新增 3 条迁移测试（迁移/幂等/失败隔离）· TenantCatalogContractTest 10 用例绿（含 405 新金片）· 契约金片 1349→1346（删 4 条写金片 + 新增 1 条 405）· 48 守卫绿 · `mvn -B clean verify` 绿（5071 / 0 / 2） |
+| P1.10 | 2026-10-22 | **websearch 配置收口（N8c）**：从 `contract.tenant.WebSearchConfig` 删除 `provider` / `apiKey`——凭据与 provider 归 `web-search-providers` 表；租户 KV 只留 maxResults、compression、blacklist、proxy、embedding/rerank、documentFragments。`TenantConfigRedaction` 去掉 apiKey 清空/preserve；`WebSearchTool` 不再从租户配置取内联凭据；执行面 `WebSearchService.WebSearchConfig` 的 provider/apiKey 保留给 L2 直接调用（`WebSearchRequest`），租户路径不再产生。 | `TenantConfigRedactionTest` 13 + `JsonContractRoundTripTest` 35 + 租户契约 10 用例绿 · 48 守卫绿 · `mvn -B clean verify` 绿（5071 / 0 / 2） |
+
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
 ## 13. 文档地图与归档

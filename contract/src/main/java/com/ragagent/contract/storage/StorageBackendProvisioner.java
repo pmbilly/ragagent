@@ -1,5 +1,7 @@
 package com.ragagent.contract.storage;
 
+import com.ragagent.contract.tenant.StorageEngineConfig;
+
 /**
  * 租户开通时「落一行默认存储后端」的**跨域命令端口**（不是只读端口：带写方法与补偿方法）。
  *
@@ -24,4 +26,12 @@ public interface StorageBackendProvisioner {
 
     /** 补偿动作：删除 {@code #provisionForTenant} 刚落的行（租户行回写失败时调用）。 */
     void deleteForTenant(long tenantId, String backendId);
+
+    /**
+     * 把租户旧 KV {@code storage-engine-config} 落成一行 legacy 后端，返回其 id。
+     *
+     * <p>用于启动迁移：KV 写接口已停用，存量配置必须在表里有一行才能继续被运行期读到。
+     * 无法确定 provider（空配置 / 无对应段）时返回 {@code null}，调用方跳过。</p>
+     */
+    String provisionFromLegacy(long tenantId, StorageEngineConfig config);
 }

@@ -1,6 +1,7 @@
 package com.ragagent.storage.service;
 
 import com.ragagent.contract.storage.StorageBackendProvisioner;
+import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.storage.config.StorageProviderEnv;
 import com.ragagent.storage.domain.StorageBackend;
@@ -67,6 +68,87 @@ public class DefaultStorageBackendProvisioner implements StorageBackendProvision
     @Override
     public void deleteForTenant(long tenantId, String backendId) {
         repository.delete(tenantId, backendId);
+    }
+
+    @Override
+    public String provisionFromLegacy(long tenantId, StorageEngineConfig config) {
+        String provider = legacyProvider(config);
+        Object section = legacySection(config, provider);
+        if (provider.isEmpty() || section == null) {
+            return null;
+        }
+        ObjectNode row = (ObjectNode) JsonMappers.toJsonNode(section);
+        if (row == null) {
+            return null;
+        }
+        // 引擎面凭据键按 provider 分族；行面统一存 generic 两键（与 StorageConfigProjector 互逆）。
+        if ("cos".equals(provider)) {
+            move(row, "secretId", "accessKeyId");
+            move(row, "secretKey", "secretAccessKey");
+        } else {
+            move(row, "accessKey", "accessKeyId");
+            move(row, "secretKey", "secretAccessKey");
+        }
+
+        StorageBackend backend = new StorageBackend();
+        backend.setId(java.util.UUID.randomUUID().toString());
+        backend.setTenantId(tenantId);
+        backend.setName("Legacy " + provider.toUpperCase(java.util.Locale.ROOT));
+        backend.setProvider(provider);
+        backend.setSource("legacy");
+        backend.setStatus("active");
+        // 旧文件路径可能仍引用它：与 env 供给行同档，禁止删除。
+        backend.setLegacyAlias(true);
+        backend.setConfig(row);
+        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+        backend.setCreatedAt(now);
+        backend.setUpdatedAt(now);
+        repository.create(backend, codec.encode(row));
+        return backend.getId();
+    }
+
+    private static String legacyProvider(StorageEngineConfig config) {
+        if (config == null) {
+            return "";
+        }
+        String provider = config.getDefaultProvider() == null
+                ? "" : config.getDefaultProvider().trim().toLowerCase(java.util.Locale.ROOT);
+        if (!provider.isEmpty()) {
+            return provider;
+        }
+        if (config.getLocal() != null) {
+            return "local";
+        }
+        for (String candidate : List.of("minio", "cos", "tos", "s3", "oss", "ks3", "obs")) {
+            if (legacySection(config, candidate) != null) {
+                return candidate;
+            }
+        }
+        return "";
+    }
+
+    private static Object legacySection(StorageEngineConfig config, String provider) {
+        if (config == null) {
+            return null;
+        }
+        return switch (provider) {
+            case "local" -> config.getLocal();
+            case "minio" -> config.getMinio();
+            case "cos" -> config.getCos();
+            case "tos" -> config.getTos();
+            case "s3" -> config.getS3();
+            case "oss" -> config.getOss();
+            case "ks3" -> config.getKs3();
+            case "obs" -> config.getObs();
+            default -> null;
+        };
+    }
+
+    private static void move(ObjectNode node, String from, String to) {
+        var value = node.remove(from);
+        if (value != null && !node.has(to)) {
+            node.set(to, value);
+        }
     }
 
     /**

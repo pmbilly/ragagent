@@ -6,8 +6,9 @@ import java.util.List;
 /**
  * 联网搜索配置段。
  *
- * <p>字段序 = JSON 键序；provider/api_key 与 rag 压缩四字段 + proxy_url 为
- * 空值省略，其余恒输出。{@code Filters} 字段不在本投影（服务端不消费）。</p>
+ * <p>字段序 = JSON 键序；rag 压缩四字段 + proxy_url 为空值省略，其余恒输出。
+ * {@code Filters} 字段不在本投影（服务端不消费）。provider 与凭据由
+ * {@code web-search-providers} 表管理，不在本投影里。</p>
  *
  * <p>字符串字段默认 ""，blacklist 默认 null（json 输出 {@code null}；
  * 经 Effective 归一化后才变 []）。</p>
@@ -19,10 +20,6 @@ public class WebSearchConfig {
     public static final int DEFAULT_MAX_RESULTS = 10;
     /** compression_method 的缺省值。 */
     public static final String DEFAULT_COMPRESSION_METHOD = "none";
-
-    private String provider = "";
-
-    private String apiKey = "";
 
     private int maxResults;
 
@@ -44,10 +41,6 @@ public class WebSearchConfig {
 
     private String proxyUrl = "";
 
-    public String getProvider() { return provider; }
-    public void setProvider(String v) { provider = v == null ? "" : v; }
-    public String getApiKey() { return apiKey; }
-    public void setApiKey(String v) { apiKey = v == null ? "" : v; }
     public int getMaxResults() { return maxResults; }
     public void setMaxResults(int v) { maxResults = v; }
     public boolean isIncludeDate() { return includeDate; }
@@ -89,8 +82,6 @@ public class WebSearchConfig {
      */
     public WebSearchConfig copy() {
         WebSearchConfig c = new WebSearchConfig();
-        c.provider = provider;
-        c.apiKey = apiKey;
         c.maxResults = maxResults;
         c.includeDate = includeDate;
         c.compressionMethod = compressionMethod;
