@@ -1972,7 +1972,7 @@ export default {
     goToAgentSettings: 'Go to agent settings'
   },
   createChat: {
-    title: 'Hi, Welcome to the GAC RAG Agent Platform.',
+    title: 'Hi, Welcome to the RagAgent Platform.',
     newSessionTitle: 'New Session',
     messages: {
       createFailed: 'Failed to create session',

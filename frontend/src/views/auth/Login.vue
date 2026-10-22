@@ -3,7 +3,7 @@
 
     <!-- Logo - Top Left -->
     <div class="header-logo">
-      <img src="@/assets/img/gac-logo.webp" alt="GAC" class="logo-image" />
+      <img src="@/assets/img/RagAgent-Dark.webp" alt="RagAgent" class="logo-image" />
     </div>
 
     <!-- Header Links - Top Right -->
@@ -729,7 +729,7 @@ onMounted(async () => {
   min-height: 100%;
   overflow: hidden;
   position: relative;
-  background: linear-gradient(225deg, #022c22 0%, #064e3b 15%, #065f46 25%, #047857 38%, #059669 50%, #07C05F 65%, #10B981 78%, #34D399 90%, #6EE7B7 100%);
+  background: linear-gradient(225deg, #13221f 0%, #173837 15%, #1b3d45 25%, #296157 38%, #276154 50%, #172d22 65%, #0f1c16 78%, #0d110e 90%, #0b1310 100%);
 
   &::before {
     content: '';
@@ -1091,7 +1091,7 @@ onMounted(async () => {
   cursor: pointer;
 
   .logo-image {
-    width: 120px;
+    width: 160px;
     height: auto;
   }
 }
@@ -1293,6 +1293,7 @@ onMounted(async () => {
   color: var(--td-text-color-secondary);
   margin: 0;
   font-family: var(--app-font-family);
+  display: none;
 }
 
 .form-hint {
@@ -1536,7 +1537,7 @@ onMounted(async () => {
   }
 
   .showcase-subtitle {
-    font-size: 18px;
+    font-size: 24px;
   }
 
   .header-logo {
@@ -1544,7 +1545,7 @@ onMounted(async () => {
     left: 40px;
 
     .logo-image {
-      width: 100px;
+      width: 140px;
     }
   }
 
@@ -1579,7 +1580,7 @@ onMounted(async () => {
 
   .showcase-section {
     flex: 0 0 auto;
-    padding: 40px 24px;
+    padding: 100px 24px 0px 24px;
   }
 
   .showcase-content {
@@ -1592,12 +1593,12 @@ onMounted(async () => {
     left: 30px;
 
     .logo-image {
-      width: 80px;
+      width: 100px;
     }
   }
 
   .showcase-subtitle {
-    font-size: 16px;
+    font-size: 22px;
     margin-bottom: 24px;
   }
 

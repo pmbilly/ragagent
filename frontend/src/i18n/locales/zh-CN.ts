@@ -4094,7 +4094,7 @@ export default {
     }
   },
   createChat: {
-    title: '您好，欢迎来到 GAC RAG 智能体平台',
+    title: '您好，欢迎来到 RagAgent 智能体平台',
     newSessionTitle: '新会话',
     messages: {
       createFailed: '创建会话失败',

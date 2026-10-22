@@ -4092,7 +4092,7 @@ export default {
     }
   },
   createChat: {
-    title: 'Добро пожаловать на платформу GAC RAG-агентов',
+    title: 'Добро пожаловать на платформу RagAgent-агентов',
     newSessionTitle: 'Новая сессия',
     messages: {
       createFailed: 'Не удалось создать сессию',
