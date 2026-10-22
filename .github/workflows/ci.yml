@@ -53,6 +53,19 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 12
+      # 与 PG 同一策略：真实例由 service 提供，测试夹具不再赌“进程能否启动”。
+      # EmbeddedRedis 读到 REDIS_TEST_ADDR 就直接连，不再拉起本地 redis-server。
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 16379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      REDIS_TEST_ADDR: localhost:16379
     steps:
       - uses: actions/checkout@v7
         with:

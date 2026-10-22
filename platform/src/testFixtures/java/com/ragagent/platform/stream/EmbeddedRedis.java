@@ -1,11 +1,15 @@
 package com.ragagent.platform.stream;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -123,7 +127,7 @@ public final class EmbeddedRedis implements AutoCloseable {
             }
 
             Process process = start(binary, port);
-            if (process != null && awaitPort(process, "127.0.0.1", port, Duration.ofSeconds(10))) {
+            if (process != null && awaitReady(process, "127.0.0.1", port, Duration.ofSeconds(10))) {
                 return new EmbeddedRedis(process, "127.0.0.1", port, channel, lock);
             }
             if (process != null) {
@@ -219,8 +223,15 @@ public final class EmbeddedRedis implements AutoCloseable {
         return null;
     }
 
-    /** 等到端口可连**且自己起的进程仍然存活**——进程先死说明端口被占用，不是我们的实例。 */
-    private static boolean awaitPort(Process process, String host, int port, Duration timeout) {
+    /**
+     * 等到端口可连、能回 {@code +PONG}、且自己起的进程仍然存活。
+     *
+     * <p>只测端口可连不够：CI 上出现过“启动瞬间端口可连、随后进程退出”的情况，
+     * {@code tryStart} 会误判成功，测试真正发命令时才报
+     * {@code Unable to connect to Redis}。这里用最小 RESP 命令验证实例真能服务，
+     * 失败则换下一个端口；全部失败返回 {@code null}，回到既有“跳过”契约。</p>
+     */
+    private static boolean awaitReady(Process process, String host, int port, Duration timeout) {
         long deadline = System.nanoTime() + timeout.toNanos();
         while (System.nanoTime() < deadline) {
             if (!process.isAlive()) {
@@ -228,14 +239,23 @@ public final class EmbeddedRedis implements AutoCloseable {
             }
             try (Socket socket = new Socket()) {
                 socket.connect(new InetSocketAddress(host, port), 200);
-                return true;
-            } catch (IOException ignored) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return false;
+                socket.setSoTimeout(300);
+                OutputStream out = socket.getOutputStream();
+                out.write("*1\r\n$4\r\nPING\r\n".getBytes(StandardCharsets.US_ASCII));
+                out.flush();
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
+                if ("+PONG".equals(reader.readLine())) {
+                    return true;
                 }
+            } catch (IOException ignored) {
+                // 还没就绪，继续等
+            }
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return false;
             }
         }
         return false;
