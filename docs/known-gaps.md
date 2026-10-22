@@ -23,7 +23,7 @@
 - **状态**：待实现。
 - **影响**：`PUT /initialization` 携带 `storageBackendId` 时不解析、按缺省存储处理。
 - **替代**：先走 `POST /storage-backends` 建后端，再在系统设置里切换。
-- **涉及**：`InitializationController`、`StorageBackendResolver`。
+- **涉及**：`InitializationController`、`StorageBackendLocator`。
 
 ## 4. `POST /system/sandbox-check`
 

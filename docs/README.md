@@ -32,7 +32,7 @@
 
 先看业务分类：[`architecture/domain-index.md`](architecture/domain-index.md) —— 19 个域按 5 类能力组织，含入口、契约面与前端页面（由脚本生成，勿手改）。
 
-查权限：[`architecture/route-policy-map.md`](architecture/route-policy-map.md) —— 386 条路由 → RBAC 角色下限/公开自服务登记（由脚本生成，勿手改）。
+查权限：[`architecture/route-policy-map.md`](architecture/route-policy-map.md) —— 384 条路由 → RBAC 角色下限/公开自服务登记（由脚本生成，勿手改）。
 
 > 代码注释里的「HANDOFF §x」指 [`internal/HANDOFF.md`](internal/HANDOFF.md)。
 

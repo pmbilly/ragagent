@@ -13,16 +13,16 @@
 | **检索引擎 / retrieve engine** | pgvector / ES / Milvus 等后端适配；由 `RETRIEVE_DRIVER` 或 KB 绑定选择 | `retrieval-engine/.../engine/EngineRegistry.java` |
 | **混合检索 / hybrid search** | 向量召回 + 关键词召回，融合后交重排 | `retrieval-engine/.../HybridSearchService.java` |
 | **重排 / rerank** | 对召回结果二次打分排序；可选模型 | `model-runtime/.../rerank/`、`PluginRerank` |
-| **金片 / golden** | 逐字节钉死的 HTTP 响应样本，共约 1,349 份；改响应形状必须显式重录 | `domains/src/testFixtures/resources/contracts/` |
+| **金片 / golden** | 逐字节钉死的 HTTP 响应样本，共 1,346 份 JSON + 5 份下载/导出类（`.body`+`.headers` 成对）；改响应形状必须显式重录 | `domains/src/testFixtures/resources/contracts/` |
 
 ## 问答与 Agent
 
 | 术语 | 含义 | 代码落点 |
 |---|---|---|
-| **管线 / pipeline** | 一次问答按阶段推进的事件链（14 个阶段） | `domains/.../session/service/rag/PipelineEventType.java` |
+| **管线 / pipeline** | 一次问答按阶段推进的事件链（14 个阶段） | `domains/.../session/rag/PipelineEventType.java` |
 | **阶段 / stage** | 管线上的一个事件，如 `chunk_search` / `chunk_rerank` / `chat_completion_stream` | 同上 |
-| **插件 / plugin** | 挂在某个阶段上的处理单元；按注册序串成链 | `domains/.../session/service/rag/plugin/Plugin.java` |
-| **装配 / wiring** | 把插件、端口实现、Bean 接起来的地方；读代码找不到执行体时先来这里 | `domains/.../session/service/QaWiring.java` |
+| **插件 / plugin** | 挂在某个阶段上的处理单元；按注册序串成链 | `domains/.../session/rag/plugin/Plugin.java` |
+| **装配 / wiring** | 把插件、端口实现、Bean 接起来的地方；读代码找不到执行体时先来这里 | `domains/.../session/assembly/QaWiring.java` |
 | **Agent / ReAct** | 思考 → 行动（工具）→ 观察的循环 | `agent-engine/.../agent/AgentEngine.java` |
 | **工具 / tool** | Agent 可调用的能力（检索、Wiki、SQL、网页等） | `contract/.../tool/`、`agent-engine/.../agent/tool/ToolRegistry.java` |
 | **技能 / skill** | 以 `SKILL.md` 为载体的指令包，按元数据/正文/资源三级注入 | `agent-engine/.../agent/skills/Manager.java` |
@@ -47,8 +47,8 @@
 
 | 术语 | 含义 | 代码落点 |
 |---|---|---|
-| **package-info** | 每个包的设计说明，共 166 份，是事实上的架构文档 | 各包 `package-info.java`；索引见 `architecture/packages.md` |
-| **守卫 / guard** | `scripts/run-guards.sh` 里的 32 条架构/契约检查 | `scripts/` |
+| **package-info** | 每个包的设计说明，共 356 份，是事实上的架构文档 | 各包 `package-info.java`；索引见 `architecture/packages.md` |
+| **守卫 / guard** | `scripts/run-guards.sh` 里的 48 条架构/契约检查 | `scripts/` |
 | **棘轮 / ratchet** | 只许减不许增的基线（大文件、域间边、命名口径等） | `scripts/*.baseline.json` |
 | **契约 / contract** | 跨模块公开 API、SPI 与不可变载荷；纯 JDK | `contract/` |
 | **端口 / port** | 业务域消费能力的接口；实现由组合根注入 | `contract/.../*Port.java` |

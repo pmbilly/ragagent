@@ -53,6 +53,7 @@ curl -s -X POST http://localhost:8083/api/v1/auth/login \
 | `/storage`、`/storage-backends` | 存储配置 |
 | `/system` | 版本、引擎、能力、运行状态 |
 | `/audit` | 审计日志 |
+| `/actuator/health` · `/actuator/info` · `/actuator/metrics` | 运维探针与指标（health 匿名可读；info / metrics 需登录态；指标含 `ragagent.qa.turns` / `ragagent.qa.failures`） |
 
 ## 典型流程
 

@@ -18,7 +18,7 @@ sequenceDiagram
     participant RET as HybridSearchService
     participant LLM as LlmChatClient
 
-    C->>Ctrl: POST /knowledgebase/{kbId}/knowledge-qa（SSE）
+    C->>Ctrl: POST /api/v1/knowledge-chat/{sessionId}（SSE；Agent 模式走 /agent-chat）
     Ctrl->>Entry: runKnowledgeQA(rawSessionId, rawBody, …)
     Entry->>Entry: {@code QaRequestParser} 解析 + 租户快照
     Entry->>Exec: executeQA(reqCtx, mode, generateTitle, sink)
@@ -78,7 +78,7 @@ LOAD_HISTORY → MEMORY_RECALL → QUERY_UNDERSTAND → CHUNK_SEARCH
 | 改检索编排 | `PluginSearch`、`HybridSearchService` |
 | 加检索后端 | `retrieval-engine/…/engine/`（实现 `IndexEngine` 并注册） |
 | 改提示词 | `platform/prompt/` |
-| 改模型接入 | `model-runtime/…/adapter/provider/`（实现 `LlmChatClient`） |
+| 改模型接入 | `model-runtime/…/llm/provider/`（实现 `LlmChatClient`） |
 | 改问答流程 | `QaTurnExecutor`（7 步）+ `SessionKnowledgeQaService` |
 | 加一个管线步骤 | 新增 `Plugin` 实现 + 在 `QaWiring` 注册 + 重跑 `gen-pipeline-map.py` |
 | 改错误形态 | `GlobalExceptionHandler`（唯一出口，见 `docs/api-response-convention.md`） |
@@ -94,6 +94,6 @@ LOAD_HISTORY → MEMORY_RECALL → QUERY_UNDERSTAND → CHUNK_SEARCH
 
 | 想知道 | 看 |
 |---|---|
-| 接口的实现在哪个类 | [port-map.md](port-map.md)（35 个 Port 对照表） |
+| 接口的实现在哪个类 | [port-map.md](port-map.md)（40 个 Port 对照表） |
 | 事件有哪些插件、读写什么 | [pipeline-map.md](pipeline-map.md) |
 | 模块/包边界 | [module-package-map.md](module-package-map.md) |

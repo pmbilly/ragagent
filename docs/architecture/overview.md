@@ -1,6 +1,6 @@
 # 架构总览
 
-七个 Gradle 模块，依赖单向、边界在编译期强制。读代码前先记住一句话：**业务在 `:domains`，能力在三个 runtime，技术底座在 `:platform`，形状在 `:contract`，装配在 `:boot`。**
+七个 Maven 模块，依赖单向、边界在编译期强制。读代码前先记住一句话：**业务在 `:domains`，能力在三个 runtime，技术底座在 `:platform`，形状在 `:contract`，装配在 `:boot`。**
 
 ## 模块与依赖
 
@@ -56,7 +56,7 @@ graph TD
 | 检索融合、重排、引擎注册 | `retrieval-engine/src/main/java/com/ragagent/retrieval/` |
 | LLM provider / embedding / rerank 客户端 | `model-runtime/src/main/java/com/ragagent/{llm,embedding,rerank}/` |
 | Agent 循环 / 工具 / 技能 / 压缩 | `agent-engine/src/main/java/com/ragagent/agent/` |
-| 管线阶段与插件 | `domains/.../session/service/rag/`，装配在 `QaWiring` |
+| 管线阶段与插件 | `domains/.../session/rag/`，装配在 `session/assembly/QaWiring` |
 | 跨模块 Bean / 端口实现 | `boot/src/main/java/com/ragagent/config/`；域内装配点见下方「装配点」 |
 | 跨模块公开类型 | `contract/src/main/java/com/ragagent/contract/` |
 | 域对外的端口实现 | `<域>/api/`：实现 `contract` 端口（Adapter），供其他域或装配层依赖；不要反向依赖 controller |
@@ -129,18 +129,19 @@ graph TD
 | `session` | 8 | 会话、消息、问答、SSE 续流、附件 |
 | `knowledge` | 8 | 知识库、文档、分块、标签、FAQ、索引 |
 | `auth` | 6 | 登录、注册、OIDC、API Key、成员 |
-| `mcp` | 4 | MCP 服务、工具发现、OAuth |
-| `model` / `websearch` / `agentmanagement` | 各 3 | 模型配置、搜索提供商、Agent 管理 |
-| `system` / `storage` / `im` / `datasource` | 各 2 | 系统信息、存储后端、IM 渠道、数据源 |
+| `mcp` | 4 | MCP 服务、工具发现、OAuth、工具审批 |
+| `model` | 4 | 模型配置、Ollama 本地模型管理 |
+| `websearch` / `storage` | 各 3 | 搜索提供商、存储后端 |
+| `agentmanagement` / `system` / `im` / `datasource` | 各 2 | Agent 管理、系统信息与指标、IM 渠道、数据源 |
 | `wiki` / `vectorstore` / `memory` / `initialization` / `favorite` / `embedchannel` / `audit` | 各 1 | 各自单面 |
-| `approval` / `agenttools` | 0 | 无独立 HTTP 面（工具或内部能力） |
+| `agenttools` | 0 | 无独立 HTTP 面（内部工具能力） |
 
-合计 51 个控制器。域的完整清单：`agentmanagement`、`agenttools`、`approval`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki`。
+合计 51 个控制器。域的完整清单：`agentmanagement`、`agenttools`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki`。
 
 ## 模块名与包名不完全对应（刻意）
 
 - `model-runtime` 有 5 个源码根：`embedding` / `llm` / `modelcontext` / `modelruntime` / `rerank`，只有 1 个与模块同名。拆模块时按能力族分，不按模块名分。
-- `boot` 主代码只有入口 + `config/`，但测试树有 23 个业务包：集成测试必须从 HTTP 面进，只能住在组合根。
+- `boot` 主代码只有入口 + `config/`，但测试树有 24 个业务包：集成测试必须从 HTTP 面进，只能住在组合根。
 - `domains` 测试树仍有 10 个跨模块测试（platform 5、model-runtime 4、contract 1）：它们依赖 domains 载荷，迁走会形成 `test → domains` 反向边。已逐个登记在 `scripts/check-module-graph.py` 的 `MISPLACED_TEST_ALLOW`（带理由，只许减）；新增错位即红。
 - 这**不是**待修的错位；改包名会产生 1600+ 文件的 diff，换不来行为收益。判据与理由见 `docs/internal/HANDOFF.md` 的模块/包映射说明。
 - 测试夹具包已从 `com.ragagent.common` / `com.ragagent.support` 改为 `com.ragagent.fixtures`；守卫会拦这两个已解散包回流。

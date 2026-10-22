@@ -8,7 +8,7 @@
 
 前置：JDK 21、Docker、Node 22+。不需要预先安装 PostgreSQL / Redis。
 
-> 本机没有 JDK 21 时，Gradle 会通过 foojay resolver 自动下载；构建样板统一在 `build-logic/`，模块构建文件只声明依赖。
+> 构建用 Maven：本机需自备 JDK 21 并设置 `JAVA_HOME`（Maven 不自动下载 JDK）；版本属性、Boot BOM 与公共插件配置集中在根 `pom.xml`，模块 pom 只声明依赖。
 
 ---
 
@@ -95,7 +95,7 @@ curl -s -H "Authorization: Bearer ${TOKEN}" http://localhost:8083/api/v1/system/
 | 练习 | 目标文件 |
 |---|---|
 | 找到 `/api/v1/knowledge-chat/{sessionId}` 的入口 | `domains/.../session/controller/KnowledgeQaController.java` |
-| 找到 14 个管线阶段 | `domains/.../session/service/rag/PipelineEventType.java` |
+| 找到 14 个管线阶段 | `domains/.../session/rag/PipelineEventType.java` |
 | 找到 `keyword-threshold` 这类检索参数的落点 | `boot/src/main/resources/application.yml` 的 `conversation:` 段，再反查属性类 |
 
 能在 IDE 里从 URL 一路跳到 `EventManager.trigger(...)`，就算过关。
@@ -112,7 +112,7 @@ curl -s -H "Authorization: Bearer ${TOKEN}" http://localhost:8083/api/v1/system/
 # 定向测试（迭代期；单模块构建前先 `mvn -B -DskipTests install`）
 mvn -B -pl domains test -Dtest='com.ragagent.session.*'
 
-# 批末全量闸门（必跑：格式 + javadoc + 45 守卫 + 全量测试）
+# 批末全量闸门（必跑：格式 + javadoc + 48 守卫 + 全量测试）
 mvn -B verify
 
 # 守卫（与 CI 同一份入口）
@@ -156,7 +156,7 @@ cd frontend && npm run type-check && npm test
 | `bash scripts/token.sh 8083` | 取测试账号 JWT |
 | `mvn -B -pl domains test -Dtest='com.ragagent.session.*'` | 定向测试 |
 | `mvn -B verify` | 全量闸门（格式 + javadoc + 守卫 + 全量测试） |
-| `bash scripts/run-guards.sh` | 46 条架构/契约守卫 |
+| `bash scripts/run-guards.sh` | 48 条架构/契约守卫 |
 | `python3 scripts/test-summary.py` | 测试条数、失败与跳过清单 |
 | `python3 scripts/gen-arch-index.py` | 重新生成 `docs/architecture/packages.md` |
 | `SPRINGDOC_ENABLED=true bash scripts/java-server-up.sh` | 本地打开 Scalar API 文档（`:8083/scalar`） |

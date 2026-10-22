@@ -67,13 +67,13 @@
 2. 实现 `Plugin`，`activationEvents()` 返回新常量；
 3. 在 `QaWiring` 注册——**顺序即执行顺序**；
 4. 如果默认路径要跑，加入 `PipelineBuilder.presets()` 的对应预设；
-5. 跑 `:domains:test --tests "com.ragagent.session.*"` 与录制测试；`PipelineRegistryCompletenessTest` 会要求该阶段至少注册一个插件；
+5. 跑 `mvn -B -pl domains test -Dtest='com.ragagent.session.*'` 与录制测试；`PipelineRegistryCompletenessTest` 会要求该阶段至少注册一个插件；
 6. 不要重排已有阶段：SSE 帧顺序与金片都锁着。
 
 ## 相关文件
 
-- `domains/.../session/service/rag/PipelineEventType.java`
-- `domains/.../session/service/rag/EventManager.java`
-- `domains/.../session/service/rag/PipelineBuilder.java`
-- `domains/.../session/service/rag/plugin/`
-- `domains/.../session/service/QaWiring.java`
+- `domains/.../session/rag/PipelineEventType.java`
+- `domains/.../session/rag/EventManager.java`
+- `domains/.../session/rag/PipelineBuilder.java`
+- `domains/.../session/rag/plugin/`
+- `domains/.../session/assembly/QaWiring.java`

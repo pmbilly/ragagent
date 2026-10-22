@@ -23,7 +23,7 @@ sequenceDiagram
   participant W as SseFrameWriter
 
   C->>K: POST /api/v1/knowledge-chat/{sessionId}
-  K->>R: runKnowledgeQA(rawBody, sink)
+  K->>R: runKnowledgeQA(sessionId, rawBody, resourceUrls, sink)
   R->>R: QaRequestBinder + QaRequestParser
   R->>E: executeQA(reqCtx, mode, sink)
   E->>O: setupSSEStream(...)
@@ -90,7 +90,7 @@ domains/.../session/assembly/QaWiring.java
 
 ### 3. 身份不随虚拟线程走
 
-`TenantContext` 是 ThreadLocal 语义。跨虚拟线程/异步任务时必须显式传快照；漏一次就是"owner 为空 / 静默 0 行"。原先全仓 30+ 处手工 `replay()`（15 个 `capture()` 站点），现已统一收口到 `TenantScope`（`run`/`supply`/`callable`），并由 `scripts/check-tenant-scope.py` 守卫禁止新的裸 `capture`/`replay`。这是全仓最容易被"优化"掉、也最容易埋隐 bug 的契约。
+`TenantContext` 是 ThreadLocal 语义。跨虚拟线程/异步任务时必须显式传快照；漏一次就是"owner 为空 / 静默 0 行"。原先全仓 30+ 处手工 `replay()`，现已统一收口到 `TenantScope`（`run`/`supply`/`callable`），当前 26 个 `capture()` 站点都在边界显式快照，并由 `scripts/check-tenant-scope.py` 守卫禁止新的裸 `capture`/`replay`。这是全仓最容易被"优化"掉、也最容易埋隐 bug 的契约。
 
 ### 4. 一轮的收尾不在主链路里
 

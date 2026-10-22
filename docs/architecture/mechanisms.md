@@ -29,20 +29,20 @@
 
 **去哪改**：`KnowledgeRedisWiring`、`MemoryTaskQueueWiring`、`DataSourceTaskQueueWiring` 与 `WikiRedisWiring`；开关见 `.env.example` 的 `*_REDIS_ENABLED`。打开后启动时会 ping 一次 Redis，连不上直接失败（不静默退化）。
 
-## 3. embedding 有两条路径
+## 3. embedding 的取径不止一条
 
-**现象**：同时存在 `domains/.../knowledge/client/EmbedderClient` 与 `model-runtime/.../embedding/EmbedderFactory`。
+**现象**：索引侧与查询侧的嵌入入口不同：`domains/.../knowledge/index/ChunkVectorIndexer`、`retrieval-engine/.../HybridSearchService`、`model-runtime/.../embedding/`（`EmbedderFactory` / `BatchEmbedder` / `ConcurrencyEmbedder` / `EmbedderPooler`）各有一段。
 
 **分叉点**在 `ChunkVectorIndexer.indexAndStore`：
 
-- KB **绑定了外部 vector store**（`vectorWrites.boundEngine(...) != null`）→ 走引擎口：`modelRuntimeAssembler.getEmbeddingModel(...)` 拿 `Embedder`，批量/重试由引擎承担；
-- **未绑定**（本地 pg 直连）→ `EmbedderClient.configFrom(...)` 直接 `POST {base_url}/embeddings`。
+- KB **绑定了外部 vector store**（`vectorWrites.boundEngine(...) != null`）→ 走引擎口：批量、超时、重试由引擎自己决定；
+- **未绑定**（本地 pg 直连）→ `modelRuntimeAssembler.getEmbeddingModel(...)` 拿 `Embedder`，按 `BatchEmbedProperties.embedSize` 分批 `batchEmbed` 后落 `IndexRow`。
 
-查询侧同理：`HybridSearchService` 对 pg 用 `EmbeddingPort`（`EmbedderClient` 实现）；外部引擎在自己的 `batchIndex` / search 内部嵌入。
+查询侧：`HybridSearchService` 走契约端口 `EmbeddingPort`（实现是 model-runtime 的 `ModelRuntimeEmbeddingAdapter`）；外部引擎在自己的 `batchIndex` / search 内部嵌入。
 
-**原因**：外部引擎的批大小、超时、重试语义由引擎决定；本地 pg 保留 Go 时代的直连路径，避免为了"统一"引入一层不必要的工厂。
+**原因**：外部引擎的批大小、超时、重试语义由引擎决定；本地 pg 保留直连路径，避免为了"统一"引入一层不必要的工厂。
 
-**去哪改**：`ChunkVectorIndexer`、`EmbedderClient`、`HybridSearchService`；不要只改其中一条而假定另一条也会变。
+**去哪改**：`ChunkVectorIndexer`、`HybridSearchService`、`model-runtime` 的 `embedding` 家族；不要只改其中一条而假定另一条也会变。
 
 ## 4. 全仓 0 处 `@Scheduled`
 
@@ -90,7 +90,7 @@ Thread.ofVirtual().start(() -> TenantScope.run(snap, () -> {
 }));
 ```
 
-全仓 15 个 `capture()` 站点（原先 30+ 处手工 `replay()`）已统一收口到 `TenantScope`（`run` / `supply` / `callable` / `runnable`），覆盖 domains / agent-engine / retrieval-engine / model-runtime / platform / boot，包括 `QaSseOrchestrator`、`QaTurnFinalizer`、`QaTurnExecutor`、`SteerSinkBridge`、`MessageSuggestionService`、`ActPhase`、`EventBus`、`HybridSearchService` 等。
+全仓 26 个 `capture()` 站点（原先 30+ 处手工 `replay()`）已统一收口到 `TenantScope`（`run` / `supply` / `callable` / `runnable`），覆盖 domains / agent-engine / retrieval-engine / model-runtime / platform / boot，包括 `QaSseOrchestrator`、`QaTurnFinalizer`、`QaTurnExecutor`、`SteerSinkBridge`、`MessageSuggestionService`、`ActPhase`、`EventBus`、`HybridSearchService` 等。
 
 **去哪改**：`platform/.../access/TenantScope.java`；守卫 `scripts/check-tenant-scope.py` 拦裸 `.replay()` 与未走 TenantScope 的 `capture()`。
 
@@ -127,8 +127,8 @@ Thread.ofVirtual().start(() -> TenantScope.run(snap, () -> {
 
 | 写法 | 数量 | 适用 |
 |---|---|---|
-| MyBatis-Plus `Mapper`（`*/mapper/*Mapper.java`） | 76 | 单表 CRUD、条件查询 |
-| `Repository`（`*/repository/*Repository.java`） | 28 | 跨表、方言差异（PostgreSQL/SQLite）、事务模板、复杂聚合 |
+| MyBatis-Plus `Mapper`（`*/mapper/*Mapper.java`） | 51 | 单表 CRUD、条件查询 |
+| `Repository`（`*/repository/*Repository.java`） | 58 | 跨表、方言差异（PostgreSQL/SQLite）、事务模板、复杂聚合 |
 
 **选择规则**：单表且无方言分支 → `Mapper`；出现跨表、方言判断或需要事务模板 → `Repository`。
 
@@ -150,7 +150,7 @@ Thread.ofVirtual().start(() -> TenantScope.run(snap, () -> {
 | `SsrfGuard`（IM 出站） | 传给 IM adapter 工厂为 `null`，出站请求不做 SSRF 校验 | 无 | `ImAdapterWiringConfig` |
 | knowledge 四个 Redis 队列 | 开关关闭 = 用 InProcess（单实例语义）；开关打开但连不上 = **启动失败**（不静默退化） | 启动日志 | `KnowledgeRedisWiring` 类注释 |
 | 队列 handler（`DataSourceSyncHandler` 等） | 任务被丢弃，记 **ERROR**（非静默） | ✅ ERROR | `RedisDataSourceSyncTaskQueue` |
-| 富化服务（`WikiImageEnricher` 等） | 返回 null → 调用方走"端口缺席"退化分支 | 部分 | `known-gaps.md` 第 18 节 |
+| 富化服务（`WikiImageEnricher` 等） | `getIfAvailable(WikiImageEnricher::identity)` 回退空实现，走"端口缺席"退化分支 | 部分 | `WikiIngestService`（`ObjectProvider` 注入） |
 | `WikiActivityAudit` | 审计写入退化为一条 debug 日志 | ✅ debug | `contract/audit/WikiActivityAudit` |
 
 **读代码时的判断顺序**：看到 `getIfAvailable()` → 查本表 → 表里没有 → 看该行 3 行内有没有 `null` 判断与日志。

@@ -9,10 +9,13 @@
 |---|---|---|
 | 企业微信 | `wecom` | webhook / 长连接 |
 | 微信（公众号等） | `wechat` | webhook |
-| 飞书 | `feishu` | webhook / 长连接 |
+| 飞书（含国际版） | `feishu` / `lark` | webhook / 长连接 |
 | 钉钉 | `dingtalk` | webhook / 长连接 |
 | Slack | `slack` | webhook |
-| 通用 IM | `im` | 由自定义适配器实现 |
+| Telegram | `telegram` | webhook |
+| Mattermost | `mattermost` | webhook / 长连接 |
+| QQ 机器人 | `qqbot` | 长连接 |
+| 云之家 | `yunzhijia` | webhook / 长连接 |
 
 具体可用方式取决于渠道配置里的“接入模式”；新建渠道时页面会按渠道给出可选项。
 
