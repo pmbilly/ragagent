@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres123!@#
-      POSTGRES_DB: WeKnora
+      POSTGRES_DB: RagAgent
     ports:
       - "15432:5432"
     volumes:

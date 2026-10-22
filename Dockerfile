@@ -73,7 +73,7 @@ USER ragagent
 # RETRIEVE_DRIVER/BUILTIN_MODELS_CONFIG —— 见 .env.example
 ENV DB_HOST=localhost \
     DB_PORT=5432 \
-    DB_NAME=WeKnora \
+    DB_NAME=RagAgent \
     REDIS_HOST=localhost \
     REDIS_PORT=6379 \
     DOCREADER_ADDR=localhost:50051 \

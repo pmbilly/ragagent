@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-WeKnora MCP Server Package
+RagAgent MCP Server Package
 
-A Model Context Protocol server that provides access to the WeKnora knowledge management API.
+A Model Context Protocol server that provides access to the RagAgent knowledge management API.
 """
 
 __version__ = "1.1.1"
-__author__ = "WeKnora Team"
-__description__ = "WeKnora MCP Server - Model Context Protocol server for WeKnora API"
+__author__ = "RagAgent Team"
+__description__ = "RagAgent MCP Server - Model Context Protocol server for RagAgent API"
 
-from weknora_mcp_server import WeKnoraClient, run
+from ragagent_mcp_server import RagAgentClient, run
 
-__all__ = ["WeKnoraClient", "run"]
+__all__ = ["RagAgentClient", "run"]

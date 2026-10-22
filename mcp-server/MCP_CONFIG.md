@@ -1,8 +1,8 @@
-# 使用 uv 运行 WeKnora MCP 服务器
+# 使用 uv 运行 RagAgent MCP 服务器
 
 > 更推荐使用`uv`来运行基于python的MCP服务。
 >
-> 也可通过 PyPI 安装：`pip install tencent-weknora-mcp`，或使用 `uvx --from tencent-weknora-mcp weknora-mcp-server`（官方包名 `tencent-weknora-mcp`，由 [Tencent/WeKnora](https://github.com/Tencent/WeKnora) 维护）。
+> 也可通过 PyPI 安装：`pip install ragagent-mcp`，或使用 `uvx --from ragagent-mcp ragagent-mcp-server`（官方包名 `ragagent-mcp`，上游为 [Tencent/WeKnora](https://github.com/Tencent/WeKnora)）。
 
 ## 1. 安装 uv
 
@@ -26,17 +26,17 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 ```json
 {
   "mcpServers": {
-    "weknora": {
+    "ragagent": {
       "args": [
         "--directory",
-        "/path/WeKnora/mcp-server",
+        "/path/RagAgent/mcp-server",
         "run",
         "run_server.py"
       ],
       "command": "uv",
       "env": {
-        "WEKNORA_API_KEY": "your_api_key_here",
-        "WEKNORA_BASE_URL": "http://localhost:8080/api/v1"
+        "RAGAGENT_API_KEY": "your_api_key_here",
+        "RAGAGENT_BASE_URL": "http://localhost:8080/api/v1"
       }
     }
   }
@@ -50,17 +50,17 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 ```json
 {
   "mcpServers": {
-    "weknora": {
+    "ragagent": {
       "command": "uv",
       "args": [
         "--directory",
-        "/path/WeKnora/mcp-server",
+        "/path/RagAgent/mcp-server",
         "run",
         "run_server.py"
       ],
       "env": {
-        "WEKNORA_API_KEY": "your_api_key_here",
-        "WEKNORA_BASE_URL": "http://localhost:8080/api/v1"
+        "RAGAGENT_API_KEY": "your_api_key_here",
+        "RAGAGENT_BASE_URL": "http://localhost:8080/api/v1"
       }
     }
   }
@@ -74,17 +74,17 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 ```json
 {
   "mcpServers": {
-    "weknora": {
+    "ragagent": {
       "command": "uv",
       "args": [
         "--directory",
-        "/path/WeKnora/mcp-server",
+        "/path/RagAgent/mcp-server",
         "run",
         "run_server.py"
       ],
       "env": {
-        "WEKNORA_API_KEY": "your_api_key_here",
-        "WEKNORA_BASE_URL": "http://localhost:8080/api/v1"
+        "RAGAGENT_API_KEY": "your_api_key_here",
+        "RAGAGENT_BASE_URL": "http://localhost:8080/api/v1"
       }
     }
   }
@@ -98,17 +98,17 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 ```json
 {
   "mcpServers": {
-    "weknora": {
+    "ragagent": {
       "command": "uv",
       "args": [
         "--directory",
-        "/path/WeKnora/mcp-server",
+        "/path/RagAgent/mcp-server",
         "run",
         "run_server.py"
       ],
       "env": {
-        "WEKNORA_API_KEY": "your_api_key_here",
-        "WEKNORA_BASE_URL": "http://localhost:8080/api/v1"
+        "RAGAGENT_API_KEY": "your_api_key_here",
+        "RAGAGENT_BASE_URL": "http://localhost:8080/api/v1"
       }
     }
   }

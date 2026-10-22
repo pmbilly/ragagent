@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-WeKnora MCP Server 模组测试脚本
+RagAgent MCP Server 模组测试脚本
 
 测试模组的各种启动方式和功能。unittest discover 会收集本文件中的 TestCase；
 也可直接运行: python test_module.py
@@ -18,7 +18,7 @@ REQUIRED_FILES = [
     "__init__.py",
     "main.py",
     "run_server.py",
-    "weknora_mcp_server.py",
+    "ragagent_mcp_server.py",
     "requirements.txt",
     "setup.py",
     "pyproject.toml",
@@ -33,20 +33,20 @@ class ModuleIntegrationTest(unittest.TestCase):
     def test_imports(self):
         import mcp  # noqa: F401
         import requests  # noqa: F401
-        import weknora_mcp_server  # noqa: F401
-        from weknora_mcp_server import WeKnoraClient, run  # noqa: F401
+        import ragagent_mcp_server  # noqa: F401
+        from ragagent_mcp_server import RagAgentClient, run  # noqa: F401
         import main  # noqa: F401
 
     def test_environment_optional_vars(self):
-        os.getenv("WEKNORA_BASE_URL")
-        os.getenv("WEKNORA_API_KEY")
+        os.getenv("RAGAGENT_BASE_URL")
+        os.getenv("RAGAGENT_API_KEY")
 
     def test_client_creation(self):
-        from weknora_mcp_server import WeKnoraClient
+        from ragagent_mcp_server import RagAgentClient
 
-        base_url = os.getenv("WEKNORA_BASE_URL", "http://localhost:8080/api/v1")
-        api_key = os.getenv("WEKNORA_API_KEY", "test_key")
-        client = WeKnoraClient(base_url, api_key)
+        base_url = os.getenv("RAGAGENT_BASE_URL", "http://localhost:8080/api/v1")
+        api_key = os.getenv("RAGAGENT_API_KEY", "test_key")
+        client = RagAgentClient(base_url, api_key)
         self.assertEqual(client.base_url, base_url)
         self.assertEqual(client.api_key, api_key)
 
@@ -75,17 +75,17 @@ class ModuleIntegrationTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_wiki_tools(self):
-        import weknora_mcp_server
+        import ragagent_mcp_server
 
-        client = weknora_mcp_server.WeKnoraClient("http://localhost:8080/api/v1", "test")
+        client = ragagent_mcp_server.RagAgentClient("http://localhost:8080/api/v1", "test")
         for method in ["wiki_search", "wiki_read_page", "wiki_index_view"]:
-            self.assertTrue(hasattr(client, method), f"WeKnoraClient missing: {method}")
+            self.assertTrue(hasattr(client, method), f"RagAgentClient missing: {method}")
             self.assertTrue(callable(getattr(client, method)), f"{method} not callable")
 
     def test_pyproject_metadata(self):
         text = (MCP_SERVER_DIR / "pyproject.toml").read_text(encoding="utf-8")
-        self.assertIn("tencent-weknora-mcp", text)
-        self.assertIn("weknora-mcp-server", text)
+        self.assertIn("ragagent-mcp", text)
+        self.assertIn("ragagent-mcp-server", text)
 
 
 if __name__ == "__main__":
