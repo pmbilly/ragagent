@@ -59,10 +59,6 @@
       "lines": 157,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
-    "domains/src/main/java/com/ragagent/knowledge/service/faq/FaqValidateOps.java#validateAppendMode": {
-      "lines": 239,
-      "reason": "存量基线（M1 首次登记，2026-10-20）"
-    },
     "domains/src/main/java/com/ragagent/mcp/controller/McpServiceCrudOps.java#updateMCPService": {
       "lines": 170,
       "reason": "存量基线（M1 首次登记，2026-10-20）"

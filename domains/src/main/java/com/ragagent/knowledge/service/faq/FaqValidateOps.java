@@ -31,41 +31,104 @@ final class FaqValidateOps {
     List<Integer> validateAppendMode(long tenantId, String kbId,
                                              List<FaqEntryPayload> entries,
                                              FaqImportProgress progress) {
+        ExistingIndex index = loadExistingIndex(tenantId, kbId);
+        StdQPass pass = validateStandardQuestions(entries, progress, index);
+        List<Integer> validIndices = new ArrayList<>(pass.validIndices());
+        Map<Integer, Chunk> mergeChunkMap = pass.mergeChunkMap();
+        List<FaqFailedEntry> failedEntries = pass.failedEntries();
+        int failedCount = pass.failedCount();
+
+        Map<String, Integer> batchAllQuestions = collectBatchQuestions(entries, validIndices);
+        Map<Integer, List<String>> removedSimilarMap =
+                filterSimilarQuestions(entries, validIndices, index, mergeChunkMap, batchAllQuestions);
+        Map<Integer, List<String>> removedNegativeMap =
+                filterNegativeQuestions(entries, validIndices);
+
+        PostValidation post = postValidateMerges(entries, validIndices, mergeChunkMap, failedEntries);
+        failedCount += post.failedCount();
+        int mergeCount = post.mergeCount();
+
+        int partialFailedCount = progress.partialFailedCount();
+        for (int i : validIndices) {
+            List<String> removedSimilar = removedSimilarMap.get(i);
+            List<String> removedNegative = removedNegativeMap.get(i);
+            if ((removedSimilar != null && !removedSimilar.isEmpty())
+                    || (removedNegative != null && !removedNegative.isEmpty())) {
+                failedEntries.add(partialFailedEntry(i, entries.get(i),
+                        removedSimilar == null ? List.of() : removedSimilar,
+                        removedNegative == null ? List.of() : removedNegative));
+                partialFailedCount++;
+            }
+        }
+        List<Integer> mergeIndices = new ArrayList<>();
+        for (int i : validIndices) {
+            if (mergeChunkMap.containsKey(i)) {
+                mergeIndices.add(i);
+            }
+        }
+        progress = FaqImportService.withValidationResults(progress, failedEntries, failedCount, partialFailedCount,
+                mergeIndices, null);
+        service.taskStore.saveProgress(progress);
+        log.info("Append mode validation completed: total={}, valid={}, merge_candidates={}, failed={}, partial_failed={}",
+                entries.size(), validIndices.size(), mergeCount, progress.failedCount(),
+                progress.partialFailedCount());
+        return validIndices;
+    }
+
+    /** 现有 FAQ chunk 的四张索引。 */
+    private record ExistingIndex(
+            Map<String, Chunk> stdQToChunk,
+            Map<String, String> questionToChunkId,
+            Map<String, Set<String>> chunkQuestions,
+            Map<String, String> chunkIdToStdQ) {
+    }
+
+    private ExistingIndex loadExistingIndex(long tenantId, String kbId) {
         List<Chunk> existingChunks = service.faqChunkRepository
                 .listAllFAQChunksWithMetadataByKnowledgeBaseId(tenantId, kbId);
-
-        Map<String, Chunk> existingStdQToChunk = new LinkedHashMap<>();
-        Map<String, String> existingQuestionToChunkID = new LinkedHashMap<>();
-        Map<String, Set<String>> existingChunkQuestions = new LinkedHashMap<>();
-        Map<String, String> existingChunkIDToStdQ = new LinkedHashMap<>();
+        Map<String, Chunk> stdQToChunk = new LinkedHashMap<>();
+        Map<String, String> questionToChunkId = new LinkedHashMap<>();
+        Map<String, Set<String>> chunkQuestions = new LinkedHashMap<>();
+        Map<String, String> chunkIdToStdQ = new LinkedHashMap<>();
         for (Chunk chunk : existingChunks) {
             FaqChunkMetadata meta = service.faqChunkCodec.sanitizedFaqMetadata(chunk);
             if (meta == null) {
                 continue;
             }
-            Set<String> qs = new LinkedHashSet<>();
+            Set<String> questions = new LinkedHashSet<>();
             if (!meta.standardQuestion.isEmpty()) {
-                existingStdQToChunk.put(meta.standardQuestion, chunk);
-                existingQuestionToChunkID.put(meta.standardQuestion, chunk.getId());
-                qs.add(meta.standardQuestion);
+                stdQToChunk.put(meta.standardQuestion, chunk);
+                questionToChunkId.put(meta.standardQuestion, chunk.getId());
+                questions.add(meta.standardQuestion);
             }
             if (meta.similarQuestions != null) {
                 for (String q : meta.similarQuestions) {
                     if (!q.isEmpty()) {
-                        existingQuestionToChunkID.put(q, chunk.getId());
-                        qs.add(q);
+                        questionToChunkId.put(q, chunk.getId());
+                        questions.add(q);
                     }
                 }
             }
-            existingChunkQuestions.put(chunk.getId(), qs);
-            existingChunkIDToStdQ.put(chunk.getId(), meta.standardQuestion);
+            chunkQuestions.put(chunk.getId(), questions);
+            chunkIdToStdQ.put(chunk.getId(), meta.standardQuestion);
         }
+        return new ExistingIndex(stdQToChunk, questionToChunkId, chunkQuestions, chunkIdToStdQ);
+    }
 
+    /** 第一遍：基础格式 + 批次内标准问去重 + 合并候选。 */
+    private record StdQPass(
+            List<Integer> validIndices,
+            Map<Integer, Chunk> mergeChunkMap,
+            List<FaqFailedEntry> failedEntries,
+            int failedCount) {
+    }
+
+    private StdQPass validateStandardQuestions(List<FaqEntryPayload> entries,
+                                               FaqImportProgress progress,
+                                               ExistingIndex index) {
         Map<Integer, Chunk> mergeChunkMap = new LinkedHashMap<>();
-
-        // 第一次迭代：基本格式验证 + 文件内标准问去重 + 合并候选识别
         Map<String, Integer> batchStandardQuestions = new LinkedHashMap<>();
-        List<Integer> validIndicesAfterStdQ = new ArrayList<>();
+        List<Integer> validIndices = new ArrayList<>();
         List<FaqFailedEntry> failedEntries = new ArrayList<>(progress.failedEntries() == null
                 ? List.of() : progress.failedEntries());
         int failedCount = progress.failedCount();
@@ -85,12 +148,12 @@ final class FaqValidateOps {
                         "标准问冲突：与批次内第 " + (firstIdx + 1) + " 条标准问重复", entry, "pre_validation"));
                 continue;
             }
-            Chunk mergeChunk = existingStdQToChunk.get(standardQ);
+            Chunk mergeChunk = index.stdQToChunk().get(standardQ);
             if (mergeChunk != null) {
                 mergeChunkMap.put(i, mergeChunk);
-            } else if (existingQuestionToChunkID.containsKey(standardQ)) {
-                String conflictChunkId = existingQuestionToChunkID.get(standardQ);
-                String conflictStdQ = existingChunkIDToStdQ.getOrDefault(conflictChunkId, "");
+            } else if (index.questionToChunkId().containsKey(standardQ)) {
+                String conflictChunkId = index.questionToChunkId().get(standardQ);
+                String conflictStdQ = index.chunkIdToStdQ().getOrDefault(conflictChunkId, "");
                 failedCount++;
                 failedEntries.add(failedEntry(i,
                         "标准问冲突：与知识库中标准问“" + conflictStdQ + "”的相似问“"
@@ -98,12 +161,16 @@ final class FaqValidateOps {
                 continue;
             }
             batchStandardQuestions.put(standardQ, i);
-            validIndicesAfterStdQ.add(i);
+            validIndices.add(i);
         }
+        return new StdQPass(validIndices, mergeChunkMap, failedEntries, failedCount);
+    }
 
-        // 第二次迭代：相似问冲突检测
+    /** 第二遍的输入：批次内所有问题（标准问 + 相似问）→ 首条出现行。 */
+    private Map<String, Integer> collectBatchQuestions(List<FaqEntryPayload> entries,
+                                                       List<Integer> validIndices) {
         Map<String, Integer> batchAllQuestions = new LinkedHashMap<>();
-        for (int i : validIndicesAfterStdQ) {
+        for (int i : validIndices) {
             FaqEntryPayload entry = entries.get(i);
             batchAllQuestions.putIfAbsent(FaqChunkMetadata.trimSpace(entry.standardQuestion()), i);
             if (entry.similarQuestions() != null) {
@@ -115,16 +182,21 @@ final class FaqValidateOps {
                 }
             }
         }
+        return batchAllQuestions;
+    }
 
+    /** 第三遍：相似问冲突；返回被移除的相似问（行 → 原因）。 */
+    private Map<Integer, List<String>> filterSimilarQuestions(List<FaqEntryPayload> entries,
+                                                              List<Integer> validIndices,
+                                                              ExistingIndex index,
+                                                              Map<Integer, Chunk> mergeChunkMap,
+                                                              Map<String, Integer> batchAllQuestions) {
         Map<Integer, List<String>> removedSimilarMap = new LinkedHashMap<>();
-        Map<Integer, List<String>> removedNegativeMap = new LinkedHashMap<>();
-
-        for (int idx = 0; idx < validIndicesAfterStdQ.size(); idx++) {
-            int i = validIndicesAfterStdQ.get(idx);
+        for (int i : validIndices) {
             FaqEntryPayload entry = entries.get(i);
             String standardQ = FaqChunkMetadata.trimSpace(entry.standardQuestion());
             Set<String> ownChunkQuestions = mergeChunkMap.containsKey(i)
-                    ? existingChunkQuestions.get(mergeChunkMap.get(i).getId()) : null;
+                    ? index.chunkQuestions().get(mergeChunkMap.get(i).getId()) : null;
 
             List<String> validSimilar = new ArrayList<>();
             List<String> removed = new ArrayList<>();
@@ -138,7 +210,7 @@ final class FaqValidateOps {
                         removed.add("「相似问冲突」：“" + q + "”与本条“标准问”冲突");
                         continue;
                     }
-                    if (existingQuestionToChunkID.containsKey(q)) {
+                    if (index.questionToChunkId().containsKey(q)) {
                         if (ownChunkQuestions != null && ownChunkQuestions.contains(q)) {
                             validSimilar.add(q);
                             continue;
@@ -146,9 +218,9 @@ final class FaqValidateOps {
                         removed.add("「相似问冲突」：“" + q + "”与知识库已有“标准问/相似问”冲突");
                         continue;
                     }
-                    Integer firstIdx2 = batchAllQuestions.get(q);
-                    if (firstIdx2 != null && firstIdx2 != i) {
-                        removed.add("「相似问冲突」：“" + q + "”与第 " + (firstIdx2 + 1)
+                    Integer firstIdx = batchAllQuestions.get(q);
+                    if (firstIdx != null && firstIdx != i) {
+                        removed.add("「相似问冲突」：“" + q + "”与第 " + (firstIdx + 1)
                                 + " 行“标准问/相似问”冲突");
                         continue;
                     }
@@ -167,10 +239,14 @@ final class FaqValidateOps {
                 removedSimilarMap.put(i, removed);
             }
         }
+        return removedSimilarMap;
+    }
 
-        // 第三次迭代：反例冲突检测（预校验，仅检查新条目自身数据）
-        for (int idx = 0; idx < validIndicesAfterStdQ.size(); idx++) {
-            int i = validIndicesAfterStdQ.get(idx);
+    /** 第四遍：反例冲突（只检查新条目自身数据）；返回被移除的反例。 */
+    private Map<Integer, List<String>> filterNegativeQuestions(List<FaqEntryPayload> entries,
+                                                               List<Integer> validIndices) {
+        Map<Integer, List<String>> removedNegativeMap = new LinkedHashMap<>();
+        for (int i : validIndices) {
             FaqEntryPayload entry = entries.get(i);
             String standardQ = FaqChunkMetadata.trimSpace(entry.standardQuestion());
             Set<String> currentQAQuestions = new LinkedHashSet<>();
@@ -201,11 +277,21 @@ final class FaqValidateOps {
                 removedNegativeMap.put(i, removed);
             }
         }
+        return removedNegativeMap;
+    }
 
-        // 第四次迭代：后校验（仅合并候选）
+    /** 第五遍：合并候选的后校验；失败行移出合并集与有效集。 */
+    private record PostValidation(int mergeCount, int failedCount) {
+    }
+
+    private PostValidation postValidateMerges(List<FaqEntryPayload> entries,
+                                              List<Integer> validIndices,
+                                              Map<Integer, Chunk> mergeChunkMap,
+                                              List<FaqFailedEntry> failedEntries) {
         Set<Integer> postValidationFailed = new LinkedHashSet<>();
         int mergeCount = 0;
-        for (int i : validIndicesAfterStdQ) {
+        int failedCount = 0;
+        for (int i : validIndices) {
             Chunk mergeChunk = mergeChunkMap.get(i);
             if (mergeChunk == null) {
                 continue;
@@ -237,37 +323,9 @@ final class FaqValidateOps {
                 mergeCount++;
             }
         }
-        if (!postValidationFailed.isEmpty()) {
-            validIndicesAfterStdQ.removeIf(postValidationFailed::contains);
-        }
-
-        int partialFailedCount = progress.partialFailedCount();
-        for (int i : validIndicesAfterStdQ) {
-            List<String> removedSimilar = removedSimilarMap.get(i);
-            List<String> removedNegative = removedNegativeMap.get(i);
-            if ((removedSimilar != null && !removedSimilar.isEmpty())
-                    || (removedNegative != null && !removedNegative.isEmpty())) {
-                failedEntries.add(partialFailedEntry(i, entries.get(i),
-                        removedSimilar == null ? List.of() : removedSimilar,
-                        removedNegative == null ? List.of() : removedNegative));
-                partialFailedCount++;
-            }
-        }
-        List<Integer> mergeIndices = new ArrayList<>();
-        for (int i : validIndicesAfterStdQ) {
-            if (mergeChunkMap.containsKey(i)) {
-                mergeIndices.add(i);
-            }
-        }
-        progress = FaqImportService.withValidationResults(progress, failedEntries, failedCount, partialFailedCount,
-                mergeIndices, null);
-        service.taskStore.saveProgress(progress);
-        log.info("Append mode validation completed: total={}, valid={}, merge_candidates={}, failed={}, partial_failed={}",
-                entries.size(), validIndicesAfterStdQ.size(), mergeCount, progress.failedCount(),
-                progress.partialFailedCount());
-        return validIndicesAfterStdQ;
+        validIndices.removeIf(postValidationFailed::contains);
+        return new PostValidation(mergeCount, failedCount);
     }
-
 
     List<Integer> validateReplaceMode(List<FaqEntryPayload> entries,
                                               FaqImportProgress progress) {
