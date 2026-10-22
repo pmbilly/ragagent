@@ -128,7 +128,13 @@ public final class EmbeddedRedis implements AutoCloseable {
 
             Process process = start(binary, port);
             if (process != null && awaitReady(process, "127.0.0.1", port, Duration.ofSeconds(10))) {
-                return new EmbeddedRedis(process, "127.0.0.1", port, channel, lock);
+                EmbeddedRedis instance = new EmbeddedRedis(process, "127.0.0.1", port, channel, lock);
+                if (instance.ping()) {
+                    return instance;
+                }
+                // 端口通了但 Lettuce 真连不上（实例已在退出）——杀掉换下一个端口
+                instance.close();
+                continue;
             }
             if (process != null) {
                 process.destroyForcibly();
@@ -145,6 +151,7 @@ public final class EmbeddedRedis implements AutoCloseable {
                 "--bind", "127.0.0.1",
                 "--save", "",
                 "--appendonly", "no",
+                "--dir", System.getProperty("java.io.tmpdir"),
                 "--daemonize", "no"));
         try {
             return new ProcessBuilder(cmd)
@@ -153,6 +160,20 @@ public final class EmbeddedRedis implements AutoCloseable {
                     .start();
         } catch (IOException e) {
             return null;
+        }
+    }
+
+    /** 真连一次，确认实例不仅能握手、还能执行命令。 */
+    private boolean ping() {
+        try {
+            var connection = connectionFactory.getConnection();
+            try {
+                return "PONG".equalsIgnoreCase(connection.ping());
+            } finally {
+                connection.close();
+            }
+        } catch (RuntimeException e) {
+            return false;
         }
     }
 
