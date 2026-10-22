@@ -1,4 +1,4 @@
-package com.ragagent.contract.session;
+package com.ragagent.session.dto;
 
 /**
  * 用户消息里的一张图片（{@code url} + 可空的 {@code caption} 描述）。

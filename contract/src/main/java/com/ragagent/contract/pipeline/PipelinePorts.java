@@ -9,8 +9,6 @@ import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.session.PipelineMessageImageView;
-import com.ragagent.contract.session.PipelineMessageView;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.websearch.WebSearchResult;
@@ -108,19 +106,6 @@ public final class PipelinePorts {
     /** 知识库批量取仓储。 */
     public interface KnowledgeBaseRepository {
         List<KnowledgeBaseView> getKnowledgeBaseByIds(List<String> ids);
-    }
-
-    /** 消息面：chat 管线所需的方法子集。 */
-    public interface MessageService {
-        /** 找不到返回 null 或抛异常。 */
-        PipelineMessageView getMessage(String sessionId, String messageId);
-
-        List<PipelineMessageView> getRecentMessagesBySession(String sessionId, int limit);
-
-        void updateMessageImages(String sessionId, String messageId,
-                List<PipelineMessageImageView> images);
-
-        void updateMessageRenderedContent(String sessionId, String messageId, String renderedContent);
     }
 
     /** 记忆面端口（签名与 memory.service.MemoryService 对齐）。 */

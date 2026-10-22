@@ -5,16 +5,17 @@ import com.ragagent.contract.model.ChatOptions;
 import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.contract.session.PipelineMessageImageView;
-import com.ragagent.contract.session.PipelineMessageView;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.session.dto.PipelineMessageImageView;
+import com.ragagent.session.dto.PipelineMessageView;
 import com.ragagent.session.rag.History;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineMessageStore;
 import com.ragagent.session.rag.PipelineState;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -47,12 +48,12 @@ public final class PluginQueryUnderstand implements Plugin {
     private static final ObjectMapper JSON = JsonMappers.lenient();
 
     private final PipelinePorts.ModelService modelService;
-    private final PipelinePorts.MessageService messageService;
+    private final PipelineMessageStore messageService;
     private final PipelinePorts.MemoryService memoryService;
     private final PipelineConfig config;
 
     public PluginQueryUnderstand(PipelinePorts.ModelService modelService,
-                                 PipelinePorts.MessageService messageService,
+                                 PipelineMessageStore messageService,
                                  PipelinePorts.MemoryService memoryService,
                                  PipelineConfig config) {
         this.modelService = modelService;

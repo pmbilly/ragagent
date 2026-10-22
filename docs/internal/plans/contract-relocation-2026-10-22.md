@@ -85,16 +85,20 @@
 - `TextConv` 保留：`FaqChunkMetadata` 在用，P1.6 已判内部助手。
 - `event.payload/package-info.java` 写明「事件载荷=外部权威面，platform 序列化，不得还乡」；按实测类型重盘，不沿用未经核实的 7 类说法。
 
-### P2 前置解耦（另立项，不在本批）
+### P2 前置解耦（本批做第一刀，其余结案）
 
-以下 18 类暂留 contract，阻断原因与解除条件：
+**已还乡（C2）**：`PipelineMessageView`、`PipelineMessageImageView`。`PipelinePorts.MessageService` 只被 session 域实现与调用（chatpipeline 归位后的遗留契约），整接口内化为 `session.rag.PipelineMessageStore` 后，两视图无跨域引用。
 
-| 组 | 类 | 解除条件 |
+**结案不迁（附证据）**：
+
+| 组 | 类 | 不迁理由 |
 |---|---|---|
-| session 视图 | `MessageImage`、`MentionedItem`、`UsedMemory`、`SessionLastRequestState`、`SuggestionItem`、`PipelineMessageView`、`PipelineMessageImageView` | 先拆 `MessageView`/`SessionView`/`PipelinePorts` 的字段族（H6 级） |
-| knowledge.config | `StorageConfigView`、`ImageProcessingConfigView`、`IndexingStrategyView`、`StorageProviderConfigView`、`KnowledgePageView` | 先处置 `KnowledgeBaseRowView`/`KnowledgeBaseResponse`/`KnowledgeCatalogPort`（shape 基线已登记） |
-| 其余 | `WikiException`、`StorageUrlContext`、`OllamaProgressListener`、`OllamaPullProgress`、`VlmConfig`、`CodePoints` | 分别先解 `WikiPageNotFoundException`、`Mode`、`OllamaAdminPort`、`ModelRuntime`、`Tokens` |
-| memory | `MemoryKeys`、`MemoryKinds`、`MemoryRecall`、`MemoryRetrievalContext` | 先解 `MemoryConfig`（auth 消费）与 `PipelinePorts` |
+| session wire 载体 | `MessageImage`、`MentionedItem`、`UsedMemory`、`SessionLastRequestState`、`SuggestionItem` | 是 `MessageView`/`SessionView`/`MessageSuggestionView` 的字段；三视图被 im/embedchannel 消费，`MessageView` 还由 `ContractJsonMixins` 注册序列化。拆字段即改 HTTP wire，不做 |
+| knowledge.config | `StorageConfigView`、`ImageProcessingConfigView`、`IndexingStrategyView`、`StorageProviderConfigView`、`KnowledgePageView` | 被 `KnowledgeBaseRowView`/`KnowledgeBaseResponse` 字段持有；后两者被 datasource（8 文件）、session（5 文件）、initialization 消费。须先把行视图/响应回 knowledge 并让消费方走端口，属 H6 级 |
+| memory | `MemoryKeys`、`MemoryKinds`、`MemoryRecall`、`MemoryRetrievalContext` | `MemoryKeys/Kinds` 被 `MemoryConfig` 引用且 auth 消费；`MemoryRecall/RetrievalContext` 是 `PipelinePorts.MemoryService` 的签名面，迁走需重设计管线记忆端口 |
+| 跨模块契约面 | `OllamaProgressListener`、`OllamaPullProgress`、`VlmConfig` | 分别是 `OllamaAdminPort`、`ModelRuntime` 的签名类型；这两个端口跨 module-runtime 与 domains:model，不是单域形状 |
+| 跨域语义 | `WikiException`、`StorageUrlContext` | `WikiPageNotFoundException` 被 session 捕获；`Mode.resolve` 读 `StorageUrlContext` 的静态上下文。解耦要改异常继承或 `Mode` 签名，波及面大于收益 |
+| 内部助手 | `CodePoints` | 被 `Tokens` 使用；`Tokens` 是 knowledge/session 共用的文本算法。迁 `CodePoints` 会把 contract 内部依赖外翻，违反 P1.6 判据 |
 
 ## 4. 结果预期
 
@@ -115,4 +119,5 @@
 - B3：5 个单件各归其域；编译绿，`TenantRowView` 的形状基线登记已清理。
 - B4：4 个 wire 载荷 → `session.dto`（`QueryData.orEmpty` 包私有，已内联为同语义三元）；`EventPayloadJsonTest` 64 + `AgentStreamBridgeTest` 9 + `FaqContractTest` 13 全绿。
 - P3：`KnowledgeQaRunner` 组 3 件 + `AgentStepData` 删除；`TextConv` 保留；`event.payload` 包说明改为「外部权威面，不随批次搬动」。
-- 结果：contract **328 → 295** 类型；全量 `mvn -B clean verify` 绿（5072 / 0 / 2），48 守卫绿；三份架构索引已按生成器同步。
+- C2：`PipelinePorts.MessageService` 内化为 `session.rag.PipelineMessageStore`；`PipelineMessageView`/`PipelineMessageImageView` → `session.dto`。其余 16 类结案不迁（理由见 P2 表）。
+- 结果：contract **328 → 293** 类型；全量 `mvn -B clean verify` 绿（5072 / 0 / 2），48 守卫绿；三份架构索引已按生成器同步。

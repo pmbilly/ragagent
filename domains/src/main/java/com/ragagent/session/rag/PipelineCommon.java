@@ -6,13 +6,13 @@ import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
-import com.ragagent.contract.session.PipelineMessageImageView;
-import com.ragagent.contract.session.PipelineMessageView;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.prompt.PromptComposer;
+import com.ragagent.session.dto.PipelineMessageImageView;
+import com.ragagent.session.dto.PipelineMessageView;
 import com.ragagent.session.rag.plugin.PluginError;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -137,7 +137,7 @@ public final class PipelineCommon {
      * 取近期消息 → 按 requestID 分组成问答对 → 剥思考标签 →
      * 按时间倒序 → 截 maxRounds → 反转回正序。
      */
-    public static List<History> loadAndProcessHistory(PipelinePorts.MessageService messageService,
+    public static List<History> loadAndProcessHistory(PipelineMessageStore messageService,
                                                       String sessionId, int maxRounds, int fetchCount) {
         List<PipelineMessageView> history =
                 messageService.getRecentMessagesBySession(sessionId, fetchCount);

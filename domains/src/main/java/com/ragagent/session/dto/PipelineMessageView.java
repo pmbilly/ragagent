@@ -1,7 +1,8 @@
-package com.ragagent.contract.session;
+package com.ragagent.session.dto;
 
 
 import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import java.time.OffsetDateTime;
 import java.util.List;
 

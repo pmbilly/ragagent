@@ -1,6 +1,5 @@
 package com.ragagent.session.rag.plugin;
 
-import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.retrieval.RetrievalObsRows;
 import com.ragagent.contract.retrieval.SearchResult;
@@ -9,6 +8,7 @@ import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.security.InputSanitizer;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineMessageStore;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.ReferencesSupport;
 import java.util.ArrayList;
@@ -34,9 +34,9 @@ import java.util.Map;
  */
 public final class PluginIntoChatMessage implements Plugin {
 
-    private final PipelinePorts.MessageService messageService;
+    private final PipelineMessageStore messageService;
 
-    public PluginIntoChatMessage(PipelinePorts.MessageService messageService) {
+    public PluginIntoChatMessage(PipelineMessageStore messageService) {
         this.messageService = messageService;
     }
 

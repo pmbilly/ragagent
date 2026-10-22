@@ -26,8 +26,6 @@ import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTextUtil;
-import com.ragagent.contract.session.PipelineMessageImageView;
-import com.ragagent.contract.session.PipelineMessageView;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.knowledge.api.KnowledgeBaseLookupAdapter;
@@ -40,6 +38,8 @@ import com.ragagent.knowledge.support.KnowledgeRowViews;
 import com.ragagent.platform.event.EventJson;
 import com.ragagent.platform.stream.QueuedChatStream;
 import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.dto.PipelineMessageImageView;
+import com.ragagent.session.dto.PipelineMessageView;
 import com.ragagent.session.dto.PipelineUsedMemoryView;
 import com.ragagent.session.rag.plugin.Plugin;
 import com.ragagent.session.rag.plugin.PluginError;
@@ -810,7 +810,7 @@ final class Rec46cSupport {
     }
 
     /** 对照 zzMessageService。 */
-    static class StubMessageService implements PipelinePorts.MessageService {
+    static class StubMessageService implements PipelineMessageStore {
         List<Message> messages = new ArrayList<>();
         RuntimeException getErr;
         RuntimeException recentErr;

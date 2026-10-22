@@ -18,8 +18,6 @@ import com.ragagent.contract.retrieval.HybridSearchPort;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.session.PipelineMessageImageView;
-import com.ragagent.contract.session.PipelineMessageView;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.contract.websearch.PipelinePageFetcher;
@@ -29,7 +27,10 @@ import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.conversation.MessageService;
+import com.ragagent.session.dto.PipelineMessageImageView;
+import com.ragagent.session.dto.PipelineMessageView;
 import com.ragagent.session.rag.EventManager;
+import com.ragagent.session.rag.PipelineMessageStore;
 import com.ragagent.session.rag.plugin.PluginChatCompletion;
 import com.ragagent.session.rag.plugin.PluginChatCompletionStream;
 import com.ragagent.session.rag.plugin.PluginDataAnalysis;
@@ -266,10 +267,10 @@ public class QaWiring {
         };
     }
 
-    /** {@link PipelinePorts.MessageService} 的 chat_pipeline 子集。 */
+    /** {@link PipelineMessageStore} 的 chat_pipeline 子集。 */
     @Bean
-    public PipelinePorts.MessageService qaPipelineMessageService(MessageService messageService) {
-        return new PipelinePorts.MessageService() {
+    public PipelineMessageStore qaPipelineMessageService(MessageService messageService) {
+        return new PipelineMessageStore() {
             @Override
             public PipelineMessageView getMessage(String sessionId, String messageId) {
                 // 端口两端只认 common 载荷：出域（实体 → 载荷）在这层收敛
@@ -351,7 +352,7 @@ public class QaWiring {
             PipelinePorts.ChunkRepository chunkRepository,
             PipelinePorts.KnowledgeRepository knowledgeRepository,
             PipelinePorts.KnowledgeBaseRepository knowledgeBaseRepository,
-            PipelinePorts.MessageService messageService,
+            PipelineMessageStore messageService,
             PipelinePorts.MemoryService memoryService,
             PipelinePorts.WebSearch webSearch,
             PipelinePorts.TenantService tenantService,

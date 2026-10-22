@@ -1,10 +1,10 @@
 package com.ragagent.session.rag.plugin;
 
-import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.session.rag.History;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
+import com.ragagent.session.rag.PipelineMessageStore;
 import com.ragagent.session.rag.PipelineState;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,9 +16,9 @@ import java.util.Map;
  */
 public final class PluginLoadHistory implements Plugin {
 
-    private final PipelinePorts.MessageService messageService;
+    private final PipelineMessageStore messageService;
 
-    public PluginLoadHistory(PipelinePorts.MessageService messageService) {
+    public PluginLoadHistory(PipelineMessageStore messageService) {
         this.messageService = messageService;
     }
 
