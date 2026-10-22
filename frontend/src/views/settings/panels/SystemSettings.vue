@@ -57,7 +57,7 @@
     </div>
 
     <div v-if="loading && settings.length === 0" class="loading-state">
-      <t-loading :text="t('system.globalSettings.loading')" />
+      <t-loading size="small" :text="t('system.globalSettings.loading')" />
     </div>
 
     <div v-else-if="settings.length === 0" class="empty-state">

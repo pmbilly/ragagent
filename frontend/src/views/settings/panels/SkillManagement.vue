@@ -87,20 +87,21 @@
       </template>
     </t-table>
 
-    <!-- 新建 / 编辑：同一个弹窗两种模式；frontmatter 始终由服务端组装 -->
-    <t-dialog
+    <!-- 新建 / 编辑：右侧抽屉，与 MCP 编辑同一交互；frontmatter 始终由服务端组装 -->
+    <SettingDrawer
       v-model:visible="editorVisible"
-      :header="editorHeader"
-      width="720px"
-      :footer="editorMode !== 'view'"
-      :confirm-btn="{
-        content: editorMode === 'create' ? t('skillManagement.createSubmit') : t('skillManagement.saveSubmit'),
-        loading: submitting,
-        disabled: saveBlocked,
-      }"
-      :cancel-btn="{ content: t('skillManagement.createCancel') }"
+      :title="editorHeader"
+      :hide-footer="editorMode === 'view'"
+      :confirm-text="editorMode === 'create' ? t('skillManagement.createSubmit') : t('skillManagement.saveSubmit')"
+      :cancel-text="t('skillManagement.createCancel')"
+      :confirm-loading="submitting"
+      :confirm-disabled="saveBlocked"
+      width="680px"
+      :min-width="560"
+      :max-width="920"
+      storage-key="setting-drawer:width:skill-editor"
       @confirm="submitEditor"
-      @close="closeEditor"
+      @cancel="closeEditor"
     >
       <div v-if="loadingDraft" class="sm-draft-loading">{{ t('skillManagement.loadingDraft') }}</div>
 
@@ -166,7 +167,7 @@
           <pre>{{ preview }}</pre>
         </details>
       </div>
-    </t-dialog>
+    </SettingDrawer>
 
     <!-- 删除：被引用时展示影响面并要求二次确认（force） -->
     <t-dialog
@@ -199,6 +200,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { MessagePlugin } from 'tdesign-vue-next'
 import { useI18n } from 'vue-i18n'
+import SettingDrawer from '@/components/settings/SettingDrawer.vue'
 
 import {
   createSkill,

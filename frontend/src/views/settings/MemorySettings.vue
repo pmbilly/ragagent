@@ -162,7 +162,7 @@
         </t-tab-panel>
       </t-tabs>
 
-      <t-loading :loading="loading">
+      <t-loading size="small" :loading="loading">
         <div v-if="listIsEmpty" class="empty">
           <p class="empty-title">
             {{ emptyTitle }}

@@ -885,7 +885,7 @@ onBeforeUnmount(() => {
       </section>
     </div>
     <div v-else class="loading-wrapper">
-      <t-loading size="medium" :text="$t('manualEditor.loading.preparing')" />
+      <t-loading size="24px" :text="$t('manualEditor.loading.preparing')" />
     </div>
   </SettingDrawer>
 </template>

@@ -1151,7 +1151,8 @@ export default {
       basic: 'Основное',
       knowledge: 'Знания и поиск',
       capability: 'Расширения',
-      integration: 'Публикация и интеграция'
+      integration: 'Публикация и интеграция',
+      publish: 'Каналы публикации'
     }
   },
   agentStream: {

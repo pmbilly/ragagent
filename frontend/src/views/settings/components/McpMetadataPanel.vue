@@ -61,7 +61,7 @@
         </t-popup>
       </p>
     </div>
-    <t-loading :loading="busy" size="small" :text="busy ? t('mcpMetadata.fetching') : ''">
+    <t-loading size="small" :loading="busy" :text="busy ? t('mcpMetadata.fetching') : ''">
       <div class="metadata-body">
         <p v-if="error" class="form-desc form-desc--error">{{ error }}</p>
         <p v-else-if="snapshot?.stale" class="form-desc form-desc--warn">{{ t('mcpMetadata.stale') }}</p>

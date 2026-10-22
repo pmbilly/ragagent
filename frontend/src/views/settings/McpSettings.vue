@@ -8,7 +8,7 @@
     </div>
 
     <div v-if="loading" class="loading-container">
-      <t-loading :text="$t('common.loading')" />
+      <t-loading size="small" :text="$t('common.loading')" />
     </div>
 
     <template v-else>
@@ -74,7 +74,7 @@
                   :disabled="togglingIds.has(service.id)"
                   :title="!service.isBuiltin && authStore.hasRole('admin') ? $t(service.enabled ? 'common.off' : 'common.on') : undefined"
                   @click="handleToggleEnabled(service)">
-                  <t-loading v-if="togglingIds.has(service.id)" size="12px" />
+                  <t-loading v-if="togglingIds.has(service.id)" size="small" />
                   <span v-else class="service-card__status-dot" aria-hidden="true" />
                   {{ $t(service.enabled || service.isBuiltin ? 'common.on' : 'common.off') }}
                 </component>

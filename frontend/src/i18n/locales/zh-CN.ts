@@ -1153,7 +1153,8 @@ export default {
       basic: '基础',
       knowledge: '知识检索',
       capability: '能力扩展',
-      integration: '发布集成'
+      integration: '发布集成',
+      publish: '发布渠道'
     }
   },
   agentStream: {
@@ -5175,15 +5176,15 @@ export default {
       fallbackResponsePlaceholder: '抱歉，我无法回答这个问题。',
       fallbackPrompt: '兜底提示词',
       fallbackPromptPlaceholder: '留空使用系统默认提示词',
-      skillsConfig: '技能',
-      skillsConfigDesc: '技能是宿主目录中的指令包（SKILL.md）。选中后，模型按技能说明用现有工具执行。',
+      skillsConfig: '技能配置',
+      skillsConfigDesc: '配置智能体能使用的技能（Skill），技能在空间的技能管理中创建。',
       skillsSelection: '技能列表',
-      skillsSelectionDesc: '列表来自宿主技能目录；勾选的技能说明会注入到该智能体的提示词。',
+      skillsSelectionDesc: '勾选的技能说明会注入到该智能体的提示词。',
       skillsAll: '全部',
       skillsSelected: '指定',
       skillsNone: '禁用',
       selectSkillsDesc: '勾选要给这个智能体用的技能。',
-      skillsAllListHint: '「全部」会带上宿主目录里当前可用的所有技能；之后新增的技能自动生效。',
+      skillsAllListHint: '「全部」会带当前空间可用的所有技能；之后新增的技能自动生效。',
       noSkillsAvailable: '空间目录里还没有技能。',
     },
     messages: {

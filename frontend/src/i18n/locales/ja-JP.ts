@@ -4922,7 +4922,8 @@ export default {
       basic: '基本',
       knowledge: 'ナレッジと検索',
       capability: '拡張機能',
-      integration: '公開と連携'
+      integration: '公開と連携',
+      publish: '公開チャネル'
     },
     questionSuggestions: {
       navLabel: '質問サジェスト',

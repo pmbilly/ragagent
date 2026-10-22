@@ -4922,7 +4922,8 @@ export default {
       basic: 'Basics',
       knowledge: 'Knowledge & Retrieval',
       capability: 'Extensions',
-      integration: 'Publish & Integrations'
+      integration: 'Publish & Integrations',
+      publish: 'Publish channels'
     },
     questionSuggestions: {
       navLabel: 'Question suggestions',

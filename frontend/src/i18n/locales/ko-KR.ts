@@ -1151,7 +1151,8 @@ export default {
       basic: '기본',
       knowledge: '지식 검색',
       capability: '기능 확장',
-      integration: '게시 및 통합'
+      integration: '게시 및 통합',
+      publish: '게시 채널'
     }
   },
   agentStream: {

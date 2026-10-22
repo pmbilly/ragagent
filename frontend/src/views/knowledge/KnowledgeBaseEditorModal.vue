@@ -4,7 +4,7 @@
       <div v-if="visible" class="settings-overlay" @click.self="handleClose">
         <div class="settings-modal">
           <div v-if="loading" class="editor-initializing" role="status" :aria-label="$t('common.loading')">
-            <t-loading size="medium" :text="$t('common.loading')" />
+            <t-loading size="24px" />
           </div>
           <!-- 关闭按钮 -->
           <button class="close-btn" @click="handleClose" :aria-label="$t('general.close')">

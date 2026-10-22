@@ -1,6 +1,9 @@
 <template>
     <div class="dialogue-wrap">
         <div class="dialogue-answers">
+            <div class="dialogue-logo" style="--wails-draggable: drag">
+                <img src="@/assets/img/RagAgent.webp" alt="RagAgent" draggable="false" />
+            </div>
             <div class="dialogue-title" style="--wails-draggable: drag">
                 <span style="--wails-draggable: drag">{{ $t('createChat.title') }}</span>
             </div>
@@ -255,11 +258,25 @@ const handleKBEditorSuccess = (kbId: string) => {
     }
 }
 
+.dialogue-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: -8px;
+
+    img {
+        height: 60px;
+        width: auto;
+        object-fit: contain;
+        user-select: none;
+    }
+}
+
 .dialogue-title {
     display: flex;
     color: var(--td-text-color-primary);
     font-family: var(--app-font-family);
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 600;
     align-items: center;
     margin-bottom: 0;
@@ -394,6 +411,11 @@ const handleKBEditorSuccess = (kbId: string) => {
 }
 </style>
 <style lang="less">
+// 与左上角 logo 同一套暗色处理：单图 + 反色，不切图
+html[theme-mode='dark'] .dialogue-logo img {
+    filter: invert(1) hue-rotate(180deg);
+}
+
 .del-menu-popup {
     z-index: 99 !important;
 

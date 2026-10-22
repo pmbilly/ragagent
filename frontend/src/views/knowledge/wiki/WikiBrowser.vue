@@ -118,7 +118,7 @@
         </div>
 
         <div v-if="!graphReady" class="wiki-reader-empty wiki-graph-empty">
-          <t-loading v-if="graphLoading" />
+          <t-loading v-if="graphLoading" size="small" />
           <div v-else class="wiki-empty-icon">
             <t-icon name="chart-bubble" size="48px" />
           </div>

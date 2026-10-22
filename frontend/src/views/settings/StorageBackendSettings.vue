@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <t-loading :loading="loading" size="small" class="backend-list-loading">
+    <t-loading size="small" :loading="loading" class="backend-list-loading">
       <t-empty
         v-if="!loading && backends.length === 0 && !authStore.hasRole('admin')"
         :description="t('settings.storageBackend.empty')"
