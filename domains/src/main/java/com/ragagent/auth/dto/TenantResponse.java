@@ -1,6 +1,5 @@
 package com.ragagent.auth.dto;
 
-import com.ragagent.contract.tenant.TenantRowView;
 import java.time.OffsetDateTime;
 
 /**

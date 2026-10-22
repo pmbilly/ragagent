@@ -10,7 +10,6 @@ import static com.ragagent.agent.AgentPromptGolden.STR_SUMMARYFORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.agent.budget.TokenEstimator;
-import com.ragagent.contract.agent.CompactionSettings;
 import com.ragagent.contract.model.CacheRetention;
 import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.model.ChatOptions;

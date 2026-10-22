@@ -1,6 +1,6 @@
 package com.ragagent.session.rag;
 
-import com.ragagent.contract.session.PipelineUsedMemoryView;
+import com.ragagent.session.dto.PipelineUsedMemoryView;
 import java.util.List;
 
 /**

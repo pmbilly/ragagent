@@ -1,7 +1,5 @@
 package com.ragagent.mcp.approval;
 
-import com.ragagent.contract.tool.Cancellation;
-import com.ragagent.contract.tool.ToolPolicyChecker;
 import com.ragagent.mcp.domain.McpToolApproval;
 import com.ragagent.mcp.service.McpToolPolicySource;
 import java.util.ArrayList;

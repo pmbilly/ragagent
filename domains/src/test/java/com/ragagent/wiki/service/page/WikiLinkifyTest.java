@@ -2,7 +2,7 @@ package com.ragagent.wiki.service.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.service.page.WikiCrossLinker.LinkRef;
 import java.util.List;

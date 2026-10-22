@@ -1,6 +1,7 @@
 package com.ragagent.auth.controller;
 
 import com.ragagent.auth.dto.TenantInvitationResponse;
+import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.auth.service.TenantInvitationReadService;
 import com.ragagent.auth.service.TenantInvitationService;
 import com.ragagent.auth.service.TenantRbacException;
@@ -10,7 +11,6 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;

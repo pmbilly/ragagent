@@ -1,12 +1,12 @@
 package com.ragagent.auth.controller;
 
 import com.ragagent.auth.apikey.service.ApiKeyAdminAdapter;
+import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.contract.knowledge.KnowledgeBaseProvisioner;
 import com.ragagent.contract.settings.SystemSettingGateway;
-import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.config.TenantProperties;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.storage.config.StorageAllowList;

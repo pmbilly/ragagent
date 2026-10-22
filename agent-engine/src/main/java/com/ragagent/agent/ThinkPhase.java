@@ -1,9 +1,9 @@
 package com.ragagent.agent;
 
+import com.ragagent.agent.compaction.CompactionOverflow;
 import com.ragagent.agent.domain.AgentState;
 import com.ragagent.agent.tool.runtime.MessageSanitizer;
 import com.ragagent.agent.tool.runtime.ThinkStreamSplitter;
-import com.ragagent.contract.agent.CompactionOverflow;
 import com.ragagent.contract.agent.ThinkBlocks;
 import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;

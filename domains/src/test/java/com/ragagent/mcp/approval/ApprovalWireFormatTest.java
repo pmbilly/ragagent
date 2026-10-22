@@ -11,8 +11,6 @@ import com.ragagent.contract.event.payload.MCPOAuthResolvedData;
 import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
 import com.ragagent.contract.event.payload.ToolApprovalResolvedData;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.tool.ApprovalEvent;
-import com.ragagent.contract.tool.Decision;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;

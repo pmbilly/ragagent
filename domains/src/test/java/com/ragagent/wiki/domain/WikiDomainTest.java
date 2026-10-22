@@ -3,11 +3,11 @@ package com.ragagent.wiki.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiException;
 import com.ragagent.contract.wiki.WikiIndex;
 import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.contract.wiki.WikiPageNotFoundException;
+import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.folder.WikiFolder;
 import com.ragagent.wiki.domain.folder.WikiFolderConflictException;
 import com.ragagent.wiki.domain.folder.WikiFolderNode;

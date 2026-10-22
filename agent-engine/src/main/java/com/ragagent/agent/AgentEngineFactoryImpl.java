@@ -1,6 +1,8 @@
 package com.ragagent.agent;
 
 import com.ragagent.agent.prompt.AgentPromptTemplates;
+import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
+import com.ragagent.agent.prompt.PinnedSkillInfo;
 import com.ragagent.agent.skills.DbSkillSource;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
@@ -11,8 +13,6 @@ import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.contract.agent.AgentEngineFactory;
 import com.ragagent.contract.agent.AgentEngineHandle;
 import com.ragagent.contract.agent.AgentEngineRequest;
-import com.ragagent.contract.agent.PinnedMCPServiceInfo;
-import com.ragagent.contract.agent.PinnedSkillInfo;
 import com.ragagent.contract.agent.SkillCatalogPort;
 import com.ragagent.contract.event.EventBusFactory;
 import com.ragagent.contract.event.EventBusInterface;

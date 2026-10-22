@@ -2,7 +2,7 @@ package com.ragagent.auth.service;
 
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.Membership;
-import com.ragagent.contract.tenant.TenantRowView;
+import com.ragagent.auth.dto.TenantRowView;
 import java.util.List;
 
 /**

@@ -6,10 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.tool.Cancellation;
-import com.ragagent.contract.tool.Decision;
-import com.ragagent.contract.tool.PendingRequest;
-import com.ragagent.contract.tool.ToolApprovalException;
 import com.ragagent.platform.redis.RedisPubSub;
 import com.ragagent.platform.redis.SpringRedisPubSub;
 import java.io.BufferedReader;

@@ -1,20 +1,20 @@
 package com.ragagent.agent;
 
 import com.ragagent.agent.budget.TokenEstimator;
+import com.ragagent.agent.compaction.CompactionSettings;
 import com.ragagent.agent.compaction.Compactor;
 import com.ragagent.agent.domain.AgentState;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
+import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
+import com.ragagent.agent.prompt.PinnedSkillInfo;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.contract.agent.AgentBudgets;
 import com.ragagent.contract.agent.AgentRunSpec;
 import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.agent.AgentToolCall;
-import com.ragagent.contract.agent.CompactionSettings;
 import com.ragagent.contract.agent.ImageDescriberFunc;
 import com.ragagent.contract.agent.KnowledgeBaseInfo;
-import com.ragagent.contract.agent.PinnedMCPServiceInfo;
-import com.ragagent.contract.agent.PinnedSkillInfo;
 import com.ragagent.contract.agent.SelectedDocumentInfo;
 import com.ragagent.contract.agent.SteerSink;
 import com.ragagent.contract.error.BizException;

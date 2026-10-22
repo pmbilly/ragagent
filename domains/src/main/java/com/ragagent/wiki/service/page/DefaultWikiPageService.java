@@ -2,12 +2,12 @@ package com.ragagent.wiki.service.page;
 
 import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiException;
 import com.ragagent.contract.wiki.WikiIndex;
 import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.WikiCategoryPaths;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.WikiPageIssue;

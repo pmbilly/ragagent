@@ -6,7 +6,7 @@ import static com.ragagent.session.rag.Rec46cSupport.json;
 
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
-import com.ragagent.contract.session.PipelineUsedMemoryView;
+import com.ragagent.session.dto.PipelineUsedMemoryView;
 import com.ragagent.session.rag.plugin.PluginError;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

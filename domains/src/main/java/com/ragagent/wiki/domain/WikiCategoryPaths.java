@@ -1,7 +1,7 @@
 package com.ragagent.wiki.domain;
 
 
-import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.wiki.WikiConstants;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;

@@ -20,6 +20,8 @@ contract 的准入标准是「跨域词汇表的唯一一处」，但类型一�
     python3 scripts/gen-contract-consumers.py            # 汇总 + 零消费者清单
     python3 scripts/gen-contract-consumers.py --check    # 零消费者即红
     python3 scripts/gen-contract-consumers.py MemoryKeys # 单类：谁在消费我
+    python3 scripts/gen-contract-consumers.py --relocate # 还乡可行性：闭包 + 目标域 + 阻断
+    python3 scripts/gen-contract-consumers.py --relocate MessageImage  # 单类可行性
 """
 
 import collections
@@ -67,8 +69,8 @@ def contract_types() -> dict[str, pathlib.Path]:
 
 def consumer_label(module: str, path: pathlib.Path) -> str:
     if module == "domains":
-        match = re.match(r"domains/src/(?:main|test|testFixtures)/java/com/ragagent/(\w+)/",
-                         path.as_posix())
+        match = re.search(r"domains/src/(?:main|test|testFixtures)/java/com/ragagent/(\w+)/",
+                          path.as_posix())
         return f"domains:{match.group(1)}" if match else "domains"
     return module
 
@@ -98,9 +100,131 @@ def scan(types: dict[str, pathlib.Path]) -> dict[str, set[str]]:
     return consumers
 
 
+def scan_detailed(types: dict[str, pathlib.Path]):
+    """返回（全部消费者标签，仅 main 消费者标签）；后者用于还乡阻断判定。"""
+    all_labels = collections.defaultdict(set)
+    main_labels = collections.defaultdict(set)
+    for module in MODULES:
+        for kind in ("main", "test", "testFixtures"):
+            base = ROOT / module / "src" / kind / "java"
+            if not base.exists():
+                continue
+            for path in base.rglob("*.java"):
+                text = path.read_text(encoding="utf-8", errors="ignore")
+                for imported in IMPORT.findall(text):
+                    if imported in types and types[imported] != path:
+                        label = consumer_label(module, path)
+                        all_labels[imported].add(
+                            label if kind == "main" else f"{label}[{kind}]")
+                        if kind == "main":
+                            main_labels[imported].add(label)
+    return all_labels, main_labels
+
+
+def reference_graph(types: dict[str, pathlib.Path]) -> dict[str, set[str]]:
+    """contract 内部引用图：同包裸名 + 跨包 import。"""
+    simple = {fq.rsplit(".", 1)[-1]: fq for fq in types}
+    graph: dict[str, set[str]] = collections.defaultdict(set)
+    for fq, path in types.items():
+        body = strip_comments(path.read_text(encoding="utf-8", errors="ignore"))
+        pkg = fq.rsplit(".", 1)[0]
+        for name, target in simple.items():
+            if target == fq:
+                continue
+            if pkg == target.rsplit(".", 1)[0]:
+                if re.search(rf"\b{name}\b", body):
+                    graph[fq].add(target)
+            elif re.search(rf"import\s+{re.escape(target)};", body):
+                graph[fq].add(target)
+    return graph
+
+
+def reverse_closure(start: str, graph: dict[str, set[str]]) -> set[str]:
+    """所有直接或间接引用 start 的 contract 类型（迁移必须带上）。"""
+    reverse: dict[str, set[str]] = collections.defaultdict(set)
+    for src, targets in graph.items():
+        for dst in targets:
+            reverse[dst].add(src)
+    seen = {start}
+    stack = [start]
+    while stack:
+        current = stack.pop()
+        for previous in reverse.get(current, ()):
+            if previous not in seen:
+                seen.add(previous)
+                stack.append(previous)
+    return seen
+
+
+def relocate_report(types: dict[str, pathlib.Path], wanted: str | None) -> int:
+    """按「反向闭包 + main 消费域」判断能否整体还乡。
+
+    判据：闭包内所有类型的 main 消费者只落在一个域/模块（boot 视为装配层跟随）。
+    两个及以上域共享即阻断——搬走会让其余域反向依赖目标域。
+    """
+    _, main_labels = scan_detailed(types)
+    graph = reference_graph(types)
+    targets = [fq for fq in types
+               if wanted is None or fq == wanted or fq.endswith("." + wanted)]
+    if wanted and not targets:
+        print(f"✗ contract 里没有 {wanted}")
+        return 1
+
+    rows = []
+    for fq in sorted(targets):
+        closure = reverse_closure(fq, graph)
+        domains: set[str] = set()
+        details = []
+        for member in sorted(closure):
+            labels = set(main_labels.get(member, set())) - {"contract"}
+            if labels:
+                details.append((member, labels))
+                domains |= labels
+        rows.append((fq, closure, domains, details))
+
+    if wanted:
+        for fq, closure, domains, details in rows:
+            name = fq.rsplit(".", 1)[-1]
+            real = domains - {"boot"}
+            if not real:
+                status = "可迁（仅装配层/测试消费）" if domains else "无 main 消费者"
+            elif len(real) == 1:
+                status = f"可迁 → {next(iter(real))}"
+            else:
+                status = "阻断 → 跨域 " + ", ".join(sorted(real))
+            print(f"{name}：{status}（闭包 {len(closure)}）")
+            companions = sorted(x.rsplit(".", 1)[-1] for x in closure - {fq})
+            if companions:
+                print("  同搬：" + ", ".join(companions))
+            for member, labels in details:
+                print(f"    {member.rsplit('.', 1)[-1]} ← {', '.join(sorted(labels))}")
+        return 0
+
+    movable = [r for r in rows if len(r[2] - {"boot"}) == 1]
+    blocked = [r for r in rows if len(r[2] - {"boot"}) > 1]
+    dead = [r for r in rows if not r[2]]
+    print(f"还乡可行性：可迁 {len(movable)} · 阻断 {len(blocked)} · 无 main 消费者 {len(dead)}")
+    for fq, closure, domains, _ in sorted(movable, key=lambda r: r[0]):
+        target = next(iter(domains - {"boot"}))
+        print(f"  可迁  {fq.rsplit('.', 1)[-1]:28s} → {target:22s} 闭包 {len(closure)}")
+    for fq, closure, domains, _ in sorted(blocked, key=lambda r: r[0]):
+        print(f"  阻断  {fq.rsplit('.', 1)[-1]:28s} ← {', '.join(sorted(domains - {'boot'}))}")
+    if dead:
+        print("  无 main 消费者（死码候选）：" + ", ".join(
+            r[0].rsplit(".", 1)[-1] for r in sorted(dead, key=lambda r: r[0])))
+    return 0
+
+
 def main() -> int:
     types = contract_types()
     consumers = scan(types)
+
+    if "--relocate" in sys.argv:
+        index = sys.argv.index("--relocate")
+        wanted = None
+        if len(sys.argv) > index + 1 and not sys.argv[index + 1].startswith("-"):
+            wanted = sys.argv[index + 1]
+        return relocate_report(types, wanted)
 
     if len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
         wanted = sys.argv[1]

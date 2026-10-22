@@ -10,9 +10,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.tool.Decision;
-import com.ragagent.contract.tool.ToolApprovalException;
-import com.ragagent.contract.tool.ToolApprovalGate;
+import com.ragagent.mcp.approval.Decision;
+import com.ragagent.mcp.approval.ToolApprovalException;
+import com.ragagent.mcp.approval.ToolApprovalGate;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
 import com.ragagent.platform.access.TenantContext;
 import org.junit.jupiter.api.AfterEach;
@@ -169,7 +169,7 @@ class AgentToolApprovalControllerTest {
 
     @Test
     void gateNotConfiguredReturns500() {
-        AgentToolApprovalController unconfigured = new AgentToolApprovalController(new com.ragagent.mcp.service.AgentToolApprovalService((com.ragagent.contract.tool.ToolApprovalGate) null));
+        AgentToolApprovalController unconfigured = new AgentToolApprovalController(new com.ragagent.mcp.service.AgentToolApprovalService((com.ragagent.mcp.approval.ToolApprovalGate) null));
 
         BizException e = assertThrows(BizException.class, () -> unconfigured.resolveToolApproval("p1",
                 new ResolveToolApprovalRequest("approve", null, "")));

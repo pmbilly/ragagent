@@ -2,11 +2,11 @@ package com.ragagent.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.agent.prompt.PinnedSkillInfo;
+import com.ragagent.agent.prompt.PinnedSkillInstructions;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.skills.SkillSource;
-import com.ragagent.contract.agent.PinnedSkillInfo;
-import com.ragagent.contract.agent.PinnedSkillInstructions;
 import com.ragagent.contract.agent.SkillCatalogPort;
 import java.util.ArrayList;
 import java.util.List;

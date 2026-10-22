@@ -1,9 +1,9 @@
 package com.ragagent.mcp.service;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.tool.Decision;
-import com.ragagent.contract.tool.ToolApprovalException;
-import com.ragagent.contract.tool.ToolApprovalGate;
+import com.ragagent.mcp.approval.Decision;
+import com.ragagent.mcp.approval.ToolApprovalException;
+import com.ragagent.mcp.approval.ToolApprovalGate;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
 import com.ragagent.platform.access.TenantContext;

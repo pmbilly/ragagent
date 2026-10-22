@@ -3,13 +3,13 @@ package com.ragagent.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.agent.budget.TokenEstimator;
+import com.ragagent.agent.compaction.CompactionSettings;
 import com.ragagent.agent.domain.AgentState;
 import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
+import com.ragagent.agent.prompt.PinnedSkillInfo;
 import com.ragagent.contract.agent.AgentToolCall;
-import com.ragagent.contract.agent.CompactionSettings;
 import com.ragagent.contract.agent.KnowledgeBaseInfo;
-import com.ragagent.contract.agent.PinnedMCPServiceInfo;
-import com.ragagent.contract.agent.PinnedSkillInfo;
 import com.ragagent.contract.agent.RecentDocInfo;
 import com.ragagent.contract.agent.SelectedDocumentInfo;
 import com.ragagent.contract.event.EventBusInterface;

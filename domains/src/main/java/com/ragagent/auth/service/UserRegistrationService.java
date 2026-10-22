@@ -1,10 +1,10 @@
 package com.ragagent.auth.service;
 
 import com.ragagent.auth.domain.User;
+import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.auth.repository.UserRepository;
 import com.ragagent.contract.auth.UserPreferences;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.security.LogSanitizer;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

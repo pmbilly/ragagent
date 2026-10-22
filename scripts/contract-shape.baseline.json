@@ -22,7 +22,6 @@
     "com/ragagent/contract/knowledge/ChunkRowView.java": "持久层行投影（分块表），应回 knowledge 域；H6",
     "com/ragagent/contract/knowledge/KnowledgeRowView.java": "持久层行投影（知识表），应回 knowledge 域；H6",
     "com/ragagent/contract/knowledge/KnowledgeBaseRowView.java": "持久层行投影（知识库表），应回 knowledge 域；H6",
-    "com/ragagent/contract/tenant/TenantRowView.java": "持久层行投影（租户表），应回 auth 域；H6",
     "com/ragagent/contract/wiki/WikiPageView.java": "wiki 页面视图，应回 wiki 域；H6",
     "com/ragagent/contract/knowledge/ChunkPageView.java": "分页壳，H6 统一 PageView 后回域",
     "com/ragagent/contract/knowledge/FaqEntryPageView.java": "分页壳，H6 统一 PageView 后回域",
@@ -56,10 +55,6 @@
     "com/ragagent/contract/tenant/StorageEngineConfig.java": {
       "fields": 63,
       "reason": "多厂商存储配置平铺；H6 按厂商拆"
-    },
-    "com/ragagent/contract/tenant/TenantRowView.java": {
-      "fields": 21,
-      "reason": "租户行投影；H6 回 auth 域"
     },
     "com/ragagent/contract/wiki/WikiPageView.java": {
       "fields": 27,

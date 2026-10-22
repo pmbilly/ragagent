@@ -1,9 +1,9 @@
 package com.ragagent.mcp;
 
-import com.ragagent.contract.tool.Cancellation;
-import com.ragagent.contract.tool.ToolApprovalGate;
-import com.ragagent.contract.tool.ToolApprovalGateFactory;
-import com.ragagent.contract.tool.ToolPolicyChecker;
+import com.ragagent.mcp.approval.Cancellation;
+import com.ragagent.mcp.approval.ToolApprovalGate;
+import com.ragagent.mcp.approval.ToolApprovalGateFactory;
+import com.ragagent.mcp.approval.ToolPolicyChecker;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpOAuthSupport;
 import com.ragagent.mcp.service.Adapter;

@@ -12,7 +12,7 @@ import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.ModelView;
-import com.ragagent.contract.model.ModelViews;
+import com.ragagent.initialization.dto.ModelViews;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.config.AppEnvLookup;
 import com.ragagent.platform.security.SsrfGuard;

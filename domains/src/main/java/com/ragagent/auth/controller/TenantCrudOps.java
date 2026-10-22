@@ -2,10 +2,10 @@ package com.ragagent.auth.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.auth.dto.TenantResponse;
+import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.ToolJson;

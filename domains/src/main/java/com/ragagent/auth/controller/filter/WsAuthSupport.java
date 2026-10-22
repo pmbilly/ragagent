@@ -2,11 +2,11 @@ package com.ragagent.auth.controller.filter;
 
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
+import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.ValidatedToken;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.config.TenantProperties;
 import jakarta.servlet.http.HttpServletRequest;

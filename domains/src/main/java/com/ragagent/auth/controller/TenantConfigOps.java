@@ -1,6 +1,7 @@
 package com.ragagent.auth.controller;
 
 import com.ragagent.auth.domain.TenantConfigRedaction;
+import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
@@ -12,7 +13,6 @@ import com.ragagent.contract.tenant.ParserEngineConfig;
 import com.ragagent.contract.tenant.RetrievalConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.access.TenantContext;

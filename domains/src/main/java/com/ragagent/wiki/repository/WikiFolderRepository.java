@@ -1,6 +1,6 @@
 package com.ragagent.wiki.repository;
 
-import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.WikiCategoryPaths;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.folder.WikiFolder;

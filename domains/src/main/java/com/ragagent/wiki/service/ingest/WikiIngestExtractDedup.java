@@ -2,8 +2,8 @@ package com.ragagent.wiki.service.ingest;
 
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.wiki.service.ingest.support.WikiBatchContext;

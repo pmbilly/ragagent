@@ -1,6 +1,5 @@
 package com.ragagent.mcp.approval;
 
-import com.ragagent.contract.tool.ToolApprovalException;
 import com.ragagent.platform.web.JsonMappers;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;

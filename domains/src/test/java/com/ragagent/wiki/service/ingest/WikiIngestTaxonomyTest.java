@@ -10,7 +10,7 @@ import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.service.WikiModelResolver;
 import com.ragagent.wiki.service.page.WikiPageService;
 import java.util.ArrayList;

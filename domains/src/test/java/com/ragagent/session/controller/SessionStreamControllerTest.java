@@ -11,12 +11,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.stream.StreamBatch;

@@ -2,7 +2,7 @@ package com.ragagent.wiki.service.ingest;
 
 import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.repository.ingest.WikiIdentityClaimStore;
 import com.ragagent.wiki.service.ingest.support.WikiBatchContext;

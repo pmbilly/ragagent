@@ -3,9 +3,6 @@ package com.ragagent.mcp.approval;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.ragagent.contract.tool.Cancellation;
-import com.ragagent.contract.tool.ToolApprovalException;
-import com.ragagent.contract.tool.ToolEnabledChecks;
 import com.ragagent.mcp.service.Adapter;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,0 +1,36 @@
+package com.ragagent.mcp.approval;
+
+import com.ragagent.contract.model.ResponseType;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/**
+ * 事件包络。
+ *
+ * <p>{@code type} 复用 {@link ResponseType}——它已是线上契约的集中定义处
+ * （见其类注释：“常量在此集中定义，避免各模块各写一份字符串”），
+ * 本包只用其中的 TOOL_APPROVAL_REQUIRED / TOOL_APPROVAL_RESOLVED /
+ * MCP_OAUTH_REQUIRED / MCP_OAUTH_RESOLVED 四个取值。</p>
+ *
+ * <p>{@code id} 必须非空：gate 传入的 ID 形如 {@code pendingID + "-approval-required"}。</p>
+ */
+public record ApprovalEvent(
+        String id,
+        ResponseType type,
+        String sessionId,
+        Object data,
+        Map<String, Object> metadata,
+        String requestId) {
+
+    public ApprovalEvent {
+        sessionId = sessionId == null ? "" : sessionId;
+        requestId = requestId == null ? "" : requestId;
+        metadata = metadata == null ? Collections.emptyMap() : Collections.unmodifiableMap(new LinkedHashMap<>(metadata));
+    }
+
+    public static ApprovalEvent of(String id, ResponseType type, String sessionId, Object data,
+                           Map<String, Object> metadata, String requestId) {
+        return new ApprovalEvent(id, type, sessionId, data, metadata, requestId);
+    }
+}

@@ -219,7 +219,7 @@
 | `:domains` | `com.ragagent.model.repository` | 模型仓储门面：可见性查询、写入、软删与内置模型对账；另有使用关系只读仓储。 |
 | `:domains` | `com.ragagent.model.service` | 模型 · 服务：ModelService / BuiltinModelsReconciler / ModelProviderCatalog…。 |
 | `:domains` | `com.ragagent.session` | 会话域：会话与消息读写（conversation/）、两条问答入口（知识库问答 / Agent 问答）、 SSE 流桥、附件（attachment/）与会话侧管线（rag/ + assembly/）。 |
-| `:domains` | `com.ragagent.session.api` | 会话 · 端口实现：SessionQaAdapter / EmbedSessionAdapter / KnowledgeQaRunnerImpl 等契约端口的适配层。 |
+| `:domains` | `com.ragagent.session.api` | 会话 · 端口实现：SessionQaAdapter / EmbedSessionAdapter 等契约端口的适配层。 |
 | `:domains` | `com.ragagent.session.assembly` | 会话侧装配：问答管线注册（QaWiring）与跨域协作件的接线点。 |
 | `:domains` | `com.ragagent.session.attachment` | 会话附件：临时文档的落盘、解析、提示词渲染与生命周期。 |
 | `:domains` | `com.ragagent.session.controller` | session 域控制器的 HTTP 端点（协议适配层）。 |

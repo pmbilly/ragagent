@@ -1,6 +1,6 @@
 package com.ragagent.wiki.service.page;
 
-import com.ragagent.contract.wiki.WikiConstants;
+import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.WikiPage;
 import java.util.ArrayList;
 import java.util.List;

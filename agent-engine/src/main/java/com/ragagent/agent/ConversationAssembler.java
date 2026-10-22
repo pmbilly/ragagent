@@ -1,14 +1,14 @@
 package com.ragagent.agent;
 
+import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
+import com.ragagent.agent.prompt.PinnedSkillInfo;
+import com.ragagent.agent.prompt.PinnedSkillInstructions;
+import com.ragagent.agent.prompt.SystemPromptSection;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.contract.agent.KnowledgeBaseInfo;
-import com.ragagent.contract.agent.PinnedMCPServiceInfo;
-import com.ragagent.contract.agent.PinnedSkillInfo;
-import com.ragagent.contract.agent.PinnedSkillInstructions;
 import com.ragagent.contract.agent.RecentDocInfo;
 import com.ragagent.contract.agent.SelectedDocumentInfo;
-import com.ragagent.contract.agent.SystemPromptSection;
 import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.wiki.WikiLanguageSupport;

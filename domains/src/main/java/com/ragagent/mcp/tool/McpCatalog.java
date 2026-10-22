@@ -1,9 +1,9 @@
 package com.ragagent.mcp.tool;
 
-import com.ragagent.contract.tool.Cancellation;
-import com.ragagent.contract.tool.ToolApprovalGate;
-import com.ragagent.contract.tool.ToolEnabledChecker;
-import com.ragagent.contract.tool.ToolEnabledChecks;
+import com.ragagent.mcp.approval.Cancellation;
+import com.ragagent.mcp.approval.ToolApprovalGate;
+import com.ragagent.mcp.approval.ToolEnabledChecker;
+import com.ragagent.mcp.approval.ToolEnabledChecks;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.oauth.error.OAuthReauthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;

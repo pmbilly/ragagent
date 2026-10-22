@@ -1,7 +1,6 @@
 package com.ragagent.agent.compaction;
 
 import com.ragagent.agent.budget.TokenEstimator;
-import com.ragagent.contract.agent.CompactionSettings;
 import com.ragagent.contract.model.CacheRetention;
 import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.model.ChatOptions;

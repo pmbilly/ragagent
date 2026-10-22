@@ -9,9 +9,6 @@ import com.ragagent.contract.event.payload.AgentCompleteData;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.payload.AgentPlanData;
 import com.ragagent.contract.event.payload.AgentQueryData;
-import com.ragagent.contract.event.payload.AgentReferencesData;
-import com.ragagent.contract.event.payload.AgentReflectionData;
-import com.ragagent.contract.event.payload.AgentStepData;
 import com.ragagent.contract.event.payload.AgentThoughtData;
 import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
@@ -20,18 +17,20 @@ import com.ragagent.contract.event.payload.ContextCompactedData;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.contract.event.payload.MCPOAuthRequiredData;
 import com.ragagent.contract.event.payload.MCPOAuthResolvedData;
-import com.ragagent.contract.event.payload.MemoryRecalledData;
 import com.ragagent.contract.event.payload.MergeData;
 import com.ragagent.contract.event.payload.QueryData;
 import com.ragagent.contract.event.payload.RerankData;
 import com.ragagent.contract.event.payload.RetrievalData;
-import com.ragagent.contract.event.payload.SessionTitleData;
 import com.ragagent.contract.event.payload.StopData;
 import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
 import com.ragagent.contract.event.payload.ToolApprovalResolvedData;
 import com.ragagent.contract.event.payload.UserMessageInjectedData;
 import com.ragagent.platform.event.EventJson;
 import com.ragagent.platform.event.EventType;
+import com.ragagent.session.dto.AgentReferencesData;
+import com.ragagent.session.dto.AgentReflectionData;
+import com.ragagent.session.dto.MemoryRecalledData;
+import com.ragagent.session.dto.SessionTitleData;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -245,23 +244,6 @@ class EventPayloadJsonTest {
         // Go: emptyPlan => {"query":"q","plan":[],"durationMs":5}
         assertSemantic("{\"query\":\"q\",\"plan\":[],\"durationMs\":5}",
                 write(new AgentPlanData("q", new ArrayList<>(), 5)));
-    }
-
-    // ===== AgentStepData =====
-
-    @Test
-    void agentStepDataZero() {
-        // Go: {"iteration":0,"thought":"","toolCalls":null,"durationMs":0}
-        assertSemantic("{\"iteration\":0,\"thought\":\"\",\"toolCalls\":null,\"durationMs\":0}",
-                write(new AgentStepData()));
-    }
-
-    @Test
-    void agentStepDataFull() {
-        // Go: {"iteration":2,"thought":"thinking","toolCalls":[{"name":"web_search"}],"durationMs":300}
-        AgentStepData d = new AgentStepData(2, "thinking", listOf(mapOf("name", "web_search")), 300);
-        assertSemantic("{\"iteration\":2,\"thought\":\"thinking\","
-                + "\"toolCalls\":[{\"name\":\"web_search\"}],\"durationMs\":300}", write(d));
     }
 
     // ===== AgentActionData =====

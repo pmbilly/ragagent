@@ -3,7 +3,7 @@ package com.ragagent.mcp.api;
 import com.ragagent.contract.pipeline.McpToolRegistrationPort;
 import com.ragagent.contract.pipeline.McpToolingGateway;
 import com.ragagent.contract.pipeline.ToolRegistryPort;
-import com.ragagent.contract.tool.ToolApprovalGate;
+import com.ragagent.mcp.approval.ToolApprovalGate;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.service.McpMetadataService;

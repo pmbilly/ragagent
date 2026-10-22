@@ -2,7 +2,7 @@ package com.ragagent.session.rag;
 
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
-import com.ragagent.contract.session.PipelineUsedMemoryView;
+import com.ragagent.session.dto.PipelineUsedMemoryView;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

@@ -2,13 +2,13 @@ package com.ragagent.agent;
 
 import com.ragagent.agent.budget.ContextDiagnostics;
 import com.ragagent.agent.budget.TokenEstimator;
+import com.ragagent.agent.compaction.CompactionOverflow;
 import com.ragagent.agent.compaction.CompactionReason;
 import com.ragagent.agent.compaction.CompactionResult;
+import com.ragagent.agent.compaction.CompactionSettings;
 import com.ragagent.agent.compaction.NothingToCompactException;
 import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.agent.AgentToolCall;
-import com.ragagent.contract.agent.CompactionOverflow;
-import com.ragagent.contract.agent.CompactionSettings;
 import com.ragagent.contract.agent.ThinkBlocks;
 import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;

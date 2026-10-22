@@ -1,6 +1,7 @@
 package com.ragagent.auth.service;
 
 import com.ragagent.auth.domain.Tenant;
+import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.auth.repository.TenantLookup;
 import com.ragagent.auth.repository.TenantMemberRepository;
 import com.ragagent.auth.repository.TenantRepository;
@@ -11,7 +12,6 @@ import com.ragagent.contract.storage.StorageBackendProvisioner;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.platform.persistence.LikeEscapes;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;

@@ -2,9 +2,9 @@ package com.ragagent.wiki.service.ingest;
 
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.text.Whitespace;
-import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.platform.text.CodePointOrder;
+import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.wiki.domain.ingest.WikiIngestPayload;

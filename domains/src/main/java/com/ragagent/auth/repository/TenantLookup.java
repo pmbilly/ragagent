@@ -1,5 +1,5 @@
 package com.ragagent.auth.repository;
-import com.ragagent.contract.tenant.TenantRowView;
+import com.ragagent.auth.dto.TenantRowView;
 
 /**
  * 租户实体查询端口：按 id 取 {@code com.ragagent.auth.domain.Tenant} 行。

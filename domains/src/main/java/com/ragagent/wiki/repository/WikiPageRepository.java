@@ -1,10 +1,10 @@
 package com.ragagent.wiki.repository;
 
-import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.SourceRefNeedle;
 import com.ragagent.wiki.domain.WikiCategoryPaths;
 import com.ragagent.wiki.domain.WikiPage;

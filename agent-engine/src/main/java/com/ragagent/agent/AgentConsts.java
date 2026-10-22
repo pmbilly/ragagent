@@ -1,6 +1,6 @@
 package com.ragagent.agent;
 
-import com.ragagent.contract.agent.CompactionSettings;
+import com.ragagent.agent.compaction.CompactionSettings;
 import java.time.Duration;
 import java.util.List;
 import java.util.Locale;

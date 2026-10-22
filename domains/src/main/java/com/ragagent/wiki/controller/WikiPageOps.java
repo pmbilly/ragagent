@@ -14,9 +14,9 @@ import static com.ragagent.wiki.controller.WikiRequestSupport.requiredFieldError
 import static com.ragagent.wiki.controller.WikiRequestSupport.trimSpace;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageConflictException;
 import com.ragagent.wiki.domain.page.WikiPageListRequest;

@@ -1,7 +1,7 @@
 package com.ragagent.agent;
 
 import com.ragagent.agent.budget.ContextDiagnostics;
-import com.ragagent.contract.agent.CompactionSettings;
+import com.ragagent.agent.compaction.CompactionSettings;
 import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.model.ChatTool;
 import com.ragagent.contract.model.TokenUsage;

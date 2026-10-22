@@ -1,8 +1,5 @@
 package com.ragagent.mcp.approval;
 
-import com.ragagent.contract.tool.ToolApprovalGate;
-import com.ragagent.contract.tool.ToolApprovalGateFactory;
-import com.ragagent.contract.tool.ToolPolicyChecker;
 import com.ragagent.platform.redis.RedisPubSub;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;

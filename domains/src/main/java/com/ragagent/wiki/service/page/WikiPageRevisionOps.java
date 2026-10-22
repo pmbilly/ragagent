@@ -1,7 +1,7 @@
 package com.ragagent.wiki.service.page;
 
-import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiException;
+import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.domain.page.WikiPageRevision;

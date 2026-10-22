@@ -8,12 +8,12 @@
 
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
-| `:contract` | `contract` | 33 | 361 | 0 |
+| `:contract` | `contract` | 33 | 328 | 0 |
 | `:platform` | `platform` | 26 | 200 | 1 |
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 20 | 154 | 0 |
 | `:retrieval-engine` | `retrieval` | 15 | 95 | 0 |
-| `:agent-engine` | `agent` | 9 | 66 | 0 |
-| `:domains` | `agentmanagement`、`agenttools`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 251 | 1592 | 51 |
+| `:agent-engine` | `agent` | 9 | 72 | 0 |
+| `:domains` | `agentmanagement`、`agenttools`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 251 | 1614 | 51 |
 | `:boot` | `(根包)`、`config` | 2 | 19 | 0 |
 
 ## 19 个业务域（domains）
@@ -23,22 +23,22 @@
 | `agentmanagement` | `com.ragagent.agentmanagement` | 26 | 2 |
 | `agenttools` | `com.ragagent.agenttools` | 59 | 0 |
 | `audit` | `com.ragagent.audit` | 20 | 1 |
-| `auth` | `com.ragagent.auth` | 121 | 6 |
+| `auth` | `com.ragagent.auth` | 122 | 6 |
 | `datasource` | `com.ragagent.datasource` | 147 | 2 |
 | `embedchannel` | `com.ragagent.embedchannel` | 25 | 1 |
 | `favorite` | `com.ragagent.favorite` | 13 | 1 |
 | `im` | `com.ragagent.im` | 106 | 2 |
-| `initialization` | `com.ragagent.initialization` | 11 | 1 |
-| `knowledge` | `com.ragagent.knowledge` | 264 | 8 |
-| `mcp` | `com.ragagent.mcp` | 157 | 4 |
+| `initialization` | `com.ragagent.initialization` | 12 | 1 |
+| `knowledge` | `com.ragagent.knowledge` | 265 | 8 |
+| `mcp` | `com.ragagent.mcp` | 171 | 4 |
 | `memory` | `com.ragagent.memory` | 91 | 1 |
 | `model` | `com.ragagent.model` | 38 | 4 |
-| `session` | `com.ragagent.session` | 199 | 8 |
+| `session` | `com.ragagent.session` | 203 | 8 |
 | `storage` | `com.ragagent.storage` | 61 | 3 |
 | `system` | `com.ragagent.system` | 18 | 2 |
 | `vectorstore` | `com.ragagent.vectorstore` | 20 | 1 |
 | `websearch` | `com.ragagent.websearch` | 52 | 3 |
-| `wiki` | `com.ragagent.wiki` | 164 | 1 |
+| `wiki` | `com.ragagent.wiki` | 165 | 1 |
 
 ## 查找规则
 

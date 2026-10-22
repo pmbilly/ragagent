@@ -2,8 +2,8 @@ package com.ragagent.wiki.service.ingest;
 
 import com.ragagent.contract.text.Whitespace;
 import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.platform.text.CodePointOrder;
+import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.service.page.SlugFuzzy;

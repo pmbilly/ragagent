@@ -1,10 +1,10 @@
 package com.ragagent.mcp.service;
 
-import com.ragagent.contract.tool.Cancellation;
-import com.ragagent.contract.tool.ToolApprovalException;
-import com.ragagent.contract.tool.ToolBulkEnabledChecker;
-import com.ragagent.contract.tool.ToolEnabledChecks;
-import com.ragagent.contract.tool.ToolPolicyChecker;
+import com.ragagent.mcp.approval.Cancellation;
+import com.ragagent.mcp.approval.ToolApprovalException;
+import com.ragagent.mcp.approval.ToolBulkEnabledChecker;
+import com.ragagent.mcp.approval.ToolEnabledChecks;
+import com.ragagent.mcp.approval.ToolPolicyChecker;
 import com.ragagent.mcp.domain.McpToolApproval;
 import java.util.List;
 import java.util.Map;
