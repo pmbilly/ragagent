@@ -145,7 +145,8 @@ public class ChunkRepository implements ChunkSearchGateway {
     public long countByKnowledgeIdAndChunkType(String knowledgeId, String chunkType) {
         return chunkMapper.selectCount(new LambdaQueryWrapper<Chunk>()
                 .eq(Chunk::getKnowledgeId, knowledgeId)
-                .eq(Chunk::getChunkType, chunkType));
+                .eq(Chunk::getChunkType, chunkType)
+                .isNull(Chunk::getDeletedAt));
     }
 
     /** 该 knowledge 下的 TEXT 型 chunk，按 {@code chunk_index} 升序（由 api 适配器直连搬入）。 */
