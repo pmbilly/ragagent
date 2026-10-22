@@ -1432,7 +1432,7 @@ const saveDesktopPort = async () => {
 }
 
 function openApiDoc() {
-  window.open('https://github.com/pmbilly/ragagent/tree/main/docs', '_blank')
+  window.open('https://github.com/pmbilly/ragagent/blob/main/docs/api/README.md', '_blank')
 }
 
 function openCreateAPIKeyDialog() {

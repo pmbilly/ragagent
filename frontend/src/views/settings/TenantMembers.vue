@@ -54,7 +54,7 @@
         {{ $t('tenantMember.sectionDescription') }}
         <a
           class="doc-link"
-          href="https://github.com/pmbilly/ragagent/tree/main/docs"
+          href="https://github.com/pmbilly/ragagent/blob/main/docs/rbac.md"
           target="_blank"
           rel="noopener noreferrer"
         >

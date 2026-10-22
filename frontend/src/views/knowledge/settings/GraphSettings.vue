@@ -588,7 +588,7 @@ const loadSystemInfo = async (force = false) => {
 
 const graphGuideUrl =
   import.meta.env.VITE_KG_GUIDE_URL ||
-  'https://github.com/pmbilly/ragagent/tree/main/docs'
+  'https://github.com/pmbilly/ragagent/blob/main/docs/knowledge-graph.md'
 
 // Open guide documentation to show how to enable graph database
 const handleOpenGraphGuide = () => {

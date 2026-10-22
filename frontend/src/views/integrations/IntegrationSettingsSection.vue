@@ -7,7 +7,7 @@
           <p class="section-description">
             {{ $t('agentEditor.im.description') }}
             <a
-              href="https://github.com/pmbilly/ragagent/tree/main/docs"
+              href="https://github.com/pmbilly/ragagent/blob/main/docs/im-integration.md"
               target="_blank"
               rel="noopener noreferrer"
               class="doc-link"

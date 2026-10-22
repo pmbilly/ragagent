@@ -15,6 +15,15 @@
 | 7 | [`architecture/mechanisms.md`](architecture/mechanisms.md) | 队列、事务、embedding、定时任务等反直觉机制 |
 | 8 | [`glossary.md`](glossary.md) | 业务术语与历史代号（K4 / A18 / R3d / B2xx） |
 
+查业务配置：
+
+- 内置模型：[`builtin-models.md`](builtin-models.md) —— 启动时声明式建模型，第一次问答必需
+- 权限与角色：[`rbac.md`](rbac.md) —— 四级角色、路由下限、API Key 范围
+- IM 渠道接入：[`im-integration.md`](im-integration.md) —— 企业微信/微信/飞书/钉钉/Slack
+- 知识图谱：[`knowledge-graph.md`](knowledge-graph.md) —— Neo4j 启用与实体关系抽取
+- 数据库迁移排障：[`migration-troubleshooting.md`](migration-troubleshooting.md) —— 启动失败与 Flyway
+- API 概览：[`api/README.md`](api/README.md) —— 认证、响应外壳、主要资源
+
 查表：[`architecture/packages.md`](architecture/packages.md) —— 356 份 `package-info` 的包索引（由脚本生成，勿手改）。
 
 按业务链路查：[`architecture/business-capability-map.md`](architecture/business-capability-map.md) —— 六条链路（知识生产 / 问答 / Agent / 渠道 / 配置 / 初始化）→ 入口、编排、落点。

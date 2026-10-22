@@ -247,7 +247,7 @@ function formatUptime(totalSeconds: number): string {
 }
 
 const troubleshootingDocsURL =
-  'https://github.com/pmbilly/ragagent/tree/main/docs'
+  'https://github.com/pmbilly/ragagent/blob/main/docs/migration-troubleshooting.md'
 
 // Pre-fills a new issue with the current migration error so users don't have to
 // paste it manually. Body is intentionally minimal — the bug template will fill

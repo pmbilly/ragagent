@@ -27,7 +27,7 @@
             ? 'modelSettings.builtinModels.descriptionAdmin'
             : 'modelSettings.builtinModels.description') }}
         </p>
-        <a class="doc-link" href="https://github.com/pmbilly/ragagent/tree/main/docs" target="_blank"
+        <a class="doc-link" href="https://github.com/pmbilly/ragagent/blob/main/docs/builtin-models.md" target="_blank"
           rel="noopener noreferrer">
           {{ $t('modelSettings.builtinModels.viewGuide') }}
           <t-icon name="link" class="link-icon" />
