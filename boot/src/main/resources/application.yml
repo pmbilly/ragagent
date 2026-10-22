@@ -5,6 +5,16 @@ server:
   # Spring Boot 的绑定地址属性是 server.address（server.host 是不存在的死键）
   address: ${SERVER_HOST:0.0.0.0}
 
+# 指标面：只暴露 health/info/metrics；不暴露 env/beans/heapdump 等敏感端点。
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+
 spring:
   application:
     name: ragagent

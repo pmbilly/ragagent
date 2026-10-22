@@ -28,10 +28,12 @@ import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SteerRunCoordinator;
 import com.ragagent.session.service.TurnLifecycle;
+import io.micrometer.core.instrument.Metrics;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Component;
@@ -84,6 +86,7 @@ public final class QaTurnExecutor {
     private void executeQA(QaRequestContext reqCtx, QaMode mode, boolean generateTitle,
             SseSink sink, CompletableFuture<Void> asyncDone) throws IOException {
         String sessionId = reqCtx.sessionId;
+        Metrics.counter("ragagent.qa.turns", "mode", mode.name().toLowerCase(Locale.ROOT)).increment();
 
         persistLastRequestStateAsync(reqCtx, mode);
         if (mode == QaMode.AGENT) {
@@ -257,6 +260,8 @@ public final class QaTurnExecutor {
                 }
             } catch (RuntimeException serviceErr) {
                 failed = true;
+                Metrics.counter("ragagent.qa.failures", "mode", mode.name().toLowerCase(Locale.ROOT))
+                        .increment();
                 log.error("QA service failed for session {}", sessionId, serviceErr);
                 Event errEvt = new Event();
                 errEvt.setType(EventType.EVENT_ERROR);

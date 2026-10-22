@@ -227,6 +227,7 @@
 - 前端：`VITE_DEV_PROXY_TARGET=http://localhost:8083`（vite 默认值已改 8083）。
 - `LOCAL_STORAGE_BASE_DIR` 必须持久目录（严禁 /tmp，macOS 会清理 ⇒ 原始文件丢失）。
 - **起停服**：`bash scripts/java-server-up.sh` / `bash scripts/java-server-down.sh`（up 自挡端口占用；down 是唯一正确停服方式）。
+- **指标面**：`/actuator/health`、`/actuator/metrics`（只暴露 health/info/metrics）；与业务接口同一认证链，匿名 401，带 JWT 200。QA 轮次计数在 `ragagent.qa.turns` / `ragagent.qa.failures`（按 mode 打 tag），首次问答后出现。
 - **⚠️ 跑完 `mvn verify` 必须重启后端**（jar 被替换而进程仍跑旧代码 ⇒ 表现为"改了没生效"；用 `spring-boot:run` 时则是 `target/classes` 被就地重写）。
 - CI 三 job：guards（`bash scripts/run-guards.sh` 为准）· backend（spotless ratchet + 全量测试 + 灌 `V1__baseline.sql` 进全新 ParadeDB）· frontend（type-check + test + build）。`seed` tag 已推送（spotless ratchet 需要）。
 - 全量闸门（**推送/批次收尾必跑**；迭代中按 §9 分档）：
@@ -574,6 +575,8 @@ boot           14 件                      →  boot
 | P2.2 | 2026-10-22 | **长方法实拆第一刀（Faq append 校验）**：`FaqValidateOps.validateAppendMode` 239 行 → 五个具名步骤（现有索引装载 / 标准问首遍 / 批次问题索引 / 相似问过滤 / 反例过滤 / 合并后校验），主方法只留编排与进度落库；拆出的 `ExistingIndex`/`StdQPass`/`PostValidation` 三个 record 承载中间态。**行为逐字保留**（错误文案、失败行序、进度写入点未动）。 | 定向 `FaqContractTest` 13 用例绿 · >100 行方法 109→**108**、>150 行 31→**30**；两个基线已 `--write` 收紧 · 48 守卫绿 · `mvn -B clean verify` 绿（5065 / 0 / 2） |
 
 | P2.3 | 2026-10-22 | **长方法实拆第二刀（knowledge_search 输出）**：`KnowledgeSearchOutputFormatter.formatOutput` 227 行 → 四个具名片段：空结果文案（`emptyResult`）、单条 XML（`appendResultXml`，已见/新命中两路）、结构化 data（`formattedResult`）、单文档总块数（`totalChunksFor`）；主方法只留循环与统计装配。**XML 逐字保留**（属性顺序、转义、already_seen 注释未动）。新增 3 条特征测试（chunk XML/data、二次调用 already_seen、空结果文案）补上原先为 0 的直接覆盖。 | 定向 3 用例绿 · >100 行方法 108→**107**、>150 行 30→**29**；两个基线已收紧 · 48 守卫绿 · `mvn -B clean verify` 绿（5068 / 0 / 2） |
+
+| P2.4 | 2026-10-22 | **指标面落地（N10 半边）**：boot 引入 `spring-boot-starter-actuator`，只暴露 `health/info/metrics`（env/beans/heapdump 等不开）；domains 引入 `micrometer-core`，在 `QaTurnExecutor` 记录 `ragagent.qa.turns` 与 `ragagent.qa.failures`（tag=mode）。端点复用现有认证链：**匿名 401、带 JWT 200**，不新增匿名运维面。 | 真机：`/actuator/metrics` 带令牌 200 / 匿名 401，`/actuator/health` 200 · 48 守卫绿 · `mvn -B clean verify` 绿（5068 / 0 / 2） |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
