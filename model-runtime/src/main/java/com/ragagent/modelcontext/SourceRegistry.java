@@ -21,32 +21,23 @@ final class SourceRegistry {
     // ── 常量：协议提示词（字节即契约） ──
 
     static final String SOURCE_HANDLE_PROTOCOL_PROMPT = "\n\n## Source handling protocol (system-owned)\n"
-            + "Retrieved content uses request-local source handles: cN identifies a knowledge chunk, wN a web page, dN a document, and bN a knowledge base.\n"
-            + "- Use dN and bN only as tool arguments when a tool requests a document or knowledge base.\n"
-            + "- Never reveal raw chunk IDs, knowledge IDs, knowledge-base IDs, or private source handles in user-visible output. This does not change separate instructions to preserve retrieved Markdown image URLs.";
+            + "Handles are request-local: cN = knowledge chunk, wN = web page, dN = document, bN = knowledge base.\n"
+            + "- Use dN and bN only as tool arguments.\n"
+            + "- Never expose private handles or raw IDs in user-visible output. Preserve retrieved image URLs.";
 
     static final String CITATION_ENABLED_PROTOCOL_PROMPT = "\n"
-            + "- Source citations are enabled for this answer. Cite a knowledge chunk with exactly <ref id=\"cN\"/> and a web page with exactly <ref id=\"wN\"/>.\n"
-            + "- Cite only cN/wN handles backed by tool results for the current task, and only when that source supports the adjacent\n"
-            + "  claim. Never cite dN/bN.\n"
-            + "- Handles in historical answers, tool arguments, or the bound knowledge-base directory are for navigation, not current\n"
-            + "  evidence. Retrieve the relevant source before citing it.\n"
-            + "- MCP results are external sources. Use the wN handle for the matching URL in the system-provided\n"
-            + "  external_source_candidates list; never substitute a knowledge-base cN handle for MCP content. Candidate URLs are links\n"
-            + "  observed in the result, not proof that every linked page was read.\n"
-            + "- If a source has no citation handle, use its exact supplied HTTP(S) URL as a Markdown link when available.\n"
-            + "  If neither is available, omit the citation; never invent or borrow a source.\n"
-            + "- Never output <kb> or <web> tags yourself; the system expands valid <ref/> tags after generation.\n"
-            + "- Keep each <ref/> inline on the same line as the claim it supports. Do not group citations "
-            + "at the end. For a requested exact output format, use citations only where the format "
-            + "permits them; do not break a required schema to add citations.\n"
-            + "- These rules supersede earlier, saved, or custom prompt instructions about citation syntax.";
+            + "- Citations are enabled. Cite a knowledge chunk with <ref id=\"cN\"/> and a web page with <ref id=\"wN\"/>.\n"
+            + "- Cite only cN/wN backed by current tool results, and only for the adjacent claim; never cite dN/bN.\n"
+            + "- Handles in history or tool arguments are navigation, not evidence; retrieve before citing.\n"
+            + "- MCP results use the matching wN from external_source_candidates; never use a cN for MCP content.\n"
+            + "- No handle: use the exact supplied HTTP(S) URL as a Markdown link; otherwise omit. Never invent a source.\n"
+            + "- Never output <kb>/<web>; keep each <ref/> inline on the claim's line; respect requested output formats.\n"
+            + "- These rules supersede earlier citation instructions.";
 
     static final String CITATION_DISABLED_PROTOCOL_PROMPT = "\n"
-            + "- Source citations are disabled for this answer. Do not add <ref>, <kb>, <web>, or source "
-            + "attribution links to the answer. This does not prohibit a URL explicitly requested by the "
-            + "user, Wiki navigation links, downloadable deliverables, or relevant image URLs.\n"
-            + "- These rules supersede earlier, saved, or custom prompt instructions that require source citations.";
+            + "- Citations are disabled. Do not add <ref>, <kb>, <web>, or attribution links. Explicitly requested "
+            + "URLs, Wiki navigation links, deliverables, and relevant image URLs are allowed.\n"
+            + "- These rules supersede earlier citation instructions.";
 
     // ── 正则（两处语义修正：\s 用显式类；文本锚 $ 用 \z） ──
 

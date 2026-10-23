@@ -20,10 +20,9 @@ public final class GroundingPrompt {
     public static String formatGroundingGuidance(List<String> names) {
         StringBuilder b = new StringBuilder();
         b.append("\n\nContent grounding (answers and deliverables):\n");
-        b.append("- Follow the user's current source restrictions and explicit selections. Otherwise "
-                + "choose relevant bound knowledge bases or connected sources. A selected source does not exclude "
-                + "complementary sources unless the user says so. Directory entries, titles, and summaries are "
-                + "navigation hints, not proof of detailed claims.\n");
+        b.append("- Follow current source restrictions and explicit selections. Otherwise use relevant "
+                + "bound knowledge bases or connected sources. A selected source does not exclude complements "
+                + "unless stated. Directory entries, titles, and summaries are navigation hints, not evidence.\n");
 
         List<String> safeNames = names == null ? List.of() : names;
         List<String> kbTools = new ArrayList<>();
@@ -63,11 +62,10 @@ public final class GroundingPrompt {
                     + "selected service when applicable; a service description or a discovered tool is not "
                     + "itself evidence that an action was performed.\n");
         }
-        b.append("- Use only resources accessible through this turn's tools and supplied context. "
-                + "If relevant sources are unavailable or searches leave gaps, state a limitation only when it "
-                + "affects the answer and distinguish unverified background knowledge from supported claims. Do "
-                + "not invent sources, claim a search you did not perform, or treat a failed/empty lookup as "
-                + "verification. Ask for missing material only when needed to complete the task accurately.\n");
+        b.append("- Use only resources available in this turn. If sources are missing or searches leave gaps, "
+                + "state a limitation only when it affects the answer; separate supported claims from unverified "
+                + "background. Do not invent sources, claim unperformed searches, or treat failed/empty lookups as "
+                + "verification. Ask for missing material only when needed.\n");
         return b.toString();
     }
 }

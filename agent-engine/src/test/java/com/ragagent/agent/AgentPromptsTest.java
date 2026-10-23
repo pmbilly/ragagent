@@ -406,11 +406,11 @@ class AgentPromptsTest {
                 "Create the requested slides using the selected skill.");
         for (String prompt : new String[] {pure, rag, custom}) {
             assertThat(prompt).contains("Content grounding (answers and deliverables):");
-            // 文案精简（2026-10-12）：解释性 bullet 已删，保留的底线仍必须在位
-            assertThat(prompt).contains("Follow the user's current source restrictions");
-            assertThat(prompt).contains("navigation hints, not proof of detailed claims");
-            assertThat(prompt).contains("Do not invent sources, claim a search you did not perform");
-            assertThat(prompt).contains("If relevant sources are unavailable or searches leave gaps");
+            // 文案精简（2026-10-24）：解释性 bullet 已删，保留的底线仍必须在位
+            assertThat(prompt).contains("Follow current source restrictions");
+            assertThat(prompt).contains("navigation hints, not evidence");
+            assertThat(prompt).contains("Do not invent sources, claim unperformed searches");
+            assertThat(prompt).contains("If sources are missing or searches leave gaps");
         }
         assertThat(custom).startsWith("Create the requested slides using the selected skill.");
         // legacy builder 推断不了工具，但证据策略仍在

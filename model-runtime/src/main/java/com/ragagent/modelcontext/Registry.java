@@ -45,9 +45,7 @@ public final class Registry {
     public static final String ARGUMENT_RESOLUTION_UNRESOLVED = "unresolved";
 
     static final String RESOURCE_HANDLE_PROTOCOL_PROMPT = "\n\n## Resource handle protocol (system-owned)\n"
-            + "Some durable resources and high-entropy Wiki slugs are represented by request-local res://NNNN handles. Wiki issues may use iN handles.\n"
-            + "- Copy supplied handles exactly in links, images, and tool arguments; they refer only to the supplied resource versions.\n"
-            + "- Never reuse or invent a resource handle: a handle that was not supplied with this request is not valid.";
+            + "- res://NNNN and iN are request-local handles; copy them exactly. Never reuse or invent a handle not supplied in this request.";
 
     final SourceRegistry sources;
     final ResourceRegistry resources;
@@ -71,8 +69,7 @@ public final class Registry {
     /** 系统私有的模型句柄与引用协议（字节即契约）。 */
     public String protocolPrompt() {
         return sources.protocolPrompt() + RESOURCE_HANDLE_PROTOCOL_PROMPT
-                + "\nMCP routing uses request-local msN server IDs and mtN tool references. "
-                + "Copy them exactly from the directory or describe result; never invent them.\n";
+                + "\nMCP uses msN server IDs and mtN tool references; copy them exactly; never invent them.\n";
     }
 
     /**

@@ -12,23 +12,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * <p>五个键一律 {@code lf_} 前缀，空值**整键省略**，
  * 未启用 langfuse 时负载字节不变；旧负载（无这些键）也能反序列化。</p>
+ *
+ * @param traceId 发起该任务的根 trace id（兼容旧负载用；关联以 traceparent 为准）
+ * @param parentObservationId 仅向后兼容保留：OTLP 路径的父子关系走 traceparent
+ * @param traceparent W3C Trace Context：{@code 00-<trace_id>-<span_id>-<flags>}
+ * @param userId 跨异步边界保留的用户/租户标签（无上游 trace 时让独立根仍归到正确的租户）
+ * @param sessionId 跨异步边界保留的会话标签
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record TracingContext(
-        /** 发起该任务的根 trace id（兼容旧负载用；关联以 traceparent 为准）。 */
         @JsonProperty("lf_trace_id")
         @JsonInclude(JsonInclude.Include.NON_EMPTY) String traceId,
-        /** 仅向后兼容保留：OTLP 路径的父子关系走 traceparent。 */
         @JsonProperty("lf_parent_obs_id")
         @JsonInclude(JsonInclude.Include.NON_EMPTY) String parentObservationId,
-        /** W3C Trace Context：{@code 00-<trace_id>-<span_id>-<flags>}。 */
         @JsonProperty("lf_traceparent")
         @JsonInclude(JsonInclude.Include.NON_EMPTY) String traceparent,
-        /** 跨异步边界保留的用户/租户标签（无上游 trace 时让独立根仍归到正确的租户）。 */
         @JsonProperty("lf_user_id")
         @JsonInclude(JsonInclude.Include.NON_EMPTY) String userId,
-        /** 同上：跨边界保留的会话标签。 */
         @JsonProperty("lf_session_id")
         @JsonInclude(JsonInclude.Include.NON_EMPTY) String sessionId) {
 

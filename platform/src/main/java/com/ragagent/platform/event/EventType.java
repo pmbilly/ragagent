@@ -72,7 +72,6 @@ public final class EventType {
     // === Agent 流式事件（实时反馈，AgentStreamHandler 订阅的就是这一组） ===
     /** Agent 思考过程 */
     public static final String EVENT_AGENT_THOUGHT = "thought";
-    /** 有界命令输出（累计尾量） */
     /** 工具调用通知 */
     public static final String EVENT_AGENT_TOOL_CALL = "toolCall";
     /** 工具结果 */

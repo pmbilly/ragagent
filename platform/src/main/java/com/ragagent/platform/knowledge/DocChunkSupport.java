@@ -12,6 +12,13 @@ import java.util.Map;
  * wiki_read_source_doc / get_document_info / list_knowledge_chunks 三工具共享的
  * 接缝与图片富化（chunk 内容富化、图片 markdown 组装、批量图片信息收集的消费侧）。
  *
+ * <p>自 {@code agent-engine} 的 {@code agent.tool} 迁入——
+ * 它与 {@code ImageInfoMatchUtil}/{@code ChunkSearchUtil} 同族：**对契约形状做技术性组装**
+ * （markdown 片段、metadata 映射、图片信息解析），不含业务判定，故归 platform.knowledge。</p>
+ *
+ * <p>原嵌套 record {@code ImageInfoRow}/{@code KnowledgeInfoRow} 随之改名 *Row（platform 面
+ * 不得出现 View/Port/Request/Response/Payload/Facts 这类业务形状命名—— 红旗口径）。</p>
+ *
  * <p>seam：</p>
  * <ul>
  *   <li>{@link KnowledgeInfoReader}：按 ID 取知识 + 取知识标签。</li>
@@ -21,14 +28,6 @@ import java.util.Map;
  *       （返回 parent chunk ID → 合并后 ImageInfo JSON 串；null 收集器 = 跳过富化）。
  *       其内部合并实现属基础设施侧。</li>
  * </ul>
- */
-/**
- * 文档/分块视图组装工具（自 {@code agent-engine} 的 {@code agent.tool} 迁入——
- * 它与 {@code ImageInfoMatchUtil}/{@code ChunkSearchUtil} 同族：**对契约形状做技术性组装**
- * （markdown 片段、metadata 映射、图片信息解析），不含业务判定，故归 platform.knowledge）。
- *
- * <p>原嵌套 record {@code ImageInfoRow}/{@code KnowledgeInfoRow} 随之改名 *Row（platform 面
- * 不得出现 View/Port/Request/Response/Payload/Facts 这类业务形状命名—— 红旗口径）。</p>
  */
 public final class DocChunkSupport {
 
