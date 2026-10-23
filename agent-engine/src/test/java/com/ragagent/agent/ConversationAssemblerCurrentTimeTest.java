@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 class ConversationAssemblerCurrentTimeTest {
 
     private static final Pattern CURRENT_TIME = Pattern.compile(
-            "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}) ([+-]\\d{2}:\\d{2})"
+            "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}) ([+-]\\d{2}:\\d{2}|Z)"
                     + " \\(UTC (\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z)\\)");
 
     @Test
@@ -26,8 +26,10 @@ class ConversationAssemblerCurrentTimeTest {
         Matcher m = CURRENT_TIME.matcher(text);
         assertThat(m.matches()).as("currentTime 文本格式：%s", text).isTrue();
 
+        // UTC 时区下 ZoneOffset 的 toString 是 "Z"，解析时归一成 +00:00。
+        String offset = "Z".equals(m.group(2)) ? "+00:00" : m.group(2);
         Instant localInstant = OffsetDateTime
-                .parse(m.group(1).replace(' ', 'T') + m.group(2))
+                .parse(m.group(1).replace(' ', 'T') + offset)
                 .toInstant();
         Instant utcInstant = Instant.parse(m.group(3));
 
