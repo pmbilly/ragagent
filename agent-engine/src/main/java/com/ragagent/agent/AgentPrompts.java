@@ -272,6 +272,8 @@ public final class AgentPrompts {
                 + "task ID at the recommended interval; after a timeout, check the existing task before "
                 + "resubmitting. On failure, address the reported cause before retrying; never bypass permission "
                 + "or policy denials; report a blocker only when it cannot be resolved.\n");
+        b.append("Once the evidence is sufficient to answer, stop retrieving and respond. Do not run a "
+                + "final completeness check; if the collected results already support the answer, answer now.\n");
         if (names.contains("discover_mcp_tools")) {
             b.append("For MCP tools, use offered functions directly; otherwise inspect the listed server, "
                     + "describe the exact tool, and wait for its definition before a dependent call. Use the "
