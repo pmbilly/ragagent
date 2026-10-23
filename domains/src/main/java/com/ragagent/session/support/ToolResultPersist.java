@@ -41,6 +41,10 @@ public final class ToolResultPersist {
 
     private static final int HISTORICAL_SANDBOX_OUTPUT_CHARS = 4 * 1024;
 
+    /** 列表类工具在历史里保留的 chunk 条数与单条字符上限。 */
+    private static final int HISTORY_CHUNK_LIMIT = 5;
+    private static final int HISTORY_CHUNK_CHARS = 400;
+
     /** data 带 display_type 时视为"模型面输出已另存"，原始 output 不再下发。 */
     public static boolean shouldOmitRawToolOutput(String toolName, Map<String, Object> data) {
         if (data == null) {
@@ -330,15 +334,22 @@ public final class ToolResultPersist {
                 int fetched = intField(data, "fetchedChunks");
                 int total = intField(data, "totalChunks");
                 String q = stringField(data, "faqQuestion");
+                String excerpt = chunkExcerpt(data, HISTORY_CHUNK_LIMIT, HISTORY_CHUNK_CHARS);
                 if (!q.isEmpty()) {
-                    return String.format("Loaded FAQ entry: %s (content omitted from history)", q);
+                    return excerpt.isEmpty()
+                            ? String.format("Loaded FAQ entry: %s (content omitted from history)", q)
+                            : "Loaded FAQ entry: " + q + ":\n" + excerpt;
                 }
                 if (!title.isEmpty() && total > 0) {
-                    return String.format("Listed %d/%d chunks from %s (content omitted from history)",
-                            fetched, total, title);
+                    return excerpt.isEmpty()
+                            ? String.format("Listed %d/%d chunks from %s (content omitted from history)",
+                                    fetched, total, title)
+                            : String.format("Listed %d/%d chunks from %s:\n%s", fetched, total, title, excerpt);
                 }
                 if (!title.isEmpty()) {
-                    return String.format("Listed chunks from %s (content omitted from history)", title);
+                    return excerpt.isEmpty()
+                            ? String.format("Listed chunks from %s (content omitted from history)", title)
+                            : String.format("Listed chunks from %s:\n%s", title, excerpt);
                 }
             }
             case "grep_results" -> {
@@ -401,6 +412,59 @@ public final class ToolResultPersist {
             return String.format("Tool completed (%s; payload omitted from history)", displayType);
         }
         return "Tool completed (payload omitted from history)";
+    }
+
+    /**
+     * 列表类工具在历史里保留少量正文。
+     *
+     * <p>只回 "Listed x/y (content omitted)" 会让模型在下一轮看不到任何内容，于是反复换 offset
+     * 重调同一个工具。保留前几条（截断）既给出证据，又避免历史膨胀。</p>
+     */
+    private static String chunkExcerpt(Map<String, Object> data, int maxChunks, int maxChars) {
+        if (data == null) {
+            return "";
+        }
+        Object raw = data.get("chunks");
+        if (!(raw instanceof List<?> chunks) || chunks.isEmpty()) {
+            return "";
+        }
+        StringBuilder b = new StringBuilder();
+        int shown = 0;
+        for (Object item : chunks) {
+            if (shown >= maxChunks) {
+                break;
+            }
+            if (!(item instanceof Map<?, ?> chunk)) {
+                continue;
+            }
+            Object content = chunk.get("content");
+            if (!(content instanceof String text) || text.isBlank()) {
+                continue;
+            }
+            String trimmed = text.strip();
+            if (trimmed.codePointCount(0, trimmed.length()) > maxChars) {
+                trimmed = trimmed.substring(0, trimmed.offsetByCodePoints(0, maxChars)) + "…";
+            }
+            if (shown > 0) {
+                b.append('\n');
+            }
+            b.append('[').append(shown + 1).append(']');
+            Object index = chunk.get("chunkIndex");
+            if (index != null) {
+                b.append(" chunk #").append(index);
+            }
+            b.append(": ").append(trimmed);
+            shown++;
+        }
+        if (shown == 0) {
+            return "";
+        }
+        int remaining = chunks.size() - shown;
+        if (remaining > 0) {
+            b.append("\n(").append(remaining)
+                    .append(" more chunks omitted; use grep_chunks for targeted search)");
+        }
+        return b.toString();
     }
 
     /** 取字符串字段（null → ""，值 trim）。 */
