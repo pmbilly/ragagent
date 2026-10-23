@@ -274,6 +274,7 @@ public final class AgentPrompts {
                 + "or policy denials; report a blocker only when it cannot be resolved.\n");
         b.append("Once the evidence is sufficient to answer, stop retrieving and respond. Do not run a "
                 + "final completeness check; if the collected results already support the answer, answer now.\n");
+        b.append("Prefer batch retrieval over per-item calls; never read the same document chunk by chunk.\n");
         if (names.contains("discover_mcp_tools")) {
             b.append("For MCP tools, use offered functions directly; otherwise inspect the listed server, "
                     + "describe the exact tool, and wait for its definition before a dependent call. Use the "

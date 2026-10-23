@@ -79,6 +79,8 @@ public class ListKnowledgeChunksTool extends BaseTool {
                     + "## Paging guidance:\n"
                     + "- Use grep_chunks first to locate the relevant chunks; do not use this tool to enumerate an entire document.\n"
                     + "- Prefer one page with limit 20-50 over repeated small pages. The full result is kept in history, so do not call again for the same content.\n"
+                    + "- If you need more than one chunk from the same document, read them in one knowledgeId page (limit 20-50) instead of calling chunkId repeatedly.\n"
+                    + "- Do not read chunks one by one; per-chunk calls waste turns and miss adjacent context.\n"
                     + "\n"
                     + "## Output:\n"
                     + "Full chunk content. FAQ entries include <faq> with <answer> from metadata.";
