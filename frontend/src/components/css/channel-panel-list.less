@@ -137,6 +137,14 @@
     object-fit: contain;
   }
 
+  // 渠道自带的浮标图片（launcherIcon）：铺满徽标，与浮标的裁切口径一致
+  &__launcher {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
   &__body {
     flex: 1;
     min-width: 0;

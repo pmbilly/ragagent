@@ -2883,6 +2883,7 @@ export default {
     refreshSuggestedQuestions: '別の候補',
     thinking: '思考中...',
     thinkingAlt: '思考中',
+    connectionLost: '接続が中断されました。回答は生成済みの可能性があります。ページを再読み込みしてください。',
     conversationTime: {
       today: '今日{time}',
       yesterday: '昨日{time}',
@@ -4025,6 +4026,10 @@ export default {
     ruRU: 'Русский',
     koKR: '한국어',
     jaJP: '日本語',
+    zhHK: '繁體中文',
+    esES: 'Español',
+    ptBR: 'Português',
+    thTH: 'ไทย',
     selectLanguage: '言語を選択',
     language: '言語',
     languageDescription: 'インターフェースの表示言語を選択します',

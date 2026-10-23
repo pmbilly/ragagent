@@ -33,6 +33,7 @@ import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.session.support.SessionNotFoundException;
 import com.ragagent.session.support.SessionOwnerIds;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -315,7 +316,20 @@ public class SessionService {
     }
 
     /**
-     * 先严格范围加载（404 门槛），
+     * 删除用的 owner 范围：自己 / 无主的行走 owner 范围；
+     * 管理员控制台可见的渠道托管行（embed / IM / API-Key）返回 {@code null}，按 id 删
+     * （授权已在上一步的 {@link #loadSessionForRead} 完成）。
+     */
+    private static String ownerScopeForDelete(Session session, String userId) {
+        String owner = session == null ? null : session.getUserId();
+        if (owner == null || owner.isEmpty() || owner.equals(userId)) {
+            return userId;
+        }
+        return null;
+    }
+
+    /**
+     * 先按读路径的可见性加载（404 门槛，管理员可命中渠道托管行），
      * 再做三件套清理（知识 / 临时 KB / 建议 / sandbox），最后软删。
      */
     public void deleteSession(String id) {
@@ -325,19 +339,19 @@ public class SessionService {
         long tenantId = requireTenantId();
         String userId = SessionOwnerIds.currentSessionOwnerId();
 
-        sessionRepository.get(tenantId, userId, id);
+        Session session = loadSessionForRead(sessionRepository, tenantId, userId, id);
 
         cleanupSessionResources(tenantId, id);
 
-        long rows = sessionRepository.delete(tenantId, userId, id);
+        long rows = sessionRepository.delete(tenantId, ownerScopeForDelete(session, userId), id);
         if (rows == 0) {
             throw new SessionNotFoundException();
         }
     }
 
     /**
-     * 先筛出**可见**的 id
-     * （逐个 {@code repo.Get}，不可见的静默跳过），全部不可见 → 404；
+     * 先筛出**可见**的 id（owner 范围内的批量查询 + 逐个走读路径兜底，
+     * 后者让管理员能删掉列表里看得见的渠道托管会话），全部不可见 → 404；
      * 清理与删除都只对可见集合做。
      */
     public void batchDeleteSessions(List<String> ids) {
@@ -347,21 +361,47 @@ public class SessionService {
         long tenantId = requireTenantId();
         String userId = SessionOwnerIds.currentSessionOwnerId();
 
-        List<Session> visible = sessionRepository.getByIds(tenantId, userId, ids);
-        if (visible.isEmpty()) {
+        List<String> ownerScopedIds = new ArrayList<>(
+                sessionRepository.getByIds(tenantId, userId, ids).stream().map(Session::getId).toList());
+
+        // 列表 / 详情对管理员放开渠道托管行（embed / IM / API-Key）；删除必须对齐，
+        // 否则控制台勾选它们必然 404。逐个补齐，不可见/已删的静默跳过。
+        List<String> consoleIds = new ArrayList<>();
+        for (String id : ids) {
+            if (ownerScopedIds.contains(id) || consoleIds.contains(id)) {
+                continue;
+            }
+            try {
+                Session session = loadSessionForRead(sessionRepository, tenantId, userId, id);
+                if (ownerScopeForDelete(session, userId) == null) {
+                    consoleIds.add(session.getId());
+                } else {
+                    ownerScopedIds.add(session.getId());
+                }
+            } catch (SessionNotFoundException ignored) {
+                // 已删 / 非本空间 / 无权限：跳过，不让个别脏 id 拖垮整批
+            }
+        }
+        if (ownerScopedIds.isEmpty() && consoleIds.isEmpty()) {
             throw new SessionNotFoundException();
         }
-        List<String> visibleIds = visible.stream().map(Session::getId).toList();
 
-        for (String id : visibleIds) {
+        List<String> deletableIds = new ArrayList<>(ownerScopedIds);
+        deletableIds.addAll(consoleIds);
+        for (String id : deletableIds) {
             cleanupSessionResources(tenantId, id);
         }
 
-        sessionRepository.batchDelete(tenantId, userId, visibleIds);
+        if (!ownerScopedIds.isEmpty()) {
+            sessionRepository.batchDelete(tenantId, userId, ownerScopedIds);
+        }
+        if (!consoleIds.isEmpty()) {
+            sessionRepository.batchDelete(tenantId, null, consoleIds);
+        }
         try {
-            suggestionRepository.deleteBySessionIds(tenantId, visibleIds);
+            suggestionRepository.deleteBySessionIds(tenantId, deletableIds);
         } catch (RuntimeException e) {
-            log.warn("Failed to delete suggestions for {} sessions", visibleIds.size(), e);
+            log.warn("Failed to delete suggestions for {} sessions", deletableIds.size(), e);
         }
     }
 

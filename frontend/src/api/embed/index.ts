@@ -83,7 +83,17 @@ export interface EmbedVisitorSessionSummary {
   updatedAt: string
 }
 
-export type EmbedLocaleTag = 'zh-CN' | 'en-US' | 'ko-KR' | 'ja-JP' | 'ru-RU' | ''
+export type EmbedLocaleTag =
+  | 'zh-CN'
+  | 'zh-HK'
+  | 'en-US'
+  | 'ko-KR'
+  | 'ja-JP'
+  | 'ru-RU'
+  | 'es-ES'
+  | 'pt-BR'
+  | 'th-TH'
+  | ''
 
 export interface EmbedChannelStats {
   sessionCount: number
@@ -673,7 +683,7 @@ export function buildWidgetSnippet(
   const base = safeBaseUrl(opts?.baseUrl)
   const position = opts?.position || 'bottom-right'
   const attrs = [
-    `src="${escapeHtmlAttr(`${base}/weknora-widget.js`)}"`,
+    `src="${escapeHtmlAttr(`${base}/ragagent-widget.js`)}"`,
     `data-channel="${escapeHtmlAttr(channelId)}"`,
     `data-token="${escapeHtmlAttr(token)}"`,
     `data-position="${escapeHtmlAttr(position)}"`,
@@ -700,7 +710,7 @@ export function buildSecureWidgetSnippet(
   const position = opts?.position || 'bottom-right'
   const endpoint = opts?.tokenEndpoint || SECURE_TOKEN_ENDPOINT_PLACEHOLDER
   const attrs = [
-    `src="${escapeHtmlAttr(`${base}/weknora-widget.js`)}"`,
+    `src="${escapeHtmlAttr(`${base}/ragagent-widget.js`)}"`,
     `data-channel="${escapeHtmlAttr(channelId)}"`,
     `data-token-endpoint="${escapeHtmlAttr(endpoint)}"`,
     `data-position="${escapeHtmlAttr(position)}"`,

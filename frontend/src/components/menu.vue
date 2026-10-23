@@ -546,36 +546,29 @@ const handleInlineBatchDelete = () => {
         onConfirm: async () => {
             batchDeleting.value = true
             try {
-                let res: any
+                // 删除接口成功时 data=null，解包后返回值就是 null —— 不能用返回值判成功。
+                // 非 2xx 与 code!=0 都已被响应拦截器 reject，能走到这里即成功。
                 if (isDeleteAll) {
-                    res = await deleteAllSessions()
+                    await deleteAllSessions();
+                    usemenuStore.clearMenuArr();
+                    total.value = 0;
+                    await getMessageList();
                 } else {
-                    res = await batchDelSessions([...batchSelectedIds.value])
-                }
-                // 后端删除类 204 无体（§1.13）；HTTP 层非 2xx 已走 catch
-                if (res !== undefined && res !== null) {
-                    if (isDeleteAll) {
-                        usemenuStore.clearMenuArr();
-                        total.value = 0;
-                        await getMessageList();
-                    } else {
-                        let next = sessionBuckets.value;
-                        for (const id of batchSelectedIds.value) {
-                            next = removeSessionFromBuckets(next, id);
-                        }
-                        sessionBuckets.value = next;
-                        syncMenuStoreFromBuckets();
+                    await batchDelSessions([...batchSelectedIds.value]);
+                    let next = sessionBuckets.value;
+                    for (const id of batchSelectedIds.value) {
+                        next = removeSessionFromBuckets(next, id);
                     }
-                    const currentChatId = route.params.chatid as string;
-                    if (currentChatId && (isDeleteAll || batchSelectedIds.value.includes(currentChatId))) {
-                        router.push('/platform/creatChat');
-                    }
-                    batchSelectedIds.value = []
-                    MessagePlugin.success(t('batchManage.deleteSuccess'))
-                    exitBatchMode()
-                } else {
-                    MessagePlugin.error(t('batchManage.deleteFailed'))
+                    sessionBuckets.value = next;
+                    syncMenuStoreFromBuckets();
                 }
+                const currentChatId = route.params.chatid as string;
+                if (currentChatId && (isDeleteAll || batchSelectedIds.value.includes(currentChatId))) {
+                    router.push('/platform/creatChat');
+                }
+                batchSelectedIds.value = []
+                MessagePlugin.success(t('batchManage.deleteSuccess'))
+                exitBatchMode()
             } catch {
                 MessagePlugin.error(t('batchManage.deleteFailed'))
             }
@@ -1028,7 +1021,7 @@ watch([() => route.name, () => route.params], (newvalue, oldvalue) => {
         loadCurrentKbInfo((newvalue[1] as any)?.kbId as string);
     }
 });
-let knowledgeIcon = ref('zhishiku-green.svg');
+let knowledgeIcon = ref('zhishiku-blue.svg');
 let prefixIcon = ref('prefixIcon.svg');
 let logoutIcon = ref('logout.svg');
 let settingIcon = ref('setting.svg');
@@ -1042,16 +1035,16 @@ const getIcon = (path: string) => {
     const agentsActiveState = route.name === 'agentList';
 
     // 知识库图标：只在知识库页面显示绿色
-    knowledgeIcon.value = kbActiveState.isKbActive ? 'zhishiku-green.svg' : 'zhishiku.svg';
+    knowledgeIcon.value = kbActiveState.isKbActive ? 'zhishiku-blue.svg' : 'zhishiku.svg';
 
     // 智能体图标：只在智能体页面显示绿色
-    agentIcon.value = agentsActiveState ? 'agent-green.svg' : 'agent.svg';
+    agentIcon.value = agentsActiveState ? 'agent-blue.svg' : 'agent.svg';
 
     // 对话图标：只在对话创建页面显示绿色，其他情况显示默认
-    prefixIcon.value = creatChatActiveState.isCreatChatActive ? 'prefixIcon-green.svg' : 'prefixIcon.svg';
+    prefixIcon.value = creatChatActiveState.isCreatChatActive ? 'prefixIcon-blue.svg' : 'prefixIcon.svg';
 
     // 设置图标：只在设置页面显示绿色
-    settingIcon.value = settingsActiveState.isSettingsActive ? 'setting-green.svg' : 'setting.svg';
+    settingIcon.value = settingsActiveState.isSettingsActive ? 'setting-blue.svg' : 'setting.svg';
 
     // 退出图标：始终显示默认
     logoutIcon.value = 'logout.svg';

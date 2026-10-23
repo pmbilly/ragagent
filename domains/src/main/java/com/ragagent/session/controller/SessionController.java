@@ -282,7 +282,11 @@ public class SessionController {
         try {
             sessionService.batchDeleteSessions(sanitizedIds);
         } catch (SessionNotFoundException e) {
-            log.warn("No visible sessions found for batch delete");
+            log.warn("No visible sessions found for batch delete (tenant={}, role={}, owner={}, requested={}, sample={})",
+                    TenantContext.currentTenantId(), TenantContext.currentRole(),
+                    SessionOwnerIds.currentSessionOwnerId(),
+                    req.ids().size(),
+                    req.ids().stream().limit(3).map(LogSanitizer::sanitize).toList());
             throw BizException.notFound(e.getMessage());
         } catch (RuntimeException e) {
             throw toInternal(e);

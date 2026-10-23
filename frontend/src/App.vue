@@ -17,9 +17,14 @@ import { renderWorkspaceNotifyContent } from '@/utils/workspaceNotifyContent'
 // TDesign locale configs
 import enUSConfig from 'tdesign-vue-next/esm/locale/en_US'
 import zhCNConfig from 'tdesign-vue-next/esm/locale/zh_CN'
+import zhTWConfig from 'tdesign-vue-next/esm/locale/zh_TW'
 import koKRConfig from 'tdesign-vue-next/esm/locale/ko_KR'
 import jaJPConfig from 'tdesign-vue-next/esm/locale/ja_JP'
 import ruRUConfig from 'tdesign-vue-next/esm/locale/ru_RU'
+// TDesign 未内置 es / pt-BR / th 语言包：本地只覆盖实际用到的组件文案，其余继承 en_US。
+import esESConfig from '@/i18n/tdesign/es-ES'
+import ptBRConfig from '@/i18n/tdesign/pt-BR'
+import thTHConfig from '@/i18n/tdesign/th-TH'
 
 const { locale, t, tm } = useI18n()
 const { formatRole, roleIcon } = useRoleLabel()
@@ -27,15 +32,31 @@ const router = useRouter()
 const authStore = useAuthStore()
 const settingsStore = useSettingsStore()
 
+// TDesign 未提供 zh-HK 包（繁体走 zh_TW）；es / pt-BR / th 用本地局部覆盖包。
 const tdLocaleMap: Record<string, object> = {
   'en-US': enUSConfig,
   'zh-CN': zhCNConfig,
+  'zh-HK': zhTWConfig,
   'ko-KR': koKRConfig,
   'ja-JP': jaJPConfig,
   'ru-RU': ruRUConfig,
+  'es-ES': esESConfig,
+  'pt-BR': ptBRConfig,
+  'th-TH': thTHConfig,
 }
 
 const tdGlobalConfig = computed(() => tdLocaleMap[locale.value] || enUSConfig)
+
+// <html lang> 跟随当前界面语言（读屏、浏览器翻译与宿主脚本都按它判语言）。
+watch(
+  locale,
+  (next) => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('lang', next)
+    }
+  },
+  { immediate: true },
+)
 
 const decodeOIDCResult = (encoded: string) => {
   const normalized = encoded.replace(/-/g, '+').replace(/_/g, '/')

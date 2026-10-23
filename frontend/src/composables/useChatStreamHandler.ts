@@ -421,6 +421,56 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
     return events
   }
 
+  /**
+   * 断流兜底：用服务端已完成的历史行覆盖内存中的同一条消息。
+   * 与 handleMsgList 对「已完成行」的处理保持一致（agent 步骤 → 重建事件流），
+   * 否则消息会永远停在未完成，UI 一直显示“正在思考”。
+   */
+  const applyCompletedSnapshot = (message: ChatMessage | undefined, row: ChatMessage | undefined): boolean => {
+    if (!message || !row || !row.completed) return false
+
+    message.content = String(row.content || '')
+    message.completed = true
+    message.error = undefined
+    message.thinking = false
+    message.thinkContent = ''
+    message.showThink = false
+    if (row.agentDurationMs !== undefined) message.agentDurationMs = row.agentDurationMs
+    if (row.usage !== undefined) message.usage = row.usage
+    if (Array.isArray(row.knowledgeReferences)) {
+      message.knowledgeReferences = row.knowledgeReferences.map((item) =>
+        normalizeKnowledgeReference(item as ChatMessage),
+      )
+    }
+
+    const steps = Array.isArray(row.agentSteps) ? (row.agentSteps as unknown[]) : []
+    if (steps.length > 0) {
+      message.agentSteps = markRaw(steps as object)
+      message.isAgentMode = true
+      message.hideContent = true
+      message.agentEventStream = markRaw(
+        reconstructEventStreamFromSteps(
+          steps,
+          String(row.content || ''),
+          true,
+          Boolean(row.fallback),
+          Number(row.agentDurationMs) || 0,
+          row.usage,
+        ),
+      )
+    } else if (message.isAgentMode) {
+      // 无步骤但有正文：补一条 answer 事件，避免时间线停在最后一步。
+      const stream = (message.agentEventStream as ChatMessage[] | undefined) || []
+      if (!stream.some((event) => event?.type === 'answer' && event.done)) {
+        stream.push({ type: 'answer', content: String(row.content || ''), done: true })
+      }
+      message.agentEventStream = markRaw(stream)
+    }
+
+    if (row.suggestionSet !== undefined) message.suggestionSet = row.suggestionSet
+    return true
+  }
+
   const handleMsgList = async (
     data: ChatMessage[],
     isScrollType = false,
@@ -1274,6 +1324,7 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
     findLastMessage,
     shouldRenderAssistantMessage,
     shouldShowGlobalTypingIndicator,
+    applyCompletedSnapshot,
     handleMsgList,
     processStreamChunk,
     prepareForNewOutgoingMessage,

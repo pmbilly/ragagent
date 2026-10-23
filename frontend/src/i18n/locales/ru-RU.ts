@@ -2047,6 +2047,10 @@ export default {
     ruRU: 'Русский',
     koKR: '한국어',
     jaJP: '日本語',
+    zhHK: '繁體中文',
+    esES: 'Español',
+    ptBR: 'Português',
+    thTH: 'ไทย',
     selectLanguage: 'Выбрать язык',
     language: 'Язык',
     languageDescription: 'Выберите язык отображения интерфейса',
@@ -3058,6 +3062,7 @@ export default {
     refreshSuggestedQuestions: 'Ещё',
     thinking: 'Думаю...',
     thinkingAlt: 'Обдумывание...',
+    connectionLost: 'Соединение прервано. Ответ мог быть сформирован — обновите страницу.',
     conversationTime: {
       today: 'Сегодня {time}',
       yesterday: 'Вчера {time}',

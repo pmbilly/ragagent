@@ -161,3 +161,39 @@ test('agent and non-agent stop notify onGenerationStopped', () => {
   assert.notEqual(nonAgent, -1)
   assert.match(source.slice(nonAgent, nonAgent + 500), /onGenerationStopped\?\.\(\)/)
 })
+
+const streamSource = readFileSync(new URL('../api/chat/streame.ts', import.meta.url), 'utf8')
+const chatViewSource = readFileSync(new URL('../views/chat/index.vue', import.meta.url), 'utf8')
+
+test('流意外结束时通知上层兜底（主动停止不通知）', () => {
+  assert.match(
+    streamSource,
+    /onclose: \(\) => \{[\s\S]{0,240}notifyClosed\('closed'\)/,
+    'onclose 必须把“连接结束”交给上层，否则消息会永远停在未完成',
+  )
+  assert.match(streamSource, /onerror: \(err\) => \{[\s\S]{0,240}notifyClosed\('error'\)/)
+  assert.match(streamSource, /const stopStream = \(\) => \{[\s\S]{0,120}intentionalStop = true/)
+  assert.match(streamSource, /if \(intentionalStop\) return/, '用户主动停止不得触发兜底')
+})
+
+test('聊天页把断流接到恢复流程，并在拿不到完成态时收束消息', () => {
+  assert.match(chatViewSource, /onClosed: \(\) => \{\s*void recoverInterruptedTurn\(\)/)
+  assert.match(chatViewSource, /runStreamRecovery\(\{/)
+  assert.match(chatViewSource, /\.error = t\('chat\.connectionLost'\)/)
+  assert.match(chatViewSource, /applySnapshot: \(pending, row\) => applyCompletedSnapshot\(/)
+  assert.match(chatViewSource, /if \(!isReplying\.value && !loading\.value\) return/, '没有在飞的回合时不得触发补拉')
+})
+
+test('工具失败帧（done=false）不得断流：只有终态错误才收束', () => {
+  assert.match(
+    streamSource,
+    /if \(shouldStopStreamOnErrorFrame\(parsed\)\) \{\s*stopStream\(\)/,
+    '错误帧必须先经 shouldStopStreamOnErrorFrame 判定',
+  )
+  assert.doesNotMatch(
+    streamSource,
+    /if \(parsed\?\.responseType === 'error'\) \{\s*stopStream\(\)/,
+    '不能见 error 就断流——工具级失败后智能体还要继续重试并收尾',
+  )
+  assert.match(streamSource, /import \{ shouldStopStreamOnErrorFrame \} from '@\/utils\/streamErrorFrame'/)
+})

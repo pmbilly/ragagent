@@ -62,7 +62,7 @@ test('embed 语言：派生不落盘 / 跟随清陈旧值 / 宿主声明走 URL'
     'URL ?locale= 属宿主声明（每次加载都会重新给出）→ 走派生路径，不得写持久值',
   )
 
-  const widget = readFileSync(join(SRC, '../public/weknora-widget.js'), 'utf8')
+  const widget = readFileSync(join(SRC, '../public/ragagent-widget.js'), 'utf8')
   assert.match(
     widget,
     /embedUrl \+= '\?locale=' \+ encodeURIComponent\(hostLocale\)/,

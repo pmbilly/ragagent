@@ -21,7 +21,7 @@ import test from 'node:test'
  *
  * ## 边界
  *
- * 只扫 `src/`。`public/` 下的独立发布物（如 `weknora-widget.js`）**不能** import 本仓工具
+ * 只扫 `src/`。`public/` 下的独立发布物（如 `ragagent-widget.js`）**不能** import 本仓工具
  * （第三方页面没有依赖），它的契约由 `src/views/embed/widgetPublicConfigContract.test.ts`
  * 单独守（那条守卫要求"两种外壳形状都吃"）。
  */

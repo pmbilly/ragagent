@@ -1,0 +1,132 @@
+import enUS from 'tdesign-vue-next/esm/locale/en_US'
+
+/**
+ * TDesign 组件内置文案（泰语）局部覆盖。
+ *
+ * 只覆盖本仓实际用到的组件；其余段落继承 en_US。
+ * 注意：组件库默认语言是 zh_CN，所以必须整体以 en_US 为底，否则未覆盖的段落会变成中文。
+ */
+export default {
+  ...enUS,
+  pagination: {
+    itemsPerPage: '{size} / หน้า',
+    jumpTo: 'ไปที่',
+    page: '',
+    total: 'ไม่มีรายการ | 1 รายการ | {count} รายการ',
+  },
+  datePicker: {
+    ...enUS.datePicker,
+    placeholder: {
+      date: 'เลือกวันที่',
+      month: 'เลือกเดือน',
+      year: 'เลือกปี',
+      quarter: 'เลือกไตรมาส',
+      week: 'เลือกสัปดาห์',
+    },
+    weekdays: ['จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.', 'อา.'],
+    months: [
+      'ม.ค.',
+      'ก.พ.',
+      'มี.ค.',
+      'เม.ย.',
+      'พ.ค.',
+      'มิ.ย.',
+      'ก.ค.',
+      'ส.ค.',
+      'ก.ย.',
+      'ต.ค.',
+      'พ.ย.',
+      'ธ.ค.',
+    ],
+    quarters: ['ไตรมาส 1', 'ไตรมาส 2', 'ไตรมาส 3', 'ไตรมาส 4'],
+    confirm: 'ยืนยัน',
+    selectTime: 'เลือกเวลา',
+    selectDate: 'เลือกวันที่',
+    nextYear: 'ปีถัดไป',
+    preYear: 'ปีก่อนหน้า',
+    nextMonth: 'เดือนถัดไป',
+    preMonth: 'เดือนก่อนหน้า',
+    preDecade: 'ทศวรรษก่อนหน้า',
+    nextDecade: 'ทศวรรษถัดไป',
+    now: 'ตอนนี้',
+  },
+  upload: {
+    ...enUS.upload,
+    sizeLimitMessage: 'ไฟล์มีขนาดเกิน {sizeLimit}',
+    cancelUploadText: 'ยกเลิก',
+    triggerUploadText: {
+      fileInput: 'อัปโหลด',
+      image: 'คลิกเพื่ออัปโหลด',
+      normal: 'อัปโหลด',
+      reupload: 'อัปโหลดใหม่',
+      continueUpload: 'อัปโหลดต่อ',
+      delete: 'ลบ',
+      uploading: 'กำลังอัปโหลด',
+    },
+    dragger: {
+      dragDropText: 'วางไฟล์ที่นี่',
+      draggingText: 'ลากไฟล์มาที่พื้นที่นี้เพื่ออัปโหลด',
+      clickAndDragText: 'คลิก «อัปโหลด» หรือลากไฟล์มาที่พื้นที่นี้',
+    },
+    file: {
+      fileNameText: 'ชื่อไฟล์',
+      fileSizeText: 'ขนาด',
+      fileStatusText: 'สถานะ',
+      fileOperationText: 'การดำเนินการ',
+      fileOperationDateText: 'วันที่',
+    },
+    progress: {
+      uploadingText: 'กำลังอัปโหลด',
+      waitingText: 'รอดำเนินการ',
+      failText: 'ล้มเหลว',
+      successText: 'สำเร็จ',
+    },
+  },
+  table: {
+    ...enUS.table,
+    empty: 'ไม่มีข้อมูล',
+    loadingText: 'กำลังโหลด…',
+    loadingMoreText: 'กำลังโหลดเพิ่มเติม',
+    sortAscendingOperationText: 'คลิกเพื่อเรียงจากน้อยไปมาก',
+    sortDescendingOperationText: 'คลิกเพื่อเรียงจากมากไปน้อย',
+    sortCancelOperationText: 'คลิกเพื่อยกเลิกการเรียง',
+    clearFilterResultButtonText: 'ล้าง',
+    columnConfigButtonText: 'ตั้งค่าคอลัมน์',
+    columnConfigTitleText: 'ตั้งค่าคอลัมน์ตาราง',
+    columnConfigDescriptionText: 'เลือกคอลัมน์ที่ต้องการแสดง',
+    confirmText: 'ยืนยัน',
+    cancelText: 'ยกเลิก',
+    resetText: 'รีเซ็ต',
+    selectAllText: 'เลือกทั้งหมด',
+    searchResultText:
+      'ค้นหา «{result}»: ไม่พบรายการ | ค้นหา «{result}»: พบ 1 รายการ | ค้นหา «{result}»: พบ {count} รายการ',
+  },
+  select: {
+    ...enUS.select,
+    empty: 'ไม่มีข้อมูล',
+    loadingText: 'กำลังโหลด…',
+    placeholder: 'โปรดเลือก',
+  },
+  empty: {
+    ...enUS.empty,
+    titleText: {
+      maintenance: 'อยู่ระหว่างการพัฒนา',
+      success: 'สำเร็จ',
+      fail: 'ล้มเหลว',
+      empty: 'ไม่มีข้อมูล',
+      networkError: 'เครือข่ายผิดพลาด',
+    },
+  },
+  dialog: { confirm: 'ยืนยัน', cancel: 'ยกเลิก' },
+  drawer: { confirm: 'ยืนยัน', cancel: 'ยกเลิก' },
+  popconfirm: { confirm: { content: 'ตกลง' }, cancel: { content: 'ยกเลิก' } },
+  colorPicker: {
+    ...enUS.colorPicker,
+    swatchColorTitle: 'ค่าเริ่มต้นของระบบ',
+    recentColorTitle: 'ใช้ล่าสุด',
+    clearConfirmText: 'ล้างสีที่ใช้ล่าสุดหรือไม่?',
+    singleColor: 'สีเดียว',
+    gradientColor: 'ไล่ระดับสี',
+  },
+  input: { ...enUS.input, placeholder: 'โปรดป้อนค่า' },
+}

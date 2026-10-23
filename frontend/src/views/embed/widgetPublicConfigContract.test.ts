@@ -20,7 +20,7 @@ import test from 'node:test'
  *  - **内层键名恒为 camelCase** ⇒ snake 键读法永久禁止。
  */
 const widgetSource = readFileSync(
-  new URL('../../../public/weknora-widget.js', import.meta.url),
+  new URL('../../../public/ragagent-widget.js', import.meta.url),
   'utf8',
 )
 

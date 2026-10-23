@@ -15,6 +15,7 @@ import {
   runStreamWithAuthRetry,
 } from '@/utils/authRefresh';
 import { refreshEmbedTokenShared } from '@/utils/embedTokenRefresh';
+import { shouldStopStreamOnErrorFrame } from '@/utils/streamErrorFrame';
 
 interface StreamOptions {
   // 请求方法 (默认POST)
@@ -27,7 +28,10 @@ interface StreamOptions {
   chunkInterval?: number
 }
 
-export function useStream() {
+/** 流式连接结束的原因（用于让上层决定是否兜底补拉）。 */
+export type StreamCloseReason = 'closed' | 'error' | 'timeout'
+
+export function useStream(options: { onClosed?: (reason: StreamCloseReason) => void } = {}) {
   // 响应式状态
   const output = ref('')              // 显示内容
   const isStreaming = ref(false)      // 流状态
@@ -36,6 +40,17 @@ export function useStream() {
   const lastStreamRequest = ref<StreamRequestMeta | null>(null)
   let controller = new AbortController()
   let streamGeneration = 0
+  // 主动收束（用户停止 / 发新消息 / 卸载）不应触发「断流兜底」。
+  let intentionalStop = false
+
+  const notifyClosed = (reason: StreamCloseReason) => {
+    if (intentionalStop) return
+    try {
+      options.onClosed?.(reason)
+    } catch (err) {
+      console.warn('[Stream] onClosed handler failed', err)
+    }
+  }
 
   // 流式渲染缓冲
   let buffer: string[] = []
@@ -53,6 +68,7 @@ export function useStream() {
     const myGeneration = ++streamGeneration
     const streamAbort = controller
     // 重置状态
+    intentionalStop = false
     output.value = '';
     error.value = null;
     isStreaming.value = true;
@@ -209,19 +225,24 @@ export function useStream() {
           if (chunkHandler) {
             chunkHandler(parsed);
           }
-          // 业务错误帧：服务端不保证立刻断流（deadline 之外还可能是代理吞掉 FIN）
-          // ⇒ 前端主动收束，否则 loading 会一直转。
-          if (parsed?.responseType === 'error') {
+          // 业务错误帧：只有**终态**（done=true）才主动收束。
+          // 工具级失败（done=false、带 toolName）不能断流——智能体还会继续重试并收尾，
+          // 断了就会丢掉后续步骤和最终回答，界面永远停在“正在思考”。
+          if (shouldStopStreamOnErrorFrame(parsed)) {
             stopStream();
           }
         },
 
         onerror: (err) => {
           if (isStreamAuthError(err)) throw err;
+          notifyClosed('error')
           throw new Error(`${i18n.global.t('error.streamFailed')}: ${err}`);
         },
 
         onclose: () => {
+          // 服务端正常收尾与连接被意外关闭都会走到这里；是否兜底由上层
+          // 按“消息是否已完成”判断，这里只负责把事件交出去。
+          notifyClosed('closed')
           stopStream();
         },
       });
@@ -261,9 +282,10 @@ export function useStream() {
     }
   }
 
-  // 停止流
+  // 停止流（主动收束，不触发断流兜底）
   const stopStream = () => {
     disarmIdle()
+    intentionalStop = true
     streamGeneration++
     controller.abort();
     controller = new AbortController(); // 重置控制器（如需重新发起）
@@ -276,6 +298,7 @@ export function useStream() {
     disarmIdle()
     idleTimer = setTimeout(() => {
       error.value = i18n.global.t('error.streamTimeout')
+      notifyClosed('timeout')
       stopStream()
     }, IDLE_TIMEOUT_MS)
   }

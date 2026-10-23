@@ -64,7 +64,13 @@ test('派生语言不落持久值；显式选择才落；跟随模式可清除�
 
   // 5) 浏览器语言解析 + 归一化
   assert.equal(mod.resolveBrowserEmbedLocale(), 'ja-JP')
-  assert.equal(mod.normalizeEmbedLocale('zh-TW'), 'zh-CN')
+  // 繁体中文（港/台/澳）统一归 zh-HK，其余中文归 zh-CN
+  assert.equal(mod.normalizeEmbedLocale('zh-TW'), 'zh-HK')
+  assert.equal(mod.normalizeEmbedLocale('zh-Hant'), 'zh-HK')
+  assert.equal(mod.normalizeEmbedLocale('zh-Hans'), 'zh-CN')
+  assert.equal(mod.normalizeEmbedLocale('es-MX'), 'es-ES')
+  assert.equal(mod.normalizeEmbedLocale('pt-PT'), 'pt-BR')
+  assert.equal(mod.normalizeEmbedLocale('th'), 'th-TH')
 
   // 6) URL ?locale= 属宿主声明（派生）：生效但不落持久值
   store.clear()

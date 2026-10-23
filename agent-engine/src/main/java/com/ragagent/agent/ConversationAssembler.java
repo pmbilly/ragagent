@@ -13,6 +13,9 @@ import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -143,6 +146,25 @@ final class ConversationAssembler {
                 .replace("\"", "&quot;");
     }
 
+    private static final DateTimeFormatter LOCAL_TIME_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter UTC_TIME_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+    /**
+     * 当前时间：本地时间（带偏移）+ 同一时刻的 UTC。
+     *
+     * <p>只给日期，模型无法处理“现在 / 半小时后”这类相对时间；只给 UTC，中文用户的
+     * “明天下午三点”又会错算掉时差。所以两者都给，并显式标注 UTC。
+     * 每次调用现取，不做缓存——同一条消息重放不需要稳定值。</p>
+     */
+    static String currentTimeText() {
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime utc = now.withZoneSameInstant(ZoneOffset.UTC);
+        return now.format(LOCAL_TIME_FORMAT) + " " + now.getOffset()
+                + " (UTC " + utc.format(UTC_TIME_FORMAT) + ")";
+    }
+
     /**
      * 当前轮的元数据块：current_time + session + 本轮生效的检索范围。
      * 注入当前 user 消息、不落历史——回放的用户轮
@@ -152,7 +174,7 @@ final class ConversationAssembler {
             List<SelectedDocumentInfo> docs) {
         StringBuilder sb = new StringBuilder();
         sb.append("<runtimeContext scope=\"this_turn\">\n");
-        sb.append("  <currentTime>").append(LocalDate.now().toString()).append("</currentTime>\n");
+        sb.append("  <currentTime>").append(currentTimeText()).append("</currentTime>\n");
         sb.append("  <session>").append(escapeXMLAttr(sessionId)).append("</session>\n");
 
         if (kbs != null && !kbs.isEmpty()) {

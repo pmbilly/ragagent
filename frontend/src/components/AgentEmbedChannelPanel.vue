@@ -16,7 +16,8 @@
           <button v-for="ch in channels" :key="ch.id" type="button" class="channel-card channel-card--clickable"
             @click="openDrawer(ch)">
             <div class="channel-card__badge">
-              <t-icon name="code" size="22px" />
+              <img v-if="ch.launcherIcon" :src="ch.launcherIcon" class="channel-card__launcher" alt="" />
+              <t-icon v-else name="code" size="22px" />
             </div>
             <div class="channel-card__body">
               <div class="channel-card__header">
@@ -598,10 +599,14 @@ const headerTitleModeOptions = computed(() => ([
 const defaultLocaleOptions = computed(() => ([
   { label: t('embedPublish.defaultLocaleBrowser'), value: '' },
   { label: '简体中文', value: 'zh-CN' },
+  { label: '繁體中文', value: 'zh-HK' },
   { label: 'English', value: 'en-US' },
   { label: '한국어', value: 'ko-KR' },
   { label: '日本語', value: 'ja-JP' },
   { label: 'Русский', value: 'ru-RU' },
+  { label: 'Español', value: 'es-ES' },
+  { label: 'Português', value: 'pt-BR' },
+  { label: 'ไทย', value: 'th-TH' },
 ]))
 
 const channelMenuOptions = (ch: EmbedChannel) => {

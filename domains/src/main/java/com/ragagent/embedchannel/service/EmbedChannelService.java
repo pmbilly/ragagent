@@ -42,8 +42,8 @@ public class EmbedChannelService {
     public static final String DEFAULT_HEADER_TITLE_MODE = "channel";
     private static final int DEFAULT_RATE_PER_MINUTE = 30;
     private static final int DEFAULT_RATE_PER_DAY = 10000;
-    private static final Set<String> SUPPORTED_LOCALES =
-            Set.of("zh-CN", "en-US", "ko-KR", "ja-JP", "ru-RU");
+    private static final Set<String> SUPPORTED_LOCALES = Set.of(
+            "zh-CN", "zh-HK", "en-US", "ko-KR", "ja-JP", "ru-RU", "es-ES", "pt-BR", "th-TH");
     private static final Set<String> SUPPORTED_WIDGET_POSITIONS =
             Set.of("bottom-left", "top-right", "top-left", "bottom-right");
     private static final int MAX_LAUNCHER_ICON_BYTES = 200 * 1024;

@@ -40,9 +40,9 @@ final class Engine46bStubSupport {
 
     private static final Pattern DUR = Pattern.compile(",\"(durationMs|duration|totalDurationMs)\":\\d+");
     private static final Pattern TS = Pattern.compile("\"timestamp\":\"[^\"]*\"");
-    private static final Pattern DATE = Pattern.compile("<currentTime>[^<]*</currentTime>");
+    private static final Pattern DATE = Pattern.compile("<currentTime[^>]*>[^<]*</currentTime>");
     private static final Pattern DATE_ESC = Pattern.compile(
-            "(\\\\u003ccurrentTime\\\\u003e)[0-9-]{10}(\\\\u003c/currentTime\\\\u003e)");
+            "(\\\\u003ccurrentTime\\\\u003e)[^\\\\]*(\\\\u003c/currentTime\\\\u003e)");
     private static final Pattern EVENT_ID = Pattern.compile("^[0-9a-f]{8}-");
 
     static String mask(String s) {

@@ -146,7 +146,7 @@
     if (!baseUrl) {
       var script = document.currentScript;
       if (script && script.src) {
-        baseUrl = script.src.replace(/\/weknora-widget\.js.*$/, '');
+        baseUrl = script.src.replace(/\/ragagent-widget\.js.*$/, '');
       } else {
         baseUrl = global.location ? global.location.origin : '';
       }

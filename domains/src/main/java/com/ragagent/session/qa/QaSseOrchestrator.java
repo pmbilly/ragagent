@@ -284,7 +284,9 @@ public final class QaSseOrchestrator {
                     emitter.emitStreamEvent(sink, evt, requestId, resourceRewriter, client);
                 } catch (IOException e) {
                     clientGone.set(true);
-                    log.info("Connection closed during event sending, stopping");
+                    // 带上会话/消息与异常类型：区分“浏览器刷新/关闭”与“网络重置”靠排查时看这一行。
+                    log.info("Connection closed during event sending, stopping (session={}, message={}, cause={})",
+                            sessionId, assistantMessageId, e.getClass().getSimpleName());
                     return;
                 }
                 if (TurnLifecycle.isTerminalEvent(evt) && evt.getType() != ResponseType.COMPLETE) {

@@ -311,11 +311,15 @@ const inviteLookupLoading = ref(false)
 
 // Language options
 const languageOptions = [
-  { value: 'zh-CN', label: '简体中文', shortLabel: '中文', flag: '🇨🇳' },
+  { value: 'zh-CN', label: '简体中文', shortLabel: '简体中文', flag: '🇨🇳' },
+  { value: 'zh-HK', label: '繁體中文', shortLabel: '繁體中文', flag: '🇭🇰' },
   { value: 'en-US', label: 'English', shortLabel: 'EN', flag: '🇺🇸' },
-  { value: 'ru-RU', label: 'Русский', shortLabel: 'RU', flag: '🇷🇺' },
+  { value: 'ru-RU', label: 'Русский', shortLabel: 'Русский', flag: '🇷🇺' },
   { value: 'ko-KR', label: '한국어', shortLabel: '한국어', flag: '🇰🇷' },
-  { value: 'ja-JP', label: '日本語', shortLabel: '日本語', flag: '🇯🇵' }
+  { value: 'ja-JP', label: '日本語', shortLabel: '日本語', flag: '🇯🇵' },
+  { value: 'es-ES', label: 'Español', shortLabel: 'Español', flag: '🇪🇸' },
+  { value: 'pt-BR', label: 'Português', shortLabel: 'Português', flag: '🇧🇷' },
+  { value: 'th-TH', label: 'ไทย', shortLabel: 'ไทย', flag: '🇹🇭' }
 ]
 
 const currentLanguage = computed(() => locale.value)

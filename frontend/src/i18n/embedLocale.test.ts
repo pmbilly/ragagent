@@ -6,6 +6,37 @@ import {
   normalizeEmbedLocale,
   SUPPORTED_LOCALES,
 } from './embed.ts'
+import zhCNBundle from './locales/embed/zh-CN.ts'
+import zhHK from './locales/embed/zh-HK.ts'
+import enUS from './locales/embed/en-US.ts'
+import koKR from './locales/embed/ko-KR.ts'
+import jaJP from './locales/embed/ja-JP.ts'
+import ruRU from './locales/embed/ru-RU.ts'
+import esES from './locales/embed/es-ES.ts'
+import ptBR from './locales/embed/pt-BR.ts'
+import thTH from './locales/embed/th-TH.ts'
+
+/** 访客侧语言包：一个语言一个文件，键集合必须与 zh-CN 完全一致（缺键会静默回落英文）。 */
+const EMBED_LOCALE_FILES = {
+  'zh-CN': zhCNBundle,
+  'zh-HK': zhHK,
+  'en-US': enUS,
+  'ko-KR': koKR,
+  'ja-JP': jaJP,
+  'ru-RU': ruRU,
+  'es-ES': esES,
+  'pt-BR': ptBR,
+  'th-TH': thTH,
+} as const
+
+function collectLeafKeys(tree: unknown, prefix = '', out = new Set<string>()): Set<string> {
+  for (const [key, value] of Object.entries((tree || {}) as Record<string, unknown>)) {
+    const path = prefix ? `${prefix}.${key}` : key
+    if (value && typeof value === 'object' && !Array.isArray(value)) collectLeafKeys(value, path, out)
+    else out.add(path)
+  }
+  return out
+}
 
 const EXPECTED_CONVERSATION_TIME_KEYS = [
   'today',
@@ -26,8 +57,22 @@ const EXPECTED_REFERENCES_DRAWER_KEYS = [
   'referencesDrawerEmpty',
 ] as const
 
-test('supported embed locales include zh-CN, en-US, ko-KR, ja-JP, ru-RU', () => {
-  assert.deepEqual([...SUPPORTED_LOCALES].sort(), ['en-US', 'ja-JP', 'ko-KR', 'ru-RU', 'zh-CN'].sort())
+test('supported embed locales match the registered bundles', () => {
+  assert.deepEqual(
+    [...SUPPORTED_LOCALES].sort(),
+    ['en-US', 'es-ES', 'ja-JP', 'ko-KR', 'pt-BR', 'ru-RU', 'th-TH', 'zh-CN', 'zh-HK'].sort(),
+  )
+})
+
+test('embed 语言包文件（一语言一文件）键集合与 zh-CN 完全一致（缺键/多键都红）', () => {
+  const reference = collectLeafKeys(EMBED_MESSAGES['zh-CN'])
+  const failures: string[] = []
+  for (const [locale, bundle] of Object.entries(EMBED_LOCALE_FILES)) {
+    const keys = collectLeafKeys(bundle)
+    for (const key of reference) if (!keys.has(key)) failures.push(`${locale}: missing ${key}`)
+    for (const key of keys) if (!reference.has(key)) failures.push(`${locale}: extra ${key}`)
+  }
+  assert.deepEqual(failures, [], failures.slice(0, 20).join('\n'))
 })
 
 test('every supported locale defines conversationTime and referencesDrawer in chat', () => {

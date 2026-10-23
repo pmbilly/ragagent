@@ -2047,6 +2047,10 @@ export default {
     ruRU: 'Русский',
     koKR: '한국어',
     jaJP: '日本語',
+    zhHK: '繁體中文',
+    esES: 'Español',
+    ptBR: 'Português',
+    thTH: 'ไทย',
     selectLanguage: '언어 선택',
     language: '언어',
     languageDescription: '인터페이스 표시 언어 선택',
@@ -3058,6 +3062,7 @@ export default {
     refreshSuggestedQuestions: '다른 질문',
     thinking: '생각 중...',
     thinkingAlt: '생각 중',
+    connectionLost: '연결이 끊겼습니다. 답변이 생성되었을 수 있으니 페이지를 새로고침해 확인하세요.',
     conversationTime: {
       today: '오늘 {time}',
       yesterday: '어제 {time}',

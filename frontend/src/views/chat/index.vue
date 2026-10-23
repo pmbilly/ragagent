@@ -180,6 +180,7 @@ import FollowUpSuggestions from '@/components/chat/FollowUpSuggestions.vue';
 import MessageTimestamp from '@/components/chat/MessageTimestamp.vue';
 import ChatQuestionMinimap from '@/components/chat/ChatQuestionMinimap.vue';
 import { shouldShowConversationTimestamp } from '@/utils/messageTimestamp';
+import { recoverInterruptedTurn as runStreamRecovery } from '@/utils/streamRecovery';
 import ChatHeader from '@/components/ChatHeader.vue';
 import {
     notifySessionMutation,
@@ -221,7 +222,13 @@ const { t } = useI18n();
 const { firstQuery, firstMentionedItems, firstModelId, firstImageFiles, firstAttachmentFiles } = storeToRefs(usemenuStore);
 // Capture before the initial send consumes firstQuery; the child focuses after mounting.
 const focusComposerOnMount = Boolean(firstQuery.value);
-const { onChunk, error, isStreaming, startStream, stopStream, lastStreamRequest } = useStream();
+const { onChunk, error, isStreaming, startStream, stopStream, lastStreamRequest } = useStream({
+    // 连接被浏览器/网络意外关闭时（非主动停止）：补拉一次历史兜底，
+    // 否则消息会永远停在未完成，UI 一直显示“正在思考”。
+    onClosed: () => {
+        void recoverInterruptedTurn();
+    },
+});
 /** Snapshot of the in-flight HTTP request for attaching to the next assistant message. */
 const pendingStreamDebug = ref(null);
 
@@ -632,6 +639,7 @@ const {
     findLastMessage,
     shouldRenderAssistantMessage,
     shouldShowGlobalTypingIndicator,
+    applyCompletedSnapshot,
     handleMsgList,
     processStreamChunk,
     prepareForNewOutgoingMessage,
@@ -729,6 +737,41 @@ const {
         void flushSteerAfterTurn(persistedAssistantId(message));
     },
 });
+
+/**
+ * 流式连接被意外关闭后的兜底：
+ * 1) 服务端通常仍在跑（甚至已完成）⇒ 补拉历史，用已完成快照覆盖内存消息；
+ * 2) 始终没等到完成 ⇒ 收束该消息并给出可读提示，避免永久“正在思考”。
+ * 主动停止 / 发新消息不会走到这里（streame 里区分了 intentionalStop）。
+ */
+async function recoverInterruptedTurn() {
+    if (props.embeddedMode || !sessionId.value) return;
+    // 没有在飞的回合（例如正常收尾后才触发的 onclose）不做任何补拉。
+    if (!isReplying.value && !loading.value) return;
+    const outcome = await runStreamRecovery({
+        findPending: () => findLastMessage((message) => message.role === 'assistant' && !message.completed),
+        fetchSnapshot: async (pending) => {
+            const rows = await getMessageList({
+                sessionId: String(sessionId.value),
+                limit: 30,
+                created_at: '',
+            });
+            const list = Array.isArray(rows) ? rows : [];
+            const pendingId = pending && pending.id;
+            const matched = pendingId ? list.find((row) => row && row.id === pendingId) : undefined;
+            return matched || [...list].reverse().find((row) => row && row.role === 'assistant');
+        },
+        applySnapshot: (pending, row) => applyCompletedSnapshot(pending, row),
+        markInterrupted: (pending) => {
+            markInFlightAssistantStopped(pending && pending.id);
+            pending.error = t('chat.connectionLost');
+        },
+    });
+    if (outcome === 'none') return;
+    isReplying.value = false;
+    loading.value = false;
+    sessionActivity.update(activitySessionId.value, false);
+}
 
 const showGlobalTypingIndicator = computed(() =>
     shouldShowGlobalTypingIndicator(messagesList, loading.value, isImRecovering.value),

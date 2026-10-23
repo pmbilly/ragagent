@@ -451,8 +451,8 @@ watch(
   width: 100%;
 
   &__title {
-    margin: 0 0 8px;
-    font-size: 13px;
+    margin: 20px 0;
+    font-size: 14px;
     font-weight: 500;
     color: var(--td-text-color-secondary);
   }

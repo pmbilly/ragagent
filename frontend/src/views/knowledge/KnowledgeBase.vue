@@ -2311,6 +2311,13 @@ const handleKBEditorSuccess = (kbIdValue: string) => {
             <span class="warning-link">{{ $t('knowledgeBase.goToStorageSettings') }} →</span>
           </p>
         </div>
+        <div v-if="canEdit && (!isWiki || activeKbTab === 'documents')" class="kb-header-actions">
+          <KbUploadSourceDropdown ref="uploadSourceRef" :accept-file-types="acceptFileTypes"
+            :supported-file-types="[...supportedFileTypes]" include-manual trigger-icon="file-add"
+            trigger-class="kb-add-doc-btn" :trigger-label="t('knowledgeBase.addDocument')"
+            data-guide="kb-detail-add-doc" placement="bottom-right" @files="handleUploadSourceFiles"
+            @url="handleUploadSourceUrl" @manual="handleManualCreate" />
+        </div>
       </div>
 
       <!-- Wiki Browser / Graph (shown when wiki or graph tab is active) -->
@@ -2511,13 +2518,6 @@ const handleKBEditorSuccess = (kbIdValue: string) => {
                         <t-icon name="view-list" size="16px" />
                       </button>
                     </t-tooltip>
-                  </div>
-                  <div v-if="canEdit" class="doc-filter-actions">
-                    <KbUploadSourceDropdown ref="uploadSourceRef" :accept-file-types="acceptFileTypes"
-                      :supported-file-types="[...supportedFileTypes]" include-manual trigger-icon="file-add"
-                      trigger-class="content-bar-icon-btn" data-guide="kb-detail-add-doc"
-                      :tooltip="t('knowledgeBase.addDocument')" placement="bottom-right" @files="handleUploadSourceFiles"
-                      @url="handleUploadSourceUrl" @manual="handleManualCreate" />
                   </div>
                 </div>
               </div>
@@ -3292,21 +3292,6 @@ const handleKBEditorSuccess = (kbIdValue: string) => {
     }
   }
 
-  .doc-filter-actions {
-    flex-shrink: 0;
-
-    :deep(.content-bar-icon-btn) {
-      color: var(--td-text-color-secondary);
-      background: transparent;
-      border: none;
-
-      &:hover {
-        color: var(--td-brand-color);
-        background: var(--td-bg-color-secondarycontainer);
-      }
-    }
-  }
-
   :deep(.t-input) {
     font-size: 13px;
     background-color: var(--td-bg-color-secondarycontainer);
@@ -3425,6 +3410,13 @@ const handleKBEditorSuccess = (kbIdValue: string) => {
     gap: 6px;
     flex-shrink: 0;
     margin-left: 4px;
+  }
+
+  .kb-header-actions {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: auto;
   }
 
   .document-breadcrumb {
@@ -3571,6 +3563,36 @@ const handleKBEditorSuccess = (kbIdValue: string) => {
 
 .document-upload-input {
   display: none;
+}
+
+// 与列表页「创建」按钮同一形态：高 36px、全圆角、图标 + 文字
+:deep(.kb-add-doc-btn) {
+  flex-shrink: 0;
+  height: 36px !important;
+  padding: 0 18px !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  border: none !important;
+  background-color: var(--td-brand-color) !important;
+  color: var(--td-text-color-anti) !important;
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--td-brand-color) 22%, transparent);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--td-brand-color-active) !important;
+    color: var(--td-text-color-anti) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--td-brand-color) 30%, transparent);
+  }
+
+  :deep(.t-icon) {
+    font-size: 16px;
+  }
 }
 
 .kb-settings-button {

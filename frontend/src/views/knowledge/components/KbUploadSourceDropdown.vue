@@ -17,7 +17,7 @@
       @change="(e) => handleFilesChange(e, true)"
     />
 
-    <t-tooltip :content="tooltipText" placement="top">
+    <t-tooltip :content="tooltipText" placement="top" :disabled="!!triggerLabel">
       <t-dropdown
         :options="dropdownOptions"
         trigger="click"
@@ -25,13 +25,14 @@
         @click="handleActionSelect"
       >
         <t-button
-          variant="text"
+          :variant="triggerLabel ? 'base' : 'text'"
           theme="default"
           :class="['kb-upload-source-trigger', triggerClass]"
           :data-guide="dataGuide || undefined"
           size="small"
         >
           <template #icon><t-icon :name="triggerIcon" size="16px" /></template>
+          <span v-if="triggerLabel" class="kb-upload-source-trigger__label">{{ triggerLabel }}</span>
         </t-button>
       </t-dropdown>
     </t-tooltip>
@@ -72,6 +73,7 @@ const props = withDefaults(defineProps<{
   includeManual?: boolean
   triggerIcon?: string
   triggerClass?: string
+  triggerLabel?: string
   dataGuide?: string
   tooltip?: string
   placement?: 'top' | 'bottom' | 'bottom-right' | 'bottom-left'
@@ -81,6 +83,7 @@ const props = withDefaults(defineProps<{
   includeManual: false,
   triggerIcon: 'file-add',
   triggerClass: '',
+  triggerLabel: '',
   dataGuide: '',
   tooltip: '',
   placement: 'bottom-right',

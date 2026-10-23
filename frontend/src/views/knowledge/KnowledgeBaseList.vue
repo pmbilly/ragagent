@@ -1271,10 +1271,12 @@ const handleUploadFinishedEvent = (event: Event) => {
 
 .kb-create-btn {
   border: none;
+  background-color: var(--td-brand-color);
   color: var(--td-text-color-anti);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 
   &:hover {
-    background: linear-gradient(135deg, var(--td-brand-color) 0%, var(--td-brand-color-active) 100%);
+    background-color: var(--td-brand-color-active);
   }
 }
 
@@ -1331,7 +1333,7 @@ const handleUploadFinishedEvent = (event: Event) => {
   font-weight: 500;
   letter-spacing: 0.01em;
   box-shadow: 0 2px 10px color-mix(in srgb, var(--td-brand-color) 22%, transparent);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 
   &:hover {
     transform: translateY(-1px);

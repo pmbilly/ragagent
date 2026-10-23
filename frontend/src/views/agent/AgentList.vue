@@ -1157,12 +1157,13 @@ defineExpose({
   font-weight: 500;
   letter-spacing: 0.01em;
   border: none !important;
+  background-color: var(--td-brand-color) !important;
   color: var(--td-text-color-anti) !important;
   box-shadow: 0 2px 10px color-mix(in srgb, var(--td-brand-color) 22%, transparent);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 
   &:hover {
-    background: linear-gradient(135deg, var(--td-brand-color) 0%, var(--td-brand-color-active) 100%) !important;
+    background-color: var(--td-brand-color-active) !important;
     transform: translateY(-1px);
     box-shadow: 0 4px 14px color-mix(in srgb, var(--td-brand-color) 30%, transparent);
   }
