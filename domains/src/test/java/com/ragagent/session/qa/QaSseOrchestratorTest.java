@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -100,9 +101,9 @@ class QaSseOrchestratorTest {
         assertThat(frames).anyMatch(frame -> frame.contains("boom"));
     }
 
-    /** STOP 的取消只由 stop watcher 发出，SSE 循环不再重复 emit。 */
+    /** STOP 的取消只由流泵发出一次，并写出 stop 帧。 */
     @Test
-    void stopFrameWrittenWithoutEmittingStopEventTwice() throws Exception {
+    void stopIsEmittedOnceAndFrameWritten() throws Exception {
         when(streamManager.getEvents(anyString(), anyString(), eq(0)))
                 .thenReturn(batch(List.of(event("s1", ResponseType.STOP, "", true)), 1));
         SseStreamContext ctx = new SseStreamContext();
@@ -114,6 +115,36 @@ class QaSseOrchestratorTest {
                 ctx, false, new StreamRewriter(null));
 
         assertThat(frames).anyMatch(frame -> frame.contains("Generation stopped by user"));
-        verify(bus, never()).emit(org.mockito.ArgumentMatchers.any());
+        assertThat(ctx.cancelled).isTrue();
+        verify(bus, times(1)).emit(org.mockito.ArgumentMatchers.any());
+    }
+
+    /** 客户端断开后降级为无头监控：仍能检测 STOP 并取消。 */
+    @Test
+    void clientDisconnectDegradesToHeadlessAndStillCancels() throws Exception {
+        when(streamManager.getEvents(anyString(), anyString(), eq(0)))
+                .thenReturn(batch(List.of(event("a1", ResponseType.ANSWER, "part1", false)), 1));
+        when(streamManager.getEvents(anyString(), anyString(), eq(1)))
+                .thenReturn(batch(List.of(event("s1", ResponseType.STOP, "", true)), 2));
+        SseStreamContext ctx = new SseStreamContext();
+        EventBusInterface bus = mock(EventBusInterface.class);
+        ctx.eventBus = bus;
+        SseSink broken = new SseSink() {
+            @Override
+            public void applyHeaders() {
+            }
+
+            @Override
+            public void writeFrame(String frame) throws java.io.IOException {
+                throw new java.io.IOException("client gone");
+            }
+        };
+
+        orchestrator.handleAgentEventsForSSE(
+                broken, SESSION_ID, MESSAGE_ID, REQUEST_ID,
+                ctx, false, new StreamRewriter(null));
+
+        assertThat(ctx.cancelled).isTrue();
+        verify(bus, times(1)).emit(org.mockito.ArgumentMatchers.any());
     }
 }

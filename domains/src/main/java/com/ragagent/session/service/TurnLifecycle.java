@@ -12,8 +12,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * "错误帧已写出但连接不关"或"收尾执行两次"。这里只做一件事：
  * <b>终态只有一个赢家，且终态不可逆</b>。</p>
  *
- * <p>状态迁移：{@code STREAMING → FINALIZING → DONE|FAILED}；
- * 也允许 {@code STREAMING → DONE|FAILED}（无收尾体的短路路径）。
+ * <p>状态迁移：{@code STREAMING → FINALIZING → DONE|FAILED|CANCELLED}；
+ * 也允许 {@code STREAMING → DONE|FAILED|CANCELLED}（无收尾体的短路路径）。
  * {@link #finish(State)} 返回 true 表示本次调用赢下了终态。</p>
  *
  * <p><b>谁可以写终态</b>：只有轮次的所有者（{@code QaTurnExecutor} 的收尾回调）调用
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public final class TurnLifecycle {
 
-    public enum State { STREAMING, FINALIZING, DONE, FAILED }
+    public enum State { STREAMING, FINALIZING, DONE, FAILED, CANCELLED }
 
     private final AtomicReference<State> state = new AtomicReference<>(State.STREAMING);
 
@@ -33,7 +33,7 @@ public final class TurnLifecycle {
 
     public boolean isTerminal() {
         State current = state.get();
-        return current == State.DONE || current == State.FAILED;
+        return current == State.DONE || current == State.FAILED || current == State.CANCELLED;
     }
 
     /** 进入收尾段；只有第一次返回 true。 */
@@ -43,12 +43,12 @@ public final class TurnLifecycle {
 
     /** 写终态；首次调用返回 true，已终态返回 false（幂等收尾）。 */
     public boolean finish(State terminal) {
-        if (terminal != State.DONE && terminal != State.FAILED) {
+        if (terminal != State.DONE && terminal != State.FAILED && terminal != State.CANCELLED) {
             throw new IllegalArgumentException("not a terminal state: " + terminal);
         }
         while (true) {
             State current = state.get();
-            if (current == State.DONE || current == State.FAILED) {
+            if (current == State.DONE || current == State.FAILED || current == State.CANCELLED) {
                 return false;
             }
             if (state.compareAndSet(current, terminal)) {

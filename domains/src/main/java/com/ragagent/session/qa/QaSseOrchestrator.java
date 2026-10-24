@@ -3,14 +3,11 @@ package com.ragagent.session.qa;
 
 import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.contract.agent.AgentToolCall;
-import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.EventBusFactory;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
-import com.ragagent.contract.event.payload.StopData;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.session.SseSink;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.access.TenantContextSnapshot;
@@ -18,7 +15,6 @@ import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.LiveRunExistsException;
-import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.session.conversation.AgentStreamBridge;
@@ -40,7 +36,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.springframework.stereotype.Component;
 
 /**
@@ -68,9 +63,6 @@ public final class QaSseOrchestrator {
 
     /** 每轮一个独立总线（生命周期随轮次）；经工厂端口创建，不 new 实现类。 */
     private final EventBusFactory eventBusFactory;
-
-    /** 单次 SSE 推送连接的最长存活时间；与 stop watcher 的 2 小时一致。 */
-    private static final long MAX_STREAM_DURATION_MILLIS = 2 * 60 * 60 * 1000L;
 
     public QaSseOrchestrator(StreamManager streamManager, StreamEventEmitter emitter, SessionService sessionService, MessageService messageService, SseFrameSink sseFrameWriter, QaTurnFinalizer turnFinalizer, EventBusFactory eventBusFactory) {
         this.streamManager = streamManager;
@@ -116,16 +108,16 @@ public final class QaSseOrchestrator {
         // A5：处理器可能跑在 stop watcher 的虚拟线程上（那里身份为空）——注册时在本线程
         // （身份完整）捕获快照，触发时用它补齐；否则收尾的索引/建议/记忆 SessionNotFound。
         TenantContextSnapshot stopIdentity = TenantContextSnapshot.capture();
-        eventBus.on(EventType.EVENT_STOP, evt -> {
+        eventBus.on(EventType.EVENT_STOP, evt -> TenantScope.run(stopIdentity, () -> {
             log.info("Received stop event, cancelling async operations for session: {}", reqCtx.sessionId);
             streamCtx.cancelled = true;
+            if (streamCtx.lifecycle.finish(TurnLifecycle.State.CANCELLED)) {
+                QaTerminalMetrics.record(mode, TurnLifecycle.State.CANCELLED);
+            }
             // 停止时保住已流出内容；用 session 租户落库
             turnFinalizer.runWithTenant(sessionTenantId, stopIdentity, () -> turnFinalizer.completeAssistantMessage(
                     streamCtx.assistantMessage, "", "", sessionTenantId));
-        });
-
-        // 独立 stop watcher（自终止：complete/终态错误）
-        startStopWatcher(reqCtx.sessionId, reqCtx.assistantMessage.getId(), eventBus);
+        }));
 
         // AgentStreamBridge 订阅（16 种事件）
         AgentStreamBridge bridge = new AgentStreamBridge(reqCtx.sessionId, reqCtx.assistantMessage.getId(),
@@ -173,164 +165,19 @@ public final class QaSseOrchestrator {
             log.error("write agent query event failed session={} message={}", reqCtx.sessionId, assistantMessageId, e);
         }
     }
-    private void startStopWatcher(String sessionId, String assistantMessageId, EventBusInterface eventBus) {
-        // A5：watcher 跑在自己的虚拟线程上（ThreadLocal 不跨线程，身份为空）——读流事件与
-        // 会话范围判定都需要完整身份，因此在本线程 capture、watcher 里 replay 后清理。
-        TenantContextSnapshot identity = TenantContextSnapshot.capture();
-        Thread.ofVirtual().start(() -> TenantScope.run(identity,
-                () -> watchStopEvents(sessionId, assistantMessageId, eventBus)));
-    }
-
-    /** stop watcher 主循环（独立虚拟线程；身份由 {@link #startStopWatcher} 显式传递）。 */
-    private void watchStopEvents(String sessionId, String assistantMessageId, EventBusInterface eventBus) {
-        int offset = 0;
-        long deadline = System.currentTimeMillis() + 2 * 60 * 60 * 1000L; // stopWatcherMaxDuration
-        while (System.currentTimeMillis() < deadline) {
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
-            }
-            StreamBatch batch;
-            try {
-                batch = streamManager.getEvents(sessionId, assistantMessageId, offset);
-            } catch (RuntimeException e) {
-                continue; // 瞬态读错误，下一 tick 重试
-            }
-            offset = batch.nextOffset();
-            for (StreamEvent evt : batch.events()) {
-                if (evt.getType() == ResponseType.STOP) {
-                    log.info("Stop watcher detected stop event, cancelling generation for session={}, message={}",
-                            sessionId, assistantMessageId);
-                    Event stopEvt = new Event();
-                    stopEvt.setType(EventType.EVENT_STOP);
-                    stopEvt.setSessionId(sessionId);
-                    StopData data = new StopData();
-                    data.setSessionId(sessionId);
-                    data.setMessageId(assistantMessageId);
-                    data.setReason("user_requested");
-                    stopEvt.setData(data);
-                    eventBus.emit(stopEvt);
-                    return;
-                }
-                if (evt.getType() == ResponseType.COMPLETE) {
-                    return;
-                }
-                if (TurnLifecycle.isTerminalEvent(evt) && evt.getType() != ResponseType.COMPLETE) {
-                    return;
-                }
-            }
-        }
-    }
     public void handleAgentEventsForSSE(SseSink sink, String sessionId,
             String assistantMessageId, String requestId, SseStreamContext streamCtx,
             boolean waitForTitle, StreamRewriter resourceRewriter) throws IOException {
-        sink.applyHeaders();
-        AtomicBoolean clientGone = new AtomicBoolean(false);
-        StreamEventEmitter.ClientState client = clientGone::get;
+        new TurnStreamPump(streamManager, emitter, sseFrameWriter)
+                .run(sink, sessionId, assistantMessageId, requestId, streamCtx,
+                        waitForTitle, resourceRewriter);
+    }
 
-        int lastOffset = 0;
-        long deadline = System.currentTimeMillis() + MAX_STREAM_DURATION_MILLIS;
-        log.info("Starting pull-based SSE streaming for session={}, message={}", sessionId, assistantMessageId);
-
-        while (System.currentTimeMillis() < deadline) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
-            }
-            StreamBatch batch;
-            try {
-                batch = streamManager.getEvents(sessionId, assistantMessageId, lastOffset);
-            } catch (RuntimeException e) {
-                log.warn("Failed to get events from stream", e);
-                continue;
-            }
-            boolean streamCompleted = false;
-            boolean titleReceived = false;
-            for (StreamEvent evt : batch.events()) {
-                if (evt.getType() == ResponseType.STOP) {
-                    log.info("Detected stop event, session={}", sessionId);
-                    // 取消只由 stop watcher 发 EVENT_STOP（唯一 owner）；本循环只负责
-                    // 把 stop 帧写给客户端并退出，避免同一 STOP 被两个轮询各发一次。
-                    try {
-                        emitter.flushHeldStreamContent(sink, requestId, resourceRewriter, client);
-                    } catch (IOException ignored) {
-                        // 客户端已断开
-                    }
-                    // 写出 stop 事件帧
-                    StreamResponse stopResp = new StreamResponse();
-                    stopResp.setId(requestId);
-                    stopResp.setResponseType(ResponseType.STOP);
-                    stopResp.setContent("Generation stopped by user");
-                    stopResp.setDone(true);
-                    sseFrameWriter.write(sink, stopResp);
-                    return;
-                }
-                if (evt.getType() == ResponseType.COMPLETE) {
-                    streamCompleted = true;
-                }
-                if (evt.getType() == ResponseType.SESSION_TITLE) {
-                    titleReceived = true;
-                }
-                try {
-                    emitter.emitStreamEvent(sink, evt, requestId, resourceRewriter, client);
-                } catch (IOException e) {
-                    clientGone.set(true);
-                    // 带上会话/消息与异常类型：区分“浏览器刷新/关闭”与“网络重置”靠排查时看这一行。
-                    log.info("Connection closed during event sending, stopping (session={}, message={}, cause={})",
-                            sessionId, assistantMessageId, e.getClass().getSimpleName());
-                    return;
-                }
-                if (TurnLifecycle.isTerminalEvent(evt) && evt.getType() != ResponseType.COMPLETE) {
-                    // ERROR+done 是终态元素：错误帧已由 emitStreamEvent 写出，不再轮询
-                    log.info("Agent stream terminated with error, session={}, message={}",
-                            sessionId, assistantMessageId);
-                    return;
-                }
-            }
-            lastOffset = batch.nextOffset();
-            if (streamCompleted) {
-                if (waitForTitle && !titleReceived) {
-                    log.info("Stream completed, waiting for title event");
-                    long titleDeadline = System.currentTimeMillis() + 3000;
-                    titleWait:
-                    while (System.currentTimeMillis() < titleDeadline) {
-                        try {
-                            Thread.sleep(50);
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                            break titleWait;
-                        }
-                        StreamBatch titleBatch;
-                        try {
-                            titleBatch = streamManager.getEvents(sessionId, assistantMessageId, lastOffset);
-                        } catch (RuntimeException e) {
-                            break titleWait;
-                        }
-                        if (!titleBatch.events().isEmpty()) {
-                            for (StreamEvent evt : titleBatch.events()) {
-                                try {
-                                    emitter.emitStreamEvent(sink, evt, requestId, resourceRewriter, client);
-                                } catch (IOException e) {
-                                    clientGone.set(true);
-                                    return;
-                                }
-                                if (evt.getType() == ResponseType.SESSION_TITLE) {
-                                    break titleWait;
-                                }
-                            }
-                            lastOffset = titleBatch.nextOffset();
-                        }
-                    }
-                }
-                // 完成信号由 complete 事件标志（SseContract 的完成方法为空操作）
-                return;
-            }
-        }
-        log.warn("Agent stream polling exceeded max duration, session={}, message={}", sessionId, assistantMessageId);
+    /** 无 SSE 客户端（steer follow-up 等）：虚拟线程里只盯 STOP/终态。 */
+    public void startHeadlessPump(String sessionId, String assistantMessageId,
+            SseStreamContext streamCtx) {
+        new TurnStreamPump(streamManager, emitter, sseFrameWriter)
+                .startHeadless(sessionId, assistantMessageId, streamCtx);
     }
     private static final Set<String> QUICK_ANSWER_TIMELINE_TOOLS = Set.of(
             "query_understand", "knowledge_search", "attachment_parsing", "image_analysis");

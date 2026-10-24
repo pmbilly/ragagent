@@ -101,13 +101,14 @@ Thread.ofVirtual().start(() -> TenantScope.run(snap, () -> {
 **原因**：
 
 - `AgentStreamBridge` 订阅 16 种事件，按到达序 `appendEvent(...)`；
-- `SessionStreamController` / `SseFrameWriter` 每 `100ms` 轮询 `getEvents(fromOffset)`（`SessionStreamController.POLL_INTERVAL_MILLIS = 100`）；
+- 主链路由 `TurnStreamPump` 一个循环读流：有 SSE 客户端时 100ms；客户端断开后降级为 300ms 无头监控（继续检测 STOP/终态，取消能力不丢）；
+- 断线续传走 `SessionStreamController` / `SseFrameWriter` 的另一条 100ms 轮询（`POLL_INTERVAL_MILLIS = 100`）；
 - `StreamManager` 只有 append/get，没有"推送"；`complete` 是结束信号；
 - steer（运行中转向）走独立子列表，永不混进用户可见的 SSE 流。
 
 **排障规则**：以 `messageId + event id/offset` 为唯一事实，不要用日志顺序推断帧顺序；断流检测靠写失败（`IOException`），不是连接回调。
 
-**去哪改**：`platform/.../stream/StreamManager.java`、`AgentStreamBridge`、`SessionStreamController`。
+**去哪改**：`platform/.../stream/StreamManager.java`、`AgentStreamBridge`、`TurnStreamPump`、`SessionStreamController`。
 
 ## 8. 新增 `@ConfigurationProperties` 可能"静默不生效"
 

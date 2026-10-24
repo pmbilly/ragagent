@@ -216,7 +216,7 @@
 | **Q4** | 向量库 Descriptor：contract 只放控制面规则；`retrieval-engine` 持工厂/探测 | ✅ 2026-10-24（5092/0/2） |
 | **Q5** | 存储 Provider Descriptor（域内）：校验/端点/探测/创建/清单单源化 | ✅ 2026-10-24（5097/0/2） |
 | **Q6** | `KnowledgeProcessWorker` 构造面 20 → 约 5（三阶段移装配点） | 待做 |
-| **Q7** | 终态收尾残余（并入 H1b-2，先补状态矩阵测试；不建 Coordinator） | Q7a ✅ 2026-10-24（5102/0/2）；Q7b-1 ✅ 2026-10-24（5103/0/2）；Q7b-2（轮询合并/状态落库）待做 |
+| **Q7** | 终态收尾残余（并入 H1b-2，先补状态矩阵测试；不建 Coordinator） | ✅ 2026-10-24（Q7a/Q7b-1/Q7b-2，5104/0/2） |
 | **Q8** | 前端流式判别联合 + `ChatMessage` 强类型 + 组件特征测试 | 待做 |
 | **Q9** | `WikiBrowser` 拆分（首刀 `useWikiDirectory`） | 待做 |
 | **Q10** | `AgentEditorModal` 拆分（先 `useAgentEditorForm` + 序列化/校验） | 待做 |
@@ -251,7 +251,7 @@
 - 前端：`VITE_DEV_PROXY_TARGET=http://localhost:8083`（vite 默认值已改 8083）。
 - `LOCAL_STORAGE_BASE_DIR` 必须持久目录（严禁 /tmp，macOS 会清理 ⇒ 原始文件丢失）。
 - **起停服**：`bash scripts/java-server-up.sh` / `bash scripts/java-server-down.sh`（up 自挡端口占用；down 是唯一正确停服方式）。
-- **指标面**：`/actuator/health`、`/actuator/metrics`（只暴露 health/info/metrics）；与业务接口同一认证链，匿名 401，带 JWT 200。QA 轮次计数在 `ragagent.qa.turns` / `ragagent.qa.failures`（按 mode 打 tag），首次问答后出现。
+- **指标面**：`/actuator/health`、`/actuator/metrics`（只暴露 health/info/metrics）；与业务接口同一认证链，匿名 401，带 JWT 200。QA 轮次计数在 `ragagent.qa.turns` / `ragagent.qa.failures`（按 mode 打 tag），终态在 `ragagent.qa.terminal{mode,outcome=done|failed|cancelled}`，首次问答后出现。
 - **⚠️ 跑完 `mvn verify` 必须重启后端**（jar 被替换而进程仍跑旧代码 ⇒ 表现为"改了没生效"；用 `spring-boot:run` 时则是 `target/classes` 被就地重写）。
 - CI 三 job：guards（`bash scripts/run-guards.sh` 为准）· backend（spotless ratchet + 全量测试 + 灌 `V1__baseline.sql` 进全新 ParadeDB）· frontend（type-check + test + build）。`seed` tag 已推送（spotless ratchet 需要）。
 - 全量闸门（**推送/批次收尾必跑**；迭代中按 §9 分档）：
@@ -677,6 +677,8 @@ boot           17 件                      →  boot
 | Q7a | 2026-10-24 | **终态矩阵测试补齐**：新增 `TurnTerminalMatrixTest`（失败后到达的成功不改写 / 终态后不再进收尾段 / 8 线程 × 20 轮并发只有一个赢家）；连同既有 `TurnLifecycleTest`、`QaTurnFinalizerCommitGateTest`（双收尾只提交一次下游）、`QaTurnExecutorNormalFailureTest`、`QaSseOrchestratorTest`（error+done 退出）构成本批矩阵。**Q7b（H1b-2：stop watcher/轮询/3 把锁收拢与状态落库）仍待做**，未在本次动实现。 | 终态相关 11 条定向测试绿 · 48 守卫绿 · `mvn -B clean verify` 绿（**5102 / 0 / 2**） |
 
 | Q7b-1 | 2026-10-24 | **H1b-2 第一刀：单锁 + STOP 单一 owner**。新增 `TurnMessageGate`/`TurnMessageHandle`；此前同一 assistant 行由三把互不排斥的锁保护（`AgentStreamBridge.mu`、`QaTurnExecutor` 的 `synchronized(am)`、`QaSseOrchestrator` 的 `synchronized(msg)`）⇒ 三者改为本轮共享的 `SseStreamContext.messageGate`，快答 reasoning 追加也纳入同一临界区。STOP 取消只由 stop watcher 发 `EVENT_STOP`，SSE 循环只负责 flush+写 stop 帧+退出（去掉重复 emit，新增测试钉住）。 | 新增 1 条 STOP 不重复 emit 测试 · 终态/桥接 17 条定向测试绿 · 48 守卫绿 · `mvn -B clean verify` 绿（**5103 / 0 / 2**）。**未做**：两个轮询（100ms SSE / 300ms watcher）合并（会改 stop 延迟或 100ms 节拍）与生命周期状态落库（需 schema 决策） |
+
+| Q7b-2 | 2026-10-24 | **H1b-2 第二刀：单流泵 + 终态指标**。`QaSseOrchestrator` 的两条读流循环（SSE 100ms + stop watcher 300ms）合并为 `TurnStreamPump`：有客户端 100ms 写帧；写失败降级为 300ms 无头监控，继续检测 STOP/终态并只发一次 `EVENT_STOP`（取消不随连接丢失）。`setupSSEStream` 不再起 watcher；`QaTurnExecutor` 在 `sink == null`（steer follow-up）时启动无头泵。`TurnLifecycle` 增 `CANCELLED` 终态；新增 `ragagent.qa.terminal{mode,outcome}` 指标（只由终态赢家打点）。**不做**：生命周期中间态落库（终态已由 `completeMessageOnce` 落库；中间态只服务崩溃续跑，当前无此需求）。 | 新增客户端断开降级 + STOP 单次 emit 测试 · 终态/桥接 30 条定向测试绿 · 48 守卫绿 · `mvn -B clean verify` 绿（**5104 / 0 / 2**） |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

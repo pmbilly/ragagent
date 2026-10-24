@@ -109,6 +109,8 @@ public final class QaTurnExecutor {
         startAsyncRunner(reqCtx, mode, streamCtx, sessionId, asyncDone);
 
         if (sink == null) {
+            // 无 SSE 客户端（steer follow-up 等）：仍需盯 STOP/终态，否则取消无人接收
+            sseOrchestrator.startHeadlessPump(sessionId, reqCtx.assistantMessage.getId(), streamCtx);
             return;
         }
         boolean shouldWaitForTitle = generateTitle && reqCtx.session.getTitle() != null
@@ -208,6 +210,7 @@ public final class QaTurnExecutor {
                     if (!streamCtx.lifecycle.finish(TurnLifecycle.State.DONE)) {
                         return; // 已由另一条收尾路径赢下终态
                     }
+                    QaTerminalMetrics.record(QaMode.NORMAL, TurnLifecycle.State.DONE);
                     log.info("Knowledge QA service completed for session: {}", sessionId);
                     turnFinalizer.runWithTenant(normalSessionTenantId, () -> {
                         turnFinalizer.completeAssistantMessage(streamCtx.assistantMessage, reqCtx.query,
@@ -285,6 +288,12 @@ public final class QaTurnExecutor {
                 }
             } finally {
                 if (mode == QaMode.AGENT) {
+                    TurnLifecycle.State terminal = streamCtx.cancelled
+                            ? TurnLifecycle.State.CANCELLED
+                            : (failed ? TurnLifecycle.State.FAILED : TurnLifecycle.State.DONE);
+                    if (streamCtx.lifecycle.finish(terminal)) {
+                        QaTerminalMetrics.record(mode, terminal);
+                    }
                     Message am = streamCtx.assistantMessage;
                     // agent 收尾：steer 交接 + 完成 + 清除 live 标记
                     //
@@ -337,6 +346,9 @@ public final class QaTurnExecutor {
      * finally 里的兜底动作。</p>
      */
     void finalizeNormalOnFailure(QaRequestContext reqCtx, SseStreamContext streamCtx) {
+        if (streamCtx.lifecycle.finish(TurnLifecycle.State.FAILED)) {
+            QaTerminalMetrics.record(QaMode.NORMAL, TurnLifecycle.State.FAILED);
+        }
         Message am = streamCtx.assistantMessage;
         if (am == null) {
             return;
