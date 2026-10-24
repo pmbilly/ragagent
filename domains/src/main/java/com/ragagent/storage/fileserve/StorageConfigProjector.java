@@ -3,6 +3,7 @@ package com.ragagent.storage.fileserve;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.storage.provider.StorageProviders;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ObjectNode;
 
@@ -57,13 +58,10 @@ final class StorageConfigProjector {
         if (!(providerConfig instanceof ObjectNode obj)) {
             return;
         }
-        String p = provider == null ? "" : provider.trim().toLowerCase(java.util.Locale.ROOT);
-        String accessField = switch (p) {
-            case "minio" -> "accessKeyId";
-            case "cos" -> "secretId";
-            default -> "accessKey";
-        };
-        String secretField = "minio".equals(p) ? "secretAccessKey" : "secretKey";
+        StorageProviders.CredentialFields fields = StorageProviders.credentials(
+                provider == null ? "" : provider.trim().toLowerCase(java.util.Locale.ROOT));
+        String accessField = fields.accessKey();
+        String secretField = fields.secretKey();
         moveKey(obj, "accessKeyId", accessField);
         moveKey(obj, "secretAccessKey", secretField);
     }

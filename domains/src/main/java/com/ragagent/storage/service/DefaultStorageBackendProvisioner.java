@@ -5,6 +5,7 @@ import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.storage.config.StorageProviderEnv;
 import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.storage.provider.StorageProviders;
 import com.ragagent.storage.repository.StorageBackendRepository;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -73,7 +74,7 @@ public class DefaultStorageBackendProvisioner implements StorageBackendProvision
     @Override
     public String provisionFromLegacy(long tenantId, StorageEngineConfig config) {
         String provider = legacyProvider(config);
-        Object section = legacySection(config, provider);
+        Object section = StorageProviders.legacySection(provider, config);
         if (provider.isEmpty() || section == null) {
             return null;
         }
@@ -119,29 +120,12 @@ public class DefaultStorageBackendProvisioner implements StorageBackendProvision
         if (config.getLocal() != null) {
             return "local";
         }
-        for (String candidate : List.of("minio", "cos", "tos", "s3", "oss", "ks3", "obs")) {
-            if (legacySection(config, candidate) != null) {
+        for (String candidate : StorageProviders.legacyCandidates()) {
+            if (StorageProviders.legacySection(candidate, config) != null) {
                 return candidate;
             }
         }
         return "";
-    }
-
-    private static Object legacySection(StorageEngineConfig config, String provider) {
-        if (config == null) {
-            return null;
-        }
-        return switch (provider) {
-            case "local" -> config.getLocal();
-            case "minio" -> config.getMinio();
-            case "cos" -> config.getCos();
-            case "tos" -> config.getTos();
-            case "s3" -> config.getS3();
-            case "oss" -> config.getOss();
-            case "ks3" -> config.getKs3();
-            case "obs" -> config.getObs();
-            default -> null;
-        };
     }
 
     private static void move(ObjectNode node, String from, String to) {

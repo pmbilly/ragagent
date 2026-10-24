@@ -3,6 +3,7 @@ package com.ragagent.storage.service;
 import com.ragagent.platform.security.Hashes;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.storage.domain.StoredResource;
+import com.ragagent.storage.provider.StorageProviders;
 import com.ragagent.storage.repository.ResourceRepository;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
@@ -266,8 +267,7 @@ public class ResourceCatalogService {
         if (scoped != null) {
             filePath = scoped.providerPath();
         }
-        for (String provider : new String[]{"local", "minio", "cos", "tos", "s3", "oss", "ks3",
-                "obs", "dummy"}) {
+        for (String provider : StorageProviders.schemeKeys()) {
             if (filePath.startsWith(provider + "://")) {
                 return provider;
             }

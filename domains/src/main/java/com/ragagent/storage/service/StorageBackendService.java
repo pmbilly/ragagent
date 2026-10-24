@@ -2,19 +2,18 @@ package com.ragagent.storage.service;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.storage.StorageEnvLookup;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.dto.StorageConfig;
+import com.ragagent.storage.provider.StorageProviders;
+import com.ragagent.storage.provider.StorageProviders.ConnectorFailure;
 import com.ragagent.storage.repository.StorageBackendRepository;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
@@ -109,53 +108,20 @@ public class StorageBackendService {
         if (prefix.startsWith("/") || cleanPrefix.equals("..") || cleanPrefix.startsWith("../")) {
             throw validation("path_prefix must be a relative path without parent traversal");
         }
-        switch (provider) {
-            case "local" -> {
-                // 无必填
-            }
-            case "minio" -> {
-                if (c.mode == null || c.mode.isEmpty()) {
-                    c.mode = "remote";
-                }
-                if (!"docker".equals(c.mode)) {
-                    required("endpoint", c.endpoint);
-                    required("access_key_id", c.accessKeyId);
-                    required("secret_access_key", c.secretAccessKey);
-                }
-                required("bucket_name", c.bucketName);
-            }
-            case "cos" -> {
-                required("region", c.region);
-                required("access_key_id", c.accessKeyId);
-                required("secret_access_key", c.secretAccessKey);
-                required("bucket_name", c.bucketName);
-            }
-            default -> {
-                required("endpoint", c.endpoint);
-                required("region", c.region);
-                required("access_key_id", c.accessKeyId);
-                required("secret_access_key", c.secretAccessKey);
-                required("bucket_name", c.bucketName);
-            }
-        }
+        StorageProviders.forValidation(provider).validate().accept(c);
     }
 
     /** SSRF（code 1000 + details=原文） */
     public void validateEndpoint(StorageBackend b) {
         StorageConfig c = configOf(b);
-        if ("local".equals(b.getProvider()) || ("minio".equals(b.getProvider()) && "docker".equals(c.mode))) {
+        StorageProviders.EndpointPolicy policy =
+                StorageProviders.forValidation(b.getProvider()).endpointPolicy().apply(c);
+        if (policy.skipSsrf()) {
             return;
         }
         String endpoint = c.endpoint == null ? "" : c.endpoint.trim();
-        if ("cos".equals(b.getProvider()) || endpoint.isEmpty()) {
-            return;
-        }
         if (!endpoint.contains("://")) {
-            String scheme = "https://";
-            if ("minio".equals(b.getProvider()) && !c.useSsl) {
-                scheme = "http://";
-            }
-            endpoint = scheme + endpoint;
+            endpoint = policy.scheme() + endpoint;
         }
         try {
             ssrfGuard.validateURLForSSRF(endpoint);
@@ -171,50 +137,8 @@ public class StorageBackendService {
         validate(b);
         validateEndpoint(b);
         StorageConfig c = configOf(b);
-        switch (b.getProvider()) {
-            case "local" -> {
-                String baseDir = localStorageBaseDir == null || localStorageBaseDir.trim().isEmpty()
-                        ? "/data/files"
-                        : localStorageBaseDir.trim();
-                // 必须 toAbsolutePath().normalize()——相对 base 下
-                // startsWith(absolute) 会误判穿越（实测复现过）
-                Path base = Path.of(baseDir).toAbsolutePath().normalize();
-                Path safe = safeJoinUnderBase(base, c.pathPrefix);
-                try {
-                    Files.createDirectories(safe);
-                } catch (IOException e) {
-                    throw new ConnectorFailure("create local storage directory: " + e.getMessage());
-                }
-                // CheckConnectivity：stat(baseDir) 且是目录
-                if (!Files.isDirectory(base)) {
-                    throw new ConnectorFailure("storage directory not accessible: " + base);
-                }
-            }
-            case "minio" -> {
-                String endpoint = c.endpoint;
-                if ("docker".equals(c.mode)) {
-                    endpoint = env("MINIO_ENDPOINT");
-                    c.accessKeyId = env("MINIO_ACCESS_KEY_ID");
-                    c.secretAccessKey = env("MINIO_SECRET_ACCESS_KEY");
-                    if (c.bucketName == null || c.bucketName.isEmpty()) {
-                        c.bucketName = env("MINIO_BUCKET_NAME");
-                    }
-                }
-                dialEndpoint(endpoint, c.useSsl ? 443 : 80, "minio");
-            }
-            case "cos" -> {
-                // COS 无 endpoint 配置面（前端表单/校验都不收）：按腾讯云规则由
-                // region+bucket 构造探测域名（同样不需要 endpoint）。
-                String region = c.region == null ? "" : c.region.trim();
-                String bucket = c.bucketName == null ? "" : c.bucketName.trim();
-                if (region.isEmpty() || bucket.isEmpty()) {
-                    throw new ConnectorFailure("dial cos: region and bucket are required");
-                }
-                dialEndpoint(bucket + ".cos." + region + ".myqcloud.com", 443, "cos");
-            }
-            case "tos", "s3", "oss", "ks3", "obs" -> dialEndpoint(c.endpoint, 443, b.getProvider());
-            default -> throw new ConnectorFailure("unsupported storage provider: " + b.getProvider());
-        }
+        StorageProviders.forValidation(b.getProvider()).connectivity().test(
+                c, new StorageProviders.TestEnv(localStorageBaseDir, b.getProvider(), this::dialEndpoint));
     }
 
     /** 创建：校验 → endpoint → 连通性测试 → 时间戳 → 落库（唯一冲突 → 409） */
@@ -473,33 +397,8 @@ public class StorageBackendService {
         }
     }
 
-    /** 越界即拒 */
-    private static Path safeJoinUnderBase(Path base, String prefix) {
-        Path result = base;
-        if (prefix != null && !prefix.trim().isEmpty()) {
-            Path resolved = base.resolve(prefix.trim()).normalize();
-            if (!resolved.startsWith(base.toAbsolutePath().normalize())) {
-                throw new ConnectorFailure("path_prefix escapes the storage base directory");
-            }
-            result = resolved;
-        }
-        return result;
-    }
-
-    /** provider 家族键读取（统一查找面）；未配置 → 空串。 */
-    private static String env(String key) {
-        String v = StorageEnvLookup.get(key);
-        return v == null ? "" : v;
-    }
-
     private static long tenant(StorageBackend b) {
         return b.getTenantId() == null ? 0 : b.getTenantId();
-    }
-
-    private static void required(String name, String value) {
-        if (value == null || value.trim().isEmpty()) {
-            throw validation(name + " is required");
-        }
     }
 
     private static String trim(String s) {
@@ -561,10 +460,4 @@ public class StorageBackendService {
         return new BizException(AppError.validation(message));
     }
 
-    /** 远端探测的失败载体（走 SanitizeStorageConnectivityError 映射） */
-    public static class ConnectorFailure extends RuntimeException {
-        ConnectorFailure(String message) {
-            super(message);
-        }
-    }
 }

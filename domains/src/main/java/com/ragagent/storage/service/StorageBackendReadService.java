@@ -5,6 +5,7 @@ import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.dto.StorageBackendResponse;
 import com.ragagent.storage.dto.StorageConfig;
+import com.ragagent.storage.provider.StorageProviders;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -109,7 +110,7 @@ public class StorageBackendReadService {
         String message;
         if (e instanceof BizException biz) {
             message = biz.appError().message();
-        } else if (e instanceof StorageBackendService.ConnectorFailure cf) {
+        } else if (e instanceof StorageProviders.ConnectorFailure cf) {
             message = StorageBackendService.sanitizeConnectivity(cf.getMessage());
         } else {
             message = StorageBackendService.sanitizeConnectivity(e.getMessage());

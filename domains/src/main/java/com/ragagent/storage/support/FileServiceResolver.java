@@ -10,6 +10,7 @@ import com.ragagent.platform.storage.support.Rewriter;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.FileServiceFactory;
+import com.ragagent.storage.provider.StorageProviders;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -40,9 +41,6 @@ public class FileServiceResolver implements Resolver {
     private static final String RESOURCE_SCHEME = "resource://";
     private static final String STORAGE_BACKEND_SCHEME = "storage://";
 
-    /** 认得的 provider scheme 列表，顺序有语义。 */
-    private static final String[] PROVIDERS =
-            {"local", "minio", "cos", "tos", "s3", "oss", "ks3", "obs", "dummy"};
 
     /**
      * 本地存储的磁盘根——启动期快照（{@code LOCAL_STORAGE_BASE_DIR}），
@@ -211,7 +209,7 @@ public class FileServiceResolver implements Resolver {
                 candidate = rest.substring(slash + 1);
             }
         }
-        for (String provider : PROVIDERS) {
+        for (String provider : StorageProviders.schemeKeys()) {
             if (candidate.startsWith(provider + "://")) {
                 return provider;
             }
