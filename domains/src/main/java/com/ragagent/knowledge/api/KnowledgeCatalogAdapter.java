@@ -110,6 +110,14 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     }
 
     @Override
+    public List<String> listKnowledgeIdsByTagIds(long tenantId, String kbId, List<String> tagIds) {
+        if (tagIds == null || tagIds.isEmpty()) {
+            return List.of();
+        }
+        return knowledgeTagRepository.listKnowledgeIdsByTagIds(tenantId, kbId, tagIds);
+    }
+
+    @Override
     public KnowledgePageView listKnowledge(String kbId, long page, long pageSize,
             String keyword, String parseStatus, String fileType,
             String folderPath, boolean folderPresent) {

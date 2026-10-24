@@ -329,7 +329,6 @@ class ArchitectureRulesTest {
             Map.entry("com.ragagent.session.service.AgentToolBackends", "PG 专有 SQL（工具后端）"),
             Map.entry("com.ragagent.session.service.AgentToolKbBackends", "PG 专有 SQL（工具知识库后端）"),
             Map.entry("com.ragagent.session.service.AgentWebPages", "PG 专有 SQL（网页缓存）"),
-            Map.entry("com.ragagent.session.service.SessionKnowledgeQaService", "PG 专有 SQL（多表 JOIN 标签检索）"),
             Map.entry("com.ragagent.system.service.SystemInfoService", "PG 专有 SQL（系统元数据）"),
             Map.entry("com.ragagent.vectorstore.service.VectorStoreConfigService", "PG 专有 SQL（向量库配置）"),
             Map.entry("com.ragagent.memory.repository.MemoryVectorStore", "列存在性探测（JDBC 元数据）"),

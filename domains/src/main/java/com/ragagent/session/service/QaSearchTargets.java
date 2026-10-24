@@ -151,7 +151,8 @@ final class QaSearchTargets {
             }
             if (useDocumentTagResolution) {
                 List<String> tagKnowledgeIds;
-                tagKnowledgeIds = service.listKnowledgeIdsByTagIds(kbTenant, kbId, tagIds);
+                tagKnowledgeIds = service.knowledgeCatalog
+                        .listKnowledgeIdsByTagIds(kbTenant, kbId, tagIds);
                 if (!explicitKnowledgeIds.isEmpty()) {
                     tagKnowledgeIds = SessionKnowledgeQaService.intersectStrings(tagKnowledgeIds, explicitKnowledgeIds);
                 }

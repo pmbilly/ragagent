@@ -18,8 +18,7 @@ import tools.jackson.databind.ObjectMapper;
  *
  * <h2>调用面</h2>
  * <p>状态压缩路径休眠：get/save 当前无调用方，真正消费的只有会话删除清理——
- * 因此 {@link com.ragagent.contract.pipeline.PipelinePorts.WebSearchStateService} 端口保持
- * 存而不读，本服务只被 {@code SessionService} 的清理三件套调用。</p>
+ * 因此不向管线暴露状态端口，本服务只被会话侧的清理三件套调用。</p>
  *
  * <h2>Delete 语义（错误被调用方吞掉）</h2>
  * <ol>

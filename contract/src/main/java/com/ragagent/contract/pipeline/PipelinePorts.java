@@ -136,22 +136,6 @@ public final class PipelinePorts {
         }
     }
 
-    /** 占位：PluginSearch 存而不读。 */
-    public interface SessionService {
-    }
-
-    /** 占位：merge 的父子解析依赖预留，当前未消费。 */
-    public interface ChunkService {
-    }
-
-    /** 占位：存而不读（状态压缩路径未启用）。 */
-    public interface WebSearchStateService {
-    }
-
-    /** 占位：存而不读。 */
-    public interface WebSearchProviderRepository {
-    }
-
     /**
      * DataAnalysis 插件的工具会话 seam（装载/执行/清理三步）。实现侧可放 agent.tools
      * 包内以触达包私有 loadFromKnowledge，打包 KnowledgeLoader/Materializer/AnalysisDuckDb

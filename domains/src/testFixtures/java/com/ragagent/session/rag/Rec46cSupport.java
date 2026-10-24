@@ -579,9 +579,6 @@ final class Rec46cSupport {
         }
     }
 
-    /** 对照 zzChunkService。 */
-    static final class StubChunkService implements PipelinePorts.ChunkService {}
-
     /** 对照 zzKnowledgeRepo。 */
     static final class StubKnowledgeRepo implements PipelinePorts.KnowledgeRepository {
         final Map<String, Knowledge> items = new LinkedHashMap<>();

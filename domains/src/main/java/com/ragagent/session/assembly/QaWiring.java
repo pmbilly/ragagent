@@ -65,9 +65,8 @@ import tools.jackson.databind.ObjectMapper;
 /**
  * chat 管线 + QA 面装配（docs/known-issues/05-wave-4.md 的 11 seam 清单）。
  *
- * <p>全部 adapter 是<b>纯新增</b>文件里的静态/内部类，不改既有 service。占位 seam
- * （TenantService/SessionService/WebSearchStateService/WebSearchProviderRepository）
- * 仅判空或存而不读——Java 传 null 等价。</p>
+ * <p>全部 adapter 是<b>纯新增</b>文件里的静态/内部类，不改既有 service。未装配的
+ * seam 在插件侧按缺省值处理（Java 传 null 等价）。</p>
  *
  * <h2>实现边界</h2>
  * <ul>
@@ -339,8 +338,7 @@ public class QaWiring {
 
     /**
      * Bean 注册序（与 chatpipeline 事件管理器的装配顺序一致）。
-     * RetrieveGraphRepository / TenantService / SessionService / WebSearchStateService /
-     * WebSearchProviderRepository 传 null（见类注释的取舍）。
+     * RetrieveGraphRepository 在 neo4j 未启用时由实现返回 null（见类注释的取舍）。
      * DataAnalysisSessionFactory：dev 无分析面，工厂恒返回不可用会话——
      * DATA_ANALYSIS 阶段只在 MergeResult 出现 CSV/Excel 命中时进入。
      */

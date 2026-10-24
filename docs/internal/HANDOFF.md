@@ -211,7 +211,7 @@
 |---|---|---|
 | **Q0** | 评估核实 + 删除收口（4 份文档按删除处理；引用迁 `docs/api/README.md` / `HANDOFF 11.1` / `HANDOFF §7` / getting-started） | ✅ 2026-10-24（48/48） |
 | **Q1** | 模型配置结构校验：`ModelConfigValidator` 窄端口 + `ModelService` 三处接线（不联网） | ✅ 2026-10-24（5088/0/2） |
-| **Q2** | SQL 下沉（复用 `KnowledgeTagRepository`）+ 删 `PipelinePorts` 3 个占位 Port | 待做 |
+| **Q2** | SQL 下沉（复用 `KnowledgeTagRepository`）+ 删 `PipelinePorts` 占位 Port | ✅ 2026-10-24（5088/0/2） |
 | **Q3** | 请求段冻结：`rerankThreshold` 归位 `RerankOutcome` → 不可变快照 + `fork()` 白名单 | 待做 |
 | **Q4** | 向量库 Descriptor：contract 只放控制面规则；`retrieval-engine` 持工厂/探测 | 待做 |
 | **Q5** | 存储 Provider Descriptor（域内）：校验与创建分两步单源化 | 待做 |
@@ -665,6 +665,8 @@ boot           17 件                      →  boot
 | Q0 | 2026-10-24 | **第五轮评估核实 + Q 系列立项**：逐项复核 `architecture-assessment-2026-10-24.md` 的数字与技术事实（48 守卫 / 19 域 / 40 Port / 326 契约 / 356 package-info / 52 文件 / 28 方法 / 2,483 主源 / 266 分支 / 38 构造器 / 前端 771 测试全对；`session/service` 27→29、构造器口径 38 vs 棘轮 53 两处更正）。**4 处重复已完成/已否决项**：`TurnLifecycle` 已实现终态单赢家（不建 Coordinator）、`KnowledgeService` 三分与 M/L 判据冲突、端口改名无收益、`VectorStoreConnectivity` 已存在；**5 处落法改写**：contract 不放 `runtimeFactory`、ChatManage 改用不可变快照而非 4 个 Policy、`QaRequestContext` 只收复制面、租户 KV Registry 降观察、Wiki 已有 `wikiDirectoryState` 起点。**基线异常**：工作区 4 份文档未提交删除（含 `known-gaps.md`），`check-reference-truth` 红 1 处 ⇒ 当前 47/48 守卫绿。产出 `docs/internal/plans/convergence-remediation-q-series.md`（Q0~Q11）。**Q0 收口（同日）**：用户拍板"删除的文件不要了"⇒ 4 份文档按删除提交；引用迁移（`api-response-convention` → `docs/api/README.md`、`known-gaps` → `HANDOFF 11.1`、`golden-fixtures` → `HANDOFF §7`、`migration-troubleshooting` → `getting-started.md` 常见失败）；`check-known-gaps.py` 指针改为 `HANDOFF 11` 并配红态探针；`docs/README` / `qa-flow` / `api/README` 同步。 | 核实：48 条守卫实跑 · 前端 `npm test` 771/0；Q0：`run-guards.sh` **48/48** · 10 处类注释指针迁移 · 守卫红态探针已验证 |
 
 | Q1 | 2026-10-24 | **模型配置结构校验接线**：`contract.model` 新增 `ModelConfigValidator`（1 方法）+ `ModelConfigDraft`（provider/baseUrl/apiKey/modelName，纯 JDK）；`model-runtime` 实现 `ProviderModelConfigValidator`（复用 26 家 `Provider.validateConfig`，未知/空 provider 直接放行，不联网）；`ModelService.createModel/updateModel/updateModelCredentials` 三处保存路径统一调用，失败即 400 且不落库。`Provider` 注释改为当前事实，`HANDOFF 11.1` 第 19 条关闭。 | 新增 6 条定向测试（厂商规则 3 + ModelService 落库闸门 3）· 48 守卫绿 · `mvn -B clean verify` 绿（**5088 / 0 / 2**） |
+
+| Q2 | 2026-10-24 | **问答 SQL 下沉 + 占位 Port 清理**：`SessionKnowledgeQaService` 删除 `DataSource` 字段/构造参数与手写 `SELECT`（标签 id 查询改为 `KnowledgeEntryReadPort.listKnowledgeIdsByTagIds`，`KnowledgeCatalogAdapter` 委托既有 `KnowledgeTagRepository.listKnowledgeIdsByTagIds`；`QaSearchTargets` 直取契约面）；删 `PipelinePorts` 中 4 个空接口（SessionService / ChunkService / WebSearchStateService / WebSearchProviderRepository）及测试桩，`QaWiring`/`WebSearchTempKbStateService` 陈旧注释同步；A7 裸 JDBC 白名单删除该 Service 条目。 | 48 守卫绿 · `mvn -B clean verify` 绿（**5088 / 0 / 2**）· 编译期确认无残留引用 |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

@@ -66,7 +66,6 @@ public class SessionKnowledgeQaService {
     final PipelinePorts.ModelService pipelineModelService;
     final TenantConfigLookup tenantService;
     final WebSearchProviderPort webSearchProviders;
-    final javax.sql.DataSource dataSource;
     /** agent 解析（im 面请求只带 agentId：入口按需补 agentRow）。 */
     final AgentResolver agentResolver;
 
@@ -83,7 +82,6 @@ public class SessionKnowledgeQaService {
             PipelinePorts.ModelService pipelineModelService,
             TenantConfigLookup tenantService,
             WebSearchProviderPort webSearchProviders,
-            javax.sql.DataSource dataSource,
             AgentResolver agentResolver) {
         this.eventManager = eventManager;
         this.cfg = cfg;
@@ -92,7 +90,6 @@ public class SessionKnowledgeQaService {
         this.pipelineModelService = pipelineModelService;
         this.tenantService = tenantService;
         this.webSearchProviders = webSearchProviders;
-        this.dataSource = dataSource;
         this.agentResolver = agentResolver;
         this.resolution = new SessionQaResolution(this);
         this.fallback = new SessionQaFallback(this);
@@ -131,38 +128,6 @@ public class SessionKnowledgeQaService {
 
     public KnowledgeBaseRowView findKnowledgeBase(String kbId) {
         return resolution.findKnowledgeBase(kbId);
-    }
-
-    public List<String> listKnowledgeIdsByTagIds(long tenantId, String kbId, List<String> tagIds) {
-        if (tagIds == null || tagIds.isEmpty()) {
-            return new ArrayList<>();
-        }
-        List<String> ids = new ArrayList<>();
-        StringBuilder in = new StringBuilder();
-        for (int i = 0; i < tagIds.size(); i++) {
-            if (i > 0) {
-                in.append(',');
-            }
-            in.append('?');
-        }
-        String sql = "SELECT DISTINCT k.id FROM knowledges k "
-                + "JOIN knowledge_tag_relations ktr ON k.id = ktr.knowledge_id "
-                + "WHERE k.tenant_id = ? AND k.knowledge_base_id = ? AND ktr.tag_id IN (" + in + ")";
-        try (var conn = dataSource.getConnection(); var ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, tenantId);
-            ps.setString(2, kbId);
-            for (int i = 0; i < tagIds.size(); i++) {
-                ps.setString(3 + i, tagIds.get(i));
-            }
-            try (var rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    ids.add(rs.getString(1));
-                }
-            }
-        } catch (java.sql.SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        return ids;
     }
 
     // KnowledgeQA 主流程

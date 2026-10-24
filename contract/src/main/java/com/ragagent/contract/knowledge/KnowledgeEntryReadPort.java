@@ -16,4 +16,7 @@ public interface KnowledgeEntryReadPort {
     KnowledgePageView listKnowledge(String kbId, long page, long pageSize,
             String keyword, String parseStatus, String fileType,
             String folderPath, boolean folderPresent);
+
+    /** 按标签过滤知识条目 id（租户 + KB 作用域）。 */
+    List<String> listKnowledgeIdsByTagIds(long tenantId, String kbId, List<String> tagIds);
 }
