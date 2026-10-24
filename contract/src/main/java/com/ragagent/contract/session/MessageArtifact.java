@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
  * 某轮对话中 skill 脚本产出的文件。
  *
  * <p>与 {@link MessageAttachment} 的区别：附件是**用户上传**的，产物是沙箱
- * **替模型生成**、由 WeKnora 落到文件服务里的——沙箱被回收后用户仍能下载。</p>
+ * **替模型生成**、由服务端落到文件服务里的——沙箱被回收后用户仍能下载。</p>
  *
  * <p>七个键全部恒输出；键名＝Java 字段名。</p>
  *
@@ -33,7 +33,7 @@ public class MessageArtifact {
     /** 沙箱侧的修改时间（同样用于去重比对）。 */
     private OffsetDateTime modTime;
 
-    /** WeKnora 落盘该 blob 的时刻。 */
+    /** 服务端落盘该 blob 的时刻。 */
     private OffsetDateTime createdAt;
 
     public MessageArtifact() {

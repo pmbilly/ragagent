@@ -14,7 +14,7 @@
 ## 2. 资源目录 / 共享授权解析（产物、附件）
 
 - **状态**：设计取舍——只做 owner 判定，不做资源目录解析。
-- **影响**：`/sessions/{id}/artifacts/{aid}` 与文件代理对非 owner 恒 404 `artifact not accessible`。
+- **影响**：`GET /sessions/{id}/messages/{messageId}/artifacts/{index}/download` 恒 404 `artifact not accessible`（资源目录解析未实现，对所有调用方如此，仅 index/存在性校验先行）；消息文件代理对 owner ≠ caller 恒 403（方向偏保守），文件路径越权同样 403 `forbidden: … not accessible`。
 - **替代**：owner 取会话/消息归属；公开资源走预签名 URL。
 - **涉及**：`SessionController`、`MessageFileProxyController`。
 
@@ -62,7 +62,7 @@
 
 - **状态**：待实现。
 - **影响**：`sampleRate` 在 (0,1) 区间时不生效，trace 恒采样。
-- **替代**：`LANGFUSE_ENABLED=false` 整体关闭。
+- **替代**：`LANGFUSE_ENABLED=false` 整体关闭；`LANGFUSE_SAMPLE_RATE=0` 也会整体关闭（0 = 全不采样 → 视作开关关闭）。
 - **涉及**：`LangfuseConfig`、`LangfuseTracing`。
 
 ## 10. 提示词缓存指纹元数据

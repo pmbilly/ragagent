@@ -2,7 +2,7 @@ package com.ragagent.contract.model;
 
 
 /**
- * 流式响应类型（共 22 个）。
+ * 流式响应类型（共 23 个）。
  *
  * chat 包只产出 ANSWER / THINKING / TOOL_CALL / ERROR；
  * 其余由 session/SSE 与 agent 引擎产出——

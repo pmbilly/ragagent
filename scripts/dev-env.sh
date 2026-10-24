@@ -11,7 +11,7 @@
 
 set -euo pipefail
 
-# JDK 21：Gradle 与 bootRun 都要求 JAVA_HOME/PATH 指向 21。
+# JDK 21：Maven 构建与 Spring Boot 运行都要求 JAVA_HOME/PATH 指向 21。
 # 踩过的坑：脚本里若依赖调用者已配好 PATH，换一个 shell 就会得到
 # "Unable to locate a Java Runtime"（Homebrew 的 openjdk 不在默认 PATH）。
 if [ -z "${JAVA_HOME:-}" ] && [ -d /opt/homebrew/opt/openjdk@21 ]; then

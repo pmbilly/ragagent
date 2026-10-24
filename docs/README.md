@@ -23,6 +23,14 @@
 - 知识图谱：[`knowledge-graph.md`](knowledge-graph.md) —— Neo4j 启用与实体关系抽取
 - 数据库迁移排障：[`migration-troubleshooting.md`](migration-troubleshooting.md) —— 启动失败与 Flyway
 - API 概览：[`api/README.md`](api/README.md) —— 认证、响应外壳、主要资源
+- 响应外壳细则：[`api-response-convention.md`](api-response-convention.md) —— 外壳形状、错误码分段、前端解析兜底
+- 已知缺口：[`known-gaps.md`](known-gaps.md) —— 读代码遇到空分支 / 恒 404 / no-op 先查这里（新缺口也登记在这里）
+
+查表（三份由守卫强制与代码同步的链路/接口表）：
+
+- 管线事件表：[`architecture/pipeline-map.md`](architecture/pipeline-map.md) —— 14 个管线阶段的事件与插件
+- Port 对照表：[`architecture/port-map.md`](architecture/port-map.md) —— 域端口 ↔ 实现 ↔ 调用方
+- 问答链路：[`architecture/qa-flow.md`](architecture/qa-flow.md) —— 一次问答的类级调用链
 
 查表：[`architecture/packages.md`](architecture/packages.md) —— 356 份 `package-info` 的包索引（由脚本生成，勿手改）。
 
@@ -41,6 +49,8 @@
 - [`internal/HANDOFF.md`](internal/HANDOFF.md) —— 当前批次、判定标准、闸门与回填
 - [`internal/plans/`](internal/plans/) —— 整改方案（v2 与历史版本）
 - [`internal/handoff/`](internal/handoff/) —— 批次记录、专项计划与归档
+- [`internal/golden-fixtures.md`](internal/golden-fixtures.md) —— 契约金片的布局、重录与签字流程
+- [`architecture-review/`](architecture-review/) —— 历轮架构评审报告（均带评估日期与基线快照声明，非现状文档）
 
 ## 约定
 

@@ -24,7 +24,8 @@ import tools.jackson.databind.JsonNode;
 
 /**
  * KV 配置分发协作者（自 {@link TenantCatalogController} 拆出）：6 个 DB-backed key 的
- * get/put、敏感 key 的 admin 门、jsonb 强类型解析与各配置段校验。
+ * get（put 仅 5 个可写——storage-engine-config 的写入口已关闭，指向 /api/v1/storage-backends）、
+ * 敏感 key 的 admin 门、jsonb 强类型解析与各配置段校验。
  * 持门面回引取 tenantService/ssrfGuard/storageAllowList/knowledgeProvisioner。
  */
 final class TenantConfigOps {

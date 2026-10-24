@@ -387,6 +387,4 @@ final class KnowledgeSearchOutputFormatter {
         }
         return "... " + snippet.trim() + " ...";
     }
-
-    /** 测试侧 RecordingSupport 不可引用主源码，经此 holders 取 mapper。 */
 }

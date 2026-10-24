@@ -141,8 +141,8 @@ graph TD
 ## 模块名与包名不完全对应（刻意）
 
 - `model-runtime` 有 5 个源码根：`embedding` / `llm` / `modelcontext` / `modelruntime` / `rerank`，只有 1 个与模块同名。拆模块时按能力族分，不按模块名分。
-- `boot` 主代码只有入口 + `config/`，但测试树有 24 个业务包：集成测试必须从 HTTP 面进，只能住在组合根。
-- `domains` 测试树仍有 10 个跨模块测试（platform 5、model-runtime 4、contract 1）：它们依赖 domains 载荷，迁走会形成 `test → domains` 反向边。已逐个登记在 `scripts/check-module-graph.py` 的 `MISPLACED_TEST_ALLOW`（带理由，只许减）；新增错位即红。
+- `boot` 主代码只有入口 + `config/`，但测试树有 23 个业务包（另根包 1 个测试类）：集成测试必须从 HTTP 面进，只能住在组合根。
+- 全仓仍有 9 个跨模块错位测试（domains 测试树 8：platform 5、model-runtime 3；platform 测试树 1：contract 规则测试）：它们依赖 domains 载荷，迁走会形成 `test → domains` 反向边。已逐个登记在 `scripts/check-module-graph.py` 的 `MISPLACED_TEST_ALLOW`（带理由，只许减）；新增错位即红。
 - 这**不是**待修的错位；改包名会产生 1600+ 文件的 diff，换不来行为收益。判据与理由见 `docs/internal/HANDOFF.md` 的模块/包映射说明。
 - 测试夹具包已从 `com.ragagent.common` / `com.ragagent.support` 改为 `com.ragagent.fixtures`；守卫会拦这两个已解散包回流。
 

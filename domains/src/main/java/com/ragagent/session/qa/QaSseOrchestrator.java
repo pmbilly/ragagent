@@ -43,7 +43,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * {@code KnowledgeQaController} 的**SSE 编排簇**：建立 SSE 流上下文、写
- * {@code agent_query} 请求帧、看门狗线程（流结束/断连即收尾）、把 agent 事件转发进 SSE，
+ * {@code agent_query} 请求帧、看门狗线程（只认流内 STOP/COMPLETE/终态事件，到点即收尾；
+ * 客户端断连由 SSE 写出路径的 IOException 处理，不归看门狗）、把 agent 事件转发进 SSE，
  * 以及 quick answer 时间线的录制（步进/工具调用）。
  *
  * <p>共享行为：{@code runWithTenant} / {@code completeAssistantMessage} 在

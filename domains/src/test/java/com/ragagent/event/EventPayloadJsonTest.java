@@ -46,7 +46,7 @@ import org.junit.jupiter.api.Test;
  *   <li>缺省边界（空串 / 0 / false / 空 map / 空列表整键省略）。</li>
  * </ol>
  *
- * <p>线上意义：payload 经 AgentStreamHandler 的 {@code toolApprovalDataToMap}
+ * <p>线上意义：payload 经 AgentStreamBridge 的 {@code toolApprovalDataToMap}
  * （payload 序列化 → map）进 StreamResponse.data，最终出现在
  * continue-stream 的 SSE 帧里。</p>
  */

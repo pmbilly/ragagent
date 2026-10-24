@@ -3,10 +3,11 @@ package com.ragagent.platform.event;
 /**
  * 事件类型常量。
  *
- * <p>取值为 String 常量集中定义（与 {@code com.ragagent.contract.model.ResponseType}
- * 的做法同源——流式子集的取值与 ResponseType 的 wire 值逐字相同：thought / tool_call /
- * tool_result / command_output / reflection / references / final_answer / error /
- * tool_approval_required / ...。接线层如需 ResponseType 枚举，按值映射即可）。</p>
+ * <p>取值为 String 常量集中定义（做法与 {@code com.ragagent.contract.model.ResponseType}
+ * 同源）。流式子集与 ResponseType 大体同名（camelCase）但<b>不逐字相等</b>：
+ * 思考事件取值 {@code thought}，而 ResponseType 的 wire 值是 {@code thinking}；其余
+ * （toolCall / toolResult / reflection / references / error / toolApprovalRequired / ...）
+ * 由接线层 {@code AgentStreamBridge} 负责两边映射，不要假设取值逐字相同。</p>
  *
  * <p>事件类型同时是 {@link EventBus} 的订阅键
  * 与 {@code Event#getType()} 的取值。不要在别处散写字面量——这里是唯一权威。</p>
@@ -69,7 +70,7 @@ public final class EventType {
     /** Agent 完成 */
     public static final String EVENT_AGENT_COMPLETE = "agentComplete";
 
-    // === Agent 流式事件（实时反馈，AgentStreamHandler 订阅的就是这一组） ===
+    // === Agent 流式事件（实时反馈，AgentStreamBridge 订阅的就是这一组） ===
     /** Agent 思考过程 */
     public static final String EVENT_AGENT_THOUGHT = "thought";
     /** 工具调用通知 */

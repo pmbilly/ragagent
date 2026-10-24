@@ -47,7 +47,7 @@ public final class CompactionOverflow {
     /**
      * 提到 token 计数但另有所指的错误。Bedrock 限流的
      * 措辞是 "ThrottlingException: Too many tokens, please wait before trying again"，
-     * 会命中溢出模式但不是溢出。在消息任意位置匹配而非锚定，因为 WeKnora 看到的是
+     * 会命中溢出模式但不是溢出。在消息任意位置匹配而非锚定，因为应用看到的是
      * 原始供应商错误，不是预规范化的前缀。
      */
     private static final Pattern[] NON_OVERFLOW_PATTERNS = {

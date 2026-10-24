@@ -45,7 +45,7 @@ done
 if [ -n "${java_bin}" ]; then
     ok "JDK 21: ${java_ver}"
 elif [ -n "${java_ver}" ]; then
-    bad "JDK 版本不是 21: ${java_ver}" "安装 JDK 21 并让 JAVA_HOME 指向它（Gradle toolchain 也会用）"
+    bad "JDK 版本不是 21: ${java_ver}" "安装 JDK 21 并让 JAVA_HOME 指向它（Maven 构建与运行都用）"
 else
     bad "找不到 java" "安装 JDK 21（macOS: brew install openjdk@21），并设置 JAVA_HOME"
 fi

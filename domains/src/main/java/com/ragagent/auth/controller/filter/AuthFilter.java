@@ -125,7 +125,7 @@ public class AuthFilter extends OncePerRequestFilter {
         }
 
         // 通道 1.7：/r/ 能力 URL（注册在认证链之前——短时令牌自证，
-        // 面向无法带 WeKnora 头的 IM 平台客户端）。
+        // 面向无法带认证头的 IM 平台客户端）。
         if (request.getRequestURI().startsWith("/r/")) {
             chain.doFilter(request, response);
             return;

@@ -1,11 +1,11 @@
-# ragagent 交接文档（v0.6.x 工作版）
+# ragagent 交接文档（v0.8.x 工作版）
 
 > **内部迁移作战文档（非新人入口）**：新人请从仓库根 `README.md` → `docs/README.md` 开始。
 > 本文件记录重构/迁移的过程与决策，路径与读数随批次变化，不是当前架构说明。
 
 > **版本谱系**：v0.1.0 归档 `docs/internal/handoff/archive/HANDOFF-v0.1.0-2026-10-13.md`；**v0.2.0 全文归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`**（含 B232~B267 全部逐批记录、v0.2.0 结构规范与 C/G1/D/E 系列过程记录）。
 > 本版 2026-10-16 生效：**只留活信息**；历史一概在归档，追溯用 `git log --grep`。
-> 工作分支：`v0.6.x`（2026-10-19 自 `main` 切出）。
+> 工作分支：`v0.8.x`（2026-10-24 已与 `main` 同指 `99f4f720e`）。
 
 ## ⭐ 接手须知（5 分钟）
 
@@ -16,14 +16,14 @@
 
 ## 0. 总目标与当前阶段
 
-- **终态（方案 §5.1）**：7 个 Gradle 模块 —— contract / platform / agent-engine / retrieval-engine / model-runtime / domains / boot；单进程分层单体；跨模块只经 contract。
-- **现状（2026-10-17）**：**7 模块** —— `:contract` · `:platform` · `:model-runtime` · `:retrieval-engine` · `:agent-engine` · `:domains` · `:boot`。`:common` 与 `:engine` 均已解散。
-- **当前阶段（v0.6.x）**：v0.5.0 可读性专项收尾（L1~L22，余 L11）+ v0.6.0 业务内聚专项（H 系列）+ 并行 K/L 专项 + **M 系列「后端代码质量收口」（代码项已完成，M8 待会签）** ⇒ 计划见 §5.0 / §5.0b / §5.0c~e。
+- **终态（方案 §5.1）**：7 个 Maven 模块 —— contract / platform / agent-engine / retrieval-engine / model-runtime / domains / boot；单进程分层单体；跨模块只经 contract。
+- **现状（2026-10-24）**：**7 模块** —— `contract` · `platform` · `model-runtime` · `retrieval-engine` · `agent-engine` · `domains` · `boot`。`:common` 与 `:engine` 均已解散；构建已迁 Maven（X 系列）。
+- **当前阶段（v0.8.x）**：v0.5.0 / v0.6.0 / v0.7.x 均已收官；v0.8.x 已落地 K/L/M 收尾 + N/P 系列 + C 系列 contract 还乡（328→293 类型）+ 更名 RagAgent（模块/命令/环境变量）+ 四语言 i18n + 指标面（actuator）+ prompt 行为调优。当前无在途专项；后续拍板项见历轮评估 `docs/internal/plans/architecture-assessment-*.md`。
 
 ## 1. 仓库身份与分支
 
-- 远程 `origin` = `https://github.com/pmbilly/ragagent.git`（公开）；主分支 `main`（停 `ef89e4ab`，含 v0.2.0 结项 + 缺陷修复）。
-- 分支谱系：`v0.1.0`（归档）· `v0.2.0`（R 系列 36 批，已合并 main 并推送）· `v0.3.0`（P1~P5 两模块纠偏）· `v0.4.0`（R1~R6 三 runtime，已合并 main）· `v0.5.0`（可读性专项 L1~L50，已合并 main）· **`v0.6.x`（当前工作分支；2026-10-19 自 `main` 切出，业务内聚专项 H 系列）**。
+- 远程 `origin` = `https://github.com/pmbilly/ragagent.git`（公开）；主分支 `main`（与 `v0.8.x` 同指 `99f4f720e`，2026-10-24）。
+- 分支谱系：`v0.1.0`（归档）· `v0.2.0`（R 系列 36 批，已合并 main 并推送）· `v0.3.0`（P1~P5 两模块纠偏）· `v0.4.0`（R1~R6 三 runtime，已合并 main）· `v0.5.0`（可读性专项 L1~L50，已合并 main）· `v0.6.x`（业务内聚专项 H 系列，已合并）· `v0.7.x`（Maven 迁移 X 系列，已合并）· **`v0.8.x`（当前工作分支，N/P/C 系列 + 更名 RagAgent，2026-10-24 已与 `main` 同步）**。
 - 网络实录：本机↔github 的 https 不稳；用 `git -c http.version=HTTP/1.1 push …` + 重试。
 - 兼容边界：**系统未上线、无历史数据包袱、前端适配后端**（知识库模块三约束，全线适用）。
 
@@ -34,7 +34,7 @@
 3. **模块名 = 顶层包名**：契约面取**单数 `contract`**（不取方案字面的 `contracts`；理由见 `contract/pom.xml` 头注释，已登记）。
 4. **三个 runtime 平级、互不引用实现**；跨模块协作经 contract、由 boot 注入（方案 §5.2）。
 5. **域间只经契约（R10）**：①可清零档 = **0** ✅；②属主边 2 条（`auth→tenant`、`system→auth`）**登记维持**；③同族 5 条（agent 家族）**冻结**。
-6. **线格式（1,349 金片）逐字节不变**；协议变更属**产品决策**、不夹带（`check-contract-sync` 是执行面）。
+6. **线格式（1,346 金片）逐字节不变**；协议变更属**产品决策**、不夹带（`check-contract-sync` 是执行面）。
 7. **agent-engine 结论（2026-10-16 架构复核）**：**做**——但必须"**先建 `contract.agent` 契约面 + 工具 SPI，再搬 `domains/agent` 实现**"；不设计边界直接搬 = 把族内协作变成跨模块直连（比现状更差）。
 8. **platform 的"落点法则"作废**：v0.2.0 曾以"去不了契约的跨域件落 platform"补缺口；v0.3.0 起按 §4 判定标准——platform **不放业务形状**。
 9. **R1 余项判定（2026-10-16 拍板）**：`contract.retrieval` 缺口 **并入 R3**（域侧直注的是实现类，索引面签名穿透 `Embedder`{模型族}与可变 setter `IndexInfo`）；`contract.agent` 6 件 **并入 R5**（今日跨域消费者仅 boot 一处测试）；`contract.execution` **判"不建"**（取消/元数据已存在于 `contract.tool.ToolCancellation`/`ToolExecContext`，再建即三套取消语义并存）。
@@ -42,7 +42,7 @@
 ## 3. 三条红线（本版口径）
 
 1. **载体红线**：不得上提持久化实体（`@TableName`/TypeHandler/可变 setter）到 L1；contract 不放**内部件/持久化形状**；platform 不放**业务形状**。
-2. **线格式红线**：金片签名 1,349 逐字节不变；确需变更 ⇒ 显式签字 + 前端确认（产品决策）。
+2. **线格式红线**：金片签名 1,346 逐字节不变；确需变更 ⇒ 显式签字 + 前端确认（产品决策）。
 3. **纪律红线**：**不刷新 baseline 掩盖违例**；**守卫必须能红**（新增/改守卫必配红态探针）；**闸门退出码显式取用**（任何 `| head` 不得代替）。
 
 ## 4. 两条判定标准（2026-10-16 拍板 ★ 本版核心）
@@ -91,7 +91,7 @@
 
 **新增守卫**（各配红态探针）：`check-comment-narrative` / `check-doc-truth` / `check-controller-purity` / `check-pipeline-map` / `check-known-gaps`；另加 `scripts/readability-report.py` 输出 6 个指标。
 
-### 5.0b 下一阶段（已立项，待启动）：v0.6.0「业务内聚专项」（H 系列）
+### 5.0b v0.6.0「业务内聚专项」（H 系列，主体已落地，尾巴见下表）
 
 > 完整方案：`docs/internal/plans/architecture-remediation-v0.6.0.md`。
 > 同日评估（现状盘点与 G 系列出处）：`docs/internal/plans/architecture-assessment-2026-10-20.md`。
@@ -103,7 +103,7 @@
 | **H1a** | 问答终态单赢家：`TurnLifecycle`（收尾闸门 + SSE/续传两处观察者口径） | ✅ 2026-10-20 |
 | **H1b** | H1b-1 ✅ 去 `controller.sse` 反向依赖；H1b-2 收锁与状态持久化 待做 | H1b-1 ✅ 2026-10-20 |
 | **H2a** | 问答运行时段：抽 `TurnRuntime`（3 字段） | ✅ 2026-10-20 |
-| **H2b** | H2b-1 ✅ 只读视图；H2b-2 ✅ 插件签名改 `PipelineState`（插件包 0 处 `ChatManage` 引用）；H2b-3 `QaRequestContext` 收口 待做 | H2b-2 ✅ 2026-10-20 |
+| **H2b** | H2b-1 ✅ 只读视图；H2b-2 ✅ 插件签名改 `PipelineState`（插件包 0 处 `ChatManage` 引用）；H2b-3 ✅ `QaRequestContext` 收口（P1.7，2026-10-21） | H2b 全部 ✅ |
 | **H2c** | 状态段六组全部抽离（Answer / Rerank / Merged / QueryPlan / Entity / SearchOutcome）；`ChatManage` 只剩 history / usedMemories 等流转字段 | ✅ 2026-10-20 |
 | **H3** | ✅ H3-1 阶段枚举/尝试状态 + H3-2 迁移收口；**两项核验后不做**：`KnowledgeTaskExecutor` 是 8 个服务的通用执行器（删了会回退 G4），5 个 stage 的通用接口需 god `IngestContext` 且与 `IngestJob` 重复 | ✅ 2026-10-20 |
 | **H4a** | 任务契约：`TaskQueue`（命名/启停/测试钩子）+ `RetryDelayOverride`；6 套队列接口继承；钩子机制 5→1。H4b 迁实现 | H4a-1 ✅ 2026-10-20 |
@@ -234,14 +234,14 @@
   ```bash
   cd ~/ragagent && env -u SYSTEM_AES_KEY JAVA_HOME=/opt/homebrew/opt/openjdk@21 mvn -B verify
   ```
-  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（最近基数 **5062 / 失败 0 / 跳过 2**，含 agent-engine 155 条——旧口径 4867 漏算该模块）。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
+  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（最近基数 **5082 / 失败 0 / 跳过 2**，2026-10-24 实测；含 agent-engine 157 条——旧口径 4867 漏算该模块）。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
   **环境前置**：PG `max_connections=100`，多个 boot jar 残留会占满连接（实测 5 个实例 = 50 条 ⇒ `too many clients`）。跑闸门前先 `ps -Ao pid,command | grep '[b]oot/build/libs/boot'` 清残留。
 - **dev 数据修复（2026-10-20）**：软删守卫误拦窗口（H5b~H5b-fix 之间）里生成失败的 5 条 embed 历史回答，已按会话用 embed `ensure` 补建 `message_suggestion_sets`（状态 `suppressed/disabled`，该智能体追问关闭）；全库 embed 历史已无「缺建议集合」行。
 - 前端（触契约时）：`cd frontend && npx vue-tsc --build --force` + `npm test`。
 
 ## 7. 测试与安全网
 
-- 回归网：**~5062 用例 / 1,349 契约金片**；每一步（哪怕纯移动）结束必须全绿。
+- 回归网：**~5082 用例 / 1,346 契约金片**；每一步（哪怕纯移动）结束必须全绿。
 - 已知偶发（全量并发下，单独重跑即绿，勿误判回归）：`WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool` · `EvaluationContractTest.getTerminalRunsExecution` · `EmbedRateLimiterTest.redisPathSharesBudgetAcrossInstances`。
 - **Redis 瞬态族已修（2026-10-19）**：根因是 `EmbeddedRedis` 用 `ServerSocket(0)` 探端口在 `maxParallelForks` 下会撞——后到者借用先到者的实例，先到者 close 杀进程后连接全断。现改为固定端口池 + 跨进程 `FileLock`，红态探针 `EmbeddedRedisPortAllocationTest` 守着；全量连跑 5 遍 0 失败。再见到同类失败按真回归查。
 - 覆盖率：**未执行基线**（`-Pcoverage`）⇒ 本项目**不声称任何覆盖率数字**（开放项）。
@@ -254,24 +254,24 @@
 > 计数口径：`<模块>/src/main/java/**/*.java`，**不含 package-info**（2026-10-16 R5a 后实测）。
 
 ```
-现状（R6 后）                              目标（方案 §5.1）
-contract      323 件（纯 JDK，零依赖块）  →  contracts/
-platform      159 件（技术适配 + 追踪装饰/流句柄/共享传输 + 提示词/配置）→ platform/
-model-runtime 132 件（llm · modelruntime · embedding · rerank ·
-                 modelcontext 12 · vlm 2 · application 装配面）
-                                        →  model-runtime（已成；余 R2c-3d 少量过渡边）
-retrieval-engine 80 件（engine 67 · support 7 · 根 5 · graph/artifact/config/telemetry）
-                                        →  retrieval-engine（已成；R3 收官）
-agent-engine   57 件（tool 23 · compaction 12 · prompt 11 · skills 9 · budget 4 · domain/根 21）
-                                        →  agent-engine（已成；R5b/R5c 以 `contract.agent` 收窄消费面）
-domains      1261 件（knowledge 240 · session 165〔含 rag 43〕· wiki 158 · mcp 131 ·
-                 datasource 127 · auth 88 · memory/im 各 80 · agenttools 58 · …）
-                                        →  domains（R5b/R5c 端口化后消费面再收）
-boot           14 件                      →  boot
+现状（2026-10-24 实测，含 C 系列还乡）      目标（方案 §5.1）
+contract      293 件（纯 JDK，零依赖块）  →  contracts/
+platform      174 件（技术适配 + 追踪装饰/流句柄/共享传输 + 提示词/配置）→ platform/
+model-runtime 134 件（llm 52 · modelruntime 39 · embedding 19 ·
+                 modelcontext 12 · rerank 12）
+                                        →  model-runtime（已成）
+retrieval-engine 80 件（engine 69 · 根 4 · graph 3 · support/artifact/config/telemetry 各 1）
+                                        →  retrieval-engine（已成）
+agent-engine   63 件（根 19 · tool 15 · compaction 11 · skills 8 · prompt 7 · budget 2 · domain 1）
+                                        →  agent-engine（已成）
+domains      1366 件（knowledge 232 · session 182〔含 rag 50〕· mcp 155 · wiki 145 ·
+                 datasource 128 · auth 104 · im 88 · memory 77 · agenttools 53 · …）
+                                        →  domains
+boot           17 件                      →  boot
 
 依赖方向：boot → 全部；domains / 三个 runtime → platform, contract；platform → contract；contract → JDK
 （**`:engine` 已解散**：chatpipeline → `domains/session/service/rag`、webfetch/抓取面 → `domains/websearch/fetch`
- ⇒ 旧的 `api(:model-runtime)`/`api(:retrieval-engine)` 传递边随模块消失；domains/boot/boot 显式声明
+ ⇒ 旧的 `api(:model-runtime)`/`api(:retrieval-engine)` 传递边随模块消失；domains/boot 显式声明
   各 runtime（含 R5a 的 `:agent-engine`，domains 那条是**过渡边**待 R5b/R5c 收窄）
  ——其中 domains→model-runtime 是**过渡边**，待 R2c-3d 余项收完）
 ```
@@ -284,10 +284,10 @@ boot           14 件                      →  boot
 
 | 守卫 | 语义 | 基线 |
 |---|---|---|
-| `check-package-cycles.py` | 环/分层/域依赖/SCC（R1~R9） | `package-cycles.baseline.json`（只许减；SCC 12 组） |
+| `check-package-cycles.py` | 环/分层/域依赖/SCC（R1~R9） | `package-cycles.baseline.json`（只许减；包级 SCC 5 组） |
 | `check-domain-contracts.py` | **R10 域间只经契约**（分档①②③） | `domain-contracts.baseline.json`（**6 条边 / 27 类**；clearable 0） |
 | `check-contract-purity.py` | C1 导入根（纯 JDK）· C2 构建依赖 · C3 框架形状 | 硬零，无基线 |
-| `check-contract-sync.py` | 金片键签名变化必须签字 | 1,349 金片 |
+| `check-contract-sync.py` | 金片键签名变化必须签字 | 1,346 金片 |
 | `check-json-key-case.py --strict` | 换锚棘轮 + 冻结覆盖快照 | 冻结面登记 |
 | `check-event-face-case.py` | 事件面/路由面命名口径 | — |
 | `check-file-size.py` | 大文件棘轮（>600 棘轮，≥800 须登记） | `file-size.baseline.json` |
@@ -301,8 +301,8 @@ boot           14 件                      →  boot
 | `check-exception-semantics.py` | 检索引擎 catch 不得清空边界条件 | 0 |
 | `check-package-dirs.py` | 包声明 ↔ 目录一致（含 testFixtures） | 0 |
 | `check-module-graph.py` | 主码依赖矩阵 · 同包 · 测试边登记 · 测试错位登记 · 夹具包 | 登记表（只许减） |
-| `check-platform-shapes.py` | platform 业务形状（业务词包 / 业务词文件 / 红旗命名三档） | `platform-shapes.baseline.json`（16 条） |
-| `check-contract-shape.py` | R1/R2 契约形状预算（端口 ≤7 方法 / 行视图禁入 / 字段 ≤20） | `contract-shape.baseline.json`（22 条，只许减） |
+| `check-platform-shapes.py` | platform 业务形状（业务词包 / 业务词文件 / 红旗命名三档） | `platform-shapes.baseline.json`（15 条） |
+| `check-contract-shape.py` | R1/R2 契约形状预算（端口 ≤7 方法 / 行视图禁入 / 字段 ≤20） | `contract-shape.baseline.json`（19 条 = 端口 4 / 行视图 7 / 字段 8，只许减） |
 | `gen-contract-consumers.py --check` | 每个 public 契约类型至少有一个消费者（跨模块 import 或 contract 内同包引用） | 硬零 |
 | `check-port-budget.py` | R1 端口准入（域内 / 无实现端口 = 0） | `port-budget.baseline.json`（空） |
 | `gen-arch-index.py --check` | `package-info` 与 `docs/architecture/packages.md` 同步 | 硬零 |
@@ -312,7 +312,29 @@ boot           14 件                      →  boot
 | `check-internal-codes.py` | 主码注释禁止批次号/裸日期戳（ISO-8601 时间示例保留）；旧夹具名不得回流 | 硬零 |
 | `gen-module-map.py --check` | 模块/包根、业务域文件/控制器数量与 `module-package-map.md` 同步 | 硬零 |
 | `check-version-consistency.py` | Boot/springdoc/MyBatis-Plus jsqlparser/README/wrapper/Dockerfile 版本一致 | 硬零 |
+| `check-method-length.py` | 方法长度棘轮（>150 行只许减，新增即红） | `method-length.baseline.json`（只许减） |
+| `check-wiring-points.py` | 装配点清单（W1~W4：@Configuration 必须登记；分类/理由/overview 三处一致） | `wiring-points.baseline.json` |
+| `check-doc-truth.py` | 文档事实（README 的模块数/控制器数/package-info 覆盖率必须与代码一致） | 硬零 |
+| `check-known-gaps.py` | 已知缺口（类注释声明缺口必须指向 `docs/known-gaps.md`） | 硬零 |
+| `check-log-level.py` | 日志级别（warn 不用于 404 / 跳过语义） | 硬零 |
+| `check-controller-purity.py` | 控制器纯度（HTTP 面只编排：禁直连 Mapper；裸转发 catch 只许减） | `controller-catch.baseline.json`（只许减） |
+| `check-route-policy.py` | 路由权限覆盖（未登记公开路由/幽灵规则/对照表过期） | `route-policy.baseline.json`（384 路由 / 372 规则） |
+| `check-controller-entity-imports.py` | 控制器实体导入（C10：只许降） | `controller-entity-imports.baseline.json`（0 / 0） |
+| `check-ingest-flow.py` | 入库链路文档（`ingest-flow.md` 引用的类必须存在） | 硬零 |
+| `gen-pipeline-map.py --check` | 管线事件表（`pipeline-map.md` 必须与插件代码同步） | 硬零 |
+| `gen-port-map.py --check` | Port 对照表（`port-map.md` 必须与接口/实现/调用方同步） | 硬零 |
+| `check-qa-flow.py` | 链路文档（`qa-flow.md` 引用的类必须存在） | 硬零 |
+| `check-schema-parity.py` | schema 对账（TestSchema 建表 vs migrations/versioned） | 硬零（55 张表） |
+| `check-reference-truth.py` | 引用真实性（package-info/公开文档不得断链、旧包名、死路径） | 硬零 |
+| `check-capability-kinds.py` | 能力种类边界（跨 kind 直连禁止；同 kind 允许） | 硬零 |
+| `check-package-info-fields.py` | 业务域 package-info 四要素（种类/入口/契约面/依赖） | 硬零 |
+| `check-package-size.py` | 业务域包规模（>30 只许降；26-30 报警） | `package-size.baseline.json` |
+| `check-comment-narrative.py` | 迁移叙事棘轮（注释只讲现在，不写迁移史） | `comment-narrative.baseline.json`（0） |
+| `check-comment-decor.py` | 注释装饰（禁止整行横线分隔，统一 `// ── 段名 ──`） | 硬零 |
+| `gen-domain-index.py --check` | 业务域索引（`domain-index.md` 必须与分类/源码同步） | 硬零 |
 | ArchUnit `ArchitectureRulesTest` | A1~A20（含 A16/A17 边界禁令、A18 状态所有权、A19 分层、A20 装配契约） | 各基线只许减 |
+
+> 守卫总数以 `scripts/run-guards.sh` 的 `run` 行数为准（当前 48 条）；本表是语义索引，二者增删要同步。
 
 ## 9. 落刀方法论（精要；**全量判据见归档 v0.2.0 §13/§14**）
 
@@ -587,6 +609,7 @@ boot           14 件                      →  boot
 | P1.10 | 2026-10-22 | **websearch 配置收口（N8c）**：从 `contract.tenant.WebSearchConfig` 删除 `provider` / `apiKey`——凭据与 provider 归 `web-search-providers` 表；租户 KV 只留 maxResults、compression、blacklist、proxy、embedding/rerank、documentFragments。`TenantConfigRedaction` 去掉 apiKey 清空/preserve；`WebSearchTool` 不再从租户配置取内联凭据；执行面 `WebSearchService.WebSearchConfig` 的 provider/apiKey 保留给 L2 直接调用（`WebSearchRequest`），租户路径不再产生。 | `TenantConfigRedactionTest` 13 + `JsonContractRoundTripTest` 35 + 租户契约 10 用例绿 · 48 守卫绿 · `mvn -B clean verify` 绿（5071 / 0 / 2） |
 
 | P1.11 | 2026-10-22 | **parser 配置归位（N8b）**：KB 级 `chunking_config.parserEngineRules` 此前 worker 固定传 `parserEngine=null`，UI 上的规则是空操作。`KnowledgeTextExtractor` 注入 `KnowledgeBaseRepository`，按文件类型解析**显式命中**的规则并传给 `DocReaderClient.read`；未命中保持服务端默认（不注入 ppt/pptx 的 markitdown 默认，避免改变既有行为）。`ChunkingConfigView.inactiveKeys` 删除 `parserEngineRules` 项，能力矩阵不再把它标成未生效。三层作用域写进 `ParserEngineConfig` javadoc：agent 上传首层 / KB 入库 / 租户历史兜底。 | 新增 3 条规则解析测试（命中/未命中/缺 KB）· 能力矩阵 5 用例绿 · 48 守卫绿 · `mvn -B clean verify` 绿（5074 / 0 / 2） |
+| —（2026-10-24 补记） | 2026-10-22~24 | **C2f 之后 16 个提交的概要回填**（未逐批立户，细节见各提交信息）：① `d9f4020c1` **更名 RagAgent**——mcp 模块/命令/环境变量同步；② `f29bb72ac`/`9310eb7f5`/`abbf07907` 三连文档同步（项目/文档/邮箱切 pmbilly/ragagent、补六篇配置接入文档、域数量/IM 渠道/actuator 端点）；③ `5d04bb482`/`1ae44b84b`/`697914b08` CI Redis 测试沉淀为本机固定 dir 实例 + 连接级 PING 就绪；④ `323ce722c` 前端品牌资源与文案切 RagAgent（widget 脚本改名 `ragagent-widget.js`）；⑤ `f1df2705c` 发布渠道分组、创建按钮、LOGO、技能抽屉与加载态统一；⑥ `c131d4e78` **主应用四语言接入**（es-ES/pt-BR/th-TH/zh-HK，embed 面九语言）+ **SSE 断流兜底**（`streamErrorFrame`/`streamRecovery`，断连补拉历史）+ **会话删除修复**（含托管行批量删，`SessionServiceDeleteTest`）；⑦ `8c3ccffb8` 精简系统提示词，46 系金片（agent-46/46b、chat-pipeline-46c、modelcontext-46a）内容更新并重签 sha256；⑧ `ac027f474`/`cce0a34e1` 列表类工具历史保留正文摘录/完整输出，消除反复翻页（先 grep 后精读）；⑨ `60aa93a59` 工具执行收敛提示（证据足够即作答）；⑩ `ed19372eb` 引导批量读取 chunk、禁止逐条精读；⑪ `99f4f720e` currentTime 断言兼容 UTC 的 Z 偏移。**行为面提示**：⑦~⑩ 改变 agent 提示词与工具输出保留策略，属线格式内 contract 文本变更（金片已重签）。 | 46 系金片 sha256 重录 · 各提交独立绿 · 全量基线刷新见 §6（2026-10-24 实测） |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
@@ -595,10 +618,10 @@ boot           14 件                      →  boot
 | 文档 | 用途 |
 |---|---|
 | `HANDOFF.md`（本文） | **唯一指挥面**：现状 / 批次表 / 判定标准 / 纪律 / 环境 / 方法论精要 |
-| `docs/java-remediation-plan-2026-10-13.md` | 整改方案（目标结构/状态所有权/规则的出处） |
-| `docs/java-remediation-implementation-plan-v2-2026-10-16.md` | **v0.3.0 执行计划（P/R 批次全部细节与验收）** |
-| `docs/java-remediation-implementation-plan-2026-10-13.md` | v1 历史（36 批已完成；已标注归档） |
-| `docs/java-remediation-implementation-plan-review-2026-10-13.md` | v1 实施评审（P0-3 模块提取立项出处） |
+| `docs/internal/plans/java-remediation-plan-2026-10-13.md` | 整改方案（目标结构/状态所有权/规则的出处） |
+| `docs/internal/plans/java-remediation-implementation-plan-v2-2026-10-16.md` | **v0.3.0 执行计划（P/R 批次全部细节与验收）** |
+| `docs/internal/plans/java-remediation-implementation-plan-2026-10-13.md` | v1 历史（36 批已完成；已标注归档） |
+| `docs/internal/plans/java-remediation-implementation-plan-review-2026-10-13.md` | v1 实施评审（P0-3 模块提取立项出处） |
 | `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md` | v0.2.0 全文（结构规范/方法论全量/逐批记录） |
 | `docs/internal/handoff/archive/HANDOFF-v0.1.0-2026-10-13.md` | v0.1.0 全文（远古追溯） |
 | `docs/internal/handoff/records/batch-records.md` | v0.1.0 早期逐批记录（~B110） |

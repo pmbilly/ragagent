@@ -8,8 +8,8 @@
 
 **原因**：服务自己就是消费者：
 
-- `KnowledgeProcessWorker implements KnowledgeProcessingQueue`（`domains/.../knowledge/task/KnowledgeProcessWorker.java:77`）；
-- `DataSourceService implements DataSourceSyncHandler`（`domains/.../datasource/service/DataSourceService.java:89`）。
+- `KnowledgeProcessWorker implements KnowledgeProcessingQueue`（`domains/.../knowledge/task/KnowledgeProcessWorker.java:70`）；
+- `DataSourceService implements DataSourceSyncHandler`（`domains/.../datasource/service/DataSourceService.java:90`）。
 
 队列接口是给**跨域调用方**用的端口；实现类同时提供入队与执行。Go 时代的 service 结构就是"方法即处理器"，迁移时保留了这一形态。
 
@@ -60,7 +60,7 @@
 
 ## 5. 事务边界：整轮问答不开事务，多表写才开
 
-**现象**：`domains/.../session` 没有 `@Transactional`；knowledge/wiki 的仓储层有；`auth` 只有 `UserService.register` 一处（租户→用户→Owner 成员行）；另有少量 `TransactionTemplate`（`StorageBackendService`、`VectorStoreConfigService`）。
+**现象**：`domains/.../session` 没有 `@Transactional`；knowledge/wiki 的仓储层有；`auth` 只有 `UserRegistrationService.register` 一处（租户→用户→Owner 成员行，`UserService.register` 是它的纯委托门面）；另有少量 `TransactionTemplate`（`StorageBackendService`、`VectorStoreConfigService`）。
 
 **原因**：一轮问答横跨 LLM 流式输出（数秒到数分钟）、外部调用与 SSE。把整轮包进一个事务会长时间持锁，且外部副作用无法回滚。因此：
 
@@ -75,7 +75,7 @@
 2. 多表一致性用 `@Transactional(rollbackFor = Exception.class)`；best-effort 清理不要加（失败语义会从"尽力"变成"整批回滚"）。
 3. 同类自调用（`this.method()`）上 `@Transactional` 不生效；需要时用独立 bean（参照 `MemoryTxTemplate`）。
 
-**去哪改**：`UserService.register`、`QaTurnFinalizer`、各域 repository、`StorageBackendService`。
+**去哪改**：`UserRegistrationService.register`、`QaTurnFinalizer`、各域 repository、`StorageBackendService`。
 
 ## 6. 身份不随虚拟线程传播
 
@@ -142,7 +142,7 @@ Thread.ofVirtual().start(() -> TenantScope.run(snap, () -> {
 
 ## 10. 可选 Bean：缺失时的行为一览
 
-全仓 77 处 `ObjectProvider.getIfAvailable()`——IDE 在注入点只看到接口，所以"缺 bean 时会发生什么"必须查表，不能靠猜。
+全仓 78 处 `ObjectProvider.getIfAvailable()`——IDE 在注入点只看到接口，所以"缺 bean 时会发生什么"必须查表，不能靠猜。
 
 | 可选 Bean | 缺失后果 | 有日志？ | 依据 |
 |---|---|---|---|

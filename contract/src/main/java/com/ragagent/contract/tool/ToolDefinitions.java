@@ -46,10 +46,10 @@ public final class ToolDefinitions {
     public static final String TOOL_LIST_SANDBOX_FILES = "list_sandbox_files";
     public static final String TOOL_WRITE_SANDBOX_FILE = "write_sandbox_file";
     public static final String TOOL_EDIT_SANDBOX_FILE = "edit_sandbox_file";
-    /** 内建 skill 安装器专用的 skill 树写入（/opt/weknora/tenant/skills）。 */
+    /** 内建 skill 安装器专用的 skill 树写入（skill 资源经 {@code read_file} 的 skill:// scheme 读取）。 */
     public static final String TOOL_WRITE_SKILL_FILE = "write_skill_file";
     public static final String TOOL_EDIT_SKILL_FILE = "edit_skill_file";
-    /** 会话 sandbox 内的临时 shell（后端声明会话 shell 能力时才注册；命令从不在 WeKnora 主机跑）。 */
+    /** 会话 sandbox 内的临时 shell（后端声明会话 shell 能力时才注册；命令从不在应用主机跑）。 */
     public static final String TOOL_SHELL_EXEC = "shell_exec";
     // Wiki 相关（作用域里有 wiki KB 时才可用）
     public static final String TOOL_WIKI_READ_PAGE = "wiki_read_page";
@@ -77,7 +77,7 @@ public final class ToolDefinitions {
 
     /**
      * 暴露给 UI 的工具清单（数组序即输出序，
-     * JSON 键序 name/label/description；22 条逐字节为契约）。
+     * JSON 键序 name/label/description；21 条逐字节为契约）。
      */
     public static List<AvailableTool> availableToolDefinitions() {
         return List.of(
@@ -118,7 +118,7 @@ public final class ToolDefinitions {
     }
 
     /**
-     * 被移除工具的替代指引；从未是 WeKnora 工具的名字返回 ""。
+     * 被移除工具的替代指引；不是已知被移除工具的名字返回 ""。
      * 文案逐字为契约（含反引号路径）。
      */
     public static String retiredToolReplacement(String name) {

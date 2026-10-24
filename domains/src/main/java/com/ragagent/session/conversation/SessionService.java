@@ -330,7 +330,7 @@ public class SessionService {
 
     /**
      * 先按读路径的可见性加载（404 门槛，管理员可命中渠道托管行），
-     * 再做三件套清理（知识 / 临时 KB / 建议 / sandbox），最后软删。
+     * 再做「每会话清理」（知识 / 临时 KB）后软删；建议只在批量 / 全量路径清理，单删不动。
      */
     public void deleteSession(String id) {
         if (id == null || id.isEmpty()) {
@@ -439,8 +439,8 @@ public class SessionService {
     }
 
     /**
-     * 单个删除 / 批量删除会话共用的「每会话清理」三件套
-     * （知识 / 临时 KB / sandbox；建议删除在软删之后）。
+     * 单删 / 批量 / 全量删除共用的「每会话清理」两件（知识 / 临时 KB）；
+     * 建议删除由批量与全量路径在软删之后另行处理。
      *
      * <p><b>实现边界</b>：知识清理是同步尽力而为——删除请求会等
      * 知识清完才返回，HTTP 契约不变。临时 KB 清理（{@code DeleteWebSearchTempKBState}）失败被吞，
