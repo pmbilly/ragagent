@@ -478,11 +478,10 @@ final class RbacRoutePolicies {
         rbac.addRule("POST", "/api/v1/agents/*/copy", TenantRole.CONTRIBUTOR, false);
         rbac.addRule("GET", "/api/v1/agents/*/suggested-questions", TenantRole.VIEWER, false);
 
-        // ── initialization 三条 ──
-        // GET=KBAccessRead（Viewer+）；POST/PUT=OwnedKBOrAdmin + KBAccessWrite
+        // ── initialization 两条（模型写只走 /models 主资源，Admin+） ──
+        // GET=KBAccessRead（Viewer+）；PUT=OwnedKBOrAdmin + KBAccessWrite
         //（与 PUT /knowledge-bases/:id 同矩阵：CONTRIBUTOR 下限，所有权判定在控制器内）。
         rbac.addRule("GET", "/api/v1/initialization/config/*", TenantRole.VIEWER, false);
-        rbac.addRule("POST", "/api/v1/initialization/initialize/*", TenantRole.CONTRIBUTOR, false);
         rbac.addRule("PUT", "/api/v1/initialization/config/*", TenantRole.CONTRIBUTOR, false);
 
         // ── initialization 系统级 8 条（ollama 6 条已归 model） ──

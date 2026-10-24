@@ -178,22 +178,6 @@ export function updateKBConfig(kbId: string, config: KBModelConfigRequest): Prom
     });
 }
 
-// 根据知识库ID执行配置更新（旧版，保留兼容性）
-export function initializeSystemByKB(kbId: string, config: InitializationConfig): Promise<any> {
-    return new Promise((resolve, reject) => {
-        console.log('Starting KB config update...', kbId, config);
-        post(`/api/v1/initialization/initialize/${kbId}`, config)
-            .then((response: any) => {
-                console.log('KB config update completed', response);
-                resolve(response);
-            })
-            .catch((error: any) => {
-                console.error('Failed to update KB config:', error);
-                reject(error.error || error);
-            });
-    });
-}
-
 // 检查Ollama服务状态
 export function checkOllamaStatus(): Promise<{ available: boolean; version?: string; error?: string; baseUrl?: string }> {
     return new Promise((resolve, reject) => {

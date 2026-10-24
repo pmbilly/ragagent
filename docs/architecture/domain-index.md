@@ -13,7 +13,7 @@
 | **集成适配** | 6 | 563 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
 | **控制面** | 3 | 160 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
 | **能力配置** | 2 | 58 | 5 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
-| **初始化向导** | 1 | 12 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
+| **初始化向导** | 1 | 11 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
 
 ## 域明细
 
@@ -37,7 +37,7 @@
 | `system` | 控制面 | 18 | 2 | 1 | `views/settings/panels` |
 | `model` | 能力配置 | 38 | 4 | 2 | `views/settings/ModelSettings.vue` |
 | `vectorstore` | 能力配置 | 20 | 1 | — | `views/settings/VectorStoreSettings.vue` |
-| `initialization` | 初始化向导 | 12 | 1 | — | `views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue` |
+| `initialization` | 初始化向导 | 11 | 1 | — | `views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue` |
 
 > 文件数含 `package-info`，与 `module-package-map.md` 同口径；契约面含 `*Port` 与 `*Gateway`（后者在 C5b 统一为 `*Port`）。
 

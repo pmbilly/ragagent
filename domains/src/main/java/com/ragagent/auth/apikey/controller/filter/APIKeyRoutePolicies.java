@@ -96,11 +96,9 @@ public final class APIKeyRoutePolicies {
         a.registerGin("POST", "/api/v1/agents/:id/copy", agWrite);
         a.registerGin("GET", "/api/v1/agents/:id/suggested-questions", agRead);
 
-        // initialization 三条（KB 依赖属 knowledge 域）
+        // initialization 两条（KB 依赖属 knowledge 域；模型写只走 /models 主资源）
         a.registerGin("GET", "/api/v1/initialization/config/:kbId",
                 APIKeyRoutePolicy.retrieve(agFull));
-        a.registerGin("POST", "/api/v1/initialization/initialize/:kbId",
-                APIKeyRoutePolicy.manageKnowledgeBases(agFull));
         a.registerGin("PUT", "/api/v1/initialization/config/:kbId",
                 APIKeyRoutePolicy.manageKnowledgeBases(agFull));
 

@@ -1,4 +1,4 @@
 /**
- * initialization 的响应装配类型（{@link com.ragagent.initialization.dto.InitResponses}）。
+ * initialization 的模型视图投影（{@link com.ragagent.initialization.dto.ModelViews}）。
  */
 package com.ragagent.initialization.dto;

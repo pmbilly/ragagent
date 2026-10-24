@@ -46,6 +46,7 @@ class AgentContractTest {
     private static final String KN_FAQ = "a0000000-0000-0000-0000-000000000201";
     private static final String CH_FAQ = "a0000000-0000-0000-0000-000000000301";
     private static final String MD_LLM = "a0000000-0000-0000-0000-000000000401";
+    private static final String MD_EMB = "a0000000-0000-0000-0000-000000000405";
     private static final String MISSING = "99999999-9999-9999-9999-999999999999";
 
     private static final Pattern TS_PATTERN = Pattern.compile(
@@ -83,11 +84,11 @@ class AgentContractTest {
                 + "(?, 10005, 'owner', 'active'), (?, 10005, 'viewer', 'active')", AGU, AGV);
         jdbc.update("INSERT INTO knowledge_bases (id, name, tenant_id, type, description, creator_id, "
                 + "chunking_config, embedding_model_id, summary_model_id, created_at, updated_at) VALUES "
-                + "(?, 'ag-init-kb', 10005, 'document', 'kb for initialization batch', ?, '{}', '', '', "
+                + "(?, 'ag-init-kb', 10005, 'document', 'kb for initialization batch', ?, '{}', ?, '', "
                 + "'2026-09-01 08:00:00+00', '2026-09-01 08:00:00+00'),"
                 + "(?, 'ag-faq-kb', 10005, 'faq', 'kb for suggested questions', ?, '{}', '', '', "
                 + "'2026-09-01 08:00:00+00', '2026-09-01 08:00:00+00')",
-                KB_INIT, AGU, KB_FAQ, AGU);
+                KB_INIT, AGU, MD_EMB, KB_FAQ, AGU);
         jdbc.update("INSERT INTO knowledges (id, tenant_id, knowledge_base_id, type, title, "
                 + "description, source, parse_status, enable_status) VALUES "
                 + "(?, 10005, ?, 'faq', 'faq-knowledge', '', 'faq', 'completed', 'enabled')",
@@ -104,8 +105,14 @@ class AgentContractTest {
         jdbc.update("INSERT INTO models (id, tenant_id, type, name, source, description, parameters, "
                 + "is_default, status, created_at, updated_at) VALUES "
                 + "(?, 10005, 'KnowledgeQA', 'ag-fixed-llm', 'remote', 'LLM Model for Knowledge QA', "
-                + "'{}', FALSE, 'active', '2026-09-01 08:00:00+00', '2026-09-01 08:00:00+00')",
+                +                 "'{}', FALSE, 'active', '2026-09-01 08:00:00+00', '2026-09-01 08:00:00+00')",
                 MD_LLM);
+        jdbc.update("INSERT INTO models (id, tenant_id, type, name, source, description, parameters, "
+                + "is_default, status, created_at, updated_at) VALUES "
+                + "(?, 10005, 'Embedding', 'ag-fixed-embed', 'remote', 'Embedding Model', "
+                + "'{\"embeddingParameters\":{\"dimension\":1024}}', FALSE, 'active', "
+                + "'2026-09-01 08:00:00+00', '2026-09-01 08:00:00+00')",
+                MD_EMB);
         token = login("ag-batch@weknora.test");
         bearer = "Bearer " + token;
     }
@@ -253,31 +260,11 @@ class AgentContractTest {
         assertGolden(getH("/api/v1/initialization/config/" + KB_INIT, null), 401,
                 "init-get-config-noauth.json");
 
-        assertGolden(postH("/api/v1/initialization/initialize/" + KB_INIT, bearer,
-                INIT_REQUEST), 200, "init-post-initialize.json");
-        assertGolden(postH("/api/v1/initialization/initialize/" + MISSING, bearer,
-                INIT_REQUEST), 404, "init-post-initialize-404.json");
-        assertGolden(postH("/api/v1/initialization/initialize/" + KB_INIT, bearer, null),
-                400, "init-post-initialize-empty.json");
-        assertGolden(postH("/api/v1/initialization/initialize/" + KB_INIT, bearer,
-                "{\"llm\":{\"source\":\"remote\",\"modelName\":\"m\"},"
-                + "\"embedding\":{\"source\":\"remote\",\"modelName\":\"e\"},"
-                + "\"documentSplitting\":{\"chunkSize\":50,\"chunkOverlap\":50,\"separators\":[\"\\n\\n\"]}}"),
-                400, "init-post-initialize-chunksize.json");
-        assertGolden(postH("/api/v1/initialization/initialize/" + KB_INIT, bearer,
-                "{\"llm\":{\"source\":\"remote\",\"modelName\":\"m\",\"baseUrl\":\"http://127.0.0.1:11434\"},"
-                + "\"embedding\":{\"source\":\"remote\",\"modelName\":\"e\"},"
-                + "\"documentSplitting\":{\"chunkSize\":500,\"chunkOverlap\":50,\"separators\":[\"\\n\\n\"]}}"),
-                400, "init-post-initialize-ssrf.json");
-        assertGolden(postH("/api/v1/initialization/initialize/" + KB_INIT, bearer,
-                "{\"llm\":{\"source\":\"remote\",\"modelName\":\"m\"},"
-                + "\"embedding\":{\"source\":\"remote\",\"modelName\":\"e\"},"
-                + "\"rerank\":{\"enabled\":true,\"modelName\":\"rr\"},"
-                + "\"documentSplitting\":{\"chunkSize\":500,\"chunkOverlap\":50,\"separators\":[\"\\n\\n\"]}}"),
-                400, "init-post-initialize-rerank.json");
-
-        assertGolden(getH("/api/v1/initialization/config/" + KB_INIT, bearer), 200,
-                "init-get-config-after.json");
+        // 初始化写路径已下线：模型写只走 /models 主资源（Admin+、凭据脱敏）
+        MvcResult retired = mockMvc.perform(postH("/api/v1/initialization/initialize/" + KB_INIT,
+                bearer, "{}")).andReturn();
+        assertEquals(404, retired.getResponse().getStatus(),
+                "initialize 端点应已下线: " + raw(retired));
 
         // 种文档行（hasFiles=true）
         jdbc.update("INSERT INTO knowledges (id, tenant_id, knowledge_base_id, type, title, "
@@ -350,11 +337,6 @@ class AgentContractTest {
         + "\"maxContextTurns\":3,\"suppressOnFallback\":true,"
         + "\"suppressWhenAnswerAsksQuestion\":true,\"knowledgeFallback\":true,"
         + "\"allowRegenerate\":true}}}}";
-
-    private static final String INIT_REQUEST = "{"
-        + "\"llm\":{\"source\":\"remote\",\"modelName\":\"ag-init-llm\",\"baseUrl\":\"\",\"apiKey\":\"sk-init\"},"
-        + "\"embedding\":{\"source\":\"remote\",\"modelName\":\"ag-init-embed\",\"baseUrl\":\"\",\"dimension\":1024},"
-        + "\"documentSplitting\":{\"chunkSize\":500,\"chunkOverlap\":50,\"separators\":[\"\\n\\n\"]}}";
 
     // ═══════════════════ 基建 ═══════════════════
 

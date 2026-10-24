@@ -17,22 +17,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * initialization 路由：KB 配置/初始化 + 未保存模型的连通性预检 + 文本抽取。
+ * initialization 路由：KB 配置读写 + 未保存模型的连通性预检 + 文本抽取。
  * 守卫：JWT 侧 Viewer+/Admin+、API-Key 全部 manage_models(fullAccess)。
  *
- * <p>Ollama 管理端点已归 {@code /api/v1/models/ollama/**}（模型域）。</p>
+ * <p>Ollama 管理端点已归 {@code /api/v1/models/ollama/**}（模型域）。
+ * 模型的创建/修改只走模型主资源（{@code /api/v1/models/**}，Admin+，凭据脱敏）。</p>
  *
  * <p>守卫层次（golden 钉死顺序，不能重排）：</p>
  * <ol>
  *   <li>GET：KBAccessRead → {@code kbGuard.requireKbAccess}（缺失→404 "knowledge base
  *       not found" 信封、跨租户→403 信封——「知识库不存在」的业务文案在同租户路径
  *       不可达，录到的 404 全是中间件文案）。</li>
- *   <li>POST/PUT：OwnedKBOrAdminFromKbIDParam（缺失→404 守卫文案；存在但非创建者且非
+ *   <li>PUT：OwnedKBOrAdminFromKbIDParam（缺失→404 守卫文案；存在但非创建者且非
  *       Admin+ → 403 纯字符串）→ KBAccessWrite → handler。</li>
  * </ol>
  *
  * <p>降级路径：PUT 的 storageBackendId 解析分支（StorageBackendResolver）未实现——
- * 现场景全走 provider 兼容投影；POST 建的 model 行 tenant_id=0（不回填租户）。</p>
+ * 现场景全走 provider 兼容投影。</p>
  */
 @RestController
 @ApiResult
@@ -55,12 +56,6 @@ public class InitializationController {
     @GetMapping("/api/v1/initialization/config/{kbId}")
     public ResponseEntity<Object> getConfig(@PathVariable("kbId") String kbId) {
         return ResponseEntity.ok(configService.getConfig(kbId));
-    }
-
-    @PostMapping("/api/v1/initialization/initialize/{kbId}")
-    public ResponseEntity<Object> initialize(@PathVariable("kbId") String kbId,
-            @RequestBody(required = false) String rawBody) {
-        return ResponseEntity.ok(configService.initialize(kbId, rawBody));
     }
 
     @PutMapping("/api/v1/initialization/config/{kbId}")

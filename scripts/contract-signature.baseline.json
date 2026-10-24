@@ -2001,45 +2001,17 @@
    "f9d434d42098",
    3
   ],
-  "init-get-config-after.json": [
-   "c61f268ff589",
-   17
-  ],
   "init-get-config-hasfiles.json": [
-   "c61f268ff589",
-   17
+   "09b434cd1c56",
+   20
   ],
   "init-get-config-noauth.json": [
    "11f9578d05e6",
    1
   ],
   "init-get-config.json": [
-   "c61f268ff589",
-   17
-  ],
-  "init-post-initialize-404.json": [
-   "f9d434d42098",
-   3
-  ],
-  "init-post-initialize-chunksize.json": [
-   "f9d434d42098",
-   3
-  ],
-  "init-post-initialize-empty.json": [
-   "f9d434d42098",
-   3
-  ],
-  "init-post-initialize-rerank.json": [
-   "f9d434d42098",
-   3
-  ],
-  "init-post-initialize-ssrf.json": [
-   "f9d434d42098",
-   3
-  ],
-  "init-post-initialize.json": [
-   "156c194f0bc0",
-   84
+   "09b434cd1c56",
+   20
   ],
   "init-put-config-404.json": [
    "f9d434d42098",

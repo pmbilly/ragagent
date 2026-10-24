@@ -112,7 +112,6 @@
 | POST | `/api/v1/initialization/extract/fabri-tag` | ADMIN | `InitializationController` |
 | POST | `/api/v1/initialization/extract/fabri-text` | ADMIN | `InitializationController` |
 | POST | `/api/v1/initialization/extract/text-relation` | ADMIN | `InitializationController` |
-| POST | `/api/v1/initialization/initialize/{kbId}` | CONTRIBUTOR | `InitializationController` |
 | POST | `/api/v1/initialization/multimodal/test` | ADMIN | `InitializationController` |
 | POST | `/api/v1/initialization/remote/check` | ADMIN | `InitializationController` |
 | POST | `/api/v1/initialization/rerank/check` | ADMIN | `InitializationController` |

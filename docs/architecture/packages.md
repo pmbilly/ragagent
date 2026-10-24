@@ -145,7 +145,7 @@
 | `:domains` | `com.ragagent.im.service` | IM · 服务：ImChannelService / ImAttachmentPreparer / ImKnowledgeBridgeOps…。 |
 | `:domains` | `com.ragagent.initialization` | 初始化与能力自检域：/api/v1/initialization/* 的初始化配置、未保存模型的 连通性预检、文本抽取试验与语音识别（ASR）。 |
 | `:domains` | `com.ragagent.initialization.controller` | initialization 的 @RestController 薄层：端点注解与委托，逻辑在 service 协作者 （com.ragagent.initialization.controller. |
-| `:domains` | `com.ragagent.initialization.dto` | initialization 的响应装配类型（com.ragagent.initialization.dto.InitResponses）。 |
+| `:domains` | `com.ragagent.initialization.dto` | initialization 的模型视图投影（com.ragagent.initialization.dto.ModelViews）。 |
 | `:domains` | `com.ragagent.initialization.service` | initialization 用例实现：初始化配置（com.ragagent.initialization.service.InitializationConfigService）、 模型连通性测试、 |
 | `:domains` | `com.ragagent.knowledge` | 知识库域：知识的存储、处理管线与检索面。 |
 | `:domains` | `com.ragagent.knowledge.api` | 知识库 · 端口实现：KnowledgeChunkPipelineAdapter / KnowledgeBaseCatalogAdapter / KnowledgeFinalizeAdapter…。 |

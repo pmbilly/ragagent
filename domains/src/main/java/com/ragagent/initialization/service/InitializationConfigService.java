@@ -3,20 +3,15 @@ package com.ragagent.initialization.service;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.KnowledgeBaseResponse;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.config.AsrConfigView;
 import com.ragagent.contract.knowledge.config.ChunkingConfigView;
 import com.ragagent.contract.knowledge.config.VlmConfigView;
 import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.ModelView;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.initialization.dto.InitResponses;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.config.AppEnvLookup;
-import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.JsonBodies;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
@@ -29,9 +24,9 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 /**
- * initialization config/initialize 端点用例：KB 初始化配置读写、初始化装配与请求绑定。
+ * initialization config 端点用例：KB 配置读写与请求绑定。
  *
- * <p>initialization 薄层化的产物：端点注解留在 controller，方法体逐字迁移至此。</p>
+ * <p>模型资源的创建/修改不在此处——只走模型主资源（Admin+、凭据脱敏）。</p>
  */
 @Service
 public final class InitializationConfigService {
@@ -40,13 +35,11 @@ public final class InitializationConfigService {
 
     private final KnowledgeCatalogPort knowledgeCatalog;
     private final ModelCatalogPort modelCatalog;
-    private final SsrfGuard ssrfGuard;
 
     public InitializationConfigService(KnowledgeCatalogPort knowledgeCatalog,
-            ModelCatalogPort modelCatalog, SsrfGuard ssrfGuard) {
+            ModelCatalogPort modelCatalog) {
         this.knowledgeCatalog = knowledgeCatalog;
         this.modelCatalog = modelCatalog;
-        this.ssrfGuard = ssrfGuard;
     }
 
     // ── GET /initialization/config/:kbId ──
@@ -73,49 +66,6 @@ public final class InitializationConfigService {
             }
         }
         return configResponse(models, kb, hasFiles(kbId));
-    }
-
-    // ── POST /initialization/initialize/:kbId ──
-
-    public Map<String, Object> initialize(String kbId,
-            String rawBody) {
-        InitializationRequests.InitializationRequest req = InitializationRequests.bindInitializationRequest(rawBody);
-        KnowledgeBaseRowView kb = kbForWrite(kbId);
-        validateConfigs(req);
-
-        List<ModelView> processed = new ArrayList<>();
-        for (ModelDescriptor d : buildModelDescriptors(req)) {
-            ModelView model = toModel(d);
-            String existingId = findExistingModelId(kb, d.type());
-            ModelView existing = null;
-            if (!existingId.isEmpty()) {
-                try {
-                    existing = modelCatalog.getModelRow(existingId);
-                } catch (Exception ignored) {
-                    existing = null;
-                }
-            }
-            if (existing != null) {
-                existing.setName(model.getName());
-                existing.setSource(model.getSource());
-                existing.setDescription(model.getDescription());
-                existing.setParameters(model.getParameters());
-                modelCatalog.updateModel(existing);
-                processed.add(existing);
-            } else {
-                modelCatalog.createModel(model);
-                processed.add(model);
-            }
-        }
-        applyInitialization(kb, req, processed);
-        saveKb(kb);
-
-        Map<String, Object> data = new TreeMap<>();
-        data.put("knowledgeBase", KnowledgeBaseResponse.from(kb, knowledgeCatalog.retrieveDriver()));
-        // 自有契约：api_key 留在 parameters、无 credentials 键
-        data.put("models", processed.stream().map(InitResponses::rawModel).toList());
-        data.put("message", "知识库配置更新成功");
-        return data;
     }
 
     // ── PUT /initialization/config/:kbId ──
@@ -281,23 +231,12 @@ public final class InitializationConfigService {
         return out;
     }
 
-    // ── 绑定 ──
 
 
 
 
 
     // ── 守卫与校验 ──
-
-    private KnowledgeBaseRowView kbForWrite(String kbId) {
-        knowledgeCatalog.requireKbAccess(kbId);
-        requireOwned(kbId);
-        KnowledgeBaseRowView kb = knowledgeCatalog.getAllTenantById(kbId);
-        if (kb == null) {
-            throw new BizException(AppError.notFound("知识库不存在"));
-        }
-        return kb;
-    }
 
     private void requireOwned(String kbId) {
         KnowledgeBaseRowView kb = knowledgeCatalog.getAllTenantById(kbId);
@@ -311,176 +250,6 @@ public final class InitializationConfigService {
         String creator = kb.getCreatorId() == null ? "" : kb.getCreatorId();
         if (!admin && (creator.isEmpty() || !creator.equals(uid))) {
             throw BizException.forbidden("must own the resource or have the required role");
-        }
-    }
-
-    private void validateConfigs(InitializationRequests.InitializationRequest req) {
-        List<String[]> urls = new ArrayList<>();
-        urls.add(new String[] {"LLM BaseURL", req.llmBaseUrl()});
-        urls.add(new String[] {"Embedding BaseURL", req.embBaseUrl()});
-        urls.add(new String[] {"Rerank BaseURL", req.rerankBaseUrl()});
-        if (req.multimodal() != null && req.multimodal().get("vlm") != null) {
-            urls.add(new String[] {"VLM BaseURL", req.multimodal().path("vlm").path("baseUrl").asString("")});
-        }
-        for (String[] u : urls) {
-            if (!u[1].isEmpty()) {
-                try {
-                    ssrfGuard.validateURLForSSRF(u[1]);
-                } catch (Exception e) {
-                    throw new BizException(AppError.badRequest(
-                            ssrfGuard.formatSSRFError(u[0], u[1], e)));
-                }
-            }
-        }
-        if (req.multimodalEnabled()) {
-            JsonNode vlm = req.multimodal() == null ? null : req.multimodal().get("vlm");
-            if (vlm == null) {
-                throw new BizException(AppError.badRequest("启用多模态时需要配置VLM信息"));
-            }
-            String modelName = vlm.path("modelName").asString("");
-            String baseUrl = vlm.path("baseUrl").asString("");
-            if ("ollama".equals(vlm.path("interfaceType").asString(""))) {
-                String ollama = AppEnvLookup.get("OLLAMA_BASE_URL");
-                baseUrl = (ollama == null ? "" : ollama) + "/v1";
-            }
-            if (modelName.isEmpty() || baseUrl.isEmpty()) {
-                throw new BizException(AppError.badRequest("VLM配置不完整"));
-            }
-        }
-        if (req.rerankEnabled() && (req.rerankModelName().isEmpty() || req.rerankBaseUrl().isEmpty())) {
-            throw new BizException(AppError.badRequest("Rerank配置不完整"));
-        }
-        if (req.nodeExtractEnabled()) {
-            String neo4j = AppEnvLookup.get("NEO4J_ENABLE");
-            if (!"true".equalsIgnoreCase(neo4j == null ? "" : neo4j)) {
-                throw new BizException(AppError.badRequest("请正确配置环境变量NEO4J_ENABLE"));
-            }
-            if (req.nodeExtractText().isEmpty() || req.nodeExtractTags().isEmpty()) {
-                throw new BizException(AppError.badRequest("Node Extractor配置不完整"));
-            }
-            if (req.nodeExtractNodes().isEmpty() || req.nodeExtractRelations().isEmpty()) {
-                throw new BizException(AppError.badRequest("请先提取实体和关系"));
-            }
-        }
-    }
-
-    // ── 模型处理 ──
-
-    private record ModelDescriptor(String type, String name, String source, String description,
-            String baseUrl, String apiKey, int dimension, String interfaceType) {}
-
-    private List<ModelDescriptor> buildModelDescriptors(InitializationRequests.InitializationRequest req) {
-        List<ModelDescriptor> list = new ArrayList<>();
-        list.add(new ModelDescriptor("KnowledgeQA", req.llmModelName(), req.llmSource(),
-                "LLM Model for Knowledge QA", req.llmBaseUrl(), req.llmApiKey(), 0, ""));
-        list.add(new ModelDescriptor("Embedding", req.embModelName(), req.embSource(),
-                "Embedding Model", req.embBaseUrl(), req.embApiKey(), req.embDimension(), ""));
-        if (req.rerankEnabled()) {
-            list.add(new ModelDescriptor("Rerank", req.rerankModelName(), "remote",
-                    "Rerank Model", req.rerankBaseUrl(), req.rerankApiKey(), 0, ""));
-        }
-        if (req.multimodalEnabled() && req.multimodal() != null && req.multimodal().get("vlm") != null) {
-            JsonNode vlm = req.multimodal().get("vlm");
-            list.add(new ModelDescriptor("VLLM", vlm.path("modelName").asString(""), "remote",
-                    "VLM Model", vlm.path("baseUrl").asString(""), vlm.path("apiKey").asString(""),
-                    0, vlm.path("interfaceType").asString("")));
-        }
-        return list;
-    }
-
-    private ModelView toModel(ModelDescriptor d) {
-        ModelView m = new ModelView();
-        m.setType(d.type());
-        m.setName(d.name());
-        m.setSource(d.source());
-        m.setDescription(d.description());
-        ModelParameters p = new ModelParameters();
-        p.setBaseUrl(d.baseUrl());
-        p.setApiKey(d.apiKey());
-        p.setInterfaceType(d.interfaceType());
-        if ("Embedding".equals(d.type())) {
-            p.getEmbeddingParameters().setDimension(d.dimension());
-        }
-        m.setParameters(p);
-        m.setDisplayName("");
-        m.setIsDefault(false);
-        m.setStatus("active");
-        // 租户不回填 → 行落 tenant_id=0，
-        // 后续按租户回读找不到（golden init-get-config-after 无 llm/embedding 键即此因）
-        m.setTenantId(0L);
-        return m;
-    }
-
-    private String findExistingModelId(KnowledgeBaseRowView kb, String type) {
-        return switch (type) {
-            case "Embedding" -> JsonBodies.orEmpty(kb.getEmbeddingModelId());
-            case "KnowledgeQA" -> JsonBodies.orEmpty(kb.getSummaryModelId());
-            case "VLLM" -> JsonBodies.orEmpty(kb.getVlmConfig().modelId());
-            default -> "";
-        };
-    }
-
-    private void applyInitialization(KnowledgeBaseRowView kb, InitializationRequests.InitializationRequest req,
-            List<ModelView> processed) {
-        String embeddingId = "";
-        String llmId = "";
-        String vlmId = "";
-        for (ModelView m : processed) {
-            switch (m.getType()) {
-                case "Embedding" -> embeddingId = m.getId();
-                case "KnowledgeQA" -> llmId = m.getId();
-                case "VLLM" -> vlmId = m.getId();
-                default -> {
-                }
-            }
-        }
-        kb.setSummaryModelId(llmId);
-        kb.setEmbeddingModelId(embeddingId);
-        ChunkingConfigView prevChunking = kb.getChunkingConfig();
-        kb.setChunkingConfig(new ChunkingConfigView(req.chunkSize(), req.chunkOverlap(),
-                req.separators(), prevChunking.parserEngineRules(), prevChunking.enableParentChild(),
-                prevChunking.parentChunkSize(), prevChunking.childChunkSize(), prevChunking.strategy(),
-                prevChunking.tokenLimit(), prevChunking.languages(),
-                prevChunking.tableMetadataInstructions(),
-                ChunkingConfigView.inactiveKeys(prevChunking.enableParentChild(),
-                        prevChunking.parentChunkSize(), prevChunking.childChunkSize(),
-                        prevChunking.tableMetadataInstructions())));
-
-        if (req.multimodalEnabled()) {
-            kb.setVlmConfig(new VlmConfigView(true, vlmId, null, null, "", "", ""));
-            String storageType = req.multimodal() == null ? ""
-                    : req.multimodal().path("storageType").asString("");
-            // cos/minio 凭据落库段依赖部署环境（dev 无），只在段存在时触达
-            if (("cos".equals(storageType) || "minio".equals(storageType))
-                    && req.multimodal().get(storageType) != null) {
-                kb.setStorageProvider(storageType);
-            }
-        } else {
-            kb.setVlmConfig(new VlmConfigView(false, "", null, null, "", "", ""));
-            kb.setStorageProvider("");
-        }
-
-        if (req.nodeExtractEnabled()) {
-            ObjectNode extract = MAPPER.createObjectNode();
-            extract.put("text", req.nodeExtractText());
-            extract.set("tags", MAPPER.valueToTree(req.nodeExtractTags()));
-            var nodes = extract.putArray("nodes");
-            for (Object n : req.nodeExtractNodes()) {
-                JsonNode node = MAPPER.valueToTree(n);
-                ObjectNode copy = nodes.addObject();
-                copy.put("name", node.path("name").asString(""));
-                copy.set("attributes", node.get("attributes") == null
-                        ? MAPPER.createArrayNode() : node.get("attributes").deepCopy());
-            }
-            var relations = extract.putArray("relations");
-            for (Object r : req.nodeExtractRelations()) {
-                JsonNode rel = MAPPER.valueToTree(r);
-                ObjectNode copy = relations.addObject();
-                copy.put("node1", rel.path("node1").asString(""));
-                copy.put("node2", rel.path("node2").asString(""));
-                copy.put("type", rel.path("type").asString(""));
-            }
-            kb.setExtractConfig(extract);
         }
     }
 

@@ -232,6 +232,22 @@ class ModelContractTest {
         assertEquals(mask(golden("model-update.json")), mask(updated.getResponse().getContentAsString(StandardCharsets.UTF_8)),
                 "update 响应应与 golden 一致（掩码后）");
 
+        // 密钥不回显：create/get/update 响应任何位置都不得出现请求里的 apiKey 明文
+        for (MvcResult r : java.util.List.of(created, got, updated)) {
+            assertTrue(!r.getResponse().getContentAsString(StandardCharsets.UTF_8)
+                    .contains("sk-golden-secret"), "模型响应不得回显 apiKey 明文");
+        }
+
+        // 更新未传 apiKey → 已有凭据保留（不得被空值覆盖）
+        MvcResult credAfterUpdate = mockMvc.perform(put("/api/v1/models/" + modelId + "/credentials")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType("application/json")
+                        .content("{}"))
+                .andExpect(status().isOk())
+                .andReturn();
+        assertTrue(credAfterUpdate.getResponse().getContentAsString(StandardCharsets.UTF_8)
+                .contains("\"apiKey\":{\"configured\":true}"), "空 apiKey 更新不得清掉已有凭据");
+
         // credentials PUT → 200（静态）
         MvcResult gb10 = mockMvc.perform(put("/api/v1/models/" + modelId + "/credentials")
                         .header("Authorization", "Bearer " + token)
