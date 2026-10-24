@@ -30,6 +30,8 @@ import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.QaSupport.SseStreamContext;
 import com.ragagent.session.service.SteerSinkBridge;
 import com.ragagent.session.service.TurnLifecycle;
+import com.ragagent.session.service.TurnMessageGate;
+import com.ragagent.session.service.TurnMessageHandle;
 import com.ragagent.session.service.sse.SseFrameSink;
 import com.ragagent.session.service.sse.StreamEventEmitter;
 import java.io.IOException;
@@ -127,7 +129,8 @@ public final class QaSseOrchestrator {
 
         // AgentStreamBridge 订阅（16 种事件）
         AgentStreamBridge bridge = new AgentStreamBridge(reqCtx.sessionId, reqCtx.assistantMessage.getId(),
-                reqCtx.requestId, OffsetDateTime.now(), reqCtx.assistantMessage,
+                reqCtx.requestId, OffsetDateTime.now(),
+                new TurnMessageHandle(reqCtx.assistantMessage, streamCtx.messageGate),
                 streamManager, eventBus);
         bridge.subscribe();
 
@@ -250,17 +253,8 @@ public final class QaSseOrchestrator {
             for (StreamEvent evt : batch.events()) {
                 if (evt.getType() == ResponseType.STOP) {
                     log.info("Detected stop event, session={}", sessionId);
-                    if (streamCtx.eventBus != null) {
-                        Event stopEvt = new Event();
-                        stopEvt.setType(EventType.EVENT_STOP);
-                        stopEvt.setSessionId(sessionId);
-                        StopData data = new StopData();
-                        data.setSessionId(sessionId);
-                        data.setMessageId(assistantMessageId);
-                        data.setReason("user_requested");
-                        stopEvt.setData(data);
-                        streamCtx.eventBus.emit(stopEvt);
-                    }
+                    // 取消只由 stop watcher 发 EVENT_STOP（唯一 owner）；本循环只负责
+                    // 把 stop 帧写给客户端并退出，避免同一 STOP 被两个轮询各发一次。
                     try {
                         emitter.flushHeldStreamContent(sink, requestId, resourceRewriter, client);
                     } catch (IOException ignored) {
@@ -340,7 +334,8 @@ public final class QaSseOrchestrator {
     }
     private static final Set<String> QUICK_ANSWER_TIMELINE_TOOLS = Set.of(
             "query_understand", "knowledge_search", "attachment_parsing", "image_analysis");
-    public void registerQuickAnswerTimelineRecorder(EventBusInterface bus, Message msg) {
+    public void registerQuickAnswerTimelineRecorder(EventBusInterface bus, Message msg,
+            TurnMessageGate messageGate) {
         if (bus == null || msg == null) {
             return;
         }
@@ -350,7 +345,7 @@ public final class QaSseOrchestrator {
             if (evt.getData() instanceof AgentToolCallData data
                     && QUICK_ANSWER_TIMELINE_TOOLS.contains(data.getToolName())
                     && !data.getToolCallId().isEmpty()) {
-                synchronized (msg) {
+                synchronized (messageGate.monitor()) {
                     pending.put(data.getToolCallId(), data.getArguments());
                     startedAt.put(data.getToolCallId(), System.currentTimeMillis());
                 }
@@ -360,7 +355,7 @@ public final class QaSseOrchestrator {
             if (evt.getData() instanceof AgentToolResultData data
                     && QUICK_ANSWER_TIMELINE_TOOLS.contains(data.getToolName())
                     && !data.getToolCallId().isEmpty()) {
-                synchronized (msg) {
+                synchronized (messageGate.monitor()) {
                     Map<String, Object> args = pending.remove(data.getToolCallId());
                     Long started = startedAt.remove(data.getToolCallId());
                     long duration = data.getDurationMs();

@@ -63,7 +63,7 @@ class AgentStreamBridgeTest {
         assistantMessage = new Message();
         assistantMessage.setId(MESSAGE);
         bridge = new AgentStreamBridge(SESSION, MESSAGE, "req-1", OffsetDateTime.now(),
-                assistantMessage, streamManager, bus);
+                new TurnMessageHandle(assistantMessage, new TurnMessageGate()), streamManager, bus);
         bridge.subscribe();
     }
 

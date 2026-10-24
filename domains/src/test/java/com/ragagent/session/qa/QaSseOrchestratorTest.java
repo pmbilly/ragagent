@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.contract.event.EventBusFactory;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.session.SseSink;
 import com.ragagent.platform.storage.support.StreamRewriter;
@@ -97,5 +98,22 @@ class QaSseOrchestratorTest {
 
         verify(streamManager, never()).getEvents(anyString(), anyString(), eq(2));
         assertThat(frames).anyMatch(frame -> frame.contains("boom"));
+    }
+
+    /** STOP 的取消只由 stop watcher 发出，SSE 循环不再重复 emit。 */
+    @Test
+    void stopFrameWrittenWithoutEmittingStopEventTwice() throws Exception {
+        when(streamManager.getEvents(anyString(), anyString(), eq(0)))
+                .thenReturn(batch(List.of(event("s1", ResponseType.STOP, "", true)), 1));
+        SseStreamContext ctx = new SseStreamContext();
+        EventBusInterface bus = mock(EventBusInterface.class);
+        ctx.eventBus = bus;
+
+        orchestrator.handleAgentEventsForSSE(
+                sink(), SESSION_ID, MESSAGE_ID, REQUEST_ID,
+                ctx, false, new StreamRewriter(null));
+
+        assertThat(frames).anyMatch(frame -> frame.contains("Generation stopped by user"));
+        verify(bus, never()).emit(org.mockito.ArgumentMatchers.any());
     }
 }

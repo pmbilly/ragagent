@@ -29,6 +29,8 @@ import com.ragagent.session.dto.AgentReflectionData;
 import com.ragagent.session.dto.MemoryRecalledData;
 import com.ragagent.session.dto.PipelineUsedMemoryView;
 import com.ragagent.session.dto.SessionTitleData;
+import com.ragagent.session.service.TurnMessageGate;
+import com.ragagent.session.service.TurnMessageHandle;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.session.support.ToolResultPersist;
 import java.time.OffsetDateTime;
@@ -81,7 +83,8 @@ public final class AgentStreamBridge {
     private final List<AnswerSegment> answerSegments = new ArrayList<>();
     /** Track start time for duration calculation */
     private final Map<String, Long> eventStartTimes = new LinkedHashMap<>();
-    private final Object mu = new Object();
+    /** 本轮 assistant 行的共享写入锁（与最终答复/快答时间线同一监视器）。 */
+    private final TurnMessageGate messageGate;
 
     /** 单个 answer event id 下的分片累积。 */
     private static final class AnswerSegment {
@@ -116,15 +119,16 @@ public final class AgentStreamBridge {
 
     public AgentStreamBridge(
             String sessionId, String assistantMessageId, String requestId,
-            OffsetDateTime receivedAt, Message assistantMessage,
+            OffsetDateTime receivedAt, TurnMessageHandle handle,
             StreamManager streamManager, EventBusInterface eventBus) {
         this.sessionId = sessionId;
         this.assistantMessageId = assistantMessageId;
         this.requestId = requestId;
         this.receivedAt = receivedAt;
-        this.assistantMessage = assistantMessage;
+        this.assistantMessage = handle.message();
         this.emitter = new AgentStreamEmitter(sessionId, assistantMessageId, streamManager);
         this.eventBus = eventBus;
+        this.messageGate = handle.gate();
     }
 
     public Message getAssistantMessage() {
@@ -158,7 +162,7 @@ public final class AgentStreamBridge {
             return null;
         }
         Map<String, Object> metadata;
-        synchronized (mu) {
+        synchronized (messageGate.monitor()) {
             eventStartTimes.putIfAbsent(evt.getId(), System.currentTimeMillis());
             if (data.isDone()) {
                 long startTime = eventStartTimes.getOrDefault(evt.getId(), System.currentTimeMillis());
@@ -184,7 +188,7 @@ public final class AgentStreamBridge {
         if (!(evt.getData() instanceof AgentToolCallData data)) {
             return null;
         }
-        synchronized (mu) {
+        synchronized (messageGate.monitor()) {
             boolean first = !eventStartTimes.containsKey(data.getToolCallId());
             if (first) {
                 eventStartTimes.put(data.getToolCallId(), System.currentTimeMillis());
@@ -220,7 +224,7 @@ public final class AgentStreamBridge {
             return null;
         }
         long durationMs;
-        synchronized (mu) {
+        synchronized (messageGate.monitor()) {
             Long startTime = eventStartTimes.get(data.getToolCallId());
             if (startTime != null) {
                 durationMs = System.currentTimeMillis() - startTime;
@@ -330,7 +334,7 @@ public final class AgentStreamBridge {
         if (!(evt.getData() instanceof AgentReferencesData data)) {
             return null;
         }
-        synchronized (mu) {
+        synchronized (messageGate.monitor()) {
             // Extract knowledge references（Java：List<SearchResult> 直 cast，Map 回退重建）
             if (data.getReferences() instanceof List<?> refs) {
                 for (Object ref : refs) {
@@ -360,7 +364,7 @@ public final class AgentStreamBridge {
         if (!(data.getMemories() instanceof List<?> used) || used.isEmpty()) {
             return null;
         }
-        synchronized (mu) {
+        synchronized (messageGate.monitor()) {
             // 事件载荷是跨域视图（chatpipeline 侧产生），落库前映射回实体
             List<PipelineUsedMemoryView> views = new ArrayList<>();
             for (Object item : used) {
@@ -403,7 +407,7 @@ public final class AgentStreamBridge {
             return null;
         }
         Map<String, Object> metadata;
-        synchronized (mu) {
+        synchronized (messageGate.monitor()) {
             eventStartTimes.putIfAbsent(evt.getId(), System.currentTimeMillis());
 
             // One-shot TTFB log on the first answer chunk.
@@ -510,7 +514,7 @@ public final class AgentStreamBridge {
         if (!(evt.getData() instanceof AgentCompleteData data)) {
             return null;
         }
-        synchronized (mu) {
+        synchronized (messageGate.monitor()) {
             if (assistantMessageId.equals(data.getMessageId())) {
                 assistantMessage.setCompleted(true);
                 assistantMessage.setAgentDurationMs(data.getTotalDurationMs());
@@ -637,7 +641,7 @@ public final class AgentStreamBridge {
 
     /** 供 executeQA 的「无 answer 事件但有最终答案」判定读取。 */
     public String composedFinalAnswer() {
-        synchronized (mu) {
+        synchronized (messageGate.monitor()) {
             return finalAnswer;
         }
     }

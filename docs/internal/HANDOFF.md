@@ -216,7 +216,7 @@
 | **Q4** | 向量库 Descriptor：contract 只放控制面规则；`retrieval-engine` 持工厂/探测 | ✅ 2026-10-24（5092/0/2） |
 | **Q5** | 存储 Provider Descriptor（域内）：校验/端点/探测/创建/清单单源化 | ✅ 2026-10-24（5097/0/2） |
 | **Q6** | `KnowledgeProcessWorker` 构造面 20 → 约 5（三阶段移装配点） | 待做 |
-| **Q7** | 终态收尾残余（并入 H1b-2，先补状态矩阵测试；不建 Coordinator） | Q7a ✅ 2026-10-24（5102/0/2）；Q7b（H1b-2 锁/持久化）待做 |
+| **Q7** | 终态收尾残余（并入 H1b-2，先补状态矩阵测试；不建 Coordinator） | Q7a ✅ 2026-10-24（5102/0/2）；Q7b-1 ✅ 2026-10-24（5103/0/2）；Q7b-2（轮询合并/状态落库）待做 |
 | **Q8** | 前端流式判别联合 + `ChatMessage` 强类型 + 组件特征测试 | 待做 |
 | **Q9** | `WikiBrowser` 拆分（首刀 `useWikiDirectory`） | 待做 |
 | **Q10** | `AgentEditorModal` 拆分（先 `useAgentEditorForm` + 序列化/校验） | 待做 |
@@ -675,6 +675,8 @@ boot           17 件                      →  boot
 | Q3 | 2026-10-24 | **请求段冻结 + fork 共享快照**：`rerankThreshold` 从 `TurnInputView` 移入 `RerankOutcome`（写者仍是 PluginRerank 降级路径）；新增 `TurnInputSnapshot`（40 字段，构造期防御拷贝），`ChatManage.freeze()` 在 setup 结束冻结，40 个请求段 getter 读快照、setter 冻结后抛 `IllegalStateException`；`cloneChatManage()` 不再 41 行逐字段复制，fork 共享快照只复制状态段。知识检索路径同样在触发前冻结。 | 新增 2 条冻结/独立性测试 · rag 域 38 条录制测试绿 · 48 守卫绿 · `mvn -B clean verify` 绿（**5099 / 0 / 2**） |
 
 | Q7a | 2026-10-24 | **终态矩阵测试补齐**：新增 `TurnTerminalMatrixTest`（失败后到达的成功不改写 / 终态后不再进收尾段 / 8 线程 × 20 轮并发只有一个赢家）；连同既有 `TurnLifecycleTest`、`QaTurnFinalizerCommitGateTest`（双收尾只提交一次下游）、`QaTurnExecutorNormalFailureTest`、`QaSseOrchestratorTest`（error+done 退出）构成本批矩阵。**Q7b（H1b-2：stop watcher/轮询/3 把锁收拢与状态落库）仍待做**，未在本次动实现。 | 终态相关 11 条定向测试绿 · 48 守卫绿 · `mvn -B clean verify` 绿（**5102 / 0 / 2**） |
+
+| Q7b-1 | 2026-10-24 | **H1b-2 第一刀：单锁 + STOP 单一 owner**。新增 `TurnMessageGate`/`TurnMessageHandle`；此前同一 assistant 行由三把互不排斥的锁保护（`AgentStreamBridge.mu`、`QaTurnExecutor` 的 `synchronized(am)`、`QaSseOrchestrator` 的 `synchronized(msg)`）⇒ 三者改为本轮共享的 `SseStreamContext.messageGate`，快答 reasoning 追加也纳入同一临界区。STOP 取消只由 stop watcher 发 `EVENT_STOP`，SSE 循环只负责 flush+写 stop 帧+退出（去掉重复 emit，新增测试钉住）。 | 新增 1 条 STOP 不重复 emit 测试 · 终态/桥接 17 条定向测试绿 · 48 守卫绿 · `mvn -B clean verify` 绿（**5103 / 0 / 2**）。**未做**：两个轮询（100ms SSE / 300ms watcher）合并（会改 stop 延迟或 100ms 节拍）与生命周期状态落库（需 schema 决策） |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

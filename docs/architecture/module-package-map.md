@@ -13,7 +13,7 @@
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 20 | 155 | 0 |
 | `:retrieval-engine` | `retrieval` | 15 | 95 | 0 |
 | `:agent-engine` | `agent` | 9 | 72 | 0 |
-| `:domains` | `agentmanagement`、`agenttools`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 251 | 1621 | 51 |
+| `:domains` | `agentmanagement`、`agenttools`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 251 | 1623 | 51 |
 | `:boot` | `(根包)`、`config` | 2 | 19 | 0 |
 
 ## 19 个业务域（domains）
@@ -33,7 +33,7 @@
 | `mcp` | `com.ragagent.mcp` | 171 | 4 |
 | `memory` | `com.ragagent.memory` | 91 | 1 |
 | `model` | `com.ragagent.model` | 38 | 4 |
-| `session` | `com.ragagent.session` | 207 | 8 |
+| `session` | `com.ragagent.session` | 209 | 8 |
 | `storage` | `com.ragagent.storage` | 62 | 3 |
 | `system` | `com.ragagent.system` | 18 | 2 |
 | `vectorstore` | `com.ragagent.vectorstore` | 20 | 1 |

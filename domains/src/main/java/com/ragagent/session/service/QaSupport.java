@@ -168,6 +168,8 @@ public final class QaSupport {
         public SteerSinkBridge steerSink;
         /** 本轮终态单赢家：三个收尾点（推送/续传/事件总线）共用。 */
         public final TurnLifecycle lifecycle = new TurnLifecycle();
+        /** 本轮 assistant 行的唯一写入锁（事件桥/最终答复/快答时间线共用）。 */
+        public final TurnMessageGate messageGate = new TurnMessageGate();
         /** SetLiveRun failed → executeQA must not start the engine */
         public boolean liveRunFailed;
         public String liveRunErr = "";

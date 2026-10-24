@@ -180,10 +180,14 @@ public final class QaTurnExecutor {
     /** 快答路径：timeline 记录器 + reasoning 累积 + 完成事件。 */
     private void registerQuickAnswerHandlers(
             SseStreamContext streamCtx, QaRequestContext reqCtx, String sessionId) {
-        sseOrchestrator.registerQuickAnswerTimelineRecorder(streamCtx.eventBus, streamCtx.assistantMessage);
+        sseOrchestrator.registerQuickAnswerTimelineRecorder(streamCtx.eventBus,
+                streamCtx.assistantMessage, streamCtx.messageGate);
         streamCtx.eventBus.on(EventType.EVENT_AGENT_THOUGHT, evt -> {
             if (evt.getData() instanceof AgentThoughtData data && !data.getContent().isEmpty()) {
-                QaTurnSupport.appendQuickAnswerReasoning(streamCtx.assistantMessage, data.getContent());
+                synchronized (streamCtx.messageGate.monitor()) {
+                    QaTurnSupport.appendQuickAnswerReasoning(
+                            streamCtx.assistantMessage, data.getContent());
+                }
             }
         });
 
@@ -195,7 +199,7 @@ public final class QaTurnExecutor {
                 return;
             }
             Message am = streamCtx.assistantMessage;
-            synchronized (am) {
+            synchronized (streamCtx.messageGate.monitor()) {
                 am.setContent(am.getContent() + QaSupport.orEmpty(data.getContent()));
                 if (data.isFallback()) {
                     am.setFallback(true);
