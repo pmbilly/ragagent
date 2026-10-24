@@ -5,8 +5,8 @@ import { useI18n } from 'vue-i18n'
 import { ensureRagPipelineHistoryStream } from '@/utils/rag-pipeline-history'
 import { applyMessageCreatedAt, bindServerTurnTimestamps, ensureMessageCreatedAt } from '@/utils/messageTimestamp'
 import { expandSteerForksInHistory, forkAfterInjectedUser, steerStepEvents, resetSteerTurnForReplay } from '@/utils/steerStreamFork'
-
-export type ChatMessage = Record<string, unknown>
+import type { BackendStreamEvent, ChatMessage } from '@/types/chatStream'
+import { normalizeStreamEvent } from '@/types/chatStream'
 
 export interface UseChatStreamHandlerOptions {
   messagesList: ChatMessage[]
@@ -299,7 +299,7 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
     }
     ensureRagPipelineHistoryStream(item as Parameters<typeof ensureRagPipelineHistoryStream>[0])
     if (item.isRagMode && item.agentEventStream) {
-      item.agentEventStream = markRaw(item.agentEventStream as object)
+      item.agentEventStream = markRaw(item.agentEventStream)
     }
   }
 
@@ -387,7 +387,7 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
               duration: toolCall.duration,
               durationMs: toolCall.duration,
               displayType: resultData?.displayType,
-              tool_data: result?.data,
+              tool_data: result?.data as Record<string, unknown> | undefined,
             })
           })
         }
@@ -493,7 +493,7 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
         item._pendingToolCalls = new Map()
       } else {
         item.agentSteps = item.agentSteps ? markRaw(item.agentSteps as object) : item.agentSteps
-        item.agentEventStream = markRaw((item.agentEventStream as unknown[]) || [])
+        item.agentEventStream = markRaw(item.agentEventStream || [])
         item._eventMap = markRaw(new Map())
         item._pendingToolCalls = markRaw(new Map())
       }
@@ -602,7 +602,7 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
     }
   }
 
-  const handleAgentChunk = (data: ChatMessage) => {
+  const handleAgentChunk = (data: BackendStreamEvent) => {
     const dataId = data.id as string | undefined
     let message = resolveActiveAssistantMessage(data)
     let created = false
@@ -1097,7 +1097,12 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
     scrollToBottom()
   }
 
-  const processStreamChunk = (data: ChatMessage) => {
+  const processStreamChunk = (raw: unknown) => {
+    const data = normalizeStreamEvent(raw)
+    if (!data) {
+      log('[Agent Event] drop malformed event', raw)
+      return
+    }
     log('[Agent Event Received]', {
       responseType: data.responseType,
       id: data.id,

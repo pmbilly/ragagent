@@ -873,6 +873,7 @@ const handleWikiDrawerClick = (e: MouseEvent) => {
 import agentIcon from '@/assets/img/agent.svg';
 import thinkingIcon from '@/assets/img/Frame3718.svg';
 import compactionIcon from '@/assets/img/context-compaction.svg';
+import type { ChatMessage } from '@/types/chatStream';
 
 interface SessionData {
   id?: string;
@@ -880,7 +881,7 @@ interface SessionData {
   requestId?: string;
   debugRequest?: Record<string, unknown>;
   isAgentMode?: boolean;
-  agentEventStream?: any[];
+  agentEventStream?: ChatMessage[];
   knowledgeReferences?: any[];
   [key: string]: unknown;
 }
@@ -1470,8 +1471,8 @@ watch(eventStream, (stream) => {
 
   // Check for agentComplete event with authoritative duration from backend
   if (agentDurationMs.value === 0) {
-    const completeEvent = stream.find((e: any) => e.type === 'agentComplete' && e.totalDurationMs);
-    if (completeEvent) {
+    const completeEvent = stream.find((e: ChatMessage) => e.type === 'agentComplete' && e.totalDurationMs);
+    if (completeEvent && typeof completeEvent.totalDurationMs === 'number') {
       agentDurationMs.value = completeEvent.totalDurationMs;
     }
   }
@@ -2224,7 +2225,7 @@ const getKbIdForWiki = (slug: string): string => {
   if (props.session?.agentEventStream) {
     for (let i = props.session.agentEventStream.length - 1; i >= 0; i--) {
       const event = props.session.agentEventStream[i];
-      const foundKbs = event?.tool_data?.foundKbs;
+      const foundKbs = event?.tool_data?.foundKbs as Record<string, unknown> | undefined;
       if (event.type === 'toolCall' && foundKbs) {
         const hit = pickKbId(foundKbs[slug]);
         if (hit) return hit;

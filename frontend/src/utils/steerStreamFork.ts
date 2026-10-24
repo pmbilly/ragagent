@@ -1,8 +1,9 @@
 import { markRaw } from 'vue'
 // 相对导入：本模块被 node:test（tsx）直接加载，别名 @/ 在测试运行时不解析（tsconfig.app 才有 paths）
 import type { MentionedItem } from '../types/mention'
+import type { ChatMessage } from '../types/chatStream'
 
-export type ChatMessage = Record<string, unknown>
+export type { ChatMessage }
 
 /**
  * Display a steer immediately; the receipt, not this preview, splits execution.

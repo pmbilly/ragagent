@@ -217,7 +217,7 @@
 | **Q5** | 存储 Provider Descriptor（域内）：校验/端点/探测/创建/清单单源化 | ✅ 2026-10-24（5097/0/2） |
 | **Q6** | `KnowledgeProcessWorker` 构造面 20 → 约 5（三阶段移装配点） | 待做 |
 | **Q7** | 终态收尾残余（并入 H1b-2，先补状态矩阵测试；不建 Coordinator） | ✅ 2026-10-24（Q7a/Q7b-1/Q7b-2，5104/0/2） |
-| **Q8** | 前端流式判别联合 + `ChatMessage` 强类型 + 组件特征测试 | 待做 |
+| **Q8** | 前端流式判别联合 + `ChatMessage` 强类型 + 组件特征测试 | Q8a ✅ 2026-10-24（776/0）；Q8b（AgentStreamDisplay 拆分）待做 |
 | **Q9** | `WikiBrowser` 拆分（首刀 `useWikiDirectory`） | 待做 |
 | **Q10** | `AgentEditorModal` 拆分（先 `useAgentEditorForm` + 序列化/校验） | 待做 |
 | **Q11** | 前端 ESLint / knip（report-only）+ 规模棘轮 | 待做 |
@@ -679,6 +679,8 @@ boot           17 件                      →  boot
 | Q7b-1 | 2026-10-24 | **H1b-2 第一刀：单锁 + STOP 单一 owner**。新增 `TurnMessageGate`/`TurnMessageHandle`；此前同一 assistant 行由三把互不排斥的锁保护（`AgentStreamBridge.mu`、`QaTurnExecutor` 的 `synchronized(am)`、`QaSseOrchestrator` 的 `synchronized(msg)`）⇒ 三者改为本轮共享的 `SseStreamContext.messageGate`，快答 reasoning 追加也纳入同一临界区。STOP 取消只由 stop watcher 发 `EVENT_STOP`，SSE 循环只负责 flush+写 stop 帧+退出（去掉重复 emit，新增测试钉住）。 | 新增 1 条 STOP 不重复 emit 测试 · 终态/桥接 17 条定向测试绿 · 48 守卫绿 · `mvn -B clean verify` 绿（**5103 / 0 / 2**）。**未做**：两个轮询（100ms SSE / 300ms watcher）合并（会改 stop 延迟或 100ms 节拍）与生命周期状态落库（需 schema 决策） |
 
 | Q7b-2 | 2026-10-24 | **H1b-2 第二刀：单流泵 + 终态指标**。`QaSseOrchestrator` 的两条读流循环（SSE 100ms + stop watcher 300ms）合并为 `TurnStreamPump`：有客户端 100ms 写帧；写失败降级为 300ms 无头监控，继续检测 STOP/终态并只发一次 `EVENT_STOP`（取消不随连接丢失）。`setupSSEStream` 不再起 watcher；`QaTurnExecutor` 在 `sink == null`（steer follow-up）时启动无头泵。`TurnLifecycle` 增 `CANCELLED` 终态；新增 `ragagent.qa.terminal{mode,outcome}` 指标（只由终态赢家打点）。**不做**：生命周期中间态落库（终态已由 `completeMessageOnce` 落库；中间态只服务崩溃续跑，当前无此需求）。 | 新增客户端断开降级 + STOP 单次 emit 测试 · 终态/桥接 30 条定向测试绿 · 48 守卫绿 · `mvn -B clean verify` 绿（**5104 / 0 / 2**） |
+
+| Q8a | 2026-10-24 | **前端流式类型基础**：新增 `src/types/chatStream.ts`（`ChatMessage` 已知字段 + `AgentEvent` + `BackendStreamEvent`），`ChatMessage` 不再整体 `Record<string, unknown>`；`normalizeStreamEvent` 在 SSE 入口归一（缺 `responseType` 丢弃、未知类型落 `unknown` 并保留原文、`content/done/id` 归一）；`useChatStreamHandler.processStreamChunk` 收 `unknown` 并使用归一结果；`steerStreamFork` 复用同一类型；`AgentStreamDisplay` 的事件流改为 `ChatMessage[]`。 | 新增 5 条归一测试 · `vue-tsc` 0 · `npm test` **776 / 0** · 48 守卫绿。**Q8b 未做**：`AgentStreamDisplay` 拆分（组件无测试挂载设施，需先补行为特征测试） |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
