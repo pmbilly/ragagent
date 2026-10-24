@@ -210,7 +210,7 @@
 | 批 | 内容 | 状态 |
 |---|---|---|
 | **Q0** | 评估核实 + 删除收口（4 份文档按删除处理；引用迁 `docs/api/README.md` / `HANDOFF 11.1` / `HANDOFF §7` / getting-started） | ✅ 2026-10-24（48/48） |
-| **Q1** | 模型配置结构校验：`ModelConfigValidator` 窄端口 + `ModelService` 三处接线（不联网） | 待做 |
+| **Q1** | 模型配置结构校验：`ModelConfigValidator` 窄端口 + `ModelService` 三处接线（不联网） | ✅ 2026-10-24（5088/0/2） |
 | **Q2** | SQL 下沉（复用 `KnowledgeTagRepository`）+ 删 `PipelinePorts` 3 个占位 Port | 待做 |
 | **Q3** | 请求段冻结：`rerankThreshold` 归位 `RerankOutcome` → 不可变快照 + `fork()` 白名单 | 待做 |
 | **Q4** | 向量库 Descriptor：contract 只放控制面规则；`retrieval-engine` 持工厂/探测 | 待做 |
@@ -414,7 +414,7 @@ boot           17 件                      →  boot
 | 16 | 审批闸门未装配 | 设计取舍 | MCP OAuth / 工具审批受理分支返回 500，不静默放行 |
 | 17 | IM 知识桥接的存疑接线 | 待核查 | 生产 `/info` 与 `/search` 的 KB/检索面恒为空 |
 | 18 | Wiki 页面 → chunks 同步 | 待实现 | Wiki 内容不写入 `chunks`，不参与常规 RAG；走 Wiki 专用检索 |
-| 19 | `Provider.validateConfig()` 生产接线 | 待实现（Q1 关闭） | 保存模型不做厂商侧结构校验；缺 key/模型名在首次调用才暴露 |
+| 19 | `Provider.validateConfig()` 生产接线 | 已关闭（Q1） | `ModelConfigValidator` 在模型保存（创建/更新/凭据）路径统一调用，只做结构校验 |
 
 ## 12. 执行记录（v0.3.0 起；模板：批次｜内容｜读数｜验证）
 
@@ -663,6 +663,8 @@ boot           17 件                      →  boot
 | —（2026-10-24 补记） | 2026-10-22~24 | **C2f 之后 16 个提交的概要回填**（未逐批立户，细节见各提交信息）：① `d9f4020c1` **更名 RagAgent**——mcp 模块/命令/环境变量同步；② `f29bb72ac`/`9310eb7f5`/`abbf07907` 三连文档同步（项目/文档/邮箱切 pmbilly/ragagent、补六篇配置接入文档、域数量/IM 渠道/actuator 端点）；③ `5d04bb482`/`1ae44b84b`/`697914b08` CI Redis 测试沉淀为本机固定 dir 实例 + 连接级 PING 就绪；④ `323ce722c` 前端品牌资源与文案切 RagAgent（widget 脚本改名 `ragagent-widget.js`）；⑤ `f1df2705c` 发布渠道分组、创建按钮、LOGO、技能抽屉与加载态统一；⑥ `c131d4e78` **主应用四语言接入**（es-ES/pt-BR/th-TH/zh-HK，embed 面九语言）+ **SSE 断流兜底**（`streamErrorFrame`/`streamRecovery`，断连补拉历史）+ **会话删除修复**（含托管行批量删，`SessionServiceDeleteTest`）；⑦ `8c3ccffb8` 精简系统提示词，46 系金片（agent-46/46b、chat-pipeline-46c、modelcontext-46a）内容更新并重签 sha256；⑧ `ac027f474`/`cce0a34e1` 列表类工具历史保留正文摘录/完整输出，消除反复翻页（先 grep 后精读）；⑨ `60aa93a59` 工具执行收敛提示（证据足够即作答）；⑩ `ed19372eb` 引导批量读取 chunk、禁止逐条精读；⑪ `99f4f720e` currentTime 断言兼容 UTC 的 Z 偏移。**行为面提示**：⑦~⑩ 改变 agent 提示词与工具输出保留策略，属线格式内 contract 文本变更（金片已重签）。 | 46 系金片 sha256 重录 · 各提交独立绿 · 全量基线刷新见 §6（2026-10-24 实测） |
 
 | Q0 | 2026-10-24 | **第五轮评估核实 + Q 系列立项**：逐项复核 `architecture-assessment-2026-10-24.md` 的数字与技术事实（48 守卫 / 19 域 / 40 Port / 326 契约 / 356 package-info / 52 文件 / 28 方法 / 2,483 主源 / 266 分支 / 38 构造器 / 前端 771 测试全对；`session/service` 27→29、构造器口径 38 vs 棘轮 53 两处更正）。**4 处重复已完成/已否决项**：`TurnLifecycle` 已实现终态单赢家（不建 Coordinator）、`KnowledgeService` 三分与 M/L 判据冲突、端口改名无收益、`VectorStoreConnectivity` 已存在；**5 处落法改写**：contract 不放 `runtimeFactory`、ChatManage 改用不可变快照而非 4 个 Policy、`QaRequestContext` 只收复制面、租户 KV Registry 降观察、Wiki 已有 `wikiDirectoryState` 起点。**基线异常**：工作区 4 份文档未提交删除（含 `known-gaps.md`），`check-reference-truth` 红 1 处 ⇒ 当前 47/48 守卫绿。产出 `docs/internal/plans/convergence-remediation-q-series.md`（Q0~Q11）。**Q0 收口（同日）**：用户拍板"删除的文件不要了"⇒ 4 份文档按删除提交；引用迁移（`api-response-convention` → `docs/api/README.md`、`known-gaps` → `HANDOFF 11.1`、`golden-fixtures` → `HANDOFF §7`、`migration-troubleshooting` → `getting-started.md` 常见失败）；`check-known-gaps.py` 指针改为 `HANDOFF 11` 并配红态探针；`docs/README` / `qa-flow` / `api/README` 同步。 | 核实：48 条守卫实跑 · 前端 `npm test` 771/0；Q0：`run-guards.sh` **48/48** · 10 处类注释指针迁移 · 守卫红态探针已验证 |
+
+| Q1 | 2026-10-24 | **模型配置结构校验接线**：`contract.model` 新增 `ModelConfigValidator`（1 方法）+ `ModelConfigDraft`（provider/baseUrl/apiKey/modelName，纯 JDK）；`model-runtime` 实现 `ProviderModelConfigValidator`（复用 26 家 `Provider.validateConfig`，未知/空 provider 直接放行，不联网）；`ModelService.createModel/updateModel/updateModelCredentials` 三处保存路径统一调用，失败即 400 且不落库。`Provider` 注释改为当前事实，`HANDOFF 11.1` 第 19 条关闭。 | 新增 6 条定向测试（厂商规则 3 + ModelService 落库闸门 3）· 48 守卫绿 · `mvn -B clean verify` 绿（**5088 / 0 / 2**） |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

@@ -4,8 +4,8 @@ package com.ragagent.llm.provider;
 /**
  * 服务商接口：元数据 + 配置校验。
  *
- * 校验失败抛 {@link com.ragagent.contract.error.BizException}。当前 ValidateConfig 未接线
- * （只有测试调用），见 HANDOFF 11.1 第 19 条；供运行时客户端接入时复用。
+ * 校验失败抛 {@link com.ragagent.contract.error.BizException}。保存模型时由
+ * {@code ModelConfigValidator} 统一调用（只做结构校验，不联网）。
  */
 public interface Provider {
 

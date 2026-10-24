@@ -2,6 +2,8 @@ package com.ragagent.model.service;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.model.ModelConfigDraft;
+import com.ragagent.contract.model.ModelConfigValidator;
 import com.ragagent.contract.model.ModelFacts;
 import com.ragagent.contract.model.ModelFactsPort;
 import com.ragagent.contract.model.ModelParameters;
@@ -75,16 +77,32 @@ public class ModelService implements ModelFactsPort  {
     private final ModelRepository modelRepo;
     private final ModelUsageRepository usageRepo;
     private final TenantConfigLookup tenantConfigLookup;
+    private final ModelConfigValidator modelConfigValidator;
 
-    public ModelService(ModelRepository modelRepo, ModelUsageRepository usageRepo, TenantConfigLookup tenantConfigLookup) {
+    public ModelService(ModelRepository modelRepo, ModelUsageRepository usageRepo,
+            TenantConfigLookup tenantConfigLookup, ModelConfigValidator modelConfigValidator) {
         this.modelRepo = modelRepo;
         this.usageRepo = usageRepo;
         this.tenantConfigLookup = tenantConfigLookup;
+        this.modelConfigValidator = modelConfigValidator;
     }
 
     private static long tenantId() {
         Long tid = TenantContext.currentTenantId();
         return tid == null ? 0 : tid;
+    }
+
+    /**
+     * 保存前结构校验：厂商字段规则（key / model name / base URL），不联网。
+     * provider 为空或未知（本地 Ollama、自定义端点）时没有厂商规则。
+     */
+    private void validateConfigStructure(Model model) {
+        ModelParameters p = model.getParameters();
+        modelConfigValidator.validate(new ModelConfigDraft(
+                p == null ? "" : p.getProvider(),
+                p == null ? "" : p.getBaseUrl(),
+                p == null ? "" : p.getApiKey(),
+                model.getName() == null ? "" : model.getName()));
     }
 
     // ── CRUD ─────────────────────────────────────────────────────────────
@@ -103,6 +121,7 @@ public class ModelService implements ModelFactsPort  {
         } else {
             model.setStatus(STATUS_DOWNLOADING);
         }
+        validateConfigStructure(model);
         modelRepo.insert(model);
         log.info("Model created successfully: {}", model.getId());
         return model;
@@ -159,6 +178,7 @@ public class ModelService implements ModelFactsPort  {
             model.setIsBuiltin(true);
             model.setManagedBy("");
         }
+        validateConfigStructure(model);
         modelRepo.updateById(model);
         log.info("Model updated successfully: {}", model.getId());
         return model;
@@ -193,6 +213,7 @@ public class ModelService implements ModelFactsPort  {
         if (existing.isIsBuiltin()) {
             existing.setManagedBy("");
         }
+        validateConfigStructure(existing);
         modelRepo.updateById(existing);
         log.info("Model credentials updated: id={}", id);
         return existing;
