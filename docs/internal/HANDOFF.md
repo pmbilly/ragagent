@@ -213,7 +213,7 @@
 | **Q1** | 模型配置结构校验：`ModelConfigValidator` 窄端口 + `ModelService` 三处接线（不联网） | ✅ 2026-10-24（5088/0/2） |
 | **Q2** | SQL 下沉（复用 `KnowledgeTagRepository`）+ 删 `PipelinePorts` 占位 Port | ✅ 2026-10-24（5088/0/2） |
 | **Q3** | 请求段冻结：`rerankThreshold` 归位 `RerankOutcome` → 不可变快照 + `fork()` 白名单 | 待做 |
-| **Q4** | 向量库 Descriptor：contract 只放控制面规则；`retrieval-engine` 持工厂/探测 | 待做 |
+| **Q4** | 向量库 Descriptor：contract 只放控制面规则；`retrieval-engine` 持工厂/探测 | ✅ 2026-10-24（5092/0/2） |
 | **Q5** | 存储 Provider Descriptor（域内）：校验与创建分两步单源化 | 待做 |
 | **Q6** | `KnowledgeProcessWorker` 构造面 20 → 约 5（三阶段移装配点） | 待做 |
 | **Q7** | 终态收尾残余（并入 H1b-2，先补状态矩阵测试；不建 Coordinator） | 待做 |
@@ -667,6 +667,8 @@ boot           17 件                      →  boot
 | Q1 | 2026-10-24 | **模型配置结构校验接线**：`contract.model` 新增 `ModelConfigValidator`（1 方法）+ `ModelConfigDraft`（provider/baseUrl/apiKey/modelName，纯 JDK）；`model-runtime` 实现 `ProviderModelConfigValidator`（复用 26 家 `Provider.validateConfig`，未知/空 provider 直接放行，不联网）；`ModelService.createModel/updateModel/updateModelCredentials` 三处保存路径统一调用，失败即 400 且不落库。`Provider` 注释改为当前事实，`HANDOFF 11.1` 第 19 条关闭。 | 新增 6 条定向测试（厂商规则 3 + ModelService 落库闸门 3）· 48 守卫绿 · `mvn -B clean verify` 绿（**5088 / 0 / 2**） |
 
 | Q2 | 2026-10-24 | **问答 SQL 下沉 + 占位 Port 清理**：`SessionKnowledgeQaService` 删除 `DataSource` 字段/构造参数与手写 `SELECT`（标签 id 查询改为 `KnowledgeEntryReadPort.listKnowledgeIdsByTagIds`，`KnowledgeCatalogAdapter` 委托既有 `KnowledgeTagRepository.listKnowledgeIdsByTagIds`；`QaSearchTargets` 直取契约面）；删 `PipelinePorts` 中 4 个空接口（SessionService / ChunkService / WebSearchStateService / WebSearchProviderRepository）及测试桩，`QaWiring`/`WebSearchTempKbStateService` 陈旧注释同步；A7 裸 JDBC 白名单删除该 Service 条目。 | 48 守卫绿 · `mvn -B clean verify` 绿（**5088 / 0 / 2**）· 编译期确认无残留引用 |
+
+| Q4 | 2026-10-24 | **向量库控制面/运行时单源**：`contract.vectorstore` 新增 `VectorStoreEngineRules` + `VectorStoreRequiredField` + `VectorStoreAddressField`；`VectorStoreConnectivity` 扩为 **`VectorStoreEngineCatalogPort`**（`probe` + `rulesFor`），实现类 `VectorStoreConnectivityProbe` 更名 `VectorStoreEngineCatalog`；`EngineFactory` 的 `EngineSpec` 增 `controlAddressFields` + `requiredFields`（运行时/控制面两套地址函数并列，qdrant 保留 `[host]:port` vs `host:port` 差异）；`VectorStoreConfigService` 两个 switch 删除，改为执行目录规则（未登记引擎：必填放行、SSRF fail-closed 文案不变）。 | 新增 4 条目录测试（9 引擎全覆盖 / 未知 null / ES 文案 / qdrant 形态）· 48 守卫绿 · `mvn -B clean verify` 绿（**5092 / 0 / 2**）· `VectorStoreContractTest` 3 用例（含 SSRF golden）绿 |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

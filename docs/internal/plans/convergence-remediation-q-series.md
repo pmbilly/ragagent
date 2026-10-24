@@ -80,7 +80,7 @@
 报告的目标结构把 `runtimeFactory` 列进描述符。控制面（`domains/vectorstore`）只需要"必填字段 / 默认值 / 地址策略"，**不需要也不应该拿到运行时工厂**——拿到就会绕过模块边界。落法改为：
 
 - `contract.vectorstore`：只放**控制面规则**（`requiredFields` / `defaults` / 地址策略查询）；
-- `retrieval-engine`：内部描述符持有 `runtimeFactory` + `connectivityProbe`（复用现有 `EngineSpec` 与 `VectorStoreConnectivity`）。
+- `retrieval-engine`：内部描述符持有 `runtimeFactory` + `connectivityProbe`（复用现有 `EngineSpec`，目录端口为 `VectorStoreEngineCatalogPort`）。
 
 ### 2.7 §6.4 的"端口改能力命名"不做
 

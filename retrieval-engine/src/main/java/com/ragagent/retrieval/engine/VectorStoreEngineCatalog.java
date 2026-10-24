@@ -2,7 +2,10 @@ package com.ragagent.retrieval.engine;
 
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.vectorstore.ConnectionConfig;
-import com.ragagent.contract.vectorstore.VectorStoreConnectivity;
+import com.ragagent.contract.vectorstore.VectorStoreAddressField;
+import com.ragagent.contract.vectorstore.VectorStoreEngineCatalogPort;
+import com.ragagent.contract.vectorstore.VectorStoreEngineRules;
+import com.ragagent.contract.vectorstore.VectorStoreRequiredField;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.engine.doris.DorisRetrieveRepository;
@@ -19,6 +22,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -26,8 +30,11 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * 向量店连通性探测（契约化搬迁）：引擎覆盖与文案逐字沿用原
- * {@code domains.vectorstore.service.VectorStoreConfigService#testConnection} 的实现。
+ * 向量店引擎目录：控制面规则（必填 / SSRF 地址）+ 连通性探测。
+ *
+ * <p>规则与运行时共用 {@link EngineFactory} 的引擎注册表（同一份引擎知识）；
+ * 探测的引擎覆盖与文案逐字沿用原
+ * {@code domains.vectorstore.service.VectorStoreConfigService#testConnection} 的实现。</p>
  *
  * <p><b>TestConnection 的引擎覆盖（实现边界，原样保留）</b>：elasticsearch 走裸 HTTP GET
  * （含 basic auth、不跟随重定向、版本解析）；milvus 走 REST {@code collections/list} 探针
@@ -36,16 +43,31 @@ import tools.jackson.databind.ObjectMapper;
  * 成功路径的 version 探测弱化为 ""。sqlite 为文件型引擎，恒 ""。</p>
  */
 @Component
-public class VectorStoreConnectivityProbe implements VectorStoreConnectivity {
+public class VectorStoreEngineCatalog implements VectorStoreEngineCatalogPort {
 
-    private static final Logger log = LoggerFactory.getLogger(VectorStoreConnectivityProbe.class);
+    private static final Logger log = LoggerFactory.getLogger(VectorStoreEngineCatalog.class);
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private static final Duration TEST_TIMEOUT = Duration.ofSeconds(10);
 
     private final SsrfGuard ssrfGuard;
 
-    public VectorStoreConnectivityProbe(SsrfGuard ssrfGuard) {
+    public VectorStoreEngineCatalog(SsrfGuard ssrfGuard) {
         this.ssrfGuard = ssrfGuard;
+    }
+
+    @Override
+    public VectorStoreEngineRules rulesFor(String engineType) {
+        EngineFactory.EngineSpec spec = EngineFactory.findSpec(engineType);
+        if (spec == null) {
+            return null;
+        }
+        List<VectorStoreRequiredField> required = spec.requiredFields().stream()
+                .map(f -> new VectorStoreRequiredField(f.message(), f.satisfied()))
+                .toList();
+        List<VectorStoreAddressField> addresses = spec.controlAddressFields().stream()
+                .map(f -> new VectorStoreAddressField(f.label(), f.value()))
+                .toList();
+        return new VectorStoreEngineRules(engineType == null ? "" : engineType, required, addresses);
     }
 
     /**

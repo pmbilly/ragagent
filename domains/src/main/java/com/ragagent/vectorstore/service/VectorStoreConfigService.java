@@ -4,7 +4,10 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.vectorstore.ConnectionConfig;
 import com.ragagent.contract.vectorstore.IndexConfig;
-import com.ragagent.contract.vectorstore.VectorStoreConnectivity;
+import com.ragagent.contract.vectorstore.VectorStoreAddressField;
+import com.ragagent.contract.vectorstore.VectorStoreEngineCatalogPort;
+import com.ragagent.contract.vectorstore.VectorStoreEngineRules;
+import com.ragagent.contract.vectorstore.VectorStoreRequiredField;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.vectorstore.config.EnvVectorStores;
@@ -28,9 +31,9 @@ import org.springframework.transaction.support.TransactionTemplate;
  * ValidateIndexConfig → OpenSearch HNSW → DB 去重 → env 去重 → TestConnection（失败=
  * "connection test failed: ..."）→ 落库 → 注册（进程内注册表当前 no-op）。</p>
  *
- * <p><b>TestConnection 的引擎覆盖</b>：探测体已拆到 retrieval-engine 的
- * {@code VectorStoreConnectivityProbe}（各引擎的差异与"错误文案逐字一致"的约定随迁，
- * 见那边的类说明）。本类只剩配置校验（必填 + 地址 SSRF）与对外错误包装。</p>
+ * <p><b>TestConnection 的引擎覆盖</b>：规则与探测体都在 retrieval-engine 的
+ * {@code VectorStoreEngineCatalog}（各引擎的差异与"错误文案逐字一致"的约定随迁，
+ * 见那边的类说明）。本类只剩执行规则（必填 + 地址 SSRF）与对外错误包装。</p>
  */
 @Service
 public class VectorStoreConfigService {
@@ -42,8 +45,8 @@ public class VectorStoreConfigService {
     private final VectorStoreRepository repo;
     private final SsrfGuard ssrfGuard;
 
-    /** 连通性探测面（探测体在 retrieval-engine，本类只做校验 + 委托 + 包装）。 */
-    private final VectorStoreConnectivity connectivity;
+    /** 引擎目录（规则与探测体在 retrieval-engine，本类只做校验 + 委托 + 包装）。 */
+    private final VectorStoreEngineCatalogPort engineCatalog;
     private final JdbcTemplate jdbc;
     private final TransactionTemplate tx;
     /** 构造期派生一次的 env stores */
@@ -55,12 +58,12 @@ public class VectorStoreConfigService {
     private final List<VectorStore> envStores;
 
     public VectorStoreConfigService(VectorStoreRepository repo, SsrfGuard ssrfGuard,
-            VectorStoreConnectivity connectivity,
+            VectorStoreEngineCatalogPort engineCatalog,
             JdbcTemplate jdbc, TransactionTemplate tx,
             RetrievalDriverProperties driverProperties, EnvVectorStores.EnvLookup envLookup) {
         this.repo = repo;
         this.ssrfGuard = ssrfGuard;
-        this.connectivity = connectivity;
+        this.engineCatalog = engineCatalog;
         this.jdbc = jdbc;
         this.tx = tx;
         this.envLookup = envLookup;
@@ -267,70 +270,41 @@ public class VectorStoreConfigService {
     }
 
     /**
- * 连通性测试：成功返回探测版本（可空），失败抛 AppError（各分支 code 1000，
- * handler 以**双前缀**形态输出——golden vs-test-byid-connrefused 钉住）。
- *
- * <p>：探测体（9 个分支 + 各厂商驱动探针）已整块沉到 {@code retrieval-engine}，
- * 经 {@link VectorStoreConnectivity} 端口调用；本方法保留为对外同名入口（行为与文案不变）。</p>
- */
+     * 连通性测试：成功返回探测版本（可空），失败抛 AppError（各分支 code 1000，
+     * handler 以**双前缀**形态输出——golden vs-test-byid-connrefused 钉住）。
+     *
+     * <p>探测体（9 个分支 + 各厂商驱动探针）在 {@code retrieval-engine}，
+     * 经 {@link VectorStoreEngineCatalogPort} 调用；本方法保留为对外同名入口（行为与文案不变）。</p>
+     */
     public String testConnection(String engineType, ConnectionConfig config) {
-        return connectivity.probe(engineType, config);
+        return engineCatalog.probe(engineType, config);
     }
 
     // ── 校验（文案逐字对照） ────────────────────────────────────────────
 
-    /** 连接配置必填校验 */
+    /** 连接配置必填校验（规则由引擎目录提供；未登记引擎放行，白名单在 validate() 已拦）。 */
     public void validateConnectionConfig(String engineType, ConnectionConfig config) {
         ConnectionConfig c = config == null ? new ConnectionConfig() : config;
-        switch (engineType == null ? "" : engineType) {
-            case "elasticsearch" -> require(c.addr, "addr is required for elasticsearch");
-            case "postgres" -> {
-                if (!c.useDefaultConnection && empty(c.addr)) {
-                    throw validation("addr or use_default_connection is required for postgres");
-                }
-            }
-            case "qdrant" -> require(c.host, "host is required for qdrant");
-            case "milvus" -> require(c.addr, "addr is required for milvus");
-            case "tencent_vectordb" -> {
-                require(c.addr, "addr is required for tencent_vectordb");
-                require(c.username, "username is required for tencent_vectordb");
-                require(c.apiKey, "api_key is required for tencent_vectordb");
-            }
-            case "weaviate" -> require(c.host, "host is required for weaviate");
-            case "doris" -> {
-                require(c.addr, "addr is required for doris (FE MySQL host:port)");
-                require(c.database, "database is required for doris");
-            }
-            case "opensearch" -> require(c.addr, "addr is required for opensearch");
-            case "sqlite" -> {
-                // 文件型引擎，无连接配置
-            }
-            default -> {
-                // 未知引擎在此直接通过（引擎白名单在 validate() 已拦）
+        VectorStoreEngineRules rules = engineCatalog.rulesFor(engineType);
+        if (rules == null) {
+            return;
+        }
+        for (VectorStoreRequiredField field : rules.requiredFields()) {
+            if (!field.satisfied().test(c)) {
+                throw validation(field.message());
             }
         }
     }
 
-    /** 逐地址字段的 SSRF 校验（白名单优先），未知引擎 fail-closed */
+    /** 逐地址字段的 SSRF 校验（白名单优先），未登记引擎 fail-closed。 */
     public void validateConnectionAddrSSRF(String engineType, ConnectionConfig config) {
         ConnectionConfig c = config == null ? new ConnectionConfig() : config;
-        switch (engineType == null ? "" : engineType) {
-            case "elasticsearch", "opensearch", "milvus", "tencent_vectordb", "doris" -> checkAddr(c.addr);
-            case "qdrant" -> {
-                String addr = c.host;
-                if (!empty(addr) && c.port != 0) {
-                    addr = addr + ":" + c.port;
-                }
-                checkAddr(addr);
-            }
-            case "weaviate" -> {
-                checkAddr(c.host);
-                checkAddr(c.grpcAddress);
-            }
-            case "sqlite" -> {
-                // 无远端地址
-            }
-            default -> throw validation("SSRF validation is not configured for engine type: " + engineType);
+        VectorStoreEngineRules rules = engineCatalog.rulesFor(engineType);
+        if (rules == null) {
+            throw validation("SSRF validation is not configured for engine type: " + engineType);
+        }
+        for (VectorStoreAddressField field : rules.addressFields()) {
+            checkAddr(field.value().apply(c));
         }
     }
 
@@ -396,12 +370,6 @@ public class VectorStoreConfigService {
     }
 
     // ── 小工具 ─────────────────────────────────────────────────────────
-
-    private static void require(String value, String message) {
-        if (empty(value)) {
-            throw validation(message);
-        }
-    }
 
     private static boolean empty(String s) {
         return s == null || s.isEmpty();

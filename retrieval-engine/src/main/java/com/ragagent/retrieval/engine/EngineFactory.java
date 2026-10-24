@@ -18,6 +18,7 @@ import com.ragagent.retrieval.engine.weaviate.WeaviateRetrieveRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * 检索引擎工厂——从 {@link com.ragagent.contract.vectorstore.VectorStoreView} 配置按引擎类型构建检索引擎服务，
@@ -75,24 +76,32 @@ public final class EngineFactory {
 
     /** 构造一条引擎服务。 */
     @FunctionalInterface
-    private interface EngineBuilder {
+    interface EngineBuilder {
         KeywordsVectorHybridRetrieveEngineService build(VectorStoreView store, SsrfGuard guard,
                                                         OpenSearchRetrieveRepository.AuditSink auditSink);
     }
 
     /** 地址策略的一条：{@code label} 逐字进错误文案；取值返回空串＝未配置（放行）。 */
-    private record AddressField(String label, Function<ConnectionConfig, String> value) {
+    record AddressField(String label, Function<ConnectionConfig, String> value) {
+    }
+
+    /** 控制面必填规则：{@code satisfied} 为 false 时抛 {@code message}。 */
+    record RequiredField(String message, Predicate<ConnectionConfig> satisfied) {
     }
 
     /**
-     * 引擎注册项。地址策略必须显式二选一——声明字段，或 {@code addressExempt}
+     * 引擎注册项：构造 + 运行时地址策略 + 控制面必填/地址规则。
+     *
+     * <p>运行时地址字段必须显式二选一——声明字段，或 {@code addressExempt}
      * （无远端地址 / 不走本工厂）。空字段 + 非免检＝登记错误，类初始化即失败。
+     * 控制面规则可以为空（如 sqlite），未知引擎由 {@link #findSpec(String)} 返回 null。</p>
      */
-    private record EngineSpec(EngineBuilder builder, List<AddressField> addressFields,
-                              boolean addressExempt) {
+    record EngineSpec(EngineBuilder builder, List<AddressField> runtimeAddressFields,
+                      List<AddressField> controlAddressFields, List<RequiredField> requiredFields,
+                      boolean addressExempt) {
 
         EngineSpec {
-            if (addressFields.isEmpty() && !addressExempt) {
+            if (runtimeAddressFields.isEmpty() && !addressExempt) {
                 throw new IllegalArgumentException(
                         "engine spec needs address fields or addressExempt");
             }
@@ -100,32 +109,60 @@ public final class EngineFactory {
     }
 
     private static final Map<String, EngineSpec> SPECS = Map.ofEntries(
-            Map.entry(EngineTypes.ENGINE_ELASTICSEARCH,
-                    new EngineSpec(EngineFactory::elasticsearch,
-                            List.of(addrField()), false)),
-            Map.entry(EngineTypes.ENGINE_POSTGRES,
-                    new EngineSpec(EngineFactory::postgresUnsupported, List.of(), true)),
-            Map.entry(EngineTypes.ENGINE_SQLITE,
-                    new EngineSpec(EngineFactory::sqlite, List.of(), true)),
-            Map.entry(EngineTypes.ENGINE_OPENSEARCH,
-                    new EngineSpec(EngineFactory::opensearch,
-                            List.of(addrField()), false)),
-            Map.entry(EngineTypes.ENGINE_DORIS,
-                    new EngineSpec(EngineFactory::doris, List.of(addrField()), false)),
-            Map.entry(EngineTypes.ENGINE_QDRANT,
-                    new EngineSpec(EngineFactory::qdrant,
-                            List.of(new AddressField("qdrant address", EngineFactory::qdrantEndpoint)),
-                            false)),
-            Map.entry(EngineTypes.ENGINE_WEAVIATE,
-                    new EngineSpec(EngineFactory::weaviate,
-                            List.of(new AddressField("weaviate HTTP address", cc -> cc.host),
-                                    new AddressField("weaviate gRPC address", cc -> cc.grpcAddress)),
-                            false)),
-            Map.entry(EngineTypes.ENGINE_MILVUS,
-                    new EngineSpec(EngineFactory::milvus, List.of(addrField()), false)),
-            Map.entry(EngineTypes.ENGINE_TENCENT_VECTORDB,
-                    new EngineSpec(EngineFactory::tencentVectorDb,
-                            List.of(addrField()), false)));
+            Map.entry(EngineTypes.ENGINE_ELASTICSEARCH, new EngineSpec(
+                    EngineFactory::elasticsearch,
+                    List.of(addrField()), List.of(addrField()),
+                    List.of(required("addr is required for elasticsearch", c -> filled(c.addr))),
+                    false)),
+            Map.entry(EngineTypes.ENGINE_POSTGRES, new EngineSpec(
+                    EngineFactory::postgresUnsupported,
+                    List.of(), List.of(),
+                    List.of(required("addr or use_default_connection is required for postgres",
+                            c -> c.useDefaultConnection || filled(c.addr))),
+                    true)),
+            Map.entry(EngineTypes.ENGINE_SQLITE, new EngineSpec(
+                    EngineFactory::sqlite, List.of(), List.of(), List.of(), true)),
+            Map.entry(EngineTypes.ENGINE_OPENSEARCH, new EngineSpec(
+                    EngineFactory::opensearch,
+                    List.of(addrField()), List.of(addrField()),
+                    List.of(required("addr is required for opensearch", c -> filled(c.addr))),
+                    false)),
+            Map.entry(EngineTypes.ENGINE_DORIS, new EngineSpec(
+                    EngineFactory::doris,
+                    List.of(addrField()), List.of(addrField()),
+                    List.of(required("addr is required for doris (FE MySQL host:port)",
+                                    c -> filled(c.addr)),
+                            required("database is required for doris", c -> filled(c.database))),
+                    false)),
+            Map.entry(EngineTypes.ENGINE_QDRANT, new EngineSpec(
+                    EngineFactory::qdrant,
+                    List.of(new AddressField("qdrant address", EngineFactory::qdrantEndpoint)),
+                    List.of(new AddressField("vector store address",
+                            EngineFactory::qdrantControlEndpoint)),
+                    List.of(required("host is required for qdrant", c -> filled(c.host))),
+                    false)),
+            Map.entry(EngineTypes.ENGINE_WEAVIATE, new EngineSpec(
+                    EngineFactory::weaviate,
+                    List.of(new AddressField("weaviate HTTP address", cc -> cc.host),
+                            new AddressField("weaviate gRPC address", cc -> cc.grpcAddress)),
+                    List.of(new AddressField("weaviate HTTP address", cc -> cc.host),
+                            new AddressField("weaviate gRPC address", cc -> cc.grpcAddress)),
+                    List.of(required("host is required for weaviate", c -> filled(c.host))),
+                    false)),
+            Map.entry(EngineTypes.ENGINE_MILVUS, new EngineSpec(
+                    EngineFactory::milvus,
+                    List.of(addrField()), List.of(addrField()),
+                    List.of(required("addr is required for milvus", c -> filled(c.addr))),
+                    false)),
+            Map.entry(EngineTypes.ENGINE_TENCENT_VECTORDB, new EngineSpec(
+                    EngineFactory::tencentVectorDb,
+                    List.of(addrField()), List.of(addrField()),
+                    List.of(required("addr is required for tencent_vectordb", c -> filled(c.addr)),
+                            required("username is required for tencent_vectordb",
+                                    c -> filled(c.username)),
+                            required("api_key is required for tencent_vectordb",
+                                    c -> filled(c.apiKey))),
+                    false)));
 
     /**
      * 先做地址策略校验，再按引擎类型建服务。
@@ -154,9 +191,14 @@ public final class EngineFactory {
         validate(specFor(store.getEngineType()), connectionConfig(store), guard);
     }
 
+    /** 未登记引擎返回 null（控制面据此决定放行或 fail-closed）。 */
+    static EngineSpec findSpec(String engineType) {
+        return SPECS.get(engineType == null ? "" : engineType);
+    }
+
     private static EngineSpec specFor(String engineType) {
         String type = engineType == null ? "" : engineType;
-        EngineSpec spec = SPECS.get(type);
+        EngineSpec spec = findSpec(type);
         if (spec == null) {
             throw new EngineNotSupportedException("vector store engine \"" + type
                     + "\" has no SSRF address policy");
@@ -165,7 +207,7 @@ public final class EngineFactory {
     }
 
     private static void validate(EngineSpec spec, ConnectionConfig cc, SsrfGuard guard) {
-        for (AddressField field : spec.addressFields()) {
+        for (AddressField field : spec.runtimeAddressFields()) {
             check(field.label(), field.value().apply(cc), guard);
         }
     }
@@ -181,11 +223,28 @@ public final class EngineFactory {
         return new AddressField("vector store address", cc -> cc.addr);
     }
 
+    private static RequiredField required(String message, Predicate<ConnectionConfig> satisfied) {
+        return new RequiredField(message, satisfied);
+    }
+
+    private static boolean filled(String value) {
+        return value != null && !value.isEmpty();
+    }
+
     /** qdrant 的端点：host 与 port 都有值时拼 {@code [host]:port}（去方括号）。 */
     private static String qdrantEndpoint(ConnectionConfig cc) {
         String endpoint = cc.host == null ? "" : cc.host;
         if (!endpoint.isEmpty() && cc.port != 0) {
             endpoint = "[" + stripBrackets(endpoint) + "]:" + cc.port;
+        }
+        return endpoint;
+    }
+
+    /** 控制面 SSRF 的 qdrant 地址：保持原有 {@code host:port} 形态（不加方括号）。 */
+    private static String qdrantControlEndpoint(ConnectionConfig cc) {
+        String endpoint = cc.host == null ? "" : cc.host;
+        if (!endpoint.isEmpty() && cc.port != 0) {
+            endpoint = endpoint + ":" + cc.port;
         }
         return endpoint;
     }
