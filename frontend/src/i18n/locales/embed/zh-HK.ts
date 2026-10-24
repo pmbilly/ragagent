@@ -99,6 +99,12 @@ export default {
     thinking: '思考中...',
     enterDescription: '輸入描述',
     thinkingAlt: '思考進行中',
+    thinkingPhases: {
+      thinking: '思考中...',
+      searching: '查資料中...',
+      analyzing: '分析中....',
+      waiting: '稍等一會兒...'
+    },
     conversationTime: {
       today: '今天 {time}',
       yesterday: '昨天 {time}',

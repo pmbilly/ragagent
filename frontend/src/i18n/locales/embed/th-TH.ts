@@ -99,6 +99,12 @@ export default {
     thinking: 'กำลังคิด...',
     enterDescription: 'ใส่คำอธิบาย',
     thinkingAlt: 'กำลังคิดอยู่',
+    thinkingPhases: {
+      thinking: 'กำลังคิด...',
+      searching: 'กำลังค้นหาแหล่งข้อมูล...',
+      analyzing: 'กำลังวิเคราะห์....',
+      waiting: 'โปรดรอสักครู่...'
+    },
     conversationTime: {
       today: 'วันนี้ {time}',
       yesterday: 'เมื่อวาน {time}',

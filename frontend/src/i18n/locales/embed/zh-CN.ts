@@ -124,6 +124,12 @@ export default {
     unableToGetKnowledgeBaseId: '无法获取知识库ID',
     summaryInProgress: '正在总结答案……',
     thinkingAlt: '正在思考',
+    thinkingPhases: {
+      thinking: '思考中...',
+      searching: '查资料中...',
+      analyzing: '分析中....',
+      waiting: '稍等一会...'
+    },
     conversationTime: {
       today: '今天 {time}',
       yesterday: '昨天 {time}',

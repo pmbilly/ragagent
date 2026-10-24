@@ -123,6 +123,12 @@ export default {
     unableToGetKnowledgeBaseId: 'Unable to get knowledge base ID',
     summaryInProgress: 'Summarizing answer…',
     thinkingAlt: 'Thinking in progress',
+    thinkingPhases: {
+      thinking: 'Thinking...',
+      searching: 'Searching sources...',
+      analyzing: 'Analyzing...',
+      waiting: 'Just a moment...'
+    },
     conversationTime: {
       today: 'Today {time}',
       yesterday: 'Yesterday {time}',

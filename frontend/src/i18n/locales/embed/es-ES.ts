@@ -99,6 +99,12 @@ export default {
     thinking: 'Pensando...',
     enterDescription: 'Introduzca la descripción',
     thinkingAlt: 'Pensando en curso',
+    thinkingPhases: {
+      thinking: 'Pensando...',
+      searching: 'Buscando fuentes...',
+      analyzing: 'Analizando....',
+      waiting: 'Un momento...'
+    },
     conversationTime: {
       today: 'Hoy {time}',
       yesterday: 'Ayer {time}',

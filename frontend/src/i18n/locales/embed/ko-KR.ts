@@ -123,6 +123,12 @@ export default {
     unableToGetKnowledgeBaseId: 'Unable to get knowledge base ID',
     summaryInProgress: 'Summarizing answer…',
     thinkingAlt: '생각 중',
+    thinkingPhases: {
+      thinking: '생각 중...',
+      searching: '자료를 찾는 중...',
+      analyzing: '분석 중....',
+      waiting: '잠시만 기다려 주세요...'
+    },
     conversationTime: {
       today: '오늘 {time}',
       yesterday: '어제 {time}',

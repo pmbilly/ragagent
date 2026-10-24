@@ -123,6 +123,12 @@ export default {
     unableToGetKnowledgeBaseId: 'ナレッジベースIDを取得できません',
     summaryInProgress: '回答を要約しています…',
     thinkingAlt: '思考中',
+    thinkingPhases: {
+      thinking: '思考中...',
+      searching: '資料を検索中...',
+      analyzing: '分析中....',
+      waiting: '少々お待ちください...'
+    },
     conversationTime: {
       today: '今日{time}',
       yesterday: '昨日{time}',
