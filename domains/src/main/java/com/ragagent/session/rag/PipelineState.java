@@ -39,7 +39,9 @@ public interface PipelineState extends TurnInputView {
     /** 引用开关（null 视为开启）。 */
     boolean citationsEnabled();
 
-    /** 重排阈值可被降级重试临时改写（写入方只此一处）。 */
+    /** 重排阈值：请求初值来自配置，降级重试时由 PluginRerank 临时改写。 */
+    double getRerankThreshold();
+
     void setRerankThreshold(double v);
 
     /** 并发分支的独立副本（不复制检索产出/答复）。 */

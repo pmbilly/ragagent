@@ -11,6 +11,8 @@ import java.util.List;
 public final class RerankOutcome {
 
     private List<SearchResult> results;
+    /** 重排阈值：降级重试时由 {@code PluginRerank} 临时改写，属于执行期状态。 */
+    private double threshold;
 
     public List<SearchResult> getResults() {
         return results;
@@ -18,5 +20,13 @@ public final class RerankOutcome {
 
     public void setResults(List<SearchResult> v) {
         results = v;
+    }
+
+    public double getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(double v) {
+        threshold = v;
     }
 }

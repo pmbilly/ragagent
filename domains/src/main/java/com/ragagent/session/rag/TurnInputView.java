@@ -40,8 +40,6 @@ public interface TurnInputView {
 
     int getRerankTopK();
 
-    double getRerankThreshold();
-
     String getChatModelId();
 
     SummaryConfig getSummaryConfig();

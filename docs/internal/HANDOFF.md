@@ -212,7 +212,7 @@
 | **Q0** | 评估核实 + 删除收口（4 份文档按删除处理；引用迁 `docs/api/README.md` / `HANDOFF 11.1` / `HANDOFF §7` / getting-started） | ✅ 2026-10-24（48/48） |
 | **Q1** | 模型配置结构校验：`ModelConfigValidator` 窄端口 + `ModelService` 三处接线（不联网） | ✅ 2026-10-24（5088/0/2） |
 | **Q2** | SQL 下沉（复用 `KnowledgeTagRepository`）+ 删 `PipelinePorts` 占位 Port | ✅ 2026-10-24（5088/0/2） |
-| **Q3** | 请求段冻结：`rerankThreshold` 归位 `RerankOutcome` → 不可变快照 + `fork()` 白名单 | 待做 |
+| **Q3** | 请求段冻结：`rerankThreshold` 归位 `RerankOutcome` → 不可变快照 + `fork()` 白名单 | ✅ 2026-10-24（5099/0/2） |
 | **Q4** | 向量库 Descriptor：contract 只放控制面规则；`retrieval-engine` 持工厂/探测 | ✅ 2026-10-24（5092/0/2） |
 | **Q5** | 存储 Provider Descriptor（域内）：校验/端点/探测/创建/清单单源化 | ✅ 2026-10-24（5097/0/2） |
 | **Q6** | `KnowledgeProcessWorker` 构造面 20 → 约 5（三阶段移装配点） | 待做 |
@@ -671,6 +671,8 @@ boot           17 件                      →  boot
 | Q4 | 2026-10-24 | **向量库控制面/运行时单源**：`contract.vectorstore` 新增 `VectorStoreEngineRules` + `VectorStoreRequiredField` + `VectorStoreAddressField`；`VectorStoreConnectivity` 扩为 **`VectorStoreEngineCatalogPort`**（`probe` + `rulesFor`），实现类 `VectorStoreConnectivityProbe` 更名 `VectorStoreEngineCatalog`；`EngineFactory` 的 `EngineSpec` 增 `controlAddressFields` + `requiredFields`（运行时/控制面两套地址函数并列，qdrant 保留 `[host]:port` vs `host:port` 差异）；`VectorStoreConfigService` 两个 switch 删除，改为执行目录规则（未登记引擎：必填放行、SSRF fail-closed 文案不变）。 | 新增 4 条目录测试（9 引擎全覆盖 / 未知 null / ES 文案 / qdrant 形态）· 48 守卫绿 · `mvn -B clean verify` 绿（**5092 / 0 / 2**）· `VectorStoreContractTest` 3 用例（含 SSRF golden）绿 |
 
 | Q5 | 2026-10-24 | **存储 provider 单一登记点**：新增 `storage.provider.StorageProviders`（9 条描述符：必填规则 / 端点+SSRF 策略 / 连通性形态 / 凭据字段名 / 旧 KV 段映射 / 运行时创建）。`StorageBackendService` 的必填、端点、探测三个 switch 删除；`FileServiceFactory` 变薄壳（`require(provider).creator()`）；`StorageConfigProjector` 凭据键、`DefaultStorageBackendProvisioner` 旧段映射与候选序、`ResourceCatalogService`/`FileServiceResolver` 的漂移数组全部改查表；`ConnectorFailure` 随登记点上移。platform 的 `StorageAllowList` / `StoragePaths` 因模块方向保留（前者与 `exposedKeys()` 同序，测试钉住）。 | 新增 5 条登记点测试 · 既有存储测试 45 条（domains 25 + boot 20）绿 · 卫生基线 methodsOver100 106→105 · 48 守卫绿 · `mvn -B clean verify` 绿（**5097 / 0 / 2**） |
+
+| Q3 | 2026-10-24 | **请求段冻结 + fork 共享快照**：`rerankThreshold` 从 `TurnInputView` 移入 `RerankOutcome`（写者仍是 PluginRerank 降级路径）；新增 `TurnInputSnapshot`（40 字段，构造期防御拷贝），`ChatManage.freeze()` 在 setup 结束冻结，40 个请求段 getter 读快照、setter 冻结后抛 `IllegalStateException`；`cloneChatManage()` 不再 41 行逐字段复制，fork 共享快照只复制状态段。知识检索路径同样在触发前冻结。 | 新增 2 条冻结/独立性测试 · rag 域 38 条录制测试绿 · 48 守卫绿 · `mvn -B clean verify` 绿（**5099 / 0 / 2**） |
 
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 

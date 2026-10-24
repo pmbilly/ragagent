@@ -199,6 +199,7 @@ public class SessionKnowledgeQaService {
 
         // Apply custom agent overrides
         resolution.applyAgentOverridesToChatManage(req, chatManage);
+        chatManage.freeze();
 
         // Pipeline 选择
         boolean hasKb = hasKnowledgeRetrievalScope(searchTargets, kb.kbIds, kb.knowledgeIds);
@@ -440,6 +441,7 @@ public class SessionKnowledgeQaService {
             }
         }
 
+        chatManage.freeze();
         List<PipelineEventType> searchEvents = List.of(
                 PipelineEventType.CHUNK_SEARCH,
                 PipelineEventType.CHUNK_RERANK,
