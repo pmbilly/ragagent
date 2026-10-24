@@ -1,32 +1,19 @@
 package com.ragagent.knowledge.task;
 
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.retrieval.RetrieveGraphRepository;
-import com.ragagent.contract.retrieval.VectorIndexStore;
-import com.ragagent.knowledge.client.DocReaderClient;
-import com.ragagent.knowledge.config.KnowledgeOcrProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.ingest.IngestJob;
 import com.ragagent.knowledge.domain.ingest.IngestStage;
 import com.ragagent.knowledge.domain.span.SpanTracker;
-import com.ragagent.knowledge.index.ChunkVectorIndexer;
-import com.ragagent.knowledge.index.KnowledgeVectorWrites;
-import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.IngestStateRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
-import com.ragagent.knowledge.service.image.ExtractedImageStore;
-import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantScopes;
 import com.ragagent.platform.access.TracingContext;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
-import com.ragagent.wiki.service.DefaultWikiKnowledgeFinalizer;
-import com.ragagent.wiki.service.ingest.WikiIngestService;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -35,8 +22,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 /**
@@ -80,51 +65,19 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private final KnowledgeRepository knowledgeRepository;
     private final IngestStateRepository ingestStateRepository;
     private final KnowledgeBaseRepository kbRepository;
-    private final KnowledgeTextExtractor textExtractor;
-    private final KnowledgeChunkWriter chunkWriter;
-    private final KnowledgeIndexStage indexStage;
-    private final KnowledgeFinalizingStage finalizingStage;
     private final SpanTracker spanTracker;
+    private final KnowledgeIngestPipeline pipeline;
 
     public KnowledgeProcessWorker(KnowledgeRepository knowledgeRepository,
                                   IngestStateRepository ingestStateRepository,
                                   KnowledgeBaseRepository kbRepository,
-                                  ChunkRepository chunkRepository,
-                                  TenantFileStorage fileStorage,
-                                  ExtractedImageStore extractedImageStore,
-                                  DocReaderClient docReader,
-                                  KnowledgeOcrProperties ocrProperties,
-                                  VectorIndexStore vectorStore,
-                                  ModelCatalogPort modelCatalog,
-                                  KnowledgeVectorWrites vectorWrites,
-                                  ChunkVectorIndexer chunkVectorIndexer,
-                                  ModelRuntime modelRuntimeAssembler,
-                                  ApplicationEventPublisher eventPublisher,
                                   SpanTracker spanTracker,
-                                  RetrieveGraphRepository graphRepository,
-                                  ObjectProvider<
-                                          WikiIngestService> wikiIngestService,
-                                  ObjectProvider<
-                                          DefaultWikiKnowledgeFinalizer> wikiKnowledgeFinalizer,
-                                  ObjectProvider<
-                                          ChunkExtractTaskQueue> chunkExtractQueue,
-                                  ObjectProvider<
-                                          QuestionGenerationTaskQueue> questionGenerationQueue) {
+                                  KnowledgeIngestPipeline pipeline) {
         this.knowledgeRepository = knowledgeRepository;
         this.ingestStateRepository = ingestStateRepository;
         this.kbRepository = kbRepository;
         this.spanTracker = spanTracker;
-        this.textExtractor = new KnowledgeTextExtractor(
-                fileStorage, extractedImageStore, docReader, kbRepository,
-                new KnowledgeImageOcr(fileStorage, ocrProperties, spanTracker), spanTracker);
-        this.chunkWriter = new KnowledgeChunkWriter(chunkRepository, spanTracker);
-        this.indexStage = new KnowledgeIndexStage(
-                chunkRepository, extractedImageStore, vectorStore, modelCatalog, vectorWrites,
-                chunkVectorIndexer, modelRuntimeAssembler, graphRepository, spanTracker);
-        this.finalizingStage = new KnowledgeFinalizingStage(
-                knowledgeRepository, ingestStateRepository, kbRepository, chunkRepository,
-                eventPublisher, spanTracker,
-                wikiIngestService, wikiKnowledgeFinalizer, chunkExtractQueue, questionGenerationQueue);
+        this.pipeline = pipeline;
     }
 
     @Override
@@ -185,28 +138,28 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             if (kb == null) {
                 throw new IllegalStateException("knowledge base not found");
             }
-            String embeddingModelId = indexStage.resolveEmbeddingModelId(k, kb);
-            indexStage.preClean(k, kb, embeddingModelId, knowledgeId);
+            String embeddingModelId = pipeline.indexStage().resolveEmbeddingModelId(k, kb);
+            pipeline.indexStage().preClean(k, kb, embeddingModelId, knowledgeId);
             //：记下本次尝试的 chunk id——失败清场只删它们（见 cleanupFailedAttempt）。
             List<String> attemptChunkIds = List.of();
             try {
                 job = job.progress(IngestStage.DOC_READER);
-                String markdown = textExtractor.extract(k, attempt, knowledgeId);
+                String markdown = pipeline.textExtractor().extract(k, attempt, knowledgeId);
                 if (knowledgeRepository.findByIdAny(knowledgeId).isAborted()) {
                     return; // 中途取消检查点
                 }
                 job = job.progress(IngestStage.CHUNKING);
-                List<Chunk> chunks = chunkWriter.chunkAndPersist(
+                List<Chunk> chunks = pipeline.chunkWriter().chunkAndPersist(
                         k, kb, knowledgeId, markdown, attempt);
                 attemptChunkIds = chunks.stream().map(Chunk::getId).toList();
                 job = job.progress(IngestStage.EMBEDDING);
-                indexStage.embedChunks(k, kb, embeddingModelId, chunks, knowledgeId, attempt);
+                pipeline.indexStage().embedChunks(k, kb, embeddingModelId, chunks, knowledgeId, attempt);
                 job = job.progress(IngestStage.POST_PROCESS);
-                finalizingStage.finalizeProcessing(k, kb, knowledgeId, attempt, chunks);
+                pipeline.finalizingStage().finalizeProcessing(k, kb, knowledgeId, attempt, chunks);
                 job = job.completed();
                 log.debug("process knowledge {} completed at {}", knowledgeId, job.stage());
             } catch (Exception inner) {
-                indexStage.cleanupFailedAttempt(knowledgeId, attemptChunkIds, k, kb, embeddingModelId);
+                pipeline.indexStage().cleanupFailedAttempt(knowledgeId, attemptChunkIds, k, kb, embeddingModelId);
                 throw inner;
             }
         } catch (Exception e) {
@@ -216,7 +169,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             job = job.failed();
             log.warn("process knowledge {} failed stage={} status={}",
                     knowledgeId, job.stage(), job.status(), e);
-            finalizingStage.failOrComplete(knowledgeId, attempt, message);
+            pipeline.finalizingStage().failOrComplete(knowledgeId, attempt, message);
         }
     }
 

@@ -102,6 +102,7 @@ graph TD
 | `DataSourceTaskQueueWiring` | 本域任务队列的 Memory/Redis 实现选择 |
 | `EmbedWiring` | 嵌入渠道运行时装配（消费会话域端口） |
 | `KnowledgeRedisWiring` | 知识域进度/索引队列与锁的 Redis 实现选择 |
+| `KnowledgeProcessWiring` | 入库主链路阶段装配（取文本/分块/索引/收口） |
 | `McpWiring` | MCP 服务与工具发现装配（客户端与协议实现在本域） |
 | `McpOAuthWiring` | MCP OAuth 授权链装配 |
 | `MemoryTaskQueueWiring` | 记忆抽取队列的实现选择 |

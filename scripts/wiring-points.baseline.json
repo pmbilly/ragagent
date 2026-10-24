@@ -49,6 +49,10 @@
       "kind": "domain-internal",
       "why": "知识域进度/索引队列与锁的 Redis 实现选择"
     },
+    "com.ragagent.knowledge.task.KnowledgeProcessWiring": {
+      "kind": "domain-internal",
+      "why": "入库主链路阶段装配：取文本/分块/索引/收口四个本域协作者"
+    },
     "com.ragagent.mcp.McpWiring": {
       "kind": "domain-internal",
       "why": "MCP 服务与工具发现装配：客户端与协议实现在本域"

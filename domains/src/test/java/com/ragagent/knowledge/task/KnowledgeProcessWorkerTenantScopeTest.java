@@ -50,7 +50,7 @@ class KnowledgeProcessWorkerTenantScopeTest {
     private final IngestStateRepository ingestStateRepository = mock(IngestStateRepository.class);
     @SuppressWarnings("unchecked")
 
-    private final KnowledgeProcessWorker worker = new KnowledgeProcessWorker(
+    private final KnowledgeProcessWorker worker = KnowledgeProcessWorkerFixture.worker(
             knowledgeRepository,
             ingestStateRepository,
             mock(KnowledgeBaseRepository.class),

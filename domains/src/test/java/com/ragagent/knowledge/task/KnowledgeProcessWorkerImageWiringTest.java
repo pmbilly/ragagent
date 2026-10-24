@@ -58,7 +58,7 @@ class KnowledgeProcessWorkerImageWiringTest {
     private final List<Chunk> inserted = new ArrayList<>();
 
     @SuppressWarnings("unchecked")
-    private final KnowledgeProcessWorker worker = new KnowledgeProcessWorker(
+    private final KnowledgeProcessWorker worker = KnowledgeProcessWorkerFixture.worker(
             knowledgeRepository,
             ingestStateRepository,
             kbRepository,
