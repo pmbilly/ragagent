@@ -21,10 +21,7 @@
 - 权限与角色：[`rbac.md`](rbac.md) —— 四级角色、路由下限、API Key 范围
 - IM 渠道接入：[`im-integration.md`](im-integration.md) —— 企业微信/微信/飞书/钉钉/Slack
 - 知识图谱：[`knowledge-graph.md`](knowledge-graph.md) —— Neo4j 启用与实体关系抽取
-- 数据库迁移排障：[`migration-troubleshooting.md`](migration-troubleshooting.md) —— 启动失败与 Flyway
-- API 概览：[`api/README.md`](api/README.md) —— 认证、响应外壳、主要资源
-- 响应外壳细则：[`api-response-convention.md`](api-response-convention.md) —— 外壳形状、错误码分段、前端解析兜底
-- 已知缺口：[`known-gaps.md`](known-gaps.md) —— 读代码遇到空分支 / 恒 404 / no-op 先查这里（新缺口也登记在这里）
+- API 概览：[`api/README.md`](api/README.md) —— 认证、响应外壳、错误码与主要资源
 
 查表（三份由守卫强制与代码同步的链路/接口表）：
 
@@ -46,10 +43,9 @@
 
 ## 维护者路径
 
-- [`internal/HANDOFF.md`](internal/HANDOFF.md) —— 当前批次、判定标准、闸门与回填
+- [`internal/HANDOFF.md`](internal/HANDOFF.md) —— 当前批次、判定标准、闸门与回填；§11 含已知缺口登记，§7 含契约金片布局与重录
 - [`internal/plans/`](internal/plans/) —— 整改方案（v2 与历史版本）
 - [`internal/handoff/`](internal/handoff/) —— 批次记录、专项计划与归档
-- [`internal/golden-fixtures.md`](internal/golden-fixtures.md) —— 契约金片的布局、重录与签字流程
 - [`architecture-review/`](architecture-review/) —— 历轮架构评审报告（均带评估日期与基线快照声明，非现状文档）
 
 ## 约定

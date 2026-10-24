@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""已知缺口守卫：类注释声明「不支持」时必须指向 `docs/known-gaps.md`。
+"""已知缺口守卫：类注释声明「不支持」时必须指向 `HANDOFF §11.1`。
 
 用法：
     python3 scripts/check-known-gaps.py
@@ -7,12 +7,12 @@
 ## 为什么
 
 `未实现` / `暂缺` / `未接线` 散落在类注释里时，新人分不清「设计取舍」与「缺陷」，
-也找不到替代路径。统一登记到 `docs/known-gaps.md`，类注释只留一行指针。
+也找不到替代路径。统一登记到 `docs/internal/HANDOFF.md §11.1`，类注释只留一行指针。
 
 ## 判据
 
 类/接口/枚举/record 的**类级 Javadoc** 里出现 `未实现|暂缺|未接线|不实现|规划中` 时，
-同一注释块必须含 `known-gaps`。方法内注释不在范围内（大量正常降级语义）。
+同一注释块必须含 `HANDOFF §11`。方法内注释不在范围内（大量正常降级语义）。
 """
 
 import pathlib
@@ -23,6 +23,7 @@ import _source_roots as _sr
 
 ROOTS = [d for _, _, d in _sr.java_roots(("main",))]
 GAP = re.compile(r"未实现|暂缺|未接线|不实现|规划中")
+POINTER = re.compile(r"HANDOFF\s*(?:§\s*)?11")
 TYPE = re.compile(r"^\s*(?:public\s+|final\s+|abstract\s+|sealed\s+)*(?:class|interface|enum|record)\s+\w+")
 
 
@@ -49,16 +50,16 @@ def main() -> int:
                        for ln in lines[k:j + 1]):
                     continue
                 block = "\n".join(lines[k:j + 1])
-                if GAP.search(block) and "known-gaps" not in block:
+                if GAP.search(block) and not POINTER.search(block):
                     flat = " ".join(x.strip() for x in block.splitlines())
                     hits.append(f"{f}:{i + 1}: {flat[:90]}")
     if hits:
-        print(f"✗ 已知缺口守卫失败：{len(hits)} 处类注释声明了缺口但未指向 docs/known-gaps.md")
+        print(f"✗ 已知缺口守卫失败：{len(hits)} 处类注释声明了缺口但未指向 HANDOFF §11.1")
         for h in hits:
             print("   " + h)
-        print("  处理：在 docs/known-gaps.md 登记该能力，类注释加「见 docs/known-gaps.md §N」。")
+        print("  处理：在 HANDOFF §11.1 登记该能力，类注释加「见 HANDOFF §11.1 第 N 条」。")
         return 1
-    print("✓ 已知缺口：类注释的缺口声明均指向 docs/known-gaps.md")
+    print("✓ 已知缺口：类注释的缺口声明均指向 HANDOFF §11.1")
     return 0
 
 

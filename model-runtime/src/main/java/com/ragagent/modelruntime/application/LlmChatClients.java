@@ -25,7 +25,7 @@ import com.ragagent.modelruntime.adapter.provider.chat.common.ConcurrencyChatCli
  *
  * 装饰器从内到外：内层实现 → 并发闸门（最外，只包住真正的 provider 往返）。
  *
- * **本类未实现的两个装饰器**（见 {@code docs/known-gaps.md} 第 8 节）：
+ * **本类未实现的两个装饰器**（见 {@code HANDOFF 11.1} 第 8 条）：
  * - debug 包装器：受 LLMDebugEnabled 环境变量控制，
  *   未启用时等价于直接返回原对象
  * - langfuse 包装器：chat/embedding/rerank 的 tracing 包装发生在

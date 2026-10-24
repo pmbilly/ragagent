@@ -39,7 +39,7 @@ import tools.jackson.databind.ObjectMapper;
  *
  * <h2>错误形态（与 {@link DataSourceController} <b>一致</b>）</h2>
  * <p>两者都走<b>统一响应外壳</b> {@code {code,message,data}}（{@code @ApiResult} + 全局处理器），
- * 见 {@code docs/api-response-convention.md}。</p>
+ * 见 {@code docs/api/README.md}。</p>
  * <p>两类的错误形态与状态码一致：均抛 {@code BizException}，由全局处理器按
  * {@code @ApiResult} 输出外壳。</p>
  */

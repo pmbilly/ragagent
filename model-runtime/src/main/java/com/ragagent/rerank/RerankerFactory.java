@@ -15,7 +15,7 @@ import com.ragagent.rerank.provider.ZhipuReranker;
  * reranker 工厂。
  *
  * <p>provider 字段缺省时按 {@link ProviderRegistry#detectProvider} 路由；customHeaders 在
- * 工厂层统一注入。debug/langfuse 装饰器未实现（等价于未启用路径）。见 {@code docs/known-gaps.md} 第 8 节。</p>
+ * 工厂层统一注入。debug/langfuse 装饰器未实现（等价于未启用路径）。见 {@code HANDOFF 11.1} 第 8 条。</p>
  */
 public final class RerankerFactory {
 

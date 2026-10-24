@@ -3,7 +3,7 @@ package com.ragagent.platform.web;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * 统一响应外壳（约定见 {@code docs/api-response-convention.md}）。
+ * 统一响应外壳（约定见 {@code docs/api/README.md}）。
  *
  * <p>形态固定为 {@code {"code": 0, "message": "ok", "data": …}}：</p>
  * <ul>

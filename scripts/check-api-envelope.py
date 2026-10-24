@@ -4,7 +4,7 @@
 背景：B183 定了「一套外壳 + 一个解包点」——`@ApiResult` 控制器成功体统一
 `{code,message,data}`（`common/web/ApiResponse`），错误体同形（`GlobalExceptionHandler`
 按请求打标分派）；前端唯一解包点 `frontend/src/utils/request.ts`。约定见
-`docs/api-response-convention.md`。
+`docs/api/README.md`。
 
 四条规则：
   R-a 每个控制器要么标注 `@ApiResult`，要么在 `scripts/api-envelope.baseline.json`
@@ -102,7 +102,7 @@ def main():
     total = len(files)
     done = len(annotated)
     print(f"统一响应外壳：{done}/{total} 个控制器已迁移"
-          f"（pending {len(pending)}，约定见 docs/api-response-convention.md）")
+          f"（pending {len(pending)}，约定见 docs/api/README.md）")
 
     if write:
         kept = {f: v for f, v in pending.items() if f in files and f not in annotated}

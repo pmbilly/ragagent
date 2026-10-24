@@ -5,7 +5,7 @@ package com.ragagent.wiki.service;
  *
  * <p>chunk 同步是<b>可选接线</b>——没装 chunk 仓储的 service 直接跳过，而不是让删除失败。</p>
  *
- * <p>knowledge 模块的 chunk 同步（wiki 页 → chunks 表）尚未接线（见 {@code docs/known-gaps.md} 第 18 节），
+ * <p>knowledge 模块的 chunk 同步（wiki 页 → chunks 表）尚未接线（见 {@code HANDOFF 11.1} 第 18 条），
  * Spring 没有实现 bean 时 {@code deletePage} 保持「跳过」行为（不是报错）。</p>
  *
  * <p>实参约定：chunkID = {@code "wp-" + pageId}，

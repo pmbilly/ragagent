@@ -46,7 +46,7 @@ import tools.jackson.databind.node.ObjectNode;
  * {@code force=true} 才强删（引用清单进 details 与审计）。</p>
  *
  * <p>响应一律 camelCase，外壳统一 {@code {code,message,data}}（{@link ApiResult}；
- * 约定见 {@code docs/api-response-convention.md}）。</p>
+ * 约定见 {@code docs/api/README.md}）。</p>
  */
 @RestController
 @ApiResult

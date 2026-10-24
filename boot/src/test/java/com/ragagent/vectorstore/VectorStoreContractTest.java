@@ -30,7 +30,7 @@ import org.springframework.test.web.servlet.MvcResult;
  * vector-stores 9 条的契约测试。golden：
  * scripts/record-infra-config-golden.sh（28 个 vs-* 文件，随统一外壳重录）。
  *
- * <p><b>外壳迁移变化</b>：响应改走统一外壳 {@code {code,message,data}}（docs/api-response-convention.md）；
+ * <p><b>外壳迁移变化</b>：响应改走统一外壳 {@code {code,message,data}}（docs/api/README.md）；
  * 同时退役三处 Go 期私有错误形态 ⇒ <b>test 失败从「200 + {"error":…}」改为真 400</b>（4 条），
  * <b>DELETE 从 204 改为 200 + 外壳</b>（1 条）。其余状态码不变。</p>
  *

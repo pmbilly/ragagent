@@ -39,7 +39,7 @@ import tools.jackson.databind.ObjectMapper;
  * id 一律 400 readonly（即使该 id 不存在）；GET /test 则先查 env 表 → 404。
  * 本部署 RETRIEVE_DRIVER 未配置 → env 列表恒空（部署状态，golden 钉住）。</p>
  *
- * <p><b>响应形态（统一外壳 {@code {code,message,data}}，见 docs/api-response-convention.md）</b>：
+ * <p><b>响应形态（统一外壳 {@code {code,message,data}}，见 docs/api/README.md）</b>：
  * 成功体一律外壳（列表/对象进 {@code data}；创建返 201，删除返 200 + 外壳，不用 204）；
  * 错误体同形（{@code {code,message,data}}），**HTTP 状态码随语义**（404/400/401…）。</p>
  *

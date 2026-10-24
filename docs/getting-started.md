@@ -141,6 +141,9 @@ cd frontend && npm run type-check && npm test
 | Redis `NOAUTH` / `invalid password` | `.env` 的 `REDIS_PASSWORD` 与服务端不一致 | 本仓 dev Redis 无密码：注释掉该行；有密码则两边一致 |
 | 端口 8083 被占用 | 旧后端还在跑 | `bash scripts/java-server-down.sh --stop` |
 | 改了代码但行为没变 / 起服后全端点 500 | 服务运行期间跑过 `mvn package`：jar 被替换，但进程仍跑旧代码（`spring-boot:run` 则是 `target/classes` 被就地重写） | 停服重启（与业务代码无关） |
+| `database "xxx" does not exist` | `DB_NAME` 与容器初始化库名不一致；复用旧卷但改了库名 | 改回旧库名，或新建库/迁移数据 |
+| Flyway `Validate failed` / checksum mismatch | 迁移脚本被改过，或手工改过表 | 不要手改 `flyway_schema_history`；恢复原脚本或按 Flyway `repair` 流程处理 |
+| `relation ... does not exist` / 扩展缺失 | 未启用 `pgvector` 等扩展 | 在目标库执行 `CREATE EXTENSION IF NOT EXISTS vector;`（按需） |
 | `No retrievable indexing pipelines` | 同"没有引用" | 同上 |
 | `docker compose up` 端口冲突 | 本机已有另一套 PG/Redis 占用 15432/16379 | 复用现有服务，或先停掉旧容器 |
 

@@ -17,7 +17,7 @@ import java.util.Set;
  * {@link #listAvailableConnectors()} 的结果数组。</p>
  *
  * <h2>表里 17 项、注册表里只有 9 个连接器</h2>
- * <p>这不是 bug：目录里绝大多数条目是<b>规划中/尚未实现</b>的（见 {@code docs/known-gaps.md} 第 5 节）
+ * <p>这不是 bug：目录里绝大多数条目是<b>规划中/尚未实现</b>的（见 {@code HANDOFF 11.1} 第 5 条）
  * （confluence / github / google_drive / onedrive / dingtalk / web_crawler / slack / imap），
  * 前端据此展示"即将支持"的选项。真正能在
  * {@link ConnectorRegistry} 里 {@code get} 得到实现的只有

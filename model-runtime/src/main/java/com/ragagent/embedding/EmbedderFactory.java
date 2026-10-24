@@ -23,7 +23,7 @@ import java.util.Map;
  *
  * <p>装饰顺序：最内层是真实 embedder →
  * {@code wrapEmbeddingConcurrency}（子批往返逐个过闸）→
- * langfuse 与 LLM debug 日志装饰器未实现（等价于未启用路径）。见 {@code docs/known-gaps.md} 第 8 节。</p>
+ * langfuse 与 LLM debug 日志装饰器未实现（等价于未启用路径）。见 {@code HANDOFF 11.1} 第 8 条。</p>
  */
 public final class EmbedderFactory {
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """按域迁移「统一响应外壳」的机械部分。
 
-配方与边界见 HANDOFF B188 行 + docs/api-response-convention.md。
+配方与边界见 HANDOFF B188 行 + docs/api/README.md。
 人工部分（判读项）仍需人做：私有错误形态转 BizException、测试内联期望、下钻与 204 断言。
 
 用法：

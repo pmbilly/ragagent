@@ -42,7 +42,7 @@ import tools.jackson.databind.node.ObjectNode;
  *
  * <p>响应外壳：本类标注 {@link ApiResult} ⇒ 成功体统一 {@code {code,message,data}}
  * （由 {@code ApiResultAdvice} 施加，方法只返回载荷）；错误体同形（{@code GlobalExceptionHandler}
- * 按请求打标分派）。约定见 {@code docs/api-response-convention.md}。</p>
+ * 按请求打标分派）。约定见 {@code docs/api/README.md}。</p>
  */
 @RestController
 @ApiResult

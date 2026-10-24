@@ -18,7 +18,7 @@
 
 - **终态（方案 §5.1）**：7 个 Maven 模块 —— contract / platform / agent-engine / retrieval-engine / model-runtime / domains / boot；单进程分层单体；跨模块只经 contract。
 - **现状（2026-10-24）**：**7 模块** —— `contract` · `platform` · `model-runtime` · `retrieval-engine` · `agent-engine` · `domains` · `boot`。`:common` 与 `:engine` 均已解散；构建已迁 Maven（X 系列）。
-- **当前阶段（v0.8.x）**：v0.5.0 / v0.6.0 / v0.7.x 均已收官；v0.8.x 已落地 K/L/M 收尾 + N/P 系列 + C 系列 contract 还乡（328→293 类型）+ 更名 RagAgent（模块/命令/环境变量）+ 四语言 i18n + 指标面（actuator）+ prompt 行为调优。当前无在途专项；后续拍板项见历轮评估 `docs/internal/plans/architecture-assessment-*.md`。
+- **当前阶段（v0.8.x）**：v0.5.0 / v0.6.0 / v0.7.x 均已收官；v0.8.x 已落地 K/L/M 收尾 + N/P 系列 + C 系列 contract 还乡（328→293 类型）+ 更名 RagAgent（模块/命令/环境变量）+ 四语言 i18n + 指标面（actuator）+ prompt 行为调优。**2026-10-24 第五轮评估核实后立项 Q 系列「配置单源与状态收敛」**（方案 `docs/internal/plans/convergence-remediation-q-series.md`），Q0 核实已完成，批次待推进（见 §5.0g）。
 
 ## 1. 仓库身份与分支
 
@@ -201,6 +201,30 @@
 四个实测修正：① 第三处构建耦合 `SourceRoots.repoRoot()`（删 Gradle 后 `JsonPropertyHygieneTest` 红）；② `spring-data-redis` 的 lettuce 是 optional（Gradle 传递、Maven 不传 ⇒ fat jar 缺 Redis 客户端，起服报 `StringRedisTemplate` 缺失）；③ `mvn -pl boot -am spring-boot:run` 会对每个 `-am` 模块执行 goal，起服改 `package + java -jar`；④ 版本/契约纯度/文档事实守卫的读数源全部改根 pom。
 四个实测坑：① surefire 必须 `@{argLine}`（`${argLine}` 配置期解析，jacoco agent 挂不上）；② 守卫绑 boot 的 verify（根 pom 的 verify 在 reactor 最前面）；③ `ContractBoundaryRulesTest` 的 `DO_NOT_INCLUDE_TESTS` 对 `-tests.jar` 无效（补显式排除）；④ `StorageRuntimeEnv` 静态快照污染（`DefaultStorageBackendProvisionerTest` 配了 s3 不恢复 ⇒ `FaqContractTest` CSV 走云分支），已加 `@AfterAll` 恢复。
 
+### 5.0g 并行专项：Q 系列「配置单源与状态收敛」（`v0.8.x` 续作，待推进）
+
+> 方案：`docs/internal/plans/convergence-remediation-q-series.md`。输入评估：`docs/internal/plans/architecture-assessment-2026-10-24.md`。
+> 定位：不拆 7 模块；只收四件事——扩展描述符单源（模型/向量库/存储）、问答请求段与终态、入库装配面、前端巨石。
+> 核实结论：报告 4 处重复已完成/已否决项，5 处落法需改写；数字口径 6 处更正（详见方案 §1/§2）。
+
+| 批 | 内容 | 状态 |
+|---|---|---|
+| **Q0** | 评估核实 + 删除收口（4 份文档按删除处理；引用迁 `docs/api/README.md` / `HANDOFF 11.1` / `HANDOFF §7` / getting-started） | ✅ 2026-10-24（48/48） |
+| **Q1** | 模型配置结构校验：`ModelConfigValidator` 窄端口 + `ModelService` 三处接线（不联网） | 待做 |
+| **Q2** | SQL 下沉（复用 `KnowledgeTagRepository`）+ 删 `PipelinePorts` 3 个占位 Port | 待做 |
+| **Q3** | 请求段冻结：`rerankThreshold` 归位 `RerankOutcome` → 不可变快照 + `fork()` 白名单 | 待做 |
+| **Q4** | 向量库 Descriptor：contract 只放控制面规则；`retrieval-engine` 持工厂/探测 | 待做 |
+| **Q5** | 存储 Provider Descriptor（域内）：校验与创建分两步单源化 | 待做 |
+| **Q6** | `KnowledgeProcessWorker` 构造面 20 → 约 5（三阶段移装配点） | 待做 |
+| **Q7** | 终态收尾残余（并入 H1b-2，先补状态矩阵测试；不建 Coordinator） | 待做 |
+| **Q8** | 前端流式判别联合 + `ChatMessage` 强类型 + 组件特征测试 | 待做 |
+| **Q9** | `WikiBrowser` 拆分（首刀 `useWikiDirectory`） | 待做 |
+| **Q10** | `AgentEditorModal` 拆分（先 `useAgentEditorForm` + 序列化/校验） | 待做 |
+| **Q11** | 前端 ESLint / knip（report-only）+ 规模棘轮 | 待做 |
+
+**顺序**：Q0 → Q1 → Q2 → Q4 → Q5 → Q6 → Q3 → Q7 → Q8 → Q9 → Q10 → Q11。
+**不做**：`TurnCompletionCoordinator` 重建、`KnowledgeService` 三分、端口改名、contract 放 `runtimeFactory`、OpenAPI 全量生成、租户 KV Registry（观察）。
+
 ### 5.1 历史批次（v0.3.0 P1~P5 / v0.4.0 R1~R6，全部 ✅）
 
 > **阶段路线（续，2026-10-16）**：**R1~R6（三 runtime + 模块收口）在 `v0.4.0` 全部完成** ⇒ **推送 `v0.4.0` + 合并 `main`**。 **✅ 2026-10-16 已执行**：`v0.4.0` 推送（995696f9..e3dce136）→ `main` 快进合并并推送（`c07786fe` → 含本记录的 tip）。**R1~R6 收口读数**：七模块 → 六模块（`:engine` 解散）、末轮增出 `:agent-engine`（七模块新图，见 §8.1 终检）；domains 对全部运行时模块只剩契约 + `modelcontext` 终态边；**16 守卫全绿**（新增模块图守卫）· 测试 5000 / 0 / 4。
@@ -246,6 +270,7 @@
 - **Redis 瞬态族已修（2026-10-19）**：根因是 `EmbeddedRedis` 用 `ServerSocket(0)` 探端口在 `maxParallelForks` 下会撞——后到者借用先到者的实例，先到者 close 杀进程后连接全断。现改为固定端口池 + 跨进程 `FileLock`，红态探针 `EmbeddedRedisPortAllocationTest` 守着；全量连跑 5 遍 0 失败。再见到同类失败按真回归查。
 - 覆盖率：**未执行基线**（`-Pcoverage`）⇒ 本项目**不声称任何覆盖率数字**（开放项）。
 - 前端：`vue-tsc` 是最终文件集上的最后一步（`tsx --test` 只转译不查类型）。
+- **契约金片**：`platform/src/testFixtures/resources/golden/`（`agent-45a/45b/45c/46/46b`、`chat-pipeline-46c`、`modelcontext-46a`，各带 `.sha256`），加载器 `platform.fixtures.GoldenResources` 逐字节校验；"重录"= 按当前实现同步常量并重算 sha256，禁止手改 JSON 或 sha256；新增 bundle 时使用方模块依赖 `platform` 的 `test-jar`。
 
 ## 8. 结构地图与守卫总表
 
@@ -364,6 +389,32 @@ boot           17 件                      →  boot
 **② 协议/行为面（需拍板）**：引用协议标记 · wiki 摄取契约标签 13 个 · chatpipeline/evaluation 模板标签 · 工具名 36 个与 schema enum。
 **③ 落库/DDL 形态**：列名与 SQL 参数 · jsonb 列 · 检索引擎索引文档字段。
 **Go 零值时间哨兵**：形状变更，另批。
+
+### 11.1 已知缺口登记（代码注释只留一行指针：`见 HANDOFF §11.1`）
+
+> 口径：状态（设计取舍 / 待实现 / 待核查）、影响、替代路径。新增缺口登记在这里，不在类注释里展开。
+
+| # | 缺口 | 状态 | 影响 / 替代 |
+|---|---|---|---|
+| 1 | 跨租户共享（org-share / shared-agent） | 设计取舍 | 不实现跨租户授予链；同租户按成员角色授权，API Key 按租户隔离 |
+| 2 | 资源目录 / 共享授权解析（产物、附件） | 设计取舍 | 产物下载恒 404；消息文件代理对 owner ≠ caller 恒 403；公开资源走预签名 URL |
+| 3 | 初始化 `storageBackendId` 解析分支 | 待实现 | 该字段被忽略、按缺省存储处理；先建后端再切换 |
+| 4 | `POST /system/sandbox-check` | 待实现 | 路由未登记，Spring 返回 404 |
+| 5 | 连接器目录中的规划项 | 待实现 | 目录 17 条 / 实现 9 个；未实现类型不可创建 |
+| 6 | Agent 推荐问题的 Wiki fallback | 设计取舍 | 无 FAQ/chunk 的知识库推荐问题恒空；手工配置开场问题 |
+| 7 | `allowed_tools → capability` 派生表 | 待实现 | 只做白名单过滤，不派生能力表 |
+| 8 | 模型运行时 debug / langfuse 装饰器 | 设计取舍 | 只有 `LangfuseChatClient` / `LangfuseReranker`；embedding/rerank debug 装饰不存在 |
+| 9 | Langfuse 概率采样 | 待实现 | `sampleRate` 在 (0,1) 时不生效，trace 恒采样 |
+| 10 | 提示词缓存指纹元数据 | 待实现（非行为面） | `prompt_prefix_fingerprint` / `call_purpose` 未写入 span |
+| 11 | 消息建议的 Langfuse span | 待实现 | 该链路无 trace |
+| 12 | 向量店进程内引擎注册表 | 设计取舍 | 注册表为空，连通性探测走厂商直连 |
+| 13 | OpenSearch 超大批量 scroll | 待实现 | 单次写入超批量上限时不分页；调小分块批量 |
+| 14 | Ollama 私部署分支 | 设计取舍 | 只支持 `localhost`，不处理自定义私部署路径 |
+| 15 | 工具 SPI 迁入 `contract.tool` | 已关闭 | `AgentTool` / `BaseTool` / `ToolDefinitions` 均在契约层 |
+| 16 | 审批闸门未装配 | 设计取舍 | MCP OAuth / 工具审批受理分支返回 500，不静默放行 |
+| 17 | IM 知识桥接的存疑接线 | 待核查 | 生产 `/info` 与 `/search` 的 KB/检索面恒为空 |
+| 18 | Wiki 页面 → chunks 同步 | 待实现 | Wiki 内容不写入 `chunks`，不参与常规 RAG；走 Wiki 专用检索 |
+| 19 | `Provider.validateConfig()` 生产接线 | 待实现（Q1 关闭） | 保存模型不做厂商侧结构校验；缺 key/模型名在首次调用才暴露 |
 
 ## 12. 执行记录（v0.3.0 起；模板：批次｜内容｜读数｜验证）
 
@@ -611,7 +662,10 @@ boot           17 件                      →  boot
 | P1.11 | 2026-10-22 | **parser 配置归位（N8b）**：KB 级 `chunking_config.parserEngineRules` 此前 worker 固定传 `parserEngine=null`，UI 上的规则是空操作。`KnowledgeTextExtractor` 注入 `KnowledgeBaseRepository`，按文件类型解析**显式命中**的规则并传给 `DocReaderClient.read`；未命中保持服务端默认（不注入 ppt/pptx 的 markitdown 默认，避免改变既有行为）。`ChunkingConfigView.inactiveKeys` 删除 `parserEngineRules` 项，能力矩阵不再把它标成未生效。三层作用域写进 `ParserEngineConfig` javadoc：agent 上传首层 / KB 入库 / 租户历史兜底。 | 新增 3 条规则解析测试（命中/未命中/缺 KB）· 能力矩阵 5 用例绿 · 48 守卫绿 · `mvn -B clean verify` 绿（5074 / 0 / 2） |
 | —（2026-10-24 补记） | 2026-10-22~24 | **C2f 之后 16 个提交的概要回填**（未逐批立户，细节见各提交信息）：① `d9f4020c1` **更名 RagAgent**——mcp 模块/命令/环境变量同步；② `f29bb72ac`/`9310eb7f5`/`abbf07907` 三连文档同步（项目/文档/邮箱切 pmbilly/ragagent、补六篇配置接入文档、域数量/IM 渠道/actuator 端点）；③ `5d04bb482`/`1ae44b84b`/`697914b08` CI Redis 测试沉淀为本机固定 dir 实例 + 连接级 PING 就绪；④ `323ce722c` 前端品牌资源与文案切 RagAgent（widget 脚本改名 `ragagent-widget.js`）；⑤ `f1df2705c` 发布渠道分组、创建按钮、LOGO、技能抽屉与加载态统一；⑥ `c131d4e78` **主应用四语言接入**（es-ES/pt-BR/th-TH/zh-HK，embed 面九语言）+ **SSE 断流兜底**（`streamErrorFrame`/`streamRecovery`，断连补拉历史）+ **会话删除修复**（含托管行批量删，`SessionServiceDeleteTest`）；⑦ `8c3ccffb8` 精简系统提示词，46 系金片（agent-46/46b、chat-pipeline-46c、modelcontext-46a）内容更新并重签 sha256；⑧ `ac027f474`/`cce0a34e1` 列表类工具历史保留正文摘录/完整输出，消除反复翻页（先 grep 后精读）；⑨ `60aa93a59` 工具执行收敛提示（证据足够即作答）；⑩ `ed19372eb` 引导批量读取 chunk、禁止逐条精读；⑪ `99f4f720e` currentTime 断言兼容 UTC 的 Z 偏移。**行为面提示**：⑦~⑩ 改变 agent 提示词与工具输出保留策略，属线格式内 contract 文本变更（金片已重签）。 | 46 系金片 sha256 重录 · 各提交独立绿 · 全量基线刷新见 §6（2026-10-24 实测） |
 
+| Q0 | 2026-10-24 | **第五轮评估核实 + Q 系列立项**：逐项复核 `architecture-assessment-2026-10-24.md` 的数字与技术事实（48 守卫 / 19 域 / 40 Port / 326 契约 / 356 package-info / 52 文件 / 28 方法 / 2,483 主源 / 266 分支 / 38 构造器 / 前端 771 测试全对；`session/service` 27→29、构造器口径 38 vs 棘轮 53 两处更正）。**4 处重复已完成/已否决项**：`TurnLifecycle` 已实现终态单赢家（不建 Coordinator）、`KnowledgeService` 三分与 M/L 判据冲突、端口改名无收益、`VectorStoreConnectivity` 已存在；**5 处落法改写**：contract 不放 `runtimeFactory`、ChatManage 改用不可变快照而非 4 个 Policy、`QaRequestContext` 只收复制面、租户 KV Registry 降观察、Wiki 已有 `wikiDirectoryState` 起点。**基线异常**：工作区 4 份文档未提交删除（含 `known-gaps.md`），`check-reference-truth` 红 1 处 ⇒ 当前 47/48 守卫绿。产出 `docs/internal/plans/convergence-remediation-q-series.md`（Q0~Q11）。**Q0 收口（同日）**：用户拍板"删除的文件不要了"⇒ 4 份文档按删除提交；引用迁移（`api-response-convention` → `docs/api/README.md`、`known-gaps` → `HANDOFF 11.1`、`golden-fixtures` → `HANDOFF §7`、`migration-troubleshooting` → `getting-started.md` 常见失败）；`check-known-gaps.py` 指针改为 `HANDOFF 11` 并配红态探针；`docs/README` / `qa-flow` / `api/README` 同步。 | 核实：48 条守卫实跑 · 前端 `npm test` 771/0；Q0：`run-guards.sh` **48/48** · 10 处类注释指针迁移 · 守卫红态探针已验证 |
+
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
+
 
 ## 13. 文档地图与归档
 

@@ -30,7 +30,7 @@ import tools.jackson.databind.ObjectMapper;
  * favorites 属于<b>做收藏动作的人</b>而非资源创建者，不走 OwnedXOrAdmin。
  * Viewer+ 即可，API key 默认拒绝（路由未对 API key 声明）。</p>
  *
- * <h2>响应形态（统一外壳 {@code {code,message,data}}，见 docs/api-response-convention.md）</h2>
+ * <h2>响应形态（统一外壳 {@code {code,message,data}}，见 docs/api/README.md）</h2>
  * <ul>
  *   <li>列表：载荷是数组（空结果序列化为 {@code []} 而非 null），外面包外壳</li>
  *   <li>add：**201 保留**（+ 外壳体）；remove：幽灵删除也是成功（200 + 外壳）</li>

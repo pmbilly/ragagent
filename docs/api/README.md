@@ -1,7 +1,7 @@
 # API 概览
 
 > 基址：`/api/v1`。健康检查：`GET /health`。
-> 统一响应与错误格式见 [`../api-response-convention.md`](../api-response-convention.md)。
+> 统一响应与错误格式见本文 §响应外壳 / §错误码。
 > 路由级权限见 [`../rbac.md`](../rbac.md) 与 [`../architecture/route-policy-map.md`](../architecture/route-policy-map.md)。
 
 ## 认证
@@ -72,9 +72,10 @@ curl -s -X POST http://localhost:8083/api/v1/auth/login \
 - **限流**：Embed 公开面有滑窗限流；多实例下可切 Redis 共享预算。
 - **上传**：文件大小、类型由部署配置约束；超限返回 4xx。
 - **500**：不透出内部异常文案，响应固定 `Internal server error`，详细堆栈看服务端日志。
+- **前端解析**：`frontend/src/utils/request.ts` 对 2xx 取 `data`、非 2xx 取 `message`；业务代码不读 `data.error.message`。
 
 ## 错误码
 
 - 通用段 `1000+`；业务按域分段，定义在 `contract.error.ErrorCode`。
 - 常见：`400` 参数/绑定错误、`401` 未认证/凭据失效、`403` 角色或 API Key 范围不足、`404` 资源不存在、`409` 冲突（重名/被引用）、`429` 限流。
-- 前端解析约定见 [`../api-response-convention.md`](../api-response-convention.md)。
+- 前端解析约定见 §约定与限制（`utils/request.ts` 的拆包规则）。

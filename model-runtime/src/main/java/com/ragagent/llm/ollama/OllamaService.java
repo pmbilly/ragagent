@@ -37,7 +37,7 @@ import tools.jackson.databind.ObjectMapper;
  *       <b>NDJSON</b>（换行分隔的 JSON）而不是 SSE，请求头 {@code Accept: application/x-ndjson}。</li>
  *   <li>心跳是 {@code HEAD /}。</li>
  *   <li>基址指向 ollama.com 时官方客户端会签 Authorization 头；本模块只服务
- *       私部署路径，不实现该分支（见 {@code docs/known-gaps.md} 第 14 节）。</li>
+ *       私部署路径，不实现该分支（见 {@code HANDOFF 11.1} 第 14 条）。</li>
  *   <li>{@code Embeddings} / {@code Generate} 的强类型请求体属于 embedding / rerank
  *       模块，故在这里以原始 JSON 形态提供，避免两处各定一套 DTO。</li>
  * </ul>
