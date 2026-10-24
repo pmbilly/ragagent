@@ -1,8 +1,8 @@
-# RagAgent
+<p align="center">
+  <img alt="RagAgent" src="https://github.com/pmbilly/ragagent/blob/main/frontend/src/assets/img/RagAgent.webp?raw=true" width="40%">
+</p>
 
-**企业级 RAG + Agent 平台**：一套可自托管的后端服务与 Web 控制台 —— 文档摄取、知识库问答、Wiki 协作、Agent 工具编排、多渠道接入与 MCP 生态。
-
-<p>
+<p align="center">
   <img alt="JDK" src="https://img.shields.io/badge/JDK-21-orange">
   <img alt="Spring Boot" src="https://img.shields.io/badge/Spring%20Boot-4.1-6DB33F">
   <img alt="Vue" src="https://img.shields.io/badge/Vue-3.5-42B883">
@@ -10,7 +10,13 @@
   <img alt="License" src="https://img.shields.io/badge/License-MIT-blue">
 </p>
 
-[GitHub](https://github.com/pmbilly/ragagent) · [文档](https://github.com/pmbilly/ragagent/tree/main/docs) · [Issues](https://github.com/pmbilly/ragagent/issues)
+<p align="center">
+[<a href="https://github.com/pmbilly/ragagent">GitHub</a>] · [<a href="https://github.com/pmbilly/ragagent/tree/main/docs">文档</a>] · [<a href="https://github.com/pmbilly/ragagent/issues">Issues</a>]
+</p>
+
+# RagAgent
+
+**企业级 RAG + Agent 平台**：一套可自托管的后端服务与 Web 控制台 —— 文档摄取、知识库问答、Wiki 协作、Agent 工具编排、多渠道接入与 MCP 生态。
 
 ---
 
