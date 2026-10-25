@@ -1236,8 +1236,8 @@ export default {
       noneReady: '사용 가능한 파싱된 첨부 파일이 없습니다'
     },
     knowledgeChunksList: {
-      chunkRange: '{fetched} / {total} 청크 로드됨',
-      page: '{page}페이지, 페이지당 {pageSize}개'
+      chunkRange: '이번에 {from}-{to}번 블록 읽음 (전체 {total}개)',
+      chunkSingle: '{index}번 블록 (전체 {total}개)'
     },
     grepResults: {
       chunkHits: '청크 {count}개',

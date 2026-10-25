@@ -151,7 +151,7 @@ class GrepChunksRecordingTest {
 
     /**
      * 与仓储层同构的 SQL：同样的 scopeClause OR 组合、
-     * {@code (content ~* ? OR knowledges.title ~* ?)}、created_at DESC LIMIT 500、
+     * {@code content ~* ?}（只搜正文，篇名命中不召回整篇）、created_at DESC LIMIT 500、
      * COUNT(*) 回填 totalChunkCount。无有效 scope 返回空表。
      */
     static final class JdbcGrepSearch implements GrepChunkSearch {
@@ -211,8 +211,7 @@ class GrepChunksRecordingTest {
             sql.append(String.join(" OR ", clauses)).append(") AND (");
             List<String> regexConds = new ArrayList<>();
             for (int i = 0; i < queries.size(); i++) {
-                regexConds.add("(chunks.content ~* ? OR knowledges.title ~* ?)");
-                args.add(queries.get(i));
+                regexConds.add("(chunks.content ~* ?)");
                 args.add(queries.get(i));
             }
             sql.append(String.join(" OR ", regexConds)).append(")");
@@ -309,7 +308,8 @@ class GrepChunksRecordingTest {
         }
     }
 
-    private static void assertToolResult(String label, ToolResult result, JsonNode r) {
+    private static void assertToolResult(String label, ToolResult result, String goldenKey) {
+        JsonNode r = rec(goldenKey);
         assertThat(result.isSuccess()).as("%s success", label).isEqualTo(r.get("success").asBoolean());
         // 输出数字形态与录制侧不同（1 vs 1.0）——语义比较吸收
         assertThat(ContractJson.deep(result.getOutput())).as("%s output", label)
@@ -338,44 +338,44 @@ class GrepChunksRecordingTest {
     @Test
     void basic() {
         GrepChunksTool tool = new GrepChunksTool(new JdbcGrepSearch(), wholeKb(KB_A));
-        assertToolResult("basic", tool.execute(req("{\"query\":\"stardust\"}")), rec("grep_chunks_basic"));
+        assertToolResult("basic", tool.execute(req("{\"query\":\"stardust\"}")), "grep_chunks_basic");
     }
 
     @Test
     void alternation() {
         GrepChunksTool tool = new GrepChunksTool(new JdbcGrepSearch(), wholeKb(KB_A));
         assertToolResult("alternation", tool.execute(req("{\"query\":\"stardust|psionic\"}")),
-                rec("grep_chunks_alternation"));
+                "grep_chunks_alternation");
     }
 
     @Test
     void alreadySeen() {
         GrepChunksTool tool = new GrepChunksTool(new JdbcGrepSearch(), wholeKb(KB_A));
         assertToolResult("already_seen_first", tool.execute(req("{\"query\":\"psionic\"}")),
-                rec("grep_chunks_already_seen_first"));
+                "grep_chunks_already_seen_first");
         assertToolResult("already_seen_second", tool.execute(req("{\"query\":\"psionic\"}")),
-                rec("grep_chunks_already_seen_second"));
+                "grep_chunks_already_seen_second");
     }
 
     @Test
     void emptyResult() {
         GrepChunksTool tool = new GrepChunksTool(new JdbcGrepSearch(), wholeKb(KB_A));
         assertToolResult("empty_result", tool.execute(req("{\"query\":\"zzzznotfound\"}")),
-                rec("grep_chunks_empty_result"));
+                "grep_chunks_empty_result");
     }
 
     @Test
     void emptyQuery() {
         GrepChunksTool tool = new GrepChunksTool(new JdbcGrepSearch(), wholeKb(KB_A));
         assertToolResult("empty_query", tool.execute(req("{\"query\":\"   \"}")),
-                rec("grep_chunks_empty_query"));
+                "grep_chunks_empty_query");
     }
 
     @Test
     void noScope() {
         GrepChunksTool tool = new GrepChunksTool(new JdbcGrepSearch(), null);
         assertToolResult("no_scope", tool.execute(req("{\"query\":\"stardust\"}")),
-                rec("grep_chunks_no_scope"));
+                "grep_chunks_no_scope");
     }
 
     @Test
@@ -385,7 +385,7 @@ class GrepChunksRecordingTest {
                         List.of("aa45bd01"), null, false)));
         GrepChunksTool tool = new GrepChunksTool(new JdbcGrepSearch(), targets);
         assertToolResult("tag_scope", tool.execute(req("{\"query\":\"rag\"}")),
-                rec("grep_chunks_tag_scope"));
+                "grep_chunks_tag_scope");
     }
 
     @Test
@@ -395,7 +395,7 @@ class GrepChunksRecordingTest {
                         List.of("aa45bb07"), null, null, false)));
         GrepChunksTool tool = new GrepChunksTool(new JdbcGrepSearch(), targets);
         assertToolResult("knowledge_scope", tool.execute(req("{\"query\":\"stardust\"}")),
-                rec("grep_chunks_knowledge_scope"));
+                "grep_chunks_knowledge_scope");
     }
 
     @Test
@@ -406,13 +406,13 @@ class GrepChunksRecordingTest {
                         List.of("aa45bd01"), null, false)));
         GrepChunksTool tool = new GrepChunksTool(new JdbcGrepSearch(), targets);
         assertToolResult("mixed_scope", tool.execute(req("{\"query\":\"stardust\"}")),
-                rec("grep_chunks_mixed_scope"));
+                "grep_chunks_mixed_scope");
     }
 
     @Test
     void mmrSelect() {
         GrepChunksTool tool = new GrepChunksTool(new JdbcGrepSearch(), wholeKb(KB_C));
         assertToolResult("mmr_select", tool.execute(req("{\"query\":\"engine\"}")),
-                rec("grep_chunks_mmr_select"));
+                "grep_chunks_mmr_select");
     }
 }

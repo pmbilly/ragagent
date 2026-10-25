@@ -4838,8 +4838,8 @@ export default {
       faqEntry: 'รายการ FAQ'
     },
     knowledgeChunksList: {
-      chunkRange: 'โหลดแล้ว {fetched} / {total} ส่วนย่อย',
-      page: 'หน้า {page}, {pageSize} ต่อหน้า'
+      chunkRange: 'อ่านบล็อก {from}-{to} (จาก {total})',
+      chunkSingle: 'บล็อก {index} (จาก {total})'
     },
     attachmentParsing: {
       parsedSummary: 'แปลงไฟล์แนบแล้ว {count} รายการ',

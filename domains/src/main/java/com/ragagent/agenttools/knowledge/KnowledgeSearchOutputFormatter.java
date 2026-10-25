@@ -119,7 +119,8 @@ final class KnowledgeSearchOutputFormatter {
             boolean seen = !tool.seenChunks.add(nz(result.sr.id));
             String sourceQuery = nz(result.sourceQuery);
             appendResultXml(ob, i, result, faqMeta, queries, seen, sourceQuery);
-            formattedResults.add(formattedResult(i, result, faqMeta, sourceQuery));
+            long totalChunks = knowledgeTotalMap.getOrDefault(nz(result.sr.knowledgeId), 0L);
+            formattedResults.add(formattedResult(i, result, faqMeta, sourceQuery, totalChunks));
         }
 
         ob.append("<retrievalStatistics>\n");
@@ -255,13 +256,16 @@ final class KnowledgeSearchOutputFormatter {
 
     /** 单条结果的结构化 data 条目。 */
     private Map<String, Object> formattedResult(int i, ResultWithMeta result,
-                                                FaqChunkMetadata faqMeta, String sourceQuery) {
+                                                FaqChunkMetadata faqMeta, String sourceQuery, long totalChunks) {
         Map<String, Object> formatted = new LinkedHashMap<>();
         formatted.put("resultIndex", i + 1);
         formatted.put("content", nz(result.sr.content));
         formatted.put("knowledgeId", nz(result.sr.knowledgeId));
         formatted.put("knowledgeBaseId", nz(result.sr.knowledgeBaseId));
         formatted.put("knowledgeTitle", nz(result.sr.knowledgeTitle));
+        if (totalChunks > 0) {
+            formatted.put("totalChunks", totalChunks);
+        }
         formatted.put("knowledgeMetadata", nz(result.sr.knowledgeCustomMetadata));
         formatted.put("matchType", result.sr.matchType);
         formatted.put("sourceQuery", sourceQuery);

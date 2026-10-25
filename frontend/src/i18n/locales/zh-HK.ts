@@ -4838,8 +4838,8 @@ export default {
       faqEntry: 'FAQ 項目'
     },
     knowledgeChunksList: {
-      chunkRange: '已載入 {fetched}／{total} 個分塊',
-      page: '第 {page} 頁，每頁 {pageSize} 個'
+      chunkRange: '本次讀取第 {from}-{to} 塊（共 {total} 塊）',
+      chunkSingle: '第 {index} 塊（共 {total} 塊）'
     },
     attachmentParsing: {
       parsedSummary: '已解析 {count} 個附件',

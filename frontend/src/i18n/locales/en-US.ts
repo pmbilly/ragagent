@@ -4838,8 +4838,8 @@ export default {
       faqEntry: 'FAQ entry'
     },
     knowledgeChunksList: {
-      chunkRange: 'Loaded {fetched} / {total} chunks',
-      page: 'Page {page}, {pageSize} per page'
+      chunkRange: 'Read chunks {from}-{to} (of {total})',
+      chunkSingle: 'Chunk {index} (of {total})'
     },
     attachmentParsing: {
       parsedSummary: 'Parsed {count} attachment(s)',

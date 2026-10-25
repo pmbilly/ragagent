@@ -78,6 +78,17 @@ public final class DocChunkSupport {
     /** 分页取 chunk 接缝（为 null = 服务不可用）。 */
     public interface PagedChunks {
         ChunkPage listPaged(long tenantId, String knowledgeId, int page, int pageSize);
+
+        /**
+         * 精确范围：{@code offset} 是块起点，不做页对齐。
+         *
+         * <p>默认实现退化为按页取整（{@code offset/limit+1}）；生产实现直接下推
+         * offset/limit，避免调用方写 offset=12/limit=5 却从第 10 块开始。</p>
+         */
+        default ChunkPage listRange(long tenantId, String knowledgeId, int offset, int limit) {
+            int size = Math.max(limit, 1);
+            return listPaged(tenantId, knowledgeId, Math.max(offset, 0) / size + 1, size);
+        }
     }
 
     /** 批量收集图片信息接缝。 */

@@ -188,8 +188,9 @@ public class SsrfGuard {
         try {
             ips = InetAddress.getAllByName(IDN.toASCII(hostname));
         } catch (Exception e) {
+            // 透传 cause：DNS 抖动/超时/不存在 的区分全靠它，吞掉只剩一句"cannot verify"
             throw new SsrfException("DNS resolution failed for hostname " + hostname
-                    + ": cannot verify if it resolves to safe IP");
+                    + ": cannot verify if it resolves to safe IP (" + e.getClass().getSimpleName() + ")", e);
         }
         for (InetAddress ip : ips) {
             IpClass.Result r = IpClass.classify(ip);
@@ -357,6 +358,10 @@ public class SsrfGuard {
     public static class SsrfException extends RuntimeException {
         public SsrfException(String message) {
             super(message);
+        }
+
+        public SsrfException(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 }

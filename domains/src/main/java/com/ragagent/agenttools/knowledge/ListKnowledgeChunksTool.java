@@ -48,14 +48,14 @@ public class ListKnowledgeChunksTool extends BaseTool {
                 },
                 "limit": {
                   "default": 20,
-                  "description": "Chunks per page when using knowledge_id (default 20, max 100)",
+                  "description": "How many consecutive blocks to read from startChunkIndex (default 20, max 100; use 20-30 for tables, 5 or more when inspecting one hit)",
                   "maximum": 100,
                   "minimum": 1,
                   "type": "integer"
                 },
-                "offset": {
+                "startChunkIndex": {
                   "default": 0,
-                  "description": "Start position when using knowledge_id (default 0)",
+                  "description": "0-based block index to start from (the index shown on grep/search chunks). Exact, not a page number.",
                   "minimum": 0,
                   "type": "integer"
                 }
@@ -70,17 +70,17 @@ public class ListKnowledgeChunksTool extends BaseTool {
                     + "- **FAQ hit** (type faq): list_knowledge_chunks(faqId=\"cN\") — reads that one FAQ chunk with answers from metadata.\n"
                     + "- **Document hit**: list_knowledge_chunks(knowledgeId=\"dN\") — pages through all chunks.\n"
                     + "\n"
-                    + "## Parameters (provide exactly one id target):\n"
+                    + "## Parameters (Exactly one of chunkId, faqId, knowledgeId is required):\n"
                     + "- faqId (optional): Short cN ID for an FAQ chunk from grep_chunks / knowledge_search.\n"
                     + "- chunkId (optional): Short cN ID for a single non-FAQ chunk.\n"
                     + "- knowledgeId (optional): Short dN document ID to page through all chunks.\n"
-                    + "- limit / offset: Only for knowledgeId paging (default limit 20, max 100).\n"
+                    + "- startChunkIndex + limit (only with knowledgeId): read `limit` consecutive blocks starting at the exact 0-based `startChunkIndex` (default 0/20, max 100). To read one block use limit=1; to read a table region use limit=20-30. For the next region, pass nextStartChunkIndex from the previous result's <pagination>.\n"
                     + "\n"
                     + "## Paging guidance:\n"
                     + "- Use grep_chunks first to locate the relevant chunks; do not use this tool to enumerate an entire document.\n"
-                    + "- Prefer one page with limit 20-50 over repeated small pages. The full result is kept in history, so do not call again for the same content.\n"
-                    + "- If you need more than one chunk from the same document, read them in one knowledgeId page (limit 20-50) instead of calling chunkId repeatedly.\n"
-                    + "- Do not read chunks one by one; per-chunk calls waste turns and miss adjacent context.\n"
+                    + "- For table-like documents (参数配置表), read 20-30 blocks per call; a limit like 10 wastes turns.\n"
+                    + "- Do not read chunks one by one: per-block calls (limit=1) waste turns and miss adjacent context.\n"
+                    + "- Keep step == limit when paging forward; a smaller step re-reads overlapping blocks.\n"
                     + "\n"
                     + "## Output:\n"
                     + "Full chunk content. FAQ entries include <faq> with <answer> from metadata.";
@@ -110,15 +110,18 @@ public class ListKnowledgeChunksTool extends BaseTool {
         if (chunkID.isEmpty()) {
             chunkID = args.path("chunkId").asString("").trim();
         }
+        String knowledgeID = args.path("knowledgeId").asString("").trim();
         if (!chunkID.isEmpty()) {
             return executeByChunkID(chunkID);
         }
-
-        String knowledgeID = args.path("knowledgeId").asString("").trim();
         if (knowledgeID.isEmpty()) {
             return failure("one of faq_id, chunk_id, or knowledge_id is required");
         }
+        return executeByKnowledgePage(knowledgeID, args);
+    }
 
+    /** knowledgeId 分页路径：offset 是精确块起点，不按 limit 取整。 */
+    private ToolResult executeByKnowledgePage(String knowledgeID, JsonNode args) {
         KnowledgeInfoRow knowledge;
         try {
             SearchAuth.authorizeKnowledgeInSearchTargets(searchTargets, knowledgeID,
@@ -137,21 +140,23 @@ public class ListKnowledgeChunksTool extends BaseTool {
         if (args.path("limit").asInt(0) > 0) {
             chunkLimit = args.path("limit").asInt(0);
         }
-        int offset = 0;
-        if (args.path("offset").asInt(0) > 0) {
-            offset = args.path("offset").asInt(0);
+        int startChunkIndex = args.path("startChunkIndex").asInt(-1);
+        if (startChunkIndex < 0) {
+            // 兼容旧参数名 offset（不写入 schema，仅过渡期读取）
+            startChunkIndex = args.path("offset").asInt(0);
         }
-        if (offset < 0) {
-            offset = 0;
+        if (startChunkIndex < 0) {
+            startChunkIndex = 0;
         }
 
-        int page = offset / chunkLimit + 1;
+        int page = startChunkIndex / chunkLimit + 1;
         int pageSize = chunkLimit;
 
         ChunkPage result;
         try {
+            // 精确起点：startChunkIndex 是块号，不按 limit 取整到页边界
             result = pagedChunks == null ? null
-                    : pagedChunks.listPaged(effectiveTenantID, knowledgeID, page, pageSize);
+                    : pagedChunks.listRange(effectiveTenantID, knowledgeID, startChunkIndex, chunkLimit);
         } catch (RuntimeException e) {
             return failure("failed to list chunks: " + e.getMessage());
         }
@@ -163,7 +168,7 @@ public class ListKnowledgeChunksTool extends BaseTool {
         int fetched = chunks.size();
 
         // 越界指引
-        if (fetched == 0 && totalChunks > 0 && offset >= totalChunks) {
+        if (fetched == 0 && totalChunks > 0 && startChunkIndex >= totalChunks) {
             long suggestedOffset = totalChunks - chunkLimit;
             if (suggestedOffset < 0) {
                 suggestedOffset = 0;
@@ -171,13 +176,13 @@ public class ListKnowledgeChunksTool extends BaseTool {
             ToolResult r = new ToolResult();
             r.setSuccess(false);
             r.setError(String.format(
-                    "offset %d is out of range: document has only %d chunks (valid offset range: 0..%d)."
-                            + " Retry with offset=%d (or any value < %d).",
-                    offset, totalChunks, totalChunks - 1, suggestedOffset, totalChunks));
+                    "startChunkIndex %d is out of range: document has only %d chunks (valid range: 0..%d)."
+                            + " Retry with startChunkIndex=%d (or any value < %d).",
+                    startChunkIndex, totalChunks, totalChunks - 1, suggestedOffset, totalChunks));
             Map<String, Object> data = new LinkedHashMap<>();
             data.put("knowledgeId", knowledgeID);
             data.put("totalChunks", totalChunks);
-            data.put("requestedOffset", offset);
+            data.put("requestedOffset", startChunkIndex);
             data.put("requestedLimit", chunkLimit);
             data.put("suggestedOffset", suggestedOffset);
             r.setData(data);
@@ -248,6 +253,7 @@ public class ListKnowledgeChunksTool extends BaseTool {
         data.put("knowledgeTitle", knowledgeTitle);
         data.put("totalChunks", totalChunks);
         data.put("fetchedChunks", fetched);
+        data.put("startChunkIndex", startChunkIndex);
         data.put("page", page);
         data.put("pageSize", pageSize);
         data.put("chunks", formattedChunks);
@@ -291,17 +297,7 @@ public class ListKnowledgeChunksTool extends BaseTool {
         String knowledgeTitle = lookupKnowledgeTitle(chunk.knowledgeId());
         String output = buildOutput(chunk.knowledgeId(), knowledgeTitle, 1, 1, chunks);
 
-        Map<String, Object> chunkData = new LinkedHashMap<>();
-        chunkData.put("seq", 1);
-        chunkData.put("chunkId", chunk.id());
-        chunkData.put("chunkIndex", chunk.chunkIndex());
-        chunkData.put("content", nz(chunk.content()));
-        chunkData.put("chunkType", chunk.chunkType());
-        chunkData.put("knowledgeId", nz(chunk.knowledgeId()));
-        chunkData.put("knowledgeBase", nz(chunk.knowledgeBaseId()));
-        FaqSnippet.appendFaqChunkData(chunkData, chunk);
-        FaqSnippet.normalizeFaqChunkDataMap(chunkData, chunk);
-        List<Map<String, Object>> formattedChunks = List.of(chunkData);
+        List<Map<String, Object>> formattedChunks = List.of(singleChunkData(chunk, 1));
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("displayType", "knowledge_chunks_list");
@@ -324,6 +320,21 @@ public class ListKnowledgeChunksTool extends BaseTool {
         toolResult.setOutput(output);
         toolResult.setData(data);
         return toolResult;
+    }
+
+    /** 单块 data 条目（chunkId 单条路径）。 */
+    private static Map<String, Object> singleChunkData(ChunkFacts chunk, int seq) {
+        Map<String, Object> chunkData = new LinkedHashMap<>();
+        chunkData.put("seq", seq);
+        chunkData.put("chunkId", chunk.id());
+        chunkData.put("chunkIndex", chunk.chunkIndex());
+        chunkData.put("content", nz(chunk.content()));
+        chunkData.put("chunkType", chunk.chunkType());
+        chunkData.put("knowledgeId", nz(chunk.knowledgeId()));
+        chunkData.put("knowledgeBase", nz(chunk.knowledgeBaseId()));
+        FaqSnippet.appendFaqChunkData(chunkData, chunk);
+        FaqSnippet.normalizeFaqChunkDataMap(chunkData, chunk);
+        return chunkData;
     }
 
     /** 取文档标题（trim 后返回；失败/无服务 → ""）。 */

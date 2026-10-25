@@ -14,10 +14,9 @@ public final class GrepChunkHit {
     public String parentChunkId;
     public String knowledgeTitle;
     public int totalChunkCount;
-    // 打分阶段回填（MatchScore/MatchedPatterns/TitleMatch）。
+    // 打分阶段回填（MatchScore/MatchedPatterns）。
     public double matchScore;
     public int matchedPatterns;
-    public boolean titleMatch;
 
     /** null 视为 ""（零值语义）。 */
     public static String nz(String v) {

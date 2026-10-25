@@ -288,6 +288,7 @@ export interface KnowledgeChunksListData {
     knowledgeTitle?: string;
     totalChunks?: number;
     fetchedChunks?: number;
+    startChunkIndex?: number;
     page?: number;
     pageSize?: number;
     faqQuestion?: string;

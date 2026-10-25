@@ -19,10 +19,6 @@
       "lines": 196,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
-    "domains/src/main/java/com/ragagent/agenttools/knowledge/ListKnowledgeChunksTool.java#execute": {
-      "lines": 151,
-      "reason": "存量基线（M1 首次登记，2026-10-20）"
-    },
     "domains/src/main/java/com/ragagent/agenttools/knowledge/QueryKnowledgeGraphTool.java#execute": {
       "lines": 240,
       "reason": "存量基线（M1 首次登记，2026-10-20）"

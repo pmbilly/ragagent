@@ -86,4 +86,5 @@ class SsrfGuardTest {
         assertThatThrownBy(() -> guard.validateURLForSSRF("wss://localhost/socket"))
                 .isInstanceOf(SsrfGuard.SsrfException.class);
     }
+
 }

@@ -1238,8 +1238,8 @@ export default {
       noneReady: '没有可用的已解析附件'
     },
     knowledgeChunksList: {
-      chunkRange: '已加载 {fetched} / {total} 个分块',
-      page: '第 {page} 页，每页 {pageSize} 个'
+      chunkRange: '本次读取第 {from}-{to} 块（共 {total} 块）',
+      chunkSingle: '第 {index} 块（共 {total} 块）'
     },
     grepResults: {
       chunkHits: '{count} 片段',

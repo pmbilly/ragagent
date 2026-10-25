@@ -1,6 +1,5 @@
 package com.ragagent.agenttools.knowledge;
 
-import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.platform.knowledge.GrepChunkHit;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -124,14 +123,6 @@ public final class GrepChunksScoring {
                     }
                     score = Math.min(baseScore + positionBonus, 1.0);
                     patternCount = matchCount;
-                }
-            }
-            String title = GrepChunkHit.nz(r.knowledgeTitle);
-            if (SearchTextUtil.regexMatchesAny(title, compiled)) {
-                r.titleMatch = true;
-                score = Math.min(score + 0.5, 1.0);
-                if (patternCount == 0) {
-                    patternCount = 1;
                 }
             }
             r.matchScore = score;

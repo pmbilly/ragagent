@@ -61,9 +61,9 @@ public class GrepChunksTool extends BaseTool {
             + "IMPORTANT — JSON escaping: every backslash in a regex MUST be written as \\\\ inside the JSON tool arguments (e.g. to search for literal \"C++\" write \"C\\\\+\\\\+\", NOT \"C\\+\\+\"; for \"\\d+\" write \"\\\\d+\"). Plain \"\\+\" / \"\\d\" etc. are invalid JSON escapes and will fail to parse.\n"
             + "Use this to locate candidate chunks by exact identifiers, error codes, product names, or recurring terms.\n"
             + "\n"
-            + "## Deep read after grep:\n"
-            + "- **FAQ hit** (chunk type faq): call list_knowledge_chunks with **faqId=cN** from the grep result (NOT the parent dN document ID).\n"
-            + "- **Document hit**: call list_knowledge_chunks with **knowledgeId=dN**, or get_document_info with **knowledgeIds=[dN]**.";
+            + "## Deep read (only when there is insufficient information in the chunks):\n"
+            + "- The <match> text is already the matched content; answer from it when it is sufficient.\n"
+            + "- **FAQ hit** (chunk type faq): list_knowledge_chunks(faqId=cN) for the full Q/A.\n";
 
     /** 单次返回上限（硬编码常量）。 */
     static final int LIMIT = 30;
@@ -84,7 +84,7 @@ public class GrepChunksTool extends BaseTool {
      *
      * <p>实现侧负责：{@code chunks} JOIN {@code knowledges}、is_enabled/deleted_at 过滤、
      * scopeClause 的 OR 组合（knowledge_id IN / 标签 EXISTS / kb+tenant 对）、
-     * 每个 query 的 {@code (content ~* ? OR knowledges.title ~* ?)}、
+     * 每个 query 的 {@code content ~* ?}（只搜正文，篇名命中不召回整篇）、
      * {@code ORDER BY chunks.created_at DESC LIMIT 500}、以及按 knowledge_id 的
      * {@code COUNT(*)} 回填 {@link GrepChunkHit#totalChunkCount}。
      * 无有效 scope 或 scope 子句为空时返回空表（两处 early return）。</p>
@@ -159,11 +159,8 @@ public class GrepChunksTool extends BaseTool {
             }
         }
 
-        // 排序：TitleMatch > MatchedPatterns > MatchScore > ChunkIndex（并列时序不定）。
+        // 排序：MatchedPatterns > MatchScore > ChunkIndex（并列时序不定）。
         finalResults.sort((a, b) -> {
-            if (a.titleMatch != b.titleMatch) {
-                return a.titleMatch ? -1 : 1;
-            }
             if (a.matchedPatterns != b.matchedPatterns) {
                 return Integer.compare(b.matchedPatterns, a.matchedPatterns);
             }
@@ -283,7 +280,6 @@ public class GrepChunksTool extends BaseTool {
         String knowledgeBaseID;
         String knowledgeTitle;
         String faqQuestion = "";
-        boolean titleMatch;
         int chunkHitCount;
         int totalChunkCount;
         final Map<String, Integer> patternCounts = new LinkedHashMap<>();
@@ -332,9 +328,6 @@ public class GrepChunksTool extends BaseTool {
             }
 
             entry.chunkHitCount++;
-            if (chunk.titleMatch) {
-                entry.titleMatch = true;
-            }
             if (entry.faqQuestion.isEmpty()) {
                 String q = FaqSnippet.faqStandardQuestion(chunk.toChunk());
                 if (!q.isEmpty()) {
@@ -371,9 +364,6 @@ public class GrepChunksTool extends BaseTool {
         }
 
         resultSlice.sort((a, b) -> {
-            if (a.titleMatch != b.titleMatch) {
-                return a.titleMatch ? -1 : 1;
-            }
             if (a.distinctPatterns != b.distinctPatterns) {
                 return Integer.compare(b.distinctPatterns, a.distinctPatterns);
             }
@@ -402,8 +392,8 @@ public class GrepChunksTool extends BaseTool {
             item.put("knowledgeBaseId", GrepChunkHit.nz(r.knowledgeBaseId));
             item.put("knowledgeTitle", GrepChunkHit.nz(r.knowledgeTitle));
             item.put("chunkType", chunkType);
-            if (r.titleMatch) {
-                item.put("titleMatch", true);
+            if (r.totalChunkCount > 0) {
+                item.put("totalChunkCount", r.totalChunkCount);
             }
             String snippet = extractChunkMatchSnippet(r, compiled);
             if (!snippet.isEmpty()) {
@@ -445,7 +435,6 @@ public class GrepChunksTool extends BaseTool {
             if (!e.faqQuestion.isEmpty()) {
                 m.put("faqQuestion", e.faqQuestion);
             }
-            m.put("titleMatch", e.titleMatch);
             m.put("chunkHitCount", e.chunkHitCount);
             m.put("totalChunkCount", e.totalChunkCount);
             m.put("patternCounts", e.patternCounts);

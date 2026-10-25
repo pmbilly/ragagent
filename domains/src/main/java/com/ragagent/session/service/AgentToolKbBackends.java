@@ -219,9 +219,8 @@ final class AgentToolKbBackends {
             RegexDialect dialect = regexDialect();
             List<String> regexParts = new ArrayList<>();
             for (String q : queries) {
-                regexParts.add("(" + dialect.condition("chunks.content") + " OR "
-                        + dialect.condition("knowledges.title") + ")");
-                args.add(q);
+                // 只搜正文：篇名命中会召回整篇，模型无法判断该读哪块，属噪音
+                regexParts.add("(" + dialect.condition("chunks.content") + ")");
                 args.add(q);
             }
             String sql = "SELECT chunks.id, chunks.content, chunks.chunk_index, chunks.knowledge_id, "
@@ -433,12 +432,20 @@ final class AgentToolKbBackends {
         return id -> ChunkProjectionAdapter.factsOf(knowledgeCatalog.getChunkByIdOnly(id));
     }
     public DocChunkSupport.PagedChunks pagedChunks() {
-        return (tenantId, knowledgeId, page, pageSize) -> {
-            int offset = Math.max(page - 1, 0) * Math.max(pageSize, 0);
-            ChunkPageView page1 = knowledgeCatalog.listPagedChunksByKnowledgeId(
-                    tenantId, knowledgeId, offset, pageSize,
-                    TEXT_FAQ_TYPES, null, "", "", "", "", Boolean.TRUE);
-            return new DocChunkSupport.ChunkPage(ChunkProjectionAdapter.factsAll(page1.items()), page1.total());
+        return new DocChunkSupport.PagedChunks() {
+            @Override
+            public DocChunkSupport.ChunkPage listPaged(long tenantId, String knowledgeId, int page, int pageSize) {
+                return listRange(tenantId, knowledgeId,
+                        Math.max(page - 1, 0) * Math.max(pageSize, 0), pageSize);
+            }
+
+            @Override
+            public DocChunkSupport.ChunkPage listRange(long tenantId, String knowledgeId, int offset, int limit) {
+                ChunkPageView page1 = knowledgeCatalog.listPagedChunksByKnowledgeId(
+                        tenantId, knowledgeId, Math.max(offset, 0), limit,
+                        TEXT_FAQ_TYPES, null, "", "", "", "", Boolean.TRUE);
+                return new DocChunkSupport.ChunkPage(ChunkProjectionAdapter.factsAll(page1.items()), page1.total());
+            }
         };
     }
     /** text+faq + enabled 过滤的 count 段（{@code listPagedChunksByKnowledgeId}）。 */

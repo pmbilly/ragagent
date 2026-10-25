@@ -193,6 +193,7 @@ final class ModelOutput {
         String question;
         List<String> answers = List.of();
         List<Map<String, JsonNode>> images = List.of();
+        long totalChunks;
         int inputOrder;
     }
 
@@ -243,6 +244,11 @@ final class ModelOutput {
             mc.answers = stringSliceValue(row.get("faqAnswers"));
             List<Map<String, JsonNode>> images = mapsValue(row.get("images"));
             mc.images = images == null ? List.of() : images;
+            int totalChunks = intValue(row, "totalChunkCount");
+            if (totalChunks == 0) {
+                totalChunks = intValue(row, "totalChunks");
+            }
+            mc.totalChunks = totalChunks;
             mc.inputOrder = idx;
             chunks.add(mc);
         }
@@ -270,6 +276,7 @@ final class ModelOutput {
         }
         String title = stringValue(data, "knowledgeTitle");
         String knowledgeId = stringValue(data, "knowledgeId");
+        int docTotal = intValue(data, "totalChunks");
         for (Map<String, JsonNode> row : rows) {
             if (stringValue(row, "knowledgeId").isEmpty()) {
                 row.put("knowledgeId", StringNode.valueOf(knowledgeId));
@@ -277,18 +284,19 @@ final class ModelOutput {
             if (stringValue(row, "knowledgeTitle").isEmpty()) {
                 row.put("knowledgeTitle", StringNode.valueOf(title));
             }
+            if (docTotal > 0 && intValue(row, "totalChunks") == 0 && intValue(row, "totalChunkCount") == 0) {
+                row.put("totalChunks", tools.jackson.databind.node.IntNode.valueOf(docTotal));
+            }
         }
         String output = modelKnowledgeOutput(r, "deep_read", rows, fallback);
         if (rows.isEmpty()) {
             return output;
         }
-        int remaining = intValue(data, "totalChunks") - intValue(data, "fetchedChunks");
-        if (remaining > 0) {
+        if (!rows.isEmpty()) {
             if (output.endsWith("</retrieval>")) {
                 output = output.substring(0, output.length() - "</retrieval>".length());
             }
-            output += "  <pagination remaining=\"" + remaining + "\" page=\"" + intValue(data, "page")
-                    + "\" pageSize=\"" + intValue(data, "pageSize") + "\" />\n</retrieval>";
+            output += ModelPagination.render(data, rows) + "\n</retrieval>";
         }
         return output;
     }
@@ -300,6 +308,7 @@ final class ModelOutput {
             final String kbHandle;
             final String title;
             String metadata;
+            long totalChunks;
             final int order;
             final List<ModelChunk> groupChunks = new ArrayList<>();
 
@@ -323,6 +332,9 @@ final class ModelOutput {
             } else if (group.metadata.isEmpty()) {
                 group.metadata = chunk.metadata;
             }
+            if (group.totalChunks == 0 && chunk.totalChunks > 0) {
+                group.totalChunks = chunk.totalChunks;
+            }
             group.groupChunks.add(chunk);
         }
         groups.sort(Comparator.comparingInt(g -> g.order));
@@ -339,6 +351,9 @@ final class ModelOutput {
             }
             if (!group.title.isEmpty()) {
                 b.append(" title=\"").append(SourceRegistry.escapeAttr(group.title)).append("\"");
+            }
+            if (group.totalChunks > 0) {
+                b.append(" totalChunks=\"").append(group.totalChunks).append("\"");
             }
             b.append(">\n");
             if (!group.metadata.isEmpty()) {

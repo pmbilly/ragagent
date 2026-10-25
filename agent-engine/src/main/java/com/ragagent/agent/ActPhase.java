@@ -430,7 +430,9 @@ final class ActPhase {
             // 临时句柄不是应用身份：幻觉/过期的 cN/dN/bN/wN/iN/res:// 令牌不能到
             // 持久层、外部服务或路由判定。
             execError = new AgentEngineException(
-                    "tool arguments contain unresolved model handles: " + tc.getUnresolvedHandles());
+                    "tool arguments contain unresolved model handles: " + tc.getUnresolvedHandles()
+                            + ". Use only handles present in the current conversation; handle numbers are"
+                            + " re-assigned every turn, so re-read the latest tool results and retry.");
         } else {
             try {
                 JsonNode raw = JSON.readTree(tc.getFunction().getArguments() == null ? "null"

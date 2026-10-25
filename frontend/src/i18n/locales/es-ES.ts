@@ -4838,8 +4838,8 @@ export default {
       faqEntry: 'entrada de FAQ'
     },
     knowledgeChunksList: {
-      chunkRange: 'Cargados {fetched} / {total} fragmentos',
-      page: 'Página {page}, {pageSize} por página'
+      chunkRange: 'Leídos los bloques {from}-{to} (de {total})',
+      chunkSingle: 'Bloque {index} (de {total})'
     },
     attachmentParsing: {
       parsedSummary: 'Analizados {count} adjunto(s)',

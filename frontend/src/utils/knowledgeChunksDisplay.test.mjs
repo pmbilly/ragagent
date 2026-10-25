@@ -5,15 +5,35 @@ import { getKnowledgeChunksSummaryHtml } from './knowledgeChunksDisplay.ts'
 
 const t = (key, params) => {
   if (key === 'agentStream.knowledgeChunksList.chunkRange') {
-    return `loaded ${params?.fetched}/${params?.total}`
+    return `read ${params?.from}-${params?.to} of ${params?.total}`
   }
-  if (key === 'agentStream.knowledgeChunksList.page') {
-    return `page ${params?.page}/${params?.pageSize}`
+  if (key === 'agentStream.knowledgeChunksList.chunkSingle') {
+    return `chunk ${params?.index} of ${params?.total}`
   }
   return key
 }
 
-test('getKnowledgeChunksSummaryHtml joins chunk range and page', () => {
+test('summary shows the exact block range read this time', () => {
+  const html = getKnowledgeChunksSummaryHtml(t, {
+    displayType: 'knowledge_chunks_list',
+    fetchedChunks: 10,
+    totalChunks: 67,
+    startChunkIndex: 26,
+  })
+  assert.equal(html, 'read <strong>26</strong>-<strong>35</strong> of <strong>67</strong>')
+})
+
+test('summary uses single-block wording when one block is read', () => {
+  const html = getKnowledgeChunksSummaryHtml(t, {
+    displayType: 'knowledge_chunks_list',
+    fetchedChunks: 1,
+    totalChunks: 67,
+    startChunkIndex: 24,
+  })
+  assert.equal(html, 'chunk <strong>24</strong> of <strong>67</strong>')
+})
+
+test('summary falls back to page/pageSize for old payloads', () => {
   const html = getKnowledgeChunksSummaryHtml(t, {
     displayType: 'knowledge_chunks_list',
     fetchedChunks: 20,
@@ -21,6 +41,5 @@ test('getKnowledgeChunksSummaryHtml joins chunk range and page', () => {
     page: 3,
     pageSize: 20,
   })
-  assert.match(html, /loaded <strong>20<\/strong>\/<strong>282<\/strong>/)
-  assert.match(html, /page 3\/20/)
+  assert.match(html, /read <strong>40<\/strong>-<strong>59<\/strong>/)
 })

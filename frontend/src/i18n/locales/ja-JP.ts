@@ -4838,8 +4838,8 @@ export default {
       faqEntry: 'FAQ項目'
     },
     knowledgeChunksList: {
-      chunkRange: '{fetched} / {total}チャンクを読み込みました',
-      page: '{page}ページ目、1ページあたり{pageSize}件'
+      chunkRange: '今回 {from}-{to} 番目のブロックを読み込み（全 {total} 件）',
+      chunkSingle: '{index} 番目のブロック（全 {total} 件）'
     },
     attachmentParsing: {
       parsedSummary: '{count}件の添付ファイルを解析しました',

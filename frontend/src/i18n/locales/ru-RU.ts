@@ -1236,8 +1236,8 @@ export default {
       noneReady: 'Нет готовых разобранных вложений'
     },
     knowledgeChunksList: {
-      chunkRange: 'Загружено {fetched} / {total} фрагментов',
-      page: 'Стр. {page}, по {pageSize} на странице'
+      chunkRange: 'Прочитаны блоки {from}-{to} (из {total})',
+      chunkSingle: 'Блок {index} (из {total})'
     },
     grepResults: {
       chunkHits: '{count} фрагм.',
