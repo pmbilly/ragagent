@@ -141,7 +141,10 @@ jobs:
     name: 真实驱动集成（Milvus/Weaviate，*IT）
     runs-on: ubuntu-latest
     steps:
+      # spotless 的 ratchetFrom('seed') 需要基线 tag 可达；浅克隆会报 No such reference 'seed'
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
