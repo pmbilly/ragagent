@@ -192,7 +192,7 @@ class GateTest {
         assertTrue(gate.needsApproval(Cancellation.none(), 1, "svc", "tool"));
     }
 
-    /** 补充用例：WEKNORA_AGENT_TOOL_APPROVAL_FAIL_OPEN=true 的 fail-open 行为。 */
+    /** 补充用例：RAGAGENT_AGENT_TOOL_APPROVAL_FAIL_OPEN=true 的 fail-open 行为。 */
     @Test
     void needsApprovalFailOpenOnCheckerError() {
         StubChecker checker = new StubChecker();

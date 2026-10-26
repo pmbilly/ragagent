@@ -1,3 +1,4 @@
+import { StorageKeys } from '../utils/storageKeys'
 /**
  * Shared localStorage utilities for per-user UI preferences (theme, fonts).
  *
@@ -23,7 +24,7 @@ const PREFERENCE_SUFFIXES = [
 
 export function readUserId(): string {
   try {
-    const raw = localStorage.getItem('weknora_user')
+    const raw = localStorage.getItem(StorageKeys.user)
     if (!raw) return 'anon'
     const parsed = JSON.parse(raw)
     return parsed?.id ? String(parsed.id) : 'anon'

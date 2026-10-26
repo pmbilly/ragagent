@@ -1,3 +1,4 @@
+import { StorageKeys } from './storageKeys'
 /**
  * Shared access-token refresh used by both axios and the chat SSE client.
  *
@@ -7,15 +8,15 @@
  */
 
 const AUTH_STORAGE_KEYS = [
-  'weknora_token',
-  'weknora_refreshToken',
-  'weknora_user',
-  'weknora_tenant',
-  'weknora_knowledge_bases',
-  'weknora_current_kb',
-  'weknora_selected_tenant_id',
-  'weknora_selected_tenantName',
-  'weknora_memberships',
+  StorageKeys.token,
+  StorageKeys.refreshToken,
+  StorageKeys.user,
+  StorageKeys.tenant,
+  StorageKeys.knowledgeBases,
+  StorageKeys.currentKb,
+  StorageKeys.selectedTenantIdSnake,
+  StorageKeys.selectedTenantName,
+  StorageKeys.memberships,
 ] as const
 
 let isRefreshing = false
@@ -114,7 +115,7 @@ export async function refreshAccessTokenShared(
   }
 
   isRefreshing = true
-  const storedRefreshToken = localStorage.getItem('weknora_refreshToken')
+  const storedRefreshToken = localStorage.getItem(StorageKeys.refreshToken)
 
   if (!storedRefreshToken) {
     clearAuthStorage()
@@ -135,9 +136,9 @@ export async function refreshAccessTokenShared(
     }
 
     const { token, refreshToken: newRefreshToken } = data
-    localStorage.setItem('weknora_token', token)
+    localStorage.setItem(StorageKeys.token, token)
     if (newRefreshToken) {
-      localStorage.setItem('weknora_refreshToken', newRefreshToken)
+      localStorage.setItem(StorageKeys.refreshToken, newRefreshToken)
     }
     processQueue(null, token)
     return token

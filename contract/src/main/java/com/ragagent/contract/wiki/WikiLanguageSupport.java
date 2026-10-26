@@ -19,7 +19,7 @@ import java.util.Locale;
  * 因此<b>入队时就要把 locale 落进 op 载荷</b>。</p>
  *
  * <p>未接语言中间件时，{@code #languageFromContextOrDefault} 恒返回
- * {@code #defaultLanguage()}（{@code WEKNORA_LANGUAGE} 或 {@code zh-CN}）——
+ * {@code #defaultLanguage()}（{@code RAGAGENT_LANGUAGE} 或 {@code zh-CN}）——
  * <b>绝不是空串</b>。</p>
  */
 public final class WikiLanguageSupport {
@@ -57,7 +57,7 @@ public final class WikiLanguageSupport {
     // 解析
 
     /**
-     * 部署默认语言的原始值（{@code WEKNORA_LANGUAGE}）——**启动期快照**。
+     * 部署默认语言的原始值（{@code RAGAGENT_LANGUAGE}）——**启动期快照**。
      *
      * <p>本类是纯静态工具（17 处调用点散布在 wiki/session/agent.management），没有 Spring 装配点，
      * 故值由 {@code config.RuntimeSnapshotWiring} 在启动期写入一次；
@@ -70,13 +70,13 @@ public final class WikiLanguageSupport {
         configuredLanguage = raw == null ? "" : raw;
     }
 
-    /** {@code WEKNORA_LANGUAGE} 的 trim 值，未设则空串。 */
+    /** {@code RAGAGENT_LANGUAGE} 的 trim 值，未设则空串。 */
     public static String envLanguage() {
         return configuredLanguage.trim();
     }
 
     /**
-     * 请求语言解析：{@code WEKNORA_LANGUAGE} env 优先 → {@code Accept-Language} 首个 tag
+     * 请求语言解析：{@code RAGAGENT_LANGUAGE} env 优先 → {@code Accept-Language} 首个 tag
      * → {@code zh-CN}。<b>永不返回空串</b>。
      *
      * <p>由 {@code agent.management.service.BuiltinAgentRegistry} 上移至此：这是
@@ -97,7 +97,7 @@ public final class WikiLanguageSupport {
     }
 
     /**
-     * 默认语言：读 {@code WEKNORA_LANGUAGE}；未设回落
+     * 默认语言：读 {@code RAGAGENT_LANGUAGE}；未设回落
      * {@code "zh-CN"}。
      */
     public static String defaultLanguage() {

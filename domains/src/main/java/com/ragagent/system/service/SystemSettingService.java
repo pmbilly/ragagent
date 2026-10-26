@@ -451,7 +451,7 @@ public class SystemSettingService implements SystemSettingGateway {
 
     /** 运行时桥：model.max_concurrency → 进程级并发上限（非正值关闭默认值）。 */
     private void applyMaxConcurrency() {
-        long limit = getInt("model.max_concurrency", "WEKNORA_MODEL_MAX_CONCURRENCY", 0L);
+        long limit = getInt("model.max_concurrency", "RAGAGENT_MODEL_MAX_CONCURRENCY", 0L);
         governorProvider.ifAvailable(governor -> governor.setGlobalLimit((int) limit));
     }
 

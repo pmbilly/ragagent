@@ -54,13 +54,13 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
      * 频道命名空间环境变量：频道会追加该后缀，
      * 使共享同一 Redis 的多套部署不互相串台。
      */
-    public static final String NAMESPACE_ENV = "WEKNORA_REDIS_NAMESPACE";
+    public static final String NAMESPACE_ENV = "RAGAGENT_REDIS_NAMESPACE";
 
     /**
      * fail-open 开关：只有值为 "true"（忽略大小写与首尾空白）才 fail-open；
      * 默认 fail-close——策略查询出错时**仍要求审批**，避免瞬时 DB 故障悄悄放行危险工具。
      */
-    public static final String FAIL_OPEN_ENV = "WEKNORA_AGENT_TOOL_APPROVAL_FAIL_OPEN";
+    public static final String FAIL_OPEN_ENV = "RAGAGENT_AGENT_TOOL_APPROVAL_FAIL_OPEN";
 
     /** 订阅生效等待窗口：2 秒 */
     private static final Duration SUBSCRIBE_TIMEOUT = Duration.ofSeconds(2);

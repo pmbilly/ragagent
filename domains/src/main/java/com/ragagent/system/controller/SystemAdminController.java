@@ -390,15 +390,15 @@ public class SystemAdminController {
     @GetMapping("/runtime/queues")
     public ResponseEntity<SystemDtos.RuntimeQueuesResponse> runtimeQueues() {
         // 每池 concurrency = setting/env/默认 的正数折叠
-        int core = positive("asynq.core_concurrency", "WEKNORA_ASYNQ_CORE_CONCURRENCY", 8);
+        int core = positive("asynq.core_concurrency", "RAGAGENT_ASYNQ_CORE_CONCURRENCY", 8);
         int postProcess = positive("asynq.postprocess_concurrency",
-                "WEKNORA_ASYNQ_POSTPROCESS_CONCURRENCY", 2);
+                "RAGAGENT_ASYNQ_POSTPROCESS_CONCURRENCY", 2);
         int enrichment = positive("asynq.enrichment_concurrency",
-                "WEKNORA_ASYNQ_ENRICHMENT_CONCURRENCY", 12);
+                "RAGAGENT_ASYNQ_ENRICHMENT_CONCURRENCY", 12);
         int maintenance = positive("asynq.maintenance_concurrency",
-                "WEKNORA_ASYNQ_MAINTENANCE_CONCURRENCY", 4);
-        int shared = positive("asynq.shared_concurrency", "WEKNORA_ASYNQ_SHARED_CONCURRENCY", 6);
-        int wiki = positive("asynq.wiki_concurrency", "WEKNORA_WIKI_ASYNQ_CONCURRENCY", 8);
+                "RAGAGENT_ASYNQ_MAINTENANCE_CONCURRENCY", 4);
+        int shared = positive("asynq.shared_concurrency", "RAGAGENT_ASYNQ_SHARED_CONCURRENCY", 6);
+        int wiki = positive("asynq.wiki_concurrency", "RAGAGENT_WIKI_ASYNQ_CONCURRENCY", 8);
         int upstreamTotal = core + postProcess + enrichment + maintenance + shared;
         // queue_count = 各池的 QueueDefinitions 条目数 / 共享池 = SharedWeight>0 的条目数
         List<SystemDtos.RuntimeWorkerPool> pools = List.of(
@@ -478,7 +478,7 @@ public class SystemAdminController {
     @PostMapping("/tenants/apply-default-storage-quota")
     public ResponseEntity<StorageQuotaApplyResponse> applyDefaultStorageQuota() {
         long gb = settings.getInt("tenant.default_storage_quota_gb",
-                "WEKNORA_TENANT_DEFAULT_STORAGE_QUOTA_GB", 10);
+                "RAGAGENT_TENANT_DEFAULT_STORAGE_QUOTA_GB", 10);
         if (gb <= 0) {
             gb = 10;
         }

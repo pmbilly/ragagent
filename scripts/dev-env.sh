@@ -76,7 +76,7 @@ export LANGFUSE_ENVIRONMENT="${LANGFUSE_ENVIRONMENT:-$(env_value LANGFUSE_ENVIRO
 export LANGFUSE_DEBUG="${LANGFUSE_DEBUG:-$(env_value LANGFUSE_DEBUG)}"   # true 时打导出成功日志
 
 # 注：指令型技能自 B57 起**入库**（skills 表，平台级），宿主技能目录
-# （weknora.skills.host-dirs / WEKNORA_SKILLS_HOST_DIRS）已退役，不再注入。
+# （weknora.skills.host-dirs / RAGAGENT_SKILLS_HOST_DIRS）已退役，不再注入。
 
 
 # 测试账号（阶段 1 建的专用租户 10002）

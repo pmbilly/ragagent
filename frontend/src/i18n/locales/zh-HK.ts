@@ -1496,7 +1496,7 @@ export default {
     addRow: '新增',
     namePlaceholder: 'VARIABLE_NAME',
     nameRule: '大寫字母、數字與底線，以字母或底線開頭。',
-    nameInvalid: '此名稱不可使用。不接受沙箱保留的名稱（如 PATH 或以 WEKNORA_ 開頭的名稱）。',
+    nameInvalid: '此名稱不可使用。不接受沙箱保留的名稱（如 PATH 或以 RAGAGENT_ 開頭的名稱）。',
     nameDuplicate: '你在此已有同名的變數。',
     valuePlaceholder: '輸入值',
     storedPlaceholder: '已儲存，輸入以取代',

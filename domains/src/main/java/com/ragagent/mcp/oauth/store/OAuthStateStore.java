@@ -38,7 +38,7 @@ public class OAuthStateStore {
     public static final Duration STATE_TTL = Duration.ofMinutes(10);
 
     /** 环境变量：多套部署共享同一 Redis 时用命名空间隔开。 */
-    static final String REDIS_NAMESPACE_ENV = "WEKNORA_REDIS_NAMESPACE";
+    static final String REDIS_NAMESPACE_ENV = "RAGAGENT_REDIS_NAMESPACE";
 
     private static final String KEY_PREFIX = "weknora:mcp_oauth_state:";
 

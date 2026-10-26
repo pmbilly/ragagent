@@ -89,7 +89,7 @@ public class SystemAdminUserService {
 
     public boolean complexPasswordEnabled() {
         return settingService.getBool(
-                "auth.complex_password_enabled", "WEKNORA_AUTH_COMPLEX_PASSWORD_ENABLED", false);
+                "auth.complex_password_enabled", "RAGAGENT_AUTH_COMPLEX_PASSWORD_ENABLED", false);
     }
 
     public String validatePasswordPolicy(String password, boolean complexEnabled) {
@@ -103,7 +103,7 @@ public class SystemAdminUserService {
     public String resolveDefaultTenantMode() {
         String def = "create_personal";
         String mode = settingService.getString(
-                "auth.default_tenant_mode", "WEKNORA_AUTH_DEFAULT_TENANT_MODE", def);
+                "auth.default_tenant_mode", "RAGAGENT_AUTH_DEFAULT_TENANT_MODE", def);
         return "tenantless".equals(mode) ? "tenantless" : "create_personal";
     }
 

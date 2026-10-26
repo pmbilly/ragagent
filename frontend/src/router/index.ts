@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { StorageKeys } from '../utils/storageKeys'
 import type { RouteLocationNormalized } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useDeploymentCapabilitiesStore } from '@/stores/deploymentCapabilities'
@@ -9,8 +10,8 @@ import i18n from '@/i18n'
 import { normalizeSettingsSection } from '@/config/settingsRoute'
 
 /** Lite /桌面 WebView 硬刷新时可能只打开 `/`，用 session 记住上次页面以便恢复 */
-const LITE_LAST_PATH_KEY = 'weknora_lite_last_path'
-const AUTO_SETUP_FAILED_KEY = 'weknora_auto_setup_failed'
+const LITE_LAST_PATH_KEY = StorageKeys.liteLastPath
+const AUTO_SETUP_FAILED_KEY = StorageKeys.autoSetupFailed
 
 function shouldTryAutoSetup() {
   return localStorage.getItem(AUTO_SETUP_FAILED_KEY) !== 'true'
@@ -21,7 +22,7 @@ function markAutoSetupFailed() {
 }
 
 function isLiteEdition(authStore: ReturnType<typeof useAuthStore>) {
-  return authStore.isLiteMode || localStorage.getItem('weknora_lite_mode') === 'true'
+  return authStore.isLiteMode || localStorage.getItem(StorageKeys.liteMode) === 'true'
 }
 
 function isLiteSpaDefaultEntry(to: RouteLocationNormalized) {
@@ -225,14 +226,14 @@ function persistLoginResponse(authStore: ReturnType<typeof useAuthStore>, respon
 }
 
 async function hydrateSessionFromToken(authStore: ReturnType<typeof useAuthStore>) {
-  const token = localStorage.getItem('weknora_token')
+  const token = localStorage.getItem(StorageKeys.token)
   if (!token) return false
 
   if (!authStore.token) {
     authStore.setToken(token)
   }
 
-  const storedRefreshToken = localStorage.getItem('weknora_refresh_token')
+  const storedRefreshToken = localStorage.getItem(StorageKeys.refreshTokenSnake)
   if (storedRefreshToken && !authStore.refreshToken) {
     authStore.setRefreshToken(storedRefreshToken)
   }

@@ -1,3 +1,4 @@
+import { StorageKeys } from './storageKeys'
 /**
  * 受保护文件（provider:// / resource:// 等）的访问上下文。
  *
@@ -109,18 +110,18 @@ export function isProtectedFileProxyPath(pathname: string): boolean {
 function tenantRequestHeaders(): Record<string, string> {
   const headers: Record<string, string> = {};
   try {
-    const token = (localStorage.getItem('weknora_token') || '').trim();
+    const token = (localStorage.getItem(StorageKeys.token) || '').trim();
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const selectedTenantId = (localStorage.getItem('weknora_selected_tenant_id') || '').trim();
+    const selectedTenantId = (localStorage.getItem(StorageKeys.selectedTenantIdSnake) || '').trim();
     if (selectedTenantId) {
       // Always attach when a selected tenant is set. Same rationale as
       // utils/request.ts / api/chat/streame.ts: the
       // "selectedTenantId === defaultTenantId → skip" short-circuit
       // silently drops the header whenever any code path writes the
-      // active tenant into weknora_tenant, leaving authenticated file
+      // active tenant into ragagent_tenant, leaving authenticated file
       // fetches landing on the home tenant.
       headers['X-Tenant-ID'] = selectedTenantId;
     }

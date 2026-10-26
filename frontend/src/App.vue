@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
+import { StorageKeys } from './utils/storageKeys'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { MessagePlugin, NotifyPlugin } from 'tdesign-vue-next'
@@ -130,9 +131,9 @@ const persistOIDCLoginResponse = async (response: any) => {
   await syncOIDCUserContext()
 
   // OIDC 跳转前暂存的邀请 token：拿到会话后兑换并进入对应空间。
-  const pendingInviteToken = sessionStorage.getItem('weknora_pending_invite_token')
+  const pendingInviteToken = sessionStorage.getItem(StorageKeys.pendingInviteToken)
   if (pendingInviteToken) {
-    sessionStorage.removeItem('weknora_pending_invite_token')
+    sessionStorage.removeItem(StorageKeys.pendingInviteToken)
     const result = await authStore.acceptInvitationByTokenAndRefresh(pendingInviteToken)
     await nextTick()
     if (result.ok) MessagePlugin.success(t('inviteRegister.joined'))

@@ -414,7 +414,7 @@ public class AuthController {
         boolean canCreateTenant = user.isCanAccessAllTenants()
                 || resolveTenantSelfServiceCreationEnabled();
         boolean autoAcceptInvitation = settingService.getBool("tenant.auto_accept_invitation",
-                "WEKNORA_TENANT_AUTO_ACCEPT_INVITATION", false);
+                "RAGAGENT_TENANT_AUTO_ACCEPT_INVITATION", false);
 
         // preferenceDefaults：browser_search_instructions 随浏览器连接裁撤后已无条目，
         // 保留空 map 以维持响应形状。
@@ -513,7 +513,7 @@ public class AuthController {
     /** 默认租户模式解析：DB > ENV > cfg（cfg 兜底 create_personal） */
     String resolveDefaultTenantMode() {
         String mode = settingService.getString("auth.default_tenant_mode",
-                "WEKNORA_AUTH_DEFAULT_TENANT_MODE", "create_personal");
+                "RAGAGENT_AUTH_DEFAULT_TENANT_MODE", "create_personal");
         return "tenantless".equals(mode)
                 ? UserService.PROVISIONING_TENANTLESS : UserService.PROVISIONING_CREATE_PERSONAL;
     }
@@ -521,7 +521,7 @@ public class AuthController {
     /** 自助建租户开关：DB > ENV > cfg(默认 true) */
     private boolean resolveTenantSelfServiceCreationEnabled() {
         return settingService.getBool("tenant.self_service_creation_enabled",
-                "WEKNORA_TENANT_SELF_SERVICE_CREATION_ENABLED",
+                "RAGAGENT_TENANT_SELF_SERVICE_CREATION_ENABLED",
                 tenantProperties.isSelfServiceCreationEnabled());
     }
 

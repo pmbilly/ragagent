@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { StorageKeys } from '../../utils/storageKeys'
 import { after, before, mock, test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import { createServer, type ViteDevServer } from 'vite'
@@ -11,7 +12,7 @@ let transport: { requests: Array<{ url: string; options: any }> }
 const originalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage')
 before(async () => {
   Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: {
-    getItem: (key: string) => key === 'weknora_token' ? 'test-token' : null,
+    getItem: (key: string) => key === StorageKeys.token ? 'test-token' : null,
   } })
   const mocks: Record<string, string> = {
     // 建立连接后立刻回调 onopen（真实 fetchEventSource 也是拿到响应头就回调），

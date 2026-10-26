@@ -103,7 +103,8 @@
 
   <build>
     <plugins>
-      <!-- 集成测试（*IT）：需真实外部服务，env 门控，默认不接 verify（-Pit 激活） -->
+      <!-- 集成测试（*IT）：需真实外部服务；-Pit 才把 failsafe 绑到 integration-test/verify，
+           类上的 @EnabledIfEnvironmentVariable 决定是否真的执行（未设 env → 记为 skipped） -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
@@ -115,4 +116,29 @@
       </plugin>
     </plugins>
   </build>
+
+  <!-- 真实驱动集成测试：默认 mvn verify 不依赖外部服务；-Pit 显式激活。
+       无 RAGAGENT_*_IT=true 时 failsafe 发现用例但 JUnit 记为 skipped（原因可见）。 -->
+  <profiles>
+    <profile>
+      <id>it</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>integration-test</id>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

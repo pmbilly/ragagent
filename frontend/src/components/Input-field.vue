@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, onUnmounted, computed, watch, nextTick, h, type PropType } from "vue";
+import { StorageKeys } from '../utils/storageKeys'
 import { storeToRefs } from 'pinia';
 import { useRoute, useRouter } from 'vue-router';
 import { onBeforeRouteUpdate } from 'vue-router';
@@ -786,7 +787,7 @@ const enabledAgents = computed(() =>
 // chat input got a 403, and (b) silently overwrote the tenant default
 // for everyone else. localStorage is per-user-per-browser, which is
 // what "remember my last pick" actually wants.
-const LAST_CHAT_MODEL_KEY = 'weknora_last_chat_model_id'
+const LAST_CHAT_MODEL_KEY = StorageKeys.lastChatModelId
 
 const readLastChatModelID = (): string => {
   try {

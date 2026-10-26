@@ -17,7 +17,7 @@ class TenantAPIKeyBootstrapTest {
 
     @Test
     void autoCreateDefaultsToFalse() {
-        // 测试环境没有 WEKNORA_TENANT_AUTO_CREATE_API_KEY → false（现代部署默认关闭）
+        // 测试环境没有 RAGAGENT_TENANT_AUTO_CREATE_API_KEY → false（现代部署默认关闭）
         assertThat(TenantAPIKeyBootstrap.resolveAutoCreateApiKey(null)).isFalse();
     }
 
@@ -31,7 +31,7 @@ class TenantAPIKeyBootstrapTest {
     @Test
     void defaultKeyNameMatchesGo() {
         assertThat(TenantAPIKeyBootstrap.DEFAULT_KEY_NAME).isEqualTo("default");
-        assertThat(TenantAPIKeyBootstrap.AUTO_CREATE_ENV).isEqualTo("WEKNORA_TENANT_AUTO_CREATE_API_KEY");
+        assertThat(TenantAPIKeyBootstrap.AUTO_CREATE_ENV).isEqualTo("RAGAGENT_TENANT_AUTO_CREATE_API_KEY");
     }
 
     // ── tenantWithAPIKey（唯一的"响应里带明文 Key"时机） ──

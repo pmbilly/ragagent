@@ -35,18 +35,18 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
  *   -e ETCD_USE_EMBED=true -e ETCD_DATA_DIR=/var/lib/milvus/etcd \
  *   -e COMMON_STORAGETYPE=local -e DEPLOY_MODE=STANDALONE \
  *   milvusdb/milvus:v2.6.11 milvus run standalone
- * WEKNORA_MILVUS_IT=true ./gradlew :engine:integrationTest
+ * RAGAGENT_MILVUS_IT=true ./gradlew :engine:integrationTest
  * </pre>
  *
  * 覆盖：建集合（BM25 函数 + 稀疏列 + 索引参数）→ 批量写 → 向量检索（distance 分数）→
  * BM25 中文关键词检索 → tag/enabled 的"查整行→回写"（向量必须仍在）→ 拷贝（offset 分页）→
  * move → 删除。Milvus 默认 Bounded 一致性有可见性延迟 → 断言用轮询等待（照真实部署语义）。
  */
-@EnabledIfEnvironmentVariable(named = "WEKNORA_MILVUS_IT", matches = "true")
+@EnabledIfEnvironmentVariable(named = "RAGAGENT_MILVUS_IT", matches = "true")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MilvusDriverLocalIT {
 
-    private static final String ADDR = System.getenv().getOrDefault("WEKNORA_MILVUS_ADDRESS",
+    private static final String ADDR = System.getenv().getOrDefault("RAGAGENT_MILVUS_ADDRESS",
             "localhost:19530");
     private static final long AWAIT_TIMEOUT_MS = 30_000;
 

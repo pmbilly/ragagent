@@ -27,7 +27,7 @@ public final class AgentConsts {
      * 单条 LLM 流允许无输出的时长。这是<b>停顿</b>预算
      * 不是总预算：一个在 write_sandbox_file 调用里持续吐整个文件体的 round 能连续
      * 输出地跑几分钟，按已用时间杀它等于扔掉组装了一半的调用。总上限属于供应商
-     * 传输层（WEKNORA_LLM_STREAM_TIMEOUT_SECONDS）。可经 AgentConfig.LLMCallTimeout 覆盖。
+     * 传输层（RAGAGENT_LLM_STREAM_TIMEOUT_SECONDS）。可经 AgentConfig.LLMCallTimeout 覆盖。
      */
     public static final Duration DEFAULT_LLM_STALL_TIMEOUT = Duration.ofSeconds(120);
 

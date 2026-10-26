@@ -26,7 +26,7 @@ export const SUPPORTED_LOCALES = [
 export type EmbedLocale = (typeof SUPPORTED_LOCALES)[number]
 
 /** Isolated from the main app `locale` key so embed preview never hijacks admin UI language. */
-export const EMBED_LOCALE_STORAGE_KEY = 'weknora-embed-locale'
+export const EMBED_LOCALE_STORAGE_KEY = 'ragagent-embed-locale'
 
 /**
  * 严格归一化：识别不了就返回 null。

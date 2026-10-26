@@ -103,7 +103,7 @@ public class EmbedChannelService {
         if (cleaned.isEmpty()) {
             throw EmbedError.badRequest("at least one allowed origin is required");
         }
-        // 生产/开发判定取 WEKNORA_DEPLOYMENT_MODE
+        // 生产/开发判定取 RAGAGENT_DEPLOYMENT_MODE
         boolean production = deploymentProperties.isProduction();
         for (String o : cleaned) {
             if ("*".equals(o)) {

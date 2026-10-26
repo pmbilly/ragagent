@@ -52,7 +52,7 @@ final class TenantCreateOps {
         // 部署级自助开关（三层解析：以 config 为底，SystemSettingGateway 再叠 DB/env）
         if (!catalogManager && !service.systemSettingService.getBool(
                 "tenant.self_service_creation_enabled",
-                "WEKNORA_TENANT_SELF_SERVICE_CREATION_ENABLED",
+                "RAGAGENT_TENANT_SELF_SERVICE_CREATION_ENABLED",
                 service.tenantProperties.isSelfServiceCreationEnabled())) {
             throw new BizException(new AppError(
                     ErrorCode.TENANT_CREATION_DISABLED.value(),
@@ -97,7 +97,7 @@ final class TenantCreateOps {
         if (tenantData.getStorageQuota() == null || tenantData.getStorageQuota() <= 0) {
             long gb = service.systemSettingService.getInt(
                     "tenant.default_storage_quota_gb",
-                    "WEKNORA_TENANT_DEFAULT_STORAGE_QUOTA_GB",
+                    "RAGAGENT_TENANT_DEFAULT_STORAGE_QUOTA_GB",
                     10);
             if (gb <= 0) {
                 gb = 10;
@@ -169,7 +169,7 @@ final class TenantCreateOps {
         // auto_create_api_key 兼容路径：失败不拖垮创建
         Object data = created;
         if (!platformCaller && service.systemSettingService.getBool(
-                "tenant.auto_create_api_key", "WEKNORA_TENANT_AUTO_CREATE_API_KEY", false)) {
+                "tenant.auto_create_api_key", "RAGAGENT_TENANT_AUTO_CREATE_API_KEY", false)) {
             try {
                 // 走管理口 ✓
                 String token = service.apiKeyAdmin.createDefaultTenantKey(created.getId());
@@ -219,7 +219,7 @@ final class TenantCreateOps {
             fallback = service.tenantProperties.maxOwnedPerUser();
         }
         return (int) service.systemSettingService.getInt(
-                "tenant.max_owned_per_user", "WEKNORA_TENANT_MAX_OWNED_PER_USER", fallback);
+                "tenant.max_owned_per_user", "RAGAGENT_TENANT_MAX_OWNED_PER_USER", fallback);
     }
 
     private static BizException quotaExceeded() {

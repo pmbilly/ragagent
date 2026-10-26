@@ -499,7 +499,7 @@ final class MessageSuggestionPipeline {
 
     /**
      * 语言解析：message 带 locale 用之，否则默认语言
-     * （WEKNORA_LANGUAGE env，缺省 zh-CN）。
+     * （RAGAGENT_LANGUAGE env，缺省 zh-CN）。
      */
     static String resolveLanguage(String locale) {
         if (locale != null && !locale.trim().isEmpty()) {

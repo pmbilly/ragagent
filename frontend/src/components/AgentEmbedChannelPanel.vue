@@ -523,12 +523,12 @@ const agentImageUploadEnabledEffective = computed(() =>
   drawerAgent.value?.config?.imageUploadEnabled === true,
 )
 
-const WEKNORA_BRAND_COLOR = '#07C05F'
+const RAGAGENT_BRAND_COLOR = '#07C05F'
 
 function getDefaultEmbedPrimaryColor(): string {
-  if (typeof window === 'undefined') return WEKNORA_BRAND_COLOR
+  if (typeof window === 'undefined') return RAGAGENT_BRAND_COLOR
   const css = getComputedStyle(document.documentElement).getPropertyValue('--td-brand-color').trim()
-  return css || WEKNORA_BRAND_COLOR
+  return css || RAGAGENT_BRAND_COLOR
 }
 
 const defaultPrimaryColor = getDefaultEmbedPrimaryColor()

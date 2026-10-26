@@ -7,6 +7,7 @@
 // 用一次 full navigation 把所有 store / SSE / 请求都重置一遍。
 
 import { updateMyPreferences } from '@/api/auth'
+import { StorageKeys } from './storageKeys'
 
 const SAFE_FALLBACK_PATH = '/platform/knowledge-bases'
 
@@ -28,7 +29,7 @@ export function navigateAfterTenantSwitch(): void {
 // 切换成功后的 toast 跨 hard reload 传递：调用方在 reload 前把信息塞进
 // sessionStorage，App.vue 启动时 consume 一次再弹出。直接在 reload 前调
 // NotifyPlugin 会被刷掉，根本来不及看清。
-const PENDING_TOAST_KEY = 'weknora_pending_tenant_switch_toast'
+const PENDING_TOAST_KEY = StorageKeys.pendingTenantSwitchToast
 
 export interface PendingTenantSwitchToast {
   name: string

@@ -151,7 +151,7 @@ class ApprovalWireFormatTest {
 
     @Test
     void pubsubChannelHonorsNamespace() {
-        // 未设置 WEKNORA_REDIS_NAMESPACE 时为裸前缀
+        // 未设置 RAGAGENT_REDIS_NAMESPACE 时为裸前缀
         assertEquals(Gate.PUBSUB_CHANNEL_BASE, Gate.pubsubChannel());
         assertEquals("weknora:mcp_approval:resolve", Gate.PUBSUB_CHANNEL_BASE);
     }

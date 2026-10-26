@@ -57,7 +57,7 @@ import org.springframework.stereotype.Component;
  * （它在下游任务里）。沿用最初的简单判定：{@code summary_status=processing} 且
  * updated_at 早于 1 小时 → failed。</p>
  * <h2>装配与开关</h2>
- * 才首次触发"同形）；{@code WEKNORA_HOUSEKEEPING_ENABLED}
+ * 才首次触发"同形）；{@code RAGAGENT_HOUSEKEEPING_ENABLED}
  * <b>缺省开启</b>，运维必须显式设 {@code false}/{@code 0}/{@code off}/{@code no} 才关停。</p>
  * （同 {@code TemporaryDocumentService} 的 10 分钟 ticker 约定）；② span 心跳过滤由
  * 绕开 SQLite 对聚合返回值不做类型转换的问题；本仓改 {@code EXISTS(updated_at > cutoff)}，
@@ -81,8 +81,8 @@ public class HousekeepingService {
 
     static final Duration DEFAULT_DOCUMENT_PROCESS_TIMEOUT = Duration.ofHours(2);
 
-    static final String ENABLED_ENV = "WEKNORA_HOUSEKEEPING_ENABLED";
-    static final String DOCUMENT_PROCESS_TIMEOUT_ENV = "WEKNORA_DOCUMENT_PROCESS_TIMEOUT";
+    static final String ENABLED_ENV = "RAGAGENT_HOUSEKEEPING_ENABLED";
+    static final String DOCUMENT_PROCESS_TIMEOUT_ENV = "RAGAGENT_DOCUMENT_PROCESS_TIMEOUT";
 
     static final List<String> CANDIDATE_STATUSES = List.of(
             Knowledge.PARSE_PENDING, Knowledge.PARSE_PROCESSING, Knowledge.PARSE_FINALIZING);

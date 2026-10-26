@@ -51,7 +51,7 @@ import tools.jackson.databind.JsonNode;
  *   <li><b>langfuse span 未接线</b>：generate 的 AttachTraceparent/StartSpan
  *       属 langfuse 追踪（Java 侧 no-op，等价未启用部署）。</li>
  *   <li><b>语言解析</b>：message 带 locale 时用之，
- *       否则落 DefaultLanguage（WEKNORA_LANGUAGE env，缺省 zh-CN）。</li>
+ *       否则落 DefaultLanguage（RAGAGENT_LANGUAGE env，缺省 zh-CN）。</li>
  * </ol>
  *
  * <p>generate 全量覆盖（generateWithModel 经 ModelRuntime

@@ -106,10 +106,10 @@ export type WidgetPosition = 'bottom-right' | 'bottom-left' | 'top-right' | 'top
 export const EMBED_SESSION_TOKEN_PREFIX = 'ems_'
 
 /** localStorage key prefix for persisted embed chat sessions (per channel). */
-export const EMBED_CHAT_SESSION_STORAGE_PREFIX = 'weknora-embed-session:'
+export const EMBED_CHAT_SESSION_STORAGE_PREFIX = 'ragagent-embed-session:'
 
 /** localStorage key prefix for anonymous embed visitor ids (per channel). */
-export const EMBED_VISITOR_STORAGE_PREFIX = 'weknora-embed-visitor:'
+export const EMBED_VISITOR_STORAGE_PREFIX = 'ragagent-embed-visitor:'
 
 export function embedVisitorStorageKey(channelId: string): string {
   return `${EMBED_VISITOR_STORAGE_PREFIX}${channelId}`
@@ -729,7 +729,7 @@ export function buildSecureServerNodeExample(channelId: string, opts?: { baseUrl
   const base = safeBaseUrl(opts?.baseUrl)
   const exchangeUrl = `${base}/api/v1/embed/${channelId}/exchange`
   return [
-    `// Node/Express — keep WEKNORA_PUBLISH_TOKEN only on the server (env var).`,
+    `// Node/Express — keep RAGAGENT_PUBLISH_TOKEN only on the server (env var).`,
     `app.get('/weknora/embed-token', async (req, res) => {`,
     `  // Only mint for logged-in visitors — e.g. session cookie or Bearer token.`,
     `  const auth = req.headers.authorization || ''`,
@@ -741,7 +741,7 @@ export function buildSecureServerNodeExample(channelId: string, opts?: { baseUrl
     `  const r = await fetch('${exchangeUrl}', {`,
     `    method: 'POST',`,
     `    headers: {`,
-    `      Authorization: 'Embed ' + process.env.WEKNORA_PUBLISH_TOKEN,`,
+    `      Authorization: 'Embed ' + process.env.RAGAGENT_PUBLISH_TOKEN,`,
     `      Origin: 'https://your-site.example.com', // must match the channel's allowedOrigins`,
     `    },`,
     `  })`,
@@ -756,14 +756,14 @@ export function buildSecureServerGoExample(channelId: string, opts?: { baseUrl?:
   const base = safeBaseUrl(opts?.baseUrl)
   const exchangeUrl = `${base}/api/v1/embed/${channelId}/exchange`
   return [
-    `// Go net/http — keep WEKNORA_PUBLISH_TOKEN only on the server (env var).`,
+    `// Go net/http — keep RAGAGENT_PUBLISH_TOKEN only on the server (env var).`,
     `func embedTokenHandler(w http.ResponseWriter, r *http.Request) {`,
     `  if r.Header.Get("Authorization") == "" && r.Header.Get("Cookie") == "" {`,
     `    http.Error(w, \`{"error":"unauthorized"}\`, http.StatusUnauthorized)`,
     `    return`,
     `  }`,
     `  req, _ := http.NewRequest(http.MethodPost, "${exchangeUrl}", nil)`,
-    `  req.Header.Set("Authorization", "Embed "+os.Getenv("WEKNORA_PUBLISH_TOKEN"))`,
+    `  req.Header.Set("Authorization", "Embed "+os.Getenv("RAGAGENT_PUBLISH_TOKEN"))`,
     `  req.Header.Set("Origin", "https://your-site.example.com") // must match the channel's allowedOrigins`,
     `  resp, err := http.DefaultClient.Do(req)`,
     `  if err != nil || resp.StatusCode >= 300 {`,

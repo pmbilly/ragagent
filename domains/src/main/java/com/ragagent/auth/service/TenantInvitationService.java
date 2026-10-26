@@ -78,11 +78,11 @@ public class TenantInvitationService {
     // ── TTL / 开关 ─────────────────────────────────────────────────────────
 
     /**
-     * 邀请 TTL：WEKNORA_INVITATION_TTL 支持 duration 写法（"168h"）与
+     * 邀请 TTL：RAGAGENT_INVITATION_TTL 支持 duration 写法（"168h"）与
      * 裸秒数（"604800"）两种写法；解析失败或非正值回落默认。
      */
     static Duration invitationTtl() {
-        String raw = AppEnvLookup.get("WEKNORA_INVITATION_TTL");
+        String raw = AppEnvLookup.get("RAGAGENT_INVITATION_TTL");
         if (raw == null || raw.isEmpty()) {
             return DEFAULT_TTL;
         }
@@ -123,12 +123,12 @@ public class TenantInvitationService {
 
     /**
      * auto-accept 开关判定
-     * （{@code tenant.auto_accept_invitation} / {@code WEKNORA_TENANT_AUTO_ACCEPT_INVITATION}）。
+     * （{@code tenant.auto_accept_invitation} / {@code RAGAGENT_TENANT_AUTO_ACCEPT_INVITATION}）。
      * 实现边界：完整实现是 SystemSettingService 的 DB&gt;env&gt;false 三层；当前
      * 只保留 env 层（默认 false），DB 层随系统设置模块收口。
      */
     public static boolean autoAcceptInvitationEnabled() {
-        String raw = AppEnvLookup.get("WEKNORA_TENANT_AUTO_ACCEPT_INVITATION");
+        String raw = AppEnvLookup.get("RAGAGENT_TENANT_AUTO_ACCEPT_INVITATION");
         if (raw == null) {
             return false;
         }

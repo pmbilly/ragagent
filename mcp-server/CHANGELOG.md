@@ -23,7 +23,7 @@
 - HTTP 传输恢复 `stateless_http=True`，与迁移前 `StreamableHTTPSessionManager(stateless=True)` 行为一致。
 - SSE 传输恢复消息端点 `/sse/messages/`，与迁移前路由一致。
 - `WeKnoraClient` 使用线程本地 `requests.Session`，避免 MCP 2.x 在线程池中并发调用时出现 Session 竞态。
-- 文件上传（`create_knowledge_from_file`）尊重 `WEKNORA_VERIFY_SSL` 设置。
+- 文件上传（`create_knowledge_from_file`）尊重 `RAGAGENT_VERIFY_SSL` 设置。
 
 ### 注意
 - 工具执行失败时，MCPServer 2.x 返回 `CallToolResult(isError=True)`（`ToolError`），

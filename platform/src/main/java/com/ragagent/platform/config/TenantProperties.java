@@ -3,16 +3,16 @@ package com.ragagent.platform.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * tenant 配置段（WEKNORA_TENANT_* env / application.yml）。
+ * tenant 配置段（RAGAGENT_TENANT_* env / application.yml）。
  *
  * - enableRbac：可空布尔，null → 默认 true（未显式关闭即强制开启，
- *   "operator did not opt out"）。env: WEKNORA_TENANT_ENABLE_RBAC
+ *   "operator did not opt out"）。env: RAGAGENT_TENANT_ENABLE_RBAC
  * - enableCrossTenantAccess：随空间分享裁撤（跨租户授予链不实现）。
  * - selfServiceCreationEnabled：指针语义，null → 默认 true。
- *   env: WEKNORA_TENANT_SELF_SERVICE_CREATION_ENABLED
+ *   env: RAGAGENT_TENANT_SELF_SERVICE_CREATION_ENABLED
  * - maxOwnedPerUser：自助创建的配额底座（0/null → 内置默认 10，由
  *   SystemSettingService 的三层解析在此之上叠 DB/env）。
- *   env: WEKNORA_TENANT_MAX_OWNED_PER_USER
+ *   env: RAGAGENT_TENANT_MAX_OWNED_PER_USER
  */
 @ConfigurationProperties(prefix = "weknora.tenant")
 public record TenantProperties(

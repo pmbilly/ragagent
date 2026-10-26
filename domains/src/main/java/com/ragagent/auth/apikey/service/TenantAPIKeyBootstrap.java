@@ -15,7 +15,7 @@ import tools.jackson.databind.ObjectMapper;
  *
  * <h2>1. 要不要自动建 Key（legacy 兼容开关）</h2>
  * <p>3 层解析：
- * {@code system_settings DB 行 > WEKNORA_TENANT_AUTO_CREATE_API_KEY env > false}。
+ * {@code system_settings DB 行 > RAGAGENT_TENANT_AUTO_CREATE_API_KEY env > false}。
  * DB 层由调用方从上层传入，env 层在这里解析——见
  * {@link #resolveAutoCreateApiKey(Boolean)}。</p>
  *
@@ -37,7 +37,7 @@ public final class TenantAPIKeyBootstrap {
     public static final String DEFAULT_KEY_NAME = "default";
 
     /** 自动建 Key 开关的环境变量名。 */
-    public static final String AUTO_CREATE_ENV = "WEKNORA_TENANT_AUTO_CREATE_API_KEY";
+    public static final String AUTO_CREATE_ENV = "RAGAGENT_TENANT_AUTO_CREATE_API_KEY";
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 

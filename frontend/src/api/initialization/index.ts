@@ -1,4 +1,5 @@
 import { get, post, put, unwrapEnvelope } from '../../utils/request';
+import { StorageKeys } from '../../utils/storageKeys'
 import i18n from '@/i18n'
 
 const t = (key: string) => i18n.global.t(key)
@@ -454,7 +455,7 @@ export function testMultimodalFunction(testData: {
         formData.append('separators', JSON.stringify(testData.separators));
 
         // 获取鉴权Token
-        const token = localStorage.getItem('weknora_token');
+        const token = localStorage.getItem(StorageKeys.token);
         const headers: Record<string, string> = {};
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
@@ -463,7 +464,7 @@ export function testMultimodalFunction(testData: {
         // 跨空间访问请求头：直接附，避免 short-circuit "selectedTenantId
         // === defaultTenantId 时不附" 在某些边角下让 header 静默丢失。
         // 与 utils/request.ts、api/chat/streame.ts 行为一致。
-        const selectedTenantId = localStorage.getItem('weknora_selected_tenant_id');
+        const selectedTenantId = localStorage.getItem(StorageKeys.selectedTenantIdSnake);
         if (selectedTenantId) {
             headers['X-Tenant-ID'] = selectedTenantId;
         }

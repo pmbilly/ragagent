@@ -2,7 +2,7 @@ import { computed, onMounted, ref } from 'vue'
 import { getApiBaseUrl } from '@/utils/api-base'
 
 type WeKnoraDesktopWindow = Window & {
-  __WEKNORA_API_BASE__?: string
+  __RAGAGENT_API_BASE__?: string
   go?: {
     main?: {
       App?: {
@@ -31,7 +31,7 @@ export function useApiBaseUrlDisplay() {
   async function loadApiBaseUrl() {
     const win = window as WeKnoraDesktopWindow
     for (let i = 0; i < 40; i++) {
-      const injected = win.__WEKNORA_API_BASE__
+      const injected = win.__RAGAGENT_API_BASE__
       if (typeof injected === 'string' && injected.trim()) {
         wailsApiBaseURL.value = injected.trim().replace(/\/$/, '')
         return

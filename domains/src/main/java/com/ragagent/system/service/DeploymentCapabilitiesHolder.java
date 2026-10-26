@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DeploymentCapabilitiesHolder {
 
-    /** 部署形态（{@code WEKNORA_EDITION} 走属性绑定，不读裸 env）。 */
+    /** 部署形态（{@code RAGAGENT_EDITION} 走属性绑定，不读裸 env）。 */
     private final DeploymentProperties deploymentProperties;
 
     private volatile SystemDtos.DeploymentCapabilitiesData snapshot =

@@ -136,3 +136,54 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build-only
+
+  integration:
+    name: 真实驱动集成（Milvus/Weaviate，*IT）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: 起 Milvus（standalone）
+        run: |
+          docker run -d --name it-milvus --security-opt seccomp=unconfined \
+            -p 19530:19530 -p 9091:9091 \
+            -e ETCD_USE_EMBED=true -e ETCD_DATA_DIR=/var/lib/milvus/etcd \
+            -e COMMON_STORAGETYPE=local -e DEPLOY_MODE=STANDALONE \
+            milvusdb/milvus:v2.6.11 milvus run standalone
+      - name: 起 Weaviate（GSE 分词必须开）
+        run: |
+          docker run -d --name it-weaviate \
+            -p 9035:8080 -p 50052:50051 \
+            -e DEFAULT_VECTORIZER_MODULE=none -e ENABLE_MODULES=none \
+            -e ENABLE_TOKENIZER_GSE=true \
+            semitechnologies/weaviate:1.28.4
+      - name: 等端口就绪（超时即失败，不允许伪装成 skip）
+        run: |
+          for i in $(seq 1 60); do
+            if nc -z 127.0.0.1 19530 && nc -z 127.0.0.1 9035; then echo ready; exit 0; fi
+            sleep 2
+          done
+          echo "::error::Milvus/Weaviate 未在 120s 内就绪"
+          docker logs it-milvus | tail -50 || true
+          docker logs it-weaviate | tail -50 || true
+          exit 1
+      - name: 发现 IT 类（改名导致 0 发现必须红）
+        run: |
+          n=$(grep -rl 'class .*IT' retrieval-engine/src/test/java --include='*IT.java' | wc -l)
+          echo "discovered $n IT classes"
+          test "$n" -ge 2
+      - name: 安装依赖（跳过测试）
+        run: mvn -B -q -DskipTests install
+      - name: 真实驱动集成（-Pit + env）
+        env:
+          RAGAGENT_MILVUS_IT: "true"
+          RAGAGENT_WEAVIATE_IT: "true"
+        run: mvn -B -Pit -pl retrieval-engine verify
+      - name: failsafe 汇总（ok/failed/skipped）
+        if: always()
+        run: |
+          grep -hE 'Tests run:' retrieval-engine/target/failsafe-reports/*.txt 2>/dev/null || true

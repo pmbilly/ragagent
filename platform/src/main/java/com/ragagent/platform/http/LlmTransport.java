@@ -33,13 +33,13 @@ import java.util.Optional;
  */
 public final class LlmTransport {
 
-    /** 非流式调用的兜底超时（环境变量 WEKNORA_LLM_CHAT_TIMEOUT_SECONDS，代码默认 300s）。 */
+    /** 非流式调用的兜底超时（环境变量 RAGAGENT_LLM_CHAT_TIMEOUT_SECONDS，代码默认 300s）。 */
     public static final Duration DEFAULT_CHAT_TIMEOUT =
-            envDurationSeconds("WEKNORA_LLM_CHAT_TIMEOUT_SECONDS", Duration.ofSeconds(300));
+            envDurationSeconds("RAGAGENT_LLM_CHAT_TIMEOUT_SECONDS", Duration.ofSeconds(300));
 
-    /** 流式调用的兜底超时（环境变量 WEKNORA_LLM_STREAM_TIMEOUT_SECONDS，代码默认 600s）。 */
+    /** 流式调用的兜底超时（环境变量 RAGAGENT_LLM_STREAM_TIMEOUT_SECONDS，代码默认 600s）。 */
     public static final Duration DEFAULT_STREAM_TIMEOUT =
-            envDurationSeconds("WEKNORA_LLM_STREAM_TIMEOUT_SECONDS", Duration.ofSeconds(600));
+            envDurationSeconds("RAGAGENT_LLM_STREAM_TIMEOUT_SECONDS", Duration.ofSeconds(600));
 
     /** 重定向上限。 */
     public static final int DEFAULT_MAX_REDIRECTS = 10;

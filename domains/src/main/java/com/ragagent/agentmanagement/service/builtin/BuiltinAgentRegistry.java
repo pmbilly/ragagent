@@ -27,7 +27,7 @@ import tools.jackson.databind.node.ObjectNode;
  *   <li><b>i18n 解析</b>：精确匹配 → 语言前缀匹配 → default → 第一项。</li>
  * </ol>
  *
- * <p>locale 来源：WEKNORA_LANGUAGE env 优先，
+ * <p>locale 来源：RAGAGENT_LANGUAGE env 优先，
  * 其次 Accept-Language 首个 tag，缺省 zh-CN（见 {@link #localeFromRequest}）。</p>
  */
 @Component

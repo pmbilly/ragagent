@@ -22,8 +22,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
  *   <li>第二道闸：瞬时队列仍有活的行保留（探测失败按仍卡死处理）；wiki 持久 op 命中的行
  *       保留（<b>不依赖 inspector</b>——Lite 装配下 inspector 为 null）；</li>
  *   <li>清扫 B：summary_status=processing 且陈旧 → failed；</li>
- *   <li>阈值与开关：{@code WEKNORA_DOCUMENT_PROCESS_TIMEOUT} 的 duration 解析（如 1h30m、500ms）与回落、
- *       {@code WEKNORA_HOUSEKEEPING_ENABLED} 的缺省开启语义。</li>
+ *   <li>阈值与开关：{@code RAGAGENT_DOCUMENT_PROCESS_TIMEOUT} 的 duration 解析（如 1h30m、500ms）与回落、
+ *       {@code RAGAGENT_HOUSEKEEPING_ENABLED} 的缺省开启语义。</li>
  * </ul>
  *
  * <p>阈值口径：DocumentProcessTimeout 传 1 小时 ⇒ 1h 下限 + 10min 缓冲 =

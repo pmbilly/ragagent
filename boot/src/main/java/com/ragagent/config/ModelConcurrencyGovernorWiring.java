@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
- * 后台并发闸门的启动装配：limit = model.max_concurrency（DB → {@code WEKNORA_MODEL_MAX_CONCURRENCY}
+ * 后台并发闸门的启动装配：limit = model.max_concurrency（DB → {@code RAGAGENT_MODEL_MAX_CONCURRENCY}
  * env → 缺省 32）。
  *
  * <h2>后端选择</h2>
@@ -56,7 +56,7 @@ public class ModelConcurrencyGovernorWiring {
         long limit;
         try {
             limit = systemSettingService.getInt("model.max_concurrency",
-                    "WEKNORA_MODEL_MAX_CONCURRENCY", DEFAULT_MODEL_MAX_CONCURRENCY);
+                    "RAGAGENT_MODEL_MAX_CONCURRENCY", DEFAULT_MODEL_MAX_CONCURRENCY);
         } catch (RuntimeException e) {
             // 设置面不可用时按缺省装配（尽力而为），
             // 闸门失效退化为"未装配"形态（全部放行），不得阻断应用启动。

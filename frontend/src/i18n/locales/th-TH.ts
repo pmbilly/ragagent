@@ -1496,7 +1496,7 @@ export default {
     addRow: 'เพิ่ม',
     namePlaceholder: 'VARIABLE_NAME',
     nameRule: 'ตัวอักษรพิมพ์ใหญ่ ตัวเลข และขีดล่าง ขึ้นต้นด้วยตัวอักษรหรือขีดล่าง',
-    nameInvalid: 'ไม่สามารถใช้ชื่อนี้ได้ ชื่อท sandbox สงวนไว้ เช่น PATH หรืออะไรก็ตามที่ขึ้นต้นด้วย WEKNORA_ จะไม่ได้รับการยอมรับ',
+    nameInvalid: 'ไม่สามารถใช้ชื่อนี้ได้ ชื่อท sandbox สงวนไว้ เช่น PATH หรืออะไรก็ตามที่ขึ้นต้นด้วย RAGAGENT_ จะไม่ได้รับการยอมรับ',
     nameDuplicate: 'คุณมีตัวแปรที่มีชื่อนี้อยู่แล้วที่นี่',
     valuePlaceholder: 'ใส่ค่า',
     storedPlaceholder: 'บันทึกแล้ว พิมพ์เพื่อแทนที่',

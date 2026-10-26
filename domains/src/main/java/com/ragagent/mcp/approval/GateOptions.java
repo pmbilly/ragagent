@@ -8,7 +8,7 @@ import java.util.UUID;
  * Gate 的装配参数。
  *
  * <p>超时来源：{@code toolApprovalTimeoutSeconds}（&gt; 0 生效，否则 10 分钟）；
- * fail-open 开关：环境变量 {@code WEKNORA_AGENT_TOOL_APPROVAL_FAIL_OPEN}（仅当值为 "true"，
+ * fail-open 开关：环境变量 {@code RAGAGENT_AGENT_TOOL_APPROVAL_FAIL_OPEN}（仅当值为 "true"，
  * 忽略大小写与空白，才 fail-open，默认 <b>fail-close</b>：策略查询失败时仍要求人工批准）。</p>
  *
  * <p>{@code ackTimeout} 与 {@code instanceId} 均带默认值、不影响默认行为：

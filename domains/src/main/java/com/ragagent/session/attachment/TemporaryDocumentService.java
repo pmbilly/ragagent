@@ -422,7 +422,7 @@ public class TemporaryDocumentService {
 
 
     private static long ttlHours() {
-        String env = AppEnvLookup.get("WEKNORA_CHAT_ATTACHMENT_TTL_HOURS");
+        String env = AppEnvLookup.get("RAGAGENT_CHAT_ATTACHMENT_TTL_HOURS");
         if (env != null && !env.isBlank()) {
             try {
                 return Long.parseLong(env.trim());

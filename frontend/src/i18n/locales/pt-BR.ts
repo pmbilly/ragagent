@@ -1496,7 +1496,7 @@ export default {
     addRow: 'Adicionar',
     namePlaceholder: 'VARIABLE_NAME',
     nameRule: 'Letras maiúsculas, dígitos e sublinhado, começando com uma letra ou sublinhado.',
-    nameInvalid: 'Esse nome não pode ser usado. Nomes reservados pelo sandbox, como PATH ou qualquer coisa que comece com WEKNORA_, não são aceitos.',
+    nameInvalid: 'Esse nome não pode ser usado. Nomes reservados pelo sandbox, como PATH ou qualquer coisa que comece com RAGAGENT_, não são aceitos.',
     nameDuplicate: 'Você já tem uma variável com esse nome aqui.',
     valuePlaceholder: 'Digite um valor',
     storedPlaceholder: 'Armazenado, digite para substituir',

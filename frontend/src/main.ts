@@ -1,4 +1,5 @@
 import { createApp } from "vue";
+import { StorageKeys } from './utils/storageKeys'
 import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
@@ -41,7 +42,7 @@ async function bootstrap() {
   // Capabilities (canCreateTenant, autoAcceptInvitation) are not cached
   // in localStorage — reconcile once before first paint when a session exists.
   const authStore = useAuthStore();
-  if (localStorage.getItem("weknora_token")) {
+  if (localStorage.getItem(StorageKeys.token)) {
     try {
       await authStore.refreshFromAuthMe();
     } catch {

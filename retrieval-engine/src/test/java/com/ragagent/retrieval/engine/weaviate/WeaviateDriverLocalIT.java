@@ -36,19 +36,19 @@ import tools.jackson.databind.ObjectMapper;
  *   -e AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true -e ENABLE_TOKENIZER_GSE=true \
  *   semitechnologies/weaviate:1.28.4
  * # 跑本类
- * WEKNORA_WEAVIATE_IT=true ./gradlew :engine:integrationTest
+ * RAGAGENT_WEAVIATE_IT=true ./gradlew :engine:integrationTest
  * </pre>
  *
  * 覆盖：建类 → 批量写 → 向量检索（certainty）→ 关键词检索（BM25 + gse 分词）→
  * <b>merge 更新（tag/enabled）后对象仍可检索</b>（证明修正后的 PATCH 没清属性/向量）→
  * 拷贝（offset 分页 + 命名向量回搬）→ move → 删除。
  */
-@EnabledIfEnvironmentVariable(named = "WEKNORA_WEAVIATE_IT", matches = "true")
+@EnabledIfEnvironmentVariable(named = "RAGAGENT_WEAVIATE_IT", matches = "true")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class WeaviateDriverLocalIT {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final String HOST = System.getenv().getOrDefault("WEKNORA_WEAVIATE_HOST",
+    private static final String HOST = System.getenv().getOrDefault("RAGAGENT_WEAVIATE_HOST",
             "localhost:9035");
 
     private final String base = "Weknora_it_" + UUID.randomUUID().toString().substring(0, 8);

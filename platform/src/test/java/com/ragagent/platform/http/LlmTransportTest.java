@@ -77,10 +77,10 @@ class LlmTransportTest {
      */
     @Test
     void defaultTimeoutsMatchGoCode() {
-        if (System.getenv("WEKNORA_LLM_CHAT_TIMEOUT_SECONDS") == null) {
+        if (System.getenv("RAGAGENT_LLM_CHAT_TIMEOUT_SECONDS") == null) {
             assertEquals(Duration.ofSeconds(300), LlmTransport.DEFAULT_CHAT_TIMEOUT);
         }
-        if (System.getenv("WEKNORA_LLM_STREAM_TIMEOUT_SECONDS") == null) {
+        if (System.getenv("RAGAGENT_LLM_STREAM_TIMEOUT_SECONDS") == null) {
             assertEquals(Duration.ofSeconds(600), LlmTransport.DEFAULT_STREAM_TIMEOUT);
         }
     }

@@ -903,8 +903,8 @@ function formatApiKeyAccessModeLabel(key: TenantAPIKey): string {
 type PlaygroundStatus = '' | 'running' | 'success' | 'failed' | 'stopped'
 
 type WeKnoraDesktopWindow = Window & {
-  __WEKNORA_API_BASE__?: string
-  __WEKNORA_API_LAN_BASE__?: string
+  __RAGAGENT_API_BASE__?: string
+  __RAGAGENT_API_LAN_BASE__?: string
   go?: {
     main?: {
       App?: {
@@ -1316,7 +1316,7 @@ async function copy(text: string) {
 async function tryLoadWailsApiBaseURL() {
   const win = window as WeKnoraDesktopWindow
   for (let i = 0; i < 40; i++) {
-    const injected = win.__WEKNORA_API_BASE__
+    const injected = win.__RAGAGENT_API_BASE__
     if (typeof injected === 'string' && injected.trim()) {
       wailsApiBaseURL.value = injected.trim().replace(/\/$/, '')
       await tryLoadWailsLanHints(win)
@@ -1341,7 +1341,7 @@ async function tryLoadWailsApiBaseURL() {
 }
 
 async function tryLoadWailsLanHints(win: WeKnoraDesktopWindow) {
-  const injectedLan = win.__WEKNORA_API_LAN_BASE__
+  const injectedLan = win.__RAGAGENT_API_LAN_BASE__
   if (typeof injectedLan === 'string' && injectedLan.trim()) {
     wailsApiLanBaseURL.value = injectedLan.trim().replace(/\/$/, '')
   }

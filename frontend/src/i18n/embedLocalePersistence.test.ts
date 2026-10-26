@@ -9,7 +9,7 @@ import { test } from 'node:test'
 // 注意：模块必须在**没有 document** 时装（否则 @vue/runtime-dom 走浏览器路径、要 createElement）；
 // 模块内的 DOM 访问都在调用时判定，所以先 import、后装桩即可。
 
-const KEY = 'weknora-embed-locale'
+const KEY = 'ragagent-embed-locale'
 const store = new Map<string, string>()
 const htmlAttrs: Record<string, string> = {}
 

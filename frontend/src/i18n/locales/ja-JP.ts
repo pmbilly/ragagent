@@ -1496,7 +1496,7 @@ export default {
     addRow: '追加',
     namePlaceholder: 'VARIABLE_NAME',
     nameRule: '英大文字、数字、アンダースコアが使用できます。先頭は英字またはアンダースコアにしてください。',
-    nameInvalid: 'この名前は使用できません。PATHやWEKNORA_で始まる名前など、サンドボックスが予約している名前は指定できません。',
+    nameInvalid: 'この名前は使用できません。PATHやRAGAGENT_で始まる名前など、サンドボックスが予約している名前は指定できません。',
     nameDuplicate: 'この名前の変数はすでにここに登録されています。',
     valuePlaceholder: '値を入力',
     storedPlaceholder: '保存済み。入力すると置き換わります',

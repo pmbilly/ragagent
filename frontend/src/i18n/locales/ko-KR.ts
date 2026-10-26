@@ -4680,7 +4680,7 @@ export default {
     addRow: '추가',
     namePlaceholder: 'VARIABLE_NAME',
     nameRule: '대문자, 숫자, 밑줄만 사용하며 문자 또는 밑줄로 시작해야 합니다.',
-    nameInvalid: '이 이름은 사용할 수 없습니다. PATH처럼 샌드박스가 예약한 이름이나 WEKNORA_로 시작하는 이름은 허용되지 않습니다.',
+    nameInvalid: '이 이름은 사용할 수 없습니다. PATH처럼 샌드박스가 예약한 이름이나 RAGAGENT_로 시작하는 이름은 허용되지 않습니다.',
     nameDuplicate: '같은 이름의 변수가 이미 있습니다.',
     valuePlaceholder: '값 입력',
     storedPlaceholder: '저장됨, 입력하면 교체됩니다',

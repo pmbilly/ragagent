@@ -4682,7 +4682,7 @@ export default {
     addRow: '添加',
     namePlaceholder: 'VARIABLE_NAME',
     nameRule: '只能用大写字母、数字和下划线，且以字母或下划线开头。',
-    nameInvalid: '这个名字不能用。沙箱保留的名字（例如 PATH，或以 WEKNORA_ 开头的名字）不接受。',
+    nameInvalid: '这个名字不能用。沙箱保留的名字（例如 PATH，或以 RAGAGENT_ 开头的名字）不接受。',
     nameDuplicate: '这里已经有同名变量了。',
     valuePlaceholder: '填入值',
     storedPlaceholder: '已存值，填入新值即替换',

@@ -6,9 +6,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * 部署形态配置。
  *
  * <ul>
- *   <li>{@code WEKNORA_EDITION} → {@code weknora.edition}：版次，capabilities 端点原样下发
+ *   <li>{@code RAGAGENT_EDITION} → {@code weknora.edition}：版次，capabilities 端点原样下发
  *       （缺省 {@code standard}；{@code lite} 会关掉 auto-setup 等运维面）。</li>
- *   <li>{@code WEKNORA_DEPLOYMENT_MODE} → {@code weknora.deployment.mode}：是否生产部署。
+ *   <li>{@code RAGAGENT_DEPLOYMENT_MODE} → {@code weknora.deployment.mode}：是否生产部署。
  *       {@code production} 判为生产，兼容历史字面量 {@code release}，
  *       其余（含未设置）按非生产处理。</li>
  * </ul>

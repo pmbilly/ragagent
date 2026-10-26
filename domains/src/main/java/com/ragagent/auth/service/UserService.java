@@ -485,7 +485,7 @@ public class UserService implements UserNameLookup {
     /** 复杂密码开关的解析顺序：系统设置 > 环境变量 > 默认 false。 */
     public boolean complexPasswordEnabled() {
         return settingService.getBool(
-                "auth.complex_password_enabled", "WEKNORA_AUTH_COMPLEX_PASSWORD_ENABLED", false);
+                "auth.complex_password_enabled", "RAGAGENT_AUTH_COMPLEX_PASSWORD_ENABLED", false);
     }
 
     // ── UserNameLookup（B97b：非 auth 域经端口取名，不再依赖本类）─────

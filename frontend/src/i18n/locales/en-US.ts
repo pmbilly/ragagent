@@ -1496,7 +1496,7 @@ export default {
     addRow: 'Add',
     namePlaceholder: 'VARIABLE_NAME',
     nameRule: 'Upper-case letters, digits and underscores, starting with a letter or an underscore.',
-    nameInvalid: 'That name cannot be used. Names the sandbox reserves, such as PATH or anything starting with WEKNORA_, are not accepted.',
+    nameInvalid: 'That name cannot be used. Names the sandbox reserves, such as PATH or anything starting with RAGAGENT_, are not accepted.',
     nameDuplicate: 'You already have a variable with that name here.',
     valuePlaceholder: 'Enter a value',
     storedPlaceholder: 'Stored, type to replace',
