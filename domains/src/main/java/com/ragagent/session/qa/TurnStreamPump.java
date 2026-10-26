@@ -141,8 +141,13 @@ final class TurnStreamPump {
                 return;
             }
         }
-        log.warn("Stream pump exceeded max duration, session={}, message={}",
+        // 超时不是"记日志退出"：走同一 STOP 协议让执行体到取消点、由 finalizer 提交终态
+        log.warn("Stream pump exceeded max duration, cancelling, session={}, message={}",
                 sessionId, assistantMessageId);
+        streamCtx.cancelled = true;
+        if (stopEmitted.compareAndSet(false, true)) {
+            emitStop(sessionId, assistantMessageId, streamCtx);
+        }
     }
 
     private int waitForTitle(SseSink sink, String sessionId, String assistantMessageId,

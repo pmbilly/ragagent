@@ -2,6 +2,7 @@ package com.ragagent.knowledge.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -81,8 +82,12 @@ class KnowledgeProcessWorkerTenantScopeTest {
     @DisplayName("提交线程无租户上下文时，管线仍运行在捕获到的知识租户作用域内（返回后恢复）")
     void pipelineRunsInsideCapturedTenantScope() {
         TenantContext.clear();                       // 模拟 worker 虚拟线程：没有 Filter 链填过
+        Knowledge row1 = new Knowledge();
+        row1.setId("kid-1");
+        row1.setTenantId(11L);
+        when(knowledgeRepository.findByIdAny("kid-1")).thenReturn(row1);
         AtomicReference<Long> tenantSeenInPipeline = new AtomicReference<>();
-        when(ingestStateRepository.casPendingToProcessing(anyString(), any()))
+        when(ingestStateRepository.casPendingToProcessing(anyString(), anyLong(), any()))
                 .thenAnswer(invocation -> {
                     tenantSeenInPipeline.set(TenantContext.currentTenantId());
                     return 0;                        // 静默退出：只需证明进管线时租户已在
@@ -102,7 +107,7 @@ class KnowledgeProcessWorkerTenantScopeTest {
         row.setTenantId(7L);
         when(knowledgeRepository.findByIdAny("kid-2")).thenReturn(row);
         AtomicReference<Long> tenantSeenInPipeline = new AtomicReference<>();
-        when(ingestStateRepository.casPendingToProcessing(anyString(), any()))
+        when(ingestStateRepository.casPendingToProcessing(anyString(), anyLong(), any()))
                 .thenAnswer(invocation -> {
                     tenantSeenInPipeline.set(TenantContext.currentTenantId());
                     return 0;

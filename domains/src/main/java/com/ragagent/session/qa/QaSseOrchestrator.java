@@ -54,6 +54,9 @@ public final class QaSseOrchestrator {
     private static final org.slf4j.Logger log =
             org.slf4j.LoggerFactory.getLogger(QaSseOrchestrator.class);
 
+    /** STOP 兜底窗口：执行体未在此时限内收尾则强制提交 CANCELLED。 */
+    private static final long STOP_FALLBACK_MILLIS = 3000L;
+
     private final StreamManager streamManager;
     private final StreamEventEmitter emitter;
     private final SessionService sessionService;
@@ -109,14 +112,28 @@ public final class QaSseOrchestrator {
         // （身份完整）捕获快照，触发时用它补齐；否则收尾的索引/建议/记忆 SessionNotFound。
         TenantContextSnapshot stopIdentity = TenantContextSnapshot.capture();
         eventBus.on(EventType.EVENT_STOP, evt -> TenantScope.run(stopIdentity, () -> {
-            log.info("Received stop event, cancelling async operations for session: {}", reqCtx.sessionId);
+            // STOP 只发起取消：置位 + 打断执行体，终态与消息完成交给唯一 finalizer
+            // （执行体 finally / 下面的兜底），避免"停止即完成"抢先写空内容与空 userId
+            log.info("Received stop event, requesting cancel for session: {}", reqCtx.sessionId);
             streamCtx.cancelled = true;
-            if (streamCtx.lifecycle.finish(TurnLifecycle.State.CANCELLED)) {
-                QaTerminalMetrics.record(mode, TurnLifecycle.State.CANCELLED);
+            Thread runner = streamCtx.runner;
+            if (runner != null) {
+                runner.interrupt();
             }
-            // 停止时保住已流出内容；用 session 租户落库
-            turnFinalizer.runWithTenant(sessionTenantId, stopIdentity, () -> turnFinalizer.completeAssistantMessage(
-                    streamCtx.assistantMessage, "", "", sessionTenantId));
+            Thread.ofVirtual().start(() -> {
+                try {
+                    Thread.sleep(STOP_FALLBACK_MILLIS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+                if (streamCtx.lifecycle.finish(TurnLifecycle.State.CANCELLED)) {
+                    QaTerminalMetrics.record(mode, TurnLifecycle.State.CANCELLED);
+                    turnFinalizer.runWithTenant(sessionTenantId, stopIdentity, () ->
+                            turnFinalizer.completeAssistantMessage(streamCtx.assistantMessage,
+                                    reqCtx.query, reqCtx.userMessageID, sessionTenantId));
+                }
+            });
         }));
 
         // AgentStreamBridge 订阅（16 种事件）

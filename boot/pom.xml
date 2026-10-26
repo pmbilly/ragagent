@@ -71,6 +71,12 @@
       <groupId>com.baomidou</groupId>
       <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
     </dependency>
+    <!-- Flyway 自动配置：Boot 4 已把它从 autoconfigure 拆成独立模块，
+         缺这条则 spring.flyway.* 配置无人消费、迁移不会随启动执行 -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-flyway</artifactId>
+    </dependency>
     <!-- OpenAPI JSON（dev-only，默认关闭；UI 由 boot 的 /scalar 页面承载） -->
     <dependency>
       <groupId>org.springdoc</groupId>

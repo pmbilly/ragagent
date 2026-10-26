@@ -23,19 +23,21 @@ public class IngestStateRepository {
         this.knowledgeMapper = knowledgeMapper;
     }
 
-    /** CAS：{@code pending → processing}（被抢/取消则 0 行）。 */
-    public int casPendingToProcessing(String id, OffsetDateTime now) {
+    /** CAS：{@code pending → processing}，且代次仍是调用方那一次（被抢占/重解析/取消则 0 行）。 */
+    public int casPendingToProcessing(String id, long parseAttempt, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
+                .eq(Knowledge::getParseAttempt, parseAttempt)
                 .eq(Knowledge::getParseStatus, Knowledge.PARSE_PENDING)
                 .set(Knowledge::getParseStatus, Knowledge.PARSE_PROCESSING)
                 .set(Knowledge::getUpdatedAt, now));
     }
 
-    /** CAS：{@code processing → finalizing} 并写子任务计数（0 行 = 行已被 cancel/delete 抢走）。 */
-    public int promoteToFinalizing(String id, int pendingSubtasks, OffsetDateTime now) {
+    /** CAS：{@code processing → finalizing} 并写子任务计数（0 行 = 被 cancel/delete/新一代次抢走）。 */
+    public int promoteToFinalizing(String id, long parseAttempt, int pendingSubtasks, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
+                .eq(Knowledge::getParseAttempt, parseAttempt)
                 .eq(Knowledge::getParseStatus, Knowledge.PARSE_PROCESSING)
                 .set(Knowledge::getParseStatus, Knowledge.PARSE_FINALIZING)
                 .set(Knowledge::getPendingSubtasksCount, pendingSubtasks)
@@ -55,9 +57,10 @@ public class IngestStateRepository {
     }
 
     /** CAS：只有仍由本次尝试占用的行（{@code processing}/{@code finalizing}）才许翻终态 completed。 */
-    public int completeIfOwned(String id, boolean resetSummaryStatus, OffsetDateTime now) {
+    public int completeIfOwned(String id, long parseAttempt, boolean resetSummaryStatus, OffsetDateTime now) {
         LambdaUpdateWrapper<Knowledge> uw = new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
+                .eq(Knowledge::getParseAttempt, parseAttempt)
                 .in(Knowledge::getParseStatus, List.of(
                         Knowledge.PARSE_PROCESSING, Knowledge.PARSE_FINALIZING))
                 .set(Knowledge::getParseStatus, Knowledge.PARSE_COMPLETED)
@@ -70,20 +73,27 @@ public class IngestStateRepository {
         return knowledgeMapper.update(null, uw);
     }
 
-    /** CAS：只有仍 {@code processing} 的行才许翻 failed 并写 error_message。 */
-    public int failIfProcessing(String id, String errorMessage, OffsetDateTime now) {
+    /** CAS：只有仍 {@code processing} 且代次未变才许翻 failed 并写 error_message。 */
+    public int failIfProcessing(String id, long parseAttempt, String errorMessage, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
+                .eq(Knowledge::getParseAttempt, parseAttempt)
                 .eq(Knowledge::getParseStatus, Knowledge.PARSE_PROCESSING)
                 .set(Knowledge::getParseStatus, Knowledge.PARSE_FAILED)
                 .set(Knowledge::getErrorMessage, errorMessage)
                 .set(Knowledge::getUpdatedAt, now));
     }
 
-    /** 索引完成的无条件推进：{@code enable_status=enabled} + processed_at + updated_at。 */
-    public int markIndexedEnabled(String id, OffsetDateTime now) {
+    /**
+     * 索引完成推进启用态：只对仍由本次代次占用的行（{@code processing}/{@code finalizing}）
+     * 生效，避免 cancel 抢走行之后又写成 {@code cancelled + enabled}。
+     */
+    public int markIndexedEnabledIfOwned(String id, long parseAttempt, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
+                .eq(Knowledge::getParseAttempt, parseAttempt)
+                .in(Knowledge::getParseStatus, List.of(
+                        Knowledge.PARSE_PROCESSING, Knowledge.PARSE_FINALIZING))
                 .set(Knowledge::getEnableStatus, "enabled")
                 .set(Knowledge::getProcessedAt, now)
                 .set(Knowledge::getUpdatedAt, now));

@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-356 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+357 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -165,6 +165,7 @@
 | `:domains` | `com.ragagent.knowledge.dto.tag` | 标签面载荷：标签增删改查分页，以及知识库标签批量绑定与统计。 |
 | `:domains` | `com.ragagent.knowledge.index` | 索引面：知识条目与向量/检索引擎的绑定与写入适配。 |
 | `:domains` | `com.ragagent.knowledge.mapper` | MyBatis-Plus mapper 接口层：每张表一个 *Mapper，只声明 SQL/条件构造， 不承载业务规则。 |
+| `:domains` | `com.ragagent.knowledge.recovery` | 知识侧启动恢复：重启后把卡在 pending/processing/finalizing/deleting 的解析行复位为 failed 并取消孤儿 span，summary 的 pending/processing 同样复位。 |
 | `:domains` | `com.ragagent.knowledge.repository` | 仓储门面层：把 mapper 的原子操作组合成领域可用的读写契约，并集中承载 软删三面孔、全字段 UPDATE、乐观锁冲突与 PG/H2 方言分支。 |
 | `:domains` | `com.ragagent.knowledge.runtime` | 知识库运行面：任务观测门面。 |
 | `:domains` | `com.ragagent.knowledge.service` | 知识库用例层（顶层残部）。 |

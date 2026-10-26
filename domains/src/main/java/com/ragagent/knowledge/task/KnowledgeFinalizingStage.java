@@ -85,23 +85,24 @@ final class KnowledgeFinalizingStage {
      * delete 抢走 → 跳过富化不覆盖状态。无富化 → 直接完成/失败收口。
      */
     void finalizeProcessing(Knowledge k, KnowledgeBase kb, String knowledgeId,
-            int attempt, List<Chunk> chunks) {
+            int attempt, long parseAttempt, List<Chunk> chunks) {
         FinalizingPlan plan = planFinalizing(kb, chunks);
         if (!plan.wiki() && !plan.graph() && !plan.question()) {
-            failOrComplete(knowledgeId, attempt, null);
+            failOrComplete(knowledgeId, attempt, parseAttempt, null);
             return;
         }
-        markIndexedEnabled(knowledgeId);
         SpanTracker.SpanHandle postSpan = beginStageSpan(attempt, knowledgeId,
                 KnowledgeProcessingSpan.STAGE_POST_PROCESS, null);
-        if (hasSummaryModel(kb)) {
-            knowledgeRepository.setSummaryStatus(knowledgeId, "none",
-                    OffsetDateTime.now(ZoneOffset.UTC));
-            spawnSummaryFanOut(knowledgeId);
-        }
         int pendingSubtasks = (plan.wiki() ? 1 : 0) + plan.questionBatchCount()
                 + plan.graphChunks().size();
-        if (promoteFinalizing(knowledgeId, pendingSubtasks)) {
+        if (promoteFinalizing(knowledgeId, parseAttempt, pendingSubtasks)) {
+            // 先抢到 ownership 再推进启用态：promote 失败说明行已被 cancel/重解析抢走
+            markIndexedEnabled(knowledgeId, parseAttempt);
+            if (hasSummaryModel(kb)) {
+                knowledgeRepository.setSummaryStatus(knowledgeId, "none",
+                        OffsetDateTime.now(ZoneOffset.UTC));
+                spawnSummaryFanOut(knowledgeId);
+            }
             if (plan.wiki()) {
                 enqueueWikiIngest(knowledgeId, k);
             }
@@ -195,8 +196,9 @@ final class KnowledgeFinalizingStage {
      * 索引完成的无条件推进：{@code enable_status=enabled}
      * + {@code processed_at}。{@code storage_size} 的 Java 侧计算未接线，保持既有形态。
      */
-    private void markIndexedEnabled(String knowledgeId) {
-        ingestStateRepository.markIndexedEnabled(knowledgeId, OffsetDateTime.now(ZoneOffset.UTC));
+    private void markIndexedEnabled(String knowledgeId, long parseAttempt) {
+        ingestStateRepository.markIndexedEnabledIfOwned(knowledgeId, parseAttempt,
+                OffsetDateTime.now(ZoneOffset.UTC));
     }
 
     /**
@@ -206,8 +208,8 @@ final class KnowledgeFinalizingStage {
      * <p>返回 false = 行已不在 processing（cancel/delete 抢走）——调用方必须跳过
      * 富化且不得覆盖状态。</p>
      */
-    private boolean promoteFinalizing(String knowledgeId, int pendingSubtasks) {
-        int promoted = ingestStateRepository.promoteToFinalizing(knowledgeId, pendingSubtasks,
+    private boolean promoteFinalizing(String knowledgeId, long parseAttempt, int pendingSubtasks) {
+        int promoted = ingestStateRepository.promoteToFinalizing(knowledgeId, parseAttempt, pendingSubtasks,
                 OffsetDateTime.now(ZoneOffset.UTC));
         if (promoted > 0) {
             log.info("[KnowledgePostProcess] Knowledge {} entered finalizing ({} subtask(s) pending)",
@@ -328,7 +330,7 @@ final class KnowledgeFinalizingStage {
         }
     }
 
-    void failOrComplete(String knowledgeId, int attempt, String error) {
+    void failOrComplete(String knowledgeId, int attempt, long parseAttempt, String error) {
         if (error == null) {
             SpanTracker.SpanHandle postSpan = beginStageSpan(attempt, knowledgeId,
                     KnowledgeProcessingSpan.STAGE_POST_PROCESS, null);
@@ -342,8 +344,8 @@ final class KnowledgeFinalizingStage {
             KnowledgeBase rowKb = row == null ? null
                     : kbRepository.findByIdAny(row.getKnowledgeBaseId());
             boolean summaryModelConfigured = hasSummaryModel(rowKb);
-            int completedRows = ingestStateRepository.completeIfOwned(knowledgeId, summaryModelConfigured,
-                    OffsetDateTime.now(ZoneOffset.UTC));
+            int completedRows = ingestStateRepository.completeIfOwned(knowledgeId, parseAttempt,
+                    summaryModelConfigured, OffsetDateTime.now(ZoneOffset.UTC));
             if (completedRows == 0) {
                 log.info("[KnowledgeProcess] completion write skipped for {}: row not owned", knowledgeId);
             }
@@ -357,8 +359,8 @@ final class KnowledgeFinalizingStage {
             }
         } else {
             // CAS：只有仍由本次处理占用的行（processing）才许翻 failed。
-            int failedRows = ingestStateRepository.failIfProcessing(knowledgeId, abbreviate(error),
-                    OffsetDateTime.now(ZoneOffset.UTC));
+            int failedRows = ingestStateRepository.failIfProcessing(knowledgeId, parseAttempt,
+                    abbreviate(error), OffsetDateTime.now(ZoneOffset.UTC));
             if (failedRows == 0) {
                 log.info("[KnowledgeProcess] failure write skipped for {}: row not processing", knowledgeId);
             }

@@ -260,7 +260,13 @@ public class SessionKnowledgeQaService {
         setupSpan.finish(setupOutput, null, null);
 
         // Trigger（session tenant 设定 + sessionID 传播在 Java 侧由 TenantContext 承担）
-        knowledgeQAByEvent(chatManage, pipeline);
+        // 取消探针是线程级的：STOP 置 streamCtx.cancelled 后，各阶段循环能读到并退出
+        CANCEL_PROBE.set(req.cancellationProbe);
+        try {
+            knowledgeQAByEvent(chatManage, pipeline);
+        } finally {
+            CANCEL_PROBE.remove();
+        }
         log.info("Knowledge base question answering initiated");
     }
 
@@ -364,8 +370,15 @@ public class SessionKnowledgeQaService {
     }
 
     /** 虚拟线程取消探测（检测中断标志；stop 链路 4.6d 接线）。 */
+    /** 当前执行线程的取消探针（来自 QaRequest；STOP 置位后返回非 null）。 */
+    private static final ThreadLocal<java.util.function.Supplier<String>> CANCEL_PROBE = new ThreadLocal<>();
+
     private static boolean cancelled() {
-        return Thread.currentThread().isInterrupted();
+        if (Thread.currentThread().isInterrupted()) {
+            return true;
+        }
+        java.util.function.Supplier<String> probe = CANCEL_PROBE.get();
+        return probe != null && probe.get() != null;
     }
 
     // SearchKnowledge

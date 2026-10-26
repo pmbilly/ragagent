@@ -164,6 +164,8 @@ public final class QaSupport {
         /** 虚拟线程上显式传租户的快照 */
         public TenantContextSnapshot tenantSnapshot;
         public volatile boolean cancelled;
+        /** 执行体线程（STOP 时 interrupt，让其尽快到达取消点） */
+        public volatile Thread runner;
         public Message assistantMessage;
         public SteerSinkBridge steerSink;
         /** 本轮终态单赢家：三个收尾点（推送/续传/事件总线）共用。 */

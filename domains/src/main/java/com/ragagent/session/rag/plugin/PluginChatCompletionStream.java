@@ -162,7 +162,7 @@ public final class PluginChatCompletionStream implements Plugin {
                 // A3：这是"提前离开"（不是读到终态）⇒ 关流，让 provider 调用与 permit 一起停。
                 responseQueue.close();
                 endStream(eventBus, chatManage, thinkingID, answerID,
-                        thinkingDecoder, answerDecoder, thinkingOpen, answerCompleted);
+                        thinkingDecoder, answerDecoder, thinkingOpen, answerCompleted, true);
                 Map<String, Object> f = new LinkedHashMap<>();
                 f.put("sessionId", chatManage.getSessionId());
                 PipelineLog.info("Stream", "channel_close", f);
@@ -191,7 +191,7 @@ public final class PluginChatCompletionStream implements Plugin {
                 if (response.isDone()) {
                     // ERROR+done 是终态元素：收束并退出（错误事件已先发；终态帧同样要补）
                     endStream(eventBus, chatManage, thinkingID, answerID,
-                            thinkingDecoder, answerDecoder, thinkingOpen, answerCompleted);
+                            thinkingDecoder, answerDecoder, thinkingOpen, answerCompleted, true);
                     return;
                 }
                 continue;
@@ -264,18 +264,22 @@ public final class PluginChatCompletionStream implements Plugin {
      * done 时完成消息并发 COMPLETE）。异常收束（队列关闭 / 空闲超时 / ERROR+done）原先
      * 只 flush 不补终态 ⇒ assistant 停在未完成、SSE 永远轮询。</p>
      */
-    private static void endStream(EventBusInterface eventBus, PipelineState chatManage,
+    static void endStream(EventBusInterface eventBus, PipelineState chatManage,
                                   String thinkingID, String answerID,
                                   StreamDecoder thinkingDecoder, StreamDecoder answerDecoder,
-                                  AtomicBoolean thinkingOpen, AtomicBoolean answerCompleted) {
+                                  AtomicBoolean thinkingOpen, AtomicBoolean answerCompleted,
+                                  boolean failed) {
         flushDecoders(eventBus, chatManage, thinkingID, answerID, thinkingDecoder, answerDecoder);
-        emitTerminalAnswer(eventBus, chatManage, answerID, answerCompleted);
+        emitTerminalAnswer(eventBus, chatManage, answerID, answerCompleted, failed);
         closeThinking(eventBus, chatManage, thinkingID, thinkingOpen);
     }
 
-    /** 补一帧终态答案（空内容 + done=true）；已终态则不重复发。 */
-    private static void emitTerminalAnswer(EventBusInterface eventBus, PipelineState chatManage,
-                                           String answerID, AtomicBoolean answerCompleted) {
+    /**
+     * 补一帧终态答案（空内容 + done=true）；已终态则不重复发。
+     * {@code failed=true} 时带 outcome=FAILED：终态帧只表示流关闭，收尾方据此判失败。
+     */
+    static void emitTerminalAnswer(EventBusInterface eventBus, PipelineState chatManage,
+                                           String answerID, AtomicBoolean answerCompleted, boolean failed) {
         if (!answerCompleted.compareAndSet(false, true)) {
             return;
         }
@@ -286,6 +290,9 @@ public final class PluginChatCompletionStream implements Plugin {
         AgentFinalAnswerData data = new AgentFinalAnswerData();
         data.setContent("");
         data.setDone(true);
+        if (failed) {
+            data.setOutcome("FAILED");
+        }
         evt.setData(data);
         try {
             eventBus.emit(evt);

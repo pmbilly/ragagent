@@ -7,9 +7,12 @@ import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.config.AsrConfigView;
 import com.ragagent.contract.knowledge.config.ChunkingConfigView;
+import com.ragagent.contract.knowledge.config.IndexingStrategyView;
 import com.ragagent.contract.knowledge.config.VlmConfigView;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelView;
+import com.ragagent.contract.storage.StorageBackendPort;
+import com.ragagent.contract.storage.StorageBackendView;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonBodies;
@@ -35,11 +38,14 @@ public final class InitializationConfigService {
 
     private final KnowledgeCatalogPort knowledgeCatalog;
     private final ModelCatalogPort modelCatalog;
+    private final StorageBackendPort storageBackendPort;
 
     public InitializationConfigService(KnowledgeCatalogPort knowledgeCatalog,
-            ModelCatalogPort modelCatalog) {
+            ModelCatalogPort modelCatalog,
+            StorageBackendPort storageBackendPort) {
         this.knowledgeCatalog = knowledgeCatalog;
         this.modelCatalog = modelCatalog;
+        this.storageBackendPort = storageBackendPort;
     }
 
     // ── GET /initialization/config/:kbId ──
@@ -78,6 +84,12 @@ public final class InitializationConfigService {
         KnowledgeBaseRowView kb = knowledgeCatalog.getAllTenantById(kbId);
         if (kb == null) {
             throw new BizException(AppError.notFound("知识库不存在"));
+        }
+        if (req.name() != null && !req.name().isBlank()) {
+            kb.setName(req.name().trim());
+        }
+        if (req.description() != null) {
+            kb.setDescription(req.description());
         }
 
         // Embedding 变更 + 已有文件 → 400（先于模型校验）
@@ -166,16 +178,7 @@ public final class InitializationConfigService {
         kb.setVlmConfig(new VlmConfigView(vlmEnabled, vlmModelId, vlmDescLang, vlmCustomInstr,
                 "", "", ""));
 
-        // 存储引擎：provider 兼容投影
-        String provider = req.storageProvider() == null ? "" : req.storageProvider().trim().toLowerCase();
-        if (provider.isEmpty()) {
-            provider = "local";
-        }
-        List<String> supported = List.of("local", "minio", "cos", "tos", "s3", "oss", "ks3", "obs");
-        if (!supported.contains(provider)) {
-            throw new BizException(AppError.badRequest("Storage provider is not allowed by STORAGE_ALLOW_LIST"));
-        }
-        kb.setStorageProvider(provider);
+        applyStorageAndBasic(kb, req);
 
         // 知识图谱
         if (req.nodeExtractEnabled()) {
@@ -253,6 +256,59 @@ public final class InitializationConfigService {
         }
     }
 
+
+    /** 存储后端绑定 + 基本信息/索引策略（一次命令的其余权威字段）。 */
+    private void applyStorageAndBasic(KnowledgeBaseRowView kb,
+            InitializationRequests.KBModelConfigRequest req) {
+        // 存储后端：storageBackendId 是权威字段；storageProvider 仅兼容投影。
+        // 空值 = 保留当前绑定（不静默清空）；显式 id 必须属于本租户且 active。
+        Long tid = TenantContext.currentTenantId();
+        long tenantId = tid == null ? 0L : tid;
+        String backendId = req.storageBackendId() == null ? "" : req.storageBackendId().trim();
+        if (!backendId.isEmpty()) {
+            StorageBackendView backend = storageBackendPort.findById(tenantId, backendId);
+            if (backend == null || !"active".equals(backend.getStatus())) {
+                throw new BizException(AppError.badRequest("storage backend is unavailable"));
+            }
+            kb.setStorageBackendId(backend.getId());
+            kb.setStorageProvider(backend.getProvider());
+        } else if (req.storageProvider() != null && !req.storageProvider().trim().isEmpty()) {
+            String provider = req.storageProvider().trim().toLowerCase(java.util.Locale.ROOT);
+            // 兼容旧客户端的白名单校验（STORAGE_ALLOW_LIST 语义）
+            List<String> supported = List.of("local", "minio", "cos", "tos", "s3", "oss", "ks3", "obs");
+            if (!supported.contains(provider)) {
+                throw new BizException(AppError.badRequest(
+                        "Storage provider is not allowed by STORAGE_ALLOW_LIST"));
+            }
+            StorageBackendView backend = storageBackendPort.findActiveLegacyAliasByProvider(tenantId, provider);
+            if (backend != null) {
+                kb.setStorageBackendId(backend.getId());
+                kb.setStorageProvider(backend.getProvider());
+            } else {
+                kb.setStorageProvider(provider);
+            }
+        }
+
+        // 基本信息/索引策略合并进本命令：一次请求提交全部权威字段，避免两次调用部分成功
+        if (req.faqConfig() != null) {
+            kb.setFaqConfig(req.faqConfig());
+        }
+        if (req.wikiConfig() != null) {
+            kb.setWikiConfig(req.wikiConfig());
+        }
+        if (req.autoTagConfig() != null) {
+            kb.setAutoTagConfig(req.autoTagConfig());
+        }
+        if (req.indexingStrategy() != null) {
+            JsonNode is = req.indexingStrategy();
+            kb.setIndexingStrategy(new IndexingStrategyView(
+                    is.path("vectorEnabled").asBoolean(true),
+                    is.path("keywordEnabled").asBoolean(true),
+                    is.path("wikiEnabled").asBoolean(false),
+                    is.path("graphEnabled").asBoolean(false)));
+        }
+    }
+
     private void saveKb(KnowledgeBaseRowView kb) {
         knowledgeCatalog.updateKnowledgeBase(kb);
     }
@@ -263,6 +319,7 @@ public final class InitializationConfigService {
             boolean hasFiles) {
         Map<String, Object> config = new TreeMap<>();
         config.put("hasFiles", hasFiles);
+        config.put("storageBackendId", kb.getStorageBackendId() == null ? "" : kb.getStorageBackendId());
         boolean canView = canViewIntegrationSecrets();
 
         for (ModelView m : models) {

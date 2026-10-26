@@ -286,6 +286,18 @@ public class MessageService {
         return messageRepository.create(message);
     }
 
+    /**
+     * 一轮问答的两条消息：**同一本地事务**写入，避免 user 成功、assistant 失败留下孤儿。
+     *
+     * <p>live-run/流的补偿不在此处——它们仍走各自的清理路径。</p>
+     */
+    @org.springframework.transaction.annotation.Transactional
+    public Message[] createTurnMessages(Message userMessage, Message assistantMessage) {
+        Message user = createMessage(userMessage);
+        Message assistant = createMessage(assistantMessage);
+        return new Message[] {user, assistant};
+    }
+
     /** 更新消息（严格 owner 范围校验后按零值跳过语义落库）。 */
     public void updateMessage(Message message) {
         long tenantId = requireTenantId();

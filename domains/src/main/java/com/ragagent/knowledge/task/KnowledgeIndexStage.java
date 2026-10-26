@@ -64,16 +64,21 @@ final class KnowledgeIndexStage {
         this.spanTracker = spanTracker;
     }
 
-    /** 失败清场（按尝试划界——只删本次产出的 chunks；清单未知时退回知识粒度兜底；向量仍知识粒度）。 */
+    /**
+     * 失败清场：chunks 只删本次产出的清单；知识级向量只在代次未变（仍是本次 attempt）时清，
+     * 否则会删掉新 attempt 已生成的向量。
+     */
     void cleanupFailedAttempt(String knowledgeId, List<String> attemptChunkIds,
-            Knowledge k, KnowledgeBase kb, String embeddingModelId) {
-        if (attemptChunkIds.isEmpty()) {
+            Knowledge k, KnowledgeBase kb, String embeddingModelId, boolean stillOwner) {
+        if (!attemptChunkIds.isEmpty()) {
+            chunkRepository.deleteByIds(attemptChunkIds);
+        } else if (stillOwner) {
             log.warn("[KnowledgeProcess] no enumerable chunks; knowledge-wide cleanup for {}", knowledgeId);
             chunkRepository.deleteByKnowledgeId(knowledgeId);
-        } else {
-            chunkRepository.deleteByIds(attemptChunkIds);
         }
-        deleteKnowledgeVectors(k, kb, embeddingModelId, knowledgeId);
+        if (stillOwner) {
+            deleteKnowledgeVectors(k, kb, embeddingModelId, knowledgeId);
+        }
     }
 
     /** 预清理：回收旧抽取图片 + 删旧 chunks 行（无条件）+ 向量行（仅启用且模型可用）+ 旧图谱（失败仅告警）。 */

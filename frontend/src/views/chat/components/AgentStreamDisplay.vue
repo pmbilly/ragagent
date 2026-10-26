@@ -3855,14 +3855,14 @@ const handleAddToKnowledge = (answerEvent: any) => {
 
   .action-title .action-title-icon {
     color: var(--agent-step-icon-color);
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
   }
 
   .tree-child .action-title-icon {
     position: absolute;
     left: -32px;
-    top: 3px;
+    top: 4px;
   }
 
   .action-title .action-name,

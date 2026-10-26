@@ -45,7 +45,7 @@
 | `ResourceCatalogPort` | `ResourceCatalogAdapter` | domains | knowledge、session | 域间（解耦） |
 | `SessionQaPort` | `SessionQaAdapter` | domains | im | 域间（解耦） |
 | `SkillCatalogPort` | `SkillCatalogService` | agent-engine | agent-engine、agentmanagement | 跨模块（必要） |
-| `StorageBackendPort` | `StorageBackendPortAdapter` | domains | knowledge、storage | 域间（解耦） |
+| `StorageBackendPort` | `StorageBackendPortAdapter` | domains | initialization、knowledge、storage | 域间（解耦） |
 | `StorageConnectivityPort` | `StorageConnectivityService` | domains | storage、system | 域间（解耦） |
 | `TenantStorageQuotaPort` | `TenantStorageQuotaAdapter` | domains | knowledge、system | 域间（解耦） |
 | `ToolRegistryPort` | `ToolRegistryPortImpl` | agent-engine | agent-engine、mcp | 跨模块（必要） |

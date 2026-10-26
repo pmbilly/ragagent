@@ -310,7 +310,8 @@ class ArchitectureRulesTest {
      */
     private static final Map<String, String> JDBC_BASELINE = Map.ofEntries(
             Map.entry("com.ragagent.platform.persistence.DatabaseDialects", "方言探测（收敛点）"),
-            Map.entry("com.ragagent.config.StartupTaskRecovery", "启动期任务修复"),
+            Map.entry("com.ragagent.config.StartupTaskRecovery", "启动期任务修复（同步日志面）"),
+            Map.entry("com.ragagent.knowledge.recovery.KnowledgeStartupRecovery", "启动恢复（知识/摘要复位，自 boot 下沉）"),
             Map.entry("com.ragagent.agent.skills.SkillCatalogService", "PG 专有 SQL（技能目录）"),
             Map.entry("com.ragagent.agenttools.datasource.AnalysisDuckDbJdbc", "非业务库引擎（DuckDB）"),
             Map.entry("com.ragagent.knowledge.repository.KnowledgeSpanRepository", "PG 专有 SQL（span 批量写）"),

@@ -114,8 +114,13 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
 
     private void processInner(String knowledgeId,
                               LangfuseTaskScope scope) {
-        // CAS pending → processing：被抢/已取消则静默退出
-        int updated = ingestStateRepository.casPendingToProcessing(knowledgeId,
+        // 先读代次再 CAS：重解析后旧 attempt 的 CAS 会因代次不匹配而 0 行退出
+        Knowledge current = knowledgeRepository.findByIdAny(knowledgeId);
+        if (current == null) {
+            return;
+        }
+        long parseAttempt = current.getParseAttempt();
+        int updated = ingestStateRepository.casPendingToProcessing(knowledgeId, parseAttempt,
                 OffsetDateTime.now(ZoneOffset.UTC));
         if (updated == 0) {
             return;
@@ -155,11 +160,15 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                 job = job.progress(IngestStage.EMBEDDING);
                 pipeline.indexStage().embedChunks(k, kb, embeddingModelId, chunks, knowledgeId, attempt);
                 job = job.progress(IngestStage.POST_PROCESS);
-                pipeline.finalizingStage().finalizeProcessing(k, kb, knowledgeId, attempt, chunks);
+                pipeline.finalizingStage().finalizeProcessing(k, kb, knowledgeId, attempt, parseAttempt, chunks);
                 job = job.completed();
                 log.debug("process knowledge {} completed at {}", knowledgeId, job.stage());
             } catch (Exception inner) {
-                pipeline.indexStage().cleanupFailedAttempt(knowledgeId, attemptChunkIds, k, kb, embeddingModelId);
+                // 代次已变（被重解析接管）时只删本次清单里的 chunks，不按知识粒度动向量
+                Knowledge latest = knowledgeRepository.findByIdAny(knowledgeId);
+                boolean stillOwner = latest != null && latest.getParseAttempt() == parseAttempt;
+                pipeline.indexStage().cleanupFailedAttempt(
+                        knowledgeId, attemptChunkIds, k, kb, embeddingModelId, stillOwner);
                 throw inner;
             }
         } catch (Exception e) {
@@ -169,7 +178,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             job = job.failed();
             log.warn("process knowledge {} failed stage={} status={}",
                     knowledgeId, job.stage(), job.status(), e);
-            pipeline.finalizingStage().failOrComplete(knowledgeId, attempt, message);
+            pipeline.finalizingStage().failOrComplete(knowledgeId, attempt, parseAttempt, message);
         }
     }
 

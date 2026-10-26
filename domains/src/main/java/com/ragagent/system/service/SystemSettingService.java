@@ -6,6 +6,7 @@ import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.contract.auth.AdminUserView;
 import com.ragagent.contract.settings.SystemSettingGateway;
+import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.settings.SystemSettingRegistry;
@@ -65,16 +66,23 @@ public class SystemSettingService implements SystemSettingGateway {
     @Value("${weknora.auth.registration-mode:}")
     private String configuredRegistrationMode;
 
+    /** 并发闸门（model-runtime）；设置面不可用时不阻断启动。 */
+    private final org.springframework.beans.factory.ObjectProvider<
+            ConcurrencyGovernor> governorProvider;
+
     public SystemSettingService(SystemSettingRepository repo,
                                 AuditWritePort auditWriter,
                                 SsrfGuard ssrfGuard,
                                 Environment environment,
-                                AdminUserAdapter adminUserPort) {
+                                AdminUserAdapter adminUserPort,
+                                org.springframework.beans.factory.ObjectProvider<
+                                        ConcurrencyGovernor> governorProvider) {
         this.adminUserPort = adminUserPort;
         this.repo = repo;
         this.auditWriter = auditWriter;
         this.ssrfGuard = ssrfGuard;
         this.environment = environment;
+        this.governorProvider = governorProvider;
     }
 
     // ── 三层解析（业务侧 GetXxx） ─────────────────────────────────────────
@@ -415,7 +423,7 @@ public class SystemSettingService implements SystemSettingGateway {
     @org.springframework.context.event.EventListener(
             org.springframework.boot.context.event.ApplicationReadyEvent.class)
     public void applyWhitelistOnStartup() {
-        for (String key : List.of("ssrf.whitelist", "sandbox.docker_enabled")) {
+        for (String key : List.of("ssrf.whitelist", "sandbox.docker_enabled", "model.max_concurrency")) {
             try {
                 dispatchSideEffects(key);
             } catch (RuntimeException e) {
@@ -424,7 +432,7 @@ public class SystemSettingService implements SystemSettingGateway {
         }
     }
 
-    /** ssrf.whitelist 与 sandbox.docker_enabled 已接线。 */
+    /** ssrf.whitelist / sandbox.docker_enabled / model.max_concurrency 已接线。 */
     private void dispatchSideEffects(String changedKey) {        if ("ssrf.whitelist".equals(changedKey)) {
             List<String> list = getStringList("ssrf.whitelist", "SSRF_WHITELIST", new ArrayList<>());
             String primary = String.join(",", list);
@@ -434,7 +442,17 @@ public class SystemSettingService implements SystemSettingGateway {
                 merged = merged.isEmpty() ? extra : merged + "," + extra;
             }
             ssrfGuard.reloadWhitelist(merged);
+            return;
         }
+        if ("model.max_concurrency".equals(changedKey)) {
+            applyMaxConcurrency();
+        }
+    }
+
+    /** 运行时桥：model.max_concurrency → 进程级并发上限（非正值关闭默认值）。 */
+    private void applyMaxConcurrency() {
+        long limit = getInt("model.max_concurrency", "WEKNORA_MODEL_MAX_CONCURRENCY", 0L);
+        governorProvider.ifAvailable(governor -> governor.setGlobalLimit((int) limit));
     }
 
     /** tenant_id=0 + oldValue/newValue（RawMessage 直嵌）。 */

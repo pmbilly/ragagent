@@ -61,6 +61,8 @@ public class KnowledgeParseService {
     }
     public static void resetKnowledgeForReparse(Knowledge k, KnowledgeBase kb) {
         k.setParseStatus(Knowledge.PARSE_PENDING);
+        // 代次 +1：旧 attempt 之后的状态 CAS 与清场都会因代次不匹配而失效
+        k.setParseAttempt(k.getParseAttempt() + 1);
         k.setEnableStatus("disabled");
         k.setDescription("");
         k.setProcessedAt(null);

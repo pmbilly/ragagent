@@ -134,8 +134,11 @@ public class DataSourceCredentialsController {
         DataSourceOwnership ds;
         try {
             ds = readService.ownership(id);
+        } catch (BizException e) {
+            throw e;
         } catch (RuntimeException e) {
-            throw new BizException(AppError.notFound("data source not found"));
+            // 基础设施异常不能伪装成 404：否则前端把"数据库/连接故障"当资源不存在
+            throw new BizException(AppError.internal("data source lookup failed"));
         }
         if (ds == null) {
             throw new BizException(AppError.notFound("data source not found"));

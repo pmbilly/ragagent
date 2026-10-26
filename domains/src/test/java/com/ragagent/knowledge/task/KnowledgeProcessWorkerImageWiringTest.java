@@ -3,6 +3,7 @@ package com.ragagent.knowledge.task;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -92,7 +93,7 @@ class KnowledgeProcessWorkerImageWiringTest {
         k.setFileType("pdf");
         k.setFilePath("resource://1/kid-img/a.pdf");
         k.setParseStatus(Knowledge.PARSE_PROCESSING);
-        when(ingestStateRepository.casPendingToProcessing(eq(KNOWLEDGE_ID), any())).thenReturn(1);
+        when(ingestStateRepository.casPendingToProcessing(eq(KNOWLEDGE_ID), anyLong(), any())).thenReturn(1);
         when(knowledgeRepository.findByIdAny(KNOWLEDGE_ID)).thenReturn(k);
 
         KnowledgeBase kb = new KnowledgeBase();

@@ -20,6 +20,14 @@ public class AgentFinalAnswerData {
     /** 兜底回答（无知识库命中）标记；false 省略 */
     private boolean isFallback;
 
+    /**
+     * 本轮业务终态（null=正常 done；FAILED=异常收束）。
+     *
+     * <p>终态答案帧只表示“流已关闭”，不表示业务成功；收尾方必须看本字段，
+     * 否则超时/ERROR+done 补的空终态帧会被当成成功。</p>
+     */
+    private String outcome;
+
     public AgentFinalAnswerData() {
     }
 
@@ -52,5 +60,13 @@ public class AgentFinalAnswerData {
 
     public void setIsFallback(boolean v) {
         this.isFallback = v;
+    }
+
+    public String getOutcome() {
+        return outcome;
+    }
+
+    public void setOutcome(String v) {
+        outcome = v == null || v.isEmpty() ? null : v;
     }
 }

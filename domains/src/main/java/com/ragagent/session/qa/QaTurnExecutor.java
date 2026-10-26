@@ -207,21 +207,28 @@ public final class QaTurnExecutor {
                     am.setFallback(true);
                 }
                 if (data.isDone()) {
-                    if (!streamCtx.lifecycle.finish(TurnLifecycle.State.DONE)) {
+                    // 终态帧只表示“流关闭”：outcome=FAILED 说明是异常/超时收束，不是业务成功
+                    boolean failed = "FAILED".equals(data.getOutcome());
+                    TurnLifecycle.State terminal = failed
+                            ? TurnLifecycle.State.FAILED : TurnLifecycle.State.DONE;
+                    if (!streamCtx.lifecycle.finish(terminal)) {
                         return; // 已由另一条收尾路径赢下终态
                     }
-                    QaTerminalMetrics.record(QaMode.NORMAL, TurnLifecycle.State.DONE);
-                    log.info("Knowledge QA service completed for session: {}", sessionId);
+                    QaTerminalMetrics.record(QaMode.NORMAL, terminal);
+                    log.info("Knowledge QA service {} for session: {}",
+                            failed ? "failed" : "completed", sessionId);
                     turnFinalizer.runWithTenant(normalSessionTenantId, () -> {
-                        turnFinalizer.completeAssistantMessage(streamCtx.assistantMessage, reqCtx.query,
+                        turnFinalizer.completeAssistantMessage(am, reqCtx.query,
                                 reqCtx.userMessageID, normalSessionTenantId);
-                        Event done = new Event();
-                        done.setType(EventType.EVENT_AGENT_COMPLETE);
-                        done.setSessionId(sessionId);
-                        AgentCompleteData cd = new AgentCompleteData();
-                        cd.setFinalAnswer(am.getContent());
-                        done.setData(cd);
-                        streamCtx.eventBus.emit(done);
+                        if (!failed) {
+                            Event done = new Event();
+                            done.setType(EventType.EVENT_AGENT_COMPLETE);
+                            done.setSessionId(sessionId);
+                            AgentCompleteData cd = new AgentCompleteData();
+                            cd.setFinalAnswer(am.getContent());
+                            done.setData(cd);
+                            streamCtx.eventBus.emit(done);
+                        }
                     });
                 }
             }
@@ -250,6 +257,7 @@ public final class QaTurnExecutor {
         }
         Thread.Builder.OfVirtual runner = Thread.ofVirtual();
         runner.start(() -> TenantScope.run(requestTenant, () -> {
+            streamCtx.runner = Thread.currentThread();
             boolean failed = false;
             try {
                 // 本线程上的会话/消息查询按会话属主
@@ -262,8 +270,9 @@ public final class QaTurnExecutor {
                 qaReq.cancellationProbe = () -> streamCtx.cancelled ? "context canceled" : null;
                 if (mode == QaMode.NORMAL) {
                     knowledgeQaService.knowledgeQA(qaReq, streamCtx.eventBus);
-                } else {
-                    agentQaService.agentQA(qaReq, streamCtx.eventBus);
+                } else if (agentQaService.agentQA(qaReq, streamCtx.eventBus)
+                        == TurnLifecycle.State.FAILED) {
+                    failed = true;
                 }
             } catch (RuntimeException serviceErr) {
                 failed = true;
@@ -324,12 +333,12 @@ public final class QaTurnExecutor {
                         }
                         log.info("Agent QA service completed for session: {}", sessionId);
                     });
-                } else if (failed) {
+                } else if (failed || streamCtx.cancelled) {
                     // NORMAL 早段失败：事件管线不会发出 done，完成位必须在此兜底——
                     // 否则该行消息永久 completed=false（AGENT 侧一直有 finally 收尾，
                     // 这条不对称正是缺陷来源）。completeAssistantMessage 是 CAS 幂等，
                     // 与成功路径的事件收尾并发时只有一方赢。
-                    finalizeNormalOnFailure(reqCtx, streamCtx);
+                    finalizeNormalOnTerminal(reqCtx, streamCtx);
                 }
                 // 收尾（含身份相关的库写）完成后再清会话范围标记；租户上下文由 TenantScope 恢复
                 SessionLookupScope.clear();
@@ -345,9 +354,11 @@ public final class QaTurnExecutor {
      * <p>包级可见是为定向测试能直接钉住这条不变量——它不是一个独立用例，只是
      * finally 里的兜底动作。</p>
      */
-    void finalizeNormalOnFailure(QaRequestContext reqCtx, SseStreamContext streamCtx) {
-        if (streamCtx.lifecycle.finish(TurnLifecycle.State.FAILED)) {
-            QaTerminalMetrics.record(QaMode.NORMAL, TurnLifecycle.State.FAILED);
+    void finalizeNormalOnTerminal(QaRequestContext reqCtx, SseStreamContext streamCtx) {
+        TurnLifecycle.State terminal = streamCtx.cancelled
+                ? TurnLifecycle.State.CANCELLED : TurnLifecycle.State.FAILED;
+        if (streamCtx.lifecycle.finish(terminal)) {
+            QaTerminalMetrics.record(QaMode.NORMAL, terminal);
         }
         Message am = streamCtx.assistantMessage;
         if (am == null) {
@@ -411,13 +422,6 @@ public final class QaTurnExecutor {
         executeQA(reqCtx, mode, generateTitle, sink, null);
     }
     private void persistTurnMessages(QaRequestContext reqCtx) {
-        if (reqCtx.userMessageID.isEmpty()) {
-            List<MessageAttachment> userMessageAttachments = new ArrayList<>(reqCtx.attachments);
-            userMessageAttachments.addAll(reqCtx.attachmentMetas);
-            Message userMsg = messageService.createMessage(buildUserMessage(reqCtx, userMessageAttachments));
-            reqCtx.userMessageID = userMsg.getId();
-            reqCtx.userCreatedAt = userMsg.getCreatedAt();
-        }
         if (reqCtx.assistantMessage == null) {
             Message am = new Message();
             am.setSessionId(reqCtx.sessionId);
@@ -426,6 +430,24 @@ public final class QaTurnExecutor {
             am.setRequestId(reqCtx.requestId);
             am.setCreatedAt(OffsetDateTime.now());
             reqCtx.assistantMessage = am;
+        }
+        if (reqCtx.userMessageID.isEmpty() && reqCtx.assistantMessage.getId().isEmpty()) {
+            // 两条消息同事务写入：任一失败一起回滚，避免孤儿 user 行
+            List<MessageAttachment> userMessageAttachments = new ArrayList<>(reqCtx.attachments);
+            userMessageAttachments.addAll(reqCtx.attachmentMetas);
+            Message[] created = messageService.createTurnMessages(
+                    buildUserMessage(reqCtx, userMessageAttachments), reqCtx.assistantMessage);
+            reqCtx.userMessageID = created[0].getId();
+            reqCtx.userCreatedAt = created[0].getCreatedAt();
+            reqCtx.assistantMessage = created[1];
+            return;
+        }
+        if (reqCtx.userMessageID.isEmpty()) {
+            List<MessageAttachment> userMessageAttachments = new ArrayList<>(reqCtx.attachments);
+            userMessageAttachments.addAll(reqCtx.attachmentMetas);
+            Message userMsg = messageService.createMessage(buildUserMessage(reqCtx, userMessageAttachments));
+            reqCtx.userMessageID = userMsg.getId();
+            reqCtx.userCreatedAt = userMsg.getCreatedAt();
         }
         if (reqCtx.assistantMessage.getId().isEmpty()) {
             reqCtx.assistantMessage.setCreatedAt(OffsetDateTime.now());

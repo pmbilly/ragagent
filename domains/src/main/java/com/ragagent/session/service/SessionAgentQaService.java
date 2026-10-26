@@ -109,7 +109,7 @@ public class SessionAgentQaService {
      *
      * <p>七步各自独立成方法：单看本方法能读出整条链路顺序，细节按需下钻。</p>
      */
-    public void agentQA(QaSupport.QaRequest req, EventBusInterface eventBus) {
+    public TurnLifecycle.State agentQA(QaSupport.QaRequest req, EventBusInterface eventBus) {
         agentResolver.resolveInto(req);
         String sessionId = req.session.getId();
         if (req.agentConfig == null) {
@@ -133,7 +133,8 @@ public class SessionAgentQaService {
         attachSteerAndCancel(engine, req);
 
         AgentQuery query = buildAgentQuery(req, models.supportsVision());
-        executeAgent(engine, req, sessionId, query, llmContext, eventBus);
+        return executeAgent(engine, req, sessionId, query, llmContext, eventBus)
+                ? TurnLifecycle.State.DONE : TurnLifecycle.State.FAILED;
     }
 
     /** 单轮 agent 的模型面：chat 模型 + 可选 rerank + 是否支持视觉。 */
@@ -279,12 +280,15 @@ public class SessionAgentQaService {
      * 再补一份 error 事件会让客户端看到两次报错。其余 {@link RuntimeException} 属引擎入口自身
      * 失败（建 span / 组装 prompt / 建工具集），没有对应 error 事件，需本层补发。</p>
      */
-    private void executeAgent(AgentEngineHandle engine, QaSupport.QaRequest req, String sessionId,
+    boolean executeAgent(AgentEngineHandle engine, QaSupport.QaRequest req, String sessionId,
             AgentQuery query, List<ChatMessage> llmContext, EventBusInterface eventBus) {
         try {
             engine.execute(sessionId, req.assistantMessageId, query.text(), llmContext, query.imageUrls());
+            return true;
         } catch (AgentExecutionException e) {
+            // 引擎已上报过 error 事件：这里不重复发，只把失败结果回传给调用方判终态
             log.error("Agent execution failed", e);
+            return false;
         } catch (RuntimeException e) {
             log.error("Agent execution failed before engine error channel", e);
             Event evt = new Event();
@@ -296,6 +300,7 @@ public class SessionAgentQaService {
             errData.setSessionId(sessionId);
             evt.setData(errData);
             eventBus.emit(evt);
+            return false;
         }
     }
 

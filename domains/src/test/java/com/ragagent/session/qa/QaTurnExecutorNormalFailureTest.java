@@ -71,7 +71,7 @@ class QaTurnExecutorNormalFailureTest {
         SseStreamContext streamCtx = new SseStreamContext();
         streamCtx.assistantMessage = assistant;
 
-        executor.finalizeNormalOnFailure(reqCtx, streamCtx);
+        executor.finalizeNormalOnTerminal(reqCtx, streamCtx);
 
         verify(finalizer).completeAssistantMessage(
                 same(assistant), eq("问题"), eq("um-1"), eq(10002L));

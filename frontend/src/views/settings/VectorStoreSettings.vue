@@ -315,11 +315,11 @@
 
                 <!-- 枚举 → 下拉 -->
                 <t-select
-                  v-if="field.enum && field.enum.length"
+                  v-if="field.enumValues && field.enumValues.length"
                   v-model="form.indexConfig[field.name]"
                   :placeholder="field.default?.toString() || ''"
                 >
-                  <t-option v-for="opt in field.enum" :key="opt" :value="opt" :label="opt" />
+                  <t-option v-for="opt in field.enumValues" :key="opt" :value="opt" :label="opt" />
                 </t-select>
 
                 <!-- 数字 → number input -->

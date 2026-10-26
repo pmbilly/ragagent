@@ -110,6 +110,7 @@ public final class TestSchema {
                 "id VARCHAR(36) PRIMARY KEY, tenant_id BIGINT NOT NULL, knowledge_base_id VARCHAR NOT NULL," +
                 "type VARCHAR(50) NOT NULL, title VARCHAR NOT NULL, description TEXT, source VARCHAR NOT NULL," +
                 "channel VARCHAR(50) NOT NULL DEFAULT 'web', parse_status VARCHAR(50) NOT NULL DEFAULT 'pending'," +
+                "parse_attempt BIGINT NOT NULL DEFAULT 0," +
                 "pending_subtasks_count INTEGER NOT NULL DEFAULT 0, summary_status VARCHAR(32) NOT NULL DEFAULT 'none'," +
                 "enable_status VARCHAR(50) NOT NULL DEFAULT 'enabled'," +
                 "embedding_model_id VARCHAR(64), file_name VARCHAR, folder_path VARCHAR NOT NULL DEFAULT ''," +

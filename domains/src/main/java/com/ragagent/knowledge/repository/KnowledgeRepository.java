@@ -92,6 +92,7 @@ public class KnowledgeRepository {
                 .set(Knowledge::getDescription, k.getDescription())
                 .set(Knowledge::getSource, k.getSource())
                 .set(Knowledge::getParseStatus, k.getParseStatus())
+                .set(Knowledge::getParseAttempt, k.getParseAttempt())
                 .set(Knowledge::getSummaryStatus, k.getSummaryStatus())
                 .set(Knowledge::getEnableStatus, k.getEnableStatus())
                 .set(Knowledge::getEmbeddingModelId, k.getEmbeddingModelId())

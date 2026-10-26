@@ -24,6 +24,7 @@
   "engine_type": "注释引用（非契约键）（VectorStoreSettings 注释 ×3；wire 是 camel engineType，VectorStoreResponse:19）",
   "extra_config": "注释引用（非契约键）（ModelEditorDialog:408 thinking_control 路径说明）",
   "folder_token": "i18n 文案里的概念名（非契约键）（zh-CN:730/731/736/739 等 5 语言的 folderTokenPlaceholder/Required/placeholderDesc/loadNotFoundHint 讲的是**用户要粘的「文件夹 token」值**；wire 上它是 resourceIds 里的 camel 哨兵 folderToken，B139/B140 已核，见 DriveConnectorTest",
+  "graph_enabled": "已复核：本层约定或前端局部命名（详见 HANDOFF §15.1.1 B19）",
   "indexing_strategy": "注释引用（非契约键）（Input-field:345 / KBEditorModal:1236,1267 能力位回退说明；wire 是 camel indexingStrategy）",
   "kb_name": "本地 UI 类型（GlobalCommandPalette 的 CmdkChunk：由 camel 源字段本地算出、仅渲染未出网；B135c 逐条复核）",
   "last_request_state": "注释引用（非契约键）（chat/index:254,533 会话恢复链路说明；服务端自管字段）",

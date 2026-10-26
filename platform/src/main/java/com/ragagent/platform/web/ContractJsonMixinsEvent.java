@@ -58,6 +58,10 @@ public final class ContractJsonMixinsEvent {
         @JsonProperty("isFallback")
         abstract public void setIsFallback(boolean v);
 
+        @JsonProperty("outcome")
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
+        private String outcome;
+
     }
 
     /** AgentPlanData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */

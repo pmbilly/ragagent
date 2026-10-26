@@ -35,7 +35,9 @@ export interface FieldSchema {
   max?: number
   // Closed value set for string fields (e.g. knnEngine ∈ lucene|faiss).
   // When non-empty the UI renders a select instead of a free-text input.
-  enum?: string[]
+  // Field name must match the backend contract (`enumValues`), otherwise the
+  // select silently degrades to a free-text input.
+  enumValues?: string[]
   // Marks a field that cannot change after store creation. Informational
   // for now (edit mode is fully read-only); kept for forward use.
   immutable?: boolean

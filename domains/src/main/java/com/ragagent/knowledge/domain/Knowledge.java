@@ -43,6 +43,8 @@ public class Knowledge {
     private String source = "";
     private String channel = "web";
     private String parseStatus = PARSE_PENDING;
+    /** 解析代次：每次重解析 +1，状态 CAS 与失败清场按它隔离新旧尝试。 */
+    private Long parseAttempt = 0L;
     private int pendingSubtasksCount;
     private String summaryStatus = "none";
     private String enableStatus = "enabled";
@@ -91,6 +93,8 @@ public class Knowledge {
     public void setChannel(String v) { channel = v == null || v.isEmpty() ? "web" : v; }
     public String getParseStatus() { return parseStatus; }
     public void setParseStatus(String v) { parseStatus = v; }
+    public Long getParseAttempt() { return parseAttempt == null ? 0L : parseAttempt; }
+    public void setParseAttempt(Long v) { parseAttempt = v == null ? 0L : v; }
     public int getPendingSubtasksCount() { return pendingSubtasksCount; }
     public void setPendingSubtasksCount(int v) { pendingSubtasksCount = v; }
     public String getSummaryStatus() { return summaryStatus; }

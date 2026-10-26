@@ -465,7 +465,7 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import KbCreateContextualGuide from '@/components/KbCreateContextualGuide.vue'
 import { KB_EDITOR_FOCUS_SECTION_EVENT, markContextualGuideDone } from '@/config/contextualGuides'
 import { MessagePlugin, DialogPlugin } from 'tdesign-vue-next'
-import { createKnowledgeBase, getKnowledgeBaseById, listKnowledgeFiles, updateKnowledgeBase, rebuildKBIndex } from '@/api/knowledge-base'
+import { createKnowledgeBase, getKnowledgeBaseById, listKnowledgeFiles, rebuildKBIndex } from '@/api/knowledge-base'
 import { updateKBConfig, type KBModelConfigRequest } from '@/api/initialization'
 import { useChatResourcesStore } from '@/stores/chatResources'
 import { selectInitialModelId } from '@/utils/modelDefaults'
@@ -1389,14 +1389,14 @@ const doSubmit = async () => {
           graphEnabled: formData.value.indexingStrategy?.graphEnabled ?? false,
         }
       }
-      await updateKnowledgeBase(kbId, {
+      // 2. 一次命令提交全部权威字段（基本信息 + FAQ/Wiki + 索引策略 + 模型/分块/存储）
+      const config: KBModelConfigRequest = {
         name: data.name,
         description: data.description,
-        config: updateConfig
-      })
-
-      // 2. 更新完整配置（模型、分块、多模态、存储引擎、知识图谱等）
-      const config: KBModelConfigRequest = {
+        faqConfig: updateConfig.faqConfig,
+        wikiConfig: updateConfig.wikiConfig,
+        autoTagConfig: updateConfig.autoTagConfig,
+        indexingStrategy: updateConfig.indexingStrategy,
         llmModelId: data.summaryModelId,
         embeddingModelId: data.embeddingModelId,
         vlmConfig: data.vlmConfig,

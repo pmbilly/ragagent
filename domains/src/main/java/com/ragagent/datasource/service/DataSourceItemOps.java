@@ -112,6 +112,31 @@ final class DataSourceItemOps {
         }
     }
 
+    /**
+     * 查旧行：基础设施异常短退避重试 2 次；仍失败抛出（调用方按 ingest_failed 记账），
+     * 不能当作"不存在"继续新建。
+     */
+    private KnowledgeRowView findExistingWithRetry(DataSource ds, String externalId) {
+        RuntimeException last = null;
+        for (int i = 0; i < 3; i++) {
+            try {
+                return service.knowledge.findByDataSourceExternalId(
+                        ds.getTenantId(), ds.getKnowledgeBaseId(), ds.getId(), externalId);
+            } catch (RuntimeException e) {
+                last = e;
+                if (i < 2) {
+                    try {
+                        Thread.sleep(50L * (i + 1));
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw e;
+                    }
+                }
+            }
+        }
+        throw last;
+    }
+
     /** 删除分支：处理"源端已删除"的单条抓取结果。 */
     private void applyDeletion(DataSource ds, FetchedItem item, SyncResult result) {
         KnowledgeRowView existing;
@@ -192,14 +217,8 @@ final class DataSourceItemOps {
 
         boolean isUpdate = false;
         if (item.getExternalId() != null && !item.getExternalId().isEmpty()) {
-            KnowledgeRowView existing;
-            try {
-                existing = service.knowledge.findByDataSourceExternalId(
-                        ds.getTenantId(), ds.getKnowledgeBaseId(), ds.getId(), item.getExternalId());
-            } catch (RuntimeException e) {
-                log.warn("[datasource] failed to check existing knowledge for external_id={}", item.getExternalId(), e);
-                existing = null; // 非致命：继续新建（可能产生重复）
-            }
+            // 查询旧行失败必须重试：绝不能当"不存在"继续新建（会产生重复文档）
+            KnowledgeRowView existing = findExistingWithRetry(ds, item.getExternalId());
             if (existing != null) {
                 log.info("[datasource] found existing knowledge {} for external_id={}, "
                         + "deleting for update", existing.getId(), item.getExternalId());

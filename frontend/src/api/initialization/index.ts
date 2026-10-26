@@ -145,6 +145,13 @@ export interface KBModelConfigRequest {
     multimodal: {
         enabled: boolean
     }
+    /** 基本信息（与模型/检索配置同一条命令提交，避免两次调用部分成功） */
+    name?: string
+    description?: string
+    faqConfig?: Record<string, unknown>
+    wikiConfig?: Record<string, unknown>
+    autoTagConfig?: Record<string, unknown>
+    indexingStrategy?: Record<string, unknown>
     /** 存储引擎选择："local" | "minio" | "cos" | "obs" 等，影响文档上传与文档内图片存储 */
     storageBackendId?: string
     storageProvider?: string
