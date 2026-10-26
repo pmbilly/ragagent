@@ -105,7 +105,7 @@ class ClasspathResourcesTest {
     @DisplayName("A12b：源码里的 getResourceAsStream 字面量必须在清单里登记")
     void literalsAreInventoried() throws Exception {
         List<String> unregistered = new ArrayList<>();
-        for (Path root : SourceRoots.backend("main/java")) {
+        for (Path root : SourceRoots.backend("main")) {
             if (!Files.isDirectory(root)) {
                 continue;
             }

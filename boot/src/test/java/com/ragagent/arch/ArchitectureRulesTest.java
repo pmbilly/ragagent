@@ -225,7 +225,7 @@ class ArchitectureRulesTest {
     void noRawNulBytesInSources() throws java.io.IOException {
         java.util.List<String> offenders = new java.util.ArrayList<>();
         for (java.nio.file.Path root : java.util.stream.Stream.of(
-                backendSourceRoots("main/java"), backendSourceRoots("test/java"))
+                backendSourceRoots("main"), backendSourceRoots("test"))
                 .flatMap(java.util.List::stream).toList()) {
             if (!java.nio.file.Files.isDirectory(root)) {
                 continue;
@@ -438,7 +438,7 @@ class ArchitectureRulesTest {
     @DisplayName("A9：.last(...) 参数必须是纯字符串字面量（拼接=注入面+方言漂移）")
     void lastOnlyConstantStrings() throws java.io.IOException {
         Set<String> actual = new TreeSet<>();
-        for (java.nio.file.Path root : backendSourceRoots("main/java")) {
+        for (java.nio.file.Path root : backendSourceRoots("main")) {
             if (!java.nio.file.Files.isDirectory(root)) {
                 continue;
             }

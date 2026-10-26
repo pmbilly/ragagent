@@ -17,8 +17,12 @@ public final class SourceRoots {
 
     private SourceRoots() {}
 
-    /** 架构测试实际扫描的模块（`common`/`engine` 已解散，从列表移除；扩面需先核过规则覆盖）。 */
-    private static final String[] MODULES = {"domains", "boot"};
+    /**
+     * 架构测试实际扫描的模块（`common`/`engine` 已解散，从列表移除；扩面需先核过规则覆盖）。
+     * B269③ 扩 model-runtime + platform：同名 @JsonProperty 存量已清（record 面 + mixin 钉序面），
+     * 混改名 class 面由序锚整文件保护规则覆盖。
+     */
+    private static final String[] MODULES = {"domains", "boot", "model-runtime", "platform"};
 
     public static Path repoRoot() {
         Path p = Path.of("").toAbsolutePath();

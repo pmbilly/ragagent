@@ -43,13 +43,11 @@ public record MemoryExtractPayload(
         @JsonProperty("chat_model_id")
         @JsonInclude(JsonInclude.Include.NON_DEFAULT) String chatModelId,
         /** {@code language} 同样为空省略。 */
-        @JsonProperty("language")
         @JsonInclude(JsonInclude.Include.NON_DEFAULT) String language,
         /**
          * 观测载体（嵌套键 {@code tracing}，五个 {@code lf_*} 组件收在里面）。
          * 空载体经 {@code EmptyOmitFilter} 整键省略。
          */
-        @JsonProperty("tracing")
         @JsonInclude(value = JsonInclude.Include.CUSTOM,
                 valueFilter = TracingContext.EmptyOmitFilter.class) TracingContext tracing) {
 

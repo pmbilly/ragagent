@@ -42,11 +42,21 @@
 - D 类死重 3 文件整删（`SessionListItem`/`MessageSuggestionEvent`/`MessageSuggestionSet`，纯序列化面注解本就无效）
 - R 类 3 处保留 value 部分：`ToolResultMixin{outputFiles}`、`SlugUpdateMixin{retractType}`、`ConnectionConfigMixin` 只删 `ignoreUnknown` 半边留 `endpoint`
 
-## B269③ 守卫收紧
+## B269③ 守卫收紧（含一个存量缺陷修复）
 
-- `memberAfter` 多行注解盲区修复（`tracing` 族漏检根因）
+**金丝雀暴露存量缺陷**：`SourceRoots.backend(sourceSet)` 契约是传源集名（内部自拼 `/java`），
+而 `JsonPropertyHygieneTest` / boot `ArchitectureRulesTest` / `ClasspathResourcesTest` 三处调用方
+传的是 `"main/java"` ⇒ 拼出 `src/main/java/java` 恒不存在 ⇒ **这几个守卫自 2026-10-10（df6a61ed5
+诞生提交）起一直空扫描假绿**。已修三处调用方传参（`"main"`/`"test"`），唤醒后：
+- domains+boot+model-runtime+platform 四模块真扫描零违规（唤醒未暴露存量违规）
+- `MemoryExtractPayload`（Go 队列事故原型，现为 record）的 `language`/`tracing` 同名注解经
+  **改前/改后字节校验零差**后删除（+2 处，累计 106）；事故记录是 class 时代历史，record 定理覆盖
+
+其余收紧：
+- `memberAfter` 多行注解感知（`tracing` 族漏检根因修复，括号深度跨行消费）
 - 混改名整文件跳过细化：record 分量不再被文件级跳过保护（定理实证）
 - `SourceRoots.MODULES` 扩 model-runtime + platform
+- 类 javadoc 补 B269 判例（record 零漂移 / class 必重排 / B8 重裁）
 
 ## B269④ 面收敛盘点（doc-only）
 

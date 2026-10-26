@@ -31,8 +31,19 @@ import org.junit.jupiter.api.Test;
  *
  * <p>必要形态只剩四类，规则见下：键≠隐式名（外部协议 / 关键字冲突等）· 键形如 {@code isXxx} 的布尔属性
  * （getter 的隐式名会丢 {@code is}）· Jackson 探测不到的成员 · 「字段序锚」——见
- * {@link #hasRenamedAnnotation}（混用改名注解的类型，整文件跳过）。<b>不再有面级放行表</b>：
- * 外部协议面的冗余注解（43 处）也已清掉，剩下的全是上面四类。</p>
+ * {@link #hasRenamedAnnotation}。<b>不再有面级放行表</b>：外部协议面的冗余注解（43 处）也已清掉，
+ * 剩下的全是上面四类。</p>
+ *
+ * <p>B269 判例补录（字节级序快照实证）：</p>
+ * <ul>
+ *   <li><b>record 分量不受序锚保护</b>——record 序 = 规范构造器序 = 声明序，与注解显隐无关；
+ *       混改名 record 文件里的同名注解照样可删（B269① 已删 97 处，快照零差）。</li>
+ *   <li><b>class 面删同名必重排</b>——混改名 class 删任一同名注解触发全类型字段序重排
+ *       （WikiNode {@code title} 前跳 / DocxBlock {@code block_id} 移尾），且 setter-only 字段会
+ *       <b>整键消失</b>（{@code AuthServerMetadata.issuer}）——与有无序列化出口无关，继续整文件保护。</li>
+ *   <li>未知键容忍由 mapper 层统一承担（Jackson 3 默认翻转 + {@code WebConfig}/{@code JsonMappers.lenient()}
+ *       双路径），逐类 {@code ignoreUnknown=true} 已在 B269② 全数摘除。</li>
+ * </ul>
  *
  * <p>基线 <b>0</b>（不是棘轮——我们自己的面已清零，从第一天起就是"新增即红"）。</p>
  */
@@ -58,7 +69,7 @@ class JsonPropertyHygieneTest {
     @DisplayName("A14：我们的面里不得有「键=隐式属性名」且「Jackson 本可自动探测」的逐字段 @JsonProperty")
     void redundantJsonPropertyIsForbidden() throws IOException {
         List<String> offenders = new ArrayList<>();
-        for (Path root : SourceRoots.backend("main/java")) {
+        for (Path root : SourceRoots.backend("main")) {
             if (!Files.isDirectory(root)) {
                 continue;
             }
@@ -87,9 +98,7 @@ class JsonPropertyHygieneTest {
         List<String> lines = Files.readAllLines(file);
         String body = String.join("\n", lines);
         boolean[] inRecordHeader = recordComponentLines(lines);
-        if (hasRenamedAnnotation(lines, inRecordHeader)) {
-            return;
-        }
+        boolean renamed = hasRenamedAnnotation(lines, inRecordHeader);
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
             Matcher ann = ANNOTATION.matcher(line);
@@ -103,6 +112,9 @@ class JsonPropertyHygieneTest {
             String keyName = key.group(1);
             if (IS_PREFIXED_KEY.matcher(keyName).matches()) {
                 continue;
+            }
+            if (renamed && !inRecordHeader[i]) {
+                continue;   // 字段序锚——record 分量除外（序=声明序与注解无关，B269① 快照实证）
             }
             Member member = memberAfter(lines, i, ann.start());
             if (member == null || !member.name.equals(keyName)) {
@@ -126,6 +138,9 @@ class JsonPropertyHygieneTest {
      * <b>显式命名</b>降级成<b>隐式命名</b>，Jackson 据此可能改变属性顺序 ⇒ 线格式<b>字段序</b>漂移
      * （Go 队列载荷断言期望 {@code tenant_id…chat_model_id,language}，删后 {@code language}
      * 跳到最前）。这类冗余注解实为「字段序锚」，一并保留。
+     *
+     * <p><b>record 分量例外</b>（B269① 快照实证）：record 序 = 规范构造器序 = 声明序，改名不重排——
+     * 混改名文件里的 record 分量同名注解仍可删（见 {@link #collect} 的豁免）。</p>
      */
     private static boolean hasRenamedAnnotation(List<String> lines, boolean[] inRecordHeader) {
         for (int i = 0; i < lines.size(); i++) {
@@ -153,6 +168,10 @@ class JsonPropertyHygieneTest {
      * 求注解所修饰成员的<b>隐式属性名</b>（Jackson 实际规则）：字段/记录分量 = 名字本身；
      * getter/setter 去 {@code get}/{@code set} 并首字母小写，布尔 {@code isXxx()} ⇒ {@code xxx}。
      * 解析不出返回 {@code null}（宁可漏报也不误报）。
+     *
+     * <p><b>多行注解感知</b>（B269③ 修复）：注解参数可跨行（如 {@code @JsonInclude(value = CUSTOM,}
+     * 换行 {@code valueFilter = X.class) Foo foo)}）——按括号深度消费到配对 {@code )}，
+     * 取同行剩余作为成员声明。修复前 {@code tracing} 族注解因盲区漏检。</p>
      */
     private static Member memberAfter(List<String> lines, int i, int start) {
         String rest = lines.get(i).substring(start);
@@ -164,13 +183,42 @@ class JsonPropertyHygieneTest {
                 candidates.add(tail);
             }
         }
-        for (int k = i + 1; k < Math.min(i + 8, lines.size()); k++) {
+        int depth = 0;
+        for (int k = i + 1; k < Math.min(i + 12, lines.size()) && candidates.isEmpty(); k++) {
             String s = lines.get(k).strip();
-            if (s.isEmpty() || isComment(s)) {
+            if (depth == 0 && (s.isEmpty() || isComment(s))) {
                 continue;
             }
-            if (stripLeadingAnnotations(s).isEmpty()) {
-                continue;                                  // 纯注解行（如 @JsonInclude(...)）⇒ 继续往后
+            if (depth > 0) {                    // 跨行注解延续：消费到配对 ')' 取同行剩余
+                int j = 0;
+                while (j < s.length() && depth > 0) {
+                    char c = s.charAt(j++);
+                    if (c == '(') {
+                        depth++;
+                    } else if (c == ')') {
+                        depth--;
+                    }
+                }
+                if (depth == 0 && j < s.length()) {
+                    String after = s.substring(j).strip();
+                    if (!after.isEmpty() && !after.startsWith("@")) {
+                        candidates.add(after);
+                    }
+                }
+                continue;
+            }
+            if (s.startsWith("@")) {
+                int delta = parenDelta(s);
+                if (delta > 0) {                // 该注解本身跨行
+                    depth = delta;
+                    continue;
+                }
+                String after = s.substring(closingParen(s)).strip();
+                if (!after.isEmpty()) {
+                    candidates.add(after);
+                    break;
+                }
+                continue;                       // 纯注解行 ⇒ 继续往后
             }
             candidates.add(s);
             break;
@@ -201,6 +249,20 @@ class JsonPropertyHygieneTest {
             }
         }
         return null;
+    }
+
+    /** 行内 '(' 与 ')' 的数量差（正数 ⇒ 注解参数未闭合、跨行）。 */
+    private static int parenDelta(String s) {
+        int d = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '(') {
+                d++;
+            } else if (c == ')') {
+                d--;
+            }
+        }
+        return d;
     }
 
     /**
