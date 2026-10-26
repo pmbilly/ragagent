@@ -36,17 +36,14 @@ public final class ContractJsonMixinsModelChat {
     })
     public abstract static class ChatMessageMixin {
 
-        @JsonProperty("role")
         private String role;
 
-        @JsonProperty("content")
         private String content;
 
         @JsonProperty("multi_content")
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         private List<MessageContentPart> multiContent;
 
-        @JsonProperty("name")
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         private String name;
 
@@ -58,7 +55,6 @@ public final class ContractJsonMixinsModelChat {
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         private List<ToolCall> toolCalls;
 
-        @JsonProperty("images")
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         private List<String> images;
 
@@ -178,10 +174,8 @@ public final class ContractJsonMixinsModelChat {
     @JsonPropertyOrder({"type", "text", "image_url"})
     public abstract static class MessageContentPartMixin {
 
-        @JsonProperty("type")
         private String type;
 
-        @JsonProperty("text")
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         private String text;
 

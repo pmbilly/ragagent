@@ -371,23 +371,23 @@ public final class GitLabClient {
 
     /** GitLab 的 project 响应。{@code namespace} 从未被读取，保留形状。 */
     public record Project(
-            @JsonProperty("id") long id,
+             long id,
             @JsonProperty("path_with_namespace") String pathWithNamespace,
-            @JsonProperty("name") String name,
+             String name,
             @JsonProperty("web_url") String webUrl,
             @JsonProperty("default_branch") String defaultBranch,
-            @JsonProperty("namespace") Namespace namespace) {
+             Namespace namespace) {
 
-        public record Namespace(@JsonProperty("id") long id) {
+        public record Namespace( long id) {
         }
     }
 
     /** {@code /repository/tree} 的一条目录项。 */
     public record TreeEntry(
-            @JsonProperty("id") String id,
-            @JsonProperty("name") String name,
-            @JsonProperty("type") String type,
-            @JsonProperty("path") String path) {
+             String id,
+             String name,
+             String type,
+             String path) {
     }
 
     /**
@@ -398,7 +398,7 @@ public final class GitLabClient {
      * {@code new_file} 与 {@code compare_same_ref} 从不读，保留形状。</p>
      */
     public record Comparison(
-            @JsonProperty("diffs") List<Diff> diffs,
+             List<Diff> diffs,
             @JsonProperty("compare_timeout") boolean compareTimeout,
             @JsonProperty("compare_same_ref") boolean compareSameRef) {
 
@@ -417,14 +417,14 @@ public final class GitLabClient {
 
     /** {@code /repository/files/<path>} 详情响应（只取占位符那两段）。 */
     record FileDetail(
-            @JsonProperty("encoding") String encoding,
-            @JsonProperty("content") String content) {
+             String encoding,
+             String content) {
     }
 
     /** {@code /user} 与 {@code /repository/commits/<ref>} 的单字段响应。 */
-    record UserInfo(@JsonProperty("id") long id) {
+    record UserInfo( long id) {
     }
 
-    record CommitRef(@JsonProperty("id") String id) {
+    record CommitRef( String id) {
     }
 }

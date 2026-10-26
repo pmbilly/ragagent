@@ -44,10 +44,10 @@ public final class FeishuApiTypes {
     /** {@code tenant_access_token} 接口的响应。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record TokenResponse(
-            @JsonProperty("code") int code,
-            @JsonProperty("msg") String msg,
+             int code,
+             String msg,
             @JsonProperty("tenant_access_token") String tenantAccessToken,
-            @JsonProperty("expire") int expire) {
+             int expire) {
     }
 
     // wiki 空间 / 节点
@@ -56,15 +56,15 @@ public final class FeishuApiTypes {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record WikiSpace(
             @JsonProperty("space_id") String spaceId,
-            @JsonProperty("name") String name,
-            @JsonProperty("description") String description,
-            @JsonProperty("visibility") String visibility) {
+             String name,
+             String description,
+             String visibility) {
     }
 
     /** wiki 空间列表的一页。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record WikiSpaceListData(
-            @JsonProperty("items") List<WikiSpace> items,
+             List<WikiSpace> items,
             @JsonProperty("has_more") boolean hasMore,
             @JsonProperty("page_token") String pageToken) {
     }
@@ -72,15 +72,15 @@ public final class FeishuApiTypes {
     /** {@code GET /open-apis/wiki/v2/spaces} 的响应。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record WikiSpaceListResponse(
-            @JsonProperty("code") int code,
-            @JsonProperty("msg") String msg,
-            @JsonProperty("data") WikiSpaceListData data) {
+             int code,
+             String msg,
+             WikiSpaceListData data) {
     }
 
     /** wiki 节点列表的一页。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record WikiNodeListData(
-            @JsonProperty("items") List<WikiNode> items,
+             List<WikiNode> items,
             @JsonProperty("has_more") boolean hasMore,
             @JsonProperty("page_token") String pageToken) {
     }
@@ -88,22 +88,22 @@ public final class FeishuApiTypes {
     /** {@code GET .../spaces/:space_id/nodes} 的响应。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record WikiNodeListResponse(
-            @JsonProperty("code") int code,
-            @JsonProperty("msg") String msg,
-            @JsonProperty("data") WikiNodeListData data) {
+             int code,
+             String msg,
+             WikiNodeListData data) {
     }
 
     /** 单个 wiki 节点查询结果的 {@code data} 段。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record WikiNodeInfoData(@JsonProperty("node") WikiNode node) {
+    public record WikiNodeInfoData( WikiNode node) {
     }
 
     /** {@code GET .../spaces/get_node} 的响应。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record WikiNodeInfoResponse(
-            @JsonProperty("code") int code,
-            @JsonProperty("msg") String msg,
-            @JsonProperty("data") WikiNodeInfoData data) {
+             int code,
+             String msg,
+             WikiNodeInfoData data) {
     }
 
     /**
@@ -319,15 +319,15 @@ public final class FeishuApiTypes {
 
     /** 导出任务的 ticket。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record ExportTaskCreateData(@JsonProperty("ticket") String ticket) {
+    public record ExportTaskCreateData( String ticket) {
     }
 
     /** {@code POST /drive/v1/export_tasks} 的响应。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record ExportTaskCreateResponse(
-            @JsonProperty("code") int code,
-            @JsonProperty("msg") String msg,
-            @JsonProperty("data") ExportTaskCreateData data) {
+             int code,
+             String msg,
+             ExportTaskCreateData data) {
     }
 
     /**
@@ -346,15 +346,15 @@ public final class FeishuApiTypes {
 
     /** 导出任务状态查询的 {@code data} 段。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record ExportTaskStatusData(@JsonProperty("result") ExportTaskResult result) {
+    public record ExportTaskStatusData( ExportTaskResult result) {
     }
 
     /** {@code GET /drive/v1/export_tasks/:ticket} 的响应。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record ExportTaskStatusResponse(
-            @JsonProperty("code") int code,
-            @JsonProperty("msg") String msg,
-            @JsonProperty("data") ExportTaskStatusData data) {
+             int code,
+             String msg,
+             ExportTaskStatusData data) {
     }
 
     // Drive（云盘）文件
@@ -364,20 +364,20 @@ public final class FeishuApiTypes {
     public record DriveFileMeta(
             @JsonProperty("doc_token") String docToken,
             @JsonProperty("doc_type") String docType,
-            @JsonProperty("title") String title) {
+             String title) {
     }
 
     /** {@code drive/v1/metas} 的 {@code data} 段。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record DriveFileMetaData(@JsonProperty("metas") List<DriveFileMeta> metas) {
+    public record DriveFileMetaData( List<DriveFileMeta> metas) {
     }
 
     /** {@code drive/v1/metas} 的响应。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record DriveFileMetaResponse(
-            @JsonProperty("code") int code,
-            @JsonProperty("msg") String msg,
-            @JsonProperty("data") DriveFileMetaData data) {
+             int code,
+             String msg,
+             DriveFileMetaData data) {
     }
 
     /** 云盘快捷方式指向的目标。 */
@@ -509,7 +509,7 @@ public final class FeishuApiTypes {
     /** 云盘文件列表的一页。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record DriveFileListData(
-            @JsonProperty("files") List<DriveFile> files,
+             List<DriveFile> files,
             @JsonProperty("has_more") boolean hasMore,
             @JsonProperty("next_page_token") String nextPageToken) {
     }
@@ -517,21 +517,21 @@ public final class FeishuApiTypes {
     /** {@code GET /open-apis/drive/v1/files} 的响应。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record DriveFileListResponse(
-            @JsonProperty("code") int code,
-            @JsonProperty("msg") String msg,
-            @JsonProperty("data") DriveFileListData data) {
+             int code,
+             String msg,
+             DriveFileListData data) {
     }
 
     /** 根文件夹的元数据。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record DriveFolderMetaData(
-            @JsonProperty("id") String id,
-            @JsonProperty("name") String name,
-            @JsonProperty("token") String token,
-            @JsonProperty("createUid") String createUid,
-            @JsonProperty("editUid") String editUid,
-            @JsonProperty("parentId") String parentId,
-            @JsonProperty("ownUid") String ownUid) {
+             String id,
+             String name,
+             String token,
+             String createUid,
+             String editUid,
+             String parentId,
+             String ownUid) {
     }
 
     /**
@@ -541,9 +541,9 @@ public final class FeishuApiTypes {
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record DriveFolderMetaResponse(
-            @JsonProperty("code") int code,
-            @JsonProperty("msg") String msg,
-            @JsonProperty("data") DriveFolderMetaData data) {
+             int code,
+             String msg,
+             DriveFolderMetaData data) {
     }
 
     // 部分失败载体

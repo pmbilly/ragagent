@@ -13,18 +13,18 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ExtraFieldConfig(
-        @JsonProperty("key") String key,
-        @JsonProperty("label") String label,
-        @JsonProperty("type") String type,
-        @JsonProperty("required") boolean required,
+         String key,
+         String label,
+         String type,
+         boolean required,
         @JsonProperty("default") String defaultValue,
-        @JsonProperty("placeholder") String placeholder,
-        @JsonProperty("options") List<Option> options) {
+         String placeholder,
+         List<Option> options) {
 
     /** options 数组元素 */
     public record Option(
-            @JsonProperty("label") String label,
-            @JsonProperty("value") String value) {
+             String label,
+             String value) {
     }
 
     public ExtraFieldConfig {

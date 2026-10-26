@@ -1,7 +1,6 @@
 package com.ragagent.datasource.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.platform.access.TracingContext;
 import com.ragagent.platform.web.JsonMappers;
 import tools.jackson.databind.ObjectMapper;
@@ -64,7 +63,6 @@ public record DataSourceSyncPayload(
          * 观测载体（嵌套键 {@code tracing}，五个 {@code lf_*} 组件收在里面）。
          * 空载体经 {@code EmptyOmitFilter} 整键省略。
          */
-        @JsonProperty("tracing")
         @JsonInclude(value = JsonInclude.Include.CUSTOM,
                 valueFilter = TracingContext.EmptyOmitFilter.class) TracingContext tracing) {
 

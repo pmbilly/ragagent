@@ -80,7 +80,7 @@ public final class DocxBlocks {
     // 块载荷
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record TextRun(@JsonProperty("content") String content) {
+    public record TextRun( String content) {
     }
 
     /** 一个内联 run。 */
@@ -90,7 +90,7 @@ public final class DocxBlocks {
 
     /** 所有带文本的块的公共载荷。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record BlockText(@JsonProperty("elements") List<TextElement> elements) {
+    public record BlockText( List<TextElement> elements) {
 
         /** 测试与构造便利：单 run 的文本块。 */
         public static BlockText of(String content) {
@@ -114,14 +114,14 @@ public final class DocxBlocks {
 
     /** sheet/bitable/image 三种块的共同形状。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record BlockTokenRef(@JsonProperty("token") String token) {
+    public record BlockTokenRef( String token) {
     }
 
     /** 文件块载荷（附件 token + 名字）。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record BlockFileRef(
-            @JsonProperty("token") String token,
-            @JsonProperty("name") String name) {
+             String token,
+             String name) {
     }
 
     /** 表格网格形状。 */
@@ -132,8 +132,8 @@ public final class DocxBlocks {
     /** 单元格 block id 列表 + 网格属性。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record BlockTable(
-            @JsonProperty("cells") List<String> cells,
-            @JsonProperty("property") BlockTableProperty property) {
+             List<String> cells,
+             BlockTableProperty property) {
     }
 
     /**
@@ -481,7 +481,7 @@ public final class DocxBlocks {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record DocxBlocksData(
-            @JsonProperty("items") List<DocxBlock> items,
+             List<DocxBlock> items,
             @JsonProperty("has_more") boolean hasMore,
             @JsonProperty("page_token") String pageToken) {
     }
@@ -489,27 +489,27 @@ public final class DocxBlocks {
     /** {@code GET .../documents/:id/blocks} 的响应。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record DocxBlocksResponse(
-            @JsonProperty("code") int code,
-            @JsonProperty("msg") String msg,
-            @JsonProperty("data") DocxBlocksData data) {
+             int code,
+             String msg,
+             DocxBlocksData data) {
     }
 
     // sheets-v2 取值
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record SheetValueRange(@JsonProperty("values") List<List<Object>> values) {
+    public record SheetValueRange( List<List<Object>> values) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record SheetValuesData(@JsonProperty("valueRange") SheetValueRange valueRange) {
+    public record SheetValuesData( SheetValueRange valueRange) {
     }
 
     /** sheets-v2 取值接口的响应。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record SheetValuesResponse(
-            @JsonProperty("code") int code,
-            @JsonProperty("msg") String msg,
-            @JsonProperty("data") SheetValuesData data) {
+             int code,
+             String msg,
+             SheetValuesData data) {
     }
 
     // bitable-v1 字段与记录
@@ -530,40 +530,40 @@ public final class DocxBlocks {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record BitableField(
             @JsonProperty("field_name") String fieldName,
-            @JsonProperty("type") int type,
-            @JsonProperty("property") BitableFieldProperty property) {
+             int type,
+             BitableFieldProperty property) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record BitableFieldsData(
             @JsonProperty("has_more") boolean hasMore,
             @JsonProperty("page_token") String pageToken,
-            @JsonProperty("items") List<BitableField> items) {
+             List<BitableField> items) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record BitableFieldsResponse(
-            @JsonProperty("code") int code,
-            @JsonProperty("msg") String msg,
-            @JsonProperty("data") BitableFieldsData data) {
+             int code,
+             String msg,
+             BitableFieldsData data) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record BitableRecord(@JsonProperty("fields") Map<String, Object> fields) {
+    public record BitableRecord( Map<String, Object> fields) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record BitableRecordsData(
             @JsonProperty("has_more") boolean hasMore,
             @JsonProperty("page_token") String pageToken,
-            @JsonProperty("items") List<BitableRecord> items) {
+             List<BitableRecord> items) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record BitableRecordsResponse(
-            @JsonProperty("code") int code,
-            @JsonProperty("msg") String msg,
-            @JsonProperty("data") BitableRecordsData data) {
+             int code,
+             String msg,
+             BitableRecordsData data) {
     }
 
     // 纯函数

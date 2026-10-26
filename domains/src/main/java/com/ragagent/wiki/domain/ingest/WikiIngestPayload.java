@@ -1,7 +1,6 @@
 package com.ragagent.wiki.domain.ingest;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.platform.access.TracingContext;
 
 /**
@@ -28,7 +27,6 @@ public record WikiIngestPayload(
          * 观测载体（嵌套键 {@code tracing}，五个 {@code lf_*} 组件收在里面）。
          * 空载体经 {@code EmptyOmitFilter} 整键省略：未启用追踪时负载字节与平铺期逐字一致。
          */
-        @JsonProperty("tracing")
         @JsonInclude(value = JsonInclude.Include.CUSTOM,
                 valueFilter = TracingContext.EmptyOmitFilter.class) TracingContext tracing) {
 

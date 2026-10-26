@@ -13,12 +13,12 @@ import java.util.Map;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record Config(
-        @JsonProperty("provider") ProviderName provider,
+         ProviderName provider,
         @JsonProperty("base_url") String baseUrl,
         @JsonProperty("api_key") String apiKey,
         @JsonProperty("model_name") String modelName,
         @JsonProperty("model_id") String modelId,
-        @JsonProperty("extra") Map<String, Object> extra) {
+         Map<String, Object> extra) {
 
     public Config {
         // 缺省归一为空串

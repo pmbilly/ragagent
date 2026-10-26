@@ -39,7 +39,6 @@ public final class ContractJsonMixinsModel {
         /** 内嵌文档形状：恒输出 {@code {"text":"..."}}。 */
         public abstract static class DocumentInfoMixin {
 
-            @JsonProperty("text")
             private String text;
 
         }
