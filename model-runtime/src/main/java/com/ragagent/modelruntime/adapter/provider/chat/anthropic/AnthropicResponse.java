@@ -1,6 +1,5 @@
 package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import tools.jackson.databind.JsonNode;
@@ -12,7 +11,6 @@ import tools.jackson.databind.JsonNode;
  * 可空指针</b>（Java 用包装类型）："没上报"（null）与"上报了 0"是两回事，
  * {@code CacheReported} 与总量算法都依赖这个区分。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class AnthropicResponse {
 
     @JsonProperty("id")
@@ -31,7 +29,6 @@ public class AnthropicResponse {
     private Error error;
 
     /** content 数组元素（content block）。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Block {
         @JsonProperty("type")
         private String type;
@@ -52,7 +49,6 @@ public class AnthropicResponse {
     }
 
     /** usage 计数。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Usage {
         @JsonProperty("input_tokens")
         private int inputTokens;
@@ -71,7 +67,6 @@ public class AnthropicResponse {
     }
 
     /** 错误信息。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Error {
         @JsonProperty("type")
         private String type;

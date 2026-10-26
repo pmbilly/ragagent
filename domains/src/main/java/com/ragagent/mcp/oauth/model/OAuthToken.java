@@ -1,7 +1,6 @@
 package com.ragagent.mcp.oauth.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -24,7 +23,6 @@ import java.time.ZoneOffset;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY,
         getterVisibility = JsonAutoDetect.Visibility.NONE,
         isGetterVisibility = JsonAutoDetect.Visibility.NONE)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public final class OAuthToken {
 
     @JsonProperty("access_token")

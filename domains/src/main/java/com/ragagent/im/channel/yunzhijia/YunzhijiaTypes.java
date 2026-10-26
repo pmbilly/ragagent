@@ -1,6 +1,5 @@
 package com.ragagent.im.channel.yunzhijia;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import tools.jackson.databind.JsonNode;
@@ -16,7 +15,6 @@ public final class YunzhijiaTypes {
     private YunzhijiaTypes() {
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class CallbackMessage {
         public int type;
         public int msgType;
@@ -41,7 +39,6 @@ public final class YunzhijiaTypes {
     }
 
     /** {@code notifyType} 容忍两种形态。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class MessageParam {
         public List<MessageParamDesc> desc;
         public List<String> notifyTo;
@@ -63,7 +60,6 @@ public final class YunzhijiaTypes {
         }
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class MessageParamDesc {
         public String type = "";
         public String data = "";
@@ -101,7 +97,6 @@ public final class YunzhijiaTypes {
         public SendMessageParam param;
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class AppAccessTokenResponse {
         public AppAccessTokenData data = new AppAccessTokenData();
         public JsonNode error;
@@ -109,7 +104,6 @@ public final class YunzhijiaTypes {
         public boolean success;
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class AppAccessTokenData {
         public String accessToken = "";
         public long expireIn;

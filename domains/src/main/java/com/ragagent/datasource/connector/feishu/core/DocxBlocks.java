@@ -1,6 +1,5 @@
 package com.ragagent.datasource.connector.feishu.core;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -79,17 +78,14 @@ public final class DocxBlocks {
 
     // 块载荷
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record TextRun( String content) {
     }
 
     /** 一个内联 run。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record TextElement(@JsonProperty("text_run") TextRun textRun) {
     }
 
     /** 所有带文本的块的公共载荷。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record BlockText( List<TextElement> elements) {
 
         /** 测试与构造便利：单 run 的文本块。 */
@@ -113,24 +109,20 @@ public final class DocxBlocks {
     }
 
     /** sheet/bitable/image 三种块的共同形状。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record BlockTokenRef( String token) {
     }
 
     /** 文件块载荷（附件 token + 名字）。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record BlockFileRef(
              String token,
              String name) {
     }
 
     /** 表格网格形状。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record BlockTableProperty(@JsonProperty("column_size") int columnSize) {
     }
 
     /** 单元格 block id 列表 + 网格属性。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record BlockTable(
              List<String> cells,
              BlockTableProperty property) {
@@ -142,7 +134,6 @@ public final class DocxBlocks {
      * <p>扁平的、<b>先序</b>排列；层级只通过 {@code children} / {@code parent_id} 表达，
      * 表格单元格是容器（它自己的文本在子块里）。</p>
      */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DocxBlock {
 
         @JsonProperty("block_id")
@@ -479,7 +470,6 @@ public final class DocxBlocks {
 
     // blocks API 响应
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record DocxBlocksData(
              List<DocxBlock> items,
             @JsonProperty("has_more") boolean hasMore,
@@ -487,7 +477,6 @@ public final class DocxBlocks {
     }
 
     /** {@code GET .../documents/:id/blocks} 的响应。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record DocxBlocksResponse(
              int code,
              String msg,
@@ -496,16 +485,13 @@ public final class DocxBlocks {
 
     // sheets-v2 取值
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record SheetValueRange( List<List<Object>> values) {
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record SheetValuesData( SheetValueRange valueRange) {
     }
 
     /** sheets-v2 取值接口的响应。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record SheetValuesResponse(
              int code,
              String msg,
@@ -522,44 +508,37 @@ public final class DocxBlocks {
         }
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record BitableFieldProperty(
             @JsonProperty("date_formatter") String dateFormatter) {
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record BitableField(
             @JsonProperty("field_name") String fieldName,
              int type,
              BitableFieldProperty property) {
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record BitableFieldsData(
             @JsonProperty("has_more") boolean hasMore,
             @JsonProperty("page_token") String pageToken,
              List<BitableField> items) {
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record BitableFieldsResponse(
              int code,
              String msg,
              BitableFieldsData data) {
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record BitableRecord( Map<String, Object> fields) {
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record BitableRecordsData(
             @JsonProperty("has_more") boolean hasMore,
             @JsonProperty("page_token") String pageToken,
              List<BitableRecord> items) {
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record BitableRecordsResponse(
              int code,
              String msg,

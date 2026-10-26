@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.contract.session.SuggestionItem;
 import com.ragagent.session.domain.SuggestionItemListTypeHandler;
 import java.time.OffsetDateTime;
@@ -26,7 +25,6 @@ import java.util.List;
  * </ol>
  */
 @TableName(value = "message_suggestion_sets", autoResultMap = true)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageSuggestionSet {
 
     public static final String PLACEMENT_AFTER_ANSWER = "after_answer";

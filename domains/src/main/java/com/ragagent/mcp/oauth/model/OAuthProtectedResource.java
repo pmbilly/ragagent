@@ -1,13 +1,11 @@
 package com.ragagent.mcp.oauth.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
  * RFC 9728 {@code /.well-known/oauth-protected-resource} 的响应。
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public record OAuthProtectedResource(
         @JsonProperty("authorization_servers") List<String> authorizationServers,
         String resource,

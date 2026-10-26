@@ -1,6 +1,5 @@
 package com.ragagent.vectorstore.controller;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.vectorstore.ConnectionConfig;
@@ -62,18 +61,15 @@ public class VectorStoreController {
 
     // ── 请求 DTO ─────────────────────────────────────────────────────────
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record CreateStoreRequest(
             String name,
             String engineType,
             ConnectionConfig connectionConfig,
             IndexConfig indexConfig) {}
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record UpdateStoreRequest(
             String name) {}
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record TestStoreRequest(
             String engineType,
             ConnectionConfig connectionConfig) {}

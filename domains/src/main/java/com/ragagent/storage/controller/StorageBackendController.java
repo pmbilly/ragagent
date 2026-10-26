@@ -1,6 +1,5 @@
 package com.ragagent.storage.controller;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.storage.config.StorageAllowList;
@@ -61,7 +60,6 @@ public class StorageBackendController {
     }
 
     /** 请求体：name/provider required */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record StorageBackendRequest(
             String name,
             String provider,

@@ -1,6 +1,5 @@
 package com.ragagent.session.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.List;
 import tools.jackson.databind.JsonNode;
@@ -24,7 +23,6 @@ public final class QaRequests {
     private QaRequests() {}
 
     /** 提及项元素：与 `session.domain.MentionedItem` 同字段名（S3 收口）。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class MentionedItemRequest {
         public String id = "";
         public String name = "";
@@ -38,7 +36,6 @@ public final class QaRequests {
         public String skillName = "";
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ImageAttachment {
         /** base64 data URI from frontend (data:image/png;base64,...) */
         public String data = "";
@@ -46,14 +43,12 @@ public final class QaRequests {
         public String caption = "";
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class AttachmentUpload {
         public String data = "";
         public String fileName = "";
         public long fileSize;
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class CreateKnowledgeQARequest {
         public String query = "";
         public List<String> knowledgeBaseIds;
@@ -111,7 +106,6 @@ public final class QaRequests {
         }
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SearchKnowledgeRequest {
         public String query = "";
         public String knowledgeBaseId = "";

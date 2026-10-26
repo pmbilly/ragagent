@@ -169,12 +169,11 @@ public final class ContractJsonMixinsCore {
     }
 
     /** ConnectionConfig 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    @JsonIgnoreProperties(value = {"endpoint"}, ignoreUnknown = true)
+    @JsonIgnoreProperties(value = {"endpoint"})
     public abstract static class ConnectionConfigMixin {
     }
 
     /** IndexConfig 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class IndexConfigMixin {
     }
 

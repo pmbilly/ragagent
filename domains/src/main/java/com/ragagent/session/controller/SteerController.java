@@ -1,6 +1,5 @@
 package com.ragagent.session.controller;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.ResponseType;
@@ -478,7 +477,6 @@ public class SteerController {
     }
 
     /** 请求体键名＝Java 字段名（camelCase）。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     private record SteerMessageRequest(
             String expectedAssistantMessageId,
             String steerId,

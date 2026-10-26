@@ -1,6 +1,5 @@
 package com.ragagent.mcp.oauth.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.platform.access.TenantContext;
 
 /**
@@ -13,7 +12,6 @@ import com.ragagent.platform.access.TenantContext;
  * "本次回调完成了" 与 "同一服务上早已存在的旧 token"。attempt 记录按 state 独立存在，
  * 且只在 {@code OAuthStateStore#completeAttempt} 后才置 {@code completed=true}。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public record OAuthAttempt(
         long tenantId,
         OAuthState.Principal principal,

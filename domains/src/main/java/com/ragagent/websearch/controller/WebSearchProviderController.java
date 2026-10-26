@@ -1,6 +1,5 @@
 package com.ragagent.websearch.controller;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.BizException;
@@ -83,7 +82,6 @@ public class WebSearchProviderController {
     // ── POST /test（Admin+）：原始凭据连通性 ───────────────────────────
 
     /** 请求体：provider required；parameters 可选 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record TestProviderRequest(
             String provider,
             WebSearchProviderParams parameters) {}
@@ -147,7 +145,6 @@ public class WebSearchProviderController {
     }
 
     /** 更新请求：无 required 字段；merge 规则见下 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record UpdateProviderRequest(
             String name,
             String description,

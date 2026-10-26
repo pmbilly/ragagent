@@ -1,6 +1,5 @@
 package com.ragagent.memory.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.memory.domain.scope.MemoryScope;
@@ -27,7 +26,6 @@ import tools.jackson.databind.ObjectMapper;
  * {@code lf_*} 键；载具只在进程内队列流动、无外部消费者，故改形）。
  * 空载体整键省略，worker 侧取 {@link #tracing()} 续接同一棵树。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public record MemoryExtractPayload(
         @JsonProperty("tenant_id") long tenantId,
         @JsonProperty("subject_id") String subjectId,

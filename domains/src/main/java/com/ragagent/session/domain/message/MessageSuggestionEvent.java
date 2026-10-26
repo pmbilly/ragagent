@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.OffsetDateTime;
 
 /**
@@ -14,7 +13,6 @@ import java.time.OffsetDateTime;
  * <p>与安全审计日志**分开存**：这里只引用 question ID，不复制建议文案。</p>
  */
 @TableName("message_suggestion_events")
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageSuggestionEvent {
 
     public static final String EVENT_IMPRESSION = "impression";

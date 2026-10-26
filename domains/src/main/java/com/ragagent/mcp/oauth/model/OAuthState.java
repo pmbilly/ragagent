@@ -1,6 +1,5 @@
 package com.ragagent.mcp.oauth.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.platform.access.TenantContext;
 
 /**
@@ -14,7 +13,6 @@ import com.ragagent.platform.access.TenantContext;
  * SHA-256 摘要 code_challenge）。因此 state 参数只是一个不透明句柄，
  * 真正的数据存在服务端（Redis 多实例 / Lite 内存）。
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public record OAuthState(
         long tenantId,
         String userId,
@@ -42,7 +40,6 @@ public record OAuthState(
     }
 
     /** principal 的 (type, id) 序列化形态（仅用于 Redis 往返）。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record Principal(String type, String id) {
 
         public static Principal of(TenantContext.Principal p) {

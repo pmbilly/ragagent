@@ -1,7 +1,6 @@
 package com.ragagent.platform.access;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -20,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @param sessionId 跨异步边界保留的会话标签
  */
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public record TracingContext(
         @JsonProperty("lf_trace_id")
         @JsonInclude(JsonInclude.Include.NON_EMPTY) String traceId,

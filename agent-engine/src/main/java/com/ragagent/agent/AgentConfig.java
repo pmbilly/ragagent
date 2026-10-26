@@ -1,7 +1,6 @@
 package com.ragagent.agent;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ragagent.contract.agent.AgentRunSpec;
 import java.util.List;
@@ -27,7 +26,6 @@ import java.util.List;
  *       sandboxConfigId 随沙箱裁剪移除。</li>
  * </ul>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class AgentConfig implements AgentRunSpec {
 

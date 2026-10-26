@@ -1,6 +1,5 @@
 package com.ragagent.platform.web;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
 /**
@@ -15,7 +14,6 @@ public final class ContractJsonMixinsMemory {
     }
 
     /** MemoryMessageCursor 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class MemoryMessageCursorMixin {
     }
 }

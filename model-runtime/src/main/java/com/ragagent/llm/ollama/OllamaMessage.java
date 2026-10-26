@@ -1,6 +1,5 @@
 package com.ragagent.llm.ollama;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.List;
  * 序列化为 base64 字符串数组（{@code byte[]} 的标准 JSON 编码）。</p>
  */
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class OllamaMessage {
 
     @JsonProperty("role")

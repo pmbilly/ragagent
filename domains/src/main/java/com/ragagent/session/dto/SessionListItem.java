@@ -2,7 +2,6 @@ package com.ragagent.session.dto;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.contract.session.SessionLastRequestState;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import java.time.OffsetDateTime;
@@ -17,7 +16,6 @@ import java.time.OffsetDateTime;
  * （声明序即线格式顺序，键名＝Java 字段名）。</p>
  */
 @TableName(value = "sessions", autoResultMap = true)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class SessionListItem {
 
     private String id;

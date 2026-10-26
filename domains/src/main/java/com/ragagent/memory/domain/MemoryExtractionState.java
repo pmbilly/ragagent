@@ -1,6 +1,5 @@
 package com.ragagent.memory.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 
@@ -31,7 +30,6 @@ import java.time.OffsetDateTime;
  * {@code null} 不会走自定义序列化器（Jackson 对 null 值用 nullSerializer），
  * 想让落库字节是 year-1 就必须让字段本身就持有零值时间。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class MemoryExtractionState {
 
     /** 空串照样输出 {@code ""}，**恒输出**（见类注释）。 */

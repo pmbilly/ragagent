@@ -1,6 +1,5 @@
 package com.ragagent.llm.ollama;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.ObjectNode;
@@ -16,7 +15,6 @@ import tools.jackson.databind.node.ObjectNode;
  * 且恒输出——空值时给 {@code {}}（字段永不为 null）。</p>
  */
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class OllamaToolCall {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -33,7 +31,6 @@ public class OllamaToolCall {
 
     /** function 子对象（index / name / arguments 三者都恒输出）。 */
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Function {
 
         private int index;

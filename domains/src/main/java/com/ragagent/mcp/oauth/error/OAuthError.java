@@ -1,6 +1,5 @@
 package com.ragagent.mcp.oauth.error;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -15,7 +14,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * {@code "OAuth error: <code>"}。该文案会被 {@code permanentRefreshFailure} 的
  * 兜底字符串匹配（"status 400" / "status 401"）看到，不能改。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public record OAuthError(
         @JsonProperty("error") String errorCode,
         @JsonProperty("error_description") String errorDescription,

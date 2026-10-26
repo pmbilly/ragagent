@@ -1,6 +1,5 @@
 package com.ragagent.platform.web;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 
@@ -17,7 +16,6 @@ public final class ContractJsonMixinsAuth {
 
     /** UserPreferences 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class UserPreferencesMixin {
     }
 }

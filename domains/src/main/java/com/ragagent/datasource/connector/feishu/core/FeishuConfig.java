@@ -1,6 +1,5 @@
 package com.ragagent.datasource.connector.feishu.core;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -25,7 +24,6 @@ import java.util.Map;
  *       本类型不落表，只在连接器内部流动。</li>
  * </ol>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class FeishuConfig {
 
     /** 默认 Open Platform API origin。 */

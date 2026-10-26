@@ -1,6 +1,5 @@
 package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -13,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * {@code message_delta.usage}（输出侧），两处都要按 max() 合并——见
  * {@link AnthropicChat#mergeAnthropicUsage}。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class AnthropicStreamEvent {
 
     @JsonProperty("type")
@@ -32,7 +30,6 @@ public class AnthropicStreamEvent {
     private AnthropicResponse.Error error;
 
     /** message_start 事件内联的 message 载荷（含 usage）。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class MessagePayload {
         @JsonProperty("usage")
         private AnthropicResponse.Usage usage;
@@ -41,7 +38,6 @@ public class AnthropicStreamEvent {
     }
 
     /** delta 的内联结构（text_delta / input_json_delta / message_delta 共用）。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Delta {
         @JsonProperty("type")
         private String type;

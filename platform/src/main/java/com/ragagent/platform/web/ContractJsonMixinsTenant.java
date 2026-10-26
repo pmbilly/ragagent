@@ -1,6 +1,5 @@
 package com.ragagent.platform.web;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ragagent.contract.tenant.StorageEngineConfig.CosEngineConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig.Ks3EngineConfig;
@@ -24,7 +23,6 @@ public final class ContractJsonMixinsTenant {
     }
 
     /** APIPrincipalConfig 的 mixin（注解逐条对位）。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class APIPrincipalConfigMixin {
     }
 

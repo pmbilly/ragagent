@@ -1,7 +1,6 @@
 package com.ragagent.datasource.connector.feishu.core;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
@@ -37,12 +36,10 @@ public final class FeishuApiTypes {
     // 通用信封
 
     /** 飞书所有响应的公共信封。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record ApiResponse(@JsonProperty("code") int code, @JsonProperty("msg") String msg) {
     }
 
     /** {@code tenant_access_token} 接口的响应。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record TokenResponse(
              int code,
              String msg,
@@ -53,7 +50,6 @@ public final class FeishuApiTypes {
     // wiki 空间 / 节点
 
     /** 一个飞书 wiki 空间。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record WikiSpace(
             @JsonProperty("space_id") String spaceId,
              String name,
@@ -62,7 +58,6 @@ public final class FeishuApiTypes {
     }
 
     /** wiki 空间列表的一页。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record WikiSpaceListData(
              List<WikiSpace> items,
             @JsonProperty("has_more") boolean hasMore,
@@ -70,7 +65,6 @@ public final class FeishuApiTypes {
     }
 
     /** {@code GET /open-apis/wiki/v2/spaces} 的响应。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record WikiSpaceListResponse(
              int code,
              String msg,
@@ -78,7 +72,6 @@ public final class FeishuApiTypes {
     }
 
     /** wiki 节点列表的一页。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record WikiNodeListData(
              List<WikiNode> items,
             @JsonProperty("has_more") boolean hasMore,
@@ -86,7 +79,6 @@ public final class FeishuApiTypes {
     }
 
     /** {@code GET .../spaces/:space_id/nodes} 的响应。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record WikiNodeListResponse(
              int code,
              String msg,
@@ -94,12 +86,10 @@ public final class FeishuApiTypes {
     }
 
     /** 单个 wiki 节点查询结果的 {@code data} 段。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record WikiNodeInfoData( WikiNode node) {
     }
 
     /** {@code GET .../spaces/get_node} 的响应。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record WikiNodeInfoResponse(
              int code,
              String msg,
@@ -112,7 +102,6 @@ public final class FeishuApiTypes {
      * <p>可变（有 setter），因为列举时会在遍历中就地补
      * {@code parent_node_token} 与 {@code space_id}。</p>
      */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class WikiNode {
 
         @JsonProperty("space_id")
@@ -318,12 +307,10 @@ public final class FeishuApiTypes {
     // 导出任务 API
 
     /** 导出任务的 ticket。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record ExportTaskCreateData( String ticket) {
     }
 
     /** {@code POST /drive/v1/export_tasks} 的响应。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record ExportTaskCreateResponse(
              int code,
              String msg,
@@ -335,7 +322,6 @@ public final class FeishuApiTypes {
      *
      * @param jobStatus {@code 0}=成功、{@code 1}=初始化中、{@code 2}=处理中
      */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record ExportTaskResult(
             @JsonProperty("file_token") String fileToken,
             @JsonProperty("file_size") long fileSize,
@@ -345,12 +331,10 @@ public final class FeishuApiTypes {
     }
 
     /** 导出任务状态查询的 {@code data} 段。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record ExportTaskStatusData( ExportTaskResult result) {
     }
 
     /** {@code GET /drive/v1/export_tasks/:ticket} 的响应。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record ExportTaskStatusResponse(
              int code,
              String msg,
@@ -360,7 +344,6 @@ public final class FeishuApiTypes {
     // Drive（云盘）文件
 
     /** {@code drive/v1/metas} 里的一条。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record DriveFileMeta(
             @JsonProperty("doc_token") String docToken,
             @JsonProperty("doc_type") String docType,
@@ -368,12 +351,10 @@ public final class FeishuApiTypes {
     }
 
     /** {@code drive/v1/metas} 的 {@code data} 段。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record DriveFileMetaData( List<DriveFileMeta> metas) {
     }
 
     /** {@code drive/v1/metas} 的响应。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record DriveFileMetaResponse(
              int code,
              String msg,
@@ -381,7 +362,6 @@ public final class FeishuApiTypes {
     }
 
     /** 云盘快捷方式指向的目标。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record DriveShortcutInfo(
             @JsonProperty("target_token") String targetToken,
             @JsonProperty("target_type") String targetType) {
@@ -393,7 +373,6 @@ public final class FeishuApiTypes {
      * <p>可变，因为快捷方式展开时会现场造一个新的（见
      * {@code listDriveFilesRecursiveFrom}）。</p>
      */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DriveFile {
 
         @JsonProperty("token")
@@ -507,7 +486,6 @@ public final class FeishuApiTypes {
     }
 
     /** 云盘文件列表的一页。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record DriveFileListData(
              List<DriveFile> files,
             @JsonProperty("has_more") boolean hasMore,
@@ -515,7 +493,6 @@ public final class FeishuApiTypes {
     }
 
     /** {@code GET /open-apis/drive/v1/files} 的响应。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record DriveFileListResponse(
              int code,
              String msg,
@@ -523,7 +500,6 @@ public final class FeishuApiTypes {
     }
 
     /** 根文件夹的元数据。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record DriveFolderMetaData(
              String id,
              String name,
@@ -539,7 +515,6 @@ public final class FeishuApiTypes {
      *
      * <p>用来解析<b>根文件夹</b>的人类可读名字——列表 API 只返回文件夹的子项，不返回它自己。</p>
      */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record DriveFolderMetaResponse(
              int code,
              String msg,

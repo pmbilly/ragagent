@@ -1,6 +1,5 @@
 package com.ragagent.wiki.service.ingest;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.model.LlmChatClient;
@@ -69,7 +68,6 @@ public class WikiIngestCitePipeline {
      * <p>只用于<b>解析</b>模型输出，从不序列化出站，因此不需要
      * {@code @JsonProperty}；Jackson 按字段名映射（snake 字段名见注解）。</p>
      */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     static final class CitationBatchResult {
         @JsonProperty("citations")
         public Map<String, List<String>> citations;

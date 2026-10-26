@@ -1,6 +1,5 @@
 package com.ragagent.retrieval.engine.doris;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.JsonMappers;
@@ -243,7 +242,6 @@ public final class DorisStreamLoadClient {
     }
 
     /** Stream Load 响应体（只保留上游消费得到的字段，未知键容忍）。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     record StreamLoadResponse(
             @JsonProperty("Label") String label,
             @JsonProperty("Status") String status,

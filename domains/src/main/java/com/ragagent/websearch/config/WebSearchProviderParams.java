@@ -1,6 +1,5 @@
 package com.ragagent.websearch.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Map;
 
 /**
@@ -15,7 +14,6 @@ import java.util.Map;
  * 裸 SQL / 未来演进写入的 parameters 可能带本类不认识的键——
  * 没有它会整行读不出来。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class WebSearchProviderParams {
 
     /** API key（落库加密；响应永不回显） */

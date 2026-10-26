@@ -1,6 +1,5 @@
 package com.ragagent.memory.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.memory.MemoryKinds;
@@ -345,7 +344,6 @@ final class MemoryExtractionLlm {
      * 键名与提示词里写给模型的一字不差（{@code expires_at} 是唯一的蛇形，
      * 因为提示词里就写的是它）。</p>
      */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     static final class ExtractionDecision {
         /** add / update / delete / none。别的值一律忽略——空 action 以前被当成 add，
          *  于是被截断的响应变成了一次静默写入。 */
@@ -388,7 +386,6 @@ final class MemoryExtractionLlm {
     }
 
     /** 抽取模型响应的外层（memories 列表）。 */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     static final class ExtractionResponse {
         @JsonProperty("memories")
         List<ExtractionDecision> memories = new ArrayList<>();

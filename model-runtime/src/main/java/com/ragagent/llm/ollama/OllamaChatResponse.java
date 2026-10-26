@@ -1,6 +1,5 @@
 package com.ragagent.llm.ollama;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -13,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 非流式路径算 {@code eval_count - prompt_eval_count} 当补全量，
  * 流式路径直接用 {@code eval_count}。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class OllamaChatResponse {
 
     @JsonProperty("model")

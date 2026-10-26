@@ -1,6 +1,5 @@
 package com.ragagent.mcp.oauth.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -14,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *       的 scheme 校验（防恶意授权服务器塞 {@code javascript:} / {@code file:} 之类被反射进浏览器）。</li>
  * </ul>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthServerMetadata {
 
     @JsonProperty("issuer")
