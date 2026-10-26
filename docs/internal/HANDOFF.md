@@ -682,6 +682,14 @@ boot           17 件                      →  boot
 
 | Q8a | 2026-10-24 | **前端流式类型基础**：新增 `src/types/chatStream.ts`（`ChatMessage` 已知字段 + `AgentEvent` + `BackendStreamEvent`），`ChatMessage` 不再整体 `Record<string, unknown>`；`normalizeStreamEvent` 在 SSE 入口归一（缺 `responseType` 丢弃、未知类型落 `unknown` 并保留原文、`content/done/id` 归一）；`useChatStreamHandler.processStreamChunk` 收 `unknown` 并使用归一结果；`steerStreamFork` 复用同一类型；`AgentStreamDisplay` 的事件流改为 `ChatMessage[]`。 | 新增 5 条归一测试 · `vue-tsc` 0 · `npm test` **776 / 0** · 48 守卫绿。**Q8b 未做**：`AgentStreamDisplay` 拆分（组件无测试挂载设施，需先补行为特征测试） |
 
+| B269① | 2026-10-26 | **同名 `@JsonProperty` 摘除 104 处（record 面 + mixin 钉序面）**：GitLabClient 13 / FeishuApiTypes 45 / DocxBlocks 27 / ExtraFieldConfig 8 / Config 2 / queue payload `tracing` 2 / mixin `@JsonPropertyOrder` 钉序 7；顺手修 `AgentFinalAnswerData` javadoc `is_fallback`→`isFallback`。**G2 class 面（~110 处）实证回退**：临时序快照 harness 证明混改名 class 删同名即全类型字段序重排 + `AuthServerMetadata.issuer` 整键消失（setter-only 可见性）——序锚 doctrine 对 class 面无条件成立；record 面零漂移（序=声明序定理实证）。方案+审计读数：`docs/internal/plans/jackson-annotation-hygiene-b269.md` | 归一化快照 diff 零差 · 48 守卫绿 · 四模块 test 绿（contract-sync/json-key-case 零触碰）|
+
+| B269② | 2026-10-26 | **冗余 `@JsonIgnoreProperties(ignoreUnknown=true)` 摘除 99 处（B8 重裁为全删）**：依据=Jackson 3 `FAIL_ON_UNKNOWN_PROPERTIES` 默认已翻转 + `WebConfig`/`JsonMappers.lenient()` 双路径显式禁用 + 8 处手工 mapper 审计 0 黄区；32 文件连带摘空 import；R 类 3 处保留 value 部分（`outputFiles`/`retractType`/`endpoint` 历史键屏蔽承重）；D 类死重 3 文件整删 | spotless 绿 · 48 守卫绿 · 六模块 test 绿 |
+
+| B269③ | 2026-10-26 | **守卫收紧 + 存量假绿缺陷修复**：金丝雀暴露 `SourceRoots.backend()` 契约错配（调用方传 `"main/java"`、内部再拼 `/java`）⇒ `JsonPropertyHygieneTest` 与 boot `ArchitectureRulesTest`/`ClasspathResourcesTest` **自 2026-10-10 起空扫描假绿**；修三处传参唤醒，四模块真扫描零存量违规。`memberAfter` 多行注解感知（`tracing` 族漏检根因）；混改名整文件跳过细化（record 分量豁免）；`SourceRoots.MODULES` 扩 model-runtime+platform；唤醒后唯一新违规 `MemoryExtractPayload`（Go 队列事故原型，现为 record）language/tracing 同名注解——字节校验零差后删（累计 106） | spotless 绿 · 48 守卫绿 · domains+boot 全测试绿（唤醒的 Architecture 22/ClasspathResources 2/ContractBoundary 6 全过）· 事故原型载荷改前/改后字节零差 |
+
+| B269④ | 2026-10-26 | **面收敛盘点（doc-only）**：清理后剩余 `@JsonProperty` 467 处全部分布在外部协议镜像（连接器 223/模型 73/OAuth 21/Langfuse 7）、SSE 契约 mixin 权威面（108，即终态）、jsonb 落库键（~16）、散点 REST DTO（~19，建议维持+新增执行 knowledge 规则）——**无下一批机械清理项**，防回流由真扫描守卫承担 | 盘点表落 `jackson-annotation-hygiene-b269.md` §④ |
+
 （历史 B232~B267 与 v0.3.0 前段全部记录 → 归档 `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md`；追溯：`git log --grep="(B###)"`）
 
 

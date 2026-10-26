@@ -58,9 +58,22 @@
 - `SourceRoots.MODULES` 扩 model-runtime + platform
 - 类 javadoc 补 B269 判例（record 零漂移 / class 必重排 / B8 重裁）
 
-## B269④ 面收敛盘点（doc-only）
+## B269④ 面收敛盘点（doc-only，清理后读数 2026-10-26）
 
-剩余 `@JsonProperty` 改名键按面分类（外部 API 镜像 / jsonb 落库 / REST 响应 / SSE 契约 / 模型协议），逐面给出「可否收敛到 knowledge 规则」与代价，供拍板。不在本批动代码。
+B269①~③ 后全仓剩余 `@JsonProperty`（改名/承重）467 处，按面分类与收敛判定：
+
+| 面 | 处数 | 代表 | 可否收敛到 knowledge 规则（键名=Java 字段名） |
+|---|---|---|---|
+| 外部 API 镜像（连接器） | 223 | Feishu/GitLab/Yuque/Ima/Notion | **不可**——键名由外部 API 定死；唯一出路是同名注解（本批已清 record 面），class 面由序锚 doctrine 保护 |
+| SSE/契约 mixin 权威面 | 108 | `ContractJsonMixins*` | **已收敛**——注解集中在 6 个 mixin 文件即终态；snake 键是前端契约（B72-B75 锚定），换键=换契约 |
+| 模型协议镜像 | 73 | Anthropic/Ollama/llm provider | **不可**——OpenAI/Anthropic/Ollama 线协议定死（`max_tokens`/`top_p` 等） |
+| OAuth 协议镜像 | 21 | mcp/oauth | **不可**——RFC 8414/OIDC 注册协议键 |
+| jsonb 落库/队列载荷 | ~16 | memory/wiki 载荷 | **语义性保留**——落库键即迁移面（jsonb 已有存量数据），换键需数据迁移；record 同名已清 |
+| Langfuse 上报 | 7 | `LangfuseTokenUsage`/`TracingContext` | **不可**——Langfuse ingestion 协议（`lf_*`/token 键） |
+| 其余散点 | ~19 | session/websearch/storage 等 REST DTO | **逐面可议**——前后端同仓，理论可向 knowledge 规则收敛，但每处都是换线键=前端联动改动；收益（~19 处注解）对代价（逐面契约迁移）不划算，**建议维持现状**，新增 DTO 执行 knowledge 规则 |
+
+结论：**无下一批机械清理项**。剩余 467 处全部落在「外部协议镜像」或「已集中/已锚定」面上，逐字段注解在
+这些面是线格式文档而非噪音。防回流由收紧后的 `JsonPropertyHygieneTest`（四模块真扫描）承担。
 
 ## 非目标
 
