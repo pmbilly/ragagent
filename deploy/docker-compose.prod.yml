@@ -69,7 +69,8 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: ragagent-ui:${APP_VERSION:-latest}
+    # 前后端分开打 tag：只改前端时不必重传/重建后端镜像
+    image: ragagent-ui:${UI_VERSION:-latest}
     container_name: RagAgent-frontend
     environment:
       APP_HOST: app
