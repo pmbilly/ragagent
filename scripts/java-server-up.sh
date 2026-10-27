@@ -55,7 +55,8 @@ mvn -B -q -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -pl boot -am package 
 
 # 运行副本：任何一次 mvn package/install 都会覆盖 boot/target/*.jar，
 # 运行中的进程若直接指向它，懒加载类会 ClassNotFoundException（本地踩过 3 次）。
-RUN_DIR="boot/target/run"
+# 放在用户主目录：不进仓库、mvn clean 也碰不到（本地已踩过 target/ 下的副本被 clean 删掉）
+RUN_DIR="${HOME}/.ragagent/run"
 mkdir -p "${RUN_DIR}"
 cp -f boot/target/boot-0.0.1-SNAPSHOT.jar "${RUN_DIR}/boot.jar"
 

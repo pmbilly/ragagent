@@ -70,7 +70,7 @@ export default {
       },
       knowledge: {
         title: '建立你的知識庫',
-        desc: '一切從這裡開始：上傳文件、網頁或常見問題，WeKnora 會自動解析並建立索引。按一下這裡開啟知識庫。'
+        desc: '一切從這裡開始：上傳文件、網頁或常見問題，RagAgent 會自動解析並建立索引。按一下這裡開啟知識庫。'
       },
       chat: {
         title: '開始 AI 對話',

@@ -25,6 +25,9 @@ frontend/package.json.md5
 # OS
 .DS_Store
 
+# 部署镜像构建暂存（jar/dist/镜像 tar，由 deploy/build-images.sh 生成）
+deploy/.build/
+
 # 本地环境
 .env
 *.local

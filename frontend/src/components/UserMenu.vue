@@ -105,11 +105,13 @@
           including tenant Owners. Real authorisation lives server-side
           (RequireSystemAdmin middleware); this is UI gating only.
         -->
+        <template v-if="authStore.isSystemAdmin">
         <div class="menu-divider"></div>
-        <div v-if="authStore.isSystemAdmin" class="menu-item" @click="handleSystemAdmin">
+        <div class="menu-item" @click="handleSystemAdmin">
           <t-icon name="server" class="menu-icon" />
           <span>{{ $t('settings.navGroups.systemAdministration') }}</span>
         </div>
+        </template>
         <!-- <div class="menu-divider"></div> -->
         <!-- <div class="menu-item" @click="openDocs">
           <t-icon name="help-circle" class="menu-icon" />

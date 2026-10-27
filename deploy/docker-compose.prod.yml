@@ -1,0 +1,87 @@
+# ragagent 单机生产编排。
+# 镜像由 deploy/build-images.sh 在本机构建后 `docker load` 到服务器（服务器不构建）。
+# 对外只暴露前端且绑回环：宿主 nginx（agent.pmbilly.com）反代 127.0.0.1:8000，后端不出网。
+name: ragagent
+
+services:
+  postgres:
+    image: paradedb/paradedb:v0.22.2-pg17
+    container_name: RagAgent-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD 未设置}
+      POSTGRES_DB: ${DB_NAME:-RagAgent}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-RagAgent}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: RagAgent-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  docreader:
+    image: wechatopenai/weknora-docreader:latest
+    container_name: RagAgent-docreader
+    restart: unless-stopped
+
+  app:
+    image: ragagent-server:${APP_VERSION:-latest}
+    container_name: RagAgent-app
+    environment:
+      DB_DRIVER: postgres
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD 未设置}
+      DB_NAME: ${DB_NAME:-RagAgent}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      DOCREADER_ADDR: docreader:50051
+      RETRIEVE_DRIVER: postgres
+      SERVER_PORT: "8080"
+      LOCAL_STORAGE_BASE_DIR: /app/data/files
+      SYSTEM_AES_KEY: ${SYSTEM_AES_KEY:?SYSTEM_AES_KEY 未设置}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET 未设置}
+      SPRINGDOC_ENABLED: "false"
+    volumes:
+      - data-files:/app/data/files
+    # 宿主 3.6G 内存且与 maxkb 等栈共处：1.2G 上限 ⇒ 镜像 ENTRYPOINT 的
+    # MaxRAMPercentage=75 折算为约 900M 堆，留出 metaspace/线程与邻居栈的余量。
+    mem_limit: 1200m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      docreader:
+        condition: service_started
+    restart: unless-stopped
+
+  frontend:
+    image: ragagent-ui:${APP_VERSION:-latest}
+    container_name: RagAgent-frontend
+    environment:
+      APP_HOST: app
+      APP_PORT: "8080"
+      MAX_FILE_SIZE_MB: "50"
+    ports:
+      - "127.0.0.1:8000:80"
+    depends_on:
+      app:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  data-files:

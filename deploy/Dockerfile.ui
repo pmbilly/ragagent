@@ -1,0 +1,20 @@
+# 生产前端镜像（运行期）——dist 与 nginx 配置由 deploy/build-images.sh 本机构建后暂存、COPY 进来。
+# 与 frontend/Dockerfile 的运行时阶段一致（同一 nginx 固定摘要、同一套模板与入口脚本）。
+FROM nginx:1.30.3-alpine@sha256:0d3b80406a13a767339fbe2f41406d6c7da727ab89cf8fae399e81f780f814d1
+
+COPY dist /usr/share/nginx/html
+
+COPY nginx.conf /etc/nginx/templates/default.conf.template
+
+# 放在 templates/ 之外：envsubst 会吃掉其中 $host 等 nginx 变量。
+COPY nginx-api-proxy.conf /etc/nginx/api-proxy.conf
+COPY nginx-http.conf /etc/nginx/conf.d/00-weknora-http.conf
+
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+ENV MAX_FILE_SIZE_MB=50
+
+EXPOSE 80
+
+ENTRYPOINT ["/docker-entrypoint.sh"]

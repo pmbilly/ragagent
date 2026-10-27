@@ -4373,7 +4373,7 @@ export default {
     registerSuccess: '注册成功，请登录',
     registerFailed: '注册失败',
     subtitle: 'RAG 问答、ReAct 智能体与 Wiki 知识库，大模型驱动的企业级知识框架',
-    registerSubtitle: '创建账户并开始使用 WeKnora',
+    registerSubtitle: '创建账户并开始使用 RagAgent',
     emailPlaceholder: '输入邮箱地址',
     passwordPlaceholder: '输入密码',
     confirmPasswordPlaceholder: '再次输入密码',
@@ -6014,7 +6014,7 @@ export default {
       },
       knowledge: {
         title: '创建你的知识库',
-        desc: '知识库是一切的起点：上传文档、网页或 FAQ，WeKnora 会自动解析并建立索引。点击这里进入知识库。'
+        desc: '知识库是一切的起点：上传文档、网页或 RagAgent 会自动解析并建立索引。点击这里进入知识库。'
       },
       welcome: {
         title: '欢迎使用 RagAgent',
