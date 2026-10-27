@@ -50,14 +50,20 @@ JAVA_BIN="${JAVA_HOME:+${JAVA_HOME}/bin/}java"
 # 先构建再起 jar：Maven 的 spring-boot:run 在多模块 reactor 里会对每个 -am 模块执行该 goal，
 # 非组合根模块没有主类 ⇒ 直接用 package + java -jar。工作目录是仓库根，
 # application.yml 的相对路径（build/generated-migrations）口径不变。
-mvn -B -q -Dmaven.test.skip=true -pl boot -am package >> "${LOG}" 2>&1 \
+mvn -B -q -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -pl boot -am package >> "${LOG}" 2>&1 \
     || { echo "✗ 构建失败，见 ${LOG}"; exit 1; }
+
+# 运行副本：任何一次 mvn package/install 都会覆盖 boot/target/*.jar，
+# 运行中的进程若直接指向它，懒加载类会 ClassNotFoundException（本地踩过 3 次）。
+RUN_DIR="boot/target/run"
+mkdir -p "${RUN_DIR}"
+cp -f boot/target/boot-0.0.1-SNAPSHOT.jar "${RUN_DIR}/boot.jar"
 
 SERVER_PORT="${JAVA_PORT}" \
 JWT_SECRET="${JWT_SECRET}" \
 SYSTEM_AES_KEY="${SYSTEM_AES_KEY}" \
 LOCAL_STORAGE_BASE_DIR="${LOCAL_STORAGE_BASE_DIR}" \
-"${JAVA_BIN}" -jar boot/target/boot-0.0.1-SNAPSHOT.jar >> "${LOG}" 2>&1 &
+"${JAVA_BIN}" -jar "${RUN_DIR}/boot.jar" >> "${LOG}" 2>&1 &
 
 echo "==> waiting for readiness（Spring 启动 + Flyway 校验，约 20-40 秒）"
 wait_for_port "${JAVA_PORT}" /api/v1/knowledge-bases 40

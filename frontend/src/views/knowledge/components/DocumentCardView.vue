@@ -790,7 +790,7 @@ const handleAction = (action: 'download' | 'edit' | 'view-trace' | 'reparse' | '
   flex-direction: column;
   border: 1px solid var(--td-component-border);
   height: 136px;
-  border-radius: 8px;
+  border-radius: 4px;
   overflow: hidden;
   box-sizing: border-box;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
