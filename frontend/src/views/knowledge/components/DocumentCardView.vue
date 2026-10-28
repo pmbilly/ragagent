@@ -355,11 +355,11 @@ const handleAction = (action: 'download' | 'edit' | 'view-trace' | 'reparse' | '
               class="card-select-checkbox"
               size="small"
               :checked="selectedIds.has(item.id)"
-              :title="item.fileName"
+              :title="item.title || item.fileName"
               @change="(checked: boolean, ctx?: { e?: Event }) => emit('toggle-checkbox', item.id, checked, ctx)"
             />
           </div>
-          <span class="card-content-title" :title="item.fileName">{{ item.fileName }}</span>
+          <span class="card-content-title" :title="item.title || item.fileName">{{ item.title || item.fileName }}</span>
           <t-popup
             v-if="canEdit"
             v-model="item.isMore"
@@ -629,7 +629,7 @@ const handleAction = (action: 'download' | 'edit' | 'view-trace' | 'reparse' | '
       :style="{ left: cardPopoverPos.x + 'px', top: cardPopoverPos.y + 'px' }"
     >
       <template v-if="hoveredCardItem">
-        <div class="card-popover-title">{{ hoveredCardItem.fileName }}</div>
+        <div class="card-popover-title">{{ hoveredCardItem.title || hoveredCardItem.fileName }}</div>
         <div
           v-if="hoveredCardItem.parseStatus === 'failed' && hoveredCardItem.errorMessage"
           class="card-popover-desc card-popover-error"

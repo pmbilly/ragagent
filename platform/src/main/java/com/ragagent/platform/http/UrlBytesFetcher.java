@@ -26,9 +26,13 @@ public final class UrlBytesFetcher {
     private UrlBytesFetcher() {
     }
 
+    /** 抓取结果：响应体 + 响应头 {@code Content-Type}（可能为空串）。 */
+    public record FetchedUrl(byte[] body, String contentType) {
+    }
+
     /** 抓取并做大小上限校验（不额外做 SSRF 校验——调用方已在更外层校验时用）。 */
     public static byte[] fetch(String url) {
-        return fetch(url, null);
+        return fetchWithMeta(url, null).body();
     }
 
     /**
@@ -37,10 +41,19 @@ public final class UrlBytesFetcher {
      *                  由调用方归类（HTTP 400 / 同步条目失败）
      */
     public static byte[] fetch(String url, Consumer<String> ssrfCheck) {
+        return fetchWithMeta(url, ssrfCheck).body();
+    }
+
+    /**
+     * 同 {@link #fetch(String, Consumer)}，但保留响应头 Content-Type——
+     * 无扩展名的网页 URL 靠它判定 html/pdf/image，不再把类型猜成空串。
+     */
+    public static FetchedUrl fetchWithMeta(String url, Consumer<String> ssrfCheck) {
         if (ssrfCheck != null) {
             ssrfCheck.accept(url);
         }
         byte[] body;
+        String contentType;
         try {
             HttpClient client = HttpClient.newBuilder()
                     .followRedirects(HttpClient.Redirect.NORMAL)
@@ -56,6 +69,7 @@ public final class UrlBytesFetcher {
                 throw new BizException(AppError.badRequest("failed to fetch URL: HTTP " + resp.statusCode()));
             }
             body = resp.body();
+            contentType = resp.headers().firstValue("Content-Type").orElse("");
         } catch (BizException e) {
             throw e;
         } catch (Exception e) {
@@ -65,6 +79,6 @@ public final class UrlBytesFetcher {
             throw new BizException(AppError.badRequest(
                     String.format("文件大小不能超过%dMB", UploadLimits.maxFileSizeMb())));
         }
-        return body;
+        return new FetchedUrl(body, contentType);
     }
 }

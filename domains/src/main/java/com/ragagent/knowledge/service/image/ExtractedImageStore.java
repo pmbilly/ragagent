@@ -8,6 +8,7 @@ import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.platform.knowledge.ImageRefRewriter;
 import com.ragagent.platform.text.ContentTypeByFilename;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -35,17 +36,23 @@ public class ExtractedImageStore {
     private final TenantFileStorage fileStorage;
     private final ResourceCatalogPort resourceCatalog;
     private final ChunkRepository chunkRepository;
+    private final RemoteImageRefs remoteImageRefs;
 
     public ExtractedImageStore(TenantFileStorage fileStorage, ResourceCatalogPort resourceCatalog,
-            ChunkRepository chunkRepository) {
+            ChunkRepository chunkRepository, RemoteImageRefs remoteImageRefs) {
         this.fileStorage = fileStorage;
         this.resourceCatalog = resourceCatalog;
         this.chunkRepository = chunkRepository;
+        this.remoteImageRefs = remoteImageRefs;
     }
 
     /** 落盘 + 绑定 + 改写正文引用；返回改写后的 markdown。 */
     public String storeAndRewrite(Knowledge k, List<ImageRefRewriter.RefRow> rows, String markdown) {
-        if (rows == null || rows.isEmpty()) {
+        // 网页正文里的外链图片不在 docreader imageRefs 里，导入时补下载（失败保留原链接）
+        List<ImageRefRewriter.RefRow> merged = new ArrayList<>(
+                rows == null ? List.of() : rows);
+        merged.addAll(remoteImageRefs.collect(markdown, k.getSource()));
+        if (merged.isEmpty()) {
             return markdown;
         }
         long tenantId = k.getTenantId() == null ? 0L : k.getTenantId();
@@ -55,7 +62,7 @@ public class ExtractedImageStore {
         }
         // 来源文件本身是图片格式时保留原图（不做小图标过滤）
         boolean filterIcons = !ContentTypeByFilename.isImageExt(k.getFileType());
-        ImageRefRewriter.Result result = ImageRefRewriter.rewrite(markdown, rows, filterIcons,
+        ImageRefRewriter.Result result = ImageRefRewriter.rewrite(markdown, merged, filterIcons,
                 (data, fileName) -> storeOne(tenantId, k.getId(), data, fileName,
                         mimeTypeOf(fileName)));
         if (!result.stored().isEmpty()) {

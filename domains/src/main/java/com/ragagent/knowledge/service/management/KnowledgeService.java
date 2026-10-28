@@ -189,7 +189,8 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     public Knowledge createFromUrl(String kbId, String url, String fileName, String fileType,
                                    String title, String channel) {
         KnowledgeBase kb = requireKb(kbId);
-        byte[] content = UrlBytesFetcher.fetch(url);
+        UrlBytesFetcher.FetchedUrl fetched = UrlBytesFetcher.fetchWithMeta(url, null);
+        byte[] content = fetched.body();
         String hash = LocalStorageService.md5Hex(content);
         Knowledge dup = knowledgeRepository.findDuplicateBySource(kbId, url);
         if (dup != null) {
@@ -197,11 +198,16 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
                     "URL 已存在");
         }
         String fname = fileName != null && !fileName.isEmpty() ? fileName : KnowledgePaths.extractFileNameFromUrl(url);
-        Knowledge k = newKnowledge(kb, "file", title != null && !title.isEmpty() ? title : fname, channel);
+        String resolvedType = UrlFileTypes.resolve(fileType, fname, fetched.contentType());
+        // 标题优先级：显式 title > 页面 <title> > 文件名（URL 末段）
+        String htmlTitle = "html".equals(resolvedType)
+                ? HtmlTitles.extract(content, fetched.contentType()) : null;
+        String resolvedTitle = title != null && !title.isEmpty() ? title
+                : (htmlTitle != null ? htmlTitle : fname);
+        Knowledge k = newKnowledge(kb, "file", resolvedTitle, channel);
         k.setSource(url);
         k.setFileName(fname);
-        k.setFileType(fileType != null && !fileType.isEmpty() ? fileType
-                : (fname.contains(".") ? fname.substring(fname.lastIndexOf('.') + 1).toLowerCase() : ""));
+        k.setFileType(resolvedType);
         k.setFileSize((long) content.length);
         k.setFileHash(hash);
         k.setFilePath(fileStorage.save(tenantId(), k.getId(), fname, content));

@@ -60,7 +60,7 @@ class ExtractedImageStoreTest {
     };
 
     private final ExtractedImageStore store =
-            new ExtractedImageStore(fileStorage, catalog, chunkRepository);
+            new ExtractedImageStore(fileStorage, catalog, chunkRepository, mock(RemoteImageRefs.class));
 
     @BeforeEach
     void stubSaves() {

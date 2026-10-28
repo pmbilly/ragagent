@@ -10,6 +10,7 @@ import com.ragagent.knowledge.domain.span.SpanTracker;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.service.image.ExtractedImageStore;
 import com.ragagent.knowledge.storage.TenantFileStorage;
+import com.ragagent.knowledge.support.HtmlMainContent;
 import com.ragagent.platform.knowledge.ImageRefRewriter;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,10 @@ final class KnowledgeTextExtractor {
         try {
             byte[] content = fileStorage.read(
                     k.getTenantId() == null ? 0L : k.getTenantId(), k.getFilePath());
+            // 网页只送主体给解析器：导航/页头/页脚不进正文（抽取失败时退回原文）
+            if ("html".equals(k.getFileType())) {
+                content = HtmlMainContent.extract(content);
+            }
             DocReaderClient.ParseResult parsed = docReader.read(
                     content, k.getFileName(), k.getFileType(), k.getTitle(),
                     resolveParserEngine(k));

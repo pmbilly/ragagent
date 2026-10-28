@@ -15,6 +15,8 @@ interface Tag {
 interface KnowledgeItem {
   id: string;
   fileName: string;
+  /** 文档标题（网页导入时取页面 <title>）；展示优先于文件名 */
+  title?: string;
   folderPath?: string;
   fileType?: string;
   fileSize?: number | string;
@@ -305,7 +307,7 @@ const handleAction = (action: 'download' | 'edit' | 'reparse' | 'cancel-parse' |
         :class="{ selected: selectedIds.has(item.id), 'menu-open': moreOpen === item.id }" :data-select-id="item.id"
         role="row" @click="emit('open', item)">
         <div class="cell cell-check" @click.stop>
-          <t-checkbox class="doc-list-check" size="small" :checked="selectedIds.has(item.id)" :title="item.fileName"
+          <t-checkbox class="doc-list-check" size="small" :checked="selectedIds.has(item.id)" :title="item.title || item.fileName"
             @change="(c: boolean, ctx?: { e?: Event }) => onRowCheckboxChange(item, c, ctx)" />
         </div>
 
@@ -314,7 +316,7 @@ const handleAction = (action: 'download' | 'edit' | 'reparse' | 'cancel-parse' |
             <t-icon :name="getFileIcon(item)" />
           </span>
           <div class="row-file-text">
-            <span class="row-file-name" :title="item.fileName">{{ item.fileName }}</span>
+            <span class="row-file-name" :title="item.title || item.fileName">{{ item.title || item.fileName }}</span>
             <button v-if="showFolderPath && item.folderPath" type="button" class="row-file-folder"
               :title="item.folderPath" @click.stop="emit('open-folder', item.folderPath)">
               <t-icon name="folder" />
