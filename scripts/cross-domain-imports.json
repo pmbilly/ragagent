@@ -91,8 +91,14 @@
     {
       "from": "wiki",
       "to": "knowledge",
+      "target": "adapter",
+      "imports": 5
+    },
+    {
+      "from": "wiki",
+      "to": "knowledge",
       "target": "api",
-      "imports": 6
+      "imports": 1
     }
   ],
   "contractImports": [

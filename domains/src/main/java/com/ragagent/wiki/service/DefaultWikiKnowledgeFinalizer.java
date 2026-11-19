@@ -1,7 +1,7 @@
 package com.ragagent.wiki.service;
 
 import com.ragagent.knowledge.api.FinalizeResult;
-import com.ragagent.knowledge.api.KnowledgeFinalizeAdapter;
+import com.ragagent.knowledge.adapter.KnowledgeFinalizeAdapter;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import org.slf4j.Logger;

@@ -10,7 +10,7 @@ import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import com.ragagent.contract.knowledge.KnowledgeView;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.knowledge.api.ChunkPortAdapter;
+import com.ragagent.knowledge.adapter.ChunkPortAdapter;
 import com.ragagent.platform.access.TenantScopes;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.WikiConstants;

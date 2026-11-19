@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.api;
+package com.ragagent.knowledge.adapter;
 
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.knowledge.client.DocReaderClient;

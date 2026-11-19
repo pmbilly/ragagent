@@ -28,7 +28,7 @@ import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTextUtil;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.contract.websearch.WebSearchResult;
-import com.ragagent.knowledge.api.KnowledgeBaseLookupAdapter;
+import com.ragagent.knowledge.adapter.KnowledgeBaseLookupAdapter;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;

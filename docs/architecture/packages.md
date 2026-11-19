@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-359 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+360 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -149,7 +149,8 @@
 | `:domains` | `com.ragagent.initialization.dto` | initialization 的模型视图投影（com.ragagent.initialization.dto.ModelViews）。 |
 | `:domains` | `com.ragagent.initialization.service` | initialization 用例实现：初始化配置（com.ragagent.initialization.service.InitializationConfigService）、 模型连通性测试、 |
 | `:domains` | `com.ragagent.knowledge` | 知识库域：知识的存储、处理管线与检索面。 |
-| `:domains` | `com.ragagent.knowledge.api` | 知识库 · 端口实现：KnowledgeChunkPipelineAdapter / KnowledgeBaseCatalogAdapter / KnowledgeFinalizeAdapter…。 |
+| `:domains` | `com.ragagent.knowledge.adapter` | 知识库 · 端口实现（11 个）：ChunkPort / KnowledgeCatalog / KnowledgeBaseCatalog / KnowledgeBaseLookup / Knowled |
+| `:domains` | `com.ragagent.knowledge.api` | 知识库 · 域内视图：com.ragagent.knowledge.api.FinalizeResult（wiki 等域消费入库收尾结果）。 |
 | `:domains` | `com.ragagent.knowledge.chunker` | 知识库 · 分块：HeuristicSplitter / DocumentProfiler / HeadingHierarchy…。 |
 | `:domains` | `com.ragagent.knowledge.client` | 知识库出站客户端：DocReaderClient（文档解析服务）。 |
 | `:domains` | `com.ragagent.knowledge.config` | 知识库 · 配置：HousekeepingProperties / BatchEmbedProperties / DocReaderProperties。 |

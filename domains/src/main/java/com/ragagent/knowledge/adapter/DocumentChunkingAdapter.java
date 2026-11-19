@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.api;
+package com.ragagent.knowledge.adapter;
 
 import com.ragagent.contract.knowledge.DocumentChunkingPort;
 import com.ragagent.knowledge.chunker.Chunker;

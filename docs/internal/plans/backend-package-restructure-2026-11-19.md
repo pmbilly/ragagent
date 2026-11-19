@@ -74,7 +74,7 @@
 | 3 | `auth` | ✅ 2026-11-19 |
 | 4 | `storage` | ✅ 2026-11-19 |
 | 5 | `session` | ✅ 2026-11-19 |
-| 11 | `knowledge` | 待做 |
+| 11 | `knowledge` | ✅ 2026-11-19 |
 
 无 `api/` 的 8 个域跳过：`favorite` · `system` · `vectorstore` · `embedchannel` · `im` · `datasource` · `agenttools` · `initialization`。
 
@@ -82,7 +82,14 @@
 
 ### 4.3 已知阻塞项
 
-`knowledge ⇄ wiki` 域级循环：`knowledge/task/KnowledgeProcessWiring` 引 `wiki.service.*`，反向 5 个文件引 `knowledge.api.*`，且是**实现类直连**而非 Port。P1 规则 4 上线后第一天会红，必须在 P3 之前解开（建议：`wiki` 侧改为实现 `knowledge` 在 `api` 声明的接口，或下沉为事件）。
+`knowledge ⇄ wiki` 域级循环。P2-7 移动后确认**两边都是实现类直连**（不是 Port）：
+
+| 方向 | 位置 | 处数 |
+|---|---|---|
+| `knowledge -> wiki.service` | `KnowledgeProcessWiring` / `KnowledgeFinalizingStage` / `ChunkExtractService` / `QuestionGenerationService` | 7 |
+| `wiki -> knowledge.adapter` | `DefaultWikiChunkCleaner` / `DefaultWikiKnowledgeFinalizer` / `WikiIngestBatchHandler` / `WikiIngestCitePipeline` / `DefaultWikiImageEnricher` | 5 |
+
+解环方向：`wiki` 侧改为注入 `contract.knowledge` 的 `ChunkPort` / `KnowledgeFinalizePort`（Adapter 已实现这些契约，按接口注入即可，不动逻辑）；`knowledge` 侧改依赖 wiki 声明的回调端口或下沉为事件。必须在 P3 之前单独一批完成，不与包移动混做。
 
 ## 5. "搬家漏登记"风险清单
 

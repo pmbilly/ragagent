@@ -6,7 +6,7 @@ import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.knowledge.api.ChunkPortAdapter;
+import com.ragagent.knowledge.adapter.ChunkPortAdapter;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.domain.WikiExtractionGranularity;
 import com.ragagent.wiki.prompt.WikiPrompts;

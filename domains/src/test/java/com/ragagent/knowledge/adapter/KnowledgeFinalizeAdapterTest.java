@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.api;
+package com.ragagent.knowledge.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.ragagent.knowledge.api.FinalizeResult;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.repository.IngestStateRepository;

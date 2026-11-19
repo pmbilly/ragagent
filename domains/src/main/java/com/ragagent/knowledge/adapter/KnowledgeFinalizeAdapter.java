@@ -1,5 +1,6 @@
-package com.ragagent.knowledge.api;
+package com.ragagent.knowledge.adapter;
 
+import com.ragagent.knowledge.api.FinalizeResult;
 import com.ragagent.knowledge.repository.IngestStateRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import java.time.OffsetDateTime;

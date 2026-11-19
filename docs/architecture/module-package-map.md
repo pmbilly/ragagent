@@ -13,7 +13,7 @@
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 20 | 158 | 0 |
 | `:retrieval-engine` | `retrieval` | 15 | 95 | 0 |
 | `:agent-engine` | `agent` | 9 | 72 | 0 |
-| `:domains` | `agentmanagement`、`agenttools`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 254 | 1644 | 51 |
+| `:domains` | `agentmanagement`、`agenttools`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 255 | 1645 | 51 |
 | `:boot` | `(根包)`、`config` | 2 | 19 | 0 |
 
 ## 19 个业务域（domains）
@@ -29,7 +29,7 @@
 | `favorite` | `com.ragagent.favorite` | 13 | 1 |
 | `im` | `com.ragagent.im` | 106 | 2 |
 | `initialization` | `com.ragagent.initialization` | 11 | 1 |
-| `knowledge` | `com.ragagent.knowledge` | 283 | 8 |
+| `knowledge` | `com.ragagent.knowledge` | 284 | 8 |
 | `mcp` | `com.ragagent.mcp` | 171 | 4 |
 | `memory` | `com.ragagent.memory` | 92 | 1 |
 | `model` | `com.ragagent.model` | 38 | 4 |
@@ -64,5 +64,5 @@
 
 ## 相关
 
-- [`packages.md`](packages.md)：359 份 `package-info` 的包级职责索引。
+- [`packages.md`](packages.md)：360 份 `package-info` 的包级职责索引。
 - [`overview.md`](overview.md)：模块依赖图、设计原则、代码在哪。

@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.api;
+package com.ragagent.knowledge.adapter;
 
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.knowledge.projection.ChunkProjectionAdapter;
