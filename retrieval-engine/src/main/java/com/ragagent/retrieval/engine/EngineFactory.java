@@ -2,10 +2,10 @@ package com.ragagent.retrieval.engine;
 
 
 import com.ragagent.contract.vectorstore.ConnectionConfig;
-import com.ragagent.contract.vectorstore.EnvStoreIds;
 import com.ragagent.contract.vectorstore.IndexConfig;
-import com.ragagent.contract.vectorstore.VectorStoreView;
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.retrieval.api.EnvStoreIds;
+import com.ragagent.retrieval.api.VectorStoreView;
 import com.ragagent.retrieval.engine.doris.DorisRetrieveRepository;
 import com.ragagent.retrieval.engine.elasticsearch.ElasticsearchV7RetrieveRepository;
 import com.ragagent.retrieval.engine.elasticsearch.ElasticsearchV8RetrieveRepository;
@@ -21,7 +21,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * 检索引擎工厂——从 {@link com.ragagent.contract.vectorstore.VectorStoreView} 配置按引擎类型构建检索引擎服务，
+ * 检索引擎工厂——从 {@link com.ragagent.retrieval.api.VectorStoreView} 配置按引擎类型构建检索引擎服务，
  * 并承担运行时地址的 SSRF 校验。
  *
  * <p><b>构造与地址策略在同一张注册表登记</b>（{@link EngineSpec}）：新增引擎时两者不可能分开漏改。

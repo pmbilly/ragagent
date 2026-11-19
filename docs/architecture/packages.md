@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-360 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+361 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -46,7 +46,7 @@
 | `:contract` | `com.ragagent.contract.tenant` | 租户契约面：租户角色等跨域值对象。 |
 | `:contract` | `com.ragagent.contract.text` | 契约文本工具面：契约载荷共用的纯 JDK 文本原语 （TextConv / CodePoints / Tokens / 空白与语言判定）。 |
 | `:contract` | `com.ragagent.contract.tool` | 工具契约面：工具执行结果载荷与工具取消/能力词汇。 |
-| `:contract` | `com.ragagent.contract.vectorstore` | 向量库契约面：环境 store id、查找端口与视图。 |
+| `:contract` | `com.ragagent.contract.vectorstore` | 向量库配置形状：ConnectionConfig 与 IndexConfig。 |
 | `:contract` | `com.ragagent.contract.websearch` | 契约 · 网页搜索：WebSearchTempStatePort / WebSearchProviderPort / PipelinePageFetcher…。 |
 | `:contract` | `com.ragagent.contract.wiki` | Wiki 契约面：摄取/收尾端口与图片标记。 |
 | `:domains` | `com.ragagent.agentmanagement` | 智能体管理面：内建智能体注册表与类型预设、自定义智能体 CRUD（custom_agents）、 技能目录、推荐问题流与 agent config jsonb。 |
@@ -351,6 +351,7 @@
 | `:platform` | `com.ragagent.platform.web.error` | 平台错误面：`BizException` 家族（含 `GuardForbiddenException`、`PlainErrorException`）、统一响应外壳的错误分派与全局异常处理器。 |
 | `:platform` | `com.ragagent.platform.web.health` | 平台健康检查面。 |
 | `:retrieval-engine` | `com.ragagent.retrieval` | 检索引擎域（库式域，**无 HTTP 面**）：多引擎仓储（engine/：OpenSearch/Doris/Milvus/Qdrant/Tencent…， 含 postgres 引擎的 embedd |
+| `:retrieval-engine` | `com.ragagent.retrieval.api` | 检索引擎的对外契约：向量库查找端口、视图、必填字段与引擎类型。 |
 | `:retrieval-engine` | `com.ragagent.retrieval.artifact` | 检索 · artifact：ArtifactReferenceRewriter。 |
 | `:retrieval-engine` | `com.ragagent.retrieval.config` | 检索 · 配置：RetrievalEnvLookup。 |
 | `:retrieval-engine` | `com.ragagent.retrieval.engine` | 检索 · 引擎：KeywordsVectorHybridRetrieveEngineService / PgVectorRetrieveRepository / RetrieveEngineRepository…。 |

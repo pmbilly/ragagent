@@ -26,6 +26,10 @@
     </dependency>
     <dependency>
       <groupId>com.ragagent</groupId>
+      <artifactId>retrieval-engine</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.ragagent</groupId>
       <artifactId>platform</artifactId>
     </dependency>
     <dependency>

@@ -1,4 +1,4 @@
-package com.ragagent.contract.vectorstore;
+package com.ragagent.retrieval.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.engine;
 
-import com.ragagent.contract.vectorstore.VectorEngineTypes;
+import com.ragagent.retrieval.api.VectorEngineTypes;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import java.util.List;
 import java.util.Map;

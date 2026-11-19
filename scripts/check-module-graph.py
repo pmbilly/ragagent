@@ -8,7 +8,9 @@
     model-runtime  → contract, platform
     retrieval-engine → contract, platform
     agent-engine   → contract, platform, model-runtime   （modelcontext = 方案认可的终态边）
-    domains        → contract, platform, model-runtime   （仅 modelcontext；其余已在 R2c-3d 清零）
+    domains        → contract, platform, model-runtime, retrieval-engine
+                     （model-runtime 仅 modelcontext；retrieval-engine 因 vectorstore 契约
+                      归位到 retrieval.api 而新增，retrieval-engine 不反向依赖 domains，不成环）
     boot           → 全部（组合根）
 
 本守卫的判据（A~E）：
@@ -60,7 +62,7 @@ ALLOWED_MAIN: dict[str, set[str]] = {
     # modelcontext：agent 工具注册表/流解码属模型侧词汇，方案明示为 agent-engine 的合法终态边
     "agent-engine": {"contract", "platform", "model-runtime"},
     # modelcontext：同上（4 处；R2c-3d 已把其余模型族边清零）
-    "domains": {"contract", "platform", "model-runtime"},
+    "domains": {"contract", "platform", "model-runtime", "retrieval-engine"},
     "boot": set(MODULES[:-1]),  # 组合根
 }
 

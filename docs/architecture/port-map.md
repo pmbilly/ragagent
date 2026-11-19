@@ -7,7 +7,7 @@
 
 - 域间（解耦）：**28**
 - 复合面（随复合端口）：**7**
-- 跨模块（必要）：**12**
+- 跨模块（必要）：**11**
 
 ## 明细
 
@@ -55,7 +55,6 @@
 | `TenantStorageQuotaPort` | `TenantStorageQuotaAdapter` | domains | knowledge、system | 域间（解耦） |
 | `ToolRegistryPort` | `ToolRegistryPortImpl` | agent-engine | agent-engine、mcp | 跨模块（必要） |
 | `UserLookupPort` | `UserLookupAdapter` | domains | agentmanagement | 域间（解耦） |
-| `VectorStoreEngineCatalogPort` | `VectorStoreEngineCatalog` | retrieval-engine | vectorstore | 跨模块（必要） |
 | `WebSearchProviderPort` | `WebSearchSupportAdapter` | domains | session | 域间（解耦） |
 | `WebSearchTempStatePort` | `WebSearchSupportAdapter` | domains | session | 域间（解耦） |
 | `WikiIngestPort` | `WikiIngestService` | domains | knowledge | 域间（解耦） |

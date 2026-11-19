@@ -2,7 +2,7 @@ package com.ragagent.retrieval.engine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.ragagent.contract.vectorstore.VectorEngineTypes;
+import com.ragagent.retrieval.api.VectorEngineTypes;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;

@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.engine;
 
 import com.ragagent.contract.retrieval.TenantStoreOwnership;
-import com.ragagent.contract.vectorstore.VectorStoreLookup;
+import com.ragagent.retrieval.api.VectorStoreLookup;
 
 /**
  * {@link TenantStoreOwnership} 的生产实现。

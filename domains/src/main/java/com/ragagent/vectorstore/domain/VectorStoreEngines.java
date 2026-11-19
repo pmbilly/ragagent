@@ -1,6 +1,6 @@
 package com.ragagent.vectorstore.domain;
 
-import com.ragagent.contract.vectorstore.VectorEngineTypes;
+import com.ragagent.retrieval.api.VectorEngineTypes;
 import java.util.Set;
 
 /**

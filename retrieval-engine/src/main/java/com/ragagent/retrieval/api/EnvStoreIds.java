@@ -1,4 +1,4 @@
-package com.ragagent.contract.vectorstore;
+package com.ragagent.retrieval.api;
 
 /**
  * env 提供的向量库 id 判定：纯字符串谓词，L2 {@code retrieval} 的引擎工厂要用它

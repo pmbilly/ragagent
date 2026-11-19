@@ -2,8 +2,8 @@ package com.ragagent.retrieval.engine;
 
 
 import com.ragagent.contract.retrieval.RetrieveEngineException;
-import com.ragagent.contract.vectorstore.VectorStoreLookup;
-import com.ragagent.contract.vectorstore.VectorStoreView;
+import com.ragagent.retrieval.api.VectorStoreLookup;
+import com.ragagent.retrieval.api.VectorStoreView;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
