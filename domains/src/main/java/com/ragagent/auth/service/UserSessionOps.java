@@ -11,38 +11,37 @@ import io.jsonwebtoken.Claims;
 import java.util.List;
 
 /**
- * 用户会话令牌操作（logout / refresh / switch-tenant，
- * 自 {@code UserService} 外提）。
+ * 用户会话令牌操作：logout / refresh / switch-tenant。
  *
- * <p>三个失败通道异常（LogoutException 等）是控制器捕获的公共 API，留在
- * {@link UserService}；本类经 {@code user} 回引用访问其协作面（令牌签发、偏好
- * 落库、membership 组装）与 mapper。</p>
+ * <p>三个失败通道异常（{@code UserService.LogoutException} 等）由控制器捕获并映射为响应，
+ * 因此定义在 {@link UserService}；本类经 {@code userService} 访问令牌签发、偏好落库与
+ * membership 组装。</p>
  */
 final class UserSessionOps {
 
-    private final UserService svc;
+    private final UserService userService;
 
-    UserSessionOps(UserService svc) {
-        this.svc = svc;
+    UserSessionOps(UserService userService) {
+        this.userService = userService;
     }
 
-
     /**
-     * 从（可过期的）JWT 里解出 user_id，吊销该用户
-     * 全部会话。access/refresh 两种 token 都收——客户端不必先 refresh 再登出。
+     * 从（可过期的）JWT 里解出 user_id，吊销该用户全部会话。
      *
-     * @throws LogoutException message = 服务端错误原文（controller 包成 500 "Logout failed"）
+     * <p>access / refresh 两种 token 都接受——客户端不必先 refresh 再登出。</p>
+     *
+     * @throws UserService.LogoutException message 为服务端错误原文，由调用方映射为响应
      */
     public void logout(String tokenString) {
         String userId = userIdFromSignedToken(tokenString);
-        svc.revokeTokensByUserId(userId);
+        userService.revokeTokensByUserId(userId);
     }
 
     /** 不做 claims 校验的解析：过期令牌也能解出 user_id。 */
     private String userIdFromSignedToken(String tokenString) {
         Claims claims;
         try {
-            claims = svc.jwtService.parseSignedAllowExpired(tokenString);
+            claims = userService.jwtService.parseSignedAllowExpired(tokenString);
         } catch (TokenValidationException e) {
             throw new UserService.LogoutException("invalid token");
         }
@@ -53,20 +52,20 @@ final class UserSessionOps {
         return userId;
     }
 
-
     /**
-     * 校验 refresh JWT → 查 auth_tokens 撤销状态 →
-     * 吊销旧 refresh → GenerateTokens（按 last-active 偏好解析目标空间）。
+     * 用未过期的 refresh token 换一对新令牌。
      *
-     * @return {accessToken, newRefreshToken}
-     * @throws RefreshTokenException message = 服务端错误原文（controller 包成 401 "Token refresh failed"）
+     * <p>旧 refresh 一律吊销（一次性使用）；新令牌按 last-active 偏好解析目标空间。</p>
+     *
+     * @return 长度 2 的数组：[0] access token，[1] 新 refresh token
+     * @throws UserService.RefreshTokenException message 为服务端错误原文，由调用方映射为响应
      */
     public String[] refreshToken(String refreshTokenString) {
         Claims claims;
         try {
-            claims = svc.jwtService.parseSigned(refreshTokenString);
+            claims = userService.jwtService.parseSigned(refreshTokenString);
         } catch (TokenValidationException e) {
-            // claims 校验（含 exp 过期）失败 → "invalid refresh token"
+            // parseSigned 内含 exp 校验：过期与签名错误走同一分支
             throw new UserService.RefreshTokenException("invalid refresh token");
         }
         if (!JwtService.isRefreshTokenClaims(claims)) {
@@ -77,8 +76,8 @@ final class UserSessionOps {
             throw new UserService.RefreshTokenException("invalid user ID in token");
         }
 
-        // 撤销状态检查（记录缺失 / 已吊销 → 同一文案）
-        AuthToken record = svc.findTokenByString(refreshTokenString);
+        // 记录缺失与已吊销返回同一文案：避免调用方借此探测令牌是否曾经存在
+        AuthToken record = userService.findTokenByString(refreshTokenString);
         if (record == null || record.isIsRevoked()) {
             throw new UserService.RefreshTokenException("refresh token is revoked");
         }
@@ -86,26 +85,25 @@ final class UserSessionOps {
             throw new UserService.RefreshTokenException("not a refresh token");
         }
 
-        User u = svc.getUserById(userId);
+        User u = userService.getUserById(userId);
         if (u == null) {
-            // 用户不存在 → 透传 "record not found"
             throw new UserService.RefreshTokenException("record not found");
         }
 
         // 吊销旧 refresh token（整行写回，updated_at 一并刷新）
-        svc.revokeTokenRecord(record);
+        userService.revokeTokenRecord(record);
 
         // 按 last-active 偏好解析空间后签发
-        return svc.generateTokens(u);
+        return userService.generateTokens(u);
     }
 
-
     /**
-     * 校验成员关系（跨空间超管豁免）→ 记
-     * last-active 偏好（先于签发，失败中止）→ 签发新令牌对 → 尽力吊销旧 refresh。
+     * 切换工作空间并签发新令牌对。
      *
-     * @throws SwitchTenantException message = 服务端错误原文（controller 包成
-     *         403 "workspace switch failed"）
+     * <p>两条顺序约束：偏好先于签发落库（200 响应必须对应持久化成功）；旧 refresh 的吊销
+     * 尽力而为，失败只记日志、不拖垮切换。跨空间超管切到自己的 home 时跳过成员校验。</p>
+     *
+     * @throws UserService.SwitchTenantException message 为服务端错误原文，由调用方映射为响应
      */
     public LoginResult switchTenant(User user, long targetTenantId, String currentRefreshToken) {
         if (user == null) {
@@ -115,17 +113,16 @@ final class UserSessionOps {
             throw new UserService.SwitchTenantException("target workspace ID is required");
         }
 
-        // 校验成员关系，除非跨空间超管切出自己的 home
+        // 跨空间超管切到自己的 home 时跳过成员校验
         if (!user.isCanAccessAllTenants() || targetTenantId == user.getTenantId()) {
-            TenantMember member = svc.memberService.getMembership(user.getId(), targetTenantId);
+            TenantMember member = userService.memberService.getMembership(user.getId(), targetTenantId);
             if (member == null || !TenantMemberService.STATUS_ACTIVE.equals(member.getStatus())) {
                 throw new UserService.SwitchTenantException("tenant membership not found");
             }
         }
 
-        TenantRowView tenant = svc.tenantService.getTenantById(targetTenantId);
+        TenantRowView tenant = userService.tenantService.getTenantById(targetTenantId);
         if (tenant == null) {
-            // "record not found" 包进 "load target workspace: " 前缀后抛出
             throw new UserService.SwitchTenantException("load target workspace: record not found");
         }
 
@@ -133,7 +130,7 @@ final class UserSessionOps {
         try {
             UserPreferences patch = new UserPreferences();
             patch.setLastActiveTenantId(targetTenantId);
-            UserPreferences merged = svc.updateUserPreferences(user.getId(), patch);
+            UserPreferences merged = userService.updateUserPreferences(user.getId(), patch);
             user.setPreferences(merged);
         } catch (RuntimeException e) {
             throw new UserService.SwitchTenantException("record last-active-tenant preference: " + e.getMessage(), e);
@@ -141,7 +138,7 @@ final class UserSessionOps {
 
         String[] tokens;
         try {
-            tokens = svc.generateTokensForTenant(user, targetTenantId);
+            tokens = userService.generateTokensForTenant(user, targetTenantId);
         } catch (RuntimeException e) {
             throw new UserService.SwitchTenantException("generate tokens: " + e.getMessage(), e);
         }
@@ -149,16 +146,16 @@ final class UserSessionOps {
         // 尽力吊销旧 refresh（失败只记日志，不拖垮切换）
         if (currentRefreshToken != null && !currentRefreshToken.isBlank()) {
             try {
-                AuthToken record = svc.findTokenByString(currentRefreshToken);
+                AuthToken record = userService.findTokenByString(currentRefreshToken);
                 if (record != null) {
-                    svc.revokeTokenRecord(record);
+                    userService.revokeTokenRecord(record);
                 }
             } catch (RuntimeException e) {
                 UserService.log.warn("Failed to revoke previous refresh token during tenant switch", e);
             }
         }
 
-        List<Membership> memberships = svc.buildLoginMemberships(user, tenant);
+        List<Membership> memberships = userService.buildLoginMemberships(user, tenant);
         return new LoginResult(true, "Workspace switched", user, tenant, memberships,
                 tokens[0], tokens[1]);
     }
