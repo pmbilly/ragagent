@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.engine;
 
-import com.ragagent.contract.retrieval.IndexRow;
 import com.ragagent.contract.retrieval.SearchParams;
+import com.ragagent.retrieval.api.IndexRow;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;

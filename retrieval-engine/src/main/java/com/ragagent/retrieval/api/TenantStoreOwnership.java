@@ -1,4 +1,4 @@
-package com.ragagent.contract.retrieval;
+package com.ragagent.retrieval.api;
 
 /**
  * 工厂函数用来校验"某个向量店 ID 属于某个租户"的查表口。

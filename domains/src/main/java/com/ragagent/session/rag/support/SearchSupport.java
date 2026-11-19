@@ -1,9 +1,9 @@
 package com.ragagent.session.rag.support;
 
 import com.ragagent.contract.knowledge.SearchChunkMerge;
-import com.ragagent.contract.retrieval.RetrievalObsRows;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.retrieval.SearchTextUtil;
+import com.ragagent.retrieval.api.RetrievalObsRows;
+import com.ragagent.retrieval.api.SearchTextUtil;
 import com.ragagent.session.rag.History;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;

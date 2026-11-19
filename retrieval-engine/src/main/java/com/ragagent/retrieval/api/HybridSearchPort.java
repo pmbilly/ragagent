@@ -1,5 +1,7 @@
-package com.ragagent.contract.retrieval;
+package com.ragagent.retrieval.api;
 
+import com.ragagent.contract.retrieval.SearchParams;
+import com.ragagent.contract.retrieval.SearchResult;
 import java.util.List;
 import java.util.Map;
 

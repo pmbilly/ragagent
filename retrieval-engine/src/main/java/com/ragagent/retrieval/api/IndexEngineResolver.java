@@ -1,4 +1,4 @@
-package com.ragagent.contract.retrieval;
+package com.ragagent.retrieval.api;
 
 /**
  * 索引引擎解析端口：把"租户 + 向量店 id"解析成一个可用的 {@link IndexEngine} 句柄。

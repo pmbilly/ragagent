@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.contract.retrieval.RetrieveEngineException;
+import com.ragagent.retrieval.api.RetrieveEngineException;
 import com.ragagent.retrieval.api.VectorStoreView;
 import com.ragagent.retrieval.engine.RetrievalEngineTestSupport.FakeEngineService;
 import com.ragagent.retrieval.engine.RetrievalEngineTestSupport.FakeStoreRepo;

@@ -6,9 +6,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.contract.retrieval.IndexEngine;
-import com.ragagent.contract.retrieval.IndexEngineResolver;
 import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.retrieval.api.IndexEngine;
+import com.ragagent.retrieval.api.IndexEngineResolver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

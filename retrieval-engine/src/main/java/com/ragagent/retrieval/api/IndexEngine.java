@@ -1,4 +1,4 @@
-package com.ragagent.contract.retrieval;
+package com.ragagent.retrieval.api;
 
 import com.ragagent.contract.model.Embedder;
 import java.util.List;

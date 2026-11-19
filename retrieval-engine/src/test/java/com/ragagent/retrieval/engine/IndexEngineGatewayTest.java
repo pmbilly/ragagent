@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.contract.retrieval.IndexEngine;
-import com.ragagent.contract.retrieval.RetrieveEngineException;
-import com.ragagent.contract.retrieval.TenantStoreOwnership;
+import com.ragagent.retrieval.api.IndexEngine;
+import com.ragagent.retrieval.api.RetrieveEngineException;
+import com.ragagent.retrieval.api.TenantStoreOwnership;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.DisplayName;

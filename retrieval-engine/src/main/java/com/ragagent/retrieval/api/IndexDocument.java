@@ -1,4 +1,4 @@
-package com.ragagent.contract.retrieval;
+package com.ragagent.retrieval.api;
 
 /**
  * 待索引条目（业务域 → 检索引擎的领域级形状）。

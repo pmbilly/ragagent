@@ -2,11 +2,11 @@ package com.ragagent.session.rag.plugin;
 
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.platform.knowledge.ImageInfoEnricher;
 import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
+import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.ImageInfoCollector;

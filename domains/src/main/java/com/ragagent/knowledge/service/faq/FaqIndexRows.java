@@ -2,10 +2,10 @@ package com.ragagent.knowledge.service.faq;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.contract.retrieval.IndexRow;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.retrieval.api.IndexRow;
 import java.util.ArrayList;
 import java.util.List;
 

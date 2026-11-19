@@ -7,10 +7,6 @@
       "com.ragagent.agent.skills.mapper"
     ],
     [
-      "com.ragagent.contract.model",
-      "com.ragagent.contract.retrieval"
-    ],
-    [
       "com.ragagent.embedding",
       "com.ragagent.embedding.provider"
     ],

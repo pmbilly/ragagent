@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.telemetry;
 
-import com.ragagent.contract.retrieval.RetrievalObsRows;
+import com.ragagent.retrieval.api.RetrievalObsRows;
 import com.ragagent.retrieval.engine.EngineTypes;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

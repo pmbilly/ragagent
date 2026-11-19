@@ -1,6 +1,6 @@
 package com.ragagent.session.rag.support;
 
-import com.ragagent.contract.retrieval.SearchTextUtil;
+import com.ragagent.retrieval.api.SearchTextUtil;
 import java.util.List;
 
 /**

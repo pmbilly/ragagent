@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.engine;
 
 import com.ragagent.contract.model.Embedder;
-import com.ragagent.contract.retrieval.RetrieveEngineException;
+import com.ragagent.retrieval.api.RetrieveEngineException;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;

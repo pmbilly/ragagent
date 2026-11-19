@@ -7,7 +7,7 @@
 
 - 域间（解耦）：**28**
 - 复合面（随复合端口）：**7**
-- 跨模块（必要）：**11**
+- 跨模块（必要）：**10**
 
 ## 明细
 
@@ -28,7 +28,6 @@
 | `EntityExtractionPort` | `EntityExtractionAdapter` | model-runtime | initialization、knowledge、session | 跨模块（必要） |
 | `FileUrlPort` | `DefaultFileUrlPort` | domains | knowledge、platform、session、storage | 跨模块（必要） |
 | `GlobalFileServicePort` | `GlobalFileServiceAdapter` | domains | session | 域间（解耦） |
-| `HybridSearchPort` | `HybridSearchService` | retrieval-engine | knowledge、session | 跨模块（必要） |
 | `KnowledgeBaseCatalogPort` | `KnowledgeBaseCatalogAdapter` | domains | agentmanagement | 域间（解耦） |
 | `KnowledgeBaseReadPort` | — | ? | — | 复合面（随复合端口） |
 | `KnowledgeBaseWritePort` | — | ? | — | 复合面（随复合端口） |

@@ -1,8 +1,6 @@
 package com.ragagent.knowledge.service.faq;
 
 import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.contract.retrieval.IndexEngine;
-import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
@@ -12,6 +10,8 @@ import com.ragagent.knowledge.dto.faq.FaqEntryFieldsUpdate;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.repository.FaqChunkRepository;
 import com.ragagent.platform.audit.ActivityAuditRecorder;
+import com.ragagent.retrieval.api.IndexEngine;
+import com.ragagent.retrieval.api.VectorIndexStore;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

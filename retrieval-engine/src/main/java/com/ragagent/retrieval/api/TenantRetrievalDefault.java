@@ -1,4 +1,4 @@
-package com.ragagent.contract.retrieval;
+package com.ragagent.retrieval.api;
 
 /**
  * 租户级检索回落口径（无绑定 store 的 KB 用哪套引擎）。

@@ -1,4 +1,4 @@
-package com.ragagent.contract.retrieval;
+package com.ragagent.retrieval.api;
 
 /**
  * 向量索引行的领域级形状（原嵌在 {@code retrieval-engine} 的 {@code VectorStoreService} 内，

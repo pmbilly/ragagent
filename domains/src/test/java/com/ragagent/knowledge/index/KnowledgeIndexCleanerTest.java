@@ -13,11 +13,11 @@ import static org.mockito.Mockito.when;
 
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.retrieval.IndexEngine;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
-import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.retrieval.api.IndexEngine;
+import com.ragagent.retrieval.api.VectorIndexStore;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

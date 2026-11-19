@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.support;
 
-import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.retrieval.api.ChunkTypes;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

@@ -1,5 +1,6 @@
-package com.ragagent.contract.retrieval;
+package com.ragagent.retrieval.api;
 
+import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.websearch.WebSearchResult;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

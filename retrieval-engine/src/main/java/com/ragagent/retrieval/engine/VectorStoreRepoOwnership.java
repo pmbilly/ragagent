@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.engine;
 
-import com.ragagent.contract.retrieval.TenantStoreOwnership;
+import com.ragagent.retrieval.api.TenantStoreOwnership;
 import com.ragagent.retrieval.api.VectorStoreLookup;
 
 /**

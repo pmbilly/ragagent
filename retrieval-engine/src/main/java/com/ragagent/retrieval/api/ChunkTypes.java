@@ -1,4 +1,4 @@
-package com.ragagent.contract.retrieval;
+package com.ragagent.retrieval.api;
 
 /**
  * Chunk 类型常量：集中管理线上的 chunk 类型字面量。

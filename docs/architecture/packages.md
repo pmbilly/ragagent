@@ -36,7 +36,7 @@
 | `:contract` | `com.ragagent.contract.model` | 模型契约面：模型事实、运行时载荷与跨域能力端口。 |
 | `:contract` | `com.ragagent.contract.pagination` | 分页契约：统一的 com.ragagent.contract.pagination.PageResult。 |
 | `:contract` | `com.ragagent.contract.pipeline` | 管线 SPI：会话域管线（domains/session/rag）消费、业务域实现的端口 （MCP 工具网关/按需注册、工具注册表、网页检索执行器）。 |
-| `:contract` | `com.ragagent.contract.retrieval` | 检索契约面：检索类型/命中合并/目标。 |
+| `:contract` | `com.ragagent.contract.retrieval` | 检索的共享形状：SearchParams、SearchResult、SearchTarget、 RetrieveGraphRepository。 |
 | `:contract` | `com.ragagent.contract.session` | 会话契约面：管线消息视图与消息端口。 |
 | `:contract` | `com.ragagent.contract.settings` | 契约 · 设置：SystemSettingGateway。 |
 | `:contract` | `com.ragagent.contract.storage` | 存储契约面：后端供给端口。 |

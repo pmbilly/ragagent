@@ -1,8 +1,8 @@
 package com.ragagent.retrieval.engine;
 
-import com.ragagent.contract.retrieval.IndexRow;
-import com.ragagent.contract.retrieval.VectorIndexStore;
 import com.ragagent.platform.persistence.DatabaseDialects;
+import com.ragagent.retrieval.api.IndexRow;
+import com.ragagent.retrieval.api.VectorIndexStore;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;

@@ -2,9 +2,9 @@ package com.ragagent.config;
 
 
 
-import com.ragagent.contract.retrieval.TenantStoreOwnership;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.retrieval.api.TenantStoreOwnership;
 import com.ragagent.retrieval.api.VectorStoreLookup;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import com.ragagent.retrieval.engine.EngineFactory;

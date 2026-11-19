@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.engine;
 
 import com.ragagent.contract.model.Embedder;
-import com.ragagent.contract.retrieval.TenantStoreOwnership;
+import com.ragagent.retrieval.api.TenantStoreOwnership;
 import com.ragagent.retrieval.api.VectorStoreLookup;
 import com.ragagent.retrieval.api.VectorStoreView;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
