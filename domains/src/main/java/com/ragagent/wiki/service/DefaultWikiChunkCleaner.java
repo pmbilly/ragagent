@@ -1,6 +1,6 @@
 package com.ragagent.wiki.service;
 
-import com.ragagent.knowledge.adapter.ChunkPortAdapter;
+import com.ragagent.contract.knowledge.ChunkPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -18,9 +18,9 @@ public class DefaultWikiChunkCleaner implements WikiChunkCleaner {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultWikiChunkCleaner.class);
 
-    private final ChunkPortAdapter chunkPort;
+    private final ChunkPort chunkPort;
 
-    public DefaultWikiChunkCleaner(ChunkPortAdapter chunkPort) {
+    public DefaultWikiChunkCleaner(ChunkPort chunkPort) {
         this.chunkPort = chunkPort;
     }
 

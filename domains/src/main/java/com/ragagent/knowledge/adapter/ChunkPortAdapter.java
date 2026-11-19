@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.adapter;
 
+import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.knowledge.projection.ChunkProjectionAdapter;
 import com.ragagent.knowledge.domain.Chunk;
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Component;
  * {@code enrichContentWithImageInfo} 来自 {@code DefaultWikiImageEnricher}。</p>
  */
 @Component
-public class ChunkPortAdapter {
+public class ChunkPortAdapter implements ChunkPort {
 
     private final ChunkRepository chunkRepository;
 

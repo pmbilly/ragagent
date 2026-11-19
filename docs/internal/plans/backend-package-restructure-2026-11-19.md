@@ -91,6 +91,8 @@
 
 解环方向：`wiki` 侧改为注入 `contract.knowledge` 的 `ChunkPort` / `KnowledgeFinalizePort`（Adapter 已实现这些契约，按接口注入即可，不动逻辑）；`knowledge` 侧改依赖 wiki 声明的回调端口或下沉为事件。必须在 P3 之前单独一批完成，不与包移动混做。
 
+> **✅ 已解（P3-0，2026-11-19）**：新增 `contract.knowledge.ChunkPort` / `KnowledgeFinalizePort`、`contract.wiki.WikiIngestPort` / `WikiKnowledgeFinalizer`；上提 `FinalizeResult` 与 `WikiEnqueueResult`。R-1 基线回到 2 条边，跨域快照 13 → 10 条。实施细节与三处踩坑见 `HANDOFF.md` §12 的 P3-0 行。
+
 ## 5. "搬家漏登记"风险清单
 
 编译期抓不到、运行期才炸的项，逐条附 2026-11-19 实测状态：

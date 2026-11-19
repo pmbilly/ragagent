@@ -1,7 +1,8 @@
 package com.ragagent.wiki.service;
 
-import com.ragagent.knowledge.adapter.KnowledgeFinalizeAdapter;
-import com.ragagent.knowledge.api.FinalizeResult;
+import com.ragagent.contract.knowledge.FinalizeResult;
+import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
+import com.ragagent.contract.wiki.WikiKnowledgeFinalizer;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import org.slf4j.Logger;
@@ -37,9 +38,9 @@ public class DefaultWikiKnowledgeFinalizer implements WikiKnowledgeFinalizer {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultWikiKnowledgeFinalizer.class);
 
-    private final KnowledgeFinalizeAdapter finalizePort;
+    private final KnowledgeFinalizePort finalizePort;
 
-    public DefaultWikiKnowledgeFinalizer(KnowledgeFinalizeAdapter finalizePort) {
+    public DefaultWikiKnowledgeFinalizer(KnowledgeFinalizePort finalizePort) {
         this.finalizePort = finalizePort;
     }
 

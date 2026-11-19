@@ -1,6 +1,9 @@
 package com.ragagent.knowledge.task;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.contract.wiki.WikiEnqueueResult;
+import com.ragagent.contract.wiki.WikiIngestPort;
+import com.ragagent.contract.wiki.WikiKnowledgeFinalizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -19,9 +22,6 @@ import com.ragagent.knowledge.support.QuestionBatchPlanner;
 import com.ragagent.knowledge.support.QuestionGenerationPolicy;
 import com.ragagent.platform.access.TracingContext;
 import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
-import com.ragagent.wiki.service.DefaultWikiKnowledgeFinalizer;
-import com.ragagent.wiki.service.ingest.WikiIngestService;
-import com.ragagent.wiki.service.ingest.support.WikiEnqueueResult;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -47,8 +47,8 @@ final class KnowledgeFinalizingStage {
     private final ChunkRepository chunkRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final SpanTracker spanTracker;
-    private final ObjectProvider<WikiIngestService> wikiIngestService;
-    private final ObjectProvider<DefaultWikiKnowledgeFinalizer> wikiKnowledgeFinalizer;
+    private final ObjectProvider<WikiIngestPort> wikiIngestService;
+    private final ObjectProvider<WikiKnowledgeFinalizer> wikiKnowledgeFinalizer;
     private final ObjectProvider<ChunkExtractTaskQueue> chunkExtractQueue;
     private final ObjectProvider<QuestionGenerationTaskQueue> questionGenerationQueue;
 
@@ -59,8 +59,8 @@ final class KnowledgeFinalizingStage {
             ChunkRepository chunkRepository,
             ApplicationEventPublisher eventPublisher,
             SpanTracker spanTracker,
-            ObjectProvider<WikiIngestService> wikiIngestService,
-            ObjectProvider<DefaultWikiKnowledgeFinalizer> wikiKnowledgeFinalizer,
+            ObjectProvider<WikiIngestPort> wikiIngestService,
+            ObjectProvider<WikiKnowledgeFinalizer> wikiKnowledgeFinalizer,
             ObjectProvider<ChunkExtractTaskQueue> chunkExtractQueue,
             ObjectProvider<QuestionGenerationTaskQueue> questionGenerationQueue) {
         this.knowledgeRepository = knowledgeRepository;
@@ -294,7 +294,7 @@ final class KnowledgeFinalizingStage {
      * 避免行搁浅在 finalizing。触发失败只记警告——op 已落库，不从重追加。
      */
     private void enqueueWikiIngest(String knowledgeId, Knowledge k) {
-        WikiIngestService service = wikiIngestService.getIfAvailable();
+        WikiIngestPort service = wikiIngestService.getIfAvailable();
         if (service == null) {
             log.info("[KnowledgePostProcess] Wiki ingest service unavailable, releasing slot for {}",
                     knowledgeId);
@@ -324,7 +324,7 @@ final class KnowledgeFinalizingStage {
      * finalizer 缺席时静默——行由 finalizing housekeeping sweep 兜底。
      */
     private void releaseWikiSlot(String knowledgeId) {
-        DefaultWikiKnowledgeFinalizer finalizer = wikiKnowledgeFinalizer.getIfAvailable();
+        WikiKnowledgeFinalizer finalizer = wikiKnowledgeFinalizer.getIfAvailable();
         if (finalizer == null) {
             return;
         }

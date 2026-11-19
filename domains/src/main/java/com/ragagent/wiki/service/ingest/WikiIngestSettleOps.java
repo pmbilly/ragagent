@@ -1,11 +1,11 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.contract.wiki.WikiKnowledgeFinalizer;
 import com.ragagent.wiki.domain.TaskDeadLetter;
 import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.wiki.domain.ingest.WikiIngestPayload;
 import com.ragagent.wiki.domain.ingest.WikiPendingOp;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
-import com.ragagent.wiki.service.WikiKnowledgeFinalizer;
 import com.ragagent.wiki.service.ingest.support.WikiCleanupScope;
 import java.util.ArrayList;
 import java.util.List;

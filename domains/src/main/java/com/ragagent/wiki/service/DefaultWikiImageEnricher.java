@@ -1,7 +1,7 @@
 package com.ragagent.wiki.service;
 
+import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.knowledge.adapter.ChunkPortAdapter;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -24,9 +24,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefaultWikiImageEnricher implements WikiImageEnricher {
 
-    private final ChunkPortAdapter chunkPort;
+    private final ChunkPort chunkPort;
 
-    public DefaultWikiImageEnricher(ChunkPortAdapter chunkPort) {
+    public DefaultWikiImageEnricher(ChunkPort chunkPort) {
         this.chunkPort = chunkPort;
     }
 

@@ -1,6 +1,7 @@
 package com.ragagent.knowledge.adapter;
 
-import com.ragagent.knowledge.api.FinalizeResult;
+import com.ragagent.contract.knowledge.FinalizeResult;
+import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
 import com.ragagent.knowledge.repository.IngestStateRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import java.time.OffsetDateTime;
@@ -11,11 +12,11 @@ import org.springframework.stereotype.Component;
 /**
  * {@link KnowledgeFinalizeAdapter} 的 knowledge 侧实现。
  *
- * <p>两条语句、try/catch 与告警日志整体搬自 {@code DefaultWikiKnowledgeFinalizer}
+ * <p>两条语句、try/catch 与告警日志整体搬自 {@code WikiKnowledgeFinalizer}
  * （wiki 侧该类退化为薄壳，只做 {@code FinalizeResult → Outcome} 映射）。</p>
  */
 @Component
-public class KnowledgeFinalizeAdapter {
+public class KnowledgeFinalizeAdapter implements KnowledgeFinalizePort {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeFinalizeAdapter.class);
 

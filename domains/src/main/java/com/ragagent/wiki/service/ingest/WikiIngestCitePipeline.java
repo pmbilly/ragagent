@@ -2,11 +2,11 @@ package com.ragagent.wiki.service.ingest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.knowledge.adapter.ChunkPortAdapter;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.domain.WikiExtractionGranularity;
 import com.ragagent.wiki.prompt.WikiPrompts;
@@ -52,9 +52,9 @@ public class WikiIngestCitePipeline {
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final WikiIngestService ingestService;
-    private final ChunkPortAdapter chunkPort;
+    private final ChunkPort chunkPort;
 
-    public WikiIngestCitePipeline(WikiIngestService ingestService, ChunkPortAdapter chunkPort) {
+    public WikiIngestCitePipeline(WikiIngestService ingestService, ChunkPort chunkPort) {
         this.ingestService = ingestService;
         this.chunkPort = chunkPort;
     }

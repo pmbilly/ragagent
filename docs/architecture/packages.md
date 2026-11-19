@@ -150,7 +150,7 @@
 | `:domains` | `com.ragagent.initialization.service` | initialization 用例实现：初始化配置（com.ragagent.initialization.service.InitializationConfigService）、 模型连通性测试、 |
 | `:domains` | `com.ragagent.knowledge` | 知识库域：知识的存储、处理管线与检索面。 |
 | `:domains` | `com.ragagent.knowledge.adapter` | 知识库 · 端口实现（11 个）：ChunkPort / KnowledgeCatalog / KnowledgeBaseCatalog / KnowledgeBaseLookup / Knowled |
-| `:domains` | `com.ragagent.knowledge.api` | 知识库 · 域内视图：com.ragagent.knowledge.api.FinalizeResult（wiki 等域消费入库收尾结果）。 |
+| `:domains` | `com.ragagent.knowledge.api` | 知识库 · 域内视图：com.ragagent.contract.knowledge.FinalizeResult（wiki 等域消费入库收尾结果）。 |
 | `:domains` | `com.ragagent.knowledge.chunker` | 知识库 · 分块：HeuristicSplitter / DocumentProfiler / HeadingHierarchy…。 |
 | `:domains` | `com.ragagent.knowledge.client` | 知识库出站客户端：DocReaderClient（文档解析服务）。 |
 | `:domains` | `com.ragagent.knowledge.config` | 知识库 · 配置：HousekeepingProperties / BatchEmbedProperties / DocReaderProperties。 |

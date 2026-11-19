@@ -6,6 +6,9 @@ import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.contract.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.WikiEnqueueResult;
+import com.ragagent.contract.wiki.WikiIngestPort;
+import com.ragagent.contract.wiki.WikiKnowledgeFinalizer;
 import com.ragagent.platform.concurrent.SingleFlight;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.domain.TaskPendingOp;
@@ -26,12 +29,10 @@ import com.ragagent.wiki.repository.ingest.WikiInflightLimiter;
 import com.ragagent.wiki.repository.ingest.WikiIngestTaskHandler;
 import com.ragagent.wiki.repository.ingest.WikiIngestTaskQueue;
 import com.ragagent.wiki.service.WikiImageEnricher;
-import com.ragagent.wiki.service.WikiKnowledgeFinalizer;
 import com.ragagent.wiki.service.ingest.support.DocIngestResult;
 import com.ragagent.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.wiki.service.ingest.support.WikiCleanupScope;
 import com.ragagent.wiki.service.ingest.support.WikiDedupSupport;
-import com.ragagent.wiki.service.ingest.support.WikiEnqueueResult;
 import com.ragagent.wiki.service.page.WikiCrossLinker;
 import com.ragagent.wiki.service.page.WikiPageService;
 import java.util.List;
@@ -79,7 +80,7 @@ import org.springframework.stereotype.Service;
  * </ul>
  */
 @Service
-public class WikiIngestService implements WikiIngestSlotReleaser {
+public class WikiIngestService implements WikiIngestSlotReleaser, WikiIngestPort {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestService.class);
 

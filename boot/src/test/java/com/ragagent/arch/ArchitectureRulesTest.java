@@ -999,7 +999,7 @@ class ArchitectureRulesTest {
     @DisplayName("A20：每个 common 契约端口恰有一个域侧实现（装配契约：提供方唯一）")
     void eachContractPortHasExactlyOneImplementation() {
         // 契约模式（B264 起）：跨域调用一律经 `common/<域>/XxxPort`，实现方是该域的 api/ 适配器
-        // （如 knowledge/api/ChunkPortAdapter）。实现方唯一是这套模式能让 @Lazy 环消失、装配面
+        // （如 knowledge/api/ChunkPort）。实现方唯一是这套模式能让 @Lazy 环消失、装配面
         // 可审计的前提：0 个 = 契约悬空（调用方拿到 NoSuchBean 才发现）；≥2 个 = 提供方不唯一，
         // 契约失去"单点替换"语义。
         Set<String> implemented = new TreeSet<>();

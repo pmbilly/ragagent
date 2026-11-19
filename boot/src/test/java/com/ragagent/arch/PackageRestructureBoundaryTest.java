@@ -49,30 +49,27 @@ class PackageRestructureBoundaryTest {
             Set.of("repository", "mapper", "domain", "service", "controller", "adapter");
 
     /**
-     * 跨域直连基线（2026-11-19 普查 2 条边；P2-4 补 {@code system -> auth.adapter}、
-     * P2-7 补 {@code wiki -> knowledge.adapter}，现 4 条边 / 20 处 import）。
+     * 跨域直连基线（2026-11-19 普查 2 条边；P2 期间一度涨到 4 条，P3-0 解环后收紧回 2 条）。
      *
      * <p>格式 {@code <from> -> <to>.<子包>}。新增条目必须先在方案文档里论证，
      * 否则就是绕过 {@code api} 又开了一条暗通道。</p>
      *
-     * <p>后两条都是 P2 移动时才暴露的——它们原先藏在 `api` 包名后面，规则按子包名判定，
-     * 看不到"api 包里装的是实现类"：</p>
+     * <p><b>已解</b>：{@code knowledge ⇄ wiki} 双向实现类直连（P3-0）——wiki 改注入
+     * {@code contract.knowledge.ChunkPort} / {@code KnowledgeFinalizePort}，knowledge 改注入
+     * {@code contract.wiki.WikiIngestPort} / {@code WikiKnowledgeFinalizer}，四条边同时消失。</p>
+     *
+     * <p>余下两条：</p>
      * <ul>
+     *   <li>{@code session -> agentmanagement.service}：会话直接取自定义智能体实现，待提端口。</li>
      *   <li>{@code system -> auth.adapter}：system 的两个 service 直接注入
      *       {@code AdminUserAdapter}（具体类，字段名却叫 {@code adminUserPort}）。根治要把
      *       它的方法提成 {@code contract.auth} 端口，涉及 {@code CreateUserResult} 上提
      *       （见 HANDOFF §11.1 第 20 条）。</li>
-     *   <li>{@code wiki -> knowledge.adapter}：wiki 的 5 个文件直接注入 knowledge 的
-     *       {@code ChunkPortAdapter} / {@code KnowledgeFinalizeAdapter}，与
-     *       {@code knowledge -> wiki.service} 构成真正的双向实现类直连。这是
-     *       {@code knowledge ⇄ wiki} 循环的另一半（方案 §4.3 的阻塞项）。</li>
      * </ul>
      */
     private static final Set<String> CROSS_DOMAIN_BASELINE = Set.of(
-            "knowledge -> wiki.service",
             "session -> agentmanagement.service",
-            "system -> auth.adapter",
-            "wiki -> knowledge.adapter");
+            "system -> auth.adapter");
 
     /**
      * 注解 SQL 基线：主码里带 {@code @Select/@Insert/@Update/@Delete} 的方法数（2026-11-19 实测）。

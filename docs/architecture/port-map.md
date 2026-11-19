@@ -5,7 +5,7 @@
 
 ## 统计
 
-- 域间（解耦）：**22**
+- 域间（解耦）：**25**
 - 复合面（随复合端口）：**7**
 - 跨模块（必要）：**12**
 
@@ -15,6 +15,7 @@
 |---|---|---|---|---|
 | `AuditWritePort` | `AuditWriteAdapter` | domains | agentmanagement、auth、datasource、knowledge、platform、system | 跨模块（必要） |
 | `ChunkFaqReadPort` | — | ? | — | 复合面（随复合端口） |
+| `ChunkPort` | `ChunkPortAdapter` | domains | wiki | 域间（解耦） |
 | `DocReaderAdminPort` | `DocReaderAdminAdapter` | domains | knowledge、system | 域间（解耦） |
 | `DocReaderParsePort` | `DocReaderParseAdapter` | domains | im、initialization、session | 域间（解耦） |
 | `DocumentChunkingPort` | `DocumentChunkingAdapter` | domains | session | 域间（解耦） |
@@ -32,6 +33,7 @@
 | `KnowledgeContentWritePort` | — | ? | — | 复合面（随复合端口） |
 | `KnowledgeDeletePort` | — | ? | — | 复合面（随复合端口） |
 | `KnowledgeEntryReadPort` | — | ? | — | 复合面（随复合端口） |
+| `KnowledgeFinalizePort` | `KnowledgeFinalizeAdapter` | domains | wiki | 域间（解耦） |
 | `KnowledgeIngestLookupPort` | — | ? | — | 复合面（随复合端口） |
 | `KnowledgeMaintenancePort` | `KnowledgeMaintenanceAdapter` | domains | websearch | 域间（解耦） |
 | `KnowledgeSpanPort` | `KnowledgeSpanAdapter` | domains | wiki | 域间（解耦） |
@@ -53,4 +55,5 @@
 | `VectorStoreEngineCatalogPort` | `VectorStoreEngineCatalog` | retrieval-engine | vectorstore | 跨模块（必要） |
 | `WebSearchProviderPort` | `WebSearchSupportAdapter` | domains | session | 域间（解耦） |
 | `WebSearchTempStatePort` | `WebSearchSupportAdapter` | domains | session | 域间（解耦） |
+| `WikiIngestPort` | `WikiIngestService` | domains | knowledge | 域间（解耦） |
 | `WikiPageOpsPort` | `WikiPageOpsAdapter` | domains | session | 域间（解耦） |

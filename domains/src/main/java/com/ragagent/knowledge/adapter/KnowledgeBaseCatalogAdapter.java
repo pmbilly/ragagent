@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 /**
  * {@link KnowledgeBaseCatalogPort} 的 knowledge 侧实现。
  *
- * <p>域内经 {@code api/} 适配器对外暴露是既定模式（同 {@link ChunkPortAdapter}）： 规则禁的是
+ * <p>域内经 {@code api/} 适配器对外暴露是既定模式（同 {@link com.ragagent.contract.knowledge.ChunkPort}）： 规则禁的是
  * {@code agenttools}/{@code agentmanagement} **直连**{@code *.service}，而本类在域内、由端口解耦。</p>
  *
  * <p>语义逐字保留：直接委托 {@code KnowledgeBaseService.listKnowledgeBases(creator)}

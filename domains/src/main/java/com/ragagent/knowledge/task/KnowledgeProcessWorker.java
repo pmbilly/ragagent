@@ -48,7 +48,7 @@ import org.springframework.stereotype.Service;
  * 既有数据保持不动；</li>
  * <li><b>wiki 交接</b>：wiki_enabled 且有文本 chunk 时 processing 原子晋升
  * finalizing（pending_subtasks_count 由子任务持有）再入队 ingest，
- * 由 DefaultWikiKnowledgeFinalizer 递减并晋升 completed。</li>
+ * 由 WikiKnowledgeFinalizer 递减并晋升 completed。</li>
  * </ol>
  */
 @Service

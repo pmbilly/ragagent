@@ -12,6 +12,7 @@ import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.RetrievalObsRows;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
+import com.ragagent.contract.wiki.WikiKnowledgeFinalizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkExtractConsumer;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
@@ -29,7 +30,6 @@ import com.ragagent.platform.access.TenantScopes;
 import com.ragagent.platform.prompt.ExtractPrompts;
 import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.platform.prompt.PromptInstructions;
-import com.ragagent.wiki.service.DefaultWikiKnowledgeFinalizer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -74,7 +74,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
     private final KnowledgeBaseRepository kbRepository;
     private final SpanTracker spanTracker;
     private final RetrieveGraphRepository graphRepository;
-    private final DefaultWikiKnowledgeFinalizer finalizer;
+    private final WikiKnowledgeFinalizer finalizer;
     private final ExtractPrompts extractPrompts;
     private final EntityExtractionPort entityExtraction;
 
@@ -86,7 +86,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
                                KnowledgeBaseRepository kbRepository,
                                SpanTracker spanTracker,
                                RetrieveGraphRepository graphRepository,
-                               DefaultWikiKnowledgeFinalizer finalizer,
+                               WikiKnowledgeFinalizer finalizer,
             EntityExtractionPort entityExtraction) {
         this(modelRuntimeAssembler, chunkRepository, knowledgeRepository, kbRepository, spanTracker,
                 graphRepository, finalizer, new ExtractPrompts(), entityExtraction);
@@ -99,7 +99,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
                         KnowledgeBaseRepository kbRepository,
                         SpanTracker spanTracker,
                         RetrieveGraphRepository graphRepository,
-                        DefaultWikiKnowledgeFinalizer finalizer,
+                        WikiKnowledgeFinalizer finalizer,
                         ExtractPrompts extractPrompts,
                         EntityExtractionPort entityExtraction) {
         this.modelRuntimeAssembler = modelRuntimeAssembler;

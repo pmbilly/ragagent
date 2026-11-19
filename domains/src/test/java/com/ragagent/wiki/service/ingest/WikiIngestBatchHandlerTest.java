@@ -15,13 +15,13 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.audit.WikiActivityAudit;
+import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.knowledge.adapter.ChunkPortAdapter;
 import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.domain.WikiConfig;
@@ -67,7 +67,7 @@ class WikiIngestBatchHandlerTest {
     private final WikiIngestDedupService dedupService = mock(WikiIngestDedupService.class);
     private final WikiModelResolver modelResolver = mock(WikiModelResolver.class);
     private final InProcessWikiFinalizeLock finalizeLock = new InProcessWikiFinalizeLock();
-    private final ChunkPortAdapter chunkPort = mock(ChunkPortAdapter.class);
+    private final ChunkPort chunkPort = mock(ChunkPort.class);
     private final KnowledgeBaseLookup kbLookup = mock(KnowledgeBaseLookup.class);
     private final WikiActivityAudit audit = mock(WikiActivityAudit.class);
 

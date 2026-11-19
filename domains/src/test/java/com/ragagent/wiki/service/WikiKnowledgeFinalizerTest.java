@@ -7,8 +7,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.knowledge.adapter.KnowledgeFinalizeAdapter;
-import com.ragagent.knowledge.api.FinalizeResult;
+import com.ragagent.contract.knowledge.FinalizeResult;
+import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
  */
 class WikiKnowledgeFinalizerTest {
 
-    private final KnowledgeFinalizeAdapter finalizePort = mock(KnowledgeFinalizeAdapter.class);
+    private final KnowledgeFinalizePort finalizePort = mock(KnowledgeFinalizePort.class);
     private final DefaultWikiKnowledgeFinalizer finalizer =
             new DefaultWikiKnowledgeFinalizer(finalizePort);
 
