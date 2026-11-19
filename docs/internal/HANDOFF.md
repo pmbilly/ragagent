@@ -29,7 +29,7 @@
 
 **阶段**：P0 基线 → P1 规则先行 → P2 纯包移动 → P3 类职责归位 → P4 `api` 语义与边界校验（见 §5）。
 
-**当前状态（2026-11-19）**：**P0、P1 已完成**（三份基线入库且可复现；跨域直连与注解 SQL 两条棘轮上线），P2 待做。代码在 `v0.11.x`；基线前 16 天 115 个提交均为功能修补，无模块增减、无契约面变更、无表结构变更。
+**当前状态（2026-11-19）**：**P0~P4 全部完成**。P0 三份基线可复现；P1 两条棘轮上线（R-1 跨域直连 · R-2 注解 SQL 282）；P2 32 个 Adapter 迁入 `adapter/`；P3 回引 62 → 已消 40 / 保留 22；P4 跨域直连 2 → 1（剩 `session → agentmanagement.service`，待 contract 解散时随 `CustomAgentConfig` 契约化一并解）。全量 **5257 / 0 / 2**，守卫 **49/49**。
 
 ## 1. 仓库身份与分支
 
@@ -82,7 +82,7 @@
 | **P1** | 结构规则先行：新增 `PackageRestructureBoundaryTest`（R-1 跨域直连棘轮 2 条边 / R-2 注解 SQL 精确 282）+ 扫描名单核对（`@ConfigurationPropertiesScan` 11 包 / `@MapperScan` 通配 / 无 `@Aspect`） | R-1 与 R-2 均绿；`ArchitectureRulesTest` 22 条不受影响；守卫 49/49 | ✅ 2026-11-19 |
 | **P2** | `api/` 里的 `*Adapter` 迁到 `adapter/`（32 个 / 11 域），纯移动不改逻辑；8 个无 `api/` 的域跳过。顺序见方案 §4.2 | 每域：编译 + 定向测试（clean 后确认条数）+ 三份快照 diff 为空 | ✅ 完成（11/11，2026-11-19） |
 | **P3** | 类职责归位：`*Ops`(50) / `*Support`(21) / `*Wiring`(13) 合并回 service | 该域定向测试 + 金片 + 全量闸门 | 待做 |
-| **P4** | `api/` 包语义纠正 + 域间边界改为测试校验 | 结构校验通过；跨域直连引用 0 | 待做 |
+| **P4** | `api/` 语义纠正（P2 已做）+ 域间边界校验 | 跨域直连 2 → 1；余 1 条已论证并写明后续归属 | ✅ 2026-11-19 |
 
 **P2 顺序**（文件数从小到大；前 6 个域用来跑顺流程）：`favorite`(13) → `system`(18) → `vectorstore`(20) → `audit`(20) → `embedchannel`(25) → `agentmanagement`(27) → `model`(38) → `websearch`(52) → `agenttools`(59) → `storage`(62) → `memory`(91) → `im`(106) → `auth`(122) → `datasource`(147) → `wiki`(165) → `mcp`(171) → `session`(212) → `knowledge`(283)。
 

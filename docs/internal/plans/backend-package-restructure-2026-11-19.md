@@ -38,7 +38,7 @@
 | **P1** | 结构规则先行：只补 2 条缺口规则（跨域直连、注解 SQL 棘轮）+ 扫描名单核对 | 先出现状违规清单（只量不改）；违规数只减不增 |
 | **P2** | `api/` 里的 `*Adapter` 迁到 `adapter/`（32 个 / 11 域），纯移动、不改类名与逻辑 | 每域：编译 + 定向测试（clean 后确认条数）+ 三份快照 diff 为空 |
 | **P3** | 类职责归位：合并 `*Ops`（50）/ `*Support`（21）/ `*Wiring`（13） | 该域定向测试 + 金片 + 全量闸门 |
-| **P4** | `api/` 包语义纠正 + 域间边界改为测试校验 | 结构校验通过；跨域直连引用只减不增 |
+| **P4** | `api/` 包语义纠正 + 域间边界改为测试校验 | 结构校验通过；跨域直连 2 → 1（余 1 条待解散时解） | ✅ 2026-11-19 |
 
 ### 4.1 P1 的规则：先盘点已有，只补缺口
 
@@ -295,6 +295,18 @@ ragagent/
 结论：本次实施后解散 contract 是"加一层"（删模块 + 改 import），不是"改一遍"。
 
 ### 9.5 解散的起点不是搬域契约
+
+> **2026-11-19 实测修正**：本节原判"先把 `error` / `event` / `json` / `text` / `pagination` 下沉 framework"，逐一验证后**五个都不成立**：
+>
+> | 包 | 结论 | 原因 |
+> |---|---|---|
+> | `error` | 不沉 | `AppError` / `ErrorCode` 是 **API 契约**（前端按 code 分支），不是技术实现 |
+> | `event` | 不沉 | contract 侧是接口（`EventBusInterface` / `EventHandler`），platform 侧是同名**实现**包，属契约/实现的正当分层 |
+> | `text` | 不沉 | 同上：contract 是 `Whitespace` / `Tokens` 契约常量，platform 是 `UnicodeText` / `HtmlText` 实现 |
+> | `json` | 不沉 | 被 contract 内部 **5 处**引用（`SearchResult` / `AgentStep` / `JsonValueSupport` 等）；下沉会让 contract 反向依赖 platform——实测编译失败，守卫同时报"新环/分层违例" |
+> | `pagination` | 不沉 | `PageResult` 是域间传输形状 |
+>
+> 结论：**contract 是全仓唯一的零依赖基础层**。凡被 contract 内部引用的类型都不能下沉（会造成反向依赖）；其余"纯契约"本就是它的职责。解散的正确起点不是"削薄通用包"，而是"把域专属契约搬回各域"——但 24 个包里只有 4 个仅被 domains 消费，其余跨模块，需逐包确认消费者后才能动手。
 
 24 个包里只有 4 个（`doc` / `pagination` / `settings` / `text`）只被 domains 消费；其余 20 个全部跨模块，`knowledge` 还被 `retrieval-engine` 与 `platform` 各用 4 处。
 
