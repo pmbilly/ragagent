@@ -75,7 +75,7 @@ public class FaqImportService {
                             FaqChunkRepository faqChunkRepository) {
 
         this.taskExecutor = taskExecutor;
-        this.validateOps = new FaqValidateOps(this);
+        this.validateOps = new FaqValidateOps(faqChunkCodec, faqChunkRepository, taskStore);
         this.batchOps = new FaqBatchOps(this, knowledgeRepository, tagRepository);
         this.faqChunkRepository = faqChunkRepository;
         this.knowledgeRepository = knowledgeRepository;

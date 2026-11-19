@@ -1,7 +1,9 @@
 package com.ragagent.im.service;
 
+import com.ragagent.contract.session.SessionQaPort;
 import com.ragagent.contract.session.SessionView;
 import com.ragagent.im.domain.ChannelSessionEntity;
+import com.ragagent.im.repository.ChannelSessionRepository;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
@@ -18,10 +20,12 @@ final class ImSessionResolver {
 
     private static final Logger log = LoggerFactory.getLogger(ImSessionResolver.class);
 
-    private final ImTurnOrchestrator service;
+    private final ChannelSessionRepository channelSessions;
+    private final SessionQaPort sessionQaPort;
 
-    ImSessionResolver(ImTurnOrchestrator service) {
-        this.service = service;
+    ImSessionResolver(ChannelSessionRepository channelSessions, SessionQaPort sessionQaPort) {
+        this.channelSessions = channelSessions;
+        this.sessionQaPort = sessionQaPort;
     }
 
     // ── 会话解析 ─────────────────────────────────────────────────────────
@@ -37,7 +41,7 @@ final class ImSessionResolver {
 
     ChannelSessionEntity resolveUserSession(IncomingMessage msg, long tenantId,
             String agentId, String imChannelId) {
-        ChannelSessionEntity cs = service.channelSessions.findUserSession(msg.platform, msg.userId,
+        ChannelSessionEntity cs = channelSessions.findUserSession(msg.platform, msg.userId,
                 msg.chatId, tenantId, agentId);
         if (cs != null) {
             return cs;
@@ -62,7 +66,7 @@ final class ImSessionResolver {
                     msg.platform, msg.chatId);
             return resolveUserSession(msg, tenantId, agentId, imChannelId);
         }
-        ChannelSessionEntity cs = service.channelSessions.findThreadSession(msg.platform, msg.chatId,
+        ChannelSessionEntity cs = channelSessions.findThreadSession(msg.platform, msg.chatId,
                 threadId, tenantId, agentId);
         if (cs != null) {
             return cs;
@@ -82,7 +86,7 @@ final class ImSessionResolver {
         s.setTenantId(tenantId);
         s.setTitle(title);
         s.setDescription(description);
-        return service.sessionQaPort.createSession(s);
+        return sessionQaPort.createSession(s);
     }
 
 
@@ -107,18 +111,18 @@ final class ImSessionResolver {
 
     ChannelSessionEntity insertMapping(ChannelSessionEntity fresh, SessionView created) {
         try {
-            service.channelSessions.insert(fresh, OffsetDateTime.now());
+            channelSessions.insert(fresh, OffsetDateTime.now());
             log.info("[IM] Created new session mapping: session={}", created.getId());
             return fresh;
         } catch (RuntimeException e) {
             log.error("[IM] channel session insert failed", e);
             // 并发创建撞唯一约束：清掉孤儿会话，回落已存在映射。
             try {
-                service.sessionQaPort.deleteSession(created.getId());
+                sessionQaPort.deleteSession(created.getId());
             } catch (Exception cleanup) {
                 log.warn("[IM] Failed to clean up orphaned session {}", created.getId(), cleanup);
             }
-            ChannelSessionEntity existing = service.channelSessions.findUserSession(fresh.getPlatform(),
+            ChannelSessionEntity existing = channelSessions.findUserSession(fresh.getPlatform(),
                     fresh.getUserId(), fresh.getChatId(), fresh.getTenantId(), fresh.getAgentId());
             if (existing == null) {
                 throw new IllegalStateException("create channel session: " + e.getMessage(), e);

@@ -6,6 +6,7 @@ import com.ragagent.contract.json.JsonValues;
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.contract.session.MessageView;
 import com.ragagent.contract.session.QaRequestPayload;
+import com.ragagent.contract.session.SessionQaPort;
 import com.ragagent.contract.session.SessionView;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.IncomingMessage;
@@ -18,10 +19,12 @@ import java.util.List;
  */
 final class ImQaRequests {
 
-    private final ImTurnOrchestrator service;
+    private final AgentLookup agentLookup;
+    private final SessionQaPort sessionQaPort;
 
-    ImQaRequests(ImTurnOrchestrator service) {
-        this.service = service;
+    ImQaRequests(AgentLookup agentLookup, SessionQaPort sessionQaPort) {
+        this.agentLookup = agentLookup;
+        this.sessionQaPort = sessionQaPort;
     }
 
 
@@ -50,7 +53,7 @@ final class ImQaRequests {
         // agent 实体由 session 面按 id 解析；装配面只传 id + 归一化配置（域间只经契约）
         req.agentId = agent == null ? "" : agent.id();
         if (agent != null) {
-            req.agentConfig = service.agentLookup.defaultedConfig(agent.configJson());
+            req.agentConfig = agentLookup.defaultedConfig(agent.configJson());
         }
         req.webSearchEnabled = JsonValues.boolAt(req.agentConfig, "webSearchEnabled", false);
         req.quotedContext = ImFormat.formatQuotedContext(quote);
@@ -77,7 +80,7 @@ final class ImQaRequests {
         if (attachments != null && !attachments.isEmpty()) {
             m.setAttachments(attachments);
         }
-        return service.sessionQaPort.createMessage(m);
+        return sessionQaPort.createMessage(m);
     }
 
     /** 助手消息落库。 */
@@ -87,6 +90,6 @@ final class ImQaRequests {
         m.setRole("assistant");
         m.setRequestId(requestId);
         m.setChannel("im");
-        return service.sessionQaPort.createMessage(m);
+        return sessionQaPort.createMessage(m);
     }
 }

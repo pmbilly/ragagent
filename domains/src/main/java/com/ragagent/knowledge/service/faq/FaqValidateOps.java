@@ -5,6 +5,8 @@ import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
 import com.ragagent.knowledge.dto.faq.FaqFailedEntry;
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
+import com.ragagent.knowledge.repository.FaqChunkRepository;
+import com.ragagent.knowledge.support.FaqImportTaskStore;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -22,10 +24,16 @@ final class FaqValidateOps {
 
     private static final Logger log = LoggerFactory.getLogger(FaqValidateOps.class);
 
-    private final FaqImportService service;
+    private final FaqChunkCodec faqChunkCodec;
+    private final FaqChunkRepository faqChunkRepository;
+    private final FaqImportTaskStore taskStore;
 
-    FaqValidateOps(FaqImportService service) {
-        this.service = service;
+    FaqValidateOps(FaqChunkCodec faqChunkCodec,
+                   FaqChunkRepository faqChunkRepository,
+                   FaqImportTaskStore taskStore) {
+        this.faqChunkCodec = faqChunkCodec;
+        this.faqChunkRepository = faqChunkRepository;
+        this.taskStore = taskStore;
     }
 
     List<Integer> validateAppendMode(long tenantId, String kbId,
@@ -68,7 +76,7 @@ final class FaqValidateOps {
         }
         progress = FaqImportService.withValidationResults(progress, failedEntries, failedCount, partialFailedCount,
                 mergeIndices, null);
-        service.taskStore.saveProgress(progress);
+        taskStore.saveProgress(progress);
         log.info("Append mode validation completed: total={}, valid={}, merge_candidates={}, failed={}, partial_failed={}",
                 entries.size(), validIndices.size(), mergeCount, progress.failedCount(),
                 progress.partialFailedCount());
@@ -84,14 +92,14 @@ final class FaqValidateOps {
     }
 
     private ExistingIndex loadExistingIndex(long tenantId, String kbId) {
-        List<Chunk> existingChunks = service.faqChunkRepository
+        List<Chunk> existingChunks = faqChunkRepository
                 .listAllFAQChunksWithMetadataByKnowledgeBaseId(tenantId, kbId);
         Map<String, Chunk> stdQToChunk = new LinkedHashMap<>();
         Map<String, String> questionToChunkId = new LinkedHashMap<>();
         Map<String, Set<String>> chunkQuestions = new LinkedHashMap<>();
         Map<String, String> chunkIdToStdQ = new LinkedHashMap<>();
         for (Chunk chunk : existingChunks) {
-            FaqChunkMetadata meta = service.faqChunkCodec.sanitizedFaqMetadata(chunk);
+            FaqChunkMetadata meta = faqChunkCodec.sanitizedFaqMetadata(chunk);
             if (meta == null) {
                 continue;
             }
@@ -296,7 +304,7 @@ final class FaqValidateOps {
             if (mergeChunk == null) {
                 continue;
             }
-            FaqChunkMetadata existingMeta = service.faqChunkCodec.sanitizedFaqMetadata(mergeChunk);
+            FaqChunkMetadata existingMeta = faqChunkCodec.sanitizedFaqMetadata(mergeChunk);
             if (existingMeta == null) {
                 continue;
             }
@@ -452,7 +460,7 @@ final class FaqValidateOps {
         }
         progress = FaqImportService.withValidationResults(progress, failedEntries, failedCount, partialFailedCount,
                 null, null);
-        service.taskStore.saveProgress(progress);
+        taskStore.saveProgress(progress);
         return validIndicesAfterStdQ;
     }
 

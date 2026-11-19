@@ -138,8 +138,8 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
         this.storageResolver = storageResolver.getIfAvailable();
         this.streamPipeline = new ImStreamPipeline(this, eventBusFactory);
         this.outboundFormatter = new ImOutboundFormatter(this);
-        this.sessionResolver = new ImSessionResolver(this);
-        this.qaRequests = new ImQaRequests(this);
+        this.sessionResolver = new ImSessionResolver(channelSessions, sessionQaPort);
+        this.qaRequests = new ImQaRequests(agentLookup, sessionQaPort);
         this.qaRunner = new ImQaRunner(this, eventBusFactory);
         this.attachmentPreparer = new ImAttachmentPreparer(docReaders);
         ImRedisStore store = redisRuntime.store();
