@@ -437,3 +437,36 @@ websearch.WebSearchResult
 **所以 S3-c 的真实前置是拆 `PipelinePorts`**：把 7 个字段拆成 7 个独立端口，各调用方按需注入。这与 `ContractJsonMixins` 是同一类问题（集中聚合导致耦合），但更根本——`ContractJsonMixins` 只影响序列化注册，`PipelinePorts` 影响所有入库链路的装配。
 
 拆解工作量：7 个端口 + 27 处 `domains` 引用 + `agent-engine` 3 处，预计 1~2 天，且不改变任何业务行为（纯注入方式）。
+
+**但拆 `PipelinePorts` 本身也依赖"域 api 包"**（第三次实测）：它的 12 个嵌套接口分属 7 个域/引擎——
+
+| 接口 | 引用谁 | 该归哪 |
+|---|---|---|
+| `ModelService` | `LlmChatClient` / `Reranker` | model-runtime |
+| `KnowledgeBaseService` / `KnowledgeService` / `ChunkRepository` / `KnowledgeRepository` / `KnowledgeBaseRepository` | knowledge 三个契约 | knowledge 域 api |
+| `MemoryService` | `MemoryRecall` / `MemoryRetrievalContext` | memory 域 api |
+| `WebSearch` | `WebSearchResult` / `WebSearchConfig` | websearch 域 api |
+| `DataAnalysisSession` | `ToolResult` | agent-engine |
+
+在"同一包内拆成 12 个文件"**不能解绑**——`DataAnalysisSession` 仍引用 `ToolResult`。只有按归属搬到各自域/引擎的 api 包才解绑，而那需要域 api 包先存在。
+
+**所以 S3 依赖 S5，S5 依赖 S6**，顺序必须反过来。
+
+### 10.2 `boot/config` 不能下移（2026-11-20 实测）
+
+尝试把 17 个装配类移入 `domains` 以提前做 S6，被依赖面否决：装配类 `import` 了 **10 处 `retrieval.engine.*`**（引擎实现类）与 `platform.*` 多处——它是"唯一能看到所有模块实现"的层，下移会让 `domains` 依赖引擎实现（违反"引擎只暴露 api/spi"）。
+
+所以 S6 的正确形态是"**`domains` 改名 `app`，`boot` 整体并入**"，不是"把 config 搬进 domains"。
+
+### 10.3 修正后的顺序
+
+| 序 | 阶段 | 依赖 | 说明 |
+|---|---|---|---|
+| 1 | **S6** | 无 | `domains`+`boot` → `app`（含 `config/` 与启动类），1 jar |
+| 2 | **S5** | S6 | 域契约归位：`contract.<域>` → `app/<域>/api`，同时拆 `PipelinePorts` 的 12 个接口到各域 |
+| 3 | **S3** | S5 | 引擎面归位（此时 contract 只剩引擎面 + 通用面） |
+| 4 | **S4** | S3 | 通用面下沉 framework |
+| 5 | **S7** | S4 | `platform`→`framework` + 目录前移 `backend/` |
+| 6 | **S8** | S7 | ArchUnit → Modulith |
+
+S1 已完成（mixin 机制），是唯一"无前置"的技术准备。
