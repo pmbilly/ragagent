@@ -419,3 +419,21 @@ ragagent/
 3. **批量删注册行要防子串误伤**。`AgentToolCall.class` 含子串 `ToolCall.class`，按关键字过滤会把前者一起删掉；症状是 `AgentStep` 的 wire format 多出 `executionName` / `executionArgs` 两个字段（本该被 `AgentToolCallMixin` 忽略）。
 
 结论：S3 的最小可执行单元是"**一个契约包 + 它的 mixin 分文件 + 引用该 mixin 的 mapper**"三件套一起改，不能拆。
+
+**第二个聚合体：`PipelinePorts`**（S3-c 实测）。它一个类 `import` 了 **7 个包**的契约：
+
+```text
+knowledge.ChunkFacts · KnowledgeBaseView · KnowledgeDocumentFacts
+memory.MemoryRecall · MemoryRetrievalContext
+model.LlmChatClient · Reranker
+retrieval.SearchParams · SearchResult
+tenant.WebSearchConfig
+tool.ToolResult
+websearch.WebSearchResult
+```
+
+被 `domains` **27 处**引用。它是"域与引擎的共享端口聚合体"，正是它把各包契约绑在一起——不拆它，搬任何包都会撕裂（`tool` 的 12 个里 4 个被它引用、`model` 的核心类型被它引用）。
+
+**所以 S3-c 的真实前置是拆 `PipelinePorts`**：把 7 个字段拆成 7 个独立端口，各调用方按需注入。这与 `ContractJsonMixins` 是同一类问题（集中聚合导致耦合），但更根本——`ContractJsonMixins` 只影响序列化注册，`PipelinePorts` 影响所有入库链路的装配。
+
+拆解工作量：7 个端口 + 27 处 `domains` 引用 + `agent-engine` 3 处，预计 1~2 天，且不改变任何业务行为（纯注入方式）。
