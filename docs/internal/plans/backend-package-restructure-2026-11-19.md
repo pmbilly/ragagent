@@ -396,12 +396,12 @@ ragagent/
 | 阶段 | 内容 | 前置 | 工时 | 验收 |
 |---|---|---|---|---|
 | **S1** | 解 `ContractJsonMixins` 结构障碍：改成按模块贡献（`JsonModuleCustomizer` SPI） | — | 2~3 天 | 1,339 金片零变化（序列化逐字节相同） |
-| **S2** | `platform` → `framework`（目录 + artifactId，**包名不动**） | S1 | 1 天 | 全量绿 + 守卫 49/49 |
-| **S3** | 引擎面归位：`model` → model-runtime/api；`retrieval` + `vectorstore` 余项 → retrieval/api；`agent` + `tool` + `pipeline` 整组 → agent/api + spi | S1 | 3~5 天 | 每批全量绿 |
+| ~~S2~~ | ~~`platform` → `framework`~~ **并入 S7**：与目录前移同为"路径/名字"改动（12 个 pom + 18 个脚本），只应打乱一次 | — | — | — |
+| **S3** | 引擎面归位：`model` → model-runtime/api；`retrieval` + `vectorstore` 余项 → retrieval/api；`agent` + `tool` + `pipeline` 整组 → agent/api + spi | S1 ✅ | 3~5 天 | 每批全量绿 |
 | **S4** | 通用面下沉：`error` / `event` / `json` / `text` / `pagination` → framework | S3（清完 contract 内部引用） | 2 天 | 全量绿 |
 | **S5** | 域契约归位（13 个包 → contract 只剩域包） | **需先做域间通信改造** | 不可估 | — |
 | **S6** | `domains` + `boot/config` → `app`；boot 只留启动类；1 jar 双角色 | S4 | 1~2 天 | 全量绿 + 双角色启动验证 |
-| **S7** | 目录前移 `backend/` + 路径适配（24 个脚本 + CI + 文档） | S6 | 1~2 天 | 全量绿 + 守卫 49/49 |
+| **S7** | **`platform` → `framework` + 目录前移 `backend/` + 路径适配**（原 S2 并入；12 个 pom + 24 个脚本 + CI + 文档） | S6 | 2~3 天 | 全量绿 + 守卫 49/49 |
 | **S8** | ArchUnit → Modulith，删 `scripts/*.py` 守卫 | S7 | 2 天 | — |
 
 **S1 是唯一的技术阻塞**。不解决它，S3/S4 都做不了——契约一旦分散到引擎，platform 就要依赖引擎，形成循环（`json` 下沉实测已直接编译失败）。
@@ -409,3 +409,13 @@ ragagent/
 **S5 不是"搬包"**。§9.7 实测：13 个域包没有一个只服务单域（`doc` 被 5 个域用、`settings` 被 2 个），所以必须先改域间通信方式（事件/端口化）。那是独立项目，不与本节混做。
 
 **第一段（S1~S4 + S6~S7）产出 6 模块**：`backend/framework` + 三个引擎 + `app` + `contract`（只剩域包）。这是可交付的稳定中间态，不需要动任何业务逻辑。
+
+### 10.1 S3 的第一手实测（2026-11-20，已回滚）
+
+试做"只把 model 面的 mixin 搬到 `model-runtime`、契约暂不动"（S3a-1），失败并回滚。三条教训：
+
+1. **mixin 不能与契约分两次搬**。`ContractJsonMixins`（platform）注册时直接引用 `ContractJsonMixinsModelChat.ChatMessageMixin`——mixin 一旦搬走，platform 就要 `import com.ragagent.modelruntime.json.*`，立刻反向依赖。所以只能"契约 + mixin"同批搬。
+2. **存在绕过 `JsonMappers` 的 mapper**。`domains` 的 `JsonContractRoundTripTest` 直接 `new ObjectMapper().registerModule(new ContractJsonModule())`——S1 的 ServiceLoader 机制覆盖不到它，mixin 搬走后该类测试立刻红。搬任何 mixin 之前先 `grep "new ContractJsonModule()"`，逐处补注册。
+3. **批量删注册行要防子串误伤**。`AgentToolCall.class` 含子串 `ToolCall.class`，按关键字过滤会把前者一起删掉；症状是 `AgentStep` 的 wire format 多出 `executionName` / `executionArgs` 两个字段（本该被 `AgentToolCallMixin` 忽略）。
+
+结论：S3 的最小可执行单元是"**一个契约包 + 它的 mixin 分文件 + 引用该 mixin 的 mapper**"三件套一起改，不能拆。
