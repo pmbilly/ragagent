@@ -3,11 +3,13 @@ package com.ragagent.auth.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.auth.domain.TenantConfigRedaction;
 import com.ragagent.auth.dto.TenantRowView;
+import com.ragagent.auth.service.TenantService;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.knowledge.KnowledgeBaseProvisioner;
 import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.tenant.ChatHistoryConfig;
 import com.ragagent.contract.tenant.ParserEngineConfig;
@@ -18,6 +20,7 @@ import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.prompt.PromptTemplateCatalog;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.JsonMappers;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,10 +33,16 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 final class TenantConfigOps {
 
-    private final TenantCatalogController service;
+    private final TenantService tenantService;
+    private final KnowledgeBaseProvisioner knowledgeProvisioner;
+    private final SsrfGuard ssrfGuard;
 
-    TenantConfigOps(TenantCatalogController service) {
-        this.service = service;
+    TenantConfigOps(TenantService tenantService,
+                    KnowledgeBaseProvisioner knowledgeProvisioner,
+                    SsrfGuard ssrfGuard) {
+        this.tenantService = tenantService;
+        this.knowledgeProvisioner = knowledgeProvisioner;
+        this.ssrfGuard = ssrfGuard;
     }
 
     // ── KV 分发器 ──────────────────────────────────────────────────────────
@@ -110,7 +119,7 @@ final class TenantConfigOps {
     /** 上下文无租户 → 400 */
     private TenantRowView requireContextTenant() {
         Long tenantId = TenantContext.currentTenantId();
-        TenantRowView tenant = tenantId == null || tenantId == 0 ? null : service.tenantService.getTenantById(tenantId);
+        TenantRowView tenant = tenantId == null || tenantId == 0 ? null : tenantService.getTenantById(tenantId);
         if (tenant == null) {
             throw new BizException(AppError.badRequest("Workspace is empty"));
         }
@@ -165,7 +174,7 @@ final class TenantConfigOps {
         }
         tenant.setWebSearchConfig(TenantBindSupport.MAPPER.valueToTree(merged));
         try {
-            service.tenantService.updateTenant(tenant);
+            tenantService.updateTenant(tenant);
         } catch (RuntimeException e) {
             throw updateFailed("Failed to update workspace web search config", e);
         }
@@ -192,7 +201,7 @@ final class TenantConfigOps {
         validateParserEngineOutboundUrls(merged);
         tenant.setParserEngineConfig(TenantBindSupport.MAPPER.valueToTree(merged));
         try {
-            service.tenantService.updateTenant(tenant);
+            tenantService.updateTenant(tenant);
         } catch (RuntimeException e) {
             throw updateFailed("Failed to update workspace parser engine config", e);
         }
@@ -220,7 +229,7 @@ final class TenantConfigOps {
 
     private void ssrfCheck(String field, String url) {
         try {
-            service.ssrfGuard.validateURLForSSRF(url);
+            ssrfGuard.validateURLForSSRF(url);
         } catch (RuntimeException e) {
             throw new BizException(AppError.validation(
                     field + " failed SSRF validation: " + e.getMessage()));
@@ -269,7 +278,7 @@ final class TenantConfigOps {
             // 实体语义（名字/类型/临时标记/描述）归知识域，本域只传模型 id、只消费 id
             String kbId;
             try {
-                kbId = service.knowledgeProvisioner.provisionChatHistoryKnowledgeBase(cfg.getEmbeddingModelId());
+                kbId = knowledgeProvisioner.provisionChatHistoryKnowledgeBase(cfg.getEmbeddingModelId());
             } catch (RuntimeException e) {
                 throw new BizException(AppError.internal("Failed to create chat history knowledge base")
                         .withDetails(e.getMessage()));
@@ -279,7 +288,7 @@ final class TenantConfigOps {
 
         tenant.setChatHistoryConfig(TenantBindSupport.MAPPER.valueToTree(cfg));
         try {
-            service.tenantService.updateTenant(tenant);
+            tenantService.updateTenant(tenant);
         } catch (RuntimeException e) {
             throw updateFailed("Failed to update chat history config", e);
         }
@@ -318,7 +327,7 @@ final class TenantConfigOps {
         TenantRowView tenant = requireContextTenant();
         tenant.setRetrievalConfig(TenantBindSupport.MAPPER.valueToTree(cfg));
         try {
-            service.tenantService.updateTenant(tenant);
+            tenantService.updateTenant(tenant);
         } catch (RuntimeException e) {
             throw updateFailed("Failed to update retrieval config", e);
         }
@@ -382,7 +391,7 @@ final class TenantConfigOps {
         TenantRowView tenant = requireContextTenant();
         tenant.setMemoryConfig(TenantBindSupport.MAPPER.valueToTree(cfg));
         try {
-            service.tenantService.updateTenant(tenant);
+            tenantService.updateTenant(tenant);
         } catch (RuntimeException e) {
             throw updateFailed("Failed to update memory config", e);
         }

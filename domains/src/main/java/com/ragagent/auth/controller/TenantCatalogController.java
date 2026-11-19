@@ -87,9 +87,10 @@ public class TenantCatalogController {
         this.ssrfGuard = ssrfGuard;
         this.storageAllowList = storageAllowList;
         this.springMapper = springMapper;
-        this.createOps = new TenantCreateOps(this);
-        this.crudOps = new TenantCrudOps(this);
-        this.configOps = new TenantConfigOps(this);
+        this.createOps = new TenantCreateOps(tenantService, memberService, userService,
+                systemSettingService, apiKeyAdmin, tenantProperties, springMapper);
+        this.crudOps = new TenantCrudOps(tenantService);
+        this.configOps = new TenantConfigOps(tenantService, knowledgeProvisioner, ssrfGuard);
     }
 
 

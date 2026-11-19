@@ -26,10 +26,12 @@ final class EmbedChannelPublicOps {
     /** 历史会话列表上限。 */
     private static final int MAX_HISTORY_SESSIONS = 50;
 
-    private final EmbedChannelController ctrl;
+    private final EmbedChannelService service;
+    private final EmbedSessionOps embedSessionOps;
 
-    EmbedChannelPublicOps(EmbedChannelController ctrl) {
-        this.ctrl = ctrl;
+    EmbedChannelPublicOps(EmbedChannelService service, EmbedSessionOps embedSessionOps) {
+        this.service = service;
+        this.embedSessionOps = embedSessionOps;
     }
 
     // ── 公开面（EmbedAuthFilter 已跑） ──
@@ -49,7 +51,7 @@ final class EmbedChannelPublicOps {
         }
         EmbedChannelService.IssueResult result;
         try {
-            result = ctrl.service.issueSessionToken(ch.getId());
+            result = service.issueSessionToken(ch.getId());
         } catch (EmbedError e) {
             if (e.kind == EmbedError.Kind.SESSION_UNAVAILABLE) {
                 return EmbedChannelController.plainError(503, "session tokens unavailable");
@@ -62,7 +64,7 @@ final class EmbedChannelPublicOps {
     /** 公开配置视图。 */
     public ResponseEntity<com.fasterxml.jackson.databind.node.ObjectNode> config(@PathVariable("channelId") String channelId) {
         EmbedChannelEntity ch = EmbedChannelRows.channel(EmbedChannelController.request0());
-        return ResponseEntity.ok(ctrl.service.publicConfig(ch));
+        return ResponseEntity.ok(service.publicConfig(ch));
     }
 
     /** 公开建议问题（开关关闭或失败时返回空列表）。 */
@@ -90,7 +92,7 @@ final class EmbedChannelPublicOps {
         }
         java.util.List<Object> questions;
         try {
-            questions = ctrl.service.suggestedQuestions(ch, limitInt);
+            questions = service.suggestedQuestions(ch, limitInt);
         } catch (RuntimeException e) {
             return EmbedChannelController.plainError(500, "failed to load suggested questions");
         }
@@ -105,7 +107,7 @@ final class EmbedChannelPublicOps {
             return EmbedChannelController.plainError(400, "chunk_id is required");
         }
         try {
-            ChunkRowView chunk = ctrl.service.embedChunk(ch, cid);
+            ChunkRowView chunk = service.embedChunk(ch, cid);
             return ResponseEntity.ok(chunk);
         } catch (EmbedChannelService.ChunkNotFoundError e) {
             return EmbedChannelController.plainError(404, "chunk not found");
@@ -130,7 +132,7 @@ final class EmbedChannelPublicOps {
         }
         String createdId;
         try {
-            createdId = ctrl.embedSessionOps.createVisitorSession(tenantId, ch.getId(),
+            createdId = embedSessionOps.createVisitorSession(tenantId, ch.getId(),
                     EmbedChannelService.embedSessionDescription(ch.getId()), visitor);
         } catch (RuntimeException e) {
             return EmbedChannelController.plainError(500, "failed to create session");
@@ -161,7 +163,7 @@ final class EmbedChannelPublicOps {
         }
         boolean deleted;
         try {
-            deleted = ctrl.embedSessionOps.deleteVisitorSession(tenantId,
+            deleted = embedSessionOps.deleteVisitorSession(tenantId,
                     EmbedChannelService.embedSessionDescription(ch.getId()), visitor, sessionId);
         } catch (RuntimeException e) {
             return EmbedChannelController.plainError(500, "failed to delete session");
@@ -198,7 +200,7 @@ final class EmbedChannelPublicOps {
         }
         List<EmbedSessionOps.VisitorSessionRow> rows;
         try {
-            rows = ctrl.embedSessionOps.visitorSessions(tenantId,
+            rows = embedSessionOps.visitorSessions(tenantId,
                     EmbedChannelService.embedSessionDescription(ch.getId()), visitor,
                     MAX_HISTORY_SESSIONS);
         } catch (RuntimeException e) {

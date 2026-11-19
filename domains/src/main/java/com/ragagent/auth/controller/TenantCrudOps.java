@@ -3,6 +3,7 @@ package com.ragagent.auth.controller;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.auth.dto.TenantResponse;
 import com.ragagent.auth.dto.TenantRowView;
+import com.ragagent.auth.service.TenantService;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.tenant.TenantRole;
@@ -22,10 +23,10 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 final class TenantCrudOps {
 
-    private final TenantCatalogController service;
+    private final TenantService tenantService;
 
-    TenantCrudOps(TenantCatalogController service) {
-        this.service = service;
+    TenantCrudOps(TenantService tenantService) {
+        this.tenantService = tenantService;
     }
 
     // ── tenants CRUD 4 条 ───────────────────────────────────────────────────
@@ -37,7 +38,7 @@ final class TenantCrudOps {
      */
     public Map<String, Object> listTenants() {
         Long tenantId = TenantContext.currentTenantId();
-        TenantRowView tenant = tenantId == null || tenantId == 0 ? null : service.tenantService.getTenantById(tenantId);
+        TenantRowView tenant = tenantId == null || tenantId == 0 ? null : tenantService.getTenantById(tenantId);
         if (tenant == null) {
             throw new BizException(AppError.unauthorized("Authentication required"));
         }
@@ -80,7 +81,7 @@ final class TenantCrudOps {
         }
 
         try {
-            service.tenantService.updateTenant(existing);
+            tenantService.updateTenant(existing);
         } catch (BizException e) {
             throw e;
         } catch (RuntimeException e) {
@@ -157,7 +158,7 @@ final class TenantCrudOps {
      */
     public org.springframework.http.ResponseEntity<Void> deleteTenant(@PathVariable("id") String id) {
         try {
-            service.tenantService.deleteTenant(Long.parseLong(id.trim()));
+            tenantService.deleteTenant(Long.parseLong(id.trim()));
         } catch (BizException e) {
             throw e;
         } catch (RuntimeException e) {
@@ -169,7 +170,7 @@ final class TenantCrudOps {
 
     /** GET/PUT 共用：租户缺失 → 500 + details "record not found"（仓储错误原文透传）。 */
     private TenantRowView loadTenantOr500(long id, String message) {
-        TenantRowView tenant = service.tenantService.getTenantById(id);
+        TenantRowView tenant = tenantService.getTenantById(id);
         if (tenant == null) {
             throw new BizException(AppError.internal(message).withDetails("record not found"));
         }

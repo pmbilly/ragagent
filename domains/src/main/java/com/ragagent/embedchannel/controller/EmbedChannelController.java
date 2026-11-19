@@ -93,8 +93,8 @@ final FileProxyPort fileProxyService;
         this.sessionPort = sessionPort;
         this.mcpApprovalOps = mcpApprovalOps;
         this.fileProxyService = fileProxyService;
-        this.mgmtOps = new EmbedChannelMgmtOps(this);
-        this.publicOps = new EmbedChannelPublicOps(this);
+        this.mgmtOps = new EmbedChannelMgmtOps(service, embedSessionOps);
+        this.publicOps = new EmbedChannelPublicOps(service, embedSessionOps);
         this.delegateOps = new EmbedChannelDelegateOps(this);
     }
 

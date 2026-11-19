@@ -1,5 +1,6 @@
 package com.ragagent.embedchannel.controller;
 
+import com.ragagent.contract.session.EmbedSessionOps;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.embedchannel.service.EmbedChannelService.UpdateCommand;
@@ -20,10 +21,12 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 final class EmbedChannelMgmtOps {
 
-    private final EmbedChannelController ctrl;
+    private final EmbedChannelService service;
+    private final EmbedSessionOps embedSessionOps;
 
-    EmbedChannelMgmtOps(EmbedChannelController ctrl) {
-        this.ctrl = ctrl;
+    EmbedChannelMgmtOps(EmbedChannelService service, EmbedSessionOps embedSessionOps) {
+        this.service = service;
+        this.embedSessionOps = embedSessionOps;
     }
 
     // ── 管理面 ──
@@ -33,7 +36,7 @@ final class EmbedChannelMgmtOps {
                                                       @RequestBody(required = false) String rawBody) {
         EmbedChannelController.EmbedChannelRequest req = EmbedChannelController.bind(rawBody);
         try {
-            ctrl.service.validateAllowedOrigins(EmbedChannelController.stringList(req.allowedOrigins()));
+            service.validateAllowedOrigins(EmbedChannelController.stringList(req.allowedOrigins()));
             if (req.launcherIcon() != null) {
                 EmbedChannelService.validateLauncherIcon(req.launcherIcon().trim());
             }
@@ -58,7 +61,7 @@ final class EmbedChannelMgmtOps {
         input.setDefaultLocale(EmbedChannelService.normalizeDefaultLocale(EmbedChannelController.orEmpty(req.defaultLocale())));
         input.setLauncherIcon(EmbedChannelController.orEmpty(req.launcherIcon()));
         try {
-            EmbedChannelEntity ch = ctrl.service.create(EmbedChannelController.currentTenant(), LogSanitizer.sanitize(agentId), input);
+            EmbedChannelEntity ch = service.create(EmbedChannelController.currentTenant(), LogSanitizer.sanitize(agentId), input);
             // 201 + 裸对象
             return ResponseEntity.status(201).body(EmbedChannelRows.row(ch, true));
         } catch (EmbedError e) {
@@ -70,7 +73,7 @@ final class EmbedChannelMgmtOps {
     public ResponseEntity<List<EmbedChannelRows.EmbedChannelRow>> listByAgent(@PathVariable("id") String agentId) {
         try {
             List<EmbedChannelEntity> rows =
-                    ctrl.service.listByAgent(EmbedChannelController.currentTenant(), LogSanitizer.sanitize(agentId));
+                    service.listByAgent(EmbedChannelController.currentTenant(), LogSanitizer.sanitize(agentId));
             return ResponseEntity.ok(EmbedChannelRows.rows(rows));
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
@@ -80,7 +83,7 @@ final class EmbedChannelMgmtOps {
     /** 全租户渠道列表（跨 agent，publish token 永不出现在列表里）。 */
     public ResponseEntity<List<EmbedChannelRows.EmbedChannelRow>> listAll() {
         try {
-            return ResponseEntity.ok(EmbedChannelRows.rows(ctrl.service.listByTenant(EmbedChannelController.currentTenant())));
+            return ResponseEntity.ok(EmbedChannelRows.rows(service.listByTenant(EmbedChannelController.currentTenant())));
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
         }
@@ -89,7 +92,7 @@ final class EmbedChannelMgmtOps {
     /** 管理详情（**含** publish token）。 */
     public ResponseEntity<EmbedChannelRows.EmbedChannelRow> get(@PathVariable("channelId") String channelId) {
         try {
-            EmbedChannelEntity ch = ctrl.service.getOwnedChannel(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
+            EmbedChannelEntity ch = service.getOwnedChannel(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
             return ResponseEntity.ok(EmbedChannelRows.row(ch, true));
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
@@ -102,7 +105,7 @@ final class EmbedChannelMgmtOps {
         EmbedChannelController.EmbedChannelRequest req = EmbedChannelController.bind(rawBody);
         try {
             if (req.allowedOrigins() != null) {
-                ctrl.service.validateAllowedOrigins(EmbedChannelController.stringList(req.allowedOrigins()));
+                service.validateAllowedOrigins(EmbedChannelController.stringList(req.allowedOrigins()));
             }
             if (req.webhookUrl() != null) {
                 EmbedChannelService.validateWebhookUrl(req.webhookUrl());
@@ -136,7 +139,7 @@ final class EmbedChannelMgmtOps {
         cmd.allowedOriginsColumn = req.allowedOrigins() == null
                 ? "null" : req.allowedOrigins().toString();
         try {
-            EmbedChannelEntity ch = ctrl.service.update(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId), cmd);
+            EmbedChannelEntity ch = service.update(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId), cmd);
             return ResponseEntity.ok(EmbedChannelRows.row(ch, false));
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
@@ -146,7 +149,7 @@ final class EmbedChannelMgmtOps {
     /** 删除渠道 → **204**（同步完成的删除无响应体，不回 {"success":true}）。 */
     public ApiResponse<Void> delete(@PathVariable("channelId") String channelId) {
         try {
-            ctrl.service.delete(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
+            service.delete(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
         }
@@ -156,7 +159,7 @@ final class EmbedChannelMgmtOps {
     /** 轮换发布令牌：200 + 含新 token 的行。 */
     public ResponseEntity<EmbedChannelRows.EmbedChannelRow> rotate(@PathVariable("channelId") String channelId) {
         try {
-            var result = ctrl.service.rotateToken(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
+            var result = service.rotateToken(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
             return ResponseEntity.ok(EmbedChannelRows.row(result.channel(), result.token()));
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
@@ -171,7 +174,7 @@ final class EmbedChannelMgmtOps {
     public ResponseEntity<PreviewResponse> preview(@PathVariable("channelId") String channelId) {
         EmbedChannelService.IssueResult result;
         try {
-            result = ctrl.service.issuePreviewSession(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
+            result = service.issuePreviewSession(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
         } catch (EmbedError e) {
             if (e.kind == EmbedError.Kind.CHANNEL_DISABLED) {
                 return EmbedChannelController.plainError(403, "embed channel is disabled");
@@ -187,11 +190,11 @@ final class EmbedChannelMgmtOps {
 
     public ResponseEntity<StatsResponse> stats(@PathVariable("channelId") String channelId) {
         try {
-            ctrl.service.getOwnedChannel(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
+            service.getOwnedChannel(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
         }
-        long total = ctrl.embedSessionOps.countSessions(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
+        long total = embedSessionOps.countSessions(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
         return ResponseEntity.ok(new StatsResponse(total));
     }
 }

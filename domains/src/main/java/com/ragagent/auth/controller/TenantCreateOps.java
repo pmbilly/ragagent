@@ -2,15 +2,22 @@ package com.ragagent.auth.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.auth.apikey.service.ApiKeyAdminAdapter;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.TenantRowView;
+import com.ragagent.auth.service.TenantMemberService;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.auth.service.UserService;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
+import com.ragagent.contract.settings.SystemSettingGateway;
 import com.ragagent.contract.tenant.TenantRole;
+import com.ragagent.platform.config.TenantProperties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -28,10 +35,28 @@ final class TenantCreateOps {
 
     private static final Logger log = LoggerFactory.getLogger(TenantCreateOps.class);
 
-    private final TenantCatalogController service;
+    private final TenantService tenantService;
+    private final TenantMemberService memberService;
+    private final UserService userService;
+    private final SystemSettingGateway systemSettingService;
+    private final ApiKeyAdminAdapter apiKeyAdmin;
+    private final TenantProperties tenantProperties;
+    private final ObjectMapper springMapper;
 
-    TenantCreateOps(TenantCatalogController service) {
-        this.service = service;
+    TenantCreateOps(TenantService tenantService,
+                    TenantMemberService memberService,
+                    UserService userService,
+                    SystemSettingGateway systemSettingService,
+                    ApiKeyAdminAdapter apiKeyAdmin,
+                    TenantProperties tenantProperties,
+                    ObjectMapper springMapper) {
+        this.tenantService = tenantService;
+        this.memberService = memberService;
+        this.userService = userService;
+        this.systemSettingService = systemSettingService;
+        this.apiKeyAdmin = apiKeyAdmin;
+        this.tenantProperties = tenantProperties;
+        this.springMapper = springMapper;
     }
 
     /** 每用户可拥有的租户数默认上限。 */
@@ -41,7 +66,7 @@ final class TenantCreateOps {
 
     public ResponseEntity<?> createTenant(
             @RequestBody(required = false) String rawBody) {
-        User caller = service.userService.getCurrentUser();
+        User caller = userService.getCurrentUser();
         if (caller == null) {
             throw new BizException(AppError.unauthorized("authentication required"));
         }
@@ -50,10 +75,10 @@ final class TenantCreateOps {
         boolean catalogManager = caller.isCanAccessAllTenants() || platformCaller;
 
         // 部署级自助开关（三层解析：以 config 为底，SystemSettingGateway 再叠 DB/env）
-        if (!catalogManager && !service.systemSettingService.getBool(
+        if (!catalogManager && !systemSettingService.getBool(
                 "tenant.self_service_creation_enabled",
                 "RAGAGENT_TENANT_SELF_SERVICE_CREATION_ENABLED",
-                service.tenantProperties.isSelfServiceCreationEnabled())) {
+                tenantProperties.isSelfServiceCreationEnabled())) {
             throw new BizException(new AppError(
                     ErrorCode.TENANT_CREATION_DISABLED.value(),
                     "self-service workspace creation is disabled; join a workspace by invitation",
@@ -79,7 +104,7 @@ final class TenantCreateOps {
             int cap = resolveMaxOwnedTenantsPerUser();
             if (cap > 0) {
                 int owned = 0;
-                for (TenantMember m : service.memberService.listByUser(caller.getId())) {
+                for (TenantMember m : memberService.listByUser(caller.getId())) {
                     if (m != null && TenantRole.OWNER.value().equals(m.getRole())) {
                         owned++;
                     }
@@ -95,7 +120,7 @@ final class TenantCreateOps {
 
         // 默认配额：StorageQuota≤0 → settings 的 GB 值（≤0 再回 10）
         if (tenantData.getStorageQuota() == null || tenantData.getStorageQuota() <= 0) {
-            long gb = service.systemSettingService.getInt(
+            long gb = systemSettingService.getInt(
                     "tenant.default_storage_quota_gb",
                     "RAGAGENT_TENANT_DEFAULT_STORAGE_QUOTA_GB",
                     10);
@@ -107,7 +132,7 @@ final class TenantCreateOps {
 
         TenantRowView created;
         try {
-            created = service.tenantService.createTenant(tenantData);
+            created = tenantService.createTenant(tenantData);
         } catch (IllegalArgumentException e) {
             // service 的非 AppError 错误（如空名）→ 500
             throw new BizException(AppError.internal("Failed to create workspace")
@@ -122,9 +147,9 @@ final class TenantCreateOps {
         // Owner 引导：失败回滚租户。平台 Key 不建成员。
         if (!platformCaller) {
             try {
-                service.memberService.ensureOwner(caller.getId(), created.getId());
+                memberService.ensureOwner(caller.getId(), created.getId());
             } catch (RuntimeException e) {
-                service.tenantService.deleteTenant(created.getId());
+                tenantService.deleteTenant(created.getId());
                 throw new BizException(AppError.internal("Failed to finalise workspace ownership")
                         .withDetails(e.getMessage()));
             }
@@ -133,14 +158,14 @@ final class TenantCreateOps {
                 int cap = resolveMaxOwnedTenantsPerUser();
                 if (cap > 0) {
                     int ownedNow = 0;
-                    for (TenantMember m : service.memberService.listByUser(caller.getId())) {
+                    for (TenantMember m : memberService.listByUser(caller.getId())) {
                         if (m != null && TenantRole.OWNER.value().equals(m.getRole())) {
                             ownedNow++;
                         }
                     }
                     if (ownedNow > cap) {
-                        service.memberService.removeMember(caller.getId(), created.getId());
-                        service.tenantService.deleteTenant(created.getId());
+                        memberService.removeMember(caller.getId(), created.getId());
+                        tenantService.deleteTenant(created.getId());
                         throw quotaExceeded();
                     }
                 }
@@ -151,16 +176,16 @@ final class TenantCreateOps {
         if (caller.getTenantId() == 0 && !platformCaller) {
             caller.setTenantId(created.getId());
             try {
-                service.userService.updateUser(caller);
+                userService.updateUser(caller);
             } catch (RuntimeException e) {
                 if (!platformCaller) {
                     try {
-                        service.memberService.removeMember(caller.getId(), created.getId());
+                        memberService.removeMember(caller.getId(), created.getId());
                     } catch (RuntimeException ignored) {
                         // 尽力回滚
                     }
                 }
-                service.tenantService.deleteTenant(created.getId());
+                tenantService.deleteTenant(created.getId());
                 throw new BizException(AppError.internal("Failed to finalise default workspace")
                         .withDetails(e.getMessage()));
             }
@@ -168,11 +193,11 @@ final class TenantCreateOps {
 
         // auto_create_api_key 兼容路径：失败不拖垮创建
         Object data = created;
-        if (!platformCaller && service.systemSettingService.getBool(
+        if (!platformCaller && systemSettingService.getBool(
                 "tenant.auto_create_api_key", "RAGAGENT_TENANT_AUTO_CREATE_API_KEY", false)) {
             try {
                 // 走管理口 ✓
-                String token = service.apiKeyAdmin.createDefaultTenantKey(created.getId());
+                String token = apiKeyAdmin.createDefaultTenantKey(created.getId());
                 data = tenantWithApiKey(created, token);
             } catch (RuntimeException e) {
                 log.warn("[tenant] auto-create default API key failed for tenant {}", created.getId(), e);
@@ -186,7 +211,7 @@ final class TenantCreateOps {
      * tenant 序列化为 map 再加 api_key；map 序列化**各层键都按字母序**——递归深排序。
      */
     private Object tenantWithApiKey(TenantRowView tenant, String token) {
-        JsonNode node = service.springMapper.valueToTree(tenant);
+        JsonNode node = springMapper.valueToTree(tenant);
         Object sorted = deepSortKeys(node);
         @SuppressWarnings("unchecked")
         TreeMap<String, Object> m = (TreeMap<String, Object>) sorted;
@@ -215,10 +240,10 @@ final class TenantCreateOps {
     /** 每用户可拥有的租户数上限：cfg 底座 → 三层解析 */
     private int resolveMaxOwnedTenantsPerUser() {
         long fallback = DEFAULT_MAX_OWNED_PER_USER;
-        if (service.tenantProperties.maxOwnedPerUser() != null && service.tenantProperties.maxOwnedPerUser() != 0) {
-            fallback = service.tenantProperties.maxOwnedPerUser();
+        if (tenantProperties.maxOwnedPerUser() != null && tenantProperties.maxOwnedPerUser() != 0) {
+            fallback = tenantProperties.maxOwnedPerUser();
         }
-        return (int) service.systemSettingService.getInt(
+        return (int) systemSettingService.getInt(
                 "tenant.max_owned_per_user", "RAGAGENT_TENANT_MAX_OWNED_PER_USER", fallback);
     }
 
