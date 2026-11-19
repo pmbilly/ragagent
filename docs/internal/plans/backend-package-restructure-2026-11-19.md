@@ -16,7 +16,7 @@
 |---|---|---|
 | 1 | **不动前端** | 路由、请求/响应字段、错误码、SSE 帧格式全不变；1,339 金片 + OpenAPI 快照守 |
 | 2 | **不动数据库** | 无 DDL、无迁移脚本、无表结构变更 |
-| 3 | **不做 contract 解散** | `contract` 保持现状；`domains` 仍是单个 Maven 模块 |
+| 3 | **不做 contract 解散** | `contract` 保持现状；`domains` 仍是单个 Maven 模块。**例外（2026-11-19 经决策后追加）**：P4-3~P4-5 把 21 个契约类型归位到引擎模块与基础域，属"内部减薄"而非"解散"——模块数、依赖图、`contract` 的存在性均未变（见 §4 末尾的说明） |
 
 排除项（与上述边界冲突或属于域重写范畴）：行级安全与租户插件、表结构重建、JobRunr、PGroonga、Sa-Token、MCP 官方 SDK 替换、agentscope。
 
@@ -39,6 +39,16 @@
 | **P2** | `api/` 里的 `*Adapter` 迁到 `adapter/`（32 个 / 11 域），纯移动、不改类名与逻辑 | 每域：编译 + 定向测试（clean 后确认条数）+ 三份快照 diff 为空 |
 | **P3** | 类职责归位：合并 `*Ops`（50）/ `*Support`（21）/ `*Wiring`（13） | 该域定向测试 + 金片 + 全量闸门 |
 | **P4** | `api/` 包语义纠正 + 域间边界改为测试校验 | 结构校验通过；跨域直连 2 → 1（余 1 条待解散时解） | ✅ 2026-11-19 |
+
+**边界外扩展（2026-11-19 经决策后追加，不计入上表五批）**
+
+| 批 | 内容 | 为什么追加 | 结果 |
+|---|---|---|---|
+| **P4-3** | 消 6 处基础域 → 业务域的**逆级依赖**（`MemoryConfig` → `contract.tenant`、`KnowledgeBaseProvisioner` → `tenant`、`DocReaderAdminPort`/`ParserEngineCatalogPort` → `settings`、新增 `platform.web.AcceptLanguages`） | 用户选择"评估 contract 解散"后，先清"下级依赖上级"这类结构违规 | 13 处里消 6、论证保留 3、其余 4 非逆级 |
+| **P4-4** | `contract.vectorstore` 的 8 个类型 → `retrieval-engine/retrieval/api`（留 `ConnectionConfig`/`IndexConfig`） | 同上，验证"引擎面归位"的流程 | 模块图新增 `domains → retrieval-engine` 边 |
+| **P4-5** | `contract.retrieval` 的 13 个类型 → `retrieval/api`（留 `SearchParams`/`SearchResult`/`SearchTarget`/`RetrieveGraphRepository`） | 同上 | 包级 SCC 5 → 4 组 |
+
+**这三批不属于 §2 边界第 3 条的原意（"contract 保持现状"）**，是决策后追加的。共同结论：`contract` 仍在、模块数仍是 7、依赖图只多一条边——所以它们没有改变"不做 contract 解散"这个决定，只把 21 个类型的归属挪到了更合适的位置。详细判据见 §9.7。
 
 ### 4.1 P1 的规则：先盘点已有，只补缺口
 
