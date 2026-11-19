@@ -35,7 +35,7 @@ final class WikiPageViewsSupport {
         WikiPageRepository.PageList result = service.repo.list(req);
         List<WikiPage> pages = result.pages();
         for (WikiPage page : pages) {
-            WikiPageLinkOps.stripWikiPageInlineChunkCitations(page);
+            WikiPageLinkService.stripWikiPageInlineChunkCitations(page);
             DefaultWikiPageService.normalizeWikiHierarchy(page);
         }
         int pageSize = req.getPageSize();

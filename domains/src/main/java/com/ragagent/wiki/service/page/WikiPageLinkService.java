@@ -2,6 +2,7 @@ package com.ragagent.wiki.service.page;
 
 import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.repository.WikiPageRepository;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,21 +15,27 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.stereotype.Service;
 
 /**
  * wiki 链接维护协作者：出链解析、入链增删、全量重建与交叉链接注入，以及 wiki 链接文本工具
  * （slug 归一、行内 chunk 引句柄剥离）。
  *
- * <p>持有 {@link DefaultWikiPageService} 回引以访问仓储与工具;本类不得独立实例化。</p>
+ * <p>依赖 {@code WikiPageRepository} 与 {@code WikiCrossLinker}；不持有页面服务回引，可独立装配与测试。</p>
  */
-final class WikiPageLinkOps {
+@Service
+public class WikiPageLinkService {
 
-    private static final Logger log = LoggerFactory.getLogger(WikiPageLinkOps.class);
+    private static final Logger log = LoggerFactory.getLogger(WikiPageLinkService.class);
 
-    private final DefaultWikiPageService service;
+    private final WikiPageRepository repo;
+    private final ObjectProvider<WikiCrossLinker> crossLinker;
 
-    WikiPageLinkOps(DefaultWikiPageService service) {
-        this.service = service;
+    public WikiPageLinkService(WikiPageRepository repo,
+                               ObjectProvider<WikiCrossLinker> crossLinker) {
+        this.repo = repo;
+        this.crossLinker = crossLinker;
     }
 
     /** wiki 链接语法：{@code \[\[([^\]]+)\]\]} */
@@ -122,7 +129,7 @@ final class WikiPageLinkOps {
         for (String targetSlug : targets) {
             WikiPage targetPage;
             try {
-                targetPage = service.repo.getBySlug(kbId, targetSlug);
+                targetPage = repo.getBySlug(kbId, targetSlug);
             } catch (RuntimeException e) {
                 continue; // target page may not exist yet
             }
@@ -130,7 +137,7 @@ final class WikiPageLinkOps {
                 targetPage.getInLinks().add(sourceSlug);
                 targetPage.setUpdatedAt(OffsetDateTime.now());
                 try {
-                    service.repo.updateMeta(targetPage);
+                    repo.updateMeta(targetPage);
                 } catch (RuntimeException e) {
                     log.warn("wiki: failed to update in_links for {}", targetSlug, e);
                 }
@@ -142,16 +149,16 @@ final class WikiPageLinkOps {
         for (String targetSlug : targets) {
             WikiPage targetPage;
             try {
-                targetPage = service.repo.getBySlug(kbId, targetSlug);
+                targetPage = repo.getBySlug(kbId, targetSlug);
             } catch (RuntimeException e) {
                 continue;
             }
-            List<String> newInLinks = DefaultWikiPageService.removeString(targetPage.getInLinks(), sourceSlug);
+            List<String> newInLinks = removeString(targetPage.getInLinks(), sourceSlug);
             if (newInLinks.size() != targetPage.getInLinks().size()) {
                 targetPage.setInLinks(newInLinks);
                 targetPage.setUpdatedAt(OffsetDateTime.now());
                 try {
-                    service.repo.updateMeta(targetPage);
+                    repo.updateMeta(targetPage);
                 } catch (RuntimeException e) {
                     log.warn("wiki: failed to update in_links for {}", targetSlug, e);
                 }
@@ -160,7 +167,7 @@ final class WikiPageLinkOps {
     }
 
     public void rebuildLinks(String kbId) {
-        List<WikiPage> pages = service.repo.listAll(kbId);
+        List<WikiPage> pages = repo.listAll(kbId);
 
         Map<String, WikiPage> pageMap = new LinkedHashMap<>();
         for (WikiPage p : pages) {
@@ -187,7 +194,7 @@ final class WikiPageLinkOps {
         for (WikiPage p : pages) {
             p.setUpdatedAt(OffsetDateTime.now());
             try {
-                service.repo.updateMeta(p);
+                repo.updateMeta(p);
             } catch (RuntimeException e) {
                 log.warn("wiki: failed to update links for page {}", p.getSlug(), e);
             }
@@ -197,7 +204,7 @@ final class WikiPageLinkOps {
     public void injectCrossLinks(String kbId, List<String> affectedSlugs) {
         List<WikiPage> allPages;
         try {
-            allPages = service.listAllPages(kbId);
+            allPages = repo.listAll(kbId);
         } catch (RuntimeException e) {
             return;
         }
@@ -215,7 +222,7 @@ final class WikiPageLinkOps {
             affectedSet.addAll(affectedSlugs);
         }
 
-        WikiCrossLinker linker = service.crossLinker.getIfAvailable(WikiCrossLinker.Noop::new);
+        WikiCrossLinker linker = crossLinker.getIfAvailable(WikiCrossLinker.Noop::new);
         int updated = 0;
         for (WikiPage p : allPages) {
             if (!affectedSet.contains(p.getSlug())) {
@@ -231,7 +238,7 @@ final class WikiPageLinkOps {
             }
             p.setContent(r.content());
             try {
-                service.updateAutoLinkedContent(p);
+                updateAutoLinkedContent(p);
             } catch (RuntimeException e) {
                 log.warn("wiki: cross-link injection failed for {}", p.getSlug(), e);
                 continue;
@@ -242,5 +249,37 @@ final class WikiPageLinkOps {
         if (updated > 0) {
             log.info("wiki: injected cross-links in {} pages", updated);
         }
+    }
+
+    /**
+     * 保存自动链接内容：重算出链并同步入链（版本号不变——维护性写入）。
+     *
+     * <p>原在 {@code DefaultWikiPageService}，实现内会回调本类的入链维护；搬到本类后
+     * 双向回转变为单向，页面服务仅保留接口方法做委托。</p>
+     */
+    public void updateAutoLinkedContent(WikiPage page) {
+        WikiPage existing = repo.getBySlug(page.getKnowledgeBaseId(), page.getSlug());
+        List<String> oldOutLinks = existing.getOutLinks();
+
+        existing.setContent(stripWikiInlineChunkCitations(page.getContent()));
+        existing.setOutLinks(parseOutLinks(existing.getContent()));
+        existing.setUpdatedAt(OffsetDateTime.now());
+
+        repo.updateAutoLinkedContent(existing);
+
+        removeInLinks(existing.getKnowledgeBaseId(), existing.getSlug(), oldOutLinks);
+        updateInLinks(existing.getKnowledgeBaseId(), existing.getSlug(), existing.getOutLinks());
+    }
+
+    static List<String> removeString(List<String> slice, String s) {
+        List<String> result = new ArrayList<>(slice == null ? 0 : slice.size());
+        if (slice != null) {
+            for (String v : slice) {
+                if (!v.equals(s)) {
+                    result.add(v);
+                }
+            }
+        }
+        return result;
     }
 }

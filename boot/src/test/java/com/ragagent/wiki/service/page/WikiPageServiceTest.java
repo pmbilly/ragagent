@@ -79,39 +79,39 @@ class WikiPageServiceTest {
             "link with spaces normalized ; See [[Entity/Acme Corp]] for details.                        ; entity/acme-corp",
     })
     void parseOutLinksTable(String name, String content, String want) {
-        assertThat(WikiPageLinkOps.parseOutLinks(content.trim()))
+        assertThat(WikiPageLinkService.parseOutLinks(content.trim()))
                 .isEqualTo(List.of(want.split(",", -1)));
     }
 
     @Test
     void parseOutLinksMultiple() {
-        assertThat(WikiPageLinkOps.parseOutLinks(
+        assertThat(WikiPageLinkService.parseOutLinks(
                 "See [[entity/acme-corp]] and [[concept/rag]] for details."))
                 .containsExactly("entity/acme-corp", "concept/rag");
     }
 
     @Test
     void parseOutLinksDeduplicates() {
-        assertThat(WikiPageLinkOps.parseOutLinks(
+        assertThat(WikiPageLinkService.parseOutLinks(
                 "See [[entity/acme-corp]] and also [[entity/acme-corp]] again."))
                 .containsExactly("entity/acme-corp");
     }
 
     @Test
     void parseOutLinksNoLinks() {
-        assertThat(WikiPageLinkOps.parseOutLinks("Just plain text without any links."))
+        assertThat(WikiPageLinkService.parseOutLinks("Just plain text without any links."))
                 .isEmpty();
     }
 
     @Test
     void parseOutLinksEmptyContent() {
-        assertThat(WikiPageLinkOps.parseOutLinks("")).isEmpty();
+        assertThat(WikiPageLinkService.parseOutLinks("")).isEmpty();
     }
 
     /** 嵌套方括号不是链接：{@code [not [a] link]} 不含 {@code [[} */
     @Test
     void parseOutLinksNestedBracketsIgnored() {
-        assertThat(WikiPageLinkOps.parseOutLinks("Not a link: [not [a] link]")).isEmpty();
+        assertThat(WikiPageLinkService.parseOutLinks("Not a link: [not [a] link]")).isEmpty();
     }
 
     // ──────────────────────────── normalizeSlug ────────────────────────────
@@ -124,25 +124,25 @@ class WikiPageServiceTest {
             "already-ok,already-ok",
     })
     void normalizeSlug(String input, String want) {
-        assertThat(WikiPageLinkOps.normalizeSlug(input)).isEqualTo(want);
+        assertThat(WikiPageLinkService.normalizeSlug(input)).isEqualTo(want);
     }
 
     @Test
     void normalizeSlugTrims() {
-        assertThat(WikiPageLinkOps.normalizeSlug("  hello  ")).isEqualTo("hello");
+        assertThat(WikiPageLinkService.normalizeSlug("  hello  ")).isEqualTo("hello");
     }
 
     @Test
     void normalizeSlugEmpty() {
-        assertThat(WikiPageLinkOps.normalizeSlug("")).isEmpty();
+        assertThat(WikiPageLinkService.normalizeSlug("")).isEmpty();
     }
 
     /** 取 slug 的命名空间前缀（首个 / 之前） */
     @Test
     void slugNamespace() {
-        assertThat(WikiPageLinkOps.slugNamespace("summary/abc")).isEqualTo("summary");
-        assertThat(WikiPageLinkOps.slugNamespace("noslash")).isEmpty();
-        assertThat(WikiPageLinkOps.slugNamespace("a/b/c")).isEqualTo("a");
+        assertThat(WikiPageLinkService.slugNamespace("summary/abc")).isEqualTo("summary");
+        assertThat(WikiPageLinkService.slugNamespace("noslash")).isEmpty();
+        assertThat(WikiPageLinkService.slugNamespace("a/b/c")).isEqualTo("a");
     }
 
     // ──────────────────── stripWikiInlineChunkCitations ────────────────────
@@ -154,14 +154,14 @@ class WikiPageServiceTest {
                 + "手柄便于操作 [c003]。多个来源[c003, c1000]。";
         String want = "[**橡皮障夹**](#)**钳**\n\n夹钳是用于夹持橡皮障夹的专用器械。"
                 + "手柄便于操作。多个来源。";
-        assertThat(WikiPageLinkOps.stripWikiInlineChunkCitations(input)).isEqualTo(want);
+        assertThat(WikiPageLinkService.stripWikiInlineChunkCitations(input)).isEqualTo(want);
     }
 
     /** 普通 markdown 与页面链接不被误伤 */
     @Test
     void stripWikiInlineChunkCitationsPreservesOrdinaryMarkdown() {
         String input = "保留 [citation]、[C003]、[c12] 和 [[concept/c003|页面链接]]。";
-        assertThat(WikiPageLinkOps.stripWikiInlineChunkCitations(input)).isEqualTo(input);
+        assertThat(WikiPageLinkService.stripWikiInlineChunkCitations(input)).isEqualTo(input);
     }
 
     // ──────────────────────── normalizeWikiHierarchy ────────────────────────
@@ -229,8 +229,8 @@ class WikiPageServiceTest {
     @Test
     void removeString() {
         List<String> slice = List.of("a", "b", "c", "b");
-        assertThat(DefaultWikiPageService.removeString(slice, "b")).containsExactly("a", "c");
-        assertThat(DefaultWikiPageService.removeString(slice, "z")).hasSize(4);
+        assertThat(WikiPageLinkService.removeString(slice, "b")).containsExactly("a", "c");
+        assertThat(WikiPageLinkService.removeString(slice, "z")).hasSize(4);
     }
 
     // ──────────────────────── PruneEmptyFolderChains ────────────────────────

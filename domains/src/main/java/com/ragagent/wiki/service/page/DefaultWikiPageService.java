@@ -82,12 +82,11 @@ public class DefaultWikiPageService implements WikiPageService {
     final WikiFolderRepository folderRepo;
     final KnowledgeBaseLookup kbLookup;
     final ObjectProvider<WikiChunkCleaner> chunkCleaner;
-    final ObjectProvider<WikiCrossLinker> crossLinker;
     final ObjectProvider<WikiPendingOpsCounter> pendingOps;
     final ObjectProvider<WikiActiveFlag> activeFlag;
 
     /** 链接维护域协作者(构造期装配;只存 service 引用,调用期才解引)。 */
-    final WikiPageLinkOps linkOps;
+    final WikiPageLinkService linkService;
 
     /** 修订/问题域协作者(构造期装配;只存 service 引用,调用期才解引)。 */
     final WikiPageRevisionOps revisionOps;
@@ -101,18 +100,17 @@ public class DefaultWikiPageService implements WikiPageService {
                                WikiFolderRepository folderRepo,
                                KnowledgeBaseLookup kbLookup,
                                ObjectProvider<WikiChunkCleaner> chunkCleaner,
-                               ObjectProvider<WikiCrossLinker> crossLinker,
                                ObjectProvider<WikiPendingOpsCounter> pendingOps,
-                               ObjectProvider<WikiActiveFlag> activeFlag) {
+                               ObjectProvider<WikiActiveFlag> activeFlag,
+                               WikiPageLinkService linkService) {
         this.repo = repo;
         this.folderRepo = folderRepo;
         this.kbLookup = kbLookup;
         this.chunkCleaner = chunkCleaner;
-        this.crossLinker = crossLinker;
         this.pendingOps = pendingOps;
         this.activeFlag = activeFlag;
         this.revisionOps = new WikiPageRevisionOps(this);
-        this.linkOps = new WikiPageLinkOps(this);
+        this.linkService = linkService;
         this.folderSupport = new WikiPageFolderSupport(this);
         this.linkRepair = new WikiPageLinkRepair(this);
         this.views = new WikiPageViewsSupport(this);
@@ -137,10 +135,10 @@ public class DefaultWikiPageService implements WikiPageService {
         }
         page.setLastEditSource(WikiEditContext.currentEditSource());
         page.setLastEditorId(WikiEditContext.currentEditorId());
-        WikiPageLinkOps.stripWikiPageInlineChunkCitations(page);
+        WikiPageLinkService.stripWikiPageInlineChunkCitations(page);
 
         // 解析正文里的出链
-        page.setOutLinks(WikiPageLinkOps.parseOutLinks(page.getContent()));
+        page.setOutLinks(WikiPageLinkService.parseOutLinks(page.getContent()));
         applyFolderToPage(page);
         normalizeWikiHierarchy(page);
 
@@ -151,7 +149,7 @@ public class DefaultWikiPageService implements WikiPageService {
         repo.create(page);
 
         // 维护目标页的入链
-        linkOps.updateInLinks(page.getKnowledgeBaseId(), page.getSlug(), page.getOutLinks());
+        linkService.updateInLinks(page.getKnowledgeBaseId(), page.getSlug(), page.getOutLinks());
         return page;
     }
 
@@ -165,7 +163,7 @@ public class DefaultWikiPageService implements WikiPageService {
     @Override
     public WikiPage updatePage(WikiPage page) {
         WikiPage existing = repo.getBySlug(page.getKnowledgeBaseId(), page.getSlug());
-        WikiPageLinkOps.stripWikiPageInlineChunkCitations(page);
+        WikiPageLinkService.stripWikiPageInlineChunkCitations(page);
 
         List<String> oldOutLinks = existing.getOutLinks();
 
@@ -199,7 +197,7 @@ public class DefaultWikiPageService implements WikiPageService {
         applyFolderToPage(existing);
 
         // 出链是正文的纯导数，所以只随正文变。无条件重解析以与库中正文保持一致。
-        existing.setOutLinks(WikiPageLinkOps.parseOutLinks(existing.getContent()));
+        existing.setOutLinks(WikiPageLinkService.parseOutLinks(existing.getContent()));
         normalizeWikiHierarchy(existing);
 
         if (contentChanged) {
@@ -220,8 +218,8 @@ public class DefaultWikiPageService implements WikiPageService {
 
         // 入链：先摘旧的再加新的。内容没变时 oldOutLinks == existing.OutLinks，
         // 这两次调用实际都是 no-op
-        linkOps.removeInLinks(existing.getKnowledgeBaseId(), existing.getSlug(), oldOutLinks);
-        linkOps.updateInLinks(existing.getKnowledgeBaseId(), existing.getSlug(), existing.getOutLinks());
+        linkService.removeInLinks(existing.getKnowledgeBaseId(), existing.getSlug(), oldOutLinks);
+        linkService.updateInLinks(existing.getKnowledgeBaseId(), existing.getSlug(), existing.getOutLinks());
 
         return existing;
     }
@@ -241,17 +239,7 @@ public class DefaultWikiPageService implements WikiPageService {
      */
     @Override
     public void updateAutoLinkedContent(WikiPage page) {
-        WikiPage existing = repo.getBySlug(page.getKnowledgeBaseId(), page.getSlug());
-        List<String> oldOutLinks = existing.getOutLinks();
-
-        existing.setContent(WikiPageLinkOps.stripWikiInlineChunkCitations(page.getContent()));
-        existing.setOutLinks(WikiPageLinkOps.parseOutLinks(existing.getContent()));
-        existing.setUpdatedAt(OffsetDateTime.now());
-
-        repo.updateAutoLinkedContent(existing);
-
-        linkOps.removeInLinks(existing.getKnowledgeBaseId(), existing.getSlug(), oldOutLinks);
-        linkOps.updateInLinks(existing.getKnowledgeBaseId(), existing.getSlug(), existing.getOutLinks());
+        linkService.updateAutoLinkedContent(page);
     }
 
 
@@ -259,7 +247,7 @@ public class DefaultWikiPageService implements WikiPageService {
     @Override
     public WikiPage getPageBySlug(String kbId, String slug) {
         WikiPage page = repo.getBySlug(kbId, slug);
-        WikiPageLinkOps.stripWikiPageInlineChunkCitations(page);
+        WikiPageLinkService.stripWikiPageInlineChunkCitations(page);
         return page;
     }
 
@@ -276,7 +264,7 @@ public class DefaultWikiPageService implements WikiPageService {
     @Override
     public WikiPage getPageById(String id) {
         WikiPage page = repo.getById(id);
-        WikiPageLinkOps.stripWikiPageInlineChunkCitations(page);
+        WikiPageLinkService.stripWikiPageInlineChunkCitations(page);
         return page;
     }
 
@@ -285,7 +273,7 @@ public class DefaultWikiPageService implements WikiPageService {
         WikiPage page = repo.getBySlug(kbId, slug);
 
         // 摘掉本页指向的那些目标页上的入链引用
-        linkOps.removeInLinks(kbId, slug, page.getOutLinks());
+        linkService.removeInLinks(kbId, slug, page.getOutLinks());
 
         repo.delete(kbId, slug);
 
@@ -523,19 +511,6 @@ public class DefaultWikiPageService implements WikiPageService {
         return slice != null && slice.contains(s);
     }
 
-    /** 移除<b>所有</b>等于 s 的元素 */
-    static List<String> removeString(List<String> slice, String s) {
-        List<String> result = new ArrayList<>(slice == null ? 0 : slice.size());
-        if (slice != null) {
-            for (String v : slice) {
-                if (!v.equals(s)) {
-                    result.add(v);
-                }
-            }
-        }
-        return result;
-    }
-
     /** 浅拷贝一份页面，列表字段另起一份 */
     static WikiPage copyPage(WikiPage p) {
         WikiPage c = new WikiPage();
@@ -715,15 +690,15 @@ public class DefaultWikiPageService implements WikiPageService {
         revisionOps.updateIssueStatus(issueId, status);
     }
 
-    // ── 链接维护:实现随协作者(WikiPageLinkOps) ──
+    // ── 链接维护:实现随协作者(WikiPageLinkService) ──
 
     @Override
     public void rebuildLinks(String kbId) {
-        linkOps.rebuildLinks(kbId);
+        linkService.rebuildLinks(kbId);
     }
 
     @Override
     public void injectCrossLinks(String kbId, List<String> affectedSlugs) {
-        linkOps.injectCrossLinks(kbId, affectedSlugs);
+        linkService.injectCrossLinks(kbId, affectedSlugs);
     }
 }
