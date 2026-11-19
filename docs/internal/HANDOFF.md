@@ -110,7 +110,7 @@ H7（platform 判据换血）· H8（适配层逻辑化）· H9（管理面模�
     JAVA_HOME=/opt/homebrew/opt/openjdk@21 mvn -B verify
   ```
   **`ZZ_PG_JDBC` 必给**：`GrepChunksRecordingTest` 与 `DatabaseQueryRecordingTest` 默认连 `WeKnora`（CI 的库名），本机库名是 `RagAgent`；不给会在 domains 报 `database "WeKnora" does not exist`，两个测试设计为「不可达即失败、不许跳过」。
-  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（2026-11-19 实测：contract 12 · platform 262 · agent-engine 157 · domains **2862** · boot **1358**；旧口径 5082 已过期）。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
+  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（2026-11-19 全量实测 **5257 / 失败 0 / 跳过 2**：contract 12 · platform 262 · retrieval-engine 286 · model-runtime 320 · agent-engine 157 · domains **2862** · boot **1358**；旧口径 5082 已过期）。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
   **环境前置**：PG `max_connections=100`，多个 boot jar 残留会占满连接（实测 5 个实例 = 50 条 ⇒ `too many clients`）。跑闸门前先 `ps -Ao pid,command | grep '[b]oot/build/libs/boot'` 清残留。
 - **⚠️ IDE 自动构建会与 Maven 抢 `target/`**：2026-11-19 实测，`clean verify` 期间 IDE 写入半成品 class，domains 测试随机报 `Unresolved compilation problems`（JDT 专属措辞）或 `cannot access Xxx` / `incompatible types`，且每次报错的文件不同。**判别：换一个错误文件就是竞争，不是回归。**
   根因是语言服务器进程用 Homebrew openjdk **27** 启动（`ps -Ao command | grep eclipse.jdt.ls` 可证），与 Maven 的 21 不一致。分两层处理：
@@ -123,7 +123,7 @@ H7（platform 判据换血）· H8（适配层逻辑化）· H9（管理面模�
 
 ## 7. 测试与安全网
 
-- 回归网：**1,339 契约金片 + 五个模块 4,651 条用例**（2026-11-19 实测：contract 12 · platform 262 · agent-engine 157 · domains 2,862 · boot 1,358；retrieval-engine 未单列）；每一步（哪怕纯移动）结束必须全绿。
+- 回归网：**1,339 契约金片 + 5,257 条用例**（2026-11-19 全量实测，失败 0 / 跳过 2）；每一步（哪怕纯移动）结束必须全绿。
 - 已知偶发（全量并发下，单独重跑即绿，勿误判回归）：`WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool` · `EvaluationContractTest.getTerminalRunsExecution` · `EmbedRateLimiterTest.redisPathSharesBudgetAcrossInstances`。
 - **Redis 瞬态族已修（2026-10-19）**：根因是 `EmbeddedRedis` 用 `ServerSocket(0)` 探端口在 `maxParallelForks` 下会撞——后到者借用先到者的实例，先到者 close 杀进程后连接全断。现改为固定端口池 + 跨进程 `FileLock`，红态探针 `EmbeddedRedisPortAllocationTest` 守着；全量连跑 5 遍 0 失败。再见到同类失败按真回归查。
 - 覆盖率：**未执行基线**（`-Pcoverage`）⇒ 本项目**不声称任何覆盖率数字**（开放项）。
@@ -288,6 +288,7 @@ boot           17 件                      →  boot
 | **P2-5** | 2026-11-19 | `storage` 的 4 个 Adapter 迁入 `adapter/`，`api` 包清空删除。`api` 无外部引用，唯一受影响的是测试 `TenantFileStorageTest` 的 import（主码 grep 不到、测试目录才暴露——**侦察必须连 `src/test` 一起扫**） | domains 主码 + 测试源集编译绿 · 三份快照无变化（397/45/12）· 守卫 49/49 |
 | **P2-6** | 2026-11-19 | `session` 的 5 个 Adapter 迁入 `adapter/`，`api` 包清空删除；`package-info` 从"等契约端口的适配层"改为列全 5 个实现 | domains 主码 + 测试源集编译绿 · 三份快照无变化（397/45/12）· 守卫 49/49 |
 | **P2-7** | 2026-11-19 | `knowledge` 的 11 个 Adapter 迁入 `adapter/`，`api` 只留 `FinalizeResult`（wiki 消费收尾结果）；域外 10 个文件改 import，测试 `KnowledgeFinalizeAdapterTest` 同步移包，`KnowledgeFinalizeAdapter` / 该校验测试补 `FinalizeResult` 的显式 import（原靠同包可见）。**最大发现**：`wiki` 引用的 `knowledge.api.*` 6 处里有 5 处是 **Adapter 具体类**（`ChunkPortAdapter` / `KnowledgeFinalizeAdapter`），不是契约——`knowledge ⇄ wiki` 循环两边都是实现类直连，此前被 `api` 包名掩盖。R-1 基线 3→4 条 | R-1 4 条绿 · R-2 282 绿 · domains 主码 + 测试源集编译绿 · 守卫 49/49 · 跨域快照 12→13 条 |
+| **P2 收官** | 2026-11-19 | 全量闸门暴露两处移动副作用并修复：① `wiki` 两个文件 `knowledge.adapter.*` 的 import 顺序（spotless，`adapter` 应在 `api` 前）；② A7 裸 JDBC 白名单里 `auth.api.TenantStorageQuotaAdapter` 类全名随移动失效（改 `auth.adapter.*`）。两处都是"按类全名/文本顺序记录"的守卫在包移动后的必然漂移，**P3 搬类名前必须按同样清单先搜一遍** | **`mvn -B clean verify` 绿：5257 / 0 / 2**（contract 12 · platform 262 · retrieval 286 · model-runtime 320 · agent-engine 157 · domains 2862 · boot 1358）· 守卫 49/49 |
 
 > 历史批次（v0.3.0~v0.11.x，含 P/R/L/M/H/K/X/Q/B269 系列）全部在归档 `handoff/archive/HANDOFF-v0.10.x-2026-11-19.md` §12；追溯用 `git log --grep`。
 

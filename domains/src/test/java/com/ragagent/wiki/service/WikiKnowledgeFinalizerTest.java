@@ -7,8 +7,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.knowledge.api.FinalizeResult;
 import com.ragagent.knowledge.adapter.KnowledgeFinalizeAdapter;
+import com.ragagent.knowledge.api.FinalizeResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
