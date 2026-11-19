@@ -6,6 +6,9 @@ import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryTombstone;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
+import com.ragagent.memory.mapper.MemoryItemEmbeddingMapper;
+import com.ragagent.memory.mapper.MemoryItemMapper;
+import com.ragagent.memory.mapper.MemoryTombstoneMapper;
 import com.ragagent.memory.support.MemoryConflictException;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.Duration;
@@ -23,10 +26,22 @@ import java.util.UUID;
 final class MemoryItemStore {
 
 
-    private final MemoryRepository repo;
+    private final MemoryItemEmbeddingMapper embeddingMapper;
+    private final MemoryItemMapper itemMapper;
+    private final MemoryTombstoneMapper tombstoneMapper;
+    private final MemoryTxTemplate tx;
+    private final boolean postgres;
 
-    MemoryItemStore(MemoryRepository repo) {
-        this.repo = repo;
+    MemoryItemStore(MemoryItemEmbeddingMapper embeddingMapper,
+                    MemoryItemMapper itemMapper,
+                    MemoryTombstoneMapper tombstoneMapper,
+                    MemoryTxTemplate tx,
+                    boolean postgres) {
+        this.embeddingMapper = embeddingMapper;
+        this.itemMapper = itemMapper;
+        this.tombstoneMapper = tombstoneMapper;
+        this.tx = tx;
+        this.postgres = postgres;
     }
 
     // ── 条目：写 ───────────────────────────────────────────────────────────
@@ -50,25 +65,25 @@ final class MemoryItemStore {
         }
         MemoryIndexStore.applyInsertDefaults(item);
         MemoryIndexStore.stampForCreate(item);
-        repo.itemMapper.insert(item);
+        itemMapper.insert(item);
     }
 
     /** 内容更新：内容变了才删向量、作废提议，最后无条件覆盖五列。 */
     public void updateItemContent(MemoryScope scope, String id, String content,
                                   String normalizedKey, int importance) {
-        repo.tx.withSubject(scope, subject -> {
-            MemoryItem current = repo.itemMapper.selectScoped(scope.tenantId(), scope.subjectId(), id);
+        tx.withSubject(scope, subject -> {
+            MemoryItem current = itemMapper.selectScoped(scope.tenantId(), scope.subjectId(), id);
             if (current == null) {
                 // 未命中 → 上抛"记录不存在"
                 throw new MemorySubjectMissingException();
             }
             if (!current.getContent().equals(content)) {
-                repo.embeddingMapper.deleteByItemId(scope.tenantId(), scope.subjectId(), id);
+                embeddingMapper.deleteByItemId(scope.tenantId(), scope.subjectId(), id);
                 // 编辑一条已确认的事实，会让基于它旧措辞的提议失效。
-                repo.itemMapper.supersedeProposalsOf(scope.tenantId(), scope.subjectId(), id,
+                itemMapper.supersedeProposalsOf(scope.tenantId(), scope.subjectId(), id,
                         MemoryKinds.STATUS_PENDING, MemoryKinds.STATUS_SUPERSEDED, OffsetDateTime.now());
             }
-            repo.itemMapper.updateItemContent(scope.tenantId(), scope.subjectId(), id, content,
+            itemMapper.updateItemContent(scope.tenantId(), scope.subjectId(), id, content,
                     normalizedKey, importance, MemoryKinds.ORIGIN_MANUAL, OffsetDateTime.now());
             return null;
         });
@@ -76,8 +91,8 @@ final class MemoryItemStore {
 
     /** 取代单条（status 迁移由 mapper 定义）。 */
     public void supersedeItem(MemoryScope scope, String id, String supersededBy) {
-        repo.tx.withSubject(scope, subject -> {
-            repo.itemMapper.supersedeItem(scope.tenantId(), scope.subjectId(), id, supersededBy,
+        tx.withSubject(scope, subject -> {
+            itemMapper.supersedeItem(scope.tenantId(), scope.subjectId(), id, supersededBy,
                     MemoryKinds.STATUS_ACTIVE, MemoryKinds.STATUS_PENDING,
                     MemoryKinds.STATUS_SUPERSEDED, OffsetDateTime.now());
             return null;
@@ -91,11 +106,11 @@ final class MemoryItemStore {
      * 所以这里不软删、也不留墓碑（墓碑由 reject 路径单独写）。</p>
      */
     public void deleteItem(MemoryScope scope, String id) {
-        repo.tx.withSubject(scope, subject -> {
-            repo.itemMapper.supersedePendingReplacements(scope.tenantId(), scope.subjectId(), id,
+        tx.withSubject(scope, subject -> {
+            itemMapper.supersedePendingReplacements(scope.tenantId(), scope.subjectId(), id,
                     MemoryKinds.STATUS_PENDING, MemoryKinds.STATUS_SUPERSEDED, OffsetDateTime.now());
-            repo.embeddingMapper.deleteByItemId(scope.tenantId(), scope.subjectId(), id);
-            repo.itemMapper.deleteScoped(scope.tenantId(), scope.subjectId(), id);
+            embeddingMapper.deleteByItemId(scope.tenantId(), scope.subjectId(), id);
+            itemMapper.deleteScoped(scope.tenantId(), scope.subjectId(), id);
             return null;
         });
     }
@@ -109,7 +124,7 @@ final class MemoryItemStore {
      * 没有外键，所以清空之后向量行确实会留下来——这是既有行为，别"顺手补齐"。</p>
      */
     public long deleteAll(MemoryScope scope) {
-        return repo.itemMapper.deleteAllInScope(scope.tenantId(), scope.subjectId());
+        return itemMapper.deleteAllInScope(scope.tenantId(), scope.subjectId());
     }
 
     /** 使用计数：{@code use_count} 在 SQL 侧自增。 */
@@ -117,7 +132,7 @@ final class MemoryItemStore {
         if (ids == null || ids.isEmpty()) {
             return;
         }
-        repo.itemMapper.touchUsed(scope.tenantId(), scope.subjectId(), ids, OffsetDateTime.now());
+        itemMapper.touchUsed(scope.tenantId(), scope.subjectId(), ids, OffsetDateTime.now());
     }
 
     /**
@@ -130,16 +145,16 @@ final class MemoryItemStore {
         if (keep <= 0) {
             return 0;
         }
-        List<String> survivors = repo.itemMapper.selectSurvivorIds(scope.tenantId(), scope.subjectId(),
+        List<String> survivors = itemMapper.selectSurvivorIds(scope.tenantId(), scope.subjectId(),
                 MemoryKinds.STATUS_ACTIVE, keep);
-        return repo.itemMapper.archiveExcept(scope.tenantId(), scope.subjectId(),
+        return itemMapper.archiveExcept(scope.tenantId(), scope.subjectId(),
                 MemoryKinds.STATUS_ACTIVE, MemoryKinds.STATUS_ARCHIVED, survivors, OffsetDateTime.now());
     }
 
     /** 过期归档：{@code expires_at} 已过的 active 条目归档。 */
     public long expireOverdue(MemoryScope scope) {
         OffsetDateTime now = OffsetDateTime.now();
-        return repo.itemMapper.expireOverdue(scope.tenantId(), scope.subjectId(),
+        return itemMapper.expireOverdue(scope.tenantId(), scope.subjectId(),
                 MemoryKinds.STATUS_ACTIVE, MemoryKinds.STATUS_ARCHIVED, now);
     }
 
@@ -147,7 +162,7 @@ final class MemoryItemStore {
 
     /** 取单条：不存在时回 {@code null}。 */
     public MemoryItem getItem(MemoryScope scope, String id) {
-        return repo.itemMapper.selectScoped(scope.tenantId(), scope.subjectId(), id);
+        return itemMapper.selectScoped(scope.tenantId(), scope.subjectId(), id);
     }
 
     /** 按 kind 列活跃条目：{@code kinds} 为空时直接回 {@code null}。 */
@@ -155,7 +170,7 @@ final class MemoryItemStore {
         if (kinds == null || kinds.isEmpty()) {
             return null;
         }
-        return repo.itemMapper.listActiveByKinds(scope.tenantId(), scope.subjectId(), kinds,
+        return itemMapper.listActiveByKinds(scope.tenantId(), scope.subjectId(), kinds,
                 MemoryKinds.STATUS_ACTIVE, OffsetDateTime.now(), limit);
     }
 
@@ -167,7 +182,7 @@ final class MemoryItemStore {
      * 是让用户失去对这个功能信任最快的方式。</p>
      */
     public List<MemoryItem> listActiveResident(MemoryScope scope, int limit) {
-        return repo.itemMapper.listActiveResident(scope.tenantId(), scope.subjectId(),
+        return itemMapper.listActiveResident(scope.tenantId(), scope.subjectId(),
                 MemoryKinds.RESIDENT, MemoryKinds.ORIGIN_EXPLICIT,
                 MemoryKinds.STATUS_ACTIVE, OffsetDateTime.now(), limit);
     }
@@ -178,9 +193,9 @@ final class MemoryItemStore {
      * <p>{@code limit <= 0} 时取 50（硬编码）；返回值同时带总数与这一页。</p>
      */
     public PageResult<MemoryItem> listItems(MemoryScope scope, String status, int limit, int offset) {
-        long total = repo.itemMapper.countListItems(scope.tenantId(), scope.subjectId(), status);
+        long total = itemMapper.countListItems(scope.tenantId(), scope.subjectId(), status);
         int effectiveLimit = limit <= 0 ? 50 : limit;
-        List<MemoryItem> items = repo.itemMapper.listItems(scope.tenantId(), scope.subjectId(), status,
+        List<MemoryItem> items = itemMapper.listItems(scope.tenantId(), scope.subjectId(), status,
                 effectiveLimit, offset);
         return PageResult.of(items, total);
     }
@@ -190,7 +205,7 @@ final class MemoryItemStore {
      * ——在用 + 提议中待定。去重必须同时考虑两者，否则确认一条提议会留下重复。
      */
     public List<MemoryItem> listLive(MemoryScope scope, String kind, int limit) {
-        return repo.itemMapper.listLive(scope.tenantId(), scope.subjectId(),
+        return itemMapper.listLive(scope.tenantId(), scope.subjectId(),
                 List.of(MemoryKinds.STATUS_ACTIVE, MemoryKinds.STATUS_PENDING),
                 kind, OffsetDateTime.now(), limit);
     }
@@ -205,13 +220,13 @@ final class MemoryItemStore {
         if (normalizedKey == null || normalizedKey.isEmpty()) {
             return null;
         }
-        return repo.itemMapper.findLiveByKey(scope.tenantId(), scope.subjectId(),
+        return itemMapper.findLiveByKey(scope.tenantId(), scope.subjectId(),
                 List.of(MemoryKinds.STATUS_ACTIVE, MemoryKinds.STATUS_PENDING), normalizedKey);
     }
 
     /** 在用条目计数。 */
     public long countActive(MemoryScope scope) {
-        return repo.itemMapper.countByStatus(scope.tenantId(), scope.subjectId(), MemoryKinds.STATUS_ACTIVE);
+        return itemMapper.countByStatus(scope.tenantId(), scope.subjectId(), MemoryKinds.STATUS_ACTIVE);
     }
 
     /**
@@ -223,7 +238,7 @@ final class MemoryItemStore {
      */
     public List<MemoryItem> itemsMissingEmbeddings(MemoryScope scope, String modelId, int limit) {
         int effectiveLimit = limit <= 0 ? 20 : limit;
-        return repo.itemMapper.itemsMissingEmbeddings(scope.tenantId(), scope.subjectId(),
+        return itemMapper.itemsMissingEmbeddings(scope.tenantId(), scope.subjectId(),
                 MemoryKinds.STATUS_ACTIVE, MemoryKinds.STATUS_PENDING, modelId, effectiveLimit);
     }
 
@@ -249,13 +264,13 @@ final class MemoryItemStore {
      * 调用方拿到的才是最终落库的那一行。</p>
      */
     public void saveItem(MemoryScope scope, MemoryItem item, String replacesId) {
-        repo.tx.withSubject(scope, subject -> {
+        tx.withSubject(scope, subject -> {
             long tenantId = scope.tenantId();
             String subjectId = scope.subjectId();
 
             MemoryItem target = new MemoryItem();
             if (replacesId != null && !replacesId.isEmpty()) {
-                MemoryItem found = repo.itemMapper.selectScoped(tenantId, subjectId, replacesId);
+                MemoryItem found = itemMapper.selectScoped(tenantId, subjectId, replacesId);
                 if (found == null) {
                     throw new MemoryConflictException();
                 }
@@ -267,7 +282,7 @@ final class MemoryItemStore {
                     // 返还它的替换者，而不是写第二遍。
                     if (!target.getSupersededBy().isEmpty()) {
                         MemoryItem replacement =
-                                repo.itemMapper.selectScoped(tenantId, subjectId, target.getSupersededBy());
+                                itemMapper.selectScoped(tenantId, subjectId, target.getSupersededBy());
                         if (replacement != null
                                 && replacement.getStatus().equals(item.getStatus())
                                 && replacement.getContent().equals(item.getContent())) {
@@ -279,7 +294,7 @@ final class MemoryItemStore {
                 }
             }
 
-            List<MemoryItem> live = repo.itemMapper.listByNormalizedKey(tenantId, subjectId,
+            List<MemoryItem> live = itemMapper.listByNormalizedKey(tenantId, subjectId,
                     item.getNormalizedKey(),
                     List.of(MemoryKinds.STATUS_ACTIVE, MemoryKinds.STATUS_PENDING));
             for (MemoryItem old : live) {
@@ -311,7 +326,7 @@ final class MemoryItemStore {
             item.setSubjectId(scope.subjectId());
             MemoryIndexStore.applyInsertDefaults(item);
             MemoryIndexStore.stampForCreate(item);
-            repo.itemMapper.insert(item);
+            itemMapper.insert(item);
 
             List<MemoryItem> supersedeCandidates = new ArrayList<>(live);
             if (!target.getId().isEmpty()) {
@@ -332,7 +347,7 @@ final class MemoryItemStore {
             if (ids.isEmpty()) {
                 return null;
             }
-            repo.itemMapper.supersedeByIds(tenantId, subjectId, item.getId(), ids,
+            itemMapper.supersedeByIds(tenantId, subjectId, item.getId(), ids,
                     List.of(MemoryKinds.STATUS_ACTIVE, MemoryKinds.STATUS_PENDING),
                     MemoryKinds.STATUS_SUPERSEDED, OffsetDateTime.now());
             return null;
@@ -348,11 +363,11 @@ final class MemoryItemStore {
      * 目标已经不是 active → 冲突。</p>
      */
     public void confirmPendingItem(MemoryScope scope, String id) {
-        repo.tx.withSubject(scope, subject -> {
+        tx.withSubject(scope, subject -> {
             long tenantId = scope.tenantId();
             String subjectId = scope.subjectId();
 
-            MemoryItem item = repo.itemMapper.selectScoped(tenantId, subjectId, id);
+            MemoryItem item = itemMapper.selectScoped(tenantId, subjectId, id);
             if (item == null) {
                 throw new MemorySubjectMissingException();
             }
@@ -365,17 +380,17 @@ final class MemoryItemStore {
                 throw new MemoryConflictException();
             }
             if (!item.getReplacesId().isEmpty()) {
-                MemoryItem target = repo.itemMapper.selectScoped(tenantId, subjectId, item.getReplacesId());
+                MemoryItem target = itemMapper.selectScoped(tenantId, subjectId, item.getReplacesId());
                 if (target == null || !MemoryKinds.STATUS_ACTIVE.equals(target.getStatus())) {
                     throw new MemoryConflictException();
                 }
             }
 
-            repo.itemMapper.supersedeForConfirm(tenantId, subjectId, id, item.getNormalizedKey(),
+            itemMapper.supersedeForConfirm(tenantId, subjectId, id, item.getNormalizedKey(),
                     item.getReplacesId(),
                     List.of(MemoryKinds.STATUS_ACTIVE, MemoryKinds.STATUS_PENDING),
                     MemoryKinds.STATUS_SUPERSEDED, now);
-            repo.itemMapper.activateItem(tenantId, subjectId, id, MemoryKinds.STATUS_ACTIVE, now);
+            itemMapper.activateItem(tenantId, subjectId, id, MemoryKinds.STATUS_ACTIVE, now);
             return null;
         });
     }
@@ -400,10 +415,10 @@ final class MemoryItemStore {
         tombstone.setSourceMessageId(sourceMessageId == null ? "" : sourceMessageId);
         tombstone.setCreatedAt(OffsetDateTime.now());
 
-        if (repo.postgres) {
-            repo.tombstoneMapper.insertIfAbsentPostgres(tombstone);
+        if (postgres) {
+            tombstoneMapper.insertIfAbsentPostgres(tombstone);
         } else {
-            repo.tombstoneMapper.insertIfAbsentOther(tombstone);
+            tombstoneMapper.insertIfAbsentOther(tombstone);
         }
         trimTombstones(scope);
     }
@@ -416,17 +431,17 @@ final class MemoryItemStore {
      * 而且顺带避开了 {@code id NOT IN ()} 这种非法 SQL。</p>
      */
     private void trimTombstones(MemoryScope scope) {
-        List<String> keep = repo.tombstoneMapper.selectNewestIds(scope.tenantId(), scope.subjectId(),
+        List<String> keep = tombstoneMapper.selectNewestIds(scope.tenantId(), scope.subjectId(),
                 MemoryKinds.MAX_TOMBSTONES);
         if (keep.size() < MemoryKinds.MAX_TOMBSTONES) {
             return;
         }
-        repo.tombstoneMapper.deleteExcept(scope.tenantId(), scope.subjectId(), keep);
+        tombstoneMapper.deleteExcept(scope.tenantId(), scope.subjectId(), keep);
     }
 
     /** 最近的拒绝，{@code created_at DESC}。 */
     public List<MemoryTombstone> listTombstones(MemoryScope scope, int limit) {
-        return repo.tombstoneMapper.listTombstones(scope.tenantId(), scope.subjectId(), limit);
+        return tombstoneMapper.listTombstones(scope.tenantId(), scope.subjectId(), limit);
     }
 
     /** 这个指纹是否已经被忘过。 */
@@ -434,7 +449,7 @@ final class MemoryItemStore {
         if (fingerprint == null || fingerprint.isEmpty()) {
             return false;
         }
-        return repo.tombstoneMapper.countByFingerprint(scope.tenantId(), scope.subjectId(), fingerprint) > 0;
+        return tombstoneMapper.countByFingerprint(scope.tenantId(), scope.subjectId(), fingerprint) > 0;
     }
 
     /**
@@ -451,7 +466,7 @@ final class MemoryItemStore {
         if (within != null && !within.isZero() && !within.isNegative()) {
             cutoff = OffsetDateTime.now().minus(within);
         }
-        return repo.tombstoneMapper.countBySourceMessage(scope.tenantId(), scope.subjectId(),
+        return tombstoneMapper.countBySourceMessage(scope.tenantId(), scope.subjectId(),
                 sourceMessageId, cutoff) > 0;
     }
 }

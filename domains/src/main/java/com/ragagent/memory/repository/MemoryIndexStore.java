@@ -15,6 +15,10 @@ import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
 import com.ragagent.memory.dto.MemoryDocAffinity;
+import com.ragagent.memory.mapper.MemoryDocAffinityMapper;
+import com.ragagent.memory.mapper.MemoryExtractionSessionMapper;
+import com.ragagent.memory.mapper.MemorySubjectMapper;
+import com.ragagent.memory.mapper.MemoryTopicStatMapper;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -39,10 +43,25 @@ import java.util.UUID;
 final class MemoryIndexStore {
 
 
-    private final MemoryRepository repo;
+    private final MemorySubjectMapper subjectMapper;
+    private final MemoryTopicStatMapper topicMapper;
+    private final MemoryDocAffinityMapper affinityMapper;
+    private final MemoryExtractionSessionMapper extractionMapper;
+    private final MemoryTxTemplate tx;
+    private final boolean postgres;
 
-    MemoryIndexStore(MemoryRepository repo) {
-        this.repo = repo;
+    MemoryIndexStore(MemorySubjectMapper subjectMapper,
+                     MemoryTopicStatMapper topicMapper,
+                     MemoryDocAffinityMapper affinityMapper,
+                     MemoryExtractionSessionMapper extractionMapper,
+                     MemoryTxTemplate tx,
+                     boolean postgres) {
+        this.subjectMapper = subjectMapper;
+        this.topicMapper = topicMapper;
+        this.affinityMapper = affinityMapper;
+        this.extractionMapper = extractionMapper;
+        this.tx = tx;
+        this.postgres = postgres;
     }
 
     // ── 话题统计 ───────────────────────────────────────────────────────────
@@ -71,14 +90,14 @@ final class MemoryIndexStore {
         stat.setCreatedAt(now);
         stat.setUpdatedAt(now);
 
-        if (repo.postgres) {
-            repo.topicMapper.insertIfAbsentPostgres(stat);
+        if (postgres) {
+            topicMapper.insertIfAbsentPostgres(stat);
         } else {
-            repo.topicMapper.insertIfAbsentOther(stat);
+            topicMapper.insertIfAbsentOther(stat);
         }
-        repo.topicMapper.bumpHits(scope.tenantId(), scope.subjectId(), normalizedKey, now);
+        topicMapper.bumpHits(scope.tenantId(), scope.subjectId(), normalizedKey, now);
 
-        MemoryTopicStat updated = repo.topicMapper.selectByKey(scope.tenantId(), scope.subjectId(), normalizedKey);
+        MemoryTopicStat updated = topicMapper.selectByKey(scope.tenantId(), scope.subjectId(), normalizedKey);
         if (updated == null) {
             throw new IllegalStateException("memory topic vanished after upsert");
         }
@@ -93,7 +112,7 @@ final class MemoryIndexStore {
             if (aliases.size() > 12) {
                 aliases = new ArrayList<>(aliases.subList(aliases.size() - 12, aliases.size()));
             }
-            repo.topicMapper.updateAliases(scope.tenantId(), scope.subjectId(), normalizedKey, aliases, now);
+            topicMapper.updateAliases(scope.tenantId(), scope.subjectId(), normalizedKey, aliases, now);
             updated.setAliases(aliases);
         }
         return updated;
@@ -114,10 +133,10 @@ final class MemoryIndexStore {
                 || oldKey.equals(newKey)) {
             return false;
         }
-        if (repo.topicMapper.countByKey(scope.tenantId(), scope.subjectId(), newKey) > 0) {
+        if (topicMapper.countByKey(scope.tenantId(), scope.subjectId(), newKey) > 0) {
             return false;
         }
-        MemoryTopicStat current = repo.topicMapper.selectByKey(scope.tenantId(), scope.subjectId(), oldKey);
+        MemoryTopicStat current = topicMapper.selectByKey(scope.tenantId(), scope.subjectId(), oldKey);
         if (current == null) {
             return false;
         }
@@ -140,7 +159,7 @@ final class MemoryIndexStore {
             aliases = new ArrayList<>(aliases.subList(aliases.size() - 12, aliases.size()));
         }
 
-        repo.topicMapper.rename(scope.tenantId(), scope.subjectId(), oldKey, newKey, newLabel, aliases,
+        topicMapper.rename(scope.tenantId(), scope.subjectId(), oldKey, newKey, newLabel, aliases,
                 OffsetDateTime.now());
         return true;
     }
@@ -161,7 +180,7 @@ final class MemoryIndexStore {
 
     /** 记录提升时刻：别再提升它第二次。 */
     public void markTopicPromoted(MemoryScope scope, String normalizedKey) {
-        repo.topicMapper.markPromoted(scope.tenantId(), scope.subjectId(), normalizedKey, OffsetDateTime.now());
+        topicMapper.markPromoted(scope.tenantId(), scope.subjectId(), normalizedKey, OffsetDateTime.now());
     }
 
     /** 按 key 查主题：不存在时回 {@code null}。 */
@@ -169,7 +188,7 @@ final class MemoryIndexStore {
         if (normalizedKey == null || normalizedKey.isEmpty()) {
             return null;
         }
-        return repo.topicMapper.selectByKey(scope.tenantId(), scope.subjectId(), normalizedKey);
+        return topicMapper.selectByKey(scope.tenantId(), scope.subjectId(), normalizedKey);
     }
 
     /** 按 ID 查主题：记忆管理器用来提升/丢弃一个还没变成记忆的主题。 */
@@ -177,25 +196,25 @@ final class MemoryIndexStore {
         if (id == null || id.isEmpty()) {
             return null;
         }
-        return repo.topicMapper.selectScopedById(scope.tenantId(), scope.subjectId(), id);
+        return topicMapper.selectScopedById(scope.tenantId(), scope.subjectId(), id);
     }
 
     /** 最热主题：{@code hits DESC, last_seen_at DESC}。 */
     public List<MemoryTopicStat> topTopics(MemoryScope scope, int limit) {
-        return repo.topicMapper.topTopics(scope.tenantId(), scope.subjectId(), limit);
+        return topicMapper.topTopics(scope.tenantId(), scope.subjectId(), limit);
     }
 
     /** 已计数、尚未变成兴趣的主题（分页）。 */
     public PageResult<MemoryTopicStat> listUnpromotedTopics(MemoryScope scope, int limit, int offset) {
-        long total = repo.topicMapper.countUnpromoted(scope.tenantId(), scope.subjectId());
+        long total = topicMapper.countUnpromoted(scope.tenantId(), scope.subjectId());
         int effectiveLimit = limit <= 0 ? 50 : limit;
-        return PageResult.of(repo.topicMapper.listUnpromoted(scope.tenantId(), scope.subjectId(),
+        return PageResult.of(topicMapper.listUnpromoted(scope.tenantId(), scope.subjectId(),
                 effectiveLimit, offset), total);
     }
 
     /** 删掉一条计数，之后若再被问到就从零开始。 */
     public void deleteTopic(MemoryScope scope, String id) {
-        repo.topicMapper.deleteScoped(scope.tenantId(), scope.subjectId(), id);
+        topicMapper.deleteScoped(scope.tenantId(), scope.subjectId(), id);
     }
 
     /**
@@ -204,7 +223,7 @@ final class MemoryIndexStore {
      * <p>否则一个停在 N−1 次的主题会在用户要求"清空一切"之后的**下一个问题**上被提升。</p>
      */
     public void deleteAllTopics(MemoryScope scope) {
-        repo.topicMapper.deleteAllInScope(scope.tenantId(), scope.subjectId());
+        topicMapper.deleteAllInScope(scope.tenantId(), scope.subjectId());
     }
 
     // ── 文档亲和 ───────────────────────────────────────────────────────────
@@ -237,12 +256,12 @@ final class MemoryIndexStore {
             row.setCreatedAt(now);
             row.setUpdatedAt(now);
 
-            if (repo.postgres) {
-                repo.affinityMapper.insertIfAbsentPostgres(row);
+            if (postgres) {
+                affinityMapper.insertIfAbsentPostgres(row);
             } else {
-                repo.affinityMapper.insertIfAbsentOther(row);
+                affinityMapper.insertIfAbsentOther(row);
             }
-            repo.affinityMapper.bump(scope.tenantId(), scope.subjectId(), doc.getKnowledgeId(),
+            affinityMapper.bump(scope.tenantId(), scope.subjectId(), doc.getKnowledgeId(),
                     doc.getTitle(), doc.getKnowledgeBaseId(), now);
         }
     }
@@ -252,7 +271,7 @@ final class MemoryIndexStore {
         if (knowledgeIds == null || knowledgeIds.isEmpty()) {
             return null;
         }
-        List<MemoryDocAffinity> rows = repo.affinityMapper.selectByKnowledgeIds(scope.tenantId(),
+        List<MemoryDocAffinity> rows = affinityMapper.selectByKnowledgeIds(scope.tenantId(),
                 scope.subjectId(), knowledgeIds);
         Map<String, Integer> affinity = new HashMap<>();
         for (MemoryDocAffinity row : rows) {
@@ -263,7 +282,7 @@ final class MemoryIndexStore {
 
     /** 最热文档（限量）。 */
     public List<MemoryDocAffinity> topDocAffinity(MemoryScope scope, int limit) {
-        return repo.affinityMapper.topAffinity(scope.tenantId(), scope.subjectId(), limit);
+        return affinityMapper.topAffinity(scope.tenantId(), scope.subjectId(), limit);
     }
 
     /** 按 ID 取文档亲和：不存在时回 {@code null}。 */
@@ -271,7 +290,7 @@ final class MemoryIndexStore {
         if (id == null || id.isEmpty()) {
             return null;
         }
-        return repo.affinityMapper.selectScopedById(scope.tenantId(), scope.subjectId(), id);
+        return affinityMapper.selectScopedById(scope.tenantId(), scope.subjectId(), id);
     }
 
     /**
@@ -280,20 +299,20 @@ final class MemoryIndexStore {
      */
     public PageResult<MemoryDocAffinity> listFamiliarDocs(MemoryScope scope, int minHits, int limit, int offset) {
         int effectiveMinHits = minHits < 1 ? MemoryConfig.MEMORY_DOC_AFFINITY_MIN_HITS : minHits;
-        long total = repo.affinityMapper.countFamiliar(scope.tenantId(), scope.subjectId(), effectiveMinHits);
+        long total = affinityMapper.countFamiliar(scope.tenantId(), scope.subjectId(), effectiveMinHits);
         int effectiveLimit = limit <= 0 ? 50 : limit;
-        return PageResult.of(repo.affinityMapper.listFamiliar(scope.tenantId(), scope.subjectId(),
+        return PageResult.of(affinityMapper.listFamiliar(scope.tenantId(), scope.subjectId(),
                 effectiveMinHits, effectiveLimit, offset), total);
     }
 
     /** 删一条文档亲和。 */
     public void deleteDocAffinity(MemoryScope scope, String id) {
-        repo.affinityMapper.deleteScoped(scope.tenantId(), scope.subjectId(), id);
+        affinityMapper.deleteScoped(scope.tenantId(), scope.subjectId(), id);
     }
 
     /** 清空全部文档亲和。 */
     public void deleteAllDocAffinity(MemoryScope scope) {
-        repo.affinityMapper.deleteAllInScope(scope.tenantId(), scope.subjectId());
+        affinityMapper.deleteAllInScope(scope.tenantId(), scope.subjectId());
     }
 
     // ── 向量 ───────────────────────────────────────────────────────────────
@@ -302,7 +321,7 @@ final class MemoryIndexStore {
 
     /** 是否有待处理的抽取会话。 */
     public boolean hasPendingExtraction(MemoryScope scope) {
-        return repo.extractionMapper.countPendingProbe(scope.tenantId(), scope.subjectId()) > 0;
+        return extractionMapper.countPendingProbe(scope.tenantId(), scope.subjectId()) > 0;
     }
 
     /**
@@ -314,7 +333,7 @@ final class MemoryIndexStore {
      */
     public MemoryRepository.EnqueueResult enqueuePendingSession(MemoryScope scope, String sessionId, Duration timeout) {
         boolean[] shouldSend = {false};
-        MemorySubject snapshot = repo.tx.withSubject(scope, subject -> {
+        MemorySubject snapshot = tx.withSubject(scope, subject -> {
             MemorySubject before = subject.copy();
             importLegacySessions(scope, subject);
             enqueueExtractionSession(scope, subject, sessionId, true);
@@ -342,7 +361,7 @@ final class MemoryIndexStore {
      */
     public MemoryExtractionBatch claimPendingSessions(MemoryScope scope, String fallbackSession,
                                                       String leaseId, Duration ttl) {
-        return repo.tx.withSubject(scope, subject -> {
+        return tx.withSubject(scope, subject -> {
             OffsetDateTime now = OffsetDateTime.now();
             if (!subject.getExtractionState().getLeaseId().isEmpty()
                     && subject.getExtractionState().leaseUntilAfter(now)) {
@@ -352,7 +371,7 @@ final class MemoryIndexStore {
             // 遗留负载只引导一次；重复调用不能把一个已经排干的行重新激活。
             enqueueExtractionSession(scope, subject, fallbackSession, false);
 
-            List<MemoryExtractionSession> sessions = repo.extractionMapper.listPending(
+            List<MemoryExtractionSession> sessions = extractionMapper.listPending(
                     scope.tenantId(), scope.subjectId(), MemoryKinds.MAX_PENDING_SESSIONS);
             if (sessions.isEmpty()) {
                 saveExtractionState(scope, subject, now);
@@ -373,11 +392,11 @@ final class MemoryIndexStore {
      */
     public void checkpointExtraction(MemoryScope scope, String leaseId, MemoryExtractionSession session,
                                      MemoryMessageCursor cursor, boolean drained) {
-        repo.tx.withSubject(scope, subject -> {
+        tx.withSubject(scope, subject -> {
             if (!validExtractionLease(subject, leaseId)) {
                 throw new MemoryExtractionLeaseLostException();
             }
-            MemoryExtractionSession progress = repo.extractionMapper.selectBySessionId(
+            MemoryExtractionSession progress = extractionMapper.selectBySessionId(
                     scope.tenantId(), scope.subjectId(), session.getSessionId());
             if (progress == null) {
                 throw new MemorySubjectMissingException();
@@ -387,7 +406,7 @@ final class MemoryIndexStore {
             // 只更新这一行即可转动未完成的工作，不必重写主体的整段历史。
             // 已完成的游标仍然是一条小的、有索引的记录。
             boolean pending = !drained || progress.getRevision() != session.getRevision();
-            repo.extractionMapper.checkpoint(scope.tenantId(), scope.subjectId(), session.getSessionId(),
+            extractionMapper.checkpoint(scope.tenantId(), scope.subjectId(), session.getSessionId(),
                     effective.getAt(), effective.getId(), pending,
                     progress.getFailedAt() == null, OffsetDateTime.now());
             return null;
@@ -406,12 +425,12 @@ final class MemoryIndexStore {
     public boolean recordExtractionFailure(MemoryScope scope, String leaseId,
                                            MemoryExtractionFailure failure) {
         boolean[] skip = {false};
-        repo.tx.withSubject(scope, subject -> {
+        tx.withSubject(scope, subject -> {
             if (!validExtractionLease(subject, leaseId)) {
                 throw new MemoryExtractionLeaseLostException();
             }
             String sessionId = failure.session().getSessionId();
-            MemoryExtractionSession progress = repo.extractionMapper.selectBySessionId(
+            MemoryExtractionSession progress = extractionMapper.selectBySessionId(
                     scope.tenantId(), scope.subjectId(), sessionId);
             if (progress == null) {
                 throw new MemorySubjectMissingException();
@@ -422,7 +441,7 @@ final class MemoryIndexStore {
             }
             skip[0] = attempts >= MemoryRepository.MAX_EXTRACTION_ATTEMPTS;
             OffsetDateTime now = OffsetDateTime.now();
-            repo.extractionMapper.recordFailure(scope.tenantId(), scope.subjectId(), sessionId,
+            extractionMapper.recordFailure(scope.tenantId(), scope.subjectId(), sessionId,
                     attempts, failure.code(), skip[0] ? now : null,
                     progress.getCursorAt(), progress.getCursorId(),
                     failure.end().getAt(), failure.end().getId(), now);
@@ -439,7 +458,7 @@ final class MemoryIndexStore {
      * {@link #validExtractionLease} 不同，别统一。</p>
      */
     public void finishExtraction(MemoryScope scope, String leaseId) {
-        repo.tx.withSubject(scope, subject -> {
+        tx.withSubject(scope, subject -> {
             if (!subject.getExtractionState().getLeaseId().equals(leaseId)) {
                 throw new MemoryExtractionLeaseLostException();
             }
@@ -448,7 +467,7 @@ final class MemoryIndexStore {
             subject.setExtractScheduledAt(null);
             OffsetDateTime now = OffsetDateTime.now();
             saveExtractionState(scope, subject, now);
-            repo.subjectMapper.updateLastExtractedAt(scope.tenantId(), scope.subjectId(), now);
+            subjectMapper.updateLastExtractedAt(scope.tenantId(), scope.subjectId(), now);
             return null;
         });
     }
@@ -459,7 +478,7 @@ final class MemoryIndexStore {
      * 绝不该释放一个正在跑的 worker。
      */
     public void releaseExtractionSlot(MemoryScope scope, String leaseId) {
-        repo.tx.withSubject(scope, subject -> {
+        tx.withSubject(scope, subject -> {
             if (!subject.getExtractionState().getLeaseId().equals(leaseId)) {
                 return null;
             }
@@ -491,7 +510,7 @@ final class MemoryIndexStore {
         // 所以必须在这里归一。
         List<String> pending = subject.getPendingSessions() == null
                 ? new ArrayList<>() : subject.getPendingSessions();
-        repo.subjectMapper.saveExtractionState(scope.tenantId(), scope.subjectId(),
+        subjectMapper.saveExtractionState(scope.tenantId(), scope.subjectId(),
                 subject.getExtractionState(), pending, subject.getExtractScheduledAt(), now);
     }
 
@@ -534,19 +553,19 @@ final class MemoryIndexStore {
         }
         row.setUpdatedAt(OffsetDateTime.now());
 
-        if (repo.postgres) {
+        if (postgres) {
             if (bump) {
-                repo.extractionMapper.upsertBumpPostgres(row);
+                extractionMapper.upsertBumpPostgres(row);
             } else {
-                repo.extractionMapper.insertIfAbsentPostgres(row);
+                extractionMapper.insertIfAbsentPostgres(row);
             }
             return;
         }
         // H2：没有 ON CONFLICT，用"先试 UPDATE 自增、没命中再插"的等价写法。
-        if (bump && repo.extractionMapper.bumpExisting(row) > 0) {
+        if (bump && extractionMapper.bumpExisting(row) > 0) {
             return;
         }
-        repo.extractionMapper.insertIfAbsentOther(row);
+        extractionMapper.insertIfAbsentOther(row);
     }
 
     /**

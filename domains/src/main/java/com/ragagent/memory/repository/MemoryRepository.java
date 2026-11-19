@@ -111,10 +111,6 @@ public class MemoryRepository {
     /** 元数据探列用的数据源。 */
     final DataSource dataSource;
 
-    /** pgvector 列就绪探测：只探一次并缓存结果。 */
-    volatile boolean vectorProbed;
-    volatile boolean vectorColumn;
-
     public MemoryRepository(MemorySubjectMapper subjectMapper,
                             MemoryItemMapper itemMapper,
                             MemoryItemEmbeddingMapper embeddingMapper,
@@ -132,11 +128,12 @@ public class MemoryRepository {
         this.affinityMapper = affinityMapper;
         this.extractionMapper = extractionMapper;
         this.tx = tx;
-        this.indexStore = new MemoryIndexStore(this);
-        this.vectorStore = new MemoryVectorStore(this);
-        this.itemStore = new MemoryItemStore(this);
         this.dataSource = dataSource;
         this.postgres = DatabaseDialects.isPostgres(dataSource);
+        this.indexStore = new MemoryIndexStore(subjectMapper, topicMapper, affinityMapper,
+                extractionMapper, tx, postgres);
+        this.vectorStore = new MemoryVectorStore(dataSource, embeddingMapper, itemMapper, tx, postgres);
+        this.itemStore = new MemoryItemStore(embeddingMapper, itemMapper, tombstoneMapper, tx, postgres);
     }
 
     // ── 返回值形状 ────────────────────────────────────────

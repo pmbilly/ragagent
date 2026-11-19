@@ -12,10 +12,14 @@ import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.domain.McpToolApproval;
 import com.ragagent.mcp.dto.McpMetadata;
+import com.ragagent.mcp.service.McpMetadataService;
+import com.ragagent.mcp.service.McpServiceManagement;
+import com.ragagent.mcp.service.McpToolApprovalService;
 import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.util.LinkedHashMap;
@@ -40,10 +44,22 @@ final class McpUsageInstructionsOps {
 
     private static final Logger log = LoggerFactory.getLogger(McpUsageInstructionsOps.class);
 
-    private final McpServiceController ctrl;
+    private final McpServiceManagement mcpServiceService;
+    private final McpMetadataService mcpMetadataService;
+    private final McpToolApprovalService mcpToolApprovalService;
+    private final ModelCatalogPort modelCatalog;
+    private final ModelRuntime modelRuntime;
 
-    McpUsageInstructionsOps(McpServiceController ctrl) {
-        this.ctrl = ctrl;
+    McpUsageInstructionsOps(McpServiceManagement mcpServiceService,
+                            McpMetadataService mcpMetadataService,
+                            McpToolApprovalService mcpToolApprovalService,
+                            ModelCatalogPort modelCatalog,
+                            ModelRuntime modelRuntime) {
+        this.mcpServiceService = mcpServiceService;
+        this.mcpMetadataService = mcpMetadataService;
+        this.mcpToolApprovalService = mcpToolApprovalService;
+        this.modelCatalog = modelCatalog;
+        this.modelRuntime = modelRuntime;
     }
 
     private static final ObjectMapper JSON = JsonMappers.lenient();
@@ -92,14 +108,14 @@ final class McpUsageInstructionsOps {
 
         McpService service;
         try {
-            service = ctrl.mcpServiceService.getMCPServiceById(tenant, serviceId);
+            service = mcpServiceService.getMCPServiceById(tenant, serviceId);
         } catch (RuntimeException e) {
             throw BizException.notFound("MCP service not found");
         }
 
         McpMetadata snapshot;
         try {
-            snapshot = ctrl.mcpMetadataService.getMCPMetadata(tenant, serviceId);
+            snapshot = mcpMetadataService.getMCPMetadata(tenant, serviceId);
         } catch (RuntimeException e) {
             throw McpServiceController.mcpMetadataAppError(e, false);
         }
@@ -110,7 +126,7 @@ final class McpUsageInstructionsOps {
 
         List<McpToolApproval> policies;
         try {
-            policies = ctrl.mcpToolApprovalService.listByService(tenant, serviceId);
+            policies = mcpToolApprovalService.listByService(tenant, serviceId);
         } catch (RuntimeException e) {
             throw BizException.internal("Failed to read MCP tool policies");
         }
@@ -264,7 +280,7 @@ final class McpUsageInstructionsOps {
      *
      */
     private ModelRowView selectChatModel() {
-        List<ModelRowView> models = ctrl.modelCatalog.listModels();
+        List<ModelRowView> models = modelCatalog.listModels();
         ModelRowView selected = null;
         for (ModelRowView model : models) {
             if (model == null || !"KnowledgeQA".equals(model.type())
@@ -283,6 +299,6 @@ final class McpUsageInstructionsOps {
 
     /** 由模型行构造 LLM 客户端（构造收在 model-runtime，本类不 import 模型族实现） */
     private LlmChatClient chatClientFor(ModelRowView model) {
-        return ctrl.modelRuntime.chatClientFor(model);
+        return modelRuntime.chatClientFor(model);
     }
 }

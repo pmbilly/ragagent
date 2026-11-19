@@ -13,7 +13,7 @@ class McpServiceCrudOpsBindingTest {
 
     @Test
     void nonObjectBodyYieldsJsonTypeName() throws Exception {
-        McpServiceCrudOps ops = new McpServiceCrudOps(null);
+        McpServiceCrudOps ops = new McpServiceCrudOps(null, null);
         assertThatThrownBy(() -> ops.updateMCPService("svc", MAPPER.readTree("[1]")))
                 .isInstanceOf(BizException.class)
                 .extracting(e -> ((BizException) e).appError().message())

@@ -12,6 +12,7 @@ import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryTombstone;
 import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.memory.repository.MemoryRepository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -32,10 +33,16 @@ final class MemoryExtractionLlm {
 
     private static final Logger log = LoggerFactory.getLogger(MemoryExtractionLlm.class);
 
-    private final MemoryExtractionService service;
+    private final MemoryRepository repo;
+    private final MemoryService memoryService;
+    private final MemoryVectorService vectorService;
 
-    MemoryExtractionLlm(MemoryExtractionService service) {
-        this.service = service;
+    MemoryExtractionLlm(MemoryRepository repo,
+                        MemoryService memoryService,
+                        MemoryVectorService vectorService) {
+        this.repo = repo;
+        this.memoryService = memoryService;
+        this.vectorService = vectorService;
     }
 
     /**
@@ -151,7 +158,7 @@ final class MemoryExtractionLlm {
         List<MemoryItem> existing;
         try {
             // 比放得下的多要一条，这样"全都放得下"与"还有更多"不用第二次查询就能分辨。
-            existing = service.repo.listActiveByKinds(scope, MemoryKinds.ALL,
+            existing = repo.listActiveByKinds(scope, MemoryKinds.ALL,
                     MemoryExtractionService.EXTRACT_RELEVANT_CANDIDATES + 1);
         } catch (RuntimeException e) {
             throw new IllegalStateException("load existing memories: " + e.getMessage(), e);
@@ -165,7 +172,7 @@ final class MemoryExtractionLlm {
             query.append(line.content).append('\n');
         }
 
-        MemoryVectorService.VectorSearchOutcome search = service.vectorService.vectorSearch(
+        MemoryVectorService.VectorSearchOutcome search = vectorService.vectorSearch(
                 scope, cfg, query.toString(), MemoryKinds.ALL, MemoryExtractionService.EXTRACT_RELEVANT_CANDIDATES);
         if (search.hits() == null || search.hits().isEmpty()) {
             // 按重要度排序的前缀是诚实的回落：没有语义打分就没有东西可以排序，
@@ -190,7 +197,7 @@ final class MemoryExtractionLlm {
                                           MemoryExtractionService.TranscriptSegment segment, List<MemoryItem> existing,
                                           List<MemoryTombstone> forgotten,
                                           List<MemoryTopicStat> knownTopics, MemoryRunBudget budget) {
-        String modelId = service.memoryService.extractionModelId(cfg, payload);
+        String modelId = memoryService.extractionModelId(cfg, payload);
         if (modelId.isEmpty()) {
             // 返回错误让水位线留在原地。在这里跳过会悄悄消费掉这次运行拿到的每一条消息：
             // 蒸馏报成功、越过了它们，而没有任何模型看过它们——一个默认设置下的工作区
@@ -201,7 +208,7 @@ final class MemoryExtractionLlm {
         }
         LlmChatClient chatModel;
         try {
-            chatModel = service.memoryService.modelResolver().getChatModel(modelId);
+            chatModel = memoryService.modelResolver().getChatModel(modelId);
         } catch (RuntimeException e) {
             throw new IllegalStateException("get extraction model: " + e.getMessage(), e);
         }

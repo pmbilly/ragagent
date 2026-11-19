@@ -7,6 +7,8 @@ import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.vector.MemoryVectorHit;
 import com.ragagent.memory.domain.vector.MemoryVectorQuery;
 import com.ragagent.memory.domain.vector.MemoryVectors;
+import com.ragagent.memory.mapper.MemoryItemEmbeddingMapper;
+import com.ragagent.memory.mapper.MemoryItemMapper;
 import com.ragagent.memory.mapper.VectorHitRow;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.sql.Connection;
@@ -18,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,10 +37,26 @@ final class MemoryVectorStore {
 
     private static final Logger log = LoggerFactory.getLogger(MemoryVectorStore.class);
 
-    private final MemoryRepository repo;
+    private final DataSource dataSource;
+    private final MemoryItemEmbeddingMapper embeddingMapper;
+    private final MemoryItemMapper itemMapper;
+    private final MemoryTxTemplate tx;
+    private final boolean postgres;
 
-    MemoryVectorStore(MemoryRepository repo) {
-        this.repo = repo;
+    /** 向量列探测结果（随本 store 走：谁探测谁缓存，父仓储不再持有）。 */
+    volatile boolean vectorProbed;
+    volatile boolean vectorColumn;
+
+    MemoryVectorStore(DataSource dataSource,
+                      MemoryItemEmbeddingMapper embeddingMapper,
+                      MemoryItemMapper itemMapper,
+                      MemoryTxTemplate tx,
+                      boolean postgres) {
+        this.dataSource = dataSource;
+        this.embeddingMapper = embeddingMapper;
+        this.itemMapper = itemMapper;
+        this.tx = tx;
+        this.postgres = postgres;
     }
 
     /**
@@ -64,9 +83,9 @@ final class MemoryVectorStore {
             embedding.setCreatedAt(now);
         }
 
-        repo.tx.withSubject(scope, subject -> {
+        tx.withSubject(scope, subject -> {
             if (!embedding.getSourceContent().isEmpty()) {
-                MemoryItem current = repo.itemMapper.selectScoped(scope.tenantId(), scope.subjectId(),
+                MemoryItem current = itemMapper.selectScoped(scope.tenantId(), scope.subjectId(),
                         embedding.getItemId());
                 if (current == null) {
                     return null;
@@ -76,18 +95,18 @@ final class MemoryVectorStore {
                     return null;
                 }
             }
-            if (repo.postgres) {
-                repo.embeddingMapper.upsertPostgres(embedding);
+            if (postgres) {
+                embeddingMapper.upsertPostgres(embedding);
             } else {
                 // H2 走"先删后插"。为对齐 PG 的 DO UPDATE **不重置 created_at**
                 // （它的列集里没有 created_at），把已存在的那行的值读出来带上。
                 MemoryItemEmbedding existing =
-                        repo.embeddingMapper.selectByItemId(embedding.getItemId());
+                        embeddingMapper.selectByItemId(embedding.getItemId());
                 if (existing != null) {
                     embedding.setCreatedAt(existing.getCreatedAt());
                 }
-                repo.embeddingMapper.deleteByItemId(scope.tenantId(), scope.subjectId(), embedding.getItemId());
-                repo.embeddingMapper.insertRow(embedding);
+                embeddingMapper.deleteByItemId(scope.tenantId(), scope.subjectId(), embedding.getItemId());
+                embeddingMapper.insertRow(embedding);
             }
             // 上面那个 blob 是每个部署都会读的；这一份是同一个向量的"数据库能排序"的形态。
             // 同一事务里写，所以一行永远不会以"可搜索但向量是旧的"状态存在。
@@ -106,7 +125,7 @@ final class MemoryVectorStore {
         if (itemId == null || itemId.isEmpty()) {
             return;
         }
-        repo.embeddingMapper.deleteByItemId(scope.tenantId(), scope.subjectId(), itemId);
+        embeddingMapper.deleteByItemId(scope.tenantId(), scope.subjectId(), itemId);
     }
 
     /**
@@ -122,7 +141,7 @@ final class MemoryVectorStore {
         if (itemIds == null || itemIds.isEmpty() || modelId == null || modelId.isEmpty()) {
             return null;
         }
-        List<MemoryItemEmbedding> rows = repo.embeddingMapper.selectByItemIds(scope.tenantId(),
+        List<MemoryItemEmbedding> rows = embeddingMapper.selectByItemIds(scope.tenantId(),
                 scope.subjectId(), itemIds, modelId);
         Map<String, float[]> vectors = new HashMap<>();
         for (MemoryItemEmbedding row : rows) {
@@ -167,7 +186,7 @@ final class MemoryVectorStore {
             return null;
         }
 
-        List<MemoryItem> items = repo.itemMapper.selectByIds(scope.tenantId(), scope.subjectId(), ids);
+        List<MemoryItem> items = itemMapper.selectByIds(scope.tenantId(), scope.subjectId(), ids);
         Map<String, MemoryItem> byId = new HashMap<>();
         for (MemoryItem item : items) {
             byId.put(item.getId(), item);
@@ -199,7 +218,7 @@ final class MemoryVectorStore {
             return 0;
         }
         int effectiveLimit = limit <= 0 ? 500 : limit;
-        List<MemoryItemEmbedding> rows = repo.embeddingMapper.selectPendingVectorColumn(
+        List<MemoryItemEmbedding> rows = embeddingMapper.selectPendingVectorColumn(
                 scope.tenantId(), scope.subjectId(), effectiveLimit);
         int moved = 0;
         for (MemoryItemEmbedding row : rows) {
@@ -224,15 +243,15 @@ final class MemoryVectorStore {
      * 上有 {@code embedding} 列（迁移 000095 是条件执行的，光看方言决定不了）。</p>
      */
     boolean vectorColumnReady() {
-        if (!repo.vectorProbed) {
+        if (!vectorProbed) {
             synchronized (this) {
-                if (!repo.vectorProbed) {
-                    repo.vectorColumn = repo.postgres && columnExists("memory_item_embeddings", "embedding");
-                    repo.vectorProbed = true;
+                if (!vectorProbed) {
+                    vectorColumn = postgres && columnExists("memory_item_embeddings", "embedding");
+                    vectorProbed = true;
                 }
             }
         }
-        return repo.vectorColumn;
+        return vectorColumn;
     }
 
     /**
@@ -249,7 +268,7 @@ final class MemoryVectorStore {
         if (literal.isEmpty()) {
             return;
         }
-        repo.embeddingMapper.writeVectorColumn(itemId, literal);
+        embeddingMapper.writeVectorColumn(itemId, literal);
     }
 
     private List<VectorHitRow> rankInDatabase(MemoryScope scope, MemoryVectorQuery query, int limit) {
@@ -257,7 +276,7 @@ final class MemoryVectorStore {
         if (literal.isEmpty()) {
             return List.of();
         }
-        return repo.embeddingMapper.rankInDatabase(scope.tenantId(), scope.subjectId(), query.modelId(),
+        return embeddingMapper.rankInDatabase(scope.tenantId(), scope.subjectId(), query.modelId(),
                 query.vector().length, query.kinds(), MemoryKinds.STATUS_ACTIVE,
                 OffsetDateTime.now(), literal, limit);
     }
@@ -269,7 +288,7 @@ final class MemoryVectorStore {
      * 只是要付传输的代价。</p>
      */
     private List<VectorHitRow> rankInProcess(MemoryScope scope, MemoryVectorQuery query, int limit) {
-        List<MemoryItemEmbedding> stored = repo.embeddingMapper.selectScopedVectors(scope.tenantId(),
+        List<MemoryItemEmbedding> stored = embeddingMapper.selectScopedVectors(scope.tenantId(),
                 scope.subjectId(), query.modelId(), query.vector().length, query.kinds(),
                 MemoryKinds.STATUS_ACTIVE, OffsetDateTime.now(), MemoryRepository.FALLBACK_VECTOR_SCAN_CAP);
 
@@ -313,7 +332,7 @@ final class MemoryVectorStore {
         for (String[] pair : new String[][]{
                 {table.toLowerCase(Locale.ROOT), column.toLowerCase(Locale.ROOT)},
                 {table.toUpperCase(Locale.ROOT), column.toUpperCase(Locale.ROOT)}}) {
-            try (Connection c = repo.dataSource.getConnection();
+            try (Connection c = dataSource.getConnection();
                  ResultSet rs = c.getMetaData().getColumns(null, null, pair[0], pair[1])) {
                 if (rs.next()) {
                     return true;

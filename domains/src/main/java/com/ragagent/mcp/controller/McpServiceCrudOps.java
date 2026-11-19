@@ -14,6 +14,7 @@ import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.dto.McpServiceCreateRequest;
 import com.ragagent.mcp.dto.McpServiceResponse;
 import com.ragagent.mcp.protocol.McpServiceUrls;
+import com.ragagent.mcp.service.McpServiceManagement;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.ApiResponse;
@@ -38,10 +39,12 @@ final class McpServiceCrudOps {
 
     private static final Logger log = LoggerFactory.getLogger(McpServiceCrudOps.class);
 
-    private final McpServiceController ctrl;
+    private final McpServiceManagement mcpServiceService;
+    private final SsrfGuard ssrfGuard;
 
-    McpServiceCrudOps(McpServiceController ctrl) {
-        this.ctrl = ctrl;
+    McpServiceCrudOps(McpServiceManagement mcpServiceService, SsrfGuard ssrfGuard) {
+        this.mcpServiceService = mcpServiceService;
+        this.ssrfGuard = ssrfGuard;
     }
 
     // ── 创建 ─────────────────────────────────────────────────────────────
@@ -72,7 +75,7 @@ final class McpServiceCrudOps {
         }
 
         try {
-            ctrl.mcpServiceService.createMCPService(service);
+            mcpServiceService.createMCPService(service);
         } catch (BizException e) {
             log.error("Failed to create MCP service, service_name={}",
                     LogSanitizer.sanitize(service.getName()), e);
@@ -92,7 +95,7 @@ final class McpServiceCrudOps {
         long tenantId = McpServiceController.requireTenant();
         List<McpService> services;
         try {
-            services = ctrl.mcpServiceService.listMCPServices(tenantId);
+            services = mcpServiceService.listMCPServices(tenantId);
         } catch (BizException e) {
             log.error("Failed to list MCP services, tenant_id={}", tenantId, e);
             throw BizException.internal("Failed to list MCP services: " + McpServiceController.rawMessage(e));
@@ -105,7 +108,7 @@ final class McpServiceCrudOps {
         long tenantId = McpServiceController.requireTenant();
         McpService service;
         try {
-            service = ctrl.mcpServiceService.getMCPServiceById(tenantId, McpServiceController.sanitize(id));
+            service = mcpServiceService.getMCPServiceById(tenantId, McpServiceController.sanitize(id));
         } catch (RuntimeException e) {
             log.debug("MCP service not found, service_id={}", McpServiceController.sanitize(id));
             throw BizException.notFound("MCP service not found");
@@ -275,7 +278,7 @@ final class McpServiceCrudOps {
         }
 
         try {
-            ctrl.mcpServiceService.updateMCPService(service, updateFields);
+            mcpServiceService.updateMCPService(service, updateFields);
         } catch (BizException e) {
             log.error("Failed to update MCP service, service_id={}", serviceId, e);
             throw BizException.internal("Failed to update MCP service: " + McpServiceController.rawMessage(e));
@@ -286,7 +289,7 @@ final class McpServiceCrudOps {
         // 重新读回：拾取服务端的合并结果（CustomHeaders 保留等），并用"无秘密"的 DTO 响应
         McpService stored;
         try {
-            stored = ctrl.mcpServiceService.getMCPServiceById(tenantId, serviceId);
+            stored = mcpServiceService.getMCPServiceById(tenantId, serviceId);
         } catch (RuntimeException e) {
             throw BizException.internal("Failed to fetch updated MCP service: " + McpServiceController.rawMessage(e));
         }
@@ -300,7 +303,7 @@ final class McpServiceCrudOps {
         long tenantId = McpServiceController.requireTenant();
         String serviceId = McpServiceController.sanitize(id);
         try {
-            ctrl.mcpServiceService.deleteMCPService(tenantId, serviceId);
+            mcpServiceService.deleteMCPService(tenantId, serviceId);
         } catch (BizException e) {
             log.error("Failed to delete MCP service, service_id={}", serviceId, e);
             throw BizException.internal("Failed to delete MCP service: " + McpServiceController.rawMessage(e));
@@ -325,7 +328,7 @@ final class McpServiceCrudOps {
 
         McpTestResult result;
         try {
-            result = ctrl.mcpServiceService.testMCPService(tenantId, serviceId);
+            result = mcpServiceService.testMCPService(tenantId, serviceId);
         } catch (RuntimeException e) {
             log.error("MCP service test failed, service_id={}", serviceId, e);
             return McpServiceController.ok(McpTestResult.fail("Test failed: " + McpServiceController.rawMessage(e)));
@@ -340,7 +343,7 @@ final class McpServiceCrudOps {
         String serviceId = McpServiceController.sanitize(id);
         List<McpTool> tools;
         try {
-            tools = ctrl.mcpServiceService.getMCPServiceTools(tenantId, serviceId);
+            tools = mcpServiceService.getMCPServiceTools(tenantId, serviceId);
         } catch (BizException e) {
             log.error("Failed to get MCP service tools, service_id={}", serviceId, e);
             throw BizException.internal("Failed to get MCP service tools: " + McpServiceController.rawMessage(e));
@@ -354,7 +357,7 @@ final class McpServiceCrudOps {
         String serviceId = McpServiceController.sanitize(id);
         List<McpResource> resources;
         try {
-            resources = ctrl.mcpServiceService.getMCPServiceResources(tenantId, serviceId);
+            resources = mcpServiceService.getMCPServiceResources(tenantId, serviceId);
         } catch (BizException e) {
             log.error("Failed to get MCP service resources, service_id={}", serviceId, e);
             throw BizException.internal("Failed to get MCP service resources: " + McpServiceController.rawMessage(e));
@@ -368,7 +371,7 @@ final class McpServiceCrudOps {
         }
         Map<String, McpMetadataSummary> summaries;
         try {
-            summaries = ctrl.mcpServiceService.listMCPMetadataSummaries(tenantId, services);
+            summaries = mcpServiceService.listMCPMetadataSummaries(tenantId, services);
         } catch (RuntimeException e) {
             log.error("Failed to list MCP metadata summaries, tenant_id={}", tenantId, e);
             return resp;
@@ -382,10 +385,10 @@ final class McpServiceCrudOps {
             return;
         }
         try {
-            ctrl.ssrfGuard.validateURLForSSRF(url);
+            ssrfGuard.validateURLForSSRF(url);
         } catch (SsrfGuard.SsrfException e) {
             log.warn("SSRF validation failed for MCP service URL", e);
-            throw BizException.badRequest(ctrl.ssrfGuard.formatSSRFError("MCP service URL", url, e));
+            throw BizException.badRequest(ssrfGuard.formatSSRFError("MCP service URL", url, e));
         }
     }
     /** 只取字符串值：非字符串值丢弃 */

@@ -138,8 +138,8 @@ public class MemoryExtractionService implements MemoryExtractHandler {
         this.sessionMessages = sessionMessages;
         this.consolidationService = consolidationService;
         this.queueProvider = queueProvider;
-        this.llmOps = new MemoryExtractionLlm(this);
-        this.transcriptOps = new MemoryTranscriptOps(this);
+        this.llmOps = new MemoryExtractionLlm(repo, memoryService, vectorService);
+        this.transcriptOps = new MemoryTranscriptOps(sessionMessages);
     }
 
     // 投递

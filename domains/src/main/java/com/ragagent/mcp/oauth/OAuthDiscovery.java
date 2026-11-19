@@ -6,6 +6,7 @@ import com.ragagent.mcp.oauth.model.OAuthProtectedResource;
 import com.ragagent.mcp.protocol.McpContext;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,10 +20,12 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 final class OAuthDiscovery {
 
-    private final OAuthHandler service;
+    private final OAuthConfig config;
+    private final Duration timeout;
 
-    OAuthDiscovery(OAuthHandler service) {
-        this.service = service;
+    OAuthDiscovery(OAuthConfig config, Duration timeout) {
+        this.config = config;
+        this.timeout = timeout;
     }
 
     /**
@@ -53,7 +56,7 @@ final class OAuthDiscovery {
     public void setProtectedResourceMetadataUrl(String url) {
         metadataLock.lock();
         try {
-            service.config.setProtectedResourceMetadataUrl(url);
+            config.setProtectedResourceMetadataUrl(url);
             this.serverMetadata = null;
             this.metadataFetchError = null;
             this.metadataFetched = false;
@@ -88,14 +91,14 @@ final class OAuthDiscovery {
      */
     private void discover(McpContext ctx) {
         // 1. 显式 metadata URL 优先，直接用它，不做任何回退
-        if (!service.config.authServerMetadataUrl().isEmpty()) {
-            fetchMetadataFromUrl(service.config.authServerMetadataUrl());
+        if (!config.authServerMetadataUrl().isEmpty()) {
+            fetchMetadataFromUrl(config.authServerMetadataUrl());
             if (serverMetadata == null && metadataFetchError == null) {
                 // 显式 URL 拉不到元数据 → 显式报错：对外 500，只有一条清晰文案，
                 // 不留空指针。
                 metadataFetchError = OAuthProtocolException.of(
                         "failed to load authorization server metadata from "
-                                + service.config.authServerMetadataUrl());
+                                + config.authServerMetadataUrl());
             }
             return;
         }
@@ -108,10 +111,10 @@ final class OAuthDiscovery {
             return;
         }
 
-        boolean explicitMetadataUrl = !service.config.protectedResourceMetadataUrl().isEmpty();
+        boolean explicitMetadataUrl = !config.protectedResourceMetadataUrl().isEmpty();
         String protectedResourceUrl;
         if (explicitMetadataUrl) {
-            protectedResourceUrl = service.config.protectedResourceMetadataUrl();
+            protectedResourceUrl = config.protectedResourceMetadataUrl();
         } else {
             try {
                 protectedResourceUrl = buildWellKnownUrl(base, "oauth-protected-resource");
@@ -124,7 +127,7 @@ final class OAuthDiscovery {
 
         OAuthHttp.Response resp;
         try {
-            resp = OAuthHttp.get(protectedResourceUrl, service.timeout);
+            resp = OAuthHttp.get(protectedResourceUrl, timeout);
         } catch (RuntimeException e) {
             metadataFetchError = OAuthProtocolException.of(
                     "failed to send protected resource request: " + e.getMessage(), e);
@@ -206,7 +209,7 @@ final class OAuthDiscovery {
     private void fetchMetadataFromUrl(String metadataUrl) {
         OAuthHttp.Response resp;
         try {
-            resp = OAuthHttp.get(metadataUrl, service.timeout);
+            resp = OAuthHttp.get(metadataUrl, timeout);
         } catch (RuntimeException e) {
             metadataFetchError = OAuthProtocolException.of(
                     "failed to send metadata request: " + e.getMessage(), e);
@@ -240,12 +243,12 @@ final class OAuthDiscovery {
         if (!baseUrl.isEmpty()) {
             return baseUrl;
         }
-        if (service.config.redirectUri().isEmpty()) {
+        if (config.redirectUri().isEmpty()) {
             throw OAuthProtocolException.of("no base URL available and no redirect URI provided");
         }
         URI parsed;
         try {
-            parsed = new URI(service.config.redirectUri());
+            parsed = new URI(config.redirectUri());
         } catch (URISyntaxException e) {
             throw OAuthProtocolException.of("failed to parse redirect URI: " + e.getMessage(), e);
         }

@@ -94,8 +94,9 @@ public class McpServiceController {
         this.ssrfGuard = ssrfGuard;
         this.modelCatalog = modelCatalog;
         this.modelRuntime = modelRuntime;
-        this.usageOps = new McpUsageInstructionsOps(this);
-        this.crudOps = new McpServiceCrudOps(this);
+        this.usageOps = new McpUsageInstructionsOps(mcpServiceService, mcpMetadataService,
+                mcpToolApprovalService, modelCatalog, modelRuntime);
+        this.crudOps = new McpServiceCrudOps(mcpServiceService, ssrfGuard);
     }
 
 

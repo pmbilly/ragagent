@@ -53,7 +53,7 @@ public class OAuthHandler {
     public OAuthHandler(OAuthConfig config) {
         this.config = config;
         this.timeout = config.httpTimeout();
-        this.discovery = new OAuthDiscovery(this);
+        this.discovery = new OAuthDiscovery(config, timeout);
         this.tokenOps = new OAuthTokenOps(this);
     }
 

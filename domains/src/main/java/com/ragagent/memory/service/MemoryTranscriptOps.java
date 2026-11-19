@@ -1,6 +1,7 @@
 package com.ragagent.memory.service;
 
 import com.ragagent.contract.memory.MemoryKeys;
+import com.ragagent.contract.session.MessageTranscriptPort;
 import com.ragagent.contract.session.SessionMessageView;
 import com.ragagent.memory.domain.MemoryExtractionSession;
 import com.ragagent.platform.web.ZeroTimeSerializer;
@@ -20,10 +21,10 @@ final class MemoryTranscriptOps {
 
     private static final Logger log = LoggerFactory.getLogger(MemoryTranscriptOps.class);
 
-    private final MemoryExtractionService service;
+    private final MessageTranscriptPort sessionMessages;
 
-    MemoryTranscriptOps(MemoryExtractionService service) {
-        this.service = service;
+    MemoryTranscriptOps(MessageTranscriptPort sessionMessages) {
+        this.sessionMessages = sessionMessages;
     }
 
     /** {@link #collectSessionSegments} 的双返回值。 */
@@ -39,7 +40,7 @@ final class MemoryTranscriptOps {
     CollectedSegments collectSessionSegments(MemoryExtractionSession session) {
         List<SessionMessageView> rows;
         try {
-            rows = service.sessionMessages.listAfterCursor(session.getSessionId(), session.getCursor().getAt(), session.getCursor().getId(),
+            rows = sessionMessages.listAfterCursor(session.getSessionId(), session.getCursor().getAt(), session.getCursor().getId(),
                     MemoryExtractionService.EXTRACT_MAX_MESSAGES_PER_RUN + 1);
         } catch (RuntimeException e) {
             throw new IllegalStateException("load session messages: " + e.getMessage(), e);
@@ -114,7 +115,7 @@ final class MemoryTranscriptOps {
         }
         List<SessionMessageView> before;
         try {
-            before = service.sessionMessages.listBeforeTime(sessionId, lines.get(0).at, MemoryExtractionService.EXTRACT_CONTEXT_LINES * 4);
+            before = sessionMessages.listBeforeTime(sessionId, lines.get(0).at, MemoryExtractionService.EXTRACT_CONTEXT_LINES * 4);
         } catch (RuntimeException e) {
             log.warn("memory: load prior context failed", e);
             return null;
