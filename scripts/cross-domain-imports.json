@@ -26,7 +26,7 @@
       "from": "session",
       "to": "agentmanagement",
       "target": "service",
-      "imports": 6
+      "imports": 4
     },
     {
       "from": "session",
@@ -80,7 +80,7 @@
   "contractImports": [
     {
       "from": "agentmanagement",
-      "imports": 22
+      "imports": 26
     },
     {
       "from": "agenttools",
@@ -132,7 +132,7 @@
     },
     {
       "from": "session",
-      "imports": 562
+      "imports": 564
     },
     {
       "from": "storage",

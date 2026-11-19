@@ -5,7 +5,7 @@
 
 ## 统计
 
-- 域间（解耦）：**27**
+- 域间（解耦）：**28**
 - 复合面（随复合端口）：**7**
 - 跨模块（必要）：**12**
 
@@ -15,6 +15,7 @@
 |---|---|---|---|---|
 | `AdminUserCommandPort` | `AdminUserAdapter` | domains | system | 域间（解耦） |
 | `AdminUserPort` | `AdminUserAdapter` | domains | system | 域间（解耦） |
+| `AgentSuggestionPort` | `CustomAgentService` | domains | session | 域间（解耦） |
 | `AuditWritePort` | `AuditWriteAdapter` | domains | agentmanagement、auth、datasource、knowledge、platform、system | 跨模块（必要） |
 | `ChunkFaqReadPort` | — | ? | — | 复合面（随复合端口） |
 | `ChunkPort` | `ChunkPortAdapter` | domains | wiki | 域间（解耦） |

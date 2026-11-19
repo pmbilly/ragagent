@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.dto.CustomAgentResult;
 import com.ragagent.agentmanagement.repository.AgentQuestionRepository;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
+import com.ragagent.contract.agent.TagScope;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.knowledge.KnowledgeBaseCatalogPort;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
@@ -361,7 +362,6 @@ public final class AgentSuggestedQuestions {
         return out;
     }
 
-    public record TagScope(String knowledgeBaseId, List<String> tagIds) {}
 
     private record ResolvedTags(List<String> knowledgeBaseIds, List<String> knowledgeIds,
             Map<Long, List<String>> tagIdsByTenant) {}

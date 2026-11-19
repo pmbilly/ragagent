@@ -10,6 +10,8 @@ import com.ragagent.agentmanagement.repository.CustomAgentRepository;
 import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.contract.agent.AgentChannelCleaner;
+import com.ragagent.contract.agent.AgentSuggestionPort;
+import com.ragagent.contract.agent.TagScope;
 import com.ragagent.contract.auth.AuthUserView;
 import com.ragagent.contract.auth.UserLookupPort;
 import com.ragagent.contract.error.AppError;
@@ -37,7 +39,7 @@ import org.springframework.stereotype.Service;
  * </ul>
  */
 @Service
-public class CustomAgentService {
+public class CustomAgentService implements AgentSuggestionPort {
 
 
     private final CustomAgentRepository agentRepo;
@@ -419,14 +421,22 @@ public class CustomAgentService {
     // ── suggested-questions(委托) ──
 
     public ArrayNode getSuggestedQuestions(String agentId, List<String> kbIds,
-            List<String> knowledgeIds, List<AgentSuggestedQuestions.TagScope> tagScopes, int limit,
+            List<String> knowledgeIds, List<TagScope> tagScopes, int limit,
             String locale) {
         return suggestedQuestions.getSuggestedQuestions(agentId, kbIds, knowledgeIds, tagScopes, limit,
                 locale);
     }
 
+    @Override
+    public String knowledgeSuggestedQuestions(String agentId, List<String> knowledgeBaseIds,
+                                             List<String> knowledgeIds, List<TagScope> tagScopes,
+                                             int limit, String locale) {
+        return getKnowledgeSuggestedQuestions(agentId, knowledgeBaseIds, knowledgeIds, tagScopes,
+                limit, locale).toString();
+    }
+
     public ArrayNode getKnowledgeSuggestedQuestions(String agentId, List<String> kbIds,
-            List<String> knowledgeIds, List<AgentSuggestedQuestions.TagScope> tagScopes, int limit,
+            List<String> knowledgeIds, List<TagScope> tagScopes, int limit,
             String locale) {
         return suggestedQuestions.getKnowledgeSuggestedQuestions(agentId, kbIds, knowledgeIds, tagScopes,
                 limit, locale);

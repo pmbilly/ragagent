@@ -1,8 +1,8 @@
 package com.ragagent.session.service.suggestion;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agentmanagement.service.AgentSuggestedQuestions;
-import com.ragagent.agentmanagement.service.CustomAgentService;
+import com.ragagent.contract.agent.AgentSuggestionPort;
+import com.ragagent.contract.agent.TagScope;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.model.ChatMessage;
@@ -16,6 +16,7 @@ import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageSuggestionEvent;
@@ -55,7 +56,7 @@ import org.springframework.stereotype.Service;
  * </ol>
  *
  * <p>generate 全量覆盖（generateWithModel 经 ModelRuntime
- * + generateFromKnowledge 经 CustomAgentService.getKnowledgeSuggestedQuestions）。</p>
+ * + generateFromKnowledge 经 AgentSuggestionPort）。</p>
  */
 @Service
 public class MessageSuggestionService {
@@ -81,15 +82,15 @@ public class MessageSuggestionService {
     private final MessageSuggestionRepository suggestionRepository;
     private final MessageService messageService;
     private final ModelRuntime modelRuntimeAssembler;
-    private final CustomAgentService customAgentService;
+    private final AgentSuggestionPort suggestionPort;
 
     public MessageSuggestionService(MessageSuggestionRepository suggestionRepository,
             MessageService messageService, ModelRuntime modelRuntimeAssembler,
-            CustomAgentService customAgentService) {
+            AgentSuggestionPort suggestionPort) {
         this.suggestionRepository = suggestionRepository;
         this.messageService = messageService;
         this.modelRuntimeAssembler = modelRuntimeAssembler;
-        this.customAgentService = customAgentService;
+        this.suggestionPort = suggestionPort;
     }
 
     // ── Ensure ──────────────────────────
@@ -464,19 +465,19 @@ public class MessageSuggestionService {
         }
         List<String> actualIds = preferActualEvidence
                 ? context.actualKnowledgeIds() : knowledgeIds;
-        List<AgentSuggestedQuestions.TagScope> tagScopes = tagScopes(ec);
+        List<TagScope> tagScopes = tagScopes(ec);
         final int poolSizeF = poolSize;
         final List<String> actualIdsF = actualIds;
         final List<String> knowledgeIdsF = knowledgeIds;
         List<Object[]> candidates = withAgentTenant(agentTenantId, () ->
-                parseCandidates(customAgentService.getKnowledgeSuggestedQuestions(
+                parseCandidates(suggestionPort.knowledgeSuggestedQuestions(
                         message.getAgentId(),
                         ec == null || ec.getKnowledgeBaseIds() == null ? List.of() : ec.getKnowledgeBaseIds(),
                         actualIdsF, tagScopes, poolSizeF, null)));
         // 部分文档没有预生成问题 → 回落请求范围（仍然做相关性排序）
         if (candidates.isEmpty() && preferActualEvidence) {
             candidates = withAgentTenant(agentTenantId, () ->
-                    parseCandidates(customAgentService.getKnowledgeSuggestedQuestions(
+                    parseCandidates(suggestionPort.knowledgeSuggestedQuestions(
                             message.getAgentId(),
                             ec == null || ec.getKnowledgeBaseIds() == null ? List.of() : ec.getKnowledgeBaseIds(),
                             knowledgeIdsF, tagScopes, poolSizeF, null)));
@@ -505,12 +506,17 @@ public class MessageSuggestionService {
         return items;
     }
 
-    /** ArrayNode（question/source/knowledge_base_id）→ [question, source, kbId] 三元组。 */
-    private static List<Object[]> parseCandidates(JsonNode arr) {
+    /** 建议问题 JSON 数组文本 → [question, source, kbId] 三元组（端口不引 Jackson，解析在此）。 */
+    private static List<Object[]> parseCandidates(String raw) {
         List<Object[]> out = new ArrayList<>();
-        if (arr == null || !arr.isArray()) {
+        if (raw == null || raw.isBlank()) return out;
+        JsonNode arr;
+        try {
+            arr = JsonMappers.lenient().readTree(raw);
+        } catch (Exception e) {
             return out;
         }
+        if (!arr.isArray()) return out;
         for (JsonNode n : arr) {
             out.add(new Object[] {n.path("question").asText(""),
                     n.path("source").asText(""), n.path("knowledgeBaseId").asText("")});
@@ -519,17 +525,17 @@ public class MessageSuggestionService {
     }
 
     /**
-     * ec.tagScopes（jsonb map 形态）→ AgentSuggestedQuestions.TagScope。
+     * ec.tagScopes（jsonb map 形态）→ TagScope。
      *
      * <p>内层键一律 camel（{@code knowledgeBaseId}/{@code tagIds}）：这里是跨模块
      * TagScope 的透传面，按 {@code QaSupport.TagScope} 的字段名（camelCase）读写，
      * 不至于静默丢作用域。</p>
      */
-    private static List<AgentSuggestedQuestions.TagScope> tagScopes(MessageExecutionContext ec) {
+    private static List<TagScope> tagScopes(MessageExecutionContext ec) {
         if (ec == null || ec.getTagScopes() == null) {
             return List.of();
         }
-        List<AgentSuggestedQuestions.TagScope> out = new ArrayList<>();
+        List<TagScope> out = new ArrayList<>();
         for (Map<String, Object> m : ec.getTagScopes()) {
             if (m == null) {
                 continue;
@@ -544,7 +550,7 @@ public class MessageSuggestionService {
                     }
                 }
             }
-            out.add(new AgentSuggestedQuestions.TagScope(kb == null ? "" : kb.toString(), tagIds));
+            out.add(new TagScope(kb == null ? "" : kb.toString(), tagIds));
         }
         return out;
     }
