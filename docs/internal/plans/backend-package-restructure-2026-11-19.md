@@ -73,7 +73,7 @@
 | 2 | `mcp` · `websearch` | ✅ 2026-11-19 |
 | 3 | `auth` | ✅ 2026-11-19 |
 | 4 | `storage` | ✅ 2026-11-19 |
-| 5 | `session` | 待做 |
+| 5 | `session` | ✅ 2026-11-19 |
 | 11 | `knowledge` | 待做 |
 
 无 `api/` 的 8 个域跳过：`favorite` · `system` · `vectorstore` · `embedchannel` · `im` · `datasource` · `agenttools` · `initialization`。

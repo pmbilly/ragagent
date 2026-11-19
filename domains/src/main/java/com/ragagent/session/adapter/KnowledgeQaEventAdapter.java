@@ -1,4 +1,4 @@
-package com.ragagent.session.api;
+package com.ragagent.session.adapter;
 
 import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineEventType;

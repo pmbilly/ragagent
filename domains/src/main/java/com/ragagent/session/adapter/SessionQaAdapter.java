@@ -1,4 +1,4 @@
-package com.ragagent.session.api;
+package com.ragagent.session.adapter;
 
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.session.MessageView;

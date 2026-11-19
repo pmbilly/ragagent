@@ -1,4 +1,4 @@
-package com.ragagent.session.api;
+package com.ragagent.session.adapter;
 
 import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.contract.session.EmbedSessionOps;

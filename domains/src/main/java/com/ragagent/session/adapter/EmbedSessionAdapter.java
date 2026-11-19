@@ -1,4 +1,4 @@
-package com.ragagent.session.api;
+package com.ragagent.session.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.AppError;
