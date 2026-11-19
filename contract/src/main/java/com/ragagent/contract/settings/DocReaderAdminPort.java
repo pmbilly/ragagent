@@ -1,4 +1,4 @@
-package com.ragagent.contract.doc;
+package com.ragagent.contract.settings;
 
 import java.util.List;
 import java.util.Map;

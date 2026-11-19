@@ -1,8 +1,8 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.tenant.MemoryConfig;
 import com.ragagent.memory.domain.MemoryExtractPayload;
 import java.util.List;
 import org.slf4j.Logger;

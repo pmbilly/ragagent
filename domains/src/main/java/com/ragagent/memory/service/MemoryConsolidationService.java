@@ -1,12 +1,12 @@
 package com.ragagent.memory.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.model.ChatOptions;
 import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.tenant.MemoryConfig;
 import com.ragagent.memory.domain.MemoryExtractPayload;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.item.MemoryItem;

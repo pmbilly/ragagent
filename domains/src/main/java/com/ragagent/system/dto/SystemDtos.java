@@ -2,7 +2,7 @@ package com.ragagent.system.dto;
 
 import com.ragagent.contract.auth.AdminUserView;
 import com.ragagent.contract.auth.UserPreferences;
-import com.ragagent.contract.doc.DocReaderAdminPort;
+import com.ragagent.contract.settings.DocReaderAdminPort;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;

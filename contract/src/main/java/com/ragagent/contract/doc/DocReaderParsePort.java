@@ -7,7 +7,7 @@ import java.util.List;
  *
  * <p><b>为什么需要它</b>：im 的附件准备、session 的临时文档解析、initialization 的连通性
  * 探测此前都直连知识域的 {@code knowledge.client.DocReaderClient}（域实现 ✗）。本端口与
- * 管理面 {@link DocReaderAdminPort} 分列：解析面给"内容管线"用，管理面给系统管理页用。</p>
+ * 管理面 {@link com.ragagent.contract.settings.DocReaderAdminPort} 分列：解析面给"内容管线"用，管理面给系统管理页用。</p>
  *
  * <p>失败语义与迁移前一致：解析失败以异常表达（受检），调用方按各自语义降级
  * （im 记 WARN 返回 null；session 落 markFailed）。</p>

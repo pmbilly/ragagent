@@ -1,10 +1,10 @@
 package com.ragagent.memory.repository;
 
-import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.contract.memory.MemoryMessageCursor;
 import com.ragagent.contract.pagination.PageResult;
+import com.ragagent.contract.tenant.MemoryConfig;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
 import com.ragagent.memory.domain.MemoryExtractionLeaseLostException;

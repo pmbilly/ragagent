@@ -9,18 +9,18 @@ import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.KnowledgeBaseProvisioner;
-import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.tenant.ChatHistoryConfig;
+import com.ragagent.contract.tenant.KnowledgeBaseProvisioner;
+import com.ragagent.contract.tenant.MemoryConfig;
 import com.ragagent.contract.tenant.ParserEngineConfig;
 import com.ragagent.contract.tenant.RetrievalConfig;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.contract.tenant.WebSearchConfig;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.prompt.PromptTemplateCatalog;
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.web.AcceptLanguages;
 import com.ragagent.platform.web.JsonMappers;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,8 +62,7 @@ final class TenantConfigOps {
             case "prompt-templates" ->
                     PromptTemplateCatalog.toJson(
                             PromptTemplateCatalog.load(),
-                            WikiLanguageSupport
-                                    .localeFromRequest(request.getHeader("Accept-Language")));
+                            AcceptLanguages.localeOrFallback(request.getHeader("Accept-Language")));
             case "parser-engine-config" -> getParserEngine();
             case "storage-engine-config" -> getStorageEngine();
             case "chat-history-config" -> getChatHistory();

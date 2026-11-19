@@ -2,7 +2,7 @@ package com.ragagent.memory.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.memory.MemoryConfig;
+import com.ragagent.contract.tenant.MemoryConfig;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.memory.MemoryContext;
 import com.ragagent.memory.domain.scope.MemoryScope;

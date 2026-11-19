@@ -1,7 +1,7 @@
 package com.ragagent.contract.knowledge;
 
 /**
- * 知识条目的**清理端口**（跨域删除面，与建行端口 {@link KnowledgeBaseProvisioner}、
+ * 知识条目的**清理端口**（跨域删除面，与建行端口 {@link com.ragagent.contract.tenant.KnowledgeBaseProvisioner}、
  * 只读端口 {@link KnowledgeBaseGateway} 分列）。
  *
  * <p><b>为什么需要它</b>：websearch 的临时 KB 会话状态在会话删除时要清理

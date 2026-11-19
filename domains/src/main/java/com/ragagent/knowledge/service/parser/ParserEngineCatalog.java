@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.service.parser;
 
-import com.ragagent.contract.doc.DocReaderAdminPort;
-import com.ragagent.contract.doc.ParserEngineCatalogPort;
+import com.ragagent.contract.settings.DocReaderAdminPort;
+import com.ragagent.contract.settings.ParserEngineCatalogPort;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

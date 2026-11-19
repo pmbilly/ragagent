@@ -1,9 +1,9 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRetrievalContext;
 import com.ragagent.contract.pagination.PageResult;
+import com.ragagent.contract.tenant.MemoryConfig;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.domain.MemoryExtractPayload;

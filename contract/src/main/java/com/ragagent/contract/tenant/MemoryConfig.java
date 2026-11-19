@@ -1,4 +1,7 @@
-package com.ragagent.contract.memory;
+package com.ragagent.contract.tenant;
+
+import com.ragagent.contract.memory.MemoryKeys;
+import com.ragagent.contract.memory.MemoryKinds;
 
 
 /**
