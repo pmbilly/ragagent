@@ -3,9 +3,11 @@ package com.ragagent.agenttools.knowledge;
 import static com.ragagent.agenttools.knowledge.KnowledgeSearchTool.nz;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.ChunkInfoBackend;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.ResultWithMeta;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
+import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.knowledge.DocChunkSupport;
 import com.ragagent.platform.knowledge.DocChunkSupport.ImageInfoRow;
@@ -28,14 +30,20 @@ final class KnowledgeSearchOutputFormatter {
             Set.of("mp3", "wav", "m4a", "flac", "ogg", "aac");
 
 
-    private final KnowledgeSearchTool tool;
+    private final ChunkInfoBackend chunkBackend;
+    private final SearchTarget.SearchTargets searchTargets;
+    private final Set<String> seenChunks;
 
-    KnowledgeSearchOutputFormatter(KnowledgeSearchTool tool) {
-        this.tool = tool;
+    KnowledgeSearchOutputFormatter(ChunkInfoBackend chunkBackend,
+                                    SearchTarget.SearchTargets searchTargets,
+                                    Set<String> seenChunks) {
+        this.chunkBackend = chunkBackend;
+        this.searchTargets = searchTargets;
+        this.seenChunks = seenChunks;
     }
 
     FaqChunkMetadata getFAQMetadata(String chunkId, Map<String, FaqChunkMetadata> cache) {
-        if (chunkId.isEmpty() || tool.chunkBackend == null) {
+        if (chunkId.isEmpty() || chunkBackend == null) {
             return null;
         }
         if (cache.containsKey(chunkId)) {
@@ -43,7 +51,7 @@ final class KnowledgeSearchOutputFormatter {
         }
         ChunkFacts chunk;
         try {
-            chunk = tool.chunkBackend.faqChunkById(chunkId);
+            chunk = chunkBackend.faqChunkById(chunkId);
         } catch (RuntimeException e) {
             cache.put(chunkId, null);
             return null;
@@ -188,7 +196,7 @@ final class KnowledgeSearchOutputFormatter {
             knowledgeTotalMap.computeIfAbsent(nz(result.sr.knowledgeId),
                     k -> totalChunksFor(result));
 
-            boolean seen = !tool.seenChunks.add(nz(result.sr.id));
+            boolean seen = !seenChunks.add(nz(result.sr.id));
             String sourceQuery = nz(result.sourceQuery);
             appendResultXml(ob, i, result, faqMeta, queries, seen, sourceQuery);
             long totalChunks = knowledgeTotalMap.getOrDefault(nz(result.sr.knowledgeId), 0L);
@@ -384,13 +392,13 @@ final class KnowledgeSearchOutputFormatter {
 
     /** 单篇文档的总 chunk 数；租户不可解析或后端失败回 0。 */
     private long totalChunksFor(ResultWithMeta result) {
-        long effectiveTenantId = tool.searchTargets == null ? 0
-                : tool.searchTargets.getTenantIdForKb(nz(result.sr.knowledgeBaseId));
+        long effectiveTenantId = searchTargets == null ? 0
+                : searchTargets.getTenantIdForKb(nz(result.sr.knowledgeBaseId));
         if (effectiveTenantId == 0) {
             return 0L;
         }
         try {
-            return tool.chunkBackend.totalChunks(effectiveTenantId, nz(result.sr.knowledgeId));
+            return chunkBackend.totalChunks(effectiveTenantId, nz(result.sr.knowledgeId));
         } catch (RuntimeException e) {
             return 0L;
         }

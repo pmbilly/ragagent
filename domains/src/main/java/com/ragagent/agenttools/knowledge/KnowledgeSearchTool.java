@@ -269,7 +269,7 @@ public class KnowledgeSearchTool extends BaseTool {
         this.searchTargets = searchTargets;
         this.config = config == null ? SearchConfig.defaults() : config;
         this.ranking = new KnowledgeSearchRanking(this.config, this.reranker, this.searchTargets);
-        this.formatter = new KnowledgeSearchOutputFormatter(this);
+        this.formatter = new KnowledgeSearchOutputFormatter(chunkBackend, searchTargets, seenChunks);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.im.runtime.IncomingMessage;
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -24,10 +25,19 @@ final class FeishuCardStreamOps {
 
     private static final Logger log = LoggerFactory.getLogger(FeishuCardStreamOps.class);
 
-    private final FeishuAdapter service;
+    private final FeishuTokenProvider tokens;
+    private final HttpClient http;
+    private final FeishuRegion region;
+    private final FeishuSendOps sendOps;
+    private final FeishuMediaOps mediaOps;
 
-    FeishuCardStreamOps(FeishuAdapter service) {
-        this.service = service;
+    FeishuCardStreamOps(FeishuTokenProvider tokens, HttpClient http, FeishuRegion region,
+                        FeishuSendOps sendOps, FeishuMediaOps mediaOps) {
+        this.tokens = tokens;
+        this.http = http;
+        this.region = region;
+        this.sendOps = sendOps;
+        this.mediaOps = mediaOps;
     }
 
     /** 流式卡片里承载内容的元素 id。 */
@@ -37,13 +47,13 @@ final class FeishuCardStreamOps {
 
     public String startStream(IncomingMessage incoming) throws Exception {
         purgeOrphans();
-        String accessToken = service.getTenantAccessToken();
+        String accessToken = tokens.getTenantAccessToken();
 
-        String cardId = cardkitCreate(accessToken, buildStreamingCardJson(service.region));
+        String cardId = cardkitCreate(accessToken, buildStreamingCardJson(region));
         sendCardByCardId(accessToken, incoming, cardId);
 
         FeishuAdapter.STREAMS.put(cardId, new FeishuAdapter.StreamState());
-        log.info("[{}] Streaming started: card_id={}", service.region.label(), cardId);
+        log.info("[{}] Streaming started: card_id={}", region.label(), cardId);
         return cardId;
     }
 
@@ -57,10 +67,10 @@ final class FeishuCardStreamOps {
             throw new IllegalStateException("unknown stream ID: " + streamId);
         }
         int seq = state.nextSeq();
-        String accessToken = service.getTenantAccessToken();
+        String accessToken = tokens.getTenantAccessToken();
 
         // 卡片 markdown 只接受上传后的 image_key（外链会 200570）→ 先换 image_key
-        String content = service.resolveMarkdownImages(accessToken, fullContent);
+        String content = mediaOps.resolveMarkdownImages(accessToken, fullContent);
 
         cardkitUpdateElement(accessToken, streamId, STREAMING_ELEMENT_ID, content, seq);
 
@@ -80,7 +90,7 @@ final class FeishuCardStreamOps {
 
     public void endStream(IncomingMessage incoming, String streamId) throws Exception {
         FeishuAdapter.StreamState state = FeishuAdapter.STREAMS.remove(streamId);
-        String accessToken = service.getTenantAccessToken();
+        String accessToken = tokens.getTenantAccessToken();
 
         int seq = 0;
         String summary = null;
@@ -99,9 +109,9 @@ final class FeishuCardStreamOps {
         try {
             cardkitSetStreaming(accessToken, streamId, false, summary, seq);
         } catch (Exception e) {
-            log.warn("[{}] Failed to disable streaming_mode", service.region.label(), e);
+            log.warn("[{}] Failed to disable streaming_mode", region.label(), e);
         }
-        log.info("[{}] Streaming ended: card_id={}", service.region.label(), streamId);
+        log.info("[{}] Streaming ended: card_id={}", region.label(), streamId);
     }
 
     /** 惰性清掉超过 TTL 的孤儿流。 */
@@ -155,14 +165,14 @@ final class FeishuCardStreamOps {
         payload.put("type", "card_json");
         payload.put("data", cardJson);
 
-        HttpRequest request = HttpRequest.newBuilder(URI.create(service.api("/open-apis/cardkit/v1/cards")))
+        HttpRequest request = HttpRequest.newBuilder(URI.create(tokens.api("/open-apis/cardkit/v1/cards")))
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Authorization", "Bearer " + accessToken)
                 .timeout(Duration.ofSeconds(10))
                 .POST(HttpRequest.BodyPublishers.ofString(FeishuAdapter.MAPPER.writeValueAsString(payload),
                         StandardCharsets.UTF_8))
                 .build();
-        HttpResponse<byte[]> response = service.http.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        HttpResponse<byte[]> response = http.send(request, HttpResponse.BodyHandlers.ofByteArray());
         JsonNode result = FeishuAdapter.readTree(response.body());
         int code = result.path("code").asInt(0);
         if (code != 0) {
@@ -194,7 +204,7 @@ final class FeishuCardStreamOps {
         fallbackPayload.put("msg_type", "interactive");
         fallbackPayload.put("content", contentJson);
 
-        service.sendWithFallback(accessToken, incoming, replyPayload, fallbackPayload, receive[0]);
+        sendOps.sendWithFallback(accessToken, incoming, replyPayload, fallbackPayload, receive[0]);
     }
 
     /** PUT 元素内容（带 sequence）。 */
@@ -204,7 +214,7 @@ final class FeishuCardStreamOps {
         payload.put("content", content);
         payload.put("sequence", sequence);
 
-        String url = service.api("/open-apis/cardkit/v1/cards/" + cardId + "/elements/" + elementId
+        String url = tokens.api("/open-apis/cardkit/v1/cards/" + cardId + "/elements/" + elementId
                 + "/content");
         HttpRequest request = HttpRequest.newBuilder(URI.create(url))
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -213,7 +223,7 @@ final class FeishuCardStreamOps {
                 .PUT(HttpRequest.BodyPublishers.ofString(FeishuAdapter.MAPPER.writeValueAsString(payload),
                         StandardCharsets.UTF_8))
                 .build();
-        HttpResponse<byte[]> response = service.http.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        HttpResponse<byte[]> response = http.send(request, HttpResponse.BodyHandlers.ofByteArray());
         JsonNode result = FeishuAdapter.readTree(response.body());
         int code = result.path("code").asInt(0);
         if (code != 0) {
@@ -234,7 +244,7 @@ final class FeishuCardStreamOps {
         payload.put("settings", FeishuAdapter.MAPPER.writeValueAsString(Map.of("config", config)));
         payload.put("sequence", sequence);
 
-        String url = service.api("/open-apis/cardkit/v1/cards/" + cardId + "/settings");
+        String url = tokens.api("/open-apis/cardkit/v1/cards/" + cardId + "/settings");
         HttpRequest request = HttpRequest.newBuilder(URI.create(url))
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Authorization", "Bearer " + accessToken)
@@ -242,7 +252,7 @@ final class FeishuCardStreamOps {
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(
                         FeishuAdapter.MAPPER.writeValueAsString(payload), StandardCharsets.UTF_8))
                 .build();
-        HttpResponse<byte[]> response = service.http.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        HttpResponse<byte[]> response = http.send(request, HttpResponse.BodyHandlers.ofByteArray());
         JsonNode result = FeishuAdapter.readTree(response.body());
         int code = result.path("code").asInt(0);
         if (code != 0) {

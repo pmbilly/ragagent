@@ -10,11 +10,7 @@ import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -116,9 +112,8 @@ public class FeishuAdapter implements AdapterInterfaces.Adapter,
     /** 媒体协作者。 */
     final FeishuMediaOps mediaOps;
 
-    private final Object tokenLock = new Object();
-    private String tokenCache = "";
-    private Instant tokenExpiresAt = Instant.EPOCH;
+    /** tenant_access_token 的取值与缓存（单实例，三个协作者共享）。 */
+    final FeishuTokenProvider tokens;
 
     public FeishuAdapter(FeishuRegion region, String appId, String appSecret,
                          String verificationToken, String encryptKey, String apiBaseUrl,
@@ -139,10 +134,11 @@ public class FeishuAdapter implements AdapterInterfaces.Adapter,
                 .connectTimeout(Duration.ofSeconds(10))
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .build();
+        this.tokens = new FeishuTokenProvider(this.appId, this.appSecret, this.apiBaseUrl, this.http);
         this.callbackOps = new FeishuCallbackOps(region, verificationToken, encryptKey);
-        this.sendOps = new FeishuSendOps(this);
-        this.streamOps = new FeishuCardStreamOps(this);
-        this.mediaOps = new FeishuMediaOps(this);
+        this.sendOps = new FeishuSendOps(tokens, http, region);
+        this.mediaOps = new FeishuMediaOps(tokens, http, region, appId, ssrfGuard);
+        this.streamOps = new FeishuCardStreamOps(tokens, http, region, sendOps, mediaOps);
     }
 
     /**
@@ -176,7 +172,7 @@ public class FeishuAdapter implements AdapterInterfaces.Adapter,
 
     /** 区域基址 + 路径。 */
     String api(String path) {
-        return apiBaseUrl + path;
+        return tokens.api(path);
     }
 
     // ── Adapter ─────────────────────────────────────────────────────────────
@@ -290,37 +286,7 @@ public class FeishuAdapter implements AdapterInterfaces.Adapter,
 
     /** 缓存留 5 分钟余量。 */
     String getTenantAccessToken() throws Exception {
-        synchronized (tokenLock) {
-            if (!tokenCache.isEmpty() && Instant.now().isBefore(tokenExpiresAt)) {
-                return tokenCache;
-            }
-        }
-        Map<String, String> payload = Map.of("app_id", appId, "app_secret", appSecret);
-        HttpRequest request = HttpRequest.newBuilder(
-                        URI.create(api("/open-apis/auth/v3/tenant_access_token/internal")))
-                .header("Content-Type", "application/json; charset=utf-8")
-                .timeout(Duration.ofSeconds(10))
-                .POST(HttpRequest.BodyPublishers.ofString(MAPPER.writeValueAsString(payload),
-                        StandardCharsets.UTF_8))
-                .build();
-        HttpResponse<byte[]> response = http.send(request, HttpResponse.BodyHandlers.ofByteArray());
-        JsonNode result = readTree(response.body());
-        int code = result.path("code").asInt(0);
-        if (code != 0) {
-            throw new IllegalStateException("get token error: code=" + code + " msg="
-                    + result.path("msg").asText(""));
-        }
-        String token = result.path("tenant_access_token").asText("");
-        long expireSeconds = result.path("expire").asLong(0);
-        synchronized (tokenLock) {
-            tokenCache = token;
-            long ttl = expireSeconds;
-            if (ttl > 300) {
-                ttl -= 300;
-            }
-            tokenExpiresAt = Instant.now().plusSeconds(Math.max(ttl, 0));
-        }
-        return token;
+        return tokens.getTenantAccessToken();
     }
 
     static JsonNode readTree(byte[] body) throws Exception {

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.ResultWithMeta;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.SearchResultView;
 import com.ragagent.contract.tool.ToolResult;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -12,9 +13,8 @@ import org.junit.jupiter.api.Test;
 /** 输出格式的特征钉子：拆成具名步骤后，XML 与 data 形状保持不变。 */
 class KnowledgeSearchOutputFormatterTest {
 
-    private final KnowledgeSearchTool tool =
-            new KnowledgeSearchTool(null, null, null, null, null, null);
-    private final KnowledgeSearchOutputFormatter formatter = new KnowledgeSearchOutputFormatter(tool);
+    private final KnowledgeSearchOutputFormatter formatter =
+            new KnowledgeSearchOutputFormatter(null, null, new LinkedHashSet<>());
 
     private static ResultWithMeta chunkResult() {
         SearchResultView view = new SearchResultView();

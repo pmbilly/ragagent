@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.im.runtime.AdapterInterfaces;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
+import com.ragagent.platform.security.SsrfGuard;
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -23,10 +25,19 @@ final class FeishuMediaOps {
 
     private static final Logger log = LoggerFactory.getLogger(FeishuMediaOps.class);
 
-    private final FeishuAdapter service;
+    private final FeishuTokenProvider tokens;
+    private final HttpClient http;
+    private final FeishuRegion region;
+    private final String appId;
+    private final SsrfGuard ssrfGuard;
 
-    FeishuMediaOps(FeishuAdapter service) {
-        this.service = service;
+    FeishuMediaOps(FeishuTokenProvider tokens, HttpClient http, FeishuRegion region,
+                   String appId, SsrfGuard ssrfGuard) {
+        this.tokens = tokens;
+        this.http = http;
+        this.region = region;
+        this.appId = appId;
+        this.ssrfGuard = ssrfGuard;
     }
 
     /** 上传飞书前对图片的下载上限（飞书限制 10MB，留余量）。 */
@@ -47,16 +58,16 @@ final class FeishuMediaOps {
             try {
                 imageKey = imageKeyForUrl(accessToken, rawUrl);
             } catch (Exception e) {
-                log.warn("[{}] image upload failed, degrading to link: url={}", service.region.label(), rawUrl, e);
+                log.warn("[{}] image upload failed, degrading to link: url={}", region.label(), rawUrl, e);
             }
             if (imageKey != null && !imageKey.isEmpty()) {
                 // 图片已经在飞书侧落地：留一行可核对的日志（key 只留前缀，避免刷屏）
-                log.info("[{}] card image uploaded: src={} key={}…", service.region.label(),
+                log.info("[{}] card image uploaded: src={} key={}…", region.label(),
                         imageCacheKey(rawUrl), imageKey.substring(0, Math.min(12, imageKey.length())));
             }
             String replacement;
             if (imageKey == null || imageKey.isEmpty()) {
-                String label = alt == null || alt.isEmpty() ? service.region.imageFallbackLabel() : alt;
+                String label = alt == null || alt.isEmpty() ? region.imageFallbackLabel() : alt;
                 replacement = "[" + label + "](" + rawUrl + ")";
             } else {
                 replacement = "![" + alt + "](" + imageKey + ")";
@@ -69,7 +80,7 @@ final class FeishuMediaOps {
 
     /** 缓存按 app 作用域 + URL 去 query。 */
     String imageKeyForUrl(String accessToken, String rawUrl) throws Exception {
-        String key = service.appId + "\u0000" + imageCacheKey(rawUrl);
+        String key = appId + "\u0000" + imageCacheKey(rawUrl);
         String cached = FeishuAdapter.IMAGE_KEY_CACHE.get(key);
         if (cached != null) {
             return cached;
@@ -87,14 +98,14 @@ final class FeishuMediaOps {
 
     /** 下载（限 10MB）→ multipart 上传 → image_key。 */
     String uploadImageFromUrl(String accessToken, String rawUrl) throws Exception {
-        if (service.ssrfGuard != null) {
-            service.ssrfGuard.validateURLForSSRF(rawUrl);
+        if (ssrfGuard != null) {
+            ssrfGuard.validateURLForSSRF(rawUrl);
         }
         HttpRequest downloadRequest = HttpRequest.newBuilder(URI.create(rawUrl))
                 .timeout(Duration.ofSeconds(30))
                 .GET()
                 .build();
-        HttpResponse<byte[]> downloadResponse = service.http.send(downloadRequest,
+        HttpResponse<byte[]> downloadResponse = http.send(downloadRequest,
                 HttpResponse.BodyHandlers.ofByteArray());
         if (downloadResponse.statusCode() != 200) {
             throw new IllegalStateException("download image: status="
@@ -112,7 +123,7 @@ final class FeishuMediaOps {
         // 但客户端渲染会一直转圈（生产实测 img_v3_… 拿着却不显示）。
         String mimeType = detectImageMime(data);
         String fileName = "image." + mimeType.substring("image/".length());
-        log.info("[{}] uploading image: bytes={} mime={}", service.region.label(), data.length,
+        log.info("[{}] uploading image: bytes={} mime={}", region.label(), data.length,
                 mimeType);
         String boundary = "----WeKnoraBoundary" + System.nanoTime();
         ByteArrayOutputStream body = new ByteArrayOutputStream();
@@ -126,13 +137,13 @@ final class FeishuMediaOps {
         body.write(data);
         body.write(("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
 
-        HttpRequest request = HttpRequest.newBuilder(URI.create(service.api("/open-apis/im/v1/images")))
+        HttpRequest request = HttpRequest.newBuilder(URI.create(tokens.api("/open-apis/im/v1/images")))
                 .header("Content-Type", "multipart/form-data; boundary=" + boundary)
                 .header("Authorization", "Bearer " + accessToken)
                 .timeout(Duration.ofSeconds(30))
                 .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray()))
                 .build();
-        HttpResponse<byte[]> response = service.http.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        HttpResponse<byte[]> response = http.send(request, HttpResponse.BodyHandlers.ofByteArray());
         JsonNode result = FeishuAdapter.readTree(response.body());
         int code = result.path("code").asInt(0);
         if (code != 0) {
@@ -176,18 +187,18 @@ final class FeishuMediaOps {
         if (!FeishuAdapter.safePathParam(msg.messageId) || !FeishuAdapter.safePathParam(msg.fileKey)) {
             throw new IllegalArgumentException("invalid message_id or file_key format");
         }
-        String accessToken = service.getTenantAccessToken();
+        String accessToken = tokens.getTenantAccessToken();
         String resourceType = ImTypes.MESSAGE_TYPE_IMAGE.equals(msg.messageType)
                 ? "image" : "file";
 
-        String url = service.api("/open-apis/im/v1/messages/" + msg.messageId + "/resources/"
+        String url = tokens.api("/open-apis/im/v1/messages/" + msg.messageId + "/resources/"
                 + msg.fileKey + "?type=" + resourceType);
         HttpRequest request = HttpRequest.newBuilder(URI.create(url))
                 .header("Authorization", "Bearer " + accessToken)
                 .timeout(Duration.ofSeconds(60))
                 .GET()
                 .build();
-        HttpResponse<byte[]> response = service.http.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        HttpResponse<byte[]> response = http.send(request, HttpResponse.BodyHandlers.ofByteArray());
         if (response.statusCode() != 200) {
             throw new IllegalStateException("download file failed: status="
                     + response.statusCode());

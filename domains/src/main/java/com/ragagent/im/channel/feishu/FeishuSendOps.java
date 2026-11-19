@@ -7,6 +7,7 @@ import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ReplyMessage;
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -26,16 +27,20 @@ final class FeishuSendOps {
 
     private static final Logger log = LoggerFactory.getLogger(FeishuSendOps.class);
 
-    private final FeishuAdapter service;
+    private final FeishuTokenProvider tokens;
+    private final HttpClient http;
+    private final FeishuRegion region;
 
-    FeishuSendOps(FeishuAdapter service) {
-        this.service = service;
+    FeishuSendOps(FeishuTokenProvider tokens, HttpClient http, FeishuRegion region) {
+        this.tokens = tokens;
+        this.http = http;
+        this.region = region;
     }
 
     // ── 发送（reply 优先，可回落 send-message） ───────────────────────────────
 
     public void sendReply(IncomingMessage incoming, ReplyMessage reply) throws Exception {
-        String accessToken = service.getTenantAccessToken();
+        String accessToken = tokens.getTenantAccessToken();
         // 纯文本消息不渲染 markdown 图片：降级成可点链接，别把 ![]() 原样丢给用户
         String text = reply.content == null ? "" : reply.content;
         text = ImFormat.degradeMarkdownImages(text);
@@ -73,36 +78,36 @@ final class FeishuSendOps {
             throws Exception {
         String messageId = incoming.messageId == null ? "" : incoming.messageId;
         if (!messageId.isEmpty() && safePathParam(messageId)) {
-            String replyUrl = service.api("/open-apis/im/v1/messages/" + messageId + "/reply");
+            String replyUrl = tokens.api("/open-apis/im/v1/messages/" + messageId + "/reply");
             ApiResult result = postFeishuMessage(accessToken, replyUrl, replyPayload);
             if (result.transportError() != null) {
                 log.warn("[{}] reply API transport error (will try fallback): {}",
-                        service.region.label(), result.transportError());
+                        region.label(), result.transportError());
             } else if (result.code() == 0) {
                 return;
             } else if (!FeishuAdapter.FALLBACK_ELIGIBLE.contains(result.code())) {
-                throw new IllegalStateException(service.region.label() + " reply api error: code="
+                throw new IllegalStateException(region.label() + " reply api error: code="
                         + result.code() + " msg=" + result.msg());
             } else {
                 log.warn("[{}] reply API returned code={} msg={}, falling back to send-message API",
-                        service.region.label(), result.code(), result.msg());
+                        region.label(), result.code(), result.msg());
             }
         } else if (!messageId.isEmpty()) {
             // message_id 含不安全字符 → 拒绝而不是放进 URL 路径（疑似篡改）
             throw new IllegalArgumentException("invalid message_id for reply API: " + messageId);
         } else {
             log.warn("[{}] incoming message has no message_id; replying via send-message API"
-                    + " (will not attach to thread)", service.region.label());
+                    + " (will not attach to thread)", region.label());
         }
 
-        String fallbackUrl = service.api("/open-apis/im/v1/messages?receive_id_type=" + receiveIdType);
+        String fallbackUrl = tokens.api("/open-apis/im/v1/messages?receive_id_type=" + receiveIdType);
         ApiResult result = postFeishuMessage(accessToken, fallbackUrl, fallbackPayload);
         if (result.transportError() != null) {
             throw new IllegalStateException("send message (fallback): " + result.transportError(),
                     result.transportError());
         }
         if (result.code() != 0) {
-            throw new IllegalStateException(service.region.label() + " send api error: code="
+            throw new IllegalStateException(region.label() + " send api error: code="
                     + result.code() + " msg=" + result.msg());
         }
     }
@@ -118,7 +123,7 @@ final class FeishuSendOps {
                         StandardCharsets.UTF_8))
                 .build();
         try {
-            HttpResponse<byte[]> response = service.http.send(request,
+            HttpResponse<byte[]> response = http.send(request,
                     HttpResponse.BodyHandlers.ofByteArray());
             JsonNode node = FeishuAdapter.readTree(response.body());
             return new ApiResult(node.path("code").asInt(0), node.path("msg").asText(""), null);
