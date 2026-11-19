@@ -366,8 +366,6 @@ public class ImChannelController {
         return tid == null ? 0L : tid;
     }
 
-    /** body 实际是 Map；返回类型泛型仅为调用点便利（未检查转换在本方法内是设计取舍）。 */
-    @SuppressWarnings("unchecked")
     /**
      * 错误出口：与全仓统一信封一致（{@code {code,message,data}}），恒抛。
      *
