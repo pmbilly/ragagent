@@ -22,15 +22,19 @@ final class FeishuCallbackOps {
 
     private static final Logger log = LoggerFactory.getLogger(FeishuCallbackOps.class);
 
-    private final FeishuAdapter service;
+    private final FeishuRegion region;
+    private final String verificationToken;
+    private final String encryptKey;
 
-    FeishuCallbackOps(FeishuAdapter service) {
-        this.service = service;
+    FeishuCallbackOps(FeishuRegion region, String verificationToken, String encryptKey) {
+        this.region = region;
+        this.verificationToken = verificationToken;
+        this.encryptKey = encryptKey;
     }
 
     /** 未配 token 跳过；加密体先解密，再比 header.token。 */
     public Exception verifyCallback(CallbackExchange exchange) {
-        if (service.verificationToken.isEmpty()) {
+        if (verificationToken.isEmpty()) {
             return null;
         }
         byte[] body = exchange.body();
@@ -51,7 +55,7 @@ final class FeishuCallbackOps {
             JsonNode event = FeishuAdapter.readTree(raw);
             JsonNode header = event.path("header");
             if (header.isMissingNode() || header.isNull()
-                    || !service.verificationToken.equals(header.path("token").asText(""))) {
+                    || !verificationToken.equals(header.path("token").asText(""))) {
                 return new AdapterInterfaces.VerifyException("invalid verification token");
             }
         } catch (Exception e) {
@@ -78,7 +82,7 @@ final class FeishuCallbackOps {
                     exchange.body(), StandardCharsets.UTF_8).contains("\"encrypt\"")) {
                 return false;
             }
-            log.error("[{}] Failed to decrypt", service.region.label(), e);
+            log.error("[{}] Failed to decrypt", region.label(), e);
             return false;
         }
         if (parsed.has("challenge") && parsed.get("challenge").isTextual()) {
@@ -99,7 +103,7 @@ final class FeishuCallbackOps {
         String eventType = header.path("event_type").asText("");
         if (!"im.message.receive_v1".equals(eventType)) {
             if (!header.isMissingNode()) {
-                log.info("[{}] Ignoring event type: {}", service.region.label(), eventType);
+                log.info("[{}] Ignoring event type: {}", region.label(), eventType);
             }
             return null;
         }
@@ -184,7 +188,7 @@ final class FeishuCallbackOps {
                         : textMessage(openId, chatId, chatType, messageId, threadId, content);
             }
             default -> {
-                log.info("[{}] Ignoring unsupported message type: {}", service.region.label(), messageType);
+                log.info("[{}] Ignoring unsupported message type: {}", region.label(), messageType);
                 yield null;
             }
         };
@@ -206,7 +210,7 @@ final class FeishuCallbackOps {
     private IncomingMessage baseMessage(String openId, String chatId, String chatType,
                                         String messageId, String threadId) {
         IncomingMessage msg = new IncomingMessage();
-        msg.platform = service.region.platform();
+        msg.platform = region.platform();
         msg.userId = openId;
         msg.userName = "";
         msg.chatId = chatId;
@@ -225,10 +229,10 @@ final class FeishuCallbackOps {
     }
     /** 未配 encrypt_key 直接报错；否则走共享的 feishu 解密（AES-256-CBC）。 */
     byte[] decrypt(String encrypted) throws Exception {
-        if (service.encryptKey.isEmpty()) {
+        if (encryptKey.isEmpty()) {
             throw new IllegalStateException("encrypt_key not configured");
         }
-        return FeishuWecomCrypt.feishuDecrypt(service.encryptKey, encrypted);
+        return FeishuWecomCrypt.feishuDecrypt(encryptKey, encrypted);
     }
 
 }

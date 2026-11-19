@@ -139,7 +139,7 @@ public class FeishuAdapter implements AdapterInterfaces.Adapter,
                 .connectTimeout(Duration.ofSeconds(10))
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .build();
-        this.callbackOps = new FeishuCallbackOps(this);
+        this.callbackOps = new FeishuCallbackOps(region, verificationToken, encryptKey);
         this.sendOps = new FeishuSendOps(this);
         this.streamOps = new FeishuCardStreamOps(this);
         this.mediaOps = new FeishuMediaOps(this);

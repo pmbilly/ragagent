@@ -2,7 +2,9 @@ package com.ragagent.session.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.WebSearchConfig;
+import com.ragagent.contract.websearch.WebSearchProviderPort;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import org.slf4j.Logger;
@@ -21,10 +23,13 @@ final class QaWebSearchParams {
     private static final Logger log = LoggerFactory.getLogger(QaWebSearchParams.class);
     private static final ObjectMapper JSON = JsonMappers.lenient();
 
-    private final SessionKnowledgeQaService service;
+    private final TenantConfigLookup tenantService;
+    private final WebSearchProviderPort webSearchProviders;
 
-    QaWebSearchParams(SessionKnowledgeQaService service) {
-        this.service = service;
+    QaWebSearchParams(TenantConfigLookup tenantService,
+                      WebSearchProviderPort webSearchProviders) {
+        this.tenantService = tenantService;
+        this.webSearchProviders = webSearchProviders;
     }
 
     // web search 解析
@@ -37,7 +42,7 @@ final class QaWebSearchParams {
             }
         }
         try {
-            return service.webSearchProviders.findDefaultProviderId(tenantId);
+            return webSearchProviders.findDefaultProviderId(tenantId);
         } catch (RuntimeException ignored) {
             // 获取失败 → 留空
         }
@@ -72,7 +77,7 @@ final class QaWebSearchParams {
         Long tid = TenantContext.currentTenantId();
         if (tid != null) {
             try {
-                JsonNode webSearch = JsonMappers.toJsonNode(service.tenantService.webSearchConfig(tid));
+                JsonNode webSearch = JsonMappers.toJsonNode(tenantService.webSearchConfig(tid));
                 if (webSearch != null && !webSearch.isNull()) {
                     WebSearchConfig cfg = JSON.treeToValue(webSearch, WebSearchConfig.class);
                     int max = cfg.getMaxResults();   // 局部 cfg（本段解析出的 WebSearchConfig），非门面字段

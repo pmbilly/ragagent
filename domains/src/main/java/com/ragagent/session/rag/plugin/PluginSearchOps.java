@@ -29,10 +29,16 @@ import java.util.concurrent.Executors;
  */
 final class PluginSearchOps {
 
-    private final PluginSearch service;
+    private final PipelinePorts.KnowledgeBaseService knowledgeBaseService;
+    private final PipelinePorts.TenantService tenantService;
+    private final PipelinePorts.WebSearch webSearchService;
 
-    PluginSearchOps(PluginSearch service) {
-        this.service = service;
+    PluginSearchOps(PipelinePorts.KnowledgeBaseService knowledgeBaseService,
+                    PipelinePorts.TenantService tenantService,
+                    PipelinePorts.WebSearch webSearchService) {
+        this.knowledgeBaseService = knowledgeBaseService;
+        this.tenantService = tenantService;
+        this.webSearchService = webSearchService;
     }
 
     // searchByTargets
@@ -56,7 +62,7 @@ final class PluginSearchOps {
         List<KnowledgeBaseView> kbList = new ArrayList<>();
         Map<String, KnowledgeBaseView> kbMap = new LinkedHashMap<>();
         try {
-            List<KnowledgeBaseView> kbs = service.knowledgeBaseService.getKnowledgeBasesByIdsUnscoped(kbIds);
+            List<KnowledgeBaseView> kbs = knowledgeBaseService.getKnowledgeBasesByIdsUnscoped(kbIds);
             if (kbs != null) {
                 kbList = kbs;
                 for (KnowledgeBaseView kb : kbs) {
@@ -72,7 +78,7 @@ final class PluginSearchOps {
         }
 
         // 只给"取到了"的 KB 求身份键（与既有行为一致：取不到的 KB 回落空 key 组）
-        Map<String, String> modelKeyMap = service.knowledgeBaseService.resolveEmbeddingModelKeys(
+        Map<String, String> modelKeyMap = knowledgeBaseService.resolveEmbeddingModelKeys(
                 kbList.stream().map(KnowledgeBaseView::getId).toList());
 
         // 分组迭代顺序不影响结果集：结果合并由全局列表承接
@@ -127,7 +133,7 @@ final class PluginSearchOps {
         List<SearchTarget> searchableTargets = targets;
         if (!modelKey.isEmpty()) {
             try {
-                queryEmbedding = service.knowledgeBaseService.getQueryEmbedding(
+                queryEmbedding = knowledgeBaseService.getQueryEmbedding(
                         targets.get(0).knowledgeBaseId(), queryText);
             } catch (RuntimeException e) {
                 List<SearchTarget> keep = new ArrayList<>(targets.size());
@@ -186,7 +192,7 @@ final class PluginSearchOps {
             params.setSkipContextEnrichment(true);
             params.setDisableVectorMatch(disableVector);
             try {
-                List<SearchResult> res = service.knowledgeBaseService.hybridSearch(fullKbIds.get(0), params);
+                List<SearchResult> res = knowledgeBaseService.hybridSearch(fullKbIds.get(0), params);
                 Map<String, Object> f = new LinkedHashMap<>();
                 f.put("kb_ids", fullKbIds);
                 f.put("hit_count", res == null ? 0 : res.size());
@@ -286,7 +292,7 @@ final class PluginSearchOps {
             params.setKnowledgeIds(t.knowledgeIds());
         }
         try {
-            List<SearchResult> res = service.knowledgeBaseService.hybridSearch(t.knowledgeBaseId(), params);
+            List<SearchResult> res = knowledgeBaseService.hybridSearch(t.knowledgeBaseId(), params);
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("kb_id", t.knowledgeBaseId());
             f.put("target_type", t.type());
@@ -307,7 +313,7 @@ final class PluginSearchOps {
     // web 检索
 
     List<SearchResult> searchWebIfEnabled(PipelineState chatManage) {
-        if (!chatManage.isWebSearchEnabled() || service.webSearchService == null || service.tenantService == null) {
+        if (!chatManage.isWebSearchEnabled() || webSearchService == null || tenantService == null) {
             return null;
         }
         String providerId = chatManage.getWebSearchProviderId();
@@ -341,7 +347,7 @@ final class PluginSearchOps {
                 null);
         List<WebSearchResult> webResults;
         try {
-            webResults = service.webSearchService.search(providerId, webConfig, chatManage.getQueryPlan().getRewriteQuery());
+            webResults = webSearchService.search(providerId, webConfig, chatManage.getQueryPlan().getRewriteQuery());
         } catch (RuntimeException e) {
             webSpan.finish(null, null, e.getMessage());
             Map<String, Object> w = new LinkedHashMap<>();
@@ -364,10 +370,10 @@ final class PluginSearchOps {
      * 无租户上下文 → null，由域侧适配器按空配置走缺省分支。
      */
     private WebSearchConfig currentTenantWebSearchConfig() {
-        if (service.tenantService == null) {
+        if (tenantService == null) {
             return null;
         }
-        return service.tenantService.currentWebSearchConfig();
+        return tenantService.currentWebSearchConfig();
     }
 
     /** 执行面配置的生效值合并（缺省补齐）。 */

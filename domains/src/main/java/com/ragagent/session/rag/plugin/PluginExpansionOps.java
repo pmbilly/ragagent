@@ -1,5 +1,6 @@
 package com.ragagent.session.rag.plugin;
 
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTarget;
@@ -23,10 +24,10 @@ import java.util.concurrent.Semaphore;
  * 持门面回引取 knowledgeBaseService；{@code withTenant}/{@code QueryTextOps} 经类名访问。
  */
 final class PluginExpansionOps {
-    private final PluginSearch service;
+    private final PipelinePorts.KnowledgeBaseService knowledgeBaseService;
 
-    PluginExpansionOps(PluginSearch service) {
-        this.service = service;
+    PluginExpansionOps(PipelinePorts.KnowledgeBaseService knowledgeBaseService) {
+        this.knowledgeBaseService = knowledgeBaseService;
     }
 
     // 查询扩展
@@ -99,7 +100,7 @@ final class PluginExpansionOps {
                         }
                         List<SearchResult> res;
                         try {
-                            res = service.knowledgeBaseService.hybridSearch(t.knowledgeBaseId(), params);
+                            res = knowledgeBaseService.hybridSearch(t.knowledgeBaseId(), params);
                         } catch (RuntimeException e) {
                             Map<String, Object> w = new LinkedHashMap<>();
                             w.put("kb_id", t.knowledgeBaseId());

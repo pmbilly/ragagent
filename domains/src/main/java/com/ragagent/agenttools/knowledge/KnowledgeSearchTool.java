@@ -268,7 +268,7 @@ public class KnowledgeSearchTool extends BaseTool {
         this.reranker = reranker;
         this.searchTargets = searchTargets;
         this.config = config == null ? SearchConfig.defaults() : config;
-        this.ranking = new KnowledgeSearchRanking(this);
+        this.ranking = new KnowledgeSearchRanking(this.config, this.reranker, this.searchTargets);
         this.formatter = new KnowledgeSearchOutputFormatter(this);
     }
 

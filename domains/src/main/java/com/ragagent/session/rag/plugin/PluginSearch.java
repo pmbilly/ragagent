@@ -51,8 +51,8 @@ public final class PluginSearch implements Plugin {
         this.knowledgeBaseService = knowledgeBaseService;
         this.webSearchService = webSearchService;
         this.tenantService = tenantService;
-        this.expansionOps = new PluginExpansionOps(this);
-        this.searchOps = new PluginSearchOps(this);
+        this.expansionOps = new PluginExpansionOps(knowledgeBaseService);
+        this.searchOps = new PluginSearchOps(knowledgeBaseService, tenantService, webSearchService);
     }
 
     @Override

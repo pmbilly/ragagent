@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.RankResult;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.ResultWithMeta;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.SearchResultView;
+import com.ragagent.contract.retrieval.SearchTarget;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -17,14 +18,20 @@ import java.util.Set;
 final class KnowledgeSearchRanking {
 
 
-    private final KnowledgeSearchTool tool;
+    private final KnowledgeSearchTool.SearchConfig config;
+    private final KnowledgeSearchTool.RerankerModel reranker;
+    private final SearchTarget.SearchTargets searchTargets;
 
-    KnowledgeSearchRanking(KnowledgeSearchTool tool) {
-        this.tool = tool;
+    KnowledgeSearchRanking(KnowledgeSearchTool.SearchConfig config,
+                           KnowledgeSearchTool.RerankerModel reranker,
+                           SearchTarget.SearchTargets searchTargets) {
+        this.config = config;
+        this.reranker = reranker;
+        this.searchTargets = searchTargets;
     }
 
     List<ResultWithMeta> rerankResults(String query, List<ResultWithMeta> results) {
-        if (results.isEmpty() || tool.reranker == null) {
+        if (results.isEmpty() || reranker == null) {
             return results;
         }
         List<RankResult> rankResults;
@@ -34,7 +41,7 @@ final class KnowledgeSearchRanking {
             return results; // rerank 失败回落原始结果
         }
         double threshold = rerankThreshold();
-        boolean preserveTop = tool.searchTargets != null && tool.searchTargets.hasRecallThresholdOverride();
+        boolean preserveTop = searchTargets != null && searchTargets.hasRecallThresholdOverride();
         return applyModelRerankScores(results, rankResults, threshold, preserveTop);
     }
 
@@ -43,12 +50,12 @@ final class KnowledgeSearchRanking {
         for (ResultWithMeta result : results) {
             passages.add(getEnrichedPassage(result.sr));
         }
-        return tool.reranker.rerank(query, passages);
+        return reranker.rerank(query, passages);
     }
 
     /** 重排阈值：配置 &gt;0 用之，否则 0.3。 */
     double rerankThreshold() {
-        return tool.config.rerankThreshold() > 0 ? tool.config.rerankThreshold() : 0.3;
+        return config.rerankThreshold() > 0 ? config.rerankThreshold() : 0.3;
     }
 
     /** 阈值过滤；全被滤掉时视 preserveTop/兜底分决定是否回落最高分单条。 */

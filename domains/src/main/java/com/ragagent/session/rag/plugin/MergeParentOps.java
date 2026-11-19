@@ -1,6 +1,7 @@
 package com.ragagent.session.rag.plugin;
 
 import com.ragagent.contract.knowledge.ChunkFacts;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
@@ -20,16 +21,16 @@ import java.util.Map;
  */
 final class MergeParentOps {
 
-    private final PluginMerge service;
+    private final PipelinePorts.ChunkRepository chunkRepo;
 
-    MergeParentOps(PluginMerge service) {
-        this.service = service;
+    MergeParentOps(PipelinePorts.ChunkRepository chunkRepo) {
+        this.chunkRepo = chunkRepo;
     }
 
     // 父块解析（text→parent / image→text→grandparent）
 
     List<SearchResult> resolveParentChunks(PipelineState chatManage, List<SearchResult> results) {
-        if (results.isEmpty() || service.chunkRepo == null) {
+        if (results.isEmpty() || chunkRepo == null) {
             return results;
         }
 
@@ -55,7 +56,7 @@ final class MergeParentOps {
         List<SearchResult> working = results;
         List<ChunkFacts> parentChunks;
         try {
-            parentChunks = service.chunkRepo.listChunksById(tenantId, new ArrayList<>(parentIds.keySet()));
+            parentChunks = chunkRepo.listChunksById(tenantId, new ArrayList<>(parentIds.keySet()));
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("error", e.getMessage());
@@ -98,7 +99,7 @@ final class MergeParentOps {
             if (!grandparentIds.isEmpty()) {
                 List<ChunkFacts> grandparents;
                 try {
-                    grandparents = service.chunkRepo.listChunksById(tenantId, grandparentIds);
+                    grandparents = chunkRepo.listChunksById(tenantId, grandparentIds);
                     for (ChunkFacts grandparent : grandparents) {
                         parentMap.put(grandparent.id(), grandparent);
                     }
@@ -249,7 +250,7 @@ final class MergeParentOps {
 
     /** 聚合器在 {@link ImageInfoCollector}。 */
     Map<String, String> collectImageInfoByChunkIds(long tenantId, List<String> chunkIds) {
-        return ImageInfoCollector.collect(service.chunkRepo, tenantId, chunkIds);
+        return ImageInfoCollector.collect(chunkRepo, tenantId, chunkIds);
     }
 
 
@@ -259,7 +260,7 @@ final class MergeParentOps {
         final int minLen = 350;
         final int maxLen = 850;
 
-        if (results.isEmpty() || service.chunkRepo == null) {
+        if (results.isEmpty() || chunkRepo == null) {
             return results;
         }
 
@@ -303,7 +304,7 @@ final class MergeParentOps {
         Map<String, ChunkFacts> chunkMap = new LinkedHashMap<>();
         List<ChunkFacts> chunks;
         try {
-            chunks = service.chunkRepo.listChunksById(tenantId, baseIds);
+            chunks = chunkRepo.listChunksById(tenantId, baseIds);
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("error", e.getMessage());
@@ -330,7 +331,7 @@ final class MergeParentOps {
         if (!neighborIdsSet.isEmpty()) {
             List<String> neighborIDs = new ArrayList<>(neighborIdsSet.keySet());
             try {
-                List<ChunkFacts> neighbors = service.chunkRepo.listChunksById(tenantId, neighborIDs);
+                List<ChunkFacts> neighbors = chunkRepo.listChunksById(tenantId, neighborIDs);
                 for (ChunkFacts chunk : neighbors) {
                     chunkMap.put(chunk.id(), chunk);
                     Map<String, Object> f = new LinkedHashMap<>();
@@ -497,7 +498,7 @@ final class MergeParentOps {
 
         List<ChunkFacts> chunks;
         try {
-            chunks = service.chunkRepo.listChunksById(tenantId, missing);
+            chunks = chunkRepo.listChunksById(tenantId, missing);
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("missing_cnt", missing.size());

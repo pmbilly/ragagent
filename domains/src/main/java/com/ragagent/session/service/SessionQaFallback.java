@@ -4,6 +4,7 @@ package com.ragagent.session.service;
 import com.ragagent.contract.event.Event;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
+import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.model.ChatOptions;
@@ -12,6 +13,7 @@ import com.ragagent.contract.model.ChatStream;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
+import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
@@ -39,10 +41,13 @@ final class SessionQaFallback {
 
     private static final Logger log = LoggerFactory.getLogger(SessionQaFallback.class);
 
-    private final SessionKnowledgeQaService service;
+    private final KnowledgeCatalogPort knowledgeCatalog;
+    private final PipelinePorts.ModelService pipelineModelService;
 
-    SessionQaFallback(SessionKnowledgeQaService service) {
-        this.service = service;
+    SessionQaFallback(KnowledgeCatalogPort knowledgeCatalog,
+                      PipelinePorts.ModelService pipelineModelService) {
+        this.knowledgeCatalog = knowledgeCatalog;
+        this.pipelineModelService = pipelineModelService;
     }
 
     void handleFallbackResponse(ChatManage chatManage) {
@@ -76,7 +81,7 @@ final class SessionQaFallback {
         }
         LlmChatClient chatModel;
         try {
-            chatModel = service.pipelineModelService.getChatModel(chatManage.getChatModelId());
+            chatModel = pipelineModelService.getChatModel(chatManage.getChatModelId());
         } catch (RuntimeException e) {
             log.error("Failed to get chat model for fallback, falling back to fixed response", e);
             handleFixedFallback(chatManage);
@@ -191,7 +196,7 @@ final class SessionQaFallback {
             }
             List<KnowledgeRowView> knowledges;
             try {
-                knowledges = service.knowledgeCatalog.listKnowledge(kbId, 1, 10000, null, null, null, null, false).items();
+                knowledges = knowledgeCatalog.listKnowledge(kbId, 1, 10000, null, null, null, null, false).items();
             } catch (RuntimeException e) {
                 log.warn("buildKBDocumentListing: failed to list knowledge for KB {}", kbId, e);
                 continue;

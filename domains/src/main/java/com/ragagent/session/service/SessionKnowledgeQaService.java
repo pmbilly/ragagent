@@ -92,8 +92,8 @@ public class SessionKnowledgeQaService {
         this.webSearchProviders = webSearchProviders;
         this.agentResolver = agentResolver;
         this.resolution = new SessionQaResolution(this);
-        this.fallback = new SessionQaFallback(this);
-        this.webSearchParams = new QaWebSearchParams(this);
+        this.fallback = new SessionQaFallback(knowledgeCatalog, pipelineModelService);
+        this.webSearchParams = new QaWebSearchParams(tenantService, webSearchProviders);
     }
 
     // ── seam 委托:实现随 Resolution 协作者(外部消费面不变) ──

@@ -44,7 +44,7 @@ public final class PluginMerge implements Plugin {
 
     public PluginMerge(PipelinePorts.ChunkRepository chunkRepo) {
         this.chunkRepo = chunkRepo;
-        this.parentOps = new MergeParentOps(this);
+        this.parentOps = new MergeParentOps(chunkRepo);
     }
 
     @Override
