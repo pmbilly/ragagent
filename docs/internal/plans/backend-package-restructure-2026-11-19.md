@@ -168,6 +168,12 @@ wiki 的 17 处回引逐一评估后，只有一类值得改：
 
 判据一句话：**看协作者需要父对象的哪一部分**——只有"注入依赖"可外提；"编排、状态、业务方法"外提只是把耦合换个地方。
 
+**判据的术语来源**：这套判据不是自创规则，背后是三条标准原则——依赖倒置（依赖抽象而非实现）、接口隔离（端口要窄，如把 10 个方法拆成查询/写两个端口）、迪米特法则（只和直接朋友说话：`service.repo.getBySlug(...)` 属"通过熟人拿陌生人"，改成自己持有 `repo`）。"构造只依赖窄接口"只是对这三条的中文概括。
+
+**不设自动化守卫的理由**：`Service` 类互相注入是合法的（编排者本来就要调下游），按"构造参数是 `*Service`"判会把正常注入一起判红；且这种回引是历史包袱的产物，新代码很难自然写出（Spring 自动给依赖，没人会 `new X(this)`）。已有 `check-file-size`（类太大就红）会逼着人拆，拆时自然会想到不传 `this`。故本条落为**人工评审判据**，不入守卫。
+
+**待 contract 解散时解决的最后一条边**：`session -> agentmanagement.service`（仅剩 `AgentConfigJson` 的 4 处静态调用）。它同时被两条约束卡住——`contract` 零第三方依赖（不能带 Jackson）、`platform` 的 C8 禁业务词文件（`Agent`）。正解是把 `CustomAgentConfig` 契约化到 `contract.agent`，届时随解散归位到 `agentmanagement/api`，`AgentConfigJson` 作为该域工具被 session 通过契约类型访问。现已登记在 R-1 基线（1 条）。
+
 **搬迁陷阱（2026-11-19 实测，`KnowledgeSearchRanking`）**：父类对构造参数做兜底时（`this.config = config == null ? SearchConfig.defaults() : config`），如果给新协作者传的是**形参**而不是兜底后的**字段**，测试传 `null` 就会：父类字段有默认值、协作者里是 `null`，运行期 NPE。正确写法是 `new Ranking(this.config, ...)`，不是 `new Ranking(config, ...)`。
 
 这类 bug 编译期完全看不出来，只有"用 null 走默认值"的测试能抓住——所以搬迁后必须跑该域的全量测试，不能只跑编译。
