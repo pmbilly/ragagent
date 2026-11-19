@@ -111,8 +111,8 @@ public class DefaultWikiPageService implements WikiPageService {
         this.activeFlag = activeFlag;
         this.revisionOps = new WikiPageRevisionOps(this);
         this.linkService = linkService;
-        this.folderSupport = new WikiPageFolderSupport(this);
-        this.linkRepair = new WikiPageLinkRepair(this);
+        this.folderSupport = new WikiPageFolderSupport(folderRepo, repo);
+        this.linkRepair = new WikiPageLinkRepair(repo);
         this.views = new WikiPageViewsSupport(this);
     }
 

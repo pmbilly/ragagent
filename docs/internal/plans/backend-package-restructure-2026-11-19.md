@@ -130,6 +130,28 @@
 4. 主码无 `*Ops` / `*Support` / `*Wiring` 后缀类（P3 完成后）。
 5. 跨域对 `repository` / `mapper` / `domain` 的引用数为 0（P4 完成后）。
 
+## 7.1 P3 回引普查方法（2026-11-19 修正）
+
+"大类靠回引拆分"的实际形态是构造器里 `new Xxx(this)`。**按类名后缀（`*Ops`/`*Support`）统计会错两次**：混入接口（`WikiDedupSupport` 其实是端口）、漏掉 `*Phase`/`*Dedup`/`*Repair` 等命名。正确口径是直接扫创建点：
+
+```bash
+grep -rnF "(this)" --include="*.java" domains/src/main/java/com/ragagent | grep -F "new "
+```
+
+实测全仓 **70 处**：wiki 16 · mcp 12 · datasource 11 · memory 10 · im 7 · auth 6 · session 6 · knowledge 4。
+
+每个回引点先判两件事再动手：
+
+1. **协作者用了父类哪些成员**（`owner.repo` / `owner.updateXxx(...)`）——纯字段依赖可直接改构造参数；调父类方法说明有**双向调用**，必须先拆。
+2. **父类是否也调它**——双方互调时，提升 Bean 会触发 Spring 循环依赖，必须先搬走其中一侧的实现。
+
+改法有两种，按协作者是否被父类以外的地方使用来选：
+
+| 改法 | 适用 | 代价 |
+|---|---|---|
+| **轻量**：仍 `new Xxx(...)`，但传实际依赖 | 只在父类内部使用的协作者 | 父类构造参数不变，风险最低 |
+| **提升**：`@Service` + 父类注入 | 被多处调用、需要独立装配的协作者 | 父类构造参数 +1；多个协作者同时提升会撞"≥8 参构造器"红线 |
+
 ## 8. 不在本次范围
 
 H7 / H8 / H9 / L11 / Q6 / Q8b / Q9 / Q10 / Q11 / R2c-3d 余项 / M8（见 `HANDOFF.md` §5.1）。已否决项见归档 §5.0b。

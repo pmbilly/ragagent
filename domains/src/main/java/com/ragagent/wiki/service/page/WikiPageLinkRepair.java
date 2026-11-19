@@ -1,6 +1,7 @@
 package com.ragagent.wiki.service.page;
 
 import com.ragagent.wiki.domain.page.WikiPageLite;
+import com.ragagent.wiki.repository.WikiPageRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -15,10 +16,10 @@ import java.util.Set;
  */
 final class WikiPageLinkRepair {
 
-    private final DefaultWikiPageService service;
+    private final WikiPageRepository repo;
 
-    WikiPageLinkRepair(DefaultWikiPageService service) {
-        this.service = service;
+    WikiPageLinkRepair(WikiPageRepository repo) {
+        this.repo = repo;
     }
 
     /**
@@ -48,7 +49,7 @@ final class WikiPageLinkRepair {
         if (outLinks.isEmpty()) {
             return new WikiPageService.RepairResult(content, false);
         }
-        Map<String, Boolean> existMap = service.repo.existsSlugs(kbId, outLinks);
+        Map<String, Boolean> existMap = repo.existsSlugs(kbId, outLinks);
         Set<String> deadPrefixes = new LinkedHashSet<>();
         for (String l : outLinks) {
             if (l.equals(selfSlug) || Boolean.TRUE.equals(existMap.get(l))) {
@@ -59,7 +60,7 @@ final class WikiPageLinkRepair {
         if (deadPrefixes.isEmpty()) {
             return new WikiPageService.RepairResult(content, false);
         }
-        List<String> allSlugs = service.repo.listAllSlugs(kbId);
+        List<String> allSlugs = repo.listAllSlugs(kbId);
         Map<String, Set<String>> liveByPrefix = new LinkedHashMap<>();
         List<String> candidateSlugs = new ArrayList<>();
         for (String sl : allSlugs) {
@@ -78,7 +79,7 @@ final class WikiPageLinkRepair {
         // 大 KB 上依然廉价。
         Map<String, String> titleToSlug = new LinkedHashMap<>();
         try {
-            Map<String, WikiPageLite> lites = service.repo.listBySlugs(kbId, candidateSlugs);
+            Map<String, WikiPageLite> lites = repo.listBySlugs(kbId, candidateSlugs);
             for (WikiPageLite lp : lites.values()) {
                 if (lp != null && !lp.getTitle().isEmpty()) {
                     titleToSlug.put(lp.getTitle(), lp.getSlug());
