@@ -36,7 +36,7 @@
 |---|---|---|
 | **P0** | 三份只读基线：OpenAPI 快照、Bean 清单 + 端点清单、跨域引用清单 | 快照入库；后续每批 diff 必须为空或差异可解释 |
 | **P1** | 结构规则先行：只补 2 条缺口规则（跨域直连、注解 SQL 棘轮）+ 扫描名单核对 | 先出现状违规清单（只量不改）；违规数只减不增 |
-| **P2** | 纯包移动：只改目录与 `package` 声明，不改类名、不改逻辑 | 编译 + 全量闸门 + 三份快照 diff 为空 |
+| **P2** | `api/` 里的 `*Adapter` 迁到 `adapter/`（32 个 / 11 域），纯移动、不改类名与逻辑 | 每域：编译 + 定向测试（clean 后确认条数）+ 三份快照 diff 为空 |
 | **P3** | 类职责归位：合并 `*Ops`（50）/ `*Support`（21）/ `*Wiring`（13） | 该域定向测试 + 金片 + 全量闸门 |
 | **P4** | `api/` 包语义纠正 + 域间边界改为测试校验 | 结构校验通过；跨域直连引用只减不增 |
 
@@ -62,11 +62,23 @@
 - `@MapperScan("com.ragagent.**.mapper")` 是通配，Mapper 只要留在任一 `mapper` 包内即安全，且 A11 已守着。
 - 全仓**没有 `@Aspect` 类**（实测 0），"切点写包路径导致静默失效"这类风险当前不存在；将来引入切面时再登记。
 
-### 4.2 P2 顺序（按文件数从小到大）
+### 4.2 P2 顺序（按 `api/` 下的 Adapter 数从小到大）
 
-`favorite`(13) → `system`(18) → `vectorstore`(20) → `audit`(20) → `embedchannel`(25) → `agentmanagement`(27) → `model`(38) → `websearch`(52) → `agenttools`(59) → `storage`(62) → `memory`(91) → `im`(106) → `auth`(122) → `datasource`(147) → `wiki`(165) → `mcp`(171) → `session`(212) → `knowledge`(283)
+> 2026-11-19 修正：原计划"按域文件数从小到大逐域移动"没有目标——P0 实测 19 个域的分层已统一，不存在错位目录。唯一语义错位是 `api/` 装的是 `*Adapter`（蓝图 5.5 的 `api/` 应为对外契约）。故 P2 对象改为这 32 个 Adapter，原 P4 的语义纠正由本批完成，P4 只剩"域间边界改为 ArchUnit 校验"。
 
-每个域一批、独立提交。前 6 个域合计约 130 个文件，用来把流程跑顺。
+| Adapter 数 | 域 | 状态 |
+|---|---|---|
+| 1 | `agentmanagement` | ✅ 2026-11-19 |
+| 1 | `audit` · `memory` · `model` · `wiki` | 待做 |
+| 2 | `mcp` · `websearch` | 待做 |
+| 3 | `auth` | 待做 |
+| 4 | `storage` | 待做 |
+| 5 | `session` | 待做 |
+| 11 | `knowledge` | 待做 |
+
+无 `api/` 的 8 个域跳过：`favorite` · `system` · `vectorstore` · `embedchannel` · `im` · `datasource` · `agenttools` · `initialization`。
+
+每域一批、独立提交。`api/` 下的非 Adapter 类（`AuthUserErrors`、`CreateUserResult`、`FinalizeResult`、`MemoryAccess`）原地不动——它们是域契约。
 
 ### 4.3 已知阻塞项
 

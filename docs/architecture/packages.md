@@ -50,7 +50,7 @@
 | `:contract` | `com.ragagent.contract.websearch` | 契约 · 网页搜索：WebSearchTempStatePort / WebSearchProviderPort / PipelinePageFetcher…。 |
 | `:contract` | `com.ragagent.contract.wiki` | Wiki 契约面：摄取/收尾端口与图片标记。 |
 | `:domains` | `com.ragagent.agentmanagement` | 智能体管理面：内建智能体注册表与类型预设、自定义智能体 CRUD（custom_agents）、 技能目录、推荐问题流与 agent config jsonb。 |
-| `:domains` | `com.ragagent.agentmanagement.api` | Agent 管理 · 端口实现：AgentLookupAdapter。 |
+| `:domains` | `com.ragagent.agentmanagement.adapter` | Agent 管理 · 端口实现：AgentLookupAdapter。 |
 | `:domains` | `com.ragagent.agentmanagement.controller` | 智能体管理面的 HTTP 薄层：智能体 CRUD（com.ragagent.agentmanagement.controller.AgentController） 与技能目录（com.ragagent |
 | `:domains` | `com.ragagent.agentmanagement.domain` | 智能体管理实体（@TableName 跟随表名）。 |
 | `:domains` | `com.ragagent.agentmanagement.dto` | 智能体管理面的响应装配类型（com.ragagent.agentmanagement.dto.AgentResponses）。 |

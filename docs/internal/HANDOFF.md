@@ -80,7 +80,7 @@
 |---|---|---|---|
 | **P0** | 三份只读基线：`scripts/gen-package-baseline.py` 生成端点 / 装配面 / 跨域引用三份 JSON | 端点 397 · Mapper 45 · `@Configuration` 23 · 跨域边 11 · 可复现（`--check` 无变化） | ✅ 2026-11-19 |
 | **P1** | 结构规则先行：新增 `PackageRestructureBoundaryTest`（R-1 跨域直连棘轮 2 条边 / R-2 注解 SQL 精确 282）+ 扫描名单核对（`@ConfigurationPropertiesScan` 11 包 / `@MapperScan` 通配 / 无 `@Aspect`） | R-1 与 R-2 均绿；`ArchitectureRulesTest` 22 条不受影响；守卫 49/49 | ✅ 2026-11-19 |
-| **P2** | 纯包移动：只改目录与 `package` 声明，不改类名、不改逻辑 | 编译 + 全量闸门 + 三份快照 diff 为空 | 待做 |
+| **P2** | `api/` 里的 `*Adapter` 迁到 `adapter/`（32 个 / 11 域），纯移动不改逻辑；8 个无 `api/` 的域跳过。顺序见方案 §4.2 | 每域：编译 + 定向测试（clean 后确认条数）+ 三份快照 diff 为空 | 进行中（1/11：`agentmanagement` ✅） |
 | **P3** | 类职责归位：`*Ops`(50) / `*Support`(21) / `*Wiring`(13) 合并回 service | 该域定向测试 + 金片 + 全量闸门 | 待做 |
 | **P4** | `api/` 包语义纠正 + 域间边界改为测试校验 | 结构校验通过；跨域直连引用 0 | 待做 |
 
@@ -112,7 +112,12 @@ H7（platform 判据换血）· H8（适配层逻辑化）· H9（管理面模�
   **`ZZ_PG_JDBC` 必给**：`GrepChunksRecordingTest` 与 `DatabaseQueryRecordingTest` 默认连 `WeKnora`（CI 的库名），本机库名是 `RagAgent`；不给会在 domains 报 `database "WeKnora" does not exist`，两个测试设计为「不可达即失败、不许跳过」。
   期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（2026-11-19 实测：contract 12 · platform 262 · agent-engine 157 · domains **2862** · boot **1358**；旧口径 5082 已过期）。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
   **环境前置**：PG `max_connections=100`，多个 boot jar 残留会占满连接（实测 5 个实例 = 50 条 ⇒ `too many clients`）。跑闸门前先 `ps -Ao pid,command | grep '[b]oot/build/libs/boot'` 清残留。
-- **⚠️ IDE 自动构建会与 Maven 抢 `target/`**：2026-11-19 实测，`clean verify` 期间 IDE 写入半成品 class，domains 测试随机报 `Unresolved compilation problems`（JDT 专属措辞）或 `cannot access Xxx`/`incompatible types`，且每次报错的文件不同。判别：换一个错误文件就是竞争，不是回归。处理：跑闸门前关闭 IDE 自动构建；仍复现就把后端复制到独立目录构建（`rsync --exclude target --exclude .git --exclude frontend`，守卫在真实仓库另跑）。
+- **⚠️ IDE 自动构建会与 Maven 抢 `target/`**：2026-11-19 实测，`clean verify` 期间 IDE 写入半成品 class，domains 测试随机报 `Unresolved compilation problems`（JDT 专属措辞）或 `cannot access Xxx` / `incompatible types`，且每次报错的文件不同。**判别：换一个错误文件就是竞争，不是回归。**
+  根因是语言服务器进程用 Homebrew openjdk **27** 启动（`ps -Ao command | grep eclipse.jdt.ls` 可证），与 Maven 的 21 不一致。分两层处理：
+  1. **语言服务器 JVM 固定到 JDK 21**：`.vscode/settings.json` 的 `java.jdt.ls.java.home` 指向 `/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home`。`.vscode/` 已整体 gitignore，各人本地配置。
+  2. **关闭自动构建**：`java.autobuild.enabled: false`，放用户级设置——它会写 `target/classes`，与 `clean verify` 抢目录。
+  **该设置对已启动的语言服务器不生效**：2026-11-19 实测，用户级 10-16 就设了这项，但 LS 仍跑 27；`⌘⇧P` → `Java: Clean Java Language Server Workspace` 也不够，**必须完全退出 IDE 再启动**。验证：`ps -Ao command | grep "[e]clipse.jdt.ls" | tr ' ' '\n' | grep -m1 openjdk`。
+  若仍复现，二选一：跑闸门前 `pkill -f eclipse.jdt.ls`，或把后端复制到独立目录构建（`rsync --exclude target --exclude .git --exclude frontend`，守卫留在真实仓库另跑）。
 - **dev 数据修复（2026-10-20）**：软删守卫误拦窗口（H5b~H5b-fix 之间）里生成失败的 5 条 embed 历史回答，已按会话用 embed `ensure` 补建 `message_suggestion_sets`（状态 `suppressed/disabled`，该智能体追问关闭）；全库 embed 历史已无「缺建议集合」行。
 - 前端（触契约时）：`cd frontend && npx vue-tsc --build --force` + `npm test`。
 
@@ -275,6 +280,7 @@ boot           17 件                      →  boot
 |---|---|---|---|
 | **P0** | 2026-11-19 | 新增 `scripts/gen-package-baseline.py`，静态生成三份基线（不启动应用）：`endpoint-inventory.json`（397 条控制器映射）、`bean-inventory.json`（45 Mapper / 23 `@Configuration` / 0 `@Aspect` / `@MapperScan` 通配 / `@ConfigurationPropertiesScan` 11 包 / `spring.factories` 1 处 / `logging.level` 1 条）、`cross-domain-imports.json`（19 域、11 条跨域边、19 个域均引 contract） | `--write` 后 `--check` 三份均无变化（可复现）；守卫 48/48 绿 |
 | **P1** | 2026-11-19 | 新增 `boot/src/test/java/com/ragagent/arch/PackageRestructureBoundaryTest`：**R-1** 跨域直连棘轮（19 域白名单，禁入对方 `repository`/`mapper`/`domain`/`service`/`controller`，基线 2 条边：`knowledge→wiki.service`、`session→agentmanagement.service`）；**R-2** 注解 SQL 精确计数（282 个方法，新增或减少都红，强制同步基线）。`ArchitectureRulesTest.MAIN` 改包内可见以复用一次性导入。四条原计划规则中三条已由既有 A7/A11/A11b/A16/A19/C10 覆盖，未重复造 | R-1/R-2 绿 · `ArchitectureRulesTest` 22 条绿 · boot 1,358 条绿 · domains 2,862 条绿（隔离目录） · 守卫 49/49 · 金片 1,339 未动 |
+| **P2-1** | 2026-11-19 | `agentmanagement`：`api/AgentLookupAdapter` → `adapter/`，包声明与测试同步移动，删空 `api` 包（该域无其它契约类）；`packages.md` 重新生成（357 包）。**P2 定义修正**：全仓 19 域分层已统一，无错位目录可移；唯一语义错位是 `api/` 装 Adapter（32 个 / 11 域），故 P2 改为 `api/` → `adapter/`，原 P4 的语义纠正由本批完成 | `AgentLookupAdapterTest` 2/2 绿（**clean 后确认只跑 2 条**——增量构建会残影出旧包的 4 条）· 三份快照无变化（397/45/11）· 守卫 49/49 |
 
 > 历史批次（v0.3.0~v0.11.x，含 P/R/L/M/H/K/X/Q/B269 系列）全部在归档 `handoff/archive/HANDOFF-v0.10.x-2026-11-19.md` §12；追溯用 `git log --grep`。
 

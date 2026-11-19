@@ -1,4 +1,4 @@
-package com.ragagent.agentmanagement.api;
+package com.ragagent.agentmanagement.adapter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
