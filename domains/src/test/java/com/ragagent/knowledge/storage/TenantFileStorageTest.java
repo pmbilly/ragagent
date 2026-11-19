@@ -14,7 +14,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.storage.fileserve.ProviderFileStorePort;
 import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
-import com.ragagent.storage.api.ProviderFileStoreAdapter;
+import com.ragagent.storage.adapter.ProviderFileStoreAdapter;
 import com.ragagent.storage.fileserve.StorageFileResolver;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

@@ -246,7 +246,7 @@
 | `:domains` | `com.ragagent.session.service.suggestion` | 消息建议面（由 session.service 切出，对齐方案 的 service.suggestion/）： MessageSuggestionService（建议生成的编排与落库）与 Messag |
 | `:domains` | `com.ragagent.session.support` | 会话 · 支撑：MessageReferenceRewriter / PipelineViews。 |
 | `:domains` | `com.ragagent.storage` | 存储后端域：存储后端配置与凭据（对外 /api/v1/storage-backends）与文件服务 （传输、解析、文件解析器）。 |
-| `:domains` | `com.ragagent.storage.api` | 存储 · 端口实现：StorageBackendPortAdapter / ProviderFileStoreAdapter / GlobalFileServiceAdapter…。 |
+| `:domains` | `com.ragagent.storage.adapter` | 存储 · 端口实现：StorageBackendPortAdapter / ProviderFileStoreAdapter / GlobalFileServiceAdapter / ResourceCatalogAdapter。 |
 | `:domains` | `com.ragagent.storage.config` | 存储 · 配置：LocalStorageEnvProperties / ResourceUrlModeProperties / StorageProviderEnv。 |
 | `:domains` | `com.ragagent.storage.controller` | 存储 · HTTP 层：StorageBackendController / FileProxyController。 |
 | `:domains` | `com.ragagent.storage.domain` | 存储 · 领域模型：StoredResource / StorageBackend。 |

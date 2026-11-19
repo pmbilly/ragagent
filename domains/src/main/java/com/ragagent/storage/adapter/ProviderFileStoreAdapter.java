@@ -1,4 +1,4 @@
-package com.ragagent.storage.api;
+package com.ragagent.storage.adapter;
 
 import com.ragagent.contract.storage.fileserve.OpenedFile;
 import com.ragagent.contract.storage.fileserve.ProviderFileStorePort;

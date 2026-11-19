@@ -72,7 +72,7 @@
 | 1 | `audit` · `memory` · `model` · `wiki` | ✅ 2026-11-19 |
 | 2 | `mcp` · `websearch` | ✅ 2026-11-19 |
 | 3 | `auth` | ✅ 2026-11-19 |
-| 4 | `storage` | 待做 |
+| 4 | `storage` | ✅ 2026-11-19 |
 | 5 | `session` | 待做 |
 | 11 | `knowledge` | 待做 |
 

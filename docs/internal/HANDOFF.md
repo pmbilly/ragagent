@@ -80,7 +80,7 @@
 |---|---|---|---|
 | **P0** | 三份只读基线：`scripts/gen-package-baseline.py` 生成端点 / 装配面 / 跨域引用三份 JSON | 端点 397 · Mapper 45 · `@Configuration` 23 · 跨域边 11 · 可复现（`--check` 无变化） | ✅ 2026-11-19 |
 | **P1** | 结构规则先行：新增 `PackageRestructureBoundaryTest`（R-1 跨域直连棘轮 2 条边 / R-2 注解 SQL 精确 282）+ 扫描名单核对（`@ConfigurationPropertiesScan` 11 包 / `@MapperScan` 通配 / 无 `@Aspect`） | R-1 与 R-2 均绿；`ArchitectureRulesTest` 22 条不受影响；守卫 49/49 | ✅ 2026-11-19 |
-| **P2** | `api/` 里的 `*Adapter` 迁到 `adapter/`（32 个 / 11 域），纯移动不改逻辑；8 个无 `api/` 的域跳过。顺序见方案 §4.2 | 每域：编译 + 定向测试（clean 后确认条数）+ 三份快照 diff 为空 | 进行中（8/11：`agentmanagement` · `audit` · `memory` · `model` · `wiki` · `mcp` · `websearch` · `auth` ✅） |
+| **P2** | `api/` 里的 `*Adapter` 迁到 `adapter/`（32 个 / 11 域），纯移动不改逻辑；8 个无 `api/` 的域跳过。顺序见方案 §4.2 | 每域：编译 + 定向测试（clean 后确认条数）+ 三份快照 diff 为空 | 进行中（9/11：`agentmanagement` · `audit` · `memory` · `model` · `wiki` · `mcp` · `websearch` · `auth` · `storage` ✅） |
 | **P3** | 类职责归位：`*Ops`(50) / `*Support`(21) / `*Wiring`(13) 合并回 service | 该域定向测试 + 金片 + 全量闸门 | 待做 |
 | **P4** | `api/` 包语义纠正 + 域间边界改为测试校验 | 结构校验通过；跨域直连引用 0 | 待做 |
 
@@ -285,6 +285,7 @@ boot           17 件                      →  boot
 | **P2-2** | 2026-11-19 | `audit` / `model` / `wiki` / `memory` 四域各 1 个 Adapter 迁入 `adapter/`：前三者 `api` 包随之清空删除；`memory/api` 保留（`MemoryAccess` 是 session 依赖的对外入口）。顺带修 `memory` 两个 `package-info` 的过期描述——原文写 `MemoryAccessAdapter`，该类并不存在（`check-package-info-fields` 只查要素齐全，查不出"引用了不存在的类"，这类失真只能靠移动时人眼核对） | domains 主码 + 测试源集编译绿 · 三份快照无变化（397/45/11）· 守卫 49/49 · `packages.md` 357→358 |
 | **P2-3** | 2026-11-19 | `mcp` / `websearch` 各 2 个 Adapter 迁入 `adapter/`，两域 `api` 包清空删除；`package-info` 随包名同步（原文已列全两个 Adapter，无失真） | domains 主码 + 测试源集编译绿 · 三份快照无变化（397/45/11）· 守卫 49/49 |
 | **P2-4** | 2026-11-19 | `auth` 的 3 个 Adapter 迁入 `adapter/`，`api` 保留（`AuthUserErrors` / `CreateUserResult` 被 system 引用）。**移动暴露一条隐藏违规**：`system` 的两个 service 直接 import `auth.api.AdminUserAdapter`（具体类，字段名却叫 `adminUserPort`），原先躲在 `api` 包里，R-1 的禁入列表看不到。处置：R-1 的 `FORBIDDEN_TARGETS` 加 `adapter`，该边登记进基线（2→3 条），根治（提 `contract.auth` 端口 + `CreateUserResult` 上提）记 §11.1 第 20 条。`AdminUserAdapter` 原来靠同包可见引用 `AuthUserErrors` / `CreateUserResult`，移包后补显式 import | R-1 3 条基线绿 · R-2 282 绿 · domains 编译绿 · 守卫 49/49 · 跨域快照 11→12 条（新增 system→auth.adapter，已接受为基线） |
+| **P2-5** | 2026-11-19 | `storage` 的 4 个 Adapter 迁入 `adapter/`，`api` 包清空删除。`api` 无外部引用，唯一受影响的是测试 `TenantFileStorageTest` 的 import（主码 grep 不到、测试目录才暴露——**侦察必须连 `src/test` 一起扫**） | domains 主码 + 测试源集编译绿 · 三份快照无变化（397/45/12）· 守卫 49/49 |
 
 > 历史批次（v0.3.0~v0.11.x，含 P/R/L/M/H/K/X/Q/B269 系列）全部在归档 `handoff/archive/HANDOFF-v0.10.x-2026-11-19.md` §12；追溯用 `git log --grep`。
 
