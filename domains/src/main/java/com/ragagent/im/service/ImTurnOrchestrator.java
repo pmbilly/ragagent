@@ -137,7 +137,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
         this.agentLookup = agentLookup;
         this.storageResolver = storageResolver.getIfAvailable();
         this.streamPipeline = new ImStreamPipeline(this, eventBusFactory);
-        this.outboundFormatter = new ImOutboundFormatter(this);
+        this.outboundFormatter = new ImOutboundFormatter(this.storageResolver);
         this.sessionResolver = new ImSessionResolver(channelSessions, sessionQaPort);
         this.qaRequests = new ImQaRequests(agentLookup, sessionQaPort);
         this.qaRunner = new ImQaRunner(this, eventBusFactory);

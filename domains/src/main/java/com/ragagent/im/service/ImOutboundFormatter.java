@@ -1,5 +1,6 @@
 package com.ragagent.im.service;
 
+import com.ragagent.contract.storage.support.Resolver;
 import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
 import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;
 import com.ragagent.im.runtime.ImFormat;
@@ -18,10 +19,10 @@ final class ImOutboundFormatter {
 
     private static final Logger log = LoggerFactory.getLogger(ImOutboundFormatter.class);
 
-    private final ImTurnOrchestrator service;
+    private final Resolver storageResolver;
 
-    ImOutboundFormatter(ImTurnOrchestrator service) {
-        this.service = service;
+    ImOutboundFormatter(Resolver storageResolver) {
+        this.storageResolver = storageResolver;
     }
 
     /** 流式整段回复。 */
@@ -48,8 +49,8 @@ final class ImOutboundFormatter {
     String cleanIMContent(String content, boolean rendersImages) {
         content = ImFormat.stripImageXMLTags(content);
         content = ImFormat.stripImCitationTags(content);
-        if (service.storageResolver != null) {
-            content = new Rewriter(service.storageResolver, "IM")
+        if (storageResolver != null) {
+            content = new Rewriter(storageResolver, "IM")
                     .rewrite(content);
         }
         // 卡片/富文本都不认 local:// 图片，留着会让整条消息发不出去
