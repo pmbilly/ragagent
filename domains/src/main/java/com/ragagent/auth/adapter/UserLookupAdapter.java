@@ -1,4 +1,4 @@
-package com.ragagent.auth.api;
+package com.ragagent.auth.adapter;
 
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.UserService;

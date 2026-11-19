@@ -1,7 +1,9 @@
-package com.ragagent.auth.api;
+package com.ragagent.auth.adapter;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.auth.api.AuthUserErrors;
+import com.ragagent.auth.api.CreateUserResult;
 import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.TenantRowView;

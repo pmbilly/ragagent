@@ -73,8 +73,14 @@
     {
       "from": "system",
       "to": "auth",
+      "target": "adapter",
+      "imports": 2
+    },
+    {
+      "from": "system",
+      "to": "auth",
       "target": "api",
-      "imports": 5
+      "imports": 3
     },
     {
       "from": "system",

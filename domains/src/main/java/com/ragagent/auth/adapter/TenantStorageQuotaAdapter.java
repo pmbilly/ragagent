@@ -1,4 +1,4 @@
-package com.ragagent.auth.api;
+package com.ragagent.auth.adapter;
 
 import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.mapper.TenantMapper;

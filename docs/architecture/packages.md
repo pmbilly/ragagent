@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-358 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+359 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -74,7 +74,8 @@
 | `:domains` | `com.ragagent.audit.repository` | 审计日志仓储门面：对 audit.mapper.AuditLogMapper 的查询与写入封装。 |
 | `:domains` | `com.ragagent.audit.service` | 审计 · 服务：AuditLogService / RbacDeniedAuditorRegistrar / WikiActivityAuditRecorder…。 |
 | `:domains` | `com.ragagent.auth` | 认证与租户控制面：登录/OIDC/令牌、用户与租户目录、RBAC 与会话身份。 |
-| `:domains` | `com.ragagent.auth.api` | 认证 · 域内访问面：UserLookupAdapter（实现 contract.auth.UserLookupPort）、 AdminUserAdapter，以及域内视图（com.ragagent. |
+| `:domains` | `com.ragagent.auth.adapter` | 认证 · 端口实现：UserLookupAdapter（contract.auth.UserLookupPort）、 AdminUserAdapter、TenantStorageQuotaAdapter。 |
+| `:domains` | `com.ragagent.auth.api` | 认证 · 域内视图：com.ragagent.auth.api.CreateUserResult 与 com.ragagent.auth.api.AuthUserErrors（system 等域经此读认证结果）。 |
 | `:domains` | `com.ragagent.auth.apikey` | API 密钥子域（auth 之下，机器调用凭据面）：租户级 API Key 的签发、校验与访问控制。 |
 | `:domains` | `com.ragagent.auth.apikey.controller` | apikey · HTTP 层：TenantAPIKeyController。 |
 | `:domains` | `com.ragagent.auth.apikey.controller.filter` | API Key 过滤器面（由 auth.apikey.filter 迁入 apikey.controller.filter，对齐方案）： 鉴权通道与网关拦截、路由授权与策略、范围清理与文件服务豁免、主体拒绝（9 类）。 |

@@ -1,6 +1,6 @@
 package com.ragagent.system.service;
 
-import com.ragagent.auth.api.AdminUserAdapter;
+import com.ragagent.auth.adapter.AdminUserAdapter;
 import com.ragagent.auth.api.AuthUserErrors;
 import com.ragagent.auth.api.CreateUserResult;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
  * 系统管理员 用户管理的**系统侧壳**：审计写入 + 控制器委托面。
  *
  * <p><b>本刀（C-13a）后</b>：用户/租户/成员的实际读写都归 auth 域（{@link AdminUserAdapter} 的实现
- * {@code auth/api/AdminUserAdapter}）——system 不再直引 {@code auth.mapper.UserMapper} /
+ * {@code auth/adapter/AdminUserAdapter}）——system 不再直引 {@code auth.mapper.UserMapper} /
  * {@code TenantService} / {@code TenantMemberService}（HANDOFF）。本类只负责：</p>
  * <ul>
  * <li>{@link #emitAdminAudit}：租户 0 + target user 的 best-effort 审计（失败记 WARN）；</li>

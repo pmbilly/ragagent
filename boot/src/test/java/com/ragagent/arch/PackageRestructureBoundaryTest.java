@@ -46,17 +46,23 @@ class PackageRestructureBoundaryTest {
 
     /** 跨域只允许进 `api` / `dto`；以下子包直连即违规。 */
     private static final Set<String> FORBIDDEN_TARGETS =
-            Set.of("repository", "mapper", "domain", "service", "controller");
+            Set.of("repository", "mapper", "domain", "service", "controller", "adapter");
 
     /**
-     * 跨域直连基线（2026-11-19 普查，13 处 import / 2 条边）。
+     * 跨域直连基线（2026-11-19 普查，13 处 import / 2 条边；P2-4 补第 3 条）。
      *
      * <p>格式 {@code <from> -> <to>.<子包>}。新增条目必须先在方案文档里论证，
      * 否则就是绕过 {@code api} 又开了一条暗通道。</p>
+     *
+     * <p>{@code system -> auth.adapter} 是 P2 移动时才暴露的：system 的两个 service 直接
+     * 注入 {@code AdminUserAdapter}（具体类，字段名却叫 {@code adminUserPort}），原先藏在
+     * {@code auth.api} 包里，规则看不到。根治要把它的方法提成 {@code contract.auth} 端口，
+     * 涉及 {@code CreateUserResult} 上提，另批处理（见 HANDOFF §11.1 第 20 条）。</p>
      */
     private static final Set<String> CROSS_DOMAIN_BASELINE = Set.of(
             "knowledge -> wiki.service",
-            "session -> agentmanagement.service");
+            "session -> agentmanagement.service",
+            "system -> auth.adapter");
 
     /**
      * 注解 SQL 基线：主码里带 {@code @Select/@Insert/@Update/@Delete} 的方法数（2026-11-19 实测）。

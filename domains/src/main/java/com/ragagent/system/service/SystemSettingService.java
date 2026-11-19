@@ -3,7 +3,7 @@ package com.ragagent.system.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.ragagent.auth.api.AdminUserAdapter;
+import com.ragagent.auth.adapter.AdminUserAdapter;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
