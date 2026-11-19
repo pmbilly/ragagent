@@ -1,4 +1,4 @@
-package com.ragagent.memory.api;
+package com.ragagent.memory.adapter;
 
 import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRetrievalContext;

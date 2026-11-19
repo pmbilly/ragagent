@@ -80,7 +80,7 @@
 |---|---|---|---|
 | **P0** | 三份只读基线：`scripts/gen-package-baseline.py` 生成端点 / 装配面 / 跨域引用三份 JSON | 端点 397 · Mapper 45 · `@Configuration` 23 · 跨域边 11 · 可复现（`--check` 无变化） | ✅ 2026-11-19 |
 | **P1** | 结构规则先行：新增 `PackageRestructureBoundaryTest`（R-1 跨域直连棘轮 2 条边 / R-2 注解 SQL 精确 282）+ 扫描名单核对（`@ConfigurationPropertiesScan` 11 包 / `@MapperScan` 通配 / 无 `@Aspect`） | R-1 与 R-2 均绿；`ArchitectureRulesTest` 22 条不受影响；守卫 49/49 | ✅ 2026-11-19 |
-| **P2** | `api/` 里的 `*Adapter` 迁到 `adapter/`（32 个 / 11 域），纯移动不改逻辑；8 个无 `api/` 的域跳过。顺序见方案 §4.2 | 每域：编译 + 定向测试（clean 后确认条数）+ 三份快照 diff 为空 | 进行中（1/11：`agentmanagement` ✅） |
+| **P2** | `api/` 里的 `*Adapter` 迁到 `adapter/`（32 个 / 11 域），纯移动不改逻辑；8 个无 `api/` 的域跳过。顺序见方案 §4.2 | 每域：编译 + 定向测试（clean 后确认条数）+ 三份快照 diff 为空 | 进行中（5/11：`agentmanagement` · `audit` · `memory` · `model` · `wiki` ✅） |
 | **P3** | 类职责归位：`*Ops`(50) / `*Support`(21) / `*Wiring`(13) 合并回 service | 该域定向测试 + 金片 + 全量闸门 | 待做 |
 | **P4** | `api/` 包语义纠正 + 域间边界改为测试校验 | 结构校验通过；跨域直连引用 0 | 待做 |
 
@@ -281,6 +281,7 @@ boot           17 件                      →  boot
 | **P0** | 2026-11-19 | 新增 `scripts/gen-package-baseline.py`，静态生成三份基线（不启动应用）：`endpoint-inventory.json`（397 条控制器映射）、`bean-inventory.json`（45 Mapper / 23 `@Configuration` / 0 `@Aspect` / `@MapperScan` 通配 / `@ConfigurationPropertiesScan` 11 包 / `spring.factories` 1 处 / `logging.level` 1 条）、`cross-domain-imports.json`（19 域、11 条跨域边、19 个域均引 contract） | `--write` 后 `--check` 三份均无变化（可复现）；守卫 48/48 绿 |
 | **P1** | 2026-11-19 | 新增 `boot/src/test/java/com/ragagent/arch/PackageRestructureBoundaryTest`：**R-1** 跨域直连棘轮（19 域白名单，禁入对方 `repository`/`mapper`/`domain`/`service`/`controller`，基线 2 条边：`knowledge→wiki.service`、`session→agentmanagement.service`）；**R-2** 注解 SQL 精确计数（282 个方法，新增或减少都红，强制同步基线）。`ArchitectureRulesTest.MAIN` 改包内可见以复用一次性导入。四条原计划规则中三条已由既有 A7/A11/A11b/A16/A19/C10 覆盖，未重复造 | R-1/R-2 绿 · `ArchitectureRulesTest` 22 条绿 · boot 1,358 条绿 · domains 2,862 条绿（隔离目录） · 守卫 49/49 · 金片 1,339 未动 |
 | **P2-1** | 2026-11-19 | `agentmanagement`：`api/AgentLookupAdapter` → `adapter/`，包声明与测试同步移动，删空 `api` 包（该域无其它契约类）；`packages.md` 重新生成（357 包）。**P2 定义修正**：全仓 19 域分层已统一，无错位目录可移；唯一语义错位是 `api/` 装 Adapter（32 个 / 11 域），故 P2 改为 `api/` → `adapter/`，原 P4 的语义纠正由本批完成 | `AgentLookupAdapterTest` 2/2 绿（**clean 后确认只跑 2 条**——增量构建会残影出旧包的 4 条）· 三份快照无变化（397/45/11）· 守卫 49/49 |
+| **P2-2** | 2026-11-19 | `audit` / `model` / `wiki` / `memory` 四域各 1 个 Adapter 迁入 `adapter/`：前三者 `api` 包随之清空删除；`memory/api` 保留（`MemoryAccess` 是 session 依赖的对外入口）。顺带修 `memory` 两个 `package-info` 的过期描述——原文写 `MemoryAccessAdapter`，该类并不存在（`check-package-info-fields` 只查要素齐全，查不出"引用了不存在的类"，这类失真只能靠移动时人眼核对） | domains 主码 + 测试源集编译绿 · 三份快照无变化（397/45/11）· 守卫 49/49 · `packages.md` 357→358 |
 
 > 历史批次（v0.3.0~v0.11.x，含 P/R/L/M/H/K/X/Q/B269 系列）全部在归档 `handoff/archive/HANDOFF-v0.10.x-2026-11-19.md` §12；追溯用 `git log --grep`。
 

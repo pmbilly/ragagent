@@ -69,7 +69,7 @@
 | Adapter 数 | 域 | 状态 |
 |---|---|---|
 | 1 | `agentmanagement` | ✅ 2026-11-19 |
-| 1 | `audit` · `memory` · `model` · `wiki` | 待做 |
+| 1 | `audit` · `memory` · `model` · `wiki` | ✅ 2026-11-19 |
 | 2 | `mcp` · `websearch` | 待做 |
 | 3 | `auth` | 待做 |
 | 4 | `storage` | 待做 |

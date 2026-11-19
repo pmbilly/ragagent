@@ -1,4 +1,4 @@
-package com.ragagent.model.api;
+package com.ragagent.model.adapter;
 
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelView;

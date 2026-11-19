@@ -1,4 +1,4 @@
-package com.ragagent.wiki.api;
+package com.ragagent.wiki.adapter;
 
 import com.ragagent.contract.wiki.WikiIndex;
 import com.ragagent.contract.wiki.WikiLinkRepairResult;

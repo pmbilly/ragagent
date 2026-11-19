@@ -1,4 +1,4 @@
-package com.ragagent.audit.api;
+package com.ragagent.audit.adapter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.audit.domain.AuditLog;
