@@ -1,4 +1,4 @@
-package com.ragagent.websearch.api;
+package com.ragagent.websearch.adapter;
 
 import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.pipeline.WebSearchExecutor;

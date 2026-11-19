@@ -70,7 +70,7 @@
 |---|---|---|
 | 1 | `agentmanagement` | ✅ 2026-11-19 |
 | 1 | `audit` · `memory` · `model` · `wiki` | ✅ 2026-11-19 |
-| 2 | `mcp` · `websearch` | 待做 |
+| 2 | `mcp` · `websearch` | ✅ 2026-11-19 |
 | 3 | `auth` | 待做 |
 | 4 | `storage` | 待做 |
 | 5 | `session` | 待做 |

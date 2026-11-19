@@ -1,4 +1,4 @@
-package com.ragagent.mcp.api;
+package com.ragagent.mcp.adapter;
 
 import com.ragagent.contract.pipeline.McpToolRegistrationPort;
 import com.ragagent.contract.pipeline.McpToolingGateway;

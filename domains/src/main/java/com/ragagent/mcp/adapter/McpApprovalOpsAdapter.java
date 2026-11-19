@@ -1,4 +1,4 @@
-package com.ragagent.mcp.api;
+package com.ragagent.mcp.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.BizException;
