@@ -11,7 +11,7 @@
 |---|---:|---:|---:|---|
 | **产品能力** | 7 | 851 | 21 | 直接产生用户价值、按产品需求演进的业务能力。 |
 | **集成适配** | 6 | 563 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
-| **控制面** | 3 | 161 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
+| **控制面** | 3 | 160 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
 | **能力配置** | 2 | 58 | 5 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
 | **初始化向导** | 1 | 11 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
 
@@ -32,7 +32,7 @@
 | `storage` | 集成适配 | 62 | 3 | 6 | `views/settings/StorageBackendSettings.vue` |
 | `websearch` | 集成适配 | 52 | 3 | 2 | `views/settings/WebSearchSettings.vue` |
 | `embedchannel` | 集成适配 | 25 | 1 | — | `views/embed` |
-| `auth` | 控制面 | 123 | 6 | 2 | `views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue` |
+| `auth` | 控制面 | 122 | 6 | 4 | `views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue` |
 | `audit` | 控制面 | 20 | 1 | 1 | `views/settings/panels/SystemAuditLog.vue` |
 | `system` | 控制面 | 18 | 2 | 1 | `views/settings/panels` |
 | `model` | 能力配置 | 38 | 4 | 2 | `views/settings/ModelSettings.vue` |
@@ -58,7 +58,7 @@
 | `storage` | `FileProxyController`、`StorageBackendController`、`StorageEngineController` | `FileUrlPort`、`GlobalFileServicePort`、`ProviderFileStorePort`、`ResourceCatalogPort`、`StorageBackendPort`、`StorageConnectivityPort` |
 | `websearch` | `WebSearchController`、`WebSearchProviderController`、`WebSearchProviderCredentialsController` | `WebSearchProviderPort`、`WebSearchTempStatePort` |
 | `embedchannel` | `EmbedChannelController` | — |
-| `auth` | `AuthController`、`TenantAPIKeyController`、`TenantAPIPrincipalController`、`TenantCatalogController`、`TenantInvitationController`、`TenantMemberController` | `TenantStorageQuotaPort`、`UserLookupPort` |
+| `auth` | `AuthController`、`TenantAPIKeyController`、`TenantAPIPrincipalController`、`TenantCatalogController`、`TenantInvitationController`、`TenantMemberController` | `AdminUserCommandPort`、`AdminUserPort`、`TenantStorageQuotaPort`、`UserLookupPort` |
 | `audit` | `AuditLogController` | `AuditWritePort` |
 | `system` | `SystemAdminController`、`SystemController` | `SystemSettingGateway` |
 | `model` | `ModelController`、`ModelCredentialsController`、`ModelDebugController`、`ModelOllamaController` | `ModelCatalogPort`、`ModelFactsPort` |

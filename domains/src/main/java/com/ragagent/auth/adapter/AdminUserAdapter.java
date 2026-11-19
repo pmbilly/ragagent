@@ -3,7 +3,6 @@ package com.ragagent.auth.adapter;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.auth.api.AuthUserErrors;
-import com.ragagent.auth.api.CreateUserResult;
 import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.TenantRowView;
@@ -12,7 +11,10 @@ import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.auth.service.PasswordPolicy;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
+import com.ragagent.contract.auth.AdminUserCommandPort;
+import com.ragagent.contract.auth.AdminUserPort;
 import com.ragagent.contract.auth.AdminUserView;
+import com.ragagent.contract.auth.CreateUserResult;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.pagination.PageResult;
@@ -46,7 +48,7 @@ import org.springframework.stereotype.Component;
  * 生成密码只出现一次且契约测试掩码。</p>
  */
 @Component
-public class AdminUserAdapter {
+public class AdminUserAdapter implements AdminUserPort, AdminUserCommandPort {
 
     private static final Logger log = LoggerFactory.getLogger(AdminUserAdapter.class);
 

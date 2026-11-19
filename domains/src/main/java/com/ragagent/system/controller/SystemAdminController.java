@@ -1,7 +1,6 @@
 package com.ragagent.system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.auth.api.CreateUserResult;
 import com.ragagent.auth.apikey.service.ApiKeyAdminAdapter;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.contract.apikey.APIKeyScopeType;
@@ -11,6 +10,7 @@ import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.contract.auth.AdminUserView;
+import com.ragagent.contract.auth.CreateUserResult;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.pagination.PageResult;

@@ -3,10 +3,10 @@ package com.ragagent.system.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.ragagent.auth.adapter.AdminUserAdapter;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
+import com.ragagent.contract.auth.AdminUserPort;
 import com.ragagent.contract.auth.AdminUserView;
 import com.ragagent.contract.settings.SystemSettingGateway;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
@@ -61,7 +61,7 @@ public class SystemSettingService implements SystemSettingGateway {
     private final SsrfGuard ssrfGuard;
     /** 三层解析的 ENV 层（Spring Environment，不读裸 System.getenv；键名由调用方给）。 */
     private final Environment environment;
-    private final AdminUserAdapter adminUserPort;
+    private final AdminUserPort adminUserPort;
     /** 配置兜底：未配置 → self_serve。 */
     @Value("${weknora.auth.registration-mode:}")
     private String configuredRegistrationMode;
@@ -74,7 +74,7 @@ public class SystemSettingService implements SystemSettingGateway {
                                 AuditWritePort auditWriter,
                                 SsrfGuard ssrfGuard,
                                 Environment environment,
-                                AdminUserAdapter adminUserPort,
+                                AdminUserPort adminUserPort,
                                 org.springframework.beans.factory.ObjectProvider<
                                         ConcurrencyGovernor> governorProvider) {
         this.adminUserPort = adminUserPort;

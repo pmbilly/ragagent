@@ -1,12 +1,13 @@
 package com.ragagent.system.service;
 
-import com.ragagent.auth.adapter.AdminUserAdapter;
 import com.ragagent.auth.api.AuthUserErrors;
-import com.ragagent.auth.api.CreateUserResult;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
+import com.ragagent.contract.auth.AdminUserCommandPort;
+import com.ragagent.contract.auth.AdminUserPort;
 import com.ragagent.contract.auth.AdminUserView;
+import com.ragagent.contract.auth.CreateUserResult;
 import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
@@ -18,9 +19,8 @@ import org.springframework.stereotype.Service;
 /**
  * 系统管理员 用户管理的**系统侧壳**：审计写入 + 控制器委托面。
  *
- * <p><b>本刀（C-13a）后</b>：用户/租户/成员的实际读写都归 auth 域（{@link AdminUserAdapter} 的实现
- * {@code auth/adapter/AdminUserAdapter}）——system 不再直引 {@code auth.mapper.UserMapper} /
- * {@code TenantService} / {@code TenantMemberService}（HANDOFF）。本类只负责：</p>
+ * <p>用户 / 租户 / 成员的读写都归 auth 域：查询走 {@link AdminUserPort}，写走
+ * {@link AdminUserCommandPort}。system 不直引 auth 的 mapper、实体或适配器实现。本类只负责：</p>
  * <ul>
  * <li>{@link #emitAdminAudit}：租户 0 + target user 的 best-effort 审计（失败记 WARN）；</li>
  * <li>{@link #systemAuditActorRole}：主体角色（平台 API-Key → {@code platform_api_key}）；</li>
@@ -38,14 +38,17 @@ public class SystemAdminUserService {
     public static final String ERR_USER_USERNAME_EXISTS = AuthUserErrors.USERNAME_EXISTS;
     public static final String ERR_USER_IDENTITY_CONFLICT = AuthUserErrors.IDENTITY_CONFLICT;
 
-    private final AdminUserAdapter adminUserPort;
+    private final AdminUserPort adminUserPort;
+    private final AdminUserCommandPort adminUserCommand;
     private final SystemSettingService settingService;
     private final AuditWritePort auditWriter;
 
-    public SystemAdminUserService(AdminUserAdapter adminUserPort,
+    public SystemAdminUserService(AdminUserPort adminUserPort,
+                                      AdminUserCommandPort adminUserCommand,
                                   SystemSettingService settingService,
                                   AuditWritePort auditWriter) {
         this.adminUserPort = adminUserPort;
+        this.adminUserCommand = adminUserCommand;
         this.settingService = settingService;
         this.auditWriter = auditWriter;
     }
@@ -69,21 +72,21 @@ public class SystemAdminUserService {
     }
 
     public AdminUserView promote(AdminUserView user) {
-        return adminUserPort.promote(user);
+        return adminUserCommand.promote(user);
     }
 
     public AdminUserView revoke(String userId, String callerId) {
-        return adminUserPort.revoke(userId, callerId);
+        return adminUserCommand.revoke(userId, callerId);
     }
 
     public void adminResetPassword(AdminUserView user, String newPassword) {
-        adminUserPort.resetPassword(user.getId(), newPassword);
+        adminUserCommand.resetPassword(user.getId(), newPassword);
     }
 
     public CreateUserResult adminCreateUser(String rawUsername, String rawEmail,
                                                      String password, boolean passwordPresent,
                                                      String provisioning) {
-        return adminUserPort.createUser(rawUsername, rawEmail, password, passwordPresent, provisioning,
+        return adminUserCommand.createUser(rawUsername, rawEmail, password, passwordPresent, provisioning,
                 complexPasswordEnabled());
     }
 
@@ -93,11 +96,11 @@ public class SystemAdminUserService {
     }
 
     public String validatePasswordPolicy(String password, boolean complexEnabled) {
-        return adminUserPort.validatePasswordPolicy(password, complexEnabled);
+        return adminUserCommand.validatePasswordPolicy(password, complexEnabled);
     }
 
     public String generatePolicyCompliantPassword(boolean complexEnabled) {
-        return adminUserPort.generatePolicyCompliantPassword(complexEnabled);
+        return adminUserCommand.generatePolicyCompliantPassword(complexEnabled);
     }
 
     public String resolveDefaultTenantMode() {

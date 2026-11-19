@@ -68,8 +68,7 @@ class PackageRestructureBoundaryTest {
      * </ul>
      */
     private static final Set<String> CROSS_DOMAIN_BASELINE = Set.of(
-            "session -> agentmanagement.service",
-            "system -> auth.adapter");
+            "session -> agentmanagement.service");
 
     /**
      * 注解 SQL 基线：主码里带 {@code @Select/@Insert/@Update/@Delete} 的方法数（2026-11-19 实测）。

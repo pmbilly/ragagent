@@ -5,7 +5,7 @@
 
 ## 统计
 
-- 域间（解耦）：**25**
+- 域间（解耦）：**27**
 - 复合面（随复合端口）：**7**
 - 跨模块（必要）：**12**
 
@@ -13,6 +13,8 @@
 
 | Port | 实现类 | 实现模块 | 调用方域 | 类型 |
 |---|---|---|---|---|
+| `AdminUserCommandPort` | `AdminUserAdapter` | domains | system | 域间（解耦） |
+| `AdminUserPort` | `AdminUserAdapter` | domains | system | 域间（解耦） |
 | `AuditWritePort` | `AuditWriteAdapter` | domains | agentmanagement、auth、datasource、knowledge、platform、system | 跨模块（必要） |
 | `ChunkFaqReadPort` | — | ? | — | 复合面（随复合端口） |
 | `ChunkPort` | `ChunkPortAdapter` | domains | wiki | 域间（解耦） |

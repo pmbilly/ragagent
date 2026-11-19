@@ -67,14 +67,8 @@
     {
       "from": "system",
       "to": "auth",
-      "target": "adapter",
-      "imports": 2
-    },
-    {
-      "from": "system",
-      "to": "auth",
       "target": "api",
-      "imports": 3
+      "imports": 1
     },
     {
       "from": "system",
@@ -90,7 +84,7 @@
     },
     {
       "from": "agenttools",
-      "imports": 151
+      "imports": 152
     },
     {
       "from": "audit",
@@ -98,7 +92,7 @@
     },
     {
       "from": "auth",
-      "imports": 139
+      "imports": 143
     },
     {
       "from": "datasource",
@@ -106,7 +100,7 @@
     },
     {
       "from": "embedchannel",
-      "imports": 24
+      "imports": 25
     },
     {
       "from": "favorite",
@@ -114,7 +108,7 @@
     },
     {
       "from": "im",
-      "imports": 49
+      "imports": 51
     },
     {
       "from": "initialization",
@@ -126,11 +120,11 @@
     },
     {
       "from": "mcp",
-      "imports": 82
+      "imports": 83
     },
     {
       "from": "memory",
-      "imports": 97
+      "imports": 98
     },
     {
       "from": "model",
@@ -138,7 +132,7 @@
     },
     {
       "from": "session",
-      "imports": 556
+      "imports": 562
     },
     {
       "from": "storage",
@@ -146,7 +140,7 @@
     },
     {
       "from": "system",
-      "imports": 33
+      "imports": 38
     },
     {
       "from": "vectorstore",
@@ -158,7 +152,7 @@
     },
     {
       "from": "wiki",
-      "imports": 136
+      "imports": 142
     }
   ]
 }
