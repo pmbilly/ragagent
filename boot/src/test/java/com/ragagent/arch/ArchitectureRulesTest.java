@@ -103,7 +103,7 @@ class ArchitectureRulesTest {
      * 而测试里读真实环境变量是<b>合法</b>的（例如各 connector 桩要读宿主 env 拼 SSRF 白名单），
      * 那些不是本规则的治理对象。</p>
      */
-    private static final JavaClasses MAIN = new ClassFileImporter()
+    static final JavaClasses MAIN = new ClassFileImporter()
             // 多模块布局：**不能用 location.asURI()** —— ArchUnit 对 jar 内的类求 asURI
             // 会抛异常，而"抛异常的导入选项"被当作**排除**，于是 :common（在 :boot 的
             // 类路径上以 jar 形态出现）被整段排除，A7 基线条目随即报"已不再违例"（实测踩到，

@@ -29,7 +29,7 @@
 
 **阶段**：P0 基线 → P1 规则先行 → P2 纯包移动 → P3 类职责归位 → P4 `api` 语义与边界校验（见 §5）。
 
-**当前状态（2026-11-19）**：**P0 已完成**（三份基线入库、可复现），P1 待做。代码在 `v0.11.x`；基线前 16 天 115 个提交均为功能修补，无模块增减、无契约面变更、无表结构变更。
+**当前状态（2026-11-19）**：**P0、P1 已完成**（三份基线入库且可复现；跨域直连与注解 SQL 两条棘轮上线），P2 待做。代码在 `v0.11.x`；基线前 16 天 115 个提交均为功能修补，无模块增减、无契约面变更、无表结构变更。
 
 ## 1. 仓库身份与分支
 
@@ -79,7 +79,7 @@
 | 批 | 内容 | 验收 | 状态 |
 |---|---|---|---|
 | **P0** | 三份只读基线：`scripts/gen-package-baseline.py` 生成端点 / 装配面 / 跨域引用三份 JSON | 端点 397 · Mapper 45 · `@Configuration` 23 · 跨域边 11 · 可复现（`--check` 无变化） | ✅ 2026-11-19 |
-| **P1** | 结构规则先行：**只补 2 条**（跨域不引对方 `repository`/`mapper`/`domain`/`service`/`controller`；注解 SQL 棘轮 281→只减）+ 扫描名单核对（`@ConfigurationPropertiesScan` 11 包 / `@MapperScan` 通配 / 无 `@Aspect`） | 先出现状违规清单（只量不改）；违规只减不增 | 待做 |
+| **P1** | 结构规则先行：新增 `PackageRestructureBoundaryTest`（R-1 跨域直连棘轮 2 条边 / R-2 注解 SQL 精确 282）+ 扫描名单核对（`@ConfigurationPropertiesScan` 11 包 / `@MapperScan` 通配 / 无 `@Aspect`） | R-1 与 R-2 均绿；`ArchitectureRulesTest` 22 条不受影响；守卫 49/49 | ✅ 2026-11-19 |
 | **P2** | 纯包移动：只改目录与 `package` 声明，不改类名、不改逻辑 | 编译 + 全量闸门 + 三份快照 diff 为空 | 待做 |
 | **P3** | 类职责归位：`*Ops`(50) / `*Support`(21) / `*Wiring`(13) 合并回 service | 该域定向测试 + 金片 + 全量闸门 | 待做 |
 | **P4** | `api/` 包语义纠正 + 域间边界改为测试校验 | 结构校验通过；跨域直连引用 0 | 待做 |
@@ -105,16 +105,20 @@ H7（platform 判据换血）· H8（适配层逻辑化）· H9（管理面模�
 - CI 三 job：guards（`bash scripts/run-guards.sh` 为准）· backend（spotless ratchet + 全量测试 + 灌 `V1__baseline.sql` 进全新 ParadeDB）· frontend（type-check + test + build）。`seed` tag 已推送（spotless ratchet 需要）。
 - 全量闸门（**推送/批次收尾必跑**；迭代中按 §9 分档）：
   ```bash
-  cd ~/ragagent && env -u SYSTEM_AES_KEY JAVA_HOME=/opt/homebrew/opt/openjdk@21 mvn -B verify
+  cd ~/ragagent && env -u SYSTEM_AES_KEY \
+    ZZ_PG_JDBC=jdbc:postgresql://localhost:15432/RagAgent \
+    JAVA_HOME=/opt/homebrew/opt/openjdk@21 mvn -B verify
   ```
-  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（最近基数 **5082 / 失败 0 / 跳过 2**，2026-10-24 实测；含 agent-engine 157 条——旧口径 4867 漏算该模块）。**该基数已于 2026-11-19 过期**（此后 115 个提交未重测）：下次全量时按实测数字更新，并在 §12 对应批次记下新基数。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
+  **`ZZ_PG_JDBC` 必给**：`GrepChunksRecordingTest` 与 `DatabaseQueryRecordingTest` 默认连 `WeKnora`（CI 的库名），本机库名是 `RagAgent`；不给会在 domains 报 `database "WeKnora" does not exist`，两个测试设计为「不可达即失败、不许跳过」。
+  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（2026-11-19 实测：contract 12 · platform 262 · agent-engine 157 · domains **2862** · boot **1358**；旧口径 5082 已过期）。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
   **环境前置**：PG `max_connections=100`，多个 boot jar 残留会占满连接（实测 5 个实例 = 50 条 ⇒ `too many clients`）。跑闸门前先 `ps -Ao pid,command | grep '[b]oot/build/libs/boot'` 清残留。
+- **⚠️ IDE 自动构建会与 Maven 抢 `target/`**：2026-11-19 实测，`clean verify` 期间 IDE 写入半成品 class，domains 测试随机报 `Unresolved compilation problems`（JDT 专属措辞）或 `cannot access Xxx`/`incompatible types`，且每次报错的文件不同。判别：换一个错误文件就是竞争，不是回归。处理：跑闸门前关闭 IDE 自动构建；仍复现就把后端复制到独立目录构建（`rsync --exclude target --exclude .git --exclude frontend`，守卫在真实仓库另跑）。
 - **dev 数据修复（2026-10-20）**：软删守卫误拦窗口（H5b~H5b-fix 之间）里生成失败的 5 条 embed 历史回答，已按会话用 embed `ensure` 补建 `message_suggestion_sets`（状态 `suppressed/disabled`，该智能体追问关闭）；全库 embed 历史已无「缺建议集合」行。
 - 前端（触契约时）：`cd frontend && npx vue-tsc --build --force` + `npm test`。
 
 ## 7. 测试与安全网
 
-- 回归网：**~5082 用例（2026-10-24 口径，已过期）/ 1,339 契约金片**；每一步（哪怕纯移动）结束必须全绿。
+- 回归网：**1,339 契约金片 + 五个模块 4,651 条用例**（2026-11-19 实测：contract 12 · platform 262 · agent-engine 157 · domains 2,862 · boot 1,358；retrieval-engine 未单列）；每一步（哪怕纯移动）结束必须全绿。
 - 已知偶发（全量并发下，单独重跑即绿，勿误判回归）：`WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool` · `EvaluationContractTest.getTerminalRunsExecution` · `EmbedRateLimiterTest.redisPathSharesBudgetAcrossInstances`。
 - **Redis 瞬态族已修（2026-10-19）**：根因是 `EmbeddedRedis` 用 `ServerSocket(0)` 探端口在 `maxParallelForks` 下会撞——后到者借用先到者的实例，先到者 close 杀进程后连接全断。现改为固定端口池 + 跨进程 `FileLock`，红态探针 `EmbeddedRedisPortAllocationTest` 守着；全量连跑 5 遍 0 失败。再见到同类失败按真回归查。
 - 覆盖率：**未执行基线**（`-Pcoverage`）⇒ 本项目**不声称任何覆盖率数字**（开放项）。
@@ -270,6 +274,7 @@ boot           17 件                      →  boot
 | 批 | 日期 | 内容 | 读数 / 验证 |
 |---|---|---|---|
 | **P0** | 2026-11-19 | 新增 `scripts/gen-package-baseline.py`，静态生成三份基线（不启动应用）：`endpoint-inventory.json`（397 条控制器映射）、`bean-inventory.json`（45 Mapper / 23 `@Configuration` / 0 `@Aspect` / `@MapperScan` 通配 / `@ConfigurationPropertiesScan` 11 包 / `spring.factories` 1 处 / `logging.level` 1 条）、`cross-domain-imports.json`（19 域、11 条跨域边、19 个域均引 contract） | `--write` 后 `--check` 三份均无变化（可复现）；守卫 48/48 绿 |
+| **P1** | 2026-11-19 | 新增 `boot/src/test/java/com/ragagent/arch/PackageRestructureBoundaryTest`：**R-1** 跨域直连棘轮（19 域白名单，禁入对方 `repository`/`mapper`/`domain`/`service`/`controller`，基线 2 条边：`knowledge→wiki.service`、`session→agentmanagement.service`）；**R-2** 注解 SQL 精确计数（282 个方法，新增或减少都红，强制同步基线）。`ArchitectureRulesTest.MAIN` 改包内可见以复用一次性导入。四条原计划规则中三条已由既有 A7/A11/A11b/A16/A19/C10 覆盖，未重复造 | R-1/R-2 绿 · `ArchitectureRulesTest` 22 条绿 · boot 1,358 条绿 · domains 2,862 条绿（隔离目录） · 守卫 49/49 · 金片 1,339 未动 |
 
 > 历史批次（v0.3.0~v0.11.x，含 P/R/L/M/H/K/X/Q/B269 系列）全部在归档 `handoff/archive/HANDOFF-v0.10.x-2026-11-19.md` §12；追溯用 `git log --grep`。
 
