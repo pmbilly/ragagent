@@ -168,6 +168,29 @@ wiki 的 17 处回引逐一评估后，只有一类值得改：
 
 判据一句话：**看协作者需要父对象的哪一部分**——只有"注入依赖"可外提；"编排、状态、业务方法"外提只是把耦合换个地方。
 
+**可操作形式（2026-11-19 最终核验）**：统计协作者引用的父类成员里，字段（F）与方法（M）各几个。**只有 M = 0 才可改**。
+
+对全仓剩余 17 处逐条统计，**全部 M ≥ 1**，没有一处是纯字段依赖：
+
+| 类 | F | M | 卡在哪 |
+|---|---|---|---|
+| `MemoryInsightOps` | 4 | 8 | `enabledScope` / `extractModelId` / `recallSelector` 等 |
+| `UserSessionOps` | 3 | 8 | 父类就是它唯一依赖（传 `this` 等于传依赖本身） |
+| `MemoryCatalogOps` | 2 | 5 | `enabledScope` / `enforceCapacity` / `rebuildBlock` |
+| `MemoryRecallOps` | 2 | 3 | `enabledScope` / `scopeDisableReason` |
+| `OAuthTokenOps` | 3 | 3 | `getResourceUrl` / `getServerMetadata` / `stateLock` |
+| `NotionFetchOps` · `FeishuDriveOps` · `FeishuWikiTreeOps` | 0 | 2 | client 的 HTTP 与分页方法 |
+| `AuthSessionOps` | 1 | 2 | `invalidParams` / `bindingError`（web 工具） |
+| `WikiPageViewsSupport` | 3 | 2 | `getIndex` / `listIssues` |
+| `WikiIngestFinalizePhase` | 0 | 2 | `getKnowledgeBaseByIdOnly` / 锁 |
+| `EmbedChannelDelegateOps` | 3 | 2 | `ensureSession`（读 `request0()`） |
+| `DataSourceSyncExecutor` | 8 | 1 | 8 个字段可传，但 +1 后 9 参超红线 |
+| `AuthOidcOps` | 3 | 1 | `resolveDefaultTenantMode` |
+| `WikiPageRevisionOps` | 1 | 1 | `updatePage`（65 行业务链） |
+| `SessionQaResolution` | 0 | 1 | `buildSearchTargets`（构造 5 个子协作者） |
+
+另一条易误判：**方法参数不算回引**。`ImOutboundFormatter` 里的 `adapter.sendReply(...)` 中 `adapter` 是方法参数，不是父类成员——它只有 `storageResolver` 一个字段依赖，已改（P3-13）。核对前缀是字段还是局部变量/参数，可避免这类误判。
+
 **判据的术语来源**：这套判据不是自创规则，背后是三条标准原则——依赖倒置（依赖抽象而非实现）、接口隔离（端口要窄，如把 10 个方法拆成查询/写两个端口）、迪米特法则（只和直接朋友说话：`service.repo.getBySlug(...)` 属"通过熟人拿陌生人"，改成自己持有 `repo`）。"构造只依赖窄接口"只是对这三条的中文概括。
 
 **不设自动化守卫的理由**：`Service` 类互相注入是合法的（编排者本来就要调下游），按"构造参数是 `*Service`"判会把正常注入一起判红；且这种回引是历史包袱的产物，新代码很难自然写出（Spring 自动给依赖，没人会 `new X(this)`）。已有 `check-file-size`（类太大就红）会逼着人拆，拆时自然会想到不传 `this`。故本条落为**人工评审判据**，不入守卫。
