@@ -10,6 +10,7 @@ import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.wiki.service.ingest.support.WikiDedupSupport;
+import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * 抽取项去重协作者:候选组渲染、LLM 去重仲裁与投影稳定化。
@@ -32,10 +34,16 @@ final class WikiIngestExtractDedup {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final WikiIngestService service;
+    private final ObjectProvider<WikiDedupSupport> dedupSupport;
+    private final WikiIngestLlmSupport llm;
+    private final WikiPageService wikiService;
 
-    WikiIngestExtractDedup(WikiIngestService service) {
-        this.service = service;
+    WikiIngestExtractDedup(ObjectProvider<WikiDedupSupport> dedupSupport,
+                           WikiIngestLlmSupport llm,
+                           WikiPageService wikiService) {
+        this.dedupSupport = dedupSupport;
+        this.llm = llm;
+        this.wikiService = wikiService;
     }
 
     /**
@@ -139,7 +147,7 @@ final class WikiIngestExtractDedup {
                                                          List<ExtractedItem> entities,
                                                          List<ExtractedItem> concepts,
                                                          WikiBatchContext batchCtx) {
-        WikiDedupSupport dedup = service.dedupSupport.getIfAvailable();
+        WikiDedupSupport dedup = dedupSupport.getIfAvailable();
         if (dedup == null) {
             log.info("wiki ingest: dedup support not wired, skipping deduplication for {} + {} items",
                     entities.size(), concepts.size());
@@ -163,7 +171,7 @@ final class WikiIngestExtractDedup {
                 for (String q : queries) {
                     List<WikiPageLite> pages;
                     try {
-                        pages = service.wikiService.findSimilarPages(kbId, q,
+                        pages = wikiService.findSimilarPages(kbId, q,
                                 List.of(WikiConstants.PAGE_TYPE_ENTITY, WikiConstants.PAGE_TYPE_CONCEPT),
                                 WikiDedupSupport.DEDUP_CANDIDATE_TOP_K);
                     } catch (Exception e) {
@@ -220,7 +228,7 @@ final class WikiIngestExtractDedup {
         }
         String dedupeJson;
         try {
-            dedupeJson = service.llm.generateWithTemplate(chatModel, WikiPrompts.WIKI_DEDUPLICATION_PROMPT,
+            dedupeJson = llm.generateWithTemplate(chatModel, WikiPrompts.WIKI_DEDUPLICATION_PROMPT,
                     Map.of("Candidates", candBuf.toString()));
         } catch (Exception e) {
             log.warn("wiki ingest: deduplication LLM call failed", e);

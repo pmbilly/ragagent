@@ -9,7 +9,6 @@ import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.contract.wiki.WikiEnqueueResult;
 import com.ragagent.contract.wiki.WikiIngestPort;
 import com.ragagent.contract.wiki.WikiKnowledgeFinalizer;
-import com.ragagent.platform.concurrent.SingleFlight;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.domain.ingest.WikiFinalizeChange;
@@ -38,9 +37,7 @@ import com.ragagent.wiki.service.page.WikiPageService;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -120,30 +117,8 @@ public class WikiIngestService implements WikiIngestSlotReleaser, WikiIngestPort
      */
     final Set<String> liteFinalizeLocks = ConcurrentHashMap.newKeySet();
 
-    /**
-     * 合并进程内<b>字节完全相同</b>的并发 prompt。
-     */
-    final SingleFlight llmRequests = new SingleFlight();
-
-    /**
-     * 只串行化同一个可复用 Wiki 页面
-     * 前缀的<b>首个</b>请求；其它前缀与已经预热过的同类保持并行。
-     */
-    final ConcurrentHashMap<String, PromptWarmup> promptWarmups = new ConcurrentHashMap<>();
-
-    /** 预热标记的回收器：预热完成后延迟数分钟移除标记（覆盖并行 reduce 突发，又不常驻缓存）。 */
-    final java.util.concurrent.ScheduledExecutorService warmupReaper =
-            java.util.concurrent.Executors.newSingleThreadScheduledExecutor(r -> {
-                Thread t = new Thread(r, "wiki-prompt-warmup-reaper");
-                t.setDaemon(true);
-                return t;
-            });
-
-    /** 一次预热的完成标记（done 完成信号 + closed 幂等关闭位） */
-    static final class PromptWarmup {
-        final CompletableFuture<Void> done = new CompletableFuture<>();
-        final AtomicBoolean closed = new AtomicBoolean(false);
-    }
+    /** 提示词预热的运行态状态（单飞锁 / 预热标记 / 回收器）：与 llm 协作者共享同一实例。 */
+    final LlmWarmupState llmState = new LlmWarmupState();
 
     // ── seam 委托:实现随协作者(测试与 CitePipeline/Taxonomy 直引) ──
 
@@ -237,14 +212,14 @@ public class WikiIngestService implements WikiIngestSlotReleaser, WikiIngestPort
         this.knowledgeFinalizer = knowledgeFinalizer;
         this.imageEnricher = imageEnricher;
         this.taskHandler = taskHandler;
-        this.contentOps = new WikiIngestContentSupport(this);
-        this.settleOps = new WikiIngestSettleOps(this);
-        this.queueOps = new WikiIngestQueueOps(this);
-        this.enqueueOps = new WikiIngestEnqueueOps(this);
-        this.pageOps = new WikiIngestPageOps(this);
-        this.indexOps = new WikiIngestIndexOps(this);
-        this.extractDedup = new WikiIngestExtractDedup(this);
-        this.llm = new WikiIngestLlmSupport(this);
+        this.contentOps = new WikiIngestContentSupport(kbLookup, tombstoneStore, imageEnricher);
+        this.queueOps = new WikiIngestQueueOps(pendingRepo);
+        this.settleOps = new WikiIngestSettleOps(deadLetterRepo, knowledgeFinalizer, pendingRepo, queueOps);
+        this.enqueueOps = new WikiIngestEnqueueOps(pendingRepo, taskQueue);
+        this.pageOps = new WikiIngestPageOps(crossLinker, wikiService);
+        this.llm = new WikiIngestLlmSupport(llmState);
+        this.indexOps = new WikiIngestIndexOps(llm, wikiService);
+        this.extractDedup = new WikiIngestExtractDedup(dedupSupport, llm, wikiService);
     }
 
     // 模式判定 / Lite 锁
@@ -526,6 +501,6 @@ public class WikiIngestService implements WikiIngestSlotReleaser, WikiIngestPort
 
     /** 供可观测/测试：当前在飞行的 LLM 请求数 */
     public int inflightLlmRequests() {
-        return llmRequests.inflightCount();
+        return llmState.inflightCount();
     }
 }

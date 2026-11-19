@@ -6,6 +6,7 @@ import com.ragagent.wiki.service.ingest.support.DocIngestResult;
 import com.ragagent.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.wiki.service.page.WikiCrossLinker;
 import com.ragagent.wiki.service.page.WikiDeadLinks;
+import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Reduce 后的页面运维协作者:死链摘要清理、死链清理与交叉链接注入。
@@ -25,10 +27,13 @@ public final class WikiIngestPageOps {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestPageOps.class);
 
-    private final WikiIngestService service;
+    private final ObjectProvider<WikiCrossLinker> crossLinker;
+    private final WikiPageService wikiService;
 
-    WikiIngestPageOps(WikiIngestService service) {
-        this.service = service;
+    WikiIngestPageOps(ObjectProvider<WikiCrossLinker> crossLinker,
+                      WikiPageService wikiService) {
+        this.crossLinker = crossLinker;
+        this.wikiService = wikiService;
     }
 
     /**
@@ -52,7 +57,7 @@ public final class WikiIngestPageOps {
                 continue;
             }
             String summarySlug = "summary/" + WikiTextUtils.slugify(r.getKnowledgeId());
-            WikiPage page = service.wikiService.findPageBySlug(kbId, summarySlug);
+            WikiPage page = wikiService.findPageBySlug(kbId, summarySlug);
             if (page == null) {
                 continue;
             }
@@ -75,7 +80,7 @@ public final class WikiIngestPageOps {
             }
             page.setContent(stripped.content());
             try {
-                service.wikiService.updateAutoLinkedContent(page);
+                wikiService.updateAutoLinkedContent(page);
             } catch (Exception e) {
                 log.warn("wiki ingest: failed to sanitize dead links in summary {}", summarySlug, e);
                 continue;
@@ -103,7 +108,7 @@ public final class WikiIngestPageOps {
         }
         int cleaned = 0;
         for (String slug : affectedSlugs) {
-            WikiPage page = service.wikiService.findPageBySlug(kbId, slug);
+            WikiPage page = wikiService.findPageBySlug(kbId, slug);
             if (page == null) {
                 continue;
             }
@@ -118,7 +123,7 @@ public final class WikiIngestPageOps {
             }
             Map<String, Boolean> liveMap;
             try {
-                liveMap = service.wikiService.existsSlugs(kbId, new ArrayList<>(page.getOutLinks()));
+                liveMap = wikiService.existsSlugs(kbId, new ArrayList<>(page.getOutLinks()));
             } catch (Exception e) {
                 log.warn("wiki: ExistsSlugs failed during dead-link cleanup for {}", slug, e);
                 continue;
@@ -151,7 +156,7 @@ public final class WikiIngestPageOps {
             }
             page.setContent(stripped.content());
             try {
-                service.wikiService.updateAutoLinkedContent(page);
+                wikiService.updateAutoLinkedContent(page);
             } catch (Exception e) {
                 log.warn("wiki: failed to clean dead links in page {}", page.getSlug(), e);
                 continue;
@@ -189,10 +194,10 @@ public final class WikiIngestPageOps {
         if (affectedSlugs == null || affectedSlugs.isEmpty()) {
             return;
         }
-        WikiCrossLinker linker = service.crossLinker.getIfAvailable(WikiCrossLinker.Noop::new);
+        WikiCrossLinker linker = crossLinker.getIfAvailable(WikiCrossLinker.Noop::new);
         int updated = 0;
         for (String slug : affectedSlugs) {
-            WikiPage page = service.wikiService.findPageBySlug(kbId, slug);
+            WikiPage page = wikiService.findPageBySlug(kbId, slug);
             if (page == null) {
                 continue;
             }
@@ -232,7 +237,7 @@ public final class WikiIngestPageOps {
             }
             page.setContent(result.content());
             try {
-                service.wikiService.updateAutoLinkedContent(page);
+                wikiService.updateAutoLinkedContent(page);
             } catch (Exception e) {
                 log.warn("wiki ingest: cross-link injection failed for {}", page.getSlug(), e);
                 continue;

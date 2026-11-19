@@ -12,6 +12,7 @@ import com.ragagent.wiki.domain.ingest.WikiIngestPayload;
 import com.ragagent.wiki.domain.ingest.WikiIngestTask;
 import com.ragagent.wiki.domain.ingest.WikiPendingOp;
 import com.ragagent.wiki.domain.ingest.WikiRetractPayload;
+import com.ragagent.wiki.repository.TaskPendingOpsRepository;
 import com.ragagent.wiki.repository.ingest.WikiIngestTaskQueue;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * wiki 摄取的写面：待办 op 持久化（task_pending_ops）、ingest/retract 投递、
@@ -30,10 +32,13 @@ final class WikiIngestEnqueueOps {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestEnqueueOps.class);
 
-    private final WikiIngestService service;
+    private final TaskPendingOpsRepository pendingRepo;
+    private final ObjectProvider<WikiIngestTaskQueue> taskQueue;
 
-    WikiIngestEnqueueOps(WikiIngestService service) {
-        this.service = service;
+    WikiIngestEnqueueOps(TaskPendingOpsRepository pendingRepo,
+                         ObjectProvider<WikiIngestTaskQueue> taskQueue) {
+        this.pendingRepo = pendingRepo;
+        this.taskQueue = taskQueue;
     }
 
     // ── 投递：ingest / retract ──
@@ -46,11 +51,11 @@ final class WikiIngestEnqueueOps {
      * （它属于 knowledge 模块的删除路径），因此当前是普通入队。</p>
      */
     boolean enqueueWikiPendingOp(TaskPendingOp op) {
-        if (service.pendingRepo == null) {
+        if (pendingRepo == null) {
             // pendingRepo 缺席：直接视为已接受
             return true;
         }
-        service.pendingRepo.enqueue(op);
+        pendingRepo.enqueue(op);
         return true;
     }
 
@@ -131,7 +136,7 @@ final class WikiIngestEnqueueOps {
         WikiIngestPayload trigger = WikiIngestPayload.withTracing(
                 tenantId, kbId, WikiLanguageSupport.languageFromContextOrDefault(),
                 TraceInjector.inject());
-        WikiIngestTaskQueue queue = service.taskQueue.getIfAvailable();
+        WikiIngestTaskQueue queue = taskQueue.getIfAvailable();
         if (queue == null) {
             throw new IllegalStateException("enqueue wiki ingest trigger: task queue is not wired");
         }
@@ -190,7 +195,7 @@ final class WikiIngestEnqueueOps {
         WikiIngestPayload trigger = WikiIngestPayload.withTracing(
                 payload.tenantId(), payload.knowledgeBaseId(), payload.language(),
                 TraceInjector.inject());
-        WikiIngestTaskQueue queue = service.taskQueue.getIfAvailable();
+        WikiIngestTaskQueue queue = taskQueue.getIfAvailable();
         if (queue == null) {
             throw new IllegalStateException("wiki retract: task queue is not wired");
         }
@@ -227,7 +232,7 @@ final class WikiIngestEnqueueOps {
                                 Map<String, String> freshTitleBySlug,
                                 List<WikiFinalizeChange> changes,
                                 List<String> folderIds) {
-        if (service.pendingRepo == null) {
+        if (pendingRepo == null) {
             // 没有持久化队列就没有 finalize 工作可记
             return;
         }
@@ -305,7 +310,7 @@ final class WikiIngestEnqueueOps {
      * ——在 Lite 面向的小规模下可以接受。</p>
      */
     void scheduleFinalize(WikiIngestPayload payload) {
-        WikiIngestTaskQueue queue = service.taskQueue.getIfAvailable();
+        WikiIngestTaskQueue queue = taskQueue.getIfAvailable();
         if (queue == null) {
             return;
         }
@@ -328,7 +333,7 @@ final class WikiIngestEnqueueOps {
      * 删除一次，而空的通道是 no-op。
      */
     void scheduleFinalizeRetry(WikiIngestPayload payload) {
-        WikiIngestTaskQueue queue = service.taskQueue.getIfAvailable();
+        WikiIngestTaskQueue queue = taskQueue.getIfAvailable();
         if (queue == null) {
             return;
         }
@@ -350,7 +355,7 @@ final class WikiIngestEnqueueOps {
      * 保证会在槽位释放后得到处理。</p>
      */
     void scheduleCappedRetry(WikiIngestPayload payload) {
-        WikiIngestTaskQueue queue = service.taskQueue.getIfAvailable();
+        WikiIngestTaskQueue queue = taskQueue.getIfAvailable();
         if (queue == null) {
             return;
         }
@@ -385,7 +390,7 @@ final class WikiIngestEnqueueOps {
     boolean scheduleStaleClaimRecheck(WikiIngestPayload payload) {
         long count;
         try {
-            count = service.pendingRepo.pendingCount(
+            count = pendingRepo.pendingCount(
                     WikiIngestConstants.TASK_TYPE,
                     WikiIngestConstants.TASK_SCOPE,
                     payload.knowledgeBaseId());
@@ -398,7 +403,7 @@ final class WikiIngestEnqueueOps {
         log.info("wiki ingest: {} rows for KB {} held by fresh claims, arming stale-claim recheck",
                 count, payload.knowledgeBaseId());
 
-        WikiIngestTaskQueue queue = service.taskQueue.getIfAvailable();
+        WikiIngestTaskQueue queue = taskQueue.getIfAvailable();
         if (queue == null) {
             return false;
         }

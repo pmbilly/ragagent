@@ -39,10 +39,10 @@ final class WikiIngestLlmSupport {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final WikiIngestService service;
+    private final LlmWarmupState state;
 
-    WikiIngestLlmSupport(WikiIngestService service) {
-        this.service = service;
+    WikiIngestLlmSupport(LlmWarmupState state) {
+        this.state = state;
     }
 
     /**
@@ -188,7 +188,7 @@ final class WikiIngestLlmSupport {
             return WikiImageMarkup.unmaskImageURLs(content, maskedData.tokenToUrl());
         }
         try {
-            CompletableFuture<Object> result = service.llmRequests.doChan(requestKey, execute);
+            CompletableFuture<Object> result = state.llmRequests.doChan(requestKey, execute);
             content = (String) SingleFlight.await(result);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -236,8 +236,8 @@ final class WikiIngestLlmSupport {
         if (key == null || key.isEmpty()) {
             return () -> { };
         }
-        WikiIngestService.PromptWarmup candidate = new WikiIngestService.PromptWarmup();
-        WikiIngestService.PromptWarmup existing = service.promptWarmups.putIfAbsent(key, candidate);
+        LlmWarmupState.PromptWarmup candidate = new LlmWarmupState.PromptWarmup();
+        LlmWarmupState.PromptWarmup existing = state.promptWarmups.putIfAbsent(key, candidate);
         if (existing == null) {
             // leader
             return () -> {
@@ -246,7 +246,7 @@ final class WikiIngestLlmSupport {
                 }
                 // 保持本地"已预热"标记足够久以覆盖并行的 reduce 突发，
                 // 又不至于变成常驻应用缓存
-                service.warmupReaper.schedule(() -> service.promptWarmups.remove(key, candidate),
+                state.warmupReaper.schedule(() -> state.promptWarmups.remove(key, candidate),
                         4, TimeUnit.MINUTES);
             };
         }
@@ -266,6 +266,6 @@ final class WikiIngestLlmSupport {
 
     /** 供测试/可观测：当前的预热标记数 */
     public int promptWarmupCount() {
-        return service.promptWarmups.size();
+        return state.promptWarmups.size();
     }
 }

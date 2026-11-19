@@ -36,10 +36,10 @@ final class WikiIngestMapPhase {
     private static final Logger log = LoggerFactory.getLogger(WikiIngestMapPhase.class);
 
 
-    private final WikiIngestBatchHandler handler;
+    private final WikiIngestStageContext ctx;
 
-    WikiIngestMapPhase(WikiIngestBatchHandler handler) {
-        this.handler = handler;
+    WikiIngestMapPhase(WikiIngestStageContext ctx) {
+        this.ctx = ctx;
     }
 
 
@@ -65,15 +65,15 @@ final class WikiIngestMapPhase {
         // 页级 span：沿 LatestAttempt →
         // postprocess stage 找父 span，在其下开 postprocess.wiki。找不到父 → null，
         // 后续 helper 全部 no-op（best-effort，追踪绝不阻断批次）。
-        KnowledgeSpanPort.SpanHandle wikiSpan = handler.spans.beginWikiSubspan(knowledgeId,
+        KnowledgeSpanPort.SpanHandle wikiSpan = ctx.spans.beginWikiSubspan(knowledgeId,
                 Map.of("language", lang, "knowledge_base_id", kbId));
 
         // 守卫 ingest/delete 竞争：用户在任务排队期间（wikiIngestDelay = 30 秒）或更早
         // 阶段在途期间删掉了文档，我们<b>绝不</b>能继续做 LLM 抽取——那会建出 source_refs
         // 指向幽灵 knowledge ID 的 wiki 页面，永远无法经 wiki_read_source_doc 到达。
-        if (handler.ingestService.isKnowledgeGone(kbId, knowledgeId)) {
+        if (ctx.ingestService.isKnowledgeGone(kbId, knowledgeId)) {
             log.info("wiki ingest: knowledge {} has been deleted, skip map", knowledgeId);
-            handler.spans.skipSpan(wikiSpan, "knowledge_deleted");
+            ctx.spans.skipSpan(wikiSpan, "knowledge_deleted");
             return new WikiIngestBatchHandler.MapResult(null, null);
         }
 
@@ -88,7 +88,7 @@ final class WikiIngestMapPhase {
         // 引用来源引用。<b>刻意</b>只用 knowledge ID（不用 docTitle，后者通常是上传文件名），
         // 这样文件名不会泄漏进下游 LLM prompt 可能读到的引用字符串里。
         String sourceRef = knowledgeId;
-        Set<String> oldPageSlugs = handler.ingestService.getExistingPageSlugsForKnowledge(kbId, knowledgeId);
+        Set<String> oldPageSlugs = ctx.ingestService.getExistingPageSlugsForKnowledge(kbId, knowledgeId);
 
         Extraction extraction = extractCandidatesWithFallback(
                 chatModel, kbId, content, lang, oldPageSlugs, batchCtx, wikiSpan, knowledgeId);
@@ -182,7 +182,7 @@ final class WikiIngestMapPhase {
         Map<String, Object> extractInput = new LinkedHashMap<>();
         extractInput.put("content_chars", content.codePointCount(0, content.length()));
         extractInput.put("old_pages", oldPageSlugs == null ? 0 : oldPageSlugs.size());
-        KnowledgeSpanPort.SpanHandle extractSpan = handler.spans.beginSubSpan(wikiSpan,
+        KnowledgeSpanPort.SpanHandle extractSpan = ctx.spans.beginSubSpan(wikiSpan,
                 "postprocess.wiki.extract", extractInput);
 
         List<ExtractedItem> entities;
@@ -190,7 +190,7 @@ final class WikiIngestMapPhase {
         Map<String, ExtractedItem> slugItems;
         boolean pass0Failed = false;
         try {
-            WikiIngestCitePipeline.CandidateSlugs candidates = handler.citePipeline.extractCandidateSlugs(
+            WikiIngestCitePipeline.CandidateSlugs candidates = ctx.citePipeline.extractCandidateSlugs(
                     chatModel, kbId, content, lang, oldPageSlugs, batchCtx);
             entities = candidates.entities();
             concepts = candidates.concepts();
@@ -201,15 +201,15 @@ final class WikiIngestMapPhase {
             pass0Failed = true;
             try {
                 WikiIngestCitePipeline.CandidateSlugs fallback =
-                        handler.citePipeline.extractEntitiesAndConceptsNoUpsert(
+                        ctx.citePipeline.extractEntitiesAndConceptsNoUpsert(
                                 chatModel, kbId, content, lang, oldPageSlugs, batchCtx);
                 entities = fallback.entities();
                 concepts = fallback.concepts();
                 slugItems = fallback.slugItems();
             } catch (RuntimeException e2) {
                 log.warn("wiki ingest: single-pass fallback also failed for {}", knowledgeId, e2);
-                handler.spans.failSpan(extractSpan, "EXTRACT_FAILED", e2.getMessage(), e2);
-                handler.spans.failSpan(wikiSpan, "EXTRACT_FAILED", e2.getMessage(), e2);
+                ctx.spans.failSpan(extractSpan, "EXTRACT_FAILED", e2.getMessage(), e2);
+                ctx.spans.failSpan(wikiSpan, "EXTRACT_FAILED", e2.getMessage(), e2);
                 throw e2;
             }
         }
@@ -220,7 +220,7 @@ final class WikiIngestMapPhase {
         extractOut.put("pass0_fallback", pass0Failed);
         extractOut.put("entities_preview", WikiIngestPreviews.previewExtractedItems(entities, 8));
         extractOut.put("concepts_preview", WikiIngestPreviews.previewExtractedItems(concepts, 8));
-        handler.spans.endSpan(extractSpan, extractOut);
+        ctx.spans.endSpan(extractSpan, extractOut);
         return new Extraction(entities, concepts, slugItems, pass0Failed);
     }
 
@@ -257,18 +257,18 @@ final class WikiIngestMapPhase {
             KnowledgeSpanPort.SpanHandle wikiSpan) {
         List<ChunkView> chunks;
         try {
-            chunks = handler.listTextChunksByKnowledgeId(payload.tenantId(), knowledgeId);
+            chunks = ctx.listTextChunksByKnowledgeId(payload.tenantId(), knowledgeId);
         } catch (Exception e) {
-            handler.spans.failSpan(wikiSpan, "LIST_CHUNKS_FAILED", e.getMessage(), e);
+            ctx.spans.failSpan(wikiSpan, "LIST_CHUNKS_FAILED", e.getMessage(), e);
             throw new IllegalStateException("get chunks: " + e.getMessage(), e);
         }
         if (chunks.isEmpty()) {
             log.info("wiki ingest: document {} has no chunks, skip", knowledgeId);
-            handler.spans.skipSpan(wikiSpan, "no_chunks");
+            ctx.spans.skipSpan(wikiSpan, "no_chunks");
             return null;
         }
 
-        String content = handler.ingestService.reconstructEnrichedContent(chunks, payload.tenantId());
+        String content = ctx.ingestService.reconstructEnrichedContent(chunks, payload.tenantId());
         int rawRuneCount = content.codePointCount(0, content.length());
         if (rawRuneCount > WikiIngestConstants.MAX_CONTENT_FOR_WIKI) {
             content = content.substring(0,
@@ -282,7 +282,7 @@ final class WikiIngestMapPhase {
         if (!WikiImageMarkup.hasSufficientTextContent(content)) {
             log.warn("wiki ingest: doc {} has insufficient text content after stripping image markup "
                     + "(raw_len={}), skipping LLM extraction", knowledgeId, rawRuneCount);
-            handler.spans.skipSpan(wikiSpan, "insufficient_text_content");
+            ctx.spans.skipSpan(wikiSpan, "insufficient_text_content");
             return null;
         }
 
@@ -294,7 +294,7 @@ final class WikiIngestMapPhase {
      * 第一个非空 chunk 的首行（短于 200 字节时），并裁掉 markdown 的 {@code "# "} 前缀。
      */
     String resolveDocTitle(String knowledgeId, List<ChunkView> chunks) {
-        KnowledgeView kn = handler.getKnowledgeByIdOnly(knowledgeId);
+        KnowledgeView kn = ctx.getKnowledgeByIdOnly(knowledgeId);
         if (kn != null && kn.title() != null && !kn.title().isEmpty()) {
             return kn.title();
         }
@@ -340,7 +340,7 @@ final class WikiIngestMapPhase {
             // generateWithTemplate 内部的退避重试已经在我们放弃之前耗尽了 LLM 自己的瞬时
             // 错误预算。
             log.error("wiki ingest: generate summary failed for {}, will requeue", knowledgeId, summaryErr);
-            handler.spans.failSpan(wikiSpan, "SUMMARY_FAILED", summaryErr.getMessage(), summaryErr);
+            ctx.spans.failSpan(wikiSpan, "SUMMARY_FAILED", summaryErr.getMessage(), summaryErr);
             throw new IllegalStateException("generate summary: " + summaryErr.getMessage(), summaryErr);
         }
 
@@ -476,7 +476,7 @@ final class WikiIngestMapPhase {
         Map<String, Object> summaryInput = new LinkedHashMap<>();
         summaryInput.put("content_chars", content.codePointCount(0, content.length()));
         summaryInput.put("extracted_slugs", summaryExtractedPages.size());
-        KnowledgeSpanPort.SpanHandle summarySpan = handler.spans.beginSubSpan(wikiSpan,
+        KnowledgeSpanPort.SpanHandle summarySpan = ctx.spans.beginSubSpan(wikiSpan,
                 "postprocess.wiki.summary", summaryInput);
         Map<String, Object> classifyInput = new LinkedHashMap<>();
         classifyInput.put("chunks", chunks.size());
@@ -485,7 +485,7 @@ final class WikiIngestMapPhase {
         // 重叠，这正确反映了它们的墙钟并发。
         KnowledgeSpanPort.SpanHandle classifySpan = pass0Failed
                 ? null
-                : handler.spans.beginSubSpan(wikiSpan, "postprocess.wiki.classify", classifyInput);
+                : ctx.spans.beginSubSpan(wikiSpan, "postprocess.wiki.classify", classifyInput);
 
         final boolean pass0FailedFinal = pass0Failed;
         final String contentFinal = content;
@@ -495,7 +495,7 @@ final class WikiIngestMapPhase {
         List<Runnable> parallel = new ArrayList<>(2);
         parallel.add(() -> {
             try {
-                String generated = handler.ingestService.generateWithTemplate(chatModel,
+                String generated = ctx.ingestService.generateWithTemplate(chatModel,
                         WikiPrompts.WIKI_SUMMARY_PROMPT,
                         Map.of(
                                 "Content", contentFinal,
@@ -510,10 +510,10 @@ final class WikiIngestMapPhase {
                 summaryOut.put("chars", generated.codePointCount(0, generated.length()));
                 summaryOut.put("summary_line", WikiTextUtils.previewText(parts.summary(), 160));
                 summaryOut.put("body_preview", WikiTextUtils.previewText(parts.content(), 320));
-                handler.spans.endSpan(summarySpan, summaryOut);
+                ctx.spans.endSpan(summarySpan, summaryOut);
             } catch (RuntimeException e) {
                 summaryErrHolder[0] = e;
-                handler.spans.failSpan(summarySpan, "SUMMARY_FAILED", e.getMessage(), e);
+                ctx.spans.failSpan(summarySpan, "SUMMARY_FAILED", e.getMessage(), e);
             }
         });
         parallel.add(() -> {
@@ -525,7 +525,7 @@ final class WikiIngestMapPhase {
             }
             String candidatesXml = WikiIngestCitePipeline.renderCandidateSlugsXML(
                     entitiesFinal, conceptsFinal);
-            WikiIngestCitePipeline.CitationResult citationResult = handler.citePipeline.classifyChunkCitations(
+            WikiIngestCitePipeline.CitationResult citationResult = ctx.citePipeline.classifyChunkCitations(
                     chatModel, candidatesXml, chunks, lang, batchCtx);
             citationsHolder[0] = citationResult.citations();
             newSlugsHolder[0] = citationResult.newSlugs();
@@ -538,7 +538,7 @@ final class WikiIngestMapPhase {
                     WikiIngestPreviews.topCitedSlugs(citationResult.citations(), 8));
             classifyOut.put("new_slugs_sample",
                     WikiIngestPreviews.previewNewSlugs(citationResult.newSlugs(), 8));
-            handler.spans.endSpan(classifySpan, classifyOut);
+            ctx.spans.endSpan(classifySpan, classifyOut);
         });
         WikiBatchSupport.fanOut(2, parallel);
 
@@ -548,7 +548,7 @@ final class WikiIngestMapPhase {
         extractedEntities = merged.entities();
         extractedConcepts = merged.concepts();
         int uncited = merged.uncited();
-        WikiIngestDedupService.Identities reclaimed = handler.dedupService.reclaimExtractedIdentities(
+        WikiIngestDedupService.Identities reclaimed = ctx.dedupService.reclaimExtractedIdentities(
                 kbId, extractedEntities, extractedConcepts, batchCtx);
         extractedEntities = reclaimed.entities();
         extractedConcepts = reclaimed.concepts();

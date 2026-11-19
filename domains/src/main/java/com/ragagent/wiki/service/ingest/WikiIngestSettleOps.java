@@ -6,11 +6,13 @@ import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.wiki.domain.ingest.WikiIngestPayload;
 import com.ragagent.wiki.domain.ingest.WikiPendingOp;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
+import com.ragagent.wiki.repository.TaskPendingOpsRepository;
 import com.ragagent.wiki.service.ingest.support.WikiCleanupScope;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * wiki 摄取的失败结算面：批内失败的重试记账（incr fail count → 释放认领 / 归档死信）、
@@ -20,10 +22,19 @@ final class WikiIngestSettleOps {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestSettleOps.class);
 
-    private final WikiIngestService service;
+    private final ObjectProvider<TaskDeadLetterRepository> deadLetterRepo;
+    private final ObjectProvider<WikiKnowledgeFinalizer> knowledgeFinalizer;
+    private final TaskPendingOpsRepository pendingRepo;
+    private final WikiIngestQueueOps queueOps;
 
-    WikiIngestSettleOps(WikiIngestService service) {
-        this.service = service;
+    WikiIngestSettleOps(ObjectProvider<TaskDeadLetterRepository> deadLetterRepo,
+                        ObjectProvider<WikiKnowledgeFinalizer> knowledgeFinalizer,
+                        TaskPendingOpsRepository pendingRepo,
+                        WikiIngestQueueOps queueOps) {
+        this.deadLetterRepo = deadLetterRepo;
+        this.knowledgeFinalizer = knowledgeFinalizer;
+        this.pendingRepo = pendingRepo;
+        this.queueOps = queueOps;
     }
 
     /**
@@ -43,7 +54,7 @@ final class WikiIngestSettleOps {
         try {
             // 复用消费面的解码（rows → WikiPendingOp：含 payload 解析与 last-write-wins 去重），
             // 而不是直接读 domain 行——域行里没有 knowledgeId/isIngest 这些语义字段
-            batch = service.queueOps.peekPendingList(kbId, WikiIngestConstants.MAX_DOCS_PER_BATCH);
+            batch = queueOps.peekPendingList(kbId, WikiIngestConstants.MAX_DOCS_PER_BATCH);
         } catch (RuntimeException e) {
             log.warn("wiki ingest: list pending ops for abandoned batch {} failed", kbId, e);
             return;
@@ -76,14 +87,14 @@ final class WikiIngestSettleOps {
         if (knowledgeId == null || knowledgeId.isEmpty()) {
             return;
         }
-        WikiKnowledgeFinalizer finalizer = service.knowledgeFinalizer.getIfAvailable();
+        WikiKnowledgeFinalizer finalizer = knowledgeFinalizer.getIfAvailable();
         if (finalizer == null) {
             // finalizer 未接线：跳过（测试/裁剪装配）
             log.debug("wiki ingest: knowledge finalizer not wired, skipping subtask finalize for {}",
                     knowledgeId);
             return;
         }
-        try (WikiCleanupScope scope = service.cleanupScope()) {
+        try (WikiCleanupScope scope = WikiCleanupScope.open()) {
             scope.run(() -> finalizer.finalizeWikiSubtask(knowledgeId));
         }
     }
@@ -110,7 +121,7 @@ final class WikiIngestSettleOps {
         if (ops == null || ops.isEmpty()) {
             return settleErrors;
         }
-        TaskDeadLetterRepository deadLetters = service.deadLetterRepo.getIfAvailable();
+        TaskDeadLetterRepository deadLetters = deadLetterRepo.getIfAvailable();
 
         for (WikiPendingOp op : ops) {
             if (op.getDbId() == 0) {
@@ -119,7 +130,7 @@ final class WikiIngestSettleOps {
             }
             int count;
             try {
-                count = service.pendingRepo.incrFailCount(op.getDbId());
+                count = pendingRepo.incrFailCount(op.getDbId());
             } catch (Exception e) {
                 log.warn("wiki ingest: failed to increment fail count for {} (id={})", op.getKnowledgeId(), op.getDbId(), e);
                 settleErrors.add(new IllegalStateException(
@@ -134,7 +145,7 @@ final class WikiIngestSettleOps {
                 // （行只被窥视、从未被认领）。ReleaseByIDs 保留 fail_count，
                 // 因此重试预算仍在递减。
                 try {
-                    service.pendingRepo.releaseByIds(List.of(op.getDbId()));
+                    pendingRepo.releaseByIds(List.of(op.getDbId()));
                 } catch (Exception e) {
                     log.warn("wiki ingest: failed to release claim for retry id={}", op.getDbId(), e);
                     settleErrors.add(new IllegalStateException(
@@ -175,7 +186,7 @@ final class WikiIngestSettleOps {
                 }
             }
             try {
-                service.pendingRepo.deleteByIds(List.of(op.getDbId()));
+                pendingRepo.deleteByIds(List.of(op.getDbId()));
             } catch (Exception e) {
                 log.warn("wiki ingest: failed to drop dead-lettered row id={}", op.getDbId(), e);
                 settleErrors.add(new IllegalStateException(
@@ -195,7 +206,7 @@ final class WikiIngestSettleOps {
         }
         java.util.concurrent.atomic.AtomicReference<List<Exception>> holder =
                 new java.util.concurrent.atomic.AtomicReference<>(List.of());
-        try (WikiCleanupScope scope = service.cleanupScope()) {
+        try (WikiCleanupScope scope = WikiCleanupScope.open()) {
             scope.run(() -> holder.set(requeueFailedOps(payload, ops)));
         }
         return holder.get();

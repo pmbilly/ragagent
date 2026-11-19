@@ -32,10 +32,10 @@ final class WikiIngestReducePhase {
     private static final Logger log = LoggerFactory.getLogger(WikiIngestReducePhase.class);
 
 
-    private final WikiIngestBatchHandler handler;
+    private final WikiIngestStageContext ctx;
 
-    WikiIngestReducePhase(WikiIngestBatchHandler handler) {
-        this.handler = handler;
+    WikiIngestReducePhase(WikiIngestStageContext ctx) {
+        this.ctx = ctx;
     }
 
 
@@ -71,7 +71,7 @@ final class WikiIngestReducePhase {
         // 很长的 LLM 调用，源文档可能在此期间被删。丢弃源知识已不存在的新增/摘要更新，
         // 免得复活一个幽灵 source_ref。retract 更新被保留——它们主动移除引用，正是文档消失
         // 时我们想要的。
-        updates = handler.ingestService.filterLiveUpdates(kbId, updates);
+        updates = ctx.ingestService.filterLiveUpdates(kbId, updates);
         if (updates == null || updates.isEmpty()) {
             return new WikiIngestBatchHandler.ReduceOutcome(false, "", false, null);
         }
@@ -98,7 +98,7 @@ final class WikiIngestReducePhase {
             outcome = reduceSlugUpdatesBody(chatModel, kbId, slug, updates, tenantId,
                     batchCtx, pageHolder);
         } catch (RuntimeException e) {
-            handler.spans.failSpan(pageSpan, "REDUCE_FAILED", e.getMessage(), e);
+            ctx.spans.failSpan(pageSpan, "REDUCE_FAILED", e.getMessage(), e);
             throw e;
         }
         finishPageSpan(pageSpan, outcome, contributors, pageHolder[0]);
@@ -124,7 +124,7 @@ final class WikiIngestReducePhase {
             input.put("slug", slug);
             input.put("updates", updates.size());
             input.put("contributors", new ArrayList<>(contributors));
-            return handler.spans.beginSubSpan(parent, "postprocess.wiki.page[" + slug + "]", input);
+            return ctx.spans.beginSubSpan(parent, "postprocess.wiki.page[" + slug + "]", input);
         }
         return null;
     }
@@ -140,12 +140,12 @@ final class WikiIngestReducePhase {
             return;
         }
         if (outcome.error() != null) {
-            handler.spans.failSpan(pageSpan, "REDUCE_FAILED",
+            ctx.spans.failSpan(pageSpan, "REDUCE_FAILED",
                     outcome.error().getMessage(), outcome.error());
             return;
         }
         if (!outcome.changed()) {
-            handler.spans.skipSpan(pageSpan, "no_change");
+            ctx.spans.skipSpan(pageSpan, "no_change");
             return;
         }
         Map<String, Object> out = new LinkedHashMap<>();
@@ -161,7 +161,7 @@ final class WikiIngestReducePhase {
             out.put("chunk_refs", page.getChunkRefs() == null ? 0 : page.getChunkRefs().size());
             out.put("aliases", page.getAliases() == null ? List.of() : page.getAliases());
         }
-        handler.spans.endSpan(pageSpan, out);
+        ctx.spans.endSpan(pageSpan, out);
     }
 
     /** 原 reduce 主体；页面写入 {@code pageHolder[0]} 供 span 收尾读取最终状态。 */
@@ -194,9 +194,9 @@ final class WikiIngestReducePhase {
             if (generation.changed()) {
                 draft.page.setChunkRefs(mergeChunkRefs(draft.page.getChunkRefs(), draft.additions));
                 if (draft.exists) {
-                    handler.wikiService.updatePage(draft.page);
+                    ctx.wikiService.updatePage(draft.page);
                 } else {
-                    handler.wikiService.createPage(draft.page);
+                    ctx.wikiService.createPage(draft.page);
                 }
                 return new WikiIngestBatchHandler.ReduceOutcome(
                         true, draft.affectedType, generation.additionFailed(), null);
@@ -232,7 +232,7 @@ final class WikiIngestReducePhase {
 
     /** 查页/建页并按类型分组；新页且无新增时返回 null（no-op）。 */
     private PageDraft openDraft(String kbId, String slug, long tenantId, List<SlugUpdate> updates) {
-        WikiPage page = handler.wikiService.findPageBySlug(kbId, slug);
+        WikiPage page = ctx.wikiService.findPageBySlug(kbId, slug);
         boolean exists = page != null;
         if (!exists) {
             boolean hasAdditions = false;
@@ -286,9 +286,9 @@ final class WikiIngestReducePhase {
         // 清理该 slug 曾经是 entity 页并被改造成摘要页时可能残留的陈旧 chunk ref。
         page.setChunkRefs(new ArrayList<>());
         if (draft.exists) {
-            handler.wikiService.updatePage(page);
+            ctx.wikiService.updatePage(page);
         } else {
-            handler.wikiService.createPage(page);
+            ctx.wikiService.createPage(page);
         }
     }
 
@@ -363,7 +363,7 @@ final class WikiIngestReducePhase {
         // 把 SourceChunks 解析成 chunk 正文：按 knowledge ID 一批查询，让
         // <new_information> 块可以逐字引用 chunk，而不是依赖简短的 Details 改写。
         Map<String, String> chunkContentById =
-                handler.citePipeline.resolveCitedChunks(tenantId, draft.additions);
+                ctx.citePipeline.resolveCitedChunks(tenantId, draft.additions);
         // 一份文档摘要被该文档派生的每个页面共享。在任何页面专属元数据之前渲染一个
         // 确定性的、去重的块，让 provider 的前缀缓存能在并行的 reduce 调用之间复用。
         Map<String, String> sourceContextByRef = new LinkedHashMap<>();
@@ -468,7 +468,7 @@ final class WikiIngestReducePhase {
         String pageAliases = String.join(", ", page.getAliases());
 
         try {
-            String updatedContent = handler.ingestService.generateWithTemplate(chatModel,
+            String updatedContent = ctx.ingestService.generateWithTemplate(chatModel,
                     WikiPrompts.WIKI_PAGE_MODIFY_USER_PROMPT,
                     Map.ofEntries(
                             Map.entry("HasAdditions", hasAdditionsStr),

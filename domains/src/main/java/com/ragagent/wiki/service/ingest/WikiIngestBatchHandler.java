@@ -92,6 +92,9 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
     final KnowledgeSpanPort spans;
 
     /** 摄取阶段协作者(构造期装配;只存 handler 引用,调用期才解引)。 */
+    /** 阶段共享依赖上下文（map/reduce/finalize/run 读它，不再读 handler 自身）。 */
+    final WikiIngestStageContext stageCtx;
+
     final WikiIngestRunSupport run;
     final WikiIngestMapPhase map;
     final WikiIngestReducePhase reduce;
@@ -123,9 +126,11 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
         this.taskQueueProvider = taskQueueProvider;
         // 端口实现内部处理"追踪器缺席（测试/裁剪装配）→ no-op"的降级
         this.spans = spanTrackerPort;
+        this.stageCtx = new WikiIngestStageContext(
+                ingestService, wikiService, citePipeline, dedupService, spans, chunkPort, kbLookup);
         this.run = new WikiIngestRunSupport(this);
-        this.map = new WikiIngestMapPhase(this);
-        this.reduce = new WikiIngestReducePhase(this);
+        this.map = new WikiIngestMapPhase(stageCtx);
+        this.reduce = new WikiIngestReducePhase(stageCtx);
     }
 
     // 统计载体

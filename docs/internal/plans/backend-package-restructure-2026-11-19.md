@@ -152,6 +152,22 @@ grep -rnF "(this)" --include="*.java" domains/src/main/java/com/ragagent | grep 
 | **轻量**：仍 `new Xxx(...)`，但传实际依赖 | 只在父类内部使用的协作者 | 父类构造参数不变，风险最低 |
 | **提升**：`@Service` + 父类注入 | 被多处调用、需要独立装配的协作者 | 父类构造参数 +1；多个协作者同时提升会撞"≥8 参构造器"红线 |
 
+### 7.2 回引不必全消：三分类判据（wiki 实测，2026-11-19）
+
+wiki 的 17 处回引逐一评估后，只有一类值得改：
+
+| 类型 | 特征 | 处置 | wiki 实例 |
+|---|---|---|---|
+| **纯依赖** | 只用父对象的注入字段（repo / lookup / provider） | **改**：构造注入实际依赖 | 10 个已改 |
+| **编排/阶段** | 用父对象 6–13 个成员，且成员之间互相协作 | **保留**：拆开会把参数摊成 8–13 个，破坏阶段共享上下文 | `MapPhase`(6) · `ReducePhase`(4) · `FinalizePhase`(8) · `RunSupport`(13) |
+| **运行态状态** | 用父对象的可变状态（单飞锁 / 缓存 / 线程池） | **保留**：外传等于共享可变状态 | `WikiIngestLlmSupport` |
+| **父类真实业务** | 调父类的真实业务方法，且该方法属于对外接口 | **保留**：搬走会与接口契约冲突或形成循环依赖 | `WikiPageRevisionOps`（`updatePage`）· `WikiPageViewsSupport`（`getIndex` / `ingest` / `listIssues`） |
+| **编排工厂** | 需要父类的上下文构造方法（如 150 行的 `newWikiBatchContext`） | **保留**：把工厂搬进"依赖容器"会让容器兼当工厂，等价于 god class 换名 | `WikiIngestRunSupport` · `WikiIngestFinalizePhase` |
+
+最终结果：wiki 17 处回引 → **13 消 / 4 留**（4 留分布在"父类真实业务"2 与"编排工厂"2）。
+
+判据一句话：**看协作者需要父对象的哪一部分**——只有"注入依赖"可外提；"编排、状态、业务方法"外提只是把耦合换个地方。
+
 ## 8. 不在本次范围
 
 H7 / H8 / H9 / L11 / Q6 / Q8b / Q9 / Q10 / Q11 / R2c-3d 余项 / M8（见 `HANDOFF.md` §5.1）。已否决项见归档 §5.0b。

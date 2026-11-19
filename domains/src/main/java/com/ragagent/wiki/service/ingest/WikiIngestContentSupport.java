@@ -1,6 +1,7 @@
 package com.ragagent.wiki.service.ingest;
 
 import com.ragagent.contract.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.wiki.repository.ingest.WikiDeletedTombstoneStore;
 import com.ragagent.wiki.service.WikiImageEnricher;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * wiki 摄取的文档支撑面：源知识存活性判定（墓碑快路径 + 数据库回落）、
@@ -18,10 +20,16 @@ final class WikiIngestContentSupport {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestContentSupport.class);
 
-    private final WikiIngestService service;
+    private final KnowledgeBaseLookup kbLookup;
+    private final ObjectProvider<WikiDeletedTombstoneStore> tombstoneStore;
+    private final ObjectProvider<WikiImageEnricher> imageEnricher;
 
-    WikiIngestContentSupport(WikiIngestService service) {
-        this.service = service;
+    WikiIngestContentSupport(KnowledgeBaseLookup kbLookup,
+                             ObjectProvider<WikiDeletedTombstoneStore> tombstoneStore,
+                             ObjectProvider<WikiImageEnricher> imageEnricher) {
+        this.kbLookup = kbLookup;
+        this.tombstoneStore = tombstoneStore;
+        this.imageEnricher = imageEnricher;
     }
 
     /**
@@ -35,13 +43,13 @@ final class WikiIngestContentSupport {
         if (knowledgeId == null || knowledgeId.isEmpty()) {
             return true;
         }
-        WikiDeletedTombstoneStore tombstones = service.tombstoneStore.getIfAvailable();
+        WikiDeletedTombstoneStore tombstones = tombstoneStore.getIfAvailable();
         if (tombstones != null && tombstones.exists(kbId, knowledgeId)) {
             return true;
         }
         // 不存在 / 软删 / 解析中取消或删除中 → 判定"已消失"；仓储缺位时保守地当作"还在"。
         // 判定细节（含异常姿态）整体在 knowledge 侧端口内，与迁移前逐字一致。
-        return service.kbLookup.knowledgeGone(knowledgeId);
+        return kbLookup.knowledgeGone(knowledgeId);
     }
 
     /**
@@ -130,7 +138,7 @@ final class WikiIngestContentSupport {
         if (textChunks.isEmpty()) {
             return content;
         }
-        WikiImageEnricher enricher = service.imageEnricher.getIfAvailable(WikiImageEnricher::identity);
+        WikiImageEnricher enricher = imageEnricher.getIfAvailable(WikiImageEnricher::identity);
         return enricher.enrich(content, textChunks, tenantId);
     }
 }

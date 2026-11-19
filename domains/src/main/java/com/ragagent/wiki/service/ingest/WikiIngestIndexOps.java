@@ -9,6 +9,7 @@ import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.wiki.domain.ingest.WikiIngestPayload;
 import com.ragagent.wiki.prompt.WikiPrompts;
+import com.ragagent.wiki.service.page.WikiPageService;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -26,10 +27,13 @@ final class WikiIngestIndexOps {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestIndexOps.class);
 
-    private final WikiIngestService service;
+    private final WikiIngestLlmSupport llm;
+    private final WikiPageService wikiService;
 
-    WikiIngestIndexOps(WikiIngestService service) {
-        this.service = service;
+    WikiIngestIndexOps(WikiIngestLlmSupport llm,
+                       WikiPageService wikiService) {
+        this.llm = llm;
+        this.wikiService = wikiService;
     }
 
     /**
@@ -108,7 +112,7 @@ final class WikiIngestIndexOps {
     public Set<String> getExistingPageSlugsForKnowledge(String kbId, String knowledgeId) {
         List<String> slugs;
         try {
-            slugs = service.wikiService.listSlugsBySourceRef(kbId, knowledgeId);
+            slugs = wikiService.listSlugsBySourceRef(kbId, knowledgeId);
         } catch (Exception e) {
             log.warn("wiki ingest: ListSlugsBySourceRef({}) failed", knowledgeId, e);
             return null;
@@ -148,7 +152,7 @@ final class WikiIngestIndexOps {
                                  String changeDesc,
                                  String lang,
                                  String customInstructions) {
-        WikiPage indexPage = service.wikiService.getIndex(payload.knowledgeBaseId());
+        WikiPage indexPage = wikiService.getIndex(payload.knowledgeBaseId());
         if (indexPage == null) {
             return;
         }
@@ -170,7 +174,7 @@ final class WikiIngestIndexOps {
             // 首次生成：经 lite 投影拉最近更新的 top-N 摘要页。
             // CountByType 让我们能告诉 LLM "showing N of M"，
             // 从而在 KB 比采样集更大时诚实地交代。
-            List<WikiIndexEntry> recentSummaries = service.wikiService.listByTypeRecent(
+            List<WikiIndexEntry> recentSummaries = wikiService.listByTypeRecent(
                     payload.knowledgeBaseId(), WikiConstants.PAGE_TYPE_SUMMARY,
                     WikiIngestConstants.INDEX_INTRO_SUMMARY_CAP);
             StringBuilder docSummaries = new StringBuilder();
@@ -181,7 +185,7 @@ final class WikiIngestIndexOps {
             }
             long totalSummaries = recentSummaries.size();
             try {
-                Map<String, Long> counts = service.wikiService.countByType(payload.knowledgeBaseId());
+                Map<String, Long> counts = wikiService.countByType(payload.knowledgeBaseId());
                 if (counts != null && counts.get(WikiConstants.PAGE_TYPE_SUMMARY) != null) {
                     totalSummaries = counts.get(WikiConstants.PAGE_TYPE_SUMMARY);
                 }
@@ -199,7 +203,7 @@ final class WikiIngestIndexOps {
             }
             String generated;
             try {
-                generated = service.llm.generateWithTemplate(chatModel, WikiPrompts.WIKI_INDEX_INTRO_PROMPT,
+                generated = llm.generateWithTemplate(chatModel, WikiPrompts.WIKI_INDEX_INTRO_PROMPT,
                         Map.of(
                                 "DocumentSummaries", framing + docSummaries,
                                 "Language", lang,
@@ -215,7 +219,7 @@ final class WikiIngestIndexOps {
             // 重新灌满上下文，而变更描述块已经编码了 prompt 想要的"刚发生了什么"。
             String updated;
             try {
-                updated = service.llm.generateWithTemplate(chatModel, WikiPrompts.WIKI_INDEX_INTRO_UPDATE_PROMPT,
+                updated = llm.generateWithTemplate(chatModel, WikiPrompts.WIKI_INDEX_INTRO_UPDATE_PROMPT,
                         Map.of(
                                 "ExistingIntro", existingIntro,
                                 "ChangeDescription", changeDesc,
@@ -240,7 +244,7 @@ final class WikiIngestIndexOps {
         }
         indexPage.setContent(intro);
         indexPage.setSummary(intro);
-        service.wikiService.updatePage(indexPage);
+        wikiService.updatePage(indexPage);
     }
 
     /**
@@ -252,14 +256,14 @@ final class WikiIngestIndexOps {
             return;
         }
         for (String slug : slugs) {
-            WikiPage page = service.wikiService.findPageBySlug(kbId, slug);
+            WikiPage page = wikiService.findPageBySlug(kbId, slug);
             if (page == null) {
                 continue;
             }
             if (WikiConstants.STATUS_DRAFT.equals(page.getStatus())) {
                 page.setStatus(WikiConstants.STATUS_PUBLISHED);
                 try {
-                    service.wikiService.updatePageMeta(page);
+                    wikiService.updatePageMeta(page);
                 } catch (Exception e) {
                     log.warn("wiki ingest: failed to publish page {}", slug, e);
                 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.wiki.domain.ingest.WikiPendingOp;
+import com.ragagent.wiki.repository.TaskPendingOpsRepository;
 import com.ragagent.wiki.service.ingest.WikiIngestService.PendingBatch;
 import com.ragagent.wiki.service.ingest.support.WikiCleanupScope;
 import java.util.ArrayList;
@@ -21,10 +22,10 @@ final class WikiIngestQueueOps {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestQueueOps.class);
 
-    private final WikiIngestService service;
+    private final TaskPendingOpsRepository pendingRepo;
 
-    WikiIngestQueueOps(WikiIngestService service) {
-        this.service = service;
+    WikiIngestQueueOps(TaskPendingOpsRepository pendingRepo) {
+        this.pendingRepo = pendingRepo;
     }
 
     /**
@@ -39,7 +40,7 @@ final class WikiIngestQueueOps {
      */
     PendingBatch peekPendingList(String kbId, int limit) {
         int effective = limit <= 0 ? WikiIngestConstants.MAX_DOCS_PER_BATCH : limit;
-        List<TaskPendingOp> rows = service.pendingRepo.peekBatch(
+        List<TaskPendingOp> rows = pendingRepo.peekBatch(
                 WikiIngestConstants.TASK_TYPE, WikiIngestConstants.TASK_SCOPE, kbId, effective);
         return decodePendingRows(rows);
     }
@@ -59,7 +60,7 @@ final class WikiIngestQueueOps {
         int effective = limit <= 0 ? WikiIngestConstants.MAX_DOCS_PER_BATCH : limit;
         java.time.OffsetDateTime staleBefore =
                 java.time.OffsetDateTime.now().minus(WikiIngestConstants.CLAIM_STALE_AFTER);
-        List<TaskPendingOp> rows = service.pendingRepo.claimBatch(
+        List<TaskPendingOp> rows = pendingRepo.claimBatch(
                 WikiIngestConstants.TASK_TYPE, WikiIngestConstants.TASK_SCOPE, kbId, effective, staleBefore);
         return decodePendingRows(rows);
     }
@@ -134,7 +135,7 @@ final class WikiIngestQueueOps {
             return;
         }
         try {
-            service.pendingRepo.deleteByIds(ids);
+            pendingRepo.deleteByIds(ids);
         } catch (RuntimeException e) {
             log.warn("wiki ingest: failed to trim {} pending rows", ids.size(), e);
             throw e;
@@ -149,7 +150,7 @@ final class WikiIngestQueueOps {
         if (ids == null || ids.isEmpty()) {
             return;
         }
-        try (WikiCleanupScope scope = service.cleanupScope()) {
+        try (WikiCleanupScope scope = WikiCleanupScope.open()) {
             scope.run(() -> trimPendingList(ids));
         }
     }
