@@ -27,10 +27,10 @@ final class DataSourceItemOps {
 
     private static final Logger log = LoggerFactory.getLogger(DataSourceItemOps.class);
 
-    private final DataSourceService service;
+    private final KnowledgeBridge knowledge;
 
-    DataSourceItemOps(DataSourceService service) {
-        this.service = service;
+    DataSourceItemOps(KnowledgeBridge knowledge) {
+        this.knowledge = knowledge;
     }
 
     /**
@@ -120,7 +120,7 @@ final class DataSourceItemOps {
         RuntimeException last = null;
         for (int i = 0; i < 3; i++) {
             try {
-                return service.knowledge.findByDataSourceExternalId(
+                return knowledge.findByDataSourceExternalId(
                         ds.getTenantId(), ds.getKnowledgeBaseId(), ds.getId(), externalId);
             } catch (RuntimeException e) {
                 last = e;
@@ -141,7 +141,7 @@ final class DataSourceItemOps {
     private void applyDeletion(DataSource ds, FetchedItem item, SyncResult result) {
         KnowledgeRowView existing;
         try {
-            existing = service.knowledge.findByDataSourceExternalId(
+            existing = knowledge.findByDataSourceExternalId(
                     ds.getTenantId(), ds.getKnowledgeBaseId(), ds.getId(), item.getExternalId());
         } catch (RuntimeException e) {
             log.error("[datasource] failed to find deleted knowledge for external_id={} (ds={}, kb={})", item.getExternalId(), ds.getId(), ds.getKnowledgeBaseId(), e);
@@ -160,7 +160,7 @@ final class DataSourceItemOps {
             return;
         }
         try {
-            service.knowledge.softDelete(ds.getTenantId(), existing.getId());
+            knowledge.softDelete(ds.getTenantId(), existing.getId());
         } catch (RuntimeException deleteErr) {
             result.setFailed(result.getFailed() + 1);
             result.setDeletionFailed(result.getDeletionFailed() + 1);
@@ -169,7 +169,7 @@ final class DataSourceItemOps {
             return;
         }
         try {
-            service.knowledge.hardDelete(ds.getTenantId(), existing.getId());
+            knowledge.hardDelete(ds.getTenantId(), existing.getId());
         } catch (RuntimeException herr) {
             result.setFailed(result.getFailed() + 1);
             result.setDeletionFailed(result.getDeletionFailed() + 1);
@@ -223,9 +223,9 @@ final class DataSourceItemOps {
                 log.info("[datasource] found existing knowledge {} for external_id={}, "
                         + "deleting for update", existing.getId(), item.getExternalId());
                 try {
-                    service.knowledge.softDelete(ds.getTenantId(), existing.getId());
+                    knowledge.softDelete(ds.getTenantId(), existing.getId());
                     try {
-                        service.knowledge.hardDelete(ds.getTenantId(), existing.getId());
+                        knowledge.hardDelete(ds.getTenantId(), existing.getId());
                     } catch (RuntimeException herr) {
                         log.warn("[datasource] failed to hard-delete replaced knowledge {}", existing.getId(), herr);
                     }
@@ -238,7 +238,7 @@ final class DataSourceItemOps {
 
         if (item.getContent() != null && item.getContent().length > 0) {
             try {
-                service.knowledge.createFromFile(ds.getTenantId(), ds.getKnowledgeBaseId(),
+                knowledge.createFromFile(ds.getTenantId(), ds.getKnowledgeBaseId(),
                         item.getContent(), item.getFileName(), metadata, tagIDs, channel);
             } catch (DuplicateKnowledgeException dup) {
                 if (dupIsSameNode(dup, item)) {
@@ -253,7 +253,7 @@ final class DataSourceItemOps {
         if (item.getUrl() != null && !item.getUrl().isEmpty()) {
             KnowledgeRowView created;
             try {
-                created = service.knowledge.createFromUrl(ds.getTenantId(), ds.getKnowledgeBaseId(),
+                created = knowledge.createFromUrl(ds.getTenantId(), ds.getKnowledgeBaseId(),
                         item.getUrl(), item.getFileName(), item.getTitle(), tagIDs, channel);
             } catch (DuplicateKnowledgeException dup) {
                 if (dupIsSameNode(dup, item)) {
@@ -264,7 +264,7 @@ final class DataSourceItemOps {
             // URL 建出来的行没有 metadata，之后的删除就永远找不到它。
             // 只在**新建**分支上补（重复分支复用已有行）。
             if (created != null) {
-                service.knowledge.attachMetadata(created, metadata);
+                knowledge.attachMetadata(created, metadata);
             }
             sweepStaleSubtree(ds, item);
             return isUpdate;
@@ -303,7 +303,7 @@ final class DataSourceItemOps {
         }
         List<KnowledgeRowView> children;
         try {
-            children = service.knowledge.findByMetadataKeyPrefix(ds.getTenantId(), ds.getKnowledgeBaseId(),
+            children = knowledge.findByMetadataKeyPrefix(ds.getTenantId(), ds.getKnowledgeBaseId(),
                     "externalId", SubtreeChildIds.subtreeChildPrefix(item.getExternalId()));
         } catch (RuntimeException e) {
             log.warn("[datasource] failed to list subtree of externalId={}", item.getExternalId(), e);
@@ -329,13 +329,13 @@ final class DataSourceItemOps {
         }
         // 批量删：一个节点的附件集从 N 缩到 M 时只付一轮删除扇出，而不是 N 轮
         try {
-            service.knowledge.softDeleteList(ds.getTenantId(), ids);
+            knowledge.softDeleteList(ds.getTenantId(), ids);
         } catch (RuntimeException derr) {
             log.warn("[datasource] failed to delete {} stale sub-item(s) of external_id={}", ids.size(), item.getExternalId(), derr);
             return;
         }
         try {
-            service.knowledge.hardDeleteList(ds.getTenantId(), ids);
+            knowledge.hardDeleteList(ds.getTenantId(), ids);
         } catch (RuntimeException herr) {
             log.warn("[datasource] failed to hard-delete {} stale sub-item(s) of external_id={}", ids.size(), item.getExternalId(), herr);
         }

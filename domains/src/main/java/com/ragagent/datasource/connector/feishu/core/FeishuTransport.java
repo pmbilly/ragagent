@@ -21,15 +21,21 @@ final class FeishuTransport {
 
     private static final Logger log = LoggerFactory.getLogger(FeishuTransport.class);
 
-    private final FeishuClient client;
+    private final String appId;
+    private final String appSecret;
+    private final String baseUrl;
+    private final ConnectorHttp.Client httpClient;
 
     // Token 缓存（线程安全）
     private final Object tokenLock = new Object();
     private String tokenCache = "";
     private OffsetDateTime tokenExpAt = OffsetDateTime.MIN;
 
-    FeishuTransport(FeishuClient client) {
-        this.client = client;
+    FeishuTransport(String appId, String appSecret, String baseUrl, ConnectorHttp.Client httpClient) {
+        this.appId = appId;
+        this.appSecret = appSecret;
+        this.baseUrl = baseUrl;
+        this.httpClient = httpClient;
     }
 
     /**
@@ -46,13 +52,13 @@ final class FeishuTransport {
 
             byte[] payload;
             try {
-                payload = FeishuClient.MAPPER.writeValueAsBytes(Map.of("app_id", client.appId, "app_secret", client.appSecret));
+                payload = FeishuClient.MAPPER.writeValueAsBytes(Map.of("app_id", appId, "app_secret", appSecret));
             } catch (Exception e) {
                 throw new ConnectorException("marshal token request: " + e.getMessage(), e);
             }
 
-            String url = client.baseUrl + "/open-apis/auth/v3/tenant_access_token/internal";
-            ConnectorHttp.Response resp = client.httpClient.exchange("POST", url,
+            String url = baseUrl + "/open-apis/auth/v3/tenant_access_token/internal";
+            ConnectorHttp.Response resp = httpClient.exchange("POST", url,
                     Map.of("Content-Type", "application/json; charset=utf-8"), payload);
 
             TokenResponse result;
@@ -96,7 +102,7 @@ final class FeishuTransport {
      * 带鉴权的 API 调用 + JSON 解码 + 瞬时失败重试。
      *
      * @param method     {@code "GET"} / {@code "POST"} …
-     * @param path       以 {@code /open-apis/...} 开头的路径（client.baseUrl 由客户端补上）
+     * @param path       以 {@code /open-apis/...} 开头的路径（baseUrl 由客户端补上）
      * @param body       请求体对象；{@code null} 表示无体
      * @param resultType 解码目标；{@code null} 表示不关心响应体
      * @return 解码结果；{@code resultType == null} 时返回 {@code null}
@@ -113,7 +119,7 @@ final class FeishuTransport {
             }
         }
 
-        String url = client.baseUrl + path;
+        String url = baseUrl + path;
         RuntimeException lastErr = null;
 
         for (int attempt = 0; attempt <= FeishuClient.MAX_RETRIES; attempt++) {
@@ -125,7 +131,7 @@ final class FeishuTransport {
 
             ConnectorHttp.Response resp;
             try {
-                resp = client.httpClient.exchange(method, url, Map.of(
+                resp = httpClient.exchange(method, url, Map.of(
                         "Content-Type", "application/json; charset=utf-8",
                         "Authorization", "Bearer " + token), bodyBytes);
             } catch (RuntimeException e) {

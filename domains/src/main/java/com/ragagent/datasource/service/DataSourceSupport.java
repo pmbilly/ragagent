@@ -10,7 +10,11 @@ import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.TaskInitiator;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorRegistry;
+import com.ragagent.datasource.repository.DataSourceRepository;
+import com.ragagent.datasource.repository.SyncLogRepository;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.audit.ActivityAuditRecorder;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
@@ -32,10 +36,25 @@ final class DataSourceSupport {
 
     private static final Logger log = LoggerFactory.getLogger(DataSourceSupport.class);
 
-    private final DataSourceService service;
+    private final ConnectorRegistry connectorRegistry;
+    private final DataSourceRepository dsRepo;
+    private final SyncLogRepository syncLogRepo;
+    private final KnowledgeBridge knowledge;
+    private final ActivityAuditRecorder activityAudit;
+    private final AutoTagProvider autoTagProvider;
 
-    DataSourceSupport(DataSourceService service) {
-        this.service = service;
+    DataSourceSupport(ConnectorRegistry connectorRegistry,
+                      DataSourceRepository dsRepo,
+                      SyncLogRepository syncLogRepo,
+                      KnowledgeBridge knowledge,
+                      ActivityAuditRecorder activityAudit,
+                      AutoTagProvider autoTagProvider) {
+        this.connectorRegistry = connectorRegistry;
+        this.dsRepo = dsRepo;
+        this.syncLogRepo = syncLogRepo;
+        this.knowledge = knowledge;
+        this.activityAudit = activityAudit;
+        this.autoTagProvider = autoTagProvider;
     }
 
     /**
@@ -46,7 +65,7 @@ final class DataSourceSupport {
     List<String> resolveAutoTagIds(DataSource ds) {
         List<String> autoTagIds = new ArrayList<>();
         try {
-            String tagId = service.autoTagProvider.findOrCreateTagId(ds.getKnowledgeBaseId(), ds.getName());
+            String tagId = autoTagProvider.findOrCreateTagId(ds.getKnowledgeBaseId(), ds.getName());
             if (tagId != null) {
                 autoTagIds.add(tagId);
                 log.info("[datasource] using auto-tag \"{}\" (id={}) for data source sync",
@@ -65,7 +84,7 @@ final class DataSourceSupport {
      * （{@value #DataSourceService.ERR_INVALID_CONFIG}）——把 JSON 解析器的原文漏给用户是没有意义的。</p>
      */
     void validateDataSourceConfig(DataSource ds) {
-        Connector connector = service.connectorRegistry.get(ds.getType());
+        Connector connector = connectorRegistry.get(ds.getType());
         DataSourceConfig config = parseConfigOrInvalid(ds);
         // ⚠️ 这里**允许** config 为 null 并原样传给连接器：
         // "空 config"（解析结果为 null）是把 null 递下去的，各连接器自己拒绝。
@@ -91,7 +110,7 @@ final class DataSourceSupport {
      * （不泄漏"这个 id 确实存在，只是不属于你"）。
      */
     KnowledgeBaseRowView requireOwnedKnowledgeBase(String kbId, Long tenantId) {
-        KnowledgeBaseRowView kb = service.knowledge.findKnowledgeBase(kbId);
+        KnowledgeBaseRowView kb = knowledge.findKnowledgeBase(kbId);
         if (kb == null) {
             throw new DataSourceException(DataSourceService.ERR_KNOWLEDGE_BASE_NOT_FOUND);
         }
@@ -174,12 +193,12 @@ final class DataSourceSupport {
     }
 
     void bestEffortUpdate(DataSource ds) {
-        bestEffort(() -> service.dsRepo.update(ds));
+        bestEffort(() -> dsRepo.update(ds));
     }
 
     /** 尽力而为地更新同步日志（失败不影响主流程）。 */
     void bestEffortUpdateLog(SyncLog syncLog) {
-        bestEffort(() -> service.syncLogRepo.update(syncLog));
+        bestEffort(() -> syncLogRepo.update(syncLog));
     }
 
     static void bestEffort(Runnable action) {
@@ -212,7 +231,7 @@ final class DataSourceSupport {
     void recordKbActivity(long tenantId, String kbId, String action, String targetType,
                           String targetId, String outcome, Map<String, Object> details,
                           ActivityTask task, boolean suppressed) {
-        service.activityAudit.record(
+        activityAudit.record(
                 tenantId,
                 "knowledge_base",
                 kbId,

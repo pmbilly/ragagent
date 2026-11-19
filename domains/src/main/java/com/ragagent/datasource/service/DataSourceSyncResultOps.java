@@ -8,6 +8,8 @@ import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.SyncItemError;
 import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.SyncResult;
+import com.ragagent.datasource.repository.DataSourceRepository;
+import com.ragagent.datasource.repository.SyncLogRepository;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -26,10 +28,16 @@ final class DataSourceSyncResultOps {
 
     private static final Logger log = LoggerFactory.getLogger(DataSourceSyncResultOps.class);
 
-    private final DataSourceService service;
+    private final DataSourceRepository dsRepo;
+    private final SyncLogRepository syncLogRepo;
+    private final DataSourceSupport support;
 
-    DataSourceSyncResultOps(DataSourceService service) {
-        this.service = service;
+    DataSourceSyncResultOps(DataSourceRepository dsRepo,
+                            SyncLogRepository syncLogRepo,
+                            DataSourceSupport support) {
+        this.dsRepo = dsRepo;
+        this.syncLogRepo = syncLogRepo;
+        this.support = support;
     }
 
     /**
@@ -55,7 +63,7 @@ final class DataSourceSyncResultOps {
         syncLog.setErrorMessage(errorMessage);
         syncLog.setResult(resultJson);
         try {
-            service.syncLogRepo.updateResult(syncLog);
+            syncLogRepo.updateResult(syncLog);
         } catch (RuntimeException e) {
             log.error("[datasource] failed to update sync log", e);
         }
@@ -72,7 +80,7 @@ final class DataSourceSyncResultOps {
         ds.setErrorMessage(errorMessage);
         ds.setLastSyncResult(resultJson);
         try {
-            service.dsRepo.updateSyncState(ds);
+            dsRepo.updateSyncState(ds);
         } catch (RuntimeException e) {
             log.error("[datasource] failed to update data source", e);
         }
@@ -85,7 +93,7 @@ final class DataSourceSyncResultOps {
         } else if (DataSourceConstants.SYNC_LOG_STATUS_PARTIAL.equals(status)) {
             outcome = AuditOutcome.PARTIAL;
         }
-        service.support.recordKbActivity(ds.getTenantId(), ds.getKnowledgeBaseId(), action,
+        support.recordKbActivity(ds.getTenantId(), ds.getKnowledgeBaseId(), action,
                 "data_source", ds.getId(), outcome,
                 DataSourceSupport.mapOf("name", ds.getName(), "type", ds.getType(),
                         "syncLogId", syncLog.getId(),

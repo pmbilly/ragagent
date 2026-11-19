@@ -127,7 +127,7 @@ public class FeishuClient implements DocxMarkdown.SheetReader {
         this.appSecret = appSecret == null ? "" : appSecret;
         this.location = location;
         this.httpClient = httpClient;
-        this.transport = new FeishuTransport(this);
+        this.transport = new FeishuTransport(appId, appSecret, baseUrl, httpClient);
         this.driveOps = new FeishuDriveOps(this);
         this.treeOps = new FeishuWikiTreeOps(this);
     }

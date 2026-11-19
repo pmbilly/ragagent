@@ -151,9 +151,10 @@ public class DataSourceService implements DataSourceSyncHandler {
         this.tenantService = tenantService;
         this.activityAudit = new ActivityAuditRecorder(auditWriter);
         this.autoTagProvider = autoTagProvider;
-        this.resultOps = new DataSourceSyncResultOps(this);
-        this.support = new DataSourceSupport(this);
-        this.itemOps = new DataSourceItemOps(this);
+        this.support = new DataSourceSupport(connectorRegistry, dsRepo, syncLogRepo,
+                knowledge, activityAudit, autoTagProvider);
+        this.resultOps = new DataSourceSyncResultOps(dsRepo, syncLogRepo, support);
+        this.itemOps = new DataSourceItemOps(knowledge);
         this.executor = new DataSourceSyncExecutor(this);
     }
 
