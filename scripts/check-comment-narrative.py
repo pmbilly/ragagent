@@ -99,7 +99,7 @@ def main() -> int:
     for f, (before, after) in sorted(increased.items()):
         print(f"    {f}: {before} → {after}")
     print("\n处理方式：注释改写为现在时（说清当前约束），历史说明删掉，设计取舍移 "
-          "\n`docs/known-gaps.md`；确属合理保留的跑 `--write` 并在 PR 说明原因。")
+          "\n`docs/internal/HANDOFF.md` §11.1；确属合理保留的跑 `--write` 并在 PR 说明原因。")
     return 1
 
 
