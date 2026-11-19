@@ -14,7 +14,7 @@
 
 | # | 边界 | 判据 |
 |---|---|---|
-| 1 | **不动前端** | 路由、请求/响应字段、错误码、SSE 帧格式全不变；1,346 金片 + OpenAPI 快照守 |
+| 1 | **不动前端** | 路由、请求/响应字段、错误码、SSE 帧格式全不变；1,339 金片 + OpenAPI 快照守 |
 | 2 | **不动数据库** | 无 DDL、无迁移脚本、无表结构变更 |
 | 3 | **不做 contract 解散** | `contract` 保持现状；`domains` 仍是单个 Maven 模块 |
 
@@ -35,19 +35,32 @@
 | 批 | 内容 | 验收 |
 |---|---|---|
 | **P0** | 三份只读基线：OpenAPI 快照、Bean 清单 + 端点清单、跨域引用清单 | 快照入库；后续每批 diff 必须为空或差异可解释 |
-| **P1** | 结构规则先行：4 条 ArchUnit + AOP 切点 / 日志配置 grep 排查 | 先出现状违规清单（只量不改）；违规数只减不增 |
+| **P1** | 结构规则先行：只补 2 条缺口规则（跨域直连、注解 SQL 棘轮）+ 扫描名单核对 | 先出现状违规清单（只量不改）；违规数只减不增 |
 | **P2** | 纯包移动：只改目录与 `package` 声明，不改类名、不改逻辑 | 编译 + 全量闸门 + 三份快照 diff 为空 |
 | **P3** | 类职责归位：合并 `*Ops`（50）/ `*Support`（21）/ `*Wiring`（13） | 该域定向测试 + 金片 + 全量闸门 |
 | **P4** | `api/` 包语义纠正 + 域间边界改为测试校验 | 结构校验通过；跨域直连引用只减不增 |
 
-### 4.1 P1 的四条规则
+### 4.1 P1 的规则：先盘点已有，只补缺口
 
-1. `mapper` 只被 `repository` 引用。
-2. 主码无 `@Select` / `@Update` / `@Insert` / `@Delete`（自定义 SQL 进 XML 或 Repository）。
-3. `JdbcTemplate` / `JdbcClient` 只在白名单包（当前 14 + 3 个文件）。
-4. 跨域不引用对方的 `repository` / `mapper` / `domain`（现状实体在 `domain/`，不叫 `entity/`）。
+2026-11-19 实测：`boot/src/test/java/com/ragagent/arch/ArchitectureRulesTest.java` 已有 **22 条规则**（A1~A20 + B257/B260），原计划的四条里三条已被覆盖：
 
-规则 4 与现有 `check-domain-contracts.py`（R10 域间只经契约）重叠，前者是 Java 侧表达，后者保留为棘轮。
+| 原计划规则 | 现状 | 结论 |
+|---|---|---|
+| `mapper` 只被 `repository` 引用 | A11（Mapper 必须在 `..mapper..`）+ A11b（mapper 包只放 MyBatis-Plus 接口）+ A16（service 不引 mapper）+ C10（controller 不引实体） | **已覆盖，不新增** |
+| `JdbcTemplate` 白名单 | A7（裸 JDBC 只许白名单类） | **已覆盖，不新增** |
+| 主码零注解 SQL | 无。现状 281 条注解 SQL（含 72 条 `<script>`） | 改为**棘轮**（只减不增）；一次改 281 条不是分包任务 |
+| 跨域不引对方 `repository` / `mapper` / `domain` | 无。`check-domain-contracts.py` 只管"域间只经 contract"，B257 只管两个域 | **P1 唯一要新增的规则** |
+
+所以 P1 实际只有两件事：
+
+1. **新增 ArchUnit**：跨域不得 import 对方的 `repository` / `mapper` / `domain` / `service` / `controller` 子包（`api` 与 `dto` 方向逐条实测后决定）。
+2. **新增注解 SQL 棘轮**：基线取当前条数，只减不增。
+
+另有三个"搬家漏登记"的实测事实，进 P1 核对清单：
+
+- **`@ConfigurationPropertiesScan` 列了 11 个精确包**（在 `RagAgentApplication`），类移出名单即**配置静默不绑定**——无编译错、无启动错、属性为 null。这比日志级别更隐蔽，是本次最该盯的一项。
+- `@MapperScan("com.ragagent.**.mapper")` 是通配，Mapper 只要留在任一 `mapper` 包内即安全，且 A11 已守着。
+- 全仓**没有 `@Aspect` 类**（实测 0），"切点写包路径导致静默失效"这类风险当前不存在；将来引入切面时再登记。
 
 ### 4.2 P2 顺序（按文件数从小到大）
 
@@ -61,18 +74,19 @@
 
 ## 5. "搬家漏登记"风险清单
 
-编译期抓不到、运行期才炸的六项，P1 阶段一次性 grep 清干净：
+编译期抓不到、运行期才炸的项，逐条附 2026-11-19 实测状态：
 
-| 项 | 后果 | 检出方式 |
-|---|---|---|
-| `@MapperScan` / `typeAliasesPackage` | 启动失败 | 启动冒烟 |
-| `AutoConfiguration.imports` 写死类全名 | 启动失败 | 启动冒烟 |
-| `@ComponentScan` 范围变化 | Bean 静默消失 | **Bean 清单 diff** |
-| **AOP 切点写成包路径** | 事务/日志/权限切面静默失效 | **grep，无运行时信号** |
-| **`logging.level.com.ragagent.xxx`** | 日志静默变少 | **grep，无运行时信号** |
-| Jackson 多态默认用类名做 type id | 输出类型名变化 | 金片 |
+| 项 | 实测状态 | 后果 | 检出方式 |
+|---|---|---|---|
+| **`@ConfigurationPropertiesScan` 的精确包名单** | 存在，**列了 11 个包** | 类移出名单 ⇒ 配置**静默不绑定**（属性 null，无报错） | Bean 清单 `configurationPropertiesScan` + A2 |
+| `@MapperScan` | 通配 `com.ragagent.**.mapper` | 移出任一 `mapper` 包才失效 | A11 已守 |
+| `@ComponentScan` 根包 | `@SpringBootApplication` 扫 `com.ragagent.**` | 移出根包 ⇒ Bean 静默消失 | Bean 清单 `configurations` diff |
+| `AutoConfiguration.imports` / `spring.factories` | 1 个 `spring.factories`（boot），0 个 `.imports` | 类名写死处改动即启动失败（响亮） | 启动冒烟 |
+| AOP 切点写包路径 | **全仓 0 个 `@Aspect`** | 当前无此风险 | 清单 `aspects` 为空即证明 |
+| `logging.level.com.ragagent` | 1 条（`com.ragagent: ${LOG_LEVEL:INFO}`） | 日志静默变少 | 清单 `loggingLevels` |
+| Jackson 多态按类名做 type id | 由金片兜底 | 输出类型名变化 | 金片 |
 
-最后两项说明：界面录屏对这类问题同样无能为力，本次不采用浏览器录制。
+最隐蔽的是第一项：它既不会编译失败，也不会启动失败，只在运行到该配置时表现为"取不到值"。界面录屏同样抓不到，所以本次不采用浏览器录制。
 
 ## 6. 为什么不用界面录制验收
 
@@ -81,7 +95,7 @@
 ```
 用户看到的
 ├── 页面长什么样 ── 前端不改（人工走查清单，迁移前后各一遍）
-├── 接口返回什么 ── 1,346 契约金片 + OpenAPI 快照 diff（零成本，可重跑）
+├── 接口返回什么 ── 1,339 契约金片 + OpenAPI 快照 diff（零成本，可重跑）
 └── 检索/回答什么 ── 检索快照 + SSE 事件对拍（脚本级）
 ```
 

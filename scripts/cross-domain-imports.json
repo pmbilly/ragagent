@@ -1,0 +1,170 @@
+{
+  "generated": "2026-11-19",
+  "domains": [
+    "agentmanagement",
+    "agenttools",
+    "audit",
+    "auth",
+    "datasource",
+    "embedchannel",
+    "favorite",
+    "im",
+    "initialization",
+    "knowledge",
+    "mcp",
+    "memory",
+    "model",
+    "session",
+    "storage",
+    "system",
+    "vectorstore",
+    "websearch",
+    "wiki"
+  ],
+  "edges": [
+    {
+      "from": "knowledge",
+      "to": "wiki",
+      "target": "service",
+      "imports": 7
+    },
+    {
+      "from": "session",
+      "to": "agentmanagement",
+      "target": "service",
+      "imports": 6
+    },
+    {
+      "from": "session",
+      "to": "agenttools",
+      "target": "datasource",
+      "imports": 4
+    },
+    {
+      "from": "session",
+      "to": "agenttools",
+      "target": "knowledge",
+      "imports": 10
+    },
+    {
+      "from": "session",
+      "to": "agenttools",
+      "target": "sql",
+      "imports": 1
+    },
+    {
+      "from": "session",
+      "to": "agenttools",
+      "target": "web",
+      "imports": 5
+    },
+    {
+      "from": "session",
+      "to": "agenttools",
+      "target": "wiki",
+      "imports": 22
+    },
+    {
+      "from": "session",
+      "to": "memory",
+      "target": "api",
+      "imports": 4
+    },
+    {
+      "from": "system",
+      "to": "auth",
+      "target": "api",
+      "imports": 5
+    },
+    {
+      "from": "system",
+      "to": "auth",
+      "target": "apikey",
+      "imports": 1
+    },
+    {
+      "from": "wiki",
+      "to": "knowledge",
+      "target": "api",
+      "imports": 6
+    }
+  ],
+  "contractImports": [
+    {
+      "from": "agentmanagement",
+      "imports": 22
+    },
+    {
+      "from": "agenttools",
+      "imports": 151
+    },
+    {
+      "from": "audit",
+      "imports": 12
+    },
+    {
+      "from": "auth",
+      "imports": 139
+    },
+    {
+      "from": "datasource",
+      "imports": 37
+    },
+    {
+      "from": "embedchannel",
+      "imports": 24
+    },
+    {
+      "from": "favorite",
+      "imports": 3
+    },
+    {
+      "from": "im",
+      "imports": 49
+    },
+    {
+      "from": "initialization",
+      "imports": 41
+    },
+    {
+      "from": "knowledge",
+      "imports": 317
+    },
+    {
+      "from": "mcp",
+      "imports": 82
+    },
+    {
+      "from": "memory",
+      "imports": 97
+    },
+    {
+      "from": "model",
+      "imports": 46
+    },
+    {
+      "from": "session",
+      "imports": 556
+    },
+    {
+      "from": "storage",
+      "imports": 78
+    },
+    {
+      "from": "system",
+      "imports": 33
+    },
+    {
+      "from": "vectorstore",
+      "imports": 28
+    },
+    {
+      "from": "websearch",
+      "imports": 38
+    },
+    {
+      "from": "wiki",
+      "imports": 124
+    }
+  ]
+}

@@ -29,7 +29,7 @@
 
 **阶段**：P0 基线 → P1 规则先行 → P2 纯包移动 → P3 类职责归位 → P4 `api` 语义与边界校验（见 §5）。
 
-**当前状态（2026-11-19）**：P0 未开工。代码在 `v0.11.x` 的 `4982db9e5`；此前 16 天 115 个提交均为功能修补，无模块增减、无契约面变更、无表结构变更。
+**当前状态（2026-11-19）**：**P0 已完成**（三份基线入库、可复现），P1 待做。代码在 `v0.11.x`；基线前 16 天 115 个提交均为功能修补，无模块增减、无契约面变更、无表结构变更。
 
 ## 1. 仓库身份与分支
 
@@ -47,20 +47,20 @@
 3. **不做蓝图 5.5 的包名对齐**（`entity` / `vo` / `bo` / `assembler`）。理由：`api/` 现装 `*Adapter`，与蓝图"对外契约"语义相反；`domain/` 混了实体、值对象、事件消费者。详见方案 §3。
 4. **纯包移动（P2）与类职责归位（P3）分两批**，不混做：前者可批量 revert，后者碰行为。
 5. **P3 按域推进**，一次一个域，该域测试与金片全绿才进下一个。
-6. **验证不依赖浏览器录制**：以全量闸门 + 1,346 金片 + OpenAPI 快照 + Bean/端点清单 + 跨域引用清单为准。
+6. **验证不依赖浏览器录制**：以全量闸门 + 1,339 金片 + OpenAPI 快照 + Bean/端点清单 + 跨域引用清单为准。
 7. 排除项：行级安全与租户插件、表结构重建、JobRunr、PGroonga、Sa-Token、MCP 官方 SDK 替换（与"不动库/不动前端"冲突，或属域重写范畴）。
 
 **沿用（上一阶段已定，本次不改）**：
 
 8. 保留分层单体；模块名 = 顶层包名；三个 runtime 平级、互不引用实现。
 9. 域间只经契约（R10）：属主边 2 条（`auth→tenant`、`system→auth`）登记维持，同族 5 条冻结。
-10. 线格式 1,346 金片逐字节不变；协议变更属产品决策、不夹带。
+10. 线格式 1,339 金片逐字节不变；协议变更属产品决策、不夹带。
 11. platform 不放业务形状（判据见 §4）。
 
 ## 3. 三条红线（本次不变）
 
 1. **载体红线**：不得上提持久化实体（`@TableName`/TypeHandler/可变 setter）到 L1；contract 不放**内部件/持久化形状**；platform 不放**业务形状**。
-2. **线格式红线**：金片签名 1,346 逐字节不变；确需变更 ⇒ 显式签字 + 前端确认（产品决策）。
+2. **线格式红线**：金片签名 1,339 逐字节不变；确需变更 ⇒ 显式签字 + 前端确认（产品决策）。
 3. **纪律红线**：**不刷新 baseline 掩盖违例**；**守卫必须能红**（新增/改守卫必配红态探针）；**闸门退出码显式取用**（任何 `| head` 不得代替）。
 
 ## 4. 两条判定标准（沿用，2026-10-16 拍板）
@@ -78,8 +78,8 @@
 
 | 批 | 内容 | 验收 | 状态 |
 |---|---|---|---|
-| **P0** | 三份只读基线：OpenAPI 快照、Bean + 端点清单、跨域引用清单 | 快照入库，后续每批 diff 可判 | 待做 |
-| **P1** | 结构规则先行：4 条 ArchUnit（Mapper 只被 Repository 引用 / 主码零注解 SQL / `JdbcTemplate` 白名单 / 跨域不引对方 `repository`·`mapper`·`domain`）+ AOP 切点与日志配置 grep | 先出现状违规清单（只量不改）；违规只减不增 | 待做 |
+| **P0** | 三份只读基线：`scripts/gen-package-baseline.py` 生成端点 / 装配面 / 跨域引用三份 JSON | 端点 397 · Mapper 45 · `@Configuration` 23 · 跨域边 11 · 可复现（`--check` 无变化） | ✅ 2026-11-19 |
+| **P1** | 结构规则先行：**只补 2 条**（跨域不引对方 `repository`/`mapper`/`domain`/`service`/`controller`；注解 SQL 棘轮 281→只减）+ 扫描名单核对（`@ConfigurationPropertiesScan` 11 包 / `@MapperScan` 通配 / 无 `@Aspect`） | 先出现状违规清单（只量不改）；违规只减不增 | 待做 |
 | **P2** | 纯包移动：只改目录与 `package` 声明，不改类名、不改逻辑 | 编译 + 全量闸门 + 三份快照 diff 为空 | 待做 |
 | **P3** | 类职责归位：`*Ops`(50) / `*Support`(21) / `*Wiring`(13) 合并回 service | 该域定向测试 + 金片 + 全量闸门 | 待做 |
 | **P4** | `api/` 包语义纠正 + 域间边界改为测试校验 | 结构校验通过；跨域直连引用 0 | 待做 |
@@ -114,7 +114,7 @@ H7（platform 判据换血）· H8（适配层逻辑化）· H9（管理面模�
 
 ## 7. 测试与安全网
 
-- 回归网：**~5082 用例（2026-10-24 口径，已过期）/ 1,346 契约金片**；每一步（哪怕纯移动）结束必须全绿。
+- 回归网：**~5082 用例（2026-10-24 口径，已过期）/ 1,339 契约金片**；每一步（哪怕纯移动）结束必须全绿。
 - 已知偶发（全量并发下，单独重跑即绿，勿误判回归）：`WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool` · `EvaluationContractTest.getTerminalRunsExecution` · `EmbedRateLimiterTest.redisPathSharesBudgetAcrossInstances`。
 - **Redis 瞬态族已修（2026-10-19）**：根因是 `EmbeddedRedis` 用 `ServerSocket(0)` 探端口在 `maxParallelForks` 下会撞——后到者借用先到者的实例，先到者 close 杀进程后连接全断。现改为固定端口池 + 跨进程 `FileLock`，红态探针 `EmbeddedRedisPortAllocationTest` 守着；全量连跑 5 遍 0 失败。再见到同类失败按真回归查。
 - 覆盖率：**未执行基线**（`-Pcoverage`）⇒ 本项目**不声称任何覆盖率数字**（开放项）。
@@ -161,7 +161,7 @@ boot           17 件                      →  boot
 | `check-package-cycles.py` | 环/分层/域依赖/SCC（R1~R9） | `package-cycles.baseline.json`（只许减；包级 SCC 5 组） |
 | `check-domain-contracts.py` | **R10 域间只经契约**（分档①②③） | `domain-contracts.baseline.json`（**6 条边 / 27 类**；clearable 0） |
 | `check-contract-purity.py` | C1 导入根（纯 JDK）· C2 构建依赖 · C3 框架形状 | 硬零，无基线 |
-| `check-contract-sync.py` | 金片键签名变化必须签字 | 1,346 金片 |
+| `check-contract-sync.py` | 金片键签名变化必须签字 | 1,339 金片 |
 | `check-json-key-case.py --strict` | 换锚棘轮 + 冻结覆盖快照 | 冻结面登记 |
 | `check-event-face-case.py` | 事件面/路由面命名口径 | — |
 | `check-file-size.py` | 大文件棘轮（>600 棘轮，≥800 须登记） | `file-size.baseline.json` |
@@ -269,7 +269,7 @@ boot           17 件                      →  boot
 
 | 批 | 日期 | 内容 | 读数 / 验证 |
 |---|---|---|---|
-| — | — | P0 未开工 | — |
+| **P0** | 2026-11-19 | 新增 `scripts/gen-package-baseline.py`，静态生成三份基线（不启动应用）：`endpoint-inventory.json`（397 条控制器映射）、`bean-inventory.json`（45 Mapper / 23 `@Configuration` / 0 `@Aspect` / `@MapperScan` 通配 / `@ConfigurationPropertiesScan` 11 包 / `spring.factories` 1 处 / `logging.level` 1 条）、`cross-domain-imports.json`（19 域、11 条跨域边、19 个域均引 contract） | `--write` 后 `--check` 三份均无变化（可复现）；守卫 48/48 绿 |
 
 > 历史批次（v0.3.0~v0.11.x，含 P/R/L/M/H/K/X/Q/B269 系列）全部在归档 `handoff/archive/HANDOFF-v0.10.x-2026-11-19.md` §12；追溯用 `git log --grep`。
 

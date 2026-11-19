@@ -1,0 +1,2388 @@
+{
+  "generated": "2026-11-19",
+  "count": 397,
+  "endpoints": [
+    {
+      "holder": "com.ragagent.agentmanagement.controller.AgentController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/agents/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.AgentController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/agents\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.AgentController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/agents/placeholders\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.AgentController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/agents/type-presets\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.AgentController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/agents/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.AgentController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/agents/{id}/suggested-questions\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.AgentController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/agents\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.AgentController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/agents/{id}/copy\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.AgentController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/agents/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.SkillController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/skills/catalog/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.SkillController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/skills\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.SkillController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/skills/catalog\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.SkillController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/skills/catalog/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.SkillController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/skills/catalog/{id}/files\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.SkillController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/skills/catalog/{id}/files/content\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.SkillController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/skills/catalog\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.agentmanagement.controller.SkillController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/skills/catalog/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.audit.controller.AuditLogController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/activity\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.audit.controller.AuditLogController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/system/admin/audit-log\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.audit.controller.AuditLogController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/tenants/{id}/audit-log\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.apikey.controller.TenantAPIKeyController",
+      "annotation": "DeleteMapping",
+      "args": "\"/{keyId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.apikey.controller.TenantAPIKeyController",
+      "annotation": "GetMapping",
+      "args": "\"/{keyId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.apikey.controller.TenantAPIKeyController",
+      "annotation": "PostMapping",
+      "args": "\"/{keyId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.apikey.controller.TenantAPIKeyController",
+      "annotation": "PutMapping",
+      "args": "\"/{keyId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.apikey.controller.TenantAPIKeyController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/tenants/{id}/api-keys\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "GetMapping",
+      "args": "\"/config\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "GetMapping",
+      "args": "\"/me\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "GetMapping",
+      "args": "\"/oidc/callback\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "GetMapping",
+      "args": "\"/oidc/config\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "GetMapping",
+      "args": "\"/oidc/start\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "GetMapping",
+      "args": "\"/oidc/url\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "GetMapping",
+      "args": "\"/validate\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "PostMapping",
+      "args": "\"/auto-setup\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "PostMapping",
+      "args": "\"/change-password\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "PostMapping",
+      "args": "\"/invitations/lookup\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "PostMapping",
+      "args": "\"/login\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "PostMapping",
+      "args": "\"/logout\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "PostMapping",
+      "args": "\"/refresh\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "PostMapping",
+      "args": "\"/register\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "PostMapping",
+      "args": "\"/register-by-invite\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "PostMapping",
+      "args": "\"/switch-tenant\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "PutMapping",
+      "args": "\"/me/preferences\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.AuthController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/auth\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantAPIPrincipalController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/tenants/{id}/api-principal-config\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantAPIPrincipalController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/tenants/{id}/api-principal-test-token\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantAPIPrincipalController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/tenants/{id}/api-principal-config\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantCatalogController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/tenants/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantCatalogController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/tenants\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantCatalogController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/tenants/all\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantCatalogController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/tenants/kv/{key}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantCatalogController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/tenants/search\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantCatalogController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/tenants/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantCatalogController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/tenants\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantCatalogController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/tenants/kv/{key}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantCatalogController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/tenants/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantInvitationController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/tenants/{id}/invitations/{invId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantInvitationController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/me/invitations\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantInvitationController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/me/invitations/pending-count\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantInvitationController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/tenants/{id}/invitations\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantInvitationController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/me/invitations/accept-by-token\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantInvitationController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/me/invitations/{invId}/accept\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantInvitationController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/me/invitations/{invId}/decline\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantInvitationController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/tenants/{id}/invitations\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantInvitationController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/tenants/{id}/invite-links\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantMemberController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/tenants/{id}/members/{userId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantMemberController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/tenants/{id}/members\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantMemberController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/tenants/{id}/leave\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantMemberController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/tenants/{id}/members\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.auth.controller.TenantMemberController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/tenants/{id}/members/{userId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/datasource/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/datasource\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/datasource/logs/{logId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/datasource/types\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/datasource/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/datasource/{id}/logs\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/datasource/{id}/resources\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/datasource\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/datasource/validate-credentials\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/datasource/{id}/pause\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/datasource/{id}/resource-ancestors\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/datasource/{id}/resume\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/datasource/{id}/sync\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/datasource/{id}/validate\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/datasource/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceCredentialsController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/datasource/{id}/credentials/{field}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.datasource.controller.DataSourceCredentialsController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/datasource/{id}/credentials\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/embed-channels/{channelId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/embed/{channelId}/sessions/{sessionId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/agents/{id}/embed-channels\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/embed-channels\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/embed-channels/{channelId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/embed-channels/{channelId}/stats\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/embed/{channelId}/chunks/{chunkId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/embed/{channelId}/config\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/embed/{channelId}/files\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/embed/{channelId}/messages/{sessionId}/load\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/embed/{channelId}/sessions\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/embed/{channelId}/sessions/{sessionId}/mcp-services/{svcId}/oauth/status\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/embed/{channelId}/sessions/{sessionId}/messages/{messageId}/suggestions\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/embed/{channelId}/suggested-questions\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/agents/{id}/embed-channels\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/embed-channels/{channelId}/preview-session\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/embed-channels/{channelId}/rotate-token\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/embed/{channelId}/agent-chat/{sessionId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/embed/{channelId}/exchange\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/embed/{channelId}/knowledge-chat/{sessionId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/embed/{channelId}/sessions\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/embed/{channelId}/sessions/{sessionId}/events\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/embed/{channelId}/sessions/{sessionId}/mcp-oauth-resolutions/{pendingId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/embed/{channelId}/sessions/{sessionId}/mcp-oauth-resolutions/{pendingId}/cancel\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/embed/{channelId}/sessions/{sessionId}/mcp-services/{svcId}/oauth/authorize-url\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/embed/{channelId}/sessions/{sessionId}/messages/{messageId}/suggestions\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/embed/{channelId}/sessions/{sessionId}/stop\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/embed/{channelId}/sessions/{sessionId}/suggestion-events\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/embed/{channelId}/sessions/{sessionId}/tool-approvals/{pendingId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.embedchannel.controller.EmbedChannelController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/embed-channels/{channelId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.favorite.controller.UserFavoriteController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/user/favorites/{type}/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.favorite.controller.UserFavoriteController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/user/favorites\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.favorite.controller.UserFavoriteController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/user/favorites\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.im.controller.ImCallbackController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/im/callback/{channelId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.im.controller.ImCallbackController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/im/callback/{channelId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.im.controller.ImChannelController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/im-channels/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.im.controller.ImChannelController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/agents/{id}/im-channels\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.im.controller.ImChannelController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/im-channels\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.im.controller.ImChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/agents/{id}/im-channels\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.im.controller.ImChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/im-channels/{id}/toggle\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.im.controller.ImChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/wechat/qrcode\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.im.controller.ImChannelController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/wechat/qrcode/status\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.im.controller.ImChannelController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/im-channels/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.initialization.controller.InitializationController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/initialization/config/{kbId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.initialization.controller.InitializationController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/initialization/asr/check\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.initialization.controller.InitializationController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/initialization/embedding/test\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.initialization.controller.InitializationController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/initialization/extract/fabri-tag\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.initialization.controller.InitializationController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/initialization/extract/fabri-text\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.initialization.controller.InitializationController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/initialization/extract/text-relation\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.initialization.controller.InitializationController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/initialization/multimodal/test\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.initialization.controller.InitializationController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/initialization/remote/check\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.initialization.controller.InitializationController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/initialization/rerank/check\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.initialization.controller.InitializationController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/initialization/config/{kbId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.ChunkController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/chunks/by-id/{id}/questions\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.ChunkController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/chunks/{knowledgeId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.ChunkController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/chunks/{knowledgeId}/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.ChunkController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/chunks/by-id/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.ChunkController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/chunks/{knowledgeId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.ChunkController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/chunks/{knowledgeId}/{id}/revisions\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.ChunkController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/chunks/by-id/{id}/questions/regenerate\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.ChunkController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/chunks/{knowledgeId}/{id}/revert\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.ChunkController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/chunks/by-id/{id}/questions\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.ChunkController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/chunks/{knowledgeId}/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.ChunkerPreviewController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/chunker/preview\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.FaqController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/faq/entries\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.FaqController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/faq/import/progress/{taskId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.FaqController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/faq/entries\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.FaqController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/faq/entries/export\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.FaqController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/faq/entries/{entryId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.FaqController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/faq/entries\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.FaqController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/faq/entries/{entryId}/similar-questions\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.FaqController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/faq/entry\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.FaqController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/faq/search\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.FaqController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/faq/entries/fields\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.FaqController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/faq/entries/tags\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.FaqController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/faq/entries/{entryId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.FaqController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/faq/import/last-result/display\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseController",
+      "annotation": "DeleteMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseController",
+      "annotation": "GetMapping",
+      "args": "\"/copy/progress/{taskId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}\"",
+      "seq": 2
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}/hybrid-search\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}/move-targets\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseController",
+      "annotation": "PostMapping",
+      "args": "\"/copy\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}/duplicate\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}/hybrid-search\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}/rebuild-index\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseController",
+      "annotation": "PutMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseController",
+      "annotation": "PutMapping",
+      "args": "\"/{id}/pin\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/knowledge-bases\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseFileProxyController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/files\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseFileProxyController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/files/signed-url\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeBaseFileProxyController",
+      "annotation": "RequestMapping",
+      "args": "value = \"/api/v1/knowledge-bases/{id}/files\", method = RequestMethod.HEAD",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "DeleteMapping",
+      "args": "\"/knowledge-bases/{id}/knowledge\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "DeleteMapping",
+      "args": "\"/knowledge/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "GetMapping",
+      "args": "\"/knowledge-bases/{id}/knowledge\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "GetMapping",
+      "args": "\"/knowledge-bases/{id}/knowledge/folders\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "GetMapping",
+      "args": "\"/knowledge/batch\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "GetMapping",
+      "args": "\"/knowledge/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "GetMapping",
+      "args": "\"/knowledge/{id}/download\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "GetMapping",
+      "args": "\"/knowledge/{id}/preview\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "GetMapping",
+      "args": "{\"/knowledge/{id}/stages\", \"/knowledge/{id}/spans\"}",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "PostMapping",
+      "args": "\"/knowledge-bases/{id}/knowledge/file\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "PostMapping",
+      "args": "\"/knowledge-bases/{id}/knowledge/manual\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "PostMapping",
+      "args": "\"/knowledge-bases/{id}/knowledge/url\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "PostMapping",
+      "args": "\"/knowledge/{id}/cancel-parse\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "PostMapping",
+      "args": "\"/knowledge/{id}/regenerate-summary\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "PostMapping",
+      "args": "\"/knowledge/{id}/reparse\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "PutMapping",
+      "args": "\"/knowledge/image/{id}/{chunkId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "PutMapping",
+      "args": "\"/knowledge/manual/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "PutMapping",
+      "args": "\"/knowledge/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeOperationsController",
+      "annotation": "GetMapping",
+      "args": "\"/knowledge/move/progress/{taskId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeOperationsController",
+      "annotation": "GetMapping",
+      "args": "\"/knowledge/search\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeOperationsController",
+      "annotation": "PostMapping",
+      "args": "\"/knowledge/batch-delete\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeOperationsController",
+      "annotation": "PostMapping",
+      "args": "\"/knowledge/batch-reparse\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeOperationsController",
+      "annotation": "PostMapping",
+      "args": "\"/knowledge/folder\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeOperationsController",
+      "annotation": "PostMapping",
+      "args": "\"/knowledge/move\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeOperationsController",
+      "annotation": "PutMapping",
+      "args": "\"/knowledge-bases/{id}/knowledge/folders\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeOperationsController",
+      "annotation": "PutMapping",
+      "args": "\"/knowledge/tags\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeOperationsController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeTagController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/tags/{tagId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeTagController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/tags\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeTagController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/tags\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.knowledge.controller.KnowledgeTagController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/knowledge-bases/{id}/tags/{tagId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.AgentToolApprovalController",
+      "annotation": "PostMapping",
+      "args": "\"/tool-approvals/{pendingId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.AgentToolApprovalController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/agent\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpCredentialsController",
+      "annotation": "DeleteMapping",
+      "args": "\"/{id}/credentials/{field}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpCredentialsController",
+      "annotation": "PutMapping",
+      "args": "\"/{id}/credentials\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpCredentialsController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/mcp-services\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpOAuthController",
+      "annotation": "DeleteMapping",
+      "args": "\"/mcp-services/{id}/oauth/token\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpOAuthController",
+      "annotation": "GetMapping",
+      "args": "\"/mcp-oauth/callback\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpOAuthController",
+      "annotation": "GetMapping",
+      "args": "\"/mcp-services/{id}/oauth/status\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpOAuthController",
+      "annotation": "PostMapping",
+      "args": "\"/agent/mcp-oauth-resolutions/{pendingId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpOAuthController",
+      "annotation": "PostMapping",
+      "args": "\"/agent/mcp-oauth-resolutions/{pendingId}/cancel\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpOAuthController",
+      "annotation": "PostMapping",
+      "args": "\"/mcp-services/{id}/oauth/authorize-url\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpOAuthController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpServiceController",
+      "annotation": "DeleteMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpServiceController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpServiceController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}\"",
+      "seq": 2
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpServiceController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}/metadata\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpServiceController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}/resources\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpServiceController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}/tool-approvals\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpServiceController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}/tools\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpServiceController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpServiceController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}/metadata/refresh\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpServiceController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}/test\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpServiceController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}/usage-instructions/generate\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpServiceController",
+      "annotation": "PutMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpServiceController",
+      "annotation": "PutMapping",
+      "args": "\"/{id}/tool-approvals/{toolName}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.mcp.controller.McpServiceController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/mcp-services\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/memory/documents/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/memory/items\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/memory/items/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/memory/topics/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/memory/documents\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/memory/export\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/memory/items\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/memory/settings\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/memory/topics\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/memory/consolidate\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/memory/items\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/memory/items/{id}/confirm\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/memory/items/{id}/reject\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/memory/topics/{id}/promote\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/memory/items/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.memory.controller.MemoryController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/memory/settings\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelController",
+      "annotation": "DeleteMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelController",
+      "annotation": "GetMapping",
+      "args": "\"/providers\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}\"",
+      "seq": 2
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelController",
+      "annotation": "PutMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/models\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelCredentialsController",
+      "annotation": "DeleteMapping",
+      "args": "\"/{id}/credentials/{field}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelCredentialsController",
+      "annotation": "PutMapping",
+      "args": "\"/{id}/credentials\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelCredentialsController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/models\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelDebugController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}/debug\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelDebugController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/models\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelOllamaController",
+      "annotation": "GetMapping",
+      "args": "\"/download/progress/{taskId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelOllamaController",
+      "annotation": "GetMapping",
+      "args": "\"/download/tasks\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelOllamaController",
+      "annotation": "GetMapping",
+      "args": "\"/models\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelOllamaController",
+      "annotation": "GetMapping",
+      "args": "\"/status\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelOllamaController",
+      "annotation": "PostMapping",
+      "args": "\"/models/check\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelOllamaController",
+      "annotation": "PostMapping",
+      "args": "\"/models/download\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.model.controller.ModelOllamaController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/models/ollama\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.platform.web.health.HealthController",
+      "annotation": "GetMapping",
+      "args": "\"/health\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.KnowledgeQaController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/agent-chat/{sessionId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.KnowledgeQaController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/knowledge-chat/{sessionId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.KnowledgeQaController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/knowledge-search\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.MessageController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/messages/{sessionId}/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.MessageController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/messages/chat-history-stats\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.MessageController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/messages/{sessionId}/load\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.MessageController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/messages/search\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.MessageFileProxyController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/sessions/{id}/messages/{messageId}/files\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.MessageFileProxyController",
+      "annotation": "RequestMapping",
+      "args": "value = \"/api/v1/sessions/{id}/messages/{messageId}/files\",\n            method = RequestMethod.HEAD",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.MessageSuggestionController",
+      "annotation": "GetMapping",
+      "args": "{\"/api/v1/sessions/{sessionId}/messages/{messageId}/suggestions\",\n            \"/api/v1/sessions/{id}/messages/{messageId}/suggestions\"}",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.MessageSuggestionController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/sessions/{sessionId}/messages/{messageId}/suggestions\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.MessageSuggestionController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/sessions/{sessionId}/suggestion-events\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/sessions/batch\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/sessions/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/sessions/{id}/messages\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api/v1/sessions/{id}/pin\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/sessions\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/sessions/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/sessions/{id}/artifacts\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/sessions/{id}/messages/{messageId}/artifacts\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/sessions/{id}/messages/{messageId}/artifacts/{index}/download\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/sessions\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/sessions/{sessionId}/generate_title\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/sessions/{sessionId}/pin\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/sessions/{sessionId}/stop\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionController",
+      "annotation": "PutMapping",
+      "args": "\"/api/v1/sessions/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SessionStreamController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/sessions/continue-stream/{sessionId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SteerController",
+      "annotation": "DeleteMapping",
+      "args": "{\"/api/v1/sessions/{id}/steer/{steerId}\",\n            \"/api/v1/sessions/{sessionId}/steer/{steerId}\"}",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SteerController",
+      "annotation": "GetMapping",
+      "args": "{\"/api/v1/sessions/{id}/steer\", \"/api/v1/sessions/{sessionId}/steer\"}",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SteerController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/sessions/{sessionId}/steer\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.SteerController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/sessions/{sessionId}/steer/{steerId}/inject\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.TemporaryDocumentController",
+      "annotation": "DeleteMapping",
+      "args": "{\"/api/v1/sessions/{id}/attachments/{attachmentId}\",\n            \"/api/v1/sessions/{sessionId}/attachments/{attachmentId}\"}",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.TemporaryDocumentController",
+      "annotation": "GetMapping",
+      "args": "{\"/api/v1/sessions/{id}/attachments\", \"/api/v1/sessions/{sessionId}/attachments\"}",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.TemporaryDocumentController",
+      "annotation": "GetMapping",
+      "args": "{\"/api/v1/sessions/{id}/attachments/{attachmentId}\",\n            \"/api/v1/sessions/{sessionId}/attachments/{attachmentId}\"}",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.TemporaryDocumentController",
+      "annotation": "GetMapping",
+      "args": "{\"/api/v1/sessions/{id}/attachments/{attachmentId}/preview\",\n            \"/api/v1/sessions/{sessionId}/attachments/{attachmentId}/preview\"}",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.session.controller.TemporaryDocumentController",
+      "annotation": "PostMapping",
+      "args": "\"/api/v1/sessions/{sessionId}/attachments\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.FileProxyController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/files/presigned-preview\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.FileProxyController",
+      "annotation": "GetMapping",
+      "args": "\"/files\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.FileProxyController",
+      "annotation": "RequestMapping",
+      "args": "value = \"/api/v1/files/presigned\", method = { RequestMethod.GET, RequestMethod.HEAD }",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.FileProxyController",
+      "annotation": "RequestMapping",
+      "args": "value = \"/api/v1/files/presigned-preview\", method = RequestMethod.HEAD",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.FileProxyController",
+      "annotation": "RequestMapping",
+      "args": "value = \"/files\", method = RequestMethod.HEAD",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.FileProxyController",
+      "annotation": "RequestMapping",
+      "args": "value = \"/r/{token}\", method = { RequestMethod.GET, RequestMethod.HEAD }",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.StorageBackendController",
+      "annotation": "DeleteMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.StorageBackendController",
+      "annotation": "GetMapping",
+      "args": "\"/types\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.StorageBackendController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.StorageBackendController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}\"",
+      "seq": 2
+    },
+    {
+      "holder": "com.ragagent.storage.controller.StorageBackendController",
+      "annotation": "PostMapping",
+      "args": "\"/test\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.StorageBackendController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.StorageBackendController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}/test\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.StorageBackendController",
+      "annotation": "PutMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.StorageBackendController",
+      "annotation": "PutMapping",
+      "args": "\"/{id}/default\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.StorageBackendController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/storage-backends\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.StorageEngineController",
+      "annotation": "GetMapping",
+      "args": "\"/engine-status\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.StorageEngineController",
+      "annotation": "PostMapping",
+      "args": "\"/engine-check\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.storage.controller.StorageEngineController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/storage\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "DeleteMapping",
+      "args": "\"/api-keys/{keyId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "DeleteMapping",
+      "args": "\"/runtime/queues/{queue}/archived\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "DeleteMapping",
+      "args": "\"/settings/{key}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "GetMapping",
+      "args": "\"/api-keys\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "GetMapping",
+      "args": "\"/list\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "GetMapping",
+      "args": "\"/runtime/queues\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "GetMapping",
+      "args": "\"/runtime/queues/{queue}/tasks\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "GetMapping",
+      "args": "\"/settings\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "GetMapping",
+      "args": "\"/settings/{key}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "PostMapping",
+      "args": "\"/api-keys\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "PostMapping",
+      "args": "\"/promote\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "PostMapping",
+      "args": "\"/revoke\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "PostMapping",
+      "args": "\"/runtime/queues/{queue}/tasks/{taskId}/actions/{action}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "PostMapping",
+      "args": "\"/tenants/apply-default-storage-quota\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "PostMapping",
+      "args": "\"/users/create\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "PostMapping",
+      "args": "\"/users/reset-password\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "PutMapping",
+      "args": "\"/settings/{key}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemAdminController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/system/admin\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemController",
+      "annotation": "GetMapping",
+      "args": "\"/capabilities\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemController",
+      "annotation": "GetMapping",
+      "args": "\"/info\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemController",
+      "annotation": "GetMapping",
+      "args": "\"/parser-engines\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemController",
+      "annotation": "PostMapping",
+      "args": "\"/docreader/reconnect\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemController",
+      "annotation": "PostMapping",
+      "args": "\"/parser-engines/check\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.system.controller.SystemController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/system\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.vectorstore.controller.VectorStoreController",
+      "annotation": "DeleteMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.vectorstore.controller.VectorStoreController",
+      "annotation": "GetMapping",
+      "args": "\"/types\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.vectorstore.controller.VectorStoreController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.vectorstore.controller.VectorStoreController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}\"",
+      "seq": 2
+    },
+    {
+      "holder": "com.ragagent.vectorstore.controller.VectorStoreController",
+      "annotation": "PostMapping",
+      "args": "\"/test\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.vectorstore.controller.VectorStoreController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.vectorstore.controller.VectorStoreController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}/test\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.vectorstore.controller.VectorStoreController",
+      "annotation": "PutMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.vectorstore.controller.VectorStoreController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/vector-stores\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.websearch.controller.WebSearchController",
+      "annotation": "GetMapping",
+      "args": "\"/api/v1/web-search/providers\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.websearch.controller.WebSearchProviderController",
+      "annotation": "DeleteMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.websearch.controller.WebSearchProviderController",
+      "annotation": "GetMapping",
+      "args": "\"/types\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.websearch.controller.WebSearchProviderController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.websearch.controller.WebSearchProviderController",
+      "annotation": "GetMapping",
+      "args": "\"/{id}\"",
+      "seq": 2
+    },
+    {
+      "holder": "com.ragagent.websearch.controller.WebSearchProviderController",
+      "annotation": "PostMapping",
+      "args": "\"/test\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.websearch.controller.WebSearchProviderController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.websearch.controller.WebSearchProviderController",
+      "annotation": "PostMapping",
+      "args": "\"/{id}/test\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.websearch.controller.WebSearchProviderController",
+      "annotation": "PutMapping",
+      "args": "\"/{id}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.websearch.controller.WebSearchProviderController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/web-search-providers\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.websearch.controller.WebSearchProviderCredentialsController",
+      "annotation": "DeleteMapping",
+      "args": "\"/{id}/credentials/{field}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.websearch.controller.WebSearchProviderCredentialsController",
+      "annotation": "PutMapping",
+      "args": "\"/{id}/credentials\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.websearch.controller.WebSearchProviderCredentialsController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/web-search-providers\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "DeleteMapping",
+      "args": "\"/folders/{folderId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "DeleteMapping",
+      "args": "\"/pages/{*slug}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "GetMapping",
+      "args": "\"/folders\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "GetMapping",
+      "args": "\"/graph\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "GetMapping",
+      "args": "\"/index\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "GetMapping",
+      "args": "\"/issues\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "GetMapping",
+      "args": "\"/lint\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "GetMapping",
+      "args": "\"/pages\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "GetMapping",
+      "args": "\"/pages/{*slug}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "GetMapping",
+      "args": "\"/revisions/{*slug}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "GetMapping",
+      "args": "\"/search\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "GetMapping",
+      "args": "\"/stats\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "PostMapping",
+      "args": "\"/auto-fix\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "PostMapping",
+      "args": "\"/folders\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "PostMapping",
+      "args": "\"/pages\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "PostMapping",
+      "args": "\"/rebuild-links\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "PostMapping",
+      "args": "\"/revert\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "PutMapping",
+      "args": "\"/folders/{folderId}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "PutMapping",
+      "args": "\"/issues/{issueId}/status\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "PutMapping",
+      "args": "\"/move-page\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "PutMapping",
+      "args": "\"/pages/{*slug}\"",
+      "seq": 1
+    },
+    {
+      "holder": "com.ragagent.wiki.controller.WikiPageController",
+      "annotation": "RequestMapping",
+      "args": "\"/api/v1/knowledgebase/{kbId}/wiki\"",
+      "seq": 1
+    }
+  ]
+}
