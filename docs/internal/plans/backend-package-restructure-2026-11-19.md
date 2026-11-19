@@ -388,3 +388,24 @@ ragagent/
 
 1. **包根不统一**：`domains` 的源根是 `com.ragagent.<域>`，不是 `com.ragagent.domains.<域>`。改名 `app` 时若顺手统一包根，会触碰全部 1,642 个文件 —— **只改模块名，不动包根**。
 2. **`boot` 并入 `app`** 后，17 个装配类落到 `app/config/`，`check-wiring-points.py`（W1~W4）的登记表与 `docs/architecture` 的装配清单要同步。
+
+## 10. 终态实施路径（第 2 期）
+
+§9 的 5 模块终态需要 8 个阶段。**顺序与原设想不同**：目录前移（`backend/`）排到最后，理由是它会让 24 个守卫脚本与 CI 的路径全部失效——只应打乱一次，与 `app` 合并相邻做。
+
+| 阶段 | 内容 | 前置 | 工时 | 验收 |
+|---|---|---|---|---|
+| **S1** | 解 `ContractJsonMixins` 结构障碍：改成按模块贡献（`JsonModuleCustomizer` SPI） | — | 2~3 天 | 1,339 金片零变化（序列化逐字节相同） |
+| **S2** | `platform` → `framework`（目录 + artifactId，**包名不动**） | S1 | 1 天 | 全量绿 + 守卫 49/49 |
+| **S3** | 引擎面归位：`model` → model-runtime/api；`retrieval` + `vectorstore` 余项 → retrieval/api；`agent` + `tool` + `pipeline` 整组 → agent/api + spi | S1 | 3~5 天 | 每批全量绿 |
+| **S4** | 通用面下沉：`error` / `event` / `json` / `text` / `pagination` → framework | S3（清完 contract 内部引用） | 2 天 | 全量绿 |
+| **S5** | 域契约归位（13 个包 → contract 只剩域包） | **需先做域间通信改造** | 不可估 | — |
+| **S6** | `domains` + `boot/config` → `app`；boot 只留启动类；1 jar 双角色 | S4 | 1~2 天 | 全量绿 + 双角色启动验证 |
+| **S7** | 目录前移 `backend/` + 路径适配（24 个脚本 + CI + 文档） | S6 | 1~2 天 | 全量绿 + 守卫 49/49 |
+| **S8** | ArchUnit → Modulith，删 `scripts/*.py` 守卫 | S7 | 2 天 | — |
+
+**S1 是唯一的技术阻塞**。不解决它，S3/S4 都做不了——契约一旦分散到引擎，platform 就要依赖引擎，形成循环（`json` 下沉实测已直接编译失败）。
+
+**S5 不是"搬包"**。§9.7 实测：13 个域包没有一个只服务单域（`doc` 被 5 个域用、`settings` 被 2 个），所以必须先改域间通信方式（事件/端口化）。那是独立项目，不与本节混做。
+
+**第一段（S1~S4 + S6~S7）产出 6 模块**：`backend/framework` + 三个引擎 + `app` + `contract`（只剩域包）。这是可交付的稳定中间态，不需要动任何业务逻辑。

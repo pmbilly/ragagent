@@ -31,13 +31,27 @@ public final class JsonMappers {
      * {@code new ObjectMapper()} 等价。
      */
     public static JsonMapper lenient() {
-        return JsonMapper.builder()
+        JsonMapper.Builder builder = JsonMapper.builder()
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .addModule(new JavaTimeModule())
-                // 契约载荷的线格式（键名/省略策略/枚举字面量）由 mixin 模块承载（契约面纯 JDK）
-                .addModule(new ContractJsonModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .build();
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        // 契约载荷的线格式（键名/省略策略/枚举字面量）由 mixin 模块承载（契约面纯 JDK），
+        // 经 ServiceLoader 由各模块自己贡献，避免 platform 认识所有契约类型。
+        // 各模块经 META-INF/services 贡献自己的 Module：契约分散到引擎后，
+        // platform 不必认识它们，也不会形成反向依赖。
+        PROVIDED_MODULES.forEach(builder::addModule);
+        return builder.build();
+    }
+
+    /** 各模块贡献的 Module（静态收集一次；{@code Module} 可跨 mapper 共享）。 */
+    private static final java.util.List<com.fasterxml.jackson.databind.Module> PROVIDED_MODULES =
+            loadProvidedModules();
+
+    private static java.util.List<com.fasterxml.jackson.databind.Module> loadProvidedModules() {
+        java.util.List<com.fasterxml.jackson.databind.Module> modules = new java.util.ArrayList<>();
+        java.util.ServiceLoader.load(JsonModuleProvider.class)
+                .forEach(provider -> modules.add(provider.module()));
+        return java.util.List.copyOf(modules);
     }
 
     /**

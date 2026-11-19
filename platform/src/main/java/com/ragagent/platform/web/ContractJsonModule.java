@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.ragagent.contract.model.PromptCacheStatus;
@@ -60,6 +61,15 @@ public final class ContractJsonModule extends SimpleModule {
         @Override
         public PromptCacheStatus deserialize(JsonParser p, DeserializationContext c) throws IOException {
             return PromptCacheStatus.fromValue(p.getText());
+        }
+    }
+
+    /** ServiceLoader 入口：让本模块可被 {@link JsonMappers} 自动发现。 */
+    public static final class Provider implements JsonModuleProvider {
+
+        @Override
+        public Module module() {
+            return new ContractJsonModule();
         }
     }
 }
