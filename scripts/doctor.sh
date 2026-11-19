@@ -127,6 +127,14 @@ else
     note "文档解析服务未就绪 (localhost:50051)" "docker compose up -d（只有上传/解析文档时需要）"
 fi
 
+if [ -n "$(env_value OCR_ENDPOINT)" ]; then
+    if port_open 18092; then
+        ok "OCR 服务可达 (localhost:18092)"
+    else
+        note "OCR 服务未就绪 (localhost:18092)" "docker compose up -d ocr（只影响入库图片识别，不影响问答）"
+    fi
+fi
+
 if lsof -ti :8083 >/dev/null 2>&1; then
     note "端口 8083 已被占用" "若是旧后端：bash scripts/java-server-down.sh --stop"
 else

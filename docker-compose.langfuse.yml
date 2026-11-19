@@ -1,28 +1,27 @@
-# Langfuse 可观测自建栈（dev 专用）
+# Langfuse 可观测自建栈（dev 专用，独立项目 `ragagent-langfuse`）
 #
-# 用法（在仓库根目录执行，自动读取 .env 里的 DB_*/REDIS_*）：
+# 用法（在仓库根目录执行，自动读取 .env 里的 DB_*/REDIS_*/LANGFUSE_*）：
 #   docker compose -f docker-compose.langfuse.yml up -d      # 启动
 #   docker compose -f docker-compose.langfuse.yml ps         # 查看状态
 #   docker compose -f docker-compose.langfuse.yml down       # 停掉（保留数据卷）
 #
 # UI: http://localhost:3000    预置管理员: admin@ragagent.local / Ragagent-dev-2026
-#     预置项目 langfuse 的密钥:  pk-lf-ragagent-dev / sk-lf-ragagent-dev（已写进 .env）
+#     预置项目 ragagent-dev 的密钥:  pk-lf-ragagent-dev / sk-lf-ragagent-dev（已写进 .env）
 #
 # 与 dev 基础设施的关系：
-#   - 复用 WeKnora-postgres-dev：新建独立 "langfuse" 库（一次性 db-init 容器，幂等）
-#   - 复用 WeKnora-redis-dev：占用 DB 1
+#   - 接入本仓 docker-compose.yml 的网络 ragagent_default（external），按服务名
+#     postgres / redis 访问，对应容器 RagAgent-postgres-dev / RagAgent-redis-dev
+#   - 复用 PostgreSQL：独立 "langfuse" 库（一次性 db-init 容器，幂等）
+#   - 复用 Redis：占用 DB 1
 #   - 新增容器仅 4 个常驻：clickhouse / s3(rustfs) / worker / web
-#   - 对象存储用 rustfs（S3 兼容，镜像本机已有；docker.io 的 minio 整仓被镜像源屏蔽）
-#     —— 首次启动后需建桶：curl -X PUT http://localhost:9100/langfuse \
-#        --aws-sigv4 "aws:amz:us-east-1:s3" --user "langfuseminio:langfuseminiosecret"
-#   - 本栈不暴露 clickhouse；S3 暴露 9100(S3 API)/9101(控制台) 供浏览器上传媒体
+#   - clickhouse 与 S3 的数据卷由本项目（ragagent-langfuse）持有，down 不删
 
 name: ragagent-langfuse
 
 services:
   langfuse-db-init:
     image: paradedb/paradedb:v0.22.2-pg17
-    container_name: ragagent-langfuse-db-init
+    container_name: RagAgent-langfuse-db-init
     environment:
       PGPASSWORD: ${DB_PASSWORD}
     entrypoint: ["sh", "-c"]
@@ -30,12 +29,12 @@ services:
       - |
         set -e
         echo "[langfuse-db-init] ensuring database '${LANGFUSE_DB_NAME:-langfuse}' exists..."
-        psql -h WeKnora-postgres-dev -U ${DB_USER} -d postgres -v ON_ERROR_STOP=0 -c "ALTER DATABASE template1 REFRESH COLLATION VERSION;" >/dev/null 2>&1 || true
-        psql -h WeKnora-postgres-dev -U ${DB_USER} -d postgres -v ON_ERROR_STOP=0 -c "ALTER DATABASE postgres REFRESH COLLATION VERSION;" >/dev/null 2>&1 || true
-        if psql -h WeKnora-postgres-dev -U ${DB_USER} -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${LANGFUSE_DB_NAME:-langfuse}'" | grep -q 1; then
+        psql -h postgres -U ${DB_USER} -d postgres -v ON_ERROR_STOP=0 -c "ALTER DATABASE template1 REFRESH COLLATION VERSION;" >/dev/null 2>&1 || true
+        psql -h postgres -U ${DB_USER} -d postgres -v ON_ERROR_STOP=0 -c "ALTER DATABASE postgres REFRESH COLLATION VERSION;" >/dev/null 2>&1 || true
+        if psql -h postgres -U ${DB_USER} -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${LANGFUSE_DB_NAME:-langfuse}'" | grep -q 1; then
           echo "[langfuse-db-init] database already exists, skipping."
         else
-          psql -h WeKnora-postgres-dev -U ${DB_USER} -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE \"${LANGFUSE_DB_NAME:-langfuse}\" TEMPLATE template0;"
+          psql -h postgres -U ${DB_USER} -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE \"${LANGFUSE_DB_NAME:-langfuse}\" TEMPLATE template0;"
           echo "[langfuse-db-init] database created."
         fi
         echo "[langfuse-db-init] done."
@@ -44,7 +43,7 @@ services:
 
   langfuse-clickhouse:
     image: clickhouse/clickhouse-server:24.8
-    container_name: ragagent-langfuse-clickhouse
+    container_name: RagAgent-langfuse-clickhouse
     restart: unless-stopped
     user: "101:101"
     environment:
@@ -64,7 +63,7 @@ services:
 
   langfuse-s3:
     image: rustfs/rustfs:1.0.0-alpha.72
-    container_name: ragagent-langfuse-s3
+    container_name: RagAgent-langfuse-s3
     restart: unless-stopped
     command: ["--address", ":9000", "--console-enable", "--access-key", "langfuseminio", "--secret-key", "langfuseminiosecret", "/data"]
     environment:
@@ -86,7 +85,7 @@ services:
 
   langfuse-worker:
     image: langfuse/langfuse-worker:3
-    container_name: ragagent-langfuse-worker
+    container_name: RagAgent-langfuse-worker
     restart: unless-stopped
     depends_on: &langfuse-depends-on
       langfuse-db-init:
@@ -95,7 +94,7 @@ services:
         condition: service_healthy
       langfuse-s3:
         condition: service_started
-    # wrapper entrypoint：启动时对 DB/REDIS 口令做 URL 编码，避免 '@' '#' 破坏连接串解析
+    # wrapper entrypoint：启动时对 DB/Redis 口令做 URL 编码，避免 '@' '#' 破坏连接串解析
     entrypoint:
       - /bin/sh
       - -ec
@@ -104,20 +103,24 @@ services:
         DU=$$(_enc "$$_LF_DB_USER")
         DP=$$(_enc "$$_LF_DB_PASSWORD")
         RP=$$(_enc "$$_LF_REDIS_PASSWORD")
-        export DATABASE_URL="postgresql://$$DU:$$DP@WeKnora-postgres-dev:5432/$$_LF_DB_NAME"
-        export REDIS_CONNECTION_STRING="redis://:$$RP@WeKnora-redis-dev:6379/$$_LF_REDIS_DB"
+        export DATABASE_URL="postgresql://$$DU:$$DP@postgres:5432/$$_LF_DB_NAME"
+        if [ -n "$$_LF_REDIS_PASSWORD" ]; then
+          export REDIS_CONNECTION_STRING="redis://:$$RP@redis:6379/$$_LF_REDIS_DB"
+        else
+          export REDIS_CONNECTION_STRING="redis://redis:6379/$$_LF_REDIS_DB"
+        fi
         unset _LF_DB_USER _LF_DB_PASSWORD _LF_REDIS_PASSWORD
         exec dumb-init -- ./worker/entrypoint.sh node worker/dist/index.js
     environment: &langfuse-env
       _LF_DB_USER: ${DB_USER}
       _LF_DB_PASSWORD: ${DB_PASSWORD}
       _LF_DB_NAME: ${LANGFUSE_DB_NAME:-langfuse}
-      _LF_REDIS_PASSWORD: ${REDIS_PASSWORD}
+      _LF_REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       _LF_REDIS_DB: ${LANGFUSE_REDIS_DB:-1}
-      SALT: ${LANGFUSE_SALT:-weknora-langfuse-dev-salt-change-me}
+      SALT: ${LANGFUSE_SALT:-ragagent-langfuse-dev-salt-change-me}
       ENCRYPTION_KEY: ${LANGFUSE_ENCRYPTION_KEY:-0000000000000000000000000000000000000000000000000000000000000000}
       NEXTAUTH_URL: ${LANGFUSE_NEXTAUTH_URL:-http://localhost:3000}
-      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-weknora-langfuse-dev-nextauth-secret-change-me}
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-ragagent-langfuse-dev-nextauth-secret-change-me}
       TELEMETRY_ENABLED: "false"
       LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "false"
       CLICKHOUSE_URL: http://langfuse-clickhouse:8123
@@ -143,7 +146,7 @@ services:
 
   langfuse-web:
     image: langfuse/langfuse:3
-    container_name: ragagent-langfuse-web
+    container_name: RagAgent-langfuse-web
     restart: unless-stopped
     depends_on: *langfuse-depends-on
     ports:
@@ -156,8 +159,12 @@ services:
         DU=$$(_enc "$$_LF_DB_USER")
         DP=$$(_enc "$$_LF_DB_PASSWORD")
         RP=$$(_enc "$$_LF_REDIS_PASSWORD")
-        export DATABASE_URL="postgresql://$$DU:$$DP@WeKnora-postgres-dev:5432/$$_LF_DB_NAME"
-        export REDIS_CONNECTION_STRING="redis://:$$RP@WeKnora-redis-dev:6379/$$_LF_REDIS_DB"
+        export DATABASE_URL="postgresql://$$DU:$$DP@postgres:5432/$$_LF_DB_NAME"
+        if [ -n "$$_LF_REDIS_PASSWORD" ]; then
+          export REDIS_CONNECTION_STRING="redis://:$$RP@redis:6379/$$_LF_REDIS_DB"
+        else
+          export REDIS_CONNECTION_STRING="redis://redis:6379/$$_LF_REDIS_DB"
+        fi
         unset _LF_DB_USER _LF_DB_PASSWORD _LF_REDIS_PASSWORD
         exec dumb-init -- ./web/entrypoint.sh node ./web/server.js --keepAliveTimeout 110000
     environment:
@@ -177,7 +184,7 @@ services:
 networks:
   devnet:
     external: true
-    name: weknora_WeKnora-network-dev
+    name: ragagent_default
 
 volumes:
   langfuse_clickhouse_data:

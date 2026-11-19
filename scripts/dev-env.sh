@@ -4,7 +4,8 @@
 # 约定：
 # 1. 只按 key 读取本仓 .env（`env_value`），不整份 source——避免把容器内地址
 #    或其它 shell 变量带进来。
-# 2. host-run 一律用 localhost + compose 映射端口（15432 / 16379 / 50051）。
+# 2. host-run 一律用 localhost + compose 映射端口（15432 / 16379 / 50051；
+#    OCR 例外：直接取 .env 的 OCR_ENDPOINT 完整 URL，dev 默认 18092）。
 # 3. SYSTEM_AES_KEY 更换后旧密文不可解；跨语言 e2e 两侧必须用同一把 key。
 # 4. 访问被 SSRF 白名单拦住的 MCP/LLM 域名时设 SSRF_WHITELIST_EXTRA
 #    （逗号分隔，支持 *.example.com 通配）。

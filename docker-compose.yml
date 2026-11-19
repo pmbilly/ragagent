@@ -1,4 +1,4 @@
-# ragagent 本地 dev 环境（基础设施：postgres / redis / docreader）
+# ragagent 本地 dev 环境（基础设施：postgres / redis / ocr / docreader）
 
 services:
   postgres:
@@ -29,6 +29,20 @@ services:
       interval: 5s
       timeout: 3s
       retries: 12
+    restart: unless-stopped
+
+  ocr:
+    # 本机自建镜像，不是 deploy/build-ocr-image.sh 的产物（那个 tag 形如 ragagent-ocr:*）。
+    image: ragagent/docreader-ocr:ci
+    container_name: RagAgent-ocr-dev
+    ports:
+      - "18092:18092"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:18092/health').read()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
     restart: unless-stopped
 
   docreader:

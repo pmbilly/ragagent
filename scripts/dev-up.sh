@@ -33,7 +33,7 @@ if [ ! -f .env ]; then
     echo "==> 已生成 .env（dev 默认值；需要改端口/密钥时编辑它）"
 fi
 
-echo "==> 启动基础设施（PostgreSQL / Redis / docreader）"
+echo "==> 启动基础设施（PostgreSQL / Redis / OCR / docreader）"
 if docker compose up -d --wait >/dev/null 2>&1; then
     echo "    基础设施就绪"
 else
