@@ -1,7 +1,6 @@
 package com.ragagent.knowledge.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,11 +30,13 @@ class FaqContractShadowTest extends FaqContractTest {
     @Test
     @DisplayName("faq-new 下唯一生效的 handler 是影子实现")
     void shadowIsTheOnlyActiveHandler() {
-        String[] names = context.getBeanNamesForType(FaqController.class);
-        assertEquals(1, names.length, "faq-new 下应只有 1 个 FAQ handler，实际 " + names.length);
-        Object bean = context.getBean(names[0]);
-        assertTrue(
-                bean instanceof FaqControllerShadow,
-                "faq-new 下生效的应是 FaqControllerShadow，实际 " + bean.getClass().getName());
+        assertEquals(
+                1,
+                context.getBeanNamesForType(FaqControllerShadow.class).length,
+                "faq-new 下应只有 1 个影子 handler");
+        assertEquals(
+                0,
+                context.getBeanNamesForType(FaqController.class).length,
+                "faq-new 下默认实现不应注册（两套同路由会 Ambiguous mapping）");
     }
 }
