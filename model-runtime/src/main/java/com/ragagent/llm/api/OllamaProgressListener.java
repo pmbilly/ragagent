@@ -1,4 +1,4 @@
-package com.ragagent.contract.model;
+package com.ragagent.llm.api;
 
 /** 拉取进度回调（每收到一行 NDJSON 触发一次）。 */
 @FunctionalInterface

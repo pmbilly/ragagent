@@ -2,10 +2,10 @@ package com.ragagent.llm.ollama;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.model.OllamaAdminPort;
-import com.ragagent.contract.model.OllamaModelInfo;
-import com.ragagent.contract.model.OllamaProgressListener;
-import com.ragagent.contract.model.OllamaPullProgress;
+import com.ragagent.llm.api.OllamaAdminPort;
+import com.ragagent.llm.api.OllamaModelInfo;
+import com.ragagent.llm.api.OllamaProgressListener;
+import com.ragagent.llm.api.OllamaPullProgress;
 import com.ragagent.platform.config.AppEnvLookup;
 import com.ragagent.platform.web.JsonMappers;
 import java.io.BufferedReader;

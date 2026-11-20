@@ -486,7 +486,11 @@ ragagent/
 
 **判据**：搬契约到某模块前，先跑 `python3 scripts/check-package-cycles.py` 看该模块内部是否已有环；有环则先解内部的环。`retrieval-engine` 能成功（P4-4/P4-5）正是因为它内部无环。
 
-本批已回滚；R2c-3d 余项（Ollama 端口 / `PromptCacheStatus`）延后到 model-runtime 内部解耦之后——其中 `PromptCacheStatus` 另有一层阻塞：它被 platform 的 `ContractJsonModule` 显式注册，需与 mixin 一起搬。
+**解法**（2026-11-20 验证）：把契约放到**不会产生反向边**的命名空间。实测 `com.ragagent.llm.api` 可行——`model-runtime` 内部只存在 `modelruntime.* → llm.*` 单向依赖，把 api 放进 `llm` 命名空间下，`llm.ollama → llm.api` 属包内引用，不产生新的跨包边。故 4 个 Ollama 类型已归位到 `llm.api`，包级环仍为 0。
+
+仍需延后的是 `PromptCacheStatus`：它被 platform 的 `ContractJsonModule` 显式注册，须与 mixin 一起搬。
+
+其中 `PromptCacheStatus` 另有一层阻塞：它被 platform 的 `ContractJsonModule` 显式注册，需与 mixin 一起搬。
 
 ### 10.5 守卫改造清单（终态会推翻 6 条规则前提）
 

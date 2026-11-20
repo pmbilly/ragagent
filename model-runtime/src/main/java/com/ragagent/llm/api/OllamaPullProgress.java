@@ -1,4 +1,4 @@
-package com.ragagent.contract.model;
+package com.ragagent.llm.api;
 
 /**
  * Ollama 拉取进度（契约面形状，原为 {@code JsonNode} 载荷）。

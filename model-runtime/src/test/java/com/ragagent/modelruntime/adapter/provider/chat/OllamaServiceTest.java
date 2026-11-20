@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.contract.model.OllamaModelInfo;
+import com.ragagent.llm.api.OllamaModelInfo;
 import com.ragagent.llm.ollama.OllamaService;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;

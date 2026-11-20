@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-361 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+362 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -307,6 +307,7 @@
 | `:model-runtime` | `com.ragagent.embedding` | 嵌入向量 provider 客户端（库式域，无 HTTP 面）：com.ragagent.embedding.EmbedderFactory 选择器、 EmbeddingHttp/ProviderJson 传输与编码、池化与失败降级。 |
 | `:model-runtime` | `com.ragagent.embedding.provider` | 嵌入 provider 的**具体实现**（各家 HTTP 调用与响应解析）：OpenAI / AzureOpenAI / Gemini / Jina / Nvidia / Ollama / Aliy |
 | `:model-runtime` | `com.ragagent.llm` | LLM 客户端（库式域，无 HTTP 面）：provider 适配（provider/）、对话流转与流式（chat/， 含 com.ragagent.modelruntime.adapter.prov |
+| `:model-runtime` | `com.ragagent.llm.api` | 模型运行时的对外契约：Ollama 本地模型管理端口与进度载荷。 |
 | `:model-runtime` | `com.ragagent.llm.domain` | LLM · 领域模型：ProviderMetadataMaps。 |
 | `:model-runtime` | `com.ragagent.llm.extract` | LLM · extract：EntityExtractionAdapter / EntityExtraction。 |
 | `:model-runtime` | `com.ragagent.llm.limiter` | LLM · limiter：ModelConcurrencyLimiter / BackgroundTaskContext / ConcurrencyGovernor…。 |

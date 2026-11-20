@@ -7,7 +7,7 @@
 
 - 域间（解耦）：**28**
 - 复合面（随复合端口）：**7**
-- 跨模块（必要）：**10**
+- 跨模块（必要）：**9**
 
 ## 明细
 
@@ -43,7 +43,6 @@
 | `MessageTranscriptPort` | `MessageTranscriptAdapter` | app | memory | 域间（解耦） |
 | `ModelCatalogPort` | `ModelCatalogAdapter` | app | initialization、knowledge、mcp、memory、model-runtime、session、wiki | 跨模块（必要） |
 | `ModelFactsPort` | `ModelService` | app | retrieval-engine | 跨模块（必要） |
-| `OllamaAdminPort` | `OllamaService` | model-runtime | model | 跨模块（必要） |
 | `ParserEngineCatalogPort` | `ParserEngineCatalog` | app | system | 域间（解耦） |
 | `ProviderFileStorePort` | `ProviderFileStoreAdapter` | app | knowledge | 域间（解耦） |
 | `ResourceCatalogPort` | `ResourceCatalogAdapter` | app | knowledge、session | 域间（解耦） |
