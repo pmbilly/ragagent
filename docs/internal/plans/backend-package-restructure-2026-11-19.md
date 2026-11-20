@@ -325,6 +325,10 @@ H7 / H8 / H9 / L11 / Q6 / Q8b / Q9 / Q10 / Q11 / R2c-3d 余项 / M8（见 `HANDO
 
 ## 9. 终态与留路（假设性：contract 解散后长什么样）
 
+## 9. 终态与留路（假设性）
+
+> 本节是早期设想。**权威路径以 §12 为准**：`contract` 已并入 `framework/shared`，解散的实测分解（35 通用面 + 189 业务词汇）与六阶段方案见 §12。
+
 ## 9. 终态与留路（contract 解散后长什么样）
 
 > 本节即**目标终态**。可达性判定与前置条件见 §10：**可达**，但必须先完成 P1（把 30 个业务邻接文件搬出 `platform`）——它们目前把 38 个契约类型钉死在 contract。
@@ -777,3 +781,101 @@ framework 的合理体积约 **77~101 个**（而非 166），前提是：
 **由此 §11.8 的 D1′ 三档降为一档**：只有"contract 并入 framework"一种可行终态。
 K16（搬 30 个 platform 业务文件）的收益也随之缩小——它不再"解锁 54 个类型"，因为那 54 个仍被
 framework 内其他类型引用，闭包下依然搬不走。
+
+## 12. shared 解散路径（2026-11-20 定稿）
+
+`contract` 已并入 `framework/shared`，所以「解散 shared」就是原来「解散 contract」那一件事。
+本节用实测数字给出分解、阶段与验收，替代 §9 的假设性描述。
+
+### 12.1 先拆一个关键前提：shared 不是铁板一块
+
+`shared` 现有 **224** 个类型，按蓝图 §5.2 分为两部分：
+
+| 组成 | 数量 | 蓝图归属 | 是否债务 |
+|---|---|---|---|
+| 通用面：`error` 3 · `event` 26 · `json` 3 · `text` 2 · `pagination` 1 | **35** | framework（§5.2 明确） | **不是**——它们是 framework 的正当内容 |
+| 业务词汇：`knowledge` 49 · `storage` 22 · `model` 21 · `session` 19 · `tenant` 11 · `websearch` 9 · `wiki` 8 … | **189** | 各域 `api` / 引擎 `api` | 是 |
+
+所以「解散」的准确口径是：**189 个业务词汇清零**，35 个通用面留在 framework 并迁出 `shared` 命名空间
+（变成 `framework/error`、`framework/event` …）。终态 `shared` 这个词消失，而不是 framework 变空。
+
+### 12.2 189 个业务词汇的消费结构（决定了要做什么）
+
+| 消费方 | 数量 | 需要什么才能搬走 |
+|---|---|---|
+| 被 **framework 自己**用 | **96** | 先解除 framework 依赖（P1） |
+| 多域共用 | **64** | 域间通信改造（P4） |
+| 单域 | **12** | 域内重构 + 闭包复核（P3） |
+| 无引用 | **9** | 直接删（P2） |
+| 被引擎用 | **8** | 随引擎 `api` 归位（P3） |
+
+96 这一档是最大单块，也是唯一能在「不改业务逻辑」的前提下推进的。
+
+### 12.3 关键发现：framework 的阻塞集中在 JSON mixin 注册表
+
+`framework` 下有 **42 个文件**引用 shared 业务类型，但引用量高度集中：
+
+| 文件 | 引用的 shared 类型数 |
+|---|---|
+| `platform/web/ContractJsonMixins.java` | **42** |
+| `platform/tracing/decorators/*`（4 个） | 13 |
+| `platform/storage/support/*`（3 个） | 6 |
+| `platform/event/*`（6 个） | 6 |
+| `platform/prompt/*`（4 个） | 5 |
+| `platform/stream/*`（4 个） | 4 |
+| 其余（web/error、knowledge、fileserve、http、audit、config） | 10 |
+
+进一步拆 `platform/web` 引用的 53 个类型：
+
+| 来源 | 数量 | 处置 |
+|---|---|---|
+| **只被 `ContractJsonMixins` 引用** | **42** | 拆分 mixin（P1a）即解除 |
+| 还被 `RbacInterceptor` / `GlobalExceptionHandler` / `JsonBodies` 等用 | 11 | 都是 `AppError` / `BizException` / `TenantRole` / `ErrorCode` / `SseSink` 这类通用面或技术抽象，**本就该留 framework** |
+
+**结论**：`shared` 解不开的头号原因不是 `stream`/`prompt`，而是**一个 1274 行的 mixin 注册表把 42 个业务类型锚在了 framework**。
+`JsonModuleProvider`（按模块贡献 JSON 模块）的机制早已就位，但一直没用上——P1a 就是把它用起来。
+
+### 12.4 六阶段路径
+
+| 阶段 | 内容 | 释放 | 前置 | 工时 | 风险 |
+|---|---|---|---|---|---|
+| **P1a** | **JSON mixin 按归属拆分**：`ContractJsonMixins` 按 `model` / `agent` / `session` / `tenant` / `knowledge` 等切成多份，随类型搬到对应模块，各模块用 `JsonModuleProvider` 自报 | 解除 **42** 个的 framework 依赖 | 无（机制已就绪） | 3~5 天 | 中：金片必须逐字节不变 |
+| **P1b** | **framework 业务代码下沉**：`stream` 4 · `prompt` 4 · `tracing/decorators` 4 · `knowledge` 3 · `storage` 5 · `audit` 1 · `config` 1 · `http` 1 | 解除其余 ~15 个的 framework 依赖 | 按域分级判据逐个定落点 | 5~7 天 | 中：部分文件被多域用，只能留 framework |
+| **P2** | 删 9 个无引用类型 | 9 | 无 | 0.5 天 | 低（先确认无反射/SPI 使用） |
+| **P3** | 引擎面 8 个 → 引擎 `api`；单域 12 个 → 域 `api` | 20 | P1 完成（framework 依赖已解除）+ 闭包复核 | 3~4 天 | 中：闭包会拦下一部分 |
+| **P4** | **多域共用 64 个 → 域间通信改造**：同级域共享改为事件或端口，按蓝图 §5.4「下沉基础域 / 改用事件 / 合并」 | 64 | P3 | **不可估**（需设计） | 高：动业务逻辑 |
+| **P5** | 收尾：`shared` 只剩通用面 35 → 迁出到 `framework/error`、`framework/event`、`framework/json`、`framework/text`、`framework/pagination`，删除 `shared` 命名空间 | 剩余 35 变成 framework 正式内容 | P4 | 2 天 | 低 |
+
+**P1a 是分水岭**：它零业务逻辑改动、只重组 JSON 装配，却解掉最大的一块（42/96）。
+P4 是唯一真正需要改业务逻辑的阶段，也是唯一无法预估算力的阶段。
+
+### 12.5 与 VO 化的关系：两条独立线，可并行
+
+| | VO 化 | shared 解散 |
+|---|---|---|
+| 改什么 | HTTP 出口形状 | 模块间依赖 |
+| 是否互相影响 | **否**——VO 化只改 app 内部，不触碰 shared 的消费结构 | 否 |
+| 释放 shared | **0 个**（实测：唯一「仅控制器层 + 单域」的 `StorageUrlContext` 还被 shared 内 `Mode` 引用，闭包挡住） | — |
+| 排序 | 与 P1~P5 无依赖，可任意穿插 | 与 VO 化无依赖 |
+
+所以「做完所有域 VO 化就能解散 shared」不成立；但两条线可以同时推进，互不阻塞。
+
+### 12.6 不可协商的判据（每次搬都要过）
+
+1. **闭包**：只要还有一个「留在原处」的引用者，类型就搬不走。任何归属估算必须逐轮迭代到不动点。
+2. **R10 + kind**：跨域只允许「上级 → 下级、且目标是 `api`/`dto`」，跨 kind 一律禁。
+3. **金片**：`*ContractTest` 逐字节不变。JSON mixin 拆分尤其依赖它——序列化策略改一点，报文字节就变。
+4. **包级环**：搬入模块前先跑 `scripts/check-package-cycles.py`；契约要放在「被依赖方」的命名空间。
+
+### 12.7 终态
+
+```text
+backend/
+├── framework/           技术底座；含 error / event / json / text / pagination（35 类型）
+├── model-runtime/       api/ 收模型面契约
+├── retrieval-engine/    api/ 收检索面契约
+├── agent-engine/        api/ 收 agent/tool 契约
+└── app/                 19 域，各域 api/ 收域契约，出入口全是 VO
+```
+
+`shared` 命名空间消失；`contract`、`shared` 这两个词都不再出现在代码里。
