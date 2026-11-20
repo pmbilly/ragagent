@@ -1,9 +1,13 @@
 package com.ragagent.knowledge.controller;
 
 import com.ragagent.knowledge.api.GeneratedQuestion;
+import com.ragagent.knowledge.assembler.ChunkAssembler;
+import com.ragagent.knowledge.controller.vo.ChunkRespVo;
+import com.ragagent.knowledge.controller.vo.ChunkRevisionRespVo;
+import com.ragagent.knowledge.controller.vo.ChunkUpdateRespVo;
+import com.ragagent.knowledge.controller.vo.GeneratedQuestionRespVo;
 import com.ragagent.knowledge.dto.chunk.ChunkResponse;
 import com.ragagent.knowledge.dto.chunk.ChunkRevisionResponse;
-import com.ragagent.knowledge.dto.chunk.ChunkUpdateResponse;
 import com.ragagent.knowledge.dto.chunk.RevertChunkRequest;
 import com.ragagent.knowledge.dto.chunk.UpdateChunkRequest;
 import com.ragagent.knowledge.dto.faq.DeleteGeneratedQuestionRequest;
@@ -74,7 +78,7 @@ public class ChunkController {
 
     /** 分页钳位：page&lt;1→1、size&lt;1→10、size&gt;100→100（size 的小值是合法值，非 clamp）。 */
     @GetMapping("/api/v1/chunks/{knowledgeId}")
-    public ResponseEntity<PageResult<ChunkResponse>> listKnowledgeChunks(
+    public ResponseEntity<PageResult<ChunkRespVo>> listKnowledgeChunks(
             @PathVariable("knowledgeId") String knowledgeId,
             @RequestParam(value = "page", required = false) String page,
             @RequestParam(value = "pageSize", required = false) String pageSize,
@@ -104,19 +108,23 @@ public class ChunkController {
         ChunkReadService.ChunkPageView result = chunkRead.listPagedChunks(
                 tenantId(), kgId, (pageValue - 1) * sizeValue, sizeValue, types);
 
-        List<ChunkResponse> items = result.items().stream().map(ChunkResponse::from).toList();
+        List<ChunkRespVo> items = result.items().stream()
+                .map(ChunkResponse::from)
+                .map(ChunkAssembler::toVo)
+                .toList();
         return ResponseEntity.ok(PageResult.of(items, result.total(), pageValue, sizeValue));
     }
 
     @GetMapping("/api/v1/chunks/by-id/{id}")
-    public ResponseEntity<ChunkResponse> getChunkByIdOnly(@PathVariable("id") String id) {
+    public ResponseEntity<ChunkRespVo> getChunkByIdOnly(@PathVariable("id") String id) {
         String chunkId = LogSanitizer.sanitize(id);
         if (chunkId.isEmpty()) {
             throw new BizException(AppError.badRequest("Chunk ID cannot be empty"));
         }
         guard.requireKbAccess(guard.kbIdFromChunkParam(chunkId));
         try {
-            return ResponseEntity.ok(chunkRead.getChunkResponseByIdOnly(chunkId));
+            return ResponseEntity.ok(
+                    ChunkAssembler.toVo(chunkRead.getChunkResponseByIdOnly(chunkId)));
         } catch (ChunkNotFoundException e) {
             throw new BizException(AppError.notFound("Chunk not found"));
         }
@@ -124,12 +132,13 @@ public class ChunkController {
 
     /** 分块修订历史（直接返回数组）。 */
     @GetMapping("/api/v1/chunks/{knowledgeId}/{id}/revisions")
-    public ResponseEntity<List<ChunkRevisionResponse>> listChunkRevisions(
+    public ResponseEntity<List<ChunkRevisionRespVo>> listChunkRevisions(
             @PathVariable("knowledgeId") String knowledgeId,
             @PathVariable("id") String id) {
         String chunkId = fetchChunkAndVerifyOwnership(knowledgeId, id);
-        List<ChunkRevisionResponse> items = chunkEdit.listChunkRevisions(chunkId).stream()
+        List<ChunkRevisionRespVo> items = chunkEdit.listChunkRevisions(chunkId).stream()
                 .map(ChunkRevisionResponse::from)
+                .map(ChunkAssembler::toVo)
                 .toList();
         return ResponseEntity.ok(items);
     }
@@ -138,7 +147,7 @@ public class ChunkController {
 
     /** 业务失败（fmt.Errorf 族）→ 500 信封 message=原文。 */
     @PutMapping("/api/v1/chunks/{knowledgeId}/{id}")
-    public ResponseEntity<ChunkUpdateResponse> updateChunk(
+    public ResponseEntity<ChunkUpdateRespVo> updateChunk(
             @PathVariable("knowledgeId") String knowledgeId,
             @PathVariable("id") String id,
             @Valid @RejectEmptyBody @RequestBody(required = false) UpdateChunkRequest req) {
@@ -160,7 +169,7 @@ public class ChunkController {
 
     /** 非 AppError 在这里是 <b>400</b> 不是 500（revert 端点特有）。 */
     @PostMapping("/api/v1/chunks/{knowledgeId}/{id}/revert")
-    public ResponseEntity<ChunkUpdateResponse> revertChunk(
+    public ResponseEntity<ChunkUpdateRespVo> revertChunk(
             @PathVariable("knowledgeId") String knowledgeId,
             @PathVariable("id") String id,
             @Valid @RejectEmptyBody @RequestBody(required = false) RevertChunkRequest req) {
@@ -186,7 +195,7 @@ public class ChunkController {
     // ── 生成问题 ──
 
     @PutMapping("/api/v1/chunks/by-id/{id}/questions")
-    public ResponseEntity<GeneratedQuestionResponse> upsertGeneratedQuestion(
+    public ResponseEntity<GeneratedQuestionRespVo> upsertGeneratedQuestion(
             @PathVariable("id") String id,
             @Valid @RequestBody UpsertGeneratedQuestionRequest req) {
         String chunkId = LogSanitizer.sanitize(id);
@@ -201,12 +210,12 @@ public class ChunkController {
         guard.requireKbAccess(guard.kbIdFromChunkParam(chunkId));
         GeneratedQuestion item = chunkQuestion.upsertGeneratedQuestion(
                 chunkId, questionId, req.question());
-        return ResponseEntity.ok(GeneratedQuestionResponse.from(item));
+        return ResponseEntity.ok(ChunkAssembler.toVo(GeneratedQuestionResponse.from(item)));
     }
 
     /** 重新生成问题（直接返回数组）。 */
     @PostMapping("/api/v1/chunks/by-id/{id}/questions/regenerate")
-    public ResponseEntity<List<GeneratedQuestionResponse>> regenerateGeneratedQuestions(
+    public ResponseEntity<List<GeneratedQuestionRespVo>> regenerateGeneratedQuestions(
             @PathVariable("id") String id) {
         String chunkId = LogSanitizer.sanitize(id);
         if (chunkId.isEmpty()) {
@@ -214,9 +223,10 @@ public class ChunkController {
         }
         guard.requireOwnedChunkKbByChunk(chunkId);
         guard.requireKbAccess(guard.kbIdFromChunkParam(chunkId));
-        List<GeneratedQuestionResponse> items = chunkQuestion.regenerateChunkQuestions(chunkId)
+        List<GeneratedQuestionRespVo> items = chunkQuestion.regenerateChunkQuestions(chunkId)
                 .stream()
                 .map(GeneratedQuestionResponse::from)
+                .map(ChunkAssembler::toVo)
                 .toList();
         return ResponseEntity.ok(items);
     }
@@ -306,7 +316,7 @@ public class ChunkController {
     }
 
     /** 更新/回滚的成功响应；knowledge 摘要重载失败仅 WARN（两键缺席）。 */
-    private ResponseEntity<ChunkUpdateResponse> updatedResponse(
+    private ResponseEntity<ChunkUpdateRespVo> updatedResponse(
             ChunkResponse response, String knowledgeId) {
         ChunkReadService.SummaryReload knowledge = null;
         try {
@@ -316,10 +326,11 @@ public class ChunkController {
                     LogSanitizer.sanitize(knowledgeId), errText(e));
         }
         if (knowledge == null) {
-            return ResponseEntity.ok(new ChunkUpdateResponse(response, null, null));
+            return ResponseEntity.ok(new ChunkUpdateRespVo(
+                    ChunkAssembler.toVo(response), null, null));
         }
-        return ResponseEntity.ok(new ChunkUpdateResponse(
-                response,
+        return ResponseEntity.ok(new ChunkUpdateRespVo(
+                ChunkAssembler.toVo(response),
                 emptyToNull(knowledge.description()),
                 emptyToNull(knowledge.summaryStatus())));
     }
