@@ -13,7 +13,7 @@
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 22 | 180 | 0 |
 | `:retrieval-engine` | `retrieval` | 16 | 124 | 0 |
 | `:agent-engine` | `agent`、`agentengine` | 10 | 97 | 0 |
-| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 261 | 1693 | 51 |
+| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 261 | 1701 | 51 |
 
 ## 20 个业务域（domains）
 
@@ -29,7 +29,7 @@
 | `favorite` | `com.ragagent.favorite` | 13 | 1 |
 | `im` | `com.ragagent.im` | 107 | 2 |
 | `initialization` | `com.ragagent.initialization` | 11 | 1 |
-| `knowledge` | `com.ragagent.knowledge` | 299 | 8 |
+| `knowledge` | `com.ragagent.knowledge` | 307 | 8 |
 | `mcp` | `com.ragagent.mcp` | 171 | 4 |
 | `memory` | `com.ragagent.memory` | 96 | 1 |
 | `model` | `com.ragagent.model` | 38 | 4 |

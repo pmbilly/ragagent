@@ -1,16 +1,17 @@
 package com.ragagent.knowledge.controller;
 
+import com.ragagent.knowledge.assembler.KnowledgeOpsAssembler;
+import com.ragagent.knowledge.controller.vo.BatchTaskRespVo;
+import com.ragagent.knowledge.controller.vo.FolderMoveRespVo;
+import com.ragagent.knowledge.controller.vo.KnowledgeMoveProgressRespVo;
+import com.ragagent.knowledge.controller.vo.KnowledgeSearchRespVo;
+import com.ragagent.knowledge.controller.vo.MoveKnowledgeRespVo;
+import com.ragagent.knowledge.controller.vo.ReparseTaskDataRespVo;
 import com.ragagent.knowledge.dto.BatchDeleteRequest;
 import com.ragagent.knowledge.dto.KnowledgeSearchScope;
 import com.ragagent.knowledge.dto.chunk.BatchReparseRequest;
-import com.ragagent.knowledge.dto.chunk.BatchTaskData;
-import com.ragagent.knowledge.dto.chunk.ReparseTaskData;
-import com.ragagent.knowledge.dto.doc.FolderMoveResponse;
-import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 import com.ragagent.knowledge.dto.doc.KnowledgeResponse;
-import com.ragagent.knowledge.dto.doc.KnowledgeSearchResponse;
 import com.ragagent.knowledge.dto.doc.MoveKnowledgeRequest;
-import com.ragagent.knowledge.dto.doc.MoveKnowledgeResponse;
 import com.ragagent.knowledge.dto.doc.MoveToFolderRequest;
 import com.ragagent.knowledge.dto.doc.RenameFolderRequest;
 import com.ragagent.knowledge.dto.tag.KnowledgeTagBatchRequest;
@@ -75,7 +76,7 @@ public class KnowledgeOperationsController {
      * 只在显式 recent=true 时合法。
      */
     @GetMapping("/knowledge/search")
-    public ResponseEntity<KnowledgeSearchResponse> searchKnowledge(
+    public ResponseEntity<KnowledgeSearchRespVo> searchKnowledge(
             @RequestParam(value = "keyword", required = false) String keywordParam,
             @RequestParam(value = "query", required = false) String queryParam,
             @RequestParam(value = "recent", required = false) String recentParam,
@@ -131,8 +132,10 @@ public class KnowledgeOperationsController {
         } else {
             outcome = knowledgeService.searchKnowledge(keyword, offset, limit, fileTypes);
         }
-        return ResponseEntity.ok(new KnowledgeSearchResponse(
-                outcome.knowledges().stream().map(KnowledgeResponse::from).toList(),
+        return ResponseEntity.ok(new KnowledgeSearchRespVo(
+                KnowledgeOpsAssembler.toVoList(
+                        outcome.knowledges().stream().map(KnowledgeResponse::from).toList(),
+                        KnowledgeOpsAssembler::toVo),
                 outcome.hasMore(), outcome.total()));
     }
 
@@ -172,7 +175,7 @@ public class KnowledgeOperationsController {
 
     /** 批量删除（异步受理 → 202）。守卫链：dedupe/maxBatch → KB 访问+ownership → 行校验（含搬移中拒绝）。 */
     @PostMapping("/knowledge/batch-delete")
-    public ResponseEntity<BatchTaskData> batchDeleteKnowledge(
+    public ResponseEntity<BatchTaskRespVo> batchDeleteKnowledge(
             @Valid @NonNullBody @RequestBody BatchDeleteRequest req) {
         String kbId = LogSanitizer.sanitize(req.kbId());
         if (req.ids() == null) {
@@ -193,7 +196,7 @@ public class KnowledgeOperationsController {
         }
         String taskId = knowledgeService.batchDeleteKnowledge(kbId, ids);
         return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(new BatchTaskData(ids.size(), taskId));
+                .body(new BatchTaskRespVo(ids.size(), taskId));
     }
 
     /**
@@ -201,7 +204,7 @@ public class KnowledgeOperationsController {
      * 标准绑定细节，故此处保留手动绑定。
      */
     @PostMapping("/knowledge/batch-reparse")
-    public ResponseEntity<ReparseTaskData> batchReparseKnowledge(
+    public ResponseEntity<ReparseTaskDataRespVo> batchReparseKnowledge(
             @RequestBody(required = false) BatchReparseRequest request) {
         BatchReparseRequest parsed = requireBatchReparse(request);
         String kbId = LogSanitizer.sanitize(parsed.kbId());
@@ -220,7 +223,7 @@ public class KnowledgeOperationsController {
         }
         String taskId = knowledgeService.batchReparseKnowledge(kbId, ids);
         return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(new ReparseTaskData(ids.size(), taskId));
+                .body(new ReparseTaskDataRespVo(ids.size(), taskId));
     }
 
     /**
@@ -247,20 +250,20 @@ public class KnowledgeOperationsController {
 
     /** 跨库移动到文件夹（目的地不存在即创建）。 */
     @PostMapping("/knowledge/folder")
-    public ResponseEntity<FolderMoveResponse> moveKnowledgeToFolder(
+    public ResponseEntity<FolderMoveRespVo> moveKnowledgeToFolder(
             @Valid @NonNullBody @RequestBody MoveToFolderRequest req) {
         List<String> ids = guards.requireBatchIds(req.knowledgeIds(), "knowledge_ids");
         String folderPath = req.folderPath() == null ? "" : req.folderPath();
         String kbId = guards.batchAccessChecks(LogSanitizer.sanitize(req.kbId()));
         guards.requireKnowledgeInKb(kbId, ids);
         long affected = knowledgeService.moveKnowledgeToFolder(kbId, ids, folderPath);
-        return ResponseEntity.ok(new FolderMoveResponse(
+        return ResponseEntity.ok(new FolderMoveRespVo(
                 KnowledgePaths.normalizeKnowledgeFolderPath(folderPath), affected));
     }
 
     /** 路由 ownership（纯字符串，KB 缺失放行）→ KB 访问 + ownership（信封）→ service。 */
     @PutMapping("/knowledge-bases/{id}/knowledge/folders")
-    public ResponseEntity<FolderMoveResponse> renameKnowledgeFolder(
+    public ResponseEntity<FolderMoveRespVo> renameKnowledgeFolder(
             @PathVariable("id") String id,
             @Valid @NonNullBody @RequestBody RenameFolderRequest req) {
         String kbId = LogSanitizer.sanitize(id);
@@ -270,7 +273,7 @@ public class KnowledgeOperationsController {
         }
         guards.batchAccessChecks(kbId);
         long affected = knowledgeService.renameKnowledgeFolder(kbId, req.from(), req.to());
-        return ResponseEntity.ok(new FolderMoveResponse(
+        return ResponseEntity.ok(new FolderMoveRespVo(
                 KnowledgePaths.normalizeKnowledgeFolderPath(req.to()), affected));
     }
 
@@ -278,7 +281,7 @@ public class KnowledgeOperationsController {
 
     /** 源/目标双库守卫链 + 兼容性校验 + 逐行归属/状态校验后入队。 */
     @PostMapping("/knowledge/move")
-    public ResponseEntity<MoveKnowledgeResponse> moveKnowledge(
+    public ResponseEntity<MoveKnowledgeRespVo> moveKnowledge(
             @Valid @NonNullBody @RequestBody MoveKnowledgeRequest req) {
         String sourceKbId = LogSanitizer.sanitize(req.sourceKbId());
         String targetKbId = LogSanitizer.sanitize(req.targetKbId());
@@ -339,12 +342,12 @@ public class KnowledgeOperationsController {
         }
         String taskId = KnowledgeTaskIdCodec.generateTaskId("kg_move", callerTenant, sourceKbId);
         knowledgeService.startKnowledgeMove(callerTenant, taskId, uniqueIds, sourceKbId, targetKbId, mode);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new MoveKnowledgeResponse(
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new MoveKnowledgeRespVo(
                 taskId, sourceKbId, targetKbId, uniqueIds.size()));
     }
 
     @GetMapping("/knowledge/move/progress/{taskId}")
-    public ResponseEntity<KnowledgeMoveProgress> getKnowledgeMoveProgress(
+    public ResponseEntity<KnowledgeMoveProgressRespVo> getKnowledgeMoveProgress(
             @PathVariable("taskId") String taskId) {
         if (taskId == null || taskId.isEmpty()) {
             throw new BizException(AppError.badRequest("Task ID cannot be empty"));
@@ -354,6 +357,6 @@ public class KnowledgeOperationsController {
         if (progress == null) {
             throw new BizException(AppError.notFound("Knowledge move task not found"));
         }
-        return ResponseEntity.ok(progress);
+        return ResponseEntity.ok(KnowledgeOpsAssembler.toVo(progress));
     }
 }
