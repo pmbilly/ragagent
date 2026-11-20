@@ -412,106 +412,75 @@ ragagent/
 1. **包根不统一**：`domains` 的源根是 `com.ragagent.<域>`，不是 `com.ragagent.domains.<域>`。改名 `app` 时若顺手统一包根，会触碰全部 1,642 个文件 —— **只改模块名，不动包根**。
 2. **`boot` 并入 `app`** 后，17 个装配类落到 `app/config/`，`check-wiring-points.py`（W1~W4）的登记表与 `docs/architecture` 的装配清单要同步。
 
-## 10. 终态与实施路径（第 2 期，2026-11-20 重写）
+## 10. 终态与实施路径（B 路线：放宽 R10 + 域分级）
 
-> 从终态反推：先证明是否可达，再排路径。所有判定带实测数字。
+> 2026-11-20 决策：选 B（贴合蓝图 §5.4/§5.5）。本节给出完整归属清单与五步执行计划，先验证再动手。
 
-### 10.1 可达性判定：蓝图 §9.2 的 5 模块**可达**，但有一道必须先清的前置
+### 10.1 为什么 contract 搬不空——根因是 R10 比蓝图更严
 
-**最初的错判**：曾用"剥洋葱"直接算 contract 的不可约核，得到 185 个无法剥离，据此判定"5 模块不可能"。
-**错在哪**：把 `platform` 当成纯技术层。实测 `platform` 里有 **30 个非 mixin 文件**直接引用业务契约——
-SSE 聊天流（`stream/` 5 个）、文档分块与图片增强（`knowledge/` 5 个）、提示词组装（`prompt/` 4 个）、
-Langfuse 装饰器（`tracing/decorators/` 4 个）、SSE Sink 与 RBAC 拦截器（`web/` 3 个）、
-文件服务（`storage/` 5 个）、审计（`audit/` 1 个）、工具 Schema（`tool/` 1 个）、事件类型（`event/` 1 个）、
-语言配置（`config/` 1 个）。**这些是业务代码住在了技术层**，它们把 38 个契约类型钉死在 contract。
+`check-domain-contracts.py`（R10）规定**跨域不得直接 import**。而蓝图：
 
-只要把这 30 个文件搬回业务所在层，`platform` 就只剩通用面依赖，contract 便能一路搬空。
+- §5.5 `api/` = 对其他域公开的接口与 BO
+- §5.4 域分三级，**只允许上级依赖下级**；同级互相需要时，依次考虑下沉到基础域、改用事件、合并
 
-**契约类型的三类归属（288 个）**
+两者冲突。R10 一刀切的结果是：任何被 ≥2 个域使用的类型都无处可去，只能堆在 `contract`（或 platform）。
+实测：`platform` 的 30 个"业务邻接"文件里，**只有 3 个**能被搬进单一域，24 个被多域共用而必须留在原地。
 
-| 类别 | 数量 | 归属 | 前置 |
-|---|---|---|---|
-| 通用面（`error` / `event` / `json` / `text` / `pagination`） | 37 | `framework` | 需先把 contract 内对 `json`/`error` 的引用搬走 |
-| 只被 platform 的 **mixin 注册表**引用 | 24 | 随类型走（S1 机制就绪） | — |
-| 被 platform **真代码**引用 | 38 | 随那 30 个文件走 | **P1 必须先做** |
-| 其余 | 189 | `app/<域>/api` 或引擎 `api` | — |
+**结论**：不先放宽 R10，任何搬迁都会卡住；放宽后，契约才有家可归。
 
-### 10.2 终态（5 模块，contract 消失）
+### 10.2 域分级（19 个业务域 + config）
 
-```text
-backend/
-├── framework/          ← 现 platform − 30 个业务邻接文件 + 37 个通用面类型
-├── model-runtime/      + api/（含从 contract.model 归位的类型）
-├── retrieval-engine/   + api/ + spi/
-├── agent-engine/       + api/ + spi/
-└── app/                ← 19 域（各带 api/）+ config/ + 启动类；1 个 jar，api/worker 两角色
-```
-
-### 10.3 五步路径（每步有前置、可独立验收）
-
-| 步 | 内容 | 规模 | 前置 | 工时 |
-|---|---|---|---|---|
-| **P1** | 30 个业务邻接文件搬出 `platform`：`stream/`→`model-runtime`；`knowledge/`→`app/knowledge`；`prompt/`→按用途拆到 `app/session` 与 `model-runtime`；`tracing/decorators/`→`model-runtime`；`web/ServletSseSink`→`app/session`、`web/RbacInterceptor`→`app/auth`；`storage/`→`app/storage`；`audit/`→`app/audit`；`tool/`→`agent-engine`；`event/EventType`→`model-runtime`；`config/LanguageProperties`→`app/wiki` | 30 文件 · 11 组 | — | 2~3 天 |
-| **P2** | 12 个 `ContractJsonMixins*` 搬进各归属模块，注册 `JsonModuleProvider`（S1 机制就绪） | 12 文件 | P1 | 1 天 |
-| **P3** | contract 类型归位：`model`→`model-runtime/api`；`retrieval`/`vectorstore`→`retrieval-engine/api`；`agent`/`tool`→`agent-engine/api`；域名包→`app/<域>/api` | 251 类型 | P1+P2 | 5~8 天 |
-| **P4** | 37 个通用面类型下沉 `framework`（此时 contract 内已无人引用） | 37 类型 | P3 | 1 天 |
-| **P5** | 删 `contract`；`platform` 改名 `framework`；全部移入 `backend/`；CI 与 24 个守卫脚本路径适配 | — | P4 | 1~2 天 |
-
-合计 **10~15 天**。P1 是分水岭：它不完成，P3 会被 38 个类型钉住（这就是之前"搬不动"的真实原因）。
-
-### 10.4 每步验收
-
-| 步 | 验收（缺一不可） |
+| 级 | 域 |
 |---|---|
-| P1 | 全量绿；`platform` 对非通用面契约的引用降为 **0**；金片 1339 逐字节不变 |
-| P2 | 金片不变（mixin 换位置不改线格式） |
-| P3 | 每搬一组跑一次全量；`contract` 剩余类型数单调递减 |
-| P4 | `contract` 目录为空，可删模块 |
-| P5 | `mvn -f backend/pom.xml clean verify` 绿 · 守卫 49/49 |
+| **L1 基础域** | `tenant` · `auth` · `system` · `storage` · `model` · `vectorstore` · `websearch` · `audit` · `initialization` |
+| **L2 业务域** | `knowledge` · `wiki` · `datasource` · `agentmanagement` · `mcp` · `memory` · `favorite` · `im` · `embedchannel` |
+| **L3 编排域** | `session` · `agenttools` |
 
-### 10.5 P1 的前提经实测被推翻（2026-11-20，第一批 P1）
+规则：**只允许上级 import 下级**（L3→L2→L1），且目标必须是对方的 `api/`（或 `dto/`）契约包；禁止下级→上级、禁止同级互相 import。
 
-试搬 `platform/knowledge` 的 5 个文件（都是"业务邻接"），结果：
+### 10.3 每个契约类型的归宿（造 288 个实测）
 
-| 文件 | 含测试的消费者 | 实际去向 |
+判据：home = 消费方里**级别最低**的那一方（这样所有其它消费方都是"上级"，都允许 import 它）；
+若最低级别有多个域（同级互需）→ 下沉 `framework`；若被 `platform` 用 → `framework`。
+
+| 去向 | 数量 | 说明 |
 |---|---|---|
-| `ImageInfoMatchUtil` · `ImageInfoEnricher` | app 多个域 + **retrieval-engine 测试** | ✅ 搬进 `retrieval-engine`（模块级，app 可依赖） |
-| `DocChunkSupport` · `GrepChunkHit` · `FaqChunkMetadataCodec` | 被 `agenttools` + `session` + `knowledge` **多个域**共用 | ❌ 必须留在 platform |
+| `framework` | **92** | 被 platform 引用，或跨模块共享（`error` / `event.payload` / 通用端口） |
+| `framework`（同级下沉） | **43** | 被同级的多个域共用，如 `AdminUserPort`（auth+system）、`APIKeyScopeContext`（auth+agentmanagement+knowledge+initialization） |
+| `agent-engine/api` | 24 | `contract.agent` / `tool` 主体 |
+| `model-runtime/api` | 16 | `contract.model` 主体 |
+| `retrieval-engine/api` | 13 | `contract.retrieval` / `vectorstore` |
+| `app/<域>/api` | 88 | 分布：`knowledge` 19 · `websearch` 10 · `memory` 9 · `wiki` 8 · `initialization` 7 · `storage` 7 · `session` 7 · `im` 6 · `embedchannel` 5 · `auth` 4 · `system` 2 · `agentmanagement` 2 · `agenttools` 1 · `audit` 1 |
+| 无引用 | 10 | 需确认死代码后删除 |
+| 待定 | 2 | 消费方含 `config` / `_root`，归属需人工判定 |
 
-**为什么**：`check-domain-contracts.py`（R10）规定**跨域不得直接 import**。一个 helper 若被 ≥2 个域使用，
-它就不能住在任何一个域里——只能留在 platform（或 contract）。实测把 30 个文件全量算一遍：
+**共享层从 288 降到 135（53%）**，其余 141 归位到域/引擎，10 个删除。
 
-| 可搬性 | 数量 | 说明 |
-|---|---|---|
-| 可搬进**单一域**（R10 允许） | **3** | `LanguageProperties`→config · `StreamStopWatcher`→im · `MessageAttachmentsPrompt`→session |
-| 必须留在 platform | **24** | 跨模块（引擎也用）或 ≥2 个域共用 |
-| 已搬（模块级，非域） | 2 | `ImageInfo*` → `retrieval-engine` |
+### 10.4 五步执行计划
 
-**结论**：P1 的"把 30 个业务邻接文件搬回业务层"**只成立 3 个**。那 37 个被 platform 钉住的契约类型
-**无法通过搬文件释放**——它们只能**下沉到 framework**。
-
-### 10.6 由此得到两条互斥的路线（需决策）
-
-| 路线 | 做法 | 代价 | 终态 |
+| 步 | 内容 | 规模 | 验收 |
 |---|---|---|---|
-| **A. 合并到 framework**（R10 不变） | 把被 ≥2 个域共用、或 platform 需要的契约类型**全部下沉 framework**；contract 逐步空掉后删除 | framework 会装下大量业务形状（`ChunkFacts` / `DocumentFacts` / `SearchResult`…），名字叫"框架"但内容是共享词汇 | 5 模块，contract 消失，但 framework ≠ 纯技术层 |
-| **B. 放宽 R10 + 域分级**（贴合蓝图 §5.4/§5.5） | 允许跨域 import 对方的 `api/`；域分三级，只允许**上级依赖下级**；同级互相需要时下沉基础域或合并 | 要改 R10 守卫、给 19 个域定级、跨域边会从 0 变成数十条（需分级校验而非一刀切） | 5 模块，契约分散在各域 `api/`，framework 保持纯技术 |
+| **B1** | 落地域分级：`scripts/capability-kinds.json` 加 `level` 字段；`check-domain-contracts.py` 从"禁跨域"改为"禁下级→上级 + 禁同级，允许上级→下级 `api`" | 19 域 + 1 守卫 | 现状仍 0 违规（当前无跨域 import，规则收紧前先证明不误报） |
+| **B2** | 建 14 个 `app/<域>/api` 包（含 `package-info`），搬 88 个域专属契约 | 88 类型 | 每域一次全量；`contract` 剩余数单调递减 |
+| **B3** | 引擎面归位：`agent` 24 + `model` 16 + `retrieval` 13 → 三个引擎的 `api/`，mixin 随类型搬（S1 机制） | 53 类型 | 金片 1339 逐字节不变 |
+| **B4** | 135 个共享类型下沉 `framework`；`platform` 改名 `framework`；删 `contract` | 135 类型 | `contract` 目录为空可删 |
+| **B5** | 目录前移 `backend/`；CI 与 24 个脚本路径；ArchUnit/Modulith 接管边界校验 | — | `mvn -f backend/pom.xml clean verify` 绿 · 守卫 49/49 |
 
-**蓝图的原文倾向 B**（§5.5 定义 `api/` = "对其他域公开的接口与 BO"，§5.4 给出三级依赖规则），
-但当前 R10 是"一刀切禁止"，与蓝图冲突。**A 与 B 都能让 contract 消失，选哪个是架构口径问题，不是可行性问题。**
+合计 **10~14 天**。B1 是闸门：它不改任何业务代码，但决定后面能否搬。
 
-### 10.7 已知风险与对策
+### 10.5 风险与对策
 
 | 风险 | 对策 |
 |---|---|
-| `platform/stream` 下沉 `model-runtime` 后，`app` 侧 SSE 需改注入点 | 保留 `platform` 侧的接口抽象（端口留在 framework），实现搬走 |
-| `prompt/` 4 个文件用途混杂（graph / model / session） | 按文件逐个判定，不整目录搬 |
-| P3 的 251 个类型会改掉约 1500 处 import | 按"组"推进（model / retrieval / agent / 各域），每组一次全量 |
-| 域 api 之间互相引用 | 同一模块内合法；R-1 只禁 `service`/`repository`/`adapter` 直连 |
+| 放宽 R10 后跨域边从 0 变数十条，可能掩盖真问题 | 只允许 import 对方 `api`/`dto`；`service`/`repository`/`adapter`/`domain` 仍全禁（沿用 P2 的 R-1 规则） |
+| 43 个"同级下沉"类型进 framework，framework 语义被稀释 | 已在 §10.3 单列；后续若发现某组同级域其实该合并（如 `im`+`embedchannel`→`channel`），随合并把它们挪回域 |
+| B2 的 88 个类型会改约 400 处 import | 按域分批，每批一次全量 |
+| 10 个"无引用"可能是死代码 | 先只做静态引用扫描，确认后再删；不确认的留在 framework |
 
 ### 10.6 明确不做
 
 | 项 | 理由 |
 |---|---|
-| 包名 `com.ragagent.platform` → `framework` | 2000+ 处改动，收益为零（终态没要求包名） |
-| 保留 `contract` 作为"共享词汇层" | 只在 P1~P4 未完成前成立；完成后它是空目录 |
+| 包名 `com.ragagent.platform` → `framework` | 2000+ 处改动，收益为零 |
+| 保留 `contract` 作为"共享词汇层" | B4 完成后它是空目录 |
+| 把 24 个多域共用的 helper 搬进某个域 | R10 禁止；它们本就该留在 framework |
