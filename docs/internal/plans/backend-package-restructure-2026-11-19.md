@@ -473,6 +473,23 @@ ragagent/
 
 合计 **10~14 天**。B1 是闸门：它不改任何业务代码，但决定后面能否搬。
 
+### 7.4 搬迁陷阱三：目标类被 platform 的**包私有**内部类钉住（2026-11-20 实测）
+
+想解绑 `contract.model` 剩下 12 个 LLM 协议形状（`ChatMessage` / `ChatStream` / `StreamResponse` /
+`ResponseType` 等），必须先搬走 `platform/tracing/decorators`（6 个 Langfuse 装饰器）——它们是这些形状在
+platform 侧的唯一使用者。
+
+**结果：搬不动。** 装饰器的测试 `LangfuseModelDecoratorsTest` 在 platform，它直接使用 platform
+`tracing.langfuse` 的 5 个**包私有**类（`DefaultLangfuseManager` / `LangfuseContext` / `LangfuseRegistry` /
+`NoopLangfuseManager` / `RecordedSpan`）。测试随装饰器搬到 `model-runtime` 后，这 5 个类都不可见，编译失败；
+而测试留在 platform 又会让 platform 依赖 model-runtime（反向边）。
+
+**判据**：搬一类文件前，先看它的**测试**是否依赖同模块的包私有类型；是则搬运等价于一次可见性重构。
+**前置**：把 `tracing.langfuse` 的 5 个类提为 public，或提供公开的测试支撑 API。
+
+因此 `contract.model` 剩余的 23 个类型，短期无法再瘦身：12 个协议形状被 decorators 钉住、
+3 个被 Jackson mixin 注册、5 个被 `pipeline`/`session`/`retrieval-engine` 引用。
+
 ### 7.5 搬迁陷阱二：目标模块内部有环时不可迁入契约（2026-11-20 实测）
 
 试搬 `contract.model` 的 4 个 Ollama 类型（`OllamaAdminPort` / `OllamaModelInfo` / `OllamaPullProgress` / `OllamaProgressListener`）到 `model-runtime`，两次放置都新增包级环：
