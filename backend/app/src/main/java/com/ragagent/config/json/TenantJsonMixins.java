@@ -1,4 +1,4 @@
-package com.ragagent.platform.web;
+package com.ragagent.config.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ragagent.shared.tenant.StorageEngineConfig.CosEngineConfig;
@@ -17,9 +17,9 @@ import com.ragagent.shared.tenant.StorageEngineConfig.TosEngineConfig;
  * {@code @JsonIgnoreProperties}；子结构（Local/Minio/Cos/Tos/S3/Oss/Ks3/Obs）**无注解**，
  * 不需要 mixin。golden {@code ct-kv-storage-*} 钉住其输出形态。</p>
  */
-public final class ContractJsonMixinsTenant {
+public final class TenantJsonMixins {
 
-    private ContractJsonMixinsTenant() {
+    private TenantJsonMixins() {
     }
 
     /** APIPrincipalConfig 的 mixin（注解逐条对位）。 */

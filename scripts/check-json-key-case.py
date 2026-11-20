@@ -73,6 +73,9 @@ FROZEN_PREFIXES = (
     # 语义未变——仍是喂给模型的结构化载荷，不属自有 JSON 面。
     # 2026-11-21：检索面 mixin 迁入 retrieval-engine，其 searchParams/vectorstore 载荷的
     # 键名沿用既有 wire 契约（query_text / match_count 等），不属自有 JSON 面。
+    # 2026-11-21：域面 mixin（tenant 配置 / 网页搜索 / 记忆 / 会话 / 认证 / wiki）迁入
+    # app/config/json，键名沿用既有 wire 契约（mineru_* / paddleocr_* / api_key 等）。
+    'config/json/',
     'retrieval/json/',
     'knowledge/wiki/',
     'datasource/connector/feishu/core/DocxBlocks',

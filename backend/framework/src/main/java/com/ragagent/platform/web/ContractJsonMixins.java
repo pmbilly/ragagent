@@ -1,6 +1,5 @@
 package com.ragagent.platform.web;
 
-import com.ragagent.shared.auth.UserPreferences;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.event.payload.AgentActionData;
 import com.ragagent.shared.event.payload.AgentCompleteData;
@@ -22,18 +21,7 @@ import com.ragagent.shared.event.payload.StopData;
 import com.ragagent.shared.event.payload.ToolApprovalRequiredData;
 import com.ragagent.shared.event.payload.ToolApprovalResolvedData;
 import com.ragagent.shared.event.payload.UserMessageInjectedData;
-import com.ragagent.shared.memory.MemoryMessageCursor;
 import com.ragagent.shared.model.TokenUsage;
-import com.ragagent.shared.session.MessageView;
-import com.ragagent.shared.tenant.APIPrincipalConfig;
-import com.ragagent.shared.tenant.ChatHistoryConfig;
-import com.ragagent.shared.tenant.ParserEngineConfig;
-import com.ragagent.shared.tenant.RetrievalConfig;
-import com.ragagent.shared.tenant.StorageEngineConfig;
-import com.ragagent.shared.tenant.WebSearchConfig;
-import com.ragagent.shared.websearch.ImageInfo;
-import com.ragagent.shared.wiki.ExtractedItem;
-import com.ragagent.shared.wiki.SlugUpdate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -62,29 +50,17 @@ public final class ContractJsonMixins {
         m.put(ChatData.class, ContractJsonMixinsEvent.ChatDataMixin.class);
         m.put(ContextCompactedData.class, ContractJsonMixinsEvent.ContextCompactedDataMixin.class);
         m.put(ErrorData.class, ContractJsonMixinsEvent.ErrorDataMixin.class);
-        m.put(ExtractedItem.class, ContractJsonMixinsCore.ExtractedItemMixin.class);
-        m.put(ImageInfo.class, ContractJsonMixinsWebSearch.ImageInfoMixin.class);
         m.put(MCPOAuthRequiredData.class, ContractJsonMixinsEvent.MCPOAuthRequiredDataMixin.class);
         m.put(MCPOAuthResolvedData.class, ContractJsonMixinsEvent.MCPOAuthResolvedDataMixin.class);
         m.put(MergeData.class, ContractJsonMixinsEvent.MergeDataMixin.class);
-        m.put(MemoryMessageCursor.class, ContractJsonMixinsMemory.MemoryMessageCursorMixin.class);
-        m.put(MessageView.class, ContractJsonMixinsSession.MessageViewMixin.class);
         m.put(QueryData.class, ContractJsonMixinsEvent.QueryDataMixin.class);
         m.put(RerankData.class, ContractJsonMixinsEvent.RerankDataMixin.class);
         m.put(RetrievalData.class, ContractJsonMixinsEvent.RetrievalDataMixin.class);
-        m.put(SlugUpdate.class, ContractJsonMixinsCore.SlugUpdateMixin.class);
         m.put(StopData.class, ContractJsonMixinsEvent.StopDataMixin.class);
         m.put(TokenUsage.class, ContractJsonMixinsCore.TokenUsageMixin.class);
         m.put(ToolApprovalRequiredData.class, ContractJsonMixinsEvent.ToolApprovalRequiredDataMixin.class);
         m.put(ToolApprovalResolvedData.class, ContractJsonMixinsEvent.ToolApprovalResolvedDataMixin.class);
         m.put(UserMessageInjectedData.class, ContractJsonMixinsEvent.UserMessageInjectedDataMixin.class);
-        m.put(UserPreferences.class, ContractJsonMixinsAuth.UserPreferencesMixin.class);
-        m.put(WebSearchConfig.class, ContractJsonMixinsCore.WebSearchConfigMixin.class);
-        m.put(ParserEngineConfig.class, ContractJsonMixinsCore.ParserEngineConfigMixin.class);
-        m.put(APIPrincipalConfig.class, ContractJsonMixinsTenant.APIPrincipalConfigMixin.class);
-        m.put(ChatHistoryConfig.class, ContractJsonMixinsTenant.ChatHistoryConfigMixin.class);
-        m.put(RetrievalConfig.class, ContractJsonMixinsTenant.RetrievalConfigMixin.class);
-        m.put(StorageEngineConfig.class, ContractJsonMixinsTenant.StorageEngineConfigMixin.class);
         return Map.copyOf(m);
     }
 }

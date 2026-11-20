@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-369 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+370 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -69,6 +69,7 @@
 | `:backend` | `com.ragagent.auth.system.repository` | 系统设置仓储门面：全量读取、按键读写与删除。 |
 | `:backend` | `com.ragagent.auth.system.service` | 系统 · 服务：SystemAdminUserService / SystemSettingService / SystemInfoService…。 |
 | `:backend` | `com.ragagent.config` | Spring 装配层：Web/MyBatis/检索引擎/会话/IM 等的 Bean 定义与 @ConfigurationProperties 属性绑定， 不含业务逻辑。 |
+| `:backend` | `com.ragagent.config.json` | 业务域面载荷的 Jackson 装配（mixin 与注册表）。 |
 | `:backend` | `com.ragagent.datasource` | 数据源连接器域：外部知识源（Notion/Feishu/Yuque/RSS/IMA/GitLab 等）的抓取、游标推进、 同步编排与数据源配置面。 |
 | `:backend` | `com.ragagent.datasource.catalog` | 数据源 · 连接器目录：类型元数据与可用连接器清单（不参与持久化）。 |
 | `:backend` | `com.ragagent.datasource.config` | 数据源装配：连接器注册表、调度器与生命周期 Bean。 |

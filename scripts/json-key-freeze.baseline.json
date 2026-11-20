@@ -3,6 +3,8 @@
   "files": {
     "agent/AgentEngine.java": "agent/AgentEngine",
     "agent/ReActIteration.java": "agent/ReActIteration",
+    "config/json/AppJsonMixins.java": "config/json/",
+    "config/json/WebSearchJsonMixins.java": "config/json/",
     "datasource/connector/feishu/core/DocxBlocks.java": "datasource/connector/feishu/core/DocxBlocks",
     "datasource/connector/feishu/core/FeishuApiTypes.java": "datasource/connector/feishu/core/FeishuApiTypes",
     "datasource/connector/feishu/core/FeishuClient.java": "datasource/connector/feishu/core/FeishuClient",
@@ -104,7 +106,6 @@
     "platform/tracing/langfuse/LangfuseTaskScope.java": "platform/tracing/langfuse",
     "platform/tracing/langfuse/LangfuseTokenUsage.java": "platform/tracing/langfuse",
     "platform/web/ContractJsonMixinsCore.java": "platform/web/ContractJsonMixins",
-    "platform/web/ContractJsonMixinsWebSearch.java": "platform/web/ContractJsonMixins",
     "rerank/RankResultCodec.java": "rerank/RankResult",
     "rerank/provider/AliyunReranker.java": "rerank/",
     "rerank/provider/JinaReranker.java": "rerank/",

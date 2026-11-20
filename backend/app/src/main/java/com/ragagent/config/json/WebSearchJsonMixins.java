@@ -1,4 +1,4 @@
-package com.ragagent.platform.web;
+package com.ragagent.config.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -12,9 +12,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * <p>其余三件（{@code WebSearchResult} / {@code WebSearchRequest} / {@code WebSearchFilters}）
  * 键名即字段名，不需要 mixin。</p>
  */
-public final class ContractJsonMixinsWebSearch {
+public final class WebSearchJsonMixins {
 
-    private ContractJsonMixinsWebSearch() {
+    private WebSearchJsonMixins() {
     }
 
     /** ImageInfo 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
