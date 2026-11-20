@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.ResultWithMeta;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.SearchResultView;
-import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.shared.tool.ToolResult;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;

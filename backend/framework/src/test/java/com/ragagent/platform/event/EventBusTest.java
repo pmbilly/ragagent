@@ -7,11 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.EventBusException;
-import com.ragagent.contract.event.EventHandler;
-import com.ragagent.contract.event.payload.AgentThoughtData;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.shared.event.Event;
+import com.ragagent.shared.event.EventBusException;
+import com.ragagent.shared.event.EventHandler;
+import com.ragagent.shared.event.payload.AgentThoughtData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

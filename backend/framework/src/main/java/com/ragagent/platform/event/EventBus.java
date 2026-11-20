@@ -1,11 +1,11 @@
 package com.ragagent.platform.event;
 
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.EventBusException;
-import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.contract.event.EventHandler;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
+import com.ragagent.shared.event.Event;
+import com.ragagent.shared.event.EventBusException;
+import com.ragagent.shared.event.EventBusInterface;
+import com.ragagent.shared.event.EventHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

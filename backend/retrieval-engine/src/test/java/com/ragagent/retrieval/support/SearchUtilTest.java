@@ -2,14 +2,14 @@ package com.ragagent.retrieval.support;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.contract.knowledge.SearchChunkMerge;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.websearch.ImageInfo;
-import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.retrieval.api.SearchTextUtil;
 import com.ragagent.retrieval.api.WebResultConverter;
+import com.ragagent.shared.knowledge.ChunkView;
+import com.ragagent.shared.knowledge.SearchChunkMerge;
+import com.ragagent.shared.retrieval.SearchResult;
+import com.ragagent.shared.websearch.ImageInfo;
+import com.ragagent.shared.websearch.WebSearchResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

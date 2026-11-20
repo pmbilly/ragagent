@@ -1,10 +1,10 @@
 package com.ragagent.storage.support;
 
-import com.ragagent.contract.storage.support.FileUrlPort;
-import com.ragagent.contract.storage.support.Resolver;
-import com.ragagent.contract.storage.support.StorageBackendResolver;
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.storage.support.FileResolverFactory;
+import com.ragagent.shared.storage.support.FileUrlPort;
+import com.ragagent.shared.storage.support.Resolver;
+import com.ragagent.shared.storage.support.StorageBackendResolver;
+import com.ragagent.shared.tenant.TenantConfigLookup.TenantStorageView;
 import org.springframework.stereotype.Component;
 
 /**

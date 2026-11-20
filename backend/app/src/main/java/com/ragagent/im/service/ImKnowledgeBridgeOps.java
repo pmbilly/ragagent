@@ -1,11 +1,11 @@
 package com.ragagent.im.service;
 
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.knowledge.error.DuplicateKnowledgeException;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCommandSet;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
+import com.ragagent.shared.knowledge.error.DuplicateKnowledgeException;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

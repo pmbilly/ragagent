@@ -1,11 +1,11 @@
 package com.ragagent.platform.web.error;
 
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResultSupport;
 import com.ragagent.platform.web.PageParams;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.error.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.Map;

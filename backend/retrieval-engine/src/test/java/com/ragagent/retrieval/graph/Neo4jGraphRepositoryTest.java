@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.contract.graph.GraphData;
-import com.ragagent.contract.graph.GraphNode;
-import com.ragagent.contract.graph.GraphRelation;
-import com.ragagent.contract.graph.NameSpace;
+import com.ragagent.shared.graph.GraphData;
+import com.ragagent.shared.graph.GraphNode;
+import com.ragagent.shared.graph.GraphRelation;
+import com.ragagent.shared.graph.NameSpace;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

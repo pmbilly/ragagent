@@ -3,10 +3,10 @@ package com.ragagent.websearch.provider;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.websearch.WebSearchFilters;
-import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.shared.retrieval.SearchResult;
+import com.ragagent.shared.websearch.WebSearchFilters;
+import com.ragagent.shared.websearch.WebSearchResult;
 import com.ragagent.websearch.config.WebSearchProviderParams;
 import com.ragagent.websearch.service.WebSearchService;
 import com.sun.net.httpserver.HttpExchange;

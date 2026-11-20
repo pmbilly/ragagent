@@ -1,6 +1,6 @@
 package com.ragagent.wiki.service.ingest.support;
 
-import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.shared.wiki.ExtractedItem;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import java.util.List;
 import java.util.Map;

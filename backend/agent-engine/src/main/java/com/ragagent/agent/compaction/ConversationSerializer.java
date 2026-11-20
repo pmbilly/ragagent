@@ -2,10 +2,10 @@ package com.ragagent.agent.compaction;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.model.ChatMessage;
-import com.ragagent.contract.model.ToolCall;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
+import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.shared.model.ToolCall;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;

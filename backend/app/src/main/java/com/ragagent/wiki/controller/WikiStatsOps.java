@@ -8,7 +8,7 @@ import static com.ragagent.wiki.controller.WikiRequestSupport.q;
 import static com.ragagent.wiki.controller.WikiRequestSupport.query;
 import static com.ragagent.wiki.controller.WikiRequestSupport.trimSpace;
 
-import com.ragagent.contract.error.BizException;
+import com.ragagent.shared.error.BizException;
 import com.ragagent.wiki.api.WikiIndex;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.graph.WikiGraph;

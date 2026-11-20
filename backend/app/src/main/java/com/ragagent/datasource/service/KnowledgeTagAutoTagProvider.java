@@ -1,10 +1,10 @@
 package com.ragagent.datasource.service;
 
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.knowledge.KnowledgeTagView;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.knowledge.KnowledgeBaseRowView;
+import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
+import com.ragagent.shared.knowledge.KnowledgeTagView;
 import org.springframework.stereotype.Component;
 
 /**

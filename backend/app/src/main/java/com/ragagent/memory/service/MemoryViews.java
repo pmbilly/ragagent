@@ -1,7 +1,7 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.contract.memory.MemoryItemView;
 import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.shared.memory.MemoryItemView;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -14,11 +14,11 @@ import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.GraphRelationVi
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.GraphSearch;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.KnowledgeBaseView;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.SearchResultView;
-import com.ragagent.contract.agent.SearchAuth.KnowledgeTagsFetcher;
-import com.ragagent.contract.agent.SearchAuth.TagView;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.shared.agent.SearchAuth.KnowledgeTagsFetcher;
+import com.ragagent.shared.agent.SearchAuth.TagView;
+import com.ragagent.shared.retrieval.SearchTarget;
+import com.ragagent.shared.tool.ToolRequest;
+import com.ragagent.shared.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.ragagent.wiki.service.page;
 
-import com.ragagent.contract.text.Whitespace;
+import com.ragagent.shared.text.Whitespace;
 import com.ragagent.wiki.service.ingest.support.WikiBatchContext;
 import java.util.ArrayList;
 import java.util.List;

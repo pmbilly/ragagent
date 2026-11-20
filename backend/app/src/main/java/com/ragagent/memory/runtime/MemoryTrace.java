@@ -1,11 +1,11 @@
 package com.ragagent.memory.runtime;
 
 
-import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.platform.access.TracingContext;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
+import com.ragagent.shared.memory.MemoryKeys;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

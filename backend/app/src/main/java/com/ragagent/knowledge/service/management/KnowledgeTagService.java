@@ -1,10 +1,5 @@
 package com.ragagent.knowledge.service.management;
 
-import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
@@ -19,6 +14,11 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.audit.ActivityAuditRecorder;
 import com.ragagent.retrieval.api.IndexEngine;
 import com.ragagent.retrieval.api.VectorIndexStore;
+import com.ragagent.shared.audit.AuditAction;
+import com.ragagent.shared.audit.AuditWritePort;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.pagination.PageResult;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;

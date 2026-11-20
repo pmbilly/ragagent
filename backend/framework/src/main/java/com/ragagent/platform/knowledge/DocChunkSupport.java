@@ -1,8 +1,8 @@
 package com.ragagent.platform.knowledge;
 
-import com.ragagent.contract.agent.SearchAuth;
-import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.agent.SearchAuth;
+import com.ragagent.shared.knowledge.ChunkFacts;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

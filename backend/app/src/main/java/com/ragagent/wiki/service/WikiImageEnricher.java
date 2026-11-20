@@ -1,6 +1,6 @@
 package com.ragagent.wiki.service;
 
-import com.ragagent.contract.knowledge.ChunkView;
+import com.ragagent.shared.knowledge.ChunkView;
 import java.util.List;
 
 /**

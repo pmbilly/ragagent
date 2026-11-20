@@ -1,9 +1,9 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.contract.model.ChatMessage;
-import com.ragagent.contract.model.ChatOptions;
-import com.ragagent.contract.model.ChatResponse;
-import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.shared.model.ChatOptions;
+import com.ragagent.shared.model.ChatResponse;
+import com.ragagent.shared.model.LlmChatClient;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;

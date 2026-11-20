@@ -1,6 +1,6 @@
 package com.ragagent.auth.apikey.controller.filter;
 
-import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.shared.apikey.APIKeyScopeContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

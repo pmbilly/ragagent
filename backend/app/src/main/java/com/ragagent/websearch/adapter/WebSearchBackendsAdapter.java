@@ -1,11 +1,11 @@
 package com.ragagent.websearch.adapter;
 
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.contract.pipeline.WebSearchExecutor;
-import com.ragagent.contract.tenant.WebSearchConfig;
-import com.ragagent.contract.websearch.WebSearchRequest;
-import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.shared.pipeline.PipelinePorts;
+import com.ragagent.shared.pipeline.WebSearchExecutor;
+import com.ragagent.shared.tenant.WebSearchConfig;
+import com.ragagent.shared.websearch.WebSearchRequest;
+import com.ragagent.shared.websearch.WebSearchResult;
 import com.ragagent.websearch.service.WebSearchService;
 import java.util.ArrayList;
 import java.util.List;

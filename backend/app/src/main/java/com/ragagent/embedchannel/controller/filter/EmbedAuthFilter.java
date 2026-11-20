@@ -1,14 +1,14 @@
 package com.ragagent.embedchannel.controller.filter;
 
-import com.ragagent.contract.storage.support.StorageUrlContext;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.embedchannel.support.EmbedError;
 import com.ragagent.embedchannel.support.EmbedRateLimiter;
 import com.ragagent.embedchannel.support.EmbedTokens;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.shared.storage.support.StorageUrlContext;
+import com.ragagent.shared.tenant.TenantConfigLookup;
+import com.ragagent.shared.tenant.TenantRole;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

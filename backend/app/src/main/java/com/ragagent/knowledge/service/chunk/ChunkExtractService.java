@@ -2,13 +2,6 @@ package com.ragagent.knowledge.service.chunk;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.graph.GraphData;
-import com.ragagent.contract.graph.GraphNode;
-import com.ragagent.contract.graph.GraphRelation;
-import com.ragagent.contract.graph.NameSpace;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.retrieval.RetrieveGraphRepository;
-import com.ragagent.contract.wiki.WikiKnowledgeFinalizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkExtractConsumer;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
@@ -30,6 +23,13 @@ import com.ragagent.platform.prompt.ExtractPrompts;
 import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.platform.prompt.PromptInstructions;
 import com.ragagent.retrieval.api.RetrievalObsRows;
+import com.ragagent.shared.graph.GraphData;
+import com.ragagent.shared.graph.GraphNode;
+import com.ragagent.shared.graph.GraphRelation;
+import com.ragagent.shared.graph.NameSpace;
+import com.ragagent.shared.model.LlmChatClient;
+import com.ragagent.shared.retrieval.RetrieveGraphRepository;
+import com.ragagent.shared.wiki.WikiKnowledgeFinalizer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

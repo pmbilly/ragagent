@@ -1,6 +1,5 @@
 package com.ragagent.datasource.service;
 
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.datasource.connector.rss.RssFetchState;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
@@ -16,6 +15,7 @@ import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.connector.StreamHandler;
 import com.ragagent.datasource.domain.connector.StreamingConnector;
+import com.ragagent.shared.knowledge.KnowledgeBaseRowView;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;

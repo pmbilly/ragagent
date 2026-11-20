@@ -3,7 +3,6 @@ package com.ragagent.embedding;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.model.Embedder;
 import com.ragagent.embedding.provider.AliyunEmbedder;
 import com.ragagent.embedding.provider.AzureOpenAiEmbedder;
 import com.ragagent.embedding.provider.GeminiEmbedder;
@@ -20,6 +19,7 @@ import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelRowViews;
 import com.ragagent.modelruntime.application.ModelRuntimeConfigs;
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.shared.model.Embedder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import java.io.InputStream;

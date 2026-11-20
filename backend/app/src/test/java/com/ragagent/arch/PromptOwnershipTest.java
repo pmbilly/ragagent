@@ -40,7 +40,7 @@ class PromptOwnershipTest {
     private static Path findRepoRoot() {
         Path p = Path.of("").toAbsolutePath().normalize();
         while (p != null) {
-            if (Files.isDirectory(p.resolve("backend/contract")) && Files.isDirectory(p.resolve("backend/app"))) {
+            if (Files.isDirectory(p.resolve("backend/framework")) && Files.isDirectory(p.resolve("backend/app"))) {
                 return p;
             }
             p = p.getParent();

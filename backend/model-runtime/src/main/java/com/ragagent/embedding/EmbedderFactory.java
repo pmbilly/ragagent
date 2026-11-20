@@ -1,6 +1,5 @@
 package com.ragagent.embedding;
 
-import com.ragagent.contract.model.Embedder;
 import com.ragagent.embedding.provider.AliyunEmbedder;
 import com.ragagent.embedding.provider.AzureOpenAiEmbedder;
 import com.ragagent.embedding.provider.BaseEmbedder;
@@ -15,6 +14,7 @@ import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
+import com.ragagent.shared.model.Embedder;
 import java.util.Locale;
 import java.util.Map;
 

@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.ragagent.contract.model.PromptCacheStatus;
-import com.ragagent.contract.model.ResponseType;
+import com.ragagent.shared.model.PromptCacheStatus;
+import com.ragagent.shared.model.ResponseType;
 import java.io.IOException;
 
 /**

@@ -1,12 +1,6 @@
 package com.ragagent.agenttools.wiki;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.agent.SearchAuth;
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.tool.BaseTool;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.llm.api.ToolDefinitions;
 import com.ragagent.platform.knowledge.DocChunkSupport;
 import com.ragagent.platform.knowledge.DocChunkSupport.ChunkPage;
@@ -16,6 +10,12 @@ import com.ragagent.platform.knowledge.DocChunkSupport.KnowledgeInfoRow;
 import com.ragagent.platform.knowledge.DocChunkSupport.PagedChunks;
 import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.agent.SearchAuth;
+import com.ragagent.shared.knowledge.ChunkFacts;
+import com.ragagent.shared.retrieval.SearchTarget;
+import com.ragagent.shared.tool.BaseTool;
+import com.ragagent.shared.tool.ToolRequest;
+import com.ragagent.shared.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;

@@ -1,9 +1,9 @@
 package com.ragagent.session.service.sse;
 
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.shared.model.ResponseType;
+import com.ragagent.shared.model.StreamResponse;
+import com.ragagent.shared.retrieval.SearchResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

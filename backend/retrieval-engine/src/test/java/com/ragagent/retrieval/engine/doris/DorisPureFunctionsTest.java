@@ -3,7 +3,7 @@ package com.ragagent.retrieval.engine.doris;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.ragagent.contract.vectorstore.IndexConfig;
+import com.ragagent.shared.vectorstore.IndexConfig;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -2,11 +2,11 @@ package com.ragagent.wiki.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.RequestFields;
 import com.ragagent.platform.web.ToolJson;
+import com.ragagent.shared.error.BizException;
 import com.ragagent.wiki.api.WikiPageNotFoundException;
 import com.ragagent.wiki.domain.folder.WikiFolderConflictException;
 import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;

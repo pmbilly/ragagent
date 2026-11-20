@@ -8,7 +8,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.domain.conversation.Session;
@@ -18,6 +17,7 @@ import com.ragagent.session.service.QaSupport.SseStreamContext;
 import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SteerRunCoordinator;
+import com.ragagent.shared.tenant.TenantConfigLookup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;

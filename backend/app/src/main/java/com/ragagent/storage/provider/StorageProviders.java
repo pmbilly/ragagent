@@ -1,11 +1,11 @@
 package com.ragagent.storage.provider;
 
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.storage.StorageEnvLookup;
-import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.storage.StorageEnvLookup;
+import com.ragagent.shared.tenant.StorageEngineConfig;
 import com.ragagent.storage.dto.StorageConfig;
 import java.io.IOException;
 import java.nio.file.Files;

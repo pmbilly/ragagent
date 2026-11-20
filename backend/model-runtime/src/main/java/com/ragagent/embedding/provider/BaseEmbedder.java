@@ -1,8 +1,8 @@
 package com.ragagent.embedding.provider;
 
-import com.ragagent.contract.model.Embedder;
 import com.ragagent.embedding.EmbedderPooler;
 import com.ragagent.embedding.EmbeddingHttp;
+import com.ragagent.shared.model.Embedder;
 import java.util.List;
 import java.util.Map;
 

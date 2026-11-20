@@ -1,8 +1,8 @@
 package com.ragagent.websearch.fetch;
 
-import com.ragagent.contract.websearch.FetchException;
 import com.ragagent.platform.text.HtmlToMarkdown;
 import com.ragagent.platform.text.JdkHtmlToMarkdown;
+import com.ragagent.shared.websearch.FetchException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;

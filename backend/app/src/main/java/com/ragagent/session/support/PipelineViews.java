@@ -1,13 +1,13 @@
 package com.ragagent.session.support;
 
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.contract.session.MessageImage;
-import com.ragagent.contract.session.PipelineMessageAttachmentView;
-import com.ragagent.contract.session.UsedMemory;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.dto.PipelineMessageImageView;
 import com.ragagent.session.dto.PipelineMessageView;
 import com.ragagent.session.dto.PipelineUsedMemoryView;
+import com.ragagent.shared.session.MessageAttachment;
+import com.ragagent.shared.session.MessageImage;
+import com.ragagent.shared.session.PipelineMessageAttachmentView;
+import com.ragagent.shared.session.UsedMemory;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -3,11 +3,11 @@ package com.ragagent.agent.budget;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.model.ChatMessage;
-import com.ragagent.contract.model.ChatTool;
-import com.ragagent.contract.model.FunctionCall;
-import com.ragagent.contract.model.MessageContentPart;
-import com.ragagent.contract.model.ToolCall;
+import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.shared.model.ChatTool;
+import com.ragagent.shared.model.FunctionCall;
+import com.ragagent.shared.model.MessageContentPart;
+import com.ragagent.shared.model.ToolCall;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

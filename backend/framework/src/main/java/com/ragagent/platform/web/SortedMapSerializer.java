@@ -3,7 +3,7 @@ package com.ragagent.platform.web;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.ragagent.contract.json.ByteKeyOrder;
+import com.ragagent.shared.json.ByteKeyOrder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;

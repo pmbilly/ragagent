@@ -25,10 +25,6 @@
       <groupId>com.ragagent</groupId>
       <artifactId>framework</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.ragagent</groupId>
-      <artifactId>contract</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>

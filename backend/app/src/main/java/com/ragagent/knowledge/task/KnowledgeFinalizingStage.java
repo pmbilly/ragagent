@@ -1,9 +1,6 @@
 package com.ragagent.knowledge.task;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.wiki.WikiEnqueueResult;
-import com.ragagent.contract.wiki.WikiIngestPort;
-import com.ragagent.contract.wiki.WikiKnowledgeFinalizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -22,6 +19,9 @@ import com.ragagent.knowledge.support.QuestionBatchPlanner;
 import com.ragagent.knowledge.support.QuestionGenerationPolicy;
 import com.ragagent.platform.access.TracingContext;
 import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
+import com.ragagent.shared.wiki.WikiEnqueueResult;
+import com.ragagent.shared.wiki.WikiIngestPort;
+import com.ragagent.shared.wiki.WikiKnowledgeFinalizer;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;

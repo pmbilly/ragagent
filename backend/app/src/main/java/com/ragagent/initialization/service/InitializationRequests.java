@@ -2,12 +2,12 @@ package com.ragagent.initialization.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.config.ChunkingConfigView;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.knowledge.config.ChunkingConfigView;
 import java.util.ArrayList;
 import java.util.List;
 

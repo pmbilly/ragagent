@@ -2,9 +2,9 @@ package com.ragagent.wiki.service.ingest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.WikiImageMarkup;
+import com.ragagent.shared.knowledge.ChunkView;
+import com.ragagent.shared.wiki.ExtractedItem;
+import com.ragagent.shared.wiki.WikiImageMarkup;
 import com.ragagent.wiki.service.ingest.support.WikiIngestPreviews;
 import com.ragagent.wiki.service.page.WikiTextUtils;
 import java.util.ArrayList;

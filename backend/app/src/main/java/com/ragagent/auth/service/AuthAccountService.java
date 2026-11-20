@@ -1,8 +1,8 @@
 package com.ragagent.auth.service;
 
 import com.ragagent.auth.domain.User;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import org.slf4j.Logger;

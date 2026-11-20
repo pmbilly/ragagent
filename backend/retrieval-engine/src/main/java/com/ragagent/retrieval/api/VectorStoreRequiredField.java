@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.api;
 
-import com.ragagent.contract.vectorstore.ConnectionConfig;
+import com.ragagent.shared.vectorstore.ConnectionConfig;
 import java.util.function.Predicate;
 
 /**

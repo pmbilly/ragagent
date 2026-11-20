@@ -1,15 +1,15 @@
 package com.ragagent.session.qa;
 
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.session.SseSink;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;
 import com.ragagent.session.service.AgentResolver;
 import com.ragagent.session.service.QaSupport.QaMode;
 import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.SessionKnowledgeQaService;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.session.SseSink;
+import com.ragagent.shared.tenant.TenantConfigLookup;
+import com.ragagent.shared.tenant.TenantConfigLookup.TenantStorageView;
 import java.io.IOException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;

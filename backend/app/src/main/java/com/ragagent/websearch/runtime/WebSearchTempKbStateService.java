@@ -2,8 +2,8 @@ package com.ragagent.websearch.runtime;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.knowledge.KnowledgeMaintenancePort;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.knowledge.KnowledgeMaintenancePort;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;

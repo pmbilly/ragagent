@@ -7,10 +7,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.knowledge.KnowledgeTagView;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.knowledge.KnowledgeBaseRowView;
+import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
+import com.ragagent.shared.knowledge.KnowledgeTagView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,9 +1,9 @@
 package com.ragagent.agentengine.api;
 
-import com.ragagent.contract.tool.AgentTool;
-import com.ragagent.contract.tool.ToolCancellation;
-import com.ragagent.contract.tool.ToolExecContext;
-import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.shared.tool.AgentTool;
+import com.ragagent.shared.tool.ToolCancellation;
+import com.ragagent.shared.tool.ToolExecContext;
+import com.ragagent.shared.tool.ToolResult;
 import java.util.List;
 
 /**

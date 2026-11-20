@@ -1,7 +1,7 @@
 package com.ragagent.mcp.dto;
 
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.shared.tenant.TenantRole;
 
 /**
  * 调用者可见性投影（角色提取与集成秘密可见性两个判定）。

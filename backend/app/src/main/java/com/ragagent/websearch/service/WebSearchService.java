@@ -1,10 +1,10 @@
 package com.ragagent.websearch.service;
 
 
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.websearch.WebSearchFilters;
-import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.retrieval.api.WebResultConverter;
+import com.ragagent.shared.retrieval.SearchResult;
+import com.ragagent.shared.websearch.WebSearchFilters;
+import com.ragagent.shared.websearch.WebSearchResult;
 import com.ragagent.websearch.config.WebSearchProviderParams;
 import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.provider.WebSearchProvider;
@@ -348,7 +348,7 @@ public class WebSearchService {
          *
          * <p>缺省合并口径与迁移前逐字一致：{@code cfg == null} → 全默认；各字段空值回落默认。</p>
          */
-        public static WebSearchConfig from(com.ragagent.contract.tenant.WebSearchConfig cfg) {
+        public static WebSearchConfig from(com.ragagent.shared.tenant.WebSearchConfig cfg) {
             WebSearchConfig out = new WebSearchConfig();
             if (cfg == null) {
                 return out;

@@ -3,9 +3,9 @@ package com.ragagent.wiki.service.ingest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.text.Whitespace;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.shared.text.Whitespace;
+import com.ragagent.shared.wiki.SlugUpdate;
+import com.ragagent.shared.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.wiki.domain.ingest.WikiPendingOp;

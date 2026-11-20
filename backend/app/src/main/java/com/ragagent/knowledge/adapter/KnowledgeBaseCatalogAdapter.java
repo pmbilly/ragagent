@@ -1,10 +1,10 @@
 package com.ragagent.knowledge.adapter;
 
-import com.ragagent.contract.knowledge.KnowledgeBaseCatalogPort;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.knowledge.support.KnowledgeBaseRowViews;
+import com.ragagent.shared.knowledge.KnowledgeBaseCatalogPort;
+import com.ragagent.shared.knowledge.KnowledgeBaseRowView;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 /**
  * {@link KnowledgeBaseCatalogPort} 的 knowledge 侧实现。
  *
- * <p>域内经 {@code api/} 适配器对外暴露是既定模式（同 {@link com.ragagent.contract.knowledge.ChunkPort}）： 规则禁的是
+ * <p>域内经 {@code api/} 适配器对外暴露是既定模式（同 {@link com.ragagent.shared.knowledge.ChunkPort}）： 规则禁的是
  * {@code agenttools}/{@code agentmanagement} **直连**{@code *.service}，而本类在域内、由端口解耦。</p>
  *
  * <p>语义逐字保留：直接委托 {@code KnowledgeBaseService.listKnowledgeBases(creator)}

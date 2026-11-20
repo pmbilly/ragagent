@@ -2,10 +2,6 @@ package com.ragagent.session.rag.plugin;
 
 
 
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.contract.memory.MemoryItemView;
-import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.retrieval.api.RetrievalObsRows;
 import com.ragagent.session.dto.MemoryRecalledData;
@@ -14,6 +10,10 @@ import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.MemoryUsedMemories;
+import com.ragagent.shared.event.Event;
+import com.ragagent.shared.event.EventBusInterface;
+import com.ragagent.shared.memory.MemoryItemView;
+import com.ragagent.shared.pipeline.PipelinePorts;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

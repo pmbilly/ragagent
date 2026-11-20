@@ -1,9 +1,9 @@
 package com.ragagent.wiki.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.audit.WikiActivityAudit;
-import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.platform.web.ApiResult;
+import com.ragagent.shared.audit.WikiActivityAudit;
+import com.ragagent.shared.knowledge.KnowledgeBaseLookup;
 import com.ragagent.wiki.service.page.WikiLintService;
 import com.ragagent.wiki.service.page.WikiPageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  *       21 个端点里除"KB 访问被拒"外全部走这一形态（见下）。</li>
  *   <li><b>守卫写的错误</b>：KB 访问拒绝走全局错误处理，形态是
  *       {@code {"success":false,"error":{...}}}。
- *       Java 侧对应 {@link com.ragagent.contract.error.BizException}，由 GlobalExceptionHandler 统一渲染。</li>
+ *       Java 侧对应 {@link com.ragagent.shared.error.BizException}，由 GlobalExceptionHandler 统一渲染。</li>
  * </ol>
  *
  * <p><b>⚠️ 错误文案的前缀</b>：KB 校验失败写出去的错误文案带
@@ -45,7 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 例：KB 未启用 wiki 时客户端收到的是
  * {@code {"error":"error code: 400, error message: Wiki feature is not enabled for this knowledge base"}}
  * 且 HTTP 状态是 <b>400</b>。Java 的 {@code BizException.getMessage()} 恰好是同一格式
- * （见 {@link com.ragagent.contract.error.BizException#BizException}），因此这里复用同一文案函数。</p>
+ * （见 {@link com.ragagent.shared.error.BizException#BizException}），因此这里复用同一文案函数。</p>
  *
  * <p><b>守卫矩阵</b>（角色下限在 WebConfig 里注册）：</p>
  * <pre>

@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
-import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.domain.item.MemoryItem;
@@ -16,6 +14,8 @@ import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
 import com.ragagent.memory.dto.MemoryDocAffinity;
 import com.ragagent.memory.repository.MemoryRepository;
 import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.shared.memory.MemoryKinds;
+import com.ragagent.shared.pagination.PageResult;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;

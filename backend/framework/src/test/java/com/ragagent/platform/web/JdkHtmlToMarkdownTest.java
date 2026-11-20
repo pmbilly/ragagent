@@ -3,11 +3,11 @@ package com.ragagent.platform.web;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.ragagent.contract.text.Whitespace;
 import com.ragagent.platform.text.HtmlConversionException;
 import com.ragagent.platform.text.HtmlEntities;
 import com.ragagent.platform.text.HtmlToMarkdown;
 import com.ragagent.platform.text.JdkHtmlToMarkdown;
+import com.ragagent.shared.text.Whitespace;
 import org.junit.jupiter.api.Test;
 
 /**

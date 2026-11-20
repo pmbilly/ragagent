@@ -1,6 +1,5 @@
 package com.ragagent.knowledge.service.faq;
 
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -16,6 +15,7 @@ import com.ragagent.knowledge.service.faq.FaqImportService.ImportJob;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.shared.knowledge.FaqChunkMetadata;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

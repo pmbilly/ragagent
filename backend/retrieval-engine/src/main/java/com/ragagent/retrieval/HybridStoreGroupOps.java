@@ -1,9 +1,5 @@
 package com.ragagent.retrieval;
 
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.retrieval.HybridSearchService.StoreGroup;
 import com.ragagent.retrieval.api.KnowledgeBaseSearchFacts;
@@ -14,6 +10,10 @@ import com.ragagent.retrieval.engine.EffectiveEngines;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.RetrieveEngineFactories;
 import com.ragagent.retrieval.engine.RetrieverEngineParams;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.error.ErrorCode;
+import com.ragagent.shared.retrieval.SearchParams;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

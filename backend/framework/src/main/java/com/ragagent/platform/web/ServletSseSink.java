@@ -1,6 +1,6 @@
 package com.ragagent.platform.web;
 
-import com.ragagent.contract.session.SseSink;
+import com.ragagent.shared.session.SseSink;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

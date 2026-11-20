@@ -2,8 +2,8 @@ package com.ragagent.memory.domain;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.contract.memory.MemoryMessageCursor;
 import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.shared.memory.MemoryMessageCursor;
 import java.time.OffsetDateTime;
 
 /**

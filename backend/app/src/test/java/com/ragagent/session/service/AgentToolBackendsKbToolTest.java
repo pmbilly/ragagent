@@ -8,9 +8,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.pipeline.WebSearchExecutor;
-import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.memory.api.MemorySearchHit;
 import com.ragagent.memory.api.MemorySearchHits;
@@ -20,6 +17,9 @@ import com.ragagent.retrieval.api.HybridSearchPort;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.dto.MessageSearchGroupItem;
 import com.ragagent.session.dto.MessageSearchResult;
+import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
+import com.ragagent.shared.pipeline.WebSearchExecutor;
+import com.ragagent.shared.retrieval.SearchTarget;
 import com.ragagent.wiki.api.WikiPageOpsPort;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -37,8 +37,8 @@ import org.junit.jupiter.api.Test;
 class AgentToolBackendsKbToolTest {
 
     /** 抓取端口桩（R4b：WebFetchTool/WebSearchTool 经契约端口取网页）。 */
-    private static final com.ragagent.contract.websearch.ToolPageFetcher STUB_FETCHER =
-            new com.ragagent.contract.websearch.ToolPageFetcher() {
+    private static final com.ragagent.shared.websearch.ToolPageFetcher STUB_FETCHER =
+            new com.ragagent.shared.websearch.ToolPageFetcher() {
                 @Override
                 public String fetch(String url) {
                     return "stub-content";

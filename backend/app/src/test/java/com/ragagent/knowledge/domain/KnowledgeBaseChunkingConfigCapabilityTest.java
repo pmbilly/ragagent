@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.support.KnowledgeBaseConfigCodec;
 import com.ragagent.knowledge.support.KnowledgeBaseConfigMaps;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.error.BizException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

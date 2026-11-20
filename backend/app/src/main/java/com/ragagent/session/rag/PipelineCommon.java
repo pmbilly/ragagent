@@ -1,11 +1,5 @@
 package com.ragagent.session.rag;
 
-import com.ragagent.contract.model.ChatMessage;
-import com.ragagent.contract.model.ChatOptions;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
@@ -14,6 +8,12 @@ import com.ragagent.platform.prompt.PromptComposer;
 import com.ragagent.session.dto.PipelineMessageImageView;
 import com.ragagent.session.dto.PipelineMessageView;
 import com.ragagent.session.rag.plugin.PluginError;
+import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.shared.model.ChatOptions;
+import com.ragagent.shared.model.LlmChatClient;
+import com.ragagent.shared.pipeline.PipelinePorts;
+import com.ragagent.shared.retrieval.SearchTarget;
+import com.ragagent.shared.session.PipelineMessageAttachmentView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;

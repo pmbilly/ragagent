@@ -1,6 +1,6 @@
 package com.ragagent.storage.adapter;
 
-import com.ragagent.contract.storage.ResourceCatalogPort;
+import com.ragagent.shared.storage.ResourceCatalogPort;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
 import java.util.Optional;

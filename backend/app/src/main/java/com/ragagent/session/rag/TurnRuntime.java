@@ -1,6 +1,6 @@
 package com.ragagent.session.rag;
 
-import com.ragagent.contract.event.EventBusInterface;
+import com.ragagent.shared.event.EventBusInterface;
 
 /**
  * 一轮问答的运行时句柄：事件总线与消息 id。

@@ -1,14 +1,14 @@
 package com.ragagent.platform.web;
 
 
-import com.ragagent.contract.apikey.APIKeyScopeContext;
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.config.TenantProperties;
+import com.ragagent.shared.apikey.APIKeyScopeContext;
+import com.ragagent.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.error.ErrorCode;
+import com.ragagent.shared.tenant.TenantRole;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

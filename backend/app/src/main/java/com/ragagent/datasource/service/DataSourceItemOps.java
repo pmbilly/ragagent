@@ -1,13 +1,13 @@
 package com.ragagent.datasource.service;
 
-import com.ragagent.contract.knowledge.KnowledgeRowView;
-import com.ragagent.contract.knowledge.error.DuplicateKnowledgeException;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceException;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.SubtreeChildIds;
 import com.ragagent.datasource.domain.SyncItemError;
 import com.ragagent.datasource.domain.SyncResult;
+import com.ragagent.shared.knowledge.KnowledgeRowView;
+import com.ragagent.shared.knowledge.error.DuplicateKnowledgeException;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -24,10 +24,6 @@
       <groupId>com.ragagent</groupId>
       <artifactId>framework</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.ragagent</groupId>
-      <artifactId>contract</artifactId>
-    </dependency>
 
     <!-- 依实际 import 面声明（jackson / slf4j / spring-context / spring-web / spring-data-redis），
          不用 starter，避免把自动配置漏进库 -->

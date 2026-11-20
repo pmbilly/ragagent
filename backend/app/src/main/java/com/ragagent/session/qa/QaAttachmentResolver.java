@@ -1,9 +1,5 @@
 package com.ragagent.session.qa;
 
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.payload.AgentToolCallData;
-import com.ragagent.contract.event.payload.AgentToolResultData;
-import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.session.attachment.TemporaryDocumentService;
 import com.ragagent.session.conversation.MessageService;
@@ -12,6 +8,10 @@ import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.service.QaSupport;
 import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.QaSupport.SseStreamContext;
+import com.ragagent.shared.event.Event;
+import com.ragagent.shared.event.payload.AgentToolCallData;
+import com.ragagent.shared.event.payload.AgentToolResultData;
+import com.ragagent.shared.session.MessageAttachment;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

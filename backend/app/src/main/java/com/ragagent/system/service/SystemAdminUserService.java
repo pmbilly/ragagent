@@ -1,16 +1,16 @@
 package com.ragagent.system.service;
 
 import com.ragagent.auth.api.AuthUserErrors;
-import com.ragagent.contract.apikey.APIKeyScopeContext;
-import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.contract.auth.AdminUserCommandPort;
-import com.ragagent.contract.auth.AdminUserPort;
-import com.ragagent.contract.auth.AdminUserView;
-import com.ragagent.contract.auth.CreateUserResult;
-import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.apikey.APIKeyScopeContext;
+import com.ragagent.shared.audit.AuditOutcome;
+import com.ragagent.shared.audit.AuditWritePort;
+import com.ragagent.shared.auth.AdminUserCommandPort;
+import com.ragagent.shared.auth.AdminUserPort;
+import com.ragagent.shared.auth.AdminUserView;
+import com.ragagent.shared.auth.CreateUserResult;
+import com.ragagent.shared.pagination.PageResult;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

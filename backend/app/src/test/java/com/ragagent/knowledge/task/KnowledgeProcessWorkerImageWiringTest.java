@@ -11,7 +11,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.config.KnowledgeOcrProperties;
 import com.ragagent.knowledge.domain.Chunk;
@@ -30,6 +29,7 @@ import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.retrieval.api.VectorIndexStore;
+import com.ragagent.shared.retrieval.RetrieveGraphRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;

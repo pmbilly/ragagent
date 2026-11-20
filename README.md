@@ -81,15 +81,14 @@
 
 ## 架构
 
-六个 Maven 模块，**依赖单向、边界在编译期强制**：越界依赖无法编译，模块之间只认契约。
+五个 Maven 模块，**依赖单向、边界在编译期强制**：越界依赖无法编译，模块之间只认契约。
 
 ```
 :app               ──►  全部模块（组合根：启动类 + 17 个装配类 + 19 个业务域）
-:agent-engine      ──►  :platform  :contract  :model-runtime（模型上下文词汇）
-:retrieval-engine  ──►  :platform  :contract
-:model-runtime     ──►  :platform  :contract
-:platform          ──►  :contract
-:contract          ──►  （无依赖：纯 JDK）
+:agent-engine      ──►  :framework  :model-runtime（模型上下文词汇）
+:retrieval-engine  ──►  :framework
+:model-runtime     ──►  :framework
+:framework         ──►  （无模块依赖：技术底座 + 共享词汇）
 ```
 
 | 模块 | 职责 | 依赖 |

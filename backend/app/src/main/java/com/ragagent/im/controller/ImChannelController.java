@@ -2,8 +2,6 @@ package com.ragagent.im.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.im.channel.wechat.WechatQRCodeService;
 import com.ragagent.im.dto.ImChannelRows;
 import com.ragagent.im.service.ImChannelService;
@@ -13,6 +11,8 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

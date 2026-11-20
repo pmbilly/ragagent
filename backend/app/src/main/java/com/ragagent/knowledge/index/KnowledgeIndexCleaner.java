@@ -1,13 +1,13 @@
 package com.ragagent.knowledge.index;
 
-import com.ragagent.contract.graph.NameSpace;
-import com.ragagent.contract.model.Embedder;
-import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.retrieval.api.IndexEngine;
 import com.ragagent.retrieval.api.VectorIndexStore;
+import com.ragagent.shared.graph.NameSpace;
+import com.ragagent.shared.model.Embedder;
+import com.ragagent.shared.retrieval.RetrieveGraphRepository;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

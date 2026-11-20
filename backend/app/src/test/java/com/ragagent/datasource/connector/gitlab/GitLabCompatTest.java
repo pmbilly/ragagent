@@ -3,7 +3,7 @@ package com.ragagent.datasource.connector.gitlab;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.ragagent.contract.text.Whitespace;
+import com.ragagent.shared.text.Whitespace;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -138,7 +138,7 @@ class GitLabCompatTest {
     // ── Whitespace（GoStrings 收敛后的共享实现）───────────────────
 
     /**
-     * {@link com.ragagent.contract.text.Whitespace#trimSpace} 比 Java 的
+     * {@link com.ragagent.shared.text.Whitespace#trimSpace} 比 Java 的
      * {@code String.strip()} 多认 4 个字符（U+00A0 / U+2007 / U+202F / U+0085）。
      *
      * <p>差别落在"token 是不是空的"这个判定上——凭据常从网页复制，

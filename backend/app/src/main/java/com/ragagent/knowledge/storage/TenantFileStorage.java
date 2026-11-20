@@ -1,10 +1,10 @@
 package com.ragagent.knowledge.storage;
 
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.storage.fileserve.OpenedFile;
-import com.ragagent.contract.storage.fileserve.ProviderFileStorePort;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.storage.fileserve.OpenedFile;
+import com.ragagent.shared.storage.fileserve.ProviderFileStorePort;
 import java.io.IOException;
 import java.io.InputStream;
 import org.slf4j.Logger;

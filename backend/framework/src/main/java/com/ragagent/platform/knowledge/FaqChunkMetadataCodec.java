@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.knowledge.FaqChunkMetadata;
 
 /**
  * FaqChunkMetadata 的 JSON 侧（原挂在该类上的 JSON 常量与 fromJson/toJsonNode 两方法）。

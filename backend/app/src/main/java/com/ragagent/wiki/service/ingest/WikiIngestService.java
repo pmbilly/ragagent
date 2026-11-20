@@ -1,15 +1,15 @@
 package com.ragagent.wiki.service.ingest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.contract.wiki.WikiEnqueueResult;
-import com.ragagent.contract.wiki.WikiIngestPort;
-import com.ragagent.contract.wiki.WikiKnowledgeFinalizer;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.knowledge.ChunkView;
+import com.ragagent.shared.knowledge.KnowledgeBaseLookup;
+import com.ragagent.shared.model.LlmChatClient;
+import com.ragagent.shared.wiki.ExtractedItem;
+import com.ragagent.shared.wiki.SlugUpdate;
+import com.ragagent.shared.wiki.WikiEnqueueResult;
+import com.ragagent.shared.wiki.WikiIngestPort;
+import com.ragagent.shared.wiki.WikiKnowledgeFinalizer;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.domain.ingest.WikiFinalizeChange;
 import com.ragagent.wiki.domain.ingest.WikiIngestConstants;

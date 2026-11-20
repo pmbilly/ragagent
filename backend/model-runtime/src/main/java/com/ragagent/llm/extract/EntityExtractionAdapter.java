@@ -1,10 +1,10 @@
 package com.ragagent.llm.extract;
 
-import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.llm.api.EntityExtractionPort;
 import com.ragagent.llm.api.EntityExtractionResult;
 import com.ragagent.platform.prompt.PipelineConfig.PromptTemplateStructured;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.model.LlmChatClient;
 import java.util.List;
 import org.springframework.stereotype.Component;
 

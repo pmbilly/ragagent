@@ -1,9 +1,6 @@
 package com.ragagent.knowledge.service.management;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.model.Embedder;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -21,6 +18,9 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.api.IndexEngine;
 import com.ragagent.retrieval.api.IndexEngineResolver;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.model.Embedder;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

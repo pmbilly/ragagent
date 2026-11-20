@@ -1,15 +1,15 @@
 package com.ragagent.retrieval;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.HybridSearchService.RetrievalConfigView;
 import com.ragagent.retrieval.HybridSearchService.StoreGroup;
 import com.ragagent.retrieval.api.KnowledgeBaseSearchFacts;
 import com.ragagent.retrieval.engine.EngineTypes;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.knowledge.ChunkFacts;
+import com.ragagent.shared.retrieval.SearchParams;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;

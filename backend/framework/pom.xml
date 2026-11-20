@@ -22,10 +22,6 @@
 
   <dependencies>
     <!-- 契约层：端口签名暴露契约类型 ⇒ 传递 -->
-    <dependency>
-      <groupId>com.ragagent</groupId>
-      <artifactId>contract</artifactId>
-    </dependency>
 
     <!-- 依实际 import 面声明（jackson / spring / mybatis-plus / slf4j / jakarta），
          不用 starter，避免把自动配置漏进库 -->

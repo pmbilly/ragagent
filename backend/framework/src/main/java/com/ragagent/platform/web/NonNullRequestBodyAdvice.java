@@ -1,7 +1,7 @@
 package com.ragagent.platform.web;
 
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
 import java.lang.reflect.Type;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;

@@ -1,6 +1,5 @@
 package com.ragagent.im.service;
 
-import com.ragagent.contract.storage.support.Resolver;
 import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
 import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;
 import com.ragagent.im.runtime.ImFormat;
@@ -8,6 +7,7 @@ import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.im.runtime.ThinkDisplay;
 import com.ragagent.platform.storage.support.Rewriter;
+import com.ragagent.shared.storage.support.Resolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

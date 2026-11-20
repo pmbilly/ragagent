@@ -3,8 +3,8 @@ package com.ragagent.platform.stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.TokenUsage;
+import com.ragagent.shared.model.ResponseType;
+import com.ragagent.shared.model.TokenUsage;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.LinkedHashMap;

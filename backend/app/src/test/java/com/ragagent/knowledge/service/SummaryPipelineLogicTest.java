@@ -2,14 +2,14 @@ package com.ragagent.knowledge.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.support.KnowledgeIndexContent;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
+import com.ragagent.shared.knowledge.ChunkFacts;
+import com.ragagent.shared.websearch.ImageInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

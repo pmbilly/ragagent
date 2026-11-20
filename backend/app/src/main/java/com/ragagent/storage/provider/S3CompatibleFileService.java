@@ -1,7 +1,7 @@
 package com.ragagent.storage.provider;
 
-import com.ragagent.contract.storage.provider.SeekableSource;
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.shared.storage.provider.SeekableSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;

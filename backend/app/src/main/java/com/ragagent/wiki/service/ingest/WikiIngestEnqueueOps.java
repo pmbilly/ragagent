@@ -1,9 +1,9 @@
 package com.ragagent.wiki.service.ingest;
 
-import com.ragagent.contract.text.Whitespace;
-import com.ragagent.contract.wiki.WikiEnqueueResult;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.tracing.TraceInjector;
+import com.ragagent.shared.text.Whitespace;
+import com.ragagent.shared.wiki.WikiEnqueueResult;
+import com.ragagent.shared.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.domain.ingest.WikiFinalizeChange;
 import com.ragagent.wiki.domain.ingest.WikiFinalizeRow;

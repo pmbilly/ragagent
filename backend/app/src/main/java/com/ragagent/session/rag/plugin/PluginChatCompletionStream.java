@@ -1,17 +1,6 @@
 package com.ragagent.session.rag.plugin;
 
 
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.contract.event.payload.AgentFinalAnswerData;
-import com.ragagent.contract.event.payload.AgentThoughtData;
-import com.ragagent.contract.event.payload.ErrorData;
-import com.ragagent.contract.model.ChatOptions;
-import com.ragagent.contract.model.ChatStream;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.modelcontext.StreamDecoder;
 import com.ragagent.platform.access.TenantContextSnapshot;
@@ -22,6 +11,17 @@ import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.ReferencesSupport;
+import com.ragagent.shared.event.Event;
+import com.ragagent.shared.event.EventBusInterface;
+import com.ragagent.shared.event.payload.AgentFinalAnswerData;
+import com.ragagent.shared.event.payload.AgentThoughtData;
+import com.ragagent.shared.event.payload.ErrorData;
+import com.ragagent.shared.model.ChatOptions;
+import com.ragagent.shared.model.ChatStream;
+import com.ragagent.shared.model.LlmChatClient;
+import com.ragagent.shared.model.ResponseType;
+import com.ragagent.shared.model.StreamResponse;
+import com.ragagent.shared.pipeline.PipelinePorts;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;

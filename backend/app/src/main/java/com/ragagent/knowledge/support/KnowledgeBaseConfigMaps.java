@@ -1,12 +1,5 @@
 package com.ragagent.knowledge.support;
 
-import com.ragagent.contract.knowledge.config.AsrConfigView;
-import com.ragagent.contract.knowledge.config.ChunkingConfigView;
-import com.ragagent.contract.knowledge.config.ImageProcessingConfigView;
-import com.ragagent.contract.knowledge.config.IndexingStrategyView;
-import com.ragagent.contract.knowledge.config.StorageConfigView;
-import com.ragagent.contract.knowledge.config.StorageProviderConfigView;
-import com.ragagent.contract.knowledge.config.VlmConfigView;
 import com.ragagent.knowledge.domain.KnowledgeBaseAsrConfig;
 import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 import com.ragagent.knowledge.domain.KnowledgeBaseImageProcessingConfig;
@@ -14,6 +7,13 @@ import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.KnowledgeBaseStorageConfig;
 import com.ragagent.knowledge.domain.KnowledgeBaseStorageProviderConfig;
 import com.ragagent.knowledge.domain.KnowledgeBaseVlmConfig;
+import com.ragagent.shared.knowledge.config.AsrConfigView;
+import com.ragagent.shared.knowledge.config.ChunkingConfigView;
+import com.ragagent.shared.knowledge.config.ImageProcessingConfigView;
+import com.ragagent.shared.knowledge.config.IndexingStrategyView;
+import com.ragagent.shared.knowledge.config.StorageConfigView;
+import com.ragagent.shared.knowledge.config.StorageProviderConfigView;
+import com.ragagent.shared.knowledge.config.VlmConfigView;
 import java.util.List;
 
 /**

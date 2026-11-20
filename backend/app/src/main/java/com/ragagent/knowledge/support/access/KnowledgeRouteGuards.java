@@ -2,15 +2,15 @@ package com.ragagent.knowledge.support.access;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.access.KnowledgeReadPort;
 import com.ragagent.knowledge.service.access.KnowledgeAccessGuard;
 import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

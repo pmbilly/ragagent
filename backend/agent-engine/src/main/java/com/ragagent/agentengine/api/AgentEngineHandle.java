@@ -1,6 +1,6 @@
 package com.ragagent.agentengine.api;
 
-import com.ragagent.contract.model.ChatMessage;
+import com.ragagent.shared.model.ChatMessage;
 import java.util.List;
 import java.util.function.Supplier;
 

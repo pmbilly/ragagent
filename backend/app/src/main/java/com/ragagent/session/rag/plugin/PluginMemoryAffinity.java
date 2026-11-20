@@ -1,9 +1,9 @@
 package com.ragagent.session.rag.plugin;
 
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineState;
+import com.ragagent.shared.pipeline.PipelinePorts;
+import com.ragagent.shared.retrieval.SearchResult;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

@@ -1,8 +1,8 @@
 package com.ragagent.platform.http;
 
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.storage.config.UploadLimits;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;

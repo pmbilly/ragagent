@@ -1,11 +1,11 @@
 package com.ragagent.wiki.service.ingest;
 
-import com.ragagent.contract.audit.WikiActivityAudit;
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.contract.knowledge.KnowledgeSpanPort;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.shared.audit.WikiActivityAudit;
+import com.ragagent.shared.knowledge.KnowledgeBaseView;
+import com.ragagent.shared.knowledge.KnowledgeSpanPort;
+import com.ragagent.shared.model.LlmChatClient;
+import com.ragagent.shared.wiki.SlugUpdate;
+import com.ragagent.shared.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.WikiConfig;
 import com.ragagent.wiki.domain.WikiPage;

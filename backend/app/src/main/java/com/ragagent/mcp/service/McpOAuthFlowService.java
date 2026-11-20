@@ -1,8 +1,6 @@
 package com.ragagent.mcp.service;
 
 import com.ragagent.agentengine.api.McpApprovalOps;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.approval.Decision;
 import com.ragagent.mcp.approval.ToolApprovalException;
 import com.ragagent.mcp.approval.ToolApprovalGate;
@@ -13,6 +11,8 @@ import com.ragagent.mcp.oauth.model.OAuthAuthorizationStatus;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.JsonBodyErrors;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;

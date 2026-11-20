@@ -1,8 +1,8 @@
 package com.ragagent.memory.api;
 
-import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.memory.service.MemoryExtractionService;
 import com.ragagent.memory.service.MemoryService;
+import com.ragagent.shared.memory.MemoryRecall;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;

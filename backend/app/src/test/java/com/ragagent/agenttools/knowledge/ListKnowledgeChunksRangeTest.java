@@ -2,12 +2,12 @@ package com.ragagent.agenttools.knowledge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.contract.agent.SearchAuth;
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.knowledge.DocChunkSupport;
+import com.ragagent.shared.agent.SearchAuth;
+import com.ragagent.shared.knowledge.ChunkFacts;
+import com.ragagent.shared.retrieval.SearchTarget;
+import com.ragagent.shared.tool.ToolRequest;
+import com.ragagent.shared.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

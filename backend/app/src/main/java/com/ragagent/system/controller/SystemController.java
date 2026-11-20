@@ -1,17 +1,17 @@
 package com.ragagent.system.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.settings.DocReaderAdminPort;
-import com.ragagent.contract.settings.ParserEngineCatalogPort;
-import com.ragagent.contract.storage.StorageConnectivityPort;
-import com.ragagent.contract.tenant.ParserEngineConfig;
-import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.settings.DocReaderAdminPort;
+import com.ragagent.shared.settings.ParserEngineCatalogPort;
+import com.ragagent.shared.storage.StorageConnectivityPort;
+import com.ragagent.shared.tenant.ParserEngineConfig;
+import com.ragagent.shared.tenant.TenantConfigLookup;
 import com.ragagent.system.dto.SystemDtos;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
 import com.ragagent.system.service.SystemInfoService;

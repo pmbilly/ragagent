@@ -1,7 +1,7 @@
 package com.ragagent.modelruntime.adapter.provider.chat.common;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.model.ChatOptions;
+import com.ragagent.shared.model.ChatOptions;
 import java.util.Map;
 
 /**

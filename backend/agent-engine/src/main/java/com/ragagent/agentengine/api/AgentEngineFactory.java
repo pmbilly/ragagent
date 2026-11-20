@@ -1,7 +1,7 @@
 package com.ragagent.agentengine.api;
 
-import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.shared.event.EventBusInterface;
+import com.ragagent.shared.model.LlmChatClient;
 
 /**
  * agent 引擎工厂（装配权下沉到 agent-engine）。

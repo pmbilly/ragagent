@@ -3,9 +3,9 @@ package com.ragagent.session.qa;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.ragagent.contract.error.BizException;
 import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;
 import com.ragagent.session.dto.QaRequests.SearchKnowledgeRequest;
+import com.ragagent.shared.error.BizException;
 import org.junit.jupiter.api.Test;
 
 /**

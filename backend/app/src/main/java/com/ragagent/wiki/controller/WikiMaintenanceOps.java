@@ -9,7 +9,7 @@ import static com.ragagent.wiki.controller.WikiRequestSupport.sanitize;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.BizException;
+import com.ragagent.shared.error.BizException;
 import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.domain.issue.WikiLintReport;
 import com.ragagent.wiki.service.page.WikiLintService;

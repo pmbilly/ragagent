@@ -46,7 +46,7 @@ class AgentEngineBoundaryTest {
     private static Path findRepoRoot() {
         Path p = Path.of("").toAbsolutePath().normalize();
         while (p != null) {
-            if (Files.isDirectory(p.resolve("backend/contract")) && Files.isDirectory(p.resolve("backend/app"))) {
+            if (Files.isDirectory(p.resolve("backend/framework")) && Files.isDirectory(p.resolve("backend/app"))) {
                 return p;
             }
             p = p.getParent();
@@ -78,7 +78,7 @@ class AgentEngineBoundaryTest {
             "common",       // L1（:common 主包）
             "platform",     // L1（:common 的平台面：B268 起 event/stream/tracing.langfuse 均在此）
             "contract",     // L1（:common 的契约面：A② 起 common/* 分流至此）
-            "event",        // L1（:common 的 event 包——现只剩 payload，待迁 com.ragagent.contract.event.payload）
+            "event",        // L1（:common 的 event 包——现只剩 payload，待迁 com.ragagent.shared.event.payload）
             "stream",       // L1 旧名（已并入 platform.stream，保留登记）
             "llm",          // L2 能力
             "modelcontext", // L2 能力（模型输出上下文协议；物理位于 :engine）
@@ -88,7 +88,10 @@ class AgentEngineBoundaryTest {
             "tracing",     // L1 core（:common）+ L2 装饰器（platform.tracing）
             // 本模块对外契约包：因 agent 是模块内 hub（依赖全部子包），契约若挂 agent.api
             // 会与 hub 形成包级环，故用独立顶层名；仍是本模块自身，不是业务域。
-            "agentengine");
+            "agentengine",
+            // L1 共享词汇层：contract 于阶段四并入 framework，包名 com.ragagent.shared。
+            // 它不是业务域，是跨模块共享的载荷/端口词汇。
+            "shared");
 
     /** {@code com.ragagent.<top>.} 形态的 import（含 static import）。 */
     private static final Pattern RAGAGENT_IMPORT =

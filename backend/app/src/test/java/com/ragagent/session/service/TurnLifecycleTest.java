@@ -3,8 +3,8 @@ package com.ragagent.session.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.ragagent.contract.model.ResponseType;
 import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.shared.model.ResponseType;
 import org.junit.jupiter.api.Test;
 
 class TurnLifecycleTest {

@@ -1,10 +1,10 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.model.ChatResponse;
-import com.ragagent.contract.model.ToolCall;
 import com.ragagent.llm.domain.ProviderMetadataMaps;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.model.ChatResponse;
+import com.ragagent.shared.model.ToolCall;
 import java.util.ArrayList;
 import java.util.List;
 

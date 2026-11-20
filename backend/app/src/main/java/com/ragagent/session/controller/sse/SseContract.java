@@ -1,7 +1,7 @@
 package com.ragagent.session.controller.sse;
 
-import com.ragagent.contract.session.SseSink;
 import com.ragagent.platform.web.ServletSseSink;
+import com.ragagent.shared.session.SseSink;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**

@@ -1,9 +1,9 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.contract.storage.fileserve.FileContentService;
-import com.ragagent.contract.storage.fileserve.OpenedFile;
-import com.ragagent.contract.storage.fileserve.WritableFileContentService;
 import com.ragagent.platform.security.Hashes;
+import com.ragagent.shared.storage.fileserve.FileContentService;
+import com.ragagent.shared.storage.fileserve.OpenedFile;
+import com.ragagent.shared.storage.fileserve.WritableFileContentService;
 import com.ragagent.storage.service.ResourceCatalogService;
 import java.io.IOException;
 import java.time.Duration;

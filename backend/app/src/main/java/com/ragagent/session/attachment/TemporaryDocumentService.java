@@ -1,9 +1,6 @@
 package com.ragagent.session.attachment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.knowledge.api.DocumentChunkingPort;
 import com.ragagent.llm.api.AsrTranscriber;
 import com.ragagent.llm.api.ModelRuntime;
@@ -13,6 +10,9 @@ import com.ragagent.platform.text.ContentTypeByFilename;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
+import com.ragagent.shared.doc.DocReaderParsePort;
+import com.ragagent.shared.session.MessageAttachment;
+import com.ragagent.shared.tenant.TenantConfigLookup;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.LinkedHashMap;

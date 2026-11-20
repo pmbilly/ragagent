@@ -1,8 +1,8 @@
 package com.ragagent.session.attachment;
 
-import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
+import com.ragagent.shared.session.MessageAttachment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;

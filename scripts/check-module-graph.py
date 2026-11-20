@@ -51,16 +51,15 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-MODULES = ["contract", "framework", "model-runtime", "retrieval-engine", "agent-engine", "app"]
+MODULES = ["framework", "model-runtime", "retrieval-engine", "agent-engine", "app"]
 
 # ── 判据 A 的矩阵（主码依赖）──────────────────────────────────────────────
 ALLOWED_MAIN: dict[str, set[str]] = {
-    "contract": set(),
-    "framework": {"contract"},
-    "model-runtime": {"contract", "framework"},
-    "retrieval-engine": {"contract", "framework"},
+    "framework": {},
+    "model-runtime": {"framework"},
+    "retrieval-engine": {"framework"},
     # modelcontext：agent 工具注册表/流解码属模型侧词汇，方案明示为 agent-engine 的合法终态边
-    "agent-engine": {"contract", "framework", "model-runtime"},
+    "agent-engine": {"framework", "model-runtime"},
     # modelcontext：同上（4 处；R2c-3d 已把其余模型族边清零）
     # 组合根：app 已吸收原 boot（启动类 + 17 个装配类），可依赖全部模块
     "app": set(MODULES[:-1]),

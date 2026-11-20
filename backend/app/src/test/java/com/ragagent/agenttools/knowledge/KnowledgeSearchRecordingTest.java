@@ -12,10 +12,10 @@ import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.KnowledgeSearchBack
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.RankResult;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.RerankerModel;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.SearchResultView;
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.shared.knowledge.ChunkFacts;
+import com.ragagent.shared.retrieval.SearchTarget;
+import com.ragagent.shared.tool.ToolRequest;
+import com.ragagent.shared.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.platform.storage.config.StorageAllowListProperties;
+import com.ragagent.shared.tenant.StorageEngineConfig;
 import org.junit.jupiter.api.Test;
 
 /**

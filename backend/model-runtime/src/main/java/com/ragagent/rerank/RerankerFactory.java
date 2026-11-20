@@ -1,6 +1,5 @@
 package com.ragagent.rerank;
 
-import com.ragagent.contract.model.Reranker;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
 import com.ragagent.rerank.provider.AliyunReranker;
@@ -10,6 +9,7 @@ import com.ragagent.rerank.provider.NvidiaReranker;
 import com.ragagent.rerank.provider.OpenAiReranker;
 import com.ragagent.rerank.provider.VolcengineReranker;
 import com.ragagent.rerank.provider.ZhipuReranker;
+import com.ragagent.shared.model.Reranker;
 
 /**
  * reranker 工厂。

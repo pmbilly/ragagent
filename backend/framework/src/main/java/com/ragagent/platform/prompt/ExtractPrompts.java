@@ -1,8 +1,8 @@
 package com.ragagent.platform.prompt;
 
-import com.ragagent.contract.graph.GraphNode;
-import com.ragagent.contract.graph.GraphRelation;
 import com.ragagent.platform.prompt.PipelineConfig.PromptTemplateStructured;
+import com.ragagent.shared.graph.GraphNode;
+import com.ragagent.shared.graph.GraphRelation;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;

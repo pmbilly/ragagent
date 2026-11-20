@@ -1,8 +1,6 @@
 package com.ragagent.session.attachment;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.knowledge.api.DocumentChunkingPort;
 import com.ragagent.knowledge.api.ParserEngineRules;
 import com.ragagent.knowledge.api.Tokens;
@@ -15,6 +13,8 @@ import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.attachment.TemporaryDocumentService.CreateOptions;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
+import com.ragagent.shared.doc.DocReaderParsePort;
+import com.ragagent.shared.tenant.TenantConfigLookup;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;

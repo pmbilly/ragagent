@@ -2,8 +2,8 @@ package com.ragagent.platform.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;

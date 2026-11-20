@@ -1,15 +1,15 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.contract.storage.fileserve.FileContentService;
-import com.ragagent.contract.storage.support.FileUrlPort;
-import com.ragagent.contract.storage.support.StorageBackendResolver;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.shared.storage.fileserve.FileContentService;
+import com.ragagent.shared.storage.support.FileUrlPort;
+import com.ragagent.shared.storage.support.StorageBackendResolver;
+import com.ragagent.shared.tenant.TenantConfigLookup;
+import com.ragagent.shared.tenant.TenantConfigLookup.TenantStorageView;
 import java.io.IOException;
 import org.springframework.stereotype.Component;
 
 /**
- * {@code com.ragagent.contract.storage.support.StorageBackendResolver} 的生产实现（A3-3 接线）。
+ * {@code com.ragagent.shared.storage.support.StorageBackendResolver} 的生产实现（A3-3 接线）。
  *
  * <p>此前该端口<b>没有实现</b>：HTTP 面的三处调用点（{@code SessionStreamController} /
  * {@code KnowledgeQaController} / {@code MessageController}）都按

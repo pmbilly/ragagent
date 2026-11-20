@@ -1,8 +1,5 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.contract.memory.MemoryKeys;
-import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.contract.tenant.MemoryConfig;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryItemEmbedding;
@@ -13,6 +10,9 @@ import com.ragagent.memory.domain.vector.MemoryVectors;
 import com.ragagent.memory.repository.MemoryRepository;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantScopes;
+import com.ragagent.shared.memory.MemoryKeys;
+import com.ragagent.shared.memory.MemoryKinds;
+import com.ragagent.shared.tenant.MemoryConfig;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;

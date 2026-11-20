@@ -1,7 +1,7 @@
 package com.ragagent.datasource.service;
 
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
-import com.ragagent.contract.knowledge.KnowledgeRowView;
+import com.ragagent.shared.knowledge.KnowledgeBaseRowView;
+import com.ragagent.shared.knowledge.KnowledgeRowView;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +72,7 @@ public interface KnowledgeBridge {
      * @param metadata 写进 {@code metadata} 列的键值对（含 {@code external_id} 等）
      * @param tagIds   自动打标（本模块的标签端口尚无实现，实际恒为空列表）
      * @param channel  界面上的来源标签（连接器给的 {@code metadata.channel} 优先）
-     * @throws com.ragagent.contract.knowledge.error.DuplicateKnowledgeException
+     * @throws com.ragagent.shared.knowledge.error.DuplicateKnowledgeException
      *         内容重复
      */
     KnowledgeRowView createFromFile(long tenantId, String kbId, byte[] content, String fileName,

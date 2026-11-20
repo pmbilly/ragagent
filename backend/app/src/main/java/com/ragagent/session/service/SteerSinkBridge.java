@@ -1,7 +1,6 @@
 package com.ragagent.session.service;
 
 import com.ragagent.agentengine.api.SteerSink;
-import com.ragagent.contract.session.MentionedItem;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.stream.StreamBatch;
@@ -9,6 +8,7 @@ import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.domain.message.Message;
+import com.ragagent.shared.session.MentionedItem;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;

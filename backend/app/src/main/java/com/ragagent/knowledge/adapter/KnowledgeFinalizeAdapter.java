@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.adapter;
 
-import com.ragagent.contract.knowledge.FinalizeResult;
-import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
 import com.ragagent.knowledge.repository.IngestStateRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.shared.knowledge.FinalizeResult;
+import com.ragagent.shared.knowledge.KnowledgeFinalizePort;
 import java.time.OffsetDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

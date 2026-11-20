@@ -8,14 +8,14 @@ import static com.ragagent.session.rag.Rec46cSupport.mask;
 import static com.ragagent.session.rag.Rec46cSupport.message;
 import static com.ragagent.session.rag.Rec46cSupport.msgsJSON;
 
-import com.ragagent.contract.model.ChatMessage;
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.contract.session.MessageImage;
-import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.rag.plugin.PluginError;
 import com.ragagent.session.rag.plugin.PluginQueryUnderstand;
+import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.shared.session.MessageAttachment;
+import com.ragagent.shared.session.MessageImage;
+import com.ragagent.shared.session.PipelineMessageAttachmentView;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

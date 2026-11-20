@@ -1,6 +1,5 @@
 package com.ragagent.memory.repository;
 
-import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryItemEmbedding;
 import com.ragagent.memory.domain.scope.MemoryScope;
@@ -11,6 +10,7 @@ import com.ragagent.memory.mapper.MemoryItemEmbeddingMapper;
 import com.ragagent.memory.mapper.MemoryItemMapper;
 import com.ragagent.memory.mapper.VectorHitRow;
 import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.shared.memory.MemoryKinds;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;

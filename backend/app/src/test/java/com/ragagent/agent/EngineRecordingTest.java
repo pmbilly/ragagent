@@ -11,16 +11,16 @@ import com.ragagent.agent.prompt.PinnedSkillInfo;
 import com.ragagent.agentengine.api.KnowledgeBaseInfo;
 import com.ragagent.agentengine.api.RecentDocInfo;
 import com.ragagent.agentengine.api.SelectedDocumentInfo;
-import com.ragagent.contract.agent.AgentToolCall;
-import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.contract.model.ChatMessage;
-import com.ragagent.contract.model.ChatResponse;
-import com.ragagent.contract.model.ChatTool;
-import com.ragagent.contract.model.FunctionCall;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.platform.event.EventJson;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.agent.AgentToolCall;
+import com.ragagent.shared.event.EventBusInterface;
+import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.shared.model.ChatResponse;
+import com.ragagent.shared.model.ChatTool;
+import com.ragagent.shared.model.FunctionCall;
+import com.ragagent.shared.model.StreamResponse;
+import com.ragagent.shared.model.TokenUsage;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -320,7 +320,7 @@ class EngineRecordingTest {
             Engine46bStubSupport.EventRecorder sink = new Engine46bStubSupport.EventRecorder()
                     .attach(engine.getBusForTest());
 
-            com.ragagent.contract.model.ToolCall tc = new com.ragagent.contract.model.ToolCall();
+            com.ragagent.shared.model.ToolCall tc = new com.ragagent.shared.model.ToolCall();
             tc.setId(c.id());
             tc.getFunction().setName("knowledge_search");
             tc.getFunction().setArguments(c.args());
@@ -531,7 +531,7 @@ class EngineRecordingTest {
 
     private static ChatMessage assistantWithCall(String id, String toolName, String args) {
         ChatMessage m = new ChatMessage("assistant", "");
-        com.ragagent.contract.model.ToolCall call = new com.ragagent.contract.model.ToolCall();
+        com.ragagent.shared.model.ToolCall call = new com.ragagent.shared.model.ToolCall();
         call.setId(id);
         call.setType("function");
         call.setFunction(new FunctionCall(toolName, args));

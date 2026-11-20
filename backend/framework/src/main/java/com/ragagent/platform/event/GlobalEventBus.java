@@ -1,7 +1,7 @@
 package com.ragagent.platform.event;
 
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.EventHandler;
+import com.ragagent.shared.event.Event;
+import com.ragagent.shared.event.EventHandler;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**

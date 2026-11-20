@@ -1,8 +1,8 @@
 package com.ragagent.session.rag;
 
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.session.dto.PipelineUsedMemoryView;
+import com.ragagent.shared.retrieval.SearchTarget;
+import com.ragagent.shared.session.PipelineMessageAttachmentView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

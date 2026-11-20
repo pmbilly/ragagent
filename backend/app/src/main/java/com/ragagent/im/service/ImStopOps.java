@@ -1,6 +1,5 @@
 package com.ragagent.im.service;
 
-import com.ragagent.contract.model.ResponseType;
 import com.ragagent.im.domain.ChannelSessionEntity;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImFormat;
@@ -11,6 +10,7 @@ import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.stream.StreamStopWatcher;
+import com.ragagent.shared.model.ResponseType;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;

@@ -47,7 +47,7 @@ class ContractBoundaryRulesTest {
             for (var dep : clazz.getDirectDependenciesFromSelf()) {
                 String target = normalizeDescriptor(dep.getTargetClass().getName());
                 boolean allowed = target.startsWith("java.") || target.startsWith("javax.")
-                        || target.startsWith("com.ragagent.contract.");
+                        || target.startsWith("com.ragagent.shared.");
                 if (!allowed) {
                     violations.add(clazz.getName() + " → " + target);
                 }

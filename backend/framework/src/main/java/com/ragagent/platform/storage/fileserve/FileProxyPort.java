@@ -1,6 +1,6 @@
 package com.ragagent.platform.storage.fileserve;
 
-import com.ragagent.contract.storage.fileserve.MessageFactsLookup;
+import com.ragagent.shared.storage.fileserve.MessageFactsLookup;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

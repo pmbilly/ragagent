@@ -5,20 +5,20 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.contract.agent.AgentStep;
-import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.session.MentionedItem;
-import com.ragagent.contract.session.MessageArtifact;
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.contract.session.MessageExecutionContext;
-import com.ragagent.contract.session.MessageImage;
-import com.ragagent.contract.session.UsedMemory;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.session.domain.AgentStepListTypeHandler;
 import com.ragagent.session.domain.MentionedItemListTypeHandler;
 import com.ragagent.session.domain.SearchResultListTypeHandler;
 import com.ragagent.session.domain.UsedMemoryListTypeHandler;
+import com.ragagent.shared.agent.AgentStep;
+import com.ragagent.shared.model.TokenUsage;
+import com.ragagent.shared.retrieval.SearchResult;
+import com.ragagent.shared.session.MentionedItem;
+import com.ragagent.shared.session.MessageArtifact;
+import com.ragagent.shared.session.MessageAttachment;
+import com.ragagent.shared.session.MessageExecutionContext;
+import com.ragagent.shared.session.MessageImage;
+import com.ragagent.shared.session.UsedMemory;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ import java.util.List;
  *
  * <h2>跨模块类型的处置</h2>
  * <p>{@code knowledge_references} 与 {@code agent_steps} 是有类型的列表
- * （{@link com.ragagent.contract.retrieval.SearchResult} / {@link AgentStep}）——
+ * （{@link com.ragagent.shared.retrieval.SearchResult} / {@link AgentStep}）——
  * 二者都直接出现在消息响应体里；若按不透明的 {@code List<Object>} 透传，读回来的元素
  * 会退化成 {@code LinkedHashMap}，键序变成 PG jsonb 的规范化序，**是实打实的契约偏差**。</p>
  * <p>仍按不透明类型处理的一处：{@code execution_context} 的字段本身是 {@code json:"-"}，

@@ -1,7 +1,7 @@
 package com.ragagent.platform.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.contract.session.MessageExecutionContext;
+import com.ragagent.shared.session.MessageExecutionContext;
 
 
 /**

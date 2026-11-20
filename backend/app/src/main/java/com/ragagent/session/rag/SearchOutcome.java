@@ -1,7 +1,7 @@
 package com.ragagent.session.rag;
 
-import com.ragagent.contract.graph.GraphData;
-import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.shared.graph.GraphData;
+import com.ragagent.shared.retrieval.SearchResult;
 import java.util.List;
 
 /**

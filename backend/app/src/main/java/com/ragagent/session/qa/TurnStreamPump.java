@@ -1,10 +1,5 @@
 package com.ragagent.session.qa;
 
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.payload.StopData;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.session.SseSink;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.event.EventType;
@@ -16,6 +11,11 @@ import com.ragagent.session.service.QaSupport.SseStreamContext;
 import com.ragagent.session.service.TurnLifecycle;
 import com.ragagent.session.service.sse.SseFrameSink;
 import com.ragagent.session.service.sse.StreamEventEmitter;
+import com.ragagent.shared.event.Event;
+import com.ragagent.shared.event.payload.StopData;
+import com.ragagent.shared.model.ResponseType;
+import com.ragagent.shared.model.StreamResponse;
+import com.ragagent.shared.session.SseSink;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;

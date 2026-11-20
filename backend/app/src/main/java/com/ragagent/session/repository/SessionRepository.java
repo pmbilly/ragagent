@@ -2,8 +2,6 @@ package com.ragagent.session.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ragagent.contract.pagination.PageResult;
-import com.ragagent.contract.session.SessionLastRequestState;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.persistence.LikeEscapes;
 import com.ragagent.platform.persistence.PageRequests;
@@ -14,6 +12,8 @@ import com.ragagent.session.dto.SessionListQuery;
 import com.ragagent.session.mapper.SessionMapper;
 import com.ragagent.session.support.SessionNotFoundException;
 import com.ragagent.session.support.SessionOwnerIds;
+import com.ragagent.shared.pagination.PageResult;
+import com.ragagent.shared.session.SessionLastRequestState;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Locale;

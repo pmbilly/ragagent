@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.im.channel.wechat.WechatQRCodeService;
 import com.ragagent.im.channel.wechat.WechatQRCodeService.LoginResult;
 import com.ragagent.im.channel.wechat.WechatQRCodeService.QRCodeResult;
+import com.ragagent.shared.error.BizException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;

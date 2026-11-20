@@ -1,7 +1,7 @@
 package com.ragagent.session.domain;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.shared.retrieval.SearchResult;
 import java.util.List;
 
 /**

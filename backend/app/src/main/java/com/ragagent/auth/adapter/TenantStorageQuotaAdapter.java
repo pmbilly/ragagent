@@ -2,7 +2,7 @@ package com.ragagent.auth.adapter;
 
 import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.mapper.TenantMapper;
-import com.ragagent.contract.tenant.TenantStorageQuotaPort;
+import com.ragagent.shared.tenant.TenantStorageQuotaPort;
 import java.sql.Timestamp;
 import java.time.Instant;
 import org.springframework.jdbc.core.JdbcTemplate;

@@ -1,7 +1,5 @@
 package com.ragagent.datasource.service;
 
-import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConstants;
 import com.ragagent.datasource.domain.FetchedItem;
@@ -10,6 +8,8 @@ import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.SyncResult;
 import com.ragagent.datasource.repository.DataSourceRepository;
 import com.ragagent.datasource.repository.SyncLogRepository;
+import com.ragagent.shared.audit.AuditAction;
+import com.ragagent.shared.audit.AuditOutcome;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;

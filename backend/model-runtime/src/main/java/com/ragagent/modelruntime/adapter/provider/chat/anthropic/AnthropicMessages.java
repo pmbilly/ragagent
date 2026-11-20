@@ -2,12 +2,12 @@ package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.model.ChatMessage;
-import com.ragagent.contract.model.ChatOptions;
-import com.ragagent.contract.model.ChatTool;
-import com.ragagent.contract.model.MessageContentPart;
-import com.ragagent.contract.model.ToolCall;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.shared.model.ChatOptions;
+import com.ragagent.shared.model.ChatTool;
+import com.ragagent.shared.model.MessageContentPart;
+import com.ragagent.shared.model.ToolCall;
 import java.util.ArrayList;
 import java.util.List;
 

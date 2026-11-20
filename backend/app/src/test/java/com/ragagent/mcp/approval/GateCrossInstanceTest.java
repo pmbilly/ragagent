@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
-import com.ragagent.contract.model.ResponseType;
+import com.ragagent.shared.event.payload.ToolApprovalRequiredData;
+import com.ragagent.shared.model.ResponseType;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;

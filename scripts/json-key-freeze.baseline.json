@@ -3,7 +3,6 @@
   "files": {
     "agent/AgentEngine.java": "agent/AgentEngine",
     "agent/ReActIteration.java": "agent/ReActIteration",
-    "contract/tenant/ParserEngineConfig.java": "contract/tenant/ParserEngineConfig",
     "datasource/connector/feishu/core/DocxBlocks.java": "datasource/connector/feishu/core/DocxBlocks",
     "datasource/connector/feishu/core/FeishuApiTypes.java": "datasource/connector/feishu/core/FeishuApiTypes",
     "datasource/connector/feishu/core/FeishuClient.java": "datasource/connector/feishu/core/FeishuClient",
@@ -139,6 +138,7 @@
     "session/rag/plugin/PluginSearch.java": "session/rag/plugin",
     "session/rag/plugin/PluginSearchOps.java": "session/rag/plugin",
     "session/rag/plugin/PluginSearchParallel.java": "session/rag/plugin",
+    "shared/tenant/ParserEngineConfig.java": "shared/tenant/ParserEngineConfig",
     "websearch/provider/BaiduProvider.java": "websearch/provider",
     "websearch/provider/BraveProvider.java": "websearch/provider",
     "websearch/provider/KeenableProvider.java": "websearch/provider",

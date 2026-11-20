@@ -15,7 +15,7 @@ import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
-import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.shared.auth.UserPreferences;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

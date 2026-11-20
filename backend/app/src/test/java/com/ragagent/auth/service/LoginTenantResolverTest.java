@@ -11,7 +11,7 @@ import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.auth.repository.UserRepository;
-import com.ragagent.contract.auth.UserPreferences;
+import com.ragagent.shared.auth.UserPreferences;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

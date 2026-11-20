@@ -1,9 +1,5 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.contract.memory.MemoryKeys;
-import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.contract.memory.MemoryRetrievalContext;
-import com.ragagent.contract.tenant.MemoryConfig;
 import com.ragagent.memory.domain.MemoryExtractPayload;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryTopicStat;
@@ -11,6 +7,10 @@ import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.dto.MemoryDocAffinity;
 import com.ragagent.memory.runtime.MemoryTrace;
+import com.ragagent.shared.memory.MemoryKeys;
+import com.ragagent.shared.memory.MemoryKinds;
+import com.ragagent.shared.memory.MemoryRetrievalContext;
+import com.ragagent.shared.tenant.MemoryConfig;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

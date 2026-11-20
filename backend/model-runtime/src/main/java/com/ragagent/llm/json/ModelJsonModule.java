@@ -2,17 +2,17 @@ package com.ragagent.llm.json;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.ragagent.contract.model.ChatMessage;
-import com.ragagent.contract.model.ChatOptions;
-import com.ragagent.contract.model.ChatResponse;
-import com.ragagent.contract.model.ChatTool;
-import com.ragagent.contract.model.FunctionDef;
-import com.ragagent.contract.model.ImageUrl;
-import com.ragagent.contract.model.MessageContentPart;
-import com.ragagent.contract.model.RankResult;
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.model.ToolCall;
 import com.ragagent.platform.web.JsonModuleProvider;
+import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.shared.model.ChatOptions;
+import com.ragagent.shared.model.ChatResponse;
+import com.ragagent.shared.model.ChatTool;
+import com.ragagent.shared.model.FunctionDef;
+import com.ragagent.shared.model.ImageUrl;
+import com.ragagent.shared.model.MessageContentPart;
+import com.ragagent.shared.model.RankResult;
+import com.ragagent.shared.model.StreamResponse;
+import com.ragagent.shared.model.ToolCall;
 
 /**
  * 模型面契约载荷的 Jackson 装配（mixin）。

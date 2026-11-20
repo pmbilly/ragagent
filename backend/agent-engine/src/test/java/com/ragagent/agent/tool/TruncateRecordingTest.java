@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agent.fixtures.ToolContractGoldenA;
-import com.ragagent.contract.tool.ToolOutput;
+import com.ragagent.shared.tool.ToolOutput;
 import org.junit.jupiter.api.Test;
 
 /**

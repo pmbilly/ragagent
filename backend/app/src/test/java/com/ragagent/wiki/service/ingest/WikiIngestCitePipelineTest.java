@@ -6,10 +6,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.contract.knowledge.ChunkPort;
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.shared.knowledge.ChunkPort;
+import com.ragagent.shared.knowledge.ChunkView;
+import com.ragagent.shared.model.LlmChatClient;
+import com.ragagent.shared.wiki.ExtractedItem;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.wiki.service.page.NewSlugFromCitation;
 import java.util.ArrayList;

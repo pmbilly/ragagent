@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.EventBusException;
-import com.ragagent.contract.event.EventBusInterface;
+import com.ragagent.shared.event.Event;
+import com.ragagent.shared.event.EventBusException;
+import com.ragagent.shared.event.EventBusInterface;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;

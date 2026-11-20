@@ -1,6 +1,6 @@
 package com.ragagent.llm.api;
 
-import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.shared.model.LlmChatClient;
 
 /**
  * 实体关系抽取端口（业务域 → 模型运行时）。

@@ -3,7 +3,6 @@ package com.ragagent.retrieval.engine.opensearch;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.engine.EngineTypes;
@@ -11,6 +10,7 @@ import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.RetrieveEngineRepository;
+import com.ragagent.shared.vectorstore.IndexConfig;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;

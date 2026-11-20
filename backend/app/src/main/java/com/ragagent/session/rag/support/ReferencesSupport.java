@@ -1,14 +1,14 @@
 package com.ragagent.session.rag.support;
 
-import com.ragagent.contract.model.ChatMessage;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.platform.prompt.PromptComposer;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineState;
+import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.shared.retrieval.SearchResult;
+import com.ragagent.shared.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

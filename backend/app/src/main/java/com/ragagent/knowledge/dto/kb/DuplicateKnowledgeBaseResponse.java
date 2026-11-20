@@ -1,5 +1,5 @@
 package com.ragagent.knowledge.dto.kb;
-import com.ragagent.contract.knowledge.KnowledgeBaseResponse;
+import com.ragagent.shared.knowledge.KnowledgeBaseResponse;
 
 
 /** KB 复制（settings-only 同步）响应：源/目标 ID + 新 KB 视图。 */

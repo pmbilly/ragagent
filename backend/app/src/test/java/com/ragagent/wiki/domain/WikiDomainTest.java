@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.ragagent.contract.wiki.WikiException;
+import com.ragagent.shared.wiki.WikiException;
 import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.api.WikiIndex;
 import com.ragagent.wiki.api.WikiIndexEntry;

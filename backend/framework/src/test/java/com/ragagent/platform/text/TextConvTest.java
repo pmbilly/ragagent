@@ -2,8 +2,8 @@ package com.ragagent.platform.text;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.contract.text.TextConv;
+import com.ragagent.shared.knowledge.FaqChunkMetadata;
+import com.ragagent.shared.text.TextConv;
 import org.junit.jupiter.api.Test;
 
 /**

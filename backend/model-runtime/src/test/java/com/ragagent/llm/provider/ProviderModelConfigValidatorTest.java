@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.contract.error.BizException;
 import com.ragagent.llm.api.ModelConfigDraft;
+import com.ragagent.shared.error.BizException;
 import org.junit.jupiter.api.Test;
 
 /**

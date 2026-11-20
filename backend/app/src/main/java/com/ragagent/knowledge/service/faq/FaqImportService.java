@@ -2,8 +2,6 @@ package com.ragagent.knowledge.service.faq;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.access.FaqGuard;
@@ -26,6 +24,8 @@ import com.ragagent.knowledge.support.KnowledgeTaskRunner;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

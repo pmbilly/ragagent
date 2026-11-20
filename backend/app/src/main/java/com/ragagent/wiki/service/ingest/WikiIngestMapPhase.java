@@ -1,13 +1,13 @@
 package com.ragagent.wiki.service.ingest;
 
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.contract.knowledge.KnowledgeSpanPort;
-import com.ragagent.contract.knowledge.KnowledgeView;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.contract.wiki.WikiImageMarkup;
-import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.shared.knowledge.ChunkView;
+import com.ragagent.shared.knowledge.KnowledgeSpanPort;
+import com.ragagent.shared.knowledge.KnowledgeView;
+import com.ragagent.shared.model.LlmChatClient;
+import com.ragagent.shared.wiki.ExtractedItem;
+import com.ragagent.shared.wiki.SlugUpdate;
+import com.ragagent.shared.wiki.WikiImageMarkup;
+import com.ragagent.shared.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.wiki.domain.ingest.WikiIngestPayload;
 import com.ragagent.wiki.domain.ingest.WikiPendingOp;

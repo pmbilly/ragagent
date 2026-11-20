@@ -1,10 +1,10 @@
 package com.ragagent.session.rag.plugin;
 
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.websearch.PipelinePageFetcher;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
+import com.ragagent.shared.retrieval.SearchResult;
+import com.ragagent.shared.websearch.PipelinePageFetcher;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

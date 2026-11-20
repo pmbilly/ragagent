@@ -1,18 +1,6 @@
 package com.ragagent.session.qa;
 
 
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.payload.AgentCompleteData;
-import com.ragagent.contract.event.payload.AgentFinalAnswerData;
-import com.ragagent.contract.event.payload.AgentThoughtData;
-import com.ragagent.contract.event.payload.ErrorData;
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.contract.session.MessageExecutionContext;
-import com.ragagent.contract.session.MessageImage;
-import com.ragagent.contract.session.SessionLastRequestState;
-import com.ragagent.contract.session.SseSink;
-import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.event.EventType;
@@ -29,6 +17,18 @@ import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SteerRunCoordinator;
 import com.ragagent.session.service.TurnLifecycle;
 import com.ragagent.session.support.AgentConfigSnapshot;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.event.Event;
+import com.ragagent.shared.event.payload.AgentCompleteData;
+import com.ragagent.shared.event.payload.AgentFinalAnswerData;
+import com.ragagent.shared.event.payload.AgentThoughtData;
+import com.ragagent.shared.event.payload.ErrorData;
+import com.ragagent.shared.session.MessageAttachment;
+import com.ragagent.shared.session.MessageExecutionContext;
+import com.ragagent.shared.session.MessageImage;
+import com.ragagent.shared.session.SessionLastRequestState;
+import com.ragagent.shared.session.SseSink;
+import com.ragagent.shared.tenant.TenantConfigLookup;
 import io.micrometer.core.instrument.Metrics;
 import java.io.IOException;
 import java.time.OffsetDateTime;

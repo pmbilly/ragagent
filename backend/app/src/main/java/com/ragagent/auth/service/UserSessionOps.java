@@ -5,8 +5,8 @@ import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.Membership;
 import com.ragagent.auth.dto.TenantRowView;
-import com.ragagent.contract.auth.UserPreferences;
 import com.ragagent.platform.text.UnicodeText;
+import com.ragagent.shared.auth.UserPreferences;
 import io.jsonwebtoken.Claims;
 import java.util.List;
 

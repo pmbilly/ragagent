@@ -1,8 +1,8 @@
 package com.ragagent.session.rag.support;
 
-import com.ragagent.contract.memory.MemoryItemView;
 import com.ragagent.platform.text.ListMerges;
 import com.ragagent.session.dto.PipelineUsedMemoryView;
+import com.ragagent.shared.memory.MemoryItemView;
 import java.util.ArrayList;
 import java.util.List;
 

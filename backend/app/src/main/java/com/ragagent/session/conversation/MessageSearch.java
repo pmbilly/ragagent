@@ -1,13 +1,6 @@
 package com.ragagent.session.conversation;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.model.RankResult;
-import com.ragagent.contract.model.Reranker;
-import com.ragagent.contract.retrieval.SearchParams;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.tenant.ChatHistoryConfig;
-import com.ragagent.contract.tenant.RetrievalConfig;
-import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
@@ -17,6 +10,13 @@ import com.ragagent.session.dto.MessageSearchGroupItem;
 import com.ragagent.session.dto.MessageSearchResult;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.support.SessionOwnerIds;
+import com.ragagent.shared.model.RankResult;
+import com.ragagent.shared.model.Reranker;
+import com.ragagent.shared.retrieval.SearchParams;
+import com.ragagent.shared.retrieval.SearchResult;
+import com.ragagent.shared.tenant.ChatHistoryConfig;
+import com.ragagent.shared.tenant.RetrievalConfig;
+import com.ragagent.shared.tenant.TenantConfigLookup;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

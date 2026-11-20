@@ -1,11 +1,11 @@
 package com.ragagent.agent;
 
 import com.ragagent.agent.domain.AgentState;
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.payload.UserMessageInjectedData;
-import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;
+import com.ragagent.shared.event.Event;
+import com.ragagent.shared.event.payload.UserMessageInjectedData;
+import com.ragagent.shared.model.ChatMessage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

@@ -1,7 +1,7 @@
 package com.ragagent.session.service.sse;
 
-import com.ragagent.contract.model.StreamResponse;
-import com.ragagent.contract.session.SseSink;
+import com.ragagent.shared.model.StreamResponse;
+import com.ragagent.shared.session.SseSink;
 import java.io.IOException;
 
 /**

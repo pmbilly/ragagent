@@ -1,10 +1,10 @@
 package com.ragagent.knowledge.adapter;
 
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.knowledge.ChunkRowView;
-import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.knowledge.projection.ChunkProjectionAdapter;
-import com.ragagent.contract.pipeline.PipelinePorts;
+import com.ragagent.shared.knowledge.ChunkFacts;
+import com.ragagent.shared.knowledge.ChunkRowView;
+import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
+import com.ragagent.shared.knowledge.projection.ChunkProjectionAdapter;
+import com.ragagent.shared.pipeline.PipelinePorts;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;

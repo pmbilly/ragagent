@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.repository;
 
-import com.ragagent.contract.pagination.PageResult;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
 import com.ragagent.platform.persistence.DatabaseDialects;
+import com.ragagent.shared.pagination.PageResult;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;

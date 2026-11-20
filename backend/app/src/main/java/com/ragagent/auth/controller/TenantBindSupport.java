@@ -1,12 +1,12 @@
 package com.ragagent.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import com.ragagent.platform.web.ToolJson;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
 
 /**
  * 租户目录的绑定错误形态助手（全静态）：

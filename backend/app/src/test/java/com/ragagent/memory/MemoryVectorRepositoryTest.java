@@ -3,7 +3,6 @@ package com.ragagent.memory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.TestSchema;
-import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryItemEmbedding;
 import com.ragagent.memory.domain.scope.MemoryScope;
@@ -11,6 +10,7 @@ import com.ragagent.memory.domain.vector.MemoryVectorHit;
 import com.ragagent.memory.domain.vector.MemoryVectorQuery;
 import com.ragagent.memory.domain.vector.MemoryVectors;
 import com.ragagent.memory.repository.MemoryRepository;
+import com.ragagent.shared.memory.MemoryKinds;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;

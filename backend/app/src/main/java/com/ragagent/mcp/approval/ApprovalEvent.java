@@ -1,6 +1,6 @@
 package com.ragagent.mcp.approval;
 
-import com.ragagent.contract.model.ResponseType;
+import com.ragagent.shared.model.ResponseType;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;

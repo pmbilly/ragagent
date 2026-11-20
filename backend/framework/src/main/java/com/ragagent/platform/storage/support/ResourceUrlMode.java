@@ -1,7 +1,7 @@
 package com.ragagent.platform.storage.support;
 
-import com.ragagent.contract.storage.support.Mode;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
+import com.ragagent.shared.storage.support.Mode;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;

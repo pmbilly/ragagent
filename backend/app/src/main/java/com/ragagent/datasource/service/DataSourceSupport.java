@@ -1,8 +1,6 @@
 package com.ragagent.datasource.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
-import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.DataSourceException;
@@ -17,6 +15,8 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.audit.ActivityAuditRecorder;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.shared.knowledge.KnowledgeBaseRowView;
+import com.ragagent.shared.knowledge.KnowledgeRowView;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;

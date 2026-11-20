@@ -1,9 +1,9 @@
 package com.ragagent.mcp.repository;
 
-import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.domain.McpToolApproval;
 import com.ragagent.mcp.domain.McpToolPolicyPatch;
 import com.ragagent.mcp.mapper.McpToolApprovalMapper;
+import com.ragagent.shared.error.BizException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;

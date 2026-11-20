@@ -2,7 +2,7 @@ package com.ragagent.platform.web.error;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.contract.error.ErrorCode;
+import com.ragagent.shared.error.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

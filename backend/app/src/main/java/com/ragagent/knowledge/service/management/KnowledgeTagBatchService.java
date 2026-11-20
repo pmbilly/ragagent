@@ -1,10 +1,10 @@
 package com.ragagent.knowledge.service.management;
 
-import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.service.KnowledgeAccessHelper;
+import com.ragagent.shared.error.BizException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;

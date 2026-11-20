@@ -3,9 +3,9 @@ package com.ragagent.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.payload.AgentCompleteData;
 import com.ragagent.platform.event.EventType;
+import com.ragagent.shared.event.Event;
+import com.ragagent.shared.event.payload.AgentCompleteData;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

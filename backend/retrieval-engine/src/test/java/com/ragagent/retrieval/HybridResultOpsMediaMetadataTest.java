@@ -2,9 +2,9 @@ package com.ragagent.retrieval;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.contract.retrieval.SearchResult;
+import com.ragagent.shared.knowledge.ChunkFacts;
+import com.ragagent.shared.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.shared.retrieval.SearchResult;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 

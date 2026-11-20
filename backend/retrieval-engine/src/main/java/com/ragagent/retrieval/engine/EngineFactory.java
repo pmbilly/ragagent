@@ -1,8 +1,6 @@
 package com.ragagent.retrieval.engine;
 
 
-import com.ragagent.contract.vectorstore.ConnectionConfig;
-import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.retrieval.api.EnvStoreIds;
 import com.ragagent.retrieval.api.VectorStoreView;
@@ -15,6 +13,8 @@ import com.ragagent.retrieval.engine.qdrant.QdrantRetrieveRepository;
 import com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepository;
 import com.ragagent.retrieval.engine.weaviate.WeaviateRetrieveRepository;
+import com.ragagent.shared.vectorstore.ConnectionConfig;
+import com.ragagent.shared.vectorstore.IndexConfig;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;

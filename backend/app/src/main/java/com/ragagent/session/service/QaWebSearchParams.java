@@ -2,11 +2,11 @@ package com.ragagent.session.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.tenant.TenantConfigLookup;
-import com.ragagent.contract.tenant.WebSearchConfig;
-import com.ragagent.contract.websearch.WebSearchProviderPort;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.tenant.TenantConfigLookup;
+import com.ragagent.shared.tenant.WebSearchConfig;
+import com.ragagent.shared.websearch.WebSearchProviderPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

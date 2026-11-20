@@ -1,10 +1,6 @@
 package com.ragagent.datasource.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.contract.tenant.TenantConfigLookup;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.DataSourceConstants;
@@ -22,6 +18,10 @@ import com.ragagent.datasource.repository.SyncLogRepository;
 import com.ragagent.platform.audit.ActivityAuditRecorder;
 import com.ragagent.platform.tracing.TraceInjector;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.audit.AuditAction;
+import com.ragagent.shared.audit.AuditOutcome;
+import com.ragagent.shared.audit.AuditWritePort;
+import com.ragagent.shared.tenant.TenantConfigLookup;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;

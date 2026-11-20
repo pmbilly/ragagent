@@ -1,10 +1,10 @@
 package com.ragagent.wiki.service.ingest;
 
-import com.ragagent.contract.knowledge.ChunkPort;
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
-import com.ragagent.contract.knowledge.KnowledgeSpanPort;
-import com.ragagent.contract.knowledge.KnowledgeView;
+import com.ragagent.shared.knowledge.ChunkPort;
+import com.ragagent.shared.knowledge.ChunkView;
+import com.ragagent.shared.knowledge.KnowledgeBaseLookup;
+import com.ragagent.shared.knowledge.KnowledgeSpanPort;
+import com.ragagent.shared.knowledge.KnowledgeView;
 import com.ragagent.wiki.service.page.WikiPageService;
 import java.util.List;
 

@@ -1,9 +1,5 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.contract.memory.MemoryKeys;
-import com.ragagent.contract.memory.MemoryKinds;
-import com.ragagent.contract.pagination.PageResult;
-import com.ragagent.contract.tenant.MemoryConfig;
 import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryTopicStat;
@@ -13,6 +9,10 @@ import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.dto.MemoryDocAffinity;
 import com.ragagent.memory.dto.MemoryDocView;
 import com.ragagent.memory.dto.MemoryTopicView;
+import com.ragagent.shared.memory.MemoryKeys;
+import com.ragagent.shared.memory.MemoryKinds;
+import com.ragagent.shared.pagination.PageResult;
+import com.ragagent.shared.tenant.MemoryConfig;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;

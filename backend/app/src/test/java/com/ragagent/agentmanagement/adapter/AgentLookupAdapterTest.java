@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
-import com.ragagent.contract.json.JsonValues;
+import com.ragagent.shared.json.JsonValues;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.session.rag.PipelineState;
+import com.ragagent.shared.event.Event;
+import com.ragagent.shared.event.EventBusInterface;
+import com.ragagent.shared.event.payload.AgentFinalAnswerData;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;

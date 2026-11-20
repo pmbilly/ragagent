@@ -1,7 +1,7 @@
 package com.ragagent.platform.event;
 
-import com.ragagent.contract.event.EventBusFactory;
-import com.ragagent.contract.event.EventBusInterface;
+import com.ragagent.shared.event.EventBusFactory;
+import com.ragagent.shared.event.EventBusInterface;
 import org.springframework.stereotype.Component;
 
 /**

@@ -1,7 +1,7 @@
 package com.ragagent.session.dto;
 
-import com.ragagent.contract.session.SessionView;
 import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.shared.session.SessionView;
 
 /** 会话实体 → 契约线格式视图。 */
 public final class SessionViewMapper {

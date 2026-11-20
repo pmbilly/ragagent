@@ -8,8 +8,8 @@
 
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
-| `:contract` | `contract` | 32 | 256 | 0 |
-| `:platform` | `platform` | 26 | 200 | 1 |
+| `:contract` |  | 0 | 0 | 0 |
+| `:platform` | `platform`、`shared` | 58 | 456 | 1 |
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 22 | 180 | 0 |
 | `:retrieval-engine` | `retrieval` | 16 | 124 | 0 |
 | `:agent-engine` | `agent`、`agentengine` | 10 | 97 | 0 |

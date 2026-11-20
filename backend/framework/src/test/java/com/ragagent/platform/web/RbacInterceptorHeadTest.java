@@ -2,9 +2,9 @@ package com.ragagent.platform.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.config.TenantProperties;
+import com.ragagent.shared.tenant.TenantRole;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

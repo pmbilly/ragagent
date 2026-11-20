@@ -1,10 +1,5 @@
 package com.ragagent.knowledge.controller;
 
-import com.ragagent.contract.apikey.APIKeyScopeContext;
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.KnowledgeParseStatus;
 import com.ragagent.knowledge.dto.BatchDeleteRequest;
 import com.ragagent.knowledge.dto.KnowledgeSearchScope;
 import com.ragagent.knowledge.dto.chunk.BatchReparseRequest;
@@ -28,6 +23,11 @@ import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.NonNullBody;
+import com.ragagent.shared.apikey.APIKeyScopeContext;
+import com.ragagent.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.knowledge.KnowledgeParseStatus;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.ArrayList;

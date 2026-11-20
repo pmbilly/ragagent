@@ -4,12 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.contract.vectorstore.ConnectionConfig;
-import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.retrieval.api.VectorStoreView;
 import com.ragagent.retrieval.engine.EngineFactory.EngineNotSupportedException;
 import com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository;
+import com.ragagent.shared.vectorstore.ConnectionConfig;
+import com.ragagent.shared.vectorstore.IndexConfig;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;

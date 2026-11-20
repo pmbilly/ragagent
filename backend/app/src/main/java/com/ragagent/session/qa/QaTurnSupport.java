@@ -1,8 +1,8 @@
 package com.ragagent.session.qa;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.agent.AgentStep;
 import com.ragagent.session.domain.message.Message;
+import com.ragagent.shared.agent.AgentStep;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;

@@ -6,10 +6,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.SlugUpdate;
+import com.ragagent.shared.knowledge.KnowledgeBaseView;
+import com.ragagent.shared.model.LlmChatClient;
+import com.ragagent.shared.wiki.ExtractedItem;
+import com.ragagent.shared.wiki.SlugUpdate;
 import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.service.WikiModelResolver;
 import com.ragagent.wiki.service.page.WikiPageService;

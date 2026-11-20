@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.api;
 
-import com.ragagent.contract.vectorstore.ConnectionConfig;
+import com.ragagent.shared.vectorstore.ConnectionConfig;
 
 /**
  * 向量店引擎目录：控制面规则（必填 / SSRF 地址）+ 连通性探测。
@@ -11,14 +11,14 @@ import com.ragagent.contract.vectorstore.ConnectionConfig;
  * 决定放行（必填校验）或 fail-closed（SSRF 校验）。</p>
  *
  * <p><b>错误契约</b>：{@link #probe(String, ConnectionConfig)} 失败抛
- * {@link com.ragagent.contract.error.BizException}（code 1000；各引擎文案逐字固定，
+ * {@link com.ragagent.shared.error.BizException}（code 1000；各引擎文案逐字固定，
  * 由 golden 用例钉住），调用方按自己的流程再包一层。</p>
  */
 public interface VectorStoreEngineCatalogPort {
 
     /**
      * 连通性探测（{@code engineType} 未知或未支持时抛
-     * {@link com.ragagent.contract.error.BizException}）。
+     * {@link com.ragagent.shared.error.BizException}）。
      *
      * <p>本方法只做探测，不做配置必填校验与地址 SSRF 校验——那两步由调用方先走
      * （顺序固定：必填 → SSRF → 探测）。</p>

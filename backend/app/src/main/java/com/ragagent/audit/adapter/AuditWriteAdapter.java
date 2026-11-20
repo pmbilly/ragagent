@@ -3,8 +3,8 @@ package com.ragagent.audit.adapter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.service.AuditLogService;
-import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.audit.AuditWritePort;
 import org.springframework.stereotype.Component;
 
 /**

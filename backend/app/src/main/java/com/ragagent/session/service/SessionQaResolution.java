@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentengine.api.AgentLookup;
-import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.rag.ChatManage;
+import com.ragagent.shared.knowledge.KnowledgeBaseRowView;
 import java.io.InputStream;
 import java.util.List;
 

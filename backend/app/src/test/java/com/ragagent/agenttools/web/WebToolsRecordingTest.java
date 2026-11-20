@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.tool.ToolCancellation;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.tool.ToolCancellation;
+import com.ragagent.shared.tool.ToolRequest;
+import com.ragagent.shared.tool.ToolResult;
+import com.ragagent.shared.websearch.WebSearchResult;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -25,8 +25,8 @@ import org.junit.jupiter.api.Test;
 class WebToolsRecordingTest {
 
     /** 抓取端口桩（R4b：WebFetchTool/WebSearchTool 经契约端口取网页）。 */
-    private static final com.ragagent.contract.websearch.ToolPageFetcher STUB_FETCHER =
-            new com.ragagent.contract.websearch.ToolPageFetcher() {
+    private static final com.ragagent.shared.websearch.ToolPageFetcher STUB_FETCHER =
+            new com.ragagent.shared.websearch.ToolPageFetcher() {
                 @Override
                 public String fetch(String url) {
                     return "stub-content";

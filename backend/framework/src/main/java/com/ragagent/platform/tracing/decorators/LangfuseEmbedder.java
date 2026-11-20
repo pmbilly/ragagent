@@ -1,8 +1,8 @@
 package com.ragagent.platform.tracing.decorators;
 
-import com.ragagent.contract.model.Embedder;
 import com.ragagent.platform.tracing.langfuse.Generation;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.shared.model.Embedder;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

@@ -9,8 +9,8 @@ import static com.ragagent.wiki.controller.WikiRequestSupport.trimSpace;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.shared.error.BizException;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.folder.WikiFolder;
 import com.ragagent.wiki.domain.folder.WikiFolderCreateRequest;

@@ -1,9 +1,9 @@
 package com.ragagent.platform.storage.support;
 
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.storage.support.FileUrlPort;
-import com.ragagent.contract.storage.support.Mode;
-import com.ragagent.contract.storage.support.Resolver;
+import com.ragagent.shared.retrieval.SearchResult;
+import com.ragagent.shared.storage.support.FileUrlPort;
+import com.ragagent.shared.storage.support.Mode;
+import com.ragagent.shared.storage.support.Resolver;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;

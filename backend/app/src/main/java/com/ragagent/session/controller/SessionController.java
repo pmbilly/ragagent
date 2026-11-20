@@ -1,10 +1,5 @@
 package com.ragagent.session.controller;
 
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.pagination.PageResult;
-import com.ragagent.contract.session.MessageArtifact;
-import com.ragagent.contract.session.SessionView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResponse;
@@ -27,6 +22,11 @@ import com.ragagent.session.dto.UpdateSessionRequest;
 import com.ragagent.session.support.MessageNotFoundException;
 import com.ragagent.session.support.SessionNotFoundException;
 import com.ragagent.session.support.SessionOwnerIds;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.pagination.PageResult;
+import com.ragagent.shared.session.MessageArtifact;
+import com.ragagent.shared.session.SessionView;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.ArrayList;

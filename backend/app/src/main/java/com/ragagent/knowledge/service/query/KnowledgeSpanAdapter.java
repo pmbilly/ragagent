@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.service.query;
 
-import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.domain.span.SpanTracker;
+import com.ragagent.shared.knowledge.KnowledgeSpanPort;
 import java.util.Map;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;

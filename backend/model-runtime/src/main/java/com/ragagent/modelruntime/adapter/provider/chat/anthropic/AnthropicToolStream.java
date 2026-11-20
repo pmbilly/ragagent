@@ -1,7 +1,7 @@
 package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
-import com.ragagent.contract.model.FunctionCall;
-import com.ragagent.contract.model.ToolCall;
+import com.ragagent.shared.model.FunctionCall;
+import com.ragagent.shared.model.ToolCall;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

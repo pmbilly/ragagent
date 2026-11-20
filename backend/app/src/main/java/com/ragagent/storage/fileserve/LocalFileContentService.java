@@ -1,10 +1,10 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.contract.storage.fileserve.FileContentService;
-import com.ragagent.contract.storage.fileserve.OpenedFile;
-import com.ragagent.contract.storage.fileserve.StoragePathGuard;
-import com.ragagent.contract.storage.fileserve.WritableFileContentService;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
+import com.ragagent.shared.storage.fileserve.FileContentService;
+import com.ragagent.shared.storage.fileserve.OpenedFile;
+import com.ragagent.shared.storage.fileserve.StoragePathGuard;
+import com.ragagent.shared.storage.fileserve.WritableFileContentService;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

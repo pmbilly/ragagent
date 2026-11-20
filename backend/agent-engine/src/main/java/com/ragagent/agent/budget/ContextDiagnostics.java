@@ -1,7 +1,7 @@
 package com.ragagent.agent.budget;
 
-import com.ragagent.contract.model.ChatMessage;
-import com.ragagent.contract.model.ChatTool;
+import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.shared.model.ChatTool;
 import java.util.List;
 
 /**

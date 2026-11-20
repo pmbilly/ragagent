@@ -1,7 +1,7 @@
 package com.ragagent.config;
 
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.web.RbacInterceptor;
+import com.ragagent.shared.tenant.TenantRole;
 
 /**
  * RBAC 规则表（集中登记所有带角色下限的路由声明，以及显式公开/自服务路由）。

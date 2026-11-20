@@ -1,7 +1,7 @@
 package com.ragagent.platform.prompt;
 
-import com.ragagent.contract.graph.GraphNode;
-import com.ragagent.contract.graph.GraphRelation;
+import com.ragagent.shared.graph.GraphNode;
+import com.ragagent.shared.graph.GraphRelation;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

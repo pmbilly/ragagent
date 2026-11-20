@@ -1,8 +1,8 @@
 package com.ragagent.platform.tracing.decorators;
 
-import com.ragagent.contract.model.RankResult;
-import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.platform.tracing.langfuse.LangfuseTokenUsage;
+import com.ragagent.shared.model.RankResult;
+import com.ragagent.shared.model.TokenUsage;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

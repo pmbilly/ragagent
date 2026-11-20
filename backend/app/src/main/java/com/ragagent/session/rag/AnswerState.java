@@ -1,6 +1,6 @@
 package com.ragagent.session.rag;
 
-import com.ragagent.contract.model.ChatResponse;
+import com.ragagent.shared.model.ChatResponse;
 
 /**
  * 状态段 · 答复：组装好的用户消息、渲染上下文与模型回复。

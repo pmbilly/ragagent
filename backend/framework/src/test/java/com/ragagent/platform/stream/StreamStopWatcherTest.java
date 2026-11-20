@@ -3,7 +3,7 @@ package com.ragagent.platform.stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.contract.model.ResponseType;
+import com.ragagent.shared.model.ResponseType;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;

@@ -1,12 +1,6 @@
 package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.contract.knowledge.SearchChunkMerge;
-import com.ragagent.contract.pipeline.PipelinePorts;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 import com.ragagent.platform.web.JsonMappers;
@@ -20,6 +14,12 @@ import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.MatchTypes;
 import com.ragagent.session.rag.support.SearchSupport;
+import com.ragagent.shared.knowledge.ChunkFacts;
+import com.ragagent.shared.knowledge.FaqChunkMetadata;
+import com.ragagent.shared.knowledge.SearchChunkMerge;
+import com.ragagent.shared.pipeline.PipelinePorts;
+import com.ragagent.shared.retrieval.SearchResult;
+import com.ragagent.shared.websearch.ImageInfo;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

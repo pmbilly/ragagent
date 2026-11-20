@@ -1,9 +1,9 @@
 package com.ragagent.websearch.provider;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.websearch.WebSearchFilters;
-import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.web.ProviderJson;
+import com.ragagent.shared.websearch.WebSearchFilters;
+import com.ragagent.shared.websearch.WebSearchResult;
 import com.ragagent.websearch.config.WebSearchProviderParams;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

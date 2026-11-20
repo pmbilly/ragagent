@@ -1,6 +1,6 @@
 package com.ragagent.wiki.service.ingest.support;
 
-import com.ragagent.contract.knowledge.KnowledgeSpanPort;
+import com.ragagent.shared.knowledge.KnowledgeSpanPort;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

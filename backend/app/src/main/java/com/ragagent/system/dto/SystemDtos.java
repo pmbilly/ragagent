@@ -1,8 +1,8 @@
 package com.ragagent.system.dto;
 
-import com.ragagent.contract.auth.AdminUserView;
-import com.ragagent.contract.auth.UserPreferences;
-import com.ragagent.contract.settings.DocReaderAdminPort;
+import com.ragagent.shared.auth.AdminUserView;
+import com.ragagent.shared.auth.UserPreferences;
+import com.ragagent.shared.settings.DocReaderAdminPort;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;

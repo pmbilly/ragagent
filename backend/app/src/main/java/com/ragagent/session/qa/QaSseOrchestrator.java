@@ -1,15 +1,6 @@
 package com.ragagent.session.qa;
 
 
-import com.ragagent.contract.agent.AgentStep;
-import com.ragagent.contract.agent.AgentToolCall;
-import com.ragagent.contract.event.EventBusFactory;
-import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.contract.event.payload.AgentToolCallData;
-import com.ragagent.contract.event.payload.AgentToolResultData;
-import com.ragagent.contract.model.ResponseType;
-import com.ragagent.contract.session.SseSink;
-import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.event.EventType;
@@ -30,6 +21,15 @@ import com.ragagent.session.service.TurnMessageGate;
 import com.ragagent.session.service.TurnMessageHandle;
 import com.ragagent.session.service.sse.SseFrameSink;
 import com.ragagent.session.service.sse.StreamEventEmitter;
+import com.ragagent.shared.agent.AgentStep;
+import com.ragagent.shared.agent.AgentToolCall;
+import com.ragagent.shared.event.EventBusFactory;
+import com.ragagent.shared.event.EventBusInterface;
+import com.ragagent.shared.event.payload.AgentToolCallData;
+import com.ragagent.shared.event.payload.AgentToolResultData;
+import com.ragagent.shared.model.ResponseType;
+import com.ragagent.shared.session.SseSink;
+import com.ragagent.shared.tool.ToolResult;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

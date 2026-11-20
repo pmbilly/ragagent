@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.api;
 
-import com.ragagent.contract.json.JsonValues;
+import com.ragagent.shared.json.JsonValues;
 import java.util.Locale;
 
 /**

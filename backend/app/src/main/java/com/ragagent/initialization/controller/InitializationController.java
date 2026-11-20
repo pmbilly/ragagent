@@ -1,11 +1,11 @@
 package com.ragagent.initialization.controller;
 
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.initialization.service.InitializationConfigService;
 import com.ragagent.initialization.service.ModelConnectivityTestService;
 import com.ragagent.initialization.service.TextExtractionTestService;
 import com.ragagent.platform.web.ApiResult;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

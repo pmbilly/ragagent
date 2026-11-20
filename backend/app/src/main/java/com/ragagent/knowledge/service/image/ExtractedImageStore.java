@@ -1,6 +1,5 @@
 package com.ragagent.knowledge.service.image;
 
-import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.ChunkRepository;
@@ -8,6 +7,7 @@ import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.platform.knowledge.ImageRefRewriter;
 import com.ragagent.platform.text.ContentTypeByFilename;
+import com.ragagent.shared.storage.ResourceCatalogPort;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;

@@ -33,9 +33,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.agent.AgentPromptGolden;
 import com.ragagent.agent.fixtures.RecordingSupport;
-import com.ragagent.contract.model.ChatMessage;
-import com.ragagent.contract.model.FunctionCall;
-import com.ragagent.contract.model.ToolCall;
+import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.shared.model.FunctionCall;
+import com.ragagent.shared.model.ToolCall;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

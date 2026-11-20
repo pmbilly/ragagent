@@ -5,12 +5,12 @@ import static com.ragagent.session.rag.Rec46cSupport.json;
 import static com.ragagent.session.rag.Rec46cSupport.searchResultsShape;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.contract.knowledge.SearchChunkMerge;
-import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.session.rag.plugin.PluginMerge;
 import com.ragagent.session.rag.support.SearchSupport;
+import com.ragagent.shared.knowledge.FaqChunkMetadata;
+import com.ragagent.shared.knowledge.SearchChunkMerge;
+import com.ragagent.shared.retrieval.SearchResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

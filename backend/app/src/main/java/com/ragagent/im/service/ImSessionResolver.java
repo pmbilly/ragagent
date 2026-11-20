@@ -1,12 +1,12 @@
 package com.ragagent.im.service;
 
-import com.ragagent.contract.session.SessionQaPort;
-import com.ragagent.contract.session.SessionView;
 import com.ragagent.im.domain.ChannelSessionEntity;
 import com.ragagent.im.repository.ChannelSessionRepository;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
+import com.ragagent.shared.session.SessionQaPort;
+import com.ragagent.shared.session.SessionView;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import org.slf4j.Logger;

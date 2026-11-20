@@ -1,7 +1,7 @@
 package com.ragagent.session.service;
 
 import com.ragagent.agenttools.web.WebFetchTool;
-import com.ragagent.contract.storage.ResourceCatalogPort;
+import com.ragagent.shared.storage.ResourceCatalogPort;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import javax.sql.DataSource;

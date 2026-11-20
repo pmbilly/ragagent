@@ -1,7 +1,6 @@
 package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.security.InputSanitizer;
@@ -13,6 +12,7 @@ import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineMessageStore;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.ReferencesSupport;
+import com.ragagent.shared.retrieval.SearchResult;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

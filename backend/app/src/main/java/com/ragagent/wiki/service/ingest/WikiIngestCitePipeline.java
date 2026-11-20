@@ -2,12 +2,12 @@ package com.ragagent.wiki.service.ingest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.knowledge.ChunkPort;
-import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.knowledge.ChunkPort;
+import com.ragagent.shared.knowledge.ChunkView;
+import com.ragagent.shared.model.LlmChatClient;
+import com.ragagent.shared.wiki.ExtractedItem;
+import com.ragagent.shared.wiki.SlugUpdate;
 import com.ragagent.wiki.domain.WikiExtractionGranularity;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.wiki.service.ingest.support.CombinedExtraction;

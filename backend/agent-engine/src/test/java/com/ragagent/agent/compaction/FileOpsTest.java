@@ -7,9 +7,9 @@ import static com.ragagent.agent.AgentPromptGolden.STR_RESOLVE4_FORMAT;
 import static com.ragagent.agent.AgentPromptGolden.STR_RESOLVE5_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.contract.model.ChatMessage;
-import com.ragagent.contract.model.FunctionCall;
-import com.ragagent.contract.model.ToolCall;
+import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.shared.model.FunctionCall;
+import com.ragagent.shared.model.ToolCall;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;

@@ -1,9 +1,9 @@
 package com.ragagent.platform.tracing.decorators;
 
-import com.ragagent.contract.model.RankResult;
-import com.ragagent.contract.model.Reranker;
 import com.ragagent.platform.tracing.langfuse.Generation;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.shared.model.RankResult;
+import com.ragagent.shared.model.Reranker;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

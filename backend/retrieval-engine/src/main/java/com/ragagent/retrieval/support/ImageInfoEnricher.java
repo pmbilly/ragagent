@@ -1,9 +1,9 @@
 package com.ragagent.retrieval.support;
 
 
-import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
+import com.ragagent.shared.knowledge.ChunkFacts;
+import com.ragagent.shared.websearch.ImageInfo;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;

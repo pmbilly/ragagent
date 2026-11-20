@@ -1,6 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
-import com.ragagent.contract.knowledge.ChunkView;
+import com.ragagent.shared.knowledge.ChunkView;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

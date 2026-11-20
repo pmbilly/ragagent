@@ -2,7 +2,7 @@ package com.ragagent.platform.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ragagent.contract.agent.ToolCallTarget;
+import com.ragagent.shared.agent.ToolCallTarget;
 import java.util.List;
 import java.util.Map;
 

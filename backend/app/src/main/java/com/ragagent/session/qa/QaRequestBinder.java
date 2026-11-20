@@ -1,12 +1,12 @@
 package com.ragagent.session.qa;
 
-import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import com.ragagent.session.dto.QaRequests.AttachmentUpload;
 import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;
 import com.ragagent.session.dto.QaRequests.SearchKnowledgeRequest;
+import com.ragagent.shared.error.BizException;
 import java.util.ArrayList;
 import java.util.List;
 

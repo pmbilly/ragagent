@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.storage.fileserve.StoragePathGuard;
 import com.ragagent.knowledge.storage.LocalStorageService;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.storage.fileserve.StoragePathGuard;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;

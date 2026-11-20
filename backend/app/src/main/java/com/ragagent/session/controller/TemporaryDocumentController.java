@@ -1,7 +1,5 @@
 package com.ragagent.session.controller;
 
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.api.ParserEngineRules;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
@@ -14,6 +12,8 @@ import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.dto.TemporaryDocumentResponse;
 import com.ragagent.session.service.AgentResolver;
 import com.ragagent.session.support.SessionNotFoundException;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.slf4j.Logger;

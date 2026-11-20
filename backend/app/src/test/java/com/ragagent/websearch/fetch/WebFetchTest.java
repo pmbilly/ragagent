@@ -2,8 +2,8 @@ package com.ragagent.websearch.fetch;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.ragagent.contract.websearch.FetchException;
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.shared.websearch.FetchException;
 import com.sun.net.httpserver.HttpServer;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;

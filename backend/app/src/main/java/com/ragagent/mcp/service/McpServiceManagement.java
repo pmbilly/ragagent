@@ -1,6 +1,5 @@
 package com.ragagent.mcp.service;
 
-import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.domain.McpAdvancedConfig;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpAuthType;
@@ -25,6 +24,7 @@ import com.ragagent.mcp.repository.McpServiceRepository;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.shared.error.BizException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;

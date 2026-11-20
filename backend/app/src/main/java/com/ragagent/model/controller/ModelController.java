@@ -1,8 +1,5 @@
 package com.ragagent.model.controller;
 
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.model.dto.CreateModelRequest;
 import com.ragagent.model.dto.ModelDetailResponse;
 import com.ragagent.model.dto.ModelProviderDto;
@@ -16,6 +13,9 @@ import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.platform.web.RejectEmptyBody;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.tenant.TenantRole;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;

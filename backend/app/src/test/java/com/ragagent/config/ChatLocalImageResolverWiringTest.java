@@ -14,11 +14,11 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.contract.storage.fileserve.FileContentService;
-import com.ragagent.contract.storage.fileserve.OpenedFile;
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
+import com.ragagent.shared.storage.fileserve.FileContentService;
+import com.ragagent.shared.storage.fileserve.OpenedFile;
+import com.ragagent.shared.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.fileserve.StorageFileResolver;

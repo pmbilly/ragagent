@@ -1,7 +1,7 @@
 package com.ragagent.storage.provider;
 
-import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.shared.tenant.StorageEngineConfig;
 import java.util.Locale;
 
 /**

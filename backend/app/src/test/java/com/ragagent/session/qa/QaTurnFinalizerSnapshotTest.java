@@ -3,9 +3,9 @@ package com.ragagent.session.qa;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.ragagent.contract.session.SessionLastRequestState;
 import com.ragagent.session.service.QaSupport.QaMode;
 import com.ragagent.session.service.QaSupport.QaRequestContext;
+import com.ragagent.shared.session.SessionLastRequestState;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;

@@ -1,14 +1,14 @@
 package com.ragagent.platform.web;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ragagent.contract.tenant.StorageEngineConfig.CosEngineConfig;
-import com.ragagent.contract.tenant.StorageEngineConfig.Ks3EngineConfig;
-import com.ragagent.contract.tenant.StorageEngineConfig.LocalEngineConfig;
-import com.ragagent.contract.tenant.StorageEngineConfig.MinioEngineConfig;
-import com.ragagent.contract.tenant.StorageEngineConfig.ObsEngineConfig;
-import com.ragagent.contract.tenant.StorageEngineConfig.OssEngineConfig;
-import com.ragagent.contract.tenant.StorageEngineConfig.S3EngineConfig;
-import com.ragagent.contract.tenant.StorageEngineConfig.TosEngineConfig;
+import com.ragagent.shared.tenant.StorageEngineConfig.CosEngineConfig;
+import com.ragagent.shared.tenant.StorageEngineConfig.Ks3EngineConfig;
+import com.ragagent.shared.tenant.StorageEngineConfig.LocalEngineConfig;
+import com.ragagent.shared.tenant.StorageEngineConfig.MinioEngineConfig;
+import com.ragagent.shared.tenant.StorageEngineConfig.ObsEngineConfig;
+import com.ragagent.shared.tenant.StorageEngineConfig.OssEngineConfig;
+import com.ragagent.shared.tenant.StorageEngineConfig.S3EngineConfig;
+import com.ragagent.shared.tenant.StorageEngineConfig.TosEngineConfig;
 
 /**
  * 租户配置族的 Jackson mixin（契约面纯 JDK 的配套）。

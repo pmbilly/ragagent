@@ -1,13 +1,13 @@
 package com.ragagent.agent;
 
 import com.ragagent.agent.tool.ExecutionPolicy;
-import com.ragagent.contract.agent.AgentToolCall;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.model.ToolCall;
-import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
+import com.ragagent.shared.agent.AgentToolCall;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.model.ToolCall;
+import com.ragagent.shared.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -34,7 +34,7 @@ final class ToolBatchExecutor {
     }
 
     /** 单次工具调用的执行回调。 */
-    /** 输入是 LLM 侧的工具调用（{@code com.ragagent.contract.model.ToolCall}），产出是 agent 域的结果。 */
+    /** 输入是 LLM 侧的工具调用（{@code com.ragagent.shared.model.ToolCall}），产出是 agent 域的结果。 */
     interface CallRunner {
         /**
          * @param inWorker true = 运行在并发子线程（身份已 replay，按子线程上下文执行）；

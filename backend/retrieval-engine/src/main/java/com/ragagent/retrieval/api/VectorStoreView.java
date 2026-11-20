@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.api;
 
-import com.ragagent.contract.vectorstore.ConnectionConfig;
-import com.ragagent.contract.vectorstore.IndexConfig;
+import com.ragagent.shared.vectorstore.ConnectionConfig;
+import com.ragagent.shared.vectorstore.IndexConfig;
 
 
 

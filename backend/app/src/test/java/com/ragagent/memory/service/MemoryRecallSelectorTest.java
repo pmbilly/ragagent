@@ -2,9 +2,9 @@ package com.ragagent.memory.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.vector.MemoryVectorHit;
+import com.ragagent.shared.memory.MemoryKinds;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;

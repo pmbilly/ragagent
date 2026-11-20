@@ -1,8 +1,8 @@
 package com.ragagent.mcp.tool;
 
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.mcp.approval.ApprovalEventBus;
+import com.ragagent.shared.event.Event;
+import com.ragagent.shared.event.EventBusInterface;
 
 /**
  * 平台事件总线 → 审批门的事件总线（{@link ApprovalEventBus}）。

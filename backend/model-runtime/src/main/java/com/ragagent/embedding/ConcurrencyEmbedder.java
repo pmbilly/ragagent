@@ -1,8 +1,8 @@
 package com.ragagent.embedding;
 
-import com.ragagent.contract.model.Embedder;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.limiter.Release;
+import com.ragagent.shared.model.Embedder;
 import java.util.List;
 
 /**

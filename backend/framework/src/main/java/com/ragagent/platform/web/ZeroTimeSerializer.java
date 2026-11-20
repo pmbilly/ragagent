@@ -3,7 +3,7 @@ package com.ragagent.platform.web;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.ragagent.contract.json.ZeroTimes;
+import com.ragagent.shared.json.ZeroTimes;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.OffsetDateTime;

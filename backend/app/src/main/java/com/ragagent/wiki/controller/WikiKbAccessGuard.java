@@ -1,11 +1,11 @@
 package com.ragagent.wiki.controller;
 
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
-import com.ragagent.contract.knowledge.KnowledgeBaseView;
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.knowledge.KnowledgeBaseLookup;
+import com.ragagent.shared.knowledge.KnowledgeBaseView;
+import com.ragagent.shared.tenant.TenantRole;
 import java.util.List;
 
 /**

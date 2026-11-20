@@ -1,10 +1,10 @@
 package com.ragagent.knowledge.adapter;
 
-import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.knowledge.support.KnowledgeHashes;
 import com.ragagent.knowledge.support.KnowledgePaths;
 import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
+import com.ragagent.shared.knowledge.KnowledgeIngest;
 import org.springframework.stereotype.Component;
 
 /**

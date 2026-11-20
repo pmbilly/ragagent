@@ -1,8 +1,5 @@
 package com.ragagent.knowledge.service;
 
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
@@ -11,6 +8,9 @@ import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.support.TagViews;
+import com.ragagent.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;

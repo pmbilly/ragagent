@@ -1,12 +1,12 @@
 package com.ragagent.agenttools.datasource;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.BaseTool;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.llm.api.ToolDefinitions;
 import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.tool.BaseTool;
+import com.ragagent.shared.tool.ToolRequest;
+import com.ragagent.shared.tool.ToolResult;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

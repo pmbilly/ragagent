@@ -1,7 +1,6 @@
 package com.ragagent.mcp.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.domain.McpConfigFingerprint;
 import com.ragagent.mcp.domain.McpMetadataSummary;
 import com.ragagent.mcp.domain.McpPrincipal;
@@ -19,6 +18,7 @@ import com.ragagent.mcp.repository.McpMetadataRepository;
 import com.ragagent.mcp.repository.McpServiceRepository;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.error.BizException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;

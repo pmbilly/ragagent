@@ -1,7 +1,7 @@
 package com.ragagent.session.domain.message;
 
-import com.ragagent.contract.session.MessageArtifact;
 import com.ragagent.platform.storage.fileserve.StoragePaths;
+import com.ragagent.shared.session.MessageArtifact;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

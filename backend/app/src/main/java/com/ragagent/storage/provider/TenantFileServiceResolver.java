@@ -1,7 +1,7 @@
 package com.ragagent.storage.provider;
 
-import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
+import com.ragagent.shared.tenant.StorageEngineConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

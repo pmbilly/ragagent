@@ -3,7 +3,7 @@ package com.ragagent.platform.web;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ragagent.contract.model.PromptCacheStatus;
+import com.ragagent.shared.model.PromptCacheStatus;
 import java.util.List;
 import java.util.Map;
 

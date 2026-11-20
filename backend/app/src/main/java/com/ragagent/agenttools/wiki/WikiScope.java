@@ -1,8 +1,8 @@
 package com.ragagent.agenttools.wiki;
 
-import com.ragagent.contract.agent.SearchAuth;
-import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
+import com.ragagent.shared.agent.SearchAuth;
+import com.ragagent.shared.retrieval.SearchTarget;
+import com.ragagent.shared.retrieval.SearchTarget.SearchTargets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

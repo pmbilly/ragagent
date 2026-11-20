@@ -10,7 +10,7 @@ import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.repository.AuditLogRepository;
 import com.ragagent.audit.service.AuditLogRetentionRunner;
 import com.ragagent.audit.service.AuditLogService;
-import com.ragagent.contract.audit.AuditAction;
+import com.ragagent.shared.audit.AuditAction;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;

@@ -1,6 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
-import com.ragagent.contract.wiki.WikiKnowledgeFinalizer;
+import com.ragagent.shared.wiki.WikiKnowledgeFinalizer;
 import com.ragagent.wiki.domain.TaskDeadLetter;
 import com.ragagent.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.wiki.domain.ingest.WikiIngestPayload;

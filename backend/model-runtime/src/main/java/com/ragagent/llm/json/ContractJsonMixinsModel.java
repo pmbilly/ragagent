@@ -2,11 +2,11 @@ package com.ragagent.llm.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ragagent.contract.model.RankResult;
-import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.contract.model.ToolCall;
-import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.platform.web.SortedMapSerializer;
+import com.ragagent.shared.model.RankResult;
+import com.ragagent.shared.model.TokenUsage;
+import com.ragagent.shared.model.ToolCall;
+import com.ragagent.shared.retrieval.SearchResult;
 import java.util.List;
 import java.util.Map;
 

@@ -3,8 +3,8 @@ package com.ragagent.mcp.controller;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.service.McpMetadataException;
+import com.ragagent.shared.error.BizException;
 import org.junit.jupiter.api.Test;
 
 /**

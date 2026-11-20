@@ -1,11 +1,11 @@
 package com.ragagent.knowledge.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 import com.ragagent.knowledge.domain.KnowledgeBaseImageProcessingConfig;
 import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.error.BizException;
 
 /**
  * KB 配置 jsonb → 契约配置类型的**解析边界**（承载原先挂在 4 个配置类型上的静态

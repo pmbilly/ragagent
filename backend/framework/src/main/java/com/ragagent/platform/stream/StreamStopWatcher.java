@@ -1,6 +1,6 @@
 package com.ragagent.platform.stream;
 
-import com.ragagent.contract.model.ResponseType;
+import com.ragagent.shared.model.ResponseType;
 import java.util.function.BooleanSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

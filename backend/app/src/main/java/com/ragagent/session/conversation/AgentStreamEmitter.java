@@ -1,8 +1,8 @@
 package com.ragagent.session.conversation;
 
-import com.ragagent.contract.model.ResponseType;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.shared.model.ResponseType;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;

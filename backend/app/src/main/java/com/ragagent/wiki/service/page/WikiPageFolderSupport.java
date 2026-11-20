@@ -1,6 +1,6 @@
 package com.ragagent.wiki.service.page;
 
-import com.ragagent.contract.wiki.WikiException;
+import com.ragagent.shared.wiki.WikiException;
 import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.domain.WikiCategoryPaths;
 import com.ragagent.wiki.domain.WikiPage;

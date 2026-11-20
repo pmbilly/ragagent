@@ -1,6 +1,6 @@
 package com.ragagent.platform.event;
 
-import com.ragagent.contract.event.EventHandler;
+import com.ragagent.shared.event.EventHandler;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;

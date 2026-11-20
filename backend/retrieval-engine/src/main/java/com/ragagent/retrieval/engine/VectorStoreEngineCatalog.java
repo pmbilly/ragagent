@@ -2,8 +2,6 @@ package com.ragagent.retrieval.engine;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.vectorstore.ConnectionConfig;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.api.VectorStoreAddressField;
@@ -16,6 +14,8 @@ import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository;
 import com.ragagent.retrieval.engine.qdrant.QdrantRetrieveRepository;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRestClient;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepository;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.vectorstore.ConnectionConfig;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;

@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.api;
 
-import com.ragagent.contract.model.Embedder;
+import com.ragagent.shared.model.Embedder;
 import java.util.List;
 import java.util.Map;
 

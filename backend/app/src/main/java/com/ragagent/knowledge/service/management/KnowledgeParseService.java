@@ -1,8 +1,6 @@
 package com.ragagent.knowledge.service.management;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTenants;
@@ -10,6 +8,8 @@ import com.ragagent.knowledge.domain.span.SpanTracker;
 import com.ragagent.knowledge.repository.DocumentParser;
 import com.ragagent.knowledge.service.KnowledgeAccessHelper;
 import com.ragagent.knowledge.support.KnowledgeMetadataOverrides;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.knowledge.KnowledgeIngest;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import org.springframework.stereotype.Service;

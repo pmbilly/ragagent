@@ -2,8 +2,8 @@ package com.ragagent.session.dto;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ragagent.contract.session.SessionLastRequestState;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import com.ragagent.shared.session.SessionLastRequestState;
 import java.time.OffsetDateTime;
 
 /**

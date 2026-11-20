@@ -1,12 +1,6 @@
 package com.ragagent.knowledge.service.faq;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.FaqChunkMetadata;
-import com.ragagent.contract.pagination.PageResult;
-import com.ragagent.contract.retrieval.SearchParams;
-import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -22,6 +16,12 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.retrieval.api.HybridSearchPort;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.knowledge.FaqChunkMetadata;
+import com.ragagent.shared.pagination.PageResult;
+import com.ragagent.shared.retrieval.SearchParams;
+import com.ragagent.shared.retrieval.SearchResult;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

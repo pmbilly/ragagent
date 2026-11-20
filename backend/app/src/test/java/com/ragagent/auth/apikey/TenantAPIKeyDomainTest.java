@@ -5,11 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.auth.apikey.domain.APIKeyStringListTypeHandler;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.contract.apikey.APIKeyCapability;
-import com.ragagent.contract.apikey.APIKeyScopeContext;
-import com.ragagent.contract.apikey.APIKeyScopeType;
-import com.ragagent.contract.apikey.TenantAPIKeyScope;
-import com.ragagent.contract.error.BizException;
+import com.ragagent.shared.apikey.APIKeyCapability;
+import com.ragagent.shared.apikey.APIKeyScopeContext;
+import com.ragagent.shared.apikey.APIKeyScopeType;
+import com.ragagent.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.shared.error.BizException;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

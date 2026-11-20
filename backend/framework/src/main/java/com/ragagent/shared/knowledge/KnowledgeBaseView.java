@@ -1,0 +1,154 @@
+package com.ragagent.shared.knowledge;
+
+import java.time.OffsetDateTime;
+
+
+/**
+ * 知识库只读视图（由 {@code KnowledgeBaseLookup} 内嵌类型提升为顶层类型，
+ * 便于 wiki 侧 20+ 调用点直接 import）。
+ *
+ * <p><b>为什么可写</b>：本视图是 DTO——{@code knowledge} 侧适配器要填充、测试夹具要构造
+ * （它们原先直接 new 实体再 set）。业务调用方（wiki 等）应当<b>只读</b>使用。</p>
+ */
+public final class KnowledgeBaseView {
+
+    private String id;
+    private long tenantId;
+    private String name;
+    private String type;
+    private String description;
+    private String creatorId;
+    private String summaryModelId;
+    private String embeddingModelId;
+    private boolean wikiEnabled;
+    private Object wikiConfig;
+    private boolean vectorEnabled;
+    private boolean keywordEnabled;
+    private Object extractConfig;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public long getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(long tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
+    }
+
+    public String getSummaryModelId() {
+        return summaryModelId;
+    }
+
+    public void setSummaryModelId(String summaryModelId) {
+        this.summaryModelId = summaryModelId;
+    }
+
+    public String getEmbeddingModelId() {
+        return embeddingModelId;
+    }
+
+    public void setEmbeddingModelId(String embeddingModelId) {
+        this.embeddingModelId = embeddingModelId;
+    }
+
+    /** {@code indexing_strategy.isWikiEnabled()} 的等价投影。 */
+    public boolean isWikiEnabled() {
+        return wikiEnabled;
+    }
+
+    public void setWikiEnabled(boolean wikiEnabled) {
+        this.wikiEnabled = wikiEnabled;
+    }
+
+    public Object getWikiConfig() {
+        return wikiConfig;
+    }
+
+    public void setWikiConfig(Object wikiConfig) {
+        this.wikiConfig = wikiConfig;
+    }
+
+    /** {@code indexing_strategy.vectorEnabled} 的等价投影。 */
+    public boolean isVectorEnabled() {
+        return vectorEnabled;
+    }
+
+    public void setVectorEnabled(boolean vectorEnabled) {
+        this.vectorEnabled = vectorEnabled;
+    }
+
+    /** {@code indexing_strategy.keywordEnabled} 的等价投影。 */
+    public boolean isKeywordEnabled() {
+        return keywordEnabled;
+    }
+
+    public void setKeywordEnabled(boolean keywordEnabled) {
+        this.keywordEnabled = keywordEnabled;
+    }
+
+    /** {@code extract_config} jsonb 原始载荷（解读留给消费方，视图不替它判定）。 */
+    public Object getExtractConfig() {
+        return extractConfig;
+    }
+
+    public void setExtractConfig(Object extractConfig) {
+        this.extractConfig = extractConfig;
+    }
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+}

@@ -18,7 +18,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SRC = ROOT / "backend" / "contract" / "src" / "main" / "java"
+SRC = ROOT / "backend" / "contract" / "src" / "main" / "java"  # 已并入 framework，此路径仅兼容旧结构
 BUILD_FILE = ROOT / "backend" / "contract" / "pom.xml"
 #: contract 解散后，「契约面只允许纯 JDK」的约束不能凭空消失——
 #: 它平移到 framework 承接共享词汇的子包上（C1 导入根、C3 框架形状继续生效）。
@@ -78,7 +78,14 @@ def check_imports(files: list[pathlib.Path]) -> list[str]:
     return problems
 
 
+#: contract 已于阶段四并入 framework/shared：C2（构建依赖）不再适用——共享词汇
+#: 现在住在 framework 里，而 framework 必然带 Spring 等依赖。C1/C3 继续生效。
+CONTRACT_MODULE_EXISTS = (ROOT / "backend" / "contract").is_dir()
+
+
 def check_build() -> list[str]:
+    if not CONTRACT_MODULE_EXISTS:
+        return []
     if not BUILD_FILE.is_file():
         return [f"C2 缺少构建文件：{BUILD_FILE.relative_to(ROOT)}"]
     text = BUILD_FILE.read_text(encoding="utf-8")

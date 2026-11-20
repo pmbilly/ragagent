@@ -1,6 +1,5 @@
 package com.ragagent.knowledge.service.chunk;
 
-import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -12,6 +11,7 @@ import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.knowledge.support.ChunkRevisionConflictException;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
+import com.ragagent.shared.error.BizException;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

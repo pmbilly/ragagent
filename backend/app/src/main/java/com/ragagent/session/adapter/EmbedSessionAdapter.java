@@ -1,13 +1,6 @@
 package com.ragagent.session.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.session.EmbedReply;
-import com.ragagent.contract.session.EmbedSessionPort;
-import com.ragagent.contract.session.MessageSuggestionView;
-import com.ragagent.contract.session.MessageView;
-import com.ragagent.contract.session.SseSink;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.conversation.MessageHistoryService;
 import com.ragagent.session.conversation.SessionStopService;
@@ -16,6 +9,13 @@ import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.session.dto.StopSessionRequest;
 import com.ragagent.session.qa.QaEntryRunner;
 import com.ragagent.session.service.suggestion.MessageSuggestionFacade;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.session.EmbedReply;
+import com.ragagent.shared.session.EmbedSessionPort;
+import com.ragagent.shared.session.MessageSuggestionView;
+import com.ragagent.shared.session.MessageView;
+import com.ragagent.shared.session.SseSink;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.stereotype.Component;

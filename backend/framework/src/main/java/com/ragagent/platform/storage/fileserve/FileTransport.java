@@ -1,8 +1,8 @@
 package com.ragagent.platform.storage.fileserve;
 
-import com.ragagent.contract.storage.fileserve.OpenedFile;
-import com.ragagent.contract.storage.provider.SeekableSource;
 import com.ragagent.platform.text.ContentTypeByFilename;
+import com.ragagent.shared.storage.fileserve.OpenedFile;
+import com.ragagent.shared.storage.provider.SeekableSource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

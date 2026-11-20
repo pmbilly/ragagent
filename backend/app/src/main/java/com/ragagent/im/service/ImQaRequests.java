@@ -2,15 +2,15 @@ package com.ragagent.im.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agentengine.api.AgentLookup;
-import com.ragagent.contract.json.JsonValues;
-import com.ragagent.contract.session.MessageAttachment;
-import com.ragagent.contract.session.MessageView;
-import com.ragagent.contract.session.QaRequestPayload;
-import com.ragagent.contract.session.SessionQaPort;
-import com.ragagent.contract.session.SessionView;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
+import com.ragagent.shared.json.JsonValues;
+import com.ragagent.shared.session.MessageAttachment;
+import com.ragagent.shared.session.MessageView;
+import com.ragagent.shared.session.QaRequestPayload;
+import com.ragagent.shared.session.SessionQaPort;
+import com.ragagent.shared.session.SessionView;
 import java.util.List;
 
 /**

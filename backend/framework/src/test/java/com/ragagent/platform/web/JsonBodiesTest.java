@@ -2,7 +2,7 @@ package com.ragagent.platform.web;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.ragagent.contract.error.BizException;
+import com.ragagent.shared.error.BizException;
 import org.junit.jupiter.api.Test;
 
 /** bindObject 的请求体形态 400 文案钉子（原先 0 金片覆盖）。 */

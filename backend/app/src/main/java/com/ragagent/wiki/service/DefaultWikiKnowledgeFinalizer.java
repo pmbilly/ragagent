@@ -1,8 +1,8 @@
 package com.ragagent.wiki.service;
 
-import com.ragagent.contract.knowledge.FinalizeResult;
-import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
-import com.ragagent.contract.wiki.WikiKnowledgeFinalizer;
+import com.ragagent.shared.knowledge.FinalizeResult;
+import com.ragagent.shared.knowledge.KnowledgeFinalizePort;
+import com.ragagent.shared.wiki.WikiKnowledgeFinalizer;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import org.slf4j.Logger;

@@ -2,11 +2,11 @@ package com.ragagent.modelruntime.adapter.provider.chat.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.model.ChatOptions;
 import com.ragagent.llm.provider.AliyunProvider;
 import com.ragagent.llm.provider.MoonshotProvider;
 import com.ragagent.llm.provider.OpenAIProvider;
 import com.ragagent.llm.provider.ProviderName;
+import com.ragagent.shared.model.ChatOptions;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;

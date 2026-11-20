@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.service.management;
 
-import com.ragagent.contract.knowledge.KnowledgeMaintenancePort;
+import com.ragagent.shared.knowledge.KnowledgeMaintenancePort;
 import org.springframework.stereotype.Component;
 
 /**

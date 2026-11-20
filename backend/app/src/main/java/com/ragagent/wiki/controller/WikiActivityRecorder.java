@@ -1,6 +1,6 @@
 package com.ragagent.wiki.controller;
 
-import com.ragagent.contract.audit.WikiActivityAudit;
+import com.ragagent.shared.audit.WikiActivityAudit;
 import com.ragagent.wiki.domain.WikiPage;
 import java.util.LinkedHashMap;
 import java.util.Map;

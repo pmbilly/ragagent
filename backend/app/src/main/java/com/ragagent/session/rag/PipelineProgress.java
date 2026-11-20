@@ -1,13 +1,13 @@
 package com.ragagent.session.rag;
 
-import com.ragagent.contract.event.Event;
-import com.ragagent.contract.event.EventBusInterface;
-import com.ragagent.contract.event.payload.AgentToolCallData;
-import com.ragagent.contract.event.payload.AgentToolResultData;
-import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.session.rag.plugin.PluginError;
+import com.ragagent.shared.event.Event;
+import com.ragagent.shared.event.EventBusInterface;
+import com.ragagent.shared.event.payload.AgentToolCallData;
+import com.ragagent.shared.event.payload.AgentToolResultData;
+import com.ragagent.shared.retrieval.SearchResult;
+import com.ragagent.shared.retrieval.SearchTarget;
 import java.time.Clock;
 import java.util.LinkedHashMap;
 import java.util.List;

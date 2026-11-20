@@ -2,12 +2,12 @@ package com.ragagent.websearch.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.error.BizException;
 import com.ragagent.websearch.service.WebSearchProviderService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.LinkedHashMap;

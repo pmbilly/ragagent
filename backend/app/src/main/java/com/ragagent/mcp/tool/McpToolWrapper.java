@@ -1,9 +1,5 @@
 package com.ragagent.mcp.tool;
 
-import com.ragagent.contract.tool.AgentTool;
-import com.ragagent.contract.tool.ToolExecContext;
-import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.llm.api.ToolDefinitions;
 import com.ragagent.mcp.approval.ApprovalCancellations;
 import com.ragagent.mcp.approval.Decision;
@@ -18,6 +14,10 @@ import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
+import com.ragagent.shared.tool.AgentTool;
+import com.ragagent.shared.tool.ToolExecContext;
+import com.ragagent.shared.tool.ToolRequest;
+import com.ragagent.shared.tool.ToolResult;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;

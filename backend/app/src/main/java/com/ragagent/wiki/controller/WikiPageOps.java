@@ -15,8 +15,8 @@ import static com.ragagent.wiki.controller.WikiRequestSupport.trimSpace;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.shared.error.BizException;
 import com.ragagent.wiki.WikiConstants;
 import com.ragagent.wiki.api.WikiPageNotFoundException;
 import com.ragagent.wiki.domain.WikiPage;

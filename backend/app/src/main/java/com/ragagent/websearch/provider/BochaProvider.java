@@ -1,8 +1,8 @@
 package com.ragagent.websearch.provider;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.web.ProviderJson;
+import com.ragagent.shared.websearch.WebSearchResult;
 import com.ragagent.websearch.config.WebSearchProviderParams;
 import java.time.Duration;
 import java.time.OffsetDateTime;

@@ -1,6 +1,6 @@
 package com.ragagent.agenttools.wiki;
 
-import com.ragagent.contract.agent.SearchAuth;
+import com.ragagent.shared.agent.SearchAuth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

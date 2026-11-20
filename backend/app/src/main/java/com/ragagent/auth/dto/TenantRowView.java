@@ -1,6 +1,6 @@
 package com.ragagent.auth.dto;
 
-import com.ragagent.contract.tenant.APIPrincipalConfig;
+import com.ragagent.shared.tenant.APIPrincipalConfig;
 
 import java.time.OffsetDateTime;
 

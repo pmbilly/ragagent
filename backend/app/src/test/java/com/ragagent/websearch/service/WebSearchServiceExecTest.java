@@ -6,9 +6,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.contract.websearch.WebSearchFilters;
-import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.shared.websearch.WebSearchFilters;
+import com.ragagent.shared.websearch.WebSearchResult;
 import com.ragagent.websearch.config.WebSearchProviderParams;
 import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.provider.WebSearchProviderRegistry;

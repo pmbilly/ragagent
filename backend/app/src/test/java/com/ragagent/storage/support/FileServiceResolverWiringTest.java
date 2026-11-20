@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.storage.support.FileUrlPort;
-import com.ragagent.contract.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.shared.storage.support.FileUrlPort;
+import com.ragagent.shared.tenant.TenantConfigLookup.TenantStorageView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

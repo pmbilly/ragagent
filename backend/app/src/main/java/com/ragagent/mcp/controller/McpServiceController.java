@@ -1,9 +1,6 @@
 package com.ragagent.mcp.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.mcp.dto.McpMetadata;
@@ -21,6 +18,9 @@ import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
+import com.ragagent.shared.tenant.TenantRole;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.slf4j.Logger;

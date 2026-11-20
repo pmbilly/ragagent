@@ -1,8 +1,6 @@
 package com.ragagent.favorite.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.favorite.dto.FavoriteResponse;
 import com.ragagent.favorite.service.UserResourceFavoriteService;
 import com.ragagent.platform.access.TenantContext;
@@ -10,6 +8,8 @@ import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.shared.error.AppError;
+import com.ragagent.shared.error.BizException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
