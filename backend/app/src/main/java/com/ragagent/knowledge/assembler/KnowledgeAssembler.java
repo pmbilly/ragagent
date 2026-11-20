@@ -1,13 +1,14 @@
 package com.ragagent.knowledge.assembler;
 
 import com.ragagent.knowledge.controller.vo.*;
+import com.ragagent.knowledge.dto.TaskIdResponse;
 import com.ragagent.knowledge.dto.chunk.*;
 import com.ragagent.knowledge.dto.doc.*;
 
 /** 知识运营与检索相关响应的装配：只做字段搬运。 */
-public final class KnowledgeOpsAssembler {
+public final class KnowledgeAssembler {
 
-    private KnowledgeOpsAssembler() {
+    private KnowledgeAssembler() {
     }
 
     /** {@code BatchTaskData} -> {@code BatchTaskRespVo}。 */
@@ -56,7 +57,7 @@ public final class KnowledgeOpsAssembler {
             return null;
         }
         return new KnowledgeSearchRespVo(
-                toVoList(src.items(), KnowledgeOpsAssembler::toVo),
+                toVoList(src.items(), KnowledgeAssembler::toVo),
                 src.hasMore(),
                 src.total());
     }
@@ -125,5 +126,25 @@ public final class KnowledgeOpsAssembler {
             return java.util.List.of();
         }
         return src.stream().map(mapper).toList();
+    }
+
+    /** 知识条目列表的分页响应。 */
+    public static KnowledgeListRespVo toVo(KnowledgeListResponse src) {
+        if (src == null) {
+            return null;
+        }
+        return new KnowledgeListRespVo(
+                toVoList(src.items(), KnowledgeAssembler::toVo),
+                src.page(), src.pageSize(), src.total());
+    }
+
+    /** 任务 id 响应。 */
+    public static TaskIdRespVo toVo(TaskIdResponse src) {
+        return src == null ? null : new TaskIdRespVo(src.taskId());
+    }
+
+    /** 清空结果响应。 */
+    public static ClearContentsRespVo toVo(ClearContentsResponse src) {
+        return src == null ? null : new ClearContentsRespVo(src.deletedCount());
     }
 }

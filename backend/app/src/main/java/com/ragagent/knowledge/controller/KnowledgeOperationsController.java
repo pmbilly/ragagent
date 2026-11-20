@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.controller;
 
-import com.ragagent.knowledge.assembler.KnowledgeOpsAssembler;
+import com.ragagent.knowledge.assembler.KnowledgeAssembler;
 import com.ragagent.knowledge.controller.vo.BatchTaskRespVo;
 import com.ragagent.knowledge.controller.vo.FolderMoveRespVo;
 import com.ragagent.knowledge.controller.vo.KnowledgeMoveProgressRespVo;
@@ -133,9 +133,9 @@ public class KnowledgeOperationsController {
             outcome = knowledgeService.searchKnowledge(keyword, offset, limit, fileTypes);
         }
         return ResponseEntity.ok(new KnowledgeSearchRespVo(
-                KnowledgeOpsAssembler.toVoList(
+                KnowledgeAssembler.toVoList(
                         outcome.knowledges().stream().map(KnowledgeResponse::from).toList(),
-                        KnowledgeOpsAssembler::toVo),
+                        KnowledgeAssembler::toVo),
                 outcome.hasMore(), outcome.total()));
     }
 
@@ -357,6 +357,6 @@ public class KnowledgeOperationsController {
         if (progress == null) {
             throw new BizException(AppError.notFound("Knowledge move task not found"));
         }
-        return ResponseEntity.ok(KnowledgeOpsAssembler.toVo(progress));
+        return ResponseEntity.ok(KnowledgeAssembler.toVo(progress));
     }
 }
