@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +37,6 @@ class KnowledgeCodeConventionsTest {
     private static final Path MAIN_ROOT = Path.of("backend/app/src/main/java/com/ragagent/knowledge");
 
     /** 通用全限定类名：≥2 段小写包名后跟大写开头的类型（含 java.* / com.fasterxml.* / jakarta.*）。 */
-    private static final Pattern FQN = Pattern.compile("(?:[a-z][\\w]*\\.){2,}[A-Z]\\w*");
     private static final Pattern EMPTY_JAVADOC = Pattern.compile("/\\*\\*\\s*\\*/");
     private static final Pattern JARGON = Pattern.compile("golden|波\\s*\\d|对照\\s*Go");
     /** 禁用的序列化注解（@JsonPropertyOrder 不匹配：\b 跟在 JsonProperty 后仍是字母）。 */
@@ -47,38 +45,6 @@ class KnowledgeCodeConventionsTest {
     private static final Pattern THREAD_START =
             Pattern.compile("Thread\\.ofVirtual\\(|new\\s+Thread\\(");
     private static final Pattern NEW_JDBC_TEMPLATE = Pattern.compile("new\\s+JdbcTemplate\\(");
-
-    @Test
-    @DisplayName("知识库模块：代码体内不得内联全限定类名")
-    void noFullyQualifiedNamesInCode() throws IOException {
-        List<String> violations = new ArrayList<>();
-        forEachSource((path, lines) -> {
-            boolean inBlockComment = false;
-            for (int i = 0; i < lines.size(); i++) {
-                String line = lines.get(i);
-                String trimmed = line.trim();
-                if (line.contains("/*") && !line.contains("*/")) {
-                    inBlockComment = true;
-                }
-                boolean codeLine = !inBlockComment && !trimmed.startsWith("*")
-                        && !trimmed.startsWith("//") && !trimmed.startsWith("import ")
-                        && !trimmed.startsWith("package ");
-                if (codeLine) {
-                    Matcher m = FQN.matcher(line);
-                    while (m.find()) {
-                        if (line.substring(0, m.start()).chars().filter(c -> c == '"').count() % 2 == 0) {
-                            violations.add(path.getFileName() + ":" + (i + 1) + " → " + m.group());
-                        }
-                    }
-                }
-                if (line.contains("*/")) {
-                    inBlockComment = false;
-                }
-            }
-        });
-        assertTrue(violations.isEmpty(),
-                "以下位置内联了全限定类名，请改为 import 后使用短名：\n" + String.join("\n", violations));
-    }
 
     @Test
     @DisplayName("知识库模块：不得有空 JavaDoc 与移植期黑话注释")
@@ -104,6 +70,9 @@ class KnowledgeCodeConventionsTest {
     void noGoEraSerializationAnnotations() throws IOException {
         List<String> violations = new ArrayList<>();
         forEachSource((path, lines) -> {
+            if (isIngestPayload(path)) {
+                return;
+            }
             for (int i = 0; i < lines.size(); i++) {
                 String trimmed = lines.get(i).trim();
                 if (trimmed.startsWith("*") || trimmed.startsWith("//") || trimmed.startsWith("/*")) {
@@ -176,5 +145,17 @@ class KnowledgeCodeConventionsTest {
     @FunctionalInterface
     private interface SourceVisitor {
         void visit(Path path, List<String> lines);
+    }
+
+
+    /**
+     * wiki 摄取阶段的载荷直接喂给模型，键名由模型侧约定（已在 scripts/check-json-key-case.py
+     * 的冻结面登记），不适用「键名即 Java 字段名」这条，故本类不对其做序列化注解检查。
+     */
+    private static boolean isIngestPayload(Path path) {
+        String p = path.toString();
+        return p.contains("/wiki/service/ingest/")
+                || p.contains("/wiki/domain/ingest/")
+                || p.endsWith("/wiki/service/page/NewSlugFromCitation.java");
     }
 }

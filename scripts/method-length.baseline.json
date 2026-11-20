@@ -95,19 +95,19 @@
       "lines": 157,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
-    "backend/app/src/main/java/com/ragagent/wiki/service/ingest/WikiIngestFinalizePhase.java#runFinalize": {
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestFinalizePhase.java#runFinalize": {
       "lines": 192,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
-    "backend/app/src/main/java/com/ragagent/wiki/service/ingest/WikiIngestRunSupport.java#runIngestPhases": {
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestRunSupport.java#runIngestPhases": {
       "lines": 372,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
-    "backend/app/src/main/java/com/ragagent/wiki/service/ingest/graph/WikiGraphCalculator.java#compute": {
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/graph/WikiGraphCalculator.java#compute": {
       "lines": 153,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
-    "backend/app/src/main/java/com/ragagent/wiki/service/page/WikiLintService.java#runLint": {
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/page/WikiLintService.java#runLint": {
       "lines": 253,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     }

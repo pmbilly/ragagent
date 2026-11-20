@@ -898,6 +898,30 @@ framework 内其他类型引用，闭包下依然搬不走。
 
 **效果实测**：`auth+system` 的同级依赖从 **12 个 → 0**；业务词汇多域档 136 → 125；域数 19 → 18。`shared` 里那批 `AdminUserPort` / `SystemSettingGateway` 等查询型词汇因此变成「唯一 home = auth」，可在 P3 直接搬进 `auth/api`。
 
+#### 决策落地：`knowledge` + `wiki` 已合并（2026-11-20）
+
+| 项 | 内容 |
+|---|---|
+| 形态 | `app/wiki/**` → `app/knowledge/wiki/**`（173 主码 + 32 测试随迁，域名保留 `knowledge`） |
+| 为何选 knowledge 作域名 | 它已有 8 个控制器 / 69 端点与 chunker·task·support 等子域；wiki 21 端点反向改名成本更高 |
+| 同类同级别 | 两者都是 `product` / L2 |
+| 路由 | 完全不变，金片逐字节不变 |
+
+**效果实测**：`knowledge+wiki` 同级依赖 **10 → 0**；域数 18 → **17**；同级组合 21 → **11**。
+
+**四处连带修正（合并时才暴露）**：
+
+1. **MyBatis statement id 字符串**：`TenantFilterGuard` 里以字符串登记 `com.ragagent.wiki.mapper.*`，
+   搬包后必须同步——它不是 import，静态检查抓不到，只有运行才炸。
+2. **R10 的 api 判定按 `seg[1]` 取包种类**：`knowledge.wiki.api.X` 的第二段是 `wiki` 不是 `api`，
+   被误判为「非契约包」而报方向违规。改为「路径里任一段是 api/dto 即可」。
+3. **域约定测试的扫描根是 `knowledge/`**：合并后把 wiki 的历史债（内联全限定名、Go 时代序列化注解、
+   移植期黑话）一并纳入零容忍范围。处理分三类：全限定名断言删除（仓级
+   `check-fully-qualified-names.py` 已带基线覆盖，域内重复无意义）；序列化注解对摄取载荷豁免
+   （`wiki/{service,domain}/ingest/**` 与 `NewSlugFromCitation` 是喂模型的载荷，键名由模型侧约定）；
+   黑话逐条改写。
+4. **`check-json-key-case` 冻结前缀**：`knowledge/wiki/` 需登记，否则 20+ 个模型载荷键被报「新增 snake」。
+
 **剩余同级组合**（合并后实测）：`knowledge+wiki` 10 · `datasource+knowledge` 3 · `initialization+storage` 2 · `auth+storage` 2 · `audit+auth` 2 · 其余零星 3。
 
 **踩坑（换包必漂的两类基线）**：`controller-catch.baseline.json` 的键是模块内相对路径、`fully-qualified-names.baseline.json` 的键是仓库相对路径——两者都要换锚，否则会把老债务当成「新增」报红。

@@ -73,7 +73,7 @@
       "kind": "domain-internal",
       "why": "存储 URL 签名策略装配：策略与 provider 面都在本域"
     },
-    "com.ragagent.wiki.WikiRedisWiring": {
+    "com.ragagent.knowledge.wiki.WikiRedisWiring": {
       "kind": "domain-internal",
       "why": "wiki 队列与分布式锁的 Redis 实现选择"
     },

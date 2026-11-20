@@ -70,7 +70,7 @@
     },
     "knowledge": {
       "kind": "product",
-      "frontend": "views/knowledge",
+      "frontend": "views/knowledge · views/knowledge/wiki",
       "level": 2
     },
     "mcp": {
@@ -107,11 +107,6 @@
       "kind": "integration",
       "frontend": "views/settings/WebSearchSettings.vue",
       "level": 1
-    },
-    "wiki": {
-      "kind": "product",
-      "frontend": "views/knowledge/wiki",
-      "level": 2
     }
   }
 }

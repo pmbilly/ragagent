@@ -94,7 +94,7 @@ flowchart LR
 4. {@link com.ragagent.embedding.EmbeddingVectors} — 向量化响应校验（客户端由 ModelRuntime 按模型 id 装配）
 5. {@link com.ragagent.knowledge.task.ChunkExtractTaskQueue} /
    {@link com.ragagent.knowledge.task.QuestionGenerationTaskQueue} — 异步子任务
-6. {@link com.ragagent.wiki.service.ingest.WikiIngestService} — wiki 交接
+6. {@link com.ragagent.knowledge.wiki.service.ingest.WikiIngestService} — wiki 交接
 
 ## 已知边界
 

@@ -68,6 +68,10 @@ FROZEN_PREFIXES = (
     #   · GitLab：响应字段（ref/per_page/page 等查询参数与响应结构）
     #   · Ima：响应类型 + 请求体字段（req.put("knowledge_base_id"…) 等，见 ImaClient）
     #   · 语雀：响应类型
+    # 2026-11-20：wiki 域并入 knowledge（app/wiki -> app/knowledge/wiki），
+    # 其 ingest 阶段的 LLM 提示词载荷键名（cited_slugs/body_preview 等）随之换路径，
+    # 语义未变——仍是喂给模型的结构化载荷，不属自有 JSON 面。
+    'knowledge/wiki/',
     'datasource/connector/feishu/core/DocxBlocks',
     'datasource/connector/feishu/core/FeishuApiTypes',
     'datasource/connector/feishu/core/FeishuClient',

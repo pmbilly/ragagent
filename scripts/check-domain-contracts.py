@@ -65,7 +65,7 @@ DOMAINS = [
     'agentmanagement', 'agenttools', 'audit', 'auth', 'datasource',
     'embedchannel', 'favorite', 'im', 'initialization', 'knowledge', 'mcp',
     'memory', 'model', 'session', 'storage', 'vectorstore',
-    'websearch', 'wiki',
+    'websearch',
 ]
 
 # 跨域实体层 import（落在 `.domain.` 包）：持久化形状不得跨域，不吃族内豁免（E1）
@@ -131,8 +131,16 @@ def scan():
                     b = imp.split('.')[0]
                     if b in DOMAINS and b != a:
                         edges[(a, b)].add(f[:-5])
-                        seg = imp.split('.')
-                        _EDGE_PKGS[f'{a}→{b}'].add(seg[1] if len(seg) > 1 else '')
+                        # 目标包种类：域后可能有多级子包（knowledge.wiki.api），
+                        # 只要路径里出现 api/dto 就算契约包，否则记一级子包名供报错。
+                        seg = imp.split('.')[1:]
+                        if 'api' in seg:
+                            kind = 'api'
+                        elif 'dto' in seg:
+                            kind = 'dto'
+                        else:
+                            kind = seg[0] if seg else ''
+                        _EDGE_PKGS[f'{a}→{b}'].add(kind)
     return {f'{a}→{b}': sorted(v) for (a, b), v in edges.items()}
 
 

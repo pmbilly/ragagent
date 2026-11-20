@@ -25,7 +25,7 @@
     "com/ragagent/contract/knowledge/ChunkPageView.java": "分页壳，H6 统一 PageView 后回域",
     "com/ragagent/contract/knowledge/FaqEntryPageView.java": "分页壳，H6 统一 PageView 后回域",
     "com/ragagent/contract/knowledge/KnowledgePageView.java": "分页壳，H6 统一 PageView 后回域",
-    "com/ragagent/wiki/api/WikiPageView.java": "wiki 页面视图，应回 wiki 域；H6"
+    "com/ragagent/knowledge/wiki/api/WikiPageView.java": "wiki 页面视图，应回 wiki 域；H6"
   },
   "fields": {
     "com/ragagent/contract/knowledge/ChunkRowView.java": {
@@ -56,7 +56,7 @@
       "fields": 63,
       "reason": "多厂商存储配置平铺；H6 按厂商拆"
     },
-    "com/ragagent/wiki/api/WikiPageView.java": {
+    "com/ragagent/knowledge/wiki/api/WikiPageView.java": {
       "fields": 27,
       "reason": "wiki 页面视图；H6 回域"
     }

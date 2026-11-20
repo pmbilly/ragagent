@@ -9,7 +9,7 @@
 
 | 种类 | 域数 | 文件 | 控制器 | 说明 |
 |---|---:|---:|---:|---|
-| **产品能力** | 7 | 898 | 21 | 直接产生用户价值、按产品需求演进的业务能力。 |
+| **产品能力** | 6 | 898 | 21 | 直接产生用户价值、按产品需求演进的业务能力。 |
 | **集成适配** | 6 | 564 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
 | **控制面** | 2 | 160 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
 | **能力配置** | 2 | 58 | 5 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
@@ -19,9 +19,8 @@
 
 | 域 | 种类 | 文件 | 控制器 | 对外契约面 | 前端页面 |
 |---|---|---:|---:|---:|---|
-| `knowledge` | 产品能力 | 316 | 8 | — | `views/knowledge` |
+| `knowledge` | 产品能力 | 489 | 9 | — | `views/knowledge · views/knowledge/wiki` |
 | `session` | 产品能力 | 212 | 8 | — | `views/chat` |
-| `wiki` | 产品能力 | 173 | 1 | — | `views/knowledge/wiki` |
 | `memory` | 产品能力 | 96 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
 | `agenttools` | 产品能力 | 61 | — | — | `views/chat（工具结果渲染）` |
 | `agentmanagement` | 产品能力 | 27 | 2 | — | `views/agent` |
@@ -44,9 +43,8 @@
 
 | 域 | HTTP 入口 | 对外契约面 |
 |---|---|---|
-| `knowledge` | `ChunkController`、`ChunkerPreviewController`、`FaqController`、`KnowledgeBaseController`、`KnowledgeBaseFileProxyController`、`KnowledgeController`、`KnowledgeOperationsController`、`KnowledgeTagController` | — |
+| `knowledge` | `ChunkController`、`ChunkerPreviewController`、`FaqController`、`KnowledgeBaseController`、`KnowledgeBaseFileProxyController`、`KnowledgeController`、`KnowledgeOperationsController`、`KnowledgeTagController`、`WikiPageController` | — |
 | `session` | `KnowledgeQaController`、`MessageController`、`MessageFileProxyController`、`MessageSuggestionController`、`SessionController`、`SessionStreamController`、`SteerController`、`TemporaryDocumentController` | — |
-| `wiki` | `WikiPageController` | — |
 | `memory` | `MemoryController` | — |
 | `agenttools` | —（无 HTTP 面） | — |
 | `agentmanagement` | `AgentController`、`SkillController` | — |

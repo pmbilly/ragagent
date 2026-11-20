@@ -163,6 +163,27 @@
 | `:backend` | `com.ragagent.knowledge.support` | 知识库任务面领域类型：任务提交端口、进度存储、导入任务存储与任务 id/事件。 |
 | `:backend` | `com.ragagent.knowledge.support.access` | 知识 · 路由守卫支撑：批量访问检查与任务 id 解析（非 service 层）。 |
 | `:backend` | `com.ragagent.knowledge.task` | 知识库异步任务：队列、进度与执行。 |
+| `:backend` | `com.ragagent.knowledge.wiki` | wiki 域：知识库内联百科（页面/修订/文件夹树/链接图/摄取管线）。 |
+| `:backend` | `com.ragagent.knowledge.wiki.adapter` | Wiki · 端口实现：WikiPageOpsAdapter。 |
+| `:backend` | `com.ragagent.knowledge.wiki.api` | Wiki 域对外契约。 |
+| `:backend` | `com.ragagent.knowledge.wiki.controller` | wiki 的 @RestController:页面 CRUD/修订/文件夹/索引/图谱/统计/问题端点(raw-JSON 对齐形态,契约换锚时整体重写为 DTO)。 |
+| `:backend` | `com.ragagent.knowledge.wiki.domain` | wiki 域留存面（拆簇后）：WikiConfig / WikiConstants / WikiException / WikiExtractionGranularity / WikiSourceRe |
+| `:backend` | `com.ragagent.knowledge.wiki.domain.folder` | wiki 文件夹面（拆自 wiki.domain，对齐方案）：WikiFolder 与其创建/更新/列表请求-响应、冲突与"非空""不存在"异常。 |
+| `:backend` | `com.ragagent.knowledge.wiki.domain.graph` | wiki 链接图面（拆自 wiki.domain）：WikiGraph（页面入链/出链视图）。 |
+| `:backend` | `com.ragagent.knowledge.wiki.domain.index` | wiki 索引面（拆自 wiki.domain）：WikiIndex / WikiIndexEntry（目录树条目）与 WikiCategoryPaths（分类路径规范化）。 |
+| `:backend` | `com.ragagent.knowledge.wiki.domain.ingest` | ingest 领域形状与跨层端口：任务载荷（WikiIngestTask / WikiIngestPayload）、 finalize 变更行、超时常量，以及队列侧需要的槽位收尾端口。 |
+| `:backend` | `com.ragagent.knowledge.wiki.domain.issue` | wiki 巡检问题面（拆自 wiki.domain）：WikiLintIssue / WikiLintReport（lint 单条问题与汇总报告）。 |
+| `:backend` | `com.ragagent.knowledge.wiki.domain.page` | wiki 页面面（拆自 wiki.domain）：WikiPage 与页面修订、列表/移动/回滚/裁剪请求-响应、冲突与"不存在"异常，以及页面统计 WikiStats。 |
+| `:backend` | `com.ragagent.knowledge.wiki.mapper` | wiki 的 MyBatis-Plus 接口（@MapperScan 扫描范围内）。 |
+| `:backend` | `com.ragagent.knowledge.wiki.prompt` | wiki 的提示词模板目录与渲染支撑。 |
+| `:backend` | `com.ragagent.knowledge.wiki.repository` | 仓储门面层：把 mapper 的原子操作组合成页面/文件夹级的读写契约，并集中承载软删、 版本冲突与 PG 方言分支。 |
+| `:backend` | `com.ragagent.knowledge.wiki.repository.ingest` | wiki 摄取的存储与并发协调：任务队列、finalize 锁、身份认领、在途限流、删除墓碑。 |
+| `:backend` | `com.ragagent.knowledge.wiki.repository.page` | wiki 页面仓储面：slug 锁的进程内/Redis 实现。 |
+| `:backend` | `com.ragagent.knowledge.wiki.service` | wiki 用例层根包：**跨切面端口与 LLM/提示词适配**——分块清洗（ com.ragagent.knowledge.wiki.service.WikiChunkCleaner + 缺省实现）、 |
+| `:backend` | `com.ragagent.knowledge.wiki.service.ingest` | wiki 摄取管线：批量/单篇入库的门面与协作者 （com.ragagent.knowledge.wiki.service.ingest.WikiIngestService、 com.ragagent |
+| `:backend` | `com.ragagent.knowledge.wiki.service.ingest.graph` | wiki 摄取·链接图面（拆自 wiki.service.ingest，对齐方案 的 service.ingest.graph/）： WikiGraphCalculator——从页面/引用计算链接图（入链、出链、孤儿）。 |
+| `:backend` | `com.ragagent.knowledge.wiki.service.ingest.support` | wiki 摄取 · 支撑：批上下文、去重工具与预览等无状态叶子类型 （WikiBatchContext、WikiCleanupScope、WikiIngestPreviews 等）。 |
+| `:backend` | `com.ragagent.knowledge.wiki.service.page` | wiki **页面**面：页面服务（接口门面 + 实现）、文件夹/视图支撑、链接与 lint （com.ragagent.knowledge.wiki.service.page.WikiLinkify |
 | `:backend` | `com.ragagent.llm` | LLM 客户端（库式域，无 HTTP 面）：provider 适配（provider/）、对话流转与流式（chat/， 含 com.ragagent.modelruntime.adapter.prov |
 | `:backend` | `com.ragagent.llm.api` | 模型运行时的对外契约：Ollama 本地模型管理端口与进度载荷。 |
 | `:backend` | `com.ragagent.llm.domain` | LLM · 领域模型：ProviderMetadataMaps。 |
@@ -351,24 +372,3 @@
 | `:backend` | `com.ragagent.websearch.repository` | 联网搜索仓储门面：提供方配置的查询与写入。 |
 | `:backend` | `com.ragagent.websearch.runtime` | 联网搜索运行面：临时知识库的 Redis 状态。 |
 | `:backend` | `com.ragagent.websearch.service` | 网页搜索 · 服务：WebSearchTempKbStateService / WebSearchProviderService / WebSearchService。 |
-| `:backend` | `com.ragagent.wiki` | wiki 域：知识库内联百科（页面/修订/文件夹树/链接图/摄取管线）。 |
-| `:backend` | `com.ragagent.wiki.adapter` | Wiki · 端口实现：WikiPageOpsAdapter。 |
-| `:backend` | `com.ragagent.wiki.api` | Wiki 域对外契约。 |
-| `:backend` | `com.ragagent.wiki.controller` | wiki 的 @RestController:页面 CRUD/修订/文件夹/索引/图谱/统计/问题端点(raw-JSON 对齐形态,契约换锚时整体重写为 DTO)。 |
-| `:backend` | `com.ragagent.wiki.domain` | wiki 域留存面（拆簇后）：WikiConfig / WikiConstants / WikiException / WikiExtractionGranularity / WikiSourceRe |
-| `:backend` | `com.ragagent.wiki.domain.folder` | wiki 文件夹面（拆自 wiki.domain，对齐方案）：WikiFolder 与其创建/更新/列表请求-响应、冲突与"非空""不存在"异常。 |
-| `:backend` | `com.ragagent.wiki.domain.graph` | wiki 链接图面（拆自 wiki.domain）：WikiGraph（页面入链/出链视图）。 |
-| `:backend` | `com.ragagent.wiki.domain.index` | wiki 索引面（拆自 wiki.domain）：WikiIndex / WikiIndexEntry（目录树条目）与 WikiCategoryPaths（分类路径规范化）。 |
-| `:backend` | `com.ragagent.wiki.domain.ingest` | ingest 领域形状与跨层端口：任务载荷（WikiIngestTask / WikiIngestPayload）、 finalize 变更行、超时常量，以及队列侧需要的槽位收尾端口。 |
-| `:backend` | `com.ragagent.wiki.domain.issue` | wiki 巡检问题面（拆自 wiki.domain）：WikiLintIssue / WikiLintReport（lint 单条问题与汇总报告）。 |
-| `:backend` | `com.ragagent.wiki.domain.page` | wiki 页面面（拆自 wiki.domain）：WikiPage 与页面修订、列表/移动/回滚/裁剪请求-响应、冲突与"不存在"异常，以及页面统计 WikiStats。 |
-| `:backend` | `com.ragagent.wiki.mapper` | wiki 的 MyBatis-Plus 接口（@MapperScan 扫描范围内）。 |
-| `:backend` | `com.ragagent.wiki.prompt` | wiki 的提示词模板目录与渲染支撑。 |
-| `:backend` | `com.ragagent.wiki.repository` | 仓储门面层：把 mapper 的原子操作组合成页面/文件夹级的读写契约，并集中承载软删、 版本冲突与 PG 方言分支。 |
-| `:backend` | `com.ragagent.wiki.repository.ingest` | wiki 摄取的存储与并发协调：任务队列、finalize 锁、身份认领、在途限流、删除墓碑。 |
-| `:backend` | `com.ragagent.wiki.repository.page` | wiki 页面仓储面：slug 锁的进程内/Redis 实现。 |
-| `:backend` | `com.ragagent.wiki.service` | wiki 用例层根包：**跨切面端口与 LLM/提示词适配**——分块清洗（ com.ragagent.wiki.service.WikiChunkCleaner + 缺省实现）、图片富化、知识收尾、 |
-| `:backend` | `com.ragagent.wiki.service.ingest` | wiki 摄取管线：批量/单篇入库的门面与协作者 （com.ragagent.wiki.service.ingest.WikiIngestService、 com.ragagent.wiki.serv |
-| `:backend` | `com.ragagent.wiki.service.ingest.graph` | wiki 摄取·链接图面（拆自 wiki.service.ingest，对齐方案 的 service.ingest.graph/）： WikiGraphCalculator——从页面/引用计算链接图（入链、出链、孤儿）。 |
-| `:backend` | `com.ragagent.wiki.service.ingest.support` | wiki 摄取 · 支撑：批上下文、去重工具与预览等无状态叶子类型 （WikiBatchContext、WikiCleanupScope、WikiIngestPreviews 等）。 |
-| `:backend` | `com.ragagent.wiki.service.page` | wiki **页面**面：页面服务（接口门面 + 实现）、文件夹/视图支撑、链接与 lint （com.ragagent.wiki.service.page.WikiLinkify、WikiCross |
