@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge;
+package com.ragagent.retrieval.api;
 
 /**
  * 知识库的「检索侧事实」——检索引擎编排一次 KB 检索时真正读取的字段

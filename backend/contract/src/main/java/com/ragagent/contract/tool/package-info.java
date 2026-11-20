@@ -2,7 +2,7 @@
  * 工具契约面：工具 SPI 与执行结果载荷。
  *
  * <p>当前成员：{@link com.ragagent.contract.tool.AgentTool} / {@link com.ragagent.contract.tool.BaseTool}
- * （纯 JDK 基类，schema 为 {@code Object}）、{@link com.ragagent.contract.tool.ToolDefinitions}、
+ * （纯 JDK 基类，schema 为 {@code Object}）、{@code ToolDefinitions}（已归位到模型运行时的 api 包）、
  * {@link com.ragagent.contract.tool.ToolRequest}、{@link com.ragagent.contract.tool.ToolExecContext}、
  * {@link com.ragagent.contract.tool.ToolResult}、{@link com.ragagent.contract.tool.ToolCancellation}、
  * {@link com.ragagent.contract.tool.ToolOutput}。</p>

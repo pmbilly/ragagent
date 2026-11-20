@@ -1,6 +1,5 @@
 package com.ragagent.llm.api;
 
-import com.ragagent.contract.graph.EntityExtractionResult;
 import com.ragagent.contract.model.LlmChatClient;
 
 /**

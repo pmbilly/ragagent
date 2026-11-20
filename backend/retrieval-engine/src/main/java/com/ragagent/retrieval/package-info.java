@@ -9,7 +9,7 @@
  *
  * <p>消费方：{@code session}（7 处）、{@code knowledge}（2 处），一律经
  * {@link com.ragagent.retrieval.api.HybridSearchPort} 注入；本域**不 import 任何业务域**，
- * 回查 chunk 走 {@link com.ragagent.contract.knowledge.ChunkSearchGateway}（实现是
+ * 回查 chunk 走 {@link com.ragagent.retrieval.api.ChunkSearchGateway}（实现是
  * {@code knowledge.repository.ChunkRepository}）。</p>
  */
 package com.ragagent.retrieval;

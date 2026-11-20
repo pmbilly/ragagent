@@ -29,7 +29,7 @@ import com.ragagent.contract.model.FunctionDef;
 import com.ragagent.contract.model.LlmChatClient;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.model.ToolCall;
-import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.llm.api.ToolDefinitions;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;

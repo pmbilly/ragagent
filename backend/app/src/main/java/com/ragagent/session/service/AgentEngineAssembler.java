@@ -23,7 +23,7 @@ import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.contract.tool.AgentTool;
-import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.llm.api.ToolDefinitions;
 import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.session.support.SessionOwnerIds;

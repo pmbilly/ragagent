@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge;
+package com.ragagent.retrieval.api;
 
 /**
  * 知识库「检索侧事实」的**只读端口**（检索引擎编排取 KB 检索配置的最小接口）。

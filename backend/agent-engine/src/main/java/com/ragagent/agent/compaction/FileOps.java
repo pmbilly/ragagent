@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.model.ToolCall;
-import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.llm.api.ToolDefinitions;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;

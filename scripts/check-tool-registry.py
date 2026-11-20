@@ -36,7 +36,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DEFINITIONS = ROOT / "backend/contract/src/main/java/com/ragagent/contract/tool/ToolDefinitions.java"
+DEFINITIONS = ROOT / "backend/model-runtime/src/main/java/com/ragagent/llm/api/ToolDefinitions.java"
 AGENTTOOLS = ROOT / "backend/app/src/main/java/com/ragagent/agenttools"
 DISPATCH = ROOT / "backend/app/src/main/java/com/ragagent/session/service/AgentToolBackends.java"
 

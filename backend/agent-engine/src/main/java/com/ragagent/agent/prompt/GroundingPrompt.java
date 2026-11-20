@@ -1,6 +1,6 @@
 package com.ragagent.agent.prompt;
 
-import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.llm.api.ToolDefinitions;
 import java.util.ArrayList;
 import java.util.List;
 

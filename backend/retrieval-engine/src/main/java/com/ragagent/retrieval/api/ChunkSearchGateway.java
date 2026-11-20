@@ -1,6 +1,7 @@
-package com.ragagent.contract.knowledge;
+package com.ragagent.retrieval.api;
 
 
+import com.ragagent.contract.knowledge.ChunkFacts;
 import java.util.List;
 
 /**

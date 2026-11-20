@@ -19,14 +19,14 @@
 
 | 域 | 种类 | 文件 | 控制器 | 对外契约面 | 前端页面 |
 |---|---|---:|---:|---:|---|
-| `knowledge` | 产品能力 | 289 | 8 | 14 | `views/knowledge` |
+| `knowledge` | 产品能力 | 289 | 8 | 11 | `views/knowledge` |
 | `session` | 产品能力 | 212 | 8 | 2 | `views/chat` |
 | `wiki` | 产品能力 | 173 | 1 | 1 | `views/knowledge/wiki` |
 | `memory` | 产品能力 | 96 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
 | `agenttools` | 产品能力 | 61 | — | — | `views/chat（工具结果渲染）` |
 | `agentmanagement` | 产品能力 | 27 | 2 | — | `views/agent` |
 | `favorite` | 产品能力 | 13 | 1 | — | `views/agent · views/knowledge（列表置顶/收藏）` |
-| `mcp` | 集成适配 | 171 | 4 | 2 | `views/settings/McpSettings.vue` |
+| `mcp` | 集成适配 | 171 | 4 | — | `views/settings/McpSettings.vue` |
 | `datasource` | 集成适配 | 147 | 2 | — | `views/knowledge/settings/DataSourceSettings.vue` |
 | `im` | 集成适配 | 107 | 2 | — | `views/integrations/IntegrationSettingsSection.vue` |
 | `storage` | 集成适配 | 62 | 3 | 6 | `views/settings/StorageBackendSettings.vue` |
@@ -35,7 +35,7 @@
 | `auth` | 控制面 | 122 | 6 | 4 | `views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue` |
 | `audit` | 控制面 | 20 | 1 | 1 | `views/settings/panels/SystemAuditLog.vue` |
 | `system` | 控制面 | 18 | 2 | 1 | `views/settings/panels` |
-| `model` | 能力配置 | 38 | 4 | 1 | `views/settings/ModelSettings.vue` |
+| `model` | 能力配置 | 38 | 4 | — | `views/settings/ModelSettings.vue` |
 | `vectorstore` | 能力配置 | 20 | 1 | — | `views/settings/VectorStoreSettings.vue` |
 | `initialization` | 初始化向导 | 11 | 1 | — | `views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue` |
 
@@ -45,14 +45,14 @@
 
 | 域 | HTTP 入口 | 对外契约面 |
 |---|---|---|
-| `knowledge` | `ChunkController`、`ChunkerPreviewController`、`FaqController`、`KnowledgeBaseController`、`KnowledgeBaseFileProxyController`、`KnowledgeController`、`KnowledgeOperationsController`、`KnowledgeTagController` | `ChunkPort`、`ChunkSearchGateway`、`DocReaderAdminPort`、`DocReaderParsePort`、`EmbeddingModelPort`、`KnowledgeBaseCatalogPort`、`KnowledgeBaseGateway`、`KnowledgeBaseSearchGateway`、`KnowledgeCatalogPort`、`KnowledgeDocumentGateway`、`KnowledgeFinalizePort`、`KnowledgeMaintenancePort`、`KnowledgeSpanPort`、`ParserEngineCatalogPort` |
+| `knowledge` | `ChunkController`、`ChunkerPreviewController`、`FaqController`、`KnowledgeBaseController`、`KnowledgeBaseFileProxyController`、`KnowledgeController`、`KnowledgeOperationsController`、`KnowledgeTagController` | `ChunkPort`、`DocReaderAdminPort`、`DocReaderParsePort`、`EmbeddingModelPort`、`KnowledgeBaseCatalogPort`、`KnowledgeBaseGateway`、`KnowledgeCatalogPort`、`KnowledgeFinalizePort`、`KnowledgeMaintenancePort`、`KnowledgeSpanPort`、`ParserEngineCatalogPort` |
 | `session` | `KnowledgeQaController`、`MessageController`、`MessageFileProxyController`、`MessageSuggestionController`、`SessionController`、`SessionStreamController`、`SteerController`、`TemporaryDocumentController` | `EmbedSessionPort`、`SessionQaPort` |
 | `wiki` | `WikiPageController` | `WikiIngestPort` |
 | `memory` | `MemoryController` | — |
 | `agenttools` | —（无 HTTP 面） | — |
 | `agentmanagement` | `AgentController`、`SkillController` | — |
 | `favorite` | `UserFavoriteController` | — |
-| `mcp` | `AgentToolApprovalController`、`McpCredentialsController`、`McpOAuthController`、`McpServiceController` | `McpToolRegistrationPort`、`McpToolingGateway` |
+| `mcp` | `AgentToolApprovalController`、`McpCredentialsController`、`McpOAuthController`、`McpServiceController` | — |
 | `datasource` | `DataSourceController`、`DataSourceCredentialsController` | — |
 | `im` | `ImCallbackController`、`ImChannelController` | — |
 | `storage` | `FileProxyController`、`StorageBackendController`、`StorageEngineController` | `FileUrlPort`、`GlobalFileServicePort`、`ProviderFileStorePort`、`ResourceCatalogPort`、`StorageBackendPort`、`StorageConnectivityPort` |
@@ -61,7 +61,7 @@
 | `auth` | `AuthController`、`TenantAPIKeyController`、`TenantAPIPrincipalController`、`TenantCatalogController`、`TenantInvitationController`、`TenantMemberController` | `AdminUserCommandPort`、`AdminUserPort`、`TenantStorageQuotaPort`、`UserLookupPort` |
 | `audit` | `AuditLogController` | `AuditWritePort` |
 | `system` | `SystemAdminController`、`SystemController` | `SystemSettingGateway` |
-| `model` | `ModelController`、`ModelCredentialsController`、`ModelDebugController`、`ModelOllamaController` | `ModelFactsPort` |
+| `model` | `ModelController`、`ModelCredentialsController`、`ModelDebugController`、`ModelOllamaController` | — |
 | `vectorstore` | `VectorStoreController` | — |
 | `initialization` | `InitializationController` | — |
 

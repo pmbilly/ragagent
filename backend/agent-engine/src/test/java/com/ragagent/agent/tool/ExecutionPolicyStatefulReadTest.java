@@ -2,7 +2,7 @@ package com.ragagent.agent.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.llm.api.ToolDefinitions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

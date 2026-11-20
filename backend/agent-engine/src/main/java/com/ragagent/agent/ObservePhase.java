@@ -19,7 +19,7 @@ import com.ragagent.contract.model.ChatResponse;
 import com.ragagent.contract.model.FunctionCall;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.model.ToolCall;
-import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.llm.api.ToolDefinitions;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.web.JsonMappers;

@@ -1,10 +1,10 @@
 package com.ragagent.mcp.tool;
 
 import com.ragagent.contract.tool.AgentTool;
-import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolExecContext;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.llm.api.ToolDefinitions;
 import com.ragagent.mcp.approval.ApprovalCancellations;
 import com.ragagent.mcp.approval.Decision;
 import com.ragagent.mcp.approval.PendingRequest;

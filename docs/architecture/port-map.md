@@ -7,7 +7,7 @@
 
 - 域间（解耦）：**24**
 - 复合面（随复合端口）：**7**
-- 跨模块（必要）：**6**
+- 跨模块（必要）：**3**
 
 ## 明细
 
@@ -36,8 +36,6 @@
 | `KnowledgeIngestLookupPort` | — | ? | — | 复合面（随复合端口） |
 | `KnowledgeMaintenancePort` | `KnowledgeMaintenanceAdapter` | backend/app | websearch | 域间（解耦） |
 | `KnowledgeSpanPort` | `KnowledgeSpanAdapter` | backend/app | wiki | 域间（解耦） |
-| `McpToolRegistrationPort` | `McpToolRegistrationAdapter` | backend/app | backend/agent-engine | 跨模块（必要） |
-| `ModelFactsPort` | `ModelService` | backend/app | backend/retrieval-engine | 跨模块（必要） |
 | `ParserEngineCatalogPort` | `ParserEngineCatalog` | backend/app | system | 域间（解耦） |
 | `ProviderFileStorePort` | `ProviderFileStoreAdapter` | backend/app | knowledge | 域间（解耦） |
 | `ResourceCatalogPort` | `ResourceCatalogAdapter` | backend/app | knowledge、session | 域间（解耦） |
@@ -45,7 +43,6 @@
 | `StorageBackendPort` | `StorageBackendPortAdapter` | backend/app | initialization、knowledge、storage | 域间（解耦） |
 | `StorageConnectivityPort` | `StorageConnectivityService` | backend/app | storage、system | 域间（解耦） |
 | `TenantStorageQuotaPort` | `TenantStorageQuotaAdapter` | backend/app | knowledge、system | 域间（解耦） |
-| `ToolRegistryPort` | `ToolRegistryPortImpl` | backend/agent-engine | backend/agent-engine、mcp | 跨模块（必要） |
 | `UserLookupPort` | `UserLookupAdapter` | backend/app | agentmanagement | 域间（解耦） |
 | `WebSearchProviderPort` | `WebSearchSupportAdapter` | backend/app | session | 域间（解耦） |
 | `WebSearchTempStatePort` | `WebSearchSupportAdapter` | backend/app | session | 域间（解耦） |

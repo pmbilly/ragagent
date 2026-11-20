@@ -8,11 +8,11 @@
 
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
-| `:contract` | `contract` | 32 | 266 | 0 |
+| `:contract` | `contract` | 32 | 256 | 0 |
 | `:platform` | `platform` | 26 | 200 | 1 |
-| `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 22 | 178 | 0 |
-| `:retrieval-engine` | `retrieval` | 16 | 119 | 0 |
-| `:agent-engine` | `agent`、`agentengine` | 10 | 94 | 0 |
+| `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 22 | 180 | 0 |
+| `:retrieval-engine` | `retrieval` | 16 | 124 | 0 |
+| `:agent-engine` | `agent`、`agentengine` | 10 | 97 | 0 |
 | `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 259 | 1683 | 51 |
 
 ## 20 个业务域（domains）

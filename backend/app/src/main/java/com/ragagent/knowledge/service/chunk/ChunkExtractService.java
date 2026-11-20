@@ -2,7 +2,6 @@ package com.ragagent.knowledge.service.chunk;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.graph.EntityExtractionResult;
 import com.ragagent.contract.graph.GraphData;
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.graph.GraphRelation;
@@ -24,6 +23,7 @@ import com.ragagent.knowledge.runtime.KnowledgeTrace;
 import com.ragagent.knowledge.support.ProcessOverridesResolver;
 import com.ragagent.knowledge.support.SubtaskDrain;
 import com.ragagent.llm.api.EntityExtractionPort;
+import com.ragagent.llm.api.EntityExtractionResult;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.platform.access.TenantScopes;
 import com.ragagent.platform.prompt.ExtractPrompts;

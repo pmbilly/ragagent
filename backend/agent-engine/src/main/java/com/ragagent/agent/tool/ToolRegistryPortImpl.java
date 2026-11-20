@@ -1,7 +1,7 @@
 package com.ragagent.agent.tool;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.pipeline.ToolRegistryPort;
+import com.ragagent.agentengine.api.ToolRegistryPort;
 import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolExecContext;

@@ -1,8 +1,8 @@
 package com.ragagent.mcp.adapter;
 
-import com.ragagent.contract.pipeline.McpToolRegistrationPort;
-import com.ragagent.contract.pipeline.McpToolingGateway;
-import com.ragagent.contract.pipeline.ToolRegistryPort;
+import com.ragagent.agentengine.api.McpToolRegistrationPort;
+import com.ragagent.agentengine.api.McpToolingGateway;
+import com.ragagent.agentengine.api.ToolRegistryPort;
 import com.ragagent.mcp.approval.ToolApprovalGate;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.protocol.McpClientManager;

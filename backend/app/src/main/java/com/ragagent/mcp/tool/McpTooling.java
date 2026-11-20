@@ -2,13 +2,13 @@ package com.ragagent.mcp.tool;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.agentengine.api.McpToolingGateway;
+import com.ragagent.agentengine.api.ToolRegistryPort;
 import com.ragagent.contract.agent.ToolCallTarget;
 import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.model.ToolCall;
-import com.ragagent.contract.pipeline.McpToolingGateway;
-import com.ragagent.contract.pipeline.ToolRegistryPort;
 import com.ragagent.contract.tool.AgentTool;
-import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.llm.api.ToolDefinitions;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;

@@ -12,7 +12,7 @@ import com.ragagent.agenttools.wiki.WikiIndexOverview;
 import com.ragagent.agenttools.wiki.WikiPages;
 import com.ragagent.agenttools.wiki.WikiRouteResolver;
 import com.ragagent.agenttools.wiki.WikiScope;
-import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.llm.api.ToolDefinitions;
 import com.ragagent.wiki.api.WikiPageNotFoundException;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.service.page.WikiPageService;

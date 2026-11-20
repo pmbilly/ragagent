@@ -1,5 +1,5 @@
 package com.ragagent.agent.tool;
-import com.ragagent.contract.tool.ToolDefinitions;
+import com.ragagent.llm.api.ToolDefinitions;
 
 /**
  * 并发执行白名单。
