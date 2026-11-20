@@ -35,6 +35,7 @@ run '方法长度棘轮（M1：>150 行只许减，新增即红）' python3 scri
 run '卫生预算计数（>100 行方法 / trim 副本 / ≥8 参构造器 只许减）' python3 scripts/check-hygiene-budget.py
 run '目录卫生（B124：游离目录 / 死包目录）' python3 scripts/check-stray-dirs.py
 run '死成员守卫（B131）'             python3 scripts/check-dead-members.py
+run '内联全限定名棘轮（只许减：import 后用短名）' python3 scripts/check-fully-qualified-names.py
 run '统一响应外壳（B183：新控制器默认必须合规，清单只许减不许增）' python3 scripts/check-api-envelope.py
 run '异常语义（B217：检索引擎层不得在 catch 里清空条件——边界失败即抛）' python3 scripts/check-exception-semantics.py
 run '契约同步（B221：金片键签名变了必须签字，防"后端改契约前端不知情"）' python3 scripts/check-contract-sync.py
