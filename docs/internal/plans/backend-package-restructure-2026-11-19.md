@@ -473,6 +473,21 @@ ragagent/
 
 合计 **10~14 天**。B1 是闸门：它不改任何业务代码，但决定后面能否搬。
 
+### 7.5 搬迁陷阱二：目标模块内部有环时不可迁入契约（2026-11-20 实测）
+
+试搬 `contract.model` 的 4 个 Ollama 类型（`OllamaAdminPort` / `OllamaModelInfo` / `OllamaPullProgress` / `OllamaProgressListener`）到 `model-runtime`，两次放置都新增包级环：
+
+| 放置位置 | 结果 |
+|---|---|
+| `com.ragagent.modelruntime.api` | 新增环 `llm ⇄ modelruntime`（守卫把 `modelruntime.*` 折叠成一个包） |
+| `com.ragagent.model.api` | 新增环 `llm ⇄ model` |
+
+**根因在目标模块自身**：`model-runtime` 的 `llm`（实现）与 `modelruntime`（装配）本来就互引；契约放进该模块的任何新包，都会因为「实现包 import 它」而并入那个既有的 SCC。
+
+**判据**：搬契约到某模块前，先跑 `python3 scripts/check-package-cycles.py` 看该模块内部是否已有环；有环则先解内部的环。`retrieval-engine` 能成功（P4-4/P4-5）正是因为它内部无环。
+
+本批已回滚；R2c-3d 余项（Ollama 端口 / `PromptCacheStatus`）延后到 model-runtime 内部解耦之后——其中 `PromptCacheStatus` 另有一层阻塞：它被 platform 的 `ContractJsonModule` 显式注册，需与 mixin 一起搬。
+
 ### 10.5 守卫改造清单（终态会推翻 6 条规则前提）
 
 终态不是"改路径"，有几条守卫的**语义**与它冲突，必须提前改，否则搬到最后一定红。
