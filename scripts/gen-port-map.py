@@ -48,13 +48,13 @@ def domain_of(path: pathlib.Path) -> str:
     if "app" not in parts:
         return module_of(path)
     i = parts.index("app")
-    # app/src/main/java/com/ragagent/<域>/...
+    # backend/app/src/main/java/com/ragagent/<域>/...
     return parts[i + 6] if len(parts) > i + 6 and parts[i + 4] == "com" else "?"
 
 
 def main() -> int:
     ports = {}
-    for p in sorted((ROOT / "contract/src/main/java").rglob("*Port.java")):
+    for p in sorted((ROOT / "backend/contract/src/main/java").rglob("*Port.java")):
         ports[p.stem] = p
 
     impls = {}

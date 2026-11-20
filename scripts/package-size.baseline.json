@@ -3,12 +3,12 @@
   "enforceThreshold": 30,
   "note": "业务域单包文件数棘轮：>30 必须登记且只许降；26-30 只报警。拆分计划见 C3/C4。",
   "allowed": {
-    "app/src/main/java/com/ragagent/mcp/protocol": {
+    "backend/app/src/main/java/com/ragagent/mcp/protocol": {
       "files": 33,
       "reason": "MCP 协议消息族集中；按协议方向/消息族可再分，暂不拆",
       "target": 25
     },
-    "app/src/main/java/com/ragagent/agenttools/wiki": {
+    "backend/app/src/main/java/com/ragagent/agenttools/wiki": {
       "files": 31,
       "reason": "wiki 工具按能力分组；工具类短小、共用视图，暂不拆",
       "target": 25

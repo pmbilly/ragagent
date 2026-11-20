@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "framework/src/main/java"
+SRC = ROOT / "backend/framework/src/main/java"
 BASELINE = ROOT / "scripts/platform-shapes.baseline.json"
 SUFFIXES = ("View", "Port", "Request", "Response", "Payload", "Facts", "Gateway")
 BUSINESS_PACKAGES = {"knowledge", "settings"}

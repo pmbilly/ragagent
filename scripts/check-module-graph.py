@@ -77,33 +77,33 @@ PKG_RE = re.compile(r"^package\s+([\w.]+);", re.M)
 
 # ── 判据 E 的存量登记（路径 → 理由；只许减）────────────────────────────────
 MISPLACED_TEST_ALLOW: dict[str, str] = {
-    "app/src/test/java/com/ragagent/agent/EngineRecordingTest.java":
+    "backend/app/src/test/java/com/ragagent/agent/EngineRecordingTest.java":
         "录制夹具集成测试：需要 app 侧装配与 agent-engine testFixtures，迁回 agent-engine 会形成反向依赖",
-    "app/src/test/java/com/ragagent/platform/web/ContractTest.java":
+    "backend/app/src/test/java/com/ragagent/platform/web/ContractTest.java":
         "HTTP 契约金片驱动：需要 app 的 Spring 上下文与真 PG，platform 模块内无此装配",
-    "app/src/test/java/com/ragagent/platform/web/ValidationContractTest.java":
+    "backend/app/src/test/java/com/ragagent/platform/web/ValidationContractTest.java":
         "同上：参数校验的 HTTP 契约测试依赖 app 的 MVC 装配",
-    "app/src/test/java/com/ragagent/retrieval/engine/EffectiveEnginesTest.java":
+    "backend/app/src/test/java/com/ragagent/retrieval/engine/EffectiveEnginesTest.java":
         "检索引擎的装配级测试：需要 app 的配置与真库，retrieval-engine 模块内无此装配",
-    "app/src/test/java/com/ragagent/retrieval/engine/PgVectorEngineRepositoryTest.java":
+    "backend/app/src/test/java/com/ragagent/retrieval/engine/PgVectorEngineRepositoryTest.java":
         "同上：pgvector 仓储测试依赖 app 的数据源装配",
-    "framework/src/test/java/com/ragagent/contract/knowledge/rule/ParserEngineRulesTest.java":
+    "backend/framework/src/test/java/com/ragagent/contract/knowledge/rule/ParserEngineRulesTest.java":
         "测契约规则，但需要 platform 的 JsonMappers；platform test → contract 是合法方向",
-    "app/src/test/java/com/ragagent/embedding/EmbeddingWireTest.java":
+    "backend/app/src/test/java/com/ragagent/embedding/EmbeddingWireTest.java":
         "wire A/B 使用 domains 的 Model/ModelRowViews；迁 model-runtime 会形成 test→domains 反向边",
-    "app/src/test/java/com/ragagent/rerank/RerankWireTest.java":
+    "backend/app/src/test/java/com/ragagent/rerank/RerankWireTest.java":
         "同上：wire A/B 使用 domains 的 Model/ModelRowViews",
-    "app/src/test/java/com/ragagent/llm/provider/ProviderRegistryTest.java":
+    "backend/app/src/test/java/com/ragagent/llm/provider/ProviderRegistryTest.java":
         "provider 目录测试使用 domains 的 Model/ModelRowViews；迁 model-runtime 会形成反向边",
-    "app/src/test/java/com/ragagent/platform/access/TracingCarrierNestingTest.java":
+    "backend/app/src/test/java/com/ragagent/platform/access/TracingCarrierNestingTest.java":
         "用 domains 的任务载荷验证平台 tracing carrier；迁 platform 会形成反向边",
-    "app/src/test/java/com/ragagent/platform/web/JsonFaceVocabularyTest.java":
+    "backend/app/src/test/java/com/ragagent/platform/web/JsonFaceVocabularyTest.java":
         "用 domains 的 DTO/配置验证平台 JSON 口径；迁 platform 会形成反向边",
-    "app/src/test/java/com/ragagent/platform/text/JsonContractRoundTripTest.java":
+    "backend/app/src/test/java/com/ragagent/platform/text/JsonContractRoundTripTest.java":
         "全仓 JSON 往返矩阵，天然需要 domains 载荷；迁 platform 会形成反向边",
-    "app/src/test/java/com/ragagent/platform/tracing/langfuse/LangfuseEndToEndTest.java":
+    "backend/app/src/test/java/com/ragagent/platform/tracing/langfuse/LangfuseEndToEndTest.java":
         "端到端 trace 依赖 domains 的 MemoryTrace；迁 platform 会形成反向边",
-    "app/src/test/java/com/ragagent/platform/tracing/langfuse/LangfuseTracingTest.java":
+    "backend/app/src/test/java/com/ragagent/platform/tracing/langfuse/LangfuseTracingTest.java":
         "同上：trace 测试依赖 domains 的 MemoryTrace",
 }
 
@@ -111,7 +111,7 @@ GHOST_FIXTURE_PREFIXES = ("com.ragagent.common", "com.ragagent.support")
 
 
 def sources(module: str, kind: str) -> list[pathlib.Path]:
-    return [f for f in pathlib.Path(ROOT / module).glob(f"src/{kind}/java/**/*.java") if "/build/" not in str(f) and "/target/" not in str(f)]
+    return [f for f in pathlib.Path(ROOT / "backend" / module).glob(f"src/{kind}/java/**/*.java") if "/build/" not in str(f) and "/target/" not in str(f)]
 
 
 def build_fqn_map() -> tuple[dict[str, set[str]], dict[str, set[str]], dict[str, set[str]]]:

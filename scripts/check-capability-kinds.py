@@ -20,7 +20,7 @@ from collections import defaultdict
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "scripts" / "capability-kinds.json"
-DOMAINS = ROOT / "app" / "src" / "main" / "java" / "com" / "ragagent"
+DOMAINS = ROOT / "backend" / "app" / "src" / "main" / "java" / "com" / "ragagent"
 IMPORT_RE = re.compile(r"^import\s+com\.ragagent\.(\w+)\.", re.M)
 
 

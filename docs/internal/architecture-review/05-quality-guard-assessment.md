@@ -19,7 +19,7 @@
 | 测试方法 | **4,652 个 `@Test` + 37 个 `@ParameterizedTest` = 4,689** | README/评估文档称「约 5000 用例」——参数化展开后可信，口径不虚 |
 | 测试代码量 | **134,719 行** vs 主码 300,535 行 | 测试/主码 LOC 比 **0.45** |
 | 脚本守卫 | **42 条**（`scripts/run-guards.sh`，单一入口，CI 与本地同口径） | 评估文档称「40 条」、CI yml 注释称「含 32 条」——**两处都已漂移**（脚本自计数，打印值正确） |
-| ArchUnit 规则 | **28 条**（`ArchitectureRulesTest` 22 + `ContractBoundaryRulesTest` 6，均在 `app/src/test/.../arch/`） | 与文档一致，零漂移 |
+| ArchUnit 规则 | **28 条**（`ArchitectureRulesTest` 22 + `ContractBoundaryRulesTest` 6，均在 `backend/app/src/test/.../arch/`） | 与文档一致，零漂移 |
 | 契约金片 | **1,349 个 JSON**（`domains/src/testFixtures/resources/contracts/`） | 其中 **~100 个（7.4%）不被任何 Java 测试引用**，只存在于 `scripts/record-*-golden.sh` 录制清单 |
 | Go 录制金片 | **8 个 bundle + .sha256**（`platform/src/testFixtures/resources/golden/`） | 加载时 SHA-256 逐字节校验，**比 HTTP 金片更强** |
 | CI | 4 job（guards / backend / docker / frontend），`backend` 起真 ParadeDB + 装 redis-server | 见 `.github/workflows/ci.yml` |
@@ -48,7 +48,7 @@
 
 **两个结构性观察**：
 1. **boot 是集成测试聚合地**（1,315 @Test 打在 2,201 行主码上）——这是刻意的组合根设计（`check-module-graph.py` 判据 E 显式豁免 boot 的 src/test 按业务包组织），代价是「改任何域都要重跑全量 Spring 上下文」的 CI 时间成本，收益是契约金片直接钉 HTTP 线格式。
-2. **contract 模块（自称「前端契约、API 形状与可测试边界的唯一来源」，20,241 行主码）只有 2 个测试文件 / 11 条用例 / 167 行测试**（`contract/src/test/.../json/JsonValuesTest.java`、`.../storage/support/ModeTest.java`）。契约面的纯度由 ArchUnit（B258-R1）+ check-contract-purity.py 硬零守护，载荷形状由 48 个 HTTP 契约测试间接覆盖，但**契约面自身的记录校验/紧凑构造器/视图逻辑没有直接单测**——20k 行的「唯一真相源」是体系中单测密度最低的模块。
+2. **contract 模块（自称「前端契约、API 形状与可测试边界的唯一来源」，20,241 行主码）只有 2 个测试文件 / 11 条用例 / 167 行测试**（`backend/contract/src/test/.../json/JsonValuesTest.java`、`.../storage/support/ModeTest.java`）。契约面的纯度由 ArchUnit（B258-R1）+ check-contract-purity.py 硬零守护，载荷形状由 48 个 HTTP 契约测试间接覆盖，但**契约面自身的记录校验/紧凑构造器/视图逻辑没有直接单测**——20k 行的「唯一真相源」是体系中单测密度最低的模块。
 
 ### 2.2 按业务域（domains 单测 + boot 契约测试合并，实测）
 
@@ -235,7 +235,7 @@
 
 ### 实例 1：Skills 管理面与 continue-stream 的 HTTP 面无任何测试，而 route-policy 守卫给不出信号
 
-- 证据 A（无测试）：全仓 grep `knowledge-search|continue-stream|catalog`，`/api/v1/sessions/continue-stream/*` 与 `/api/v1/skills/catalog**` 只出现在**主码**（`app/src/main/java/com/ragagent/config/RbacRoutePolicies.java` 的 addRule 与 `WebConfig.java` 的白名单），没有任何 `src/test` 文件引用这两个路径；`SessionStreamController.continueStream`（177 行，全仓第 10 大方法）零直接测试。
+- 证据 A（无测试）：全仓 grep `knowledge-search|continue-stream|catalog`，`/api/v1/sessions/continue-stream/*` 与 `/api/v1/skills/catalog**` 只出现在**主码**（`backend/app/src/main/java/com/ragagent/config/RbacRoutePolicies.java` 的 addRule 与 `WebConfig.java` 的白名单），没有任何 `src/test` 文件引用这两个路径；`SessionStreamController.continueStream`（177 行，全仓第 10 大方法）零直接测试。
 - 证据 B（守卫为何沉默）：`check-route-policy.py` 的判据是「路由必须有权限规则或登记公开」——它只回答「有没有人管权限」，不回答「有没有线格式保护」。1,349 个金片、48 个契约测试都没覆盖这两个面。
 - 证据 C（影响面）：Skills 是 README 头条能力（「技能（Skills）：以 SKILL.md 为载体的三级注入」），`SkillCatalogController` + `SkillsCatalogController` 两个控制器的增删改查面**没有任何契约钉死**——后端改字段前端无声（正是 check-fe-contract-keys.py 注释里描述的事故形态）。域内服务层（agent-engine 的 `SkillCatalogServiceTest`/`DbSkillSourceTest`）有单测，但 HTTP 形状（外壳、分页结构、错误信封）无保护。
 - 补充：主聊天 SSE 面（`/api/v1/knowledge-chat/{id}`、`/api/v1/agent-chat/{id}` 的非 embed 渠道）同样无 HTTP 级测试，只有 embed 渠道变体被 `W5dTerminalEmbedContractTest` 覆盖；流式链路本身由 `chat-pipeline-46c` Go 金片 + 单测保护。**即：产品最核心的「流式问答」端到端线格式，靠的是手工 AB 脚本（`scripts/ab-*.sh`）而非自动化契约。**
@@ -304,12 +304,12 @@
 ## 附录 A：本报告的证据文件索引
 
 - 测试计数：`*/src/test/**`、`*/src/testFixtures/**`（grep `@Test`/`@ParameterizedTest`/`@SpringBootTest`/`*ContractTest.java`）
-- 域覆盖表：`domains/src/main/java/com/ragagent/<域>/` × `domains/src/test|app/src/test/java/com/ragagent/<域>/`
+- 域覆盖表：`domains/src/main/java/com/ragagent/<域>/` × `domains/src/test|backend/app/src/test/java/com/ragagent/<域>/`
 - 金片：`domains/src/testFixtures/resources/contracts/`（1,349）、`platform/src/testFixtures/resources/golden/`（8+.sha256）、`domains/src/testFixtures/java/com/ragagent/fixtures/{GoldenContract,ContractPaths}.java`、`scripts/check-contract-sync.py`、`scripts/contract-signature.baseline.json`、`scripts/audit-contract-fixtures.sh`
-- 守卫：`scripts/run-guards.sh`（42 入口）、各 `check-*.py`、`app/src/test/java/com/ragagent/arch/{ArchitectureRulesTest,ContractBoundaryRulesTest}.java`、各 `*.baseline.json`
+- 守卫：`scripts/run-guards.sh`（42 入口）、各 `check-*.py`、`backend/app/src/test/java/com/ragagent/arch/{ArchitectureRulesTest,ContractBoundaryRulesTest}.java`、各 `*.baseline.json`
 - CI：`.github/workflows/ci.yml`、`scripts/test-summary.py`、`scripts/ci-smoke.sh`、`retrieval-engine/build.gradle.kts`（integrationTest 任务）
-- 漏网实例：`app/src/main/java/com/ragagent/config/{RbacRoutePolicies,WebConfig}.java`、`domains/src/main/java/com/ragagent/session/controller/SessionStreamController.java`、`scripts/method-length-report.py`、`scripts/record-ct-golden.sh` 等
-- 脆弱性：`app/src/test/java/com/ragagent/im/ImPipelineTest.java:166`、`domains/src/test/java/com/ragagent/datasource/task/RedisDataSourceSyncTaskQueueTest.java` 等 89 处 sleep
+- 漏网实例：`backend/app/src/main/java/com/ragagent/config/{RbacRoutePolicies,WebConfig}.java`、`domains/src/main/java/com/ragagent/session/controller/SessionStreamController.java`、`scripts/method-length-report.py`、`scripts/record-ct-golden.sh` 等
+- 脆弱性：`backend/app/src/test/java/com/ragagent/im/ImPipelineTest.java:166`、`domains/src/test/java/com/ragagent/datasource/task/RedisDataSourceSyncTaskQueueTest.java` 等 89 处 sleep
 
 ## 附录 B：方法与边界声明
 

@@ -7,7 +7,7 @@
 编译通过 ⇒ 只有运行时才炸。现有 `check-fe-contract-keys.py` 用正则扫前端源码找可疑键，
 但脚本自己就写明有**七种写法扫不到** —— 靠"在错误的层（文本）上找"永远补不齐。
 
-换一个**可靠的信号源**：契约金片（`app/src/testFixtures/resources/contracts/*.json`，
+换一个**可靠的信号源**：契约金片（`backend/app/src/testFixtures/resources/contracts/*.json`，
 1,429 个）是**期望值**，只在契约**有意变更**时才更新（`-Dcontract.refresh=true` 重录）
 ⇒ **金片变了 = 契约变了**。本守卫据此把"悄悄变"改成"必须签字"：
 
@@ -36,7 +36,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-CONTRACTS = ROOT / "app/src/testFixtures/resources/contracts"
+CONTRACTS = ROOT / "backend/app/src/testFixtures/resources/contracts"
 BASELINE = ROOT / "scripts/contract-signature.baseline.json"
 
 KEY_RE = re.compile(r'"([A-Za-z_][\w]*)"\s*:')

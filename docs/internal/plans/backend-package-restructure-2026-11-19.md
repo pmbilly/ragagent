@@ -52,7 +52,7 @@
 
 ### 4.1 P1 的规则：先盘点已有，只补缺口
 
-2026-11-19 实测：`app/src/test/java/com/ragagent/arch/ArchitectureRulesTest.java` 已有 **22 条规则**（A1~A20 + B257/B260），原计划的四条里三条已被覆盖：
+2026-11-19 实测：`backend/app/src/test/java/com/ragagent/arch/ArchitectureRulesTest.java` 已有 **22 条规则**（A1~A20 + B257/B260），原计划的四条里三条已被覆盖：
 
 | 原计划规则 | 现状 | 结论 |
 |---|---|---|

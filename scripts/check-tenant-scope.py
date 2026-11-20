@@ -16,11 +16,11 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ROOTS = [
-    ROOT / "app" / "src" / "main" / "java",
-    ROOT / "agent-engine" / "src" / "main" / "java",
-    ROOT / "retrieval-engine" / "src" / "main" / "java",
-    ROOT / "model-runtime" / "src" / "main" / "java",
-    ROOT / "framework" / "src" / "main" / "java",
+    ROOT / "backend" / "app" / "src" / "main" / "java",
+    ROOT / "backend" / "agent-engine" / "src" / "main" / "java",
+    ROOT / "backend" / "retrieval-engine" / "src" / "main" / "java",
+    ROOT / "backend" / "model-runtime" / "src" / "main" / "java",
+    ROOT / "backend" / "framework" / "src" / "main" / "java",
     ROOT / "boot" / "src" / "main" / "java",
 ]
 SCOPE_FILE = "TenantScope.java"

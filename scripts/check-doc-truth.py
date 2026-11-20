@@ -27,7 +27,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-MODULES = ["contract", "framework", "model-runtime", "retrieval-engine", "agent-engine", "app"]
+MODULES = ["backend/contract", "backend/framework", "backend/model-runtime", "backend/retrieval-engine", "backend/agent-engine", "backend/app"]
 
 
 def module_count() -> int:
@@ -50,14 +50,14 @@ def probe_count() -> int:
 
 def provider_count() -> int:
     # 注册数只看静态块；它与 ProviderName 全集的一致性由 ProviderRegistryCompletenessTest 兜底
-    text = (ROOT / "model-runtime/src/main/java/com/ragagent/llm/provider/ProviderRegistry.java") \
+    text = (ROOT / "backend/model-runtime/src/main/java/com/ragagent/llm/provider/ProviderRegistry.java") \
         .read_text(encoding="utf-8")
     return len(re.findall(r"^\s*register\(new \w+Provider\(\)\);", text, re.M))
 
 
 def golden_counts() -> tuple[int, int]:
     # 样本口径：JSON 一份一个样本；非 JSON 样本由 .body + .headers 成对落盘，只数 .body
-    d = ROOT / "app/src/testFixtures/resources/contracts"
+    d = ROOT / "backend/app/src/testFixtures/resources/contracts"
     return (len(list(d.glob("*.json"))), len(list(d.glob("*.body"))))
 
 

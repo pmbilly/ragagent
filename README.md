@@ -197,7 +197,7 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 
 ## 配置项
 
-配置集中在 `app/src/main/resources/application.yml`，全部为 `${ENV_VAR:default}` 形式，无 profile 分文件。常用变量：
+配置集中在 `backend/app/src/main/resources/application.yml`，全部为 `${ENV_VAR:default}` 形式，无 profile 分文件。常用变量：
 
 | 变量 | 缺省 | 说明 |
 |---|---|---|

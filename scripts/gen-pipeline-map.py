@@ -20,9 +20,9 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-PLUGIN_DIR = ROOT / "app/src/main/java/com/ragagent/session/rag/plugin"
-WIRING = ROOT / "app/src/main/java/com/ragagent/session/assembly/QaWiring.java"
-EVENT_ENUM = ROOT / "app/src/main/java/com/ragagent/session/rag/PipelineEventType.java"
+PLUGIN_DIR = ROOT / "backend/app/src/main/java/com/ragagent/session/rag/plugin"
+WIRING = ROOT / "backend/app/src/main/java/com/ragagent/session/assembly/QaWiring.java"
+EVENT_ENUM = ROOT / "backend/app/src/main/java/com/ragagent/session/rag/PipelineEventType.java"
 OUT = ROOT / "docs/architecture/pipeline-map.md"
 
 

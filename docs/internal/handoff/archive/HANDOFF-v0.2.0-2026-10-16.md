@@ -1282,7 +1282,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 **🔶 B264 第⑤步（2026-10-14，session 起步：`sse/` → `controller.sse/`）**
 - **首个最小簇**：`session.sse`（`SseContract` / `SseFrameWriter` / `StreamEventEmitter` / `StreamResponseBuilder`）→ `session.controller.sse`——类集与 §8.8.1 的 `controller.sse/` 目标**逐名一致** ✓；动前断言：四类对 session 域内包**零依赖**（出边只到 `common`/`llm`/`storage`/`platform`）⇒ 只产生 `controller → controller.sse`、`qa → controller.sse` 单向边。
-- **两树测试随迁**：`domains/src/test/.../session/sse/StreamResponseBuilderTest` + `app/src/test/.../session/sse/SseFrameWriterTest` → `session/controller/sse/`（"同名包"两处一起处理）；三处空目录删除。
+- **两树测试随迁**：`domains/src/test/.../session/sse/StreamResponseBuilderTest` + `backend/app/src/test/.../session/sse/SseFrameWriterTest` → `session/controller/sse/`（"同名包"两处一起处理）；三处空目录删除。
 - **锚点**：`scripts/check-event-face-case.py` 的 **`EVENT_MAP_FILES` 路径锚**（`session/sse/StreamResponseBuilder.java`，SSE 帧键位覆盖清单）换新路径——**这类"按路径的覆盖清单"漏换就静默丢覆盖**（与 `FROZEN_PREFIXES` 同族）。
 - **新增** `controller/sse/package-info`（写明迁入依据）。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m38s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓。
@@ -1896,7 +1896,7 @@ public interface AdminUserPort {
 ### 三、⚠️ 四个"搬家漏项"（当场全修好；判据可复用）
 1. **搬插件漏搬它的配置块** ✗：protobuf 插件迁走、`protobuf { protoc { artifact = … } }` 没迁 ⇒ 生成码与运行时版本不匹配（`RuntimeVersion` 不存在）⇒ **判据：搬构建插件必须连其配置块一起搬**
 2. **`:platform` 测试静默不跑** ✗✗：漏抄 `tasks.withType<Test> { useJUnitPlatform() }` ⇒ `build` 全绿但 **platform tests 一条不采** —— **正是 `:common` 注释里记录过的同款陷阱** ⇒ 补上后 **144 条**恢复 ⇒ **判据：新模块建好后必须核对"测试条数总量守恒"（本轮 4996 ✓）；`build` 绿 ≠ 测试跑了**
-3. **资源随迁遗漏两处** ✗：① `prompts/`（`PromptSourceTest` 按**模块相对路径** `src/main/resources/prompts` 读 ⇒ 随 `:platform`）② **`common/text/TS{Characters,Phrases}.txt`**（由 **`contract.text.TextConv` 按 classpath 加载** ⇒ **本属 `:contract`** ⇒ 迁入 `contract/src/main/resources/`，**classpath 路径不变** ⇒ 全模块可见）⇒ **判据：资源的归属看"谁加载"，不是"谁旁边"**
+3. **资源随迁遗漏两处** ✗：① `prompts/`（`PromptSourceTest` 按**模块相对路径** `src/main/resources/prompts` 读 ⇒ 随 `:platform`）② **`common/text/TS{Characters,Phrases}.txt`**（由 **`contract.text.TextConv` 按 classpath 加载** ⇒ **本属 `:contract`** ⇒ 迁入 `backend/contract/src/main/resources/`，**classpath 路径不变** ⇒ 全模块可见）⇒ **判据：资源的归属看"谁加载"，不是"谁旁边"**
 4. **Gradle 配置期自解析** ✗：`:platform` 的 test block 在配置期读自身 `testRuntimeClasspath` ⇒ 报 `project :platform local metadata has not been calculated yet` ⇒ 改 `doFirst` **惰性求值** ✓
 
 ### 四、基线收紧（合规、非掩盖）
@@ -2767,7 +2767,7 @@ public interface AdminUserPort {
 **🔶 A④-1：`:contract` 契约面提取为独立 Gradle 模块（2026-10-14，阶段 6 第一步）**
 - **动因**：把"契约面纯 JDK"从 **ArchUnit R1 的静态规则**升格为**编译期硬约束** —— 新模块的 `build.gradle.kts` **没有任何 dependencies 块**，一沾框架/其他模块就编译不过（R1 只能事后再扫，这个扫不动）。
 - **命名（登记一处与方案的差异）**：模块名取**单数 `contract`**（＝顶层包 `com.ragagent.contract`），不取方案 §5.1 字面的 `contracts`：① 本仓约定「模块名 = 顶层包名」（B117 给 `:common` 定名时的首要理由）；② `contracts` 在本仓**已被占用** —— `domains/src/testFixtures/resources/contracts` 有 1,426 金片 + 49 个 `*ContractTest`（B117 原话："再叫 contracts 会语义撞车"）。**§8.1 的面清单不变** ✓
-- **搬迁**：`common/src/main/java/com/ragagent/contract/**` → `contract/src/main/java/com/ragagent/contract/**`，**116 文件 / 18 个面**；`:contract` 116 文件 / 7.3k 行；`:common` 219 → **158 文件**（12.1k 行）。
+- **搬迁**：`common/src/main/java/com/ragagent/contract/**` → `backend/contract/src/main/java/com/ragagent/contract/**`，**116 文件 / 18 个面**；`:contract` 116 文件 / 7.3k 行；`:common` 219 → **158 文件**（12.1k 行）。
 - **构建面**：`settings.gradle.kts` +`include("contract")`；`common` +`api(project(":contract"))`（common 端口签名暴露契约类型 ⇒ api 传递）；`domains`/`boot` +`implementation(...)`；`engine` +`api(...)`；根构建 +`jacocoAggregation(project(":contract"))`；新模块自带 `spotless`（ratchetFrom seed）。
 - **守卫面（低成本的原因）**：脚本源码根有**单一事实来源** —— `scripts/_source_roots.py` 的 `MODULE_DIRS` 加一行即覆盖 12 个脚本 ✓；另有自有根的 `check-stray-dirs.py`（`SOURCE_ROOTS`）与 `test-summary.py`（`MODULES`）各一处；`check-package-dirs.py` 用通配 `*/src/*/java` ⇒ 免改 ✓；`check-json-key-case.py` 键是**包相对** ⇒ 免换锚 ✓；`file-size`/`json-key` 两个基线**实测都无相关键** ⇒ 免换锚 ✓（对比 A③-⑨ 那次按路径换锚）。
 - **⚠️ 一处"模块提取暴露的越界"（正面教训）**：`:contract:javadoc` 报 **3 处 `reference not found`** —— 三个契约类在 `{@link}` **平台/域内部类型**（`platform.access.TenantContext`、`platform.web.RbacInterceptor`、`common.knowledge.KnowledgeBaseLookup#knowledgeGone`）✗：在 `:common` 内同模块能解析，独立模块后断链 ⇒ 说明**契约面本来就在 link 模块外类型**（分层味道），改 `{@code}` 收口 ✓ ⇒ **javadoc 的 `doclint:reference`（build 已接 check）是模块提取的天然探针** ✓
@@ -2934,7 +2934,7 @@ public interface AdminUserPort {
 - **本步新踩的三类"换包连带"（都已修，值得记住）**：
   1. **同包 javadoc `{@link SimpleName}` 会失链** ✗（`:domains:javadoc` 报 `reference not found`）——FQN 正则抓不到它（它是**简单名**）⇒ 改成全限定形式（仓内既有风格）；并写成**全量扫描**（凡 javadoc 里指向旧同包类且无 import 的，一次改完）。
   2. **`FROZEN_PREFIXES` 里存在"按文件"的前缀** ✗（`knowledge/service/ChunkExtractService`）⇒ 换包即静默失效，守卫原话点名"离开/进入" ⇒ 换锚到新路径 + `--write` 刷冻结快照（**diff 恰一行** = 纯换锚 ✓）。
-  3. **别的模块的测试树里也有同名包** ✗（`app/src/test/java/com/ragagent/knowledge/service/Chunk*Test.java` 裸引用被搬走的类）⇒ 补 import 器需把编译目标扩到 `:boot:compileTestJava`（只跑 `:domains:*` 会漏）。
+  3. **别的模块的测试树里也有同名包** ✗（`backend/app/src/test/java/com/ragagent/knowledge/service/Chunk*Test.java` 裸引用被搬走的类）⇒ 补 import 器需把编译目标扩到 `:boot:compileTestJava`（只跑 `:domains:*` 会漏）。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m46s** ✓ **十二守卫** ✓（环 0 / **包级 SCC 12 组**不变）。
 - **登记（`service` 其余子面）**：门面 `KnowledgeService` 闭包仍 **18 类**（其 6 个引用者是归位的最后一关）；`ChunkQuestionService` 需与 `QuestionGenerationService` 的边一起处置；`KnowledgeTagService`（零入度）可作下一簇 `service.tag`。`KnowledgeService` 闭包 = **18 类**（`KnowledgeService` + 3 双向伙伴 + 3 单向使用者 + 11 个被依赖者）⇒ 下一簇可切的目标是这 18 类里**离门面最远的自洢子集**（`Chunk*` 四类与 `HousekeepingService`、3 个 adapter 已在闭包外）；门面本体归位仍需先让这 18 类继续收缩。按上述闭包把「`KnowledgeService` + 3 个双向伙伴 + 3 个单向使用者（+ 递归闭包）」整体搬进目标子面（`service.management` 与其协作者面），届时 SCC 不扩大、门面归位。`KnowledgeService`(717) → `service.management/*`（**需配套断边**：B263① 实测直接搬会让 SCC 扩大）。① ㉜ `SpanTracker` 移出 service（`domain.span` 候选）⇒ 断最后一处 task→service，`{service, task}` SCC 收口；② `KnowledgeService`(717) → `service.management/*`（需配套断边）。① `KnowledgeService`(716) 余部 → `service.management/*`（**需配套断边**）；② **`task ⇄ service` 环**（task→service 6 文件 / service→task 11 文件）。① `KnowledgeService`(716) 余部 → `service.management/*`（**需配套断边**：B263① 已实测"往子面搬会让 SCC 扩大"）；② **`task ⇄ service` 环**（现测：task→service **6** 文件 / service→task **11** 文件）；③ `escapeLikeKeyword` **多副本统一到 `common`**（§9.2 式，⑯ 登记）。
 **🔶 B263 第㉘步（2026-10-14，`KnowledgeProcessWorker` 归仓储：824 → 792 行）**

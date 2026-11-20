@@ -28,7 +28,7 @@ import re
 import sys
 
 # ── 规则一：检索层 catch 内清空条件 ──────────────────────────────────────────
-ENGINE_ROOT = pathlib.Path('retrieval-engine/src/main/java/com/ragagent/retrieval/engine')
+ENGINE_ROOT = pathlib.Path('backend/retrieval-engine/src/main/java/com/ragagent/retrieval/engine')
 RESET_CALL = 'createObjectNode('
 
 # ── 规则二：非边界层空转 catch ──────────────────────────────────────────────
@@ -38,7 +38,7 @@ BOUNDARY_SEGMENTS = ('/controller/', '/api/', '/task/', '/channel/', '/client/',
 
 # ── 规则三：Jackson 空体文案只许出现在收敛点 ─────────────────────────────────
 BODY_ERROR_LITERAL = '"No content to map due to end-of-input"'
-BODY_ERROR_OWNER = 'framework/src/main/java/com/ragagent/platform/web/JsonBodyErrors.java'
+BODY_ERROR_OWNER = 'backend/framework/src/main/java/com/ragagent/platform/web/JsonBodyErrors.java'
 
 CATCH_HEAD = re.compile(r'\bcatch\s*\(\s*(?:final\s+)?([A-Za-z0-9_.]*)\s*[A-Za-z0-9_]*\s*\)\s*\{')
 

@@ -53,12 +53,12 @@ graph TD
 | HTTP 路由 / 参数绑定 | `domains/src/main/java/com/ragagent/<域>/controller/` |
 | 业务用例 / 事务边界 | `<域>/service/` |
 | SQL / 软删 / 方言 | `<域>/repository/` 或 `<域>/mapper/` |
-| 检索融合、重排、引擎注册 | `retrieval-engine/src/main/java/com/ragagent/retrieval/` |
-| LLM provider / embedding / rerank 客户端 | `model-runtime/src/main/java/com/ragagent/{llm,embedding,rerank}/` |
-| Agent 循环 / 工具 / 技能 / 压缩 | `agent-engine/src/main/java/com/ragagent/agent/` |
+| 检索融合、重排、引擎注册 | `backend/retrieval-engine/src/main/java/com/ragagent/retrieval/` |
+| LLM provider / embedding / rerank 客户端 | `backend/model-runtime/src/main/java/com/ragagent/{llm,embedding,rerank}/` |
+| Agent 循环 / 工具 / 技能 / 压缩 | `backend/agent-engine/src/main/java/com/ragagent/agent/` |
 | 管线阶段与插件 | `domains/.../session/rag/`，装配在 `session/assembly/QaWiring` |
-| 跨模块 Bean / 端口实现 | `app/src/main/java/com/ragagent/config/`；域内装配点见下方「装配点」 |
-| 跨模块公开类型 | `contract/src/main/java/com/ragagent/contract/` |
+| 跨模块 Bean / 端口实现 | `backend/app/src/main/java/com/ragagent/config/`；域内装配点见下方「装配点」 |
+| 跨模块公开类型 | `backend/contract/src/main/java/com/ragagent/contract/` |
 | 域对外的端口实现 | `<域>/api/`：实现 `contract` 端口（Adapter），供其他域或装配层依赖；不要反向依赖 controller |
 
 ## 协作者命名（M7 判据）

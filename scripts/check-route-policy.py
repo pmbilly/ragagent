@@ -21,9 +21,9 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DOMAINS = ROOT / "app/src/main/java"
-POLICIES = ROOT / "app/src/main/java/com/ragagent/config/RbacRoutePolicies.java"
-APIKEY_POLICIES = ROOT / ("app/src/main/java/com/ragagent/auth/apikey/controller/filter/"
+DOMAINS = ROOT / "backend/app/src/main/java"
+POLICIES = ROOT / "backend/app/src/main/java/com/ragagent/config/RbacRoutePolicies.java"
+APIKEY_POLICIES = ROOT / ("backend/app/src/main/java/com/ragagent/auth/apikey/controller/filter/"
                           "APIKeyRoutePolicies.java")
 BASELINE = ROOT / "scripts/route-policy.baseline.json"
 MAP = ROOT / "docs/architecture/route-policy-map.md"

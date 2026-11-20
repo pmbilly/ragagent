@@ -20,7 +20,7 @@ INLINE_RE = re.compile(r"\{@(?:link|code|literal)\s+([^}]*)\}")
 
 
 def package_files() -> list[pathlib.Path]:
-    return sorted(ROOT.glob("*/src/main/java/**/package-info.java"))
+    return sorted(list(ROOT.glob("backend/*/src/main/java/**/package-info.java")) + list(ROOT.glob("*/src/main/java/**/package-info.java")))
 
 
 def first_sentence(text: str) -> str:

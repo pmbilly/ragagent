@@ -30,9 +30,9 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-MODULES = ["contract", "framework", "model-runtime", "retrieval-engine",
-           "agent-engine", "app"]
-CONTRACT = ROOT / "contract/src/main/java"
+MODULES = ["backend/contract", "backend/framework", "backend/model-runtime", "backend/retrieval-engine",
+           "backend/agent-engine", "backend/app"]
+CONTRACT = ROOT / "backend/contract/src/main/java"
 TYPE = re.compile(r"^(?:public\s+)?(?:final\s+|abstract\s+|sealed\s+)?"
                   r"(?:class|interface|record|enum)\s+(\w+)", re.M)
 IMPORT = re.compile(r"^import\s+(com\.ragagent\.contract\.[\w.]+);", re.M)
@@ -69,7 +69,7 @@ def contract_types() -> dict[str, pathlib.Path]:
 
 def consumer_label(module: str, path: pathlib.Path) -> str:
     if module == "domains":
-        match = re.search(r"app/src/(?:main|test|testFixtures)/java/com/ragagent/(\w+)/",
+        match = re.search(r"backend/app/src/(?:main|test|testFixtures)/java/com/ragagent/(\w+)/",
                           path.as_posix())
         return f"domains:{match.group(1)}" if match else "app"
     return module
@@ -89,7 +89,7 @@ def scan(types: dict[str, pathlib.Path]) -> dict[str, set[str]]:
                 for imported in IMPORT.findall(text):
                     if imported in types and types[imported] != path:
                         consumers[imported].add(consumer_label(module, path))
-                if module != "contract":
+                if not module.endswith("/contract"):
                     continue
                 body = strip_comments(text)
                 for name, fq in simple.items():

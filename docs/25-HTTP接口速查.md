@@ -4,7 +4,7 @@
 
 基址 **`/api/v1`**（静态文件代理 `/files`、`/r/{token}` 与健康检查除外）。认证五种：`Authorization: Bearer <jwt>`（Web 控制台）、`X-API-Key`（服务端集成）、平台 Key + `X-Tenant-ID`（跨空间）、`X-API-Key` + `X-External-User-ID/Token`（外部用户）、`Authorization: Embed <publish-token>`（嵌入挂件）。统一响应外壳 `{code, message, data}`：成功 `code = 0` 且 `data` 恒存在；失败 `code != 0`、`message` 可直接展示。两个例外：`GET /health` 固定 `{"status":"ok"}`；`/api/v1/im/callback/*` 按第三方平台要求原样返回。分页统一 `{items, page, pageSize, total}`，`page` 从 1 起，`pageSize` 上限常见 100（会话列表 1000），越界返回 400 不做钳位。
 
-**API 文档开关**：`springdoc.api-docs.enabled` 由环境变量 `SPRINGDOC_ENABLED` 控制（默认 `false`，生产不暴露）。开启后 OpenAPI JSON 在 `/v3/api-docs`，本地访问 `http://localhost:8083/scalar` 看 Scalar UI（`app/src/main/java/com/ragagent/config/ScalarUi.java`，同一开关控制，关闭时 404）。
+**API 文档开关**：`springdoc.api-docs.enabled` 由环境变量 `SPRINGDOC_ENABLED` 控制（默认 `false`，生产不暴露）。开启后 OpenAPI JSON 在 `/v3/api-docs`，本地访问 `http://localhost:8083/scalar` 看 Scalar UI（`backend/app/src/main/java/com/ragagent/config/ScalarUi.java`，同一开关控制，关闭时 404）。
 
 下表的角色列取自 `docs/architecture/route-policy-map.md`（由 `scripts/check-route-policy.py --map` 从控制器注解与 `RbacRoutePolicies` 生成，方法+路径已抽查与控制器源码一致）。**角色只表达下限**：所有权、API Key 范围、签名校验等守卫在控制器或服务内。`PUBLIC` 表示匿名可达（仍走认证链解析身份）。
 

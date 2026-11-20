@@ -36,17 +36,17 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DEFINITIONS = ROOT / "contract/src/main/java/com/ragagent/contract/tool/ToolDefinitions.java"
-AGENTTOOLS = ROOT / "app/src/main/java/com/ragagent/agenttools"
-DISPATCH = ROOT / "app/src/main/java/com/ragagent/session/service/AgentToolBackends.java"
+DEFINITIONS = ROOT / "backend/contract/src/main/java/com/ragagent/contract/tool/ToolDefinitions.java"
+AGENTTOOLS = ROOT / "backend/app/src/main/java/com/ragagent/agenttools"
+DISPATCH = ROOT / "backend/app/src/main/java/com/ragagent/session/service/AgentToolBackends.java"
 
 CONSTANT = re.compile(r"public static final String (TOOL_\w+)\s*=\s*\"([^\"]+)\"")
 DECLARED = re.compile(r"static\s+final\s+String\s+(?:(?:LEGACY_)?TOOL_\w+)\s*=\s*\"([^\"]*)\"")
 IMPLEMENTED = re.compile(r"super\(\s*ToolDefinitions\.(TOOL_\w+)")
 DISPATCHED = re.compile(r"case ToolDefinitions\.(TOOL_\w+)")
-ASSEMBLER = ROOT / "app/src/main/java/com/ragagent/session/service/AgentEngineAssembler.java"
+ASSEMBLER = ROOT / "backend/app/src/main/java/com/ragagent/session/service/AgentEngineAssembler.java"
 FRONTEND_CAPS = ROOT / "frontend/src/utils/tool-capabilities.ts"
-MODULES = ["contract", "framework", "model-runtime", "retrieval-engine", "agent-engine", "app"]
+MODULES = ["backend/contract", "backend/framework", "backend/model-runtime", "backend/retrieval-engine", "backend/agent-engine", "backend/app"]
 
 
 def definitions() -> dict[str, str]:

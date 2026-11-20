@@ -2,10 +2,10 @@
 """契约层纯度守卫：`:contract` 必须是纯 JDK。
 
 判据（硬零，不做棘轮）：
-  C1 导入根：contract/src/main 只允许 java. / javax. / com.ragagent.
+  C1 导入根：backend/contract/src/main 只允许 java. / javax. / com.ragagent.
   C2 构建依赖：contract/pom.xml 不得声明非 test 作用域的依赖（
      compileOnly / runtimeOnly / annotationProcessor（测试依赖除外）。
-  C3 框架形状：contract/src/main 不得出现 Spring / MyBatis / JPA 注解，
+  C3 框架形状：backend/contract/src/main 不得出现 Spring / MyBatis / JPA 注解，
      也不得实现 TypeHandler。
 
 红态探针（改本脚本或 contract 构建后必跑）：
@@ -18,8 +18,8 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SRC = ROOT / "contract" / "src" / "main" / "java"
-BUILD_FILE = ROOT / "contract" / "pom.xml"
+SRC = ROOT / "backend" / "contract" / "src" / "main" / "java"
+BUILD_FILE = ROOT / "backend" / "contract" / "pom.xml"
 
 ALLOWED_IMPORT_ROOTS = ("java.", "javax.", "com.ragagent.")
 

@@ -92,7 +92,7 @@
   "autoConfigurationImports": [],
   "springFactories": [
     {
-      "file": "app/src/main/resources/META-INF/spring.factories",
+      "file": "backend/app/src/main/resources/META-INF/spring.factories",
       "lines": [
         "org.springframework.boot.env.EnvironmentPostProcessor=\\",
         "com.ragagent.config.AppEnvLookupEnvironmentPostProcessor"
@@ -100,6 +100,6 @@
     }
   ],
   "loggingLevels": [
-    "app/src/main/resources/application.yml :: com.ragagent: ${LOG_LEVEL:INFO}"
+    "backend/app/src/main/resources/application.yml :: com.ragagent: ${LOG_LEVEL:INFO}"
   ]
 }

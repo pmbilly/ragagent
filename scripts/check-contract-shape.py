@@ -22,10 +22,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "contract/src/main/java"
+SRC = ROOT / "backend/contract/src/main/java"
 #: 终态的契约面 = contract（尚未搬完的部分）+ 各模块的 api 包（已归位的端口/形状）。
 #: 只扫 contract 会让搬走的端口静默失去覆盖——比报红更危险。
-MAIN_ROOTS = sorted(p for p in ROOT.glob("*/src/main/java") if p.is_dir())
+MAIN_ROOTS = sorted([p for p in ROOT.glob("backend/*/src/main/java") if p.is_dir()] + [p for p in ROOT.glob("*/src/main/java") if p.is_dir()])
 BASELINE = ROOT / "scripts/contract-shape.baseline.json"
 
 MAX_PORT_METHODS = 7

@@ -43,7 +43,7 @@ flowchart TB
 
 **抽取（入库路径）**：分块图抽取任务 `ChunkExtractService`（`knowledge/service/chunk/`）对每个文本/OCR 分块调一次模型抽取，经契约端口 `EntityExtractionPort`（`contract/model/`，模型运行时侧实现 `EntityExtractionAdapter`）产出实体与关系。配置闸门是知识库的 `extractConfig`（jsonb 列）——`enabled=false` 直接 `skipped=extract_disabled`；上传/重解析弹窗可按文档覆盖（`ProcessOverridesResolver.extractConfig`），口径是**覆盖只减不增**：KB 未开图时单文档不能打开，KB 开图时允许单文档关闭。
 
-**落库与隔离**：`Neo4jGraphRepository`（`retrieval-engine/src/main/java/com/ragagent/retrieval/graph/`）写 `AddGraph` / 删 `DelGraph` / 读 `SearchNode`。节点标签 = `ENTITY` 前缀 + 命名空间各段（`-` 换 `_`），形如 `ENTITYkbId:ENTITYknowledgeId`——同一知识库的图谱天然按租户/知识库隔离；节点键 `{name, kg: knowledge_id}`，同名实体在同知识内合并；写入走 APOC（`apoc.merge.node` / `apoc.merge.relationship` / chunks 并集），删除走 `apoc.periodic.iterate`（batchSize 1000）。
+**落库与隔离**：`Neo4jGraphRepository`（`backend/retrieval-engine/src/main/java/com/ragagent/retrieval/graph/`）写 `AddGraph` / 删 `DelGraph` / 读 `SearchNode`。节点标签 = `ENTITY` 前缀 + 命名空间各段（`-` 换 `_`），形如 `ENTITYkbId:ENTITYknowledgeId`——同一知识库的图谱天然按租户/知识库隔离；节点键 `{name, kg: knowledge_id}`，同名实体在同知识内合并；写入走 APOC（`apoc.merge.node` / `apoc.merge.relationship` / chunks 并集），删除走 `apoc.periodic.iterate`（batchSize 1000）。
 
 **检索（问答路径）**：与 [§7.5](07-检索引擎.md) 的图检索衔接——
 

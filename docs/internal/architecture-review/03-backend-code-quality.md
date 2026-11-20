@@ -15,7 +15,7 @@
 
 - 51 个控制器中，**0 个** import 任何域的 `repository` / `mapper` 包（实测，见 §4.1）；
 - 265 个 service 目录文件中，**0 个** import **其他域**的 `repository` / `mapper` 包（实测，见 §4.1）；
-- `app/src/test/java/com/ragagent/arch/ArchitectureRulesTest.java`（1135 行，22 个 ArchUnit 测试）把分层反向依赖、Mapper 包归属、禁裸 `System.getenv`、禁懒注入、JSON 工厂统一等规则做成了**编译期可执行的棘轮**（`noLayerInversions` / `mapperInterfacesLiveInMapperPackages` / `rawJdbcOnlyFromWhitelist` 等，行 563-1120）；
+- `backend/app/src/test/java/com/ragagent/arch/ArchitectureRulesTest.java`（1135 行，22 个 ArchUnit 测试）把分层反向依赖、Mapper 包归属、禁裸 `System.getenv`、禁懒注入、JSON 工厂统一等规则做成了**编译期可执行的棘轮**（`noLayerInversions` / `mapperInterfacesLiveInMapperPackages` / `rawJdbcOnlyFromWhitelist` 等，行 563-1120）；
 - 注释密度与质量异常高（大量 javadoc 解释"为什么这样写"而非"写了什么"），
   测试约 13.5 万行 vs 生产 30 万行，测试/生产比约 0.45。
 
@@ -75,11 +75,11 @@
 | 770 | domains/src/main/java/com/ragagent/memory/service/MemoryService.java |
 | 770 | domains/src/main/java/com/ragagent/knowledge/service/faq/FaqEntryCommandService.java |
 | 761 | domains/src/main/java/com/ragagent/im/runtime/ToolDisplay.java |
-| 758 | retrieval-engine/src/main/java/com/ragagent/retrieval/HybridSearchService.java |
-| 758 | model-runtime/src/main/java/com/ragagent/modelruntime/adapter/provider/chat/anthropic/AnthropicChat.java |
+| 758 | backend/retrieval-engine/src/main/java/com/ragagent/retrieval/HybridSearchService.java |
+| 758 | backend/model-runtime/src/main/java/com/ragagent/modelruntime/adapter/provider/chat/anthropic/AnthropicChat.java |
 | 754 | domains/src/main/java/com/ragagent/im/channel/dingtalk/DingtalkAdapter.java |
 | 748 | domains/src/main/java/com/ragagent/wiki/service/ingest/WikiIngestCitePipeline.java |
-| 740 | model-runtime/src/main/java/com/ragagent/modelcontext/ModelOutput.java |
+| 740 | backend/model-runtime/src/main/java/com/ragagent/modelcontext/ModelOutput.java |
 | 738 | domains/src/main/java/com/ragagent/auth/service/UserService.java |
 | 729 | domains/src/main/java/com/ragagent/wiki/service/page/DefaultWikiPageService.java |
 | 725 | domains/src/main/java/com/ragagent/memory/service/MemoryExtractionService.java |
@@ -87,7 +87,7 @@
 | 723 | domains/src/main/java/com/ragagent/mcp/tool/McpCatalog.java |
 | 719 | domains/src/main/java/com/ragagent/datasource/connector/feishu/core/DocxBlocks.java |
 | 711 | domains/src/main/java/com/ragagent/knowledge/service/management/KnowledgeService.java |
-| 709 | agent-engine/src/main/java/com/ragagent/agent/AgentEngine.java |
+| 709 | backend/agent-engine/src/main/java/com/ragagent/agent/AgentEngine.java |
 
 > 说明：测试侧大文件更多（最大 JsonContractRoundTripTest 1409 行、ArchitectureRulesTest 1135 行），本报告聚焦生产代码，测试文件仅作背景。
 
@@ -319,7 +319,7 @@
   a) **协议仿真逻辑**：AuthController（641 行）内含 gin binding 仿真——GIN_EMAIL 正则（行 105-114）、按码点计数（行 173、201-212）、逐条收集 binding 错误——这是为保持与 Go 后端逐字节兼容而留在 controller 的验证框架移植，本应属 validator 层；
   b) **策略解析**：AuthController.resolveRegistrationMode/resolveDefaultTenantMode/resolveTenantSelfServiceCreationEnabled（行 504-524）在 controller 里读 SystemSettingGateway 拼三级优先级（DB>env>cfg）；
   c) **授权编排**：DataSourceController 每个端点开头自取租户判 401（javadoc 行 58-66 解释了"刻意不抽切面"的理由——文案两组端点不同）。
-  这些选择**有文档化的合理性**（契约锁定），但代价是 534 处 BizException 抛出点沉在 HTTP 层，单元测试只能走 HTTP 契约测试（app/src/test 的 HttpContractTest 们确实这么干，最大 1009 行），业务规则无法在 service 层单测。
+  这些选择**有文档化的合理性**（契约锁定），但代价是 534 处 BizException 抛出点沉在 HTTP 层，单元测试只能走 HTTP 契约测试（backend/app/src/test 的 HttpContractTest 们确实这么干，最大 1009 行），业务规则无法在 service 层单测。
 - **反向 2：响应封装不统一**。`@ApiResult` 注解 + ApiResponse 是主流（65 处），但 DataSourceController（546 行，37 处 BizException）全家直写 `{"error":...}`，EmbedChannelController 系列用 `Map<String,Object>` 错误体（12+6+4 处）——同一系统两套错误信封，客户端要兼容两种形态。javadoc 说"别统一"，但这是技术债不是特性。
 
 ### 4.2 命名与模式一致性：三套并存的服务命名方言

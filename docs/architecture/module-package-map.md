@@ -46,10 +46,10 @@
    `agent` → `:agent-engine`；`retrieval` → `:retrieval-engine`；
    `embedding` / `llm` / `modelcontext` / `modelruntime` / `rerank` → `:model-runtime`；
    其余 20 个包根 → `:domains`；`com.ragagent.config` 与根包 → `:boot`。
-2. **HTTP 路由**在 `app/src/main/java/com/ragagent/<域>/controller/`；
+2. **HTTP 路由**在 `backend/app/src/main/java/com/ragagent/<域>/controller/`；
    跨模块公开类型在 `contract/`，端口实现与全局 Bean 在 `boot/config/`。
-3. **测试**：业务域测试住在 `app/src/test/`；HTTP 集成测试住在 `boot/src/test/`；
-   共享录制/桩夹具在 `framework/src/testFixtures/`。
+3. **测试**：业务域测试住在 `backend/app/src/test/`；HTTP 集成测试住在 `boot/src/test/`；
+   共享录制/桩夹具在 `backend/framework/src/testFixtures/`。
 
 ## 刻意例外
 

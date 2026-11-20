@@ -16,7 +16,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DOMAINS = ROOT / "app/src/main/java"
+DOMAINS = ROOT / "backend/app/src/main/java"
 BASELINE = ROOT / "scripts/controller-entity-imports.baseline.json"
 IMPORT = re.compile(r"^import com\.ragagent\.(?:[\w]+\.)+domain\.[\w.]+;", re.M)
 

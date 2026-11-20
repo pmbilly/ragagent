@@ -149,20 +149,20 @@ def build_beans(files):
 
 
 def build_cross(files):
-	domains = sorted([p.name for p in (_sr.REPO / "app/src/main/java/com/ragagent").iterdir() if p.is_dir()])
+	domains = sorted([p.name for p in (_sr.REPO / "backend/app/src/main/java/com/ragagent").iterdir() if p.is_dir()])
 	domset = set(domains)
 	edges = {}
 	contract = {}
 	for path, text in files:
 		if "/domains/" not in str(path):
 			continue
-		parts = path.relative_to(_sr.REPO / "app/src/main/java/com/ragagent").parts
+		parts = path.relative_to(_sr.REPO / "backend/app/src/main/java/com/ragagent").parts
 		if len(parts) < 2 or parts[0] not in domset:
 			continue
 		src = parts[0]
 		for m in IMPORT.finditer(text):
 			dst, sub = m.group(1), m.group(2)
-			if dst == "contract":
+			if dst.endswith("/contract"):
 				contract[src] = contract.get(src, 0) + 1
 				continue
 			if dst not in domset or dst == src:

@@ -17,7 +17,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "scripts" / "capability-kinds.json"
-DOMAINS = ROOT / "app" / "src" / "main" / "java" / "com" / "ragagent"
+DOMAINS = ROOT / "backend" / "app" / "src" / "main" / "java" / "com" / "ragagent"
 FIELDS = ("种类", "入口", "对外契约面", "依赖")
 VALUE_RE = {field: re.compile(rf"<b>{field}</b>：([^<\n]+)") for field in FIELDS}
 

@@ -20,12 +20,12 @@
   <name>ragagent-java</name>
 
   <modules>
-    <module>contract</module>
-    <module>framework</module>
-    <module>model-runtime</module>
-    <module>retrieval-engine</module>
-    <module>agent-engine</module>
-    <module>app</module>
+    <module>backend/contract</module>
+    <module>backend/framework</module>
+    <module>backend/model-runtime</module>
+    <module>backend/retrieval-engine</module>
+    <module>backend/agent-engine</module>
+    <module>backend/app</module>
   </modules>
 
   <properties>

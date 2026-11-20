@@ -33,19 +33,19 @@ MODULE_ALLOW: dict[str, str] = {}
 
 # 源码树根（S2 扫描范围）
 SOURCE_ROOTS = (
-    "contract/src/main/java",
-    "app/src/main/java",
-    "app/src/test/java",
-    "app/src/testFixtures/java",
+    "backend/contract/src/main/java",
+    "backend/app/src/main/java",
+    "backend/app/src/test/java",
+    "backend/app/src/testFixtures/java",
     "common/src/main/java",
     "common/src/test/java",
     "common/src/testFixtures/java",
-    "model-runtime/src/main/java",
-    "model-runtime/src/test/java",
-    "retrieval-engine/src/main/java",
-    "retrieval-engine/src/test/java",
-    "agent-engine/src/main/java",
-    "agent-engine/src/test/java",
+    "backend/model-runtime/src/main/java",
+    "backend/model-runtime/src/test/java",
+    "backend/retrieval-engine/src/main/java",
+    "backend/retrieval-engine/src/test/java",
+    "backend/agent-engine/src/main/java",
+    "backend/agent-engine/src/test/java",
     "engine/src/testFixtures/java",
     "boot/src/main/java",
     "boot/src/test/java",
@@ -72,7 +72,7 @@ def _ignored(path: pathlib.Path) -> bool:
 def check_stray_dirs() -> list[str]:
     problems = []
     scan = [(ROOT, ROOT_ALLOW)]
-    for mod in (ROOT / "app", ROOT / "common", ROOT / "model-runtime", ROOT / "retrieval-engine", ROOT / "agent-engine", ROOT / ROOT / "frontend", ROOT / "mcp-server",
+    for mod in (ROOT / "backend/app", ROOT / "common", ROOT / "backend/model-runtime", ROOT / "backend/retrieval-engine", ROOT / "backend/agent-engine", ROOT / ROOT / "frontend", ROOT / "mcp-server",
                 ROOT / "docreader", ROOT / "otlp-proto", ROOT / "migrations", ROOT / "docs",
                 ROOT / "scripts"):
         if mod.is_dir():

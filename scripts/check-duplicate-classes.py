@@ -16,7 +16,7 @@ import pathlib
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-MODULES = ["contract", "framework", "model-runtime", "retrieval-engine", "agent-engine", "app"]
+MODULES = ["backend/contract", "backend/framework", "backend/model-runtime", "backend/retrieval-engine", "backend/agent-engine", "backend/app"]
 EXEMPT = {"package-info", "module-info"}
 
 

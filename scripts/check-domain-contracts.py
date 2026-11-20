@@ -3,7 +3,7 @@
 
 口径
 ====
-业务域 = `app/src/main/java/com/ragagent/<域>/**`，域名取自方案 §8.9 的域清单（本文件 DOMAINS）。
+业务域 = `backend/app/src/main/java/com/ragagent/<域>/**`，域名取自方案 §8.9 的域清单（本文件 DOMAINS）。
 跨域调用只许经 **`contract.*`（端口 / 载荷）** 或**装配层**（`config` / `platform` / `common`）——
 即：业务域 A 不得 `import com.ragagent.<业务域B>.*`（A≠B）。
 
@@ -55,7 +55,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DOMAIN_SRC = os.path.join(ROOT, 'app/src/main/java/com/ragagent')
+DOMAIN_SRC = os.path.join(ROOT, 'backend/app/src/main/java/com/ragagent')
 BASELINE = os.path.join(ROOT, 'scripts/domain-contracts.baseline.json')
 
 # 业务域清单（方案 §8.9）。新增域时同步这里——否则新域的跨域引用不会被本守卫看见。

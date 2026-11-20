@@ -51,7 +51,7 @@ import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-CONTRACTS = ROOT / 'app/src/testFixtures/resources/contracts'
+CONTRACTS = ROOT / 'backend/app/src/testFixtures/resources/contracts'
 MAIN_ROOTS = [ROOT / m / 'src/main/java' for m in ('app', 'engine', 'common', 'boot')]
 TEST_ROOTS = [ROOT / m / 'src/test/java' for m in ('app', 'engine', 'common')]
 CODE_BY_STATUS = {400: 1000, 401: 1001, 403: 1002, 404: 1003, 405: 1004,

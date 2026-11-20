@@ -18,8 +18,8 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "scripts" / "capability-kinds.json"
 OUT = ROOT / "docs" / "architecture" / "domain-index.md"
-DOMAINS = ROOT / "app" / "src" / "main" / "java" / "com" / "ragagent"
-CONTRACT = ROOT / "contract" / "src" / "main" / "java" / "com" / "ragagent" / "contract"
+DOMAINS = ROOT / "backend" / "app" / "src" / "main" / "java" / "com" / "ragagent"
+CONTRACT = ROOT / "backend" / "contract" / "src" / "main" / "java" / "com" / "ragagent" / "contract"
 FRONTEND_SRC = ROOT / "frontend" / "src"
 
 IMPLEMENTS_RE = re.compile(r"\bimplements\s+([^{]+)\{")
