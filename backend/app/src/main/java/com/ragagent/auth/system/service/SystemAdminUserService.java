@@ -1,4 +1,4 @@
-package com.ragagent.system.service;
+package com.ragagent.auth.system.service;
 
 import com.ragagent.auth.api.AuthUserErrors;
 import com.ragagent.platform.access.TenantContext;

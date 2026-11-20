@@ -4,6 +4,8 @@
   "src/main/java/com/ragagent/auth/controller/AuthController.java": 9,
   "src/main/java/com/ragagent/auth/controller/TenantAPIPrincipalController.java": 1,
   "src/main/java/com/ragagent/auth/controller/TenantInvitationController.java": 4,
+  "src/main/java/com/ragagent/auth/system/controller/SystemAdminController.java": 1,
+  "src/main/java/com/ragagent/auth/system/controller/SystemController.java": 4,
   "src/main/java/com/ragagent/datasource/controller/DataSourceController.java": 15,
   "src/main/java/com/ragagent/datasource/controller/DataSourceCredentialsController.java": 5,
   "src/main/java/com/ragagent/im/controller/ImChannelController.java": 7,
@@ -19,8 +21,6 @@
   "src/main/java/com/ragagent/session/controller/SteerController.java": 12,
   "src/main/java/com/ragagent/session/controller/TemporaryDocumentController.java": 7,
   "src/main/java/com/ragagent/storage/controller/StorageBackendController.java": 2,
-  "src/main/java/com/ragagent/system/controller/SystemAdminController.java": 1,
-  "src/main/java/com/ragagent/system/controller/SystemController.java": 4,
   "src/main/java/com/ragagent/vectorstore/controller/VectorStoreController.java": 2,
   "src/main/java/com/ragagent/websearch/controller/WebSearchProviderController.java": 6,
   "src/main/java/com/ragagent/websearch/controller/WebSearchProviderCredentialsController.java": 3

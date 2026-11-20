@@ -1,7 +1,11 @@
-package com.ragagent.system.controller;
+package com.ragagent.auth.system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.auth.apikey.service.ApiKeyAdminAdapter;
+import com.ragagent.auth.system.dto.SystemDtos;
+import com.ragagent.auth.system.dto.SystemSettingResponse;
+import com.ragagent.auth.system.service.SystemAdminUserService;
+import com.ragagent.auth.system.service.SystemSettingService;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
@@ -21,10 +25,6 @@ import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
 import com.ragagent.shared.pagination.PageResult;
 import com.ragagent.shared.tenant.TenantStorageQuotaPort;
-import com.ragagent.system.dto.SystemDtos;
-import com.ragagent.system.dto.SystemSettingResponse;
-import com.ragagent.system.service.SystemAdminUserService;
-import com.ragagent.system.service.SystemSettingService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

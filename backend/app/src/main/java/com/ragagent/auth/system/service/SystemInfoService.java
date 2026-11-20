@@ -1,4 +1,4 @@
-package com.ragagent.system.service;
+package com.ragagent.auth.system.service;
 
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.shared.retrieval.RetrieveGraphRepository;

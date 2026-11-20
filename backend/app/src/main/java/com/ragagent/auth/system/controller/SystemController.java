@@ -1,6 +1,9 @@
-package com.ragagent.system.controller;
+package com.ragagent.auth.system.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.auth.system.dto.SystemDtos;
+import com.ragagent.auth.system.service.DeploymentCapabilitiesHolder;
+import com.ragagent.auth.system.service.SystemInfoService;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.web.ApiResult;
@@ -12,9 +15,6 @@ import com.ragagent.shared.settings.ParserEngineCatalogPort;
 import com.ragagent.shared.storage.StorageConnectivityPort;
 import com.ragagent.shared.tenant.ParserEngineConfig;
 import com.ragagent.shared.tenant.TenantConfigLookup;
-import com.ragagent.system.dto.SystemDtos;
-import com.ragagent.system.service.DeploymentCapabilitiesHolder;
-import com.ragagent.system.service.SystemInfoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.LinkedHashMap;
 import java.util.List;

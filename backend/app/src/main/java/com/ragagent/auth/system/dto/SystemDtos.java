@@ -1,4 +1,4 @@
-package com.ragagent.system.dto;
+package com.ragagent.auth.system.dto;
 
 import com.ragagent.shared.auth.AdminUserView;
 import com.ragagent.shared.auth.UserPreferences;

@@ -1,4 +1,4 @@
-package com.ragagent.system.domain;
+package com.ragagent.auth.system.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;

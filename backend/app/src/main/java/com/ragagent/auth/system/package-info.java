@@ -7,4 +7,4 @@
  * <b>对外契约面</b>：{@code SystemSettingGateway}<br>
  * <b>依赖</b>：{@code contract}、{@code platform}、同模块 {@code auth}。</p>
  */
-package com.ragagent.system;
+package com.ragagent.auth.system;

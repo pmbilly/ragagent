@@ -1,7 +1,7 @@
-package com.ragagent.system.dto;
+package com.ragagent.auth.system.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.system.domain.SystemSetting;
+import com.ragagent.auth.system.domain.SystemSetting;
 import java.time.OffsetDateTime;
 import java.util.List;
 

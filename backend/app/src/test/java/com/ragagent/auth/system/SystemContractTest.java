@@ -1,4 +1,4 @@
-package com.ragagent.system;
+package com.ragagent.auth.system;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;

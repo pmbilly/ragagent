@@ -885,6 +885,23 @@ framework 内其他类型引用，闭包下依然搬不走。
 | 接受 framework 含少量跨域词汇（`shared` 命名空间仍可消失，只是这些类型迁到 framework 自己的包） | 零额外工时 | 多出 10~20 个跨域查询词汇 |
 | 拍板 **auth + system 合并** | 多 2~3 天（族定义、`capability-kinds.json`、路由前缀不变） | 保持纯净 |
 
+#### 决策落地：`auth` + `system` 已合并（2026-11-20）
+
+按上一节的二选一，选择**合并**（D3′ 由「暂缓」改为「执行」）。形态与实测：
+
+| 项 | 内容 |
+|---|---|
+| 形态 | `app/system/**` → `app/auth/system/**`（保留 `auth` 作域名，18 个文件 / 22 端点随迁） |
+| 为何选 auth 作域名 | 它已有 122 文件 / 43 端点，且已含 `apikey` 子域；反向改名成本更高 |
+| 同类同级别 | 两者都是 `control` / L1，合并后 kind 与 level 不变 |
+| 路由 | 完全不变（`@RequestMapping` 路径未动），金片逐字节不变 |
+
+**效果实测**：`auth+system` 的同级依赖从 **12 个 → 0**；业务词汇多域档 136 → 125；域数 19 → 18。`shared` 里那批 `AdminUserPort` / `SystemSettingGateway` 等查询型词汇因此变成「唯一 home = auth」，可在 P3 直接搬进 `auth/api`。
+
+**剩余同级组合**（合并后实测）：`knowledge+wiki` 10 · `datasource+knowledge` 3 · `initialization+storage` 2 · `auth+storage` 2 · `audit+auth` 2 · 其余零星 3。
+
+**踩坑（换包必漂的两类基线）**：`controller-catch.baseline.json` 的键是模块内相对路径、`fully-qualified-names.baseline.json` 的键是仓库相对路径——两者都要换锚，否则会把老债务当成「新增」报红。
+
 #### 修正后的 P4 口径
 
 | 项 | 旧口径 | 新口径 |

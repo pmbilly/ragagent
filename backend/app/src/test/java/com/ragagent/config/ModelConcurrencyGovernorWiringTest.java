@@ -13,12 +13,12 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.auth.system.service.SystemSettingService;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.limiter.LocalLimiter;
 import com.ragagent.llm.limiter.ModelConcurrencyLimiter;
 import com.ragagent.llm.limiter.RedisLimiter;
 import com.ragagent.platform.stream.EmbeddedRedis;
-import com.ragagent.system.service.SystemSettingService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

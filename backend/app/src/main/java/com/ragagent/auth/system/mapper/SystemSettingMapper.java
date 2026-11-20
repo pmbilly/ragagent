@@ -1,7 +1,7 @@
-package com.ragagent.system.mapper;
+package com.ragagent.auth.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.system.domain.SystemSetting;
+import com.ragagent.auth.system.domain.SystemSetting;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

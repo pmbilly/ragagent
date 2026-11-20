@@ -1,8 +1,8 @@
-package com.ragagent.system.repository;
+package com.ragagent.auth.system.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.system.domain.SystemSetting;
-import com.ragagent.system.mapper.SystemSettingMapper;
+import com.ragagent.auth.system.domain.SystemSetting;
+import com.ragagent.auth.system.mapper.SystemSettingMapper;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 

@@ -40,7 +40,7 @@
     },
     "auth": {
       "kind": "control",
-      "frontend": "views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue",
+      "frontend": "views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue · views/settings/panels",
       "level": 1
     },
     "datasource": {
@@ -96,11 +96,6 @@
     "storage": {
       "kind": "integration",
       "frontend": "views/settings/StorageBackendSettings.vue",
-      "level": 1
-    },
-    "system": {
-      "kind": "control",
-      "frontend": "views/settings/panels",
       "level": 1
     },
     "vectorstore": {

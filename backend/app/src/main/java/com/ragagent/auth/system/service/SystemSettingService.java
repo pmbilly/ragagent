@@ -1,8 +1,10 @@
-package com.ragagent.system.service;
+package com.ragagent.auth.system.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.ragagent.auth.system.domain.SystemSetting;
+import com.ragagent.auth.system.repository.SystemSettingRepository;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.SsrfGuard;
@@ -14,8 +16,6 @@ import com.ragagent.shared.audit.AuditWritePort;
 import com.ragagent.shared.auth.AdminUserPort;
 import com.ragagent.shared.auth.AdminUserView;
 import com.ragagent.shared.settings.SystemSettingGateway;
-import com.ragagent.system.domain.SystemSetting;
-import com.ragagent.system.repository.SystemSettingRepository;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;

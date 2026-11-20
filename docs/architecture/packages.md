@@ -60,6 +60,13 @@
 | `:backend` | `com.ragagent.auth.mapper` | 认证 · 映射：TenantInvitationMapper / TenantMemberMapper / AuthTokenMapper…。 |
 | `:backend` | `com.ragagent.auth.repository` | 认证域仓储门面：会话令牌的查询、签发落库与吊销。 |
 | `:backend` | `com.ragagent.auth.service` | 认证 · 服务：TenantInvitationService / TenantMemberService / TenantService…。 |
+| `:backend` | `com.ragagent.auth.system` | 系统设置与管理员面：系统设置读写（/api/v1/system）与管理员操作 （/api/v1/system/admin）。 |
+| `:backend` | `com.ragagent.auth.system.controller` | 系统 · HTTP 层：SystemAdminController / SystemController。 |
+| `:backend` | `com.ragagent.auth.system.domain` | 系统 · 领域模型：SystemSetting。 |
+| `:backend` | `com.ragagent.auth.system.dto` | 系统管理 · 传输形状：系统设置响应视图。 |
+| `:backend` | `com.ragagent.auth.system.mapper` | 系统 · 映射：SystemSettingMapper。 |
+| `:backend` | `com.ragagent.auth.system.repository` | 系统设置仓储门面：全量读取、按键读写与删除。 |
+| `:backend` | `com.ragagent.auth.system.service` | 系统 · 服务：SystemAdminUserService / SystemSettingService / SystemInfoService…。 |
 | `:backend` | `com.ragagent.config` | Spring 装配层：Web/MyBatis/检索引擎/会话/IM 等的 Bean 定义与 @ConfigurationProperties 属性绑定， 不含业务逻辑。 |
 | `:backend` | `com.ragagent.datasource` | 数据源连接器域：外部知识源（Notion/Feishu/Yuque/RSS/IMA/GitLab 等）的抓取、游标推进、 同步编排与数据源配置面。 |
 | `:backend` | `com.ragagent.datasource.catalog` | 数据源 · 连接器目录：类型元数据与可用连接器清单（不参与持久化）。 |
@@ -324,13 +331,6 @@
 | `:backend` | `com.ragagent.storage.repository` | 存储后端与资源仓储门面：存储元数据与资源行的查询（JdbcClient 方言 SQL）。 |
 | `:backend` | `com.ragagent.storage.service` | 存储 · 服务：ResourceCatalogService / StorageBackendService / DefaultStorageBackendProvisioner…。 |
 | `:backend` | `com.ragagent.storage.support` | 存储域的支撑层：存储 URL 解析与重写——签名 URL、流式重写与文件服务解析 （原顶层包 storageurl， 并入）。 |
-| `:backend` | `com.ragagent.system` | 系统设置与管理员面：系统设置读写（/api/v1/system）与管理员操作 （/api/v1/system/admin）。 |
-| `:backend` | `com.ragagent.system.controller` | 系统 · HTTP 层：SystemAdminController / SystemController。 |
-| `:backend` | `com.ragagent.system.domain` | 系统 · 领域模型：SystemSetting。 |
-| `:backend` | `com.ragagent.system.dto` | 系统管理 · 传输形状：系统设置响应视图。 |
-| `:backend` | `com.ragagent.system.mapper` | 系统 · 映射：SystemSettingMapper。 |
-| `:backend` | `com.ragagent.system.repository` | 系统设置仓储门面：全量读取、按键读写与删除。 |
-| `:backend` | `com.ragagent.system.service` | 系统 · 服务：SystemAdminUserService / SystemSettingService / SystemInfoService…。 |
 | `:backend` | `com.ragagent.vectorstore` | 向量库配置域：向量库类型目录与配置校验/持久化，对外 /api/v1/vector-stores。 |
 | `:backend` | `com.ragagent.vectorstore.config` | 向量存储 · 环境配置：EnvVectorStores 的读取与查询视图。 |
 | `:backend` | `com.ragagent.vectorstore.controller` | 向量库 · HTTP 层：VectorStoreController。 |

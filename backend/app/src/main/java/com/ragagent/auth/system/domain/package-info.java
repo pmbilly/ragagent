@@ -3,4 +3,4 @@
  *
  * <p>依赖 {@code platform}。</p>
  */
-package com.ragagent.system.domain;
+package com.ragagent.auth.system.domain;

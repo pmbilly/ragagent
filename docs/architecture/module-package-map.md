@@ -13,16 +13,16 @@
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 22 | 180 | 0 |
 | `:retrieval-engine` | `retrieval` | 16 | 124 | 0 |
 | `:agent-engine` | `agent`、`agentengine` | 10 | 97 | 0 |
-| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 261 | 1710 | 51 |
+| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch`、`wiki` | 261 | 1710 | 51 |
 
-## 20 个业务域（domains）
+## 19 个业务域（domains）
 
 | 域 | 主码包 | 文件 | 控制器 |
 |---|---|---:|---:|
 | `agentmanagement` | `com.ragagent.agentmanagement` | 27 | 2 |
 | `agenttools` | `com.ragagent.agenttools` | 61 | 0 |
 | `audit` | `com.ragagent.audit` | 20 | 1 |
-| `auth` | `com.ragagent.auth` | 122 | 6 |
+| `auth` | `com.ragagent.auth` | 140 | 8 |
 | `config` | `com.ragagent.config` | 17 | 0 |
 | `datasource` | `com.ragagent.datasource` | 147 | 2 |
 | `embedchannel` | `com.ragagent.embedchannel` | 25 | 1 |
@@ -35,7 +35,6 @@
 | `model` | `com.ragagent.model` | 38 | 4 |
 | `session` | `com.ragagent.session` | 212 | 8 |
 | `storage` | `com.ragagent.storage` | 62 | 3 |
-| `system` | `com.ragagent.system` | 18 | 2 |
 | `vectorstore` | `com.ragagent.vectorstore` | 20 | 1 |
 | `websearch` | `com.ragagent.websearch` | 52 | 3 |
 | `wiki` | `com.ragagent.wiki` | 173 | 1 |
@@ -45,7 +44,7 @@
 1. **先看包根**：`com.ragagent.contract.*` → `:contract`；`platform` → `:platform`；
    `agent` → `:agent-engine`；`retrieval` → `:retrieval-engine`；
    `embedding` / `llm` / `modelcontext` / `modelruntime` / `rerank` → `:model-runtime`；
-   其余 20 个包根 → `:domains`；`com.ragagent.config` 与根包 → `:boot`。
+   其余 19 个包根 → `:domains`；`com.ragagent.config` 与根包 → `:boot`。
 2. **HTTP 路由**在 `backend/app/src/main/java/com/ragagent/<域>/controller/`；
    跨模块公开类型在 `contract/`，端口实现与全局 Bean 在 `boot/config/`。
 3. **测试**：业务域测试住在 `backend/app/src/test/`；HTTP 集成测试住在 `boot/src/test/`；
