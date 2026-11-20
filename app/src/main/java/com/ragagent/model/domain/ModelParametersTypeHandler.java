@@ -2,7 +2,7 @@ package com.ragagent.model.domain;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.model.ModelParameters;
+import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.web.JsonMappers;
 import java.sql.CallableStatement;

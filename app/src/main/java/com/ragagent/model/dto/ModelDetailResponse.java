@@ -1,6 +1,6 @@
 package com.ragagent.model.dto;
 
-import com.ragagent.contract.model.ModelParameters;
+import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.model.domain.Model;
 import java.time.OffsetDateTime;
 import java.util.Map;

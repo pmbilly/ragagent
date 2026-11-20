@@ -1,4 +1,4 @@
-package com.ragagent.contract.model;
+package com.ragagent.llm.api;
 
 /**
  * ModelParameters（models.parameters jsonb 列的落库形态）。

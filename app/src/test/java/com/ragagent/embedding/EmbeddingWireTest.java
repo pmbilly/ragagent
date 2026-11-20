@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.model.Embedder;
-import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.embedding.provider.AliyunEmbedder;
 import com.ragagent.embedding.provider.AzureOpenAiEmbedder;
 import com.ragagent.embedding.provider.GeminiEmbedder;
@@ -13,6 +12,7 @@ import com.ragagent.embedding.provider.NvidiaEmbedder;
 import com.ragagent.embedding.provider.OpenAiEmbedder;
 import com.ragagent.embedding.provider.VolcengineEmbedder;
 import com.ragagent.embedding.provider.ZhipuEmbedder;
+import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.llm.limiter.BackgroundTaskContext;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.limiter.LocalLimiter;

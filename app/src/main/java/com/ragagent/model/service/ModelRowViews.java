@@ -1,6 +1,6 @@
 package com.ragagent.model.service;
 
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.model.domain.Model;
 
 /**

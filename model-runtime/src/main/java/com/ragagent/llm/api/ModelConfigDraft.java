@@ -1,4 +1,4 @@
-package com.ragagent.contract.model;
+package com.ragagent.llm.api;
 
 /**
  * 模型配置结构校验的输入：只携带厂商规则需要的字段，不含落库/加密细节。

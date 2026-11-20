@@ -1,7 +1,7 @@
 package com.ragagent.memory.service;
 
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import java.util.List;
 
 /**

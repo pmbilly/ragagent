@@ -2,10 +2,10 @@ package com.ragagent.knowledge.index;
 
 import com.ragagent.contract.graph.NameSpace;
 import com.ragagent.contract.model.Embedder;
-import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.retrieval.api.IndexEngine;
 import com.ragagent.retrieval.api.VectorIndexStore;
 import java.util.List;

@@ -1,10 +1,10 @@
 package com.ragagent.knowledge.support;
 
-import com.ragagent.contract.model.AsrTranscriber;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.llm.api.AsrTranscriber;
+import com.ragagent.llm.api.ModelCatalogPort;
+import com.ragagent.llm.api.ModelRuntime;
 
 /**
  * 音视频入库所需的依赖集合。

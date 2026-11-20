@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.model.ChatConfig;
 import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.model.ChatOptions;
 import com.ragagent.contract.model.ChatResponse;
@@ -13,6 +12,7 @@ import com.ragagent.contract.model.ChatTool;
 import com.ragagent.contract.model.FunctionCall;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.ToolCall;
+import com.ragagent.llm.api.ChatConfig;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

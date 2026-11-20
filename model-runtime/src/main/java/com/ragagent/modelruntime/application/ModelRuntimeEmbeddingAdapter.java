@@ -2,7 +2,7 @@ package com.ragagent.modelruntime.application;
 
 import com.ragagent.contract.model.EmbeddingPort;
 import com.ragagent.contract.model.ModelFacts;
-import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.llm.api.ModelRuntime;
 import java.util.List;
 import org.springframework.stereotype.Component;
 

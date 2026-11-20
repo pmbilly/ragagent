@@ -23,6 +23,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "contract/src/main/java"
+#: 终态的契约面 = contract（尚未搬完的部分）+ 各模块的 api 包（已归位的端口/形状）。
+#: 只扫 contract 会让搬走的端口静默失去覆盖——比报红更危险。
+MAIN_ROOTS = sorted(p for p in ROOT.glob("*/src/main/java") if p.is_dir())
 BASELINE = ROOT / "scripts/contract-shape.baseline.json"
 
 MAX_PORT_METHODS = 7
@@ -77,33 +80,36 @@ def main() -> int:
     seen_rows = set()
     seen_fields = set()
 
-    for path in sorted(SRC.rglob("*.java")):
-        if path.name == "package-info.java":
-            continue
-        rel = str(path.relative_to(SRC))
-        stem = path.stem
-        if stem.endswith("Port"):
-            methods = count_port_methods(path)
-            seen_ports.add(stem)
-            limit = allowed_ports.get(stem, {}).get("methods", MAX_PORT_METHODS)
-            if methods > limit:
-                problems.append(
-                    f"端口 {stem} 有 {methods} 个方法（上限 {limit}）——拆窄或登记基线"
-                )
-        if stem.endswith("RowView") or stem.endswith("PageView"):
-            seen_rows.add(rel)
-            if rel not in allowed_rows:
-                problems.append(
-                    f"{rel} 是域内行/页投影，不应进 contract——回域或登记基线"
-                )
-        fields = count_fields(path)
-        if fields > MAX_FIELDS:
-            seen_fields.add(rel)
-            limit = allowed_fields.get(rel, {}).get("fields", MAX_FIELDS)
-            if fields > limit:
-                problems.append(
-                    f"{rel} 有 {fields} 个字段（上限 {limit}）——收窄形状或登记基线"
-                )
+    for src in MAIN_ROOTS:
+        for path in sorted(src.rglob("*.java")):
+            rel = str(path.relative_to(src))
+            if not (rel.startswith("com/ragagent/contract/") or "/api/" in rel):
+                continue
+            if path.name == "package-info.java":
+                continue
+            stem = path.stem
+            if stem.endswith("Port"):
+                methods = count_port_methods(path)
+                seen_ports.add(stem)
+                limit = allowed_ports.get(stem, {}).get("methods", MAX_PORT_METHODS)
+                if methods > limit:
+                    problems.append(
+                        f"端口 {stem} 有 {methods} 个方法（上限 {limit}）——拆窄或登记基线"
+                    )
+            if stem.endswith("RowView") or stem.endswith("PageView"):
+                seen_rows.add(rel)
+                if rel not in allowed_rows:
+                    problems.append(
+                        f"{rel} 是域内行/页投影，不应进 contract——回域或登记基线"
+                    )
+            fields = count_fields(path)
+            if fields > MAX_FIELDS:
+                seen_fields.add(rel)
+                limit = allowed_fields.get(rel, {}).get("fields", MAX_FIELDS)
+                if fields > limit:
+                    problems.append(
+                        f"{rel} 有 {fields} 个字段（上限 {limit}）——收窄形状或登记基线"
+                    )
 
     print("▶ 契约形状预算（端口 ≤7 方法 / 行视图禁入 / 字段 ≤20）")
     if problems:

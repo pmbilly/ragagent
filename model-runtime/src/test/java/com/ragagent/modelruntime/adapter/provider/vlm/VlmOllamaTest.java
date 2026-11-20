@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.model.VlmConfig;
+import com.ragagent.llm.api.VlmConfig;
 import com.ragagent.llm.ollama.OllamaService;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;

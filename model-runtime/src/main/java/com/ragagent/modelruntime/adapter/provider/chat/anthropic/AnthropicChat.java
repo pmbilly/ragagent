@@ -2,7 +2,6 @@ package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.model.CacheRetention;
-import com.ragagent.contract.model.ChatConfig;
 import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.model.ChatOptions;
 import com.ragagent.contract.model.ChatResponse;
@@ -13,6 +12,7 @@ import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.StreamResponse;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.contract.model.ToolCall;
+import com.ragagent.llm.api.ChatConfig;
 import com.ragagent.llm.provider.ProviderBaseURLs;
 import com.ragagent.modelruntime.adapter.provider.chat.PromptCache;
 import com.ragagent.modelruntime.adapter.provider.chat.common.SseReader;

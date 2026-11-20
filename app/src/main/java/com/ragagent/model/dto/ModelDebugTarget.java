@@ -1,6 +1,6 @@
 package com.ragagent.model.dto;
 
-import com.ragagent.contract.model.ModelParameters;
+import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.model.domain.Model;
 
 /** 调试面需要的模型字段投影：控制器不再直接持有 {@link Model}。 */

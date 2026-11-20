@@ -1,8 +1,8 @@
 package com.ragagent.llm.extract;
 
 import com.ragagent.contract.graph.EntityExtractionResult;
-import com.ragagent.contract.model.EntityExtractionPort;
 import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.llm.api.EntityExtractionPort;
 import com.ragagent.platform.prompt.PipelineConfig.PromptTemplateStructured;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.List;

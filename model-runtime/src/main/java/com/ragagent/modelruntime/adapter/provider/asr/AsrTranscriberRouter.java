@@ -1,6 +1,6 @@
 package com.ragagent.modelruntime.adapter.provider.asr;
 
-import com.ragagent.contract.model.AsrTranscriber;
+import com.ragagent.llm.api.AsrTranscriber;
 import com.ragagent.platform.security.SsrfGuard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;

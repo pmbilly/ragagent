@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
-import com.ragagent.contract.model.ModelRuntime;
+import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.retrieval.api.HybridSearchPort;
 import com.ragagent.session.conversation.MessageService;

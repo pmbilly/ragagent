@@ -1,17 +1,17 @@
 package com.ragagent.modelruntime.application;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.model.ChatConfig;
 import com.ragagent.contract.model.Embedder;
 import com.ragagent.contract.model.LlmChatClient;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.contract.model.ModelParameters;
-import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.Reranker;
-import com.ragagent.contract.model.VlmConfig;
-import com.ragagent.contract.model.VlmPredictor;
 import com.ragagent.embedding.EmbedderFactory;
+import com.ragagent.llm.api.ChatConfig;
+import com.ragagent.llm.api.ModelCatalogPort;
+import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
+import com.ragagent.llm.api.ModelParameters;
+import com.ragagent.llm.api.ModelRuntime;
+import com.ragagent.llm.api.VlmConfig;
+import com.ragagent.llm.api.VlmPredictor;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.limiter.Release;
 import com.ragagent.llm.ollama.OllamaService;

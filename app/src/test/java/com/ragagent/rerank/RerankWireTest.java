@@ -3,9 +3,9 @@ package com.ragagent.rerank;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.Reranker;
+import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelRowViews;
 import com.ragagent.modelruntime.application.ModelRuntimeConfigs;

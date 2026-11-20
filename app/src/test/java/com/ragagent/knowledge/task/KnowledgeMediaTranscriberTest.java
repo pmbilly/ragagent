@@ -2,8 +2,8 @@ package com.ragagent.knowledge.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.contract.model.AsrTranscriber;
 import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.llm.api.AsrTranscriber;
 import com.ragagent.platform.web.JsonMappers;
 import java.util.List;
 import org.junit.jupiter.api.Test;

@@ -10,10 +10,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.model.ModelConfigDraft;
-import com.ragagent.contract.model.ModelConfigValidator;
-import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.llm.api.ModelConfigDraft;
+import com.ragagent.llm.api.ModelConfigValidator;
+import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.repository.ModelRepository;
 import com.ragagent.model.repository.ModelUsageRepository;

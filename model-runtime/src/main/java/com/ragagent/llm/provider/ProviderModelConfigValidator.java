@@ -1,7 +1,7 @@
 package com.ragagent.llm.provider;
 
-import com.ragagent.contract.model.ModelConfigDraft;
-import com.ragagent.contract.model.ModelConfigValidator;
+import com.ragagent.llm.api.ModelConfigDraft;
+import com.ragagent.llm.api.ModelConfigValidator;
 import org.springframework.stereotype.Component;
 
 /**

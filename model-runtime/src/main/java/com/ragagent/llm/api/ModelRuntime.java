@@ -1,6 +1,9 @@
-package com.ragagent.contract.model;
+package com.ragagent.llm.api;
 
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.Embedder;
+import com.ragagent.contract.model.LlmChatClient;
+import com.ragagent.contract.model.Reranker;
+import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 
 /**
  * 模型运行时端口（契约面）：按模型 id 造出可直接调用的能力客户端。

@@ -1,7 +1,7 @@
 package com.ragagent.initialization.dto;
 
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.contract.model.ModelView;
+import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
+import com.ragagent.llm.api.ModelView;
 
 /**
  * 模型**视图 → 运行行视图**的投影（契约面内映射，**不吃实体**）。

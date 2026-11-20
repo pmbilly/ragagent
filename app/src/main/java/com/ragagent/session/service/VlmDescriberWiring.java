@@ -1,9 +1,9 @@
 package com.ragagent.session.service;
 
 import com.ragagent.agentengine.api.ImageDescriberFunc;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.contract.model.ModelRuntime;
-import com.ragagent.contract.model.VlmPredictor;
+import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
+import com.ragagent.llm.api.ModelRuntime;
+import com.ragagent.llm.api.VlmPredictor;
 import org.springframework.stereotype.Component;
 
 /**

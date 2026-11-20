@@ -1,6 +1,6 @@
 package com.ragagent.model.service;
 
-import com.ragagent.contract.model.ModelParameters;
+import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.repository.ModelRepository;
 import com.ragagent.platform.config.AppEnvLookup;

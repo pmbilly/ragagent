@@ -1,7 +1,7 @@
 package com.ragagent.rerank;
 
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.contract.model.ModelParameters;
+import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
+import com.ragagent.llm.api.ModelParameters;
 
 /**
  * 「模型行 → rerank 运行时配置」的 L2 映射。

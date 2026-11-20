@@ -8,9 +8,9 @@
 
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
-| `:contract` | `contract` | 33 | 295 | 0 |
+| `:contract` | `contract` | 33 | 284 | 0 |
 | `:platform` | `platform` | 26 | 202 | 1 |
-| `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 21 | 163 | 0 |
+| `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 21 | 174 | 0 |
 | `:retrieval-engine` | `retrieval` | 16 | 119 | 0 |
 | `:agent-engine` | `agent`、`agentengine` | 10 | 94 | 0 |
 | `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 257 | 1664 | 51 |

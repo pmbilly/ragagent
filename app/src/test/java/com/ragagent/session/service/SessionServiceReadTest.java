@@ -9,9 +9,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.websearch.WebSearchTempStatePort;
+import com.ragagent.llm.api.ModelCatalogPort;
+import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.session.conversation.SessionLookupScope;

@@ -3,7 +3,7 @@ package com.ragagent.modelruntime.adapter.provider.asr;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.model.AsrTranscriber;
+import com.ragagent.llm.api.AsrTranscriber;
 import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.util.List;

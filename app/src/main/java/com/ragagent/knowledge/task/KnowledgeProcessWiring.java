@@ -1,8 +1,5 @@
 package com.ragagent.knowledge.task;
 
-import com.ragagent.contract.model.AsrTranscriber;
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.retrieval.RetrieveGraphRepository;
 import com.ragagent.contract.wiki.WikiIngestPort;
 import com.ragagent.contract.wiki.WikiKnowledgeFinalizer;
@@ -19,6 +16,9 @@ import com.ragagent.knowledge.service.image.ExtractedImageStore;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.knowledge.support.FfmpegMedia;
 import com.ragagent.knowledge.support.MediaPipelineDeps;
+import com.ragagent.llm.api.AsrTranscriber;
+import com.ragagent.llm.api.ModelCatalogPort;
+import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.retrieval.api.VectorIndexStore;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;

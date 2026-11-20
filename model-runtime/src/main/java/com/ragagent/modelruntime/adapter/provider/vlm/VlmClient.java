@@ -1,6 +1,6 @@
 package com.ragagent.modelruntime.adapter.provider.vlm;
 
-import com.ragagent.contract.model.VlmConfig;
+import com.ragagent.llm.api.VlmConfig;
 import com.ragagent.llm.ollama.OllamaChatRequest;
 import com.ragagent.llm.ollama.OllamaMessage;
 import com.ragagent.llm.ollama.OllamaService;

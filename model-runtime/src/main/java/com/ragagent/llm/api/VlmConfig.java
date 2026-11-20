@@ -1,4 +1,4 @@
-package com.ragagent.contract.model;
+package com.ragagent.llm.api;
 
 import java.util.Map;
 

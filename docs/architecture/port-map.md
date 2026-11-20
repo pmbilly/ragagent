@@ -7,7 +7,7 @@
 
 - 域间（解耦）：**27**
 - 复合面（随复合端口）：**7**
-- 跨模块（必要）：**8**
+- 跨模块（必要）：**6**
 
 ## 明细
 
@@ -24,7 +24,6 @@
 | `EmbedSessionPort` | `EmbedSessionAdapter` | app | embedchannel | 域间（解耦） |
 | `EmbeddingModelPort` | `EmbeddingModelAdapter` | app | wiki | 域间（解耦） |
 | `EmbeddingPort` | `ModelRuntimeEmbeddingAdapter` | model-runtime | knowledge、memory、retrieval-engine | 跨模块（必要） |
-| `EntityExtractionPort` | `EntityExtractionAdapter` | model-runtime | initialization、knowledge、session | 跨模块（必要） |
 | `FileUrlPort` | `DefaultFileUrlPort` | app | knowledge、platform、session、storage | 跨模块（必要） |
 | `GlobalFileServicePort` | `GlobalFileServiceAdapter` | app | session | 域间（解耦） |
 | `KnowledgeBaseCatalogPort` | `KnowledgeBaseCatalogAdapter` | app | agentmanagement | 域间（解耦） |
@@ -40,7 +39,6 @@
 | `KnowledgeSpanPort` | `KnowledgeSpanAdapter` | app | wiki | 域间（解耦） |
 | `McpToolRegistrationPort` | `McpToolRegistrationAdapter` | app | agent-engine | 跨模块（必要） |
 | `MessageTranscriptPort` | `MessageTranscriptAdapter` | app | memory | 域间（解耦） |
-| `ModelCatalogPort` | `ModelCatalogAdapter` | app | initialization、knowledge、mcp、memory、model-runtime、session、wiki | 跨模块（必要） |
 | `ModelFactsPort` | `ModelService` | app | retrieval-engine | 跨模块（必要） |
 | `ParserEngineCatalogPort` | `ParserEngineCatalog` | app | system | 域间（解耦） |
 | `ProviderFileStorePort` | `ProviderFileStoreAdapter` | app | knowledge | 域间（解耦） |

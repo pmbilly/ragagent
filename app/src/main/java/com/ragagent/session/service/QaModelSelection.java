@@ -2,7 +2,7 @@ package com.ragagent.session.service;
 
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeRowView;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.session.domain.conversation.Session;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

@@ -35,7 +35,7 @@
 | `auth` | 控制面 | 122 | 6 | 4 | `views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue` |
 | `audit` | 控制面 | 20 | 1 | 1 | `views/settings/panels/SystemAuditLog.vue` |
 | `system` | 控制面 | 18 | 2 | 1 | `views/settings/panels` |
-| `model` | 能力配置 | 38 | 4 | 2 | `views/settings/ModelSettings.vue` |
+| `model` | 能力配置 | 38 | 4 | 1 | `views/settings/ModelSettings.vue` |
 | `vectorstore` | 能力配置 | 20 | 1 | — | `views/settings/VectorStoreSettings.vue` |
 | `initialization` | 初始化向导 | 11 | 1 | — | `views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue` |
 
@@ -61,7 +61,7 @@
 | `auth` | `AuthController`、`TenantAPIKeyController`、`TenantAPIPrincipalController`、`TenantCatalogController`、`TenantInvitationController`、`TenantMemberController` | `AdminUserCommandPort`、`AdminUserPort`、`TenantStorageQuotaPort`、`UserLookupPort` |
 | `audit` | `AuditLogController` | `AuditWritePort` |
 | `system` | `SystemAdminController`、`SystemController` | `SystemSettingGateway` |
-| `model` | `ModelController`、`ModelCredentialsController`、`ModelDebugController`、`ModelOllamaController` | `ModelCatalogPort`、`ModelFactsPort` |
+| `model` | `ModelController`、`ModelCredentialsController`、`ModelDebugController`、`ModelOllamaController` | `ModelFactsPort` |
 | `vectorstore` | `VectorStoreController` | — |
 | `initialization` | `InitializationController` | — |
 

@@ -1,4 +1,4 @@
-package com.ragagent.contract.model;
+package com.ragagent.llm.api;
 
 /**
  * 模型配置结构校验：必填字段、字段组合与 URL 形态。

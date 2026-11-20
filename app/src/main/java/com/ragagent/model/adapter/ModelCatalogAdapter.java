@@ -1,7 +1,7 @@
 package com.ragagent.model.adapter;
 
-import com.ragagent.contract.model.ModelCatalogPort;
-import com.ragagent.contract.model.ModelView;
+import com.ragagent.llm.api.ModelCatalogPort;
+import com.ragagent.llm.api.ModelView;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.mapper.ModelMapper;
 import com.ragagent.model.service.ModelRowViews;

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
-import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.domain.conversation.Session;

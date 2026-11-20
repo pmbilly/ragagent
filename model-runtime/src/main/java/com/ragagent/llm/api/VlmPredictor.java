@@ -1,4 +1,4 @@
-package com.ragagent.contract.model;
+package com.ragagent.llm.api;
 
 /**
  * VLM（视觉语言模型）预测句柄：单张图片 + 提示词 → 文本。
