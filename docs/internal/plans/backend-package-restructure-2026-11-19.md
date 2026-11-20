@@ -323,7 +323,10 @@ wiki 的 17 处回引逐一评估后，只有一类值得改：
 
 H7 / H8 / H9 / L11 / Q6 / Q8b / Q9 / Q10 / Q11 / R2c-3d 余项 / M8（见 `HANDOFF.md` §5.1）。已否决项见归档 §5.0b。
 
-## 9. 终态与留路（contract 解散后长什么样）
+## 9. 终态与留路（假设性：contract 解散后长什么样）
+
+> **⚠️ 本节描述的是「假如能解散」的形态，已被 §10.1 的剥洋葱测试证否**：contract 的不可约核是 185 个类型（48 个被 platform 真代码钉住、137 个互相引用），解散在结构上不成立。
+> 本节保留用于两件事：① 记录「如果将来做业务重构（拆 knowledge/session 模型、把域间通信改为事件），目标形态是什么」；② §9.3 的包去向表在判断「某个契约该归谁」时仍有参考价值。
 
 > 本节记录长期目标，以及本次方案如何为它铺路。**本次不做 contract 解散**，本节只用于判断"现在这一步会不会返工"。
 
@@ -407,84 +410,89 @@ ragagent/
 1. **包根不统一**：`domains` 的源根是 `com.ragagent.<域>`，不是 `com.ragagent.domains.<域>`。改名 `app` 时若顺手统一包根，会触碰全部 1,642 个文件 —— **只改模块名，不动包根**。
 2. **`boot` 并入 `app`** 后，17 个装配类落到 `app/config/`，`check-wiring-points.py`（W1~W4）的登记表与 `docs/architecture` 的装配清单要同步。
 
-## 10. 终态实施路径（第 2 期）
+## 10. 终态与实施路径（第 2 期，2026-11-20 重写）
 
-§9 的 5 模块终态需要 8 个阶段。**顺序与原设想不同**：目录前移（`backend/`）排到最后，理由是它会让 24 个守卫脚本与 CI 的路径全部失效——只应打乱一次，与 `app` 合并相邻做。
+> 本节改为**从终态反推**：先证明终态是否可达（有数字），再排路径。目标是不再出现"做到一半才发现行不通"。
 
-| 阶段 | 内容 | 前置 | 工时 | 验收 |
-|---|---|---|---|---|
-| **S1** | 解 `ContractJsonMixins` 结构障碍：改成按模块贡献（`JsonModuleCustomizer` SPI） | — | 2~3 天 | 1,339 金片零变化（序列化逐字节相同） |
-| ~~S2~~ | ~~`platform` → `framework`~~ **并入 S7**：与目录前移同为"路径/名字"改动（12 个 pom + 18 个脚本），只应打乱一次 | — | — | — |
-| **S3** | 引擎面归位：`model` → model-runtime/api；`retrieval` + `vectorstore` 余项 → retrieval/api；`agent` + `tool` + `pipeline` 整组 → agent/api + spi | S1 ✅ | 3~5 天 | 每批全量绿 |
-| **S4** | 通用面下沉：`error` / `event` / `json` / `text` / `pagination` → framework | S3（清完 contract 内部引用） | 2 天 | 全量绿 |
-| **S5** | 域契约归位（13 个包 → contract 只剩域包） | **需先做域间通信改造** | 不可估 | — |
-| **S6** | `domains` + `boot` → `app`（boot 整体并入，非只留启动类） | — | 1~2 天 | ✅ 2026-11-20：全量绿 4220/0 · 守卫 49/49 |
-| **S7** | **`platform` → `framework` + 目录前移 `backend/` + 路径适配**（原 S2 并入；12 个 pom + 24 个脚本 + CI + 文档） | S6 | 2~3 天 | 全量绿 + 守卫 49/49 |
-| **S8** | ArchUnit → Modulith，删 `scripts/*.py` 守卫 | S7 | 2 天 | — |
+### 10.1 终态判定：蓝图 §9.2 的 5 模块不可达
 
-**S1 是唯一的技术阻塞**。不解决它，S3/S4 都做不了——契约一旦分散到引擎，platform 就要依赖引擎，形成循环（`json` 下沉实测已直接编译失败）。
+**判据——剥洋葱测试**。一个契约类型能离开 `contract`，前提是 `contract` 内没有别的类型引用它（否则 contract 会反向依赖 app/引擎，编译即失败）。反复剥离直到不再变化，剩下的就是**不可约核**。
 
-**S5 不是"搬包"**。§9.7 实测：13 个域包没有一个只服务单域（`doc` 被 5 个域用、`settings` 被 2 个），所以必须先改域间通信方式（事件/端口化）。那是独立项目，不与本节混做。
+| 口径 | 可剥离 | 不可约核 |
+|---|---|---|
+| 现状（mixin 全留在 platform） | 77 | **211** |
+| mixin 随类型搬走（S1 机制已就绪，尚未执行） | 103 | **185** |
 
-**第一段（S1~S4 + S6~S7）产出 6 模块**：`backend/framework` + 三个引擎 + `app` + `contract`（只剩域包）。这是可交付的稳定中间态，不需要动任何业务逻辑。
+核的构成（mixin 剥离口径）：
 
-### 10.1 S3 的第一手实测（2026-11-20，已回滚）
+| 原因 | 数量 | 说明 |
+|---|---|---|
+| 被 `platform` **真代码**引用 | 48 | SSE 编码、`JsonMappers`、可观测性——技术层必须有这些形状 |
+| 被核内其它契约类型引用 | 137 | `knowledge` 41 · `model` 26 · `session` 18 · `agent` 14 · `wiki` 13 …互相引用成网 |
 
-试做"只把 model 面的 mixin 搬到 `model-runtime`、契约暂不动"（S3a-1），失败并回滚。三条教训：
+**结论：`contract` 无法消失。** 最多从 288 缩到 185（36%）。蓝图 §9.2 的"5 模块、contract 消失"在该代码库上**结构不可达**——不是工程量大，是剥到 185 个就剥不动了：再往下必须改域间通信方式或拆分 `knowledge`/`session` 的模型，那属于业务重构，不是分包。
 
-1. **mixin 不能与契约分两次搬**。`ContractJsonMixins`（platform）注册时直接引用 `ContractJsonMixinsModelChat.ChatMessageMixin`——mixin 一旦搬走，platform 就要 `import com.ragagent.modelruntime.json.*`，立刻反向依赖。所以只能"契约 + mixin"同批搬。
-2. **存在绕过 `JsonMappers` 的 mapper**。`domains` 的 `JsonContractRoundTripTest` 直接 `new ObjectMapper().registerModule(new ContractJsonModule())`——S1 的 ServiceLoader 机制覆盖不到它，mixin 搬走后该类测试立刻红。搬任何 mixin 之前先 `grep "new ContractJsonModule()"`，逐处补注册。
-3. **批量删注册行要防子串误伤**。`AgentToolCall.class` 含子串 `ToolCall.class`，按关键字过滤会把前者一起删掉；症状是 `AgentStep` 的 wire format 多出 `executionName` / `executionArgs` 两个字段（本该被 `AgentToolCallMixin` 忽略）。
-
-结论：S3 的最小可执行单元是"**一个契约包 + 它的 mixin 分文件 + 引用该 mixin 的 mapper**"三件套一起改，不能拆。
-
-**第二个聚合体：`PipelinePorts`**（S3-c 实测）。它一个类 `import` 了 **7 个包**的契约：
+### 10.2 可达终态（6 模块）
 
 ```text
-knowledge.ChunkFacts · KnowledgeBaseView · KnowledgeDocumentFacts
-memory.MemoryRecall · MemoryRetrievalContext
-model.LlmChatClient · Reranker
-retrieval.SearchParams · SearchResult
-tenant.WebSearchConfig
-tool.ToolResult
-websearch.WebSearchResult
+backend/
+├── framework/          ← 现 platform 改名（包名保持 com.ragagent.platform，避免 2000+ 处 import 改动）
+├── model-runtime/      ← 主代码 + api/（可选，见 10.4 第 2 步）
+├── retrieval-engine/   ← 主代码 + api/
+├── agent-engine/       ← 主代码 + api/
+├── app/                ← 已完成（19 域 + config/ + 启动类）
+└── contract/           ← 保留：185 个跨域共享词汇类型
 ```
 
-被 `domains` **27 处**引用。它是"域与引擎的共享端口聚合体"，正是它把各包契约绑在一起——不拆它，搬任何包都会撕裂（`tool` 的 12 个里 4 个被它引用、`model` 的核心类型被它引用）。
+模块数 6（现状已是 6），差别只在命名与目录层级。
 
-**所以 S3-c 的真实前置是拆 `PipelinePorts`**：把 7 个字段拆成 7 个独立端口，各调用方按需注入。这与 `ContractJsonMixins` 是同一类问题（集中聚合导致耦合），但更根本——`ContractJsonMixins` 只影响序列化注册，`PipelinePorts` 影响所有入库链路的装配。
+### 10.3 每步可行性（数字依据）
 
-拆解工作量：7 个端口 + 27 处 `domains` 引用 + `agent-engine` 3 处，预计 1~2 天，且不改变任何业务行为（纯注入方式）。
-
-**但拆 `PipelinePorts` 本身也依赖"域 api 包"**（第三次实测）：它的 12 个嵌套接口分属 7 个域/引擎——
-
-| 接口 | 引用谁 | 该归哪 |
-|---|---|---|
-| `ModelService` | `LlmChatClient` / `Reranker` | model-runtime |
-| `KnowledgeBaseService` / `KnowledgeService` / `ChunkRepository` / `KnowledgeRepository` / `KnowledgeBaseRepository` | knowledge 三个契约 | knowledge 域 api |
-| `MemoryService` | `MemoryRecall` / `MemoryRetrievalContext` | memory 域 api |
-| `WebSearch` | `WebSearchResult` / `WebSearchConfig` | websearch 域 api |
-| `DataAnalysisSession` | `ToolResult` | agent-engine |
-
-在"同一包内拆成 12 个文件"**不能解绑**——`DataAnalysisSession` 仍引用 `ToolResult`。只有按归属搬到各自域/引擎的 api 包才解绑，而那需要域 api 包先存在。
-
-**所以 S3 依赖 S5，S5 依赖 S6**，顺序必须反过来。
-
-### 10.2 `boot/config` 不能下移（2026-11-20 实测）
-
-尝试把 17 个装配类移入 `domains` 以提前做 S6，被依赖面否决：装配类 `import` 了 **10 处 `retrieval.engine.*`**（引擎实现类）与 `platform.*` 多处——它是"唯一能看到所有模块实现"的层，下移会让 `domains` 依赖引擎实现（违反"引擎只暴露 api/spi"）。
-
-所以 S6 的正确形态是"**`domains` 改名 `app`，`boot` 整体并入**"，不是"把 config 搬进 domains"。
-
-### 10.3 修正后的顺序
-
-| 序 | 阶段 | 依赖 | 说明 |
+| 步 | 内容 | 判定 | 依据 |
 |---|---|---|---|
-| 1 | **S6** | 无 | `domains`+`boot` → `app`（含 `config/` 与启动类），1 jar |
-| 2 | **S5** | S6 | 域契约归位：`contract.<域>` → `app/<域>/api`，同时拆 `PipelinePorts` 的 12 个接口到各域 |
-| 3 | **S3** | S5 | 引擎面归位（此时 contract 只剩引擎面 + 通用面） |
-| 4 | **S4** | S3 | 通用面下沉 framework |
-| 5 | **S7** | S4 | `platform`→`framework` + 目录前移 `backend/` |
-| 6 | **S8** | S7 | ArchUnit → Modulith |
+| **S7-a** | `platform` → `framework`（目录 + artifactId，**包名不动**） | ✅ **可行** | 纯改名，无依赖变化；18 个脚本 + 12 个 pom 同步 |
+| **S7-b** | 全部模块移入 `backend/` | ✅ **可行** | 同上；24 个脚本 + CI 工作目录适配 |
+| **S8** | ArchUnit → Modulith 边界 | ✅ **可行** | 必须在 S7 后；R-1/R-2 棘轮可平滑迁移 |
+| **S3-e** | 引擎面搬 26 个（`model` 11 · `agent` 9 · `tool` 4 · `vectorstore` 2） | ⚠️ **收益有限** | 让 `model-runtime/api` 等包名与蓝图一致，但只占 288 的 9%，且每批都要动 mixin |
+| **S3-d** | 域面搬 77 个 → `app/<域>/api` | ❌ **不建议** | `contract` 仍存 185 个，读者反而更难看到全貌；且会制造跨域 `api` 依赖（R-1 允许，但契约分散） |
+| **S5** | 域契约归位 | ❌ **不可行** | 单域专属仅 2 个，且都是语义错位（§9.7 闭包修正：2/288 = 0.7%） |
+| **S4** | 通用面下沉 framework | ❌ **不可行** | `error`/`event`/`json`/`text`/`pagination` 逐个实测都不该沉（§9.5：json 下沉会造成反向依赖，实测编译失败） |
 
-S1 已完成（mixin 机制），是唯一"无前置"的技术准备。
+### 10.4 执行顺序（三步，每步独立可交付）
+
+**第 1 步：S7 改名与归位（1~2 天，零结构风险）**
+
+```text
+1) git mv platform framework；改 artifactId 与 5 个模块的依赖声明
+2) 建 backend/，6 个模块全部移入；改根 pom 的 <modules> 前缀
+3) 24 个守卫脚本的路径、4 份基线 JSON、模块矩阵、CI 工作目录
+4) 验收：mvn -f backend/pom.xml clean verify 绿 · 守卫 49/49
+```
+
+不变量：包名、类名、依赖方向、测试条数全部不变。
+
+**第 2 步：S3-e 引擎 api 包（1~2 天，可选）**
+
+只搬 26 个、按引擎分组，每组三件套（契约 + mixin + 引该 mixin 的 mapper）：
+
+| 组 | 契约 | mixin |
+|---|---|---|
+| `model-runtime/api` | 11 | `ContractJsonMixinsModel` / `ModelChat` |
+| `agent-engine/api` | 9+4 | `ContractJsonMixinsAgent` |
+| `retrieval-engine/api` | 2 | — |
+
+验收：金片 1339 逐字节不变。**若排期紧，此步可整体跳过**——它只影响包名美观，不影响任何闸门。
+
+**第 3 步：S8 边界校验切换（2 天）**
+
+R-1（跨域直连）、R-2（注解 SQL）从 Python 脚本迁进 ArchUnit/Modulith，`scripts/` 下同类检查退役。
+
+### 10.5 明确不做（防重提）
+
+| 项 | 不做的理由 |
+|---|---|
+| 解散 `contract` | 剥到 185 个就停（§10.1），结构不可达 |
+| 域契约回各域 | 单域专属 2 个，且语义错位（§9.7） |
+| 通用面下沉 | 五个包都不该沉，`json` 实测编译失败（§9.5） |
+| `PipelinePorts` 拆分 | 12 个接口分属 7 个域，拆分需要"域 api 包"先存在；而域 api 包已被证明不可行 |
+| 包名 `com.ragagent.platform` → `framework` | 2000+ 处 import 改动，收益为零（终态没要求包名） |
