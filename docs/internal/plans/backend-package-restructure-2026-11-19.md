@@ -301,6 +301,24 @@ wiki 的 17 处回引逐一评估后，只有一类值得改：
 
 结论：不解散、也不值得为 7.4% 做一轮下沉。contract 的定位应写成"跨域共享词汇层"，边界由 R-1 约束（已完成），而不是"待解散的临时模块"。
 
+**闭包修正（2026-11-20，S5 实测）：7.4% 这个数仍然偏高**
+
+"单域专属"是**按类型单独统计**的，但搬迁有闭包约束——contract 不能反向依赖 app，所以一个类型能否离开 contract，前提是**contract 内没有其他类型引用它**。
+
+拿 `contract.session` 的 6 个"单域专属"类型试搬，编译立刻失败：`MessageView` / `MessageSuggestionView` / `SessionQaPort` 用**简单名**引用它们（同包，本来不需要 import）。按闭包重算，这 6 个牵出 16 个类型（`SessionQaPort → AgentEngineFactory` 等），**一个都动不了**。
+
+用"单域 + 无 contract 内部引用 + 不被引擎模块引用"三条同时约束重扫 288 个类型：
+
+| 判据 | 数量 |
+|---|---|
+| 无 contract 内部引用 | 89 |
+| 其中只被 1 个模块用（app） | 32 |
+| **同时只被 1 个域用** | **2** |
+
+这 2 个还都是语义错位而非位置错位（`OutputBudgets` 在 `contract.agent` 但只被 agenttools 用；`ToolCapabilities` 在 `contract.tool` 但只被 im 用）——按语义它们本来就该待在原包。
+
+**最终结论：contract 减薄的实际空间是 0.7%（2/288），且没有一处是"放错了"。** 这条路线到此关闭，不再重提。
+
 ## 8. 不在本次范围
 
 H7 / H8 / H9 / L11 / Q6 / Q8b / Q9 / Q10 / Q11 / R2c-3d 余项 / M8（见 `HANDOFF.md` §5.1）。已否决项见归档 §5.0b。
