@@ -1,6 +1,6 @@
 {
   "pending": {
     "app/src/main/java/com/ragagent/im/controller/ImCallbackController.java": "外部协议例外：平台回调 ACK（微信/云之家等）按第三方协议原样返回，不进统一外壳",
-    "platform/src/main/java/com/ragagent/platform/web/health/HealthController.java": "基础设施例外：/health 探针保持 {\"status\":\"ok\"}，见 docs/api-response-convention.md"
+    "framework/src/main/java/com/ragagent/platform/web/health/HealthController.java": "基础设施例外：/health 探针保持 {\"status\":\"ok\"}，见 docs/api-response-convention.md"
   }
 }

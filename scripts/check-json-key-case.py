@@ -20,7 +20,7 @@
 **冻结覆盖快照（B169 / scripts/json-key-freeze.baseline.json）**：把「当前被 FROZEN_PREFIXES
 覆盖**且含 snake 键**的文件 → 命中前缀」存成快照，**离开**或**新进入**冻结集合都会使 --strict 失败。
 起因（B168 实测 ✗）：B162 把 `llm/TokenUsage` 搬进 `common/llm`、B163 把 6 个 Langfuse 装饰器从
-`tracing/langfuse` 换包（B163 到 `tracing/decorators`、B268 到 `platform/tracing/langfuse`） ⇒ **前缀不再命中、冻结静默失效** ✗，直到 CI 才报出；
+`tracing/langfuse` 换包（B163 到 `tracing/decorators`、B268 到 `framework/tracing/langfuse`） ⇒ **前缀不再命中、冻结静默失效** ✗，直到 CI 才报出；
 更糟的是当时 CI 的提示语是「确属第三方/模型契约则加入 BASELINE」——**若照做就会把静默失保合法化** ✗。
 有了快照，同一提交内就报「离开冻结面」✓。前缀冻结的固有脆弱点：**换包 = 失效**，故换包后要回核名单。
 
@@ -95,13 +95,13 @@ FROZEN_PREFIXES = (
     'contract/retrieval/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
     'memory/domain/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
     'platform/tracing/langfuse', 'platform/tracing/decorators', 'retrieval/engine/doris', 'websearch/ImageInfo',
-    # R4a 换锚：6 个 Langfuse 装饰器（tracing/decorators → platform/tracing/decorators）——包名带上了
-    # platform 前缀，模块相对路径随之变化（与上一行同族；三件流句柄迁 platform/stream 无蛇键，不入册）。
+    # R4a 换锚：6 个 Langfuse 装饰器（tracing/decorators → framework/tracing/decorators）——包名带上了
+    # platform 前缀，模块相对路径随之变化（与上一行同族；三件流句柄迁 framework/stream 无蛇键，不入册）。
     # 键名本体未变（Langfuse metadata 是第三方观测面）。
     # ⚠️ 前缀冻结会在**换包**时静默失效（B168 实测 ✗）：B162 把 llm/TokenUsage 搬进 common/llm、
     # B163 把 6 个 Langfuse 装饰器从 tracing/langfuse 换包到 tracing/decorators ⇒ 旧前缀不再命中，
     # 冻结悄悄失效、CI 才报"非冻结面出现新的 snake 键"。**换包时务必回来核这里** ✓。
-    # A②-2a/2c：契约载荷的**线格式载体**（模块自 common/web 迁 platform/web，前缀同步换锚）——注解从契约类搬进 mixin 模块（§8.1 纯 JDK），
+    # A②-2a/2c：契约载荷的**线格式载体**（模块自 common/web 迁 framework/web，前缀同步换锚）——注解从契约类搬进 mixin 模块（§8.1 纯 JDK），
     # 键名仍是既有 API/jsonb 契约（snake 键是设计，不是漂移）。
     'platform/web/ContractJsonMixins',   # 剩余面（error/event/json/text 等）
     'llm/json/',                          # 模型面 mixin（从 platform.web 整体迁入）

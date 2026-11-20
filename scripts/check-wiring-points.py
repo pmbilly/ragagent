@@ -32,7 +32,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BASELINE = ROOT / "scripts/wiring-points.baseline.json"
 OVERVIEW = ROOT / "docs/architecture/overview.md"
-MODULES = ["contract", "platform", "model-runtime", "retrieval-engine",
+MODULES = ["contract", "framework", "model-runtime", "retrieval-engine",
            "agent-engine", "app"]
 # 短形式（可带参数）与全限定形式都要认：只认短形式会漏掉 FQN 写法
 CONFIG = re.compile(
@@ -45,7 +45,7 @@ KIND_RULES = {
     "composition-root": lambda fqcn, module: fqcn.startswith("com.ragagent.config."),
     "domain-internal": lambda fqcn, module: module == "app",
     "module-internal": lambda fqcn, module: module in {
-        "platform", "model-runtime", "retrieval-engine", "agent-engine"},
+        "framework", "model-runtime", "retrieval-engine", "agent-engine"},
 }
 
 

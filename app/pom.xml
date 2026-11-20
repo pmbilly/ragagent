@@ -48,7 +48,7 @@
     </dependency>
     <dependency>
       <groupId>com.ragagent</groupId>
-      <artifactId>platform</artifactId>
+      <artifactId>framework</artifactId>
     </dependency>
     <dependency>
       <groupId>com.ragagent</groupId>
@@ -194,7 +194,7 @@
     <!-- 跨模块测试夹具：Gradle 的 testFixtures(project(...)) 在 Maven 侧等价于 test-jar -->
     <dependency>
       <groupId>com.ragagent</groupId>
-      <artifactId>platform</artifactId>
+      <artifactId>framework</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>

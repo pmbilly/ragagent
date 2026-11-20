@@ -16,8 +16,8 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>platform</artifactId>
-  <name>platform</name>
+  <artifactId>framework</artifactId>
+  <name>framework</name>
 
   <dependencies>
     <!-- 契约层：端口签名暴露契约类型 ⇒ 传递 -->

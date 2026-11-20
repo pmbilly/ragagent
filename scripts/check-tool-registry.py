@@ -46,7 +46,7 @@ IMPLEMENTED = re.compile(r"super\(\s*ToolDefinitions\.(TOOL_\w+)")
 DISPATCHED = re.compile(r"case ToolDefinitions\.(TOOL_\w+)")
 ASSEMBLER = ROOT / "app/src/main/java/com/ragagent/session/service/AgentEngineAssembler.java"
 FRONTEND_CAPS = ROOT / "frontend/src/utils/tool-capabilities.ts"
-MODULES = ["contract", "platform", "model-runtime", "retrieval-engine", "agent-engine", "app"]
+MODULES = ["contract", "framework", "model-runtime", "retrieval-engine", "agent-engine", "app"]
 
 
 def definitions() -> dict[str, str]:

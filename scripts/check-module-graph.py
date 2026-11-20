@@ -51,16 +51,16 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-MODULES = ["contract", "platform", "model-runtime", "retrieval-engine", "agent-engine", "app"]
+MODULES = ["contract", "framework", "model-runtime", "retrieval-engine", "agent-engine", "app"]
 
 # ── 判据 A 的矩阵（主码依赖）──────────────────────────────────────────────
 ALLOWED_MAIN: dict[str, set[str]] = {
     "contract": set(),
-    "platform": {"contract"},
-    "model-runtime": {"contract", "platform"},
-    "retrieval-engine": {"contract", "platform"},
+    "framework": {"contract"},
+    "model-runtime": {"contract", "framework"},
+    "retrieval-engine": {"contract", "framework"},
     # modelcontext：agent 工具注册表/流解码属模型侧词汇，方案明示为 agent-engine 的合法终态边
-    "agent-engine": {"contract", "platform", "model-runtime"},
+    "agent-engine": {"contract", "framework", "model-runtime"},
     # modelcontext：同上（4 处；R2c-3d 已把其余模型族边清零）
     # 组合根：app 已吸收原 boot（启动类 + 17 个装配类），可依赖全部模块
     "app": set(MODULES[:-1]),
@@ -87,7 +87,7 @@ MISPLACED_TEST_ALLOW: dict[str, str] = {
         "检索引擎的装配级测试：需要 app 的配置与真库，retrieval-engine 模块内无此装配",
     "app/src/test/java/com/ragagent/retrieval/engine/PgVectorEngineRepositoryTest.java":
         "同上：pgvector 仓储测试依赖 app 的数据源装配",
-    "platform/src/test/java/com/ragagent/contract/knowledge/rule/ParserEngineRulesTest.java":
+    "framework/src/test/java/com/ragagent/contract/knowledge/rule/ParserEngineRulesTest.java":
         "测契约规则，但需要 platform 的 JsonMappers；platform test → contract 是合法方向",
     "app/src/test/java/com/ragagent/embedding/EmbeddingWireTest.java":
         "wire A/B 使用 domains 的 Model/ModelRowViews；迁 model-runtime 会形成 test→domains 反向边",

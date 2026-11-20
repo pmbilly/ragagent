@@ -14,7 +14,7 @@
     注释本身就是判据（写清理由的容错是常态，沉默的空转不是）。
     边界层（controller/api/task/channel/client/mapper）豁免：那里的兜底是 HTTP/队列语义的一部分。
 
-规则三：Jackson 空体文案只许出现在 `platform/web/JsonBodyErrors.java`。
+规则三：Jackson 空体文案只许出现在 `framework/web/JsonBodyErrors.java`。
     值 `"No content to map due to end-of-input"` 是**线上行为**（契约金片逐字节钉住），
     但它同时与 Jackson 版本耦合（消息文案可能变）。收敛到一处常量后，升级只需改一个文件；
     本规则防止调用点再次各自复制字面量。
@@ -32,13 +32,13 @@ ENGINE_ROOT = pathlib.Path('retrieval-engine/src/main/java/com/ragagent/retrieva
 RESET_CALL = 'createObjectNode('
 
 # ── 规则二：非边界层空转 catch ──────────────────────────────────────────────
-SOURCE_ROOTS = ['contract', 'platform', 'model-runtime', 'retrieval-engine',
+SOURCE_ROOTS = ['contract', 'framework', 'model-runtime', 'retrieval-engine',
                 'agent-engine', 'app']
 BOUNDARY_SEGMENTS = ('/controller/', '/api/', '/task/', '/channel/', '/client/', '/mapper/')
 
 # ── 规则三：Jackson 空体文案只许出现在收敛点 ─────────────────────────────────
 BODY_ERROR_LITERAL = '"No content to map due to end-of-input"'
-BODY_ERROR_OWNER = 'platform/src/main/java/com/ragagent/platform/web/JsonBodyErrors.java'
+BODY_ERROR_OWNER = 'framework/src/main/java/com/ragagent/platform/web/JsonBodyErrors.java'
 
 CATCH_HEAD = re.compile(r'\bcatch\s*\(\s*(?:final\s+)?([A-Za-z0-9_.]*)\s*[A-Za-z0-9_]*\s*\)\s*\{')
 

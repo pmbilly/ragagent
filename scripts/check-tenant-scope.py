@@ -20,7 +20,7 @@ ROOTS = [
     ROOT / "agent-engine" / "src" / "main" / "java",
     ROOT / "retrieval-engine" / "src" / "main" / "java",
     ROOT / "model-runtime" / "src" / "main" / "java",
-    ROOT / "platform" / "src" / "main" / "java",
+    ROOT / "framework" / "src" / "main" / "java",
     ROOT / "boot" / "src" / "main" / "java",
 ]
 SCOPE_FILE = "TenantScope.java"
@@ -61,7 +61,7 @@ def main() -> int:
         print("✗ 租户作用域守卫失败：")
         for problem in problems:
             print("   " + problem)
-        print("  跨虚拟线程的身份传递只允许经 platform/access/TenantScope。")
+        print("  跨虚拟线程的身份传递只允许经 framework/access/TenantScope。")
         return 1
 
     print(f"✓ 租户作用域：{capture_files} 个 capture 站点均经 TenantScope；无裸 replay")

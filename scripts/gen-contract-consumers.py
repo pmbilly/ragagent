@@ -30,7 +30,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-MODULES = ["contract", "platform", "model-runtime", "retrieval-engine",
+MODULES = ["contract", "framework", "model-runtime", "retrieval-engine",
            "agent-engine", "app"]
 CONTRACT = ROOT / "contract/src/main/java"
 TYPE = re.compile(r"^(?:public\s+)?(?:final\s+|abstract\s+|sealed\s+)?"

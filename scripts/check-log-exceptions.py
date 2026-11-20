@@ -19,7 +19,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ROOTS = [ROOT / name / "src" / "main" / "java" for name in (
-    "app", "agent-engine", "retrieval-engine", "model-runtime", "platform", "boot"
+    "app", "agent-engine", "retrieval-engine", "model-runtime", "framework", "boot"
 )]
 LOG_RE = re.compile(r"\blog\.(trace|debug|info|warn|error)\s*\(")
 THROW_DECL_RE = re.compile(

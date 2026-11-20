@@ -15,7 +15,7 @@
 |---|---|---|---|---|
 | `AdminUserCommandPort` | `AdminUserAdapter` | app | system | 域间（解耦） |
 | `AdminUserPort` | `AdminUserAdapter` | app | system | 域间（解耦） |
-| `AuditWritePort` | `AuditWriteAdapter` | app | agentmanagement、auth、datasource、knowledge、platform、system | 跨模块（必要） |
+| `AuditWritePort` | `AuditWriteAdapter` | app | agentmanagement、auth、datasource、framework、knowledge、system | 跨模块（必要） |
 | `ChunkFaqReadPort` | — | ? | — | 复合面（随复合端口） |
 | `ChunkPort` | `ChunkPortAdapter` | app | wiki | 域间（解耦） |
 | `DocReaderAdminPort` | `DocReaderAdminAdapter` | app | knowledge、system | 域间（解耦） |
@@ -24,7 +24,7 @@
 | `EmbedSessionPort` | `EmbedSessionAdapter` | app | embedchannel | 域间（解耦） |
 | `EmbeddingModelPort` | `EmbeddingModelAdapter` | app | wiki | 域间（解耦） |
 | `EmbeddingPort` | `ModelRuntimeEmbeddingAdapter` | model-runtime | knowledge、memory、retrieval-engine | 跨模块（必要） |
-| `FileUrlPort` | `DefaultFileUrlPort` | app | knowledge、platform、session、storage | 跨模块（必要） |
+| `FileUrlPort` | `DefaultFileUrlPort` | app | framework、knowledge、session、storage | 跨模块（必要） |
 | `GlobalFileServicePort` | `GlobalFileServiceAdapter` | app | session | 域间（解耦） |
 | `KnowledgeBaseCatalogPort` | `KnowledgeBaseCatalogAdapter` | app | agentmanagement | 域间（解耦） |
 | `KnowledgeBaseReadPort` | — | ? | — | 复合面（随复合端口） |

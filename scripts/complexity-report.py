@@ -23,7 +23,7 @@ import re
 import sys
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
-ROOTS = ("contract", "platform", "model-runtime", "retrieval-engine", "agent-engine", "app", "boot")
+ROOTS = ("contract", "framework", "model-runtime", "retrieval-engine", "agent-engine", "app", "boot")
 BRANCH = re.compile(r"\b(if|for|while|catch)\s*\(|\bcase\s|&&|\|\||\?:")
 CTOR = re.compile(r"^[ \t]*(?:public|protected|private)?[ \t]*([A-Z]\w*)[ \t]*\(", re.M)
 FIELD = re.compile(r"^(\s{4})public\s+(?!static|final)([\w<>,.\[\]\s]+)\s+(\w+)\s*[;=]")

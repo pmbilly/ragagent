@@ -45,7 +45,7 @@ DEAD_NAMES = (
 PATH_ROOTS = (
     "app/",
     "contract/",
-    "platform/",
+    "framework/",
     "model-runtime/",
     "retrieval-engine/",
     "agent-engine/",

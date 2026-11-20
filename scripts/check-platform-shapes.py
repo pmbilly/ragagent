@@ -4,7 +4,7 @@
 四条判据（命中即必须在 `scripts/platform-shapes.baseline.json` 的 allowed 里，
 逐条附理由；新增 ⇒ ✗；基线条目不再命中 ⇒ 提示可清理，不失败）：
 
-  1. **业务词包**：`platform/knowledge`、`platform/settings` 下的文件——包名本身是域词汇；
+  1. **业务词包**：`framework/knowledge`、`framework/settings` 下的文件——包名本身是域词汇；
   2. **业务词文件**：文件名含 Knowledge/Chunk/Faq/Doc/Session/Agent/Retrieval/Memory/Wiki/VectorStore；
   3. **红旗命名**：文件名以 View/Port/Request/Response/Payload/Facts/Gateway 结尾；
   4. `ContractJsonMixins*` 是契约注解注册表，按设计 import 业务形状，豁免。
@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "platform/src/main/java"
+SRC = ROOT / "framework/src/main/java"
 BASELINE = ROOT / "scripts/platform-shapes.baseline.json"
 SUFFIXES = ("View", "Port", "Request", "Response", "Payload", "Facts", "Gateway")
 BUSINESS_PACKAGES = {"knowledge", "settings"}

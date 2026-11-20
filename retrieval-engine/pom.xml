@@ -22,7 +22,7 @@
   <dependencies>
     <dependency>
       <groupId>com.ragagent</groupId>
-      <artifactId>platform</artifactId>
+      <artifactId>framework</artifactId>
     </dependency>
     <dependency>
       <groupId>com.ragagent</groupId>
@@ -82,7 +82,7 @@
     <!-- EmbeddedRedis 等平台测试基座（Gradle: testFixtures(project(":platform"))） -->
     <dependency>
       <groupId>com.ragagent</groupId>
-      <artifactId>platform</artifactId>
+      <artifactId>framework</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
