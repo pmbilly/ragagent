@@ -1,5 +1,8 @@
 package com.ragagent.knowledge.controller;
 
+import com.ragagent.knowledge.assembler.KnowledgeAssembler;
+import com.ragagent.knowledge.controller.vo.KnowledgeTagRespVo;
+import com.ragagent.knowledge.controller.vo.KnowledgeTagWithStatsRespVo;
 import com.ragagent.knowledge.dto.tag.CreateTagRequest;
 import com.ragagent.knowledge.dto.tag.DeleteTagRequest;
 import com.ragagent.knowledge.dto.tag.KnowledgeTagResponse;
@@ -50,7 +53,7 @@ public class KnowledgeTagController {
     }
 
     @GetMapping("/api/v1/knowledge-bases/{id}/tags")
-    public ResponseEntity<PageResult<KnowledgeTagWithStats>> listTags(
+    public ResponseEntity<PageResult<KnowledgeTagWithStatsRespVo>> listTags(
             @PathVariable("id") String id,
             @RequestParam(value = "page", required = false) String page,
             @RequestParam(value = "pageSize", required = false) String pageSize,
@@ -61,8 +64,11 @@ public class KnowledgeTagController {
         Integer pageValue = page == null ? null : bindPaginationInt(page);
         Integer pageSizeValue = pageSize == null ? null : bindPaginationInt(pageSize);
 
-        return ResponseEntity.ok(tagService.listTags(kbId, pageValue, pageSizeValue,
-                LogSanitizer.sanitize(keyword)));
+        PageResult<KnowledgeTagWithStats> pageResult =
+                tagService.listTags(kbId, pageValue, pageSizeValue, LogSanitizer.sanitize(keyword));
+        return ResponseEntity.ok(PageResult.of(
+                KnowledgeAssembler.toVoList(pageResult.items(), KnowledgeAssembler::toVo),
+                pageResult.total(), pageResult.page(), pageResult.pageSize()));
     }
 
     /** 分页 query：缺省/null 交给 service；非整数 → 400「page: 类型不正确」。 */
@@ -76,7 +82,7 @@ public class KnowledgeTagController {
     }
 
     @PostMapping("/api/v1/knowledge-bases/{id}/tags")
-    public ResponseEntity<KnowledgeTagResponse> createTag(
+    public ResponseEntity<KnowledgeTagRespVo> createTag(
             @PathVariable("id") String id,
             @Valid @NonNullBody @RequestBody CreateTagRequest req) {
         String kbId = LogSanitizer.sanitize(id);
@@ -87,11 +93,11 @@ public class KnowledgeTagController {
                 LogSanitizer.sanitize(req.name()), LogSanitizer.sanitize(req.color()),
                 req.sortOrder() == null ? 0 : req.sortOrder());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(KnowledgeTagResponse.from(tag));
+                .body(KnowledgeAssembler.toVo(KnowledgeTagResponse.from(tag)));
     }
 
     @PutMapping("/api/v1/knowledge-bases/{id}/tags/{tagId}")
-    public ResponseEntity<KnowledgeTagResponse> updateTag(
+    public ResponseEntity<KnowledgeTagRespVo> updateTag(
             @PathVariable("id") String id,
             @PathVariable("tagId") String tagIdParam,
             @Valid @NonNullBody @RequestBody UpdateTagRequest req) {
@@ -101,7 +107,7 @@ public class KnowledgeTagController {
 
         String tagId = tagService.resolveTagId(LogSanitizer.sanitize(tagIdParam));
         var tag = tagService.updateTag(tagId, req.name(), req.color(), req.sortOrder());
-        return ResponseEntity.ok(KnowledgeTagResponse.from(tag));
+        return ResponseEntity.ok(KnowledgeAssembler.toVo(KnowledgeTagResponse.from(tag)));
     }
 
     @DeleteMapping("/api/v1/knowledge-bases/{id}/tags/{tagId}")

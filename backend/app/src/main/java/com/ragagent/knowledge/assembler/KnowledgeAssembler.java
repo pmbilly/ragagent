@@ -4,6 +4,10 @@ import com.ragagent.knowledge.controller.vo.*;
 import com.ragagent.knowledge.dto.TaskIdResponse;
 import com.ragagent.knowledge.dto.chunk.*;
 import com.ragagent.knowledge.dto.doc.*;
+import com.ragagent.knowledge.dto.kb.*;
+import com.ragagent.knowledge.dto.tag.*;
+import java.util.List;
+import java.util.function.Function;
 
 /** 知识运营与检索相关响应的装配：只做字段搬运。 */
 public final class KnowledgeAssembler {
@@ -120,10 +124,10 @@ public final class KnowledgeAssembler {
     }
 
     /** 列表装配，保持原有顺序。 */
-    public static <S, T> java.util.List<T> toVoList(
-            java.util.List<S> src, java.util.function.Function<S, T> mapper) {
+    public static <S, T> List<T> toVoList(
+            List<S> src, Function<S, T> mapper) {
         if (src == null) {
-            return java.util.List.of();
+            return List.of();
         }
         return src.stream().map(mapper).toList();
     }
@@ -146,5 +150,89 @@ public final class KnowledgeAssembler {
     /** 清空结果响应。 */
     public static ClearContentsRespVo toVo(ClearContentsResponse src) {
         return src == null ? null : new ClearContentsRespVo(src.deletedCount());
+    }
+
+    /** {@code CopyKnowledgeBaseResponse} -> {@code CopyKnowledgeBaseRespVo}。 */
+    public static CopyKnowledgeBaseRespVo toVo(CopyKnowledgeBaseResponse src) {
+        if (src == null) {
+            return null;
+        }
+        return new CopyKnowledgeBaseRespVo(
+                src.taskId(),
+                src.sourceId(),
+                src.targetId());
+    }
+
+    /** {@code DuplicateKnowledgeBaseResponse} -> {@code DuplicateKnowledgeBaseRespVo}。 */
+    public static DuplicateKnowledgeBaseRespVo toVo(DuplicateKnowledgeBaseResponse src) {
+        if (src == null) {
+            return null;
+        }
+        return new DuplicateKnowledgeBaseRespVo(
+                src.sourceId(),
+                src.targetId(),
+                src.knowledgeBase());
+    }
+
+    /** {@code KBCloneProgress} -> {@code KbCloneProgressRespVo}。 */
+    public static KbCloneProgressRespVo toVo(KBCloneProgress src) {
+        if (src == null) {
+            return null;
+        }
+        return new KbCloneProgressRespVo(
+                src.taskId(),
+                src.sourceId(),
+                src.targetId(),
+                src.status(),
+                src.progress(),
+                src.total(),
+                src.processed(),
+                src.message(),
+                src.error(),
+                src.createdAt(),
+                src.updatedAt());
+    }
+
+    /** {@code RebuildIndexResponse} -> {@code RebuildIndexRespVo}。 */
+    public static RebuildIndexRespVo toVo(RebuildIndexResponse src) {
+        if (src == null) {
+            return null;
+        }
+        return new RebuildIndexRespVo(
+                src.documentCount());
+    }
+
+    /** {@code KnowledgeTagResponse} -> {@code KnowledgeTagRespVo}。 */
+    public static KnowledgeTagRespVo toVo(KnowledgeTagResponse src) {
+        if (src == null) {
+            return null;
+        }
+        return new KnowledgeTagRespVo(
+                src.id(),
+                src.seqId(),
+                src.knowledgeBaseId(),
+                src.name(),
+                src.color(),
+                src.sortOrder(),
+                src.createdAt(),
+                src.updatedAt());
+    }
+
+    /** {@code KnowledgeTagWithStats} -> {@code KnowledgeTagWithStatsRespVo}。 */
+    public static KnowledgeTagWithStatsRespVo toVo(KnowledgeTagWithStats src) {
+        if (src == null) {
+            return null;
+        }
+        return new KnowledgeTagWithStatsRespVo(
+                src.id(),
+                src.seqId(),
+                src.knowledgeBaseId(),
+                src.name(),
+                src.color(),
+                src.sortOrder(),
+                src.createdAt(),
+                src.updatedAt(),
+                src.knowledgeCount(),
+                src.chunkCount());
     }
 }

@@ -5,6 +5,7 @@ import com.ragagent.knowledge.dto.chunk.*;
 import com.ragagent.knowledge.dto.faq.GeneratedQuestionResponse;
 import com.ragagent.shared.pagination.PageResult;
 import java.util.List;
+import java.util.function.Function;
 
 /** 知识域分片相关对象的响应装配：只做字段搬运与空值处理。 */
 public final class ChunkAssembler {
@@ -88,7 +89,7 @@ public final class ChunkAssembler {
     }
 
     /** 批量装配，保持原有顺序。 */
-    public static <S, T> List<T> toVoList(List<S> src, java.util.function.Function<S, T> mapper) {
+    public static <S, T> List<T> toVoList(List<S> src, Function<S, T> mapper) {
         if (src == null) {
             return List.of();
         }
@@ -97,7 +98,7 @@ public final class ChunkAssembler {
 
     /** 分页装配：页号与页大小原样透传。 */
     public static <S, T> PageResult<T> toVoPage(PageResult<S> page,
-            java.util.function.Function<S, T> mapper) {
+            Function<S, T> mapper) {
         if (page == null) {
             return null;
         }
