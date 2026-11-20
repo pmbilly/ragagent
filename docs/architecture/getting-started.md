@@ -96,7 +96,7 @@ curl -s -H "Authorization: Bearer ${TOKEN}" http://localhost:8083/api/v1/system/
 |---|---|
 | 找到 `/api/v1/knowledge-chat/{sessionId}` 的入口 | `domains/.../session/controller/KnowledgeQaController.java` |
 | 找到 14 个管线阶段 | `domains/.../session/rag/PipelineEventType.java` |
-| 找到 `keyword-threshold` 这类检索参数的落点 | `boot/src/main/resources/application.yml` 的 `conversation:` 段，再反查属性类 |
+| 找到 `keyword-threshold` 这类检索参数的落点 | `app/src/main/resources/application.yml` 的 `conversation:` 段，再反查属性类 |
 
 能在 IDE 里从 URL 一路跳到 `EventManager.trigger(...)`，就算过关。
 

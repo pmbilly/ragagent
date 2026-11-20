@@ -149,14 +149,14 @@ def build_beans(files):
 
 
 def build_cross(files):
-	domains = sorted([p.name for p in (_sr.REPO / "domains/src/main/java/com/ragagent").iterdir() if p.is_dir()])
+	domains = sorted([p.name for p in (_sr.REPO / "app/src/main/java/com/ragagent").iterdir() if p.is_dir()])
 	domset = set(domains)
 	edges = {}
 	contract = {}
 	for path, text in files:
 		if "/domains/" not in str(path):
 			continue
-		parts = path.relative_to(_sr.REPO / "domains/src/main/java/com/ragagent").parts
+		parts = path.relative_to(_sr.REPO / "app/src/main/java/com/ragagent").parts
 		if len(parts) < 2 or parts[0] not in domset:
 			continue
 		src = parts[0]

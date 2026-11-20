@@ -33,7 +33,7 @@ RESET_CALL = 'createObjectNode('
 
 # ── 规则二：非边界层空转 catch ──────────────────────────────────────────────
 SOURCE_ROOTS = ['contract', 'platform', 'model-runtime', 'retrieval-engine',
-                'agent-engine', 'domains', 'boot']
+                'agent-engine', 'app']
 BOUNDARY_SEGMENTS = ('/controller/', '/api/', '/task/', '/channel/', '/client/', '/mapper/')
 
 # ── 规则三：Jackson 空体文案只许出现在收敛点 ─────────────────────────────────

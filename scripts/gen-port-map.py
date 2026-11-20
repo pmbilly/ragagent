@@ -45,10 +45,10 @@ def module_of(path: pathlib.Path) -> str:
 
 def domain_of(path: pathlib.Path) -> str:
     parts = path.parts
-    if "domains" not in parts:
+    if "app" not in parts:
         return module_of(path)
-    i = parts.index("domains")
-    # domains/src/main/java/com/ragagent/<域>/...
+    i = parts.index("app")
+    # app/src/main/java/com/ragagent/<域>/...
     return parts[i + 6] if len(parts) > i + 6 and parts[i + 4] == "com" else "?"
 
 

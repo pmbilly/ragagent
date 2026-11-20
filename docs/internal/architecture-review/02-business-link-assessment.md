@@ -332,7 +332,7 @@ EmbedChannelController（29 端点: 管理面 JWT+RBAC / 公开面 token / 委�
 | 4. 清单再登记 | `ProviderRegistry.allProviders()` | 同一文件第二处 |
 | 5.（非标请求形状）适配器 | `modelruntime/adapter/provider/chat/common/ProviderAdapters.java` REGISTRY | 11 个请求整形适配器 |
 | 6. HTTP 目录条目 | `domains/model/service/ModelProviderCatalog.java` ENTRIES | 199 行手写静态数据 |
-| 7. **契约金片** | `domains/src/testFixtures/resources/contracts/model-providers.json`（26 家）+ `boot/src/test/java/com/ragagent/model/ModelContractTest.java` | 金片字节校验，不改即红 |
+| 7. **契约金片** | `domains/src/testFixtures/resources/contracts/model-providers.json`（26 家）+ `app/src/test/java/com/ragagent/model/ModelContractTest.java` | 金片字节校验，不改即红 |
 
 **碰 boot 主码：否**（组件扫描）。**碰契约金片：是**（第 7 项，字节级）。工作量：4–7 处 / 3 模块 + 金片——五套机制中成本最高（双目录 + 金片）。
 

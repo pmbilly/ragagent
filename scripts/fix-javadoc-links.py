@@ -21,7 +21,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SCAN_ROOTS = [p / "src" / "main" / "java" for p in
-              [ROOT / "contract", ROOT / "common", ROOT / "domains", ROOT / "engine", ROOT / "boot"]]
+              [ROOT / "contract", ROOT / "common", ROOT / "app", ROOT / "engine", ROOT / "boot"]]
 CONTRACT = ROOT / "contract" / "src" / "main" / "java"
 
 

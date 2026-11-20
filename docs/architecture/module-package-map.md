@@ -4,7 +4,7 @@
 这张表回答"类/包属于哪个模块"，包内职责见 [`packages.md`](packages.md)，
 整体分层与设计原则见 [`overview.md`](overview.md)。
 
-## 7 个模块
+## 6 个模块
 
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
@@ -13,10 +13,9 @@
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 20 | 158 | 0 |
 | `:retrieval-engine` | `retrieval` | 16 | 117 | 0 |
 | `:agent-engine` | `agent` | 9 | 72 | 0 |
-| `:domains` | `agentmanagement`、`agenttools`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 255 | 1644 | 51 |
-| `:boot` | `(根包)`、`config` | 2 | 19 | 0 |
+| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 257 | 1663 | 51 |
 
-## 19 个业务域（domains）
+## 20 个业务域（domains）
 
 | 域 | 主码包 | 文件 | 控制器 |
 |---|---|---:|---:|
@@ -24,6 +23,7 @@
 | `agenttools` | `com.ragagent.agenttools` | 59 | 0 |
 | `audit` | `com.ragagent.audit` | 20 | 1 |
 | `auth` | `com.ragagent.auth` | 122 | 6 |
+| `config` | `com.ragagent.config` | 17 | 0 |
 | `datasource` | `com.ragagent.datasource` | 147 | 2 |
 | `embedchannel` | `com.ragagent.embedchannel` | 25 | 1 |
 | `favorite` | `com.ragagent.favorite` | 13 | 1 |
@@ -45,17 +45,17 @@
 1. **先看包根**：`com.ragagent.contract.*` → `:contract`；`platform` → `:platform`；
    `agent` → `:agent-engine`；`retrieval` → `:retrieval-engine`；
    `embedding` / `llm` / `modelcontext` / `modelruntime` / `rerank` → `:model-runtime`；
-   其余 19 个包根 → `:domains`；`com.ragagent.config` 与根包 → `:boot`。
-2. **HTTP 路由**在 `domains/src/main/java/com/ragagent/<域>/controller/`；
+   其余 20 个包根 → `:domains`；`com.ragagent.config` 与根包 → `:boot`。
+2. **HTTP 路由**在 `app/src/main/java/com/ragagent/<域>/controller/`；
    跨模块公开类型在 `contract/`，端口实现与全局 Bean 在 `boot/config/`。
-3. **测试**：业务域测试住在 `domains/src/test/`；HTTP 集成测试住在 `boot/src/test/`；
+3. **测试**：业务域测试住在 `app/src/test/`；HTTP 集成测试住在 `boot/src/test/`；
    共享录制/桩夹具在 `platform/src/testFixtures/`。
 
 ## 刻意例外
 
 - `:model-runtime` 有 5 个主码包根（`embedding` / `llm` / `modelcontext` / `modelruntime` / `rerank`），
   按能力族拆分，不与模块同名。
-- `:boot` 的测试树有 24 个业务包根：集成测试必须从 HTTP 面进，只能住在组合根。
+- `:boot` 的测试树有 0 个业务包根：集成测试必须从 HTTP 面进，只能住在组合根。
 - `domains` 测试树仍有 10 个跨模块测试（platform 5、model-runtime 4、contract 1），
   依赖 domains 载荷，迁走会形成反向边；登记在 `scripts/check-module-graph.py` 的
   `MISPLACED_TEST_ALLOW`（带理由，只许减）。

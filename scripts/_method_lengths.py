@@ -14,7 +14,7 @@ import pathlib
 import re
 
 MODULES = ["contract", "platform", "model-runtime", "retrieval-engine",
-           "agent-engine", "domains", "boot"]
+           "agent-engine", "app"]
 
 DECL = re.compile(r"^ {4}(?! )(?!if\b|for\b|while\b|switch\b|catch\b|try\b|else\b|return\b|"
                   r"new\b|throw\b|assert\b|case\b|default\b|yield\b|synchronized\s*\(|@|//|\*|/\*)"

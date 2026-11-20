@@ -16,7 +16,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ROOTS = [
-    ROOT / "domains" / "src" / "main" / "java",
+    ROOT / "app" / "src" / "main" / "java",
     ROOT / "agent-engine" / "src" / "main" / "java",
     ROOT / "retrieval-engine" / "src" / "main" / "java",
     ROOT / "model-runtime" / "src" / "main" / "java",

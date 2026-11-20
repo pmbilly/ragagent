@@ -18,7 +18,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "scripts" / "capability-kinds.json"
 OUT = ROOT / "docs" / "architecture" / "domain-index.md"
-DOMAINS = ROOT / "domains" / "src" / "main" / "java" / "com" / "ragagent"
+DOMAINS = ROOT / "app" / "src" / "main" / "java" / "com" / "ragagent"
 CONTRACT = ROOT / "contract" / "src" / "main" / "java" / "com" / "ragagent" / "contract"
 FRONTEND_SRC = ROOT / "frontend" / "src"
 
@@ -36,7 +36,9 @@ def load_config():
     data = json.loads(CONFIG.read_text(encoding="utf-8"))
     kinds = data["kinds"]
     domains = data["domains"]
-    actual = {p.name for p in DOMAINS.iterdir() if p.is_dir()}
+    # 装配与启动包不是业务域：不参与域索引与能力分类校验
+    INFRA_PACKAGES = {"config"}
+    actual = {p.name for p in DOMAINS.iterdir() if p.is_dir() and p.name not in INFRA_PACKAGES}
 
     problems = []
     missing = sorted(actual - set(domains))

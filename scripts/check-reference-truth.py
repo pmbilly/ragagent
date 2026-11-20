@@ -43,7 +43,7 @@ DEAD_NAMES = (
     "docs/superpowers/plans/",
 )
 PATH_ROOTS = (
-    "domains/",
+    "app/",
     "contract/",
     "platform/",
     "model-runtime/",

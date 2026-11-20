@@ -19,7 +19,7 @@ import pathlib
 import re
 import sys
 
-ROOT = pathlib.Path("domains/src/main/java")
+ROOT = pathlib.Path("app/src/main/java")
 BASELINE = pathlib.Path("scripts/controller-catch.baseline.json")
 MAPPER_IMPORT = re.compile(r"^import\s+com\.ragagent\.[\w.]*mapper\.[\w.]+Mapper;", re.M)
 CATCH = re.compile(r"catch\s*\(\s*RuntimeException\b")

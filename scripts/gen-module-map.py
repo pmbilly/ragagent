@@ -20,8 +20,7 @@ MODULES = [
     ("model-runtime", ":model-runtime"),
     ("retrieval-engine", ":retrieval-engine"),
     ("agent-engine", ":agent-engine"),
-    ("domains", ":domains"),
-    ("boot", ":boot"),
+    ("app", ":app"),
 ]
 PKG_RE = re.compile(r"^package\s+([\w.]+);", re.M)
 
@@ -52,7 +51,7 @@ def module_row(module: str, label: str):
 
 
 def domain_rows():
-    base = ROOT / "domains" / "src" / "main" / "java" / "com" / "ragagent"
+    base = ROOT / "app" / "src" / "main" / "java" / "com" / "ragagent"
     rows = []
     for d in sorted(p for p in base.iterdir() if p.is_dir()):
         files = [p for p in d.rglob("*.java") if "/build/" not in str(p) and "/target/" not in str(p)]
@@ -106,9 +105,9 @@ def render() -> str:
         "   `agent` → `:agent-engine`；`retrieval` → `:retrieval-engine`；",
         "   `embedding` / `llm` / `modelcontext` / `modelruntime` / `rerank` → `:model-runtime`；",
         f"   其余 {len(domains)} 个包根 → `:domains`；`com.ragagent.config` 与根包 → `:boot`。",
-        "2. **HTTP 路由**在 `domains/src/main/java/com/ragagent/<域>/controller/`；",
+        "2. **HTTP 路由**在 `app/src/main/java/com/ragagent/<域>/controller/`；",
         "   跨模块公开类型在 `contract/`，端口实现与全局 Bean 在 `boot/config/`。",
-        "3. **测试**：业务域测试住在 `domains/src/test/`；HTTP 集成测试住在 `boot/src/test/`；",
+        "3. **测试**：业务域测试住在 `app/src/test/`；HTTP 集成测试住在 `boot/src/test/`；",
         "   共享录制/桩夹具在 `platform/src/testFixtures/`。",
         "",
         "## 刻意例外",

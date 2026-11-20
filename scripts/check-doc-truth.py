@@ -12,7 +12,7 @@ README 是新人第一份材料，数字漂了比没有更糟：曾出现"每个
 
 ## 判据
 
-  D1 `七个 Maven 模块` ↔ 根 `pom.xml` 的 `<modules>` 数；
+  D1 `六个 Maven 模块` ↔ 根 `pom.xml` 的 `<modules>` 数；
   D2 `N 个业务控制器` ↔ 业务控制器数；README 声明的 `/health` 探针数 ↔ 实际探针类数；
   D3 `每个包有 package-info.java` ↔ 主码含 java 的包全部存在 package-info；
   D4 `N 份 JSON 响应样本` ↔ 金片目录 `*.json` 数；`M 份下载/导出类样本` ↔ `*.body` 数
@@ -27,7 +27,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-MODULES = ["contract", "platform", "model-runtime", "retrieval-engine", "agent-engine", "domains", "boot"]
+MODULES = ["contract", "platform", "model-runtime", "retrieval-engine", "agent-engine", "app"]
 
 
 def module_count() -> int:
@@ -57,7 +57,7 @@ def provider_count() -> int:
 
 def golden_counts() -> tuple[int, int]:
     # 样本口径：JSON 一份一个样本；非 JSON 样本由 .body + .headers 成对落盘，只数 .body
-    d = ROOT / "domains/src/testFixtures/resources/contracts"
+    d = ROOT / "app/src/testFixtures/resources/contracts"
     return (len(list(d.glob("*.json"))), len(list(d.glob("*.body"))))
 
 
@@ -79,12 +79,12 @@ def main() -> int:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     problems = []
 
-    if "七个 Maven 模块" in readme:
+    if "六个 Maven 模块" in readme:
         actual = module_count()
-        if actual != 7:
-            problems.append(f"D1 README 称七个模块，根 pom 实际 {actual}")
+        if actual != 6:
+            problems.append(f"D1 README 称六个模块，根 pom 实际 {actual}")
     else:
-        problems.append("D1 README 缺少「七个 Maven 模块」锚点——模块数变化时请同步守卫")
+        problems.append("D1 README 缺少「六个 Maven 模块」锚点——模块数变化时请同步守卫")
 
     m = re.search(r"(\d+)\s*个业务控制器", readme)
     if m:

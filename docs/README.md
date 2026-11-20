@@ -8,7 +8,7 @@
 |---|---|---|
 | 1 | [`../README.md`](../README.md) | 项目是什么、四条命令跑起来 |
 | 2 | [`architecture/getting-started.md`](architecture/getting-started.md) | 30 / 60 / 120 分钟上手与常见失败对照 |
-| 3 | [`architecture/overview.md`](architecture/overview.md) | 7 个模块、依赖矩阵、代码在哪 |
+| 3 | [`architecture/overview.md`](architecture/overview.md) | 6 个模块、依赖矩阵、代码在哪 |
 | 4 | [`architecture/request-path.md`](architecture/request-path.md) | 一次问答经过哪些模块与类、日志关键字 |
 | 5 | [`architecture/rag-pipeline.md`](architecture/rag-pipeline.md) | 14 个管线阶段与插件装配表 |
 | 6 | [`architecture/ingest-flow.md`](architecture/ingest-flow.md) | 一份文档从入口到入库、富化与收口的一页纸 |
@@ -34,7 +34,7 @@
 
 按业务链路查：[`architecture/business-capability-map.md`](architecture/business-capability-map.md) —— 六条链路（知识生产 / 问答 / Agent / 渠道 / 配置 / 初始化）→ 入口、编排、落点。
 
-先看模块：[`architecture/module-package-map.md`](architecture/module-package-map.md) —— 7 个模块的包根、19 个业务域的包/控制器数量（由脚本生成，勿手改）。
+先看模块：[`architecture/module-package-map.md`](architecture/module-package-map.md) —— 6 个模块的包根、19 个业务域的包/控制器数量（由脚本生成，勿手改）。
 
 先看业务分类：[`architecture/domain-index.md`](architecture/domain-index.md) —— 19 个域按 5 类能力组织，含入口、契约面与前端页面（由脚本生成，勿手改）。
 

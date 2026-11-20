@@ -8,7 +8,7 @@
     model-runtime  → contract, platform
     retrieval-engine → contract, platform
     agent-engine   → contract, platform, model-runtime   （modelcontext = 方案认可的终态边）
-    domains        → contract, platform, model-runtime, retrieval-engine
+    app            → contract, platform, model-runtime, retrieval-engine
                      （model-runtime 仅 modelcontext；retrieval-engine 因 vectorstore 契约
                       归位到 retrieval.api 而新增，retrieval-engine 不反向依赖 domains，不成环）
     boot           → 全部（组合根）
@@ -20,9 +20,9 @@
   B) **主码不得跨模块同包**：同一个包声明出现在两个模块的 src/main 里会成为 split package
      （classpath 上合并、同名类互相遮蔽，历史上靠"实测"才发现）。硬性为 0。
   C) **测试期依赖边**必须 ⊆ 矩阵 ∪ ALLOWED_TEST_EXTRA。
-     · `domains → agent-engine`：消费其 **testFixtures**（录制夹具 RecordingSupport 等）
-       ——夹具随 agent 树迁出后仍被 domains/boot 的录制测试复用（同向依赖、不成环）。
-     · `domains → model-runtime`：测试桩直接用模型侧类型（Embedder/Reranker 等），
+     · `app → agent-engine`：消费其 **testFixtures**（录制夹具 RecordingSupport 等）
+       ——夹具随 agent 树迁出后仍被 app/boot 的录制测试复用（同向依赖、不成环）。
+     · `app → model-runtime`：测试桩直接用模型侧类型（Embedder/Reranker 等），
        比再造一层契约桩更贴近真实装配。
      · `boot → *`：组合根测试天然要看到全部模块。
   D) **夹具不得与别模块主码同包**（`testFixtures` 会被别的模块当依赖吃进来，与对方主码同包
@@ -51,7 +51,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-MODULES = ["contract", "platform", "model-runtime", "retrieval-engine", "agent-engine", "domains", "boot"]
+MODULES = ["contract", "platform", "model-runtime", "retrieval-engine", "agent-engine", "app"]
 
 # ── 判据 A 的矩阵（主码依赖）──────────────────────────────────────────────
 ALLOWED_MAIN: dict[str, set[str]] = {
@@ -62,14 +62,14 @@ ALLOWED_MAIN: dict[str, set[str]] = {
     # modelcontext：agent 工具注册表/流解码属模型侧词汇，方案明示为 agent-engine 的合法终态边
     "agent-engine": {"contract", "platform", "model-runtime"},
     # modelcontext：同上（4 处；R2c-3d 已把其余模型族边清零）
-    "domains": {"contract", "platform", "model-runtime", "retrieval-engine"},
-    "boot": set(MODULES[:-1]),  # 组合根
+    # 组合根：app 已吸收原 boot（启动类 + 17 个装配类），可依赖全部模块
+    "app": set(MODULES[:-1]),
 }
 
 # ── 判据 C 的额外测试期边（每条都要理由）──────────────────────────────────
 ALLOWED_TEST_EXTRA: dict[tuple[str, str], str] = {
-    ("domains", "agent-engine"): "消费 agent-engine 的 testFixtures（录制夹具），同向不成环",
-    ("domains", "model-runtime"): "测试桩直接用模型侧类型（Embedder/Reranker/ModelRuntime）",
+    ("app", "agent-engine"): "消费 agent-engine 的 testFixtures（录制夹具），同向不成环",
+    ("app", "model-runtime"): "测试桩直接用模型侧类型（Embedder/Reranker/ModelRuntime）",
 }
 
 IMPORT_RE = re.compile(r"^import\s+(?:static\s+)?(com\.ragagent\.[\w.]+);", re.M)
@@ -77,23 +77,33 @@ PKG_RE = re.compile(r"^package\s+([\w.]+);", re.M)
 
 # ── 判据 E 的存量登记（路径 → 理由；只许减）────────────────────────────────
 MISPLACED_TEST_ALLOW: dict[str, str] = {
+    "app/src/test/java/com/ragagent/agent/EngineRecordingTest.java":
+        "录制夹具集成测试：需要 app 侧装配与 agent-engine testFixtures，迁回 agent-engine 会形成反向依赖",
+    "app/src/test/java/com/ragagent/platform/web/ContractTest.java":
+        "HTTP 契约金片驱动：需要 app 的 Spring 上下文与真 PG，platform 模块内无此装配",
+    "app/src/test/java/com/ragagent/platform/web/ValidationContractTest.java":
+        "同上：参数校验的 HTTP 契约测试依赖 app 的 MVC 装配",
+    "app/src/test/java/com/ragagent/retrieval/engine/EffectiveEnginesTest.java":
+        "检索引擎的装配级测试：需要 app 的配置与真库，retrieval-engine 模块内无此装配",
+    "app/src/test/java/com/ragagent/retrieval/engine/PgVectorEngineRepositoryTest.java":
+        "同上：pgvector 仓储测试依赖 app 的数据源装配",
     "platform/src/test/java/com/ragagent/contract/knowledge/rule/ParserEngineRulesTest.java":
         "测契约规则，但需要 platform 的 JsonMappers；platform test → contract 是合法方向",
-    "domains/src/test/java/com/ragagent/embedding/EmbeddingWireTest.java":
+    "app/src/test/java/com/ragagent/embedding/EmbeddingWireTest.java":
         "wire A/B 使用 domains 的 Model/ModelRowViews；迁 model-runtime 会形成 test→domains 反向边",
-    "domains/src/test/java/com/ragagent/rerank/RerankWireTest.java":
+    "app/src/test/java/com/ragagent/rerank/RerankWireTest.java":
         "同上：wire A/B 使用 domains 的 Model/ModelRowViews",
-    "domains/src/test/java/com/ragagent/llm/provider/ProviderRegistryTest.java":
+    "app/src/test/java/com/ragagent/llm/provider/ProviderRegistryTest.java":
         "provider 目录测试使用 domains 的 Model/ModelRowViews；迁 model-runtime 会形成反向边",
-    "domains/src/test/java/com/ragagent/platform/access/TracingCarrierNestingTest.java":
+    "app/src/test/java/com/ragagent/platform/access/TracingCarrierNestingTest.java":
         "用 domains 的任务载荷验证平台 tracing carrier；迁 platform 会形成反向边",
-    "domains/src/test/java/com/ragagent/platform/web/JsonFaceVocabularyTest.java":
+    "app/src/test/java/com/ragagent/platform/web/JsonFaceVocabularyTest.java":
         "用 domains 的 DTO/配置验证平台 JSON 口径；迁 platform 会形成反向边",
-    "domains/src/test/java/com/ragagent/platform/text/JsonContractRoundTripTest.java":
+    "app/src/test/java/com/ragagent/platform/text/JsonContractRoundTripTest.java":
         "全仓 JSON 往返矩阵，天然需要 domains 载荷；迁 platform 会形成反向边",
-    "domains/src/test/java/com/ragagent/platform/tracing/langfuse/LangfuseEndToEndTest.java":
+    "app/src/test/java/com/ragagent/platform/tracing/langfuse/LangfuseEndToEndTest.java":
         "端到端 trace 依赖 domains 的 MemoryTrace；迁 platform 会形成反向边",
-    "domains/src/test/java/com/ragagent/platform/tracing/langfuse/LangfuseTracingTest.java":
+    "app/src/test/java/com/ragagent/platform/tracing/langfuse/LangfuseTracingTest.java":
         "同上：trace 测试依赖 domains 的 MemoryTrace",
 }
 
@@ -211,9 +221,6 @@ def main() -> int:
     misplaced = 0
     ghost = 0
     for m in MODULES:
-        # 组合根的有意例外：boot 的 src/test 是 HTTP 集成测试聚合地，按业务包组织是刻意设计。
-        if m == "boot":
-            continue
         for kind in ("test", "testFixtures"):
             for f in sources(m, kind):
                 pm = PKG_RE.search(f.read_text(encoding="utf-8"))

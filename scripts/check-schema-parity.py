@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TEST_SCHEMA = ROOT / "domains/src/testFixtures/java/com/ragagent/TestSchema.java"
+TEST_SCHEMA = ROOT / "app/src/testFixtures/java/com/ragagent/TestSchema.java"
 MIGRATIONS = sorted((ROOT / "migrations/versioned").glob("V*.sql"))
 
 CONSTRAINT_HEADS = {"primary", "unique", "constraint", "foreign", "key", "index", "check"}

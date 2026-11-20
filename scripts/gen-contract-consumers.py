@@ -31,7 +31,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 MODULES = ["contract", "platform", "model-runtime", "retrieval-engine",
-           "agent-engine", "domains", "boot"]
+           "agent-engine", "app"]
 CONTRACT = ROOT / "contract/src/main/java"
 TYPE = re.compile(r"^(?:public\s+)?(?:final\s+|abstract\s+|sealed\s+)?"
                   r"(?:class|interface|record|enum)\s+(\w+)", re.M)
@@ -69,9 +69,9 @@ def contract_types() -> dict[str, pathlib.Path]:
 
 def consumer_label(module: str, path: pathlib.Path) -> str:
     if module == "domains":
-        match = re.search(r"domains/src/(?:main|test|testFixtures)/java/com/ragagent/(\w+)/",
+        match = re.search(r"app/src/(?:main|test|testFixtures)/java/com/ragagent/(\w+)/",
                           path.as_posix())
-        return f"domains:{match.group(1)}" if match else "domains"
+        return f"domains:{match.group(1)}" if match else "app"
     return module
 
 

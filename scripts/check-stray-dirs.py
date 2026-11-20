@@ -34,9 +34,9 @@ MODULE_ALLOW: dict[str, str] = {}
 # 源码树根（S2 扫描范围）
 SOURCE_ROOTS = (
     "contract/src/main/java",
-    "domains/src/main/java",
-    "domains/src/test/java",
-    "domains/src/testFixtures/java",
+    "app/src/main/java",
+    "app/src/test/java",
+    "app/src/testFixtures/java",
     "common/src/main/java",
     "common/src/test/java",
     "common/src/testFixtures/java",
@@ -72,7 +72,7 @@ def _ignored(path: pathlib.Path) -> bool:
 def check_stray_dirs() -> list[str]:
     problems = []
     scan = [(ROOT, ROOT_ALLOW)]
-    for mod in (ROOT / "domains", ROOT / "common", ROOT / "model-runtime", ROOT / "retrieval-engine", ROOT / "agent-engine", ROOT / "boot", ROOT / "frontend", ROOT / "mcp-server",
+    for mod in (ROOT / "app", ROOT / "common", ROOT / "model-runtime", ROOT / "retrieval-engine", ROOT / "agent-engine", ROOT / ROOT / "frontend", ROOT / "mcp-server",
                 ROOT / "docreader", ROOT / "otlp-proto", ROOT / "migrations", ROOT / "docs",
                 ROOT / "scripts"):
         if mod.is_dir():

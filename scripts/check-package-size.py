@@ -16,7 +16,7 @@ import sys
 from collections import Counter
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SRC = ROOT / "domains" / "src" / "main" / "java"
+SRC = ROOT / "app" / "src" / "main" / "java"
 BASELINE = ROOT / "scripts" / "package-size.baseline.json"
 
 

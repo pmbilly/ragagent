@@ -57,7 +57,7 @@ graph TD
 | LLM provider / embedding / rerank 客户端 | `model-runtime/src/main/java/com/ragagent/{llm,embedding,rerank}/` |
 | Agent 循环 / 工具 / 技能 / 压缩 | `agent-engine/src/main/java/com/ragagent/agent/` |
 | 管线阶段与插件 | `domains/.../session/rag/`，装配在 `session/assembly/QaWiring` |
-| 跨模块 Bean / 端口实现 | `boot/src/main/java/com/ragagent/config/`；域内装配点见下方「装配点」 |
+| 跨模块 Bean / 端口实现 | `app/src/main/java/com/ragagent/config/`；域内装配点见下方「装配点」 |
 | 跨模块公开类型 | `contract/src/main/java/com/ragagent/contract/` |
 | 域对外的端口实现 | `<域>/api/`：实现 `contract` 端口（Adapter），供其他域或装配层依赖；不要反向依赖 controller |
 

@@ -51,9 +51,9 @@ import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-CONTRACTS = ROOT / 'domains/src/testFixtures/resources/contracts'
-MAIN_ROOTS = [ROOT / m / 'src/main/java' for m in ('domains', 'engine', 'common', 'boot')]
-TEST_ROOTS = [ROOT / m / 'src/test/java' for m in ('boot', 'domains', 'engine', 'common')]
+CONTRACTS = ROOT / 'app/src/testFixtures/resources/contracts'
+MAIN_ROOTS = [ROOT / m / 'src/main/java' for m in ('app', 'engine', 'common', 'boot')]
+TEST_ROOTS = [ROOT / m / 'src/test/java' for m in ('app', 'engine', 'common')]
 CODE_BY_STATUS = {400: 1000, 401: 1001, 403: 1002, 404: 1003, 405: 1004,
                   409: 1005, 429: 1006, 503: 1008}
 
@@ -273,7 +273,7 @@ def cmd_converge(test_filters, rounds=40):
     env.setdefault('JAVA_HOME', '/opt/homebrew/opt/openjdk@21')
     budget = {}
     for rnd in range(rounds):
-        cmd = ['mvn', '-B', '-pl', 'boot', 'test', '-Dtest=' + ','.join(test_filters)]
+        cmd = ['mvn', '-B', '-pl', 'test', '-Dtest=' + ','.join(test_filters)]
         run = subprocess.run(cmd, capture_output=True, text=True, env=env)
         if run.returncode != 0 and 'error:' in (run.stdout + run.stderr):
             # 编译失败 ⇒ 没有测试结果 ⇒ 不能当成"全绿" ✗（B199 实测假绿一次 ✓）

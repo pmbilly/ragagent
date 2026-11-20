@@ -43,7 +43,7 @@ from _method_lengths import scan  # noqa: E402
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BASELINE = ROOT / "scripts/hygiene-budget.baseline.json"
 MODULES = ["contract", "platform", "model-runtime", "retrieval-engine",
-           "agent-engine", "domains", "boot"]
+           "agent-engine", "app"]
 METHOD_THRESHOLD = 100
 CTOR_THRESHOLD = 8
 

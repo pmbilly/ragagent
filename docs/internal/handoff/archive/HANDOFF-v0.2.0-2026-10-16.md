@@ -1282,7 +1282,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 **🔶 B264 第⑤步（2026-10-14，session 起步：`sse/` → `controller.sse/`）**
 - **首个最小簇**：`session.sse`（`SseContract` / `SseFrameWriter` / `StreamEventEmitter` / `StreamResponseBuilder`）→ `session.controller.sse`——类集与 §8.8.1 的 `controller.sse/` 目标**逐名一致** ✓；动前断言：四类对 session 域内包**零依赖**（出边只到 `common`/`llm`/`storage`/`platform`）⇒ 只产生 `controller → controller.sse`、`qa → controller.sse` 单向边。
-- **两树测试随迁**：`domains/src/test/.../session/sse/StreamResponseBuilderTest` + `boot/src/test/.../session/sse/SseFrameWriterTest` → `session/controller/sse/`（"同名包"两处一起处理）；三处空目录删除。
+- **两树测试随迁**：`domains/src/test/.../session/sse/StreamResponseBuilderTest` + `app/src/test/.../session/sse/SseFrameWriterTest` → `session/controller/sse/`（"同名包"两处一起处理）；三处空目录删除。
 - **锚点**：`scripts/check-event-face-case.py` 的 **`EVENT_MAP_FILES` 路径锚**（`session/sse/StreamResponseBuilder.java`，SSE 帧键位覆盖清单）换新路径——**这类"按路径的覆盖清单"漏换就静默丢覆盖**（与 `FROZEN_PREFIXES` 同族）。
 - **新增** `controller/sse/package-info`（写明迁入依据）。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m38s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓。
@@ -2934,7 +2934,7 @@ public interface AdminUserPort {
 - **本步新踩的三类"换包连带"（都已修，值得记住）**：
   1. **同包 javadoc `{@link SimpleName}` 会失链** ✗（`:domains:javadoc` 报 `reference not found`）——FQN 正则抓不到它（它是**简单名**）⇒ 改成全限定形式（仓内既有风格）；并写成**全量扫描**（凡 javadoc 里指向旧同包类且无 import 的，一次改完）。
   2. **`FROZEN_PREFIXES` 里存在"按文件"的前缀** ✗（`knowledge/service/ChunkExtractService`）⇒ 换包即静默失效，守卫原话点名"离开/进入" ⇒ 换锚到新路径 + `--write` 刷冻结快照（**diff 恰一行** = 纯换锚 ✓）。
-  3. **别的模块的测试树里也有同名包** ✗（`boot/src/test/java/com/ragagent/knowledge/service/Chunk*Test.java` 裸引用被搬走的类）⇒ 补 import 器需把编译目标扩到 `:boot:compileTestJava`（只跑 `:domains:*` 会漏）。
+  3. **别的模块的测试树里也有同名包** ✗（`app/src/test/java/com/ragagent/knowledge/service/Chunk*Test.java` 裸引用被搬走的类）⇒ 补 import 器需把编译目标扩到 `:boot:compileTestJava`（只跑 `:domains:*` 会漏）。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m46s** ✓ **十二守卫** ✓（环 0 / **包级 SCC 12 组**不变）。
 - **登记（`service` 其余子面）**：门面 `KnowledgeService` 闭包仍 **18 类**（其 6 个引用者是归位的最后一关）；`ChunkQuestionService` 需与 `QuestionGenerationService` 的边一起处置；`KnowledgeTagService`（零入度）可作下一簇 `service.tag`。`KnowledgeService` 闭包 = **18 类**（`KnowledgeService` + 3 双向伙伴 + 3 单向使用者 + 11 个被依赖者）⇒ 下一簇可切的目标是这 18 类里**离门面最远的自洢子集**（`Chunk*` 四类与 `HousekeepingService`、3 个 adapter 已在闭包外）；门面本体归位仍需先让这 18 类继续收缩。按上述闭包把「`KnowledgeService` + 3 个双向伙伴 + 3 个单向使用者（+ 递归闭包）」整体搬进目标子面（`service.management` 与其协作者面），届时 SCC 不扩大、门面归位。`KnowledgeService`(717) → `service.management/*`（**需配套断边**：B263① 实测直接搬会让 SCC 扩大）。① ㉜ `SpanTracker` 移出 service（`domain.span` 候选）⇒ 断最后一处 task→service，`{service, task}` SCC 收口；② `KnowledgeService`(717) → `service.management/*`（需配套断边）。① `KnowledgeService`(716) 余部 → `service.management/*`（**需配套断边**）；② **`task ⇄ service` 环**（task→service 6 文件 / service→task 11 文件）。① `KnowledgeService`(716) 余部 → `service.management/*`（**需配套断边**：B263① 已实测"往子面搬会让 SCC 扩大"）；② **`task ⇄ service` 环**（现测：task→service **6** 文件 / service→task **11** 文件）；③ `escapeLikeKeyword` **多副本统一到 `common`**（§9.2 式，⑯ 登记）。
 **🔶 B263 第㉘步（2026-10-14，`KnowledgeProcessWorker` 归仓储：824 → 792 行）**

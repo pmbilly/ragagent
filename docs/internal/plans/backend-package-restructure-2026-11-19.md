@@ -52,7 +52,7 @@
 
 ### 4.1 P1 的规则：先盘点已有，只补缺口
 
-2026-11-19 实测：`boot/src/test/java/com/ragagent/arch/ArchitectureRulesTest.java` 已有 **22 条规则**（A1~A20 + B257/B260），原计划的四条里三条已被覆盖：
+2026-11-19 实测：`app/src/test/java/com/ragagent/arch/ArchitectureRulesTest.java` 已有 **22 条规则**（A1~A20 + B257/B260），原计划的四条里三条已被覆盖：
 
 | 原计划规则 | 现状 | 结论 |
 |---|---|---|
@@ -400,7 +400,7 @@ ragagent/
 | **S3** | 引擎面归位：`model` → model-runtime/api；`retrieval` + `vectorstore` 余项 → retrieval/api；`agent` + `tool` + `pipeline` 整组 → agent/api + spi | S1 ✅ | 3~5 天 | 每批全量绿 |
 | **S4** | 通用面下沉：`error` / `event` / `json` / `text` / `pagination` → framework | S3（清完 contract 内部引用） | 2 天 | 全量绿 |
 | **S5** | 域契约归位（13 个包 → contract 只剩域包） | **需先做域间通信改造** | 不可估 | — |
-| **S6** | `domains` + `boot/config` → `app`；boot 只留启动类；1 jar 双角色 | S4 | 1~2 天 | 全量绿 + 双角色启动验证 |
+| **S6** | `domains` + `boot` → `app`（boot 整体并入，非只留启动类） | — | 1~2 天 | ✅ 2026-11-20：全量绿 4220/0 · 守卫 49/49 |
 | **S7** | **`platform` → `framework` + 目录前移 `backend/` + 路径适配**（原 S2 并入；12 个 pom + 24 个脚本 + CI + 文档） | S6 | 2~3 天 | 全量绿 + 守卫 49/49 |
 | **S8** | ArchUnit → Modulith，删 `scripts/*.py` 守卫 | S7 | 2 天 | — |
 

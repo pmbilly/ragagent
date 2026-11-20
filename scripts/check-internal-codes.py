@@ -18,7 +18,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-MODULES = ["contract", "platform", "model-runtime", "retrieval-engine", "agent-engine", "domains", "boot"]
+MODULES = ["contract", "platform", "model-runtime", "retrieval-engine", "agent-engine", "app"]
 COMMENT_RE = re.compile(r"//[^\n]*|/\*.*?\*/", re.S)
 CODE_RE = re.compile(
     r"\b(?:B\d{2,3}|K\d{1,2}|A\d{2}|R\d[a-z]?|W\d[a-zγ]?|P\d[a-z]?|O\d{1,2}|G\d|D\d|E\d|F\d|C\d)"
