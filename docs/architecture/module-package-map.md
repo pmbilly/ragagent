@@ -8,19 +8,19 @@
 
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
-| `:contract` | `contract` | 33 | 321 | 0 |
+| `:contract` | `contract` | 33 | 320 | 0 |
 | `:platform` | `platform` | 26 | 202 | 1 |
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 20 | 158 | 0 |
 | `:retrieval-engine` | `retrieval` | 16 | 119 | 0 |
 | `:agent-engine` | `agent` | 9 | 72 | 0 |
-| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 256 | 1662 | 51 |
+| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 257 | 1664 | 51 |
 
 ## 20 个业务域（domains）
 
 | 域 | 主码包 | 文件 | 控制器 |
 |---|---|---:|---:|
 | `agentmanagement` | `com.ragagent.agentmanagement` | 27 | 2 |
-| `agenttools` | `com.ragagent.agenttools` | 59 | 0 |
+| `agenttools` | `com.ragagent.agenttools` | 61 | 0 |
 | `audit` | `com.ragagent.audit` | 20 | 1 |
 | `auth` | `com.ragagent.auth` | 122 | 6 |
 | `config` | `com.ragagent.config` | 17 | 0 |
@@ -64,5 +64,5 @@
 
 ## 相关
 
-- [`packages.md`](packages.md)：360 份 `package-info` 的包级职责索引。
+- [`packages.md`](packages.md)：361 份 `package-info` 的包级职责索引。
 - [`overview.md`](overview.md)：模块依赖图、设计原则、代码在哪。

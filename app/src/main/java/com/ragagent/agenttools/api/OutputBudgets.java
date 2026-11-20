@@ -1,4 +1,4 @@
-package com.ragagent.contract.agent;
+package com.ragagent.agenttools.api;
 import com.ragagent.contract.tool.ToolRequest;
 
 /**

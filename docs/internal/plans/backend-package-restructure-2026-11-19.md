@@ -438,7 +438,7 @@ ragagent/
 
 规则：**只允许上级 import 下级**（L3→L2→L1），且目标必须是对方的 `api/`（或 `dto/`）契约包；禁止下级→上级、禁止同级互相 import。
 
-### 10.3 每个契约类型的归宿（造 288 个实测）
+### 10.3 每个契约类型的归宿（造 288 个实测；已含 kind 约束）
 
 判据：home = 消费方里**级别最低**的那一方（这样所有其它消费方都是"上级"，都允许 import 它）；
 若最低级别有多个域（同级互需）→ 下沉 `framework`；若被 `platform` 用 → `framework`。
@@ -450,11 +450,16 @@ ragagent/
 | `agent-engine/api` | 24 | `contract.agent` / `tool` 主体 |
 | `model-runtime/api` | 16 | `contract.model` 主体 |
 | `retrieval-engine/api` | 13 | `contract.retrieval` / `vectorstore` |
-| `app/<域>/api` | 88 | 分布：`knowledge` 19 · `websearch` 10 · `memory` 9 · `wiki` 8 · `initialization` 7 · `storage` 7 · `session` 7 · `im` 6 · `embedchannel` 5 · `auth` 4 · `system` 2 · `agentmanagement` 2 · `agenttools` 1 · `audit` 1 |
+| `app/<域>/api` | **49** | `knowledge` 19 · `memory` 9 · `wiki` 8 · `session` 7 · `agentmanagement` 2 · `im` 2 · `embedchannel` 1 · `storage` 1（另有 `agenttools` 1 已搬） |
 | 无引用 | 10 | 需确认死代码后删除 |
 | 待定 | 2 | 消费方含 `config` / `_root`，归属需人工判定 |
 
-**共享层从 288 降到 135（53%）**，其余 141 归位到域/引擎，10 个删除。
+**共享层从 288 降到 173（-40%）**，53 归引擎，49 归域，10 个无引用待清理。
+
+**第二层约束：kind（能力种类）**。实测搬 `WikiActivityAudit`（`contract.audit` → `app/audit/api`）时被
+`check-capability-kinds.py` 拦下：`wiki`（product）→ `audit`（control）属**跨 kind 直连**，同样禁止。
+故归属判据必须同时满足两条：① 级别上级→下级；② **同一 kind**。跨 kind 共用的一律下沉 framework——
+这也是 `framework(跨 kind)` 从 43 涨到 56 + 同级 25 = 173 的原因。
 
 ### 10.4 五步执行计划
 

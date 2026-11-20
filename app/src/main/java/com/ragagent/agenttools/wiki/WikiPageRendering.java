@@ -1,6 +1,6 @@
 package com.ragagent.agenttools.wiki;
 
-import com.ragagent.contract.agent.OutputBudgets;
+import com.ragagent.agenttools.api.OutputBudgets;
 import com.ragagent.contract.tool.ToolOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
