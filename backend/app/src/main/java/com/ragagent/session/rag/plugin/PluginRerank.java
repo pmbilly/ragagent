@@ -1,14 +1,14 @@
 package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.knowledge.DocumentChunkMetadata;
-import com.ragagent.contract.knowledge.GeneratedQuestion;
 import com.ragagent.contract.model.RankResult;
 import com.ragagent.contract.model.Reranker;
 import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.websearch.ImageInfo;
+import com.ragagent.knowledge.api.DocumentChunkMetadata;
+import com.ragagent.knowledge.api.GeneratedQuestion;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.retrieval.api.RetrievalObsRows;

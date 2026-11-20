@@ -5,7 +5,7 @@
 
 ## 统计
 
-- 域间（解耦）：**26**
+- 域间（解耦）：**24**
 - 复合面（随复合端口）：**7**
 - 跨模块（必要）：**6**
 
@@ -20,7 +20,6 @@
 | `ChunkPort` | `ChunkPortAdapter` | backend/app | wiki | 域间（解耦） |
 | `DocReaderAdminPort` | `DocReaderAdminAdapter` | backend/app | knowledge、system | 域间（解耦） |
 | `DocReaderParsePort` | `DocReaderParseAdapter` | backend/app | im、initialization、session | 域间（解耦） |
-| `DocumentChunkingPort` | `DocumentChunkingAdapter` | backend/app | session | 域间（解耦） |
 | `EmbedSessionPort` | `EmbedSessionAdapter` | backend/app | embedchannel | 域间（解耦） |
 | `EmbeddingModelPort` | `EmbeddingModelAdapter` | backend/app | wiki | 域间（解耦） |
 | `EmbeddingPort` | `ModelRuntimeEmbeddingAdapter` | backend/model-runtime | backend/retrieval-engine、knowledge、memory | 跨模块（必要） |
@@ -38,7 +37,6 @@
 | `KnowledgeMaintenancePort` | `KnowledgeMaintenanceAdapter` | backend/app | websearch | 域间（解耦） |
 | `KnowledgeSpanPort` | `KnowledgeSpanAdapter` | backend/app | wiki | 域间（解耦） |
 | `McpToolRegistrationPort` | `McpToolRegistrationAdapter` | backend/app | backend/agent-engine | 跨模块（必要） |
-| `MessageTranscriptPort` | `MessageTranscriptAdapter` | backend/app | memory | 域间（解耦） |
 | `ModelFactsPort` | `ModelService` | backend/app | backend/retrieval-engine | 跨模块（必要） |
 | `ParserEngineCatalogPort` | `ParserEngineCatalog` | backend/app | system | 域间（解耦） |
 | `ProviderFileStorePort` | `ProviderFileStoreAdapter` | backend/app | knowledge | 域间（解耦） |

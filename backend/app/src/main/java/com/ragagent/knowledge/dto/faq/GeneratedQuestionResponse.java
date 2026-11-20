@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.dto.faq;
 
-import com.ragagent.contract.knowledge.GeneratedQuestion;
+import com.ragagent.knowledge.api.GeneratedQuestion;
 
 /** 生成问题视图：id / 问题 / 所属内容版本。 */
 public record GeneratedQuestionResponse(String id, String question, Integer contentRevision) {

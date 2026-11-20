@@ -2,9 +2,9 @@ package com.ragagent.session.attachment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.contract.knowledge.DocumentChunkingPort;
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.contract.tenant.TenantConfigLookup;
+import com.ragagent.knowledge.api.DocumentChunkingPort;
 import com.ragagent.llm.api.AsrTranscriber;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.platform.config.AppEnvLookup;

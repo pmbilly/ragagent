@@ -1,8 +1,8 @@
 package com.ragagent.memory.service;
 
 import com.ragagent.contract.memory.MemoryKeys;
-import com.ragagent.contract.session.MessageTranscriptPort;
-import com.ragagent.contract.session.SessionMessageView;
+import com.ragagent.memory.api.MessageTranscriptPort;
+import com.ragagent.memory.api.SessionMessageView;
 import com.ragagent.memory.domain.MemoryExtractionSession;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.Duration;

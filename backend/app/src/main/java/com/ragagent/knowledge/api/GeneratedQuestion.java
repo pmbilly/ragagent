@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge;
+package com.ragagent.knowledge.api;
 
 
 /**

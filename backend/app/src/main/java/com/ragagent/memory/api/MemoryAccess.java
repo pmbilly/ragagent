@@ -1,8 +1,6 @@
 package com.ragagent.memory.api;
 
 import com.ragagent.contract.memory.MemoryRecall;
-import com.ragagent.contract.memory.MemorySearchHit;
-import com.ragagent.contract.memory.MemorySearchHits;
 import com.ragagent.memory.service.MemoryExtractionService;
 import com.ragagent.memory.service.MemoryService;
 import java.util.ArrayList;

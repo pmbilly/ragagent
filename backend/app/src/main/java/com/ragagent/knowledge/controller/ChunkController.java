@@ -2,8 +2,8 @@ package com.ragagent.knowledge.controller;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.GeneratedQuestion;
 import com.ragagent.contract.pagination.PageResult;
+import com.ragagent.knowledge.api.GeneratedQuestion;
 import com.ragagent.knowledge.dto.chunk.ChunkResponse;
 import com.ragagent.knowledge.dto.chunk.ChunkRevisionResponse;
 import com.ragagent.knowledge.dto.chunk.ChunkUpdateResponse;

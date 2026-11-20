@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.chunker;
 
-import com.ragagent.contract.text.CodePoints;
+import com.ragagent.knowledge.api.CodePoints;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

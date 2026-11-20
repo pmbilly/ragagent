@@ -1,7 +1,7 @@
 package com.ragagent.session.adapter;
 
-import com.ragagent.contract.session.MessageTranscriptPort;
-import com.ragagent.contract.session.SessionMessageView;
+import com.ragagent.memory.api.MessageTranscriptPort;
+import com.ragagent.memory.api.SessionMessageView;
 import com.ragagent.session.repository.MessageRepository;
 import java.time.OffsetDateTime;
 import java.util.List;

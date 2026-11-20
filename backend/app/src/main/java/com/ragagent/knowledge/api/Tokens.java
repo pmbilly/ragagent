@@ -1,4 +1,4 @@
-package com.ragagent.contract.text;
+package com.ragagent.knowledge.api;
 
 import java.util.Map;
 

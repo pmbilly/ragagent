@@ -1,4 +1,4 @@
-package com.ragagent.contract.text;
+package com.ragagent.knowledge.api;
 
 /**
  * 码点（Unicode code point）工具。

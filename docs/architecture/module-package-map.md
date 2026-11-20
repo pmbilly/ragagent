@@ -8,12 +8,12 @@
 
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
-| `:contract` | `contract` | 33 | 277 | 0 |
+| `:contract` | `contract` | 32 | 266 | 0 |
 | `:platform` | `platform` | 26 | 200 | 1 |
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 22 | 178 | 0 |
 | `:retrieval-engine` | `retrieval` | 16 | 119 | 0 |
 | `:agent-engine` | `agent`、`agentengine` | 10 | 94 | 0 |
-| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 258 | 1672 | 51 |
+| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 259 | 1683 | 51 |
 
 ## 20 个业务域（domains）
 
@@ -29,9 +29,9 @@
 | `favorite` | `com.ragagent.favorite` | 13 | 1 |
 | `im` | `com.ragagent.im` | 107 | 2 |
 | `initialization` | `com.ragagent.initialization` | 11 | 1 |
-| `knowledge` | `com.ragagent.knowledge` | 282 | 8 |
+| `knowledge` | `com.ragagent.knowledge` | 289 | 8 |
 | `mcp` | `com.ragagent.mcp` | 171 | 4 |
-| `memory` | `com.ragagent.memory` | 92 | 1 |
+| `memory` | `com.ragagent.memory` | 96 | 1 |
 | `model` | `com.ragagent.model` | 38 | 4 |
 | `session` | `com.ragagent.session` | 212 | 8 |
 | `storage` | `com.ragagent.storage` | 62 | 3 |

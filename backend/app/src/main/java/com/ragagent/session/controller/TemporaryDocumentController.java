@@ -2,7 +2,7 @@ package com.ragagent.session.controller;
 
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.knowledge.rule.ParserEngineRules;
+import com.ragagent.knowledge.api.ParserEngineRules;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.text.ContentTypeByFilename;

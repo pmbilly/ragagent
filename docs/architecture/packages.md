@@ -76,7 +76,6 @@
 | `:backend` | `com.ragagent.contract.knowledge.config` | 知识库配置视图：ASR / 分块 / 图片处理 / 索引策略 / 存储 / 存储 provider / VLM 的配置形状。 |
 | `:backend` | `com.ragagent.contract.knowledge.error` | 知识库领域错误：DuplicateKnowledgeDetails / DuplicateKnowledgeException。 |
 | `:backend` | `com.ragagent.contract.knowledge.projection` | 知识库投影：把实体行视图映射为契约视图/事实的唯一实现 （KnowledgeBaseViews / ChunkProjectionAdapter / KnowledgeProjectionAdapter）。 |
-| `:backend` | `com.ragagent.contract.knowledge.rule` | 知识库解析规则：ParserEngineRules（文件类型 → 默认解析引擎）。 |
 | `:backend` | `com.ragagent.contract.memory` | 记忆契约面：配置/条目视图/键与类目/召回与检索上下文。 |
 | `:backend` | `com.ragagent.contract.model` | 模型契约面：模型事实、运行时载荷与跨域能力端口。 |
 | `:backend` | `com.ragagent.contract.pagination` | 分页契约：统一的 com.ragagent.contract.pagination.PageResult。 |
@@ -154,6 +153,7 @@
 | `:backend` | `com.ragagent.initialization.service` | initialization 用例实现：初始化配置（com.ragagent.initialization.service.InitializationConfigService）、 模型连通性测试、 |
 | `:backend` | `com.ragagent.knowledge` | 知识库域：知识的存储、处理管线与检索面。 |
 | `:backend` | `com.ragagent.knowledge.adapter` | 知识库 · 端口实现（11 个）：ChunkPort / KnowledgeCatalog / KnowledgeBaseCatalog / KnowledgeBaseLookup / Knowled |
+| `:backend` | `com.ragagent.knowledge.api` | knowledge 域对外契约。 |
 | `:backend` | `com.ragagent.knowledge.chunker` | 知识库 · 分块：HeuristicSplitter / DocumentProfiler / HeadingHierarchy…。 |
 | `:backend` | `com.ragagent.knowledge.client` | 知识库出站客户端：DocReaderClient（文档解析服务）。 |
 | `:backend` | `com.ragagent.knowledge.config` | 知识库 · 配置：HousekeepingProperties / BatchEmbedProperties / DocReaderProperties。 |

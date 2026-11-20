@@ -87,8 +87,6 @@ MISPLACED_TEST_ALLOW: dict[str, str] = {
         "检索引擎的装配级测试：需要 app 的配置与真库，retrieval-engine 模块内无此装配",
     "backend/app/src/test/java/com/ragagent/retrieval/engine/PgVectorEngineRepositoryTest.java":
         "同上：pgvector 仓储测试依赖 app 的数据源装配",
-    "backend/framework/src/test/java/com/ragagent/contract/knowledge/rule/ParserEngineRulesTest.java":
-        "测契约规则，但需要 platform 的 JsonMappers；platform test → contract 是合法方向",
     "backend/app/src/test/java/com/ragagent/embedding/EmbeddingWireTest.java":
         "wire A/B 使用 domains 的 Model/ModelRowViews；迁 model-runtime 会形成 test→domains 反向边",
     "backend/app/src/test/java/com/ragagent/rerank/RerankWireTest.java":

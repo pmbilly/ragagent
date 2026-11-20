@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.chunker;
 
-import com.ragagent.contract.text.Tokens;
+import com.ragagent.knowledge.api.Tokens;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;

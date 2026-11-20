@@ -7,8 +7,8 @@ import static org.mockito.Mockito.when;
 
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.contract.knowledge.DocumentChunkingPort;
 import com.ragagent.contract.session.MessageAttachment;
+import com.ragagent.knowledge.api.DocumentChunkingPort;
 import com.ragagent.llm.api.AsrTranscriber;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;

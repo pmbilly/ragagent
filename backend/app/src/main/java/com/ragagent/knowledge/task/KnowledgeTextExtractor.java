@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.task;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.knowledge.rule.ParserEngineRules;
+import com.ragagent.knowledge.api.ParserEngineRules;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;

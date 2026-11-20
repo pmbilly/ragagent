@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.adapter;
 
-import com.ragagent.contract.knowledge.DocumentChunkingPort;
+import com.ragagent.knowledge.api.DocumentChunkingPort;
 import com.ragagent.knowledge.chunker.Chunker;
 import com.ragagent.knowledge.chunker.ParsedChunk;
 import com.ragagent.knowledge.chunker.SplitterConfig;

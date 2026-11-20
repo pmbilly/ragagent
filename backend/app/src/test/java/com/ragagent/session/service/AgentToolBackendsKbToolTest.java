@@ -9,11 +9,11 @@ import static org.mockito.Mockito.when;
 
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.memory.MemorySearchHit;
-import com.ragagent.contract.memory.MemorySearchHits;
 import com.ragagent.contract.pipeline.WebSearchExecutor;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.memory.api.MemoryAccess;
+import com.ragagent.memory.api.MemorySearchHit;
+import com.ragagent.memory.api.MemorySearchHits;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.retrieval.api.HybridSearchPort;

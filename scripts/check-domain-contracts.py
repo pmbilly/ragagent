@@ -281,10 +281,12 @@ def main():
     new_edges = sorted(k for k in actual
                        if k not in base
                        and tier_of(tiers, k) not in (TIER_FAMILY, TIER_LEVEL))
+    # ⓪ 档（级别合法 + 目标为 api/dto）与 ③ 族内同为「规则」而非「登记」：
+    # 蓝图允许的方向，新增边与新增类都放行，否则 K17 的放宽形同虚设。
     new_classes = {k: sorted(set(actual[k]) - set(base.get(k, [])))
                    for k in actual
                    if k in base and set(actual[k]) - set(base.get(k, []))
-                   and tier_of(tiers, k) != TIER_FAMILY}
+                   and tier_of(tiers, k) not in (TIER_FAMILY, TIER_LEVEL)}
     gone = {k: sorted(set(base.get(k, [])) - set(actual.get(k, [])))
             for k in base if set(base.get(k, [])) - set(actual.get(k, [])) or k not in actual}
 
