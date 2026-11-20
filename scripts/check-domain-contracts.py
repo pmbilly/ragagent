@@ -72,10 +72,44 @@ DOMAINS = [
 ENTITY_IMPORT = re.compile(
     r'^import (?:static )?com\.ragagent\.(\w+)\.(?:[\w]+\.)*domain\.[\w.]+;', re.M)
 
+TIER_LEVEL = 'level-ok'
 TIER_CLEARABLE = 'clearable'
 TIER_OWNER = 'owner'
 TIER_FAMILY = 'intra-family'
-TIER_MARK = {TIER_CLEARABLE: '①', TIER_OWNER: '②', TIER_FAMILY: '③'}
+TIER_MARK = {TIER_LEVEL: '⓪', TIER_CLEARABLE: '①', TIER_OWNER: '②', TIER_FAMILY: '③'}
+
+
+# ── 域分级（蓝图 §5.4：只允许上级依赖下级） ────────────────────────────────
+#: 级别的单一来源是 scripts/capability-kinds.json 的 level 字段（1 基础 / 2 业务 / 3 编排）
+def _load_levels():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'capability-kinds.json')
+    data = json.load(open(path, encoding='utf-8'))
+    return {name: meta['level'] for name, meta in data['domains'].items() if 'level' in meta}
+
+
+LEVEL = _load_levels()
+
+#: 跨域只允许 import 对方的契约包；实现包（service/repository/adapter/domain/mapper）一律禁
+LEGAL_IMPORT_PKG = {'api', 'dto'}
+
+#: 由级别判定为合法的边（①②③ 之外的第四档：上级 → 下级 的 api/dto）
+_LEVEL_OK: set[str] = set()
+#: 边 → 被导入的二级包名集合（api/dto/service/…），供分级判定用
+_EDGE_PKGS: dict[str, set] = collections.defaultdict(set)
+
+
+def level_verdict(edge, imps):
+    """上级 import 下级且目标是 api/dto ⇒ ok；下级→上级 或 同级 ⇒ inverted；否则 None。"""
+    a, b = edge.split('→')
+    la, lb = LEVEL.get(a), LEVEL.get(b)
+    if la is None or lb is None:
+        return None
+    if la <= lb:
+        return 'inverted'
+    pkgs = _EDGE_PKGS.get(edge) or set()
+    if not pkgs or any(p not in LEGAL_IMPORT_PKG for p in pkgs):
+        return 'inverted'
+    return 'ok'
 
 
 def scan():
@@ -97,6 +131,8 @@ def scan():
                     b = imp.split('.')[0]
                     if b in DOMAINS and b != a:
                         edges[(a, b)].add(f[:-5])
+                        seg = imp.split('.')
+                        _EDGE_PKGS[f'{a}→{b}'].add(seg[1] if len(seg) > 1 else '')
     return {f'{a}→{b}': sorted(v) for (a, b), v in edges.items()}
 
 
@@ -133,7 +169,9 @@ def load_baseline():
 
 
 def tier_of(tiers, edge):
-    """档位：显式 owner / 显式族内 / **族定义推导的族内** / 默认 clearable。"""
+    """档位：级别合法 / 显式 owner / 显式族内 / **族定义推导的族内** / 默认 clearable。"""
+    if edge in _LEVEL_OK:
+        return TIER_LEVEL
     if edge in (tiers.get(TIER_OWNER) or {}):
         return TIER_OWNER
     if edge in ((tiers.get(TIER_FAMILY) or {}).get('edges') or {}):
@@ -175,7 +213,8 @@ def summarize(tiers, edges):
         agg[t][1] += len(v)
     fams = (tiers.get(TIER_FAMILY) or {}).get('families') or {}
     lines = []
-    for t, label in ((TIER_CLEARABLE, '目标 0（A③ 主线）'), (TIER_OWNER, '登记允许（条件：读侧走 L1 端口）'),
+    for t, label in ((TIER_LEVEL, '上级→下级 api/dto（分级允许）'),
+                     (TIER_CLEARABLE, '目标 0（A③ 主线）'), (TIER_OWNER, '登记允许（条件：读侧走 L1 端口）'),
                      (TIER_FAMILY, '族内豁免+冻结')):
         n, c = agg[t]
         extra = ''
@@ -192,8 +231,18 @@ def main():
     args = ap.parse_args()
 
     actual = scan()
+    cand_inverted = {}
+    for k, imps in actual.items():
+        v = level_verdict(k, imps)
+        if v == 'ok':
+            _LEVEL_OK.add(k)
+        elif v == 'inverted':
+            cand_inverted[k] = imps
     entities = scan_entity_imports()
     base, tiers, entity_base = load_baseline()
+    # 已登记的 ③ 族内边按冻结处理（只许减），不被新规则追溯推翻
+    inverted = {k: v for k, v in cand_inverted.items()
+                if tier_of(tiers, k) == TIER_CLEARABLE}
     problems, stale = audit_tiers(tiers, actual)
     new_entities = sorted(set(entities) - entity_base)
     stale_entities = sorted(entity_base - set(entities))
@@ -230,7 +279,8 @@ def main():
         return 1 if problems else 0
 
     new_edges = sorted(k for k in actual
-                       if k not in base and tier_of(tiers, k) != TIER_FAMILY)
+                       if k not in base
+                       and tier_of(tiers, k) not in (TIER_FAMILY, TIER_LEVEL))
     new_classes = {k: sorted(set(actual[k]) - set(base.get(k, [])))
                    for k in actual
                    if k in base and set(actual[k]) - set(base.get(k, []))
@@ -267,6 +317,13 @@ def main():
               + (f'（清理陈旧登记 {len(stale)} 条）' if stale else ''))
         print('\n'.join(lines))
         return 0
+
+    if inverted:
+        print('✗ 域间依赖方向违规（只允许上级 import 下级，且目标必须是 api/dto）：')
+        for k, imps in sorted(inverted.items()):
+            a, b = k.split('→')
+            print(f'    {k}  L{LEVEL.get(a, "?")} → L{LEVEL.get(b, "?")}  {sorted(imps)[:4]}')
+        return 1
 
     if problems:
         print('✗ R10 分档元数据自检失败（守卫自身的口径错了，先修基线 tiers）：')

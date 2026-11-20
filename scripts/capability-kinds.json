@@ -1,5 +1,5 @@
 {
-  "note": "19 个业务域的能力种类。新增/删除域必须同步本文件；gen-domain-index.py --check 会校验。",
+  "note": "19 个业务域的能力种类与依赖级别（level：1 基础域 / 2 业务域 / 3 编排域，只允许上级 import 下级）。新增/删除域必须同步本文件。",
   "kinds": {
     "product": {
       "label": "产品能力",
@@ -25,79 +25,98 @@
   "domains": {
     "agentmanagement": {
       "kind": "product",
-      "frontend": "views/agent"
+      "frontend": "views/agent",
+      "level": 2
     },
     "agenttools": {
       "kind": "product",
-      "frontend": "views/chat（工具结果渲染）"
+      "frontend": "views/chat（工具结果渲染）",
+      "level": 3
     },
     "audit": {
       "kind": "control",
-      "frontend": "views/settings/panels/SystemAuditLog.vue"
+      "frontend": "views/settings/panels/SystemAuditLog.vue",
+      "level": 1
     },
     "auth": {
       "kind": "control",
-      "frontend": "views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue"
+      "frontend": "views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue",
+      "level": 1
     },
     "datasource": {
       "kind": "integration",
-      "frontend": "views/knowledge/settings/DataSourceSettings.vue"
+      "frontend": "views/knowledge/settings/DataSourceSettings.vue",
+      "level": 2
     },
     "embedchannel": {
       "kind": "integration",
-      "frontend": "views/embed"
+      "frontend": "views/embed",
+      "level": 2
     },
     "favorite": {
       "kind": "product",
-      "frontend": "views/agent · views/knowledge（列表置顶/收藏）"
+      "frontend": "views/agent · views/knowledge（列表置顶/收藏）",
+      "level": 2
     },
     "im": {
       "kind": "integration",
-      "frontend": "views/integrations/IntegrationSettingsSection.vue"
+      "frontend": "views/integrations/IntegrationSettingsSection.vue",
+      "level": 2
     },
     "initialization": {
       "kind": "setup",
-      "frontend": "views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue"
+      "frontend": "views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue",
+      "level": 1
     },
     "knowledge": {
       "kind": "product",
-      "frontend": "views/knowledge"
+      "frontend": "views/knowledge",
+      "level": 2
     },
     "mcp": {
       "kind": "integration",
-      "frontend": "views/settings/McpSettings.vue"
+      "frontend": "views/settings/McpSettings.vue",
+      "level": 2
     },
     "memory": {
       "kind": "product",
-      "frontend": "views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue"
+      "frontend": "views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue",
+      "level": 2
     },
     "model": {
       "kind": "capability-config",
-      "frontend": "views/settings/ModelSettings.vue"
+      "frontend": "views/settings/ModelSettings.vue",
+      "level": 1
     },
     "session": {
       "kind": "product",
-      "frontend": "views/chat"
+      "frontend": "views/chat",
+      "level": 3
     },
     "storage": {
       "kind": "integration",
-      "frontend": "views/settings/StorageBackendSettings.vue"
+      "frontend": "views/settings/StorageBackendSettings.vue",
+      "level": 1
     },
     "system": {
       "kind": "control",
-      "frontend": "views/settings/panels"
+      "frontend": "views/settings/panels",
+      "level": 1
     },
     "vectorstore": {
       "kind": "capability-config",
-      "frontend": "views/settings/VectorStoreSettings.vue"
+      "frontend": "views/settings/VectorStoreSettings.vue",
+      "level": 1
     },
     "websearch": {
       "kind": "integration",
-      "frontend": "views/settings/WebSearchSettings.vue"
+      "frontend": "views/settings/WebSearchSettings.vue",
+      "level": 1
     },
     "wiki": {
       "kind": "product",
-      "frontend": "views/knowledge/wiki"
+      "frontend": "views/knowledge/wiki",
+      "level": 2
     }
   }
 }
