@@ -1,4 +1,4 @@
-package com.ragagent.platform.web;
+package com.ragagent.llm.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

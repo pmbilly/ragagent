@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.ragagent.platform.web.ContractJsonModule;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -37,7 +37,7 @@ public final class StreamJson {
     private static ObjectMapper build() {
         ObjectMapper mapper = JsonMapper.builder()
                 .addModule(new JavaTimeModule())
-                .addModule(new ContractJsonModule())
+                .addModules(JsonMappers.contractModules())
                 .addModule(offsetDateTimeModule())
                 .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)

@@ -3,7 +3,7 @@ package com.ragagent.platform.tracing.langfuse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.ragagent.platform.web.ContractJsonModule;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.Instant;
@@ -74,7 +74,7 @@ public final class LangfuseAttributes {
     private static ObjectMapper buildJson() {
         // 浮点走 Jackson 默认（上报面，形态无契约意义）
         return JsonMapper.builder()
-                .addModule(new ContractJsonModule())
+                .addModules(JsonMappers.contractModules())
                 .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
                 .build();
     }

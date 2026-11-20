@@ -18,7 +18,6 @@ import com.ragagent.platform.config.DeploymentProperties;
 import com.ragagent.platform.config.TenantProperties;
 import com.ragagent.platform.tracing.langfuse.LangfuseHttpInterceptor;
 import com.ragagent.platform.web.ApiResultInterceptor;
-import com.ragagent.platform.web.ContractJsonModule;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RbacInterceptor;
 import com.ragagent.platform.web.RequestIdFilter;
@@ -55,7 +54,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer contractJsonCustomizer() {
         return builder -> builder
-                .modulesToInstall(new ContractJsonModule())
+                .modulesToInstall(JsonMappers.contractModules().toArray(new com.fasterxml.jackson.databind.Module[0]))
                 .featuresToDisable(
                         DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                         DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES,

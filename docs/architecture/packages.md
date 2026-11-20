@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-363 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+364 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -311,6 +311,7 @@
 | `:model-runtime` | `com.ragagent.llm.api` | 模型运行时的对外契约：Ollama 本地模型管理端口与进度载荷。 |
 | `:model-runtime` | `com.ragagent.llm.domain` | LLM · 领域模型：ProviderMetadataMaps。 |
 | `:model-runtime` | `com.ragagent.llm.extract` | LLM · extract：EntityExtractionAdapter / EntityExtraction。 |
+| `:model-runtime` | `com.ragagent.llm.json` | 模型面契约载荷的 Jackson 装配（mixin 与注册表）。 |
 | `:model-runtime` | `com.ragagent.llm.limiter` | LLM · limiter：ModelConcurrencyLimiter / BackgroundTaskContext / ConcurrencyGovernor…。 |
 | `:model-runtime` | `com.ragagent.llm.ollama` | LLM · ollama：OllamaService / OllamaChatResponse / OllamaChatRequest…。 |
 | `:model-runtime` | `com.ragagent.llm.provider` | LLM · 提供方：AzureOpenAIProvider / SiliconFlowProvider / OpenRouterProvider…。 |

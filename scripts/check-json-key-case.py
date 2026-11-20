@@ -103,7 +103,8 @@ FROZEN_PREFIXES = (
     # 冻结悄悄失效、CI 才报"非冻结面出现新的 snake 键"。**换包时务必回来核这里** ✓。
     # A②-2a/2c：契约载荷的**线格式载体**（模块自 common/web 迁 platform/web，前缀同步换锚）——注解从契约类搬进 mixin 模块（§8.1 纯 JDK），
     # 键名仍是既有 API/jsonb 契约（snake 键是设计，不是漂移）。
-    'platform/web/ContractJsonMixins',
+    'platform/web/ContractJsonMixins',   # 剩余面（error/event/json/text 等）
+    'llm/json/',                          # 模型面 mixin（从 platform.web 整体迁入）
     'contract/wiki/ExtractedItem', 'session/rag/plugin', 'agent/AgentEngine',
     'agent/ReActIteration', 'retrieval/HybridSearchService', 'retrieval/vlm/VlmClient',
     'knowledge/service/chunk/ChunkExtractService', 'knowledge/task/KnowledgeProcessWorker',

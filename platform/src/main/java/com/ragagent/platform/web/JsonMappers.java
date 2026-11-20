@@ -43,6 +43,20 @@ public final class JsonMappers {
         return builder.build();
     }
 
+    /**
+     * 契约载荷所需的全部 Module：{@link ContractJsonModule} + 各模块经
+     * {@code META-INF/services} 贡献的模块（模型面等）。
+     *
+     * <p>供**绕过 {@link #lenient()}** 的 mapper 使用（事件、SSE、Langfuse、MVC 装配、金片夹具）；
+     * 直接 {@code new ContractJsonModule()} 会漏掉模型面 mixin，导致线格式静默回退。</p>
+     */
+    public static java.util.List<com.fasterxml.jackson.databind.Module> contractModules() {
+        java.util.List<com.fasterxml.jackson.databind.Module> all = new java.util.ArrayList<>();
+        all.add(new ContractJsonModule());
+        all.addAll(PROVIDED_MODULES);
+        return java.util.List.copyOf(all);
+    }
+
     /** 各模块贡献的 Module（静态收集一次；{@code Module} 可跨 mapper 共享）。 */
     private static final java.util.List<com.fasterxml.jackson.databind.Module> PROVIDED_MODULES =
             loadProvidedModules();
