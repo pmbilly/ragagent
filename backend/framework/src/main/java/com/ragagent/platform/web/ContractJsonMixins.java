@@ -1,8 +1,5 @@
 package com.ragagent.platform.web;
 
-import com.ragagent.shared.agent.AgentStep;
-import com.ragagent.shared.agent.AgentToolCall;
-import com.ragagent.shared.agent.ToolCallTarget;
 import com.ragagent.shared.auth.UserPreferences;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.event.payload.AgentActionData;
@@ -36,7 +33,6 @@ import com.ragagent.shared.tenant.ParserEngineConfig;
 import com.ragagent.shared.tenant.RetrievalConfig;
 import com.ragagent.shared.tenant.StorageEngineConfig;
 import com.ragagent.shared.tenant.WebSearchConfig;
-import com.ragagent.shared.tool.ToolResult;
 import com.ragagent.shared.vectorstore.ConnectionConfig;
 import com.ragagent.shared.vectorstore.IndexConfig;
 import com.ragagent.shared.websearch.ImageInfo;
@@ -64,8 +60,6 @@ public final class ContractJsonMixins {
         m.put(AgentFinalAnswerData.class, ContractJsonMixinsEvent.AgentFinalAnswerDataMixin.class);
         m.put(AgentPlanData.class, ContractJsonMixinsEvent.AgentPlanDataMixin.class);
         m.put(AgentQueryData.class, ContractJsonMixinsEvent.AgentQueryDataMixin.class);
-        m.put(AgentStep.class, ContractJsonMixinsAgent.AgentStepMixin.class);
-        m.put(AgentToolCall.class, ContractJsonMixinsAgent.AgentToolCallMixin.class);
         m.put(AgentToolCallData.class, ContractJsonMixinsEvent.AgentToolCallDataMixin.class);
         m.put(AgentToolResultData.class, ContractJsonMixinsEvent.AgentToolResultDataMixin.class);
         m.put(AppError.class, ContractJsonMixinsCore.AppErrorMixin.class);
@@ -91,8 +85,6 @@ public final class ContractJsonMixins {
         m.put(TokenUsage.class, ContractJsonMixinsCore.TokenUsageMixin.class);
         m.put(ToolApprovalRequiredData.class, ContractJsonMixinsEvent.ToolApprovalRequiredDataMixin.class);
         m.put(ToolApprovalResolvedData.class, ContractJsonMixinsEvent.ToolApprovalResolvedDataMixin.class);
-        m.put(ToolCallTarget.class, ContractJsonMixinsAgent.ToolCallTargetMixin.class);
-        m.put(ToolResult.class, ContractJsonMixinsCore.ToolResultMixin.class);
         m.put(UserMessageInjectedData.class, ContractJsonMixinsEvent.UserMessageInjectedDataMixin.class);
         m.put(UserPreferences.class, ContractJsonMixinsAuth.UserPreferencesMixin.class);
         m.put(WebSearchConfig.class, ContractJsonMixinsCore.WebSearchConfigMixin.class);

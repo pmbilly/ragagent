@@ -1,4 +1,4 @@
-package com.ragagent.platform.web;
+package com.ragagent.agentengine.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -13,9 +13,9 @@ import java.util.Map;
  * <p>为什么独立成文件：契约面（{@code contract.*}）要求<b>纯 JDK</b>——载荷类的线格式由
  * 这里的 mixin 承载（Jackson 只在读写时把注解套上去），契约类本身零框架引用。</p>
  */
-public final class ContractJsonMixinsAgent {
+public final class AgentJsonMixins {
 
-    private ContractJsonMixinsAgent() {
+    private AgentJsonMixins() {
     }
 
     /** AgentStep 的 mixin（注解逐条对位，行为与搬迁前一致）。 */

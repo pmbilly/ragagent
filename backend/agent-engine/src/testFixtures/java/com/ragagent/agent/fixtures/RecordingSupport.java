@@ -2,7 +2,7 @@ package com.ragagent.agent.fixtures;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.web.ContractJsonModule;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +11,7 @@ import java.util.Collections;
 public final class RecordingSupport {
 
     public static final ObjectMapper PLAIN = new ObjectMapper()
-            .registerModule(new ContractJsonModule());
+            .registerModules(JsonMappers.contractModules());
 
     /**
      * 数字文本归一——把文本里的数字 token 统一成 Java {@code Double.toString} 形态
@@ -52,7 +52,7 @@ public final class RecordingSupport {
 
     /** JSON mapper（map 键序由类型上的 serializer 负责；2026-10-03 起标准转义）。 */
     public static final ObjectMapper JSON_MAPPER = new ObjectMapper()
-            .registerModule(new ContractJsonModule());
+            .registerModules(JsonMappers.contractModules());
 
     private RecordingSupport() {
     }

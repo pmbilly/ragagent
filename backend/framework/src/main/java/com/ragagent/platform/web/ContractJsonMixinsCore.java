@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.shared.model.PromptCacheStatus;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -148,20 +147,6 @@ public final class ContractJsonMixinsCore {
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         @JsonProperty("proxy_url")
         private String proxyUrl;
-
-    }
-
-    /** ToolResult 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    @JsonIgnoreProperties(value = {"outputFiles"})
-    public abstract static class ToolResultMixin {
-        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private Map<String, Object> data;
-
-        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private String error;
-
-        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private List<String> images;
 
     }
 
