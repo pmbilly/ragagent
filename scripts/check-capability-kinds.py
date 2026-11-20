@@ -21,7 +21,10 @@ from collections import defaultdict
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "scripts" / "capability-kinds.json"
 DOMAINS = ROOT / "backend" / "app" / "src" / "main" / "java" / "com" / "ragagent"
-IMPORT_RE = re.compile(r"^import\s+com\.ragagent\.(\w+)\.", re.M)
+IMPORT_RE = re.compile(r"^import\s+(?:static\s+)?com\.ragagent\.(\w+)\.(\w+)\.", re.M)
+
+#: 跨 kind 只允许 import 对方的契约包；实现包（service/repository/adapter/domain/mapper）一律禁
+LEGAL_IMPORT_PKG = {"api", "dto"}
 
 
 def main() -> int:
@@ -29,23 +32,34 @@ def main() -> int:
     kinds = data["kinds"]
     domains = data["domains"]
     kind_of = {name: meta["kind"] for name, meta in domains.items()}
+    level_of = {name: meta.get("level") for name, meta in domains.items()}
 
     violations = defaultdict(list)
     for source in sorted(domains):
         source_dir = DOMAINS / source
         for path in source_dir.rglob("*.java"):
             text = path.read_text(encoding="utf-8", errors="ignore")
-            targets = set(IMPORT_RE.findall(text)) & set(domains)
-            for target in sorted(targets):
-                if target == source:
+            for target, sub_pkg in IMPORT_RE.findall(text):
+                if target not in domains or target == source:
                     continue
-                if kind_of[source] != kind_of[target]:
-                    violations[(source, target)].append(
-                        str(path.relative_to(ROOT))
-                    )
+                if kind_of[source] == kind_of[target]:
+                    continue
+                # 跨 kind：仅当「上级 → 下级」且目标是契约包（api/dto）时放行。
+                # 依据：蓝图 §5.4 只规定三级域依赖，没有 kind 轴；kind 是本地补充，
+                # 不该否决蓝图明确允许的方向。
+                src_lv = level_of.get(source)
+                tgt_lv = level_of.get(target)
+                if (
+                    src_lv is not None
+                    and tgt_lv is not None
+                    and src_lv > tgt_lv
+                    and sub_pkg in LEGAL_IMPORT_PKG
+                ):
+                    continue
+                violations[(source, target)].append(str(path.relative_to(ROOT)))
 
     if violations:
-        print("✗ 能力种类边界违例：跨 kind 不得直连实现包，请改走 contract 端口")
+        print("✗ 能力种类边界违例：跨 kind 只允许「上级 import 下级 api/dto」，其余改走契约")
         for (source, target), files in sorted(violations.items()):
             print(
                 f"   {source}（{kinds[kind_of[source]]['label']}）"
@@ -57,7 +71,7 @@ def main() -> int:
                 print(f"      … 另有 {len(files) - 5} 个")
         return 1
 
-    print(f"✓ 能力种类边界：{len(domains)} 域 / 0 条跨 kind 直连")
+    print(f"✓ 能力种类边界：{len(domains)} 域 / 0 条违规跨 kind 依赖")
     return 0
 
 

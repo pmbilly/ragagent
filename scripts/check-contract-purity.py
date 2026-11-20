@@ -20,6 +20,10 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / "backend" / "contract" / "src" / "main" / "java"
 BUILD_FILE = ROOT / "backend" / "contract" / "pom.xml"
+#: contract 解散后，「契约面只允许纯 JDK」的约束不能凭空消失——
+#: 它平移到 framework 承接共享词汇的子包上（C1 导入根、C3 框架形状继续生效）。
+SHARED_ROOT = ROOT / "backend" / "framework" / "src" / "main" / "java"
+SHARED_SEGMENT = "shared"
 
 ALLOWED_IMPORT_ROOTS = ("java.", "javax.", "com.ragagent.")
 
@@ -48,10 +52,19 @@ FORBIDDEN_SHAPES = (
 )
 
 
+def registered_sources() -> list[pathlib.Path]:
+    """契约面源码：contract 本体 + framework 的 shared 子包（后者是 contract 解散后的承接处）。"""
+    files: list[pathlib.Path] = []
+    if SRC.is_dir():
+        files += list(SRC.rglob("*.java"))
+    if SHARED_ROOT.is_dir():
+        files += [p for p in SHARED_ROOT.rglob("*.java")
+                  if SHARED_SEGMENT in p.relative_to(SHARED_ROOT).parts]
+    return sorted(p for p in files if "/build/" not in str(p) and "/target/" not in str(p))
+
+
 def contract_sources() -> list[pathlib.Path]:
-    if not SRC.is_dir():
-        return []
-    return sorted(p for p in SRC.rglob("*.java") if "/build/" not in str(p) and "/target/" not in str(p))
+    return registered_sources()
 
 
 def check_imports(files: list[pathlib.Path]) -> list[str]:
