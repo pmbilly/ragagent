@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-365 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+367 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -122,10 +122,12 @@
 | `:backend` | `com.ragagent.knowledge` | 知识库域：知识的存储、处理管线与检索面。 |
 | `:backend` | `com.ragagent.knowledge.adapter` | 知识库 · 端口实现（11 个）：ChunkPort / KnowledgeCatalog / KnowledgeBaseCatalog / KnowledgeBaseLookup / Knowled |
 | `:backend` | `com.ragagent.knowledge.api` | knowledge 域对外契约。 |
+| `:backend` | `com.ragagent.knowledge.assembler` | 领域对象与 HTTP 出入参之间的装配：只做字段搬运与空值处理，不含业务判断。 |
 | `:backend` | `com.ragagent.knowledge.chunker` | 知识库 · 分块：HeuristicSplitter / DocumentProfiler / HeadingHierarchy…。 |
 | `:backend` | `com.ragagent.knowledge.client` | 知识库出站客户端：DocReaderClient（文档解析服务）。 |
 | `:backend` | `com.ragagent.knowledge.config` | 知识库 · 配置：HousekeepingProperties / BatchEmbedProperties / DocReaderProperties。 |
 | `:backend` | `com.ragagent.knowledge.controller` | 知识库 HTTP 面：薄绑定层（@Valid DTO → service → 裸资源视图），线格式 camelCase、无信封； 无手搓解析与信封拼装。 |
+| `:backend` | `com.ragagent.knowledge.controller.vo` | FAQ 模块的 HTTP 出入参：只承载传输形状，不参与业务判断。 |
 | `:backend` | `com.ragagent.knowledge.domain` | 知识库持久化实体与 JSON 结构（MyBatis-Plus 注解 + Jackson 序列化注解）。 |
 | `:backend` | `com.ragagent.knowledge.domain.access` | 知识库访问守卫：KnowledgeRouteGuards（路由级租户/成员校验）+ KnowledgeAccessGuard（知识库读写权限）+ ChunkAccessGuard（chunk 写守卫） |
 | `:backend` | `com.ragagent.knowledge.domain.ingest` | 知识 · 入库状态：5 个 canonical 阶段（IngestStage）与一次尝试的内存态 （IngestJob）。 |

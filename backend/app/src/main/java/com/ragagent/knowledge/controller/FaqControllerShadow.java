@@ -1,10 +1,12 @@
 package com.ragagent.knowledge.controller;
 
+import com.ragagent.knowledge.assembler.FaqEntryAssembler;
+import com.ragagent.knowledge.assembler.FaqExportAssembler;
+import com.ragagent.knowledge.controller.vo.FaqEntryRespVo;
 import com.ragagent.knowledge.dto.doc.UpdateLastImportDisplayStatusRequest;
 import com.ragagent.knowledge.dto.faq.AddSimilarQuestionsRequest;
 import com.ragagent.knowledge.dto.faq.FaqBatchUpsertPayload;
 import com.ragagent.knowledge.dto.faq.FaqDeleteRequest;
-import com.ragagent.knowledge.dto.faq.FaqEntry;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
 import com.ragagent.knowledge.dto.faq.FaqEntryTagBatchRequest;
@@ -73,7 +75,7 @@ public class FaqControllerShadow {
     // ── 读 ──
 
     @GetMapping("/api/v1/knowledge-bases/{id}/faq/entries")
-    public ResponseEntity<PageResult<FaqEntry>> listEntries(
+    public ResponseEntity<PageResult<FaqEntryRespVo>> listEntries(
             @PathVariable("id") String id,
             @RequestParam(value = "page", required = false) String page,
             @RequestParam(value = "pageSize", required = false) String pageSize,
@@ -109,9 +111,11 @@ public class FaqControllerShadow {
         }
         Boolean isEnabledFilter = parseOptionalFAQEnabled(isEnabled);
 
-        return ResponseEntity.ok(faqEntryQuery.listEntries(kbId, pageValue, sizeValue, tagUuids,
-                legacyTagSeqId, LogSanitizer.sanitize(keyword), LogSanitizer.sanitize(searchField),
-                LogSanitizer.sanitize(sortOrder), isEnabledFilter));
+        return ResponseEntity.ok(FaqEntryAssembler.toVoPage(
+                faqEntryQuery.listEntries(kbId, pageValue, sizeValue, tagUuids,
+                        legacyTagSeqId, LogSanitizer.sanitize(keyword),
+                        LogSanitizer.sanitize(searchField), LogSanitizer.sanitize(sortOrder),
+                        isEnabledFilter)));
     }
 
     /** 导出：CSV（默认，含 BOM）或 JSON（?format=json）。 */
@@ -123,30 +127,18 @@ public class FaqControllerShadow {
         requireKbRead(kbId);
         String fmt = format == null ? "" : format.toLowerCase().trim();
         if ("json".equals(fmt)) {
-            byte[] jsonData = faqEntryQuery.exportJson(kbId);
-            return ResponseEntity.ok()
-                    .header("Content-Type", "application/json; charset=utf-8")
-                    .header("Content-Disposition", "attachment; filename=faq_export.json")
-                    .body(jsonData);
+            return FaqExportAssembler.json(faqEntryQuery.exportJson(kbId));
         }
-        byte[] csvData = faqEntryQuery.exportCsv(kbId);
-        byte[] bom = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
-        byte[] body = new byte[bom.length + csvData.length];
-        System.arraycopy(bom, 0, body, 0, bom.length);
-        System.arraycopy(csvData, 0, body, bom.length, csvData.length);
-        return ResponseEntity.ok()
-                .header("Content-Type", "text/csv; charset=utf-8")
-                .header("Content-Disposition", "attachment; filename=faq_export.csv")
-                .body(body);
+        return FaqExportAssembler.csv(faqEntryQuery.exportCsv(kbId));
     }
 
     @GetMapping("/api/v1/knowledge-bases/{id}/faq/entries/{entryId}")
-    public ResponseEntity<FaqEntry> getEntry(
+    public ResponseEntity<FaqEntryRespVo> getEntry(
             @PathVariable("id") String id, @PathVariable("entryId") String entryId) {
         String kbId = LogSanitizer.sanitize(id);
         requireKbRead(kbId);
         long entrySeqId = parseEntryId(entryId);
-        return ResponseEntity.ok(faqEntryQuery.getEntry(kbId, entrySeqId));
+        return ResponseEntity.ok(FaqEntryAssembler.toVo(faqEntryQuery.getEntry(kbId, entrySeqId)));
     }
 
     /** 导入进度轮询面（前端 3 秒轮询依赖 404 语义与 data 内 camelCase 字段形状）。 */
@@ -171,35 +163,37 @@ public class FaqControllerShadow {
     }
 
     @PostMapping("/api/v1/knowledge-bases/{id}/faq/entry")
-    public ResponseEntity<FaqEntry> createEntry(
+    public ResponseEntity<FaqEntryRespVo> createEntry(
             @PathVariable("id") String id,
             @Valid @NonNullBody @RequestBody FaqEntryPayload req) {
         String kbId = LogSanitizer.sanitize(id);
         requireKbWrite(kbId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(faqEntryCommand.createEntry(kbId, req));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(FaqEntryAssembler.toVo(faqEntryCommand.createEntry(kbId, req)));
     }
 
     @PutMapping("/api/v1/knowledge-bases/{id}/faq/entries/{entryId}")
-    public ResponseEntity<FaqEntry> updateEntry(
+    public ResponseEntity<FaqEntryRespVo> updateEntry(
             @PathVariable("id") String id,
             @PathVariable("entryId") String entryId,
             @Valid @NonNullBody @RequestBody FaqEntryPayload req) {
         String kbId = LogSanitizer.sanitize(id);
         requireKbWrite(kbId);
         long entrySeqId = parseEntryId(entryId);
-        return ResponseEntity.ok(faqEntryCommand.updateEntry(kbId, entrySeqId, req));
+        return ResponseEntity.ok(
+                FaqEntryAssembler.toVo(faqEntryCommand.updateEntry(kbId, entrySeqId, req)));
     }
 
     @PostMapping("/api/v1/knowledge-bases/{id}/faq/entries/{entryId}/similar-questions")
-    public ResponseEntity<FaqEntry> addSimilarQuestions(
+    public ResponseEntity<FaqEntryRespVo> addSimilarQuestions(
             @PathVariable("id") String id,
             @PathVariable("entryId") String entryId,
             @Valid @NonNullBody @RequestBody AddSimilarQuestionsRequest req) {
         String kbId = LogSanitizer.sanitize(id);
         requireKbWrite(kbId);
         long entrySeqId = parseEntryId(entryId);
-        return ResponseEntity.ok(
-                faqEntryCommand.addSimilarQuestions(kbId, entrySeqId, req.similarQuestions()));
+        return ResponseEntity.ok(FaqEntryAssembler.toVo(
+                faqEntryCommand.addSimilarQuestions(kbId, entrySeqId, req.similarQuestions())));
     }
 
     @PutMapping("/api/v1/knowledge-bases/{id}/faq/entries/fields")
@@ -234,7 +228,7 @@ public class FaqControllerShadow {
 
     /** matchCount 先钳 [10,200]（service 再钳 50）。 */
     @PostMapping("/api/v1/knowledge-bases/{id}/faq/search")
-    public ResponseEntity<List<FaqEntry>> searchFAQ(
+    public ResponseEntity<List<FaqEntryRespVo>> searchFAQ(
             @PathVariable("id") String id,
             @Valid @NonNullBody @RequestBody FaqSearchRequest raw) {
         String kbId = LogSanitizer.sanitize(id);
@@ -243,7 +237,7 @@ public class FaqControllerShadow {
                 raw.vectorThreshold(),
                 raw.matchCount() <= 0 ? 10 : Math.min(raw.matchCount(), 200),
                 raw.firstPriorityTagIds(), raw.secondPriorityTagIds(), raw.onlyRecommended());
-        return ResponseEntity.ok(faqEntryQuery.searchEntries(kbId, req));
+        return ResponseEntity.ok(FaqEntryAssembler.toVoList(faqEntryQuery.searchEntries(kbId, req)));
     }
 
     @PutMapping("/api/v1/knowledge-bases/{id}/faq/import/last-result/display")
