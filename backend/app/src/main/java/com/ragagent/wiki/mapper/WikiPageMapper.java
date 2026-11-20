@@ -1,8 +1,8 @@
 package com.ragagent.wiki.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.contract.wiki.WikiIndexEntry;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import com.ragagent.wiki.api.WikiIndexEntry;
 import com.ragagent.wiki.domain.SourceRefNeedle;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.WikiStringListTypeHandler;

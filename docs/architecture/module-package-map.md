@@ -8,12 +8,12 @@
 
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
-| `:contract` | `contract` | 33 | 284 | 0 |
+| `:contract` | `contract` | 33 | 277 | 0 |
 | `:platform` | `platform` | 26 | 200 | 1 |
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 22 | 178 | 0 |
 | `:retrieval-engine` | `retrieval` | 16 | 119 | 0 |
 | `:agent-engine` | `agent`、`agentengine` | 10 | 94 | 0 |
-| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 257 | 1664 | 51 |
+| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki` | 258 | 1672 | 51 |
 
 ## 20 个业务域（domains）
 
@@ -38,7 +38,7 @@
 | `system` | `com.ragagent.system` | 18 | 2 |
 | `vectorstore` | `com.ragagent.vectorstore` | 20 | 1 |
 | `websearch` | `com.ragagent.websearch` | 52 | 3 |
-| `wiki` | `com.ragagent.wiki` | 165 | 1 |
+| `wiki` | `com.ragagent.wiki` | 173 | 1 |
 
 ## 查找规则
 
@@ -64,5 +64,5 @@
 
 ## 相关
 
-- [`packages.md`](packages.md)：364 份 `package-info` 的包级职责索引。
+- [`packages.md`](packages.md)：365 份 `package-info` 的包级职责索引。
 - [`overview.md`](overview.md)：模块依赖图、设计原则、代码在哪。

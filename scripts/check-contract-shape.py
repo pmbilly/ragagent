@@ -98,7 +98,8 @@ def main() -> int:
                     )
             if stem.endswith("RowView") or stem.endswith("PageView"):
                 seen_rows.add(rel)
-                if rel not in allowed_rows:
+                # 只约束共享契约层：域 api 持有自己的行/页投影是正当的（正是本规则要求的「回域」）。
+                if rel.startswith("com/ragagent/contract/") and rel not in allowed_rows:
                     problems.append(
                         f"{rel} 是域内行/页投影，不应进 contract——回域或登记基线"
                     )

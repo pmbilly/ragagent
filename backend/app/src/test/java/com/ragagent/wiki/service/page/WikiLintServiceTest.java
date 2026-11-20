@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
 import com.ragagent.contract.wiki.WikiException;
-import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.wiki.WikiConstants;
+import com.ragagent.wiki.api.WikiPageNotFoundException;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.issue.WikiLintIssue;
 import com.ragagent.wiki.domain.issue.WikiLintReport;

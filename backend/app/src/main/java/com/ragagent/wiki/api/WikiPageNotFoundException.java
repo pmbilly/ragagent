@@ -1,4 +1,6 @@
-package com.ragagent.contract.wiki;
+package com.ragagent.wiki.api;
+
+import com.ragagent.contract.wiki.WikiException;
 
 
 public class WikiPageNotFoundException extends WikiException {

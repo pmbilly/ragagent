@@ -5,7 +5,7 @@
 
 ## 统计
 
-- 域间（解耦）：**27**
+- 域间（解耦）：**26**
 - 复合面（随复合端口）：**7**
 - 跨模块（必要）：**6**
 
@@ -52,4 +52,3 @@
 | `WebSearchProviderPort` | `WebSearchSupportAdapter` | backend/app | session | 域间（解耦） |
 | `WebSearchTempStatePort` | `WebSearchSupportAdapter` | backend/app | session | 域间（解耦） |
 | `WikiIngestPort` | `WikiIngestService` | backend/app | knowledge | 域间（解耦） |
-| `WikiPageOpsPort` | `WikiPageOpsAdapter` | backend/app | session | 域间（解耦） |

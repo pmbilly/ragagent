@@ -1,11 +1,11 @@
 package com.ragagent.wiki.adapter;
 
-import com.ragagent.contract.wiki.WikiIndex;
-import com.ragagent.contract.wiki.WikiLinkRepairResult;
-import com.ragagent.contract.wiki.WikiPageIssueView;
-import com.ragagent.contract.wiki.WikiPageOpsPort;
-import com.ragagent.contract.wiki.WikiPageView;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.wiki.api.WikiIndex;
+import com.ragagent.wiki.api.WikiLinkRepairResult;
+import com.ragagent.wiki.api.WikiPageIssueView;
+import com.ragagent.wiki.api.WikiPageOpsPort;
+import com.ragagent.wiki.api.WikiPageView;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.service.page.WikiEditContext;

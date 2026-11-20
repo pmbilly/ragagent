@@ -9,7 +9,7 @@
 
 | 种类 | 域数 | 文件 | 控制器 | 说明 |
 |---|---:|---:|---:|---|
-| **产品能力** | 7 | 852 | 21 | 直接产生用户价值、按产品需求演进的业务能力。 |
+| **产品能力** | 7 | 860 | 21 | 直接产生用户价值、按产品需求演进的业务能力。 |
 | **集成适配** | 6 | 564 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
 | **控制面** | 3 | 160 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
 | **能力配置** | 2 | 58 | 5 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
@@ -21,7 +21,7 @@
 |---|---|---:|---:|---:|---|
 | `knowledge` | 产品能力 | 282 | 8 | 15 | `views/knowledge` |
 | `session` | 产品能力 | 212 | 8 | 3 | `views/chat` |
-| `wiki` | 产品能力 | 165 | 1 | 2 | `views/knowledge/wiki` |
+| `wiki` | 产品能力 | 173 | 1 | 1 | `views/knowledge/wiki` |
 | `memory` | 产品能力 | 92 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
 | `agenttools` | 产品能力 | 61 | — | — | `views/chat（工具结果渲染）` |
 | `agentmanagement` | 产品能力 | 27 | 2 | — | `views/agent` |
@@ -47,7 +47,7 @@
 |---|---|---|
 | `knowledge` | `ChunkController`、`ChunkerPreviewController`、`FaqController`、`KnowledgeBaseController`、`KnowledgeBaseFileProxyController`、`KnowledgeController`、`KnowledgeOperationsController`、`KnowledgeTagController` | `ChunkPort`、`ChunkSearchGateway`、`DocReaderAdminPort`、`DocReaderParsePort`、`DocumentChunkingPort`、`EmbeddingModelPort`、`KnowledgeBaseCatalogPort`、`KnowledgeBaseGateway`、`KnowledgeBaseSearchGateway`、`KnowledgeCatalogPort`、`KnowledgeDocumentGateway`、`KnowledgeFinalizePort`、`KnowledgeMaintenancePort`、`KnowledgeSpanPort`、`ParserEngineCatalogPort` |
 | `session` | `KnowledgeQaController`、`MessageController`、`MessageFileProxyController`、`MessageSuggestionController`、`SessionController`、`SessionStreamController`、`SteerController`、`TemporaryDocumentController` | `EmbedSessionPort`、`MessageTranscriptPort`、`SessionQaPort` |
-| `wiki` | `WikiPageController` | `WikiIngestPort`、`WikiPageOpsPort` |
+| `wiki` | `WikiPageController` | `WikiIngestPort` |
 | `memory` | `MemoryController` | — |
 | `agenttools` | —（无 HTTP 面） | — |
 | `agentmanagement` | `AgentController`、`SkillController` | — |

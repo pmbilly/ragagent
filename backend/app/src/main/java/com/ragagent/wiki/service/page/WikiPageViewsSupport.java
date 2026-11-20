@@ -1,8 +1,8 @@
 package com.ragagent.wiki.service.page;
 
 import com.ragagent.contract.wiki.WikiException;
-import com.ragagent.contract.wiki.WikiIndex;
-import com.ragagent.contract.wiki.WikiIndexEntry;
+import com.ragagent.wiki.api.WikiIndex;
+import com.ragagent.wiki.api.WikiIndexEntry;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageListRequest;
 import com.ragagent.wiki.domain.page.WikiPageListResponse;
