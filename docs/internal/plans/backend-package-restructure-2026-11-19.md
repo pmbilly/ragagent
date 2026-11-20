@@ -469,7 +469,38 @@ backend/
 | P4 | `contract` 目录为空，可删模块 |
 | P5 | `mvn -f backend/pom.xml clean verify` 绿 · 守卫 49/49 |
 
-### 10.5 已知风险与对策
+### 10.5 P1 的前提经实测被推翻（2026-11-20，第一批 P1）
+
+试搬 `platform/knowledge` 的 5 个文件（都是"业务邻接"），结果：
+
+| 文件 | 含测试的消费者 | 实际去向 |
+|---|---|---|
+| `ImageInfoMatchUtil` · `ImageInfoEnricher` | app 多个域 + **retrieval-engine 测试** | ✅ 搬进 `retrieval-engine`（模块级，app 可依赖） |
+| `DocChunkSupport` · `GrepChunkHit` · `FaqChunkMetadataCodec` | 被 `agenttools` + `session` + `knowledge` **多个域**共用 | ❌ 必须留在 platform |
+
+**为什么**：`check-domain-contracts.py`（R10）规定**跨域不得直接 import**。一个 helper 若被 ≥2 个域使用，
+它就不能住在任何一个域里——只能留在 platform（或 contract）。实测把 30 个文件全量算一遍：
+
+| 可搬性 | 数量 | 说明 |
+|---|---|---|
+| 可搬进**单一域**（R10 允许） | **3** | `LanguageProperties`→config · `StreamStopWatcher`→im · `MessageAttachmentsPrompt`→session |
+| 必须留在 platform | **24** | 跨模块（引擎也用）或 ≥2 个域共用 |
+| 已搬（模块级，非域） | 2 | `ImageInfo*` → `retrieval-engine` |
+
+**结论**：P1 的"把 30 个业务邻接文件搬回业务层"**只成立 3 个**。那 37 个被 platform 钉住的契约类型
+**无法通过搬文件释放**——它们只能**下沉到 framework**。
+
+### 10.6 由此得到两条互斥的路线（需决策）
+
+| 路线 | 做法 | 代价 | 终态 |
+|---|---|---|---|
+| **A. 合并到 framework**（R10 不变） | 把被 ≥2 个域共用、或 platform 需要的契约类型**全部下沉 framework**；contract 逐步空掉后删除 | framework 会装下大量业务形状（`ChunkFacts` / `DocumentFacts` / `SearchResult`…），名字叫"框架"但内容是共享词汇 | 5 模块，contract 消失，但 framework ≠ 纯技术层 |
+| **B. 放宽 R10 + 域分级**（贴合蓝图 §5.4/§5.5） | 允许跨域 import 对方的 `api/`；域分三级，只允许**上级依赖下级**；同级互相需要时下沉基础域或合并 | 要改 R10 守卫、给 19 个域定级、跨域边会从 0 变成数十条（需分级校验而非一刀切） | 5 模块，契约分散在各域 `api/`，framework 保持纯技术 |
+
+**蓝图的原文倾向 B**（§5.5 定义 `api/` = "对其他域公开的接口与 BO"，§5.4 给出三级依赖规则），
+但当前 R10 是"一刀切禁止"，与蓝图冲突。**A 与 B 都能让 contract 消失，选哪个是架构口径问题，不是可行性问题。**
+
+### 10.7 已知风险与对策
 
 | 风险 | 对策 |
 |---|---|

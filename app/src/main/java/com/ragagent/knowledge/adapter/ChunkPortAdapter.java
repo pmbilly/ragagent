@@ -6,7 +6,7 @@ import com.ragagent.contract.knowledge.projection.ChunkProjectionAdapter;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.support.ChunkRowViews;
-import com.ragagent.platform.knowledge.ImageInfoEnricher;
+import com.ragagent.retrieval.support.ImageInfoEnricher;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

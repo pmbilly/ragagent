@@ -8,8 +8,6 @@ import com.ragagent.contract.retrieval.SearchResult;
 import com.ragagent.contract.websearch.ImageInfo;
 import com.ragagent.contract.websearch.WebSearchResult;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
-import com.ragagent.platform.knowledge.ImageInfoEnricher;
-import com.ragagent.platform.knowledge.ImageInfoMatchUtil;
 import com.ragagent.retrieval.api.SearchTextUtil;
 import com.ragagent.retrieval.api.WebResultConverter;
 import java.util.ArrayList;

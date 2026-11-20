@@ -194,7 +194,7 @@ BASELINE: dict[str, set[str]] = {
     'retrieval/api/WebResultConverter.java': {'published_at'},
     # R3b 换锚：`ImageInfoMatchUtil` 由 retrieval/support 上提 platform.knowledge。`start_pos`/`end_pos`
     # 是**既有 wire 键**（图片在原文中的位置，随 chunk 元数据进出存量数据），换包换锚、键名不动。
-    'platform/knowledge/ImageInfoMatchUtil.java': {'start_pos', 'end_pos'},
+    'retrieval/support/ImageInfoMatchUtil.java': {'start_pos', 'end_pos'},
     # R3b 拆类换锚：`RetrievalObs` 的纯函数族上提契约面成为 `RetrievalObsRows`。这些键是**观测 span 的
     # 既有 wire 载荷**（langfuse/trace 面消费：命中预览、分数、FAQ 加成等），键名属于观测面契约、
     # 改键会破坏存量 trace 断言 —— 换包换锚，键名不动（同 agent/ActPhase.java 的登记同族）。

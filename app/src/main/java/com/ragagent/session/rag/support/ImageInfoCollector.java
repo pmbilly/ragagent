@@ -2,7 +2,7 @@ package com.ragagent.session.rag.support;
 
 import com.ragagent.contract.pipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.SearchResult;
-import com.ragagent.platform.knowledge.ImageInfoEnricher;
+import com.ragagent.retrieval.support.ImageInfoEnricher;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
