@@ -473,7 +473,29 @@ ragagent/
 
 合计 **10~14 天**。B1 是闸门：它不改任何业务代码，但决定后面能否搬。
 
-### 10.5 风险与对策
+### 10.5 守卫改造清单（终态会推翻 6 条规则前提）
+
+终态不是"改路径"，有几条守卫的**语义**与它冲突，必须提前改，否则搬到最后一定红。
+
+| 守卫 | 现状前提 | 与终态冲突 | 改法 | 何时 |
+|---|---|---|---|---|
+| **`check-platform-shapes.py`（C8）** | platform 禁业务词包/文件名、禁 `View`/`Port`/`Facts`/`Gateway` 后缀 | **framework 要承载 173 个共享词汇**，其中大量 `*Facts` / `*View` / `*Port` | 新增豁免：`framework/shared/**` 整包不看判据 1~3（它就是共享词汇层） | B4 前 |
+| **`check-contract-purity.py`（C1/C2/C3）** | contract 纯 JDK、无框架依赖 | contract 消失 | 退役；或改成"`framework/shared/**` 禁第三方依赖"（保留原意） | B4 |
+| `check-contract-shape.py` | 端口 ≤7 方法，只扫 `contract` | 端口分散到 14 个 `app/<域>/api` | 扫描根从 `contract` 改为 `app/*/api` + 引擎 `api` | B2 起 |
+| `check-contract-sync.py` / `check-fe-contract-keys.py` | 前端契约源在 `contract` | 源变成各域 `api` + framework | 多根扫描 | B2 起 |
+| `check-domain-contracts.py`（R10） | 跨域只经 contract；`clearable` 目标 0 | 跨域经对方 `api` 合法（B1 已加 ⓪ 档） | B1 已改分级；B5 把"目标 0"改成"⓪ 档合法、① 档递减" | B1/B5 |
+| `check-module-graph.py` | 6 模块矩阵，含 contract 边 | 5 模块、无 contract | 改矩阵（app→framework，删 contract） | B5 |
+| `_source_roots.py` / `check-doc-truth.py` / `check-duplicate-classes.py` / `check-hygiene-budget.py` | `MODULE_DIRS` 含 contract；"六模块"锚点 | 5 模块 | 改列表与锚点 | B5 |
+| `PackageRestructureBoundaryTest`（R-1） | `CROSS_DOMAIN_BASELINE` 为空、禁一切跨域 | 跨域 `api` 合法 | 改为"允许 `.api.` / `.dto.`，其余仍禁" | B2 前 |
+| `ArchitectureRulesTest`（22 条） | 含 contract 纯度与跨域规则 | 同上 | 删/改其中 contract 相关条目 | B5 |
+| `check-json-key-case.py` 与 5 份基线 JSON | 冻结面按**路径**登记 | 每搬一批路径就漂移 | 每批 `--write`（已在做） | 全程 |
+
+**两条最关键的**：
+
+1. **C8（platform 禁业务词）**——如果不给它"共享词汇包"的豁免，B4 把 173 个类型下沉后，守卫会报出上百条违规，而它们**全都是预期内的**。
+2. **C1/C2/C3（contract 纯 JDK）**——它存在的理由就是"契约面不能带框架依赖"；contract 消失后这条规则要转移到 framework 的共享包上，否则"纯 JDK 契约"这个约束就**凭空消失了**，将来可能有人在共享包里塞 Spring 注解。
+
+### 10.6 风险与对策
 
 | 风险 | 对策 |
 |---|---|
