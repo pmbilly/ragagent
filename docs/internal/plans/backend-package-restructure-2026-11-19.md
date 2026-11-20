@@ -681,3 +681,65 @@ wiki 7 · auth 7 · apikey 6 · websearch 8 · storage.support 若干 …
 | 五 | 清理 + Modulith | 2~3 天 |
 | **合计** | | **14~20 天** |
 
+### 11.7 修订：共享词汇可以回到域（2026-11-20 二次评估）
+
+§11.1 的"166 进 framework"是在**两个假设**下算的，两者都可变：
+
+| 假设 | 它是否蓝图要求 | 改动后果 |
+|---|---|---|
+| `platform` 不动（其业务邻接代码仍算 platform 依赖） | 否——蓝图 §5.3 要求 framework 只留技术适配 | 搬走 30 个文件后，"platform 依赖"从 87 → 54 |
+| 跨 kind 不得 import | **否——kind 是我们自己发明的轴，蓝图只有三级域规则** | 取消后"跨 kind"从 55 → 0，净增 55 个可归域 |
+
+三种情形实测（251 个类型）：
+
+| 情形 | framework | 域 api | 引擎 api |
+|---|---|---|---|
+| **A** 现状（platform 不动 + kind 约束） | **168** | 45 | 28 |
+| **B** 搬走 30 文件 + 保留 kind | 147 | 52 | 42 |
+| **C** 搬走 30 文件 + 取消 kind | **101** | **93** | 42 |
+
+**即：按 C 做，framework 只装 101 个，其余 93 个走域 api。**
+
+剩下的 101 拆解：
+
+| 组成 | 数量 | 能否再降 |
+|---|---|---|
+| platform **真技术代码**还需（SSE 编码器、`JsonMappers`、安全、可观测性） | 54 | 否——技术层确实要有这些形状 |
+| 同级域共享 | 42 | **可降**：见下 |
+| 引擎互斥（agent + retrieval 同时用） | 5 | 否（两引擎互不可见） |
+| 无引用 / 待定 | 15 | K13/K14 清理 |
+
+**42 个同级共享的集中度很高**（蓝图 §5.4：同级互需时依次考虑"下沉基础域 / 改用事件 / 合并"）：
+
+```
+knowledge + wiki      13 个   ← 合并候选（守卫里本就同属 knowledge 族）
+auth + system         11 个   ← 合并候选（守卫里本就同属 identity 族）
+datasource + knowledge 4 个   ← 下沉或事件
+其余 12 对            各 1~2 个
+```
+
+若做这两处**域合并**（knowledge+wiki、auth+system），约 24 个类型也回到域 api，
+framework 进一步降到 **~77**。
+
+**修订后的结论**：共享词汇**可以**回到业务域通过 api 提供，不是必须塞进 framework。
+framework 的合理体积约 **77~101 个**（而非 166），前提是：
+
+1. 搬走 platform 的 30 个业务邻接文件（新卡点 K16）
+2. 取消 or 降级 kind 轴（新卡点 K17）
+3. 合并 knowledge+wiki、auth+system 两对同级域（新卡点 K18，可选）
+
+### 11.8 新增卡点与决策
+
+| # | 卡点 | 内容 | 规模 | 前置 |
+|---|---|---|---|---|
+| **K16** | platform 的 30 个业务邻接文件搬回域/引擎 | `knowledge/`(5) · `storage/`(5) · `prompt/`(4) · `stream/`(17，含 4 个碰 model) · `tracing/decorators`(6) · `audit/`(1) · `tool/`(1) · `event/EventType`(1) · `web/{RbacInterceptor, ServletSseSink}`(2) · `config/LanguageProperties`(1) | 30+ 文件 | 与 K10a/K10b 重叠，需合并推进 |
+| **K17** | kind 轴怎么处理 | 选项：**甲** 整体取消（只留级别）；**乙** 保留但允许"级别合法时跨 kind 的 api import"；**丙** 保持现状（则 55 个类型留 framework） | 1 个守卫 | 无 |
+| **K18** | 合并 knowledge+wiki、auth+system | 各消 13 / 11 个同级共享；代价是域数量 19 → 17，且要改 `capability-kinds.json`、`check-capability-kinds` 族定义、以及两个域的 controller 路由前缀保持不变 | 2 处 | 可选，收益 ~24 类型 |
+
+**决策修订**：
+
+| # | 决策 | 选项 |
+|---|---|---|
+| **D1′** | framework 目标体积 | ① 168（现状口径，只做 K7/K8）<br>② **101**（做 K16 + 取消 kind）← 推荐<br>③ ~77（再加 K18 域合并） |
+| **D2′** | K17 选甲/乙/丙 | 推荐**乙**：保留 kind 的语义（product/control 分离有价值），但"级别合法 + 目标是 api"时放行 |
+| **D3′** | K18 是否合并两个域对 | 推荐**做 knowledge+wiki**（本就同族、13 个类型），**auth+system 暂不**（职责差异大，合并风险高） |
