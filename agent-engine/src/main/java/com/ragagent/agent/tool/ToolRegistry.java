@@ -1,7 +1,8 @@
 package com.ragagent.agent.tool;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.agent.Cleanable;
+import com.ragagent.agentengine.api.Cleanable;
+import com.ragagent.agentengine.api.McpCatalogGuardedTool;
 import com.ragagent.contract.agent.ToolCallTarget;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.ChatMessage;
@@ -9,7 +10,6 @@ import com.ragagent.contract.model.FunctionDef;
 import com.ragagent.contract.pipeline.McpToolingGateway;
 import com.ragagent.contract.pipeline.ToolRegistryPort;
 import com.ragagent.contract.tool.AgentTool;
-import com.ragagent.contract.tool.McpCatalogGuardedTool;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolExecContext;

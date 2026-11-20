@@ -6,7 +6,7 @@ import com.ragagent.agent.prompt.GroundingPrompt;
 import com.ragagent.agent.prompt.PinnedSkillInstructions;
 import com.ragagent.agent.prompt.PlaceholderDefinition;
 import com.ragagent.agent.prompt.SystemPromptSection;
-import com.ragagent.contract.agent.KnowledgeBaseInfo;
+import com.ragagent.agentengine.api.KnowledgeBaseInfo;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.prompt.PromptComposer;
 import com.ragagent.platform.prompt.PromptConstants;

@@ -1,7 +1,7 @@
 package com.ragagent.session.conversation;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.agent.ThinkBlocks;
+import com.ragagent.agentengine.api.ThinkBlocks;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeRowView;

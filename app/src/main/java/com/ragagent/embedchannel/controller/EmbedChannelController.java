@@ -2,6 +2,7 @@ package com.ragagent.embedchannel.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.agentengine.api.McpApprovalOps;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.session.EmbedSessionOps;
@@ -9,7 +10,6 @@ import com.ragagent.contract.session.EmbedSessionPort;
 import com.ragagent.contract.session.MessageView;
 import com.ragagent.contract.storage.support.StorageUrlContext;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.contract.tool.McpApprovalOps;
 import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.embedchannel.support.EmbedError;
 import com.ragagent.embedchannel.support.EmbedTokens;

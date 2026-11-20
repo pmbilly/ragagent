@@ -5,6 +5,7 @@
     "agenttools",
     "audit",
     "auth",
+    "config",
     "datasource",
     "embedchannel",
     "favorite",
@@ -21,138 +22,6 @@
     "websearch",
     "wiki"
   ],
-  "edges": [
-    {
-      "from": "session",
-      "to": "agentmanagement",
-      "target": "service",
-      "imports": 4
-    },
-    {
-      "from": "session",
-      "to": "agenttools",
-      "target": "datasource",
-      "imports": 4
-    },
-    {
-      "from": "session",
-      "to": "agenttools",
-      "target": "knowledge",
-      "imports": 10
-    },
-    {
-      "from": "session",
-      "to": "agenttools",
-      "target": "sql",
-      "imports": 1
-    },
-    {
-      "from": "session",
-      "to": "agenttools",
-      "target": "web",
-      "imports": 5
-    },
-    {
-      "from": "session",
-      "to": "agenttools",
-      "target": "wiki",
-      "imports": 22
-    },
-    {
-      "from": "session",
-      "to": "memory",
-      "target": "api",
-      "imports": 4
-    },
-    {
-      "from": "system",
-      "to": "auth",
-      "target": "api",
-      "imports": 1
-    },
-    {
-      "from": "system",
-      "to": "auth",
-      "target": "apikey",
-      "imports": 1
-    }
-  ],
-  "contractImports": [
-    {
-      "from": "agentmanagement",
-      "imports": 26
-    },
-    {
-      "from": "agenttools",
-      "imports": 151
-    },
-    {
-      "from": "audit",
-      "imports": 12
-    },
-    {
-      "from": "auth",
-      "imports": 142
-    },
-    {
-      "from": "datasource",
-      "imports": 37
-    },
-    {
-      "from": "embedchannel",
-      "imports": 25
-    },
-    {
-      "from": "favorite",
-      "imports": 3
-    },
-    {
-      "from": "im",
-      "imports": 51
-    },
-    {
-      "from": "initialization",
-      "imports": 41
-    },
-    {
-      "from": "knowledge",
-      "imports": 291
-    },
-    {
-      "from": "mcp",
-      "imports": 83
-    },
-    {
-      "from": "memory",
-      "imports": 98
-    },
-    {
-      "from": "model",
-      "imports": 46
-    },
-    {
-      "from": "session",
-      "imports": 540
-    },
-    {
-      "from": "storage",
-      "imports": 78
-    },
-    {
-      "from": "system",
-      "imports": 38
-    },
-    {
-      "from": "vectorstore",
-      "imports": 20
-    },
-    {
-      "from": "websearch",
-      "imports": 37
-    },
-    {
-      "from": "wiki",
-      "imports": 142
-    }
-  ]
+  "edges": [],
+  "contractImports": []
 }

@@ -4,7 +4,7 @@ import static com.ragagent.session.service.QaSupport.TagScope;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.agent.AgentLookup;
+import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;

@@ -2,7 +2,7 @@ package com.ragagent.agent.skills;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.agent.skills.mapper.SkillMapper;
-import com.ragagent.contract.agent.SkillCatalogPort;
+import com.ragagent.agentengine.api.SkillCatalogPort;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;

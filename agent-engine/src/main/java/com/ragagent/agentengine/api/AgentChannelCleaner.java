@@ -1,4 +1,4 @@
-package com.ragagent.contract.agent;
+package com.ragagent.agentengine.api;
 
 /**
  * agent 删除后清理其外部渠道绑定的扩展点。

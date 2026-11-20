@@ -2,7 +2,7 @@ package com.ragagent.agent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.tool.ToolRegistry;
-import com.ragagent.contract.agent.SteerSink;
+import com.ragagent.agentengine.api.SteerSink;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.model.ChatMessage;
 import com.ragagent.contract.model.ChatOptions;

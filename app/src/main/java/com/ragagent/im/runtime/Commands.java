@@ -1,6 +1,6 @@
 package com.ragagent.im.runtime;
 
-import com.ragagent.contract.agent.AgentLookup;
+import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.im.domain.ChannelSessionEntity;
 import java.util.ArrayList;
 import java.util.List;

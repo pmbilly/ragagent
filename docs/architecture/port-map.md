@@ -5,9 +5,9 @@
 
 ## 统计
 
-- 域间（解耦）：**28**
+- 域间（解耦）：**27**
 - 复合面（随复合端口）：**7**
-- 跨模块（必要）：**9**
+- 跨模块（必要）：**8**
 
 ## 明细
 
@@ -15,7 +15,6 @@
 |---|---|---|---|---|
 | `AdminUserCommandPort` | `AdminUserAdapter` | app | system | 域间（解耦） |
 | `AdminUserPort` | `AdminUserAdapter` | app | system | 域间（解耦） |
-| `AgentSuggestionPort` | `CustomAgentService` | app | session | 域间（解耦） |
 | `AuditWritePort` | `AuditWriteAdapter` | app | agentmanagement、auth、datasource、knowledge、platform、system | 跨模块（必要） |
 | `ChunkFaqReadPort` | — | ? | — | 复合面（随复合端口） |
 | `ChunkPort` | `ChunkPortAdapter` | app | wiki | 域间（解耦） |
@@ -47,7 +46,6 @@
 | `ProviderFileStorePort` | `ProviderFileStoreAdapter` | app | knowledge | 域间（解耦） |
 | `ResourceCatalogPort` | `ResourceCatalogAdapter` | app | knowledge、session | 域间（解耦） |
 | `SessionQaPort` | `SessionQaAdapter` | app | im | 域间（解耦） |
-| `SkillCatalogPort` | `SkillCatalogService` | agent-engine | agent-engine、agentmanagement | 跨模块（必要） |
 | `StorageBackendPort` | `StorageBackendPortAdapter` | app | initialization、knowledge、storage | 域间（解耦） |
 | `StorageConnectivityPort` | `StorageConnectivityService` | app | storage、system | 域间（解耦） |
 | `TenantStorageQuotaPort` | `TenantStorageQuotaAdapter` | app | knowledge、system | 域间（解耦） |

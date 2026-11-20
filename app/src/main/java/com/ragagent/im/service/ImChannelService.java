@@ -2,7 +2,7 @@ package com.ragagent.im.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.agent.AgentLookup;
+import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.repository.ImChannelRepository;
 import com.ragagent.platform.security.Hashes;

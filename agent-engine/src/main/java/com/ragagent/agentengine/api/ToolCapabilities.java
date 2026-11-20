@@ -1,5 +1,6 @@
-package com.ragagent.contract.tool;
+package com.ragagent.agentengine.api;
 
+import com.ragagent.contract.tool.ToolDefinitions;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;

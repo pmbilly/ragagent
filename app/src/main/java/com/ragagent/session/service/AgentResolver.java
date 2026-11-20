@@ -2,8 +2,8 @@ package com.ragagent.session.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.agent.AgentLookup;
-import com.ragagent.contract.agent.AgentLookup.AgentView;
+import com.ragagent.agentengine.api.AgentLookup;
+import com.ragagent.agentengine.api.AgentLookup.AgentView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import org.slf4j.Logger;

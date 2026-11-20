@@ -1,6 +1,6 @@
 package com.ragagent.session.service;
 
-import com.ragagent.contract.agent.SteerSink;
+import com.ragagent.agentengine.api.SteerSink;
 import com.ragagent.contract.session.MentionedItem;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;

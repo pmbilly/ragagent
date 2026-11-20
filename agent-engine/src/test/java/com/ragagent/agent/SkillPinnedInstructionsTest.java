@@ -7,7 +7,7 @@ import com.ragagent.agent.prompt.PinnedSkillInstructions;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.skills.SkillSource;
-import com.ragagent.contract.agent.SkillCatalogPort;
+import com.ragagent.agentengine.api.SkillCatalogPort;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;

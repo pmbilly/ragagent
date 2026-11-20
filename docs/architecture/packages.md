@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-362 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+363 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -14,6 +14,7 @@
 | `:agent-engine` | `com.ragagent.agent.skills.mapper` | 技能 · 映射：SkillMapper。 |
 | `:agent-engine` | `com.ragagent.agent.tool` | Agent 运行面的**工具框架**（`agent.tool/`）：工具契约与基类、定义与 schema、注册表、 参数校验与投射、执行上下文与预算、输出持久化、取消与能力标记、通用单件工具。 |
 | `:agent-engine` | `com.ragagent.agent.tool.runtime` | 工具运行时横切件（不放具体工具）：SearchAuth（检索范围鉴权）、 ToolResultPersist（工具结果的客户端 / 存储投影）、MessageSanitizer 与 ThinkBloc |
+| `:agent-engine` | `com.ragagent.agentengine.api` | Agent 引擎的对外契约：执行请求/句柄/工厂、工具能力、技能目录、预算与流式信号。 |
 | `:app` | `com.ragagent` | com · ragagent：RagAgentApplication。 |
 | `:app` | `com.ragagent.agentmanagement` | 智能体管理面：内建智能体注册表与类型预设、自定义智能体 CRUD（custom_agents）、 技能目录、推荐问题流与 agent config jsonb。 |
 | `:app` | `com.ragagent.agentmanagement.adapter` | Agent 管理 · 端口实现：AgentLookupAdapter。 |
@@ -300,7 +301,7 @@
 | `:contract` | `com.ragagent.contract.storage.support` | 存储 · 支撑：StorageBackendResolver / StorageUrlContext / FileUrlPort…。 |
 | `:contract` | `com.ragagent.contract.tenant` | 租户契约面：租户角色等跨域值对象。 |
 | `:contract` | `com.ragagent.contract.text` | 契约文本工具面：契约载荷共用的纯 JDK 文本原语 （TextConv / CodePoints / Tokens / 空白与语言判定）。 |
-| `:contract` | `com.ragagent.contract.tool` | 工具契约面：工具执行结果载荷与工具取消/能力词汇。 |
+| `:contract` | `com.ragagent.contract.tool` | 工具契约面：工具 SPI 与执行结果载荷。 |
 | `:contract` | `com.ragagent.contract.vectorstore` | 向量库配置形状：ConnectionConfig 与 IndexConfig。 |
 | `:contract` | `com.ragagent.contract.websearch` | 契约 · 网页搜索：WebSearchTempStatePort / WebSearchProviderPort / PipelinePageFetcher…。 |
 | `:contract` | `com.ragagent.contract.wiki` | Wiki 契约面：摄取/收尾端口与图片标记。 |

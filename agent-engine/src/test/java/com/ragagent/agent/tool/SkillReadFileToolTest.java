@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.skills.SkillSource;
-import com.ragagent.contract.agent.SkillCatalogPort;
+import com.ragagent.agentengine.api.SkillCatalogPort;
 import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.platform.web.JsonMappers;

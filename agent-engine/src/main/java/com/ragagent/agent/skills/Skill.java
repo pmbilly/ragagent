@@ -1,6 +1,6 @@
 package com.ragagent.agent.skills;
 
-import com.ragagent.contract.agent.SkillCatalogPort.SkillValidationException;
+import com.ragagent.agentengine.api.SkillCatalogPort.SkillValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;

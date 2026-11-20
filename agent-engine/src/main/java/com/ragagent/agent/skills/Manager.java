@@ -1,6 +1,6 @@
 package com.ragagent.agent.skills;
 
-import com.ragagent.contract.agent.SkillCatalogPort;
+import com.ragagent.agentengine.api.SkillCatalogPort;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

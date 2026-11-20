@@ -24,7 +24,7 @@
 | `wiki` | 产品能力 | 165 | 1 | 2 | `views/knowledge/wiki` |
 | `memory` | 产品能力 | 92 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
 | `agenttools` | 产品能力 | 61 | — | — | `views/chat（工具结果渲染）` |
-| `agentmanagement` | 产品能力 | 27 | 2 | 1 | `views/agent` |
+| `agentmanagement` | 产品能力 | 27 | 2 | — | `views/agent` |
 | `favorite` | 产品能力 | 13 | 1 | — | `views/agent · views/knowledge（列表置顶/收藏）` |
 | `mcp` | 集成适配 | 171 | 4 | 2 | `views/settings/McpSettings.vue` |
 | `datasource` | 集成适配 | 147 | 2 | — | `views/knowledge/settings/DataSourceSettings.vue` |
@@ -50,7 +50,7 @@
 | `wiki` | `WikiPageController` | `WikiIngestPort`、`WikiPageOpsPort` |
 | `memory` | `MemoryController` | — |
 | `agenttools` | —（无 HTTP 面） | — |
-| `agentmanagement` | `AgentController`、`SkillController` | `AgentSuggestionPort` |
+| `agentmanagement` | `AgentController`、`SkillController` | — |
 | `favorite` | `UserFavoriteController` | — |
 | `mcp` | `AgentToolApprovalController`、`McpCredentialsController`、`McpOAuthController`、`McpServiceController` | `McpToolRegistrationPort`、`McpToolingGateway` |
 | `datasource` | `DataSourceController`、`DataSourceCredentialsController` | — |

@@ -1,4 +1,4 @@
-package com.ragagent.contract.agent;
+package com.ragagent.agentengine.api;
 
 /**
  * 可选的资源释放接口。

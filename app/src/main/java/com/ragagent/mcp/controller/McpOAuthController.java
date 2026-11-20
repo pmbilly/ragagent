@@ -1,6 +1,6 @@
 package com.ragagent.mcp.controller;
 
-import com.ragagent.contract.tool.McpApprovalOps;
+import com.ragagent.agentengine.api.McpApprovalOps;
 import com.ragagent.mcp.oauth.OAuthManager;
 import com.ragagent.mcp.oauth.error.OAuthCallbackException;
 import com.ragagent.mcp.protocol.McpClientManager;

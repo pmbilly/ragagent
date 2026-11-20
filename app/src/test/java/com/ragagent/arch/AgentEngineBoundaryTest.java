@@ -85,7 +85,10 @@ class AgentEngineBoundaryTest {
             "retrieval",    // L2 能力
             "embedding",    // L2 能力
             "rerank",       // L2 能力
-            "tracing");     // L1 core（:common）+ L2 装饰器（platform.tracing）
+            "tracing",     // L1 core（:common）+ L2 装饰器（platform.tracing）
+            // 本模块对外契约包：因 agent 是模块内 hub（依赖全部子包），契约若挂 agent.api
+            // 会与 hub 形成包级环，故用独立顶层名；仍是本模块自身，不是业务域。
+            "agentengine");
 
     /** {@code com.ragagent.<top>.} 形态的 import（含 static import）。 */
     private static final Pattern RAGAGENT_IMPORT =

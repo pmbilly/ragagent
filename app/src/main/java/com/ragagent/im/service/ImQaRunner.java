@@ -1,6 +1,6 @@
 package com.ragagent.im.service;
 
-import com.ragagent.contract.agent.AgentLookup;
+import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.contract.event.EventBusFactory;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.event.payload.AgentCompleteData;

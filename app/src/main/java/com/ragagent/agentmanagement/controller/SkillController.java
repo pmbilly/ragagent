@@ -2,7 +2,7 @@ package com.ragagent.agentmanagement.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.agent.SkillCatalogPort;
+import com.ragagent.agentengine.api.SkillCatalogPort;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;

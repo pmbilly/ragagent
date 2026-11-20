@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.contract.agent.AgentLookup;
+import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.session.attachment.TemporaryDocumentService;

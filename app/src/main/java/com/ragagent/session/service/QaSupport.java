@@ -1,7 +1,7 @@
 package com.ragagent.session.service;
 
-import com.ragagent.contract.agent.AgentLookup;
-import com.ragagent.contract.agent.SteerSink;
+import com.ragagent.agentengine.api.AgentLookup;
+import com.ragagent.agentengine.api.SteerSink;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.session.MentionedItem;

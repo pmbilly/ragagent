@@ -1,8 +1,8 @@
 package com.ragagent.session.service.suggestion;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.agent.AgentSuggestionPort;
-import com.ragagent.contract.agent.TagScope;
+import com.ragagent.agentengine.api.AgentSuggestionPort;
+import com.ragagent.agentengine.api.TagScope;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.model.ChatMessage;

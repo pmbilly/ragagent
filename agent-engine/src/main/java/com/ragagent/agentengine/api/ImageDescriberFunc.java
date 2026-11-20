@@ -1,4 +1,4 @@
-package com.ragagent.contract.agent;
+package com.ragagent.agentengine.api;
 
 /**
  * 图片描述函数（原为 {@code AgentEngine.ImageDescriberFunc} 嵌套接口，上提契约面）。

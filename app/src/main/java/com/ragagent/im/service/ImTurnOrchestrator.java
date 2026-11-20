@@ -2,8 +2,8 @@ package com.ragagent.im.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.contract.agent.AgentChannelCleaner;
-import com.ragagent.contract.agent.AgentLookup;
+import com.ragagent.agentengine.api.AgentChannelCleaner;
+import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.contract.event.EventBusFactory;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;

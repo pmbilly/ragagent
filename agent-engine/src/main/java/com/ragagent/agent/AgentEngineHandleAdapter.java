@@ -1,8 +1,8 @@
 package com.ragagent.agent;
 
-import com.ragagent.contract.agent.AgentEngineHandle;
-import com.ragagent.contract.agent.AgentExecutionException;
-import com.ragagent.contract.agent.SteerSink;
+import com.ragagent.agentengine.api.AgentEngineHandle;
+import com.ragagent.agentengine.api.AgentExecutionException;
+import com.ragagent.agentengine.api.SteerSink;
 import com.ragagent.contract.model.ChatMessage;
 import java.util.List;
 import java.util.function.Supplier;

@@ -3,7 +3,7 @@ package com.ragagent.agent.tool;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
-import com.ragagent.contract.agent.SkillCatalogPort;
+import com.ragagent.agentengine.api.SkillCatalogPort;
 import com.ragagent.contract.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;

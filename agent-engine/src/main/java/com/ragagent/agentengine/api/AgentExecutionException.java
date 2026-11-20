@@ -1,4 +1,4 @@
-package com.ragagent.contract.agent;
+package com.ragagent.agentengine.api;
 
 /**
  * agent 执行失败（引擎失败通道的契约面类型）。

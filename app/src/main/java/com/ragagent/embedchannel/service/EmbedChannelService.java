@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.agent.AgentLookup;
+import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.contract.knowledge.ChunkRowView;
 import com.ragagent.contract.knowledge.KnowledgeCatalogPort;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;

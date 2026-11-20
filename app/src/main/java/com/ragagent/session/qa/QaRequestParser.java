@@ -3,8 +3,8 @@ package com.ragagent.session.qa;
 import static com.ragagent.session.service.QaSupport.KnowledgeTargets;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
-import com.ragagent.contract.agent.AgentLookup;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.session.MessageAttachment;

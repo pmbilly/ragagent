@@ -1,8 +1,8 @@
 package com.ragagent.mcp.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.agentengine.api.McpApprovalOps;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.tool.McpApprovalOps;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
 import com.ragagent.mcp.service.AgentToolApprovalService;
 import com.ragagent.mcp.service.McpOAuthFlowService;

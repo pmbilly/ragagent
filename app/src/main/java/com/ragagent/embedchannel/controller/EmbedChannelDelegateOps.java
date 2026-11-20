@@ -1,12 +1,12 @@
 package com.ragagent.embedchannel.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agentengine.api.McpApprovalOps;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.session.EmbedReply;
 import com.ragagent.contract.session.MessageSuggestionView;
 import com.ragagent.contract.session.MessageView;
-import com.ragagent.contract.tool.McpApprovalOps;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResponse;

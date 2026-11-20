@@ -1,7 +1,7 @@
 package com.ragagent.im.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.agent.AgentLookup;
+import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.contract.json.JsonValues;
 import com.ragagent.contract.session.MessageAttachment;
 import com.ragagent.contract.session.MessageView;

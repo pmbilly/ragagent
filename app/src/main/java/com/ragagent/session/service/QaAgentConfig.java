@@ -1,6 +1,6 @@
 package com.ragagent.session.service;
 
-import com.ragagent.contract.agent.AgentRunSpec;
+import com.ragagent.agentengine.api.AgentRunSpec;
 import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
 import java.util.ArrayList;
 import java.util.List;

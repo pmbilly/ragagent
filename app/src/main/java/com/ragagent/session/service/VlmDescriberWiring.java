@@ -1,6 +1,6 @@
 package com.ragagent.session.service;
 
-import com.ragagent.contract.agent.ImageDescriberFunc;
+import com.ragagent.agentengine.api.ImageDescriberFunc;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.contract.model.ModelRuntime;
 import com.ragagent.contract.model.VlmPredictor;

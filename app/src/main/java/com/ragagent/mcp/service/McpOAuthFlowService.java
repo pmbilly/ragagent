@@ -1,8 +1,8 @@
 package com.ragagent.mcp.service;
 
+import com.ragagent.agentengine.api.McpApprovalOps;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.contract.tool.McpApprovalOps;
 import com.ragagent.mcp.approval.Decision;
 import com.ragagent.mcp.approval.ToolApprovalException;
 import com.ragagent.mcp.approval.ToolApprovalGate;

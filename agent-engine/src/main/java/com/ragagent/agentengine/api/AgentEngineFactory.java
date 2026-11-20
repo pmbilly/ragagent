@@ -1,4 +1,4 @@
-package com.ragagent.contract.agent;
+package com.ragagent.agentengine.api;
 
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.model.LlmChatClient;

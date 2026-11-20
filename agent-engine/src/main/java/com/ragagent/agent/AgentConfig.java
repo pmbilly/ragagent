@@ -2,7 +2,7 @@ package com.ragagent.agent;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ragagent.contract.agent.AgentRunSpec;
+import com.ragagent.agentengine.api.AgentRunSpec;
 import java.util.List;
 
 /**

@@ -1,8 +1,8 @@
 package com.ragagent.im.runtime;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.agent.AgentLookup;
-import com.ragagent.contract.tool.ToolCapabilities;
+import com.ragagent.agentengine.api.AgentLookup;
+import com.ragagent.agentengine.api.ToolCapabilities;
 import com.ragagent.im.runtime.Commands.CommandContext;
 import com.ragagent.im.runtime.Commands.CommandRegistry;
 import com.ragagent.im.runtime.Commands.CommandResult;

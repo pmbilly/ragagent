@@ -1,17 +1,17 @@
 package com.ragagent.session.service;
 
+import com.ragagent.agentengine.api.AgentEngineFactory;
+import com.ragagent.agentengine.api.AgentEngineHandle;
+import com.ragagent.agentengine.api.AgentEngineRequest;
+import com.ragagent.agentengine.api.AgentRunSpec;
+import com.ragagent.agentengine.api.ImageDescriberFunc;
+import com.ragagent.agentengine.api.KnowledgeBaseInfo;
+import com.ragagent.agentengine.api.RecentDocInfo;
+import com.ragagent.agentengine.api.SelectedDocumentInfo;
 import com.ragagent.agenttools.web.WebFetchTool;
 import com.ragagent.agenttools.web.WebSearchTool;
 import com.ragagent.agenttools.wiki.WikiRouteResolver;
 import com.ragagent.agenttools.wiki.WikiScope;
-import com.ragagent.contract.agent.AgentEngineFactory;
-import com.ragagent.contract.agent.AgentEngineHandle;
-import com.ragagent.contract.agent.AgentEngineRequest;
-import com.ragagent.contract.agent.AgentRunSpec;
-import com.ragagent.contract.agent.ImageDescriberFunc;
-import com.ragagent.contract.agent.KnowledgeBaseInfo;
-import com.ragagent.contract.agent.RecentDocInfo;
-import com.ragagent.contract.agent.SelectedDocumentInfo;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.contract.knowledge.FaqEntryPageView;
 import com.ragagent.contract.knowledge.FaqEntryView;

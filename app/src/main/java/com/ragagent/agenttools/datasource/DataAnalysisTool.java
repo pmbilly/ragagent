@@ -1,9 +1,9 @@
 package com.ragagent.agenttools.datasource;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agentengine.api.Cleanable;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
 import com.ragagent.agenttools.sql.SqlGuard;
-import com.ragagent.contract.agent.Cleanable;
 import com.ragagent.contract.agent.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.BaseTool;
