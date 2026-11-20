@@ -547,3 +547,137 @@ platform 侧的唯一使用者。
 | 包名 `com.ragagent.platform` → `framework` | 2000+ 处改动，收益为零 |
 | 保留 `contract` 作为"共享词汇层" | B4 完成后它是空目录 |
 | 把 24 个多域共用的 helper 搬进某个域 | R10 禁止；它们本就该留在 framework |
+
+## 11. 全部卡点与解决路径（2026-11-20 全面复核）
+
+> 本节是对"到终态还差什么"的一次性盘点：15 个卡点、五层依赖、每个卡点给根因/解法/规模/风险/前置。
+> 目的是**先确认路径再动手**，不再边做边发现。
+
+### 11.1 终态必须重新定义（测量结论，需先确认）
+
+`contract` 现有 **251** 个类型（原 288，已迁出 37）。按 §10.3 的判据（级别 + kind + 模块可达性）全量分类：
+
+| 归宿 | 数量 | 占比 |
+|---|---|---|
+| `framework`（被 platform 引用 / 跨 kind / 同级互需 / 引擎互斥） | **166** | 66% |
+| `app/<域>/api` | 45 | 18% |
+| 引擎 api（model 7 · retrieval 11 · agent 10） | 28 | 11% |
+| 无引用（可删） | 10 | 4% |
+| 待定 | 2 | 1% |
+
+按包看，进 framework 的大头不是"通用面"：
+
+```
+knowledge 27 · storage 17 · model 16 · session 12 · tenant 11 · event 25
+wiki 7 · auth 7 · apikey 6 · websearch 8 · storage.support 若干 …
+```
+
+**结论**：蓝图 §9.2 把 `framework` 定义为"现 platform + 通用面（error·event·json·text·pagination）"，但实测
+**framework 必须再装下 166 个业务共享词汇**（`ChunkFacts` / `SearchResult` / `ChatMessage` / `SessionQaPort` …）。
+
+所以"5 模块、contract 消失"在**模块数量**上可达，但它的实质是：
+
+> **把 contract 合并进 framework，而不是"解散"。** framework 会变成"技术底座 + 跨域共享词汇层"两段结构。
+
+这一点必须先确认——它决定 §11.2 里 K3/K4/K9 的做法。
+
+### 11.2 卡点总表（15 个，五层）
+
+#### L1 模块结构（无前置）
+
+| # | 卡点 | 根因 | 解法 | 规模 | 风险 |
+|---|---|---|---|---|---|
+| **K1** | `platform` → `framework` 改名 + 全部移入 `backend/` | 终态要求 | 纯改名：目录 + artifactId + 根 pom `<modules>` 前缀 | 12 个 pom · 24 个脚本 · CI | 低（不改代码） |
+| **K2** | 模块数锚点全线漂移 | README 写"六个"、`_source_roots` 的 `MODULE_DIRS`、`check-module-graph` 的 `MODULES` | 与 K1 同一提交改 | 4 处 | 低 |
+
+#### L2 守卫（终态的前提，不改则 K9 必红）
+
+| # | 卡点 | 根因 | 解法 | 风险 |
+|---|---|---|---|---|
+| **K3** | **C8（`check-platform-shapes`）：platform 禁业务词包/文件名/`*Facts`/`*View`/`*Port` 后缀** | framework 要装 166 个共享词汇，判据 2/3 会全命中 | 新增 `framework/shared/**` 整包豁免；判据改为"shared 只允许跨模块共享的形状，禁止 service/repository/adapter" | 中（放宽的是形状命名，不是分层） |
+| **K4** | **C1/C2/C3（`check-contract-purity`）：contract 纯 JDK** | contract 消失后规则失效 → "契约不带框架依赖"约束凭空消失 | 规则目标从 `contract` 平移到 `framework/shared`；保留"零第三方依赖 + 只允许 JDK 类型" | 低（同语义换目标） |
+| **K5** | 契约类守卫扫描根过窄 | `check-contract-sync` / `check-fe-contract-keys` 只扫 contract | 改为多根：contract + 各模块 `*/api`（`check-contract-shape` 已于 B3-2 改完） | 低 |
+| **K6** | 基线按**路径**登记，换包即漂移 | 5 份基线 + `FROZEN_PREFIXES` | 每批 `--write`；换包时补新前缀（已踩 4 次，做法固定） | 低 |
+
+#### L3 契约归位（可立即做）
+
+| # | 卡点 | 内容 | 规模 | 前置 |
+|---|---|---|---|---|
+| **K7** | 45 个域专属契约 → `app/<域>/api` | 分布：`knowledge` 19 · `memory` 9 · `wiki` 8 · `session` 7 · `storage` 1 · `embedchannel` 1 | 45 类型 · 约 400 处 import | 无（R10 分级已就绪，B2 已验证流程） |
+| **K8** | 28 个引擎契约 → 引擎 api | `model` 7 · `retrieval` 11 · `agent` 10 | 28 类型 · 约 200 处 import | 无（落点判据已由 B3 的 `agentengine.api` / `llm.api` 验证） |
+| **K9** | 166 个共享词汇 → `framework/shared` | 最大的一批 | 166 类型 · 约 1200 处 import | **K1 + K3 + K4**（不做守卫改造必红一片） |
+
+#### L4 硬骨头（有结构性前置）
+
+| # | 卡点 | 根因 | 解法（选项） | 规模 | 判定 |
+|---|---|---|---|---|---|
+| **K10a** | `platform/tracing/decorators`（6 文件 + 测试）搬不动 | 测试用 platform `tracing.langfuse` 的 **5 个包私有类**（`DefaultLangfuseManager` / `LangfuseContext` / `LangfuseRegistry` / `NoopLangfuseManager` / `RecordedSpan`），platform 内各被引用 5~9 次 | **甲**：5 类提 public（API 面 +5）<br>**乙**：在 platform 提供公开的 `LangfuseTestSupport`，测试改用它（API 面 +1，但要多写一层）<br>**丙**：不搬，`ChatMessage` 等 6~8 个协议形状永久留 contract | 5 类 / 34 处引用 | 推荐**乙**：暴露面最小，且不用把内部实现类变成公开 API |
+| **K10b** | `platform/stream`（17 文件）中 4 个引用 model 契约 | `StreamEvent`/`StreamManager` 是通用流基建，但 `StreamEvent` 携带 `ResponseType` | **甲**：整体 17 文件搬 `model-runtime`（连贯，但 app 有 60+ 处引用要改）<br>**乙**：只搬 `SyncChatStream`/`QueuedChatStream`/`StreamStopWatcher`（3 文件），`StreamEvent` 留 platform → `ResponseType`/`StreamResponse` 永久留 contract<br>**丙**：不动 | 3 或 17 文件 | 推荐**乙**：收益/风险比最好，代价是 2~3 个类型留 contract |
+| **K11** | `PipelinePorts`（12 个嵌套接口，5 文件）是枢纽 | 一个类 import 了 7 个包的契约；它把 knowledge/session/tool/retrieval 绑在一起 | 把 12 个接口按归属拆到各域 `api` 与引擎 `api`；`PipelinePorts` 变空壳后删除 | 12 接口 · 27 处调用 | **前置 K7**（域 api 包必须先存在）；拆完才能释放 `session`/`knowledge` 里被它引用的类型 |
+| **K12** | `PromptCacheStatus` / `ResponseType` 被 `ContractJsonModule` **显式** ser/deser（不是 mixin） | 它们是枚举，用自定义序列化器 | 把两个序列化器搬进 `ModelJsonModule`（S1 机制已验证可用） | 2 类型 · 2 个 ser/deser 类 | 低；随 K10 一起做 |
+
+#### L5 收尾
+
+| # | 卡点 | 解法 | 规模 |
+|---|---|---|---|
+| **K13** | 10 个"无引用"契约类型 | 先确认是否死代码（含反射/SPI 使用），再删 | 10 |
+| **K14** | 2 个"待定"类型（消费者含 `_root`/`config`） | 人工判定归属 | 2 |
+| **K15** | ArchUnit（22 条）→ Modulith | R-1/R-2 迁进 Modulith，退役同类 Python 守卫 | 2 天 |
+
+### 11.3 依赖 DAG 与推荐顺序
+
+```text
+阶段一（无前置，可并行）
+  K1+K2  改名与目录前移 ──┐
+  K7     45 域契约        │
+  K8     28 引擎契约      │
+  K6     基线随批 --write ┘
+
+阶段二（终态守卫，必须在 K9 之前）
+  K3      C8 加 shared 豁免
+  K4      C1/C2/C3 平移
+  K5      契约守卫多根扫描
+
+阶段三（大头）
+  K9      166 → framework/shared        ← 依赖 K1/K3/K4
+  K12     2 个显式 ser/deser 随 mixin 走
+
+阶段四（硬骨头，按收益排序）
+  K10a    LangfuseTestSupport（解锁 6 个装饰器 + 6~8 个协议形状）
+  K11     PipelinePorts 拆分（依赖 K7；解锁 session/knowledge 剩余）
+  K10b    stream 3 文件（解锁 2~3 个类型）
+
+阶段五（收尾）
+  K13/K14 清理与判定
+  K15     ArchUnit → Modulith
+```
+
+### 11.4 每阶段的验收与回滚点
+
+| 阶段 | 验收（缺一不可） | 回滚点 |
+|---|---|---|
+| 一 | `mvn -f backend/pom.xml clean verify` 绿 · 守卫 49/49 · 测试条数不变 | 每次提交前 |
+| 二 | 守卫自身仍能拦住**故意注入**的违规（每个改过的守卫做一次受控验证） | 守卫改动单独提交 |
+| 三 | 金片 1339 逐字节不变 · `contract` 剩余数单调递减 | 每 20~30 个类型一次提交 |
+| 四 | 每批全量绿 + 包级环 0 新增 | 单独提交 |
+| 五 | Modulith 规则覆盖原 R-1/R-2 判据 | 守卫退役前先比对 |
+
+### 11.5 需要先决策的三点
+
+| # | 决策 | 影响 |
+|---|---|---|
+| **D1** | 接受"framework = 技术底座 + 166 个共享词汇"（即"解散"实为"合并"）吗？ | 决定 K3/K4/K9 是否要做；若不接受，则终态只能是"6 模块 + contract 保留"，§11 的 K9 及之后全部不做 |
+| **D2** | K10a 选甲（提 public）还是乙（`LangfuseTestSupport`）？ | 决定 6~8 个 LLM 协议形状能否归位 |
+| **D3** | K10b 选甲（搬 17 文件）还是乙（搬 3 文件）？ | 决定 `ResponseType`/`StreamResponse` 是否永久留 contract |
+
+### 11.6 工作量估算
+
+| 阶段 | 内容 | 工时 |
+|---|---|---|
+| 一 | 改名 + 前移 + 两批契约 | 3~4 天 |
+| 二 | 守卫改造 + 三次受控验证 | 1~2 天 |
+| 三 | 166 个类型（分 6~8 批） | 5~7 天 |
+| 四 | K10a / K11 / K10b | 3~4 天 |
+| 五 | 清理 + Modulith | 2~3 天 |
+| **合计** | | **14~20 天** |
+
