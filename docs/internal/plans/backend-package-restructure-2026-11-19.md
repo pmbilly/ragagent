@@ -843,10 +843,57 @@ framework 内其他类型引用，闭包下依然搬不走。
 | **P1b** | **framework 业务代码下沉**：`stream` 4 · `prompt` 4 · `tracing/decorators` 4 · `knowledge` 3 · `storage` 5 · `audit` 1 · `config` 1 · `http` 1 | 解除其余 ~15 个的 framework 依赖 | 按域分级判据逐个定落点 | 5~7 天 | 中：部分文件被多域用，只能留 framework |
 | **P2** | 删 9 个无引用类型 | 9 | 无 | 0.5 天 | 低（先确认无反射/SPI 使用） |
 | **P3** | 引擎面 8 个 → 引擎 `api`；单域 12 个 → 域 `api` | 20 | P1 完成（framework 依赖已解除）+ 闭包复核 | 3~4 天 | 中：闭包会拦下一部分 |
-| **P4** | **多域共用 64 个 → 域间通信改造**：同级域共享改为事件或端口，按蓝图 §5.4「下沉基础域 / 改用事件 / 合并」 | 64 | P3 | **不可估**（需设计） | 高：动业务逻辑 |
+| **P4** | **多域档分层处置**（见 §12.4.2）：A 唯一 home 改 import ／ B1 knowledge+wiki 合并 ／ B2 同级逐个拍板 ／ C 全平台词汇归 framework；**只有 `PipelinePorts` 需真改造** | **74** | P3 | **6~10 天 + 1 个拍板项** | 中：金片守出口、R10 守方向、闭包守搬迁 |
 | **P5** | 收尾：`shared` 只剩通用面 35 → 迁出到 `framework/error`、`framework/event`、`framework/json`、`framework/text`、`framework/pagination`，删除 `shared` 命名空间 | 剩余 35 变成 framework 正式内容 | P4 | 2 天 | 低 |
 
 **P1a 是分水岭**：它零业务逻辑改动、只重组 JSON 装配，却解掉最大的一块（42/96）。
+
+### 12.4.2 P4 重评：从「不可估」到「74 个里只有 1 处真要动逻辑」（2026-11-20）
+
+早期把 P4 整体标为「不可估」，理由是「64 个多域共用，需改域间通信」。这个结论没有拆开域组合、类型形态与分级落点，属于**过度悲观**。逐类型扫开后：
+
+**数据口径**：类型级 `import`-only 扫描得 189 个业务词汇，其中多域档 136 个；剔除「还有引擎/框架消费者」的 36 个后，**纯域间档 74 个**（早期口径 64 为类型级粗算，另有文件级扫描得 72，差值来自嵌套类型，结论一致）。
+
+| 层 | 数量 | 内容 | 动作 | 动业务逻辑 |
+|---|---|---|---|---|
+| **A 唯一 home** | **41** | 最低级消费方唯一：knowledge 15 · websearch 12 · storage 9 · initialization 8 · model 8 · auth 6 · mcp 5 · embedchannel 4 · im 4 · system 3 · memory 2 · audit 1 | 搬 home 域 `api/` + 改 import；其余消费方全是上级，R10 分级直接放行 | **零** |
+| **B1 knowledge+wiki 同级** | **13** | `ChunkPort` / `WikiIngestPort` / `KnowledgeFinalizePort` 等，即 P3-0 解环时上提的回调端口族 | 走 K18/D3′ 已推荐的 **knowledge+wiki 合并**，合并后变域内调用，一次清零 | 零 |
+| **B2 其他同级** | **20** | auth+system 12 · datasource+knowledge 4 · initialization+model 4 · 其余零星 | 逐个二选一：**合并** 或 **永驻 framework** | 零或极小 |
+| **C 全平台词汇** | 3~5 | `TenantRole`（13 域）· `TenantConfigLookup`（10 域）· `AuditAction`（7 域） | 归 framework——蓝图 §5.3 框架层本就有审计/租户能力，是正当终态 | 零 |
+| 例外 | 1 | `pipeline.PipelinePorts`（12 个嵌套接口的枢纽，K11 已登记） | 按 K11 拆分归位 | **中（唯一真改造）** |
+
+#### 事件化是伪选项（两处实锤）
+
+蓝图 §5.4 的三选一里「改用事件」在 B 档几乎无处可用，因为同级互需的类型形态是**查询与纯函数**：
+
+| 接口 | 消费域 | 实际方法 | 事件化 |
+|---|---|---|---|
+| `AdminUserPort` | auth + system | `byId` / `byEmail` / `byUsername` / `listSystemAdmins` | ❌ request-response |
+| `SystemSettingGateway` | auth + system | `getString` / `getBool` / `getInt` | ❌ request-response |
+| `KnowledgeIngest` | datasource + knowledge | `contentHash` / `fileNameFromUrl` / `newTaskId` | ❌ 纯函数 |
+
+事件适合命令与通知，不适合同步查询与纯函数。**所以 B2 的真实选项只有两条：合并域，或永驻 framework。**
+
+#### 由此浮出的唯一决策点
+
+> **`auth` + `system` 若不合并，`AdminUserPort` 等 ~12 个查询型词汇只能永驻 framework。**
+
+这与 §12.7 终态图（framework 只含 35 个通用面）有出入。二选一：
+
+| 选项 | 代价 | framework 纯度 |
+|---|---|---|
+| 接受 framework 含少量跨域词汇（`shared` 命名空间仍可消失，只是这些类型迁到 framework 自己的包） | 零额外工时 | 多出 10~20 个跨域查询词汇 |
+| 拍板 **auth + system 合并** | 多 2~3 天（族定义、`capability-kinds.json`、路由前缀不变） | 保持纯净 |
+
+#### 修正后的 P4 口径
+
+| 项 | 旧口径 | 新口径 |
+|---|---|---|
+| 工时 | 不可估 | **6~10 天 + 1 个拍板项** |
+| 动业务逻辑 | 整个 P4 | **仅 `PipelinePorts` 一处** |
+| 风险 | 高 | **中**（三道闸都在沿用范围内） |
+
+**一句话**：P4 不是「域间通信改造」，是「按域组合分四层、36~41 个纯改 import、13 个合并、20 个拍板、3~5 个归 framework，只剩一个枢纽要拆」。
 
 #### 12.4.1 P1a 的第一手实测（2026-11-20，已回滚）
 
