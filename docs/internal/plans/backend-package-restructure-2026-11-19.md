@@ -847,6 +847,27 @@ framework 内其他类型引用，闭包下依然搬不走。
 | **P5** | 收尾：`shared` 只剩通用面 35 → 迁出到 `framework/error`、`framework/event`、`framework/json`、`framework/text`、`framework/pagination`，删除 `shared` 命名空间 | 剩余 35 变成 framework 正式内容 | P4 | 2 天 | 低 |
 
 **P1a 是分水岭**：它零业务逻辑改动、只重组 JSON 装配，却解掉最大的一块（42/96）。
+
+#### 12.4.1 P1a 的第一手实测（2026-11-20，已回滚）
+
+试搬 `TokenUsage` 的 mixin（`ContractJsonMixinsCore.TokenUsageMixin`）到 `model-runtime`，全量闸门在 framework 的 `StreamJsonTest` 报红：
+
+```text
+expected: ..."usage":{"prompt_tokens":3,...}
+but was:  ..."usage":{"promptTokens":3,...}
+```
+
+**根因**：`framework` 自己的 `StreamEvent` 有字段 `TokenUsage usage` 与 `ResponseType type`，而 `StreamJson` 是 framework 内部 mapper（SSE 进出 Redis 用，不是 HTTP 那个）。mixin 搬到下游模块后，framework 的 mapper 拿不到它 → 线格式退回 camelCase。
+
+**新增判据（P1a 必须遵守）**：
+
+> **framework 自身 mapper 的序列化路径上的类型，其 mixin 必须留在 framework。**
+
+判定方法：看该类型是否出现在 `StreamJson` / `EventJson` / `LangfuseAttributes` 的序列化对象图里。当前被钉住的是 `StreamEvent` 的字段类型——`TokenUsage`、`ResponseType`（后者由 `ContractJsonModule` 显式注册，同理）。
+
+**另记一条操作教训**：`model-runtime` 的 `ModelJsonModule` 早已存在并注册了 10 个模型面 mixin；本次按「新建文件」写入把它覆盖了，导致 `ChatMessage` 的线格式整体失效。**搬 mixin 前先确认目标模块是否已有 provider 文件，只追加不重建。**
+
+**修正后的 P1a 可搬量**：21 个业务面注册项中，`TokenUsage` 必须留 framework（占 1），其余 20 项按归属搬到 `agent-engine`（4）／`retrieval-engine`（4）／`app`（12）。
 P4 是唯一真正需要改业务逻辑的阶段，也是唯一无法预估算力的阶段。
 
 ### 12.5 与 VO 化的关系：两条独立线，可并行
