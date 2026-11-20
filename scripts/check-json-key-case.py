@@ -71,6 +71,9 @@ FROZEN_PREFIXES = (
     # 2026-11-20：wiki 域并入 knowledge（app/wiki -> app/knowledge/wiki），
     # 其 ingest 阶段的 LLM 提示词载荷键名（cited_slugs/body_preview 等）随之换路径，
     # 语义未变——仍是喂给模型的结构化载荷，不属自有 JSON 面。
+    # 2026-11-21：检索面 mixin 迁入 retrieval-engine，其 searchParams/vectorstore 载荷的
+    # 键名沿用既有 wire 契约（query_text / match_count 等），不属自有 JSON 面。
+    'retrieval/json/',
     'knowledge/wiki/',
     'datasource/connector/feishu/core/DocxBlocks',
     'datasource/connector/feishu/core/FeishuApiTypes',

@@ -60,51 +60,7 @@ public final class ContractJsonMixinsCore {
     }
 
     /** SearchParams 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    public abstract static class SearchParamsMixin {
-        @JsonProperty("query_text")
-        private String queryText;
 
-        @JsonProperty("query_embedding")
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        private float[] queryEmbedding;
-
-        @JsonProperty("vector_threshold")
-        private double vectorThreshold;
-
-        @JsonProperty("keyword_threshold")
-        private double keywordThreshold;
-
-        @JsonProperty("match_count")
-        private int matchCount;
-
-        @JsonProperty("disable_keywords_match")
-        private boolean disableKeywordsMatch;
-
-        @JsonProperty("disable_vector_match")
-        private boolean disableVectorMatch;
-
-        @JsonProperty("knowledge_ids")
-        private List<String> knowledgeIds;
-
-        @JsonProperty("tag_ids")
-        private List<String> tagIds;
-
-        @JsonProperty("scope_tag_ids")
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        private List<String> scopeTagIds;
-
-        @JsonProperty("only_recommended")
-        private boolean onlyRecommended;
-
-        @JsonProperty("knowledge_base_ids")
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        private List<String> knowledgeBaseIds;
-
-        @JsonProperty("skip_context_enrichment")
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private boolean skipContextEnrichment;
-
-    }
 
     /** WebSearchConfig 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
     public abstract static class WebSearchConfigMixin {
@@ -151,13 +107,10 @@ public final class ContractJsonMixinsCore {
     }
 
     /** ConnectionConfig 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    @JsonIgnoreProperties(value = {"endpoint"})
-    public abstract static class ConnectionConfigMixin {
-    }
+
 
     /** IndexConfig 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    public abstract static class IndexConfigMixin {
-    }
+
 
     /** ExtractedItem 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
     public abstract static class ExtractedItemMixin {

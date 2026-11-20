@@ -78,6 +78,7 @@ import com.ragagent.memory.dto.MemoryDocView;
 import com.ragagent.memory.dto.MemoryTopicView;
 import com.ragagent.platform.stream.LiveRunPayload;
 import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.dto.SessionListItem;
@@ -137,7 +138,7 @@ class JsonContractRoundTripTest {
 
     // 裸 mapper + 契约 Json 模块：等价于搬迁前的"注解直接在类上"（§8.1 去框架化后注解在 mixin 里）
     private static final ObjectMapper MAPPER = new ObjectMapper()
-            .registerModule(new com.ragagent.platform.web.ContractJsonModule());
+            .registerModules(JsonMappers.contractModules());
 
     // ── MCP（auth_config / headers 等 jsonb 列 + 直接作响应体） ──────────────
 

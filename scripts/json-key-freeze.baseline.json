@@ -128,6 +128,7 @@
     "retrieval/engine/qdrant/QdrantRetrieveRepository.java": "retrieval/engine/",
     "retrieval/engine/qdrant/QdrantSearchOps.java": "retrieval/engine/",
     "retrieval/engine/qdrant/QdrantWriteOps.java": "retrieval/engine/",
+    "retrieval/json/VectorJsonMixins.java": "retrieval/json/",
     "retrieval/telemetry/RetrievalObs.java": "retrieval/telemetry/",
     "session/rag/plugin/MergeParentOps.java": "session/rag/plugin",
     "session/rag/plugin/PluginChatCompletion.java": "session/rag/plugin",

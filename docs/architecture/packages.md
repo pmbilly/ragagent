@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-368 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+369 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -284,6 +284,7 @@
 | `:backend` | `com.ragagent.retrieval.engine.tencentvectordb` | 引擎 · tencentvectordb：TencentVectorDbRetrieveRepository / TencentVectorDbRestClient / TencentVectorDbSearchOps…。 |
 | `:backend` | `com.ragagent.retrieval.engine.weaviate` | 引擎 · weaviate：WeaviateRetrieveRepository / WeaviateVectorEmbedding / WeaviateRestClient…。 |
 | `:backend` | `com.ragagent.retrieval.graph` | 检索 · 图谱：Neo4jGraphRepository / Neo4jGraphConfig / Neo4jProperties。 |
+| `:backend` | `com.ragagent.retrieval.json` | 检索与向量库面载荷的 Jackson 装配（mixin 与注册表）。 |
 | `:backend` | `com.ragagent.retrieval.support` | 检索引擎的支撑层：检索文本归一/分词/哈希、chunk 内容拼接、grep 结果视图与打分等无状态算法 （原顶层包 searchutil， 并入）。 |
 | `:backend` | `com.ragagent.retrieval.telemetry` | 检索 · telemetry：RetrievalObs。 |
 | `:backend` | `com.ragagent.session` | 会话域：会话与消息读写（conversation/）、两条问答入口（知识库问答 / Agent 问答）、 SSE 流桥、附件（attachment/）与会话侧管线（rag/ + assembly/）。 |
