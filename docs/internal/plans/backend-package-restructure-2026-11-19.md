@@ -325,8 +325,10 @@ H7 / H8 / H9 / L11 / Q6 / Q8b / Q9 / Q10 / Q11 / R2c-3d 余项 / M8（见 `HANDO
 
 ## 9. 终态与留路（假设性：contract 解散后长什么样）
 
-> **⚠️ 本节描述的是「假如能解散」的形态，已被 §10.1 的剥洋葱测试证否**：contract 的不可约核是 185 个类型（48 个被 platform 真代码钉住、137 个互相引用），解散在结构上不成立。
-> 本节保留用于两件事：① 记录「如果将来做业务重构（拆 knowledge/session 模型、把域间通信改为事件），目标形态是什么」；② §9.3 的包去向表在判断「某个契约该归谁」时仍有参考价值。
+## 9. 终态与留路（contract 解散后长什么样）
+
+> 本节即**目标终态**。可达性判定与前置条件见 §10：**可达**，但必须先完成 P1（把 30 个业务邻接文件搬出 `platform`）——它们目前把 38 个契约类型钉死在 contract。
+> 早期曾据「剥洋葱」误判为不可达，原因见 §10.1 的错判说明。
 
 > 本节记录长期目标，以及本次方案如何为它铺路。**本次不做 contract 解散**，本节只用于判断"现在这一步会不会返工"。
 
@@ -412,87 +414,73 @@ ragagent/
 
 ## 10. 终态与实施路径（第 2 期，2026-11-20 重写）
 
-> 本节改为**从终态反推**：先证明终态是否可达（有数字），再排路径。目标是不再出现"做到一半才发现行不通"。
+> 从终态反推：先证明是否可达，再排路径。所有判定带实测数字。
 
-### 10.1 终态判定：蓝图 §9.2 的 5 模块不可达
+### 10.1 可达性判定：蓝图 §9.2 的 5 模块**可达**，但有一道必须先清的前置
 
-**判据——剥洋葱测试**。一个契约类型能离开 `contract`，前提是 `contract` 内没有别的类型引用它（否则 contract 会反向依赖 app/引擎，编译即失败）。反复剥离直到不再变化，剩下的就是**不可约核**。
+**最初的错判**：曾用"剥洋葱"直接算 contract 的不可约核，得到 185 个无法剥离，据此判定"5 模块不可能"。
+**错在哪**：把 `platform` 当成纯技术层。实测 `platform` 里有 **30 个非 mixin 文件**直接引用业务契约——
+SSE 聊天流（`stream/` 5 个）、文档分块与图片增强（`knowledge/` 5 个）、提示词组装（`prompt/` 4 个）、
+Langfuse 装饰器（`tracing/decorators/` 4 个）、SSE Sink 与 RBAC 拦截器（`web/` 3 个）、
+文件服务（`storage/` 5 个）、审计（`audit/` 1 个）、工具 Schema（`tool/` 1 个）、事件类型（`event/` 1 个）、
+语言配置（`config/` 1 个）。**这些是业务代码住在了技术层**，它们把 38 个契约类型钉死在 contract。
 
-| 口径 | 可剥离 | 不可约核 |
-|---|---|---|
-| 现状（mixin 全留在 platform） | 77 | **211** |
-| mixin 随类型搬走（S1 机制已就绪，尚未执行） | 103 | **185** |
+只要把这 30 个文件搬回业务所在层，`platform` 就只剩通用面依赖，contract 便能一路搬空。
 
-核的构成（mixin 剥离口径）：
+**契约类型的三类归属（288 个）**
 
-| 原因 | 数量 | 说明 |
-|---|---|---|
-| 被 `platform` **真代码**引用 | 48 | SSE 编码、`JsonMappers`、可观测性——技术层必须有这些形状 |
-| 被核内其它契约类型引用 | 137 | `knowledge` 41 · `model` 26 · `session` 18 · `agent` 14 · `wiki` 13 …互相引用成网 |
+| 类别 | 数量 | 归属 | 前置 |
+|---|---|---|---|
+| 通用面（`error` / `event` / `json` / `text` / `pagination`） | 37 | `framework` | 需先把 contract 内对 `json`/`error` 的引用搬走 |
+| 只被 platform 的 **mixin 注册表**引用 | 24 | 随类型走（S1 机制就绪） | — |
+| 被 platform **真代码**引用 | 38 | 随那 30 个文件走 | **P1 必须先做** |
+| 其余 | 189 | `app/<域>/api` 或引擎 `api` | — |
 
-**结论：`contract` 无法消失。** 最多从 288 缩到 185（36%）。蓝图 §9.2 的"5 模块、contract 消失"在该代码库上**结构不可达**——不是工程量大，是剥到 185 个就剥不动了：再往下必须改域间通信方式或拆分 `knowledge`/`session` 的模型，那属于业务重构，不是分包。
-
-### 10.2 可达终态（6 模块）
+### 10.2 终态（5 模块，contract 消失）
 
 ```text
 backend/
-├── framework/          ← 现 platform 改名（包名保持 com.ragagent.platform，避免 2000+ 处 import 改动）
-├── model-runtime/      ← 主代码 + api/（可选，见 10.4 第 2 步）
-├── retrieval-engine/   ← 主代码 + api/
-├── agent-engine/       ← 主代码 + api/
-├── app/                ← 已完成（19 域 + config/ + 启动类）
-└── contract/           ← 保留：185 个跨域共享词汇类型
+├── framework/          ← 现 platform − 30 个业务邻接文件 + 37 个通用面类型
+├── model-runtime/      + api/（含从 contract.model 归位的类型）
+├── retrieval-engine/   + api/ + spi/
+├── agent-engine/       + api/ + spi/
+└── app/                ← 19 域（各带 api/）+ config/ + 启动类；1 个 jar，api/worker 两角色
 ```
 
-模块数 6（现状已是 6），差别只在命名与目录层级。
+### 10.3 五步路径（每步有前置、可独立验收）
 
-### 10.3 每步可行性（数字依据）
+| 步 | 内容 | 规模 | 前置 | 工时 |
+|---|---|---|---|---|
+| **P1** | 30 个业务邻接文件搬出 `platform`：`stream/`→`model-runtime`；`knowledge/`→`app/knowledge`；`prompt/`→按用途拆到 `app/session` 与 `model-runtime`；`tracing/decorators/`→`model-runtime`；`web/ServletSseSink`→`app/session`、`web/RbacInterceptor`→`app/auth`；`storage/`→`app/storage`；`audit/`→`app/audit`；`tool/`→`agent-engine`；`event/EventType`→`model-runtime`；`config/LanguageProperties`→`app/wiki` | 30 文件 · 11 组 | — | 2~3 天 |
+| **P2** | 12 个 `ContractJsonMixins*` 搬进各归属模块，注册 `JsonModuleProvider`（S1 机制就绪） | 12 文件 | P1 | 1 天 |
+| **P3** | contract 类型归位：`model`→`model-runtime/api`；`retrieval`/`vectorstore`→`retrieval-engine/api`；`agent`/`tool`→`agent-engine/api`；域名包→`app/<域>/api` | 251 类型 | P1+P2 | 5~8 天 |
+| **P4** | 37 个通用面类型下沉 `framework`（此时 contract 内已无人引用） | 37 类型 | P3 | 1 天 |
+| **P5** | 删 `contract`；`platform` 改名 `framework`；全部移入 `backend/`；CI 与 24 个守卫脚本路径适配 | — | P4 | 1~2 天 |
 
-| 步 | 内容 | 判定 | 依据 |
-|---|---|---|---|
-| **S7-a** | `platform` → `framework`（目录 + artifactId，**包名不动**） | ✅ **可行** | 纯改名，无依赖变化；18 个脚本 + 12 个 pom 同步 |
-| **S7-b** | 全部模块移入 `backend/` | ✅ **可行** | 同上；24 个脚本 + CI 工作目录适配 |
-| **S8** | ArchUnit → Modulith 边界 | ✅ **可行** | 必须在 S7 后；R-1/R-2 棘轮可平滑迁移 |
-| **S3-e** | 引擎面搬 26 个（`model` 11 · `agent` 9 · `tool` 4 · `vectorstore` 2） | ⚠️ **收益有限** | 让 `model-runtime/api` 等包名与蓝图一致，但只占 288 的 9%，且每批都要动 mixin |
-| **S3-d** | 域面搬 77 个 → `app/<域>/api` | ❌ **不建议** | `contract` 仍存 185 个，读者反而更难看到全貌；且会制造跨域 `api` 依赖（R-1 允许，但契约分散） |
-| **S5** | 域契约归位 | ❌ **不可行** | 单域专属仅 2 个，且都是语义错位（§9.7 闭包修正：2/288 = 0.7%） |
-| **S4** | 通用面下沉 framework | ❌ **不可行** | `error`/`event`/`json`/`text`/`pagination` 逐个实测都不该沉（§9.5：json 下沉会造成反向依赖，实测编译失败） |
+合计 **10~15 天**。P1 是分水岭：它不完成，P3 会被 38 个类型钉住（这就是之前"搬不动"的真实原因）。
 
-### 10.4 执行顺序（三步，每步独立可交付）
+### 10.4 每步验收
 
-**第 1 步：S7 改名与归位（1~2 天，零结构风险）**
-
-```text
-1) git mv platform framework；改 artifactId 与 5 个模块的依赖声明
-2) 建 backend/，6 个模块全部移入；改根 pom 的 <modules> 前缀
-3) 24 个守卫脚本的路径、4 份基线 JSON、模块矩阵、CI 工作目录
-4) 验收：mvn -f backend/pom.xml clean verify 绿 · 守卫 49/49
-```
-
-不变量：包名、类名、依赖方向、测试条数全部不变。
-
-**第 2 步：S3-e 引擎 api 包（1~2 天，可选）**
-
-只搬 26 个、按引擎分组，每组三件套（契约 + mixin + 引该 mixin 的 mapper）：
-
-| 组 | 契约 | mixin |
-|---|---|---|
-| `model-runtime/api` | 11 | `ContractJsonMixinsModel` / `ModelChat` |
-| `agent-engine/api` | 9+4 | `ContractJsonMixinsAgent` |
-| `retrieval-engine/api` | 2 | — |
-
-验收：金片 1339 逐字节不变。**若排期紧，此步可整体跳过**——它只影响包名美观，不影响任何闸门。
-
-**第 3 步：S8 边界校验切换（2 天）**
-
-R-1（跨域直连）、R-2（注解 SQL）从 Python 脚本迁进 ArchUnit/Modulith，`scripts/` 下同类检查退役。
-
-### 10.5 明确不做（防重提）
-
-| 项 | 不做的理由 |
+| 步 | 验收（缺一不可） |
 |---|---|
-| 解散 `contract` | 剥到 185 个就停（§10.1），结构不可达 |
-| 域契约回各域 | 单域专属 2 个，且语义错位（§9.7） |
-| 通用面下沉 | 五个包都不该沉，`json` 实测编译失败（§9.5） |
-| `PipelinePorts` 拆分 | 12 个接口分属 7 个域，拆分需要"域 api 包"先存在；而域 api 包已被证明不可行 |
-| 包名 `com.ragagent.platform` → `framework` | 2000+ 处 import 改动，收益为零（终态没要求包名） |
+| P1 | 全量绿；`platform` 对非通用面契约的引用降为 **0**；金片 1339 逐字节不变 |
+| P2 | 金片不变（mixin 换位置不改线格式） |
+| P3 | 每搬一组跑一次全量；`contract` 剩余类型数单调递减 |
+| P4 | `contract` 目录为空，可删模块 |
+| P5 | `mvn -f backend/pom.xml clean verify` 绿 · 守卫 49/49 |
+
+### 10.5 已知风险与对策
+
+| 风险 | 对策 |
+|---|---|
+| `platform/stream` 下沉 `model-runtime` 后，`app` 侧 SSE 需改注入点 | 保留 `platform` 侧的接口抽象（端口留在 framework），实现搬走 |
+| `prompt/` 4 个文件用途混杂（graph / model / session） | 按文件逐个判定，不整目录搬 |
+| P3 的 251 个类型会改掉约 1500 处 import | 按"组"推进（model / retrieval / agent / 各域），每组一次全量 |
+| 域 api 之间互相引用 | 同一模块内合法；R-1 只禁 `service`/`repository`/`adapter` 直连 |
+
+### 10.6 明确不做
+
+| 项 | 理由 |
+|---|---|
+| 包名 `com.ragagent.platform` → `framework` | 2000+ 处改动，收益为零（终态没要求包名） |
+| 保留 `contract` 作为"共享词汇层" | 只在 P1~P4 未完成前成立；完成后它是空目录 |
