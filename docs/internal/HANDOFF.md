@@ -110,7 +110,7 @@ H7（platform 判据换血）· H8（适配层逻辑化）· H9（管理面模�
     JAVA_HOME=/opt/homebrew/opt/openjdk@21 mvn -B verify
   ```
   **`ZZ_PG_JDBC` 必给**：`GrepChunksRecordingTest` 与 `DatabaseQueryRecordingTest` 默认连 `WeKnora`（CI 的库名），本机库名是 `RagAgent`；不给会在 domains 报 `database "WeKnora" does not exist`，两个测试设计为「不可达即失败、不许跳过」。
-  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒。**旧口径 5257 已过期**（`contract`/`platform`/`boot` 三个模块名都不存在）；2026-11-21 开工前重跑一次，把 `framework / model-runtime / retrieval-engine / agent-engine / app` 五段条数记进 §12 首行，之后每批对照。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
+  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒。**旧口径 5257 已过期**（`contract`/`platform`/`boot` 三个模块名都不存在）；2026-11-21 实测基线 **5256 / 失败 0 / 跳过 2** = framework 268 · model-runtime 286〔跳 1〕· retrieval-engine 321〔跳 1〕· agent-engine 157 · app 4224，之后每批对照。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
   **环境前置**：PG `max_connections=100`，多个 boot jar 残留会占满连接（实测 5 个实例 = 50 条 ⇒ `too many clients`）。跑闸门前先 `ps -Ao pid,command | grep '[b]oot/build/libs/boot'` 清残留。
 - **⚠️ IDE 自动构建会与 Maven 抢 `target/`**：2026-11-19 实测，`clean verify` 期间 IDE 写入半成品 class，domains 测试随机报 `Unresolved compilation problems`（JDT 专属措辞）或 `cannot access Xxx` / `incompatible types`，且每次报错的文件不同。**判别：换一个错误文件就是竞争，不是回归。**
   根因是语言服务器进程用 Homebrew openjdk **27** 启动（`ps -Ao command | grep eclipse.jdt.ls` 可证），与 Maven 的 21 不一致。分两层处理：
@@ -270,6 +270,7 @@ app             1489 件（17 个业务域 + config 装配根）
 
 | 批 | 日期 | 内容 | 读数 / 验证 |
 |---|---|---|---|
+| **基线重测** | 2026-11-21 | 守卫修复（port-map / consumers / A20 重锚）+ R10 同级 api 放行 + `shared` 解散计划 v2 后的全量闸门 | **BUILD SUCCESS 5:23** · **5256 / 0 / 2**（framework 268 · model-runtime 286〔跳 1〕· retrieval-engine 321〔跳 1〕· agent-engine 157 · app 4224）· 守卫 49/49 · 金片 1,339 未动 |
 | **P0** | 2026-11-19 | 新增 `scripts/gen-package-baseline.py`，静态生成三份基线（不启动应用）：`endpoint-inventory.json`（397 条控制器映射）、`bean-inventory.json`（45 Mapper / 23 `@Configuration` / 0 `@Aspect` / `@MapperScan` 通配 / `@ConfigurationPropertiesScan` 11 包 / `spring.factories` 1 处 / `logging.level` 1 条）、`cross-domain-imports.json`（19 域、11 条跨域边、19 个域均引 contract） | `--write` 后 `--check` 三份均无变化（可复现）；守卫 48/48 绿 |
 | **P1** | 2026-11-19 | 新增 `backend/app/src/test/java/com/ragagent/arch/PackageRestructureBoundaryTest`：**R-1** 跨域直连棘轮（19 域白名单，禁入对方 `repository`/`mapper`/`domain`/`service`/`controller`，基线 2 条边：`knowledge→wiki.service`、`session→agentmanagement.service`）；**R-2** 注解 SQL 精确计数（282 个方法，新增或减少都红，强制同步基线）。`ArchitectureRulesTest.MAIN` 改包内可见以复用一次性导入。四条原计划规则中三条已由既有 A7/A11/A11b/A16/A19/C10 覆盖，未重复造 | R-1/R-2 绿 · `ArchitectureRulesTest` 22 条绿 · boot 1,358 条绿 · domains 2,862 条绿（隔离目录） · 守卫 49/49 · 金片 1,339 未动 |
 | **P2-1** | 2026-11-19 | `agentmanagement`：`api/AgentLookupAdapter` → `adapter/`，包声明与测试同步移动，删空 `api` 包（该域无其它契约类）；`packages.md` 重新生成（357 包）。**P2 定义修正**：全仓 19 域分层已统一，无错位目录可移；唯一语义错位是 `api/` 装 Adapter（32 个 / 11 域），故 P2 改为 `api/` → `adapter/`，原 P4 的语义纠正由本批完成 | `AgentLookupAdapterTest` 2/2 绿（**clean 后确认只跑 2 条**——增量构建会残影出旧包的 4 条）· 三份快照无变化（397/45/11）· 守卫 49/49 |

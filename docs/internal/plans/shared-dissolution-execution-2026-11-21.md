@@ -317,4 +317,4 @@ WP6 收尾                ← 全部完成 + 拍板项落定
 | 批 | 日期 | 内容 | 验收数字（测试/守卫/金片） | 备注 |
 |---|---|---|---|---|
 | 基座 | 2026-11-21 | 守卫修复：port-map / contract-consumers / A20 重锚；R10 同级 api 放行；本文件 v2 重扫 + 补 §4.0 唯一归属总表（153 校验通过）+ WP4-C 接口映射 + WP6 批量手法 | 定向守卫 5 条绿 + 探针 2 条（同级 api 过 / 同级 service 红） | 全量 verify 未跑（定向：ArchitectureRulesTest 22/22 绿、50 个 run 行→脚本自计 49 守卫全绿），等开工基线 |
-| 基线 | | 开工全量跑一次 | | |
+| 基线 | 2026-11-21 | 全量 `mvn -B clean verify` + 49 守卫 | **5256 / 0 / 2**（framework 268 · model-runtime 286〔跳 1〕· retrieval-engine 321〔跳 1〕· agent-engine 157 · app 4224）· 守卫 **49/49** · BUILD SUCCESS 5:23 | 基线提交 `698437956` |
