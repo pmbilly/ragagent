@@ -9,7 +9,7 @@ import com.ragagent.auth.api.AuthUserErrors;
 import com.ragagent.auth.api.CreateUserResult;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.pagination.PageResult;
-import com.ragagent.framework.shared.apikey.APIKeyScopeContext;
+import com.ragagent.framework.tenant.APIKeyScopeContext;
 import com.ragagent.framework.web.JsonMappers;
 import java.util.Map;
 import org.slf4j.Logger;

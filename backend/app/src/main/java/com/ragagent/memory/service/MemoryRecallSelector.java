@@ -1,7 +1,7 @@
 package com.ragagent.memory.service;
 
 import com.ragagent.framework.shared.memory.MemoryKinds;
-import com.ragagent.framework.shared.tenant.MemoryConfig;
+import com.ragagent.framework.tenant.MemoryConfig;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.vector.MemoryVectorHit;

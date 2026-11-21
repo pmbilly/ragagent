@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.ragagent.datasource.domain.DataSourceConfig;
-import com.ragagent.framework.shared.tenant.APIPrincipalConfig;
+import com.ragagent.framework.tenant.APIPrincipalConfig;
 import com.ragagent.knowledge.wiki.domain.WikiConfig;
 import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.mcp.domain.McpAuthConfig;

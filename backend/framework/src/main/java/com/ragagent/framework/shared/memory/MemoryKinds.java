@@ -9,9 +9,9 @@ import java.util.List;
  * 便于按名字检索。</p>
  *
  * <p>{@code writeMode} 的两个取值刻意**不在这里**——它们已经落在
- * {@link com.ragagent.framework.shared.tenant.MemoryConfig#WRITE_MODE_EXPLICIT_ONLY} / {@link com.ragagent.framework.shared.tenant.MemoryConfig#WRITE_MODE_AUTO}，
+ * {@link com.ragagent.framework.tenant.MemoryConfig#WRITE_MODE_EXPLICIT_ONLY} / {@link com.ragagent.framework.tenant.MemoryConfig#WRITE_MODE_AUTO}，
  * 重复定义会让两处漂移。同理 {@code interestThreshold} 与
- * {@code MEMORY_DOC_AFFINITY_MIN_HITS} 也在 {@link com.ragagent.framework.shared.tenant.MemoryConfig} 上。</p>
+ * {@code MEMORY_DOC_AFFINITY_MIN_HITS} 也在 {@link com.ragagent.framework.tenant.MemoryConfig} 上。</p>
  */
 public final class MemoryKinds {
 

@@ -5,7 +5,7 @@ import com.ragagent.auth.api.ChatHistoryConfig;
 import com.ragagent.auth.api.RetrievalConfig;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.shared.retrieval.SearchResult;
-import com.ragagent.framework.shared.tenant.TenantConfigLookup;
+import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.llm.api.RankResult;

@@ -7,7 +7,7 @@ import com.ragagent.TestSchema;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.shared.memory.MemoryKeys;
 import com.ragagent.framework.shared.memory.MemoryKinds;
-import com.ragagent.framework.shared.tenant.MemoryConfig;
+import com.ragagent.framework.tenant.MemoryConfig;
 import com.ragagent.memory.MemoryContext;
 import com.ragagent.memory.api.MemoryRetrievalContext;
 import com.ragagent.memory.config.MemorySettings;

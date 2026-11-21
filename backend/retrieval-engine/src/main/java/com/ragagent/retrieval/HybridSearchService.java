@@ -12,7 +12,7 @@ import com.ragagent.framework.model.EmbeddingPort;
 import com.ragagent.framework.model.ModelFacts;
 import com.ragagent.framework.security.LogSanitizer;
 import com.ragagent.framework.shared.retrieval.SearchResult;
-import com.ragagent.framework.shared.tenant.TenantConfigLookup;
+import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.tracing.langfuse.LangfuseManager;
 import com.ragagent.framework.tracing.langfuse.Span;
 import com.ragagent.framework.web.JsonMappers;

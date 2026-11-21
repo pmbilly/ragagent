@@ -40,7 +40,7 @@ import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.html.UnicodeText;
 import com.ragagent.framework.security.LogSanitizer;
 import com.ragagent.framework.settings.SystemSettingRegistry;
-import com.ragagent.framework.shared.tenant.TenantRole;
+import com.ragagent.framework.tenant.TenantRole;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.framework.web.JsonMappers;

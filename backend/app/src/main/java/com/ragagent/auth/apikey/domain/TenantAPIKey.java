@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.framework.shared.apikey.APIKeyScopeType;
+import com.ragagent.framework.tenant.APIKeyScopeType;
 import java.time.OffsetDateTime;
 import java.util.List;
 

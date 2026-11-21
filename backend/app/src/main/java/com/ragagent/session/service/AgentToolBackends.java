@@ -36,7 +36,7 @@ import com.ragagent.framework.settings.ConversationProperties;
 import com.ragagent.framework.shared.agent.SearchAuth;
 import com.ragagent.framework.shared.knowledge.ChunkFacts;
 import com.ragagent.framework.shared.retrieval.SearchTarget;
-import com.ragagent.framework.shared.tenant.TenantConfigLookup;
+import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.knowledge.api.chunk.ChunkPageView;

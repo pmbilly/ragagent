@@ -1,8 +1,8 @@
 package com.ragagent.auth.apikey.controller.filter;
 
-import com.ragagent.framework.shared.apikey.APIKeyCapability;
-import com.ragagent.framework.shared.apikey.APIKeyScopeContext;
-import com.ragagent.framework.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.framework.tenant.APIKeyCapability;
+import com.ragagent.framework.tenant.APIKeyScopeContext;
+import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

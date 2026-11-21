@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.framework.shared.memory.MemoryKinds;
-import com.ragagent.framework.shared.tenant.MemoryConfig;
+import com.ragagent.framework.tenant.MemoryConfig;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;

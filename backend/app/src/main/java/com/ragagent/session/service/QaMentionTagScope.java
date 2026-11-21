@@ -4,7 +4,7 @@ package com.ragagent.session.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentengine.api.AgentLookup;
-import com.ragagent.framework.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
 import java.util.ArrayList;
 import java.util.HashSet;

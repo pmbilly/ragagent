@@ -3,8 +3,8 @@ package com.ragagent.framework.storage.support;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.ragagent.framework.shared.apikey.APIKeyScopeContext;
-import com.ragagent.framework.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.framework.tenant.APIKeyScopeContext;
+import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

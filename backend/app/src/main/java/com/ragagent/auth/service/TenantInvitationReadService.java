@@ -9,7 +9,7 @@ import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.error.ErrorCode;
-import com.ragagent.framework.shared.tenant.TenantRole;
+import com.ragagent.framework.tenant.TenantRole;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;

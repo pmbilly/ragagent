@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.persistence.PgJsonTypeHandler;
 import com.ragagent.framework.persistence.SecretJsonTypeHandler;
-import com.ragagent.framework.shared.tenant.APIPrincipalConfig;
+import com.ragagent.framework.tenant.APIPrincipalConfig;
 import java.time.OffsetDateTime;
 
 /**

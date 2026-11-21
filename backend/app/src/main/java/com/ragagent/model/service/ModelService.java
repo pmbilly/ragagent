@@ -8,7 +8,7 @@ import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.model.ModelFacts;
-import com.ragagent.framework.shared.tenant.TenantConfigLookup;
+import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ModelConfigDraft;
 import com.ragagent.llm.api.ModelConfigValidator;

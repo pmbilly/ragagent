@@ -1,6 +1,6 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.framework.shared.tenant.MemoryConfig;
+import com.ragagent.framework.tenant.MemoryConfig;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.memory.domain.MemoryExtractPayload;

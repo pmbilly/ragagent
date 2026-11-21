@@ -1,9 +1,9 @@
 package com.ragagent.session.controller;
 
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.shared.apikey.TenantAPIKeyScope;
 import com.ragagent.framework.shared.retrieval.SearchResult;
 import com.ragagent.framework.storage.support.Mode;
+import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.framework.web.ServletSseSink;
 import com.ragagent.session.dto.QaRequests.SearchKnowledgeRequest;

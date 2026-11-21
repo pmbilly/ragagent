@@ -10,7 +10,7 @@ import com.ragagent.auth.service.LoginResult;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.shared.tenant.TenantRole;
+import com.ragagent.framework.tenant.TenantRole;
 import com.ragagent.framework.web.JsonBodyErrors;
 import com.ragagent.framework.web.RequestFields;
 import com.ragagent.framework.web.ToolJson;

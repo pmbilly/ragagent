@@ -10,7 +10,7 @@ import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.shared.tenant.APIPrincipalConfig;
+import com.ragagent.framework.tenant.APIPrincipalConfig;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.framework.web.JsonBodyErrors;
 import com.ragagent.framework.web.JsonMappers;

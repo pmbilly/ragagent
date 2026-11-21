@@ -5,7 +5,7 @@ import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.auth.repository.UserRepository;
 import com.ragagent.framework.security.LogSanitizer;
-import com.ragagent.framework.shared.tenant.TenantRole;
+import com.ragagent.framework.tenant.TenantRole;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;

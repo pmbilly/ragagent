@@ -1,4 +1,5 @@
-package com.ragagent.framework.shared.apikey;
+package com.ragagent.framework.tenant;
+import java.util.Locale;
 
 /**
  * API Key 的作用域类型。
@@ -25,6 +26,6 @@ public final class APIKeyScopeType {
         if (scope == null) {
             return TENANT;
         }
-        return PLATFORM.equals(scope.trim().toLowerCase(java.util.Locale.ROOT)) ? PLATFORM : TENANT;
+        return PLATFORM.equals(scope.trim().toLowerCase(Locale.ROOT)) ? PLATFORM : TENANT;
     }
 }

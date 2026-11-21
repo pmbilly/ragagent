@@ -12,7 +12,7 @@ import com.ragagent.framework.prompt.PipelineConfig;
 import com.ragagent.framework.prompt.PromptSource;
 import com.ragagent.framework.settings.ConversationProperties;
 import com.ragagent.framework.shared.retrieval.SearchResult;
-import com.ragagent.framework.shared.tenant.TenantConfigLookup;
+import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.ChunkQueryPort;
 import com.ragagent.knowledge.api.KnowledgeBaseBatchQueryPort;

@@ -17,7 +17,7 @@ import com.ragagent.auth.api.UserLookupPort;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.shared.tenant.TenantRole;
+import com.ragagent.framework.tenant.TenantRole;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseCatalogPort;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

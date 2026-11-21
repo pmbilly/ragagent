@@ -11,7 +11,7 @@ import com.ragagent.auth.repository.TenantInvitationRepository;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.config.AppEnvLookup;
 import com.ragagent.framework.pagination.PageResult;
-import com.ragagent.framework.shared.tenant.TenantRole;
+import com.ragagent.framework.tenant.TenantRole;
 import com.ragagent.framework.web.JsonMappers;
 import java.security.SecureRandom;
 import java.time.Duration;

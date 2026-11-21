@@ -6,7 +6,7 @@ import com.ragagent.auth.dto.TenantMemberResponse;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.pagination.PageResult;
-import com.ragagent.framework.shared.tenant.TenantRole;
+import com.ragagent.framework.tenant.TenantRole;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

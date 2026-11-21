@@ -1,4 +1,4 @@
-package com.ragagent.framework.shared.tenant;
+package com.ragagent.framework.tenant;
 
 
 

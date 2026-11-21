@@ -7,7 +7,7 @@ import com.ragagent.auth.service.TenantService;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.shared.tenant.TenantRole;
+import com.ragagent.framework.tenant.TenantRole;
 import com.ragagent.framework.web.JsonBodyErrors;
 import com.ragagent.framework.web.ToolJson;
 import java.util.ArrayList;

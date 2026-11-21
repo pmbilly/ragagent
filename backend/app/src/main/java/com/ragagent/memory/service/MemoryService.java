@@ -1,8 +1,8 @@
 package com.ragagent.memory.service;
 
 import com.ragagent.framework.pagination.PageResult;
-import com.ragagent.framework.shared.tenant.MemoryConfig;
-import com.ragagent.framework.shared.tenant.TenantConfigLookup;
+import com.ragagent.framework.tenant.MemoryConfig;
+import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.web.ZeroTimeSerializer;
 import com.ragagent.memory.api.MemoryRecall;
 import com.ragagent.memory.api.MemoryRetrievalContext;

@@ -7,7 +7,7 @@ import com.ragagent.auth.dto.TenantResponse;
 import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.shared.tenant.TenantRole;
+import com.ragagent.framework.tenant.TenantRole;
 import com.ragagent.framework.web.JsonBodyErrors;
 import com.ragagent.framework.web.RequestFields;
 import java.util.List;

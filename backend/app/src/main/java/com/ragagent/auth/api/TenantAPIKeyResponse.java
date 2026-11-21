@@ -1,6 +1,6 @@
 package com.ragagent.auth.api;
 
-import com.ragagent.framework.shared.apikey.APIKeyScopeType;
+import com.ragagent.framework.tenant.APIKeyScopeType;
 import java.time.OffsetDateTime;
 import java.util.List;
 

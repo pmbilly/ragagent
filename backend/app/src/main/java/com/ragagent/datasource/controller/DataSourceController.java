@@ -12,7 +12,7 @@ import com.ragagent.datasource.service.KnowledgeBridge;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.framework.web.JsonMappers;

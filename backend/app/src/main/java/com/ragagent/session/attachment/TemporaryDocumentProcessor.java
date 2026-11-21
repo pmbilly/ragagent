@@ -3,7 +3,7 @@ package com.ragagent.session.attachment;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.knowledge.ImageRefRewriter;
-import com.ragagent.framework.shared.tenant.TenantConfigLookup;
+import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.DocReaderParsePort;
 import com.ragagent.knowledge.api.DocumentChunkingPort;

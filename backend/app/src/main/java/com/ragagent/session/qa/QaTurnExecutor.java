@@ -15,7 +15,7 @@ import com.ragagent.framework.shared.session.MessageExecutionContext;
 import com.ragagent.framework.shared.session.MessageImage;
 import com.ragagent.framework.shared.session.SessionLastRequestState;
 import com.ragagent.framework.shared.session.SseSink;
-import com.ragagent.framework.shared.tenant.TenantConfigLookup;
+import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.modelruntime.stream.StreamManager;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionLookupScope;

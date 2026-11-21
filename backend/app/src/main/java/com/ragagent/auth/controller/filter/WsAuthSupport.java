@@ -8,7 +8,7 @@ import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.ValidatedToken;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.config.TenantProperties;
-import com.ragagent.framework.shared.tenant.TenantRole;
+import com.ragagent.framework.tenant.TenantRole;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

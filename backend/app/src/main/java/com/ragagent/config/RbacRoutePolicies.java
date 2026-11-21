@@ -1,6 +1,6 @@
 package com.ragagent.config;
 
-import com.ragagent.framework.shared.tenant.TenantRole;
+import com.ragagent.framework.tenant.TenantRole;
 import com.ragagent.framework.web.RbacInterceptor;
 
 /**

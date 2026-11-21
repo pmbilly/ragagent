@@ -1,9 +1,9 @@
 package com.ragagent.storage.controller;
 
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.shared.tenant.TenantConfigLookup;
-import com.ragagent.framework.shared.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.framework.storage.fileserve.FileServeHttp;
+import com.ragagent.framework.tenant.TenantConfigLookup;
+import com.ragagent.framework.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.storage.fileserve.FileProxyService;
 import io.swagger.v3.oas.annotations.tags.Tag;

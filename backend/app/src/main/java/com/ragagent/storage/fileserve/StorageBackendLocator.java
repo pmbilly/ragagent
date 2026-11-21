@@ -1,7 +1,7 @@
 package com.ragagent.storage.fileserve;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.shared.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.framework.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.repository.StorageBackendRepository;
 

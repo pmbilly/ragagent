@@ -1,4 +1,4 @@
-package com.ragagent.framework.shared.apikey;
+package com.ragagent.framework.tenant;
 
 
 import com.ragagent.framework.error.BizException;

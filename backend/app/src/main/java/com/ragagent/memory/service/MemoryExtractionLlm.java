@@ -2,7 +2,7 @@ package com.ragagent.memory.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.framework.shared.memory.MemoryKinds;
-import com.ragagent.framework.shared.tenant.MemoryConfig;
+import com.ragagent.framework.tenant.MemoryConfig;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;

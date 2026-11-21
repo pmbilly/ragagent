@@ -4,7 +4,7 @@ package com.ragagent.auth.apikey.service;
 import com.ragagent.auth.apikey.dto.TenantAPIKeyRequest;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.shared.apikey.APIKeyCapability;
+import com.ragagent.framework.tenant.APIKeyCapability;
 import java.util.List;
 
 /**

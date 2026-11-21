@@ -10,7 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.shared.tenant.TenantConfigLookup;
+import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.llm.api.ModelConfigDraft;
 import com.ragagent.llm.api.ModelConfigValidator;
 import com.ragagent.llm.api.ModelParameters;

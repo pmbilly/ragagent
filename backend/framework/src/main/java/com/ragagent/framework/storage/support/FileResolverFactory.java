@@ -1,6 +1,6 @@
 package com.ragagent.framework.storage.support;
 
-import com.ragagent.framework.shared.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.framework.tenant.TenantConfigLookup.TenantStorageView;
 
 /**
  * 文件解析器（{@link Resolver}）的构造面（L1）：按"当前租户 + 进程级默认文件服务 + 后端解析器"

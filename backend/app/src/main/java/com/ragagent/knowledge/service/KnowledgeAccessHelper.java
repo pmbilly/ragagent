@@ -2,7 +2,7 @@ package com.ragagent.knowledge.service;
 
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;

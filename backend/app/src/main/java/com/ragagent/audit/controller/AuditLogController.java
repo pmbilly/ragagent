@@ -8,7 +8,7 @@ import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.shared.knowledge.KnowledgeBaseFacts;
 import com.ragagent.framework.shared.knowledge.KnowledgeBaseGateway;
-import com.ragagent.framework.shared.tenant.TenantRole;
+import com.ragagent.framework.tenant.TenantRole;
 import com.ragagent.framework.web.ApiResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;

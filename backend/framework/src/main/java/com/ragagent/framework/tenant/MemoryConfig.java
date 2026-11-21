@@ -1,4 +1,4 @@
-package com.ragagent.framework.shared.tenant;
+package com.ragagent.framework.tenant;
 
 import com.ragagent.framework.shared.memory.MemoryKeys;
 import com.ragagent.framework.shared.memory.MemoryKinds;

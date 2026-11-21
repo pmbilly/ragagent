@@ -12,7 +12,7 @@ import com.ragagent.framework.config.RetrievalDriverProperties;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.model.EmbeddingPort;
 import com.ragagent.framework.model.ModelFacts;
-import com.ragagent.framework.shared.tenant.TenantConfigLookup;
+import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.retrieval.api.ChunkSearchGateway;
 import com.ragagent.retrieval.api.KnowledgeBaseSearchFacts;
 import com.ragagent.retrieval.api.KnowledgeBaseSearchGateway;
