@@ -88,23 +88,22 @@
 :agent-engine      ──►  :framework  :model-runtime（模型上下文词汇）
 :retrieval-engine  ──►  :framework
 :model-runtime     ──►  :framework
-:framework         ──►  （无模块依赖：技术底座 + 共享词汇）
+:framework         ──►  （无模块依赖：技术底座 + 通用面 + 跨域词汇）
 ```
 
 | 模块 | 职责 | 依赖 |
 |---|---|---|
-| `:contract` | **契约面**：纯 JDK 的公开 API、SPI 与不可变载荷（agent / knowledge / session / model / retrieval / tool / pipeline / tenant / websearch / vectorstore …）。构建文件的生产依赖块为空（仅测试面有依赖）—— 契约纯度由编译期保证 | 无 |
-| `:platform` | **技术底座**：Web 统一外壳与错误形态、SSRF 防护、事件总线、SSE 流管理、追踪装饰、提示词与配置装载、通用文本/知识工具 | contract |
-| `:model-runtime` | **模型运行时**：26 家 LLM provider 的传输与出站请求体拼装、Embedding / 重排客户端族、模型上下文协议（工具调用与思考块解析）、抽取、Ollama 本地模型管理 | platform · contract |
-| `:retrieval-engine` | **检索引擎**：九种向量/检索后端的适配与注册、混合检索融合、重排管线、索引写入与向量店连通性探测 | platform · contract |
-| `:agent-engine` | **Agent 引擎**：ReAct 执行循环与阶段（think/act/observe/finalize）、工具注册表与工具框架、技能目录与装载、上下文压缩、预算与转向 | platform · contract · model-runtime |
+| `:framework` | **技术底座**：Web 统一外壳与错误形态、SSRF 防护、事件总线、SSE 流管理、追踪与装饰、提示词与配置装载、持久化方言与租户过滤、通用面（`error` / `event` / `json` / `text` / `pagination`）、跨域词汇（`vocabulary`）、租户与 API Key（`tenant`） | 无 |
+| `:model-runtime` | **模型运行时**：26 家 LLM provider 的传输与出站请求体拼装、Embedding / 重排客户端族、模型上下文协议（工具调用与思考块解析）、抽取、Ollama 本地模型管理、SSE 流泵与 langfuse 装饰 | framework |
+| `:retrieval-engine` | **检索引擎**：九种向量/检索后端的适配与注册、混合检索融合、重排管线、索引写入与向量店连通性探测 | framework |
+| `:agent-engine` | **Agent 引擎**：ReAct 执行循环与阶段（think/act/observe/finalize）、工具注册表与工具框架、技能目录与装载、上下文压缩、预算与转向 | framework · model-runtime |
 | `:app` | **应用（组合根 + 业务域）**：17 个业务域（知识库、会话、Wiki、Agent 管理、MCP（含工具审批）、IM、数据源、认证（含租户）、审计、记忆、收藏、系统设置……）含 51 个控制器与持久层，外加应用入口与 17 个全局装配类。只出不进（无任何模块依赖它） | 全部 |
 
 全部模块合计 **51 个业务控制器**（另有 1 个 `/health` 基础设施探针）。
 
 **三条设计原则**
 
-1. **契约面纯 JDK**：跨模块的公开类型集中在 `:contract`，不允许出现任何框架或实现依赖 —— 它同时是前端契约、API 形状与可测试边界的唯一来源。
+1. **契约面纯 JDK**：跨模块的公开类型集中在各模块的 `api` 包与 `framework.{error,event,json,text,pagination,vocabulary,tenant}`，不允许出现任何框架或实现依赖 —— 它同时是前端契约、API 形状与可测试边界的唯一来源。
 2. **端口下沉，实现在下**：业务域通过契约端口消费能力模块（检索、模型、Agent），实现由装配层注入；跨模块协作不靠"互相 import"，靠端口与组合根。
 3. **服务端分层**：HTTP 面只编排、领域服务承载用例、仓储封装软删与方言差异；一类型一文件，每个包有 `package-info.java` 说明职责与依赖判据。
 
@@ -242,13 +241,11 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 
 ```
 .
-├── contract/            # :contract  契约面（纯 JDK）
-├── platform/            # :platform  技术底座
+├── framework/           # :framework  技术底座 + 通用面 + 跨域词汇
 ├── model-runtime/       # :model-runtime  模型运行时
 ├── retrieval-engine/    # :retrieval-engine  检索引擎
 ├── agent-engine/        # :agent-engine  Agent 引擎
-├── domains/             # :domains   业务域（19 域）
-├── boot/                # :boot      组合根与应用入口
+├── app/                 # :app  组合根 + 17 个业务域
 ├── frontend/            # Vue 3 + Vite 控制台
 ├── docreader/           # 文档解析 gRPC proto
 ├── otlp-proto/          # OTLP 追踪 proto

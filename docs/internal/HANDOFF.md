@@ -13,7 +13,7 @@
 2. **基线核对**：先跑 §6 全量闸门，确认 `BUILD SUCCESSFUL` 与各模块测试条数（**numbers 守恒**；`framework`/`model-runtime`/`retrieval-engine`/`agent-engine`/`app` 任意一段缺失＝静默少跑）。
 3. **待办与读数都会过期**：宣称"未完成"或据此动手前先实测（`git log` / 守卫 / 脚本输出）；**以守卫为准**。
 4. **提交**：批次号 `(P#)`，写明验证方式；**推送等用户发话**（历史纪律，一字不改）。
-5. **越界即停**：动前端、动数据库、改模块划分（含解散 `shared` 命名空间），三者任一都要先回来问。`contract` 已解散，不再是待办项。
+5. **越界即停**：动前端、动数据库、改模块划分，三者任一都要先回来问。`contract` 与 `shared` 均已解散，不再是待办项。
 
 ## 0. 本次重构：目标、边界、阶段
 
@@ -29,7 +29,7 @@
 
 **阶段**：P0 基线 → P1 规则先行 → P2 纯包移动 → P3 类职责归位 → P4 `api` 语义与边界校验（见 §5）。
 
-**当前状态（2026-11-21）**：**P0~P4 与 S1、S6 已完成**；7 模块 → **5 模块**（`domains`→`app`、`boot`→`app`、`contract` 解散）。P0 三份基线可复现；P1 两条棘轮在线（R-1 跨域直连 1 条 · R-2 注解 SQL 282）；P2 32 个 Adapter 迁入 `adapter/`；P3 回引 62 → 消 40 / 留 22；P4 跨域直连 2 → 1。**当前主线是 `shared` 解散**。全量条数以开工基线重测为准（旧口径 5257 已过期：`contract`/`platform`/`boot` 三个模块名都不存在了；S6 记录为 app 4220 · model-runtime 321 · retrieval-engine 286 · agent-engine 157）。守卫 **49/49**。
+**当前状态（2026-11-21）**：**P0~P4 与 S1、S6 已完成**；7 模块 → **5 模块**（`domains`→`app`、`boot`→`app`、`contract` 解散）。P0 三份基线可复现；P1 两条棘轮在线（R-1 跨域直连 1 条 · R-2 注解 SQL 282）；P2 32 个 Adapter 迁入 `adapter/`；P3 回引 62 → 消 40 / 留 22；P4 跨域直连 2 → 1。**`shared` 已于 2026-11-22 清零**（153 个业务词汇全部归位：各域/引擎 `api` + `framework.{vocabulary,tenant}`）。全量条数以开工基线重测为准（旧口径 5257 已过期：`contract`/`platform`/`boot` 三个模块名都不存在了；S6 记录为 app 4220 · model-runtime 321 · retrieval-engine 286 · agent-engine 157）。守卫 **49/49**。
 
 ## 1. 仓库身份与分支
 
@@ -65,7 +65,7 @@
 
 ## 4. 两条判定标准（沿用，2026-10-16 拍板）
 
-**`*/api`**：跨域词汇的落点（原 `contract` 的唯一性判据沿用）；零框架依赖（C1）；**每一个类都能回答"谁在跨域消费我"**（`gen-contract-consumers.py`）。`framework/shared` 是解散期的暂存区，不是合法落点。
+**`*/api`**：跨域词汇的落点（原 `contract` 的唯一性判据沿用）；零框架依赖（C1）；**每一个类都能回答"谁在跨域消费我"**（`gen-contract-consumers.py`）。跨模块形状的落点是各模块 `api` 与 `framework.vocabulary`（单包：拆兄弟包会成环）；`shared` 已不存在。
 
 **platform**：只剩**技术适配**（框架、HTTP、存储、提示词、追踪、事件基建）；**任何业务形状出现即红灯**。
 
@@ -110,7 +110,7 @@ H7（platform 判据换血）· H8（适配层逻辑化）· H9（管理面模�
     JAVA_HOME=/opt/homebrew/opt/openjdk@21 mvn -B verify
   ```
   **`ZZ_PG_JDBC` 必给**：`GrepChunksRecordingTest` 与 `DatabaseQueryRecordingTest` 默认连 `WeKnora`（CI 的库名），本机库名是 `RagAgent`；不给会在 domains 报 `database "WeKnora" does not exist`，两个测试设计为「不可达即失败、不许跳过」。
-  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒。**旧口径 5257 已过期**（`contract`/`platform`/`boot` 三个模块名都不存在）；2026-11-21 实测基线 **5256 / 失败 0 / 跳过 2** = framework 268 · model-runtime 286〔跳 1〕· retrieval-engine 321〔跳 1〕· agent-engine 157 · app 4224，之后每批对照。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
+  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒。**旧口径 5257 已过期**（`contract`/`platform`/`boot` 三个模块名都不存在）；2026-11-22 实测 **5256 / 失败 0 / 跳过 2** = framework 217 · model-runtime 333〔跳 1〕· retrieval-engine 321〔跳 1〕· agent-engine 157 · app 4228，之后每批对照。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
   **环境前置**：PG `max_connections=100`，多个 boot jar 残留会占满连接（实测 5 个实例 = 50 条 ⇒ `too many clients`）。跑闸门前先 `ps -Ao pid,command | grep '[b]oot/build/libs/boot'` 清残留。
 - **⚠️ IDE 自动构建会与 Maven 抢 `target/`**：2026-11-19 实测，`clean verify` 期间 IDE 写入半成品 class，domains 测试随机报 `Unresolved compilation problems`（JDT 专属措辞）或 `cannot access Xxx` / `incompatible types`，且每次报错的文件不同。**判别：换一个错误文件就是竞争，不是回归。**
   根因是语言服务器进程用 Homebrew openjdk **27** 启动（`ps -Ao command | grep eclipse.jdt.ls` 可证），与 Maven 的 21 不一致。分两层处理：
@@ -137,7 +137,7 @@ H7（platform 判据换血）· H8（适配层逻辑化）· H9（管理面模�
 > 计数口径：`<模块>/src/main/java/**/*.java`，**不含 package-info**（2026-11-21 实测）。
 
 ```
-framework        355 件（platform 技术适配 + shared 188 个待解散类型）
+framework        233 件（技术适配 + 通用面 + 跨域词汇 vocabulary / tenant）
 model-runtime    158 件（llm · modelruntime · embedding · modelcontext · rerank）
 retrieval-engine 114 件（engine 69 · retrieval/api · graph · support/artifact/config/telemetry）
 agent-engine      90 件（根 · tool · compaction · skills · prompt · budget · domain）
@@ -145,8 +145,8 @@ app             1489 件（17 个业务域 + config 装配根）
 
 依赖方向：app → 全部；agent-engine → framework, model-runtime；
           retrieval-engine / model-runtime → framework；framework → 无模块依赖（技术底座）。
-（`contract` 已解散：原契约类型两处——已归位到各域/引擎 `api`；其余暂存 `framework/shared`，
-  待 `shared` 解散清零。`shared` 是暂存区，不是合法落点。）
+（`contract` 与 `shared` 均已解散：跨域类型已归位到各域/引擎 `api`，以及
+  `framework.vocabulary`（30 个跨域形状）与 `framework.tenant`（租户 / API Key）。）
 ```
 
 ### 8.2 域内分层（上一阶段方案 §6，本次沿用）
@@ -259,7 +259,7 @@ app             1489 件（17 个业务域 + config 装配根）
 | 12 | 向量店进程内引擎注册表 | 设计取舍 | 注册表为空，连通性探测走厂商直连 |
 | 13 | OpenSearch 超大批量 scroll | 待实现 | 单次写入超批量上限时不分页；调小分块批量 |
 | 14 | Ollama 私部署分支 | 设计取舍 | 只支持 `localhost`，不处理自定义私部署路径 |
-| 15 | 工具 SPI 迁入契约层 | 已关闭 | `AgentTool` / `BaseTool` 暂存 `framework/shared/tool`（`ToolDefinitions` 已在 `model-runtime/llm/api`），随 `shared` 解散归 `agent-engine/api` |
+| 15 | 工具 SPI 迁入契约层 | 已关闭 | `AgentTool` / `BaseTool` 已在 `agent-engine/api`（`ToolDefinitions` 在 `model-runtime/llm/api`） |
 | 16 | 审批闸门未装配 | 设计取舍 | MCP OAuth / 工具审批受理分支返回 500，不静默放行 |
 | 17 | IM 知识桥接的存疑接线 | 待核查 | 生产 `/info` 与 `/search` 的 KB/检索面恒为空 |
 | 18 | Wiki 页面 → chunks 同步 | 待实现 | Wiki 内容不写入 `chunks`，不参与常规 RAG；走 Wiki 专用检索 |
