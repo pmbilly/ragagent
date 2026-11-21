@@ -3,6 +3,7 @@ package com.ragagent.session.rag.plugin;
 
 import com.ragagent.auth.api.TenantWebSearchConfigPort;
 import com.ragagent.knowledge.api.KnowledgeBaseQueryPort;
+import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.retrieval.api.WebResultConverter;
@@ -10,7 +11,6 @@ import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.runtime.SessionTrace;
 import com.ragagent.shared.error.PipelinePortException;
-import com.ragagent.shared.knowledge.KnowledgeBaseView;
 import com.ragagent.shared.retrieval.SearchParams;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.retrieval.SearchTarget;

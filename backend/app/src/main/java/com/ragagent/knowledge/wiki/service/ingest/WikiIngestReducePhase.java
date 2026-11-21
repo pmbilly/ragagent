@@ -1,5 +1,8 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
+import com.ragagent.knowledge.api.chunk.KnowledgeSpanPort;
+import com.ragagent.knowledge.api.wiki.ExtractedItem;
+import com.ragagent.knowledge.api.wiki.SlugUpdate;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.domain.WikiPage;
 import com.ragagent.knowledge.wiki.prompt.WikiPrompts;
@@ -7,10 +10,7 @@ import com.ragagent.knowledge.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.knowledge.wiki.service.page.WikiSlugHandles;
 import com.ragagent.knowledge.wiki.service.page.WikiTextUtils;
 import com.ragagent.platform.text.CodePointOrder;
-import com.ragagent.shared.knowledge.KnowledgeSpanPort;
 import com.ragagent.shared.model.LlmChatClient;
-import com.ragagent.shared.wiki.ExtractedItem;
-import com.ragagent.shared.wiki.SlugUpdate;
 import com.ragagent.shared.wiki.WikiLanguageSupport;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -269,7 +269,8 @@ final class WikiIngestReducePhase {
                 draft.affectedType = "ingest"; // 新增覆盖 retract 的类型判定
             }
         }
-        draft.language = WikiLanguageSupport.resolveSlugUpdateLanguage(updates);
+        draft.language = WikiLanguageSupport.resolveSlugUpdateLanguage(
+                updates.stream().map(SlugUpdate::getLanguage).toList());
         return draft;
     }
 

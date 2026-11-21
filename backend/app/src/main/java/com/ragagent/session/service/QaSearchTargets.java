@@ -1,7 +1,7 @@
 package com.ragagent.session.service;
 
-import com.ragagent.shared.knowledge.KnowledgeBaseRowView;
-import com.ragagent.shared.knowledge.KnowledgeRowView;
+import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
+import com.ragagent.knowledge.api.kb.KnowledgeBaseRowView;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

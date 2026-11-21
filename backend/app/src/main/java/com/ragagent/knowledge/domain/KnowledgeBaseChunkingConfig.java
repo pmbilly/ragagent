@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.domain;
 
-import com.ragagent.shared.knowledge.config.ChunkingConfigView;
+import com.ragagent.knowledge.api.config.ChunkingConfigView;
 import java.util.List;
 
 /**

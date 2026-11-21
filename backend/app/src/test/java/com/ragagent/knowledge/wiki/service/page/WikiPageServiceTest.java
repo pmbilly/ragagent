@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
+import com.ragagent.knowledge.api.wiki.WikiException;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.api.WikiIndex;
 import com.ragagent.knowledge.wiki.api.WikiIndexEntry;
@@ -19,7 +20,6 @@ import com.ragagent.knowledge.wiki.domain.page.WikiPageLite;
 import com.ragagent.knowledge.wiki.domain.page.WikiStats;
 import com.ragagent.knowledge.wiki.repository.WikiFolderRepository;
 import com.ragagent.knowledge.wiki.repository.WikiPageRepository;
-import com.ragagent.shared.wiki.WikiException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;

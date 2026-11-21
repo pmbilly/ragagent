@@ -2,6 +2,8 @@ package com.ragagent.config.json;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.ragagent.knowledge.api.wiki.ExtractedItem;
+import com.ragagent.knowledge.api.wiki.SlugUpdate;
 import com.ragagent.platform.web.JsonModuleProvider;
 import com.ragagent.retrieval.api.ImageInfo;
 import com.ragagent.shared.auth.UserPreferences;
@@ -13,8 +15,6 @@ import com.ragagent.shared.tenant.ParserEngineConfig;
 import com.ragagent.shared.tenant.RetrievalConfig;
 import com.ragagent.shared.tenant.StorageEngineConfig;
 import com.ragagent.shared.tenant.WebSearchConfig;
-import com.ragagent.shared.wiki.ExtractedItem;
-import com.ragagent.shared.wiki.SlugUpdate;
 
 /**
  * 业务域面载荷的 Jackson 装配（wiki / tenant 配置 / 会话 / 记忆 / 认证 / 网页搜索）。

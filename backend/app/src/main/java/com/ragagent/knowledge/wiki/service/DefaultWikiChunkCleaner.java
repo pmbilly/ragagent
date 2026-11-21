@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.wiki.service;
 
-import com.ragagent.shared.knowledge.ChunkPort;
+import com.ragagent.knowledge.api.chunk.ChunkPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

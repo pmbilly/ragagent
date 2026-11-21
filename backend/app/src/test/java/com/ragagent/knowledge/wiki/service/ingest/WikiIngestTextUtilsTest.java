@@ -3,10 +3,10 @@ package com.ragagent.knowledge.wiki.service.ingest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.knowledge.api.WikiImageMarkup;
+import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiIngestPreviews;
 import com.ragagent.knowledge.wiki.service.page.WikiTextUtils;
 import com.ragagent.shared.knowledge.ChunkView;
-import com.ragagent.shared.wiki.ExtractedItem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

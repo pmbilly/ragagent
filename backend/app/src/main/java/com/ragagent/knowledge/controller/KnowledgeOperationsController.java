@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.controller;
 
+import com.ragagent.knowledge.api.chunk.KnowledgeParseStatus;
 import com.ragagent.knowledge.assembler.KnowledgeAssembler;
 import com.ragagent.knowledge.controller.vo.BatchTaskRespVo;
 import com.ragagent.knowledge.controller.vo.FolderMoveRespVo;
@@ -28,7 +29,6 @@ import com.ragagent.shared.apikey.APIKeyScopeContext;
 import com.ragagent.shared.apikey.TenantAPIKeyScope;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.knowledge.KnowledgeParseStatus;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.ArrayList;

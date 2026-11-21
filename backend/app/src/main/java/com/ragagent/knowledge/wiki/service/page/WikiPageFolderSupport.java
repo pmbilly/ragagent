@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.wiki.service.page;
 
+import com.ragagent.knowledge.api.wiki.WikiException;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.domain.WikiCategoryPaths;
 import com.ragagent.knowledge.wiki.domain.WikiPage;
@@ -10,7 +11,6 @@ import com.ragagent.knowledge.wiki.domain.folder.WikiFolderNotEmptyException;
 import com.ragagent.knowledge.wiki.domain.folder.WikiFolderNotFoundException;
 import com.ragagent.knowledge.wiki.repository.WikiFolderRepository;
 import com.ragagent.knowledge.wiki.repository.WikiPageRepository;
-import com.ragagent.shared.wiki.WikiException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;

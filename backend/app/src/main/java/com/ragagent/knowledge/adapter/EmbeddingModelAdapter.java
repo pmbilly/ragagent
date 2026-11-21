@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.adapter;
 
+import com.ragagent.knowledge.api.kb.EmbeddingModelPort;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.llm.api.ModelRuntime;
-import com.ragagent.shared.knowledge.EmbeddingModelPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

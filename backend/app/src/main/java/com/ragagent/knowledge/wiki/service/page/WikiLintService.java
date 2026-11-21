@@ -1,13 +1,13 @@
 package com.ragagent.knowledge.wiki.service.page;
 
+import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;
+import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
+import com.ragagent.knowledge.api.wiki.WikiException;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.domain.WikiPage;
 import com.ragagent.knowledge.wiki.domain.issue.WikiLintIssue;
 import com.ragagent.knowledge.wiki.domain.issue.WikiLintReport;
 import com.ragagent.knowledge.wiki.domain.page.WikiStats;
-import com.ragagent.shared.knowledge.KnowledgeBaseLookup;
-import com.ragagent.shared.knowledge.KnowledgeBaseView;
-import com.ragagent.shared.wiki.WikiException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -1,5 +1,8 @@
 package com.ragagent.knowledge.wiki.service.page;
 
+import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;
+import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
+import com.ragagent.knowledge.api.wiki.WikiException;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.api.WikiIndex;
 import com.ragagent.knowledge.wiki.api.WikiIndexEntry;
@@ -22,9 +25,6 @@ import com.ragagent.knowledge.wiki.service.WikiChunkCleaner;
 import com.ragagent.knowledge.wiki.service.ingest.graph.WikiGraphCalculator;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiPendingOpsCounter;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.knowledge.KnowledgeBaseLookup;
-import com.ragagent.shared.knowledge.KnowledgeBaseView;
-import com.ragagent.shared.wiki.WikiException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

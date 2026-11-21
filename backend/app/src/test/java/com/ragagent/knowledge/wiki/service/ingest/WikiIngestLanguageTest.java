@@ -9,7 +9,6 @@ import com.ragagent.knowledge.wiki.domain.ingest.WikiPendingOp;
 import com.ragagent.knowledge.wiki.prompt.WikiPromptTemplate;
 import com.ragagent.knowledge.wiki.prompt.WikiPrompts;
 import com.ragagent.shared.text.Whitespace;
-import com.ragagent.shared.wiki.SlugUpdate;
 import com.ragagent.shared.wiki.WikiLanguageSupport;
 import java.util.List;
 import java.util.Map;
@@ -113,33 +112,21 @@ class WikiIngestLanguageTest {
 
         // 用更新自己携带的语言
         assertThat(WikiLanguageSupport.resolveSlugUpdateLanguage(
-                List.of(slugUpdate("Korean")))).isEqualTo("Korean");
+                List.of("Korean"))).isEqualTo("Korean");
 
         // 页面会聚合多篇文档的贡献，第一个不保证带语言
         assertThat(WikiLanguageSupport.resolveSlugUpdateLanguage(
-                List.of(slugUpdateWithType("retract", ""), slugUpdate("Korean"))))
+                List.of("", "Korean")))
                 .isEqualTo("Korean");
 
         // 回落到请求语言
         assertThat(WikiLanguageSupport.resolveSlugUpdateLanguage(
-                List.of(slugUpdateWithType("retract", ""), slugUpdateWithType("entity", ""))))
+                List.of("", "")))
                 .isEqualTo("English");
 
         // 空更新集同样回落
         assertThat(WikiLanguageSupport.resolveSlugUpdateLanguage(null)).isEqualTo("English");
         assertThat(WikiLanguageSupport.resolveSlugUpdateLanguage(List.of())).isEqualTo("English");
-    }
-
-    private static SlugUpdate slugUpdate(String language) {
-        SlugUpdate u = new SlugUpdate("entity/x", SlugUpdate.TYPE_ENTITY);
-        u.setLanguage(language);
-        return u;
-    }
-
-    private static SlugUpdate slugUpdateWithType(String type, String language) {
-        SlugUpdate u = new SlugUpdate("entity/x", type);
-        u.setLanguage(language);
-        return u;
     }
 
     // ── prompt 不渲染空语言 ──

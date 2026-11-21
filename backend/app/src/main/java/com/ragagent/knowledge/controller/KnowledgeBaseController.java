@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.controller;
 
+import com.ragagent.knowledge.api.kb.KnowledgeBaseResponse;
 import com.ragagent.knowledge.assembler.KnowledgeAssembler;
 import com.ragagent.knowledge.controller.vo.CopyKnowledgeBaseRespVo;
 import com.ragagent.knowledge.controller.vo.DuplicateKnowledgeBaseRespVo;
@@ -25,7 +26,6 @@ import com.ragagent.shared.apikey.APIKeyScopeContext;
 import com.ragagent.shared.apikey.TenantAPIKeyScope;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.knowledge.KnowledgeBaseResponse;
 import com.ragagent.shared.retrieval.SearchParams;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.storage.support.PublicModeForbiddenException;

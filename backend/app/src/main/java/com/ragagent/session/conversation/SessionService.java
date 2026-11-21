@@ -1,5 +1,6 @@
 package com.ragagent.session.conversation;
 
+import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.llm.api.ModelRuntime;
@@ -23,7 +24,6 @@ import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
 import com.ragagent.shared.event.Event;
 import com.ragagent.shared.event.EventBusInterface;
-import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
 import com.ragagent.shared.model.ChatMessage;
 import com.ragagent.shared.model.ChatOptions;
 import com.ragagent.shared.model.ChatResponse;

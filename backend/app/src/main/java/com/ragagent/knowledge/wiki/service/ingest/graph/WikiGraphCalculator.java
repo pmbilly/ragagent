@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.wiki.service.ingest.graph;
 
+import com.ragagent.knowledge.api.wiki.WikiException;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.domain.WikiPage;
 import com.ragagent.knowledge.wiki.domain.graph.WikiGraph;
-import com.ragagent.shared.wiki.WikiException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;

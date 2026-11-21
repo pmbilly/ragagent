@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.platform.access.TenantContext;
@@ -19,7 +20,6 @@ import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.session.support.SessionNotFoundException;
-import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
 import com.ragagent.websearch.api.WebSearchTempStatePort;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

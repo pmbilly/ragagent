@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.wiki.service.page;
 
+import com.ragagent.knowledge.api.wiki.WikiException;
 import com.ragagent.knowledge.wiki.api.WikiIndex;
 import com.ragagent.knowledge.wiki.api.WikiIndexEntry;
 import com.ragagent.knowledge.wiki.domain.WikiPage;
@@ -8,7 +9,6 @@ import com.ragagent.knowledge.wiki.domain.page.WikiPageListResponse;
 import com.ragagent.knowledge.wiki.domain.page.WikiStats;
 import com.ragagent.knowledge.wiki.repository.WikiPageRepository;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiPendingOpsCounter;
-import com.ragagent.shared.wiki.WikiException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

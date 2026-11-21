@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.api;
 
-import com.ragagent.shared.knowledge.KnowledgeBaseView;
+import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import java.util.List;
 
 /** 知识库批量取。 */

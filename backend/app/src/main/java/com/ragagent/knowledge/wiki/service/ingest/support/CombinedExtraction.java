@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.wiki.service.ingest.support;
 
-import com.ragagent.shared.wiki.ExtractedItem;
+import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import java.util.ArrayList;
 import java.util.List;
 

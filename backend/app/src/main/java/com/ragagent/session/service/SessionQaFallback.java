@@ -1,6 +1,8 @@
 package com.ragagent.session.service;
 
 
+import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
+import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
 import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.platform.access.TenantContextSnapshot;
@@ -15,8 +17,6 @@ import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.shared.event.Event;
 import com.ragagent.shared.event.EventBusInterface;
 import com.ragagent.shared.event.payload.AgentFinalAnswerData;
-import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
-import com.ragagent.shared.knowledge.KnowledgeRowView;
 import com.ragagent.shared.model.ChatMessage;
 import com.ragagent.shared.model.ChatOptions;
 import com.ragagent.shared.model.ChatResponse;

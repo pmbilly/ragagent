@@ -1,12 +1,12 @@
 package com.ragagent.knowledge.adapter;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;
+import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
-import com.ragagent.shared.knowledge.KnowledgeBaseLookup;
-import com.ragagent.shared.knowledge.KnowledgeBaseView;
 import com.ragagent.shared.knowledge.KnowledgeView;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;

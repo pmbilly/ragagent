@@ -1,13 +1,13 @@
 package com.ragagent.knowledge.dto.kb;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.knowledge.api.config.AsrConfigView;
+import com.ragagent.knowledge.api.config.ChunkingConfigView;
+import com.ragagent.knowledge.api.config.ImageProcessingConfigView;
+import com.ragagent.knowledge.api.config.IndexingStrategyView;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeBaseVlmConfig;
 import com.ragagent.knowledge.support.KnowledgeBaseConfigMaps;
-import com.ragagent.shared.knowledge.config.AsrConfigView;
-import com.ragagent.shared.knowledge.config.ChunkingConfigView;
-import com.ragagent.shared.knowledge.config.ImageProcessingConfigView;
-import com.ragagent.shared.knowledge.config.IndexingStrategyView;
 
 public record CreateKnowledgeBaseRequest(
         String name,

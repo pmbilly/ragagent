@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.controller.vo;
 
-import com.ragagent.shared.knowledge.KnowledgeBaseResponse;
+import com.ragagent.knowledge.api.kb.KnowledgeBaseResponse;
 
 /**
  * {@code DuplicateKnowledgeBaseResponse} 的 HTTP 响应体。

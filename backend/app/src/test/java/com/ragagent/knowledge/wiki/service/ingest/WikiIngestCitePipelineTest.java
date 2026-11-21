@@ -6,12 +6,12 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.knowledge.api.chunk.ChunkPort;
+import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import com.ragagent.knowledge.wiki.prompt.WikiPrompts;
 import com.ragagent.knowledge.wiki.service.page.NewSlugFromCitation;
-import com.ragagent.shared.knowledge.ChunkPort;
 import com.ragagent.shared.knowledge.ChunkView;
 import com.ragagent.shared.model.LlmChatClient;
-import com.ragagent.shared.wiki.ExtractedItem;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

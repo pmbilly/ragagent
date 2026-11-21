@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.support;
 
+import com.ragagent.knowledge.api.chunk.ChunkPageView;
+import com.ragagent.knowledge.api.chunk.ChunkRowView;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.knowledge.ChunkPageView;
-import com.ragagent.shared.knowledge.ChunkRowView;
 import com.ragagent.shared.pagination.PageResult;
 import java.util.ArrayList;
 import java.util.List;

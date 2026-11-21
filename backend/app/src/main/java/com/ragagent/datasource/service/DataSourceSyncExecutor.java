@@ -15,7 +15,7 @@ import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.connector.StreamHandler;
 import com.ragagent.datasource.domain.connector.StreamingConnector;
-import com.ragagent.shared.knowledge.KnowledgeBaseRowView;
+import com.ragagent.knowledge.api.kb.KnowledgeBaseRowView;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;

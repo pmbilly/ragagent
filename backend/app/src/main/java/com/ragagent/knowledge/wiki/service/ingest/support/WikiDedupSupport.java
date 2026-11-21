@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.wiki.service.ingest.support;
 
+import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import com.ragagent.knowledge.wiki.domain.page.WikiPageLite;
-import com.ragagent.shared.wiki.ExtractedItem;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

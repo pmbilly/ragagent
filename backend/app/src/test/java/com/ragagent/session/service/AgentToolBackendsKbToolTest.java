@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.auth.service.TenantService;
+import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.knowledge.wiki.api.WikiPageOpsPort;
 import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.memory.api.MemorySearchHit;
@@ -18,7 +19,6 @@ import com.ragagent.retrieval.api.HybridSearchPort;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.dto.MessageSearchGroupItem;
 import com.ragagent.session.dto.MessageSearchResult;
-import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
 import com.ragagent.shared.retrieval.SearchTarget;
 import com.ragagent.websearch.api.WebSearchExecutor;
 import java.time.LocalDate;

@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.knowledge.api.chunk.KnowledgeParseStatus;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
-import com.ragagent.shared.knowledge.KnowledgeParseStatus;
 import java.time.OffsetDateTime;
 import java.util.List;
 

@@ -1,13 +1,13 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
+import com.ragagent.knowledge.api.wiki.ExtractedItem;
+import com.ragagent.knowledge.api.wiki.SlugUpdate;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.domain.page.WikiPageLite;
 import com.ragagent.knowledge.wiki.repository.ingest.WikiIdentityClaimStore;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiDedupSupport;
 import com.ragagent.knowledge.wiki.service.page.WikiPageService;
-import com.ragagent.shared.wiki.ExtractedItem;
-import com.ragagent.shared.wiki.SlugUpdate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

@@ -2,6 +2,7 @@ package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.domain.page.WikiPageLite;
 import com.ragagent.knowledge.wiki.prompt.WikiPrompts;
@@ -11,7 +12,6 @@ import com.ragagent.knowledge.wiki.service.page.WikiPageService;
 import com.ragagent.knowledge.wiki.service.page.WikiTextUtils;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.shared.model.LlmChatClient;
-import com.ragagent.shared.wiki.ExtractedItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;

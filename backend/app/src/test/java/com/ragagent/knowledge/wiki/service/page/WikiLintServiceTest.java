@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
+import com.ragagent.knowledge.api.wiki.WikiException;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.api.WikiPageNotFoundException;
 import com.ragagent.knowledge.wiki.domain.WikiPage;
 import com.ragagent.knowledge.wiki.domain.issue.WikiLintIssue;
 import com.ragagent.knowledge.wiki.domain.issue.WikiLintReport;
 import com.ragagent.knowledge.wiki.repository.WikiPageRepository;
-import com.ragagent.shared.wiki.WikiException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;

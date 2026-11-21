@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.wiki.service;
 
+import com.ragagent.knowledge.api.kb.EmbeddingModelPort;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelRuntime;
-import com.ragagent.shared.knowledge.EmbeddingModelPort;
 import com.ragagent.shared.model.LlmChatClient;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  *   <li>chat：{@code ModelCatalogPort.findModel}（含"downloading → 500"状态闸门，来自模型域）
  *       → {@link ModelRuntime#chatClientFor}（构造与并发闸门装饰收在 model-runtime 一处）。</li>
  *   <li>embedding：先校验模型类型确为 embedding，再复用
- *       {@link com.ragagent.shared.knowledge.EmbeddingModelPort}（L1 端口；实现侧仍是最小 OpenAI 兼容客户端）。</li>
+ *       {@link com.ragagent.knowledge.api.kb.EmbeddingModelPort}（L1 端口；实现侧仍是最小 OpenAI 兼容客户端）。</li>
  * </ul>
  *
  * <p>跨域口径与 {@code memory.service.DefaultMemoryModelResolver} 一致：只经契约面

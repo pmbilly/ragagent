@@ -1,9 +1,9 @@
 package com.ragagent.session.service;
 
+import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
+import com.ragagent.knowledge.api.kb.KnowledgeBaseRowView;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.shared.knowledge.KnowledgeBaseRowView;
-import com.ragagent.shared.knowledge.KnowledgeRowView;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;

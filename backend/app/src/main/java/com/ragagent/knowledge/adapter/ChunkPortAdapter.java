@@ -1,12 +1,12 @@
 package com.ragagent.knowledge.adapter;
 
+import com.ragagent.knowledge.api.chunk.ChunkPort;
+import com.ragagent.knowledge.api.projection.ChunkProjectionAdapter;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.support.ChunkRowViews;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
-import com.ragagent.shared.knowledge.ChunkPort;
 import com.ragagent.shared.knowledge.ChunkView;
-import com.ragagent.shared.knowledge.projection.ChunkProjectionAdapter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
  * chunk 读写面（知识族内直接依赖：wiki 摄取与页面渲染注入本类）。
  *
  * <p>"实体 → 载荷"的公用投影在
- * {@link com.ragagent.shared.knowledge.projection.ChunkProjectionAdapter#view}
- * /{@link com.ragagent.shared.knowledge.projection.ChunkProjectionAdapter#viewAll}。
+ * {@link com.ragagent.knowledge.api.projection.ChunkProjectionAdapter#view}
+ * /{@link com.ragagent.knowledge.api.projection.ChunkProjectionAdapter#viewAll}。
  *
  * <p>四个方法的过滤条件/降级姿态与迁移前的 wiki 侧实现<b>逐字一致</b>：
  * {@code textChunks} 来自 {@code WikiIngestBatchHandler}、{@code chunksByIds} 来自

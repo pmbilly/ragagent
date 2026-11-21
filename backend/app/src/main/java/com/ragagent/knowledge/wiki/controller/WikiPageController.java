@@ -2,10 +2,10 @@ package com.ragagent.knowledge.wiki.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.audit.api.WikiActivityAudit;
+import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;
 import com.ragagent.knowledge.wiki.service.page.WikiLintService;
 import com.ragagent.knowledge.wiki.service.page.WikiPageService;
 import com.ragagent.platform.web.ApiResult;
-import com.ragagent.shared.knowledge.KnowledgeBaseLookup;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.ObjectProvider;

@@ -169,11 +169,11 @@ public final class WikiLanguageSupport {
      * 一个页面会聚合多篇文档的贡献，因此语言取<b>第一个携带语言</b>的更新；
      * 都没有则回落到请求语言（{@code languageNameFromContext}）。
      */
-    public static String resolveSlugUpdateLanguage(List<SlugUpdate> updates) {
-        if (updates != null) {
-            for (SlugUpdate u : updates) {
-                if (u != null && u.getLanguage() != null && !u.getLanguage().isEmpty()) {
-                    return u.getLanguage();
+    public static String resolveSlugUpdateLanguage(List<String> languages) {
+        if (languages != null) {
+            for (String language : languages) {
+                if (language != null && !language.isEmpty()) {
+                    return language;
                 }
             }
         }

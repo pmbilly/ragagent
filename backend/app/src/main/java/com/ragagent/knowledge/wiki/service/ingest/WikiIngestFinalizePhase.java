@@ -2,6 +2,7 @@ package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.knowledge.wiki.domain.TaskPendingOp;
 import com.ragagent.knowledge.wiki.domain.WikiConfig;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiFinalizeRow;
@@ -12,7 +13,6 @@ import com.ragagent.knowledge.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.knowledge.wiki.service.page.WikiCrossLinker;
 import com.ragagent.platform.access.TenantScopes;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.knowledge.KnowledgeBaseView;
 import com.ragagent.shared.model.LlmChatClient;
 import com.ragagent.shared.wiki.WikiLanguageSupport;
 import java.util.ArrayList;

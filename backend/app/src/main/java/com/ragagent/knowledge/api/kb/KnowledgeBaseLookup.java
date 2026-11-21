@@ -1,0 +1,60 @@
+package com.ragagent.knowledge.api.kb;
+import com.ragagent.shared.knowledge.KnowledgeView;
+
+
+
+/**
+ * 知识库 / 知识条目的**只读端口**。
+ *
+ * <p>{@code wiki} 域需要「按 id 取知识库」「按 id 取知识条目」「判断知识条目是否已不可用」，
+ * 但不应依赖 {@code knowledge} 的领域模型与 mapper。端口定义在中性包 {@code common.knowledge}，
+ * 由 {@code knowledge} 侧实现（与本项目其他端口同法：接口进 common、实现留业务域）。</p>
+ *
+ * <p><b>本端口只覆盖读侧</b>；chunk 读写与知识行收尾属知识族内部调用（不经契约端口），
+ * span 与嵌入仍见 {@link com.ragagent.knowledge.api.chunk.KnowledgeSpanPort} /
+ * {@link com.ragagent.knowledge.api.kb.EmbeddingModelPort}。</p>
+ */
+public interface KnowledgeBaseLookup {
+
+    /**
+     * 按 id 取知识库（<b>软删过滤</b>：{@code deleted_at IS NULL}，{@code LIMIT 1}）。
+     *
+     * <p>调用方据此区分「库里没有」（404）与「不是你的」（403）——因此查询<b>不带空间过滤</b>，
+     * 由调用方比对 {@link KnowledgeBaseView#getTenantId()}。</p>
+     *
+     * @return 视图；不存在返回 {@code null}
+     */
+    KnowledgeBaseView knowledgeBaseById(String kbId);
+
+    /**
+     * 按 id 取知识库（<b>不过滤软删</b>，{@code LIMIT 1}）——给健康检查类调用方用，
+     * 与迁移前 {@code WikiLintService} 的行为逐字一致。
+     *
+     * @return 视图；不存在返回 {@code null}
+     */
+    KnowledgeBaseView knowledgeBaseByIdIncludingDeleted(String kbId);
+
+    /**
+     * 按 id 取知识条目（软删过滤：{@code deleted_at IS NULL}，{@code LIMIT 1}）。
+     *
+     * @return 视图；不存在返回 {@code null}
+     */
+    KnowledgeView knowledgeById(String knowledgeId);
+
+    /**
+     * 知识条目是否**已不可用**：不存在 / 已软删 / 解析状态为删除中或已取消。
+     *
+     * <p>仓储缺位（装配裁剪）时返回 {@code false}（保守地当作"还在"）；查询异常亦按迁移前的
+     * 语义处理（{@code true}）。wiki 侧的"墓碑表"判定不在此端口内（属 wiki 自己的存储）。</p>
+     */
+    boolean knowledgeGone(String knowledgeId);
+
+    /**
+     * 知识条目是否**仍存活**：存在且未软删（{@code deleted_at IS NULL}，{@code LIMIT 1}）。
+     *
+     * <p>与 {@code #knowledgeGone(String)} 的区别：本方法<b>不</b>看解析状态
+     * （健康检查只关心"还在不在"），且仓储缺位时无法判定按 {@code false}（与迁移前的
+     * {@code WikiLintService.knowledgeExistsByIdOnly} 逐字一致）。</p>
+     */
+    boolean knowledgeExists(String knowledgeId);
+}

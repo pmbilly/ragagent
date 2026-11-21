@@ -1,10 +1,10 @@
 package com.ragagent.knowledge.adapter;
 
 import com.ragagent.knowledge.api.ChunkQueryPort;
+import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
+import com.ragagent.knowledge.api.chunk.ChunkRowView;
+import com.ragagent.knowledge.api.projection.ChunkProjectionAdapter;
 import com.ragagent.shared.knowledge.ChunkFacts;
-import com.ragagent.shared.knowledge.ChunkRowView;
-import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
-import com.ragagent.shared.knowledge.projection.ChunkProjectionAdapter;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;

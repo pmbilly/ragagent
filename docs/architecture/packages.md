@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-373 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+377 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -133,6 +133,13 @@
 | `:backend` | `com.ragagent.knowledge` | 知识库域：知识的存储、处理管线与检索面。 |
 | `:backend` | `com.ragagent.knowledge.adapter` | 知识库 · 端口实现（11 个）：ChunkPort / KnowledgeCatalog / KnowledgeBaseCatalog / KnowledgeBaseLookup / Knowled |
 | `:backend` | `com.ragagent.knowledge.api` | knowledge 域对外契约。 |
+| `:backend` | `com.ragagent.knowledge.api.catalog` | 知识目录复合端口及其能力分面。 |
+| `:backend` | `com.ragagent.knowledge.api.chunk` | chunk 视图、载荷与读取端口。 |
+| `:backend` | `com.ragagent.knowledge.api.config` | 知识库配置形状（入库 / 解析 / 存储 / VLM 的 jsonb 配置列）。 |
+| `:backend` | `com.ragagent.knowledge.api.error` | 知识域错误载荷。 |
+| `:backend` | `com.ragagent.knowledge.api.kb` | 知识库视图、批量取与行投影。 |
+| `:backend` | `com.ragagent.knowledge.api.projection` | 实体 → 视图的投影助手。 |
+| `:backend` | `com.ragagent.knowledge.api.wiki` | wiki 词汇（页面、抽取项、语言）。 |
 | `:backend` | `com.ragagent.knowledge.assembler` | 领域对象与 HTTP 出入参之间的装配：只做字段搬运与空值处理，不含业务判断。 |
 | `:backend` | `com.ragagent.knowledge.chunker` | 知识库 · 分块：HeuristicSplitter / DocumentProfiler / HeadingHierarchy…。 |
 | `:backend` | `com.ragagent.knowledge.client` | 知识库出站客户端：DocReaderClient（文档解析服务）。 |
@@ -326,9 +333,6 @@
 | `:backend` | `com.ragagent.shared.graph` | 图谱契约面：图数据/节点/关系/命名空间。 |
 | `:backend` | `com.ragagent.shared.json` | 契约 · JSON：ByteKeyOrder / JsonValues / ZeroTimes。 |
 | `:backend` | `com.ragagent.shared.knowledge` | 知识契约面：分块/库/文档的事实、视图、网关与端口。 |
-| `:backend` | `com.ragagent.shared.knowledge.config` | 知识库配置视图：ASR / 分块 / 图片处理 / 索引策略 / 存储 / 存储 provider / VLM 的配置形状。 |
-| `:backend` | `com.ragagent.shared.knowledge.error` | 知识库领域错误：DuplicateKnowledgeDetails / DuplicateKnowledgeException。 |
-| `:backend` | `com.ragagent.shared.knowledge.projection` | 知识库投影：把实体行视图映射为契约视图/事实的唯一实现 （KnowledgeBaseViews / ChunkProjectionAdapter / KnowledgeProjectionAdapter）。 |
 | `:backend` | `com.ragagent.shared.memory` | 记忆契约面：配置/条目视图/键与类目/召回与检索上下文。 |
 | `:backend` | `com.ragagent.shared.model` | 模型契约面：模型事实、运行时载荷与跨域能力端口。 |
 | `:backend` | `com.ragagent.shared.pagination` | 分页契约：统一的 com.ragagent.shared.pagination.PageResult。 |

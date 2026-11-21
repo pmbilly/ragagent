@@ -28,18 +28,6 @@
     "com/ragagent/knowledge/wiki/api/WikiPageView.java": "wiki 页面视图，应回 wiki 域；H6"
   },
   "fields": {
-    "com/ragagent/contract/knowledge/ChunkRowView.java": {
-      "fields": 30,
-      "reason": "持久层行，字段≈表列；H6 回域"
-    },
-    "com/ragagent/contract/knowledge/KnowledgeRowView.java": {
-      "fields": 30,
-      "reason": "持久层行，字段≈表列；H6 回域"
-    },
-    "com/ragagent/contract/knowledge/KnowledgeBaseResponse.java": {
-      "fields": 32,
-      "reason": "HTTP 响应载体（控制器直接用）；H6 回 knowledge/dto"
-    },
     "com/ragagent/contract/retrieval/SearchResult.java": {
       "fields": 25,
       "reason": "检索命中元数据（跨模块消费）；H6 评估拆分"
@@ -59,6 +47,18 @@
     "com/ragagent/knowledge/wiki/api/WikiPageView.java": {
       "fields": 27,
       "reason": "wiki 页面视图；H6 回域"
+    },
+    "com/ragagent/knowledge/api/chunk/ChunkRowView.java": {
+      "fields": 30,
+      "reason": "持久层行，字段≈表列；收窄属 H6 治理"
+    },
+    "com/ragagent/knowledge/api/chunk/KnowledgeRowView.java": {
+      "fields": 30,
+      "reason": "持久层行，字段≈表列；收窄属 H6 治理"
+    },
+    "com/ragagent/knowledge/api/kb/KnowledgeBaseResponse.java": {
+      "fields": 32,
+      "reason": "知识库响应聚合体（DTO 形状由前端契约锁定）；收窄属 H6 治理"
     }
   }
 }

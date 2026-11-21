@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.wiki.domain.folder;
 
-import com.ragagent.shared.wiki.WikiException;
+import com.ragagent.knowledge.api.wiki.WikiException;
 
 /**
  * 同一父目录下已存在同名活跃文件夹。

@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.wiki.service.ingest.support;
 
+import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import com.ragagent.knowledge.wiki.service.page.NewSlugFromCitation;
 import com.ragagent.knowledge.wiki.service.page.WikiTextUtils;
-import com.ragagent.shared.wiki.ExtractedItem;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;

@@ -2,6 +2,7 @@ package com.ragagent.knowledge.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.knowledge.api.projection.ChunkProjectionAdapter;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
 import com.ragagent.knowledge.mapper.ChunkMapper;
@@ -16,7 +17,6 @@ import com.ragagent.platform.text.CleanInvalidUtf8;
 import com.ragagent.retrieval.api.ChunkSearchGateway;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.shared.knowledge.ChunkFacts;
-import com.ragagent.shared.knowledge.projection.ChunkProjectionAdapter;
 import com.ragagent.shared.pagination.PageResult;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

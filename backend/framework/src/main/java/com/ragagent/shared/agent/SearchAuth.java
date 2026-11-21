@@ -2,6 +2,8 @@ package com.ragagent.shared.agent;
 
 
 import com.ragagent.shared.knowledge.ChunkFacts;
+import com.ragagent.shared.knowledge.ChunkView;
+import com.ragagent.shared.knowledge.KnowledgeView;
 import com.ragagent.shared.retrieval.SearchTarget;
 import com.ragagent.shared.retrieval.SearchTarget.SearchTargets;
 import java.util.ArrayList;

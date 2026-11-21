@@ -2,10 +2,10 @@ package com.ragagent.session.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentengine.api.AgentLookup;
+import com.ragagent.knowledge.api.kb.KnowledgeBaseRowView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.shared.apikey.APIKeyScopeContext;
 import com.ragagent.shared.apikey.TenantAPIKeyScope;
-import com.ragagent.shared.knowledge.KnowledgeBaseRowView;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
