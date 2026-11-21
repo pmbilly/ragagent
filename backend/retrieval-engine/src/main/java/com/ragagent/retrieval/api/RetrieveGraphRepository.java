@@ -1,7 +1,5 @@
-package com.ragagent.shared.retrieval;
+package com.ragagent.retrieval.api;
 
-import com.ragagent.shared.graph.GraphData;
-import com.ragagent.shared.graph.NameSpace;
 import java.util.List;
 
 /**

@@ -1,6 +1,6 @@
 package com.ragagent.websearch.api;
 
-import com.ragagent.shared.websearch.WebSearchResult;
+import com.ragagent.retrieval.api.WebSearchResult;
 import java.util.List;
 
 /**

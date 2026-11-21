@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.api.projection;
 
 import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
-import com.ragagent.shared.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.retrieval.api.KnowledgeDocumentFacts;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;

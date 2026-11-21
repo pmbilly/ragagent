@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.api;
 
-import com.ragagent.shared.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.retrieval.api.KnowledgeDocumentFacts;
 import java.util.List;
 
 /** 知识批量取。 */

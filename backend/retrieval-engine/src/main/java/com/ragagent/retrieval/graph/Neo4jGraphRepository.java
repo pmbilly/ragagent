@@ -1,10 +1,10 @@
 package com.ragagent.retrieval.graph;
 
-import com.ragagent.shared.graph.GraphData;
+import com.ragagent.retrieval.api.GraphData;
+import com.ragagent.retrieval.api.NameSpace;
+import com.ragagent.retrieval.api.RetrieveGraphRepository;
 import com.ragagent.shared.graph.GraphNode;
 import com.ragagent.shared.graph.GraphRelation;
-import com.ragagent.shared.graph.NameSpace;
-import com.ragagent.shared.retrieval.RetrieveGraphRepository;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

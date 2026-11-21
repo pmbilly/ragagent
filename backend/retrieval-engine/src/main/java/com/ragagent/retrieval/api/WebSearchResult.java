@@ -1,4 +1,4 @@
-package com.ragagent.shared.websearch;
+package com.ragagent.retrieval.api;
 
 import java.time.OffsetDateTime;
 

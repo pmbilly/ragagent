@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.graph;
 
-import com.ragagent.shared.retrieval.RetrieveGraphRepository;
+import com.ragagent.retrieval.api.RetrieveGraphRepository;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;

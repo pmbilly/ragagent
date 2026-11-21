@@ -1,7 +1,6 @@
 package com.ragagent.retrieval.api;
 
 
-import com.ragagent.shared.knowledge.KnowledgeDocumentFacts;
 import java.util.List;
 
 /**

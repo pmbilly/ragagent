@@ -7,7 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.shared.websearch.WebSearchResult;
+import com.ragagent.retrieval.api.WebSearchResult;
 import com.ragagent.websearch.api.WebSearchFilters;
 import com.ragagent.websearch.config.WebSearchProviderParams;
 import com.ragagent.websearch.domain.WebSearchProviderEntity;

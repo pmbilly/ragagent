@@ -1,8 +1,8 @@
 package com.ragagent.websearch.adapter;
 
 import com.ragagent.platform.access.TenantContext;
+import com.ragagent.retrieval.api.WebSearchResult;
 import com.ragagent.shared.tenant.WebSearchConfig;
-import com.ragagent.shared.websearch.WebSearchResult;
 import com.ragagent.websearch.api.WebSearchExecutor;
 import com.ragagent.websearch.api.WebSearchRequest;
 import com.ragagent.websearch.api.WebSearchRunPort;

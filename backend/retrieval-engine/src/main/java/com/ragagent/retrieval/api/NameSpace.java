@@ -1,4 +1,4 @@
-package com.ragagent.shared.graph;
+package com.ragagent.retrieval.api;
 
 import java.util.ArrayList;
 import java.util.List;

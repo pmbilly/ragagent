@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.api;
 
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
-import com.ragagent.shared.retrieval.SearchParams;
+import com.ragagent.retrieval.api.SearchParams;
 import com.ragagent.shared.retrieval.SearchResult;
 import java.util.List;
 import java.util.Map;

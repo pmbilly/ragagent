@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.ragagent.platform.web.JsonModuleProvider;
 import com.ragagent.retrieval.api.ConnectionConfig;
 import com.ragagent.retrieval.api.IndexConfig;
-import com.ragagent.shared.retrieval.SearchParams;
+import com.ragagent.retrieval.api.SearchParams;
 import com.ragagent.shared.retrieval.SearchResult;
 
 /**

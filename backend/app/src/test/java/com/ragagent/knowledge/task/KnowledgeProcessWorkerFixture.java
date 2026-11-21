@@ -15,8 +15,8 @@ import com.ragagent.knowledge.service.image.ExtractedImageStore;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelRuntime;
+import com.ragagent.retrieval.api.RetrieveGraphRepository;
 import com.ragagent.retrieval.api.VectorIndexStore;
-import com.ragagent.shared.retrieval.RetrieveGraphRepository;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 

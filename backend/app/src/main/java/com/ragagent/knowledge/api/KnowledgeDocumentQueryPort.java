@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.api;
 
-import com.ragagent.shared.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.retrieval.api.KnowledgeDocumentFacts;
 import java.util.List;
 
 /** 知识文档查询面：按租户过滤的单条 / 批量读取。 */

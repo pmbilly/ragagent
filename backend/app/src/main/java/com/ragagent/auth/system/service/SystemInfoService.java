@@ -1,7 +1,7 @@
 package com.ragagent.auth.system.service;
 
 import com.ragagent.platform.config.RetrievalDriverProperties;
-import com.ragagent.shared.retrieval.RetrieveGraphRepository;
+import com.ragagent.retrieval.api.RetrieveGraphRepository;
 import java.sql.Connection;
 import java.time.Duration;
 import java.time.Instant;

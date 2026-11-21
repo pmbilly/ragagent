@@ -1,7 +1,7 @@
 package com.ragagent.websearch.api;
 
+import com.ragagent.retrieval.api.WebSearchResult;
 import com.ragagent.shared.tenant.WebSearchConfig;
-import com.ragagent.shared.websearch.WebSearchResult;
 import java.util.List;
 
 /** web 搜索执行面：providerId + 执行面配置 + 查询。 */

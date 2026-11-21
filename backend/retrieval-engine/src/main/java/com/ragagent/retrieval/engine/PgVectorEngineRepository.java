@@ -1,11 +1,11 @@
 package com.ragagent.retrieval.engine;
 
 import com.ragagent.retrieval.api.IndexRow;
+import com.ragagent.retrieval.api.SearchParams;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
-import com.ragagent.shared.retrieval.SearchParams;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;

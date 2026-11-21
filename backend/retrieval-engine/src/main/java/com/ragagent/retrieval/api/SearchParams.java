@@ -1,4 +1,4 @@
-package com.ragagent.shared.retrieval;
+package com.ragagent.retrieval.api;
 
 import java.util.List;
 

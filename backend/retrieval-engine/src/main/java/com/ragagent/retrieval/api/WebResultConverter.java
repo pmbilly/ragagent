@@ -1,7 +1,6 @@
 package com.ragagent.retrieval.api;
 
 import com.ragagent.shared.retrieval.SearchResult;
-import com.ragagent.shared.websearch.WebSearchResult;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
