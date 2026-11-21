@@ -3,12 +3,12 @@ package com.ragagent.audit.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.audit.api.AuditAction;
 import com.ragagent.audit.api.AuditOutcome;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.repository.AuditLogRepository;
-import com.ragagent.framework.shared.audit.AuditAction;
 import com.ragagent.framework.web.JsonMappers;
 import java.time.Clock;
 import java.time.Duration;

@@ -1,13 +1,13 @@
 package com.ragagent.agent.tool;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agentengine.api.AgentTool;
 import com.ragagent.agentengine.api.Cleanable;
 import com.ragagent.agentengine.api.McpCatalogGuardedTool;
 import com.ragagent.agentengine.api.McpToolingGateway;
 import com.ragagent.agentengine.api.ToolRegistryPort;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.shared.agent.ToolCallTarget;
-import com.ragagent.framework.shared.tool.AgentTool;
 import com.ragagent.framework.shared.tool.ToolCancellation;
 import com.ragagent.framework.shared.tool.ToolExecContext;
 import com.ragagent.framework.shared.tool.ToolOutput;

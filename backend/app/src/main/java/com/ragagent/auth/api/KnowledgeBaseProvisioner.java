@@ -1,4 +1,4 @@
-package com.ragagent.framework.shared.tenant;
+package com.ragagent.auth.api;
 
 /**
  * 知识库的**命令端口**（跨域"由知识域建行"的最小接口，与只读端口 {@link com.ragagent.framework.shared.knowledge.KnowledgeBaseGateway} 分列）。

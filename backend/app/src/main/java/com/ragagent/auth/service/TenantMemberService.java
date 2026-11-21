@@ -2,6 +2,7 @@ package com.ragagent.auth.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.audit.api.AuditAction;
 import com.ragagent.audit.api.AuditOutcome;
 import com.ragagent.audit.api.AuditWritePort;
 import com.ragagent.auth.domain.TenantMember;
@@ -12,7 +13,6 @@ import com.ragagent.auth.repository.UserRepository;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.framework.shared.apikey.APIKeyScopeContext;
-import com.ragagent.framework.shared.audit.AuditAction;
 import com.ragagent.framework.shared.tenant.TenantRole;
 import com.ragagent.framework.web.JsonMappers;
 import java.time.OffsetDateTime;

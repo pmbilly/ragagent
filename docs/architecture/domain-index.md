@@ -9,9 +9,9 @@
 
 | 种类 | 域数 | 文件 | 控制器 | 说明 |
 |---|---:|---:|---:|---|
-| **产品能力** | 6 | 966 | 21 | 直接产生用户价值、按产品需求演进的业务能力。 |
+| **产品能力** | 6 | 967 | 21 | 直接产生用户价值、按产品需求演进的业务能力。 |
 | **集成适配** | 6 | 596 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
-| **控制面** | 2 | 183 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
+| **控制面** | 2 | 185 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
 | **能力配置** | 2 | 58 | 5 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
 | **初始化向导** | 1 | 11 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
 
@@ -19,7 +19,7 @@
 
 | 域 | 种类 | 文件 | 控制器 | 对外契约面 | 前端页面 |
 |---|---|---:|---:|---:|---|
-| `knowledge` | 产品能力 | 547 | 9 | — | `views/knowledge · views/knowledge/wiki` |
+| `knowledge` | 产品能力 | 548 | 9 | — | `views/knowledge · views/knowledge/wiki` |
 | `session` | 产品能力 | 212 | 8 | — | `views/chat` |
 | `memory` | 产品能力 | 101 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
 | `agenttools` | 产品能力 | 66 | — | — | `views/chat（工具结果渲染）` |
@@ -31,8 +31,8 @@
 | `storage` | 集成适配 | 74 | 3 | — | `views/settings/StorageBackendSettings.vue` |
 | `websearch` | 集成适配 | 63 | 3 | — | `views/settings/WebSearchSettings.vue` |
 | `embedchannel` | 集成适配 | 30 | 1 | — | `views/embed` |
-| `auth` | 控制面 | 158 | 8 | — | `views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue · views/settings/panels` |
-| `audit` | 控制面 | 25 | 1 | — | `views/settings/panels/SystemAuditLog.vue` |
+| `auth` | 控制面 | 159 | 8 | — | `views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue · views/settings/panels` |
+| `audit` | 控制面 | 26 | 1 | — | `views/settings/panels/SystemAuditLog.vue` |
 | `model` | 能力配置 | 38 | 4 | — | `views/settings/ModelSettings.vue` |
 | `vectorstore` | 能力配置 | 20 | 1 | — | `views/settings/VectorStoreSettings.vue` |
 | `initialization` | 初始化向导 | 11 | 1 | — | `views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue` |

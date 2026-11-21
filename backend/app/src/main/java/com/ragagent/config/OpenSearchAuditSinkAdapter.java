@@ -1,11 +1,11 @@
 package com.ragagent.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.audit.api.AuditAction;
 import com.ragagent.audit.api.AuditOutcome;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.shared.audit.AuditAction;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository;
 import org.slf4j.Logger;

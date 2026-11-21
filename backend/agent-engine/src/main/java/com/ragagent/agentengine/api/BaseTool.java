@@ -1,4 +1,4 @@
-package com.ragagent.framework.shared.tool;
+package com.ragagent.agentengine.api;
 
 /**
  * 工具基类：name / description / schema 三件套与共享的输出格式化函数。

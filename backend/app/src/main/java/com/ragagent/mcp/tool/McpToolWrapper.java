@@ -1,6 +1,6 @@
 package com.ragagent.mcp.tool;
 
-import com.ragagent.framework.shared.tool.AgentTool;
+import com.ragagent.agentengine.api.AgentTool;
 import com.ragagent.framework.shared.tool.ToolExecContext;
 import com.ragagent.framework.shared.tool.ToolRequest;
 import com.ragagent.framework.shared.tool.ToolResult;

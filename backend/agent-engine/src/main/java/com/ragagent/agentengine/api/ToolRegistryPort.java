@@ -1,6 +1,5 @@
 package com.ragagent.agentengine.api;
 
-import com.ragagent.framework.shared.tool.AgentTool;
 import com.ragagent.framework.shared.tool.ToolCancellation;
 import com.ragagent.framework.shared.tool.ToolExecContext;
 import com.ragagent.framework.shared.tool.ToolResult;

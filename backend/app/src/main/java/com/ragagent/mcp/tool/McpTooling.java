@@ -2,10 +2,10 @@ package com.ragagent.mcp.tool;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.agentengine.api.AgentTool;
 import com.ragagent.agentengine.api.McpToolingGateway;
 import com.ragagent.agentengine.api.ToolRegistryPort;
 import com.ragagent.framework.shared.agent.ToolCallTarget;
-import com.ragagent.framework.shared.tool.AgentTool;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ToolCall;

@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.service.faq;
 
 import com.ragagent.audit.api.ActivityAuditRecorder;
-import com.ragagent.framework.shared.audit.AuditAction;
+import com.ragagent.audit.api.AuditAction;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;

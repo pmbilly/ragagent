@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.ragagent.audit.api.AuditAction;
 import com.ragagent.audit.api.AuditOutcome;
 import com.ragagent.audit.controller.AuditLogController;
 import com.ragagent.audit.domain.AuditLog;
@@ -16,7 +17,6 @@ import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.shared.audit.AuditAction;
 import com.ragagent.framework.shared.knowledge.KnowledgeBaseFacts;
 import com.ragagent.framework.shared.knowledge.KnowledgeBaseGateway;
 import com.ragagent.framework.web.error.GlobalExceptionHandler;

@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.service.management;
 
-import com.ragagent.framework.shared.knowledge.KnowledgeIngest;
+import com.ragagent.knowledge.api.KnowledgeIngest;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTenants;

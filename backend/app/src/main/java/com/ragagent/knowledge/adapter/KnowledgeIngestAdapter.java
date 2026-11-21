@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.adapter;
 
-import com.ragagent.framework.shared.knowledge.KnowledgeIngest;
+import com.ragagent.knowledge.api.KnowledgeIngest;
 import com.ragagent.knowledge.support.KnowledgeHashes;
 import com.ragagent.knowledge.support.KnowledgePaths;
 import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;

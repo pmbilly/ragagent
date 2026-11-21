@@ -2,6 +2,7 @@ package com.ragagent.datasource.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.audit.api.ActivityAuditRecorder;
+import com.ragagent.audit.api.AuditAction;
 import com.ragagent.audit.api.AuditOutcome;
 import com.ragagent.audit.api.AuditWritePort;
 import com.ragagent.datasource.domain.DataSource;
@@ -18,7 +19,6 @@ import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorRegistry;
 import com.ragagent.datasource.repository.DataSourceRepository;
 import com.ragagent.datasource.repository.SyncLogRepository;
-import com.ragagent.framework.shared.audit.AuditAction;
 import com.ragagent.framework.shared.tenant.TenantConfigLookup;
 import com.ragagent.framework.tracing.TraceInjector;
 import com.ragagent.framework.web.JsonMappers;

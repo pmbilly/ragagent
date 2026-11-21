@@ -1,4 +1,4 @@
-package com.ragagent.framework.shared.knowledge;
+package com.ragagent.knowledge.api;
 
 /**
  * 知识**摄取面**（契约端口）：跨域方触发"入库前的必要能力"与"处理任务投递"。

@@ -2,11 +2,11 @@ package com.ragagent.agent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.tool.ToolRegistry;
+import com.ragagent.agentengine.api.BaseTool;
 import com.ragagent.agentengine.api.SteerSink;
 import com.ragagent.framework.event.EventBusInterface;
 import com.ragagent.framework.eventbus.EventJson;
 import com.ragagent.framework.eventbus.EventType;
-import com.ragagent.framework.shared.tool.BaseTool;
 import com.ragagent.framework.shared.tool.ToolRequest;
 import com.ragagent.framework.shared.tool.ToolResult;
 import com.ragagent.framework.tool.ToolSchemas;

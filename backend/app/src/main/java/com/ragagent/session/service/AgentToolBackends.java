@@ -2,6 +2,7 @@ package com.ragagent.session.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.agentengine.api.AgentTool;
 import com.ragagent.agenttools.datasource.AnalysisDuckDbJdbc;
 import com.ragagent.agenttools.datasource.DataAnalysisTool;
 import com.ragagent.agenttools.datasource.DataSchemaTool;
@@ -36,7 +37,6 @@ import com.ragagent.framework.shared.agent.SearchAuth;
 import com.ragagent.framework.shared.knowledge.ChunkFacts;
 import com.ragagent.framework.shared.retrieval.SearchTarget;
 import com.ragagent.framework.shared.tenant.TenantConfigLookup;
-import com.ragagent.framework.shared.tool.AgentTool;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.knowledge.api.chunk.ChunkPageView;

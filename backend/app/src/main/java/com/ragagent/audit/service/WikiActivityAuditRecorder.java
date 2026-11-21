@@ -2,11 +2,11 @@ package com.ragagent.audit.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.audit.api.AuditAction;
 import com.ragagent.audit.api.AuditOutcome;
 import com.ragagent.audit.api.WikiActivityAudit;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.shared.audit.AuditAction;
 import com.ragagent.framework.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;

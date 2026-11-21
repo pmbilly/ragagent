@@ -1,4 +1,4 @@
-package com.ragagent.framework.shared.audit;
+package com.ragagent.audit.api;
 
 /**
  * 审计动作常量。

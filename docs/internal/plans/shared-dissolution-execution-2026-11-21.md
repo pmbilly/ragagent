@@ -74,7 +74,7 @@ bash scripts/run-guards.sh; echo "exit=$?"
 
 ## 4. 工作包
 
-### 4.0 归属总表（剩余 48 个）
+### 4.0 归属总表（剩余 43 个）
 
 > 起点 153 个业务词汇，已归位 87 个（WP4-C 1 · 知识簇 40 · 模型面 21 · 检索面 6 · 域面 18 · 内联 1）；下表是**剩余 48 个**的唯一归属。
 
@@ -337,6 +337,7 @@ WP6 收尾                ← 全部完成 + 拍板项落定
 | 批 | 日期 | 内容 | 验收数字（测试/守卫/金片） | 备注 |
 |---|---|---|---|---|
 | 基座 | 2026-11-21 | 守卫修复：port-map / contract-consumers / A20 重锚；R10 同级 api 放行；本文件 v2 重扫 + 补 §4.0 唯一归属总表（153 校验通过）+ WP4-C 接口映射 + WP6 批量手法 | 定向守卫 5 条绿 + 探针 2 条（同级 api 过 / 同级 service 红） | 全量 verify 未跑（定向：ArchitectureRulesTest 22/22 绿、50 个 run 行→脚本自计 49 守卫全绿），等开工基线 |
+| 清 shared（1） | 2026-11-21 | 5 个类型归位：`AuditAction`→audit/api、`KnowledgeIngest`/`KnowledgeBaseProvisioner`→knowledge·auth/api、`AgentTool`/`BaseTool`→agentengine/api | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 退回 4 个：`KnowledgeView`（被 SearchAuth 钉）、`StorageEngineConfig`（auth⇄storage 环）、`AgentTool`/`BaseTool` 首次因误加 import 失败 |
 | 包根收敛 | 2026-11-21 | `platform→framework`（1,126 文件）；通用面并 `framework.{error,event,json,text,pagination}`；实现下沉 `eventbus`/`html`；`shared→framework.shared` 消环 | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | C1 改白名单扫描（107 文件）；12 处守卫/基线重键 |
 | storage 收口 | 2026-11-21 | 11 个 IO/策略词汇 → `platform/storage/{fileserve,support}`；`shared/storage` 整包删除；两个名字登记 C8 基线 | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 结论：门面重构的必要性经实测取消（9/11 是 IO 载体） |
 | storage 部分 | 2026-11-21 | 7 个类型 → `storage/api`；11 个经实测属 framework 闭包（§4.5） | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 整批搬迁撞 5 条 R10 已回退，改按闭包切开 |

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.audit.api.AuditAction;
 import com.ragagent.audit.api.AuditOutcome;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.repository.AuditLogRepository;
@@ -20,7 +21,6 @@ import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.config.TenantProperties;
 import com.ragagent.framework.shared.apikey.APIKeyScopeContext;
 import com.ragagent.framework.shared.apikey.TenantAPIKeyScope;
-import com.ragagent.framework.shared.audit.AuditAction;
 import com.ragagent.framework.shared.tenant.TenantRole;
 import com.ragagent.framework.web.RbacInterceptor;
 import java.time.OffsetDateTime;

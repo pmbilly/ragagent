@@ -141,7 +141,7 @@
 | `:backend` | `com.ragagent.framework.shared.session` | 会话契约面：管线消息视图与消息端口。 |
 | `:backend` | `com.ragagent.framework.shared.settings` | 契约 · 设置：SystemSettingGateway。 |
 | `:backend` | `com.ragagent.framework.shared.tenant` | 租户契约面：租户角色等跨域值对象。 |
-| `:backend` | `com.ragagent.framework.shared.tool` | 工具契约面：工具 SPI 与执行结果载荷。 |
+| `:backend` | `com.ragagent.framework.shared.tool` | 工具契约面（跨模块共享部分）：工具请求 / 执行上下文 / 结果载荷。 |
 | `:backend` | `com.ragagent.framework.shared.vectorstore` | 向量库配置形状：ConnectionConfig 与 IndexConfig。 |
 | `:backend` | `com.ragagent.framework.shared.websearch` | 契约 · 网页搜索：WebSearchTempStatePort / WebSearchProviderPort / PipelinePageFetcher…。 |
 | `:backend` | `com.ragagent.framework.shared.wiki` | Wiki 契约面：摄取/收尾端口与图片标记。 |

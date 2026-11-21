@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.shared.knowledge.KnowledgeIngest;
 import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.knowledge.api.KnowledgeIngest;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.span.SpanTracker;

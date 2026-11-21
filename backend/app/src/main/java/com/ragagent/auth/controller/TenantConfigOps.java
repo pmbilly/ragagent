@@ -2,6 +2,7 @@ package com.ragagent.auth.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.auth.api.ChatHistoryConfig;
+import com.ragagent.auth.api.KnowledgeBaseProvisioner;
 import com.ragagent.auth.api.ParserEngineConfig;
 import com.ragagent.auth.api.RetrievalConfig;
 import com.ragagent.auth.api.WebSearchConfig;
@@ -16,7 +17,6 @@ import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.framework.shared.apikey.APIKeyCapability;
 import com.ragagent.framework.shared.apikey.APIKeyScopeContext;
 import com.ragagent.framework.shared.apikey.TenantAPIKeyScope;
-import com.ragagent.framework.shared.tenant.KnowledgeBaseProvisioner;
 import com.ragagent.framework.shared.tenant.MemoryConfig;
 import com.ragagent.framework.shared.tenant.StorageEngineConfig;
 import com.ragagent.framework.shared.tenant.TenantRole;

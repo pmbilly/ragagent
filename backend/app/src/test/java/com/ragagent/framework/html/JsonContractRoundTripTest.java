@@ -4,6 +4,7 @@ import static com.ragagent.fixtures.JsonRoundTrip.assertRoundTrips;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.audit.api.AuditAction;
 import com.ragagent.audit.api.AuditOutcome;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.dto.AuditLogListResponse;
@@ -38,7 +39,6 @@ import com.ragagent.datasource.dto.DatasourceCredentialsResponse;
 import com.ragagent.framework.shared.agent.AgentStep;
 import com.ragagent.framework.shared.agent.AgentToolCall;
 import com.ragagent.framework.shared.agent.ToolCallTarget;
-import com.ragagent.framework.shared.audit.AuditAction;
 import com.ragagent.framework.shared.knowledge.FaqChunkMetadata;
 import com.ragagent.framework.shared.retrieval.SearchResult;
 import com.ragagent.framework.shared.session.MentionedItem;

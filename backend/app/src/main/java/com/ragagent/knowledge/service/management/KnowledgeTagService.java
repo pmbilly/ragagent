@@ -1,12 +1,12 @@
 package com.ragagent.knowledge.service.management;
 
 import com.ragagent.audit.api.ActivityAuditRecorder;
+import com.ragagent.audit.api.AuditAction;
 import com.ragagent.audit.api.AuditWritePort;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.pagination.PageResult;
-import com.ragagent.framework.shared.audit.AuditAction;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;

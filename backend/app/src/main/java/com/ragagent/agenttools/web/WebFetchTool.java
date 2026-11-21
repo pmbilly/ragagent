@@ -2,7 +2,7 @@ package com.ragagent.agenttools.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.shared.tool.BaseTool;
+import com.ragagent.agentengine.api.BaseTool;
 import com.ragagent.framework.shared.tool.ToolCancellation;
 import com.ragagent.framework.shared.tool.ToolOutput;
 import com.ragagent.framework.shared.tool.ToolRequest;
