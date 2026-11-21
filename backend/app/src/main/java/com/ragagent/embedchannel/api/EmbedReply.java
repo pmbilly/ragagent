@@ -1,4 +1,4 @@
-package com.ragagent.shared.session;
+package com.ragagent.embedchannel.api;
 
 /**
  * embed 会话操作面的响应（中性：状态码 + 载荷）。

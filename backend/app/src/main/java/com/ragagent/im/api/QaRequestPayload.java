@@ -1,5 +1,6 @@
-package com.ragagent.shared.session;
+package com.ragagent.im.api;
 
+import com.ragagent.shared.session.MessageAttachment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -41,5 +42,5 @@ public final class QaRequestPayload {
     public List<MessageAttachment> attachments = new ArrayList<>();
 
     /** vision 图片（data URI）；默认 null，与容器默认一致。 */
-    public java.util.List<String> imageUrls;
+    public List<String> imageUrls;
 }

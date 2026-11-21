@@ -1,6 +1,8 @@
 package com.ragagent.im.service;
 
 import com.ragagent.agentengine.api.AgentLookup;
+import com.ragagent.im.api.QaRequestPayload;
+import com.ragagent.im.api.SessionView;
 import com.ragagent.im.runtime.AdapterInterfaces.FullOutputProgressSender;
 import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;
 import com.ragagent.im.runtime.ImFormat;
@@ -19,8 +21,6 @@ import com.ragagent.shared.event.payload.AgentCompleteData;
 import com.ragagent.shared.event.payload.AgentFinalAnswerData;
 import com.ragagent.shared.event.payload.ErrorData;
 import com.ragagent.shared.session.MessageView;
-import com.ragagent.shared.session.QaRequestPayload;
-import com.ragagent.shared.session.SessionView;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;

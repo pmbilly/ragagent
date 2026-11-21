@@ -1,4 +1,4 @@
-package com.ragagent.shared.memory;
+package com.ragagent.memory.api;
 
 import java.util.List;
 

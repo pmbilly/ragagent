@@ -1,5 +1,6 @@
-package com.ragagent.shared.tenant;
+package com.ragagent.auth.api;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -85,7 +86,7 @@ public class WebSearchConfig {
         c.maxResults = maxResults;
         c.includeDate = includeDate;
         c.compressionMethod = compressionMethod;
-        c.blacklist = blacklist == null ? null : new java.util.ArrayList<>(blacklist);
+        c.blacklist = blacklist == null ? null : new ArrayList<>(blacklist);
         c.embeddingModelId = embeddingModelId;
         c.embeddingDimension = embeddingDimension;
         c.rerankModelId = rerankModelId;

@@ -1,4 +1,4 @@
-package com.ragagent.shared.settings;
+package com.ragagent.auth.api;
 
 import java.util.List;
 import java.util.Map;

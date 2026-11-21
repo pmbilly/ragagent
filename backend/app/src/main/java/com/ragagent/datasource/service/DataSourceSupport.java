@@ -1,6 +1,7 @@
 package com.ragagent.datasource.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.audit.api.ActivityAuditRecorder;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.DataSourceException;
@@ -14,7 +15,6 @@ import com.ragagent.datasource.repository.SyncLogRepository;
 import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseRowView;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.audit.ActivityAuditRecorder;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;

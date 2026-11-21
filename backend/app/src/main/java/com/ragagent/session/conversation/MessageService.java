@@ -2,6 +2,7 @@ package com.ragagent.session.conversation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agentengine.api.ThinkBlocks;
+import com.ragagent.auth.api.ChatHistoryConfig;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseRowView;
@@ -19,7 +20,6 @@ import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.shared.session.MessageArtifact;
 import com.ragagent.shared.session.MessageAttachment;
 import com.ragagent.shared.session.MessageImage;
-import com.ragagent.shared.tenant.ChatHistoryConfig;
 import com.ragagent.shared.tenant.TenantConfigLookup;
 import com.ragagent.shared.wiki.WikiLanguageSupport;
 import java.util.ArrayList;

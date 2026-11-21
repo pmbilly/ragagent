@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.ragagent.TestSchema;
 import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.auth.api.UserPreferences;
 import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
@@ -16,7 +17,6 @@ import com.ragagent.auth.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.knowledge.storage.LocalStorageService;
-import com.ragagent.shared.auth.UserPreferences;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.regex.Matcher;

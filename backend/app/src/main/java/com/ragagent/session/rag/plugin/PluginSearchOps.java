@@ -2,6 +2,7 @@ package com.ragagent.session.rag.plugin;
 
 
 import com.ragagent.auth.api.TenantWebSearchConfigPort;
+import com.ragagent.auth.api.WebSearchConfig;
 import com.ragagent.knowledge.api.KnowledgeBaseQueryPort;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.platform.access.TenantContextSnapshot;
@@ -15,7 +16,6 @@ import com.ragagent.session.runtime.SessionTrace;
 import com.ragagent.shared.error.PipelinePortException;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.retrieval.SearchTarget;
-import com.ragagent.shared.tenant.WebSearchConfig;
 import com.ragagent.websearch.api.WebSearchRunPort;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

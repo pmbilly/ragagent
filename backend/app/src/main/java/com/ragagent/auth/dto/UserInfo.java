@@ -1,7 +1,7 @@
 package com.ragagent.auth.dto;
 
+import com.ragagent.auth.api.UserPreferences;
 import com.ragagent.auth.domain.User;
-import com.ragagent.shared.auth.UserPreferences;
 import java.time.OffsetDateTime;
 
 /**

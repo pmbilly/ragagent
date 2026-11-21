@@ -74,33 +74,32 @@ bash scripts/run-guards.sh; echo "exit=$?"
 
 ## 4. 工作包
 
-### 4.0 归属总表（剩余 84 个）
+### 4.0 归属总表（剩余 66 个）
 
-> 起点 153 个业务词汇，已归位 69 个（WP4-C 1 · 知识簇 40 · 模型面 21 · 检索面 6 · 内联 1）；下表是**剩余 84 个**的唯一归属，脚本校验合计 84 / 无重复无遗漏。
+> 起点 153 个业务词汇，已归位 87 个（WP4-C 1 · 知识簇 40 · 模型面 21 · 检索面 6 · 域面 18 · 内联 1）；下表是**剩余 66 个**的唯一归属。
 
 | 落点 | 数量 | 类型 |
 |---|---|---|
-| `app/memory/api` | 6 | `MemoryItemView` `MemoryKeys` `MemoryKinds` `MemoryMessageCursor` `MemoryRecall` `MemoryRetrievalContext` |
-| `app/audit/api` | 3 | `AuditOutcome` `AuditWritePort` `KnowledgeBaseFacts` |
 | `app/storage/api` | 7 | `FileContentService` `MessageFileFacts` `PublicModeForbiddenException` `ResourceModeException` `StorageEnvLookup` `StorageUrlContext` `WritableFileContentService` |
-| `app/im/api` | 4 | `MessageAttachment` `QaRequestPayload` `SessionQaPort` `SessionView` |
 | `app/session/api` | 9 | `MentionedItem` `MessageExecutionContext` `MessageImage` `PipelineMessageAttachmentView` `SessionLastRequestState` `SseSink` `SuggestionAttribution` `SuggestionItem` `UsedMemory` |
-| `app/storage/api`（随 platform/storage 整包） | 7 | `FileUrlPort` `MessageFactsLookup` `Mode` `OpenedFile` `Resolver` `SeekableSource` `StorageBackendResolver` |
-| `app/auth/api` | 10 | `APIKeyCapability` `APIKeyScopeType` `APIPrincipalConfig` `ChatHistoryConfig` `DocReaderAdminPort` `MemoryConfig` `ParserEngineConfig` `RetrievalConfig` `UserPreferences` `WebSearchConfig` |
+| `app/memory/api` | 2 | `MemoryKeys` `MemoryKinds` |
 | framework 正式包（永驻） | 22 | `APIKeyScopeContext` `AuditAction` `ChunkFacts` `ChunkView` `FaqChunkMetadata` `GraphNode` `GraphRelation` `KnowledgeBaseProvisioner` `KnowledgeView` `MessageView` `SearchAuth` `SearchResult` `SearchTarget` `StorageBackendPort` `StorageBackendProvisioner` `StorageBackendView` `StorageConnectivityPort` `StorageEngineConfig` `TenantAPIKeyScope` `TenantConfigLookup` `TenantRole` `WikiLanguageSupport` |
 | agent-engine `agentengine.api` | 10 | `AgentStep` `AgentTool` `AgentToolCall` `BaseTool` `ToolCallTarget` `ToolCancellation` `ToolExecContext` `ToolOutput` `ToolRequest` `ToolResult` |
-| `app/embedchannel/api` | 3 | `EmbedReply` `EmbedSessionPort` `MessageSuggestionView` |
-| retrieval-engine `retrieval.api | 1 | `MessageArtifact` |
-| 待拍板（`KnowledgeBaseGateway`） | 1 | `KnowledgeBaseGateway` |
+| `app/storage/api`（随 platform/storage 整包） | 7 | `FileUrlPort` `MessageFactsLookup` `Mode` `OpenedFile` `Resolver` `SeekableSource` `StorageBackendResolver` |
 | framework 工具包 | 1 | `KnowledgeIngest` |
+| retrieval-engine `retrieval.api | 1 | `MessageArtifact` |
+| `app/im/api` | 1 | `MessageAttachment` |
+| `app/auth/api` | 4 | `APIKeyCapability` `APIKeyScopeType` `APIPrincipalConfig` `MemoryConfig` |
+| 待拍板（`KnowledgeBaseGateway`） | 1 | `KnowledgeBaseGateway` |
+| `app/audit/api` | 1 | `KnowledgeBaseFacts` |
 
 **六条落点约束**：
 
-1. `app/knowledge/api` 已落地（知识簇 39 个），子包 `kb/chunk/catalog/config/projection/error/wiki`。
-2. **`framework` 永驻 22 个**：被 framework 视图/工具与引擎引用。其中 `AgentStep` `AgentToolCall` `ToolCallTarget` **整族被 `MessageView` 钉住**——`MessageView` 属 D-4（channel 合并批次），所以 agent-engine 面在 channel 合并前搬不动。
-3. 模型面（20 个）与检索面（6 个）已离开 shared；`Embedder`/`ModelFacts`/`EmbeddingPort` 在 `platform/model`（C8 登记）。
-4. `SearchResult` 永驻 framework（model-runtime/agent-engine 都在用）。
-5. `app/knowledge/api` 落 31 个的计划已实现 39 个（含 D-6 组）。
+1. `app/knowledge/api` 已落地（知识簇 39 个），子包 `kb/chunk/catalog/config/projection/error/wiki`；`memory/api`、`im/api`、`embedchannel/api`、`audit/api`、`auth/api` 本批落地。
+2. **`framework` 永驻 22 个**：被 framework 视图/工具与引擎引用。`MemoryKeys`/`MemoryKinds`/`MemoryConfig`/`APIPrincipalConfig`/`APIKeyCapability`/`APIKeyScopeType`/`KnowledgeBaseFacts`/`MessageAttachment`/`AgentStep`/`AgentToolCall`/`ToolCallTarget` 因被永驻类型引用而留下。
+3. 模型面（20）与检索面（6）已离开 shared；`Embedder`/`ModelFacts`/`EmbeddingPort` 在 `platform/model`（C8 登记）。
+4. `SearchResult` 永驻 framework。
+5. `app/knowledge/api` 计划 31 个，实际 39（含 D-6 组）。
 6. `KnowledgeBaseGateway` 仍待拍板。
 
 ### WP1 复核结论：0 个可删（已执行：`JsonValueSupport` 内联）
@@ -306,6 +305,7 @@ WP6 收尾                ← 全部完成 + 拍板项落定
 | 批 | 日期 | 内容 | 验收数字（测试/守卫/金片） | 备注 |
 |---|---|---|---|---|
 | 基座 | 2026-11-21 | 守卫修复：port-map / contract-consumers / A20 重锚；R10 同级 api 放行；本文件 v2 重扫 + 补 §4.0 唯一归属总表（153 校验通过）+ WP4-C 接口映射 + WP6 批量手法 | 定向守卫 5 条绿 + 探针 2 条（同级 api 过 / 同级 service 红） | 全量 verify 未跑（定向：ArchitectureRulesTest 22/22 绿、50 个 run 行→脚本自计 49 守卫全绿），等开工基线 |
+| WP4-域面 | 2026-11-21 | 18 个类型归位：`memory/api` 4 · `im/api` 3 · `embedchannel/api` 3 · `audit/api` 2 · `auth/api` 6；`ActivityAuditRecorder` 迁 `audit/api` | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 回退：`MemoryKeys`/`MemoryKinds`/`MemoryConfig`（被 framework 永驻类型引用）、审计记录器初版落 `audit/support` 破 R10 |
 | WP3-检索面 | 2026-11-21 | 6 个类型 → `retrieval-engine/api`（`GraphData` `KnowledgeDocumentFacts` `NameSpace` `RetrieveGraphRepository` `SearchParams` `WebSearchResult`） | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 发现：agent 整族被 `MessageView` 钉住，需等 channel 合并（D-4） |
 | K10b-2 | 2026-11-21 | 模型面收尾：6 个类型 → `llm.api`（`shared/model` 清空删除）；`EmbeddingPort`/`ModelFacts` → `platform/model`（C8 登记）；`PromptCacheStatus` 线格式并入模型 JSON 模块 | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 坑：删序列化器时误删 `ContractJsonModule.Provider`，ServiceLoader 找不到 provider 导致 36 个测试静态初始化失败 |
 | K10b-1 | 2026-11-21 | 模型面归位：12 个模型类型 → `llm.api`、`Embedder` → `platform.model`；`platform/stream` 17 文件 → `modelruntime.stream`；装饰器 6 文件 → `modelruntime.tracing`；`PromptFingerprints` → `modelruntime.prompt`；`TokenUsage`/`ResponseType` 线格式并入模型 JSON 模块 | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 坑：覆盖 model-runtime 既有 `META-INF/services` 导致线格式回退（已恢复并合并） |

@@ -1,9 +1,7 @@
-package com.ragagent.platform.audit;
+package com.ragagent.audit.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.shared.audit.AuditOutcome;
-import com.ragagent.shared.audit.AuditWritePort;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

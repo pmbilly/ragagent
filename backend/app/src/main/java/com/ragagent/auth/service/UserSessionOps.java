@@ -1,12 +1,12 @@
 package com.ragagent.auth.service;
 
+import com.ragagent.auth.api.UserPreferences;
 import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.Membership;
 import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.platform.text.UnicodeText;
-import com.ragagent.shared.auth.UserPreferences;
 import io.jsonwebtoken.Claims;
 import java.util.List;
 

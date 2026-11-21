@@ -1,5 +1,7 @@
 package com.ragagent.auth.system.service;
 
+import com.ragagent.audit.api.AuditOutcome;
+import com.ragagent.audit.api.AuditWritePort;
 import com.ragagent.auth.api.AdminUserCommandPort;
 import com.ragagent.auth.api.AdminUserPort;
 import com.ragagent.auth.api.AdminUserView;
@@ -8,8 +10,6 @@ import com.ragagent.auth.api.CreateUserResult;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.shared.apikey.APIKeyScopeContext;
-import com.ragagent.shared.audit.AuditOutcome;
-import com.ragagent.shared.audit.AuditWritePort;
 import com.ragagent.shared.pagination.PageResult;
 import java.util.Map;
 import org.slf4j.Logger;

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.TestSchema;
+import com.ragagent.audit.api.AuditWritePort;
 import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.mapper.TenantMapper;
 import com.ragagent.auth.service.TenantService;
@@ -31,7 +32,6 @@ import com.ragagent.datasource.repository.SyncLogRepository;
 import com.ragagent.datasource.task.Scheduler;
 import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseRowView;
-import com.ragagent.shared.audit.AuditWritePort;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

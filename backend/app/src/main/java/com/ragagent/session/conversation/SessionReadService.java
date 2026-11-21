@@ -1,9 +1,9 @@
 package com.ragagent.session.conversation;
 
+import com.ragagent.im.api.SessionView;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.dto.SessionViewMapper;
-import com.ragagent.shared.session.SessionView;
 import java.util.List;
 import org.springframework.stereotype.Service;
 

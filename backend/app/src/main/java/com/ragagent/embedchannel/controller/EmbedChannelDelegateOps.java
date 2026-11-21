@@ -2,14 +2,14 @@ package com.ragagent.embedchannel.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agentengine.api.McpApprovalOps;
+import com.ragagent.embedchannel.api.EmbedReply;
+import com.ragagent.embedchannel.api.MessageSuggestionView;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ServletSseSink;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.session.EmbedReply;
-import com.ragagent.shared.session.MessageSuggestionView;
 import com.ragagent.shared.session.MessageView;
 import java.util.List;
 import org.springframework.http.ResponseEntity;

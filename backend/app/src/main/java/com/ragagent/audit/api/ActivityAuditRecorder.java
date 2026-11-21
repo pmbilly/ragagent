@@ -1,11 +1,9 @@
-package com.ragagent.platform.audit;
+package com.ragagent.audit.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.audit.AuditOutcome;
-import com.ragagent.shared.audit.AuditWritePort;
 import java.util.Map;
 import java.util.TreeMap;
 

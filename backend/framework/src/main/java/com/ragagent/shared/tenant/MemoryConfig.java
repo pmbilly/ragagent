@@ -2,6 +2,7 @@ package com.ragagent.shared.tenant;
 
 import com.ragagent.shared.memory.MemoryKeys;
 import com.ragagent.shared.memory.MemoryKinds;
+import java.time.Duration;
 
 
 /**
@@ -211,21 +212,21 @@ public class MemoryConfig {
     /**
      * 一轮结束后等多久才蒸馏（非正数回默认 90s）。
      *
-     * <p>返回 {@link java.time.Duration} 而不是毫秒数——调用方要拿它做时间运算。</p>
+     * <p>返回 {@link Duration} 而不是毫秒数——调用方要拿它做时间运算。</p>
      */
-    public java.time.Duration extractDelay() {
+    public Duration extractDelay() {
         if (extractDelaySeconds <= 0) {
-            return java.time.Duration.ofSeconds(DEFAULT_EXTRACT_DELAY_SECONDS);
+            return Duration.ofSeconds(DEFAULT_EXTRACT_DELAY_SECONDS);
         }
-        return java.time.Duration.ofSeconds(extractDelaySeconds);
+        return Duration.ofSeconds(extractDelaySeconds);
     }
 
     /** 同一人两次蒸馏运行之间的最小间隔（非正数回默认值）。 */
-    public java.time.Duration extractMinInterval() {
+    public Duration extractMinInterval() {
         if (extractMinIntervalSeconds <= 0) {
-            return java.time.Duration.ofSeconds(DEFAULT_EXTRACT_MIN_INTERVAL_SECONDS);
+            return Duration.ofSeconds(DEFAULT_EXTRACT_MIN_INTERVAL_SECONDS);
         }
-        return java.time.Duration.ofSeconds(extractMinIntervalSeconds);
+        return Duration.ofSeconds(extractMinIntervalSeconds);
     }
 
     /**

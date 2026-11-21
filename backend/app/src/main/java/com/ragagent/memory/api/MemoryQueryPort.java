@@ -1,7 +1,5 @@
 package com.ragagent.memory.api;
 
-import com.ragagent.shared.memory.MemoryRecall;
-import com.ragagent.shared.memory.MemoryRetrievalContext;
 import java.util.List;
 import java.util.Map;
 

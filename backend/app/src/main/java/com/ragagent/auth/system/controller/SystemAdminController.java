@@ -1,6 +1,8 @@
 package com.ragagent.auth.system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.audit.api.AuditOutcome;
+import com.ragagent.audit.api.AuditWritePort;
 import com.ragagent.auth.api.AdminUserView;
 import com.ragagent.auth.api.CreateUserResult;
 import com.ragagent.auth.api.TenantAPIKeyCreateResponse;
@@ -20,8 +22,6 @@ import com.ragagent.platform.web.RejectEmptyBody;
 import com.ragagent.shared.apikey.APIKeyCapability;
 import com.ragagent.shared.apikey.APIKeyScopeType;
 import com.ragagent.shared.audit.AuditAction;
-import com.ragagent.shared.audit.AuditOutcome;
-import com.ragagent.shared.audit.AuditWritePort;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
 import com.ragagent.shared.pagination.PageResult;

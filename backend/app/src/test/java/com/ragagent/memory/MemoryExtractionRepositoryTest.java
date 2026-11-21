@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
+import com.ragagent.memory.api.MemoryMessageCursor;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
 import com.ragagent.memory.domain.MemoryExtractionLeaseLostException;
 import com.ragagent.memory.domain.MemoryExtractionSession;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.repository.MemoryRepository;
-import com.ragagent.shared.memory.MemoryMessageCursor;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;

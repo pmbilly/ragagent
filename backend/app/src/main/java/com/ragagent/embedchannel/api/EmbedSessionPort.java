@@ -1,5 +1,7 @@
-package com.ragagent.shared.session;
+package com.ragagent.embedchannel.api;
 
+import com.ragagent.shared.session.MessageView;
+import com.ragagent.shared.session.SseSink;
 import java.io.IOException;
 import java.util.List;
 

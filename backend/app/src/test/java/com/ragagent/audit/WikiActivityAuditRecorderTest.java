@@ -5,13 +5,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
+import com.ragagent.audit.api.AuditOutcome;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.repository.AuditLogRepository;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.audit.service.WikiActivityAuditRecorder;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.shared.audit.AuditAction;
-import com.ragagent.shared.audit.AuditOutcome;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

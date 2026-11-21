@@ -1,13 +1,13 @@
 package com.ragagent.agenttools.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.auth.api.WebSearchConfig;
 import com.ragagent.llm.api.ToolDefinitions;
 import com.ragagent.platform.tool.ToolSchemas;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import com.ragagent.platform.web.ToolJson;
 import com.ragagent.retrieval.api.WebSearchResult;
-import com.ragagent.shared.tenant.WebSearchConfig;
 import com.ragagent.shared.tool.BaseTool;
 import com.ragagent.shared.tool.ToolOutput;
 import com.ragagent.shared.tool.ToolRequest;

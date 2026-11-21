@@ -1,9 +1,9 @@
-package com.ragagent.shared.audit;
+package com.ragagent.audit.api;
 
 /**
  * 审计结果常量。
  *
- * <p>同 {@link AuditAction}：列 varchar(16)、允许任意值，用 String 常量而非 enum。</p>
+ * <p>同 {@code AuditAction}：列 varchar(16)、允许任意值，用 String 常量而非 enum。</p>
  */
 public final class AuditOutcome {
 

@@ -1,7 +1,9 @@
 package com.ragagent.auth.system.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.auth.api.DocReaderAdminPort;
 import com.ragagent.auth.api.ParserEngineCatalogPort;
+import com.ragagent.auth.api.ParserEngineConfig;
 import com.ragagent.auth.system.dto.SystemDtos;
 import com.ragagent.auth.system.service.DeploymentCapabilitiesHolder;
 import com.ragagent.auth.system.service.SystemInfoService;
@@ -11,9 +13,7 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.settings.DocReaderAdminPort;
 import com.ragagent.shared.storage.StorageConnectivityPort;
-import com.ragagent.shared.tenant.ParserEngineConfig;
 import com.ragagent.shared.tenant.TenantConfigLookup;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.LinkedHashMap;

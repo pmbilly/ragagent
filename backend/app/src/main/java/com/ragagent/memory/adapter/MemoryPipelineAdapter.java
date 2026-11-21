@@ -1,9 +1,9 @@
 package com.ragagent.memory.adapter;
 
 import com.ragagent.memory.api.MemoryQueryPort;
+import com.ragagent.memory.api.MemoryRecall;
+import com.ragagent.memory.api.MemoryRetrievalContext;
 import com.ragagent.memory.service.MemoryService;
-import com.ragagent.shared.memory.MemoryRecall;
-import com.ragagent.shared.memory.MemoryRetrievalContext;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Component;

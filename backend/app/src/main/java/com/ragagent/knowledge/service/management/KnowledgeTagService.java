@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service.management;
 
+import com.ragagent.audit.api.ActivityAuditRecorder;
+import com.ragagent.audit.api.AuditWritePort;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
@@ -11,11 +13,9 @@ import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.support.KnowledgeTaskRunner;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.audit.ActivityAuditRecorder;
 import com.ragagent.retrieval.api.IndexEngine;
 import com.ragagent.retrieval.api.VectorIndexStore;
 import com.ragagent.shared.audit.AuditAction;
-import com.ragagent.shared.audit.AuditWritePort;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
 import com.ragagent.shared.pagination.PageResult;

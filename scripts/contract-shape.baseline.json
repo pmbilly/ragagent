@@ -59,6 +59,10 @@
     "com/ragagent/knowledge/api/kb/KnowledgeBaseResponse.java": {
       "fields": 32,
       "reason": "知识库响应聚合体（DTO 形状由前端契约锁定）；收窄属 H6 治理"
+    },
+    "com/ragagent/auth/api/ParserEngineConfig.java": {
+      "fields": 27,
+      "reason": "解析引擎配置形状（外部服务参数）；收窄属 H6 治理"
     }
   }
 }

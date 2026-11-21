@@ -1,6 +1,7 @@
 package com.ragagent.auth.service;
 
 import com.ragagent.auth.api.SystemSettingGateway;
+import com.ragagent.auth.api.UserPreferences;
 import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
@@ -11,7 +12,6 @@ import com.ragagent.auth.repository.AuthTokenRepository;
 import com.ragagent.auth.repository.UserRepository;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.UserNameLookup;
-import com.ragagent.shared.auth.UserPreferences;
 import io.jsonwebtoken.Claims;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.ragagent.TestSchema;
 import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.auth.api.UserPreferences;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicy;
@@ -18,7 +19,6 @@ import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
-import com.ragagent.shared.auth.UserPreferences;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

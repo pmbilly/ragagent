@@ -1,6 +1,5 @@
 package com.ragagent.auth.api;
 
-import com.ragagent.shared.tenant.WebSearchConfig;
 
 /** 当前租户的 web 搜索配置读取面。 */
 public interface TenantWebSearchConfigPort {

@@ -1,4 +1,4 @@
-package com.ragagent.shared.auth;
+package com.ragagent.auth.api;
 
 
 /**

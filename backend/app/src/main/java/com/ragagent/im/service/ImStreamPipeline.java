@@ -1,6 +1,8 @@
 package com.ragagent.im.service;
 
 import com.ragagent.agentengine.api.AgentLookup;
+import com.ragagent.im.api.QaRequestPayload;
+import com.ragagent.im.api.SessionView;
 import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.IncomingMessage;
@@ -20,8 +22,6 @@ import com.ragagent.shared.event.payload.AgentToolCallData;
 import com.ragagent.shared.event.payload.AgentToolResultData;
 import com.ragagent.shared.event.payload.ErrorData;
 import com.ragagent.shared.session.MessageView;
-import com.ragagent.shared.session.QaRequestPayload;
-import com.ragagent.shared.session.SessionView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

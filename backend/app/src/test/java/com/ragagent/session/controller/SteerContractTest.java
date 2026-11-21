@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.ragagent.TestSchema;
 import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.auth.api.UserPreferences;
 import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
@@ -17,7 +18,6 @@ import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.modelruntime.stream.StreamEvent;
 import com.ragagent.modelruntime.stream.StreamManager;
-import com.ragagent.shared.auth.UserPreferences;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;

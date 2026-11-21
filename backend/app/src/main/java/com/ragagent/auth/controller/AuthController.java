@@ -2,6 +2,7 @@ package com.ragagent.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.auth.api.SystemSettingGateway;
+import com.ragagent.auth.api.UserPreferences;
 import com.ragagent.auth.dto.AuthConfigResponse;
 import com.ragagent.auth.dto.AuthLoginResponse;
 import com.ragagent.auth.dto.ChangePasswordRequest;
@@ -42,7 +43,6 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.platform.web.RejectEmptyBody;
-import com.ragagent.shared.auth.UserPreferences;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
 import com.ragagent.shared.tenant.TenantRole;

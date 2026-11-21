@@ -1,4 +1,4 @@
-package com.ragagent.shared.tenant;
+package com.ragagent.auth.api;
 
 
 /**

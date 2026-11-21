@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
 import com.ragagent.memory.MemoryContext;
+import com.ragagent.memory.api.MemoryRetrievalContext;
 import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.scope.MemoryScope;
@@ -13,7 +14,6 @@ import com.ragagent.memory.repository.MemoryRepository;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.shared.memory.MemoryKeys;
 import com.ragagent.shared.memory.MemoryKinds;
-import com.ragagent.shared.memory.MemoryRetrievalContext;
 import com.ragagent.shared.tenant.MemoryConfig;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;

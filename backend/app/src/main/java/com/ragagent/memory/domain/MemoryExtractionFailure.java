@@ -1,6 +1,6 @@
 package com.ragagent.memory.domain;
 
-import com.ragagent.shared.memory.MemoryMessageCursor;
+import com.ragagent.memory.api.MemoryMessageCursor;
 
 /**
  * 一次抽取失败的描述：标识"哪一段输出不合法"，但**不保留消息原文**。

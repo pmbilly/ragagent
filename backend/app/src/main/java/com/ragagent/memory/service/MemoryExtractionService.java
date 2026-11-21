@@ -2,6 +2,7 @@ package com.ragagent.memory.service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.memory.api.MemoryMessageCursor;
 import com.ragagent.memory.api.MessageTranscriptPort;
 import com.ragagent.memory.domain.MemoryExtractHandler;
 import com.ragagent.memory.domain.MemoryExtractPayload;
@@ -23,7 +24,6 @@ import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.shared.memory.MemoryKeys;
 import com.ragagent.shared.memory.MemoryKinds;
-import com.ragagent.shared.memory.MemoryMessageCursor;
 import com.ragagent.shared.tenant.MemoryConfig;
 import java.time.Duration;
 import java.time.OffsetDateTime;

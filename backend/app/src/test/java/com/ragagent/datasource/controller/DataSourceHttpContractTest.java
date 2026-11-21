@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.ragagent.TestSchema;
 import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.auth.api.UserPreferences;
 import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
@@ -26,7 +27,6 @@ import com.ragagent.datasource.domain.connector.ConnectorHttp;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.shared.apikey.APIKeyScopeContext;
 import com.ragagent.shared.apikey.TenantAPIKeyScope;
-import com.ragagent.shared.auth.UserPreferences;
 import com.sun.net.httpserver.HttpServer;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;

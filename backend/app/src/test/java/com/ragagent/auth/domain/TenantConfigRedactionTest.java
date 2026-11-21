@@ -2,7 +2,8 @@ package com.ragagent.auth.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.shared.tenant.ParserEngineConfig;
+import com.ragagent.auth.api.ParserEngineConfig;
+import com.ragagent.auth.api.WebSearchConfig;
 import com.ragagent.shared.tenant.StorageEngineConfig;
 import com.ragagent.shared.tenant.StorageEngineConfig.CosEngineConfig;
 import com.ragagent.shared.tenant.StorageEngineConfig.Ks3EngineConfig;
@@ -11,7 +12,6 @@ import com.ragagent.shared.tenant.StorageEngineConfig.ObsEngineConfig;
 import com.ragagent.shared.tenant.StorageEngineConfig.OssEngineConfig;
 import com.ragagent.shared.tenant.StorageEngineConfig.S3EngineConfig;
 import com.ragagent.shared.tenant.StorageEngineConfig.TosEngineConfig;
-import com.ragagent.shared.tenant.WebSearchConfig;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;

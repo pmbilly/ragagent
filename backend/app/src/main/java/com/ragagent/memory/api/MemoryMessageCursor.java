@@ -1,4 +1,4 @@
-package com.ragagent.shared.memory;
+package com.ragagent.memory.api;
 
 import com.ragagent.shared.json.ZeroTimes;
 import java.time.OffsetDateTime;

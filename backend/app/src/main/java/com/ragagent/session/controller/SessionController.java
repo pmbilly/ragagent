@@ -1,5 +1,6 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.im.api.SessionView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResponse;
@@ -26,7 +27,6 @@ import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
 import com.ragagent.shared.pagination.PageResult;
 import com.ragagent.shared.session.MessageArtifact;
-import com.ragagent.shared.session.SessionView;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.ArrayList;

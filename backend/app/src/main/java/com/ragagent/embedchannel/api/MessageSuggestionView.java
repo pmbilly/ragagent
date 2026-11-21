@@ -1,5 +1,6 @@
-package com.ragagent.shared.session;
+package com.ragagent.embedchannel.api;
 
+import com.ragagent.shared.session.SuggestionItem;
 import java.time.OffsetDateTime;
 import java.util.List;
 

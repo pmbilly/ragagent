@@ -1,4 +1,4 @@
-package com.ragagent.shared.tenant;
+package com.ragagent.auth.api;
 
 import java.util.LinkedHashMap;
 import java.util.List;

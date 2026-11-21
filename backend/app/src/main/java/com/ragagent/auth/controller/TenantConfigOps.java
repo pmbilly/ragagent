@@ -1,6 +1,10 @@
 package com.ragagent.auth.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.auth.api.ChatHistoryConfig;
+import com.ragagent.auth.api.ParserEngineConfig;
+import com.ragagent.auth.api.RetrievalConfig;
+import com.ragagent.auth.api.WebSearchConfig;
 import com.ragagent.auth.domain.TenantConfigRedaction;
 import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.auth.service.TenantService;
@@ -14,14 +18,10 @@ import com.ragagent.shared.apikey.APIKeyScopeContext;
 import com.ragagent.shared.apikey.TenantAPIKeyScope;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.tenant.ChatHistoryConfig;
 import com.ragagent.shared.tenant.KnowledgeBaseProvisioner;
 import com.ragagent.shared.tenant.MemoryConfig;
-import com.ragagent.shared.tenant.ParserEngineConfig;
-import com.ragagent.shared.tenant.RetrievalConfig;
 import com.ragagent.shared.tenant.StorageEngineConfig;
 import com.ragagent.shared.tenant.TenantRole;
-import com.ragagent.shared.tenant.WebSearchConfig;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 

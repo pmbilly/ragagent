@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.service.parser;
 
+import com.ragagent.auth.api.DocReaderAdminPort;
 import com.ragagent.auth.api.ParserEngineCatalogPort;
-import com.ragagent.shared.settings.DocReaderAdminPort;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

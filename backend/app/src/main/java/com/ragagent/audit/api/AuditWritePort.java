@@ -1,4 +1,4 @@
-package com.ragagent.shared.audit;
+package com.ragagent.audit.api;
 
 /**
  * 审计写入端口：供**适配面**（{@code agenttools}/{@code agentmanagement}）写审计日志，

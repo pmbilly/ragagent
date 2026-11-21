@@ -1,4 +1,4 @@
-package com.ragagent.shared.memory;
+package com.ragagent.memory.api;
 
 /**
  * 记忆条目**只读视图**：供 L2（{@code chatpipeline}）与各域消费，替代 {@code memory.domain.MemoryItem} 实体。

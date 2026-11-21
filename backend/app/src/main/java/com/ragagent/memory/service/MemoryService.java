@@ -1,5 +1,7 @@
 package com.ragagent.memory.service;
 
+import com.ragagent.memory.api.MemoryRecall;
+import com.ragagent.memory.api.MemoryRetrievalContext;
 import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.domain.MemoryExtractPayload;
 import com.ragagent.memory.domain.MemoryTopicStat;
@@ -11,8 +13,6 @@ import com.ragagent.memory.dto.MemoryItemResponse;
 import com.ragagent.memory.dto.MemoryTopicView;
 import com.ragagent.memory.repository.MemoryRepository;
 import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.shared.memory.MemoryRecall;
-import com.ragagent.shared.memory.MemoryRetrievalContext;
 import com.ragagent.shared.pagination.PageResult;
 import com.ragagent.shared.tenant.MemoryConfig;
 import com.ragagent.shared.tenant.TenantConfigLookup;

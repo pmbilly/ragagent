@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.adapter;
 
+import com.ragagent.auth.api.DocReaderAdminPort;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.config.DocReaderProperties;
-import com.ragagent.shared.settings.DocReaderAdminPort;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

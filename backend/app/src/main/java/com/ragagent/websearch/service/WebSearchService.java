@@ -348,7 +348,7 @@ public class WebSearchService {
          *
          * <p>缺省合并口径与迁移前逐字一致：{@code cfg == null} → 全默认；各字段空值回落默认。</p>
          */
-        public static WebSearchConfig from(com.ragagent.shared.tenant.WebSearchConfig cfg) {
+        public static WebSearchConfig from(com.ragagent.auth.api.WebSearchConfig cfg) {
             WebSearchConfig out = new WebSearchConfig();
             if (cfg == null) {
                 return out;

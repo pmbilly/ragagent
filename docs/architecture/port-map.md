@@ -6,10 +6,10 @@
 ## 统计
 
 - 域内（可评估内联）：**11**
-- 域间（解耦）：**25**
+- 域间（解耦）：**26**
 - 复合面（随复合端口）：**7**
 - 装配点实现（不参与内联判定）：**6**
-- 跨模块（必要）：**12**
+- 跨模块（必要）：**11**
 
 ## 明细
 
@@ -18,7 +18,7 @@
 | `AdminUserCommandPort` | `AdminUserAdapter` | backend/app | auth | 域内（可评估内联） |
 | `AdminUserPort` | `AdminUserAdapter` | backend/app | auth | 域内（可评估内联） |
 | `AgentSuggestionPort` | `CustomAgentService` | backend/app | session | 域间（解耦） |
-| `AuditWritePort` | `AuditWriteAdapter` | backend/app | agentmanagement、auth、backend/framework、datasource、knowledge | 跨模块（必要） |
+| `AuditWritePort` | `AuditWriteAdapter` | backend/app | agentmanagement、auth、datasource、knowledge | 域间（解耦） |
 | `ChunkFaqReadPort` | — | ? | — | 复合面（随复合端口） |
 | `ChunkPort` | `ChunkPortAdapter` | backend/app | knowledge | 域内（可评估内联） |
 | `ChunkQueryPort` | `KnowledgeChunkPipelineAdapter` | backend/app | session | 域间（解耦） |
