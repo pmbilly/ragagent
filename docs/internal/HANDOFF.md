@@ -10,14 +10,14 @@
 ## ⭐ 接手须知（5 分钟）
 
 1. **开工顺序**：§0 目标与边界 → §5 批次表（唯一待办来源）→ §9 方法论 → §10 纪律 → 干活 → 回填 §12。
-2. **基线核对**：先跑 §6 全量闸门，确认 `BUILD SUCCESSFUL` 与各模块测试条数（**numbers 守恒**；`boot`/`platform` 条数缺失＝静默少跑）。
+2. **基线核对**：先跑 §6 全量闸门，确认 `BUILD SUCCESSFUL` 与各模块测试条数（**numbers 守恒**；`framework`/`model-runtime`/`retrieval-engine`/`agent-engine`/`app` 任意一段缺失＝静默少跑）。
 3. **待办与读数都会过期**：宣称"未完成"或据此动手前先实测（`git log` / 守卫 / 脚本输出）；**以守卫为准**。
 4. **提交**：批次号 `(P#)`，写明验证方式；**推送等用户发话**（历史纪律，一字不改）。
-5. **越界即停**：动前端、动数据库、解散 contract，三者任一都要先回来问。
+5. **越界即停**：动前端、动数据库、改模块划分（含解散 `shared` 命名空间），三者任一都要先回来问。`contract` 已解散，不再是待办项。
 
 ## 0. 本次重构：目标、边界、阶段
 
-**基线**：2026-11-19 的 `v0.11.x`，7 模块（`contract` / `platform` / `model-runtime` / `retrieval-engine` / `agent-engine` / `domains` / `boot`），19 个业务域。
+**基线**：2026-11-19 的 `v0.11.x`，当时 7 模块、19 个业务域。**现状（2026-11-21）**：5 模块（`framework` / `model-runtime` / `retrieval-engine` / `agent-engine` / `app`），17 个业务域 + `config` 装配包。
 
 **目标**：让业务域的目录与职责边界一眼可读，把"靠 Python 脚本维持的规则"改成"由 Java 测试表达"，为后续按域重写铺路。
 
@@ -25,11 +25,11 @@
 
 1. **不动前端**：路由、请求/响应字段、错误码、SSE 帧格式全不变。
 2. **不动数据库**：无 DDL、无迁移脚本、无表结构变更。
-3. **不做 contract 解散、不做模块改名**。
+3. **不做模块改名**；`contract` 已于 2026-11-20 解散（并入 `framework/shared`），`shared` 解散按专项计划执行（见 §13）。
 
 **阶段**：P0 基线 → P1 规则先行 → P2 纯包移动 → P3 类职责归位 → P4 `api` 语义与边界校验（见 §5）。
 
-**当前状态（2026-11-20）**：**P0~P4 与 S1、S6 已完成**：7 模块 → **6 模块**（`domains` 并入 `boot` 后改名 `app`，`boot` 模块消失）。P0 三份基线可复现；P1 两条棘轮上线（R-1 跨域直连 · R-2 注解 SQL 282）；P2 32 个 Adapter 迁入 `adapter/`；P3 回引 62 → 已消 40 / 保留 22；P4 跨域直连 2 → 1（剩 `session → agentmanagement.service`，待 contract 解散时随 `CustomAgentConfig` 契约化一并解）。全量 **5257 / 0 / 2**，守卫 **49/49**。
+**当前状态（2026-11-21）**：**P0~P4 与 S1、S6 已完成**；7 模块 → **5 模块**（`domains`→`app`、`boot`→`app`、`contract` 解散）。P0 三份基线可复现；P1 两条棘轮在线（R-1 跨域直连 1 条 · R-2 注解 SQL 282）；P2 32 个 Adapter 迁入 `adapter/`；P3 回引 62 → 消 40 / 留 22；P4 跨域直连 2 → 1。**当前主线是 `shared` 解散**。全量条数以开工基线重测为准（旧口径 5257 已过期：`contract`/`platform`/`boot` 三个模块名都不存在了；S6 记录为 app 4220 · model-runtime 321 · retrieval-engine 286 · agent-engine 157）。守卫 **49/49**。
 
 ## 1. 仓库身份与分支
 
@@ -43,7 +43,7 @@
 **本次重构（2026-11-19 用户拍板）**：
 
 1. **只做后端分包与目录结构**；不动前端、不动数据库。
-2. **不做 contract 解散**；`contract` 保持现状，直到"按域重写"批次（与蓝图 D8 解耦）。
+2. ~~不做 contract 解散~~（已失效）：`contract` 已解散，不重开该讨论。
 3. **不做蓝图 5.5 的包名对齐**（`entity` / `vo` / `bo` / `assembler`）。理由：`api/` 现装 `*Adapter`，与蓝图"对外契约"语义相反；`domain/` 混了实体、值对象、事件消费者。详见方案 §3。
 4. **纯包移动（P2）与类职责归位（P3）分两批**，不混做：前者可批量 revert，后者碰行为。
 5. **P3 按域推进**，一次一个域，该域测试与金片全绿才进下一个。
@@ -53,26 +53,26 @@
 **沿用（上一阶段已定，本次不改）**：
 
 8. 保留分层单体；模块名 = 顶层包名；三个 runtime 平级、互不引用实现。
-9. 域间只经契约（R10）：属主边 2 条（`auth→tenant`、`system→auth`）登记维持，同族 5 条冻结。
+9. 域间只经契约（R10）：2026-11-21 起**同级 `api/dto` 也放行**（实现包 `service/repository/adapter/domain` 仍禁）；当前 16 条边 / 52 类 = ⓪ 14 条 + ③ 族内 2 条，① clearable 与 ② owner 均 0。
 10. 线格式 1,339 金片逐字节不变；协议变更属产品决策、不夹带。
 11. platform 不放业务形状（判据见 §4）。
 
 ## 3. 三条红线（本次不变）
 
-1. **载体红线**：不得上提持久化实体（`@TableName`/TypeHandler/可变 setter）到 L1；contract 不放**内部件/持久化形状**；platform 不放**业务形状**。
+1. **载体红线**：不得上提持久化实体（`@TableName`/TypeHandler/可变 setter）到 L1；`api` 包不放**内部件/持久化形状**；`platform` 不放**业务形状**（C8 守）。
 2. **线格式红线**：金片签名 1,339 逐字节不变；确需变更 ⇒ 显式签字 + 前端确认（产品决策）。
 3. **纪律红线**：**不刷新 baseline 掩盖违例**；**守卫必须能红**（新增/改守卫必配红态探针）；**闸门退出码显式取用**（任何 `| head` 不得代替）。
 
 ## 4. 两条判定标准（沿用，2026-10-16 拍板）
 
-**contract**：跨域词汇表的**唯一一处**；零框架依赖；**每一个类都能回答"谁在跨域消费我"**。
+**`*/api`**：跨域词汇的落点（原 `contract` 的唯一性判据沿用）；零框架依赖（C1）；**每一个类都能回答"谁在跨域消费我"**（`gen-contract-consumers.py`）。`framework/shared` 是解散期的暂存区，不是合法落点。
 
 **platform**：只剩**技术适配**（框架、HTTP、存储、提示词、追踪、事件基建）；**任何业务形状出现即红灯**。
 
 口径：
 - 判定标准是**原则**，优先于方案 §8.1/§8.2 的枚举清单（方案原文："只公布跨模块确有消费者的 API/SPI"；"不为 DDD 完整编造空层"）。
-- **跨域端口/视图面扩容 = 追认**（A③ 域间契约化的必然产物）；**platform 业务形状 = 归正**（去框架化进 contract / 中性化 / 归域 / 归 agent-engine，见实施计划 v2 §1.2）。
-- 验收工具：`check-contract-purity.py`（C1/C2/C3 全零）+ **C8**（platform 内 `*View/*Port/*Request/*Response/*Payload/*Facts` 命名红灯，例外须登记理由）。
+- **跨域端口/视图面扩容 = 追认**（A③ 域间契约化的必然产物）；**platform 业务形状 = 归正**（中性化 / 归域 / 归引擎，见实施计划 v2 §1.2）。
+- 验收工具：`check-contract-purity.py`（C1 导入根 + C3 框架形状全零；C2 构建依赖随 `contract` 消失停用）+ **C8**（platform 内 `*View/*Port/*Request/*Response/*Payload/*Facts` 命名红灯，例外须登记理由）。`shared` 解散后 C8 的 shared 豁免一并失效，永驻 platform 的词汇必须登记。
 
 ## 5. 批次计划（唯一待办来源）
 
@@ -81,12 +81,12 @@
 | **P0** | 三份只读基线：`scripts/gen-package-baseline.py` 生成端点 / 装配面 / 跨域引用三份 JSON | 端点 397 · Mapper 45 · `@Configuration` 23 · 跨域边 11 · 可复现（`--check` 无变化） | ✅ 2026-11-19 |
 | **P1** | 结构规则先行：新增 `PackageRestructureBoundaryTest`（R-1 跨域直连棘轮 2 条边 / R-2 注解 SQL 精确 282）+ 扫描名单核对（`@ConfigurationPropertiesScan` 11 包 / `@MapperScan` 通配 / 无 `@Aspect`） | R-1 与 R-2 均绿；`ArchitectureRulesTest` 22 条不受影响；守卫 49/49 | ✅ 2026-11-19 |
 | **P2** | `api/` 里的 `*Adapter` 迁到 `adapter/`（32 个 / 11 域），纯移动不改逻辑；8 个无 `api/` 的域跳过。顺序见方案 §4.2 | 每域：编译 + 定向测试（clean 后确认条数）+ 三份快照 diff 为空 | ✅ 完成（11/11，2026-11-19） |
-| **P3** | 类职责归位：`*Ops`(50) / `*Support`(21) / `*Wiring`(13) 合并回 service | 该域定向测试 + 金片 + 全量闸门 | 待做 |
+| **P3** | 类职责归位：`*Ops`(50) / `*Support`(21) / `*Wiring`(13) 合并回 service | 该域定向测试 + 金片 + 全量闸门 | ✅ 2026-11-19（回引 62 → 消 40 / 留 22，见 §12） |
 | **P4** | `api/` 语义纠正（P2 已做）+ 域间边界校验 | 跨域直连 2 → 1；余 1 条已论证并写明后续归属 | ✅ 2026-11-19 |
 
 **P2 顺序**（文件数从小到大；前 6 个域用来跑顺流程）：`favorite`(13) → `system`(18) → `vectorstore`(20) → `audit`(20) → `embedchannel`(25) → `agentmanagement`(27) → `model`(38) → `websearch`(52) → `agenttools`(59) → `storage`(62) → `memory`(91) → `im`(106) → `auth`(122) → `datasource`(147) → `wiki`(165) → `mcp`(171) → `session`(212) → `knowledge`(283)。
 
-**阻塞项**：`knowledge ⇄ wiki` 域级循环（`KnowledgeProcessWiring` ↔ `WikiIngest*`，实现类直连而非 Port）。P1 规则上线第一天会红，P3 前必须解开。
+**阻塞项（已解）**：`knowledge ⇄ wiki` 域级循环——P3-0 用 4 个端口解开，R-1 基线 4 → 2。
 
 ### 5.1 历史欠账（不在本次范围；明细见归档）
 
@@ -110,7 +110,7 @@ H7（platform 判据换血）· H8（适配层逻辑化）· H9（管理面模�
     JAVA_HOME=/opt/homebrew/opt/openjdk@21 mvn -B verify
   ```
   **`ZZ_PG_JDBC` 必给**：`GrepChunksRecordingTest` 与 `DatabaseQueryRecordingTest` 默认连 `WeKnora`（CI 的库名），本机库名是 `RagAgent`；不给会在 domains 报 `database "WeKnora" does not exist`，两个测试设计为「不可达即失败、不许跳过」。
-  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒（2026-11-19 全量实测 **5257 / 失败 0 / 跳过 2**：contract 12 · platform 262 · retrieval-engine 286 · model-runtime 320 · agent-engine 157 · domains **2862** · boot **1358**；旧口径 5082 已过期）。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
+  期望：`BUILD SUCCESSFUL` + 各模块测试汇总条数守恒。**旧口径 5257 已过期**（`contract`/`platform`/`boot` 三个模块名都不存在）；2026-11-21 开工前重跑一次，把 `framework / model-runtime / retrieval-engine / agent-engine / app` 五段条数记进 §12 首行，之后每批对照。`PATH` 须 `/opt/homebrew/bin` 在前（python3.9 会让 file-size 假红）。
   **环境前置**：PG `max_connections=100`，多个 boot jar 残留会占满连接（实测 5 个实例 = 50 条 ⇒ `too many clients`）。跑闸门前先 `ps -Ao pid,command | grep '[b]oot/build/libs/boot'` 清残留。
 - **⚠️ IDE 自动构建会与 Maven 抢 `target/`**：2026-11-19 实测，`clean verify` 期间 IDE 写入半成品 class，domains 测试随机报 `Unresolved compilation problems`（JDT 专属措辞）或 `cannot access Xxx` / `incompatible types`，且每次报错的文件不同。**判别：换一个错误文件就是竞争，不是回归。**
   根因是语言服务器进程用 Homebrew openjdk **27** 启动（`ps -Ao command | grep eclipse.jdt.ls` 可证），与 Maven 的 21 不一致。分两层处理：
@@ -123,41 +123,32 @@ H7（platform 判据换血）· H8（适配层逻辑化）· H9（管理面模�
 
 ## 7. 测试与安全网
 
-- 回归网：**1,339 契约金片 + 5,257 条用例**（2026-11-19 全量实测，失败 0 / 跳过 2）；每一步（哪怕纯移动）结束必须全绿。
+- 回归网：**1,339 契约金片**（2026-11-21 实测条数未变）+ 全量用例（条数以 §12 开工基线为准）；每一步（哪怕纯移动）结束必须全绿。
 - 已知偶发（全量并发下，单独重跑即绿，勿误判回归）：`WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool` · `EvaluationContractTest.getTerminalRunsExecution` · `EmbedRateLimiterTest.redisPathSharesBudgetAcrossInstances`。
 - **Redis 瞬态族已修（2026-10-19）**：根因是 `EmbeddedRedis` 用 `ServerSocket(0)` 探端口在 `maxParallelForks` 下会撞——后到者借用先到者的实例，先到者 close 杀进程后连接全断。现改为固定端口池 + 跨进程 `FileLock`，红态探针 `EmbeddedRedisPortAllocationTest` 守着；全量连跑 5 遍 0 失败。再见到同类失败按真回归查。
 - 覆盖率：**未执行基线**（`-Pcoverage`）⇒ 本项目**不声称任何覆盖率数字**（开放项）。
 - 前端：`vue-tsc` 是最终文件集上的最后一步（`tsx --test` 只转译不查类型）。
-- **契约金片**：`platform/src/testFixtures/resources/golden/`（`agent-45a/45b/45c/46/46b`、`chat-pipeline-46c`、`modelcontext-46a`，各带 `.sha256`），加载器 `platform.fixtures.GoldenResources` 逐字节校验；"重录"= 按当前实现同步常量并重算 sha256，禁止手改 JSON 或 sha256；新增 bundle 时使用方模块依赖 `platform` 的 `test-jar`。
+- **契约金片**：`backend/framework/src/testFixtures/resources/golden/`（`agent-45a/45b/45c/46/46b`、`chat-pipeline-46c`、`modelcontext-46a`，各带 `.sha256`），加载器 `platform.fixtures.GoldenResources` 逐字节校验；"重录"= 按当前实现同步常量并重算 sha256，禁止手改 JSON 或 sha256；新增 bundle 时使用方模块依赖 `framework` 的 `test-jar`。
 
 ## 8. 结构地图与守卫总表
 
-### 8.1 现状模块（7）与目标（7）
+### 8.1 现状模块（5）
 
-> 计数口径：`<模块>/src/main/java/**/*.java`，**不含 package-info**（2026-10-16 R5a 后实测）。
+> 计数口径：`<模块>/src/main/java/**/*.java`，**不含 package-info**（2026-11-21 实测）。
 
 ```
-现状（2026-10-24 实测，此后未重测）      目标（上一阶段方案 §5.1，非本次目标）
-contract      293 件（纯 JDK，零依赖块）  →  contracts/
-platform      174 件（技术适配 + 追踪装饰/流句柄/共享传输 + 提示词/配置）→ platform/
-model-runtime 134 件（llm 52 · modelruntime 39 · embedding 19 ·
-                 modelcontext 12 · rerank 12）
-                                        →  model-runtime（已成）
-retrieval-engine 80 件（engine 69 · 根 4 · graph 3 · support/artifact/config/telemetry 各 1）
-                                        →  retrieval-engine（已成）
-agent-engine   63 件（根 19 · tool 15 · compaction 11 · skills 8 · prompt 7 · budget 2 · domain 1）
-                                        →  agent-engine（已成）
-domains      1366 件（knowledge 232 · session 182〔含 rag 50〕· mcp 155 · wiki 145 ·
-                 datasource 128 · auth 104 · im 88 · memory 77 · agenttools 53 · …）
-                                        →  domains
-boot           17 件                      →  boot
+framework        355 件（platform 技术适配 + shared 188 个待解散类型）
+model-runtime    158 件（llm · modelruntime · embedding · modelcontext · rerank）
+retrieval-engine 114 件（engine 69 · retrieval/api · graph · support/artifact/config/telemetry）
+agent-engine      90 件（根 · tool · compaction · skills · prompt · budget · domain）
+app             1489 件（17 个业务域 + config 装配根）
 
-依赖方向：boot → 全部；domains / 三个 runtime → platform, contract；platform → contract；contract → JDK
-（**`:engine` 已解散**：chatpipeline → `domains/session/service/rag`、webfetch/抓取面 → `domains/websearch/fetch`
- ⇒ 旧的 `api(:model-runtime)`/`api(:retrieval-engine)` 传递边随模块消失；domains/boot 显式声明
-  各 runtime（含 R5a 的 `:agent-engine`，domains 那条是**过渡边**待 R5b/R5c 收窄）
- ——其中 domains→model-runtime 是**过渡边**，待 R2c-3d 余项收完）
+依赖方向：app → 全部；agent-engine → framework, model-runtime；
+          retrieval-engine / model-runtime → framework；framework → 无模块依赖（技术底座）。
+（`contract` 已解散：原契约类型两处——已归位到各域/引擎 `api`；其余暂存 `framework/shared`，
+  待 `shared` 解散清零。`shared` 是暂存区，不是合法落点。）
 ```
+
 ### 8.2 域内分层（上一阶段方案 §6，本次沿用）
 
 `controller`（绑定/帧写出）· `service`（用例与政策）· `domain`（状态与不变量）· `mapper` · `repository` · `dto` · `client` · `task` · `api` · `support` · `config`（只装配）。
@@ -168,8 +159,8 @@ boot           17 件                      →  boot
 | 守卫 | 语义 | 基线 |
 |---|---|---|
 | `check-package-cycles.py` | 环/分层/域依赖/SCC（R1~R9） | `package-cycles.baseline.json`（只许减；包级 SCC 5 组） |
-| `check-domain-contracts.py` | **R10 域间只经契约**（分档①②③） | `domain-contracts.baseline.json`（**6 条边 / 27 类**；clearable 0） |
-| `check-contract-purity.py` | C1 导入根（纯 JDK）· C2 构建依赖 · C3 框架形状 | 硬零，无基线 |
+| `check-domain-contracts.py` | **R10 域间只经契约**（分档 ⓪①②③；⓪ 含同级 api/dto） | `domain-contracts.baseline.json`（16 条边 / 52 类 = ⓪ 14 · ③ 2 · ①② 0） |
+| `check-contract-purity.py` | C1 导入根（纯 JDK）· C3 框架形状（C2 随 contract 消失停用） | 硬零，无基线 |
 | `check-contract-sync.py` | 金片键签名变化必须签字 | 1,339 金片 |
 | `check-json-key-case.py --strict` | 换锚棘轮 + 冻结覆盖快照 | 冻结面登记 |
 | `check-event-face-case.py` | 事件面/路由面命名口径 | — |
@@ -186,8 +177,8 @@ boot           17 件                      →  boot
 | `check-module-graph.py` | 主码依赖矩阵 · 同包 · 测试边登记 · 测试错位登记 · 夹具包 | 登记表（只许减） |
 | `check-platform-shapes.py` | platform 业务形状（业务词包 / 业务词文件 / 红旗命名三档） | `platform-shapes.baseline.json`（15 条） |
 | `check-contract-shape.py` | R1/R2 契约形状预算（端口 ≤7 方法 / 行视图禁入 / 字段 ≤20） | `contract-shape.baseline.json`（19 条 = 端口 4 / 行视图 7 / 字段 8，只许减） |
-| `gen-contract-consumers.py --check` | 每个 public 契约类型至少有一个消费者（跨模块 import 或 contract 内同包引用） | 硬零 |
-| `check-port-budget.py` | R1 端口准入（域内 / 无实现端口 = 0） | `port-budget.baseline.json`（空） |
+| `gen-contract-consumers.py --check` | 每个 `api` 包 public 类型至少有一个消费者（import 或同包引用） | 硬零 |
+| `check-port-budget.py` | R1 端口准入（域内 / 无实现端口 = 0） | `port-budget.baseline.json`（11 条：重锚到全模块后暴露的单域端口） |
 | `gen-arch-index.py --check` | `package-info` 与 `docs/architecture/packages.md` 同步 | 硬零 |
 | `check-tenant-scope.py` | 跨线程身份必须走 `TenantScope`；禁止裸 capture/replay | 硬零 |
 | `check-log-exceptions.py` | log 里禁止 `Throwable.toString()` / `.getMessage()` | 硬零 |
@@ -217,12 +208,12 @@ boot           17 件                      →  boot
 | `gen-domain-index.py --check` | 业务域索引（`domain-index.md` 必须与分类/源码同步） | 硬零 |
 | ArchUnit `ArchitectureRulesTest` | A1~A20（含 A16/A17 边界禁令、A18 状态所有权、A19 分层、A20 装配契约） | 各基线只许减 |
 
-> 守卫总数以 `scripts/run-guards.sh` 的 `run` 行数为准（当前 48 条）；本表是语义索引，二者增删要同步。
+> 守卫总数以 `scripts/run-guards.sh` 的**汇总行**为准（当前 **49** 条；`^run ` 行 49 处，另 1 处 `run` 在注释里）；本表是语义索引，二者增删要同步。
 
 ## 9. 落刀方法论（精要；**全量判据见归档 v0.2.0 §13/§14**）
 
 1. **固定套路**：侦察（图分析+引用面）→ 动前断言（零入度/引用面白名单）→ `git mv` → FQN/import 修复（编译驱动）→ 定向测试 → 全量闸门 → 提交；**一次只搬一个包簇**。
-2. **搬前三道判据**：① 同包裸名共居检查；② 消费域核查（只被本域用 ⇒ 回域，不进契约）；③ §5.1 三测 + **持久化形状排除**（内部件/实体字段类型不得进 contract）。
+2. **搬前三道判据**：① 同包裸名共居检查；② 消费域核查（只被本域用 ⇒ 回域，不进契约）；③ §5.1 三测 + **持久化形状排除**（内部件/实体字段类型不得进 `api`）。
 3. **三维闭包预检**：import + **同包裸名** + **字符串 FQN/注册名**（三类全查，缺一必栽）。
 4. **`git mv` 后必须 `--rerun-tasks`**（时间戳让增量编译认为"已编译" ⇒ 测试静默少跑；每批必须核对测试条数守恒）。
 5. **换锚五处**：`FROZEN_PREFIXES`（json-key）· `file-size.limits` 键 · json 键文件路径 · SCC 基线成员 · 扫描名单（`_source_roots.py` 的 `MODULE_DIRS` 一行覆盖多脚本）。
@@ -268,12 +259,12 @@ boot           17 件                      →  boot
 | 12 | 向量店进程内引擎注册表 | 设计取舍 | 注册表为空，连通性探测走厂商直连 |
 | 13 | OpenSearch 超大批量 scroll | 待实现 | 单次写入超批量上限时不分页；调小分块批量 |
 | 14 | Ollama 私部署分支 | 设计取舍 | 只支持 `localhost`，不处理自定义私部署路径 |
-| 15 | 工具 SPI 迁入 `contract.tool` | 已关闭 | `AgentTool` / `BaseTool` / `ToolDefinitions` 均在契约层 |
+| 15 | 工具 SPI 迁入契约层 | 已关闭 | `AgentTool` / `BaseTool` 暂存 `framework/shared/tool`（`ToolDefinitions` 已在 `model-runtime/llm/api`），随 `shared` 解散归 `agent-engine/api` |
 | 16 | 审批闸门未装配 | 设计取舍 | MCP OAuth / 工具审批受理分支返回 500，不静默放行 |
 | 17 | IM 知识桥接的存疑接线 | 待核查 | 生产 `/info` 与 `/search` 的 KB/检索面恒为空 |
 | 18 | Wiki 页面 → chunks 同步 | 待实现 | Wiki 内容不写入 `chunks`，不参与常规 RAG；走 Wiki 专用检索 |
 | 19 | `Provider.validateConfig()` 生产接线 | 已关闭（Q1） | `ModelConfigValidator` 在模型保存（创建/更新/凭据）路径统一调用，只做结构校验 |
-| 20 | `system → auth.adapter.AdminUserAdapter` 跨域直连具体类 | 待实现 | `AdminUserAdapter` 未实现任何接口，system 两个 service 直接注入（字段名却叫 `adminUserPort`）；根治需在 `contract.auth` 声明端口并把 `CreateUserResult` 上提。P2-4 移动时暴露，现登记在 R-1 棘轮基线 |
+| 20 | `system → auth.adapter.AdminUserAdapter` 跨域直连具体类 | 待实现 | `AdminUserAdapter` 未实现任何接口，system 两个 service 直接注入（字段名却叫 `adminUserPort`）；根治需在 `auth/api` 声明端口并把 `CreateUserResult` 上提。P2-4 移动时暴露，现登记在 R-1 棘轮基线 |
 
 ## 12. 执行记录（本次重构；模板：批次｜内容｜读数｜验证）
 
@@ -309,7 +300,8 @@ boot           17 件                      →  boot
 | 文档 | 用途 |
 |---|---|
 | `HANDOFF.md`（本文） | **唯一指挥面**：本次重构的目标 / 批次表 / 纪律 / 环境 / 结构地图 |
-| `docs/internal/plans/backend-package-restructure-2026-11-19.md` | **本次方案**：边界、五批判据、搬家风险清单、为何不做包名对齐 |
+| `docs/internal/plans/backend-package-restructure-2026-11-19.md` | 上一阶段方案：边界、五批判据、搬家风险清单、为何不做包名对齐 |
+| `docs/internal/plans/shared-dissolution-execution-2026-11-21.md` | **当前主线**：`shared` 解散执行计划（153 个业务词汇的唯一归属总表 · 6 个 WP · 守卫平移清单） |
 | `docs/blueprint/architecture-blueprint.md` | 未来架构蓝图（只作参考，本次只抽取分包一项） |
 | `docs/internal/handoff/archive/HANDOFF-v0.10.x-2026-11-19.md` | v0.10.x 全文快照（v0.5.0~v0.11.x 全部逐批记录、各专项明细与否决理由） |
 | `docs/internal/handoff/archive/HANDOFF-v0.2.0-2026-10-16.md` | v0.2.0 全文（结构规范 / 方法论全量 / 逐批记录） |

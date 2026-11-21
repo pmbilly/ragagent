@@ -84,7 +84,7 @@
 五个 Maven 模块，**依赖单向、边界在编译期强制**：越界依赖无法编译，模块之间只认契约。
 
 ```
-:app               ──►  全部模块（组合根：启动类 + 17 个装配类 + 19 个业务域）
+:app               ──►  全部模块（组合根：启动类 + 17 个装配类 + 17 个业务域）
 :agent-engine      ──►  :framework  :model-runtime（模型上下文词汇）
 :retrieval-engine  ──►  :framework
 :model-runtime     ──►  :framework
@@ -98,7 +98,7 @@
 | `:model-runtime` | **模型运行时**：26 家 LLM provider 的传输与出站请求体拼装、Embedding / 重排客户端族、模型上下文协议（工具调用与思考块解析）、抽取、Ollama 本地模型管理 | platform · contract |
 | `:retrieval-engine` | **检索引擎**：九种向量/检索后端的适配与注册、混合检索融合、重排管线、索引写入与向量店连通性探测 | platform · contract |
 | `:agent-engine` | **Agent 引擎**：ReAct 执行循环与阶段（think/act/observe/finalize）、工具注册表与工具框架、技能目录与装载、上下文压缩、预算与转向 | platform · contract · model-runtime |
-| `:app` | **应用（组合根 + 业务域）**：19 个业务域（知识库、会话、Wiki、Agent 管理、MCP（含工具审批）、IM、数据源、认证（含租户）、审计、记忆、收藏、系统设置……）含 51 个控制器与持久层，外加应用入口与 17 个全局装配类。只出不进（无任何模块依赖它） | 全部 |
+| `:app` | **应用（组合根 + 业务域）**：17 个业务域（知识库、会话、Wiki、Agent 管理、MCP（含工具审批）、IM、数据源、认证（含租户）、审计、记忆、收藏、系统设置……）含 51 个控制器与持久层，外加应用入口与 17 个全局装配类。只出不进（无任何模块依赖它） | 全部 |
 
 全部模块合计 **51 个业务控制器**（另有 1 个 `/health` 基础设施探针）。
 
