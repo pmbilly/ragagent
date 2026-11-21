@@ -79,7 +79,7 @@ TIER_FAMILY = 'intra-family'
 TIER_MARK = {TIER_LEVEL: '⓪', TIER_CLEARABLE: '①', TIER_OWNER: '②', TIER_FAMILY: '③'}
 
 
-# ── 域分级（蓝图 §5.4：只允许上级依赖下级） ────────────────────────────────
+# ── 域分级（蓝图 §5.4：上级→下级；同级只许 api/dto） ──────────────────────
 #: 级别的单一来源是 scripts/capability-kinds.json 的 level 字段（1 基础 / 2 业务 / 3 编排）
 def _load_levels():
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'capability-kinds.json')
@@ -92,19 +92,25 @@ LEVEL = _load_levels()
 #: 跨域只允许 import 对方的契约包；实现包（service/repository/adapter/domain/mapper）一律禁
 LEGAL_IMPORT_PKG = {'api', 'dto'}
 
-#: 由级别判定为合法的边（①②③ 之外的第四档：上级 → 下级 的 api/dto）
+#: 由级别判定为合法的边（①②③ 之外的第四档：上级 → 下级、或同级 → api/dto）
 _LEVEL_OK: set[str] = set()
 #: 边 → 被导入的二级包名集合（api/dto/service/…），供分级判定用
 _EDGE_PKGS: dict[str, set] = collections.defaultdict(set)
 
 
 def level_verdict(edge, imps):
-    """上级 import 下级且目标是 api/dto ⇒ ok；下级→上级 或 同级 ⇒ inverted；否则 None。"""
+    """上级→下级、同级→api/dto ⇒ ok；下级→上级 或 跨域实现包 ⇒ inverted；否则 None。
+
+    同级放行的理由：L1 是"非业务/非编排"的合并层（auth/audit/storage/websearch/
+    initialization 同层），audit 要知道"谁做的"、websearch 要读租户配置，语义上的
+    上下级真实存在但层级表表达不出。环本身由 check-package-cycles.py（R1/R1b/R9/R8）
+    独立兜底，这里只放开**契约面**，实现包（service/repository/adapter/domain）仍禁。
+    """
     a, b = edge.split('→')
     la, lb = LEVEL.get(a), LEVEL.get(b)
     if la is None or lb is None:
         return None
-    if la <= lb:
+    if la < lb:
         return 'inverted'
     pkgs = _EDGE_PKGS.get(edge) or set()
     if not pkgs or any(p not in LEGAL_IMPORT_PKG for p in pkgs):
@@ -221,7 +227,7 @@ def summarize(tiers, edges):
         agg[t][1] += len(v)
     fams = (tiers.get(TIER_FAMILY) or {}).get('families') or {}
     lines = []
-    for t, label in ((TIER_LEVEL, '上级→下级 api/dto（分级允许）'),
+    for t, label in ((TIER_LEVEL, '上级→下级 或 同级 api/dto（分级允许）'),
                      (TIER_CLEARABLE, '目标 0（A③ 主线）'), (TIER_OWNER, '登记允许（条件：读侧走 L1 端口）'),
                      (TIER_FAMILY, '族内豁免+冻结')):
         n, c = agg[t]
@@ -329,7 +335,7 @@ def main():
         return 0
 
     if inverted:
-        print('✗ 域间依赖方向违规（只允许上级 import 下级，且目标必须是 api/dto）：')
+        print('✗ 域间依赖方向违规（上级→下级、同级→api/dto；跨域实现包一律禁）：')
         for k, imps in sorted(inverted.items()):
             a, b = k.split('→')
             print(f'    {k}  L{LEVEL.get(a, "?")} → L{LEVEL.get(b, "?")}  {sorted(imps)[:4]}')

@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""契约消费者答案：每个 contract 类型必须能回答「谁在用它」。
+"""契约消费者答案：每个 api 契约类型必须能回答「谁在用它」。
 
 ## 为什么
 
-contract 的准入标准是「跨域词汇表的唯一一处」，但类型一多就会出现第二种失守：
-某个类只剩自己或某一只域在用，仍留在 contract 里，慢慢变成「第二个 common」。
+api 包的准入标准是「跨域词汇的唯一一处」，但类型一多就会出现第二种失守：
+某个类只剩自己或某一只域在用，仍留在 api 里，慢慢变成「第二个 shared」。
 本脚本把消费者算成可查的答案，并用 `--check` 拦住**零消费者**的公共类型。
 
 ## 口径
 
-  * 类型：contract 主码里的顶层 class/interface/record/enum（去掉注释后按行首匹配，
-    嵌套类型不计）；
-  * 消费者：`import com.ragagent.contract...<Type>;`（各模块 main/test），
-    以及 contract 内同包文件的简单名引用；
+  * 类型：各模块主码里包路径含 `api` 段的顶层 class/interface/record/enum
+    （去掉注释后按行首匹配，嵌套类型不计）；
+  * 消费者：`import com.ragagent...<Type>;`（各模块 main/test/testFixtures），
+    以及同包文件的简单名引用；
   * `--check` 只判「零消费者」——单域消费者是合法答案（是否回域由人工按形状判断）。
 
 ## 用法
@@ -30,12 +30,14 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-MODULES = ["backend/contract", "backend/framework", "backend/model-runtime", "backend/retrieval-engine",
-           "backend/agent-engine", "backend/app"]
-CONTRACT = ROOT / "backend/contract/src/main/java"
+sys.path.insert(0, str(ROOT / "scripts"))
+import _source_roots as _sr  # noqa: E402
+
+API_SEG = "api"
 TYPE = re.compile(r"^(?:public\s+)?(?:final\s+|abstract\s+|sealed\s+)?"
                   r"(?:class|interface|record|enum)\s+(\w+)", re.M)
-IMPORT = re.compile(r"^import\s+(com\.ragagent\.contract\.[\w.]+);", re.M)
+IMPORT = re.compile(r"^import\s+(com\.ragagent\.[\w.]+);", re.M)
+PKG = re.compile(r"^package\s+([\w.]+);", re.M)
 
 
 def strip_comments(text: str) -> str:
@@ -55,11 +57,25 @@ def top_level_types(text: str) -> list[str]:
     return names
 
 
+def _api_files(sources: tuple[str, ...]):
+    """主码里包路径含 `api` 段的文件：(源集, 模块, 路径)。"""
+    for source_set, module, base in _sr.java_roots(sources):
+        for path in base.rglob("*.java"):
+            if API_SEG in path.relative_to(base).parts[:-1]:
+                yield source_set, module, path
+
+
+def _all_files(sources: tuple[str, ...]):
+    for source_set, module, base in _sr.java_roots(sources):
+        for path in base.rglob("*.java"):
+            yield source_set, module, path
+
+
 def contract_types() -> dict[str, pathlib.Path]:
     found = {}
-    for path in CONTRACT.rglob("*.java"):
+    for _, _, path in _api_files(("main",)):
         text = strip_comments(path.read_text(encoding="utf-8", errors="ignore"))
-        pkg = re.search(r"^package\s+([\w.]+);", text, re.M)
+        pkg = PKG.search(text)
         if not pkg:
             continue
         for name in top_level_types(text):
@@ -68,61 +84,58 @@ def contract_types() -> dict[str, pathlib.Path]:
 
 
 def consumer_label(module: str, path: pathlib.Path) -> str:
-    if module == "domains":
-        match = re.search(r"backend/app/src/(?:main|test|testFixtures)/java/com/ragagent/(\w+)/",
+    if module == "backend/app":
+        match = re.search(r"src/(?:main|test|testFixtures)/java/com/ragagent/(\w+)/",
                           path.as_posix())
         return f"domains:{match.group(1)}" if match else "app"
     return module
 
 
+def _reference_labels(types: dict[str, pathlib.Path], sources: tuple[str, ...],
+                      split_kind: bool) -> dict[str, set[str]]:
+    """类型 → 消费者标签集合（不含声明文件自身）。
+
+    同包简单名引用也算消费者：api 包内互相引用的类型同样「有人在用」，
+    少了这一支，纯同包工具类会全部落进零消费者。
+    """
+    by_pkg: dict[str, dict[str, str]] = collections.defaultdict(dict)
+    for fq in types:
+        pkg, name = fq.rsplit(".", 1)
+        by_pkg[pkg][name] = fq
+
+    labels = collections.defaultdict(set)
+    for source_set, module, path in _all_files(sources):
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        label = consumer_label(module, path)
+        if split_kind and source_set != "main":
+            label = f"{label}[{source_set}]"
+
+        for imported in IMPORT.findall(text):
+            if imported in types and types[imported] != path:
+                labels[imported].add(label)
+
+        body = strip_comments(text)
+        pkg_match = PKG.search(body)
+        if not pkg_match:
+            continue
+        for name, fq in by_pkg.get(pkg_match.group(1), {}).items():
+            if types[fq] != path and re.search(rf"\b{name}\b", body):
+                labels[fq].add(label)
+    return labels
+
+
 def scan(types: dict[str, pathlib.Path]) -> dict[str, set[str]]:
-    """类型 → 消费者标签集合（不含声明文件自身）。"""
-    consumers = collections.defaultdict(set)
-    simple = {fq.rsplit(".", 1)[-1]: fq for fq in types}
-    for module in MODULES:
-        for kind in ("main", "test", "testFixtures"):
-            base = ROOT / module / "src" / kind / "java"
-            if not base.exists():
-                continue
-            for path in base.rglob("*.java"):
-                text = path.read_text(encoding="utf-8", errors="ignore")
-                for imported in IMPORT.findall(text):
-                    if imported in types and types[imported] != path:
-                        consumers[imported].add(consumer_label(module, path))
-                if not module.endswith("/contract"):
-                    continue
-                body = strip_comments(text)
-                for name, fq in simple.items():
-                    if types[fq] == path:
-                        continue
-                    if re.search(rf"\b{name}\b", body):
-                        consumers[fq].add("contract")
-    return consumers
+    return _reference_labels(types, ("main", "test", "testFixtures"), split_kind=False)
 
 
 def scan_detailed(types: dict[str, pathlib.Path]):
     """返回（全部消费者标签，仅 main 消费者标签）；后者用于还乡阻断判定。"""
-    all_labels = collections.defaultdict(set)
-    main_labels = collections.defaultdict(set)
-    for module in MODULES:
-        for kind in ("main", "test", "testFixtures"):
-            base = ROOT / module / "src" / kind / "java"
-            if not base.exists():
-                continue
-            for path in base.rglob("*.java"):
-                text = path.read_text(encoding="utf-8", errors="ignore")
-                for imported in IMPORT.findall(text):
-                    if imported in types and types[imported] != path:
-                        label = consumer_label(module, path)
-                        all_labels[imported].add(
-                            label if kind == "main" else f"{label}[{kind}]")
-                        if kind == "main":
-                            main_labels[imported].add(label)
-    return all_labels, main_labels
+    all_labels = _reference_labels(types, ("main", "test", "testFixtures"), split_kind=True)
+    return all_labels, scan(types)
 
 
 def reference_graph(types: dict[str, pathlib.Path]) -> dict[str, set[str]]:
-    """contract 内部引用图：同包裸名 + 跨包 import。"""
+    """api 内部引用图：同包裸名 + 跨包 import。"""
     simple = {fq.rsplit(".", 1)[-1]: fq for fq in types}
     graph: dict[str, set[str]] = collections.defaultdict(set)
     for fq, path in types.items():
@@ -140,7 +153,7 @@ def reference_graph(types: dict[str, pathlib.Path]) -> dict[str, set[str]]:
 
 
 def reverse_closure(start: str, graph: dict[str, set[str]]) -> set[str]:
-    """所有直接或间接引用 start 的 contract 类型（迁移必须带上）。"""
+    """所有直接或间接引用 start 的类型（迁移必须带上）。"""
     reverse: dict[str, set[str]] = collections.defaultdict(set)
     for src, targets in graph.items():
         for dst in targets:
@@ -159,7 +172,7 @@ def reverse_closure(start: str, graph: dict[str, set[str]]) -> set[str]:
 def relocate_report(types: dict[str, pathlib.Path], wanted: str | None) -> int:
     """按「反向闭包 + main 消费域」判断能否整体还乡。
 
-    判据：闭包内所有类型的 main 消费者只落在一个域/模块（boot 视为装配层跟随）。
+    判据：闭包内所有类型的 main 消费者只落在一个域/模块（装配层视为跟随）。
     两个及以上域共享即阻断——搬走会让其余域反向依赖目标域。
     """
     _, main_labels = scan_detailed(types)
@@ -167,7 +180,7 @@ def relocate_report(types: dict[str, pathlib.Path], wanted: str | None) -> int:
     targets = [fq for fq in types
                if wanted is None or fq == wanted or fq.endswith("." + wanted)]
     if wanted and not targets:
-        print(f"✗ contract 里没有 {wanted}")
+        print(f"✗ api 里没有 {wanted}")
         return 1
 
     rows = []
@@ -176,7 +189,7 @@ def relocate_report(types: dict[str, pathlib.Path], wanted: str | None) -> int:
         domains: set[str] = set()
         details = []
         for member in sorted(closure):
-            labels = set(main_labels.get(member, set())) - {"contract"}
+            labels = set(main_labels.get(member, set()))
             if labels:
                 details.append((member, labels))
                 domains |= labels
@@ -185,7 +198,7 @@ def relocate_report(types: dict[str, pathlib.Path], wanted: str | None) -> int:
     if wanted:
         for fq, closure, domains, details in rows:
             name = fq.rsplit(".", 1)[-1]
-            real = domains - {"boot"}
+            real = {d for d in domains if d not in ("app", "backend/app")}
             if not real:
                 status = "可迁（仅装配层/测试消费）" if domains else "无 main 消费者"
             elif len(real) == 1:
@@ -200,15 +213,15 @@ def relocate_report(types: dict[str, pathlib.Path], wanted: str | None) -> int:
                 print(f"    {member.rsplit('.', 1)[-1]} ← {', '.join(sorted(labels))}")
         return 0
 
-    movable = [r for r in rows if len(r[2] - {"boot"}) == 1]
-    blocked = [r for r in rows if len(r[2] - {"boot"}) > 1]
+    movable = [r for r in rows if len({d for d in r[2] if d not in ("app", "backend/app")}) == 1]
+    blocked = [r for r in rows if len({d for d in r[2] if d not in ("app", "backend/app")}) > 1]
     dead = [r for r in rows if not r[2]]
     print(f"还乡可行性：可迁 {len(movable)} · 阻断 {len(blocked)} · 无 main 消费者 {len(dead)}")
     for fq, closure, domains, _ in sorted(movable, key=lambda r: r[0]):
-        target = next(iter(domains - {"boot"}))
+        target = next(iter({d for d in domains if d not in ("app", "backend/app")}))
         print(f"  可迁  {fq.rsplit('.', 1)[-1]:28s} → {target:22s} 闭包 {len(closure)}")
     for fq, closure, domains, _ in sorted(blocked, key=lambda r: r[0]):
-        print(f"  阻断  {fq.rsplit('.', 1)[-1]:28s} ← {', '.join(sorted(domains - {'boot'}))}")
+        print(f"  阻断  {fq.rsplit('.', 1)[-1]:28s} ← {', '.join(sorted(domains))}")
     if dead:
         print("  无 main 消费者（死码候选）：" + ", ".join(
             r[0].rsplit(".", 1)[-1] for r in sorted(dead, key=lambda r: r[0])))
@@ -230,7 +243,7 @@ def main() -> int:
         wanted = sys.argv[1]
         matches = [fq for fq in types if fq.endswith("." + wanted) or fq == wanted]
         if not matches:
-            print(f"✗ contract 里没有 {wanted}")
+            print(f"✗ api 里没有 {wanted}")
             return 1
         for fq in matches:
             labels = consumers.get(fq, set())

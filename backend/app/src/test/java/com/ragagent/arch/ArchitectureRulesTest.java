@@ -792,7 +792,7 @@ class ArchitectureRulesTest {
      */
     /** L1 底座顶层包：它们不是业务域/适配包，其内的 `task` 之类段名不算"边界层"。 */
     private static final Set<String> BASE_TOP_LEVEL = Set.of(
-            "common", "platform", "contract", "event", "tracing", "stream", "config");
+            "platform", "error", "event", "json", "text", "pagination", "tracing", "stream", "config");
 
     private static final List<String> SERVICE_FORBIDDEN_BOUNDARY =
             List.of("controller", "mapper", "task", "client", "channel");
@@ -1032,15 +1032,17 @@ class ArchitectureRulesTest {
     }
 
     /**
-     * 契约端口判据：顶层接口、名字以 {@code Port} 结尾、位于契约面（{@code com.ragagent.contract}）
-     * 或尚未迁完的 {@code com.ragagent.common}（A② 收纳进行中——两处都收，规则不会因搬家而静默失去
-     * 覆盖面；待 {@code common} 侧端口清零后再收窄为单前缀）。
+     * 契约端口判据：顶层接口、名字以 {@code Port} 结尾、位于任一 {@code api} 包
+     * （{@code com.ragagent.<域>.api}、{@code com.ragagent.<模块>.api} 及 {@code api} 下子包）。
+     *
+     * <p>判据锚在包路径的 {@code api} 段而不是模块名或某个固定前缀——端口搬到哪个模块，
+     * 覆盖就跟到哪里。</p>
      */
     private static boolean isContractPort(JavaClass clazz) {
+        String pkg = clazz.getPackageName();
         return clazz.isInterface()
                 && clazz.getSimpleName().endsWith("Port")
-                && (clazz.getPackageName().startsWith("com.ragagent.contract")
-                        || clazz.getPackageName().startsWith("com.ragagent.common"));
+                && ("." + pkg + ".").contains(".api.");
     }
 
     // ── 工具/管理适配包不得直连业务域 service/mapper ───────────────────

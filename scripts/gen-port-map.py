@@ -7,15 +7,20 @@
 
 ## 为什么需要
 
-`contract` 里有 40 个 `*Port`，读代码时 IDE 从接口跳不到实现（实现分散在
-domains / retrieval-engine 等模块）。本表把「谁调、谁实现、为什么存在」放在一处，
-避免每次靠 grep 反查。
+端口分散在各模块（`*/api/*Port` 与尚未迁完的 `shared/*`），读代码时 IDE 从接口跳不到
+实现（实现分散在 domains / retrieval-engine 等模块）。本表把「谁调、谁实现、为什么存在」
+放在一处，避免每次靠 grep 反查。
 
 ## 分类规则
 
   * **跨模块**：调用方与实现不在同一 Gradle 模块 ⇒ 端口必要（打破编译依赖）；
   * **域间**：同模块但不同业务域 ⇒ 端口服务于域解耦；
   * **域内**：同域 ⇒ 多为多余抽象，可评估内联。
+
+## 识别口径
+
+主码全部模块的 `*Port.java`，**只认顶层 interface**（`DefaultFileUrlPort` 一类实现类
+以 Port 结尾，不是端口）。契约解散后锚点不再写死某个目录：端口搬到哪，表跟到哪。
 
 生成物是派生数据：改 Port / 实现 / 调用方后重跑本脚本，不要手改。
 """
@@ -31,8 +36,9 @@ import _source_roots as _sr  # noqa: E402
 
 OUT = ROOT / "docs/architecture/port-map.md"
 IMPL = re.compile(r"\bimplements\s+([^{]+)")
-USES = re.compile(r"^import\s+com\.ragagent\.contract\.[\w.]*\.(\w+Port);", re.M)
+USES = re.compile(r"^import\s+com\.ragagent\.[\w.]*\.(\w+Port);", re.M)
 EXTENDS = re.compile(r"\binterface\s+(\w+)\s+extends\s+([^{]+)\{")
+DECLARES_INTERFACE = re.compile(r"\binterface\s+(\w+)\b")
 
 
 def module_of(path: pathlib.Path) -> str:
@@ -54,7 +60,10 @@ def domain_of(path: pathlib.Path) -> str:
 
 def main() -> int:
     ports = {}
-    for p in sorted((ROOT / "backend/contract/src/main/java").rglob("*Port.java")):
+    for p in sorted(ROOT.glob("backend/*/src/main/java/**/*Port.java")):
+        text = p.read_text(encoding="utf-8", errors="ignore")
+        if p.stem not in DECLARES_INTERFACE.findall(text):
+            continue
         ports[p.stem] = p
 
     impls = {}

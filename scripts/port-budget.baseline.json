@@ -1,0 +1,29 @@
+{
+  "note": "端口准入基线（R1：域内端口 / 无实现端口 = 0）。本文件只登记**存量**并逐条附理由，新增即红、减小后用 --write 思路手工删除条目（棘轮：只许减）。2026-11-21 首建：端口地图重锚到全部模块的 `*Port` interface 后，首次真实读数暴露 11 个单域端口。",
+  "allowed": [
+    "ChunkPort",
+    "ChunkQuestionPort",
+    "EmbeddingModelPort",
+    "KnowledgeFinalizePort",
+    "KnowledgeQaEventPort",
+    "KnowledgeReadPort",
+    "KnowledgeSpanPort",
+    "WikiIngestPort",
+    "AdminUserPort",
+    "AdminUserCommandPort",
+    "DataSourceSchedulePort"
+  ],
+  "reasons": {
+    "ChunkPort": "knowledge 域内：分块能力面，存量；随 shared 解散批次评估内联或收敛为域间端口",
+    "ChunkQuestionPort": "knowledge 域内：题目抽取面，存量",
+    "EmbeddingModelPort": "knowledge 域内：嵌入模型选择面，存量（模型侧另有 model-runtime 的 Embedder）",
+    "KnowledgeFinalizePort": "knowledge 域内：入库收口面，存量",
+    "KnowledgeQaEventPort": "session 域内：QA 事件面，存量",
+    "KnowledgeReadPort": "knowledge 域内：只读仓储面，存量",
+    "KnowledgeSpanPort": "knowledge 域内：片段定位面，存量",
+    "WikiIngestPort": "knowledge 域内：wiki 摄取面（wiki 已并入 knowledge），存量",
+    "AdminUserPort": "auth 域内：用户管理面（system 并入 auth 留下的域内端口）",
+    "AdminUserCommandPort": "auth 域内：用户写面（同上）",
+    "DataSourceSchedulePort": "datasource 域内：调度面，存量"
+  }
+}
