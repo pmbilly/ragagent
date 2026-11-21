@@ -1,7 +1,7 @@
 package com.ragagent.llm.api;
 
-import com.ragagent.framework.shared.graph.GraphNode;
-import com.ragagent.framework.shared.graph.GraphRelation;
+import com.ragagent.framework.vocabulary.GraphNode;
+import com.ragagent.framework.vocabulary.GraphRelation;
 import java.util.List;
 
 /**

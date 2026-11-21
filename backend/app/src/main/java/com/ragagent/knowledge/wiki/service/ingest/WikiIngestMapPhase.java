@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
-import com.ragagent.framework.shared.knowledge.ChunkView;
-import com.ragagent.framework.shared.knowledge.KnowledgeView;
-import com.ragagent.framework.shared.wiki.WikiLanguageSupport;
+import com.ragagent.framework.vocabulary.ChunkView;
+import com.ragagent.framework.vocabulary.KnowledgeView;
+import com.ragagent.framework.vocabulary.WikiLanguageSupport;
 import com.ragagent.knowledge.api.WikiImageMarkup;
 import com.ragagent.knowledge.api.chunk.KnowledgeSpanPort;
 import com.ragagent.knowledge.api.wiki.ExtractedItem;

@@ -1,8 +1,8 @@
 package com.ragagent.session.rag.support;
 
 import com.ragagent.framework.prompt.PromptComposer;
-import com.ragagent.framework.shared.retrieval.SearchResult;
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.retrieval.api.ChunkTypes;

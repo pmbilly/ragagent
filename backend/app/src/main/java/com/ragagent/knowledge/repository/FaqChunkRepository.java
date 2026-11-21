@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.knowledge.FaqChunkMetadataCodec;
 import com.ragagent.framework.persistence.DatabaseDialects;
 import com.ragagent.framework.persistence.PageRequests;
-import com.ragagent.framework.shared.knowledge.FaqChunkMetadata;
+import com.ragagent.framework.vocabulary.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.mapper.ChunkMapper;
 import java.time.OffsetDateTime;

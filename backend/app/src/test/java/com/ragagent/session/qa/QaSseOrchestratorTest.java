@@ -11,8 +11,8 @@ import static org.mockito.Mockito.when;
 
 import com.ragagent.framework.event.EventBusFactory;
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.shared.session.SseSink;
 import com.ragagent.framework.storage.support.StreamRewriter;
+import com.ragagent.framework.vocabulary.SseSink;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.modelruntime.stream.StreamBatch;

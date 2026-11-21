@@ -1,6 +1,6 @@
 package com.ragagent.agentengine.api;
 
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.ToolResult;
 import java.util.List;
 
 /**

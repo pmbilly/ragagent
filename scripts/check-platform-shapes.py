@@ -24,7 +24,7 @@ SUFFIXES = ("View", "Port", "Request", "Response", "Payload", "Facts", "Gateway"
 #: 共享词汇包：framework 承接 contract 之后，这里是「跨域共享的形状」而非技术适配，
 #: 判据 1~3 全部不适用（形状后缀、业务词是它的正常命名）。
 #: 契约面目录（原 shared，2026-11-21 起通用面提到顶层；这些目录里的业务词是正常命名）。
-CONTRACT_SEGMENTS = ("error", "event", "json", "text", "pagination")
+CONTRACT_SEGMENTS = ("vocabulary", "error", "event", "json", "text", "pagination")
 SHARED_SEGMENT = "shared"
 BUSINESS_PACKAGES = {"knowledge", "settings"}
 BUSINESS_WORDS = (
@@ -46,7 +46,7 @@ def hit_reason(path: Path):
     # 共享词汇层：framework 承接 contract 之后的形状集合（Facts/View/Port 是它的正常命名），
     # C8 判据 1~3 全部不适用；此处只要求它不写实现（由 R-1 与 C1/C3 分别把关）。
     # 契约面：shared 暂存区 + framework 下的通用面子包（Facts/View/Port 是正常命名）。
-    if rel_parts[:4] == ("com", "ragagent", "framework", "shared"):
+    if rel_parts[:4] == ("com", "ragagent", "framework", "vocabulary"):
         return None
     if len(rel_parts) > 3 and rel_parts[2] == "framework" and rel_parts[3] in CONTRACT_SEGMENTS:
         return None

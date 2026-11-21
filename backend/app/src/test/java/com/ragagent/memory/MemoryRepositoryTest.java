@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
 import com.ragagent.framework.pagination.PageResult;
-import com.ragagent.framework.shared.memory.MemoryKinds;
+import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.framework.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryTopicStat;

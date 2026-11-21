@@ -2,7 +2,7 @@ package com.ragagent.session.qa;
 
 import com.ragagent.framework.access.TenantContextSnapshot;
 import com.ragagent.framework.access.TenantScope;
-import com.ragagent.framework.shared.session.SessionLastRequestState;
+import com.ragagent.framework.vocabulary.SessionLastRequestState;
 import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.session.attachment.TemporaryDocumentService;
 import com.ragagent.session.conversation.MessageService;

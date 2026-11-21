@@ -3,7 +3,7 @@ package com.ragagent.mcp.tool;
 import com.ragagent.agentengine.api.AgentTool;
 import com.ragagent.agentengine.api.ToolExecContext;
 import com.ragagent.agentengine.api.ToolRequest;
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.framework.web.ToolJson;
 import com.ragagent.llm.api.ToolDefinitions;

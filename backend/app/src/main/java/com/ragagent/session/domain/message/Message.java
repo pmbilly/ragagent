@@ -6,14 +6,14 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.framework.persistence.PgJsonTypeHandler;
-import com.ragagent.framework.shared.agent.AgentStep;
-import com.ragagent.framework.shared.retrieval.SearchResult;
-import com.ragagent.framework.shared.session.MentionedItem;
-import com.ragagent.framework.shared.session.MessageArtifact;
-import com.ragagent.framework.shared.session.MessageAttachment;
-import com.ragagent.framework.shared.session.MessageExecutionContext;
-import com.ragagent.framework.shared.session.MessageImage;
-import com.ragagent.framework.shared.session.UsedMemory;
+import com.ragagent.framework.vocabulary.AgentStep;
+import com.ragagent.framework.vocabulary.MentionedItem;
+import com.ragagent.framework.vocabulary.MessageArtifact;
+import com.ragagent.framework.vocabulary.MessageAttachment;
+import com.ragagent.framework.vocabulary.MessageExecutionContext;
+import com.ragagent.framework.vocabulary.MessageImage;
+import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.framework.vocabulary.UsedMemory;
 import com.ragagent.llm.api.TokenUsage;
 import com.ragagent.session.domain.AgentStepListTypeHandler;
 import com.ragagent.session.domain.MentionedItemListTypeHandler;
@@ -49,7 +49,7 @@ import java.util.List;
  *
  * <h2>跨模块类型的处置</h2>
  * <p>{@code knowledge_references} 与 {@code agent_steps} 是有类型的列表
- * （{@link com.ragagent.framework.shared.retrieval.SearchResult} / {@link AgentStep}）——
+ * （{@link com.ragagent.framework.vocabulary.SearchResult} / {@link AgentStep}）——
  * 二者都直接出现在消息响应体里；若按不透明的 {@code List<Object>} 透传，读回来的元素
  * 会退化成 {@code LinkedHashMap}，键序变成 PG jsonb 的规范化序，**是实打实的契约偏差**。</p>
  * <p>仍按不透明类型处理的一处：{@code execution_context} 的字段本身是 {@code json:"-"}，

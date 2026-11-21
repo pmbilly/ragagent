@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.ragagent.framework.html.CodePointOrder;
-import com.ragagent.framework.shared.wiki.WikiLanguageSupport;
+import com.ragagent.framework.vocabulary.WikiLanguageSupport;
 import com.ragagent.knowledge.api.chunk.KnowledgeSpanPort;
 import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import com.ragagent.knowledge.api.wiki.SlugUpdate;

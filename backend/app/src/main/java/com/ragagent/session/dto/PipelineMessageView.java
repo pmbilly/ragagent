@@ -1,8 +1,8 @@
 package com.ragagent.session.dto;
 
 
-import com.ragagent.framework.shared.retrieval.SearchResult;
-import com.ragagent.framework.shared.session.PipelineMessageAttachmentView;
+import com.ragagent.framework.vocabulary.PipelineMessageAttachmentView;
+import com.ragagent.framework.vocabulary.SearchResult;
 import java.time.OffsetDateTime;
 import java.util.List;
 

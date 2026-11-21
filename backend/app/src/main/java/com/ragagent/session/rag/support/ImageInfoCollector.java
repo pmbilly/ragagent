@@ -1,6 +1,6 @@
 package com.ragagent.session.rag.support;
 
-import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.knowledge.api.ChunkQueryPort;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import java.util.ArrayList;

@@ -2,7 +2,7 @@ package com.ragagent.modelcontext;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.ToolResult;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;

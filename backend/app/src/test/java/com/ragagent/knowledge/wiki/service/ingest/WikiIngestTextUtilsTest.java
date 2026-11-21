@@ -2,7 +2,7 @@ package com.ragagent.knowledge.wiki.service.ingest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.shared.knowledge.ChunkView;
+import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.knowledge.api.WikiImageMarkup;
 import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiIngestPreviews;

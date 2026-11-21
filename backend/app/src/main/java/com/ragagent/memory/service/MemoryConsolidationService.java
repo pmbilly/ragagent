@@ -1,8 +1,8 @@
 package com.ragagent.memory.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.shared.memory.MemoryKinds;
 import com.ragagent.framework.tenant.MemoryConfig;
+import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.framework.web.ZeroTimeSerializer;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;

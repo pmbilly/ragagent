@@ -13,7 +13,7 @@ import com.ragagent.agentengine.api.RecentDocInfo;
 import com.ragagent.agentengine.api.SelectedDocumentInfo;
 import com.ragagent.framework.event.EventBusInterface;
 import com.ragagent.framework.eventbus.EventJson;
-import com.ragagent.framework.shared.agent.AgentToolCall;
+import com.ragagent.framework.vocabulary.AgentToolCall;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatResponse;

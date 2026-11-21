@@ -1,6 +1,6 @@
 package com.ragagent.im.service;
 
-import com.ragagent.framework.shared.session.MessageAttachment;
+import com.ragagent.framework.vocabulary.MessageAttachment;
 import com.ragagent.im.api.QaRequestPayload;
 import com.ragagent.im.runtime.AdapterInterfaces;
 import com.ragagent.im.runtime.AdapterInterfaces.Adapter;

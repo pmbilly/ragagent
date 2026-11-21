@@ -1,8 +1,8 @@
 package com.ragagent.session.service;
 
 import com.ragagent.framework.prompt.MessageAttachmentsPrompt;
-import com.ragagent.framework.shared.agent.AgentStep;
-import com.ragagent.framework.shared.agent.AgentToolCall;
+import com.ragagent.framework.vocabulary.AgentStep;
+import com.ragagent.framework.vocabulary.AgentToolCall;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.FunctionCall;

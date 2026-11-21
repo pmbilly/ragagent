@@ -13,9 +13,9 @@ import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.KnowledgeSearchBack
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.RankResult;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.RerankerModel;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.SearchResultView;
-import com.ragagent.framework.shared.knowledge.ChunkFacts;
-import com.ragagent.framework.shared.retrieval.SearchTarget;
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.ChunkFacts;
+import com.ragagent.framework.vocabulary.SearchTarget;
+import com.ragagent.framework.vocabulary.ToolResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

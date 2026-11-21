@@ -9,10 +9,10 @@ import static com.ragagent.session.rag.Rec46cSupport.mask;
 import static com.ragagent.session.rag.Rec46cSupport.msgsJSON;
 
 import com.ragagent.framework.prompt.PipelineConfig;
-import com.ragagent.framework.shared.graph.GraphNode;
-import com.ragagent.framework.shared.graph.GraphRelation;
-import com.ragagent.framework.shared.retrieval.SearchResult;
-import com.ragagent.framework.shared.session.PipelineMessageAttachmentView;
+import com.ragagent.framework.vocabulary.GraphNode;
+import com.ragagent.framework.vocabulary.GraphRelation;
+import com.ragagent.framework.vocabulary.PipelineMessageAttachmentView;
+import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.llm.extract.EntityExtraction;

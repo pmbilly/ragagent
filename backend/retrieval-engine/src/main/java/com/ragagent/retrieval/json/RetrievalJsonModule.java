@@ -2,7 +2,7 @@ package com.ragagent.retrieval.json;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.framework.web.JsonModuleProvider;
 import com.ragagent.retrieval.api.ConnectionConfig;
 import com.ragagent.retrieval.api.IndexConfig;

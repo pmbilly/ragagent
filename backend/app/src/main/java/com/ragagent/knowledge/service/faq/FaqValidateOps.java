@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.service.faq;
 
-import com.ragagent.framework.shared.knowledge.FaqChunkMetadata;
+import com.ragagent.framework.vocabulary.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
 import com.ragagent.knowledge.dto.faq.FaqFailedEntry;

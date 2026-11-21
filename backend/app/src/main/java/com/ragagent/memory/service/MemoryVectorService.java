@@ -2,9 +2,9 @@ package com.ragagent.memory.service;
 
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.access.TenantScopes;
-import com.ragagent.framework.shared.memory.MemoryKeys;
-import com.ragagent.framework.shared.memory.MemoryKinds;
 import com.ragagent.framework.tenant.MemoryConfig;
+import com.ragagent.framework.vocabulary.MemoryKeys;
+import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryItemEmbedding;

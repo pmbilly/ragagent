@@ -1,8 +1,8 @@
 package com.ragagent.agent.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.framework.shared.agent.AgentStep;
-import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.vocabulary.AgentStep;
+import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.llm.api.TokenUsage;
 import java.util.List;
 

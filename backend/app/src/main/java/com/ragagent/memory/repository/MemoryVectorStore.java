@@ -1,6 +1,6 @@
 package com.ragagent.memory.repository;
 
-import com.ragagent.framework.shared.memory.MemoryKinds;
+import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.framework.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryItemEmbedding;

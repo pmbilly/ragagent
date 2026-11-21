@@ -1,6 +1,6 @@
 package com.ragagent.session.rag.plugin;
 
-import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;

@@ -1,7 +1,7 @@
 package com.ragagent.framework.tenant;
 
-import com.ragagent.framework.shared.memory.MemoryKeys;
-import com.ragagent.framework.shared.memory.MemoryKinds;
+import com.ragagent.framework.vocabulary.MemoryKeys;
+import com.ragagent.framework.vocabulary.MemoryKinds;
 import java.time.Duration;
 
 

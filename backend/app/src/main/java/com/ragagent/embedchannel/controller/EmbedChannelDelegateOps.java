@@ -8,7 +8,7 @@ import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.security.LogSanitizer;
-import com.ragagent.framework.shared.session.MessageView;
+import com.ragagent.framework.vocabulary.MessageView;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ServletSseSink;
 import java.util.List;

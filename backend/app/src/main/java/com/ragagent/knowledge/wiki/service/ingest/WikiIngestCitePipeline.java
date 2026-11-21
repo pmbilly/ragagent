@@ -2,7 +2,7 @@ package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.shared.knowledge.ChunkView;
+import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.chunk.ChunkPort;
 import com.ragagent.knowledge.api.wiki.ExtractedItem;

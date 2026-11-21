@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.framework.shared.session.SuggestionItem;
+import com.ragagent.framework.vocabulary.SuggestionItem;
 import com.ragagent.session.domain.SuggestionItemListTypeHandler;
 import java.time.OffsetDateTime;
 import java.util.List;

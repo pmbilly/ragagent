@@ -3,7 +3,7 @@ package com.ragagent.session.service;
 import com.ragagent.agentengine.api.SteerSink;
 import com.ragagent.framework.access.TenantContextSnapshot;
 import com.ragagent.framework.access.TenantScope;
-import com.ragagent.framework.shared.session.MentionedItem;
+import com.ragagent.framework.vocabulary.MentionedItem;
 import com.ragagent.modelruntime.stream.StreamBatch;
 import com.ragagent.modelruntime.stream.StreamEvent;
 import com.ragagent.modelruntime.stream.StreamManager;

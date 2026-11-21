@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.adapter;
 
-import com.ragagent.framework.shared.knowledge.ChunkFacts;
+import com.ragagent.framework.vocabulary.ChunkFacts;
 import com.ragagent.knowledge.api.ChunkQueryPort;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.knowledge.api.chunk.ChunkRowView;

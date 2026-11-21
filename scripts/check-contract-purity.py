@@ -24,7 +24,7 @@ BUILD_FILE = ROOT / "backend" / "contract" / "pom.xml"
 #: 它平移到 framework 承接共享词汇的子包上（C1 导入根、C3 框架形状继续生效）。
 SHARED_ROOT = ROOT / "backend" / "framework" / "src" / "main" / "java"
 #: 通用面（纯 JDK）与仍在 shared 的业务词汇都在扫描面内。
-CONTRACT_SEGMENTS = ("shared", "error", "event", "json", "text", "pagination")
+CONTRACT_SEGMENTS = ("vocabulary", "error", "event", "json", "text", "pagination")
 
 ALLOWED_IMPORT_ROOTS = ("java.", "javax.", "com.ragagent.")
 

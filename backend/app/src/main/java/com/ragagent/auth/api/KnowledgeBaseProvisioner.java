@@ -1,7 +1,7 @@
 package com.ragagent.auth.api;
 
 /**
- * 知识库的**命令端口**（跨域"由知识域建行"的最小接口，与只读端口 {@link com.ragagent.framework.shared.knowledge.KnowledgeBaseGateway} 分列）。
+ * 知识库的**命令端口**（跨域"由知识域建行"的最小接口，与只读端口 {@link com.ragagent.framework.vocabulary.KnowledgeBaseGateway} 分列）。
  *
  * <p>为什么需要它：{@code auth} 的聊天历史配置端点（{@code PUT /tenant/config/chat-history}）在
  * "enabled + 有 embedding 模型 + 还没有 KB"时要**自动建一个隐藏知识库**并把 id 记进租户配置。

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agentengine.api.ToolCancellation;
 import com.ragagent.agentengine.api.ToolRequest;
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.retrieval.api.WebSearchResult;
 import java.util.List;

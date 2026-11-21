@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-376 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+360 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -128,23 +128,6 @@
 | `:backend` | `com.ragagent.framework.redis` | 平台 · Redis：SpringRedisPubSub / RedisPubSub。 |
 | `:backend` | `com.ragagent.framework.security` | 平台安全面：加密（AES）、SSRF 守卫/白名单、输入与日志净化、IP 分类、用户名查找。 |
 | `:backend` | `com.ragagent.framework.settings` | 平台 · 设置：ConversationProperties / SystemSettingRegistry。 |
-| `:backend` | `com.ragagent.framework.shared` | 契约面（contracts，阶段 6 起逐步收纳）：跨模块公开的 API / SPI 与不可变载荷。 |
-| `:backend` | `com.ragagent.framework.shared.agent` | 代理契约面：代理目录/定义/执行/进度/运行请求 + 渠道清理端口。 |
-| `:backend` | `com.ragagent.framework.shared.apikey` | API Key 契约面：能力/作用域上下文与类型、管理端口、响应载荷。 |
-| `:backend` | `com.ragagent.framework.shared.audit` | 审计契约面：wiki 活动审计 + 审计写入端口。 |
-| `:backend` | `com.ragagent.framework.shared.auth` | 认证契约面：跨域用户目录读端口（UserLookupPort）与展示视图 （AuthUserView），以及管理面载荷（AdminUserView / UserPreferences）。 |
-| `:backend` | `com.ragagent.framework.shared.doc` | 文档解析服务（DocReader）的跨域端口面。 |
-| `:backend` | `com.ragagent.framework.shared.graph` | 图谱契约面：图数据/节点/关系/命名空间。 |
-| `:backend` | `com.ragagent.framework.shared.knowledge` | 知识契约面：分块/库/文档的事实、视图、网关与端口。 |
-| `:backend` | `com.ragagent.framework.shared.memory` | 记忆契约面：配置/条目视图/键与类目/召回与检索上下文。 |
-| `:backend` | `com.ragagent.framework.shared.retrieval` | 检索的共享形状：SearchParams、SearchResult、SearchTarget、 RetrieveGraphRepository。 |
-| `:backend` | `com.ragagent.framework.shared.session` | 会话契约面：管线消息视图与消息端口。 |
-| `:backend` | `com.ragagent.framework.shared.settings` | 契约 · 设置：SystemSettingGateway。 |
-| `:backend` | `com.ragagent.framework.shared.tenant` | 租户契约面：租户角色等跨域值对象。 |
-| `:backend` | `com.ragagent.framework.shared.tool` | 工具结果载荷（跨模块剩余部分）：ToolResult。 |
-| `:backend` | `com.ragagent.framework.shared.vectorstore` | 向量库配置形状：ConnectionConfig 与 IndexConfig。 |
-| `:backend` | `com.ragagent.framework.shared.websearch` | 契约 · 网页搜索：WebSearchTempStatePort / WebSearchProviderPort / PipelinePageFetcher…。 |
-| `:backend` | `com.ragagent.framework.shared.wiki` | Wiki 契约面：摄取/收尾端口与图片标记。 |
 | `:backend` | `com.ragagent.framework.storage.config` | 平台存储配置面：允许清单、上传上限与存储运行时环境。 |
 | `:backend` | `com.ragagent.framework.storage.fileserve` | 存储 · 文件服务：FileTransport / FileProxyPort / FileServeHttp…。 |
 | `:backend` | `com.ragagent.framework.storage.support` | 存储 · 支撑：FileResolverFactory / ResourceUrlMode / StreamRewriter…。 |
@@ -154,6 +137,7 @@
 | `:backend` | `com.ragagent.framework.tool` | 平台工具技术适配：工具 schema 的 JSON 解析（ToolSchemas）。 |
 | `:backend` | `com.ragagent.framework.tracing` | 观测技术面：Langfuse/OTLP 适配与 trace 载体注入。 |
 | `:backend` | `com.ragagent.framework.tracing.langfuse` | 平台追踪面（Langfuse OTel 适配； |
+| `:backend` | `com.ragagent.framework.vocabulary` | 跨域词汇：被两个以上模块共用的形状（租户外的业务载荷、会话视图、检索引擎形状等）。 |
 | `:backend` | `com.ragagent.framework.web` | 平台 Web 面：统一响应外壳、JSON 映射、分页/字段参数、请求 ID 过滤器、非空体/RBAC 拦截器与序列化器。 |
 | `:backend` | `com.ragagent.framework.web.error` | 平台错误面：`BizException` 家族（含 `GuardForbiddenException`、`PlainErrorException`）、统一响应外壳的错误分派与全局异常处理器。 |
 | `:backend` | `com.ragagent.framework.web.health` | 平台健康检查面。 |

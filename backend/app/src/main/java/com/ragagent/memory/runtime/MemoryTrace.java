@@ -2,9 +2,9 @@ package com.ragagent.memory.runtime;
 
 
 import com.ragagent.framework.access.TracingContext;
-import com.ragagent.framework.shared.memory.MemoryKeys;
 import com.ragagent.framework.tracing.langfuse.LangfuseManager;
 import com.ragagent.framework.tracing.langfuse.LangfuseTracing;
+import com.ragagent.framework.vocabulary.MemoryKeys;
 import com.ragagent.memory.domain.item.MemoryItem;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.wiki.service;
 
-import com.ragagent.framework.shared.knowledge.ChunkView;
+import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.knowledge.api.chunk.ChunkPort;
 import java.util.ArrayList;
 import java.util.List;

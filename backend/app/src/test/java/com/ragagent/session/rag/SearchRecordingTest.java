@@ -6,9 +6,9 @@ import static com.ragagent.session.rag.Rec46cSupport.json;
 import static com.ragagent.session.rag.Rec46cSupport.resultIDs;
 import static com.ragagent.session.rag.Rec46cSupport.searchResultsShape;
 
-import com.ragagent.framework.shared.graph.GraphNode;
-import com.ragagent.framework.shared.retrieval.SearchResult;
-import com.ragagent.framework.shared.retrieval.SearchTarget;
+import com.ragagent.framework.vocabulary.GraphNode;
+import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.framework.vocabulary.SearchTarget;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.retrieval.api.GraphData;

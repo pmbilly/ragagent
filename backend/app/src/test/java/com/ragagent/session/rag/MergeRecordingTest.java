@@ -5,8 +5,8 @@ import static com.ragagent.session.rag.Rec46cSupport.json;
 import static com.ragagent.session.rag.Rec46cSupport.searchResultsShape;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.shared.knowledge.FaqChunkMetadata;
-import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.vocabulary.FaqChunkMetadata;
+import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.retrieval.api.SearchChunkMerge;
 import com.ragagent.session.rag.plugin.PluginMerge;

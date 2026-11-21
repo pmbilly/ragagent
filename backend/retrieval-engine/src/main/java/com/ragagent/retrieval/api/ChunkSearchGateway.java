@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.api;
 
 
-import com.ragagent.framework.shared.knowledge.ChunkFacts;
+import com.ragagent.framework.vocabulary.ChunkFacts;
 import java.util.List;
 
 /**

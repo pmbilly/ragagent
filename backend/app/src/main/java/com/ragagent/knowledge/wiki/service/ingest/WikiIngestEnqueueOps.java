@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
-import com.ragagent.framework.shared.wiki.WikiLanguageSupport;
 import com.ragagent.framework.text.Whitespace;
 import com.ragagent.framework.tracing.TraceInjector;
+import com.ragagent.framework.vocabulary.WikiLanguageSupport;
 import com.ragagent.knowledge.api.WikiEnqueueResult;
 import com.ragagent.knowledge.wiki.domain.TaskPendingOp;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiFinalizeChange;

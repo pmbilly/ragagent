@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.adapter;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.framework.shared.knowledge.KnowledgeView;
+import com.ragagent.framework.vocabulary.KnowledgeView;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.knowledge.domain.Knowledge;

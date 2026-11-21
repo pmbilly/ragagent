@@ -8,7 +8,7 @@ import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.skills.SkillSource;
 import com.ragagent.agentengine.api.SkillCatalogPort;
 import com.ragagent.agentengine.api.ToolRequest;
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.framework.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

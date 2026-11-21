@@ -2,7 +2,7 @@ package com.ragagent.modelcontext;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.ToolResult;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;

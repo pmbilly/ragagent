@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
-import com.ragagent.framework.shared.retrieval.SearchResult;
-import com.ragagent.framework.shared.session.MessageArtifact;
-import com.ragagent.framework.shared.session.MessageAttachment;
-import com.ragagent.framework.shared.session.MessageImage;
+import com.ragagent.framework.vocabulary.MessageArtifact;
+import com.ragagent.framework.vocabulary.MessageAttachment;
+import com.ragagent.framework.vocabulary.MessageImage;
+import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageWithSession;

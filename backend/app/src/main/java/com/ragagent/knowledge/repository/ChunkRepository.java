@@ -7,7 +7,7 @@ import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.framework.persistence.DatabaseDialects;
 import com.ragagent.framework.persistence.PageRequests;
 import com.ragagent.framework.persistence.TxTemplate;
-import com.ragagent.framework.shared.knowledge.ChunkFacts;
+import com.ragagent.framework.vocabulary.ChunkFacts;
 import com.ragagent.knowledge.api.projection.ChunkProjectionAdapter;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;

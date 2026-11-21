@@ -1,6 +1,6 @@
 package com.ragagent.agenttools.api;
 
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.ToolResult;
 
 /** 一次数据装载 / 执行 / 清理会话。 */
 public interface DataAnalysisSession {

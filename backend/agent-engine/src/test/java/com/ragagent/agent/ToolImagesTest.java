@@ -2,9 +2,9 @@ package com.ragagent.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.shared.agent.AgentStep;
-import com.ragagent.framework.shared.agent.AgentToolCall;
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.AgentStep;
+import com.ragagent.framework.vocabulary.AgentToolCall;
+import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.llm.api.ChatMessage;
 import java.util.ArrayList;
 import java.util.List;

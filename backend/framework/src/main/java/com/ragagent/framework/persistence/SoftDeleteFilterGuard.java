@@ -2,6 +2,7 @@ package com.ragagent.framework.persistence;
 
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
+import com.ragagent.framework.storage.support.Mode;
 import java.util.Set;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Table;

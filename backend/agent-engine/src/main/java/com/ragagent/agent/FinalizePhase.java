@@ -8,7 +8,7 @@ import com.ragagent.framework.event.payload.AgentCompleteData;
 import com.ragagent.framework.event.payload.AgentFinalAnswerData;
 import com.ragagent.framework.eventbus.EventIds;
 import com.ragagent.framework.eventbus.EventType;
-import com.ragagent.framework.shared.agent.AgentStep;
+import com.ragagent.framework.vocabulary.AgentStep;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ResponseType;

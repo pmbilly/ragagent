@@ -2,9 +2,9 @@ package com.ragagent.session.service.suggestion;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.shared.retrieval.SearchResult;
-import com.ragagent.framework.shared.session.SuggestionItem;
-import com.ragagent.framework.shared.wiki.WikiLanguageSupport;
+import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.framework.vocabulary.SuggestionItem;
+import com.ragagent.framework.vocabulary.WikiLanguageSupport;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.retrieval.api.SearchTextUtil;
 import com.ragagent.session.domain.message.Message;

@@ -2,8 +2,8 @@ package com.ragagent.session.rag.plugin;
 
 import com.ragagent.framework.access.TenantContextSnapshot;
 import com.ragagent.framework.access.TenantScope;
-import com.ragagent.framework.shared.retrieval.SearchResult;
-import com.ragagent.framework.shared.retrieval.SearchTarget;
+import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.framework.vocabulary.SearchTarget;
 import com.ragagent.knowledge.api.KnowledgeBaseQueryPort;
 import com.ragagent.retrieval.api.SearchParams;
 import com.ragagent.session.rag.PipelineLog;

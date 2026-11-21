@@ -2,8 +2,8 @@ package com.ragagent.memory.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.shared.memory.MemoryKinds;
 import com.ragagent.framework.tenant.MemoryConfig;
+import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.repository.MemoryRepository;
 import java.time.OffsetDateTime;

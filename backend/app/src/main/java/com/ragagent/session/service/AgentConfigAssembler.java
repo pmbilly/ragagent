@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.framework.prompt.PromptSource;
-import com.ragagent.framework.shared.retrieval.SearchTarget.SearchTargets;
+import com.ragagent.framework.vocabulary.SearchTarget.SearchTargets;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ToolDefinitions;
 import java.io.InputStream;

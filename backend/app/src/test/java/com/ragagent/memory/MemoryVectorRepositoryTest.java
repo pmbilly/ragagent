@@ -3,7 +3,7 @@ package com.ragagent.memory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.TestSchema;
-import com.ragagent.framework.shared.memory.MemoryKinds;
+import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryItemEmbedding;
 import com.ragagent.memory.domain.scope.MemoryScope;

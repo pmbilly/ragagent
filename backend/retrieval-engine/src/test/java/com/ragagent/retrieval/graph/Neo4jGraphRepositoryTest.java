@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.framework.shared.graph.GraphNode;
-import com.ragagent.framework.shared.graph.GraphRelation;
+import com.ragagent.framework.vocabulary.GraphNode;
+import com.ragagent.framework.vocabulary.GraphRelation;
 import com.ragagent.retrieval.api.GraphData;
 import com.ragagent.retrieval.api.NameSpace;
 import java.util.List;

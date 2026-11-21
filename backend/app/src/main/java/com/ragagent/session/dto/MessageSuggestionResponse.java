@@ -1,6 +1,6 @@
 package com.ragagent.session.dto;
 
-import com.ragagent.framework.shared.session.SuggestionItem;
+import com.ragagent.framework.vocabulary.SuggestionItem;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
 import java.time.OffsetDateTime;
 import java.util.List;

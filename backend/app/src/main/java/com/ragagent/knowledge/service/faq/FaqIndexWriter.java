@@ -4,7 +4,7 @@ import com.ragagent.auth.api.TenantStorageQuotaPort;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.model.Embedder;
 import com.ragagent.framework.model.EmbeddingPort;
-import com.ragagent.framework.shared.knowledge.FaqChunkMetadata;
+import com.ragagent.framework.vocabulary.FaqChunkMetadata;
 import com.ragagent.knowledge.config.BatchEmbedProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;

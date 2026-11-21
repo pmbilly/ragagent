@@ -1,8 +1,8 @@
 package com.ragagent.session.support;
 
-import com.ragagent.framework.shared.agent.AgentStep;
-import com.ragagent.framework.shared.agent.AgentToolCall;
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.AgentStep;
+import com.ragagent.framework.vocabulary.AgentToolCall;
+import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.llm.api.ToolDefinitions;
 import java.util.LinkedHashMap;
 import java.util.List;

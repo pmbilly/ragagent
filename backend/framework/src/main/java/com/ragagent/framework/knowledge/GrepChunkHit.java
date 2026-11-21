@@ -1,7 +1,7 @@
 package com.ragagent.framework.knowledge;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.shared.knowledge.ChunkFacts;
+import com.ragagent.framework.vocabulary.ChunkFacts;
 
 public final class GrepChunkHit {
     public String id;

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agentengine.api.ToolRequest;
 import com.ragagent.framework.security.SsrfGuard;
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.protocol.McpClient;

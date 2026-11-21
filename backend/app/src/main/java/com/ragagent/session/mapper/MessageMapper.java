@@ -2,8 +2,8 @@ package com.ragagent.session.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ragagent.framework.persistence.PgJsonTypeHandler;
-import com.ragagent.framework.shared.session.MessageArtifact;
-import com.ragagent.framework.shared.session.MessageAttachment;
+import com.ragagent.framework.vocabulary.MessageArtifact;
+import com.ragagent.framework.vocabulary.MessageAttachment;
 import com.ragagent.session.domain.AgentStepListTypeHandler;
 import com.ragagent.session.domain.MentionedItemListTypeHandler;
 import com.ragagent.session.domain.SearchResultListTypeHandler;

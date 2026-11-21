@@ -3,7 +3,7 @@ package com.ragagent.mcp.tool;
 import com.ragagent.agentengine.api.AgentTool;
 import com.ragagent.agentengine.api.McpToolingGateway;
 import com.ragagent.agentengine.api.ToolRegistryPort;
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ToolDefinitions;
 import com.ragagent.mcp.approval.ToolApprovalGate;

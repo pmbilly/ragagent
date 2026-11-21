@@ -2,8 +2,8 @@ package com.ragagent.retrieval;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.shared.knowledge.ChunkFacts;
-import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.vocabulary.ChunkFacts;
+import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.retrieval.api.KnowledgeDocumentFacts;
 import java.util.Map;
 import org.junit.jupiter.api.Test;

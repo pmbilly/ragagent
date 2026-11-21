@@ -16,7 +16,7 @@ import com.ragagent.framework.event.payload.AgentToolCallData;
 import com.ragagent.framework.event.payload.AgentToolResultData;
 import com.ragagent.framework.eventbus.EventBus;
 import com.ragagent.framework.eventbus.EventType;
-import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.llm.api.TokenUsage;
 import com.ragagent.modelruntime.stream.StreamEvent;

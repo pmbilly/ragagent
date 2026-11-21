@@ -6,7 +6,7 @@ import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.prompt.AgentPromptPlaceholders;
 import com.ragagent.framework.settings.ConversationProperties;
-import com.ragagent.framework.shared.wiki.WikiLanguageSupport;
+import com.ragagent.framework.vocabulary.WikiLanguageSupport;
 import com.ragagent.knowledge.api.WikiImageMarkup;
 import com.ragagent.knowledge.api.projection.ChunkProjectionAdapter;
 import com.ragagent.knowledge.domain.Chunk;

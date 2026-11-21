@@ -2,7 +2,7 @@ package com.ragagent.session.controller.sse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.shared.session.SseSink;
+import com.ragagent.framework.vocabulary.SseSink;
 import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.session.service.sse.SseFrameSink;
 import jakarta.servlet.http.HttpServletResponse;

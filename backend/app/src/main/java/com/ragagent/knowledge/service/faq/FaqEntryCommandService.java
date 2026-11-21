@@ -7,7 +7,7 @@ import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.security.Hashes;
-import com.ragagent.framework.shared.knowledge.FaqChunkMetadata;
+import com.ragagent.framework.vocabulary.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;

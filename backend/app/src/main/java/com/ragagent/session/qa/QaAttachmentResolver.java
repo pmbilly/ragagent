@@ -4,7 +4,7 @@ import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.payload.AgentToolCallData;
 import com.ragagent.framework.event.payload.AgentToolResultData;
 import com.ragagent.framework.eventbus.EventType;
-import com.ragagent.framework.shared.session.MessageAttachment;
+import com.ragagent.framework.vocabulary.MessageAttachment;
 import com.ragagent.session.attachment.TemporaryDocumentService;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.domain.document.TemporaryDocument;

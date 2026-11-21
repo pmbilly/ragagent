@@ -1,8 +1,8 @@
 package com.ragagent.session.service.sse;
 
-import com.ragagent.framework.shared.session.SseSink;
 import com.ragagent.framework.storage.support.Rewriter;
 import com.ragagent.framework.storage.support.StreamRewriter;
+import com.ragagent.framework.vocabulary.SseSink;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.modelruntime.stream.StreamEvent;

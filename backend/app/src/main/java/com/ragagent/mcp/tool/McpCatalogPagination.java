@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agentengine.api.McpToolingGateway;
 import com.ragagent.agentengine.api.ToolRegistryPort;
 import com.ragagent.framework.security.Hashes;
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ToolDefinitions;
 import com.ragagent.mcp.domain.McpService;

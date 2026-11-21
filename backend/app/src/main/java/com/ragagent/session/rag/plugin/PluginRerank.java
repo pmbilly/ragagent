@@ -1,8 +1,8 @@
 package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.shared.retrieval.SearchResult;
-import com.ragagent.framework.shared.retrieval.SearchTarget;
+import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.framework.vocabulary.SearchTarget;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.DocumentChunkMetadata;
 import com.ragagent.knowledge.api.GeneratedQuestion;

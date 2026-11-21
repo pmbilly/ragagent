@@ -2,7 +2,7 @@ package com.ragagent.session.domain.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.shared.session.MessageArtifact;
+import com.ragagent.framework.vocabulary.MessageArtifact;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

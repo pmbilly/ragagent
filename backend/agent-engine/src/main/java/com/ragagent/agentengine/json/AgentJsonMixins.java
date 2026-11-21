@@ -2,7 +2,7 @@ package com.ragagent.agentengine.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ragagent.framework.shared.agent.ToolCallTarget;
+import com.ragagent.framework.vocabulary.ToolCallTarget;
 import java.util.List;
 import java.util.Map;
 

@@ -3,7 +3,7 @@ package com.ragagent.retrieval;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.shared.knowledge.ChunkFacts;
+import com.ragagent.framework.vocabulary.ChunkFacts;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.retrieval.HybridSearchService.RetrievalConfigView;
 import com.ragagent.retrieval.HybridSearchService.StoreGroup;

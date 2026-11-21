@@ -1,9 +1,9 @@
 package com.ragagent.memory.repository;
 
 import com.ragagent.framework.pagination.PageResult;
-import com.ragagent.framework.shared.memory.MemoryKeys;
-import com.ragagent.framework.shared.memory.MemoryKinds;
 import com.ragagent.framework.tenant.MemoryConfig;
+import com.ragagent.framework.vocabulary.MemoryKeys;
+import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.framework.web.ZeroTimeSerializer;
 import com.ragagent.memory.api.MemoryMessageCursor;
 import com.ragagent.memory.domain.MemoryExtractionBatch;

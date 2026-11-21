@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.security.LogSanitizer;
-import com.ragagent.framework.shared.session.MentionedItem;
+import com.ragagent.framework.vocabulary.MentionedItem;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.framework.web.JsonBodyErrors;
 import com.ragagent.framework.web.JsonMappers;

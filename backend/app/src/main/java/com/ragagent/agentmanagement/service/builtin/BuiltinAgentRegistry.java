@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.framework.prompt.PromptSource;
-import com.ragagent.framework.shared.wiki.WikiLanguageSupport;
+import com.ragagent.framework.vocabulary.WikiLanguageSupport;
 import com.ragagent.framework.web.JsonMappers;
 import java.io.InputStream;
 import java.util.ArrayList;

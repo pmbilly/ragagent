@@ -12,7 +12,7 @@ import com.ragagent.framework.event.payload.AgentToolCallData;
 import com.ragagent.framework.event.payload.AgentToolResultData;
 import com.ragagent.framework.event.payload.ErrorData;
 import com.ragagent.framework.eventbus.EventType;
-import com.ragagent.framework.shared.session.MessageView;
+import com.ragagent.framework.vocabulary.MessageView;
 import com.ragagent.im.api.QaRequestPayload;
 import com.ragagent.im.api.SessionView;
 import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;

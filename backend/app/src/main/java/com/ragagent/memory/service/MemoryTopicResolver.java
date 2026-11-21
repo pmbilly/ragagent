@@ -3,7 +3,7 @@ package com.ragagent.memory.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.shared.memory.MemoryKeys;
+import com.ragagent.framework.vocabulary.MemoryKeys;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;

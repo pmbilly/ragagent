@@ -2,7 +2,7 @@ package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.prompt.PipelineConfig;
-import com.ragagent.framework.shared.graph.GraphNode;
+import com.ragagent.framework.vocabulary.GraphNode;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.KnowledgeBaseBatchQueryPort;
 import com.ragagent.knowledge.api.KnowledgeDocumentQueryPort;

@@ -99,10 +99,10 @@ FROZEN_PREFIXES = (
     'datasource/connector/yuque/YuqueApiTypes',
     # A②-2a（2026-10-14）：`common/llm` 整目录迁入契约面 ⇒ 前缀拆成 4 个文件级
     # （前缀冻结在换包时静默失效——本文件开头已记过两次，这是第三次实战）
-    'framework/shared/model/ResponseType', 'framework/shared/model/TokenUsage', 'framework/shared/model/PromptCacheStatus',
-    'framework/shared/tool/ToolResult',
-    'llm/', 'modelruntime/', 'framework/tenant', 'framework/shared/tenant/ParserEngineConfig',
-    'framework/shared/retrieval/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
+    'framework/vocabulary/model/ResponseType', 'framework/vocabulary/model/TokenUsage', 'framework/vocabulary/model/PromptCacheStatus',
+    'framework/vocabulary/tool/ToolResult',
+    'llm/', 'modelruntime/', 'framework/tenant', 'framework/vocabulary/tenant/ParserEngineConfig',
+    'framework/vocabulary/retrieval/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
     'memory/domain/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
     'framework/tracing/langfuse', 'modelruntime/tracing', 'retrieval/engine/doris', 'websearch/ImageInfo',
     # R4a 换锚：6 个 Langfuse 装饰器（tracing/decorators → framework/tracing/decorators）——包名带上了
@@ -115,7 +115,7 @@ FROZEN_PREFIXES = (
     # 键名仍是既有 API/jsonb 契约（snake 键是设计，不是漂移）。
     'framework/web/ContractJsonMixins',   # 剩余面（error/event/json/text 等）
     'llm/json/',                          # 模型面 mixin（从 platform.web 整体迁入）
-    'framework/shared/wiki/ExtractedItem', 'session/rag/plugin', 'agent/AgentEngine',
+    'framework/vocabulary/wiki/ExtractedItem', 'session/rag/plugin', 'agent/AgentEngine',
     'agent/ReActIteration', 'retrieval/HybridSearchService', 'retrieval/vlm/VlmClient',
     'knowledge/service/chunk/ChunkExtractService', 'knowledge/task/KnowledgeProcessWorker',
     # C11b 阶段拆分：worker 内的 span 键随代码外移到取文本/分块协作者，冻结前缀同步换锚
@@ -144,7 +144,7 @@ BASELINE: dict[str, set[str]] = {
     'agent/AgentPrompts.java': {'current_time', 'web_search_status'},
     # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake）
     # A③-⑨ 自 agent/tool/ 迁入 contract/tool/（按路径换锚）
-    'framework/shared/tool/ToolCapabilities.java': {'data_analysis', 'data_schema', 'database_query', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'query_knowledge_graph', 'todo_write', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_update_issue', 'wiki_write_page'},
+    'framework/vocabulary/tool/ToolCapabilities.java': {'data_analysis', 'data_schema', 'database_query', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'query_knowledge_graph', 'todo_write', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_update_issue', 'wiki_write_page'},
     # MyBatis 列名/参数（非 JSON 键）
     'auth/service/TenantInvitationService.java': {'invitation_id'},
     # MyBatis 列名/参数（非 JSON 键）

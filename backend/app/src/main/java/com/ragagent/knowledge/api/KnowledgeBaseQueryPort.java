@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.api;
 
-import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.retrieval.api.SearchParams;
 import java.util.List;

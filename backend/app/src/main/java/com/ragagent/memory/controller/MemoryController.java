@@ -3,7 +3,7 @@ package com.ragagent.memory.controller;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.pagination.PageResult;
-import com.ragagent.framework.shared.memory.MemoryKinds;
+import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.memory.config.MemorySettings;

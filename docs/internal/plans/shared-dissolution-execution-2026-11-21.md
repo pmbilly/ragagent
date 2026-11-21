@@ -134,6 +134,22 @@ com.ragagent.framework
 **为什么 `shared` 收进 `framework.shared`**：通用面进 framework 后，`shared → framework` 与 `framework → shared` 形成包级环（R1 新增环即红）。收进同一根后环消失，且暂存区边界仍然可见（清零后直接删目录）。
 
 **守卫同步**：C1 从「扫目录」改为「扫 framework 下契约子包白名单」（107 文件，红态探针仍有效）；C8 豁免 `framework.shared` 与契约子包；`L1/L1_CORE` 增补 `framework`；`check-event-face-case` 锚改 `framework/event/payload` + `framework/eventbus/EventType`；json 冻结前缀、装配点、形状基线、错位测试登记全部重键。
+### 4.8 收口结果（2026-11-22）：`shared` 已删除
+
+153 个业务词汇全部有了归属，`com.ragagent.*.shared` 命名空间不存在：
+
+| 落点 | 数量 | 内容 |
+|---|---|---|
+| `app/<域>/api`（含子包） | 96 | 知识簇 39 · 域面 18 · storage 7 · memory/im/embedchannel/audit/auth 等 |
+| `model-runtime/llm/api` | 17 | 模型面词汇（`ChatMessage` `ChatOptions` `TokenUsage` …） |
+| `agent-engine/agentengine/api` | 14 | `AgentTool` `BaseTool` `ToolRequest` 等工具族 |
+| `retrieval-engine/retrieval/api` | 7 | 检索面 |
+| `framework/tenant` | 9 | 租户 / API Key 作用域（基础设施） |
+| `framework/vocabulary` | 30 | 跨域形状（`MessageView` `SearchResult` `GraphNode` `ChunkFacts` `ToolResult` `MemoryKeys` …） |
+| 删除 | 2 | `PipelinePorts` 拆分、`JsonValueSupport` 内联 |
+
+**`framework/vocabulary` 为什么是单包**：这些形状互相引用（`MessageView` 含检索结果与 agent 步骤），拆成兄弟包会立刻形成包级环（实测 6 个包成环）；它们又被 framework 的 Web/持久化层引用，所以必须留在 framework 内。约束：只放纯 JDK 形状、不放实现、每个类型必须有跨模块消费方（C1 + 消费者守卫）。
+
 ### WP1 复核结论：0 个可删（已执行：`JsonValueSupport` 内联）
 
 删除前按坑 15 做了三处扫描（简单名 / 反射字符串 / SPI），结果推翻了"9 个死代码"：
@@ -337,6 +353,7 @@ WP6 收尾                ← 全部完成 + 拍板项落定
 | 批 | 日期 | 内容 | 验收数字（测试/守卫/金片） | 备注 |
 |---|---|---|---|---|
 | 基座 | 2026-11-21 | 守卫修复：port-map / contract-consumers / A20 重锚；R10 同级 api 放行；本文件 v2 重扫 + 补 §4.0 唯一归属总表（153 校验通过）+ WP4-C 接口映射 + WP6 批量手法 | 定向守卫 5 条绿 + 探针 2 条（同级 api 过 / 同级 service 红） | 全量 verify 未跑（定向：ArchitectureRulesTest 22/22 绿、50 个 run 行→脚本自计 49 守卫全绿），等开工基线 |
+| 收口 | 2026-11-22 | 剩余 30 个类型 → `framework/{tenant,vocabulary}`；`shared` 目录删除；C8/purity/环守卫重锚到 vocabulary | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 目标达成：153 → 0 |
 | 清 shared（2） | 2026-11-21 | 4 个 tool 载荷 → `agentengine/api`（`ToolRequest` `ToolCancellation` `ToolExecContext` `ToolOutput`）；`ToolResult` 因 model-runtime 消费留 framework | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | shared 48 → 39 |
 | 清 shared（1） | 2026-11-21 | 5 个类型归位：`AuditAction`→audit/api、`KnowledgeIngest`/`KnowledgeBaseProvisioner`→knowledge·auth/api、`AgentTool`/`BaseTool`→agentengine/api | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 退回 4 个：`KnowledgeView`（被 SearchAuth 钉）、`StorageEngineConfig`（auth⇄storage 环）、`AgentTool`/`BaseTool` 首次因误加 import 失败 |
 | 包根收敛 | 2026-11-21 | `platform→framework`（1,126 文件）；通用面并 `framework.{error,event,json,text,pagination}`；实现下沉 `eventbus`/`html`；`shared→framework.shared` 消环 | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | C1 改白名单扫描（107 文件）；12 处守卫/基线重键 |

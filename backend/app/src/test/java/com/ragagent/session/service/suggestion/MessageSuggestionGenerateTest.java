@@ -2,8 +2,8 @@ package com.ragagent.session.service.suggestion;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.shared.retrieval.SearchResult;
-import com.ragagent.framework.shared.session.SuggestionItem;
+import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.framework.vocabulary.SuggestionItem;
 import com.ragagent.session.domain.message.Message;
 import java.util.List;
 import java.util.Set;

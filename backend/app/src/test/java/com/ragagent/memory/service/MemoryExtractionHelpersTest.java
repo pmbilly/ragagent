@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.shared.memory.MemoryKinds;
+import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ChatResponse;
 import com.ragagent.memory.domain.MemoryExtractPayload;

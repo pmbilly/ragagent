@@ -3,7 +3,7 @@ package com.ragagent.knowledge.wiki.service.ingest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.access.TenantScopes;
-import com.ragagent.framework.shared.wiki.WikiLanguageSupport;
+import com.ragagent.framework.vocabulary.WikiLanguageSupport;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.knowledge.wiki.domain.TaskPendingOp;

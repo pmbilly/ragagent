@@ -9,7 +9,7 @@ import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.prompt.ExtractPrompts;
 import com.ragagent.framework.prompt.PipelineConfig.PromptTemplateStructured;
-import com.ragagent.framework.shared.graph.GraphRelation;
+import com.ragagent.framework.vocabulary.GraphRelation;
 import com.ragagent.framework.web.JsonBodies;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ChatMessage;

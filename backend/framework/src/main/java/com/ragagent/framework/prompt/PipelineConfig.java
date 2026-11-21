@@ -1,7 +1,7 @@
 package com.ragagent.framework.prompt;
 
-import com.ragagent.framework.shared.graph.GraphNode;
-import com.ragagent.framework.shared.graph.GraphRelation;
+import com.ragagent.framework.vocabulary.GraphNode;
+import com.ragagent.framework.vocabulary.GraphRelation;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

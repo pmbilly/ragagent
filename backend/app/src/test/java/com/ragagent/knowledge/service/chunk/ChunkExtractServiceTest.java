@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.prompt.ExtractPrompts;
-import com.ragagent.framework.shared.graph.GraphNode;
+import com.ragagent.framework.vocabulary.GraphNode;
 import com.ragagent.knowledge.api.WikiKnowledgeFinalizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;

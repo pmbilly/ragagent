@@ -3,8 +3,8 @@ package com.ragagent.retrieval.support;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.ragagent.framework.knowledge.ChunkSearchUtil;
-import com.ragagent.framework.shared.knowledge.ChunkView;
-import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.vocabulary.ChunkView;
+import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.retrieval.api.ImageInfo;
 import com.ragagent.retrieval.api.SearchChunkMerge;
 import com.ragagent.retrieval.api.SearchTextUtil;

@@ -1,7 +1,7 @@
 package com.ragagent.session.adapter;
 
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.shared.session.MessageView;
+import com.ragagent.framework.vocabulary.MessageView;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.im.api.QaRequestPayload;
 import com.ragagent.im.api.SessionQaPort;

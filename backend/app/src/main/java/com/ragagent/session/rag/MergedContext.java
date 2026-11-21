@@ -1,6 +1,6 @@
 package com.ragagent.session.rag;
 
-import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.vocabulary.SearchResult;
 import java.util.List;
 
 /**

@@ -1,7 +1,7 @@
 package com.ragagent.im.api;
 
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.shared.session.MessageView;
+import com.ragagent.framework.vocabulary.MessageView;
 
 /**
  * 会话问答面端口（L1）：装配面（IM 等）触发会话 QA、读写会话与消息所需的窄面。

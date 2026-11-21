@@ -11,7 +11,7 @@ import com.ragagent.agentengine.api.AgentTool;
 import com.ragagent.agentengine.api.ToolRequest;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.llm.api.ToolDefinitions;
 import java.util.ArrayList;
 import java.util.List;

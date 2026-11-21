@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.shared.knowledge.ChunkView;
+import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.WikiEnqueueResult;
 import com.ragagent.knowledge.api.WikiIngestPort;
