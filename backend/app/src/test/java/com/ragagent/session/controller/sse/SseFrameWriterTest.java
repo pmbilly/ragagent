@@ -3,8 +3,8 @@ package com.ragagent.session.controller.sse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.agent.fixtures.ContractJson;
-import com.ragagent.shared.model.ResponseType;
-import com.ragagent.shared.model.StreamResponse;
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.llm.api.StreamResponse;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;

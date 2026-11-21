@@ -1,10 +1,11 @@
 package com.ragagent.session.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.modelruntime.stream.LiveRun;
+import com.ragagent.modelruntime.stream.StreamEvent;
+import com.ragagent.modelruntime.stream.StreamManager;
 import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.platform.stream.LiveRun;
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
@@ -14,7 +15,6 @@ import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.support.SessionNotFoundException;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.model.ResponseType;
 import com.ragagent.shared.session.MentionedItem;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;

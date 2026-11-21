@@ -12,7 +12,7 @@ import com.ragagent.knowledge.api.wiki.SlugUpdate;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.service.WikiModelResolver;
 import com.ragagent.knowledge.wiki.service.page.WikiPageService;
-import com.ragagent.shared.model.LlmChatClient;
+import com.ragagent.llm.api.LlmChatClient;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

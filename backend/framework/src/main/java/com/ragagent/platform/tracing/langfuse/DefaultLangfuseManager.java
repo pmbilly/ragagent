@@ -13,7 +13,7 @@ import java.util.Map;
  * Finish 追加 output/usage、非空 err 记 ERROR（exception 事件 + Status）；span 若
  * 隐式开过自动根（autoTrace），Finish 时连根一起结束（否则根永不出导）。</p>
  */
-final class DefaultLangfuseManager implements LangfuseManager {
+public final class DefaultLangfuseManager implements LangfuseManager {
 
     private final LangfuseConfig cfg;
     private final BatchSpanProcessor processor;

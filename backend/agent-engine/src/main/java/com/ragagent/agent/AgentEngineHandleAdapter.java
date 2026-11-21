@@ -3,7 +3,7 @@ package com.ragagent.agent;
 import com.ragagent.agentengine.api.AgentEngineHandle;
 import com.ragagent.agentengine.api.AgentExecutionException;
 import com.ragagent.agentengine.api.SteerSink;
-import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.llm.api.ChatMessage;
 import java.util.List;
 import java.util.function.Supplier;
 

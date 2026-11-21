@@ -2,7 +2,7 @@ package com.ragagent.agent.compaction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.shared.model.ChatResponse;
+import com.ragagent.llm.api.ChatResponse;
 import org.junit.jupiter.api.Test;
 
 /**

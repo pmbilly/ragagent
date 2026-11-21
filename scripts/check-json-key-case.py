@@ -104,7 +104,7 @@ FROZEN_PREFIXES = (
     'llm/', 'modelruntime/', 'platform/tenant', 'shared/tenant/ParserEngineConfig',
     'shared/retrieval/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
     'memory/domain/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
-    'platform/tracing/langfuse', 'platform/tracing/decorators', 'retrieval/engine/doris', 'websearch/ImageInfo',
+    'platform/tracing/langfuse', 'modelruntime/tracing', 'retrieval/engine/doris', 'websearch/ImageInfo',
     # R4a 换锚：6 个 Langfuse 装饰器（tracing/decorators → framework/tracing/decorators）——包名带上了
     # platform 前缀，模块相对路径随之变化（与上一行同族；三件流句柄迁 framework/stream 无蛇键，不入册）。
     # 键名本体未变（Langfuse metadata 是第三方观测面）。

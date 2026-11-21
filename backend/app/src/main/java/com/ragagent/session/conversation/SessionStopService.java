@@ -1,15 +1,15 @@
 package com.ragagent.session.conversation;
 
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.modelruntime.stream.StreamEvent;
+import com.ragagent.modelruntime.stream.StreamManager;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.dto.StopSessionRequest;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.model.ResponseType;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;

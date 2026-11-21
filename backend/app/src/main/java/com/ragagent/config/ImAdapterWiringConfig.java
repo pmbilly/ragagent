@@ -12,8 +12,8 @@ import com.ragagent.im.channel.wecom.WecomAdapterFactory;
 import com.ragagent.im.channel.yunzhijia.YunzhijiaAdapterFactory;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.service.ImTurnOrchestrator;
+import com.ragagent.modelruntime.stream.StreamManager;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.stream.StreamManager;
 import org.springframework.context.annotation.Configuration;
 
 /**

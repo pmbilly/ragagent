@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.ragagent.shared.model.PromptCacheStatus;
-import com.ragagent.shared.model.ResponseType;
 import java.io.IOException;
 
 /**
@@ -30,24 +29,8 @@ public final class ContractJsonModule extends SimpleModule {
         super("ragagent-contract-json");
         ContractJsonMixins.mappings().forEach(this::setMixInAnnotation);
 
-        addSerializer(ResponseType.class, new ResponseTypeSerializer());
-        addDeserializer(ResponseType.class, new ResponseTypeDeserializer());
         addSerializer(PromptCacheStatus.class, new PromptCacheStatusSerializer());
         addDeserializer(PromptCacheStatus.class, new PromptCacheStatusDeserializer());
-    }
-
-    private static final class ResponseTypeSerializer extends JsonSerializer<ResponseType> {
-        @Override
-        public void serialize(ResponseType v, JsonGenerator g, SerializerProvider p) throws IOException {
-            g.writeString(v.value());
-        }
-    }
-
-    private static final class ResponseTypeDeserializer extends JsonDeserializer<ResponseType> {
-        @Override
-        public ResponseType deserialize(JsonParser p, DeserializationContext c) throws IOException {
-            return ResponseType.fromValue(p.getText());
-        }
     }
 
     private static final class PromptCacheStatusSerializer extends JsonSerializer<PromptCacheStatus> {

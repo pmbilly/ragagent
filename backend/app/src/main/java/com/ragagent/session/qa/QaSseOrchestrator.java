@@ -1,13 +1,14 @@
 package com.ragagent.session.qa;
 
 
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.modelruntime.stream.LiveRunExistsException;
+import com.ragagent.modelruntime.stream.StreamEvent;
+import com.ragagent.modelruntime.stream.StreamManager;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.storage.support.StreamRewriter;
-import com.ragagent.platform.stream.LiveRunExistsException;
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.session.conversation.AgentStreamBridge;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionService;
@@ -27,7 +28,6 @@ import com.ragagent.shared.event.EventBusFactory;
 import com.ragagent.shared.event.EventBusInterface;
 import com.ragagent.shared.event.payload.AgentToolCallData;
 import com.ragagent.shared.event.payload.AgentToolResultData;
-import com.ragagent.shared.model.ResponseType;
 import com.ragagent.shared.session.SseSink;
 import com.ragagent.shared.tool.ToolResult;
 import java.io.IOException;

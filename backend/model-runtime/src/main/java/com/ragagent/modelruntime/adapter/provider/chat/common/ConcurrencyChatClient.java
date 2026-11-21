@@ -1,14 +1,14 @@
 package com.ragagent.modelruntime.adapter.provider.chat.common;
 
+import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.ChatOptions;
+import com.ragagent.llm.api.ChatResponse;
+import com.ragagent.llm.api.ChatStream;
+import com.ragagent.llm.api.LlmChatClient;
+import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.limiter.Release;
-import com.ragagent.platform.stream.SyncChatStream;
-import com.ragagent.shared.model.ChatMessage;
-import com.ragagent.shared.model.ChatOptions;
-import com.ragagent.shared.model.ChatResponse;
-import com.ragagent.shared.model.ChatStream;
-import com.ragagent.shared.model.LlmChatClient;
-import com.ragagent.shared.model.StreamResponse;
+import com.ragagent.modelruntime.stream.SyncChatStream;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;

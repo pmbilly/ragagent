@@ -1,14 +1,14 @@
 package com.ragagent.session.rag.plugin;
 
+import com.ragagent.llm.api.ChatOptions;
+import com.ragagent.llm.api.ChatResponse;
+import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.ReferencesSupport;
-import com.ragagent.shared.model.ChatOptions;
-import com.ragagent.shared.model.ChatResponse;
-import com.ragagent.shared.model.LlmChatClient;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

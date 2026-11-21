@@ -1,14 +1,15 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.modelruntime.stream.StreamBatch;
+import com.ragagent.modelruntime.stream.StreamEvent;
+import com.ragagent.modelruntime.stream.StreamManager;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.storage.support.FileResolverFactory;
 import com.ragagent.platform.storage.support.ResourceUrlMode;
 import com.ragagent.platform.storage.support.Rewriter;
 import com.ragagent.platform.storage.support.StreamRewriter;
-import com.ragagent.platform.stream.StreamBatch;
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.ServletSseSink;
 import com.ragagent.session.controller.sse.SseContract;
@@ -20,7 +21,6 @@ import com.ragagent.session.service.sse.StreamEventEmitter;
 import com.ragagent.session.support.MessageNotFoundException;
 import com.ragagent.session.support.SessionNotFoundException;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.model.ResponseType;
 import com.ragagent.shared.storage.support.FileUrlPort;
 import com.ragagent.shared.storage.support.Mode;
 import com.ragagent.shared.storage.support.PublicModeForbiddenException;

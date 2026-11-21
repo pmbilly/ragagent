@@ -47,9 +47,9 @@ bash scripts/run-guards.sh; echo "exit=$?"
 | single（单域） | **19** | ~~21~~ | WP2 域归位 |
 | engine（被引擎用，含引擎+域） | **25** | 24 | WP3 引擎归位 |
 | multi（≥2 域） | **31** | ~~46~~ | WP4 域归位 |
-| framework（被 framework 引用） | **36** | ~~29~~ | WP5（K10a/K10b/K12/K16 + 永驻词汇） |
+| framework（被 framework 引用） | **23** | ~~29~~ | WP5（永驻词汇） |
 
-合计 **111**（已归位 42）。**dead 归零**：v1 的 33 个里，9 个是 shared 内闭包（7 个端口分面 + 2 个被同包调用），其余 24 个是外部活代码；single/multi/framework 三档随之重算。
+合计 **98**（已归位 55）。**dead 归零**：v1 的 33 个里，9 个是 shared 内闭包（7 个端口分面 + 2 个被同包调用），其余 24 个是外部活代码；single/multi/framework 三档随之重算。
 
 收尾 WP6 = 35 通用面迁出 + 守卫平移 + 删命名空间。
 
@@ -74,32 +74,32 @@ bash scripts/run-guards.sh; echo "exit=$?"
 
 ## 4. 工作包
 
-### 4.0 归属总表（剩余 111 个）
+### 4.0 归属总表（剩余 98 个）
 
-> 起点 153 个业务词汇，已归位 42 个（WP4-C 1 · 知识簇 40 · 内联 1）；下表是**剩余 111 个**的唯一归属，脚本校验合计 111 / 无重复无遗漏。下面 WP1~WP5 的清单是分组说明，冲突以本表为准。
+> 起点 153 个业务词汇，已归位 55 个（WP4-C 1 · 知识簇 40 · 模型面 13 · 内联 1）；下表是**剩余 98 个**的唯一归属，脚本校验合计 98 / 无重复无遗漏。
 
 | 落点 | 数量 | 类型 |
 |---|---|---|
-| `app/storage/api` | 7 | `FileContentService` `MessageFileFacts` `PublicModeForbiddenException` `ResourceModeException` `StorageEnvLookup` `StorageUrlContext` `WritableFileContentService` |
 | `app/audit/api` | 3 | `AuditOutcome` `AuditWritePort` `KnowledgeBaseFacts` |
-| model-runtime `llm.api` | 17 | `CacheRetention` `ChatMessage` `ChatOptions` `ChatResponse` `ChatTool` `Embedder` `EmbeddingPort` `FunctionCall` `FunctionDef` `ImageUrl` `LlmChatClient` `MessageContentPart` `ModelFacts` `PromptCacheStatus` `RankResult` `Reranker` `ToolCall` |
-| agent-engine `agentengine.api` | 10 | `AgentStep` `AgentTool` `AgentToolCall` `BaseTool` `ToolCallTarget` `ToolCancellation` `ToolExecContext` `ToolOutput` `ToolRequest` `ToolResult` |
-| retrieval-engine `retrieval.api` | 7 | `GraphData` `KnowledgeDocumentFacts` `MessageArtifact` `NameSpace` `RetrieveGraphRepository` `SearchParams` `WebSearchResult` |
-| framework 正式包（永驻） | 26 | `APIKeyScopeContext` `AuditAction` `ChatStream` `ChunkFacts` `ChunkView` `FaqChunkMetadata` `GraphNode` `GraphRelation` `KnowledgeBaseProvisioner` `KnowledgeView` `MessageView` `ResponseType` `SearchAuth` `SearchResult` `SearchTarget` `StorageBackendPort` `StorageBackendProvisioner` `StorageBackendView` `StorageConnectivityPort` `StorageEngineConfig` `StreamResponse` `TenantAPIKeyScope` `TenantConfigLookup` `TenantRole` `TokenUsage` `WikiLanguageSupport` |
-| `app/embedchannel/api` | 3 | `EmbedReply` `EmbedSessionPort` `MessageSuggestionView` |
-| `app/memory/api` | 6 | `MemoryItemView` `MemoryKeys` `MemoryKinds` `MemoryMessageCursor` `MemoryRecall` `MemoryRetrievalContext` |
-| `app/im/api` | 4 | `MessageAttachment` `QaRequestPayload` `SessionQaPort` `SessionView` |
 | `app/storage/api`（随 platform/storage 整包） | 7 | `FileUrlPort` `MessageFactsLookup` `Mode` `OpenedFile` `Resolver` `SeekableSource` `StorageBackendResolver` |
-| `app/auth/api` | 10 | `APIKeyCapability` `APIKeyScopeType` `APIPrincipalConfig` `ChatHistoryConfig` `DocReaderAdminPort` `MemoryConfig` `ParserEngineConfig` `RetrievalConfig` `UserPreferences` `WebSearchConfig` |
+| `app/storage/api` | 7 | `FileContentService` `MessageFileFacts` `PublicModeForbiddenException` `ResourceModeException` `StorageEnvLookup` `StorageUrlContext` `WritableFileContentService` |
 | `app/session/api` | 9 | `MentionedItem` `MessageExecutionContext` `MessageImage` `PipelineMessageAttachmentView` `SessionLastRequestState` `SseSink` `SuggestionAttribution` `SuggestionItem` `UsedMemory` |
-| framework 工具包 | 1 | `KnowledgeIngest` |
+| retrieval-engine `retrieval.api` | 7 | `GraphData` `KnowledgeDocumentFacts` `MessageArtifact` `NameSpace` `RetrieveGraphRepository` `SearchParams` `WebSearchResult` |
+| `app/auth/api` | 10 | `APIKeyCapability` `APIKeyScopeType` `APIPrincipalConfig` `ChatHistoryConfig` `DocReaderAdminPort` `MemoryConfig` `ParserEngineConfig` `RetrievalConfig` `UserPreferences` `WebSearchConfig` |
+| `app/memory/api` | 6 | `MemoryItemView` `MemoryKeys` `MemoryKinds` `MemoryMessageCursor` `MemoryRecall` `MemoryRetrievalContext` |
+| model-runtime `llm.api` | 8 | `CacheRetention` `EmbeddingPort` `FunctionCall` `FunctionDef` `ImageUrl` `MessageContentPart` `ModelFacts` `PromptCacheStatus` |
+| `app/embedchannel/api` | 3 | `EmbedReply` `EmbedSessionPort` `MessageSuggestionView` |
+| framework 正式包（永驻） | 22 | `APIKeyScopeContext` `AuditAction` `ChunkFacts` `ChunkView` `FaqChunkMetadata` `GraphNode` `GraphRelation` `KnowledgeBaseProvisioner` `KnowledgeView` `MessageView` `SearchAuth` `SearchResult` `SearchTarget` `StorageBackendPort` `StorageBackendProvisioner` `StorageBackendView` `StorageConnectivityPort` `StorageEngineConfig` `TenantAPIKeyScope` `TenantConfigLookup` `TenantRole` `WikiLanguageSupport` |
+| agent-engine `agentengine.api` | 10 | `AgentStep` `AgentTool` `AgentToolCall` `BaseTool` `ToolCallTarget` `ToolCancellation` `ToolExecContext` `ToolOutput` `ToolRequest` `ToolResult` |
+| `app/im/api` | 4 | `MessageAttachment` `QaRequestPayload` `SessionQaPort` `SessionView` |
 | 待拍板（`KnowledgeBaseGateway`） | 1 | `KnowledgeBaseGateway` |
+| framework 工具包 | 1 | `KnowledgeIngest` |
 
 **五条落点约束**：
 
-1. `app/knowledge/api` 的子包结构已落地（`kb` 8 · `chunk` 9 · `catalog` 8 · `config` 7 · `projection` 2 · `error` 2 · `wiki` 3 + 根 18），单包不超过 18 个文件。
-2. **`framework` 永驻 26 个**（原 19 + 知识簇 7）：`ChunkFacts` `FaqChunkMetadata` `SearchAuth` `ChunkView` `KnowledgeView` `SearchTarget` `WikiLanguageSupport` —— 它们被 framework 自己的 `platform/knowledge` 工具与引擎引用，搬进 app 会造出 framework→app / retrieval-engine→app 的非法边。
-3. `SearchChunkMerge` 落 `retrieval-engine/api`（纯函数，被检索引擎测试与 app 共用），不属 knowledge。
+1. `app/knowledge/api` 已落地（知识簇 39 个），子包 `kb/chunk/catalog/config/projection/error/wiki`。
+2. **`framework` 永驻 22 个**：被 framework 工具与引擎引用，搬 app 会造非法模块边。
+3. `SearchChunkMerge` 已在 `retrieval-engine/api`。
 4. `SearchResult` 永驻 framework（model-runtime/agent-engine 都在用）。
 5. `KnowledgeBaseGateway` 仍待拍板；`AuditWritePort`/`AuditOutcome` 若随 `AuditAction` 归 framework，对应行随之调整。
 
@@ -306,6 +306,7 @@ WP6 收尾                ← 全部完成 + 拍板项落定
 | 批 | 日期 | 内容 | 验收数字（测试/守卫/金片） | 备注 |
 |---|---|---|---|---|
 | 基座 | 2026-11-21 | 守卫修复：port-map / contract-consumers / A20 重锚；R10 同级 api 放行；本文件 v2 重扫 + 补 §4.0 唯一归属总表（153 校验通过）+ WP4-C 接口映射 + WP6 批量手法 | 定向守卫 5 条绿 + 探针 2 条（同级 api 过 / 同级 service 红） | 全量 verify 未跑（定向：ArchitectureRulesTest 22/22 绿、50 个 run 行→脚本自计 49 守卫全绿），等开工基线 |
+| K10b-1 | 2026-11-21 | 模型面归位：12 个模型类型 → `llm.api`、`Embedder` → `platform.model`；`platform/stream` 17 文件 → `modelruntime.stream`；装饰器 6 文件 → `modelruntime.tracing`；`PromptFingerprints` → `modelruntime.prompt`；`TokenUsage`/`ResponseType` 线格式并入模型 JSON 模块 | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 坑：覆盖 model-runtime 既有 `META-INF/services` 导致线格式回退（已恢复并合并） |
 | 知识簇 | 2026-11-21 | 40 个类型归位：39 → `knowledge/api/{kb,chunk,catalog,config,projection,error,wiki}`、`SearchChunkMerge` → `retrieval/api`；`JsonValueSupport` 内联；7 个类型永驻 framework（被 framework/引擎引用）；`platform/knowledge` 4 个工具留 framework | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 过程修正：K16 的 4 个工具文件搬 app 会破 R10，改留 framework |
 | WP4-C | 2026-11-21 | 拆 `PipelinePorts`：11 接口 + 1 异常 + 3 record → 15 个顶层类型（端口加 `Port` 后缀）；30 个文件改 import；`shared/pipeline` 删除 | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 同步 `gen-port-map` 匿名实现识别、A20 实现方判定、两处 javadoc |
 | A（D-6 ①） | 2026-11-21 | `initialization` level 1→3；`DocReaderParsePort` 移到 `knowledge/api`；`check-capability-kinds` 判据对齐同级 api（`src_lv >= tgt_lv`） | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 10 个文件改 import；`initialization/api` 清空删除；三份生成物重生成 |

@@ -1,7 +1,7 @@
 package com.ragagent.session.service;
 
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.shared.model.ResponseType;
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.modelruntime.stream.StreamEvent;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**

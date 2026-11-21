@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.wiki.service;
 
 import com.ragagent.knowledge.api.kb.EmbeddingModelPort;
+import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelRuntime;
-import com.ragagent.shared.model.LlmChatClient;
 import org.springframework.stereotype.Component;
 
 /**

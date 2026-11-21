@@ -1,7 +1,7 @@
 package com.ragagent.session.service;
 
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.modelruntime.stream.StreamEvent;
+import com.ragagent.modelruntime.stream.StreamManager;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.domain.message.Message;
 import java.util.LinkedHashSet;

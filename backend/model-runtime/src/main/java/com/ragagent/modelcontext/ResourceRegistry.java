@@ -1,8 +1,8 @@
 package com.ragagent.modelcontext;
 
-import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.ToolCall;
 import com.ragagent.shared.model.MessageContentPart;
-import com.ragagent.shared.model.ToolCall;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;

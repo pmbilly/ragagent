@@ -3,7 +3,7 @@ package com.ragagent.platform.event;
 /**
  * 事件类型常量。
  *
- * <p>取值为 String 常量集中定义（做法与 {@code com.ragagent.shared.model.ResponseType}
+ * <p>取值为 String 常量集中定义（做法与 {@code ResponseType}
  * 同源）。流式子集与 ResponseType 大体同名（camelCase）但<b>不逐字相等</b>：
  * 思考事件取值 {@code thought}，而 ResponseType 的 wire 值是 {@code thinking}；其余
  * （toolCall / toolResult / reflection / references / error / toolApprovalRequired / ...）

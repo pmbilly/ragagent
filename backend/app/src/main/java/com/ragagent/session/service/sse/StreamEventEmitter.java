@@ -1,10 +1,10 @@
 package com.ragagent.session.service.sse;
 
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.llm.api.StreamResponse;
+import com.ragagent.modelruntime.stream.StreamEvent;
 import com.ragagent.platform.storage.support.Rewriter;
 import com.ragagent.platform.storage.support.StreamRewriter;
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.shared.model.ResponseType;
-import com.ragagent.shared.model.StreamResponse;
 import com.ragagent.shared.session.SseSink;
 import java.io.IOException;
 import java.util.LinkedHashMap;

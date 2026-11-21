@@ -35,7 +35,7 @@ import _source_roots as _sr
 
 PAYLOAD_DIR = _sr.find_pkg_path("shared/event/payload")
 EVENT_TYPE = _sr.find_pkg_path("platform/event/EventType.java")
-RESPONSE_TYPE = _sr.find_pkg_path("shared/model/ResponseType.java")
+RESPONSE_TYPE = _sr.find_pkg_path("llm/api/ResponseType.java")
 
 # 查询参数白名单（键 → 判定依据）。OIDC/OAuth2 标准参数，由外部协议决定，不得改名。
 QUERY_WHITELIST = {

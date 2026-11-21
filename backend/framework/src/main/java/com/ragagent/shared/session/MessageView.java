@@ -1,7 +1,6 @@
 package com.ragagent.shared.session;
 
 import com.ragagent.shared.agent.AgentStep;
-import com.ragagent.shared.model.TokenUsage;
 import com.ragagent.shared.retrieval.SearchResult;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ public class MessageView {
 
     private long agentDurationMs;
 
-    private TokenUsage usage;
+    private Object usage;
 
     private String renderedContent = "";
 
@@ -184,11 +183,11 @@ public class MessageView {
         this.agentDurationMs = agentDurationMs;
     }
 
-    public TokenUsage getUsage() {
+    public Object getUsage() {
         return usage;
     }
 
-    public void setUsage(TokenUsage usage) {
+    public void setUsage(Object usage) {
         this.usage = usage;
     }
 

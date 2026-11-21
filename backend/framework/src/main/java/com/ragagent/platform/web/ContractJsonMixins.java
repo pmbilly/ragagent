@@ -21,7 +21,6 @@ import com.ragagent.shared.event.payload.StopData;
 import com.ragagent.shared.event.payload.ToolApprovalRequiredData;
 import com.ragagent.shared.event.payload.ToolApprovalResolvedData;
 import com.ragagent.shared.event.payload.UserMessageInjectedData;
-import com.ragagent.shared.model.TokenUsage;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -57,7 +56,6 @@ public final class ContractJsonMixins {
         m.put(RerankData.class, ContractJsonMixinsEvent.RerankDataMixin.class);
         m.put(RetrievalData.class, ContractJsonMixinsEvent.RetrievalDataMixin.class);
         m.put(StopData.class, ContractJsonMixinsEvent.StopDataMixin.class);
-        m.put(TokenUsage.class, ContractJsonMixinsCore.TokenUsageMixin.class);
         m.put(ToolApprovalRequiredData.class, ContractJsonMixinsEvent.ToolApprovalRequiredDataMixin.class);
         m.put(ToolApprovalResolvedData.class, ContractJsonMixinsEvent.ToolApprovalResolvedDataMixin.class);
         m.put(UserMessageInjectedData.class, ContractJsonMixinsEvent.UserMessageInjectedDataMixin.class);

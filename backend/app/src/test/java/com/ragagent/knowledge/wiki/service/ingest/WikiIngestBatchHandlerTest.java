@@ -37,7 +37,7 @@ import com.ragagent.knowledge.wiki.repository.ingest.WikiIngestTaskQueue;
 import com.ragagent.knowledge.wiki.service.WikiModelResolver;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.knowledge.wiki.service.page.WikiPageService;
-import com.ragagent.shared.model.LlmChatClient;
+import com.ragagent.llm.api.LlmChatClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

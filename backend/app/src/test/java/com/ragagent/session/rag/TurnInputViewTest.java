@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelFactoryPort;
-import com.ragagent.shared.model.LlmChatClient;
 import org.junit.jupiter.api.Test;
 
 /**

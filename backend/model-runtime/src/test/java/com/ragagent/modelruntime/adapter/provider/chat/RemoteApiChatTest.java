@@ -11,20 +11,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.llm.api.ChatConfig;
+import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.ChatOptions;
+import com.ragagent.llm.api.ChatResponse;
+import com.ragagent.llm.api.ChatTool;
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.llm.api.StreamResponse;
+import com.ragagent.llm.api.TokenUsage;
+import com.ragagent.llm.api.ToolCall;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapters;
 import com.ragagent.platform.http.LlmTransport;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.web.ContractJsonModule;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.model.ChatMessage;
-import com.ragagent.shared.model.ChatOptions;
-import com.ragagent.shared.model.ChatResponse;
-import com.ragagent.shared.model.ChatTool;
-import com.ragagent.shared.model.ResponseType;
-import com.ragagent.shared.model.StreamResponse;
-import com.ragagent.shared.model.TokenUsage;
-import com.ragagent.shared.model.ToolCall;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -51,7 +50,7 @@ class RemoteApiChatTest {
 
     // TokenUsage 的线格式（snake 键 + NON_DEFAULT 省略）自 B268-A② 起由契约 mixin 模块承载
     private static final ObjectMapper MAPPER = new ObjectMapper()
-            .registerModule(new ContractJsonModule());
+            .registerModules(JsonMappers.contractModules());
 
     /** 无 provider、无 baseURL 的默认实例。 */
     private static RemoteApiChat newTestRemoteChat() {

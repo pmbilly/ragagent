@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.wiki.service;
 
-import com.ragagent.shared.model.LlmChatClient;
+import com.ragagent.llm.api.LlmChatClient;
 import java.util.List;
 
 /**

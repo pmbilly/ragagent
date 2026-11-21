@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.platform.web.ContractJsonModule;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * modelcontext 包内的 JSON 语义小工具：解析容错与 double 归一。
@@ -16,7 +16,7 @@ final class ModelJsonValues {
     static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_TRAILING_TOKENS, true)
             // 上下文预算读写的载荷含契约类（TokenUsage 等）：线格式在 mixin 模块里
-            .registerModule(new ContractJsonModule());
+            .registerModules(JsonMappers.contractModules());
 
     private ModelJsonValues() {
     }

@@ -1,10 +1,10 @@
 package com.ragagent.session.qa;
 
 
+import com.ragagent.modelruntime.stream.StreamManager;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.event.EventType;
-import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionLookupScope;
 import com.ragagent.session.domain.message.Message;

@@ -1,0 +1,205 @@
+package com.ragagent.modelruntime.tracing;
+
+import com.ragagent.llm.api.RankResult;
+import com.ragagent.llm.api.TokenUsage;
+import com.ragagent.platform.tracing.langfuse.LangfuseTokenUsage;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 模型观测的载荷/用量辅助（文本截断、预览、用量估算、usage 转换）。
+ *
+ * <p>省略号形态：chat 的 MCP 目录裁剪切用 {@code "…"}（单字符），
+ * embedding/rerank 的预览裁剪切用 {@code "..."}（三点）——两处保持既有差异。</p>
+ */
+final class LangfusePayloads {
+
+    /** chat 的 MCP 目录截断上限。 */
+    static final int MCP_CATALOG_RUNES = 8000;
+    /** rerank 的输出条数上限。 */
+    static final int RERANK_MAX_SCORES = 50;
+    /** rerank 的输入文档预览条数。 */
+    static final int RERANK_PREVIEW_DOCS = 8;
+
+    private LangfusePayloads() {
+    }
+
+    /** 按码点截断（maxRunes<=0 → ""；超长追加省略号）。 */
+    static String truncate(String s, int maxRunes, String ellipsis) {
+        if (s == null) {
+            return "";
+        }
+        if (maxRunes <= 0) {
+            return "";
+        }
+        int[] runes = s.codePoints().toArray();
+        if (runes.length <= maxRunes) {
+            return s;
+        }
+        return new String(runes, 0, maxRunes) + ellipsis;
+    }
+
+    /** chat 载荷的文本裁剪（省略号 "…"）。 */
+    static String truncateChat(String s, int maxRunes) {
+        return truncate(s, maxRunes, "…");
+    }
+
+    /** embedding 载荷的输入预览：前 n 条、各裁到 120 码点。 */
+    static List<String> previewTexts(List<String> texts, int n) {
+        List<String> out = new ArrayList<>(Math.min(n, texts.size()));
+        int limit = Math.min(n, texts.size());
+        for (int i = 0; i < limit; i++) {
+            out.add(truncate(texts.get(i), 120, "..."));
+        }
+        return out;
+    }
+
+    /** rerank 载荷的文档预览：前 n 条文档的 {index, preview, length}。 */
+    static List<Map<String, Object>> previewDocs(List<String> docs, int n) {
+        int limit = Math.min(n, docs.size());
+        List<Map<String, Object>> out = new ArrayList<>(limit);
+        for (int i = 0; i < limit; i++) {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("index", i);
+            row.put("preview", truncate(docs.get(i), 160, "..."));
+            row.put("length", codePointCount(docs.get(i)));
+            out.add(row);
+        }
+        return out;
+    }
+
+    /** rerank 载荷的结果摘要：前 n 条 {rank, index, model_score, preview}。 */
+    static List<Map<String, Object>> summarizeRerankResults(List<RankResult> results,
+                                                            List<String> documents, int n) {
+        int limit = Math.min(n, results.size());
+        List<Map<String, Object>> out = new ArrayList<>(limit);
+        for (int i = 0; i < limit; i++) {
+            RankResult result = results.get(i);
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("rank", i + 1);
+            row.put("index", result.getIndex());
+            row.put("model_score", result.getRelevanceScore());
+            int idx = result.getIndex();
+            if (idx >= 0 && idx < documents.size()) {
+                row.put("preview", truncate(documents.get(idx), 160, "..."));
+            }
+            out.add(row);
+        }
+        return out;
+    }
+
+    /** rerank 分数统计：{min, max, avg}；空结果 → null。 */
+    static Map<String, Object> scoreStats(List<RankResult> results) {
+        if (results.isEmpty()) {
+            return null;
+        }
+        double minScore = results.get(0).getRelevanceScore();
+        double maxScore = minScore;
+        double sum = 0.0;
+        for (RankResult r : results) {
+            if (r.getRelevanceScore() < minScore) {
+                minScore = r.getRelevanceScore();
+            }
+            if (r.getRelevanceScore() > maxScore) {
+                maxScore = r.getRelevanceScore();
+            }
+            sum += r.getRelevanceScore();
+        }
+        Map<String, Object> stats = new LinkedHashMap<>();
+        stats.put("min", minScore);
+        stats.put("max", maxScore);
+        stats.put("avg", sum / results.size());
+        return stats;
+    }
+
+    /** rerank 文档平均码点数。 */
+    static int avgDocChars(List<String> documents) {
+        if (documents.isEmpty()) {
+            return 0;
+        }
+        int total = 0;
+        for (String doc : documents) {
+            total += codePointCount(doc);
+        }
+        return total / documents.size();
+    }
+
+    /** embedding 用量估算：Σ(码点数/4 + 1)，空 → null。 */
+    static LangfuseTokenUsage approxEmbeddingUsage(List<String> texts) {
+        int total = 0;
+        for (String t : texts) {
+            int runes = codePointCount(t);
+            if (runes == 0) {
+                continue;
+            }
+            total += runes / 4 + 1;
+        }
+        if (total == 0) {
+            return null;
+        }
+        return inputTokens(total);
+    }
+
+    /** rerank 用量估算：query + 各文档的 (码点数/4 + 1)。 */
+    static LangfuseTokenUsage approxRerankUsage(String query, List<String> documents) {
+        int total = codePointCount(query) / 4 + 1;
+        for (String d : documents) {
+            total += codePointCount(d) / 4 + 1;
+        }
+        if (total == 0) {
+            return null;
+        }
+        return inputTokens(total);
+    }
+
+    private static LangfuseTokenUsage inputTokens(int total) {
+        LangfuseTokenUsage usage = new LangfuseTokenUsage();
+        usage.input = total;
+        usage.total = total;
+        usage.unit = "TOKENS";
+        return usage;
+    }
+
+    /**
+     * VLM 不返回 token usage，按
+     * promptTokens=prompt 码点数/4+1、outputTokens=输出码点数/4 估算
+     * （空输出 → 0；总数为两者之和）。
+     */
+    static LangfuseTokenUsage approxVlmUsage(String prompt, String result) {
+        int input = codePointCount(prompt) / 4 + 1;
+        int output = codePointCount(result) / 4;
+        LangfuseTokenUsage usage = new LangfuseTokenUsage();
+        usage.input = input;
+        usage.output = output;
+        usage.total = input + output;
+        usage.unit = "TOKENS";
+        return usage;
+    }
+
+    /** chat 用量换算：三值全零 → null（不上报）；否则映射 + unit=TOKENS。 */
+    static LangfuseTokenUsage convertUsage(TokenUsage usage) {
+        if (usage == null) {
+            return null;
+        }
+        if (usage.getPromptTokens() == 0 && usage.getCompletionTokens() == 0
+                && usage.getTotalTokens() == 0) {
+            return null;
+        }
+        LangfuseTokenUsage out = new LangfuseTokenUsage();
+        out.input = usage.getPromptTokens();
+        out.output = usage.getCompletionTokens();
+        out.total = usage.getTotalTokens();
+        out.cacheRead = usage.getCacheReadTokens();
+        out.cacheWrite = usage.getCacheWriteTokens();
+        out.cacheMiss = usage.getCacheMissTokens();
+        out.unit = "TOKENS";
+        return out;
+    }
+
+    /** 按 Unicode 码点计数（null 计 0）。 */
+    static int codePointCount(String s) {
+        return s == null ? 0 : s.codePointCount(0, s.length());
+    }
+}

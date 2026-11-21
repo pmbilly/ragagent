@@ -10,28 +10,28 @@ import java.util.Map;
  * {@code exception*} 两字段承载 exception 事件
  * （name="exception"，attributes: exception.type/exception.message）。</p>
  */
-final class RecordedSpan {
+public final class RecordedSpan {
 
     /** 32 位十六进制 trace id。 */
-    final String traceIdHex;
+    public final String traceIdHex;
     /** 16 位十六进制 span id。 */
-    final String spanIdHex;
+    public final String spanIdHex;
     /** 16 位十六进制父 span id；根 span 为 null。 */
-    final String parentSpanIdHex;
-    final String name;
+    public final String parentSpanIdHex;
+    public final String name;
     /** OTLP span kind 的缺省值（INTERNAL=1）。 */
-    final long startNanos;
+    public final long startNanos;
 
-    long endNanos;
+    public long endNanos;
     /** 属性（键 → JSON 字符串值），写入顺序稳定。 */
-    final Map<String, String> attributes = new LinkedHashMap<>();
+    public final Map<String, String> attributes = new LinkedHashMap<>();
     /** 非 null → Status{code=ERROR, message=...}。 */
-    String statusMessage;
+    public String statusMessage;
     /** 非 null → exception 事件（exceptionType/exceptionMessage 两字段）。 */
-    String exceptionType;
-    String exceptionMessage;
+    public String exceptionType;
+    public String exceptionMessage;
 
-    RecordedSpan(String traceIdHex, String spanIdHex, String parentSpanIdHex,
+    public RecordedSpan(String traceIdHex, String spanIdHex, String parentSpanIdHex,
                  String name, long startNanos) {
         this.traceIdHex = traceIdHex;
         this.spanIdHex = spanIdHex;

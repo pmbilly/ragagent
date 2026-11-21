@@ -1,9 +1,9 @@
 package com.ragagent.session.runtime;
 
-import com.ragagent.platform.tracing.decorators.LangfuseChatClient;
-import com.ragagent.platform.tracing.decorators.LangfuseReranker;
-import com.ragagent.shared.model.LlmChatClient;
-import com.ragagent.shared.model.Reranker;
+import com.ragagent.llm.api.LlmChatClient;
+import com.ragagent.llm.api.Reranker;
+import com.ragagent.modelruntime.tracing.LangfuseChatClient;
+import com.ragagent.modelruntime.tracing.LangfuseReranker;
 
 /**
  * 会话域的模型装饰入口：把观测装饰收在一处。

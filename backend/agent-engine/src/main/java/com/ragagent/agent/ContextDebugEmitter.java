@@ -2,9 +2,9 @@ package com.ragagent.agent;
 
 import com.ragagent.agent.budget.ContextDiagnostics;
 import com.ragagent.agent.compaction.CompactionSettings;
-import com.ragagent.shared.model.ChatMessage;
-import com.ragagent.shared.model.ChatTool;
-import com.ragagent.shared.model.TokenUsage;
+import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.ChatTool;
+import com.ragagent.llm.api.TokenUsage;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,8 +1,8 @@
 package com.ragagent.agent;
 
 import com.ragagent.agent.budget.TokenEstimator;
-import com.ragagent.shared.model.ChatMessage;
-import com.ragagent.shared.model.TokenUsage;
+import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.TokenUsage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -1,12 +1,12 @@
 package com.ragagent.retrieval.engine;
 
+import com.ragagent.platform.model.Embedder;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.api.IndexDocument;
 import com.ragagent.retrieval.api.IndexEngine;
 import com.ragagent.retrieval.api.IndexEngineResolver;
 import com.ragagent.retrieval.api.TenantRetrievalDefault;
 import com.ragagent.retrieval.api.TenantStoreOwnership;
-import com.ragagent.shared.model.Embedder;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Component;

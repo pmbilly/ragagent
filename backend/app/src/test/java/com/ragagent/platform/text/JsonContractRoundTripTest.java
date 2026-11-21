@@ -67,6 +67,12 @@ import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestPayload;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiPendingOp;
 import com.ragagent.knowledge.wiki.service.ingest.support.CombinedExtraction;
 import com.ragagent.knowledge.wiki.service.page.NewSlugFromCitation;
+import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.ChatOptions;
+import com.ragagent.llm.api.ChatTool;
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.llm.api.StreamResponse;
+import com.ragagent.llm.api.TokenUsage;
 import com.ragagent.mcp.domain.McpAdvancedConfig;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpAuthType;
@@ -80,8 +86,8 @@ import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.dto.MemoryConsolidationResult;
 import com.ragagent.memory.dto.MemoryDocView;
 import com.ragagent.memory.dto.MemoryTopicView;
-import com.ragagent.platform.stream.LiveRunPayload;
-import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.modelruntime.stream.LiveRunPayload;
+import com.ragagent.modelruntime.stream.StreamEvent;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.api.ConnectionConfig;
 import com.ragagent.retrieval.api.IndexConfig;
@@ -95,12 +101,6 @@ import com.ragagent.shared.audit.AuditAction;
 import com.ragagent.shared.audit.AuditOutcome;
 import com.ragagent.shared.auth.UserPreferences;
 import com.ragagent.shared.knowledge.FaqChunkMetadata;
-import com.ragagent.shared.model.ChatMessage;
-import com.ragagent.shared.model.ChatOptions;
-import com.ragagent.shared.model.ChatTool;
-import com.ragagent.shared.model.ResponseType;
-import com.ragagent.shared.model.StreamResponse;
-import com.ragagent.shared.model.TokenUsage;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.session.MentionedItem;
 import com.ragagent.shared.session.MessageArtifact;
@@ -668,7 +668,7 @@ class JsonContractRoundTripTest {
      * 所以同样纳入这道防线。</p>
      *
      * <p>timestamp 留空：本工具用的是**裸** ObjectMapper（未注册 JSR-310），
-     * 非空值会在这里炸；其真实字节形状由 {@code com.ragagent.platform.stream.StreamJsonTest} 钉住。</p>
+     * 非空值会在这里炸；其真实字节形状由 {@code com.ragagent.modelruntime.stream.StreamJsonTest} 钉住。</p>
      */
     @Test
     void streamEventContractsRoundTrip() {

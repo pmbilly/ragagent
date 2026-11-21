@@ -1,6 +1,10 @@
 package com.ragagent.memory.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.ChatOptions;
+import com.ragagent.llm.api.ChatResponse;
+import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.memory.domain.MemoryExtractPayload;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.domain.item.MemoryItem;
@@ -8,10 +12,6 @@ import com.ragagent.memory.domain.item.MemoryTombstone;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.repository.MemoryRepository;
 import com.ragagent.shared.memory.MemoryKinds;
-import com.ragagent.shared.model.ChatMessage;
-import com.ragagent.shared.model.ChatOptions;
-import com.ragagent.shared.model.ChatResponse;
-import com.ragagent.shared.model.LlmChatClient;
 import com.ragagent.shared.tenant.MemoryConfig;
 import java.time.Instant;
 import java.time.LocalDate;

@@ -1,6 +1,6 @@
 package com.ragagent.agent.compaction;
 
-import com.ragagent.shared.model.ChatResponse;
+import com.ragagent.llm.api.ChatResponse;
 import java.util.regex.Pattern;
 
 /**

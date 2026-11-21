@@ -17,7 +17,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
         "com.ragagent.storage.config",
         "com.ragagent.platform.config", "com.ragagent.knowledge.config",
         "com.ragagent.platform.security", "com.ragagent.platform.storage.config", "com.ragagent.auth.config", "com.ragagent.retrieval.graph",
-        "com.ragagent.platform.stream", "com.ragagent.platform.tracing.langfuse"})
+        "com.ragagent.modelruntime.stream", "com.ragagent.platform.tracing.langfuse"})
 public class RagAgentApplication {
 
     public static void main(String[] args) {

@@ -1,6 +1,6 @@
 package com.ragagent.agent.compaction;
 
-import com.ragagent.shared.model.ChatMessage;
+import com.ragagent.llm.api.ChatMessage;
 import java.util.List;
 
 /**

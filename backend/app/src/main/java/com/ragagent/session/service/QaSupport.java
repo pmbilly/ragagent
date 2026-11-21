@@ -2,14 +2,14 @@ package com.ragagent.session.service;
 
 import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.agentengine.api.SteerSink;
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.modelruntime.stream.StreamEvent;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.storage.support.StreamRewriter;
-import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.dto.QaRequests.MentionedItemRequest;
 import com.ragagent.shared.event.EventBusInterface;
-import com.ragagent.shared.model.ResponseType;
 import com.ragagent.shared.session.MentionedItem;
 import com.ragagent.shared.session.MessageAttachment;
 import com.ragagent.shared.session.SuggestionAttribution;

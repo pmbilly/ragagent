@@ -1,10 +1,10 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.llm.api.TokenUsage;
+import com.ragagent.llm.api.ToolCall;
 import com.ragagent.llm.domain.ProviderMetadataMaps;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingEmitter;
-import com.ragagent.shared.model.TokenUsage;
-import com.ragagent.shared.model.ToolCall;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;

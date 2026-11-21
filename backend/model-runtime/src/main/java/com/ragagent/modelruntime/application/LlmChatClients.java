@@ -1,6 +1,7 @@
 package com.ragagent.modelruntime.application;
 
 import com.ragagent.llm.api.ChatConfig;
+import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.llm.provider.ProviderName;
@@ -11,7 +12,6 @@ import com.ragagent.modelruntime.adapter.provider.chat.anthropic.AnthropicChat;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ConcurrencyChatClient;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.model.LlmChatClient;
 
 /**
  * 聊天实例工厂。

@@ -8,6 +8,8 @@ import static com.ragagent.session.rag.Rec46cSupport.json;
 import static com.ragagent.session.rag.Rec46cSupport.mask;
 import static com.ragagent.session.rag.Rec46cSupport.msgsJSON;
 
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.session.rag.plugin.PluginChatCompletion;
@@ -19,8 +21,6 @@ import com.ragagent.session.rag.support.ReferencesSupport;
 import com.ragagent.shared.graph.GraphData;
 import com.ragagent.shared.graph.GraphNode;
 import com.ragagent.shared.graph.GraphRelation;
-import com.ragagent.shared.model.ResponseType;
-import com.ragagent.shared.model.StreamResponse;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.session.PipelineMessageAttachmentView;
 import java.util.ArrayList;

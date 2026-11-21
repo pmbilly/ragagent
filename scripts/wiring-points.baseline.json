@@ -81,17 +81,17 @@
       "kind": "module-internal",
       "why": "把可运行时调谐的 SsrfGuard 单例交给 LLM 传输层（避免各建实例）"
     },
-    "com.ragagent.platform.stream.StreamManagerConfig": {
-      "kind": "module-internal",
-      "why": "SSE 流管理器 Memory/Redis 实现选择；选 Redis 时启动即 Ping"
-    },
-    "com.ragagent.platform.tracing.decorators.LangfuseWiring": {
-      "kind": "module-internal",
-      "why": "langfuse 追踪装饰器装配：未配置即 no-op，配置无效拒启"
-    },
     "com.ragagent.retrieval.graph.Neo4jGraphConfig": {
       "kind": "module-internal",
       "why": "图仓储装配：NEO4J_ENABLE 门控，未启用时退化为 no-op"
+    },
+    "com.ragagent.modelruntime.stream.StreamManagerConfig": {
+      "kind": "module-internal",
+      "why": "SSE 流管理器 Memory/Redis 实现选择；选 Redis 时启动即 Ping"
+    },
+    "com.ragagent.modelruntime.tracing.LangfuseWiring": {
+      "kind": "module-internal",
+      "why": "langfuse 追踪装饰器装配：未配置即 no-op，配置无效拒启"
     }
   }
 }

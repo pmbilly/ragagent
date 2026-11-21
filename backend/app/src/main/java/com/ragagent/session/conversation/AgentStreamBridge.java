@@ -1,8 +1,10 @@
 package com.ragagent.session.conversation;
 
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.llm.api.TokenUsage;
+import com.ragagent.modelruntime.stream.StreamEvent;
+import com.ragagent.modelruntime.stream.StreamManager;
 import com.ragagent.platform.event.EventType;
-import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.dto.AgentReferencesData;
@@ -29,8 +31,6 @@ import com.ragagent.shared.event.payload.MCPOAuthResolvedData;
 import com.ragagent.shared.event.payload.ToolApprovalRequiredData;
 import com.ragagent.shared.event.payload.ToolApprovalResolvedData;
 import com.ragagent.shared.event.payload.UserMessageInjectedData;
-import com.ragagent.shared.model.ResponseType;
-import com.ragagent.shared.model.TokenUsage;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.tool.ToolResult;
 import java.time.OffsetDateTime;

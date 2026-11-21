@@ -37,7 +37,6 @@ DEAD_NAMES = (
     "agent.management",
     "agentm",
     ":engine",
-    "platform.model",
     "ModelGateway",
     "EmbeddingGateway",
     "docs/superpowers/plans/",

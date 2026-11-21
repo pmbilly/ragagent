@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.shared.model.ResponseType;
-import com.ragagent.shared.model.StreamResponse;
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.llm.api.StreamResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;

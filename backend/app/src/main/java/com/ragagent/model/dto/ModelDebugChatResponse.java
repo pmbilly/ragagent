@@ -1,8 +1,8 @@
 package com.ragagent.model.dto;
 
-import com.ragagent.shared.model.StreamResponse;
-import com.ragagent.shared.model.TokenUsage;
-import com.ragagent.shared.model.ToolCall;
+import com.ragagent.llm.api.StreamResponse;
+import com.ragagent.llm.api.TokenUsage;
+import com.ragagent.llm.api.ToolCall;
 import java.util.ArrayList;
 import java.util.List;
 

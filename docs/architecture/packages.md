@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-377 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+379 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -252,6 +252,9 @@
 | `:backend` | `com.ragagent.modelruntime.adapter.provider.chat.common` | 跨 provider 共享的对话底座：装配（ProviderAdapter(s)）、并发客户端、思考策略与流式修正，（流句柄三件已迁 `platform.stream`——契约 ChatStream 的队列实现与追踪装饰器共用）。 |
 | `:backend` | `com.ragagent.modelruntime.adapter.provider.vlm` | 提供方 · 视觉：VlmHttpTransport / VlmClient。 |
 | `:backend` | `com.ragagent.modelruntime.application` | 模型运行时 · application：ModelRuntimeAssembler / ModelRuntimeConfigs / LlmChatClients…。 |
+| `:backend` | `com.ragagent.modelruntime.prompt` | 提示词指纹与缓存键计算。 |
+| `:backend` | `com.ragagent.modelruntime.stream` | 流式会话的存储与泵：StreamManager 的 Redis / 内存两种实现与帧编解码。 |
+| `:backend` | `com.ragagent.modelruntime.tracing` | Langfuse 追踪装饰器：聊天 / 嵌入 / 重排 / VLM 的观测包装。 |
 | `:backend` | `com.ragagent.platform` | 平台面（platform，阶段 6 起逐步收纳）：框架适配、可靠执行与通用技术能力。 |
 | `:backend` | `com.ragagent.platform.access` | 平台访问上下文面（方案 的 platform.access/）：请求级会话与追踪载体。 |
 | `:backend` | `com.ragagent.platform.audit` | 平台审计写入：业务活动的租户兜底、操作者提取、details 字母序与 best-effort 语义。 |
@@ -260,6 +263,7 @@
 | `:backend` | `com.ragagent.platform.event` | 平台事件总线面（platform.event/）： Event / EventBus / EventJson 等 9 类——进程内事件总线与载荷编解码。 |
 | `:backend` | `com.ragagent.platform.http` | 平台 HTTP 面：SSRF 策略下的安全抓取工具，以及全进程共享的裸 HTTP 传输层 （com.ragagent.platform.http.LlmTransport：连接级 SSRF 校验 + |
 | `:backend` | `com.ragagent.platform.knowledge` | 平台 · 知识/文本/图片工具：分块文本检索、文档分块组装、FAQ 元数据编解码、图片引用富化与重写。 |
+| `:backend` | `com.ragagent.platform.model` | 模型能力的对外接口（嵌入等）：引擎与各域只认能力，不认厂商实现。 |
 | `:backend` | `com.ragagent.platform.persistence` | 平台持久化面：MyBatis 拦截器（全表写守卫 / 租户过滤）、分页请求、JSONB / 时间类型处理器、方言与 LIKE 转义。 |
 | `:backend` | `com.ragagent.platform.prompt` | 平台提示词面：模板目录、常量、占位符与组装。 |
 | `:backend` | `com.ragagent.platform.redis` | 平台 · Redis：SpringRedisPubSub / RedisPubSub。 |
@@ -268,12 +272,10 @@
 | `:backend` | `com.ragagent.platform.storage.config` | 平台存储配置面：允许清单、上传上限与存储运行时环境。 |
 | `:backend` | `com.ragagent.platform.storage.fileserve` | 存储 · 文件服务：FileTransport / FileProxyPort / FileServeHttp…。 |
 | `:backend` | `com.ragagent.platform.storage.support` | 存储 · 支撑：FileResolverFactory / ResourceUrlMode / StreamRewriter…。 |
-| `:backend` | `com.ragagent.platform.stream` | 流事件基础设施：Redis / 内存两种流管理器（com.ragagent.platform.stream.RedisStreamManager）与事件载体 （com.ragagent.platfor |
 | `:backend` | `com.ragagent.platform.task` | 平台任务面：Redis 任务队列核心（RedisTaskQueueCore）、 Redis 重试执行循环（RedisRetryingTaskQueue）、进程内执行队列 （InProcessTaskQ |
 | `:backend` | `com.ragagent.platform.text` | 平台文本面（的 `platform.text/`）：HTML→Markdown、实体/空白/代码点处理、路径与文件类型推断。 |
 | `:backend` | `com.ragagent.platform.tool` | 平台工具技术适配：工具 schema 的 JSON 解析（ToolSchemas）。 |
 | `:backend` | `com.ragagent.platform.tracing` | 观测技术面：Langfuse/OTLP 适配与 trace 载体注入。 |
-| `:backend` | `com.ragagent.platform.tracing.decorators` | 追踪 · decorators：LangfuseChatClient / LangfuseEmbedder / LangfusePayloads…。 |
 | `:backend` | `com.ragagent.platform.tracing.langfuse` | 平台追踪面（Langfuse OTel 适配； |
 | `:backend` | `com.ragagent.platform.web` | 平台 Web 面：统一响应外壳、JSON 映射、分页/字段参数、请求 ID 过滤器、非空体/RBAC 拦截器与序列化器。 |
 | `:backend` | `com.ragagent.platform.web.error` | 平台错误面：`BizException` 家族（含 `GuardForbiddenException`、`PlainErrorException`）、统一响应外壳的错误分派与全局异常处理器。 |

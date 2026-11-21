@@ -1,5 +1,6 @@
 package com.ragagent.session.adapter;
 
+import com.ragagent.llm.api.TokenUsage;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionService;
@@ -152,7 +153,7 @@ public class SessionQaAdapter implements SessionQaPort {
         m.setCompleted(v.isCompleted());
         m.setFallback(v.isFallback());
         m.setAgentDurationMs(v.getAgentDurationMs());
-        m.setUsage(v.getUsage());
+        m.setUsage((TokenUsage) v.getUsage());
         m.setRenderedContent(v.getRenderedContent());
         m.setChannel(v.getChannel());
         m.setAgentId(v.getAgentId());

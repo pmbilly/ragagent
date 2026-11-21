@@ -5,11 +5,11 @@ import static com.ragagent.agent.AgentPromptGolden.STR_BD_STRING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.shared.model.ChatMessage;
-import com.ragagent.shared.model.ChatTool;
+import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.ChatTool;
+import com.ragagent.llm.api.ToolCall;
 import com.ragagent.shared.model.FunctionCall;
 import com.ragagent.shared.model.MessageContentPart;
-import com.ragagent.shared.model.ToolCall;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

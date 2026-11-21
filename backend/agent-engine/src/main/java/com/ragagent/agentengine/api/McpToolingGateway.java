@@ -1,7 +1,7 @@
 package com.ragagent.agentengine.api;
 
+import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.shared.agent.ToolCallTarget;
-import com.ragagent.shared.model.ChatMessage;
 import java.util.List;
 
 /**

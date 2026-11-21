@@ -1,6 +1,6 @@
 package com.ragagent.mcp.approval;
 
-import com.ragagent.shared.model.ResponseType;
+import com.ragagent.llm.api.ResponseType;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.llm.api.ModelParameters;
+import com.ragagent.llm.api.RankResult;
+import com.ragagent.llm.api.Reranker;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelRowViews;
 import com.ragagent.modelruntime.application.ModelRuntimeConfigs;
@@ -16,8 +18,6 @@ import com.ragagent.rerank.provider.NvidiaReranker;
 import com.ragagent.rerank.provider.OpenAiReranker;
 import com.ragagent.rerank.provider.VolcengineReranker;
 import com.ragagent.rerank.provider.ZhipuReranker;
-import com.ragagent.shared.model.RankResult;
-import com.ragagent.shared.model.Reranker;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import java.io.InputStream;

@@ -1,9 +1,9 @@
 package com.ragagent.retrieval.engine;
 
+import com.ragagent.platform.model.Embedder;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
-import com.ragagent.shared.model.Embedder;
 import java.util.List;
 import java.util.Map;
 

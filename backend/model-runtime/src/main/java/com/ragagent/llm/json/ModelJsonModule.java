@@ -1,18 +1,27 @@
 package com.ragagent.llm.json;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.ChatOptions;
+import com.ragagent.llm.api.ChatResponse;
+import com.ragagent.llm.api.ChatTool;
+import com.ragagent.llm.api.RankResult;
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.llm.api.StreamResponse;
+import com.ragagent.llm.api.TokenUsage;
+import com.ragagent.llm.api.ToolCall;
 import com.ragagent.platform.web.JsonModuleProvider;
-import com.ragagent.shared.model.ChatMessage;
-import com.ragagent.shared.model.ChatOptions;
-import com.ragagent.shared.model.ChatResponse;
-import com.ragagent.shared.model.ChatTool;
 import com.ragagent.shared.model.FunctionDef;
 import com.ragagent.shared.model.ImageUrl;
 import com.ragagent.shared.model.MessageContentPart;
-import com.ragagent.shared.model.RankResult;
-import com.ragagent.shared.model.StreamResponse;
-import com.ragagent.shared.model.ToolCall;
+import java.io.IOException;
 
 /**
  * 模型面契约载荷的 Jackson 装配（mixin）。
@@ -39,7 +48,31 @@ public final class ModelJsonModule extends SimpleModule {
         setMixInAnnotation(RankResult.DocumentInfo.class,
                 ContractJsonMixinsModel.RankResultMixin.DocumentInfoMixin.class);
         setMixInAnnotation(StreamResponse.class, ContractJsonMixinsModel.StreamResponseMixin.class);
+        setMixInAnnotation(TokenUsage.class, ContractJsonMixinsModel.TokenUsageMixin.class);
         setMixInAnnotation(ToolCall.class, ContractJsonMixinsModelChat.ToolCallMixin.class);
+        addSerializer(ResponseType.class, new ResponseTypeSerializer());
+        addDeserializer(ResponseType.class, new ResponseTypeDeserializer());
+    }
+
+    private static final class ResponseTypeSerializer
+            extends JsonSerializer<ResponseType> {
+        @Override
+        public void serialize(ResponseType value,
+                              JsonGenerator gen,
+                              SerializerProvider provider)
+                throws IOException {
+            gen.writeString(value.value());
+        }
+    }
+
+    private static final class ResponseTypeDeserializer
+            extends JsonDeserializer<ResponseType> {
+        @Override
+        public ResponseType deserialize(JsonParser p,
+                                        DeserializationContext ctxt)
+                throws IOException {
+            return ResponseType.fromValue(p.getText());
+        }
     }
 
     /** ServiceLoader 入口。 */

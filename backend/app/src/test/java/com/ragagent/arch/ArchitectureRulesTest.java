@@ -648,7 +648,7 @@ class ArchitectureRulesTest {
     private static final Set<String> SELF_MADE_MAPPER_BASELINE = Set.of(
             "com.ragagent.platform.web.JsonMappers",
             "com.ragagent.platform.tracing.langfuse.LangfuseAttributes",
-            "com.ragagent.platform.stream.StreamJson",
+            "com.ragagent.modelruntime.stream.StreamJson",
             "com.ragagent.platform.event.EventJson",
             "com.ragagent.datasource.connector.gitlab.GitLabConnector",
             "com.ragagent.datasource.connector.notion.NotionJson",
@@ -804,7 +804,7 @@ class ArchitectureRulesTest {
             "redis.clients.",
             "jakarta.servlet.",
             "com.ragagent.platform.tracing.langfuse.",
-            "com.ragagent.platform.tracing.decorators.");
+            "com.ragagent.modelruntime.tracing.");
 
     @Test
     @DisplayName("A16：service 不得直接依赖边界层（controller/mapper/task/client/channel）")

@@ -1,12 +1,12 @@
 package com.ragagent.mcp.approval;
 
+import com.ragagent.llm.api.ResponseType;
 import com.ragagent.platform.config.AppEnvLookup;
 import com.ragagent.platform.redis.RedisPubSub;
 import com.ragagent.shared.event.payload.MCPOAuthRequiredData;
 import com.ragagent.shared.event.payload.MCPOAuthResolvedData;
 import com.ragagent.shared.event.payload.ToolApprovalRequiredData;
 import com.ragagent.shared.event.payload.ToolApprovalResolvedData;
-import com.ragagent.shared.model.ResponseType;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;

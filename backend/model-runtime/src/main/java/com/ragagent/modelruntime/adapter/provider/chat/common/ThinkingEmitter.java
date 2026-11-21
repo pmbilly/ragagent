@@ -1,7 +1,7 @@
 package com.ragagent.modelruntime.adapter.provider.chat.common;
 
-import com.ragagent.shared.model.ResponseType;
-import com.ragagent.shared.model.StreamResponse;
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.llm.api.StreamResponse;
 import java.util.concurrent.BlockingQueue;
 
 /**

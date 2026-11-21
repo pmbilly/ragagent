@@ -4,13 +4,13 @@ import static com.ragagent.modelcontext.ModelContextGolden.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.ChatResponse;
+import com.ragagent.llm.api.ChatTool;
+import com.ragagent.llm.api.ToolCall;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.shared.model.ChatMessage;
-import com.ragagent.shared.model.ChatResponse;
-import com.ragagent.shared.model.ChatTool;
 import com.ragagent.shared.model.FunctionCall;
-import com.ragagent.shared.model.ToolCall;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.tool.ToolResult;
 import java.util.ArrayList;

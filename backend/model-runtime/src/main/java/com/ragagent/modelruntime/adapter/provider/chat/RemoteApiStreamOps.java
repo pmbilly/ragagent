@@ -1,11 +1,11 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.llm.api.StreamResponse;
+import com.ragagent.llm.api.TokenUsage;
+import com.ragagent.llm.api.ToolCall;
 import com.ragagent.modelruntime.adapter.provider.chat.common.SseReader;
-import com.ragagent.shared.model.ResponseType;
-import com.ragagent.shared.model.StreamResponse;
-import com.ragagent.shared.model.TokenUsage;
-import com.ragagent.shared.model.ToolCall;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;

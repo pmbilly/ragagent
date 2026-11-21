@@ -1,5 +1,8 @@
 package com.ragagent.session.rag;
 
+import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.ChatOptions;
+import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
@@ -10,9 +13,6 @@ import com.ragagent.session.dto.PipelineMessageImageView;
 import com.ragagent.session.dto.PipelineMessageView;
 import com.ragagent.session.rag.plugin.PluginError;
 import com.ragagent.shared.error.PipelinePortException;
-import com.ragagent.shared.model.ChatMessage;
-import com.ragagent.shared.model.ChatOptions;
-import com.ragagent.shared.model.LlmChatClient;
 import com.ragagent.shared.retrieval.SearchTarget;
 import com.ragagent.shared.session.PipelineMessageAttachmentView;
 import java.util.ArrayList;

@@ -1,7 +1,12 @@
 package com.ragagent.session.rag.plugin;
 
 
+import com.ragagent.llm.api.ChatOptions;
+import com.ragagent.llm.api.ChatStream;
+import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelFactoryPort;
+import com.ragagent.llm.api.ResponseType;
+import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.modelcontext.StreamDecoder;
 import com.ragagent.platform.access.TenantContextSnapshot;
@@ -17,11 +22,6 @@ import com.ragagent.shared.event.EventBusInterface;
 import com.ragagent.shared.event.payload.AgentFinalAnswerData;
 import com.ragagent.shared.event.payload.AgentThoughtData;
 import com.ragagent.shared.event.payload.ErrorData;
-import com.ragagent.shared.model.ChatOptions;
-import com.ragagent.shared.model.ChatStream;
-import com.ragagent.shared.model.LlmChatClient;
-import com.ragagent.shared.model.ResponseType;
-import com.ragagent.shared.model.StreamResponse;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;

@@ -1,8 +1,8 @@
 package com.ragagent.agent;
 
 import com.ragagent.agent.compaction.ConversationSerializer;
+import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.shared.agent.AgentStep;
-import com.ragagent.shared.model.ChatMessage;
 import java.util.List;
 
 /**

@@ -5,12 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ragagent.llm.api.ChatConfig;
+import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.modelruntime.adapter.provider.chat.RemoteApiChat;
 import com.ragagent.modelruntime.adapter.provider.chat.anthropic.AnthropicChat;
 import com.ragagent.platform.http.LlmTransport;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.model.LlmChatClient;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
