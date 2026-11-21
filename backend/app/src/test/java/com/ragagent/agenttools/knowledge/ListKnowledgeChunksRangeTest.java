@@ -2,11 +2,11 @@ package com.ragagent.agenttools.knowledge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.agentengine.api.ToolRequest;
 import com.ragagent.framework.knowledge.DocChunkSupport;
 import com.ragagent.framework.shared.agent.SearchAuth;
 import com.ragagent.framework.shared.knowledge.ChunkFacts;
 import com.ragagent.framework.shared.retrieval.SearchTarget;
-import com.ragagent.framework.shared.tool.ToolRequest;
 import com.ragagent.framework.shared.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.ragagent.mcp.approval;
 
-import com.ragagent.framework.shared.tool.ToolCancellation;
+import com.ragagent.agentengine.api.ToolCancellation;
 
 /**
  * 审批取消源的桥：工具侧轮询式 {@link ToolCancellation} → 契约回调式 {@link Cancellation}。

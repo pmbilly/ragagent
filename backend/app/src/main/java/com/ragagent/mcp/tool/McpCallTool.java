@@ -5,7 +5,7 @@ import com.ragagent.agentengine.api.AgentTool;
 import com.ragagent.agentengine.api.BaseTool;
 import com.ragagent.agentengine.api.McpToolingGateway;
 import com.ragagent.agentengine.api.ToolRegistryPort;
-import com.ragagent.framework.shared.tool.ToolRequest;
+import com.ragagent.agentengine.api.ToolRequest;
 import com.ragagent.framework.shared.tool.ToolResult;
 import com.ragagent.framework.tool.ToolSchemas;
 import com.ragagent.framework.web.JsonMappers;

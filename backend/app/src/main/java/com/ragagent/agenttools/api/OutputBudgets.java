@@ -1,5 +1,5 @@
 package com.ragagent.agenttools.api;
-import com.ragagent.framework.shared.tool.ToolRequest;
+import com.ragagent.agentengine.api.ToolRequest;
 
 /**
  * 预算分摊。

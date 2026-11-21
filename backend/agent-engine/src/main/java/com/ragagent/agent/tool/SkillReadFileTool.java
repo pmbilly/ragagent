@@ -5,7 +5,7 @@ import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.agentengine.api.BaseTool;
 import com.ragagent.agentengine.api.SkillCatalogPort;
-import com.ragagent.framework.shared.tool.ToolRequest;
+import com.ragagent.agentengine.api.ToolRequest;
 import com.ragagent.framework.shared.tool.ToolResult;
 import com.ragagent.framework.tool.ToolSchemas;
 import com.ragagent.framework.web.JsonMappers;

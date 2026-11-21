@@ -1,4 +1,4 @@
-package com.ragagent.framework.shared.tool;
+package com.ragagent.agentengine.api;
 
 /**
  * 工具输出截断。

@@ -1,7 +1,7 @@
 package com.ragagent.agenttools.datasource;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.shared.tool.ToolRequest;
+import com.ragagent.agentengine.api.ToolRequest;
 import com.ragagent.framework.shared.tool.ToolResult;
 
 /**

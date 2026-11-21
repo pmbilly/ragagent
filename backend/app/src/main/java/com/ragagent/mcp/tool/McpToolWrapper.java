@@ -1,8 +1,8 @@
 package com.ragagent.mcp.tool;
 
 import com.ragagent.agentengine.api.AgentTool;
-import com.ragagent.framework.shared.tool.ToolExecContext;
-import com.ragagent.framework.shared.tool.ToolRequest;
+import com.ragagent.agentengine.api.ToolExecContext;
+import com.ragagent.agentengine.api.ToolRequest;
 import com.ragagent.framework.shared.tool.ToolResult;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.framework.web.ToolJson;

@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agent.fixtures.ToolContractGoldenB;
+import com.ragagent.agentengine.api.ToolRequest;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.ExtractConfigView;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.GraphNodeView;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.GraphRelationView;
@@ -17,7 +18,6 @@ import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.SearchResultVie
 import com.ragagent.framework.shared.agent.SearchAuth.KnowledgeTagsFetcher;
 import com.ragagent.framework.shared.agent.SearchAuth.TagView;
 import com.ragagent.framework.shared.retrieval.SearchTarget;
-import com.ragagent.framework.shared.tool.ToolRequest;
 import com.ragagent.framework.shared.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
