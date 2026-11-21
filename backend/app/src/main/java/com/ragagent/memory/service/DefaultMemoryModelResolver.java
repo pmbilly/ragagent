@@ -5,8 +5,8 @@ import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.llm.api.ModelRuntime;
-import com.ragagent.shared.model.EmbeddingPort;
-import com.ragagent.shared.model.ModelFacts;
+import com.ragagent.platform.model.EmbeddingPort;
+import com.ragagent.platform.model.ModelFacts;
 import java.util.List;
 import org.springframework.stereotype.Component;
 

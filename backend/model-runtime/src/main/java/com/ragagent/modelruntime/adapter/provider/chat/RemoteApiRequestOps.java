@@ -7,12 +7,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatTool;
+import com.ragagent.llm.api.FunctionCall;
+import com.ragagent.llm.api.FunctionDef;
+import com.ragagent.llm.api.MessageContentPart;
 import com.ragagent.llm.api.ToolCall;
 import com.ragagent.llm.domain.ProviderMetadataMaps;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.model.FunctionCall;
-import com.ragagent.shared.model.FunctionDef;
-import com.ragagent.shared.model.MessageContentPart;
 import java.util.ArrayList;
 import java.util.List;
 

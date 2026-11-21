@@ -12,15 +12,16 @@ import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;
 import com.ragagent.llm.api.ChatTool;
+import com.ragagent.llm.api.FunctionDef;
+import com.ragagent.llm.api.ImageUrl;
+import com.ragagent.llm.api.MessageContentPart;
+import com.ragagent.llm.api.PromptCacheStatus;
 import com.ragagent.llm.api.RankResult;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.llm.api.TokenUsage;
 import com.ragagent.llm.api.ToolCall;
 import com.ragagent.platform.web.JsonModuleProvider;
-import com.ragagent.shared.model.FunctionDef;
-import com.ragagent.shared.model.ImageUrl;
-import com.ragagent.shared.model.MessageContentPart;
 import java.io.IOException;
 
 /**
@@ -52,6 +53,8 @@ public final class ModelJsonModule extends SimpleModule {
         setMixInAnnotation(ToolCall.class, ContractJsonMixinsModelChat.ToolCallMixin.class);
         addSerializer(ResponseType.class, new ResponseTypeSerializer());
         addDeserializer(ResponseType.class, new ResponseTypeDeserializer());
+        addSerializer(PromptCacheStatus.class, new PromptCacheStatusSerializer());
+        addDeserializer(PromptCacheStatus.class, new PromptCacheStatusDeserializer());
     }
 
     private static final class ResponseTypeSerializer
@@ -72,6 +75,24 @@ public final class ModelJsonModule extends SimpleModule {
                                         DeserializationContext ctxt)
                 throws IOException {
             return ResponseType.fromValue(p.getText());
+        }
+    }
+
+    private static final class PromptCacheStatusSerializer
+            extends JsonSerializer<PromptCacheStatus> {
+        @Override
+        public void serialize(PromptCacheStatus value, JsonGenerator gen,
+                              SerializerProvider provider) throws IOException {
+            gen.writeString(value.value());
+        }
+    }
+
+    private static final class PromptCacheStatusDeserializer
+            extends JsonDeserializer<PromptCacheStatus> {
+        @Override
+        public PromptCacheStatus deserialize(JsonParser p, DeserializationContext ctxt)
+                throws IOException {
+            return PromptCacheStatus.fromValue(p.getText());
         }
     }
 

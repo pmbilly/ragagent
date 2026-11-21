@@ -1,4 +1,4 @@
-package com.ragagent.shared.model;
+package com.ragagent.platform.model;
 
 /**
  * 模型的「最小事实集」——跨域只读端口的载荷（调用侧真正需要的几个字段）。

@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.ragagent.llm.api.CacheRetention;
 import com.ragagent.llm.api.ChatTool;
+import com.ragagent.llm.api.FunctionCall;
+import com.ragagent.llm.api.ImageUrl;
+import com.ragagent.llm.api.MessageContentPart;
 import com.ragagent.llm.api.ToolCall;
-import com.ragagent.shared.model.CacheRetention;
-import com.ragagent.shared.model.FunctionCall;
-import com.ragagent.shared.model.ImageUrl;
-import com.ragagent.shared.model.MessageContentPart;
 import java.util.List;
 import java.util.Map;
 

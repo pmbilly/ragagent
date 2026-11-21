@@ -1,4 +1,4 @@
-package com.ragagent.shared.model;
+package com.ragagent.llm.api;
 
 /**
  * 多内容消息的一部分。

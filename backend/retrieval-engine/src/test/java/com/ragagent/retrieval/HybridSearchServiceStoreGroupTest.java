@@ -9,6 +9,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.platform.config.RetrievalDriverProperties;
+import com.ragagent.platform.model.EmbeddingPort;
+import com.ragagent.platform.model.ModelFacts;
 import com.ragagent.retrieval.api.ChunkSearchGateway;
 import com.ragagent.retrieval.api.KnowledgeBaseSearchFacts;
 import com.ragagent.retrieval.api.KnowledgeBaseSearchGateway;
@@ -27,8 +29,6 @@ import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import com.ragagent.retrieval.engine.RetrieveEngineService;
 import com.ragagent.retrieval.engine.RetrieverEngineParams;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.model.EmbeddingPort;
-import com.ragagent.shared.model.ModelFacts;
 import com.ragagent.shared.retrieval.SearchParams;
 import com.ragagent.shared.tenant.TenantConfigLookup;
 import java.util.List;

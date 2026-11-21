@@ -4,14 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.llm.api.CacheRetention;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
+import com.ragagent.llm.api.PromptCacheStatus;
 import com.ragagent.llm.api.TokenUsage;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.modelruntime.prompt.PromptFingerprints;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.model.CacheRetention;
-import com.ragagent.shared.model.PromptCacheStatus;
 import java.util.List;
 import org.springframework.http.HttpHeaders;
 

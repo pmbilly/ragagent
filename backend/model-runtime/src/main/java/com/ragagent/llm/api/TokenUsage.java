@@ -1,5 +1,4 @@
 package com.ragagent.llm.api;
-import com.ragagent.shared.model.PromptCacheStatus;
 
 
 /**

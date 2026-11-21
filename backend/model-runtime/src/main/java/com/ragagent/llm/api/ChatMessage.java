@@ -1,6 +1,5 @@
 package com.ragagent.llm.api;
 
-import com.ragagent.shared.model.MessageContentPart;
 import java.util.List;
 
 /**

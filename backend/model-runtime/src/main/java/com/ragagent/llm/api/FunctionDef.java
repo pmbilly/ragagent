@@ -1,4 +1,4 @@
-package com.ragagent.shared.model;
+package com.ragagent.llm.api;
 
 /**
  * 函数定义。JSON 字段序 = 声明序，三者均恒输出——

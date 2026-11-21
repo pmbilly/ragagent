@@ -1,6 +1,7 @@
 package com.ragagent.session.service;
 
 import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.FunctionCall;
 import com.ragagent.llm.api.ToolCall;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.web.JsonMappers;
@@ -10,7 +11,6 @@ import com.ragagent.session.support.PipelineViews;
 import com.ragagent.session.support.ToolResultPersist;
 import com.ragagent.shared.agent.AgentStep;
 import com.ragagent.shared.agent.AgentToolCall;
-import com.ragagent.shared.model.FunctionCall;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

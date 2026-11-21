@@ -1,5 +1,4 @@
 package com.ragagent.llm.api;
-import com.ragagent.shared.model.FunctionDef;
 
 /**
  * 工具定义。JSON 字段序 = 声明序，两者均恒输出——

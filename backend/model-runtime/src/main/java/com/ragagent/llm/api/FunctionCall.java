@@ -1,4 +1,4 @@
-package com.ragagent.shared.model;
+package com.ragagent.llm.api;
 
 /**
  * 函数调用详情。

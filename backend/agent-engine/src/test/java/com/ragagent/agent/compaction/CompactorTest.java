@@ -10,12 +10,12 @@ import static com.ragagent.agent.AgentPromptGolden.STR_SUMMARYFORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.agent.budget.TokenEstimator;
+import com.ragagent.llm.api.CacheRetention;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;
 import com.ragagent.llm.api.ChatStream;
 import com.ragagent.llm.api.LlmChatClient;
-import com.ragagent.shared.model.CacheRetention;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

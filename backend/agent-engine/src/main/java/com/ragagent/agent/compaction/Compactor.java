@@ -1,11 +1,11 @@
 package com.ragagent.agent.compaction;
 
 import com.ragagent.agent.budget.TokenEstimator;
+import com.ragagent.llm.api.CacheRetention;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;
 import com.ragagent.llm.api.LlmChatClient;
-import com.ragagent.shared.model.CacheRetention;
 import java.util.ArrayList;
 import java.util.List;
 

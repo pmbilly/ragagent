@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.FunctionCall;
 import com.ragagent.llm.api.ToolCall;
-import com.ragagent.shared.model.FunctionCall;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;

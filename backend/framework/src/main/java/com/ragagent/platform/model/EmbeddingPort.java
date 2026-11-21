@@ -1,4 +1,4 @@
-package com.ragagent.shared.model;
+package com.ragagent.platform.model;
 
 import java.util.List;
 

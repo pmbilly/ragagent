@@ -1,15 +1,7 @@
 package com.ragagent.platform.web;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.ragagent.shared.model.PromptCacheStatus;
-import java.io.IOException;
 
 /**
  * 契约载荷的 Jackson 装配：把线格式（键名/省略策略/枚举字面量）从契约类里剥离到 mixin 与
@@ -28,23 +20,6 @@ public final class ContractJsonModule extends SimpleModule {
     public ContractJsonModule() {
         super("ragagent-contract-json");
         ContractJsonMixins.mappings().forEach(this::setMixInAnnotation);
-
-        addSerializer(PromptCacheStatus.class, new PromptCacheStatusSerializer());
-        addDeserializer(PromptCacheStatus.class, new PromptCacheStatusDeserializer());
-    }
-
-    private static final class PromptCacheStatusSerializer extends JsonSerializer<PromptCacheStatus> {
-        @Override
-        public void serialize(PromptCacheStatus v, JsonGenerator g, SerializerProvider p) throws IOException {
-            g.writeString(v.value());
-        }
-    }
-
-    private static final class PromptCacheStatusDeserializer extends JsonDeserializer<PromptCacheStatus> {
-        @Override
-        public PromptCacheStatus deserialize(JsonParser p, DeserializationContext c) throws IOException {
-            return PromptCacheStatus.fromValue(p.getText());
-        }
     }
 
     /** ServiceLoader 入口：让本模块可被 {@link JsonMappers} 自动发现。 */

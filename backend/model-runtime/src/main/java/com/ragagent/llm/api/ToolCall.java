@@ -1,6 +1,5 @@
 package com.ragagent.llm.api;
 
-import com.ragagent.shared.model.FunctionCall;
 import java.util.List;
 import java.util.Map;
 

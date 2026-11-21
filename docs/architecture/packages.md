@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-379 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+378 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -336,7 +336,6 @@
 | `:backend` | `com.ragagent.shared.json` | 契约 · JSON：ByteKeyOrder / JsonValues / ZeroTimes。 |
 | `:backend` | `com.ragagent.shared.knowledge` | 知识契约面：分块/库/文档的事实、视图、网关与端口。 |
 | `:backend` | `com.ragagent.shared.memory` | 记忆契约面：配置/条目视图/键与类目/召回与检索上下文。 |
-| `:backend` | `com.ragagent.shared.model` | 模型契约面：模型事实、运行时载荷与跨域能力端口。 |
 | `:backend` | `com.ragagent.shared.pagination` | 分页契约：统一的 com.ragagent.shared.pagination.PageResult。 |
 | `:backend` | `com.ragagent.shared.retrieval` | 检索的共享形状：SearchParams、SearchResult、SearchTarget、 RetrieveGraphRepository。 |
 | `:backend` | `com.ragagent.shared.session` | 会话契约面：管线消息视图与消息端口。 |

@@ -1,11 +1,13 @@
 package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.llm.api.CacheRetention;
 import com.ragagent.llm.api.ChatConfig;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;
 import com.ragagent.llm.api.ChatStream;
+import com.ragagent.llm.api.FunctionCall;
 import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.llm.api.StreamResponse;
@@ -17,8 +19,6 @@ import com.ragagent.modelruntime.adapter.provider.chat.common.SseReader;
 import com.ragagent.modelruntime.stream.QueuedChatStream;
 import com.ragagent.platform.http.LlmTransport;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.model.CacheRetention;
-import com.ragagent.shared.model.FunctionCall;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
