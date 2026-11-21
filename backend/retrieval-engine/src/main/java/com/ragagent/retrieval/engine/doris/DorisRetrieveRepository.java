@@ -1,13 +1,13 @@
 package com.ragagent.retrieval.engine.doris;
 
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.retrieval.api.IndexConfig;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.RetrieveEngineRepository;
-import com.ragagent.shared.vectorstore.IndexConfig;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;

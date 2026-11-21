@@ -1,4 +1,6 @@
-package com.ragagent.shared.storage.fileserve;
+package com.ragagent.storage.api;
+
+import com.ragagent.shared.storage.fileserve.WritableFileContentService;
 
 /**
  * 进程级文件服务面（L1）：取"本地基座 + 资源目录装饰"的写读删服务。

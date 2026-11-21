@@ -15,7 +15,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.platform.knowledge.ImageRefRewriter;
-import com.ragagent.shared.storage.ResourceCatalogPort;
+import com.ragagent.storage.api.ResourceCatalogPort;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

@@ -3,7 +3,7 @@ package com.ragagent.vectorstore.domain;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.vectorstore.ConnectionConfig;
+import com.ragagent.retrieval.api.ConnectionConfig;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

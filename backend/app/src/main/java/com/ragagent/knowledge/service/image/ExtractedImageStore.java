@@ -7,7 +7,7 @@ import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.platform.knowledge.ImageRefRewriter;
 import com.ragagent.platform.text.ContentTypeByFilename;
-import com.ragagent.shared.storage.ResourceCatalogPort;
+import com.ragagent.storage.api.ResourceCatalogPort;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;

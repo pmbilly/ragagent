@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service.management;
 
+import com.ragagent.auth.api.TenantStorageQuotaPort;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
@@ -18,7 +19,6 @@ import com.ragagent.shared.graph.NameSpace;
 import com.ragagent.shared.knowledge.KnowledgeIngest;
 import com.ragagent.shared.model.Embedder;
 import com.ragagent.shared.retrieval.RetrieveGraphRepository;
-import com.ragagent.shared.tenant.TenantStorageQuotaPort;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

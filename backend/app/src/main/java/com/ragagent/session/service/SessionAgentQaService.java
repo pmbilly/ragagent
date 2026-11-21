@@ -22,7 +22,7 @@ import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
 import com.ragagent.shared.model.ChatMessage;
 import com.ragagent.shared.model.LlmChatClient;
 import com.ragagent.shared.model.Reranker;
-import com.ragagent.shared.storage.ResourceCatalogPort;
+import com.ragagent.storage.api.ResourceCatalogPort;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;

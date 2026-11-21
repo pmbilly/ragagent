@@ -6,7 +6,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.shared.tenant.TenantConfigLookup;
 import com.ragagent.shared.tenant.WebSearchConfig;
-import com.ragagent.shared.websearch.WebSearchProviderPort;
+import com.ragagent.websearch.api.WebSearchProviderPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,4 +1,4 @@
-package com.ragagent.shared.storage;
+package com.ragagent.storage.api;
 
 import java.util.Optional;
 

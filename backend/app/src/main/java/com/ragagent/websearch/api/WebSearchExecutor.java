@@ -1,4 +1,4 @@
-package com.ragagent.shared.pipeline;
+package com.ragagent.websearch.api;
 
 import com.ragagent.shared.websearch.WebSearchRequest;
 import com.ragagent.shared.websearch.WebSearchResult;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ProviderJson;
-import com.ragagent.shared.websearch.ImageInfo;
+import com.ragagent.retrieval.api.ImageInfo;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

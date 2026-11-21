@@ -1,5 +1,6 @@
-package com.ragagent.shared.settings;
+package com.ragagent.auth.api;
 
+import com.ragagent.shared.settings.DocReaderAdminPort;
 import java.util.List;
 import java.util.Map;
 

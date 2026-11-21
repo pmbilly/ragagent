@@ -52,7 +52,7 @@ import com.ragagent.shared.retrieval.SearchParams;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.tenant.TenantConfigLookup;
 import com.ragagent.shared.tenant.WebSearchConfig;
-import com.ragagent.shared.websearch.PipelinePageFetcher;
+import com.ragagent.websearch.api.PipelinePageFetcher;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;

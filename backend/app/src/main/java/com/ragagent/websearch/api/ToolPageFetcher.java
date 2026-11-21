@@ -1,4 +1,4 @@
-package com.ragagent.shared.websearch;
+package com.ragagent.websearch.api;
 
 /**
  * 工具网页抓取端口（契约化）：{@code web_fetch}/{@code web_search} 的页面读取用。

@@ -1,8 +1,8 @@
 package com.ragagent.vectorstore.config;
 
+import com.ragagent.retrieval.api.ConnectionConfig;
 import com.ragagent.retrieval.api.EnvStoreIds;
-import com.ragagent.shared.vectorstore.ConnectionConfig;
-import com.ragagent.shared.vectorstore.IndexConfig;
+import com.ragagent.retrieval.api.IndexConfig;
 import com.ragagent.vectorstore.domain.VectorStore;
 import java.util.ArrayList;
 import java.util.List;

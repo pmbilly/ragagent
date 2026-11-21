@@ -1,9 +1,9 @@
 package com.ragagent.auth.adapter;
 
+import com.ragagent.auth.api.AuthUserView;
+import com.ragagent.auth.api.UserLookupPort;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.shared.auth.AuthUserView;
-import com.ragagent.shared.auth.UserLookupPort;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;

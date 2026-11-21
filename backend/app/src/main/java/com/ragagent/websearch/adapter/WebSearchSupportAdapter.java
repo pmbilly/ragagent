@@ -1,7 +1,7 @@
 package com.ragagent.websearch.adapter;
 
-import com.ragagent.shared.websearch.WebSearchProviderPort;
-import com.ragagent.shared.websearch.WebSearchTempStatePort;
+import com.ragagent.websearch.api.WebSearchProviderPort;
+import com.ragagent.websearch.api.WebSearchTempStatePort;
 import com.ragagent.websearch.repository.WebSearchProviderRepository;
 import com.ragagent.websearch.runtime.WebSearchTempKbStateService;
 import org.springframework.stereotype.Component;

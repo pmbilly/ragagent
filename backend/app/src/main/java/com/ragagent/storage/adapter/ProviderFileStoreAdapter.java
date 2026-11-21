@@ -1,8 +1,8 @@
 package com.ragagent.storage.adapter;
 
 import com.ragagent.shared.storage.fileserve.OpenedFile;
-import com.ragagent.shared.storage.fileserve.ProviderFileStorePort;
 import com.ragagent.shared.tenant.TenantConfigLookup;
+import com.ragagent.storage.api.ProviderFileStorePort;
 import com.ragagent.storage.fileserve.ProviderFileContentService;
 import com.ragagent.storage.fileserve.StorageFileResolver;
 import com.ragagent.storage.provider.FileService;

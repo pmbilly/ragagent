@@ -1,6 +1,7 @@
 package com.ragagent.auth.system.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.auth.api.ParserEngineCatalogPort;
 import com.ragagent.auth.system.dto.SystemDtos;
 import com.ragagent.auth.system.service.DeploymentCapabilitiesHolder;
 import com.ragagent.auth.system.service.SystemInfoService;
@@ -11,7 +12,6 @@ import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
 import com.ragagent.shared.settings.DocReaderAdminPort;
-import com.ragagent.shared.settings.ParserEngineCatalogPort;
 import com.ragagent.shared.storage.StorageConnectivityPort;
 import com.ragagent.shared.tenant.ParserEngineConfig;
 import com.ragagent.shared.tenant.TenantConfigLookup;

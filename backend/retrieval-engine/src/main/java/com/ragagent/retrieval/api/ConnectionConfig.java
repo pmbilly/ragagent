@@ -1,4 +1,4 @@
-package com.ragagent.shared.vectorstore;
+package com.ragagent.retrieval.api;
 
 
 /**

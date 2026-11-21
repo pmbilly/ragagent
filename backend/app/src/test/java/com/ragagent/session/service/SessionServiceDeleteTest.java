@@ -26,7 +26,7 @@ import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.session.support.SessionNotFoundException;
 import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
-import com.ragagent.shared.websearch.WebSearchTempStatePort;
+import com.ragagent.websearch.api.WebSearchTempStatePort;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

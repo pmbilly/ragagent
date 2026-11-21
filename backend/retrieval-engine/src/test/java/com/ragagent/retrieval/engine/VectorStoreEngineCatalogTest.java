@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.retrieval.api.ConnectionConfig;
 import com.ragagent.retrieval.api.VectorStoreEngineRules;
-import com.ragagent.shared.vectorstore.ConnectionConfig;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

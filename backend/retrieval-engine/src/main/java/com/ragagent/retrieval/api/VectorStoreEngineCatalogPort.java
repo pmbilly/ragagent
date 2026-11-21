@@ -1,6 +1,5 @@
 package com.ragagent.retrieval.api;
 
-import com.ragagent.shared.vectorstore.ConnectionConfig;
 
 /**
  * 向量店引擎目录：控制面规则（必填 / SSRF 地址）+ 连通性探测。

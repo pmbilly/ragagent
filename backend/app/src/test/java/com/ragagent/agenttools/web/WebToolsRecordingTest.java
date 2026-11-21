@@ -25,8 +25,8 @@ import org.junit.jupiter.api.Test;
 class WebToolsRecordingTest {
 
     /** 抓取端口桩（R4b：WebFetchTool/WebSearchTool 经契约端口取网页）。 */
-    private static final com.ragagent.shared.websearch.ToolPageFetcher STUB_FETCHER =
-            new com.ragagent.shared.websearch.ToolPageFetcher() {
+    private static final com.ragagent.websearch.api.ToolPageFetcher STUB_FETCHER =
+            new com.ragagent.websearch.api.ToolPageFetcher() {
                 @Override
                 public String fetch(String url) {
                     return "stub-content";

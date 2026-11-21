@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service.faq;
 
+import com.ragagent.auth.api.TenantStorageQuotaPort;
 import com.ragagent.knowledge.config.BatchEmbedProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -21,7 +22,6 @@ import com.ragagent.retrieval.api.VectorIndexStore;
 import com.ragagent.shared.knowledge.FaqChunkMetadata;
 import com.ragagent.shared.model.Embedder;
 import com.ragagent.shared.model.EmbeddingPort;
-import com.ragagent.shared.tenant.TenantStorageQuotaPort;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;

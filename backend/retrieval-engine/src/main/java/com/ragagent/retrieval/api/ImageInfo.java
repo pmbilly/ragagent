@@ -1,4 +1,4 @@
-package com.ragagent.shared.websearch;
+package com.ragagent.retrieval.api;
 
 /**
  * 图片富化信息。

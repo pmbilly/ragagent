@@ -1,4 +1,4 @@
-package com.ragagent.shared.websearch;
+package com.ragagent.websearch.api;
 
 /**
  * 管线网页抓取端口（契约化）：{@code chatpipeline} 的网页抓取插件用。

@@ -1,4 +1,4 @@
-package com.ragagent.shared.auth;
+package com.ragagent.auth.api;
 
 /**
  * 用户展示视图（跨域）：id + username / email，调用方按 username → email 回退。

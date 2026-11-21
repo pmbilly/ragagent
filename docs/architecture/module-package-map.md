@@ -9,11 +9,11 @@
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
 | `:contract` |  | 0 | 0 | 0 |
-| `:platform` | `platform`、`shared` | 58 | 436 | 1 |
+| `:platform` | `platform`、`shared` | 58 | 418 | 1 |
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 22 | 180 | 0 |
-| `:retrieval-engine` | `retrieval` | 17 | 128 | 0 |
+| `:retrieval-engine` | `retrieval` | 17 | 131 | 0 |
 | `:agent-engine` | `agent`、`agentengine` | 11 | 101 | 0 |
-| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch` | 262 | 1731 | 51 |
+| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch` | 264 | 1748 | 51 |
 
 ## 18 个业务域（domains）
 
@@ -22,7 +22,7 @@
 | `agentmanagement` | `com.ragagent.agentmanagement` | 27 | 2 |
 | `agenttools` | `com.ragagent.agenttools` | 61 | 0 |
 | `audit` | `com.ragagent.audit` | 20 | 1 |
-| `auth` | `com.ragagent.auth` | 147 | 8 |
+| `auth` | `com.ragagent.auth` | 151 | 8 |
 | `config` | `com.ragagent.config` | 25 | 0 |
 | `datasource` | `com.ragagent.datasource` | 147 | 2 |
 | `embedchannel` | `com.ragagent.embedchannel` | 25 | 1 |
@@ -34,9 +34,9 @@
 | `memory` | `com.ragagent.memory` | 96 | 1 |
 | `model` | `com.ragagent.model` | 38 | 4 |
 | `session` | `com.ragagent.session` | 212 | 8 |
-| `storage` | `com.ragagent.storage` | 62 | 3 |
+| `storage` | `com.ragagent.storage` | 67 | 3 |
 | `vectorstore` | `com.ragagent.vectorstore` | 20 | 1 |
-| `websearch` | `com.ragagent.websearch` | 52 | 3 |
+| `websearch` | `com.ragagent.websearch` | 60 | 3 |
 
 ## 查找规则
 
@@ -62,5 +62,5 @@
 
 ## 相关
 
-- [`packages.md`](packages.md)：370 份 `package-info` 的包级职责索引。
+- [`packages.md`](packages.md)：372 份 `package-info` 的包级职责索引。
 - [`overview.md`](overview.md)：模块依赖图、设计原则、代码在哪。

@@ -5,7 +5,7 @@ import com.ragagent.platform.storage.config.UploadLimits;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
 import com.ragagent.shared.storage.fileserve.OpenedFile;
-import com.ragagent.shared.storage.fileserve.StoragePathGuard;
+import com.ragagent.storage.api.StoragePathGuard;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

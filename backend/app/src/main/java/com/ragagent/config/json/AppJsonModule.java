@@ -3,6 +3,7 @@ package com.ragagent.config.json;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.ragagent.platform.web.JsonModuleProvider;
+import com.ragagent.retrieval.api.ImageInfo;
 import com.ragagent.shared.auth.UserPreferences;
 import com.ragagent.shared.memory.MemoryMessageCursor;
 import com.ragagent.shared.session.MessageView;
@@ -12,7 +13,6 @@ import com.ragagent.shared.tenant.ParserEngineConfig;
 import com.ragagent.shared.tenant.RetrievalConfig;
 import com.ragagent.shared.tenant.StorageEngineConfig;
 import com.ragagent.shared.tenant.WebSearchConfig;
-import com.ragagent.shared.websearch.ImageInfo;
 import com.ragagent.shared.wiki.ExtractedItem;
 import com.ragagent.shared.wiki.SlugUpdate;
 

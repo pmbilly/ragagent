@@ -32,7 +32,7 @@ import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.retrieval.SearchTarget;
 import com.ragagent.shared.tenant.TenantConfigLookup;
-import com.ragagent.shared.websearch.WebSearchProviderPort;
+import com.ragagent.websearch.api.WebSearchProviderPort;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

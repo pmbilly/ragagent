@@ -3,8 +3,8 @@ package com.ragagent.retrieval.engine.milvus;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.retrieval.api.IndexConfig;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
-import com.ragagent.shared.vectorstore.IndexConfig;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

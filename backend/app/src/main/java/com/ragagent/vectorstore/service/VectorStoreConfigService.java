@@ -2,14 +2,14 @@ package com.ragagent.vectorstore.service;
 
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.retrieval.api.ConnectionConfig;
+import com.ragagent.retrieval.api.IndexConfig;
 import com.ragagent.retrieval.api.VectorStoreAddressField;
 import com.ragagent.retrieval.api.VectorStoreEngineCatalogPort;
 import com.ragagent.retrieval.api.VectorStoreEngineRules;
 import com.ragagent.retrieval.api.VectorStoreRequiredField;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.vectorstore.ConnectionConfig;
-import com.ragagent.shared.vectorstore.IndexConfig;
 import com.ragagent.vectorstore.config.EnvVectorStores;
 import com.ragagent.vectorstore.domain.VectorStore;
 import com.ragagent.vectorstore.domain.VectorStoreEngines;

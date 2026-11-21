@@ -1,4 +1,6 @@
-package com.ragagent.shared.knowledge;
+package com.ragagent.websearch.api;
+
+import com.ragagent.shared.knowledge.KnowledgeBaseGateway;
 
 /**
  * 知识条目的**清理端口**（跨域删除面，与建行端口 {@link com.ragagent.shared.tenant.KnowledgeBaseProvisioner}、

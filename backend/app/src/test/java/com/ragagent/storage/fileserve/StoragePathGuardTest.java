@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.storage.fileserve.StoragePathGuard;
+import com.ragagent.storage.api.StoragePathGuard;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;

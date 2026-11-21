@@ -4,7 +4,7 @@ import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.shared.retrieval.SearchResult;
-import com.ragagent.shared.websearch.PipelinePageFetcher;
+import com.ragagent.websearch.api.PipelinePageFetcher;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

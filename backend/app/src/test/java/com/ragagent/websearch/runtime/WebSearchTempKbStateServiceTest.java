@@ -8,7 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.shared.knowledge.KnowledgeMaintenancePort;
+import com.ragagent.websearch.api.KnowledgeMaintenancePort;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;

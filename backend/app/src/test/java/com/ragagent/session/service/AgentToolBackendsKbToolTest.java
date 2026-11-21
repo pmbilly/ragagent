@@ -19,8 +19,8 @@ import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.dto.MessageSearchGroupItem;
 import com.ragagent.session.dto.MessageSearchResult;
 import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
-import com.ragagent.shared.pipeline.WebSearchExecutor;
 import com.ragagent.shared.retrieval.SearchTarget;
+import com.ragagent.websearch.api.WebSearchExecutor;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -37,8 +37,8 @@ import org.junit.jupiter.api.Test;
 class AgentToolBackendsKbToolTest {
 
     /** 抓取端口桩（R4b：WebFetchTool/WebSearchTool 经契约端口取网页）。 */
-    private static final com.ragagent.shared.websearch.ToolPageFetcher STUB_FETCHER =
-            new com.ragagent.shared.websearch.ToolPageFetcher() {
+    private static final com.ragagent.websearch.api.ToolPageFetcher STUB_FETCHER =
+            new com.ragagent.websearch.api.ToolPageFetcher() {
                 @Override
                 public String fetch(String url) {
                     return "stub-content";

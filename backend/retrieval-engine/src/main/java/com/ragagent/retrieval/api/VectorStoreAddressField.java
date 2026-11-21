@@ -1,6 +1,5 @@
 package com.ragagent.retrieval.api;
 
-import com.ragagent.shared.vectorstore.ConnectionConfig;
 import java.util.function.Function;
 
 /**
