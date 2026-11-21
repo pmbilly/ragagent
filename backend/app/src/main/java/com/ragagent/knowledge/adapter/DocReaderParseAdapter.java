@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.adapter;
 
+import com.ragagent.initialization.api.DocReaderParsePort;
 import com.ragagent.knowledge.client.DocReaderClient;
-import com.ragagent.shared.doc.DocReaderParsePort;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;

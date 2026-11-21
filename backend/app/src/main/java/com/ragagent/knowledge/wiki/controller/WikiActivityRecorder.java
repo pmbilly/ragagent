@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.wiki.controller;
 
+import com.ragagent.audit.api.WikiActivityAudit;
 import com.ragagent.knowledge.wiki.domain.WikiPage;
-import com.ragagent.shared.audit.WikiActivityAudit;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.slf4j.Logger;

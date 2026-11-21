@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
+import com.ragagent.audit.api.WikiActivityAudit;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.domain.WikiConfig;
 import com.ragagent.knowledge.wiki.domain.WikiPage;
@@ -12,7 +13,6 @@ import com.ragagent.knowledge.wiki.service.ingest.support.DocIngestResult;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiCleanupScope;
 import com.ragagent.knowledge.wiki.service.page.WikiTextUtils;
-import com.ragagent.shared.audit.WikiActivityAudit;
 import com.ragagent.shared.knowledge.KnowledgeBaseView;
 import com.ragagent.shared.knowledge.KnowledgeSpanPort;
 import com.ragagent.shared.model.LlmChatClient;

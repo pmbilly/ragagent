@@ -1,4 +1,4 @@
-package com.ragagent.shared.websearch;
+package com.ragagent.websearch.api;
 
 import java.util.ArrayList;
 import java.util.List;

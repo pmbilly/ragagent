@@ -4,7 +4,7 @@ import com.ragagent.im.runtime.AdapterInterfaces;
 import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.shared.doc.DocReaderParsePort;
+import com.ragagent.initialization.api.DocReaderParsePort;
 import com.ragagent.shared.session.MessageAttachment;
 import com.ragagent.shared.session.QaRequestPayload;
 import java.nio.charset.StandardCharsets;

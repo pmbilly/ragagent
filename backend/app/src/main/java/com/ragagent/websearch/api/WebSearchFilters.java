@@ -1,4 +1,4 @@
-package com.ragagent.shared.websearch;
+package com.ragagent.websearch.api;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;

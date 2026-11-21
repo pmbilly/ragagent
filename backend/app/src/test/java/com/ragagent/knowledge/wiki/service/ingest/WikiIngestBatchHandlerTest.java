@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.audit.api.WikiActivityAudit;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.domain.TaskPendingOp;
 import com.ragagent.knowledge.wiki.domain.WikiConfig;
@@ -30,7 +31,6 @@ import com.ragagent.knowledge.wiki.repository.ingest.WikiIngestTaskQueue;
 import com.ragagent.knowledge.wiki.service.WikiModelResolver;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.knowledge.wiki.service.page.WikiPageService;
-import com.ragagent.shared.audit.WikiActivityAudit;
 import com.ragagent.shared.knowledge.ChunkPort;
 import com.ragagent.shared.knowledge.KnowledgeBaseLookup;
 import com.ragagent.shared.knowledge.KnowledgeBaseView;

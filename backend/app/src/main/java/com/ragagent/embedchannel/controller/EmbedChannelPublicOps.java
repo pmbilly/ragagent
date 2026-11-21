@@ -1,12 +1,12 @@
 package com.ragagent.embedchannel.controller;
 
+import com.ragagent.embedchannel.api.EmbedSessionOps;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.embedchannel.support.EmbedError;
 import com.ragagent.embedchannel.support.EmbedTokens;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.shared.knowledge.ChunkRowView;
-import com.ragagent.shared.session.EmbedSessionOps;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;

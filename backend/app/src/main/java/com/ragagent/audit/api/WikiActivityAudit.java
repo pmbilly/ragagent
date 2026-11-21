@@ -1,4 +1,4 @@
-package com.ragagent.shared.audit;
+package com.ragagent.audit.api;
 
 import java.util.Map;
 

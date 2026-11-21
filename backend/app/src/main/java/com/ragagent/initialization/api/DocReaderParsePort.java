@@ -1,4 +1,4 @@
-package com.ragagent.shared.doc;
+package com.ragagent.initialization.api;
 
 import java.util.List;
 

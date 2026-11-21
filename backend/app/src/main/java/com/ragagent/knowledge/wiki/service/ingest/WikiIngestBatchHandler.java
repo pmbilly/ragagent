@@ -2,6 +2,7 @@ package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.audit.api.WikiActivityAudit;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.domain.WikiConfig;
 import com.ragagent.knowledge.wiki.domain.WikiExtractionGranularity;
@@ -20,7 +21,6 @@ import com.ragagent.knowledge.wiki.service.page.WikiPageService;
 import com.ragagent.knowledge.wiki.service.page.WikiTextUtils;
 import com.ragagent.platform.access.TenantScopes;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.audit.WikiActivityAudit;
 import com.ragagent.shared.knowledge.ChunkPort;
 import com.ragagent.shared.knowledge.ChunkView;
 import com.ragagent.shared.knowledge.KnowledgeBaseLookup;

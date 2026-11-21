@@ -1,12 +1,12 @@
 package com.ragagent.embedchannel.controller;
 
+import com.ragagent.embedchannel.api.EmbedSessionOps;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.embedchannel.service.EmbedChannelService.UpdateCommand;
 import com.ragagent.embedchannel.support.EmbedError;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.shared.session.EmbedSessionOps;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
