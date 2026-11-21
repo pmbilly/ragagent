@@ -1,8 +1,8 @@
 package com.ragagent.session.rag.plugin;
 
+import com.ragagent.memory.api.MemoryQueryPort;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineState;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.SearchResult;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,9 +20,9 @@ public final class PluginMemoryAffinity implements Plugin {
     private static final int AFFINITY_MIN_HITS = 2;
     private static final int AFFINITY_MAX_LOOKUP = 200;
 
-    private final PipelinePorts.MemoryService memoryService;
+    private final MemoryQueryPort memoryService;
 
-    public PluginMemoryAffinity(PipelinePorts.MemoryService memoryService) {
+    public PluginMemoryAffinity(MemoryQueryPort memoryService) {
         this.memoryService = memoryService;
     }
 

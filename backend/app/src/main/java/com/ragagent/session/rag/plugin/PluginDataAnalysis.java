@@ -2,6 +2,13 @@ package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.agenttools.api.ColumnInfo;
+import com.ragagent.agenttools.api.DataAnalysisSession;
+import com.ragagent.agenttools.api.DataAnalysisSessionFactory;
+import com.ragagent.agenttools.api.KnowledgeData;
+import com.ragagent.agenttools.api.TableSchema;
+import com.ragagent.knowledge.api.KnowledgeDocumentQueryPort;
+import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.session.rag.PipelineEventType;
@@ -13,7 +20,6 @@ import com.ragagent.shared.model.ChatMessage;
 import com.ragagent.shared.model.ChatOptions;
 import com.ragagent.shared.model.ChatResponse;
 import com.ragagent.shared.model.LlmChatClient;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.tool.ToolResult;
 import java.util.ArrayList;
@@ -27,7 +33,7 @@ import java.util.Map;
  * MergeResult 里出现 CSV/Excel 命中 → 过滤表格列/摘要块 → 经 DataAnalysisTool
  * 装载数据 → LLM 生成 (knowledge_id, sql) → 执行并把分析结果并回 MergeResult。
  *
- * <p>工具构造走 {@link PipelinePorts.DataAnalysisSessionFactory} seam（DataAnalysisTool
+ * <p>工具构造走 {@link DataAnalysisSessionFactory} seam（DataAnalysisTool
  * 以 KnowledgeLoader/Materializer/AnalysisDuckDb 三个 seam 构造，装配期打包成工厂）。
  * format schema 逐字节取自 {@link #FORMAT_SCHEMA_JSON} 常量。</p>
  */
@@ -39,13 +45,13 @@ public final class PluginDataAnalysis implements Plugin {
     public static final String FORMAT_SCHEMA_JSON = """
             {"type":"object","properties":{"knowledge_id":{"type":"string","description":"short dN document ID to query"},"sql":{"type":"string","description":"SQL to be executed on knowledge"}},"required":["knowledge_id","sql"],"additionalProperties":false}""";
 
-    private final PipelinePorts.ModelService modelService;
-    private final PipelinePorts.KnowledgeService knowledgeService;
-    private final PipelinePorts.DataAnalysisSessionFactory toolFactory;
+    private final ModelFactoryPort modelService;
+    private final KnowledgeDocumentQueryPort knowledgeService;
+    private final DataAnalysisSessionFactory toolFactory;
 
-    public PluginDataAnalysis(PipelinePorts.ModelService modelService,
-                              PipelinePorts.KnowledgeService knowledgeService,
-                              PipelinePorts.DataAnalysisSessionFactory toolFactory) {
+    public PluginDataAnalysis(ModelFactoryPort modelService,
+                              KnowledgeDocumentQueryPort knowledgeService,
+                              DataAnalysisSessionFactory toolFactory) {
         this.modelService = modelService;
         this.knowledgeService = knowledgeService;
         this.toolFactory = toolFactory;
@@ -92,11 +98,11 @@ public final class PluginDataAnalysis implements Plugin {
         }
 
         // 3. 工具会话：装载 → LLM 生成 SQL → 执行
-        PipelinePorts.DataAnalysisSession tool = toolFactory.create(chatManage.getSessionId());
+        DataAnalysisSession tool = toolFactory.create(chatManage.getSessionId());
         try {
-            PipelinePorts.TableSchema schema;
+            TableSchema schema;
             try {
-                schema = tool.loadFromKnowledge(new PipelinePorts.KnowledgeData(
+                schema = tool.loadFromKnowledge(new KnowledgeData(
                         knowledge.id(), knowledge.knowledgeBaseId(), knowledge.tenantId(),
                         knowledge.fileType(), knowledge.filePath()));
             } catch (RuntimeException e) {
@@ -186,13 +192,13 @@ public final class PluginDataAnalysis implements Plugin {
     }
 
     /** 渲染表结构描述：表名、列数、行数与列信息。 */
-    static String tableSchemaDescription(PipelinePorts.TableSchema schema) {
+    static String tableSchemaDescription(TableSchema schema) {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("Table name: %s\n", schema.tableName()));
         builder.append(String.format("Columns: %d\n", schema.columns().size()));
         builder.append(String.format("Rows: %d\n\n", schema.rowCount()));
         builder.append("Column info:\n");
-        for (PipelinePorts.ColumnInfo col : schema.columns()) {
+        for (ColumnInfo col : schema.columns()) {
             builder.append(String.format("- %s (%s)\n", col.name(), col.type()));
         }
         return builder.toString();

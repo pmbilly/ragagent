@@ -1,6 +1,8 @@
 package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.knowledge.api.ChunkQueryPort;
+import com.ragagent.knowledge.api.KnowledgeBatchQueryPort;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.rag.PipelineEventType;
@@ -15,7 +17,6 @@ import com.ragagent.shared.graph.GraphRelation;
 import com.ragagent.shared.graph.NameSpace;
 import com.ragagent.shared.knowledge.ChunkFacts;
 import com.ragagent.shared.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.RetrieveGraphRepository;
 import com.ragagent.shared.retrieval.SearchResult;
 import java.util.ArrayList;
@@ -35,12 +36,12 @@ import java.util.Map;
 public final class PluginSearchEntity implements Plugin {
 
     private final RetrieveGraphRepository graphRepo;
-    private final PipelinePorts.ChunkRepository chunkRepo;
-    private final PipelinePorts.KnowledgeRepository knowledgeRepo;
+    private final ChunkQueryPort chunkRepo;
+    private final KnowledgeBatchQueryPort knowledgeRepo;
 
     public PluginSearchEntity(RetrieveGraphRepository graphRepository,
-                              PipelinePorts.ChunkRepository chunkRepository,
-                              PipelinePorts.KnowledgeRepository knowledgeRepository) {
+                              ChunkQueryPort chunkRepository,
+                              KnowledgeBatchQueryPort knowledgeRepository) {
         this.graphRepo = graphRepository;
         this.chunkRepo = chunkRepository;
         this.knowledgeRepo = knowledgeRepository;

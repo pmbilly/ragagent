@@ -7,7 +7,7 @@ import com.ragagent.shared.tool.ToolResult;
 /**
  * DataAnalysisTool 包内面的公开桥。
  *
- * <p>chat_pipeline 的 {@code PipelinePorts.DataAnalysisSession} 是 chatpipeline
+ * <p>chat_pipeline 的 {@code DataAnalysisSession} 是 chatpipeline
  * 包私有接口（只能由该包实现），而 {@link DataAnalysisTool#loadFromKnowledge} 是
  * agent.tools 包私有方法（只能由本包触达）——两个包私有面之间的桥只能各放一半：
  * 本文件公开「本包 → 调用者」的三个调用点，chatpipeline 侧新增

@@ -44,22 +44,23 @@ def main() -> int:
                     continue
                 if kind_of[source] == kind_of[target]:
                     continue
-                # 跨 kind：仅当「上级 → 下级」且目标是契约包（api/dto）时放行。
+                # 跨 kind：仅当「上级 → 下级」或「同级」且目标是契约包（api/dto）时放行。
                 # 依据：蓝图 §5.4 只规定三级域依赖，没有 kind 轴；kind 是本地补充，
-                # 不该否决蓝图明确允许的方向。
+                # 不该否决蓝图明确允许的方向。同级放行与 R10 保持一致（2026-11-21）：
+                # 判据统一为 level + api/dto，避免两条守卫对同一条边给出相反结论。
                 src_lv = level_of.get(source)
                 tgt_lv = level_of.get(target)
                 if (
                     src_lv is not None
                     and tgt_lv is not None
-                    and src_lv > tgt_lv
+                    and src_lv >= tgt_lv
                     and sub_pkg in LEGAL_IMPORT_PKG
                 ):
                     continue
                 violations[(source, target)].append(str(path.relative_to(ROOT)))
 
     if violations:
-        print("✗ 能力种类边界违例：跨 kind 只允许「上级 import 下级 api/dto」，其余改走契约")
+        print("✗ 能力种类边界违例：跨 kind 只允许「上级→下级 或 同级」的 api/dto，其余改走契约")
         for (source, target), files in sorted(violations.items()):
             print(
                 f"   {source}（{kinds[kind_of[source]]['label']}）"

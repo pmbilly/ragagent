@@ -9,33 +9,33 @@
 
 | 种类 | 域数 | 文件 | 控制器 | 说明 |
 |---|---:|---:|---:|---|
-| **产品能力** | 6 | 904 | 21 | 直接产生用户价值、按产品需求演进的业务能力。 |
-| **集成适配** | 6 | 581 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
-| **控制面** | 2 | 173 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
+| **产品能力** | 6 | 916 | 21 | 直接产生用户价值、按产品需求演进的业务能力。 |
+| **集成适配** | 6 | 582 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
+| **控制面** | 2 | 174 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
 | **能力配置** | 2 | 58 | 5 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
-| **初始化向导** | 1 | 13 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
+| **初始化向导** | 1 | 11 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
 
 ## 域明细
 
 | 域 | 种类 | 文件 | 控制器 | 对外契约面 | 前端页面 |
 |---|---|---:|---:|---:|---|
-| `knowledge` | 产品能力 | 495 | 9 | — | `views/knowledge · views/knowledge/wiki` |
+| `knowledge` | 产品能力 | 501 | 9 | — | `views/knowledge · views/knowledge/wiki` |
 | `session` | 产品能力 | 212 | 8 | — | `views/chat` |
-| `memory` | 产品能力 | 96 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
-| `agenttools` | 产品能力 | 61 | — | — | `views/chat（工具结果渲染）` |
+| `memory` | 产品能力 | 97 | 1 | — | `views/settings/MemorySettings.vue · views/settings/MemoryWorkspaceSettings.vue` |
+| `agenttools` | 产品能力 | 66 | — | — | `views/chat（工具结果渲染）` |
 | `agentmanagement` | 产品能力 | 27 | 2 | — | `views/agent` |
 | `favorite` | 产品能力 | 13 | 1 | — | `views/agent · views/knowledge（列表置顶/收藏）` |
 | `mcp` | 集成适配 | 171 | 4 | — | `views/settings/McpSettings.vue` |
 | `datasource` | 集成适配 | 147 | 2 | — | `views/knowledge/settings/DataSourceSettings.vue` |
 | `im` | 集成适配 | 107 | 2 | — | `views/integrations/IntegrationSettingsSection.vue` |
 | `storage` | 集成适配 | 67 | 3 | — | `views/settings/StorageBackendSettings.vue` |
-| `websearch` | 集成适配 | 62 | 3 | — | `views/settings/WebSearchSettings.vue` |
+| `websearch` | 集成适配 | 63 | 3 | — | `views/settings/WebSearchSettings.vue` |
 | `embedchannel` | 集成适配 | 27 | 1 | — | `views/embed` |
-| `auth` | 控制面 | 151 | 8 | — | `views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue · views/settings/panels` |
+| `auth` | 控制面 | 152 | 8 | — | `views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue · views/settings/panels` |
 | `audit` | 控制面 | 22 | 1 | — | `views/settings/panels/SystemAuditLog.vue` |
 | `model` | 能力配置 | 38 | 4 | — | `views/settings/ModelSettings.vue` |
 | `vectorstore` | 能力配置 | 20 | 1 | — | `views/settings/VectorStoreSettings.vue` |
-| `initialization` | 初始化向导 | 13 | 1 | — | `views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue` |
+| `initialization` | 初始化向导 | 11 | 1 | — | `views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue` |
 
 > 文件数含 `package-info`，与 `module-package-map.md` 同口径；契约面含 `*Port` 与 `*Gateway`（后者在 C5b 统一为 `*Port`）。
 

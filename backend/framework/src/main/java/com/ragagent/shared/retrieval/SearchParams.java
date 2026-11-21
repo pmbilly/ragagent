@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * 混合检索参数。
  *
- * <p>管线侧载体：HybridSearch seam（{@code com.ragagent.shared.pipeline.PipelinePorts.KnowledgeBaseService}）的入参。</p>
+ * <p>管线侧载体：HybridSearch seam（{@code com.ragagent.knowledge.api.KnowledgeBaseQueryPort}）的入参。</p>
  */
 public final class SearchParams {
 

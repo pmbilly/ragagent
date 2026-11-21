@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.adapter;
 
-import com.ragagent.initialization.api.DocReaderParsePort;
+import com.ragagent.knowledge.api.DocReaderParsePort;
 import com.ragagent.knowledge.client.DocReaderClient;
 import java.util.ArrayList;
 import java.util.List;

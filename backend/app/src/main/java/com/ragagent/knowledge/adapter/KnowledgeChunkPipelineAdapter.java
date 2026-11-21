@@ -1,21 +1,21 @@
 package com.ragagent.knowledge.adapter;
 
+import com.ragagent.knowledge.api.ChunkQueryPort;
 import com.ragagent.shared.knowledge.ChunkFacts;
 import com.ragagent.shared.knowledge.ChunkRowView;
 import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
 import com.ragagent.shared.knowledge.projection.ChunkProjectionAdapter;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link PipelinePorts.ChunkRepository}（管线面）的 knowledge 域实现：
+ * {@link ChunkQueryPort}（管线面）的 knowledge 域实现：
  * 原会话 {@code QaWiring#qaPipelineChunkRepository} 匿名实现的搬运——
  * 投影经 L1 {@link ChunkProjectionAdapter}，父 id 批量保持"逐父循环取子"的原口径。
  */
 @Component
-public class KnowledgeChunkPipelineAdapter implements PipelinePorts.ChunkRepository {
+public class KnowledgeChunkPipelineAdapter implements ChunkQueryPort {
 
     private final KnowledgeCatalogPort knowledgeCatalog;
 

@@ -1,7 +1,7 @@
 package com.ragagent.session.rag.support;
 
+import com.ragagent.knowledge.api.ChunkQueryPort;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.SearchResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -19,14 +19,14 @@ public final class ImageInfoCollector {
     private ImageInfoCollector() {}
 
     /** 无命中返回 null。 */
-    public static Map<String, String> collect(PipelinePorts.ChunkRepository chunkRepo,
+    public static Map<String, String> collect(ChunkQueryPort chunkRepo,
                                               long tenantId, List<String> chunkIds) {
         return ImageInfoEnricher.collectImageInfoByChunkIds(
                 chunkRepo::listChunksByParentIds, tenantId, chunkIds);
     }
 
     /** 给无 image_info 的结果补齐。 */
-    public static void enrichSearchResultsImageInfo(PipelinePorts.ChunkRepository chunkRepo,
+    public static void enrichSearchResultsImageInfo(ChunkQueryPort chunkRepo,
                                                     long tenantId, List<SearchResult> results) {
         if (results == null || results.isEmpty()) {
             return;

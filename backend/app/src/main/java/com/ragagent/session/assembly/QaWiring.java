@@ -4,10 +4,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agenttools.datasource.DataAnalysisSessionFactoryAdapter;
+import com.ragagent.auth.api.TenantWebSearchConfigPort;
+import com.ragagent.knowledge.api.ChunkQueryPort;
+import com.ragagent.knowledge.api.KnowledgeBaseBatchQueryPort;
+import com.ragagent.knowledge.api.KnowledgeBaseQueryPort;
+import com.ragagent.knowledge.api.KnowledgeBatchQueryPort;
+import com.ragagent.knowledge.api.KnowledgeDocumentQueryPort;
 import com.ragagent.llm.api.EntityExtractionPort;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
+import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.llm.api.ModelRuntime;
+import com.ragagent.memory.api.MemoryQueryPort;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.platform.prompt.PromptSource;
@@ -38,6 +46,7 @@ import com.ragagent.session.rag.plugin.PluginWebFetch;
 import com.ragagent.session.rag.plugin.PluginWikiBoost;
 import com.ragagent.session.runtime.SessionModels;
 import com.ragagent.session.support.PipelineViews;
+import com.ragagent.shared.error.PipelinePortException;
 import com.ragagent.shared.knowledge.KnowledgeBaseRowView;
 import com.ragagent.shared.knowledge.KnowledgeBaseView;
 import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
@@ -46,13 +55,13 @@ import com.ragagent.shared.knowledge.projection.KnowledgeBaseViews;
 import com.ragagent.shared.knowledge.projection.KnowledgeProjectionAdapter;
 import com.ragagent.shared.model.LlmChatClient;
 import com.ragagent.shared.model.Reranker;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.RetrieveGraphRepository;
 import com.ragagent.shared.retrieval.SearchParams;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.tenant.TenantConfigLookup;
 import com.ragagent.shared.tenant.WebSearchConfig;
 import com.ragagent.websearch.api.PipelinePageFetcher;
+import com.ragagent.websearch.api.WebSearchRunPort;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -98,12 +107,12 @@ public class QaWiring {
 
     // ── 11 seam 的生产 adapter ────────────────────────────────────────────────
 
-    /** {@link PipelinePorts.ModelService}：getChatModel/getRerankModel 的运行时工厂。 */
+    /** {@link ModelFactoryPort}：getChatModel/getRerankModel 的运行时工厂。 */
     @Bean
-    public PipelinePorts.ModelService qaPipelineModelService(
+    public ModelFactoryPort qaPipelineModelService(
             ModelCatalogPort modelCatalog,
             ModelRuntime modelRuntime) {
-        return new PipelinePorts.ModelService() {
+        return new ModelFactoryPort() {
             @Override
             public LlmChatClient getChatModel(String modelId) {
                 ModelRowView model = modelCatalog.findModel(modelId);
@@ -132,9 +141,9 @@ public class QaWiring {
      * PluginSearch 的租户 web 配置读取——TenantContext 实时值 + 租户行合并。
      */
     @Bean
-    public PipelinePorts.TenantService qaPipelineTenantService(
+    public TenantWebSearchConfigPort qaPipelineTenantService(
             TenantConfigLookup tenantService) {
-        return new PipelinePorts.TenantService() {
+        return new TenantWebSearchConfigPort() {
             @Override
             public WebSearchConfig currentWebSearchConfig() {
                 Long tid = TenantContext.currentTenantId();
@@ -154,11 +163,11 @@ public class QaWiring {
         };
     }
 
-    /** {@link PipelinePorts.KnowledgeBaseService} 的 chat_pipeline 子集。 */
+    /** {@link KnowledgeBaseQueryPort} 的 chat_pipeline 子集。 */
     @Bean
-    public PipelinePorts.KnowledgeBaseService qaPipelineKnowledgeBaseService(
+    public KnowledgeBaseQueryPort qaPipelineKnowledgeBaseService(
             KnowledgeCatalogPort kbService, HybridSearchPort hybridSearchService) {
-        return new PipelinePorts.KnowledgeBaseService() {
+        return new KnowledgeBaseQueryPort() {
             @Override
             public KnowledgeBaseView getKnowledgeBaseByIdUnscoped(String id) {
                 // 语义保持：仍走 getAllTenantById（含 ensureDefaults 的"索引策略零值 →
@@ -166,7 +175,7 @@ public class QaWiring {
                 KnowledgeBaseRowView kb = kbService.getAllTenantById(id);
                 if (kb == null) {
                     // 插件取 KB 元数据失败 → BizError(1003) → 管线 500 信封
-                    throw new PipelinePorts.PipelinePortException(
+                    throw new PipelinePortException(
                             "error code: 1003, error message: knowledge base not found");
                 }
                 return KnowledgeBaseViews.view(kb);
@@ -183,7 +192,7 @@ public class QaWiring {
             public List<SearchResult> hybridSearch(String knowledgeBaseId, SearchParams params) {
                 // KB 元数据缺失时保持既定的 1003 错误（A/B 场景 kse-unknown-kb 依赖）。
                 if (kbService.getAllTenantById(knowledgeBaseId) == null) {
-                    throw new PipelinePorts.PipelinePortException(
+                    throw new PipelinePortException(
                             "error code: 1003, error message: knowledge base not found");
                 }
                 // 入参是值拷贝（归一化不回传调用方）——显式浅拷贝。
@@ -214,10 +223,10 @@ public class QaWiring {
         };
     }
 
-    /** {@link PipelinePorts.KnowledgeService} 的 chat_pipeline 子集。 */
+    /** {@link KnowledgeDocumentQueryPort} 的 chat_pipeline 子集。 */
     @Bean
-    public PipelinePorts.KnowledgeService qaPipelineKnowledgeService(KnowledgeCatalogPort knowledgeService) {
-        return new PipelinePorts.KnowledgeService() {
+    public KnowledgeDocumentQueryPort qaPipelineKnowledgeService(KnowledgeCatalogPort knowledgeService) {
+        return new KnowledgeDocumentQueryPort() {
             @Override
             public KnowledgeDocumentFacts getKnowledgeById(String id) {
                 // 知识查询带租户过滤（从 TenantContext 取）
@@ -239,12 +248,12 @@ public class QaWiring {
         };
     }
 
-    /** {@link PipelinePorts.ChunkRepository} 的实现在 knowledge 域适配器，此处只按类型注入。 */
+    /** {@link ChunkQueryPort} 的实现在 knowledge 域适配器，此处只按类型注入。 */
 
-    /** {@link PipelinePorts.KnowledgeRepository}（getKnowledgeBatch）。 */
+    /** {@link KnowledgeBatchQueryPort}（getKnowledgeBatch）。 */
     @Bean
-    public PipelinePorts.KnowledgeRepository qaPipelineKnowledgeRepository(KnowledgeCatalogPort knowledgeService) {
-        return new PipelinePorts.KnowledgeRepository() {
+    public KnowledgeBatchQueryPort qaPipelineKnowledgeRepository(KnowledgeCatalogPort knowledgeService) {
+        return new KnowledgeBatchQueryPort() {
             @Override
             public List<KnowledgeDocumentFacts> getKnowledgeBatch(long tenantId, List<String> ids) {
                 return KnowledgeProjectionAdapter.factsOf(knowledgeService.getKnowledgeBatch(tenantId, ids));
@@ -252,11 +261,11 @@ public class QaWiring {
         };
     }
 
-    /** {@link PipelinePorts.KnowledgeBaseRepository}（getKnowledgeBaseByIds）。 */
+    /** {@link KnowledgeBaseBatchQueryPort}（getKnowledgeBaseByIds）。 */
     @Bean
-    public PipelinePorts.KnowledgeBaseRepository qaPipelineKnowledgeBaseRepository(
+    public KnowledgeBaseBatchQueryPort qaPipelineKnowledgeBaseRepository(
             KnowledgeCatalogPort kbService) {
-        return new PipelinePorts.KnowledgeBaseRepository() {
+        return new KnowledgeBaseBatchQueryPort() {
             @Override
             public List<KnowledgeBaseView> getKnowledgeBaseByIds(List<String> ids) {
                 return ids.stream().map(kbService::getAllTenantById)
@@ -295,9 +304,9 @@ public class QaWiring {
         };
     }
 
-    /** {@link PipelinePorts.MemoryService} 的实现在 memory 域适配器，此处只按类型注入。 */
+    /** {@link MemoryQueryPort} 的实现在 memory 域适配器，此处只按类型注入。 */
 
-    /** {@link PipelinePorts.WebSearch} 的实现在 websearch 域适配器（管线/工具双面），此处只按类型注入。 */
+    /** {@link WebSearchRunPort} 的实现在 websearch 域适配器（管线/工具双面），此处只按类型注入。 */
 
     // ── EventManager（插件注册序） ───────────────
 
@@ -344,16 +353,16 @@ public class QaWiring {
      */
     @Bean
     public EventManager chatPipelineEventManager(
-            PipelinePorts.ModelService modelService,
-            PipelinePorts.KnowledgeBaseService knowledgeBaseService,
-            PipelinePorts.KnowledgeService knowledgeService,
-            PipelinePorts.ChunkRepository chunkRepository,
-            PipelinePorts.KnowledgeRepository knowledgeRepository,
-            PipelinePorts.KnowledgeBaseRepository knowledgeBaseRepository,
+            ModelFactoryPort modelService,
+            KnowledgeBaseQueryPort knowledgeBaseService,
+            KnowledgeDocumentQueryPort knowledgeService,
+            ChunkQueryPort chunkRepository,
+            KnowledgeBatchQueryPort knowledgeRepository,
+            KnowledgeBaseBatchQueryPort knowledgeBaseRepository,
             PipelineMessageStore messageService,
-            PipelinePorts.MemoryService memoryService,
-            PipelinePorts.WebSearch webSearch,
-            PipelinePorts.TenantService tenantService,
+            MemoryQueryPort memoryService,
+            WebSearchRunPort webSearch,
+            TenantWebSearchConfigPort tenantService,
             RetrieveGraphRepository retrieveGraphRepository,
             PipelinePageFetcher pipelinePageFetcher,
             EntityExtractionPort entityExtraction,

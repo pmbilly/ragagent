@@ -1,13 +1,20 @@
 package com.ragagent.session.rag;
 
 import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.auth.api.TenantWebSearchConfigPort;
 import com.ragagent.knowledge.adapter.KnowledgeBaseLookupAdapter;
+import com.ragagent.knowledge.api.ChunkQueryPort;
+import com.ragagent.knowledge.api.KnowledgeBaseQueryPort;
+import com.ragagent.knowledge.api.KnowledgeBatchQueryPort;
+import com.ragagent.knowledge.api.KnowledgeDocumentQueryPort;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.support.ChunkRowViews;
 import com.ragagent.knowledge.support.KnowledgeRowViews;
+import com.ragagent.llm.api.ModelFactoryPort;
+import com.ragagent.memory.api.MemoryQueryPort;
 import com.ragagent.platform.event.EventJson;
 import com.ragagent.platform.stream.QueuedChatStream;
 import com.ragagent.platform.web.JsonMappers;
@@ -40,12 +47,12 @@ import com.ragagent.shared.model.RankResult;
 import com.ragagent.shared.model.Reranker;
 import com.ragagent.shared.model.ResponseType;
 import com.ragagent.shared.model.StreamResponse;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.RetrieveGraphRepository;
 import com.ragagent.shared.retrieval.SearchParams;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.tenant.WebSearchConfig;
 import com.ragagent.shared.websearch.WebSearchResult;
+import com.ragagent.websearch.api.WebSearchRunPort;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -531,7 +538,7 @@ final class Rec46cSupport {
 
 
     /** 对照 zzModelService（chat + rerank 双查询）。 */
-    static final class StubModelService implements PipelinePorts.ModelService {
+    static final class StubModelService implements ModelFactoryPort {
         final Map<String, LlmChatClient> chatModels = new LinkedHashMap<>();
         final Map<String, RuntimeException> chatErr = new LinkedHashMap<>();
         final Map<String, Reranker> rerankModels = new LinkedHashMap<>();
@@ -617,10 +624,10 @@ final class Rec46cSupport {
     }
 
     /** 对照 zzTenantService。 */
-    static final class StubTenantService implements PipelinePorts.TenantService {}
+    static final class StubTenantService implements TenantWebSearchConfigPort {}
 
     /** 对照 zzKnowledgeService。 */
-    static final class StubKnowledgeService implements PipelinePorts.KnowledgeService {
+    static final class StubKnowledgeService implements KnowledgeDocumentQueryPort {
         @Override
         public KnowledgeDocumentFacts getKnowledgeById(String id) {
             Knowledge k = new Knowledge();
@@ -646,7 +653,7 @@ final class Rec46cSupport {
     }
 
     /** 对照 zzKnowledgeRepo。 */
-    static final class StubKnowledgeRepo implements PipelinePorts.KnowledgeRepository {
+    static final class StubKnowledgeRepo implements KnowledgeBatchQueryPort {
         final Map<String, Knowledge> items = new LinkedHashMap<>();
 
         @Override
@@ -707,7 +714,7 @@ final class Rec46cSupport {
     }
 
     /** 对照 zzWebSearchService。 */
-    static final class StubWebSearch implements PipelinePorts.WebSearch {
+    static final class StubWebSearch implements WebSearchRunPort {
         final List<WebSearchResult> results = new ArrayList<>();
         RuntimeException err;
 
@@ -723,7 +730,7 @@ final class Rec46cSupport {
     }
 
     /** 对照 zzChunkRepo。 */
-    static final class StubChunkRepo implements PipelinePorts.ChunkRepository {
+    static final class StubChunkRepo implements ChunkQueryPort {
         final Map<String, Chunk> chunks = new LinkedHashMap<>();
         boolean listErr;
         final List<String> calls = new ArrayList<>();
@@ -758,7 +765,7 @@ final class Rec46cSupport {
     }
 
     /** 对照 zzKBService。 */
-    static final class StubKBService implements PipelinePorts.KnowledgeBaseService {
+    static final class StubKBService implements KnowledgeBaseQueryPort {
         final Map<String, KnowledgeBase> kbs = new LinkedHashMap<>();
         RuntimeException kbErr;
         final Map<String, float[]> embed = new LinkedHashMap<>();
@@ -921,7 +928,7 @@ final class Rec46cSupport {
     }
 
     /** 对照 zzMemoryService。 */
-    static final class StubMemoryService implements PipelinePorts.MemoryService {
+    static final class StubMemoryService implements MemoryQueryPort {
         MemoryRecall recallValue = MemoryRecall.EMPTY;
         MemoryRetrievalContext ctx = MemoryRetrievalContext.EMPTY;
         Map<String, Integer> affinity = new LinkedHashMap<>();

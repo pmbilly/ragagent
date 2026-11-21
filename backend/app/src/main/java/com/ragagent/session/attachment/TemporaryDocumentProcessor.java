@@ -1,7 +1,7 @@
 package com.ragagent.session.attachment;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.initialization.api.DocReaderParsePort;
+import com.ragagent.knowledge.api.DocReaderParsePort;
 import com.ragagent.knowledge.api.DocumentChunkingPort;
 import com.ragagent.knowledge.api.ParserEngineRules;
 import com.ragagent.knowledge.api.Tokens;

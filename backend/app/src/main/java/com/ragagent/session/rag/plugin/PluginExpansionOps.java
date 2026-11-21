@@ -1,10 +1,10 @@
 package com.ragagent.session.rag.plugin;
 
+import com.ragagent.knowledge.api.KnowledgeBaseQueryPort;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.SearchParams;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.retrieval.SearchTarget;
@@ -24,9 +24,9 @@ import java.util.concurrent.Semaphore;
  * 持门面回引取 knowledgeBaseService；{@code withTenant}/{@code QueryTextOps} 经类名访问。
  */
 final class PluginExpansionOps {
-    private final PipelinePorts.KnowledgeBaseService knowledgeBaseService;
+    private final KnowledgeBaseQueryPort knowledgeBaseService;
 
-    PluginExpansionOps(PipelinePorts.KnowledgeBaseService knowledgeBaseService) {
+    PluginExpansionOps(KnowledgeBaseQueryPort knowledgeBaseService) {
         this.knowledgeBaseService = knowledgeBaseService;
     }
 

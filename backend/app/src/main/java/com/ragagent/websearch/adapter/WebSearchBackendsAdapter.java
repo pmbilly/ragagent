@@ -1,11 +1,11 @@
 package com.ragagent.websearch.adapter;
 
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.tenant.WebSearchConfig;
 import com.ragagent.shared.websearch.WebSearchResult;
 import com.ragagent.websearch.api.WebSearchExecutor;
 import com.ragagent.websearch.api.WebSearchRequest;
+import com.ragagent.websearch.api.WebSearchRunPort;
 import com.ragagent.websearch.service.WebSearchService;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  *   <li>{@link WebSearchExecutor}（工具面）：L2 请求 → 域执行配置的转换
  *       自会话 {@code AgentToolBackends#toServiceConfig} 原样搬入——
  *       域内配置形状不外泄给工具；</li>
- *   <li>{@link PipelinePorts.WebSearch}（管线面）：L1 租户配置 → 执行面配置的转换
+ *   <li>{@link WebSearchRunPort}（管线面）：L1 租户配置 → 执行面配置的转换
  *       与"当前租户缺省补 0"自会话 {@code QaWiring#qaPipelineWebSearch} 原样搬入。</li>
  * </ul>
  *
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  * （工具侧折叠为 success=false 由工具层负责）。</p>
  */
 @Component
-public class WebSearchBackendsAdapter implements WebSearchExecutor, PipelinePorts.WebSearch {
+public class WebSearchBackendsAdapter implements WebSearchExecutor, WebSearchRunPort {
 
     private final WebSearchService webSearchService;
 

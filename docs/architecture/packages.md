@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-375 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+373 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -127,7 +127,6 @@
 | `:backend` | `com.ragagent.im.runtime` | IM · 运行时：AdapterInterfaces / FeishuWecomCrypt / SlackAdapterCore…。 |
 | `:backend` | `com.ragagent.im.service` | IM · 服务：ImChannelService / ImAttachmentPreparer / ImKnowledgeBridgeOps…。 |
 | `:backend` | `com.ragagent.initialization` | 初始化与能力自检域：/api/v1/initialization/* 的初始化配置、未保存模型的 连通性预检、文本抽取试验与语音识别（ASR）。 |
-| `:backend` | `com.ragagent.initialization.api` | initialization 域对外契约。 |
 | `:backend` | `com.ragagent.initialization.controller` | initialization 的 @RestController 薄层：端点注解与委托，逻辑在 service 协作者 （com.ragagent.initialization.controller. |
 | `:backend` | `com.ragagent.initialization.dto` | initialization 的模型视图投影（com.ragagent.initialization.dto.ModelViews）。 |
 | `:backend` | `com.ragagent.initialization.service` | initialization 用例实现：初始化配置（com.ragagent.initialization.service.InitializationConfigService）、 模型连通性测试、 |
@@ -333,7 +332,6 @@
 | `:backend` | `com.ragagent.shared.memory` | 记忆契约面：配置/条目视图/键与类目/召回与检索上下文。 |
 | `:backend` | `com.ragagent.shared.model` | 模型契约面：模型事实、运行时载荷与跨域能力端口。 |
 | `:backend` | `com.ragagent.shared.pagination` | 分页契约：统一的 com.ragagent.shared.pagination.PageResult。 |
-| `:backend` | `com.ragagent.shared.pipeline` | 管线 SPI：会话域管线（domains/session/rag）消费、业务域实现的端口 （MCP 工具网关/按需注册、工具注册表、网页检索执行器）。 |
 | `:backend` | `com.ragagent.shared.retrieval` | 检索的共享形状：SearchParams、SearchResult、SearchTarget、 RetrieveGraphRepository。 |
 | `:backend` | `com.ragagent.shared.session` | 会话契约面：管线消息视图与消息端口。 |
 | `:backend` | `com.ragagent.shared.settings` | 契约 · 设置：SystemSettingGateway。 |

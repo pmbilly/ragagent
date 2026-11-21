@@ -1,8 +1,11 @@
 package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.knowledge.api.KnowledgeBaseBatchQueryPort;
+import com.ragagent.knowledge.api.KnowledgeDocumentQueryPort;
 import com.ragagent.llm.api.EntityExtractionPort;
 import com.ragagent.llm.api.EntityExtractionResult;
+import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.platform.prompt.PipelineConfig;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.rag.PipelineEventType;
@@ -11,7 +14,6 @@ import com.ragagent.shared.graph.GraphNode;
 import com.ragagent.shared.knowledge.KnowledgeBaseView;
 import com.ragagent.shared.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.shared.model.LlmChatClient;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,17 +30,17 @@ import java.util.Map;
  */
 public final class PluginExtractEntity implements Plugin {
 
-    private final PipelinePorts.ModelService modelService;
+    private final ModelFactoryPort modelService;
     private final PipelineConfig.PromptTemplateStructured template;
-    private final PipelinePorts.KnowledgeBaseRepository knowledgeBaseRepo;
-    private final PipelinePorts.KnowledgeService knowledgeService;
+    private final KnowledgeBaseBatchQueryPort knowledgeBaseRepo;
+    private final KnowledgeDocumentQueryPort knowledgeService;
     private final boolean neo4jEnabled;
     private final EntityExtractionPort entityExtraction;
 
-    public PluginExtractEntity(PipelinePorts.ModelService modelService,
+    public PluginExtractEntity(ModelFactoryPort modelService,
                                PipelineConfig.PromptTemplateStructured template,
-                               PipelinePorts.KnowledgeBaseRepository knowledgeBaseRepo,
-                               PipelinePorts.KnowledgeService knowledgeService,
+                               KnowledgeBaseBatchQueryPort knowledgeBaseRepo,
+                               KnowledgeDocumentQueryPort knowledgeService,
                                boolean neo4jEnabled,
                                EntityExtractionPort entityExtraction) {
         this.modelService = modelService;

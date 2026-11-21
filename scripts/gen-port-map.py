@@ -39,6 +39,9 @@ IMPL = re.compile(r"\bimplements\s+([^{]+)")
 USES = re.compile(r"^import\s+com\.ragagent\.[\w.]*\.(\w+Port);", re.M)
 EXTENDS = re.compile(r"\binterface\s+(\w+)\s+extends\s+([^{]+)\{")
 DECLARES_INTERFACE = re.compile(r"\binterface\s+(\w+)\b")
+#: 装配点的匿名实现（`new XxxPort() { ... }`）：端口存在只为打破域/模块依赖，
+#: 实现落在 @Configuration 里，不适用「域内 = 多余抽象」的判定。
+ANON_IMPL = re.compile(r"\bnew\s+(\w+Port)\s*\(\s*\)\s*\{")
 
 
 def module_of(path: pathlib.Path) -> str:
@@ -68,12 +71,17 @@ def main() -> int:
 
     impls = {}
     users = {}
+    anon = set()
     for f in _sr.all_java_files():
         text = f.read_text(encoding="utf-8", errors="ignore")
         for m in IMPL.finditer(text):
             for name in re.findall(r"\b(\w+Port)\b", m.group(1)):
                 if name in ports:
                     impls.setdefault(name, []).append(f)
+        for m in ANON_IMPL.finditer(text):
+            if m.group(1) in ports:
+                impls.setdefault(m.group(1), []).append(f)
+                anon.add(m.group(1))
         for m in USES.finditer(text):
             if m.group(1) in ports:
                 users.setdefault(m.group(1), []).append(f)
@@ -94,12 +102,16 @@ def main() -> int:
         callers = sorted({domain_of(f) for f in users.get(name, []) if f not in impl_set})
         impl_mod = module_of(impl) if impl else "?"
         caller_mods = sorted({module_of(f) for f in users.get(name, []) if f not in impl_set})
+        is_wiring = impl is not None and "@Configuration" in impl.read_text(
+            encoding="utf-8", errors="ignore")
         if name in facets:
             kind = "复合面（随复合端口）"
         elif impl and any(m != impl_mod for m in caller_mods):
             kind = "跨模块（必要）"
         elif impl and any(d != domain_of(impl) for d in callers):
             kind = "域间（解耦）"
+        elif name in anon and is_wiring:
+            kind = "装配点实现（不参与内联判定）"
         elif impl:
             kind = "域内（可评估内联）"
         else:

@@ -1,10 +1,10 @@
 package com.ragagent.session.rag.plugin;
 
+import com.ragagent.knowledge.api.KnowledgeBaseQueryPort;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.shared.knowledge.KnowledgeBaseView;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.retrieval.SearchTarget;
 import java.util.List;
@@ -17,9 +17,9 @@ public final class PluginWikiBoost implements Plugin {
 
     private static final double WIKI_BOOST_FACTOR = 1.3;
 
-    private final PipelinePorts.KnowledgeBaseService kbService;
+    private final KnowledgeBaseQueryPort kbService;
 
-    public PluginWikiBoost(PipelinePorts.KnowledgeBaseService kbService) {
+    public PluginWikiBoost(KnowledgeBaseQueryPort kbService) {
         this.kbService = kbService;
     }
 

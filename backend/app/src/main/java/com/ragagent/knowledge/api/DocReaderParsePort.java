@@ -1,4 +1,4 @@
-package com.ragagent.initialization.api;
+package com.ragagent.knowledge.api;
 
 import java.util.List;
 

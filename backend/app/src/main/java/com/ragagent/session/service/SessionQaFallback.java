@@ -1,6 +1,7 @@
 package com.ragagent.session.service;
 
 
+import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
@@ -23,7 +24,6 @@ import com.ragagent.shared.model.ChatStream;
 import com.ragagent.shared.model.LlmChatClient;
 import com.ragagent.shared.model.ResponseType;
 import com.ragagent.shared.model.StreamResponse;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -42,10 +42,10 @@ final class SessionQaFallback {
     private static final Logger log = LoggerFactory.getLogger(SessionQaFallback.class);
 
     private final KnowledgeCatalogPort knowledgeCatalog;
-    private final PipelinePorts.ModelService pipelineModelService;
+    private final ModelFactoryPort pipelineModelService;
 
     SessionQaFallback(KnowledgeCatalogPort knowledgeCatalog,
-                      PipelinePorts.ModelService pipelineModelService) {
+                      ModelFactoryPort pipelineModelService) {
         this.knowledgeCatalog = knowledgeCatalog;
         this.pipelineModelService = pipelineModelService;
     }

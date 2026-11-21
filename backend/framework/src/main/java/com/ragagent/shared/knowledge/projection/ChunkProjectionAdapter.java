@@ -23,7 +23,7 @@ public final class ChunkProjectionAdapter {
 
     /**
      * 实体 → L1 **facts** 投影（{@link ChunkFacts}，16 字段；作为"实体→facts"的
-     * 域内公用投影，供 chat 管线的 {@code PipelinePorts.ChunkRepository} 装配点复用，
+     * 域内公用投影，供 chat 管线的 {@code ChunkQueryPort} 装配点复用，
      * 避免映射逻辑两处漂移）。仅带调用方真正读取的字段。
      */
     public static ChunkFacts factsOf(ChunkRowView c) {

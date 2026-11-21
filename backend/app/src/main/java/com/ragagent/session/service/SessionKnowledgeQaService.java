@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
+import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.settings.ConversationProperties;
@@ -28,7 +29,6 @@ import com.ragagent.shared.error.BizException;
 import com.ragagent.shared.event.EventBusInterface;
 import com.ragagent.shared.knowledge.KnowledgeBaseRowView;
 import com.ragagent.shared.knowledge.KnowledgeCatalogPort;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.retrieval.SearchTarget;
 import com.ragagent.shared.tenant.TenantConfigLookup;
@@ -63,7 +63,7 @@ public class SessionKnowledgeQaService {
     final ConversationProperties cfg;
     final ModelCatalogPort modelCatalog;
     final KnowledgeCatalogPort knowledgeCatalog;
-    final PipelinePorts.ModelService pipelineModelService;
+    final ModelFactoryPort pipelineModelService;
     final TenantConfigLookup tenantService;
     final WebSearchProviderPort webSearchProviders;
     /** agent 解析（im 面请求只带 agentId：入口按需补 agentRow）。 */
@@ -79,7 +79,7 @@ public class SessionKnowledgeQaService {
             ConversationProperties cfg,
             ModelCatalogPort modelCatalog,
             KnowledgeCatalogPort knowledgeCatalog,
-            PipelinePorts.ModelService pipelineModelService,
+            ModelFactoryPort pipelineModelService,
             TenantConfigLookup tenantService,
             WebSearchProviderPort webSearchProviders,
             AgentResolver agentResolver) {

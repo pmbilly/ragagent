@@ -3,6 +3,7 @@ package com.ragagent.session.rag.plugin;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.knowledge.api.DocumentChunkMetadata;
 import com.ragagent.knowledge.api.GeneratedQuestion;
+import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.retrieval.api.ImageInfo;
@@ -16,7 +17,6 @@ import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.runtime.SessionTrace;
 import com.ragagent.shared.model.RankResult;
 import com.ragagent.shared.model.Reranker;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.retrieval.SearchTarget;
 import java.util.ArrayList;
@@ -46,9 +46,9 @@ import java.util.regex.Pattern;
  */
 public final class PluginRerank implements Plugin {
 
-    private final PipelinePorts.ModelService modelService;
+    private final ModelFactoryPort modelService;
 
-    public PluginRerank(PipelinePorts.ModelService modelService) {
+    public PluginRerank(ModelFactoryPort modelService) {
         this.modelService = modelService;
     }
 

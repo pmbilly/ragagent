@@ -7,7 +7,7 @@
 
 ## 1. 任务定义
 
-`backend/framework/src/main/java/com/ragagent/shared`（下称 shared）现有 **188** 个类型 = **35 通用面 + 153 业务词汇**。任务终态：
+`backend/framework/src/main/java/com/ragagent/shared`（下称 shared）现有 **188** 个类型 = **36 通用面 + 152 业务词汇**（WP4-C 拆掉 `PipelinePorts`、新增 `PipelinePortException`）。任务终态：
 
 1. **153 个业务词汇清零**——删除或归位到域 `api/`、引擎 `api/`、framework 正式包。
 2. **35 个通用面迁出 shared 命名空间**——`error` 3 · `event` 26 · `json` 3 · `text` 2 · `pagination` 1 → `framework/error|event|json|text|pagination`（蓝图 §5.2 明确归 framework）。
@@ -43,13 +43,13 @@ bash scripts/run-guards.sh; echo "exit=$?"
 
 | 档 | v2 实测 | v1 声称 | 对应工作包 |
 |---|---|---|---|
-| dead（主码+测试均无引用） | **9** | ~~33~~ | WP1 删除 |
+| dead（任何地方都无引用） | **0** | ~~33~~ | 无——WP1 复核：9 个"外部零引用"全是 shared 内闭包 |
 | single（单域） | **33** | ~~21~~ | WP2 域归位 |
 | engine（被引擎用，含引擎+域） | **24** | 24 | WP3 引擎归位 |
-| multi（≥2 域） | **51** | ~~46~~ | WP4（A 27 + B 18 + C 1）+ WP1 回收 5 |
+| multi（≥2 域） | **59** | ~~46~~ | WP4（A 26 + B 18）+ 闭包随迁 15 |
 | framework（被 framework 引用） | **36** | ~~29~~ | WP5（K10a/K10b/K12/K16 + `platform/storage`） |
 
-合计 153。**v1 的 dead 33 里 24 个是活代码**（详见 WP1 回收表），v1 的 single/multi/framework 三档随之重算。
+合计 153。**dead 归零**：v1 的 33 个里，9 个是 shared 内闭包（7 个端口分面 + 2 个被同包调用），其余 24 个是外部活代码；single/multi/framework 三档随之重算。
 
 收尾 WP6 = 35 通用面迁出 + 守卫平移 + 删命名空间。
 
@@ -80,11 +80,10 @@ bash scripts/run-guards.sh; echo "exit=$?"
 
 | 落点 | 数量 | 类型 |
 |---|---|---|
-| 删除（WP1） | 9 | `ChunkFaqReadPort` `DuplicateKnowledgeDetails` `JsonValueSupport` `KnowledgeBaseReadPort` `KnowledgeBaseWritePort` `KnowledgeContentWritePort` `KnowledgeDeletePort` `KnowledgeEntryReadPort` `KnowledgeIngestLookupPort` |
+| 删除（内联进 `KnowledgeBaseRowView`） | 1 | `JsonValueSupport` |
 | `app/storage/api` | 7 | `FileContentService` `MessageFileFacts` `PublicModeForbiddenException` `ResourceModeException` `StorageEnvLookup` `StorageUrlContext` `WritableFileContentService` |
 | `app/storage/api`（随 platform/storage 整包） | 7 | `FileUrlPort` `MessageFactsLookup` `Mode` `OpenedFile` `Resolver` `SeekableSource` `StorageBackendResolver` |
-| `app/knowledge/api` | 30 | `ChunkFacts` `ChunkPageView` `ChunkPort` `ChunkProjectionAdapter` `ChunkRowView` `ChunkView` `DuplicateKnowledgeException` `EmbeddingModelPort` `ExtractedItem` `FaqChunkMetadata` `FaqEntryPageView` `FaqEntryView` `KnowledgeBaseCatalogPort` `KnowledgeBaseLookup` `KnowledgeBaseResponse` `KnowledgeBaseView` `KnowledgeBaseViews` `KnowledgePageView` `KnowledgeParseStatus` `KnowledgeProjectionAdapter` `KnowledgeRowView` `KnowledgeSpanPort` `KnowledgeTagView` `KnowledgeView` `SearchAuth` `SearchChunkMerge` `SearchTarget` `SlugUpdate` `WikiException` `WikiLanguageSupport` |
-| `app/initialization/api` | 2 | `KnowledgeBaseRowView` `KnowledgeCatalogPort` |
+| `app/knowledge/api` | 31 | `ChunkFacts` `ChunkPageView` `ChunkPort` `ChunkProjectionAdapter` `ChunkRowView` `ChunkView` `DuplicateKnowledgeDetails` `DuplicateKnowledgeException` `EmbeddingModelPort` `ExtractedItem` `FaqChunkMetadata` `FaqEntryPageView` `FaqEntryView` `KnowledgeBaseCatalogPort` `KnowledgeBaseLookup` `KnowledgeBaseResponse` `KnowledgeBaseView` `KnowledgeBaseViews` `KnowledgePageView` `KnowledgeParseStatus` `KnowledgeProjectionAdapter` `KnowledgeRowView` `KnowledgeSpanPort` `KnowledgeTagView` `KnowledgeView` `SearchAuth` `SearchChunkMerge` `SearchTarget` `SlugUpdate` `WikiException` `WikiLanguageSupport` |
 | `app/audit/api` | 3 | `AuditOutcome` `AuditWritePort` `KnowledgeBaseFacts` |
 | `app/memory/api` | 6 | `MemoryItemView` `MemoryKeys` `MemoryKinds` `MemoryMessageCursor` `MemoryRecall` `MemoryRetrievalContext` |
 | `app/session/api` | 9 | `MentionedItem` `MessageExecutionContext` `MessageImage` `PipelineMessageAttachmentView` `SessionLastRequestState` `SseSink` `SuggestionAttribution` `SuggestionItem` `UsedMemory` |
@@ -97,34 +96,30 @@ bash scripts/run-guards.sh; echo "exit=$?"
 | framework 正式包（永驻） | 19 | `APIKeyScopeContext` `AuditAction` `ChatStream` `GraphNode` `GraphRelation` `KnowledgeBaseProvisioner` `MessageView` `ResponseType` `SearchResult` `StorageBackendPort` `StorageBackendProvisioner` `StorageBackendView` `StorageConnectivityPort` `StorageEngineConfig` `StreamResponse` `TenantAPIKeyScope` `TenantConfigLookup` `TenantRole` `TokenUsage` |
 | framework 工具包 | 1 | `KnowledgeIngest` |
 | 待拍板（`KnowledgeBaseGateway`） | 1 | `KnowledgeBaseGateway` |
-| 待拍板（D-6 七个配置形状） | 7 | `AsrConfigView` `ChunkingConfigView` `ImageProcessingConfigView` `IndexingStrategyView` `StorageConfigView` `StorageProviderConfigView` `VlmConfigView` |
-| 拆分后删除（WP4-C） | 1 | `PipelinePorts` |
+| 待拍板（D-6：KB 形状与知识目录） | 16 | `AsrConfigView` `ChunkingConfigView` `ImageProcessingConfigView` `IndexingStrategyView` `StorageConfigView` `StorageProviderConfigView` `VlmConfigView` `KnowledgeCatalogPort` `ChunkFaqReadPort` `KnowledgeBaseReadPort` `KnowledgeBaseWritePort` `KnowledgeContentWritePort` `KnowledgeDeletePort` `KnowledgeEntryReadPort` `KnowledgeIngestLookupPort` `KnowledgeBaseRowView` |
 
-**三条落点约束**：
+**四条落点约束**：
 
-1. `app/knowledge/api` 落 30 个后总文件约 42，**破 `check-package-size` 的 30 条硬线**（现在 12 个类型 + package-info）。执行时拆 `knowledge/api/{kb,chunk,wiki,search}` 子包——R10、形状守卫、`check-capability-kinds` 都认路径里的 `api` 段，拆子包不需要改守卫；**不要**给超限包登记理由，那等于把导航成本固化。
+1. `app/knowledge/api` 落 31 个后总文件约 43，**破 `check-package-size` 的 30 条硬线**（现在 12 个类型 + package-info）。执行时拆 `knowledge/api/{kb,chunk,wiki,search}` 子包——R10、形状守卫、`check-capability-kinds` 都认路径里的 `api` 段，拆子包不需要改守卫；**不要**给超限包登记理由，那等于把导航成本固化。
 2. `SearchAuth`（18 个 agenttools 调用点 + 2 个 session）与 `WikiLanguageSupport`（agentmanagement 2 + knowledge 8 + session 4）都只能落 `knowledge/api`：消费方是 L3 或同级 L2，`level-ok` 合法；`SearchAuth` 是 11 方法的类不是端口，不进端口方法预算。
-3. `SearchResult` **永驻 framework**：`model-runtime` 的 `Registry`/`SourceRegistry`、`agent-engine` 的 `AgentState`、`app` 37 处都在消费，而两个引擎只能看到 framework——v1 的"随 Rewriter 落 storage/retrieval-engine"不可行。`AuditWritePort`/`AuditOutcome` 若与 `AuditAction` 同批判归 framework，本表对应行随之调整。
+3. `SearchResult` **永驻 framework**：`model-runtime` 的 `Registry`/`SourceRegistry`、`agent-engine` 的 `AgentState`、`app` 37 处都在消费，而两个引擎只能看到 framework——"随 Rewriter 落 storage/retrieval-engine"不可行。`AuditWritePort`/`AuditOutcome` 若与 `AuditAction` 同批判归 framework，本表对应行随之调整。
+4. **没有"死代码"**：153 个类型全部有引用（`JsonValueSupport` 是唯一可消项——被 `KnowledgeBaseRowView` 的 `boolAt` 调用一次，内联即可）。7 个 `*ReadPort`/`*WritePort` 是 `KnowledgeCatalogPort` 的 `extends` 分面，不是死类型；`DuplicateKnowledgeDetails` 由 `DuplicateKnowledgeException` 构造。上一版按"外部 import 为零"判死的 9 个全部落在这三类闭包里（坑 3 的原样复现）。
 
-### WP1 删除死代码（9 个，0.5 天）
+5. **整批搬**：`KnowledgeCatalogPort` 与 7 个分面、`KnowledgeBaseRowView` 和留在 shared 的 `KnowledgeBaseResponse`/`KnowledgeBaseViews` 互引，单独搬会造出 `shared.knowledge ⇄ knowledge.api` 的包级 SCC（R9 新增即红）。实测闭包正好是 `knowledge/api` 组的 **47 个类型**。`PipelinePorts` 已拆完（WP4-C），原先押后的 `KnowledgeBaseView`/`ChunkFacts` 已解锁，47 个可以一次搬。
 
-**对象**（主码+测试均零引用，2026-11-21 v2 重扫）：
+### WP1 复核结论：0 个可删（0.5 天已花完）
 
-- `shared/knowledge` 7 个端口：`ChunkFaqReadPort` `KnowledgeBaseReadPort` `KnowledgeBaseWritePort` `KnowledgeContentWritePort` `KnowledgeDeletePort` `KnowledgeEntryReadPort` `KnowledgeIngestLookupPort`
-- `shared/knowledge` 2 个工具/异常：`JsonValueSupport` `DuplicateKnowledgeDetails`
+删除前按坑 15 做了三处扫描（简单名 / 反射字符串 / SPI），结果推翻了"9 个死代码"：
 
-**步骤**：逐个删除前**必须**扫全仓（含 `src/test`）三处：① 简单名文本匹配；② `Class.forName`/字符串类名反射；③ `@Spi`/`META-INF/services`。按"先删无引用者"的级联顺序：`app/storage/adapter/GlobalFileServiceAdapter` 目前只在 `package-info` 的 javadoc 里出现，确认无调用方后先删它——`WritableFileContentService` 会少一条引用，但仍被 `session` 使用（不转死）。
-
-**回收表（v1 误判为 dead，实测是活代码，24 个）**：
-
-| 类型 | 真实消费方（主码） | 落点 |
+| 类型 | 为什么不是死码 | 处置 |
 |---|---|---|
-| storage 6：`FileContentService` `MessageFileFacts` `WritableFileContentService` `PublicModeForbiddenException` `ResourceModeException` `StorageUrlContext` | storage / session / knowledge / embedchannel | `app/storage/api` |
-| storage 7：`SeekableSource` `MessageFactsLookup` `OpenedFile` `FileUrlPort` `Mode` `Resolver` `StorageBackendResolver` | **framework `platform/storage/**`**（`fileserve/FileTransport`、`fileserve/FileProxyPort`、`support/Rewriter`、`support/FileResolverFactory`、`support/ResourceUrlMode`） | 等 `platform/storage` 整包搬 `app/storage`（WP5 新增行）后随迁 `app/storage/api` |
-| knowledge 4：`DuplicateKnowledgeException` `ChunkProjectionAdapter` `KnowledgeProjectionAdapter` `KnowledgeBaseViews` | knowledge / session / datasource / im | `app/knowledge/api`（纯函数、零第三方依赖；`session(L3)→knowledge(L2)` 合法） |
-| knowledge 7 配置形状：`AsrConfigView` `ChunkingConfigView` `ImageProcessingConfigView` `IndexingStrategyView` `StorageConfigView` `StorageProviderConfigView` `VlmConfigView` | knowledge + **initialization(L1)** | **拍板 D-6**：initialization(L1)→knowledge(L2) 是下级→上级，同级 api 放行救不了 |
+| `ChunkFaqReadPort` `KnowledgeBaseReadPort` `KnowledgeBaseWritePort` `KnowledgeContentWritePort` `KnowledgeDeletePort` `KnowledgeEntryReadPort` `KnowledgeIngestLookupPort` | 全是 `KnowledgeCatalogPort` 的 `extends` 分面（复合端口按能力拆窄的产物） | 随复合端口整组搬（见 D-6） |
+| `JsonValueSupport` | 被 `KnowledgeBaseRowView` 调用（`JsonValueSupport.boolAt(...)`，同包不需要 import） | **内联**进 `KnowledgeBaseRowView`，消 1 个类型 |
+| `DuplicateKnowledgeDetails` | 由 `DuplicateKnowledgeException` 构造（同包） | 随异常进 `knowledge/api` |
 
-**风险**：测试仍引用的类型删了会编译红——这属于"该留"，不是误判。**v1 的 33 个清单不可复用**：其中 13 个 storage 全部有主码引用（`Mode` 被 4 个 session 控制器、`StorageUrlContext` 被 embedchannel 控制器+过滤器直接用），照删会当场编译红。
+**结论**：`dead = 0`，WP1 不再有删除动作。这 9 个的共性是"外部 import 为零"——FQN 口径看不见同包引用，**坑 3 的原样复现**（上一版清单是同一个错误）。后续判死必须用"简单名 + 同包 + 测试 + 反射 + SPI"五路扫描，不能只看 import。
+
+**唯一可做的安全动作**：`JsonValueSupport` 内联（3 行静态工具 → `KnowledgeBaseRowView` 私有方法）。等 D-6 定完再和其他搬迁一起提交，避免单独改动一个待搬文件。
 
 ### WP2 单域 21 个 → 域 `api/`（1~2 天）
 
@@ -191,29 +186,27 @@ bash scripts/run-guards.sh; echo "exit=$?"
 | embedchannel+knowledge（1） | `ChunkRowView` | 拍板 D-3 同组（默认永驻 framework） |
 | agenttools+session（1） | `retrieval.SearchTarget` | **`app/knowledge/api`**（两个 L3 域依赖 knowledge(L2) 的 api 完全合法；SearchTarget 本就是知识检索目标形状，P4-5 时它是"必留 4 个"之一，现在两个 L3 消费方让它有了家） |
 
-#### WP4-C `pipeline.PipelinePorts` 拆分（K11，唯一真改造，1~2 天）
+#### WP4-C `pipeline.PipelinePorts` 拆分（K11）✅ 2026-11-21
 
-**11 个嵌套接口**（+1 个 `PipelinePortException` + 3 个 record），消费者不止 5 个域：主码 27 个文件引用，其中 session 一家约 20 个（`session/rag/plugin/*` 与 `QaWiring`）。按方法归属拆到各消费域 `api` 与 `retrieval-engine/api`，`PipelinePorts` 变空壳后删除。拆之前先读 §11.2 K11 行与接口源码；拆完先跑 `check-package-cycles.py`（新边集中在 session→各域）。
+原 11 个嵌套接口 + 1 异常 + 3 record，按语义拆成 15 个独立类型（端口一律加 `Port` 后缀，避免与各域同名 service/repository 冲突）：
 
-**接口 → 落点映射**（实现方与调用点已实测，不要现场再定）：
+| 新类型（顶层） | 落点 | 实现方 |
+|---|---|---|
+| `ModelFactoryPort` | model-runtime `llm.api` | `QaWiring` 匿名实现 |
+| `KnowledgeBaseQueryPort` | `app/knowledge/api` | `QaWiring` 匿名实现 |
+| `KnowledgeDocumentQueryPort` | `app/knowledge/api` | `QaWiring` 匿名实现 |
+| `ChunkQueryPort` | `app/knowledge/api` | `knowledge/adapter/KnowledgeChunkPipelineAdapter` |
+| `KnowledgeBatchQueryPort` | `app/knowledge/api` | `QaWiring` 匿名实现 |
+| `KnowledgeBaseBatchQueryPort` | `app/knowledge/api` | `QaWiring` 匿名实现 |
+| `MemoryQueryPort` | `app/memory/api` | `memory/adapter/MemoryPipelineAdapter` |
+| `WebSearchRunPort` | `app/websearch/api` | `websearch/adapter/WebSearchBackendsAdapter` |
+| `TenantWebSearchConfigPort` | `app/auth/api` | `QaWiring` 匿名实现 |
+| `DataAnalysisSessionFactory` | `app/agenttools/api` | `agenttools/datasource/DataAnalysisSessionFactoryAdapter` |
+| `DataAnalysisSession` | `app/agenttools/api` | 同上（`SessionImpl`） |
+| `KnowledgeData` / `ColumnInfo` / `TableSchema` | `app/agenttools/api` | —（record） |
+| `PipelinePortException` | `framework/shared/error` | — |
 
-| 嵌套类型 | 语义 | 落点 | 实现方 |
-|---|---|---|---|
-| `ModelService` | getChatModel / getRerankModel 运行时工厂 | model-runtime `llm.api` | `QaWiring` 匿名实现 |
-| `KnowledgeBaseService` | 知识库子集 | `app/knowledge/api` | `QaWiring` |
-| `KnowledgeService` | 知识子集 | `app/knowledge/api` | `QaWiring` |
-| `ChunkRepository` | chunk 读 | `app/knowledge/api` | `knowledge/adapter/KnowledgeChunkPipelineAdapter` |
-| `KnowledgeRepository` | getKnowledgeBatch | `app/knowledge/api` | `QaWiring` |
-| `KnowledgeBaseRepository` | getKnowledgeBaseByIds | `app/knowledge/api` | `QaWiring` |
-| `MemoryService` | 记忆召回/抽取 | `app/memory/api` | `memory/adapter/MemoryPipelineAdapter` |
-| `WebSearch` | 网页搜索执行面 | `app/websearch/api` | websearch 域适配器 |
-| `TenantService` | 租户配置读取 | `app/auth/api` | `QaWiring` |
-| `DataAnalysisSessionFactory` | 建数据分析会话 | `app/agenttools/api` | `agenttools/datasource/DataAnalysisSessionFactoryAdapter` |
-| `DataAnalysisSession` | 会话执行 | `app/agenttools/api` | 同上（`SessionImpl`） |
-| `PipelinePortException` | 管线异常 | framework 错误面 | — |
-| `KnowledgeData` / `ColumnInfo` / `TableSchema`（record） | 数据分析载荷 | `app/agenttools/api` | — |
-
-拆完 `PipelinePorts` 空壳删除；每个新包补 `package-info.java`（四要素），`QaWiring` 的 17 个插件注入点逐类型改签名。
+`PipelinePorts` 与 `shared/pipeline` 包已删除；30 个消费文件改 import。**两个守卫口径同步调整**：`gen-port-map` 认得装配点的匿名 `new XxxPort() {}` 实现（新增「装配点实现（不参与内联判定）」档），ArchUnit A20 不再按顶层类过滤实现方——否则这 6 个端口会被误判「契约悬空」。
 
 ### WP5 framework 档 36 个（K10a/K10b/K12/K16 + `platform/storage`，5~8 天）
 
@@ -264,18 +257,18 @@ bash scripts/run-guards.sh; echo "exit=$?"
 | D-3 | datasource+knowledge 4 个 + 同级 3 个（CatalogPort/ChunkRowView） | **重新推荐：3 个形状类进 `knowledge/api`**。同级 api 已于 2026-11-21 批准，v1 的"备选"现在是零守卫成本，且比永驻 framework 更贴合语义（`datasource`/`agentmanagement` 都是 L2，同级 api 合法）。`KnowledgeIngest` 纯函数 → framework 工具包。永驻 framework 降为备选 |
 | D-4 | embedchannel+im 的 `MessageView` | 永驻 framework（channel 合并是蓝图第一阶段既定项但属独立批次，不混入本计划） |
 | D-5 | `ToolResult` 落点 | `agent-engine/api`（随 `tool` 族） |
-| D-6 | knowledge 7 个配置形状（`AsrConfigView` `ChunkingConfigView` `ImageProcessingConfigView` `IndexingStrategyView` `StorageConfigView` `StorageProviderConfigView` `VlmConfigView`） | 消费方是 knowledge + **initialization(L1)**，`initialization→knowledge` 是下级→上级，同级放行救不了。三选一：① **把 initialization 的 level 从 1 改成 3**（它是 `setup` 类域：只编排、不承载业务规则），7 个形状进 `knowledge/api`——代价是 `im→initialization`（2 类）从 L2→L1 变成 L2→L3 反向，须同批端口化；② **端口倒置**：initialization 在自己 `api` 声明配置端口、knowledge 实现（零守卫改动，多一个接口）；③ 随 D-2 永驻 framework。**推荐 ②**：改层级会牵 im，永驻 framework 会把 KB 业务词带进底座 |
+| D-6 ✅ | **16 个 KB 形状**（7 个配置形状 + `KnowledgeCatalogPort` 及 7 个分面 + `KnowledgeBaseRowView`） | 消费方都是 knowledge + **initialization(L1)**，`initialization→knowledge` 是下级→上级，同级放行救不了。**推荐 ①：把 `initialization` 的 level 从 1 改成 3**（它是 `setup` 编排面，本就只调契约、不承载业务规则）。连带成本实测只有一处：`im→initialization.api.DocReaderParsePort`（2 个文件）会反过来变红——把 `DocReaderParsePort` 移到 `knowledge/api` 即可（im L2→L2 同级 api 合法，initialization L3→L2 合法）；`session(L3)→initialization(L3)` 同级 api 在新规则下合法。② 端口倒置不再可行：16 个形状里有 8 个是端口/视图类型，倒置会让 initialization 的端口签名反向引用 knowledge 的 api。③ 永驻 framework 会把 KB 业务词塞进底座（C8 红）。 |
 
 ## 6. 执行顺序与依赖
 
 ```
-WP1 删死（9）+ 回收表登记（24）─────────────┐
+WP1 复核：0 删除（9 个闭包随 D-6 走）───────┐
 WP2 单域（21）─────────────────────────────┤ 可并行，互不依赖
 WP3 引擎（24）─────────────────────────────┤
 WP5 framework 档（36，K10a/K10b/K16 + platform/storage 独立线）┘
 WP4-A 唯一 home（26）   ← 建议 WP1 之后（死代码干扰闭包）
 WP4-B 同级（18，其中 3 条已因同级放行转正） ← WP4-A 之后
-WP4-C PipelinePorts（11 接口 / 27 文件）    ← 独立，随时可做（建议靠后）
+WP4-C PipelinePorts（已拆，2026-11-21）     ← ✅
 WP6 收尾                ← 全部完成 + 拍板项落定
 ```
 
@@ -289,14 +282,14 @@ WP6 收尾                ← 全部完成 + 拍板项落定
 2. `mvn -B clean verify`（根 `pom.xml`，`backend/pom.xml` 不存在） 绿，测试条数 ≥ 开工基线。
 3. `bash scripts/run-guards.sh` 全绿（守卫条数以 `run` 行为准）。
 4. `check-package-cycles.py` 包级环 0 新增。
-5. 蓝图终态对齐：`backend/framework` = 技术底座 + 通用面（35）+ 拍板永驻词汇（~10±）；三引擎 `api` 齐备。
+5. 蓝图终态对齐：`backend/framework` = 技术底座 + 通用面（36）+ 拍板永驻词汇（~10±）；三引擎 `api` 齐备。
 6. **17 域 `api/` 覆盖**：现状 8 个域没有 `api/`（agentmanagement / datasource / favorite / im / mcp / model / session / vectorstore），本计划只新建 session、im 两个，**余 6 个须另立批次**——不写清楚，本条终态在本计划收尾时无法成立。
 
 ## 8. 坑清单（全部实测翻过车，执行前逐条对照）
 
 1. **mixin 不能乱搬**：framework 自身 mapper（`StreamJson`/`EventJson`/`LangfuseAttributes`）序列化对象图上的类型，其 mixin 必须留 framework（`TokenUsage`/`ResponseType` 实测红过）。判定：类型出现在这三个类的序列化路径上就留。
 2. **provider 文件只追加不重建**：`ModelJsonModule` 被整文件覆盖导致 `ChatMessage` 线格式失效。搬 mixin 前先看目标模块是否已有 provider。
-3. **闭包**：只要还有一个"留在原地"的引用者（含 shared 内同包简单名引用，FQN 匹配抓不到），类型就搬不走。搬前逐类型 `grep` + 看同包。
+3. **闭包**：只要还有一个"留在原地"的引用者（含 shared 内同包简单名引用，FQN 匹配抓不到），类型就搬不走。搬前逐类型 `grep` + 看同包。**判死同理**：外部 import 为零 ≠ 死——本轮 WP1 的 9 个候选全部是 `extends` 分面或被同包调用，五路扫描（简单名 / 同包 / 测试 / 反射 / SPI）之后归零。
 4. **新包必须 `package-info.java`**（D3 守卫红）。
 5. **spotless 每个受影响模块分别 apply**。
 6. **`@ConfigurationPropertiesScan` 精确包名单**（`app` 的启动类）：搬任何 `@ConfigurationProperties` 类先核对名单，移出即静默不绑定（无编译错无启动错，属性 null）。
@@ -317,4 +310,7 @@ WP6 收尾                ← 全部完成 + 拍板项落定
 | 批 | 日期 | 内容 | 验收数字（测试/守卫/金片） | 备注 |
 |---|---|---|---|---|
 | 基座 | 2026-11-21 | 守卫修复：port-map / contract-consumers / A20 重锚；R10 同级 api 放行；本文件 v2 重扫 + 补 §4.0 唯一归属总表（153 校验通过）+ WP4-C 接口映射 + WP6 批量手法 | 定向守卫 5 条绿 + 探针 2 条（同级 api 过 / 同级 service 红） | 全量 verify 未跑（定向：ArchitectureRulesTest 22/22 绿、50 个 run 行→脚本自计 49 守卫全绿），等开工基线 |
+| WP4-C | 2026-11-21 | 拆 `PipelinePorts`：11 接口 + 1 异常 + 3 record → 15 个顶层类型（端口加 `Port` 后缀）；30 个文件改 import；`shared/pipeline` 删除 | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 同步 `gen-port-map` 匿名实现识别、A20 实现方判定、两处 javadoc |
+| A（D-6 ①） | 2026-11-21 | `initialization` level 1→3；`DocReaderParsePort` 移到 `knowledge/api`；`check-capability-kinds` 判据对齐同级 api（`src_lv >= tgt_lv`） | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 10 个文件改 import；`initialization/api` 清空删除；三份生成物重生成 |
+| WP1 复核 | 2026-11-21 | 删除前五路扫描：9 个候选全是 shared 内闭包，**0 个可删**；计划 v3（dead 0 · multi 60 · D-6 扩到 16 个） | 无代码改动 | 坑 3 原样复现：FQN 口径看不见同包引用 |
 | 基线 | 2026-11-21 | 全量 `mvn -B clean verify` + 49 守卫 | **5256 / 0 / 2**（framework 268 · model-runtime 286〔跳 1〕· retrieval-engine 321〔跳 1〕· agent-engine 157 · app 4224）· 守卫 **49/49** · BUILD SUCCESS 5:23 | 基线提交 `698437956` |

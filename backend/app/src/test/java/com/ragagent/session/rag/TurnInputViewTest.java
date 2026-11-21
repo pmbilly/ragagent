@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.shared.model.LlmChatClient;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -20,7 +20,7 @@ class TurnInputViewTest {
         chatManage.setChatModelId("model-1");
         chatManage.setSummaryConfig(new SummaryConfig());
 
-        PipelinePorts.ModelService modelService = mock(PipelinePorts.ModelService.class);
+        ModelFactoryPort modelService = mock(ModelFactoryPort.class);
         LlmChatClient client = mock(LlmChatClient.class);
         when(modelService.getChatModel("model-1")).thenReturn(client);
 

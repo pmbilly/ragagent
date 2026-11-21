@@ -1,5 +1,6 @@
 package com.ragagent.session.rag.plugin;
 
+import com.ragagent.knowledge.api.ChunkQueryPort;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
@@ -8,7 +9,6 @@ import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.ImageInfoCollector;
 import com.ragagent.shared.knowledge.ChunkFacts;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.SearchResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -21,9 +21,9 @@ import java.util.Map;
  */
 final class MergeParentOps {
 
-    private final PipelinePorts.ChunkRepository chunkRepo;
+    private final ChunkQueryPort chunkRepo;
 
-    MergeParentOps(PipelinePorts.ChunkRepository chunkRepo) {
+    MergeParentOps(ChunkQueryPort chunkRepo) {
         this.chunkRepo = chunkRepo;
     }
 

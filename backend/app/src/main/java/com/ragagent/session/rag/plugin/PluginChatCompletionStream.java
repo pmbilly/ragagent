@@ -1,6 +1,7 @@
 package com.ragagent.session.rag.plugin;
 
 
+import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.modelcontext.StreamDecoder;
 import com.ragagent.platform.access.TenantContextSnapshot;
@@ -21,7 +22,6 @@ import com.ragagent.shared.model.ChatStream;
 import com.ragagent.shared.model.LlmChatClient;
 import com.ragagent.shared.model.ResponseType;
 import com.ragagent.shared.model.StreamResponse;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -50,9 +50,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public final class PluginChatCompletionStream implements Plugin {
 
-    private final PipelinePorts.ModelService modelService;
+    private final ModelFactoryPort modelService;
 
-    public PluginChatCompletionStream(PipelinePorts.ModelService modelService) {
+    public PluginChatCompletionStream(ModelFactoryPort modelService) {
         this.modelService = modelService;
     }
 

@@ -1,15 +1,17 @@
 package com.ragagent.session.rag.plugin;
 
 
+import com.ragagent.auth.api.TenantWebSearchConfigPort;
+import com.ragagent.knowledge.api.KnowledgeBaseQueryPort;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.SearchSupport;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.retrieval.SearchTarget;
+import com.ragagent.websearch.api.WebSearchRunPort;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,9 +37,9 @@ import java.util.concurrent.Executors;
  */
 public final class PluginSearch implements Plugin {
 
-    final PipelinePorts.KnowledgeBaseService knowledgeBaseService;
-    final PipelinePorts.WebSearch webSearchService;
-    final PipelinePorts.TenantService tenantService;
+    final KnowledgeBaseQueryPort knowledgeBaseService;
+    final WebSearchRunPort webSearchService;
+    final TenantWebSearchConfigPort tenantService;
 
     /** 查询扩展协作者。 */
     final PluginExpansionOps expansionOps;
@@ -45,9 +47,9 @@ public final class PluginSearch implements Plugin {
     /** 检索执行协作者。 */
     final PluginSearchOps searchOps;
 
-    public PluginSearch(PipelinePorts.KnowledgeBaseService knowledgeBaseService,
-                        PipelinePorts.WebSearch webSearchService,
-                        PipelinePorts.TenantService tenantService) {
+    public PluginSearch(KnowledgeBaseQueryPort knowledgeBaseService,
+                        WebSearchRunPort webSearchService,
+                        TenantWebSearchConfigPort tenantService) {
         this.knowledgeBaseService = knowledgeBaseService;
         this.webSearchService = webSearchService;
         this.tenantService = tenantService;

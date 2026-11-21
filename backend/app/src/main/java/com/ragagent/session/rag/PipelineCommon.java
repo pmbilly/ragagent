@@ -1,5 +1,6 @@
 package com.ragagent.session.rag;
 
+import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
@@ -8,10 +9,10 @@ import com.ragagent.platform.prompt.PromptComposer;
 import com.ragagent.session.dto.PipelineMessageImageView;
 import com.ragagent.session.dto.PipelineMessageView;
 import com.ragagent.session.rag.plugin.PluginError;
+import com.ragagent.shared.error.PipelinePortException;
 import com.ragagent.shared.model.ChatMessage;
 import com.ragagent.shared.model.ChatOptions;
 import com.ragagent.shared.model.LlmChatClient;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.SearchTarget;
 import com.ragagent.shared.session.PipelineMessageAttachmentView;
 import java.util.ArrayList;
@@ -62,11 +63,11 @@ public final class PipelineCommon {
     public record PreparedChatModel(LlmChatClient chatModel, ChatOptions options) {}
 
     /** 取 chat 模型并从 SummaryConfig 组 ChatOptions。失败抛异常。 */
-    public static PreparedChatModel prepareChatModel(PipelinePorts.ModelService modelService,
+    public static PreparedChatModel prepareChatModel(ModelFactoryPort modelService,
                                                      TurnInputView input) {
         LlmChatClient chatModel = modelService.getChatModel(input.getChatModelId());
         if (chatModel == null) {
-            throw new PipelinePorts.PipelinePortException(
+            throw new PipelinePortException(
                     "chat model " + input.getChatModelId() + " not found");
         }
         ChatOptions opt = new ChatOptions();

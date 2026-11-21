@@ -1,6 +1,7 @@
 package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.knowledge.api.ChunkQueryPort;
 import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 import com.ragagent.platform.web.JsonMappers;
@@ -18,7 +19,6 @@ import com.ragagent.session.rag.support.SearchSupport;
 import com.ragagent.shared.knowledge.ChunkFacts;
 import com.ragagent.shared.knowledge.FaqChunkMetadata;
 import com.ragagent.shared.knowledge.SearchChunkMerge;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.SearchResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -39,10 +39,10 @@ import java.util.Map;
  */
 public final class PluginMerge implements Plugin {
 
-    final PipelinePorts.ChunkRepository chunkRepo;
+    final ChunkQueryPort chunkRepo;
     final MergeParentOps parentOps;
 
-    public PluginMerge(PipelinePorts.ChunkRepository chunkRepo) {
+    public PluginMerge(ChunkQueryPort chunkRepo) {
         this.chunkRepo = chunkRepo;
         this.parentOps = new MergeParentOps(chunkRepo);
     }

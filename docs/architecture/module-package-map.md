@@ -9,34 +9,34 @@
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
 | `:contract` |  | 0 | 0 | 0 |
-| `:platform` | `platform`、`shared` | 58 | 413 | 1 |
-| `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 22 | 180 | 0 |
+| `:platform` | `platform`、`shared` | 57 | 412 | 1 |
+| `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 22 | 181 | 0 |
 | `:retrieval-engine` | `retrieval` | 17 | 131 | 0 |
 | `:agent-engine` | `agent`、`agentengine` | 11 | 101 | 0 |
-| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch` | 267 | 1756 | 51 |
+| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch` | 266 | 1768 | 51 |
 
 ## 18 个业务域（domains）
 
 | 域 | 主码包 | 文件 | 控制器 |
 |---|---|---:|---:|
 | `agentmanagement` | `com.ragagent.agentmanagement` | 27 | 2 |
-| `agenttools` | `com.ragagent.agenttools` | 61 | 0 |
+| `agenttools` | `com.ragagent.agenttools` | 66 | 0 |
 | `audit` | `com.ragagent.audit` | 22 | 1 |
-| `auth` | `com.ragagent.auth` | 151 | 8 |
+| `auth` | `com.ragagent.auth` | 152 | 8 |
 | `config` | `com.ragagent.config` | 25 | 0 |
 | `datasource` | `com.ragagent.datasource` | 147 | 2 |
 | `embedchannel` | `com.ragagent.embedchannel` | 27 | 1 |
 | `favorite` | `com.ragagent.favorite` | 13 | 1 |
 | `im` | `com.ragagent.im` | 107 | 2 |
-| `initialization` | `com.ragagent.initialization` | 13 | 1 |
-| `knowledge` | `com.ragagent.knowledge` | 495 | 9 |
+| `initialization` | `com.ragagent.initialization` | 11 | 1 |
+| `knowledge` | `com.ragagent.knowledge` | 501 | 9 |
 | `mcp` | `com.ragagent.mcp` | 171 | 4 |
-| `memory` | `com.ragagent.memory` | 96 | 1 |
+| `memory` | `com.ragagent.memory` | 97 | 1 |
 | `model` | `com.ragagent.model` | 38 | 4 |
 | `session` | `com.ragagent.session` | 212 | 8 |
 | `storage` | `com.ragagent.storage` | 67 | 3 |
 | `vectorstore` | `com.ragagent.vectorstore` | 20 | 1 |
-| `websearch` | `com.ragagent.websearch` | 62 | 3 |
+| `websearch` | `com.ragagent.websearch` | 63 | 3 |
 
 ## 查找规则
 
@@ -62,5 +62,5 @@
 
 ## 相关
 
-- [`packages.md`](packages.md)：375 份 `package-info` 的包级职责索引。
+- [`packages.md`](packages.md)：373 份 `package-info` 的包级职责索引。
 - [`overview.md`](overview.md)：模块依赖图、设计原则、代码在哪。

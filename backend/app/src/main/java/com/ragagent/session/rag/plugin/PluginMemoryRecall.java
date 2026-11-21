@@ -2,6 +2,7 @@ package com.ragagent.session.rag.plugin;
 
 
 
+import com.ragagent.memory.api.MemoryQueryPort;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.retrieval.api.RetrievalObsRows;
 import com.ragagent.session.dto.MemoryRecalledData;
@@ -13,7 +14,6 @@ import com.ragagent.session.rag.support.MemoryUsedMemories;
 import com.ragagent.shared.event.Event;
 import com.ragagent.shared.event.EventBusInterface;
 import com.ragagent.shared.memory.MemoryItemView;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,9 +26,9 @@ import java.util.Map;
  */
 public final class PluginMemoryRecall implements Plugin {
 
-    private final PipelinePorts.MemoryService memoryService;
+    private final MemoryQueryPort memoryService;
 
-    public PluginMemoryRecall(PipelinePorts.MemoryService memoryService) {
+    public PluginMemoryRecall(MemoryQueryPort memoryService) {
         this.memoryService = memoryService;
     }
 

@@ -66,7 +66,7 @@
     "initialization": {
       "kind": "setup",
       "frontend": "views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue",
-      "level": 1
+      "level": 3
     },
     "knowledge": {
       "kind": "product",

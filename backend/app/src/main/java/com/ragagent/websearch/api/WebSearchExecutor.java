@@ -11,7 +11,7 @@ import java.util.List;
  * 域内细节）不进签名——请求到执行配置的转换留在 websearch 域。</p>
  *
  * <p><b>实现</b>：websearch 域适配器同时实现本口与管线的
- * {@code PipelinePorts.WebSearch}（后者入参是 L1 租户配置），两个工具/管线面同源；
+ * {@code WebSearchRunPort}（后者入参是 L1 租户配置），两个工具/管线面同源；
  * 失败语义与域实现一致（工具侧折叠为 success=false）。装配按类型注入。</p>
  */
 public interface WebSearchExecutor {

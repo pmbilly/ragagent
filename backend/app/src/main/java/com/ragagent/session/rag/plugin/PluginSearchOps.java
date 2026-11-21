@@ -1,19 +1,22 @@
 package com.ragagent.session.rag.plugin;
 
 
+import com.ragagent.auth.api.TenantWebSearchConfigPort;
+import com.ragagent.knowledge.api.KnowledgeBaseQueryPort;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.platform.access.TenantScope;
 import com.ragagent.retrieval.api.WebResultConverter;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.runtime.SessionTrace;
+import com.ragagent.shared.error.PipelinePortException;
 import com.ragagent.shared.knowledge.KnowledgeBaseView;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import com.ragagent.shared.retrieval.SearchParams;
 import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.shared.retrieval.SearchTarget;
 import com.ragagent.shared.tenant.WebSearchConfig;
 import com.ragagent.shared.websearch.WebSearchResult;
+import com.ragagent.websearch.api.WebSearchRunPort;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,13 +32,13 @@ import java.util.concurrent.Executors;
  */
 final class PluginSearchOps {
 
-    private final PipelinePorts.KnowledgeBaseService knowledgeBaseService;
-    private final PipelinePorts.TenantService tenantService;
-    private final PipelinePorts.WebSearch webSearchService;
+    private final KnowledgeBaseQueryPort knowledgeBaseService;
+    private final TenantWebSearchConfigPort tenantService;
+    private final WebSearchRunPort webSearchService;
 
-    PluginSearchOps(PipelinePorts.KnowledgeBaseService knowledgeBaseService,
-                    PipelinePorts.TenantService tenantService,
-                    PipelinePorts.WebSearch webSearchService) {
+    PluginSearchOps(KnowledgeBaseQueryPort knowledgeBaseService,
+                    TenantWebSearchConfigPort tenantService,
+                    WebSearchRunPort webSearchService) {
         this.knowledgeBaseService = knowledgeBaseService;
         this.tenantService = tenantService;
         this.webSearchService = webSearchService;
@@ -119,7 +122,7 @@ final class PluginSearchOps {
         sf.put("total_hits", results.size());
         PipelineLog.info("Search", "kb_result_summary", sf);
         if (firstErr[0] != null) {
-            throw new PipelinePorts.PipelinePortException(firstErr[0].getMessage(), firstErr[0]);
+            throw new PipelinePortException(firstErr[0].getMessage(), firstErr[0]);
         }
         return results;
     }

@@ -2,6 +2,8 @@ package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.llm.api.ModelFactoryPort;
+import com.ragagent.memory.api.MemoryQueryPort;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.platform.prompt.PipelineConfig;
@@ -18,7 +20,6 @@ import com.ragagent.shared.model.ChatMessage;
 import com.ragagent.shared.model.ChatOptions;
 import com.ragagent.shared.model.ChatResponse;
 import com.ragagent.shared.model.LlmChatClient;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,14 +48,14 @@ public final class PluginQueryUnderstand implements Plugin {
 
     private static final ObjectMapper JSON = JsonMappers.lenient();
 
-    private final PipelinePorts.ModelService modelService;
+    private final ModelFactoryPort modelService;
     private final PipelineMessageStore messageService;
-    private final PipelinePorts.MemoryService memoryService;
+    private final MemoryQueryPort memoryService;
     private final PipelineConfig config;
 
-    public PluginQueryUnderstand(PipelinePorts.ModelService modelService,
+    public PluginQueryUnderstand(ModelFactoryPort modelService,
                                  PipelineMessageStore messageService,
-                                 PipelinePorts.MemoryService memoryService,
+                                 MemoryQueryPort memoryService,
                                  PipelineConfig config) {
         this.modelService = modelService;
         this.messageService = messageService;

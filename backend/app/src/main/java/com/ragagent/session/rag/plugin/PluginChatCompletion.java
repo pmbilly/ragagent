@@ -1,5 +1,6 @@
 package com.ragagent.session.rag.plugin;
 
+import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
@@ -8,7 +9,6 @@ import com.ragagent.session.rag.support.ReferencesSupport;
 import com.ragagent.shared.model.ChatOptions;
 import com.ragagent.shared.model.ChatResponse;
 import com.ragagent.shared.model.LlmChatClient;
-import com.ragagent.shared.pipeline.PipelinePorts;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -21,9 +21,9 @@ import java.util.Map;
  */
 public final class PluginChatCompletion implements Plugin {
 
-    private final PipelinePorts.ModelService modelService;
+    private final ModelFactoryPort modelService;
 
-    public PluginChatCompletion(PipelinePorts.ModelService modelService) {
+    public PluginChatCompletion(ModelFactoryPort modelService) {
         this.modelService = modelService;
     }
 

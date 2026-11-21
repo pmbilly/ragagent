@@ -1005,7 +1005,9 @@ class ArchitectureRulesTest {
         Set<String> implemented = new TreeSet<>();
         Set<String> duplicated = new TreeSet<>();
         for (JavaClass clazz : MAIN) {
-            if (clazz.isInterface() || !clazz.isTopLevelClass()) {
+            // 只排除接口本身：实现方允许是装配点的匿名类（`new XxxPort() { ... }`），
+            // 这类实现不在顶层类里，按顶层过滤会把它误判成"契约悬空"。
+            if (clazz.isInterface()) {
                 continue;
             }
             clazz.getAllRawInterfaces().stream()
