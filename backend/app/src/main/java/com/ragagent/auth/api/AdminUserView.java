@@ -1,5 +1,6 @@
-package com.ragagent.shared.auth;
+package com.ragagent.auth.api;
 
+import com.ragagent.shared.auth.UserPreferences;
 import java.time.OffsetDateTime;
 
 

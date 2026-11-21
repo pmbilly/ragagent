@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
+import com.ragagent.knowledge.api.WikiKnowledgeFinalizer;
 import com.ragagent.knowledge.wiki.domain.TaskDeadLetter;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestPayload;
@@ -7,7 +8,6 @@ import com.ragagent.knowledge.wiki.domain.ingest.WikiPendingOp;
 import com.ragagent.knowledge.wiki.repository.TaskDeadLetterRepository;
 import com.ragagent.knowledge.wiki.repository.TaskPendingOpsRepository;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiCleanupScope;
-import com.ragagent.shared.wiki.WikiKnowledgeFinalizer;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package com.ragagent.shared.settings;
+package com.ragagent.auth.api;
 
 /**
  * 系统设置的**只读端口**（跨域读取系统设置的最小接口）。

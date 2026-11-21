@@ -1,6 +1,8 @@
 package com.ragagent.auth.apikey.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.auth.api.TenantAPIKeyCreateResponse;
+import com.ragagent.auth.api.TenantAPIKeyResponse;
 import com.ragagent.auth.apikey.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.dto.TenantAPIKeyProjections;
 import com.ragagent.auth.apikey.dto.TenantAPIKeyRequest;
@@ -10,8 +12,6 @@ import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonBodyErrors;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.apikey.TenantAPIKeyCreateResponse;
-import com.ragagent.shared.apikey.TenantAPIKeyResponse;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
 import com.ragagent.shared.knowledge.KnowledgeBaseFacts;

@@ -1,10 +1,10 @@
 package com.ragagent.auth.apikey.service;
 
+import com.ragagent.auth.api.TenantAPIKeyCreateResponse;
+import com.ragagent.auth.api.TenantAPIKeyResponse;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.auth.apikey.dto.TenantAPIKeyProjections;
 import com.ragagent.shared.apikey.APIKeyScopeType;
-import com.ragagent.shared.apikey.TenantAPIKeyCreateResponse;
-import com.ragagent.shared.apikey.TenantAPIKeyResponse;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;

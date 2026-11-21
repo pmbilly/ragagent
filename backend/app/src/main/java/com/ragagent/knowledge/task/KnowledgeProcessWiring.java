@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.knowledge.api.WikiIngestPort;
+import com.ragagent.knowledge.api.WikiKnowledgeFinalizer;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.config.KnowledgeOcrProperties;
 import com.ragagent.knowledge.domain.span.SpanTracker;
@@ -18,8 +20,6 @@ import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.retrieval.api.VectorIndexStore;
 import com.ragagent.shared.retrieval.RetrieveGraphRepository;
-import com.ragagent.shared.wiki.WikiIngestPort;
-import com.ragagent.shared.wiki.WikiKnowledgeFinalizer;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;

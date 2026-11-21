@@ -1,6 +1,9 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.knowledge.api.WikiEnqueueResult;
+import com.ragagent.knowledge.api.WikiIngestPort;
+import com.ragagent.knowledge.api.WikiKnowledgeFinalizer;
 import com.ragagent.knowledge.wiki.domain.TaskPendingOp;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiFinalizeChange;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestConstants;
@@ -31,9 +34,6 @@ import com.ragagent.shared.knowledge.KnowledgeBaseLookup;
 import com.ragagent.shared.model.LlmChatClient;
 import com.ragagent.shared.wiki.ExtractedItem;
 import com.ragagent.shared.wiki.SlugUpdate;
-import com.ragagent.shared.wiki.WikiEnqueueResult;
-import com.ragagent.shared.wiki.WikiIngestPort;
-import com.ragagent.shared.wiki.WikiKnowledgeFinalizer;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

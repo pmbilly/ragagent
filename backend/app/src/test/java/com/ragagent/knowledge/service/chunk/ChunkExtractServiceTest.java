@@ -16,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.knowledge.api.WikiKnowledgeFinalizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -36,7 +37,6 @@ import com.ragagent.shared.model.ChatResponse;
 import com.ragagent.shared.model.ChatStream;
 import com.ragagent.shared.model.LlmChatClient;
 import com.ragagent.shared.retrieval.RetrieveGraphRepository;
-import com.ragagent.shared.wiki.WikiKnowledgeFinalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

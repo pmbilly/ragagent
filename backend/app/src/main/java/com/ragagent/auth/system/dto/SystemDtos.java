@@ -1,6 +1,6 @@
 package com.ragagent.auth.system.dto;
 
-import com.ragagent.shared.auth.AdminUserView;
+import com.ragagent.auth.api.AdminUserView;
 import com.ragagent.shared.auth.UserPreferences;
 import com.ragagent.shared.settings.DocReaderAdminPort;
 import java.time.OffsetDateTime;

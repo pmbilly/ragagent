@@ -1,4 +1,4 @@
-package com.ragagent.shared.knowledge;
+package com.ragagent.knowledge.api;
 
 import java.time.OffsetDateTime;
 

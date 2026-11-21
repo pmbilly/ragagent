@@ -2,6 +2,7 @@ package com.ragagent.knowledge.service.chunk;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.knowledge.api.WikiKnowledgeFinalizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkExtractConsumer;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
@@ -29,7 +30,6 @@ import com.ragagent.shared.graph.GraphRelation;
 import com.ragagent.shared.graph.NameSpace;
 import com.ragagent.shared.model.LlmChatClient;
 import com.ragagent.shared.retrieval.RetrieveGraphRepository;
-import com.ragagent.shared.wiki.WikiKnowledgeFinalizer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

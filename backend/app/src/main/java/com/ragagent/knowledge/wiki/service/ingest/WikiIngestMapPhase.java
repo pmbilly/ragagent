@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
+import com.ragagent.knowledge.api.WikiImageMarkup;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestPayload;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiPendingOp;
@@ -15,7 +16,6 @@ import com.ragagent.shared.knowledge.KnowledgeView;
 import com.ragagent.shared.model.LlmChatClient;
 import com.ragagent.shared.wiki.ExtractedItem;
 import com.ragagent.shared.wiki.SlugUpdate;
-import com.ragagent.shared.wiki.WikiImageMarkup;
 import com.ragagent.shared.wiki.WikiLanguageSupport;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

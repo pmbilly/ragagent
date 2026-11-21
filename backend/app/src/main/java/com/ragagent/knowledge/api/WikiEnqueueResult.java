@@ -1,4 +1,4 @@
-package com.ragagent.shared.wiki;
+package com.ragagent.knowledge.api;
 
 /**
  * Wiki 摄取入队结果：{@code accepted=false} 时 {@code error} 说明原因（调用方据此决定是否记日志）。

@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
+import com.ragagent.knowledge.api.WikiEnqueueResult;
 import com.ragagent.knowledge.wiki.domain.TaskPendingOp;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiFinalizeChange;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiFinalizeRow;
@@ -12,7 +13,6 @@ import com.ragagent.knowledge.wiki.repository.TaskPendingOpsRepository;
 import com.ragagent.knowledge.wiki.repository.ingest.WikiIngestTaskQueue;
 import com.ragagent.platform.tracing.TraceInjector;
 import com.ragagent.shared.text.Whitespace;
-import com.ragagent.shared.wiki.WikiEnqueueResult;
 import com.ragagent.shared.wiki.WikiLanguageSupport;
 import java.time.Duration;
 import java.util.ArrayList;

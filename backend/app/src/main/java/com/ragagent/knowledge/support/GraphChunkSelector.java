@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.support;
 
+import com.ragagent.knowledge.api.WikiImageMarkup;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.retrieval.api.ChunkTypes;
-import com.ragagent.shared.wiki.WikiImageMarkup;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

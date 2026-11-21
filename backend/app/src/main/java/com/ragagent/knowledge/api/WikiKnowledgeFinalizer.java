@@ -1,4 +1,4 @@
-package com.ragagent.shared.wiki;
+package com.ragagent.knowledge.api;
 
 /**
  * 知识文档的「wiki 子任务已终结」记账端口。

@@ -1,4 +1,7 @@
-package com.ragagent.shared.apikey;
+package com.ragagent.auth.api;
+
+import java.time.OffsetDateTime;
+import java.util.List;
 
 
 /**
@@ -16,11 +19,11 @@ public record TenantAPIKeyCreateResponse(
         String name,
         String apiKey,
         boolean fullAccess,
-        java.util.List<String> knowledgeBaseIds,
-        java.util.List<String> capabilities,
-        java.time.OffsetDateTime lastUsedAt,
-        java.time.OffsetDateTime expiresAt,
-        java.time.OffsetDateTime createdAt,
+        List<String> knowledgeBaseIds,
+        List<String> capabilities,
+        OffsetDateTime lastUsedAt,
+        OffsetDateTime expiresAt,
+        OffsetDateTime createdAt,
         String token) {
 
     /** 值构造：投影字段 + Token。 */

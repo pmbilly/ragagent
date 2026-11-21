@@ -1,7 +1,8 @@
-package com.ragagent.shared.wiki;
+package com.ragagent.knowledge.api;
 
 import com.ragagent.shared.text.Whitespace;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,7 +107,7 @@ public final class WikiImageMarkup {
         Map<String, String> tokenToUrl = new LinkedHashMap<>();
 
         List<String> keys = new ArrayList<>(data.keySet());
-        java.util.Collections.sort(keys);
+        Collections.sort(keys);
 
         for (String key : keys) {
             // null 值按 "" 归一

@@ -1,6 +1,7 @@
 package com.ragagent.knowledge.service.enrichment;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.knowledge.api.WikiImageMarkup;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -27,7 +28,6 @@ import com.ragagent.shared.model.ChatMessage;
 import com.ragagent.shared.model.ChatOptions;
 import com.ragagent.shared.model.ChatResponse;
 import com.ragagent.shared.model.LlmChatClient;
-import com.ragagent.shared.wiki.WikiImageMarkup;
 import com.ragagent.shared.wiki.WikiLanguageSupport;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

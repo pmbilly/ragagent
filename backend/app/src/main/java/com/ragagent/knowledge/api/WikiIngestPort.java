@@ -1,4 +1,4 @@
-package com.ragagent.shared.wiki;
+package com.ragagent.knowledge.api;
 
 /**
  * Wiki · 摄取入队端口（knowledge 入库收尾时触发）。

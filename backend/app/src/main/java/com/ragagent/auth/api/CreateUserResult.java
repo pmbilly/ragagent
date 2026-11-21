@@ -1,4 +1,4 @@
-package com.ragagent.shared.auth;
+package com.ragagent.auth.api;
 
 /** 建用户结果：新建成（带生成密码）或身份已存在（幂等）。 */
 public sealed interface CreateUserResult {

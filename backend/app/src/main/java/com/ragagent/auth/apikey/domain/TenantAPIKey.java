@@ -39,7 +39,7 @@ import java.util.List;
  *
  * <p><b>JSON 契约</b>：本实体**不是**响应体——四个 api-keys 端点都经
  * {@code tenantAPIKeyForResponse} 投影到
- * {@link com.ragagent.shared.apikey.TenantAPIKeyResponse}。字段命名对齐响应契约（camelCase），
+ * {@link com.ragagent.auth.api.TenantAPIKeyResponse}。字段命名对齐响应契约（camelCase），
  * 且 {@code key_hash} 必须双向忽略（不进 JSON）。</p>
  */
 @TableName(value = "tenant_api_keys", autoResultMap = true)

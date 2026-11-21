@@ -1,6 +1,7 @@
 package com.ragagent.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.auth.api.SystemSettingGateway;
 import com.ragagent.auth.apikey.service.ApiKeyAdminAdapter;
 import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.auth.service.TenantMemberService;
@@ -10,7 +11,6 @@ import com.ragagent.platform.config.TenantProperties;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.platform.web.ApiResult;
-import com.ragagent.shared.settings.SystemSettingGateway;
 import com.ragagent.shared.tenant.KnowledgeBaseProvisioner;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
