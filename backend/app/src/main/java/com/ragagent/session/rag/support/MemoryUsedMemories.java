@@ -1,7 +1,7 @@
 package com.ragagent.session.rag.support;
 
+import com.ragagent.framework.html.ListMerges;
 import com.ragagent.memory.api.MemoryItemView;
-import com.ragagent.platform.text.ListMerges;
 import com.ragagent.session.dto.PipelineUsedMemoryView;
 import java.util.ArrayList;
 import java.util.List;

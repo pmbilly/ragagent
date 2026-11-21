@@ -1,9 +1,9 @@
 package com.ragagent.auth.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.security.CryptoService;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.tenant.APIPrincipalConfig;
+import com.ragagent.framework.security.CryptoService;
+import com.ragagent.framework.shared.tenant.APIPrincipalConfig;
+import com.ragagent.framework.web.JsonMappers;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

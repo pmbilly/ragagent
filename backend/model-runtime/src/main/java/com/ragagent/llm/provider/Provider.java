@@ -4,7 +4,7 @@ package com.ragagent.llm.provider;
 /**
  * 服务商接口：元数据 + 配置校验。
  *
- * 校验失败抛 {@link com.ragagent.shared.error.BizException}。保存模型时由
+ * 校验失败抛 {@link com.ragagent.framework.error.BizException}。保存模型时由
  * {@code ModelConfigValidator} 统一调用（只做结构校验，不联网）。
  */
 public interface Provider {
@@ -15,7 +15,7 @@ public interface Provider {
     /**
      * 校验服务商配置。
      *
-     * @throws com.ragagent.shared.error.BizException 校验失败
+     * @throws com.ragagent.framework.error.BizException 校验失败
      */
     void validateConfig(Config config);
 }

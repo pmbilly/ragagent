@@ -1,6 +1,6 @@
 package com.ragagent.mcp.oauth.model;
 
-import com.ragagent.platform.access.TenantContext;
+import com.ragagent.framework.access.TenantContext;
 
 /**
  * 一次进行中的 OAuth 授权码流程所需的全部临时数据。

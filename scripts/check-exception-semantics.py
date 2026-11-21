@@ -38,7 +38,7 @@ BOUNDARY_SEGMENTS = ('/controller/', '/api/', '/task/', '/channel/', '/client/',
 
 # ── 规则三：Jackson 空体文案只许出现在收敛点 ─────────────────────────────────
 BODY_ERROR_LITERAL = '"No content to map due to end-of-input"'
-BODY_ERROR_OWNER = 'backend/framework/src/main/java/com/ragagent/platform/web/JsonBodyErrors.java'
+BODY_ERROR_OWNER = 'backend/framework/src/main/java/com/ragagent/framework/web/JsonBodyErrors.java'
 
 CATCH_HEAD = re.compile(r'\bcatch\s*\(\s*(?:final\s+)?([A-Za-z0-9_.]*)\s*[A-Za-z0-9_]*\s*\)\s*\{')
 

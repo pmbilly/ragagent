@@ -1,7 +1,7 @@
 package com.ragagent.auth.system.service;
 
 import com.ragagent.auth.system.dto.SystemDtos;
-import com.ragagent.platform.config.DeploymentProperties;
+import com.ragagent.framework.config.DeploymentProperties;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.beans.factory.ObjectProvider;

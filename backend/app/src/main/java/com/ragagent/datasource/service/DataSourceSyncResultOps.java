@@ -9,7 +9,7 @@ import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.SyncResult;
 import com.ragagent.datasource.repository.DataSourceRepository;
 import com.ragagent.datasource.repository.SyncLogRepository;
-import com.ragagent.shared.audit.AuditAction;
+import com.ragagent.framework.shared.audit.AuditAction;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;

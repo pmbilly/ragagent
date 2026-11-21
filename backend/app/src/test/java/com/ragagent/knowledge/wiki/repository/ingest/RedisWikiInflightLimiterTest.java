@@ -3,8 +3,8 @@ package com.ragagent.knowledge.wiki.repository.ingest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import com.ragagent.framework.stream.EmbeddedRedis;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestConstants;
-import com.ragagent.platform.stream.EmbeddedRedis;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -6,7 +6,7 @@ import com.ragagent.datasource.dto.DataSourceOwnership;
 import com.ragagent.datasource.dto.DataSourceResponse;
 import com.ragagent.datasource.dto.ResourceResponse;
 import com.ragagent.datasource.dto.SyncLogResponse;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.web.JsonMappers;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;

@@ -1,9 +1,9 @@
 package com.ragagent.memory.domain;
 
-import com.ragagent.platform.security.Hashes;
-import com.ragagent.platform.text.ListMerges;
-import com.ragagent.shared.memory.MemoryKeys;
-import com.ragagent.shared.memory.MemoryKinds;
+import com.ragagent.framework.html.ListMerges;
+import com.ragagent.framework.security.Hashes;
+import com.ragagent.framework.shared.memory.MemoryKeys;
+import com.ragagent.framework.shared.memory.MemoryKinds;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;

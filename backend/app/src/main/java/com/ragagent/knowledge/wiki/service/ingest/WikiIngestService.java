@@ -1,6 +1,8 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.shared.knowledge.ChunkView;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.WikiEnqueueResult;
 import com.ragagent.knowledge.api.WikiIngestPort;
 import com.ragagent.knowledge.api.WikiKnowledgeFinalizer;
@@ -32,8 +34,6 @@ import com.ragagent.knowledge.wiki.service.ingest.support.WikiDedupSupport;
 import com.ragagent.knowledge.wiki.service.page.WikiCrossLinker;
 import com.ragagent.knowledge.wiki.service.page.WikiPageService;
 import com.ragagent.llm.api.LlmChatClient;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.knowledge.ChunkView;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

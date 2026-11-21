@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.wiki.adapter;
 
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.wiki.api.WikiIndex;
 import com.ragagent.knowledge.wiki.api.WikiLinkRepairResult;
 import com.ragagent.knowledge.wiki.api.WikiPageIssueView;
@@ -9,7 +10,6 @@ import com.ragagent.knowledge.wiki.domain.WikiPage;
 import com.ragagent.knowledge.wiki.domain.WikiPageIssue;
 import com.ragagent.knowledge.wiki.service.page.WikiEditContext;
 import com.ragagent.knowledge.wiki.service.page.WikiPageService;
-import com.ragagent.platform.web.JsonMappers;
 import java.util.List;
 import org.springframework.stereotype.Component;
 

@@ -9,7 +9,7 @@ import com.ragagent.audit.api.AuditOutcome;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.repository.AuditLogRepository;
-import com.ragagent.shared.audit.AuditAction;
+import com.ragagent.framework.shared.audit.AuditAction;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

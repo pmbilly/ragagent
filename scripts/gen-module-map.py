@@ -16,7 +16,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "docs" / "architecture" / "module-package-map.md"
 MODULES = [
     ("backend/contract", ":contract"),
-    ("backend/framework", ":platform"),
+    ("backend/framework", ":framework"),
     ("backend/model-runtime", ":model-runtime"),
     ("backend/retrieval-engine", ":retrieval-engine"),
     ("backend/agent-engine", ":agent-engine"),
@@ -101,7 +101,7 @@ def render() -> str:
         "",
         "## 查找规则",
         "",
-        "1. **先看包根**：`com.ragagent.contract.*` → `:contract`；`platform` → `:platform`；",
+        "1. **先看包根**：`com.ragagent.contract.*` → `:contract`；`platform` → `:framework`；",
         "   `agent` → `:agent-engine`；`retrieval` → `:retrieval-engine`；",
         "   `embedding` / `llm` / `modelcontext` / `modelruntime` / `rerank` → `:model-runtime`；",
         f"   其余 {len(domains)} 个包根 → `:domains`；`com.ragagent.config` 与根包 → `:boot`。",

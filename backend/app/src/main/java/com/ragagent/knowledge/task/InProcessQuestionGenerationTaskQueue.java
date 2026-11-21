@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.framework.task.InProcessTaskQueue;
+import com.ragagent.framework.task.RetryPolicy;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.knowledge.domain.QuestionGenerationConsumer;
-import com.ragagent.platform.task.InProcessTaskQueue;
-import com.ragagent.platform.task.RetryPolicy;
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Component;
 

@@ -3,13 +3,13 @@ package com.ragagent.knowledge.wiki.service.ingest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.shared.wiki.WikiLanguageSupport;
+import com.ragagent.framework.text.Whitespace;
 import com.ragagent.knowledge.wiki.domain.TaskPendingOp;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiPendingOp;
 import com.ragagent.knowledge.wiki.prompt.WikiPromptTemplate;
 import com.ragagent.knowledge.wiki.prompt.WikiPrompts;
-import com.ragagent.shared.text.Whitespace;
-import com.ragagent.shared.wiki.WikiLanguageSupport;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;

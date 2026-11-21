@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 import java.util.Map;
 

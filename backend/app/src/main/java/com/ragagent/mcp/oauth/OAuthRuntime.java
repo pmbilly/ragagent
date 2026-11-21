@@ -1,5 +1,6 @@
 package com.ragagent.mcp.oauth;
 
+import com.ragagent.framework.access.TenantContext;
 import com.ragagent.mcp.domain.McpOAuthToken;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.oauth.error.OAuthError;
@@ -11,7 +12,6 @@ import com.ragagent.mcp.oauth.store.OAuthRepository;
 import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.mcp.protocol.McpOAuthRuntime;
-import com.ragagent.platform.access.TenantContext;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;

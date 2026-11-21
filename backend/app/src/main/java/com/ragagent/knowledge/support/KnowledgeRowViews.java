@@ -1,10 +1,10 @@
 package com.ragagent.knowledge.support;
 
+import com.ragagent.framework.pagination.PageResult;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
 import com.ragagent.knowledge.api.kb.KnowledgePageView;
 import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.pagination.PageResult;
 import java.util.ArrayList;
 import java.util.List;
 

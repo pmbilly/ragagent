@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.shared.agent.AgentStep;
-import com.ragagent.shared.agent.AgentToolCall;
-import com.ragagent.shared.agent.ToolCallTarget;
-import com.ragagent.shared.tool.ToolResult;
+import com.ragagent.framework.shared.agent.AgentStep;
+import com.ragagent.framework.shared.agent.AgentToolCall;
+import com.ragagent.framework.shared.agent.ToolCallTarget;
+import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;

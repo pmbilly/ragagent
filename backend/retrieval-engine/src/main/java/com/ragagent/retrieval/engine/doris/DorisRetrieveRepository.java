@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.engine.doris;
 
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.retrieval.api.IndexConfig;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import com.ragagent.retrieval.engine.EngineTypes;

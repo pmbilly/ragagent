@@ -10,13 +10,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.ragagent.RagAgentApplication;
-import com.ragagent.platform.config.AppEnvLookup;
-import com.ragagent.platform.security.CryptoService;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.storage.config.StorageRuntimeEnv;
-import com.ragagent.platform.storage.config.UploadLimits;
+import com.ragagent.framework.config.AppEnvLookup;
+import com.ragagent.framework.security.CryptoService;
+import com.ragagent.framework.security.SsrfGuard;
+import com.ragagent.framework.shared.wiki.WikiLanguageSupport;
+import com.ragagent.framework.storage.config.StorageRuntimeEnv;
+import com.ragagent.framework.storage.config.UploadLimits;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
-import com.ragagent.shared.wiki.WikiLanguageSupport;
 import com.ragagent.storage.api.StorageEnvLookup;
 import com.tngtech.archunit.core.domain.Dependency;
 import com.tngtech.archunit.core.domain.JavaAnnotation;
@@ -309,7 +309,7 @@ class ArchitectureRulesTest {
      * detectPostgres 八处复制清零，相应白名单条目随之摘除）。</p>
      */
     private static final Map<String, String> JDBC_BASELINE = Map.ofEntries(
-            Map.entry("com.ragagent.platform.persistence.DatabaseDialects", "方言探测（收敛点）"),
+            Map.entry("com.ragagent.framework.persistence.DatabaseDialects", "方言探测（收敛点）"),
             Map.entry("com.ragagent.config.StartupTaskRecovery", "启动期任务修复（同步日志面）"),
             Map.entry("com.ragagent.knowledge.recovery.KnowledgeStartupRecovery", "启动恢复（知识/摘要复位，自 boot 下沉）"),
             Map.entry("com.ragagent.agent.skills.SkillCatalogService", "PG 专有 SQL（技能目录）"),
@@ -646,10 +646,10 @@ class ArchitectureRulesTest {
      * 没注册 JSR-310、又开着严格模式，与 §2-12「宽松读统一策略」正好相反。</p>
      */
     private static final Set<String> SELF_MADE_MAPPER_BASELINE = Set.of(
-            "com.ragagent.platform.web.JsonMappers",
-            "com.ragagent.platform.tracing.langfuse.LangfuseAttributes",
+            "com.ragagent.framework.web.JsonMappers",
+            "com.ragagent.framework.tracing.langfuse.LangfuseAttributes",
             "com.ragagent.modelruntime.stream.StreamJson",
-            "com.ragagent.platform.event.EventJson",
+            "com.ragagent.framework.eventbus.EventJson",
             "com.ragagent.datasource.connector.gitlab.GitLabConnector",
             "com.ragagent.datasource.connector.notion.NotionJson",
             "com.ragagent.modelcontext.ModelJsonValues");
@@ -803,7 +803,7 @@ class ArchitectureRulesTest {
             "org.springframework.data.redis.",
             "redis.clients.",
             "jakarta.servlet.",
-            "com.ragagent.platform.tracing.langfuse.",
+            "com.ragagent.framework.tracing.langfuse.",
             "com.ragagent.modelruntime.tracing.");
 
     @Test
@@ -947,7 +947,7 @@ class ArchitectureRulesTest {
      * <p>两类登记理由：① ~~4 个实体直接 import 其他域 {@code mapper} 里的
      * {@code JsonbRawStringTypeHandler}（{@code CustomAgentEntity} / {@code EmbedChannelEntity} /
      * {@code ChannelSessionEntity} / {@code ImChannelEntity}）~~ —— **2026-10-14 A③-⑩ 已收口**：
-     * 该处理器归位 L1 {@code com.ragagent.platform.persistence}（三方共用），实体只留
+     * 该处理器归位 L1 {@code com.ragagent.framework.persistence}（三方共用），实体只留
      * {@code @TableField} 注解引用 ⇒ 基线相应收紧 4 条；② **6 个 {@code @Component} 的领域
      * 守卫 / 接线类**（knowledge 的 4 个 guard + {@code SpanTracker} + {@code ConnectorHttpWiring}）
      * ——收敛方向＝改由装配层注入，或搬去域外的接线面。**基线只许减不许增**。</p>

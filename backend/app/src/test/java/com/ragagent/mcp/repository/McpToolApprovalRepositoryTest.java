@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ragagent.TestSchema;
+import com.ragagent.framework.error.BizException;
 import com.ragagent.mcp.domain.McpToolApproval;
 import com.ragagent.mcp.domain.McpToolPolicyPatch;
-import com.ragagent.shared.error.BizException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;

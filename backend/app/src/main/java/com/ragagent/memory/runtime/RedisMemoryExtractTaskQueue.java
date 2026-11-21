@@ -1,11 +1,11 @@
 package com.ragagent.memory.runtime;
 
+import com.ragagent.framework.task.RedisRetryingTaskQueue;
+import com.ragagent.framework.task.RetryPolicy;
+import com.ragagent.framework.tracing.langfuse.LangfuseTaskScope;
 import com.ragagent.memory.domain.MemoryExtractHandler;
 import com.ragagent.memory.domain.MemoryExtractPayload;
 import com.ragagent.memory.domain.MemoryExtractTaskQueue;
-import com.ragagent.platform.task.RedisRetryingTaskQueue;
-import com.ragagent.platform.task.RetryPolicy;
-import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

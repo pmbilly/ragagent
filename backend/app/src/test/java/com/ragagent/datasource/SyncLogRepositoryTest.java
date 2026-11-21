@@ -12,7 +12,7 @@ import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.SyncResult;
 import com.ragagent.datasource.repository.DataSourceRepository;
 import com.ragagent.datasource.repository.SyncLogRepository;
-import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.framework.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;

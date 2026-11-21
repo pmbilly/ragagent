@@ -9,10 +9,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.stream.EmbeddedRedis;
 import com.ragagent.memory.domain.MemoryExtractHandler;
 import com.ragagent.memory.domain.MemoryExtractPayload;
 import com.ragagent.memory.service.MemoryExtractionService;
-import com.ragagent.platform.stream.EmbeddedRedis;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;

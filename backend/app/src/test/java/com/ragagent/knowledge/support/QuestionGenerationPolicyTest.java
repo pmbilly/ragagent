@@ -3,9 +3,9 @@ package com.ragagent.knowledge.support;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.platform.web.JsonMappers;
 import org.junit.jupiter.api.Test;
 
 /** 推荐问题开关：逐文档覆盖优先于 KB 级配置。 */

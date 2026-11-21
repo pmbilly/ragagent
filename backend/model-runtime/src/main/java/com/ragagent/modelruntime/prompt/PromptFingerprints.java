@@ -3,10 +3,10 @@ package com.ragagent.modelruntime.prompt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.framework.security.Hashes;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
-import com.ragagent.platform.security.Hashes;
-import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 

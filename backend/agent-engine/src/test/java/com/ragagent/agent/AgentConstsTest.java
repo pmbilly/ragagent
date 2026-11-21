@@ -3,7 +3,7 @@ package com.ragagent.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.agentengine.api.AgentBudgets;
-import com.ragagent.platform.event.EventIds;
+import com.ragagent.framework.eventbus.EventIds;
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
 

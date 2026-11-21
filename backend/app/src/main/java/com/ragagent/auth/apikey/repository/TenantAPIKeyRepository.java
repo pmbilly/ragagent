@@ -4,7 +4,7 @@ import com.ragagent.auth.apikey.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.domain.APIKeyStringListTypeHandler;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.auth.apikey.mapper.TenantAPIKeyMapper;
-import com.ragagent.platform.security.CryptoService;
+import com.ragagent.framework.security.CryptoService;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package com.ragagent.websearch.controller;
 
-import com.ragagent.platform.web.ApiResult;
+import com.ragagent.framework.web.ApiResult;
 import com.ragagent.websearch.dto.WebSearchProviderTypes;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;

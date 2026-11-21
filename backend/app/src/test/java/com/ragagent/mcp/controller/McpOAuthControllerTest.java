@@ -15,6 +15,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.security.SsrfGuard;
+import com.ragagent.framework.web.error.GlobalExceptionHandler;
 import com.ragagent.mcp.approval.Decision;
 import com.ragagent.mcp.approval.ToolApprovalException;
 import com.ragagent.mcp.approval.ToolApprovalGate;
@@ -30,10 +34,6 @@ import com.ragagent.mcp.oauth.store.OAuthStateStore;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpServiceUrls;
 import com.ragagent.mcp.service.McpServiceManagement;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.web.error.GlobalExceptionHandler;
-import com.ragagent.shared.error.BizException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;

@@ -1,6 +1,6 @@
 package com.ragagent.mcp.oauth.model;
 
-import com.ragagent.platform.access.TenantContext;
+import com.ragagent.framework.access.TenantContext;
 
 /**
  * 一次授权流程的<b>非秘密</b>、可鉴权状态。

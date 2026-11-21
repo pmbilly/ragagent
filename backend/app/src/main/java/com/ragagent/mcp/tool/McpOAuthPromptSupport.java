@@ -1,5 +1,12 @@
 package com.ragagent.mcp.tool;
 
+import com.ragagent.framework.event.Event;
+import com.ragagent.framework.event.EventBusInterface;
+import com.ragagent.framework.event.payload.MCPOAuthRequiredData;
+import com.ragagent.framework.eventbus.EventType;
+import com.ragagent.framework.shared.tool.ToolCancellation;
+import com.ragagent.framework.shared.tool.ToolExecContext;
+import com.ragagent.framework.web.ToolJson;
 import com.ragagent.mcp.approval.Cancellation;
 import com.ragagent.mcp.approval.Decision;
 import com.ragagent.mcp.approval.OAuthPendingRequest;
@@ -10,13 +17,6 @@ import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.mcp.protocol.McpOAuthRequiredException;
-import com.ragagent.platform.event.EventType;
-import com.ragagent.platform.web.ToolJson;
-import com.ragagent.shared.event.Event;
-import com.ragagent.shared.event.EventBusInterface;
-import com.ragagent.shared.event.payload.MCPOAuthRequiredData;
-import com.ragagent.shared.tool.ToolCancellation;
-import com.ragagent.shared.tool.ToolExecContext;
 import java.time.Duration;
 import java.time.Instant;
 

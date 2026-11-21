@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.access.TracingContext;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
-import com.ragagent.platform.access.TracingContext;
 import com.ragagent.retrieval.api.ChunkTypes;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

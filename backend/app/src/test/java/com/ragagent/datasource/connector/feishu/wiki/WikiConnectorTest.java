@@ -20,7 +20,7 @@ import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncCursor;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.framework.web.ZeroTimeSerializer;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;

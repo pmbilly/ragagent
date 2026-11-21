@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
 import com.ragagent.retrieval.api.ConnectionConfig;
 import com.ragagent.retrieval.api.IndexConfig;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
 import java.time.OffsetDateTime;
 
 /**

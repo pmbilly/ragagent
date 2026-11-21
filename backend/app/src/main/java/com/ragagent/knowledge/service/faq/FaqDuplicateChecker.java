@@ -1,10 +1,10 @@
 package com.ragagent.knowledge.service.faq;
 
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.shared.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.repository.FaqChunkRepository;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.knowledge.FaqChunkMetadata;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;

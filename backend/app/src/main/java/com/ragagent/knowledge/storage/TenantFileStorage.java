@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.storage;
 
-import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.storage.fileserve.OpenedFile;
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.storage.fileserve.OpenedFile;
+import com.ragagent.framework.storage.fileserve.StoragePaths;
 import com.ragagent.storage.api.ProviderFileStorePort;
 import java.io.IOException;
 import java.io.InputStream;

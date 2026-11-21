@@ -1,7 +1,7 @@
 package com.ragagent.model.controller;
 
+import com.ragagent.framework.web.ApiResult;
 import com.ragagent.model.service.OllamaManageService;
-import com.ragagent.platform.web.ApiResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

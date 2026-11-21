@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.wiki.service.page;
 
+import com.ragagent.framework.text.Whitespace;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiBatchContext;
-import com.ragagent.shared.text.Whitespace;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

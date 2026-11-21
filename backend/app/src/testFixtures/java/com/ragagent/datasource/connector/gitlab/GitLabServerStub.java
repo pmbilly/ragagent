@@ -1,7 +1,7 @@
 package com.ragagent.datasource.connector.gitlab;
 
 import com.ragagent.datasource.domain.connector.ConnectorHttp;
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.security.SsrfGuard;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;

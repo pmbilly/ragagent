@@ -6,7 +6,7 @@ import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.SyncCursor;
 import com.ragagent.datasource.domain.connector.ConnectorHttp;
 import com.ragagent.datasource.domain.connector.StreamHandler;
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.security.SsrfGuard;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

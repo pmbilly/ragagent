@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.wiki.repository.ingest;
 
+import com.ragagent.framework.task.TaskQueue;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestTask;
-import com.ragagent.platform.task.TaskQueue;
 /**
  * wiki 后台任务的投递端口。
  *

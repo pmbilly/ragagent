@@ -2,11 +2,11 @@ package com.ragagent.retrieval.json;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.ragagent.platform.web.JsonModuleProvider;
+import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.web.JsonModuleProvider;
 import com.ragagent.retrieval.api.ConnectionConfig;
 import com.ragagent.retrieval.api.IndexConfig;
 import com.ragagent.retrieval.api.SearchParams;
-import com.ragagent.shared.retrieval.SearchResult;
 
 /**
  * 检索与向量库面载荷的 Jackson 装配。

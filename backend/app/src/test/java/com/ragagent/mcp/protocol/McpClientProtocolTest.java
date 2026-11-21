@@ -6,13 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpAuthType;
 import com.ragagent.mcp.domain.McpResource;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.domain.McpTransportType;
-import com.ragagent.platform.security.SsrfGuard;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;

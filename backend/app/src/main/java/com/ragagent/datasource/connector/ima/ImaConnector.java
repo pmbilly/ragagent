@@ -18,7 +18,7 @@ import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncCursor;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;

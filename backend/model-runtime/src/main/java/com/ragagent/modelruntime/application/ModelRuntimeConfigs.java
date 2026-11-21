@@ -2,6 +2,7 @@ package com.ragagent.modelruntime.application;
 
 import com.ragagent.embedding.EmbedderConfig;
 import com.ragagent.embedding.EmbedderConfigs;
+import com.ragagent.framework.error.BizException;
 import com.ragagent.llm.api.ChatConfig;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.llm.api.VlmConfig;
@@ -10,7 +11,6 @@ import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
 import com.ragagent.rerank.RerankerConfig;
 import com.ragagent.rerank.RerankerConfigs;
-import com.ragagent.shared.error.BizException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

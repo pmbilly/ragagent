@@ -9,12 +9,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.stream.EmbeddedRedis;
 import com.ragagent.knowledge.wiki.domain.TaskDeadLetter;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestPayload;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestSlotReleaser;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestTask;
 import com.ragagent.knowledge.wiki.repository.TaskDeadLetterRepository;
-import com.ragagent.platform.stream.EmbeddedRedis;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;

@@ -2,7 +2,7 @@ package com.ragagent.im.runtime;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

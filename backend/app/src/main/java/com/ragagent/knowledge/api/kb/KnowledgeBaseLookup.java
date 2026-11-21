@@ -1,5 +1,5 @@
 package com.ragagent.knowledge.api.kb;
-import com.ragagent.shared.knowledge.KnowledgeView;
+import com.ragagent.framework.shared.knowledge.KnowledgeView;
 
 
 

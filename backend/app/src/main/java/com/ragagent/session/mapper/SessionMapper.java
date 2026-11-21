@@ -1,7 +1,7 @@
 package com.ragagent.session.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import com.ragagent.framework.persistence.PgJsonTypeHandler;
 import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.dto.SessionListItem;
@@ -69,7 +69,7 @@ public interface SessionMapper extends BaseMapper<Session> {
      */
     @Update("<script>"
             + "UPDATE sessions SET "
-            + "agent_config = #{state, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler, "
+            + "agent_config = #{state, typeHandler=com.ragagent.framework.persistence.PgJsonTypeHandler, "
             + "jdbcType=OTHER}, "
             + "updated_at = #{updatedAt} "
             + "WHERE tenant_id = #{tenantId} AND id = #{id} AND deleted_at IS NULL "

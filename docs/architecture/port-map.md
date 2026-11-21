@@ -6,10 +6,10 @@
 ## 统计
 
 - 域内（可评估内联）：**11**
-- 域间（解耦）：**26**
+- 域间（解耦）：**27**
 - 复合面（随复合端口）：**7**
 - 装配点实现（不参与内联判定）：**6**
-- 跨模块（必要）：**11**
+- 跨模块（必要）：**10**
 
 ## 明细
 
@@ -32,7 +32,7 @@
 | `EmbeddingPort` | `ModelRuntimeEmbeddingAdapter` | backend/model-runtime | backend/retrieval-engine、knowledge、memory | 跨模块（必要） |
 | `EntityExtractionPort` | `EntityExtractionAdapter` | backend/model-runtime | initialization、knowledge、session | 跨模块（必要） |
 | `FileProxyPort` | `FileProxyService` | backend/app | embedchannel、knowledge、session | 域间（解耦） |
-| `FileUrlPort` | `DefaultFileUrlPort` | backend/app | backend/framework、knowledge、session、storage | 跨模块（必要） |
+| `FileUrlPort` | `DefaultFileUrlPort` | backend/app | knowledge、session、storage | 域间（解耦） |
 | `GlobalFileServicePort` | `GlobalFileServiceAdapter` | backend/app | session | 域间（解耦） |
 | `HybridSearchPort` | `HybridSearchService` | backend/retrieval-engine | knowledge、session | 跨模块（必要） |
 | `KnowledgeBaseBatchQueryPort` | `QaWiring` | backend/app | session | 装配点实现（不参与内联判定） |

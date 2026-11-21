@@ -1,7 +1,7 @@
 package com.ragagent.agenttools;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.fixtures.GoldenResources;
+import com.ragagent.framework.fixtures.GoldenResources;
 
 /**
  * Go 录制常量（由录制输出生成，<b>禁止手改</b>）。

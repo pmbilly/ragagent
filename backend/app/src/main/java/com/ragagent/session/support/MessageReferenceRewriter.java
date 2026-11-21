@@ -2,12 +2,12 @@ package com.ragagent.session.support;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.storage.support.Rewriter;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.shared.agent.AgentStep;
+import com.ragagent.framework.shared.agent.AgentToolCall;
+import com.ragagent.framework.shared.session.MessageImage;
+import com.ragagent.framework.storage.support.Rewriter;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.session.domain.message.Message;
-import com.ragagent.shared.agent.AgentStep;
-import com.ragagent.shared.agent.AgentToolCall;
-import com.ragagent.shared.session.MessageImage;
 import java.util.List;
 
 /**

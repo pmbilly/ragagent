@@ -50,7 +50,7 @@ import com.ragagent.agent.prompt.PlaceholderDefinition;
 import com.ragagent.agent.prompt.SystemPromptSection;
 import com.ragagent.agentengine.api.KnowledgeBaseInfo;
 import com.ragagent.agentengine.api.RecentDocInfo;
-import com.ragagent.platform.prompt.PromptConstants;
+import com.ragagent.framework.prompt.PromptConstants;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;

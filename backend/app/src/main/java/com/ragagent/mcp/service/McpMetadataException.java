@@ -1,7 +1,7 @@
 package com.ragagent.mcp.service;
 
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
 
 /**
  * 目录快照语义错误。

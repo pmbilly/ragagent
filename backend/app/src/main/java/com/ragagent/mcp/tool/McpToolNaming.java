@@ -1,7 +1,7 @@
 package com.ragagent.mcp.tool;
 
+import com.ragagent.framework.security.Hashes;
 import com.ragagent.llm.api.ToolDefinitions;
-import com.ragagent.platform.security.Hashes;
 
 /**
  * MCP 工具的引用/注册名/摘要：引用绑定定义哈希，注册名保留 ASCII 提示段并带身份后缀。

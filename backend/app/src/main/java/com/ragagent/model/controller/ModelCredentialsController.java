@@ -1,14 +1,14 @@
 package com.ragagent.model.controller;
 
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.web.ApiResponse;
+import com.ragagent.framework.web.ApiResult;
 import com.ragagent.model.dto.ModelCredentialsPutRequest;
 import com.ragagent.model.dto.ModelCredentialsResponse;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;

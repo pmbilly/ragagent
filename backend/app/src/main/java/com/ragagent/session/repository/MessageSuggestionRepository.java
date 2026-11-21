@@ -2,7 +2,7 @@ package com.ragagent.session.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ragagent.platform.persistence.DatabaseDialects;
+import com.ragagent.framework.persistence.DatabaseDialects;
 import com.ragagent.session.domain.message.MessageSuggestionEvent;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.session.domain.message.MessageSuggestionSetNotFoundException;

@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.task;
 
-import com.ragagent.platform.task.TaskQueue;
+import com.ragagent.framework.task.TaskQueue;
 
 /**
  * 知识处理入队端口。

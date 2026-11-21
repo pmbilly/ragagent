@@ -1,5 +1,13 @@
 package com.ragagent.knowledge.controller;
 
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.security.LogSanitizer;
+import com.ragagent.framework.shared.apikey.APIKeyScopeContext;
+import com.ragagent.framework.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.framework.web.ApiResponse;
+import com.ragagent.framework.web.ApiResult;
+import com.ragagent.framework.web.NonNullBody;
 import com.ragagent.knowledge.api.chunk.KnowledgeParseStatus;
 import com.ragagent.knowledge.assembler.KnowledgeAssembler;
 import com.ragagent.knowledge.controller.vo.BatchTaskRespVo;
@@ -21,14 +29,6 @@ import com.ragagent.knowledge.service.query.KnowledgeSearchService;
 import com.ragagent.knowledge.support.KnowledgePaths;
 import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.knowledge.support.access.KnowledgeRouteGuards;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.NonNullBody;
-import com.ragagent.shared.apikey.APIKeyScopeContext;
-import com.ragagent.shared.apikey.TenantAPIKeyScope;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.ArrayList;

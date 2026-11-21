@@ -1,10 +1,10 @@
 package com.ragagent.mcp.oauth;
 
+import com.ragagent.framework.access.TenantContext;
 import com.ragagent.mcp.domain.McpOAuthClient;
 import com.ragagent.mcp.domain.McpOAuthToken;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.oauth.store.OAuthRepository;
-import com.ragagent.platform.access.TenantContext;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;

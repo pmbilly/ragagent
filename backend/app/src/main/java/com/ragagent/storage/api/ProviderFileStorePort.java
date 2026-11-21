@@ -1,6 +1,6 @@
 package com.ragagent.storage.api;
 
-import com.ragagent.shared.storage.fileserve.OpenedFile;
+import com.ragagent.framework.storage.fileserve.OpenedFile;
 import java.io.IOException;
 import java.io.InputStream;
 

@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.shared.tool.ToolCancellation;
+import com.ragagent.framework.shared.tool.ToolRequest;
+import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.retrieval.api.WebSearchResult;
-import com.ragagent.shared.tool.ToolCancellation;
-import com.ragagent.shared.tool.ToolRequest;
-import com.ragagent.shared.tool.ToolResult;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;

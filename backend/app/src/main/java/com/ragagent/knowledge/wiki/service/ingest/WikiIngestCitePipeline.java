@@ -2,6 +2,8 @@ package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.shared.knowledge.ChunkView;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.chunk.ChunkPort;
 import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import com.ragagent.knowledge.api.wiki.SlugUpdate;
@@ -12,8 +14,6 @@ import com.ragagent.knowledge.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.knowledge.wiki.service.page.NewSlugFromCitation;
 import com.ragagent.knowledge.wiki.service.page.WikiTextUtils;
 import com.ragagent.llm.api.LlmChatClient;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.knowledge.ChunkView;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;

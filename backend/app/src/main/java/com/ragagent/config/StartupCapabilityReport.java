@@ -1,8 +1,8 @@
 package com.ragagent.config;
 
 import com.ragagent.auth.config.JwtProperties;
+import com.ragagent.framework.config.RetrievalDriverProperties;
 import com.ragagent.modelruntime.stream.StreamProperties;
-import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.retrieval.engine.EngineRegistry;
 import java.io.IOException;
 import java.net.InetSocketAddress;

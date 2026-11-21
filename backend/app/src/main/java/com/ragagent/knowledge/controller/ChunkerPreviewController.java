@@ -1,5 +1,10 @@
 package com.ragagent.knowledge.controller;
 
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.error.ErrorCode;
+import com.ragagent.framework.web.ApiResult;
+import com.ragagent.framework.web.NonNullBody;
 import com.ragagent.knowledge.api.Tokens;
 import com.ragagent.knowledge.chunker.Chunker;
 import com.ragagent.knowledge.chunker.DocumentProfiler;
@@ -8,11 +13,6 @@ import com.ragagent.knowledge.chunker.SplitterConfig;
 import com.ragagent.knowledge.chunker.TextNormalizer;
 import com.ragagent.knowledge.dto.chunk.PreviewPayload;
 import com.ragagent.knowledge.dto.chunk.PreviewRequest;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.NonNullBody;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.error.ErrorCode;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

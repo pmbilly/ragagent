@@ -1,12 +1,12 @@
 package com.ragagent.knowledge.service.faq;
 
+import com.ragagent.framework.shared.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
 import com.ragagent.knowledge.dto.faq.FaqFailedEntry;
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 import com.ragagent.knowledge.repository.FaqChunkRepository;
 import com.ragagent.knowledge.support.FaqImportTaskStore;
-import com.ragagent.shared.knowledge.FaqChunkMetadata;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

@@ -78,9 +78,9 @@ PKG_RE = re.compile(r"^package\s+([\w.]+);", re.M)
 MISPLACED_TEST_ALLOW: dict[str, str] = {
     "backend/app/src/test/java/com/ragagent/agent/EngineRecordingTest.java":
         "录制夹具集成测试：需要 app 侧装配与 agent-engine testFixtures，迁回 agent-engine 会形成反向依赖",
-    "backend/app/src/test/java/com/ragagent/platform/web/ContractTest.java":
+    "backend/app/src/test/java/com/ragagent/framework/web/ContractTest.java":
         "HTTP 契约金片驱动：需要 app 的 Spring 上下文与真 PG，platform 模块内无此装配",
-    "backend/app/src/test/java/com/ragagent/platform/web/ValidationContractTest.java":
+    "backend/app/src/test/java/com/ragagent/framework/web/ValidationContractTest.java":
         "同上：参数校验的 HTTP 契约测试依赖 app 的 MVC 装配",
     "backend/app/src/test/java/com/ragagent/retrieval/engine/EffectiveEnginesTest.java":
         "检索引擎的装配级测试：需要 app 的配置与真库，retrieval-engine 模块内无此装配",
@@ -92,15 +92,15 @@ MISPLACED_TEST_ALLOW: dict[str, str] = {
         "同上：wire A/B 使用 domains 的 Model/ModelRowViews",
     "backend/app/src/test/java/com/ragagent/llm/provider/ProviderRegistryTest.java":
         "provider 目录测试使用 domains 的 Model/ModelRowViews；迁 model-runtime 会形成反向边",
-    "backend/app/src/test/java/com/ragagent/platform/access/TracingCarrierNestingTest.java":
+    "backend/app/src/test/java/com/ragagent/framework/access/TracingCarrierNestingTest.java":
         "用 domains 的任务载荷验证平台 tracing carrier；迁 platform 会形成反向边",
-    "backend/app/src/test/java/com/ragagent/platform/web/JsonFaceVocabularyTest.java":
+    "backend/app/src/test/java/com/ragagent/framework/web/JsonFaceVocabularyTest.java":
         "用 domains 的 DTO/配置验证平台 JSON 口径；迁 platform 会形成反向边",
-    "backend/app/src/test/java/com/ragagent/platform/text/JsonContractRoundTripTest.java":
+    "backend/app/src/test/java/com/ragagent/framework/html/JsonContractRoundTripTest.java":
         "全仓 JSON 往返矩阵，天然需要 domains 载荷；迁 platform 会形成反向边",
-    "backend/app/src/test/java/com/ragagent/platform/tracing/langfuse/LangfuseEndToEndTest.java":
+    "backend/app/src/test/java/com/ragagent/framework/tracing/langfuse/LangfuseEndToEndTest.java":
         "端到端 trace 依赖 domains 的 MemoryTrace；迁 platform 会形成反向边",
-    "backend/app/src/test/java/com/ragagent/platform/tracing/langfuse/LangfuseTracingTest.java":
+    "backend/app/src/test/java/com/ragagent/framework/tracing/langfuse/LangfuseTracingTest.java":
         "同上：trace 测试依赖 domains 的 MemoryTrace",
 }
 

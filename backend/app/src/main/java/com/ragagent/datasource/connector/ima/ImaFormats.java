@@ -1,6 +1,6 @@
 package com.ragagent.datasource.connector.ima;
 
-import com.ragagent.platform.security.Hashes;
+import com.ragagent.framework.security.Hashes;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;

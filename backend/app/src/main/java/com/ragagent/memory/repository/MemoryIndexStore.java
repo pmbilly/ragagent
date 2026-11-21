@@ -1,5 +1,10 @@
 package com.ragagent.memory.repository;
 
+import com.ragagent.framework.pagination.PageResult;
+import com.ragagent.framework.shared.memory.MemoryKeys;
+import com.ragagent.framework.shared.memory.MemoryKinds;
+import com.ragagent.framework.shared.tenant.MemoryConfig;
+import com.ragagent.framework.web.ZeroTimeSerializer;
 import com.ragagent.memory.api.MemoryMessageCursor;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
@@ -15,11 +20,6 @@ import com.ragagent.memory.mapper.MemoryDocAffinityMapper;
 import com.ragagent.memory.mapper.MemoryExtractionSessionMapper;
 import com.ragagent.memory.mapper.MemorySubjectMapper;
 import com.ragagent.memory.mapper.MemoryTopicStatMapper;
-import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.shared.memory.MemoryKeys;
-import com.ragagent.shared.memory.MemoryKinds;
-import com.ragagent.shared.pagination.PageResult;
-import com.ragagent.shared.tenant.MemoryConfig;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

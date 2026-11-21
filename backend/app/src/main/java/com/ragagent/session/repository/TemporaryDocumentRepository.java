@@ -2,7 +2,7 @@ package com.ragagent.session.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ragagent.platform.persistence.PageRequests;
+import com.ragagent.framework.persistence.PageRequests;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.mapper.TemporaryDocumentMapper;
 import java.time.OffsetDateTime;
@@ -62,7 +62,7 @@ public class TemporaryDocumentRepository {
                 .eq(TemporaryDocument::getId, documentId)
                 .set(TemporaryDocument::getStatus, TemporaryDocument.STATUS_PROCESSING)
                 .set(TemporaryDocument::getStartedAt, startedAt,
-                        "typeHandler=com.ragagent.platform.persistence.NaiveOffsetDateTimeTypeHandler")
+                        "typeHandler=com.ragagent.framework.persistence.NaiveOffsetDateTimeTypeHandler")
                 .set(TemporaryDocument::getErrorMessage, ""));
     }
 
@@ -77,12 +77,12 @@ public class TemporaryDocumentRepository {
                 .set(TemporaryDocument::getContent, content)
                 // update-Inline 的 SET 子句不带 @TableField 的 typeHandler 信息，
                 // 必须 set(col, val, mapping) 显式挂——否则真 PG 上报 jsonb/timestamptz 类型错
-                .set(TemporaryDocument::getChunks, chunks, "typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler")
-                .set(TemporaryDocument::getImageRefs, imageRefs, "typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler")
-                .set(TemporaryDocument::getMetadata, metadata, "typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler")
+                .set(TemporaryDocument::getChunks, chunks, "typeHandler=com.ragagent.framework.persistence.PgJsonTypeHandler")
+                .set(TemporaryDocument::getImageRefs, imageRefs, "typeHandler=com.ragagent.framework.persistence.PgJsonTypeHandler")
+                .set(TemporaryDocument::getMetadata, metadata, "typeHandler=com.ragagent.framework.persistence.PgJsonTypeHandler")
                 .set(TemporaryDocument::getTokenCount, tokenCount)
                 .set(TemporaryDocument::getChunkCount, chunkCount)
-                .set(TemporaryDocument::getReadyAt, readyAt, "typeHandler=com.ragagent.platform.persistence.NaiveOffsetDateTimeTypeHandler")
+                .set(TemporaryDocument::getReadyAt, readyAt, "typeHandler=com.ragagent.framework.persistence.NaiveOffsetDateTimeTypeHandler")
                 .set(TemporaryDocument::getErrorMessage, ""));
     }
 

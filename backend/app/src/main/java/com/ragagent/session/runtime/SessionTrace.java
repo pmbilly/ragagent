@@ -1,7 +1,7 @@
 package com.ragagent.session.runtime;
 
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
-import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
+import com.ragagent.framework.tracing.langfuse.LangfuseManager;
+import com.ragagent.framework.tracing.langfuse.LangfuseTracing;
 import java.util.Map;
 
 /**

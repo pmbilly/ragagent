@@ -1,12 +1,12 @@
 package com.ragagent.knowledge.service.management;
 
+import com.ragagent.framework.shared.knowledge.KnowledgeIngest;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTenants;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.service.KnowledgeAccessHelper;
 import com.ragagent.knowledge.service.access.ChunkAccessGuard;
-import com.ragagent.shared.knowledge.KnowledgeIngest;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;

@@ -2,7 +2,7 @@ package com.ragagent.datasource.connector.yuque;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.framework.web.ZeroTimeSerializer;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.OffsetDateTime;

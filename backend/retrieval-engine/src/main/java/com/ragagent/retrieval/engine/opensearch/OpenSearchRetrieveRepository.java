@@ -3,8 +3,8 @@ package com.ragagent.retrieval.engine.opensearch;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.security.SsrfGuard;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.retrieval.api.IndexConfig;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;

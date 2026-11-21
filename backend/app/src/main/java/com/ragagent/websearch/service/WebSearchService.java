@@ -1,9 +1,9 @@
 package com.ragagent.websearch.service;
 
 
+import com.ragagent.framework.shared.retrieval.SearchResult;
 import com.ragagent.retrieval.api.WebResultConverter;
 import com.ragagent.retrieval.api.WebSearchResult;
-import com.ragagent.shared.retrieval.SearchResult;
 import com.ragagent.websearch.api.WebSearchFilters;
 import com.ragagent.websearch.config.WebSearchProviderParams;
 import com.ragagent.websearch.domain.WebSearchProviderEntity;

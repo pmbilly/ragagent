@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.index;
 
+import com.ragagent.framework.model.Embedder;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.llm.api.ModelRuntime;
-import com.ragagent.platform.model.Embedder;
 import com.ragagent.retrieval.api.IndexEngine;
 import com.ragagent.retrieval.api.NameSpace;
 import com.ragagent.retrieval.api.RetrieveGraphRepository;

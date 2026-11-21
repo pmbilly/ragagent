@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTransportType;
-import com.ragagent.platform.security.SsrfGuard;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.concurrent.CompletableFuture;

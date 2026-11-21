@@ -23,7 +23,8 @@ BUILD_FILE = ROOT / "backend" / "contract" / "pom.xml"
 #: contract 解散后，「契约面只允许纯 JDK」的约束不能凭空消失——
 #: 它平移到 framework 承接共享词汇的子包上（C1 导入根、C3 框架形状继续生效）。
 SHARED_ROOT = ROOT / "backend" / "framework" / "src" / "main" / "java"
-SHARED_SEGMENT = "shared"
+#: 通用面（纯 JDK）与仍在 shared 的业务词汇都在扫描面内。
+CONTRACT_SEGMENTS = ("shared", "error", "event", "json", "text", "pagination")
 
 ALLOWED_IMPORT_ROOTS = ("java.", "javax.", "com.ragagent.")
 
@@ -53,13 +54,15 @@ FORBIDDEN_SHAPES = (
 
 
 def registered_sources() -> list[pathlib.Path]:
-    """契约面源码：contract 本体 + framework 的 shared 子包（后者是 contract 解散后的承接处）。"""
+    """契约面源码：framework 模块的契约子包（通用面 + 仍在 shared 的业务词汇）。"""
     files: list[pathlib.Path] = []
     if SRC.is_dir():
         files += list(SRC.rglob("*.java"))
-    if SHARED_ROOT.is_dir():
-        files += [p for p in SHARED_ROOT.rglob("*.java")
-                  if SHARED_SEGMENT in p.relative_to(SHARED_ROOT).parts]
+    base = SHARED_ROOT / "com" / "ragagent" / "framework"
+    for seg in CONTRACT_SEGMENTS:
+        d = base / seg
+        if d.is_dir():
+            files += list(d.rglob("*.java"))
     return sorted(p for p in files if "/build/" not in str(p) and "/target/" not in str(p))
 
 
@@ -124,7 +127,7 @@ def check_shapes(files: list[pathlib.Path]) -> list[str]:
 def main() -> int:
     files = contract_sources()
     if not files:
-        print(f"✗ 契约层纯度：找不到 {SRC.relative_to(ROOT)} 下的源码")
+        print("✗ 契约层纯度：找不到契约面源码（framework 下的通用面与 shared 暂存区都为空？）")
         return 1
 
     problems = check_imports(files) + check_build() + check_shapes(files)

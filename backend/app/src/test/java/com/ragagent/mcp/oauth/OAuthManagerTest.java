@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpAuthType;
 import com.ragagent.mcp.domain.McpOAuthClient;
@@ -21,8 +23,6 @@ import com.ragagent.mcp.oauth.error.OAuthProtocolException;
 import com.ragagent.mcp.oauth.model.OAuthAuthorizationStatus;
 import com.ragagent.mcp.oauth.store.OAuthStateStore;
 import com.ragagent.mcp.protocol.McpServiceUrls;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.security.SsrfGuard;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;

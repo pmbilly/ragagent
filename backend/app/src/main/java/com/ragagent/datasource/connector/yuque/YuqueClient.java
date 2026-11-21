@@ -16,7 +16,7 @@ import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2UserResponse;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.connector.ConnectorHttp;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;

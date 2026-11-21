@@ -9,11 +9,11 @@ import static com.ragagent.knowledge.wiki.controller.WikiRequestSupport.sanitize
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.error.BizException;
 import com.ragagent.knowledge.wiki.domain.WikiPageIssue;
 import com.ragagent.knowledge.wiki.domain.issue.WikiLintReport;
 import com.ragagent.knowledge.wiki.service.page.WikiLintService;
 import com.ragagent.knowledge.wiki.service.page.WikiPageService;
-import com.ragagent.shared.error.BizException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.List;

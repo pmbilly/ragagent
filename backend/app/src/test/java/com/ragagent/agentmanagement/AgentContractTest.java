@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.ragagent.TestSchema;
 import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.agentmanagement.service.CustomAgentService;
-import com.ragagent.platform.access.TenantContext;
+import com.ragagent.framework.access.TenantContext;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;

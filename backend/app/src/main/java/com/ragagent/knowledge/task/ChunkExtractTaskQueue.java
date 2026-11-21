@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.framework.task.TaskQueue;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
-import com.ragagent.platform.task.TaskQueue;
 
 /**
  * 分块图抽取任务的投递口。

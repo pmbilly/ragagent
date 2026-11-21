@@ -1,15 +1,15 @@
 package com.ragagent.agenttools.wiki;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.shared.agent.SearchAuth;
+import com.ragagent.framework.shared.agent.SearchAuth.KnowledgeScopeReader;
+import com.ragagent.framework.shared.retrieval.SearchTarget.SearchTargets;
+import com.ragagent.framework.shared.tool.BaseTool;
+import com.ragagent.framework.shared.tool.ToolRequest;
+import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.tool.ToolSchemas;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ToolDefinitions;
-import com.ragagent.platform.tool.ToolSchemas;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.agent.SearchAuth;
-import com.ragagent.shared.agent.SearchAuth.KnowledgeScopeReader;
-import com.ragagent.shared.retrieval.SearchTarget.SearchTargets;
-import com.ragagent.shared.tool.BaseTool;
-import com.ragagent.shared.tool.ToolRequest;
-import com.ragagent.shared.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.List;
 

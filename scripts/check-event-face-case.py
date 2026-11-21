@@ -33,8 +33,8 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # 路径改成按模块查找（新增模块无需改这里）。
 import _source_roots as _sr
 
-PAYLOAD_DIR = _sr.find_pkg_path("shared/event/payload")
-EVENT_TYPE = _sr.find_pkg_path("platform/event/EventType.java")
+PAYLOAD_DIR = _sr.find_pkg_path("framework/event/payload")
+EVENT_TYPE = _sr.find_pkg_path("framework/eventbus/EventType.java")
 RESPONSE_TYPE = _sr.find_pkg_path("llm/api/ResponseType.java")
 
 # 查询参数白名单（键 → 判定依据）。OIDC/OAuth2 标准参数，由外部协议决定，不得改名。

@@ -3,7 +3,7 @@ package com.ragagent.retrieval.engine.milvus;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.retrieval.api.IndexConfig;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import com.ragagent.retrieval.engine.EngineTypes;

@@ -1,12 +1,12 @@
 package com.ragagent.knowledge.controller;
 
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.storage.fileserve.FileProxyPort;
+import com.ragagent.framework.storage.fileserve.FileServeHttp;
+import com.ragagent.framework.storage.support.FileUrlPort;
+import com.ragagent.framework.web.ApiResult;
 import com.ragagent.knowledge.service.access.ChunkAccessGuard;
-import com.ragagent.platform.storage.fileserve.FileProxyPort;
-import com.ragagent.platform.storage.fileserve.FileServeHttp;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.storage.support.FileUrlPort;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

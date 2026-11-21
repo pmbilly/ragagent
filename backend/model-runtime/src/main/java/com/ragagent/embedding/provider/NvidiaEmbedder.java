@@ -6,7 +6,7 @@ import com.ragagent.embedding.EmbedQueryContext;
 import com.ragagent.embedding.EmbedderPooler;
 import com.ragagent.embedding.EmbeddingHttp;
 import com.ragagent.embedding.EmbeddingVectors;
-import com.ragagent.platform.web.ProviderJson;
+import com.ragagent.framework.web.ProviderJson;
 import java.time.Duration;
 import java.util.List;
 

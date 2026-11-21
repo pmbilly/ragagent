@@ -1,6 +1,15 @@
 package com.ragagent.session.service;
 
 
+import com.ragagent.framework.access.TenantContextSnapshot;
+import com.ragagent.framework.access.TenantScope;
+import com.ragagent.framework.event.Event;
+import com.ragagent.framework.event.EventBusInterface;
+import com.ragagent.framework.event.payload.AgentFinalAnswerData;
+import com.ragagent.framework.eventbus.EventIds;
+import com.ragagent.framework.eventbus.EventType;
+import com.ragagent.framework.prompt.AgentPromptPlaceholders;
+import com.ragagent.framework.prompt.PromptComposer;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
 import com.ragagent.llm.api.ChatMessage;
@@ -12,18 +21,9 @@ import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.modelcontext.Registry;
-import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.platform.access.TenantScope;
-import com.ragagent.platform.event.EventIds;
-import com.ragagent.platform.event.EventType;
-import com.ragagent.platform.prompt.AgentPromptPlaceholders;
-import com.ragagent.platform.prompt.PromptComposer;
 import com.ragagent.session.dto.AgentReferencesData;
 import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.PipelineCommon;
-import com.ragagent.shared.event.Event;
-import com.ragagent.shared.event.EventBusInterface;
-import com.ragagent.shared.event.payload.AgentFinalAnswerData;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;

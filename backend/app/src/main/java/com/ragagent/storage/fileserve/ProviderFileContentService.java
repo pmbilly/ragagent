@@ -1,7 +1,7 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.shared.storage.fileserve.OpenedFile;
-import com.ragagent.shared.storage.provider.SeekableSource;
+import com.ragagent.framework.storage.fileserve.OpenedFile;
+import com.ragagent.framework.storage.support.SeekableSource;
 import com.ragagent.storage.api.WritableFileContentService;
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.SeekableFileService;

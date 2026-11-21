@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import com.ragagent.framework.persistence.PgJsonTypeHandler;
+import com.ragagent.framework.shared.session.SessionLastRequestState;
 import com.ragagent.session.support.SessionOwnerIds;
-import com.ragagent.shared.session.SessionLastRequestState;
 import java.time.OffsetDateTime;
 
 /**

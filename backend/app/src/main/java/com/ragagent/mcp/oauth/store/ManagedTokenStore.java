@@ -1,8 +1,8 @@
 package com.ragagent.mcp.oauth.store;
 
+import com.ragagent.framework.access.TenantContext;
 import com.ragagent.mcp.oauth.model.OAuthToken;
 import com.ragagent.mcp.protocol.McpContext;
-import com.ragagent.platform.access.TenantContext;
 
 /**
  * 对依赖传输<b>隐藏本地过期时间</b>的 token 存储。

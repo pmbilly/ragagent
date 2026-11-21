@@ -3,7 +3,7 @@ package com.ragagent.session.support;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.web.JsonMappers;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 

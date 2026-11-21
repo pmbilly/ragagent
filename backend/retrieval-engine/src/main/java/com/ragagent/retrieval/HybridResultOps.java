@@ -1,12 +1,12 @@
 package com.ragagent.retrieval;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.shared.knowledge.ChunkFacts;
+import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.retrieval.api.KnowledgeDocumentFacts;
 import com.ragagent.retrieval.engine.EngineTypes;
-import com.ragagent.shared.knowledge.ChunkFacts;
-import com.ragagent.shared.retrieval.SearchResult;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

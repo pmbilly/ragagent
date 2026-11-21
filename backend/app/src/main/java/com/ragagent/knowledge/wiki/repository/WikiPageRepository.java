@@ -1,6 +1,8 @@
 package com.ragagent.knowledge.wiki.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.persistence.DatabaseDialects;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.api.WikiIndexEntry;
 import com.ragagent.knowledge.wiki.api.WikiPageNotFoundException;
@@ -17,8 +19,6 @@ import com.ragagent.knowledge.wiki.domain.page.WikiRevisionPruneRequest;
 import com.ragagent.knowledge.wiki.mapper.WikiPageIssueMapper;
 import com.ragagent.knowledge.wiki.mapper.WikiPageMapper;
 import com.ragagent.knowledge.wiki.mapper.WikiPageRevisionMapper;
-import com.ragagent.platform.persistence.DatabaseDialects;
-import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

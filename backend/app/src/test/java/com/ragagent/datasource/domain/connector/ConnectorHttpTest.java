@@ -6,7 +6,7 @@ package com.ragagent.datasource.domain.connector;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.security.SsrfGuard;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;

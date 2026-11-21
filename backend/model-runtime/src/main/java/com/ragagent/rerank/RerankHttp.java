@@ -1,6 +1,6 @@
 package com.ragagent.rerank;
 
-import com.ragagent.platform.http.LlmTransport;
+import com.ragagent.framework.http.LlmTransport;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;

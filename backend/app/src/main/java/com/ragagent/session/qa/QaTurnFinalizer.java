@@ -1,8 +1,9 @@
 package com.ragagent.session.qa;
 
+import com.ragagent.framework.access.TenantContextSnapshot;
+import com.ragagent.framework.access.TenantScope;
+import com.ragagent.framework.shared.session.SessionLastRequestState;
 import com.ragagent.memory.api.MemoryAccess;
-import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.platform.access.TenantScope;
 import com.ragagent.session.attachment.TemporaryDocumentService;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionLookupScope;
@@ -14,7 +15,6 @@ import com.ragagent.session.service.QaSupport.QaMode;
 import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.suggestion.MessageSuggestionService;
-import com.ragagent.shared.session.SessionLastRequestState;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,7 +2,7 @@ package com.ragagent.im.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.platform.security.CryptoService;
+import com.ragagent.framework.security.CryptoService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.api;
 
-import com.ragagent.shared.graph.GraphNode;
-import com.ragagent.shared.graph.GraphRelation;
+import com.ragagent.framework.shared.graph.GraphNode;
+import com.ragagent.framework.shared.graph.GraphRelation;
 import java.util.List;
 
 /**

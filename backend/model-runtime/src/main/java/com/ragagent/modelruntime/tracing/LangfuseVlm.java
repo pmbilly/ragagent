@@ -1,7 +1,7 @@
 package com.ragagent.modelruntime.tracing;
 
-import com.ragagent.platform.tracing.langfuse.Generation;
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.framework.tracing.langfuse.Generation;
+import com.ragagent.framework.tracing.langfuse.LangfuseManager;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

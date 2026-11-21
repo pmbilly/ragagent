@@ -3,7 +3,7 @@ package com.ragagent.memory.dto;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.framework.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 
 /**

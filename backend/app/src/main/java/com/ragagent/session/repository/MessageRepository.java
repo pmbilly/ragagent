@@ -3,21 +3,21 @@ package com.ragagent.session.repository;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.ragagent.framework.persistence.DatabaseDialects;
+import com.ragagent.framework.persistence.LikeEscapes;
+import com.ragagent.framework.persistence.PageRequests;
+import com.ragagent.framework.shared.session.MessageArtifact;
+import com.ragagent.framework.shared.session.MessageAttachment;
+import com.ragagent.framework.shared.session.MessageImage;
+import com.ragagent.framework.web.ZeroTimeSerializer;
 import com.ragagent.memory.api.MemoryMessageCursor;
 import com.ragagent.memory.api.SessionMessageView;
-import com.ragagent.platform.persistence.DatabaseDialects;
-import com.ragagent.platform.persistence.LikeEscapes;
-import com.ragagent.platform.persistence.PageRequests;
-import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageWithSession;
 import com.ragagent.session.mapper.MessageMapper;
 import com.ragagent.session.mapper.SessionMapper;
 import com.ragagent.session.support.MessageNotFoundException;
-import com.ragagent.shared.session.MessageArtifact;
-import com.ragagent.shared.session.MessageAttachment;
-import com.ragagent.shared.session.MessageImage;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -52,7 +52,7 @@ import org.springframework.stereotype.Component;
 public class MessageRepository {
 
     /** jsonb 列的类型处理器全限定名（3 参 set 的 mapping 串）。 */
-    private static final String PG_JSON = "com.ragagent.platform.persistence.PgJsonTypeHandler";
+    private static final String PG_JSON = "com.ragagent.framework.persistence.PgJsonTypeHandler";
     private static final String MENTIONED_ITEMS =
             "com.ragagent.session.domain.MentionedItemListTypeHandler";
     private static final String IMAGES = "com.ragagent.session.domain.message.MessageImageListTypeHandler";

@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.api.projection;
 
 
+import com.ragagent.framework.shared.knowledge.ChunkFacts;
+import com.ragagent.framework.shared.knowledge.ChunkView;
 import com.ragagent.knowledge.api.chunk.ChunkRowView;
-import com.ragagent.shared.knowledge.ChunkFacts;
-import com.ragagent.shared.knowledge.ChunkView;
 import java.util.ArrayList;
 import java.util.List;
 

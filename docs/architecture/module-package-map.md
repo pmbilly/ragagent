@@ -9,7 +9,7 @@
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
 | `:contract` |  | 0 | 0 | 0 |
-| `:platform` | `platform`、`shared` | 52 | 294 | 1 |
+| `:framework` | `framework` | 48 | 290 | 1 |
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 25 | 225 | 0 |
 | `:retrieval-engine` | `retrieval` | 17 | 138 | 0 |
 | `:agent-engine` | `agent`、`agentengine` | 11 | 101 | 0 |
@@ -40,7 +40,7 @@
 
 ## 查找规则
 
-1. **先看包根**：`com.ragagent.contract.*` → `:contract`；`platform` → `:platform`；
+1. **先看包根**：`com.ragagent.contract.*` → `:contract`；`platform` → `:framework`；
    `agent` → `:agent-engine`；`retrieval` → `:retrieval-engine`；
    `embedding` / `llm` / `modelcontext` / `modelruntime` / `rerank` → `:model-runtime`；
    其余 18 个包根 → `:domains`；`com.ragagent.config` 与根包 → `:boot`。
@@ -62,5 +62,5 @@
 
 ## 相关
 
-- [`packages.md`](packages.md)：379 份 `package-info` 的包级职责索引。
+- [`packages.md`](packages.md)：375 份 `package-info` 的包级职责索引。
 - [`overview.md`](overview.md)：模块依赖图、设计原则、代码在哪。

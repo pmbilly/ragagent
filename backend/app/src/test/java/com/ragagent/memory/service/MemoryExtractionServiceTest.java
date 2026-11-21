@@ -12,6 +12,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.framework.shared.memory.MemoryKinds;
+import com.ragagent.framework.shared.tenant.MemoryConfig;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;
@@ -30,8 +32,6 @@ import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.repository.MemoryRepository;
 import com.ragagent.memory.support.MemoryConflictException;
-import com.ragagent.shared.memory.MemoryKinds;
-import com.ragagent.shared.tenant.MemoryConfig;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

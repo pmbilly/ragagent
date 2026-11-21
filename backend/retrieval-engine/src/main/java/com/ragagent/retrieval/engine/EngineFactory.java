@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.engine;
 
 
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.retrieval.api.ConnectionConfig;
 import com.ragagent.retrieval.api.EnvStoreIds;
 import com.ragagent.retrieval.api.IndexConfig;

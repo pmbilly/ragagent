@@ -2,8 +2,8 @@ package com.ragagent.auth.apikey.dto;
 
 import com.ragagent.auth.api.TenantAPIKeyResponse;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.shared.apikey.APIKeyCapability;
-import com.ragagent.shared.apikey.APIKeyScopeType;
+import com.ragagent.framework.shared.apikey.APIKeyCapability;
+import com.ragagent.framework.shared.apikey.APIKeyScopeType;
 
 /**
  * 实体 → 响应投影。

@@ -1,13 +1,13 @@
 package com.ragagent.session.rag.plugin;
 
+import com.ragagent.framework.access.TenantContextSnapshot;
+import com.ragagent.framework.access.TenantScope;
+import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.shared.retrieval.SearchTarget;
 import com.ragagent.knowledge.api.KnowledgeBaseQueryPort;
-import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.platform.access.TenantScope;
 import com.ragagent.retrieval.api.SearchParams;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
-import com.ragagent.shared.retrieval.SearchResult;
-import com.ragagent.shared.retrieval.SearchTarget;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;

@@ -1,6 +1,6 @@
 package com.ragagent.config;
 
-import com.ragagent.platform.config.AppEnvLookup;
+import com.ragagent.framework.config.AppEnvLookup;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;

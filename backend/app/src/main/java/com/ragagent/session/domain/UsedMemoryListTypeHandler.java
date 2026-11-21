@@ -1,7 +1,7 @@
 package com.ragagent.session.domain;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.ragagent.shared.session.UsedMemory;
+import com.ragagent.framework.shared.session.UsedMemory;
 import java.util.List;
 
 /**

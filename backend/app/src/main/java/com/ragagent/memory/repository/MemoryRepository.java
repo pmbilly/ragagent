@@ -1,5 +1,7 @@
 package com.ragagent.memory.repository;
 
+import com.ragagent.framework.pagination.PageResult;
+import com.ragagent.framework.persistence.DatabaseDialects;
 import com.ragagent.memory.api.MemoryMessageCursor;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
@@ -21,8 +23,6 @@ import com.ragagent.memory.mapper.MemoryItemMapper;
 import com.ragagent.memory.mapper.MemorySubjectMapper;
 import com.ragagent.memory.mapper.MemoryTombstoneMapper;
 import com.ragagent.memory.mapper.MemoryTopicStatMapper;
-import com.ragagent.platform.persistence.DatabaseDialects;
-import com.ragagent.shared.pagination.PageResult;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

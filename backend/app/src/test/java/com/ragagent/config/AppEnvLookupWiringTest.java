@@ -2,7 +2,7 @@ package com.ragagent.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.platform.config.AppEnvLookup;
+import com.ragagent.framework.config.AppEnvLookup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

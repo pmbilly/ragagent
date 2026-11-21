@@ -1,10 +1,10 @@
 package com.ragagent.memory.service;
 
+import com.ragagent.framework.shared.memory.MemoryKeys;
+import com.ragagent.framework.web.ZeroTimeSerializer;
 import com.ragagent.memory.api.MessageTranscriptPort;
 import com.ragagent.memory.api.SessionMessageView;
 import com.ragagent.memory.domain.MemoryExtractionSession;
-import com.ragagent.platform.web.ZeroTimeSerializer;
-import com.ragagent.shared.memory.MemoryKeys;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

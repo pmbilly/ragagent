@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.oauth.error.OAuthProtocolException;
 import com.ragagent.mcp.oauth.model.AuthServerMetadata;
@@ -15,8 +17,6 @@ import com.ragagent.mcp.oauth.store.DbTokenStore;
 import com.ragagent.mcp.oauth.store.OAuthTokenStore;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.mcp.protocol.McpServiceUrls;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.security.SsrfGuard;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Base64;

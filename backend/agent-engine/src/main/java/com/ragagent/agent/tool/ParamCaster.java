@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.ToolJson;
+import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.web.ToolJson;
 import java.util.Iterator;
 import java.util.Map;
 

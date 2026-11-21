@@ -1,6 +1,6 @@
 package com.ragagent.storage.provider;
 
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.security.SsrfGuard;
 import com.volcengine.tos.TOSClientConfiguration;
 import com.volcengine.tos.TOSV2;
 import com.volcengine.tos.TOSV2ClientBuilder;

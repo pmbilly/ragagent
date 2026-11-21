@@ -1,10 +1,10 @@
 package com.ragagent.knowledge.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 import com.ragagent.knowledge.dto.kb.KBCloneProgress;
 import com.ragagent.knowledge.support.KnowledgeTaskProgressStore;
-import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

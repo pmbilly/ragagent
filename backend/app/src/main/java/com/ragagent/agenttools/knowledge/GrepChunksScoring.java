@@ -1,6 +1,6 @@
 package com.ragagent.agenttools.knowledge;
 
-import com.ragagent.platform.knowledge.GrepChunkHit;
+import com.ragagent.framework.knowledge.GrepChunkHit;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

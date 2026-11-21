@@ -1,15 +1,15 @@
 package com.ragagent.mcp.controller;
 
 import com.ragagent.agentengine.api.McpApprovalOps;
+import com.ragagent.framework.security.LogSanitizer;
+import com.ragagent.framework.web.ApiResponse;
+import com.ragagent.framework.web.ApiResult;
 import com.ragagent.mcp.oauth.OAuthManager;
 import com.ragagent.mcp.oauth.error.OAuthCallbackException;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.service.McpOAuthFlowService;
 import com.ragagent.mcp.service.McpOAuthFlowService.AuthorizeRequest;
 import com.ragagent.mcp.service.McpOAuthFlowService.ResolveRequest;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import org.slf4j.Logger;

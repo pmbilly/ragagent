@@ -1,6 +1,14 @@
 package com.ragagent.session.rag.plugin;
 
 
+import com.ragagent.framework.access.TenantContextSnapshot;
+import com.ragagent.framework.access.TenantScope;
+import com.ragagent.framework.event.Event;
+import com.ragagent.framework.event.EventBusInterface;
+import com.ragagent.framework.event.payload.AgentFinalAnswerData;
+import com.ragagent.framework.event.payload.AgentThoughtData;
+import com.ragagent.framework.event.payload.ErrorData;
+import com.ragagent.framework.eventbus.EventType;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatStream;
 import com.ragagent.llm.api.LlmChatClient;
@@ -9,19 +17,11 @@ import com.ragagent.llm.api.ResponseType;
 import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.modelcontext.StreamDecoder;
-import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.platform.access.TenantScope;
-import com.ragagent.platform.event.EventType;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.ReferencesSupport;
-import com.ragagent.shared.event.Event;
-import com.ragagent.shared.event.EventBusInterface;
-import com.ragagent.shared.event.payload.AgentFinalAnswerData;
-import com.ragagent.shared.event.payload.AgentThoughtData;
-import com.ragagent.shared.event.payload.ErrorData;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;

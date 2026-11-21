@@ -1,7 +1,7 @@
 package com.ragagent.im.runtime;
 
-import com.ragagent.platform.redis.RedisPubSub;
-import com.ragagent.platform.redis.SpringRedisPubSub;
+import com.ragagent.framework.redis.RedisPubSub;
+import com.ragagent.framework.redis.SpringRedisPubSub;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;

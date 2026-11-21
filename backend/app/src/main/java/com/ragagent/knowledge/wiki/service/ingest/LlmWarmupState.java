@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
-import com.ragagent.platform.concurrent.SingleFlight;
+import com.ragagent.framework.concurrent.SingleFlight;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;

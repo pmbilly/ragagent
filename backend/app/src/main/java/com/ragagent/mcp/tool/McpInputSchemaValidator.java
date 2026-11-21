@@ -2,7 +2,7 @@ package com.ragagent.mcp.tool;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.web.JsonMappers;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -15,6 +15,8 @@ import static com.ragagent.knowledge.wiki.controller.WikiRequestSupport.trimSpac
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.api.WikiPageNotFoundException;
 import com.ragagent.knowledge.wiki.domain.WikiPage;
@@ -28,8 +30,6 @@ import com.ragagent.knowledge.wiki.domain.page.WikiPageUpdateRequest;
 import com.ragagent.knowledge.wiki.service.page.WikiEditContext;
 import com.ragagent.knowledge.wiki.service.page.WikiPageService;
 import com.ragagent.knowledge.wiki.service.page.WikiRevertToCurrentVersionException;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.shared.error.BizException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

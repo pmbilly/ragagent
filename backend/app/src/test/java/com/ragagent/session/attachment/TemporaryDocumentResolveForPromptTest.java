@@ -6,15 +6,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.auth.service.TenantService;
+import com.ragagent.framework.knowledge.ImageRefRewriter;
+import com.ragagent.framework.shared.session.MessageAttachment;
 import com.ragagent.knowledge.api.DocReaderParsePort;
 import com.ragagent.knowledge.api.DocumentChunkingPort;
 import com.ragagent.llm.api.AsrTranscriber;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
-import com.ragagent.platform.knowledge.ImageRefRewriter;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
-import com.ragagent.shared.session.MessageAttachment;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.util.Arrays;

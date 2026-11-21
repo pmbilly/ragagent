@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.assembler;
 
+import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.knowledge.controller.vo.*;
 import com.ragagent.knowledge.dto.chunk.*;
 import com.ragagent.knowledge.dto.faq.GeneratedQuestionResponse;
-import com.ragagent.shared.pagination.PageResult;
 import java.util.List;
 import java.util.function.Function;
 

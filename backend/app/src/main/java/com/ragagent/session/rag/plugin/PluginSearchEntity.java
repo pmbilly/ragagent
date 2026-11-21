@@ -1,10 +1,14 @@
 package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.shared.graph.GraphNode;
+import com.ragagent.framework.shared.graph.GraphRelation;
+import com.ragagent.framework.shared.knowledge.ChunkFacts;
+import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.ChunkQueryPort;
 import com.ragagent.knowledge.api.KnowledgeBatchQueryPort;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.api.GraphData;
 import com.ragagent.retrieval.api.KnowledgeDocumentFacts;
 import com.ragagent.retrieval.api.NameSpace;
@@ -15,10 +19,6 @@ import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.ImageInfoCollector;
 import com.ragagent.session.rag.support.MatchTypes;
 import com.ragagent.session.rag.support.SearchSupport;
-import com.ragagent.shared.graph.GraphNode;
-import com.ragagent.shared.graph.GraphRelation;
-import com.ragagent.shared.knowledge.ChunkFacts;
-import com.ragagent.shared.retrieval.SearchResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

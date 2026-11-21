@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.service.image;
 
-import com.ragagent.platform.knowledge.ImageRefRewriter;
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.knowledge.ImageRefRewriter;
+import com.ragagent.framework.security.SsrfGuard;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;

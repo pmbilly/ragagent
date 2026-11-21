@@ -77,7 +77,7 @@
       "kind": "domain-internal",
       "why": "wiki 队列与分布式锁的 Redis 实现选择"
     },
-    "com.ragagent.platform.http.LlmTransportWiring": {
+    "com.ragagent.framework.http.LlmTransportWiring": {
       "kind": "module-internal",
       "why": "把可运行时调谐的 SsrfGuard 单例交给 LLM 传输层（避免各建实例）"
     },

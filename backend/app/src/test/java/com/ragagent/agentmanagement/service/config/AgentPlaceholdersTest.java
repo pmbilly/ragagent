@@ -3,7 +3,7 @@ package com.ragagent.agentmanagement.service.config;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.prompt.AgentPromptPlaceholders;
+import com.ragagent.framework.prompt.AgentPromptPlaceholders;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

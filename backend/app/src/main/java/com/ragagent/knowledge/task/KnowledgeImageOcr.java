@@ -2,15 +2,15 @@ package com.ragagent.knowledge.task;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.html.ContentTypeByFilename;
+import com.ragagent.framework.knowledge.ChunkSearchUtil;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.config.KnowledgeOcrProperties;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.domain.span.SpanTracker;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.knowledge.support.ImageOcrImage;
-import com.ragagent.platform.knowledge.ChunkSearchUtil;
-import com.ragagent.platform.text.ContentTypeByFilename;
-import com.ragagent.platform.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;

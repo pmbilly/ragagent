@@ -1,7 +1,7 @@
 package com.ragagent.auth.service;
 
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
 
 /**
  * 成员/邀请域的 service 哨兵异常。

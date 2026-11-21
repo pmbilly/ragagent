@@ -1,6 +1,6 @@
 package com.ragagent.session.rag;
 
-import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.framework.security.LogSanitizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

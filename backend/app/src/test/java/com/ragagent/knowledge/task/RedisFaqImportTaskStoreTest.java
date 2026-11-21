@@ -3,9 +3,9 @@ package com.ragagent.knowledge.task;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import com.ragagent.framework.stream.EmbeddedRedis;
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 import com.ragagent.knowledge.support.FaqImportTaskStore;
-import com.ragagent.platform.stream.EmbeddedRedis;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;

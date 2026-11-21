@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.wiki.service.page;
 
 
-import com.ragagent.shared.text.Whitespace;
+import com.ragagent.framework.text.Whitespace;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;

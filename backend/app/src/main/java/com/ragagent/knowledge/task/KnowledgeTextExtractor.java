@@ -1,6 +1,8 @@
 package com.ragagent.knowledge.task;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.html.ContentTypeByFilename;
+import com.ragagent.framework.knowledge.ImageRefRewriter;
 import com.ragagent.knowledge.api.ParserEngineRules;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -13,8 +15,6 @@ import com.ragagent.knowledge.service.image.ExtractedImageStore;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.knowledge.support.HtmlMainContent;
 import com.ragagent.knowledge.support.ProcessOverridesResolver;
-import com.ragagent.platform.knowledge.ImageRefRewriter;
-import com.ragagent.platform.text.ContentTypeByFilename;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;

@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.engine;
 
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.retrieval.api.VectorStoreView;
 
 /**

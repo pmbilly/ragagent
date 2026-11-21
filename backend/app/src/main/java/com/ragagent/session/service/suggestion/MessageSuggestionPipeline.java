@@ -2,14 +2,14 @@ package com.ragagent.session.service.suggestion;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.shared.session.SuggestionItem;
+import com.ragagent.framework.shared.wiki.WikiLanguageSupport;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.retrieval.api.SearchTextUtil;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.service.suggestion.MessageSuggestionService.Evidence;
 import com.ragagent.session.service.suggestion.MessageSuggestionService.GenerationContext;
-import com.ragagent.shared.retrieval.SearchResult;
-import com.ragagent.shared.session.SuggestionItem;
-import com.ragagent.shared.wiki.WikiLanguageSupport;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

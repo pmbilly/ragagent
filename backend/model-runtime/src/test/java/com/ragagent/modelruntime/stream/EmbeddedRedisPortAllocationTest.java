@@ -3,7 +3,7 @@ package com.ragagent.modelruntime.stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-import com.ragagent.platform.stream.EmbeddedRedis;
+import com.ragagent.framework.stream.EmbeddedRedis;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

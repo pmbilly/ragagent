@@ -2,7 +2,7 @@ package com.ragagent.datasource.connector.rss;
 
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.connector.ConnectorHttp;
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.security.SsrfGuard;
 import java.net.URI;
 import java.time.Duration;
 import java.util.Arrays;

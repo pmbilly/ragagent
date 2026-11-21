@@ -1,6 +1,6 @@
 package com.ragagent.im.channel.wecom;
 
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.security.SsrfGuard;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.http.HttpClient;

@@ -2,11 +2,11 @@ package com.ragagent.storage.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.platform.storage.support.Rewriter;
-import com.ragagent.shared.storage.support.FileUrlPort;
-import com.ragagent.shared.storage.support.Mode;
-import com.ragagent.shared.storage.support.StorageBackendResolver;
-import com.ragagent.shared.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.framework.shared.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.framework.storage.support.FileUrlPort;
+import com.ragagent.framework.storage.support.Mode;
+import com.ragagent.framework.storage.support.Rewriter;
+import com.ragagent.framework.storage.support.StorageBackendResolver;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;

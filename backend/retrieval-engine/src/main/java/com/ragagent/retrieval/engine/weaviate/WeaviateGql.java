@@ -2,7 +2,7 @@ package com.ragagent.retrieval.engine.weaviate;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.platform.web.ToolJson;
+import com.ragagent.framework.web.ToolJson;
 import com.ragagent.retrieval.engine.weaviate.WeaviateRestClient.Json;
 import java.math.BigDecimal;
 import java.util.ArrayList;

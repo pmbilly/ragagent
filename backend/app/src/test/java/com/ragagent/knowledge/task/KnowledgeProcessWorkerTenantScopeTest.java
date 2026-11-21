@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.framework.access.TenantContext;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.config.KnowledgeOcrProperties;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -21,7 +22,6 @@ import com.ragagent.knowledge.service.image.ExtractedImageStore;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelRuntime;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.retrieval.api.RetrieveGraphRepository;
 import com.ragagent.retrieval.api.VectorIndexStore;
 import java.util.concurrent.atomic.AtomicReference;

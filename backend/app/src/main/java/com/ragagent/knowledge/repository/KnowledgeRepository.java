@@ -5,12 +5,12 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.ragagent.framework.pagination.PageResult;
+import com.ragagent.framework.persistence.LikeEscapes;
+import com.ragagent.framework.persistence.PageRequests;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.dto.KnowledgeSearchScope;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.platform.persistence.LikeEscapes;
-import com.ragagent.platform.persistence.PageRequests;
-import com.ragagent.shared.pagination.PageResult;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -79,7 +79,7 @@ public class KnowledgeRepository {
                 .set(Knowledge::getMetadata, k.getMetadata() == null
                                 ? JsonNodeFactory.instance.objectNode()
                                 : k.getMetadata(),
-                        "typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler")
+                        "typeHandler=com.ragagent.framework.persistence.PgJsonTypeHandler")
                 .set(Knowledge::getUpdatedAt, k.getUpdatedAt() == null ? OffsetDateTime.now(ZoneOffset.UTC) : k.getUpdatedAt()));
     }
 
@@ -93,7 +93,7 @@ public class KnowledgeRepository {
                 .set(Knowledge::getMetadata, metadata == null
                                 ? JsonNodeFactory.instance.objectNode()
                                 : metadata,
-                        "typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler")
+                        "typeHandler=com.ragagent.framework.persistence.PgJsonTypeHandler")
                 .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
     }
 
@@ -116,7 +116,7 @@ public class KnowledgeRepository {
                 .set(Knowledge::getFileHash, k.getFileHash())
                 .set(Knowledge::getFilePath, k.getFilePath())
                 .set(Knowledge::getMetadata, metadata,
-                        "typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler")
+                        "typeHandler=com.ragagent.framework.persistence.PgJsonTypeHandler")
                 .set(Knowledge::getUpdatedAt, k.getUpdatedAt())
                 .set(Knowledge::getProcessedAt, k.getProcessedAt())
                 .set(Knowledge::getErrorMessage, k.getErrorMessage()));

@@ -2,15 +2,15 @@ package com.ragagent.session.rag.plugin;
 
 
 import com.ragagent.auth.api.TenantWebSearchConfigPort;
+import com.ragagent.framework.access.TenantContextSnapshot;
+import com.ragagent.framework.access.TenantScope;
+import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.shared.retrieval.SearchTarget;
 import com.ragagent.knowledge.api.KnowledgeBaseQueryPort;
-import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.platform.access.TenantScope;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.SearchSupport;
-import com.ragagent.shared.retrieval.SearchResult;
-import com.ragagent.shared.retrieval.SearchTarget;
 import com.ragagent.websearch.api.WebSearchRunPort;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

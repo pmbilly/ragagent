@@ -1,11 +1,11 @@
 package com.ragagent.mcp.service;
 
+import com.ragagent.framework.error.BizException;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpToolApproval;
 import com.ragagent.mcp.domain.McpToolPolicyPatch;
 import com.ragagent.mcp.repository.McpServiceRepository;
 import com.ragagent.mcp.repository.McpToolApprovalRepository;
-import com.ragagent.shared.error.BizException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 

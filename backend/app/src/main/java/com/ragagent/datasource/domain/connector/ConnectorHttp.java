@@ -1,6 +1,6 @@
 package com.ragagent.datasource.domain.connector;
 
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.security.SsrfGuard;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;

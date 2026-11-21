@@ -1,8 +1,8 @@
 package com.ragagent.rerank;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.web.ProviderJson;
 import com.ragagent.llm.api.RankResult;
-import com.ragagent.platform.web.ProviderJson;
 
 /**
  * {@link RankResult} 的 JSON 编解码（契约面持纯形状，解析/序列化留实现侧）。

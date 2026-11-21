@@ -1,5 +1,8 @@
 package com.ragagent.modelruntime.tracing;
 
+import com.ragagent.framework.tracing.langfuse.Generation;
+import com.ragagent.framework.tracing.langfuse.LangfuseManager;
+import com.ragagent.framework.tracing.langfuse.LangfuseTokenUsage;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;
@@ -11,9 +14,6 @@ import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.llm.api.TokenUsage;
 import com.ragagent.llm.api.ToolCall;
 import com.ragagent.modelruntime.stream.QueuedChatStream;
-import com.ragagent.platform.tracing.langfuse.Generation;
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
-import com.ragagent.platform.tracing.langfuse.LangfuseTokenUsage;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

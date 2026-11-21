@@ -2,8 +2,8 @@ package com.ragagent.agent.prompt;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.prompt.PromptSource;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.prompt.PromptSource;
+import com.ragagent.framework.web.JsonMappers;
 import java.util.List;
 
 /**

@@ -2,10 +2,10 @@ package com.ragagent.modelruntime.adapter.provider.asr;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.http.LlmTransport;
+import com.ragagent.framework.security.SsrfGuard;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.AsrTranscriber;
-import com.ragagent.platform.http.LlmTransport;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;

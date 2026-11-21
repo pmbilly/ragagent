@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.engine.tencentvectordb;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.web.JsonMappers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

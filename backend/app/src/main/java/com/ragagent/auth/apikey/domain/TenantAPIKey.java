@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.shared.apikey.APIKeyScopeType;
+import com.ragagent.framework.shared.apikey.APIKeyScopeType;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -22,7 +22,7 @@ import java.util.List;
  *       先用 AES-GCM 加密再落库；
  *       加密失败**绝不放行明文**，直接中断写入。<br>
  *       落点：{@code TenantAPIKeyRepository.insert/updateApiKeyHash} 在写库前
- *       调 {@link com.ragagent.platform.security.CryptoService#encryptAESGCM}，
+ *       调 {@link com.ragagent.framework.security.CryptoService#encryptAESGCM}，
  *       失败抛 {@code IllegalStateException}。</li>
  *   <li><b>读路径解密</b>：读出后解密 {@code api_key}，失败**抛错**
  *       （严格模式，不是宽容模式）。<br>

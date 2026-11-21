@@ -2,10 +2,10 @@ package com.ragagent.knowledge.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.html.CleanInvalidUtf8;
+import com.ragagent.framework.persistence.DatabaseDialects;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
-import com.ragagent.platform.persistence.DatabaseDialects;
-import com.ragagent.platform.text.CleanInvalidUtf8;
-import com.ragagent.platform.web.JsonMappers;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

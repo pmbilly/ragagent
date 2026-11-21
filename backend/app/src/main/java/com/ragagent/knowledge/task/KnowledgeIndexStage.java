@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.model.Embedder;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -12,12 +14,10 @@ import com.ragagent.knowledge.service.image.ExtractedImageStore;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.llm.api.ModelRuntime;
-import com.ragagent.platform.model.Embedder;
 import com.ragagent.retrieval.api.IndexEngine;
 import com.ragagent.retrieval.api.NameSpace;
 import com.ragagent.retrieval.api.RetrieveGraphRepository;
 import com.ragagent.retrieval.api.VectorIndexStore;
-import com.ragagent.shared.error.BizException;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;

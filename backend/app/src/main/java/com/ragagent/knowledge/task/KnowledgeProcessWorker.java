@@ -1,5 +1,10 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.access.TenantScopes;
+import com.ragagent.framework.access.TracingContext;
+import com.ragagent.framework.tracing.langfuse.LangfuseTaskScope;
+import com.ragagent.framework.tracing.langfuse.LangfuseTracing;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -9,11 +14,6 @@ import com.ragagent.knowledge.domain.span.SpanTracker;
 import com.ragagent.knowledge.repository.IngestStateRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.access.TenantScopes;
-import com.ragagent.platform.access.TracingContext;
-import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
-import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;

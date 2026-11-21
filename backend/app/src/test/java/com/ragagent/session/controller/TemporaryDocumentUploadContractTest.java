@@ -11,12 +11,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.agentengine.api.AgentLookup;
-import com.ragagent.platform.access.TenantContext;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.error.BizException;
 import com.ragagent.session.attachment.TemporaryDocumentService;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.service.AgentResolver;
-import com.ragagent.shared.error.BizException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

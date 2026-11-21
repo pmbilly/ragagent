@@ -2,7 +2,7 @@ package com.ragagent.mcp.domain;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.web.JsonMappers;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +14,7 @@ import org.apache.ibatis.type.JdbcType;
 /**
  * mcp_metadata.tools（jsonb，NOT NULL）的 TypeHandler。
  *
- * <p>为什么不用通用 {@link com.ragagent.platform.persistence.PgJsonTypeHandler}：
+ * <p>为什么不用通用 {@link com.ragagent.framework.persistence.PgJsonTypeHandler}：
  * {@code List<McpTool>} 走泛型会退化成 {@code List<LinkedHashMap>}，元素类型丢失。</p>
  *
  * <p>⚠️ 落库键名＝{@link McpTool} 的 Java 属性名：键名恒为驼峰

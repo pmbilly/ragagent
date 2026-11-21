@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.auth.domain.TenantInvitation;
 import com.ragagent.auth.mapper.TenantInvitationMapper;
-import com.ragagent.platform.persistence.PageRequests;
+import com.ragagent.framework.persistence.PageRequests;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;

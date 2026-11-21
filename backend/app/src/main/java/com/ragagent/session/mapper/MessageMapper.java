@@ -1,7 +1,9 @@
 package com.ragagent.session.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import com.ragagent.framework.persistence.PgJsonTypeHandler;
+import com.ragagent.framework.shared.session.MessageArtifact;
+import com.ragagent.framework.shared.session.MessageAttachment;
 import com.ragagent.session.domain.AgentStepListTypeHandler;
 import com.ragagent.session.domain.MentionedItemListTypeHandler;
 import com.ragagent.session.domain.SearchResultListTypeHandler;
@@ -10,8 +12,6 @@ import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageArtifactListTypeHandler;
 import com.ragagent.session.domain.message.MessageAttachmentListTypeHandler;
 import com.ragagent.session.domain.message.MessageImageListTypeHandler;
-import com.ragagent.shared.session.MessageArtifact;
-import com.ragagent.shared.session.MessageAttachment;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

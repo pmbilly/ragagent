@@ -1,8 +1,8 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
+import com.ragagent.framework.http.LlmTransport;
+import com.ragagent.framework.storage.config.StorageRuntimeEnv;
 import com.ragagent.llm.api.ChatMessage;
-import com.ragagent.platform.http.LlmTransport;
-import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

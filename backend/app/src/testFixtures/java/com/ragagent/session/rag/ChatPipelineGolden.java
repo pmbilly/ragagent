@@ -1,7 +1,7 @@
 package com.ragagent.session.rag;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.fixtures.GoldenResources;
+import com.ragagent.framework.fixtures.GoldenResources;
 
 /**
  * 4.6c 录制常量（chat_pipeline 检索管线 26 文件），由 Go 录制 JSONL 生成——<b>禁止手改</b>。

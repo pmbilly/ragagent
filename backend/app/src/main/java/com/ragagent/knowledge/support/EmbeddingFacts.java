@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.support;
 
+import com.ragagent.framework.model.ModelFacts;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
-import com.ragagent.platform.model.ModelFacts;
 
 /** 模型行 → 嵌入端口载荷（端口只认模型事实，不认实体/配置对象）。 */
 public final class EmbeddingFacts {

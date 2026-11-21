@@ -1,19 +1,19 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.html.ContentTypeByFilename;
+import com.ragagent.framework.security.LogSanitizer;
+import com.ragagent.framework.web.ApiResponse;
+import com.ragagent.framework.web.ApiResult;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.ParserEngineRules;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.platform.text.ContentTypeByFilename;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.attachment.TemporaryDocumentService;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.dto.TemporaryDocumentResponse;
 import com.ragagent.session.service.AgentResolver;
 import com.ragagent.session.support.SessionNotFoundException;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.slf4j.Logger;

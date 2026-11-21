@@ -3,7 +3,7 @@ package com.ragagent.websearch.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.web.JsonMappers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

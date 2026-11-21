@@ -1,10 +1,12 @@
 package com.ragagent.session.adapter;
 
+import com.ragagent.framework.event.EventBusInterface;
+import com.ragagent.framework.shared.session.MessageView;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.im.api.QaRequestPayload;
 import com.ragagent.im.api.SessionQaPort;
 import com.ragagent.im.api.SessionView;
 import com.ragagent.llm.api.TokenUsage;
-import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.domain.conversation.Session;
@@ -12,8 +14,6 @@ import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.service.QaSupport;
 import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
-import com.ragagent.shared.event.EventBusInterface;
-import com.ragagent.shared.session.MessageView;
 import org.springframework.stereotype.Component;
 
 /**

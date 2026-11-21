@@ -99,12 +99,12 @@ FROZEN_PREFIXES = (
     'datasource/connector/yuque/YuqueApiTypes',
     # A②-2a（2026-10-14）：`common/llm` 整目录迁入契约面 ⇒ 前缀拆成 4 个文件级
     # （前缀冻结在换包时静默失效——本文件开头已记过两次，这是第三次实战）
-    'shared/model/ResponseType', 'shared/model/TokenUsage', 'shared/model/PromptCacheStatus',
-    'shared/tool/ToolResult',
-    'llm/', 'modelruntime/', 'platform/tenant', 'shared/tenant/ParserEngineConfig',
-    'shared/retrieval/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
+    'framework/shared/model/ResponseType', 'framework/shared/model/TokenUsage', 'framework/shared/model/PromptCacheStatus',
+    'framework/shared/tool/ToolResult',
+    'llm/', 'modelruntime/', 'framework/tenant', 'framework/shared/tenant/ParserEngineConfig',
+    'framework/shared/retrieval/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
     'memory/domain/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
-    'platform/tracing/langfuse', 'modelruntime/tracing', 'retrieval/engine/doris', 'websearch/ImageInfo',
+    'framework/tracing/langfuse', 'modelruntime/tracing', 'retrieval/engine/doris', 'websearch/ImageInfo',
     # R4a 换锚：6 个 Langfuse 装饰器（tracing/decorators → framework/tracing/decorators）——包名带上了
     # platform 前缀，模块相对路径随之变化（与上一行同族；三件流句柄迁 framework/stream 无蛇键，不入册）。
     # 键名本体未变（Langfuse metadata 是第三方观测面）。
@@ -113,9 +113,9 @@ FROZEN_PREFIXES = (
     # 冻结悄悄失效、CI 才报"非冻结面出现新的 snake 键"。**换包时务必回来核这里** ✓。
     # A②-2a/2c：契约载荷的**线格式载体**（模块自 common/web 迁 framework/web，前缀同步换锚）——注解从契约类搬进 mixin 模块（§8.1 纯 JDK），
     # 键名仍是既有 API/jsonb 契约（snake 键是设计，不是漂移）。
-    'platform/web/ContractJsonMixins',   # 剩余面（error/event/json/text 等）
+    'framework/web/ContractJsonMixins',   # 剩余面（error/event/json/text 等）
     'llm/json/',                          # 模型面 mixin（从 platform.web 整体迁入）
-    'shared/wiki/ExtractedItem', 'session/rag/plugin', 'agent/AgentEngine',
+    'framework/shared/wiki/ExtractedItem', 'session/rag/plugin', 'agent/AgentEngine',
     'agent/ReActIteration', 'retrieval/HybridSearchService', 'retrieval/vlm/VlmClient',
     'knowledge/service/chunk/ChunkExtractService', 'knowledge/task/KnowledgeProcessWorker',
     # C11b 阶段拆分：worker 内的 span 键随代码外移到取文本/分块协作者，冻结前缀同步换锚
@@ -144,7 +144,7 @@ BASELINE: dict[str, set[str]] = {
     'agent/AgentPrompts.java': {'current_time', 'web_search_status'},
     # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake）
     # A③-⑨ 自 agent/tool/ 迁入 contract/tool/（按路径换锚）
-    'shared/tool/ToolCapabilities.java': {'data_analysis', 'data_schema', 'database_query', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'query_knowledge_graph', 'todo_write', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_update_issue', 'wiki_write_page'},
+    'framework/shared/tool/ToolCapabilities.java': {'data_analysis', 'data_schema', 'database_query', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'query_knowledge_graph', 'todo_write', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_update_issue', 'wiki_write_page'},
     # MyBatis 列名/参数（非 JSON 键）
     'auth/service/TenantInvitationService.java': {'invitation_id'},
     # MyBatis 列名/参数（非 JSON 键）
@@ -160,9 +160,9 @@ BASELINE: dict[str, set[str]] = {
     # PipelineLog 观测面（日志字段，非契约）
     'session/rag/support/SearchSupport.java': {'chunk_id', 'dropped_id', 'kept_id', 'match_type'},
     # langfuse 线上字段（第三方契约）
-    'platform/access/TracingContext.java': {'lf_parent_obs_id', 'lf_session_id', 'lf_trace_id', 'lf_traceparent', 'lf_user_id'},
+    'framework/access/TracingContext.java': {'lf_parent_obs_id', 'lf_session_id', 'lf_trace_id', 'lf_traceparent', 'lf_user_id'},
     # MDC 日志键（非 JSON）
-    'platform/web/RequestIdFilter.java': {'request_id'},
+    'framework/web/RequestIdFilter.java': {'request_id'},
     # OpenSearch 字段
     'config/OpenSearchAuditSinkAdapter.java': {'dst_alias', 'src_alias'},
     # MyBatis 列名/参数（非 JSON 键）
@@ -195,7 +195,7 @@ BASELINE: dict[str, set[str]] = {
     # R2c-3d 换锚：抽取提示词装载器由 `llm/extract` 迁 `platform.prompt`（纯提示词/配置面归技术面）。
     # 下列键是 **`initialization/extract_config.yaml` 的存量配置键**（vendor 资源"复制即校验"，
     # 键名由外部 yaml 决定、改键会破坏存量配置）——换包换锚，键名不动。
-    'platform/prompt/ExtractPrompts.java': {'extract_entity', 'extract_graph', 'fabri_text',
+    'framework/prompt/ExtractPrompts.java': {'extract_entity', 'extract_graph', 'fabri_text',
         'with_no_tag', 'with_tag'},
     # ImageInfo 面（§15.3 冻结族）
     # websearch metadata 的 published_at（§15.3 ① 外部决定：键名由搜索服务给，非我们的 JSON 面）。
@@ -259,7 +259,7 @@ BASELINE: dict[str, set[str]] = {
     # websearch metadata（§15.3 ① 外部决定）
     'session/rag/support/ReferencesSupport.java': {'published_at'},
     # 提示词模板变量（数据值，非 JSON 键）
-    'platform/prompt/PromptTemplateCatalog.java': {'has_knowledge_base', 'has_web_search'},
+    'framework/prompt/PromptTemplateCatalog.java': {'has_knowledge_base', 'has_web_search'},
     # provider 配置字段（对方词汇）
     'embedding/EmbedderFactory.java': {'api_version'},
     # agent 侧解析规则族（同 chat_parser_engine_rules，§14.9 ②）——该件已上提 L1，条目随之换锚（见上方 common/ 条目）

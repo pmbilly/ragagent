@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ragagent.TestSchema;
 import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.model.service.OllamaDownloadTaskStore;
-import com.ragagent.platform.security.SsrfGuard;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;

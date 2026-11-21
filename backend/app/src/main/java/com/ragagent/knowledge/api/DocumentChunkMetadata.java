@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * 文档 Chunk 的 metadata 形状。
  *
- * <p>存于 {@code chunks.metadata}（jsonb），由 {@code com.ragagent.platform.persistence.PgJsonTypeHandler} 以 JsonNode 透传落库；
+ * <p>存于 {@code chunks.metadata}（jsonb），由 {@code com.ragagent.framework.persistence.PgJsonTypeHandler} 以 JsonNode 透传落库；
  * 本类型用于 service 层读写（Upsert/Delete/Regenerate 生成问题）。生成问题在响应侧只以
  * {@link GeneratedQuestion} 元素出现，本类型本身不出 HTTP 响应。
  *

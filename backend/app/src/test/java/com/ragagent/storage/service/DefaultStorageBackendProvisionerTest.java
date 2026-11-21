@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.TestSchema;
-import com.ragagent.platform.storage.config.StorageRuntimeEnv;
+import com.ragagent.framework.storage.config.StorageRuntimeEnv;
 import com.ragagent.storage.api.StorageBackendProvisioner;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.dto.StorageConfig;

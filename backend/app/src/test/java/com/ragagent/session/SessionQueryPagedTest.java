@@ -3,11 +3,11 @@ package com.ragagent.session;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.TestSchema;
+import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.dto.SessionListItem;
 import com.ragagent.session.dto.SessionListQuery;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.shared.pagination.PageResult;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

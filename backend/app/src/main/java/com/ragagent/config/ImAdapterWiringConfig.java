@@ -1,5 +1,6 @@
 package com.ragagent.config;
 
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.im.channel.dingtalk.DingtalkAdapterFactory;
 import com.ragagent.im.channel.feishu.FeishuAdapterFactory;
 import com.ragagent.im.channel.feishu.FeishuRegion;
@@ -13,7 +14,6 @@ import com.ragagent.im.channel.yunzhijia.YunzhijiaAdapterFactory;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.service.ImTurnOrchestrator;
 import com.ragagent.modelruntime.stream.StreamManager;
-import com.ragagent.platform.security.SsrfGuard;
 import org.springframework.context.annotation.Configuration;
 
 /**

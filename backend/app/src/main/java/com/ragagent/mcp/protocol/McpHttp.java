@@ -1,6 +1,6 @@
 package com.ragagent.mcp.protocol;
 
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.security.SsrfGuard;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ProxySelector;

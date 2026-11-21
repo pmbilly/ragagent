@@ -2,9 +2,9 @@ package com.ragagent.config;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.ragagent.platform.persistence.FullTableWriteGuard;
-import com.ragagent.platform.persistence.SoftDeleteFilterGuard;
-import com.ragagent.platform.persistence.TenantFilterGuard;
+import com.ragagent.framework.persistence.FullTableWriteGuard;
+import com.ragagent.framework.persistence.SoftDeleteFilterGuard;
+import com.ragagent.framework.persistence.TenantFilterGuard;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

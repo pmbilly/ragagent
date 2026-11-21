@@ -4,7 +4,7 @@ import com.ragagent.auth.api.TenantAPIKeyCreateResponse;
 import com.ragagent.auth.api.TenantAPIKeyResponse;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.auth.apikey.dto.TenantAPIKeyProjections;
-import com.ragagent.shared.apikey.APIKeyScopeType;
+import com.ragagent.framework.shared.apikey.APIKeyScopeType;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;

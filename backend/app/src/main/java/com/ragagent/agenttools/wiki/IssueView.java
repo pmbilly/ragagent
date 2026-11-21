@@ -1,6 +1,6 @@
 package com.ragagent.agenttools.wiki;
 
-import com.ragagent.platform.web.ToolJson;
+import com.ragagent.framework.web.ToolJson;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.ragagent.storage.service;
 
-import com.ragagent.platform.security.Hashes;
-import com.ragagent.platform.storage.fileserve.StoragePaths;
+import com.ragagent.framework.security.Hashes;
+import com.ragagent.framework.storage.fileserve.StoragePaths;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.provider.StorageProviders;
 import com.ragagent.storage.repository.ResourceRepository;

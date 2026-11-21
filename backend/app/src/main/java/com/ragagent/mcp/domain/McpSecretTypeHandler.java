@@ -1,6 +1,6 @@
 package com.ragagent.mcp.domain;
 
-import com.ragagent.platform.security.CryptoService;
+import com.ragagent.framework.security.CryptoService;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

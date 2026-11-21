@@ -1,7 +1,7 @@
 package com.ragagent.auth.service;
 
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.text.UnicodeText;
+import com.ragagent.framework.html.UnicodeText;
+import com.ragagent.framework.security.SsrfGuard;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;

@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.shared.error.BizException;
+import com.ragagent.framework.error.BizException;
 import org.junit.jupiter.api.Test;
 
 /** 请求体绑定的 400 文案钉子（非对象 body / EOF）。 */

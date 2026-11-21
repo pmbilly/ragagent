@@ -1,7 +1,7 @@
 package com.ragagent.embedding;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.web.ProviderJson;
+import com.ragagent.framework.web.ProviderJson;
 import java.util.Arrays;
 import java.util.List;
 

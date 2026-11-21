@@ -2,6 +2,12 @@ package com.ragagent.knowledge.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.framework.html.CleanInvalidUtf8;
+import com.ragagent.framework.pagination.PageResult;
+import com.ragagent.framework.persistence.DatabaseDialects;
+import com.ragagent.framework.persistence.PageRequests;
+import com.ragagent.framework.persistence.TxTemplate;
+import com.ragagent.framework.shared.knowledge.ChunkFacts;
 import com.ragagent.knowledge.api.projection.ChunkProjectionAdapter;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
@@ -10,14 +16,8 @@ import com.ragagent.knowledge.mapper.ChunkRevisionMapper;
 import com.ragagent.knowledge.support.ChunkNotFoundException;
 import com.ragagent.knowledge.support.ChunkRevisionConflictException;
 import com.ragagent.knowledge.support.ChunkRowViews;
-import com.ragagent.platform.persistence.DatabaseDialects;
-import com.ragagent.platform.persistence.PageRequests;
-import com.ragagent.platform.persistence.TxTemplate;
-import com.ragagent.platform.text.CleanInvalidUtf8;
 import com.ragagent.retrieval.api.ChunkSearchGateway;
 import com.ragagent.retrieval.api.ChunkTypes;
-import com.ragagent.shared.knowledge.ChunkFacts;
-import com.ragagent.shared.pagination.PageResult;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -60,7 +60,7 @@ import org.springframework.stereotype.Component;
 public class ChunkRepository implements ChunkSearchGateway {
 
     /** 三条 json 列共用的类型处理器（3 参 set 的 mapping 串）。 */
-    private static final String PG_JSON = "com.ragagent.platform.persistence.PgJsonTypeHandler";
+    private static final String PG_JSON = "com.ragagent.framework.persistence.PgJsonTypeHandler";
 
     private static final int STATUS_DEFAULT = 0;
     private static final int STATUS_INDEXED = 2;

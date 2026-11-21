@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.shared.error.BizException;
+import com.ragagent.framework.error.BizException;
 import org.junit.jupiter.api.Test;
 
 /**

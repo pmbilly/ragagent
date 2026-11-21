@@ -1,8 +1,8 @@
 package com.ragagent.websearch.fetch;
 
-import com.ragagent.platform.http.LlmTransport;
-import com.ragagent.platform.security.IpClass;
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.http.LlmTransport;
+import com.ragagent.framework.security.IpClass;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.websearch.api.FetchException;
 import java.io.IOException;
 import java.net.InetAddress;

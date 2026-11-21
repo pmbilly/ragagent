@@ -1,6 +1,6 @@
 package com.ragagent.mcp.approval;
 
-import com.ragagent.platform.config.AppEnvLookup;
+import com.ragagent.framework.config.AppEnvLookup;
 import java.time.Duration;
 import java.util.UUID;
 

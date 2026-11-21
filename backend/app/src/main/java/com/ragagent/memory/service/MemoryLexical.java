@@ -1,7 +1,7 @@
 package com.ragagent.memory.service;
 
+import com.ragagent.framework.shared.memory.MemoryKeys;
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.shared.memory.MemoryKeys;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

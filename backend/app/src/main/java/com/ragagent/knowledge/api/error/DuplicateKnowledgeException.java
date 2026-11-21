@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.api.error;
 
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.error.ErrorCode;
 import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.error.ErrorCode;
 
 /**
  * 上传内容与库内已有文档重复（409）。

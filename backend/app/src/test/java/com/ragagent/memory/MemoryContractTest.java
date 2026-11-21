@@ -3,12 +3,12 @@ package com.ragagent.memory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.shared.tenant.MemoryConfig;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.dto.MemoryConsolidationResult;
 import com.ragagent.memory.dto.MemoryDocView;
 import com.ragagent.memory.dto.MemoryTopicView;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.tenant.MemoryConfig;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;

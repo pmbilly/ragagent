@@ -1,12 +1,12 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
+import com.ragagent.framework.html.CodePointOrder;
+import com.ragagent.framework.text.Whitespace;
 import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.domain.WikiPage;
 import com.ragagent.knowledge.wiki.domain.page.WikiPageLite;
 import com.ragagent.knowledge.wiki.service.page.SlugFuzzy;
-import com.ragagent.platform.text.CodePointOrder;
-import com.ragagent.shared.text.Whitespace;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;

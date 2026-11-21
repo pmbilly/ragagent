@@ -1,5 +1,11 @@
 package com.ragagent.memory.controller;
 
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.pagination.PageResult;
+import com.ragagent.framework.shared.memory.MemoryKinds;
+import com.ragagent.framework.web.ApiResponse;
+import com.ragagent.framework.web.ApiResult;
 import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.dto.CreateMemoryItemRequest;
 import com.ragagent.memory.dto.MemoryConsolidationResult;
@@ -14,12 +20,6 @@ import com.ragagent.memory.service.MemoryConsolidationService;
 import com.ragagent.memory.service.MemoryScopeExceptions;
 import com.ragagent.memory.service.MemoryService;
 import com.ragagent.memory.support.MemoryConflictException;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.memory.MemoryKinds;
-import com.ragagent.shared.pagination.PageResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.ArrayList;

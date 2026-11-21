@@ -16,7 +16,7 @@ class ParserEngineRulesTest {
     /** G1-k：resolve 已改纯 JDK 读面 ⇒ 夹具同步归一（顺带覆盖新读面）。 */
     private static Object rules(String json) {
         try {
-            return com.ragagent.platform.web.JsonMappers.toJavaValue(MAPPER.readTree(json));
+            return com.ragagent.framework.web.JsonMappers.toJavaValue(MAPPER.readTree(json));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

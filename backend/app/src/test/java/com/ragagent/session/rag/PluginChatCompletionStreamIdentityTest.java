@@ -2,6 +2,7 @@ package com.ragagent.session.rag;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.framework.access.TenantContext;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;
@@ -10,7 +11,6 @@ import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.modelruntime.stream.QueuedChatStream;
-import com.ragagent.platform.access.TenantContext;
 import com.ragagent.session.rag.plugin.PluginChatCompletionStream;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;

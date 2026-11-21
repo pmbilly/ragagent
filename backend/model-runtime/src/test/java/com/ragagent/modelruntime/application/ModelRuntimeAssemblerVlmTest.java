@@ -10,14 +10,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.framework.security.CryptoService;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.llm.api.VlmPredictor;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
-import com.ragagent.platform.security.CryptoService;
-import com.ragagent.platform.security.SsrfGuard;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

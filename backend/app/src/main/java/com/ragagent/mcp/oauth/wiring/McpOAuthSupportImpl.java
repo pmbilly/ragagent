@@ -1,5 +1,6 @@
 package com.ragagent.mcp.oauth.wiring;
 
+import com.ragagent.framework.access.TenantContext;
 import com.ragagent.mcp.domain.McpAdvancedConfig;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpPrincipal;
@@ -17,7 +18,6 @@ import com.ragagent.mcp.protocol.McpOAuthRuntime;
 import com.ragagent.mcp.protocol.McpOAuthSupport;
 import com.ragagent.mcp.protocol.McpProtocol;
 import com.ragagent.mcp.protocol.McpTransport;
-import com.ragagent.platform.access.TenantContext;
 import java.net.URI;
 import java.time.Duration;
 import java.util.LinkedHashMap;

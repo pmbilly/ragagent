@@ -4,14 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.shared.memory.MemoryKinds;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ChatResponse;
 import com.ragagent.memory.domain.MemoryExtractPayload;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryTombstone;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.memory.MemoryKinds;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;

@@ -1,10 +1,10 @@
 package com.ragagent.im.channel.dingtalk;
 
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCredentials;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.service.ImTurnOrchestrator;
-import com.ragagent.platform.security.SsrfGuard;
 import java.util.Map;
 import java.util.function.BiConsumer;
 

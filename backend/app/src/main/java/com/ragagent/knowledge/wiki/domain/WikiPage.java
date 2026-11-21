@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import com.ragagent.framework.persistence.PgJsonTypeHandler;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;

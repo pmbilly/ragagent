@@ -2,7 +2,7 @@ package com.ragagent.datasource.connector.gitlab;
 
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.shared.text.Whitespace;
+import com.ragagent.framework.text.Whitespace;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

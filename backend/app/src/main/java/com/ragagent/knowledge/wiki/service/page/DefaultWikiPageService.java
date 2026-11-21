@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.wiki.service.page;
 
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.knowledge.api.wiki.WikiException;
@@ -24,7 +25,6 @@ import com.ragagent.knowledge.wiki.repository.WikiPageRepository;
 import com.ragagent.knowledge.wiki.service.WikiChunkCleaner;
 import com.ragagent.knowledge.wiki.service.ingest.graph.WikiGraphCalculator;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiPendingOpsCounter;
-import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -57,7 +57,7 @@ import org.springframework.stereotype.Service;
  *
  * <h3>上下文</h3>
  * <p>编辑来源与用户身份由 {@link WikiEditContext} +
- * {@link com.ragagent.platform.access.TenantContext} 承担，service 签名不带额外的来源参数。</p>
+ * {@link com.ragagent.framework.access.TenantContext} 承担，service 签名不带额外的来源参数。</p>
  */
 @Service
 public class DefaultWikiPageService implements WikiPageService {

@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.api;
 
-import com.ragagent.shared.knowledge.ChunkView;
+import com.ragagent.framework.shared.knowledge.ChunkView;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

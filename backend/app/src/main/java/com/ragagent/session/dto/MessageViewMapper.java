@@ -1,7 +1,7 @@
 package com.ragagent.session.dto;
 
+import com.ragagent.framework.shared.session.MessageView;
 import com.ragagent.session.domain.message.Message;
-import com.ragagent.shared.session.MessageView;
 
 /** 消息实体 → 契约线格式视图。 */
 public final class MessageViewMapper {

@@ -1,11 +1,11 @@
 package com.ragagent.memory.runtime;
 
 
+import com.ragagent.framework.access.TracingContext;
+import com.ragagent.framework.shared.memory.MemoryKeys;
+import com.ragagent.framework.tracing.langfuse.LangfuseManager;
+import com.ragagent.framework.tracing.langfuse.LangfuseTracing;
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.platform.access.TracingContext;
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
-import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
-import com.ragagent.shared.memory.MemoryKeys;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,7 +32,7 @@ public final class MemoryTrace {
      * 一一对应，没有 try-finally 包起来。</p>
      */
     public static Span start(String name, Map<String, Object> input) {
-        com.ragagent.platform.tracing.langfuse.Span inner = LangfuseManager.get()
+        com.ragagent.framework.tracing.langfuse.Span inner = LangfuseManager.get()
                 .startSpan(new LangfuseManager.SpanOptions(
                         name, input, null));
         return new Span(name, input, inner);
@@ -47,9 +47,9 @@ public final class MemoryTrace {
     public static final class Span {
         private final String name;
         private final Map<String, Object> input;
-        private final com.ragagent.platform.tracing.langfuse.Span inner;
+        private final com.ragagent.framework.tracing.langfuse.Span inner;
 
-        Span(String name, Map<String, Object> input, com.ragagent.platform.tracing.langfuse.Span inner) {
+        Span(String name, Map<String, Object> input, com.ragagent.framework.tracing.langfuse.Span inner) {
             this.name = name;
             this.input = input;
             this.inner = inner;

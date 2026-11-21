@@ -1,9 +1,9 @@
 package com.ragagent.mcp.controller;
 
+import com.ragagent.framework.web.ApiResponse;
+import com.ragagent.framework.web.ApiResult;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
 import com.ragagent.mcp.service.AgentToolApprovalService;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

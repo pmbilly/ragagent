@@ -1,7 +1,7 @@
 package com.ragagent.session.domain;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.ragagent.shared.agent.AgentStep;
+import com.ragagent.framework.shared.agent.AgentStep;
 import java.util.List;
 
 /**

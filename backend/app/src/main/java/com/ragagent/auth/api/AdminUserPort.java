@@ -1,6 +1,6 @@
 package com.ragagent.auth.api;
 
-import com.ragagent.shared.pagination.PageResult;
+import com.ragagent.framework.pagination.PageResult;
 
 /**
  * 管理员用户的查询端口。

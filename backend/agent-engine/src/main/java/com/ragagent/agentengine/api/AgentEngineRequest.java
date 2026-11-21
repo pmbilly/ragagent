@@ -1,6 +1,6 @@
 package com.ragagent.agentengine.api;
 
-import com.ragagent.shared.tool.AgentTool;
+import com.ragagent.framework.shared.tool.AgentTool;
 import java.util.List;
 
 /**

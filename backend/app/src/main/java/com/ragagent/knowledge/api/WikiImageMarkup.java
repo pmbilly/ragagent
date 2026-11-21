@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.api;
 
-import com.ragagent.shared.text.Whitespace;
+import com.ragagent.framework.text.Whitespace;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;

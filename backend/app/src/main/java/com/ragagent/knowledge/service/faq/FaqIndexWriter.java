@@ -1,6 +1,10 @@
 package com.ragagent.knowledge.service.faq;
 
 import com.ragagent.auth.api.TenantStorageQuotaPort;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.model.Embedder;
+import com.ragagent.framework.model.EmbeddingPort;
+import com.ragagent.framework.shared.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.config.BatchEmbedProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -14,14 +18,10 @@ import com.ragagent.knowledge.support.SourceTypes;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.llm.api.ModelRuntime;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.model.Embedder;
-import com.ragagent.platform.model.EmbeddingPort;
 import com.ragagent.retrieval.api.IndexDocument;
 import com.ragagent.retrieval.api.IndexEngine;
 import com.ragagent.retrieval.api.IndexRow;
 import com.ragagent.retrieval.api.VectorIndexStore;
-import com.ragagent.shared.knowledge.FaqChunkMetadata;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;

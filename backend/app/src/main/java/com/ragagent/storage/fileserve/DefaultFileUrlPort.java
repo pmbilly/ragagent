@@ -1,6 +1,6 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.shared.storage.support.FileUrlPort;
+import com.ragagent.framework.storage.support.FileUrlPort;
 import com.ragagent.storage.api.FileContentService;
 import java.io.IOException;
 

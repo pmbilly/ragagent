@@ -1,6 +1,8 @@
 package com.ragagent.knowledge.service.enrichment;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.access.TenantScopes;
 import com.ragagent.knowledge.api.WikiKnowledgeFinalizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkQuestionPort;
@@ -14,8 +16,6 @@ import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.runtime.KnowledgeTrace;
 import com.ragagent.knowledge.support.SubtaskDrain;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.access.TenantScopes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

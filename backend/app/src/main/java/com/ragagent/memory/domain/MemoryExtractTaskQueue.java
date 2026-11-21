@@ -1,6 +1,6 @@
 package com.ragagent.memory.domain;
 
-import com.ragagent.platform.task.TaskQueue;
+import com.ragagent.framework.task.TaskQueue;
 
 import java.time.Duration;
 

@@ -9,6 +9,8 @@ import static com.ragagent.knowledge.wiki.controller.WikiRequestSupport.trimSpac
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.knowledge.wiki.domain.WikiPage;
 import com.ragagent.knowledge.wiki.domain.folder.WikiFolder;
 import com.ragagent.knowledge.wiki.domain.folder.WikiFolderCreateRequest;
@@ -17,8 +19,6 @@ import com.ragagent.knowledge.wiki.domain.folder.WikiFolderNode;
 import com.ragagent.knowledge.wiki.domain.folder.WikiFolderUpdateRequest;
 import com.ragagent.knowledge.wiki.domain.page.WikiPageMoveRequest;
 import com.ragagent.knowledge.wiki.service.page.WikiPageService;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.shared.error.BizException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;

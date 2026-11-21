@@ -1,10 +1,10 @@
 package com.ragagent.agenttools.knowledge;
 
-import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.framework.shared.knowledge.ChunkFacts;
+import com.ragagent.framework.shared.knowledge.FaqChunkMetadata;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.retrieval.api.SearchTextUtil;
-import com.ragagent.shared.knowledge.ChunkFacts;
-import com.ragagent.shared.knowledge.FaqChunkMetadata;
 import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;

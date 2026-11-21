@@ -6,9 +6,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
-import com.ragagent.platform.persistence.SecretJsonTypeHandler;
-import com.ragagent.shared.tenant.APIPrincipalConfig;
+import com.ragagent.framework.persistence.PgJsonTypeHandler;
+import com.ragagent.framework.persistence.SecretJsonTypeHandler;
+import com.ragagent.framework.shared.tenant.APIPrincipalConfig;
 import java.time.OffsetDateTime;
 
 /**

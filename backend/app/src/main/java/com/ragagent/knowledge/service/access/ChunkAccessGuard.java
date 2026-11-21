@@ -1,6 +1,10 @@
 package com.ragagent.knowledge.service.access;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.framework.shared.tenant.TenantRole;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -8,10 +12,6 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.support.ChunkNotFoundException;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.shared.apikey.TenantAPIKeyScope;
-import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.tenant.TenantRole;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

@@ -1,12 +1,12 @@
 package com.ragagent.session.rag.support;
 
+import com.ragagent.framework.shared.retrieval.SearchResult;
 import com.ragagent.retrieval.api.RetrievalObsRows;
 import com.ragagent.retrieval.api.SearchChunkMerge;
 import com.ragagent.retrieval.api.SearchTextUtil;
 import com.ragagent.session.rag.History;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
-import com.ragagent.shared.retrieval.SearchResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

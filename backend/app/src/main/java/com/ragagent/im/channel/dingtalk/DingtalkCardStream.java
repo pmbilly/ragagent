@@ -2,9 +2,9 @@ package com.ragagent.im.channel.dingtalk;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.platform.web.JsonMappers;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;

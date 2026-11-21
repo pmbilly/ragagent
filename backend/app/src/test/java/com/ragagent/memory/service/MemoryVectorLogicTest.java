@@ -2,10 +2,10 @@ package com.ragagent.memory.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.framework.shared.memory.MemoryKinds;
+import com.ragagent.framework.shared.tenant.MemoryConfig;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.repository.MemoryRepository;
-import com.ragagent.shared.memory.MemoryKinds;
-import com.ragagent.shared.tenant.MemoryConfig;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

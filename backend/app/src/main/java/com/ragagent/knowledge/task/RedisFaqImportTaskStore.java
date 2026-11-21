@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 import com.ragagent.knowledge.support.FaqImportTaskStore;
-import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.util.List;
 import org.slf4j.Logger;

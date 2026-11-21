@@ -2,7 +2,7 @@ package com.ragagent.favorite.service;
 
 import com.ragagent.favorite.domain.UserResourceFavorite;
 import com.ragagent.favorite.repository.UserResourceFavoriteRepository;
-import com.ragagent.shared.error.BizException;
+import com.ragagent.framework.error.BizException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;

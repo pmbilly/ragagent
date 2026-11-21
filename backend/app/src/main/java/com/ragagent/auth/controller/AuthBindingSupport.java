@@ -5,11 +5,11 @@ import com.ragagent.auth.dto.AuthLoginResponse;
 import com.ragagent.auth.dto.Membership;
 import com.ragagent.auth.dto.TenantResponse;
 import com.ragagent.auth.dto.TenantRowView;
-import com.ragagent.platform.web.JsonBodyErrors;
-import com.ragagent.platform.web.RequestFields;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.tenant.TenantRole;
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.shared.tenant.TenantRole;
+import com.ragagent.framework.web.JsonBodyErrors;
+import com.ragagent.framework.web.RequestFields;
 import java.util.List;
 
 /**

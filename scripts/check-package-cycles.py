@@ -109,7 +109,7 @@ def rel(f):
 BASELINE = pathlib.Path("scripts/package-cycles.baseline.json")
 L2 = {"llm", "modelruntime", "retrieval", "embedding", "rerank", "chatpipeline", "modelcontext",
       "searchutil", "storageurl", "webfetch"}
-L1 = {"common", "event", "stream", "tracing", "config", "shared", "platform"}  # B258 契约面 / B259 平台面 属底座
+L1 = {"common", "event", "json", "text", "pagination", "error", "stream", "tracing", "config", "shared", "framework"}  # B258 契约面 / B259 平台面 属底座
 L3 = sorted(set(DOMAIN_FILES) - L2 - L1)
 # 已完成端口化、禁止回流的包对（R4）
 DECOUPLED = []
@@ -172,7 +172,7 @@ relapsed = sorted((a, b) for a, b in DECOUPLED
                    if b in edge.get(a, ()) and not _same_family(a, b))
 
 # L1 核心底座：不得依赖业务域（R5）
-L1_CORE = {"common", "event", "stream", "tracing", "shared", "platform"}  # B258/B259：同上
+L1_CORE = {"common", "event", "json", "text", "pagination", "error", "stream", "tracing", "shared", "framework"}  # B258/B259：同上
 l1_to_l3 = sorted((a, b) for a in L1_CORE for b in edge.get(a, ()) if b in L3)
 
 # common 实现痕迹（R6）：按子包登记，只许减不许增

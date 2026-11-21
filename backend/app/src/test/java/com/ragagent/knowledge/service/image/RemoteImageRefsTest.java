@@ -3,8 +3,8 @@ package com.ragagent.knowledge.service.image;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import com.ragagent.platform.knowledge.ImageRefRewriter;
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.knowledge.ImageRefRewriter;
+import com.ragagent.framework.security.SsrfGuard;
 import com.sun.net.httpserver.HttpServer;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;

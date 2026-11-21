@@ -10,11 +10,11 @@ import com.ragagent.embedding.provider.OllamaEmbedder;
 import com.ragagent.embedding.provider.OpenAiEmbedder;
 import com.ragagent.embedding.provider.VolcengineEmbedder;
 import com.ragagent.embedding.provider.ZhipuEmbedder;
+import com.ragagent.framework.model.Embedder;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
-import com.ragagent.platform.model.Embedder;
 import java.util.Locale;
 import java.util.Map;
 

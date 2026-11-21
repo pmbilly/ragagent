@@ -7,6 +7,8 @@ import static com.ragagent.session.rag.Rec46cSupport.resultIDs;
 import static com.ragagent.session.rag.Rec46cSupport.scores;
 import static com.ragagent.session.rag.Rec46cSupport.searchResultsShape;
 
+import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.shared.retrieval.SearchTarget;
 import com.ragagent.memory.api.MemoryItemView;
 import com.ragagent.memory.api.MemoryRecall;
 import com.ragagent.session.rag.plugin.PluginError;
@@ -15,8 +17,6 @@ import com.ragagent.session.rag.plugin.PluginMemoryRecall;
 import com.ragagent.session.rag.plugin.PluginRerank;
 import com.ragagent.session.rag.plugin.PluginWikiBoost;
 import com.ragagent.session.rag.support.ReferencesSupport;
-import com.ragagent.shared.retrieval.SearchResult;
-import com.ragagent.shared.retrieval.SearchTarget;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

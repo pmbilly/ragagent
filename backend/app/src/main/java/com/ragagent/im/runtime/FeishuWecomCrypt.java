@@ -1,6 +1,6 @@
 package com.ragagent.im.runtime;
 
-import com.ragagent.platform.security.Hashes;
+import com.ragagent.framework.security.Hashes;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;

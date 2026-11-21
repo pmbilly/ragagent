@@ -1,7 +1,7 @@
 package com.ragagent.config;
 
+import com.ragagent.framework.prompt.ExtractPrompts;
 import com.ragagent.llm.ollama.OllamaService;
-import com.ragagent.platform.prompt.ExtractPrompts;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

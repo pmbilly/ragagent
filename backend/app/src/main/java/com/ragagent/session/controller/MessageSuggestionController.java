@@ -1,7 +1,7 @@
 package com.ragagent.session.controller;
 
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
+import com.ragagent.framework.web.ApiResponse;
+import com.ragagent.framework.web.ApiResult;
 import com.ragagent.session.dto.MessageSuggestionResponse;
 import com.ragagent.session.service.suggestion.MessageSuggestionFacade;
 import io.swagger.v3.oas.annotations.tags.Tag;

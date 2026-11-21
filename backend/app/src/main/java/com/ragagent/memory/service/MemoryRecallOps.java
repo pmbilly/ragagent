@@ -1,5 +1,8 @@
 package com.ragagent.memory.service;
 
+import com.ragagent.framework.shared.memory.MemoryKeys;
+import com.ragagent.framework.shared.memory.MemoryKinds;
+import com.ragagent.framework.shared.tenant.MemoryConfig;
 import com.ragagent.memory.api.MemoryRecall;
 import com.ragagent.memory.domain.MemoryRender;
 import com.ragagent.memory.domain.MemoryText;
@@ -7,9 +10,6 @@ import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.runtime.MemoryTrace;
-import com.ragagent.shared.memory.MemoryKeys;
-import com.ragagent.shared.memory.MemoryKinds;
-import com.ragagent.shared.tenant.MemoryConfig;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;

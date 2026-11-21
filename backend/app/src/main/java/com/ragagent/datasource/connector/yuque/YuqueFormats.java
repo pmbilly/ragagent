@@ -1,6 +1,6 @@
 package com.ragagent.datasource.connector.yuque;
 
-import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.framework.web.ZeroTimeSerializer;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;

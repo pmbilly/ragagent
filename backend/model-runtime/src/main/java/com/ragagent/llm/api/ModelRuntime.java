@@ -1,7 +1,7 @@
 package com.ragagent.llm.api;
 
+import com.ragagent.framework.model.Embedder;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
-import com.ragagent.platform.model.Embedder;
 
 /**
  * 模型运行时端口（契约面）：按模型 id 造出可直接调用的能力客户端。

@@ -1,14 +1,14 @@
 package com.ragagent.knowledge.wiki.repository.ingest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.tracing.langfuse.LangfuseTaskScope;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.wiki.domain.TaskDeadLetter;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestPayload;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestSlotReleaser;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestTask;
 import com.ragagent.knowledge.wiki.repository.TaskDeadLetterRepository;
-import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
-import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
 import org.slf4j.Logger;

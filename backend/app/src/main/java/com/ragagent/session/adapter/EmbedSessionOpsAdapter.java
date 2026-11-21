@@ -1,6 +1,7 @@
 package com.ragagent.session.adapter;
 
 import com.ragagent.embedchannel.api.EmbedSessionOps;
+import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
 import com.ragagent.session.domain.conversation.Session;
@@ -8,7 +9,6 @@ import com.ragagent.session.dto.SessionListItem;
 import com.ragagent.session.dto.SessionListQuery;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.session.support.SessionOwnerIds;
-import com.ragagent.shared.pagination.PageResult;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;

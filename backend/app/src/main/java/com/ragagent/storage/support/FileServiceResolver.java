@@ -1,14 +1,14 @@
 package com.ragagent.storage.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.platform.storage.support.Rewriter;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.storage.support.FileUrlPort;
-import com.ragagent.shared.storage.support.Resolver;
-import com.ragagent.shared.storage.support.StorageBackendResolver;
-import com.ragagent.shared.tenant.StorageEngineConfig;
-import com.ragagent.shared.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.framework.shared.tenant.StorageEngineConfig;
+import com.ragagent.framework.shared.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.framework.storage.fileserve.StoragePaths;
+import com.ragagent.framework.storage.support.FileUrlPort;
+import com.ragagent.framework.storage.support.Resolver;
+import com.ragagent.framework.storage.support.Rewriter;
+import com.ragagent.framework.storage.support.StorageBackendResolver;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.FileServiceFactory;
 import com.ragagent.storage.provider.StorageProviders;

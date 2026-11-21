@@ -1,10 +1,10 @@
 package com.ragagent.mcp.protocol;
 
+import com.ragagent.framework.access.TenantContext;
 import com.ragagent.mcp.domain.McpResource;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.domain.McpTransportType;
-import com.ragagent.platform.access.TenantContext;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;

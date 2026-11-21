@@ -3,8 +3,8 @@ package com.ragagent.knowledge.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.TestSchema;
+import com.ragagent.framework.access.TenantContext;
 import com.ragagent.knowledge.service.management.KnowledgeService;
-import com.ragagent.platform.access.TenantContext;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;

@@ -1,13 +1,13 @@
 package com.ragagent.agent;
 
 import com.ragagent.agent.tool.ExecutionPolicy;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.access.TenantContextSnapshot;
+import com.ragagent.framework.access.TenantScope;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.shared.agent.AgentToolCall;
+import com.ragagent.framework.shared.tool.ToolResult;
 import com.ragagent.llm.api.ToolCall;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.platform.access.TenantScope;
-import com.ragagent.shared.agent.AgentToolCall;
-import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;

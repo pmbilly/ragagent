@@ -1,6 +1,6 @@
 package com.ragagent.mcp.approval;
 
-import com.ragagent.platform.redis.RedisPubSub;
+import com.ragagent.framework.redis.RedisPubSub;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;

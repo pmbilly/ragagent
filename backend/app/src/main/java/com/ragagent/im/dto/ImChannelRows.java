@@ -2,8 +2,8 @@ package com.ragagent.im.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.im.domain.ImChannelEntity;
-import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 
 /** IM 渠道响应行：键序保持 WeKnora 线格式（前端逐字依赖）。 */

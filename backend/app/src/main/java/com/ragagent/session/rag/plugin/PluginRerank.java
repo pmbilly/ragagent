@@ -1,12 +1,14 @@
 package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.shared.retrieval.SearchTarget;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.DocumentChunkMetadata;
 import com.ragagent.knowledge.api.GeneratedQuestion;
 import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.llm.api.RankResult;
 import com.ragagent.llm.api.Reranker;
-import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.retrieval.api.ImageInfo;
 import com.ragagent.retrieval.api.RetrievalObsRows;
@@ -17,8 +19,6 @@ import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.runtime.SessionTrace;
-import com.ragagent.shared.retrieval.SearchResult;
-import com.ragagent.shared.retrieval.SearchTarget;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;

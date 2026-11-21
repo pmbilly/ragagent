@@ -8,8 +8,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.auth.apikey.dto.TenantAPIKeyRequest;
 import com.ragagent.auth.apikey.service.TenantAPIKeyValidator;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;

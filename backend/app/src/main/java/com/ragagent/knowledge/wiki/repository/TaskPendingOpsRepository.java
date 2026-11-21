@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.wiki.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ragagent.framework.persistence.PageRequests;
 import com.ragagent.knowledge.wiki.domain.TaskPendingOp;
 import com.ragagent.knowledge.wiki.mapper.TaskPendingOpMapper;
-import com.ragagent.platform.persistence.PageRequests;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -7,7 +7,7 @@ import com.ragagent.datasource.connector.feishu.core.DocxMarkdown.PendingAttachm
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.SubtreeChildIds;
 import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.platform.config.AppEnvLookup;
+import com.ragagent.framework.config.AppEnvLookup;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

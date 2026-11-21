@@ -1,10 +1,10 @@
 package com.ragagent.im.channel.feishu;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.im.runtime.AdapterInterfaces;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.platform.security.SsrfGuard;
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.net.http.HttpClient;

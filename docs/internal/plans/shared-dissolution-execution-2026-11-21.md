@@ -74,9 +74,9 @@ bash scripts/run-guards.sh; echo "exit=$?"
 
 ## 4. 工作包
 
-### 4.0 归属总表（剩余 59 个）
+### 4.0 归属总表（剩余 48 个）
 
-> 起点 153 个业务词汇，已归位 87 个（WP4-C 1 · 知识簇 40 · 模型面 21 · 检索面 6 · 域面 18 · 内联 1）；下表是**剩余 59 个**的唯一归属。
+> 起点 153 个业务词汇，已归位 87 个（WP4-C 1 · 知识簇 40 · 模型面 21 · 检索面 6 · 域面 18 · 内联 1）；下表是**剩余 48 个**的唯一归属。
 
 | 落点 | 数量 | 类型 |
 |---|---|---|
@@ -102,25 +102,38 @@ bash scripts/run-guards.sh; echo "exit=$?"
 5. `app/knowledge/api` 计划 31 个，实际 39（含 D-6 组）。
 6. `KnowledgeBaseGateway` 仍待拍板。
 
-### 4.5 storage 批次结论（2026-11-21 执行）
+### 4.5 storage 批次结论（2026-11-21 完成，18/18）
 
-18 个 storage 类型按「是否被 framework 的 `platform/storage` 直接引用」切开：
+storage 18 个类型分两批归位：
 
-**已搬（7 个 → `app/storage/api`）**：`FileContentService` `WritableFileContentService` `StorageBackendPort` `StorageBackendProvisioner` `StorageBackendView` `StorageConnectivityPort` `StorageEnvLookup`。framework 的 5 个文件一个都不引用它们；`FileContentService` 反向 import framework 的 `OpenedFile`（app→framework，合法）。
-
-**留下（11 个，被 framework 闭包钉死）**：`OpenedFile` `SeekableSource`（← `FileTransport`）、`FileUrlPort` `Resolver`（← `FileResolverFactory`/`Rewriter`）、`Mode` `StorageUrlContext` `ResourceModeException` `PublicModeForbiddenException`（← `Rewriter`/`ResourceUrlMode` 的传递闭包）、`StorageBackendResolver` `MessageFactsLookup` `MessageFileFacts`（← `FileResolverFactory`/`FileProxyPort`）。
-
-要让这 11 个也搬走，**必须重构 framework 的 5 个文件**（约 900 行）：
-
-| 文件 | 现有耦合 | 改法 | 人日 |
+| 批次 | 数量 | 落点 | 说明 |
 |---|---|---|---|
-| `FileTransport.serve(resp, req, OpenedFile, Options)` | 签名直接吃 `OpenedFile` / `SeekableSource` | 换成 framework 自有的 `InputStream + length + contentType` 载体 | 1 |
-| `Rewriter` / `StreamRewriter`（313+269 行） | `Mode` / `Resolver` / `FileUrlPort` 三个域类型决定重写策略 | 策略改为入参（枚举 + 函数），不再 import 域类型 | 1 |
-| `FileResolverFactory`（22 行） | 返回 `Resolver` / `StorageBackendResolver` | 改为返回函数式契约 | 0.5 |
-| `FileProxyPort`（45 行） | 吃 `MessageFactsLookup` | 反转：app 侧实现，framework 只声明 `Function<String, Facts>` | 0.5 |
+| 业务/开通面 | 7 | `app/storage/api` | `FileContentService` `WritableFileContentService` `StorageBackendPort` `StorageBackendProvisioner` `StorageBackendView` `StorageConnectivityPort` `StorageEnvLookup` |
+| IO 载体与策略词汇 | 11 | `platform/storage/{fileserve,support}` | `OpenedFile` `SeekableSource` `Mode` `Resolver` `FileUrlPort` `StorageUrlContext` `ResourceModeException` `PublicModeForbiddenException` `StorageBackendResolver` `MessageFactsLookup` `MessageFileFacts` |
 
-合计 **≈3 人日**；收益是 framework 少 11 个 storage 词汇，风险是碰文件直出热路径（下载夹具兜底）。按 D-2 类永驻是零成本选项。
+**为什么不是"门面重构"**：原计划估 3 人日改 5 个文件，实测后发现 11 个里有 9 个是纯 IO/策略词汇——`OpenedFile`（seekable/stream/bytes 三形态）、`SeekableSource`（`size()`+`open(offset)`）、`Mode`/`Resolver`/`FileUrlPort`（重写策略的入参类型）。任何"中性化"都会重新造出同形状的类型，属于换名不换结构。因此按用户已拍板的「能力接口/IO 载体算基础设施」口径归 `platform/storage`，`shared/storage` 整包删除。
 
+**残留**：`FileUrlPort`、`MessageFileFacts` 两个名字撞 C8 红旗命名，已登记基线并写明「IO 能力契约，非业务形状」。若将来要求 framework 零 storage 词汇，仍需把 `Rewriter`/`FileProxyPort` 的策略参数化（约 1.5 人日）。
+
+### 4.7 包根收敛（2026-11-21，已完成）
+
+`platform` 与通用面的落点已收敛为**单一根**：
+
+```
+com.ragagent.framework
+├── error · event · json · text · pagination     ← 契约面（纯 JDK，107 文件受 C1 覆盖）
+├── eventbus · html                              ← 原 platform.event / platform.text 的技术实现下沉一层
+├── web · http · persistence · redis · security · access · config · settings
+│   · concurrent · task · tracing · storage · prompt · tool · model · audit
+│   · knowledge · text                           ← 原 platform 的 183 文件
+└── shared                                       ← 暂存区：剩余 48 个业务词汇，清零后删除
+```
+
+**为什么不是顶层 `com.ragagent.{error,event,...}`**：`framework.event`（事件总线实现）与事件契约同名；合并会破坏 C1「契约面零第三方依赖」。改为实现下沉 `framework.eventbus` / `framework.html`，契约留在 `framework.{error,event,json,text,pagination}`。
+
+**为什么 `shared` 收进 `framework.shared`**：通用面进 framework 后，`shared → framework` 与 `framework → shared` 形成包级环（R1 新增环即红）。收进同一根后环消失，且暂存区边界仍然可见（清零后直接删目录）。
+
+**守卫同步**：C1 从「扫目录」改为「扫 framework 下契约子包白名单」（107 文件，红态探针仍有效）；C8 豁免 `framework.shared` 与契约子包；`L1/L1_CORE` 增补 `framework`；`check-event-face-case` 锚改 `framework/event/payload` + `framework/eventbus/EventType`；json 冻结前缀、装配点、形状基线、错位测试登记全部重键。
 ### WP1 复核结论：0 个可删（已执行：`JsonValueSupport` 内联）
 
 删除前按坑 15 做了三处扫描（简单名 / 反射字符串 / SPI），结果推翻了"9 个死代码"：
@@ -324,6 +337,8 @@ WP6 收尾                ← 全部完成 + 拍板项落定
 | 批 | 日期 | 内容 | 验收数字（测试/守卫/金片） | 备注 |
 |---|---|---|---|---|
 | 基座 | 2026-11-21 | 守卫修复：port-map / contract-consumers / A20 重锚；R10 同级 api 放行；本文件 v2 重扫 + 补 §4.0 唯一归属总表（153 校验通过）+ WP4-C 接口映射 + WP6 批量手法 | 定向守卫 5 条绿 + 探针 2 条（同级 api 过 / 同级 service 红） | 全量 verify 未跑（定向：ArchitectureRulesTest 22/22 绿、50 个 run 行→脚本自计 49 守卫全绿），等开工基线 |
+| 包根收敛 | 2026-11-21 | `platform→framework`（1,126 文件）；通用面并 `framework.{error,event,json,text,pagination}`；实现下沉 `eventbus`/`html`；`shared→framework.shared` 消环 | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | C1 改白名单扫描（107 文件）；12 处守卫/基线重键 |
+| storage 收口 | 2026-11-21 | 11 个 IO/策略词汇 → `platform/storage/{fileserve,support}`；`shared/storage` 整包删除；两个名字登记 C8 基线 | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 结论：门面重构的必要性经实测取消（9/11 是 IO 载体） |
 | storage 部分 | 2026-11-21 | 7 个类型 → `storage/api`；11 个经实测属 framework 闭包（§4.5） | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 整批搬迁撞 5 条 R10 已回退，改按闭包切开 |
 | WP4-域面 | 2026-11-21 | 18 个类型归位：`memory/api` 4 · `im/api` 3 · `embedchannel/api` 3 · `audit/api` 2 · `auth/api` 6；`ActivityAuditRecorder` 迁 `audit/api` | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 回退：`MemoryKeys`/`MemoryKinds`/`MemoryConfig`（被 framework 永驻类型引用）、审计记录器初版落 `audit/support` 破 R10 |
 | WP3-检索面 | 2026-11-21 | 6 个类型 → `retrieval-engine/api`（`GraphData` `KnowledgeDocumentFacts` `NameSpace` `RetrieveGraphRepository` `SearchParams` `WebSearchResult`） | **5256 / 0 / 2** · 守卫 **49/49** · BUILD SUCCESS | 发现：agent 整族被 `MessageView` 钉住，需等 channel 合并（D-4） |

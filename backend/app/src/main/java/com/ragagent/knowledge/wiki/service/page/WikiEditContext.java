@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.wiki.service.page;
 
+import com.ragagent.framework.access.TenantContext;
 import com.ragagent.knowledge.wiki.WikiConstants;
-import com.ragagent.platform.access.TenantContext;
 import java.util.function.Supplier;
 
 /**

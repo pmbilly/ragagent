@@ -2,8 +2,8 @@ package com.ragagent.storage.fileserve;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.platform.security.CryptoService;
-import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.framework.security.CryptoService;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.provider.StorageProviders;
 

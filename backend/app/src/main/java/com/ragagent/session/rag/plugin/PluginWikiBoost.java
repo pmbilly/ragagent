@@ -1,12 +1,12 @@
 package com.ragagent.session.rag.plugin;
 
+import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.shared.retrieval.SearchTarget;
 import com.ragagent.knowledge.api.KnowledgeBaseQueryPort;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineState;
-import com.ragagent.shared.retrieval.SearchResult;
-import com.ragagent.shared.retrieval.SearchTarget;
 import java.util.List;
 
 /**

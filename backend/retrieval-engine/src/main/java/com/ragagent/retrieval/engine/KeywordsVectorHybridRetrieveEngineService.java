@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.engine;
 
-import com.ragagent.platform.model.Embedder;
+import com.ragagent.framework.model.Embedder;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  *   <li>并发用 Java 21 虚拟线程执行器 + {@code Semaphore}；
  *       首批失败即取消其余任务</li>
  *   <li>分批工具为本类内 {@code chunkSlice}（末批可短）</li>
- *   <li>嵌入口直接用全仓统一的 {@link com.ragagent.platform.model.Embedder}
+ *   <li>嵌入口直接用全仓统一的 {@link com.ragagent.framework.model.Embedder}
  *       （不为检索引擎单独造薄口）</li>
  * </ul>
  */

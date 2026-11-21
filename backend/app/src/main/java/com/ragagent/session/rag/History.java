@@ -1,6 +1,6 @@
 package com.ragagent.session.rag;
 
-import com.ragagent.shared.retrieval.SearchResult;
+import com.ragagent.framework.shared.retrieval.SearchResult;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

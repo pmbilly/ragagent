@@ -1,11 +1,11 @@
 package com.ragagent.mcp.oauth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.mcp.oauth.error.OAuthNoTokenException;
 import com.ragagent.mcp.oauth.model.AuthServerMetadata;
 import com.ragagent.mcp.oauth.model.OAuthToken;
 import com.ragagent.mcp.protocol.McpContext;
-import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;

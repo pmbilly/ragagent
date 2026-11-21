@@ -8,7 +8,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
-import com.ragagent.platform.persistence.SoftDeleteFilterGuard;
+import com.ragagent.framework.persistence.SoftDeleteFilterGuard;
 import java.util.Collections;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.MappedStatement;

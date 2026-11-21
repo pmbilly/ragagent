@@ -1,13 +1,13 @@
 package com.ragagent.agent;
 
 import com.ragagent.agent.domain.AgentState;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.shared.agent.AgentStep;
+import com.ragagent.framework.tracing.langfuse.LangfuseManager;
+import com.ragagent.framework.tracing.langfuse.Span;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatResponse;
 import com.ragagent.llm.api.ChatTool;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.tracing.langfuse.LangfuseManager;
-import com.ragagent.platform.tracing.langfuse.Span;
-import com.ragagent.shared.agent.AgentStep;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;

@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.engine;
 
-import com.ragagent.platform.persistence.DatabaseDialects;
+import com.ragagent.framework.persistence.DatabaseDialects;
 import com.ragagent.retrieval.api.IndexRow;
 import com.ragagent.retrieval.api.VectorIndexStore;
 import java.nio.charset.StandardCharsets;

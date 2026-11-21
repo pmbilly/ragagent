@@ -5,11 +5,11 @@ import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
 import com.knuddels.jtokkit.api.EncodingType;
 import com.knuddels.jtokkit.api.IntArrayList;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatTool;
 import com.ragagent.llm.api.MessageContentPart;
 import com.ragagent.llm.api.ToolCall;
-import com.ragagent.platform.web.JsonMappers;
 import java.util.List;
 
 /**

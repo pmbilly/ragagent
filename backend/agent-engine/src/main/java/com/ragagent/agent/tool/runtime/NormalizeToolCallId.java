@@ -1,6 +1,6 @@
 package com.ragagent.agent.tool.runtime;
 
-import com.ragagent.platform.security.Hashes;
+import com.ragagent.framework.security.Hashes;
 
 /**
  * 工具调用 ID 归一化。

@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.framework.error.BizException;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelRowViews;
 import com.ragagent.modelruntime.application.ModelRuntimeConfigs;
-import com.ragagent.shared.error.BizException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;

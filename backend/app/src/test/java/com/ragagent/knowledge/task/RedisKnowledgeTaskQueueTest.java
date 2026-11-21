@@ -8,11 +8,11 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.stream.EmbeddedRedis;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.knowledge.service.chunk.ChunkExtractService;
 import com.ragagent.knowledge.service.enrichment.QuestionGenerationService;
-import com.ragagent.platform.stream.EmbeddedRedis;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.ragagent.memory.domain;
 
-import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.framework.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 
 /**

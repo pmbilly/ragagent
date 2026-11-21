@@ -10,12 +10,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.error.BizException;
 import com.ragagent.mcp.approval.Decision;
 import com.ragagent.mcp.approval.ToolApprovalException;
 import com.ragagent.mcp.approval.ToolApprovalGate;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.shared.error.BizException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

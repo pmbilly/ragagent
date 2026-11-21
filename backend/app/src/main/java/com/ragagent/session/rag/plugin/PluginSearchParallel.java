@@ -1,11 +1,11 @@
 package com.ragagent.session.rag.plugin;
 
+import com.ragagent.framework.shared.retrieval.SearchResult;
 import com.ragagent.session.rag.PipelineCommon;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.SearchSupport;
-import com.ragagent.shared.retrieval.SearchResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

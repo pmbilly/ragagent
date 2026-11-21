@@ -76,16 +76,16 @@ class AgentEngineBoundaryTest {
             // 属收紧）；`chatpipeline`/`webfetch` 随 R4b 归位（session/websearch 域）⇒ 一并摘除。
             "agent",        // 自身
             "common",       // L1（:common 主包）
-            "platform",     // L1（:common 的平台面：B268 起 event/stream/tracing.langfuse 均在此）
+            "framework",    // L1 底座（原 platform 面：event/stream/tracing.langfuse 均在此）
             "contract",     // L1（:common 的契约面：A② 起 common/* 分流至此）
-            "event",        // L1（:common 的 event 包——现只剩 payload，待迁 com.ragagent.shared.event.payload）
-            "stream",       // L1 旧名（已并入 platform.stream，保留登记）
+            "event",        // L1（:common 的 event 包——现只剩 payload，待迁 com.ragagent.framework.event.payload）
+            "stream",       // L1 旧名（已并入 framework.stream，保留登记）
             "llm",          // L2 能力
             "modelcontext", // L2 能力（模型输出上下文协议；物理位于 :engine）
             "retrieval",    // L2 能力
             "embedding",    // L2 能力
             "rerank",       // L2 能力
-            "tracing",     // L1 core（:common）+ L2 装饰器（platform.tracing）
+            "tracing",     // L1 core（:common）+ L2 装饰器（framework.tracing）
             // 本模块对外契约包：因 agent 是模块内 hub（依赖全部子包），契约若挂 agent.api
             // 会与 hub 形成包级环，故用独立顶层名；仍是本模块自身，不是业务域。
             "agentengine",
@@ -163,9 +163,9 @@ class AgentEngineBoundaryTest {
         assertThat(isDomainImport("import com.ragagent.session.service.QaWiring;")).isTrue();
         assertThat(isDomainImport("import com.ragagent.mcp.domain.McpService;")).isTrue();
         assertThat(isDomainImport("import static com.ragagent.knowledge.wiki.service.WikiPrompts.GO_SHA256;")).isTrue();
-        assertThat(isDomainImport("import com.ragagent.platform.web.JsonMappers;")).isFalse();
+        assertThat(isDomainImport("import com.ragagent.framework.web.JsonMappers;")).isFalse();
         assertThat(isDomainImport("import com.ragagent.modelcontext.Registry;")).isFalse();
-        assertThat(isDomainImport("import com.ragagent.platform.event.EventBus;")).isFalse();
+        assertThat(isDomainImport("import com.ragagent.framework.eventbus.EventBus;")).isFalse();
         assertThat(isDomainImport("import java.util.List;")).isFalse();
         assertThat(isDomainImport(" * 说明文字里的 com.ragagent.knowledge 不是 import")).isFalse();
     }

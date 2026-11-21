@@ -1,8 +1,8 @@
 package com.ragagent.modelruntime.tracing;
 
+import com.ragagent.framework.tracing.langfuse.LangfuseTokenUsage;
 import com.ragagent.llm.api.RankResult;
 import com.ragagent.llm.api.TokenUsage;
-import com.ragagent.platform.tracing.langfuse.LangfuseTokenUsage;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

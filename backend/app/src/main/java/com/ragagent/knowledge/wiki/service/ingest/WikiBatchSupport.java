@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.access.TenantScopes;
-import com.ragagent.shared.wiki.WikiLanguageSupport;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.access.TenantScopes;
+import com.ragagent.framework.shared.wiki.WikiLanguageSupport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;

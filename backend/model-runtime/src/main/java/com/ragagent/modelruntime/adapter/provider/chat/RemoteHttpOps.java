@@ -1,8 +1,8 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.http.LlmTransport;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapter;
-import com.ragagent.platform.http.LlmTransport;
-import com.ragagent.shared.error.BizException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;

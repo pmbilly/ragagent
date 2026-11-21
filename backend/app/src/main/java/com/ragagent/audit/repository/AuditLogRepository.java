@@ -5,7 +5,7 @@ import com.ragagent.audit.api.AuditOutcome;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.mapper.AuditLogMapper;
-import com.ragagent.platform.persistence.PageRequests;
+import com.ragagent.framework.persistence.PageRequests;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;

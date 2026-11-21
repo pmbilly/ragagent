@@ -1,9 +1,9 @@
 package com.ragagent.memory.domain;
 
+import com.ragagent.framework.html.HtmlText;
+import com.ragagent.framework.shared.memory.MemoryKeys;
+import com.ragagent.framework.shared.memory.MemoryKinds;
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.platform.text.HtmlText;
-import com.ragagent.shared.memory.MemoryKeys;
-import com.ragagent.shared.memory.MemoryKinds;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

@@ -1,6 +1,11 @@
 package com.ragagent.modelruntime.application;
 
 import com.ragagent.embedding.EmbedderFactory;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.model.Embedder;
+import com.ragagent.framework.security.CryptoService;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.llm.api.ChatConfig;
 import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelCatalogPort;
@@ -24,12 +29,7 @@ import com.ragagent.modelruntime.tracing.LangfuseChatClient;
 import com.ragagent.modelruntime.tracing.LangfuseEmbedder;
 import com.ragagent.modelruntime.tracing.LangfuseReranker;
 import com.ragagent.modelruntime.tracing.LangfuseVlm;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.model.Embedder;
-import com.ragagent.platform.security.CryptoService;
-import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.rerank.RerankerFactory;
-import com.ragagent.shared.error.BizException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;

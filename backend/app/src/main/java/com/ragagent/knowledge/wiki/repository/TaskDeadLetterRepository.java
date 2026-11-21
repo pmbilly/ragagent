@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.wiki.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ragagent.framework.persistence.PageRequests;
 import com.ragagent.knowledge.wiki.domain.TaskDeadLetter;
 import com.ragagent.knowledge.wiki.mapper.TaskDeadLetterMapper;
-import com.ragagent.platform.persistence.PageRequests;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.springframework.stereotype.Repository;

@@ -1,6 +1,7 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.ragagent.audit.api.WikiActivityAudit;
+import com.ragagent.framework.shared.wiki.WikiLanguageSupport;
 import com.ragagent.knowledge.api.chunk.KnowledgeSpanPort;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.knowledge.api.wiki.SlugUpdate;
@@ -17,7 +18,6 @@ import com.ragagent.knowledge.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiCleanupScope;
 import com.ragagent.knowledge.wiki.service.page.WikiTextUtils;
 import com.ragagent.llm.api.LlmChatClient;
-import com.ragagent.shared.wiki.WikiLanguageSupport;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

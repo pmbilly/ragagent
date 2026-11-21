@@ -3,14 +3,14 @@ package com.ragagent.rerank;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.security.SsrfGuard;
+import com.ragagent.framework.web.ProviderJson;
 import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.llm.api.RankResult;
 import com.ragagent.llm.api.Reranker;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelRowViews;
 import com.ragagent.modelruntime.application.ModelRuntimeConfigs;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.web.ProviderJson;
 import com.ragagent.rerank.provider.AliyunReranker;
 import com.ragagent.rerank.provider.JinaReranker;
 import com.ragagent.rerank.provider.LkeapReranker;

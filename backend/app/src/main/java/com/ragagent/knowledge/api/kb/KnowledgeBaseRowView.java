@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.api.kb;
 
+import com.ragagent.framework.json.JsonValues;
 import com.ragagent.knowledge.api.config.AsrConfigView;
 import com.ragagent.knowledge.api.config.ChunkingConfigView;
 import com.ragagent.knowledge.api.config.ImageProcessingConfigView;
@@ -7,7 +8,6 @@ import com.ragagent.knowledge.api.config.IndexingStrategyView;
 import com.ragagent.knowledge.api.config.StorageConfigView;
 import com.ragagent.knowledge.api.config.StorageProviderConfigView;
 import com.ragagent.knowledge.api.config.VlmConfigView;
-import com.ragagent.shared.json.JsonValues;
 import java.time.OffsetDateTime;
 import java.util.List;
 

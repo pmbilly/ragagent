@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.framework.task.TaskQueue;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
-import com.ragagent.platform.task.TaskQueue;
 
 /**
  * 问题生成批任务的投递口。

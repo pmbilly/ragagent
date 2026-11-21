@@ -1,8 +1,8 @@
 package com.ragagent.session.support;
 
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.shared.apikey.APIKeyScopeContext;
-import com.ragagent.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.shared.apikey.APIKeyScopeContext;
+import com.ragagent.framework.shared.apikey.TenantAPIKeyScope;
 
 /**
  * {@code sessions.user_id} 的取值规则。

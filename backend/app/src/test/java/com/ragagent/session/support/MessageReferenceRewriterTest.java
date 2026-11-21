@@ -4,15 +4,15 @@ package com.ragagent.session.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.platform.storage.support.Rewriter;
+import com.ragagent.framework.shared.agent.AgentStep;
+import com.ragagent.framework.shared.agent.AgentToolCall;
+import com.ragagent.framework.shared.retrieval.SearchResult;
+import com.ragagent.framework.shared.session.MessageImage;
+import com.ragagent.framework.shared.tool.ToolResult;
+import com.ragagent.framework.storage.support.FileUrlPort;
+import com.ragagent.framework.storage.support.Mode;
+import com.ragagent.framework.storage.support.Rewriter;
 import com.ragagent.session.domain.message.Message;
-import com.ragagent.shared.agent.AgentStep;
-import com.ragagent.shared.agent.AgentToolCall;
-import com.ragagent.shared.retrieval.SearchResult;
-import com.ragagent.shared.session.MessageImage;
-import com.ragagent.shared.storage.support.FileUrlPort;
-import com.ragagent.shared.storage.support.Mode;
-import com.ragagent.shared.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;

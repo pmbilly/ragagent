@@ -1,15 +1,15 @@
 package com.ragagent.session.rag.plugin;
 
+import com.ragagent.framework.knowledge.ChunkSearchUtil;
+import com.ragagent.framework.shared.knowledge.ChunkFacts;
+import com.ragagent.framework.shared.retrieval.SearchResult;
 import com.ragagent.knowledge.api.ChunkQueryPort;
-import com.ragagent.platform.knowledge.ChunkSearchUtil;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
 import com.ragagent.session.rag.PipelineLog;
 import com.ragagent.session.rag.PipelineState;
 import com.ragagent.session.rag.support.ImageInfoCollector;
-import com.ragagent.shared.knowledge.ChunkFacts;
-import com.ragagent.shared.retrieval.SearchResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

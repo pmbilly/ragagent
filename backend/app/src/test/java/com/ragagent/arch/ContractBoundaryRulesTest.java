@@ -47,7 +47,7 @@ class ContractBoundaryRulesTest {
             for (var dep : clazz.getDirectDependenciesFromSelf()) {
                 String target = normalizeDescriptor(dep.getTargetClass().getName());
                 boolean allowed = target.startsWith("java.") || target.startsWith("javax.")
-                        || target.startsWith("com.ragagent.shared.");
+                        || target.startsWith("com.ragagent.framework.shared.");
                 if (!allowed) {
                     violations.add(clazz.getName() + " → " + target);
                 }
@@ -166,7 +166,7 @@ class ContractBoundaryRulesTest {
     }
 
     /**
- * R4 · 平台面（起收纳 `com.ragagent.platform`）不得依赖业务域与三个 runtime 的实现。
+ * R4 · 平台面（起收纳 `com.ragagent.framework`）不得依赖业务域与三个 runtime 的实现。
  *
  * <p>§8 的 DAG：`platform → contracts`。平台放的是事件/流/任务/HTTP/持久化助手/文本与解析
  * 等**技术底座**；一旦它反向依赖业务域或 runtime，模块提取与"顶层不依赖具体实现"就同时破产。</p>
@@ -176,7 +176,7 @@ class ContractBoundaryRulesTest {
     void platformFaceStaysBelowBusiness() {
         List<String> violations = new ArrayList<>();
         for (JavaClass clazz : MAIN) {
-            if (!clazz.getPackageName().startsWith("com.ragagent.platform")) {
+            if (!clazz.getPackageName().startsWith("com.ragagent.framework")) {
                 continue;
             }
             for (var dep : clazz.getDirectDependenciesFromSelf()) {
@@ -259,10 +259,10 @@ class ContractBoundaryRulesTest {
     /** `:common` 侧的包面（起含契约面）。 */
     private static boolean isCommonSide(String packageName) {
         return packageName.startsWith("com.ragagent.contract")
-                || packageName.startsWith("com.ragagent.platform")
+                || packageName.startsWith("com.ragagent.framework")
                 || packageName.startsWith("com.ragagent.common")
-                || packageName.startsWith("com.ragagent.event")
-                || packageName.startsWith("com.ragagent.platform.stream")
+                || packageName.startsWith("com.ragagent.framework.event")
+                || packageName.startsWith("com.ragagent.framework.stream")
                 || packageName.startsWith("com.ragagent.tracing.langfuse");
     }
 

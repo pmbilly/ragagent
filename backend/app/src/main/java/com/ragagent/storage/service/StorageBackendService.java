@@ -1,11 +1,11 @@
 package com.ragagent.storage.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.storage.config.StorageAllowList;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.security.SsrfGuard;
+import com.ragagent.framework.storage.config.StorageAllowList;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.dto.StorageConfig;
 import com.ragagent.storage.provider.StorageProviders;

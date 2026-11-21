@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.ragagent.framework.web.JsonModuleProvider;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;
@@ -21,7 +22,6 @@ import com.ragagent.llm.api.ResponseType;
 import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.llm.api.TokenUsage;
 import com.ragagent.llm.api.ToolCall;
-import com.ragagent.platform.web.JsonModuleProvider;
 import java.io.IOException;
 
 /**

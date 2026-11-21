@@ -1,6 +1,6 @@
 package com.ragagent.auth.apikey.controller.filter;
 
-import com.ragagent.shared.apikey.APIKeyCapability;
+import com.ragagent.framework.shared.apikey.APIKeyCapability;
 import java.util.ArrayList;
 import java.util.List;
 

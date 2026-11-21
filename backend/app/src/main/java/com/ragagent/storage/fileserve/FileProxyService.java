@@ -1,16 +1,16 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.storage.fileserve.FileProxyPort;
-import com.ragagent.platform.storage.fileserve.FileServeHttp;
-import com.ragagent.platform.storage.fileserve.FileTransport;
-import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.platform.text.ContentTypeByFilename;
-import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.storage.fileserve.MessageFactsLookup;
-import com.ragagent.shared.storage.fileserve.OpenedFile;
-import com.ragagent.shared.tenant.TenantConfigLookup;
-import com.ragagent.shared.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.html.ContentTypeByFilename;
+import com.ragagent.framework.shared.tenant.TenantConfigLookup;
+import com.ragagent.framework.shared.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.framework.storage.fileserve.FileProxyPort;
+import com.ragagent.framework.storage.fileserve.FileServeHttp;
+import com.ragagent.framework.storage.fileserve.FileTransport;
+import com.ragagent.framework.storage.fileserve.MessageFactsLookup;
+import com.ragagent.framework.storage.fileserve.OpenedFile;
+import com.ragagent.framework.storage.fileserve.StoragePaths;
 import com.ragagent.storage.api.FileContentService;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;

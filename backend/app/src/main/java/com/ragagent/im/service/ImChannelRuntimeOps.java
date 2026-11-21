@@ -1,6 +1,7 @@
 package com.ragagent.im.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.redis.RedisPubSub;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.repository.ImChannelRepository;
 import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
@@ -8,7 +9,6 @@ import com.ragagent.im.runtime.ImRedisKeys;
 import com.ragagent.im.runtime.ImRedisStore;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.QaQueue;
-import com.ragagent.platform.redis.RedisPubSub;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;

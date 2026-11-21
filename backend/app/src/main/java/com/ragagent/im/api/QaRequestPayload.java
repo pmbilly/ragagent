@@ -1,6 +1,6 @@
 package com.ragagent.im.api;
 
-import com.ragagent.shared.session.MessageAttachment;
+import com.ragagent.framework.shared.session.MessageAttachment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;

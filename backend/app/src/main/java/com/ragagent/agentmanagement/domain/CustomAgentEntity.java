@@ -3,7 +3,7 @@ package com.ragagent.agentmanagement.domain;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ragagent.platform.persistence.JsonbRawStringTypeHandler;
+import com.ragagent.framework.persistence.JsonbRawStringTypeHandler;
 import java.time.OffsetDateTime;
 
 /**

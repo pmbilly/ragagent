@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.framework.error.BizException;
 import com.ragagent.mcp.protocol.McpOAuthRequiredException;
-import com.ragagent.shared.error.BizException;
 import org.junit.jupiter.api.Test;
 
 /**

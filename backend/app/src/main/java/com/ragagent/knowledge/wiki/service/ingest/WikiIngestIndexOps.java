@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
+import com.ragagent.framework.html.CodePointOrder;
+import com.ragagent.framework.text.Whitespace;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.api.WikiIndexEntry;
 import com.ragagent.knowledge.wiki.domain.WikiPage;
@@ -8,8 +10,6 @@ import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestPayload;
 import com.ragagent.knowledge.wiki.prompt.WikiPrompts;
 import com.ragagent.knowledge.wiki.service.page.WikiPageService;
 import com.ragagent.llm.api.LlmChatClient;
-import com.ragagent.platform.text.CodePointOrder;
-import com.ragagent.shared.text.Whitespace;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;

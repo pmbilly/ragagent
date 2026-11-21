@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
+import com.ragagent.framework.shared.memory.MemoryKinds;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
 import com.ragagent.memory.repository.MemoryRepository;
 import com.ragagent.memory.support.MemoryConflictException;
-import com.ragagent.shared.memory.MemoryKinds;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

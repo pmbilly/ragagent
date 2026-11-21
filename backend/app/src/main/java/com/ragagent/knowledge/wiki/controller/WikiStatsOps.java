@@ -8,12 +8,12 @@ import static com.ragagent.knowledge.wiki.controller.WikiRequestSupport.q;
 import static com.ragagent.knowledge.wiki.controller.WikiRequestSupport.query;
 import static com.ragagent.knowledge.wiki.controller.WikiRequestSupport.trimSpace;
 
+import com.ragagent.framework.error.BizException;
 import com.ragagent.knowledge.wiki.api.WikiIndex;
 import com.ragagent.knowledge.wiki.domain.WikiPage;
 import com.ragagent.knowledge.wiki.domain.graph.WikiGraph;
 import com.ragagent.knowledge.wiki.domain.page.WikiStats;
 import com.ragagent.knowledge.wiki.service.page.WikiPageService;
-import com.ragagent.shared.error.BizException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

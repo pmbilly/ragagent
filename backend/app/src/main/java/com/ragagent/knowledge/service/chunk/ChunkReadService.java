@@ -1,12 +1,12 @@
 package com.ragagent.knowledge.service.chunk;
 
+import com.ragagent.framework.pagination.PageResult;
+import com.ragagent.framework.security.LogSanitizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.dto.chunk.ChunkResponse;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.shared.pagination.PageResult;
 import java.util.List;
 import org.springframework.stereotype.Service;
 

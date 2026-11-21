@@ -1,6 +1,6 @@
 package com.ragagent.mcp.domain;
 
-import com.ragagent.platform.security.Hashes;
+import com.ragagent.framework.security.Hashes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

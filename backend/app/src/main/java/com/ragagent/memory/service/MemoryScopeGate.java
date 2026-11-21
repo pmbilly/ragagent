@@ -2,13 +2,13 @@ package com.ragagent.memory.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.shared.tenant.MemoryConfig;
+import com.ragagent.framework.shared.tenant.TenantConfigLookup;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.memory.MemoryContext;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.repository.MemoryRepository;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.tenant.MemoryConfig;
-import com.ragagent.shared.tenant.TenantConfigLookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

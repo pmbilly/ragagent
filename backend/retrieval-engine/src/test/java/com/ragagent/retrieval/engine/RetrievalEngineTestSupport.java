@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.engine;
 
-import com.ragagent.platform.model.Embedder;
+import com.ragagent.framework.model.Embedder;
 import com.ragagent.retrieval.api.TenantStoreOwnership;
 import com.ragagent.retrieval.api.VectorStoreLookup;
 import com.ragagent.retrieval.api.VectorStoreView;

@@ -11,15 +11,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.framework.security.SsrfGuard;
+import com.ragagent.framework.shared.knowledge.KnowledgeIngest;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.knowledge.api.chunk.KnowledgeParseStatus;
 import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseRowView;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.knowledge.support.KnowledgePaths;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.knowledge.KnowledgeIngest;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;

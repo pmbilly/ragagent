@@ -3,7 +3,7 @@ package com.ragagent.config;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
-import com.ragagent.platform.persistence.SoftDeleteFilterGuard;
+import com.ragagent.framework.persistence.SoftDeleteFilterGuard;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

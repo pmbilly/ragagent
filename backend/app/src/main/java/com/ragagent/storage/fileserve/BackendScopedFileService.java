@@ -1,7 +1,7 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.shared.storage.fileserve.OpenedFile;
+import com.ragagent.framework.storage.fileserve.OpenedFile;
+import com.ragagent.framework.storage.fileserve.StoragePaths;
 import com.ragagent.storage.api.FileContentService;
 import java.io.IOException;
 import java.net.URI;

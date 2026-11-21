@@ -1,6 +1,9 @@
 package com.ragagent.knowledge.service.management;
 
 import com.ragagent.auth.api.TenantStorageQuotaPort;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.model.Embedder;
+import com.ragagent.framework.shared.knowledge.KnowledgeIngest;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
@@ -12,13 +15,10 @@ import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.support.KnowledgeTaskProgressStore;
 import com.ragagent.knowledge.support.KnowledgeTaskRunner;
 import com.ragagent.llm.api.ModelRuntime;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.model.Embedder;
 import com.ragagent.retrieval.api.IndexEngine;
 import com.ragagent.retrieval.api.IndexEngineResolver;
 import com.ragagent.retrieval.api.NameSpace;
 import com.ragagent.retrieval.api.RetrieveGraphRepository;
-import com.ragagent.shared.knowledge.KnowledgeIngest;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

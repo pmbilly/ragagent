@@ -2,9 +2,9 @@ package com.ragagent.im.channel.feishu;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 

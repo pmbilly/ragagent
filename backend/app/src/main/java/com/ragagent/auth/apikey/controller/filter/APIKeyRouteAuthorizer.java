@@ -1,6 +1,6 @@
 package com.ragagent.auth.apikey.controller.filter;
 
-import com.ragagent.shared.apikey.TenantAPIKeyScope;
+import com.ragagent.framework.shared.apikey.TenantAPIKeyScope;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

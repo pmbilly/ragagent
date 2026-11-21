@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import com.ragagent.framework.event.Event;
+import com.ragagent.framework.event.payload.ToolApprovalRequiredData;
+import com.ragagent.framework.eventbus.EventBus;
+import com.ragagent.framework.eventbus.EventType;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.mcp.approval.ApprovalEvent;
 import com.ragagent.mcp.approval.ApprovalEventBus;
-import com.ragagent.platform.event.EventBus;
-import com.ragagent.platform.event.EventType;
-import com.ragagent.shared.event.Event;
-import com.ragagent.shared.event.payload.ToolApprovalRequiredData;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;

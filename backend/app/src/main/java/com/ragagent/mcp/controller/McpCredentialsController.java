@@ -1,13 +1,13 @@
 package com.ragagent.mcp.controller;
 
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.security.LogSanitizer;
+import com.ragagent.framework.web.ApiResponse;
+import com.ragagent.framework.web.ApiResult;
 import com.ragagent.mcp.dto.McpCredentialsResponse;
 import com.ragagent.mcp.dto.McpCredentialsState;
 import com.ragagent.mcp.service.McpServiceManagement;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.security.LogSanitizer;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.shared.error.BizException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

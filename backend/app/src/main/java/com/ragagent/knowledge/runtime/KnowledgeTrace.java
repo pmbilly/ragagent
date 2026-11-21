@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.runtime;
 
-import com.ragagent.platform.access.TracingContext;
-import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
+import com.ragagent.framework.access.TracingContext;
+import com.ragagent.framework.tracing.langfuse.LangfuseTaskScope;
 import java.util.Map;
 
 /**

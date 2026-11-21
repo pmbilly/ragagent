@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.api.chunk;
 
-import com.ragagent.shared.knowledge.ChunkView;
+import com.ragagent.framework.shared.knowledge.ChunkView;
 import java.util.List;
 
 /**

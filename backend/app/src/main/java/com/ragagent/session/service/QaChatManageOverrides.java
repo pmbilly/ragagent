@@ -3,7 +3,7 @@ package com.ragagent.session.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
-import com.ragagent.platform.prompt.PromptSource;
+import com.ragagent.framework.prompt.PromptSource;
 import com.ragagent.session.rag.ChatManage;
 import java.util.LinkedHashMap;
 import java.util.Map;

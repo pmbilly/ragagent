@@ -2,6 +2,7 @@ package com.ragagent.knowledge.task;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeBaseAsrConfig;
@@ -11,7 +12,6 @@ import com.ragagent.knowledge.support.MediaFileTypes;
 import com.ragagent.knowledge.support.MediaPipelineDeps;
 import com.ragagent.llm.api.AsrTranscriber;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
-import com.ragagent.platform.web.JsonMappers;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;

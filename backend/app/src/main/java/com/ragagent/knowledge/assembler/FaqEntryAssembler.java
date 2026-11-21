@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.assembler;
 
+import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.knowledge.controller.vo.FaqEntryRespVo;
 import com.ragagent.knowledge.dto.faq.FaqEntry;
-import com.ragagent.shared.pagination.PageResult;
 import java.util.List;
 
 /** 领域对象到 FAQ 响应 VO 的装配。 */

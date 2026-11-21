@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.framework.stream.EmbeddedRedis;
 import com.ragagent.knowledge.wiki.domain.page.WikiSlugLock;
 import com.ragagent.knowledge.wiki.repository.ingest.InProcessWikiFinalizeLock;
 import com.ragagent.knowledge.wiki.repository.ingest.InProcessWikiIdentityClaimStore;
@@ -17,7 +18,6 @@ import com.ragagent.knowledge.wiki.repository.ingest.WikiIdentityClaimStore;
 import com.ragagent.knowledge.wiki.repository.ingest.WikiInflightLimiter;
 import com.ragagent.knowledge.wiki.repository.page.InProcessWikiSlugLock;
 import com.ragagent.knowledge.wiki.repository.page.RedisWikiSlugLock;
-import com.ragagent.platform.stream.EmbeddedRedis;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

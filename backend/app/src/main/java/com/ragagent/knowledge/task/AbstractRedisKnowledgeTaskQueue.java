@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.task;
 
-import com.ragagent.platform.task.RedisRetryingTaskQueue;
-import com.ragagent.platform.task.RetryPolicy;
+import com.ragagent.framework.task.RedisRetryingTaskQueue;
+import com.ragagent.framework.task.RetryPolicy;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**

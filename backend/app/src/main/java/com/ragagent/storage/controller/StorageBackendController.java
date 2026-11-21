@@ -1,14 +1,14 @@
 package com.ragagent.storage.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.storage.config.StorageAllowList;
-import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.platform.web.ApiResult;
-import com.ragagent.platform.web.JsonBodyErrors;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.platform.web.RequestFields;
-import com.ragagent.shared.error.BizException;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.storage.config.StorageAllowList;
+import com.ragagent.framework.web.ApiResponse;
+import com.ragagent.framework.web.ApiResult;
+import com.ragagent.framework.web.JsonBodyErrors;
+import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.web.RequestFields;
 import com.ragagent.storage.dto.StorageConfig;
 import com.ragagent.storage.service.StorageBackendReadService;
 import com.ragagent.storage.service.StorageBackendService;

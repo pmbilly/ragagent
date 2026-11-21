@@ -1,6 +1,6 @@
 package com.ragagent.websearch.provider;
 
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.security.SsrfGuard;
 import java.net.URI;
 
 /**

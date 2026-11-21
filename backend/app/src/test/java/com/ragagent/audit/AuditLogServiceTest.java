@@ -16,7 +16,7 @@ import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.repository.AuditLogRepository;
 import com.ragagent.audit.service.AuditLogService;
-import com.ragagent.shared.audit.AuditAction;
+import com.ragagent.framework.shared.audit.AuditAction;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;

@@ -1,6 +1,6 @@
 package com.ragagent.mcp.domain;
 
-import com.ragagent.platform.access.TenantContext;
+import com.ragagent.framework.access.TenantContext;
 
 /**
  * principal 辅助方法集：规范化 / 有效性 / 存储标识 / 上下文提取。

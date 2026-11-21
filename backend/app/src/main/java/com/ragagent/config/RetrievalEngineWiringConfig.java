@@ -2,8 +2,8 @@ package com.ragagent.config;
 
 
 
-import com.ragagent.platform.config.RetrievalDriverProperties;
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.config.RetrievalDriverProperties;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.retrieval.api.TenantStoreOwnership;
 import com.ragagent.retrieval.api.VectorStoreLookup;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;

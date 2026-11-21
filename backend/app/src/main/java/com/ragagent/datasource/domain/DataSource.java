@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
-import com.ragagent.platform.security.CryptoService;
-import com.ragagent.platform.web.ZeroTimeSerializer;
+import com.ragagent.framework.persistence.PgJsonTypeHandler;
+import com.ragagent.framework.security.CryptoService;
+import com.ragagent.framework.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 
 /**

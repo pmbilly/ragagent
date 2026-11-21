@@ -1,6 +1,6 @@
 package com.ragagent.websearch.service;
 
-import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.websearch.config.WebSearchProviderParams;
 import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.dto.WebSearchProviderResponse;

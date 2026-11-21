@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.framework.stream.EmbeddedRedis;
 import com.ragagent.llm.api.ResponseType;
-import com.ragagent.platform.stream.EmbeddedRedis;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;

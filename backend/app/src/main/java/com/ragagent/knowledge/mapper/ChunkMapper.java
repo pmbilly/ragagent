@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ragagent.framework.persistence.PgJsonTypeHandler;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -47,11 +47,11 @@ public interface ChunkMapper extends BaseMapper<Chunk> {
             + "next_chunk_id = #{c.nextChunkId}, "
             + "chunk_type = #{c.chunkType}, "
             + "parent_chunk_id = #{c.parentChunkId}, "
-            + "relation_chunks = #{c.relationChunks, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler, "
+            + "relation_chunks = #{c.relationChunks, typeHandler=com.ragagent.framework.persistence.PgJsonTypeHandler, "
             + "jdbcType=OTHER}, "
-            + "indirect_relation_chunks = #{c.indirectRelationChunks, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler, "
+            + "indirect_relation_chunks = #{c.indirectRelationChunks, typeHandler=com.ragagent.framework.persistence.PgJsonTypeHandler, "
             + "jdbcType=OTHER}, "
-            + "metadata = #{c.metadata, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler, "
+            + "metadata = #{c.metadata, typeHandler=com.ragagent.framework.persistence.PgJsonTypeHandler, "
             + "jdbcType=OTHER}, "
             + "content_hash = #{c.contentHash}, "
             + "image_info = #{c.imageInfo}, "

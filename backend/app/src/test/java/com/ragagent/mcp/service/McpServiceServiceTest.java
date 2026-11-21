@@ -12,13 +12,13 @@ import static org.mockito.Mockito.verify;
 
 import com.ragagent.TestObjectProviders;
 import com.ragagent.TestSchema;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.repository.McpServiceRepository;
-import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.shared.error.BizException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.LinkedHashMap;

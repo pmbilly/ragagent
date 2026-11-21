@@ -1,6 +1,6 @@
 package com.ragagent.storage.api;
 
-import com.ragagent.shared.tenant.StorageEngineConfig;
+import com.ragagent.framework.shared.tenant.StorageEngineConfig;
 
 /**
  * 租户开通时「落一行默认存储后端」的**跨域命令端口**（不是只读端口：带写方法与补偿方法）。

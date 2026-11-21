@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.domain.span;
 
+import com.ragagent.framework.security.Hashes;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeSpanRepository;
-import com.ragagent.platform.security.Hashes;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;

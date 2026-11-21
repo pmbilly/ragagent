@@ -1,13 +1,13 @@
 package com.ragagent.knowledge.wiki.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ragagent.framework.persistence.PgJsonTypeHandler;
 import com.ragagent.knowledge.wiki.api.WikiIndexEntry;
 import com.ragagent.knowledge.wiki.domain.SourceRefNeedle;
 import com.ragagent.knowledge.wiki.domain.WikiPage;
 import com.ragagent.knowledge.wiki.domain.WikiStringListTypeHandler;
 import com.ragagent.knowledge.wiki.domain.page.WikiPageListRequest;
 import com.ragagent.knowledge.wiki.domain.page.WikiPageLite;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
@@ -123,7 +123,7 @@ public interface WikiPageMapper extends BaseMapper<WikiPage> {
             + "out_links = #{page.outLinks, typeHandler=com.ragagent.knowledge.wiki.domain.WikiStringListTypeHandler}, "
             + "source_refs = #{page.sourceRefs, typeHandler=com.ragagent.knowledge.wiki.domain.WikiStringListTypeHandler}, "
             + "chunk_refs = #{page.chunkRefs, typeHandler=com.ragagent.knowledge.wiki.domain.WikiStringListTypeHandler}, "
-            + "page_metadata = #{page.pageMetadata, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler}, "
+            + "page_metadata = #{page.pageMetadata, typeHandler=com.ragagent.framework.persistence.PgJsonTypeHandler}, "
             + "parent_slug = #{page.parentSlug}, folder_id = #{page.folderId}, "
             + "category_path = #{page.categoryPath, typeHandler=com.ragagent.knowledge.wiki.domain.WikiStringListTypeHandler}, "
             + "wiki_path = #{page.wikiPath}, depth = #{page.depth}, sort_order = #{page.sortOrder}, "
@@ -160,7 +160,7 @@ public interface WikiPageMapper extends BaseMapper<WikiPage> {
             + "status = #{status}, "
             + "source_refs = #{sourceRefs, typeHandler=com.ragagent.knowledge.wiki.domain.WikiStringListTypeHandler}, "
             + "chunk_refs = #{chunkRefs, typeHandler=com.ragagent.knowledge.wiki.domain.WikiStringListTypeHandler}, "
-            + "page_metadata = #{pageMetadata, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler}, "
+            + "page_metadata = #{pageMetadata, typeHandler=com.ragagent.framework.persistence.PgJsonTypeHandler}, "
             + "parent_slug = #{parentSlug}, folder_id = #{folderId}, "
             + "category_path = #{categoryPath, typeHandler=com.ragagent.knowledge.wiki.domain.WikiStringListTypeHandler}, "
             + "wiki_path = #{wikiPath}, depth = #{depth}, sort_order = #{sortOrder}, "

@@ -1,7 +1,7 @@
 package com.ragagent.websearch.adapter;
 
 import com.ragagent.auth.api.WebSearchConfig;
-import com.ragagent.platform.access.TenantContext;
+import com.ragagent.framework.access.TenantContext;
 import com.ragagent.retrieval.api.WebSearchResult;
 import com.ragagent.websearch.api.WebSearchExecutor;
 import com.ragagent.websearch.api.WebSearchRequest;

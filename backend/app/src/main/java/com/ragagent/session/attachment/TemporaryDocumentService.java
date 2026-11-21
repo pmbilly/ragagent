@@ -1,18 +1,18 @@
 package com.ragagent.session.attachment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.config.AppEnvLookup;
+import com.ragagent.framework.html.ContentTypeByFilename;
+import com.ragagent.framework.shared.session.MessageAttachment;
+import com.ragagent.framework.shared.tenant.TenantConfigLookup;
+import com.ragagent.framework.storage.config.UploadLimits;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.DocReaderParsePort;
 import com.ragagent.knowledge.api.DocumentChunkingPort;
 import com.ragagent.llm.api.AsrTranscriber;
 import com.ragagent.llm.api.ModelRuntime;
-import com.ragagent.platform.config.AppEnvLookup;
-import com.ragagent.platform.storage.config.UploadLimits;
-import com.ragagent.platform.text.ContentTypeByFilename;
-import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
-import com.ragagent.shared.session.MessageAttachment;
-import com.ragagent.shared.tenant.TenantConfigLookup;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.LinkedHashMap;

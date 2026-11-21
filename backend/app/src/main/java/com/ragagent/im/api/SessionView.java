@@ -1,6 +1,6 @@
 package com.ragagent.im.api;
 
-import com.ragagent.shared.session.SessionLastRequestState;
+import com.ragagent.framework.shared.session.SessionLastRequestState;
 import java.time.OffsetDateTime;
 
 

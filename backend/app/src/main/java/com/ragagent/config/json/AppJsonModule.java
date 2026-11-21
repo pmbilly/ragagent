@@ -7,14 +7,14 @@ import com.ragagent.auth.api.ParserEngineConfig;
 import com.ragagent.auth.api.RetrievalConfig;
 import com.ragagent.auth.api.UserPreferences;
 import com.ragagent.auth.api.WebSearchConfig;
+import com.ragagent.framework.shared.session.MessageView;
+import com.ragagent.framework.shared.tenant.APIPrincipalConfig;
+import com.ragagent.framework.shared.tenant.StorageEngineConfig;
+import com.ragagent.framework.web.JsonModuleProvider;
 import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import com.ragagent.knowledge.api.wiki.SlugUpdate;
 import com.ragagent.memory.api.MemoryMessageCursor;
-import com.ragagent.platform.web.JsonModuleProvider;
 import com.ragagent.retrieval.api.ImageInfo;
-import com.ragagent.shared.session.MessageView;
-import com.ragagent.shared.tenant.APIPrincipalConfig;
-import com.ragagent.shared.tenant.StorageEngineConfig;
 
 /**
  * 业务域面载荷的 Jackson 装配（wiki / tenant 配置 / 会话 / 记忆 / 认证 / 网页搜索）。

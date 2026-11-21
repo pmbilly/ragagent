@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.framework.access.TenantContext;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpAuthType;
 import com.ragagent.mcp.domain.McpOAuthToken;
@@ -17,7 +18,6 @@ import com.ragagent.mcp.oauth.model.OAuthToken;
 import com.ragagent.mcp.oauth.store.DbTokenStore;
 import com.ragagent.mcp.oauth.store.ManagedTokenStore;
 import com.ragagent.mcp.protocol.McpContext;
-import com.ragagent.platform.access.TenantContext;
 import java.lang.reflect.Method;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

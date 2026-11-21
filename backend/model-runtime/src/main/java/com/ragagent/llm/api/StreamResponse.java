@@ -1,6 +1,6 @@
 package com.ragagent.llm.api;
 
-import com.ragagent.shared.retrieval.SearchResult;
+import com.ragagent.framework.shared.retrieval.SearchResult;
 import java.util.List;
 import java.util.Map;
 

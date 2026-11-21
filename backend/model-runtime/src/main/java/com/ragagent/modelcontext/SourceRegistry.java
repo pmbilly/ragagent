@@ -2,9 +2,9 @@ package com.ragagent.modelcontext;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.shared.retrieval.SearchResult;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ToolCall;
-import com.ragagent.shared.retrieval.SearchResult;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

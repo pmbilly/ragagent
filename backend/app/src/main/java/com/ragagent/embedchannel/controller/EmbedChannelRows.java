@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.ragagent.embedchannel.controller.filter.EmbedAuthFilter;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.service.EmbedChannelService;
-import com.ragagent.shared.error.BizException;
+import com.ragagent.framework.error.BizException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;

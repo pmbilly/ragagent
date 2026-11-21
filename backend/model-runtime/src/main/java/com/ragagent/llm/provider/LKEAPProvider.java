@@ -1,6 +1,6 @@
 package com.ragagent.llm.provider;
 
-import com.ragagent.shared.error.BizException;
+import com.ragagent.framework.error.BizException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;

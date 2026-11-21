@@ -1,6 +1,6 @@
 package com.ragagent.mcp.oauth.model;
 
-import com.ragagent.platform.security.Hashes;
+import com.ragagent.framework.security.Hashes;
 import java.security.SecureRandom;
 import java.util.Base64;
 

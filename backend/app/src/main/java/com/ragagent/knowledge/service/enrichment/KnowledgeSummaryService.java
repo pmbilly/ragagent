@@ -1,6 +1,12 @@
 package com.ragagent.knowledge.service.enrichment;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.prompt.AgentPromptPlaceholders;
+import com.ragagent.framework.settings.ConversationProperties;
+import com.ragagent.framework.shared.wiki.WikiLanguageSupport;
 import com.ragagent.knowledge.api.WikiImageMarkup;
 import com.ragagent.knowledge.api.projection.ChunkProjectionAdapter;
 import com.ragagent.knowledge.domain.Chunk;
@@ -21,14 +27,8 @@ import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;
 import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelRuntime;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.prompt.AgentPromptPlaceholders;
-import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.retrieval.api.SearchChunkMerge;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.wiki.WikiLanguageSupport;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;

@@ -1,10 +1,10 @@
 package com.ragagent.modelruntime.adapter.provider.vlm;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.config.AppEnvLookup;
+import com.ragagent.framework.http.LlmTransport;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.modelruntime.adapter.provider.asr.OpenAiAsrTranscriber;
-import com.ragagent.platform.config.AppEnvLookup;
-import com.ragagent.platform.http.LlmTransport;
-import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;

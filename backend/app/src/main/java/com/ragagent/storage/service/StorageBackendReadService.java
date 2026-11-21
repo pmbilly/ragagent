@@ -1,8 +1,8 @@
 package com.ragagent.storage.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.error.BizException;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.dto.StorageBackendResponse;
 import com.ragagent.storage.dto.StorageConfig;

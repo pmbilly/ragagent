@@ -8,11 +8,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.settings.ConversationProperties;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelRuntime;
-import com.ragagent.platform.access.TenantContext;
-import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.session.conversation.SessionLookupScope;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.domain.conversation.Session;

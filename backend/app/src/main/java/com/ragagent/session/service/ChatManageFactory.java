@@ -1,13 +1,13 @@
 package com.ragagent.session.service;
 
-import com.ragagent.platform.settings.ConversationProperties;
+import com.ragagent.framework.event.EventBusInterface;
+import com.ragagent.framework.settings.ConversationProperties;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.SummaryConfig;
 import com.ragagent.session.service.SessionKnowledgeQaService.KnowledgeResolution;
 import com.ragagent.session.service.SessionKnowledgeQaService.SearchTargetView;
 import com.ragagent.session.support.PipelineViews;
-import com.ragagent.shared.event.EventBusInterface;
 import java.util.List;
 
 /**

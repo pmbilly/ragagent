@@ -1,12 +1,12 @@
 package com.ragagent.memory.service;
 
+import com.ragagent.framework.model.EmbeddingPort;
+import com.ragagent.framework.model.ModelFacts;
 import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.llm.api.ModelRuntime;
-import com.ragagent.platform.model.EmbeddingPort;
-import com.ragagent.platform.model.ModelFacts;
 import java.util.List;
 import org.springframework.stereotype.Component;
 

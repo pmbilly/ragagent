@@ -1,11 +1,11 @@
 package com.ragagent.storage.fileserve;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.security.CryptoService;
-import com.ragagent.platform.storage.fileserve.StoragePaths;
-import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.tenant.StorageEngineConfig;
-import com.ragagent.shared.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.framework.security.CryptoService;
+import com.ragagent.framework.shared.tenant.StorageEngineConfig;
+import com.ragagent.framework.shared.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.framework.storage.fileserve.StoragePaths;
+import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.storage.api.FileContentService;
 import com.ragagent.storage.api.StorageEnvLookup;
 import com.ragagent.storage.api.WritableFileContentService;

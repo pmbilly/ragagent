@@ -7,14 +7,14 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ragagent.framework.error.AppError;
+import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.error.ErrorCode;
+import com.ragagent.framework.shared.retrieval.SearchTarget;
 import com.ragagent.session.rag.plugin.PluginError;
 import com.ragagent.session.rag.plugin.PluginSearch;
 import com.ragagent.session.rag.plugin.PluginSearchEntity;
 import com.ragagent.session.rag.plugin.PluginSearchParallel;
-import com.ragagent.shared.error.AppError;
-import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.error.ErrorCode;
-import com.ragagent.shared.retrieval.SearchTarget;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;

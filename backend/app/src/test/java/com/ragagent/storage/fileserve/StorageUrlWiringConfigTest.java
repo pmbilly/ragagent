@@ -2,10 +2,10 @@ package com.ragagent.storage.fileserve;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.platform.storage.support.Rewriter;
-import com.ragagent.shared.storage.support.FileUrlPort;
-import com.ragagent.shared.storage.support.Resolver;
-import com.ragagent.shared.storage.support.StorageBackendResolver;
+import com.ragagent.framework.storage.support.FileUrlPort;
+import com.ragagent.framework.storage.support.Resolver;
+import com.ragagent.framework.storage.support.Rewriter;
+import com.ragagent.framework.storage.support.StorageBackendResolver;
 import java.util.Iterator;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;

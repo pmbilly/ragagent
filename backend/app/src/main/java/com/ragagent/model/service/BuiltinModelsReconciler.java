@@ -1,9 +1,9 @@
 package com.ragagent.model.service;
 
+import com.ragagent.framework.config.AppEnvLookup;
 import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.repository.ModelRepository;
-import com.ragagent.platform.config.AppEnvLookup;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
