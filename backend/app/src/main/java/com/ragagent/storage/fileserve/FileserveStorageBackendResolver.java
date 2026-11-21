@@ -1,10 +1,10 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.shared.storage.fileserve.FileContentService;
 import com.ragagent.shared.storage.support.FileUrlPort;
 import com.ragagent.shared.storage.support.StorageBackendResolver;
 import com.ragagent.shared.tenant.TenantConfigLookup;
 import com.ragagent.shared.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.storage.api.FileContentService;
 import java.io.IOException;
 import org.springframework.stereotype.Component;
 

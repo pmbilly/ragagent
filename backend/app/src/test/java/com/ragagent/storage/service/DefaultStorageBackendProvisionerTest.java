@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.TestSchema;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
-import com.ragagent.shared.storage.StorageBackendProvisioner;
+import com.ragagent.storage.api.StorageBackendProvisioner;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.dto.StorageConfig;
 import org.junit.jupiter.api.AfterAll;

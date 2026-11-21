@@ -12,7 +12,7 @@ import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.repository.TenantMemberRepository;
 import com.ragagent.auth.repository.TenantRepository;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.storage.StorageBackendProvisioner;
+import com.ragagent.storage.api.StorageBackendProvisioner;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

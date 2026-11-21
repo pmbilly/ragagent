@@ -1,8 +1,8 @@
 package com.ragagent.session.service;
 
-import com.ragagent.shared.storage.fileserve.WritableFileContentService;
 import com.ragagent.storage.api.GlobalFileServicePort;
 import com.ragagent.storage.api.ResourceCatalogPort;
+import com.ragagent.storage.api.WritableFileContentService;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

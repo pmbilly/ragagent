@@ -6,7 +6,7 @@ import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.shared.error.AppError;
 import com.ragagent.shared.error.BizException;
-import com.ragagent.shared.storage.StorageConnectivityPort;
+import com.ragagent.storage.api.StorageConnectivityPort;
 import com.ragagent.storage.dto.StorageEngineDtos;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;

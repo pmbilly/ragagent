@@ -342,7 +342,7 @@
 | `:backend` | `com.ragagent.shared.session` | 会话契约面：管线消息视图与消息端口。 |
 | `:backend` | `com.ragagent.shared.settings` | 契约 · 设置：SystemSettingGateway。 |
 | `:backend` | `com.ragagent.shared.storage` | 存储契约面：后端供给端口。 |
-| `:backend` | `com.ragagent.shared.storage.fileserve` | 存储 · 文件服务：WritableFileContentService / FileContentService / GlobalFileServicePort…。 |
+| `:backend` | `com.ragagent.shared.storage.fileserve` | 存储 · 文件服务（framework 侧）：可打开的读取载体与下载传输。 |
 | `:backend` | `com.ragagent.shared.storage.provider` | 存储 · 提供方：SeekableSource。 |
 | `:backend` | `com.ragagent.shared.storage.support` | 存储 · 支撑：StorageBackendResolver / StorageUrlContext / FileUrlPort…。 |
 | `:backend` | `com.ragagent.shared.tenant` | 租户契约面：租户角色等跨域值对象。 |

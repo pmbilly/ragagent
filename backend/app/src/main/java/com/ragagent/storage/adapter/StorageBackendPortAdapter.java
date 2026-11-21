@@ -1,8 +1,8 @@
 package com.ragagent.storage.adapter;
 
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.shared.storage.StorageBackendPort;
-import com.ragagent.shared.storage.StorageBackendView;
+import com.ragagent.storage.api.StorageBackendPort;
+import com.ragagent.storage.api.StorageBackendView;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.repository.StorageBackendRepository;
 import com.ragagent.storage.service.StorageBackendService;

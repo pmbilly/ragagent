@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
-import com.ragagent.shared.storage.fileserve.WritableFileContentService;
+import com.ragagent.storage.api.WritableFileContentService;
 import com.ragagent.storage.fileserve.LocalFileContentService;
 import com.ragagent.storage.fileserve.StorageFileResolver;
 import com.ragagent.storage.service.ResourceCatalogService;
