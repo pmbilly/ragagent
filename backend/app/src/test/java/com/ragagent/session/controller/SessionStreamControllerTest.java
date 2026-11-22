@@ -275,7 +275,8 @@ class SessionStreamControllerTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
         String body = invoke(MESSAGE_ID, null, response);
 
-        assertThat(response.getHeader("Content-Type")).startsWith("text/event-stream");
+                // F8 钉：SseEmitter 化后的线上值（旧实现的 charset 后缀已消失——spec 合法，SseContract 契约表本就无 charset）
+        assertThat(response.getHeader("Content-Type")).isEqualTo("text/event-stream");
         assertThat(response.getHeader("X-Accel-Buffering")).isEqualTo("no");
         assertThat(body).contains("\"responseType\":\"agentQuery\"");
         assertThat(body).contains("\"responseType\":\"answer\"");

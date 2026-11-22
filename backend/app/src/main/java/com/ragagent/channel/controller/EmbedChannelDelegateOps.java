@@ -68,6 +68,9 @@ final class EmbedChannelDelegateOps {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
         String patched = patchEmbedChatPayload(rawBody, ch, true);
         ctrl.sessionPort.validateChat(patched);
+        // 分派按 agent 配置的 agentMode 判定（prepareAgentQA 内解析）：默认 quick-answer
+        // 配置解析为 NORMAL 模式，行为与历史 knowledgeQa 直派一致；租户显式改过内建
+        // agent 模式时走 AGENT——显式配置优先于渠道级强制。
         ctrl.sessionPort.agentQa(LogSanitizer.sanitize(sessionId), patched, resourceUrls, sink);
         return emitter;
     }

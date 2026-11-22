@@ -58,7 +58,7 @@ class EmitterFrameBytesTest {
         String frame = new String(body, StandardCharsets.UTF_8);
         // 记录实测骨架：断言按 spec 解析器口径（event 行与 data 行），同时钉住具体字节防漂移
         assertThat(frame).startsWith("event:").contains("\ndata:").endsWith("\n\n");
-        assertThat(result.getResponse().getContentType()).startsWith("text/event-stream");
+        assertThat(result.getResponse().getContentType()).isEqualTo("text/event-stream");
         // 逐字节钉：任何 Spring 升级改变帧形态时此行红——迁移决策的依据不可静默漂移
         assertThat(frame)
                 .as("SseEmitter 帧字节（迁移依据）: " + frame.replace("\n", "\\n"))

@@ -10,6 +10,7 @@ import com.ragagent.framework.tenant.APIKeyScopeContext;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.tenant.TenantRole;
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -125,6 +126,12 @@ public class RbacInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws IOException {
+        // SseEmitter 化后的异步错误派发（completeError→ASYNC dispatch）会重跑本拦截器，
+        // 而 Filter 的 finally 在异步启动时已清 TenantContext——此时角色恒空、必 403。
+        // 首派发已完成 RBAC 强制；ASYNC 派发只做错误渲染，不再校验。
+        if (request.getDispatcherType() == DispatcherType.ASYNC) {
+            return true;
+        }
         // URL 里的租户 id 必须等于活动租户。
         // 自动对所有 /api/v1/tenants/{id}/** 生效（漏配规则的代价是越权读取别人的审计/密钥列表）。
         // 必须先于 API-Key 短路执行（对 Key 主体同样生效）——
