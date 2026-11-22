@@ -23,8 +23,9 @@ BUILD_FILE = ROOT / "backend" / "contract" / "pom.xml"
 #: contract 解散后，「契约面只允许纯 JDK」的约束不能凭空消失——
 #: 它平移到 framework 承接共享词汇的子包上（C1 导入根、C3 框架形状继续生效）。
 SHARED_ROOT = ROOT / "backend" / "framework" / "src" / "main" / "java"
-#: 通用面（纯 JDK）与仍在 shared 的业务词汇都在扫描面内。
-CONTRACT_SEGMENTS = ("vocabulary", "error", "event", "json", "text", "pagination")
+#: 通用面（纯 JDK）。段与目录一一对应：目录删除（包归零/迁移）必须同步改这里——
+#: 静默跳过不存在的段 = 覆盖丢失（B168 教训的守卫版）。
+CONTRACT_SEGMENTS = ("error", "event", "json", "text", "pagination")
 
 ALLOWED_IMPORT_ROOTS = ("java.", "javax.", "com.ragagent.")
 
@@ -59,10 +60,14 @@ def registered_sources() -> list[pathlib.Path]:
     if SRC.is_dir():
         files += list(SRC.rglob("*.java"))
     base = SHARED_ROOT / "com" / "ragagent" / "framework"
+    missing = [seg for seg in CONTRACT_SEGMENTS if not (base / seg).is_dir()]
+    if missing:
+        print("✗ 契约扫描段目录不存在（覆盖丢失）："
+              + "、".join(missing)
+              + "——同步 CONTRACT_SEGMENTS 或恢复目录")
+        raise SystemExit(2)
     for seg in CONTRACT_SEGMENTS:
-        d = base / seg
-        if d.is_dir():
-            files += list(d.rglob("*.java"))
+        files += list((base / seg).rglob("*.java"))
     return sorted(p for p in files if "/build/" not in str(p) and "/target/" not in str(p))
 
 
