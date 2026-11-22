@@ -72,10 +72,6 @@ final class TurnStreamPump {
         long deadline = System.currentTimeMillis() + MAX_DURATION_MILLIS;
         long interval = sink == null ? HEADLESS_INTERVAL_MILLIS : SSE_INTERVAL_MILLIS;
 
-        if (sink != null) {
-            sink.applyHeaders();
-        }
-
         while (System.currentTimeMillis() < deadline) {
             try {
                 Thread.sleep(interval);

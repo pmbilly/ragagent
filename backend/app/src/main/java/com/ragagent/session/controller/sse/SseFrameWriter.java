@@ -81,12 +81,7 @@ public class SseFrameWriter implements SseFrameSink {
     /** 组帧（序列化 + {@code event:}/{@code data:} 行）——写出口无关（servlet 直写与 SseSink 共用）。 */
     @Override
     public String frameOf(StreamResponse payload) throws IOException {
-        String json;
-        try {
-            json = mapper.writeValueAsString(payload);
-        } catch (JsonProcessingException e) {
-            throw new IOException("failed to marshal stream response: " + e.getMessage(), e);
-        }
+        String json = jsonOf(payload);
 
         StringBuilder frame = new StringBuilder(json.length() + 32);
         frame.append("event:").append(EVENT_NAME).append('\n');
@@ -97,6 +92,15 @@ public class SseFrameWriter implements SseFrameSink {
     /** 写一帧到 {@link SseSink}（embed/QA 会话流的出口）。 */
     @Override
     public void write(SseSink sink, StreamResponse payload) throws IOException {
-        sink.writeFrame(frameOf(payload));
+        sink.send(EVENT_NAME, jsonOf(payload));
+    }
+
+    /** 序列化载荷为 JSON（组帧的 data 段；帧骨架由 SseSink 实现负责）。 */
+    String jsonOf(StreamResponse payload) throws IOException {
+        try {
+            return mapper.writeValueAsString(payload);
+        } catch (JsonProcessingException e) {
+            throw new IOException("failed to marshal stream response: " + e.getMessage(), e);
+        }
     }
 }

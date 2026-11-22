@@ -1,7 +1,6 @@
 package com.ragagent.session.controller.sse;
 
 import com.ragagent.framework.vocabulary.SseSink;
-import com.ragagent.framework.web.ServletSseSink;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
@@ -40,7 +39,10 @@ public final class SseContract {
      * 重复调用不应产生第二个同名头。</p>
      */
     public static void setSSEHeaders(HttpServletResponse response) {
-        new ServletSseSink(response).applyHeaders();
+        response.setHeader("Content-Type", CONTENT_TYPE);
+        response.setHeader("Cache-Control", CACHE_CONTROL);
+        response.setHeader("Connection", CONNECTION);
+        response.setHeader("X-Accel-Buffering", X_ACCEL_BUFFERING);
     }
 
     /**

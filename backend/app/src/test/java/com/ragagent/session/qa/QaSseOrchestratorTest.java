@@ -62,12 +62,8 @@ class QaSseOrchestratorTest {
     private SseSink sink() {
         return new SseSink() {
             @Override
-            public void applyHeaders() {
-            }
-
-            @Override
-            public void writeFrame(String frame) {
-                frames.add(frame);
+            public void send(String eventName, String json) {
+                frames.add("event:" + eventName + "\ndata:" + json + "\n\n");
             }
         };
     }
@@ -131,11 +127,7 @@ class QaSseOrchestratorTest {
         ctx.eventBus = bus;
         SseSink broken = new SseSink() {
             @Override
-            public void applyHeaders() {
-            }
-
-            @Override
-            public void writeFrame(String frame) throws java.io.IOException {
+            public void send(String eventName, String json) throws java.io.IOException {
                 throw new java.io.IOException("client gone");
             }
         };

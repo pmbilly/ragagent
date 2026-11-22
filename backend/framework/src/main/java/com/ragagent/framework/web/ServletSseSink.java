@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * {@link SseSink} 的 servlet 实现（HTTP 边界）：四个 SSE 头 + 输出流逐帧写入并 flush。
+ * {@link SseSink} 的 servlet 直写实现（过渡：入口逐一切换 {@code SseEmitter} 后删除）。
  *
- * <p>头设置逻辑原在 {@code session.controller.sse.SseContract#setSSEHeaders}，自 起以本类为
- * 单一实现（SseContract 保留同名薄壳委托，兼容既有 servlet 路径）。</p>
+ * <p>帧骨架 {@code event:<name>\ndata:<json>\n\n}（冒号后无空格）与 {@code SseEmitter}
+ * 实测逐字节一致。头部设置职责已上移控制器（{@code SseContract.setSSEHeaders}）。</p>
  */
 public final class ServletSseSink implements SseSink {
 
@@ -20,16 +20,11 @@ public final class ServletSseSink implements SseSink {
     }
 
     @Override
-    public void applyHeaders() {
-        response.setHeader("Content-Type", "text/event-stream");
-        response.setHeader("Cache-Control", "no-cache");
-        response.setHeader("Connection", "keep-alive");
-        response.setHeader("X-Accel-Buffering", "no");
-    }
-
-    @Override
-    public void writeFrame(String frame) throws IOException {
-        response.getOutputStream().write(frame.getBytes(StandardCharsets.UTF_8));
+    public void send(String eventName, String json) throws IOException {
+        StringBuilder frame = new StringBuilder(json.length() + 32);
+        frame.append("event:").append(eventName).append('\n');
+        frame.append("data:").append(json).append('\n').append('\n');
+        response.getOutputStream().write(frame.toString().getBytes(StandardCharsets.UTF_8));
         response.getOutputStream().flush();
     }
 }
