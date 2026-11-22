@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentengine.api.TagScope;
+import com.ragagent.agentmanagement.assembler.AgentAssembler;
+import com.ragagent.agentmanagement.controller.vo.AgentListRespVo;
+import com.ragagent.agentmanagement.controller.vo.AgentViewRespVo;
 import com.ragagent.agentmanagement.dto.AgentResponses;
 import com.ragagent.agentmanagement.dto.AgentView;
 import com.ragagent.agentmanagement.service.CustomAgentService;
@@ -67,7 +70,7 @@ public class AgentController {
 
     // ── GET /agents ──
     @GetMapping("/api/v1/agents")
-    public ResponseEntity<AgentResponses.AgentListPayload> list(
+    public ResponseEntity<AgentListRespVo> list(
             @RequestParam(value = "creator", required = false) String creator,
             HttpServletRequest req) {
         String locale = BuiltinAgentRegistry.localeFromRequest(req.getHeader("Accept-Language"));
@@ -77,7 +80,8 @@ public class AgentController {
             rows.add(AgentResponses.agent(r));
         }
         // 载荷形状不变（{agents, disabledOwnAgentIds}）；外壳由 @ApiResult 统一施加
-        return ResponseEntity.ok(AgentResponses.listEnvelope(rows, result.disabledOwnIds()));
+        return ResponseEntity.ok(AgentAssembler.toListVo(
+                AgentResponses.listEnvelope(rows, result.disabledOwnIds())));
     }
 
     // ── GET /agents/placeholders ──
@@ -95,28 +99,28 @@ public class AgentController {
 
     // ── POST /agents ──
     @PostMapping("/api/v1/agents")
-    public ResponseEntity<AgentView> create(
+    public ResponseEntity<AgentViewRespVo> create(
             @RequestBody(required = false) String rawBody) {
         AgentRequest parsed = bindAgentRequest(rawBody, true);
         ObjectNode cfg = configNode(parsed);
         authorizeKnowledgeScope(cfg);
         var result = service.createAgent(parsed.name(), parsed.description(), parsed.avatar(), cfg);
-        return ResponseEntity.status(201).body(AgentResponses.agent(result));
+        return ResponseEntity.status(201).body(AgentAssembler.toVo(AgentResponses.agent(result)));
     }
 
     // ── GET /agents/:id ──
     @GetMapping("/api/v1/agents/{id}")
-    public ResponseEntity<AgentView> get(@PathVariable("id") String id,
+    public ResponseEntity<AgentViewRespVo> get(@PathVariable("id") String id,
             HttpServletRequest req) {
         requireNonEmpty(id);
         String locale = BuiltinAgentRegistry.localeFromRequest(req.getHeader("Accept-Language"));
         var result = service.getAgentById(id, locale);
-        return ResponseEntity.ok(AgentResponses.agent(result));
+        return ResponseEntity.ok(AgentAssembler.toVo(AgentResponses.agent(result)));
     }
 
     // ── PUT /agents/:id ──
     @PutMapping("/api/v1/agents/{id}")
-    public ResponseEntity<AgentView> update(@PathVariable("id") String id,
+    public ResponseEntity<AgentViewRespVo> update(@PathVariable("id") String id,
             @RequestBody(required = false) String rawBody, HttpServletRequest req) {
         requireNonEmpty(id);
         AgentRequest parsed = bindAgentRequest(rawBody, false);
@@ -126,7 +130,7 @@ public class AgentController {
         String locale = BuiltinAgentRegistry.localeFromRequest(req.getHeader("Accept-Language"));
         var result = service.updateAgent(id, parsed.name(), parsed.description(), parsed.avatar(),
                 cfg, locale);
-        return ResponseEntity.ok(AgentResponses.agent(result));
+        return ResponseEntity.ok(AgentAssembler.toVo(AgentResponses.agent(result)));
     }
 
     // ── DELETE /agents/:id ──
@@ -141,7 +145,7 @@ public class AgentController {
 
     // ── POST /agents/:id/copy ──
     @PostMapping("/api/v1/agents/{id}/copy")
-    public ResponseEntity<AgentView> copy(@PathVariable("id") String id,
+    public ResponseEntity<AgentViewRespVo> copy(@PathVariable("id") String id,
             HttpServletRequest req) {
         requireNonEmpty(id);
         String locale = BuiltinAgentRegistry.localeFromRequest(req.getHeader("Accept-Language"));
@@ -149,7 +153,7 @@ public class AgentController {
         var source = service.getAgentById(id, locale);
         authorizeKnowledgeScope(source.config());
         var result = service.copyAgent(id, locale);
-        return ResponseEntity.status(201).body(AgentResponses.agent(result));
+        return ResponseEntity.status(201).body(AgentAssembler.toVo(AgentResponses.agent(result)));
     }
 
     // ── GET /agents/:id/suggested-questions ──

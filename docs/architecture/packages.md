@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-351 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+353 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -19,7 +19,9 @@
 | `:backend` | `com.ragagent.agentengine.json` | Agent 面契约载荷的 Jackson 装配（mixin 与注册表）。 |
 | `:backend` | `com.ragagent.agentmanagement` | 智能体管理面：内建智能体注册表与类型预设、自定义智能体 CRUD（custom_agents）、 技能目录、推荐问题流与 agent config jsonb。 |
 | `:backend` | `com.ragagent.agentmanagement.adapter` | Agent 管理 · 端口实现：AgentLookupAdapter。 |
+| `:backend` | `com.ragagent.agentmanagement.assembler` | 领域对象与 HTTP 出入参之间的装配：只做字段搬运与空值处理，不含业务判断。 |
 | `:backend` | `com.ragagent.agentmanagement.controller` | 智能体管理面的 HTTP 薄层：智能体 CRUD（com.ragagent.agentmanagement.controller.AgentController） 与技能目录（com.ragagent |
+| `:backend` | `com.ragagent.agentmanagement.controller.vo` | 智能体管理模块的 HTTP 出参：只承载传输形状，不参与业务判断。 |
 | `:backend` | `com.ragagent.agentmanagement.domain` | 智能体管理实体（@TableName 跟随表名）。 |
 | `:backend` | `com.ragagent.agentmanagement.dto` | 智能体管理面的响应装配类型（com.ragagent.agentmanagement.dto.AgentResponses）。 |
 | `:backend` | `com.ragagent.agentmanagement.mapper` | 智能体管理面的 MyBatis-Plus 接口与 jsonb 原串 TypeHandler。 |
