@@ -1,7 +1,6 @@
 package com.ragagent.knowledge.task;
 
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.model.Embedder;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -11,6 +10,7 @@ import com.ragagent.knowledge.index.ChunkVectorIndexer;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.service.image.ExtractedImageStore;
+import com.ragagent.llm.api.Embedder;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 import com.ragagent.llm.api.ModelRuntime;

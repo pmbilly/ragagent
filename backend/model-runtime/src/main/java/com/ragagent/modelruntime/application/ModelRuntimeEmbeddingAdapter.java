@@ -1,7 +1,7 @@
 package com.ragagent.modelruntime.application;
 
-import com.ragagent.framework.model.EmbeddingPort;
-import com.ragagent.framework.model.ModelFacts;
+import com.ragagent.llm.api.EmbeddingPort;
+import com.ragagent.llm.api.ModelFacts;
 import com.ragagent.llm.api.ModelRuntime;
 import java.util.List;
 import org.springframework.stereotype.Component;

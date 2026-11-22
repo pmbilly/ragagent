@@ -1,10 +1,10 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.framework.model.EmbeddingPort;
-import com.ragagent.framework.model.ModelFacts;
+import com.ragagent.llm.api.EmbeddingPort;
 import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
+import com.ragagent.llm.api.ModelFacts;
 import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.llm.api.ModelRuntime;
 import java.util.List;

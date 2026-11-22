@@ -6,7 +6,9 @@
     contract       （纯 JDK）
     platform       → contract
     model-runtime  → contract, platform
-    retrieval-engine → contract, platform
+    retrieval-engine → contract, platform, model-runtime
+                     （2026-11-22 新增：Embedder/ModelFacts/EmbeddingPort 从 framework.model
+                      归位 llm.api，蓝图 §5.2 目标图两个引擎都指向 model-runtime）
     agent-engine   → contract, platform, model-runtime   （modelcontext = 方案认可的终态边）
     app            → contract, platform, model-runtime, retrieval-engine
                      （model-runtime 仅 modelcontext；retrieval-engine 因 vectorstore 契约
@@ -57,7 +59,8 @@ MODULES = ["framework", "model-runtime", "retrieval-engine", "agent-engine", "ap
 ALLOWED_MAIN: dict[str, set[str]] = {
     "framework": {},
     "model-runtime": {"framework"},
-    "retrieval-engine": {"framework"},
+    # model-runtime：Embedder/ModelFacts/EmbeddingPort 归位 llm.api（2026-11-22，蓝图 §5.2 目标图）
+    "retrieval-engine": {"framework", "model-runtime"},
     # modelcontext：agent 工具注册表/流解码属模型侧词汇，方案明示为 agent-engine 的合法终态边
     "agent-engine": {"framework", "model-runtime"},
     # modelcontext：同上（4 处；R2c-3d 已把其余模型族边清零）

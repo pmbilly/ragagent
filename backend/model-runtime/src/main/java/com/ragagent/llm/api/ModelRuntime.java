@@ -1,6 +1,5 @@
 package com.ragagent.llm.api;
 
-import com.ragagent.framework.model.Embedder;
 import com.ragagent.llm.api.ModelCatalogPort.ModelRowView;
 
 /**

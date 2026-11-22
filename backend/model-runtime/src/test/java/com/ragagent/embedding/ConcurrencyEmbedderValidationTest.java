@@ -2,7 +2,7 @@ package com.ragagent.embedding;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.ragagent.framework.model.Embedder;
+import com.ragagent.llm.api.Embedder;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

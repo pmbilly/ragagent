@@ -1,4 +1,4 @@
-package com.ragagent.framework.model;
+package com.ragagent.llm.api;
 
 import java.util.List;
 

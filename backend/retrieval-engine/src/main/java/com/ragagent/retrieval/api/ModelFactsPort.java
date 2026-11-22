@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.api;
 
-import com.ragagent.framework.model.ModelFacts;
+import com.ragagent.llm.api.ModelFacts;
 
 /**
  * 模型的跨域只读端口：按 id 读取最小事实集。

@@ -2,7 +2,6 @@ package com.ragagent.knowledge.service.management;
 
 import com.ragagent.auth.api.TenantStorageQuotaPort;
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.model.Embedder;
 import com.ragagent.knowledge.api.KnowledgeIngest;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -14,6 +13,7 @@ import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.support.KnowledgeTaskProgressStore;
 import com.ragagent.knowledge.support.KnowledgeTaskRunner;
+import com.ragagent.llm.api.Embedder;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.retrieval.api.IndexEngine;
 import com.ragagent.retrieval.api.IndexEngineResolver;

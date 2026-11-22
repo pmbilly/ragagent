@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-360 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+358 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -121,7 +121,6 @@
 | `:backend` | `com.ragagent.framework.http` | 平台 HTTP 面：SSRF 策略下的安全抓取工具，以及全进程共享的裸 HTTP 传输层 （com.ragagent.framework.http.LlmTransport：连接级 SSRF 校验 + |
 | `:backend` | `com.ragagent.framework.json` | 契约 · JSON：ByteKeyOrder / JsonValues / ZeroTimes。 |
 | `:backend` | `com.ragagent.framework.jsonbind` | JSON 绑定：Jackson 的 mapper 工厂、契约 mixin 注册表与各模块贡献的模块 SPI。 |
-| `:backend` | `com.ragagent.framework.model` | 模型能力的对外接口（嵌入等）：引擎与各域只认能力，不认厂商实现。 |
 | `:backend` | `com.ragagent.framework.pagination` | 分页契约：统一的 com.ragagent.framework.pagination.PageResult。 |
 | `:backend` | `com.ragagent.framework.persistence` | 平台持久化面：MyBatis 拦截器（全表写守卫 / 租户过滤）、分页请求、JSONB / 时间类型处理器、方言与 LIKE 转义。 |
 | `:backend` | `com.ragagent.framework.prompt` | 平台提示词面：模板目录、常量、占位符与组装。 |
@@ -134,7 +133,6 @@
 | `:backend` | `com.ragagent.framework.task` | 平台任务面：Redis 任务队列核心（RedisTaskQueueCore）、 Redis 重试执行循环（RedisRetryingTaskQueue）、进程内执行队列 （InProcessTaskQ |
 | `:backend` | `com.ragagent.framework.tenant` | 多租户与访问控制（基础设施）：租户角色、租户配置读取面、API Key 作用域。 |
 | `:backend` | `com.ragagent.framework.text` | 契约文本工具面：契约载荷共用的纯 JDK 文本原语 （TextConv / CodePoints / Tokens / 空白与语言判定）。 |
-| `:backend` | `com.ragagent.framework.tool` | 平台工具技术适配：工具 schema 的 JSON 解析（ToolSchemas）。 |
 | `:backend` | `com.ragagent.framework.tracing` | 观测技术面：Langfuse/OTLP 适配与 trace 载体注入。 |
 | `:backend` | `com.ragagent.framework.tracing.langfuse` | 平台追踪面（Langfuse OTel 适配； |
 | `:backend` | `com.ragagent.framework.vocabulary` | 跨域词汇：被两个以上模块共用、且无法下沉到任何单个域的形状。 |

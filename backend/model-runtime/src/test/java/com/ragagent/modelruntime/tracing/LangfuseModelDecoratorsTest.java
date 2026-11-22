@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.framework.model.Embedder;
 import com.ragagent.framework.tracing.langfuse.LangfuseAttributes;
 import com.ragagent.framework.tracing.langfuse.LangfuseConfig;
 import com.ragagent.framework.tracing.langfuse.LangfuseTestSupport;
@@ -14,6 +13,7 @@ import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;
 import com.ragagent.llm.api.ChatStream;
+import com.ragagent.llm.api.Embedder;
 import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.RankResult;
 import com.ragagent.llm.api.Reranker;

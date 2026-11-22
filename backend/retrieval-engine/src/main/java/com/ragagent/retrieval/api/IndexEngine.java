@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.api;
 
-import com.ragagent.framework.model.Embedder;
+import com.ragagent.llm.api.Embedder;
 import java.util.List;
 import java.util.Map;
 

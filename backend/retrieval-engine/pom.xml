@@ -2,8 +2,8 @@
 <!--
   检索引擎模块：com.ragagent.retrieval。
 
-  依赖方向：retrieval-engine → platform → contract；对模型族出边为 0
-  （VLM 客户端归位 model-runtime，索引面用的 Embedder 已在契约面）。
+  依赖方向：retrieval-engine → model-runtime → framework（蓝图 §5.2 目标图：
+  两个引擎都指向 model-runtime；Embedder/ModelFacts 等模型能力端口在 llm.api）。
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -25,6 +25,12 @@
       <groupId>com.ragagent</groupId>
       <artifactId>framework</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>com.ragagent</groupId>
+      <artifactId>model-runtime</artifactId>
+    </dependency>
+
 
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>

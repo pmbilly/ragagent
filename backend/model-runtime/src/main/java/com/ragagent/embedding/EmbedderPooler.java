@@ -1,6 +1,6 @@
 package com.ragagent.embedding;
 
-import com.ragagent.framework.model.Embedder;
+import com.ragagent.llm.api.Embedder;
 import java.util.List;
 
 /**
