@@ -1,7 +1,7 @@
 package com.ragagent.session.domain;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.ragagent.framework.vocabulary.MentionedItem;
+import com.ragagent.agentengine.api.MentionedItem;
 import java.util.List;
 
 /**

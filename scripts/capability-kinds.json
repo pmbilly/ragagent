@@ -48,19 +48,9 @@
       "frontend": "views/knowledge/settings/DataSourceSettings.vue",
       "level": 2
     },
-    "embedchannel": {
-      "kind": "integration",
-      "frontend": "views/embed",
-      "level": 2
-    },
     "favorite": {
       "kind": "product",
       "frontend": "views/agent · views/knowledge（列表置顶/收藏）",
-      "level": 2
-    },
-    "im": {
-      "kind": "integration",
-      "frontend": "views/integrations/IntegrationSettingsSection.vue",
       "level": 2
     },
     "initialization": {
@@ -107,6 +97,11 @@
       "kind": "integration",
       "frontend": "views/settings/WebSearchSettings.vue",
       "level": 1
+    },
+    "channel": {
+      "kind": "integration",
+      "frontend": "views/embed · views/settings（挂件渠道与 IM 渠道面板，合并批不改前端）",
+      "level": 2
     }
   }
 }

@@ -1,8 +1,8 @@
 package com.ragagent.session.support;
 
-import com.ragagent.framework.vocabulary.MessageAttachment;
-import com.ragagent.framework.vocabulary.MessageImage;
-import com.ragagent.framework.vocabulary.UsedMemory;
+import com.ragagent.channel.api.MessageAttachment;
+import com.ragagent.channel.api.MessageImage;
+import com.ragagent.channel.api.UsedMemory;
 import com.ragagent.session.PipelineMessageAttachmentView;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.dto.PipelineMessageImageView;

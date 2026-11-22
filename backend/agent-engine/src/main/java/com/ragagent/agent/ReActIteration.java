@@ -1,10 +1,10 @@
 package com.ragagent.agent;
 
 import com.ragagent.agent.domain.AgentState;
+import com.ragagent.agentengine.api.AgentStep;
 import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.tracing.langfuse.LangfuseManager;
 import com.ragagent.framework.tracing.langfuse.Span;
-import com.ragagent.framework.vocabulary.AgentStep;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatResponse;
 import com.ragagent.llm.api.ChatTool;

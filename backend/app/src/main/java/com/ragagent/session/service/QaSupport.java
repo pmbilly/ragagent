@@ -1,13 +1,13 @@
 package com.ragagent.session.service;
 
 import com.ragagent.agentengine.api.AgentLookup;
+import com.ragagent.agentengine.api.MentionedItem;
 import com.ragagent.agentengine.api.SteerSink;
+import com.ragagent.channel.api.MessageAttachment;
+import com.ragagent.channel.api.SuggestionAttribution;
 import com.ragagent.framework.event.EventBusInterface;
 import com.ragagent.framework.storage.support.StreamRewriter;
 import com.ragagent.framework.tenant.TenantContextSnapshot;
-import com.ragagent.framework.vocabulary.MentionedItem;
-import com.ragagent.framework.vocabulary.MessageAttachment;
-import com.ragagent.framework.vocabulary.SuggestionAttribution;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.modelruntime.stream.StreamEvent;
 import com.ragagent.session.domain.conversation.Session;

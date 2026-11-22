@@ -1,11 +1,11 @@
 package com.ragagent.session.adapter;
 
+import com.ragagent.channel.api.MessageView;
+import com.ragagent.channel.api.QaRequestPayload;
+import com.ragagent.channel.api.SessionQaPort;
+import com.ragagent.channel.api.SessionView;
 import com.ragagent.framework.event.EventBusInterface;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.MessageView;
-import com.ragagent.im.api.QaRequestPayload;
-import com.ragagent.im.api.SessionQaPort;
-import com.ragagent.im.api.SessionView;
 import com.ragagent.llm.api.TokenUsage;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionService;

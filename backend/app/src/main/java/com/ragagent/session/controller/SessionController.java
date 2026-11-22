@@ -1,14 +1,14 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.channel.api.SessionView;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.framework.security.LogSanitizer;
 import com.ragagent.framework.tenant.TenantContext;
-import com.ragagent.framework.vocabulary.MessageArtifact;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
-import com.ragagent.im.api.SessionView;
+import com.ragagent.retrieval.api.MessageArtifact;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionReadService;
 import com.ragagent.session.conversation.SessionService;

@@ -1,13 +1,13 @@
 package com.ragagent.session.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.embedchannel.api.EmbedReply;
-import com.ragagent.embedchannel.api.EmbedSessionPort;
-import com.ragagent.embedchannel.api.MessageSuggestionView;
+import com.ragagent.channel.api.EmbedReply;
+import com.ragagent.channel.api.EmbedSessionPort;
+import com.ragagent.channel.api.MessageSuggestionView;
+import com.ragagent.channel.api.MessageView;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.MessageView;
 import com.ragagent.framework.vocabulary.SseSink;
 import com.ragagent.session.conversation.MessageHistoryService;
 import com.ragagent.session.conversation.SessionStopService;

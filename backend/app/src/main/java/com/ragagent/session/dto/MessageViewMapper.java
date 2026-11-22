@@ -1,6 +1,6 @@
 package com.ragagent.session.dto;
 
-import com.ragagent.framework.vocabulary.MessageView;
+import com.ragagent.channel.api.MessageView;
 import com.ragagent.session.domain.message.Message;
 
 /** 消息实体 → 契约线格式视图。 */

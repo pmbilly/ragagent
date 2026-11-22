@@ -795,7 +795,9 @@ class ArchitectureRulesTest {
             "platform", "error", "event", "json", "text", "pagination", "tracing", "stream", "config");
 
     private static final List<String> SERVICE_FORBIDDEN_BOUNDARY =
-            List.of("controller", "mapper", "task", "client", "channel");
+            List.of("controller", "mapper", "task", "client");
+            // 原 im 域的渠道适配器子包（technical adapters）现为 channel.channel.<vendor>：
+            // 由下方 CHANNEL_ADAPTER 前缀单独表达，避免与 channel 域根名相撞。
 
     /** 具体技术实现前缀：MyBatis / Redis / Servlet / Langfuse（厂商 SDK 碰到再加）。 */
     private static final List<String> SERVICE_FORBIDDEN_TECH = List.of(
@@ -806,8 +808,12 @@ class ArchitectureRulesTest {
             "com.ragagent.framework.tracing.langfuse.",
             "com.ragagent.modelruntime.tracing.");
 
+    /** 渠道适配器技术层（channel 域的 channel.<vendor> 子包）——各厂商长连接/回调适配。 */
+    private static final List<String> CHANNEL_ADAPTER =
+            List.of("com.ragagent.channel.channel.");
+
     @Test
-    @DisplayName("A16：service 不得直接依赖边界层（controller/mapper/task/client/channel）")
+    @DisplayName("A16：service 不得直接依赖边界层（controller/mapper/task/client + 渠道适配器）")
     void servicesDoNotDependOnBoundaryLayers() {
         Set<String> actual = new TreeSet<>();
         for (JavaClass clazz : MAIN) {
@@ -825,9 +831,12 @@ class ArchitectureRulesTest {
                 String rest = target.startsWith("com.ragagent.")
                         ? target.substring("com.ragagent.".length()) : "";
                 String head = rest.isEmpty() ? "" : rest.split("\\.", 2)[0];
-                boolean hit = !rest.isEmpty() && !BASE_TOP_LEVEL.contains(head)
+                boolean adapterHit = CHANNEL_ADAPTER.stream()
+                        .anyMatch(rest::startsWith);
+                boolean hit = adapterHit
+                        || (!rest.isEmpty() && !BASE_TOP_LEVEL.contains(head)
                         && SERVICE_FORBIDDEN_BOUNDARY.stream()
-                                .anyMatch(component -> packageHasComponent(rest, component));
+                                .anyMatch(component -> packageHasComponent(rest, component)));
                 if (hit) {
                     actual.add(topLevel(clazz).getName());
                     break;

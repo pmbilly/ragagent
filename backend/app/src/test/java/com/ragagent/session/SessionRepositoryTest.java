@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
-import com.ragagent.im.api.SessionLastRequestState;
+import com.ragagent.channel.api.SessionLastRequestState;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.session.support.SessionNotFoundException;

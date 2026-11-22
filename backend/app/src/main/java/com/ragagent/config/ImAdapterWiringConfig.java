@@ -1,18 +1,18 @@
 package com.ragagent.config;
 
+import com.ragagent.channel.channel.dingtalk.DingtalkAdapterFactory;
+import com.ragagent.channel.channel.feishu.FeishuAdapterFactory;
+import com.ragagent.channel.channel.feishu.FeishuRegion;
+import com.ragagent.channel.channel.mattermost.MattermostAdapterFactory;
+import com.ragagent.channel.channel.qqbot.QqBotAdapterFactory;
+import com.ragagent.channel.channel.slack.SlackAdapterFactory;
+import com.ragagent.channel.channel.telegram.TelegramAdapterFactory;
+import com.ragagent.channel.channel.wechat.WechatAdapterFactory;
+import com.ragagent.channel.channel.wecom.WecomAdapterFactory;
+import com.ragagent.channel.channel.yunzhijia.YunzhijiaAdapterFactory;
+import com.ragagent.channel.runtime.ImTypes;
+import com.ragagent.channel.service.ImTurnOrchestrator;
 import com.ragagent.framework.security.SsrfGuard;
-import com.ragagent.im.channel.dingtalk.DingtalkAdapterFactory;
-import com.ragagent.im.channel.feishu.FeishuAdapterFactory;
-import com.ragagent.im.channel.feishu.FeishuRegion;
-import com.ragagent.im.channel.mattermost.MattermostAdapterFactory;
-import com.ragagent.im.channel.qqbot.QqBotAdapterFactory;
-import com.ragagent.im.channel.slack.SlackAdapterFactory;
-import com.ragagent.im.channel.telegram.TelegramAdapterFactory;
-import com.ragagent.im.channel.wechat.WechatAdapterFactory;
-import com.ragagent.im.channel.wecom.WecomAdapterFactory;
-import com.ragagent.im.channel.yunzhijia.YunzhijiaAdapterFactory;
-import com.ragagent.im.runtime.ImTypes;
-import com.ragagent.im.service.ImTurnOrchestrator;
 import com.ragagent.modelruntime.stream.StreamManager;
 import org.springframework.context.annotation.Configuration;
 

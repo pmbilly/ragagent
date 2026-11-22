@@ -1,6 +1,7 @@
 package com.ragagent.session.conversation;
 
 import com.ragagent.agentengine.api.AgentPromptPlaceholders;
+import com.ragagent.channel.api.SessionLastRequestState;
 import com.ragagent.framework.config.ConversationProperties;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
@@ -13,7 +14,6 @@ import com.ragagent.framework.security.LogSanitizer;
 import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.tenant.TenantRole;
 import com.ragagent.framework.text.RequestLanguages;
-import com.ragagent.im.api.SessionLastRequestState;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;

@@ -8,7 +8,7 @@
   "src/main/java/com/ragagent/auth/system/controller/SystemController.java": 4,
   "src/main/java/com/ragagent/datasource/controller/DataSourceController.java": 15,
   "src/main/java/com/ragagent/datasource/controller/DataSourceCredentialsController.java": 5,
-  "src/main/java/com/ragagent/im/controller/ImChannelController.java": 7,
+  "src/main/java/com/ragagent/channel/controller/ImChannelController.java": 7,
   "src/main/java/com/ragagent/knowledge/controller/ChunkController.java": 5,
   "src/main/java/com/ragagent/mcp/controller/McpCredentialsController.java": 3,
   "src/main/java/com/ragagent/mcp/controller/McpOAuthController.java": 1,

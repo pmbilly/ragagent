@@ -1,8 +1,8 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.channel.api.MessageView;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.security.LogSanitizer;
-import com.ragagent.framework.vocabulary.MessageView;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.session.conversation.MessageHistoryService;

@@ -1,6 +1,6 @@
 package com.ragagent.session.dto;
 
-import com.ragagent.framework.vocabulary.MessageArtifact;
+import com.ragagent.retrieval.api.MessageArtifact;
 import java.time.OffsetDateTime;
 
 /**

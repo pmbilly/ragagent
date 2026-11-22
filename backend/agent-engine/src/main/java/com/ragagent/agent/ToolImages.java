@@ -1,7 +1,7 @@
 package com.ragagent.agent;
 
 import com.ragagent.agent.compaction.ConversationSerializer;
-import com.ragagent.framework.vocabulary.AgentStep;
+import com.ragagent.agentengine.api.AgentStep;
 import com.ragagent.llm.api.ChatMessage;
 import java.util.List;
 

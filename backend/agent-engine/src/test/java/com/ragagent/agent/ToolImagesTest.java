@@ -2,8 +2,8 @@ package com.ragagent.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.vocabulary.AgentStep;
-import com.ragagent.framework.vocabulary.AgentToolCall;
+import com.ragagent.agentengine.api.AgentStep;
+import com.ragagent.agentengine.api.AgentToolCall;
 import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.llm.api.ChatMessage;
 import java.util.ArrayList;

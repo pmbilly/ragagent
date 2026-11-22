@@ -1,8 +1,8 @@
 package com.ragagent.session.qa;
 
+import com.ragagent.channel.api.SessionLastRequestState;
 import com.ragagent.framework.tenant.TenantContextSnapshot;
 import com.ragagent.framework.tenant.TenantScope;
-import com.ragagent.im.api.SessionLastRequestState;
 import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.session.attachment.TemporaryDocumentService;
 import com.ragagent.session.conversation.MessageService;

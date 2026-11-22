@@ -134,10 +134,10 @@ graph TD
 | `model` | 4 | 模型配置、Ollama 本地模型管理 |
 | `websearch` / `storage` | 各 3 | 搜索提供商、存储后端 |
 | `agentmanagement` / `system` / `im` / `datasource` | 各 2 | Agent 管理、系统信息与指标、IM 渠道、数据源 |
-| `wiki` / `vectorstore` / `memory` / `initialization` / `favorite` / `embedchannel` / `audit` | 各 1 | 各自单面 |
+| `wiki` / `vectorstore` / `memory` / `initialization` / `favorite` / `channel` / `audit` | 各 1 | 各自单面（channel=im 与 embedchannel 合并域） |
 | `agenttools` | 0 | 无独立 HTTP 面（内部工具能力） |
 
-合计 51 个控制器。域的完整清单：`agentmanagement`、`agenttools`、`audit`、`auth`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki`。
+合计 51 个控制器。域的完整清单：`agentmanagement`、`agenttools`、`audit`、`auth`、`channel`（im 与 embedchannel 合并）、`datasource`、`favorite`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`system`、`vectorstore`、`websearch`、`wiki`。
 
 ## 模块名与包名不完全对应（刻意）
 

@@ -134,13 +134,13 @@ EVENT_MAP_FILES = {
         'mention 载荷生产侧（B135c 已 camel）',
     'session/service/SteerSinkBridge.java':
         'mention 载荷读取/规范化侧（B135c 已 camel）',
-    'im/runtime/ToolDisplay.java':
+    'channel/runtime/ToolDisplay.java':
         'IM 侧读取同一批事件载荷（step.arguments/step.data）',
 }
 # 值面豁免（B88 决策：工具名与 schema enum 值是"各自语义"，不是字段名；§15.3 ②）——
 # 它们会出现在键位调用里（如 `LABELS.get("wiki_search")`），但语义是**值**。逐条登记。
 VALUE_TOKENS = {
-    'im/runtime/ToolDisplay.java': {
+    'channel/runtime/ToolDisplay.java': {
         'data_analysis', 'data_schema', 'database_query', 'edit_sandbox_file', 'execute_skill_script',
         'get_document_content', 'get_document_info', 'get_related_documents', 'grep_chunks',
         'image_analysis', 'knowledge_graph_extract', 'knowledge_search', 'list_knowledge_chunks',

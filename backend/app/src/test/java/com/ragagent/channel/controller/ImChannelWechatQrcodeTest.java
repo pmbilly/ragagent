@@ -1,0 +1,125 @@
+package com.ragagent.channel.controller;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.channel.channel.wechat.WechatQRCodeService;
+import com.ragagent.channel.channel.wechat.WechatQRCodeService.LoginResult;
+import com.ragagent.channel.channel.wechat.WechatQRCodeService.QRCodeResult;
+import com.ragagent.framework.error.BizException;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.ResponseEntity;
+
+/**
+ * 微信扫码两个端点的响应面：成功体是裸对象（键名即字段名，camelCase）；
+ * 失败是 500 固定文案；缺 qrcode 400；服务 bean 缺位时保留接缝文案。
+ */
+class ImChannelWechatQrcodeTest {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    /** 可编程桩（覆盖出站调用）。 */
+    private static final class StubService extends WechatQRCodeService {
+        QRCodeResult qrResult;
+        LoginResult pollResult;
+        boolean failQr;
+        boolean failPoll;
+
+        StubService() {
+            super("http://127.0.0.1:1", null);
+        }
+
+        @Override
+        public QRCodeResult getLoginQRCode() {
+            if (failQr) {
+                throw new IllegalStateException("boom");
+            }
+            return qrResult;
+        }
+
+        @Override
+        public LoginResult pollQRCodeStatus(String qrcode) {
+            if (failPoll) {
+                throw new IllegalStateException("boom");
+            }
+            return pollResult;
+        }
+    }
+
+    private static String json(ResponseEntity<?> response) throws Exception {
+        return MAPPER.writeValueAsString(response.getBody());
+    }
+
+    @Test
+    @DisplayName("取码：200 裸 {qrcode,qrcodeUrl}；出站失败 → 500 + 前缀 + 原因")
+    void qrcodeEndpoint() throws Exception {
+        ImChannelController controller = new ImChannelController(null);
+        StubService stub = new StubService();
+        controller.wechatQRCodeService(stub);
+
+        // 注意 record 组件序是 (qrcodeUrl, qrcode)
+        stub.qrResult = new QRCodeResult("https://x/qr.png", "q-1");
+        ResponseEntity<?> ok = controller.wechatQrcode();
+        assertEquals(200, ok.getStatusCode().value());
+        assertEquals("{\"qrcode\":\"q-1\",\"qrcodeUrl\":\"https://x/qr.png\"}",
+                json(ok));
+
+        stub.failQr = true;
+        BizException e = assertThrows(BizException.class, controller::wechatQrcode);
+        assertEquals(500, e.appError().httpCode());
+        assertEquals("failed to generate QR code: boom", e.appError().message());
+
+        // bean 缺位 → 保留接缝文案
+        ImChannelController bare = new ImChannelController(null);
+        BizException seam = assertThrows(BizException.class, bare::wechatQrcode);
+        assertEquals(500, seam.appError().httpCode());
+        assertTrue(seam.appError().message().startsWith("failed to generate QR code: "));
+    }
+
+    @Test
+    @DisplayName("轮询：未确认 credentials/baseUrl 显式 null；confirmed 带凭据；失败 500 固定文案")
+    void qrcodeStatusEndpoint() throws Exception {
+        ImChannelController controller = new ImChannelController(null);
+        StubService stub = new StubService();
+        controller.wechatQRCodeService(stub);
+
+        stub.pollResult = new LoginResult("wait", "", "", "", "");
+        String wait = json(controller.wechatQrcodeStatus("{\"qrcode\":\"q-1\"}"));
+        assertEquals("{\"status\":\"wait\",\"credentials\":null,\"baseUrl\":null}", wait);
+
+        stub.pollResult = new LoginResult("confirmed", "tk", "bot-9", "u-9",
+                "https://ilink.example");
+        String confirmed = json(controller.wechatQrcodeStatus("{\"qrcode\":\"q-1\"}"));
+        assertEquals("{\"status\":\"confirmed\",\"credentials\":"
+                + "{\"botToken\":\"tk\",\"ilinkBotId\":\"bot-9\",\"ilinkUserId\":\"u-9\"},"
+                + "\"baseUrl\":\"https://ilink.example\"}", confirmed);
+
+        // confirmed 但 baseurl 为空 → 空串照写（§1.6：空串不是 null）
+        stub.pollResult = new LoginResult("confirmed", "tk", "bot-9", "u-9", "");
+        String noBase = json(controller.wechatQrcodeStatus("{\"qrcode\":\"q-1\"}"));
+        assertTrue(noBase.contains("\"baseUrl\":\""));
+
+        // 缺 qrcode → 400 固定文案（走统一错误出口，HTTP 形态见 ImContractTest）
+        BizException bad = assertThrows(BizException.class,
+                () -> controller.wechatQrcodeStatus("{}"));
+        assertEquals(400, bad.appError().httpCode());
+        assertEquals("qrcode is required", bad.appError().message());
+        assertEquals(400, assertThrows(BizException.class,
+                () -> controller.wechatQrcodeStatus(null)).appError().httpCode());
+
+        // 出站失败 → 500 固定文案（不带原因）
+        stub.failPoll = true;
+        BizException failed = assertThrows(BizException.class,
+                () -> controller.wechatQrcodeStatus("{\"qrcode\":\"q-1\"}"));
+        assertEquals(500, failed.appError().httpCode());
+        assertEquals("failed to check QR code status", failed.appError().message());
+
+        // bean 缺位 → 接缝文案（同一文案）
+        ImChannelController bare = new ImChannelController(null);
+        assertEquals(500, assertThrows(BizException.class,
+                () -> bare.wechatQrcodeStatus("{\"qrcode\":\"q-1\"}")).appError().httpCode());
+    }
+}

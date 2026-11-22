@@ -1,12 +1,12 @@
 package com.ragagent.session.attachment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.channel.api.MessageAttachment;
 import com.ragagent.framework.config.AppEnvLookup;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.storage.config.UploadLimits;
 import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.text.ContentTypeByFilename;
-import com.ragagent.framework.vocabulary.MessageAttachment;
 import com.ragagent.knowledge.api.DocReaderParsePort;
 import com.ragagent.knowledge.api.DocumentChunkingPort;
 import com.ragagent.llm.api.AsrTranscriber;

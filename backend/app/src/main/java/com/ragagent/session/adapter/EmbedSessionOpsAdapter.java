@@ -1,6 +1,6 @@
 package com.ragagent.session.adapter;
 
-import com.ragagent.embedchannel.api.EmbedSessionOps;
+import com.ragagent.channel.api.EmbedSessionOps;
 import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;

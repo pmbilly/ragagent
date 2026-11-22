@@ -3,7 +3,7 @@ package com.ragagent.session.qa;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.ragagent.im.api.SessionLastRequestState;
+import com.ragagent.channel.api.SessionLastRequestState;
 import com.ragagent.session.service.QaSupport.QaMode;
 import com.ragagent.session.service.QaSupport.QaRequestContext;
 import java.util.ArrayList;

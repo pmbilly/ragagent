@@ -2,6 +2,7 @@ package com.ragagent.session.conversation;
 
 import com.ragagent.agentengine.api.AgentCompleteData;
 import com.ragagent.agentengine.api.AgentFinalAnswerData;
+import com.ragagent.agentengine.api.AgentStep;
 import com.ragagent.agentengine.api.AgentThoughtData;
 import com.ragagent.agentengine.api.AgentToolCallData;
 import com.ragagent.agentengine.api.AgentToolResultData;
@@ -12,7 +13,6 @@ import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.EventBusInterface;
 import com.ragagent.framework.event.EventType;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.AgentStep;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.llm.api.ResponseType;

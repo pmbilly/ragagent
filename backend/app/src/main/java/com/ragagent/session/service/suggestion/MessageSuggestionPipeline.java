@@ -2,7 +2,7 @@ package com.ragagent.session.service.suggestion;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.embedchannel.api.SuggestionItem;
+import com.ragagent.channel.api.SuggestionItem;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.framework.vocabulary.SearchResult;

@@ -1,0 +1,30 @@
+package com.ragagent.channel.runtime;
+
+/**
+ * 一条 IM 流文本缓冲的换行状态。
+ */
+public final class StreamSection {
+
+    private boolean lastCharNewline;
+    private final StringBuilder text = new StringBuilder();
+
+    public void write(String str) {
+        if (str == null || str.isEmpty()) {
+            return;
+        }
+        text.append(str);
+        lastCharNewline = str.charAt(str.length() - 1) == '\n';
+    }
+
+    public void ensureNewlineBefore() {
+        if (!lastCharNewline) {
+            text.append('\n');
+            lastCharNewline = true;
+        }
+    }
+
+    /** 累积文本。 */
+    public String text() {
+        return text.toString();
+    }
+}

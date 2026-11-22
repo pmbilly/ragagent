@@ -2,7 +2,7 @@ package com.ragagent.session.service.suggestion;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.embedchannel.api.SuggestionItem;
+import com.ragagent.channel.api.SuggestionItem;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.session.domain.message.Message;
 import java.util.List;

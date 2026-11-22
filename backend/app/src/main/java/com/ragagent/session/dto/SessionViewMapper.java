@@ -1,6 +1,6 @@
 package com.ragagent.session.dto;
 
-import com.ragagent.im.api.SessionView;
+import com.ragagent.channel.api.SessionView;
 import com.ragagent.session.domain.conversation.Session;
 
 /** 会话实体 → 契约线格式视图。 */

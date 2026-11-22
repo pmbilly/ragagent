@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.ragagent.im.api.SessionLastRequestState;
+import com.ragagent.channel.api.SessionLastRequestState;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.dto.SessionListItem;
 import java.time.OffsetDateTime;

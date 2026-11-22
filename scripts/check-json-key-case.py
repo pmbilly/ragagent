@@ -136,6 +136,37 @@ FROZEN_PREFIXES = (
 
 # 基线：已逐条复核的例外（文件相对路径 → 允许的键集合）。新增即失败。
 BASELINE: dict[str, set[str]] = {
+    'channel/channel/feishu/FeishuMediaOps.java': {'image_key'},
+    'channel/channel/feishu/FeishuSendOps.java': {'msg_type', 'receive_id'},
+    'channel/channel/feishu/FeishuTokenProvider.java': {'app_id', 'tenant_access_token'},
+    'channel/channel/feishu/LarkEventConverter.java': {'chat_id', 'chat_type', 'event_type', 'file_key', 'file_name', 'image_key', 'message_id', 'message_type', 'open_id', 'sender_id'},
+    'channel/channel/mattermost/MattermostAdapter.java': {'channel_id', 'file_ids', 'post_id', 'root_id', 'user_id', 'user_name'},
+    'channel/channel/mattermost/MattermostClient.java': {'channel_id', 'root_id'},
+    'channel/channel/qqbot/QqBotAdapter.java': {'group_openid', 'member_openid', 'user_openid'},
+    'channel/channel/qqbot/QqBotClient.java': {'access_token', 'expires_in', 'msg_id', 'msg_seq', 'msg_type'},
+    'channel/channel/qqbot/QqBotGatewayClient.java': {'heartbeat_interval'},
+    'channel/channel/slack/SlackAdapter.java': {'thread_ts', 'url_private_download'},
+    'channel/channel/slack/SlackSocketModeClient.java': {'envelope_id'},
+    'channel/channel/telegram/TelegramAdapter.java': {'chat_id', 'file_id', 'file_name', 'file_path', 'file_size', 'first_name', 'last_name', 'message_id', 'message_thread_id', 'parse_mode'},
+    'channel/channel/telegram/TelegramLongPollingClient.java': {'allowed_updates', 'update_id'},
+    'channel/channel/wechat/WechatAdapter.java': {'base_info', 'channel_version', 'client_id', 'context_token', 'from_user_id', 'ilink_user_id', 'item_list', 'message_state', 'message_type', 'text_item', 'to_user_id'},
+    'channel/channel/wechat/WechatLongPollClient.java': {'aes_key', 'base_info', 'context_token', 'encrypt_query_param', 'file_item', 'file_name', 'from_user_id', 'get_updates_buf', 'image_item', 'item_list', 'message_id', 'message_type', 'text_item', 'voice_item'},
+    'channel/channel/wechat/WechatQRCodeService.java': {'bot_token', 'ilink_bot_id', 'ilink_user_id', 'qrcode_img_content'},
+    'channel/channel/wecom/WecomAdapterFactory.java': {'corp_agent_id'},
+    'channel/channel/wecom/WecomLongConnClient.java': {'aes_key', 'bot_id', 'msg_item', 'req_id'},
+    'channel/channel/wecom/WecomWebhookAdapter.java': {'access_token', 'expires_in'},
+    'channel/channel/yunzhijia/YunzhijiaAdapter.java': {'group_id', 'group_type', 'operator_name', 'robot_id', 'robot_name', 'yunzhijia_format_type', 'yunzhijia_image_height', 'yunzhijia_image_width'},
+    'channel/controller/ImChannelController.java': {'agent_id', 'agent_name', 'bot_identity', 'created_at', 'output_mode', 'session_mode', 'tenant_id', 'updated_at'},
+    'channel/runtime/SlackAdapterCore.java': {'bot_id', 'channel_type', 'thread_ts'},
+    'channel/runtime/ToolDisplay.java': {'data_analysis', 'data_schema', 'database_query', 'edit_sandbox_file', 'execute_skill_script', 'get_document_content', 'get_document_info', 'get_related_documents', 'grep_chunks', 'image_analysis', 'knowledge_graph_extract', 'knowledge_search', 'list_knowledge_chunks', 'list_sandbox_files', 'query_knowledge_graph', 'query_understand', 'read_sandbox_file', 'read_skill', 'search_knowledge', 'shell_exec', 'todo_write', 'web_fetch', 'web_search', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_search', 'write_sandbox_file'},
+    'channel/service/ImChannelRuntimeOps.java': {'channel_id', 'source_instance'},
+    'channel/service/ImStopOps.java': {'message_id', 'session_id'},
+    'channel/service/ImTurnOrchestrator.java': {'raw_msgtype'},
+    # 2026-11-22 WP2a 域合并换锚：IM 渠道适配器的第三方协议键（钉钉/飞书/企微等回调与流式协议），外部契约不改名。
+    'channel/channel/dingtalk/DingtalkCallbackParser.java': {'raw_msgtype', 'rich_text_picture_count', 'robot_code', 'session_webhook'},
+    'channel/channel/dingtalk/DingtalkStreamClient.java': {'robot_code'},
+    'channel/channel/feishu/FeishuCallbackOps.java': {'chat_id', 'chat_type', 'event_type', 'file_key', 'file_name', 'image_key', 'message_id', 'message_type', 'open_id', 'root_id', 'sender_id'},
+    'channel/channel/feishu/FeishuCardStreamOps.java': {'card_id', 'element_id', 'msg_type', 'receive_id', 'streaming_mode', 'text_size'},
     # 2026-11-22 WP4 随类迁移换锚：两文件自 framework.prompt 迁 app（auth/knowledge），键为存量线格式——
     # has_knowledge_base/has_web_search 是模板目录接口的既有响应键（前端消费，约束不动前端）；
     # extract_entity/extract_graph/fabri_text/with_no_tag/with_tag 是 extract_config.yaml 的既有模板 id/段名（模型提示词资产）。
@@ -149,7 +180,6 @@ BASELINE: dict[str, set[str]] = {
     'agent/AgentPrompts.java': {'current_time', 'web_search_status'},
     # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake）
     # A③-⑨ 自 agent/tool/ 迁入 contract/tool/（按路径换锚）
-    'framework/vocabulary/tool/ToolCapabilities.java': {'data_analysis', 'data_schema', 'database_query', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'query_knowledge_graph', 'todo_write', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_update_issue', 'wiki_write_page'},
     # MyBatis 列名/参数（非 JSON 键）
     'auth/service/TenantInvitationService.java': {'invitation_id'},
     # MyBatis 列名/参数（非 JSON 键）
@@ -165,7 +195,6 @@ BASELINE: dict[str, set[str]] = {
     # PipelineLog 观测面（日志字段，非契约）
     'session/rag/support/SearchSupport.java': {'chunk_id', 'dropped_id', 'kept_id', 'match_type'},
     # langfuse 线上字段（第三方契约）
-    'framework/access/TracingContext.java': {'lf_parent_obs_id', 'lf_session_id', 'lf_trace_id', 'lf_traceparent', 'lf_user_id'},
     # MDC 日志键（非 JSON）
     'framework/web/RequestIdFilter.java': {'request_id'},
     # OpenSearch 字段
@@ -296,7 +325,6 @@ BASELINE: dict[str, set[str]] = {
     # Langfuse 任务 span 载荷（同上，观测面）
 
     # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake。同族见 contract/tool/ToolCapabilities.java 的登记（B257 改名自 agent/tools/，B260 迁入 agent/tool/，A③-⑨ 迁入 contract/tool/））
-    'modelcontext/ToolPolicy.java': {'call_mcp_tool', 'data_schema', 'discover_mcp_tools', 'edit_sandbox_file', 'edit_skill_file', 'execute_skill_script', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'list_sandbox_files', 'query_knowledge_graph', 'read_file', 'read_sandbox_file', 'read_skill', 'search_conversations', 'search_memory', 'shell_exec', 'todo_write', 'web_fetch', 'web_search', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_write_page', 'write_sandbox_file', 'write_skill_file'},
     # span 观测面（followUpSpan.finish 的 metadata）
     'session/service/suggestion/MessageSuggestionService.java': {'question_count'},
     # span 观测面（同本文件既有条目）

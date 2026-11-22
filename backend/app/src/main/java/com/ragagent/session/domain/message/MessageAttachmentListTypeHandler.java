@@ -1,7 +1,7 @@
 package com.ragagent.session.domain.message;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.ragagent.framework.vocabulary.MessageAttachment;
+import com.ragagent.channel.api.MessageAttachment;
 import com.ragagent.session.domain.AbstractJsonListTypeHandler;
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package com.ragagent.session.service;
 
+import com.ragagent.agentengine.api.AgentStep;
+import com.ragagent.agentengine.api.AgentToolCall;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.AgentStep;
-import com.ragagent.framework.vocabulary.AgentToolCall;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.FunctionCall;
 import com.ragagent.llm.api.ToolCall;

@@ -4,12 +4,12 @@ package com.ragagent.session.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.agentengine.api.AgentStep;
+import com.ragagent.agentengine.api.AgentToolCall;
+import com.ragagent.channel.api.MessageImage;
 import com.ragagent.framework.storage.support.FileUrlPort;
 import com.ragagent.framework.storage.support.Mode;
 import com.ragagent.framework.storage.support.Rewriter;
-import com.ragagent.framework.vocabulary.AgentStep;
-import com.ragagent.framework.vocabulary.AgentToolCall;
-import com.ragagent.framework.vocabulary.MessageImage;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.session.domain.message.Message;

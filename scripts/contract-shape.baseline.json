@@ -19,31 +19,9 @@
     }
   },
   "rows": {
-    "com/ragagent/contract/knowledge/ChunkRowView.java": "持久层行投影（分块表），应回 knowledge 域；H6",
-    "com/ragagent/contract/knowledge/KnowledgeRowView.java": "持久层行投影（知识表），应回 knowledge 域；H6",
-    "com/ragagent/contract/knowledge/KnowledgeBaseRowView.java": "持久层行投影（知识库表），应回 knowledge 域；H6",
-    "com/ragagent/contract/knowledge/ChunkPageView.java": "分页壳，H6 统一 PageView 后回域",
-    "com/ragagent/contract/knowledge/FaqEntryPageView.java": "分页壳，H6 统一 PageView 后回域",
-    "com/ragagent/contract/knowledge/KnowledgePageView.java": "分页壳，H6 统一 PageView 后回域",
     "com/ragagent/knowledge/wiki/api/WikiPageView.java": "wiki 页面视图，应回 wiki 域；H6"
   },
   "fields": {
-    "com/ragagent/contract/retrieval/SearchResult.java": {
-      "fields": 25,
-      "reason": "检索命中元数据（跨模块消费）；H6 评估拆分"
-    },
-    "com/ragagent/contract/session/MessageView.java": {
-      "fields": 26,
-      "reason": "会话读模型（跨域消费）；H6 评估拆分"
-    },
-    "com/ragagent/contract/tenant/ParserEngineConfig.java": {
-      "fields": 27,
-      "reason": "解析引擎配置载体（配置项枚举）；H6 评估分组"
-    },
-    "com/ragagent/contract/tenant/StorageEngineConfig.java": {
-      "fields": 63,
-      "reason": "多厂商存储配置平铺；H6 按厂商拆"
-    },
     "com/ragagent/knowledge/wiki/api/WikiPageView.java": {
       "fields": 27,
       "reason": "wiki 页面视图；H6 回域"
@@ -63,6 +41,10 @@
     "com/ragagent/auth/api/ParserEngineConfig.java": {
       "fields": 27,
       "reason": "解析引擎配置形状（外部服务参数）；收窄属 H6 治理"
+    },
+    "com/ragagent/channel/api/MessageView.java": {
+      "fields": 26,
+      "reason": "消息线格式视图（聚合簇锚，channel 合并批整类保形）；字段级拆解留蓝图 D1 批"
     }
   }
 }

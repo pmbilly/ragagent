@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-355 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+348 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -69,6 +69,27 @@
 | `:backend` | `com.ragagent.auth.system.mapper` | 系统 · 映射：SystemSettingMapper。 |
 | `:backend` | `com.ragagent.auth.system.repository` | 系统设置仓储门面：全量读取、按键读写与删除。 |
 | `:backend` | `com.ragagent.auth.system.service` | 系统 · 服务：SystemAdminUserService / SystemSettingService / SystemInfoService…。 |
+| `:backend` | `com.ragagent.channel` | 种类：集成适配 入口：渠道回调适配与挂件会话端口（channel. |
+| `:backend` | `com.ragagent.channel.api` | embedchannel 域对外契约。 |
+| `:backend` | `com.ragagent.channel.callback` | IM · 平台回调处理：渠道校验、适配器验签/解析与 ACK 直写。 |
+| `:backend` | `com.ragagent.channel.channel.dingtalk` | 渠道 · dingtalk：DingtalkAdapter / DingtalkAdapterFactory / DingtalkStreamClient。 |
+| `:backend` | `com.ragagent.channel.channel.feishu` | 渠道 · feishu：FeishuAdapter / FeishuLongConnClient / FeishuAdapterFactory…。 |
+| `:backend` | `com.ragagent.channel.channel.mattermost` | 渠道 · mattermost：MattermostAdapter / MattermostAdapterFactory / MattermostClient。 |
+| `:backend` | `com.ragagent.channel.channel.qqbot` | 渠道 · qqbot：QqBotAdapter / QqBotAdapterFactory / QqBotGatewayClient…。 |
+| `:backend` | `com.ragagent.channel.channel.slack` | 渠道 · slack：SlackAdapter / SlackSocketModeClient / SlackAdapterFactory。 |
+| `:backend` | `com.ragagent.channel.channel.telegram` | 渠道 · telegram：TelegramAdapter / TelegramLongPollingClient / TelegramAdapterFactory。 |
+| `:backend` | `com.ragagent.channel.channel.wechat` | 渠道 · wechat：WechatQRCodeService / WechatAdapter / WechatAdapterFactory…。 |
+| `:backend` | `com.ragagent.channel.channel.wecom` | 渠道 · wecom：WecomWebhookAdapter / WecomWSAdapter / WecomLongConnClient…。 |
+| `:backend` | `com.ragagent.channel.channel.yunzhijia` | 渠道 · yunzhijia：YunzhijiaAdapter / YunzhijiaLongConnClient / YunzhijiaAdapterFactory…。 |
+| `:backend` | `com.ragagent.channel.controller` | IM · HTTP 层：ImCallbackController / ImChannelController。 |
+| `:backend` | `com.ragagent.channel.controller.filter` | 渠道域过滤器：挂件令牌交换与 API-Key 作用域清理（EmbedAuthFilter）。 |
+| `:backend` | `com.ragagent.channel.domain` | IM · 领域模型：ChannelSessionEntity / ImChannelEntity。 |
+| `:backend` | `com.ragagent.channel.dto` | IM · 传输形状：渠道响应行。 |
+| `:backend` | `com.ragagent.channel.mapper` | IM · 映射：ChannelSessionMapper / ImChannelMapper。 |
+| `:backend` | `com.ragagent.channel.repository` | IM 仓储门面：渠道配置行与渠道会话映射的读写。 |
+| `:backend` | `com.ragagent.channel.runtime` | IM · 运行时：AdapterInterfaces / FeishuWecomCrypt / SlackAdapterCore…。 |
+| `:backend` | `com.ragagent.channel.service` | IM · 服务：ImChannelService / ImAttachmentPreparer / ImKnowledgeBridgeOps…。 |
+| `:backend` | `com.ragagent.channel.support` | Embed · 支撑类型：错误、令牌与限流。 |
 | `:backend` | `com.ragagent.config` | Spring 装配层：Web/MyBatis/检索引擎/会话/IM 等的 Bean 定义与 @ConfigurationProperties 属性绑定， 不含业务逻辑。 |
 | `:backend` | `com.ragagent.config.json` | 业务域面载荷的 Jackson 装配（mixin 与注册表）。 |
 | `:backend` | `com.ragagent.datasource` | 数据源连接器域：外部知识源（Notion/Feishu/Yuque/RSS/IMA/GitLab 等）的抓取、游标推进、 同步编排与数据源配置面。 |
@@ -90,15 +111,6 @@
 | `:backend` | `com.ragagent.datasource.repository` | 数据源与同步日志仓储门面：对 datasource.mapper 的读写封装。 |
 | `:backend` | `com.ragagent.datasource.service` | 数据源 · 服务：DataSourceService / KnowledgeTagAutoTagProvider / DataSourceSyncResultOps…。 |
 | `:backend` | `com.ragagent.datasource.task` | 同步任务面（方案 的 task/）：同步任务队列（DataSourceSyncTaskQueue + InProcess/Redis 双实现）、任务处理器（DataSourceSyncHandler） |
-| `:backend` | `com.ragagent.embedchannel` | 嵌入渠道域：对外暴露的嵌入问答渠道、渠道配置与令牌，以及渠道鉴权过滤器。 |
-| `:backend` | `com.ragagent.embedchannel.api` | embedchannel 域对外契约。 |
-| `:backend` | `com.ragagent.embedchannel.controller` | embedchannel 域控制器的 HTTP 端点与协作类（3 个协作类）。 |
-| `:backend` | `com.ragagent.embedchannel.controller.filter` | 嵌入渠道鉴权过滤器面（由 embedchannel.filter 迁入 controller.filter，对齐方案）： EmbedAuthFilter——对外嵌入问答的访客鉴权。 |
-| `:backend` | `com.ragagent.embedchannel.domain` | 嵌入渠道 · 领域模型：EmbedChannelEntity。 |
-| `:backend` | `com.ragagent.embedchannel.mapper` | 嵌入渠道 · 映射：EmbedChannelMapper。 |
-| `:backend` | `com.ragagent.embedchannel.repository` | 嵌入渠道仓储门面：渠道行的查询、写入与软删。 |
-| `:backend` | `com.ragagent.embedchannel.service` | 嵌入渠道 · 服务：EmbedChannelService / RedisEmbedTokenStore / EmbedTokenStore。 |
-| `:backend` | `com.ragagent.embedchannel.support` | Embed · 支撑类型：错误、令牌与限流。 |
 | `:backend` | `com.ragagent.embedding` | 嵌入向量 provider 客户端（库式域，无 HTTP 面）：com.ragagent.embedding.EmbedderFactory 选择器、 EmbeddingHttp/ProviderJson 传输与编码、池化与失败降级。 |
 | `:backend` | `com.ragagent.embedding.provider` | 嵌入 provider 的**具体实现**（各家 HTTP 调用与响应解析）：OpenAI / AzureOpenAI / Gemini / Jina / Nvidia / Ollama / Aliy |
 | `:backend` | `com.ragagent.favorite` | 收藏域：用户对资源的收藏闭环（controller/service/mapper/domain 各一，最小完整域）。 |
@@ -129,29 +141,10 @@
 | `:backend` | `com.ragagent.framework.text` | 平台文本与标记卫生面（原 text + html 两包合并）：契约文本原语、繁简转换、 请求语言解析、HTML→Markdown 转换、实体表与转义、路径/文件名/无效字符清洗、 退化检测与码点序比较。 |
 | `:backend` | `com.ragagent.framework.tracing` | 观测技术面：Langfuse/OTLP 适配与 trace 载体注入。 |
 | `:backend` | `com.ragagent.framework.tracing.langfuse` | 平台追踪面（Langfuse OTel 适配； |
-| `:backend` | `com.ragagent.framework.vocabulary` | 跨域词汇：被两个以上模块共用、且无法落到任何单个域/引擎 api 的形状（纯 JDK）。 |
+| `:backend` | `com.ragagent.framework.vocabulary` | 跨引擎晶格形状（终态 8 类，纯 JDK）：retrieval-engine 与 model-runtime 互不可见、 又都被 app/agent-engine 消费——framework 是它们唯一的共同可见层。 |
 | `:backend` | `com.ragagent.framework.web` | 平台 Web 面：统一响应外壳、JSON 映射、分页/字段参数、请求 ID 过滤器、非空体/RBAC 拦截器与序列化器。 |
 | `:backend` | `com.ragagent.framework.web.error` | 平台错误面：`BizException` 家族（含 `GuardForbiddenException`、`PlainErrorException`）、统一响应外壳的错误分派与全局异常处理器。 |
 | `:backend` | `com.ragagent.framework.web.health` | 平台健康检查面。 |
-| `:backend` | `com.ragagent.im` | 即时通讯渠道域：九渠道适配（feishu/wechat/wecom/dingtalk/slack/mattermost/telegram/qqbot/yunzhijia， 一渠道一子包）与运行时（会话映射、工具展示、入站消息派发）。 |
-| `:backend` | `com.ragagent.im.api` | 种类：集成适配 入口：com.ragagent.im.api.SessionQaPort 对外契约面：会话视图、QA 请求载荷与会话问答端口（供 session 编排消费） 依赖：framework |
-| `:backend` | `com.ragagent.im.callback` | IM · 平台回调处理：渠道校验、适配器验签/解析与 ACK 直写。 |
-| `:backend` | `com.ragagent.im.channel.dingtalk` | 渠道 · dingtalk：DingtalkAdapter / DingtalkAdapterFactory / DingtalkStreamClient。 |
-| `:backend` | `com.ragagent.im.channel.feishu` | 渠道 · feishu：FeishuAdapter / FeishuLongConnClient / FeishuAdapterFactory…。 |
-| `:backend` | `com.ragagent.im.channel.mattermost` | 渠道 · mattermost：MattermostAdapter / MattermostAdapterFactory / MattermostClient。 |
-| `:backend` | `com.ragagent.im.channel.qqbot` | 渠道 · qqbot：QqBotAdapter / QqBotAdapterFactory / QqBotGatewayClient…。 |
-| `:backend` | `com.ragagent.im.channel.slack` | 渠道 · slack：SlackAdapter / SlackSocketModeClient / SlackAdapterFactory。 |
-| `:backend` | `com.ragagent.im.channel.telegram` | 渠道 · telegram：TelegramAdapter / TelegramLongPollingClient / TelegramAdapterFactory。 |
-| `:backend` | `com.ragagent.im.channel.wechat` | 渠道 · wechat：WechatQRCodeService / WechatAdapter / WechatAdapterFactory…。 |
-| `:backend` | `com.ragagent.im.channel.wecom` | 渠道 · wecom：WecomWebhookAdapter / WecomWSAdapter / WecomLongConnClient…。 |
-| `:backend` | `com.ragagent.im.channel.yunzhijia` | 渠道 · yunzhijia：YunzhijiaAdapter / YunzhijiaLongConnClient / YunzhijiaAdapterFactory…。 |
-| `:backend` | `com.ragagent.im.controller` | IM · HTTP 层：ImCallbackController / ImChannelController。 |
-| `:backend` | `com.ragagent.im.domain` | IM · 领域模型：ChannelSessionEntity / ImChannelEntity。 |
-| `:backend` | `com.ragagent.im.dto` | IM · 传输形状：渠道响应行。 |
-| `:backend` | `com.ragagent.im.mapper` | IM · 映射：ChannelSessionMapper / ImChannelMapper。 |
-| `:backend` | `com.ragagent.im.repository` | IM 仓储门面：渠道配置行与渠道会话映射的读写。 |
-| `:backend` | `com.ragagent.im.runtime` | IM · 运行时：AdapterInterfaces / FeishuWecomCrypt / SlackAdapterCore…。 |
-| `:backend` | `com.ragagent.im.service` | IM · 服务：ImChannelService / ImAttachmentPreparer / ImKnowledgeBridgeOps…。 |
 | `:backend` | `com.ragagent.initialization` | 初始化与能力自检域：/api/v1/initialization/* 的初始化配置、未保存模型的 连通性预检、文本抽取试验与语音识别（ASR）。 |
 | `:backend` | `com.ragagent.initialization.controller` | initialization 的 @RestController 薄层：端点注解与委托，逻辑在 service 协作者 （com.ragagent.initialization.controller. |
 | `:backend` | `com.ragagent.initialization.dto` | initialization 的模型视图投影（com.ragagent.initialization.dto.ModelViews）。 |

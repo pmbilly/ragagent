@@ -5,15 +5,15 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.ragagent.agentengine.api.AgentActionData;
 import com.ragagent.agentengine.api.AgentCompleteData;
 import com.ragagent.agentengine.api.AgentFinalAnswerData;
+import com.ragagent.agentengine.api.AgentStep;
+import com.ragagent.agentengine.api.AgentToolCall;
 import com.ragagent.agentengine.api.AgentToolCallData;
 import com.ragagent.agentengine.api.AgentToolResultData;
 import com.ragagent.agentengine.api.ContextCompactedData;
 import com.ragagent.agentengine.api.ErrorData;
+import com.ragagent.agentengine.api.ToolCallTarget;
 import com.ragagent.agentengine.api.UserMessageInjectedData;
 import com.ragagent.framework.jsonbind.JsonModuleProvider;
-import com.ragagent.framework.vocabulary.AgentStep;
-import com.ragagent.framework.vocabulary.AgentToolCall;
-import com.ragagent.framework.vocabulary.ToolCallTarget;
 import com.ragagent.framework.vocabulary.ToolResult;
 
 /**

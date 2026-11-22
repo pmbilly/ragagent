@@ -1,11 +1,11 @@
 package com.ragagent.agent;
 
 import com.ragagent.agent.tool.ExecutionPolicy;
+import com.ragagent.agentengine.api.AgentToolCall;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.tenant.TenantContextSnapshot;
 import com.ragagent.framework.tenant.TenantScope;
-import com.ragagent.framework.vocabulary.AgentToolCall;
 import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.llm.api.ToolCall;
 import java.util.ArrayList;

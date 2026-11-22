@@ -41,7 +41,7 @@
       "kind": "domain-internal",
       "why": "本域任务队列的 Memory/Redis 实现选择"
     },
-    "com.ragagent.embedchannel.EmbedWiring": {
+    "com.ragagent.channel.EmbedWiring": {
       "kind": "domain-internal",
       "why": "嵌入渠道运行时装配：消费会话域端口，装配的是本域入口流程"
     },

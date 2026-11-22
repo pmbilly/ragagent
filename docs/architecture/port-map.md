@@ -25,13 +25,13 @@
 | `ChunkQuestionPort` | `ChunkQuestionService` | backend/app | knowledge | 域内（可评估内联） |
 | `DataSourceSchedulePort` | `Scheduler` | backend/app | datasource | 域内（可评估内联） |
 | `DocReaderAdminPort` | `DocReaderAdminAdapter` | backend/app | auth、knowledge | 域间（解耦） |
-| `DocReaderParsePort` | `DocReaderParseAdapter` | backend/app | im、initialization、session | 域间（解耦） |
+| `DocReaderParsePort` | `DocReaderParseAdapter` | backend/app | channel、initialization、session | 域间（解耦） |
 | `DocumentChunkingPort` | `DocumentChunkingAdapter` | backend/app | session | 域间（解耦） |
-| `EmbedSessionPort` | `EmbedSessionAdapter` | backend/app | embedchannel | 域间（解耦） |
+| `EmbedSessionPort` | `EmbedSessionAdapter` | backend/app | channel | 域间（解耦） |
 | `EmbeddingModelPort` | `EmbeddingModelAdapter` | backend/app | knowledge | 域内（可评估内联） |
 | `EmbeddingPort` | `ModelRuntimeEmbeddingAdapter` | backend/model-runtime | backend/retrieval-engine、knowledge、memory | 跨模块（必要） |
 | `EntityExtractionPort` | `EntityExtractionAdapter` | backend/model-runtime | initialization、knowledge、session | 跨模块（必要） |
-| `FileProxyPort` | `FileProxyService` | backend/app | embedchannel、knowledge、session | 域间（解耦） |
+| `FileProxyPort` | `FileProxyService` | backend/app | channel、knowledge、session | 域间（解耦） |
 | `FileUrlPort` | `DefaultFileUrlPort` | backend/app | knowledge、session、storage | 域间（解耦） |
 | `GlobalFileServicePort` | `GlobalFileServiceAdapter` | backend/app | session | 域间（解耦） |
 | `HybridSearchPort` | `HybridSearchService` | backend/retrieval-engine | knowledge、session | 跨模块（必要） |
@@ -41,7 +41,7 @@
 | `KnowledgeBaseReadPort` | — | ? | — | 复合面（随复合端口） |
 | `KnowledgeBaseWritePort` | — | ? | — | 复合面（随复合端口） |
 | `KnowledgeBatchQueryPort` | `QaWiring` | backend/app | session | 装配点实现（不参与内联判定） |
-| `KnowledgeCatalogPort` | `KnowledgeCatalogAdapter` | backend/app | datasource、embedchannel、im、initialization、knowledge、session | 域间（解耦） |
+| `KnowledgeCatalogPort` | `KnowledgeCatalogAdapter` | backend/app | channel、datasource、initialization、knowledge、session | 域间（解耦） |
 | `KnowledgeContentWritePort` | — | ? | — | 复合面（随复合端口） |
 | `KnowledgeDeletePort` | — | ? | — | 复合面（随复合端口） |
 | `KnowledgeDocumentQueryPort` | `QaWiring` | backend/app | session | 装配点实现（不参与内联判定） |
@@ -62,7 +62,7 @@
 | `ParserEngineCatalogPort` | `ParserEngineCatalog` | backend/app | auth | 域间（解耦） |
 | `ProviderFileStorePort` | `ProviderFileStoreAdapter` | backend/app | knowledge | 域间（解耦） |
 | `ResourceCatalogPort` | `ResourceCatalogAdapter` | backend/app | knowledge、session | 域间（解耦） |
-| `SessionQaPort` | `SessionQaAdapter` | backend/app | im | 域间（解耦） |
+| `SessionQaPort` | `SessionQaAdapter` | backend/app | channel | 域间（解耦） |
 | `SkillCatalogPort` | `SkillCatalogService` | backend/agent-engine | agentmanagement、backend/agent-engine | 跨模块（必要） |
 | `StorageBackendPort` | `StorageBackendPortAdapter` | backend/app | initialization、knowledge、storage | 域间（解耦） |
 | `StorageConnectivityPort` | `StorageConnectivityService` | backend/app | auth、storage | 域间（解耦） |
