@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
+import com.ragagent.auth.api.MemoryConfig;
+import com.ragagent.auth.api.MemoryKeys;
+import com.ragagent.auth.api.MemoryKinds;
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.tenant.MemoryConfig;
-import com.ragagent.framework.tenant.MemoryKeys;
-import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.memory.MemoryContext;
 import com.ragagent.memory.api.MemoryRetrievalContext;
 import com.ragagent.memory.config.MemorySettings;

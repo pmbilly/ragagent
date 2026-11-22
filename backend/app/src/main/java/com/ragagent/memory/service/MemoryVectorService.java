@@ -1,10 +1,10 @@
 package com.ragagent.memory.service;
 
+import com.ragagent.auth.api.MemoryConfig;
+import com.ragagent.auth.api.MemoryKeys;
+import com.ragagent.auth.api.MemoryKinds;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.access.TenantScopes;
-import com.ragagent.framework.tenant.MemoryConfig;
-import com.ragagent.framework.tenant.MemoryKeys;
-import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryItemEmbedding;

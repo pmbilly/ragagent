@@ -1,8 +1,8 @@
 package com.ragagent.memory.runtime;
 
 
+import com.ragagent.auth.api.MemoryKeys;
 import com.ragagent.framework.access.TracingContext;
-import com.ragagent.framework.tenant.MemoryKeys;
 import com.ragagent.framework.tracing.langfuse.LangfuseManager;
 import com.ragagent.framework.tracing.langfuse.LangfuseTracing;
 import com.ragagent.memory.domain.item.MemoryItem;

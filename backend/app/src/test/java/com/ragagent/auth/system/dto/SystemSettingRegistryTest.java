@@ -1,4 +1,4 @@
-package com.ragagent.framework.settings;
+package com.ragagent.auth.system.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

@@ -1,7 +1,7 @@
 package com.ragagent.session.service;
 
+import com.ragagent.framework.config.ConversationProperties;
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.settings.ConversationProperties;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.rag.ChatManage;
 import com.ragagent.session.rag.SummaryConfig;

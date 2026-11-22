@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
-import com.ragagent.framework.vocabulary.MemoryKinds;
+import com.ragagent.auth.api.MemoryKinds;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubjectMissingException;

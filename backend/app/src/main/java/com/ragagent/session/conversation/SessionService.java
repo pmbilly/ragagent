@@ -1,6 +1,7 @@
 package com.ragagent.session.conversation;
 
 import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.config.ConversationProperties;
 import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
@@ -11,7 +12,6 @@ import com.ragagent.framework.eventbus.EventType;
 import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.framework.prompt.AgentPromptPlaceholders;
 import com.ragagent.framework.security.LogSanitizer;
-import com.ragagent.framework.settings.ConversationProperties;
 import com.ragagent.framework.tenant.TenantRole;
 import com.ragagent.im.api.SessionLastRequestState;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;

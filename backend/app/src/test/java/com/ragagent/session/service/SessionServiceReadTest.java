@@ -9,7 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.settings.ConversationProperties;
+import com.ragagent.framework.config.ConversationProperties;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.llm.api.ModelCatalogPort;
 import com.ragagent.llm.api.ModelRuntime;

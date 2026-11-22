@@ -1,12 +1,15 @@
-package com.ragagent.framework.settings;
+package com.ragagent.framework.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.prompt.PromptSource;
+import jakarta.annotation.PostConstruct;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * config.yaml 的 conversation 段 + prompt_templates 回填（缺省值取自 dev 配置）。
@@ -16,7 +19,7 @@ import java.util.Map;
  * {@code com.ragagent.framework.prompt.PromptSource}（classpath {@code prompts/}）装载。
  * 按 id 取模板的语义：按 {@code PromptSource.files()} 的顺序首个 id 命中即返回 content。</p>
  */
-@org.springframework.boot.context.properties.ConfigurationProperties(prefix = "conversation")
+@ConfigurationProperties(prefix = "conversation")
 public class ConversationProperties {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
@@ -67,7 +70,7 @@ public class ConversationProperties {
     private String summaryContextTemplate = "";
 
     /** 启动回填。 */
-    @jakarta.annotation.PostConstruct
+    @PostConstruct
     public void backfillFromTemplates() {
         Map<String, String[]> byId = loadTemplates();
         fallbackPrompt = content(byId, fallbackPromptId, fallbackPrompt);
@@ -111,7 +114,7 @@ public class ConversationProperties {
                 if (in == null) {
                     continue;
                 }
-                Object raw = new org.yaml.snakeyaml.Yaml().load(in);
+                Object raw = new Yaml().load(in);
                 JsonNode root = MAPPER.valueToTree(raw);
                 JsonNode list = root.get("templates");
                 if (list == null || !list.isArray()) {

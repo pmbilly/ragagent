@@ -20,10 +20,10 @@
  *       {@code GraphNode}、{@code GraphRelation}</li>
  *   <li><b>知识</b>：{@code ChunkFacts}、{@code ChunkView}、{@code KnowledgeView}、
  *       {@code KnowledgeBaseFacts}、{@code KnowledgeBaseGateway}</li>
- *   <li><b>工具与记忆</b>：{@code ToolResult}、{@code MemoryKeys}、{@code MemoryKinds}</li>
+ *   <li><b>工具与记忆</b>：{@code ToolResult}</li>
  * </ul>
  *
- * <p>行为较重的成员（{@code MemoryKeys} 的键解析）计划随属主能力包一起下沉，
+ * <p>行为较重的成员已随租户配置面归位 auth/api，
  * 本包最终只留数据形状。检索鉴权/FAQ 元数据/wiki 语言解析已落 {@code framework.content}。</p>
  */
 package com.ragagent.framework.vocabulary;

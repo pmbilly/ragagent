@@ -1,4 +1,4 @@
-package com.ragagent.framework.settings;
+package com.ragagent.auth.system.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -3,8 +3,8 @@ package com.ragagent.memory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.auth.api.MemoryConfig;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.tenant.MemoryConfig;
 import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.dto.MemoryConsolidationResult;
 import com.ragagent.memory.dto.MemoryDocView;

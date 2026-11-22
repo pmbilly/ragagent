@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.framework.tenant.MemoryKeys;
+import com.ragagent.auth.api.MemoryKeys;
 import com.ragagent.framework.web.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

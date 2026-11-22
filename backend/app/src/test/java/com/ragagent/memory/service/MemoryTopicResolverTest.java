@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.framework.tenant.MemoryKeys;
+import com.ragagent.auth.api.MemoryKeys;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;

@@ -1,6 +1,6 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.framework.tenant.MemoryKeys;
+import com.ragagent.auth.api.MemoryKeys;
 import com.ragagent.framework.web.ZeroTimeSerializer;
 import com.ragagent.memory.api.MessageTranscriptPort;
 import com.ragagent.memory.api.SessionMessageView;

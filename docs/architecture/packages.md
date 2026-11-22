@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-358 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+357 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -126,7 +126,6 @@
 | `:backend` | `com.ragagent.framework.prompt` | 平台提示词面：模板目录、常量、占位符与组装。 |
 | `:backend` | `com.ragagent.framework.redis` | 平台 · Redis：SpringRedisPubSub / RedisPubSub。 |
 | `:backend` | `com.ragagent.framework.security` | 平台安全面：加密（AES）、SSRF 守卫/白名单、输入与日志净化、IP 分类、用户名查找。 |
-| `:backend` | `com.ragagent.framework.settings` | 平台 · 设置：ConversationProperties / SystemSettingRegistry。 |
 | `:backend` | `com.ragagent.framework.storage.config` | 平台存储配置面：允许清单、上传上限与存储运行时环境。 |
 | `:backend` | `com.ragagent.framework.storage.fileserve` | 存储 · 文件服务：FileTransport / FileProxyPort / FileServeHttp…。 |
 | `:backend` | `com.ragagent.framework.storage.support` | 存储 · 支撑：FileResolverFactory / ResourceUrlMode / StreamRewriter…。 |

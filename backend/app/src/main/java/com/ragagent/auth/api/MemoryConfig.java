@@ -1,6 +1,5 @@
-package com.ragagent.framework.tenant;
+package com.ragagent.auth.api;
 
-import com.ragagent.framework.vocabulary.MemoryKinds;
 import java.time.Duration;
 
 

@@ -1,6 +1,6 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.framework.tenant.MemoryKeys;
+import com.ragagent.auth.api.MemoryKeys;
 import com.ragagent.memory.domain.item.MemoryItem;
 import java.util.ArrayList;
 import java.util.HashMap;

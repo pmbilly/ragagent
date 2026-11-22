@@ -1,4 +1,4 @@
-package com.ragagent.framework.tenant;
+package com.ragagent.auth.api;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
