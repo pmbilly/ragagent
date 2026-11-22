@@ -1,4 +1,4 @@
-package com.ragagent.agent.tool.runtime;
+package com.ragagent.knowledge.api;
 
 
 
@@ -10,13 +10,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agent.fixtures.ToolContractGoldenB;
-import com.ragagent.framework.content.SearchAuth;
-import com.ragagent.framework.content.SearchAuth.ChunkView;
-import com.ragagent.framework.content.SearchAuth.KnowledgeView;
-import com.ragagent.framework.content.SearchAuth.ScopeAuthException;
-import com.ragagent.framework.content.SearchAuth.TagView;
-import com.ragagent.framework.vocabulary.SearchTarget;
-import com.ragagent.framework.vocabulary.SearchTarget.SearchTargets;
+import com.ragagent.knowledge.api.SearchAuth.ChunkView;
+import com.ragagent.knowledge.api.SearchAuth.KnowledgeView;
+import com.ragagent.knowledge.api.SearchAuth.ScopeAuthException;
+import com.ragagent.knowledge.api.SearchAuth.TagView;
+import com.ragagent.knowledge.api.SearchTarget.SearchTargets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;

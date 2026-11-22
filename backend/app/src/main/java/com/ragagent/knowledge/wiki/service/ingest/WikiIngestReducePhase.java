@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
-import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.html.CodePointOrder;
+import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.knowledge.api.chunk.KnowledgeSpanPort;
 import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import com.ragagent.knowledge.api.wiki.SlugUpdate;
@@ -269,7 +269,7 @@ final class WikiIngestReducePhase {
                 draft.affectedType = "ingest"; // 新增覆盖 retract 的类型判定
             }
         }
-        draft.language = WikiLanguageSupport.resolveSlugUpdateLanguage(
+        draft.language = RequestLanguages.resolveSlugUpdateLanguage(
                 updates.stream().map(SlugUpdate::getLanguage).toList());
         return draft;
     }

@@ -1,7 +1,6 @@
 package com.ragagent.config;
 
 import com.ragagent.framework.config.LanguageProperties;
-import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.security.CryptoEnvProperties;
 import com.ragagent.framework.security.CryptoService;
 import com.ragagent.framework.security.SsrfGuard;
@@ -9,6 +8,7 @@ import com.ragagent.framework.security.SsrfWhitelistProperties;
 import com.ragagent.framework.storage.config.StorageRuntimeEnv;
 import com.ragagent.framework.storage.config.UploadLimitProperties;
 import com.ragagent.framework.storage.config.UploadLimits;
+import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.storage.api.StorageEnvLookup;
 import com.ragagent.storage.config.LocalStorageEnvProperties;
 import com.ragagent.storage.config.ResourceUrlModeProperties;
@@ -38,7 +38,7 @@ public class RuntimeSnapshotWiring {
                                  StorageProviderEnv.StorageType storageTypeProperties,
                                  ResourceUrlModeProperties resourceUrlModeProperties,
                                  Environment environment) {
-        WikiLanguageSupport.installLanguage(languageProperties.language());
+        RequestLanguages.installLanguage(languageProperties.language());
         UploadLimits.installFileSizeMb(uploadLimitProperties.fileSizeMb());
         CryptoService.installAesKey(cryptoEnvProperties.aesKey());
         SsrfGuard.installWhitelist(ssrfWhitelistProperties.whitelist(),

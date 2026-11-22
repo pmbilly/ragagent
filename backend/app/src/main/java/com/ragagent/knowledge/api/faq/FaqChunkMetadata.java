@@ -1,4 +1,4 @@
-package com.ragagent.framework.content;
+package com.ragagent.knowledge.api.faq;
 
 import com.ragagent.framework.text.TextConv;
 import java.nio.charset.StandardCharsets;

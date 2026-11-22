@@ -7,10 +7,10 @@ import com.ragagent.embedchannel.api.SuggestionItem;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.access.TenantContextSnapshot;
 import com.ragagent.framework.access.TenantScope;
-import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.tenant.APIKeyScopeContext;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
+import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.framework.vocabulary.MessageExecutionContext;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
@@ -380,7 +380,7 @@ public class MessageSuggestionService {
             joined = "clarify, deepen, action";
         }
         MessageExecutionContext ec = message.getExecutionContext();
-        String language = WikiLanguageSupport.resolveLanguageName(ec == null ? null : ec.getLocale());
+        String language = RequestLanguages.resolveLanguageName(ec == null ? null : ec.getLocale());
         String systemPrompt = buildSuggestionSystemPrompt(count, language, joined);
         String instruction = strVal(followUps, "additionalInstruction").trim();
         if (!instruction.isEmpty()) {

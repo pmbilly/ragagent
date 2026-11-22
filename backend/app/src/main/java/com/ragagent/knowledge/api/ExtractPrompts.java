@@ -1,8 +1,8 @@
-package com.ragagent.framework.prompt;
+package com.ragagent.knowledge.api;
 
-import com.ragagent.framework.prompt.PipelineConfig.PromptTemplateStructured;
 import com.ragagent.framework.vocabulary.GraphNode;
 import com.ragagent.framework.vocabulary.GraphRelation;
+import com.ragagent.llm.api.PipelineConfig.PromptTemplateStructured;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.yaml.snakeyaml.Yaml;
  * config.yaml 的 {@code extract} 段装载：抽取路由用的三份提示词模板
  * （{@code extract_graph} / {@code extract_entity} / {@code fabri_text}）。
  *
- * <p>与 {@link PipelineConfig}（同包的抽取管线配置）成对——装载产物就是它的
+ * <p>与 {@code PipelineConfig}（llm api 的抽取管线配置）成对——装载产物就是它的
  * {@code PromptTemplateStructured}。vendor 资源 {@code agent/management/extract_config.yaml}
  * <b>复制即校验</b>；YAML 未知键丢弃（snakeyaml 裸 load → 手工取键，同
  * ConversationProperties/BuiltinAgentRegistry 的装载惯例）。</p>

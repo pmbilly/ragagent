@@ -2,10 +2,10 @@ package com.ragagent.framework.html;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.security.CryptoService;
 import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.framework.storage.config.UploadLimits;
+import com.ragagent.framework.text.RequestLanguages;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,20 +22,20 @@ class RuntimeSnapshotTest {
     @AfterEach
     void restore() {
         SsrfGuard.restoreWhitelist(whitelistSnapshot);
-        WikiLanguageSupport.installLanguage("");
+        RequestLanguages.installLanguage("");
         UploadLimits.installFileSizeMb("");
         CryptoService.installAesKey("");
     }
 
     @Test
     void languageSnapshotInstallsAndFallsBack() {
-        WikiLanguageSupport.installLanguage("en-US");
-        assertThat(WikiLanguageSupport.defaultLanguage()).isEqualTo("en-US");
-        assertThat(WikiLanguageSupport.envLanguage()).isEqualTo("en-US");
+        RequestLanguages.installLanguage("en-US");
+        assertThat(RequestLanguages.defaultLanguage()).isEqualTo("en-US");
+        assertThat(RequestLanguages.envLanguage()).isEqualTo("en-US");
 
         // 空白/未装 → 缺省 zh-CN
-        WikiLanguageSupport.installLanguage("   ");
-        assertThat(WikiLanguageSupport.defaultLanguage()).isEqualTo("zh-CN");
+        RequestLanguages.installLanguage("   ");
+        assertThat(RequestLanguages.defaultLanguage()).isEqualTo("zh-CN");
     }
 
     @Test

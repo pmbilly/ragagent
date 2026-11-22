@@ -1,13 +1,13 @@
 package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.content.ChunkSearchUtil;
-import com.ragagent.framework.content.FaqChunkMetadata;
-import com.ragagent.framework.content.FaqChunkMetadataCodec;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.ChunkFacts;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.knowledge.api.ChunkQueryPort;
+import com.ragagent.knowledge.api.faq.FaqChunkMetadata;
+import com.ragagent.knowledge.api.faq.FaqChunkMetadataCodec;
+import com.ragagent.retrieval.api.ChunkFacts;
+import com.ragagent.retrieval.api.ChunkSearchUtil;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.retrieval.api.ImageInfo;
 import com.ragagent.retrieval.api.RetrievalObsRows;

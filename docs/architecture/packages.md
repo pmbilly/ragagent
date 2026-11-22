@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-357 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+356 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -112,7 +112,6 @@
 | `:backend` | `com.ragagent.framework.access` | 平台访问上下文面（方案 的 platform.access/）：请求级会话与追踪载体。 |
 | `:backend` | `com.ragagent.framework.concurrent` | 平台并发原语：进程内 in-flight 去重（SingleFlight）等与业务无关的并发工具。 |
 | `:backend` | `com.ragagent.framework.config` | 平台配置面：部署属性与环境查找面。 |
-| `:backend` | `com.ragagent.framework.content` | 内容形态的通用能力：文档分块、FAQ 元数据编解码、图片引用改写、检索片段工具、检索作用域判定、语言解析。 |
 | `:backend` | `com.ragagent.framework.error` | 契约 · 错误：ErrorCode / BizException / AppError。 |
 | `:backend` | `com.ragagent.framework.event` | 契约 · 事件：EventBusInterface / EventBusFactory / EventHandler…。 |
 | `:backend` | `com.ragagent.framework.event.payload` | 事件载荷契约面：SSE 事件载荷（线格式由 common.web.ContractJsonMixinsEvent 承载）。 |
@@ -123,7 +122,6 @@
 | `:backend` | `com.ragagent.framework.jsonbind` | JSON 绑定：Jackson 的 mapper 工厂、契约 mixin 注册表与各模块贡献的模块 SPI。 |
 | `:backend` | `com.ragagent.framework.pagination` | 分页契约：统一的 com.ragagent.framework.pagination.PageResult。 |
 | `:backend` | `com.ragagent.framework.persistence` | 平台持久化面：MyBatis 拦截器（全表写守卫 / 租户过滤）、分页请求、JSONB / 时间类型处理器、方言与 LIKE 转义。 |
-| `:backend` | `com.ragagent.framework.prompt` | 平台提示词面：模板目录、常量、占位符与组装。 |
 | `:backend` | `com.ragagent.framework.redis` | 平台 · Redis：SpringRedisPubSub / RedisPubSub。 |
 | `:backend` | `com.ragagent.framework.security` | 平台安全面：加密（AES）、SSRF 守卫/白名单、输入与日志净化、IP 分类、用户名查找。 |
 | `:backend` | `com.ragagent.framework.storage.config` | 平台存储配置面：允许清单、上传上限与存储运行时环境。 |
@@ -168,6 +166,7 @@
 | `:backend` | `com.ragagent.knowledge.api.chunk` | chunk 视图、载荷与读取端口。 |
 | `:backend` | `com.ragagent.knowledge.api.config` | 知识库配置形状（入库 / 解析 / 存储 / VLM 的 jsonb 配置列）。 |
 | `:backend` | `com.ragagent.knowledge.api.error` | 知识域错误载荷。 |
+| `:backend` | `com.ragagent.knowledge.api.faq` | FAQ 条目在 chunks.metadata（jsonb）中的结构与其 Jackson 读写（映射面）。 |
 | `:backend` | `com.ragagent.knowledge.api.kb` | 知识库视图、批量取与行投影。 |
 | `:backend` | `com.ragagent.knowledge.api.projection` | 实体 → 视图的投影助手。 |
 | `:backend` | `com.ragagent.knowledge.api.wiki` | wiki 词汇（页面、抽取项、语言）。 |

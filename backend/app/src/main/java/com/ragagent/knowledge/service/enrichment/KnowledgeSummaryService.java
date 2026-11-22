@@ -1,12 +1,12 @@
 package com.ragagent.knowledge.service.enrichment;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agentengine.api.AgentPromptPlaceholders;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.config.ConversationProperties;
-import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.prompt.AgentPromptPlaceholders;
+import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.knowledge.api.WikiImageMarkup;
 import com.ragagent.knowledge.api.projection.ChunkProjectionAdapter;
 import com.ragagent.knowledge.domain.Chunk;
@@ -430,7 +430,7 @@ public class KnowledgeSummaryService {
         }
         String summaryPrompt = AgentPromptPlaceholders.renderPromptPlaceholders(
                 conversationProps.getGenerateSummaryPrompt(),
-                Map.of("language", WikiLanguageSupport.languageNameFromContext()));
+                Map.of("language", RequestLanguages.languageNameFromContext()));
         ChatOptions options = new ChatOptions();
         options.setTemperature(0.3); // 摘要温度固定 0.3（不用 config 的 summaryTemperature）
         options.setMaxTokens(maxTokens);

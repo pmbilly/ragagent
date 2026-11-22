@@ -3,20 +3,13 @@
   "allowed": {
     "com/ragagent/framework/web/ApiResponse.java": "统一响应壳（全仓 HTTP 响应外壳）——HTTP 技术适配",
     "com/ragagent/framework/storage/fileserve/FileProxyPort.java": "文件直出 HTTP 面（request/response 进出，与 FileServeHttp/FileTransport 配套）——HTTP 技术适配",
-    "com/ragagent/framework/content/ChunkSearchUtil.java": "跨族共享（knowledge/session/retrieval）+ 依赖 Jackson；判据见 framework/knowledge/package-info",
-    "com/ragagent/framework/content/DocChunkSupport.java": "跨族共享（agenttools/session）+ 依赖 JsonMappers；判据见 framework/knowledge/package-info",
-    "com/ragagent/framework/content/FaqChunkMetadataCodec.java": "跨族共享（knowledge/agenttools/session）+ 依赖 Jackson；判据见 framework/knowledge/package-info",
-    "com/ragagent/framework/content/GrepChunkHit.java": "跨族共享（agenttools/session）+ 依赖 Jackson；判据见 framework/knowledge/package-info",
-    "com/ragagent/framework/content/ImageRefRewriter.java": "跨族共享（knowledge/session）+ 依赖 ImageIO/slf4j；判据见 framework/knowledge/package-info",
     "com/ragagent/framework/settings/SystemSettingRegistry.java": "系统设置解析注册表（语义属 system 域）——G7 归位",
     "com/ragagent/framework/prompt/AgentPromptPlaceholders.java": "agent 提示词占位符常量（提示词装载设施）——随提示词治理评估",
     "com/ragagent/framework/config/RetrievalDriverProperties.java": "检索驱动配置绑定（@ConfigurationProperties）——技术适配",
     "com/ragagent/framework/storage/support/FileUrlPort.java": "存储 URL 解析端口（重写器/解析器工厂的参数面）：IO 能力契约，非业务形状",
     "com/ragagent/framework/storage/fileserve/MessageFileFacts.java": "消息文件事实（会话 id / 文件键）：文件代理授权匹配的输入形状，随 framework/storage 同址",
-    "com/ragagent/framework/content/SearchAuth.java": "作用域判定（哪些知识库/文件可检索）：随唯一引用方 DocChunkSupport 同包，跨族共享",
-    "com/ragagent/framework/content/FaqChunkMetadata.java": "FAQ chunk 元数据编解码形状：随 FaqChunkMetadataCodec 同包，跨族共享",
-    "com/ragagent/framework/content/WikiLanguageSupport.java": "wiki 语言解析：被配置装载与 wiki 流程共用，随 knowledge 能力包",
     "com/ragagent/framework/tenant/MemoryKeys.java": "记忆配置键解析：随 MemoryConfig 同包（租户配置面）",
-    "com/ragagent/framework/config/ConversationProperties.java": "会话配置绑定（@ConfigurationProperties）——G7 评估归位"
+    "com/ragagent/framework/config/ConversationProperties.java": "会话配置绑定（@ConfigurationProperties）——G7 评估归位",
+    "com/ragagent/framework/text/RequestLanguages.java": "wiki 语言解析：被配置装载与 wiki 流程共用，随 knowledge 能力包"
   }
 }

@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.ragagent.framework.vocabulary.ChunkView;
-import com.ragagent.framework.vocabulary.KnowledgeView;
+import com.ragagent.knowledge.api.KnowledgeView;
 import com.ragagent.knowledge.api.chunk.ChunkPort;
 import com.ragagent.knowledge.api.chunk.KnowledgeSpanPort;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;

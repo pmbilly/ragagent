@@ -1,7 +1,7 @@
 package com.ragagent.session.rag;
 
 import com.ragagent.framework.vocabulary.PipelineMessageAttachmentView;
-import com.ragagent.framework.vocabulary.SearchTarget;
+import com.ragagent.knowledge.api.SearchTarget;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

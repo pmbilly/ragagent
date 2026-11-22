@@ -12,8 +12,8 @@ import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeFileMaterial
 import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeLoader;
 import com.ragagent.agenttools.datasource.DataAnalysisTool.QueryResult;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.SearchTarget;
 import com.ragagent.framework.vocabulary.ToolResult;
+import com.ragagent.knowledge.api.SearchTarget;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;

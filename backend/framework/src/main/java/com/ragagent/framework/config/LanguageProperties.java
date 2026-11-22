@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * <p>env 名保持原样：{@code RAGAGENT_LANGUAGE} → {@code weknora.language}（Spring 松散绑定；
  * 同前缀下 {@code weknora.edition} / {@code weknora.housekeeping.*} 等由各自配置类绑定）。</p>
  *
- * <p>缺省 {@code zh-CN} 的回落规则留在 {@link com.ragagent.framework.content.WikiLanguageSupport}。</p>
+ * <p>缺省 {@code zh-CN} 的回落规则留在 {@link com.ragagent.framework.text.RequestLanguages}。</p>
  */
 @ConfigurationProperties(prefix = "weknora")
 public record LanguageProperties(String language) {

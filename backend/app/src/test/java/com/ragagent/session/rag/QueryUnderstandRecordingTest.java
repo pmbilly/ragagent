@@ -8,11 +8,11 @@ import static com.ragagent.session.rag.Rec46cSupport.mask;
 import static com.ragagent.session.rag.Rec46cSupport.message;
 import static com.ragagent.session.rag.Rec46cSupport.msgsJSON;
 
-import com.ragagent.framework.prompt.PipelineConfig;
 import com.ragagent.framework.vocabulary.MessageAttachment;
 import com.ragagent.framework.vocabulary.MessageImage;
 import com.ragagent.framework.vocabulary.PipelineMessageAttachmentView;
 import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.PipelineConfig;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.rag.plugin.PluginError;
 import com.ragagent.session.rag.plugin.PluginQueryUnderstand;

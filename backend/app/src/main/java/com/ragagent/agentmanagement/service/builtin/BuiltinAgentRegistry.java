@@ -3,10 +3,10 @@ package com.ragagent.agentmanagement.service.builtin;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.agentengine.api.PromptSource;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
-import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.prompt.PromptSource;
+import com.ragagent.framework.text.RequestLanguages;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -245,11 +245,11 @@ public class BuiltinAgentRegistry {
 
     /**
      * env → Accept-Language 首个 tag → zh-CN。
-     * 实现上移 L1（{@link WikiLanguageSupport#localeFromRequest}），此处保留薄委托
+     * 实现上移 L1（{@link RequestLanguages#localeFromRequest}），此处保留薄委托
      * 以避免 {@code AgentController} 的 6 处调用点无谓改写。
      */
     public static String localeFromRequest(String acceptLanguage) {
-        return WikiLanguageSupport.localeFromRequest(acceptLanguage);
+        return RequestLanguages.localeFromRequest(acceptLanguage);
     }
 
     /** 供测试清理用（entries 是进程级单例，一次装载）。 */

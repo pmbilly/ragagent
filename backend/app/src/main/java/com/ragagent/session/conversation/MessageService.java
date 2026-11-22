@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agentengine.api.ThinkBlocks;
 import com.ragagent.auth.api.ChatHistoryConfig;
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.tenant.TenantConfigLookup;
+import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.framework.vocabulary.MessageArtifact;
 import com.ragagent.framework.vocabulary.MessageAttachment;
 import com.ragagent.framework.vocabulary.MessageImage;
@@ -193,7 +193,7 @@ public class MessageService {
             }
             message.setContent(ArtifactVersions.clarifyArtifactVersions(
                     message.getContent(), message.getArtifacts(), referenced,
-                    WikiLanguageSupport.languageFromContextOrDefault()));
+                    RequestLanguages.languageFromContextOrDefault()));
         }
         return messages;
     }

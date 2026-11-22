@@ -5,11 +5,11 @@ import com.ragagent.agentengine.api.BaseTool;
 import com.ragagent.agentengine.api.ToolRequest;
 import com.ragagent.agentengine.api.ToolSchemas;
 import com.ragagent.agenttools.knowledge.FaqSnippet;
-import com.ragagent.framework.content.SearchAuth;
-import com.ragagent.framework.content.SearchAuth.KnowledgeScopeReader;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.SearchTarget.SearchTargets;
 import com.ragagent.framework.vocabulary.ToolResult;
+import com.ragagent.knowledge.api.SearchAuth;
+import com.ragagent.knowledge.api.SearchAuth.KnowledgeScopeReader;
+import com.ragagent.knowledge.api.SearchTarget.SearchTargets;
 import com.ragagent.llm.api.ToolDefinitions;
 import java.util.List;
 

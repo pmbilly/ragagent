@@ -1,7 +1,6 @@
-package com.ragagent.framework.content;
+package com.ragagent.framework.text;
 
 
-import com.ragagent.framework.text.Whitespace;
 import java.util.List;
 import java.util.Locale;
 
@@ -22,9 +21,9 @@ import java.util.Locale;
  * {@code #defaultLanguage()}（{@code RAGAGENT_LANGUAGE} 或 {@code zh-CN}）——
  * <b>绝不是空串</b>。</p>
  */
-public final class WikiLanguageSupport {
+public final class RequestLanguages {
 
-    private WikiLanguageSupport() {}
+    private RequestLanguages() {}
 
     /** 默认语言兜底值 */
     public static final String FALLBACK_LANGUAGE = "zh-CN";

@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.service.faq;
 
-import com.ragagent.framework.content.FaqChunkMetadata;
-import com.ragagent.framework.content.FaqChunkMetadataCodec;
+import com.ragagent.knowledge.api.faq.FaqChunkMetadata;
+import com.ragagent.knowledge.api.faq.FaqChunkMetadataCodec;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;

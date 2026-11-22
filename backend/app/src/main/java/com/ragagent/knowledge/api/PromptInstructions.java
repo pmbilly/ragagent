@@ -1,4 +1,4 @@
-package com.ragagent.framework.prompt;
+package com.ragagent.knowledge.api;
 
 /**
  * KB 级业务指引 → 系统自有 prompt 的追加。

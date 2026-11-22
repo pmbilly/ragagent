@@ -3,10 +3,10 @@ package com.ragagent.framework.config;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.prompt.PromptSource;
 import jakarta.annotation.PostConstruct;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.yaml.snakeyaml.Yaml;
@@ -16,7 +16,7 @@ import org.yaml.snakeyaml.Yaml;
  *
  * <p>经 {@code @ConfigurationProperties(prefix="conversation")}
  * 绑定 application.yml 的 {@code conversation.*}；vendor 模板经
- * {@code com.ragagent.framework.prompt.PromptSource}（classpath {@code prompts/}）装载。
+ * {@code com.ragagent.agentengine.api.PromptSource}（classpath {@code prompts/}）装载。
  * 按 id 取模板的语义：按 {@code PromptSource.files()} 的顺序首个 id 命中即返回 content。</p>
  */
 @ConfigurationProperties(prefix = "conversation")
@@ -106,11 +106,18 @@ public class ConversationProperties {
         return t == null ? "" : t[0];
     }
 
+    /** 模板文件清单（顺序 = 按 id 查找的查找序；与 agent 引擎 api 的 PromptSource 清单同源，改任一侧必须同步另一侧）。 */
+    private static final List<String> TEMPLATE_FILES = List.of(
+            "agent_system_prompt.yaml", "system_prompt.yaml", "context_template.yaml",
+            "fallback.yaml", "generate_summary.yaml", "generate_session_title.yaml",
+            "rewrite.yaml", "graph_extraction.yaml", "generate_questions.yaml",
+            "keywords_extraction.yaml", "intent_prompts.yaml");
+
     /** 按 id 取模板：id → [content, user]。 */
     private Map<String, String[]> loadTemplates() {
         Map<String, String[]> byId = new LinkedHashMap<>();
-        for (String file : PromptSource.files()) {
-            try (InputStream in = PromptSource.open(file)) {
+        for (String file : TEMPLATE_FILES) {
+            try (InputStream in = ConversationProperties.class.getClassLoader().getResourceAsStream("prompts/" + file)) {
                 if (in == null) {
                     continue;
                 }

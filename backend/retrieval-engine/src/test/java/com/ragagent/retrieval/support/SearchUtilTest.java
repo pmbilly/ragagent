@@ -2,9 +2,9 @@ package com.ragagent.retrieval.support;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.ragagent.framework.content.ChunkSearchUtil;
 import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.retrieval.api.ChunkSearchUtil;
 import com.ragagent.retrieval.api.ImageInfo;
 import com.ragagent.retrieval.api.SearchChunkMerge;
 import com.ragagent.retrieval.api.SearchTextUtil;

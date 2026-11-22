@@ -1,6 +1,6 @@
 package com.ragagent.session.rag.support;
 
-import com.ragagent.framework.prompt.PromptComposer;
+import com.ragagent.agentengine.api.PromptComposer;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.llm.api.ChatMessage;

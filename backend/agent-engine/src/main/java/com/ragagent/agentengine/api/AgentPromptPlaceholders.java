@@ -1,6 +1,9 @@
-package com.ragagent.framework.prompt;
+package com.ragagent.agentengine.api;
+
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import java.time.format.TextStyle;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -66,11 +69,11 @@ public final class AgentPromptPlaceholders {
         }
         // 调用方没提供时补自动值
         autoFill(template, vals, "current_time",
-                LocalDate.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE));
+                LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE));
         autoFill(template, vals, "current_week",
                 LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH));
         autoFill(template, vals, "yesterday",
-                LocalDate.now().minusDays(1).format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE));
+                LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE));
 
         String result = template;
         for (Map.Entry<String, String> e : vals.entrySet()) {

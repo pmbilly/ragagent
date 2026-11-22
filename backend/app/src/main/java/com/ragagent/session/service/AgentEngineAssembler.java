@@ -15,7 +15,7 @@ import com.ragagent.agenttools.wiki.WikiRouteResolver;
 import com.ragagent.agenttools.wiki.WikiScope;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.vocabulary.SearchTarget;
+import com.ragagent.knowledge.api.SearchTarget;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.knowledge.api.chunk.FaqEntryPageView;
 import com.ragagent.knowledge.api.chunk.FaqEntryView;

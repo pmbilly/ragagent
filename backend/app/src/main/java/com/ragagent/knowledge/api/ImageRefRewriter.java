@@ -1,4 +1,4 @@
-package com.ragagent.framework.content;
+package com.ragagent.knowledge.api;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;

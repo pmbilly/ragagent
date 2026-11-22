@@ -2,7 +2,6 @@ package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.prompt.PipelineConfig;
 import com.ragagent.framework.vocabulary.GraphNode;
 import com.ragagent.knowledge.api.KnowledgeBaseBatchQueryPort;
 import com.ragagent.knowledge.api.KnowledgeDocumentQueryPort;
@@ -11,6 +10,7 @@ import com.ragagent.llm.api.EntityExtractionPort;
 import com.ragagent.llm.api.EntityExtractionResult;
 import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelFactoryPort;
+import com.ragagent.llm.api.PipelineConfig;
 import com.ragagent.retrieval.api.KnowledgeDocumentFacts;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineState;

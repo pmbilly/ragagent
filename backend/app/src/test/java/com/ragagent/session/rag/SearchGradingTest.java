@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.error.ErrorCode;
-import com.ragagent.framework.vocabulary.SearchTarget;
+import com.ragagent.knowledge.api.SearchTarget;
 import com.ragagent.session.rag.plugin.PluginError;
 import com.ragagent.session.rag.plugin.PluginSearch;
 import com.ragagent.session.rag.plugin.PluginSearchEntity;

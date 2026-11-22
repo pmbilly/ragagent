@@ -1,4 +1,4 @@
-package com.ragagent.framework.prompt;
+package com.ragagent.llm.api;
 
 import com.ragagent.framework.vocabulary.GraphNode;
 import com.ragagent.framework.vocabulary.GraphRelation;

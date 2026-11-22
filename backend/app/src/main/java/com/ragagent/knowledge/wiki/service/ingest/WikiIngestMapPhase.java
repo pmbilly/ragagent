@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
-import com.ragagent.framework.content.WikiLanguageSupport;
+import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.framework.vocabulary.ChunkView;
-import com.ragagent.framework.vocabulary.KnowledgeView;
+import com.ragagent.knowledge.api.KnowledgeView;
 import com.ragagent.knowledge.api.WikiImageMarkup;
 import com.ragagent.knowledge.api.chunk.KnowledgeSpanPort;
 import com.ragagent.knowledge.api.wiki.ExtractedItem;
@@ -59,7 +59,7 @@ final class WikiIngestMapPhase {
                                     WikiBatchContext batchCtx) {
         long docStartedAt = System.currentTimeMillis();
         String knowledgeId = op.getKnowledgeId();
-        String lang = WikiLanguageSupport.resolveLanguageName(op.getLanguage());
+        String lang = RequestLanguages.resolveLanguageName(op.getLanguage());
         String kbId = payload.knowledgeBaseId();
 
         // 页级 span：沿 LatestAttempt →

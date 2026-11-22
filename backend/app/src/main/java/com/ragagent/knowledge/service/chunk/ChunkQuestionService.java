@@ -3,19 +3,18 @@ package com.ragagent.knowledge.service.chunk;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.agentengine.api.AgentPromptPlaceholders;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.config.ConversationProperties;
 import com.ragagent.framework.config.RetrievalDriverProperties;
-import com.ragagent.framework.content.ChunkSearchUtil;
-import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.html.DegenerateText;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.prompt.AgentPromptPlaceholders;
-import com.ragagent.framework.prompt.PromptInstructions;
 import com.ragagent.framework.tenant.TenantConfigLookup;
+import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.knowledge.api.DocumentChunkMetadata;
 import com.ragagent.knowledge.api.GeneratedQuestion;
+import com.ragagent.knowledge.api.PromptInstructions;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkQuestionPort;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -32,6 +31,7 @@ import com.ragagent.llm.api.ChatResponse;
 import com.ragagent.llm.api.Embedder;
 import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelRuntime;
+import com.ragagent.retrieval.api.ChunkSearchUtil;
 import com.ragagent.retrieval.api.IndexEngine;
 import com.ragagent.retrieval.api.IndexEngineResolver;
 import com.ragagent.retrieval.api.TenantRetrievalDefault;
@@ -498,7 +498,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
                 "content", content,
                 "context", contextSection.toString(),
                 "doc_name", docName == null ? "" : docName,
-                "language", WikiLanguageSupport.languageNameFromContext()));
+                "language", RequestLanguages.languageNameFromContext()));
         prompt = PromptInstructions.appendCustomPromptInstructions(
                 prompt, customInstructions, "question_generation");
         ChatOptions options = new ChatOptions();

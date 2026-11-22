@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.api;
 
-import com.ragagent.framework.vocabulary.ChunkFacts;
+import com.ragagent.retrieval.api.ChunkFacts;
 import java.util.List;
 
 /** chunk 查询面：按 ID / 按父 ID 批量取。 */

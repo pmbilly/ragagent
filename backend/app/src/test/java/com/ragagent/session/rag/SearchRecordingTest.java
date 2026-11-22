@@ -8,7 +8,7 @@ import static com.ragagent.session.rag.Rec46cSupport.searchResultsShape;
 
 import com.ragagent.framework.vocabulary.GraphNode;
 import com.ragagent.framework.vocabulary.SearchResult;
-import com.ragagent.framework.vocabulary.SearchTarget;
+import com.ragagent.knowledge.api.SearchTarget;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.retrieval.api.GraphData;

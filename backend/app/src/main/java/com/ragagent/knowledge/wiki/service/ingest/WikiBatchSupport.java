@@ -2,7 +2,7 @@ package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.access.TenantScopes;
-import com.ragagent.framework.content.WikiLanguageSupport;
+import com.ragagent.framework.text.RequestLanguages;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -105,7 +105,7 @@ public final class WikiBatchSupport {
      * <h2>上下文传播</h2>
      * <p>ThreadLocal <b>不会</b>被新线程继承，因此这里在扇出时显式抓取父线程的
      * {@link TenantContext#currentTenantId()} 与
-     * {@link WikiLanguageSupport#languageFromContext()}，在每个虚拟线程里重新装上并在
+     * {@link RequestLanguages#languageFromContext()}，在每个虚拟线程里重新装上并在
      * 结束时清除。没有这一步，扇出里的 LLM 调用会丢掉租户（
      * {@code generateWithTemplate} 的跨调用合并会退化）与语言（
      * 语言解析会回落到默认值）。</p>
@@ -119,7 +119,7 @@ public final class WikiBatchSupport {
         }
         // 在父线程抓取"会随 ctx 流动"的值
         final Long tenantId = TenantContext.currentTenantId();
-        final String locale = WikiLanguageSupport.languageFromContext();
+        final String locale = RequestLanguages.languageFromContext();
 
         int effective = Math.max(1, limit);
         Semaphore slots = new Semaphore(effective);
@@ -135,7 +135,7 @@ public final class WikiBatchSupport {
                 if (tenantId != null) {
                     TenantContext.set(tenantId, null, null, false, null, false);
                 }
-                WikiLanguageSupport.setCurrentLocale(locale);
+                RequestLanguages.setCurrentLocale(locale);
                 try {
                     body.run();
                 } catch (Throwable ignored) {
@@ -145,7 +145,7 @@ public final class WikiBatchSupport {
                     if (tenantId != null) {
                         TenantContext.clear();
                     }
-                    WikiLanguageSupport.clearCurrentLocale();
+                    RequestLanguages.clearCurrentLocale();
                     slots.release();
                 }
             });

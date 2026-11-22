@@ -1,11 +1,11 @@
 package com.ragagent.knowledge.wiki.service;
 
-import com.ragagent.framework.prompt.PromptInstructions;
+import com.ragagent.knowledge.api.PromptInstructions;
 
 /**
  * 把 KB 级业务指引追加到系统自有 prompt 上。
  *
- * <p>实现已上提至 {@link com.ragagent.framework.prompt.PromptInstructions}
+ * <p>实现已上提至 {@link com.ragagent.knowledge.api.PromptInstructions}
  * （chunk 问题生成需要共用），本类保留为 wiki 侧的历史入口，一行委托。</p>
  */
 public final class WikiPromptInstructions {

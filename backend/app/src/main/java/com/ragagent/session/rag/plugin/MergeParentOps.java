@@ -1,9 +1,9 @@
 package com.ragagent.session.rag.plugin;
 
-import com.ragagent.framework.content.ChunkSearchUtil;
-import com.ragagent.framework.vocabulary.ChunkFacts;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.knowledge.api.ChunkQueryPort;
+import com.ragagent.retrieval.api.ChunkFacts;
+import com.ragagent.retrieval.api.ChunkSearchUtil;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;

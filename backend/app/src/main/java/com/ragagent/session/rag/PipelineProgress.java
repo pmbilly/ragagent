@@ -6,7 +6,7 @@ import com.ragagent.framework.event.payload.AgentToolCallData;
 import com.ragagent.framework.event.payload.AgentToolResultData;
 import com.ragagent.framework.eventbus.EventType;
 import com.ragagent.framework.vocabulary.SearchResult;
-import com.ragagent.framework.vocabulary.SearchTarget;
+import com.ragagent.knowledge.api.SearchTarget;
 import com.ragagent.session.rag.plugin.PluginError;
 import java.time.Clock;
 import java.util.LinkedHashMap;

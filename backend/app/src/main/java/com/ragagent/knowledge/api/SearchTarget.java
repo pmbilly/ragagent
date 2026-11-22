@@ -1,4 +1,4 @@
-package com.ragagent.framework.vocabulary;
+package com.ragagent.knowledge.api;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

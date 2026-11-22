@@ -1,6 +1,8 @@
 package com.ragagent.session.service;
 
 
+import com.ragagent.agentengine.api.AgentPromptPlaceholders;
+import com.ragagent.agentengine.api.PromptComposer;
 import com.ragagent.framework.access.TenantContextSnapshot;
 import com.ragagent.framework.access.TenantScope;
 import com.ragagent.framework.event.Event;
@@ -8,8 +10,6 @@ import com.ragagent.framework.event.EventBusInterface;
 import com.ragagent.framework.event.payload.AgentFinalAnswerData;
 import com.ragagent.framework.eventbus.EventIds;
 import com.ragagent.framework.eventbus.EventType;
-import com.ragagent.framework.prompt.AgentPromptPlaceholders;
-import com.ragagent.framework.prompt.PromptComposer;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
 import com.ragagent.llm.api.ChatMessage;

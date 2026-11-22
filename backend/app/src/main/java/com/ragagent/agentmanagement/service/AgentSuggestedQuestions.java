@@ -8,10 +8,10 @@ import com.ragagent.agentengine.api.TagScope;
 import com.ragagent.agentmanagement.dto.CustomAgentResult;
 import com.ragagent.agentmanagement.repository.AgentQuestionRepository;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
-import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.html.DegenerateText;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
+import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseCatalogPort;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -522,6 +522,6 @@ public final class AgentSuggestedQuestions {
     }
 
     public static String currentLocale() {
-        return WikiLanguageSupport.defaultLanguage();
+        return RequestLanguages.defaultLanguage();
     }
 }

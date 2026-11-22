@@ -6,7 +6,7 @@ import com.ragagent.audit.api.WikiActivityAudit;
 import com.ragagent.framework.access.TenantScopes;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.vocabulary.ChunkView;
-import com.ragagent.framework.vocabulary.KnowledgeView;
+import com.ragagent.knowledge.api.KnowledgeView;
 import com.ragagent.knowledge.api.chunk.ChunkPort;
 import com.ragagent.knowledge.api.chunk.KnowledgeSpanPort;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;

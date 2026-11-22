@@ -1,17 +1,17 @@
 package com.ragagent.session.rag;
 
+import com.ragagent.agentengine.api.AgentPromptPlaceholders;
+import com.ragagent.agentengine.api.PromptComposer;
 import com.ragagent.framework.access.TenantContextSnapshot;
 import com.ragagent.framework.access.TenantScope;
 import com.ragagent.framework.error.PipelinePortException;
-import com.ragagent.framework.prompt.AgentPromptPlaceholders;
-import com.ragagent.framework.prompt.MessageAttachmentsPrompt;
-import com.ragagent.framework.prompt.PromptComposer;
 import com.ragagent.framework.vocabulary.PipelineMessageAttachmentView;
-import com.ragagent.framework.vocabulary.SearchTarget;
+import com.ragagent.knowledge.api.SearchTarget;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelFactoryPort;
+import com.ragagent.session.MessageAttachmentsPrompt;
 import com.ragagent.session.dto.PipelineMessageImageView;
 import com.ragagent.session.dto.PipelineMessageView;
 import com.ragagent.session.rag.plugin.PluginError;

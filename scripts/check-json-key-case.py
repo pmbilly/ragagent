@@ -136,6 +136,11 @@ FROZEN_PREFIXES = (
 
 # 基线：已逐条复核的例外（文件相对路径 → 允许的键集合）。新增即失败。
 BASELINE: dict[str, set[str]] = {
+    # 2026-11-22 WP4 随类迁移换锚：两文件自 framework.prompt 迁 app（auth/knowledge），键为存量线格式——
+    # has_knowledge_base/has_web_search 是模板目录接口的既有响应键（前端消费，约束不动前端）；
+    # extract_entity/extract_graph/fabri_text/with_no_tag/with_tag 是 extract_config.yaml 的既有模板 id/段名（模型提示词资产）。
+    'auth/PromptTemplateCatalog.java': {'has_knowledge_base', 'has_web_search'},
+    'knowledge/api/ExtractPrompts.java': {'extract_entity', 'extract_graph', 'fabri_text', 'with_no_tag', 'with_tag'},
     # 会话配置读取面（A③-㊶ 知识支持面上提 L1 时随类换锚，旧路径条目已清）：`file_types` 是存量 DB
     # 配置键（parser_engine_rules 的既有形态），改键会破坏存量数据——非新增契约。
     # Langfuse span/trace 观测面（B135 复核改标：原写「agent_steps 落库列 + 历史回放」，实测站点是 toolSpanInput/toolSpanMeta 与 traceArgumentValue 构造 ⇒ 观测面，非 JSON 契约）
@@ -195,8 +200,6 @@ BASELINE: dict[str, set[str]] = {
     # R2c-3d 换锚：抽取提示词装载器由 `llm/extract` 迁 `platform.prompt`（纯提示词/配置面归技术面）。
     # 下列键是 **`initialization/extract_config.yaml` 的存量配置键**（vendor 资源"复制即校验"，
     # 键名由外部 yaml 决定、改键会破坏存量配置）——换包换锚，键名不动。
-    'framework/prompt/ExtractPrompts.java': {'extract_entity', 'extract_graph', 'fabri_text',
-        'with_no_tag', 'with_tag'},
     # ImageInfo 面（§15.3 冻结族）
     # websearch metadata 的 published_at（§15.3 ① 外部决定：键名由搜索服务给，非我们的 JSON 面）。
     # B147a 复核改标：原写「存量面」是错的——与 ReferencesSupport 同族，属外部词汇而非历史数据。
@@ -259,7 +262,6 @@ BASELINE: dict[str, set[str]] = {
     # websearch metadata（§15.3 ① 外部决定）
     'session/rag/support/ReferencesSupport.java': {'published_at'},
     # 提示词模板变量（数据值，非 JSON 键）
-    'framework/prompt/PromptTemplateCatalog.java': {'has_knowledge_base', 'has_web_search'},
     # provider 配置字段（对方词汇）
     'embedding/EmbedderFactory.java': {'api_version'},
     # agent 侧解析规则族（同 chat_parser_engine_rules，§14.9 ②）——该件已上提 L1，条目随之换锚（见上方 common/ 条目）

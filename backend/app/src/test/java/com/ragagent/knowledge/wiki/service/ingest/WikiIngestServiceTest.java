@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.content.WikiLanguageSupport;
+import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;
 import com.ragagent.knowledge.api.wiki.SlugUpdate;
@@ -70,7 +70,7 @@ class WikiIngestServiceTest {
     @AfterEach
     void clearTenant() throws Exception {
         TenantContext.clear();
-        WikiLanguageSupport.clearCurrentLocale();
+        RequestLanguages.clearCurrentLocale();
         for (AutoCloseable c : cleanup) {
             c.close();
         }

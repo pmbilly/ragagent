@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.ragagent.audit.api.WikiActivityAudit;
-import com.ragagent.framework.content.WikiLanguageSupport;
+import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.knowledge.api.chunk.KnowledgeSpanPort;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.knowledge.api.wiki.SlugUpdate;
@@ -197,7 +197,7 @@ final class WikiIngestRunSupport {
                                  List<Long> peekedIds,
                                  WikiIngestBatchHandler.Stats stats) {
         String kbId = payload.knowledgeBaseId();
-        String lang = WikiLanguageSupport.languageNameFromContext();
+        String lang = RequestLanguages.languageNameFromContext();
 
         WikiBatchContext batchCtx = handler.newWikiBatchContext(kbId, wikiConfig);
 
@@ -636,7 +636,7 @@ final class WikiIngestRunSupport {
                 slugUpdates.computeIfAbsent(slug, k -> new ArrayList<>()).add(
                         SlugUpdate.retract(slug, op.getKnowledgeId(), op.getDocTitle(),
                                 op.getDocSummary(),
-                                WikiLanguageSupport.resolveLanguageName(op.getLanguage())));
+                                RequestLanguages.resolveLanguageName(op.getLanguage())));
             }
             for (String folderId : folderSet) {
                 retractFolderIDs.add(folderId);

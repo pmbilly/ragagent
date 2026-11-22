@@ -8,7 +8,7 @@ import static com.ragagent.session.rag.Rec46cSupport.scores;
 import static com.ragagent.session.rag.Rec46cSupport.searchResultsShape;
 
 import com.ragagent.framework.vocabulary.SearchResult;
-import com.ragagent.framework.vocabulary.SearchTarget;
+import com.ragagent.knowledge.api.SearchTarget;
 import com.ragagent.memory.api.MemoryItemView;
 import com.ragagent.memory.api.MemoryRecall;
 import com.ragagent.session.rag.plugin.PluginError;

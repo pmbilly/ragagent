@@ -1,5 +1,5 @@
 package com.ragagent.knowledge.api.kb;
-import com.ragagent.framework.vocabulary.KnowledgeView;
+import com.ragagent.knowledge.api.KnowledgeView;
 
 
 

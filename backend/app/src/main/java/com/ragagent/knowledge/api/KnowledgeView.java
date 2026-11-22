@@ -1,4 +1,4 @@
-package com.ragagent.framework.vocabulary;
+package com.ragagent.knowledge.api;
 
 /**
  * 知识条目（{@code knowledge} 行）只读视图。

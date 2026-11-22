@@ -1,7 +1,7 @@
 package com.ragagent.session.service;
 
 import com.ragagent.agentengine.api.AgentRunSpec;
-import com.ragagent.framework.vocabulary.SearchTarget.SearchTargets;
+import com.ragagent.knowledge.api.SearchTarget.SearchTargets;
 import java.util.ArrayList;
 import java.util.List;
 

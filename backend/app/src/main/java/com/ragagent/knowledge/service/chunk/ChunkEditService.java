@@ -1,7 +1,6 @@
 package com.ragagent.knowledge.service.chunk;
 
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.content.ChunkSearchUtil;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
@@ -12,6 +11,7 @@ import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.service.access.ChunkAccessGuard;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.knowledge.support.ChunkRevisionConflictException;
+import com.ragagent.retrieval.api.ChunkSearchUtil;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

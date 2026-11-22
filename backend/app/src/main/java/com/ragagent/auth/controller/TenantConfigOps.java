@@ -1,6 +1,7 @@
 package com.ragagent.auth.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.auth.PromptTemplateCatalog;
 import com.ragagent.auth.api.ChatHistoryConfig;
 import com.ragagent.auth.api.KnowledgeBaseProvisioner;
 import com.ragagent.auth.api.MemoryConfig;
@@ -14,7 +15,6 @@ import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.prompt.PromptTemplateCatalog;
 import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.framework.tenant.APIKeyCapability;
 import com.ragagent.framework.tenant.APIKeyScopeContext;

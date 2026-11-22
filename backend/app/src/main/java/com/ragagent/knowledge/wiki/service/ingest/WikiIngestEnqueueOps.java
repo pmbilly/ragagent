@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
-import com.ragagent.framework.content.WikiLanguageSupport;
+import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.framework.text.Whitespace;
 import com.ragagent.framework.tracing.TraceInjector;
 import com.ragagent.knowledge.api.WikiEnqueueResult;
@@ -111,7 +111,7 @@ final class WikiIngestEnqueueOps {
      */
     TaskPendingOp newWikiIngestPendingOp(long tenantId, String kbId, String knowledgeId) throws Exception {
         WikiPendingOp op = new WikiPendingOp(WikiIngestConstants.OP_INGEST, knowledgeId);
-        op.setLanguage(WikiLanguageSupport.languageFromContextOrDefault());
+        op.setLanguage(RequestLanguages.languageFromContextOrDefault());
 
         TaskPendingOp row = new TaskPendingOp();
         row.setTenantId(tenantId);
@@ -134,7 +134,7 @@ final class WikiIngestEnqueueOps {
         // 入队侧注入：把当前
         // 请求的 traceparent 打进负载，worker 侧续接同一棵树
         WikiIngestPayload trigger = WikiIngestPayload.withTracing(
-                tenantId, kbId, WikiLanguageSupport.languageFromContextOrDefault(),
+                tenantId, kbId, RequestLanguages.languageFromContextOrDefault(),
                 TraceInjector.inject());
         WikiIngestTaskQueue queue = taskQueue.getIfAvailable();
         if (queue == null) {

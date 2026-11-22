@@ -11,11 +11,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.ragagent.RagAgentApplication;
 import com.ragagent.framework.config.AppEnvLookup;
-import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.security.CryptoService;
 import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.framework.storage.config.StorageRuntimeEnv;
 import com.ragagent.framework.storage.config.UploadLimits;
+import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import com.ragagent.storage.api.StorageEnvLookup;
 import com.tngtech.archunit.core.domain.Dependency;
@@ -126,7 +126,7 @@ class ArchitectureRulesTest {
      * <b>永远绿</b>（实测：探针类照样通过，属"空转规则"）。</p>
      */
     private static final Set<String> INSTALL_TARGETS = Set.of(
-            WikiLanguageSupport.class.getName() + "#installLanguage",
+            RequestLanguages.class.getName() + "#installLanguage",
             UploadLimits.class.getName() + "#installFileSizeMb",
             CryptoService.class.getName() + "#installAesKey",
             SsrfGuard.class.getName() + "#installWhitelist",
@@ -892,7 +892,10 @@ class ArchitectureRulesTest {
     private static final Set<String> RUNTIME_PUBLIC_FIELD_BASELINE = Set.of(
             // skill 定义载体：带 loaded / frontmatterRepaired 运行标记——收编为不可变 model +
             // 独立状态容器的候选（阶段 6 消化）。其余命中都在内嵌 DTO（不在治理范围）。
-            "com.ragagent.agent.skills.Skill");
+            "com.ragagent.agent.skills.Skill",
+            // 2026-11-22 WP4：grep_chunks 结果行自 framework.content 迁入 agenttools.api——
+            // 数据形状载体（检索打分→结果行的单写者回填路径），非运行态协作者。
+            "com.ragagent.agenttools.api.GrepChunkHit");
 
     /** A18b 作用域：运行态与编排协作者所在包。 */
     private static boolean isRuntimePackage(String packageName) {

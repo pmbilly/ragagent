@@ -1,4 +1,4 @@
-package com.ragagent.framework.prompt;
+package com.ragagent.session;
 
 import com.ragagent.framework.html.HtmlText;
 import com.ragagent.framework.vocabulary.PipelineMessageAttachmentView;

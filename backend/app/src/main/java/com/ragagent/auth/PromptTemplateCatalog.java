@@ -1,14 +1,16 @@
-package com.ragagent.framework.prompt;
+package com.ragagent.auth;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.agentengine.api.PromptSource;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * 提示词模板目录，供 {@code GET /api/v1/tenants/kv/prompt-templates} 消费。
@@ -102,7 +104,7 @@ public final class PromptTemplateCatalog {
             if (in == null) {
                 return null; // 文件不存在 → 跳过（对应字段保持 null）
             }
-            JsonNode root = MAPPER.valueToTree(new org.yaml.snakeyaml.Yaml().load(in));
+            JsonNode root = MAPPER.valueToTree(new Yaml().load(in));
             JsonNode list = root == null ? null : root.get("templates");
             if (list == null || !list.isArray()) {
                 return null;

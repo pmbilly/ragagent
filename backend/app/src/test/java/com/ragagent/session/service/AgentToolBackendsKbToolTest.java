@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.framework.config.ConversationProperties;
-import com.ragagent.framework.vocabulary.SearchTarget;
+import com.ragagent.knowledge.api.SearchTarget;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.knowledge.wiki.api.WikiPageOpsPort;
 import com.ragagent.memory.api.MemoryAccess;

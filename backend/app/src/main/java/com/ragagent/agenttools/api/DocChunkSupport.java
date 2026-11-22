@@ -1,9 +1,10 @@
-package com.ragagent.framework.content;
+package com.ragagent.agenttools.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.ChunkFacts;
+import com.ragagent.knowledge.api.SearchAuth;
+import com.ragagent.retrieval.api.ChunkFacts;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
