@@ -2,8 +2,8 @@ package com.ragagent.retrieval.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.content.ChunkSearchUtil;
-import com.ragagent.framework.web.JsonMappers;
-import com.ragagent.framework.web.ProviderJson;
+import com.ragagent.framework.jsonbind.JsonMappers;
+import com.ragagent.framework.jsonbind.ProviderJson;
 import com.ragagent.retrieval.api.ImageInfo;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

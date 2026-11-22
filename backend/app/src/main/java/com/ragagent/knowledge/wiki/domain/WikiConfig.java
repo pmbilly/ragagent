@@ -2,7 +2,7 @@ package com.ragagent.knowledge.wiki.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 
 /**
  * 知识库的 wiki 专属配置。

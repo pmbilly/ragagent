@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.embedding.EmbedderPooler;
 import com.ragagent.embedding.EmbeddingHttp;
-import com.ragagent.framework.web.ProviderJson;
+import com.ragagent.framework.jsonbind.ProviderJson;
 import com.ragagent.llm.ollama.OllamaService;
 import java.util.ArrayList;
 import java.util.List;

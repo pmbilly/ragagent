@@ -12,7 +12,7 @@ import com.ragagent.embedchannel.support.EmbedError;
 import com.ragagent.embedchannel.support.EmbedTokens;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.config.DeploymentProperties;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.knowledge.api.chunk.ChunkRowView;
 import java.time.OffsetDateTime;

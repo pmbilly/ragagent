@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.datasource.domain.DataSourceSyncPayload;
 import com.ragagent.datasource.domain.TaskInitiator;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestPayload;

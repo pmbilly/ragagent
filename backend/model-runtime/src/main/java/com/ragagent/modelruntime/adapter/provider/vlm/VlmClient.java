@@ -1,6 +1,6 @@
 package com.ragagent.modelruntime.adapter.provider.vlm;
 
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.llm.api.VlmConfig;
 import com.ragagent.llm.ollama.OllamaChatRequest;
 import com.ragagent.llm.ollama.OllamaMessage;

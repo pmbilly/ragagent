@@ -2,7 +2,7 @@ package com.ragagent.mcp.protocol;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.mcp.domain.McpAdvancedConfig;
 import com.ragagent.mcp.domain.McpResource;
 import com.ragagent.mcp.domain.McpService;

@@ -1,8 +1,8 @@
 package com.ragagent.session.adapter;
 
 import com.ragagent.framework.event.EventBusInterface;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.vocabulary.MessageView;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.im.api.QaRequestPayload;
 import com.ragagent.im.api.SessionQaPort;
 import com.ragagent.im.api.SessionView;

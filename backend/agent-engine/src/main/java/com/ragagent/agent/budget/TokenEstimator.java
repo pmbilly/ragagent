@@ -5,7 +5,7 @@ import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
 import com.knuddels.jtokkit.api.EncodingType;
 import com.knuddels.jtokkit.api.IntArrayList;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatTool;
 import com.ragagent.llm.api.MessageContentPart;

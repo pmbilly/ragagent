@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;

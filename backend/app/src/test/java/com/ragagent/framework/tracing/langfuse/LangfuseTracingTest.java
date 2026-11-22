@@ -178,7 +178,7 @@ class LangfuseTracingTest {
     @Test
     @DisplayName("载体 JSON：空值整键省略、非空按 lf_* 键名、未知键可忽略")
     void tracingContextJsonShape() throws Exception {
-        ObjectMapper mapper = com.ragagent.framework.web.JsonMappers.lenient();
+        ObjectMapper mapper = com.ragagent.framework.jsonbind.JsonMappers.lenient();
         assertEquals("{}", mapper.writeValueAsString(TracingContext.EMPTY));
         assertEquals("{\"lf_trace_id\":\"t\",\"lf_traceparent\":\"00-t-s-01\"}",
                 mapper.writeValueAsString(new TracingContext("t", "", "00-t-s-01", "", "")));

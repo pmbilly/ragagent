@@ -3,7 +3,7 @@ package com.ragagent.framework.tracing.langfuse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.Instant;

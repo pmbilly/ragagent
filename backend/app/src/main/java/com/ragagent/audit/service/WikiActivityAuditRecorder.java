@@ -7,7 +7,7 @@ import com.ragagent.audit.api.AuditOutcome;
 import com.ragagent.audit.api.WikiActivityAudit;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

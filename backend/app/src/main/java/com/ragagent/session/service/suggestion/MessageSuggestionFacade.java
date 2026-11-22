@@ -2,8 +2,8 @@ package com.ragagent.session.service.suggestion;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.security.LogSanitizer;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.session.domain.message.MessageSuggestionSetNotFoundException;
 import com.ragagent.session.support.MessageNotFoundException;

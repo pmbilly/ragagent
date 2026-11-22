@@ -10,7 +10,7 @@ import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiSpace;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.connector.ConnectorHttp;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;

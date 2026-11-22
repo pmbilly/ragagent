@@ -1,4 +1,4 @@
-package com.ragagent.framework.web;
+package com.ragagent.framework.jsonbind;
 
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.event.payload.AgentActionData;

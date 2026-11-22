@@ -9,7 +9,7 @@ import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
 import com.ragagent.agentmanagement.service.CustomAgentService;
 import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.stereotype.Component;

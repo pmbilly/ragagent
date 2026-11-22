@@ -2,8 +2,8 @@ package com.ragagent.model.domain;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.security.CryptoService;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ModelParameters;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.knowledge.support.KnowledgeBaseConfigCodec;
 import com.ragagent.knowledge.support.KnowledgeBaseConfigMaps;
 import java.util.ArrayList;

@@ -6,7 +6,7 @@ import com.ragagent.audit.api.AuditOutcome;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

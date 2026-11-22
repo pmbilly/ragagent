@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.wiki.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.persistence.DatabaseDialects;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.api.WikiIndexEntry;
 import com.ragagent.knowledge.wiki.api.WikiPageNotFoundException;

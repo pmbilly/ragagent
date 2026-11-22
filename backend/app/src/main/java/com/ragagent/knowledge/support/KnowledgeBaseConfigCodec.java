@@ -2,7 +2,7 @@ package com.ragagent.knowledge.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 import com.ragagent.knowledge.domain.KnowledgeBaseImageProcessingConfig;
 import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;

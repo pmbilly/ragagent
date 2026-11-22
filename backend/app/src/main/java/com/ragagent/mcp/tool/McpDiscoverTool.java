@@ -3,9 +3,9 @@ package com.ragagent.mcp.tool;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agentengine.api.BaseTool;
 import com.ragagent.agentengine.api.ToolRequest;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.tool.ToolSchemas;
 import com.ragagent.framework.vocabulary.ToolResult;
-import com.ragagent.framework.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 

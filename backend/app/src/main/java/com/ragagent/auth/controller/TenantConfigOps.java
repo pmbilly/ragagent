@@ -12,6 +12,7 @@ import com.ragagent.auth.service.TenantService;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.prompt.PromptTemplateCatalog;
 import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.framework.tenant.APIKeyCapability;
@@ -21,7 +22,6 @@ import com.ragagent.framework.tenant.StorageEngineConfig;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import com.ragagent.framework.tenant.TenantRole;
 import com.ragagent.framework.web.AcceptLanguages;
-import com.ragagent.framework.web.JsonMappers;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 

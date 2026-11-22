@@ -1,8 +1,8 @@
 package com.ragagent.storage.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.persistence.DatabaseDialects;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.storage.domain.StorageBackend;
 import java.sql.ResultSet;
 import java.sql.SQLException;

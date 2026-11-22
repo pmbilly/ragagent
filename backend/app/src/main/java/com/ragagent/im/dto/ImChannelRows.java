@@ -2,7 +2,7 @@ package com.ragagent.im.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.im.domain.ImChannelEntity;
 import java.time.OffsetDateTime;
 

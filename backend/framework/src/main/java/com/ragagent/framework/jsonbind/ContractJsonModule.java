@@ -1,4 +1,4 @@
-package com.ragagent.framework.web;
+package com.ragagent.framework.jsonbind;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;

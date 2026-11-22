@@ -6,6 +6,7 @@ import com.ragagent.framework.config.TenantProperties;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.error.ErrorCode;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.tenant.APIKeyScopeContext;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import com.ragagent.framework.tenant.TenantRole;

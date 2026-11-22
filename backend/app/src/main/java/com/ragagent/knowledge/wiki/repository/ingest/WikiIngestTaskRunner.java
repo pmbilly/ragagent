@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.wiki.repository.ingest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.tracing.langfuse.LangfuseTaskScope;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.wiki.domain.TaskDeadLetter;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestPayload;

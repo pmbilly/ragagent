@@ -2,8 +2,8 @@ package com.ragagent.mcp.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.security.LogSanitizer;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.mcp.domain.McpConfigFingerprint;
 import com.ragagent.mcp.domain.McpMetadataSummary;
 import com.ragagent.mcp.domain.McpPrincipal;

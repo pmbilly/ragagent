@@ -2,9 +2,9 @@ package com.ragagent.retrieval;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.vocabulary.ChunkFacts;
 import com.ragagent.framework.vocabulary.SearchResult;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.retrieval.api.KnowledgeDocumentFacts;
 import com.ragagent.retrieval.engine.EngineTypes;
 import java.util.ArrayList;

@@ -2,8 +2,8 @@ package com.ragagent.framework.content;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.vocabulary.ChunkFacts;
-import com.ragagent.framework.web.JsonMappers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

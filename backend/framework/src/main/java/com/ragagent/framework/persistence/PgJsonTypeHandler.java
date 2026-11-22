@@ -1,7 +1,7 @@
 package com.ragagent.framework.persistence;
 
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import org.apache.ibatis.type.JdbcType;

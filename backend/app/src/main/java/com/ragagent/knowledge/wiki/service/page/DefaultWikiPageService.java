@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.wiki.service.page;
 
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.knowledge.api.wiki.WikiException;

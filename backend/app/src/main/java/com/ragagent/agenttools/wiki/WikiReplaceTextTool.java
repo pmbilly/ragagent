@@ -6,10 +6,10 @@ import com.ragagent.agentengine.api.ToolRequest;
 import com.ragagent.agenttools.knowledge.FaqSnippet;
 import com.ragagent.framework.content.SearchAuth;
 import com.ragagent.framework.content.SearchAuth.KnowledgeScopeReader;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.tool.ToolSchemas;
 import com.ragagent.framework.vocabulary.SearchTarget.SearchTargets;
 import com.ragagent.framework.vocabulary.ToolResult;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ToolDefinitions;
 import java.util.List;
 

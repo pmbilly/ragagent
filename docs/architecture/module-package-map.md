@@ -9,7 +9,7 @@
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
 | `:contract` |  | 0 | 0 | 0 |
-| `:framework` | `framework` | 32 | 265 | 1 |
+| `:framework` | `framework` | 33 | 266 | 1 |
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 25 | 225 | 0 |
 | `:retrieval-engine` | `retrieval` | 17 | 138 | 0 |
 | `:agent-engine` | `agent`、`agentengine` | 11 | 107 | 0 |
@@ -62,5 +62,5 @@
 
 ## 相关
 
-- [`packages.md`](packages.md)：359 份 `package-info` 的包级职责索引。
+- [`packages.md`](packages.md)：360 份 `package-info` 的包级职责索引。
 - [`overview.md`](overview.md)：模块依赖图、设计原则、代码在哪。

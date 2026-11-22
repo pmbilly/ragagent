@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.ragagent.framework.web.ToolJson;
+import com.ragagent.framework.jsonbind.ToolJson;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.MessageContentPart;
 import com.ragagent.llm.api.ToolCall;

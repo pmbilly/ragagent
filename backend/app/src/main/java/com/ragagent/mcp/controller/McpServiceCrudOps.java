@@ -2,11 +2,11 @@ package com.ragagent.mcp.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.jsonbind.ToolJson;
 import com.ragagent.framework.security.LogSanitizer;
 import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.JsonBodyErrors;
-import com.ragagent.framework.web.ToolJson;
 import com.ragagent.mcp.domain.McpAdvancedConfig;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpAuthType;

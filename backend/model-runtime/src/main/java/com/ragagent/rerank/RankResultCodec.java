@@ -1,7 +1,7 @@
 package com.ragagent.rerank;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.web.ProviderJson;
+import com.ragagent.framework.jsonbind.ProviderJson;
 import com.ragagent.llm.api.RankResult;
 
 /**

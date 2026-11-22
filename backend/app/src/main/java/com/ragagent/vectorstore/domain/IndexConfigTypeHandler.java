@@ -1,7 +1,7 @@
 package com.ragagent.vectorstore.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.retrieval.api.IndexConfig;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

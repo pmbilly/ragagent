@@ -1,8 +1,8 @@
 package com.ragagent.framework.storage.fileserve;
 
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.security.CryptoService;
 import com.ragagent.framework.storage.config.StorageRuntimeEnv;
-import com.ragagent.framework.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Locale;

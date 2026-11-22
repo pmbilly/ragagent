@@ -2,7 +2,7 @@ package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.http.LlmTransport;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.llm.api.CacheRetention;
 import com.ragagent.llm.api.ChatConfig;
 import com.ragagent.llm.api.ChatMessage;

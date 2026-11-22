@@ -2,10 +2,10 @@ package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.prompt.AgentPromptPlaceholders;
 import com.ragagent.framework.prompt.MessageAttachmentsPrompt;
 import com.ragagent.framework.prompt.PipelineConfig;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;

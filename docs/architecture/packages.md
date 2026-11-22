@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-359 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+360 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -120,6 +120,7 @@
 | `:backend` | `com.ragagent.framework.html` | 平台文本面（的 `platform.text/`）：HTML→Markdown、实体/空白/代码点处理、路径与文件类型推断。 |
 | `:backend` | `com.ragagent.framework.http` | 平台 HTTP 面：SSRF 策略下的安全抓取工具，以及全进程共享的裸 HTTP 传输层 （com.ragagent.framework.http.LlmTransport：连接级 SSRF 校验 + |
 | `:backend` | `com.ragagent.framework.json` | 契约 · JSON：ByteKeyOrder / JsonValues / ZeroTimes。 |
+| `:backend` | `com.ragagent.framework.jsonbind` | JSON 绑定：Jackson 的 mapper 工厂、契约 mixin 注册表与各模块贡献的模块 SPI。 |
 | `:backend` | `com.ragagent.framework.model` | 模型能力的对外接口（嵌入等）：引擎与各域只认能力，不认厂商实现。 |
 | `:backend` | `com.ragagent.framework.pagination` | 分页契约：统一的 com.ragagent.framework.pagination.PageResult。 |
 | `:backend` | `com.ragagent.framework.persistence` | 平台持久化面：MyBatis 拦截器（全表写守卫 / 租户过滤）、分页请求、JSONB / 时间类型处理器、方言与 LIKE 转义。 |

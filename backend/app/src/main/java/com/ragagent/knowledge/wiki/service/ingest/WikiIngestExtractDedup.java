@@ -2,7 +2,7 @@ package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.domain.page.WikiPageLite;

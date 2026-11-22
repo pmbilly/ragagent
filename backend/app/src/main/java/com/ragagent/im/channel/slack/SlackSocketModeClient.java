@@ -2,7 +2,7 @@ package com.ragagent.im.channel.slack;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.SlackAdapterCore;
 import java.net.URI;

@@ -13,7 +13,7 @@ import com.ragagent.datasource.domain.connector.ConnectorRegistry;
 import com.ragagent.datasource.repository.DataSourceRepository;
 import com.ragagent.datasource.repository.SyncLogRepository;
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.web.ZeroTimeSerializer;
 import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseRowView;

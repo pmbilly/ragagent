@@ -3,7 +3,7 @@ package com.ragagent.mcp.adapter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agentengine.api.McpApprovalOps;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
 import com.ragagent.mcp.service.AgentToolApprovalService;
 import com.ragagent.mcp.service.McpOAuthFlowService;

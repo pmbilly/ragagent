@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.fixtures.JsonRoundTrip;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.web.ZeroTimeSerializer;
 import com.ragagent.memory.api.MemoryMessageCursor;
 import com.ragagent.memory.domain.MemoryExtractionSession;

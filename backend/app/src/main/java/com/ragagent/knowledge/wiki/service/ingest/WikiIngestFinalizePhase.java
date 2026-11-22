@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.access.TenantScopes;
 import com.ragagent.framework.content.WikiLanguageSupport;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.knowledge.wiki.domain.TaskPendingOp;
 import com.ragagent.knowledge.wiki.domain.WikiConfig;

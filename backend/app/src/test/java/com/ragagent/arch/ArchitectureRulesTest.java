@@ -646,7 +646,7 @@ class ArchitectureRulesTest {
      * 没注册 JSR-310、又开着严格模式，与 §2-12「宽松读统一策略」正好相反。</p>
      */
     private static final Set<String> SELF_MADE_MAPPER_BASELINE = Set.of(
-            "com.ragagent.framework.web.JsonMappers",
+            "com.ragagent.framework.jsonbind.JsonMappers",
             "com.ragagent.framework.tracing.langfuse.LangfuseAttributes",
             "com.ragagent.modelruntime.stream.StreamJson",
             "com.ragagent.framework.eventbus.EventJson",

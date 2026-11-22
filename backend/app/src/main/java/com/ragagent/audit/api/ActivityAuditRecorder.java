@@ -3,7 +3,7 @@ package com.ragagent.audit.api;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import java.util.Map;
 import java.util.TreeMap;
 

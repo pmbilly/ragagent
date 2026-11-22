@@ -6,7 +6,7 @@ import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.EventBusInterface;
 import com.ragagent.framework.event.payload.MCPOAuthRequiredData;
 import com.ragagent.framework.eventbus.EventType;
-import com.ragagent.framework.web.ToolJson;
+import com.ragagent.framework.jsonbind.ToolJson;
 import com.ragagent.mcp.approval.Cancellation;
 import com.ragagent.mcp.approval.Decision;
 import com.ragagent.mcp.approval.OAuthPendingRequest;

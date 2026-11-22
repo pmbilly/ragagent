@@ -2,11 +2,11 @@ package com.ragagent.agentengine.json;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.ragagent.framework.jsonbind.JsonModuleProvider;
 import com.ragagent.framework.vocabulary.AgentStep;
 import com.ragagent.framework.vocabulary.AgentToolCall;
 import com.ragagent.framework.vocabulary.ToolCallTarget;
 import com.ragagent.framework.vocabulary.ToolResult;
-import com.ragagent.framework.web.JsonModuleProvider;
 
 /**
  * Agent 面载荷的 Jackson 装配。

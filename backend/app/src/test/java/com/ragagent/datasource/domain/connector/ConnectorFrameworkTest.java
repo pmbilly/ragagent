@@ -13,7 +13,7 @@ import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncCursor;
 import com.ragagent.fixtures.JsonRoundTrip;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

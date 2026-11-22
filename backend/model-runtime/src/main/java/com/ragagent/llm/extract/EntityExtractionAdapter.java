@@ -1,7 +1,7 @@
 package com.ragagent.llm.extract;
 
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.prompt.PipelineConfig.PromptTemplateStructured;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.llm.api.EntityExtractionPort;
 import com.ragagent.llm.api.EntityExtractionResult;
 import com.ragagent.llm.api.LlmChatClient;

@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.support;
 
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseRowView;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import java.util.ArrayList;

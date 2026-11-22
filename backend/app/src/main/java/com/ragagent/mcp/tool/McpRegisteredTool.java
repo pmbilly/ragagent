@@ -3,8 +3,8 @@ package com.ragagent.mcp.tool;
 
 import com.ragagent.agentengine.api.McpCatalogGuardedTool;
 import com.ragagent.agentengine.api.ToolRequest;
+import com.ragagent.framework.jsonbind.ToolJson;
 import com.ragagent.framework.vocabulary.ToolResult;
-import com.ragagent.framework.web.ToolJson;
 
 /**
  * 绑定一个授权目录与 schema 的模型可见定义。它的定义虽然预先广告过，也<b>不得</b>

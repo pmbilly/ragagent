@@ -11,8 +11,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.security.SsrfGuard;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.KnowledgeIngest;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.knowledge.api.chunk.KnowledgeParseStatus;

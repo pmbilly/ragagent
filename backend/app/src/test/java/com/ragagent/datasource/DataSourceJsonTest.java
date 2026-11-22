@@ -18,7 +18,7 @@ import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.SyncResult;
 import com.ragagent.datasource.domain.TaskInitiator;
 import com.ragagent.fixtures.JsonRoundTrip;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;

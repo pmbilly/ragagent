@@ -4,10 +4,10 @@ import static com.ragagent.modelcontext.ModelContextGolden.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.jsonbind.JsonMappers;
+import com.ragagent.framework.jsonbind.ToolJson;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.framework.vocabulary.ToolResult;
-import com.ragagent.framework.web.JsonMappers;
-import com.ragagent.framework.web.ToolJson;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatResponse;
 import com.ragagent.llm.api.ChatTool;

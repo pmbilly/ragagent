@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.connector.ConnectorHttp;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.web.ZeroTimeSerializer;
 import java.nio.charset.StandardCharsets;
 import java.time.DateTimeException;

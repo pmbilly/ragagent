@@ -16,6 +16,7 @@ import com.ragagent.auth.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.framework.error.ErrorCode;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

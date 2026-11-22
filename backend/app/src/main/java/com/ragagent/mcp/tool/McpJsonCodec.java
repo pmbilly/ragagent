@@ -2,9 +2,9 @@ package com.ragagent.mcp.tool;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.jsonbind.JsonMappers;
+import com.ragagent.framework.jsonbind.ToolJson;
 import com.ragagent.framework.vocabulary.ToolResult;
-import com.ragagent.framework.web.JsonMappers;
-import com.ragagent.framework.web.ToolJson;
 import com.ragagent.llm.api.ToolDefinitions;
 import java.util.Base64;
 import java.util.HashMap;

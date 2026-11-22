@@ -1,7 +1,7 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.storage.config.StorageRuntimeEnv;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.storage.config.StorageProviderEnv;
 import com.ragagent.storage.domain.StorageBackend;
 import java.util.Map;

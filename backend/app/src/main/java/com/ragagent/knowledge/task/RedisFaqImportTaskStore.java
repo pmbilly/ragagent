@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 import com.ragagent.knowledge.support.FaqImportTaskStore;
 import java.time.Duration;

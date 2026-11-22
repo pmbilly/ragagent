@@ -12,7 +12,7 @@ import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2Doc;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2Repo;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2User;
 import com.ragagent.datasource.domain.connector.ConnectorException;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;

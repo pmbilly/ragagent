@@ -1,8 +1,8 @@
 package com.ragagent.session.qa;
 
 import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.web.JsonBodyErrors;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.framework.web.RequestFields;
 import com.ragagent.session.dto.QaRequests.AttachmentUpload;
 import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;

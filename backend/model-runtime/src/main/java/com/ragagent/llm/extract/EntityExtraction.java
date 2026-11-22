@@ -2,11 +2,11 @@ package com.ragagent.llm.extract;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.jsonbind.JsonMappers;
+import com.ragagent.framework.jsonbind.ToolJson;
 import com.ragagent.framework.prompt.PipelineConfig.PromptTemplateStructured;
 import com.ragagent.framework.vocabulary.GraphNode;
 import com.ragagent.framework.vocabulary.GraphRelation;
-import com.ragagent.framework.web.JsonMappers;
-import com.ragagent.framework.web.ToolJson;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;

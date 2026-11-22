@@ -1,11 +1,11 @@
 package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.prompt.AgentPromptPlaceholders;
 import com.ragagent.framework.prompt.MessageAttachmentsPrompt;
 import com.ragagent.framework.security.InputSanitizer;
 import com.ragagent.framework.vocabulary.SearchResult;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.retrieval.api.RetrievalObsRows;
 import com.ragagent.session.rag.PipelineEventType;

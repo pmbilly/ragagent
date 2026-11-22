@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.repository.TenantMemberRepository;
 import com.ragagent.auth.repository.TenantRepository;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.storage.api.StorageBackendProvisioner;
 import java.util.List;
 import org.junit.jupiter.api.Test;

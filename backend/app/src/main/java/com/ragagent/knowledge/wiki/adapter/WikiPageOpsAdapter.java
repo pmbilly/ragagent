@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.wiki.adapter;
 
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.knowledge.wiki.api.WikiIndex;
 import com.ragagent.knowledge.wiki.api.WikiLinkRepairResult;
 import com.ragagent.knowledge.wiki.api.WikiPageIssueView;

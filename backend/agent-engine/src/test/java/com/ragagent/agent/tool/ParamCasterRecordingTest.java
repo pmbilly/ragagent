@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agent.fixtures.ToolContractGoldenA;
-import com.ragagent.framework.web.ToolJson;
+import com.ragagent.framework.jsonbind.ToolJson;
 import org.junit.jupiter.api.Test;
 
 /**

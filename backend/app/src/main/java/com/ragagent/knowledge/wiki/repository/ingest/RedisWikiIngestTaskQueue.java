@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.wiki.repository.ingest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.task.RedisRetryingTaskQueue;
 import com.ragagent.framework.task.RetryPolicy;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestSlotReleaser;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestTask;
 import com.ragagent.knowledge.wiki.repository.TaskDeadLetterRepository;

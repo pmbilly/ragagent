@@ -3,7 +3,7 @@ package com.ragagent.llm.ollama;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.config.AppEnvLookup;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.llm.api.OllamaAdminPort;
 import com.ragagent.llm.api.OllamaModelInfo;
 import com.ragagent.llm.api.OllamaProgressListener;

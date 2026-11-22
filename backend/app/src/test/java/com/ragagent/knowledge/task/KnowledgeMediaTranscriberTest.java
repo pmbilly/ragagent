@@ -2,7 +2,7 @@ package com.ragagent.knowledge.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.llm.api.AsrTranscriber;
 import java.util.List;

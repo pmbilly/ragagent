@@ -9,7 +9,7 @@ import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.repository.AuditLogRepository;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.OffsetDateTime;

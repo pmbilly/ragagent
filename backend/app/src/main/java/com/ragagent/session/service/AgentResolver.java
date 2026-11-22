@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.agentengine.api.AgentLookup.AgentView;
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

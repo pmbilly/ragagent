@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.engine;
 
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.model.Embedder;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.retrieval.api.IndexDocument;
 import com.ragagent.retrieval.api.IndexEngine;
 import com.ragagent.retrieval.api.IndexEngineResolver;

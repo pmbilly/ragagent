@@ -3,8 +3,8 @@ package com.ragagent.rerank;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.framework.jsonbind.ProviderJson;
 import com.ragagent.framework.security.SsrfGuard;
-import com.ragagent.framework.web.ProviderJson;
 import com.ragagent.llm.api.ModelParameters;
 import com.ragagent.llm.api.RankResult;
 import com.ragagent.llm.api.Reranker;

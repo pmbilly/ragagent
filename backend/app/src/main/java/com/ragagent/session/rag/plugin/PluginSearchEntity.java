@@ -2,11 +2,11 @@ package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.vocabulary.ChunkFacts;
 import com.ragagent.framework.vocabulary.GraphNode;
 import com.ragagent.framework.vocabulary.GraphRelation;
 import com.ragagent.framework.vocabulary.SearchResult;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.api.ChunkQueryPort;
 import com.ragagent.knowledge.api.KnowledgeBatchQueryPort;
 import com.ragagent.retrieval.api.GraphData;

@@ -3,8 +3,8 @@ package com.ragagent.storage.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.security.CryptoService;
-import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.storage.dto.StorageConfig;
 import org.springframework.stereotype.Component;
 

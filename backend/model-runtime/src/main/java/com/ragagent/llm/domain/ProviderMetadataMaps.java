@@ -1,7 +1,7 @@
 package com.ragagent.llm.domain;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

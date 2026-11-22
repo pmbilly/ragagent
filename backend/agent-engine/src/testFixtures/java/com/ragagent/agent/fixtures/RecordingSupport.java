@@ -2,8 +2,8 @@ package com.ragagent.agent.fixtures;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.web.JsonMappers;
-import com.ragagent.framework.web.ToolJson;
+import com.ragagent.framework.jsonbind.JsonMappers;
+import com.ragagent.framework.jsonbind.ToolJson;
 import java.util.ArrayList;
 import java.util.Collections;
 

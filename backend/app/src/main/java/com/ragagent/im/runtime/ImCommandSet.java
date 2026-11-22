@@ -3,7 +3,7 @@ package com.ragagent.im.runtime;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.agentengine.api.ToolCapabilities;
-import com.ragagent.framework.web.JsonMappers;
+import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.im.runtime.Commands.CommandContext;
 import com.ragagent.im.runtime.Commands.CommandRegistry;
 import com.ragagent.im.runtime.Commands.CommandResult;
