@@ -1,4 +1,4 @@
-package com.ragagent.framework.knowledge;
+package com.ragagent.framework.content;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.JsonNode;

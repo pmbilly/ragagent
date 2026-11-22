@@ -6,7 +6,7 @@ import com.ragagent.agentengine.api.TagScope;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.access.TenantContextSnapshot;
 import com.ragagent.framework.access.TenantScope;
-import com.ragagent.framework.knowledge.WikiLanguageSupport;
+import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.tenant.APIKeyScopeContext;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import com.ragagent.framework.vocabulary.MessageExecutionContext;

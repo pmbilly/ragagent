@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.support;
 
 
-import com.ragagent.framework.knowledge.ChunkSearchUtil;
+import com.ragagent.framework.content.ChunkSearchUtil;
 import com.ragagent.framework.vocabulary.ChunkFacts;
 import com.ragagent.retrieval.api.ImageInfo;
 import java.util.ArrayList;

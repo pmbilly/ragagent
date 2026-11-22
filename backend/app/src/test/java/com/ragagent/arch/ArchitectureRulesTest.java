@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.ragagent.RagAgentApplication;
 import com.ragagent.framework.config.AppEnvLookup;
-import com.ragagent.framework.knowledge.WikiLanguageSupport;
+import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.security.CryptoService;
 import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.framework.storage.config.StorageRuntimeEnv;

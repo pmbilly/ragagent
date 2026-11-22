@@ -2,7 +2,7 @@ package com.ragagent.knowledge.service.faq;
 
 import com.ragagent.auth.api.TenantStorageQuotaPort;
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.knowledge.FaqChunkMetadata;
+import com.ragagent.framework.content.FaqChunkMetadata;
 import com.ragagent.framework.model.Embedder;
 import com.ragagent.framework.model.EmbeddingPort;
 import com.ragagent.knowledge.config.BatchEmbedProperties;

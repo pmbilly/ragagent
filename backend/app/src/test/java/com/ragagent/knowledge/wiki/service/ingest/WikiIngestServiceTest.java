@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.knowledge.WikiLanguageSupport;
+import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;
 import com.ragagent.knowledge.api.wiki.SlugUpdate;

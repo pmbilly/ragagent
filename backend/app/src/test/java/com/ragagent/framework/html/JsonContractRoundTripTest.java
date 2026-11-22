@@ -36,7 +36,7 @@ import com.ragagent.datasource.domain.TaskInitiator;
 import com.ragagent.datasource.dto.DataSourceResponse;
 import com.ragagent.datasource.dto.DatasourceCredentialFieldMetadata;
 import com.ragagent.datasource.dto.DatasourceCredentialsResponse;
-import com.ragagent.framework.knowledge.FaqChunkMetadata;
+import com.ragagent.framework.content.FaqChunkMetadata;
 import com.ragagent.framework.tenant.MemoryConfig;
 import com.ragagent.framework.tenant.StorageEngineConfig;
 import com.ragagent.framework.vocabulary.AgentStep;

@@ -2,9 +2,9 @@ package com.ragagent.knowledge.service.enrichment;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.knowledge.WikiLanguageSupport;
 import com.ragagent.framework.prompt.AgentPromptPlaceholders;
 import com.ragagent.framework.settings.ConversationProperties;
 import com.ragagent.knowledge.api.WikiImageMarkup;

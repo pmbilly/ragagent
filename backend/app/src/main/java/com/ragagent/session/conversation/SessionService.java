@@ -1,13 +1,13 @@
 package com.ragagent.session.conversation;
 
 import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.EventBusInterface;
 import com.ragagent.framework.eventbus.EventIds;
 import com.ragagent.framework.eventbus.EventType;
-import com.ragagent.framework.knowledge.WikiLanguageSupport;
 import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.framework.prompt.AgentPromptPlaceholders;
 import com.ragagent.framework.security.LogSanitizer;

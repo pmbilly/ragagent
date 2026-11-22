@@ -1,9 +1,11 @@
-package com.ragagent.framework.knowledge;
+package com.ragagent.framework.content;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.security.Hashes;
 import com.ragagent.framework.web.JsonMappers;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -138,7 +140,7 @@ public final class ChunkSearchUtil {
         }
         for (int overlap = maxOverlap; overlap >= MIN_OVERLAP_CODE_POINTS; overlap--) {
             if (codePointSlicesEqual(accCodePoints, accCodePoints.length - overlap, nextCodePoints, 0, overlap)) {
-                return acc + fromCodePoints(java.util.Arrays.copyOfRange(nextCodePoints, overlap, nextCodePoints.length));
+                return acc + fromCodePoints(Arrays.copyOfRange(nextCodePoints, overlap, nextCodePoints.length));
             }
         }
         return acc + separator + next;
@@ -166,7 +168,7 @@ public final class ChunkSearchUtil {
      */
     public static String generatedQuestionSourceId(String chunkId, String questionId) {
         String candidate = chunkId + "-" + questionId;
-        if (candidate.getBytes(java.nio.charset.StandardCharsets.UTF_8).length
+        if (candidate.getBytes(StandardCharsets.UTF_8).length
                 <= MAX_GENERATED_QUESTION_SOURCE_ID_LENGTH) {
             return candidate;
         }

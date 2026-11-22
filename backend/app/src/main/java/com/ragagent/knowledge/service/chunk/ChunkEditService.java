@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.service.chunk;
 
 import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.content.ChunkSearchUtil;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.knowledge.ChunkSearchUtil;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
 import com.ragagent.knowledge.domain.Knowledge;

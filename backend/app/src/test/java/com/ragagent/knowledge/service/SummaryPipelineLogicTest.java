@@ -2,7 +2,7 @@ package com.ragagent.knowledge.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.knowledge.ChunkSearchUtil;
+import com.ragagent.framework.content.ChunkSearchUtil;
 import com.ragagent.framework.vocabulary.ChunkFacts;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;

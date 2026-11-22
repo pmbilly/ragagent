@@ -1,4 +1,4 @@
-package com.ragagent.framework.knowledge;
+package com.ragagent.framework.content;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.vocabulary.ChunkFacts;

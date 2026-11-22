@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.service.image;
 
+import com.ragagent.framework.content.ChunkSearchUtil;
+import com.ragagent.framework.content.ImageRefRewriter;
 import com.ragagent.framework.html.ContentTypeByFilename;
-import com.ragagent.framework.knowledge.ChunkSearchUtil;
-import com.ragagent.framework.knowledge.ImageRefRewriter;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.ChunkRepository;

@@ -2,8 +2,8 @@ package com.ragagent.knowledge.task;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.content.ChunkSearchUtil;
 import com.ragagent.framework.html.ContentTypeByFilename;
-import com.ragagent.framework.knowledge.ChunkSearchUtil;
 import com.ragagent.framework.web.JsonMappers;
 import com.ragagent.knowledge.config.KnowledgeOcrProperties;
 import com.ragagent.knowledge.domain.Knowledge;

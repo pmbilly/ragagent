@@ -1,7 +1,10 @@
-package com.ragagent.framework.knowledge;
+package com.ragagent.framework.content;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.vocabulary.ChunkFacts;
 import com.ragagent.framework.web.JsonMappers;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -103,7 +106,7 @@ public final class DocChunkSupport {
 
     /** 独立 ObjectMapper（主源码不可依赖测试侧的 RecordingSupport）。 */
     private static final class ImageJson {
-        static final com.fasterxml.jackson.databind.ObjectMapper PLAIN =
+        static final ObjectMapper PLAIN =
                 JsonMappers.lenient();
 
         private ImageJson() {
@@ -116,12 +119,12 @@ public final class DocChunkSupport {
             return null;
         }
         try {
-            com.fasterxml.jackson.databind.JsonNode node = ImageJson.PLAIN.readTree(imageInfoJson);
+            JsonNode node = ImageJson.PLAIN.readTree(imageInfoJson);
             if (!node.isArray() || node.isEmpty()) {
                 return null;
             }
             List<ImageInfoRow> out = new ArrayList<>();
-            for (com.fasterxml.jackson.databind.JsonNode item : node) {
+            for (JsonNode item : node) {
                 String url = item.path("url").asText("");
                 String originalUrl = item.path("originalUrl").asText("");
                 if (url.isEmpty()) {
@@ -131,7 +134,7 @@ public final class DocChunkSupport {
                         item.path("caption").asText(""), item.path("ocrText").asText("")));
             }
             return out;
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             return null;
         }
     }

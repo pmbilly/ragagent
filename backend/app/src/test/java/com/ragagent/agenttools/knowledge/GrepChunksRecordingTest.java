@@ -8,7 +8,7 @@ import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agent.fixtures.ToolContractGoldenB;
 import com.ragagent.agentengine.api.ToolRequest;
 import com.ragagent.agenttools.knowledge.GrepChunksTool.GrepChunkSearch;
-import com.ragagent.framework.knowledge.GrepChunkHit;
+import com.ragagent.framework.content.GrepChunkHit;
 import com.ragagent.framework.vocabulary.SearchTarget;
 import com.ragagent.framework.vocabulary.ToolResult;
 import java.sql.Connection;

@@ -15,8 +15,8 @@ import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.GraphRelationVi
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.GraphSearch;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.KnowledgeBaseView;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.SearchResultView;
-import com.ragagent.framework.knowledge.SearchAuth.KnowledgeTagsFetcher;
-import com.ragagent.framework.knowledge.SearchAuth.TagView;
+import com.ragagent.framework.content.SearchAuth.KnowledgeTagsFetcher;
+import com.ragagent.framework.content.SearchAuth.TagView;
 import com.ragagent.framework.vocabulary.SearchTarget;
 import com.ragagent.framework.vocabulary.ToolResult;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.ragagent.framework.knowledge;
+package com.ragagent.framework.content;
 
 
 import com.ragagent.framework.text.Whitespace;

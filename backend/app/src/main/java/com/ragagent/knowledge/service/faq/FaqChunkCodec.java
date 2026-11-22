@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.service.faq;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.knowledge.FaqChunkMetadata;
-import com.ragagent.framework.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.framework.content.FaqChunkMetadata;
+import com.ragagent.framework.content.FaqChunkMetadataCodec;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.faq.FaqEntry;

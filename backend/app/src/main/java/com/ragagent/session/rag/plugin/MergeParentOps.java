@@ -1,6 +1,6 @@
 package com.ragagent.session.rag.plugin;
 
-import com.ragagent.framework.knowledge.ChunkSearchUtil;
+import com.ragagent.framework.content.ChunkSearchUtil;
 import com.ragagent.framework.vocabulary.ChunkFacts;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.knowledge.api.ChunkQueryPort;

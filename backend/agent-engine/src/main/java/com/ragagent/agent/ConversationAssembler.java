@@ -9,7 +9,7 @@ import com.ragagent.agent.skills.Skill;
 import com.ragagent.agentengine.api.KnowledgeBaseInfo;
 import com.ragagent.agentengine.api.RecentDocInfo;
 import com.ragagent.agentengine.api.SelectedDocumentInfo;
-import com.ragagent.framework.knowledge.WikiLanguageSupport;
+import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ToolDefinitions;
 import java.time.LocalDate;

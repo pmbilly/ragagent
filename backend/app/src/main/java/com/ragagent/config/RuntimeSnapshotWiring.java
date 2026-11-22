@@ -1,7 +1,7 @@
 package com.ragagent.config;
 
 import com.ragagent.framework.config.LanguageProperties;
-import com.ragagent.framework.knowledge.WikiLanguageSupport;
+import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.security.CryptoEnvProperties;
 import com.ragagent.framework.security.CryptoService;
 import com.ragagent.framework.security.SsrfGuard;

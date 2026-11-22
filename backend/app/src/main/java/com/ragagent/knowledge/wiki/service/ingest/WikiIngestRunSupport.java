@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.ragagent.audit.api.WikiActivityAudit;
-import com.ragagent.framework.knowledge.WikiLanguageSupport;
+import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.knowledge.api.chunk.KnowledgeSpanPort;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.knowledge.api.wiki.SlugUpdate;

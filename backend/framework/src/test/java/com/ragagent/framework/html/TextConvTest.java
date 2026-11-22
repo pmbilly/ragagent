@@ -2,7 +2,7 @@ package com.ragagent.framework.html;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.knowledge.FaqChunkMetadata;
+import com.ragagent.framework.content.FaqChunkMetadata;
 import com.ragagent.framework.text.TextConv;
 import org.junit.jupiter.api.Test;
 

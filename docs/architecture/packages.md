@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-360 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+359 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -110,9 +110,9 @@
 | `:backend` | `com.ragagent.favorite.service` | 收藏 · 服务：UserResourceFavoriteService。 |
 | `:backend` | `com.ragagent.framework` | 平台面（platform，阶段 6 起逐步收纳）：框架适配、可靠执行与通用技术能力。 |
 | `:backend` | `com.ragagent.framework.access` | 平台访问上下文面（方案 的 platform.access/）：请求级会话与追踪载体。 |
-| `:backend` | `com.ragagent.framework.audit` | 平台审计写入：业务活动的租户兜底、操作者提取、details 字母序与 best-effort 语义。 |
 | `:backend` | `com.ragagent.framework.concurrent` | 平台并发原语：进程内 in-flight 去重（SingleFlight）等与业务无关的并发工具。 |
 | `:backend` | `com.ragagent.framework.config` | 平台配置面：部署属性与环境查找面。 |
+| `:backend` | `com.ragagent.framework.content` | 内容形态的通用能力：文档分块、FAQ 元数据编解码、图片引用改写、检索片段工具、检索作用域判定、语言解析。 |
 | `:backend` | `com.ragagent.framework.error` | 契约 · 错误：ErrorCode / BizException / AppError。 |
 | `:backend` | `com.ragagent.framework.event` | 契约 · 事件：EventBusInterface / EventBusFactory / EventHandler…。 |
 | `:backend` | `com.ragagent.framework.event.payload` | 事件载荷契约面：SSE 事件载荷（线格式由 common.web.ContractJsonMixinsEvent 承载）。 |
@@ -120,7 +120,6 @@
 | `:backend` | `com.ragagent.framework.html` | 平台文本面（的 `platform.text/`）：HTML→Markdown、实体/空白/代码点处理、路径与文件类型推断。 |
 | `:backend` | `com.ragagent.framework.http` | 平台 HTTP 面：SSRF 策略下的安全抓取工具，以及全进程共享的裸 HTTP 传输层 （com.ragagent.framework.http.LlmTransport：连接级 SSRF 校验 + |
 | `:backend` | `com.ragagent.framework.json` | 契约 · JSON：ByteKeyOrder / JsonValues / ZeroTimes。 |
-| `:backend` | `com.ragagent.framework.knowledge` | 平台 · 知识/文本/图片工具：分块文本检索、文档分块组装、FAQ 元数据编解码、图片引用富化与重写。 |
 | `:backend` | `com.ragagent.framework.model` | 模型能力的对外接口（嵌入等）：引擎与各域只认能力，不认厂商实现。 |
 | `:backend` | `com.ragagent.framework.pagination` | 分页契约：统一的 com.ragagent.framework.pagination.PageResult。 |
 | `:backend` | `com.ragagent.framework.persistence` | 平台持久化面：MyBatis 拦截器（全表写守卫 / 租户过滤）、分页请求、JSONB / 时间类型处理器、方言与 LIKE 转义。 |

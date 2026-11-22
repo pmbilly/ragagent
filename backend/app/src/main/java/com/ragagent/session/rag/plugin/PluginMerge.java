@@ -1,9 +1,9 @@
 package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.knowledge.ChunkSearchUtil;
-import com.ragagent.framework.knowledge.FaqChunkMetadata;
-import com.ragagent.framework.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.framework.content.ChunkSearchUtil;
+import com.ragagent.framework.content.FaqChunkMetadata;
+import com.ragagent.framework.content.FaqChunkMetadataCodec;
 import com.ragagent.framework.vocabulary.ChunkFacts;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.framework.web.JsonMappers;

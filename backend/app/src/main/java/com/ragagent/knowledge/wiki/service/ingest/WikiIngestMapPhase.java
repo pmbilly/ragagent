@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
-import com.ragagent.framework.knowledge.WikiLanguageSupport;
+import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.framework.vocabulary.KnowledgeView;
 import com.ragagent.knowledge.api.WikiImageMarkup;

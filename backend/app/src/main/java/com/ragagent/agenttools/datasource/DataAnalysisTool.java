@@ -6,7 +6,7 @@ import com.ragagent.agentengine.api.Cleanable;
 import com.ragagent.agentengine.api.ToolRequest;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
 import com.ragagent.agenttools.sql.SqlGuard;
-import com.ragagent.framework.knowledge.SearchAuth;
+import com.ragagent.framework.content.SearchAuth;
 import com.ragagent.framework.tool.ToolSchemas;
 import com.ragagent.framework.vocabulary.SearchTarget;
 import com.ragagent.framework.vocabulary.ToolResult;

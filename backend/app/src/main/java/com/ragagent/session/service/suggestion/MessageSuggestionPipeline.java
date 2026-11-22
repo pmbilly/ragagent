@@ -2,7 +2,7 @@ package com.ragagent.session.service.suggestion;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.knowledge.WikiLanguageSupport;
+import com.ragagent.framework.content.WikiLanguageSupport;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.framework.vocabulary.SuggestionItem;
 import com.ragagent.framework.web.JsonMappers;
