@@ -13,6 +13,11 @@ import java.util.Map;
 
 public class AgentActionData {
 
+    private static String orEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+
     private int iteration;
 
     private String toolName = "";
@@ -37,11 +42,11 @@ public class AgentActionData {
     public AgentActionData(int iteration, String toolName, Map<String, Object> toolInput,
                            String toolOutput, boolean success, String error, long durationMs) {
         this.iteration = iteration;
-        this.toolName = QueryData.orEmpty(toolName);
+        this.toolName = orEmpty(toolName);
         this.toolInput = toolInput;
-        this.toolOutput = QueryData.orEmpty(toolOutput);
+        this.toolOutput = orEmpty(toolOutput);
         this.success = success;
-        this.error = QueryData.orEmpty(error);
+        this.error = orEmpty(error);
         this.durationMs = durationMs;
     }
 
@@ -58,7 +63,7 @@ public class AgentActionData {
     }
 
     public void setToolName(String v) {
-        this.toolName = QueryData.orEmpty(v);
+        this.toolName = orEmpty(v);
     }
 
     public Map<String, Object> getToolInput() {
@@ -74,7 +79,7 @@ public class AgentActionData {
     }
 
     public void setToolOutput(String v) {
-        this.toolOutput = QueryData.orEmpty(v);
+        this.toolOutput = orEmpty(v);
     }
 
     public boolean isSuccess() {
@@ -90,7 +95,7 @@ public class AgentActionData {
     }
 
     public void setError(String v) {
-        this.error = QueryData.orEmpty(v);
+        this.error = orEmpty(v);
     }
 
     public long getDurationMs() {

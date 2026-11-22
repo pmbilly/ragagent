@@ -13,6 +13,11 @@ package com.ragagent.framework.event.payload;
 
 public class AgentThoughtData {
 
+    private static String orEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+
     private String content = "";
 
     private int iteration;
@@ -23,7 +28,7 @@ public class AgentThoughtData {
     }
 
     public AgentThoughtData(String content, int iteration, boolean done) {
-        this.content = QueryData.orEmpty(content);
+        this.content = orEmpty(content);
         this.iteration = iteration;
         this.done = done;
     }
@@ -33,7 +38,7 @@ public class AgentThoughtData {
     }
 
     public void setContent(String v) {
-        this.content = QueryData.orEmpty(v);
+        this.content = orEmpty(v);
     }
 
     public int getIteration() {

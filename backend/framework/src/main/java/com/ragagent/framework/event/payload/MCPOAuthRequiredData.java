@@ -14,6 +14,11 @@ package com.ragagent.framework.event.payload;
 
 public class MCPOAuthRequiredData {
 
+    private static String orEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+
     private String pendingId = "";
 
     /** 0 恒输出 */
@@ -47,17 +52,17 @@ public class MCPOAuthRequiredData {
                                 String assistantMessageId, String serviceId, String serviceName,
                                 String mcpToolName, int timeoutSeconds, long requestedAtUnix,
                                 String toolCallId, String requestId) {
-        this.pendingId = QueryData.orEmpty(pendingId);
+        this.pendingId = orEmpty(pendingId);
         this.tenantId = tenantId;
-        this.sessionId = QueryData.orEmpty(sessionId);
-        this.assistantMessageId = QueryData.orEmpty(assistantMessageId);
-        this.serviceId = QueryData.orEmpty(serviceId);
-        this.serviceName = QueryData.orEmpty(serviceName);
-        this.mcpToolName = QueryData.orEmpty(mcpToolName);
+        this.sessionId = orEmpty(sessionId);
+        this.assistantMessageId = orEmpty(assistantMessageId);
+        this.serviceId = orEmpty(serviceId);
+        this.serviceName = orEmpty(serviceName);
+        this.mcpToolName = orEmpty(mcpToolName);
         this.timeoutSeconds = timeoutSeconds;
         this.requestedAtUnix = requestedAtUnix;
-        this.toolCallId = QueryData.orEmpty(toolCallId);
-        this.requestId = QueryData.orEmpty(requestId);
+        this.toolCallId = orEmpty(toolCallId);
+        this.requestId = orEmpty(requestId);
     }
 
     public String getPendingId() {
@@ -65,7 +70,7 @@ public class MCPOAuthRequiredData {
     }
 
     public void setPendingId(String v) {
-        this.pendingId = QueryData.orEmpty(v);
+        this.pendingId = orEmpty(v);
     }
 
     public long getTenantId() {
@@ -81,7 +86,7 @@ public class MCPOAuthRequiredData {
     }
 
     public void setSessionId(String v) {
-        this.sessionId = QueryData.orEmpty(v);
+        this.sessionId = orEmpty(v);
     }
 
     public String getAssistantMessageId() {
@@ -89,7 +94,7 @@ public class MCPOAuthRequiredData {
     }
 
     public void setAssistantMessageId(String v) {
-        this.assistantMessageId = QueryData.orEmpty(v);
+        this.assistantMessageId = orEmpty(v);
     }
 
     public String getServiceId() {
@@ -97,7 +102,7 @@ public class MCPOAuthRequiredData {
     }
 
     public void setServiceId(String v) {
-        this.serviceId = QueryData.orEmpty(v);
+        this.serviceId = orEmpty(v);
     }
 
     public String getServiceName() {
@@ -105,7 +110,7 @@ public class MCPOAuthRequiredData {
     }
 
     public void setServiceName(String v) {
-        this.serviceName = QueryData.orEmpty(v);
+        this.serviceName = orEmpty(v);
     }
 
     public String getMcpToolName() {
@@ -113,7 +118,7 @@ public class MCPOAuthRequiredData {
     }
 
     public void setMcpToolName(String v) {
-        this.mcpToolName = QueryData.orEmpty(v);
+        this.mcpToolName = orEmpty(v);
     }
 
     public int getTimeoutSeconds() {
@@ -137,7 +142,7 @@ public class MCPOAuthRequiredData {
     }
 
     public void setToolCallId(String v) {
-        this.toolCallId = QueryData.orEmpty(v);
+        this.toolCallId = orEmpty(v);
     }
 
     public String getRequestId() {
@@ -145,6 +150,6 @@ public class MCPOAuthRequiredData {
     }
 
     public void setRequestId(String v) {
-        this.requestId = QueryData.orEmpty(v);
+        this.requestId = orEmpty(v);
     }
 }

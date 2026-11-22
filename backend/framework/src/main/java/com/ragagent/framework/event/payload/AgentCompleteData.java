@@ -14,6 +14,11 @@ import java.util.Map;
 
 public class AgentCompleteData {
 
+    private static String orEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+
     private String sessionId = "";
 
     private int totalSteps;
@@ -49,15 +54,15 @@ public class AgentCompleteData {
                              List<Object> knowledgeRefs, Object agentSteps, Object usage,
                              long totalDurationMs, String messageId, String requestId,
                              Map<String, Object> extra) {
-        this.sessionId = QueryData.orEmpty(sessionId);
+        this.sessionId = orEmpty(sessionId);
         this.totalSteps = totalSteps;
-        this.finalAnswer = QueryData.orEmpty(finalAnswer);
+        this.finalAnswer = orEmpty(finalAnswer);
         this.knowledgeRefs = knowledgeRefs;
         this.agentSteps = agentSteps;
         this.usage = usage;
         this.totalDurationMs = totalDurationMs;
-        this.messageId = QueryData.orEmpty(messageId);
-        this.requestId = QueryData.orEmpty(requestId);
+        this.messageId = orEmpty(messageId);
+        this.requestId = orEmpty(requestId);
         this.extra = extra;
     }
 
@@ -66,7 +71,7 @@ public class AgentCompleteData {
     }
 
     public void setSessionId(String v) {
-        this.sessionId = QueryData.orEmpty(v);
+        this.sessionId = orEmpty(v);
     }
 
     public int getTotalSteps() {
@@ -82,7 +87,7 @@ public class AgentCompleteData {
     }
 
     public void setFinalAnswer(String v) {
-        this.finalAnswer = QueryData.orEmpty(v);
+        this.finalAnswer = orEmpty(v);
     }
 
     public List<Object> getKnowledgeRefs() {
@@ -122,7 +127,7 @@ public class AgentCompleteData {
     }
 
     public void setMessageId(String v) {
-        this.messageId = QueryData.orEmpty(v);
+        this.messageId = orEmpty(v);
     }
 
     public String getRequestId() {
@@ -130,7 +135,7 @@ public class AgentCompleteData {
     }
 
     public void setRequestId(String v) {
-        this.requestId = QueryData.orEmpty(v);
+        this.requestId = orEmpty(v);
     }
 
     public Map<String, Object> getExtra() {

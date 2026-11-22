@@ -12,6 +12,11 @@ package com.ragagent.framework.event.payload;
 
 public class UserMessageInjectedData {
 
+    private static String orEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+
     /** 与排队的 steer 事件关联 */
     private String steerId = "";
 
@@ -29,10 +34,10 @@ public class UserMessageInjectedData {
 
     public UserMessageInjectedData(String steerId, String content, String messageId,
                                    String userMessageId) {
-        this.steerId = QueryData.orEmpty(steerId);
-        this.content = QueryData.orEmpty(content);
-        this.messageId = QueryData.orEmpty(messageId);
-        this.userMessageId = QueryData.orEmpty(userMessageId);
+        this.steerId = orEmpty(steerId);
+        this.content = orEmpty(content);
+        this.messageId = orEmpty(messageId);
+        this.userMessageId = orEmpty(userMessageId);
     }
 
     public String getSteerId() {
@@ -40,7 +45,7 @@ public class UserMessageInjectedData {
     }
 
     public void setSteerId(String v) {
-        this.steerId = QueryData.orEmpty(v);
+        this.steerId = orEmpty(v);
     }
 
     public String getContent() {
@@ -48,7 +53,7 @@ public class UserMessageInjectedData {
     }
 
     public void setContent(String v) {
-        this.content = QueryData.orEmpty(v);
+        this.content = orEmpty(v);
     }
 
     public String getMessageId() {
@@ -56,7 +61,7 @@ public class UserMessageInjectedData {
     }
 
     public void setMessageId(String v) {
-        this.messageId = QueryData.orEmpty(v);
+        this.messageId = orEmpty(v);
     }
 
     public String getUserMessageId() {
@@ -64,6 +69,6 @@ public class UserMessageInjectedData {
     }
 
     public void setUserMessageId(String v) {
-        this.userMessageId = QueryData.orEmpty(v);
+        this.userMessageId = orEmpty(v);
     }
 }

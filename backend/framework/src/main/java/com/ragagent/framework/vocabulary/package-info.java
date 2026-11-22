@@ -15,18 +15,15 @@
  *       {@code MentionedItem}、{@code UsedMemory}、{@code MessageExecutionContext}、
  *       {@code SessionLastRequestState}、{@code SuggestionItem}、{@code SuggestionAttribution}、
  *       {@code SseSink}、{@code PipelineMessageAttachmentView}</li>
- *   <li><b>Agent 执行</b>：{@code AgentStep}、{@code AgentToolCall}、{@code ToolCallTarget}、
- *       {@code SearchAuth}</li>
+ *   <li><b>Agent 执行</b>：{@code AgentStep}、{@code AgentToolCall}、{@code ToolCallTarget}</li>
  *   <li><b>检索与图谱</b>：{@code SearchResult}、{@code SearchTarget}、
  *       {@code GraphNode}、{@code GraphRelation}</li>
  *   <li><b>知识</b>：{@code ChunkFacts}、{@code ChunkView}、{@code KnowledgeView}、
- *       {@code FaqChunkMetadata}、{@code KnowledgeBaseFacts}、{@code KnowledgeBaseGateway}、
- *       {@code WikiLanguageSupport}</li>
+ *       {@code KnowledgeBaseFacts}、{@code KnowledgeBaseGateway}</li>
  *   <li><b>工具与记忆</b>：{@code ToolResult}、{@code MemoryKeys}、{@code MemoryKinds}</li>
  * </ul>
  *
- * <p>行为较重的成员（{@code SearchAuth} 的作用域判定、{@code WikiLanguageSupport} 的语言解析、
- * {@code MemoryKeys} 的键解析、{@code FaqChunkMetadata} 的编解码）计划随属主能力包一起下沉，
- * 本包最终只留数据形状。</p>
+ * <p>行为较重的成员（{@code MemoryKeys} 的键解析）计划随属主能力包一起下沉，
+ * 本包最终只留数据形状。检索鉴权/FAQ 元数据/wiki 语言解析已落 {@code framework.content}。</p>
  */
 package com.ragagent.framework.vocabulary;

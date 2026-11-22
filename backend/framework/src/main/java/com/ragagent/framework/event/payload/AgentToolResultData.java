@@ -14,6 +14,11 @@ import java.util.Map;
 
 public class AgentToolResultData {
 
+    private static String orEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+
     /** 工具调用 ID（追踪用） */
     private String toolCallId = "";
 
@@ -41,10 +46,10 @@ public class AgentToolResultData {
     public AgentToolResultData(String toolCallId, String toolName, String output, String error,
                                boolean success, long durationMs, int iteration,
                                Map<String, Object> data) {
-        this.toolCallId = QueryData.orEmpty(toolCallId);
-        this.toolName = QueryData.orEmpty(toolName);
-        this.output = QueryData.orEmpty(output);
-        this.error = QueryData.orEmpty(error);
+        this.toolCallId = orEmpty(toolCallId);
+        this.toolName = orEmpty(toolName);
+        this.output = orEmpty(output);
+        this.error = orEmpty(error);
         this.success = success;
         this.durationMs = durationMs;
         this.iteration = iteration;
@@ -56,7 +61,7 @@ public class AgentToolResultData {
     }
 
     public void setToolCallId(String v) {
-        this.toolCallId = QueryData.orEmpty(v);
+        this.toolCallId = orEmpty(v);
     }
 
     public String getToolName() {
@@ -64,7 +69,7 @@ public class AgentToolResultData {
     }
 
     public void setToolName(String v) {
-        this.toolName = QueryData.orEmpty(v);
+        this.toolName = orEmpty(v);
     }
 
     public String getOutput() {
@@ -72,7 +77,7 @@ public class AgentToolResultData {
     }
 
     public void setOutput(String v) {
-        this.output = QueryData.orEmpty(v);
+        this.output = orEmpty(v);
     }
 
     public String getError() {
@@ -80,7 +85,7 @@ public class AgentToolResultData {
     }
 
     public void setError(String v) {
-        this.error = QueryData.orEmpty(v);
+        this.error = orEmpty(v);
     }
 
     public boolean isSuccess() {

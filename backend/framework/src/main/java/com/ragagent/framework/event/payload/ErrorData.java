@@ -10,6 +10,11 @@ import java.util.Map;
 
 public class ErrorData {
 
+    private static String orEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+
     private String error = "";
 
     /** 空串省略 */
@@ -31,11 +36,11 @@ public class ErrorData {
 
     public ErrorData(String error, String errorCode, String stage, String sessionId,
                      String query, Map<String, Object> extra) {
-        this.error = QueryData.orEmpty(error);
-        this.errorCode = QueryData.orEmpty(errorCode);
-        this.stage = QueryData.orEmpty(stage);
-        this.sessionId = QueryData.orEmpty(sessionId);
-        this.query = QueryData.orEmpty(query);
+        this.error = orEmpty(error);
+        this.errorCode = orEmpty(errorCode);
+        this.stage = orEmpty(stage);
+        this.sessionId = orEmpty(sessionId);
+        this.query = orEmpty(query);
         this.extra = extra;
     }
 
@@ -44,7 +49,7 @@ public class ErrorData {
     }
 
     public void setError(String v) {
-        this.error = QueryData.orEmpty(v);
+        this.error = orEmpty(v);
     }
 
     public String getErrorCode() {
@@ -52,7 +57,7 @@ public class ErrorData {
     }
 
     public void setErrorCode(String v) {
-        this.errorCode = QueryData.orEmpty(v);
+        this.errorCode = orEmpty(v);
     }
 
     public String getStage() {
@@ -60,7 +65,7 @@ public class ErrorData {
     }
 
     public void setStage(String v) {
-        this.stage = QueryData.orEmpty(v);
+        this.stage = orEmpty(v);
     }
 
     public String getSessionId() {
@@ -68,7 +73,7 @@ public class ErrorData {
     }
 
     public void setSessionId(String v) {
-        this.sessionId = QueryData.orEmpty(v);
+        this.sessionId = orEmpty(v);
     }
 
     public String getQuery() {
@@ -76,7 +81,7 @@ public class ErrorData {
     }
 
     public void setQuery(String v) {
-        this.query = QueryData.orEmpty(v);
+        this.query = orEmpty(v);
     }
 
     public Map<String, Object> getExtra() {

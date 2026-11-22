@@ -13,6 +13,11 @@ import java.util.Map;
 
 public class AgentToolCallData {
 
+    private static String orEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+
     /** 工具调用 ID（追踪用） */
     private String toolCallId = "";
 
@@ -31,11 +36,11 @@ public class AgentToolCallData {
 
     public AgentToolCallData(String toolCallId, String toolName, Map<String, Object> arguments,
                              int iteration, String hint) {
-        this.toolCallId = QueryData.orEmpty(toolCallId);
-        this.toolName = QueryData.orEmpty(toolName);
+        this.toolCallId = orEmpty(toolCallId);
+        this.toolName = orEmpty(toolName);
         this.arguments = arguments;
         this.iteration = iteration;
-        this.hint = QueryData.orEmpty(hint);
+        this.hint = orEmpty(hint);
     }
 
     public String getToolCallId() {
@@ -43,7 +48,7 @@ public class AgentToolCallData {
     }
 
     public void setToolCallId(String v) {
-        this.toolCallId = QueryData.orEmpty(v);
+        this.toolCallId = orEmpty(v);
     }
 
     public String getToolName() {
@@ -51,7 +56,7 @@ public class AgentToolCallData {
     }
 
     public void setToolName(String v) {
-        this.toolName = QueryData.orEmpty(v);
+        this.toolName = orEmpty(v);
     }
 
     public Map<String, Object> getArguments() {
@@ -75,6 +80,6 @@ public class AgentToolCallData {
     }
 
     public void setHint(String v) {
-        this.hint = QueryData.orEmpty(v);
+        this.hint = orEmpty(v);
     }
 }

@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * providerMetadata 的形状转换：llm 协议面树形（{@code Map<String, JsonNode>}）⇄ 契约面不透明
- * （{@code Map<String, Object>}——{@code AgentToolCall#providerMetadata}，jsonb 读回时值是 Map/List 形态）。
+ * （{@code Map<String, Object>}——agent 工具调用的 {@code providerMetadata}，jsonb 读回时值是 Map/List 形态）。
  *
  * <p>契约载荷以 {@code Object} 持不透明 JSON；进出 llm 协议面时在此归一：
  * 出（契约→llm）逐值转树；入（llm→契约）浅拷贝（值本就是树实例）。</p>

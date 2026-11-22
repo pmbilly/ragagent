@@ -64,23 +64,6 @@ public final class ContractJsonMixinsEvent {
 
     }
 
-    /** AgentPlanData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    public abstract static class AgentPlanDataMixin {
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private long durationMs;
-
-    }
-
-    /** AgentQueryData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    public abstract static class AgentQueryDataMixin {
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private String requestId;
-
-        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private Map<String, Object> extra;
-
-    }
-
     /** AgentToolCallData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
     public abstract static class AgentToolCallDataMixin {
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -101,34 +84,6 @@ public final class ContractJsonMixinsEvent {
 
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         private Map<String, Object> data;
-
-    }
-
-    /** ChatData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    public abstract static class ChatDataMixin {
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private String response;
-
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private String streamChunk;
-
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private int tokenCount;
-
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private long durationMs;
-
-        @JsonProperty("isStream")
-        private boolean isStream;
-
-        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private Map<String, Object> extra;
-
-        @JsonProperty("isStream")
-        abstract public boolean isStream();
-
-        @JsonProperty("isStream")
-        abstract public void setStream(boolean v);
 
     }
 
@@ -172,58 +127,6 @@ public final class ContractJsonMixinsEvent {
 
         @JsonInclude(JsonInclude.Include.NON_DEFAULT)
         private boolean canceled;
-
-    }
-
-    /** MergeData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    public abstract static class MergeDataMixin {
-        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private Object results;
-
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private long durationMs;
-
-        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private Map<String, Object> extra;
-
-    }
-
-    /** QueryData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    public abstract static class QueryDataMixin {
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private String rewrittenQuery;
-
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private String userId;
-
-        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private Map<String, Object> extra;
-
-    }
-
-    /** RerankData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    public abstract static class RerankDataMixin {
-        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private Object results;
-
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private long durationMs;
-
-        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private Map<String, Object> extra;
-
-    }
-
-    /** RetrievalData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    public abstract static class RetrievalDataMixin {
-        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private Object results;
-
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private long durationMs;
-
-        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private Map<String, Object> extra;
 
     }
 

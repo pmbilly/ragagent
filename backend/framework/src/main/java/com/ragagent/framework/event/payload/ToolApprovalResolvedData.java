@@ -11,6 +11,11 @@ package com.ragagent.framework.event.payload;
 
 public class ToolApprovalResolvedData {
 
+    private static String orEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+
     private String pendingId = "";
 
     /** false 恒输出 */
@@ -30,9 +35,9 @@ public class ToolApprovalResolvedData {
 
     public ToolApprovalResolvedData(String pendingId, boolean approved, String reason,
                                     boolean timedOut, boolean canceled) {
-        this.pendingId = QueryData.orEmpty(pendingId);
+        this.pendingId = orEmpty(pendingId);
         this.approved = approved;
-        this.reason = QueryData.orEmpty(reason);
+        this.reason = orEmpty(reason);
         this.timedOut = timedOut;
         this.canceled = canceled;
     }
@@ -42,7 +47,7 @@ public class ToolApprovalResolvedData {
     }
 
     public void setPendingId(String v) {
-        this.pendingId = QueryData.orEmpty(v);
+        this.pendingId = orEmpty(v);
     }
 
     public boolean isApproved() {
@@ -58,7 +63,7 @@ public class ToolApprovalResolvedData {
     }
 
     public void setReason(String v) {
-        this.reason = QueryData.orEmpty(v);
+        this.reason = orEmpty(v);
     }
 
     public boolean isTimedOut() {

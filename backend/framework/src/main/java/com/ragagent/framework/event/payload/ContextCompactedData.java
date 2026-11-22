@@ -12,6 +12,11 @@ package com.ragagent.framework.event.payload;
 
 public class ContextCompactedData {
 
+    private static String orEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+
     /** threshold | overflow */
     private String reason = "";
 
@@ -39,13 +44,13 @@ public class ContextCompactedData {
     public ContextCompactedData(String reason, int round, int tokensBefore, int tokensAfter,
                                 int messagesBefore, int messagesAfter, String summary,
                                 boolean degraded, boolean splitTurn) {
-        this.reason = QueryData.orEmpty(reason);
+        this.reason = orEmpty(reason);
         this.round = round;
         this.tokensBefore = tokensBefore;
         this.tokensAfter = tokensAfter;
         this.messagesBefore = messagesBefore;
         this.messagesAfter = messagesAfter;
-        this.summary = QueryData.orEmpty(summary);
+        this.summary = orEmpty(summary);
         this.degraded = degraded;
         this.splitTurn = splitTurn;
     }
@@ -55,7 +60,7 @@ public class ContextCompactedData {
     }
 
     public void setReason(String v) {
-        this.reason = QueryData.orEmpty(v);
+        this.reason = orEmpty(v);
     }
 
     public int getRound() {
@@ -103,7 +108,7 @@ public class ContextCompactedData {
     }
 
     public void setSummary(String v) {
-        this.summary = QueryData.orEmpty(v);
+        this.summary = orEmpty(v);
     }
 
     public boolean isDegraded() {

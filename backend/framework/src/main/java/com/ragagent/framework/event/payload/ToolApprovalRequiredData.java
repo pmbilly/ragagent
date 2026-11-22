@@ -16,6 +16,11 @@ package com.ragagent.framework.event.payload;
 
 public class ToolApprovalRequiredData {
 
+    private static String orEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+
     private String pendingId = "";
 
     /** 0 恒输出 */
@@ -59,21 +64,21 @@ public class ToolApprovalRequiredData {
                                     String mcpToolName, String registeredToolName, String description,
                                     Object args, String argsJson, int timeoutSeconds,
                                     long requestedAtUnix, String toolCallId, String requestId) {
-        this.pendingId = QueryData.orEmpty(pendingId);
+        this.pendingId = orEmpty(pendingId);
         this.tenantId = tenantId;
-        this.sessionId = QueryData.orEmpty(sessionId);
-        this.assistantMessageId = QueryData.orEmpty(assistantMessageId);
-        this.serviceId = QueryData.orEmpty(serviceId);
-        this.serviceName = QueryData.orEmpty(serviceName);
-        this.mcpToolName = QueryData.orEmpty(mcpToolName);
-        this.registeredToolName = QueryData.orEmpty(registeredToolName);
-        this.description = QueryData.orEmpty(description);
+        this.sessionId = orEmpty(sessionId);
+        this.assistantMessageId = orEmpty(assistantMessageId);
+        this.serviceId = orEmpty(serviceId);
+        this.serviceName = orEmpty(serviceName);
+        this.mcpToolName = orEmpty(mcpToolName);
+        this.registeredToolName = orEmpty(registeredToolName);
+        this.description = orEmpty(description);
         this.args = args;
-        this.argsJson = QueryData.orEmpty(argsJson);
+        this.argsJson = orEmpty(argsJson);
         this.timeoutSeconds = timeoutSeconds;
         this.requestedAtUnix = requestedAtUnix;
-        this.toolCallId = QueryData.orEmpty(toolCallId);
-        this.requestId = QueryData.orEmpty(requestId);
+        this.toolCallId = orEmpty(toolCallId);
+        this.requestId = orEmpty(requestId);
     }
 
     public String getPendingId() {
@@ -81,7 +86,7 @@ public class ToolApprovalRequiredData {
     }
 
     public void setPendingId(String v) {
-        this.pendingId = QueryData.orEmpty(v);
+        this.pendingId = orEmpty(v);
     }
 
     public long getTenantId() {
@@ -97,7 +102,7 @@ public class ToolApprovalRequiredData {
     }
 
     public void setSessionId(String v) {
-        this.sessionId = QueryData.orEmpty(v);
+        this.sessionId = orEmpty(v);
     }
 
     public String getAssistantMessageId() {
@@ -105,7 +110,7 @@ public class ToolApprovalRequiredData {
     }
 
     public void setAssistantMessageId(String v) {
-        this.assistantMessageId = QueryData.orEmpty(v);
+        this.assistantMessageId = orEmpty(v);
     }
 
     public String getServiceId() {
@@ -113,7 +118,7 @@ public class ToolApprovalRequiredData {
     }
 
     public void setServiceId(String v) {
-        this.serviceId = QueryData.orEmpty(v);
+        this.serviceId = orEmpty(v);
     }
 
     public String getServiceName() {
@@ -121,7 +126,7 @@ public class ToolApprovalRequiredData {
     }
 
     public void setServiceName(String v) {
-        this.serviceName = QueryData.orEmpty(v);
+        this.serviceName = orEmpty(v);
     }
 
     public String getMcpToolName() {
@@ -129,7 +134,7 @@ public class ToolApprovalRequiredData {
     }
 
     public void setMcpToolName(String v) {
-        this.mcpToolName = QueryData.orEmpty(v);
+        this.mcpToolName = orEmpty(v);
     }
 
     public String getRegisteredToolName() {
@@ -137,7 +142,7 @@ public class ToolApprovalRequiredData {
     }
 
     public void setRegisteredToolName(String v) {
-        this.registeredToolName = QueryData.orEmpty(v);
+        this.registeredToolName = orEmpty(v);
     }
 
     public String getDescription() {
@@ -145,7 +150,7 @@ public class ToolApprovalRequiredData {
     }
 
     public void setDescription(String v) {
-        this.description = QueryData.orEmpty(v);
+        this.description = orEmpty(v);
     }
 
     public Object getArgs() {
@@ -161,7 +166,7 @@ public class ToolApprovalRequiredData {
     }
 
     public void setArgsJson(String v) {
-        this.argsJson = QueryData.orEmpty(v);
+        this.argsJson = orEmpty(v);
     }
 
     public int getTimeoutSeconds() {
@@ -185,7 +190,7 @@ public class ToolApprovalRequiredData {
     }
 
     public void setToolCallId(String v) {
-        this.toolCallId = QueryData.orEmpty(v);
+        this.toolCallId = orEmpty(v);
     }
 
     public String getRequestId() {
@@ -193,6 +198,6 @@ public class ToolApprovalRequiredData {
     }
 
     public void setRequestId(String v) {
-        this.requestId = QueryData.orEmpty(v);
+        this.requestId = orEmpty(v);
     }
 }

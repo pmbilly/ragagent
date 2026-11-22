@@ -12,6 +12,11 @@ package com.ragagent.framework.event.payload;
 
 public class AgentFinalAnswerData {
 
+    private static String orEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+
     private String content = "";
 
     /** false 恒输出（Done:true 是收尾标记） */
@@ -32,7 +37,7 @@ public class AgentFinalAnswerData {
     }
 
     public AgentFinalAnswerData(String content, boolean done, boolean isFallback) {
-        this.content = QueryData.orEmpty(content);
+        this.content = orEmpty(content);
         this.done = done;
         this.isFallback = isFallback;
     }
@@ -42,7 +47,7 @@ public class AgentFinalAnswerData {
     }
 
     public void setContent(String v) {
-        this.content = QueryData.orEmpty(v);
+        this.content = orEmpty(v);
     }
 
     public boolean isDone() {

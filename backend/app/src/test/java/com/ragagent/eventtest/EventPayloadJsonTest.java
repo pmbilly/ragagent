@@ -7,20 +7,13 @@ import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.framework.event.payload.AgentActionData;
 import com.ragagent.framework.event.payload.AgentCompleteData;
 import com.ragagent.framework.event.payload.AgentFinalAnswerData;
-import com.ragagent.framework.event.payload.AgentPlanData;
-import com.ragagent.framework.event.payload.AgentQueryData;
 import com.ragagent.framework.event.payload.AgentThoughtData;
 import com.ragagent.framework.event.payload.AgentToolCallData;
 import com.ragagent.framework.event.payload.AgentToolResultData;
-import com.ragagent.framework.event.payload.ChatData;
 import com.ragagent.framework.event.payload.ContextCompactedData;
 import com.ragagent.framework.event.payload.ErrorData;
 import com.ragagent.framework.event.payload.MCPOAuthRequiredData;
 import com.ragagent.framework.event.payload.MCPOAuthResolvedData;
-import com.ragagent.framework.event.payload.MergeData;
-import com.ragagent.framework.event.payload.QueryData;
-import com.ragagent.framework.event.payload.RerankData;
-import com.ragagent.framework.event.payload.RetrievalData;
 import com.ragagent.framework.event.payload.StopData;
 import com.ragagent.framework.event.payload.ToolApprovalRequiredData;
 import com.ragagent.framework.event.payload.ToolApprovalResolvedData;
@@ -80,128 +73,6 @@ class EventPayloadJsonTest {
         return new ArrayList<>(List.of(items));
     }
 
-    // ===== QueryData =====
-
-    @Test
-    void queryDataZero() {
-        // Go: {"originalQuery":"","sessionId":""}
-        assertSemantic("{\"originalQuery\":\"\",\"sessionId\":\"\"}", write(new QueryData()));
-    }
-
-    @Test
-    void queryDataFull() {
-        // Go: {"originalQuery":"What is \u003cRAG\u003e \u0026 why?","rewrittenQuery":"explain retrieval-augmented generation",
-        //      "sessionId":"sess-1","userId":"u-1","extra":{"alpha":true,"mid":"m","zebra":1}}
-        QueryData d = new QueryData();
-        d.setOriginalQuery("What is <RAG> & why?");
-        d.setRewrittenQuery("explain retrieval-augmented generation");
-        d.setSessionId("sess-1");
-        d.setUserId("u-1");
-        // 刻意乱序插入：序列化按键名字母序输出
-        d.setExtra(mapOf("zebra", 1, "alpha", true, "mid", "m"));
-        assertSemantic("{\"originalQuery\":\"What is <RAG> & why?\","
-                + "\"rewrittenQuery\":\"explain retrieval-augmented generation\","
-                + "\"sessionId\":\"sess-1\",\"userId\":\"u-1\","
-                + "\"extra\":{\"alpha\":true,\"mid\":\"m\",\"zebra\":1}}", write(d));
-    }
-
-    @Test
-    void queryDataEmptyExtraOmitted() {
-        // Go: {"originalQuery":"q","sessionId":"s"}——空 map 也被 omitempty 省略
-        QueryData d = new QueryData("q", "", "s", "", new LinkedHashMap<>());
-        assertSemantic("{\"originalQuery\":\"q\",\"sessionId\":\"s\"}", write(d));
-    }
-
-    // ===== RetrievalData =====
-
-    @Test
-    void retrievalDataZero() {
-        // Go: {"query":"","knowledgeBaseId":"","topK":0,"threshold":0,"retrievalType":"","resultCount":0}
-        assertSemantic("{\"query\":\"\",\"knowledgeBaseId\":\"\",\"topK\":0,\"threshold\":0,"
-                + "\"retrievalType\":\"\",\"resultCount\":0}", write(new RetrievalData()));
-    }
-
-    @Test
-    void retrievalDataFull() {
-        // Go: {"query":"q","knowledgeBaseId":"kb-1","topK":10,"threshold":0.5,"retrievalType":"vector",
-        //      "resultCount":2,"results":[{"content":"c","score":0.9}],"durationMs":123,"extra":{"k":"v"}}
-        RetrievalData d = new RetrievalData();
-        d.setQuery("q");
-        d.setKnowledgeBaseId("kb-1");
-        d.setTopK(10);
-        d.setThreshold(0.5);
-        d.setRetrievalType("vector");
-        d.setResultCount(2);
-        d.setResults(listOf(mapOf("score", 0.9, "content", "c")));
-        d.setDurationMs(123);
-        d.setExtra(mapOf("k", "v"));
-        assertSemantic("{\"query\":\"q\",\"knowledgeBaseId\":\"kb-1\",\"topK\":10,\"threshold\":0.5,"
-                + "\"retrievalType\":\"vector\",\"resultCount\":2,"
-                + "\"results\":[{\"content\":\"c\",\"score\":0.9}],\"durationMs\":123,\"extra\":{\"k\":\"v\"}}",
-                write(d));
-    }
-
-    @Test
-    void retrievalDataZeroThresholdAlwaysOutput() {
-        // Go: {"query":"q","knowledgeBaseId":"kb","topK":0,"threshold":0,"retrievalType":"keyword","resultCount":0}
-        // threshold 无 omitempty：0 也输出
-        RetrievalData d = new RetrievalData("q", "kb", 0, 0.0, "keyword", 0, null, 0, null);
-        assertSemantic("{\"query\":\"q\",\"knowledgeBaseId\":\"kb\",\"topK\":0,\"threshold\":0,"
-                + "\"retrievalType\":\"keyword\",\"resultCount\":0}", write(d));
-    }
-
-    // ===== RerankData =====
-
-    @Test
-    void rerankDataZero() {
-        // Go: {"query":"","inputCount":0,"outputCount":0,"modelId":"","threshold":0}
-        assertSemantic("{\"query\":\"\",\"inputCount\":0,\"outputCount\":0,\"modelId\":\"\",\"threshold\":0}",
-                write(new RerankData()));
-    }
-
-    @Test
-    void rerankDataFull() {
-        // Go: {"query":"q","inputCount":10,"outputCount":5,"modelId":"m-1","threshold":0.3,
-        //      "results":["a","b"],"durationMs":45}
-        RerankData d = new RerankData("q", 10, 5, "m-1", 0.3, new ArrayList<>(List.of("a", "b")), 45, null);
-        assertSemantic("{\"query\":\"q\",\"inputCount\":10,\"outputCount\":5,\"modelId\":\"m-1\","
-                + "\"threshold\":0.3,\"results\":[\"a\",\"b\"],\"durationMs\":45}", write(d));
-    }
-
-    // ===== MergeData =====
-
-    @Test
-    void mergeDataZero() {
-        // Go: {"inputCount":0,"outputCount":0,"mergeType":""}
-        assertSemantic("{\"inputCount\":0,\"outputCount\":0,\"mergeType\":\"\"}", write(new MergeData()));
-    }
-
-    @Test
-    void mergeDataFull() {
-        // Go: {"inputCount":3,"outputCount":2,"mergeType":"dedup","results":[1,2],"durationMs":7}
-        MergeData d = new MergeData(3, 2, "dedup", new ArrayList<>(List.of(1, 2)), 7, null);
-        assertSemantic("{\"inputCount\":3,\"outputCount\":2,\"mergeType\":\"dedup\","
-                + "\"results\":[1,2],\"durationMs\":7}", write(d));
-    }
-
-    // ===== ChatData =====
-
-    @Test
-    void chatDataZero() {
-        // Go: {"query":"","modelId":"","isStream":false}——is_stream 无 omitempty
-        assertSemantic("{\"query\":\"\",\"modelId\":\"\",\"isStream\":false}", write(new ChatData()));
-    }
-
-    @Test
-    void chatDataFull() {
-        // Go: {"query":"q","modelId":"m","response":"r","streamChunk":"sc","tokenCount":42,
-        //      "durationMs":99,"isStream":true,"extra":{"a":1.5}}
-        ChatData d = new ChatData("q", "m", "r", "sc", 42, 99, true, mapOf("a", 1.5));
-        assertSemantic("{\"query\":\"q\",\"modelId\":\"m\",\"response\":\"r\",\"streamChunk\":\"sc\","
-                + "\"tokenCount\":42,\"durationMs\":99,\"isStream\":true,\"extra\":{\"a\":1.5}}",
-                write(d));
-    }
-
     // ===== ErrorData =====
 
     @Test
@@ -219,31 +90,6 @@ class EventPayloadJsonTest {
         assertSemantic("{\"error\":\"boom <x>&\",\"errorCode\":\"E-1\","
                 + "\"stage\":\"agent_execution\",\"sessionId\":\"s-1\",\"query\":\"q\","
                 + "\"extra\":{\"attempt\":2}}", write(d));
-    }
-
-    // ===== AgentPlanData =====
-
-    @Test
-    void agentPlanDataZero() {
-        // Go: {"query":"","plan":null}——plan 无 omitempty：nil slice 输出 null
-        assertSemantic("{\"query\":\"\",\"plan\":null}", write(new AgentPlanData()));
-    }
-
-    @Test
-    void agentPlanDataFull() {
-        // Go: {"query":"q","plan":["step1","step2"],"durationMs":5}
-        AgentPlanData d = new AgentPlanData("q", new ArrayList<>(List.of("step1", "step2")), 5);
-        assertSemantic("{\"query\":\"q\",\"plan\":[\"step1\",\"step2\"],\"durationMs\":5}", write(d));
-    }
-
-    @Test
-    void agentPlanDataNilVsEmptyPlan() {
-        // Go: nilPlan => {"query":"q","plan":null,"durationMs":5}
-        assertSemantic("{\"query\":\"q\",\"plan\":null,\"durationMs\":5}",
-                write(new AgentPlanData("q", null, 5)));
-        // Go: emptyPlan => {"query":"q","plan":[],"durationMs":5}
-        assertSemantic("{\"query\":\"q\",\"plan\":[],\"durationMs\":5}",
-                write(new AgentPlanData("q", new ArrayList<>(), 5)));
     }
 
     // ===== AgentActionData =====
@@ -275,22 +121,6 @@ class EventPayloadJsonTest {
         assertSemantic("{\"iteration\":1,\"toolName\":\"web_search\",\"toolInput\":null,"
                 + "\"toolOutput\":\"out\",\"success\":false,\"error\":\"timeout\",\"durationMs\":120}",
                 write(d));
-    }
-
-    // ===== AgentQueryData =====
-
-    @Test
-    void agentQueryDataZero() {
-        // Go: {"sessionId":"","query":""}
-        assertSemantic("{\"sessionId\":\"\",\"query\":\"\"}", write(new AgentQueryData()));
-    }
-
-    @Test
-    void agentQueryDataFull() {
-        // Go: {"sessionId":"s","query":"q","requestId":"r-1","extra":{"src":"embed"}}
-        AgentQueryData d = new AgentQueryData("s", "q", "r-1", mapOf("src", "embed"));
-        assertSemantic("{\"sessionId\":\"s\",\"query\":\"q\",\"requestId\":\"r-1\","
-                + "\"extra\":{\"src\":\"embed\"}}", write(d));
     }
 
     // ===== AgentCompleteData =====

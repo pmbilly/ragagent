@@ -11,6 +11,11 @@ package com.ragagent.framework.event.payload;
 
 public class MCPOAuthResolvedData {
 
+    private static String orEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+
     private String pendingId = "";
 
     private String serviceId = "";
@@ -32,10 +37,10 @@ public class MCPOAuthResolvedData {
 
     public MCPOAuthResolvedData(String pendingId, String serviceId, boolean authorized,
                                 String reason, boolean timedOut, boolean canceled) {
-        this.pendingId = QueryData.orEmpty(pendingId);
-        this.serviceId = QueryData.orEmpty(serviceId);
+        this.pendingId = orEmpty(pendingId);
+        this.serviceId = orEmpty(serviceId);
         this.authorized = authorized;
-        this.reason = QueryData.orEmpty(reason);
+        this.reason = orEmpty(reason);
         this.timedOut = timedOut;
         this.canceled = canceled;
     }
@@ -45,7 +50,7 @@ public class MCPOAuthResolvedData {
     }
 
     public void setPendingId(String v) {
-        this.pendingId = QueryData.orEmpty(v);
+        this.pendingId = orEmpty(v);
     }
 
     public String getServiceId() {
@@ -53,7 +58,7 @@ public class MCPOAuthResolvedData {
     }
 
     public void setServiceId(String v) {
-        this.serviceId = QueryData.orEmpty(v);
+        this.serviceId = orEmpty(v);
     }
 
     public boolean isAuthorized() {
@@ -69,7 +74,7 @@ public class MCPOAuthResolvedData {
     }
 
     public void setReason(String v) {
-        this.reason = QueryData.orEmpty(v);
+        this.reason = orEmpty(v);
     }
 
     public boolean isTimedOut() {

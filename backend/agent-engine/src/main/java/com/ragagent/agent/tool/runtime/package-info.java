@@ -1,6 +1,6 @@
 /**
- * 工具运行时横切件（不放具体工具）：{@code SearchAuth}（检索范围鉴权）、
- * {@code ToolResultPersist}（工具结果的客户端 / 存储投影）、{@code MessageSanitizer} 与
+ * 工具运行时横切件（不放具体工具）：{@code ToolResultPersist}（工具结果的客户端 / 存储投影）、
+ * {@code MessageSanitizer} 与
  * {@code ThinkBlocks} / {@code ThinkStreamSplitter}（消息与思考块清洗 / 切分）、
  * {@code NormalizeToolCallId}（工具调用 id 归一）、{@code JsonRepair}（模型 JSON 修复）、
  * {@code PythonSyntax}（数据分析工具的 Python 语法辅助）。

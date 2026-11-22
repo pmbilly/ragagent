@@ -10,6 +10,11 @@ package com.ragagent.framework.event.payload;
 
 public class StopData {
 
+    private static String orEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+
     private String sessionId = "";
 
     private String messageId = "";
@@ -21,9 +26,9 @@ public class StopData {
     }
 
     public StopData(String sessionId, String messageId, String reason) {
-        this.sessionId = QueryData.orEmpty(sessionId);
-        this.messageId = QueryData.orEmpty(messageId);
-        this.reason = QueryData.orEmpty(reason);
+        this.sessionId = orEmpty(sessionId);
+        this.messageId = orEmpty(messageId);
+        this.reason = orEmpty(reason);
     }
 
     public String getSessionId() {
@@ -31,7 +36,7 @@ public class StopData {
     }
 
     public void setSessionId(String v) {
-        this.sessionId = QueryData.orEmpty(v);
+        this.sessionId = orEmpty(v);
     }
 
     public String getMessageId() {
@@ -39,7 +44,7 @@ public class StopData {
     }
 
     public void setMessageId(String v) {
-        this.messageId = QueryData.orEmpty(v);
+        this.messageId = orEmpty(v);
     }
 
     public String getReason() {
@@ -47,6 +52,6 @@ public class StopData {
     }
 
     public void setReason(String v) {
-        this.reason = QueryData.orEmpty(v);
+        this.reason = orEmpty(v);
     }
 }

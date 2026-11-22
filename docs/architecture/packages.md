@@ -14,7 +14,7 @@
 | `:backend` | `com.ragagent.agent.skills` | 指令型技能：SKILL.md 解析（Skill/Frontmatter）、宿主目录加载与技能管理器（提示词注入路径）。 |
 | `:backend` | `com.ragagent.agent.skills.mapper` | 技能 · 映射：SkillMapper。 |
 | `:backend` | `com.ragagent.agent.tool` | Agent 运行面的**工具框架**（`agent.tool/`）：工具契约与基类、定义与 schema、注册表、 参数校验与投射、执行上下文与预算、输出持久化、取消与能力标记、通用单件工具。 |
-| `:backend` | `com.ragagent.agent.tool.runtime` | 工具运行时横切件（不放具体工具）：SearchAuth（检索范围鉴权）、 ToolResultPersist（工具结果的客户端 / 存储投影）、MessageSanitizer 与 ThinkBloc |
+| `:backend` | `com.ragagent.agent.tool.runtime` | 工具运行时横切件（不放具体工具）：ToolResultPersist（工具结果的客户端 / 存储投影）、 MessageSanitizer 与 ThinkBlocks / ThinkStreamSpl |
 | `:backend` | `com.ragagent.agentengine.api` | Agent 引擎的对外契约：执行请求/句柄/工厂、工具能力、技能目录、预算与流式信号。 |
 | `:backend` | `com.ragagent.agentengine.json` | Agent 面契约载荷的 Jackson 装配（mixin 与注册表）。 |
 | `:backend` | `com.ragagent.agentmanagement` | 智能体管理面：内建智能体注册表与类型预设、自定义智能体 CRUD（custom_agents）、 技能目录、推荐问题流与 agent config jsonb。 |
@@ -306,7 +306,7 @@
 | `:backend` | `com.ragagent.retrieval.engine.weaviate` | 引擎 · weaviate：WeaviateRetrieveRepository / WeaviateVectorEmbedding / WeaviateRestClient…。 |
 | `:backend` | `com.ragagent.retrieval.graph` | 检索 · 图谱：Neo4jGraphRepository / Neo4jGraphConfig / Neo4jProperties。 |
 | `:backend` | `com.ragagent.retrieval.json` | 检索与向量库面载荷的 Jackson 装配（mixin 与注册表）。 |
-| `:backend` | `com.ragagent.retrieval.support` | 检索引擎的支撑层：检索文本归一/分词/哈希、chunk 内容拼接、grep 结果视图与打分等无状态算法 （原顶层包 searchutil， 并入）。 |
+| `:backend` | `com.ragagent.retrieval.support` | 检索引擎的支撑层：检索文本归一/分词/哈希、chunk 内容拼接、grep 结果打分等无状态算法 （原顶层包 searchutil， 并入）。 |
 | `:backend` | `com.ragagent.retrieval.telemetry` | 检索 · telemetry：RetrievalObs。 |
 | `:backend` | `com.ragagent.session` | 会话域：会话与消息读写（conversation/）、两条问答入口（知识库问答 / Agent 问答）、 SSE 流桥、附件（attachment/）与会话侧管线（rag/ + assembly/）。 |
 | `:backend` | `com.ragagent.session.adapter` | 会话 · 端口实现：SessionQaAdapter / EmbedSessionAdapter / EmbedSessionOpsAdapter / KnowledgeQaEventAdapter |
