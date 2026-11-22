@@ -1,7 +1,6 @@
 package com.ragagent.framework.knowledge;
 
 import com.ragagent.framework.vocabulary.ChunkFacts;
-import com.ragagent.framework.vocabulary.SearchAuth;
 import com.ragagent.framework.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

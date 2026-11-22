@@ -1,4 +1,4 @@
-package com.ragagent.framework.vocabulary;
+package com.ragagent.framework.tenant;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

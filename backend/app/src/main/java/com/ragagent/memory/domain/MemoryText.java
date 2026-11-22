@@ -2,7 +2,7 @@ package com.ragagent.memory.domain;
 
 import com.ragagent.framework.html.ListMerges;
 import com.ragagent.framework.security.Hashes;
-import com.ragagent.framework.vocabulary.MemoryKeys;
+import com.ragagent.framework.tenant.MemoryKeys;
 import com.ragagent.framework.vocabulary.MemoryKinds;
 import java.util.List;
 import java.util.Locale;

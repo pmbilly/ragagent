@@ -1,6 +1,10 @@
-package com.ragagent.framework.vocabulary;
+package com.ragagent.framework.knowledge;
 
 
+import com.ragagent.framework.vocabulary.ChunkFacts;
+import com.ragagent.framework.vocabulary.ChunkView;
+import com.ragagent.framework.vocabulary.KnowledgeView;
+import com.ragagent.framework.vocabulary.SearchTarget;
 import com.ragagent.framework.vocabulary.SearchTarget.SearchTargets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

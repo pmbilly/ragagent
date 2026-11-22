@@ -2,10 +2,10 @@ package com.ragagent.framework.html;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.framework.knowledge.WikiLanguageSupport;
 import com.ragagent.framework.security.CryptoService;
 import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.framework.storage.config.UploadLimits;
-import com.ragagent.framework.vocabulary.WikiLanguageSupport;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 

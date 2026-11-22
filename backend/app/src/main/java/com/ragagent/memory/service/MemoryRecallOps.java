@@ -1,7 +1,7 @@
 package com.ragagent.memory.service;
 
 import com.ragagent.framework.tenant.MemoryConfig;
-import com.ragagent.framework.vocabulary.MemoryKeys;
+import com.ragagent.framework.tenant.MemoryKeys;
 import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.memory.api.MemoryRecall;
 import com.ragagent.memory.domain.MemoryRender;

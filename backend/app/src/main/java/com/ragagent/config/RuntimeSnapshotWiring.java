@@ -1,6 +1,7 @@
 package com.ragagent.config;
 
 import com.ragagent.framework.config.LanguageProperties;
+import com.ragagent.framework.knowledge.WikiLanguageSupport;
 import com.ragagent.framework.security.CryptoEnvProperties;
 import com.ragagent.framework.security.CryptoService;
 import com.ragagent.framework.security.SsrfGuard;
@@ -8,7 +9,6 @@ import com.ragagent.framework.security.SsrfWhitelistProperties;
 import com.ragagent.framework.storage.config.StorageRuntimeEnv;
 import com.ragagent.framework.storage.config.UploadLimitProperties;
 import com.ragagent.framework.storage.config.UploadLimits;
-import com.ragagent.framework.vocabulary.WikiLanguageSupport;
 import com.ragagent.storage.api.StorageEnvLookup;
 import com.ragagent.storage.config.LocalStorageEnvProperties;
 import com.ragagent.storage.config.ResourceUrlModeProperties;

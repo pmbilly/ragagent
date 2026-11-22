@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.agentengine.api.ToolRequest;
 import com.ragagent.framework.knowledge.DocChunkSupport;
+import com.ragagent.framework.knowledge.SearchAuth;
 import com.ragagent.framework.vocabulary.ChunkFacts;
-import com.ragagent.framework.vocabulary.SearchAuth;
 import com.ragagent.framework.vocabulary.SearchTarget;
 import com.ragagent.framework.vocabulary.ToolResult;
 import java.util.ArrayList;

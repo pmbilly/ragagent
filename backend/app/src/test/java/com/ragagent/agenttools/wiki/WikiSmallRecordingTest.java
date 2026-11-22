@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.fixtures.RecordingSupport;
 import com.ragagent.agent.fixtures.ToolContractGoldenB;
 import com.ragagent.agentengine.api.ToolRequest;
-import com.ragagent.framework.vocabulary.SearchAuth;
+import com.ragagent.framework.knowledge.SearchAuth;
 import com.ragagent.framework.vocabulary.ToolResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

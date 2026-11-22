@@ -3,7 +3,7 @@ package com.ragagent.knowledge.domain.access;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.vocabulary.FaqChunkMetadata;
+import com.ragagent.framework.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;

@@ -1,7 +1,7 @@
 package com.ragagent.memory.domain;
 
 import com.ragagent.framework.html.HtmlText;
-import com.ragagent.framework.vocabulary.MemoryKeys;
+import com.ragagent.framework.tenant.MemoryKeys;
 import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.memory.domain.item.MemoryItem;
 import java.util.ArrayList;

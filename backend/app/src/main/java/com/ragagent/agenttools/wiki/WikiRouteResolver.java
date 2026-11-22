@@ -1,6 +1,6 @@
 package com.ragagent.agenttools.wiki;
 
-import com.ragagent.framework.vocabulary.SearchAuth;
+import com.ragagent.framework.knowledge.SearchAuth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

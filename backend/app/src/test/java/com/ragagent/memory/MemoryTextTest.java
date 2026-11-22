@@ -2,7 +2,7 @@ package com.ragagent.memory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.vocabulary.MemoryKeys;
+import com.ragagent.framework.tenant.MemoryKeys;
 import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.memory.domain.MemoryRender;
 import com.ragagent.memory.domain.MemoryText;

@@ -2,7 +2,7 @@ package com.ragagent.memory.service;
 
 import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.framework.tenant.MemoryConfig;
-import com.ragagent.framework.vocabulary.MemoryKeys;
+import com.ragagent.framework.tenant.MemoryKeys;
 import com.ragagent.framework.vocabulary.MemoryKinds;
 import com.ragagent.memory.config.MemorySettings;
 import com.ragagent.memory.domain.MemoryText;

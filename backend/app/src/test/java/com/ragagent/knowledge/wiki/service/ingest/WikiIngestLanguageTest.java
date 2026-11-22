@@ -3,8 +3,8 @@ package com.ragagent.knowledge.wiki.service.ingest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.knowledge.WikiLanguageSupport;
 import com.ragagent.framework.text.Whitespace;
-import com.ragagent.framework.vocabulary.WikiLanguageSupport;
 import com.ragagent.knowledge.wiki.domain.TaskPendingOp;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestConstants;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiPendingOp;
